@@ -1,5 +1,12 @@
 Revision history for Comics
 
+1.13	019-04-19
+
+	Fix patterns for Buttersafe.
+	Disable GoneIntoRapture, DoodleForFood. They changed their
+	sites and it is no longer possible to fetch the comic.
+	Disable CatsCafeComics. They turned the site into a web shop.
+
 1.12	2019-04-17
 
 	Add --reuse option to reuse saved fetch results (for

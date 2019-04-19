@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Carp;
 
@@ -213,6 +213,51 @@ Plain lexical variables are preserved across an C<await> deferral:
       print $message;
    }
 
+=head3 Cancellation
+
+Cancelled futures cause a suspended C<async sub> to simply stop running.
+
+   async sub fizz
+   {
+      await func();
+      say "This is never reached";
+   }
+
+   my $f = fizz();
+   $f->cancel;
+
+Cancellation requests can propagate backwards into the future the
+C<async sub> is currently waiting on.
+
+   async sub floof
+   {
+      ...
+      await $f1;
+   }
+
+   my $f2 = floof();
+
+   $f2->cancel;  # $f1 will be cancelled too
+
+This behaviour is still more experimental than the rest of the logic. The
+following should be noted:
+
+=over 4
+
+=item *
+
+There is currently no way to perform the equivalent of L<Future/on_cancel>
+to add a cancellation callback to a future chain.
+
+=item *
+
+Cancellation propagation is only implemented on Perl version 5.24 and above.
+An C<async sub> in an earlier perl version will still stop executing if
+cancelled, but will not propagate the request backwards into the future that
+the C<async sub> is currently waiting on. See L</TODO>.
+
+=back
+
 =head2 Things That Don't Yet Work
 
 C<local> variable assignments inside an C<async> function will confuse the
@@ -351,6 +396,15 @@ Support sub signatures in recent perls.
 
 L<https://rt.cpan.org/Ticket/Display.html?id=123465>
 
+=item *
+
+Implement cancel back-propagation for Perl versions earlier than 5.24.
+Currently this does not work due to some as-yet-unknown effects that
+installing the back-propagation has, causing future instances to be reclaimed
+too early.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=129202>
+
 =back
 
 =head1 KNOWN BUGS
@@ -364,11 +418,15 @@ at L<https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait>.
 
 =item *
 
-In some situations, foreach values on computed lists of expressions may lose
-values. A workaround for this is to calculate values ahead of time into a
-lexical array, and iterate over that.
+Warnings and memory leaks when dropping still-pending Futures
 
-L<https://rt.cpan.org/Ticket/Display.html?id=128619>
+L<https://rt.cpan.org/Ticket/Display.html?id=128620>
+
+=item *
+
+Devel::Cover can't see into async subs
+
+L<https://rt.cpan.org/Ticket/Display.html?id=128309>
 
 =back
 

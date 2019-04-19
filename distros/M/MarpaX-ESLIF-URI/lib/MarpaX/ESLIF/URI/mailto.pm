@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::mailto;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Class::Tiny::Antlers;
 use MarpaX::ESLIF;
@@ -134,7 +134,7 @@ MarpaX::ESLIF::URI::mailto - URI::mailto syntax as per RFC6068
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SUBROUTINES/METHODS
 

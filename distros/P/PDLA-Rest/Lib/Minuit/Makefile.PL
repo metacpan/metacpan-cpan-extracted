@@ -167,7 +167,16 @@ minuitlib/libminuit\$(LIB_EXT): minuitlib/minuit\$(OBJ_EXT) minuitlib/intracfals
 	return $orig;
 };
 
+# Remove i386 option for OS X recent versions for better build, dual arch does not work anyway. KG 25/Oct/2015
+my %items;
+if ($Config{osname} =~ /darwin/ && $Config{osvers} >=14) { # OS X Mavericks+
+	print "Forcing single arch build for MINUIT\n";
+	$items{LDDLFLAGS} = $Config{lddlflags};
+	$items{LDDLFLAGS} =~ s/-arch i386/ /g;
+}
+
 WriteMakefile(
  %hash,
  VERSION => "0.1",   # This is overridden by VERSION_FROM in %hash 
+ %items
 );

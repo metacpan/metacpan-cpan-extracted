@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 cPanel, L.L.C.
+# Copyright (c) 2019 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -27,6 +27,21 @@ OpenStack::Client::Auth - OpenStack Keystone authentication and authorization
         'tenant'   => $ENV{'OS_TENANT_NAME'},
         'username' => $ENV{'OS_USERNAME'},
         'password' => $ENV{'OS_PASSWORD'}
+    );
+
+    # or you can also use API v3
+    $auth = OpenStack::Client::Auth->new(
+        $ENV{OS_AUTH_URL},
+        'username' => $ENV{'OS_USERNAME'},
+        'password' => $ENV{'OS_PASSWORD'},
+        'version'  => 3,
+        # provide a scope to get a catalog
+        'scope' => {
+            project => {
+                name => $ENV{'OS_PROJECT_NAME'},
+                domain => { id => 'default' },
+            }
+        }
     );
 
     my $glance = $auth->service('image',
@@ -230,11 +245,11 @@ endpoint is the public endpoint.
 
 =head1 AUTHOR
 
-Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
+Written by Alexandra Hrefna Maheu <xan@cpanel.net>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2018 cPanel, L.L.C.  Released under the terms of the MIT license.
+Copyright (c) 2019 cPanel, L.L.C.  Released under the terms of the MIT license.
 See LICENSE for further details.
 
 =cut

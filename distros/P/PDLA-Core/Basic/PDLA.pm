@@ -139,11 +139,15 @@ start-up modules.
    use PDLA::MatrixOps;
    use PDLA::Math;
    use PDLA::Version;
+   use PDLA::IO::Misc;
+   use PDLA::IO::FITS;
+   use PDLA::IO::Pic;
+   use PDLA::IO::Storable;
    use PDLA::Lvalue;
 
 =cut
 
-our $VERSION = "2.013007";
+our $VERSION = "2.016000";
 
 # Main loader of standard PDLA package
 
@@ -167,9 +171,19 @@ use PDLA::Math;
 use PDLA::MatrixOps;
 use PDLA::Lvalue;
 
+# Load these for TPJ compatibility
+
+use PDLA::IO::Misc;          # Misc IO (Ascii)
+use PDLA::IO::FITS;          # FITS IO (rfits/wfits; used by rpic/wpic too)
+use PDLA::IO::Pic;           # rpic/wpic
+
 # Load this so config/install info is available
 
 use PDLA::Config;
+
+# Load this to avoid mysterious Storable segfaults
+
+use PDLA::IO::Storable;
 
 EOD
 

@@ -9,7 +9,7 @@ use URI;
 use JSON;
 use Data::Dumper;
 
-our $VERSION = '1.0.7'; # VERSION
+our $VERSION = '1.0.8'; # VERSION
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.0.7
+version 1.0.8
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ sub new {
   return bless {
     username  => $options{username},
     password  => $options{password},
-    loginurl  => $options{loginurl} || 'https://sso.garmin.com/sso/login',
+    loginurl  => $options{loginurl} || 'https://sso.garmin.com/sso/signin',
     searchurl => $options{searchurl} || 'https://connect.garmin.com/modern/proxy/activitylist-service/activities/search/activities',
   }, $self;
 }
@@ -107,11 +107,12 @@ sub _login {
   # Get sso ticket
   $uri = URI->new("https://sso.garmin.com/sso/login");
   $uri->query_form(%params);
-  $response = $ua->post($uri, {
-    username => $self->{username},
-    password => $self->{password},
-    _eventId => "submit",
-    embed    => "true",
+  $response = $ua->post($uri, origin => 'https://sso.garmin.com',
+    content => {
+      username => $self->{username},
+      password => $self->{password},
+      _eventId => "submit",
+      embed    => "true",
   });
   croak "Can't retrieve sso page: " . $response->status_line
     unless $response->is_success;

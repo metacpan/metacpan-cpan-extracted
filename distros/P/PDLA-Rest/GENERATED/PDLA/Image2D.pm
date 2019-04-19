@@ -531,7 +531,7 @@ return ccNcompt(shift,4);
 
 =for sig
 
-  Signature: (a(m,n); [o]b(m,n); int con)
+  Signature: (a(m,n); int+ [o]b(m,n); int con)
 
 
 

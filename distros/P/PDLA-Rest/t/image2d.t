@@ -1,7 +1,7 @@
 # -*-perl-*-
 #
 
-use Test::More tests => 26;
+use Test::More tests => 28;
 use Test::Exception;
 
 use PDLA;
@@ -159,6 +159,10 @@ SKIP: {
 	ok(cc4compt($pa)->max == 7);
 	dies_ok { ccNcompt($pa,5); };
 	lives_ok { ccNcompt($pa,8) };
+	my $im = (xvals(25,25)+yvals(25,25));
+	my $seg_b = cc4compt(byte $im%2);
+	ok($seg_b->type >= long);
+	ok(cc4compt($im%2)->max == $seg_b->max);
 }
 
 {

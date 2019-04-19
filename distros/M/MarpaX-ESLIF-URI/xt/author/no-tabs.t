@@ -17,13 +17,15 @@ my @files = (
     'lib/MarpaX/ESLIF/URI/https.pm',
     'lib/MarpaX/ESLIF/URI/mailto.pm',
     'lib/MarpaX/ESLIF/URI/tag.pm',
+    'lib/MarpaX/ESLIF/URI/tel.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/file.t',
     't/http.t',
     't/mailto.t',
-    't/tag.t'
+    't/tag.t',
+    't/tel.t'
 );
 
 notabs_ok($_) foreach @files;

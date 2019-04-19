@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018, cPanel, L.L.C.
+# Copyright (c) 2019, cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'             => 'OpenStack::Client',
     'VERSION_FROM'     => 'lib/OpenStack/Client.pm',
-    'AUTHOR'           => 'Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>',
+    'AUTHOR'           => 'Alexandra Hrefna Maheu <xan@cpanel.net>',
     'LICENSE'          => 'mit',
     'ABSTRACT'         => 'A nice and tiny OpenStack API client',
     'MIN_PERL_VERSION' => '5.14.0',

@@ -315,6 +315,7 @@ sub flushgeneric {  # Construct the generic code switch
 
      $type = $PDLA_DATATYPES{$case};
 
+     my $ppsym = $PDLA::Types::typehash{$case}->{ppsym};
      print $indent,"case $case:\n"; # Start of this case
      print $indent,"   {";
 
@@ -324,6 +325,7 @@ sub flushgeneric {  # Construct the generic code switch
         $line = $_;
 
         $line =~ s/\bgeneric\b/$type/g;
+        $line =~ s/\bgeneric_ppsym\b/$ppsym/g;
 
         print "   ",$line;
      }
@@ -724,9 +726,10 @@ sub datatypes_switch {
   foreach my $i ( 0 .. $ntypes ) {
     my $type = PDLA::Type->new( $i );
     my $typesym = $type->symbol;
+    my $typeppsym = $type->ppsym;
     my $cname = $type->ctype;
     $cname =~ s/^PDLA_//;
-    push @m, "\tcase $typesym: retval = PDLA.bvals.$cname; break;";
+    push @m, "\tcase $typesym: retval.type = $typesym; retval.value.$typeppsym = PDLA.bvals.$cname; break;";
   }
   print map "$_\n", @m;
 }

@@ -43,7 +43,7 @@ variation for your specific C++ compiler,
 
 *** DISABLE HARNESS_OPTIONS=j9 ***
 
-If you have the HARNESS_OPTIONS environment variable set to run tests 
+If you have the HARNESS_OPTIONS environment variable set to run tests
 concurrently in multiple processes, the test suite will attempt to invoke
 the C++ compiler multiple times concurrently.  Recent versions of Inline and
 Inline::C have made progress on stamping out race conditions, but YMMV for now.

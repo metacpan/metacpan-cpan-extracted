@@ -9,10 +9,13 @@ package Comics::Plugin::DoodleForFood;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 our $name    = "Doodle For Food";
 our $url     = "https://www.doodleforfood.com/";
+
+# Can't get it to work anymore.
+our $disabled = 1;
 
 our $pattern =
   qr{ class="tmblr-full"> \s*

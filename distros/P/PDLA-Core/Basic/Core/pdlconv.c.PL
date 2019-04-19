@@ -61,7 +61,8 @@ for(['readdata_vaffine', "*ap = *pp"],
 print OUT <<"!WITH!SUBS!";
 
 void pdl_${name}(pdl *a) {
-	int i,j;
+	PDLA_Indx i;
+	int j;
 	int intype = a->datatype;
 	if(!PDLA_VAFFOK(a)) {
 		die("pdl_$name without vaffine");
@@ -142,7 +143,7 @@ void pdl_converttype( pdl** aa, int targtype, Logical changePerl ) {
     HV*   hash;
     STRLEN   nbytes;
     int   diffsize;
-    int   i;
+    PDLA_Indx   i;
 #if (PERL_VERSION >= 5) && (PERL_SUBVERSION >= 57)
     dXSARGS;
 #endif
@@ -297,7 +298,7 @@ void pdl_coercetypes( pdl** aa, pdl** bb, Logical changePerl ) {
            if (vector->datatype == PDLA_F)  /* FxD is OK as F */
               targtype = vector->datatype;
 
-           else if (vector->datatype <= PDLA_L && scalar->datatype <= PDLA_L)
+           else if (vector->datatype < PDLA_F && scalar->datatype < PDLA_F)
               targtype = vector->datatype; /* two ints is OK as input int */
 
            else if (vector->datatype <= PDLA_F && scalar->datatype==PDLA_D)

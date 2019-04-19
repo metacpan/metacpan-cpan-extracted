@@ -2,7 +2,8 @@ use strict;
 use warnings;
 
 use PDLA;
-use Test::More tests => 1;
+use Config;
+use Test::More tests => 7;
 
 my $array = [
  [[1,2],
@@ -16,3 +17,44 @@ my $pdl = pdl $array;
 
 is_deeply( unpdl($pdl), $array, "back convert 3d");
 
+SKIP:
+{
+  skip("your perl hasn't 64bit int support", 6) if $Config{ivsize} < 8;
+  my $input = [
+      -9223372036854775808, #min int64
+      -9000000000000000001,
+      -9000000000000000002,
+      -9000000000000000003,
+      -9000000000000000004,
+      -9000000000000000005,
+      -8999999999999999999,
+      -8999999999999999998,
+      -8999999999999999997,
+      -8999999999999999996,
+      -1000000000000000001,
+               -2147483648, #min int32
+                2147483647, #max int32
+                4294967295, #max uint32
+       1000000000000000001,
+       9000000000000000001,
+       9000000000000000002,
+       9000000000000000003,
+       9000000000000000004,
+       9000000000000000005,
+       8999999999999999999,
+       8999999999999999998,
+       8999999999999999997,
+       8999999999999999996,
+       9223372036854775807, #max int64
+  ];
+
+  is_deeply(longlong($input)->unpdl, $input, 'back convert of 64bit integers');
+  my $small_pdl = longlong([ -9000000000000000001, 9000000000000000001 ]);
+  is($small_pdl->at(0), -9000000000000000001, 'at/1');
+  is(PDLA::Core::at_c($small_pdl, [1]),  9000000000000000001, 'at_c/1');
+  $small_pdl->set(0, -8888888888888888888);
+  PDLA::Core::set_c($small_pdl, [1], 8888888888888888888);
+  is($small_pdl->at(0), -8888888888888888888, 'at/2');
+  is(PDLA::Core::at_c($small_pdl, [1]),  8888888888888888888, 'at_c/2');
+  is_deeply($small_pdl->unpdl, [ -8888888888888888888, 8888888888888888888 ], 'unpdl/small_pdl');
+}

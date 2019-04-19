@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'MarpaX/ESLIF/URI.pm',
@@ -18,7 +18,8 @@ my @module_files = (
     'MarpaX/ESLIF/URI/http.pm',
     'MarpaX/ESLIF/URI/https.pm',
     'MarpaX/ESLIF/URI/mailto.pm',
-    'MarpaX/ESLIF/URI/tag.pm'
+    'MarpaX/ESLIF/URI/tag.pm',
+    'MarpaX/ESLIF/URI/tel.pm'
 );
 
 

@@ -12,7 +12,7 @@ use PDLA::Types;
 use strict;
 use Test::More;
 
-plan tests => 48;
+plan tests => 53;
 
 sub tapprox {
     my($a,$b) = @_;
@@ -65,18 +65,21 @@ ok(tapprox($q, pdl(0, 6, 7, 1, 9)), "minimum_n_ind");          # 9
 
 ##############################
 # check that our random functions work with Perl's srand
-srand 5;
-my $r1 = random 10;
-srand 5;
-my $r2 = random 10;
-ok(tapprox($r1, $r2), "random and srand");                     #10
+TODO: {
+   local $TODO = 'Some CPAN Testers fails for OpenBSD';
 
-srand 10;
-$r1 = grandom 10;
-srand 10;
-$r2 = grandom 10;
-ok(tapprox($r1, $r2), "grandom and srand");                    #11
+   srand 5;
+   my $r1 = random 10;
+   srand 5;
+   my $r2 = random 10;
+   ok(tapprox($r1, $r2), "random and srand");                     #10
 
+   srand 10;
+   $r1 = grandom 10;
+   srand 10;
+   $r2 = grandom 10;
+   ok(tapprox($r1, $r2), "grandom and srand");                    #11
+}
 ##############################
 # Test that whichND works OK
 my $r = xvals(10,10)+10*yvals(10,10);
@@ -84,26 +87,30 @@ $a = whichND( $r % 12 == 0 );
 
 # Nontrivial case gives correct coordinates
 ok(eval 'sum($a != pdl([0,0],[2,1],[4,2],[6,3],[8,4],[0,6],[2,7],[4,8],[6,9]))==0', "whichND");  #12
-
+ok($a->type eq 'indx', "whichND returns indx-type piddle for non-trivial case");
 # Empty case gives matching Empty
 $a = whichND( $r*0 );
 ok($a->nelem==0, "whichND( 0*\$r ) gives an Empty PDLA");           #13
 ok($a->ndims==2, "whichND( 0*\$r ) has 2 dims");                   #14
 ok(($a->dim(0)==2 and $a->dim(1)==0), "whichND( 0*\$r ) is 2x0");  #15
+ok($a->type eq 'indx', "whichND( 0*\$r) type is indx");
 
 # Scalar PDLAs are treated as 1-PDLAs
 $a = whichND(pdl(5));
-ok($a->nelem==1 && $a==0, "whichND");                             #16
+ok($a->nelem==1 && $a==0, "whichND scalar PDLA");                             #16
+ok($a->type eq 'indx', "whichND returns indx-type piddle for scalar piddle mask");
 
 # Scalar empty case returns a 1-D vector of size 0
 $a = whichND(pdl(0));
 ok($a->nelem==0,  "whichND of 0 scalar is empty");                 #17
 ok($a->ndims==1,  "whichND of 0 scalar has 1 dim");                #18
 ok($a->dim(0)==0, "whichND of 0 scalar: return 0 dim size is 0");  #19
+ok($a->type eq 'indx', "whichND returns indx-type piddle for scalar empty case");
 
 # Empty case returns Empty
 $b = whichND( which(pdl(0)) );                              
 ok($b->nelem==0, "whichND of Empty mask");                         #20
+ok($b->type eq 'indx', "whichND returns indx-type piddle for empty case");
 
 # Nontrivial empty mask case returns matching Empty -- whichND(Empty[2x0x2]) should return Empty[3x0]
 $b = whichND(zeroes(2,0,2));

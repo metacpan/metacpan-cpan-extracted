@@ -4,7 +4,7 @@
 #
 package PDLA::Ops;
 
-@EXPORT_OK  = qw(  PDLA::PP log10 PDLA::PP assgn );
+@EXPORT_OK  = qw(  PDLA::PP log10 PDLA::PP assgn PDLA::PP ipow );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDLA::Core;
@@ -1222,8 +1222,8 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub PDLA::log10 { 
-    my $x = shift; 
+sub PDLA::log10 {
+    my $x = shift;
     if ( ! UNIVERSAL::isa($x,"PDLA") ) { return log($x) / log(10); }
     my $y;
     if ( $x->is_inplace ) { $x->set_inplace(0); $y = $x; }
@@ -1273,14 +1273,59 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+
+
+=head2 ipow
+
+=for sig
+
+  Signature: (a(); b(); [o] ans())
+
+
+=for ref
+
+raise piddle C<$a> to integer power C<$b>
+
+=for example
+
+   $c = $a->ipow($b,0);     # explicit function call
+   $c = ipow $a, $b;
+   $a->inplace->ipow($b,0);  # modify $a inplace
+
+It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+Note that when calling this function explicitly you need to supply
+a third argument that should generally be zero (see first example).
+This restriction is expected to go away in future releases.
+
+Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squaring>
+
+
+
+=for bad
+
+ipow does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+
+
+=cut
+
+
+
+
+
+
+*ipow = \&PDLA::ipow;
+
+
+
 ;
 
 
 =head1 AUTHOR
 
 Tuomas J. Lukka (lukka@fas.harvard.edu),
-Karl Glazebrook (kgb@aaoepp.aao.gov.au), 
-Doug Hunt (dhunt@ucar.edu), 
+Karl Glazebrook (kgb@aaoepp.aao.gov.au),
+Doug Hunt (dhunt@ucar.edu),
 Christian Soeller (c.soeller@auckland.ac.nz),
 Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).

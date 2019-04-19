@@ -4,9 +4,20 @@
 #include "webp/decode.h"
 #include "imext.h"
 #include <errno.h>
+#include <limits.h>
+#include <assert.h>
+
+struct i_webp_config_tag {
+  struct WebPConfig cfg;
+};
 
 #define START_SLURP_SIZE 8192
 #define next_slurp_size(old) ((size_t)((old) * 3 / 2) + 10)
+
+static int
+webp_compress_defaults(i_img *im, struct WebPConfig *config);
+static int
+config_update(WebPConfig *cfg, i_img *im);
 
 static unsigned char *
 slurpio(io_glue *ig, size_t *size) {
@@ -45,7 +56,7 @@ find_fourcc(WebPData *d, const char *fourcc, size_t *result_chsize) {
   p += 12; /* skip the RIFF header */
   sz -= 12;
   while (sz > 8) {
-    size_t chsize = p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24);
+    size_t chsize = p[4] | (p[5] << 8) | (p[6] << 16) | ((size_t)p[7] << 24);
     if (chsize + 8 > sz) {
       /* corrupt? */
       return NULL;
@@ -100,7 +111,7 @@ get_image(WebPMux *mux, int n, int *error) {
     int width, height;
     int y;
     uint8_t *bmp = WebPDecodeRGBA(f.bitstream.bytes, f.bitstream.size,
-				 &width, &height);
+				  &width, &height);
     uint8_t *p = bmp;
     if (!bmp) {
       WebPDataClear(&f.bitstream);
@@ -272,79 +283,126 @@ i_readwebp_multi(io_glue *ig, int *count) {
 }
 
 undef_int
-i_writewebp(i_img *im, io_glue *ig) {
-  return i_writewebp_multi(ig, &im, 1);
+i_writewebp(i_img *im, io_glue *ig, i_webp_config_t *cfg) {
+  return i_writewebp_multi(ig, &im, 1, cfg);
 }
 
+static const int rgb_chans[4] = { 0, 1, 2, 0 };
 static const int gray_chans[4] = { 0, 0, 0, 1 };
 
-static unsigned char *
-frame_raw(i_img *im, int *out_chans) {
-  unsigned char *data, *p;
-  i_img_dim y;
-  const int *chans = im->channels < 3 ? gray_chans : NULL;
-  *out_chans = (im->channels & 1) ? 3 : 4;
-  data = mymalloc(im->xsize * im->ysize * *out_chans);
-  p = data;
-  for (y = 0; y < im->ysize; ++y) {
-    i_gsamp(im, 0, im->xsize, y, p, chans, *out_chans);
-    p += *out_chans * im->xsize;
-  }
+#define make_argb(a, r, g, b) (((uint32_t)(a) << 24) | ((r) << 16) | ((g) << 8) | (b))
+#define make_argb4(p) make_argb(p[3], p[0], p[1], p[2])
+#define make_argb3(p) make_argb((unsigned char)0xFF, p[0], p[1], p[2])
+#define make_argb2(p) make_argb(p[1], p[0], p[0], p[0])
+#define make_argb1(p) make_argb((unsigned char)0xFF, p[0], p[0], p[0])
 
-  return data;
+static int
+frame_raw_argb(i_img *im, WebPPicture *pic) {
+  unsigned char *row;
+  uint32_t *result, *p;
+  i_color_model_t cm = i_img_color_model(im);
+  i_img_dim x, y;
+  
+  row = mymalloc(im->xsize * cm);
+  p = pic->argb;
+  pic->argb_stride = im->xsize;
+  for (y = 0; y < im->ysize; ++y) {
+    const unsigned char *rp = row;
+    i_gsamp(im, 0, im->xsize, y, row, NULL, cm);
+    for (x = 0; x < im->xsize; ++x) {
+      switch (cm) {
+      case icm_gray:
+	*p++ = make_argb1(rp);
+	break;
+      case icm_gray_alpha:
+	*p++ = make_argb2(rp);
+	break;
+      case icm_rgb:
+	*p++ = make_argb3(rp);
+	break;
+      case icm_rgb_alpha:
+	*p++ = make_argb4(rp);
+	break;
+      default:
+	assert(0);
+	break;
+      }
+      rp += cm;
+    }
+  }
+  myfree(row);
+
+  return 1;
 }
 
-static unsigned char *
-frame_webp(i_img *im, size_t *sz) {
+static int
+my_webp_writer(const uint8_t* data, size_t data_size,
+	       const WebPPicture* picture) {
+  io_glue *io = (io_glue *)picture->custom_ptr;
+
+  if (i_io_write(io, data, data_size) != data_size) {
+    i_push_error(errno, "failed to write");
+    return 0;
+  }
+
+  return 1;
+}
+
+static int
+frame_webp(i_img *im, io_glue *io, const i_webp_config_t *basecfg) {
   int chans;
-  unsigned char *raw = frame_raw(im, &chans);
   uint8_t *webp;
   size_t webp_size;
   char webp_mode[80];
+  WebPConfig config;
   int lossy = 1;
+  WebPPicture pic;
+  WebPMemoryWriter writer;
 
-  if (i_tags_get_string(&im->tags, "webp_mode", 0, webp_mode, sizeof(webp_mode))) {
-    if (strcmp(webp_mode, "lossless") == 0) {
-      lossy = 0;
-    }
-    else if (strcmp(webp_mode, "lossy") != 0) {
-      i_push_error(0, "webp_mode must be 'lossy' or 'lossless'");
-      return NULL;
-    }
-  }
-  if (lossy) {
-    double quality;
-    if (i_tags_get_float(&im->tags, "webp_quality", 0, &quality)) {
-      if (quality < 0 || quality > 100) {
-	i_push_error(0, "webp_quality must be in the range 0 to 100 inclusive");
-	return NULL;
-      }
-    }
-    else {
-      quality = 80;
-    }
-    if (chans == 4) {
-      webp_size = WebPEncodeRGBA(raw, im->xsize, im->ysize, im->xsize * chans, quality, &webp);
-    }
-    else {
-      webp_size = WebPEncodeRGB(raw, im->xsize, im->ysize, im->xsize * chans, quality, &webp);
-    }
+  if (basecfg) {
+    config = basecfg->cfg;
+    if (!config_update(&config, im))
+      return 0;
   }
   else {
-    if (chans == 4) {
-      webp_size = WebPEncodeLosslessRGBA(raw, im->xsize, im->ysize, im->xsize * chans, &webp);
-    }
-    else {
-      webp_size = WebPEncodeLosslessRGB(raw, im->xsize, im->ysize, im->xsize * chans, &webp);
-    }
+    if (!webp_compress_defaults(im, &config))
+      return 0;
   }
-  *sz = webp_size;
-  myfree(raw);
-  return webp;
+
+  if (!WebPPictureInit(&pic)) {
+    i_push_error(0, "failed to initialize picture");
+    return 0;
+  }
+
+  pic.use_argb = 1;
+  pic.width = im->xsize;
+  pic.height = im->ysize;
+  if (!WebPPictureAlloc(&pic)) {
+    i_push_error(0, "picture allocation failed");
+    goto fail;
+  }
+
+  if (!frame_raw_argb(im, &pic))
+    goto fail;
+
+  pic.writer = my_webp_writer;
+  pic.custom_ptr = io;
+
+  if (!WebPEncode(&config, &pic))
+    goto fail;
+
+  i_io_close(io);
+  
+  WebPPictureFree(&pic);
+  return 1;
+
+ fail:
+  WebPPictureFree(&pic);
+  return 0;
 }
 
 undef_int
-i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
+i_writewebp_multi(io_glue *ig, i_img **imgs, int count, i_webp_config_t *cfg) {
   WebPMux *mux;
   int i;
   WebPData outd;
@@ -374,17 +432,25 @@ i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
   }
 
   if (count == 1) {
+    io_glue *bio = io_new_bufchain();
     WebPData d;
-    d.bytes = frame_webp(imgs[0], &d.size);
-    if (!d.bytes)
+    unsigned char *p;
+
+    if (!frame_webp(imgs[0], bio, cfg)) {
+      io_glue_destroy(bio);
       goto fail;
+    }
+
+    d.size = io_slurp(bio, &p);
+    d.bytes = p;
+    io_glue_destroy(bio);
 
     if ((err = WebPMuxSetImage(mux, &d, 1)) != WEBP_MUX_OK) {
       i_push_errorf(err, "failed to set image (%d)", (int)err);
-      WebPDataClear(&d);
+      myfree(p);
       goto fail;
     }
-    WebPDataClear(&d);
+    myfree(p);
   }
   else {
     WebPMuxFrameInfo f;
@@ -399,11 +465,13 @@ i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
       params.loop_count = 0;
     }
     if (i_tags_get_color(&imgs[0]->tags, "webp_background", 0,
-			&color.c)) {
+			 &color.c)) {
       params.bgcolor = color.n;
     }
     f.id = WEBP_CHUNK_ANMF;
     for (i = 0; i < count; ++i) {
+      io_glue *bio = io_new_bufchain();
+      unsigned char *p;
       WebPData d;
       char buf[80];
 
@@ -422,6 +490,7 @@ i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
 	}
 	else {
 	  i_push_error(0, "invalid webp_dispose, must be 'none' or 'background'");
+	  io_glue_destroy(bio);
 	  goto fail;
 	}
       }
@@ -438,6 +507,7 @@ i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
 	}
 	else {
 	  i_push_error(0, "invalid webp_blend, must be 'none' or 'alpha'");
+	  io_glue_destroy(bio);
 	  goto fail;
 	}
       }
@@ -445,12 +515,19 @@ i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
 	f.blend_method = WEBP_MUX_BLEND;
       }
       
-      f.bitstream.bytes = frame_webp(imgs[i], &f.bitstream.size);
-      if (!f.bitstream.bytes)
+      if (!frame_webp(imgs[i], bio, cfg)) {
+	io_glue_destroy(bio);
+	goto fail;
+      }
+
+      f.bitstream.size = io_slurp(bio, &p);
+      f.bitstream.bytes = p;
+      io_glue_destroy(bio);
+      if (!f.bitstream.size)
 	goto fail;
 
       WebPMuxPushFrame(mux, &f, 1);
-      WebPDataClear(&f.bitstream);
+      myfree(p);
     }
     err = WebPMuxSetAnimationParams(mux, &params);
     if (err != WEBP_MUX_OK) {
@@ -484,15 +561,384 @@ i_writewebp_multi(io_glue *ig, i_img **imgs, int count) {
 
 char const *
 i_webp_libversion(void) {
-  static char buf[100];
+  static char buf[120];
   if (!*buf) {
     unsigned int mux_ver = WebPGetMuxVersion();
     unsigned int enc_ver = WebPGetEncoderVersion();
     unsigned int dec_ver = WebPGetDecoderVersion();
+#ifdef HAVE_SNPRINTF
+    snprintf(buf, sizeof(buf),
+	     "encoder %d.%d.%d (%x) decoder %d.%d.%d (%x) mux %d.%d.%d (%x)",
+	     enc_ver >> 16, (enc_ver >> 8) & 0xFF, enc_ver & 0xFF, enc_ver,
+	     dec_ver >> 16, (dec_ver >> 8) & 0xFF, dec_ver & 0xFF, dec_ver,
+	     mux_ver >> 16, (mux_ver >> 8) & 0xFF, mux_ver & 0xFF, mux_ver);
+#else
     sprintf(buf, "encoder %d.%d.%d (%x) decoder %d.%d.%d (%x) mux %d.%d.%d (%x)",
 	    enc_ver >> 16, (enc_ver >> 8) & 0xFF, enc_ver & 0xFF, enc_ver,
 	    dec_ver >> 16, (dec_ver >> 8) & 0xFF, dec_ver & 0xFF, dec_ver,
 	    mux_ver >> 16, (mux_ver >> 8) & 0xFF, mux_ver & 0xFF, mux_ver);
+#endif
   }
   return buf;
 }
+
+unsigned
+i_webp_encode_abi_version(void) {
+  return WEBP_ENCODER_ABI_VERSION;
+}
+
+typedef struct {
+  const char *name;
+  int value;
+} name_map_entry_t;
+
+#define NAMES_END { NULL, -1 }
+
+static const name_map_entry_t
+preset_names[] =
+  {
+    { "default", WEBP_PRESET_DEFAULT },
+    { "picture", WEBP_PRESET_PICTURE },
+    { "photo",   WEBP_PRESET_PHOTO },
+    { "drawing", WEBP_PRESET_DRAWING },
+    { "icon",    WEBP_PRESET_ICON },
+    { "text",    WEBP_PRESET_TEXT },
+    NAMES_END
+  };
+
+static const name_map_entry_t
+lossy_names[] =
+  {
+    { "lossy", 0 },
+    { "lossless", 1 },
+    NAMES_END
+  };
+
+static const name_map_entry_t
+hint_names[] =
+  {
+    { "default", WEBP_HINT_DEFAULT },
+    { "picture", WEBP_HINT_PICTURE },
+    { "photo", WEBP_HINT_PHOTO },
+    { "graph", WEBP_HINT_GRAPH },
+    NAMES_END
+  };
+
+static int
+find_map_value(const name_map_entry_t *map, const char *value_name, const char *tag_name,
+	       int *result, int def) {
+  while(map->name) {
+    if (strcmp(map->name, value_name) == 0) {
+      *result = map->value;
+      return 1;
+    }
+    ++map;
+  }
+
+  i_push_errorf(0, "Unknown value '%s' for tag %s", value_name, tag_name);
+
+  return 0;
+}
+
+static int
+find_map_tag(const name_map_entry_t *map, i_img *im, const char *tag_name,
+	     int *result, int def) {
+  char text[100];
+
+  if (!i_tags_get_string(&im->tags, tag_name, 0, text, sizeof(text))) {
+    *result = def;
+    return 1;
+  }
+
+  return find_map_value(map, text, tag_name, result, def);
+}
+
+typedef struct {
+  const char *name;
+  ptrdiff_t off;
+  int min, max;
+} named_int_t;
+
+#define STR_(x) #x
+#define EXPAND(x) x
+
+#define INT_ENTRY(name, min, max) { "webp_" STR_(name), offsetof(struct WebPConfig, name), min, max }
+
+static const named_int_t
+named_ints[] =
+  {
+    INT_ENTRY(method, 0, 6),
+    INT_ENTRY(target_size, 0, INT_MAX),
+    INT_ENTRY(segments, 1, 4),
+    INT_ENTRY(sns_strength, 0, 100),
+    INT_ENTRY(filter_strength, 0, 100),
+    INT_ENTRY(filter_sharpness, 0, 7),
+    INT_ENTRY(filter_type, 0, 1),
+    INT_ENTRY(autofilter, 0, 1),
+    INT_ENTRY(alpha_compression, 0, 1),
+    INT_ENTRY(alpha_filtering, 0, 2),
+    INT_ENTRY(alpha_quality, 0, 100),
+    INT_ENTRY(pass, 1, 10),
+    INT_ENTRY(preprocessing, 0, 1),
+    INT_ENTRY(partitions, 0, 3),
+    INT_ENTRY(partition_limit, 0, 100),
+#if WEBP_ENCODER_ABI_VERSION >= 0x200
+    INT_ENTRY(emulate_jpeg_size, 0, 1),
+#endif
+#if WEBP_ENCODER_ABI_VERSION >= 0x201
+    INT_ENTRY(thread_level, 0, 1),
+    INT_ENTRY(low_memory, 0, 1),
+#endif
+#if WEBP_ENCODER_ABI_VERSION >= 0x205
+    INT_ENTRY(near_lossless, 0, 100),
+#endif
+#if WEBP_ENCODER_ABI_VERSION >= 0x209
+    INT_ENTRY(exact, 0, 1),
+#endif
+#if WEBP_ENCODER_ABI_VERSION >= 0x20e
+    INT_ENTRY(use_sharp_yuv, 0, 1),
+#endif
+    NAMES_END
+  };
+
+static int
+config_update(WebPConfig *cfg, i_img *im) {
+  WebPConfig work = *cfg;
+
+  {
+    int hint;
+    if (!find_map_tag(hint_names, im, "webp_image_hint", &hint, work.image_hint))
+      return 0;
+    work.image_hint = hint;
+  }
+  {
+    char *base = (char *)&work;
+    const named_int_t *n;
+    for (n = named_ints; n->name; ++n) {
+      int value;
+      if (i_tags_get_int(&im->tags, n->name, 0, &value)) {
+	if (value < n->min || value > n->max) {
+	  i_push_errorf(0, "value %d for %s out of range %d to %d",
+			value, n->name, n->min, n->max);
+	  return 0;
+	}
+	*(int*)(base + n->off) = value;
+      }
+    }
+  }
+  {
+    double psnr;
+    if (i_tags_get_float(&im->tags, "webp_target_psnr", 0, &psnr))
+      work.target_PSNR = psnr;
+  }
+  {
+    double qual;
+    if (i_tags_get_float(&im->tags, "webp_quality", 0, &qual))
+      work.quality = qual;
+  }
+  
+  if (!WebPValidateConfig(&work)) {
+    i_push_errorf(0, "update failed validation");
+    return 0;
+  }
+
+  *cfg = work;
+
+  return 1;
+}
+
+static int
+webp_compress_defaults(i_img *im, struct WebPConfig *config) {
+  int preset;
+  double quality;
+  int lossless;
+
+  i_clear_error();
+
+  if (!find_map_tag(preset_names, im, "webp_preset", &preset, WEBP_PRESET_DEFAULT))
+    return 0;
+
+  if (!i_tags_get_float(&im->tags, "webp_quality", 0, &quality)) {
+    quality = 80.0;
+  }
+  if (quality < 0 || quality > 100) {
+    i_push_error(0, "webp_quality must be in the range 0 to 100 inclusive");
+    return 0;
+  }
+
+  if (!WebPConfigPreset(config, preset, quality)) {
+    i_push_error(0, "failed to configure preset");
+    return 0;
+  }
+
+  if (!find_map_tag(lossy_names, im, "webp_mode", &lossless, 0))
+    return 0;
+
+  if (lossless) {
+    int level;
+    if (i_tags_get_int(&im->tags, "webp_lossless_level", 0, &level)) {
+      if (!WebPConfigLosslessPreset(config, level)) {
+	i_push_error(0, "failed to configure lossless preset");
+	return 0;
+      }
+    }
+    else {
+      config->lossless = 1;
+    }
+  }
+
+  return config_update(config, im);
+}
+
+i_webp_config_t *
+i_webp_config_create(i_img *im) {
+  i_webp_config_t *result = mymalloc(sizeof(i_webp_config_t));
+
+  if (!webp_compress_defaults(im, &result->cfg)) {
+    myfree(result);
+    return NULL;
+  }
+
+  return result;
+}
+
+void
+i_webp_config_destroy(i_webp_config_t *cfg) {
+  myfree(cfg);
+}
+
+i_webp_config_t *
+i_webp_config_clone(i_webp_config_t *cfg) {
+  i_webp_config_t *result = mymalloc(sizeof(i_webp_config_t));
+  *result = *cfg;
+  return result;
+}
+
+int
+i_webp_config_update(i_webp_config_t *cfg, i_img *im) {
+  return config_update(&cfg->cfg, im);
+}
+
+int
+i_webp_config_setint(i_webp_config_t *cfg, const char *name, int value) {
+  WebPConfig oldconf = cfg->cfg;
+  char *base = (char *)&oldconf;
+  i_clear_error();
+
+  const named_int_t *n;
+  for (n = named_ints; n->name; ++n) {
+    if (strcmp(name, n->name) == 0) {
+      if (value < n->min || value > n->max) {
+	i_push_errorf(0, "value %d for %s out of range %d to %d",
+		      value, n->name, n->min, n->max);
+	return 0;
+      }
+      *(int*)(base + n->off) = value;
+      if (!WebPValidateConfig(&oldconf)) {
+	i_push_errorf(0, "update failed validation");
+	return 0;
+      }
+      cfg->cfg = oldconf;
+      return 1;
+    }
+  }
+  
+  i_push_errorf(0, "unknown integer field %s", name);
+  return 0;
+}
+
+int
+i_webp_config_getint(i_webp_config_t *cfg, const char *name, int *value) {
+  char *base = (char *)&cfg->cfg;
+  i_clear_error();
+
+  const named_int_t *n;
+  for (n = named_ints; n->name; ++n) {
+    if (strcmp(name, n->name) == 0) {
+      *value = *(int*)(base + n->off);
+      return 1;
+    }
+  }
+  
+  i_push_errorf(0, "unknown integer field %s", name);
+  return 0;
+}
+
+int
+i_webp_config_getfloat(i_webp_config_t *cfg, const char *name, float *value) {
+  i_clear_error();
+
+  if (strcmp(name, "webp_quality") == 0) {
+    *value = cfg->cfg.quality;
+    return 1;
+  }
+  else if (strcmp(name, "webp_target_psnr") == 0) {
+    *value = cfg->cfg.target_PSNR;
+    return 1;
+  }
+  else {
+    i_push_errorf(0, "unknown field %s", name);
+    return 0;
+  }
+}
+
+int
+i_webp_config_setfloat(i_webp_config_t *cfg, const char *name, float value) {
+  float *field = NULL;
+  WebPConfig oldconf = cfg->cfg;
+  i_clear_error();
+
+  if (strcmp(name, "webp_quality") == 0) {
+    if (value < 0 || value > 100) {
+      i_push_errorf(0, "value %f for webp_quality out of range 0 to 100", value);
+      return 0;
+    }
+    oldconf.quality = value;
+  }
+  else if (strcmp(name, "webp_target_psnr") == 0) {
+    if (value < 0) {
+      i_push_errorf(0, "value %f for webp_target_psnr must be non-negative", value);
+      return 0;
+    }
+    oldconf.target_PSNR = value;
+  }
+  else {
+    i_push_errorf(0, "unknown field %s", name);
+    return 0;
+  }
+
+  if (!WebPValidateConfig(&oldconf)) {
+    i_push_errorf(0, "update failed validation");
+    return 0;
+  }
+  cfg->cfg = oldconf;
+
+  return 1;
+}
+
+int
+i_webp_config_set_image_hint(i_webp_config_t *cfg, const char *value) {
+  int hint;
+  if (!find_map_value(hint_names, value, "webp_image_hint", &hint, cfg->cfg.image_hint))
+    return 0;
+ 
+  cfg->cfg.image_hint = hint;
+
+  return 1;
+}
+
+int
+i_webp_config_get_image_hint(i_webp_config_t *cfg, const char **value) {
+  const name_map_entry_t *m = hint_names;
+  *value = NULL;
+  while (m->name) {
+    if (m->value == cfg->cfg.image_hint) {
+      *value = m->name;
+      return 1;
+    }
+    ++m;
+  }
+  i_push_errorf(0, "unknown value %d for webp_image_hint", (int)cfg->cfg.image_hint);
+  return 0;
+}
+

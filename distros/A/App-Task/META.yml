@@ -1,5 +1,5 @@
 ---
-abstract: 'Nest tasks w/ indented output and pre/post headers '
+abstract: 'Nest tasks w/ indented output and pre/post headers'
 author:
   - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
 build_requires:
@@ -18,7 +18,10 @@ no_index:
     - t
     - inc
 requires:
+  IO::Interactive::Tiny: '0'
+  IPC::Open3::Utils: '0'
   Test::More: '0'
   Test::Trap: '0'
-  Tie::Handle: '0'
-version: '0.01'
+  Text::OutputFilter: '0'
+  Tie::Handle::Base: '0'
+version: '0.02'

@@ -199,6 +199,44 @@ BETA-VERSION WARNING
           print $message;
        }
 
+  Cancellation
+
+    Cancelled futures cause a suspended async sub to simply stop running.
+
+       async sub fizz
+       {
+          await func();
+          say "This is never reached";
+       }
+    
+       my $f = fizz();
+       $f->cancel;
+
+    Cancellation requests can propagate backwards into the future the async
+    sub is currently waiting on.
+
+       async sub floof
+       {
+          ...
+          await $f1;
+       }
+    
+       my $f2 = floof();
+    
+       $f2->cancel;  # $f1 will be cancelled too
+
+    This behaviour is still more experimental than the rest of the logic.
+    The following should be noted:
+
+      * There is currently no way to perform the equivalent of "on_cancel"
+      in Future to add a cancellation callback to a future chain.
+
+      * Cancellation propagation is only implemented on Perl version 5.24
+      and above. An async sub in an earlier perl version will still stop
+      executing if cancelled, but will not propagate the request backwards
+      into the future that the async sub is currently waiting on. See
+      "TODO".
+
  Things That Don't Yet Work
 
     local variable assignments inside an async function will confuse the
@@ -303,6 +341,13 @@ TODO
 
       https://rt.cpan.org/Ticket/Display.html?id=123465
 
+      * Implement cancel back-propagation for Perl versions earlier than
+      5.24. Currently this does not work due to some as-yet-unknown effects
+      that installing the back-propagation has, causing future instances to
+      be reclaimed too early.
+
+      https://rt.cpan.org/Ticket/Display.html?id=129202
+
 KNOWN BUGS
 
     This is not a complete list of all known issues, but rather a summary
@@ -311,11 +356,13 @@ KNOWN BUGS
     bugs, see the RT queue at
     https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait.
 
-      * In some situations, foreach values on computed lists of expressions
-      may lose values. A workaround for this is to calculate values ahead
-      of time into a lexical array, and iterate over that.
+      * Warnings and memory leaks when dropping still-pending Futures
 
-      https://rt.cpan.org/Ticket/Display.html?id=128619
+      https://rt.cpan.org/Ticket/Display.html?id=128620
+
+      * Devel::Cover can't see into async subs
+
+      https://rt.cpan.org/Ticket/Display.html?id=128309
 
 ACKNOWLEDGEMENTS
 

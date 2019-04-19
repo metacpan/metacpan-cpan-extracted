@@ -76,7 +76,7 @@
 # it does not need to be supplied, and the return value should be
 # given as a single-quoted string and use the $name variable
 #
-# The Substitute rule replaces dollar-signed macros ($P(), $ISBAD(), ect)
+# The Substitute rule replaces dollar-signed macros ($P(), $ISBAD(), etc)
 # with the low-level C code to perform the macro.
 #
 # The Substitute class replaces the dosubst rule. The old rule
@@ -807,7 +807,13 @@ $::PP_VERBOSE    = 0;
 $PDLA::PP::done = 0;  # pp_done has not been called yet
 
 END {
-  pp_done() unless $PDLA::PP::done; # make sure we call this
+    #you can uncomment this for testing, but this should remain
+    #commented in production code. This causes pp_done to be called
+    #even when a .pd file aborts with die(), potentially bypassing
+    #problem code when build is re-attempted. Having this commented
+    #means we are a bit more strict: a module must call pp_done in
+    #order to have .xs and .pm files written.
+#  pp_done() unless $PDLA::PP::done;
 }
 
 use Carp;

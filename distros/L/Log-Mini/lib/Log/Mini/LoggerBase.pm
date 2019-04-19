@@ -7,9 +7,6 @@ use Carp qw(croak);
 use List::Util qw(first);
 use Time::Moment;
 
-use Data::Dumper;
-use feature qw/say/;
-
 my $LEVELS = {
     error => 1,
     warn  => 2,

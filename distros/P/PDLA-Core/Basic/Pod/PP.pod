@@ -151,7 +151,7 @@ Set the version for .pm and .xs files
 
 Why do we need PP? Several reasons: firstly, we want to be able to
 generate subroutine code for each of the PDLA datatypes (PDLA_Byte,
-PDLA_Short,. etc).  AUTOMATICALLY.  Secondly, when referring to slices
+PDLA_Short, etc).  AUTOMATICALLY.  Secondly, when referring to slices
 of PDLA arrays in Perl (e.g. C<< $a->slice('0:10:2,:') >> or other things such
 as transposes) it is nice to be able to do this transparently and to
 be able to do this 'in-place' - i.e, not to have to make a memory copy
@@ -2321,7 +2321,7 @@ For example:
 
 Warning: If, in the middle of your .pd file, you put documentation meant for
 the bottom of your pod, you will thoroughly confuse CPAN. On the other hand,
-if in the middle of your .pd fil, you add some Perl code destined for the
+if in the middle of your .pd file, you add some Perl code destined for the
 bottom or top of your .pm file, you only have yourself to confuse. :-)
 
 =item pp_beginwrap
@@ -2449,16 +2449,125 @@ I<perlxs>, I<perlxstut>
 
 =head1 CURRENTLY UNDOCUMENTED
 
+Almost everything having to do with L<Slice operation>. This includes much of the following (each entry is followed by a guess/description of where it is used or defined):
+
+=over 3
+
+=item MACROS
+
+$CDIM()
+
+$CHILD()
+    PDLA::PP::Rule::Substitute::Usual
+
+$CHILD_P()
+    PDLA::PP::Rule::Substitute::Usual
+
+$CHILD_PTR()
+    PDLA::PP::Rule::Substitute::Usual
+
+$COPYDIMS()
+
+$COPYINDS()
+
+$CROAK()
+    PDLA::PP::Rule::Substitute::dosubst_private()
+
+$DOCOMPDIMS()
+    Used in slices.pd, defined where?
+
+$DOPRIVDIMS()
+    Used in slices.pd, defined where?
+    Code comes from PDLA::PP::CType::get_malloc, which is called by PDLA::PP::CType::get_copy, which is called by PDLA::PP::CopyOtherPars, PDLA::PP::NT2Copies__, and PDLA::PP::make_incsize_copy.  But none of those three at first glance seem to have anything to do with $DOPRIVDIMS
+
+
+$EQUIVCPOFFS()
+
+$EQUIVCPTRUNC()
+
+$PARENT()
+    PDLA::PP::Rule::Substitute::Usual
+
+$PARENT_P()
+    PDLA::PP::Rule::Substitute::Usual
+
+$PARENT_PTR()
+    PDLA::PP::Rule::Substitute::Usual
+
+
+$PDIM()
+
+$PRIV()
+    PDLA::PP::Rule::Substitute::dosubst_private()
+
 $RESIZE()
+
+$SETDELTATHREADIDS()
+    PDLA::PP::Rule::MakeComp
+
+$SETDIMS()
+    PDLA::PP::Rule::MakeComp
+
+$SETNDIMS()
+    PDLA::PP::Rule::MakeComp
+
+$SETREVERSIBLE()
+    PDLA::PP::Rule::Substitute::dosubst_private()
+
+=item Keys
+
+AffinePriv
 
 BackCode
 
-Almost everything having to do with L<Slice Operation>.
+BadBackCode
+
+CallCopy
+
+Comp (related to $COMP()?)
+
+DefaultFlow
+
+EquivCDimExpr
+
+EquivCPOffsCode
+
+EquivDimCheck
+
+EquivPDimExpr
+
+FTypes (see comment in this POD's source file between NoPthread and PMCode.)
+
+GlobalNew
+
+Identity
+
+MakeComp
+
+NoPdlThread
+
+P2Child
+
+ParentInds
+
+Priv
+
+ReadDataFuncName
+
+RedoDims (related to RedoDimsCode ?)
+
+Reversible
+
+WriteBckDataFuncName
+
+XCHGOnly
+
+=back
 
 =head1 BUGS
 
 Although PDLA::PP is quite flexible and thoroughly used, there are surely
-bugs. First amonth them: this documentation needs a thorough revision.
+bugs. First amongst them: this documentation needs a thorough revision.
 
 =head1 AUTHOR
 

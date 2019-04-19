@@ -13,7 +13,7 @@ BEGIN {
     eval {
         require PDLA::LiteF;
     } or BAIL_OUT("PDLA::LiteF failed: $@");
-    plan tests => 58;
+    plan tests => 70;
     PDLA::LiteF->import;
 }
 $| = 1;
@@ -82,6 +82,12 @@ ok $d->reshape(-1)->ndims==0, "reshape(-1) on 0-dim PDLA gives 0-dim PDLA";
 ok $d->reshape(1)->ndims==1, "reshape(1) on 0-dim PDLA gives 1-dim PDLA";
 ok $d->reshape(1)->reshape(-1)->ndims==0, "reshape(-1) on 1-dim, 1-element PDLA gives 0-dim PDLA";
 
+# reshape test related to bug SF#398 "$pdl->hdr items are lost after $pdl->reshape"
+$c = ones(25);
+$c->hdr->{demo} = "yes";
+is($c->hdr->{demo}, "yes", "hdr before reshape");
+$c->reshape(5,5);
+is($c->hdr->{demo}, "yes", "hdr after reshape");
 
 
 
@@ -223,4 +229,28 @@ $b = $a->inplace->new_or_inplace;
 $b++;
 ok(all($b==$a),"new_or_inplace returns the original thing if inplace is set");
 ok(!($b->is_inplace),"new_or_inplace clears the inplace flag");
+
+# check reshape and dims.  While we're at it, check null & empty creation too.
+my $null = null;
+my $empty = zeroes(0);
+ok($empty->nelem==0,"you can make an empty PDLA with zeroes(0)");
+ok("$empty" =~ m/Empty/, "an empty PDLA prints 'Empty'");
+
+ok($null->info =~ /^PDLA->null$/, "null piddle's info is 'PDLA->null'");
+my $mt_info = $empty->info;
+$mt_info =~m/\[([\d,]+)\]/;
+my $mt_info_dims = pdl("$1");
+ok(any($mt_info_dims==0), "empty piddle's info contains a 0 dimension");
+ok($null->isnull && $null->isempty, "a null piddle is both null and empty");
+ok(!$empty->isnull && $empty->isempty, "an empty piddle is empty but not null");
+
+$a = short pdl(3,4,5,6);
+eval { $a->reshape(2,2);};
+ok(!$@,"reshape succeeded in the normal case");
+ok( ( $a->ndims==2 and $a->dim(0)==2 and $a->dim(1)==2 ), "reshape did the right thing");
+ok(all($a == short pdl([[3,4],[5,6]])), "reshape moved the elements to the right place");
+
+$b = $a->slice(":,:");
+eval { $b->reshape(4); };
+ok( $@ !~ m/Can\'t/, "reshape doesn't fail on a PDLA with a parent" );
 

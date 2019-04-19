@@ -70,18 +70,7 @@ RCS
 ^IO/GD/GD\.c
 ^IO/GD/GD\.pm
 ^IO/GD/GD\.xs
-^IO/Misc/Misc.*
 ^IO/NDF/NDF.pm$
-^IO/Pnm/Pnm\..*
-^IO/Pnm/converters$
-^IO/Pnm/converters/README
-^IO/Pnm/converters/pnmtotiff$
-^IO/Pnm/converters/pnmtotiff.c
-^IO/Pnm/converters/tifftopnm$
-^IO/Pnm/converters/tifftopnm.c
-^IO/Storable/Storable\.c
-^IO/Storable/Storable\.pm
-^IO/Storable/Storable\.xs
 ^IO/tmp0
 ^IO/tmp0.hdr
 ^Image2D/Image2D\..*
@@ -110,7 +99,6 @@ RCS
 ^Lib/Genetic
 ^Lib/Image2D/Image2D\..*
 ^Lib/ImageND/ImageND\..*
-^Lib/ImageRGB/ImageRGB\..*
 ^Lib/Minuit/.*\.a$
 ^Lib/Minuit/.*\.pm$
 ^Lib/Minuit/.*\.xs$

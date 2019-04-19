@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
             "Class::Tiny::Antlers" : "0",
             "DateTime" : "0",
             "Log::Any" : "0",
-            "MarpaX::ESLIF" : "0",
+            "MarpaX::ESLIF" : "v3.0.9",
             "Net::servent" : "0",
             "Safe::Isa" : "0",
             "overload" : "0",
@@ -87,31 +87,35 @@
    "provides" : {
       "MarpaX::ESLIF::URI" : {
          "file" : "lib/MarpaX/ESLIF/URI.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "MarpaX::ESLIF::URI::file" : {
          "file" : "lib/MarpaX/ESLIF/URI/file.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "MarpaX::ESLIF::URI::ftp" : {
          "file" : "lib/MarpaX/ESLIF/URI/ftp.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "MarpaX::ESLIF::URI::http" : {
          "file" : "lib/MarpaX/ESLIF/URI/http.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "MarpaX::ESLIF::URI::https" : {
          "file" : "lib/MarpaX/ESLIF/URI/https.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "MarpaX::ESLIF::URI::mailto" : {
          "file" : "lib/MarpaX/ESLIF/URI/mailto.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "MarpaX::ESLIF::URI::tag" : {
          "file" : "lib/MarpaX/ESLIF/URI/tag.pm",
-         "version" : "0.005"
+         "version" : "0.007"
+      },
+      "MarpaX::ESLIF::URI::tel" : {
+         "file" : "lib/MarpaX/ESLIF/URI/tel.pm",
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -127,11 +131,12 @@
          "web" : "https://github.com/jddurand/perl-marpax-eslif-uri"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_authority" : "cpan:JDDPAUSE",
    "x_contributors" : [
       "Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>"
    ],
+   "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

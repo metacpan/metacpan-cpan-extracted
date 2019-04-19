@@ -3,10 +3,7 @@ package Log::Mini;
 use strict;
 use warnings;
 
-our $VERSION = "0.2.0";
-
-use feature qw/say/;
-
+our $VERSION = "0.2.1";
 
 sub new {
     shift;

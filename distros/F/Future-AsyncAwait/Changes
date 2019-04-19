@@ -1,5 +1,16 @@
 Revision history for Future-AsyncAwait
 
+0.24    2019-04-18 23:47:56
+        [CHANGES]
+         * Stop `async sub`s on ->cancel (RT129202)
+         * Propagate ->cancel requests back to awaiting future, though at
+           present only on perl 5.24+ (RT129202)
+         * Added more internal consistency checks and `panic()` assertions
+
+        [BUGFIXES]
+         * Further fixes for broken behaviour of `foreach(LIST)` (RT129215)
+         * Fix Devel::MAT::Dumper helper for expired but unreclaimed magic
+
 0.23    2019-04-16 01:08:34
         [BUGFIXES]
          * Many improvements to mortals handling, including workarounds for

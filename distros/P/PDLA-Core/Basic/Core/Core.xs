@@ -28,8 +28,6 @@
 
 #define setflag(reg,flagval,val) (val?(reg |= flagval):(reg &= ~flagval))
 
-#define SET_RETVAL_NV(x) x->datatype<PDLA_F ? (RETVAL=newSViv( (IV)result )) : (RETVAL=newSVnv( result ))
-
 Core PDLA; /* Struct holding pointers to shared C routines */
 
 #ifdef FOO
@@ -248,7 +246,7 @@ void propagate_badvalue( pdl *it ) {
 
 /* this is horrible - the routines from bad should perhaps be here instead ? */
 PDLA_Anyval pdl_get_badvalue( int datatype ) {
-    PDLA_Anyval retval;
+    PDLA_Anyval retval = { -1, 0 };
     switch ( datatype ) {
 
 #include "pdldataswitch.c"
@@ -261,7 +259,7 @@ PDLA_Anyval pdl_get_badvalue( int datatype ) {
 
 
 PDLA_Anyval pdl_get_pdl_badvalue( pdl *it ) {
-    PDLA_Anyval retval;
+    PDLA_Anyval retval = { -1, 0 };
     int datatype;
 
 #if BADVAL_PER_PDLA
@@ -620,10 +618,10 @@ sclr_c(it)
 	PDLA_Indx nullp = 0;
 	PDLA_Indx dummyd = 1;
 	PDLA_Indx dummyi = 1;
-	PDLA_Anyval result;
+	PDLA_Anyval result = { -1, 0 };
    CODE:
         /* get the first element of a piddle and return as
-         * Perl double scalar (NV)
+         * Perl scalar (autodetect suitable type IV or NV)
          */
         pdl_make_physvaffine( it );
 	if (it->nvals < 1)
@@ -632,7 +630,7 @@ sclr_c(it)
         /* result = pdl_get_offs(PDLA_REPRP(it),offs); */
         result=pdl_at(PDLA_REPRP(it), it->datatype, &nullp, &dummyd,
         &dummyi, PDLA_REPROFFS(it),1);
-        SET_RETVAL_NV(it) ;
+        ANYVAL_TO_SV(RETVAL, result);
 
     OUTPUT:
         RETVAL
@@ -646,7 +644,7 @@ at_c(x,position)
     PDLA_Indx * pos;
     int npos;
     int ipos;
-    PDLA_Anyval result;
+    PDLA_Anyval result = { -1, 0 };
    CODE:
     pdl_make_physvaffine( x );
 
@@ -668,7 +666,7 @@ at_c(x,position)
         (PDLA_VAFFOK(x) ? x->vafftrans->incs : x->dimincs), PDLA_REPROFFS(x),
 	x->ndims);
 
-    SET_RETVAL_NV(x) ;
+    ANYVAL_TO_SV(RETVAL, result);
 
     OUTPUT:
      RETVAL
@@ -682,7 +680,7 @@ at_bad_c(x,position)
     int npos;
     int ipos;
     int badflag;
-    PDLA_Anyval result;
+    PDLA_Anyval result = { -1, 0 };
    CODE:
     pdl_make_physvaffine( x );
 
@@ -708,22 +706,23 @@ at_bad_c(x,position)
 #  if BADVAL_USENAN
    /* do we have to bother about NaN's? */
    if ( badflag &&
-        ( ( x->datatype < 4 && ( result == pdl_get_badvalue( x->datatype ) ) ) ||
-          ( x->datatype >= 4 && ( finite(result) == 0 ) )
+        ( ( x->datatype < PDLA_F && ANYVAL_EQ_ANYVAL(result, pdl_get_badvalue(x->datatype)) ) ||
+          ( x->datatype == PDLA_F && finite(result.value.F) == 0 ) ||
+          ( x->datatype == PDLA_D && finite(result.value.D) == 0 )
         )
       ) {
 	 RETVAL = newSVpvn( "BAD", 3 );
    } else
 #  else
    if ( badflag &&
-        ( pdl_get_badvalue( x->datatype ) == result )
+        ANYVAL_EQ_ANYVAL( result, pdl_get_badvalue( x->datatype ) )
       ) {
 	 RETVAL = newSVpvn( "BAD", 3 );
    } else
 #  endif
 #endif
 
-    SET_RETVAL_NV(x) ;
+    ANYVAL_TO_SV(RETVAL, result);
 
     OUTPUT:
      RETVAL
@@ -739,6 +738,7 @@ list_c(x)
 	void *data;
 	int ind;
 	int stop = 0;
+	SV *sv;
 	PPCODE:
       pdl_make_physvaffine( x );
 	inds = pdl_malloc(sizeof(PDLA_Indx) * x->ndims); /* GCC -> on stack :( */
@@ -749,8 +749,10 @@ list_c(x)
 	EXTEND(sp,x->nvals);
 	for(ind=0; ind < x->ndims; ind++) inds[ind] = 0;
 	while(!stop) {
-		PUSHs(sv_2mortal(newSVnv(pdl_at( data, x->datatype,
-			inds, x->dims, incs, offs, x->ndims))));
+		PDLA_Anyval pdl_val = { -1, 0 };
+		pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims);
+		ANYVAL_TO_SV(sv,pdl_val);
+		PUSHs(sv_2mortal(sv));
 		stop = 1;
 		for(ind = 0; ind < x->ndims; ind++)
 			if(++(inds[ind]) >= x->dims[ind])
@@ -774,6 +776,9 @@ listref_c(x)
    int lind;
    int stop = 0;
    AV *av;
+   SV *sv;
+   PDLA_Anyval pdl_val =    { -1, 0 };
+   PDLA_Anyval pdl_badval = { -1, 0 };
   CODE:
 #if BADVAL
     /*
@@ -782,12 +787,10 @@ listref_c(x)
     #  returns
     */
 
-   SV *sv;
-   PDLA_Anyval pdl_val, pdl_badval;
    int badflag = (x->state & PDLA_BADVAL) > 0;
 #  if BADVAL_USENAN
     /* do we have to bother about NaN's? */
-   if ( badflag && x->datatype < 4 ) {
+   if ( badflag && x->datatype < PDLA_F ) {
       pdl_badval = pdl_get_pdl_badvalue( x );
    }
 #  else
@@ -811,23 +814,22 @@ listref_c(x)
       pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
       if ( badflag && 
 #  if BADVAL_USENAN
-	/* NOTE: dangerous use of hardwired datatype value 4! */
-	( (x->datatype < 4 && pdl_val == pdl_badval) ||
-			(x->datatype >= 4 && finite(pdl_val) == 0) )
+        ( (x->datatype < PDLA_F && ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval)) ||
+          (x->datatype == PDLA_F && finite(pdl_val.value.F) == 0) ||
+          (x->datatype == PDLA_D && finite(pdl_val.value.D) == 0) )
 #  else
-        pdl_val == pdl_badval
+        ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval)
 #  endif
       ) {
 	 sv = newSVpvn( "BAD", 3 );
       } else {
-	 sv = newSVnv( pdl_val );
+	 ANYVAL_TO_SV(sv, pdl_val);
       }
       av_store( av, lind, sv );
 #else
-      av_store(av,lind,
-               newSVnv( pdl_at( data, x->datatype,
-	       inds, x->dims, incs, offs, x->ndims ) )
-               );
+      pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
+      ANYVAL_TO_SV(sv, pdl_val);
+      av_store(av, lind, sv);
 #endif
 
       lind++;
@@ -879,6 +881,10 @@ set_c(x,position,value)
        pdl_changed( x , PDLA_PARENTDATACHANGED , 0 );
 
 BOOT:
+{
+#if NVSIZE > 8
+   fprintf(stderr, "Your perl NV has more precision than PDLA_Double.  There will be loss of floating point precision!\n");
+#endif
 
    /* Initialize structure of pointers to core C routines */
 
@@ -949,6 +955,7 @@ BOOT:
        by other modules
    */
    sv_setiv(get_sv("PDLA::SHARE",TRUE|GV_ADDMULTI), PTR2IV(&PDLA));
+}
 
 # make piddle belonging to 'class' and of type 'type'
 # from avref 'array_ref' which is checked for being
@@ -1202,22 +1209,19 @@ setdims(x,dims_arg)
        int i;
 	CODE:
 	{
+	        /* This mask avoids all kinds of subtle dereferencing bugs (CED 11/2015) */
+	        if(x->trans || x->vafftrans || x->children.next ) {
+		  pdl_barf("Can't setdims on a PDLA that already has children");
+		}
+
+		/* not sure if this is still necessary with the mask above... (CED 11/2015)  */
 		pdl_children_changesoon(x,PDLA_PARENTDIMSCHANGED|PDLA_PARENTDATACHANGED);
 		dims = pdl_packdims(dims_arg,&ndims);
 		pdl_reallocdims(x,ndims);
 		for(i=0; i<ndims; i++) x->dims[i] = dims[i];
 		pdl_resize_defaultincs(x);
 		x->threadids[0] = ndims;
- /* make null != dims = [0] */
-#ifndef ELIFJELFIJSEJIF
 		x->state &= ~PDLA_NOMYDIMS;
-#else
-		   if(ndims == 1 && dims[0] == 0) {
-			x->state |= PDLA_NOMYDIMS;
-		   } else {
-			x->state &= ~PDLA_NOMYDIMS;
-		   }
-#endif
 		pdl_changed(x,PDLA_PARENTDIMSCHANGED|PDLA_PARENTDATACHANGED,0);
 	}
 
@@ -1315,6 +1319,7 @@ void
 threadover_n(...)
    PREINIT:
    int npdls;
+   SV *sv;
    CODE:
    {
     npdls = items - 1;
@@ -1342,8 +1347,10 @@ threadover_n(...)
 		EXTEND(sp,items);
 		PUSHs(sv_2mortal(newSViv((sd-1))));
 		for(i=0; i<npdls; i++) {
-			PUSHs(sv_2mortal(newSVnv(
-				pdl_get_offs(pdls[i],pdl_thr.offs[i]))));
+			PDLA_Anyval pdl_val = { -1, 0 };
+			pdl_val = pdl_get_offs(pdls[i],pdl_thr.offs[i]);
+			ANYVAL_TO_SV(sv, pdl_val);
+			PUSHs(sv_2mortal(sv));
 		}
 	    	PUTBACK;
 		perl_call_sv(code,G_DISCARD);

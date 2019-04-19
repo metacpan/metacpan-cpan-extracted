@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::http;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Carp qw/croak/;
 use Class::Tiny::Antlers;
@@ -87,7 +87,7 @@ MarpaX::ESLIF::URI::http - URI::http syntax as per RFC7230
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SUBROUTINES/METHODS
 

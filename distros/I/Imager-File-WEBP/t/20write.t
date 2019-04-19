@@ -12,10 +12,15 @@ use TestImage qw(alpha_test_image);
 
   my $data;
   ok($im->write(data => \$data, type => "webp"),
-     "write single image");
+     "write single image")
+    or diag $im->errstr;
   ok(length $data, "actually wrote something");
   is(substr($data, 0, 4), 'RIFF', "got a RIFF file");
   is(substr($data, 8, 4), 'WEBP', "of WEBP flavour");
+  my $im2 = Imager->new;
+  ok($im2->read(data => \$data, type => "webp"),
+     "read it back");
+  is_image_similar($im2, $im, 2_000_000, "check it's similar");
 }
 
 SKIP:
@@ -99,7 +104,7 @@ SKIP:
   my $data;
   ok(!$im->write(data => \$data, type => "webp", webp_mode => "invalid"),
      "fail to write webp invalid mode");
-  like($im->errstr, qr/webp_mode must be 'lossy' or 'lossless'/,
+  like($im->errstr, qr/Unknown value 'invalid' for tag webp_mode/,
        "check error message");
   print "# ", $im->errstr, "\n";
 }
@@ -153,7 +158,7 @@ SKIP:
   my $data;
   ok(!Imager->write_multi({ data => \$data, type => "webp" }, @im),
      "write multiple with bad tag in second");
-  like(Imager->errstr, qr/webp_mode must be 'lossy' or 'lossless'/,
+  like(Imager->errstr, qr/Unknown value 'invalid' for tag webp_mode/,
        "check error message");
 }
 

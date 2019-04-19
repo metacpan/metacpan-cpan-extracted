@@ -1,6 +1,7 @@
-use Test::More tests => 53;
+use Test::More tests => 60;
 use PDLA::LiteF;
 use Test::Exception;
+use Config;
 
 use strict;
 use warnings;
@@ -168,6 +169,15 @@ ok(all($data == 1), 'or assign');
 ok(all($data eq $data), 'eq'); # check eq operator
 }
 
+SKIP:
+{
+  skip("ipow skipped without 64bit support", 1) if $Config{ivsize} < 8;
+  # check ipow routine
+  my $xdata = indx(0xeb * ones(8));
+  my $n = sequence(indx,8);
+  my $exact = indx(1,235,55225,12977875,3049800625,716703146875,168425239515625,39579931286171875);
+  ok(all($exact - ipow($xdata,$n) == indx(0)), 'ipow');
+}
 
 #### Modulus checks ####
 
@@ -219,4 +229,16 @@ my $USHORT_MAX = 65535;
 
 ok byte($BYTE_MAX)%1 == 0, 'big byte modulus';
 ok ushort($USHORT_MAX)%1 == 0, 'big ushort modulus';
+}
+
+SKIP:
+{
+  skip("your perl hasn't 64bit int support", 6) if $Config{ivsize} < 8;
+  # SF bug #343 longlong constructor and display lose digits due to implicit double precision conversions
+  cmp_ok longlong(10555000100001145) - longlong(10555000100001144),      '==', 1, "longlong precision/1";
+  cmp_ok longlong(9000000000000000002) - longlong(9000000000000000001),  '==', 1, "longlong precision/2";
+  cmp_ok longlong(-8999999999999999998) + longlong(8999999999999999999), '==', 1, "longlong precision/3";
+  cmp_ok longlong(1000000000000000001) - longlong(1000000000000000000),  '==', 1, "longlong precision/4";
+  cmp_ok longlong(9223372036854775807) - longlong(9223372036854775806),  '==', 1, "longlong precision/5";
+  cmp_ok longlong(9223372036854775807) + longlong(-9223372036854775808), '==',-1, "longlong precision/6";
 }

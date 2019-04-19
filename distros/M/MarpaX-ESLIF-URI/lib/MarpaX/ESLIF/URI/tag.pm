@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::tag;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Class::Tiny::Antlers;
 use MarpaX::ESLIF;
@@ -127,7 +127,7 @@ MarpaX::ESLIF::URI::tag - URI::tag syntax as per RFC4151
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SUBROUTINES/METHODS
 

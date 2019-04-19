@@ -38,6 +38,8 @@ lib/LINE/Bot/API/Event/BeaconDetection.pm
 lib/LINE/Bot/API/Event/Follow.pm
 lib/LINE/Bot/API/Event/Join.pm
 lib/LINE/Bot/API/Event/Leave.pm
+lib/LINE/Bot/API/Event/MemberJoin.pm
+lib/LINE/Bot/API/Event/MemberLeave.pm
 lib/LINE/Bot/API/Event/Message.pm
 lib/LINE/Bot/API/Event/Postback.pm
 lib/LINE/Bot/API/Event/Unfollow.pm

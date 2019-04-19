@@ -1,3 +1,22 @@
+Imager-File-WEBP 0.005 - 19 Apr 2019
+======================
+
+ - minor whitespace fixups.
+   The reporter supplied a patch, but it was excessive.
+   https://rt.cpan.org/Ticket/Display.html?id=128954
+
+ - use snprintf() when available.
+   https://rt.cpan.org/Ticket/Display.html?id=128954
+
+ - fix a sign-extension -> size_t conversion issue when scanning for
+   RIFF blocks, which is used to detect if an image uses lossless
+   compression.  Due to the way this works I expect it can't be
+   triggered, and can't be a security issue.
+   https://rt.cpan.org/Ticket/Display.html?id=128953
+
+ - significantly extend the options available for compression.
+   I now use the advanced encoding API.
+
 Imager-File-WEBP 0.004 - 14 Feb 2019
 ======================
 

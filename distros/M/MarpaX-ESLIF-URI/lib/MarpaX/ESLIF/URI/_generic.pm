@@ -7,13 +7,13 @@ package MarpaX::ESLIF::URI::_generic;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Carp qw/croak/;
 use Class::Method::Modifiers qw/fresh around/;
 use Class::Tiny::Antlers;
 use Log::Any qw/$log/;
-use MarpaX::ESLIF;
+use MarpaX::ESLIF 3.0.9;
 use MarpaX::ESLIF::URI;   # Because of resolve()
 use MarpaX::ESLIF::URI::_generic::RecognizerInterface;
 use MarpaX::ESLIF::URI::_generic::ValueInterface;
@@ -676,7 +676,7 @@ MarpaX::ESLIF::URI::_generic - URI Generic syntax as per RFC3986/RFC6874
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SUBROUTINES/METHODS
 

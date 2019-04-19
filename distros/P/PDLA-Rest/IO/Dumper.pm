@@ -91,7 +91,6 @@ This package comes with NO WARRANTY.
 
 package PDLA::IO::Dumper;
 use File::Temp;
-use PDLA::IO::FITS qw(rfits wfits); # needs rfits / wfits
 
 BEGIN{
   use Exporter ();

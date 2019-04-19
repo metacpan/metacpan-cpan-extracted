@@ -1,5 +1,9 @@
 Revision history for Perl extension LINE::Bot::API
 
+1.07  2019-04-19 16:42:43 JST
+        - Add member join/leave event.
+
+
 1.06  2019-04-05 16:50:39 JST
         - Define the class for 'File' message type.
         - Replace links to developers.line.biz.

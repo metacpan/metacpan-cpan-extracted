@@ -70,7 +70,7 @@ typedef SV PADNAME;
 static void panic(char *fmt, ...);
 
 #ifndef NOT_REACHED
-#  define NOT_REACHED STMT_START { panic("Unreachable"); } STMT_END
+#  define NOT_REACHED STMT_START { panic("Unreachable\n"); } STMT_END
 #endif
 #include "docatch.c.inc"
 
@@ -126,6 +126,10 @@ struct SuspendedFrame {
     } eval;
     struct block_loop loop;
   } el;
+
+  /* for debugging purposes */
+  SV *loop_list_first_item;
+
 #ifdef HAVE_ITERVAR
   SV *itervar;
 #endif
@@ -285,7 +289,7 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
     }
   }
 
-  if(state->padlen) {
+  if(state->padlen && state->padslots) {
     int i;
     for(i = 0; i < state->padlen - 1; i++)
       if(state->padslots[i])
@@ -409,6 +413,7 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
 
     Safefree(state->padslots);
     state->padslots = NULL;
+    state->padlen = 0;
   }
 
   Safefree(state);
@@ -419,12 +424,9 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
 #define suspend_frame(frame, cx)  MY_suspend_frame(aTHX_ frame, cx)
 static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 {
-  /* The base of the stack within this context */
-  SV **bp = PL_stack_base + cx->blk_oldsp + 1;
-  I32 *markbase = PL_markstack + cx->blk_oldmarksp + 1;
-
   frame->stacklen = (I32)(PL_stack_sp - PL_stack_base)  - cx->blk_oldsp;
   if(frame->stacklen) {
+    SV **bp = PL_stack_base + cx->blk_oldsp + 1;
     I32 i;
     /* Steal SVs right off the stack */
     Newx(frame->stack, frame->stacklen, SV *);
@@ -437,10 +439,11 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 
   frame->marklen = (I32)(PL_markstack_ptr - PL_markstack) - cx->blk_oldmarksp;
   if(frame->marklen) {
+    I32 *markbase = PL_markstack + cx->blk_oldmarksp + 1;
     I32 i;
     Newx(frame->marks, frame->marklen, I32);
     for(i = 0; i < frame->marklen; i++) {
-      /* Translate mark value relative to bp */
+      /* Translate mark value relative to base */
       I32 relmark = markbase[i] - cx->blk_oldsp;
       frame->marks[i] = relmark;
     }
@@ -539,8 +542,8 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
          * older than 5.20, this might be PL_tmps_floor
          */
         if(var == (int *)&PL_tmps_floor) {
-          /* Don't bother to save the old tmpsfloor. We'll actually just
-           * squash all the mortals into one big block anyway
+          /* Don't bother to save the old tmpsfloor as we'll SAVETMPS again
+           * later if we need to
            */
           oldtmpsfloor = val;
           goto nosave;
@@ -576,8 +579,8 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
          * older than 5.24, this might be PL_tmps_floor
          */
         if(var == (STRLEN *)&PL_tmps_floor) {
-          /* Don't bother to save the old tmpsfloor. We'll actually just
-           * squash all the mortals into one big block anyway
+          /* Don't bother to save the old tmpsfloor as we'll SAVETMPS again
+           * later if we need to
            */
           oldtmpsfloor = val;
           goto nosave;
@@ -735,11 +738,51 @@ nosave:
         case CXt_LOOP_ARY:
 #else
         case CXt_LOOP_FOR:
+          /* The ix field stores an absolute stack height as offset from
+           * PL_stack_base directly. When we get resumed the stack will
+           * probably not be the same absolute height at this point, so we'll
+           * have to store them relative to something fixed.
+           */
+          if(!cx->blk_loop.state_u.ary.ary) {
+            I32 height = PL_stack_sp - PL_stack_base;
+            frame->el.loop.state_u.ary.ix = height - frame->el.loop.state_u.ary.ix;
+          }
 #endif
           /* this field is also refcounted, so we need to save it too */
           if(frame->el.loop.state_u.ary.ary)
             SvREFCNT_inc(frame->el.loop.state_u.ary.ary);
           break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+        case CXt_LOOP_LIST:
+          /* Safety check the above logic
+           * CXt_LOOP_LIST frame's cx->blk_oldsp has a different meaning than
+           * other frame types, but that meaning shouldn't matter provided we
+           * didn't attempt to steal any stack values or marks
+           */
+          if(frame->stacklen || frame->marklen)
+            panic("ARGH CXt_LOOP_LIST frame tried to steal stack values or marks\n");
+
+          /* The various fields in the context structure store absolute stack
+           * heights as offsets from PL_stack_base directly. When we get
+           * resumed the stack will probably not be the same absolute height
+           * at this point, so we'll have to store them relative to something
+           * fixed.
+           * We'll adjust them to be upside-down, counting -backwards- from
+           * the current stack height.
+           */
+          I32 height = PL_stack_sp - PL_stack_base;
+
+          if(cx->blk_oldsp != height)
+            panic("ARGH suspending CXt_LOOP_LIST frame with blk_oldsp != stack height\n");
+
+          /* First item is at [1] oddly, not [0] */
+          frame->loop_list_first_item = PL_stack_base[cx->blk_loop.state_u.stack.basesp+1];
+
+          frame->el.loop.state_u.stack.basesp = height - frame->el.loop.state_u.stack.basesp;
+          frame->el.loop.state_u.stack.ix     = height - frame->el.loop.state_u.stack.ix;
+          break;
+#endif
       }
 
       break;
@@ -1214,6 +1257,42 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
     Safefree(frame->mortals);
     frame->mortals = NULL;
   }
+
+  switch(frame->type) {
+#if !HAVE_PERL_VERSION(5, 24, 0)
+    case CXt_LOOP_FOR:
+      if(!cx->blk_loop.state_u.ary.ary) {
+        I32 height = PL_stack_sp - PL_stack_base;
+        cx->blk_loop.state_u.ary.ix = height - cx->blk_loop.state_u.ary.ix;
+      }
+      break;
+#endif
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+    case CXt_LOOP_LIST: {
+      I32 height = PL_stack_sp - PL_stack_base;
+
+      cx->blk_loop.state_u.stack.basesp = height - cx->blk_loop.state_u.stack.basesp;
+      cx->blk_loop.state_u.stack.ix     = height - cx->blk_loop.state_u.stack.ix;
+
+      /* For consistency; check that the first SV in the list is in the right
+       * place. If so we presume the others are
+       */
+      if(PL_stack_base[cx->blk_loop.state_u.stack.basesp+1] == frame->loop_list_first_item)
+        break;
+
+      /* First item is at [1] oddly, not [0] */
+      fprintf(stderr, "F:AA: consistency check resume LOOP_LIST with first=%p:",
+        frame->loop_list_first_item);
+      debug_sv_summary(frame->loop_list_first_item);
+      fprintf(stderr, " stackitem=%p:", PL_stack_base[frame->el.loop.state_u.stack.basesp + 1]);
+      debug_sv_summary(PL_stack_base[frame->el.loop.state_u.stack.basesp]);
+      fprintf(stderr, "\n");
+      panic("ARGH CXt_LOOP_LIST consistency check failed\n");
+      break;
+    }
+#endif
+  }
 }
 
 #define suspendedstate_resume(state, cv)  MY_suspendedstate_resume(aTHX_ state, cv)
@@ -1236,6 +1315,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 
     Safefree(state->padslots);
     state->padslots = NULL;
+    state->padlen = 0;
   }
 
   SuspendedFrame *frame, *next;
@@ -1348,29 +1428,35 @@ static SV *MY_future_new_from_proto(pTHX_ SV *proto)
   return f;
 }
 
-#define future_is_ready(f)  MY_future_is_ready(aTHX_ f)
-static int MY_future_is_ready(pTHX_ SV *f)
+#define future_is_ready(f)      MY_future_check(aTHX_ f, "is_ready")
+#define future_is_cancelled(f)  MY_future_check(aTHX_ f, "is_cancelled")
+static bool MY_future_check(pTHX_ SV *f, const char *method)
 {
   dSP;
 
-  ENTER_with_name("future_is_ready");
+  if(!f || !SvOK(f))
+    panic("ARGH future_check() on undefined value\n");
+  if(!SvROK(f))
+    panic("ARGH future_check() on non-reference\n");
+
+  ENTER_with_name("future_check");
   SAVETMPS;
 
   PUSHMARK(SP);
   XPUSHs(f);
   PUTBACK;
 
-  call_method("is_ready", G_SCALAR);
+  call_method(method, G_SCALAR);
 
   SPAGAIN;
 
-  int is_ready = POPi;
+  bool ret = SvTRUEx(POPs);
 
   PUTBACK;
   FREETMPS;
-  LEAVE_with_name("future_is_ready");
+  LEAVE_with_name("future_check");
 
-  return is_ready;
+  return ret;
 }
 
 #define future_get_to_stack(f, gimme)  MY_future_get_to_stack(aTHX_ f, gimme)
@@ -1395,6 +1481,7 @@ static void MY_future_on_ready(pTHX_ SV *f, CV *code)
   dSP;
 
   ENTER_with_name("future_on_ready");
+  SAVETMPS;
 
   PUSHMARK(SP);
   XPUSHs(f);
@@ -1403,7 +1490,27 @@ static void MY_future_on_ready(pTHX_ SV *f, CV *code)
 
   call_method("on_ready", G_VOID);
 
+  FREETMPS;
   LEAVE_with_name("future_on_ready");
+}
+
+#define future_chain_on_cancel(f1, f2)  MY_future_chain_on_cancel(aTHX_ f1, f2)
+static void MY_future_chain_on_cancel(pTHX_ SV *f1, SV *f2)
+{
+  dSP;
+
+  ENTER_with_name("future_chain_on_cancel");
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  XPUSHs(f1);
+  XPUSHs(f2);
+  PUTBACK;
+
+  call_method("on_cancel", G_VOID);
+
+  FREETMPS;
+  LEAVE_with_name("future_chain_on_cancel");
 }
 
 /*
@@ -1489,6 +1596,17 @@ static OP *pp_await(pTHX)
   TRACEPRINT("ENTER await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
 
   if(state && state->awaiting_future) {
+    if(!SvROK(state->returning_future))
+      panic("ARGG we lost state->returning_future\n");
+
+    if(future_is_cancelled(state->returning_future)) {
+      TRACEPRINT("  CANCELLED\n");
+
+      PUSHMARK(SP);
+      PUTBACK;
+      return PL_ppaddr[OP_RETURN](aTHX);
+    }
+
     I32 orig_height;
 
     TRACEPRINT("  RESUME\n");
@@ -1580,6 +1698,21 @@ static OP *pp_await(pTHX)
 
   if(!SvWEAKREF(state->returning_future))
     sv_rvweaken(state->returning_future);
+  if(!SvROK(state->returning_future))
+    panic("ARGH we lost the ->returning_future\n");
+
+/* For unknown reasons, doing this on perls 5.20 or 5.22 massively breaks
+ * everything.
+ *   https://rt.cpan.org/Ticket/Display.html?id=129202#txn-1843918
+ */
+#if HAVE_PERL_VERSION(5, 24, 0)
+  future_chain_on_cancel(state->returning_future, state->awaiting_future);
+#endif
+
+  if(!SvROK(state->returning_future))
+    panic("ARGH we lost the ->returning_future\n");
+  if(!SvROK(state->awaiting_future))
+    panic("ARGH we lost the ->awaiting_future\n");
 
   TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
 

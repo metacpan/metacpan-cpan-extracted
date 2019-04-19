@@ -15,7 +15,7 @@ GetOptions("incpath=s", \@incpaths,
 our $BUILDING_IMAGER;
 our %IMAGER_LIBS;
 
-my %opts = 
+my %opts =
   (
    NAME => 'Imager::File::WEBP',
    VERSION_FROM => 'WEBP.pm',
@@ -54,52 +54,52 @@ if (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 }) {
 }
 
 my @inc;
-  unshift @INC, "inc";
-  require Imager::ExtUtils;
-  push @inc, Imager::ExtUtils->includes;
-  $opts{TYPEMAPS} = [ Imager::ExtUtils->typemap ];
+unshift @INC, "inc";
+require Imager::ExtUtils;
+push @inc, Imager::ExtUtils->includes;
+$opts{TYPEMAPS} = [ Imager::ExtUtils->typemap ];
 
-  # Imager required configure through use
-  my @Imager_req = ( Imager => "0.94" );
-  if (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 }) {
-    $opts{META_MERGE}{prereqs} =
-      {
-       configure =>
-       {
-	requires =>
-	{
-	 @Imager_req,
-	},
-       },
-       build =>
-       {
-	requires =>
-	{
-	 @Imager_req,
-	 "Test::More" => "0.47",
-	}
-       },
-       runtime =>
-       {
-	requires =>
-	{
-	 @Imager_req,
-	}
-       },
-       test =>
-       {
-	requires =>
-	{
-	 "Test::More" => "0.47",
-	}
-       },
-      };
-    $opts{PREREQ_PM} =
+# Imager required configure through use
+my @Imager_req = ( Imager => "0.94" );
+if (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 }) {
+  $opts{META_MERGE}{prereqs} =
+    {
+     configure =>
+     {
+      requires =>
       {
        @Imager_req,
-       XSLoader => 0,
-      };
-  }
+      },
+     },
+     build =>
+     {
+      requires =>
+      {
+       @Imager_req,
+       "Test::More" => "0.47",
+      }
+     },
+     runtime =>
+     {
+      requires =>
+      {
+       @Imager_req,
+      }
+     },
+     test =>
+     {
+      requires =>
+      {
+       "Test::More" => "0.47",
+      }
+     },
+    };
+  $opts{PREREQ_PM} =
+    {
+     @Imager_req,
+     XSLoader => 0,
+    };
+}
 
 require Imager::Probe;
 
@@ -124,6 +124,10 @@ if ($probe_res) {
   $opts{DEFINE} .= " $probe_res->{DEFINE}";
   $opts{INC} = "@inc";
 
+  if ($Config{d_snprintf}) {
+    $opts{DEFINE} .= " -DHAVE_SNPRINTF";
+  }
+
   WriteMakefile(%opts);
 }
 else {
@@ -132,13 +136,13 @@ else {
 
 sub _webp_test_code {
   return <<'CODE';
-    unsigned int mux_ver = WebPGetMuxVersion();
-    unsigned int enc_ver = WebPGetEncoderVersion();
-    unsigned int dec_ver = WebPGetDecoderVersion();
-    printf("encoder %d.%d.%d (%x)\ndecoder %d.%d.%d (%x)\nmux %d.%d.%d (%x)\n",
-	    enc_ver >> 16, (enc_ver >> 8) & 0xFF, enc_ver & 0xFF, enc_ver,
-	    dec_ver >> 16, (dec_ver >> 8) & 0xFF, dec_ver & 0xFF, dec_ver,
-	    mux_ver >> 16, (mux_ver >> 8) & 0xFF, mux_ver & 0xFF, mux_ver);
+  unsigned int mux_ver = WebPGetMuxVersion();
+  unsigned int enc_ver = WebPGetEncoderVersion();
+  unsigned int dec_ver = WebPGetDecoderVersion();
+  printf("encoder %d.%d.%d (%x)\ndecoder %d.%d.%d (%x)\nmux %d.%d.%d (%x)\n",
+         enc_ver >> 16, (enc_ver >> 8) & 0xFF, enc_ver & 0xFF, enc_ver,
+         dec_ver >> 16, (dec_ver >> 8) & 0xFF, dec_ver & 0xFF, dec_ver,
+         mux_ver >> 16, (mux_ver >> 8) & 0xFF, mux_ver & 0xFF, mux_ver);
   if (enc_ver < 0x000500 || dec_ver < 0x000500) {
     printf("Need at least version 0.5.0 of libwebp\n");
     return 1;

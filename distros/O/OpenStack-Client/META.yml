@@ -1,7 +1,7 @@
 ---
 abstract: 'A nice and tiny OpenStack API client'
 author:
-  - 'Alexandra Hrefna HilmisdÃ³ttir <xan@cpanel.net>'
+  - 'Alexandra Hrefna Maheu <xan@cpanel.net>'
 build_requires:
   HTTP::Request: '0'
   JSON: '0'
@@ -26,5 +26,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: https://github.com/xantronix/openstack-client.git
-version: '1.0005'
+version: '1.0006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

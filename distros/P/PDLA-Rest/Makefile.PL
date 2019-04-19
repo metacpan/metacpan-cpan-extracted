@@ -40,15 +40,13 @@ if (!defined($PDLA::Config{USE_POGL}) or +$PDLA::Config{USE_POGL}) {
    warn "Makefile.PL: Have \$PDLA::Config{USE_POGL} => 0 so skipping TriD build with POGL\n";
 }
 
+my @coredep = ('PDLA::Core' => '2.016000');
 my @prereq = (
 	   'Astro::FITS::Header' => 0,
            'Carp'                => 0,         # Need to run
            'Config'              => 0,         # 
            'Convert::UU'         => 0,         # for PDLA::IO::Dumper
            'Data::Dumper'        => 2.121,     # for PDLA::IO::Dumper
-           'English'             => 0,
-           'ExtUtils::MakeMaker' => 6.56,      # for CONFIGURE_REQUIRES support
-           'ExtUtils::Manifest'  => 0,
            'Fcntl'               => 0,
            'File::Basename'      => 0,
            'File::Find'          => 0,
@@ -61,7 +59,7 @@ my @prereq = (
 	   'Inline'              => 0.68,
 	   'Inline::C'           => 0.62,
 	   'Module::Compile'     => 0.23,      # for new PDLA::NiceSlice
-           'PDLA::Core' => '2.013007',
+	   @coredep,
 	   'Pod::Parser'         => 0,         # version TBD for PDLA::Doc
 	   'Pod::Select'         => 0,         # version TBD for PDLA::Doc
            'Scalar::Util'        => 0,
@@ -90,8 +88,9 @@ my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDLA::Core::Dev -e pdlpp_
 
 my %makefile_hash = (
 	      'PREREQ_PM' => { @prereq },
+	      'LICENSE' => 'perl',
               'CONFIGURE_REQUIRES' => {
-                'PDLA::Core' => '2.013007',
+                @coredep,
                 'Devel::CheckLib' => 1.01,
                 'Carp'            => 1.20,    # EU::MM seems to need this not to crash
                 'ExtUtils::MakeMaker' => 6.56,
@@ -104,6 +103,7 @@ my %makefile_hash = (
                 'Test::Exception' => 0,
                 'Test::Warn' => 0,  # for t/pptest.t
                 'Test::Deep' => 0,
+                'ExtUtils::Manifest'  => 0,
               },
               BUILD_REQUIRES => {
                 'ExtUtils::MakeMaker' => 0,

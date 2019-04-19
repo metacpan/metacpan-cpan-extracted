@@ -1,3 +1,64 @@
+2.016000 2019-04-19
+ - Bugs fixed:
+   - 417   Perl 5.22: + GSL 2.1 fails to build
+   - 408   PDLA::GSL::RNG set_seed minor improvement
+   - 407   Build failures with GSL 2.1
+ - PDLA::Transform image resampling now handles bad values in
+   images.  In particular, the `h' and `j' (optimized filter)
+   resampling methods properly skip bad values in the image,
+   marking output pixels bad if more than 1/3 of the weighted
+   values associated with that output pixel are bad.
+ - PDLA::GSLSF modules have several fixes/improvements to support
+   building against GSL 2.0:
+       - New calling convention for gsl_sf_ellint_D.
+       - New functions gsl_sf_legendre_array
+         and gsl_sf_legendre_array_index.
+       - Deprecated gsl_sf_legendre_Plm_array
+         and gsl_sf_legendre_sphPlm_array.
+       - New tests for new legendre functions.
+       - Test requires all PDLA::GSLSF modules
+         to successfully load.
+ - PDLA::GSL::RNG now allows chaining for the set_seed() method:
+   e.g. $rng = PDLA::GSL::RNG->new(..)->set_seed(..)
+ - PDLA::Image2D's ccNcompt connected-component analysis code now
+   returns types that are >= long, to avoid common overflow errors.
+ - PDLA::Fit::LM:
+       - Documentation has been clarified relating to input
+         data uncertainties and weighting of the fit.
+       - A small test suite has been added.
+ - There is now a .gitattributes file so GitHub repo language
+   stats are more accurate.
+ - The PDLA SF/GitHub deveolpment workflow is integrated into
+   the DEVELOPMENT docs.
+
+2.015000 2019-04-19
+ - Fixes to improve compile and test of F77 modules
+   on OS X (i.e. don't build i386 versions)
+ - Fix win10 breakage in t/flexraw_fortran.t  Apparently, temp
+   files were not being released after use which was preventing
+   the tests to pass.
+ - improving PDLA::GSL::RNG documentation
+ - remove spurious '}' from gnuplot demo
+
+2.014000 2019-04-19
+ - PDLA can now create and use piddles having more
+   than 2**32 elements.  Of particular use is that
+   you can now use PDLA::IO::FlexRaw to memory map
+   piddles from files on disk which can allow for
+   simplified processing and IO on extremely large
+   data.
+ - Many fixes to the build process to make PDLA more robust
+   to build, test, and install.  This takes advantage of new
+   automated CI testing via Travis CI on the github site.
+   Thanks much to Ed and Zakariyya for their work to get
+   this started and maintained.  This CI testing makes
+   this the best tested and best testing PDLA release ever!
+ - Various documentation clean-ups and work to improve
+   on-line viewing at http://metacpan.org and others.
+   (Thanks kmx and Derek!)
+ - zap IO/{Misc,FITS,Pic}, Lib/ImageRGB as restored to ::Core
+ - zap IO/Storable as restored to ::Core
+
 2.013005 2019-04-17
  - zap IO/HDF as that's in separate distro
  - hide PDLA package declaration from IO/Storage as PAUSE tries to index

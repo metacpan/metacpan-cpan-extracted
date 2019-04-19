@@ -1,6 +1,24 @@
 Changelog for MarpaX-ESLIF-URI
 
-0.005 2018-04-11T04:24:24
+0.007 2019-04-19T12:26:16
+ [Jean-Damien Durand]
+ - use MarpaX::ESLIF 3.0.9
+
+0.006 2019-04-19T07:21:38Z
+ [Jean-Damien Durand]
+ - dzil xtest
+ - pod fix
+ - Mention MarpaX::ESLIF::URI::tel in global pod
+ - RFC4904
+ - Add boolean methods
+ - RFC4759
+ - RFC4715
+ - pod fixes
+ - RFC4694 pod fixes
+ - RFC4694 (except E.164)
+ - tel schema
+
+0.005 2018-04-11T04:24:24Z
  [Jean-Damien Durand]
  - Fix general typo "methods or MarpaX::ESLIF::URI::_generic"
  - Mention MarpaX::ESLIF::URI::tag in the top package

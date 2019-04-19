@@ -1,7 +1,7 @@
 {
    "abstract" : "A nice and tiny OpenStack API client",
    "author" : [
-      "Alexandra Hrefna HilmisdÃ³ttir <xan@cpanel.net>"
+      "Alexandra Hrefna Maheu <xan@cpanel.net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/xantronix/openstack-client"
       }
    },
-   "version" : "1.0005",
+   "version" : "1.0006",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

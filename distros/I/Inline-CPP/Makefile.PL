@@ -4,13 +4,13 @@ use strict;
 
 # The next line is verified via t/13version_numbers.t. Retain single quoting.
 
-my $DIST_VERSION    = '0.75';                        # DRY in Makefile.PL.
+my $DIST_VERSION    = '0.80';                        # DRY in Makefile.PL.
 
 my $CPP_Config_path = 'lib/Inline/CPP/Config.pm';
 
 my %PREREQ_PM = (
-  'Inline'            => '0.78',
-  'Inline::C'         => '0.78_003', # supports 5.8.1
+  'Inline'            => '0.82',
+  'Inline::C'         => '0.80', # supports 5.8.1
   'Parse::RecDescent' => '0',
   'Carp'              => '0',
   'Config'            => '0',

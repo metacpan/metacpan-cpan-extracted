@@ -209,7 +209,7 @@ PDLA_Anyval pdl_at( void* x, int datatype, PDLA_Indx* pos, PDLA_Indx* dims,
 
     int i;
     PDLA_Indx ioff;
-    PDLA_Anyval result;
+    PDLA_Anyval result = { -1, 0 };
 
     for(i=0; i<ndims; i++) { /* Check */
 
@@ -225,14 +225,10 @@ PDLA_Anyval pdl_at( void* x, int datatype, PDLA_Indx* pos, PDLA_Indx* dims,
    GENERICLOOP (datatype)
 
       generic *xx = (generic *) x;
-      result = (PDLA_Anyval)xx[ioff];
+      result.type = datatype;
+      result.value.generic_ppsym = xx[ioff];
 
    ENDGENERICLOOP
-
-#ifdef MACOS_MZERO_BRAINDAMAGE
-    if(!result)
-        result=0;
-#endif
 
    return result;
 }
@@ -255,7 +251,7 @@ void pdl_set( void* x, int datatype, PDLA_Indx* pos, PDLA_Indx* dims, PDLA_Indx*
    GENERICLOOP (datatype)
 
       generic *xx = (generic *) x;
-      xx[ioff] = value;
+      ANYVAL_TO_CTYPE(xx[ioff], generic, value);
 
    ENDGENERICLOOP
 }

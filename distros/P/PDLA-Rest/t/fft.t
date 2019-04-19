@@ -5,7 +5,6 @@ use warnings;
 use PDLA;
 use PDLA::Image2D;
 use PDLA::FFT;
-use PDLA::IO::FITS;
 
 use Test::More tests => 17;
 use Test::Exception;

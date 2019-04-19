@@ -4,6 +4,9 @@
 WEBP\.c$
 Makefile$
 ^Imager-File-WEBP
+^cov-int/
+\.tar\.gz$
+\.i$
 MYMETA\.*
 blib
 

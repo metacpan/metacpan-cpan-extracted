@@ -231,15 +231,15 @@ foreach my $func ( keys %over ) {
 %over = 
     (
      zcover   => { def=>'char tmp', txt => '== 0', init => 1, alltypes => 1,
-		   op => 'tmp &= ($a() == 0);', check => '!tmp' },
+		   otype => 'int+', op => 'tmp &= ($a() == 0);', check => '!tmp' },
      andover  => { def=>'char tmp', txt => 'and', init => 1, alltypes => 1, 
-		   op => 'tmp &=  ($a() != 0);', check => '!tmp' },
-     bandover => { def=>'$GENERIC(b) tmp', txt => 'bitwise and', init => '~0', 
-		   op => 'tmp &= $a();', check => '!tmp' },
+		   otype => 'int+', op => 'tmp &=  ($a() != 0);', check => '!tmp' },
+     bandover => { def=>'$GENERIC() tmp', txt => 'bitwise and', init => '~0', 
+		   otype => '', op => 'tmp &= $a();', check => '!tmp' },
      orover   => { def=>'char tmp', txt => 'or', init => 0, alltypes => 1, 
-		   op => 'tmp |= ($a() != 0);', check => 'tmp' },
-     borover  => { def=>'$GENERIC(b) tmp', txt => 'bitwise or', init => 0, 
-		   op => 'tmp |= $a() ;', check => '!~tmp' },
+		   otype => 'int+', op => 'tmp |= ($a() != 0);', check => 'tmp' },
+     borover  => { def=>'$GENERIC() tmp', txt => 'bitwise or', init => 0, 
+		   otype => '', op => 'tmp |= $a() ;', check => '!~tmp' },
 
      );
 
@@ -248,19 +248,20 @@ foreach my $func ( keys %over ) {
     my $def   = $over{$func}{def};
     my $txt   = $over{$func}{txt};
     my $init  = $over{$func}{init};
+    my $otype = $over{$func}{otype};
     my $op    = $over{$func}{op};
     my $check = $over{$func}{check};
 
     my %extra = {};
     unless ( defined $over{$func}{alltypes} and $over{$func}{alltypes} ) {
-	$extra{GenericTypes} = ['B','S','U','L'];
+	$extra{GenericTypes} = ['B','S','U','L','N'];
     }
 
     pp_def(
 	   $func,
 	   HandleBad => 1,
 	   %extra,
-	   Pars => 'a(n); int+ [o]b();',
+	   Pars => 'a(n); ' . $otype . ' [o]b();',
 	   Code =>
 	   $def . '=' . $init . ';
             loop(n) %{ ' . $op . ' if (' . $check . ') break; %}
@@ -290,7 +291,7 @@ as it will not contain any bad values.',
 pp_def(
        'intover',
        HandleBad => 0,
-       Pars => 'a(n); int+ [o]b();',
+       Pars => 'a(n); float+ [o]b();',
        Code =>
        '$GENERIC(b) tmp = 0;
        PDLA_Indx ns = $SIZE(n), nn;
@@ -375,6 +376,22 @@ pp_def(
 	Doc => projectdocs( 'average', 'average', '' ),
 	);
 
+pp_addpm("*PDLA::avgover = \\&PDLA::average;\n");
+pp_addpm("*avgover = \\&PDLA::average;\n");
+pp_add_exported('PDLA::PP avgover');
+
+pp_addpm(<<'EOD');
+=head2 avgover
+
+=for ref
+
+  Synonym for average.
+
+=cut
+
+EOD
+
+
 # do the above calculation, but in double precision
 pp_def( 
 	'daverage',
@@ -399,6 +416,22 @@ pp_def(
 "Unlike L<average|/average>, the calculation is performed in double\n" .
 "precision." ),
 	);
+
+pp_addpm("*PDLA::davgover = \\&PDLA::daverage;\n");
+pp_addpm("*davgover = \\&PDLA::daverage;\n");
+pp_add_exported('PDLA::PP davgover');
+
+pp_addpm(<<'EOD');
+=head2 davgover
+
+=for ref
+
+  Synonym for daverage.
+
+=cut
+
+EOD
+
 
 # Internal utility sorting routine for median/qsort/qsortvec routines.
 #
@@ -578,15 +611,15 @@ FOO
 
 sub generic_qsort {
     my $pdl = shift;
-    return '$TBSULNQFDA(pdl_qsort_B,pdl_qsort_S,pdl_qsort_U,
-             pdl_qsort_L,pdl_qsort_N,pdl_qsort_Q,pdl_qsort_F,pdl_qsort_D,pdl_qsort_D) ($P(' . $pdl . '), 0, nn);';
+    return '$TBSULNQFD(pdl_qsort_B,pdl_qsort_S,pdl_qsort_U,
+             pdl_qsort_L,pdl_qsort_N,pdl_qsort_Q,pdl_qsort_F,pdl_qsort_D) ($P(' . $pdl . '), 0, nn);';
 }
 
 sub generic_qsortvec {
     my $pdl = shift;
     my $ndim = shift;
-    return '$TBSULNQFDA(pdl_qsortvec_B,pdl_qsortvec_S,pdl_qsortvec_U,
-             pdl_qsortvec_L,pdl_qsortvec_N,pdl_qsortvec_Q,pdl_qsortvec_F,pdl_qsortvec_D,pdl_qsortvec_D) ($P(' . $pdl . '), '. $ndim.', 0, nn);';
+    return '$TBSULNQFD(pdl_qsortvec_B,pdl_qsortvec_S,pdl_qsortvec_U,
+             pdl_qsortvec_L,pdl_qsortvec_N,pdl_qsortvec_Q,pdl_qsortvec_F,pdl_qsortvec_D) ($P(' . $pdl . '), '. $ndim.', 0, nn);';
 }
 
 
@@ -1116,8 +1149,8 @@ Bad values are moved to the end of the array:
     ); # pp_def qsort
 
 sub generic_qsort_ind {
-    return '$TBSULNQFDA(pdl_qsort_ind_B,pdl_qsort_ind_S,pdl_qsort_ind_U,
-            pdl_qsort_ind_L,pdl_qsort_ind_N,pdl_qsort_ind_Q,pdl_qsort_ind_F,pdl_qsort_ind_D,pdl_qsort_ind_D) ($P(a), $P(indx),
+    return '$TBSULNQFD(pdl_qsort_ind_B,pdl_qsort_ind_S,pdl_qsort_ind_U,
+            pdl_qsort_ind_L,pdl_qsort_ind_N,pdl_qsort_ind_Q,pdl_qsort_ind_F,pdl_qsort_ind_D) ($P(a), $P(indx),
             0, nn);';
 }
 
@@ -1214,8 +1247,8 @@ Vectors with bad components should be moved to the end of the array:
 sub generic_qsortvec_ind {
     my $pdl = shift;
     my $ndim = shift;
-    return '$TBSULNQFDA(pdl_qsortvec_ind_B,pdl_qsortvec_ind_S,pdl_qsortvec_ind_U,
-             pdl_qsortvec_ind_L,pdl_qsortvec_ind_N,pdl_qsortvec_ind_Q,pdl_qsortvec_ind_F,pdl_qsortvec_ind_D,pdl_qsortvec_ind_D) ($P(' . $pdl . '), $P(indx), '. $ndim.', 0, nn);';
+    return '$TBSULNQFD(pdl_qsortvec_ind_B,pdl_qsortvec_ind_S,pdl_qsortvec_ind_U,
+             pdl_qsortvec_ind_L,pdl_qsortvec_ind_N,pdl_qsortvec_ind_Q,pdl_qsortvec_ind_F,pdl_qsortvec_ind_D) ($P(' . $pdl . '), $P(indx), '. $ndim.', 0, nn);';
 }
 
 pp_def(
@@ -1375,6 +1408,96 @@ otherwise the bad flag is cleared for the output piddle.',
 
 } # foreach: $which
 
+pp_addpm("*PDLA::maxover = \\&PDLA::maximum;\n");
+pp_addpm("*maxover = \\&PDLA::maximum;\n");
+pp_add_exported('PDLA::PP maxover');
+
+pp_addpm(<<'EOD');
+=head2 maxover
+
+=for ref
+
+  Synonym for maximum.
+
+=cut
+
+EOD
+
+pp_addpm("*PDLA::maxover_ind = \\&PDLA::maximum_ind;\n");
+pp_addpm("*maxover_ind = \\&PDLA::maximum_ind;\n");
+pp_add_exported('PDLA::PP maxover_ind');
+
+pp_addpm(<<'EOD');
+=head2 maxover_ind
+
+=for ref
+
+  Synonym for maximum_ind.
+
+=cut
+
+EOD
+
+pp_addpm("*PDLA::maxover_n_ind = \\&PDLA::maximum_n_ind;\n");
+pp_addpm("*maxover_n_ind = \\&PDLA::maximum_n_ind;\n");
+pp_add_exported('PDLA::PP maxover_n_ind');
+
+pp_addpm(<<'EOD');
+=head2 maxover_n_ind
+
+=for ref
+
+  Synonym for maximum_n_ind.
+
+=cut
+
+EOD
+
+pp_addpm("*PDLA::minover = \\&PDLA::minimum;\n");
+pp_addpm("*minover = \\&PDLA::minimum;\n");
+pp_add_exported('PDLA::PP minover');
+
+pp_addpm(<<'EOD');
+=head2 minover
+
+=for ref
+
+  Synonym for minimum.
+
+=cut
+
+EOD
+
+pp_addpm("*PDLA::minover_ind = \\&PDLA::minimum_ind;\n");
+pp_addpm("*minover_ind = \\&PDLA::minimum_ind;\n");
+pp_add_exported('PDLA::PP minover_ind');
+
+pp_addpm(<<'EOD');
+=head2 minover_ind
+
+=for ref
+
+  Synonym for minimum_ind.
+
+=cut
+
+EOD
+
+pp_addpm("*PDLA::minover_n_ind = \\&PDLA::minimum_n_ind;\n");
+pp_addpm("*minover_n_ind = \\&PDLA::minimum_n_ind;\n");
+pp_add_exported('PDLA::PP minover_n_ind');
+
+pp_addpm(<<'EOD');
+=head2 minover_n_ind
+
+=for ref
+
+  Synonym for minimum_n_ind
+
+=cut
+
+EOD
+
 # removed IsNaN handling, even from Code section
 # I think it was wrong, since it was
 #
@@ -1455,6 +1578,20 @@ Otherwise they will have their bad flags cleared,
 since they will not contain any bad values.',
 	); # pp_def minmaximum
 
+pp_addpm("*PDLA::minmaxover = \\&PDLA::minmaximum;\n");
+pp_addpm("*minmaxover = \\&PDLA::minmaximum;\n");
+pp_add_exported('PDLA::PP minmaxover');
+
+pp_addpm(<<'EOD');
+=head2 minmaxover
+
+=for ref
+
+  Synonym for minmaximum.
+
+=cut
+
+EOD
 
 pp_addpm({At=>'Bot'},<<'EOD');
 

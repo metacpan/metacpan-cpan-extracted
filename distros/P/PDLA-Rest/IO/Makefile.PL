@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 # do we build PDLA::IO::Browser ?
-my @dirs = qw( FastRaw Misc FlexRaw Pnm Storable FITS HDF GD Dicom IDL );
+my @dirs = qw( FastRaw FlexRaw GD Dicom IDL );
 if ($PDLA::Config{WITH_IO_BROWSER} && $PDLA::Config{WITH_IO_BROWSER}) {
    push @dirs, 'Browser';
    print "   Building PDLA::IO::Browser. Turn off WITH_IO_BROWSER if this is incorrect.\n";

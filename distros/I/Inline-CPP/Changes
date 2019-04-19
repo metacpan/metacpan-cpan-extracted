@@ -1,5 +1,9 @@
 Revision history for Perl extension Inline::CPP.
 
+0.80
+  - Bump minimum Inline::C version to 0.80 for better backward compatibility.
+  - Bump minimum Inline version to 0.82.
+
 0.79
   - Whitespace cleanup in POD.
   - support Perl 5.8.1

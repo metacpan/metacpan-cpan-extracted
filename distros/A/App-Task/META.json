@@ -1,5 +1,5 @@
 {
-   "abstract" : "Nest tasks w/ indented output and pre/post headers ",
+   "abstract" : "Nest tasks w/ indented output and pre/post headers",
    "author" : [
       "Daniel Muey <http://drmuey.com/cpan_contact.pl>"
    ],
@@ -32,12 +32,15 @@
       },
       "runtime" : {
          "requires" : {
+            "IO::Interactive::Tiny" : "0",
+            "IPC::Open3::Utils" : "0",
             "Test::More" : "0",
             "Test::Trap" : "0",
-            "Tie::Handle" : "0"
+            "Text::OutputFilter" : "0",
+            "Tie::Handle::Base" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "version" : "0.02"
 }

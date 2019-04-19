@@ -408,6 +408,39 @@ L<PDLA>
 
 L<Inline>
 
+=head2 Handy macros from pdl.h
+
+Some of the C API functions return C<PDLA_Anyval> C type which
+is a structure and therefore requires special handling.
+
+You might want to use for example C<get_pdl_badvalue> function:
+
+ /* THIS DOES NOT WORK! (although it did in older PDLA) */
+ if( PDLA->get_pdl_badvalue(a) == 0 )  { ... }
+
+ /* THIS IS CORRECT */
+ double bad_a;
+ ANYVAL_TO_CTYPE(bad_a, double, PDLA->get_pdl_badvalue(a));
+ if( bad_a == 0 ) { ... }
+
+In pdl.h there are the following macros for handling PDLA_Anyval from C code:
+
+ ANYVAL_TO_SV(out_SV, in_anyval)
+ ANYVAL_FROM_CTYPE(out_anyval, out_anyval_type, in_variable)
+ ANYVAL_TO_CTYPE(out_variable, out_ctype, in_anyval)
+ ANYVAL_EQ_ANYVAL(x, y)
+
+As these macros where not available in older PDLA versions you might want
+to add the following defines into your C/XS code to make compatible with
+older PDLA versions.
+
+ #if PDLA_CORE_VERSION < 12
+ #define ANYVAL_TO_SV(outsv,inany)              outsv  = newSVnv((NV)(inany)
+ #define ANYVAL_FROM_CTYPE(outany,avtype,inval) outany = (PDLA_Double)(inval)
+ #define ANYVAL_TO_CTYPE(outval,ctype,inany)    outval = (ctype)(inany)
+ #define ANYVAL_EQ_ANYVAL(x,y)                  (x == y)
+ #endif
+
 =head1 BUGS
 
 This manpage is still under development.

@@ -5,6 +5,7 @@ author:
 build_requires:
   CPAN::Meta: '2.120900'
   ExtUtils::MakeMaker: '0'
+  ExtUtils::Manifest: '0'
   ExtUtils::ParseXS: '3.01'
   File::Path: '0'
   Test::Deep: '0'
@@ -17,10 +18,10 @@ configure_requires:
   ExtUtils::Depends: '0.402'
   ExtUtils::MakeMaker: '6.56'
   File::Path: '0'
-  PDLA::Core: '2.013007'
+  PDLA::Core: '2.016000'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -37,9 +38,6 @@ requires:
   Config: '0'
   Convert::UU: '0'
   Data::Dumper: '2.121'
-  English: '0'
-  ExtUtils::MakeMaker: '6.56'
-  ExtUtils::Manifest: '0'
   Fcntl: '0'
   File::Basename: '0'
   File::Find: '0'
@@ -53,7 +51,7 @@ requires:
   Inline::C: '0.62'
   Module::Compile: '0.23'
   OpenGL: '0.6702'
-  PDLA::Core: '2.013007'
+  PDLA::Core: '2.016000'
   Pod::Parser: '0'
   Pod::Select: '0'
   Scalar::Util: '0'
@@ -65,5 +63,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdla-rest/issues
   homepage: http://pdlporters.github.io
   repository: git://github.com/PDLPorters/pdla-rest
-version: '2.013005'
+version: '2.016000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

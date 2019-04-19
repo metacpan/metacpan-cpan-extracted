@@ -1,3 +1,147 @@
+2.016000 2019-04-19
+ - Bugs fixed:
+   - 416   PDLA::PP creates .pm & .xs files before pp_done is called
+   - 414   ccNcompt (i.e. cc4compt and cc8compt) breaks with byte data type
+ - All collapse operators now have "<name>over" equivalent names.
+   This ends an API wart in which most, but not all, of the collapse
+   operators had a short form that did full collapse and a long form
+   that did 1-D collapse only (e.g. "and" collapses to a point,
+   while "andover" collapses by one dimension).  The exceptions are
+   left in for legacy code, but now have regularized "-over" forms
+   as well:
+      average       -> avgover
+      daverage      -> davgover
+      maximum       -> maxover
+      maximum_ind   -> maxover_ind
+      maximum_n_ind -> maxover_n_ind
+      minmaximum    -> minmaxover
+      minimum       -> minover
+      minimum_ind   -> minover_ind
+      minimum_n_ind -> minover_n_ind
+ - PDLAs with dataflow can now be reshaped.  The dataflow
+   connection gets severed by the reshape operation.
+ - PDLA::IO::FITS now works better with RICE-compressed FITS
+   images, such as are produced by NASA's SDO project.
+       - The NAXIS- header keywords are now replaced by their
+         ZNAXIS- equivalents, so the NAXIS fields in the header
+         are correct after the image is read in.
+       - The Z-, TFIELDS, TTYPE*, and TFORM* keywords are now
+         deleted from the header object, so that the uncompressed,
+         loaded image does not have leftover compression headers.
+ - The language preprocessor PDLA::PP now does not automatically
+   call pp_done for modules that do not call pp_done themselves.
+   This new, stricter behavior requires module authors to call
+   pp_done at the end of their PDLA::PP file.  This prevents
+   partially-complete .xs and .pm files from being written if
+   there is a module build error.
+ - PDLA::whichND returns PDLAs of Indx type, to avoid overflows.
+ - Empty piddles are handled slightly differently now by
+   PDLA::info and `help vars'.  Empty piddles are different
+   from null piddles, and now generate different info strings.
+   (null piddles lack data or dimensions; empty piddles have
+   at least one dimension of size 0).
+ - There is now a .gitattributes file so GitHub repo language
+   stats are more accurate.
+ - The PDLA SF/GitHub deveolpment workflow is integrated into
+   the DEVELOPMENT docs.
+
+2.015000 2019-04-19
+ - Fixes to improve compile and test of F77 modules
+   on OS X (i.e. don't build i386 versions)
+ - Basic/Ops/ops.pd - make compatible with MSVC++ 6.0
+ - Fix missing PDLA license information
+ - Fix sf.net bug #403: reshape() failed when applied to a
+   piddle with dataflow.  Now, changing the shape of a PDLA
+   that already has dataflow is prevented and an error message
+   given.
+ - Fix sf.net bug 406 Added missing logic for clump(-N) and minor
+   cleanup of perl wrapper.
+ - force new_pdl_from_string to return a piddle with P=physical flag
+ - Add $PDLA::indxformat for PDLA_Indx This avoids loss of
+   significance when 64bit PDLA_Indx values are printed.
+   Make new_pdl_from_string() avoid converting IV values
+   to NVs This allows pdl(indx, '[ 9007199254740992 ]')
+   to work without rounding due to the 52bit double
+   precision mantissa versus the 63bits + sign for PDLA_Indx.
+ - Add type support info to pdl() constructor documentation.
+   pdl() has always supported this usage but examples were
+   missing in the documentation.
+
+2.014000 2019-04-19
+ - PDLA can now create and use piddles having more
+   than 2**32 elements.  Of particular use is that
+   you can now use PDLA::IO::FlexRaw to memory map
+   piddles from files on disk which can allow for
+   simplified processing and IO on extremely large
+   data.
+ - PDLA now detects when your perl installation has been
+   built with floating point longer than 8 bytes and gives
+   a one time warning that precision will be lost converting
+   from perl NV to PDLA_Doubles.  This warning is given on
+   "use PDLA;"
+ - Skipping t/bigmem.t to avoid OOM CPAN Testers fails.
+ - Minor fixes to C code to meet stricter compiler and C99 requirements.
+ - A new ipow() method has been added with 64bit integer
+   support.  ipow() calculates the integer exponentiation
+   of a value by successive multiplications.  This allows
+   one to avoid loss of significance in integer exponents.
+   pow() converts the value to double and will always have
+   <52bits precision.
+ - Corrected return types of intover, borover, bandover
+ - nbadover and ngoodover now return indx type (PDLA_Indx)
+ - Fixed compile problem in clang from using finite() on an integer datatype.
+ - Mark some failing tests in t/primitive.t as TODO
+   to avoid CPAN Testers failures.
+ - Add IPC::Cmd to TEST_REQUIRES
+ - Implement PDLA_Anyval data type as union to support 64bit indexing
+   This adds a union data type to add 64bit integer support to
+   the original PDLA-2.x types which assumed that double was
+   capable of holding all the "lesser" types.  With the PDLA_Anyval
+   type, we can correctly handle 64bit integer data types and
+   avoid errors and loss of precision due to conversions to or
+   from PDLA_Double.  Special thanks to kmx and zowie for their
+   help to complete and debug this implementation.
+ - Due to the new PDLA_Anyval type changes, existing
+   PDLA::PP modules may need to be updated to support
+   the new PDLA Core version 12 API.  Authors, please
+   see PDLA::API for macros to ease the porting.
+   Users, be aware that some modules may not work
+   until they are updated by their maintainers.
+ - Many fixes to the build process to make PDLA more robust
+   to build, test, and install.  This takes advantage of new
+   automated CI testing via Travis CI on the github site.
+   Thanks much to Ed and Zakariyya for their work to get
+   this started and maintained.  This CI testing makes
+   this the best tested and best testing PDLA release ever!
+ - Various documentation clean-ups and work to improve
+   on-line viewing at http://metacpan.org and others.
+   (Thanks kmx and Derek!)
+ - "use PDLA" now includes "use PDLA::IO::Storable"
+   This avoids a hard to diagnose crash that can
+   occur when a user tries using Storable without the
+   necessary "use PDLA::IO::Storable".
+ - MANY sf.net bugs fixed:
+
+   400  dataflow slice crash around 2**31 boundary
+   399  Small doc fixes
+   398  $pdl->hdr items are lost after $pdl->reshape
+   396  online docs for modules only work first time in PDLA shells
+   395  ipow (integer exponentiation) support for 64bit index support
+   394  demo cartography fails
+   383  gcc/#gfortran 4.9.2 needs -lquadmath
+   378  where on dice of pdl bad results
+   376  PDLA Segmentation fault working with Storable restored PDLA
+   347  t/#pdl_from_string.t has a failure if BADVAL_NAN=1
+   346  ExtUtils::F77 dependency causing problems for CPAN install
+   343  longlong constructor and display lose digits due to...
+   340  orover of byte data returns long type
+
+2.013009 2019-04-19
+ - fix non-PDLA-ed test
+
+2.013008 2019-04-19
+ - restore PDLA::IO::Misc, ::FITS, ::Pic
+
 2.013007 2019-04-15
  - rename pdl2 exe to pdla2, pdldoc to pdladoc, perldl exe to perldla,
    pdl exe to pdla

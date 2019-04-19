@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 cPanel, L.L.C.
+# Copyright (c) 2019 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -19,7 +19,7 @@ use URI::Encode ();
 
 use OpenStack::Client::Response ();
 
-our $VERSION = '1.0005';
+our $VERSION = '1.0006';
 
 =encoding utf8
 
@@ -515,7 +515,8 @@ sub every ($$$@) {
         my $result = $self->get($path, %{$opts});
 
         unless (defined $result->{$attribute}) {
-            die "Response from $path does not contain attribute '$attribute'";
+            my $keys = join( ', ', sort keys %$result );
+            die "Response from $path does not contain attribute '$attribute', possible options are " . $keys;
         }
 
         foreach my $item (@{$result->{$attribute}}) {
@@ -618,7 +619,7 @@ The OpenStack Keystone authentication and authorization interface
 
 =head1 AUTHOR
 
-Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
+Written by Alexandra Hrefna Maheu <xan@cpanel.net>
 
 =head1 CONTRIBUTORS
 
@@ -630,7 +631,7 @@ Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2018 cPanel, L.L.C.  Released under the terms of the MIT license.
+Copyright (c) 2019 cPanel, L.L.C.  Released under the terms of the MIT license.
 See LICENSE for further details.
 
 =cut

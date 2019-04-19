@@ -40,6 +40,45 @@ extern int pdl_debugging;
 #define PDLADEBUG_f(a)
 #endif
 
+#define ANYVAL_TO_SV(outsv,inany) do { switch (inany.type) { \\
+                case PDLA_B:   outsv = newSViv( (IV)(inany.value.B) ); break; \\
+                case PDLA_S:   outsv = newSViv( (IV)(inany.value.S) ); break; \\
+                case PDLA_US:  outsv = newSViv( (IV)(inany.value.U) ); break; \\
+                case PDLA_L:   outsv = newSViv( (IV)(inany.value.L) ); break; \\
+                case PDLA_IND: outsv = newSViv( (IV)(inany.value.N) ); break; \\
+                case PDLA_LL:  outsv = newSViv( (IV)(inany.value.Q) ); break; \\
+                case PDLA_F:   outsv = newSVnv( (NV)(inany.value.F) ); break; \\
+                case PDLA_D:   outsv = newSVnv( (NV)(inany.value.D) ); break; \\
+                default:      outsv = &PL_sv_undef; \\
+            } \\
+        } while (0)
+
+#define ANYVAL_FROM_CTYPE(outany,avtype,inval) do { switch (avtype) { \\
+                case PDLA_B:   outany.type = avtype; outany.value.B = (PDLA_Byte)(inval);     break; \\
+                case PDLA_S:   outany.type = avtype; outany.value.S = (PDLA_Short)(inval);    break; \\
+                case PDLA_US:  outany.type = avtype; outany.value.U = (PDLA_Ushort)(inval);   break; \\
+                case PDLA_L:   outany.type = avtype; outany.value.L = (PDLA_Long)(inval);     break; \\
+                case PDLA_IND: outany.type = avtype; outany.value.N = (PDLA_Indx)(inval);     break; \\
+                case PDLA_LL:  outany.type = avtype; outany.value.Q = (PDLA_LongLong)(inval); break; \\
+                case PDLA_F:   outany.type = avtype; outany.value.F = (PDLA_Float)(inval);    break; \\
+                case PDLA_D:   outany.type = avtype; outany.value.D = (PDLA_Double)(inval);   break; \\
+                default:      outany.type = -1;     outany.value.B = 0; \\
+            } \\
+        } while (0)
+
+#define ANYVAL_TO_CTYPE(outval,ctype,inany) do { switch (inany.type) { \\
+                case PDLA_B:   outval = (ctype)(inany.value.B); break; \\
+                case PDLA_S:   outval = (ctype)(inany.value.S); break; \\
+                case PDLA_US:  outval = (ctype)(inany.value.U); break; \\
+                case PDLA_L:   outval = (ctype)(inany.value.L); break; \\
+                case PDLA_IND: outval = (ctype)(inany.value.N); break; \\
+                case PDLA_LL:  outval = (ctype)(inany.value.Q); break; \\
+                case PDLA_F:   outval = (ctype)(inany.value.F); break; \\
+                case PDLA_D:   outval = (ctype)(inany.value.D); break; \\
+                default:      outval = 0; \\
+            } \\
+        } while (0)
+
 /* Auto-PThreading (i.e. multi-threading) settings for PDLA functions */
 /*  Target number of pthreads: Actual will be this number or less.
     A 0 here means no pthreading */
@@ -57,6 +96,11 @@ extern int pdl_autopthread_size;
 typedef struct pdl pdl;
 
 $PDLA_DATATYPES
+
+extern int _anyval_eq_anyval(PDLA_Anyval, PDLA_Anyval);
+
+#define ANYVAL_EQ_ANYVAL(x,y) (_anyval_eq_anyval(x,y))
+
 $mymalloc
 !GROK!THIS!
 
@@ -323,7 +367,7 @@ struct pdl {
    PDLA_Anyval badvalue; /* BAD value is stored as a PDLA_Anyval for portability */
    int has_badvalue;     /* flag is required by pdlapi.c (compare to PDLA_BADVAL above -- why two? --CED) */
    PDLA_Indx nvals; /* Actual size of data (not quite nelem in case of dummy) */
-   int datatype; /* One of the usual suspects (PDLA_L, PDLA_D, etc.) */
+   pdl_datatypes datatype; /* One of the usual suspects (PDLA_L, PDLA_D, etc.) */
    PDLA_Indx   *dims;      /* Array of data dimensions - could point below or to an allocated array */
    PDLA_Indx   *dimincs;   /* Array of data default increments, aka strides through memory for each dim (0 for dummies) */
    short    ndims;     /* Number of data dimensions in dims and dimincs */

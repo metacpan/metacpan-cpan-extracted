@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 #
 package MarpaX::ESLIF::URI::_generic::ValueInterface;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -67,7 +67,7 @@ MarpaX::ESLIF::URI::_generic::ValueInterface - MarpaX::ESLIF's URI Value Interfa
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =for Pod::Coverage *EVERYTHING*
 

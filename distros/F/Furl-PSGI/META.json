@@ -1,0 +1,65 @@
+{
+   "abstract" : "Furl, but wired to a PSGI app",
+   "author" : [
+      "Meredith Howard <mhoward@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Furl-PSGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Furl" : "0",
+            "Furl::HTTP" : "0",
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Parser::XS" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Furl::PSGI" : {
+         "file" : "lib/Furl/PSGI.pm",
+         "version" : "0.01"
+      },
+      "Furl::PSGI::HTTP" : {
+         "file" : "lib/Furl/PSGI/HTTP.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/merrilymeredith/p5-Furl-PSGI/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/merrilymeredith/p5-Furl-PSGI.git",
+         "web" : "https://github.com/merrilymeredith/p5-Furl-PSGI"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+}
+

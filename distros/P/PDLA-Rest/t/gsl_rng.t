@@ -16,7 +16,7 @@ BEGIN
    if ( $PDLA::Config{WITH_GSL} ) {
       eval " use PDLA::GSL::RNG; ";
       unless ($@) {
-         plan tests => 18;
+         plan tests => 19;
       } else {
          plan skip_all => "PDLA::GSL::RNG not installed.";
       }
@@ -39,6 +39,9 @@ ok(1,'new() function');
 $rng->set_seed(666);
 
 ok(1,'set_seed(); function');
+
+my $rng2 = PDLA::GSL::RNG->new('taus')->set_seed(666);
+is(ref $rng2, 'PDLA::GSL::RNG', 'PDLA::GSL::RNG->new(..)->set_seed(..)');
 
 # min() function Test: 
 $min = $rng->min(); $max = $rng->max();

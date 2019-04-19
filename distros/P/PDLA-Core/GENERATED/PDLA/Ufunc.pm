@@ -4,7 +4,7 @@
 #
 package PDLA::Ufunc;
 
-@EXPORT_OK  = qw( PDLA::PP prodover PDLA::PP dprodover PDLA::PP cumuprodover PDLA::PP dcumuprodover PDLA::PP sumover PDLA::PP dsumover PDLA::PP cumusumover PDLA::PP dcumusumover PDLA::PP bandover PDLA::PP zcover PDLA::PP borover PDLA::PP orover PDLA::PP andover PDLA::PP intover PDLA::PP average PDLA::PP daverage PDLA::PP medover PDLA::PP oddmedover PDLA::PP modeover PDLA::PP pctover PDLA::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDLA::PP qsort PDLA::PP qsorti PDLA::PP qsortvec PDLA::PP qsortveci PDLA::PP minimum PDLA::PP minimum_ind PDLA::PP minimum_n_ind PDLA::PP maximum PDLA::PP maximum_ind PDLA::PP maximum_n_ind PDLA::PP minmaximum );
+@EXPORT_OK  = qw( PDLA::PP prodover PDLA::PP dprodover PDLA::PP cumuprodover PDLA::PP dcumuprodover PDLA::PP sumover PDLA::PP dsumover PDLA::PP cumusumover PDLA::PP dcumusumover PDLA::PP orover PDLA::PP zcover PDLA::PP andover PDLA::PP bandover PDLA::PP borover PDLA::PP intover PDLA::PP average PDLA::PP avgover PDLA::PP daverage PDLA::PP davgover PDLA::PP medover PDLA::PP oddmedover PDLA::PP modeover PDLA::PP pctover PDLA::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDLA::PP qsort PDLA::PP qsorti PDLA::PP qsortvec PDLA::PP qsortveci PDLA::PP minimum PDLA::PP minimum_ind PDLA::PP minimum_n_ind PDLA::PP maximum PDLA::PP maximum_ind PDLA::PP maximum_n_ind PDLA::PP maxover PDLA::PP maxover_ind PDLA::PP maxover_n_ind PDLA::PP minover PDLA::PP minover_ind PDLA::PP minover_n_ind PDLA::PP minmaximum PDLA::PP minmaxover );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDLA::Core;
@@ -464,7 +464,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-=head2 bandover
+=head2 orover
 
 =for sig
 
@@ -473,21 +473,21 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Project via bitwise and to N-1 dimensions
+Project via or to N-1 dimensions
 
 This function reduces the dimensionality of a piddle
-by one by taking the bitwise and along the 1st dimension.
+by one by taking the or along the 1st dimension.
 
 By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
 =for usage
 
- $b = bandover($a);
+ $b = orover($a);
 
 =for example
 
- $spectrum = bandover $image->xchg(0,1)
+ $spectrum = orover $image->xchg(0,1)
 
 
 
@@ -506,7 +506,7 @@ as it will not contain any bad values.
 
 
 
-*bandover = \&PDLA::bandover;
+*orover = \&PDLA::orover;
 
 
 
@@ -560,102 +560,6 @@ as it will not contain any bad values.
 
 
 
-=head2 borover
-
-=for sig
-
-  Signature: (a(n); int+ [o]b())
-
-
-=for ref
-
-Project via bitwise or to N-1 dimensions
-
-This function reduces the dimensionality of a piddle
-by one by taking the bitwise or along the 1st dimension.
-
-By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
-I<any> dimension.
-
-=for usage
-
- $b = borover($a);
-
-=for example
-
- $spectrum = borover $image->xchg(0,1)
-
-
-
-
-
-=for bad
-
-If C<a()> contains only bad data (and its bad flag is set), 
-C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
-as it will not contain any bad values.
-
-=cut
-
-
-
-
-
-
-*borover = \&PDLA::borover;
-
-
-
-
-
-=head2 orover
-
-=for sig
-
-  Signature: (a(n); int+ [o]b())
-
-
-=for ref
-
-Project via or to N-1 dimensions
-
-This function reduces the dimensionality of a piddle
-by one by taking the or along the 1st dimension.
-
-By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
-I<any> dimension.
-
-=for usage
-
- $b = orover($a);
-
-=for example
-
- $spectrum = orover $image->xchg(0,1)
-
-
-
-
-
-=for bad
-
-If C<a()> contains only bad data (and its bad flag is set), 
-C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
-as it will not contain any bad values.
-
-=cut
-
-
-
-
-
-
-*orover = \&PDLA::orover;
-
-
-
-
-
 =head2 andover
 
 =for sig
@@ -704,11 +608,107 @@ as it will not contain any bad values.
 
 
 
+=head2 bandover
+
+=for sig
+
+  Signature: (a(n);  [o]b())
+
+
+=for ref
+
+Project via bitwise and to N-1 dimensions
+
+This function reduces the dimensionality of a piddle
+by one by taking the bitwise and along the 1st dimension.
+
+By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
+I<any> dimension.
+
+=for usage
+
+ $b = bandover($a);
+
+=for example
+
+ $spectrum = bandover $image->xchg(0,1)
+
+
+
+
+
+=for bad
+
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
+
+=cut
+
+
+
+
+
+
+*bandover = \&PDLA::bandover;
+
+
+
+
+
+=head2 borover
+
+=for sig
+
+  Signature: (a(n);  [o]b())
+
+
+=for ref
+
+Project via bitwise or to N-1 dimensions
+
+This function reduces the dimensionality of a piddle
+by one by taking the bitwise or along the 1st dimension.
+
+By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
+I<any> dimension.
+
+=for usage
+
+ $b = borover($a);
+
+=for example
+
+ $spectrum = borover $image->xchg(0,1)
+
+
+
+
+
+=for bad
+
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
+
+=cut
+
+
+
+
+
+
+*borover = \&PDLA::borover;
+
+
+
+
+
 =head2 intover
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+  Signature: (a(n); float+ [o]b())
 
 
 =for ref
@@ -807,6 +807,22 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+*PDLA::avgover = \&PDLA::average;
+
+
+*avgover = \&PDLA::average;
+
+
+=head2 avgover
+
+=for ref
+
+  Synonym for average.
+
+=cut
+
+
+
 
 
 =head2 daverage
@@ -853,6 +869,22 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 *daverage = \&PDLA::daverage;
+
+
+
+*PDLA::davgover = \&PDLA::daverage;
+
+
+*davgover = \&PDLA::daverage;
+
+
+=head2 davgover
+
+=for ref
+
+  Synonym for daverage.
+
+=cut
 
 
 
@@ -2195,6 +2227,102 @@ Not yet been converted to ignore bad values
 
 
 
+*PDLA::maxover = \&PDLA::maximum;
+
+
+*maxover = \&PDLA::maximum;
+
+
+=head2 maxover
+
+=for ref
+
+  Synonym for maximum.
+
+=cut
+
+
+
+*PDLA::maxover_ind = \&PDLA::maximum_ind;
+
+
+*maxover_ind = \&PDLA::maximum_ind;
+
+
+=head2 maxover_ind
+
+=for ref
+
+  Synonym for maximum_ind.
+
+=cut
+
+
+
+*PDLA::maxover_n_ind = \&PDLA::maximum_n_ind;
+
+
+*maxover_n_ind = \&PDLA::maximum_n_ind;
+
+
+=head2 maxover_n_ind
+
+=for ref
+
+  Synonym for maximum_n_ind.
+
+=cut
+
+
+
+*PDLA::minover = \&PDLA::minimum;
+
+
+*minover = \&PDLA::minimum;
+
+
+=head2 minover
+
+=for ref
+
+  Synonym for minimum.
+
+=cut
+
+
+
+*PDLA::minover_ind = \&PDLA::minimum_ind;
+
+
+*minover_ind = \&PDLA::minimum_ind;
+
+
+=head2 minover_ind
+
+=for ref
+
+  Synonym for minimum_ind.
+
+=cut
+
+
+
+*PDLA::minover_n_ind = \&PDLA::minimum_n_ind;
+
+
+*minover_n_ind = \&PDLA::minimum_n_ind;
+
+
+=head2 minover_n_ind
+
+=for ref
+
+  Synonym for minimum_n_ind
+
+=cut
+
+
+
 
 
 =head2 minmaximum
@@ -2234,6 +2362,22 @@ since they will not contain any bad values.
 
 
 *minmaximum = \&PDLA::minmaximum;
+
+
+
+*PDLA::minmaxover = \&PDLA::minmaximum;
+
+
+*minmaxover = \&PDLA::minmaximum;
+
+
+=head2 minmaxover
+
+=for ref
+
+  Synonym for minmaximum.
+
+=cut
 
 
 

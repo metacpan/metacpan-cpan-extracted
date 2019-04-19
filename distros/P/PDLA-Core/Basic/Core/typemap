@@ -11,21 +11,38 @@ PDLA_Anyval  T_PDLA_ANYVAL
 INPUT
 
 T_PDLA
-	$var = SvPDLAV($arg)
+	$var = SvPDLAV($arg);
+
 T_PDLA_ANYVAL
-	$var = (double)SvNV($arg)
+	if (!SvOK($arg)) {
+		$var.type = -1;
+		$var.value.B = 0;
+	} else if (SvIOK($arg)) {
+	\#if IVSIZE == 8
+		$var.type = PDLA_LL;
+		$var.value.Q = (PDLA_LongLong) SvIV($arg);
+	\#else
+		$var.type = PDLA_L;
+		$var.value.L = (PDLA_Long) SvIV($arg);
+	\#endif
+	} else {
+		$var.type = PDLA_D;
+		$var.value.D = (PDLA_Double) SvNV($arg);
+	}
+
 T_PDLATRANS
 	if(sv_isa($arg,\"PDLA::Trans\"))
 		$var = INT2PTR(pdl_trans *,SvIV(SvRV($arg)));
 	else
 	        croak(\"$var is not of type PDLA::Trans\")
 
-
 OUTPUT
 
 T_PDLA
 	SetSV_PDLA($arg,$var);
+
 T_PDLA_ANYVAL
-	sv_setnv($arg, (double)$var); 
+	ANYVAL_TO_SV($arg, $var)
+
 T_PDLATRANS
 	sv_setref_pv($arg, \"PDLA::Trans\", (void*)$var);

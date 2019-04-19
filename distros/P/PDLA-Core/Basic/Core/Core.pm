@@ -7,9 +7,10 @@ use warnings;
 use PDLA::Exporter;
 use DynaLoader;
 our @ISA    = qw( PDLA::Exporter DynaLoader );
-our $VERSION = "2.013007";
+our $VERSION = "2.016000";
 bootstrap PDLA::Core $VERSION;
 use PDLA::Types ':All';
+use Config;
 
 our @EXPORT = qw( piddle pdl null barf ); # Only stuff always exported!
 my @convertfuncs = map PDLA::Types::typefld($_,'convertfunc'), PDLA::Types::typesrtkeys();
@@ -39,6 +40,7 @@ $PDLA::verbose      = 0;
 $PDLA::use_commas   = 0;        # Whether to insert commas when printing arrays
 $PDLA::floatformat  = "%7g";    # Default print format for long numbers
 $PDLA::doubleformat = "%10.8g";
+$PDLA::indxformat   = "%12d";   # Default print format for PDLA_Indx values
 $PDLA::undefval     = 0;        # Value to use instead of undef when creating PDLAs
 $PDLA::toolongtoprint = 10000;  # maximum pdl size to stringify for printing
 
@@ -61,7 +63,7 @@ for (map {
   no strict 'refs';
   *$conv = *{"PDLA::$conv"} = sub {
     return bless [$val], "PDLA::Type" unless @_;
-    convert(alltopdl('PDLA', (scalar(@_)>1 ? [@_] : shift)), $val);
+    alltopdl('PDLA', (scalar(@_)>1 ? [@_] : shift), PDLA::Type->new($val));
   };
 }
 
@@ -255,15 +257,16 @@ Whether to insert commas when printing pdls
 
 =back
 
-=head3 C<$PDLA::floatformat>, C<$PDLA::doubleformat>
+=head3 C<$PDLA::floatformat>, C<$PDLA::doubleformat>, C<$PDLA::indxformat>
 
 =over 4
 
-The default print format for floats and doubles, repectively.
-The default default values are:
+The default print format for floats, doubles, and indx values,
+repectively.  The default default values are:
 
   $PDLA::floatformat  = "%7g";
   $PDLA::doubleformat = "%10.8g";
+  $PDLA::indxformat   = "%12d";
 
 =back
 
@@ -334,22 +337,31 @@ PDLA constructor - creates new piddle from perl scalars/arrays, piddles, and str
 
 =for usage
 
- $a = pdl(SCALAR|ARRAY REFERENCE|ARRAY|STRING);
+ $double_pdl = pdl(SCALAR|ARRAY REFERENCE|ARRAY|STRING);  # default type
+ $type_pdl   = pdl(PDLA::Type,SCALAR|ARRAY REFERENCE|ARRAY|STRING);
 
 =for example
 
- $a = pdl [1..10];             # 1D array
- $a = pdl ([1..10]);           # 1D array
- $a = pdl (1,2,3,4);           # Ditto
- $b = pdl [[1,2,3],[4,5,6]];   # 2D 3x2 array
- $b = pdl "[[1,2,3],[4,5,6]]"; # Ditto (slower)
- $b = pdl "[1 2 3; 4 5 6]";    # Ditto
- $b = pdl q[1 2 3; 4 5 6];     # Ditto, using the q quote operator
- $b = pdl "1 2 3; 4 5 6";      # Ditto, less obvious, but still works
- $b = pdl 42                   # 0-dimensional scalar
- $c = pdl $a;                  # Make a new copy
- $a = pdl([1,2,3],[4,5,6]);    # 2D
- $a = pdl([[1,2,3],[4,5,6]]);  # 2D
+ $a = pdl [1..10];                    # 1D array
+ $a = pdl ([1..10]);                  # 1D array
+ $a = pdl (1,2,3,4);                  # Ditto
+ $b = pdl [[1,2,3],[4,5,6]];          # 2D 3x2 array
+ $b = pdl "[[1,2,3],[4,5,6]]";        # Ditto (slower)
+ $b = pdl "[1 2 3; 4 5 6]";           # Ditto
+ $b = pdl q[1 2 3; 4 5 6];            # Ditto, using the q quote operator
+ $b = pdl "1 2 3; 4 5 6";             # Ditto, less obvious, but still works
+ $b = pdl 42                          # 0-dimensional scalar
+ $c = pdl $a;                         # Make a new copy
+
+ $u = pdl ushort(), 42                # 0-dimensional ushort scalar
+ $b = pdl(byte(),[[1,2,3],[4,5,6]]);  # 2D byte piddle
+
+ $n = pdl indx(), [1..5];             # 1D array of indx values
+ $n = pdl indx, [1..5];               # ... can leave off parens
+ $n = indx( [1..5] );                 # ... still the same!
+
+ $a = pdl([1,2,3],[4,5,6]);           # 2D
+ $a = pdl([1,2,3],[4,5,6]);           # 2D
 
 Note the last two are equivalent - a list is automatically
 converted to a list reference for syntactic convenience. i.e. you
@@ -638,7 +650,7 @@ below for usage).
  $b = topdl $piddle;        # fall through
  $a = topdl (1,2,3,4);      # Convert 1D array
 
-=head2 PDLA::get_datatype
+=head2 get_datatype
 
 =for ref
 
@@ -826,7 +838,7 @@ sub PDLA::shape {  # Return dimensions as a pdl
    my $pdl = PDLA->topdl (shift);
    my @dims = ();
    for(0..$pdl->getndims()-1) {push @dims,($pdl->getdim($_))}
-   return pdl(\@dims);
+   return indx(\@dims);
 }
 
 sub PDLA::howbig {
@@ -835,7 +847,7 @@ sub PDLA::howbig {
 	PDLA::howbig_c($t);
 }
 
-=head2 PDLA::threadids
+=head2 threadids
 
 =for ref
 
@@ -900,7 +912,7 @@ sub PDLA::flows {
          return ($this->fflows || $this->bflows);
 }
 
-=head2 PDLA::new
+=head2 new
 
 =for ref
 
@@ -1088,7 +1100,7 @@ sub PDLA::Core::new_pdl_from_string {
    $nan->upd_data();
    $value =~ s/\beE\b/pi/g;
 
-   my $val = eval{
+   my $val = eval {
       # Install the warnings handler:
       my $old_warn_handler = $SIG{__WARN__};
       local $SIG{__WARN__} = sub {
@@ -1119,7 +1131,7 @@ sub PDLA::Core::new_pdl_from_string {
       if( $to_return->dim(-1) == 1 ) {
 	      if( $to_return->dims > 1 ) {
 		      # remove potentially spurious last dimension
-		      $to_return = $to_return->mv(-1,1)->clump(2);
+		      $to_return = $to_return->mv(-1,1)->clump(2)->sever;
 	      } elsif( $to_return->dims == 1 ) {
 		      # fix scalar values
 		      $to_return->setdims([]);
@@ -1205,7 +1217,9 @@ sub PDLA::Core::parse_basic_string {
 		elsif (s/^([\d+\-e.]+)//i) {
 			# Note that improper numbers are handled by the warning signal
 			# handler
-			push @to_return, $sign * $1;
+                        my $val = $1;
+                        my $nval = $val + 0x0;
+                        push @to_return, ($sign>0x0) ? $nval : -$nval;
 		}
 		else {
 			die "Incorrectly formatted input at:\n  ", substr ($_, 0, 10), "...\n";
@@ -1255,6 +1269,12 @@ sub PDLA::new {
          # new was passed a string argument that doesn't look like a number
          # so we can process as a Matlab-style data entry format.
 		return PDLA::Core::new_pdl_from_string($new,$value,$this,$type);
+      } elsif ($Config{ivsize} < 8 && $pack[$new->get_datatype] eq 'q*') {
+         # special case when running on a perl without 64bit int support
+         # we have to avoid pack("q", ...) in this case
+         # because it dies with error: "Invalid type 'q' in pack"
+         $new->setdims([]);
+         set_c($new, [0], $value);
       } else {
          $new->setdims([]);
          ${$new->get_dataref}     = pack( $pack[$new->get_datatype], $value );
@@ -1306,7 +1326,7 @@ sub PDLA::copy {
     return $new;
 }
 
-=head2 PDLA::hdr_copy
+=head2 hdr_copy
 
 =for ref
 
@@ -1433,7 +1453,7 @@ sub PDLA::_deep_hdr_copy {
 }
 
 
-=head2 PDLA::unwind
+=head2 unwind
 
 =for ref
 
@@ -1444,7 +1464,7 @@ that all threadids have been removed.
 
  $y = $x->unwind;
 
-=head2 PDLA::make_physical
+=head2 make_physical
 
 =for ref
 
@@ -1607,8 +1627,6 @@ the usual cases. The following example demonstrates typical usage:
 sub PDLA::clump {
   my $ndims = $_[0]->getndims;
   if ($#_ < 2) {
-    return &PDLA::_clump_int($_[0],$_[1]) # Truncate clumping to actual dims
-      if $_[1] > $ndims;
     return &PDLA::_clump_int(@_);
   } else {
     my ($this,@dims) = @_;
@@ -1726,7 +1744,7 @@ sub PDLA::thread_define ($$) {
   barf "error defining $name: $@\n" if $@;
 }
 
-=head2 PDLA::thread
+=head2 thread
 
 =for ref
 
@@ -1790,7 +1808,7 @@ sub PDLA::diagonal {
 	$var->diagonalI(\@_);
 }
 
-=head2 PDLA::thread1
+=head2 thread1
 
 =for ref
 
@@ -1814,7 +1832,7 @@ sub PDLA::thread1 {
 	$var->threadI(1,\@_);
 }
 
-=head2 PDLA::thread2
+=head2 thread2
 
 =for ref
 
@@ -1838,7 +1856,7 @@ sub PDLA::thread2 {
 	$var->threadI(2,\@_);
 }
 
-=head2 PDLA::thread3
+=head2 thread3
 
 =for ref
 
@@ -1984,7 +2002,7 @@ but
  [0]
 
 
-=head2 PDLA::info
+=head2 info
 
 =for ref
 
@@ -2040,8 +2058,7 @@ Calculated memory consumption of this piddle's data area
 sub PDLA::info {
     my ($this,$str) = @_;
     $str = "%C: %T %D" unless defined $str;
-    return ref($this)."->null"
-	if PDLA::Core::dimstr($this) =~ /D \[0\]/;
+    return ref($this)."->null" if $this->isnull;
     my @hash = split /(%[-,0-9]*[.]?[0-9]*\w)/, $str;
     my @args = ();
     my $nstr = '';
@@ -2197,6 +2214,10 @@ sub PDLA::topdl {
 # Convert everything to PDLA if not blessed
 
 sub alltopdl {
+    if (ref $_[2] eq 'PDLA::Type') {
+      return convert($_[1], $_[2]) if blessed($_[1]);
+      return $_[0]->new($_[2], $_[1]) if $_[0] eq 'PDLA';
+    }
     return $_[1] if blessed($_[1]); # Fall through
     return $_[0]->new($_[1]);
 0;}
@@ -2332,7 +2353,7 @@ sub new_or_inplace {
 # Allow specifications like zeroes(10,10) or zeroes($x)
 # or zeroes(inplace $x) or zeroes(float,4,3)
 
-=head2 PDLA::new_from_specification
+=head2 new_from_specification
 
 =for ref
 
@@ -2595,9 +2616,10 @@ preserves dataflow:
   ]
  ]
 
-Note: an explicit copy of slices is generally forced - this is the
-only way (for now) of stopping a crash if C<$x> is a slice.
-Important: Physical piddles are changed inplace!
+Important: Piddles are changed inplace!  
+
+Note: If C<$x> is connected to any other PDLA (e.g. if it is a slice)
+then the connection is first severed.
 
 =for example
 
@@ -2619,7 +2641,8 @@ sub PDLA::reshape{
     if (@_ == 2 && $_[1] == -1) {  # a slicing reshape that drops 1-dims
 	return $_[0]->slice( map { $_==1 ? [0,0,0] : [] } $_[0]->dims);
     }
-    my $pdl = pdl($_[0]);
+    my $pdl = topdl($_[0]);
+    $pdl->sever;
     my $nelem = $pdl->nelem;
     my @dims = grep defined, @_[1..$#_];
     for my $dim(@dims) { barf "reshape: invalid dim size '$dim'" if $dim < 0 }
@@ -3438,6 +3461,7 @@ sub str1D {
     my $dtype = $self->get_datatype();
     $dformat = $PDLA::floatformat  if $dtype == $PDLA_F;
     $dformat = $PDLA::doubleformat if $dtype == $PDLA_D;
+    $dformat = $PDLA::indxformat if $dtype == $PDLA_IND;
 
     my $badflag = $self->badflag();
     for $t (@$x) {
@@ -3492,6 +3516,8 @@ sub str2D{
 		$format = $PDLA::floatformat;
 	    } elsif ($dtype == $PDLA_D) {
 		$format = $PDLA::doubleformat;
+	    } elsif ($dtype == $PDLA_IND) {
+		$format = $PDLA::indxformat;
 	    } else {
 		# Stick with default
 		$findmax = 0;

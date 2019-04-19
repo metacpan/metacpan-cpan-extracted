@@ -3,111 +3,115 @@ package App::Task;
 use strict;
 use warnings;
 
-our $lastprintchar;
-our $VERSION = '0.01';
-our $depth   = 0;
-our $level   = 0;
+our $VERSION = '0.02';
 
-package App::Task::Tie {
-    require Tie::Handle;
-    our @ISA = ('Tie::Handle');
+use IPC::Open3::Utils ();
+use Text::OutputFilter;
+use IO::Interactive::Tiny ();
 
-    sub FILENO {
-        my ($tie) = @_;
-        return fileno( $tie->{orig} );
-    }
-
-    sub WRITE {
-        my ( $tie, $buf, $len, $offset ) = @_;
-        print substr $buf, $offset, $len;
-
-        return 1;
-    }
-
-    sub PRINT {
-        my ( $tie, @args ) = @_;
-
-        ($lastprintchar) = substr( $args[-1], -1, 1 );
-        chomp( $args[-1] );
-        my $i = App::Task::indent();
-
-        # print { $tie->{orig} } "DEBUG: -$App::Task::depth-\n";
-        # use Data::Dumper;print { $tie->{orig} } Dumper({ $App::Task::depth => \@args});
-        print { $tie->{orig} } map { my $p = $_; $p =~ s/\n/\n$i/msg; "$i$p" } @args;
-        print { $tie->{orig} } "\n" if $lastprintchar eq "\n";
-
-        return 1;
-    }
-
-    sub PRINTF {
-        my ( $tie, $pattern, @args ) = @_;
-
-        ($lastprintchar) = substr( $pattern, -1, 1 );
-        chomp($pattern);
-        my $i = App::Task::indent();
-
-        my $new = sprintf( "$i$pattern", @args );
-        if ( substr( $new, -1, 1 ) eq "\n" ) {
-            chomp($new);
-            $lastprintchar = "\n";
-        }
-        $new =~ s/\n/\n$i/msg;
-        print { $tie->{orig} } $new;
-        print { $tie->{orig} } "\n" if $lastprintchar eq "\n";
-
-        return 1;
-    }
-
-    sub TIEHANDLE { my ( $self, $orig ) = @_; bless { orig => $orig }, $self }
-};
+BEGIN {
+    no warnings "redefine";
+    require Tie::Handle::Base;
+    *Text::OutputFilter::OPEN = \&Tie::Handle::Base::OPEN;
+}
 
 sub import {
     no strict 'refs';    ## no critic
     *{ caller() . '::task' } = \&task;
 }
 
-sub indent {
-    warn "indent() called outside of run()\n" if $depth < 0;
-    return "" if $depth <= 0;
-    return "    " x $depth;
-}
-
+our $depth      = 0;
+our $level      = 0;
 our $steps      = {};
 our $prev_depth = 1;
+
+sub _nl { local $depth = 0; print "\n" }
 
 sub _sys {
     my @cmd = @_;
 
-    my $rv = system(@cmd) ? 0 : 1;    # TODO: indent **line at a time** i.e. not run it all and dump it all at once
-    print "\n";
+    my $rv = IPC::Open3::Utils::run_cmd(
+        @cmd,
+        {
+            autoflush         => { stdout => 1, stderr => 1 },
+            carp_open3_errors => 1,
+            close_stdin       => 1,
+        }
+    );
 
     return $rv;
 }
 
-sub task($$) {
-    my ( $msg, $code, $cmdhr ) = @_;
-    chomp($msg);
+sub _escape {
+    my ( $str, $leave_slashes ) = @_;
 
-    local *STDOUT = *STDOUT;
-    local *STDERR = *STDERR;
-    open( local *ORIGOUT, ">&", \*STDOUT );
-    open( local *ORIGERR, ">&", \*STDERR );
+    $str =~ s/\\/\\\\/g unless $leave_slashes;
+    $str =~ s/\n/\\n/g;
+    $str =~ s/\t/\\t/g;
 
-    # close STDOUT;
-    # close STDERR;
+    return $str;
+}
+
+sub _indent {
+    my ($string) = @_;
+
+    warn "_indent() called outside of task()\n" if $depth < 0;
+    my $i = $depth <= 0 ? "" : "    " x $depth;
+
+    $string =~ s/\n/\n$i/msg;
+    return "$i$string";
+}
+
+sub tie_task {
+    close ORIGOUT;
+    close ORIGERR;
+    open( *ORIGOUT, ">&", \*STDOUT );
+    open( *ORIGERR, ">&", \*STDERR );
 
     ORIGOUT->autoflush();
     ORIGERR->autoflush();
-    my $o = tie( *STDOUT, __PACKAGE__ . "::Tie", \*ORIGOUT );
-    my $e = tie( *STDERR, __PACKAGE__ . "::Tie", \*ORIGERR );
+    my $o = tie( *STDOUT, "Text::OutputFilter", 0, \*ORIGOUT, \&_indent );
+    my $e = tie( *STDERR, "Text::OutputFilter", 0, \*ORIGERR, \&_indent );
+
+    return ( $o, $e );
+}
+
+sub task {
+    my ( $msg, $code, $cmdhr ) = @_;
+    chomp($msg);
+
+    local *STDOUT  = *STDOUT;
+    local *STDERR  = *STDERR;
+    local *ORIGOUT = *ORIGOUT;
+    local *ORIGERR = *ORIGERR;
+
+    my ( $o, $e ) = tie_task();
 
     my $task = $code;
     my $type = ref($code);
     if ( $type eq 'ARRAY' ) {
-        $task = $cmdhr->{fatal} ? sub { _sys( @{$code} ) or die "`@{$code}` did not exit cleanly: $?\n" } : sub { _sys( @{$code} ) };
+        my $disp = join " ", map {
+            my $copy = "$_";
+            $copy = _escape( $copy, 1 );
+            if ( $copy =~ m/ / ) { $copy =~ s/'/\\'/g; $copy = "'$copy'" }
+            $copy
+        } @{$code};
+        if ( $ENV{App_Task_DRYRUN} ) {
+            $task = sub { print "(DRYRUN) ＞＿ $disp\n" };
+        }
+        else {
+            $task = $cmdhr->{fatal} ? sub { _sys( @{$code} ) or die "`$disp` did not exit cleanly: $?\n" } : sub { _sys( @{$code} ) };
+        }
+
     }
     elsif ( !$type ) {
-        $task = $cmdhr->{fatal} ? sub { _sys($code) or die "`$code` did not exit cleanly: $?\n" } : sub { _sys($code) };
+        my $disp = _escape( $code, 0 );
+        if ( $ENV{App_Task_DRYRUN} ) {
+            $task = sub { print "(DRYRUN) ＞＿ $disp\n" };
+        }
+        else {
+            $task = $cmdhr->{fatal} ? sub { _sys($code) or die "`$disp` did not exit cleanly: $?\n" } : sub { _sys($code) };
+        }
     }
 
     my $cur_depth = $depth;
@@ -126,30 +130,23 @@ sub task($$) {
 
     my $pre = $steps->{$depth} ? "[$level.$steps->{$depth}]" : "[$level]";
 
-    {
+    my $fmt_pre = IO::Interactive::Tiny::is_interactive() ? "\e[1;107;30m" : "";    # ANSI code to highlight the heading/footing
+    my $fmt_pst = $fmt_pre ? "\e[0m" : "";
 
+    {
         local $depth = $depth - 1;
-        if ( !defined $lastprintchar || $lastprintchar ne "\n" ) {
-            local $depth = 0;
-            print "\n";
-        }
-        print "➜➜➜➜ $pre $msg …\n";
+        print "$fmt_pre➜➜➜➜ $pre $msg …$fmt_pst\n";
     }
 
     my $ok = $task->();
 
     {
         local $depth = $depth - 1;
-        if ( $lastprintchar ne "\n" ) {
-            local $depth = 0;
-            print "\n";
-        }
-
         if ($ok) {
-            print " … $pre done ($msg).\n\n";
+            print "$fmt_pre … $pre done ($msg).$fmt_pst\n";
         }
         else {
-            warn " … $pre failed ($msg).\n\n";
+            warn "$fmt_pre … $pre failed ($msg).$fmt_pst\n";
         }
     }
 
@@ -167,13 +164,15 @@ sub task($$) {
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
-App::Task - Nest tasks w/ indented output and pre/post headers 
+App::Task - Nest tasks w/ indented output and pre/post headers
 
 =head1 VERSION
 
-This document describes App::Task version 0.01
+This document describes App::Task version 0.02
 
 =head1 SYNOPSIS
 
@@ -182,7 +181,7 @@ This document describes App::Task version 0.01
     task "…" => sub {};
     task "…" => ["system","args","here"], {fatal => 1};
     task "…" => "system command here";
- 
+
 Nested
 
     task "…" => sub {
@@ -190,10 +189,10 @@ Nested
             task "…" => sub { … };
         };
         task "…" => sub { … };
-        task "…" => sub { 
-            task "…" => sub { 
-                task "…" => sub { …  }; 
-            }; 
+        task "…" => sub {
+            task "…" => sub {
+                task "…" => sub { …  };
+            };
         };
     }
 
@@ -209,7 +208,7 @@ For example, say this:
     foo();
     system(…,…);
     say test_foo() ? "foo is good" : "foo is down";
- 
+
 outputs this:
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -229,7 +228,9 @@ Nothing wrong with that but it could be easier to process visually, so if we C<t
     task "finalize foo" => sub {
         task "enable barring" => […,…];
         task "verify foo" => sub {
-            say test_foo() ? "foo is good" : "foo is down";
+            my $status = test_foo();
+            say $status ? "foo is good" : "foo is down";
+            return $status;
         };
     };
 
@@ -259,7 +260,7 @@ Now you get:
 
      … done (finalize foo).
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 Each variant has a pre/post heading and indented output.
 
@@ -273,7 +274,7 @@ To make CODEREF fatal just throw an exception.
 
 CMD_STRING is a string suitable for C<system(CMD_STRING)>.
 
-If the command exits clean the post heading will be “done”, if it exist unclean it will be “failed”.
+If the command exits clean the post heading will be “done”, if it exits unclean it will be “failed”.
 
 To make CMD_STRING exiting unclean be fatal you can set fatal to true in the optional 3rd argument to task:
 
@@ -284,24 +285,122 @@ To make CMD_STRING exiting unclean be fatal you can set fatal to true in the opt
 
 task NAME => CMD_ARRAYREF is a string suitable for C<system(@{CMD_ARRAYREF})>.
 
-If the command exits clean the post heading will be “done”, if it exist unclean it will be “failed”.
+If the command exits clean the post heading will be “done”, if it exits unclean it will be “failed”.
 
 To make CMD_STRING exiting unclean be fatal you can set fatal to true in the optional 3rd argument to task:
 
     task "prep fiddler" => ["/usr/bin/fiddler", "prep"]; # will continue on unclean exit
     task "create fiddler" => ["/usr/bin/fiddler", "new"], { fatal => 1 }; # will die on unclean exit
 
+=head3 $ENV{App_Task_DRYRUN}
+
+If this is true the C<CMD_ARRAYREF> and C<CMD_STRING> version of C<task()> will out put a DEBUG string of the command it would have run.
+
+You can then check it in your application’s code to do things differently in a dry run mode. An example is found in the L</App::Task::tie_task()> example function below.
+
+=head2 App::Task::tie_task()
+
+Not exported or exportable.
+
+Take no arguments. Returns the tied() objects for STDOUT, STDERR.
+
+    App::Task::tie_task();
+    my ($o, $e) = App::Task::tie_task();
+
+Dies if you call it and STDOUT or STDERR are already tied.
+
+Some modules don’t play well with tied STDOUT/STDERR. To get them to work you need to do some wrapping to essentially:
+
+redefine the thing in question to do this pseudo code logic:
+
+    if (SDTDOUT/STDERR are tied) {
+        untie STDOUT/STDERR
+        do the original thing
+        reset STDOUT/STDERR by calling C<App::Task::tie_task()>
+    }
+    else {
+        do the original thing
+    }
+
+For example, L<Git::Repository> is an excellent tool. However if you do this:
+
+    my $git = get_git_obj($CWD);
+    task "doing some git stuff" => sub {
+        $git->run(checkout => "-b", $branchname);
+        my $user = $git->run( "config", "--get", "user.name" );
+        …
+    };
+
+A few things go wonky, the most obvious is that the config call will output the result, unindented, to the screen instead of C<$user> being populated with it.
+
+To make it play nice we change our C<get_git_obj()> function to look like this (including the L<Git::Repository::Plugin::Dirty> plugin).
+
+    my $git;
+
+    sub get_git_obj {
+        my ( $work_tree, $verbose ) = @_;
+
+        if ( !$git ) {
+            require Git::Repository;
+            Git::Repository->import('Dirty');
+
+            my $real_run   = \&Git::Repository::run;
+            my $real_dirty = \&Git::Repository::is_dirty;
+            no warnings "redefine";
+            *Git::Repository::run = sub {
+                if ( !$ENV{App_Task_DRYRUN} ) {
+                    if ( tied *STDOUT || tied *STDERR ) {
+                        untie *STDOUT;
+                        untie *STDERR;
+                        if ( defined wantarray ) {
+                            my ( @rv, $rv );
+                            if   (wantarray) { @rv = $real_run->(@_) }
+                            else             { $rv = $real_run->(@_) }
+                            App::Task::tie_task();
+                            return wantarray ? @rv : $rv;
+                        }
+                        else {
+                            $real_run->(@_);
+                        }
+                        App::Task::tie_task();
+                        return;
+                    }
+                    else {
+                        goto &$real_run;
+                    }
+                }
+
+                shift;
+                print "(DRYRUN) ＞＿ git " . join " ", map {
+                    if (m/ /) { s/'/\\'/g; $_ = "'$_'" }
+                    $_
+                } @_;
+                print "\n";
+            };
+            *Git::Repository::is_dirty = sub {
+                return if $ENV{App_Task_DRYRUN};
+                goto &$real_dirty;
+            };
+        }
+
+        if ( !$git->{$work_tree} ) {
+            $git->{$work_tree} = Git::Repository->new( { fatal => ["!0"], quiet => ( $verbose ? 0 : 1 ), work_tree => $work_tree } );
+        }
+
+        return $git->{$work_tree};
+    }
+
 =head1 DIAGNOSTICS
 
 Throws no warnings or errors of its own.
 
 =head1 CONFIGURATION AND ENVIRONMENT
-  
+
 App::Task requires no configuration files or environment variables.
 
 =head1 DEPENDENCIES
 
-L<IPC::Open3::Utils>, L<Tie::Handle>
+L<Text::OutputFilter>, L<Tie::Handle::Base>, L<IPC::Open3::Utils>, L<IO::Interactive::Tiny>
 
 =head1 INCOMPATIBILITIES AND LIMITATIONS
 

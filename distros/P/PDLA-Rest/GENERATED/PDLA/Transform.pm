@@ -378,7 +378,7 @@ sub invert {
                     SV *big; SV *blur; SV *sv_min; SV *flux; SV *bv)
 
 
-=head2 PDLA::match
+=head2 match
 
 =for usage
 
@@ -610,6 +610,14 @@ Pixel values are filtered through a spatially-variable filter tuned to
 the computed Jacobian of the transformation, with radial Gaussian
 rolloff.  This is the most accurate resampling method, in the sense of
 introducing the fewest artifacts into a properly sampled data set.
+This method uses a lookup table to speed up calculation of the Gaussian
+weighting.
+
+=item * G
+
+This method works exactly like 'g' (above), except that the Gaussian
+values are computed explicitly for every sample -- which is considerably
+slower.
 
 =back
 
@@ -647,8 +655,7 @@ than 1.0 are silly, because they allow the entire input array to be compressed
 into a region smaller than a single pixel.
 
 Wherever an output pixel would require averaging over an area that is too
-big in input space, it instead gets NaN or the equivalent (bad values are
-not yet supported).
+big in input space, it instead gets NaN or the bad value.
 
 =item phot, photometry, Photometry
 
@@ -691,6 +698,15 @@ the average value of everything along the parallel occupied by the
 pixel.  This flaw is inherent in the assumptions that underly creating
 a Jacobian matrix.  Maybe someone will write code to work around it.
 Maybe that someone is you.
+
+BAD VALUES:
+
+If your PDLA was compiled with bad value support, C<map()> supports
+bad values in the data array.  Bad values in the input array are
+propagated to the output array.  The 'g' and 'h' methods will do some
+smoothing over bad values:  if more than 1/3 of the weighted input-array
+footprint of a given output pixel is bad, then the output pixel gets marked
+bad.
 
 
 
@@ -785,7 +801,8 @@ sub map {
   $out = PDLA::new_from_specification('PDLA',$in->type,@odims);
   $out->sethdr($ohdr) if defined($ohdr);
 
-  if($PDLA::Bad::Status and $in->badflag()) {
+  if($PDLA::Bad::Status) {
+    # set badflag on output all the time if possible, to account for boundary violations
     $out->badflag(1);
   }
 

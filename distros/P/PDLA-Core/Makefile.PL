@@ -14,8 +14,8 @@ use File::Spec;
 $::PP_VERBOSE = $::PP_VERBOSE = 0; # =1 makes PP waffle a lot
 
 # file globals(!)
-my ($pdl_f77conf, $forcebuild);
-my ($seen_pdlconf, $seen_f77conf);
+my ($forcebuild);
+my ($seen_pdlconf);
 my $pdl_conf_file = ''; # apparently for users to change
 
 # build-system globals
@@ -214,16 +214,6 @@ EOD
   %PDLA_CONFIG = ();
 }
 
-sub check_f77conf {
-  my ($seenyet) = @_;
-  return 0 unless $seenyet;
-
-  my $pdl_f77conf = File::Spec->rel2abs($pdl_f77conf)
-    unless File::Spec->file_name_is_absolute($pdl_f77conf);
-  $PDLA::Config{F77CONF} = $pdl_f77conf;
-  return 1;
-}
-
 sub make_Version_pm {
   # Get Version from Basic/PDLA.pm and generated Basic/Core/Version.pm from it
   require './Basic/PDLA.pm';
@@ -320,9 +310,6 @@ for my $mod (@test) {
 	if(/^PDLACONF=(.*)$/) {
 		$seen_pdlconf=1;
 		$pdl_conf_file = $1; ();
-	} elsif (/^F77CONF=(.*)$/) {
-		$seen_f77conf=1;
-		$pdl_f77conf=$1; ();
 	} elsif (/^FORCE$/i) {
 		$forcebuild=1;
 		();
@@ -342,31 +329,11 @@ unless ( $seen_pdlconf ) {
 
 # needs to be called before any of the make_XX routines
 getpdl_config($pdl_conf_file);
-$seen_f77conf = check_f77conf($seen_f77conf);
 
 # Check environment for SKIP_KNOWN_PROBLEMS
 if (!defined($PDLA::Config{SKIP_KNOWN_PROBLEMS}) and defined($ENV{SKIP_KNOWN_PROBLEMS})) {
    $PDLA::Config{SKIP_KNOWN_PROBLEMS} = $ENV{SKIP_KNOWN_PROBLEMS};
    warn "Makefile.PL: setting SKIP_KNOWN_PROBLEMS Config from environment value: $ENV{SKIP_KNOWN_PROBLEMS}";
-}
-# Add check for POGL if USE_POGL is enabled
-if (!defined($PDLA::Config{USE_POGL}) or +$PDLA::Config{USE_POGL}) {
-   eval "use OpenGL $PDLA::Config{POGL_VERSION} qw();";
-   if ($@) {
-      if (defined($PDLA::Config{USE_POGL})) {
-         warn "Makefile.PL: DEPENDENCY ERROR: USE_POGL requires at least OpenGL version $PDLA::Config{POGL_VERSION}!\n";
-         exit 0;
-      } else {
-         warn "Makefile.PL: OpenGL-$PDLA::Config{POGL_VERSION} not found, setting \$PDLA::Config{USE_POGL} => 0\n";
-         $PDLA::Config{USE_POGL} = 0;
-      }
-   } else {
-      # Have OpenGL so set USE_POGL option if needed
-      warn "Makefile.PL: Found required OpenGL version, setting USE_POGL => 1\n" unless defined($PDLA::Config{USE_POGL});
-      $PDLA::Config{USE_POGL} ||= 1;
-   }
-} else {
-   warn "Makefile.PL: Have \$PDLA::Config{USE_POGL} => 0 so skipping TriD build with POGL\n";
 }
 
 make_Version_pm();
@@ -387,14 +354,11 @@ my @podpms = map { $_.".pod", '$(INST_LIBDIR)/PDLA/' . $_ .".pod"}
   qw/Bugs/;
 
 my @prereq = (
-	   'Astro::FITS::Header' => 0,
            'Carp'                => 0,         # Need to run
            'Config'              => 0,         # 
            'Convert::UU'         => 0,         # for PDLA::IO::Dumper
            'Data::Dumper'        => 2.121,     # for PDLA::IO::Dumper
            'English'             => 0,
-           'ExtUtils::MakeMaker' => 6.56,      # for CONFIGURE_REQUIRES support
-           'ExtUtils::Manifest'  => 0,
            'Fcntl'               => 0,
            'File::Basename'      => 0,
            'File::Find'          => 0,
@@ -414,16 +378,10 @@ my @prereq = (
 	   'Text::Balanced'      => 1.89,      # for PDLA::NiceSlice
 	  );
 
-# add OpenGL version dependency for CPAN to follow
-push @prereq, ('OpenGL' => $PDLA::Config{POGL_VERSION}) if $PDLA::Config{USE_POGL};
-
-# push @prereq, ('ExtUtils::F77' => 1.10) unless $seen_f77conf;
-
 my @exe_files = qw(perldla pdladoc);
 push @exe_files, "pdla$Config{exe_ext}" if $^O !~ /MSWin/;
 my @cleanup = ("pdla$Config{exe_ext}", qw(
     pdladoc.db pdladoc.pod perldla.pod Changes.new
-    t/callext$(OBJ_EXT) t/callext.$(DLEXT)
 ));
 
 ##############################
@@ -440,6 +398,7 @@ my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDLA::Core::Dev -e pdlpp_
 
 my %makefile_hash = (
 	      'PREREQ_PM' => { @prereq },
+              'LICENSE' => 'perl',
               'CONFIGURE_REQUIRES' => {
                 'Devel::CheckLib' => 1.01,
                 'Carp'            => 1.20,    # EU::MM seems to need this not to crash
@@ -448,6 +407,7 @@ my %makefile_hash = (
               },
               TEST_REQUIRES => {
                 'CPAN::Meta' => '2.120900',
+                'IPC::Cmd' => 0.72,
                 'Test::Exception' => 0,
                 'Test::Warn' => 0,  # for t/pptest.t
                 'Test::Deep' => 0,
@@ -463,15 +423,25 @@ my %makefile_hash = (
 	      'EXE_FILES' => \@exe_files,
 	      'PM' => { @podpms }, #so that the script docs are picked up
               'META_MERGE' => {
-                 "meta-spec" => { version => 2 },
-                 resources => {
-                    homepage => 'http://pdlporters.github.io',
-                    repository  => {
-                       url => 'git://github.com/PDLPorters/pdla-core',
-                       type => 'git',
-                       web => 'https://github.com/PDLPorters/pdla-core',
+                "meta-spec" => { version => 2 },
+                resources => {
+                  homepage => 'http://pdlporters.github.io',
+                  bugtracker  => {web=>'https://github.com/PDLPorters/pdla-core/issues'},
+                  repository  => {
+                    url => 'git://github.com/PDLPorters/pdla-core',
+                    type => 'git',
+                    web => 'https://github.com/PDLPorters/pdla-core',
+                  },
+                  x_IRC => 'irc://irc.perl.org/#pdl',
+                },
+                no_index => { file => ['Doc/scantree.pl'] },
+                prereqs => {
+                  runtime => {
+                    suggests => {
+                      'Astro::FITS::Header' => 0,
                     },
-                 },
+                  },
+                },
               },
 	      'OPTIMIZE'  => $PDLA::Config{OPTIMIZE} || $Config{optimize},
 	      'CCFLAGS' => $ccflags,

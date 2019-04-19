@@ -119,6 +119,43 @@ use Future::AsyncAwait;
    is( scalar $fret->get, "awaited twice", '$fret now ready after foreach with two awaits' );
 }
 
+# RT#129215
+{
+   my @F = map { Future->new } 0, 1, 2;
+   my $fret = (async sub {
+      foreach my $idx ( 0, 1, 2 ) {
+         await $F[$idx];
+      }
+      return "OK";
+   })->();
+
+   # Arrange for the stack to be at different heights on each resume
+   my $tmp = do { 1 + ( $F[0]->done // 0 ) };
+   $tmp = [ 2, 3, [ $F[1]->done ] ];
+   $tmp = 4 * ( 6 + ( $F[2]->done // 0 ) );
+
+   is( scalar $fret->get, "OK", '$fret now ready after differing stack resumes' );
+}
+
+SKIP: {
+   skip "IO::Async::Loop not available", 1 unless eval { require IO::Async::Loop; };
+   my $loop = IO::Async::Loop->new;
+
+   my $out = "";
+
+   (async sub {
+      foreach my $k (qw( one two three four )) {
+         $out .= "$k\n";
+         await $loop->delay_future(after => 0.01);
+         $out .= "$k\n";
+      }
+   })->()->get;
+
+   is( $out, "one\none\ntwo\ntwo\nthree\nthree\nfour\nfour\n",
+      'Output from sleepy foreach(LIST)'
+   );
+}
+
 # TODO:
 #   This ought to be a compiletime check. That's hard right now so for now
 #   it's a runtime check

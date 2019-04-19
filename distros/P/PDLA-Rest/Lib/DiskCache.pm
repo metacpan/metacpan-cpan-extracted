@@ -96,7 +96,6 @@ $PDLA::DiskCache::VERSION = 1.1;
  
 use strict;
 use Carp;
-use PDLA::IO::FITS; # needed as default funcs are from here
 
 =head2 diskcache
 

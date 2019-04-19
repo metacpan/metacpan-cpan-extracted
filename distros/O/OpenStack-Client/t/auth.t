@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 #
-# Copyright (c) 2018 cPanel, L.L.C.
+# Copyright (c) 2019 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -40,11 +40,13 @@ throws_ok {
 foreach my $test_version (@test_versions) {
     my $version = defined $test_version? $test_version: 'undefined';
 
-    throws_ok {
-        OpenStack::Client::Auth->new($test_endpoint,
-            (defined $test_version? ('version' => $test_version): ()),
-        );
-    } qr/No OpenStack tenant name provided in "tenant"/, "OpenStack::Client::Auth->new() dies if no tenant name is provided for version $version";
+    if ( $test_version && $test_version < 3 ) {
+        throws_ok {
+            OpenStack::Client::Auth->new($test_endpoint,
+                (defined $test_version? ('version' => $test_version): ()),
+            );
+        } qr/No OpenStack tenant name provided in "tenant"/, "OpenStack::Client::Auth->new() dies if no tenant name is provided for version $version";
+    }
 
     throws_ok {
         OpenStack::Client::Auth->new($test_endpoint,

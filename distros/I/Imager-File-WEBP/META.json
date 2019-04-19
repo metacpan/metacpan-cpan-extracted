@@ -58,6 +58,6 @@
          "web" : "http://github.com/tonycoz/imager-file-webp.git"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

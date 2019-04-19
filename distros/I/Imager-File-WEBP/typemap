@@ -1,0 +1,21 @@
+Imager::File::WEBP::Config	T_PTROBJ
+opt_Imager::File::WEBP::Config	T_PTROBJ_OPT
+
+#############################################################################
+INPUT
+
+T_PTROBJ_OPT
+	SvGETMAGIC($arg);
+	if (SvOK($arg)) {
+	    if (SvROK($arg) && sv_derived_from($arg, \"${my $t = $ntype; $t =~ s/^opt_//; \$t}\")) {
+	        IV tmp = SvIV((SV*)SvRV($arg));
+	        $var = INT2PTR($type,tmp);
+	    }
+	    else
+	        Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			    \"$var\", \"${my $t = $ntype; $t =~ s/^opt_//; \$t}\");
+	}
+	else {
+	    $var = NULL;
+	}

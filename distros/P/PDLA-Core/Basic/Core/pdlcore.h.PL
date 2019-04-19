@@ -24,8 +24,9 @@ use vars qw( %PDLA_DATATYPES );
 # version 9 for STRLEN/Size_t/Off_t for mmap delete magic
 # version 10 for 64bit index support (PDLA index datatype)
 # version 11 for core cleanup (proto-PDLA-3)
+# version 12 for PDLA_Anyval union data type (full 64bit support)
 use vars qw( $pdl_core_version );
-$pdl_core_version = 11;
+$pdl_core_version = 12;
 
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
@@ -138,7 +139,7 @@ void    pdl_unpackdims ( SV* sv, PDLA_Indx *dims,  /* Unpack */
                          int ndims );
 void*   pdl_malloc ( STRLEN nbytes );           /* malloc memory - auto free()*/
 
-void pdl_makescratchhash(pdl *ret,PDLA_Anyval data, int datatype);
+void pdl_makescratchhash(pdl *ret, PDLA_Anyval data);
 PDLA_Indx pdl_safe_indterm(PDLA_Indx dsz, PDLA_Indx at, char *file, int lineno);
 void pdl_barf(const char* pat,...); /* General croaking utility */
 void pdl_warn(const char* pat,...); /* General warn utility */
@@ -152,7 +153,7 @@ for my $in ( keys %PDLA_DATATYPES ) {
   (my $type = $PDLA_DATATYPES{$in}) =~ s/^PDLA_//;
   print OUT <<"!WITH!SUBS!";
 PDLA_Indx pdl_setav_$type(PDLA_$type* pdata, AV* av,
-	PDLA_Indx* pdims, PDLA_Long ndims, int level, PDLA_Anyval undefval);
+	PDLA_Indx* pdims, PDLA_Long ndims, int level, PDLA_$type undefval);
 !WITH!SUBS!
 }
 

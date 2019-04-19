@@ -110,7 +110,7 @@ endpoint client.
         - Content-Type
 
             Defaults to `application/json`, although some API calls (e.g., a PATCH)
-            expect a different type; the the case of an image update, the expected
+            expect a different type; the case of an image update, the expected
             type is `application/openstack-images-v2.1-json-patch` or some version
             thereof.
 
@@ -232,7 +232,7 @@ references of the structure defined by the PATCH RFC (6902) governing
 
 # AUTHOR
 
-Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
+Written by Alexandra Hrefna Maheu <xan@cpanel.net>
 
 # CONTRIBUTORS
 
@@ -240,5 +240,5 @@ Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
 
 # COPYRIGHT
 
-Copyright (c) 2018 cPanel, L.L.C.  Released under the terms of the MIT license.
+Copyright (c) 2019 cPanel, L.L.C.  Released under the terms of the MIT license.
 See LICENSE for further details.

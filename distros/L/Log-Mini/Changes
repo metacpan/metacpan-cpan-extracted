@@ -1,5 +1,8 @@
 Revision history for Perl extension Log-Mini
 
+0.2.1 2019-04-18T20:57:59Z
+    - Unused imports were removed
+
 0.2.0 2019-04-11T22:06:58Z
     - Null logger
 

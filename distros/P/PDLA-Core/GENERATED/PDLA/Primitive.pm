@@ -41,7 +41,7 @@ For explanation of the signature format, see L<PDLA::PP|PDLA::PP>.
 
  # Pulls in PDLA::Primitive, among other modules.
  use PDLA;
- 
+
  # Only pull in PDLA::Primitive:
  use PDLA::Primitive;
 
@@ -151,23 +151,23 @@ Matrix multiplication
 
 PDLA overloads the C<x> operator (normally the repeat operator) for
 matrix multiplication.  The number of columns (size of the 0
-dimension) in the left-hand argument must normally equal the number of 
-rows (size of the 1 dimension) in the right-hand argument. 
+dimension) in the left-hand argument must normally equal the number of
+rows (size of the 1 dimension) in the right-hand argument.
 
 Row vectors are represented as (N x 1) two-dimensional PDLAs, or you
-may be sloppy and use a one-dimensional PDLA.  Column vectors are 
+may be sloppy and use a one-dimensional PDLA.  Column vectors are
 represented as (1 x N) two-dimensional PDLAs.
 
 Threading occurs in the usual way, but as both the 0 and 1 dimension
-(if present) are included in the operation, you must be sure that 
+(if present) are included in the operation, you must be sure that
 you don't try to thread over either of those dims.
 
 EXAMPLES
 
 Here are some simple ways to define vectors and matrices:
 
- pdla> $r = pdl(1,2);                # A row vector 
- pdla> $c = pdl([[3],[4]]);          # A column vector 
+ pdla> $r = pdl(1,2);                # A row vector
+ pdla> $c = pdl([[3],[4]]);          # A column vector
  pdla> $c = pdl(3,4)->(*1);          # A column vector, using NiceSlice
  pdla> $m = pdl([[1,2],[3,4]]);      # A 2x2 matrix
 
@@ -259,9 +259,9 @@ sub PDLA::matmult {
 
     while($a->getndims < 2) {$a = $a->dummy(-1)}
     while($b->getndims < 2) {$b = $b->dummy(-1)}
-    
+
     return ($c .= $a * $b) if( ($a->dim(0)==1 && $a->dim(1)==1) ||
-    	       	       	       ($b->dim(0)==1 && $b->dim(1)==1) );
+    			       ($b->dim(0)==1 && $b->dim(1)==1) );
     if($b->dim(1) != $a->dim(0)) {
         barf(sprintf("Dim mismatch in matmult of [%dx%d] x [%dx%d]: %d != %d",$a->dim(0),$a->dim(1),$b->dim(0),$b->dim(1),$a->dim(0),$b->dim(1)));
     }
@@ -325,7 +325,7 @@ Inner product of two vectors and a matrix
 
  d = sum_ij a(i) b(i,j) c(j)
 
-Note that you should probably not thread over C<a> and C<c> since that would be  
+Note that you should probably not thread over C<a> and C<c> since that would be
 very wasteful. Instead, you should use a temporary for C<b*c>.
 
 
@@ -398,8 +398,8 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Efficient Triple matrix product C<a*b*c>
 
-Efficiency comes from by using the temporary C<tmp>. This operation only 
-scales as C<N**3> whereas threading using L<inner2|/inner2> would scale 
+Efficiency comes from by using the temporary C<tmp>. This operation only
+scales as C<N**3> whereas threading using L<inner2|/inner2> would scale
 as C<N**4>.
 
 The reason for having this routine is that you do not need to
@@ -632,7 +632,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-        
+
 sub PDLA::conv1d {
    my $opt = pop @_ if ref($_[$#_]) eq 'HASH';
    die 'Usage: conv1d( a(m), kern(p), [o]b(m), {Options} )'
@@ -710,7 +710,7 @@ The unique elements are returned in ascending order.
 =for example
 
   PDLA> p pdl(2,2,2,4,0,-1,6,6)->uniq
-  [-1 0 2 4 6]     # 0 is returned 2nd (sorted order) 
+  [-1 0 2 4 6]     # 0 is returned 2nd (sorted order)
 
   PDLA> p pdl(2,2,2,4,nan,-1,6,6)->uniq
   [-1 2 4 6 nan]   # NaN value is returned at end
@@ -830,7 +830,7 @@ sub PDLA::uniqind {
   # Now map back to the original space
   my $ansind = $nanind;
   if ( $uniqind->nelem > 0 ) {
-     $ansind = ($good->index($i_srt->index($uniqind)))->append($ansind);   
+     $ansind = ($good->index($i_srt->index($uniqind)))->append($ansind);
   } else {
      $ansind = $uniqind->append($ansind);
   }
@@ -874,7 +874,7 @@ lexicographcally.
 
 If a vector contains all bad values, it is ignored as in L<uniq|uniq>.
 If some of the values are good, it is treated as a normal vector. For
-example, [1 2 BAD] and [BAD 2 3] could be returned, but [BAD BAD BAD] 
+example, [1 2 BAD] and [BAD 2 3] could be returned, but [BAD BAD BAD]
 could not.  Vectors containing BAD values will be returned after any
 non-NaN and non-BAD containing vectors, followed by the NaN vectors.
 
@@ -1074,7 +1074,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 *clip = \&PDLA::clip;
 sub PDLA::clip {
   my($a, $l, $h) = @_;
-  my $d; 
+  my $d;
   unless(defined($l) || defined($h)) {
       # Deal with pathological case
       if($a->is_inplace) {
@@ -1084,7 +1084,7 @@ sub PDLA::clip {
 	  return $a->copy;
       }
   }
-  
+
   if($a->is_inplace) {
       $a->set_inplace(0); $d = $a
   } elsif ($#_ > 2) {
@@ -1161,7 +1161,7 @@ have its bad flag set if the output contains any bad data.
 
 
 
-=for ref 
+=for ref
 
 Calculate useful statistics over a dimension of a piddle
 
@@ -1184,7 +1184,7 @@ with C<N> being the number of elements in x
 
   PRMS = sqrt( sum( (x-mean(x))^2 )/(N-1)
 
-The population deviation is the best-estimate of the deviation 
+The population deviation is the best-estimate of the deviation
 of the population from which a sample is drawn.
 
 =item * the median
@@ -1210,8 +1210,8 @@ variance)
 =back
 
 This operator is a projection operator so the calculation
-will take place over the final dimension. Thus if the input 
-is N-dimensional each returned value will be N-1 dimensional, 
+will take place over the final dimension. Thus if the input
+is N-dimensional each returned value will be N-1 dimensional,
 to calculate the statistics for the entire piddle either
 use C<clump(-1)> directly on the piddle or call C<stats>.
 
@@ -1297,14 +1297,14 @@ sub PDLA::stats {
     # done rather more efficiently...
     if(defined $weights) {
 	$weights = pdl($weights) unless UNIVERSAL::isa($weights,'PDLA');
-	if( ($weights->ndims != $data->ndims) or 
+	if( ($weights->ndims != $data->ndims) or
 	    (pdl($weights->dims) != pdl($data->dims))->or
 	  ) {
 		$weights = $weights + zeroes($data)
 	}
 	$weights = $weights->flat;
-    } 
-	
+    }
+
     return PDLA::statsover($data->flat,$weights);
 }
 
@@ -1439,12 +1439,12 @@ Calculates a 2d histogram.
  $h = histogram2d($datax, $datay, $stepx, $minx,
        $nbinx, $stepy, $miny, $nbiny);
  $hist = zeroes $nbinx, $nbiny;  # Put histogram in existing piddle.
- histogram2d($datax, $datay, $hist, $stepx, $minx, 
+ histogram2d($datax, $datay, $hist, $stepx, $minx,
        $nbinx, $stepy, $miny, $nbiny);
 
 The histogram will contain C<$nbinx> x C<$nbiny> bins, with the lower
 limits of the first one at C<($minx, $miny)>, and with bin size
-C<($stepx, $stepy)>. 
+C<($stepx, $stepy)>.
 The value in each bin is the number of
 values in C<$datax> and C<$datay> that lie within the bin limits.
 
@@ -1503,7 +1503,7 @@ Calculates a 2d histogram from weighted data.
 
 The histogram will contain C<$nbinx> x C<$nbiny> bins, with the lower
 limits of the first one at C<($minx, $miny)>, and with bin size
-C<($stepx, $stepy)>. 
+C<($stepx, $stepy)>.
 The value in each bin is the sum of the values in
 C<$weights> that correspond to values in C<$datax> and C<$datay> that lie within the bin limits.
 
@@ -1629,12 +1629,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Glue two or more PDLAs together along an arbitrary dimension 
+Glue two or more PDLAs together along an arbitrary dimension
 (N-D L<append|append>).
 
 Sticks $a, $b, and all following arguments together along the
-specified dimension.  All other dimensions must be compatible in the 
-threading sense.  
+specified dimension.  All other dimensions must be compatible in the
+threading sense.
 
 Glue is permissive, in the sense that every PDLA is treated as having an
 infinite number of trivial dimensions of order 1 -- so C<< $a->glue(3,$b) >>
@@ -1693,9 +1693,9 @@ sub PDLA::glue{
     }
     $a->xchg(0,$dim);
 }
-	
-	
-	
+
+
+
 
 
 
@@ -1713,8 +1713,8 @@ sub PDLA::glue{
 
 Internal routine
 
-C<axisvalues> is the internal primitive that implements 
-L<axisvals|PDLA::Basic/axisvals> 
+C<axisvalues> is the internal primitive that implements
+L<axisvals|PDLA::Basic/axisvals>
 and alters its argument.
 
 
@@ -2476,7 +2476,7 @@ to find the values C<$yi> at a set of points C<$xi>.
 
 C<interpolate> uses a binary search to find the suspects, er...,
 interpolation indices and therefore abscissas (ie C<$x>)
-have to be I<strictly> ordered (increasing or decreasing). 
+have to be I<strictly> ordered (increasing or decreasing).
 For interpolation at lots of
 closely spaced abscissas an approach that uses the last index found as
 a start for the next search can be faster (compare Numerical Recipes
@@ -2550,9 +2550,9 @@ sub interpol ($$$;$) {
 
 
 
-=head2 interpND 
+=head2 interpND
 
-=for ref 
+=for ref
 
 Interpolate values from an N-D piddle, with switchable method
 
@@ -2564,17 +2564,17 @@ Interpolate values from an N-D piddle, with switchable method
 
 InterpND acts like L<indexND|PDLA::Slices/indexND>,
 collapsing C<$index> by lookup
-into C<$source>; but it does interpolation rather than direct sampling.  
-The interpolation method and boundary condition are switchable via 
-an options hash. 
+into C<$source>; but it does interpolation rather than direct sampling.
+The interpolation method and boundary condition are switchable via
+an options hash.
 
 By default, linear or sample interpolation is used, with constant
 value outside the boundaries of the source pdl.  No dataflow occurs,
 because in general the output is computed rather than indexed.
 
 All the interpolation methods treat the pixels as value-centered, so
-the C<sample> method will return C<< $a->(0) >> for coordinate values on 
-the set [-0.5,0.5), and all methods will return C<< $a->(1) >> for 
+the C<sample> method will return C<< $a->(0) >> for coordinate values on
+the set [-0.5,0.5), and all methods will return C<< $a->(1) >> for
 a coordinate value of exactly 1.
 
 
@@ -2582,11 +2582,11 @@ Recognized options:
 
 =over 3
 
-=item method 
+=item method
 
 Values can be:
 
-=over 3 
+=over 3
 
 =item * 0, s, sample, Sample (default for integer source types)
 
@@ -2601,8 +2601,8 @@ The values are N-linearly interpolated from an N-dimensional cube of size 2.
 
 The values are interpolated using a local cubic fit to the data.  The
 fit is constrained to match the original data and its derivative at the
-data points.  The second derivative of the fit is not continuous at the 
-data points.  Multidimensional datasets are interpolated by the 
+data points.  The second derivative of the fit is not continuous at the
+data points.  Multidimensional datasets are interpolated by the
 successive-collapse method.
 
 (Note that the constraint on the first derivative causes a small amount
@@ -2623,7 +2623,7 @@ they are calculated and put in the stash.
 
 =item b, bound, boundary, Boundary
 
-This option is passed unmodified into L<indexND|PDLA::Slices/indexND>, 
+This option is passed unmodified into L<indexND|PDLA::Slices/indexND>,
 which is used as the indexing engine for the interpolation.
 Some current allowed values are 'extend', 'periodic', 'truncate', and 'mirror'
 (default is 'truncate').
@@ -2654,8 +2654,8 @@ sub PDLA::interpND {
 
   my($method)   = $opt->{m} || $opt->{meth} || $opt->{method} || $opt->{Method};
   if(!defined $method) {
-	$method = ($source->type <= zeroes(long,1)->type) ? 
-	   	   'sample' : 
+	$method = ($source->type <= zeroes(long,1)->type) ?
+		   'sample' :
 	           'linear';
   }
 
@@ -2715,13 +2715,13 @@ sub PDLA::interpND {
 
       my ($d,@di) = $index->dims;
       my $di = $index->ndims - 1;
-      
+
       # Grab a 4-on-a-side n-cube around each desired pixel
       my $samp = $source->range($index->floor - 1,4,$boundary) #ith, cth, sth
 	  ->reorder( $di .. $di+$d-1, 0..$di-1, $di+$d .. $source->ndims-1 );
 	                   # (cth, ith, sth)
-      
-      # Make a cube of the subpixel offsets, and expand its dims to 
+
+      # Make a cube of the subpixel offsets, and expand its dims to
       # a 4-on-a-side N-1 cube, to match the slices of $samp (used below).
       my $b = $index - $index->floor;
       for my $i(1..$d-1) {
@@ -2741,19 +2741,19 @@ sub PDLA::interpND {
 	  $bb = $b->slice("($i)");
 
 	  # Collapse the sample...
-	  $samp = ( $a0 + 
+	  $samp = ( $a0 +
 		    $bb * (
-			   $s0  +  
-			   $bb * ( (3 * $a1a0 - 2*$s0 - $s1) +  
-				   $bb * ( $s1 + $s0 - 2*$a1a0 ) 
+			   $s0  +
+			   $bb * ( (3 * $a1a0 - 2*$s0 - $s1) +
+				   $bb * ( $s1 + $s0 - 2*$a1a0 )
 				   )
 			   )
 		    );
-	  
+
 	  # "Collapse" the subpixel offset...
 	  $b = $b->slice(":,($i)");
       }
-      
+
       return $samp;
 
   } elsif($method =~ m/^f(ft|ourier)?/i) {
@@ -2772,7 +2772,7 @@ sub PDLA::interpND {
      my $i;
      my $c = PDLA::Basic::ndcoords($source);               # (dim, source-dims)
      for $i(1..$index->ndims-1) {
-	 $c = $c->dummy($i,$index->dim($i)) 
+	 $c = $c->dummy($i,$index->dim($i))
      }
      my $id = $index->ndims-1;
      my $phase = (($c * $index * 3.14159 * 2 / pdl($source->dims))
@@ -2788,8 +2788,8 @@ sub PDLA::interpND {
      }
      my $out = cos($phase + $phref ) * $mag;
      $out = $out->clump($source->ndims)->sumover;
-     
-     return $out;		
+
+     return $out;
  }  else {
      barf("interpND: unknown method '$method'; valid ones are 'linear' and 'sample'.\n");
  }
@@ -2878,12 +2878,12 @@ with output from C<which>, remember to flatten it before calling index:
 
 Compare also L<where|/where> for similar functionality.
 
-SEE ALSO: 
+SEE ALSO:
 
 L<which_both|/which_both> returns separately the indices of both
 zero and nonzero values in the mask.
 
-L<where|/where> returns associated values from a data PDLA, rather than 
+L<where|/where> returns associated values from a data PDLA, rather than
 indices into the mask PDLA.
 
 L<whichND|/whichND> returns N-D indices into a multidimensional PDLA.
@@ -2964,7 +2964,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
    sub which_both { my ($this,$outi,$outni) = @_;
 		$this = $this->flat;
-		$outi = $this->nullcreate unless defined $outi;	
+		$outi = $this->nullcreate unless defined $outi;
 		$outni = $this->nullcreate unless defined $outni;
 		PDLA::_which_both_int($this,$outi,$outni);
 		return wantarray ? ($outi,$outni) : $outi;
@@ -3006,14 +3006,14 @@ that is compared to an N-dimensional mask.  Use C<whereND> for that.
  $i = $x->where($x+5 > 0); # $i contains those elements of $x
                            # where mask ($x+5 > 0) is 1
  $i .= -5;  # Set those elements (of $x) to -5. Together, these
-            # commands clamp $x to a maximum of -5. 
+            # commands clamp $x to a maximum of -5.
 
 It is also possible to use the same mask for several piddles with
 the same call:
 
  ($i,$j,$k) = where($x,$y,$z, $x+5>0);
 
-Note: C<$i> is always 1-D, even if C<$x> is E<gt>1-D. 
+Note: C<$i> is always 1-D, even if C<$x> is E<gt>1-D.
 
 WARNING: The first argument
 (the values) and the second argument (the mask) currently have to have
@@ -3135,7 +3135,7 @@ sub PDLA::whereND :lvalue {
 
 =for ref
 
-Return the coordinates of non-zero values in a mask. 
+Return the coordinates of non-zero values in a mask.
 
 =for usage
 
@@ -3146,38 +3146,38 @@ L<indexND|PDLA::Slices/indexND> or L<range|PDLA::Slices/range>.
 
  $coords = whichND($mask);
 
-returns a PDLA containing the coordinates of the elements that are non-zero 
+returns a PDLA containing the coordinates of the elements that are non-zero
 in C<$mask>, suitable for use in indexND.  The 0th dimension contains the
 full coordinate listing of each point; the 1st dimension lists all the points.
 For example, if $mask has rank 4 and 100 matching elements, then $coords has
 dimension 4x100.
 
 If no such elements exist, then whichND returns a structured empty PDLA:
-an Nx0 PDLA that contains no values (but matches, threading-wise, with 
+an Nx0 PDLA that contains no values (but matches, threading-wise, with
 the vectors that would be produced if such elements existed).
 
 DEPRECATED BEHAVIOR IN LIST CONTEXT:
 
 whichND once delivered different values in list context than in scalar
-context, for historical reasons.  In list context, it returned the 
-coordinates transposed, as a collection of 1-PDLAs (one per dimension) 
-in a list.  This usage is deprecated in PDLA 2.4.10, and will cause a 
+context, for historical reasons.  In list context, it returned the
+coordinates transposed, as a collection of 1-PDLAs (one per dimension)
+in a list.  This usage is deprecated in PDLA 2.4.10, and will cause a
 warning to be issued every time it is encountered.  To avoid the
-warning, you can set the global variable "$PDLA::whichND" to 's' to 
+warning, you can set the global variable "$PDLA::whichND" to 's' to
 get scalar behavior in all contexts, or to 'l' to get list behavior in
-list context.  
+list context.
 
 In later versions of PDLA, the deprecated behavior will disappear.  Deprecated
 list context whichND expressions can be replaced with:
 
     @list = $a->whichND->mv(0,-1)->dog;
-    
+
 
 SEE ALSO:
 
 L<which|/which> finds coordinates of nonzero values in a 1-D mask.
 
-L<where|/where> extracts values from a data PDLA that are associated 
+L<where|/where> extracts values from a data PDLA that are associated
 with nonzero values in a mask PDLA.
 
 =for example
@@ -3210,17 +3210,17 @@ sub PDLA::whichND {
   # Scalar context: generate an N-D index piddle
 
   unless($mask->nelem) {
-      return PDLA::new_from_specification('PDLA',$mask->ndims,0);
+      return PDLA::new_from_specification('PDLA',indx,$mask->ndims,0);
   }
-  
+
   unless($mask->getndims) {
-    return $mask ? pdl(0) : PDLA::new_from_specification('PDLA',0);
+    return $mask ? pdl(indx,0) : PDLA::new_from_specification('PDLA',indx,0);
   }
-  
-  $ind = $mask->flat->which->dummy(0,$mask->getndims)->long->make_physical;
+
+  $ind = $mask->flat->which->dummy(0,$mask->getndims)->make_physical;
   if($ind->nelem==0) {
       # In the empty case, explicitly return the correct type of structured empty
-      return PDLA::new_from_specification('PDLA',$mask->ndims, 0);
+      return PDLA::new_from_specification('PDLA',indx,$mask->ndims, 0);
   }
 
   my $mult = ones($mask->getndims)->long;
@@ -3256,8 +3256,8 @@ Implements simple set operations like union and intersection
 
 The operator can be C<OR>, C<XOR> or C<AND>. This is then applied
 to C<$a> viewed as a set and C<$b> viewed as a set. Set theory says
-that a set may not have two or more identical elements, but setops 
-takes care of this for you, so C<$a=pdl(1,1,2)> is OK. The functioning 
+that a set may not have two or more identical elements, but setops
+takes care of this for you, so C<$a=pdl(1,1,2)> is OK. The functioning
 is as follows:
 
 =over
@@ -3280,7 +3280,7 @@ in set operation terms.
 
 The resulting vector will contain the intersection of C<$a> and C<$b>, so
 the elements that are in both C<$a> and C<$b>. Note that for convenience
-this operation is also aliased to L<intersect|intersect>
+this operation is also aliased to L<intersect|intersect>.
 
 =back
 
@@ -3290,7 +3290,7 @@ subroutine.
 
 Finally IDL users might be familiar with Craig Markwardt's C<cmset_op.pro>
 routine which has inspired this routine although it was written independently
-However the present routine has a few less options (but see the exampels)
+However the present routine has a few less options (but see the examples)
 
 =for example
 

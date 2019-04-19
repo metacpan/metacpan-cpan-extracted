@@ -263,7 +263,7 @@ sub PDLA::badvalue {
     my $num;
     if ( UNIVERSAL::isa($self,"PDLA") ) {
 	$num = $self->get_datatype;
-	if ( $num < 4 and defined($val) and $self->badflag ) {
+	if ( $num < $PDLA_F && defined($val) && $self->badflag ) {
 	    $self->inplace->setbadtoval( $val );
 	    $self->badflag(1);
 	}
@@ -273,7 +273,7 @@ sub PDLA::badvalue {
 	    if ( defined $val ) {
 		return &{$name}($self, $val )->sclr;
 	    } else {
-		return &{$name}($self)->sclr;
+		return &{$name}($self, undef)->sclr;
 	    }
 	}
 
@@ -288,7 +288,7 @@ sub PDLA::badvalue {
     if ( defined $val ) {
 	return &{$name}( $val )->sclr;
     } else {
-	return &{$name}()->sclr;
+	return &{$name}( undef )->sclr;
     }
 
 } # sub: badvalue()
@@ -408,7 +408,7 @@ same as the input piddle's flag.
 
 =for sig
 
-  Signature: (a(n); int+ [o] b())
+  Signature: (a(n); indx [o] b())
 
 =for ref
 
@@ -452,7 +452,7 @@ flag set.
 
 =for sig
 
-  Signature: (a(n); int+ [o] b())
+  Signature: (a(n); indx [o] b())
 
 =for ref
 

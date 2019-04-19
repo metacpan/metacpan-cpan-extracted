@@ -21,7 +21,7 @@ BEGIN {
 
 
 
-our $VERSION = "2.013007";
+our $VERSION = "2.016000";
    use PDLA::Slices;
    use PDLA::Types;
    use PDLA::Bad;

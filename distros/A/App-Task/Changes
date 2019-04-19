@@ -6,6 +6,23 @@ and this project adheres to [Simple Versioning](https://drmuey.github.io/simver/
 
 ## [Unreleased]
 
-## [0.1] - 2018-01-15
+## [0.02] - 2019-04-18
+### Added
+- App::Task::tie_task()
+
+### Changed
+- Issue #2: Do system commands via line handler (Created Issue #10 to look into remaining STDERR issue)
+- make header/footer stand out when possible
+
+### Fixed
+- Issue #3: POD: Add =encoding #3
+- Issue #4: reconfig for github/github issues for metacpan
+- Issue #5: correct dependencies
+- Issue #6: `{ fatal => 1 }` does not work, prototype …
+- Issue #7: POD: correct DESCRIPTION "verify foo" task should return false when the check fails
+- Issue #8: Misc TIE fixups
+- Issue #9: Get it to play nice w/ Git::Repository (System::Command)
+
+## [0.01] - 2018-01-15
 ### Added
 - Initial Release

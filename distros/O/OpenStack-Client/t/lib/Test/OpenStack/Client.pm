@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 cPanel, L.L.C.
+# Copyright (c) 2019 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #

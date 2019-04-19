@@ -1,5 +1,14 @@
 Revision history for WebService-GarminConnect
 
+1.0.8   2019-04-19
+        - More changes to the Garmin login process (thanks noduck!)
+
+1.0.7   2018-10-09
+        - Use a real User-Agent string or Garmin blocks us
+
+1.0.6   2018-04-07
+        - More changes to the Garmin login process
+
 1.0.5   2017-05-12
         - Fix login to reflect changes on Garmin side
 

@@ -459,8 +459,9 @@ sub get_xsdatapdecl {
     if ( $this->{BadFlag} and $type and 
 	 ( $usenan == 0 or $type !~ /^PDLA_(Float|Double)$/ ) ) {
 	my $cname = $type; $cname =~ s/^PDLA_//;
-#	$str .= "\t$type   ${name}_badval = PDLA->bvals.$cname;\n";
-        $str .= "\t$type   ${name}_badval = ($type) PDLA->get_pdl_badvalue($pdl);\n";
+	$str .= "\t$type   ${name}_badval = 0;\n";
+	$str .= "\tPDLA_Anyval  ${name}_anyval_badval = PDLA->get_pdl_badvalue($pdl);\n";
+	$str .= "\tANYVAL_TO_CTYPE(${name}_badval, ${type}, ${name}_anyval_badval);\n";
     }	
 
     return "$str\n";
