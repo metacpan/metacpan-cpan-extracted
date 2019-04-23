@@ -1,7 +1,7 @@
 package Bencher::Scenarios::RangeIterators;
 
-our $DATE = '2019-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Benchmark various range iterators
@@ -18,7 +18,7 @@ Bencher::Scenarios::RangeIterators - Benchmark various range iterators
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::RangeIterators (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-17.
+This document describes version 0.003 of Bencher::Scenarios::RangeIterators (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-23.
 
 =head1 DESCRIPTION
 
@@ -26,9 +26,9 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
-=item * L<Bencher::Scenario::RangeIterators::Create>
-
 =item * L<Bencher::Scenario::RangeIterators::Startup>
+
+=item * L<Bencher::Scenario::RangeIterators::Create>
 
 =item * L<Bencher::Scenario::RangeIterators::Iterate>
 

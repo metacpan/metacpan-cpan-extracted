@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::NoWarnings;
 
 use_ok "Text::OutputFilter";
@@ -17,9 +17,10 @@ my $expect;
 # Test printf ()
 tie *STDOUT, "Text::OutputFilter", 1, \$buf, sub { "[$_[0]]" };
 $expect  = " [000042]\n";
-printf "%06d\n", 42;
+my $r = printf "%06d\n", 42;
 untie *STDOUT;
 is ($buf, $expect, "printf ()");
+is ($r, 1, "printf returned true");
 
 # test binmode, tell, fileno, and eof
 $buf = "";

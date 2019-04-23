@@ -1,3 +1,6 @@
+1.009 - 2019/04/22
+- fixed bug where DNS error was reported when DNS was processed before the end
+  of mail
 1.008 - 2019/04/11
 - fail early if bh does not match, don't wait for DNS result
 1.007 - 2019/02/29

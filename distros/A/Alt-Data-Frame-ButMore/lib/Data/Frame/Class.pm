@@ -23,7 +23,7 @@ Data::Frame::Class - For creating classes in Data::Frame
 
 =head1 VERSION
 
-version 0.0043
+version 0.0045
 
 =head1 SYNOPSIS
 

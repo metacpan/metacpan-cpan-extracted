@@ -18,7 +18,7 @@
  */
 
 /* This define causes the affine transformations not to be
- * optimized away so $a->slice(...) will always made physical.
+ * optimized away so $x->slice(...) will always made physical.
  * Uncommenting this define is not recommended at the moment
  */
 
@@ -144,7 +144,7 @@ pdl* pdl_create(int type) {
      it->magic = 0;
      it->hdrsv = 0;
 
-     PDLADEBUG_f(printf("CREATE %p\n",(void*)it));
+     PDLADEBUG_f(printf("CREATE %p (size=%zu)\n",(void*)it,sizeof(pdl)));
      return it;
 }
 
@@ -420,7 +420,7 @@ void pdl_dump_flags_fixspace(int flags, int nspac, int type)
 	printf("\n");
 }
 
-/* Dump a tranformation (don't dump the pdls, just pointers to them */
+/* Dump a transformation (don't dump the pdls, just pointers to them */
 void pdl_dump_trans_fixspace (pdl_trans *it, int nspac) {
 	int i;
 	char spaces[PDLA_MAXSPACE];
@@ -497,7 +497,7 @@ void pdl_dump_fixspace(pdl *it,int nspac)
 	if(it->state & PDLA_ALLOCATED) {
 		printf(")\n%s   First values: (",spaces);
 		for(i=0; i<it->nvals && i<10; i++) {
-			printf("%s%f",(i?" ":""),pdl_get_offs(it,i));
+                       printf("%s%f",(i?" ":""),pdl_get_offs(it,i).value.D);
 		}
 	} else {
 		printf(")\n%s   (not allocated",spaces);
@@ -685,7 +685,7 @@ void pdl__removechildtrans(pdl *it,pdl_trans *trans,int nth,int all)
 				flag = 1;
 				if(!all) return;
 				/* return;  Cannot return; might be many times
-				  (e.g. $a+$a) */
+				  (e.g. $x+$x) */
 			}
 		}
 		c=c->next;
@@ -1447,7 +1447,7 @@ void pdl_make_physvaffine(pdl *it)
 			/* inc = the increment at the current stage */
 			inc = it->vafftrans->incs[i];
 			incsign = (inc >= 0 ? 1:-1);
-			inc= abs(inc);
+			inc *= incsign;
 			newinc = 0;
 			/* For all dimensions of the current piddle */
 			for(j=current->ndims-1; j>=0 && current->dimincs[j] != 0; j--) {

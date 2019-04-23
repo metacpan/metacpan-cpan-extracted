@@ -1,12 +1,12 @@
-#!perl -w
+use strict;
+use warnings;
+use Test::More;
+use ExtUtils::Manifest;
 
-use Test::More tests => 1;
-use ExtUtils::Manifest qw(manicheck);
+unless ( $ENV{RELEASE_TESTING} ) {
+    plan( skip_all => "Author tests not required for installation" );
+}
+plan tests => 2;
 
-my @missing_files = do {
-  local $SIG{__WARN__} = sub { }; # suppress "No such file:" messages
-  manicheck;
-};
-
-is_deeply \@missing_files, [], 'missing files from MANIFEST'
-  or map diag("$_\n"), @missing_files;
+is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';

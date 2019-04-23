@@ -25,15 +25,14 @@ user => $m_hrS->{database}{user},
 password => $m_hrS->{database}{password},
 );
 
-# *m_hrS= \$MySQL::Admin::Settings::m_hrSettings;
 $m_oDb = new DBI::Library::Database();
 $m_oDb->initDB(\%conf);
 $m_sSid = cookie( -name => 'sid' );
 $m_sSid = defined $m_sSid ? $m_sSid : '123';
 $m_sUser = $m_oDb->getName($m_sSid);
 $m_sUser = defined $m_sUser ? $m_sUser : 'guest';
-$m_nRight   = $m_oDb->userright($m_sUser);
-$m_nRight   = defined $m_nRight ? $m_nRight: 0;
+$m_nRight = $m_oDb->userright($m_sUser);
+$m_nRight = defined $m_nRight ? $m_nRight: 0;
 @menuNavi = $m_oDb->fetch_AoH("select * from $m_hrS->{database}{name}.mainMenu where `right` <= $m_nRight order by position");
 print q(<?xml version="1.0" encoding="UTF-8"?><actions>);
 print uri_escape("javascript:requestURI('cgi-bin/mysql.pl?action=EditFile&name='+cAction,'EditFile','EditFile')");

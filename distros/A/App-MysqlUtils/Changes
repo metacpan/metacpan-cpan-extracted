@@ -1,3 +1,9 @@
+0.017   2019-04-23 (PERLANCAR)
+
+	- mysql-fill-csv-columns-from-query: Add option --header and --tsv
+	  (from App::CSVUtils).
+
+
 0.016   2019-04-15 (PERLANCAR)
 
 	- Add utility: mysql-fill-csv-columns-from-query.

@@ -2,14 +2,15 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
+use App::CSVUtils;
 use IPC::System::Options qw(system);
 use List::MoreUtils qw(firstidx);
 use Perinci::Object;
@@ -1029,6 +1030,7 @@ _
     args => {
         %args_common,
         %args_database0,
+        %App::CSVUtils::args_common,
         %argscsv_filename1,
         query => {
             schema => 'str*',
@@ -1041,7 +1043,6 @@ _
     },
 };
 sub mysql_fill_csv_columns_from_query {
-    require App::CSVUtils;
     require Text::CSV::FromAOH;
 
     my %args = @_;
@@ -1052,6 +1053,10 @@ sub mysql_fill_csv_columns_from_query {
     my $field_idxs;
     my $columns_set;
     my $res = App::CSVUtils::csvutil(
+        # common csvutil arg
+        header => $args{header} // 1,
+        tsv => $args{tsv},
+
         action => 'each-row',
         filename => $args{filename},
         hash => 1,
@@ -1102,7 +1107,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.016 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-04-15.
+This document describes version 0.017 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -1509,6 +1514,13 @@ Arguments ('*' denotes required arguments):
 
 Input CSV file.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =item * B<host> => I<str> (default: "localhost")
 
 =item * B<password> => I<str>
@@ -1518,6 +1530,10 @@ Will try to get default from C<~/.my.cnf>.
 =item * B<port> => I<int> (default: 3306)
 
 =item * B<query>* => I<str>
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =item * B<username> => I<str>
 

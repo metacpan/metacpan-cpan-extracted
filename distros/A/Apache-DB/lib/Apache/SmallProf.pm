@@ -2,10 +2,10 @@ package Apache::SmallProf;
 
 use strict;
 use vars qw($VERSION @ISA);
-use Apache::DB 0.13;
+use Apache::DB 0.16;
 @ISA = qw(DB);
 
-$VERSION = '0.09';
+$VERSION = '0.16';
 
 $Apache::Registry::MarkLine = 0;
 
@@ -287,4 +287,4 @@ Devel::SmallProf(3), Apache::DB(3), Apache::DProf(3)
 Devel::SmallProf - Ted Ashton
 Apache::SmallProf derived from Devel::SmallProf - Doug MacEachern
 
-Currently maintained by Frank Wiles <frank@wiles.org>
+Currently maintained by Dirk Lindner <lze@cpan.org.org>

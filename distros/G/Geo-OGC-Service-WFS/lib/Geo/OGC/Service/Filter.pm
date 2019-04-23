@@ -1,6 +1,7 @@
 package Geo::OGC::Service::Filter;
 
 use Modern::Perl;
+use Carp;
 use Data::Dumper;
 use Geo::OGC::Service;
 use vars qw(@ISA);
@@ -161,12 +162,7 @@ sub error {
     if (!$msg->{debug}) {
         Geo::OGC::Service::error($self->{responder}, $msg, $headers);
     } else {
-        my $json = JSON->new;
-        $json->allow_blessed([1]);
-        my $writer = $self->{responder}->([200, [ 'Content-Type' => 'application/json',
-                                                  'Content-Encoding' => 'UTF-8' ]]);
-        $writer->write($json->encode($msg->{debug}));
-        $writer->close;
+        print STDERR Dumper $msg;
     }
 }
 
@@ -184,7 +180,9 @@ sub filter2sql {
     my ($ns, $name) = parse_tag($node);
 
     if ($name eq 'Literal') {
-        return "'".$node->firstChild->data."'";
+        my $child = $node->firstChild;
+        my $data = $child ? $child->data : '';
+        return "'".$data."'";
 
     } elsif ($name eq 'PropertyName') {
         my $ref = strip($node->textContent);
@@ -199,15 +197,15 @@ sub filter2sql {
 
     } elsif ($name eq 'ResourceId') {
         my $id = $node->getAttribute('rid');
-        return $type->{"gml:id"}." = '$id'"; # $type->{"gml:id"} may not be set!
+        return $type->{'gml:id'}." = '$id'";
 
     } elsif ($name eq 'FeatureId') {
         my $id = $node->getAttribute('fid');
-        return $type->{"gml:id"}." = '$id'"; # $type->{"gml:id"} may not be set!
+        return $type->{'gml:id'}." = '$id'";
 
     } elsif ($name eq 'GmlObjectId') {
         my $id = $node->getAttribute('gml:id');
-        return $type->{"gml:id"}." = '$id'"; # $type->{"gml:id"} may not be set!
+        return $type->{'gml:id'}." = '$id'";
 
     } elsif ($name eq 'PropertyIsEqualTo') {
         $node = $node->firstChild;
@@ -278,9 +276,7 @@ sub filter2sql {
             $node = $node->nextSibling;
         }
         my $envelope = filter2sql($node, $type);
-        if (exists $type->{SRID} && $type->{SRID} > 0) {
-            $envelope = "ST_Transform($envelope,$type->{SRID})";
-        }
+        $envelope = "ST_Transform($envelope,$type->{SRID})";
         return "($property && $envelope)";
         
     } elsif ($spatial2op{$name}) {
@@ -324,7 +320,7 @@ sub filter2sql {
 
 sub node2sql {
     my ($node) = @_;
-    my $srs = get_integer($node->getAttribute('srsName')) // '';
+    my $srs = get_integer($node->getAttribute('srsName')) // '4326';
     $srs = ",$srs" if $srs ne '';
     my ($ns, $name) = parse_tag($node);
     my $wkt;

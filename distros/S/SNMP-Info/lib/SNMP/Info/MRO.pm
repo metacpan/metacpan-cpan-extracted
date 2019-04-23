@@ -3,8 +3,8 @@ package SNMP::Info::MRO;
 use warnings;
 use strict;
 
-use vars qw/$VERSION/;
-$VERSION = '3.66';
+our ($VERSION);
+$VERSION = '3.67';
 
 use PPI;
 use Class::ISA;  ## no critic

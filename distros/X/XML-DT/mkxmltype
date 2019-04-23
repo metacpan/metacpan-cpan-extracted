@@ -7,7 +7,7 @@ use Term::ReadLine;
 
 use strict;
 
-our ($latin1,$html,$show_att,$expand_att_id);
+our ($latin1,$html,$show_att,$expand_att_id,$class);
 our ($lines,$t,$shell);
 
 my (@files)=@ARGV;
@@ -32,15 +32,39 @@ sub mkxmltypes {
 #    '-outputenc' => 'ISO-8859-1',
     '-default'   => sub{ 
           $c =~ s/,$//;
-          push(@{$type{$q}}, (eval("[$c]") || "?$c"));
-          $elel{$q}++;
-          if(ctxt(1)){ $ele{ctxt(1)}{$q} ++;}
-          else       { $root{$q}++}
-          for(keys(%v)){
-              $atl{$_}++;
-              $att{$q}{$_}{tipo($v{$_})||"_str"} ++  ;
-              $dom{$q}{$_}{$v{$_}} ++ } 
-          "'$q',";
+          if(not $class){
+            push(@{$type{$q}}, (eval("[$c]") || "?$c"));
+            $elel{$q}++;
+            if(ctxt(1)){ $ele{ctxt(1)}{$q} ++;}
+            else       { $root{$q}++}
+            for(keys(%v)){
+                $atl{$_}++;
+                $att{$q}{$_}{tipo($v{$_})||"_str"} ++  ;
+                $dom{$q}{$_}{$v{$_}} ++ } 
+            "'$q',";
+          }
+          else{
+            my $qcl=$q;
+            if($v{class}){$qcl .="+$v{class}"}
+            if($v{id}   ){$qcl .="+$v{id}"}
+            
+            push(@{$type{$qcl}}, (eval("[$c]") || "?$c"));
+            $elel{$qcl}++;
+            if(ctxt(1)){ 
+               my $fcl=ctxt(1);
+               if(father->{class}){$fcl .="+".father->{class}}
+               if(father->{id}   ){$fcl .="+".father->{id}}
+               $ele{$fcl}{$qcl} ++;}
+            else       { $root{$qcl}++}
+
+            for(keys(%v)){
+                next if ($_ eq "class");
+                next if ($_ eq "id");
+                $atl{$_}++;
+                $att{$qcl}{$_}{tipo($v{$_})||"_str"} ++  ;
+                $dom{$qcl}{$_}{$v{$_}} ++ } 
+            "'$qcl',";
+          }
         },
     '-pcdata'    => sub{ if ($c =~ /[^ \t\n]/){ $ele{ctxt(1)}{"#PCDATA"}=1;
 "'#PCDATA'," } else {""}},
@@ -59,6 +83,7 @@ sub mkxmltypes {
     unlink($fname) if $lines;
   }
 
+  ###  print "DEBUG",Dumper(\%att,\%ele,\%dom,\%atl);
   print "# ", join(" ",keys %root)," ...",  scalar(localtime(time)) ,"\n";
 
   my %resumofinal=();
@@ -270,6 +295,7 @@ This command tries to infer DTD and Camlila-like types for a specific XML file;
  -expand_att_id
  -lines=20000        just reads the first 20000 lines of the XML file
  -t
+ -class              '<div class="a" id="b">'... is treated as 'div+a+b'
  -shell              Enter interactive shell mode
 
 =head1 SEE ALSO

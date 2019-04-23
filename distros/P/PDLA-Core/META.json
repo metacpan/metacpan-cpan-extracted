@@ -26,7 +26,6 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "ExtUtils::ParseXS" : "3.01",
             "File::Path" : "0"
          }
       },
@@ -35,6 +34,7 @@
             "Carp" : "1.2",
             "Devel::CheckLib" : "1.01",
             "ExtUtils::MakeMaker" : "6.56",
+            "ExtUtils::ParseXS" : "3.01",
             "File::Path" : "0"
          }
       },
@@ -91,6 +91,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.016000",
+   "version" : "2.019103",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

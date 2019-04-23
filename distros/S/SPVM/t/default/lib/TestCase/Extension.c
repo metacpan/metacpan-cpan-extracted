@@ -5,17 +5,14 @@
 
 #include <spvm_native.h>
 
+static const char* MFILE = "TestCase/Extension.c";
+
 int32_t SPNATIVE__TestCase__Extension__bpkgvar_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
   
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$BYTE_VALUE", "byte");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  int8_t value = env->bpkgvar(env, pkgvar_id);
+  int8_t value;
+  SPVM_BPKGVAR(env, value, "TestCase::Extension", "$BYTE_VALUE", MFILE, __LINE__);
   
   stack[0].bval = value;
   
@@ -26,13 +23,8 @@ int32_t SPNATIVE__TestCase__Extension__spkgvar_test(SPVM_ENV* env, SPVM_VALUE* s
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$SHORT_VALUE", "short");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-
-  int16_t value = env->spkgvar(env, pkgvar_id);
+  int16_t value;
+  SPVM_SPKGVAR(env, value,  "TestCase::Extension", "$SHORT_VALUE", MFILE, __LINE__);
   
   stack[0].sval = value;
 
@@ -43,13 +35,8 @@ int32_t SPNATIVE__TestCase__Extension__ipkgvar_test(SPVM_ENV* env, SPVM_VALUE* s
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$INT_VALUE", "int");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  int32_t value = env->ipkgvar(env, pkgvar_id);
+  int32_t value;
+  SPVM_IPKGVAR(env, value, "TestCase::Extension", "$INT_VALUE", MFILE, __LINE__);
   
   stack[0].ival = value;
   
@@ -60,13 +47,8 @@ int32_t SPNATIVE__TestCase__Extension__lpkgvar_test(SPVM_ENV* env, SPVM_VALUE* s
   (void)env;
   (void)stack;
   
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$LONG_VALUE", "long");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  int64_t value = env->lpkgvar(env, pkgvar_id);
+  int64_t value;
+  SPVM_LPKGVAR(env, value, "TestCase::Extension", "$LONG_VALUE", MFILE, __LINE__);
   
   stack[0].lval = value;
   
@@ -77,13 +59,8 @@ int32_t SPNATIVE__TestCase__Extension__fpkgvar_test(SPVM_ENV* env, SPVM_VALUE* s
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$FLOAT_VALUE", "float");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  float value = env->fpkgvar(env, pkgvar_id);
+  float value;
+  SPVM_FPKGVAR(env, value, "TestCase::Extension", "$FLOAT_VALUE", MFILE, __LINE__);
   
   stack[0].fval = value;
   
@@ -94,13 +71,8 @@ int32_t SPNATIVE__TestCase__Extension__dpkgvar_test(SPVM_ENV* env, SPVM_VALUE* s
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$DOUBLE_VALUE", "double");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  double value = env->dpkgvar(env, pkgvar_id);
+  double value;
+  SPVM_DPKGVAR(env, value, "TestCase::Extension", "$DOUBLE_VALUE", MFILE, __LINE__);
   
   stack[0].dval = value;
   
@@ -111,13 +83,8 @@ int32_t SPNATIVE__TestCase__Extension__opkgvar_test(SPVM_ENV* env, SPVM_VALUE* s
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$MINIMAL_VALUE", "TestCase::Minimal");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  void* value = env->opkgvar(env, pkgvar_id);
+  void* value;
+  SPVM_OPKGVAR(env, value, "TestCase::Extension", "$MINIMAL_VALUE", "TestCase::Minimal", MFILE, __LINE__);
   
   stack[0].oval = value;
   
@@ -128,12 +95,7 @@ int32_t SPNATIVE__TestCase__Extension__set_bpkgvar_test(SPVM_ENV* env, SPVM_VALU
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$BYTE_VALUE", "byte");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  env->set_bpkgvar(env, pkgvar_id, INT8_MIN);
+  SPVM_SET_BPKGVAR(env, "TestCase::Extension", "$BYTE_VALUE", INT8_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -142,12 +104,7 @@ int32_t SPNATIVE__TestCase__Extension__set_spkgvar_test(SPVM_ENV* env, SPVM_VALU
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$SHORT_VALUE", "short");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  env->set_spkgvar(env, pkgvar_id, INT16_MIN);
+  SPVM_SET_SPKGVAR(env, "TestCase::Extension", "$SHORT_VALUE", INT16_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -156,12 +113,7 @@ int32_t SPNATIVE__TestCase__Extension__set_ipkgvar_test(SPVM_ENV* env, SPVM_VALU
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$INT_VALUE", "int");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  env->set_ipkgvar(env, pkgvar_id, INT32_MIN);
+  SPVM_SET_IPKGVAR(env, "TestCase::Extension", "$INT_VALUE", INT32_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -170,12 +122,7 @@ int32_t SPNATIVE__TestCase__Extension__set_lpkgvar_test(SPVM_ENV* env, SPVM_VALU
   (void)env;
   (void)stack;
   
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$LONG_VALUE", "long");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  env->set_lpkgvar(env, pkgvar_id, INT64_MIN);
+  SPVM_SET_LPKGVAR(env, "TestCase::Extension", "$LONG_VALUE", INT64_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -184,12 +131,7 @@ int32_t SPNATIVE__TestCase__Extension__set_fpkgvar_test(SPVM_ENV* env, SPVM_VALU
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$FLOAT_VALUE", "float");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  env->set_fpkgvar(env, pkgvar_id, FLT_MIN);
+  SPVM_SET_FPKGVAR(env, "TestCase::Extension", "$FLOAT_VALUE", FLT_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -198,51 +140,35 @@ int32_t SPNATIVE__TestCase__Extension__set_dpkgvar_test(SPVM_ENV* env, SPVM_VALU
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$DOUBLE_VALUE", "double");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  env->set_dpkgvar(env, pkgvar_id, DBL_MIN);
+  SPVM_SET_DPKGVAR(env, "TestCase::Extension", "$DOUBLE_VALUE", DBL_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
-
 
 int32_t SPNATIVE__TestCase__Extension__set_opkgvar_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
 
-  int32_t pkgvar_id = env->pkgvar_id(env, "TestCase::Extension", "$MINIMAL_VALUE", "TestCase::Minimal");
-  
-  if (pkgvar_id < 0) {
-    assert(0);
-  }
-  
-  int32_t basic_type_id = env->basic_type_id(env, "TestCase::Minimal");
-  if (basic_type_id < 0) {
-    assert(0);
-  }
-  
-  void* minimal = env->new_obj(env, basic_type_id);
-  env->set_opkgvar(env, pkgvar_id, minimal);
+  void* minimal;
+  SPVM_NEW(env, minimal, "TestCase::Minimal", MFILE, __LINE__);
+  SPVM_SET_OPKGVAR(env, "TestCase::Extension", "$MINIMAL_VALUE", "TestCase::Minimal", minimal, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
 
 
-int32_t SPNATIVE__TestCase__Extension__has_interface_test(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPNATIVE__TestCase__Extension__has_callback_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
   
   void* object = stack[0].oval;
   
-  int32_t basic_type_id = env->basic_type_id(env, "TestCase::Interface::Interface");
+  int32_t basic_type_id = env->basic_type_id(env, "TestCase::Callback::Callback");
   if (basic_type_id < 0) {
     assert(0);
   }
   
-  int32_t match = env->has_interface(env, object, basic_type_id);
+  int32_t match = env->has_callback(env, object, basic_type_id);
   
   stack[0].ival = match;
   
@@ -345,12 +271,7 @@ int32_t SPNATIVE__TestCase__Extension__native_set_bfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "byte_value", "byte");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  env->set_bfield(env, object, field_id, INT8_MIN);
+  SPVM_SET_BFIELD(env, object, "TestCase::Simple", "byte_value", INT8_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -361,12 +282,7 @@ int32_t SPNATIVE__TestCase__Extension__native_set_sfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "short_value", "short");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  env->set_sfield(env, object, field_id, INT16_MIN);
+  SPVM_SET_SFIELD(env, object, "TestCase::Simple", "short_value", INT16_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -377,12 +293,7 @@ int32_t SPNATIVE__TestCase__Extension__native_set_ifield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "int_value", "int");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  env->set_ifield(env, object, field_id, INT32_MIN);
+  SPVM_SET_IFIELD(env, object, "TestCase::Simple", "int_value", INT32_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -393,12 +304,7 @@ int32_t SPNATIVE__TestCase__Extension__native_set_lfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "long_value", "long");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  env->set_lfield(env, object, field_id, INT64_MIN);
+  SPVM_SET_LFIELD(env, object, "TestCase::Simple", "long_value", INT64_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -409,12 +315,7 @@ int32_t SPNATIVE__TestCase__Extension__native_set_ffield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "float_value", "float");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  env->set_ffield(env, object, field_id, FLT_MIN);
+  SPVM_SET_FFIELD(env, object, "TestCase::Simple", "float_value", FLT_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -425,12 +326,7 @@ int32_t SPNATIVE__TestCase__Extension__native_set_dfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "double_value", "double");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  env->set_dfield(env, object, field_id, DBL_MIN);
+  SPVM_SET_DFIELD(env, object, "TestCase::Simple", "double_value", DBL_MIN, MFILE, __LINE__);
   
   return SPVM_SUCCESS;
 }
@@ -469,12 +365,8 @@ int32_t SPNATIVE__TestCase__Extension__native_get_bfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "byte_value", "byte");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  SPVM_VALUE_byte byte_value = env->bfield(env, object, field_id);
+  SPVM_VALUE_byte byte_value;
+  SPVM_BFIELD(env, byte_value, object, "TestCase::Simple", "byte_value", MFILE, __LINE__);
   
   if (byte_value == INT8_MIN) {
     stack[0].ival = 1;
@@ -492,12 +384,8 @@ int32_t SPNATIVE__TestCase__Extension__native_get_sfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "short_value", "short");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  SPVM_VALUE_short short_value = env->sfield(env, object, field_id);
+  SPVM_VALUE_short short_value;
+  SPVM_SFIELD(env, short_value, object, "TestCase::Simple", "short_value", MFILE, __LINE__);
   
   if (short_value == INT16_MIN) {
     stack[0].ival = 1;
@@ -515,12 +403,8 @@ int32_t SPNATIVE__TestCase__Extension__native_get_ifield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "int_value", "int");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  SPVM_VALUE_int int_value = env->ifield(env, object, field_id);
+  SPVM_VALUE_int int_value;
+  SPVM_IFIELD(env, int_value, object, "TestCase::Simple", "int_value", MFILE, __LINE__);
   
   if (int_value == INT32_MIN) {
     stack[0].ival = 1;
@@ -538,12 +422,8 @@ int32_t SPNATIVE__TestCase__Extension__native_get_lfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "long_value", "long");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  SPVM_VALUE_long long_value = env->lfield(env, object, field_id);
+  SPVM_VALUE_long long_value;
+  SPVM_LFIELD(env, long_value, object, "TestCase::Simple", "long_value", MFILE, __LINE__);
   
   if (long_value == INT64_MIN) {
     stack[0].ival = 1;
@@ -561,12 +441,8 @@ int32_t SPNATIVE__TestCase__Extension__native_get_ffield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "float_value", "float");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  SPVM_VALUE_float float_value = env->ffield(env, object, field_id);
+  SPVM_VALUE_float float_value;
+  SPVM_FFIELD(env, float_value, object, "TestCase::Simple", "float_value", MFILE, __LINE__);
   
   if (float_value == FLT_MIN) {
     stack[0].ival = 1;
@@ -584,12 +460,8 @@ int32_t SPNATIVE__TestCase__Extension__native_get_dfield(SPVM_ENV* env, SPVM_VAL
 
   void* object = stack[0].oval;
   
-  int32_t field_id = env->field_id(env, "TestCase::Simple", "double_value", "double");
-  if (field_id < 0) {
-    return SPVM_EXCEPTION;
-  }
-  
-  SPVM_VALUE_double double_value = env->dfield(env, object, field_id);
+  SPVM_VALUE_double double_value;
+  SPVM_DFIELD(env, double_value, object, "TestCase::Simple", "double_value", MFILE, __LINE__);
   
   if (double_value == DBL_MIN) {
     stack[0].ival = 1;

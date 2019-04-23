@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: The results from a probe run.
-our $VERSION = '0.86'; # VERSION
+our $VERSION = '0.87'; # VERSION
 
 
 sub new
@@ -41,7 +41,7 @@ FFI::Probe::Runner::Result - The results from a probe run.
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,10 @@ Shlomi Fish (shlomif)
 Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
+
+Petr Pisar (ppisar)
+
+Mohammad S Anwar (MANWAR)
 
 =head1 COPYRIGHT AND LICENSE
 

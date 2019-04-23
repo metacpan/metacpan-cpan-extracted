@@ -6,8 +6,8 @@ PDLA::AutoLoader - MatLab style AutoLoader for PDLA
 =head1 SYNOPSIS
 
  use PDLA::AutoLoader;
- $a = func1(...);   # Load file func1.pdl
- $b = func2(...);   # Load file func2.pdl
+ $x = func1(...);   # Load file func1.pdl
+ $y = func2(...);   # Load file func2.pdl
 
  $PDLA::AutoLoader::Rescan = 1; # Enable re-scanning
 
@@ -29,7 +29,7 @@ B<Note>: This variable is unrelated to Perl's C<PERL5LIB>.
 
 If you add a leading '+' on a directory name, PDLA will search the
 entire directory tree below that point. Internally, PDLA stores the
-dirctory list in the variable C<@PDLALIB>, which can be modified at
+directory list in the variable C<@PDLALIB>, which can be modified at
 run time.
 
 For example, in csh:

@@ -9,10 +9,11 @@ sub reg {
     my $email     = param('email');
     my $register  = translate('register');
     my $t_regtext = translate('t_regtext');
-    print qq(
+    my $disclaimer  = translate('disclaimer');
+    print qq|
       <div class="dbForm">
       $t_regtext<br/>
-      <form onsubmit="submitForm(this,'makeUser','makeUser');return false;" method="get">
+      <form onsubmit="var self = this; disclaimer('$disclaimer', function(){ submitForm(self,'makeUser','makeUser');});return false;" method="get">
       <label for="username">Name</label><br/>
       <input type="text" name="username" id="username" value="$sUserRegName" size="20" maxlength="10" alt="Login" align="left"/>
       <br/>
@@ -24,7 +25,7 @@ sub reg {
       <input type="submit" name="submit" value="$register" size="15" alt="$register" align="left"/>
       </form>
       </div>
-     );
+     |;
 } ## end sub reg
 
 sub lostPassword {
@@ -119,7 +120,7 @@ sub make {
               . '/^.{3}$/' . qq|" data-error="$wrong_captcha_text" data-right="$right_captcha_text"  name="captcha"/>|;
         };
         print $@ if $@;
-        print qq(<div align="center" id="form">
+        print qq(<div align="left" id="form">
           <form  name="Login" onSubmit="m_sid ='123';submitForm(this,'login','login');return false;">
           <label for="user">Name</label>
           <br/>$sUserRegName

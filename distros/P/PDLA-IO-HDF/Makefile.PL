@@ -17,6 +17,8 @@ eval {
   %pkghash = $pkg->get_makefile_vars;
 };
 
+my @coredep = ('PDLA::Core' => '2.019100');
+
 WriteMakefile(
     NAME => $thispackage,
     VERSION_FROM => 'HDF.pm',
@@ -25,6 +27,7 @@ WriteMakefile(
         "meta-spec" => { version => 2 },
         resources => {
             homepage => 'http://pdlporters.github.io',
+            bugtracker  => {web=>'https://github.com/PDLPorters/pdla-io-hdf/issues'},
             repository  => {
                 url => 'git://github.com/PDLPorters/pdla-io-hdf',
                 type => 'git',
@@ -36,13 +39,12 @@ WriteMakefile(
       'ExtUtils::MakeMaker' => 0,
       'ExtUtils::Depends' => '0.402',
       'Alien::HDF4' => 0,
-      'PDLA::Core' => 0,
+      @coredep,
     },
     'BUILD_REQUIRES' => {
-      'PDLA::Core' => 0,
+      @coredep,
     },
     'TEST_REQUIRES' => {
-      'PDLA::Core' => 0,
       'Test::More' => 0,
     },
 );

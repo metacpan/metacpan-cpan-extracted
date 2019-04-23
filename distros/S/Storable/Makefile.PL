@@ -13,15 +13,7 @@ use Config;
 use File::Copy qw(move copy);
 use File::Spec;
 
-unlink "lib/Storable/Limit.pm";
-
-my $limit_pm = File::Spec->catfile('lib', 'Storable', 'Limit.pm');
-
 my $pm = { 'Storable.pm' => '$(INST_ARCHLIB)/Storable.pm' };
-unless ($ENV{PERL_CORE}) {
-    # the core Makefile takes care of this for core builds
-    $pm->{$limit_pm} = '$(INST_ARCHLIB)/Storable/Limit.pm';
-}
 
 WriteMakefile(
     NAME                => 'Storable',
@@ -86,20 +78,7 @@ sub xlinkext {
 }
 
 sub depend {
-    my $extra_deps = "";
-    my $options = "";
-    if ($ENV{PERL_CORE}) {
-        $options = "--core";
-    }
-    else {
-        # blib.pm needs arch/lib
-        $extra_deps = ' Storable.pm';
-    }
-    my $linktype = uc($_[0]->{LINKTYPE});
     "
-$limit_pm : stacksize \$(INST_$linktype)$extra_deps
-	\$(MKPATH) \$(INST_LIB)
-	\$(FULLPERLRUNINST) stacksize $options
 
 release : dist
 	git tag \$(VERSION)
@@ -107,18 +86,6 @@ release : dist
 	git push
 	git push --tags
 "
-}
-
-sub test {
-    my ($self, %attr) = @_;
-
-    my $out = $self->SUPER::test(%attr);
-
-    if ($ENV{PERL_CORE}) {
-        $out =~ s!^(test(?:db)?_(?:static|dynamic)\b.*)!$1 $limit_pm!gm;
-    }
-
-    $out;
 }
 
 sub postamble {

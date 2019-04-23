@@ -13,7 +13,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION = version->new(1.1.2);
+our $VERSION = version->new(1.1.3);
 our $workflow = App::Git::Workflow->new;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -90,7 +90,7 @@ git-branches - lists branches with dates of last commits
 
 =head1 VERSION
 
-This documentation refers to git-branches version 1.1.2
+This documentation refers to git-branches version 1.1.3
 
 =head1 SYNOPSIS
 

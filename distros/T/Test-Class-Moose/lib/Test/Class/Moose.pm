@@ -4,7 +4,7 @@ package Test::Class::Moose;
 
 use 5.010000;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 use Moose 2.0000;
 use Carp;
@@ -14,7 +14,7 @@ use Sub::Attribute;
 
 # We don't use anything from this module in this one, but we want to require a
 # specific version.
-use Test2 1.1302118 ();
+use Test2 1.302118 ();
 
 use Test::Class::Moose::AttributeRegistry;
 use Test::Class::Moose::Config;
@@ -255,7 +255,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 
@@ -1188,13 +1188,17 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Harald Jörg Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge Larry Leszczynski mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
+=for stopwords Andy Jack Christopher Layne Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Harald Jörg Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge Larry Leszczynski mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
 
 =over 4
 
 =item *
 
 Andy Jack <github@veracity.ca>
+
+=item *
+
+Christopher Layne <clayne@apple.com>
 
 =item *
 
@@ -1296,7 +1300,7 @@ Udo Oji <Velti@signor.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2018 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

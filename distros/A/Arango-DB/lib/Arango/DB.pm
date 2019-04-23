@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::DB;
-$Arango::DB::VERSION = '0.005';
+$Arango::DB::VERSION = '0.006';
 use base 'Arango::DB::API';
 use Arango::DB::Database;
 use Arango::DB::Collection;
@@ -31,14 +31,26 @@ sub new {
     return $self;
 }
 
+
+use Sub::Install qw(install_sub);
+use Sub::Name qw(subname);
+BEGIN {
+    my $package = __PACKAGE__;
+    for my $m (qw'version status time statistics statistics_description') {
+        install_sub {
+            code => subname(
+                "${package}::$m",
+                sub { my ($self, %opts) = @_; return $self->_api($m, \%opts) }
+               ),
+                 into => $package,
+                 as => $m
+             };
+    }
+}
+
 sub _auth {
     my $self = shift;
     return "Basic " . encode_base64url( $self->{username} . ":" . $self->{password} );
-}
-
-sub version {
-    my ($self, %opts) = @_;
-    return $self->_api('version', \%opts);
 }
 
 sub list_collections {
@@ -71,6 +83,18 @@ sub delete_database {
     return $self->_api('delete_database', { name => $name });
 }
 
+sub create_user {
+    my ($self, $username, %opts) = @_;
+    die "Arango::DB | No username suplied" unless defined $username and length $username;
+    return $self->_api('create_user', { %opts, user => $username });
+}
+
+sub delete_user {
+    my ($self, $username) = @_;
+    die "Arango::DB | No username suplied" unless defined $username and length $username;
+    return $self->_api('delete_user', { username => $username });
+}
+
 1;
 
 __END__
@@ -85,7 +109,7 @@ Arango::DB - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSYS
 
@@ -164,7 +188,31 @@ Password to be used to connect to ArangoDB. Default to the empty string.
     my $version_info = $db->version;
     my $detailed_info = $db->version( 'details' => 1 );
 
-Returns a hash reference with basic server info. Detailed information can be requested with the C<details> option. 
+Returns a hash reference with basic server info. Detailed information can be requested with the C<details> option.
+
+=head2 C<statistics>
+
+   my $stats = $db->statistics;
+
+Read the statistics of a server.
+
+=head2 C<statistics_description>
+
+   my $stats_desc = $db->statistics_description;
+
+Statistics description
+
+=head2 C<status>
+
+   my $status = $db->status;
+
+Return status information
+
+=head2 C<time>
+
+   my $time = $db->time;
+
+Return system time
 
 =head2 C<list_databases>
 
@@ -195,6 +243,18 @@ Deletes an existing database.
     my $collections = $db->list_collections;
 
 Lists collection details without specifying a specific database;
+
+=head2 C<create_user>
+
+    $db->create_user('username', passwd => "3432rfsdADF");
+
+Creates an user. Optional parameters are C<passwd>, C<active> and C<extra>.
+
+=head2 C<delete_user>
+
+    $db->delete_user('username');
+
+Deletes an user.
 
 =head1 EXCEPTIONS
 

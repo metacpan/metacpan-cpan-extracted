@@ -1,11 +1,11 @@
 package Net::Checkpoint::Management::v1::Role::ObjectMethods;
-$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001001';
-# ABSTRACT: Role for Cisco Firepower Management Center (FMC) API version 1 method generation
+$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001002';
+# ABSTRACT: Role for Checkpoint Management API version 1.x method generation
 
 use 5.024;
 use feature 'signatures';
 use MooX::Role::Parameterized;
-use Carp qw( croak );
+use Carp::Clan qw(^Net::Checkpoint::Management::v1);
 use Clone qw( clone );
 use Moo::Role; # last for cleanup
 
@@ -57,14 +57,12 @@ role {
         ), $object, $object_data);
     });
 
-    $mop->method('delete_' . $params->{singular} => sub ($self, $id) {
+    $mop->method('delete_' . $params->{singular} => sub ($self, $object) {
         return $self->_delete(join('/',
             '/web_api',
             'v' . $self->api_version,
             $params->{delete}
-        ), {
-            uid => $id,
-        });
+        ), $object);
     });
 
     $mop->method('find_' . $params->{singular} => sub ($self, $search_params = {}, $query_params = {}) {
@@ -104,11 +102,11 @@ __END__
 
 =head1 NAME
 
-Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Cisco Firepower Management Center (FMC) API version 1 method generation
+Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Checkpoint Management API version 1.x method generation
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
@@ -143,7 +141,7 @@ version 0.001001
 
 =head1 DESCRIPTION
 
-This role adds methods for the REST methods of a specific object.
+This role adds methods for the commands of a specific object.
 
 =head1 METHODS
 
@@ -159,12 +157,12 @@ Throws an exception on error.
 
 Takes optional query parameters.
 
-Returns a hashref with a single key 'items' that has a list of hashrefs
-similar to the FMC API.
+Returns a hashref similar to the Checkpoint Management API but without the
+'from' and 'to' keys.
 
 Throws an exception on error.
 
-As the API only allows fetching 1000 objects at a time it works around that by
+As the API only allows fetching 500 objects at a time it works around that by
 making multiple API calls.
 
 =head2 get_$singular
@@ -185,7 +183,8 @@ Throws an exception on error.
 
 =head2 delete_$singular
 
-Takes an object id.
+Takes a hashref of attributes uniquely identifying the object.
+For most objects the uid is sufficient, accessrule requires the layer uid too.
 
 Returns true on success.
 

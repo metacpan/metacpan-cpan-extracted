@@ -17,7 +17,7 @@ sub fetchMenu {
                     "select * from  $m_hrSettings->{database}{name}.$actions[$i]->{submenu} where `right` <= $m_nRight order by id")
             );
             my $headline = translate( $actions[$i]->{title} );
-            maxlength( 15, \$headline );
+            maxlength( 25, \$headline );
             push @ret,
               {
                 text    => $headline,
@@ -27,7 +27,7 @@ sub fetchMenu {
               };
         } else {
             my $headline = translate( $actions[$i]->{title} );
-            maxlength( 15, \$headline );
+            maxlength( 25, \$headline );
             if ( $actions[$i]->{action} =~ /^javascript:(.+)$/ ) {
                 push @ret,
                   {

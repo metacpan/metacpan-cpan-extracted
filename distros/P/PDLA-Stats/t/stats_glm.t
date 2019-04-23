@@ -29,34 +29,31 @@ sub tapprox {
 my $a = sequence 5;
 my $b = pdl(0, 0, 0, 1, 1);
 
-  # 3
-is( t_fill_m(), 1 );
+is( t_fill_m(), 1, "fill_m replaces bad values with sample mean");
 sub t_fill_m {
   my $aa = sequence 5;
   $aa = $aa->setvaltobad(0);
   tapprox( $aa->fill_m->sum, 12.5 );
 }
 
-  # 4
-is( t_fill_rand(), 1 );
+is( t_fill_rand(), 1, "fill_rand replaces bad values with random sample of good values from same variable");
 sub t_fill_rand {
   my $aa = sequence 5;
   $aa = $aa->setvaltobad(0);
   my $stdv = $aa->fill_rand->stdv;
   tapprox( $stdv, 1.01980390271856 ) || tapprox( $stdv, 1.16619037896906 );
 }
-  # 5-6
-is( tapprox( $a->dev_m->avg, 0 ), 1 );
-is( tapprox( $a->stddz->avg, 0 ), 1 );
-  # 7-9
-is( tapprox( $a->sse($b), 18), 1 );
-is( tapprox( $a->mse($b), 3.6), 1 );
-is( tapprox( $a->rmse($b), 1.89736659610103 ), 1 );
-  # 10
-is( tapprox( $b->glue(1,ones(5))->pred_logistic(pdl(1,2))->sum, 4.54753948757851 ), 1 );
+
+is( tapprox( $a->dev_m->avg, 0 ), 1, "dev_m replaces values with deviations from the mean on $a");
+is( tapprox( $a->stddz->avg, 0 ), 1, "stddz standardizes data on $a");
+
+is( tapprox( $a->sse($b), 18), 1, "sse gives sum of squared errors between actual and predicted values between $a and $b");
+is( tapprox( $a->mse($b), 3.6), 1, "mse gives mean of squared errors between actual and predicted values between $a and $b");
+is( tapprox( $a->rmse($b), 1.89736659610103 ), 1, "rmse gives root mean squared error, ie. stdv around predicted value between $a and $b");
+
+is( tapprox( $b->glue(1,ones(5))->pred_logistic(pdl(1,2))->sum, 4.54753948757851 ), 1, "pred_logistic calculates predicted probability value for logistic regression");
 
 my $y = pdl(0, 1, 0, 1, 0);
-  # 11-13
 is( tapprox( $y->d0(), 6.73011667009256 ), 1, 'd0');
 is( tapprox( $y->dm( ones(5) * .5 ), 6.93147180559945 ), 1, 'dm' );
 is( tapprox( sum($y->dvrs(ones(5) * .5) ** 2), 6.93147180559945 ), 1, 'dvrs' );
@@ -204,7 +201,7 @@ pct_var => pdl( qw[0.925175 0.0663489 0.00847592] ),
   }
 }
 
-is( tapprox( t_pca_sorti(), 0 ), 1 );
+is( tapprox( t_pca_sorti(), 0 ), 1, "pca_sorti - principal component analysis output sorted to find which vars a component is best represented");
 sub t_pca_sorti {
   my $a = sequence 10, 5;
   $a = lvalue_assign_detour( $a, which($a % 7 == 0), 0 );
@@ -237,20 +234,18 @@ $a_bad->setbadat(-1);
 my $b_bad = pdl(0, 0, 0, 0, 1, 1);
 $b_bad->setbadat(0);
 
-  # 25
-is( tapprox( $a_bad->dev_m->avg, 0 ), 1 );
-is( tapprox( $a_bad->stddz->avg, 0 ), 1 );
-  # 27
-is( tapprox( $a_bad->sse($b_bad), 23), 1 );
-is( tapprox( $a_bad->mse($b_bad), 5.75), 1 );
-is( tapprox( $a_bad->rmse($b_bad), 2.39791576165636 ), 1 );
-  # 30
-is( tapprox( $b_bad->glue(1,ones(6))->pred_logistic(pdl(1,2))->sum, 4.54753948757851 ), 1 );
+is( tapprox( $a_bad->dev_m->avg, 0 ), 1, "dev_m with bad values $a_bad");
+is( tapprox( $a_bad->stddz->avg, 0 ), 1, "stdz with bad values $a_bad");
 
-  # 31
-is( tapprox( $b_bad->d0(), 6.73011667009256 ), 1 );
-is( tapprox( $b_bad->dm( ones(6) * .5 ), 6.93147180559945 ), 1 );
-is( tapprox( sum($b_bad->dvrs(ones(6) * .5) ** 2), 6.93147180559945 ), 1 );
+is( tapprox( $a_bad->sse($b_bad), 23), 1, "sse with bad values between $a_bad and $b_bad");
+is( tapprox( $a_bad->mse($b_bad), 5.75), 1, "mse with badvalues between $a_bad and $b_bad");
+is( tapprox( $a_bad->rmse($b_bad), 2.39791576165636 ), 1, "rmse with bad values between $a_bad and $b_bad");
+
+is( tapprox( $b_bad->glue(1,ones(6))->pred_logistic(pdl(1,2))->sum, 4.54753948757851 ), 1, "pred_logistic with bad values");
+
+is( tapprox( $b_bad->d0(), 6.73011667009256 ), 1, "null deviance with bad values on $b_bad");
+is( tapprox( $b_bad->dm( ones(6) * .5 ), 6.93147180559945 ), 1, "model deviance with bad values on $b_bad");
+is( tapprox( sum($b_bad->dvrs(ones(6) * .5) ** 2), 6.93147180559945 ), 1, "deviance residual with bad values on $b_bad");
 
 {
   my @a = qw( a a a b b b b c c BAD );

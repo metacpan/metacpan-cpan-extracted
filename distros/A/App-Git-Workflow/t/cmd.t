@@ -27,7 +27,7 @@ sub options {
             # Mock Git
             [],
             # STDOUT
-            qr/\Atest Version = $App::Git::Workflow::VERSION\n\Z/,
+            qr/\Atest Version = $App::Git::Workflow::Command::VERSION\n\Z/,
             { version => 1 },
         ],
         [
@@ -73,9 +73,9 @@ sub options {
         my $option = {};
         my ($stdout, $stderr) = capture { get_options($option) };
         like $stdout, $data->[2], 'Ran ' . join ' ', @{ $data->[0] }
-            or diag Dumper $stdout, $data->[2];
+            or diag 'STDOUT matches', Dumper $stdout, $data->[2];
         is_deeply $option, $data->[3], 'Options set correctly'
-            or diag Dumper $option, $data->[3];
+            or diag 'Options not set correctly: ', Dumper $option, $data->[3];
     }
 }
 

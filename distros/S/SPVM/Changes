@@ -1,3 +1,54 @@
+0.0429 2018-04-23
+  - LICENSE is changed from MIT to same one as Perl.
+    because SPVM is cpan module and SPVM want to use glibc code.
+  - add rand function
+  - SPVM::call_sub can receive decoded string
+  - add stringify overload to SPVM::Data::Array
+  - SPVM::call_sub can receive numeric array
+  - SPVM::call_sub can receive string array
+  - add to_strs to SPVM::Data::Array
+0.0428 2018-04-22
+  - rename new_list to list
+  - rename new_hash to hash
+  - add contains function
+  - add index function
+  - add memcpy function
+  - add memmove function
+  - add replace function
+  - add replace_all function
+  - fix native distribution make dependency bugs
+  - fix env->pkgvar_id segfault bugs
+  - rename SPVM::Socket to SPVM::IO::Socket
+  - add SPVM_BFIELD macro
+  - add SPVM_SFIELD macro
+  - add SPVM_IFIELD macro
+  - add SPVM_LFIELD macro
+  - add SPVM_FFIELD macro
+  - add SPVM_DFIELD macro
+  - add SPVM_OFIELD macro
+  - add SPVM_SET_BFIELD macro
+  - add SPVM_SET_SFIELD macro
+  - add SPVM_SET_IFIELD macro
+  - add SPVM_SET_LFIELD macro
+  - add SPVM_SET_FFIELD macro
+  - add SPVM_SET_DFIELD macro
+  - add SPVM_SET_OFIELD macro
+  - add SPVM_BPKGVAR macro
+  - add SPVM_SPKGVAR macro
+  - add SPVM_IPKGVAR macro
+  - add SPVM_LPKGVAR macro
+  - add SPVM_FPKGVAR macro
+  - add SPVM_DPKGVAR macro
+  - add SPVM_OPKGVAR macro
+  - add SPVM_SET_BPKGVAR macro
+  - add SPVM_SET_SPKGVAR macro
+  - add SPVM_SET_IPKGVAR macro
+  - add SPVM_SET_LPKGVAR macro
+  - add SPVM_SET_FPKGVAR macro
+  - add SPVM_SET_DPKGVAR macro
+  - add SPVM_SET_OPKGVAR macro
+  - add lc, uc, lcfirst, ucfirst functions
+  - rename interface_t to callback_t
 0.0427 2018-04-17
   - add getenv function
   - add SPVM::Errno module

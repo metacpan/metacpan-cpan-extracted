@@ -25,10 +25,10 @@ undef &MY::postamble; # suppress warning
 
 WriteMakefile(
     NAME => $thispackage,
-    OBJECT => 'SD.o ',
+    OBJECT => 'SD$(OBJ_EXT) ',
     %pkghash,
     clean => {
-        FILES => 'SD.pm SD.xs SD.o SD.c',
+        FILES => 'SD.pm SD.xs SD$(OBJ_EXT) SD.c',
     },
     dist => { 
         COMPRESS => 'gzip', 

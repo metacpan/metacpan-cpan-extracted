@@ -40,22 +40,50 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.015'
+version: '0.019'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-list-field-names'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-add-field'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-avg'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-concat'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-convert-to-hash'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-delete-field'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-dump'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-each-row'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-grep'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-list-field-names'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-map'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -67,6 +95,14 @@ x_Dist_Zilla:
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-select-fields'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-select-row'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-sort-fields'
       version: '0.421'
     -
@@ -75,35 +111,7 @@ x_Dist_Zilla:
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-avg'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-select-row'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-grep'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-map'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-each-row'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-convert-to-hash'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-concat'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript csv-select-fields'
+      name: 'GenPericmdScript dump-csv'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
@@ -180,7 +188,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.594'
+      version: '0.596'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -245,9 +253,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
-      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
-      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::PERLANCAR/OurPkgVersion'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:

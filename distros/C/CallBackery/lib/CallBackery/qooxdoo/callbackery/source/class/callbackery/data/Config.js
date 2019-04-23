@@ -25,7 +25,8 @@ qx.Class.define('callbackery.data.Config', {
         },
         userConfig : {
             nullable : true,
-            event : 'changeUserConfig'
+            event : 'changeUserConfig',
+            apply: '_applyUserConfig'
         }
     },
     members: {
@@ -40,6 +41,13 @@ qx.Class.define('callbackery.data.Config', {
                 });
             }
             return ha;
+        },
+        /* if there is a sessonCookie in the userConfig start using it. This allows for seemless login */
+        _applyUserConfig: function(newData,oldData) {
+            if (newData.userInfo.sessionCookie) {
+                callbackery.data.Server.getInstance().setSessionCookie(newData.userInfo.sessionCookie);
+            }
         }
+
     }
 });

@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.016 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2019-04-15.
+    This document describes version 0.017 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2019-04-23.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -348,6 +348,13 @@ FUNCTIONS
 
         Input CSV file.
 
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
     *   host => *str* (default: "localhost")
 
     *   password => *str*
@@ -357,6 +364,11 @@ FUNCTIONS
     *   port => *int* (default: 3306)
 
     *   query* => *str*
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     *   username => *str*
 

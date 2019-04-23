@@ -165,7 +165,7 @@ An implementation of online docs for PDLA.
 =head1 Using PDLA documentation
 
 PDLA::Doc's main use is in the "help" (synonym "?") and "apropos"
-(synonym "??") commands in the perldl shell.  PDLA:Doc provides the
+(synonym "??") commands in the perldla shell.  PDLA:Doc provides the
 infrastrucure to index and access PDLA's documentation through these
 commands.  There is also an API for direct access to the documentation 
 database (see below).
@@ -291,10 +291,10 @@ the end of the current paragraph is accepted, for example:
 
   =for example
 
-         ($x,$y) = $a->func(1,3);  # this is part of the accepted info
-         $x = func($a,0,1);        # this as well
+         ($x,$y) = $z->func(1,3);  # this is part of the accepted info
+         $x = func($z,0,1);        # this as well
 
-         $x = func($a,$b);         # but this isn't
+         $x = func($c,$d);         # but this isn't
 
 To make the resulting pod documentation also easily digestible for the
 existing pod filters (pod2man, pod2text, pod2html, etc) the actual
@@ -379,7 +379,7 @@ documented along these lines should have is the I<Ref> field preceding
 a one line description of its intended functionality (suitable for
 inclusion in a concise reference card). PP defined functions (see L<PDLA::PP>)
 should have a I<Sig> field stating their signature. To facilitate
-maintainance of this documentation for such functions the 'Doc' field
+maintenance of this documentation for such functions the 'Doc' field
 has been introduced into the definition of C<pp_def> (see again L<PDLA::PP>)
 which will take care that name and signature of the so defined function
 are documented in this way (for examples of this usage see, for example,

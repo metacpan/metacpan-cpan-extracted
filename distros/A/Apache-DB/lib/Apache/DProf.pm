@@ -6,7 +6,7 @@ use File::Path ();
 
 {
     no strict;
-    $VERSION = '0.08';
+    $VERSION = '0.16';
 }
 
 # Need to determine if we are in a mod_perl 1.x or 2.x environment
@@ -184,7 +184,7 @@ an absolute path of a directory this user can.
 
 Originally written by Doug MacEachern
 
-Currently maintained by Frank Wiles <frank@wiles.org>
+Currently maintained by Dirk Lindner <lze@cpan.org.org>
 
 =head1 LICENSE 
 

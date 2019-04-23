@@ -37,9 +37,9 @@ use SNMP::Info::Layer2;
 @SNMP::Info::Layer2::ZyXEL_DSLAM::ISA       = qw/SNMP::Info::Layer2 Exporter/;
 @SNMP::Info::Layer2::ZyXEL_DSLAM::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
+our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 # Set for No CDP
 %GLOBALS = ( %SNMP::Info::Layer2::GLOBALS );

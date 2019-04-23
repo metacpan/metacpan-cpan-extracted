@@ -30,6 +30,13 @@ METHODS
 
     Defaults to 2 megabytes.
 
+ write_len
+
+    Buffer write length. Higher values mean we will attempt to write more
+    data for each I/O loop iteration.
+
+    Defaults to 2 megabytes.
+
  connect
 
     Establish a connection to the server.

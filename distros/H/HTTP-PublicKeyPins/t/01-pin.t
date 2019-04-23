@@ -3,6 +3,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use Crypt::PKCS10();
 use HTTP::PublicKeyPins qw(pin_sha256);
 use FileHandle();
 use File::Spec();
@@ -10,6 +11,7 @@ use File::Spec();
 plan tests => 40;
 
 MAIN: {
+	diag(`openssl version`);
 	foreach my $path ('t/certs/duckduckgo.pem', 't/certs/dsa.pem', 't/certs/google.pem',
 									't/certs/trusted.pem', # /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 									't/certs/x509.pem', # RFC 7468
@@ -43,10 +45,12 @@ sub test_request {
 	SKIP: {
 		my $temp_der_pub_path = 't/test_der.pub';
 		my $temp_pem_pub_path = 't/test_pem.pub';
-		my $version = `openssl req -noout -in $path -pubkey >$temp_pem_pub_path`;
+		diag("Testing Request $path");
+		diag(`openssl req -noout -in $path -pubkey >$temp_pem_pub_path`);
 		if ($? != 0) {
 			unlink $temp_pem_pub_path;
-			skip("openssl is not available or does not support the certificate request in $path", 3);
+			diag(`openssl req -noout -in $path -pubkey`);
+			skip("openssl is not available or does not support the certificate request in $path", 5);
 		}
 		unlink $temp_pem_pub_path or die "Failed to unlink $temp_pem_pub_path:$!";
 		my $test_pin_sha256 = pin_sha256($path);
@@ -76,9 +80,11 @@ sub test_certificate {
 	SKIP: {
 		my $temp_der_pub_path = 't/test_der.pub';
 		my $temp_pem_pub_path = 't/test_pem.pub';
+		diag("Testing Certificate $path");
 		my $version = `openssl x509 -noout -in $path -pubkey >$temp_pem_pub_path`;
 		if ($? != 0) {
 			unlink $temp_pem_pub_path;
+			diag(`openssl x509 -noout -in $path -pubkey`);
 			skip("openssl is not available or does not support the certificate in $path", 4);
 		}
 		unlink $temp_pem_pub_path or die "Failed to unlink $temp_pem_pub_path:$!";
@@ -110,6 +116,7 @@ sub test_rsa_pub_key {
 		my $version = `openssl x509 -noout -in t/certs/$path.pem -pubkey >$temp_pem_pub_path`;
 		if ($? != 0) {
 			unlink $temp_pem_pub_path;
+			diag(`openssl x509 -noout -in t/certs/$path.pem -pubkey`);
 			skip("openssl is not available or does not support the certificate in t/certs/$path.pub", 1);
 		}
 		unlink $temp_pem_pub_path;
@@ -131,7 +138,8 @@ sub test_rsa_key {
 		my $version = `openssl rsa -in t/keys/$path -pubout 2>$dev_null >$temp_pem_pub_path`;
 		if ($? != 0) {
 			unlink $temp_pem_pub_path;
-			skip("openssl is not available or does not support the certificate in t/keys/$path", 2);
+			diag(`openssl rsa -in t/keys/$path -pubout 2>&1`);
+			skip("openssl is not available or does not support the key in t/keys/$path", 2);
 		}
 		unlink $temp_pem_pub_path;
 		my $test_pin_sha256 = pin_sha256("t/keys/$path");

@@ -25,7 +25,7 @@ PDLA::IO::HDF - A PDLA interface to the HDF4 library.
 This library provides functions to manipulate HDF files with the
 SD, VS, and V HDF interfaces.
 
-For more infomation on HDF, see http://hdf.ncsa.uiuc.edu/
+For more information on HDF, see http://hdf.ncsa.uiuc.edu/
 
 The 'new' function of this package uses the 'new' functions for the
 individual HDF interfaces. This allows you to use all of the interfaces
@@ -36,7 +36,7 @@ interfaces, for that see the docs on those modules.
 
 =cut
 
-our $VERSION = '2.013006';
+our $VERSION = '2.019100';
 $VERSION = eval $VERSION;
 
 use PDLA::Primitive;
@@ -53,7 +53,7 @@ use PDLA::IO::HDF::VS;
 
 These constants are now implented using the perl 'use constant' pragma.
 
-Previously, they were just scalars that were changable (which is a no-no).
+Previously, they were just scalars that were changeable (which is a no-no).
 
 See constant(1) for more info on how to use these in your code.
 

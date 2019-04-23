@@ -33,7 +33,7 @@ $m_sDefaultClass = 'DBI::Library' unless defined $DBI::Library::m_sDefaultClass;
         qw(quote quote_identifier CurrentPass CurrentUser CurrentHost CurrentDb Driver tableLength tableExists initDB useexecute void fetch_hashref fetch_AoH fetch_array updateModules deleteexecute editexecute addexecute selectTable)
     ],
 );
-$DBI::Library::VERSION = '1.16';
+$DBI::Library::VERSION = '1.17';
 $m_tbl                 = 'querys';
 $driver                = 'mysql';
 require Exporter;

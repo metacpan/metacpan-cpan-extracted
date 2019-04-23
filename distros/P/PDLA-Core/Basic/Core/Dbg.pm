@@ -7,12 +7,12 @@ PDLA::Dbg - functions to support debugging of PDLA scripts
        use PDLA;
        use PDLA::Dbg;
 
-       $c = $a->slice("5:10,2:30")->px->diagonal(3,4);
+       $c = $x->slice("5:10,2:30")->px->diagonal(3,4);
        PDLA->px;
 
 =head1 DESCRIPTION
 
-This packages implements a couple of functions that should come in
+These packages implements a couple of functions that should come in
 handy when debugging your PDLA scripts. They make a lot of sense while
 you're doing rapid prototyping of new PDLA code, let's say inside the
 perldla or pdla2 shell.
@@ -40,10 +40,10 @@ Print info about a piddle (or all known piddles)
 =for example
 
     pdla> PDLA->px
-    pdla> $b += $a->clump(2)->px('clumptest')->sumover
-    pdla> $a->px('%C (%A) Type: %T') # prints nothing unless $PDLA::debug
+    pdla> $y += $x->clump(2)->px('clumptest')->sumover
+    pdla> $x->px('%C (%A) Type: %T') # prints nothing unless $PDLA::debug
     pdla> $PDLA::debug = 1
-    pdla>  $a->px('%C (%A) Type: %T')
+    pdla>  $x->px('%C (%A) Type: %T')
     PDLA (52433464) Type: Double
 
 

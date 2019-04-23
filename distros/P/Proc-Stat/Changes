@@ -1,4 +1,9 @@
 Revision history for Perl extension Proc::Stat
 
+0.02  Mon Apr 22 18:08:31 PDT 2019
+	correct return value of loadkid
+	Thanks to Peter Scott <peter@psdt.com>
+	for spotting that bug
+
 0.01  Sun Mar 10 21:17:24 PDT 2019
 	initial release

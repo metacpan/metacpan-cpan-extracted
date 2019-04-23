@@ -267,9 +267,19 @@ function showPopup(id, hideCloseButton) {
     evalId(id);
 }
 
+function showEditorOptions() {
+    visible('popup');
+    visible('closeButton');
+    tmpTxt = getText('editorOptions');
+    tmpID = 'editorOptions';
+    setText('popupTitle', translate('editorOptions'));
+    setText('popupContent', tmpTxt);
+}
+
 function closePopup() {
     hide('popup');
-    setText(tmpID, tmpTxt);
+    if(tmpID !== 'editorOptions')
+        setText(tmpID, tmpTxt);
     document.getElementById('popupContent1').style.left = '25%';
     document.getElementById('popupContent1').style.width = '50%';
 }
@@ -339,6 +349,7 @@ function submitForm(node, tabId, tabTitle, bHistory, method, uri) {
     bHistory = typeof bHistory !== 'undefined' ? bHistory : true;
     method = typeof method !== 'undefined' ? method : 'POST';
     var url = typeof uri !== 'undefined' ? uri : 'cgi-bin/mysql.pl?';
+    try{
     if (checkForm(node)) {
         var formData = new FormData();
         formData.append("sid", m_sid);
@@ -370,15 +381,13 @@ function submitForm(node, tabId, tabTitle, bHistory, method, uri) {
         }
         requestURI(url, tabId, tabTitle, bHistory, formData, method);
     }
+    }catch(e){
+        alert(e)
+    }
 }
 var http_request = false;
 var oldpage = 0;
 
-function GetEditorLines(){
-    var doc = editor.session.getDocument();
-    var lines = doc.getAllLines();
-    return lines;
-}
 
 //requestURI('cgi-bin/mysql.pl?action=loadSidebar',action,action,false,false,'GET',false)
 /*
@@ -513,7 +522,7 @@ function setContent() {
             }
             return false;
         }
-        if (m_sid == '123' && m_blogin && cAction != 'reg') {
+        if (m_sid == '123' && m_blogin && ( cAction != 'reg' && cAction != 'datenschutz' && cAction != 'lostPassword'  && cAction != 'make' && cAction != 'makePassword') ) {
            showPopup('loginContent', true);
 		   evalId('popupContent');
         } else {
@@ -525,7 +534,7 @@ function setContent() {
 
 function alert(txt) {
     visible('popup');
-    setText('popupContent', '<div align="center">' + txt + '<br/><input  type="submit" id="confirmButton" value="Ok"/></div>');
+    setText('popupContent', '<div align="center">' + txt + '<br/><input type="submit" id="confirmButton" value="Ok"/></div>');
     var node = document.getElementById("confirmButton");
     node.addEventListener('click', function(evt) {
         hide('popup');
@@ -588,7 +597,7 @@ function stopDrop() {
 
 function prompt(txt, sub) {
     visible('popup');
-    setText('popupContent', '<b>' + txt +'</b><br/><input  type="text" align="center" id="promptPopUp"/><br/><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input  type="submit" id="confirmButton" value="Ok"/></div>');
+    setText('popupContent', '<b>' + txt +'</b><br/><input  type="text" align="center" id="promptPopUp"/><br/><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input type="submit" id="confirmButton" value="Ok"/></div>');
     var node = document.getElementById("confirmButton");
     node.addEventListener('click', function(evt) {
         hide('popup');
@@ -600,6 +609,19 @@ function prompt(txt, sub) {
         evt.stopPropagation();
     });
 }
+
+function disclaimer(txt, sub) {
+    visible('disclaimer');
+    setText('disclaimerContent', '<div align="center" style="padding:0.4em;"><b>' + txt +'</b>&#160;<input type="checkbox" onclick="$(\'#confirmButtonDisclaimer\').toggle()" /><a href="javascript:requestURI(\'cgi-bin/mysql.pl?action=datenschutz\',\'datenschutz\',\'datenschutz\');">'+translate('datenschutz')+'</a><br/><input type="submit" id="confirmButtonDisclaimer" style="display:none;" value="Ok"/></div>');
+    var node = document.getElementById("confirmButtonDisclaimer");
+    node.addEventListener('click', function(evt) {
+        hide('disclaimer');
+        $('#confirmButtonDisclaimer').toggle()
+        privatPolicy = true
+        sub();
+    });
+}
+
 
 function errorPopUp(txt, sub, arg, arg2, arg3) {
     visible('popup');
@@ -618,7 +640,7 @@ function checkForm(form) {
         if (selectElement[i]) {
             var value = selectElement[i].value;
             var regexp = selectElement[i].dataset.regexp;
-            if (regexp) {
+            if ( value && regexp) {
                 if (eval('value.match(' + regexp + ')')) {
                     selectElement[i].style.borderColor = 'green';
                     selectElement[i].title = selectElement[i].dataset.right;
@@ -657,7 +679,6 @@ function evalId(id) {
 
 function showEditor(txt) {
     if(document.getElementById('editor')){
-        ace.require("/ace/src-min/chromevox");
         editor = ace.edit("editor");
         editor.session.setMode("ace/mode/perl");
         editor.setTheme("ace/theme/sqlserver");
@@ -680,7 +701,7 @@ function translate(string) {
     if (typeof Lang != 'undefined') {
         var l = new Lang();
         if (string) {
-	    string.replace(/\s/g, '');
+            string = string.replace(/\s/g, '');
             var ret = eval('l.' + lng + string.toLowerCase());
             return ret ? ret : string;
         } else {
@@ -710,10 +731,7 @@ function traversTranslate(id, lng, l) {
 function disableOutputEscaping(id) {
  //   if (navigator.userAgent.indexOf("Firefox") != -1) document.getElementById(id).innerHTML = document.getElementById(id).textContent;
 }
-// //cms
-// function document.getElementById(id) {
-//     return document.getElementById(id);
-// }
+
 
 function insertAtCursorPosition(txt) {
     var textarea = document.getElementById('sqlEdit');
@@ -931,23 +949,6 @@ function checkLength(max) {
     }
     maxLength = tmpMax;
 }
-//<<editor.pm
-JString.prototype = new Array();
-JString.prototype.constructor = JString;
-JString.superclass = Array.prototype;
-
-function JString(string) {
-    for (i = 0; i < string.length; i++) {
-        JString.prototype[i] = string[i];
-    }
-}
-JString.prototype.splice = function(i, n, array) {
-    JString.superclass.splice.call(this, i, n, array);
-    return this.join("");
-};
-JString.prototype.toString = function() {
-    return this.join("");
-};
 
 function markInput(bool) {
     var body = document.getElementsByTagName("body")[0];
@@ -980,28 +981,32 @@ function enableHtml(enable){
         if (document.getElementById('enlarged')) {
             document.getElementById('enlarged').style.display = 'none';
         }
-        ace.require("/ace/src-min/chromevox");
         editor = ace.edit("edit");
         editor.session.setMode("ace/mode/perl");
-        editor.setTheme("ace/theme/chromevox");
+        editor.setTheme("ace/theme/sqlserver");
         editor.setValue($('#txt').val(), 1);
         hide('txt');
         visible('edit');
         visible('editorRim');
         $('.md-container').hide();
     } else {
-        document.getElementById('htmlButton').checked = false;
-        if (document.getElementById('enlarged')) {
+        if(document.getElementById('htmlButton')){
+            document.getElementById('htmlButton').checked = false;
+        }
+        if(document.getElementById('enlarged')){
             document.getElementById('enlarged').style.display = '';
         }
         if(!markDownEditor){
             markDownEditor = $('#txt').markdownEditor(
-            {
-                theme:'theme/tomorrow_night_eighties',
-                uploadPath:false,
-                preview:false
-            }
+                {
+                    theme:"ace/theme/sqlserver",
+                    uploadPath:false,
+                    preview:false,
+                    fontSize: '1em',
+                    fullscreen: false
+                }
             );
+
         }
         visible('txt');
         hide('edit');
@@ -1009,186 +1014,10 @@ function enableHtml(enable){
         $('.md-container').show();
     }
 }
-
-function put(t) {
-    addText(t);
+function saveText(){
+    if(html)
+        document.getElementById('txt').value = editor.getValue();
 }
-//<< markdown buttons
-function addText(text) {
-    var element = document.getElementById("txt");
-    element.value += text;
-    element.focus();
-}
-
-function left() {
-    align("left");
-}
-
-function center() {
-    align("center");
-}
-
-function aright() {
-    align("right");
-}
-
-function justify() {
-    align("justify");
-}
-
-function strike() {
-    insertT("~~");
-}
-
-function underline() {
-    insertT("__");
-}
-
-function bold() {
-    insertT("**");
-}
-
-function italicize() {
-    insertT("*");
-}
-
-function img() {
-    var textarea = document.getElementById('txt');
-    if (typeof document.selection != 'undefined') {
-        var range = document.selection.createRange();
-        var txt = range.text;
-        range = document.selection.createRange();
-        if (txt.length == 0) {
-            prompt("Insert Image location:", function(txt) {
-                txt = promptValue;
-                var o = "";
-                if (html) {
-                    o = "<img src='" + txt + "'/>";
-                } else {
-                    o = "![]("  + txt + ")";
-                }
-                textarea.value += o;
-            });
-        } else {
-            if (html) {
-                range.text = "<img src='" + txt + "'/>";
-            } else {
-                range.text = "![]("  + txt + ")";
-            }
-            range.moveStart('character', txt.length + 11);
-        }
-        range.select();
-    } else if (textarea.selectionEnd > textarea.selectionStart) {
-        var i = textarea.selectionStart;
-        var n = textarea.selectionEnd;
-        var img = textarea.value.substring(i, n);
-        o = new JString(textarea.value);
-        if (html) {
-            textarea.value = o.splice(i, (n - i), "<img src='" + img + "'/>");
-        } else {
-            textarea.value = o.splice(i, (n - i), "![]("  + img + ")");
-        }
-    } else if (textarea.selectionStart && (textarea.selectionEnd == textarea.selectionStart)) { //insert at gecko
-        var ia = textarea.selectionStart;
-        prompt("Insert Image location:", function(txta) {
-            var a = textarea.value.substring(0, ia);
-            var b = textarea.value.substring(ia, textarea.value.length);
-            if (html) {
-                textarea.value = a + "<img src='" + txta + "'/>" + b;
-            } else {
-                textarea.value = a + "![](" + txta + ")" + b;
-            }
-        });
-    } else {
-        prompt("Insert Image location:", function(imga) {
-            if (html) {
-                if (img) {
-                    textarea.value += "<img src='" + imga + "'/>";
-                }
-            } else {
-                if (img) {
-                    textarea.value += "![](" + imga + ")";
-                }
-            }
-        });
-    }
-}
-
-function link() {
-    prompt("Insert a url:", function(link) {
-        if (html) {
-            insertT("a href=\"" + link + "\"", "a");
-        } else {
-            insertT("[","]("+ link + ")");
-        }
-    });
-}
-
-function insertT(tag, tag2) {
-    if (!tag2) tag2 = tag;
-    var textarea = document.getElementById('txt');
-    if (typeof document.selection != 'undefined') { //IE6
-        range = document.selection.createRange();
-        var txt = range.text;
-        if (txt.length == 0) {
-            prompt("Insert text:", function(txt) {
-                if (txt.length > 0) {
-                    var o = "";
-                    if (html) {
-                        o = "<" + tag + ">" + txt + "</" + tag2 + ">";
-                    } else {
-                        o = tag + txt + tag2;
-                    }
-                    textarea.value += o;
-                }
-            });
-        } else {
-            if (html) {
-                range.text = "<" + tag + ">" + txt + "</" + tag2 + ">";
-            } else {
-                range.text = tag + txt + tag2;
-            }
-            range.moveStart('character', tag.length + txt.length + tag2.length);
-        }
-        range.select();
-    } else if (textarea.selectionEnd > textarea.selectionStart) { //selektieren gecko
-        var i = textarea.selectionStart;
-        var n = textarea.selectionEnd;
-        var txtb = textarea.value.substring(i, n);
-        o = new JString(textarea.value);
-        if (html) {
-            textarea.value = o.splice(i, (n - i), "<" + tag + ">" + txtb + "</" + tag2 + ">");
-        } else {
-            textarea.value = o.splice(i, (n - i), tag + txtb + tag2 );
-        }
-    } else if (textarea.selectionStart && (textarea.selectionEnd == textarea.selectionStart)) { //insert at gecko
-        var ia = textarea.selectionStart;
-        prompt("Insert text:", function(txta) {
-            var a = textarea.value.substring(0, ia);
-            var b = textarea.value.substring(ia, textarea.value.length);
-            if (html) {
-                textarea.value = a + "<" + tag + ">" + txta + "</" + tag2 + ">" + b;
-            } else {
-                textarea.value = a + tag + txta + tag2 + b;
-            }
-        });
-    } else {
-        prompt("Insert text:", function(bol) {
-            if (html) {
-                textarea.value += "<" + tag + ">" + bol + "</" + tag2 + ">";
-            } else {
-                textarea.value += tag + bol + tag2 ;
-            }
-        });
-    }
-}
-
-function clearIt() {
-    var element = document.getElementById("txt");
-    element.value = "";
-    element.focus();
-}
-
 
 function getValue(id) {
     return document.getElementById(id).value;
@@ -1197,7 +1026,7 @@ function getValue(id) {
 function setValue(id, txt) {
     document.getElementById(id).value = txt;
 }
-//editor.pm>>
+
 //<<drag&drop
 var dragobjekt = null;
 var dragX = 0;

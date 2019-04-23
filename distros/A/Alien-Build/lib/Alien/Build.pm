@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.65'; # VERSION
+our $VERSION = '1.68'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -525,7 +525,7 @@ sub download
           }
           else
           {
-            $self->log("multiple files, assuming directoryn");
+            $self->log("multiple files, assuming directory");
             $self->install_prop->{complete}->{download} = 1;
             $self->install_prop->{download} = _path('.')->absolute->stringify;
             $valid = 1;
@@ -1151,7 +1151,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.65
+version 1.68
 
 =head1 SYNOPSIS
 

@@ -6,9 +6,10 @@ use utf8;
 require Exporter;
 @HTML::Editor::Markdown::EXPORT  = qw(Markdown);
 @ISA                             = qw(Exporter);
-$HTML::Editor::Markdown::VERSION = '1.09';
+$HTML::Editor::Markdown::VERSION = '1.16';
 use HTML::Entities;
 use Text::Markdown::Hoedown;
+use Search::Tools::UTF8;
 $currentstring = 0;
 
 =head1 NAME
@@ -61,7 +62,7 @@ Markdown()
 
 sub Markdown {
     my $string = shift;
-    utf8::decode($$string) unless utf8::is_utf8($$string);
+    utf8::decode($$string) unless is_valid_utf8($$string); 
     $$string = encode_entities( $$string, '<>&' );
     $$string = markdown($$string);
     $$string =~ s/\n/<br>/;

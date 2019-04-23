@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -608,6 +608,96 @@ sub stmtListToScript {
     $stmt[-1] =~ s/\n+$/\n/;
 
     return join('',@stmt);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Commands
+
+=head3 commands() - Liste der Kommandos des DBMS
+
+=head4 Synopsis
+
+    @commands | $commandA = $sql->commands;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+my %Commands = (
+    Oracle => [
+    ],
+    PostgreSQL => [qw/
+        ABORT
+        ALTER
+        ANALYZE
+        BEGIN
+        CALL
+        CHECKPOINT
+        CLOSE
+        CLUSTER
+        COMMENT
+        COMMIT
+        COPY CREATE
+        DEALLOCATE
+        DECLARE
+        DELETE
+        DISCARD
+        DO
+        DROP
+        END
+        EXECUTE
+        EXPLAIN
+        FETCH
+        GRANT
+        IMPORT FOREIGN SCHEMA
+        INSERT
+        LISTEN
+        LOAD
+        LOCK
+        MOVE
+        NOTIFY
+        PREPARE
+        REASSIGN OWNED
+        REFRESH MATERIALIZED VIEW
+        REINDEX
+        RELEASE SAVEPOINT
+        ROLLBACK
+        SAVEPOINT
+        SECURITY LABEL
+        SELECT
+        SET
+        SHOW
+        START TRANSACTION
+        TRUNCATE
+        UNLISTEN
+        UPDATE
+        VACUUM
+        VALUES
+    /],
+    SQLite => [
+    ],
+    MySQL => [
+    ],
+    Access => [
+    ],
+    MSSQL => [
+    ],
+);
+
+sub commands {
+    my $self = shift;
+
+    my $dbms = $self->{'dbms'};
+    my $cmdA = $Commands{$dbms};
+    if (!@$cmdA) {
+        $self->throw(
+            q~SQL-00099: No commands defined for DBMS~,
+            Dbms => $dbms,
+        );
+    }
+
+    return wantarray? @$cmdA: $cmdA;
 }
 
 # -----------------------------------------------------------------------------
@@ -5162,7 +5252,7 @@ sub whereClause {
 
     my @where;
     while (@_) {
-        if ($_[0] =~ /[\s=><]/) {
+        if (defined($_[0]) && $_[0] =~ /[\s=><]/) {
             # Enthält das Argument Leerzeichen oder einen der
             # Vergleichsoperatoren =, >, <, betrachten wir es als
             # vollständige Klausel und übernehmen es in die WHERE-Klausel.
@@ -5410,7 +5500,7 @@ sub diff {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

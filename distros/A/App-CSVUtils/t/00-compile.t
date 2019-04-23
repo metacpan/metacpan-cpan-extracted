@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm'
@@ -18,6 +18,7 @@ my @scripts = (
     'script/csv-concat',
     'script/csv-convert-to-hash',
     'script/csv-delete-field',
+    'script/csv-dump',
     'script/csv-each-row',
     'script/csv-grep',
     'script/csv-list-field-names',
@@ -27,7 +28,8 @@ my @scripts = (
     'script/csv-select-fields',
     'script/csv-select-row',
     'script/csv-sort-fields',
-    'script/csv-sum'
+    'script/csv-sum',
+    'script/dump-csv'
 );
 
 # no fake home requested

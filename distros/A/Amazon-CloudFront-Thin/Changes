@@ -1,5 +1,10 @@
 Revision history for Amazon-CloudFront-Thin
 
+0.05    2019-04-20
+    - update API endpoints (Chris Compton)
+    - support filenames containing ']]>'
+    - updated CloudFront documentation links
+
 0.04    2015-12-29
     - Docs on handling unicode paths (Devin Ceartas)
 

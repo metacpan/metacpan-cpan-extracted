@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Devel::CheckLib;
+eval { require Devel::CheckLib; Devel::CheckLib->import; };
 use Config;
 use ExtUtils::MakeMaker;
 
@@ -65,7 +65,7 @@ if ( exists $PDLA::Config{POSIX_THREADS_LIBS} and defined $PDLA::Config{POSIX_TH
  } else {
     print "\tNope, your perl was not linked against pthread library\n";
     if ($^O =~ /mswin/i or $^O =~ /cygwin/i) {
-       if (check_lib(LIB=>'-lpthread',header=>'pthread.h')) {
+       if (eval { check_lib(LIB=>'-lpthread',header=>'pthread.h') }) {
           print "\tWe found -lpthread and pthread.h so will build anyway\n";
           $pthread_library = '-lpthread';
        } else {

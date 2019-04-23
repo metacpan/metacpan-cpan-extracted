@@ -3,6 +3,8 @@
 
 use strict;
 
+use File::Basename;
+
 use PDLA::LiteF;
 
 use PDLA::Core ':Internal'; # For howbig()
@@ -12,7 +14,8 @@ use PDLA::Config;
 
 kill 'INT',$$  if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
 
-use Test::More tests => 90;
+use Test::More;
+use Test::Exception;
 
 BEGIN {
       use_ok( "PDLA::IO::FITS" ); #1
@@ -95,9 +98,9 @@ unless($PDLA::Astro_FITS_Header) {
  for(1..59){ok(1,"Test skipped (no binary table support without Astro::FITS::Header)");}
 } else { # Astro::FITS::Header exists
 
-	my $a = long( 1, 4, 9, 32 );
-	my $b = double( 2.3, 4.3, -999.0, 42 );
-	my $table = { COLA => $a, COLB => $b };
+	my $x = long( 1, 4, 9, 32 );
+	my $y = double( 2.3, 4.3, -999.0, 42 );
+	my $table = { COLA => $x, COLB => $y };
 	wfits $table, $file;
 	
 	my $table2 = rfits $file;
@@ -113,10 +116,10 @@ unless($PDLA::Astro_FITS_Header) {
 	is( $$table2{hdr}{TTYPE2}, "COLB", "column #2 is COLB" );	  #11
 	is( $$table2{hdr}{TFORM2}, "1D", "  stored as 1D" );		  #12
 	
-	compare_piddles $a, $$table2{COLA}, "COLA";			#13-16
-	compare_piddles $b, $$table2{COLB}, "COLB";			#17-20
+	compare_piddles $x, $$table2{COLA}, "COLA";			#13-16
+	compare_piddles $y, $$table2{COLB}, "COLB";			#17-20
 	
-	$table = { BAR => $a, FOO => $b,
+	$table = { BAR => $x, FOO => $y,
 		   hdr => { TTYPE1 => 'FOO', TTYPE2 => 'BAR' } };
 	$table2 = {};
 	
@@ -130,19 +133,19 @@ unless($PDLA::Astro_FITS_Header) {
 	is( $$table2{hdr}{TTYPE2}, "BAR", "column #2 is BAR" );	       #24
 	is( $$table2{hdr}{TFORM2}, "1J", "  stored as 1J" );	       #25
 	
-	compare_piddles $a, $$table2{BAR}, "BAR";			#26-29
-	compare_piddles $b, $$table2{FOO}, "FOO";			#30-33
+	compare_piddles $x, $$table2{BAR}, "BAR";			#26-29
+	compare_piddles $y, $$table2{FOO}, "FOO";			#30-33
 	
 	# try out more "exotic" data types
 	
-	$a = byte(12,45,23,0);
-	$b = short(-99,100,0,32767);
+	$x = byte(12,45,23,0);
+	$y = short(-99,100,0,32767);
 	my $c = ushort(99,32768,65535,0);
 	my $d = [ "A string", "b", "", "The last string" ];
 	my $e = float(-999.0,0,0,12.3);
 	##my $f = float(1,0,-1,2) + i * float( 0,1,2,-1 );
 	$table = {
-	       ACOL => $a, BCOL => $b, CCOL => $c, DCOL => $d, ECOL => $e,
+	       ACOL => $x, BCOL => $y, CCOL => $c, DCOL => $d, ECOL => $e,
 	##	  FCOL => $f,
 	};
 	$table2 = {};
@@ -177,8 +180,8 @@ unless($PDLA::Astro_FITS_Header) {
 	# instead of being written out as an Int2 using TSCALE/TZERO
 	#
 	my $i = 1;
-	foreach my $colinfo ( ( ["ACOL","1B",$a],
-				["BCOL","1I",$b],
+	foreach my $colinfo ( ( ["ACOL","1B",$x],
+				["BCOL","1I",$y],
 				["CCOL","1J",$c->long],
 				["DCOL","${dlen}A",$d],
 				["ECOL","1E",$e],
@@ -208,8 +211,8 @@ unless($PDLA::Astro_FITS_Header) {
     my $p;
     my $q;
     for my $cref ( \(&byte, &short, &long, &float, &double) ) {
-        for my $a ($a1,$a2) {
-            $p = &$cref($a);
+        for my $x ($a1,$a2) {
+            $p = &$cref($x);
             $p->wfits('x.fits');
             $q = PDLA->rfits('x.fits');
 	    my $flag = 1;
@@ -262,41 +265,74 @@ unless($PDLA::Astro_FITS_Header) {
 #### Check that discontinuous data (e.g. from fftnd) get written correctly.
 #### (Sourceforge bug 3299611) it is possible to store data in a PDLA non-contiguously
 #### through the C API, by manipulating dimincs; fft uses this technique, which
-#### used to hose up fits output.
+#### used to hose up fits output.  
 
 SKIP:{
     eval "use PDLA::FFT";
-    skip "PDLA::FFT not installed", 1 if $@;
+    skip "PDLA::FFT not installed", 79 if $@;
 
-    my $a = sequence(10,10,10);
-    my $ai = zeroes($a);
-    fftnd($a,$ai);
-    wfits($a,$file);
-    my $b = rfits($file);
-    ok(all($a==$b),"fftnd output (non-contiguous in memory) is written correctly");
+    my $ar = sequence(10,10,10);
+    my $ai = zeroes($ar);
+    fftnd($ar,$ai);
+    wfits($ar,$file);
+    my $y = rfits($file);
+    ok(all($ar==$y),"fftnd output (non-contiguous in memory) is written correctly");
     unlink $file;
 }
 
 ##############################
 # Check multi-HDU read/write
 
-$a = sequence(5,5);
-$b = rvals(5,5);
+my $x = sequence(5,5);
+my $y = rvals(5,5);
 
 our @aa;
 
-eval { wfits([$a,$b],$file); };
-ok(!$@, "wfits with multiple HDUs didn't fail");
+lives_ok { wfits([$x,$y],$file) } "wfits with multiple HDUs didn't fail";
 
-eval { @aa = rfits($file); };
-ok(!$@, "rfits in list context didn't fail");
+lives_ok { @aa = rfits($file) } "rfits in list context didn't fail";
 
-ok( $aa[0]->ndims == $a->ndims && all($aa[0]->shape == $a->shape), "first element has right shape");
-ok( all($aa[0] == $a), "first element reproduces written one");
+ok( $aa[0]->ndims == $x->ndims && all($aa[0]->shape == $x->shape), "first element has right shape");
+ok( all($aa[0] == $x), "first element reproduces written one");
 
-ok( $aa[1]->ndims == $b->ndims && all($aa[1]->shape == $b->shape), "second element has right shape");
-ok( all($aa[1] == $b), "Second element reproduces written one");
+ok( $aa[1]->ndims == $y->ndims && all($aa[1]->shape == $y->shape), "second element has right shape");
+ok( all($aa[1] == $y), "Second element reproduces written one");
 
 unlink $file;
+
+##############################
+# Rudimentary check for longlong support
+SKIP:{
+	eval "use PDLA::Types";
+	our $PDLA_LL;
+    	skip "Longlong not supported",5   unless ($PDLA_LL//0);
+
+	$x = rvals(longlong,7,7);
+	eval { wfits($x, $file); };
+	ok(!$@, sprintf("writing a longlong image succeeded %s",($@?"($@)":"")));
+	eval { $y = rfits($file); };
+	ok(!$@, sprintf("Reading the longlong image succeeded %s",($@?"($@)":"")));
+	ok(ref($y->hdr) eq "HASH", "Reading the longlong image produced a PDLA with a hash header");
+	ok($y->hdr->{BITPIX} == 64, "BITPIX value was correct");
+	ok(all($y==$x),"The new image matches the old one (longlong)");
+	unlink $file;
+}
+
+###############################
+# Check that tilde expansion works
+
+my $tildefile = cfile('~',"PDLA-IO-FITS-test_$$.fits");
+
+# Only read/write the tildefile if the directory is writable.
+# Some build environments, like the Debian pbuilder chroots, use a non-existent $HOME.
+# See: https://github.com/PDLPorters/pdl/issues/238
+if(-w dirname($tildefile)) {
+	lives_ok { sequence(3,5,2)->wfits($tildefile) } "wfits tilde expansion didn't fail";
+	lives_ok { rfits($tildefile) } "rfits tilde expansion didn't fail";
+	$tildefile =~ s/^(~)/glob($1)/e; #use the same trick as in FITS.pm to resolve this filename.
+	unlink($tildefile) or warn "Could not delete $tildefile: $!\n"; #clean up.
+}
+
+done_testing();
 
 1;

@@ -1,0 +1,126 @@
+NAME
+    Bencher::Scenario::INIParsingModules - Benchmark INI parsing modules
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenario::INIParsingModules (from Perl distribution
+    Bencher-Scenario-INIParsingModules), released on 2019-04-23.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m INIParsingModules
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m INIParsingModules
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Config::INI::Reader 0.025
+
+    Config::IOD::INI::Reader 0.342
+
+    Config::IniFiles 2.94
+
+    Config::Simple::Conf 2.002
+
+BENCHMARK PARTICIPANTS
+    *   Config::IOD::INI::Reader (perl_code)
+
+        Code template:
+
+         state $iod = Config::IOD::INI::Reader->new; $iod->read_file(<filename>)
+
+    *   Config::INI::Reader (perl_code)
+
+        Code template:
+
+         Config::INI::Reader->read_file(<filename>)
+
+    *   Config::IniFiles (perl_code)
+
+        Code template:
+
+         Config::IniFiles->new(-file => <filename>)
+
+    *   Config::Simple::Conf (perl_code)
+
+        Code template:
+
+         Config::Simple::Conf->new(<filename>)
+
+BENCHMARK DATASETS
+    *   extra-bench-basic-compat.ini
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
+    version 4.8.0-53-generic*.
+
+    Benchmark with default options ("bencher -m INIParsingModules"):
+
+     #table1#
+     +--------------------------+-----------+-----------+------------+---------+---------+
+     | participant              | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+     +--------------------------+-----------+-----------+------------+---------+---------+
+     | Config::IniFiles         |       170 |      5.9  |        1   | 2.2e-05 |      20 |
+     | Config::INI::Reader      |       560 |      1.8  |        3.3 | 3.4e-06 |      20 |
+     | Config::Simple::Conf     |      1200 |      0.81 |        7.3 | 5.6e-06 |      20 |
+     | Config::IOD::INI::Reader |      1300 |      0.75 |        7.9 | 4.7e-06 |      20 |
+     +--------------------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m INIParsingModules
+    --module-startup"):
+
+     #table2#
+     +--------------------------+-----------+------------------------+------------+-----------+---------+
+     | participant              | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
+     +--------------------------+-----------+------------------------+------------+-----------+---------+
+     | Config::IniFiles         |      43   |                   36   |        1   |   0.00018 |      20 |
+     | Config::INI::Reader      |      42   |                   35   |        1   |   6e-05   |      20 |
+     | Config::IOD::INI::Reader |      16   |                    9   |        2.8 |   0.00012 |      20 |
+     | Config::Simple::Conf     |       8.6 |                    1.6 |        5   | 4.1e-05   |      20 |
+     | perl -e1 (baseline)      |       7   |                    0   |        7   | 8.5e-05   |      21 |
+     +--------------------------+-----------+------------------------+------------+-----------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-INIParsingModules>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-INIParsingModules>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-INIP
+    arsingModules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

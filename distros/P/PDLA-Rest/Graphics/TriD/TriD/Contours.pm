@@ -45,7 +45,7 @@ Define a new contour plot for TriD.
 
 where $d is a 2D pdl of data to be contoured. [$x,$y,$z] define a 3D
 map of $d into the visualization space [$r,$g,$b] is an optional [3,1]
-piddle specifing the contour color and $options is a hash reference to
+piddle specifying the contour color and $options is a hash reference to
 a list of options documented below.  Contours can also be colored by
 value using the set_color_table function.
 
@@ -182,7 +182,7 @@ Add labels to a contour plot
   $contour->addlabels($labelint,$segint,$font);
 
 $labelint is the integer interval between labeled contours.  If you
-have 8 countour levels and specify $labelint=3 addlabels will attempt
+have 8 contour levels and specify $labelint=3 addlabels will attempt
 to label the 1st, 4th, and 7th contours.  $labelint defaults to 1.
 
 $segint specifies the density of labels on a single contour

@@ -33,6 +33,6 @@ requires:
   perl: '5.005'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.416'
+version: '0.418'
 x_module_name: RDF::Simple
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

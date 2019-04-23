@@ -4,7 +4,7 @@
       "Lee S. Katz <gzu2@cdc.gov>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "gpl_3"
    ],
@@ -19,37 +19,6 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.47"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Bio::Matrix::IO" : "0",
-            "Bio::Tree::DistanceFactory" : "0",
-            "Bio::Tree::Statistics" : "0",
-            "DBD::SQLite" : "0",
-            "DBI" : "0",
-            "Data::Dumper" : "0",
-            "Exporter" : "0",
-            "File::Basename" : "0",
-            "Graph::Dijkstra" : "0",
-            "JSON" : "2.90",
-            "List::Util" : "0",
-            "Thread::Queue" : "0",
-            "perl" : "5.010000",
-            "threads" : "0",
-            "threads::shared" : "0"
-         }
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -58,6 +27,5 @@
          "web" : "https://github.com/lskatz/mashtree"
       }
    },
-   "version" : "0.50",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.52"
 }

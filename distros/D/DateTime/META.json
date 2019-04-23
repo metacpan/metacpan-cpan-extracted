@@ -106,43 +106,43 @@
    "provides" : {
       "DateTime" : {
          "file" : "lib/DateTime.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::Duration" : {
          "file" : "lib/DateTime/Duration.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::Helpers" : {
          "file" : "lib/DateTime/Helpers.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::Infinite" : {
          "file" : "lib/DateTime/Infinite.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::Infinite::Future" : {
          "file" : "lib/DateTime/Infinite.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::Infinite::Past" : {
          "file" : "lib/DateTime/Infinite.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::LeapSecond" : {
          "file" : "lib/DateTime/LeapSecond.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::PP" : {
          "file" : "lib/DateTime/PP.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::PPExtra" : {
          "file" : "lib/DateTime/PPExtra.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       },
       "DateTime::Types" : {
          "file" : "lib/DateTime/Types.pm",
-         "version" : "1.50"
+         "version" : "1.51"
       }
    },
    "release_status" : "stable",
@@ -158,7 +158,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.50",
+   "version" : "1.51",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -195,7 +195,7 @@
                }
             },
             "name" : "@DROLSKY/Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -271,7 +271,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@DROLSKY/GitHub::Meta",
-            "version" : "0.45"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
@@ -281,7 +281,7 @@
                }
             },
             "name" : "@DROLSKY/GitHub::Update",
-            "version" : "0.45"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -427,6 +427,7 @@
                   ],
                   "spell_cmd" : "",
                   "stopwords" : [
+                     "AEST",
                      "Anno",
                      "BCE",
                      "CLDR",
@@ -535,7 +536,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 8
+                  "default_jobs" : 24
                }
             },
             "name" : "@DROLSKY/DROLSKY::RunExtraTests",
@@ -639,7 +640,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -647,7 +648,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -854,8 +855,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@DROLSKY/InstallGuide",
-            "version" : "1.200011"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -902,7 +909,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -918,7 +925,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -953,19 +960,19 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "v%V%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -984,7 +991,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -992,7 +999,7 @@
                }
             },
             "name" : "@DROLSKY/Commit generated files",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1001,12 +1008,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.50",
-                  "tag_format" : "v%v",
-                  "tag_message" : "v%v"
+                  "tag" : "v1.51",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1014,7 +1021,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1026,12 +1033,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -1066,7 +1073,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1074,7 +1081,7 @@
                }
             },
             "name" : "@DROLSKY/Commit version bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1086,12 +1093,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/Push version bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::MakeMaker",
@@ -1101,10 +1108,10 @@
                   "version" : "6.012"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
-                  "version" : "0.47"
+                  "version" : "0.42"
                },
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 8,
+                  "default_jobs" : 24,
                   "version" : "6.012"
                }
             },
@@ -1263,6 +1270,7 @@
       "Karen Etheridge <ether@cpan.org>",
       "Michael Conrad <mike@nrdvana.net>",
       "Michael R. Davis <mrdvt92@users.noreply.github.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "M Somerville <dracos@users.noreply.github.com>",
       "Nick Tonkin <1nickt@users.noreply.github.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
@@ -1276,6 +1284,6 @@
       "viviparous <viviparous@prc>"
    ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.03"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

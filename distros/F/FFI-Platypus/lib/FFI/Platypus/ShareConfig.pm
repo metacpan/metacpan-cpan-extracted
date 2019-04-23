@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = '0.86'; # VERSION
+our $VERSION = '0.87'; # VERSION
 
 sub dist_dir ($)
 {
@@ -63,7 +63,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 
@@ -90,6 +90,10 @@ Shlomi Fish (shlomif)
 Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
+
+Petr Pisar (ppisar)
+
+Mohammad S Anwar (MANWAR)
 
 =head1 COPYRIGHT AND LICENSE
 

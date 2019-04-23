@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.87"
+            "Rinci" : "v1.1.88"
          }
       },
       "runtime" : {
@@ -38,7 +38,6 @@
             "Config::IOD::INI::Reader" : "0",
             "Config::IniFiles" : "0",
             "File::Slurper" : "0",
-            "File::Temp" : "0",
             "Perinci::CmdLine::Any" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -66,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-App-INIUtils"
       }
    },
-   "version" : "0.032",
+   "version" : "0.033",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -371,7 +370,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use File::Slurper qw(write_text);
+use JSON;
+
+my $json = JSON->new->allow_nonref->pretty->canonical; # XXX: json doesn't support binary data!
+
+for my $filename (glob("share/examples/*.tsv")) {
+    next if $filename =~ /TODO-|invalid-/;
+    say "$filename ...";
+
+    my $rows = [];
+    open my($fh), "<:encoding(utf8)", $filename or die "Can't read '$filename': $!";
+    while (defined(my $row = <$fh>)) {
+        chomp $fh;
+        push @$rows, [split /\t/, $row];
+    }
+
+    write_text("$filename.json", $json->encode($rows));
+}

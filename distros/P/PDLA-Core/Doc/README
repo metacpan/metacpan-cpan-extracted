@@ -22,7 +22,7 @@ directory of the PDLA-Doc distribution):
 
 and at the perldla prompt, type 'help':
 
-   perldl> help
+   perldla> help
 
 and proceed from there.
 For details check the supplied file 'local.perldlrc'.

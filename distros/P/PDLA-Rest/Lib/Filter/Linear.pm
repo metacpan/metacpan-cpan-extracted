@@ -4,13 +4,13 @@ PDLA::Filter::Linear - linear filtering for PDLA
 
 =head1 SYNOPSIS
 
-	$a = new PDLA::Filter::Linear(
+	$x = new PDLA::Filter::Linear(
 		{Weights => $v,
 		 Point => 10});
 
-	$b = new PDLA::Filter::Gaussian(15,2); # 15 points, 2 std devn.
+	$y = new PDLA::Filter::Gaussian(15,2); # 15 points, 2 std devn.
 
-	($pred,$corrslic) = $a->predict($dat);
+	($pred,$corrslic) = $x->predict($dat);
 
 =head1 DESCRIPTION
 

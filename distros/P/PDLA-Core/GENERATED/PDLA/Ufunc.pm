@@ -4,7 +4,7 @@
 #
 package PDLA::Ufunc;
 
-@EXPORT_OK  = qw( PDLA::PP prodover PDLA::PP dprodover PDLA::PP cumuprodover PDLA::PP dcumuprodover PDLA::PP sumover PDLA::PP dsumover PDLA::PP cumusumover PDLA::PP dcumusumover PDLA::PP orover PDLA::PP zcover PDLA::PP andover PDLA::PP bandover PDLA::PP borover PDLA::PP intover PDLA::PP average PDLA::PP avgover PDLA::PP daverage PDLA::PP davgover PDLA::PP medover PDLA::PP oddmedover PDLA::PP modeover PDLA::PP pctover PDLA::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDLA::PP qsort PDLA::PP qsorti PDLA::PP qsortvec PDLA::PP qsortveci PDLA::PP minimum PDLA::PP minimum_ind PDLA::PP minimum_n_ind PDLA::PP maximum PDLA::PP maximum_ind PDLA::PP maximum_n_ind PDLA::PP maxover PDLA::PP maxover_ind PDLA::PP maxover_n_ind PDLA::PP minover PDLA::PP minover_ind PDLA::PP minover_n_ind PDLA::PP minmaximum PDLA::PP minmaxover );
+@EXPORT_OK  = qw( PDLA::PP prodover PDLA::PP dprodover PDLA::PP cumuprodover PDLA::PP dcumuprodover PDLA::PP sumover PDLA::PP dsumover PDLA::PP cumusumover PDLA::PP dcumusumover PDLA::PP andover PDLA::PP bandover PDLA::PP borover PDLA::PP orover PDLA::PP zcover PDLA::PP intover PDLA::PP average PDLA::PP avgover PDLA::PP daverage PDLA::PP davgover PDLA::PP medover PDLA::PP oddmedover PDLA::PP modeover PDLA::PP pctover PDLA::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDLA::PP qsort PDLA::PP qsorti PDLA::PP qsortvec PDLA::PP qsortveci PDLA::PP minimum PDLA::PP minimum_ind PDLA::PP minimum_n_ind PDLA::PP maximum PDLA::PP maximum_ind PDLA::PP maximum_n_ind PDLA::PP maxover PDLA::PP maxover_ind PDLA::PP maxover_n_ind PDLA::PP minover PDLA::PP minover_ind PDLA::PP minover_n_ind PDLA::PP minmaximum PDLA::PP minmaxover );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDLA::Core;
@@ -83,7 +83,7 @@ I<any> dimension.
 
 =for usage
 
- $b = prodover($a);
+ $y = prodover($x);
 
 =for example
 
@@ -131,7 +131,7 @@ I<any> dimension.
 
 =for usage
 
- $b = dprodover($a);
+ $y = dprodover($x);
 
 =for example
 
@@ -183,7 +183,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumuprodover($a);
+ $y = cumuprodover($x);
 
 =for example
 
@@ -234,7 +234,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumuprodover($a);
+ $y = cumuprodover($x);
 
 =for example
 
@@ -283,7 +283,7 @@ I<any> dimension.
 
 =for usage
 
- $b = sumover($a);
+ $y = sumover($x);
 
 =for example
 
@@ -331,7 +331,7 @@ I<any> dimension.
 
 =for usage
 
- $b = dsumover($a);
+ $y = dsumover($x);
 
 =for example
 
@@ -383,7 +383,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumusumover($a);
+ $y = cumusumover($x);
 
 =for example
 
@@ -434,7 +434,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumusumover($a);
+ $y = cumusumover($x);
 
 =for example
 
@@ -464,102 +464,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-=head2 orover
-
-=for sig
-
-  Signature: (a(n); int+ [o]b())
-
-
-=for ref
-
-Project via or to N-1 dimensions
-
-This function reduces the dimensionality of a piddle
-by one by taking the or along the 1st dimension.
-
-By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
-I<any> dimension.
-
-=for usage
-
- $b = orover($a);
-
-=for example
-
- $spectrum = orover $image->xchg(0,1)
-
-
-
-
-
-=for bad
-
-If C<a()> contains only bad data (and its bad flag is set), 
-C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
-as it will not contain any bad values.
-
-=cut
-
-
-
-
-
-
-*orover = \&PDLA::orover;
-
-
-
-
-
-=head2 zcover
-
-=for sig
-
-  Signature: (a(n); int+ [o]b())
-
-
-=for ref
-
-Project via == 0 to N-1 dimensions
-
-This function reduces the dimensionality of a piddle
-by one by taking the == 0 along the 1st dimension.
-
-By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
-I<any> dimension.
-
-=for usage
-
- $b = zcover($a);
-
-=for example
-
- $spectrum = zcover $image->xchg(0,1)
-
-
-
-
-
-=for bad
-
-If C<a()> contains only bad data (and its bad flag is set), 
-C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
-as it will not contain any bad values.
-
-=cut
-
-
-
-
-
-
-*zcover = \&PDLA::zcover;
-
-
-
-
-
 =head2 andover
 
 =for sig
@@ -579,7 +483,7 @@ I<any> dimension.
 
 =for usage
 
- $b = andover($a);
+ $y = andover($x);
 
 =for example
 
@@ -627,7 +531,7 @@ I<any> dimension.
 
 =for usage
 
- $b = bandover($a);
+ $y = bandover($x);
 
 =for example
 
@@ -675,7 +579,7 @@ I<any> dimension.
 
 =for usage
 
- $b = borover($a);
+ $y = borover($x);
 
 =for example
 
@@ -704,6 +608,102 @@ as it will not contain any bad values.
 
 
 
+=head2 orover
+
+=for sig
+
+  Signature: (a(n); int+ [o]b())
+
+
+=for ref
+
+Project via or to N-1 dimensions
+
+This function reduces the dimensionality of a piddle
+by one by taking the or along the 1st dimension.
+
+By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
+I<any> dimension.
+
+=for usage
+
+ $y = orover($x);
+
+=for example
+
+ $spectrum = orover $image->xchg(0,1)
+
+
+
+
+
+=for bad
+
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
+
+=cut
+
+
+
+
+
+
+*orover = \&PDLA::orover;
+
+
+
+
+
+=head2 zcover
+
+=for sig
+
+  Signature: (a(n); int+ [o]b())
+
+
+=for ref
+
+Project via == 0 to N-1 dimensions
+
+This function reduces the dimensionality of a piddle
+by one by taking the == 0 along the 1st dimension.
+
+By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
+I<any> dimension.
+
+=for usage
+
+ $y = zcover($x);
+
+=for example
+
+ $spectrum = zcover $image->xchg(0,1)
+
+
+
+
+
+=for bad
+
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
+
+=cut
+
+
+
+
+
+
+*zcover = \&PDLA::zcover;
+
+
+
+
+
 =head2 intover
 
 =for sig
@@ -723,7 +723,7 @@ I<any> dimension.
 
 =for usage
 
- $b = intover($a);
+ $y = intover($x);
 
 =for example
 
@@ -780,7 +780,7 @@ I<any> dimension.
 
 =for usage
 
- $b = average($a);
+ $y = average($x);
 
 =for example
 
@@ -844,7 +844,7 @@ I<any> dimension.
 
 =for usage
 
- $b = daverage($a);
+ $y = daverage($x);
 
 =for example
 
@@ -909,7 +909,7 @@ I<any> dimension.
 
 =for usage
 
- $b = medover($a);
+ $y = medover($x);
 
 =for example
 
@@ -957,7 +957,7 @@ I<any> dimension.
 
 =for usage
 
- $b = oddmedover($a);
+ $y = oddmedover($x);
 
 =for example
 
@@ -1013,7 +1013,7 @@ I<any> dimension.
 
 =for usage
 
- $b = modeover($a);
+ $y = modeover($x);
 
 =for example
 
@@ -1079,7 +1079,7 @@ I<any> dimension.
 
 =for usage
 
- $b = pctover($a, $p);
+ $y = pctover($x, $p);
 
 =for example
 
@@ -1128,7 +1128,7 @@ I<any> dimension.
 
 =for usage
 
- $b = oddpctover($a, $p);
+ $y = oddpctover($x, $p);
 
 =for example
 
@@ -1760,7 +1760,7 @@ Useful in conditional expressions:
 
 =for example
 
- if (any $a>15) { print "some values are greater than 15\n" }
+ if (any $x>15) { print "some values are greater than 15\n" }
 
 =cut
 
@@ -1788,7 +1788,7 @@ Useful in conditional expressions:
 
 =for example
 
- if (all $a>15) { print "all values are greater than 15\n" }
+ if (all $x>15) { print "all values are greater than 15\n" }
 
 =cut
 
@@ -1866,9 +1866,9 @@ Quicksort a vector into ascending order.
 
 Bad values are moved to the end of the array:
 
- pdla> p $b
+ pdla> p $y
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdla> p qsort($b)
+ pdla> p qsort($y)
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
@@ -1898,8 +1898,8 @@ Quicksort a vector and return index of elements in ascending order.
 
 =for example
 
- $ix = qsorti $a;
- print $a->index($ix); # Sorted list
+ $ix = qsorti $x;
+ print $x->index($ix); # Sorted list
 
 
 
@@ -1907,9 +1907,9 @@ Quicksort a vector and return index of elements in ascending order.
 
 Bad elements are moved to the end of the array:
 
- pdla> p $b
+ pdla> p $y
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdla> p $b->index( qsorti($b) )
+ pdla> p $y->index( qsorti($y) )
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
@@ -2034,7 +2034,7 @@ I<any> dimension.
 
 =for usage
 
- $b = minimum($a);
+ $y = minimum($x);
 
 =for example
 
@@ -2141,7 +2141,7 @@ I<any> dimension.
 
 =for usage
 
- $b = maximum($a);
+ $y = maximum($x);
 
 =for example
 
@@ -2338,8 +2338,8 @@ Find minimum and maximum and their indices for a given piddle;
 
 =for usage
 
- pdla> $a=pdl [[-2,3,4],[1,0,3]]
- pdla> ($min, $max, $min_ind, $max_ind)=minmaximum($a)
+ pdla> $x=pdl [[-2,3,4],[1,0,3]]
+ pdla> ($min, $max, $min_ind, $max_ind)=minmaximum($x)
  pdla> p $min, $max, $min_ind, $max_ind
  [-2 0] [4 3] [0 1] [2 2]
 

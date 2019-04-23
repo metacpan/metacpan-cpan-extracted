@@ -102,7 +102,7 @@ $params{session} = $opt{session} if defined $opt{session};
 # }
 
 my $shell = App::PerlShell->new( %params,
-    skipvars => [qw(%LexPersist:: %ModRefresh:: %ShellCommands:: $AUTOLOAD)]
+    skipvars => [qw(%LexPersist:: %ModRefresh:: %Plugin:: $AUTOLOAD)]
 );
 $shell->run();
 

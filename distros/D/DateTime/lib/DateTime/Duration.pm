@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.50';
+our $VERSION = '1.51';
 
 use Carp ();
 use DateTime;
@@ -35,7 +35,7 @@ my @all_units = qw( months days minutes seconds nanoseconds );
             # compares to anything.
             type    => t('Defined'),
             default => 0,
-            }
+        }
         } qw(
         years
         months
@@ -362,7 +362,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 SYNOPSIS
 
@@ -562,7 +562,7 @@ object or an already-constructed duration object.
 
 =head2 $dur->multiply( $number )
 
-Multiplies each unit in the by the specified integer number.
+Multiplies each unit in the C<DateTime::Duration> object by the specified integer number.
 
 =head2 DateTime::Duration->compare( $duration1, $duration2, $base_datetime )
 
@@ -656,7 +656,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

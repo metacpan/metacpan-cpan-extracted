@@ -1,7 +1,7 @@
 package Getopt::Long::Negate::EN;
 
-our $DATE = '2016-03-01'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,6 +39,9 @@ sub negations_for_option {
     elsif ($word =~ /\Aallow([_-].+)/ )     { return ("disallow$1")   }
     elsif ($word =~ /\Adisallow([_-].+)/)   { return ("allow$1")      }
 
+    elsif ($word =~ /\Ainclude([_-].+)/ ) { return ("exclude$1") }
+    elsif ($word =~ /\Aexclude([_-].+)/ ) { return ("include$1") }
+
     elsif ($word =~ /\Ano[_-](.+)/     ) { return ($1)          }
 
     else {
@@ -62,7 +65,7 @@ Getopt::Long::Negate::EN - Better negation of boolean option names
 
 =head1 VERSION
 
-This document describes version 0.05 of Getopt::Long::Negate::EN (from Perl distribution Getopt-Long-Negate-EN), released on 2016-03-01.
+This document describes version 0.060 of Getopt::Long::Negate::EN (from Perl distribution Getopt-Long-Negate-EN), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -96,6 +99,9 @@ This document describes version 0.05 of Getopt::Long::Negate::EN (from Perl dist
  @negs = negations_for_option('disallowed-foo'); # ('allowed-foo')
  @negs = negations_for_option('allow-foo');      # ('disallow-foo')
  @negs = negations_for_option('disallow-foo');   # ('allow-foo')
+
+ @negs = negations_for_option('include-foo'); # ('exclude-foo')
+ @negs = negations_for_option('exclude-foo'); # ('include-foo')
 
  @negs = negations_for_option('no-foo');      # ('foo')
 
@@ -135,7 +141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 my @pack = (["fft.pd", qw(FFT PDLA::FFT)]);
 my %hash = pdlpp_stdargs(@pack);
-$hash{OBJECT} .= ' fftn.o';
+$hash{OBJECT} .= ' fftn$(OBJ_EXT)';
 $hash{DEFINE} .= ' -DFFT_FLOAT';
 $hash{LIBS} = ['-lm'] unless $^O =~ /MSWin/;
 

@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Try::Catch" => 0,
     "YAML::LibYAML" => "0.75"
   },
-  "VERSION" => "1.75",
+  "VERSION" => "1.76",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }

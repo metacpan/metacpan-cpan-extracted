@@ -1,7 +1,7 @@
 package Bencher::Scenario::RangeIterators::Create;
 
-our $DATE = '2019-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark iterator creation',
@@ -27,7 +27,7 @@ Bencher::Scenario::RangeIterators::Create - Benchmark iterator creation
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::RangeIterators::Create (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-17.
+This document describes version 0.003 of Bencher::Scenario::RangeIterators::Create (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -49,11 +49,11 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Range::Iterator> 0.001
+L<Range::Iterator> 0.002
 
-L<Range::Iter> 0.001
+L<Range::Iter> 0.002
 
-L<Range::ArrayIter> 0.001
+L<Range::ArrayIter> 0.002
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -87,7 +87,7 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m RangeIterators::Create >>):
 
@@ -95,9 +95,9 @@ Benchmark with default options (C<< bencher -m RangeIterators::Create >>):
  +------------------+-----------+-----------+------------+---------+---------+
  | participant      | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +------------------+-----------+-----------+------------+---------+---------+
- | Range::ArrayIter |    270000 |       3.6 |        1   | 6.4e-09 |      22 |
- | Range::Iterator  |    370000 |       2.7 |        1.3 | 1.1e-08 |      20 |
- | Range::Iter      |    420000 |       2.4 |        1.5 | 2.5e-09 |      20 |
+ | Range::ArrayIter |    330000 |     3     |      1     | 3.3e-09 |      21 |
+ | Range::Iterator  |    606400 |     1.649 |      1.811 | 5.8e-11 |      20 |
+ | Range::Iter      |    700000 |     1.4   |      2.1   | 5.4e-09 |      20 |
  +------------------+-----------+-----------+------------+---------+---------+
 
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker 7.1101;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dancer2-Plugin-ParamTypes",
   "LICENSE" => "mit",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Dancer2::Plugin::ParamTypes",
   "PREREQ_PM" => {
     "Dancer2" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Memory::Cycle" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

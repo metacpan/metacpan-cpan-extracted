@@ -37,9 +37,9 @@ use SNMP::Info::Layer3;
 @SNMP::Info::Layer2::Adtran::ISA       = qw/SNMP::Info::LLDP SNMP::Info::Layer2 Exporter/;
 @SNMP::Info::Layer2::Adtran::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
+our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 # This will be filled in with the device's index into the EntPhysicalEntry
 # table by the serial() function.

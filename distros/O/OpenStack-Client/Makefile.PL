@@ -14,7 +14,7 @@ WriteMakefile(
     'ABSTRACT'         => 'A nice and tiny OpenStack API client',
     'MIN_PERL_VERSION' => '5.14.0',
 
-    'BUILD_REQUIRES' => {
+    'PREREQ_PM' => {
         'JSON'           => 0,
         'HTTP::Request'  => 0,
         'LWP::UserAgent' => 0,

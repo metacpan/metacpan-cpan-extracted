@@ -1,7 +1,7 @@
 package Bencher::Scenario::RangeIterators::Iterate;
 
-our $DATE = '2019-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +12,7 @@ our $scenario = {
     participants => [
         {module=>'Range::Iterator', code_template=>'state $iter = Range::Iterator->new(<start>, <end>); $iter->next for 1..<n>'},
         {module=>'Range::Iter', code_template=>'state $iter = Range::Iter::range_iter(<start>, <end>); $iter->() for 1..<n>'},
-        {module=>'Range::ArrayIter', code_template=>'$iter = Range::ArrayIter::range_arrayiter(<start>, <end>); for (@$iter) {}'},
+        {module=>'Range::ArrayIter', code_template=>'state $iter = Range::ArrayIter::range_arrayiter(<start>, <end>); for (@$iter) {}'},
     ],
     datasets => [
         {name=>'100k', args=>{start=>1, end=>100_000, n=>100_000}},
@@ -34,7 +34,7 @@ Bencher::Scenario::RangeIterators::Iterate - Benchmark iteration
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::RangeIterators::Iterate (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-17.
+This document describes version 0.003 of Bencher::Scenario::RangeIterators::Iterate (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -56,11 +56,11 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Range::Iterator> 0.001
+L<Range::Iterator> 0.002
 
-L<Range::Iter> 0.001
+L<Range::Iter> 0.002
 
-L<Range::ArrayIter> 0.001
+L<Range::ArrayIter> 0.002
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -86,7 +86,7 @@ Code template:
 
 Code template:
 
- $iter = Range::ArrayIter::range_arrayiter(<start>, <end>); for (@$iter) {}
+ state $iter = Range::ArrayIter::range_arrayiter(<start>, <end>); for (@$iter) {}
 
 
 
@@ -102,18 +102,18 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m RangeIterators::Iterate >>):
 
  #table1#
- +------------------+-----------+-----------+------------+-----------+---------+
- | participant      | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
- +------------------+-----------+-----------+------------+-----------+---------+
- | Range::ArrayIter |       8.1 |     120   |       1    |   0.00015 |      20 |
- | Range::Iterator  |      22.8 |      43.8 |       2.83 | 2.6e-05   |      20 |
- | Range::Iter      |      90.8 |      11   |      11.3  |   4e-06   |      20 |
- +------------------+-----------+-----------+------------+-----------+---------+
+ +------------------+-----------+-----------+------------+---------+---------+
+ | participant      | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+ +------------------+-----------+-----------+------------+---------+---------+
+ | Range::ArrayIter |      9.83 |     102   |       1    | 6.7e-05 |      20 |
+ | Range::Iterator  |     20.5  |      48.7 |       2.09 | 2.7e-05 |      21 |
+ | Range::Iter      |     63.4  |      15.8 |       6.46 | 1.1e-05 |      20 |
+ +------------------+-----------+-----------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

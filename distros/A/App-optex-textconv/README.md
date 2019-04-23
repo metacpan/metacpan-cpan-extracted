@@ -4,7 +4,7 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 

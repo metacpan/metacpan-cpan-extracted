@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_select_row
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-04-15'; # DATE
+our $DATE = '2019-04-23'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-select-row - Only output specified row(s)
 
 =head1 VERSION
 
-This document describes version 0.015 of csv-select-row (from Perl distribution App-CSVUtils), released on 2019-04-15.
+This document describes version 0.019 of csv-select-row (from Perl distribution App-CSVUtils), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -66,6 +66,10 @@ will be named `field1`, `field2`, and so on.
 =item B<--row-spec>=I<s>*
 
 Row number (e.g. 2 for first data row), range (2-7), or comma-separated list of such (2-7,10,20-23).
+
+=item B<--tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =back
 

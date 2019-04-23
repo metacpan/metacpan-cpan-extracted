@@ -22,7 +22,7 @@ our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 sub _CERTIFICATE_HEADER_SIZE { return 40; }
 sub _MAX_PUBLIC_KEY_SIZE     { return 65_536; }
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub pin_sha256 {
     my ($path) = @_;
@@ -134,7 +134,9 @@ sub _check_for_der_pkcs10_certificate_request {
           _MAX_PUBLIC_KEY_SIZE()
           or Carp::croak("Failed to read from $path:$EXTENDED_OS_ERROR");
         Crypt::PKCS10->setAPIversion(1);
-        my $req = Crypt::PKCS10->new($pkcs10_certificate_string);
+        my $req = Crypt::PKCS10->new($pkcs10_certificate_string)
+          or Carp::croak( 'Failed to initialise Crypt::PKCS10 library:'
+              . Crypt::PKCS10->error() );
         $pem_encoded_public_key_string = $req->subjectPublicKey(1);
     } or do {
         return;
@@ -146,7 +148,17 @@ sub _check_for_der_encoded_x509_certificate {
     my ( $handle, $file_header, $path ) = @_;
     my $pem_encoded_public_key_string;
     eval {
-        my $x509 = Crypt::OpenSSL::X509->new_from_file( $path,
+        my $temp_handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+          or
+          Carp::croak("Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
+        binmode $temp_handle;
+        my $string;
+        while ( my $line = <$temp_handle> ) {
+            $string .= $line;
+        }
+        close $temp_handle
+          or Carp::croak("Failed to close '$path':$EXTENDED_OS_ERROR");
+        my $x509 = Crypt::OpenSSL::X509->new_from_string( $string,
             Crypt::OpenSSL::X509::FORMAT_ASN1() );
         $pem_encoded_public_key_string =
           _get_pem_encoded_public_key_string($x509);
@@ -265,7 +277,7 @@ HTTP::PublicKeyPins - Generate RFC 7469 HTTP Public Key Pin (HPKP) header values
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 

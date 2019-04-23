@@ -27,7 +27,9 @@ RCS
 \.bs
 \.bundle$
 \.cvsignore$
+\.inline-ct
 \.inlinepdlpp
+\.inlinewith
 \.lck$
 \.m$
 \.o$
@@ -86,6 +88,7 @@ RCS
 ^Demos/BAD_demo.pm$
 ^Demos/TkTriD_demo.pm$
 ^Demos/TriD/test6.p$
+^Doc/Doc/Config\.pm$
 ^IO/ImageRGB/ImageRGB\..*
 ^IO/Misc/Misc.*
 ^IO/Pnm/Pnm\..*

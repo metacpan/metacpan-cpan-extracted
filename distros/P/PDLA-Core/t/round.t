@@ -1,12 +1,10 @@
 # -*-perl-*-
-
+use strict;
+use warnings;
 use Test::More tests => 1;
 
 use PDLA::LiteF;
 use PDLA::Math;
-
-use strict;
-use warnings;
 
 kill 'INT',$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
 
@@ -17,4 +15,4 @@ $pa /= 4;
 my $ans_rint = pdl(-5,-5,-4,-4,-4,-4,-4,-3,-3,-3,-2,-2,-2,-2,-2,
 -1,-1,-1,0,0,0,0,0,1,1,1,2,2,2,2,2,3,3,3,4,4,4,4,4,5,5);
 
-ok(all(rint($pa)==$ans_rint));
+ok(all(rint($pa)==$ans_rint),"rint");

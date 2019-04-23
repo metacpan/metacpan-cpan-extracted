@@ -10,6 +10,7 @@ use PDL::Core qw(pdl);
 use PDL::Primitive qw(which whichND);
 
 use Data::Rmap qw(rmap_array);
+use Ref::Util;
 use Safe::Isa;
 use Type::Params;
 use Types::Standard qw(slurpy ArrayRef ConsumerOf Int);
@@ -21,14 +22,14 @@ use Class::Method::Modifiers;
 use Role::Tiny::With;
 with qw(PDL::Role::Stringifiable);
 
-use Devel::OverloadInfo qw(overload_info);
+use Devel::OverloadInfo qw(overload_op_info);
 
 my $overload_info;
 my $super_dotassign;
 
 BEGIN {
-    my $overload_info = overload_info('PDL');
-    $super_dotassign = $overload_info->{'.='}{code};
+    my $overload_info = overload_op_info('PDL', '.=');
+    $super_dotassign = $overload_info->{code};
 }
 
 use overload
@@ -79,7 +80,9 @@ sub new {
     my $data = shift @args;    # first arg
 
     my ($faked_data) = rmap_array {
-        ( ref( $_->[0] ) eq 'ARRAY' ) ? [ $_[0]->recurse() ] : [ (0) x @$_ ]
+        Ref::Util::is_plain_arrayref( $_->[0] )
+          ? [ $_[0]->recurse() ]
+          : [ (0) x @$_ ]
     }
     $data;
 
@@ -88,12 +91,11 @@ sub new {
     $pdl .= PDL::Core::indx($faked_data);
     $pdl .= PDL->sequence( $self->dims );
 
-    my $nelem    = $self->nelem;
     if ($self->ndims == 1) {    # for speed 
         $self->_internal($data);
     } else {
         my $internal = $self->_internal;
-        for my $idx ( 0 .. $nelem - 1 ) {
+        for my $idx ( 0 .. $self->nelem - 1 ) {
             my @where = reverse $self->one2nd($idx);
             $internal->[$idx] = $self->_array_get( $data, \@where );
         }
@@ -404,7 +406,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.0043
+version 0.0045
 
 =head1 SYNOPSIS
 

@@ -20,6 +20,8 @@ write_text("$dir/5.csv", qq(f1\n1\n2\n3\n4\n5\n6\n));
 write_text("$dir/no-rows.csv", qq(f1,f2,f3\n));
 write_text("$dir/no-header-1.csv", "1,2,3\n4,5,6\n7,8,9\n");
 
+write_text("$dir/1.tsv", "f1\tf2\tf3\n1\t2\t3\n4\t5\t6\n7\t8\t9\n");
+
 # XXX test with opt: --no-header
 
 subtest csv_add_field => sub {
@@ -223,6 +225,31 @@ subtest csv_map => sub {
         is_deeply($res, [200,"OK","1.2.34.5.67.8.9",{'cmdline.skip_format'=>1}], "result")
             or diag explain $res;
     };
+};
+
+subtest csv_dump => sub {
+    my $res;
+
+    $res = App::CSVUtils::csv_dump(filename=>"$dir/1.csv");
+    is_deeply($res, [200,"OK",[["f1","f2","f3"],[1,2,3],[4,5,6],[7,8,9]]])
+        or diag explain $res;
+
+    $res = App::CSVUtils::csv_dump(filename=>"$dir/1.tsv", tsv=>1);
+    is_deeply($res, [200,"OK",[["f1","f2","f3"],[1,2,3],[4,5,6],[7,8,9]]])
+        or diag explain $res;
+
+    $res = App::CSVUtils::csv_dump(filename=>"$dir/1.csv", hash=>1);
+    is_deeply($res, [200,"OK",[{f1=>1,f2=>2,f3=>3},{f1=>4,f2=>5,f3=>6},{f1=>7,f2=>8,f3=>9}]])
+        or diag explain $res;
+
+    $res = App::CSVUtils::csv_dump(filename=>"$dir/1.csv", header=>0);
+    is_deeply($res, [200,"OK",[["field1","field2","field3"],["f1","f2","f3"],[1,2,3],[4,5,6],[7,8,9]]])
+        or diag explain $res;
+
+    $res = App::CSVUtils::csv_dump(filename=>"$dir/1.csv", header=>0, hash=>1);
+    is_deeply($res, [200,"OK",[{field1=>'f1',field2=>'f2',field3=>'f3'},{field1=>1,field2=>2,field3=>3},{field1=>4,field2=>5,field3=>6},{field1=>7,field2=>8,field3=>9}]])
+        or diag explain $res;
+
 };
 
 done_testing;

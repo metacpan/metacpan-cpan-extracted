@@ -1,3 +1,5 @@
+0.11, April 22, 2019
+  * Fix a bug when using pg databases in non-standard port
 0.10, April 11, 2017
   * Separated the Filter module from the main module (no functional changes).
   * Headers can be set now in error responses.

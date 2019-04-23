@@ -6,12 +6,12 @@ PDLA::FAQ - Frequently asked questions about PDLA
 
 =head1 VERSION
 
-Current FAQ version:  1.006
+Current FAQ version:  1.008
 
 
 =head1 DESCRIPTION
 
-This is version 1.005 of the PDLA FAQ, a collection of  frequently 
+This is version 1.008 of the PDLA FAQ, a collection of  frequently 
 asked questions about PDLA - the Perl Data Language.  
 
 
@@ -68,12 +68,11 @@ initiator of the PDLA project:
     The PDLA concept is to give standard perl5 the ability
     to COMPACTLY store and SPEEDILY manipulate the large
     N-dimensional data sets which are the bread and butter
-    of scientific computing. e.g. $a=$b+$c can add two
+    of scientific computing. e.g. $x=$y+$z can add two
     2048x2048 images in only a fraction of a second.
 
 
-It provides tons of useful
-functionality for scientific and numeric analysis.
+It provides tons of useful functionality for scientific and numeric analysis.
 
 For readers familiar with other scientific data evaluation packages it
 may be helpful to add that PDLA is in many respects similar to IDL,
@@ -262,15 +261,13 @@ assist you in porting PDLA to a new system.
 
 PDLA is available as source distribution in the 
 I<Comprehensive Perl Archive Network> (or CPAN) and from the
-sourceforge.net project page at L<https://sourceforge.net/projects/pdl/files/>.
+GitHub project page at L<https://github.com/PDLPorters/pdla-core>.
 The CPAN archives contains not only the PDLA distribution but
 also just about everything else that is Perl-related.  CPAN is
 mirrored by dozens of sites all over the world.  The main site
 is L<http://www.cpan.org>, and local CPAN sites (mirrors) can be
-found there. Within CPAN you find the latest released version of
-PDLA in the directory /modules/by-module/PDLA/. PDLA's homepage is at
-L<http://pdl.perl.org> and the latest version can also be downloaded
-from there.
+found there. PDLA's homepage is at L<http://pdl.perl.org> and the
+latest version can also be downloaded from there.
 
 
 =head2 Q: 2.8    What do I have to pay to get PDLA?  
@@ -316,11 +313,11 @@ reproduced in braces ( <... ...> ) ):
     < ... help output ... >
     pdla> help PDLA::QuickStart
     < ... perldoc page ... >
-    pdla> $a = pdl (1,5,7.3,1.0)
-    pdla> $b = sequence float, 4, 4
+    pdla> $x = pdl (1,5,7.3,1.0)
+    pdla> $y = sequence float, 4, 4
     pdla> help inner
     < ... help on the 'inner' function ... >
-    pdla> $c = inner $a, $b
+    pdla> $c = inner $x, $y
     pdla> p $c
     [22.6 79.8 137 194.2]
 
@@ -368,36 +365,40 @@ pages).
 
 =back
 
-If you are interested in PDLA in general you can join the PDLA mailing
-list pdl-general@lists.sourceforge.net. This is a forum to discuss programming
-issues in PDLA, report bugs, seek assistance with PDLA related problems,
-etc. To subscribe, fill out the form at
-L<http://lists.sourceforge.net/lists/listinfo/pdl-general> .
-
-A searchable archive and a hypertext version of the traffic on this
-list (1997-2004) can be found at
-L<http://www.xray.mpe.mpg.de/mailing-lists/perldl/> . More recent
-messages (since June 2005) can be found at TBD.
+If you are interested in PDLA in general you can join the pdl-general mailing
+list. This is a forum to discuss programming issues in PDLA, report bugs, seek
+assistance with PDLA related problems, etc.
 
 If you are interested in all the technical details of the ongoing PDLA
-development you can join the PDLA developers mailing list
-pdl-devel@lists.sourceforge.net . To subscribe, fill out the form at
-L<http://lists.sourceforge.net/lists/listinfo/pdl-devel> .
+development you can join the pdl-devel mailing list.
 
-A searchable archive and a hypertext version
-of the traffic on this list (1997-2004) can be found at 
-L<http://www.xray.mpe.mpg.de/mailing-lists/pdl-porters/> . More recent messages 
-(since June 2005) can be found at TBD
+Subscription and current archive links to both mailing lists can be
+found at L<http://pdl.perl.org/?page=mailing-lists>.
 
 Cross-posting between these lists should be avoided unless there is a
 I<very> good reason for doing that.
+
+The PDLA project, begun in the late 1990s, has undergone considerable evolution
+since that time, and the support for it has as well. Thus mailing-list
+archives are in several places.  Originally pdl-general was called 'perldl',
+and pdl-devel was called 'pdl-porters'.
+
+|Time Period | URL                                                   |
+|------------|-------------------------------------------------------|
+|1996 - 2004 | http://www.xray.mpe.mpg.de/mailing-lists/perldl/      |
+|1997 - 2004 | http://www.xray.mpe.mpg.de/mailing-lists/pdl-porters/ |
+|2005 - 2015 | http://perldl.jach.hawaii.narkive.com/                |
+|2005 - 2015 | http://pdl-porters.jach.hawaii.narkive.com/           |
+|2015 -      | https://sourceforge.net/p/pdl/mailman/pdl-general/    |
+|2015 -      | https://sourceforge.net/p/pdl/mailman/pdl-devel/      |
+|--------------------------------------------------------------------|
 
 
 =head2 Q: 3.3    What is the current version of PDLA ?  
 
 
-As of this writing (FAQ version 1.006 of 10 Oct 2015) the latest stable version
-is 2.014.  The latest stable version should always be available from a CPAN
+As of this writing (FAQ version 1.008 of 21 May 2017) the latest stable version
+is 2.018.  The latest stable version should always be available from a CPAN
 mirror site near you (see L<Question 2.7|"Q: 2.7    Where do I get it?"> for
 info on where to get PDLA).
 
@@ -534,7 +535,7 @@ To guarantee a completely clean installation of PDLA, you will need
 to first delete the current installation files and folders.  These
 will be all directories named C<PDLA> in the Perl C<@INC> path,
 files named C<*Pdlapp*> in any C<Inline> directories, and the 
-programs C<pdl, pdladoc, pdla2, perldla, and pptemplate>.  Then just build
+programs C<pdla, pdladoc, pdla2, perldla, and pptemplate>.  Then just build
 and install as usual.  This is much easier to keep track of if you
 always install C<PDLA> into a non-standard location.  See Q: 4.4 above.
 
@@ -576,8 +577,10 @@ PDLA builds fine on Win32 using MinGW or Microsoft compilers.  See
 the F<win32/INSTALL> file in the PDLA source distribution for details.
 Other compilers have not been tested--input is welcome.  There is
 also a distribution of PDLA through ActiveState's ppm, though it
-might not always be the latest version.  PDLA-2.014 builds out of
-the box on Strawberry Perl and ActiveState Perl.
+might not always be the latest version.  PDLA-2.018 builds out of
+the box on Strawberry Perl and ActiveState Perl and there are 
+distributions of Strawberry Perl with bundled PDLA
+(see L<http://strawberryperl.com/releases.html>).
 
 
 
@@ -600,24 +603,31 @@ Assume you have Git installed on your system and want to download the
 project source code into the directory C<PDLA>. To get read-only access
 to the repository, you type at the command line
 
-   git clone git://git.code.sf.net/p/pdl/code pdl-code
+   git clone git://github.com/PDLPorters/pdla-core
+
+If you wish to submit changes to PDLA, you should "fork" the repository
+from L<https://github.com/PDLPorters/pdla-core>, then clone your fork in the
+normal fashion.
+
+To become an official PDLA developer, you will need to be added to the
+GitHub "PDLPorters" organisation.
 
 For official PDLA developers, to get read/write access to the repository
 type at the command line
 
-   git clone ssh://USERNAME@git.code.sf.net/p/pdl/code pdl-code
+   git clone git://github.com/PDLPorters/pdla-core
 
+They can still use their own fork; at least one active developer uses
+that model rather than branches on the main repository.
 
 =head2 Q: 4.10   I had a problem with the Git version, how do I check if someone has submitted a patch?  
 
 
-The Sourceforge system contains a patch-manager which contains patches
-that have not yet been applied to the distribution. This can be
-accessed via the Tickets menu at PDLA's Sourceforge project page
-L<http://sourceforge.net/projects/pdl> .
+The best way is to check L<https://github.com/PDLPorters/pdla-core/pulls> to see if
+somebody has submitted a pull request related to your problem.
 
 In addition, if you are not subscribing to the mailing list,
-check the archive of the C<pdl-porters> and C<perldl> mailing lists.
+check the archive of the C<pdl-devel> and C<pdl-general> mailing lists.
 See L<Question 3.2|"Q: 3.2 Are there other PDLA information sources on the Internet?"> for details.
 
 
@@ -626,32 +636,46 @@ See L<Question 3.2|"Q: 3.2 Are there other PDLA information sources on the Inter
 
 The first thing you should do is to read the Git documentation and
 learn the basics about Git. There are many sources available online.
-But here are the basics:
+It is very important that you use Git "best practice", with branches,
+but fortunately this is very easy! Here are the basics.
 
-Before you upload your changes, commit them to YOUR repository
+Make sure your copy is up to date with the main repo:
+
+   git checkout master
+   git pull --rebase # rebase in case you wrongly changed your own master
+
+Make a branch:
+
+   git checkout -b mybranch-name
+
+Commit your changes locally:
 
    git add <file1> <file2> ...
    git commit
 
-or combine these two with 
+or combine these two with:
 
    git commit -a
 
-Then pull in any changes others have made
-
-   git pull origin
-
 Test the PDLA before you push it to the main repository.  If the
-code is broken for you, then it is most likely broken for others
-and they won't be happy to have their recent PDLA fail to build!
-NOTE: git makes it very easy to maintain a separate branch of
-development.  [ TBD, provide information on how ].
+code is broken for you, then it is most likely broken for others.
+Luckily, the rest of this process will test that automatically to help
+you catch such errors.
 
-Then update the shared repository (at SF.net) with your changes
+Then update the shared repository with your changes:
 
-   git push origin master
+   git push -u origin mybranch-name
 
+This will still leave your changes on a branch, but this is good. Now
+go to the GitHub page, L<https://github.com/PDLPorters/pdla-core>. It will
+ask you whether you want to make a "pull request" - you do. Follow the
+prompts. This will then initiate the automated "continuous integration"
+tests, on Linux and Windows, with various versions of Perl, with various
+compilers. You will also want to get at least one other developer to
+review your changes.
 
+Once this review process is successfully completed, you can merge your
+changes to the master branch!
 
 =head1 PDLA JARGON
 
@@ -677,8 +701,8 @@ multiprocessor machines or clusters)
 PDLA threading of operations on piddles (as mentioned in the
 indexing docs) is the iteration of a basic operation over
 appropriate sub-slices of piddles, e.g. the inner product 
-C<inner $a, $b> of a (3) pdl C<$a> and a (3,5,4) pdl 
-C<$b> results in a (5,4) piddle where each
+C<inner $x, $y> of a (3) pdl C<$x> and a (3,5,4) pdl 
+C<$y> results in a (5,4) piddle where each
 value is the result of an inner product of the (3) pdl with a
 (3) sub-slice of the (3,5,4) piddle.  For details check
 L<PDLA::Indexing|PDLA::Indexing> 
@@ -733,7 +757,7 @@ shell if you are new to PDLA.
 
 
 
-=head2 Q: 6.3    I want to access the third element of a pdl but $a[2] doesn't work ?!  
+=head2 Q: 6.3    I want to access the third element of a pdl but $x[2] doesn't work ?!  
 
 
 See answer to the next question why the normal Perl array syntax doesn't
@@ -778,10 +802,11 @@ very useful !
 
 Most people will try to form new piddles from old piddles
 using some variation over the theme: 
-C<$a =  pdl([$b, 0, 2])> , but this does not work. The way to
-concatenate piddles is to use the function 
-C<cat> (see also C<append> and C<glue>). Similarly you can split piddles
-using the command C<dog> .
+C<$x =  pdl([$y, 0, 2])>.  This does work, but may not work in the way
+that a novice user would expect. (If C<$y> has N dimensions then C<$x>
+will have N+1 dimensions.) Other ways to concatenate piddles are
+to use the functions C<cat>, C<append>, and C<glue>. Similarly you can
+split piddles using the command C<dog>.
 
 
 =head2 Q: 6.6    Sometimes I am getting these strange results when using inplace  operations?   
@@ -834,35 +859,35 @@ C<.=> for certain types of assignments.
 In Perl 5.6.7 and higher this assignment can be made
 using lvalue subroutines:
 
-    pdla> $a = sequence(5); p $a
+    pdla> $x = sequence(5); p $x
     [0 1 2 3 4]
-    pdla> $a->slice('1:2') .= pdl([5,6])
-    pdla> p $a
+    pdla> $x->slice('1:2') .= pdl([5,6])
+    pdla> p $x
     [0 5 6 3 4]
 
 see L<PDLA::Lvalue> for more info.  PDLA also supports a more
 matrix-like slice syntax via the L<PDLA::NiceSlice|PDLA::NiceSlice> module:
 
-    pdla> $a(1:2) .= pdl([5,6])
-    pdla> p $a
+    pdla> $x(1:2) .= pdl([5,6])
+    pdla> p $x
     [0 5 6 3 4]
 
 With versions of Perl prior to 5.6.7 B<or when running under
 the perl debugger> this has to be done using a temporary variable: 
 
-    pdla> $a = sequence(5); p $a
+    pdla> $x = sequence(5); p $x
     [0 1 2 3 4]
-    pdla> $tmp = $a->slice('1:2'); p $tmp;
+    pdla> $tmp = $x->slice('1:2'); p $tmp;
     [1 2]
     pdla> $tmp .= pdl([5, 6]);    # Note .= !!
-    pdla> p $a
+    pdla> p $x
     [0 5 6 3 4]
 
 This can also be made into one expression, which is often
 seen in PDLA code:
 
-    pdla> ($tmp = $a->slice('1:2')) .= pdl([5,6])
-    pdla> p $a
+    pdla> ($tmp = $x->slice('1:2')) .= pdl([5,6])
+    pdla> p $x
     [0 5 6 3 4]
 
 
@@ -876,12 +901,12 @@ has two very useful functions:
 C<any> and C<all> . Use these to test if any or
 all elements in a piddle fulfills some criterion:
 
-    pdla> $a=pdl ( 1, -2, 3);
-    pdla> print '$a has at least one element < 0' if (any $a < 0);
-    $a has at least one element < 0
+    pdla> $x=pdl ( 1, -2, 3);
+    pdla> print '$x has at least one element < 0' if (any $x < 0);
+    $x has at least one element < 0
     
-    pdla> print '$a is not positive definite' unless (all $a > 0);
-    $a is not positive definite
+    pdla> print '$x is not positive definite' unless (all $x > 0);
+    $x is not positive definite
 
 
 =head2 Q: 6.11   Logical operators and piddles -  '||' and '&&' don't work!  
@@ -924,11 +949,11 @@ C<[t]> qualifiers (see next question if you don't know what
 the I<signature> of a PDLA function is).  For example, you 
 can invoke the C<sumover> function as follows:
 
-    sumover $a, $b=null;
+    sumover $x, $y=null;
 
 which is equivalent to
 
-    $b = sumover $a;
+    $y = sumover $x;
 
 If this seems still a bit murky check 
 L<PDLA::Indexing|PDLA::Indexing> and 
@@ -1023,17 +1048,17 @@ section below on L<Extensions of PDLA|"EXTENSIONS OF PDLA">.
 
 Piddles behave like Perl references in many respects. So when you say
 
-    $a = pdl [0,1,2,3];
-    $b = $a;
+    $x = pdl [0,1,2,3];
+    $y = $x;
 
-then both $b and $a point to the same object, e.g. then saying
+then both $y and $x point to the same object, e.g. then saying
 
-    $b++;
+    $y++;
 
 will *not* create a copy of the original piddle but just increment in
 place, of which you can convince yourself by saying
 
-    print $a;
+    print $x;
     [1 2 3 4]
 
 This should not be mistaken for dataflow which connects several

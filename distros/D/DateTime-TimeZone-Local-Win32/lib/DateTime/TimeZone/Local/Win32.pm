@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.03';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.04';
 use 5.006;
 
 use strict;
@@ -158,6 +158,7 @@ sub EnvVars { return 'TZ' }
         'Pakistan Standard Time'          => 'Asia/Karachi',
         'Paraguay Standard Time'          => 'America/Asuncion',
         'Prague Bratislava'               => 'Europe/Prague',
+        'Qyzylorda Standard Time'         => 'Asia/Qyzylorda',
         'Romance'                         => 'Europe/Paris',
         'Romance Standard Time'           => 'Europe/Paris',
         'Russia Time Zone 10'             => 'Asia/Srednekolymsk',
@@ -320,7 +321,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
@@ -398,7 +399,7 @@ Dave Rolsky <autarch@urth.org>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2018 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2019 by David Pinkowitz <dapink@cpan.org>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

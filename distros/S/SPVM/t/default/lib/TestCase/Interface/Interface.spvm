@@ -1,3 +1,0 @@
-package TestCase::Interface::Interface : interface_t {
-  sub foo : int ($self : self, $var1 : int, $var2 : long);
-}

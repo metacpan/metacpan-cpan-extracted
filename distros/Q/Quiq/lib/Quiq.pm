@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 =encoding utf8
 
@@ -177,6 +177,10 @@ L<Quiq::Debug> - Hilfe beim Debuggen von Programmen
 =item *
 
 L<Quiq::DestinationTree> - Verwalte Zielbaum eines Datei-Generators
+
+=item *
+
+L<Quiq::Digest> - Erzeuge Digest
 
 =item *
 
@@ -746,7 +750,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

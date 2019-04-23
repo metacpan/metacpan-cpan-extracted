@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "HTTP::Request" : "0",
-            "JSON" : "0",
-            "LWP::UserAgent" : "0",
-            "URI::Encode" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -35,6 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "URI::Encode" : "0",
             "perl" : "5.014000"
          }
       },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/xantronix/openstack-client"
       }
    },
-   "version" : "1.0006",
+   "version" : "1.0007",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

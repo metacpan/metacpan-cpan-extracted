@@ -144,7 +144,7 @@ Felipe Gasper (FELIPE)
 
 # COPYRIGHT
 
-Copyright 2017 by [Gasper Software Consulting](http://gaspersoftware.com)
+Copyright 2017-2019 by [Gasper Software Consulting](http://gaspersoftware.com)
 
 # LICENSE
 

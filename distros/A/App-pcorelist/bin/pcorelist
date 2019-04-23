@@ -1,0 +1,16 @@
+#!perl
+# ABSTRACT: Wrapper around corelist with subcommands and tab completion
+use strict;
+use warnings;
+our $VERSION = '0.001'; # VERSION
+
+use App::Spec;
+use File::Share qw/ dist_file /;
+
+use App::pcorelist;
+
+my $specfile = dist_file("App-pcorelist", "pcorelist.yaml");
+my $spec = App::Spec->read($specfile);
+my $run = $spec->runner;
+$run->run;
+

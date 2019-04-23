@@ -196,7 +196,7 @@ sub quote_for_re {
     return quotemeta($text);
   } else {
     # We quote just the '{' or '}' characters.
-    return $text =~ s/({|})/\\$1/gr;
+    return $text =~ s/(\{|\})/\\$1/gr;
   }
 }
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 use Cwd;
 use Term::ReadLine;

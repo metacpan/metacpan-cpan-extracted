@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/trapd00r/Term-ExtendedColor/issues
   homepage: http://japh.se/
   repository: https://github.com/trapd00r/Term-ExtendedColor.git
-version: '0.503'
+version: '0.504'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

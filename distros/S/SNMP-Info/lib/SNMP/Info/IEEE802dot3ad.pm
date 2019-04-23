@@ -41,9 +41,9 @@ use SNMP::Info::Aggregate;
   agg_ports_lag
 /;
 
-use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
+our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
   %SNMP::Info::Aggregate::MIBS,

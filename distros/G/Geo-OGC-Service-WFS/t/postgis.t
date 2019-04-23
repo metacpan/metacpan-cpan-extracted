@@ -29,16 +29,24 @@ sub setup_db {
     $dbh = DBI->connect($connect, $user, $pass, \%attr);
     # check for postgis before creating it
     ($e) = $dbh->selectrow_array("SELECT extname FROM pg_extension WHERE extname='postgis'");
-    $dbh->do("CREATE EXTENSION postgis") unless $e;
-    $dbh->do("CREATE TABLE test (id serial primary key, i int, d double precision, s text, p text, geom geometry)");
-    $dbh->do("INSERT INTO test (i, d, s, p, geom) VALUES (1, 2.1, 'hello', 'pass', st_geometryfromtext('POINT (1 2)'))");
+    unless ($e) {
+        $dbh->do("CREATE EXTENSION postgis") or die $dbh->errstr;
+    }
+    for my $sql (
+        "CREATE TABLE test (id serial primary key, i int, d double precision, s text, p text)",
+        "SELECT AddGeometryColumn ('public','test','geom',4326,'POINT',2)",
+        "INSERT INTO test (i, d, s, p, geom) VALUES (1, 2.1, 'hello', 'pass', ST_GeomFromText('POINT (1 2)',4326))"
+        ) 
+    {
+        $dbh->do($sql) or die $dbh->errstr;
+    }
 }
 
 sub cleanup {
     my $connect = "dbi:Pg:dbname=postgres";
     my %attr = (PrintError => 0, RaiseError => 1, AutoCommit => 1);
     $dbh = DBI->connect($connect, $user, $pass, \%attr);
-    $dbh->do("DROP DATABASE IF EXISTS $test_db");
+    $dbh->do("DROP DATABASE IF EXISTS $test_db") or die $dbh->errstr;
 }
 
 eval {
@@ -63,9 +71,9 @@ SKIP: {
             {
                 "prefix" => "local",
                 "gml:id" => "id",
-                "DataSource" => "Pg:dbname=$test_db host=localhost user=$user password=$pass",
+                "DataSource" => "PG:dbname=$test_db host=localhost user=$user password=$pass",
                 "test_auth.geom" => {
-                    "Transaction" => "Query,Insert,Update,Delete",
+                    "Operations" => "Query,Insert,Update,Delete",
                     "pseudo_credentials" => "usern,pass"
                 }
             }
@@ -145,7 +153,7 @@ SKIP: {
         my $req = HTTP::Request->new(POST => "/");
         $req->content_type('text/xml');
         my $post = Geo::OGC::Service::XMLWriter::Caching->new;
-        my $point = [Point => [pos => "3 4"]];
+        my $point = [Point => {srsName => 'http://www.opengis.net/gml/srs/epsg.xml#4326'}, [pos => "3 4"]];
         $post->element(
             Transaction => {service=>"WFS"}, 
             [Insert => [ ['local.test.geom' => [ [i => 2], [d => 4.5], [s => 'foo'], [geometryProperty => $point] ]] ]]
@@ -171,7 +179,7 @@ SKIP: {
         my $req = HTTP::Request->new(POST => "/");
         $req->content_type('text/xml');
         my $post = Geo::OGC::Service::XMLWriter::Caching->new;
-        my $point = [Point => [pos => "5 6"]];
+        my $point = [Point => {srsName => 'EPSG:4326'}, [pos => "5 6"]];
         $post->element(
             Transaction => {service=>"WFS"}, 
             [Update => {typeName => 'local.test.geom'}, [ 
@@ -224,11 +232,17 @@ SKIP: {
     };
 
     # test pseudo credentials
-    
-    $dbh->do("create table test_auth (id serial primary key, usern text, pass text, geom geometry)") or die $dbh->errstr;
-    $dbh->do("insert into test_auth (usern, pass, geom) values ('me', 'pass', st_geometryfromtext('POINT (1 2)'))") or die $dbh->errstr;
-    $dbh->do("insert into test_auth (usern, pass, geom) values ('me', 'pass', st_geometryfromtext('POINT (3 4)'))") or die $dbh->errstr;
-    $dbh->do("insert into test_auth (usern, pass, geom) values ('her', 'pass', st_geometryfromtext('POINT (3 4)'))") or die $dbh->errstr;
+
+    for my $sql (
+        "create table test_auth (id serial primary key, usern text, pass text)",
+        "SELECT AddGeometryColumn ('public','test_auth','geom',4326,'POINT',2)",
+        "insert into test_auth (usern, pass, geom) values ('me', 'pass', ST_GeomFromText('POINT (1 2)', 4326))",
+        "insert into test_auth (usern, pass, geom) values ('me', 'pass', ST_GeomFromText('POINT (3 4)', 4326))",
+        "insert into test_auth (usern, pass, geom) values ('her', 'pass', ST_GeomFromText('POINT (3 4)', 4326))"
+        ) 
+    {
+        $dbh->do($sql) or die $dbh->errstr;
+    }
 
     test_psgi $app, sub {
         my $cb = shift;
@@ -237,7 +251,7 @@ SKIP: {
         my $post = <<'end'; # almost actual XML sent by OpenLayers
 <?xml version="1.0"?>
 <wfs:GetFeature xmlns:wfs="http://www.opengis.net/wfs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="WFS" version="1.1.0" outputFormat="GML2" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd">
-  <wfs:Query typeName="feature:local.test_auth.geom">
+  <wfs:Query typeName="feature:public.test_auth.geom">
     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
       <ogc:And>
         <ogc:And>
@@ -268,6 +282,7 @@ end
 
         $req->content($post);
         my $res = $cb->($req);
+        #say STDERR $res->content;
         my $parser = XML::LibXML->new(no_blanks => 1);
         my $dom;
         eval {

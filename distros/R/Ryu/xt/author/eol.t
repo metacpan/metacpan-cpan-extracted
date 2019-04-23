@@ -27,6 +27,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/observable.t',
     't/ryu.t',
+    't/source/batch.t',
     't/source/buffer.t',
     't/source/chained.t',
     't/source/chomp.t',

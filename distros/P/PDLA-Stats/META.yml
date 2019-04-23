@@ -4,14 +4,11 @@ author:
   - 'Maggie J. Xiong  <maggiexyz users.sourceforge.net>'
 build_requires:
   PDLA::Core: '2.008'
-  PDLA::Graphics::PGPLOT: '0'
-  PDLA::Slatec: '0'
-  PGPLOT: '0'
   Test::More: '0'
 configure_requires:
   PDLA::Core: '2.008'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0529, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,12 +18,12 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  PDLA::Core: '2.008'
+recommends:
   PDLA::Graphics::PGPLOT: '0'
   PDLA::Slatec: '0'
-  PGPLOT: '0'
+requires:
+  PDLA::Core: '2.008'
 resources:
   repository: git://github.com/PDLPorters/pdla-stats
-version: '0.72'
-
+version: '0.76'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

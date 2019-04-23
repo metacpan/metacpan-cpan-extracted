@@ -1,8 +1,6 @@
 COPYING
 Changes
-Changes_CVS
 DEPENDENCIES
-DEVELOPMENT
 Demos/BAD2_demo.pm.PL
 Demos/BAD_demo.pm.PL
 Demos/Cartography_demo.pm
@@ -124,6 +122,7 @@ Graphics/PGPLOT/PGPLOTOptions.pm
 Graphics/PGPLOT/Window/Makefile.PL
 Graphics/PGPLOT/Window/Window.pm
 Graphics/PGPLOT/Window/Window.xs
+Graphics/PGPLOT/Window/ppport.h
 Graphics/PGPLOT/Window/typemap
 Graphics/State.pm
 Graphics/TriD/Makefile.PL
@@ -476,8 +475,6 @@ debian/rules
 debian/source/format
 debian/write_config_debian.pl
 inc/Alien/Proj4.pm
-inc/Carp.pm
-inc/Carp/Heavy.pm
 lib/PDLA/Rest.pm
 m51.fits
 macosx/README
@@ -491,6 +488,7 @@ t/fastraw.t
 t/fft.t
 t/flexraw.t
 t/flexraw_fortran.t
+t/func.t
 t/gauss.t
 t/gd_oo_tests.t
 t/gd_tests.t

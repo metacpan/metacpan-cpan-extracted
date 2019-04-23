@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Transport::Wrapper::IPC_Run;
-{ $Net::CLI::Interact::Transport::Wrapper::IPC_Run::VERSION = '2.300002' }
+{ $Net::CLI::Interact::Transport::Wrapper::IPC_Run::VERSION = '2.300003' }
 
 use Moo;
 use Sub::Quote;

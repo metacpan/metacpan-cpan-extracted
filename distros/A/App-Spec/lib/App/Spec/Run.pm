@@ -3,10 +3,8 @@ use strict;
 use warnings;
 package App::Spec::Run;
 use 5.010;
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
-use List::Util qw/ any /;
-use Data::Dumper;
 use App::Spec::Run::Validator;
 use App::Spec::Run::Response;
 use Getopt::Long qw/ :config pass_through bundling /;
@@ -17,23 +15,50 @@ has spec => ( is => 'ro' );
 has options => ( is => 'rw' );
 has parameters => ( is => 'rw', default => sub { +{} } );
 has commands => ( is => 'rw' );
+has argv => ( is => 'rw' );
+has argv_orig => ( is => 'rw' );
 #has runmode => ( is => 'rw', default => 'normal' );
 has validation_errors => ( is => 'rw' );
 has op => ( is => 'rw' );
 has cmd => ( is => 'rw' );
-has response => ( is => 'rw' );
+has response => ( is => 'rw', default => sub { App::Spec::Run::Response->new } );
+has subscribers => ( is => 'rw', default => sub { +{} } );
+
+my %EVENTS = (
+    print_output => 1,
+    global_options => 1,
+);
 
 sub process {
     my ($self) = @_;
 
-    my $res = $self->response;
-    unless ($res) {
-        $res = App::Spec::Run::Response->new;
-        $self->response($res);
+    my $plugins = $self->spec->plugins || [];
+    for my $plugin (@$plugins) {
+        $plugin->init_run($self);
+    }
+    my @callbacks;
+    my $subscriber_events = $self->subscribers;
+    for my $key (qw/ global_options print_output /) {
+        my $subscribers = $subscriber_events->{ $key };
+        for my $sub (@$subscribers) {
+            my $plugin = $sub->{plugin};
+            my $method = $sub->{method};
+            my $callback = sub {
+                $plugin->$method( run => $self, @_);
+            };
+            push @callbacks, $callback;
+        }
+        $self->response->add_callbacks($key => \@callbacks);
+    }
+
+    my $argv = $self->argv;
+    unless ($argv) {
+        $argv = \@ARGV;
+        $self->argv($argv);
+        $self->argv_orig([ @$argv ]);
     }
 
     my $completion_parameter = $ENV{PERL5_APPSPECRUN_COMPLETION_PARAMETER};
-    $self->check_help;
 
     my %option_specs;
     my %param_specs;
@@ -52,10 +77,10 @@ sub process {
             param_specs => \%param_specs,
         });
         my %errs;
-        my ($ok) = $opt->process( \%errs, type => "parameters", app => $self );
-        $ok &&= $opt->process( \%errs, type => "options", app => $self );
-        $self->validation_errors(\%errs) if not $ok;
+        my $ok = $opt->process( $self, \%errs );
         unless ($ok) {
+            $self->validation_errors(\%errs);
+            # if we are in completion mode, some errors might be ok
             if (not $completion_parameter) {
                 $self->error_output;
             }
@@ -84,6 +109,7 @@ sub run {
 
     $self->process;
 
+#    $self->event_processed;
     $self->finish;
 
 }
@@ -95,16 +121,14 @@ sub run_op {
 
 sub out {
     my ($self, $text) = @_;
-    my $res = $self->response;
-    $text .= "\n" unless $text =~ m/\n\z/;
-    $res->add_output($text);
+    $text .= "\n" if (not ref $text and $text !~ m/\n\z/);
+    $self->response->add_output($text);
 }
 
 sub err {
     my ($self, $text) = @_;
-    my $res = $self->response;
-    $text .= "\n" unless $text =~ m/\n\z/;
-    $res->add_error($text);
+    $text .= "\n" if (not ref $text and $text !~ m/\n\z/);
+    $self->response->add_error($text);
 }
 
 sub halt {
@@ -151,6 +175,12 @@ sub completion_output {
         my $params = $self->parameters;
         my $value = $params->{ $completion_parameter };
         $value = [$value] unless is_arrayref $value;
+        # cmd param1 param2<TAB> results in
+        # @ARGV = ["param1", "param2"]
+        # cmd param1 param2 <TAB> results in
+        # @ARGV = ["param1", "param2", ""]
+        # so we know that there is a new value to be completed
+        my $last = pop @$value;
         @seen{ @$value } = (1) x @$value;
     }
     for my $item (@$result) {
@@ -184,6 +214,7 @@ sub error_output {
             }
         }
         else {
+            require Data::Dumper;
             my $err = Data::Dumper->Dump([$errs], ['errs']);
             push @error_output, $err;
         }
@@ -241,11 +272,11 @@ sub process_parameters {
         my $required = $p->required;
         my $value;
         if ($multiple) {
-            $value = [@ARGV];
-            @ARGV = ();
+            $value = [@{ $self->argv }];
+            @{ $self->argv } = ();
         }
         else {
-            $value = shift @ARGV;
+            $value = shift @{ $self->argv };
         }
         $parameters->{ $name } = $value;
         $param_specs->{ $name } = $p;
@@ -255,6 +286,7 @@ sub process_parameters {
 sub process_input {
     my ($self, %args) = @_;
     my %options;
+    $self->options(\%options);
     my @cmds;
     my $spec = $self->spec;
     my $option_specs = $args{option_specs};
@@ -263,6 +295,8 @@ sub process_input {
     my $global_parameters = $spec->parameters;
     my @getopt = $spec->make_getopt($global_options, \%options, $option_specs);
     GetOptions(@getopt);
+    $self->event_globaloptions;
+    my $op = $self->op;
 
     $self->process_parameters(
         parameter_list => $global_parameters,
@@ -272,12 +306,11 @@ sub process_input {
 
 
     my $commands = $spec->subcommands;
-    my $op;
+    my $opclass = $self->spec->class;
     my $cmd_spec;
     my $subcommand_required = 1;
     while (keys %$commands) {
-        my @k = keys %$commands;
-        my $cmd = shift @ARGV;
+        my $cmd = shift @{ $self->argv };
         if (not defined $cmd) {
             if (not $op or $subcommand_required) {
                 $self->err($spec->usage(
@@ -310,7 +343,8 @@ sub process_input {
         GetOptions(@getopt);
         push @cmds, $cmd;
         $commands = $cmd_spec->subcommands || {};
-        $op = $cmd_spec->op if $cmd_spec->op;
+        $op = '::' . $cmd_spec->op if $cmd_spec->op;
+        $opclass = $cmd_spec->class if $cmd_spec->class;
 
         $self->process_parameters(
             parameter_list => $cmd_spec->parameters,
@@ -330,11 +364,14 @@ sub process_input {
                 $self->halt(1);
             }
             else {
-                $op = "execute";
+                $op = "::execute";
             }
         }
         $self->commands(\@cmds);
         $self->options(\%options);
+        if ($op =~ m/^::/) {
+            $op = $opclass . $op;
+        }
         $self->op($op);
         return $op;
     }
@@ -356,69 +393,38 @@ sub colored {
     return $msg;
 }
 
-sub check_help {
+sub subscribe {
+    my ($self, %args) = @_;
+
+    for my $event (sort keys %args) {
+        next unless exists $EVENTS{ $event };
+        my $info = $args{ $event };
+        push @{ $self->subscribers->{ $event } }, $info;
+    }
+
+}
+
+sub event_globaloptions {
     my ($self) = @_;
-    GetOptions(
-        "help|h" => \my $help,
-    );
 
-    my $op;
-    if ($self->spec->has_subcommands) {
-        if ($help and (not @ARGV or $ARGV[0] ne "help")) {
-            # call subcommand 'help'
-            unshift @ARGV, "help";
-        }
+    my $subscribers = $self->subscribers->{global_options};
+    for my $sub (@$subscribers) {
+        my $plugin = $sub->{plugin};
+        my $method = $sub->{method};
+        $plugin->$method( run => $self);
     }
-    else {
-        if ($help) {
-            $op = "cmd_help";
-            unshift @ARGV, "--help";
-        }
-    }
-
-    $self->op($op);
 }
 
-
-sub cmd_help {
-    my ($run) = @_;
-    my $spec = $run->spec;
-    my $cmds = $run->commands;
-    shift @$cmds;
-    my $help = $spec->usage(
-        commands => $cmds,
-        colored => $run->colorize_code,
-    );
-    $run->out($help);
-}
-
-sub cmd_self_completion {
-    my ($run) = @_;
-    my $options = $run->options;
-    my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
-    unless ($shell) {
-        my $ppid = getppid();
-        chomp($shell = `ps --no-headers -o cmd $ppid`);
-        $shell =~ s/.*\W(\w*sh).*$/$1/; #handling case of '-zsh' or '/bin/bash'
-                                        #or bash -i -rs
-    }
-    unless (any { $_ eq $shell } qw/ bash zsh / ) {
-        die "Specify which shell, '$shell' not supported";
-    }
-    my $spec = $run->spec;
-    my $completion = $spec->generate_completion(
-        shell => $shell,
-    );
-    $run->out($completion);
-}
-
-sub cmd_self_pod {
-    my ($run) = @_;
-    my $spec = $run->spec;
-    my $pod = $spec->generate_pod(
-    );
-    $run->out($pod);
-}
+#sub event_processed {
+#    my ($self) = @_;
+#    my $plugins = $self->spec->plugins_by_type->{GlobalOptions};
+#    for my $plugin (@$plugins) {
+#        next unless $plugin->can("event_processed");
+#        $plugin->event_processed(
+#            run => $self,
+#        );
+#    }
+#}
 
 1;
 
@@ -432,7 +438,7 @@ App::Spec::Run - App::Spec framework to run your app
 =head1 DESCRIPTION
 
 App::Spec::Run is the framework which runs your app defined by the spec.
-Your app class should inherit from App::Spec::Run::Cmd.
+Your app class should inherit from L<App::Spec::Run::Cmd>.
 
 =head1 SYNOPSIS
 
@@ -446,11 +452,35 @@ Your app class should inherit from App::Spec::Run::Cmd.
 
 =over 4
 
+=item Constructor
+
+You can create the object yourself like this:
+
+    my $run = App::Spec::Run->new(
+        spec => $appspec,
+        cmd => App::YourApp->new,
+    );
+
+Or you use the runner method of L<App::Spec>, which will create it for you:
+
+    my $run = $appspec->runner(...);
+
+Both methods take optional arguments:
+
+    my $run = App::Spec::Run->new(
+        spec => $appspec,
+        cmd => App::YourApp->new,
+
+        # Custom array instead of the default ARGV.
+        # The contents of this array will be modified
+        argv => \@my_arguments,
+    );
+
 =item run
 
     $run->run;
 
-Actually runs your app
+Actually runs your app. Calls C<process> and C<finish>.
 
 =item process
 
@@ -465,7 +495,14 @@ Does not print the output and does not exit.
 
     $run->out("Hello world!");
 
-Appends to response output. Adds a newline if not present
+Appends to response output. Adds a newline if not present. You can also
+pass a data structure:
+
+    $run->out($hashref);
+
+This will be formatted with L<Data::Dumper>.
+
+See also L<App::Spec::Plugin::Format>.
 
 =item err
 
@@ -554,9 +591,19 @@ Outputs any errors.
 
 Calls C<halt>
 
-=item check_help, cmd_help, cmd_self_completion, cmd_self_pod
+=item event_globaloptions
 
-Will probably be removed as soon as help is turned into a plugin
+Calls any plugin that needs to know
+
+=item subscribe
+
+A plugin can subscribe for an event:
+
+    $run->subscribe(
+        print_output => {
+            plugin => $self,
+            method => "print_output",
+        },
 
 =back
 
@@ -585,6 +632,17 @@ A hashref with the given parameters
 
 An arrayref containing all subcommands from the commandline
 
+=item argv_orig
+
+This contains the original contents of C<argv> before processing
+
+=item argv
+
+This is a reference to the commandline arguments array C<@ARGV>, or the
+array reference you specified otherwise. When calling your command method,
+it will contain the rest of the arguments which weren't processed as
+any subcommand, option or parameter.
+
 =item validation_errors
 
 Contains errors from option/parameter validation
@@ -603,6 +661,17 @@ This is an instance of your app class
 This contains the response of your command (exit code, output, ...)
 
 See L<App::Spec::Run::Response>
+
+=item subscribers
+
+Contains a hashref
+
+    {
+        print_output => {
+            module => $plugin,
+            method => 'print_output',
+        },
+    }
 
 =back
 

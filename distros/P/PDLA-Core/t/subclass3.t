@@ -153,11 +153,11 @@ ok($main::OVERRIDEWORKED == 1, "over-ride of inner");
 ### Test over-ride of which, one2nd
 $main::OVERRIDEWORKED = 0;
 # which ND test
-my $a= PDLA::Derived->sequence(10,10,3,4);     
+my $a1= PDLA::Derived->sequence(10,10,3,4);     
 # $PDLA::whichND_no_warning = 1;
-# my ($x, $y, $z, $w)=whichND($a == 203);
+# my ($x, $y, $z, $w)=whichND($a1 == 203);
 # ok($main::OVERRIDEWORKED == 2, "whichND test");
-my ($x, $y, $z, $w) = whichND($a == 203)->mv(0,-1)->dog;  # quiet deprecation warning
+my ($x, $y, $z, $w) = whichND($a1 == 203)->mv(0,-1)->dog;  # quiet deprecation warning
 ok($main::OVERRIDEWORKED == 1, "whichND worked");         # whitebox test condition, uugh!
 
 # Check to see if the clip functions return a derived object:

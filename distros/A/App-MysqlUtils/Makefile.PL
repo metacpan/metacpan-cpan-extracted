@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::MysqlUtils",
   "PREREQ_PM" => {
-    "App::CSVUtils" => 0,
+    "App::CSVUtils" => "0.019",
     "Complete::Util" => "0.57",
     "Config::IOD::Reader" => "0.341",
     "DBI" => 0,
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::CSVUtils" => 0,
+  "App::CSVUtils" => "0.019",
   "Complete::Util" => "0.57",
   "Config::IOD::Reader" => "0.341",
   "DBI" => 0,

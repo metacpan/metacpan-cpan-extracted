@@ -143,11 +143,11 @@ $doc
 
 =for example
 
-   \$c = $name \$a, \$b, 0;     # explicit call with trailing 0
-   \$c = \$a $op \$b;           # overloaded call
-   \$a->inplace->$name(\$b,0);  # modify \$a inplace
+   \$c = $name \$x, \$y, 0;     # explicit call with trailing 0
+   \$c = \$x $op \$y;           # overloaded call
+   \$x->inplace->$name(\$y,0);  # modify \$x inplace
 
-It can be made to work inplace with the C<\$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<$optxt> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -229,11 +229,11 @@ $doc
 
 =for example
 
-   \$c = \$a->$name(\$b,0); # explicit function call
+   \$c = \$x->$name(\$y,0); # explicit function call
    $ovcall
-   \$a->inplace->$name(\$b,0);     # modify \$a inplace
+   \$x->inplace->$name(\$y,0);     # modify \$x inplace
 
-It can be made to work inplace with the C<\$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<$funcovp> function.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -284,10 +284,10 @@ $doc
 
 =for example
 
-   \$b = $funcov \$a;
-   \$a->inplace->$name;  # modify \$a inplace
+   \$y = $funcov \$x;
+   \$x->inplace->$name;  # modify \$x inplace
 
-It can be made to work inplace with the C<\$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<$funcovp> operator/function.
 
 =cut
@@ -341,9 +341,12 @@ biop('ne','!=',1,'binary I<not equal to> operation (C<!=>)', Comparison => 1 );
 my $T = [B,U,S,L,N,Q]; # the sensible types here
 biop('shiftleft','<<',1,'leftshift C<$a> by C<$b>',GenericTypes => $T);
 biop('shiftright','>>',1,'rightshift C<$a> by C<$b>',GenericTypes => $T);
-biop('or2','|',1,'binary I<or> of two piddles',GenericTypes => $T);
-biop('and2','&',1,'binary I<and> of two piddles',GenericTypes => $T);
-biop('xor','^',1,'binary I<exclusive or> of two piddles',GenericTypes => $T);
+biop('or2','|',1,'binary I<or> of two piddles',GenericTypes => $T,
+      Bitwise => 1);
+biop('and2','&',1,'binary I<and> of two piddles',GenericTypes => $T,
+      Bitwise => 1);
+biop('xor','^',1,'binary I<exclusive or> of two piddles',GenericTypes => $T,
+      Bitwise => 1);
 
 # really an ufunc
 ufunc('bitnot','~','unary bit negation',GenericTypes => $T);
@@ -404,14 +407,26 @@ sub PDLA::log10 {
 #
 pp_def(
        'assgn',
-#       HandleBad => 1,
+       HandleBad => 1,
        Pars => 'a(); [o]b();',
        Code =>
        '$b() = $a();',
-#       BadCode =>
-#       'if ( $ISBAD(a()) ) { $SETBAD(b()); } else { $b() = $a(); }',
+       BadCode =>
+       'if ( $ISBAD(a()) ) { $SETBAD(b()); } else { $b() = $a(); }',
        Doc =>
 'Plain numerical assignment. This is used to implement the ".=" operator',
+		BadDoc =>
+'If C<a> is a child piddle (e.g., the result of a slice) and bad values are generated in C<b>,
+the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
+The following idiom ensures that the badflag is propagated back to the parent of C<a>:
+
+ $pdl->slice(":,(1)") .= PDLA::Bad_aware_func();
+ $pdl->badflag(1);
+ $pdl->check_badflag();
+
+This is unnecessary if $pdl->badflag is known to be 1 before the slice is performed.
+
+See http://pdl.perl.org/PDLAdocs/BadValues.html#dataflow_of_the_badflag for details.'
 ); # pp_def assgn
 
 pp_def('ipow',
@@ -422,11 +437,11 @@ raise piddle C<\$a> to integer power C<\$b>
 
 =for example
 
-   \$c = \$a->ipow(\$b,0);     # explicit function call
-   \$c = ipow \$a, \$b;
-   \$a->inplace->ipow(\$b,0);  # modify \$a inplace
+   \$c = \$x->ipow(\$y,0);     # explicit function call
+   \$c = ipow \$x, \$y;
+   \$x->inplace->ipow(\$y,0);  # modify \$x inplace
 
-It can be made to work inplace with the C<\$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
 This restriction is expected to go away in future releases.

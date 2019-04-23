@@ -27,7 +27,7 @@ my $build = $class->new(
 
     module_name        => 'Bio::DB::HTS',
     dist_version_from  => 'lib/Bio/DB/HTS.pm',
-    dist_author        => 'Rishi Nag',
+    dist_author        => 'Alessandro Vullo',
     dist_abstract      => 'Perl interface to HTS library for DNA sequencing',
     license            => 'Apache_2_0',
 
@@ -41,13 +41,20 @@ my $build = $class->new(
         '-Wno-unused-result',  ],
 
     build_requires => { 'ExtUtils::CBuilder' => 0, },
-    configure_requires => { 'Module::Build' => 0.42, },
-    requires => { 'perl' => '5.008', 'Bio::Root::Version' => '1.006001', },
+    configure_requires => { 'Module::Build' => 0.38, },
+    requires => { 'perl' => '5.008', 'Bio::SeqFeature::Lite' => 0 },
     meta_merge => {
         'resources' => {
             'repository' => 'https://github.com/Ensembl/Bio-DB-HTS',
             },
         },
+
+    add_to_cleanup => [
+        't/data/*ai',
+        't/data/*.gzi',
+        't/data/write_test_07.cram',
+        't/data/write_test_08.bam',
+        ],
 );
 
 $build->find_hts;

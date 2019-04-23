@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.66
+    SNMP::Info - Version 3.67
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -275,6 +275,11 @@ SUBCLASSES
 
         See documentation in SNMP::Info::CiscoVTP for details.
 
+    SNMP::Info::DocsisHE
+        SNMP Interface for DOCSIS CMTS
+
+        See documentation in SNMP::Info::DocsisHE for details.
+
     SNMP::Info::EDP
         Extreme Discovery Protocol. EXTREME-EDP-MIB
 
@@ -296,13 +301,6 @@ SUBCLASSES
 
         See documentation in SNMP::Info::FDP for details.
 
-    SNMP::Info::IPv6
-        SNMP Interface for obtaining configured IPv6 addresses and mapping
-        IPv6 addresses to MAC addresses and interfaces, using information
-        from IP-MIB, IPV6-MIB and/or CISCO-IETF-IP-MIB.
-
-        See documentation in SNMP::Info::IPv6 for details.
-
     SNMP::Info::IEEE802dot11
         IEEE802dot11-MIB. A collection of OIDs providing information about
         standards based 802.11 wireless devices.
@@ -313,6 +311,13 @@ SUBCLASSES
         SNMP Interface to IEEE Aggregated Links. IEEE8023-LAG-MIB
 
         See documentation in SNMP::Info::IEEE802dot3ad for details.
+
+    SNMP::Info::IPv6
+        SNMP Interface for obtaining configured IPv6 addresses and mapping
+        IPv6 addresses to MAC addresses and interfaces, using information
+        from IP-MIB, IPV6-MIB and/or CISCO-IETF-IP-MIB.
+
+        See documentation in SNMP::Info::IPv6 for details.
 
     SNMP::Info::LLDP
         LLDP-MIB, LLDP-EXT-DOT1-MIB, and LLDP-EXT-DOT3-MIB. Link Layer
@@ -755,6 +760,11 @@ SUBCLASSES
             Subclass for Lantronix devices.
 
             See documentation in SNMP::Info::Layer3::Lantronix for details.
+
+        SNMP::Info::Layer3::Lenovo
+            Subclass for Lenovo switches running CNOS.
+
+            See documentation in SNMP::Info::Layer3::Lenovo for details.
 
         SNMP::Info::Layer3::Microsoft
             Subclass for Generic Microsoft Routers running Microsoft Windows
@@ -1800,7 +1810,7 @@ EXTENDING SNMP::INFO
                                            SNMP::Info::CiscoVTP Exporter/;
      @SNMP::Info::Layer2::Sample::EXPORT_OK = qw//;
 
-     use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG/;
+     our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG);
 
      %MIBS    = (%SNMP::Info::Layer2::MIBS,
                  %SNMP::Info::CiscoVTP::MIBS,

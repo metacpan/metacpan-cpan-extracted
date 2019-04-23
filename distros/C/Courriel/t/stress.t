@@ -9,7 +9,7 @@ use Test::Requires (
     'Path::Class' => '0',
 );
 
-use File::Slurp::Tiny qw( read_file );
+use File::Slurper qw( read_binary );
 use Path::Class qw( dir );
 
 use Courriel;
@@ -19,7 +19,7 @@ my $dir = dir(qw( t data stress-test ));
 while ( my $file = $dir->next ) {
     next if $file->is_dir;
 
-    my $text = read_file( $file->stringify );
+    my $text = read_binary( $file->stringify );
 
     is(
         exception { Courriel->parse( text => $text ) },

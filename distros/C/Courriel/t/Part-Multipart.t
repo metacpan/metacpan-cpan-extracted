@@ -28,7 +28,7 @@ my $crlf = "\x0d\x0a";
 
 {
     my $headers = Courriel::Headers->new( headers => [] );
-    my $ct = Courriel::Header::ContentType->new(
+    my $ct      = Courriel::Header::ContentType->new(
         mime_type => 'multipart/mixed' );
 
     my $part = Courriel::Part::Multipart->new(

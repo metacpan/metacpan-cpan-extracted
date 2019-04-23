@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.033'; # VERSION
 
 use 5.010;
 use strict;
@@ -111,7 +111,7 @@ insert-ini-key - Insert a key to INI configuration file
 
 =head1 VERSION
 
-This document describes version 0.032 of insert-ini-key (from Perl distribution App-INIUtils), released on 2019-01-17.
+This document describes version 0.033 of insert-ini-key (from Perl distribution App-INIUtils), released on 2019-04-23.
 
 =head1 SYNOPSIS
 

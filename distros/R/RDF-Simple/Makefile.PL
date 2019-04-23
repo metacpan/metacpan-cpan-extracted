@@ -2,11 +2,11 @@
 use warnings;
 use strict;
 
-my $VERSION = 1.28;
+my $VERSION = 1.29;
 
 use inc::Module::Install;
 
-version(0.417);
+version(0.419);
 all_from('lib/RDF/Simple.pm');
 author('Martin Thurn mthurn@cpan.org');
 perl_version(5.005);

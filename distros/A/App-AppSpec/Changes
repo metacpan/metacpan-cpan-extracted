@@ -1,4 +1,15 @@
 Revision history for Perl module App::AppSpec
 
+0.003 2019-04-22 13:32:14+02:00
+
+    - Fix typo (PR#1 @errietta)
+    - Change default command name in module sample to execute (PR#3 @jjatria)
+    - Introduce short format for options/parameters
+    - use YAML::PP
+    - Load spec file instead of passing to JSON::Validator
+
+0.002 Thu Oct 13 21:23:38 CEST 2016
+    - Adapt to App::Spec 0.003 changes
+
 0.001_001 Sun Sep  4 22:12:24 CEST 2016
     - developer version

@@ -297,11 +297,19 @@ TODO: {
 ########################
 
 $expected = pdl(1)->exp;
+# using approx() here since PDLA only has support for double data
+# so there will be differences in the least significant places for
+# perls compiled with uselongdouble
+#
 $got = pdl q[e];
-is($got, $expected, 'q[e] returns exp(1)')
+ok(approx($got, $expected, 1e-12), 'q[e] returns exp(1)')
 	or diag("Got $got");
+# using approx() here since PDLA only has support for double data
+# so there will be differences in the least significant places for
+# perls compiled with uselongdouble
+#
 $got = pdl q[E];
-is($got, $expected, 'q[E] returns exp(1)')
+ok(approx($got, $expected, 1e-12), 'q[E] returns exp(1)')
 	or diag("Got $got");
 $expected = pdl(1, exp(1));
 $got = pdl q[1 e];
@@ -442,9 +450,9 @@ foreach my $append (qw(2 e l)) {
 }
 
 # Basic 2D array
-# pdla> p $a = pdl q[ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
-# pdla> p $a = pdl q[ 1 2 3 ; 4 5 6 ]
-# pdla> p $a = pdl '[ [ 1, 2, 3 ], [ 4, 5, 6 ] ]';
+# pdla> p $x = pdl q[ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+# pdla> p $x = pdl q[ 1 2 3 ; 4 5 6 ]
+# pdla> p $x = pdl '[ [ 1, 2, 3 ], [ 4, 5, 6 ] ]';
 #
 # [
 #  [1 2 3]
@@ -452,9 +460,9 @@ foreach my $append (qw(2 e l)) {
 # ]
 
 # Basic 1D array
-# pdla> p $b = pdl [ 1, 2, 3, 4, 5, 6 ]
-# pdla> p $b = pdl q[ 1 2 3 4 5 6 ]
-# pdla> p $b = pdl q[1,2,3,4,5,6]
+# pdla> p $y = pdl [ 1, 2, 3, 4, 5, 6 ]
+# pdla> p $y = pdl q[ 1 2 3 4 5 6 ]
+# pdla> p $y = pdl q[1,2,3,4,5,6]
 # [1 2 3 4 5 6]
 
 # 1D array with signs

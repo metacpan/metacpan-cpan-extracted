@@ -1,4 +1,7 @@
-Revision history for Perl MySQL::Admin 1.12
+Revision history for Perl MySQL::Admin 1.16
+1.16
+    Discalimer foir DSVGO added.
+    A few fixes.
 1.12
    a few small fixes.
    Default date (0000-00-00) in MySQL will not work longer.

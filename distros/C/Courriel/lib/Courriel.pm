@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Courriel::Headers;
 use Courriel::Helpers qw( unique_boundary );
@@ -423,7 +423,7 @@ sub _parse_headers {
 
     if ( ${$text} =~ /^(.+?)($Courriel::Helpers::LINE_SEP_RE)\g{2}/s ) {
         $header_text = $1 . $2;
-        $sep_idx = ( length $header_text ) + ( length $2 );
+        $sep_idx     = ( length $header_text ) + ( length $2 );
     }
     else {
         return ( 0, Courriel::Headers::->new );
@@ -532,7 +532,7 @@ Courriel - High level email parsing and manipulation
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -765,23 +765,6 @@ better than the ones mentioned above.
 This module rips some chunks of code from a few other places, notably several
 of the Email suite modules.
 
-=head1 DONATIONS
-
-If you'd like to thank me for the work I've done on this module, please
-consider making a "donation" to me via PayPal. I spend a lot of free time
-creating free software, and would appreciate any support you'd care to offer.
-
-Please note that B<I am not suggesting that you must do this> in order for me
-to continue working on this particular software. I will continue to do so,
-inasmuch as I have in the past, for as long as it interests me.
-
-Similarly, a donation made in this way will probably not make me work on this
-software much more, unless I get so many donations that I can consider working
-on free software full time, which seems unlikely at best.
-
-To donate, log into PayPal and send money to autarch@urth.org or use the
-button on this page: L<http://www.urth.org/~autarch/fs-donation.html>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-courriel@rt.cpan.org>, or
@@ -840,7 +823,7 @@ Zbigniew Łukasiak <zzbbyy@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

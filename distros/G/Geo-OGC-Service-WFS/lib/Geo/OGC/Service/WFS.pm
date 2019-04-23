@@ -43,6 +43,7 @@ package Geo::OGC::Service::WFS;
 
 use 5.010000; # say // and //=
 use feature "switch";
+use utf8;
 use Carp;
 use File::Basename;
 use Modern::Perl;
@@ -62,11 +63,10 @@ use Geo::OGC::Service::Filter ':all';
 use vars qw(@ISA);
 push @ISA, qw(Geo::OGC::Service::Filter);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # GDAL and PostgreSQL data type to XML data type
 our %type_map = (
-    geometry => "gml:GeometryPropertyType",
     Short => "xs:short",
     Integer => "xs:integer",
     Integer64 => "xs:long",
@@ -85,7 +85,36 @@ our %type_map = (
     time => "xs:time",
     "time with time zone" => "xs:time",
     boolean => "xs:boolean",
-    );
+);
+
+our %well_known_w3_ns = (
+    'xmlns:xlink' => "http://www.w3.org/1999/xlink",
+    'xmlns:xs'    => "http://www.w3.org/2001/XMLSchema",
+    'xmlns:xsi'   => "http://www.w3.org/2001/XMLSchema-instance",
+);
+
+our %wfs_1_1_0_ns = (
+    %well_known_w3_ns,
+    xmlns => "http://www.opengis.net/wfs",
+    'xmlns:wfs' => "http://www.opengis.net/wfs",
+    'xmlns:gml' => "http://www.opengis.net/gml",
+    'xmlns:ows' => "http://www.opengis.net/ows",
+    'xmlns:ogc' => "http://www.opengis.net/ogc",
+    'xsi:schemaLocation' => "http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
+);
+
+our %wfs_2_0_0_ns = (
+    %well_known_w3_ns,
+    xmlns => "http://www.opengis.net/wfs/2.0",
+    'xmlns:wfs' => "http://www.opengis.net/wfs/2.0",
+    'xmlns:gml' => "http://schemas.opengis.net/gml",
+    'xmlns:ows' => "http://www.opengis.net/ows/1.1",
+    'xmlns:fes' => "http://www.opengis.net/fes/2.0",
+    'xmlns:srv' => "http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd",
+    'xmlns:gmd' => "http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd",
+    'xmlns:gco' => "http://schemas.opengis.net/iso/19139/20060504/gco/gco.xsd",
+    'xsi:schemaLocation' => "http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd"
+);
 
 # Value in request => GDAL GML creation option
 our %OutputFormats = (
@@ -96,7 +125,12 @@ our %OutputFormats = (
     'GML3Deegree' => 'GML3Deegree',
     'application/gml+xml; version=3.2' => 'GML3.2',
     'application/json' => 'GeoJSON',
-    );
+);
+
+our @GDAL_GML_Creation_options = (qw/XSISCHEMAURI XSISCHEMA PREFIX
+STRIP_PREFIX TARGET_NAMESPACE FORMAT GML3_LONGSRS SRSNAME_FORMAT
+SRSDIMENSION_LOC WRITE_FEATURE_BOUNDED_BY SPACE_INDENTATION GML_ID
+NAME DESCRIPTION/);
 
 =pod
 
@@ -109,18 +143,8 @@ The entry method into this service. Fails unless the request is well known.
 sub process_request {
     my ($self, $responder) = @_;
     $self->parse_request;
-    $self->{debug} = $self->{config}{debug} // 0;
+    $self->{debug} = $self->{parameters}{debug} // $self->{config}{debug} // 0;
     $self->{responder} = $responder;
-    if ($self->{parameters}{debug}) {
-        $self->error({ 
-            debug => { 
-                config => $self->{config}, 
-                parameters => $self->{parameters}, 
-                env => $self->{env},
-                request => $self->{request} 
-            } });
-        return;
-    }
     if ($self->{debug}) {
         $self->log({ request => $self->{request}, parameters => $self->{parameters} });
         my $parser = XML::LibXML->new(no_blanks => 1);
@@ -171,8 +195,8 @@ are either simple or complex. The simple root keys are
 FeatureTypeList is a root key, which is a list of FeatureType
 hashes. A FeatureType defines one layer (key Layer exists) or a group
 of layers (key Layer does not exist). The key DataSource is required -
-it is a GDAL data source string. Currently only PostGIS layer groups
-are supported.
+it is a GDAL data source string. Currently only PostGIS layers are
+supported.
 
 If Layer is specified, then also keys Name, Title, Abstract, and
 DefaultSRS are required, and LowerCorner is optional.
@@ -191,50 +215,15 @@ requirement for the table/view names for to be listed.
 
 sub GetCapabilities {
     my ($self) = @_;
-
     my $writer = Geo::OGC::Service::XMLWriter::Caching->new();
-
-    my %inspireNameSpace = (
-        'xmlns:inspire_dls' => "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0",
-        'xmlns:inspire_common' => "http://inspire.ec.europa.eu/schemas/common/1.0"
-        );
-    my $inspireSchemaLocations = 
-        'http://inspire.ec.europa.eu/schemas/common/1.0 '.
-        'http://inspire.ec.europa.eu/schemas/common/1.0/common.xsd '.
-        'http://inspire.ec.europa.eu/schemas/inspire_dls/1.0 '.
-        'http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd';
-    
     my %ns;
     if ($self->{version} eq '2.0.0') {
-        %ns = (
-            xmlns => "http://www.opengis.net/wfs/2.0" ,
-            'xmlns:gml' => "http://schemas.opengis.net/gml",
-            'xmlns:wfs' => "http://www.opengis.net/wfs/2.0",
-            'xmlns:ows' => "http://www.opengis.net/ows/1.1",
-            'xmlns:xlink' => "http://www.w3.org/1999/xlink",
-            'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
-            'xmlns:fes' => "http://www.opengis.net/fes/2.0",
-            'xmlns:xs' => "http://www.w3.org/2001/XMLSchema",
-            'xmlns:srv' => "http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd",
-            'xmlns:gmd' => "http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd",
-            'xmlns:gco' => "http://schemas.opengis.net/iso/19139/20060504/gco/gco.xsd",
-            'xsi:schemaLocation' => "http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd",
-            );
+        %ns = (%wfs_2_0_0_ns);
         # updateSequence="260" ?
     } else {
-        %ns = (
-            xmlns => "http://www.opengis.net/wfs",
-            'xmlns:gml' => "http://www.opengis.net/gml",
-            'xmlns:wfs' => "http://www.opengis.net/wfs",
-            'xmlns:ows' => "http://www.opengis.net/ows",
-            'xmlns:xlink' => "http://www.w3.org/1999/xlink",
-            'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
-            'xmlns:ogc' => "http://www.opengis.net/ogc",
-            'xsi:schemaLocation' => "http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
-            );
+        %ns = (%wfs_1_1_0_ns);
     }
     $ns{version} = $self->{version};
-
     $writer->open_element('wfs:WFS_Capabilities', \%ns);
     $self->DescribeService($writer);
     $self->OperationsMetadata($writer);
@@ -282,7 +271,7 @@ sub OperationsMetadata  {
         ImplementsFeatureVersioning => 0,
         ManageStoredQueries => 0,
         PagingIsTransactionSafe => 1,
-        );
+    );
     for my $key (keys %constraints) {
         $writer->element('ows:Constraint', {name => $key}, 
                          [['ows:NoValues'], 
@@ -313,37 +302,31 @@ sub FeatureTypeList  {
             ['wfs:Abstract', $type->{Abstract}],
             ['wfs:DefaultSRS', $type->{DefaultSRS}],
             ['wfs:OtherSRS', 'EPSG:3857'],
-            ['wfs:OutputFormats', \@formats]);
-        push @FeatureType, ['ows:WGS84BoundingBox', {dimensions=>2}, 
-                            [['ows:LowerCorner',$type->{LowerCorner}],
-                             ['ows:UpperCorner',$type->{UpperCorner}]]]
-                                 if exists $type->{LowerCorner};
-        push @FeatureType, ['wfs:Operations', 
-                            [list2element('wfs:Operation', $type->{Operations})]] if exists $type->{Operations};
+            ['wfs:OutputFormats', \@formats]
+        );
+        push @FeatureType, [
+            'ows:WGS84BoundingBox', {dimensions => 2}, [
+                ['ows:LowerCorner',$type->{LowerCorner}],
+                ['ows:UpperCorner',$type->{UpperCorner}]
+            ]
+        ] if exists $type->{LowerCorner};
+        push @FeatureType, [
+            'wfs:Operations', [
+                list2element('wfs:Operation', $type->{Operations})
+            ]
+        ] if $type->{Operations};
         $writer->element('wfs:FeatureType', \@FeatureType);
     };
 
-    for my $type (@{$self->{config}{FeatureTypeList}}) {
-
-        eval {
-            if ($self->open_datasource($type)) {
-                if (exists $type->{Layer}) {
-                    # announce only the named layer
-                    $list_layer->($type);
-                }
-                else {
-                    # announce a group of layers
-                    for my $t ($self->feature_types_in_data_source($type)) {
-                        $list_layer->($t);
-                    }
-                }
+    eval {
+        $self->read_feature_type_list;
+        for my $type (@{$self->{feature_types}}) {
+            for my $t (@$type) {
+                $list_layer->($t);
             }
-        };
-        if ($@) {
-            say STDERR $@;
-            next;
         }
-    }
+    };
+    say STDERR $@ if $@;
     $writer->close_element;
 }
 
@@ -365,62 +348,68 @@ sub DescribeFeatureType {
 
     unless (@typenames) {
         $self->error({ exceptionCode => 'MissingParameterValue',
-                       locator => 'typeName' });
+                       locator => 'typeName' },
+                     [$self->CORS]);
         return;
     }
     
     my %types;
 
     for my $name (@typenames) {
-        $types{$name} = $self->feature_type($name);
+        eval {
+            $types{$name} = $self->get_feature_type($name);
+        };
         unless ($types{$name}) {
+            $@ =~ s/ at \/.*//;
             $self->error({ exceptionCode => 'InvalidParameterValue',
                            locator => 'typeName',
-                           ExceptionText => "Type '$name' is not available" });
+                           ExceptionText => $@ },
+                         [$self->CORS]);
             return;
         }
     }
 
     my $writer = Geo::OGC::Service::XMLWriter::Caching->new();
-    $writer->open_element(
-        'schema', 
-        { version => '0.1',
-          targetNamespace => "http://mapserver.gis.umn.edu/mapserver",
-          xmlns => "http://www.w3.org/2001/XMLSchema",
-          'xmlns:ogr' => "http://ogr.maptools.org/",
-          'xmlns:ogc' => "http://www.opengis.net/ogc",
-          'xmlns:xsd' => "http://www.w3.org/2001/XMLSchema",
-          'xmlns:gml' => "http://www.opengis.net/gml",
-          elementFormDefault => "qualified" });
-    $writer->element(
-        'import', 
-        { namespace => "http://www.opengis.net/gml",
-          schemaLocation => "http://schemas.opengis.net/gml/2.1.2/feature.xsd" } );
+    
+    $writer->open_element(schema => { 
+        targetNamespace => $self->{config}{targetNamespace},
+        xmlns => "http://www.w3.org/2001/XMLSchema",
+        'xmlns:gml' => "http://schemas.opengis.net/gml",
+        elementFormDefault => "qualified",
+        attributeFormDefault => "unqualified" });
+    
+    $writer->element(import => { 
+        namespace => "http://www.opengis.net/gml",
+        schemaLocation => "http://schemas.opengis.net/gml/2.1.2/feature.xsd" });
 
     for my $name (sort keys %types) {
         my $type = $types{$name};
-        next if $type->{"gml:id"} && $type->{Name} eq $type->{"gml:id"};
+
+        # to do: geometry and primary key
 
         my ($pseudo_credentials) = pseudo_credentials($type);
         my @elements;
-        for my $property (keys %{$type->{Schema}}) {
+        for my $property (keys %{$type->{columns}}) {
 
             next if $pseudo_credentials->{$property};
 
             my $minOccurs = 0;
-            push @elements, ['element', 
-                             { name => $type->{Schema}{$property}{out_name},
-                               type => $type->{Schema}{$property}{out_type},
-                               minOccurs => "$minOccurs",
-                               maxOccurs => "1" } ];
-
+            push @elements, ['element', { 
+                name => $type->{columns}{$property}{out_name},
+                type => $type->{columns}{$property}{out_type},
+                minOccurs => "$minOccurs",
+                maxOccurs => "1" 
+            }];
+            
         }
         $writer->element(
-            'complexType', {name => $type->{Name}.'Type'},
+            'complexType', 
+            {name => $type->{Name}.'Type'},
             ['complexContent', 
-             ['extension', { base => 'gml:AbstractFeatureType' },
-              ['sequence', \@elements
-              ]]]);
+                ['extension', { base => 'gml:AbstractFeatureType' },
+                    ['sequence', \@elements
+                    ]]]
+            );
         $writer->element(
             'element', { name => $type->{Name},
                          type => 'ogr:'.$type->{Name}.'Type',
@@ -473,216 +462,142 @@ sub GetFeature {
         return;
     }
 
-    my $type = $self->feature_type($typename);
-
+    my $type;
+    eval {
+        $type = $self->get_feature_type($typename);
+    };
     unless ($type) {
+        $@ =~ s/ at \/.*//;
         $self->error({ exceptionCode => 'InvalidParameterValue',
                        locator => 'typeName',
-                       ExceptionText => "Type '$typename' is not available" },
+                       ExceptionText => $@ },
                      [$self->CORS]);
         return;
     }
 
+    my $ds = Geo::OGR::Open($type->{DataSource});
     my $layer;
+    my $epsg = $query->{EPSG} // $type->{SRID};
 
-    if ($type && $type->{Layer}) {
-        $layer = $self->{DataSource}->GetLayer($type->{Layer});
-        $layer->SetSpatialFilterRect(@{$query->{BBOX}}) if $query->{BBOX};
+    my @bbox;
+    my $bbox_crs;
+    if ($query->{BBOX}) {
+        @bbox = @{$query->{BBOX}};
+        $bbox_crs = 4326; # WFS 1.1.0 14.3.3
+        if (@bbox == 5) {
+            $bbox_crs = epsg_number(pop @bbox);
+        }
     }
 
-    elsif ($type && $type->{Table}) {
+    my $filter = filter2sql($query->{filter}, $type) // '';
 
-        my $filter = filter2sql($query->{filter}, $type) // '';
-        my $epsg;
-        ($epsg) = $query->{EPSG} =~ /(\d\d\d\d+)/ if $query->{EPSG};
-
-        # pseudo_credentials: these fields are required to be in the filter and they are not included as attributes
-        my ($pseudo_credentials, @pseudo_credentials) = pseudo_credentials($type);
-        if (@pseudo_credentials) {
-            # test for pseudo credentials in filter
-            my $pat1 = "\\(\\(\"$pseudo_credentials[0]\" = '.+?'\\) AND \\(\"$pseudo_credentials[1]\" = '.+?'\\)\\)";
-            my $pat2 = "\\(\\(\"$pseudo_credentials[1]\" = '.+?'\\) AND \\(\"$pseudo_credentials[0]\" = '.+?'\\)\\)";
-            my $n = join(' and ', @pseudo_credentials);
-            unless ($filter and ($filter =~ /$pat1/ or $filter =~ /$pat2/)) {
-                $self->error({ exceptionCode => 'InvalidParameterValue',
-                               locator => 'filter',
-                               ExceptionText => "Not authorized. Please provide '$n' in filter." });
-                return;
-            }
+    # pseudo_credentials: these fields are required to be in the filter and they are not included as attributes
+    my ($pseudo_credentials, @pseudo_credentials) = pseudo_credentials($type);
+    if (@pseudo_credentials) {
+        # test for pseudo credentials in filter
+        my $pat1 = "\\(\\(\"$pseudo_credentials[0]\" = '.+?'\\) AND \\(\"$pseudo_credentials[1]\" = '.+?'\\)\\)";
+        my $pat2 = "\\(\\(\"$pseudo_credentials[1]\" = '.+?'\\) AND \\(\"$pseudo_credentials[0]\" = '.+?'\\)\\)";
+        my $n = join(' and ', @pseudo_credentials);
+        unless ($filter and ($filter =~ /$pat1/ or $filter =~ /$pat2/)) {
+            $self->error({ exceptionCode => 'InvalidParameterValue',
+                           locator => 'filter',
+                           ExceptionText => "Not authorized. Please provide '$n' in filter." });
+            return;
         }
-        
-        my @cols;
-         # reverse the field names
-        for my $col (keys %{$type->{Schema}}) {
-            next if $pseudo_credentials->{$col};
-
-            my $is_geometry = $col eq $type->{GeometryColumn};
-            my $name = $type->{Schema}{$col}{out_name};
-
-            next if $query->{properties} && not $query->{properties}{$name};
-
-            # only one geometry property in the output
-            next if $type->{Schema}{$col}{out_type} eq 'gml:GeometryPropertyType' && not $is_geometry;
-
-            if (defined $epsg and $is_geometry) {
-                push @cols, "ST_Transform(\"$col\",$epsg) as \"$name\"";
-            } else {
-                $filter =~ s/$name/$col/g if $filter;
-                $name = 'gml_id' if defined $type->{"gml:id"} && $col eq $type->{"gml:id"};
-                push @cols, "\"$col\" as \"$name\"";
-            }
-        }
-
-        my $geom = '"'.$type->{GeometryColumn}.'"';
-        
-        my $sql = "SELECT ".join(',',@cols)." FROM \"$type->{Table}\" WHERE ST_IsValid($geom)";
-
-        $geom = "ST_Transform($geom,$epsg)" if defined $epsg;
-        $filter =~ s/GeometryColumn/$type->{GeometryColumn}/g if $filter;
-        $sql .= " AND $filter" if $filter;
-        $sql .= " AND ($geom && ST_Transform(ST_MakeEnvelope(".join(",", @{$query->{BBOX}}).")),$type->{SRID})" if $query->{BBOX};
-
-        print STDERR "$sql\n" if $self->{debug};
-        eval {
-            $layer = $self->{DataSource}->ExecuteSQL($sql);
-        };
-        print STDERR $@ if $@;
     }
 
+    my @columns = ("$type->{'gml:id'} as gml_id");
+    # reverse the field names
+    for my $column (keys %{$type->{columns}}) {
+        next if $pseudo_credentials->{$column};
+        my $name = $type->{columns}{$column}{out_name};
+        next if $query->{properties} && not $query->{properties}{$name};
+        
+        $filter =~ s/$name/$column/g if $filter;
+        push @columns, "\"$column\" as \"$name\"";
+    }
+    my $Geometry = $type->{GeometryColumn};
+    push @columns, "ST_Transform($Geometry,$epsg) as geometryProperty";
+    
+    my $sql = "SELECT ".join(',',@columns)." FROM $type->{Table} WHERE ST_IsValid($Geometry)";
+    
+    if ($filter) {
+        $filter =~ s/GeometryColumn/$Geometry/g;
+        $sql .= " AND $filter";
+    }
+    
+    if (@bbox) {
+        my $bbox = join(",", @bbox);
+        $sql .= " AND (ST_Transform($Geometry,$epsg) && ST_Transform(ST_MakeEnvelope($bbox,$bbox_crs),$epsg))";
+    }
+    
+    print STDERR "$sql\n" if $self->{debug};
+    eval {
+        $layer = $ds->ExecuteSQL($sql);
+    };
     unless ($layer) {
-        $self->error({ exceptionCode => 'InvalidParameterValue',
-                       locator => 'typeName',
-                       ExceptionText => "Type '$typename' is not available (or there was an internal or configuration error)" },
-                     [$self->CORS]);
+        say STDERR $sql,"\n",$@;
+        $self->error({ exceptionCode => 'Error',
+                       ExceptionText => 'Internal error' });
         return;
     }
-
-    # query may have resulttype outputformat set
-
-    # note that OpenLayers does not seem to like the default target namespace, at least with outputFormat: "GML2"
-    # use "TARGET_NAMESPACE": "http://ogr.maptools.org/", "PREFIX": "ogr", in config or type section
-    my $ns = $self->{config}{TARGET_NAMESPACE} // $type->{TARGET_NAMESPACE} // 'http://www.opengis.net/wfs';
-    my $prefix = $self->{config}{PREFIX} // $type->{PREFIX} // 'wfs';
-    my $format = $self->{request}{outputformat} // $self->{config}{FORMAT} // 'GML3.2';
-    $format = $OutputFormats{$format} if $OutputFormats{$format};
-    print STDERR "Output format (for GDAL creation): $format\n" if $self->{debug} > 2;
 
     my $i = 0;
-    my $count = $query->{count};
+    my $count = min($query->{count}, $self->{config}{max_count}, 1000000);
+    my $result_type = $query->{resulttype} // 'results'; # real data instead of number of features
+    my ($content_type, $driver);
 
-    if (Geo::GDAL::VersionInfo >= 2010000) {
-        # use streaming object
-        #say STDERR "use streaming object";
-        my $content_type;
+    # for GML creation options see http://www.gdal.org/drv_gml.html
+    # for GeoJSON creation options see http://www.gdal.org/drv_geojson.html
+
+    # the FORMAT, TARGET_NAMESPACE, and PREFIX need to be set for OpenLayers
+    # the following has worked
+    # OpenLayers 2: FORMAT (not set), TARGET_NAMESPACE (http://ogr.maptools.org/), and PREFIX (ogr)
+    # OpenLayers 4: FORMAT (GML3), TARGET_NAMESPACE (http://www.opengis.net/gml), and PREFIX (ogr)
+
+    # tweaked GML is for getting transactions to work with OpenLayers v4
+
+    my %creation_options;
+    $creation_options{FORMAT} = $self->{request}{outputformat} // $self->{config}{FORMAT} // $type->{FORMAT} // 'GML2';
+    for my $format ($creation_options{FORMAT}) {
+        # convert some known values to those understood by GDAL
+        $format = $OutputFormats{$format} if $format && $OutputFormats{$format};
         if ($format =~ /GML/) {
+            for my $key (@GDAL_GML_Creation_options) {
+                next if $key eq 'FORMAT';
+                next unless exists $type->{$key} || exists $self->{config}{$key};
+                $creation_options{$key} = $type->{$key} // $self->{config}{$key};
+            }
             $content_type = $self->{config}{'Content-Type'} // 'text/xml; charset=utf-8';
+            $driver = Geo::OGR::Driver('GML');
         } elsif ($format =~ /JSON/) {
             $content_type = 'application/json; charset=utf-8';
-        }
-        my $writer = $self->{responder}->([200, [ 'Content-Type' => $content_type, $self->CORS ]]);
-        my $output;
-        if ($format =~ /GML/) {
-            $output = Geo::OGR::Driver('GML')->Create($writer, { TARGET_NAMESPACE => $ns, PREFIX => $prefix, FORMAT => $format });
-        } elsif ($format =~ /JSON/) {
-            $output = Geo::OGR::Driver('GeoJSON')->Create($writer);
-        }
-        my $l2 = $output->CreateLayer($type->{Name});
-        my $d = $layer->GetLayerDefn;
-        for (0..$d->GetFieldCount-1) {
-            my $f = $d->GetFieldDefn($_);
-            $l2->CreateField($f);
-        }
-        $layer->ResetReading;
-        while (my $f = $layer->GetNextFeature) {
-            $l2->CreateFeature($f);
-            $i++;
-            last if defined $count and $i >= $count;
+            $driver = Geo::OGR::Driver('GeoJSON');
+        } else {
+            $self->error({ exceptionCode => 'Error',
+                           locator => 'outputFormat',
+                           ExceptionText => "Format '$format' is not supported." });
+            return;
         }
     }
-    elsif (Geo::GDAL::VersionInfo >= 2000200) {
-        # capture stdout, requires fix to close vsistdout bug
-        #say STDERR "capture stdout";
-        my $content_type = $self->{config}{'Content-Type'} // 'text/xml; charset=utf-8';
-        my $headers = ['Content-Type' => $content_type, $self->CORS];
-        my $writer = Geo::OGC::Service::XMLWriter::Streaming->new($self->{responder}, $headers);
 
-        my $vsi = '/vsistdout/';
-        my $gml;
-        my $l2;
-
-        my $stdout = capture_stdout {
-            $gml = Geo::OGR::Driver('GML')->Create(
-                $vsi, { TARGET_NAMESPACE => $ns, PREFIX => $prefix, FORMAT => $format });
-            $l2 = $gml->CreateLayer($type->{Name});
-            my $d = $layer->GetLayerDefn;
-            for (0..$d->GetFieldCount-1) {
-                my $f = $d->GetFieldDefn($_);
-                $l2->CreateField($f);
-            }
-        };        
-        $writer->write($stdout);
-        
-        $layer->ResetReading;
-        while (1) {
-            my $f = $layer->GetNextFeature;
-            my $stdout = capture_stdout {
-                if ($f) {
-                    $l2->CreateFeature($f);
-                    $i++;
-                }
-                if (!$f or (defined $count and $i >= $count)) {
-                    undef $l2;
-                    undef $gml;
-                }
-            };
-            $writer->write($stdout);
-            last unless $gml;
-        }
-    }
-    else {
-        # use temp file
-        #say STDERR "use tmp file";
-        my $file = '/tmp/' . mktemp('tempXXXXXX', '/tmp').'.xml';
-        my $content_type = $self->{config}{'Content-Type'} // 'text/xml; charset=utf-8';
-        {
-            # local variables, to close the file at the end
-            my $gml = Geo::OGR::Driver('GML')->Create(
-                $file, { TARGET_NAMESPACE => $ns, PREFIX => $prefix, FORMAT => $format });
-            my $l2 = $gml->CreateLayer($type->{Name});
-            my $d = $layer->GetLayerDefn;
-            for (0..$d->GetFieldCount-1) {
-                my $f = $d->GetFieldDefn($_);
-                $l2->CreateField($f);
-            }
-            
-            $layer->ResetReading;
-            while (my $f = $layer->GetNextFeature) {
-                $l2->CreateFeature($f);
-                $i++;
-                last if defined $count and $i >= $count;
-            }
-        }
-
-        open my $fh, "<:raw", $file or return $self->return_403;
-
-        my @stat = stat $file;
+    my $writer = $self->{responder}->([200, [ 'Content-Type' => $content_type, $self->CORS ]]);
+    my $output = $driver->Create($writer, \%creation_options );
     
-        Plack::Util::set_io_path($fh, Cwd::realpath($file));
-    
-        $self->{responder}->([ 200, 
-                               [
-                                'Content-Type'   => $content_type,
-                                'Content-Length' => $stat[7],
-                                'Last-Modified'  => HTTP::Date::time2str( $stat[9] ),
-                                $self->CORS
-                               ],
-                               $fh,
-                             ]);
-        unlink $file;
-        $file =~ s/xml$/xsd/;
-        unlink $file;
+    my $l2 = $output->CreateLayer($type->{Name});
+    my $d = $layer->GetLayerDefn;
+    for (0..$d->GetFieldCount-1) {
+        my $f = $d->GetFieldDefn($_);
+        $l2->CreateField($f);
     }
-    print STDERR "$i features served, max is ",$count//'not set',"\n" if $self->{debug};
+    $layer->ResetReading;
+    while (my $f = $layer->GetNextFeature) {
+        $l2->CreateFeature($f);
+        $i++;
+        last if defined $count and $i >= $count; 
+    }
+    
+    print STDERR "$i features served, max is $count\n" if $self->{debug};
 }
 
 =pod
@@ -719,7 +634,16 @@ are not yet supported.
 
 sub Transaction {
     my ($self) = @_;
-    my $dbisql = $self->transaction_sql;
+    my $dbisql;
+    eval {
+        $dbisql = $self->transaction_sql;
+    };
+    unless ($dbisql) {
+        $@ =~ s/ at \/.*//;
+        $self->error({ exceptionCode => 'Error building transaction SQL',
+                       ExceptionText => $@ });
+        return;
+    }
     my %rows = (
         Insert => 0,
         Update => 0,
@@ -732,51 +656,45 @@ sub Transaction {
         Replace => [],
         Delete => [] 
         );
+    my $version2 = $self->{version} =~ /^2/;
     for my $dbi (keys %$dbisql) {
-        my($connect, $user, $pass) = split / /, $dbi;
-        if ($self->{debug}) {
-            say STDERR $connect,' ',$dbisql->{$dbi};
-        }
-        my $error;
-        my $dbh = DBI->connect($connect, $user, $pass) or ($error = "Can't connect to database '$connect'.");
-        say STDERR $error if $error;
-        undef $error;
-        $dbh->{pg_enable_utf8} = 1;
-        for my $op (keys %{$dbisql->{$dbi}}) {
-
-            my $n = @{$dbisql->{$dbi}{$op}{SQL}};
-
-            for my $i (0..$#{$dbisql->{$dbi}{$op}{SQL}}) {
-
-                my $sql = $dbisql->{$dbi}{$op}{SQL}[$i];
-                my $table = $dbisql->{$dbi}{$op}{Table}[$i];
-                my $rows = $dbh->do($sql) or ($error = "Error executing SQL: ".$dbh->errstr);
-                if (!$error) {
-                    my $id = '';
-                    $id = $dbh->last_insert_id(undef, undef, $table, undef) if $op eq 'Insert';
-                    push @{$results{$op}}, ['wfs:Feature', 
-                                            [['ogc:FeatureId', {fid => $id}],
-                                             ['fes:ResourceId', {rid => $id}]]];
-                    $rows{$op} += ($rows == 0) ? 1 : $rows;
-                } else {
-                    say STDERR $error; # or does do do it already?
-                    undef $error;
+        my ($db, $user, $pass) = split / /, $dbi;
+        my $dbh = DBI->connect($db, $user, $pass);
+        if ($dbh) {
+            my $error;
+          try:
+            for my $op (keys %{$dbisql->{$dbi}}) {
+                for my $i (0..$#{$dbisql->{$dbi}{$op}{SQL}}) {
+                    my $sql = $dbisql->{$dbi}{$op}{SQL}[$i];
+                    my $type = $dbisql->{$dbi}{$op}{type}[$i];
+                    my $rows = $dbh->do($sql);
+                    if ($rows) {
+                        my $id = '';
+                        $id = $dbh->last_insert_id(undef, $type->{schema}, $type->{table}, undef) if $op eq 'Insert';
+                        my @id = $version2 ? ('fes:ResourceId' => {rid => $id}) : ('ogc:FeatureId' => {fid => $id});
+                        push @{$results{$op}}, ['wfs:Feature', [\@id]];
+                        $rows{$op} += ($rows == 0) ? 1 : $rows;
+                    } else {
+                        $error .= $dbh->errstr;
+                        last try;
+                    }
                 }
-                
             }
-            
+            if ($error) {
+                $self->error({ exceptionCode => 'Error executing transaction SQL',
+                               ExceptionText => $error });
+                last;
+            }
+        } else {
+            $self->error({ exceptionCode => 'Database connection error',
+                           ExceptionText => "Can't connect to database '$db'" });
         }
     }
-    my $writer = Geo::OGC::Service::XMLWriter::Caching->new();
-    $writer->open_element(
-        'TransactionResponse', 
-        { version => $self->{version},
-          'xmlns:ogc' => "http://www.opengis.net/ogc",
-          'xmlns:wfs' => "http://www.opengis.net/wfs/2.0",
-          'xmlns:fes' => "http://www.opengis.net/fes/2.0",
-          'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
-          'xsi:schemaLocation' => "http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0.0/wfs.xsd"
-        });
+        
+    my $writer = Geo::OGC::Service::XMLWriter::Caching->new([$self->CORS]);
+    my %ns = $version2 ? (%wfs_2_0_0_ns) : (%wfs_1_1_0_ns);
+    $ns{version} = $self->{version};
+    $writer->open_element('wfs:TransactionResponse' => \%ns);
     $writer->element('wfs:TransactionSummary',
                      [['wfs:totalInserted' => $rows{Insert}],
                       ['wfs:totalUpdated' => $rows{Update}],
@@ -851,9 +769,10 @@ sub parse_request {
             outputformat => $self->{parameters}{outputformat},
             queries => [
                 {
-                    typename => fallback($self->{parameters}{typename}, $self->{parameters}{typenames}),
+                    # typenames is WFS 2, and can be a space separated list
+                    typename => ($self->{parameters}{typename} // $self->{parameters}{typenames}),
                     filter => $self->{filter},
-                    EPSG => get_integer($self->{parameters}{srsname}),
+                    EPSG => epsg_number($self->{parameters}{srsname}),
                     count => get_integer($self->{parameters}{count}, $self->{parameters}{maxfeatures}),
                     BBOX => split_to_listref($self->{parameters}{bbox})
                 }
@@ -879,206 +798,217 @@ sub parse_request {
         $self->{config}{version};
 }
 
-sub open_datasource {
-    my ($self, $type) = @_;
-    croak "Missing DataSource parameter in FeatureType." unless exists $type->{DataSource};
-    my $n = $type->{DataSource};
-    my ($name, $path) = fileparse($0);
-    $n =~ s/\$path/$path/;
-    $self->{DataSource} = Geo::OGR::DataSource::Open($n);
-    croak "Can't open '$type->{DataSource}' as a data source." unless $self->{DataSource};
+sub get_feature_type {
+    my ($self, $typename) = @_;
+    $typename =~ s/^\w+://; # remove possible namespace
+    $self->read_feature_type_list unless $self->{feature_types} && @{$self->{feature_types}};
+    for my $t (@{$self->{feature_types}}) {
+        for my $t2 (@$t) {
+            if ($t2->{Name} eq $typename) {
+                return $t2;
+            }
+        }
+    }
+    croak "Feature type '$typename' is not available.";
 }
 
-sub feature_type {
-    my ($self, $type_name) = @_;
-    my ($ns, $name) = parse_name($type_name);
+# read FeatureTypeList from config and create
+# feature_types as an array of arrays of feature_types
+# a feature_type should contain information for
+# operations (GetCapabilities etc)
+# this sub parses the FeatureTypeList of config
+# TO DO: make this boot time thing
+sub read_feature_type_list {
+    my $self = shift;
+
+    # to do: basic config
+    $self->{config}{targetNamespace} //= $self->{config}{resource};
+    
+    $self->{feature_types} = [];
     for my $type (@{$self->{config}{FeatureTypeList}}) {
-        my $ret;
-        eval {
-            if ($self->open_datasource($type)) {
-                if (exists $type->{Layer}) {
-                    if ($type->{Name} eq $name) {
-                        $ret = clone($type);
-                        my $layer = $self->{DataSource}->GetLayer($type->{Layer});
-                        my $schema = $layer->GetSchema;
-                        my %geometry_types = map {$_ => 1} Geo::OGR::GeometryTypes();
-                        for my $field (@{$schema->{Fields}}) {
-                            my $name = $field->{Name};
-                            my $type = $field->{Type};
-                            if ($geometry_types{$type}) {
-                                $name = "ogrGeometry" if $name eq '';
-                                $type = "geometry";
-                                if (not exists $self->{config}{GeometryColumn}) {
-                                    $ret->{GeometryColumn} //= $name; # pick the first
-                                } elsif ($field->{Name} eq $self->{config}{GeometryColumn}) {
-                                    $ret->{GeometryColumn} = $name;
-                                }
-                            }
-                            $ret->{Schema}{$name}{in_type} = $type;
-                        }
-                    }
-                }
-                else {
-                    # open policy: announce all in a data source except those denied
-                    for my $t ($self->feature_types_in_data_source($type)) {
-                        if ($t->{Name} eq $name) {
-                            $ret = $t;
-                        }
-                    }
-                }
-            }
-        };
-        if ($@) {
-            say STDERR $@;
-            next;
+        if ($type->{require_user}) {
+            # simple test now
+            # also, this should probably be runtime check
+            next unless $self->{env}{REMOTE_USER} eq $type->{require_user};
         }
-        if ($ret) {
-            for my $in_name (keys %{$ret->{Schema}}) {
-                my $in_type = $ret->{Schema}{$in_name}{in_type};
+        if (exists $type->{DataSource} and $type->{DataSource} =~ /^pg:/i) {
+            push @{$self->{feature_types}}, $self->feature_types_in_data_source($type);
+        } else {
+            carp "Only PostgreSQL data sources supported in FeatureTypeList.";
+        }
+    }
+    for my $type (@{$self->{feature_types}}) {
+        for my $t (@$type) {
+            for my $in_name (keys %{$t->{columns}}) {
+                my $in_type = $t->{columns}{$in_name}{in_type};
                 my $out_type = $type_map{$in_type} // 'xs:string';
                 my $out_name = $in_name;
 
                 # field name adjustments as GDAL does them
-                $out_name =~ s/ /_/g;
-                $out_name =~ s/-/_/g;
+                $out_name =~ s/[ -] /_/g;
                 
-                # extra name adjustments, needed by QGIS
-                # this has no effect now since no 'use utf8'.. FIXME?
-                $out_name =~ s/[åö]/o/g;
-                $out_name =~ s/ä/a/g;
-                $out_name =~ s/[ÅÖ]/O/g;
-                $out_name =~ s/Ä/A/g;
+                # extra name adjustments, maybe needed by old QGIS?
+                if ($self->{config}{no_scands_in_names}) {
+                    $out_name =~ s/[åö]/o/g;
+                    $out_name =~ s/ä/a/g;
+                    $out_name =~ s/[ÅÖ]/O/g;
+                    $out_name =~ s/Ä/A/g;
+                }
 
-                # GDAL will use geometryProperty for geometry elements when producing GML:
-                $out_name = 'geometryProperty' if $out_type eq 'gml:GeometryPropertyType';
-
-                $ret->{Schema}{$in_name}{out_name} = $out_name;
-                $ret->{Schema}{$in_name}{out_type} = $out_type;
-                
+                $t->{columns}{$in_name}{out_name} = $out_name;
+                $t->{columns}{$in_name}{out_type} = $out_type;
             }
         }
-        return $ret if $ret;
     }
 }
 
 sub feature_types_in_data_source {
     my ($self, $type) = @_;
-    return unless $type->{DataSource} =~ /^Pg:/;
-    
-    my $dbi = DataSource2dbi($type->{DataSource});
-    my ($connect, $user, $pass) = split / /, $dbi;
-    my $dbh = DBI->connect($connect, $user, $pass, { PrintError => 0, RaiseError => 0 }) 
-        or croak("Can't connect to database '$connect': ".$DBI::errstr);
-    #$dbh->{pg_enable_utf8} = 1; Use of the default is highly encouraged.
-    my $sth = $dbh->table_info( '', 'public', undef, "'TABLE','VIEW'" );
+    my @types;
+    my $ds = $type->{DataSource};
+    my $dbi = DataSource2dbi($ds);
+    my ($db, $user, $pass) = split / /, $dbi;
+    my $dbh = DBI->connect($db, $user, $pass, {PrintError => 0}) or return;
+    # SCHEMA and TABLE are search patterns or not set, for example: "FOO%"
+    my $schema = $type->{SCHEMA} // 'public';
+    # TABLE_TYPE is a Perl DBI attribute
+    my $table = $type->{TABLE};
+    my $table_type = $type->{TABLE_TYPE} // "'TABLE','VIEW'";
+    my $sth = $dbh->table_info('', $schema, $table, $table_type);
     my @tables;
     while (my $data = $sth->fetchrow_hashref) {
-        my $n = $data->{TABLE_NAME};
-        # in open policy, can restrict to specific table types (TABLE_TYPE is a Perl DBI attribute)
-        next if $type->{TABLE_TYPE} && !$type->{TABLE_TYPE}{$data->{TABLE_TYPE}};
-        # in open policy, can restrict to tables with a specific prefix
-        next if $type->{TABLE_PREFIX} && !(index($n, $type->{TABLE_PREFIX}) != -1);
-        $n =~ s/"//g;
-        push @tables, $n;
-    }
-    my @feature_types;
-    for my $table (@tables) {
-        my $sth = $dbh->column_info( '', 'public', $table, '' );
-        my %schema;
-        my @geometry_columns;
-        while (my $data = $sth->fetchrow_hashref) {
-            my $n = $data->{COLUMN_NAME};
-            $n =~ s/^"//;
-            $n =~ s/"$//;
-            $schema{$n}{in_type} = $data->{TYPE_NAME};
-            push @geometry_columns, $n if $data->{TYPE_NAME} eq 'geometry';            
+        my $schema = $data->{TABLE_SCHEM};
+        my $table = $data->{TABLE_NAME};
+        for ($schema, $table) {
+            s/^"//;
+            s/"$//;
         }
-        for my $geom (@geometry_columns) {
-            print STDERR "Testing \"$table.$geom\": " if $self->{debug} > 2;
-            my $sql = "select auth_name,auth_srid ".
-                "from \"$table\" ".
-                "join spatial_ref_sys on spatial_ref_sys.srid=st_srid(\"$geom\") ".
-                "limit 1";
-            my $sth = $dbh->prepare($sql) or croak($dbh->errstr);
-            my $rv = $sth->execute;
-            # the execute may fail because of no permission, in that case we skip but log an error
-            unless ($rv) {
-                print STDERR "No permission to serve table '$table'.\n";
-                next;
-            }
-            my ($auth_name, $auth_srid)  = $sth->fetchrow_array;
-            $auth_name //= 'unknown';
-            $auth_srid //= -1;
-
-            my $allow_empty_layers = 1;
-            unless ($allow_empty_layers) {
-                # check that the table contains at least one spatial feature
-                $sql = "select \"$geom\" from \"$table\" where not \"$geom\" isnull limit 1";
-                $sth = $dbh->prepare($sql) or croak($dbh->errstr);
-                $rv = $sth->execute or croak($dbh->errstr); # error here is a configuration error
-                my($g)  = $sth->fetchrow_array;
-                next unless $g;
-            }
-
-            my $prefix = $type->{prefix};
-            my $shortname = $table.'.'.$geom;
-
-            # XML layer names can't have spaces
-            $shortname =~ s/ /_/g;
-                
-            if (0) {
-                # if this is enabled then use utf8 is needed at least for åäöÅÄÖ
-                $shortname =~ s/[åö]/o/g;
-                $shortname =~ s/ä/a/g;
-                $shortname =~ s/[ÅÖ]/O/g;
-                $shortname =~ s/Ä/A/g;
-            }
-
-            my $name = $prefix.'.'.$shortname;
-            if ($type->{allow} and !($type->{allow}{$shortname} or $type->{allow}{$name})) {
-                print STDERR "not allowed.\n" if $self->{debug} > 2;
-                next;
-            }
-            if ($type->{deny} and ($type->{deny}{$shortname} or $type->{deny}{$name})) {
-                print STDERR "denied.\n" if $self->{debug} > 2;
-                next;
-            }
-
-            my $feature_type = {
-                Title => "$table($geom)",
-                Name => $name,
-                Abstract => "Layer from $table in $prefix using column $geom",
-                DefaultSRS => "$auth_name:$auth_srid",
-                Table => $table,
-                GeometryColumn => $geom,
-                SRID => $auth_srid,
-                Schema => \%schema
-            };
-            for my $n ($shortname, $name) {
-                if ($type->{$n}) {
-                    for my $key (keys %{$type->{$n}}) {
-                        $feature_type->{$key} = $type->{$n}{$key};
+        my $name = "\"$schema\".\"$table\"";
+        push @tables, [$schema, $table, $name, "$schema.$table"];
+    }
+    my %pk_type = (
+        smallint => 1,
+        integer => 1,
+        bigint => 1
+        );
+    for my $table (@tables) {
+        # require a readable table with single integer pk and geometry column(s) with SRS
+        my %columns;
+        my %geometries;
+        my @pk;
+        # setting gml:id is a way to include views
+        if ($type->{'gml:id'}) {
+            @pk = ($type->{'gml:id'});
+        } else {
+            @pk = $dbh->primary_key('', @$table[0,1]);
+        }
+        if (@pk == 1) {
+            $pk[0] =~ s/^"//;
+            $pk[0] =~ s/"$//;
+            my $pk_exists = 0;
+            $sth = $dbh->column_info('', @$table[0,1], '');
+            while (my $data = $sth->fetchrow_hashref) {
+                my $col = $data->{COLUMN_NAME};
+                $col =~ s/^"//;
+                $col =~ s/"$//;
+                if ($col eq $pk[0]) {
+                    if ($pk_type{$data->{TYPE_NAME}}) {
+                        $pk_exists = 1;
+                    } else {
+                        if ($self->{debug} > 3) {
+                            say STDERR "$table->[3]: PK is not integer";
+                        }
+                        %geometries = ();
+                        last;
                     }
+                } elsif ($data->{TYPE_NAME} eq 'geometry') {
+                    $geometries{$col} = 1;
+                } else {
+                    $columns{$col}{in_type} = $data->{TYPE_NAME};
                 }
             }
-            for my $key (keys %$type) {
-                $feature_type->{$key} //= $type->{$key} unless ref $key;
+            unless ($pk_exists) {
+                if ($self->{debug} > 3) {
+                    say STDERR "$table->[3]: 'gml:id ($pk[0]) does not exist in the table";
+                }
+                %geometries = ();
             }
+        } elsif ($self->{debug} > 3) {
+            say STDERR "$table->[3] does not have single PK, maybe use gml:id in config?";
+        }
+        for my $geom (keys %geometries) {
+            my $ok;
+            my $sql = "select auth_name,auth_srid from $table->[2] ".
+                "join spatial_ref_sys on spatial_ref_sys.srid=st_srid(\"$geom\") ".
+                "limit 1";
+            $sth = $dbh->prepare($sql);
+            if ($sth) {
+                my $rv = $sth->execute;
+                if ($rv) {
+                    my ($auth_name, $auth_srid) = $sth->fetchrow_array;
+                    $auth_name //= 'undef';
+                    $auth_srid //= 'undef';
+                    $geometries{$geom} = [$auth_name, $auth_srid];
+                    if ($auth_name eq 'EPSG' && $auth_srid) {
+                        $ok = 1;
+                    } elsif ($self->{debug} > 3) {
+                        say STDERR "$table->[3]: auth of $geom is $auth_name:$auth_srid (is it empty?)";
+                    }
+                } elsif ($self->{debug} > 3) {
+                    say STDERR "$table->[3]: no permission";
+                }
+            }
+            delete $geometries{$geom} unless $ok;
+        }
+        unless (%geometries) {
+            if ($self->{debug} > 2) {
+                say STDERR "$table->[3]: is not readable with single integer pk and geometry column(s) with EPSG SRS";
+            }
+            next;
+        }
+
+        for my $geom (keys %geometries) {
+            
+            my $name = $table->[3].'.'.$geom;
+            $name =~ s/ /_/g; # XML layer names can't have spaces
+
+            my $feature_type = {
+                Name => $name,
+                Title => $name,
+                Abstract => "Layer from $table->[1] in $table->[0] using column $geom.",
+                DefaultSRS => $geometries{$geom}[0].":".$geometries{$geom}[1],
+                SRID => $geometries{$geom}[1],
+                DataSource => $ds,
+                Table => $table->[2], # full quoted name with schema
+                GeometryColumn => '"'.$geom.'"',
+                columns => \%columns,
+                'gml:id' => $pk[0],
+                Operations => $type->{Operations}, # $self->{config}{Operations} is the default
+                require_user => $type->{require_user} // $self->{config}{require_user}, # operation dependent?
+                pseudo_credentials => $type->{pseudo_credentials},
+                # to do: these in ows:WGS84BoundingBox, GetCapabilities
+                #LowerCorner 
+                #UpperCorner
+            };
+            for my $o (@GDAL_GML_Creation_options) {
+                $feature_type->{$o} = $type->{$o} if exists $type->{$o};
+            }
+
             my ($h, @c) = pseudo_credentials($feature_type);
             my $ok = 1;
             for my $c (@c) {
-                unless ($feature_type->{Schema}{$c}) {
-                    print STDERR "pseudo credential column '$c' not in schema.\n" if $self->{debug} > 2;
+                unless ($feature_type->{columns}{$c}) {
+                    carp "pseudo credential column '$c' not in table.\n";
                     $ok = 0;
                     next;
                 }
             }
             next unless $ok;
-            print STDERR "added.\n" if $self->{debug} > 2;
-            push @feature_types, $feature_type;
+            push @types, $feature_type;
         }
     }
-    return @feature_types;
+    #print STDERR Dumper \@types;
+    return \@types;
 }
 
 # return WFS request in a hash
@@ -1147,7 +1077,7 @@ sub ogc_request {
             $query->{lc($key)} = $b if $b;
         }
         if (defined $query->{srsname}) {
-            $query->{EPSG} = get_integer($query->{srsname});
+            $query->{EPSG} = epsg_number($query->{srsname});
         }
         for my $property ($node->getChildrenByTagNameNS('*', 'PropertyName')) {
             $query->{properties} = {} unless $query->{properties};
@@ -1167,16 +1097,7 @@ sub transaction_sql {
     my ($self) = @_;
     my $get_type = sub {
         my $name = shift;
-        $name =~ s/^\w+://; # remove possible namespace
-        my $type = $self->feature_type($name);
-        unless ($type) {
-            say STDERR "No such feature type: '$name'";
-            return;
-        }
-        unless ($type->{Table}) {
-            say STDERR "The datasource is not PostGIS for '$name'.";
-            return;
-        }
+        my $type = $self->get_feature_type($name);
         my $dbi = DataSource2dbi($type->{DataSource});
         return ($name, $type, $dbi);
     };
@@ -1198,14 +1119,15 @@ sub transaction_sql {
             my ($ns, $name) = parse_tag($field);
             my $col;
             my $val;
-            if ($name eq 'geometryProperty' or $name eq 'null') {
+            if ($name eq 'geometry' or $name eq 'geometryProperty' or $name eq 'null') {
                 $col = $type->{GeometryColumn};
                 $val = node2sql($field->firstChild);
-            }  else {
-                for my $c (keys %{$type->{Schema}}) {
-                    $col = $c if $name eq $type->{Schema}{$c}{out_name};
+            } else {
+                for my $c (keys %{$type->{columns}}) {
+                    $col = $c if $name eq $type->{columns}{$c}{out_name};
                 }
                 next unless $col;
+                $col = '"'.$col.'"';
                 $val = $field->firstChild->data;
                 $val = "'".$val."'";
             }
@@ -1213,11 +1135,14 @@ sub transaction_sql {
                 say STDERR "Can't find column name for property '$name'.";
                 next;
             }
-            push @cols, '"'.$col.'"';
+            push @cols, $col;
             push @vals, $val;
         }
-        push @{$dbisql{$dbi}{Insert}{SQL}}, "INSERT INTO $type->{Table} (".join(',',@cols).") VALUES (".join(',',@vals).")";
-        push @{$dbisql{$dbi}{Insert}{Table}}, $type->{Table};
+        my $cols = join(',',@cols);
+        my $vals = join(',',@vals);
+        say STDERR "Insert: ($cols) VALUES ($vals)" if $self->{debug} > 1;
+        push @{$dbisql{$dbi}{Insert}{SQL}}, "INSERT INTO $type->{Table} ($cols) VALUES ($vals)";
+        push @{$dbisql{$dbi}{Insert}{type}}, $type;
     }
     for my $node (@{$self->{request}{Update}}) {
         my ($type_name, $type, $dbi) = $get_type->($node->getAttribute('typeName'));
@@ -1239,49 +1164,57 @@ sub transaction_sql {
             next if $name eq $type->{"gml:id"};
             my @val = $property->getChildrenByTagNameNS('*', 'Value');
             my $val;
-            if ($name eq 'geometryProperty' or $name eq 'null') {
+            if ($name eq 'geometry' or $name eq 'geometryProperty' or $name eq 'null') {
                 $col = $type->{GeometryColumn};
                 $val = @val ? node2sql($val[0]->firstChild) : 'NULL';
             } else {
-                for my $c (keys %{$type->{Schema}}) {
-                    $col = $c if $name eq $type->{Schema}{$c}{out_name};
-                }                
+                for my $c (keys %{$type->{columns}}) {
+                    $col = $c if $name eq $type->{columns}{$c}{out_name};
+                }
+                $col = '"'.$col.'"' if $col;
                 $val = @val ? "'".$val[0]->textContent()."'" : 'NULL';
             }
             unless ($col) {
                 say STDERR "Can't find column name for property '$name'.";
                 next;
             }
-            $set .= "\"$col\" = $val, ";
+            $set .= "$col = $val, ";
         }
         $set =~ s/, $//;
         my $where = $get_filter->($node, $type);
+        say STDERR "Update: SET $set WHERE $where" if $self->{debug} > 1;
         push @{$dbisql{$dbi}{Update}{SQL}}, "UPDATE $type->{Table} SET $set WHERE $where";
-        push @{$dbisql{$dbi}{Update}{Table}}, $type->{Table};
+        push @{$dbisql{$dbi}{Update}{type}}, $type;
     }
     for my $node (@{$self->{request}{Delete}}) {
         my ($type_name, $type, $dbi) = $get_type->($node->getAttribute('typeName'));
         next unless $type_name;
         my $where = $get_filter->($node, $type);
+        say STDERR "Delete: $where" if $self->{debug} > 1;
         push @{$dbisql{$dbi}{Delete}{SQL}}, "DELETE FROM $type->{Table} WHERE $where";
-        push @{$dbisql{$dbi}{Delete}{Table}}, $type->{Table};
+        push @{$dbisql{$dbi}{Delete}{type}}, $type;
     }
     return \%dbisql;
 }
 
-sub DataSource2dbi {
-    my $DataSource = shift;
-    my $dbi = 'dbi:'.$DataSource;
-    $dbi =~ s/ host/;host/;
-    $dbi =~ s/user=//;
-    $dbi =~ s/password=//;
-    return $dbi;
+# determine the EPSG number
+sub epsg_number {
+    my $str = shift;
+    return undef unless $str;
+    my ($epsg) = $str =~ /^EPSG:(\d+)$/;
+    return $epsg if $epsg;
 }
 
-sub fallback {
-    for my $arg (@_) {
-        return $arg if defined $arg;
-    }
+sub DataSource2dbi {
+    my $DataSource = shift;
+    my $dbi = $DataSource;
+    $dbi =~ s/^pg/Pg/i;
+    $dbi =~ s/ host/;host/;
+    $dbi =~ s/ port/;port/;
+    $dbi =~ s/ options/;options/;
+    $dbi =~ s/user=//;
+    $dbi =~ s/password=//;
+    return 'dbi:'.$dbi;
 }
 
 sub split_to_listref {
@@ -1308,6 +1241,16 @@ sub pseudo_credentials {
     return ({$c1 => 1,$c2 => 1},$c1,$c2);
 }
 
+sub min {
+    my $retval = shift;
+    for my $x (@_) {
+        next unless defined $x;
+        $retval = $x unless defined $retval;
+        $retval = $x if $x < $retval;
+    }
+    return $retval;
+}
+
 1;
 __END__
 
@@ -1331,7 +1274,7 @@ Ari Jolma, E<lt>ari.jolma at gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Ari Jolma
+Copyright (C) 2015- by Ari Jolma
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

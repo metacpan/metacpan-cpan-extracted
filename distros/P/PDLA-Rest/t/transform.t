@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use PDLA::LiteF;
 use PDLA::Transform;
-use Test::More tests => 27;
+use Test::More tests => 35;
 use Test::Exception;
 
 {
@@ -100,7 +100,7 @@ SKIP: {
 	ok(($pb->slice("0:1")->isbad->all  and  $pb->slice(":,0:1")->isbad->all  and ($pb->isbad->sum==16)), "Bad values happen");
 
 	eval { $pb = $pa->map($t1,{pix=>1,method=>'h'}) };
-	ok(($pb->slice("0")->isbad->all  and  $pb->slice(":,0:1")->isbad->all and $pb->isbad->sum==13), "Bad values happen with 'h' method");
+	ok(($pb->slice("0")->isbad->all  and  $pb->slice(":,0:1")->isbad->all and $pb->isbad->sum==13), "Bad values happen with 'h' method"); 
 }
 
 {
@@ -179,6 +179,19 @@ SKIP: {
 			my $wndb = $pb->whichND;
 			ok($wndb->nelem==4 and all($wndb==pdl([[3,4],[4,4]])) and all(approx($pb->slice([3,4],4),0.5)),'offset with hanning interpolation does the right thing');
 		}
+	}
+
+	{
+	    ##############################
+	    #check that no resampling methods produce segfaults for transformations
+	    #was segfaulting on 'g' only
+	    use PDLA::IO::FITS;
+	    use PDLA::Transform::Cartography;
+	    my $m51 = rfits('m51.fits');
+	    my $tp = t_perspective(r0=>200,iu=>'arcmin',origin=>[-10,3]);
+	    foreach my $method(qw/s l c h g j H G/){ #f doesn't work so well on images this big
+		lives_ok {$m51->map(!$tp,{nofits=>1,method=>$method})} "no map segfault m=>$method";
+	    }
 	}
 
 }

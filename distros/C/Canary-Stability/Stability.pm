@@ -23,7 +23,7 @@ See the F<Makefile.PL> in L<Coro> or L<AnyEvent> for usage examples.
 package Canary::Stability;
 
 BEGIN {
-   $VERSION = 2012;
+   $VERSION = 2013;
 }
 
 sub sgr {
@@ -85,6 +85,7 @@ EOF
 *** status testing, you might also not want to care at all, and all will
 *** be well as long $distname works well enough for you, as the stability
 *** canary is only used when installing the distribution.
+***
 EOF
    } elsif ($] < $minperl) {
 
@@ -96,7 +97,19 @@ EOF
 *** likes ($minperl). This is not a fatal problem - the module might work
 *** well with your version of perl, but it does mean the author likely
 *** won't do anything to make it work if it breaks.
+***
 EOF
+
+      if ($ENV{AUTOMATED_TESTING}) {
+         print <<EOF;
+*** Since this is an AUTOMATED_TESTING environment, the stability canary
+*** decided to fail cleanly here, rather than to generate a false test
+*** result.
+***
+EOF
+         exit 0;
+      }
+
    } elsif (defined $Internals::StabilityBranchVersion) {
       # note to people studying this modules sources:
       # the above test is not considered a clean or stable way to
@@ -109,6 +122,7 @@ EOF
 *** It seems you are running schmorp's stability branch of perl.
 *** All should be well, and if it isn't, you should report this as a bug
 *** to the $distname author.
+***
 EOF
    } elsif ($] < 5.021) {
       #sgr 32;
@@ -117,6 +131,7 @@ EOF
 ***
 *** Your version of perl ($]) is quite supported by $distname, nothing
 *** else to be said, hope it comes in handy.
+***
 EOF
    } else {
       sgr 31;
@@ -131,6 +146,7 @@ EOF
 *** stability branch.
 ***
 *** If everything works fine, you can ignore this message.
+***
 EOF
       sgr 0;
       print <<EOF;
@@ -193,6 +209,16 @@ Force use of colour.
 =item C<PERL_CANARY_STABILITY_DISABLE=1>
 
 Disable this modules functionality completely.
+
+=item C<AUTOMATED_TESTING=1>
+
+When this variable is set to a true value and the perl minimum version
+requirement is not met, the module will exit, which should skip testing
+under automated testing environments.
+
+This is done to avoid false failure or success reports when the chances of
+success are already quite low and the failures are not supported by the
+author.
 
 =back
 

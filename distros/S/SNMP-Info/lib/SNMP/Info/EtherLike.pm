@@ -39,9 +39,9 @@ use SNMP::Info;
 @SNMP::Info::EtherLike::ISA       = qw/SNMP::Info Exporter/;
 @SNMP::Info::EtherLike::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
+our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = ( 'EtherLike-MIB' => 'etherMIB' );
 

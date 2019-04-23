@@ -10,7 +10,6 @@ use PDL::Factor  ();
 use PDL::SV      ();
 use PDL::Logical ();
 
-use Data::Munge qw(elem);
 use List::AllUtils;
 use Scalar::Util qw(looks_like_number);
 use Type::Params;
@@ -81,6 +80,10 @@ fun guess_and_convert_to_pdl ( (ArrayRef | Value | ColumnLike) $x,
         :$strings_as_factors=false, :$test_count=1000, :$na=[qw(BAD NA)]) {
     return $x if ( $x->$_DOES('PDL') );
 
+    my $is_na = sub {
+        length( $_[0] ) == 0 or List::AllUtils::any { $_[0] eq $_ } @$na;
+    };
+
     my $like_number;
     if ( !ref $x ) {
         $like_number = looks_like_number($x);
@@ -88,18 +91,10 @@ fun guess_and_convert_to_pdl ( (ArrayRef | Value | ColumnLike) $x,
     }
     else {
         $like_number = List::AllUtils::all {
-            my $x = $_;
-            looks_like_number($x)
-              or length($x) == 0
-              or (
-                # should be somewhat faster than elem()
-                List::AllUtils::any { $x eq $_ } @$na
-              )
+            looks_like_number($_) or &$is_na($_);
         }
         @$x[ 0 .. List::AllUtils::min( $test_count - 1, $#$x ) ];
     }
-
-    my $is_na = sub { length( $_[0] ) == 0 or elem( $_[0], $na ); };
 
     if ($like_number) {
         my @data   = map { &$is_na($_) ? 'nan' : $_ } @$x;
@@ -134,7 +129,7 @@ Data::Frame::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0043
+version 0.0045
 
 =head1 DESCRIPTION
 

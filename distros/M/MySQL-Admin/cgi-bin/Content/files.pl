@@ -359,7 +359,7 @@ sub FileOpen {
 sub saveFile {
     my $txt   = param('txt');
     my $sFile = param('file');
-    $txt =~ s/\r\n/\n/g;
+#     $txt =~ s/\r\n/\n/g;
     my $fh = gensym();
     unless ( -d $sFile ) {
         open $fh, ">:encoding(UTF-8)", "$sFile.bak" or warn "files.pl::saveFile $/ $! $/ $sFile $/";
@@ -401,7 +401,7 @@ sub showEditor {
 qq|<a href="javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=FileOpen&file=$efl','FileOpen','FileOpen')">$linkText</a>|;
     print qq|<div class="ShowTables marginTop">
 
-    <form accept-charset="utf-8" action ="$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}" onsubmit="document.getElementById('txt').value = GetEditorLines();submitForm(this,'$a','$a');return false;" method="post">
+    <form accept-charset="utf-8" action ="$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}" onsubmit="document.getElementById('txt').value = editor.getValue();submitForm(this,'$a','$a');return false;" method="post">
 
     <table cellspacing="5" cellpadding="0" border="0" align="center" summary="files.pl" width="95%">
       <tbody>

@@ -29,6 +29,15 @@ ENVIRONMENT VARIABLES
     "PERL_CANARY_STABILITY_DISABLE=1"
         Disable this modules functionality completely.
 
+    "AUTOMATED_TESTING=1"
+        When this variable is set to a true value and the perl minimum
+        version requirement is not met, the module will exit, which should
+        skip testing under automated testing environments.
+
+        This is done to avoid false failure or success reports when the
+        chances of success are already quite low and the failures are not
+        supported by the author.
+
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>
      http://software.schmorp.de/pkg/Canary-Stability.html

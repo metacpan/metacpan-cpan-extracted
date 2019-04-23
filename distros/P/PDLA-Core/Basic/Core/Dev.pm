@@ -46,7 +46,6 @@ use English; require Exporter;
 
 # Return library locations
 
-
 sub PDLA_INCLUDE { '"-I'.whereami_any().'/Core"' };
 sub PDLA_TYPEMAP { whereami_any().'/Core/typemap.pdl' };
 # sub PDLA_INST_INCLUDE { '-I'.whereami_any().'/Core' };
@@ -311,7 +310,7 @@ sub flushgeneric {  # Construct the generic code switch
 
    print $indent,"switch ($loopvar) {\n\n";
 
-   for $case (keys %PDLA_DATATYPES) {
+   for $case (PDLA::Types::typesrtkeys()){
 
      $type = $PDLA_DATATYPES{$case};
 
@@ -371,40 +370,26 @@ EOF
 }
 
 # Expects list in format:
-# [gtest.pd, GTest, PDLA::GTest,     ['../GIS/Proj', ...] ], [...]
-# source,    prefix,module/package, optional deps
+# [gtest.pd, GTest, PDLA::GTest,    PDLA::XSPkg], [...]
+# source,    prefix,module/package, optional pp_addxs destination
 # The idea is to support in future several packages in same dir - EUMM
 #   7.06 supports
-# each optional dep is a relative dir that a "make" will chdir to and
-# "make" first - so the *.pd file can then "use" what it makes
 
 # This is the function internal for PDLA.
-
+#
 sub pdlpp_postamble_int {
-	join '',map { my($src,$pref,$mod, $deps) = @$_;
-        die "If give dependencies, must be array-ref" if $deps and !ref $deps;
+	join '',map { my($src,$pref,$mod,$callpack) = @$_;
 	my $w = whereami_any();
 	$w =~ s%/((PDLA)|(Basic))$%%;  # remove the trailing subdir
 	my $top = File::Spec->abs2rel($w);
 	my $basic = File::Spec->catdir($top, 'Basic');
 	my $core = File::Spec->catdir($basic, 'Core');
 	my $gen = File::Spec->catdir($basic, 'Gen');
-        my $depbuild = '';
-        for my $dep (@{$deps || []}) {
-            my $target = '';
-            if ($dep eq 'core') {
-                $dep = $top;
-                $target = ' core';
-            }
-            require ExtUtils::MM;
-            $dep =~ s#([\(\)])#\\$1#g; # in case of unbalanced (
-            $depbuild .= MM->oneliner("exit(!(chdir q($dep) && !system(q(\$(MAKE)$target))))");
-            $depbuild .= "\n\t";
-        }
+	$callpack //= '';
 qq|
 
 $pref.pm: $src $core/Types.pm
-	$depbuild\$(PERLRUNINST) \"-MPDLA::PP qw/$mod $mod $pref/\" $src
+	\$(PERLRUNINST) \"-MPDLA::PP qw[$mod $mod $pref $callpack]\" $src
 
 $pref.xs: $pref.pm
 	\$(TOUCH) \$@
@@ -418,14 +403,18 @@ $pref\$(OBJ_EXT): $pref.c
 
 
 # This is the function to be used outside the PDLA tree.
+# same format as pdlpp_postamble_int
 sub pdlpp_postamble {
-	join '',map { my($src,$pref,$mod) = @$_;
+	join '',map { my($src,$pref,$mod,$callpack) = @$_;
 	my $w = whereami_any();
 	$w =~ s%/((PDLA)|(Basic))$%%;  # remove the trailing subdir
+	require ExtUtils::MM;
+	my $oneliner = MM->oneliner(q{exit if \$\$ENV{DESTDIR}; use PDLA::Doc; eval { PDLA::Doc::add_module(q{$mod}); }});
+	$callpack //= '';
 qq|
 
 $pref.pm: $src
-	\$(PERL) "-I$w" \"-MPDLA::PP qw/$mod $mod $pref/\" $src
+	\$(PERL) "-I$w" \"-MPDLA::PP qw[$mod $mod $pref $callpack]\" $src
 
 $pref.xs: $pref.pm
 	\$(TOUCH) \$@
@@ -433,6 +422,10 @@ $pref.xs: $pref.pm
 $pref.c: $pref.xs
 
 $pref\$(OBJ_EXT): $pref.c
+
+install ::
+	\@echo "Updating PDLA documentation database...";
+	$oneliner
 |
 	} (@_)
 }
@@ -446,6 +439,7 @@ sub pdlpp_stdargs_int {
  my $mallocinc = exists $PDLA::Config{MALLOCDBG}->{include} ?
    $PDLA::Config{MALLOCDBG}->{include} : '';
 my $libsarg = $libs || $malloclib ? "$libs $malloclib " : ''; # for Win32
+ require ExtUtils::MakeMaker;
  return (
  	%::PDLA_OPTIONS,
 	 'NAME'  	=> $mod,
@@ -464,6 +458,7 @@ my $libsarg = $libs || $malloclib ? "$libs $malloclib " : ''; # for Win32
 sub pdlpp_stdargs {
  my($rec) = @_;
  my($src,$pref,$mod) = @$rec;
+ require ExtUtils::MakeMaker;
  return (
  	%::PDLA_OPTIONS,
 	 'NAME'  	=> $mod,
@@ -760,7 +755,7 @@ sub generate_core_flags {
     # access (read, if set is true then write as well; if postset true then
     #         read first and write new value after that)
     # to piddle's state
-    foreach my $name ( keys %flags ) {
+    foreach my $name ( sort keys %flags ) {
         my $flag = "PDLA_" . ($flags{$name}{FLAG} || uc($name));
         if ( $flags{$name}{set} ) {
             print <<"!WITH!SUBS!";

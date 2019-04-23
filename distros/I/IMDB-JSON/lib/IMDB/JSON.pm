@@ -10,7 +10,7 @@ Search IMDB for a specific title, process the result and extract the JSON script
 
 package IMDB::JSON;
 
-$IMDB::JSON::VERSION = "0.02";
+$IMDB::JSON::VERSION = "0.03";
 
 use strict;
 use HTML::TokeParser;
@@ -25,7 +25,7 @@ use JSON::XS;
 
  my $IMDB = IMDB::JSON->new;
 
- print Dumper($IMDB->search("The Thing", "1982));
+ print Dumper($IMDB->search("The Thing", 1982));
 
  exit;
 
@@ -149,6 +149,11 @@ sub _result {
 	return;
 }
 
+=head1 search(tilte, year)
+
+Attempt to return IMDB data for the movie / show B<tilte> published in B<year>
+
+=cut
 
 sub search {
 	my ($self, $title, $year) = @_;
@@ -162,6 +167,12 @@ sub search {
 	print STDERR "DEBUG: " . length($data) . " bytes of data received\n" if $self->{debug};
 
 	return if !$data;
+
+	return $self->_get_json($data);
+}
+
+sub _get_json {
+	my ($self, $data) = @_;
 
 	my $p = HTML::TokeParser->new(\$data);
 
@@ -179,6 +190,22 @@ sub search {
 	} else {
 		return ($self->{raw_json} ? $json : decode_json($json));
 	}
+}
+
+=head1 byid(imdb_id)
+
+Returns JSON results for B<imdb_id>
+
+=cut
+
+sub byid {
+	my ($self, $id) = @_;
+
+	my $data = $self->_get($self->{base_url} . '/title/' . $id);
+
+	return if !$data;
+
+	return $self->_get_json($data);
 }
 
 1;

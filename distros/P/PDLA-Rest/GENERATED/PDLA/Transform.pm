@@ -89,30 +89,30 @@ Coordinate transformations and mappings are a little counterintuitive
 at first.  Here are some examples of transforms in action:
 
    use PDLA::Transform;
-   $a = rfits('m51.fits');   # Substitute path if necessary!
+   $x = rfits('m51.fits');   # Substitute path if necessary!
    $ts = t_linear(Scale=>3); # Scaling transform
 
    $w = pgwin(xs);
-   $w->imag($a);
+   $w->imag($x);
 
    ## Grow m51 by a factor of 3; origin is at lower left.
-   $b = $ts->map($a,{pix=>1});    # pix option uses direct pixel coord system
-   $w->imag($b);
+   $y = $ts->map($x,{pix=>1});    # pix option uses direct pixel coord system
+   $w->imag($y);
 
    ## Shrink m51 by a factor of 3; origin still at lower left.
-   $c = $ts->unmap($a, {pix=>1});
+   $c = $ts->unmap($x, {pix=>1});
    $w->imag($c);
 
    ## Grow m51 by a factor of 3; origin is at scientific origin.
-   $d = $ts->map($a,$a->hdr);    # FITS hdr template prevents autoscaling
+   $d = $ts->map($x,$x->hdr);    # FITS hdr template prevents autoscaling
    $w->imag($d);
 
    ## Shrink m51 by a factor of 3; origin is still at sci. origin.
-   $e = $ts->unmap($a,$a->hdr);
+   $e = $ts->unmap($x,$x->hdr);
    $w->imag($e);
 
    ## A no-op: shrink m51 by a factor of 3, then autoscale back to size
-   $f = $ts->map($a);            # No template causes autoscaling of output
+   $f = $ts->map($x);            # No template causes autoscaling of output
 
 =head1 OPERATOR OVERLOADS
 
@@ -303,9 +303,9 @@ sub apply {
   my($from) = shift;
 
   if(UNIVERSAL::isa($me,'PDLA')){
-      my($a) = $from;
+      my($x) = $from;
       $from = $me;
-      $me = $a;
+      $me = $x;
   }
 
   if(UNIVERSAL::isa($me,'PDLA::Transform') && UNIVERSAL::isa($from,'PDLA')){
@@ -351,9 +351,9 @@ sub invert {
   my($data) = shift;
 
   if(UNIVERSAL::isa($me,'PDLA')){
-      my($a) = $data;
+      my($x) = $data;
       $data = $me;
-      $me = $a;
+      $me = $x;
   }
 
   if(UNIVERSAL::isa($me,'PDLA::Transform') && UNIVERSAL::isa($data,'PDLA')){
@@ -382,9 +382,9 @@ sub invert {
 
 =for usage
 
-  $b = $a->match($c);                  # Match $c's header and size
-  $b = $a->match([100,200]);           # Rescale to 100x200 pixels
-  $b = $a->match([100,200],{rect=>1}); # Rescale and remove rotation/skew.
+  $y = $x->match($c);                  # Match $c's header and size
+  $y = $x->match([100,200]);           # Rescale to 100x200 pixels
+  $y = $x->match([100,200],{rect=>1}); # Rescale and remove rotation/skew.
 
 =for ref
 
@@ -392,7 +392,7 @@ Resample a scientific image to the same coordinate system as another.
 
 The example above is syntactic sugar for
 
- $b = $a->map(t_identity, $c, ...);
+ $y = $x->map(t_identity, $c, ...);
 
 it resamples the input PDLA with the identity transformation in
 scientific coordinates, and matches the pixel coordinate system to
@@ -401,16 +401,16 @@ $c's FITS header.
 There is one difference between match and map: match makes the
 C<rectify> option to C<map> default to 0, not 1.  This only affects
 matching where autoscaling is required (i.e. the array ref example
-above).  By default, that example simply scales $a to the new size and
-maintains any rotation or skew in its scientiic-to-pixel coordinate
+above).  By default, that example simply scales $x to the new size and
+maintains any rotation or skew in its scientific-to-pixel coordinate
 transform.
 
 =head2 map
 
 =for usage
 
-  $b = $a->map($xform,[<template>],[\%opt]); # Distort $a with tranform $xform
-  $b = $a->map(t_identity,[$pdl],[\%opt]); # rescale $a to match $pdl's dims.
+  $y = $x->map($xform,[<template>],[\%opt]); # Distort $x with transform $xform
+  $y = $x->map(t_identity,[$pdl],[\%opt]); # rescale $x to match $pdl's dims.
 
 =for ref
 
@@ -515,7 +515,7 @@ subsequent dimensions -- or, for a 2-D transformation, the scientific
 pixel aspect ratio.  Values less than 1 shrink the scale in the first
 dimension compared to the other dimensions; values greater than 1
 enlarge it compared to the other dimensions.  (This is the same sense
-as in the L<PGPLOT|PDLA::Graphics::PGPLOT>interface.)
+as in the L<PGPLOT|PDLA::Graphics::PGPLOT> interface.)
 
 =item ir, irange, input_range, Input_Range
 
@@ -741,9 +741,9 @@ sub map {
   my($in) = shift;
 
   if(UNIVERSAL::isa($me,'PDLA') && UNIVERSAL::isa($in,'PDLA::Transform')) {
-      my($a) = $in;
+      my($x) = $in;
       $in = $me;
-      $me = $a;
+      $me = $x;
   }
 
   barf ("PDLA::Transform::map: source is not defined or is not a PDLA\n")
@@ -774,9 +774,9 @@ sub map {
   if(UNIVERSAL::isa($tmp,'PDLA')) {
     @odims = $tmp->dims;
 
-    my($a);
-    if(defined ($a = $tmp->gethdr)) {
-      my(%b) = %{$a};
+    my($x);
+    if(defined ($x = $tmp->gethdr)) {
+      my(%b) = %{$x};
       $ohdr = \%b;
     }
   } elsif(ref $tmp eq 'HASH') {
@@ -1070,9 +1070,9 @@ sub map {
   ## just transform and interpolate.
   ##  ( Kind of an anticlimax after all that, eh? )
   if(!$integrate) {
-    my $a = $in->interpND($idx,{method=>$method, bound=>$bound});
+    my $x = $in->interpND($idx,{method=>$method, bound=>$bound});
     my $tmp; # work around perl -d "feature"
-    ($tmp = $out->slice(":")) .= $a; # trivial slice prevents header overwrite...
+    ($tmp = $out->slice(":")) .= $x; # trivial slice prevents header overwrite...
     return $out;
   }
 
@@ -1194,9 +1194,9 @@ sub unmap {
   my(@params) = @_;
 
   if(UNIVERSAL::isa($data,'PDLA::Transform') && UNIVERSAL::isa($me,'PDLA')) {
-      my $a = $data;
+      my $x = $data;
       $data = $me;
-      $me = $a;
+      $me = $x;
   }
 
   return $me->inverse->map($data,@params);
@@ -1393,9 +1393,9 @@ sub compose {
 Shift a transform into a different space by 'wrapping' it with a second.
 
 This is just a convenience function for two
-L<t_compose|/t_compose> calls. C<< $a->wrap($b) >> is the same as
-C<(!$b) x $a x $b>: the resulting transform first hits the data with
-$b, then with $a, then with the inverse of $b.
+L<t_compose|/t_compose> calls. C<< $x->wrap($y) >> is the same as
+C<(!$y) x $x x $y>: the resulting transform first hits the data with
+$y, then with $x, then with the inverse of $y.
 
 For example, to shift the origin of rotation, do this:
 
@@ -1422,27 +1422,27 @@ sub wrap {
 
 # Composition operator -- handles 'x'.
 sub _compose_op {
-    my($a,$b,$c) = @_;
-    $c ? compose($b,$a) : compose($a,$b);
+    my($x,$y,$c) = @_;
+    $c ? compose($y,$x) : compose($x,$y);
 }
 
 # Raise-to-power operator -- handles '**'.
 
 sub _pow_op {
-    my($a,$b,$c) = @_;
+    my($x,$y,$c) = @_;
 
     barf("%s", "Can't raise anything to the power of a transform")
-        if($c || UNIVERSAL::isa($b,'PDLA::Transform')) ;
+        if($c || UNIVERSAL::isa($y,'PDLA::Transform')) ;
 
-    $a = $a->inverse
-        if($b < 0);
+    $x = $x->inverse
+        if($y < 0);
 
-    return $a if(abs($b) == 1);
-    return new PDLA::Transform if(abs($b) == 0);
+    return $x if(abs($y) == 1);
+    return new PDLA::Transform if(abs($y) == 0);
 
     my(@l);
-    for my $i(1..abs($b)) {
-        push(@l,$a);
+    for my $i(1..abs($y)) {
+        push(@l,$x);
     }
 
     t_compose(@l);
@@ -1565,16 +1565,16 @@ EXAMPLE
 
 To scale logarithmically the Y axis of m51, try:
 
-  $a = float rfits('m51.fits');
+  $x = float rfits('m51.fits');
   $lookup = xvals(128,128) -> cat( 10**(yvals(128,128)/50) * 256/10**2.55 );
   $t = t_lookup($lookup);
-  $b = $t->map($a);
+  $y = $t->map($x);
 
 To do the same thing but with a smaller lookup table, try:
 
   $lookup = 16 * xvals(17,17)->cat(10**(yvals(17,17)/(100/16)) * 16/10**2.55);
   $t = t_lookup($lookup,{scale=>1/16.0});
-  $b = $t->map($a);
+  $y = $t->map($x);
 
 (Notice that, although the lookup table coordinates are is divided by 16,
 it is a 17x17 -- so linear interpolation works right to the edge of the original
@@ -1634,7 +1634,7 @@ sub t_lookup {
       barf("Too many dims (".$data->dim(0).") for your table (".$me->{idim}.")\n");
     };
 
-    my($a)= ($table
+    my($x)= ($table
              ->interpND(float($data) * $scale + $offset,
                         $p->{interpND_opt}
                         )
@@ -1644,11 +1644,11 @@ sub t_lookup {
     # Put the index dimension (and threaded indices) back at the front of
     # the dimension list.
     my($dnd) = $data->ndims - 1;
-    return ($a -> ndims > $data->ndims - 1) ?
-      ($a->reorder( $dnd..($dnd + $table->ndims - $data->dim(0)-1)
+    return ($x -> ndims > $data->ndims - 1) ?
+      ($x->reorder( $dnd..($dnd + $table->ndims - $data->dim(0)-1)
                     , 0..$data->ndims-2
                     )
-       ) : $a;
+       ) : $x;
   };
 
   $me->{func} = sub {my($data,$p) = @_;  &$lookup_func($data,$p,$p->{table},$p->{scale},$p->{offset})};
@@ -1944,8 +1944,8 @@ sub PDLA::Transform::Linear::new {
                        $angle = $angle->at(0)
                          if(UNIVERSAL::isa($angle,'PDLA'));
 
-                       my($a) = $angle * $DEG2RAD;
-                       $subm .= $subm x pdl([cos($a),-sin($a)],[sin($a),cos($a)]);
+                       my($x) = $angle * $DEG2RAD;
+                       $subm .= $subm x pdl([cos($x),-sin($x)],[sin($x),cos($x)]);
                        $m .= $m x $i;
                      };
 
@@ -2005,11 +2005,11 @@ sub PDLA::Transform::Linear::new {
     barf("Linear transform: transform is $d-D; data only ".($in->dim(0))."\n")
         if($in->dim(0) < $d);
 
-    my($a) = $in->slice("0:$d")->copy + $opt->{pre};
+    my($x) = $in->slice("0:$d")->copy + $opt->{pre};
     my($out) = $in->is_inplace ? $in : $in->copy;
 
     my $tmp; # work around perl -d "feature"
-    ($tmp = $out->slice("0:$d")) .= $a x $opt->{matrix} + $opt->{post};
+    ($tmp = $out->slice("0:$d")) .= $x x $opt->{matrix} + $opt->{post};
 
     return $out;
   };
@@ -2022,11 +2022,11 @@ sub PDLA::Transform::Linear::new {
     barf("Linear transform: transform is $d-D; data only ".($in->dim(0))."\n")
         if($in->dim(0) < $d);
 
-    my($a) = $in->slice("0:$d")->copy - $opt->{post};
+    my($x) = $in->slice("0:$d")->copy - $opt->{post};
     my($out) = $in->is_inplace ? $in : $in->copy;
 
     my $tmp; # work around perl -d "feature"
-    ($tmp = $out->slice("0:$d")) .= $a x $opt->{inverse} - $opt->{pre};
+    ($tmp = $out->slice("0:$d")) .= $x x $opt->{inverse} - $opt->{pre};
 
     $out;
   } : undef;
@@ -2082,17 +2082,17 @@ sub PDLA::Transform::Linear::stringify {
 
 Convenience interface to L<t_linear|/t_linear>.
 
-t_scale produces a tranform that scales around the origin by a fixed
+t_scale produces a transform that scales around the origin by a fixed
 amount.  It acts exactly the same as C<t_linear(Scale=>\<scale\>)>.
 
 =cut
 
 sub t_scale {
     my($scale) = shift;
-    my($b) = shift;
-    return t_linear(scale=>$scale,%{$b})
-        if(ref $b eq 'HASH');
-    t_linear(Scale=>$scale,$b,@_);
+    my($y) = shift;
+    return t_linear(scale=>$scale,%{$y})
+        if(ref $y eq 'HASH');
+    t_linear(Scale=>$scale,$y,@_);
 }
 
 
@@ -2115,11 +2115,11 @@ It acts exactly the same as C<t_linear(Pre=>\<shift\>)>.
 
 sub t_offset {
     my($pre) = shift;
-    my($b) = shift;
-    return t_linear(pre=>$pre,%{$b})
-        if(ref $b eq 'HASH');
+    my($y) = shift;
+    return t_linear(pre=>$pre,%{$y})
+        if(ref $y eq 'HASH');
 
-    t_linear(pre=>$pre,$b,@_);
+    t_linear(pre=>$pre,$y,@_);
 }
 
 
@@ -2143,11 +2143,11 @@ N-D (matrix).  It acts exactly the same as C<t_linear(Rot=>\<shift\>)>.
 *t_rot = \&t_rotate;
 sub t_rotate    {
     my $rot = shift;
-    my($b) = shift;
-    return t_linear(rot=>$rot,%{$b})
-        if(ref $b eq 'HASH');
+    my($y) = shift;
+    return t_linear(rot=>$rot,%{$y})
+        if(ref $y eq 'HASH');
 
-    t_linear(rot=>$rot,$b,@_);
+    t_linear(rot=>$rot,$y,@_);
 }
 
 
@@ -2492,10 +2492,10 @@ Here, we scale the output to stretch 2*pi radians out to the
 full image width in the horizontal direction, and to stretch 1 radius out
 to a diameter in the vertical direction.
 
-  $a = rfits('m51.fits');
+  $x = rfits('m51.fits');
   $ts = t_linear(s => [250/2.0/3.14159, 2]); # Scale to fill orig. image
   $tu = t_radial(o => [130,130]);            # Expand around galactic core
-  $b = $a->map($ts x $tu);
+  $y = $x->map($ts x $tu);
 
 Examine radial structure in M51 (conformal):
 Here, we scale the output to stretch 2*pi radians out to the full image width
@@ -2503,10 +2503,10 @@ in the horizontal direction, and scale the vertical direction by the exact
 same amount to preserve conformality of the operation.  Notice that
 each piece of the image looks "natural" -- only scaled and not stretched.
 
-  $a = rfits('m51.fits')
+  $x = rfits('m51.fits')
   $ts = t_linear(s=> 250/2.0/3.14159);  # Note scalar (heh) scale.
   $tu = t_radial(o=> [130,130], r0=>5); # 5 pix. radius -> bottom of image
-  $b = $ts->compose($tu)->unmap($a);
+  $y = $ts->compose($tu)->unmap($x);
 
 
 =cut
@@ -2778,9 +2778,9 @@ sub t_cubic {
     $me->{name} = "cubic";
 
     $me->{params}->{cuberoot} = sub {
-        my $a = shift;
-        my $as = 1 - 2*($a<0);
-        return $as * (  abs($a) ** (1/3) );
+        my $x = shift;
+        my $as = 1 - 2*($x<0);
+        return $as * (  abs($x) ** (1/3) );
     };
 
     $me->{func} = sub {

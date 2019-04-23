@@ -1,5 +1,5 @@
 use Test::More;
-use Text::Names qw/isCommonSurname isCommonFirstname guessGender firstnamePrevalence surnamePrevalence isLikelyMisparsed/; 
+use Text::Names::GB qw/isCommonSurname isCommonFirstname guessGender firstnamePrevalence surnamePrevalence isLikelyMisparsed/;
 
 ok(isCommonSurname('Smith'),'No threshold test, positive');
 ok(isCommonSurname('Kennedy'),'No threshold test, positive');
@@ -23,6 +23,7 @@ is(guessGender("Christian Loew"),"M");
 is(guessGender('Natalia'), 'F');
 is(guessGender('Ana'), 'F');
 is(guessGender('Eleni'), 'F');
+is(guessGender('Reece'), 'M');
 ok(firstnamePrevalence('David') > 1);
 ok(surnamePrevalence('Smith') > 1);
 ok(firstnamePrevalence('Angela') > 0);

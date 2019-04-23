@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::CSVUtils" : "0",
+            "App::CSVUtils" : "0.019",
             "Complete::Util" : "0.57",
             "Config::IOD::Reader" : "0.341",
             "DBI" : "0",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-App-MysqlUtils"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -236,7 +236,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.594"
+            "version" : "0.596"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -320,9 +320,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Author::PERLANCAR/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Author::PERLANCAR/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",

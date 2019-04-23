@@ -1,5 +1,8 @@
 Revision history for Perl module X::Tiny
 
+0.18 Tue Apr 23 2019
+- Switch implementation to use Module::Runtime rather than Module::Load.
+
 0.17 Mon Mar 11 2019
 - Fix the fix to the test from RT #128809. (Blegh, oops.)
 

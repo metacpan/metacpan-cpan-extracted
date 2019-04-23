@@ -3,7 +3,7 @@ package Database::Async::Query;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 
@@ -392,7 +392,6 @@ sub from {
         $src = Ryu::Source->from($src);
     }
     die 'Invalid source' unless blessed($src) and $src->isa('Ryu::Source');
-    $src->each(sub { $log->infof('have row %s', $_) });
 
     $self->in->from($src);
     $src->prepare_await;

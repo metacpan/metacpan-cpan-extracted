@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Perl;
 use Encode ();
@@ -701,6 +701,76 @@ sub elapsed {
 
 # -----------------------------------------------------------------------------
 
+=head2 Logging
+
+=head3 log() - Schreibe Meldung nach STDERR
+
+=head4 Synopsis
+
+    $prg->log($fmt,@args);
+    $prg->log($level,$fmt,@args);
+
+=head4 Description
+
+Schreibe eine Logmeldung nach STDERR, wenn $level größer oder gleich
+dem eingestellten Loglevel ($prg->logLevel) ist. Ist $level nicht
+angegeben, wird 1 angenommen.
+
+Die Logmeldung wird per
+
+    printf STDERR $fmt,@args;
+
+erzeugt. Endet $fmt nicht mit einem Newline, wird es hinzugefügt.
+
+Per Default ist der LogLevel 0. Er wird mit
+
+    $prg->logLevel($n); # $n > 0
+
+eingestellt.
+
+=head4 Caveats
+
+=over 2
+
+=item *
+
+Ist $fmt eine Zahl, muss der Level $level explizit angegeben werden.
+
+=item *
+
+Die Argumente der Methode werden I<immer> ausgewertet, auch wenn
+kein Logging erfolgt. Ist damit ein größerer Aufwand verbunden,
+kann es sinnvoll sein, eine Bedingung zu formulieren:
+
+    if ($level >= $prg->logLevel) {
+        # $msg mit großem Aufwand erzeugen
+        $prg->log($level,$msg);
+    }
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub log {
+    my $self = shift;
+    my $level = $_[0] =~ /^\d+$/? shift: 1;
+    # @_: $fmt,@args
+
+    if ($self->logLevel >= $level) {
+        my $fmt = shift;
+        if (substr($fmt,-1,1) ne "\n") {
+            $fmt .= "\n";
+        }
+        printf STDERR $fmt,@_;
+    }
+
+    return;    
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Hilfe
 
 =head3 help() - Gib Hilfetext aus und beende Programm
@@ -864,6 +934,7 @@ sub new {
     return $class->SUPER::new(
         encoding=>$encoding,
         exitCode=>0,
+        logLevel=>0,
         optH=>Quiq::Hash->new,
         t0=>Time::HiRes::gettimeofday,
     );
@@ -873,7 +944,7 @@ sub new {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

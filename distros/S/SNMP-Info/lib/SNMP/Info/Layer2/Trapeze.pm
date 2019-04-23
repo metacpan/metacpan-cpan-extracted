@@ -38,9 +38,9 @@ use SNMP::Info::LLDP;
     = qw/SNMP::Info SNMP::Info::Bridge SNMP::Info::LLDP Exporter/;
 @SNMP::Info::Layer2::Trapeze::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
+our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::MIBS,

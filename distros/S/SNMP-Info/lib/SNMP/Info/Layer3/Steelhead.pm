@@ -37,9 +37,9 @@ use SNMP::Info::Layer3;
     = qw/SNMP::Info::Layer3 Exporter/;
 @SNMP::Info::Layer3::Steelhead::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %GLOBALS %FUNCS %MIBS %MUNGE/;
+our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,

@@ -14,10 +14,10 @@ is($l,"D’Arms");
 
 my %tests = (
     'Kuehni, R. G., Hardin, C. L.' => 'Kuehni, R. G.; Hardin, C. L.',
-	'Bourget, David; Doe, John' => 'Bourget, David; Doe, John',	
-	'David Bourget & John Doe' => 'Bourget, David; Doe, John',	
-	'David Bourget and John Doe' => 'Bourget, David; Doe, John',	
-	'Bourget D, Doe J' => 'Bourget, D.; Doe, J.',	
+	'Bourget, David; Doe, John' => 'Bourget, David; Doe, John',
+	'David Bourget & John Doe' => 'Bourget, David; Doe, John',
+	'David Bourget and John Doe' => 'Bourget, David; Doe, John',
+	'Bourget D, Doe J' => 'Bourget, D.; Doe, J.',
 	'Bourget DJR' => 'Bourget, D. J. R.',
     'Bourget, D.J.R.' => 'Bourget, D. J. R.',
     'Bourget D.J.R.' => 'Bourget, D. J. R.',

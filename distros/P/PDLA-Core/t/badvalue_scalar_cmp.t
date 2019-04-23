@@ -16,7 +16,7 @@ use PDLA::LiteF;
 ## Name: scalar PDLA with badvalue always compares BAD with perl scalars
 ##
 ## <http://sourceforge.net/p/pdl/bugs/390/>
-## <https://github.com/PDLAPorters/pdl/issues/124>
+## <https://github.com/PDLPorters/pdl/issues/124>
 
 plan tests => 5;
 
@@ -33,9 +33,17 @@ subtest "Issue example code" => sub {
 	is( "$m", 2, "Mean of [1 2 3] is 2" );
 	is( "$s", 1, "And std. dev is 1" );
 
+	if ($PDLA::Config{BADVAL_PER_PDLA}) {
+	  # to ensure warnings happen if per-PDLA
+	  $s->badflag(1);
+	  $s->badvalue(0);
+	}
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	is( "".($s >  0), "1", "is 1 >  0? -> true" );
 	is( "".($s <  0), "0", "is 1 <  0? -> false");
 	is( "".($s == 0), "0", "is 1 == 0? -> false");
+	ok scalar(@warnings), 'bad gave warnings';
 };
 
 subtest "Badvalue set on 0-dim PDLA + comparision operators" => sub {

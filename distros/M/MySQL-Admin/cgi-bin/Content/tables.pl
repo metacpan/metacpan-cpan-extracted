@@ -663,7 +663,7 @@ sub ExecSql {
     my $sql        = shift;
     my $showSql    = defined $_[0] ? shift : 0;
     my $table      = defined $_[0] ? shift : 0;
-    my @statements = split /\r?\n/, $sql;
+    my @statements = split /;\s*\r?\n/, $sql;
     my $ret        = 1;
     my $id2        = 0;
     $SQL .= $sql;
@@ -1661,7 +1661,7 @@ sub ShowTables {
         $end   = $#a;
     } ## end else [ if ( $#a > $lpp ) ]
 
-    #   no warnings;    #don't want flood the eror.log with "non numeric" warnings .
+    no warnings;    #don't want flood the eror.log with "non numeric" warnings .
     @a = sort { round( $a->{$orderby} ) <=> round( $b->{$orderby} ) } @a;
     @a = reverse @a if $state;
     ShowDbHeader( $m_sCurrentDb, 0, 'Show' );

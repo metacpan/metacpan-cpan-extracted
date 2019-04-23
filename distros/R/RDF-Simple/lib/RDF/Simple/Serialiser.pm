@@ -60,8 +60,8 @@ use Class::MethodMaker [
                         scalar => [ qw/ baseuri path nodeid_prefix / ],
                        ];
 
-my
-$VERSION = 1.13;
+our
+$VERSION = 1.14;
 
 =item new()
 

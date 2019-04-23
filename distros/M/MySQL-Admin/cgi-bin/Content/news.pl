@@ -68,8 +68,8 @@ sub addNews {
             my @cat = param('catlist');
             my $cat = join '|', @cat;
             &saveUpload() if $m_nRight >= $m_hrSettings->{uploads}{right};
-            unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
-            unless ( is_valid_utf8($message) )  { utf8::encode($message); }
+#             unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }#
+#             unless ( is_valid_utf8($message) )  { utf8::encode($message); }
             $headline = encode_entities( $headline, '<>&' );
             my $attach =
                 ( defined param('file') )
@@ -80,8 +80,8 @@ sub addNews {
             $cit =~ s/("|'|\s| )//g;
             my $sra = ( $cit && $type ) ? "$cit.$type" : undef;
             my $format = param('format') eq 'on' ? 'html' : 'markdown';
-            unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
-            unless ( is_valid_utf8($body) )     { utf8::encode($body); }
+#             unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
+#             unless ( is_valid_utf8($body) )     { utf8::encode($body); }
 
             if (   defined $headline
                 && defined $message
@@ -121,8 +121,8 @@ sub saveedit {
         my $headline = param('headline');
         $headline = ( $headline =~ /^(.{3,50})$/ ) ? $1 : 0;
         my $body = param('message');
-        unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
-        unless ( is_valid_utf8($body) )     { utf8::encode($body); }
+#         unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
+#         unless ( is_valid_utf8($body) )     { utf8::encode($body); }
         $headline = encode_entities( $headline, '<>&' );
         &saveUpload() if $m_nRight >= $m_hrSettings->{uploads}{right};
         my $attach =
@@ -250,8 +250,8 @@ qq|<input size="5" type="hidden" name="md5" value="$md5sum"/><div align="center"
 sub addReply {
     my $body     = param('message');
     my $headline = param('headline');
-    unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
-    unless ( is_valid_utf8($body) )     { utf8::encode($body); }
+#     unless ( is_valid_utf8($headline) ) { utf8::encode($headline); }
+#     unless ( is_valid_utf8($body) )     { utf8::encode($body); }
     $headline = encode_entities( $headline, '<>&' );
     my $reply  = param('reply');
     my $format = 'markdown';
@@ -359,7 +359,8 @@ sub showMessage {
     my $ref      = $m_oDatabase->fetch_hashref($sql_read);
     if ( $ref->{id} eq $id ) {
         my $m_sTitle = $ref->{title};
-        $ref->{body} =~ s/\[previewende\]//s;
+        #linux fix
+#         utf8::encode($ref->{body}); 
         if ( $ref->{format} eq 'markdown' ) { Markdown( \$ref->{body} ); }
         my $menu       = "";
         my $answerlink = "javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=reply&reply=$ref->{id}&thread=news')";
@@ -426,7 +427,7 @@ sub readcats {
     $sel{$_} = 1 foreach @select;
     my @cats = $m_oDatabase->fetch_AoH( "select * from cats where `right` <= ?", $m_nRight );
     my $cat  = translate('catslist');
-    my $list = qq|<select name="catlist" size="5" class="selectpicker" multiple >|;
+    my $list = qq|<select style="width:200px" name="catlist" size="5" multiple >|;
     for ( my $i = 0 ; $i <= $#cats ; $i++ ) {
         my $catname = lc( $cats[$i]->{name} );
         $list .=
@@ -454,17 +455,18 @@ sub preview {
     $html = $html eq 'on' ? 1 : 0;
     my $previewBody = $body;
 
+    #Don't works fine on win32
+    if ( !is_valid_utf8($body) || $^O eq 'MSWin32' ) {
+     #   utf8::encode($body);
+    } ## end if ( !is_valid_utf8($body...))
+    if ( !is_valid_utf8($headline) || $^O eq 'MSWin32' ) {
+    #    utf8::encode($previewHeadline);
+    } ## end if ( !is_valid_utf8($headline...))
+
     unless ($html) {
         Markdown( \$previewBody );
     } ## end unless ($html)
-
-    #Don't works fine on win32
-    if ( !is_valid_utf8($body) || $^O eq 'MSWin32' ) {
-        utf8::encode($body);
-    } ## end if ( !is_valid_utf8($body...))
-    if ( !is_valid_utf8($headline) || $^O eq 'MSWin32' ) {
-        utf8::encode($previewHeadline);
-    } ## end if ( !is_valid_utf8($headline...))
+    
     $previewHeadline = encode_entities( $headline, '<>&' );
     print
 qq(<table class="ShowTables" style="padding:1%;"><tr><td class="headline">$previewHeadline</td></tr><tr><td align="left">$previewBody</td></tr></table>);
@@ -670,9 +672,8 @@ sub threadBody {
             );
             $menu .= action( \%delete ) if ( $m_nRight >= 5 );
             my $h1       = qq(<tr id="trw$id"><td valign="top">);
-            my $readmore = translate('readmore');
-            $reply .= qq( <a href="$replylink" class="link" >$readmore</a>)
-              if $body =~ /\[previewende\]/i && $thread eq 'news';
+#             utf8::encode($body); 
+
             if ( $format eq 'markdown' ) { Markdown( \$body ); }
             $h1 .=
 qq(<table class="ShowTables" style="padding:1%;"><tr><td class="headline">$headline</td></tr><tr><td align="left" >$menu</td></tr><tr><td align="left"><table align="left" border ="0" cellpadding="0" cellspacing="0" summary="user_datum"  width="100%"><tr><td align="left" class="username">$m_sUsername</td><td align="right" class="date">$date</td></tr></table></td></tr><tr><td align="left">$body</td></tr>);
@@ -718,7 +719,7 @@ qq(    <div class="ShowTables marginTop">    <form action="$m_hrSettings->{cgi}{
         my $rebuild = translate('rebuild');
         my $delete  = translate('delete');
         unless ( is_valid_utf8( $trash[$i]->{title} ) ) {
-            utf8::encode( $trash[$i]->{title} );
+#             utf8::encode( $trash[$i]->{title} );
         } ## end unless ( is_valid_utf8( $trash...))
         print
 qq(<tr>                <td style="padding-left:1%;"><input type="checkbox" name="markBox$i" class="markBox" value="$trash[$i]->{id}" /></td>                <td>$trash[$i]->{title}</td>                <td>$trash[$i]->{date}</td>                <td>$trash[$i]->{user}</td>                <td>$trash[$i]->{table}</td>                <td align="center">$trash[$i]->{oldId}</td>                <td align="center">$trash[$i]->{refererId}</td>                <td align="center">$trash[$i]->{cat}</td>                <td align="right" style="padding-right:1%;"><a href="javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=rebuildtrash&id=$trash[$i]->{id}','news','news')" width="50">$rebuild</a> <a href="javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=DeleteEntry&table=trash&&id=$trash[$i]->{id}','news','$m_sTitle');">$delete</a></td>                </tr>);

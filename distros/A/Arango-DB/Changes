@@ -1,3 +1,7 @@
+0.006  2019-04-22
+   - User routes (create/delete)
+   - Metadata routes (status/time/statistics and statistics_description)
+
 0.005  2019-04-11
    - Cursor creation now supports all options from Arango::DB API.
    - Cursor next method to request further hits.

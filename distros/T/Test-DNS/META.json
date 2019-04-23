@@ -27,6 +27,14 @@
             "Test::Pod" : "1.41"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Net::DNS" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::Deep" : "0"
+         }
+      },
       "test" : {
          "recommends" : {
             "CPAN::Meta" : "2.120900"
@@ -43,7 +51,7 @@
    "provides" : {
       "Test::DNS" : {
          "file" : "lib/Test/DNS.pm",
-         "version" : "0.201"
+         "version" : "0.203"
       }
    },
    "release_status" : "stable",
@@ -57,7 +65,7 @@
          "web" : "https://github.com/xsawyerx/test-dns"
       }
    },
-   "version" : "0.201",
+   "version" : "0.203",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

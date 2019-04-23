@@ -24,6 +24,11 @@ WriteMakefile(
     'macro' => {
          CVSROOT => 'modperl.com:/local/cvs_repository',
     },
+    meta_merge         => {
+        resources => {
+	    repository => 'https://sourceforge.net/p/lindnerei/code/ci/master/tree/'
+	}
+    }
 );
 
 sub MY::postamble {

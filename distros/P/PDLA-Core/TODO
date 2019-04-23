@@ -292,7 +292,7 @@ the work planned for the future  PDLA-2.x releases.
 
 
    Complete Perldl2 shell:
-   * Implement remaining perldl features for pdla2
+   * Implement remaining perldla features for pdla2
    * Fix Ctrl-C handling for win32 systems
    * Update documentation
    * See Perldl2/TODO for the pdla2-specific list.
@@ -308,7 +308,7 @@ the work planned for the future  PDLA-2.x releases.
    Add support for improved 2-D image display using OpenGL
    * Add threaded 2-D image tiled display to imag2d
    * Enable REPL and GUI simultaneous operations and event loops
-     * perldl via ReadLine and FreeGLUT
+     * perldla via ReadLine and FreeGLUT
      * REPL via ReadLine and FreeGLUT 
      * Maybe for wxWidgets for Padre support
    * Implement some tests

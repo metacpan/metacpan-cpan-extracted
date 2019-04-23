@@ -1,0 +1,33 @@
+---
+abstract: 'Plugin to extract links from HTML using Mojo::DOM or Mojo::DOM58'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Path::Tiny: '0'
+  Test2::V0: '0.000060'
+  Test::Alien::Build: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Build-Plugin-Decode-Mojo
+requires:
+  Alien::Build::Plugin: '0'
+  Module::Load: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-Alien/Alien-Build-Plugin-Decode-Mojo/issues
+  homepage: https://metacpan.org/pod/Alien::Build::Plugin::Decode::Mojo
+  repository: git://github.com/Perl5-Alien/Alien-Build-Plugin-Decode-Mojo.git
+version: '0.01'
+x_generated_by_perl: v5.29.9
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

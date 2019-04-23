@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Completion::Zsh;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Moo;
 extends 'App::Spec::Completion';
@@ -16,6 +16,7 @@ sub generate_completion {
     my $completion_outer = $self->completion_commands(
         commands => $spec->subcommands,
         options => $spec->options,
+        parameters => $spec->parameters,
         level => 1,
         functions => $functions,
     );
@@ -120,7 +121,7 @@ sub completion_commands {
             my $name = $cmd_spec->name;
             $subcmds .= $indent2 . "$name)\n";
             my $sc = $self->completion_commands(
-                commands => $cmd_spec->subcommands || [],
+                commands => $cmd_spec->subcommands || {},
                 options => [ @$options, @{ $cmd_spec->options } ],
                 parameters => $cmd_spec->parameters,
                 level => $level + 1,
@@ -264,7 +265,7 @@ sub dynamic_completion {
         $function = <<"EOM";
 $function_name() \{
     local __dynamic_completion
-    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' \$words`
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' "\${words[@]}"`
     __${appname}_dynamic_comp '$name' "\$__dynamic_completion"
 \}
 EOM

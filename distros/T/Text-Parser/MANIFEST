@@ -33,6 +33,8 @@ t/author-minimum-version.t
 t/author-pod-coverage.t
 t/author-pod-linkcheck.t
 t/author-pod-syntax.t
+t/auto_split-mutliline-order.t
+t/auto_split-splice_fields.t
 t/auto_trim.t
 t/bad-basic-joiner.t
 t/bad-continued.txt
@@ -45,6 +47,10 @@ t/example-2.sp
 t/example-3.sp
 t/example-4.sp
 t/example-5.sp
+t/example-split.txt
+t/example-wrapped.txt
+t/example.gzip.txt.gz
+t/example.plaintext.txt
 t/example.sp
 t/input.txt
 t/join-backslash.t
@@ -54,6 +60,7 @@ t/release-cpan-changes.t
 t/release-distmeta.t
 t/release-kwalitee.t
 t/split-no-trim.t
+t/test-exceptions.t
 t/text-simple.txt
 t/trim-vs-split.t
 t/trim-vs-split.txt

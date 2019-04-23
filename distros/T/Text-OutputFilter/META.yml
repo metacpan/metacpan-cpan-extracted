@@ -5,7 +5,7 @@ author:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150005
+generated_by: Author, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,7 +14,9 @@ name: Text-OutputFilter
 provides: 
   Text::OutputFilter: 
     file: OutputFilter.pm
-    version: '0.20'
+    version: '0.21'
+recommends: 
+  Test::More: '1.302162'
 requires: 
   Carp: 0
   Test::More: 0
@@ -23,4 +25,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-OutputFilter
-version: '0.20'
+version: '0.21'

@@ -25,6 +25,13 @@ subtest ifelse => sub {
         pdl( [1] ),
         'ifelse() always returns a dimensioned piddle'
     );
+
+    my $pdlsv = PDL::SV->new( [qw(foo bar baz)] );
+    pdl_is(
+        ifelse( $pdlsv != 'bar', $pdlsv, PDL::SV->new( ['quux'] ) ),
+        PDL::SV->new( [qw(foo quux baz)] ),
+        'ifelse() with PDL::SV as arguments'
+    );
 };
 
 subtest is_discrete => sub {

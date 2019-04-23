@@ -1,0 +1,30 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'JSON::PP' => '0',
+                                      'Text::Markdown' => '0',
+                                      'YAML' => '0',
+                                      'Yancy' => '1.023',
+                                      'perl' => '5.014'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '1.001005'
+                                 }
+                 }
+     };
+  $x;
+ }

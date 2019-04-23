@@ -1,7 +1,5 @@
 #!bash
 
-# http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
-
 _appspec() {
 
     COMPREPLY=()
@@ -29,48 +27,99 @@ _appspec() {
     *)
     # subcmds
     case ${MYWORDS[0]} in
-      _complete)
-        FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
-        OPTIONS+=('--name' 'name of the program')
+      _meta)
         __appspec_handle_options_flags
-          case $INDEX in
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --name)
-              ;;
+        case $INDEX in
 
-            esac
+        1)
+            __comp_current_options || return
+            __appspec_dynamic_comp 'commands' 'completion'$'\t''Shell completion functions'$'\n''pod'$'\t''Pod documentation'
+
+        ;;
+        *)
+        # subcmds
+        case ${MYWORDS[1]} in
+          completion)
+            __appspec_handle_options_flags
+            case $INDEX in
+
+            2)
+                __comp_current_options || return
+                __appspec_dynamic_comp 'commands' 'generate'$'\t''Generate self completion'
+
             ;;
+            *)
+            # subcmds
+            case ${MYWORDS[2]} in
+              generate)
+                FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
+                OPTIONS+=('--name' 'name of the program (optional, override name in spec)')
+                __appspec_handle_options_flags
+                case ${MYWORDS[$INDEX-1]} in
+                  --name)
+                  ;;
+
+                esac
+                case $INDEX in
+
+                *)
+                    __comp_current_options || return
+                ;;
+                esac
+              ;;
+            esac
+
+            ;;
+            esac
+          ;;
+          pod)
+            __appspec_handle_options_flags
+            case $INDEX in
+
+            2)
+                __comp_current_options || return
+                __appspec_dynamic_comp 'commands' 'generate'$'\t''Generate self pod'
+
+            ;;
+            *)
+            # subcmds
+            case ${MYWORDS[2]} in
+              generate)
+                __appspec_handle_options_flags
+                __comp_current_options true || return # no subcmds, no params/opts
+              ;;
+            esac
+
+            ;;
+            esac
+          ;;
         esac
-      ;;
-      _pod)
-        FLAGS+=()
-        OPTIONS+=()
-        __appspec_handle_options_flags
-        __comp_current_options true || return # no subcmds, no params/opts
+
+        ;;
+        esac
       ;;
       completion)
         FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
-        OPTIONS+=('--name' 'name of the program')
+        OPTIONS+=('--name' 'name of the program (optional, override the value from the spec)')
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --name)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --name)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       help)
         FLAGS+=('--all' '')
-        OPTIONS+=()
         __appspec_handle_options_flags
         case $INDEX in
 
@@ -82,39 +131,78 @@ _appspec() {
         *)
         # subcmds
         case ${MYWORDS[1]} in
-          _complete)
-            FLAGS+=()
-            OPTIONS+=()
+          _meta)
             __appspec_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          _pod)
-            FLAGS+=()
-            OPTIONS+=()
-            __appspec_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
+            case $INDEX in
+
+            2)
+                __comp_current_options || return
+                __appspec_dynamic_comp 'commands' 'completion'$'\n''pod'
+
+            ;;
+            *)
+            # subcmds
+            case ${MYWORDS[2]} in
+              completion)
+                __appspec_handle_options_flags
+                case $INDEX in
+
+                3)
+                    __comp_current_options || return
+                    __appspec_dynamic_comp 'commands' 'generate'
+
+                ;;
+                *)
+                # subcmds
+                case ${MYWORDS[3]} in
+                  generate)
+                    __appspec_handle_options_flags
+                    __comp_current_options true || return # no subcmds, no params/opts
+                  ;;
+                esac
+
+                ;;
+                esac
+              ;;
+              pod)
+                __appspec_handle_options_flags
+                case $INDEX in
+
+                3)
+                    __comp_current_options || return
+                    __appspec_dynamic_comp 'commands' 'generate'
+
+                ;;
+                *)
+                # subcmds
+                case ${MYWORDS[3]} in
+                  generate)
+                    __appspec_handle_options_flags
+                    __comp_current_options true || return # no subcmds, no params/opts
+                  ;;
+                esac
+
+                ;;
+                esac
+              ;;
+            esac
+
+            ;;
+            esac
           ;;
           completion)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           new)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           pod)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           validate)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
@@ -127,52 +215,55 @@ _appspec() {
         FLAGS+=('--overwrite' 'Overwrite existing dist directory' '-o' 'Overwrite existing dist directory' '--with-subcommands' 'Create an app with subcommands' '-s' 'Create an app with subcommands')
         OPTIONS+=('--name' 'The (file) name of the app' '-n' 'The (file) name of the app' '--class' 'The main class name for your app implementation' '-c' 'The main class name for your app implementation')
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --name|-n)
+          ;;
+          --class|-c)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --name|-n)
-              ;;
-              --class|-c)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       pod)
-        FLAGS+=()
-        OPTIONS+=()
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       validate)
         FLAGS+=('--color' 'output colorized' '-C' 'output colorized')
-        OPTIONS+=()
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
     esac
@@ -184,9 +275,11 @@ _appspec() {
 
 _appspec_compreply() {
     IFS=$'\n' COMPREPLY=($(compgen -W "$1" -- ${COMP_WORDS[COMP_CWORD]}))
+
+    # http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
     if [[ ${#COMPREPLY[*]} -eq 1 ]]; then # Only one completion
         COMPREPLY=( ${COMPREPLY[0]%% -- *} ) # Remove ' -- ' and everything after
-        COMPREPLY="$(echo -e "$COMPREPLY" | sed -e 's/[[:space:]]*$//')"
+        COMPREPLY=( ${COMPREPLY[0]%% *} ) # Remove trailing spaces
     fi
 }
 
@@ -216,7 +309,7 @@ __appspec_dynamic_comp() {
             cols=`tput cols`
             [[ -z $cols ]] && cols=80
             desclength=`expr $cols - 4 - $max`
-            formatted=`printf "'%-*s -- %-*s'" "$max" "$name" "$desclength" "$desc"`
+            formatted=`printf "%-*s -- %-*s" "$max" "$name" "$desclength" "$desc"`
             comp="$comp$formatted"$'\n'
         else
             comp="$comp'$name'"$'\n'

@@ -13,9 +13,9 @@ This script is a collection of tools for authors of L<App::Spec> command line sc
     # generate completion
     % appspec completion --bash path/to/spec.yaml
     # generate pod
-    % appspec pod --bash path/to/spec.yaml
+    % appspec pod path/to/spec.yaml
     # validate your spec file
-    % appspec validate --bash path/to/spec.yaml
+    % appspec validate path/to/spec.yaml
     # generate a new App::Spec app skeleton
     % appspec new --class App::foo --name foo --with-subcommands
 
@@ -39,9 +39,9 @@ This command takes a spec file and outputs the corresponding shell script for ta
 
 Options:
 
-    --name    name of the program
-    --zsh     for zsh (flag)     
-    --bash    for bash (flag)    
+    --name    name of the program (optional, override the value from the spec)
+    --zsh     for zsh (flag)                                                  
+    --bash    for bash (flag)                                                 
 
 Parameters:
 
@@ -59,10 +59,10 @@ This command creates a skeleton for a new app. It will create a directory for yo
 
 Options:
 
-    --name -n              *  The (file) name of the app                     
-    --class -c             *  The main class name for your app implementation
-    --overwrite -o            Overwrite existing dist directory (flag)       
-    --with-subcommands -s     Create an app with subcommands (flag)          
+    --name -n                The (file) name of the app                     
+    --class -c               The main class name for your app implementation
+    --overwrite -o           Overwrite existing dist directory (flag)       
+    --with-subcommands -s    Create an app with subcommands (flag)          
 
 Parameters:
 
@@ -112,23 +112,47 @@ Options:
     --all     (flag)
 
 
-=head3  _complete
+=head3  _meta
 
-    appspec  _complete [options]
+    appspec  _meta <subcommands>
+
+Information and utilities for this app
+
+
+
+=head3 _meta completion
+
+    appspec _meta completion <subcommands>
+
+Shell completion functions
+
+
+
+=head3 _meta completion generate
+
+    appspec _meta completion generate [options]
 
 Generate self completion
 
 
 Options:
 
-    --name    name of the program
-    --zsh     for zsh (flag)     
-    --bash    for bash (flag)    
+    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      
 
 
-=head3  _pod
+=head3 _meta pod
 
-    appspec  _pod
+    appspec _meta pod <subcommands>
+
+Pod documentation
+
+
+
+=head3 _meta pod generate
+
+    appspec _meta pod generate
 
 Generate self pod
 

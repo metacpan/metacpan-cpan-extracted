@@ -46,7 +46,7 @@ The Perl Data Language (a.k.a. PerlDL or PDLA) project aims to turn perl
 into an efficient numerical language for scientific computing. The PDLA
 module gives standard perl the ability to COMPACTLY store and SPEEDILY
 manipulate the large N-dimensional data sets which are the bread and
-butter of scientific computing.  e.g. $a=$b+$c can add two 2048x2048
+butter of scientific computing.  e.g. $x=$y+$c can add two 2048x2048
 images in only a fraction of a second.
 
 The aim is to provide tons of useful functionality for scientific and
@@ -82,9 +82,9 @@ basic examples of what you can do.
 
 Bug Reports
 -----------
-You can check the existing PDLA bugs on sourceforge at
+You can check the existing PDLA bugs on GitHub at
 
-	http://sourceforge.net/p/pdl/bugs/
+	https://github.com/PDLPorters/pdla-core/issues
 
 The mailing list archives can be searched/read at
 
@@ -96,11 +96,8 @@ not sure what you have is a bug or not.  For example, the list
 is the place to go for install problems.
 
 If you need to post a problem report, and after checking with
-the perldl list that it *is* a bug, please use the sourceforge.net
-tracker system following the guidance in the BUGS file:
-
-	http://sourceforge.net/p/pdl/bugs/
-
+the pdl-general list that it *is* a bug, please use the GitHub issue
+tracker system following the guidance in the BUGS file.
 
 
 Notes
@@ -140,4 +137,4 @@ Compilation Reports:
 --------------------
 The CPAN Testers' result page provides a database showing the results
 of compiling PDLA and many other CPAN packages on multiple platforms.
-See http://testers.cpan.org/
+See http://www.cpantesters.org.

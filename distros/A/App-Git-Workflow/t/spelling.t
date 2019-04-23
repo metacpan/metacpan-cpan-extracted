@@ -41,5 +41,8 @@ add_stopwords(qw/
     ARGV
     STD
     eg
+    brs
+    pushb
+    popb
 /);
 all_pod_files_spelling_ok();

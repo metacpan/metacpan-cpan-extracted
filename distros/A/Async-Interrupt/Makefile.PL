@@ -11,8 +11,8 @@ WriteMakefile(
 
     PREREQ_PM    => {
        common::sense => 0,
-       "ExtUtils::MakeMaker" => 6.52, "Canary::Stability" => 0,
     },
+    CONFIGURE_REQUIRES => { ExtUtils::MakeMaker => 6.52, Canary::Stability => 0 },
     NAME => "Async::Interrupt",
     VERSION_FROM => "Interrupt.pm",
 );

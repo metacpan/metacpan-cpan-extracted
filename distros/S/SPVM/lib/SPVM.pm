@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0427';
+our $VERSION = '0.0429';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -106,7 +106,7 @@ sub new_varray_from_bin { SPVM::ExchangeAPI::new_varray_from_bin($SPVM_ENV, @_) 
 
 =head1 NAME
 
-SPVM - Static Perl Virtual Machine. Fast calcuration & Easy C/C++ Binding
+SPVM - Static Perl Virtual Machine. Fast calculation & Easy C/C++ Binding
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Use SPVM Module from Perl
 
 =head1 DESCRIPTION
 
-SPVM is Static Perl Virtual Machine. Provide fast calcuration & easy C/C++ Binding.
+SPVM is Static Perl Virtual Machine. Provide fast calculation & easy C/C++ Binding.
 
 B<Features:>
 
@@ -931,36 +931,33 @@ L<SPVM(GitHub)|https://github.com/yuki-kimoto/SPVM>.
 
 Yuki Kimoto E<lt>kimoto.yuki@gmail.com<gt>
 
-=head1 CORE DEVELOPER
+=head1 CORE DEVELOPERS
 
 moti<lt>motohiko.ave@gmail.com<gt>
 
 =head1 CONTRIBUTERS
 
-akinomyoga, NAGAYASU Shinya, Reini Urban, chromatic, Kazutake Hiramatsu
+=over 2
+
+=item * Mohammad S Anwar
+
+=item * akinomyoga
+
+=item * NAGAYASU Shinya
+
+=item * Reini Urban
+
+=item * chromatic
+
+=item * Kazutake Hiramatsu
+
+=back
 
 =head1 COPYRIGHT & LICENSE
 
-MIT License
+Copyright 2018-2019 Yuki Kimoto, all rights reserved.
 
-Copyright (c) [2018] [Yuki Kimoto]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

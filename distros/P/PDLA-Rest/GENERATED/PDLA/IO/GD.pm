@@ -86,7 +86,7 @@ piddle variables. It's deceptively useful, however.
 
   Signature: (byte img(x,y); byte lut(i,j); char* filename)
 
-Writes a 2-d PDLA varable out to a PNG file, using the supplied color look-up-table piddle
+Writes a 2-d PDLA variable out to a PNG file, using the supplied color look-up-table piddle
 (hereafter referred to as a LUT).
 
 The LUT contains a line for each value 0-255 with a corresponding R, G, and B value.
@@ -119,7 +119,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Same as write_png(), except you can specify the compression level (0-9) as the last arguement.
+Same as write_png(), except you can specify the compression level (0-9) as the last argument.
 
 
 =for bad
@@ -147,7 +147,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (img(x,y,z); char* filename)
 
-Writes an (x, y, z(3)) PDLA varable out to a PNG file, using a true color format.
+Writes an (x, y, z(3)) PDLA variable out to a PNG file, using a true color format.
 
 This means a larger file on disk, but can contain more than 256 colors.
 
@@ -179,7 +179,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Same as write_true_png(), except you can specify the compression level (0-9) as the last arguement.
+Same as write_true_png(), except you can specify the compression level (0-9) as the last argument.
 
 
 =for bad
@@ -685,12 +685,13 @@ sub new
       # have an even number of arguments, and the even-indexed ones (the keys)
       # are scalars
       if( @_ % 2 == 0 ) {
-        my $Npairs = scalar(@_)/2;
+        my @pairs = @_;
+        my $Npairs = scalar(@pairs)/2;
 
         use List::MoreUtils 'none';
-        if( List::MoreUtils::none { ref $_[2*$_] } 0..$Npairs-1 ) {
+        if( List::MoreUtils::none { ref $pairs[2*$_] } 0..$Npairs-1 ) {
           # treat the arguments as a hash
-          $options = { @_ }
+          $options = { @pairs }
         }
       }
     }

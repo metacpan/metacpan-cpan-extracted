@@ -1,0 +1,52 @@
+=encoding utf8
+
+=head1 NAME
+
+Serge::Sync::Plugin::TranslationService::lokalise - L<Lokalise|https://lokalise.co> synchronization plugin for L<Serge|https://serge.io/> based on L<Lokalise CLI|https://docs.lokalise.co/api-and-cli/lokalise-cli-tool>
+
+=head1 SYNOPSIS
+
+    ts
+    {
+        plugin                      lokalise
+
+        data
+        {
+            config_file              ./files/config/lokalise_config_file.yml
+            resource_directory      ./files/resources
+        }
+    }
+
+=head1 DESCRIPTION
+
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Lokalise (Translation management system built for agile teams who want to automate their localization process),
+implemented using the command-line client for the Lokalise API.
+
+=head1 ATTRIBUTES
+
+=over
+
+=item I<config_file>
+
+Lokalise CLI path to the configuration file
+
+=item I<resource_directory>
+
+Lokalise CLI resources directory.
+
+=back
+
+=head1 INSTALLATION
+
+ cpanm Serge::Sync::Plugin::TranslationService::lokalise
+
+=head1 AUTHOR
+
+Dragos Varovici <dvarovici.work@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Dragos Varovici.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

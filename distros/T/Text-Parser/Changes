@@ -1,5 +1,11 @@
 Revision history for Text-Parser
 
+0.919     2019-04-21 23:53:30-07:00 America/Los_Angeles
+  - Change auto_split and multiline_type into read-write attributes: multiline_type can be changed back to undef (Issues #32, #31, #26)
+  - Add a new function called field_range that will return the elements in a given range (#26)
+  - Check that file is a plain text file with -T, make code ready for future Text::Parser::AutoUncompress (Issue #33)
+  - Elaborated Pod for functions in Text::Parser::AutoSplit and mentioned them in Text::Parser Pod (Issue #27)
+
 0.918     2019-04-18 00:28:58-07:00 America/Los_Angeles
   - Add a test to ensure that auto_split works correctly even without auto_trim (Issue: #18)
   - Add a new method named this_line which works in all subclasses (Issue: #20)

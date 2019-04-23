@@ -10,3 +10,8 @@ macro disable_paging
 macro enable_paging
     send config paging enable
 
+macro config_ap_syslog_host_global
+    send config ap syslog host global %s
+    follow /Are you sure/ with y\n
+    match generic
+

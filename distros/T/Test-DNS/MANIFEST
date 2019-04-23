@@ -5,6 +5,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+cpanfile
 lib/Test/DNS.pm
 t/00-compile.t
 t/00-report-prereqs.dd

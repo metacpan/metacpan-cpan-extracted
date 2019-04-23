@@ -54,7 +54,7 @@ use vars qw(
 );
 @MySQL::Admin::GUI::EXPORT  = qw( ContentHeader Body ChangeDb Unique openFile action applyRights maxlength);
 @ISA                        = qw( Exporter MySQL::Admin );
-$MySQL::Admin::GUI::VERSION = '1.16';
+$MySQL::Admin::GUI::VERSION = '1.17';
 $m_bMod_perl                = ( $ENV{MOD_PERL} ) ? 1 : 0;
 local $^W = 0;
 our @m_processlist;
@@ -91,7 +91,7 @@ sub ContentHeader {
     init($m_hrSettingsfile) unless $m_bMod_perl and $m_bFirstTime;
     $m_nSkipCaptch = 0;
     $m_bMainTemplate = param('m_blogin') eq 'true' ? 1 : 0;
-
+my $cyrptpass ;
     #todo klären wiso m_hrLng durch init nicht gesetzt wird.
     *m_hrLng     = \$MySQL::Admin::Translate::lang;
     $m_oDatabase = new DBI::Library::Database();
@@ -137,14 +137,15 @@ sub ContentHeader {
       : defined param('sid') ? param('sid')
       : '123'
       unless $m_sAction eq 'logout';
+
     $m_sUser = $m_oDatabase->getName($m_sSid);
     $m_sUser = defined $m_sUser ? $m_sUser : 'guest';
     my @aCookies;
     if ( $m_sAction eq 'logout' or ( $m_sUser eq 'guest' and $m_sAction ne 'login' ) ) {
         my $cookie = cookie(
             -name    => 'sid',
-            -value   => '',
-            -expires => '-1d',
+            -value   => '123',
+            -expires => '+1y',
             -path    => "$cookiepath"
         );
         push @aCookies, $cookie;
@@ -176,9 +177,10 @@ sub ContentHeader {
             my $md5 = new MD5;
             $md5->add($u);
             $md5->add($p);
-            my $cyrptpass = $md5->hexdigest();
+             $cyrptpass = $md5->hexdigest();
             my $result    = 1;
             if ( $m_oDatabase->checkPass( $u, $cyrptpass ) ) {
+         
                 $m_nSkipCaptch = 2;
                 $m_sSid = $m_oDatabase->setSid( $u, $p, $ip );
                 my $cookie = cookie(
@@ -197,6 +199,8 @@ sub ContentHeader {
                 $m_sUser = $u;
                 $m_sAction = $m_bMainTemplate ? $m_hrSettings->{defaultAction} : 'news';
             } else {
+                $m_sAction = 'showLogin';
+
                 print header(
                     -type                        => 'text/xml',
                     -access_control_allow_origin => '*',
@@ -204,6 +208,7 @@ sub ContentHeader {
                 );
             } ## end else [ if ( $m_oDatabase->checkPass...)]
         } else {
+            $m_sAction = 'showLogin';
             print header(
                 -type                        => 'text/xml',
                 -access_control_allow_origin => '*',
@@ -211,6 +216,7 @@ sub ContentHeader {
             );
         } ## end else [ if ( defined $u && defined...)]
     } else {
+        $m_sUser = $m_oDatabase->getName($m_sSid);
         print header(
             -type                        => 'text/xml',
             -access_control_allow_origin => '*',
@@ -437,7 +443,7 @@ sub action {
 sub maxlength {
     my $maxWidth = shift;
     ++$maxWidth;
-    my $txt = shift;
+    my $txt = decode_utf8(shift, Encode::FB_QUIET);
     if ( length($$txt) > $maxWidth ) {
         my $maxLength = $maxWidth;
         my $i++;

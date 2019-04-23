@@ -23,6 +23,8 @@ my %WriteMakefileArgs = (
     "JSON" => 0,
     "JSON::Schema::Fit" => "0.04",
     "MIME::Base64" => "3.11",
+    "Sub::Install" => 0,
+    "Sub::Name" => 0,
     "URI::Encode" => 0,
     "base" => 0,
     "strict" => 0,
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +53,8 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "JSON::Schema::Fit" => "0.04",
   "MIME::Base64" => "3.11",
+  "Sub::Install" => 0,
+  "Sub::Name" => 0,
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,

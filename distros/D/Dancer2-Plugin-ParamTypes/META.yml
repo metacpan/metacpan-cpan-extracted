@@ -23,13 +23,14 @@ name: Dancer2-Plugin-ParamTypes
 provides:
   Dancer2::Plugin::ParamTypes:
     file: lib/Dancer2/Plugin/ParamTypes.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Dancer2: '0'
   Ref::Util: '0'
   constant: '0'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/xsawyerx/dancer2-plugin-paramtypes/issues
   repository: git://github.com/xsawyerx/dancer2-plugin-paramtypes.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.73'

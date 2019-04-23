@@ -5,11 +5,11 @@ use Test::Warnings;
 use IPC::ReadpipeX;
 
 $? = 1;
-is readpipex($^X, '-e', 'print "42\n43\n"'), "42\n43\n", 'right output';
+is readpipex($^X, '-le', 'print 42; print 43'), "42\n43\n", 'right output';
 is $?, 0, '$? is 0';
 
 $? = 1;
-is_deeply [readpipex($^X, '-e', 'print "42\n43\n"')], ["42\n","43\n"], 'right output';
+is_deeply [readpipex($^X, '-le', 'print 42; print 43')], ["42\n","43\n"], 'right output';
 is $?, 0, '$? is 0';
 
 is readpipex($^X, '-e', 'exit 5'), '', 'no output';

@@ -1,59 +1,59 @@
 $VAR1 = {
+          'session' => '/var/www/cgi-bin/config/session.pl',
+          'language' => 'en',
+          'actions' => '/var/www/cgi-bin/config/actions.pl',
+          'config' => '/var/www/cgi-bin/config/settings.pl',
+          'database' => {
+                          'name' => 'lze',
+                          'CurrentDb' => 'lze',
+                          'CurrentUser' => 'lze',
+                          'CurrentHost' => 'localhost',
+                          'host' => 'localhost',
+                          'CurrentPass' => '',
+                          'password' => '',
+                          'user' => 'lze'
+                        },
+          'translate' => '/var/www/cgi-bin/config/translate.pl',
           'files' => {
-                       'owner' => 'www-data',
                        'group' => 'www-data',
+                       'owner' => 'www-data',
                        'chmod' => '0755'
                      },
-          'admin' => {
-                       'password' => 'testpass'
-                     },
-          'database' => {
-                          'password' => '',
-                          'CurrentHost' => 'localhost',
-                          'CurrentPass' => '',
-                          'name' => 'lze',
-                          'host' => 'localhost',
-                          'CurrentUser' => 'lze',
-                          'user' => 'lze',
-                          'CurrentDb' => 'lze'
-                        },
-          'config' => '/var/www/cgi-bin/config/settings.pl',
+          'mod' => 0,
+          'floodtime' => 10,
+          'saveTranslate' => '0',
+          'htmlright' => '2',
+          'size' => '16',
+          'uploads' => {
+                         'right' => 2,
+                         'maxlength' => '2100000000000000',
+                         'chmod' => 438,
+                         'path' => '/var/www/html//download',
+                         'enabled' => 1
+                       },
+          'apacheconfig' => '/etc/apache2/sites-enabled/',
+          'cgi' => {
+                     'serverName' => 'http://localhost',
+                     'expires' => '+1y',
+                     'title' => 'MySQL::Admin',
+                     'style' => 'mysql',
+                     'cookiePath' => '/',
+                     'bin' => '/var/www/cgi-bin',
+                     'DocumentRoot' => '/var/www/html/'
+                   },
+          'news' => {
+                      'captcha' => 3,
+                      'messages' => '5',
+                      'right' => 5
+                    },
+          'version' => '1.14',
           'tree' => {
                       'navigation' => '/var/www/cgi-bin/config/tree.pl',
                       'links' => '/var/www/cgi-bin/config/links.pl'
                     },
-          'cgi' => {
-                     'cookiePath' => '/',
-                     'style' => 'mysql',
-                     'DocumentRoot' => '/var/www/html/',
-                     'serverName' => 'http://localhost',
-                     'title' => 'MySQL::Admin',
-                     'expires' => '+1y',
-                     'bin' => '/var/www/cgi-bin'
-                   },
-          'saveTranslate' => '0',
-          'uploads' => {
-                         'maxlength' => '2100000000000000',
-                         'path' => '/var/www/html//download',
-                         'right' => 2,
-                         'chmod' => 438,
-                         'enabled' => 1
-                       },
-          'apacheconfig' => '/etc/apache2/sites-enabled/',
-          'floodtime' => 10,
-          'language' => 'en',
-          'size' => '16',
-          'translate' => '/var/www/cgi-bin/config/translate.pl',
-          'session' => '/var/www/cgi-bin/config/session.pl',
-          'version' => '1.14',
-          'htmlright' => '2',
-          'actions' => '/var/www/cgi-bin/config/actions.pl',
           'defaultAction' => 'ShowDatabases',
-          'mod' => 'n',
-          'news' => {
-                      'right' => 5,
-                      'messages' => '5',
-                      'captcha' => 3
-                    }
+          'admin' => {
+                       'password' => 'testpass'
+                     }
         };
 $m_hrSettings =$VAR1;

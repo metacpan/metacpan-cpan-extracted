@@ -1,0 +1,177 @@
+=head1 NAME
+
+pcorelist - corelist with subcommands and shell completion
+
+=head1 ABSTRACT
+
+This is a wrapper around the corelist tool which adds shell completion
+
+=head1 DESCRIPTION
+
+corelist is a tool providing information about when a module was included
+in the perl core, and when a feature was added to perl.
+
+pcorelist is a simple wrapper that adds subcommands. This makes it easier
+to add tab completion.
+
+=head2 EXAMPLES
+
+  pcorelist features <TAB>
+  # shows all features
+
+  pcorelist module <TAB>
+  # shows all modules
+
+  pcorelist diff <TAB>
+  # shows all perl versions
+
+
+=head2 GLOBAL OPTIONS
+
+    --help -h    Show command help (flag)
+
+
+=head2 SUBCOMMANDS
+
+=head3  completion-dir
+
+    pcorelist  completion-dir
+
+Output the location of the shell completion files
+
+For bash, just source the bash file.
+
+    source /path/to/completion/bash/pcorelist.bash
+
+For zsh, put the following in your C<.zshrc>:
+
+    # before the compinit call
+    fpath=('/path/to/completion/zsh' $fpath)
+
+Then C<exec zsh>.
+
+
+
+=head3  diff
+
+    pcorelist  diff [options] <perl1> <perl2>
+
+Show diff between two Perl versions
+
+Options:
+
+    --added      Show only added modules (flag)  
+    --removed    Show only removed modules (flag)
+
+Parameters:
+
+    perl1  *  Perl version 1
+    perl2  *  Perl version 2
+
+=head3  features
+
+    pcorelist  features [options] [<feature>+]
+
+List features with perl versions
+
+If given a feature name as a parameter, show the
+perl feature bundle it was first released with.
+
+
+Options:
+
+    --raw    List only feature names (flag)
+
+Parameters:
+
+    feature   [] feature name (multiple)
+
+=head3  module
+
+    pcorelist  module [options] <module>
+
+Show for which perl version the module was first released
+
+Options:
+
+    --all -a     Show all perl and module versions (flag)
+    --date -d    Show by date (flag)                     
+    --perl -p    Show by Perl Version                    
+
+Parameters:
+
+    module  *  Module name
+
+=head3  modules
+
+    pcorelist  modules
+
+List all modules
+
+
+=head3  perl
+
+    pcorelist  perl [options]
+
+Perl Versions
+
+Options:
+
+    --raw -r     Show raw output without header (flag)
+    --release    Show perl releases with dates (flag) 
+
+
+=head3  help
+
+    pcorelist  help <subcommands> [options]
+
+Show command help
+
+Options:
+
+    --all     (flag)
+
+
+=head3  _meta
+
+    pcorelist  _meta <subcommands>
+
+Information and utilities for this app
+
+
+=head3 _meta completion
+
+    pcorelist _meta completion <subcommands>
+
+Shell completion functions
+
+
+=head3 _meta completion generate
+
+    pcorelist _meta completion generate [options]
+
+Generate self completion
+
+Options:
+
+    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      
+
+
+=head3 _meta pod
+
+    pcorelist _meta pod <subcommands>
+
+Pod documentation
+
+
+=head3 _meta pod generate
+
+    pcorelist _meta pod generate
+
+Generate self pod
+
+
+
+

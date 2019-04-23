@@ -4,13 +4,11 @@ use PDLA::LiteF;
 use strict;
 use warnings;
 
-BEGIN {
-	eval {
-		require PDLA::Fit::Linfit;
-		PDLA::Fit::Linfit->import();
-		1;
-	} or plan skip_all => "PDLA::Fit::Linfit: $@";
-}
+eval {
+	require PDLA::Fit::Linfit;
+	PDLA::Fit::Linfit->import();
+	1;
+} or plan skip_all => "PDLA::Fit::Linfit: $@";
 
 kill 'INT',$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
 

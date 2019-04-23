@@ -1,0 +1,46 @@
+---
+abstract: 'Build a Yancy site from static Markdown files'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '1.001005'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yancy-Backend-Static
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Yancy::Backend::Static:
+    file: lib/Yancy/Backend/Static.pm
+    version: '0.001'
+requires:
+  JSON::PP: '0'
+  Text::Markdown: '0'
+  YAML: '0'
+  Yancy: '1.023'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.freenode.org/#yancy
+  bugtracker: https://github.com/preaction/Yancy-Backend-Static/issues
+  homepage: http://preaction.me/yancy/
+  repository: https://github.com/preaction/Yancy-Backend-Static.git
+version: '0.001'
+x_authority: cpan:PREACTION
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

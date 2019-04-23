@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use Config;
+use version;
 
 # This mess sorts out the Fortran availability - KGB.
 # Depends on ExtUtils::F77
@@ -98,7 +99,7 @@ if($Config{cc} eq 'cl') {
 
 $hash{LIBS}[0] .= $f77->runtime ;
 $hash{clean}{FILES} .= " SlatecProtos.h f77_underscore" .
-  join '', map {" slatec/$_.o "} @slatecfiles;
+  join '', map {" slatec/$_\$(OBJ_EXT) "} @slatecfiles;
 
 # Handle multiple compilers
 
@@ -136,13 +137,14 @@ slatec/$_\$(OBJ_EXT): slatec/$_.f
  
 };
 
-# Remove i386 option for OS X recent versions for better build, dual arch does not work anyway. KG 25/Oct/2015
+# Remove i386 option for OS X recent versions for better build, dual arch does not work anyway
 my %items;
-if ($Config{osname} =~ /darwin/ && $Config{osvers} >=14) { # OS X Mavericks+
-        print "Forcing single arch build for SLATEC\n";
-        $items{LDDLFLAGS} = $Config{lddlflags};
-        $items{LDDLFLAGS} =~ s/-arch i386/ /g;
+if ($Config{osname} =~ /darwin/ && version->parse($Config{osvers}) >= version->parse("14")) { # OS X Mavericks+
+       print "Forcing single arch build for SLATEC\n";
+       $items{LDDLFLAGS} = $Config{lddlflags};
+       $items{LDDLFLAGS} =~ s/-arch i386/ /g;
 }
+
 
 WriteMakefile(
  %hash,

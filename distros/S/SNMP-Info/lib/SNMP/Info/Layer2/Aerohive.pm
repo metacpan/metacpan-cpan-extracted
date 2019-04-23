@@ -36,9 +36,9 @@ use SNMP::Info::Layer2;
 @SNMP::Info::Layer2::Aerohive::ISA       = qw/SNMP::Info::Layer2 Exporter/;
 @SNMP::Info::Layer2::Aerohive::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
+our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::Layer2::MIBS,
@@ -83,6 +83,7 @@ $VERSION = '3.66';
 %MUNGE
     = ( %SNMP::Info::Layer2::MUNGE, 'at_paddr' => \&SNMP::Info::munge_mac, );
 
+# hiveos does not have sysServices
 sub layers {
     return '00000111';
 }
@@ -221,7 +222,10 @@ sub bp_index {
     my $aerohive = shift;
     my $partial  = shift;
 
-    my $i_index = $aerohive->i_index($partial) || {};
+    # somewhere caching is doing something strange, without load_
+    # netdisco can't find bp_index mappings & will not registerer
+    # any clients. netdisco/netdisco#496
+    my $i_index = $aerohive->load_i_index($partial) || {};
 
     my %bp_index;
     foreach my $iid ( keys %$i_index ) {

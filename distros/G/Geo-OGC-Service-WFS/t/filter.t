@@ -13,7 +13,7 @@ my $xml = <<end;
     <ValueReference>
       geometryProperty
     </ValueReference>
-    <gml:Envelope>
+    <gml:Envelope srsName="urn:x-ogc:def:crs:EPSG:1235">
       <gml:lowerCorner>
         231640 6794667
       </gml:lowerCorner>
@@ -28,7 +28,7 @@ end
 my $parser = XML::LibXML->new(no_blanks => 1);
 my $dom = $parser->load_xml(string => $xml);
 my $sql = Geo::OGC::Service::Filter::filter2sql($dom->documentElement(), { GeometryColumn => 'geom', SRID => 3067 });
-is $sql, '("geom" && ST_Transform(ST_MakeEnvelope(231640,6794667,237728,6798990),3067))';
+is $sql, '("geom" && ST_Transform(ST_MakeEnvelope(231640,6794667,237728,6798990,1235),3067))';
 
 $xml = <<end;
 <fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0">

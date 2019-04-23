@@ -1,5 +1,11 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.0045      2019-04-21
+    - Remove PDL::Stats::Basic and Data::Munge from dependencies.
+    - Bump version requirements of some dependencies, trying to fix a
+      failure on CPANTS. 
+    - Speed-up some Data::Frame methods.
+
 0.0043      2019-04-14
     - Breaking change: Dropped the number_of_rows() method for PDL and row
       names. It becomes redundant as we have a role to add length() method to

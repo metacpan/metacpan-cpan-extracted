@@ -1,3 +1,9 @@
+0.16.0 2019-04-23 17:04:50 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - if the getUserConfig returns a sessionCookie property, start using it
+   to authenticate and thus skipping the login step. this can be used to
+   implement single sign on ... see bdass.
+
 0.15.1 2019-04-03 15:44:12 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - added missing NumberFormatter to archive

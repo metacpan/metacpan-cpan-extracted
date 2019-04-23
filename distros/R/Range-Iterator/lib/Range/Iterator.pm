@@ -1,12 +1,12 @@
 package Range::Iterator;
 
-our $DATE = '2019-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
 
-my $re_num = qr/\A[+-]?[0-9]+(\.[0-9]+)?\z/;
+use Scalar::Util qw(looks_like_number);
 
 sub new {
     my $class = shift;
@@ -22,7 +22,7 @@ sub new {
         _cur   => $start,
     };
 
-    if ($start =~ $re_num && $end =~ $re_num) {
+    if (looks_like_number($start) && looks_like_number($end)) {
         $self->{_num}   = 1;
         $self->{_ended}++ if $start > $end;
     } else {
@@ -63,7 +63,7 @@ Range::Iterator - Generate an iterator object for range
 
 =head1 VERSION
 
-This document describes version 0.001 of Range::Iterator (from Perl distribution Range-Iterator), released on 2019-04-17.
+This document describes version 0.002 of Range::Iterator (from Perl distribution Range-Iterator), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -76,9 +76,14 @@ You can add step:
 
  my $iter = Range::Iterator->new(1, 10, 2); # 1, 3, 5, 7, 9
 
-Anything that can be incremented by Perl is game:
+You can use alphanumeric strings too since C<++> has some extra builtin magic
+(see L<perlop>):
 
-  $iter = Range::Iterator->new("a", "e"); # a, b, c, d, e
+ $iter = Range::Iterator->new("zx", "aab"); # zx, zy, zz, aaa, aab
+
+Infinite list:
+
+ $iter = Range::Iterator->new(1, Inf); # 1, 2, 3, ...
 
 =head1 DESCRIPTION
 

@@ -87,7 +87,7 @@ test_psgi $app, sub {
 <?xml version="1.0" encoding="UTF-8"?>
 <ExceptionReport version="1.0">
 <Exception exceptionCode="InvalidParameterValue" locator="typeName">
-<ExceptionText>Type 'x' is not available</ExceptionText>
+<ExceptionText>Feature type 'x' is not available.</ExceptionText>
 </Exception>
 </ExceptionReport>
 END_XML

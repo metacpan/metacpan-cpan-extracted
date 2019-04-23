@@ -1,2 +1,5 @@
+0.002     2019-04-20 12:51:53 EDT
+  - Fix tests to not trigger weird failures on Windows
+
 0.001     2019-04-18 18:31:56 EDT
   - First release

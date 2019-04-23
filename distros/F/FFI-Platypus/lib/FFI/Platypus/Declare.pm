@@ -6,7 +6,7 @@ use Carp ();
 use FFI::Platypus;
 
 # ABSTRACT: Declarative interface to FFI::Platypus
-our $VERSION = '0.86'; # VERSION
+our $VERSION = '0.87'; # VERSION
 
 
 our $ffi    = {};
@@ -174,7 +174,7 @@ FFI::Platypus::Declare - Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 
@@ -255,8 +255,8 @@ for details.
 
 Load the custom type defined in the module I<$name>, and make an alias 
 with the name I<$alias>. If the custom type requires any arguments, they 
-may be passed in as I<@type_args>. See L<FFI::Platypus::Type#Custom 
-Types> for details.
+may be passed in as I<@type_args>. See L<FFI::Platypus::Type#Custom-Types>
+for details.
 
 If I<$name> contains C<::> then it will be assumed to be a fully 
 qualified package name. If not, then C<FFI::Platypus::Type::> will be 
@@ -449,6 +449,10 @@ Shlomi Fish (shlomif)
 Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
+
+Petr Pisar (ppisar)
+
+Mohammad S Anwar (MANWAR)
 
 =head1 COPYRIGHT AND LICENSE
 

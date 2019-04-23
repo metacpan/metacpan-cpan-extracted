@@ -1,8 +1,9 @@
+# ABSTRACT: Processes and validates options and parameters
 use strict;
 use warnings;
 package App::Spec::Run::Validator;
 
-our $VERSION = '0.004'; # VERSION;
+our $VERSION = '0.005'; # VERSION;
 
 use List::Util qw/ any /;
 use List::MoreUtils qw/ uniq /;
@@ -27,8 +28,15 @@ my %validate = (
 );
 
 sub process {
+    my ($self, $run, $errs) = @_;
+    my ($ok) = $self->_process( $errs, type => "parameters", app => $run );
+    $ok &&= $self->_process( $errs, type => "options", app => $run );
+    return $ok;
+}
+
+sub _process {
     my ($self, $errs, %args) = @_;
-    my $app = $args{app};
+    my $run = $args{app};
     my $type = $args{type};
     my ($items, $specs);
     if ($args{type} eq "parameters") {
@@ -40,6 +48,7 @@ sub process {
         $specs = $self->option_specs;
     }
 
+    # TODO: iterate over parameters in original cmdline order
     for my $name (sort keys %$specs) {
         my $spec = $specs->{ $name };
         my $value = $items->{ $name };
@@ -147,7 +156,7 @@ sub process {
                     runmode => "validation",
                     parameter => $name,
                 };
-                $possible_values = $app->cmd->$op($app, $args) || [];
+                $possible_values = $run->cmd->$op($run, $args) || [];
             }
             elsif ($spec->mapping) {
                 $possible_values = $spec_values->{mapping};
@@ -217,3 +226,48 @@ sub process {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+App::Spec::Run::Validator - Processes and validates options and parameters
+
+=head1 METHODS
+
+=over 4
+
+=item process
+
+    my %errs;
+    my $ok = $validator->process( $run, \%errs );
+
+Returns 1 or 0. In case of validation errors, it fills C<%errs>.
+
+=back
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item options
+
+Holds the read commandline options
+
+=item parameters
+
+Holds the read commandline parameters
+
+=item option_specs
+
+Holds the items from App::Spec for options
+
+=item param_specs
+
+Holds the items from App::Spec for parameters
+
+=back
+
+=cut

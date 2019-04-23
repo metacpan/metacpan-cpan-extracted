@@ -325,5 +325,14 @@ for my $o (
     );
 }
 
+{
+    my $dt = DateTime->new( year => 2019, nanosecond => 10 );
+    is(
+        '00000001000000',
+        $dt->format_cldr('SSSSSSSSSSSSSS'),
+        'formatting nanosecond to > 9 digits of precision works',
+    );
+}
+
 done_testing();
 

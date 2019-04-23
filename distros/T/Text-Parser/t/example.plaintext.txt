@@ -1,0 +1,51 @@
+[@CorePrep]
+ 
+[-SingleEncoding]
+[-Transformer]
+transformer = List
+ 
+[Name]
+;;[Version]
+
+[Region  / prelude]
+ 
+[Generic / SYNOPSIS]
+[Generic / RATIONALE]
+[Generic / DESCRIPTION]
+[Generic / OVERVIEW]
+[Generic / ERRORS AND EXCEPTIONS]
+
+[Collect / CONSTRUCTOR]
+command = constr
+
+[Collect / ATTRIBUTES]
+command = attr
+ 
+[Collect / METHODS]
+command = method
+
+[Collect / FOR USE IN SUBCLASS ONLY]
+command = sub_use_method
+
+[Collect / METHODS AVAILABLE ON AUTO-SPLIT]
+command = auto_split_meth
+
+[Collect / OVERRIDE IN SUBCLASS]
+command = inherit
+
+[Collect / DEPRECATED]
+command = deprecated
+
+[Collect / FUNCTIONS]
+command = func
+ 
+[Region  / postlude]
+ 
+[Generic / EXAMPLES]
+[Leftovers]
+ 
+[Bugs]
+[Authors]
+[Legal]
+;;[@Default]
+[Contributors]

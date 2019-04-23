@@ -35,7 +35,6 @@ my %WriteMakefileArgs = (
     "Config::IOD::INI::Reader" => 0,
     "Config::IniFiles" => 0,
     "File::Slurper" => 0,
-    "File::Temp" => 0,
     "Perinci::CmdLine::Any" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -46,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.032",
+  "VERSION" => "0.033",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +59,6 @@ my %FallbackPrereqs = (
   "Config::IniFiles" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,

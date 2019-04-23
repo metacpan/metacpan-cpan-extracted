@@ -124,9 +124,6 @@ sub apply_profile {
       demo 3d2         # 3d demo, part 2. (Somewhat memory-intensive)
       demo 3dgal       # the 3D gallery: make cool images with 3-line scripts
 
-      demo pgplot      # PGPLOT graphics output (Req.: PGPLOT)
-      demo OOplot      # PGPLOT OO interface    (Req.: PGPLOT)
-
       demo gnuplot     # Gnuplot graphics (requires PDLA::Graphics::Gnuplot)
       demo prima       # Prima graphics (requires PDLA::Graphics::Prima)
 
@@ -144,8 +141,6 @@ EOD
          '3d' => 'PDLA::Demos::TriD1',
          '3d2' => 'PDLA::Demos::TriD2',
          '3dgal' => 'PDLA::Demos::TriDGallery',
-         'pgplot' => 'PDLA::Demos::PGPLOT_demo',
-         'ooplot' => 'PDLA::Demos::PGPLOT_OO_demo', # note: lowercase
          'bad' => 'PDLA::Demos::BAD_demo',
          'bad2' => 'PDLA::Demos::BAD2_demo',
          'transform' => 'PDLA::Demos::Transform_demo',

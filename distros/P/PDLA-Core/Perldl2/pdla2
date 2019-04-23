@@ -21,6 +21,7 @@ BEGIN {
    eval " use Devel::REPL $minversion ";
    if ($@) {
       my ($perldla) = $0;
+      $perldla =~ s/pdla2\.bat$/perldla\.bat/;
       $perldla =~ s/pdla2$/perldla/;
       warn "pdla2: Devel::REPL version $minversion not found, running '$perldla' instead...\n";
       do $perldla;

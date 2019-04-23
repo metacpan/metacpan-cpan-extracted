@@ -39,6 +39,7 @@ lib/Quiq/Database/Row/Object/Table.pm
 lib/Quiq/Database/Tree.pm
 lib/Quiq/Debug.pm
 lib/Quiq/DestinationTree.pm
+lib/Quiq/Digest.pm
 lib/Quiq/DirHandle.pm
 lib/Quiq/Duration.pm
 lib/Quiq/Epoch.pm
@@ -222,6 +223,7 @@ t/bin/Quiq/Database/Row/Object/Table.t
 t/bin/Quiq/Database/Tree.t
 t/bin/Quiq/Debug.t
 t/bin/Quiq/DestinationTree.t
+t/bin/Quiq/Digest.t
 t/bin/Quiq/DirHandle.t
 t/bin/Quiq/Duration.t
 t/bin/Quiq/Epoch.t

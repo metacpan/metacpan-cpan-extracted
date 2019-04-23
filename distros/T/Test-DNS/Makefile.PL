@@ -15,7 +15,12 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Test-DNS",
   "LICENSE" => "mit",
   "NAME" => "Test::DNS",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Moose" => 0,
+    "Net::DNS" => 0,
+    "Test::Builder::Module" => 0,
+    "Test::Deep" => 0
+  },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
@@ -23,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.201",
+  "VERSION" => "0.203",
   "test" => {
     "TESTS" => "t/*.t t/records/*.t"
   }
@@ -35,6 +40,10 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Moose" => 0,
+  "Net::DNS" => 0,
+  "Test::Builder::Module" => 0,
+  "Test::Deep" => 0,
   "Test::More" => 0
 );
 

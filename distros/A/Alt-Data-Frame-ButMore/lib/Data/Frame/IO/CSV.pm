@@ -12,7 +12,6 @@ use PDL::SV        ();
 use PDL::DateTime  ();
 use PDL::Types     ();
 
-use Data::Munge qw(elem);
 use Package::Stash;
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 use Scalar::Util qw(openhandle looks_like_number);
@@ -205,7 +204,7 @@ Data::Frame::IO::CSV - Partial class for data frame's conversion from/to CSV
 
 =head1 VERSION
 
-version 0.0043
+version 0.0045
 
 =head1 METHODS
 

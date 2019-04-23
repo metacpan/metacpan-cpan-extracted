@@ -7,7 +7,7 @@ PDLA::Modules - A guide to PDLA's module reference.
 
 This page serves as a table of contents for PDLA's module documentation.
 This page does not list every single PDLA module. It only shows the ones
-intended for PDLA users, while ommitting those which are deemed "for
+intended for PDLA users, while omitting those which are deemed "for
 internal use only". If you wish to see a comprehensive list of all
 documentation, please see the L<PDLA::Index|PDLA::Index> page.
 

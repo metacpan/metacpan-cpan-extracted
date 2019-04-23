@@ -1,5 +1,12 @@
 Revision history for Perl extension Canary::Stability
 
+2013  Mon Apr 22 12:38:45 CEST 2019
+	- carbon-dioxide levels hit 400ppm first time in recorded history.
+        - during AUTOMATED_TESTING, turn minimum version recommendations into
+          hard requirements to avoid false positives in unsupported perl
+          versions.
+        - added dummy testsuite.
+
 2012  Sun Sep 25 01:45:56 CEST 2016
 	- another year where the UNFCCC had to adjust their predictions
           in the worse direction.

@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Cursor object
 package Arango::DB::Cursor;
-$Arango::DB::Cursor::VERSION = '0.005';
+$Arango::DB::Cursor::VERSION = '0.006';
 use warnings;
 use strict;
 
@@ -34,6 +34,12 @@ sub next {
   return undef;
 }
 
+sub finish {
+  my ($self) = @_;
+  $self->{arango}->_api('cursor_delete',  { database => $self->{database}, id => $self->{id} });
+  delete $self->{$_} for (keys %$self);
+}
+
 sub has_more {
   my ($self) = @_;
   return $self->{hasMore};
@@ -53,7 +59,7 @@ Arango::DB::Cursor - ArangoDB Cursor object
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 USAGE
 
@@ -75,6 +81,10 @@ to gather more hits if they exists, and the query id is still alive.
 =item C<has_more>
 
 Returns a boolean stating if there are more results to be fetched.
+
+=item C<finish>
+
+Deletes the cursor in the server and destroys all the object details.
 
 =back
 

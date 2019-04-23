@@ -37,7 +37,7 @@ use SNMP::Info::CiscoAgg;
 use SNMP::Info::CiscoPortSecurity;
 use SNMP::Info::Layer3::Cisco;
 
-use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
+our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
 @SNMP::Info::Layer3::CiscoSwitch::ISA = qw/
     SNMP::Info::CiscoAgg
@@ -48,9 +48,7 @@ use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
 @SNMP::Info::Layer3::CiscoSwitch::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
-
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::Layer3::Cisco::MIBS,

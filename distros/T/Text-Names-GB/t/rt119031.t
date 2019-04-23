@@ -20,4 +20,4 @@ is(Text::Names::GB::guessGender('Natalia'), 'F');
 is(Text::Names::GB::guessGender('Ana'), 'F');
 is(Text::Names::GB::guessGender('Eleni'), 'F');
 
-done_testing;
+done_testing();

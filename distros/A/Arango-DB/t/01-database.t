@@ -1,3 +1,4 @@
+# -*- cperl -*-
 use Arango::DB;
 use Test2::V0;
 use Test2::Tools::Exception qw/dies lives/;
@@ -10,6 +11,7 @@ skip_all "Can't reach ArangoDB Server" unless server_alive();
 my $arango = Arango::DB->new( );
 clean_test_environment($arango);
 
+## -- version
 my $version = $arango->version;
 is $version->{server} => 'arango';
 
@@ -18,6 +20,24 @@ ok (exists($version->{details}));
 
 $version = $arango->version( details => 0 );
 ok (!exists($version->{details}));
+
+## -- status
+my $status = $arango->status;
+is $status->{server} => 'arango';
+
+## -- time
+my $time = $arango->time;
+like $time->{time}, qr/^\d+(?:\.\d+)?$/;
+
+## -- statistics
+my $stats = $arango->statistics;
+like $stats->{time}, qr/^\d+(?:\.\d+)?$/;
+like $stats->{http}{requestsTotal}, qr/^\d+$/;
+
+my $stats_desc = $arango->statistics_description;
+ok exists($stats_desc->{groups});
+is ref($stats_desc->{groups}), "ARRAY";
+
 
 my $ans = $arango->list_databases;
 

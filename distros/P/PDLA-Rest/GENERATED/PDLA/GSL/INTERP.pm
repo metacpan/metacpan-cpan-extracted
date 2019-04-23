@@ -27,7 +27,7 @@ PDLA::GSL::INTERP - PDLA interface to Interpolation routines in GSL
 
 =head1 DESCRIPTION
 
-This is an interface to the interpolation package present in the 
+This is an interface to the interpolation package present in the
 GNU Scientific Library.
 
 =head1 SYNOPSIS
@@ -45,17 +45,28 @@ GNU Scientific Library.
    $res = $spl->deriv2(4.35);
    $res = $spl->integ(2.1,7.4);
 
+=head1 NOMENCLATURE
+
+Throughout this documentation we strive to use the same variables that
+are present in the original GSL documentation (see L<See
+Also|"SEE-ALSO">). Oftentimes those variables are called C<a> and
+C<b>. Since good Perl coding practices discourage the use of Perl
+variables C<$a> and C<$b>, here we refer to Parameters C<a> and C<b>
+as C<$pa> and C<$pb>, respectively, and Limits (of domain or
+integration) as C<$la> and C<$lb>.
+
+
 =head1 FUNCTIONS
 
 =head2 init()
 
-=for ref 
+=for ref
 
-The init method initializes a new instance of INTERP. It needs as 
-input an interpolation type and two piddles holding the x and y 
+The init method initializes a new instance of INTERP. It needs as
+input an interpolation type and two piddles holding the x and y
 values to be interpolated. The GSL routines require that x be
-monotonically increasing and a quicksort is performed by default to 
-ensure that. You can skip the quicksort by passing the option 
+monotonically increasing and a quicksort is performed by default to
+ensure that. You can skip the quicksort by passing the option
 {Sort => 0}.
 
 The available interpolation types are :
@@ -99,7 +110,7 @@ Example:
 
 =head2 eval()
 
-=for ref 
+=for ref
 
 The function eval returns the interpolating function at a given point. By default
 it will barf if you try to extrapolate, to comply silently if the point to be
@@ -123,9 +134,9 @@ Example:
 
 =head2 deriv()
 
-=for ref 
+=for ref
 
-The deriv function returns the derivative of the 
+The deriv function returns the derivative of the
 interpolating function at a given point. By default
 it will barf if you try to extrapolate, to comply silently if the point to be
 evaluated is out of range pass the option {Extrapolate => 1}
@@ -149,9 +160,9 @@ Example:
 
 =head2 deriv2()
 
-=for ref 
+=for ref
 
-The deriv2 function returns the second derivative 
+The deriv2 function returns the second derivative
 of the interpolating function at a given point. By default
 it will barf if you try to extrapolate, to comply silently if the point to be
 evaluated is out of range pass the option {Extrapolate => 1}
@@ -175,11 +186,11 @@ Example:
 
 =head2 integ()
 
-=for ref 
+=for ref
 
-The integ function returns the integral 
+The integ function returns the integral
 of the interpolating function between two points.
-By default it will barf if you try to extrapolate, 
+By default it will barf if you try to extrapolate,
 to comply silently if one of the integration limits
 is out of range pass the option {Extrapolate => 1}
 
@@ -188,34 +199,33 @@ is out of range pass the option {Extrapolate => 1}
 
 Usage:
 
-    $result = $spl->integ($a,$b,$opt);
+    $result = $spl->integ($la,$lb,$opt);
 
 =for example
 
 Example:
 
-    my $res = $spl->integ($a,$b)
-    $res = $spl->integ($a,$b,{Extrapolate => 0}) #same as above
+    my $res = $spl->integ($la,$lb)
+    $res = $spl->integ($x,$y,{Extrapolate => 0}) #same as above
 
-    # silently comply if $a or $b are out of range
-    $res = $spl->eval($a,$b,{Extrapolate => 1})
+    # silently comply if $la or $lb are out of range
+    $res = $spl->eval($la,$lb,{Extrapolate => 1})
 
 =head1 BUGS
 
-Feedback is welcome. 
+Feedback is welcome.
 
 =head1 SEE ALSO
 
 L<PDLA>
 
-The GSL documentation is online at
-
-  http://www.gnu.org/software/gsl/manual/
+The GSL documentation for interpolation is online at
+L<https://www.gnu.org/software/gsl/doc/html/interp.html>
 
 =head1 AUTHOR
 
 This file copyright (C) 2003 Andres Jordan <andresj@physics.rutgers.edu>
-All rights reserved. There is no warranty. You are allowed to redistribute this 
+All rights reserved. There is no warranty. You are allowed to redistribute this
 software/documentation under certain conditions. For details, see the file
 COPYING in the PDLA distribution. If this file is separated from the
 PDLA distribution, the copyright notice should be included in the file.
@@ -352,14 +362,14 @@ sub integ{
   my $opt;
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Extrapolate => 0}; }
-  my ($obj,$a,$b) = @_;
+  my ($obj,$la,$lb) = @_;
   my $s_obj = $$obj[0];
   my $a_obj = $$obj[1];
   if($$opt{Extrapolate} == 0){
-    return eval_integ_meat($a,$b,$$s_obj,$$a_obj);
+    return eval_integ_meat($la,$lb,$$s_obj,$$a_obj);
   }
   else{
-    return eval_integ_meat_ext($a,$b,$$s_obj,$$a_obj);
+    return eval_integ_meat_ext($la,$lb,$$s_obj,$$a_obj);
   }
 }
 

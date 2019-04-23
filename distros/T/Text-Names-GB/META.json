@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Text::Capitalize" : "1.1",
             "Text::LevenshteinXS" : "0.03",
-            "Text::Names" : "0",
+            "Text::Names" : "0.46",
             "perl" : "5.0"
          }
       },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/nigelhorne/Text-Names-GB"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

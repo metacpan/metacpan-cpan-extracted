@@ -117,7 +117,13 @@ sub weather_complete {
 sub palindrome{
     my ($self, $run) = @_;
     my $string = $run->parameters->{string};
-    say +($string eq reverse $string) ? "yes" : "nope";
+    my $argv = $run->argv;
+    if (@$argv) {
+        $run->err("Sorry, only one palindrome at a time");
+        $run->halt(1);
+        return;
+    }
+    $run->out( ($string eq reverse $string) ? "yes" : "nope" );
 }
 
 my %units = (
@@ -200,6 +206,31 @@ sub config {
     warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$opt], ['opt']);
 }
 
+sub data {
+    my ($self, $run) = @_;
+    my $opt = $run->options;
+    my $item = $opt->{item};
+
+    my $ref;
+    if ($item eq 'hash') {
+        $ref = {
+            foo => 23,
+        };
+    }
+    elsif ($item eq 'table') {
+        $ref = [
+            [qw/ FOO BAR /],
+            [ qw/ a b /],
+            [ qw/ c d /],
+        ];
+    }
+
+    # instead of print Data::Dumper->Dump($ref) or doing your own YAML or JSON
+    # encoding simply pass it to App::Spec
+    $run->out("Data '$item':");
+    $run->out($ref);
+}
+
 sub convert_complete {
     my ($self, $run, $args) = @_;
     my $errors = $run->validation_errors;
@@ -237,9 +268,6 @@ sub convert_complete {
         my $value = $param->{value};
         my $units = $units{ $type };
         my @result;
-        if ($runmode eq "validation") {
-            return [sort keys %$units];
-        }
         for my $unit (sort keys %$units) {
             next if $unit eq $source;
             my $label = $units->{ $unit }->{label};

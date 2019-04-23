@@ -17,7 +17,7 @@ use Capture::Tiny qw/capture/;
 use App::Git::Workflow;
 use Mock::App::Git::Workflow::Repository;
 
-our $VERSION     = version->new(1.1.2);
+our $VERSION     = version->new(1.1.3);
 our @EXPORT      = qw/command_ok/;
 our @EXPORT_OK   = qw/command_ok/;
 our %EXPORT_TAGS = ();
@@ -119,7 +119,7 @@ Test::Git::Workflow::Command - Test Git::Workflow::Command::* files
 
 =head1 VERSION
 
-This documentation refers to Test::Git::Workflow::Command version 1.1.2
+This documentation refers to Test::Git::Workflow::Command version 1.1.3
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ Helper module to test L<Git::Worflow::Commands>s
 
 =head1 SUBROUTINES/METHODS
 
-=head3 C<command_ok ( $module, $data )>
+=head2 C<command_ok ( $module, $data )>
 
 Tests C<$module> with the supplied <C$data>
 

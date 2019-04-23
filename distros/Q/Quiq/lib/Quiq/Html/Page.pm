@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -70,6 +70,11 @@ URL oder JavaScript-Code im Head der Seite. Mehrfach-Definition,
 wenn Array-Referenz. Das Attribut kann mehrfach auftreten, die
 Werte werden zu einer Liste zusammengefügt.
 
+=item javaScriptToHead => $bool (Default: 0)
+
+Setze den JavaScrip-Code nicht an das Ende des Body, sondern in
+den Head der HTML-Seite.
+
 =item styleSheet => $spec | \@specs (Default: undef)
 
 Einzelne Style-Spezifikation oder Liste von Style-Spezifikationen.
@@ -112,6 +117,7 @@ sub new {
         noNewline=>0,
         placeholders=>[],
         javaScript=>[],
+        javaScriptToHead=>0,
         styleSheet=>[],
         title=>'',
         topIndentation=>2,
@@ -155,9 +161,9 @@ sub html {
     my $self = ref $this? $this: $this->new(@_);
 
     my ($body,$comment,$encoding,$head,$noNewline,$placeholders,
-        $title,$javaScript,$styleSheet,$topIndentation) =
+        $title,$javaScript,$javaScriptToHead,$styleSheet,$topIndentation) =
         $self->get(qw/body comment encoding head noNewline placeholders
-        title javaScript styleSheet topIndentation/);
+        title javaScript javaScriptToHead styleSheet topIndentation/);
 
     # Stylesheet-Defininition(en)
     my $styleTags = Quiq::Css->style($h,$styleSheet);
@@ -174,7 +180,7 @@ sub html {
             -ind=>$topIndentation,
             '-',
             $body,
-            $scriptTags,
+            $javaScriptToHead? (): $scriptTags,
         );
     }
 
@@ -197,6 +203,7 @@ sub html {
                 ),
                 $h->cat($head),
                 $styleTags,
+                $javaScriptToHead? $scriptTags: (),
             ),
             $body,
         ),
@@ -221,7 +228,7 @@ sub html {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

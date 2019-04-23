@@ -49,11 +49,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Database::Async" : "0.002",
+            "Database::Async" : "0.004",
             "Database::Async::Engine" : "0",
             "Database::Async::Query" : "0",
             "Future" : "0.38",
-            "Future::AsyncAwait" : "0.22",
+            "Future::AsyncAwait" : "0.24",
             "IO::Async::SSL" : "0",
             "IO::Socket::SSL" : "0",
             "Log::Any" : "1.050",
@@ -63,6 +63,7 @@
             "Ryu::Async" : "0.014",
             "Ryu::Observable" : "0",
             "Scalar::Util" : "0",
+            "Template" : "2.28",
             "URI::QueryParam" : "0",
             "URI::postgres" : "0",
             "curry" : "1.001",
@@ -78,7 +79,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Database::Async" : "0.002",
+            "Database::Async" : "0.004",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Async::Loop" : "0",
@@ -102,22 +103,15 @@
    "provides" : {
       "Database::Async::Engine::PostgreSQL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL.pm",
-         "version" : "0.001"
+         "version" : "0.003"
+      },
+      "Database::Async::Engine::PostgreSQL::DDL" : {
+         "file" : "lib/Database/Async/Engine/PostgreSQL/DDL.pm",
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues"
-      },
-      "homepage" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL",
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git",
-         "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL"
-      }
-   },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom M <tom@audioboundary.com>"

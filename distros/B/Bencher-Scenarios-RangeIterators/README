@@ -2,16 +2,16 @@ NAME
     Bencher::Scenarios::RangeIterators - Benchmark various range iterators
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.003 of
     Bencher::Scenarios::RangeIterators (from Perl distribution
-    Bencher-Scenarios-RangeIterators), released on 2019-04-17.
+    Bencher-Scenarios-RangeIterators), released on 2019-04-23.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
 
-    *   Bencher::Scenario::RangeIterators::Create
-
     *   Bencher::Scenario::RangeIterators::Startup
+
+    *   Bencher::Scenario::RangeIterators::Create
 
     *   Bencher::Scenario::RangeIterators::Iterate
 

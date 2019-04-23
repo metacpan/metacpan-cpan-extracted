@@ -1,7 +1,5 @@
 #!bash
 
-# http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
-
 _subrepo() {
 
     COMPREPLY=()
@@ -30,8 +28,6 @@ _subrepo() {
     # subcmds
     case ${MYWORDS[0]} in
       _meta)
-        FLAGS+=()
-        OPTIONS+=()
         __subrepo_handle_options_flags
         case $INDEX in
 
@@ -44,8 +40,6 @@ _subrepo() {
         # subcmds
         case ${MYWORDS[1]} in
           completion)
-            FLAGS+=()
-            OPTIONS+=()
             __subrepo_handle_options_flags
             case $INDEX in
 
@@ -61,15 +55,16 @@ _subrepo() {
                 FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
                 OPTIONS+=('--name' 'name of the program (optional, override name in spec)')
                 __subrepo_handle_options_flags
-                  case $INDEX in
-                  *)
-                    __comp_current_options true || return # after parameters
-                    case ${MYWORDS[$INDEX-1]} in
-                      --name)
-                      ;;
+                case ${MYWORDS[$INDEX-1]} in
+                  --name)
+                  ;;
 
-                    esac
-                    ;;
+                esac
+                case $INDEX in
+
+                *)
+                    __comp_current_options || return
+                ;;
                 esac
               ;;
             esac
@@ -78,8 +73,6 @@ _subrepo() {
             esac
           ;;
           pod)
-            FLAGS+=()
-            OPTIONS+=()
             __subrepo_handle_options_flags
             case $INDEX in
 
@@ -92,8 +85,6 @@ _subrepo() {
             # subcmds
             case ${MYWORDS[2]} in
               generate)
-                FLAGS+=()
-                OPTIONS+=()
                 __subrepo_handle_options_flags
                 __comp_current_options true || return # no subcmds, no params/opts
               ;;
@@ -109,64 +100,69 @@ _subrepo() {
       ;;
       branch)
         FLAGS+=('--all' 'All subrepos')
-        OPTIONS+=()
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_branch_param_subrepo_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       clean)
         FLAGS+=('--all' 'All subrepos')
-        OPTIONS+=()
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_clean_param_subrepo_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       clone)
         FLAGS+=('--force' 'reclone (completely replace) an existing subdir.' '-f' 'reclone (completely replace) an existing subdir.')
         OPTIONS+=('--branch' 'Upstream branch' '-b' 'Upstream branch')
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --branch|-b)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
           2)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --branch|-b)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       commit)
-        FLAGS+=()
-        OPTIONS+=()
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_commit_param_subrepo_completion
@@ -174,267 +170,127 @@ _subrepo() {
           2)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       fetch)
         FLAGS+=('--all' 'All subrepos')
-        OPTIONS+=()
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_fetch_param_subrepo_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       help)
-        FLAGS+=()
-        OPTIONS+=()
         __subrepo_handle_options_flags
-        case $INDEX in
-
-        1)
-            __comp_current_options || return
-            __subrepo_dynamic_comp 'commands' 'branch'$'\n''clean'$'\n''clone'$'\n''commit'$'\n''fetch'$'\n''init'$'\n''pull'$'\n''push'$'\n''status'$'\n''version'
-
-        ;;
-        *)
-        # subcmds
-        case ${MYWORDS[1]} in
-          _meta)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            case $INDEX in
-
-            2)
-                __comp_current_options || return
-                __subrepo_dynamic_comp 'commands' 'completion'$'\n''pod'
-
-            ;;
-            *)
-            # subcmds
-            case ${MYWORDS[2]} in
-              completion)
-                FLAGS+=()
-                OPTIONS+=()
-                __subrepo_handle_options_flags
-                case $INDEX in
-
-                3)
-                    __comp_current_options || return
-                    __subrepo_dynamic_comp 'commands' 'generate'
-
-                ;;
-                *)
-                # subcmds
-                case ${MYWORDS[3]} in
-                  generate)
-                    FLAGS+=()
-                    OPTIONS+=()
-                    __subrepo_handle_options_flags
-                    __comp_current_options true || return # no subcmds, no params/opts
-                  ;;
-                esac
-
-                ;;
-                esac
-              ;;
-              pod)
-                FLAGS+=()
-                OPTIONS+=()
-                __subrepo_handle_options_flags
-                case $INDEX in
-
-                3)
-                    __comp_current_options || return
-                    __subrepo_dynamic_comp 'commands' 'generate'
-
-                ;;
-                *)
-                # subcmds
-                case ${MYWORDS[3]} in
-                  generate)
-                    FLAGS+=()
-                    OPTIONS+=()
-                    __subrepo_handle_options_flags
-                    __comp_current_options true || return # no subcmds, no params/opts
-                  ;;
-                esac
-
-                ;;
-                esac
-              ;;
-            esac
-
-            ;;
-            esac
-          ;;
-          branch)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          clean)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          clone)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          commit)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          fetch)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          init)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          pull)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          push)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          status)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-          version)
-            FLAGS+=()
-            OPTIONS+=()
-            __subrepo_handle_options_flags
-            __comp_current_options true || return # no subcmds, no params/opts
-          ;;
-        esac
-
-        ;;
-        esac
+        __comp_current_options true || return # no subcmds, no params/opts
       ;;
       init)
-        FLAGS+=()
         OPTIONS+=('--remote' 'Specify remote repository' '-r' 'Specify remote repository' '--branch' 'Upstream branch' '-b' 'Upstream branch')
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --remote|-r)
+          ;;
+          --branch|-b)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --remote|-r)
-              ;;
-              --branch|-b)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       pull)
         FLAGS+=('--all' 'All subrepos')
         OPTIONS+=('--branch' 'Upstream branch' '-b' 'Upstream branch' '--remote' 'Specify remote repository' '-r' 'Specify remote repository' '--update' 'update' '-u' 'update')
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --branch|-b)
+          ;;
+          --remote|-r)
+          ;;
+          --update|-u)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_pull_param_subrepo_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --branch|-b)
-              ;;
-              --remote|-r)
-              ;;
-              --update|-u)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       push)
         FLAGS+=('--all' 'All subrepos')
         OPTIONS+=('--branch' 'Upstream branch' '-b' 'Upstream branch' '--remote' 'Specify remote repository' '-r' 'Specify remote repository' '--update' 'update' '-u' 'update')
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --branch|-b)
+          ;;
+          --remote|-r)
+          ;;
+          --update|-u)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_push_param_subrepo_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --branch|-b)
-              ;;
-              --remote|-r)
-              ;;
-              --update|-u)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       status)
-        FLAGS+=()
         OPTIONS+=('--quiet' 'Just print names' '-q' 'Just print names')
         __subrepo_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --quiet|-q)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _subrepo_status_param_subrepo_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --quiet|-q)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       version)
-        FLAGS+=()
-        OPTIONS+=()
         __subrepo_handle_options_flags
         __comp_current_options true || return # no subcmds, no params/opts
       ;;
@@ -447,9 +303,11 @@ _subrepo() {
 
 _subrepo_compreply() {
     IFS=$'\n' COMPREPLY=($(compgen -W "$1" -- ${COMP_WORDS[COMP_CWORD]}))
+
+    # http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
     if [[ ${#COMPREPLY[*]} -eq 1 ]]; then # Only one completion
         COMPREPLY=( ${COMPREPLY[0]%% -- *} ) # Remove ' -- ' and everything after
-        COMPREPLY="$(echo -e "$COMPREPLY" | sed -e 's/[[:space:]]*$//')"
+        COMPREPLY=( ${COMPREPLY[0]%% *} ) # Remove trailing spaces
     fi
 }
 
@@ -507,7 +365,7 @@ __subrepo_dynamic_comp() {
             cols=`tput cols`
             [[ -z $cols ]] && cols=80
             desclength=`expr $cols - 4 - $max`
-            formatted=`printf "'%-*s -- %-*s'" "$max" "$name" "$desclength" "$desc"`
+            formatted=`printf "%-*s -- %-*s" "$max" "$name" "$desclength" "$desc"`
             comp="$comp$formatted"$'\n'
         else
             comp="$comp'$name'"$'\n'

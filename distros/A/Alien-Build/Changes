@@ -1,5 +1,15 @@
 Revision history for Alien-Build
 
+1.68      2019-04-23 04:57:49 -0400
+  - Add decoder property to Download::Negotiate plugin (gh#115, gh#116)
+
+1.67      2019-04-22 07:55:59 -0400
+  - Production release identical to 1.66_01
+
+1.66_01   2019-04-21 13:46:14 -0400
+  - Fix to Fetch::CurlCommand plugin.  It's handling of URLs with trailing slash (/)
+    wasn't quite right.  (gh#112, gh#113)
+
 1.65      2019-04-11 09:15:37 -0400
   - Further improvements with ExtUtils::Depends compatability (gh#107, gh#109).
   - Improved documentation (gh#106).

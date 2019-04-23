@@ -18,7 +18,7 @@ Currently, multiple matches are not handled very well.
 
 =head1 SYNOPSIS
 
- use PDLA::Doc::Perldl; # Load all documenation functions
+ use PDLA::Doc::Perldl; # Load all documentation functions
 
 =head1 BUGS
 
@@ -491,74 +491,74 @@ $PDLA::Doc::Perldl::hash_indent=3;
 sub whatis_r {
   my $prefix = shift;
   my $indent = shift;
-  my $a = shift;
+  my $x = shift;
   
-  unless(defined $a) {
+  unless(defined $x) {
     print $prefix,"<undef>\n";
     return;
   }
 
-  unless(ref $a) {
+  unless(ref $x) {
     print "${prefix}'".
-      substr($a,0,$PDLA::Doc::Perldl::max_strlen).
-      "'".((length $a > $PDLA::Doc::Perldl::max_strlen) && '...').
+      substr($x,0,$PDLA::Doc::Perldl::max_strlen).
+      "'".((length $x > $PDLA::Doc::Perldl::max_strlen) && '...').
       "\n";
     return;
   }
 
-  if(ref $a eq 'ARRAY') {
-    print "${prefix}Array (".scalar(@$a)." elements):\n";
+  if(ref $x eq 'ARRAY') {
+    print "${prefix}Array (".scalar(@$x)." elements):\n";
 
     my($el);
-    for $el(0..$#$a) {
+    for $el(0..$#$x) {
       my $pre = sprintf("%s  %2d: "," "x$indent,$el);
-      whatis_r($pre,$indent + $PDLA::Doc::Perldl::array_indent, $a->[$el]);
+      whatis_r($pre,$indent + $PDLA::Doc::Perldl::array_indent, $x->[$el]);
       last if($el == $PDLA::Doc::Perldl::max_arraylen);
     } 
     printf "%s   ... \n"," " x $indent
-      if($#$a > $PDLA::Doc::Perldl::max_arraylen);
+      if($#$x > $PDLA::Doc::Perldl::max_arraylen);
 
     return;
   }
       
-  if(ref $a eq 'HASH') {
-    print "${prefix}Hash (".scalar(keys %$a)." elements)\n";
+  if(ref $x eq 'HASH') {
+    print "${prefix}Hash (".scalar(keys %$x)." elements)\n";
     my $key;
-    for $key(sort keys %$a) {
+    for $key(sort keys %$x) {
       my $pre = " " x $indent .
 	        " $key: " . 
 		(" "x($PDLA::Doc::Perldl::max_keylen - length($key))) ;
 
-      whatis_r($pre,$indent + $PDLA::Doc::Perldl::hash_indent, $a->{$key});
+      whatis_r($pre,$indent + $PDLA::Doc::Perldl::hash_indent, $x->{$key});
     }
     return;
   }
 
-  if(ref $a eq 'CODE') {
+  if(ref $x eq 'CODE') {
     print "${prefix}Perl CODE ref\n";
     return;
   }
 
-  if(ref $a eq 'SCALAR' | ref $a eq 'REF') {
-    whatis_r($prefix." Ref -> ",$indent+8,$$a);
+  if(ref $x eq 'SCALAR' | ref $x eq 'REF') {
+    whatis_r($prefix." Ref -> ",$indent+8,$$x);
     return;
   }
 
-  if(UNIVERSAL::can($a,'px')) {
-    my $b;
+  if(UNIVERSAL::can($x,'px')) {
+    my $y;
     local $PDLA::debug = 1;
 
-    $b = ( (UNIVERSAL::isa($a,'PDLA') && $a->nelem < 5 && $a->ndims < 2)
+    $y = ( (UNIVERSAL::isa($x,'PDLA') && $x->nelem < 5 && $x->ndims < 2)
 	   ? 
-	   ": $a" :
+	   ": $x" :
 	   ": *****"
 	   );
 
-    $a->px($prefix.(ref $a)." %7T (%D) ".$b);
+    $x->px($prefix.(ref $x)." %7T (%D) ".$y);
 
   } else {
 
-    print "${prefix}Object: ".ref($a)."\n";
+    print "${prefix}Object: ".ref($x)."\n";
 
   }
 }
@@ -588,9 +588,9 @@ and the remaining commands listed, along with the names of their modules.
 sub help_url {
     local $_;
     foreach(@INC) {
-	my $a = "$_/PDLA/HtmlDocs/PDLA/Index.html";
-	if(-e $a) {
-	    return "file://$a";
+	my $x = "$_/PDLA/HtmlDocs/PDLA/Index.html";
+	if(-e $x) {
+	    return "file://$x";
 	}
     }
 }
@@ -607,9 +607,9 @@ sub help {
 	  if ($topic =~ /^\s*vars\s*$/i) {
 	      PDLA->px((caller)[0]);
 	  } elsif($topic =~ /^\s*url\s*/i) {
-	      my $a = help_url();
-	      if($a) {
-		  print $a;
+	      my $x = help_url();
+	      if($x) {
+		  print $x;
 	      } else {
 		  print "Hmmm. Curious: I couldn't find the HTML docs anywhere in \@INC...\n";
 	      }

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDLA-IO-HDF",
    "no_index" : {
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDLA::Core" : "0"
+            "PDLA::Core" : "2.019100"
          }
       },
       "configure" : {
@@ -30,18 +30,20 @@
             "Alien::HDF4" : "0",
             "ExtUtils::Depends" : "0.402",
             "ExtUtils::MakeMaker" : "0",
-            "PDLA::Core" : "0"
+            "PDLA::Core" : "2.019100"
          }
       },
       "test" : {
          "requires" : {
-            "PDLA::Core" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/pdla-io-hdf/issues"
+      },
       "homepage" : "http://pdlporters.github.io",
       "repository" : {
          "type" : "git",
@@ -49,5 +51,6 @@
          "web" : "https://github.com/PDLPorters/pdla-io-hdf"
       }
    },
-   "version" : "2.013006"
+   "version" : "2.019100",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

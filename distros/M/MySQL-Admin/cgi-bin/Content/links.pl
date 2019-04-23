@@ -1,12 +1,11 @@
 use utf8;
-use warnings;
 no warnings 'redefine';
 use vars qw(@t $ff $ss $folderfirst $sortstate);
 $folderfirst = param('folderfirst') ? 1 : 0;
 $ss          = param('sort')        ? 1 : 0;
 folderFirst($folderfirst);
 
-#Style("admiin");
+#Style("admin");
 #size(22);
 sub ShowBookmarks {
     loadTree( $m_hrSettings->{tree}{links} );
@@ -106,9 +105,9 @@ sub ExportOperaBookmarks {
 sub _rec {
     my $tree = shift;
     for ( my $i = 0 ; $i < @$tree ; $i++ ) {
-        if ( defined @$tree[$i] ) {
+        if ( @$tree[$i] ) {
             my $text = defined @$tree[$i]->{text} ? @$tree[$i]->{text} : '';
-            if ( ref @{ @$tree[$i]->{subtree} } eq "HASH" ) {
+            if ( ref @$tree[$i]->{subtree}[0] eq "HASH") {
                 print "#FOLDER\n\tID=@$tree[$i]->{rid}\n\tNAME=$text\n\tUNIQUEID=@$tree[$i]->{rid}\n";
                 _rec( \@{ @$tree[$i]->{subtree} } );
                 print "-\n\n";

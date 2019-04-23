@@ -202,7 +202,7 @@ sub mouse_click {
    die "mouse_click: callback could not find image window\n" unless defined $img;
 
    # calculate zoom/aspect ratio factors
-   my $glds = 0; $glds = 1 if $img->dim(0) < 5;  # hack, need verify consistancy
+   my $glds = 0; $glds = 1 if $img->dim(0) < 5;  # hack, need verify consistency
 
    my $zoom_x = $width / $img->dim($glds+0);
    my $zoom_y = $height / $img->dim($glds+1);
@@ -257,7 +257,7 @@ sub resize_window {
    die "resize_window: callback could not find image window\n" unless defined $img;
 
    # calculate zoom/aspect ratio factors
-   my $glds = 0; $glds = 1 if $img->dim(0) < 5;  # hack, need verify consistancy
+   my $glds = 0; $glds = 1 if $img->dim(0) < 5;  # hack, need verify consistency
 
    my $zoom_x = $width / $img->dim($glds+0);
    my $zoom_y = $height / $img->dim($glds+1);
@@ -646,13 +646,13 @@ the sub, only the imag2d() windows will update correctly.
 
   use PDLA::Graphics2D;     # imports imag2d() and twiddle()
 
-  $a = sequence(64,48,3);  # make test RGB image
-  $a = $a->mv(2,0);        # color must be dim(0) with size [0..4]
-  $a /= $a->max;           # pixel values in [0.0,1.0]
-  $a = sin(10*$a);
-  $w1 = imag2d($a);        # with parens...
-  $w2 = imag2d $a->sqrt;   # or without
-  $w3 = imag2d $a**2;
+  $x = sequence(64,48,3);  # make test RGB image
+  $x = $x->mv(2,0);        # color must be dim(0) with size [0..4]
+  $x /= $x->max;           # pixel values in [0.0,1.0]
+  $x = sin(10*$x);
+  $w1 = imag2d($x);        # with parens...
+  $w2 = imag2d $x->sqrt;   # or without
+  $w3 = imag2d $x**2;
 
 
 =head2 imag2d_update

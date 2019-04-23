@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.65'; # VERSION
+our $VERSION = '1.68'; # VERSION
 
 
 has '+url' => undef;
@@ -34,7 +34,21 @@ has 'bootstrap_ssl' => 0;
 has 'prefer' => 1;
 
 
+has 'decoder' => undef;
+
+
 sub pick
+{
+  my($self) = @_;
+  my($fetch, @decoders) = $self->_pick;
+  if($self->decoder)
+  {
+    @decoders = ref $self->decoder ? @{ $self->decoder } : ($self->decoder);
+  }
+  ($fetch, @decoders);
+}
+
+sub _pick
 {
   my($self) = @_;
 
@@ -167,7 +181,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.65
+version 1.68
 
 =head1 SYNOPSIS
 
@@ -214,6 +228,13 @@ considered for download.
 Regular expression to parse out the version from a filename.  The regular expression
 should store the result in C<$1>.
 
+Note: if you provide a C<version> property, this plugin will assume that you will
+be downloading an initial index to select package downloads from.  Depending on
+the protocol (and typically this is the case for http and HTML) that may bring in
+additional dependencies.  If start_url points to a tarball or other archive directly
+(without needing to do through an index selection process), it is recommended that
+you not specify this property.
+
 =head2 ssl
 
 If your initial URL does not need SSL, but you know ahead of time that a subsequent
@@ -253,6 +274,10 @@ Use L<Alien::Build::Plugin::Prefer::SortVersions>.
 Don't set any preference at all.  A hook must be installed, or another prefer plugin specified.
 
 =back
+
+=head2 decoder
+
+Override the detected decoder.
 
 =head1 METHODS
 

@@ -22,7 +22,7 @@ Module::Build->new(
     "Moo" => 0,
     "Moo::Role" => 0,
     "MooX::Types::MooseLike::Base" => 0,
-    "Net::CLI::Interact" => "2.300002",
+    "Net::CLI::Interact" => "2.300003",
     "Sub::Quote" => 0,
     "Term::ANSIColor" => 0,
     "Term::ReadPassword" => 0,

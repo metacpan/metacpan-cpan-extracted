@@ -6,12 +6,13 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Path;
 use Quiq::Option;
 use Scalar::Util ();
 use Quiq::Perl;
+no bytes;
 use Fcntl qw(:flock);
 
 # -----------------------------------------------------------------------------
@@ -254,7 +255,7 @@ sub destroy {
 =head4 Description
 
 Lies die nächste die nächsten $n I<Zeichen> von Dateihandle $fh
-und liefere diese zurück.
+und liefere diese zurück. Ist das Dateiende erreicht, liefere undef.
 
 =cut
 
@@ -263,13 +264,69 @@ und liefere diese zurück.
 sub read {
     my ($self,$n) = @_;
 
+    if ($n == 0) {
+        # Der Returnwert 0 von read() zeigt nur dann EOF an, wenn
+        # mehr als 0 Bytes gelesen werden sollen
+        return '';
+    }
+
     undef $!;
-    CORE::read($self,my $data,$n);
-    if (!defined $data and $!) {
+    $n = CORE::read($self,my $data,$n);
+    if (!defined $n) {
         $self->throw(q~FH-00012: Read fehlgeschlagen~,Errstr=>$!);
+    }
+    elsif ($n == 0) {
+        return undef;
     }
 
     return $data;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 readData() - Lies Daten mit Längenangabe
+
+=head4 Synopsis
+
+    $data = $fh->readData;
+
+=head4 Description
+
+Lies Daten in der Repräsentation
+
+    <LENGTH><DATA>
+
+und liefere <DATA> zurück. <LENGTH> ist ein 32 Bit Integer und <DATA>
+sind beliebige Daten mit <LENGTH> Bytes Länge.
+
+Wurden die Daten in einem Encoding wie UTF-8 geschrieben, müssen diese
+nach dem Einlesen anscheinend nicht dekodiert werden. Warum?
+
+Wurden die Daten $data in einem Encoding wie UTF-8 geschrieben, müssen
+diese anschließend decodiert werden mit
+
+    Encode::decode('utf-8',$data);
+
+Auf der FileHandle $fh das Encoding zu definieren, ist I<nicht>
+richtig, da die Längenangabe diesem Encoding nicht unterliegt!
+
+=head4 See Also
+
+writeData()
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub readData {
+    my $self = shift;
+
+    my $length = $self->read(4);
+    if (!defined $length) {
+        return undef;
+    }
+
+    return $self->read(unpack 'I',$length);
 }
 
 # -----------------------------------------------------------------------------
@@ -503,6 +560,45 @@ sub print {
 {
     no warnings 'once';
     *write = \&print;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 writeData() - Schreibe Daten mit Längenangabe
+
+=head4 Synopsis
+
+    $fh->writeData($data);
+
+=head4 Description
+
+Schreibe die Daten $data in der Repräsentation
+
+    <LENGTH><DATA>
+
+Hierbei ist <LENGTH> ein 32 Bit Integer, der die Länge der
+darauffolgenden Daten <DATA> in Bytes angibt.
+
+Liegen die Daten $data in einem Encoding wie UTF-8 vor, müssen diese
+zuvor encodiert werden mit
+
+    Encode::encode('utf-8',$data);
+
+Auf der FileHandle $fh das Encoding zu definieren, ist I<nicht>
+richtig, da die Längenangabe diesem Encoding nicht unterliegt!
+
+=head4 See Also
+
+readData()
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub writeData {
+    my ($self,$str) = @_;
+    Quiq::Perl->print($self,pack('I',bytes::length($str)),$str);
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -839,7 +935,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

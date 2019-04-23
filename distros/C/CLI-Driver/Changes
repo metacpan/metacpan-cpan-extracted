@@ -1,4 +1,6 @@
 Revision history for CLI-Driver
 
+0.02 - fixed PREREQ_PM for YAML::Tiny
+
 0.01 - first version    
 

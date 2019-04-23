@@ -1,4 +1,5 @@
 requires "Carp" => "0";
+requires "Test2" => "1.302096";
 requires "Test2::API" => "0";
 requires "Test2::Event" => "0";
 requires "Test2::Util::HashBase" => "0";
@@ -7,11 +8,12 @@ requires "strict" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
+  requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
   requires "IPC::Run3" => "0";
-  requires "Test2::Bundle::Extended" => "0";
   requires "Test2::Require::Module" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::More" => "1.302015";
 };
 

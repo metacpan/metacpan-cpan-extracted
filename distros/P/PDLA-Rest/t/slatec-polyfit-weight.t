@@ -10,17 +10,21 @@ use warnings;
 ##       garbage to slatec polfit
 ##
 ## <https://sourceforge.net/p/pdl/bugs/368/>
-## <https://github.com/PDLAPorters/pdl/issues/48>
+## <https://github.com/PDLPorters/pdl/issues/48>
 
 use PDLA::LiteF;
+use PDLA::Config;
+
 BEGIN {
-	eval {
+    unless ($PDLA::Config{WITH_SLATEC} &&
+	    eval {
 		require PDLA::Slatec;
 		PDLA::Slatec->import();
 		1;
-	} or do {
-		plan skip_all => "PDLA::Slatec not available";
-	}
+	    }
+	) {
+	plan skip_all => "PDLA::Slatec not available";
+    }
 }
 
 plan tests => 3;

@@ -37,8 +37,8 @@ use LWP::UserAgent;
 use RDF::Simple::Parser::Handler;
 use XML::SAX qw(Namespaces Validation);
 
-my
-$VERSION = 1.15;
+our
+$VERSION = 1.16;
 
 # Use a hash to implement objects of this type:
 use Class::MethodMaker [

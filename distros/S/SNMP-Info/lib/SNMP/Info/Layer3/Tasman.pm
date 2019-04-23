@@ -40,9 +40,9 @@ use SNMP::Info::MAU;
     SNMP::Info::Layer3 Exporter/;
 @SNMP::Info::Layer3::Tasman::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
+our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,

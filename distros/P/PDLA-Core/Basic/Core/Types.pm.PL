@@ -219,6 +219,7 @@ sub gentypehashcode {
   use Data::Dumper;
   local $Data::Dumper::Terse = 1;
   local $Data::Dumper::Indent = 1;
+  local $Data::Dumper::Sortkeys = 1;
   local $Data::Dumper::Pad = "\t\t";
   my $i = 0;
   my $perlcode = '';
@@ -342,7 +343,7 @@ the L<type|PDLA::Core/type> method.
 Skip to the end of this document to find out how to change
 the set of types supported by PDLA.
 
-=head1 Support functions
+=head1 FUNCTIONS
 
 A number of functions are available for module writers
 to get/process type information. These are used in various
@@ -351,7 +352,15 @@ appropriate type loops, etc.
 
 =head2 typesrtkeys
 
-return array of keys of typehash sorted in order of type complexity
+=for ref
+
+Returns an array of keys of typehash sorted in order of type complexity
+
+=for example
+
+ pdla> @typelist = PDLA::Types::typesrtkeys;
+ pdla> print @typelist;
+ PDLA_B PDLA_S PDLA_US PDLA_L PDLA_IND PDLA_LL PDLA_F PDLA_D
 
 =cut
 
@@ -362,7 +371,15 @@ sub typesrtkeys {
 
 =head2 ppdefs
 
-return array of pp symbols for all known types
+=for ref
+
+Returns an array of pp symbols for all known types
+
+=for example
+
+ pdla> @ppdefs = PDLA::Types::ppdefs
+ pdla> print @ppdefs;
+ B S U L N Q F D
 
 =cut
 
@@ -372,8 +389,19 @@ sub ppdefs {
 
 =head2 typefld
 
-return specified field (C<$fld>) for specified type (C<$type>)
+=for ref
+
+Returns specified field (C<$fld>) for specified type (C<$type>)
 by querying type hash
+
+=for usage
+
+PDLA::Types::typefld($type,$fld);
+
+=for example
+
+ pdla> print PDLA::Types::typefld('PDLA_IND',realctype)
+ long
 
 =cut
 
@@ -385,7 +413,7 @@ sub typefld {
   return $typehash{$type}->{$fld};
 }
 
-=head2 mapfld (in_value, in_key, out_key)
+=head2 mapfld
 
 Map a given source field to the corresponding target field by
 querying the type hash. This gives you a way to say, "Find the type
@@ -450,7 +478,7 @@ sub datatypes_header {
     warn "Using new 64bit index support\n" if $Config::Config{'ivsize'}==8;
 
     my $anyval_union = '';
-    my $enum = '';
+    my $enum = 'PDLA_INVALID=-1, ';
     my $typedefs = '';
     for (sort { $typehash{$a}{'numval'}<=>$typehash{$b}{'numval'} }  keys %typehash) {
      $enum .= $typehash{$_}{'sym'}.", ";

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Plugin::NoWarnings;
 use Test2::Require::Module 'IPC::Run3';
 
@@ -19,7 +19,7 @@ use Test::Builder;
 
 package main;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 # It we name the variable "$array" we don't get the broken output. Perl is

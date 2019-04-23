@@ -1,6 +1,6 @@
 package Dancer2::Plugin::ParamTypes;
 # ABSTRACT: Parameter type checking plugin for Dancer2
-$Dancer2::Plugin::ParamTypes::VERSION = '0.005';
+$Dancer2::Plugin::ParamTypes::VERSION = '0.006';
 use strict;
 use warnings;
 use constant {
@@ -222,7 +222,7 @@ Dancer2::Plugin::ParamTypes - Parameter type checking plugin for Dancer2
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

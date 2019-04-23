@@ -1,0 +1,177 @@
+a.treeviewLink16 {
+color:#000;
+cursor:pointer;
+font-family:verdana,sans-serif;
+font-size:14px;
+height:22px;
+/* vertical-align:top; */
+white-space:nowrap;
+}
+td.subtree{
+  vertical-align:top;
+}
+a.dropzone16{
+color:#000;
+cursor:pointer;
+font-family:verdana,sans-serif;
+font-size:14px;
+height:22px;
+vertical-align:top;
+background-color:rgba(255,255,255,0.8);
+white-space:nowrap;
+}
+a.treeviewLink16:hover {
+color:red;
+cursor:pointer;
+font-family:verdana,sans-serif;
+font-size:14px;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.caption16 {
+color:black;
+background-color:white;
+font-family:verdana, sans-serif;
+font-size:14px;
+height:24px;
+vertical-align:top;
+text-align:left;
+padding-left:2px;
+white-space:nowrap;
+}
+td.captionBorder16 {
+border-bottom:1px;
+border-bottom-style:dashed;
+color:black;
+background-color:white;
+font-family:verdana, sans-serif;
+font-size:14px;
+height:24px;
+vertical-align:top;
+text-align:left;
+padding-left:2px;
+white-space:nowrap;
+}
+td.columnsFolder16,td.columnsNode16 {
+color:#000;
+font-family:verdana, sans-serif;
+font-size:14px;
+height:22px;
+vertical-align:top;
+padding-left:2px;
+white-space:nowrap;
+}
+td.columnsFolderBorder16,td.columnsNodeBorder16 {
+border-left:1px;
+border-left-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+font-size:14px;
+height:22px;
+vertical-align:top;
+padding-left:2px;
+white-space:nowrap;
+}
+td.columnsLastNode16 {
+color:#000;
+font-family:verdana, sans-serif;
+font-size:14px;
+height:22px;
+vertical-align:top;
+padding-left:2px;
+white-space:nowrap;
+}
+table.treeview16 {
+color:#000;
+white-space:nowrap;
+}
+td.columnsLastNodeBorder16 {
+border-left:1px;
+border-left-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+font-size:14px;
+height:22px;
+vertical-align:top;
+padding-left:2px;
+white-space:nowrap;
+}
+td.folder16 {
+background-image:url('folderOpen.gif');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:14px;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderClosed16 {
+background-image:url('folderClosed.gif');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:14px;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.lastMinusNode16 {
+background-image:url('lastMinusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.lastNode16 {
+background-image:url('lastNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+font-size:14px;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.lastPlusNode16 {
+background-image:url('lastPlusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+font-size:14px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.minusNode16 {
+background-image:url('minusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+font-size:14px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.node16 {
+background-image:url('node.gif');
+background-repeat:repeat-y;
+cursor:pointer;
+font-size:14px;
+height:22px;
+text-align:left;
+vertical-align:top;
+white-space:nowrap;
+}
+td.plusNode16 {
+background-image:url('plusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+font-size:14px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.submenuDeco16 {
+background-image:url('vertLine.gif');
+background-repeat:repeat-y;
+}

@@ -3,7 +3,7 @@ package X::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =encoding utf-8
 
@@ -155,7 +155,7 @@ meant to be “sub-failures” here!
 use strict;
 use warnings;
 
-use Module::Load ();
+use Module::Runtime ();
 
 sub create {
     my ( $class, $type, @args ) = @_;
@@ -163,7 +163,7 @@ sub create {
     my $x_package = "${class}::$type";
 
     if (!$x_package->can('new')) {
-        Module::Load::load($x_package);
+        Module::Runtime::require_module($x_package);
     }
 
     return $x_package->new(@args);
@@ -183,7 +183,7 @@ Felipe Gasper (FELIPE)
 
 =head1 COPYRIGHT
 
-Copyright 2017 by L<Gasper Software Consulting|http://gaspersoftware.com>
+Copyright 2017-2019 by L<Gasper Software Consulting|http://gaspersoftware.com>
 
 =head1 LICENSE
 

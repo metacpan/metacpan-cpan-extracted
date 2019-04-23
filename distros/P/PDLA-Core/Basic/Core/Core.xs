@@ -101,15 +101,15 @@ static void pdl_freedata (pdl *a) {
  * this seems to cause an infinite loop in between tests 42 & 43 of
  * t/bad.t - ie
  *
- * $a = sequence( byte, 2, 3 );
- * $b = $a->slice("(1),:");
+ * $x = sequence( byte, 2, 3 );
+ * $y = $x->slice("(1),:");
  * my $mask = sequence( byte, 2, 3 );
  * $mask = $mask->setbadif( ($mask % 3) == 2 );
- * print "a,b == ", $a->badflag, ",", $b->badflag, "\n";
- * $a->inplace->copybad( $mask );                          <-- think this is the call
- * print "a,b == ", $a->badflag, ",", $b->badflag, "\n";
- * print "$a $b\n";
- * ok( $b->badflag, 1 );
+ * print "a,b == ", $x->badflag, ",", $y->badflag, "\n";
+ * $x->inplace->copybad( $mask );                          <-- think this is the call
+ * print "a,b == ", $x->badflag, ",", $y->badflag, "\n";
+ * print "$x $y\n";
+ * ok( $y->badflag, 1 );
  *
  */
 
@@ -334,8 +334,6 @@ iscontig(x)
   OUTPUT:
     RETVAL
 
-# using "perl" not $^X because that doesn't work on "perl in space"
-# TODO: switching back to $^X since using "perl" is not a viable fix
 INCLUDE_COMMAND: $^X -e "require q{./Dev.pm}; PDLA::Core::Dev::generate_core_flags()"
 
 #if 0

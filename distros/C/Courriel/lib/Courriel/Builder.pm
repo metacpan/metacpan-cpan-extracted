@@ -3,7 +3,7 @@ package Courriel::Builder;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Carp qw( croak );
 use Courriel;
@@ -19,7 +19,7 @@ use DateTime::Format::Mail;
 use Devel::PartialDump;
 use File::Basename qw( basename );
 use File::LibMagic;
-use File::Slurp::Tiny qw( read_file );
+use File::Slurper qw( read_binary );
 use List::AllUtils qw( first );
 use Params::ValidationCompiler qw( validation_for );
 use Scalar::Util qw( blessed reftype );
@@ -346,7 +346,7 @@ my $flm = File::LibMagic->new;
         my $ct
             = _content_type( $mime_type // $flm->checktype_filename($file) );
 
-        my $content = read_file($file);
+        my $content = read_binary($file);
 
         return Courriel::Part::Single->new(
             headers      => _attachment_headers($content_id),
@@ -452,7 +452,7 @@ Courriel::Builder - Build emails with sugar
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -720,7 +720,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

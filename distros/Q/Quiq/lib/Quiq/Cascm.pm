@@ -5,11 +5,12 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
 use Quiq::Path;
+use Quiq::Terminal;
 use Quiq::CommandLine;
 use Quiq::Array;
 use Quiq::Stopwatch;
@@ -184,6 +185,104 @@ sub new {
     $self->set(sh=>$sh);
 
     return $self;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Datei bearbeiten
+
+=head3 edit() - Bearbeite Repository-Datei
+
+=head4 Synopsis
+
+    $output = $scm->edit($repoFile,$package);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Datei mit Repository-Pfadangabe.
+
+=item $package
+
+Package, dem die ausgecheckte Datei (mit reservierter Version)
+zugeordnet wird.
+
+=back
+
+=head4 Returns
+
+Ausgabe der CASCM-Kommandos (String)
+
+=head4 Description
+
+Checke die Workspace-Datei $repoFile aus, öffne sie im Editor und
+checke sie nach dem Editieren wieder ein (sofern sie geändert wurde).
+Vor dem Einchecken einer Änderung wird eine Rückfrage gestellt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub edit {
+    my ($self,$repoFile,$package) = @_;
+
+    # Vollständigen Pfad der Repository-Datei ermitteln
+
+    my $p = Quiq::Path->new;
+    my $file = sprintf '%s/%s',$self->workspace,$repoFile;
+    if (!$p->exists($file)) {
+        $self->throw(
+            q~CASCM-00099: Repository file does not exist~,
+            File => $file,
+        );
+    }
+    
+    # Datei ins lokale Verzeichnis kopieren
+
+    my $localFile = $p->filename($file);
+    my $which = 'r';
+    if (-e $localFile) {
+        # Repo-Datei muss nicht kopiert werden, wenn sie schon
+        # vorhanden ist, falls sie nicht differiert
+        $which = 'l';
+        if ($p->compare($file,$localFile)) {
+            $which = Quiq::Terminal->askUser(
+                'Local file exists and differs from repository file.'.
+                    ' Which file: l=local, r=repository, q=quit?',
+                -values=>'l/r/q',
+                -default=>'l',
+            );
+            if ($which eq 'q') {
+                return '';
+            }
+            # Datei differiert und wird kopiert
+        }
+    }
+    if ($which eq 'r') {
+        $p->copyToDir($file,'.');
+    }
+
+    my $backupFile = "$localFile.bak";
+    $p->copy($localFile,$backupFile);
+
+    my $editor = $ENV{'EDITOR'} || 'vi';
+    Quiq::Shell->exec("$editor $localFile");
+    if ($p->compare($localFile,$backupFile)) {
+        my $answ = Quiq::Terminal->askUser(
+            "Save changes to repository?",
+            -values=>'y/n',
+            -default=>'y',
+        );
+        if ($answ eq 'y') {
+            my ($repoDir) = $p->split($repoFile);
+            return $self->putFiles($package,$repoDir,$localFile);
+        }
+    }
+
+    return '';
 }
 
 # -----------------------------------------------------------------------------
@@ -732,7 +831,7 @@ sub createPackage {
 
 =head4 Synopsis
 
-    $scm->deletePackage($package);
+    $output = $scm->deletePackage($package);
 
 =head4 Arguments
 
@@ -781,7 +880,7 @@ sub deletePackage {
 
 =head4 Synopsis
 
-    $scm->renamePackage($oldName,$newName);
+    $output = $scm->renamePackage($oldName,$newName);
 
 =head4 Arguments
 
@@ -823,6 +922,136 @@ sub renamePackage {
     );
 
     return $self->runCmd('hup',$c);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 showPackage() - Inhalt eines Package
+
+=head4 Synopsis
+
+    $tab = $scm->showPackage($package);
+
+=head4 Returns
+
+Ergebnismengen-Objekt (Quiq::Database::ResultSet::Array)
+
+=head4 Description
+
+Ermittele die in Package $package enthaltenen Items und ihrer Versions
+und liefere diese Ergebnismenge zurück.
+
+=head4 Example
+
+    $scm->showPackage('S6800_0_Seitz_IMS_Obsolete_Files');
+    =>
+    1 id
+    2 item_path
+    3 item_type
+    4 version
+    5 versiondataobjid
+    
+    1         2                                         3   4    5
+    | 4002520 | CPM_META/q07i101.cols.xml               | 1 |  1 | 5965056 |
+    | 3992044 | CPM_META/q07i102.cols.xml               | 1 |  9 | 6017511 |
+    | 4114775 | CPM_META/q07i105.cols.xml               | 1 |  2 | 6146470 |
+    | 3992045 | CPM_META/q07i109.cols.xml               | 1 |  6 | 5968199 |
+    | 3992046 | CPM_META/q07i113.cols.xml               | 1 |  6 | 5968200 |
+    | 4233433 | CPM_META/q24i200shw.cpmload.xml         | 1 | 13 | 6327078 |
+    | 4233434 | CPM_META/q24i200shw.flm.cpmload.xml     | 1 |  4 | 6318106 |
+    | 4233435 | CPM_META/q24i210kumul.cpmload.xml       | 1 | 11 | 6327079 |
+    | 4233436 | CPM_META/q24i210kumul.flm.cpmload.xml   | 1 |  4 | 6318108 |
+    | 4233437 | CPM_META/q24i210risiko.cpmload.xml      | 1 | 13 | 6336633 |
+    | 4233438 | CPM_META/q24i210risiko.flm.cpmload.xml  | 1 |  4 | 6318110 |
+    | 4233439 | CPM_META/q24i210schaden.cpmload.xml     | 1 | 13 | 6327081 |
+    | 4233440 | CPM_META/q24i210schaden.flm.cpmload.xml | 1 |  4 | 6318112 |
+    | 4003062 | CPM_META/q33i001.cols.xml               | 1 |  3 | 5981911 |
+    | 4003063 | CPM_META/q33i003.cols.xml               | 1 |  4 | 5981912 |
+    | 4003064 | CPM_META/q33i005.cols.xml               | 1 |  3 | 5981913 |
+    | 4003065 | CPM_META/q33i206.cols.xml               | 1 |  3 | 5981914 |
+    | 4115111 | CPM_META/q44i912.cols.xml               | 1 |  2 | 6157279 |
+    | 4144529 | CPM_META/q44i912.cpmload.xml            | 1 |  2 | 6318380 |
+    | 4144530 | CPM_META/q44i912.flm.cpmload.xml        | 1 |  2 | 6318381 |
+    | 4115112 | CPM_META/q44i913.cols.xml               | 1 |  3 | 6237929 |
+    | 4115113 | CPM_META/q44i914.cols.xml               | 1 |  4 | 6249865 |
+    | 4144531 | CPM_META/q44i914.cpmload.xml            | 1 |  7 | 6318382 |
+    | 4144532 | CPM_META/q44i914.flm.cpmload.xml        | 1 |  2 | 6318383 |
+    | 4095239 | CPM_META/q46i080.cpmload.xml            | 1 |  3 | 6327923 |
+    | 4095240 | CPM_META/q46i080.flm.cpmload.xml        | 1 |  2 | 6318576 |
+    | 4095550 | CPM_META/q46i081.cpmload.xml            | 1 |  3 | 6327924 |
+    | 4095551 | CPM_META/q46i081.flm.cpmload.xml        | 1 |  2 | 6318578 |
+    | 4095548 | CPM_META/q46i084.cpmload.xml            | 1 |  3 | 6327925 |
+    | 4095549 | CPM_META/q46i084.flm.cpmload.xml        | 1 |  2 | 6318580 |
+    | 4003101 | CPM_META/q80i102.cols.xml               | 1 |  4 | 5974529 |
+    | 3936189 | ddl/table/q31i001.sql                   | 1 |  1 | 5885525 |
+    | 3936190 | ddl/table/q31i002.sql                   | 1 |  1 | 5885526 |
+    | 3936191 | ddl/table/q31i003.sql                   | 1 |  1 | 5885527 |
+    | 3936192 | ddl/table/q31i004.sql                   | 1 |  1 | 5885528 |
+    | 3936193 | ddl/table/q31i007.sql                   | 1 |  1 | 5885529 |
+    | 3936194 | ddl/table/q31i014.sql                   | 1 |  1 | 5885530 |
+    | 3936195 | ddl/table/q31i017.sql                   | 1 |  1 | 5885531 |
+    | 4144537 | ddl/table/q44i912_cpm.sql               | 1 |  1 | 6163139 |
+    | 4144538 | ddl/table/q44i914_cpm.sql               | 1 |  1 | 6163140 |
+    | 3936311 | ddl/table/q65i001.sql                   | 1 |  1 | 5885647 |
+    | 3936312 | ddl/table/q65i002.sql                   | 1 |  1 | 5885648 |
+    | 3936313 | ddl/table/q65i003.sql                   | 1 |  1 | 5885649 |
+    | 3936314 | ddl/table/q65i030.sql                   | 1 |  1 | 5885650 |
+    | 4060343 | ddl/udf/rv_cpm_load_ims.sql             | 1 |  1 | 6038412 |
+    | 4060442 | ddl/udf/rv_cpm_load_imsh.sql            | 1 |  2 | 6039389 |
+    | 4060883 | ddl/udf/rv_cpm_load_imshr.sql           | 1 |  1 | 6039379 |
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub showPackage {
+    my ($self,$package) = @_;
+
+    my $projectContext = $self->projectContext;
+    my $viewPath = $self->viewPath;
+
+    my $tab = $self->runSql("
+        SELECT
+            itm.itemobjid AS id
+            , SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
+            , itm.itemtype AS item_type
+            , ver.mappedversion AS version
+            , ver.versiondataobjid
+        FROM
+            haritems itm
+            JOIN harversions ver
+                ON ver.itemobjid = itm.itemobjid
+            JOIN harpackage pkg
+                ON pkg.packageobjid = ver.packageobjid
+            JOIN harenvironment env
+                ON env.envobjid = pkg.envobjid
+            JOIN harstate sta
+                ON sta.stateobjid = pkg.stateobjid
+            JOIN haritems par
+                ON par.itemobjid = itm.parentobjid
+            JOIN harrepository rep
+                ON rep.repositobjid = itm.repositobjid
+        WHERE
+            env.environmentname = '$projectContext'
+            AND pkg.packagename = '$package'
+        START WITH
+            itm.itemname = '$viewPath'
+            AND itm.repositobjid = rep.repositobjid
+        CONNECT BY
+            PRIOR itm.itemobjid = itm.parentobjid
+        ORDER BY
+            item_path
+            , TO_NUMBER(ver.mappedversion)
+    ");
+
+    # Wir entfernen den Anfang des View-Path,
+    # da er für alle Pfade gleich ist
+
+    for my $row ($tab->rows) {
+        $row->[1] =~ s|^/\Q$viewPath\E/||;
+    }
+
+    return $tab;
 }
 
 # -----------------------------------------------------------------------------
@@ -1268,7 +1497,7 @@ sub sql {
 
 # -----------------------------------------------------------------------------
 
-=head2 Privat
+=head2 Private Methoden
 
 =head3 credentialsOptions() - Credential-Optionen
 
@@ -1514,7 +1743,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

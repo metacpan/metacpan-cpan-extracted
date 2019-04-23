@@ -36,9 +36,9 @@ use SNMP::Info;
 @SNMP::Info::Aggregate::ISA       = qw/SNMP::Info Exporter/;
 @SNMP::Info::Aggregate::EXPORT_OK = qw/agg_ports_ifstack/;
 
-use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
+our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 # Load MIB for leafs referenced within class
 %MIBS = ('IF-MIB' => 'ifIndex',);

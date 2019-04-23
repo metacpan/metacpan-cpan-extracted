@@ -54,7 +54,7 @@ sub MY::postamble {
 thirdparty: $tpd/touch
 	mkdir -p $tpd
 
-CHANGES: $self->{VERSION_FROM}
+CHANGES: $self->{VERSION_FROM} Makefile
 	echo $self->{VERSION} `date +"%Y-%m-%d %H:%M:%S %z"` `git config user.name` '<'`git config user.email`'>' >> CHANGES.new
 	\@echo >> CHANGES.new
 	\@echo ' -' >> CHANGES.new

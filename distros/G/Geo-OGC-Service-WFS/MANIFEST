@@ -5,12 +5,6 @@ MANIFEST
 README.md
 t/Geo-OGC-Service-WFS.t
 t/Geo-OGC-Service-WFS.conf
-t/test.cpg
-t/test.dbf
-t/test.prj
-t/test.qpj
-t/test.shp
-t/test.shx
 t/filter.t
 t/postgis.t
 lib/Geo/OGC/Service/WFS.pm

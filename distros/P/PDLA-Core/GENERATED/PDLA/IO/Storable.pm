@@ -55,7 +55,8 @@ be able to store and retrieve piddles via Storable.
 
 use Carp;
 
-{ package PDLA;
+{ package # hide from PAUSE
+    PDLA;
 # routines to make PDLA work with Storable >= 1.03
 
 # pdlpack() serializes a piddle, while pdlunpack() unserializes it. Earlier
@@ -297,8 +298,8 @@ store a piddle using L<Storable|Storable>
 
 =for example
 
-  $a = random 12,10;
-  $a->store('myfile');
+  $x = random 12,10;
+  $x->store('myfile');
 
 =cut
 
@@ -310,8 +311,8 @@ freeze a piddle using L<Storable|Storable>
 
 =for example
 
-  $a = random 12,10;
-  $frozen = $a->freeze;
+  $x = random 12,10;
+  $frozen = $x->freeze;
 
 =cut
 

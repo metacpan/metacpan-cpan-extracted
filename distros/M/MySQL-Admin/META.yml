@@ -16,10 +16,10 @@ name: MySQL-Admin
 provides:
   DBI::Library:
     file: lib/DBI/Library.pm
-    version: '1.16'
+    version: '1.17'
   DBI::Library::Database:
     file: lib/DBI/Library/Database.pm
-    version: '1.16'
+    version: '1.17'
   DBI::Library::Database::db:
     file: lib/DBI/Library/Database.pm
   DBI::Library::Database::st:
@@ -30,40 +30,40 @@ provides:
     file: lib/DBI/Library.pm
   HTML::Editor:
     file: lib/HTML/Editor.pm
-    version: '1.16'
+    version: '1.17'
   HTML::Editor::Markdown:
     file: lib/HTML/Editor/Markdown.pm
-    version: '1.09'
+    version: '1.16'
   HTML::Menu::Pages:
     file: lib/HTML/Menu/Pages.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin:
     file: lib/MySQL/Admin.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::Actions:
     file: lib/MySQL/Admin/Actions.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::Config:
     file: lib/MySQL/Admin/Config.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::Documentation:
     file: lib/MySQL/Admin/Documentation.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::GUI:
     file: lib/MySQL/Admin/GUI.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::Session:
     file: lib/MySQL/Admin/Session.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::Settings:
     file: lib/MySQL/Admin/Settings.pm
-    version: '1.16'
+    version: '1.17'
   MySQL::Admin::Translate:
     file: lib/MySQL/Admin/Translate.pm
-    version: '1.16'
+    version: '1.17'
   Template::Quick:
     file: lib/Template/Quick.pm
-    version: '1.16'
+    version: '1.17'
 requires:
   Authen::Captcha: '1.024'
   CGI: '3.48'
@@ -84,5 +84,5 @@ requires:
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
   repository: https://sourceforge.net/p/lindnerei/code/ci/master/tree/
-version: '1.16'
+version: '1.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

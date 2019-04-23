@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 
 use strict;
 use warnings;
@@ -243,11 +243,11 @@ sub _compute_result {
 	    }
 	    $self->{records}{$dns} = $txt = { permfail => $error }
 		if $error;
+	} elsif (exists $self->{records}{$dns} && ! $txt) {
+	    $self->{records}{$dns} = $txt = { tempfail => "dns lookup failed" }
 	}
 
 	my @v = _verify_sig($sig,$txt);
-	@v = (DKIM_TEMPERROR, "dns lookup failed")
-	    if !@v and exists $self->{records}{$dns};
 	push @rv, Mail::DKIM::Iterator::VerifyRecord->new($sig,$dns,@v);
 	$sig->{':result'} = $rv[-1] if @v; # we got a final result
     }
@@ -487,7 +487,7 @@ sub sign {
 
 # Verify a DKIM signature (hash from parse_signature) using a DKIM key (hash
 # from parse_dkimkey). Output is (error_code,error_string) or simply
-# (DKIM_PASS) in case of no error.
+# (DKIM_PASS) in case of no error or () if no final result can be computed yet.
 sub _verify_sig {
     my ($sig,$param) = @_;
 

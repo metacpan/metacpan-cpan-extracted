@@ -27,44 +27,11 @@ use Class::Method::Modifiers;
 use Role::Tiny::With;
 with qw(PDL::Role::Enumerable);
 
-use Devel::OverloadInfo qw(overload_info);
-
-my $overload_info;
-my $super_dotassign;
-
-BEGIN {
-    my $overload_info = overload_info('PDL');
-    $super_dotassign = $overload_info->{'.='}{code};
-}
-
 use overload
   '==' => \&_eq,
   'eq' => \&_eq,
   '!=' => \&_ne,
   'ne' => \&_ne,
-#  '<'  => \&_lt,
-#  'lt' => \&_lt,
-#  '<=' => \&_le,
-#  'le' => \&_le,
-#  '>'  => \&_gt,
-#  'gt' => \&_gt,
-#  '>=' => \&_ge,
-#  'ge' => \&_ge,
-#
-#  '.=' => sub {
-#    my ( $self, $other, $swap ) = @_;
-#
-#    unless ( $other->$_DOES('PDL::SV') ) {
-#        return $super_dotassign->( $self, $other, $swap );
-#    }
-#
-#    my $internal = $self->_internal;
-#    for my $i ( 0 .. $other->dim(0) - 1 ) {
-#        my $idx = PDL::Core::at( $self, $i );
-#        $internal->[$idx] = $other->at($i);
-#    }
-#    return $self;
-#  },
   fallback => 1;
 
 # after stringifiable role is added, the string method will exist
@@ -354,7 +321,7 @@ PDL::Factor - PDL subclass for keeping categorical data
 
 =head1 VERSION
 
-version 0.0043
+version 0.0045
 
 =head1 SYNOPSIS
 

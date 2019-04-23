@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.015 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-04-15.
+    This document describes version 0.019 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-04-23.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -17,6 +17,8 @@ DESCRIPTION
     *   csv-convert-to-hash
 
     *   csv-delete-field
+
+    *   csv-dump
 
     *   csv-each-row
 
@@ -37,6 +39,8 @@ DESCRIPTION
     *   csv-sort-fields
 
     *   csv-sum
+
+    *   dump-csv
 
 FUNCTIONS
   csv_add_field
@@ -92,6 +96,11 @@ FUNCTIONS
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -124,6 +133,11 @@ FUNCTIONS
 
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     *   with_data_rows => *bool*
 
@@ -192,6 +206,11 @@ FUNCTIONS
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -229,6 +248,11 @@ FUNCTIONS
 
         Row number (e.g. 2 for first data row).
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -265,6 +289,53 @@ FUNCTIONS
 
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_dump
+    Usage:
+
+     csv_dump(%args) -> [status, msg, payload, meta]
+
+    Dump CSV as data structure (array of array/hash).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   hash => *bool*
+
+        Provide row in $_ as hashref instead of arrayref.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     Returns an enveloped result (an array).
 
@@ -318,6 +389,11 @@ FUNCTIONS
 
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     Returns an enveloped result (an array).
 
@@ -384,6 +460,11 @@ FUNCTIONS
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -416,6 +497,11 @@ FUNCTIONS
 
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     Returns an enveloped result (an array).
 
@@ -483,6 +569,11 @@ FUNCTIONS
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -530,6 +621,11 @@ FUNCTIONS
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -569,6 +665,11 @@ FUNCTIONS
 
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     *   with => *str* (default: " ")
 
@@ -613,6 +714,11 @@ FUNCTIONS
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -650,6 +756,11 @@ FUNCTIONS
 
         Row number (e.g. 2 for first data row), range (2-7), or
         comma-separated list of such (2-7,10,20-23).
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     Returns an enveloped result (an array).
 
@@ -692,6 +803,11 @@ FUNCTIONS
 
     *   reverse => *bool*
 
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -724,6 +840,11 @@ FUNCTIONS
 
         When you declare that CSV does not have header row ("--no-header"),
         the fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
 
     *   with_data_rows => *bool*
 

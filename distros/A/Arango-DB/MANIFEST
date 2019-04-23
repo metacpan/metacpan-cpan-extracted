@@ -18,6 +18,8 @@ t/01-database.t
 t/02-collection.t
 t/03-document.t
 t/04-query.t
+t/05-users.t
+t/05-users.t~
 t/helper.pl
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

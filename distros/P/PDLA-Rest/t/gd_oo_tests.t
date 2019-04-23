@@ -22,7 +22,7 @@ BEGIN
         eval( " use PDLA::IO::GD; " );
         if( $@ )
         {
-            plan skip_all => "PDLA::IO::GD requires the gd image library.";
+            plan skip_all => "PDLA::IO::GD requires the gd image library. \$@='$@'";
         }  
 #        elsif( $^O =~ /bsd$/i or $^O =~ /dragonfly/i )
 #        {
@@ -55,9 +55,9 @@ use PDLA::Config;
 
 sub tapprox
 {
-    my $a = shift;
-    my $b = shift;
-    my $d = abs($a - $b);
+    my $x = shift;
+    my $y = shift;
+    my $d = abs($x - $y);
     #ok( all($d < 1.0e-5) );
     return all($d < 1.0e-5);
 }

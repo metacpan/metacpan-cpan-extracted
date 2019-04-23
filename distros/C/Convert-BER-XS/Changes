@@ -1,0 +1,64 @@
+Revision history for Perl extension Convert::BER::XS
+
+1.1  Sun Apr 21 13:58:00 CEST 2019
+	- added ber_dump helper function, for debugging. Kind of regretting
+          not having used an OO interface for it, or the other ber_ functions,
+          but that's how it is.
+        - check for overflow in "w" and INTEGER format decoding and reject
+          out-of-range numbers.
+        - improved(?) error messages.
+        - fix tests failing on 3 2bit perls because I miscounted the number
+          of tests to skip :/. Boy is it hard to get a 32 bit perl these days.
+        - added some longer testcases.
+
+1.0  Sat Apr 20 23:07:32 CEST 2019
+	- API seems stable enough.
+	- add ber_decode_prefix.
+        - fixed first component OID encoding.
+        - reject all kinds of illegal padding.
+        - add X.690 / RFC 2578 references to errors, when applicable.
+        - add SNMP_GAUGE32 alias.
+
+0.9  Sat Apr 20 17:48:15 CEST 2019
+	- I always forget the (void) prototype in C.
+        - rename CONSTRUCTED to FLAGS and make it multi-valued.
+        - there is no ASN_INTEGER32 type, that's an SNMP thing, Nuke.
+        - documented and cleaned up export tags and constants.
+        - major cleanup of tghe overall documentation.
+        - fixed :encode/:decode tags.
+        - fixed synopsis.
+        - allow 64 bits for OID components and tags if perl supports them.
+        - allow up to 8 octet lengths (2**64 bytes), provided
+          perl supports 64 bit.
+        - ber_is_int/ber_int now handle 65 bits (IV + UV).
+
+0.8  Sat Apr 20 15:48:21 CEST 2019
+	- confidence rises after some sleeping and fixing.
+	- add some basic tests.
+	- ported it down to 5.8.9.
+        - some portability fixes and give some allowance to non-C99
+          compilers.
+        - fix an out-of-bounds access when creating profiles.
+        - fixed boolean/null decoding.
+        - fixed out of boundas access when decoidng even-length oid
+          components. yup.
+        - fixed ObjectDescriptor type mapping,
+        - fixed ENUMERATED type mapping.
+
+0.7  Sat Apr 20 03:31:51 CEST 2019
+	- profile support, no longer are snmp types hardcoded.
+        - much improved documentation.
+        - all types except REAL implemented.
+
+0.2  Fri Apr 19 22:41:16 CEST 2019
+	- release early, release often.
+	- more useful documentation.
+        - tune ber_is_xxx functions to be more useful.
+
+0.1  Fri Apr 19 21:46:05 CEST 2019
+	- add experimental encoder.
+        - add some minimal documentation.
+
+0.0  Fri Apr 19 17:55:27 CEST 2019
+	- cloned from an unfinished version of Net::SNMP:XS 2.0.
+

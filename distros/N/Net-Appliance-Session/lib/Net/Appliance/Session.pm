@@ -1,5 +1,5 @@
 package Net::Appliance::Session;
-{ $Net::Appliance::Session::VERSION = '4.300001' }
+{ $Net::Appliance::Session::VERSION = '4.300005' }
 
 use Moo;
 use Sub::Quote;
@@ -539,7 +539,7 @@ Oliver Gorwits <oliver@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Oliver Gorwits.
+This software is copyright (c) 2019 by Oliver Gorwits.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

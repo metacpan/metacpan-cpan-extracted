@@ -4,11 +4,11 @@ lib/App/PerlShell.pm
 lib/App/PerlShell/Config.pm
 lib/App/PerlShell/LexPersist.pm
 lib/App/PerlShell/ModRefresh.pm
-lib/App/PerlShell/AddOn/Gnuplot.pm
-lib/App/PerlShell/AddOn/Macros.pm
-lib/App/PerlShell/AddOn/ShellCommands.pm
-lib/App/PerlShell/AddOn/TextCSV.pm
-lib/App/PerlShell/AddOn/TextTable.pm
+lib/App/PerlShell/Plugin/Gnuplot.pm
+lib/App/PerlShell/Plugin/Macros.pm
+lib/App/PerlShell/Plugin/ShellCommands.pm
+lib/App/PerlShell/Plugin/TextCSV.pm
+lib/App/PerlShell/Plugin/TextTable.pm
 Makefile.PL
 MANIFEST
 README

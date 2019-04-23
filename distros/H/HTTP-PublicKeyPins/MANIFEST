@@ -19,6 +19,7 @@ t/certs/x509_1.pem
 t/certs/x509.pem
 t/certs/trusted.pem
 t/keys/duckduckgo.pub
+t/keys/test.key
 t/reqs/new.pem
 t/reqs/rsa.pem
 META.yml                                 Module YAML meta-data (added by MakeMaker)

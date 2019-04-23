@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
+use Quiq::Path;
 use File::Temp ();
 
 # -----------------------------------------------------------------------------
@@ -83,7 +84,11 @@ sub new {
     my @args;
     while (@_) {
         my $opt = shift;
-        if ($opt =~ /^(-dir|-suffix|-template|-unlink)$/) {
+        if ($opt eq '-dir') {
+            substr($opt,0,1) = '';
+            push @args,uc($opt),Quiq::Path->expandTilde(shift);
+        }
+        elsif ($opt =~ /^(-suffix|-template|-unlink)$/) {
             substr($opt,0,1) = '';
             push @args,uc($opt),shift;
         }
@@ -102,7 +107,7 @@ sub new {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

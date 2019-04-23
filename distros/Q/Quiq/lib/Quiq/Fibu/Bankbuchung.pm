@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Fibu::Buchung;
 
@@ -332,6 +332,28 @@ sub toBuchungen {
                 vorgang => 'Sonstige Kosten / Sonstige Kosten',
                 text => 'Rechner',
                 beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->empfaenger =~ /Borgert-Bühren/i &&
+            $self->buchungsdetails =~ /Betriebskostenabrechnung 2017/i &&
+            $self->betragZahl eq '-1286.24') {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-1286,24',
+                text => 'Privatentnahme',
+            ),
+        ;
+    }
+    elsif ($self->auftraggeber =~ /Borgert-Buhren, Kirsten/i &&
+            $self->buchungsdetails =~ /Betriebskostenabrechnung 2017/i &&
+            $self->betragZahl eq '1286.24') {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldzugänge / Einlage von Privat',
+                betrag => '1286,24',
+                text => 'Privateinlage',
             ),
         ;
     }
@@ -1396,7 +1418,7 @@ sub saldoZahl {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

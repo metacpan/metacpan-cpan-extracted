@@ -1,11 +1,13 @@
+Apache-DB-0.15.tar.gz
 Changes
 DB.pm
 DB.xs
-MANIFEST
-Makefile.PL
-README
 lib/Apache/DProf.pm
 lib/Apache/SmallProf.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+perl5db.pl
 perldb.conf
-META.yml                                 Module meta-data (added by MakeMaker)
+README
 META.json                                Module JSON meta-data (added by MakeMaker)

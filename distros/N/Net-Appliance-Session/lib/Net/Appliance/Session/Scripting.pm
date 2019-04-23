@@ -1,11 +1,11 @@
 package Net::Appliance::Session::Scripting;
-{ $Net::Appliance::Session::Scripting::VERSION = '4.300001' }
+{ $Net::Appliance::Session::Scripting::VERSION = '4.300005' }
 
 use strict;
 use warnings FATAL => 'all';
 
 use Getopt::Long 2.24 qw(:config bundling);
-use Term::ANSIColor qw(colored);
+use Term::ANSIColor qw(colored color);
 use Text::ParseWords qw(shellwords);
 use Term::ReadPassword qw(read_password);
 $Term::ReadPassword::USE_STARS = 1;
@@ -19,7 +19,7 @@ use Text::Glob qw(match_glob);
 use Net::Appliance::Session;
 
 my $banner = colored ['blue'],
-  "Net Appliance Session scripting - v$VERSION - © 2012-2017 by Oliver Gorwits\n";
+  sprintf "Net Appliance Session scripting - v%s - © 2012-2019 by Oliver Gorwits\n", $Net::Appliance::Session::Scripting::VERSION;
 
 my %options = (cloginrc_opts => {});
 my $exit_status = 0;
@@ -101,7 +101,7 @@ sub commandline {
     bailout() if exists $options{help};
 
     if (exists $options{version}) {
-        print "nas version $VERSION\n";
+        printf "nas version %s\n", $Net::Appliance::Session::Scripting::VERSION;
         exit(0);
     }
 
@@ -253,7 +253,7 @@ sub do_session {
             push @messages, qq{personality "/cisco/ios"};
         }
         if (not exists $options{transport}
-                or not exists $options{cloginrc_opts}{transport}) {
+                and not exists $options{cloginrc_opts}{transport}) {
             push @messages, 'transport SSH';
         }
         if (scalar @messages) {
@@ -264,14 +264,17 @@ sub do_session {
     print colored ['white'], "Connecting to [$options{hostname}]...\n\n"
         if not $options{quiet};
 
+    my $transport = ($options{transport}
+                  || $options{cloginrc_opts}{transport}
+                  || 'SSH');
+
     my $s = Net::Appliance::Session->new({
         host => $options{hostname},
-        transport => ($options{transport} || 'SSH'),
+        transport => $transport,
         personality => ($options{personality} || 'ios'),
         ($options{username} ? (username => $options{username}) : ()),
         ($options{password} ? (password => $options{password}) : ()),
-        (($options{quiet} and ($options{transport} eq 'SSH'
-                or $options{cloginrc_opts}{transport} eq 'SSH')) ? (
+        (($options{quiet} and ($transport eq 'SSH')) ? (
             connect_options => { opts => ['-q'] },
         ) : ()),
         %{ $options{cloginrc_opts} || {} },
@@ -301,7 +304,13 @@ sub do_session {
                 $args = '' if not defined $args;
                 print colored ['white bold'], "Running macro [$name]...\n"
                     if not $options{quiet};
-                $s->macro($name, { params => [split /\s+/, $args] });
+                if ($name eq 'disconnect') {
+                    $s->close;
+                    last
+                }
+                else {
+                    $s->macro($name, { params => [split /\s+/, $args] });
+                }
                 next;
             }
             elsif ($cmd =~ m/^!m/) {
@@ -337,7 +346,7 @@ sub do_session {
         print colored ['white bold'], $_;
     }
     finally {
-        $s->close;
+        eval { $s->close };
     };
 }
 
@@ -355,7 +364,11 @@ sub get_next_cmd {
         return $cmd;
     }
     else {
-        prompt($turtle . $s->last_prompt);
+        my $cmd = prompt($turtle . $s->last_prompt);
+        print color ('reset');
+        chomp $cmd;
+        print $cmd, "\n";
+        return $cmd;
     }
 }
 

@@ -2,8 +2,8 @@ NAME
     Range::Iter - Generate a coderef iterator for range
 
 VERSION
-    This document describes version 0.001 of Range::Iter (from Perl
-    distribution Range-Iter), released on 2019-04-16.
+    This document describes version 0.002 of Range::Iter (from Perl
+    distribution Range-Iter), released on 2019-04-23.
 
 SYNOPSIS
       use Range::Iter qw(range_iter);
@@ -15,9 +15,14 @@ SYNOPSIS
 
      my $iter = range_iter(1, 10, 2); # 1, 3, 5, 7, 9
 
-    Anything that can be incremented by Perl is game:
+    You can use alphanumeric strings too since "++" has some extra builtin
+    magic (see perlop):
 
-      $iter = range_iter("a", "e"); # a, b, c, d, e
+     $iter = range_iter("zx", "aab"); # zx, zy, zz, aaa, aab
+
+    Infinite list:
+
+     $iter = range_iter(1, Inf); # 1, 2, 3, ...
 
 DESCRIPTION
 FUNCTIONS

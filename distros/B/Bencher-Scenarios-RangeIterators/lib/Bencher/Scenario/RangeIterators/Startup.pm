@@ -1,7 +1,7 @@
 package Bencher::Scenario::RangeIterators::Startup;
 
-our $DATE = '2019-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark startup overhead',
@@ -28,7 +28,7 @@ Bencher::Scenario::RangeIterators::Startup - Benchmark startup overhead
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::RangeIterators::Startup (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-17.
+This document describes version 0.003 of Bencher::Scenario::RangeIterators::Startup (from Perl distribution Bencher-Scenarios-RangeIterators), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -46,11 +46,11 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Range::Iterator> 0.001
+L<Range::Iterator> 0.002
 
-L<Range::Iter> 0.001
+L<Range::Iter> 0.002
 
-L<Range::ArrayIter> 0.001
+L<Range::ArrayIter> 0.002
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -78,7 +78,7 @@ L<Range::ArrayIter>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m RangeIterators::Startup >>):
 
@@ -86,10 +86,10 @@ Benchmark with default options (C<< bencher -m RangeIterators::Startup >>):
  +---------------------+-----------+------------------------+------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------+------------------------+------------+---------+---------+
- | Range::ArrayIter    |       8   |                    2.5 |        1   | 1.5e-05 |      20 |
- | Range::Iter         |       7.9 |                    2.4 |        1   | 1.2e-05 |      20 |
- | Range::Iterator     |       7.4 |                    1.9 |        1.1 | 9.9e-06 |      20 |
- | perl -e1 (baseline) |       5.5 |                    0   |        1.5 | 3.2e-05 |      20 |
+ | Range::ArrayIter    |      10.4 |                    4.6 |       1    | 8.5e-06 |      20 |
+ | Range::Iterator     |      10.4 |                    4.6 |       1.01 | 8.7e-06 |      21 |
+ | Range::Iter         |      10   |                    4.2 |       1    | 1.8e-05 |      21 |
+ | perl -e1 (baseline) |       5.8 |                    0   |       1.8  | 1.2e-05 |      20 |
  +---------------------+-----------+------------------------+------------+---------+---------+
 
 

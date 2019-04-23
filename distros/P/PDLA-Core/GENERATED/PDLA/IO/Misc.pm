@@ -157,15 +157,15 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 # - Would be nice to have a proper extend function rather than hack
 # - Is a NO-OP when handed a perl ARRAY ref rather than a piddle arg
 sub _ext_lastD {                           # Called by rcols and rgrep
-   my ($a,$n) = @_;
+   my ($x,$n) = @_;
    if (ref($_[0]) ne 'ARRAY') {
-      my @nold   = $a->dims;
+      my @nold   = $x->dims;
       my @nnew   = @nold;
       $nnew[-1] += $n;                      # add $n to the last dimension
-      my $b      = zeroes($a->type,@nnew);  # New pdl
-      my $bb     = $b->mv(-1,0)->slice("0:".($nold[-1]-1))->mv(0,-1);
-      $bb       .= $a;
-      $_[0]      = $b;
+      my $y      = zeroes($x->type,@nnew);  # New pdl
+      my $yy     = $y->mv(-1,0)->slice("0:".($nold[-1]-1))->mv(0,-1);
+      $yy       .= $x;
+      $_[0]      = $y;
    }
    1;
 }
@@ -264,7 +264,7 @@ arrays (also see L</rgrep>).
 For each column number specified, a 1D output PDLA will be
 generated.  Anonymous arrays of column numbers generate
 2D output piddles with dim0 for the column data and dim1
-equal to the number of colums in the anonymous array(s).
+equal to the number of columns in the anonymous array(s).
 
 An empty anonymous array as column specification will
 produce a single output data piddle with dim(1) equal
@@ -308,7 +308,7 @@ Options (case insensitive):
   to be read in.  Any missing columns use the DEFTYPE value (default B<[]>).
   
   COLSEP
-  - splits on this string/pattern/qr{} between colums of data. Defaults to
+  - splits on this string/pattern/qr{} between columns of data. Defaults to
   $PDLA::IO::Misc::defcolsep.
   
   PERLCOLS
@@ -381,7 +381,7 @@ For example:
   4. LINES => '-1:0:3' may not work as you expect, since lines are skipped
      when read in, then the whole array reversed.
 
-  5. For consistancy with wcols and rcols 1D usage, column data is loaded
+  5. For consistency with wcols and rcols 1D usage, column data is loaded
      into the rows of the pdls (i.e., dim(0) is the elements read per column
      in the file and dim(1) is the number of columns of data read.
 
@@ -480,12 +480,12 @@ my ( @explicit_cols )  = @_;  # call specified columns to read
 
 # work out which line numbers are required
 # - the regexp's are a bit over the top
-my ( $a, $b, $c );
+my ( $x, $y, $c );
 if ( $$options{LINES} ne '' ) {
    if ( $$options{LINES} =~ /^\s*([+-]?\d*)\s*:\s*([+-]?\d*)\s*$/ ) {
-      $a = $1; $b = $2;
+      $x = $1; $y = $2;
    } elsif ( $$options{LINES} =~ /^\s*([+-]?\d*)\s*:\s*([+-]?\d*)\s*:\s*([+]?\d*)\s*$/ ) {
-      $a = $1; $b = $2; $c = $3;
+      $x = $1; $y = $2; $c = $3;
    } else {
       barf "rcols() - unable to parse LINES option.\n";
    }
@@ -493,8 +493,8 @@ if ( $$options{LINES} ne '' ) {
 
 # Since we do not know how many lines there are in advance, things get a bit messy
 my ( $index_start, $index_end ) = ( 0, -1 );
-$index_start  = $a if defined($a) and $a ne '';
-$index_end    = $b if defined($b) and $b ne '';
+$index_start  = $x if defined($x) and $x ne '';
+$index_end    = $y if defined($y) and $y ne '';
 my $line_step = $c || 1;
 
 # $line_rev = 0/1 for normal order/reversed
@@ -814,11 +814,11 @@ wantarray ? return(@ret) : return $ret[0];
 Can take file name or *HANDLE, and if no file/filehandle is given defaults to STDOUT.
 
   Options (case insensitive):
-  
+
     HEADER - prints this string before the data. If the string
              is not terminated by a newline, one is added. (default B<''>).
-  
-    COLSEP - prints this string between colums of data. Defaults to
+
+    COLSEP - prints this string between columns of data. Defaults to
              $PDLA::IO::Misc::defcolsep.
 
     FORMAT - A printf-style format string that is cycled through
@@ -833,7 +833,7 @@ Can take file name or *HANDLE, and if no file/filehandle is given defaults to ST
    or 2D piddles (as might be returned from rcols() with the [] column
    syntax and/or using the PERLCOLS option).  dim(0) of all piddles
    written must be the same size.  The printf-style $format_string,
-   if given, overrides a any FORMAT key settings in the option hash 
+   if given, overrides any FORMAT key settings in the option hash.
 
 e.g.,
 
@@ -844,27 +844,27 @@ e.g.,
   wcols $x, $y+2, *STDERR;
   wcols $x, $y+2, '|wc';
 
-  $a = sequence(3); $b = zeros(3); $c = random(3);
-  wcols $a,$b,$c; # Orthogonal version of 'print $a,$b,$c' :-)
+  $x = sequence(3); $y = zeros(3); $c = random(3);
+  wcols $x,$y,$c; # Orthogonal version of 'print $x,$y,$c' :-)
 
-  wcols "%10.3f", $a,$b; # Formatted
-  wcols "%10.3f %10.5g", $a,$b; # Individual column formatting
+  wcols "%10.3f", $x,$y; # Formatted
+  wcols "%10.3f %10.5g", $x,$y; # Individual column formatting
 
-  $a = sequence(3); $b = zeros(3); $units = [ 'm/sec', 'kg', 'MPH' ];
-  wcols $a,$b, { HEADER => "#   a   b" };
-  wcols $a,$b, { Header => "#   a   b", Colsep => ', ' };  # case insensitive option names!
-  wcols " %4.1f  %4.1f  %s",$a,$b,$units, { header => "# Day  Time  Units" };
+  $x = sequence(3); $y = zeros(3); $units = [ 'm/sec', 'kg', 'MPH' ];
+  wcols $x,$y, { HEADER => "#   x   y" };
+  wcols $x,$y, { Header => "#   x   y", Colsep => ', ' };  # case insensitive option names!
+  wcols " %4.1f  %4.1f  %s",$x,$y,$units, { header => "# Day  Time  Units" };
 
-  $a52 = sequence(5,2); $b = ones(5); $c = [ 1, 2, 4 ];
+  $a52 = sequence(5,2); $y = ones(5); $c = [ 1, 2, 4 ];
   wcols $a52;         # now can write out 2D pdls (2 columns data in output)
-  wcols $b, $a52, $c  # ...and mix and match with 1D listrefs as well
+  wcols $y, $a52, $c  # ...and mix and match with 1D listrefs as well
 
   NOTES:
-  
+
   1. Columns are separated by whitespace by default, use
      C<$PDLA::IO::Misc::defcolsep> to modify the default value or
      the COLSEP option
-  
+
   2. Support for the C<$PDLA::IO::Misc::colsep> global value
      of PDLA-2.4.6 and earlier is maintained but the initial value
      of the global is undef until you set it.  The value will be
@@ -894,12 +894,14 @@ sub PDLA::wcols {
 	   elsif ( $key =~ /^COLSEP/i ) { $usecolsep = $opt->{$key}; }  # option: COLSEP
 	   elsif ( $key =~ /^FORMAT/i ) { $format_string = $opt->{$key}; }  # option: FORMAT
            else {
-               print "Warning: wcols does not understand option <$key>.\n"; 
+               print "Warning: wcols does not understand option <$key>.\n";
            }
        }
    }
-   if (ref(\$_[0]) eq "SCALAR") {
-       $step = $format_string = shift; # 1st arg not piddle, explicit overrides option hash
+   if (ref(\$_[0]) eq "SCALAR" || $format_string) {
+       $format_string = shift if (ref(\$_[0]) eq "SCALAR");
+       # 1st arg not piddle, explicit format string overrides option hash FORMAT
+       $step = $format_string;
        $step =~ s/(%%|[^%])//g;  # use step to count number of format items
        $step = length ($step);
    }
@@ -1003,8 +1005,8 @@ default print format.
 
 =for usage
 
- Usage: @str = swcols format, pdl1,pdl2,pdl3,...;
-    or  $str = swcols format, pdl1,pdl2,pdl3,...;
+ Usage: @str = swcols format, pdl_1,pdl_2,pdl_3,...;
+    or  $str = swcols format, pdl_1,pdl_2,pdl_3,...;
 
 =cut
 
@@ -1104,9 +1106,9 @@ e.g.
 
 =for example
 
- ($a,$b) = rgrep {/Foo (.*) Bar (.*) Mumble/} $file;
+ ($x,$y) = rgrep {/Foo (.*) Bar (.*) Mumble/} $file;
 
-i.e. the vectors C<$a> and C<$b> get the progressive values
+i.e. the vectors C<$x> and C<$y> get the progressive values
 of C<$1>, C<$2> etc.
 
 =cut
@@ -1214,7 +1216,7 @@ Usage:
 
 =for example
 
- $a = rdsa 'file.sdf'
+ $x = rdsa 'file.sdf'
 
 Not yet tested with PDLA-1.9X versions
 

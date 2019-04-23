@@ -7,19 +7,21 @@
 [/previewBody]
 [editor]
 <div class="ShowTables" style="padding-bottom:1%;margin-top:1.5em;" >
-<form name="postmodify"  method="post"  enctype="multipart/form-data" onsubmit="submitForm(this,'[action/]','[action/]');return false;">
+<form accept-charset="UTF8" name="postmodify"  method="post"  enctype="multipart/form-data" onsubmit="saveText();submitForm(this,'[action/]','[action/]');return false;">
 <table class="editor" width="100%" cellspacing="4" >
 <tr>
     <td ><a name="winedit"></a><input name="headline" id="title" value="[headline/]"  type="text" style="width:100%;margin-bottom:5px;"/></td>
-    <td align="right"><a href="javascript:showPopup('editorOptions')">[tr=more/]</a></td>
+    <td align="right"><a href="javascript:showEditorOptions()" id="editorOptions">[tr=more/]</a></td>
 </tr>
 <tr>
     <td align="center" colspan="3">
-        <div id="editorRim" style="display:none;border:1px solid black;"><pre id="edit" style="display:none;"></pre></div>
-        <textarea rows="10" class="txt" name="message" id="txt" style="width:98%;"  accept-charset="UTF-8">[body/]</textarea>
+        <div id="editorRim" style="display:none;border:1px solid black;"><pre id="edit" style="font-size:1em;display:none;"></pre></div>
+        <textarea rows="10" class="txt" name="message" id="txt" style="width:98%;" accept-charset="UTF-8">[body/]</textarea>
         <script language="JavaScript1.5" type="text/javascript">
             markDownEditor = null;
             enableHtml([html/]===1);
+            if(right < 5 )
+                hide('editorOptions')
             $('.selectpicker').selectpicker({
                 size: 5
             });
@@ -32,19 +34,19 @@
         <input name="thread" value="[thread/]" style="display:none;"/>
         <input name="reply" value="[reply/]" style="display:none;"/>
     </td>
-    <td align="right" style="white-space: nowrap;"><input type="submit" name="submit" style="width:100px;margin-top:5px;" onclick="act ='[tr=preview/]';" alt="preview" value="[tr=preview/]" title="[tr=preview/]"/>
-    <input type="submit" name="submit" style="width:100px;margin-top:5px;" value="[tr=save/]" title="[tr=save/]" onclick="act ='[tr=save/]'" /></td>
+    <td align="right" style="white-space: nowrap;"><input type="submit" name="submit" style="width:150px;margin-top:5px;" onclick="act ='[tr=preview/]';" alt="preview" value="[tr=preview/]" title="[tr=preview/]"/>
+    <input type="submit" name="submit" style="width:150px;margin-top:5px;" value="[tr=save/]" title="[tr=save/]" onclick="act ='[tr=save/]'" /></td>
 </tr>
 </table>
 <div id="editorOptions" style="display:none;">
     <div style="text-align:left;" align="left">
         HTML:<br>[buttons/]<br>
-        [attach/]<br>
         [tr=catlist/]:<br>
         [catlist/]<br>
         [atemp/]<br>
     </div>
 </div>
+[attach/]<br>
 </form>
 </div>
 [/editor]

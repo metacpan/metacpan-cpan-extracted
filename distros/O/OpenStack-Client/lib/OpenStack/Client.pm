@@ -19,7 +19,7 @@ use URI::Encode ();
 
 use OpenStack::Client::Response ();
 
-our $VERSION = '1.0006';
+our $VERSION = '1.0007';
 
 =encoding utf8
 

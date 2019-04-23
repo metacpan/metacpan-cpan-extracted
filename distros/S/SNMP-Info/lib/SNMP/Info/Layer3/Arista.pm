@@ -46,9 +46,9 @@ use SNMP::Info::Aggregate 'agg_ports_ifstack';
 /;
 @SNMP::Info::Layer3::Arista::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
+our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,

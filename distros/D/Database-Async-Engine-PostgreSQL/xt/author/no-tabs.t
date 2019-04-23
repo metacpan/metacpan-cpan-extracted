@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Database/Async/Engine/PostgreSQL.pm',
     'lib/Database/Async/Engine/PostgreSQL.pod',
+    'lib/Database/Async/Engine/PostgreSQL/DDL.pm',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',

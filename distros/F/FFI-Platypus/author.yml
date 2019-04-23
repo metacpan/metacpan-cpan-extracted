@@ -114,8 +114,11 @@ pod_spelling_system:
     - shellwords
     - fbx
     - strndup
-
-
+    - Petr
+    - Pisar
+    - ppisar
+    - Anwar
+    - MANWAR
 pod_coverage:
   skip: 0
   # format is "Class#method" or "Class", regex allowed

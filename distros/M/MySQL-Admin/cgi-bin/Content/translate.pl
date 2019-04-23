@@ -88,7 +88,9 @@ sub on_valid_form {
         my $rkey = lc $entrys[$i];
         delete $m_hrLng->{$lg}{ $entrys[$i] };
         my $txt = param( $entrys[$i] );
-        utf8::encode($txt);
+        if ( !is_valid_utf8($body) || $^O eq 'MSWin32' ) {
+            utf8::encode($txt);
+        }
         print "$rkey: " . $txt . '<br/>'
           unless $rkey eq 'sid'
           or $rkey eq 'action'

@@ -42,6 +42,8 @@
 *.nagoya.jp;*.nagoya.jp
 *.nom.br;*.nom.br
 *.np;*.np
+*.on-rancher.cloud;*.on-rancher.cloud
+*.on-rio.io;*.on-rio.io
 *.otap.co;*.otap.co
 *.pg;*.pg
 *.platform.sh;*.platform.sh
@@ -756,6 +758,7 @@ bieszczady.pl;bieszczady.pl
 bievat.no;bievat.no
 bievát.no;xn--bievt-0qa.no
 bifuka.hokkaido.jp;bifuka.hokkaido.jp
+bigv.io;bigv.io
 bihoro.hokkaido.jp;bihoro.hokkaido.jp
 bike;bike
 bilbao.museum;bilbao.museum
@@ -1328,6 +1331,7 @@ cloud66.ws;cloud66.ws
 cloudaccess.host;cloudaccess.host
 cloudaccess.net;cloudaccess.net
 cloudapp.net;cloudapp.net
+cloudapps.digital;cloudapps.digital
 cloudcontrolapp.com;cloudcontrolapp.com
 cloudcontrolled.com;cloudcontrolled.com
 cloudeity.net;cloudeity.net
@@ -1821,6 +1825,7 @@ dinosaur.museum;dinosaur.museum
 direct;direct
 directory;directory
 discount;discount
+discourse.group;discourse.group
 discover;discover
 discovery.museum;discovery.museum
 dish;dish
@@ -2703,6 +2708,7 @@ ginan.gifu.jp;ginan.gifu.jp
 ginowan.okinawa.jp;ginowan.okinawa.jp
 ginoza.okinawa.jp;ginoza.okinawa.jp
 giske.no;giske.no
+git-pages.rit.edu;git-pages.rit.edu
 git-repos.de;git-repos.de
 github.io;github.io
 githubusercontent.com;githubusercontent.com
@@ -4514,6 +4520,7 @@ lombardia.it;lombardia.it
 lombardy.it;lombardy.it
 lomza.pl;lomza.pl
 london;london
+london.cloudapps.digital;london.cloudapps.digital
 london.museum;london.museum
 londrina.br;londrina.br
 loppa.no;loppa.no
@@ -5168,6 +5175,7 @@ na.it;na.it
 naamesjevuemie.no;naamesjevuemie.no
 nab;nab
 nabari.mie.jp;nabari.mie.jp
+nabu.casa;nabu.casa
 nachikatsuura.wakayama.jp;nachikatsuura.wakayama.jp
 nadex;nadex
 nagahama.shiga.jp;nagahama.shiga.jp
@@ -5848,6 +5856,8 @@ omotego.fukushima.jp;omotego.fukushima.jp
 omura.nagasaki.jp;omura.nagasaki.jp
 omuta.fukuoka.jp;omuta.fukuoka.jp
 on-aptible.com;on-aptible.com
+on-rancher.cloud;on-rancher.cloud
+on-rio.io;on-rio.io
 on-the-web.tv;on-the-web.tv
 on-web.fr;on-web.fr
 on.ca;on.ca
@@ -6575,6 +6585,7 @@ rishirifuji.hokkaido.jp;rishirifuji.hokkaido.jp
 risor.no;risor.no
 rissa.no;rissa.no
 risør.no;xn--risr-ira.no
+rit.edu;rit.edu
 ritto.shiga.jp;ritto.shiga.jp
 rivne.ua;rivne.ua
 rj.gov.br;rj.gov.br
@@ -7411,6 +7422,7 @@ sydney;sydney
 sydney.museum;sydney.museum
 sykkylven.no;sykkylven.no
 symantec;symantec
+syncloud.it;syncloud.it
 syno-ds.de;syno-ds.de
 synology-diskstation.de;synology-diskstation.de
 synology-ds.de;synology-ds.de
@@ -7945,6 +7957,7 @@ ug;ug
 ug.gov.pl;ug.gov.pl
 ugim.gov.pl;ugim.gov.pl
 uhren.museum;uhren.museum
+ui.nabu.casa;ui.nabu.casa
 uji.kyoto.jp;uji.kyoto.jp
 ujiie.tochigi.jp;ujiie.tochigi.jp
 ujitawara.kyoto.jp;ujitawara.kyoto.jp
@@ -7952,6 +7965,7 @@ uk;uk
 uk.com;uk.com
 uk.eu.org;uk.eu.org
 uk.net;uk.net
+uk0.bigv.io;uk0.bigv.io
 uki.kumamoto.jp;uki.kumamoto.jp
 ukiha.fukuoka.jp;ukiha.fukuoka.jp
 uklugs.org;uklugs.org

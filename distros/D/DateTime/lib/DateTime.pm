@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.50';
+our $VERSION = '1.51';
 
 use Carp;
 use DateTime::Duration;
@@ -501,7 +501,7 @@ sub _calc_local_components {
         if ( int $p{epoch} != $p{epoch} ) {
             my ( $floor, $nano, $second );
 
-            $floor = $nano = fmod( $p{epoch}, 1.0 );
+            $floor  = $nano = fmod( $p{epoch}, 1.0 );
             $second = floor( $p{epoch} - $floor );
             if ( $nano < 0 ) {
                 $nano += 1;
@@ -1214,7 +1214,7 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         # yy is a weird special case, where it must be exactly 2 digits
         qr/yy/ => sub {
             my $year = $_[0]->year();
-            my $y2 = length $year > 2 ? substr( $year, -2, 2 ) : $year;
+            my $y2   = length $year > 2 ? substr( $year, -2, 2 ) : $year;
             $y2 *= -1 if $year < 0;
             $_[0]->_zero_padded_number( 'yy', $y2 );
         },
@@ -1415,14 +1415,21 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
 }
 
 sub _format_nanosecs {
-    my $self = shift;
+    my $self      = shift;
     my $precision = @_ ? shift : 9;
 
-    my $divide_by = 10**( 9 - $precision );
+    my $exponent     = 9 - $precision;
+    my $formatted_ns = floor(
+        (
+              $exponent < 0
+            ? $self->{rd_nanosecs} * 10**-$exponent
+            : $self->{rd_nanosecs} / 10**$exponent
+        )
+    );
 
     return sprintf(
         '%0' . $precision . 'u',
-        floor( $self->{rd_nanosecs} / $divide_by )
+        $formatted_ns
     );
 }
 
@@ -2313,7 +2320,7 @@ sub STORABLE_thaw {
         'DateTime::_Thawed';
 
     my %formatter = defined $$formatter ? ( formatter => $$formatter ) : ();
-    my $new = ( ref $self )->from_object(
+    my $new       = ( ref $self )->from_object(
         object => $object,
         locale => $locale,
         %formatter,
@@ -2348,7 +2355,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 SYNOPSIS
 
@@ -4491,7 +4498,8 @@ RFC822-conformant dates (using "%a, %d %b %Y %H:%M:%S %z").
 
 =item * %Z
 
-The time zone or name or abbreviation.
+The short name for the time zone, typically an abbreviation like "EST" or
+"AEST".
 
 =item * %%
 
@@ -4613,7 +4621,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis Mohammad S Anwar M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4691,6 +4699,10 @@ Michael R. Davis <mrdvt92@users.noreply.github.com>
 
 =item *
 
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
 M Somerville <dracos@users.noreply.github.com>
 
 =item *
@@ -4737,7 +4749,7 @@ viviparous <viviparous@prc>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

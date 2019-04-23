@@ -27,7 +27,7 @@ no_index:
 provides:
   IPC::ReadpipeX:
     file: lib/IPC/ReadpipeX.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Exporter: '5.57'
@@ -36,10 +36,10 @@ resources:
   bugtracker: https://github.com/Grinnz/IPC-ReadpipeX/issues
   homepage: https://github.com/Grinnz/IPC-ReadpipeX
   repository: https://github.com/Grinnz/IPC-ReadpipeX.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
-    version: '5.028001'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -119,7 +119,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -174,7 +174,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -182,7 +182,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -191,7 +191,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -222,7 +222,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Commit_Version_Bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -234,7 +234,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
@@ -268,7 +268,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::DBOOK/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:
@@ -339,8 +339,12 @@ x_Dist_Zilla:
       version: '0.029'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@Author::DBOOK/InstallGuide'
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::DBOOK/Manifest'
@@ -408,5 +412,5 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

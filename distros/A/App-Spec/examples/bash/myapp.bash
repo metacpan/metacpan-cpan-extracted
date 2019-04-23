@@ -1,7 +1,5 @@
 #!bash
 
-# http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
-
 _myapp() {
 
     COMPREPLY=()
@@ -16,22 +14,20 @@ _myapp() {
     MYWORDS=("${COMP_WORDS[@]:1:$COMP_CWORD}")
 
     FLAGS=('--verbose' 'be verbose' '-v' 'be verbose' '--help' 'Show command help' '-h' 'Show command help')
-    OPTIONS=()
+    OPTIONS=('--format' 'Format output')
     __myapp_handle_options_flags
 
     case $INDEX in
 
     0)
         __comp_current_options || return
-        __myapp_dynamic_comp 'commands' 'config'$'\t''configuration'$'\n''convert'$'\t''Various unit conversions'$'\n''cook'$'\t''Cook something'$'\n''help'$'\t''Show command help'$'\n''palindrome'$'\t''Check if a string is a palindrome'$'\n''weather'$'\t''Weather'
+        __myapp_dynamic_comp 'commands' 'config'$'\t''configuration'$'\n''convert'$'\t''Various unit conversions'$'\n''cook'$'\t''Cook something'$'\n''data'$'\t''output some data'$'\n''help'$'\t''Show command help'$'\n''palindrome'$'\t''Check if a string is a palindrome'$'\n''weather'$'\t''Weather'
 
     ;;
     *)
     # subcmds
     case ${MYWORDS[0]} in
       _meta)
-        FLAGS+=()
-        OPTIONS+=()
         __myapp_handle_options_flags
         case $INDEX in
 
@@ -44,8 +40,6 @@ _myapp() {
         # subcmds
         case ${MYWORDS[1]} in
           completion)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             case $INDEX in
 
@@ -61,15 +55,20 @@ _myapp() {
                 FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
                 OPTIONS+=('--name' 'name of the program (optional, override name in spec)')
                 __myapp_handle_options_flags
-                  case $INDEX in
-                  *)
-                    __comp_current_options true || return # after parameters
-                    case ${MYWORDS[$INDEX-1]} in
-                      --name)
-                      ;;
+                case ${MYWORDS[$INDEX-1]} in
+                  --format)
+                    _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+                    return
+                  ;;
+                  --name)
+                  ;;
 
-                    esac
-                    ;;
+                esac
+                case $INDEX in
+
+                *)
+                    __comp_current_options || return
+                ;;
                 esac
               ;;
             esac
@@ -78,8 +77,6 @@ _myapp() {
             esac
           ;;
           pod)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             case $INDEX in
 
@@ -92,8 +89,6 @@ _myapp() {
             # subcmds
             case ${MYWORDS[2]} in
               generate)
-                FLAGS+=()
-                OPTIONS+=()
                 __myapp_handle_options_flags
                 __comp_current_options true || return # no subcmds, no params/opts
               ;;
@@ -108,25 +103,34 @@ _myapp() {
         esac
       ;;
       config)
-        FLAGS+=()
         OPTIONS+=('--set' 'key=value pair(s)')
         __myapp_handle_options_flags
-          case $INDEX in
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --set)
-              ;;
+        case ${MYWORDS[$INDEX-1]} in
+          --format)
+            _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+            return
+          ;;
+          --set)
+          ;;
 
-            esac
-            ;;
+        esac
+        case $INDEX in
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       convert)
-        FLAGS+=()
-        OPTIONS+=()
         __myapp_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --format)
+            _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+            return
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _myapp_convert_param_type_completion
@@ -142,51 +146,75 @@ _myapp() {
               __comp_current_options || return
                 _myapp_convert_param_target_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       cook)
         FLAGS+=('--sugar' 'add sugar' '-s' 'add sugar')
         OPTIONS+=('--with' 'Drink with ...')
         __myapp_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --format)
+            _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+            return
+          ;;
+          --with)
+            _myapp_compreply "'almond\ milk'"$'\n'"'soy\ milk'"$'\n'"'oat\ milk'"$'\n'"'spelt\ milk'"$'\n'"'cow\ milk'"
+            return
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _myapp_compreply "tea"$'\n'"coffee"
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --with)
-                _myapp_compreply "'almond\ milk'"$'\n'"'soy\ milk'"$'\n'"'oat\ milk'"$'\n'"'spelt\ milk'"$'\n'"'cow\ milk'"
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
+        esac
+      ;;
+      data)
+        OPTIONS+=('--item' '')
+        __myapp_handle_options_flags
+        case ${MYWORDS[$INDEX-1]} in
+          --format)
+            _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+            return
+          ;;
+          --item)
+            _myapp_compreply "'hash'"$'\n'"'table'"
+            return
+          ;;
+
+        esac
+        case $INDEX in
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       help)
         FLAGS+=('--all' '')
-        OPTIONS+=()
         __myapp_handle_options_flags
         case $INDEX in
 
         1)
             __comp_current_options || return
-            __myapp_dynamic_comp 'commands' 'config'$'\n''convert'$'\n''cook'$'\n''palindrome'$'\n''weather'
+            __myapp_dynamic_comp 'commands' 'config'$'\n''convert'$'\n''cook'$'\n''data'$'\n''palindrome'$'\n''weather'
 
         ;;
         *)
         # subcmds
         case ${MYWORDS[1]} in
           _meta)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             case $INDEX in
 
@@ -199,8 +227,6 @@ _myapp() {
             # subcmds
             case ${MYWORDS[2]} in
               completion)
-                FLAGS+=()
-                OPTIONS+=()
                 __myapp_handle_options_flags
                 case $INDEX in
 
@@ -213,8 +239,6 @@ _myapp() {
                 # subcmds
                 case ${MYWORDS[3]} in
                   generate)
-                    FLAGS+=()
-                    OPTIONS+=()
                     __myapp_handle_options_flags
                     __comp_current_options true || return # no subcmds, no params/opts
                   ;;
@@ -224,8 +248,6 @@ _myapp() {
                 esac
               ;;
               pod)
-                FLAGS+=()
-                OPTIONS+=()
                 __myapp_handle_options_flags
                 case $INDEX in
 
@@ -238,8 +260,6 @@ _myapp() {
                 # subcmds
                 case ${MYWORDS[3]} in
                   generate)
-                    FLAGS+=()
-                    OPTIONS+=()
                     __myapp_handle_options_flags
                     __comp_current_options true || return # no subcmds, no params/opts
                   ;;
@@ -254,32 +274,26 @@ _myapp() {
             esac
           ;;
           config)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           convert)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           cook)
-            FLAGS+=()
-            OPTIONS+=()
+            __myapp_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
+          ;;
+          data)
             __myapp_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           palindrome)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           weather)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             case $INDEX in
 
@@ -292,20 +306,14 @@ _myapp() {
             # subcmds
             case ${MYWORDS[2]} in
               cities)
-                FLAGS+=()
-                OPTIONS+=()
                 __myapp_handle_options_flags
                 __comp_current_options true || return # no subcmds, no params/opts
               ;;
               countries)
-                FLAGS+=()
-                OPTIONS+=()
                 __myapp_handle_options_flags
                 __comp_current_options true || return # no subcmds, no params/opts
               ;;
               show)
-                FLAGS+=()
-                OPTIONS+=()
                 __myapp_handle_options_flags
                 __comp_current_options true || return # no subcmds, no params/opts
               ;;
@@ -320,25 +328,27 @@ _myapp() {
         esac
       ;;
       palindrome)
-        FLAGS+=()
-        OPTIONS+=()
         __myapp_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --format)
+            _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+            return
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
                 _myapp_palindrome_param_string_completion
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       weather)
-        FLAGS+=()
-        OPTIONS+=()
         __myapp_handle_options_flags
         case $INDEX in
 
@@ -351,32 +361,40 @@ _myapp() {
         # subcmds
         case ${MYWORDS[1]} in
           cities)
-            FLAGS+=()
             OPTIONS+=('--country' 'country name(s)' '-c' 'country name(s)')
             __myapp_handle_options_flags
-              case $INDEX in
-              *)
-                __comp_current_options true || return # after parameters
-                case ${MYWORDS[$INDEX-1]} in
-                  --country|-c)
-                    _myapp_weather_cities_option_country_completion
-                  ;;
+            case ${MYWORDS[$INDEX-1]} in
+              --format)
+                _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+                return
+              ;;
+              --country|-c)
+                _myapp_weather_cities_option_country_completion
+              ;;
 
-                esac
-                ;;
+            esac
+            case $INDEX in
+
+            *)
+                __comp_current_options || return
+            ;;
             esac
           ;;
           countries)
-            FLAGS+=()
-            OPTIONS+=()
             __myapp_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           show)
             FLAGS+=('--temperature' 'show temperature' '-T' 'show temperature' '--celsius' 'show temperature in celsius' '-C' 'show temperature in celsius' '--fahrenheit' 'show temperature in fahrenheit' '-F' 'show temperature in fahrenheit')
-            OPTIONS+=()
             __myapp_handle_options_flags
-              case $INDEX in
+            case ${MYWORDS[$INDEX-1]} in
+              --format)
+                _myapp_compreply "'JSON'"$'\n'"'YAML'"$'\n'"'Table'"$'\n'"'Data__Dumper'"$'\n'"'Data__Dump'"
+                return
+              ;;
+
+            esac
+            case $INDEX in
               2)
                   __comp_current_options || return
                     _myapp_weather_show_param_country_completion
@@ -385,12 +403,11 @@ _myapp() {
                   __comp_current_options || return
                     _myapp_weather_show_param_city_completion
               ;;
-              *)
-                __comp_current_options true || return # after parameters
-                case ${MYWORDS[$INDEX-1]} in
 
-                esac
-                ;;
+
+            *)
+                __comp_current_options || return
+            ;;
             esac
           ;;
         esac
@@ -407,9 +424,11 @@ _myapp() {
 
 _myapp_compreply() {
     IFS=$'\n' COMPREPLY=($(compgen -W "$1" -- ${COMP_WORDS[COMP_CWORD]}))
+
+    # http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
     if [[ ${#COMPREPLY[*]} -eq 1 ]]; then # Only one completion
         COMPREPLY=( ${COMPREPLY[0]%% -- *} ) # Remove ' -- ' and everything after
-        COMPREPLY="$(echo -e "$COMPREPLY" | sed -e 's/[[:space:]]*$//')"
+        COMPREPLY=( ${COMPREPLY[0]%% *} ) # Remove trailing spaces
     fi
 }
 
@@ -472,7 +491,7 @@ __myapp_dynamic_comp() {
             cols=`tput cols`
             [[ -z $cols ]] && cols=80
             desclength=`expr $cols - 4 - $max`
-            formatted=`printf "'%-*s -- %-*s'" "$max" "$name" "$desclength" "$desc"`
+            formatted=`printf "%-*s -- %-*s" "$max" "$name" "$desclength" "$desc"`
             comp="$comp$formatted"$'\n'
         else
             comp="$comp'$name'"$'\n'

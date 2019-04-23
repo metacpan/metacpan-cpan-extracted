@@ -1,4 +1,12 @@
 
+1.852 21 April Feb 2019
+
+   * ParseOpenInfo() leaks if it croaks
+     DB_File_type memory not freed when ParseOpenInfo croaks.
+     https://github.com/pmqs/DB_File/issues/1
+
+   * Fix whitespace in DB_File.xs
+
 1.851 4 April Feb 2019
 
    * Fix typo in MANIFEST with .travis.yml file

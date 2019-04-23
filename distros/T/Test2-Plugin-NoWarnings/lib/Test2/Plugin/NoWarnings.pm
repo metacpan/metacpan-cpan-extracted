@@ -3,8 +3,9 @@ package Test2::Plugin::NoWarnings;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
+use Test2 1.302096;
 use Test2::API qw( context_do );
 use Test2::Event::Warning;
 
@@ -26,8 +27,8 @@ $SIG{__WARN__} = sub {
     context_do {
         my $ctx = shift;
         $ctx->send_event(
-            'Ok',
-            name => "Unexpected warning: $w",
+            'Warning',
+            warning => "Unexpected warning: $w",
         );
     }
     $_[0];
@@ -73,11 +74,11 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
-    use Test2::Bundle::Extended;
+    use Test2::V0;
     use Test2::Plugin::NoWarnings;
 
     ...;
@@ -132,7 +133,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

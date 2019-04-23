@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.033'; # VERSION
 
 use 5.010;
 use strict;
@@ -24,7 +24,7 @@ $SPEC{dump_ini} = {
 sub dump_ini {
     my %args = @_;
 
-    App::INIUtils::_parse_str($args{ini}, $args{parser});
+    App::INIUtils::_dump_str($args{ini}, $args{parser});
 }
 
 my $cli = Perinci::CmdLine::Any->new(
@@ -50,7 +50,7 @@ dump-ini - Dump INI as hash of hashes structure
 
 =head1 VERSION
 
-This document describes version 0.032 of dump-ini (from Perl distribution App-INIUtils), released on 2019-01-17.
+This document describes version 0.033 of dump-ini (from Perl distribution App-INIUtils), released on 2019-04-23.
 
 =head1 SYNOPSIS
 

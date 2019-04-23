@@ -950,7 +950,7 @@ sub pp_addxs {
 # inserts #line directives into source text. Use like this:
 #   ...
 #   FirstKey => ...,
-#   Code => pp_line_numbers (__LINE__, $a . $b . $c),
+#   Code => pp_line_numbers (__LINE__, $x . $y . $c),
 #   OtherKey => ...
 
 sub pp_line_numbers ($$) {
@@ -1860,7 +1860,7 @@ EOD
 # Removing useless use of hasp2child in this function. DCM Sept 12, 2011
 sub VarArgsXSHdr {
   my($name,$xsargs,$parobjs,$optypes,#$hasp2child,
-     $pmcode,$hdrcode,$inplacecode,$globalnew,$callcopy) = @_;
+     $pmcode,$hdrcode,$inplacecode,$globalnew,$callcopy,$bitwise) = @_;
 
   # Don't do var args processing if the user has pre-defined pmcode
   return 'DO NOT SET!!' if ($pmcode);
@@ -1977,6 +1977,9 @@ sub VarArgsXSHdr {
   # Add code for creating output variables via call to 'initialize' perl routine
   $clause3 .= callPerlInit (\@create, $ci, $callcopy); @create = ();
 
+  # Bitwise ops may get five args
+  my $bitwise_cond = $bitwise ? " || items == 5" : '';
+
   return<<END;
 
 void
@@ -2009,7 +2012,7 @@ $pars
 $clause1
   }
 $clause2
-  else if (items == $nin) { PDLA_COMMENT("only input variables on stack, create outputs and temps")
+  else if (items == $nin$bitwise_cond) { PDLA_COMMENT("only input variables on stack, create outputs and temps")
     nreturn = $nallout;
 $clause3
   }
@@ -2055,7 +2058,7 @@ sub VarArgsXSReturn {
 
 return <<"END"
 if (nreturn) {
-  if (nreturn - items > 0) EXTEND (SP, nreturn - items);
+  if (nreturn > 0) EXTEND (SP, nreturn );
 $clause1
   XSRETURN(nreturn);
 } else {
@@ -2616,7 +2619,7 @@ sub make_incsizes {
 	my($parnames,$parobjs,$dimobjs,$havethreading) = @_;
 	my $str = ($havethreading?"pdl_thread __pdlthread; ":"").
 	  (join '',map {$parobjs->{$_}->get_incdecls} @$parnames).
-	    (join '',map {$_->get_decldim} values %$dimobjs);
+	    (join '',map {$_->get_decldim} sort values %$dimobjs);
 	return ($str,undef);
 }
 
@@ -2628,7 +2631,7 @@ sub make_incsize_copy {
 	 (join '',map {$parobjs->{$_}->get_incdecl_copy(sub{"\$PRIV($_[0])"},
 	 						sub{"$copyname->$_[0]"})} @$parnames).
 	 (join '',map {$_->get_copydim(sub{"\$PRIV($_[0])"},
-						sub{"$copyname->$_[0]"})} values %$dimobjs);
+						sub{"$copyname->$_[0]"})} sort values %$dimobjs);
 
 }
 
@@ -2790,7 +2793,7 @@ sub make_redodims_thread {
     my $nn = $#$pnames;
     my @privname = map { "\$PRIV(pdls[$_])" } ( 0 .. $nn );
     $str .= $npdls ? "PDLA_Indx __creating[$npdls];\n" : "PDLA_Indx __creating[1];\n";
-    $str .= join '',map {$_->get_initdim."\n"} values %$dobjs;
+    $str .= join '',map {$_->get_initdim."\n"} sort values %$dobjs;
 
     # if FlagCreat is NOT true, then we set __creating[] to 0
     # and we can use this knowledge below, and in hdrcheck()
@@ -3193,7 +3196,7 @@ $PDLA::PP::deftbl =
  # make sure it is not used when the GlobalNew flag is set ; CS 4/15/00
    PDLA::PP::Rule->new("VarArgsXSHdr",
 		      ["Name","NewXSArgs","USParObjs","OtherParTypes",
-		       "PMCode","HdrCode","InplaceCode","_GlobalNew","_CallCopy"],
+		       "PMCode","HdrCode","InplaceCode","_GlobalNew","_CallCopy","_Bitwise"],
 		      'XS code to process arguments on stack based on supplied Pars argument to pp_def; GlobalNew has implications how/if this is done',
 		      \&VarArgsXSHdr),
 
@@ -3483,11 +3486,17 @@ $PDLA::PP::deftbl =
 
    # The RedoDimsSub rule is a bit weird since it takes in the RedoDims target
    # twice (directly and via RedoDims-PostComp). Can this be cleaned up?
-   #
+   #    [I don't know who put this in, or when -- but I don't understand it.  CED 13-April-2015]
    PDLA::PP::Rule->new("RedoDims-PreComp", "RedoDims",
 		      sub { return $_[0] . ' $PRIV(__ddone) = 1;'; }),
    PDLA::PP::Rule::MakeComp->new("RedoDims-PostComp",
 				["RedoDims-PreComp", "PrivNames", "PrivObjs"], "PRIV"),
+
+   # RedoDimsSub is supposed to allow you to use $SIZE as an lvalue, to resize things.  It hasn't
+   # worked since I can remember (at least since I started messing around with range).  The reason
+   # appears to be that the SIZE macro was using the redodims argument instead of its own zeroth
+   # argument.  Renaming gone wrong?  Anyway I've fixed it to use $_[0] instead of $redodims in the
+   # SIZE closure.   -- CED 13-April-2015
    PDLA::PP::Rule->new("RedoDimsSub",
 		      ["RedoDims", "RedoDims-PostComp", "_DimObjs"],
 		      sub {
@@ -3496,9 +3505,10 @@ $PDLA::PP::deftbl =
 			my $dimobjs  = $_[2];
 
 			$result->[1]{"SIZE"} = sub {
-			  croak "can't get SIZE of undefined dimension (RedoDims=$redodims)."
-			    unless defined $dimobjs->{$redodims};
-			  return $dimobjs->{$redodims}->get_size();
+			    eval 'use PDLA::IO::Dumper';
+			    croak "FOO can't get SIZE of undefined dimension (RedoDims=$redodims).\nredodims is $redodims\ndimobjs is ".sdump($dimobjs)."\n"
+			       unless defined $dimobjs->{$_[0]};  # This is the closure's $_[0], not the rule definition's $_[0]
+			  return $dimobjs->{$_[0]}->get_size();
 			};
 			return $result;
 		      }),

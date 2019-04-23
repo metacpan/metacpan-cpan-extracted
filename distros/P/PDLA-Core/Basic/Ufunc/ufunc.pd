@@ -59,7 +59,7 @@ I<any> dimension.
 
 =for usage
 
- \$b = $op(\$a);
+ \$y = $op(\$x);
 
 =for example
 
@@ -94,7 +94,7 @@ is the first element of the parameter.
 
 =for usage
 
- \$b = $op(\$a);
+ \$y = $op(\$x);
 
 =for example
 
@@ -126,7 +126,7 @@ my %over =
      prodover => { name => 'product', op => '*=', init => 1, },
      );
 
-foreach my $func ( keys %over ) {
+foreach my $func ( sort keys %over ) {
 
     # creates $func and cumu$func functions
     # and d$func and dcumu$func functions, which
@@ -243,7 +243,7 @@ foreach my $func ( keys %over ) {
 
      );
 
-foreach my $func ( keys %over ) {
+foreach my $func ( sort keys %over ) {
 
     my $def   = $over{$func}{def};
     my $txt   = $over{$func}{txt};
@@ -266,9 +266,8 @@ foreach my $func ( keys %over ) {
 	   $def . '=' . $init . ';
             loop(n) %{ ' . $op . ' if (' . $check . ') break; %}
             $b() = tmp;',
-	   BadCode => 
-	   'char tmp = ' . $init . ';
-	    $GENERIC(b) gtmp = '. $init . ';
+	   BadCode =>
+	    $def . '=' . $init .';
             int flag = 0;
             loop(n) %{
                if ( $ISGOOD(a()) ) { ' . $op . ' flag = 1; if (' . $check . ') break; }
@@ -438,7 +437,7 @@ EOD
 # note: we export them to the PDLA Core structure for use in
 #       other modules (eg Image2D)
 
-for (keys %PDLA::Types::typehash) {
+for ( PDLA::Types::typesrtkeys() ) {
     my $ctype = $PDLA::Types::typehash{$_}{ctype};
     my $ppsym = $PDLA::Types::typehash{$_}{ppsym};
 
@@ -795,7 +794,7 @@ I<any> dimension.
 
 =for usage
 
- $b = pctover($a, $p);
+ $y = pctover($x, $p);
 
 =for example
 
@@ -839,7 +838,7 @@ I<any> dimension.
 
 =for usage
 
- $b = oddpctover($a, $p);
+ $y = oddpctover($x, $p);
 
 =for example
 
@@ -1007,7 +1006,7 @@ Useful in conditional expressions:
 
 =for example
 
- if (any $a>15) { print "some values are greater than 15\n" }
+ if (any $x>15) { print "some values are greater than 15\n" }
 
 =cut
 
@@ -1039,7 +1038,7 @@ Useful in conditional expressions:
 
 =for example
 
- if (all $a>15) { print "all values are greater than 15\n" }
+ if (all $x>15) { print "all values are greater than 15\n" }
 
 =cut
 
@@ -1115,6 +1114,9 @@ pp_def(
     'PDLA_Indx nn;
      loop(n) %{ $b() = $a(); %}
      nn = $COMP(__n_size)-1;
+     if ($PDLA(a)->dims[0] != $PDLA(b)->dims[0] && $PDLA(a)->dims[0]!=0 && $PDLA(b)->dims[0]!=1){
+        PDLA->pdl_barf("You likely passed a scalar argument to qsort, when you should have passed a piddle (or nothing at all)");
+     }
     ' . generic_qsort('b'),
     BadCode =>
     'register PDLA_Indx nn = 0, nb = $SIZE(n) - 1;
@@ -1122,6 +1124,9 @@ pp_def(
         if ( $ISGOOD(a()) ) { $b(n=>nn) = $a(); nn++; }
         else                { $SETBAD(b(n=>nb)); nb--; }
      %}
+     if ($PDLA(a)->dims[0] != $PDLA(b)->dims[0] && $PDLA(b)->dims[0]!=0 && $PDLA(b)->dims[0]!=1){
+        PDLA->pdl_barf("You likely passed a scalar argument to qsort, when you should have passed a piddle (or nothing at all)");
+     }
      if ( nn != 0 ) {
         nn -= 1;
      ' . generic_qsort('b') . ' }',
@@ -1141,9 +1146,9 @@ Quicksort a vector into ascending order.
 '
 Bad values are moved to the end of the array:
 
- pdla> p $b
+ pdla> p $y
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdla> p qsort($b)
+ pdla> p qsort($y)
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 ',
     ); # pp_def qsort
@@ -1164,6 +1169,9 @@ pp_def(
         loop(n) %{ 
            $indx() = n; 
         %}
+        if ($PDLA(a)->dims[0] != $PDLA(indx)->dims[0] && $PDLA(a)->dims[0]!=0 && $PDLA(indx)->dims[0]!=1){
+           PDLA->pdl_barf("You likely passed a scalar argument to qsorti, when you should have passed a piddle (or nothing at all)");
+        }
        ' . generic_qsort_ind(),
        BadCode =>
        'register PDLA_Indx nn = 0, nb = $SIZE(n) - 1;
@@ -1172,15 +1180,18 @@ pp_def(
            if ( $ISGOOD(a()) ) { $indx(n=>nn) = n; nn++; } /* play safe since nn used more than once */ 
            else                { $indx(n=>nb) = n; nb--; }
         %}
+         if ($PDLA(a)->dims[0] != $PDLA(indx)->dims[0] && $PDLA(a)->dims[0]!=0 && $PDLA(indx)->dims[0]!=1){
+            PDLA->pdl_barf("You likely passed a scalar argument to qsorti, when you should have passed a piddle (or nothing at all)");
+        }
         if ( nn != 0 ) {
            nn -= 1;
         ' . generic_qsort_ind() . ' }',
        BadDoc => 
 'Bad elements are moved to the end of the array:
 
- pdla> p $b
+ pdla> p $y
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdla> p $b->index( qsorti($b) )
+ pdla> p $y->index( qsorti($y) )
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 ',
        Doc => '
@@ -1190,8 +1201,8 @@ Quicksort a vector and return index of elements in ascending order.
 
 =for example
 
- $ix = qsorti $a;
- print $a->index($ix); # Sorted list
+ $ix = qsorti $x;
+ print $x->index($ix); # Sorted list
 
 =cut
 
@@ -1213,6 +1224,9 @@ pp_def(
      loop(n,m) %{ $b() = $a(); %}
      nn = ($COMP(__m_size))-1;
      nd = $COMP(__n_size);
+     if (($PDLA(a)->dims[0] != $PDLA(b)->dims[0] || $PDLA(a)->dims[1] != $PDLA(b)->dims[1]) && $PDLA(a)->dims[1] !=0 && $PDLA(b)->dims[1] != 1){
+        PDLA->pdl_barf("You likely passed a scalar argument to qsortvec, when you should have passed a piddle (or nothing at all)");
+     }
     ' . generic_qsortvec('b','nd'),
     Doc => '
 =for ref
@@ -1242,13 +1256,12 @@ the 1st dimension is list order.  Higher dimensions are threaded over.
 '
 Vectors with bad components should be moved to the end of the array:
 ',
-    ); # pp_def qsort
+    ); # pp_def qsortvec
 
 sub generic_qsortvec_ind {
     my $pdl = shift;
     my $ndim = shift;
-    return '$TBSULNQFD(pdl_qsortvec_ind_B,pdl_qsortvec_ind_S,pdl_qsortvec_ind_U,
-             pdl_qsortvec_ind_L,pdl_qsortvec_ind_N,pdl_qsortvec_ind_Q,pdl_qsortvec_ind_F,pdl_qsortvec_ind_D) ($P(' . $pdl . '), $P(indx), '. $ndim.', 0, nn);';
+    return '$TBSULNQFD(pdl_qsortvec_ind_B,pdl_qsortvec_ind_S,pdl_qsortvec_ind_U,pdl_qsortvec_ind_L,pdl_qsortvec_ind_N,pdl_qsortvec_ind_Q,pdl_qsortvec_ind_F,pdl_qsortvec_ind_D) ($P(' . $pdl . '), $P(indx), '. $ndim.', 0, nn);';
 }
 
 pp_def(
@@ -1262,6 +1275,9 @@ pp_def(
         $indx()=m;
      %}
      nd = $COMP(__n_size);
+     if ($PDLA(a)->ndims >1 && $PDLA(a)->dims[1] != $PDLA(indx)->dims[0] && $PDLA(a)->dims[1]!=0 && $PDLA(indx)->dims[0]!=1){
+        PDLA->pdl_barf("You likely passed a scalar argument to qsortveci, when you should have passed a piddle (or nothing at all)");
+     }
     ' . generic_qsortvec_ind('a','nd'),
     Doc => '
 =for ref
@@ -1561,8 +1577,8 @@ Find minimum and maximum and their indices for a given piddle;
 
 =for usage
 
- pdla> $a=pdl [[-2,3,4],[1,0,3]]
- pdla> ($min, $max, $min_ind, $max_ind)=minmaximum($a)
+ pdla> $x=pdl [[-2,3,4],[1,0,3]]
+ pdla> ($min, $max, $min_ind, $max_ind)=minmaximum($x)
  pdla> p $min, $max, $min_ind, $max_ind
  [-2 0] [4 3] [0 1] [2 2]
 

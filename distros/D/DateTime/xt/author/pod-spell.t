@@ -11,8 +11,10 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 1nickt
+AEST
 Alders
 Anno
+Anwar
 BCE
 Bell
 Ben
@@ -80,6 +82,7 @@ McIntosh
 Measham
 Measham's
 Michael
+Mohammad
 Nick
 Olaf
 Oschwald
@@ -162,6 +165,7 @@ jmac
 lib
 madcityzen
 mike
+mohammad
 mrdvt92
 mutiplication
 na

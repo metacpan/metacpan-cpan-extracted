@@ -404,7 +404,9 @@ If I<filename> is a single B<->, then write to the standard output.
 
 Note that the I<filename> is actually evaluated as a quoted Perl string, so it
 can contain variables from the Perl environment. This behavior can be
-deactivated by the B<-Q> flag, to have the B<filename> be used as-is.
+deactivated by the B<-Q> flag, to have the B<filename> be used as-is (in 
+particular, you probably want to use this flag on platform where file-names use
+back-slash characters '\').
 
 =back
 

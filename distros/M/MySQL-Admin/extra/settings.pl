@@ -8,7 +8,7 @@ $VAR1 = {
     },
     'language'     => 'de',
     'config'       => 'config/settings.pl',
-    'version'      => '0.82',
+    'version'      => '1.17',
     'apacheconfig' => 'n',
     'cgi'          => {
         'cookiePath'   => '/',

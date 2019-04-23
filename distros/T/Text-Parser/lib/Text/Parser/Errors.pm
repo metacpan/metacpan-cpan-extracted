@@ -1,4 +1,4 @@
-package Text::Parser::Errors 0.918;
+package Text::Parser::Errors 0.919;
 use strict;
 use warnings;
 
@@ -8,6 +8,18 @@ use Scalar::Util 'looks_like_number';
 # ABSTRACT: Exceptions for Text::Parser
 
 
+sub _Str {
+    die "attribute must be a string"
+        if not defined $_[0]
+        or ref( $_[0] ) ne '';
+}
+
+sub _Num {
+    die "attribute must be a number"
+        if not defined $_[0]
+        or not looks_like_number( $_[0] );
+}
+
 exception 'GenericError' => 'a generic error';
 
 
@@ -16,10 +28,8 @@ exception
     has             => [
     name => (
         is  => 'ro',
-        isa => sub {
-            die "$_[0] must be a string" if '' ne ref( $_[0] );
-        }
-    )
+        isa => \&_Str,
+    ),
     ],
     extends => GenericError();
 
@@ -29,17 +39,27 @@ exception
     has             => [
     name => (
         is  => 'ro',
-        isa => sub {
-            die "$_[0] must be a string" if '' ne ref( $_[0] );
-        }
-    )
+        isa => \&_Str,
+    ),
     ],
     extends => GenericError();
 
 
 exception
-    'CantUndoMultiline' => 'already multiline parser, cannot be undone',
-    extends             => GenericError();
+    FileNotPlainText => 'file does not exist',
+    has              => [
+    name => (
+        is  => 'ro',
+        isa => \&_Str,
+    ),
+    ],
+    has => [
+    mime_type => (
+        is      => 'ro',
+        default => undef,
+    ),
+    ],
+    extends => GenericError();
 
 
 exception
@@ -47,20 +67,14 @@ exception
     has           => [
     discontd => (
         is  => 'ro',
-        isa => sub {
-            die "$_[0] must be a string" if '' ne ref( $_[0] );
-        }
-    )
+        isa => \&_Str,
+    ),
     ],
     has => [
     line_num => (
         is  => 'ro',
-        isa => sub {
-            die "$_[0] must be a number"
-                if ref( $_[0] ) ne ''
-                or not looks_like_number( $_[0] );
-        }
-    )
+        isa => \&_Num,
+    ),
     ],
     extends => GenericError();
 
@@ -70,10 +84,8 @@ exception
     has            => [
     line => (
         is  => 'ro',
-        isa => sub {
-            die "$_[0] must be a string" if '' ne ref( $_[0] );
-        },
-    )
+        isa => \&_Str,
+    ),
     ],
     extends => GenericError();
 
@@ -92,7 +104,7 @@ Text::Parser::Errors - Exceptions for Text::Parser
 
 =head1 VERSION
 
-version 0.918
+version 0.919
 
 =head1 DESCRIPTION
 
@@ -102,53 +114,87 @@ This document contains a manifest of all the exception classes thrown by L<Text:
 
 All exceptions are derived from C<Text::Parser::Errors::GenericError>. They are all based on L<Throwable::SugarFactory> and so all the exception methods of those, such as C<L<error|Throwable::SugarFactory/error>>, C<L<namespace|Throwable::SugarFactory/namespace>>, etc., will be accessible. Read L<Exceptions> if you don't know about exceptions in Perl 5.
 
-=head2 C<Text::Parser::Errors::InvalidFilename>
+=head2 Input file related errors
+
+=head3 C<Text::Parser::Errors::InvalidFilename>
 
 Thrown when file name specified to C<L<read|Text::Parser/read>> or C<L<filename|Text::Parser/filename>> is invalid.
 
-=head3 Attributes
+=head4 Attributes
 
-=head4 name
+=over 4
 
-A string with the anticipated file name.
+=item *
 
-=head2 C<Text::Parser::Errors::InvalidFilename>
+B<name> - a string with the anticipated file name.
+
+=back
+
+=head3 C<Text::Parser::Errors::FileNotReadable>
 
 Thrown when file name specified to C<L<read|Text::Parser/read>> or C<L<filename|Text::Parser/filename>> has no read permissions or is unreadable for any other reason.
 
-=head3 Attributes
+=head4 Attributes
 
-=head4 name
+=over 4
 
-A string with the name of the file that could not be read
+=item *
 
-=head2 C<Text::Parser::Errors::CantUndoMultiline>
+B<name> - a string with the name of the file that could not be read
 
-Thrown when a multi-line parser is turned back to a non-multiline one.
+=back
 
-=head2 C<Text::Parser::Errors::UnexpectedEof>
+=head3 C<Text::Parser::Errors::FileNotPlainText>
 
-Thrown when a line continuation character is at the end of a file, indicating that the line is continued on the next line. Since there is no further line, the line continuation is left unterminated and is an error condition. This exception is thrown only for C<join_next> type of multiline parsers.
+Thrown when file name specified to C<L<read|Text::Parser/read>> or C<L<filename|Text::Parser/filename>> is not a plain text file.
 
-=head3 Attributes
+=head4 Attributes
 
-=head4 discontd
+=over 4
 
-This is a string containing the line which got discontinued by the unexpected EOF.
+=item *
 
-=head4 line_num
+B<name> - a string with the name of the non-text input file
 
-The line at which the unexpected EOF is encountered.
+=item *
 
-=head2 C<Text::Parser::Errors::UnexpectedCont>
+B<mime_type> - C<undef> for now. This is reserved for future.
 
-Thrown when a line continuation character is at the beginning of a file, indicating that the previous line should be joined. Since there is no line before the first line, this is an error condition. This is thrown only in C<join_last> type of multiline parsers.
+=back
 
-=head3 Attributes
+=head2 Errors in C<multiline_type> parsers
 
-=head4 line
+=head3 C<Text::Parser::Errors::UnexpectedEof>
 
-This is a string containing the content of the line with the unexpected continuation character. Given the description, it is obvious that the line number is C<1>.
+Thrown when a line continuation character indicates that the last line in the file is wrapped on to the next line.
+
+=head4 Attributes
+
+=over 4
+
+=item *
+
+B<discontd> - a string containing the line with the continuation character.
+
+=item *
+
+B<line_num> - line number at which the unexpected EOF is encountered.
+
+=back
+
+=head3 C<Text::Parser::Errors::UnexpectedCont>
+
+Thrown when a line continuation character on the first line indicates that it is a continuation of a previous line.
+
+=head4 Attributes
+
+=over 4
+
+=item *
+
+B<line> - a string containing the content of the line with the unexpected continuation character.
+
+=back
 
 =head1 SEE ALSO
 

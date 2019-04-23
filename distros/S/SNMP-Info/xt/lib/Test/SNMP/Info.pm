@@ -65,8 +65,12 @@ TODO: {
     # We also could connect to http://snmplabs.com v3 simulator but would
     # prefer to keep those tests isolated to 10_remote_snmplabs.t - we could
     # also move the update() tests to that file.
-    todo_skip "Revisit v3 Context update() tests when using Net-SNMP 5.8+", 4
-      if 1;
+
+    my $version = $SNMP::VERSION;
+    my ( $major, $minor, $rev ) = split( '\.', $version );
+
+    todo_skip "Skip v3 Context update() tests when using Net-SNMP < 5.8", 4
+      if ($major < 5 or $minor < 8);
 
     # Starting context
     ok(!defined $test->{info}{sess}{Context}, q(Context doesn't exist));
@@ -935,7 +939,7 @@ sub init : Tests(3) {
   my $netsnmp_ver = $SNMP::VERSION;
   local $SNMP::VERSION = '5.0.1';
 
-  warnings_like { $test->{info}->init() }
+  warnings_exist { $test->{info}->init() }
   [{carped => qr/Net-SNMP\s5.0.1\sseems\sto\sbe\srather\sbuggy/x}],
     'Use of bad Net-SNMP gives warning';
 
@@ -956,6 +960,8 @@ sub args : Tests(2) {
     'Community'   => 'public',
     'Version'     => 2,
     'Session'     => $sess,
+    'Debug'       => ($ENV{INFO_TRACE} || 0),
+    'DebugSNMP'   => ($ENV{SNMP_TRACE} || 0),
   };
 
   can_ok($test->{info}, 'args');

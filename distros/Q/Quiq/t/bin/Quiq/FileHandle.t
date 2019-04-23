@@ -133,6 +133,28 @@ sub test_print : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+use Quiq::TempFile;
+
+sub test_writeData : Test(1) {
+    my $self = shift;
+
+    my $file = Quiq::TempFile->new;
+
+    my $data1 = "abcdef\näöüÄÖÜß\nxyz";
+
+    my $fh = Quiq::FileHandle->new('>',$file);
+    $fh->writeData(Encode::encode('utf-8',$data1));
+    $fh->close;
+
+    $fh = Quiq::FileHandle->new('<',$file);
+    my $data2 = Encode::decode('utf-8',$fh->readData);
+    $fh->close;
+
+    $self->is($data2,$data1);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_seek : Test(1) {
     my $self = shift;
 

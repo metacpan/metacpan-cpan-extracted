@@ -1,5 +1,9 @@
 Revision history for Text-Names-GB
 
+0.03	Sat Apr 20 23:01:56 EDT 2019
+	Added more names
+	Fix warnings mode
+
 0.02	Thu Jul 20 10:49:00 EDT 2017
 	Added support for Kai
 	Added dependency on Text::Names

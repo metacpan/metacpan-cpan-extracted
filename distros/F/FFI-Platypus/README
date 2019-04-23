@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.86
+    version 0.87
 
 SYNOPSIS
 
@@ -1427,6 +1427,10 @@ AUTHOR
     Damyan Ivanov
 
     Ilya Pavlov (Ilya33)
+
+    Petr Pisar (ppisar)
+
+    Mohammad S Anwar (MANWAR)
 
 COPYRIGHT AND LICENSE
 

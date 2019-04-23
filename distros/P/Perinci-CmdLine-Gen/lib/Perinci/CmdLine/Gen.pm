@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Gen;
 
-our $DATE = '2019-04-14'; # DATE
-our $VERSION = '0.488'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.490'; # VERSION
 
 use 5.010001;
 use strict;
@@ -442,9 +442,11 @@ use experimental 'smartmatch'; no warnings ('void'); require List::Util; use exp
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
                 $cmdline_mod_ver = "1.816";
             } else {
-                $extra_modules->{"Perinci::CmdLine::Base"} = "1.816";
-                $extra_modules->{"Perinci::CmdLine::Classic"} = "1.770";
+                $extra_modules->{"Perinci::CmdLine::Lite"} = "1.816";
             }
+        } elsif ($cmdline_mod =~ /\APerinci::CmdLine::Classic\z/) {
+            $extra_modules->{"Perinci::CmdLine::Base"} = "1.816";
+            $extra_modules->{"Perinci::CmdLine::Classic"} = "1.770";
         }
 
         $code = join(
@@ -580,7 +582,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.488 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2019-04-14.
+This document describes version 0.490 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2019-04-23.
 
 =head1 FUNCTIONS
 
@@ -797,6 +799,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 gen_perinci_cmdline_script

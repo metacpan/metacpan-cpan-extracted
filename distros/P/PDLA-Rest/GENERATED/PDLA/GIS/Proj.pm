@@ -94,7 +94,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 Proj4 forward transformation $params is a string of the projection transformation
 parameters.
 
-Returns two pdls for x and y values respectively. The units are dependant on Proj4
+Returns two pdls for x and y values respectively. The units are dependent on Proj4
 behavior. They will be PDLA->null if an error has occurred.
 
 BadDoc: Ignores bad elements of $lat and $lon, and sets the corresponding elements 
@@ -121,7 +121,7 @@ sub fwd_transform
 Proj4 inverse transformation $params is a string of the projection transformation
 parameters.
 
-Returns two pdls for lat and lon values respectively. The units are dependant on Proj4
+Returns two pdls for lat and lon values respectively. The units are dependent on Proj4
 behavior. They will be PDLA->null if an error has occurred.
 
 BadDoc: Ignores bad elements of $lat and $lon, and sets the corresponding elements 

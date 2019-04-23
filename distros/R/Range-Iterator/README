@@ -2,8 +2,8 @@ NAME
     Range::Iterator - Generate an iterator object for range
 
 VERSION
-    This document describes version 0.001 of Range::Iterator (from Perl
-    distribution Range-Iterator), released on 2019-04-17.
+    This document describes version 0.002 of Range::Iterator (from Perl
+    distribution Range-Iterator), released on 2019-04-23.
 
 SYNOPSIS
       use Range::Iterator;
@@ -15,9 +15,14 @@ SYNOPSIS
 
      my $iter = Range::Iterator->new(1, 10, 2); # 1, 3, 5, 7, 9
 
-    Anything that can be incremented by Perl is game:
+    You can use alphanumeric strings too since "++" has some extra builtin
+    magic (see perlop):
 
-      $iter = Range::Iterator->new("a", "e"); # a, b, c, d, e
+     $iter = Range::Iterator->new("zx", "aab"); # zx, zy, zz, aaa, aab
+
+    Infinite list:
+
+     $iter = Range::Iterator->new(1, Inf); # 1, 2, 3, ...
 
 DESCRIPTION
     This module offers an object-based iterator for range.

@@ -37,7 +37,7 @@ use Exporter;
 use SNMP::Info::CiscoStack;
 use SNMP::Info::Layer3::CiscoSwitch;
 
-use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
+our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
 # NOTE : Top-most items gets precedence for @ISA
 @SNMP::Info::Layer3::C3550::ISA = qw/
@@ -47,7 +47,7 @@ use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
 @SNMP::Info::Layer3::C3550::EXPORT_OK = qw//;
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 # NOTE: Order creates precedence
 #       Example: v_name exists in Bridge.pm and CiscoVTP.pm

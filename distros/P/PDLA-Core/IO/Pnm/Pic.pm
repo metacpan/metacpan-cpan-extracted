@@ -314,7 +314,7 @@ sub PDLA::rpic {
     my $flags = $converter{$type}->{FLAGS};
     $flags = "$Dflags" unless defined($flags);
     $flags .= " $$hints{XTRAFLAGS}" if defined($$hints{XTRAFLAGS});
-    my $cmd = "$converter{$type}->{get} $flags $file |";
+    my $cmd = qq{$converter{$type}->{get} $flags "$file" |};
     $cmd = $file if $converter{$type}->{'get'} =~ /^NONE/;
 
     print("conversion by '$cmd'\n") if $PDLA::IO::Pic::debug > 10;
@@ -421,7 +421,7 @@ e.g.
 =item LUT
 
 This is a palette image and the value of this key should be a
-pdl containg an RGB lookup table (3,x), e.g.
+pdl containing an RGB lookup table (3,x), e.g.
 
    LUT        => $lut,
 
@@ -490,7 +490,7 @@ sub PDLA::wpic {
     ($pdl,$iform) = chkpdl($pdl,$iform,$hints,$format);
     print "using intermediate format $iform\n" if $PDLA::IO::Pic::debug>10;
 
-    $cmd = "|"  . "$conv $flags >$file";
+    $cmd = "|"  . qq{$conv $flags >"$file"};
     $cmd = ">" . $file if $conv =~ /^NONE/;
     print "built the command $cmd to write image\n" if $PDLA::IO::Pic::debug>10;
 
@@ -506,15 +506,15 @@ sub PDLA::wpic {
 
 =for usage
 
- Usage: $a = rim($file);
- or       rim($a,$file);
+ Usage: $x = rim($file);
+ or       rim($x,$file);
 
 =for ref
 
 Read images in most formats, with improved RGB handling.
 
 You specify a filename and get back a PDLA with the image data in it.
-Any PNM handled format or FITS will work. In the second form, $a is an
+Any PNM handled format or FITS will work. In the second form, $x is an
 existing PDLA that gets loaded with the image data.
 
 If the image is in one of the standard RGB formats, then you get back
@@ -543,7 +543,7 @@ The same as L<rpic|rpic>, which is used as an engine:
 If you don't specify this then formats are autodetected.  If you do specify
 it then only the specified interpreter is tried.  For example,
 
-  $a = rim("foo.gif",{FORMAT=>"JPEG"})
+  $x = rim("foo.gif",{FORMAT=>"JPEG"})
 
 forces JPEG interpretation.
 
@@ -551,7 +551,7 @@ forces JPEG interpretation.
 
 Contains extra command line flags for the pnm interpreter.  For example,
 
-  $a = rim("foo.jpg",{XTRAFLAGS=>"-nolut"})
+  $x = rim("foo.jpg",{XTRAFLAGS=>"-nolut"})
 
 prevents use of a lookup table in JPEG images.
 

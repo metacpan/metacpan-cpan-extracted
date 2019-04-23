@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.010000;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 use Package::DeprecationManager 0.16 -deprecations => {
     'Test::Class::Moose::Config::args' => '0.79',
@@ -28,7 +28,7 @@ Test::Class::Moose::Deprecated - Managed deprecation warnings for Test::Class::M
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2018 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

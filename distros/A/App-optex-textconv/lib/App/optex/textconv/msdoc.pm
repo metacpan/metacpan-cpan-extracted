@@ -1,6 +1,6 @@
 package App::optex::textconv::msdoc;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -8,10 +8,13 @@ use v5.14;
 use Carp;
 use utf8;
 
-use Exporter 'import';
-our @EXPORT      = ();
-our %EXPORT_TAGS = ();
-our @EXPORT_OK   = qw(&to_text);
+use App::optex::textconv::Converter 'import';
+
+our @CONVERTER = (
+    [ qr/\.docx$/ => \&to_text ],
+    [ qr/\.pptx$/ => \&to_text ],
+    [ qr/\.xlsx$/ => \&to_text ],
+    );
 
 sub extract_text {
     local *_ = shift;

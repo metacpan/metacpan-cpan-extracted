@@ -1,8 +1,9 @@
+package Perlbal::Plugin::SessionAffinity;
+$Perlbal::Plugin::SessionAffinity::VERSION = '0.110';
 use strict;
 use warnings;
-package Perlbal::Plugin::SessionAffinity;
 # ABSTRACT: Sane session affinity (sticky sessions) for Perlbal
-$Perlbal::Plugin::SessionAffinity::VERSION = '0.101';
+
 use Perlbal;
 use Hash::Util;
 use CGI::Cookie;
@@ -245,13 +246,22 @@ sub register {
                 $tunable_name eq 'pool' and next;
 
                 # make sure svc has value for this tunable
-                defined $svc->{$tunable_name} or next;
+                # we use 'exists' first because if it's an unknown key
+                # in a lock hash, it will crash with 'disallowed key' access
+                exists $svc->{$tunable_name} && defined $svc->{$tunable_name}
+                    or next;
 
                 my $tunable = $Perlbal::Service::tunables->{$tunable_name};
                 my $role    = $tunable->{'check_role'};
 
                 if ( $role eq '*' || $role eq $svc_role ) {
-                    $nodeservice->set( $tunable_name, $svc->{$tunable_name} );
+                    my $value = ref $svc->{$tunable_name};
+
+                    # It might be an arrayref
+                    $value eq 'ARRAY'
+                        and $value = join '', @{$value};
+
+                    $nodeservice->set( $tunable_name, $value );
                 }
             }
 
@@ -375,7 +385,7 @@ Perlbal::Plugin::SessionAffinity - Sane session affinity (sticky sessions) for P
 
 =head1 VERSION
 
-version 0.101
+version 0.110
 
 =head1 SYNOPSIS
 
@@ -657,7 +667,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Sawyer X.
+This software is copyright (c) 2019 by Sawyer X.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

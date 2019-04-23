@@ -12,10 +12,6 @@ WriteMakefile(
 
     MIN_PERL_VERSION => 5.010000,
 
-    PREREQ_PM    => {
-        'Module::Load'  => 0,
-        'overload' => 0,
-    },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
@@ -29,6 +25,12 @@ WriteMakefile(
             },
         },
     },
+
+    PREREQ_PM    => {
+        'Module::Runtime' => 0,
+        'overload' => 0,
+    },
+
     TEST_REQUIRES => {
         'parent'          => 0,
         'Test::More'      => 0,

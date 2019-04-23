@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -58,10 +58,11 @@ Kazumasa Utashiro
 
 =cut
 
-use utf8;
-use Encode;
-use Data::Dumper;
 use List::Util qw(first);
+
+our @CONVERTER;
+use App::optex::textconv::default;
+use App::optex::textconv::msdoc;
 
 my($mod, $argv);
 sub initialize {
@@ -74,19 +75,21 @@ sub argv (&) {
     @$argv = $sub->(@$argv);
 }
 
-use App::optex::textconv::msdoc;
-my @converter = (
-    [ qr/\.docx$/    => \&App::optex::textconv::msdoc::to_text ],
-    [ qr/\.pptx$/    => \&App::optex::textconv::msdoc::to_text ],
-    [ qr/\.xlsx$/    => \&App::optex::textconv::msdoc::to_text ],
-    [ qr/\.pdf$/i    => "pdftotext -nopgbrk \"%s\" -" ],
-    [ qr/\.jpe?g$/i  => "exif \"%s\"" ],
-    [ qr[^https?://] => "w3m -dump \"%s\"" ],
-    );
+sub hit {
+    local $_ = shift;
+    my $check = shift;
+    if (ref $check eq 'Regexp') {
+	return /$check/;
+    }
+    if (ref $check eq 'CODE') {
+	return $check->();
+    }
+    return /$check/;
+}
 
 sub converter {
     my $filename = shift;
-    if (my $ent = first { $filename =~ $_->[0] } @converter) {
+    if (my $ent = first { hit $filename, $_->[0] } @CONVERTER) {
 	return $ent->[1];
     }
     undef;
@@ -98,7 +101,16 @@ sub exec_command {
     qx($exec);
 }
 
-use App::optex::Tmpfile;
+sub load {
+    my $name = shift;
+    my $module = __PACKAGE__ . "::$name";
+    eval "use $module";
+    if ($@) {
+	warn $@ unless $@ =~ /Can't locate/;
+	return 0;
+    }
+    $module;
+}
 
 my @persist;
 
@@ -113,7 +125,7 @@ sub textconv {
 	    }};
 	    my($suffix) = map { lc } /\.(\w+)$/x;
 	    my $func = do {
-		if (my $converter = converter($_)) {
+		if (my $converter = converter $_) {
 		    if (ref $converter eq 'CODE') {
 			$converter;
 		    }
@@ -122,14 +134,24 @@ sub textconv {
 		    }
 		}
 		elsif ($suffix) {
-		    my $module = __PACKAGE__ . "::$suffix";
-		    eval "use $module";
-		    next if $@;
-		    "${module}::to_text";
+		    state %loaded;
+		    my $state = \$loaded{$suffix};
+		    my $to_text = __PACKAGE__."::$suffix\::to_text";
+		    if (not defined $$state) {
+			$$state = 0;
+			load $suffix or next;
+			$$state = 1 if defined &{$to_text};
+			redo;
+		    } elsif ($$state) {
+			$to_text;
+		    } else {
+			next;
+		    }
 		} else {
 		    next;
 		}
 	    };
+	    use App::optex::Tmpfile;
 	    my $tmp = $persist[@persist] = new App::optex::Tmpfile;
 	    no strict 'refs';
 	    $tmp->write(&$func($_))->rewind;

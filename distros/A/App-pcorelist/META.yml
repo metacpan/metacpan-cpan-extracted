@@ -1,0 +1,41 @@
+---
+abstract: 'Wrapper around corelist with subcommands and tab completion'
+author:
+  - 'Tina Müller <tinita@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-pcorelist
+provides:
+  App::pcorelist:
+    file: lib/App/pcorelist.pm
+    version: '0.001'
+requires:
+  App::Spec: '0.005'
+  App::Spec::Run::Cmd: '0'
+  File::Share: '0'
+  Module::CoreList: '0'
+  Text::Table: '0'
+  YAML::PP: '0.012'
+  base: '0'
+  feature: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/perlpunk/App-pcorelist-p5.git
+version: '0.001'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

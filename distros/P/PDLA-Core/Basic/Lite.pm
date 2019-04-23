@@ -5,14 +5,14 @@ PDLA::Lite - minimum PDLA module OO loader
 =head1 DESCRIPTION
 
 Loads the smallest possible set of modules for
-PDLA to work, without importing an functions in
-to the current namespace. This is the absolute
-minimum set for PDLA.
+PDLA to work, importing only those functions always defined by
+L<PDLA::Core|PDLA::Core>) into the current namespace
+(C<pdl>, C<piddle>, C<barf> and C<null>).
+This is the absolute minimum set for PDLA.
 
-Although no functions are defined (apart from
-a few always exported by L<PDLA::Core|PDLA::Core>) you can still
-use method syntax, viz:
+Access to other functions is by method syntax, viz:
 
+  $x = PDLA->pdl(1, 2, 3, 4, 5);
   $x->wibble(42);
 
 =head1 SYNOPSIS
@@ -31,11 +31,12 @@ use method syntax, viz:
 
 =cut
 
-# Load the fundamental PDLA packages, no imports
-# Because there are no imports, we do not need
-# the usual 'eval in the user's namespace' routine.
+package PDLA::Lite;
 
-use PDLA::Core '';
+use strict;
+use warnings;
+
+use PDLA::Core qw(pdl piddle barf null);
 use PDLA::Ops '';
 use PDLA::Primitive '';
 use PDLA::Ufunc '';
@@ -45,8 +46,15 @@ use PDLA::Bad '';
 use PDLA::Version ;  # Doesn't export anything - no need for ''
 use PDLA::Lvalue;
 
-package PDLA::Lite;
-$VERSION = $PDLA::Version::VERSION;
+our $VERSION = $PDLA::Version::VERSION;
+
+our @ISA = qw( PDLA::Exporter );
+
+our @EXPORT = qw( piddle pdl null barf ); # Only stuff always exported!
+our %EXPORT_TAGS = (
+   Func     => [@EXPORT],
+);
+
 
 ;# Exit with OK status
 

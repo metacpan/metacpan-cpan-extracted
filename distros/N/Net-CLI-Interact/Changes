@@ -1,3 +1,7 @@
+2.300003 2019-04-19
+
+  * catch unknown personality errors
+
 2.300002 2017-10-14
 
   * #25 cisco/hp/pb login failure on hp procurve (A. Zanger)

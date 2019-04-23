@@ -23,6 +23,7 @@ Bowers
 Boyd
 CLI
 CPAN
+Christopher
 Chuck
 Class
 Config
@@ -55,6 +56,7 @@ Jörg
 Karen
 Krieg
 Larry
+Layne
 Leszczynski
 Load
 MetaCPAN
@@ -102,6 +104,7 @@ arisdottle
 autarch
 catchgithub
 charles_adams
+clayne
 de
 denny
 dirs

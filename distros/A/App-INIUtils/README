@@ -2,8 +2,8 @@ NAME
     App::INIUtils - INI utilities
 
 VERSION
-    This document describes version 0.032 of App::INIUtils (from Perl
-    distribution App-INIUtils), released on 2019-01-17.
+    This document describes version 0.033 of App::INIUtils (from Perl
+    distribution App-INIUtils), released on 2019-04-23.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:

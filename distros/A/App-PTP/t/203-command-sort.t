@@ -15,8 +15,14 @@ use Test::More tests => 6;
      'sort');
 }{
   my $data = ptp([qw(--ls)], 'default_data.txt');
-  is($data, "\n.\\+\nab/cd\nBe\nfoobar=\nfoobaz\nlast\nlast=\ntest\n",
-     'local sort');
+  my @expected = ("", ".\\+", "ab/cd", "Be", "foobar=", "foobaz", "last", "last=", "test");
+  {
+    # The order may vary depending on the system, so let's not hard-code the
+    # expected output here.
+    use locale;
+    @expected = sort @expected;
+  }
+  is($data, join("\n", @expected)."\n", 'local sort');
 }
 
 my $numeric_input = "20ab\n1d\n20.5\n99\nabc\n";

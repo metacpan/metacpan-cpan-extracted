@@ -1,3 +1,19 @@
+4.300005  2019-04-19
+
+  * Some fixes for echo commands and clean closing
+
+4.300004  2019-04-19
+
+  * Update copyright notice
+
+4.300003  2019-04-19
+
+  * Fix log bug and quiet option bug
+
+4.300002  2019-04-19
+
+  * Fix $VERSION error (thanks to Debian maintainers)
+
 4.300001  2017-12-07
 
   * #34 Support list or single value to add_library option

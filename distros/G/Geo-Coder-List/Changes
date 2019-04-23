@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-List
 
+0.25	Sat 20 Apr 21:24:01 EDT 2019
+	Specify a minimum level of Perl
+
 0.24	Wed 17 Apr 15:41:37 EDT 2019
 	Support the cache option
 	Test Geo::Coder::Free::Local

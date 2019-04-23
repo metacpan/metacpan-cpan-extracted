@@ -1,7 +1,8 @@
-use Test::More tests => 60;
+use Test::More tests => 63;
 use PDLA::LiteF;
-use Test::Exception;
 use Config;
+kill INT,$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
+use Test::Exception;
 
 use strict;
 use warnings;
@@ -62,7 +63,7 @@ ok($pc->at(2) == 12,'3 left bitshift 2 is 12');
 my $pa = pdl 16,64,9;
 my $pb = sqrt($pa);
 
-ok(all approx($pb,(pdl 4,8,3)),'sqrt of pdl(16,64,9)');
+ok(all( approx($pb,(pdl 4,8,3))),'sqrt of pdl(16,64,9)');
 
 # See that a is unchanged.
 
@@ -88,37 +89,37 @@ ok($pb->at(3) == 0, 'simple modulus 3');
 
 {
 # Might as well test this also
-ok(all approx((pdl 2,3),(pdl 2,3)),'approx equality 1');
-ok(!all approx((pdl 2,3),(pdl 2,4)),'approx equality 2');
+ok(all( approx((pdl 2,3),(pdl 2,3))),'approx equality 1');
+ok(!all( approx((pdl 2,3),(pdl 2,4))),'approx equality 2');
 }
 
 {
 # Simple function tests
 my $pa = pdl(2,3);
-ok(all approx(exp($pa), pdl(7.3891,20.0855)), 'exponential');
-ok(all approx(sqrt($pa), pdl(1.4142, 1.7321)), 'sqrt makes decimal');
+ok(all( approx(exp($pa), pdl(7.3891,20.0855))), 'exponential');
+ok(all( approx(sqrt($pa), pdl(1.4142, 1.7321))), 'sqrt makes decimal');
 }
 
 {
 # And and Or
 
-ok(all approx(pdl(1,0,1) & pdl(1,1,0), pdl(1,0,0)), 'elementwise and');
-ok(all approx(pdl(1,0,1) | pdl(1,1,0), pdl(1,1,1)), 'elementwise or');
+ok(all( approx(pdl(1,0,1) & pdl(1,1,0), pdl(1,0,0))), 'elementwise and');
+ok(all( approx(pdl(1,0,1) | pdl(1,1,0), pdl(1,1,1))), 'elementwise or');
 }
 
 {
 # atan2
-ok (all approx(atan2(pdl(1,1), pdl(1,1)), ones(2) * atan2(1,1)), 'atan2');
+ok (all( approx(atan2(pdl(1,1), pdl(1,1)), ones(2) * atan2(1,1))), 'atan2');
 }
 
 {
 my $pa = sequence (3,4);
 my $pb = sequence (3,4) + 1;
 
-ok (all approx($pa->or2($pb,0), $pa | $pb), 'or2');
-ok (all approx($pa->and2($pb,0), $pa & $pb), 'and2');
-ok (all approx($pb->minus($pa,0), $pb - $pa), 'explicit minus call');
-ok (all approx($pb - $pa, ones(3,4)), 'pdl subtraction');
+ok (all( approx($pa->or2($pb,0), $pa | $pb)), 'or2');
+ok (all( approx($pa->and2($pb,0), $pa & $pb)), 'and2');
+ok (all( approx($pb->minus($pa,0), $pb - $pa)), 'explicit minus call');
+ok (all( approx($pb - $pa, ones(3,4))), 'pdl subtraction');
 }
 
 # inplace tests
@@ -127,12 +128,12 @@ ok (all approx($pb - $pa, ones(3,4)), 'pdl subtraction');
 my $pa = pdl 1;
 my $sq2 = sqrt 2; # perl sqrt
 $pa->inplace->plus(1,0);  # trailing 0 is ugly swap-flag
-ok(all approx($pa, pdl 2), 'inplace plus');
+ok(all( approx($pa, pdl 2)), 'inplace plus');
 my $warning_shutup;
 $warning_shutup = $warning_shutup = sqrt $pa->inplace;
-ok(all approx( $pa, pdl($sq2)), 'inplace pdl sqrt vs perl scalar sqrt');
+ok(all( approx( $pa, pdl($sq2))), 'inplace pdl sqrt vs perl scalar sqrt');
 my $pb = pdl 4;
-ok(all approx( 2, sqrt($pb->inplace)),'perl scalar vs inplace pdl sqrt');
+ok(all( approx( 2, sqrt($pb->inplace))),'perl scalar vs inplace pdl sqrt');
 }
 
 {
@@ -151,10 +152,10 @@ my $pa = log10(pdl(110,23));
 my $pb = log(pdl(110,23)) / log(10);
 note "a: $pa\n";
 note "b: $pb\n";
-ok(all approx( $pa, $pb), 'log10 pdl');
+ok(all( approx( $pa, $pb)), 'log10 pdl');
 
 # check inplace
-ok(all approx( pdl(110,23)->inplace->log10(), $pb), 'inplace pdl log10');
+ok(all( approx( pdl(110,23)->inplace->log10(), $pb)), 'inplace pdl log10');
 }
 
 }
@@ -241,4 +242,19 @@ SKIP:
   cmp_ok longlong(1000000000000000001) - longlong(1000000000000000000),  '==', 1, "longlong precision/4";
   cmp_ok longlong(9223372036854775807) - longlong(9223372036854775806),  '==', 1, "longlong precision/5";
   cmp_ok longlong(9223372036854775807) + longlong(-9223372036854775808), '==',-1, "longlong precision/6";
+}
+
+is(~pdl(1,2,3)              ."", '[-2 -3 -4]', 'bitwise negation');
+is((pdl(1,2,3) ^ pdl(4,5,6))."", '[5 7 5]'   , 'bitwise xor'     );
+
+SKIP: {
+skip 'No BADVAL', 1 if !$PDLA::Config{WITH_BADVAL};
+# Check badflag propagation with .= (Ops::assgn) sf.net bug 3543056
+$a = sequence(10);
+$b = sequence(5);
+$b->inplace->setvaltobad(3);
+$a->slice('0:4') .= $b;
+$a->badflag(1);
+$a->check_badflag();
+ok($a->badflag == 1 && $a->nbad == 1, 'badflag propagation with .=');
 }

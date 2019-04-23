@@ -3,13 +3,11 @@ use Test::More;
 use strict;
 use warnings;
 
-BEGIN {
-	eval {
-		require PDLA::Opt::Simplex;
-		PDLA::Opt::Simplex->import();
-		1;
-	} or plan skip_all => "PDLA::Opt::Simplex not installed: $@";
-}
+eval {
+	require PDLA::Opt::Simplex;
+	PDLA::Opt::Simplex->import();
+	1;
+} or plan skip_all => "PDLA::Opt::Simplex not installed: $@";
 
 plan tests => 8;
 
@@ -30,7 +28,7 @@ my ( $x, $y ) = $opt->list;
 ok( $x < 0.001 );
 ok( ( $y - 1 ) < 0.001 );
 ok( $ssize < 0.001 );
-ok( ( $optval - 1 ) < 0.001 ); 
+ok( ( $optval - 1 ) < 0.001 );
 }
 
 {
@@ -46,5 +44,5 @@ my ( $x, $y ) = $opt->list;
 ok( $x < 0.001 );
 ok( ( $y - 1 ) < 0.001 );
 ok( $ssize < 0.001 );
-ok( ( $optval - 1 ) < 0.001 ); 
+ok( ( $optval - 1 ) < 0.001 );
 }

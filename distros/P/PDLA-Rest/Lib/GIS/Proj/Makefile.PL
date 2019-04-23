@@ -18,8 +18,13 @@ if (defined $PDLA::Config{$config_flag} && $PDLA::Config{$config_flag}==0) {
   return;
 }
 
-require Alien::Proj4; # runtime not compile-time so return above will work
-my @inc = Alien::Proj4->default_inc;
+eval { require Alien::Proj4 }; # runtime not compile-time so return above will work
+my @inc = eval { Alien::Proj4->default_inc };
+if ($@) {
+  write_dummy_make("Will skip build of $package_name on this system");
+  $PDLA::Config{$config_flag}=0; # we know Proj4 doesn't work
+  return;
+}
 @inc = @{$PDLA::Config{$config_incs}}
   if $PDLA::Config{$config_incs} and @{$PDLA::Config{$config_incs}};
 push @inc, qw(include);

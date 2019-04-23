@@ -1,5 +1,8 @@
 Revision history for Perl extension Async::Interrupt.
 
+1.25 Sat Apr 20 12:42:25 CEST 2019
+	- fix dependency on Canary::Stability (reported by Ross Opperman).
+
 1.24 Tue Apr 17 21:24:11 CEST 2018
 	- actually rewnew was missing, not wrongly documented. silly.
 

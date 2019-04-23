@@ -1,52 +1,55 @@
 package Text::Names::GB;
 
+use warnings;
+use strict;
+
 # our @ISA = ('Text::Names');
 use Text::Names qw/
-    abbreviationOf 
-    reverseName 
-    cleanParseName 
-    parseName 
-    parseName2 
-    normalizeNameWhitespace 
-    samePerson 
-    sameAuthors 
-    parseNames 
-    parseNameList 
-    cleanNames 
-    cleanName 
-    weakenings 
+    abbreviationOf
+    reverseName
+    cleanParseName
+    parseName
+    parseName2
+    normalizeNameWhitespace
+    samePerson
+    sameAuthors
+    parseNames
+    parseNameList
+    cleanNames
+    cleanName
+    weakenings
     composeName
     abbreviationOf
     setNameAbbreviations
     getNameAbbreviations
     isCommonSurname
     isCommonFirstname
-    guessGender
     firstnamePrevalence
     surnamePrevalence
     isMisparsed
     isLikelyMisparsed
-/; 
+/;
+    # guessGender
 
 require Exporter;
 
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	@NAME_PREFIXES 
-    abbreviationOf 
-    reverseName 
-    cleanParseName 
-    parseName 
-    parseName2 
-    normalizeNameWhitespace 
-    samePerson 
-    sameAuthors 
-    parseNames 
-    parseNameList 
-    cleanNames 
-    cleanName 
-    weakenings 
+	@NAME_PREFIXES
+    abbreviationOf
+    reverseName
+    cleanParseName
+    parseName
+    parseName2
+    normalizeNameWhitespace
+    samePerson
+    sameAuthors
+    parseNames
+    parseNameList
+    cleanNames
+    cleanName
+    weakenings
     composeName
     abbreviationOf
     setNameAbbreviations
@@ -70,11 +73,11 @@ Text::Names::GB - Perl extension for proper name parsing, normalization, recogni
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -87,7 +90,8 @@ to be implemented as subclasses.
 
 =head2 guessGender
 
-Overrides the US tests with UK tests, that's probably true in most other countries as well.
+Overrides the US tests with UK tests,
+that's probably true in most other countries as well.
 
 =cut
 
@@ -102,6 +106,27 @@ sub guessGender {
 	}
 	if($name eq 'KAI') {
 		return 'M';
+	}
+	if($name eq 'REECE') {
+		return 'M';
+	}
+	if($name eq 'RITCHIE') {
+		return 'M';
+	}
+	if($name eq 'OLLIE') {
+		return 'M';
+	}
+	if($name eq 'BEATON') {
+		return 'M';
+	}
+	if($name eq 'CALLUM') {
+		return 'M';
+	}
+	if($name eq 'STACEY') {
+		return 'F';
+	}
+	if($name eq 'ZARA') {
+		return 'F';
 	}
 	# return $self->SUPER::guessGender($name);
 	return Text::Names::guessGender($name);
@@ -149,9 +174,9 @@ L<http://search.cpan.org/dist/Text-Names-GB/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

@@ -152,9 +152,9 @@ X axis values between endpoints (see L<xvals|/xvals>).
 
 =for usage
 
- $a = zeroes(100,100);
- $x = $a->xlinvals(0.5,1.5);
- $y = $a->ylinvals(-2,-1);
+ $w = zeroes(100,100);
+ $x = $w->xlinvals(0.5,1.5);
+ $y = $w->ylinvals(-2,-1);
  # calculate Z for X between 0.5 and 1.5 and
  # Y between -2 and -1.
  $z = f($x,$y);            
@@ -187,9 +187,9 @@ X axis values logarithmically spaced between endpoints (see L<xvals|/xvals>).
 
 =for usage
 
- $a = zeroes(100,100);
- $x = $a->xlogvals(1e-6,1e-3);
- $y = $a->ylinvals(1e-4,1e3);
+ $w = zeroes(100,100);
+ $x = $w->xlogvals(1e-6,1e-3);
+ $y = $w->ylinvals(1e-4,1e3);
  # calculate Z for X between 1e-6 and 1e-3 and
  # Y between 1e-4 and 1e3.
  $z = f($x,$y);            
@@ -300,7 +300,7 @@ sub PDLA::zlogvals {
 =for ref
 
 Synonym for L<ndcoords|ndcoords> - enumerates all coordinates in a
-PDLA or dim list, adding an extra dim on the front to accomodate
+PDLA or dim list, adding an extra dim on the front to accommodate
 the vector coordinate index (the form expected by L<indexND|indexND>,
 L<range|range>, and L<interpND|interpND>).  See L<ndcoords|ndcoords> for more detail.
 
@@ -355,10 +355,10 @@ $indices = ndcoords($type,@dimlist);
    ]
   ]
 
-  pdla> $a = zeroes(byte,2,3);        # $a is a 2x3 byte piddle
-  pdla> $b = ndcoords($a);            # $b inherits $a's type
-  pdla> $c = ndcoords(long,$a->dims); # $c is a long piddle, same dims as $b
-  pdla> help $b;
+  pdla> $w = zeroes(byte,2,3);        # $w is a 2x3 byte piddle
+  pdla> $y = ndcoords($w);            # $y inherits $w's type
+  pdla> $c = ndcoords(long,$w->dims); # $c is a long piddle, same dims as $y
+  pdla> help $y;
   This variable is   Byte D [2,2,3]              P            0.01Kb
   pdla> help $c;
   This variable is   Long D [2,2,3]              P            0.05Kb
@@ -380,8 +380,8 @@ sub PDLA::ndcoords {
   $out = PDLA->zeroes(@d);
   
   for my $d(0..$#dims) {
-    my $a = $out->index($d)->mv($d,0);
-    $a .= xvals($a);
+    my $w = $out->index($d)->mv($d,0);
+    $w .= xvals($w);
   }
 
   $out;
@@ -519,7 +519,7 @@ Create array filled with a sequence of values
 
 =for usage
 
- $a = sequence($b); $a = sequence [OPTIONAL TYPE], @dims;
+ $w = sequence($y); $w = sequence [OPTIONAL TYPE], @dims;
 
 etc. see L<zeroes|PDLA::Core/zeroes>.
 
@@ -594,8 +594,8 @@ or floating point datatypes.
 For a more general metric, one can define, e.g.,
 
  sub distance {
-   my ($a,$centre,$f) = @_;
-   my ($r) = $a->allaxisvals-$centre;
+   my ($w,$centre,$f) = @_;
+   my ($r) = $w->allaxisvals-$centre;
    $f->($r);
  }
  sub l1 { sumover(abs($_[0])); }
@@ -604,7 +604,7 @@ For a more general metric, one can define, e.g.,
 
 so now
 
- distance($a, $centre, \&euclid);
+ distance($w, $centre, \&euclid);
 
 will emulate rvals, while C<\&l1> and C<\&linfty> will generate other
 well-known norms. 
@@ -739,17 +739,17 @@ transpose rows and columns.
 
 =for usage
 
- $b = transpose($a); 
+ $y = transpose($w);
 
 =for example
 
- pdla> $a = sequence(3,2)
- pdla> p $a
+ pdla> $w = sequence(3,2)
+ pdla> p $w
  [
   [0 1 2]
   [3 4 5]
  ]                                                                               
- pdla> p transpose( $a )
+ pdla> p transpose( $w )
  [
   [0 3]
   [1 4]

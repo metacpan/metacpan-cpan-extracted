@@ -205,6 +205,16 @@ Splits input into fixed-size chunks.
 Note that output is always guaranteed to be a full chunk - if there is partial input
 at the time the input stream finishes, those extra bytes will be discarded.
 
+=head2 batch
+
+Splits input into arrayref batches of a given size.
+
+Note that the last item emitted may have fewer elements (or none at all).
+
+ $src->batch(10)
+  ->map(sub { "Next 10 (or fewer) items: @$_" })
+  ->say;
+
 =head2 by_line
 
 Emits one item for each line in the input. Similar to L</split> with a C<\n> parameter,

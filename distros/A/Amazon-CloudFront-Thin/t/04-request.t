@@ -8,7 +8,7 @@ sub request {
     my ($self, $req) = @_;
     isa_ok $self, 'MyAgent';
     isa_ok $req, 'HTTP::Request';
-    like $req->content, qr{\Q<?xml version="1.0" encoding="UTF-8"?><InvalidationBatch xmlns="http://cloudfront.amazonaws.com/doc/2015-04-17/"><Paths><Quantity>1</Quantity><Items><Path><![CDATA[/some/path]]></Path></Items></Paths><CallerReference>\E\d+\Q</CallerReference></InvalidationBatch>\E}, 'comparing payload';
+    like $req->content, qr{\Q<?xml version="1.0" encoding="UTF-8"?><InvalidationBatch xmlns="http://cloudfront.amazonaws.com/doc/2018-11-05/"><Paths><Quantity>1</Quantity><Items><Path><![CDATA[/some/path]]></Path></Items></Paths><CallerReference>\E\d+\Q</CallerReference></InvalidationBatch>\E}, 'comparing payload';
 
     my $headers = $req->headers->as_string;
     like $headers, qr{X-Amz-Date: \d{8}T\d{6}Z}, 'headers contain date in iso 8601 (NOT RFC 1123)';

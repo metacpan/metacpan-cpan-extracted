@@ -215,8 +215,8 @@ sub parse_file {
 
         my $spans = serialize_spans( zone_as_spans($zone) );
 
-        $spans =~ s/-inf/DateTime::TimeZone::NEG_INFINITY/gi;
-        $spans =~ s/\binf/DateTime::TimeZone::INFINITY/gi;
+        $spans =~ s/-inf(inity)?/DateTime::TimeZone::NEG_INFINITY/gi;
+        $spans =~ s/\binf(inity)?/DateTime::TimeZone::INFINITY/gi;
 
         $spans =~ s/('(?:start|end)_date'\s+=>\s+)'(\d+)'/$1$2/g;
 

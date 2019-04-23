@@ -21,7 +21,7 @@ L<Cookbook|Net::CLI::Interact::Manual::Cookbook>.
 =head1 PERSONALITIES
 
 See the files themselves at the following link for full details:
-L<https://github.com/ollyg/Net-CLI-Interact/tree/master/lib/Net/CLI/Interact/phrasebook>.
+L<https://github.com/ollyg/Net-CLI-Interact/tree/master/share/phrasebook>.
 
 =over 4
 

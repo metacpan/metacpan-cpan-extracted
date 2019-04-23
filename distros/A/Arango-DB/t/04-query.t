@@ -57,7 +57,10 @@ is $results, undef, "No more results";
 $cursor = $db->cursor('FOR p IN @@collection RETURN p', bindVars => { '@collection' => 'collection' });
 isa_ok $cursor, 'Arango::DB::Cursor';
 
-
+## Do t again
+$cursor = $db->cursor($query, batchSize => 1);
+$cursor->finish;
+is $cursor, {}, "Finish removed all data";
 
 $arango->delete_database("tmp_");
 

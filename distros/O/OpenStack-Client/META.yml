@@ -3,12 +3,9 @@ abstract: 'A nice and tiny OpenStack API client'
 author:
   - 'Alexandra Hrefna Maheu <xan@cpanel.net>'
 build_requires:
-  HTTP::Request: '0'
-  JSON: '0'
-  LWP::UserAgent: '0'
+  ExtUtils::MakeMaker: '0'
   Test::Exception: '0'
   Test::More: '0'
-  URI::Encode: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,8 +20,12 @@ no_index:
     - t
     - inc
 requires:
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  URI::Encode: '0'
   perl: '5.014000'
 resources:
   repository: https://github.com/xantronix/openstack-client.git
-version: '1.0006'
+version: '1.0007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

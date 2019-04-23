@@ -1,3 +1,8 @@
+v0.82.0 2019-04-22T07:44:54Z
+ - ippool removed
+ - resources updated
+ - perl 5.28.2 # no filter
+
 v0.81.0 2019-03-29T09:05:36Z
  - json src filter fixed
  - dockerhub api fixed

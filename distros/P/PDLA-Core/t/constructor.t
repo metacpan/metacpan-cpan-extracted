@@ -4,7 +4,7 @@
 # Separate from core.t because the problem crashes perl
 # and I'd like to keep the granularity of the core.t tests
 #
-use Test::More tests => 80;
+use Test::More tests => 87;
 use PDLA::LiteF;
 use PDLA::Config;
 
@@ -129,14 +129,14 @@ is $p->at(1,0), $PDLA::undefval, "scalar got padded OK";
 is $p->at(0,1), $pdl_v->at(0), "vector element 0 got copied OK";
 is $p->at(1,1), $pdl_v->at(1), "vector element 1 got copied OK";
 
-## A more complicated case 
+## A more complicated case
 $p = pdl($pdl_s, 5, $pdl_v, $pdl_m, [$pdl_v, $pdl_v]);
 isa_ok($p,'PDLA');
 is $p->ndims(), 3, 'complicated case -> 3-d PDLA';
 is $p->dim(0), 2, 'complicated case -> dim 0 is 2';
 is $p->dim(1), 2, 'complicated case -> dim 1 is 2';
 is $p->dim(2), 5, 'complicated case -> dim 1 is 5';
-@testvals = ([ [0,0,0], 2 ],   [ [1,0,0], 0 ],   [ [0,1,0], 0 ],  [ [1,1,0], 0 ], 
+@testvals = ([ [0,0,0], 2 ],   [ [1,0,0], 0 ],   [ [0,1,0], 0 ],  [ [1,1,0], 0 ],
 	     [ [0,0,1], 5 ],   [ [1,0,1], 0 ],   [ [0,1,1], 0 ],  [ [1,1,1], 0 ],
 	     [ [0,0,2], 3 ],   [ [1,0,2], 0 ],   [ [0,1,2], 4 ],  [ [1,1,2], 0 ],
 	     [ [0,0,3], 5 ],   [ [1,0,3], 6 ],   [ [0,1,3], 7 ],  [ [1,1,3], 8 ],
@@ -183,10 +183,6 @@ is $p->at(0,0), 5, "scalar OK for scalar & empty";
 is $p->at(0,1), $PDLA::undefval, "padding OK for scalar & empty";
 
 
-
-
-
-
 # This is from sf.net bug #3011879
 my @c;
 $c[0][0]=pdl(0,4,2,1);
@@ -196,6 +192,28 @@ $c[0][1]=pdl(0,0,3,1);
 $c[1][1]=pdl(0,0,2,1);
 $c[2][1]=pdl(5,1,1,1);
 my $d = pdl(@c);
+
+##############################
+# test bad values
+ SKIP: {
+     skip "BAD values not compiled in",7 unless($PDLA::Bad::Status);
+     
+     $x = pdl(3,4,5);
+     $x=$x->setbadif($x==4);
+     eval '$y = pdl($x,5);';
+     ok(!$@, "a badvalue PDLA works in the constructor");
+
+     ok( $y->badflag, "bad value propagates from inner PDLA to constructed PDLA" );
+     ok( $y->slice("(1),(0)") == $y->badvalue, "bad value was passed in" );
+     ok( $y->at(1,1) == 0, "padding was correct" );
+
+     eval '$y = pdl(short, $x, 5);';
+     
+     ok(!$@, "constructed a short PDLA");
+     ok( $y->slice("(1),(0)") == $y->badvalue, "bad value was translated" );
+     ok( $y->at(1,1) == 0, "padding was correct");
+
+}
 
 
 

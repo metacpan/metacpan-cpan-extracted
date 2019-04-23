@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_fill_csv_columns_from_query
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-04-15'; # DATE
+our $DATE = '2019-04-23'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ mysql-fill-csv-columns-from-query - Fill CSV columns with data from a query
 
 =head1 VERSION
 
-This document describes version 0.016 of mysql-fill-csv-columns-from-query (from Perl distribution App-MysqlUtils), released on 2019-04-15.
+This document describes version 0.017 of mysql-fill-csv-columns-from-query (from Perl distribution App-MysqlUtils), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,17 @@ C<*> marks required options.
 
 Input CSV file.
 
+=item B<--no-header>
+
+When you declare that CSV does not have header row (`--no-header`), the fields
+will be named `field1`, `field2`, and so on.
+
+
 =item B<--query>=I<s>*
+
+=item B<--tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =back
 
@@ -274,12 +284,14 @@ List of available configuration parameters:
  database (see --database)
  filename (see --filename)
  format (see --format)
+ header (see --no-header)
  host (see --host)
  log_level (see --log-level)
  naked_res (see --naked-res)
  password (see --password)
  port (see --port)
  query (see --query)
+ tsv (see --tsv)
  username (see --username)
 
 =head1 ENVIRONMENT

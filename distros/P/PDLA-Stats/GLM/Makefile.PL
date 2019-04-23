@@ -9,7 +9,7 @@ if ($PDLA::VERSION =~ /^2\.4\.7/) {
     exit;
 }
 
-$package = ["glm.pp",GLM,PDLA::Stats::GLM];
+$package = ["glm.pd",GLM,PDLA::Stats::GLM];
 %hash = pdlpp_stdargs($package); 
 
 WriteMakefile( %hash );

@@ -1,5 +1,14 @@
 Revision history for Test-DNS
 
+0.203     2019-04-22 19:49:38+03:00 Asia/Jerusalem
+
+        - GH #3: Add the exact dependency as a module.
+          (Mohammad S Anwar)
+
+0.202     2019-04-22 16:40:55+03:00 Asia/Jerusalem
+
+        - GH #2: Missed cpanfile. (Thanks, Slaven Rezić!)
+
 0.201     2019-03-03 15:03:41+02:00 Asia/Jerusalem
         - Removed Set::Object dependency. (Should fix tests.)
 

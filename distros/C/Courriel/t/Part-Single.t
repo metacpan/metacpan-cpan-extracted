@@ -169,7 +169,7 @@ EOF
 
 {
     my $orig_content = "foo \x{4E00} bar";
-    my $encoded = encode_base64( encode( 'UTF-8', $orig_content ) );
+    my $encoded      = encode_base64( encode( 'UTF-8', $orig_content ) );
 
     my $part = Courriel::Part::Single->new(
         headers      => Courriel::Headers->new(),
@@ -212,7 +212,7 @@ EOF
 
 {
     my $orig_content = "foo \x{4E00} bar";
-    my $encoded = encode( 'UTF-8', $orig_content );
+    my $encoded      = encode( 'UTF-8', $orig_content );
 
     my $part = Courriel::Part::Single->new(
         headers      => Courriel::Headers->new(),

@@ -1,15 +1,15 @@
 use Test2::V0;
-use Test2::Tools::Compare qw( array hash );
+use Test2::Tools::Compare qw( array hash F );
 use Net::Checkpoint::Management::v1;
 use JSON qw();
 use Data::Dumper::Concise;
 
 SKIP: {
-    skip "environment variables not set"
-        unless exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_HOSTNAME}
+    skip_all "environment variables not set"
+        unless (exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_HOSTNAME}
             && exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_USERNAME}
             && exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_PASSWORD}
-            && exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_POLICY};
+            && exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_POLICY});
 };
 
 my $cpmgmt = Net::Checkpoint::Management::v1->new(
@@ -159,8 +159,27 @@ ok(lives {
 is($access_rule->{uid}, $ipv4_object_rule->{uid},
     'find access rule by name returns correct rule');
 
+is($access_rule->{enabled}, T(), "access rule is enabled");
+ok($access_rule = $cpmgmt->update_accessrule({
+        uid     => $access_rule->{uid},
+        layer   => $acl_uid,
+    }, {
+        enabled => JSON->boolean(0),
+    }), "disable access rule successful");
+is($access_rule->{enabled}, F(), "access rule is disabled");
+
+ok($cpmgmt->delete_accessrule({
+        uid     => $access_rule->{uid},
+        layer   => $acl_uid,
+    }), "delete access rule successful");
+
 # ok(my $taskid = $cpmgmt->publish, 'publish successful');
 
-$cpmgmt->logout;
+END {
+    if (defined $cpmgmt) {
+        $cpmgmt->discard;
+        $cpmgmt->logout;
+    }
+}
 
 done_testing;

@@ -16,8 +16,8 @@ use Class::MethodMaker [
                         scalar => [ qw/ stack base genID disallowed qnames result bnode_absolute_prefix / ],
                        ];
 
-my
-$VERSION = 1.17;
+our
+$VERSION = 1.18;
 
 sub new
   {

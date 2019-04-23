@@ -25,10 +25,10 @@ undef &MY::postamble; # suppress warning
 
 WriteMakefile(
     NAME => $thispackage,
-    OBJECT => 'VS.o ',
+    OBJECT => 'VS$(OBJ_EXT) ',
     %pkghash,
     clean => {
-        FILES => 'VS.pm VS.xs VS.o VS.c',
+        FILES => 'VS.pm VS.xs VS$(OBJ_EXT) VS.c',
     },
     dist => { 
         COMPRESS => 'gzip', 

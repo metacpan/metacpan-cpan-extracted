@@ -9,7 +9,7 @@ use HTTP::Date     ();
 use HTTP::Request  ();
 use Digest::SHA    ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my ($class, @extra) = @_;
@@ -68,7 +68,7 @@ sub create_invalidation {
     my $time = time;
 
     my $url = URI->new(
-        'https://cloudfront.amazonaws.com/2015-04-17/distribution/'
+        'https://cloudfront.amazonaws.com/2018-11-05/distribution/'
         . $self->{distribution_id} . '/invalidation'
     );
 
@@ -192,9 +192,12 @@ sub _create_xml_payload {
         # http://docs.aws.amazon.com/AmazonCloudFront/latest/APIReference/InvalidationBatchDatatype.html
         $path = '/' . $path unless index($path, '/') == 0;
         # we wrap paths on CDATA so we don't have to escape them
+        if (index($path, ']]>') >= 0) {
+            $path =~ s/\]\]>/\]\]\]\]><![CDATA[>/gs; # split CDATA end token.
+        }
         $path_content .= '<Path><![CDATA[' . $path . ']]></Path>'
     }
-    return qq{<?xml version="1.0" encoding="UTF-8"?><InvalidationBatch xmlns="http://cloudfront.amazonaws.com/doc/2015-04-17/"><Paths><Quantity>$total_paths</Quantity><Items>$path_content</Items></Paths><CallerReference>$identifier</CallerReference></InvalidationBatch>};
+    return qq{<?xml version="1.0" encoding="UTF-8"?><InvalidationBatch xmlns="http://cloudfront.amazonaws.com/doc/2018-11-05/"><Paths><Quantity>$total_paths</Quantity><Items>$path_content</Items></Paths><CallerReference>$identifier</CallerReference></InvalidationBatch>};
 }
 
 42;
@@ -372,10 +375,10 @@ Each path is wrapped under CDATA on the resulting XML, so it should be
 safe for non-ASCII and unsafe characters in your paths.
 
 For more information, please refer to
-L<< Amazon's API documentation for CreateInvalidation|http://docs.aws.amazon.com/AmazonCloudFront/latest/APIReference/CreateInvalidation.html >>.
+L<< Amazon's API documentation for CreateInvalidation|https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CreateInvalidation.html >>.
 For information on invalidations in general, including limitations,
-please refer to L<< Amazon's CloudFront Developer Guide|http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html >>.
-Finally, please refer to L<< Amazon's CloudFront error messages|http://docs.aws.amazon.com/AmazonCloudFront/latest/APIReference/Errors.html >>
+please refer to L<< Amazon's CloudFront Developer Guide|https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html >>.
+Finally, please refer to L<< Amazon's CloudFront error messages|https://docs.aws.amazon.com/cloudfront/latest/APIReference/CommonErrors.html >>
 for more information on how to interpret errors returned as responses.
 
 =head1 HANDLING UNICODE FILENAMES & PATHS
@@ -404,7 +407,7 @@ Breno G. de Oliveira C<< garu at cpan.org >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Breno G. de Oliveira C<< <garu at cpan.org> >>. All rights reserved.
+Copyright 2015-2019 Breno G. de Oliveira C<< <garu at cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>.

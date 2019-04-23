@@ -1,4 +1,7 @@
-Revision history for Getopt-Long-Negate-EN
+0.060   2019-04-23 (PERLANCAR)
+
+	- Add include<->exclude.
+
 
 0.05    2016-03-01 (PERLANCAR)
 

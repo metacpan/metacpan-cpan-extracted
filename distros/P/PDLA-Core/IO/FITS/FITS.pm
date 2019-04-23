@@ -7,8 +7,8 @@ PDLA::IO::FITS -- Simple FITS support for PDLA
  use PDLA;
  use PDLA::IO::FITS;
 
- $a = rfits('foo.fits');          # read a FITS file
- $a->wfits('bar.fits');           # write a FITS file
+ $x = rfits('foo.fits');          # read a FITS file
+ $x->wfits('bar.fits');           # write a FITS file
 
 =head1 DESCRIPTION
 
@@ -48,6 +48,7 @@ PDLA distribution, the copyright notice should be pasted into in this file.
 =cut
 
 use strict;
+use warnings;
 
 BEGIN {
 
@@ -79,9 +80,9 @@ BEGIN {
   eval "use Astro::FITS::Header;";
   $PDLA::Astro_FITS_Header = (defined $Astro::FITS::Header::VERSION);
   if($PDLA::Astro_FITS_Header) {
-    my($a) = $Astro::FITS::Header::VERSION;
-    $a =~ s/[^0-9\.].*//;
-    $PDLA::Astro_FITS_Header = 0 if($a < 1.12);
+    my($x) = $Astro::FITS::Header::VERSION;
+    $x =~ s/[^0-9\.].*//;
+    $PDLA::Astro_FITS_Header = 0 if($x < 1.12);
   }
 
   unless($PDLA::Astro_FITS_Header) {
@@ -116,6 +117,10 @@ Suffix magic:
   $pdl = rfits('file.fits[2]');    # Read 2nd extension
   $pdl = rfits('file.fits.gz[3]'); # Read 3rd extension
   @pdls = rfits('file.fits');      # Read primary data and extensions
+
+Tilde expansion:
+  #expand leading ~ to home directory (using glob())
+  $pdl = rfits '~/filename.fits';
 
   $hdr = rfits('file.fits',{data=>0});  # Options hash changes behavior
 
@@ -238,7 +243,7 @@ the repeat count) or variable length arrays.)
 Thus, if your table contains a column named C<FOO> with type C<5D>,
 the expression
 
-  $a->{FOO}->((2))
+  $x->{FOO}->((2))
 
 returns a 5-element double-precision PDLA containing the values of FOO
 from the third row of the table.
@@ -327,7 +332,7 @@ sub PDLA::rfits {
   
   my $class = shift;
   
-  barf 'Usage: $a = rfits($file)  -or-   $a = PDLA->rfits($file)' if (@_ < 1 || @_ > 2);
+  barf 'Usage: $x = rfits($file)  -or-   $x = PDLA->rfits($file)' if (@_ < 1 || @_ > 2);
   
   my $file = shift; 
   
@@ -342,7 +347,9 @@ sub PDLA::rfits {
   # indicator which cancelled the check for empty primary data array at the end.
   my $explicit_extension = ($file =~ m/\[\d+\]$/ ? 1 : 0);
   $extnum = ( ($file =~ s/\[(\d+)\]$//) ? $1 : 0 );
-  
+
+  $file =~ s/^(~)/glob($1)/e; #tilde expansion.
+
   $file = "gunzip -c $file |" if $file =~ /\.gz$/;    # Handle compression
   $file = "uncompress -c $file |" if $file =~ /\.Z$/;
   
@@ -592,6 +599,7 @@ our $type_table = {
     8=>$PDLA_B,
     16=>$PDLA_S,
     32=>$PDLA_L,
+    64=>$PDLA_LL,
     -32=>$PDLA_F,
     -64=>$PDLA_D
 };
@@ -600,6 +608,7 @@ our $type_table_2 = {
     8=>byte,
     16=>short,
     32=>long,
+    64=>longlong,
     -32=>float,
     -64=>double
 };
@@ -649,9 +658,8 @@ sub _rfits_image($$$$) {
   if (!isbigendian() ) {
     # Need to byte swap on little endian machines
     bswap2($pdl) if $pdl->get_datatype == $PDLA_S;
-    bswap4($pdl) if $pdl->get_datatype == $PDLA_L || 
-      $pdl->get_datatype == $PDLA_F;
-    bswap8($pdl) if $pdl->get_datatype == $PDLA_D;
+    bswap4($pdl) if $pdl->get_datatype == $PDLA_L || $pdl->get_datatype == $PDLA_F;
+    bswap8($pdl) if $pdl->get_datatype == $PDLA_D || $pdl->get_datatype==$PDLA_LL;
   }
   
   if(exists $opt->{bscale}) {
@@ -830,6 +838,7 @@ $PDLA::IO::FITS_bintable_handlers = {
   ,'L' => [ byte,    1,     1,     1  ] # logical - treat as byte
   ,'I' => [ short,   2,     2,     2  ] # short (no unsigned shorts?)
   ,'J' => [ long,    4,     4,     4  ] # long
+  ,'K' => [ longlong,8,     8,     8  ] # longlong
   ,'E' => [ float,   4,     4,     4  ] # single-precision
   ,'D' => [ double,  8,     8,     8  ] # double-precision
   ,'C' => [ sub { _nucomplx(float,  eval '@_') }, sub { _rdcomplx(float,  eval '@_') },
@@ -1224,9 +1233,9 @@ sub _rfits_bintable ($$$$) {
 	my %foo = ("TZERO$i"=>"BZERO", 
 		   "TSCAL$i"=>"BSCALE", 
 		   "TUNIT$i"=>"BUNIT");
-	for my $a(keys %foo) {
-	  $tmpcol->{data}->hdr->{$foo{$a}} = $hdr->{$a}
-	  if( defined($hdr->{$a}) );
+	for my $x(keys %foo) {
+	  $tmpcol->{data}->hdr->{$foo{$x}} = $hdr->{$x}
+	  if( defined($hdr->{$x}) );
 	}
       } # End of bscale checking...
 
@@ -1236,8 +1245,8 @@ sub _rfits_bintable ($$$$) {
 
       if(exists($hdr->{"TDIM$i"})) {
 	  if($hdr->{"TDIM$i"} =~ m/\((\s*\d+(\s*\,\s*\d+)*\s*)\)/) {
-	      my $a = $1;
-	      @tdims = map { $_+0 } split(/\,/,$a);
+	      my $x = $1;
+	      @tdims = map { $_+0 } split(/\,/,$x);
 	      my $tdims = pdl(@tdims);
 	      my $tds = $tdims->prodover;
 	      if($tds > $tmpcol->{data}->dim(0)) {
@@ -1560,6 +1569,10 @@ Suffix magic:
   # Automatically compress through pipe to compress 
   wfits $pdl, 'filename.fits.Z';  
 
+Tilde expansion:
+  #expand leading ~ to home directory (using glob())
+  wfits $pdl, '~/filename.fits';
+
 =over 3
 
 =item * Ordinary (PDLA) data handling: 
@@ -1585,7 +1598,7 @@ C<wfits> will remove any extraneous C<NAXISn> keywords (per the FITS
 standard), and also remove the other keywords associated with that
 axis: C<CTYPEn>, C<CRPIXn>, C<CRVALn>, C<CDELTn>, and C<CROTAn>.  This
 may cause confusion if the slice is NOT out of the last dimension:
-C<wfits($a(:,(0),:),'file.fits');> and you would be best off adjusting
+C<wfits($x(:,(0),:),'file.fits');> and you would be best off adjusting
 the header yourself before calling C<wfits>.
 
 You can tile-compress images according to the CFITSIO extension to the 
@@ -1666,7 +1679,7 @@ the list are stringified before being written.  For example, if you
 pass in a perl list of 7 PDLAs, each PDLA will be stringified before
 being written, just as if you printed it to the screen.  This is
 probably not what you want -- you should use L<glue|glue> to connect 
-the separate PDLAs into a single one.  (e.g. C<$a-E<gt>glue(1,$b,$c)-E<gt>mv(1,0)>)
+the separate PDLAs into a single one.  (e.g. C<$x-E<gt>glue(1,$y,$c)-E<gt>mv(1,0)>)
 
 The column names are case-insensitive, but by convention the keys of
 C<$hash> should normally be ALL CAPS, containing only digits, capital
@@ -1714,9 +1727,9 @@ other fields are passed into the final FITS header verbatim.
 
 As an example, the following
 
-  $a = long(1,2,4);
-  $b = double(1,2,4);
-  wfits { 'COLA'=>$a, 'COLB'=>$b }, "table1.fits";
+  $x = long(1,2,4);
+  $y = double(1,2,4);
+  wfits { 'COLA'=>$x, 'COLB'=>$y }, "table1.fits";
 
 will create a binary FITS table called F<table1.fits> which
 contains two columns called C<COLA> and C<COLB>. The order
@@ -1724,7 +1737,7 @@ of the columns is controlled by setting the C<TTYPEn>
 keywords in the header array, so 
 
   $h = { 'TTYPE1'=>'Y', 'TTYPE2'=>'X' };
-  wfits { 'X'=>$a, 'Y'=>$b, hdr=>$h }, "table2.fits";
+  wfits { 'X'=>$x, 'Y'=>$y, hdr=>$h }, "table2.fits";
 
 creates F<table2.fits> where the first column is
 called C<Y> and the second column is C<X>.
@@ -1846,21 +1859,23 @@ sub wheader ($$) {
 #
 sub PDLA::wfits {
   barf 'Usage: wfits($pdl,$file,[$BITPIX],[{options}])' if $#_<1 || $#_>3;
-  my ($pdl,$file,$a,$b) = @_;
+  my ($pdl,$file,$x,$y) = @_;
   my ($opt, $BITPIX);
 
   local $\ = undef;  # fix sf.net bug #3394327 
 
-  if(ref $a eq 'HASH') {
-      $a = $opt;
-      $BITPIX = $b;
-  } elsif(ref $b eq 'HASH') {
-      $BITPIX = $a;
-      $opt = $b;
+  if(ref $x eq 'HASH') {
+      $x = $opt;
+      $BITPIX = $y;
+  } elsif(ref $y eq 'HASH') {
+      $BITPIX = $x;
+      $opt = $y;
   }
 
   my ($k, $buff, $off, $ndims, $sz);
-  
+
+  $file =~ s/^(~)/glob($1)/e; # tilde expansion
+
   local $SIG{PIPE};
 
   if ($file =~ /\.gz$/) {            # Handle suffix-style compression
@@ -1876,24 +1891,6 @@ sub PDLA::wfits {
   }
   
   #### Figure output type
-
-#  unless( UNIVERSAL::isa($pdl,'PDLA') ) {
-#      my $ref = ref($pdl) || "";
-#      if($ref eq 'HASH') {
-#	  my $fh = IO::File->new( $file )
-#	      or barf "Could not open $file\n";
-#	  _wfits_nullhdu($fh);
-#	  # default to binary table if none specified
-#	  my $table_type = exists $pdl->{tbl} ?
-#	      ($pdl->{tbl} =~ m/^a/i ? 'ascii' : 'binary') :
-#	      "binary";
-#	  _wfits_table($fh,$pdl,$table_type);
-#	  $fh->close;
-#	return;
-#     } else {
-#	  barf('wfits: multiple output xtensions not supported\n')
-#     }
-# }
 
   my @outputs = ();
   my $issue_nullhdu;
@@ -1939,15 +1936,23 @@ sub PDLA::wfits {
 	      $BITPIX =   8 if $pdl->get_datatype == $PDLA_B;
 	      $BITPIX =  16 if $pdl->get_datatype == $PDLA_S || $pdl->get_datatype == $PDLA_US;
 	      $BITPIX =  32 if $pdl->get_datatype == $PDLA_L;
+	      $BITPIX =  64 if $pdl->get_datatype == $PDLA_LL;
 	      $BITPIX = -32 if $pdl->get_datatype == $PDLA_F;
 	      $BITPIX = -64 if $pdl->get_datatype == $PDLA_D;
+	      $BITPIX = 8 * PDLA::Core::howbig($PDLA_IND) if($pdl->get_datatype==$PDLA_IND);
 	  }
+	  if ($BITPIX eq "") {
+	      $BITPIX = -64;
+	      warn "wfits: PDLA has an unsupported datatype -- defaulting to 64-bit float.\n";
+	  }
+
 	  my $convert = sub { return $_[0] }; # Default - do nothing
-	  $convert = sub {byte($_[0])}   if $BITPIX ==   8;
-	  $convert = sub {short($_[0])}  if $BITPIX ==  16;
-	  $convert = sub {long($_[0])}   if $BITPIX ==  32;
-	  $convert = sub {float($_[0])}  if $BITPIX == -32;
-	  $convert = sub {double($_[0])} if $BITPIX == -64;
+	  $convert = sub {byte($_[0])}     if $BITPIX ==   8;
+	  $convert = sub {short($_[0])}    if $BITPIX ==  16;
+	  $convert = sub {long($_[0])}     if $BITPIX ==  32;
+	  $convert = sub {longlong($_[0])} if $BITPIX == 64;
+	  $convert = sub {float($_[0])}    if $BITPIX == -32;
+	  $convert = sub {double($_[0])}   if $BITPIX == -64;
 	  
 	  # Automatically figure output scaling
 	  
@@ -1958,7 +1963,8 @@ sub PDLA::wfits {
 	      my ($dmin,$dmax) = (0, 2**8-1)     if $BITPIX == 8;
 	      ($dmin,$dmax) = (-2**15, 2**15-1)  if $BITPIX == 16;
 	      ($dmin,$dmax) = (-2**31, 2**31-1)  if $BITPIX == 32;
-	      
+	      ($dmin,$dmax) = (-(pdl(longlong,1)<<63), (pdl(longlong,1)<<63)-1) if $BITPIX==64;
+
 	      if ($min<$dmin || $max>$dmax) {
 		  $bzero = $min - $dmin;
 		  $max -= $bzero;
@@ -2060,8 +2066,8 @@ sub PDLA::wfits {
 	      $h->{BZERO}  = $bzero  if($bzero  != 0);
 	      
 	      if ( $pdl->badflag() ) {
-		  if ( $BITPIX > 0 ) { my $a = &$convert(pdl(0.0));
-				       $h->{BLANK} = $a->badvalue(); }
+		  if ( $BITPIX > 0 ) { my $x = &$convert(pdl(0.0));
+				       $h->{BLANK} = $x->badvalue(); }
 		  else               { delete $h->{BLANK}; }
 	      }
 	      
@@ -2174,7 +2180,7 @@ sub PDLA::wfits {
 	      #                    (make sure it's for the correct type)
 	      #   otherwise      - make sure the BLANK keyword is removed
 	      if ( $pdl->badflag() ) {
-		  if ( $BITPIX > 0 ) { my $a = &$convert(pdl(0.0)); $hdr{BLANK} = $a->badvalue(); }
+		  if ( $BITPIX > 0 ) { my $x = &$convert(pdl(0.0)); $hdr{BLANK} = $x->badvalue(); }
 		  else               { delete $hdr{BLANK}; }
 	      }
 	      
@@ -2200,7 +2206,7 @@ sub PDLA::wfits {
 	  if ( !isbigendian() ) { # Need to set a byte swap routine
 	      $bswap = \&bswap2 if $BITPIX==16;
 	      $bswap = \&bswap4 if $BITPIX==32 || $BITPIX==-32;
-	      $bswap = \&bswap8 if $BITPIX==-64;
+	      $bswap = \&bswap8 if $BITPIX==-64 || $BITPIX==64;
 	  }
 	  
 	  # Write FITS data
@@ -2442,7 +2448,7 @@ sub _prep_table {
 
   ### Allocate any table columns that are already in the header...
   local $_;
-  map { for my $a(1) { # [Shenanigans to make next work right]
+  map { for my $x(1) { # [Shenanigans to make next work right]
     next unless m/^TTYPE(\d*)$/;
 
     my $num = $1;
@@ -2696,12 +2702,12 @@ FOO
       my $row = "";
       for my $c(1..$cols) {
 	my $tmp;
-	my $a = $fieldvars[$c];
+	my $x = $fieldvars[$c];
        
 	if($internaltype[$c] eq 'P') {  # PDLA handling
 	  $tmp = $converters[$c]
-	    ? &{$converters[$c]}($a->slice("$r")->flat->sever, $r, $c) 
-	      : $a->slice("$r")->flat->sever ;
+	    ? &{$converters[$c]}($x->slice("$r")->flat->sever, $r, $c)
+	      : $x->slice("$r")->flat->sever ;
 
 	  ## This would go faster if moved outside the loop but I'm too
 	  ## lazy to do it Right just now.  Perhaps after it actually works.
@@ -2716,9 +2722,9 @@ FOO
 	  my $t = $tmp->get_dataref;  
 	  $tmp = $$t;
 	} else {                                  # Only other case is ASCII just now...
-	  $tmp = ( ref $a eq 'ARRAY' ) ?          # Switch on array or string
-	    ( $#$a == 0 ? $a->[0] : $a->[$r] )    # Thread arrays as needed
-	      : $a;
+	  $tmp = ( ref $x eq 'ARRAY' ) ?          # Switch on array or string
+	    ( $#$x == 0 ? $x->[0] : $x->[$r] )    # Thread arrays as needed
+	      : $x;
 	 
 	  $tmp .= " " x ($field_len[$c] - length($tmp));
 	}
@@ -2859,7 +2865,7 @@ sub _wfits_nullhdu ($) {
     _print_to_fits( $fh, $hdr, " " );
   } else {
     _print_to_fits( $fh, 
-		    q+SIMPLE  =                    T / Null HDU (no data, only extensions)            BITPIX  =                  -32 / Needed to make fverify happy                   NAXIS   =                    0                                                  EXTEND  =                    T / File contains extensions                       COMMENT   Written by perl (PDLA::IO::FITS::wfits) legacy code.                  COMMENT   For best results, install Astro::FITS::Header.                        HDUNAME = 'PRIMARY '                                                            END                                                                             +,
+		    q+SIMPLE  =                    T / Null HDU (no data, only extensions)            BITPIX  =                  -32 / Needed to make fverify happy                   NAXIS   =                    0                                                  EXTEND  =                    T / File contains extensions                       COMMENT  Written by perl (PDLA::IO::FITS::wfits) legacy code.                   COMMENT   For best results, install Astro::FITS::Header.                        HDUNAME = 'PRIMARY '                                                            END                                                                             +,
 		    " ");
   }
 }

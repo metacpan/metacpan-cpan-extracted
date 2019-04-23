@@ -1,7 +1,7 @@
 package App::INIUtils;
 
-our $VERSION = '0.032'; # VERSION
-our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.033'; # VERSION
+our $DATE = '2019-04-23'; # DATE
 
 use 5.010001;
 
@@ -116,17 +116,21 @@ sub _parse_str {
         return Config::IOD::INI::Reader->new->read_string($ini);
     } elsif ($parser eq 'Config::IniFiles') {
         require Config::IniFiles;
-        require File::Temp;
-        my ($tempfh, $tempnam) = File::Temp::tempfile();
-        print $tempfh $ini;
-        close $tempfh;
-        my $cfg = Config::IniFiles->new(-file => $tempnam);
+        my $cfg = Config::IniFiles->new(-file => \$ini);
         die join("\n", @Config::IniFiles::errors) unless $cfg;
-        unlink $tempnam;
         return $cfg;
     } else {
         die "Unknown parser '$parser'";
     }
+}
+
+sub _dump_str {
+    my ($ini, $parser) = @_;
+    my $res = _parse_str($ini, $parser);
+    if ($parser eq 'Config::IniFiles') {
+        $res = $res->{v};
+    }
+    $res;
 }
 
 1;
@@ -144,7 +148,7 @@ App::INIUtils - INI utilities
 
 =head1 VERSION
 
-This document describes version 0.032 of App::INIUtils (from Perl distribution App-INIUtils), released on 2019-01-17.
+This document describes version 0.033 of App::INIUtils (from Perl distribution App-INIUtils), released on 2019-04-23.
 
 =head1 SYNOPSIS
 

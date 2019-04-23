@@ -1,5 +1,15 @@
 Revision history for Perl extension Perlbal::Plugin::SessionAffinity
 
+0.110   22.04.19
+        * GH #1: Handle inexistent tunable keys in a locked hashed of a
+          service.  This was presented when using SessionAffinity with
+          Throttle.
+          (Thanks, Slaven Rezić!)
+        * GH #1: Handle tunable values for services that were stored as
+          arrayrefs by flattening them to comma-separated values.
+          (Slaven Rezić)
+        * Tests less verbose.
+
 0.101   14.10.16
         * Provide a META.json file.
 

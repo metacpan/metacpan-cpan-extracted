@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Phrasebook;
-{ $Net::CLI::Interact::Phrasebook::VERSION = '2.300002' }
+{ $Net::CLI::Interact::Phrasebook::VERSION = '2.300003' }
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(InstanceOf Str Any HashRef);
@@ -213,10 +213,13 @@ sub _find_phrasebooks {
     # then within each of @libs gather the files along that path
 
     my $target = $self->_find_personality_in( @libs, @alib );
-    my @files = $self->_gather_pb_from( $target, @libs, @alib );
+    die (sprintf "error: unknown personality: '%s'\n",
+            $self->personality) unless $target;
 
-    die (sprintf "Personality [%s] contains no phrasebook files!\n",
+    my @files = $self->_gather_pb_from( $target, @libs, @alib );
+    die (sprintf "error: personality '%s' contains no phrasebook files!\n",
             $self->personality) unless scalar @files;
+
     return @files;
 }
 

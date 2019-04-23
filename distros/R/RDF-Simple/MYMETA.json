@@ -55,7 +55,7 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.417",
+   "version" : "0.419",
    "x_module_name" : "RDF::Simple",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

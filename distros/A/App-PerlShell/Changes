@@ -1,5 +1,10 @@
 Revision history for Perl Shell.
 
+1.04  Thu May  3 14:05:00 2018
+    - AddOn => Plugin
+    - Fixed some POD mistakes and updated examples
+    - bin/plsh.pl SKIPVARS updated
+
 1.03  Thu Apr 26 14:05:00 2018
     - Added App::PerlShell::AddOn::Gnuplot from PPC::Plugin::Gnuplot
 

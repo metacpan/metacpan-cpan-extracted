@@ -6,7 +6,7 @@ use diagnostics;
 
 use vars qw($VERSION);
 
-$VERSION = do { my @r = (q$Revision: 0.01 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 0.02 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 sub DESTROY {};		# make modperl happy
 
@@ -404,6 +404,7 @@ sub _util {
     }
     $ps->{utilize}->{$pid} = $util;
   }
+  $ps;
 }
 
 =item * $ps = $ps->purgemissing($pid0,$pid1,...);

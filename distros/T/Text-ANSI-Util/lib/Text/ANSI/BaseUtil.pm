@@ -1,7 +1,7 @@
 package Text::ANSI::BaseUtil;
 
-our $DATE = '2016-03-11'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2019-04-22'; # DATE
+our $VERSION = '0.230'; # VERSION
 
 use 5.010001;
 use strict;
@@ -138,7 +138,7 @@ sub _ta_wrap {
 
             #use Data::Dump; say "D:s=",Data::Dump::dump(\@s);
 
-            my $only_code = 1 if !@s;
+            my $only_code; $only_code = 1 if !@s;
             while (1) {
                 my ($s, $s_type) = splice @s, 0, 2;
                 $s_type //= '';
@@ -269,9 +269,9 @@ sub _ta_wrap {
         my $tw = $opts->{tab_width} // 8;
         die "Please specify a positive tab width" unless $tw > 0;
         my $optfli  = $opts->{flindent};
-        my $optfliw = Text::WideChar::Util::_get_indent_width($is_mb, $optfli, $tw) if defined $optfli;
+        my $optfliw; $optfliw = Text::WideChar::Util::_get_indent_width($is_mb, $optfli, $tw) if defined $optfli;
         my $optsli  = $opts->{slindent};
-        my $optsliw = Text::WideChar::Util::_get_indent_width($is_mb, $optsli, $tw) if defined $optsli;
+        my $optsliw; $optsliw = Text::WideChar::Util::_get_indent_width($is_mb, $optsli, $tw) if defined $optsli;
         my $pad = $opts->{pad};
         my $x = 0;
         my $y = 0;
@@ -834,7 +834,7 @@ Text::ANSI::BaseUtil - Base for Text::ANSI::{Util,WideUtil}
 
 =head1 VERSION
 
-This document describes version 0.22 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2016-03-11.
+This document describes version 0.230 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2019-04-22.
 
 =for Pod::Coverage .*
 
@@ -860,7 +860,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

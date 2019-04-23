@@ -20,9 +20,10 @@ use Encode qw(encode_utf8 decode_utf8);
 use XML::Entities;
 use XML::Entities::Data;
 use Time::HiRes qw(gettimeofday sleep);
+use Lingua::Identify qw(langof);
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 =head1 NAME
 
@@ -413,15 +414,25 @@ sub _Unpacker {
   my $Zip = Archive::Zip->new();
 
   unless ($Zip->read($Source) == Archive::Zip::AZ_OK ) {
-    Error("Error reading file '".$Source."' as zip");
+    Error($X,"Error reading file '".$Source."' as zip");
 	}
 	
   my @FilesInZip = $Zip->members(); 
 
   Msg($X,"Unzip source file to directory: ".$TMPPath."\n");
   foreach (@FilesInZip) {
-    my $ExtFile = $TMPPath.'/'.$_->fileName;
-    Error($X,"can't unpuck ".$_->fileName." from ".$Source." archive") unless $Zip->extractMember($_, $ExtFile) == AZ_OK;
+    my $Fname = $_->fileName;
+    Error($X,"Error reading file '".$Source."' as zip. So file '".substr($Fname,-100,100)."' have strange structure. [may be exploit?]") if $Fname =~ m#\.\./# || $Fname =~ m#^\W*/#; 
+    my $ExtFile = $TMPPath.'/'.$Fname;
+
+    my $Code;
+    eval{$Code = $Zip->extractMember($_, $ExtFile);};
+    if ($@) {
+      my $Ext;
+      $Ext = "[dublicate names of dir and file?] " if $@ =~ /mkdir\s(.+?):/;
+      Error($X,"can't unpuck ".$Fname." from ".$Source." archive: $Ext".EncodeUtf8($X,$@));
+    }
+    $X->Error($X,"can't unpuck ".$Fname." from ".$Source." archive. Code #".$Code) unless $Code == AZ_OK;
   }
 
   return $TMPPath;
@@ -917,16 +928,16 @@ sub Msg {
 
   return if !$X->{'verbose'} && $Type ne 'e' && !$Force;
 
-  my $Color;
-  if ($Type eq 'w') {
-    $Color = "bold green";
-  } elsif ($Type eq 'e') {
-    $Color = "bold red";
-  }
+  #my $Color;
+  #if ($Type eq 'w') {
+  #  $Color = "bold green";
+  #} elsif ($Type eq 'e') {
+  #  $Color = "bold red";
+  #}
 
-  print color($Color) if $Color;
+  #print color($Color) if $Color;
   print $Str;
-  print color('reset') if $Color;
+  #print color('reset') if $Color;
 }
 
 sub Error {
@@ -1385,6 +1396,18 @@ sub isAllowedImageType {
   my $X = shift;
   my $ImgType = shift || return;
   return grep {lc($ImgType) eq $_} @AccessImgFormat;
+}
+
+sub GuessLang {
+  my $X = shift;
+  my $Text = shift;
+  return if length($Text) < 150;
+  $Text = substr($Text,0,2000);
+  my %LangsHashLocal = Lingua::Identify::langof($Text);
+  my @SortedProbability = sort {$b <=> $a} values(%LangsHashLocal);
+  foreach my $Lang (keys %LangsHashLocal) {
+    return lc($Lang) if $LangsHashLocal{$Lang} == $SortedProbability[0];
+  }
 }
 
 =head1 LICENSE AND COPYRIGHT

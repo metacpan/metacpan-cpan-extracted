@@ -25,8 +25,8 @@ if ( $HAVE_LP ) {
 if ( $HAVE_MR ) {
     pod_coverage_ok("App::PerlShell::ModRefresh");
 }
-pod_coverage_ok("App::PerlShell::AddOn::Gnuplot");
-pod_coverage_ok("App::PerlShell::AddOn::Macros");
-pod_coverage_ok("App::PerlShell::AddOn::ShellCommands");
-pod_coverage_ok("App::PerlShell::AddOn::TextCSV");
-pod_coverage_ok("App::PerlShell::AddOn::TextTable");
+pod_coverage_ok("App::PerlShell::Plugin::Gnuplot");
+pod_coverage_ok("App::PerlShell::Plugin::Macros");
+pod_coverage_ok("App::PerlShell::Plugin::ShellCommands");
+pod_coverage_ok("App::PerlShell::Plugin::TextCSV");
+pod_coverage_ok("App::PerlShell::Plugin::TextTable");

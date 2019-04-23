@@ -4,17 +4,17 @@ Makefile.PL
 add_doc.pl
 README.md
 Stats.pm
-Basic/stats_basic.pp
+Basic/stats_basic.pd
 Basic/Makefile.PL
-Distr/distr.pp
+Distr/distr.pd
 Distr/Makefile.PL
 Distr/t/stats_distr.t
-GLM/glm.pp
+GLM/glm.pd
 GLM/Makefile.PL
 GSL/gsl_cdf.pd
 GSL/Makefile.PL
 GSL/t/cdf.t
-Kmeans/kmeans.pp
+Kmeans/kmeans.pd
 Kmeans/Makefile.PL
 t/01-checkmanifest.t
 t/stats_basic.t
@@ -22,8 +22,14 @@ t/stats_glm.t
 t/stats_ols_rptd.t
 t/stats_kmeans.t
 t/stats_ts.t
-TS/ts.pp
+TS/ts.pd
 TS/Makefile.PL
 xt/00-check-changelog.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDLA/GSL/CDF.pm                mod=PDLA::GSL::CDF pd=GSL/gsl_cdf.pd (added by pdlpp_mkgen)
+GENERATED/PDLA/Stats/Basic.pm            mod=PDLA::Stats::Basic pd=Basic/stats_basic.pd (added by pdlpp_mkgen)
+GENERATED/PDLA/Stats/Distr.pm            mod=PDLA::Stats::Distr pd=Distr/distr.pd (added by pdlpp_mkgen)
+GENERATED/PDLA/Stats/GLM.pm              mod=PDLA::Stats::GLM pd=GLM/glm.pd (added by pdlpp_mkgen)
+GENERATED/PDLA/Stats/Kmeans.pm           mod=PDLA::Stats::Kmeans pd=Kmeans/kmeans.pd (added by pdlpp_mkgen)
+GENERATED/PDLA/Stats/TS.pm               mod=PDLA::Stats::TS pd=TS/ts.pd (added by pdlpp_mkgen)

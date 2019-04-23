@@ -53,22 +53,7 @@ my $pa = xvals $a0;
 
 note $pa;
 
-ok($pa->at(0,0) == 0);
-ok($pa->at(1,0) == 1);
-ok($pa->at(2,0) == 2);
-ok($pa->at(1,1) == 1);
-
-$pa = zeroes 5,10;
-
-my $pb = yvals $pa;
-
-my $c = $pb->copy();
-
-my $d = $pb-$c;
-
-note "$d,$pb,$c";
-
-# note $pa;
-
-note "OUTOUT\n";
-
+is($pa->at(0,0), 0, "xvals 0,0 == 0");
+is($pa->at(1,0), 1, "xvals 1,0 == 1");
+is($pa->at(2,0), 2, "xvals 2,0 == 2");
+is($pa->at(1,1), 1, "xvals 1,1 == 1");

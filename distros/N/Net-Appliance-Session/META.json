@@ -35,7 +35,7 @@
             "Moo" : "0",
             "Moo::Role" : "0",
             "MooX::Types::MooseLike::Base" : "0",
-            "Net::CLI::Interact" : "2.300002",
+            "Net::CLI::Interact" : "2.300003",
             "Sub::Quote" : "0",
             "Term::ANSIColor" : "0",
             "Term::ReadPassword" : "0",
@@ -55,23 +55,23 @@
    "provides" : {
       "Net::Appliance::Session" : {
          "file" : "lib/Net/Appliance/Session.pm",
-         "version" : "4.300001"
+         "version" : "4.300005"
       },
       "Net::Appliance::Session::Async" : {
          "file" : "lib/Net/Appliance/Session/Async.pm",
-         "version" : "4.300001"
+         "version" : "4.300005"
       },
       "Net::Appliance::Session::Engine" : {
          "file" : "lib/Net/Appliance/Session/Engine.pm",
-         "version" : "4.300001"
+         "version" : "4.300005"
       },
       "Net::Appliance::Session::Scripting" : {
          "file" : "lib/Net/Appliance/Session/Scripting.pm",
-         "version" : "4.300001"
+         "version" : "4.300005"
       },
       "Net::Appliance::Session::Transport" : {
          "file" : "lib/Net/Appliance/Session/Transport.pm",
-         "version" : "4.300001"
+         "version" : "4.300005"
       }
    },
    "release_status" : "stable",
@@ -86,6 +86,6 @@
          "url" : "https://github.com/ollyg/Net-Appliance-Session"
       }
    },
-   "version" : "4.300001",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "4.300005",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -3,7 +3,7 @@ package Database::Async::ORM::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Database::Async::ORM::Type;
 
@@ -17,6 +17,11 @@ sub defined_in { shift->{defined_in} }
 sub description { shift->{description} }
 sub tables { (shift->{tables} // [])->@* }
 sub types { (shift->{types} // [])->@* }
+
+sub table_by_name {
+    my ($self, $name) = @_;
+    (grep { $_->name eq $name } (shift->{tables} // [])->@*)[0]
+}
 
 sub add_table {
     my ($self, $table) = @_;

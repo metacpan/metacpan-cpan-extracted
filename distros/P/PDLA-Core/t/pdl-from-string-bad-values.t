@@ -17,7 +17,7 @@ use PDLA::LiteF;
 ## the string "[BAD]".
 ##
 ## <http://sourceforge.net/p/pdl/bugs/367/>
-## <https://github.com/PDLAPorters/pdl/issues/47>
+## <https://github.com/PDLPorters/pdl/issues/47>
 
 # input string -> expected string
 my $cases = {

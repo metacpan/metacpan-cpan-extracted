@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::DB::API;
-$Arango::DB::API::VERSION = '0.005';
+$Arango::DB::API::VERSION = '0.006';
 use Arango::DB::Database;
 use Arango::DB::Collection;
 
@@ -14,11 +14,17 @@ use URI::Encode qw(uri_encode);
 use JSON::Schema::Fit 0.02;
 
 my %API = (
-    'list_databases'  => {
-        method => 'get',
-        uri    => '_api/database',
-        params => { details => { type => 'boolean' }},
-    },
+    create_document   => { method => 'post',   uri => '{database}_api/document/{collection}' },
+    delete_collection => { method => 'delete', uri => '{database}_api/collection/{name}'     },
+    delete_database   => { method => 'delete', uri => '_api/database/{name}'                 },
+    list_collections  => { method => 'get',    uri => '{database}_api/collection'            },
+    cursor_next       => { method => 'put',    uri => '{database}_api/cursor/{id}'           },
+    cursor_delete     => { method => 'delete', uri => '{database}_api/cursor/{id}'           },
+    list_databases    => { method => 'get',    uri => '_api/database'                        },
+    status            => { method => 'get',    uri => '_admin/status'                        },
+    time              => { method => 'get',    uri => '_admin/time'                          },
+    statistics        => { method => 'get',    uri => '_admin/statistics'                    },
+    statistics_description  => { method => 'get', uri => '_admin/statistics-description'     },
     'create_database' => {
         method  => 'post',
         uri     => '_api/database',
@@ -28,11 +34,7 @@ my %API = (
             return Arango::DB::Database->_new(arango => $self, 'name' => $params{name});
         },
     },
-    'create_document' => {
-        method => 'post',
-        uri => '{database}_api/document/{collection}'
-    },
-    'create_collection' => {
+   'create_collection' => {
         method  => 'post',
         uri     => '{database}_api/collection',
         params  => { name => { type => 'string' }},
@@ -40,18 +42,6 @@ my %API = (
             my ($self, %params) = @_;
             return Arango::DB::Collection->_new(arango => $self, database => $params{database}, 'name' => $params{name});
         },
-    },
-    'delete_collection' => {
-        method => 'delete',
-        uri    => '{database}_api/collection/{name}'
-    },
-    'delete_database' => {
-        method => 'delete',
-        uri    => '_api/database/{name}'
-    },
-    'list_collections' => {
-        method => 'get',
-        uri    => '{database}_api/collection'
     },
     'all_keys' => {
         method => 'put',
@@ -62,10 +52,6 @@ my %API = (
         method => 'get',
         uri    => '_api/version',
         params => {  details => { type => 'boolean' } } ,
-    },
-    'cursor_next' => {
-        method => 'put',
-        uri    => '{database}_api/cursor/{id}',
     },
     'create_cursor' => {
         method => 'post',
@@ -84,18 +70,28 @@ my %API = (
                     maxTransactionSize          => { type => 'integer' },
                     stream                      => { type => 'boolean' },
                     skipInaccessibleCollections => { type => 'boolean' },
-                    maxWarningCount             => { type => 'integer' }, 
+                    maxWarningCount             => { type => 'integer' },
                     intermediateCommitCount     => { type => 'integer' },
                     satelliteSyncWait           => { type => 'integer' },
                     fullCount                   => { type => 'boolean' },
                     intermediateCommitSize      => { type => 'integer' },
-                    'optimizer.rules'           => { type => 'string' },
+                    'optimizer.rules'           => { type => 'string'  },
                     maxPlans                    => { type => 'integer' },
                  }
             },
         },
-    },
-    
+      },
+      delete_user => { method => 'delete', uri => '_api/user/{username}' },
+      create_user => {
+          method => 'post',
+          uri => '_api/user',
+          params => {
+              password => { type => 'string' },
+              active => { type => 'boolean' },
+              user => { type => 'string' },
+              extra => { type => 'object', additionalProperties => 1 },
+          }
+      },
 );
 
 
@@ -176,7 +172,7 @@ Arango::DB::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

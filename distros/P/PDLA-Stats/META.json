@@ -4,13 +4,13 @@
       "Maggie J. Xiong  <maggiexyz users.sourceforge.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0529, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDLA-Stats",
    "no_index" : {
@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDLA::Core" : "2.008",
-            "PDLA::Graphics::PGPLOT" : "0",
-            "PDLA::Slatec" : "0",
-            "PGPLOT" : "0"
+            "PDLA::Core" : "2.008"
          }
       },
       "configure" : {
@@ -34,19 +31,17 @@
          }
       },
       "runtime" : {
-         "requires" : {
-            "PDLA::Core" : "2.008",
+         "recommends" : {
             "PDLA::Graphics::PGPLOT" : "0",
-            "PDLA::Slatec" : "0",
-            "PGPLOT" : "0"
+            "PDLA::Slatec" : "0"
+         },
+         "requires" : {
+            "PDLA::Core" : "2.008"
          }
       },
       "test" : {
          "requires" : {
             "PDLA::Core" : "2.008",
-            "PDLA::Graphics::PGPLOT" : "0",
-            "PDLA::Slatec" : "0",
-            "PGPLOT" : "0",
             "Test::More" : "0"
          }
       }
@@ -59,6 +54,6 @@
          "web" : "https://github.com/PDLPorters/pdla-stats"
       }
    },
-   "version" : "0.72"
+   "version" : "0.76",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }
-

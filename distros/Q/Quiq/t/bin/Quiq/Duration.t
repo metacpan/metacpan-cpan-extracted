@@ -256,13 +256,13 @@ sub test_secondsToString_fixed : Test(3) {
     my $self = shift;
 
     my $str = Quiq::Duration->secondsToString(0,'m');
-    $self->is($str,'00m00s');
+    $self->is($str,'0s');
 
     $str = Quiq::Duration->secondsToString(127,'m');
-    $self->is($str,'02m07s');
+    $self->is($str,'2m07s');
 
     $str = Quiq::Duration->secondsToString(3727,'m');
-    $self->is($str,'01h02m07s');
+    $self->is($str,'1h02m07s');
 }
 
 # -----------------------------------------------------------------------------

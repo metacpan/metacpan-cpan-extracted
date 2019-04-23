@@ -5,9 +5,10 @@ use 5.010;
 use utf8;
 package App::AppSpec;
 use Term::ANSIColor;
+use YAML::PP;
 use File::Basename qw/ dirname /;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use base 'App::Spec::Run::Cmd';
 
@@ -40,8 +41,13 @@ sub generate_pod {
     my $parameters = $run->parameters;
 
     my $spec = $self->_read_spec($run);
-    my $pod = $spec->generate_pod(
+
+    require App::Spec::Pod;
+    my $generator = App::Spec::Pod->new(
+        spec => $spec,
     );
+    my $pod = $generator->generate;
+
     say $pod;
 }
 
@@ -49,14 +55,13 @@ sub cmd_validate {
     my ($self, $run) = @_;
     my $options = $run->options;
     my $parameters = $run->parameters;
-    my $color = $self->colorize;
 
     my @errors;
     require App::AppSpec::Schema::Validator;
     my $validator = App::AppSpec::Schema::Validator->new;
     my $spec_file = $parameters->{spec_file};
     if (ref $spec_file eq 'SCALAR') {
-        my $spec = YAML::XS::Load($$spec_file);
+        my $spec = YAML::PP::Load($$spec_file);
         @errors = $validator->validate_spec($spec);
     }
     else {
@@ -65,14 +70,10 @@ sub cmd_validate {
     binmode STDOUT, ":encoding(utf-8)";
     if (@errors) {
         print $validator->format_errors(\@errors);
-        $color and print color 'red';
-        say "Not valid!";
-        $color and print color 'reset';
+        say $run->colored(out => red => "Not valid!");
     }
     else {
-        $color and print color 'bold green';
-        say "Validated ✓";
-        $color and print color 'reset';
+        say $run->colored(out => [qw/ bold green /] => "Validated ✓");
     }
 }
 
@@ -109,10 +110,12 @@ class: $class
 title: 'app title'
 description: 'app description'
 options:
-- name: "some-option"
-  type: "flag"
-  summary: "option summary"
+- name: some-flag
+  type: flag
+  summary: option summary
+- spec: other-option=s --another option
 EOM
+    my $subname = $options->{"with-subcommands"} ? "mycommand" : "execute";
     my $module = <<"EOM";
 package $class;
 use strict;
@@ -120,7 +123,7 @@ use warnings;
 use feature qw/ say /;
 use base 'App::Spec::Run::Cmd';
 
-sub mycommand \{
+sub $subname \{
     my (\$self, \$run) = \@_;
     my \$options = \$run->options;
     my \$parameters = \$run->parameters;
@@ -166,7 +169,7 @@ EOM
     File::Path::make_path("$dist/bin");
     File::Path::make_path(dirname $module_path);
     my $specfile = "$dist/share/$name-spec.yaml";
-    say "Writig spec to $specfile";
+    say "Writing spec to $specfile";
     open my $fh, ">", $specfile or die $!;
     print $fh $spec;
     close $fh;
@@ -203,6 +206,11 @@ completion or pod from it.
 =item cmd_completion, cmd_new, cmd_validate, generate_pod
 
 =back
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself.
 
 =cut
 

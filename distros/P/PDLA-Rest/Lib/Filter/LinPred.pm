@@ -4,13 +4,13 @@ PDLA::Filter::LinPred - Linear predictive filtering
 
 =head1 SYNOPSIS
 
-	$a = new PDLA::Filter::LinPred(
+	$x = new PDLA::Filter::LinPred(
 		{NLags => 10,
 		 LagInterval => 2,
 		 LagsBehind => 2,
 		 Data => $dat});
 
-	($pd,$corrslic) = $a->predict($dat);
+	($pd,$corrslic) = $x->predict($dat);
 
 =head1 DESCRIPTION
 

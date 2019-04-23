@@ -42,23 +42,25 @@ use SNMP::Info::PowerEthernet;
 use SNMP::Info::IPv6;
 use SNMP::Info::AdslLine;
 use SNMP::Info::LLDP;
+use SNMP::Info::DocsisHE;
 
 @SNMP::Info::Layer3::ISA = qw/
     SNMP::Info::PowerEthernet SNMP::Info::IPv6
     SNMP::Info::Entity SNMP::Info::EtherLike
     SNMP::Info::Bridge SNMP::Info::AdslLine
-    SNMP::Info::LLDP
+    SNMP::Info::LLDP SNMP::Info::DocsisHE
     SNMP::Info Exporter/;
 @SNMP::Info::Layer3::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %GLOBALS %FUNCS %MIBS %MUNGE/;
+our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     %SNMP::Info::MIBS,
     %SNMP::Info::AdslLine::MIBS,
     %SNMP::Info::Bridge::MIBS,
+    %SNMP::Info::DocsisHE::MIBS,
     %SNMP::Info::EtherLike::MIBS,
     %SNMP::Info::Entity::MIBS,
     %SNMP::Info::PowerEthernet::MIBS,
@@ -76,6 +78,7 @@ $VERSION = '3.66';
     %SNMP::Info::GLOBALS,
     %SNMP::Info::AdslLine::GLOBALS,
     %SNMP::Info::Bridge::GLOBALS,
+    %SNMP::Info::DocsisHE::GLOBALS,
     %SNMP::Info::EtherLike::GLOBALS,
     %SNMP::Info::Entity::GLOBALS,
     %SNMP::Info::PowerEthernet::GLOBALS,
@@ -93,6 +96,7 @@ $VERSION = '3.66';
     %SNMP::Info::FUNCS,
     %SNMP::Info::AdslLine::FUNCS,
     %SNMP::Info::Bridge::FUNCS,
+    %SNMP::Info::DocsisHE::FUNCS,
     %SNMP::Info::EtherLike::FUNCS,
     %SNMP::Info::Entity::FUNCS,
     %SNMP::Info::PowerEthernet::FUNCS,
@@ -167,6 +171,7 @@ $VERSION = '3.66';
     %SNMP::Info::AdslLine::MUNGE,
     %SNMP::Info::Bridge::MUNGE,
     %SNMP::Info::EtherLike::MUNGE,
+    %SNMP::Info::DocsisHE::MUNGE,
     %SNMP::Info::Entity::MUNGE,
     %SNMP::Info::PowerEthernet::MUNGE,
     %SNMP::Info::IPv6::MUNGE,
@@ -325,15 +330,25 @@ sub interfaces {
 
     # Check for duplicates in ifDescr, if so uniquely identify by adding
     # ifIndex to repeated values
-    my %seen;
-    foreach my $iid ( keys %$i_descr ) {
+    my (%seen, %first_seen_as);
+    foreach my $iid ( sort keys %$i_descr ) {
         my $port = $i_descr->{$iid};
         next unless defined $port;
+
+        my $port = SNMP::Info::munge_null($port);
+        $port =~ s/^\s+//; $port =~ s/\s+$//;
+        next unless length $port;
+
         if ( $seen{$port}++ ) {
+            # (#320) also fixup the port this is a duplicate of
+            $interfaces->{ $first_seen_as{$port} }
+              = sprintf( "%s (%d)", $port, $first_seen_as{$port} );
+
             $interfaces->{$iid} = sprintf( "%s (%d)", $port, $iid );
         }
         else {
             $interfaces->{$iid} = $port;
+            $first_seen_as{$port} = $iid;
         }
     }
     return $interfaces;

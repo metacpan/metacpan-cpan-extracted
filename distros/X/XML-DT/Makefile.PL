@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 %req_modules = (
 		'ExtUtils::MakeMaker' => '6.17',
 		'Test::More'          => '0.40',
-		'LWP::Simple'         => '1.35',
+		'HTTP::Simple'         => '0',
 		'XML::DTDParser'      => '2.00',
                 'XML::LibXML'         => '1.54',
                 'parent'              => '0',

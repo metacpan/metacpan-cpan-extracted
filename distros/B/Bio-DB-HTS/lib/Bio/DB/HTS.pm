@@ -222,6 +222,7 @@ follows:
  * Bio::DB::HTS::Pileup    -- Methods for manipulating the pileup data structure.
  * Bio::DB::HTS::Fai       -- Methods for creating and reading from indexed Fasta
                               files.
+
 =head1 METHODS
 
 We cover the high-level API first. The high-level API code can be
@@ -867,9 +868,9 @@ methods:
 
  $pileup->is_refskip True if the base on the padded read is a gap relative to the reference (denoted as < or > in the pileup)
 
- $pileup->is_head Undocumented field in the bam.h header file.
+ $pileup->is_head True if this is the first base in the query sequence.
 
- $pileup->is_tail Undocumented field in the bam.h header file.
+ $pileup->is_tail True if this is the last base in the query sequence.
 
 See L</Examples> for a very simple SNP caller.
 
@@ -1264,10 +1265,11 @@ True if the base on the padded read is a gap relative to the reference (denoted 
 
 =item $flag = $pileup->is_head
 
-=item $flag = $pileup->is_del
+True if this is the first base in the query sequence.
 
-These fields are undocumented in the BAM documentation, but are
-exported to the Perl API just in case.
+=item $flag = $pileup->is_tail
+
+True if this is the last base in the query sequence.
 
 =back
 
@@ -1346,7 +1348,7 @@ L<http://search.cpan.org/dist/Bio-DB-HTS/>
 =cut
 
 package Bio::DB::HTS;
-$Bio::DB::HTS::VERSION = '2.11';
+$Bio::DB::HTS::VERSION = '3.01';
 
 use strict;
 use warnings;
@@ -2139,7 +2141,7 @@ sub _glob_match {
 
 package Bio::DB::HTS::Fai;
 
-$Bio::DB::HTS::Fai::VERSION = '2.11';
+$Bio::DB::HTS::Fai::VERSION = '3.01';
 
 sub open { shift->load(@_) }
 
@@ -2156,7 +2158,7 @@ package Bio::SeqFeature::HTSCoverage;
 
 use base 'Bio::SeqFeature::Lite';
 
-$Bio::SeqFeature::HTSCoverage::VERSION = '2.11';
+$Bio::SeqFeature::HTSCoverage::VERSION = '3.01';
 
 sub coverage {
     my $self = shift;
@@ -2188,7 +2190,7 @@ sub gff3_string {
 
 package Bio::DB::HTSfile;
 
-$Bio::DB::HTS::HTSfile::VERSION = '2.11';
+$Bio::DB::HTS::HTSfile::VERSION = '3.01';
 
 use File::Spec;
 use Cwd;

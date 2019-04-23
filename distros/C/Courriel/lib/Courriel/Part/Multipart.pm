@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Courriel::HeaderAttribute;
 use Courriel::Helpers qw( unique_boundary );
@@ -49,7 +49,7 @@ sub BUILD {
     ## no critic (Subroutines::ProtectPrivateSubs)
     $self->content_type->_set_attribute(
         boundary => Courriel::HeaderAttribute->new(
-            name => ( $existing ? $existing->name : 'boundary' ),
+            name  => ( $existing ? $existing->name : 'boundary' ),
             value => $boundary,
         )
     );
@@ -122,7 +122,7 @@ Courriel::Part::Multipart - A part which contains other parts
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

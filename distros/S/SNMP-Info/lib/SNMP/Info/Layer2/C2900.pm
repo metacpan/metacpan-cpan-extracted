@@ -39,9 +39,9 @@ use SNMP::Info::Layer2::Cisco;
 @SNMP::Info::Layer2::C2900::ISA = qw/SNMP::Info::Layer2::Cisco Exporter/;
 @SNMP::Info::Layer2::C2900::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
+our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %GLOBALS = (
     %SNMP::Info::Layer2::Cisco::GLOBALS,

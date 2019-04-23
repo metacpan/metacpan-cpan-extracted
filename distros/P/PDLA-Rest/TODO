@@ -45,7 +45,7 @@ the work planned for the future  PDLA-2.x releases.
      - activestate perl
      - strawberry perl
    * Mac OS X
-   
+
 
    Verify dependency detection across all major PDLA platforms
    * Unix/Linux/BSD, Windows(ASPerl/Strawberry)/Cygwin, Mac OS X

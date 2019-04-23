@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::DT.
 
+0.69  Apr 22, 2019
+       - Switch from LWP to HTTP::Tiny
+    
 0.68  Sep 29, 2015
        - Minor fix in MANIFEST to make Kwalittee happy.
 

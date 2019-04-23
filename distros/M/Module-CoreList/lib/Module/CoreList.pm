@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20190320';
+our $VERSION = '5.20190420';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -346,6 +346,8 @@ sub changes_between {
     5.029007 => '2019-01-20',
     5.029008 => '2019-02-20',
     5.029009 => '2019-03-20',
+    5.028002 => '2019-04-19',
+    5.029010 => '2019-04-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -15433,7 +15435,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Module::CoreList'      => '5.20180420',
             'Module::CoreList::Utils'=> '5.20180420',
             'POSIX'                 => '1.84',
-            'Time::HiRes'           => '1.9760',
+            'Time::HiRes'           => '1.9759',
             'XS::APItest'           => '0.97',
             'bytes'                 => '1.06',
             'subs'                  => '1.03',
@@ -16205,6 +16207,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Encode'                => '3.01',
             'ExtUtils::Manifest'    => '1.72',
             'JSON::PP'              => '4.02',
+            'JSON::PP::Boolean'     => '4.02',
             'Module::CoreList'      => '5.20190320',
             'Module::CoreList::Utils'=> '5.20190320',
             'PerlIO::encoding'      => '0.27',
@@ -16212,6 +16215,61 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'threads::shared'       => '1.60',
             'utf8'                  => '1.22',
             'warnings'              => '1.44',
+        },
+        removed => {
+        }
+    },
+    5.028002 => {
+        delta_from => 5.028001,
+        changed => {
+            'B::Op_private'         => '5.028002',
+            'Config'                => '5.028002',
+            'Module::CoreList'      => '5.20190419',
+            'Module::CoreList::Utils'=> '5.20190419',
+            'PerlIO::scalar'        => '0.30',
+            'Storable'              => '3.08_01',
+        },
+        removed => {
+        }
+    },
+    5.029010 => {
+        delta_from => 5.029009,
+        changed => {
+            'B::Op_private'         => '5.029010',
+            'Config'                => '5.02901',
+            'Cwd'                   => '3.78',
+            'Data::Dumper'          => '2.174',
+            'ExtUtils::CBuilder'    => '0.280231',
+            'ExtUtils::CBuilder::Base'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Unix'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::VMS'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows::BCC'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows::GCC'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows::MSVC'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::aix'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::android'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::cygwin'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::darwin'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::dec_osf'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::os2'=> '0.280231',
+            'File::Spec'            => '3.78',
+            'File::Spec::AmigaOS'   => '3.78',
+            'File::Spec::Cygwin'    => '3.78',
+            'File::Spec::Epoc'      => '3.78',
+            'File::Spec::Functions' => '3.78',
+            'File::Spec::Mac'       => '3.78',
+            'File::Spec::OS2'       => '3.78',
+            'File::Spec::Unix'      => '3.78',
+            'File::Spec::VMS'       => '3.78',
+            'File::Spec::Win32'     => '3.78',
+            'I18N::Langinfo'        => '0.18',
+            'Module::CoreList'      => '5.20190420',
+            'Module::CoreList::Utils'=> '5.20190420',
+            'Module::Metadata'      => '1.000036',
+            'POSIX'                 => '1.88',
+            'Storable'              => '3.15',
+            'Unicode'               => '12.1.0',
         },
         removed => {
         }
@@ -17197,6 +17255,20 @@ sub is_core
         removed => {
         }
     },
+    5.028002 => {
+        delta_from => 5.028001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029010 => {
+        delta_from => 5.029009,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -17684,11 +17756,11 @@ sub is_core
     'CPAN::Tarzip'          => undef,
     'CPAN::URL'             => undef,
     'CPAN::Version'         => undef,
-    'Compress::Raw::Bzip2'  => undef,
-    'Compress::Raw::Zlib'   => undef,
-    'Compress::Zlib'        => undef,
+    'Compress::Raw::Bzip2'  => 'https://github.com/pmqs/Compress-Raw-Bzip2/issues',
+    'Compress::Raw::Zlib'   => 'https://github.com/pmqs/Compress-Raw-Zlib/issues',
+    'Compress::Zlib'        => 'https://github.com/pmqs/IO-Compress/issues',
     'Config::Perl::V'       => undef,
-    'DB_File'               => undef,
+    'DB_File'               => 'https://github.com/pmqs/DB_File/issues',
     'Digest'                => undef,
     'Digest::MD5'           => undef,
     'Digest::SHA'           => undef,
@@ -17759,38 +17831,38 @@ sub is_core
     'ExtUtils::testlib'     => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
     'Fatal'                 => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=autodie',
     'File::Fetch'           => undef,
-    'File::GlobMapper'      => undef,
+    'File::GlobMapper'      => 'https://github.com/pmqs/IO-Compress/issues',
     'File::Path'            => undef,
     'File::Temp'            => 'https://rt.cpan.org/Public/Dist/Display.html?Name=File-Temp',
     'Filter::Util::Call'    => undef,
     'Getopt::Long'          => undef,
     'HTTP::Tiny'            => 'https://github.com/chansen/p5-http-tiny/issues',
-    'IO::Compress::Adapter::Bzip2'=> undef,
-    'IO::Compress::Adapter::Deflate'=> undef,
-    'IO::Compress::Adapter::Identity'=> undef,
-    'IO::Compress::Base'    => undef,
-    'IO::Compress::Base::Common'=> undef,
-    'IO::Compress::Bzip2'   => undef,
-    'IO::Compress::Deflate' => undef,
-    'IO::Compress::Gzip'    => undef,
-    'IO::Compress::Gzip::Constants'=> undef,
-    'IO::Compress::RawDeflate'=> undef,
-    'IO::Compress::Zip'     => undef,
-    'IO::Compress::Zip::Constants'=> undef,
-    'IO::Compress::Zlib::Constants'=> undef,
-    'IO::Compress::Zlib::Extra'=> undef,
+    'IO::Compress::Adapter::Bzip2'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Adapter::Deflate'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Adapter::Identity'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Base'    => 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Base::Common'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Bzip2'   => 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Deflate' => 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Gzip'    => 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Gzip::Constants'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::RawDeflate'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Zip'     => 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Zip::Constants'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Zlib::Constants'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Compress::Zlib::Extra'=> 'https://github.com/pmqs/IO-Compress/issues',
     'IO::Socket::IP'        => undef,
-    'IO::Uncompress::Adapter::Bunzip2'=> undef,
-    'IO::Uncompress::Adapter::Identity'=> undef,
-    'IO::Uncompress::Adapter::Inflate'=> undef,
-    'IO::Uncompress::AnyInflate'=> undef,
-    'IO::Uncompress::AnyUncompress'=> undef,
-    'IO::Uncompress::Base'  => undef,
-    'IO::Uncompress::Bunzip2'=> undef,
-    'IO::Uncompress::Gunzip'=> undef,
-    'IO::Uncompress::Inflate'=> undef,
-    'IO::Uncompress::RawInflate'=> undef,
-    'IO::Uncompress::Unzip' => undef,
+    'IO::Uncompress::Adapter::Bunzip2'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Adapter::Identity'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Adapter::Inflate'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::AnyInflate'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::AnyUncompress'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Base'  => 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Bunzip2'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Gunzip'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Inflate'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::RawInflate'=> 'https://github.com/pmqs/IO-Compress/issues',
+    'IO::Uncompress::Unzip' => 'https://github.com/pmqs/IO-Compress/issues',
     'IO::Zlib'              => undef,
     'IPC::Cmd'              => undef,
     'IPC::Msg'              => undef,

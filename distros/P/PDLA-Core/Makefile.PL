@@ -1,11 +1,7 @@
 use strict;
 use warnings;
 
-# using absolute path to make it valid also for Makefile.PL files in subdirectories
-use Cwd;
-use lib Cwd::abs_path('inc');
-
-use Devel::CheckLib;
+eval { require Devel::CheckLib; Devel::CheckLib->import; };
 use 5.010_000;
 use ExtUtils::MakeMaker 6.56;  # for CONFIGURE_REQUIRES support
 use Config;
@@ -191,9 +187,9 @@ EOD
   # option).
   #
   my $flag_bad     = $PDLA_CONFIG{WITH_BADVAL} || 0;
-  my $flag_per_pdl = $PDLA_CONFIG{BADVAL_PER_PDLA} || 0;
   my $flag_use_nan = $PDLA_CONFIG{BADVAL_USENAN} || 0;
-  if ( $flag_bad and $flag_per_pdl and $flag_use_nan ) {
+  my $flag_per_pdl = $PDLA_CONFIG{BADVAL_PER_PDLA} || 0;
+  if ( $flag_bad and $flag_use_nan and $flag_per_pdl ) {
       print "WARNING: Setting BADVAL_USENAN=0 as BADVAL_PER_PDLA option is set!\n\n";
       $PDLA_CONFIG{BADVAL_USENAN} = 0;
   }
@@ -232,7 +228,7 @@ our \$VERSION='$PDLA::VERSION';
 \$VERSION = eval \$VERSION;
 1;
 EOVF
-  $fh->close();
+  close $fh;
 }
 
 sub make_Types_pm {
@@ -396,6 +392,8 @@ if($Config{archname}=~m/x86_64/) {
 # create GENERATED subdir with *.pm files during 'make dist' (to make metacpan.org happy)
 my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDLA::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
 
+my @optimize = (OPTIMIZE => $PDLA::Config{OPTIMIZE}) if $PDLA::Config{OPTIMIZE};
+
 my %makefile_hash = (
 	      'PREREQ_PM' => { @prereq },
               'LICENSE' => 'perl',
@@ -404,6 +402,7 @@ my %makefile_hash = (
                 'Carp'            => 1.20,    # EU::MM seems to need this not to crash
                 'ExtUtils::MakeMaker' => 6.56,
                 'File::Path'          => 0,
+                'ExtUtils::ParseXS'   => 3.01, # avoids 2.21, known broken
               },
               TEST_REQUIRES => {
                 'CPAN::Meta' => '2.120900',
@@ -414,7 +413,6 @@ my %makefile_hash = (
               },
               BUILD_REQUIRES => {
                 'ExtUtils::MakeMaker' => 0,
-                'ExtUtils::ParseXS'   => 3.01, # avoids 2.21, known broken
                 'File::Path'          => 0,
               },
               'MIN_PERL_VERSION' => '5.010',
@@ -443,7 +441,7 @@ my %makefile_hash = (
                   },
                 },
               },
-	      'OPTIMIZE'  => $PDLA::Config{OPTIMIZE} || $Config{optimize},
+	      @optimize,
 	      'CCFLAGS' => $ccflags,
 	      'dist'     => { COMPRESS => 'gzip',
                               SUFFIX   => 'gz',
@@ -452,7 +450,7 @@ my %makefile_hash = (
 		'FILES' => join ' ', @cleanup, qw(
                   tbyte.tif tmp0 tmp0.hdr tushort.tif
                   MANIFEST.bak tmp1* tmpraw* t/tmpraw* t/tmp1*
-                  _Inline/ .inlinepdlpp/ .inlinewith/ *.xfig
+                  _Inline/ .inlinepdlpp/ .inline-ct/ .inlinewith/ *.xfig
                 ),
               },
 	      'realclean' => {'FILES' => 'Basic/Core/Config.pm'},
@@ -509,21 +507,21 @@ doctest ::
 
 doc_site_install ::
 	$(NOECHO) $(ECHO) "doc_site_install: Building PDLA documentation database ..."
-	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(INSTALLSITEARCH)"
+	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLSITEARCH)"
 %HTML%	$(NOECHO) $(ECHO) "doc_site_install: Building PDLA documentation web pages ..."
-%HTML%	$(NOECHO) $(PERL) Doc$(DFSEP)mkhtmldoc.pl "$(INSTALLSITEARCH)$(DFSEP)PDLA"
+%HTML%	$(NOECHO) $(PERL) Doc$(DFSEP)mkhtmldoc.pl "$(DESTDIR)$(INSTALLSITEARCH)$(DFSEP)PDLA"
 
 doc_vendor_install ::
 	$(NOECHO) $(ECHO) "doc_vendor_install: Building PDLA documentation database ..."
-	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(INSTALLVENDORARCH)"
+	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLVENDORARCH)"
 %HTML%	$(NOECHO) $(ECHO) "doc_vendor_install: Building PDLA documentation web pages ..."
-%HTML%	$(NOECHO) $(PERL) Doc$(DFSEP)mkhtmldoc.pl "$(INSTALLVENDORARCH)$(DFSEP)PDLA"
+%HTML%	$(NOECHO) $(PERL) Doc$(DFSEP)mkhtmldoc.pl "$(DESTDIR)$(INSTALLVENDORARCH)$(DFSEP)PDLA"
 
 doc_perl_install ::
 	$(NOECHO) $(ECHO) "doc_perl_install: Building PDLA documentation database ..."
-	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(INSTALLARCHLIB)"
+	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLARCHLIB)"
 %HTML%	$(NOECHO) $(ECHO) "doc_perl_install: Building PDLA documentation web pages ..."
-%HTML%	$(NOECHO) $(PERL) Doc$(DFSEP)mkhtmldoc.pl "$(INSTALLARCHLIB)$(DFSEP)PDLA"
+%HTML%	$(NOECHO) $(PERL) Doc$(DFSEP)mkhtmldoc.pl "$(DESTDIR)$(INSTALLARCHLIB)$(DFSEP)PDLA"
 ';
 
   if(defined $PDLA::Config{HTML_DOCS} && !$PDLA::Config{HTML_DOCS}){
@@ -536,7 +534,7 @@ doc_perl_install ::
 # support the `$<` variable in explicit rules
 $text .= <<EOT if $^O !~ /MSWin/;
 pdla$Config::Config{exe_ext} : pdla.c
-	\$(CC) pdla.c -o \$\@
+	\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(CPPFLAGS) pdla.c -o \$\@
 EOT
 
 $text .= << 'EOT' if $^O =~ /MSWin/;

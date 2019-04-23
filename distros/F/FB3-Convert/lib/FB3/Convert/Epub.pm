@@ -259,7 +259,7 @@ sub Reaper {
     processor_params => ['underline']
   };
   $AllowElements->{'div'} = {
-    'exclude_if_inside' => ['div','p','ul','ol','h1','h2','h3','h4','h5','h6','li','pre','table'], #Если div содежрит block-level элементы, мы его чикаем 
+    'exclude_if_inside' => ['div','p','ul','ol','h1','h2','h3','h4','h5','h6','li','pre','table','section'], #Если div содежрит block-level элементы, мы его чикаем 
     'allow_attributes' => [],
     processor => \&TransformTo,
     processor_params => ['p'],
@@ -448,7 +448,13 @@ sub Reaper {
 
   unless (defined $Description->{'DOCUMENT-INFO'}->{'LANGUAGE'}) {
     my $Lang = $XC->findnodes('/root:package/root:metadata/dc:language',$RootDoc)->[0];
-    $Description->{'DOCUMENT-INFO'}->{'LANGUAGE'} =  $self->html_trim($Lang->to_literal) if $Lang;
+    $Description->{'DOCUMENT-INFO'}->{'LANGUAGE'} = $self->html_trim($Lang->to_literal) if $Lang;
+
+    unless ($Description->{'DOCUMENT-INFO'}->{'LANGUAGE'}) {
+      my $TextForIdent = FetchText4Ident($AC,500);
+      $Description->{'DOCUMENT-INFO'}->{'LANGUAGE'} = $X->GuessLang($TextForIdent);
+      $Description->{'DOCUMENT-INFO'}->{'LANGUAGE'} ||= 'en';
+    }
   }
 
   unless (defined $Description->{'TITLE-INFO'}->{'BOOK-TITLE'}) {
@@ -775,6 +781,30 @@ sub Reaper {
     value => \@Body
   };
 
+}
+
+sub FetchText4Ident {
+  my $Data = shift;
+  my $MinLen = shift || 200;
+  my $Text;
+
+  foreach (@$Data) {
+    my $Content = $_->{'content'};
+    $Content =~ s/<.*>//g;
+    $Content =~ s/[\n\r]/ /g;
+    $Content =~ s/^\s*//;
+    $Content =~ s/\s*$//;
+    $Content =~ s/\s+/ /g;
+    $Content =~ s/[\{\}\\\(\)\/0-9\[\]]+//g;
+    $Content =~ s/\s+\././g;
+    $Content =~ s/,\./,/g;
+    $Content =~ s/\.+/./g;
+
+    $Text .= (length($Text)?' ':'').$Content;
+    return $Text if length($Text) >= $MinLen;
+  }
+
+  return $Text;
 }
 
 sub CleanEmptyP {
@@ -1196,6 +1226,7 @@ sub CleanTitle {
 sub CleanNodeEmptyId {
   my $X = shift;
   my $Node = shift;
+  my $IdsCollect = shift || {};
 
   return $Node unless ref $Node eq 'ARRAY';
 
@@ -1206,16 +1237,20 @@ sub CleanNodeEmptyId {
     next unless ref $Item eq 'HASH';
     foreach my $El (keys %$Item) {
       next if ref $Item->{$El} ne 'HASH' || !exists $Item->{$El}->{'value'};
-      $Item->{$El}->{'value'} = CleanNodeEmptyId($X,$Item->{$El}->{'value'});
+      $Item->{$El}->{'value'} = CleanNodeEmptyId($X,$Item->{$El}->{'value'},$IdsCollect);
       if (exists $Item->{$El}->{'attributes'}->{'id'} || $El =~ /^(a|span)$/) {
         my $Id = exists $Item->{$El}->{'attributes'}->{'id'} ? $Item->{$El}->{'attributes'}->{'id'} : '';
-        if (!exists $X->{'href_list'}->{"#".$Id} || !$Id) { #элементы с несуществующими id
-          
+
+        if (!$Id || !exists $X->{'href_list'}->{"#".$Id} || exists $IdsCollect->{$Id}) { #элементы с несуществующими id
           my $Link;
-          $Link = $X->trim($Item->{$El}->{'attributes'}->{'xlink:href'})if exists $Item->{$El}->{'attributes'}->{'xlink:href'};
+          $Link = $X->trim($Item->{$El}->{'attributes'}->{'xlink:href'}) if exists $Item->{$El}->{'attributes'}->{'xlink:href'};
           
           if ($Id) {
-            $X->Msg("Find non exists ID and delete '$Id' in node '$El' [".$X->{'id_list'}->{$Id}."]\n","w");
+            if (exists $IdsCollect->{$Id}) {
+              $X->Msg("Find double ID and delete '$Id' in node '$El'\n","w");
+            } else {
+              $X->Msg("Find non exists ID and delete '$Id' in node '$El' [".$X->{'id_list'}->{$Id}."]\n","w");
+            }
             delete $Item->{$El}->{'attributes'}->{'id'}; #удалим id
           } elsif ($Link eq '') {
             $X->Msg("Find node '$El' without id\n","w");
@@ -1236,6 +1271,7 @@ sub CleanNodeEmptyId {
           push @$Ret, @{$Item->{$El}->{'value'}} if scalar @{$Item->{$El}->{'value'}}; #переносим на место ноды ее внутренности
           $X->Msg("Delete node '$El'\n");
         }
+        $IdsCollect->{$Id}++;
       }
     }
   }

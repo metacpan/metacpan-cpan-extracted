@@ -10,33 +10,35 @@ use warnings;
 
 use PDLA::LiteF;
 use PDLA::Types;
+use PDLA::Constants qw(PI);
+use strict;
+use warnings;
 
 my $pa = pdl 42.4;
 note "A is $pa";
 
-is($pa->get_datatype,$PDLA_D);
+is($pa->get_datatype,$PDLA_D, "A is double");
 
 my $pb = byte $pa;
 note "B (byte $pa) is $pb";
 
-is($pb->get_datatype,$PDLA_B);
-is($pb->at(),42);
+is($pb->get_datatype,$PDLA_B, "B is byte");
+is($pb->at(),42, 'byte value is 42');
 
 my $pc = $pb * 3;
-is($pc->get_datatype, $PDLA_B); # $pc is the same
+is($pc->get_datatype, $PDLA_B, "C also byte");
 note "C ($pb * 3) is $pc";
 
 my $pd = $pb * 600.0;
-is($pd->get_datatype, $PDLA_F); # $pd is promoted to float
+is($pd->get_datatype, $PDLA_F, "D promoted to float");
 note "D ($pb * 600) is $pd";
 
 my $pi = 4*atan2(1,1);
 
 my $pe = $pb * $pi;
-is($pe->get_datatype, $PDLA_D); # $pe needs to be double to represent result
-note "E ($pb * $pi) is $pe";
+is($pe->get_datatype, $PDLA_D, "E promoted to double (needed to represent result)");
+note "E ($pb * PI) is $pe";
 
 my $pf = $pb * "-2.2";
-is($pf->get_datatype, $PDLA_D); # $pe check strings are handled ok
+is($pf->get_datatype, $PDLA_D, "F check string handling");
 note "F ($pb * string(-2.2)) is $pf";
-

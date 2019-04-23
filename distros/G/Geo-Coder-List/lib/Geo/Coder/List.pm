@@ -1,5 +1,7 @@
 package Geo::Coder::List;
 
+use 5.10.1;
+
 use warnings;
 use strict;
 use Carp;
@@ -16,11 +18,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS

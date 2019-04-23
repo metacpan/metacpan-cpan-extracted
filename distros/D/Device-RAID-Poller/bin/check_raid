@@ -1,0 +1,246 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+check_raid - Runs various RAID checks for polling purposes.
+
+=head1 SYNOPSIS
+
+check_raid B<-n>
+
+check_raid [B<-p>]
+
+=head1 FLAGS
+
+=head2 -n
+
+This flag puts it into check mode for use with Nagios/Icinga/etc.
+
+=head2 -p
+
+In the default mode, JSON is printed to STD OUT. This is prints it in a pretty manner.
+
+=head1 NRPE
+
+In nrpe.conf the foolowing is required.
+
+    command[check_raid]=/usr/local/bin/sudo /usr/local/bin/check_raid -n
+
+In sudoers the following is required.
+
+    nagios ALL = NOPASSWD: /usr/local/bin/check_raid
+
+=head1 Icinga2
+
+Below is a example of a check command config for Icinga2.
+
+    object CheckCommand "rcheck_raid" {
+        import "nrpe"
+        vars.nrpe_command = "rcheck_raid"
+    }
+
+=head2 SNMPD
+
+To add this to the net-snmp snmpd server, you just need to add it like below.
+
+    extend check_raid /usr/local/bin/sudo /usr/local/bin/check_raid -p
+
+The -p flag is not needed, only if you want to make debugging the output easy for
+debugging when polling from like LibreNMS or the like.
+
+=cut
+
+#Copyright (c) 2019, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Device::RAID::Poller;
+use JSON;
+
+sub version{
+	print "check_raid v. 0.0.0\n";
+}
+
+sub help{
+	&version;
+
+	print '
+
+-n   Run as a nagios/ichinga check instead of outputing JSON.
+-p   Print the JSON in a pretty format.
+';
+
+}
+
+# command line option holders
+my $help=0;
+my $version=0;
+my $nagios=0;
+my $pretty=0;
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   'version' => \$version,
+		   'v' => \$version,
+		   'help' => \$help,
+		   'h' => \$help,
+		   'n' => \$nagios,
+		   'p' => \$pretty,
+		   );
+
+# print version or help if requested
+if ( $help ){
+	&help;
+	exit 42;
+}
+if ( $version ){
+	&version;
+	exit 42;
+}
+
+my $drp=Device::RAID::Poller->new;
+my $load=$drp->load;
+if ( ! $load ){
+	warn('No backends consider themselves usable');
+	exit 255;
+}
+
+my %status=$drp->run;
+
+# put together stat information
+my %array_stats=(
+				 arrays=>0,
+				 good_arrays=>0,
+				 bad_arrays=>0,
+				 rebuilding_arrays=>0,
+				 unknown_arrays=>0,
+				 good_drives=>0,
+				 bad_drives=>0,
+				 spare_drives=>0,
+				 bbu_failed=>0,
+				 bbu_good=>0,
+				 bbu_charging=>0,
+				 bbu_notPresent=>0,
+				 bbu_unknown=>0,
+				 bbu_na=>0,
+				 );
+my @devs=keys(%status);
+foreach my $dev (@devs){
+	$array_stats{arrays}++;
+
+	if ( $status{$dev}{status} eq 'good' ){
+		$array_stats{good_arrays}++;
+	}elsif( $status{$dev}{status} eq 'bad' ){
+		$array_stats{bad_arrays}++;
+	}elsif( $status{$dev}{status} eq 'rebuilding' ){
+		$array_stats{rebuilding_arrays}++;
+	}elsif( $status{$dev}{status} eq 'unknown' ){
+		$array_stats{unknown_arrays}++;
+	}
+
+	if ( $status{$dev}{BBUstatus} eq 'good' ){
+		$array_stats{bbu_good}++;
+	}elsif( $status{$dev}{BBUstatus} eq 'bad' ){
+		$array_stats{bbu_bad}++;
+	}elsif( $status{$dev}{BBUstatus} eq 'charging' ){
+		$array_stats{bbu_charging}++;
+	}elsif( $status{$dev}{BBUstatus} eq 'notPresent' ){
+		$array_stats{bbu_notPresent}++;
+	}elsif( $status{$dev}{BBUstatus} eq 'unknown' ){
+		$array_stats{bbu_unknown}++;
+	}elsif( $status{$dev}{BBUstatus} eq 'na' ){
+		$array_stats{bbu_na}++;
+	}
+
+	if (defined($status{$dev}{good}[0] ) ){
+		$array_stats{good_drives}=$array_stats{good_drives}+$#{ $status{$dev}{good} }+1;
+	}
+	if (defined($status{$dev}{bad}[0] ) ){
+		$array_stats{bad_drives}=$array_stats{bad_drives}+$#{ $status{$dev}{bad} };
+	}
+	if (defined($status{$dev}{spare}[0] ) ){
+		$array_stats{spare_drives}=$array_stats{spare_drives}+$#{ $status{$dev}{spare} };
+	}
+}
+
+# process it like it is a nagios/ichinga check instead of as a SNMP extend
+if ( $nagios ){
+	my @devs=keys(%status);
+
+	# 0, OK
+	# 1, WARNING
+	# 2, CRITICAL
+	# 3, UNKNOWN
+	my $check_status=0;
+
+	# If anything other than good arrays are found, set the check status in order of severity.
+	if ( $array_stats{unknown_arrays} > 0 ){
+		$check_status=3;
+		print "UNKNOWN: ".$array_stats{unknown_arrays}." arrays with a unknown status found | ";
+	}elsif ( $array_stats{rebuilding_arrays} > 0 ){
+		$check_status=1;
+		print "WARNING: ".$array_stats{rebuilding_arrays}." arrays with a rebuilding status found | ";
+	}elsif ( $array_stats{bad_arrays} > 0 ){
+		$check_status=3;
+		print "CRITICAL: ".$array_stats{bad_arrays}." arrays with a bad status found | ";
+	}else{
+		print "OK: all found arrays are good | ";
+	}
+
+	print 'arrays='.$array_stats{arrays}.' '.
+	'good_arrays='.$array_stats{good_arrays}.', '.
+	'bad_arrays='.$array_stats{bad_arrays}.', '.
+	'rebuilding_arrays='.$array_stats{rebuilding_arrays}.', '.
+	'unknown_arrays='.$array_stats{unknown_arrays}.', '.
+	'good_drives='.$array_stats{good_drives}.', '.
+	'bad_drives='.$array_stats{bad_drives}.', '.
+	'spare_drives='.$array_stats{spare_drives}.', '.
+	'bbu_failed='.$array_stats{bbu_failed}.', '.
+	'bbu_good='.$array_stats{bbu_good}.', '.
+	'bbu_charging='.$array_stats{bbu_charging}.', '.
+	'bbu_notPresent='.$array_stats{bbu_notPresent}.', '.
+	'bbu_unknown='.$array_stats{bbu_unknown}.', '.
+	'bbu_na='.$array_stats{bbu_na}."\n";
+
+	# exit with the check status as the exit value as expected by nagios/ichinga
+	exit $check_status;
+}
+
+my %to_json=(
+			 version=>1,
+			 error=>0,
+			 errorString=>'',
+			 data=>{
+					arrays=>\%status,
+					stats=>\%array_stats,
+					},
+			 );
+my $j=JSON->new;
+if ( $pretty ){
+	$j->pretty;
+}
+print $j->encode(\%to_json);

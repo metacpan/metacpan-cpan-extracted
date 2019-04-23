@@ -30,6 +30,8 @@ or if you don't have the cpan script try
 PDLA (all)         perl >= 5.10.x          PDLA requires at least this version
                                           of perl to build and run.
 
+                  Devel::CheckLib >= 1.01
+
                   File::Spec  >= 0.6      perl5 core module.
                   File::Temp  >= 0        perl5 core module.
                   Pod::Parser >= 0        perl5 core module.
@@ -40,6 +42,8 @@ PDLA (all)         perl >= 5.10.x          PDLA requires at least this version
 		                          This version of EU::MM is the first
 					  with support for CONFIGURE_REQUIRES.
 
+                  Test::Exception >= 0    Needed for test suite.
+
 
 PDLA::NiceSlice    Text::Balanced >= 1.89  A nicer way to index piddles.
                   Filter::Util::Call
@@ -48,7 +52,7 @@ PDLA::NiceSlice    Text::Balanced >= 1.89  A nicer way to index piddles.
                   Module::Compile         implementation under development.
 
 
-Inline::Pdlapp     Inline >= 0.68          This module allows to define fast
+Inline::Pdlapp     Inline >= 0.68          This module allows defining fast
                   Inline::C >= 0.62       PP code inline in your scripts.
 
                                           NOTE: Though Inline is listed as as
@@ -83,16 +87,16 @@ pdla2   (shell)    Devel::REPL >= 1.003011
                   or Term::ReadLine::Gnu 
 		                          
 					  Devel::REPL requires Data::Dump::Streamer
-					  to support pdla2.  This may need to be
-					  hand-installed if you are doing a manual
-					  PDLA build.
+					  and Sys::SigAction to support pdla2.  They
+                                          may need to be hand-installed if you are
+                                          doing a manual PDLA build.
 
-perldl (shell)    Term::ReadLine::Perl    
+perldla (shell)    Term::ReadLine::Perl    
                   or Term::ReadLine::Gnu 
 
-                                          pdla2 (and perldl) will be installed
+                                          pdla2 (and perldla) will be installed
                                           by default.  If Devel::REPL is not
-                                          installed, pdla2 uses perldl.  The
+                                          installed, pdla2 uses perldla. The
                                           same thing if a Term::ReadLine::Perl
                                           or Term::ReadLine::Gnu is not installed.
 
@@ -129,12 +133,11 @@ PDLA::Graphics::PGPLOT
                   Requires both the PGPLOT perl module **and**
                   the PGPLOT fortran library.  See
                   http://astro.caltech.edu/~tjp/pgplot for the
-                  library and
-                  http://search.cpan.org/search%3fmodule=PGPLOT
+                  library and http://metacpan.org/pod/PGPLOT
                   for the perl module (on CPAN).
-                
+
                   NOTE: These are two separate items to be installed.
-  
+
                                           PDLA::Graphics::PGPLOT Module
                                           builds ok without PGPLOT module
                                           and library.

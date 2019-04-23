@@ -6,7 +6,7 @@ use utf8;
 use vars qw($config $DefaultClass @EXPORT  @ISA $defaultconfig);
 @MySQL::Admin::Config::EXPORT  = qw(loadConfig saveConfig $config);
 @ISA                           = qw(Exporter);
-$MySQL::Admin::Config::VERSION = '1.16';
+$MySQL::Admin::Config::VERSION = '1.17';
 $DefaultClass                  = 'MySQL::Admin::Config' unless defined $MySQL::Admin::Config::DefaultClass;
 $defaultconfig                 = '%CONFIG%';
 

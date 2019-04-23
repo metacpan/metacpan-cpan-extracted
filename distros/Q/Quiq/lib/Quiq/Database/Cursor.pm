@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::Database::Row::Array;
 use Quiq::Database::Row::Object;
@@ -14,6 +14,9 @@ use Quiq::Database::ResultSet::Object;
 use Quiq::Database::Connection;
 use Time::HiRes ();
 use Quiq::Database::Cursor;
+use Quiq::Path;
+use Quiq::Digest;
+use Encode ();
 
 # -----------------------------------------------------------------------------
 
@@ -58,6 +61,9 @@ sub new {
     my $self = $class->SUPER::new(
         apiCur=>undef,
         bindVars=>0,
+        cacheFile=>undef,
+        cacheFh=>undef,
+        cacheOp=>'', # damit einfach mit eq verglichen werden kann
         db=>undef,
         hits=>0,
         id=>0,
@@ -303,7 +309,28 @@ sub titles {
 
 =head2 Tests
 
-=head3 isSelect() - Prüfe, ob Cursor Datensätze liefert
+=head3 fromCache() - Liefert der Cursor Datensätze aus dem Cache?
+
+=head4 Synopsis
+
+    $bool = $cur->fromCache;
+
+=head4 Description
+
+Liefere wahr, wenn der Cursor Datensätze aus dem Cache liefert,
+andernfalls falsch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub fromCache {
+    return shift->{'cacheOp'} eq 'r'? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isSelect() - Liefert der Cursor Datensätze?
 
 =head4 Synopsis
 
@@ -311,8 +338,8 @@ sub titles {
 
 =head4 Description
 
-Liefere "wahr", wenn der Cursor Datensätze liefert,
-andernfalls "falsch".
+Liefere wahr, wenn der Cursor Datensätze liefert,
+andernfalls falsch.
 
 =cut
 
@@ -446,27 +473,93 @@ Ergebnismenge erreicht, liefere undef.
 sub fetch {
     my $self = shift;
 
-    my ($apiCur,$curName,$chunkSize,$rowClass,$titles) =
-        $self->get(qw/apiCur curName chunkSize rowClass titles/);
+    my ($cacheOp,$rowClass,$titleA) = $self->get(qw/cacheOp rowClass titles/);
 
-    # Lowlevel-Cursor ist bereits zu
-    return undef if !$apiCur;
+    my $arr;
+    if ($cacheOp eq 'r') {
+        # Wir holen die Datensätze aus dem Cache
 
-    # Datensatz fetchen
-    # warn "$curName $chunkSize $self->{'chunkPos'}\n" if $chunkSize;
-    my $arr = $apiCur->fetch($curName,$chunkSize,\$self->{'chunkPos'});
+        my $fh = $self->{'cacheFh'};
 
-    # Wenn Ende erreicht, Lowlevel-Cursor schließen, Fetchzeit setzen.
+        # Cachedatei ist bereits geschlossen
+        return undef if !$fh;
 
-    if (!$arr) {
-        $apiCur->destroy;
-        $self->{'apiCur'} = undef;
-        return undef;
+        # Datensatz aus Cachedatei lesen
+
+        my $width = @$titleA;
+        my $utf8 = $self->{'db'}->utf8;
+
+        my @arr;
+        for (my $i = 0; $i < $width; $i++) {
+            my $data = $fh->readData;
+            if (!defined $data) {
+                # Ende Cachedatei erreicht, diese schließen
+
+                $self->{'cacheFh'}->close;
+                return undef;
+            }
+            if ($utf8) {
+                $data = Encode::decode('utf-8',$data);
+            }
+            push @arr,$data;
+        }
+        $arr = \@arr;
+    }
+    else {
+        # Wir holen die Datensätze von der Datenbank
+
+        my ($apiCur,$curName,$chunkSize) =
+            $self->get(qw/apiCur curName chunkSize/);
+
+        # Lowlevel-Cursor ist bereits zu
+        return undef if !$apiCur;
+
+        # Datensatz fetchen
+        $arr = $apiCur->fetch($curName,$chunkSize,\$self->{'chunkPos'});
+
+        if ($cacheOp eq 'w') {
+            # Datensatz in Cache speichern
+
+            if (!$arr) {
+                # Ende erreicht. Cachedatei schließen und umbenennen,
+                # so dass sie mit dem Schließen des Cursors nicht
+                # automatisch gelöscht wird.
+
+                $self->{'cacheFh'}->close;
+
+                my $p = Quiq::Path->new;
+                my $cacheFile = $self->{'cacheFile'};
+                my ($dir) = $p->split($cacheFile);
+                my $newCacheFile = $dir.'/'.
+                    Quiq::Digest->md5($self->{'stmt'});
+                $p->rename($cacheFile,$newCacheFile);
+                $self->{'cacheFile'} = $newCacheFile;
+            }
+            else {
+                my $utf8 = $self->{'db'}->utf8;
+                my $width = @$titleA;
+                for (my $i = 0; $i < $width; $i++) {
+                    my $data = $arr->[$i];
+                    if ($utf8) {
+                        $data = Encode::encode('utf-8',$data);
+                    }
+                    $self->{'cacheFh'}->writeData($data);
+                }
+            }
+        }
+
+        # Ende erreicht, Lowlevel-Cursor schließen
+
+        if (!$arr) {
+            $self->{'apiCur'}->destroy;
+            return undef;
+        }
+
     }
 
     # Datensatz-Objekt instantiieren
 
-    my $row = $rowClass->new($titles,$arr);
+    my $row = $rowClass->new($titleA,$arr);
     if ($row->can('rowStatus')) {
         $row->rowStatus(0);
     }
@@ -532,7 +625,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

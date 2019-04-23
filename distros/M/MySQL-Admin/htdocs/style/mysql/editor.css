@@ -1,0 +1,105 @@
+table.blog{
+background-color:#e6dede;
+color:#000000;
+}
+span.Variable_Array{color:green;}
+span.Variable_Hash{color:green;}
+span.Variable_Typeglob{color:green;}
+span.Subroutine{color:black; font-weight:bold;}
+span.Quote{color:blue;}
+span.String{color:red;}
+span.Comment_Normal{color:gray;}
+span.Comment_POD{color:gray;}
+span.Bareword{color:green;}
+span.Package{color:green;}
+span.Number{color:#f0f;}
+span.Operator{color:#000;}
+span.Symbol{color:#000;}
+span.Character{color:#800;}
+span.Directive{color:#399;font-style:italic;}
+span.Label{color:#939;font-style:italic;}
+span.Line{color:blue;}
+a.Builtin_Operator{color:blue;}
+a.Builtin_Operator:hover{color:red;}
+a.Builtin_Function{color:blue;}
+a.Builtin_Function:hover{color:red;}
+a.Keyword{font-weight:bold;}
+a.Keyword:hover{color:red;}
+span.Variable_{color:#800;}
+.c  { color: gray;} /* comment */
+.cm { color: #000000;} /* comma */
+.co { color: #000000;} /* colon */
+.h  { color: #000000; font-weight:bold;} /* here-doc-target */
+.hh { color: #000000; font-style:italic;} /* here-doc-text */
+.i  { color: blue;} /* identifier */
+.j  { font-weight:bold;} /* label */
+.k  {  font-weight:bold;} /* keyword */
+.m  { color: blue; font-weight:bold;} /* subroutine */
+.n  { color: #B452CD;} /* numeric */
+.p  { color: #000000;} /* paren */
+.pd { color: gray; font-style:italic;} /* pod-text */
+.pu { color: #000000;} /* punctuation */
+.q  { color: green;} /* quote */
+.s  { color: #000000;} /* structure */
+.sc { color: #000000;} /* semicolon */
+.v  { color: #070C76;} /* v-string */
+.w  { color: #070C76;} /* bareword */
+td.header{
+text-align:left;
+vertical-align:top;
+background-color:#ffffff;
+color:#000000;
+font-size:18px;
+ border-bottom-style:solid;
+ border-top-style:solid;
+}
+td.short{
+text-align:center;
+vertical-align:top;
+font-weight:bold;
+border-right:gray;
+border-right-style: dashed;
+border-right-width:1px;
+ border-bottom: gray;
+ border-bottom-style:dashed;
+border-bottom-width:1px;
+}
+td.middle{
+text-align:center;
+vertical-align:top;
+font-weight:bold;
+border-right:gray;
+border-right-style: dashed;
+border-right-width:1px;
+border-bottom: gray;
+border-bottom-style:dashed;
+border-bottom-width:1px;
+}
+td.long{
+text-align:left;
+vertical-align:top;
+border-bottom: gray;
+border-bottom-style:dashed;
+border-bottom-width:1px;
+}
+pre { color: #000000;
+      font-family: courier;
+}
+.c  { color: gray;} /* comment */
+.cm { color: #000000;} /* comma */
+.co { color: #000000;} /* colon */
+.h  { color: #000000; font-weight:bold;} /* here-doc-target */
+.hh { color: #000000; font-style:italic;} /* here-doc-text */
+.i  { color: blue;} /* identifier */
+.j  { font-weight:bold;} /* label */
+.k  {  font-weight:bold;} /* keyword */
+.m  { color: blue; font-weight:bold;} /* subroutine */
+.n  { color: #B452CD;} /* numeric */
+.p  { color: #000000;} /* paren */
+.pd { color: gray; font-style:italic;} /* pod-text */
+.pu { color: #000000;} /* punctuation */
+.q  { color: green;} /* quote */
+.s  { color: #000000;} /* structure */
+.sc { color: #000000;} /* semicolon */
+.v  { color: #070C76;} /* v-string */
+.w  { color: #070C76;} /* bareword */

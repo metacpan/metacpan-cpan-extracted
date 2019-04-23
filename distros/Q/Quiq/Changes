@@ -1,3 +1,43 @@
+1.138 2019-04-22
+================
+[Quiq::Database::Connection]
+* Optionales Caching von Ergebnismengen hinzugefügt
+
+[Quiq::Database::Cursor]
+* Optionales Caching von Ergebnismengen hinzugefügt
+
+[Quiq::Html::Table::List]
+* Erzeugung Footer hinzugefügt
+
+[Quiq::Html::Page]
+* JavaScript-Code kann im Header oder am Ende der Seite plaziert werden
+
+[Quiq::JQuery::DataTable]
+* Erzeugung Footer hinzugefügt
+
+[Quiq::Cascm]
+* Operationen edit() und showPackage() hinzugefügt
+
+[Quiq::Digest]
+* Klasse hinzugefügt
+
+[Quiq::Duration]
+* Zeitformatierung und secondsToString() verbessert
+
+[Quiq::FileHandle]
+* read() korrigiert
+* Methoden writeData() und readData() hinzugefügt
+
+[Quiq::Program]
+* Methode log() hinzugefügt
+
+[Quiq::Sql]
+* Methode commands() hinzugefügt
+* Behandlung von undef in Methode whereClause() hinzugefügt
+
+[Quiq::TempFile]
+* Tilde-Expansion ergänzt
+
 1.137 2019-03-30
 ================
 Kwalitee Issues bearbeitet.

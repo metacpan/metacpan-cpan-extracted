@@ -24,6 +24,202 @@ package SPVM::CORE {
     init_native_constants();
   }
   
+  native sub rand : int ($seed_ref : int&);
+  
+  precompile sub lc : string($str : string) {
+    
+    unless ($str) { die "String must be defined"; }
+    
+    my $offset = 32;
+    my $new_str = (byte[])copy_str($str);
+    for (my $i = 0; $i < length $str; $i++) {
+      my $char = $str->[$i];
+      if ($char >= 'A' && $char <= 'Z') {
+        $new_str->[$i] = (byte)($str->[$i] + 32);
+      }
+      else {
+        $new_str->[$i] = $str->[$i];
+      }
+    }
+    return (string)$new_str;
+  }
+
+  precompile sub lcfirst : string($str : string) {
+
+    unless ($str) { die "String must be defined"; }
+    
+    my $offset = 32;
+    my $new_str = (byte[])copy_str($str);
+    if (length $str > 0) {
+      my $char = $str->[0];
+      if ($char >= 'A' && $char <= 'Z') {
+        $new_str->[0] = (byte)($char + 32);
+      }
+    }
+    return (string)$new_str;
+  }
+
+  precompile sub uc : string($str : string) {
+
+    unless ($str) { die "String must be defined"; }
+    
+    my $offset = 32;
+    my $new_str = (byte[])copy_str($str);
+    for (my $i = 0; $i < length $str; $i++) {
+      my $char = $str->[$i];
+      if ($char >= 'a' && $char <= 'z') {
+        $new_str->[$i] = (byte)($str->[$i] - 32);
+      }
+      else {
+        $new_str->[$i] = $str->[$i];
+      }
+    }
+    return (string)$new_str;
+  }
+
+  precompile sub ucfirst : string($str : string) {
+
+    unless ($str) { die "String must be defined"; }
+    
+    my $offset = 32;
+    my $new_str = (byte[])copy_str($str);
+    if (length $str > 0) {
+      my $char = $str->[0];
+      if ($char >= 'a' && $char <= 'z') {
+        $new_str->[0] = (byte)($char - 32);
+      }
+    }
+    return (string)$new_str;
+  }
+
+  precompile sub replace_all : string ($str : string, $substr : string, $replace : string) {
+
+    unless ($str) { die "String must be defined"; }
+    
+    my $offset = 0;
+    my $found_pos : int;
+    my $substr_len = length $substr;
+    my $result_str = $str;
+    while (1) {
+      $result_str = replace($result_str, $substr, $replace, $offset, \$found_pos);
+      if ($found_pos >= 0) {
+        $offset = $found_pos + $substr_len;
+      }
+      else {
+        return $result_str;
+      }
+    }
+  }
+
+  precompile sub replace : string ($str : string, $substr : string, $replace : string, $from : int, $found_pos_ref : int&) {
+    unless ($substr && length $substr > 0) {
+      die "Sub string must have length";
+    }
+    my $found_pos = index($str, $substr, $from);
+    $$found_pos_ref = $found_pos;
+    if ($found_pos >= 0) {
+      my $str_len = length $str;
+      my $substr_len = length $substr;
+      my $replace_len = length $replace;
+      
+      my $result_str_len = $str_len + $replace_len - $substr_len;
+      my $result_str = new byte[$result_str_len];
+      
+      if ($found_pos > 0) {
+        memmove((byte[])$result_str, 0, (byte[])$str, 0, $found_pos);
+      }
+      memmove((byte[])$result_str, $found_pos, (byte[])$replace, 0, $replace_len);
+      
+      my $str_rest_offset = $found_pos + $substr_len;
+      my $str_rest_length = $str_len - $str_rest_offset;
+      my $result_rest_offset = $found_pos + $replace_len;
+      my $result_rest_length = $result_str_len - $result_rest_offset;
+      memmove((byte[])$result_str, $result_rest_offset, (byte[])$str, $str_rest_offset, $str_rest_length);
+      
+      return $result_str;
+    }
+    else {
+      my $copy_str = copy_str($str);
+      return $copy_str;
+    }
+  }
+
+  native sub memcpy : void ($dist_str : byte[], $dist_offset : int, $src_str : byte[], $src_offset : int, $length : int);
+  native sub memmove : void ($dist_str : byte[], $dist_offset : int, $src_str : byte[], $src_offset : int, $length : int);
+  
+  precompile sub index : int($source : string, $target : string, $fromIndex : int) {
+    my $sourceCount = length $source;
+    my $targetCount = length $target;
+    
+    if ($fromIndex >= $sourceCount) {
+      my $ret : int;
+      if ($targetCount == 0) {
+        $ret = $sourceCount;
+      }
+      else {
+        $ret = -1;
+      }
+      return $ret;
+    }
+    if ($fromIndex < 0) {
+      $fromIndex = 0;
+    }
+    if ($targetCount == 0) {
+      return $fromIndex;
+    }
+
+    my $first : byte  = $target->[0];
+    my $max : int = ($sourceCount - $targetCount);
+
+    for (my $i = $fromIndex; $i <= $max; $i++) {
+      if ($source->[$i] != $first) {
+        while (++$i <= $max && $source->[$i] != $first) {}
+      }
+
+      if ($i <= $max) {
+        my $j = $i + 1;
+        my $end = $j + $targetCount - 1;
+        for (my $k = 01; $j < $end && $source->[$j] == $target->[$k]; ($j++, $k++)) {}
+
+        if ($j == $end) {
+          return $i;
+        }
+      }
+    }
+    return -1;
+  }
+  
+  precompile sub contains : int ($text : string, $pattern : string) {
+    if (!$text) {
+      die "Target string must be defined";
+    }
+    if (!$pattern) {
+      die "Search string must be defined";
+    }
+
+    my $pat_len = length $pattern;
+    my $text_len = length $text;
+    my $i = 0;
+    my $j = 0;
+    
+    while ($i < $text_len && $j < $pat_len) {
+      if ($text->[$i] == $pattern->[$j]) {
+        $i++;
+        $j++;
+      } else {
+        $i = $i - $j + 1;
+        $j = 0;
+      }
+    }
+    
+    if ($j == $pat_len) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
   native sub getenv : string ($name : string);
   
   native sub abs : int ($x : int);
@@ -54,7 +250,7 @@ package SPVM::CORE {
       die "Separator must not be empty string";
     }
     
-    my $separated_strings_list = new_list([]);
+    my $separated_strings_list = list([]);
     
     my $match_start = 0;
     my $string_base = 0;
@@ -611,11 +807,11 @@ package SPVM::CORE {
   native sub cmulf : SPVM::Complex_2f ($z1 : SPVM::Complex_2f, $z2 : SPVM::Complex_2f);
   native sub cdivf : SPVM::Complex_2f ($z1 : SPVM::Complex_2f, $z2 : SPVM::Complex_2f);
   
-  sub new_list : SPVM::List ($objects : object[]) {
+  sub list : SPVM::List ($objects : object[]) {
     return SPVM::List->new_with_array($objects);
   }
 
-  sub new_hash : SPVM::Hash ($objects : object[]) {
+  sub hash : SPVM::Hash ($objects : object[]) {
     return SPVM::Hash->new_with_array($objects);
   }
   

@@ -1,6 +1,9 @@
 Revision history for HTTP-PublicKeyPins
 
-0.15   Mon Apr 15 19:00:00 2010
+0.16   Sat Apr 20 08:05:00 2019
+        Fixing up a binmode type issue in openssl causing issues in Win32 CPAN Testers
+
+0.15   Mon Apr 15 19:00:00 2019
         Including CryptX as a dependency
 
 0.14   Thu Mar 17 20:07:00 2016

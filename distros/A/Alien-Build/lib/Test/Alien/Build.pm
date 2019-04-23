@@ -27,7 +27,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '1.65'; # VERSION
+our $VERSION = '1.68'; # VERSION
 
 
 my $build;
@@ -236,6 +236,7 @@ sub alien_download_ok
   my $ok;
   my $file;
   my @diag;
+  my @note;
   
   if($build)
   {
@@ -259,10 +260,12 @@ sub alien_download_ok
       if(-d $file || -f $file)
       {
         $ok = 1;
+        push @note, $out if defined $out;
       }
       else
       {
         $ok = 0;
+        push @diag, $out if defined $out;
         push @diag, 'no file or directory';
       }
     }
@@ -275,6 +278,7 @@ sub alien_download_ok
   
   my $ctx = context();
   $ctx->ok($ok, $name);
+  $ctx->note($_) for @note;
   $ctx->diag($_) for @diag;
   $ctx->release;
 
@@ -567,7 +571,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 1.65
+version 1.68
 
 =head1 SYNOPSIS
 

@@ -62,12 +62,12 @@ sub test_new_startup : Startup(8) {
     # $self->diag("### $udl ###");
 
     my $udlObj = Quiq::Udl->new($udl);
-    if ($udlObj->dbms eq 'sqlite') {
-        # Um Permission-Probleme bei CPAN-Tests zu vermeiden
-
-        my $file = $udlObj->db;
-        Quiq::Path->chmod($file,0600);
-    }
+    # Um Permission-Probleme bei CPAN-Tests zu vermeiden
+    # (hilft leider nichts)
+    # if ($udlObj->dbms eq 'sqlite') {
+    #     my $file = $udlObj->db;
+    #     Quiq::Path->chmod($file,0600);
+    # }
 
     # Datenbankverbindung aufbauen
 

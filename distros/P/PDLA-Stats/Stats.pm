@@ -6,7 +6,7 @@ PDLA::Stats - a collection of statistics modules in Perl Data Language, with a q
 
 =cut
 
-$VERSION = '0.72';
+$VERSION = '0.76';
 
 $PDLA::onlinedoc->scan(__FILE__) if $PDLA::onlinedoc;
 
@@ -14,7 +14,7 @@ $PDLA::onlinedoc->scan(__FILE__) if $PDLA::onlinedoc;
 
 Loads modules named below, making the functions available in the current namespace.
 
-Properly formated documentations online at http://pdl-stats.sf.net
+Properly formatted documentations online at http://pdl-stats.sf.net
  
 =head1 SYNOPSIS
 
@@ -250,7 +250,7 @@ EOD
 
 ~~~~~~~~~~~~ ~~~~~ ~~~~~~~~ ~~~~~ ~~~ `` ><(((">
 
-Copyright (C) 2009-2013 Maggie J. Xiong <maggiexyz users.sourceforge.net>
+Copyright (C) 2009-2015 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDLA distribution.
 

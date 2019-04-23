@@ -1,3 +1,24 @@
+0.019   2019-04-23 (PERLANCAR)
+
+	- Declare argument specification variables with 'our' instead of
+	  'my' so they are accessible from outside.
+
+
+0.018   2019-04-23 (PERLANCAR)
+
+	- Add option --tsv to parse input file as TSV instead of CSV.
+
+
+0.017   2019-04-23 (PERLANCAR)
+
+	- csvutil(): forgot to update valid actions in schema.
+
+
+0.016   2019-04-23 (PERLANCAR)
+
+	- Add utility: csv-dump (and its alias dump-csv).
+
+
 0.015   2019-04-15 (PERLANCAR)
 
 	- Add utility: csv-each-row.

@@ -20,9 +20,14 @@ name: Test-DNS
 provides:
   Test::DNS:
     file: lib/Test/DNS.pm
-    version: '0.201'
+    version: '0.203'
+requires:
+  Moose: '0'
+  Net::DNS: '0'
+  Test::Builder::Module: '0'
+  Test::Deep: '0'
 resources:
   bugtracker: https://github.com/xsawyerx/test-dns/issues
   repository: git://github.com/xsawyerx/test-dns.git
-version: '0.201'
+version: '0.203'
 x_serialization_backend: 'YAML::Tiny version 1.73'

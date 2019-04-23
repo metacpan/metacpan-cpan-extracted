@@ -1,8 +1,10 @@
-# Text::Names::GB
+# NAME
+
+Text::Names::GB - Perl extension for proper name parsing, normalization, recognition, and classification
 
 # VERSION
 
-Version 0.01
+Version 0.03
 
 # SYNOPSIS
 
@@ -15,7 +17,8 @@ to be implemented as subclasses.
 
 ## guessGender
 
-Overrides the US data with UK data, that's probably true in most other countries as well.
+Overrides the US tests with UK tests,
+that's probably true in most other countries as well.
 
 # AUTHOR
 
@@ -55,6 +58,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

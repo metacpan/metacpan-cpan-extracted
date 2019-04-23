@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojolicious::Plugin::Web::Auth:
     file: lib/Mojolicious/Plugin/Web/Auth.pm
-    version: '0.16'
+    version: '0.17'
   Mojolicious::Plugin::Web::Auth::Base:
     file: lib/Mojolicious/Plugin/Web/Auth/Base.pm
   Mojolicious::Plugin::Web::Auth::OAuth:
@@ -56,8 +56,9 @@ resources:
   bugtracker: https://github.com/hayajo/Mojolicious-Plugin-Web-Auth/issues
   homepage: https://github.com/hayajo/Mojolicious-Plugin-Web-Auth
   repository: git://github.com/hayajo/Mojolicious-Plugin-Web-Auth.git
-version: '0.16'
+version: '0.17'
 x_contributors:
+  - 'Dan Book <grinnz@gmail.com>'
   - 'Fayland Lam <fayland@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'

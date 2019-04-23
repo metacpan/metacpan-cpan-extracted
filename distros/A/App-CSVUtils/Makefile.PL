@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "script/csv-concat",
     "script/csv-convert-to-hash",
     "script/csv-delete-field",
+    "script/csv-dump",
     "script/csv-each-row",
     "script/csv-grep",
     "script/csv-list-field-names",
@@ -28,7 +29,8 @@ my %WriteMakefileArgs = (
     "script/csv-select-fields",
     "script/csv-select-row",
     "script/csv-sort-fields",
-    "script/csv-sum"
+    "script/csv-sum",
+    "script/dump-csv"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::CSVUtils",
@@ -59,7 +61,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/*.t"
   }

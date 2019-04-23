@@ -5,7 +5,6 @@ use warnings;
 use Test::More;
 
 BEGIN {
-      # 1-2
     use_ok( 'PDLA::Stats::Basic' );
     use_ok( 'PDLA::Stats::Kmeans' );
 }
@@ -22,14 +21,14 @@ sub tapprox {
   return $diff < $eps;
 }
 
-is(tapprox( t_iv_cluster(), 0 ), 1);
+is(tapprox( t_iv_cluster(), 0 ), 1, "independent variable cluster");
 sub t_iv_cluster {
   my @a = qw( a a b b );
   my $a = iv_cluster( \@a );
   return abs($a - pdl(byte, [1,1,0,0], [0,0,1,1]))->sum;
 }
 
-is(tapprox( t_iv_cluster_bad(), 0 ), 1);
+is(tapprox( t_iv_cluster_bad(), 0 ), 1, "independent variable cluster with bad data");
 sub t_iv_cluster_bad {
   my @a = qw( a a BAD b b );
   my $a = iv_cluster( \@a );
@@ -38,7 +37,7 @@ sub t_iv_cluster_bad {
   return abs($a - pdl(byte, [1,1,-9,0,0], [0,0,-9,1,1]))->sum;
 }
 
-is(tapprox( t_assign(), 0 ), 1);
+is(tapprox( t_assign(), 0 ), 1, "assign");
 sub t_assign {
   my $centroid = pdl( [0,1], [0,1], [0,1] );
   my $a = sequence 4, 3;
@@ -48,7 +47,7 @@ sub t_assign {
   return abs($c - $cluster)->sum;
 }
 
-is(tapprox( t_centroid(), 0 ), 1);
+is(tapprox( t_centroid(), 0 ), 1, "centroid");
 sub t_centroid {
   my $a = sequence 4, 3;
   my $cluster = pdl(byte, [1,0,1,0], [0,1,0,1]);
@@ -58,7 +57,7 @@ sub t_centroid {
   return sum( $m - $m_a + ( $ss - $ss_a ) );
 }
 
-is(tapprox( t_assign_bad(), 0 ), 1);
+is(tapprox( t_assign_bad(), 0 ), 1, "assign with bad data");
 sub t_assign_bad {
   my $centroid = pdl( [0,1], [0,1], [0,1] );
   my $a = sequence 5, 3;
@@ -70,7 +69,7 @@ sub t_assign_bad {
   return ($c - $cluster)->sum;
 }
 
-is(tapprox( t_centroid_bad(), 0 ), 1);
+is(tapprox( t_centroid_bad(), 0 ), 1, "centroid with bad data");
 sub t_centroid_bad {
   my $a = sequence 5, 3;
   $a->setbadat(4,0);
@@ -127,9 +126,8 @@ sub t_kmeans_4d {
            ),
   );
 
-    # 9-10
-  is(tapprox( sum( $m{R2} - $a{R2} ), 0 ), 1);
-  is(tapprox( sum( $m{ss}->sumover - $a{ss_sum} ), 0, 1e-3 ), 1);
+  is(tapprox( sum( $m{R2} - $a{R2} ), 0 ), 1, "kmeans R2 result as expected");
+  is(tapprox( sum( $m{ss}->sumover - $a{ss_sum} ), 0, 1e-3 ), 1, "kmeans ss result as expected");
 }
 
 t_kmeans_4d_seed();
@@ -178,9 +176,8 @@ sub t_kmeans_4d_seed {
            ),
   );
 
-    # 11-12
-  is(tapprox( sum( $m{R2} - $a{R2} ), 0 ), 1);
-  is(tapprox( sum( $m{ss}->sumover - $a{ss_sum} ), 0, 1e-3 ), 1);
+  is(tapprox( sum( $m{R2} - $a{R2} ), 0 ), 1, "kmeans R2 with manually seeded centroid");
+  is(tapprox( sum( $m{ss}->sumover - $a{ss_sum} ), 0, 1e-3 ), 1, "kmeans ss with manually seeded centroid");
 }
 
 TODO: {
@@ -227,13 +224,11 @@ sub t_kmeans_3d_bad {
            ),
   );
 
-    # 14-15 
-  is(tapprox( sum( $m{R2} - $a{R2} ), 0 ), 1);
-  is(tapprox( sum( $m{ms} - $a{ms} ), 0, 1e-3 ), 1);
+  is(tapprox( sum( $m{R2} - $a{R2} ), 0 ), 1, "3d kmeans with bad data R2 is as expected");
+  is(tapprox( sum( $m{ms} - $a{ms} ), 0, 1e-3 ), 1, "3d kmeans with bad data ss is as expected");
 }
 
-  # 16
-is(tapprox( t_pca_cluster(), 0 ), 1);
+is(tapprox( t_pca_cluster(), 0 ), 1, "principal component analysis clustering");
 sub t_pca_cluster {
   my $l = pdl(
 [qw( -0.798603   -0.61624  -0.906765   0.103116)],
@@ -244,7 +239,7 @@ sub t_pca_cluster {
   my $c = $l->pca_cluster({v=>0,ncomp=>4,plot=>0});
   return ( $c - pdl(byte, [1,0,1,0], [0,1,0,0], [0,0,0,1]) )->sum;
 }
-  # 17
+
 {
   my $a = pdl( [[3,1], [2,4]] );
   my $b = pdl( [2,4], [3,1] );
@@ -253,7 +248,7 @@ sub t_pca_cluster {
 
   is( tapprox(sum($d - pdl(1.754116, 1.4142136)), 0), 1, '_d_point2line');
 }
-  # 18
+
 {
   my $c0 = pdl(byte, [1,0,1,0], [0,1,0,1]);
   my $c1 = pdl(byte, [0,0,0,1], [0,1,1,0]);

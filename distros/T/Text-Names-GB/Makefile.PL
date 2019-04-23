@@ -14,7 +14,7 @@ WriteMakefile(
     PREREQ_PM         => {
         'Text::Capitalize' => 1.1,
         'Text::LevenshteinXS' => 0.03,
-        'Text::Names' => 0,
+        'Text::Names' => 0.46,
     }, # e.g., Module::Name => 1.1
     LICENSE => 'perl_5',
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005

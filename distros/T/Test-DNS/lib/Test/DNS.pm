@@ -1,6 +1,6 @@
 package Test::DNS;
 # ABSTRACT: Test DNS queries and zone configuration
-$Test::DNS::VERSION = '0.201';
+$Test::DNS::VERSION = '0.203';
 use Moose;
 use Net::DNS;
 use Test::Deep 'cmp_bag';
@@ -232,7 +232,7 @@ Test::DNS - Test DNS queries and zone configuration
 
 =head1 VERSION
 
-version 0.201
+version 0.203
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+0.033   2019-04-23 (PERLANCAR)
+
+	- Config::IniFiles doesn't need to parse from file; dump-ini:
+	  return proper dump for Config::IniFiles.
+
+
 0.032   2019-01-17 (PERLANCAR)
 
 	- Add utilities: grep-ini, map-ini.

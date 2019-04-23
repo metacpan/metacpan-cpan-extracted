@@ -39,9 +39,9 @@ use SNMP::Info;
 @SNMP::Info::Entity::ISA       = qw/SNMP::Info Exporter/;
 @SNMP::Info::Entity::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
+our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = ( 'ENTITY-MIB' => 'entPhysicalSerialNum' );
 

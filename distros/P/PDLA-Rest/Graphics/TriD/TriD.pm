@@ -10,8 +10,8 @@ PDLA::Graphics::TriD -- PDLA 3D interface
  $t = sequence(100)/10;
  $x = sin($t); $y = cos($t), $z = $t;
  $coords = cat($x, $y, $z)->xchg(0,1);
- $r = cos(2*$t); $g = sin($t); $b = $t;
- $colors = cat($r, $g, $b)->xchg(0,1);
+ my $red = cos(2*$t); my $green = sin($t); my $blue = $t;
+ $colors = cat($red, $green, $blue)->xchg(0,1);
  
  # After each graph, let the user rotate and
  # wait for him to press 'q', then make new graph
@@ -24,9 +24,9 @@ PDLA::Graphics::TriD -- PDLA 3D interface
  $surf2 = sqrt(rvals(zeroes(50,50))/2);
  $x = sin($surface); $y = cos($surface), $z = $surface;
  $coords = cat($x, $y, $z)->xchg(0,1);
- $r = cos(2*$surface); $g = sin($surface); $b = $surface;
- $colors = cat($r, $g, $b)->xchg(0,1);
- imagrgb([$r,$g,$b]);     # 2-d piddles
+ $red = cos(2*$surface); $green = sin($surface); $blue = $surface;
+ $colors = cat($red, $green, $blue)->xchg(0,1);
+ imagrgb([$red,$green,$blue]);     # 2-d piddles
  lattice3d([$surf1]);
  points3d([$x,$y,$z]);
  spheres3d([$x,$y,$z]);  # preliminary implementation
@@ -132,7 +132,7 @@ The following contexts are currently supported:
 
 A 2-D lattice. C< [$piddle] > is interpreted as the Z coordinate over
 a lattice over the first dimension. Equivalent to
-C< [$piddle->xvals, $piddle->yvals, $piddle] >.
+C<< [$piddle->xvals, $piddle->yvals, $piddle] >>.
 
 =item POLAR2D
 
@@ -147,8 +147,8 @@ A set of colors. C< [$piddle] > is interpreted as grayscale color
 =item LINE
 
 A line made of 1 or 2 coordinates. C< [$piddle] > is interpreted as
-C< [$piddle->xvals,$piddle,0] >. C< [$piddle1,$piddle2] > is interpreted as
-C< [$piddle1,$piddle2,$piddle1->xvals] >.
+C<< [$piddle->xvals,$piddle,0] >>. C< [$piddle1,$piddle2] > is interpreted as
+C<< [$piddle1,$piddle2,$piddle1->xvals] >>.
 
 =back
 
@@ -420,8 +420,8 @@ ways one might want to do this.
 
 e.g.
 
- pdl> $a=sqrt(rvals(zeroes(50,50))/2)
- pdl> imagrgb [0.5*sin(8*$a)+0.5,0.5*cos(8*$a)+0.5,0.5*cos(4*$a)+0.5]
+ pdl> $x=sqrt(rvals(zeroes(50,50))/2)
+ pdl> imagrgb [0.5*sin(8*$x)+0.5,0.5*cos(8*$x)+0.5,0.5*cos(4*$x)+0.5]
 
 =head2 imagrgb3d
 
@@ -561,7 +561,7 @@ your own risk.
 The syntax C<PDLA::Graphics::TriD::Scale(x,y,z)> here means that you create
 an object like
 
-	$a = new PDLA::Graphics::TriD::Scale($x,$y,$z);
+	$c = new PDLA::Graphics::TriD::Scale($x,$y,$z);
 
 =head2 PDLA::Graphics::TriD::LineStrip
 

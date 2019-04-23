@@ -124,7 +124,7 @@ App::INIUtils::Common - Routines common between App::INIUtils and App::IODUtils
 
 =head1 VERSION
 
-This document describes version 0.032 of App::INIUtils::Common (from Perl distribution App-INIUtils), released on 2019-01-17.
+This document describes version 0.033 of App::INIUtils::Common (from Perl distribution App-INIUtils), released on 2019-04-23.
 
 =for Pod::Coverage ^(.+)$
 

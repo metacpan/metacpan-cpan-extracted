@@ -1,7 +1,7 @@
 package Log::ger::Output::File;
 
-our $DATE = '2017-08-02'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 ## no critic (InputOutput::RequireBriefOpen)
 
@@ -65,7 +65,7 @@ sub get_hooks {
                     $lock_handle = $code_lock->() if $lock_mode eq 'write';
                     print $fh $_[1];
                     print $fh "\n" unless $_[1] =~ /\R\z/;
-                    $fh->flush if $autoflush || $lock_handle;
+                    $fh->flush if $fh->can("flush") && $autoflush || $lock_handle;
                     undef $lock_handle;
                 };
                 [$logger];
@@ -88,7 +88,7 @@ Log::ger::Output::File - Send logs to file
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

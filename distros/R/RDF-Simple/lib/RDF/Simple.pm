@@ -1,13 +1,13 @@
 
-# $Id: Simple.pm,v 1.4 2009/04/09 21:27:32 Martin Exp $
-
 package RDF::Simple;
 use strict;
 
 our
-$VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 1.41;
 
 1;
+
+__END__
 
 =head1 NAME
 
@@ -41,8 +41,8 @@ Use the serialiser to build RDF to send to others.
 
 If you want a more complex and involved RDF API,
 I'd suggest looking at RDF::Core
-or at the redland RDF application toolkit
-at http://www.redland.opensource.ac.uk
+or at the Attean Semantic web framework
+at http://metacpan.org/pod/Attean
 
 Please report bugs via RT at
 <https://rt.cpan.org/Dist/Display.html?Queue=RDF-Simple>
@@ -62,4 +62,3 @@ This package and its contents are available under the same terms as perl itself
 
 =cut
 
-__END__

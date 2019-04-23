@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.137;
+our $VERSION = 1.138;
 
 use Quiq::TimeLapse::Filename;
 
@@ -206,7 +206,7 @@ sub text {
 
 =head1 VERSION
 
-1.137
+1.138
 
 =head1 AUTHOR
 

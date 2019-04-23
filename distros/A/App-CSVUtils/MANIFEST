@@ -13,6 +13,7 @@ script/csv-avg
 script/csv-concat
 script/csv-convert-to-hash
 script/csv-delete-field
+script/csv-dump
 script/csv-each-row
 script/csv-grep
 script/csv-list-field-names
@@ -23,6 +24,7 @@ script/csv-select-fields
 script/csv-select-row
 script/csv-sort-fields
 script/csv-sum
+script/dump-csv
 t/00-compile.t
 t/01-basic.t
 t/author-critic.t

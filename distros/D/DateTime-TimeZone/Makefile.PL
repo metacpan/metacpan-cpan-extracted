@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "overload" => 0
   },
-  "VERSION" => "2.34",
+  "VERSION" => "2.35",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -103,7 +103,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 if ( $^O eq 'MSWin32' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'DateTime::TimeZone::Local::Win32'} = $FallbackPrereqs{'DateTime::TimeZone::Local::Win32'} = '2.03';
+	$WriteMakefileArgs{PREREQ_PM}{'DateTime::TimeZone::Local::Win32'} = $FallbackPrereqs{'DateTime::TimeZone::Local::Win32'} = '2.04';
 }
 
 WriteMakefile(%WriteMakefileArgs);

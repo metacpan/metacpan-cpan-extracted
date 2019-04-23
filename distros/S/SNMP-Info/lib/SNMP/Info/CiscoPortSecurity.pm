@@ -37,9 +37,9 @@ use SNMP::Info;
 @SNMP::Info::CiscoPortSecurity::ISA       = qw/SNMP::Info Exporter/;
 @SNMP::Info::CiscoPortSecurity::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE %PAECAPABILITIES/;
+our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE, %PAECAPABILITIES);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = (
     'CISCO-PORT-SECURITY-MIB' => 'ciscoPortSecurityMIB',

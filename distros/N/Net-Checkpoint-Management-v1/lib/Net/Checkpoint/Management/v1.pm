@@ -1,12 +1,12 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001001';
+$Net::Checkpoint::Management::v1::VERSION = '0.001002';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
 use Moo;
 use feature 'signatures';
 use Types::Standard qw( ArrayRef Str );
-use Carp qw( croak );
+use Carp::Clan qw(^Net::Checkpoint::Management::v1);
 use Clone qw( clone );
 use Net::Checkpoint::Management::v1::Role::ObjectMethods;
 use Data::Dumper::Concise;
@@ -31,7 +31,6 @@ has 'api_versions' => (
 
 sub _build_api_versions ($self) {
     my $res_versions = $self->post('/web_api/v1.1/show-api-versions', {});
-    say $res_versions->code;
     return $res_versions->data->{'supported-versions'};
 }
 
@@ -43,12 +42,21 @@ has 'api_version' => (
 
 with 'Net::Checkpoint::Management::v1::Role::REST::Client';
 
+sub _error_handler ($self, $data) {
+    my $error_message = (exists $data->{errors} && exists $data->{errors}->[0]
+        && exists $data->{errors}->[0]->{message})
+        ? $data->{errors}->[0]->{message}
+        : $data->{message};
+    croak($error_message);
+}
+
 sub _create ($self, $url, $object_data, $query_params = {}) {
     my $params = $self->user_agent->www_form_urlencode( $query_params );
     my $res = $self->post("$url?$params", $object_data);
     my $code = $res->code;
     my $data = $res->data;
-    croak($data->{errors}->[0]->{message})
+
+    $self->_error_handler($data)
         unless $code == 200;
     return $data;
 }
@@ -70,7 +78,7 @@ sub _list ($self, $url, $list_key, $query_params = {}) {
         });
         my $code = $res->code;
         my $data = $res->data;
-        croak($data->{errors}->[0]->{message})
+        $self->_error_handler($data)
             unless $code == 200;
 
         # use first response for base structure of response
@@ -103,7 +111,7 @@ sub _get ($self, $url, $query_params = {}) {
     my $code = $res->code;
     my $data = $res->data;
 
-    croak($data->{errors}->[0]->{message})
+    $self->_error_handler($data)
         unless $code == 200;
 
     return $data;
@@ -116,7 +124,7 @@ sub _update ($self, $url, $object, $object_data) {
     my $res = $self->post($url, $updated_data);
     my $code = $res->code;
     my $data = $res->data;
-    croak($data->{errors}->[0]->{message})
+    $self->_error_handler($data)
         unless $code == 200;
 
     return $data;
@@ -126,7 +134,7 @@ sub _delete ($self, $url, $object) {
     my $res = $self->post($url, $object);
     my $code = $res->code;
     my $data = $res->data;
-    croak($data->{errors}->[0]->{message})
+    $self->_error_handler($data)
         unless $code == 200;
 
     return 1;
@@ -238,7 +246,7 @@ sub login($self) {
             $res->data->{sid});
     }
     else {
-        croak($res->data->{message});
+        $self->_error_handler($res->data);
     }
 }
 
@@ -247,7 +255,7 @@ sub logout($self) {
     my $res = $self->post('/web_api/v1/logout', {});
     my $code = $res->code;
     my $data = $res->data;
-    croak($data->{message})
+    $self->_error_handler($data)
         unless $code == 200;
 }
 
@@ -256,10 +264,21 @@ sub publish($self) {
     my $res = $self->post('/web_api/v' . $self->api_version . '/publish', {});
     my $code = $res->code;
     my $data = $res->data;
-    croak($data->{message})
+    $self->_error_handler($data)
         unless $code == 200;
 
     return $data->{'task-id'};
+}
+
+
+sub discard($self) {
+    my $res = $self->post('/web_api/v' . $self->api_version . '/discard', {});
+    my $code = $res->code;
+    my $data = $res->data;
+    $self->_error_handler($data)
+        unless $code == 200;
+
+    return $data;
 }
 
 1;
@@ -276,7 +295,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
@@ -326,6 +345,12 @@ Logs out of the Checkpoint Manager API using version 1.
 
 Publishes all previously submitted changes.
 Returns the task id on success.
+
+=head2 discard
+
+Discards all previously submitted changes.
+Returns a hashref containing the operation status messange and the number of
+discarded changes.
 
 =head1 AUTHOR
 

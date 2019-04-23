@@ -4,12 +4,22 @@ use base 'SPVM::Data';
 
 use SPVM::ExchangeAPI;
 
+use overload bool => sub {1}, '""' => sub { shift->to_str }, fallback => 1;
+
 sub to_elems {
   my $self = shift;
   
   my $env = $self->{env};
   
   SPVM::ExchangeAPI::to_elems($env, $self);
+}
+
+sub to_strs {
+  my $self = shift;
+  
+  my $env = $self->{env};
+  
+  SPVM::ExchangeAPI::to_strs($env, $self);
 }
 
 sub to_bin {

@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings FATAL => 'all';
@@ -70,10 +70,6 @@ Once connected to the device you can enter any command and it will be run.
 
 =head1 GENERAL USAGE NOTES
 
-Please see the C<SYNOPSIS> section and the command line help for the available
-options. In the future more documentation will be forthcoming, I promise. Here
-are some highlights:
-
 The C<exit-last> option can be useful for creating a session script which
 checks for some error condition. Assuming the last command should have no
 output on success, then the exit status of the script will be non-zero when
@@ -126,7 +122,7 @@ Oliver Gorwits <oliver@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Oliver Gorwits.
+This software is copyright (c) 2019 by Oliver Gorwits.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

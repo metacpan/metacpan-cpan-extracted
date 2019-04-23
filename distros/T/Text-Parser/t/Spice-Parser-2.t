@@ -112,12 +112,6 @@ throws_ok {
     'Exception thrown if you try to change auto_chomp';
 ok( $sp->auto_chomp, 'Retains true value' );
 
-throws_ok {
-    $sp->auto_split(0);
-}
-'Moose::Exception::CannotAssignValueToReadOnlyAccessor',
-    'Dont change auto_split ; it is ro';
-
 lives_ok { $sp->read('t/example-2.sp'); } 'Works fine';
 is( $sp->has_aborted,             1, 'Has aborted' );
 is( scalar( $sp->get_records() ), 1, '1 record saved' );

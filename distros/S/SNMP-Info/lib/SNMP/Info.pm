@@ -21,11 +21,11 @@ use NetAddr::IP::Lite ':lower';
 @SNMP::Info::ISA       = qw/Exporter/;
 @SNMP::Info::EXPORT_OK = qw//;
 
-use vars
-    qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
-    $NOSUCH $BIGINT $REPEATERS/;
+our
+    ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
+     $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.66
+SNMP::Info - Version 3.67
 
 =head1 AUTHOR
 
@@ -338,6 +338,12 @@ F<CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB>
 
 See documentation in L<SNMP::Info::CiscoVTP> for details.
 
+=item SNMP::Info::DocsisHE
+
+SNMP Interface for DOCSIS CMTS
+
+See documentation in L<SNMP::Info::DocsisHE> for details.
+
 =item SNMP::Info::EDP
 
 Extreme Discovery Protocol.  F<EXTREME-EDP-MIB>
@@ -363,14 +369,6 @@ Foundry (Brocade) Discovery Protocol.  F<FOUNDRY-SN-SWITCH-GROUP-MIB>
 
 See documentation in L<SNMP::Info::FDP> for details.
 
-=item SNMP::Info::IPv6
-
-SNMP Interface for obtaining configured IPv6 addresses and mapping IPv6
-addresses to MAC addresses and interfaces, using information from F<IP-MIB>,
-F<IPV6-MIB> and/or F<CISCO-IETF-IP-MIB>.
-
-See documentation in L<SNMP::Info::IPv6> for details.
-
 =item SNMP::Info::IEEE802dot11
 
 F<IEEE802dot11-MIB>.  A collection of OIDs providing information about
@@ -383,6 +381,14 @@ See documentation in L<SNMP::Info::IEEE802dot11> for details.
 SNMP Interface to IEEE Aggregated Links.  F<IEEE8023-LAG-MIB>
 
 See documentation in L<SNMP::Info::IEEE802dot3ad> for details.
+
+=item SNMP::Info::IPv6
+
+SNMP Interface for obtaining configured IPv6 addresses and mapping IPv6
+addresses to MAC addresses and interfaces, using information from F<IP-MIB>,
+F<IPV6-MIB> and/or F<CISCO-IETF-IP-MIB>.
+
+See documentation in L<SNMP::Info::IPv6> for details.
 
 =item SNMP::Info::LLDP
 
@@ -906,6 +912,12 @@ Subclass for Lantronix devices.
 
 See documentation in L<SNMP::Info::Layer3::Lantronix> for details.
 
+=item SNMP::Info::Layer3::Lenovo
+
+Subclass for Lenovo switches running CNOS.
+
+See documentation in L<SNMP::Info::Layer3::Lenovo> for details.
+
 =item SNMP::Info::Layer3::Microsoft
 
 Subclass for Generic Microsoft Routers running Microsoft Windows OS.
@@ -1376,7 +1388,15 @@ sub new {
     $new_obj->{snmp_comm} = $sess->{Community} || $args{Community} || 'public';
     $new_obj->{snmp_user} = $sess->{SecName}   || $args{SecName}   || 'initial';
 
-    return $auto_specific ? $new_obj->specify() : $new_obj;
+    my $info = $auto_specific ? $new_obj->specify() : $new_obj;
+
+    if ( $info->debug() > 1 ) {
+        require mro;
+        print STDERR (ref $info) ." has resolution order: \n";
+        print STDERR "  $_\n" foreach @{ mro::get_linear_isa( ref $info ) };
+    }
+
+    return $info;
 }
 
 =item update()
@@ -1665,6 +1685,7 @@ sub device_type {
         14823 => 'SNMP::Info::Layer3::Aruba',
         14988 => 'SNMP::Info::Layer3::Mikrotik',
         17163 => 'SNMP::Info::Layer3::Steelhead',
+        19046 => 'SNMP::Info::Layer3::Lenovo',
         21091 => 'SNMP::Info::Layer2::Exinda',
         25506 => 'SNMP::Info::Layer3::H3C',
         25461 => 'SNMP::Info::Layer3::PaloAlto',
@@ -2195,6 +2216,7 @@ sub specify {
 
     $self->debug()
         and print "SNMP::Info::specify() - Changed Class to $device_type.\n";
+
     return $sub_obj;
 }
 
@@ -3354,7 +3376,7 @@ $info->init() will throw an exception if a MIB does not load.
     # been overridden during the compliation of the local Net-SNMP library.
     # These cover the globals and funcs defined in this file.
     'SNMPv2-MIB'  => 'sysObjectID',
-    'RFC1213-MIB' => 'ipRouteIfIndex',
+    # (#325) 'RFC1213-MIB' => 'ipRouteIfIndex',
     'IP-MIB'      => 'ipAdEntAddr',
     'IF-MIB'      => 'ifIndex',
 );
@@ -3417,7 +3439,7 @@ will inherit the Cisco Vlan module as an example.
                                        SNMP::Info::CiscoVTP Exporter/;
  @SNMP::Info::Layer2::Sample::EXPORT_OK = qw//;
 
- use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG/;
+ our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG);
 
  %MIBS    = (%SNMP::Info::Layer2::MIBS,
              %SNMP::Info::CiscoVTP::MIBS,
@@ -4822,6 +4844,11 @@ sub _validate_autoload_method {
         return [1,(exists $self->{store}->{$method} ? 1: 0)];
     }
 
+    # (#325) lazy load legacy RFC1213-MIB only if needed
+    SNMP::loadModules('RFC1213-MIB')
+      if $leaf_name =~ m/^(?:RFC1213-MIB::|ipr_|ipRoute)/
+         and not SNMP::translateObj($leaf_name);
+
     # Translate MIB leaf node name to OID
     my $oid = SNMP::translateObj($leaf_name);
 
@@ -4983,8 +5010,6 @@ For example to override $info->name() create `` sub name {...}'' in your
 subclass.
 
 =cut
-
-our $AUTOLOAD;
 
 sub AUTOLOAD {
     my $self = shift;

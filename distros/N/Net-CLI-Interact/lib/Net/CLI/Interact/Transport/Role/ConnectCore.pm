@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Transport::Role::ConnectCore;
-{ $Net::CLI::Interact::Transport::Role::ConnectCore::VERSION = '2.300002' }
+{ $Net::CLI::Interact::Transport::Role::ConnectCore::VERSION = '2.300003' }
 
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(Int);

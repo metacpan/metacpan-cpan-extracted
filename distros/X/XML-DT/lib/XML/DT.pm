@@ -6,7 +6,10 @@ use 5.008006;
 use strict;
 
 use Data::Dumper;
-use LWP::Simple;
+
+use HTTP::Tiny;
+my $ua = HTTP::Tiny->new();
+
 use XML::DTDParser "ParseDTDFile";
 
 use XML::LibXML ':libxml';
@@ -23,7 +26,7 @@ our @EXPORT = qw(&dt &dtstring &dturl &inctxt &ctxt &mkdtskel &inpath
                  @dtatributes @dtattributes &pathdt &pathdtstring
                  &father &gfather &ggfather &root);
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 =encoding utf-8
 
@@ -97,7 +100,7 @@ of XPath on handler keys. Example:
    "title"                => sub{ $c },
    "//image[@type='jpg']" => sub{ "JPEG: <img src=\"$c\">" },
    "//image[@type='bmp']" => sub{ "BMP: sorry, no bitmaps on the web" },
- )
+ );
 
  pathdt($filename, %handler);
 
@@ -649,10 +652,13 @@ sub pathdturl{
 
 sub dturl{
   my $url = shift;
-  my $contents = get($url);
-  if ($contents) {
-    return dtstring($contents, @_);
+  my $contents = $ua->get($url);
+  if ($contents->{success}) {
+#    warn("JJ ok\n");
+    return dtstring($contents->{content}, @_);
   } else {
+#    warn("JJ not ok\n");
+    warn("$contents->{status}: $contents->{reason}");
     return undef;
   }
 }

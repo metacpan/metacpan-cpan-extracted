@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.024000",
   "NAME" => "Net::Checkpoint::Management::v1",
   "PREREQ_PM" => {
+    "Carp::Clan" => "6.07",
     "Clone" => "0.41",
     "JSON" => "2.97001",
     "Moo" => "2.003004",
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => "0.000119",
     "Test::More" => 0
   },
-  "VERSION" => "0.001001",
+  "VERSION" => "0.001002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp::Clan" => "6.07",
   "Clone" => "0.41",
   "File::Spec" => 0,
   "IO::Handle" => 0,

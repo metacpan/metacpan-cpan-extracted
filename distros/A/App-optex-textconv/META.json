@@ -56,11 +56,17 @@
    "provides" : {
       "App::optex::textconv" : {
          "file" : "lib/App/optex/textconv.pm",
-         "version" : "0.02"
+         "version" : "0.03"
+      },
+      "App::optex::textconv::Converter" : {
+         "file" : "lib/App/optex/textconv/Converter.pm"
+      },
+      "App::optex::textconv::default" : {
+         "file" : "lib/App/optex/textconv/default.pm"
       },
       "App::optex::textconv::msdoc" : {
          "file" : "lib/App/optex/textconv/msdoc.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -74,7 +80,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-textconv"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>"

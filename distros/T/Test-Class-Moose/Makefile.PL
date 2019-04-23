@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Sub::Attribute" => 0,
     "TAP::Formatter::Color" => "3.29",
-    "Test2" => "1.1302118",
+    "Test2" => "1.302118",
     "Test2::API" => 0,
     "Test2::AsyncSubtest" => "0.000018",
     "Test2::IPC" => 0,
@@ -69,7 +69,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.96",
+  "VERSION" => "0.97",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,7 +101,7 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Sub::Attribute" => 0,
   "TAP::Formatter::Color" => "3.29",
-  "Test2" => "1.1302118",
+  "Test2" => "1.302118",
   "Test2::API" => 0,
   "Test2::AsyncSubtest" => "0.000018",
   "Test2::IPC" => 0,

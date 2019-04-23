@@ -39,7 +39,7 @@
    "provides" : {
       "Storable" : {
          "file" : "__Storable__.pm",
-         "version" : "3.11"
+         "version" : "3.15"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "web" : "http://rt.perl.org/perlbug/"
       }
    },
-   "version" : "3.11",
+   "version" : "3.15",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

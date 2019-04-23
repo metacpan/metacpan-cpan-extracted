@@ -1,15 +1,15 @@
 package Range::Iter;
 
-our $DATE = '2019-04-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
 
+use Scalar::Util qw(looks_like_number);
+
 use Exporter qw(import);
 our @EXPORT_OK = qw(range_iter);
-
-my $re_num = qr/\A[+-]?[0-9]+(\.[0-9]+)?\z/;
 
 sub range_iter($$;$) {
     my ($start, $end, $step) = @_;
@@ -18,7 +18,7 @@ sub range_iter($$;$) {
     my $value = $start;
     my $ended;
 
-    if ($start =~ $re_num && $end =~ $re_num) {
+    if (looks_like_number($start) && looks_like_number($end)) {
         # numeric version
         $ended++ if $value > $end;
         sub {
@@ -54,7 +54,7 @@ Range::Iter - Generate a coderef iterator for range
 
 =head1 VERSION
 
-This document describes version 0.001 of Range::Iter (from Perl distribution Range-Iter), released on 2019-04-16.
+This document describes version 0.002 of Range::Iter (from Perl distribution Range-Iter), released on 2019-04-23.
 
 =head1 SYNOPSIS
 
@@ -67,9 +67,14 @@ You can add step:
 
  my $iter = range_iter(1, 10, 2); # 1, 3, 5, 7, 9
 
-Anything that can be incremented by Perl is game:
+You can use alphanumeric strings too since C<++> has some extra builtin magic
+(see L<perlop>):
 
-  $iter = range_iter("a", "e"); # a, b, c, d, e
+ $iter = range_iter("zx", "aab"); # zx, zy, zz, aaa, aab
+
+Infinite list:
+
+ $iter = range_iter(1, Inf); # 1, 2, 3, ...
 
 =head1 DESCRIPTION
 

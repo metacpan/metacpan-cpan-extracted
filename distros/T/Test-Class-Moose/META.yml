@@ -29,73 +29,73 @@ name: Test-Class-Moose
 provides:
   Test::Class::Moose:
     file: lib/Test/Class/Moose.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::AttributeRegistry:
     file: lib/Test/Class/Moose/AttributeRegistry.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::CLI:
     file: lib/Test/Class/Moose/CLI.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Config:
     file: lib/Test/Class/Moose/Config.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Deprecated:
     file: lib/Test/Class/Moose/Deprecated.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Executor::Parallel:
     file: lib/Test/Class/Moose/Executor/Parallel.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Executor::Sequential:
     file: lib/Test/Class/Moose/Executor/Sequential.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Load:
     file: lib/Test/Class/Moose/Load.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Report:
     file: lib/Test/Class/Moose/Report.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Report::Class:
     file: lib/Test/Class/Moose/Report/Class.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Report::Instance:
     file: lib/Test/Class/Moose/Report/Instance.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Report::Method:
     file: lib/Test/Class/Moose/Report/Method.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Report::Time:
     file: lib/Test/Class/Moose/Report/Time.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role:
     file: lib/Test/Class/Moose/Role.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role::AutoUse:
     file: lib/Test/Class/Moose/Role/AutoUse.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role::CLI:
     file: lib/Test/Class/Moose/Role/CLI.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role::Executor:
     file: lib/Test/Class/Moose/Role/Executor.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role::HasTimeReport:
     file: lib/Test/Class/Moose/Role/HasTimeReport.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role::ParameterizedInstances:
     file: lib/Test/Class/Moose/Role/ParameterizedInstances.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Role::Reporting:
     file: lib/Test/Class/Moose/Role/Reporting.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Runner:
     file: lib/Test/Class/Moose/Runner.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Tutorial:
     file: lib/Test/Class/Moose/Tutorial.pm
-    version: '0.96'
+    version: '0.97'
   Test::Class::Moose::Util:
     file: lib/Test/Class/Moose/Util.pm
-    version: '0.96'
+    version: '0.97'
 recommends:
   Parallel::ForkManager: v0.7.6
 requires:
@@ -122,7 +122,7 @@ requires:
   Scalar::Util: '0'
   Sub::Attribute: '0'
   TAP::Formatter::Color: '3.29'
-  Test2: '1.1302118'
+  Test2: '1.302118'
   Test2::API: '0'
   Test2::AsyncSubtest: '0.000018'
   Test2::IPC: '0'
@@ -137,7 +137,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/test-class-moose/issues
   homepage: http://metacpan.org/release/Test-Class-Moose/
   repository: git://github.com/houseabsolute/test-class-moose.git
-version: '0.96'
+version: '0.97'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -162,7 +162,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -660,8 +660,12 @@ x_Dist_Zilla:
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@DROLSKY/InstallGuide'
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
@@ -734,13 +738,13 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CODE_OF_CONDUCT.md
@@ -759,7 +763,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -767,16 +771,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.96
-          tag_format: v%v
-          tag_message: v%v
+          tag: v0.97
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -788,7 +792,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -819,7 +823,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -831,7 +835,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
       config:
@@ -913,6 +917,7 @@ x_Dist_Zilla:
 x_authority: cpan:DROLSKY
 x_contributors:
   - 'Andy Jack <github@veracity.ca>'
+  - 'Christopher Layne <clayne@apple.com>'
   - 'Chuck Adams <charles_adams@symantec.com>'
   - 'Denny de la Haye <denny@users.noreply.github.com>'
   - 'Desmond Daignault <nawglan@users.noreply.github.com>'

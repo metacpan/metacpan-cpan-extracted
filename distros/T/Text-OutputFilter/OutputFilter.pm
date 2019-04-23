@@ -3,7 +3,7 @@ package Text::OutputFilter;
 use strict;
 use warnings;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 =head1 NAME
 
@@ -70,7 +70,7 @@ H.Merijn Brand <h.m.brand@procura.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2016 H.Merijn Brand for PROCURA B.V.
+Copyright (C) 2006-2019 H.Merijn Brand for PROCURA B.V.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
@@ -83,8 +83,7 @@ perl(1), perlopen(1), 'open STDOUT, "|-"', Text::Filter
 
 use Carp;
 
-sub TIEHANDLE
-{
+sub TIEHANDLE {
     my ($class, $lm, $io, $ref, $fno) = @_;
 
     defined $lm  or $lm  = 4;
@@ -123,8 +122,7 @@ sub TIEHANDLE
         }, $class;
     } # TIEHANDLE
 
-sub BINMODE
-{
+sub BINMODE {
     my $self = shift;
     $self->{closed} and croak "Cannot set binmode on closed filehandle";
     if (@_) {
@@ -136,21 +134,18 @@ sub BINMODE
 	}
     } # BINMODE
 
-sub FILENO
-{
+sub FILENO {
     my $self = shift;
     fileno $self->{io};
     } # FILENO
 
-sub _Filter_
-{
+sub _Filter_ {
     my ($nl, $pfx, $sub, $line) = @_;
     my $l = $sub->($line);
     defined $l ? $pfx . $l . ($nl ? "\n" : "") : "";
     } # _Filter_
 
-sub PRINT
-{
+sub PRINT {
     my $self = shift;
     my ($pfx, $io, $sub) = @{$self}{qw( pfx io sb )};
 
@@ -161,11 +156,10 @@ sub PRINT
     my $line = $self->{line} . (join $fsep => @_) . $rsep;
     my @line = split m/\n/, $line, -1;
     $self->{line} = pop @line;
-    print { $io } _Filter_ (1, $pfx, $sub, $_) for @line;
+    print { $io } map { _Filter_ (1, $pfx, $sub, $_) } @line;
     } # PRINT
 
-sub PRINTF
-{
+sub PRINTF {
     my $self = shift;
     my ($pfx, $io, $sub) = @{$self}{qw( pfx io sb )};
 
@@ -176,21 +170,18 @@ sub PRINTF
     $self->PRINT (sprintf $fmt, @_);
     } # PRINTF
 
-sub TELL
-{
+sub TELL {
     my $self = shift;
     $self->{closed} and croak "Cannot tell from a closed filehandle";
     tell $self->{io};
     } # TELL
 
-sub EOF
-{
+sub EOF {
     my $self = shift;
     $self->{closed};
     } # EOF
 
-sub CLOSE
-{
+sub CLOSE {
     my $self = shift;
     my ($pfx, $io, $sub, $line) = @{$self}{qw( pfx io sb line )};
     defined $line && $line ne "" and
@@ -200,15 +191,13 @@ sub CLOSE
     $self->{closed} = 1;
     } # CLOSE
 
-sub UNTIE
-{
+sub UNTIE {
     my $self = shift;
     $self->{closed} or $self->CLOSE;
     $self;
     } # UNTIE
 
-sub DESTROY
-{
+sub DESTROY {
     my $self = shift;
     $self->{closed} or $self->CLOSE;
     %$self = ();
@@ -217,8 +206,7 @@ sub DESTROY
 
 ### ###########################################################################
 
-sub _outputOnly
-{
+sub _outputOnly {
     my $name = shift;
     sub { croak "No support for $name method: File is output only" };
     } # _outputOnly
@@ -230,8 +218,7 @@ sub _outputOnly
 *getc		= _outputOnly ("getc");
 *GETC		= _outputOnly ("GETC");
 
-sub _NYI
-{
+sub _NYI {
     my $name = shift;
     sub { croak "Support for $name method NYI" };
     } # _NYI

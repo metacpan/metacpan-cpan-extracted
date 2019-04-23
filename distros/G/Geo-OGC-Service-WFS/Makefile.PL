@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Geo::OGC::Service::WFS',
     VERSION_FROM      => 'lib/Geo/OGC/Service/WFS.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    MIN_PERL_VERSION  => '5.010000',
+    MIN_PERL_VERSION  => '5.012000',
     PM                => { 'lib/Geo/OGC/Service/WFS.pm' => '$(INST_LIBDIR)/WFS.pm',
                            'lib/Geo/OGC/Service/Filter.pm' => '$(INST_LIBDIR)/Filter.pm',
     },
@@ -14,7 +14,7 @@ WriteMakefile(
                            "Clone" => 0,
                            "JSON" => 0,
                            "DBI" => 0,
-                           "Geo::GDAL" => 2, # probably a sensible minimum
+                           "Geo::GDAL" => 2.01, # to use streaming objects
                            "HTTP::Date" => 0,
                            "File::MkTemp" => 0,
                            "Data::Dumper" => 0,

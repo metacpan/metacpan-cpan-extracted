@@ -8,13 +8,12 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,5 +34,5 @@ requires:
 resources:
   bugtracker: http://github.com/xsawyerx/perlbal-plugin-sessionaffinity/issues
   repository: http://github.com/xsawyerx/perlbal-plugin-sessionaffinity
-version: '0.101'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.110'
+x_serialization_backend: 'YAML::Tiny version 1.73'

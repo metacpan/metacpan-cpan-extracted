@@ -20,8 +20,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Text::Parser",
   "PREREQ_PM" => {
-    "Exception::Class" => 0,
-    "Exporter" => 0,
     "FileHandle" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
@@ -39,6 +37,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Exception::Class" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Output" => 0,
@@ -46,7 +45,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.918",
+  "VERSION" => "0.919",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +55,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Test::TidyAll" => 0,
   "Exception::Class" => 0,
-  "Exporter" => 0,
   "FileHandle" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,

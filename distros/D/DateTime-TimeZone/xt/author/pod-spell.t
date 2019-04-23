@@ -31,6 +31,7 @@ Amsterdam
 Anadyr
 Anchorage
 Andorra
+Andrew
 Android
 Antarctica
 Anwar
@@ -388,6 +389,7 @@ Palau
 Palmer
 Panama
 Pangnirtung
+Paprocki
 Papua
 Paramaribo
 Paris
@@ -566,6 +568,7 @@ Zone
 Zurich
 alexey
 alfiej
+apaprocki
 autarch
 brong
 d'Ivoire

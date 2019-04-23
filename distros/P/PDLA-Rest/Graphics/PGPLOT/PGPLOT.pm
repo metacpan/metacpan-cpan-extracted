@@ -8,12 +8,12 @@ PDLA::Graphics::PGPLOT - PGPLOT enhanced interface for PDLA
 
 =head1 SYNOPSIS
 
- pdl> $a = pdl [1..100]
- pdl> $b = sqrt($a)
- pdl> line $b
+ pdl> $x = pdl [1..100]
+ pdl> $y = sqrt($x)
+ pdl> line $y
  pdl> hold
  Graphics on HOLD
- pdl> $c = sin($a/10)*2 + 4
+ pdl> $c = sin($x/10)*2 + 4
  pdl> line $c
 
 =head1 DESCRIPTION
@@ -58,7 +58,7 @@ Device manipulation commands:
  dev          -  Explicitly set a new PGPLOT graphics device
  new_window   -  Create a new plot window (use of dev is recommended)
  focus_window -  Change focus to a new window
- window_list  -  Get a list of currently exisiting plot windows
+ window_list  -  Get a list of currently existing plot windows
  close_window -  Close an open window
 
 
@@ -146,7 +146,10 @@ package PDLA::Graphics::PGPLOT;
 use PDLA::Core qw/:Func :Internal/; # Grab the Core names
 use PDLA::Graphics::PGPLOTOptions qw(default_options);
 use PDLA::Graphics::PGPLOT::Window;
-use PGPLOT;
+BEGIN {
+  eval { require PGPLOT; PGPLOT->import; 1 }
+    or die "Dependency on PGPLOT is not satisfied: $@";
+}
 use Exporter;
 
 use strict;

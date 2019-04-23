@@ -21,11 +21,11 @@ no_index:
     - t
     - inc
 requires:
-  Module::Load: '0'
+  Module::Runtime: '0'
   overload: '0'
   perl: '5.01'
 resources:
   bugtracker: https://github.com/FGasper/p5-X-Tiny/issues
   repository: https://github.com/FGasper/p5-X-Tiny.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

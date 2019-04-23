@@ -1,7 +1,7 @@
 package Perl::Critic::Policy::Variables::ProhibitLoopOnHash;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Don't write loops on hashes, only on keys and values of hashes
-$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.007';
+$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.008';
 use strict;
 use warnings;
 use parent 'Perl::Critic::Policy';
@@ -39,7 +39,7 @@ sub violates {
     # a postfix for() is a PPI::Statement
     # This was originally written as: $elem->snext_sibling or return
     $elem->parent && $elem->parent->isa('PPI::Statement::Expression')
-        and return;
+        and return ();
 
     # for \my %foo
     if ( !$elem->snext_sibling ) {
@@ -193,7 +193,7 @@ Perl::Critic::Policy::Variables::ProhibitLoopOnHash - Don't write loops on hashe
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 
@@ -211,7 +211,7 @@ An effort is made to detect expressions:
     action() for %{ $hash{'stuff'} } ? keys %{ $hash{'stuff'} } : (); # ok
 
 (Granted, the second example there doesn't make much sense, but I have found
-a variationo of it in real code.)
+a variation of it in real code.)
 
 =head1 CONFIGURATION
 
@@ -219,7 +219,7 @@ This policy is not configurable except for the standard options.
 
 =head1 AUTHOR
 
-Sawyer X, C<xsaawyerx@cpan.org>
+Sawyer X, C<xsawyerx@cpan.org>
 
 =head1 THANKS
 

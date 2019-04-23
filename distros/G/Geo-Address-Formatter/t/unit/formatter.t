@@ -110,8 +110,20 @@ my $GAF = $CLASS->new( conf_path => $path );
       $components
     );
   } qr/invalid replacement/, 'got warning';
+}
 
 
+{
+    my $components = {
+        'continent' => 'Antarctica',
+        'country_code' => ''
+    };
+    $GAF->_sanity_cleaning($components),
+    is_deeply(
+        $components,
+        { 'continent' => 'Antarctica'},
+    '_sanity_cleaning'
+  );
 }
 
 {

@@ -46,21 +46,21 @@ PDLA::Transform::Proj4 - PDLA::Transform interface to the Proj4 projection libra
  # Make an orthographic map of Earth
  use PDLA::Transform::Cartography;
  use PDLA::Transform::Proj4;
- $a = earth_coast();
- $a = graticule(10,2)->glue(1,$a);
+ $x = earth_coast();
+ $x = graticule(10,2)->glue(1,$x);
  $t = t_proj( proj_params => "+proj=ortho +ellps=WGS84 +lon_0=-90 +lat_0=40" );
  $w = pgwin(xs);
- $w->lines($t->apply($a)->clean_lines());
+ $w->lines($t->apply($x)->clean_lines());
  
  # Using the aliased functions:
  # Make an orthographic map of Earth
  use PDLA::Transform::Cartography;
  use PDLA::Transform::Proj4;
- $a = earth_coast();
- $a = graticule(10,2)->glue(1,$a);
+ $x = earth_coast();
+ $x = graticule(10,2)->glue(1,$x);
  $t = t_proj_ortho( ellps => 'WGS84', lon_0 => -90, lat_0 => 40 )
  $w = pgwin(xs);
- $w->lines($t->apply($a)->clean_lines());
+ $w->lines($t->apply($x)->clean_lines());
 
 =head1 DESCRIPTION
 

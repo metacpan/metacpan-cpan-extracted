@@ -4,7 +4,7 @@ package Database::Async::Engine::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use parent qw(Database::Async::Engine);
 
@@ -84,6 +84,17 @@ Defaults to 2 megabytes.
 
 sub read_len { shift->{read_len} //= 2 * 1024 * 1024 }
 
+=head2 write_len
+
+Buffer write length. Higher values mean we will attempt to write more
+data for each I/O loop iteration.
+
+Defaults to 2 megabytes.
+
+=cut
+
+sub write_len { shift->{write_len} //= 2 * 1024 * 1024 }
+
 =head2 connect
 
 Establish a connection to the server.
@@ -125,6 +136,7 @@ async sub connect {
         my $stream = IO::Async::Stream->new(
             handle   => $sock,
             read_len => $self->read_len,
+            write_len => $self->write_len,
             on_read  => sub { 0 }
         )
     );
@@ -146,7 +158,7 @@ async sub connect {
     $log->tracef('Send initial request with user %s', $uri->user);
     my %qp = $uri->query_params;
     delete $qp{sslmode};
-    $qp{application_name} //= 'Database::Async';
+    $qp{application_name} //= $self->application_name;
     $self->protocol->send_startup_request(
         database         => $self->database_name,
         user             => $self->database_user,
@@ -218,6 +230,9 @@ async sub negotiate_ssl {
     }
     return $stream;
 }
+
+sub is_replication { shift->{is_replication} //= 0 }
+sub application_name { shift->{application_name} //= 'perl' }
 
 =head2 uri_for_dsn
 

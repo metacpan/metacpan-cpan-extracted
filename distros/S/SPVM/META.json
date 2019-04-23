@@ -1,5 +1,5 @@
 {
-   "abstract" : "Static Perl Virtual Machine. Fast calcuration & Easy C/C++ Binding",
+   "abstract" : "Static Perl Virtual Machine. Fast calculation & Easy C/C++ Binding",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
@@ -42,5 +42,5 @@
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.0427"
+   "version" : "0.0429"
 }

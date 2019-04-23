@@ -9,7 +9,7 @@ use warnings;
 use base q(RDF::Simple::Serialiser);
 
 our
-$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 1.31;
 
 =head1 NAME
 

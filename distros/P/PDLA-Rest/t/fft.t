@@ -1,7 +1,5 @@
-
 use strict;
 use warnings;
-
 use PDLA;
 use PDLA::Image2D;
 use PDLA::FFT;
@@ -20,9 +18,9 @@ foreach my $type(double,float){
   $pa = pdl($type,1,-1,1,-1);
   $pb = zeroes($type,$pa->dims);
   fft($pa,$pb);
-  ok(all($pa==pdl($type,0,0,4,0))); #1,3
+  ok(all($pa==pdl($type,0,0,4,0)), "fft for type $type");
   ifft($pa,$pb);
-  ok(all($pa==pdl($type,1,-1,1,-1))); #2,4
+  ok(all($pa==pdl($type,1,-1,1,-1)), "ifft for type $type");
 }
 
 $pk = ones(5,5);
@@ -32,23 +30,23 @@ $pb = $pa->copy;
 $pc = $pb->zeroes;
 fft($pb,$pc);
 ifft($pb,$pc);
-ok (tapprox($pc,0)); #5
+ok (tapprox($pc,0), "fft zeroes");
 
 #print "\n",$pc->info("Type: %T Dim: %-15D State: %S"),"\n";
 #print "Max: ",$pc->max,"\n";
 #print "Min: ",$pc->min,"\n";
    
-ok (tapprox($pa,$pb)); #6
+ok (tapprox($pa,$pb), "m51 image recovered");
 
 $pb = $pa->copy;
 $pc = $pb->zeroes; fftnd($pb,$pc); ifftnd($pb,$pc);
-ok ( tapprox($pc,0) ); #7
-ok ( tapprox($pa,$pb) );#8
+ok ( tapprox($pc,0), "fftnd zeroes");
+ok ( tapprox($pa,$pb), "fftnd real image");
 
 $pb = $pa->slice("1:35,1:69");
 $pc = $pb->copy; fftnd($pb,$pc); ifftnd($pb,$pc);
-ok ( tapprox($pc,$pb) );#9
-ok ( tapprox($pa->slice("1:35,1:69"),$pb) );#10
+ok ( tapprox($pc,$pb), "fftnd real and imaginary");
+ok ( tapprox($pa->slice("1:35,1:69"),$pb), "fftnd original restored");
 
 # Now compare fft convolutions with direct method
 
@@ -56,8 +54,8 @@ $pb = conv2d($pa,$pk);
 $kk = kernctr($pa,$pk);
 fftconvolve( $pi=$pa->copy, $kk );
 
-ok ( tapprox($kk,0) );#11
-ok ( tapprox($pi,$pb) );#12
+ok ( tapprox($kk,0), "kernctr");
+ok ( tapprox($pi,$pb), "fftconvolve" );
 
 $pk = pdl[
  [ 0.51385498,  0.17572021,  0.30862427],
@@ -73,15 +71,15 @@ $pb = conv2d($pa,$pk);
 $kk = kernctr($pa,$pk);
 fftconvolve( $pi=$pa->copy, $kk );
 
-ok ( tapprox($kk,0) );#13
-ok ( tapprox($pi,$pb) );#14
+ok ( tapprox($kk,0), "kernctr weird kernel");
+ok ( tapprox($pi,$pb), "fftconvolve weird kernel");
 
 $pb = $pa->copy;
 
 # Test real ffts
 realfft($pb);
 realifft($pb);
-ok( tapprox($pa,$pb) );#15
+ok( tapprox($pa,$pb), "realfft");
 
 # Test that errors are properly caught
 throws_ok {fft(sequence(10))}

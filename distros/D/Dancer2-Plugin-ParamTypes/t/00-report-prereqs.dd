@@ -16,7 +16,8 @@ do { my $x = {
                       'requires' => {
                                       'Dancer2' => '0',
                                       'Ref::Util' => '0',
-                                      'constant' => '0'
+                                      'constant' => '0',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

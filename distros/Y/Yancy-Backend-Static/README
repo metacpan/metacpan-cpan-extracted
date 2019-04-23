@@ -1,0 +1,46 @@
+Yancy::Backend::Static
+
+This Yancy::Backend allows Yancy to work with a site made up of Markdown
+files with YAML frontmatter, like a Statocles site. In other words, this
+module works with a flat-file database made up of YAML + Markdown files.
+
+  Collections
+
+You should configure the "pages" collection to have all of the fields
+that could be in the frontmatter of your Markdown files. This is JSON
+Schema and will be validated, but if you're using the Yancy editor, make
+sure only to use the types Yancy supports.
+
+  Limitations
+
+This backend should support everything Yancy::Backend supports, though
+some list() queries may not work (please make a pull request).
+
+  Future Developments
+
+This backend could be enhanced to provide collections for static files
+(CSS, JavaScript, etc...) and templates.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -36,9 +36,9 @@ use Exporter;
 @SNMP::Info::CiscoStack::ISA       = qw/Exporter/;
 @SNMP::Info::CiscoStack::EXPORT_OK = qw//;
 
-use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE %PORTSTAT/;
+our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE, %PORTSTAT);
 
-$VERSION = '3.66';
+$VERSION = '3.67';
 
 %MIBS = ( 'CISCO-STACK-MIB' => 'ciscoStackMIB', );
 

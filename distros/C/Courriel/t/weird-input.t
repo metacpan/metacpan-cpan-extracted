@@ -8,7 +8,7 @@ use Test::Requires (
     'Path::Class' => '0',
 );
 
-use File::Slurp::Tiny qw( read_file );
+use File::Slurper qw( read_binary );
 use Path::Class qw( dir );
 
 use Courriel;
@@ -76,7 +76,7 @@ done_testing();
 sub _parse {
     my $file = shift;
 
-    my $text = read_file( $file->stringify );
+    my $text = read_binary( $file->stringify );
 
     my $email = eval { Courriel->parse( text => \$text ) };
     BAIL_OUT("Failed to parse $file")

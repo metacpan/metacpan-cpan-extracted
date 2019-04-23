@@ -1,13 +1,10 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.918;
+package Text::Parser::Multiline 0.919;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
-use Exporter 'import';
-our (@EXPORT_OK) = ();
-our (@EXPORT)    = ();
 use Moose::Role;
 
 
@@ -16,13 +13,6 @@ requires(
     qw(join_last_line is_line_continued _set_this_line this_line)
 );
 
-use Exception::Class (
-    'Text::Parser::Multiline::Error',
-    'Text::Parser::Multiline::Error::UnexpectedContinuation' => {
-        isa   => 'Text::Parser::Multiline::Error',
-        alias => 'throw_unexpected_continuation',
-    }
-);
 use Text::Parser::Errors;
 
 around save_record       => \&__around_save_record;
@@ -41,13 +31,16 @@ my %save_record_proc = (
 sub __around_save_record {
     my ( $orig, $self ) = ( shift, shift );
     $orig_save_record = $orig;
+    return $orig->( $self, @_ ) if not defined $self->multiline_type;
     my $type = $self->multiline_type;
     $save_record_proc{$type}->( $orig, $self, @_ );
 }
 
 sub __around_is_line_continued {
     my ( $orig, $self, $line ) = ( shift, shift, shift );
-    return $orig->( $self, $line ) if $self->multiline_type eq 'join_next';
+    return $orig->( $self, $line )
+        if not defined $self->multiline_type
+        or $self->multiline_type eq 'join_next';
     return 0 if not $orig->( $self, $line );
     return 1 if $self->lines_parsed() > 1;
     die unexpected_cont( line => $line );
@@ -55,6 +48,7 @@ sub __around_is_line_continued {
 
 sub __after__read_file_handle {
     my $self = shift;
+    return if not defined $self->multiline_type;
     return $self->__test_safe_eof()
         if $self->multiline_type eq 'join_next';
     $self->_set_this_line( $self->__pop_last_line );
@@ -133,7 +127,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.918
+version 0.919
 
 =head1 SYNOPSIS
 

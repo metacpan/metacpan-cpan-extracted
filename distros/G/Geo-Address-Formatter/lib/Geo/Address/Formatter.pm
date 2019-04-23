@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.75';
+$Geo::Address::Formatter::VERSION = '1.76';
 use strict;
 use warnings;
 use feature qw(say);
@@ -279,8 +279,19 @@ sub _sanity_cleaning {
         }
     }
 
+    # remove things that might be empty
+    foreach my $c (keys %$rh_components){
+        if (!defined ($rh_components->{$c})){
+            delete $rh_components->{$c};
+        }
+        if ($rh_components->{$c} !~ m/\w/){
+            delete $rh_components->{$c};
+        }
+    }
+
     # catch values containing URLs
     foreach my $c (keys %$rh_components){
+       
         if ($rh_components->{$c} =~ m|https?://|){
             delete $rh_components->{$c};
         }
@@ -673,7 +684,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 SYNOPSIS
 

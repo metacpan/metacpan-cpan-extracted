@@ -107,7 +107,7 @@ There is also another make item:
    make doctest
 
 which creates the documentation database for use
-in the PDLA shell (pdla2 or perldl).  It will be run
+in the PDLA shell (pdla2 or perldla).  It will be run
 automatically on PDLA install, but you may wish to
 run it by hand to have access to PDLA on-line docs
 when running from the build directory before/without

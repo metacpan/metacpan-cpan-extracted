@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,6 +35,21 @@ sub _get_csv_row {
     $csv->string . "\n";
 }
 
+sub _instantiate_parser {
+    require Text::CSV_XS;
+
+    my $args = shift;
+
+    my %tcsv_opts = (binary=>1);
+    if ($args->{tsv}) {
+        $tcsv_opts{sep_char}    = "\t";
+        $tcsv_opts{quote_char}  = undef;
+        $tcsv_opts{escape_char} = undef;
+    }
+
+    Text::CSV_XS->new(\%tcsv_opts);
+}
+
 sub _complete_field_or_field_list {
     # return list of known fields of a CSV
 
@@ -65,8 +80,7 @@ sub _complete_field_or_field_list {
     return undef unless defined $args && $args->{filename};
 
     # can the file be opened?
-    require Text::CSV_XS;
-    my $csv = Text::CSV_XS->new({binary => 1});
+    my $csv = _instantiate_parser(\%args);
     open my($fh), "<:encoding(utf8)", $args->{filename} or
         return [];
 
@@ -97,7 +111,7 @@ sub _complete_field_list {
     _complete_field_or_field_list('field_list', @_);
 }
 
-my %args_common = (
+our %args_common = (
     header => {
         summary => 'Whether CSV has a header row',
         schema => 'bool*',
@@ -109,9 +123,13 @@ will be named `field1`, `field2`, and so on.
 
 _
     },
+    tsv => {
+        summary => "Inform that input file is in TSV (tab-separated) format instead of CSV",
+        schema => 'bool*',
+    },
 );
 
-my %arg_filename_1 = (
+our %arg_filename_1 = (
     filename => {
         summary => 'Input CSV file',
         schema => 'filename*',
@@ -121,7 +139,7 @@ my %arg_filename_1 = (
     },
 );
 
-my %arg_filename_0 = (
+our %arg_filename_0 = (
     filename => {
         summary => 'Input CSV file',
         schema => 'filename*',
@@ -131,7 +149,7 @@ my %arg_filename_0 = (
     },
 );
 
-my %arg_filenames_0 = (
+our %arg_filenames_0 = (
     filenames => {
         'x.name.is_plural' => 1,
         summary => 'Input CSV files',
@@ -143,7 +161,7 @@ my %arg_filenames_0 = (
     },
 );
 
-my %arg_field_1 = (
+our %arg_field_1 = (
     field => {
         summary => 'Field name',
         schema => 'str*',
@@ -154,7 +172,7 @@ my %arg_field_1 = (
     },
 );
 
-my %arg_field_1_nocomp = (
+our %arg_field_1_nocomp = (
     field => {
         summary => 'Field name',
         schema => 'str*',
@@ -164,7 +182,7 @@ my %arg_field_1_nocomp = (
     },
 );
 
-my %arg_fields_1 = (
+our %arg_fields_1 = (
     fields => {
         'x.name.is_plural' => 1,
         summary => 'Field names',
@@ -177,7 +195,7 @@ my %arg_fields_1 = (
     },
 );
 
-my %arg_fields_or_field_pat = (
+our %arg_fields_or_field_pat = (
     fields => {
         'x.name.is_plural' => 1,
         summary => 'Field names',
@@ -193,7 +211,7 @@ my %arg_fields_or_field_pat = (
     },
 );
 
-my %arg_eval_2 = (
+our %arg_eval_2 = (
     eval => {
         summary => 'Perl code to do munging',
         schema => 'str*',
@@ -203,7 +221,7 @@ my %arg_eval_2 = (
     },
 );
 
-my %args_sort = (
+our %args_sort = (
     sort_reverse => {
         schema => ['bool', is=>1],
     },
@@ -216,7 +234,7 @@ my %args_sort = (
     },
 );
 
-my %args_sort_short = (
+our %args_sort_short = (
     reverse => {
         schema => ['bool', is=>1],
         cmdline_aliases => {r=>{}},
@@ -232,14 +250,14 @@ my %args_sort_short = (
     },
 );
 
-my %arg_with_data_rows = (
+our %arg_with_data_rows = (
     with_data_rows => {
         summary => 'Whether to also output data rows',
         schema => 'bool',
     },
 );
 
-my %arg_eval = (
+our %arg_eval = (
     eval => {
         summary => 'Perl code',
         schema => 'str*',
@@ -248,7 +266,7 @@ my %arg_eval = (
     },
 );
 
-my %arg_hash = (
+our %arg_hash = (
     hash => {
         summary => 'Provide row in $_ as hashref instead of arrayref',
         schema => ['bool*', is=>1],
@@ -264,10 +282,11 @@ $SPEC{csvutil} = {
         %args_common,
         action => {
             schema => ['str*', in=>[
-                'list-field-names',
-                'munge-field',
-                'delete-field',
                 'add-field',
+                'list-field-names',
+                'delete-field',
+                'munge-field',
+                'replace-newline',
                 'sort-fields',
                 'sum',
                 'avg',
@@ -276,7 +295,9 @@ $SPEC{csvutil} = {
                 'map',
                 'each-row',
                 'convert-to-hash',
+                'concat',
                 'select-fields',
+                'dump',
             ]],
             req => 1,
             pos => 0,
@@ -298,14 +319,12 @@ $SPEC{csvutil} = {
     },
 };
 sub csvutil {
-    require Text::CSV_XS;
-
     my %args = @_;
     my $action = $args{action};
     my $has_header = $args{header} // 1;
     my $add_newline = $args{add_newline} // 1;
 
-    my $csv = Text::CSV_XS->new({binary => 1});
+    my $csv = _instantiate_parser(\%args);
     open my($fh), "<:encoding(utf8)", $args{filename} or
         return [500, "Can't open input filename '$args{filename}': $!"];
 
@@ -333,6 +352,8 @@ sub csvutil {
         }
         $csv->getline($fh);
     };
+
+    my $rows = [];
 
     while (my $row = $code_getline->()) {
         $i++;
@@ -592,6 +613,17 @@ sub csvutil {
             if ($i == $args{_row_number}) {
                 $selected_row = $row;
             }
+        } elsif ($action eq 'dump') {
+            my $rowhash;
+            if ($args{hash}) {
+                $rowhash = {};
+                for (0..$#{$fields}) {
+                    $rowhash->{ $fields->[$_] } = $row->[$_];
+                }
+                push @$rows, $rowhash unless $i == 1;
+            } else {
+                push @$rows, $row;
+            }
         } else {
             return [400, "Unknown action '$action'"];
         }
@@ -618,8 +650,13 @@ sub csvutil {
                              $args{_with_data_rows} ? $i+1 : 2,
                              $has_header);
     }
+
+    if ($action eq 'dump') {
+        return [200, "OK", $rows];
+    }
+
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
-}
+} # csvutil
 
 $SPEC{csv_add_field} = {
     v => 1.1,
@@ -748,12 +785,10 @@ _
     },
 };
 sub csv_replace_newline {
-    require Text::CSV_XS;
-
     my %args = @_;
     my $with = $args{with};
 
-    my $csv = Text::CSV_XS->new({binary => 1});
+    my $csv = _instantiate_parser(\%args);
     open my($fh), "<:encoding(utf8)", $args{filename} or
         return [500, "Can't open input filename '$args{filename}': $!"];
 
@@ -1031,15 +1066,13 @@ _
     },
 };
 sub csv_concat {
-    require Text::CSV_XS;
-
     my %args = @_;
 
     my %res_field_idxs;
     my @rows;
 
     for my $filename (@{ $args{filenames} }) {
-        my $csv = Text::CSV_XS->new({binary => 1});
+        my $csv = _instantiate_parser(\%args);
         open my($fh), "<:encoding(utf8)", $filename or
             return [500, "Can't open input filename '$filename': $!"];
         my $i = 0;
@@ -1066,7 +1099,7 @@ sub csv_concat {
 
     my $num_fields = keys %res_field_idxs;
     my $res = "";
-    my $csv = Text::CSV_XS->new({binary => 1});
+    my $csv = _instantiate_parser(\%args);
 
     # generate header
     my $status = $csv->combine(
@@ -1103,6 +1136,20 @@ sub csv_select_fields {
             _fields => $args{fields}, _field_pat => $args{field_pat});
 }
 
+$SPEC{csv_dump} = {
+    v => 1.1,
+    summary => 'Dump CSV as data structure (array of array/hash)',
+    args => {
+        %args_common,
+        %arg_filename_0,
+        %arg_hash,
+    },
+};
+sub csv_dump {
+    my %args = @_;
+    csvutil(%args, action=>'dump');
+}
+
 1;
 # ABSTRACT: CLI utilities related to CSV
 
@@ -1118,7 +1165,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.015 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-04-15.
+This document describes version 0.019 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-04-23.
 
 =head1 DESCRIPTION
 
@@ -1135,6 +1182,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-convert-to-hash>
 
 =item * L<csv-delete-field>
+
+=item * L<csv-dump>
 
 =item * L<csv-each-row>
 
@@ -1155,6 +1204,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-sort-fields>
 
 =item * L<csv-sum>
+
+=item * L<dump-csv>
 
 =back
 
@@ -1216,6 +1267,10 @@ Whether CSV has a header row.
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1255,6 +1310,10 @@ Whether CSV has a header row.
 
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =item * B<with_data_rows> => I<bool>
 
@@ -1330,6 +1389,10 @@ Whether CSV has a header row.
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1374,6 +1437,10 @@ will be named C<field1>, C<field2>, and so on.
 
 Row number (e.g. 2 for first data row).
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1417,6 +1484,58 @@ Whether CSV has a header row.
 
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 csv_dump
+
+Usage:
+
+ csv_dump(%args) -> [status, msg, payload, meta]
+
+Dump CSV as data structure (array of array/hash).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =back
 
@@ -1481,6 +1600,10 @@ Whether CSV has a header row.
 
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =back
 
@@ -1557,6 +1680,10 @@ Whether CSV has a header row.
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1596,6 +1723,10 @@ Whether CSV has a header row.
 
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =back
 
@@ -1672,6 +1803,10 @@ Whether CSV has a header row.
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1726,6 +1861,10 @@ Whether CSV has a header row.
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1771,6 +1910,10 @@ Whether CSV has a header row.
 
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =item * B<with> => I<str> (default: " ")
 
@@ -1822,6 +1965,10 @@ Whether CSV has a header row.
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1865,6 +2012,10 @@ will be named C<field1>, C<field2>, and so on.
 =item * B<row_spec>* => I<str>
 
 Row number (e.g. 2 for first data row), range (2-7), or comma-separated list of such (2-7,10,20-23).
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =back
 
@@ -1914,6 +2065,10 @@ will be named C<field1>, C<field2>, and so on.
 
 =item * B<reverse> => I<bool>
 
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1953,6 +2108,10 @@ Whether CSV has a header row.
 
 When you declare that CSV does not have header row (C<--no-header>), the fields
 will be named C<field1>, C<field2>, and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =item * B<with_data_rows> => I<bool>
 
