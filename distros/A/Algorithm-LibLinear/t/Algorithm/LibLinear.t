@@ -24,13 +24,13 @@ my $input_data_set = do { local $/; <DATA> };
         Algorithm::LibLinear::DataSet->load(string => $input_data_set);
     isa_ok $data_set, 'Algorithm::LibLinear::DataSet';
 
-    my $found_cost = $learner->find_cost_parameter(
-        data_set => $data_set,
-        max => 10,
-        num_folds => 5,
-        update => 1,
-    );
-    is $learner->cost, $found_cost->[0];
+    my ($found_cost, $found_loss_sensitivity) = @{
+        $learner->find_parameters(data_set => $data_set, num_folds => 5)
+    };
+    my ($found_cost2) = @{
+        $learner->find_cost_parameter(data_set => $data_set, num_folds => 5)
+    };
+    is $found_cost, $found_cost2;
 
     my $classifier = $learner->train(data_set => $data_set);
     isa_ok $classifier, 'Algorithm::LibLinear::Model';

@@ -1,2 +1,3 @@
 name = "MooX-BuildArgs"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"

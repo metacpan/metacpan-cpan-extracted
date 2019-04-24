@@ -1,7 +1,7 @@
 package MooX::BuildArgs;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -31,6 +31,7 @@ references will not be weakened within L</build_args>.
 =cut
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
 with 'MooX::BuildArgsHooks';
@@ -64,6 +65,7 @@ Returns a hashref containing the captured arguments.
 has build_args => (
     is       => 'ro',
     init_arg => '_build_args',
+    clearer  => 'clear_build_args',
 );
 
 1;
@@ -91,10 +93,18 @@ L<MooX::SingleArg>
 
 =back
 
+=head1 SUPPORT
+
+Please submit bugs and feature requests to the
+MooX-BuildArgs GitHub issue tracker:
+
+L<https://github.com/bluefeet/MooX-BuildArgs/issues>
+
 =head1 AUTHORS
 
     Aran Clary Deltac <bluefeet@gmail.com>
     Peter Pentchev <roam@ringlet.net>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 LICENSE
 

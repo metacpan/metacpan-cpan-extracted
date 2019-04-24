@@ -1,5 +1,13 @@
 Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
 
+0.05  Wds Apr 24 CEST 2019
+    Fix building under threaded perls.
+
+0.04  Tue Apr 23 20:14:18 CEST 2019
+    Fixup builds for 5.28.x where there is already a stadtx_hash.h
+    included in the build process via perl headers.
+    Fixup documentation of fetch algorithm.
+
 0.03  Sat Mar 30 15:43:44 2019
     rename "version" to variant in all use cases
     add support for variant 1 as well as variant 0,

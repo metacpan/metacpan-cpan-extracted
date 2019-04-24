@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scatterpolar::Textfont;
 use Chart::Plotly::Trace::Scatterpolar::Transform;
 use Chart::Plotly::Trace::Scatterpolar::Unselected;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The scatterpolar trace type encompasses line charts, scatter charts, text charts, and bubble charts in polar coordinates. The data visualized as scatter point or lines is set in `r` (radial) and `theta` (angular) coordinates Text (appearing either on the chart or on hover only) is via `text`. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -93,7 +93,8 @@ has fill => (
 );
 
 has fillcolor => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Sets the fill color. Defaults to a half-transparent variant of the line color, marker color, or marker line color, whichever is available.",
 );
@@ -118,6 +119,18 @@ has hoveron => (
     isa => "Str",
     documentation =>
       "Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.",
+);
+
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
 );
 
 has hovertext => (
@@ -284,8 +297,12 @@ has thetaunit => (
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scatterpolar::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -318,7 +335,7 @@ Chart::Plotly::Trace::Scatterpolar - The scatterpolar trace type encompasses lin
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -436,6 +453,14 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
 =item * hovertext
 
 Sets hover text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. To be seen, trace `hoverinfo` must contain a *text* flag.
@@ -538,6 +563,8 @@ Sets the unit of input *theta* values. Has an effect only when on *linear* angul
 
 =item * uid
 
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
+
 =item * uirevision
 
 Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
@@ -556,7 +583,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

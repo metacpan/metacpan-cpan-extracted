@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Scatter3d::Stream;
 use Chart::Plotly::Trace::Scatter3d::Textfont;
 use Chart::Plotly::Trace::Scatter3d::Transform;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines in 3D dimension is set in `x`, `y`, `z`. Text (appearing either on the chart or on hover only) is via `text`. Bubble charts are achieved by setting `marker.size` and/or `marker.color` Projections are achieved via `projection`. Surface fills are achieved via `surfaceaxis`.
 
@@ -92,6 +92,18 @@ has hoverinfosrc => ( is            => "rw",
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatter3d::Hoverlabel", );
 
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
 has hovertext => (
     is  => "rw",
     isa => "Str|ArrayRef[Str]",
@@ -155,13 +167,6 @@ has scene => (
       "Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.",
 );
 
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
 has showlegend => (
                is            => "rw",
                isa           => "Bool",
@@ -178,7 +183,9 @@ has surfaceaxis => (
 );
 
 has surfacecolor => ( is            => "rw",
-                      documentation => "Sets the surface fill color.", );
+                      isa           => "Str",
+                      documentation => "Sets the surface fill color.",
+);
 
 has text => (
     is  => "rw",
@@ -225,8 +232,12 @@ has textsrc => ( is            => "rw",
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scatter3d::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -313,7 +324,7 @@ Chart::Plotly::Trace::Scatter3d - The data visualized as scatter point or lines 
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -406,6 +417,14 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
 =item * hovertext
 
 Sets text elements associated with each (x,y,z) triplet. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y,z) coordinates. To be seen, trace `hoverinfo` must contain a *text* flag.
@@ -448,10 +467,6 @@ Sets the opacity of the trace.
 
 Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.
 
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
 =item * showlegend
 
 Determines whether or not an item corresponding to this trace is shown in the legend.
@@ -487,6 +502,8 @@ Sets the source reference on plot.ly for  text .
 =item * transforms
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -540,7 +557,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

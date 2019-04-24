@@ -1,5 +1,20 @@
 Revision history for Perl extension Convert::BER::XS
 
+TODO: indefinite length encoding for constructed values
+TODO: max_depth? yes max_size? no...
+
+1.11 Tue Apr 23 22:16:20 CEST 2019
+	- multibyte lengths were not properly encoded when they contained
+          embedded 0 bytes.
+        - length 0x7f wasn't encoded in minimum number of bytes.
+        - lengths larger than 4 byte caused buffer overruns during encoding
+          (e.g. string lengths >= 2**32 bytes).
+	- tweaked ber_dump output.
+        - slight code tweaks and optimisations.
+        - documentation proofread (Stefan Traby).
+        - add t/05_bugs.t and t/06_snmp.t.
+        - checked, and I think we don't leak memory on errors.
+
 1.1  Sun Apr 21 13:58:00 CEST 2019
 	- added ber_dump helper function, for debugging. Kind of regretting
           not having used an OO interface for it, or the other ber_ functions,

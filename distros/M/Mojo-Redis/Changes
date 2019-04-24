@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojo-Redis
 
+3.22 2019-04-24T12:32:18+0700
+ - Forgot to update protocol parser for Mojo::Redis::Cache after 3.21 #43
+ - Fix broken link in Mojo::Redis::Connection #44
+   Contributor: Mohammad S Anwar
+
 3.21 2019-04-16T09:58:44+0700
  - Changed default protocol parser to Protocol::Redis::XS #43
 

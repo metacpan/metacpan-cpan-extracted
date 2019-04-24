@@ -4,12 +4,13 @@ author:
   - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
 build_requires:
   Module::Build: '0.3601'
+  Test::Exception: '0'
+  Test::File::ShareDir: '0'
   Test::More: '0'
   Test::Most: '0'
 configure_requires:
   Const::Fast: '0'
   Data::Dump: '0'
-  Getopt::Long::Descriptive: '0'
   Module::Build: '0.3601'
   Path::Tiny: '0'
   Text::Template: '0'
@@ -45,7 +46,7 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.023'
+version: '0.025'
 x_contributors:
   - 'stphnlyd <stephanloyd9@gmail.com>'
   - 'weatherwax <s.g.lobo@hotmail.com>'

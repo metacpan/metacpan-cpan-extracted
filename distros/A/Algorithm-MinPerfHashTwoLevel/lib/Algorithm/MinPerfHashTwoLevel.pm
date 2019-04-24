@@ -1,11 +1,12 @@
 package Algorithm::MinPerfHashTwoLevel;
-
-use 5.018004;
 use strict;
 use warnings;
-use warnings FATAL => "all";
+our $VERSION = '0.05';
+our $DEFAULT_VARIANT = 1;
+
 
 use Exporter qw(import);
+
 no warnings "portable";
 my %constant;
 BEGIN {
@@ -36,8 +37,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.03';
-our $DEFAULT_VARIANT = 1;
 
 require XSLoader;
 XSLoader::load('Algorithm::MinPerfHashTwoLevel', $VERSION);
@@ -254,6 +253,7 @@ sub compute {
 sub state {
     return $_[0]->{state};
 }
+
 1;
 __END__
 
@@ -292,10 +292,10 @@ as follows:
     2. find the xor_val for bucket[idx]
     3. if the xor_val is zero we are done, the key is not in the hash
     4. compute idx 
-        if variant == 0 and (int)xor_val < 0
-         idx = -xor_val-1
-        else 
+        if variant == 0 or (int)xor_val > 0
          idx = (h2 ^ xor_val) % n;
+        else
+         idx = -xor_val-1
     5. compare the key data associated with bucket[idx] with the key provided
     6. if they match return the desired value.
 

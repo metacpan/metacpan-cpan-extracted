@@ -1,5 +1,13 @@
 Revision history for Unix-PID-Tiny
 
+0.92 Thu Apr 18 15:02:03 2019
+    - thanks to xantronix for both all of these features (and some nice fixups to the tests):
+        - add support for persistent PID files; allow traversing /proc/$pid/fd
+          to ensure a process indicated by a PID file still holds an open file
+          descriptor for that PID file
+        - add support for checking a PID file's minimum mtime value when testing
+          if the PID file indicates a running PID
+
 0.91 Tue Jul 23 22:46:46 2013
     - rt 86817 - minor fixes
     - rt 86640 - Add pidfile functions from non-tiny version

@@ -1,7 +1,7 @@
 {
    "abstract" : "extremely lightweight but not very powerful web application framework",
    "author" : [
-      "Ashley Willis <ashley+perl@gitable.org>"
+      "Ashley Willis <ashleyw@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
@@ -44,28 +44,22 @@
    "provides" : {
       "Limper" : {
          "file" : "lib/Limper.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Limper::Engine" : {
          "file" : "lib/Limper/Engine.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Limper::Passphrase" : {
          "file" : "lib/Limper/Passphrase.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Limper::Plugin" : {
          "file" : "lib/Limper/Plugin.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "ssh://git@gitable.org/ashley/limper.git"
-      }
-   },
-   "version" : "0.013"
+   "version" : "0.014"
 }
 

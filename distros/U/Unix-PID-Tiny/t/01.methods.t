@@ -3,13 +3,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 80 + 1;    # +1 is for NoWarnings
+use File::Slurp;
+use File::Temp;
+
+use Test::More tests => 86 + 1;    # +1 is for NoWarnings
 use Test::NoWarnings;
 
 use Test::Warn;
-use File::Slurp;
-use File::Temp;
-my $dir = File::Temp->newdir();
+use Test::MockFile;
 
 our $current_kill  = sub { diag( "kill: " . explain( \@_ ) ) };
 our $current_sleep = sub { diag( "sleep: " . explain( \@_ ) ) };
@@ -26,15 +27,28 @@ BEGIN {
     *Unix::PID::Tiny::_kill = sub { $current_kill->(@_) };
 }
 
+my $dir = File::Temp->newdir();
+
 #############
 #### new() ##
 #############
 
 is( \&Unix::PID::Tiny::pid_file_no_cleanup, \&Unix::PID::Tiny::pid_file_no_unlink, 'pid_file_no_cleanup() is the same as pid_file_no_unlink()' );
 
-my $p = Unix::PID::Tiny->new();
-is( $p->{'minimum_pid'}, 11, "new() no args gives default minimum_pid" );
-is( $p->{'ps_path'},     "", "new() no args has empty ps_path" );
+{
+    my %EXPECTED_DEFAULTS = (
+        'minimum_pid'         => 11,
+        'ps_path'             => '',
+        'keep_open'           => 0,
+        'check_proc_open_fds' => 0
+    );
+
+    my $p = Unix::PID::Tiny->new();
+
+    foreach my $key ( sort keys %EXPECTED_DEFAULTS ) {
+        is( $p->{$key} => $EXPECTED_DEFAULTS{$key}, "new() no args give default $key" );
+    }
+}
 
 my $x = Unix::PID::Tiny->new( { minimum_pid => 42, ps_path => "/bin" } );
 my $s = Unix::PID::Tiny->new( { ps_path => "/bin/" } );
@@ -62,6 +76,8 @@ is( $no_exec->{'ps_path'}, "", "new() ps_path is empty when given a dir whose ps
 ############
 
 {
+    my $p = Unix::PID::Tiny->new();
+
     warning_like {
         ok( !$x->kill(41), "kill() returns false when given PID is less than minimum_pid" );
     }
@@ -108,6 +124,8 @@ is( $no_exec->{'ps_path'}, "", "new() ps_path is empty when given a dir whose ps
 ######################
 
 {
+    my $p = Unix::PID::Tiny->new();
+
     warnings_like {
         ok( !$p->is_pid_running("not numeric"), "is_pid_running(): bad arg returns false: string" );
         ok( !$p->is_pid_running(0),             "is_pid_running(): bad arg returns false: zero" );
@@ -168,6 +186,8 @@ is( $no_exec->{'ps_path'}, "", "new() ps_path is empty when given a dir whose ps
 #####################
 
 {
+    my $p = Unix::PID::Tiny->new();
+
     no warnings 'redefine';
     local *Unix::PID::Tiny::_raw_ps = sub { return ( "foo bar baz bar wop zap zig jim jag jam zog zim\n", "1 2 3 4 5 6 7 8 9 10 11 12\n" ) };
 
@@ -201,51 +221,92 @@ is( $no_exec->{'ps_path'}, "", "new() ps_path is empty when given a dir whose ps
     [ qr/isn\'t numeric in int/, qr/isn\'t numeric in int/, qr/Use of uninitialized value/, qr/Use of uninitialized value/ ], "pid_info_hash(): Weird args give weird warnings";
 }
 
-my $myps = $p->pid_info_hash($$);
-is( $myps->{PID}, $$, "pid_info_hash(): calls ps and parses result" );
+{
+    my $p = Unix::PID::Tiny->new();
+
+    my $myps = $p->pid_info_hash($$);
+    is( $myps->{PID}, $$, "pid_info_hash(): calls ps and parses result" );
+}
 
 ################
 ##### _raw_ps ##
 ################
 
-my @ps = $p->_raw_ps($$);
-is( @ps, 2, "_raw_ps: returns array in array context" );
+{
+    my $p = Unix::PID::Tiny->new();
 
-my $ps = $p->_raw_ps($$);
-my ($end) = reverse( split( /\s+/, $ps[1], 11 ) );
-like( $ps, qr/^$ps[0]/,   "_raw_ps: returns single string in scalar context (begin)" );
-like( $ps, qr/\Q$end\E$/, "_raw_ps: returns single string in scalar context (end)" );
+    my @ps = $p->_raw_ps($$);
+    is( @ps, 2, "_raw_ps: returns array in array context" );
+
+    my $ps = $p->_raw_ps($$);
+    my ($end) = reverse( split( /\s+/, $ps[1], 11 ) );
+    like( $ps, qr/^$ps[0]/,   "_raw_ps: returns single string in scalar context (begin)" );
+    like( $ps, qr/\Q$end\E$/, "_raw_ps: returns single string in scalar context (end)" );
+}
 
 ############################
 #### get_pid_from_pidfile ##
 ############################
 
-is( $p->get_pid_from_pidfile("$dir/noexist.pid"), 0, "get_pid_from_pidfile: returns zerp on !-e pidfile" );
+{
+    my $p = Unix::PID::Tiny->new();
 
-write_file( "$dir/jibby.pid", "42\n" );
-is( $p->get_pid_from_pidfile("$dir/jibby.pid"), 42, "get_pid_from_pidfile: returns normalized value from pidfile" );
+    is( $p->get_pid_from_pidfile("$dir/noexist.pid"), 0, "get_pid_from_pidfile: returns zerp on !-e pidfile" );
 
-write_file( "$dir/jibby.pid", " -42 \n" );
-is( $p->get_pid_from_pidfile("$dir/jibby.pid"), 42, "get_pid_from_pidfile: returns normalized value from pidfile (w/ complexly goofed up data)" );
+    write_file( "$dir/jibby.pid", "42\n" );
+    is( $p->get_pid_from_pidfile("$dir/jibby.pid"), 42, "get_pid_from_pidfile: returns normalized value from pidfile" );
+
+    write_file( "$dir/jibby.pid", " -42 \n" );
+    is( $p->get_pid_from_pidfile("$dir/jibby.pid"), 42, "get_pid_from_pidfile: returns normalized value from pidfile (w/ complexly goofed up data)" );
+}
 
 ##########################
 #### is_pidfile_running ##
 ##########################
 
-ok( !$p->is_pidfile_running("$dir/noexist.pid"), "is_pidfile_running: returns false when pidfile does not exist" );
-
 {
-    local $current_kill = sub { return 1 };
-    write_file( "$dir/me.pid", $$ );
-    is( $p->is_pidfile_running("$dir/me.pid"), $$, "is_pidfile_running: returns the pid (i.e. true) when its pid is still running" );
+    my $p = Unix::PID::Tiny->new();
+
+    ok( !$p->is_pidfile_running("$dir/noexist.pid"), "is_pidfile_running: returns false when pidfile does not exist" );
+
+    {
+        local $current_kill = sub { return 1 };
+        write_file( "$dir/me.pid", $$ );
+        is( $p->is_pidfile_running("$dir/me.pid"), $$, "is_pidfile_running: returns the pid (i.e. true) when its pid is still running" );
+    }
+
+    write_file( "$dir/me.pid", 12345 );
+  SKIP: {
+        local $current_kill = sub { CORE::kill(@_) };
+        skip "test pid is running", 1 if $p->is_pid_running(12345);
+        $current_kill = sub { return };
+        ok( !$p->is_pidfile_running("$dir/me.pid"), "is_pidfile_running: returns false when pidfile pid is not running" );
+    }
 }
 
-write_file( "$dir/me.pid", 12345 );
-SKIP: {
-    local $current_kill = sub { CORE::kill(@_) };
-    skip "test pid is running", 1 if $p->is_pid_running(12345);
-    $current_kill = sub { return };
-    ok( !$p->is_pidfile_running("$dir/me.pid"), "is_pidfile_running: returns false when pidfile pid is not running" );
+{
+    my $p = Unix::PID::Tiny->new(
+        {
+            'keep_open'           => 1,
+            'check_proc_open_fds' => 1
+        }
+    );
+
+    my $now = time();
+
+    my @mocked;
+
+    push @mocked, Test::MockFile->file( "/my.pid", "54321\n", { 'mtime' => $now - 60 } );
+    push @mocked, Test::MockFile->file( "/other.pid", "9999999999\n" );
+    push @mocked, Test::MockFile->dir( "/proc/54321",    ['fds'] );
+    push @mocked, Test::MockFile->dir( "/proc/54321/fd", ['3'] );
+    push @mocked, Test::MockFile->symlink( "/my.pid" => "/proc/54321/fd/3" );
+
+    ok( $p->is_pidfile_running("/my.pid"),     "is_pidfile_running: returns true with keep_open, check_proc_open_fds on valid PID file" );
+    ok( !$p->is_pidfile_running("/other.pid"), "is_pidfile_running: returns false with keep_open, check_proc_open_fds on old PID file" );
+    ok( !$p->is_pidfile_running( "/my.pid", $now + 60 ), "is_pidfile_running: returns false with \$since value more recent than mtime" );
+
+    undef @mocked;
 }
 
 ################
@@ -253,6 +314,8 @@ SKIP: {
 ################
 
 {
+    my $p = Unix::PID::Tiny->new();
+
     my @last_args;
     my $exp_rv = 1;
     no warnings 'redefine';
@@ -277,6 +340,8 @@ SKIP: {
 
 # pidfile cleanup/behavior
 SKIP: {
+    my $p = Unix::PID::Tiny->new();
+
     my $pid = fork();
 
     skip "failed to fork()", 3 unless defined $pid;
@@ -315,6 +380,8 @@ SKIP: {
 ##########################
 
 {
+    my $p = Unix::PID::Tiny->new();
+
     local $current_kill = sub { return 1 };
     my @sleep;
     local $current_sleep = sub { push @sleep, \@_ };

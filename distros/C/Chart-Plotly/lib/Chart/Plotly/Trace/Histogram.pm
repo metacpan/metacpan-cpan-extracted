@@ -18,7 +18,7 @@ use Chart::Plotly::Trace::Histogram::Unselected;
 use Chart::Plotly::Trace::Histogram::Xbins;
 use Chart::Plotly::Trace::Histogram::Ybins;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` for vertically spanning histograms and in `y` for horizontally spanning histograms. Binning options are set `xbins` and `ybins` respectively if no aggregation data is provided.
 
@@ -49,6 +49,13 @@ sub type {
     my @components = split( /::/, __PACKAGE__ );
     return lc( $components[-1] );
 }
+
+has alignmentgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set several traces linked to the same position axis or matching axes to the same alignmentgroup. This controls whether bars compute their positional range dependently or independently.",
+);
 
 has autobinx => (
     is  => "rw",
@@ -118,12 +125,22 @@ has hovertemplate => (
     is  => "rw",
     isa => "Str|ArrayRef[Str]",
     documentation =>
-      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variable `binNumber` Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\".",
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variable `binNumber` Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
 );
 
 has hovertemplatesrc => ( is            => "rw",
                           isa           => "Str",
                           documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
+has hovertext => ( is            => "rw",
+                   isa           => "Str|ArrayRef[Str]",
+                   documentation => "Same as `text`.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
 );
 
 has ids => (
@@ -167,6 +184,13 @@ has nbinsy => (
       "Specifies the maximum number of desired bins. This value will be used in an algorithm that will decide the optimal bin size such that the histogram best visualizes the distribution of the data. Ignored if `ybins.size` is provided.",
 );
 
+has offsetgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set several traces linked to the same position axis or matching axes to the same offsetgroup where bars of the same position coordinate will line up.",
+);
+
 has opacity => ( is            => "rw",
                  isa           => "Num",
                  documentation => "Sets the opacity of the trace.",
@@ -202,7 +226,7 @@ has text => (
     is  => "rw",
     isa => "Str|ArrayRef[Str]",
     documentation =>
-      "Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
+      "Sets hover text elements associated with each bar. If a single string, the same string appears over all bars. If an array of string, the items are mapped in order to the this trace's coordinates.",
 );
 
 has textsrc => ( is            => "rw",
@@ -213,8 +237,12 @@ has textsrc => ( is            => "rw",
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Histogram::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -303,7 +331,7 @@ Chart::Plotly::Trace::Histogram - The sample data from which statistics are comp
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -356,6 +384,10 @@ Trace type.
 
 =over
 
+=item * alignmentgroup
+
+Set several traces linked to the same position axis or matching axes to the same alignmentgroup. This controls whether bars compute their positional range dependently or independently.
+
 =item * autobinx
 
 Obsolete: since v1.42 each bin attribute is auto-determined separately and `autobinx` is not needed. However, we accept `autobinx: true` or `false` and will update `xbins` accordingly before deleting `autobinx` from the trace.
@@ -398,11 +430,19 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hovertemplate
 
-Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variable `binNumber` Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>".
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variable `binNumber` Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
 
 =item * hovertemplatesrc
 
 Sets the source reference on plot.ly for  hovertemplate .
+
+=item * hovertext
+
+Same as `text`.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
 
 =item * ids
 
@@ -430,6 +470,10 @@ Specifies the maximum number of desired bins. This value will be used in an algo
 
 Specifies the maximum number of desired bins. This value will be used in an algorithm that will decide the optimal bin size such that the histogram best visualizes the distribution of the data. Ignored if `ybins.size` is provided.
 
+=item * offsetgroup
+
+Set several traces linked to the same position axis or matching axes to the same offsetgroup where bars of the same position coordinate will line up.
+
 =item * opacity
 
 Sets the opacity of the trace.
@@ -452,7 +496,7 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 =item * text
 
-Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
+Sets hover text elements associated with each bar. If a single string, the same string appears over all bars. If an array of string, the items are mapped in order to the this trace's coordinates.
 
 =item * textsrc
 
@@ -461,6 +505,8 @@ Sets the source reference on plot.ly for  text .
 =item * transforms
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -516,7 +562,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

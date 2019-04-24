@@ -1,4 +1,4 @@
-# AWS::ServiceDiscovery::Service generated from spec 2.25.0
+# AWS::ServiceDiscovery::Service generated from spec 2.30.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ServiceDiscovery::Service',
@@ -60,7 +60,7 @@ package Cfn::Resource::Properties::AWS::ServiceDiscovery::Service::DnsRecordValu
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has TTL => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TTL => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

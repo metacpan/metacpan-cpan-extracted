@@ -110,7 +110,7 @@ The BER tuple array index constants:
 =item C<:const_asn>
 
 ASN class values (these are C<0>, C<1>, C<2> and C<3>, respectively -
-exactly thw two topmost bits from the identifier octet shifted 6 bits to
+exactly the two topmost bits from the identifier octet shifted 6 bits to
 the right):
 
       ASN_UNIVERSAL ASN_APPLICATION ASN_CONTEXT ASN_PRIVATE
@@ -298,7 +298,7 @@ values joined together.
 
 =item $bindata = ber_encode $tuple[, $profile]
 
-Encodes the BER tuple into a BER/DER data structure. AS with
+Encodes the BER tuple into a BER/DER data structure. As with
 Cyber_decode>, an optional profile can be given.
 
 The encoded data should be both BER and DER ("shortest form") compliant
@@ -414,7 +414,7 @@ use Exporter qw(import);
 our $VERSION;
 
 BEGIN {
-   $VERSION = 1.1;
+   $VERSION = 1.11;
    XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -481,7 +481,7 @@ representation to STDOUT.
 
 =item ber_dump $tuple[, $profile[, $prefix]]
 
-In addition to specifying the BER C<$tuple> to dump, youc an also specify
+In addition to specifying the BER C<$tuple> to dump, you can also specify
 a C<$profile> and a C<$prefix> string that is printed in front of each line.
 
 If C<$profile> is C<$Convert::BER::XS::SNMP_PROFILE>, then C<ber_dump>
@@ -498,7 +498,7 @@ Example output:
    SEQUENCE
    | OCTET_STRING     bytes  800063784300454045045400000001
    | OCTET_STRING     bytes
-   | CONTEXT (7)      bytes  CONSTRUCTED
+   | CONTEXT (7)      CONSTRUCTED
    | | INTEGER          int    1058588941
    | | INTEGER          int    0
    | | INTEGER          int    0
@@ -551,7 +551,7 @@ sub _ber_dump {
       $type  =~ s/^BER_TYPE_//;
 
       if ($ber->[BER_FLAGS]) {
-         printf "$indent%-16.16s %-6.6s CONSTRUCTED\n", $tag, lc $type;
+         printf "$indent%-16.16s\n", $tag;
          &_ber_dump ($_, $profile, "$indent| ")
             for @$data;
       } else {
@@ -560,7 +560,7 @@ sub _ber_dump {
             $data = unpack "H*", $data;
          } else {
             $data =~ s/[^\x20-\x7e]/./g;
-            $data = "\"$data\"" if $type =~ /string/i || !length $data;
+            $data = "\"$data\"" if $tag =~ /string/i || !length $data;
          }
 
          substr $data, 40, 1e9, "..." if 40 < length $data;

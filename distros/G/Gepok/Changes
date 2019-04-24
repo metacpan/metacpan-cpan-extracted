@@ -1,4 +1,7 @@
-Revision history for Gepok
+0.290   2019-04-24 (PERLANCAR)
+
+	- Avoid undef warning.
+
 
 0.28    2014-12-11 (PERLANCAR)
 

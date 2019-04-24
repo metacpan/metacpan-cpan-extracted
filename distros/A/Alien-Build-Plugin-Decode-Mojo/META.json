@@ -37,7 +37,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build::Plugin" : "0",
+            "Alien::Build::Plugin" : "1.68",
             "Module::Load" : "0",
             "URI" : "0",
             "perl" : "5.008001"
@@ -47,7 +47,7 @@
          "requires" : {
             "Path::Tiny" : "0",
             "Test2::V0" : "0.000060",
-            "Test::Alien::Build" : "0",
+            "Test::Alien::Build" : "1.68",
             "perl" : "5.008001"
          }
       }
@@ -65,7 +65,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.29.9",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_use_unsafe_inc" : 0

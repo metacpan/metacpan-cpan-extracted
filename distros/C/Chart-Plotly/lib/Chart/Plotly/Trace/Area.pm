@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Area::Marker;
 use Chart::Plotly::Trace::Area::Stream;
 use Chart::Plotly::Trace::Area::Transform;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT:
 
@@ -114,13 +114,6 @@ has rsrc => ( is            => "rw",
               documentation => "Sets the source reference on plot.ly for  r .",
 );
 
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
 has showlegend => (
                is            => "rw",
                isa           => "Bool",
@@ -145,8 +138,12 @@ has tsrc => ( is            => "rw",
               documentation => "Sets the source reference on plot.ly for  t .",
 );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -176,7 +173,7 @@ Chart::Plotly::Trace::Area -
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -280,10 +277,6 @@ Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the
 
 Sets the source reference on plot.ly for  r .
 
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
 =item * showlegend
 
 Determines whether or not an item corresponding to this trace is shown in the legend.
@@ -302,6 +295,8 @@ Sets the source reference on plot.ly for  t .
 
 =item * uid
 
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
+
 =item * uirevision
 
 Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
@@ -318,7 +313,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

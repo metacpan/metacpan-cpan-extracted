@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -33,9 +33,11 @@ sub TO_JSON {
     return \%hash;
 }
 
-has color => ( is            => "rw",
-               isa           => "Maybe[ArrayRef]",
-               documentation => "Sets the cell fill color. It accepts either a specific color or an array of colors.",
+has color => (
+        is  => "rw",
+        isa => "Str|ArrayRef[Str]",
+        documentation =>
+          "Sets the cell fill color. It accepts either a specific color or an array of colors or a 2D array of colors.",
 );
 
 has colorsrc => ( is            => "rw",
@@ -58,7 +60,7 @@ Chart::Plotly::Trace::Table::Cells::Fill - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -118,7 +120,7 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * color
 
-Sets the cell fill color. It accepts either a specific color or an array of colors.
+Sets the cell fill color. It accepts either a specific color or an array of colors or a 2D array of colors.
 
 =item * colorsrc
 
@@ -132,7 +134,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

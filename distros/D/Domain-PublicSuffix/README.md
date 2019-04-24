@@ -8,19 +8,22 @@ INSTALLATION
 ------------
 
 To install this module from Git, you will need Dist::Zilla. Once installed, run:
+```
    dzil authordeps | cpanm
    dzil install
+```
 
 To install this module from an archive, type the following:
-
+```
    perl Makefile.PL
    make
    make test
    make install
-
+```
    OR
-
+```
    cpanm .
+```
 
 DEPENDENCIES
 ------------
@@ -35,7 +38,7 @@ This module requires these other modules and libraries:
 COPYRIGHT AND LICENSE
 ---------------------
 
-Copyright (C) 2008-16 by Nicholas Melnick
+Copyright (C) 2008-19 by Nicholas Melnick
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

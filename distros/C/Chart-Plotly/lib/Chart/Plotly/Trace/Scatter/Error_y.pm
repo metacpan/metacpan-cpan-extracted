@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter.
 
@@ -58,7 +58,9 @@ has arraysrc => ( is            => "rw",
 );
 
 has color => ( is            => "rw",
-               documentation => "Sets the stoke color of the error bars.", );
+               isa           => "Str",
+               documentation => "Sets the stoke color of the error bars.",
+);
 
 has symmetric => (
     is  => "rw",
@@ -117,7 +119,7 @@ Chart::Plotly::Trace::Scatter::Error_y - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -210,7 +212,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -4,13 +4,15 @@ MooX::BuildArgs - Save instantiation arguments for later use.
 
 # SYNOPSIS
 
-    package Foo;
-    use Moo;
-    with 'MooX::BuildArgs';
-    has bar => (is => 'ro');
-    
-    my $foo = Foo->new( bar => 32 );
-    print $foo->build_args->{bar}; # 32
+```perl
+package Foo;
+use Moo;
+with 'MooX::BuildArgs';
+has bar => (is => 'ro');
+
+my $foo = Foo->new( bar => 32 );
+print $foo->build_args->{bar}; # 32
+```
 
 # DESCRIPTION
 
@@ -27,7 +29,9 @@ references will not be weakened within ["build\_args"](#build_args).
 
 ## build\_args
 
-    my $args_hashref = $object->build_args();
+```perl
+my $args_hashref = $object->build_args();
+```
 
 Returns a hashref containing the captured arguments.
 
@@ -38,10 +42,20 @@ Returns a hashref containing the captured arguments.
 - [MooX::Rebuild](https://metacpan.org/pod/MooX::Rebuild)
 - [MooX::SingleArg](https://metacpan.org/pod/MooX::SingleArg)
 
+# SUPPORT
+
+Please submit bugs and feature requests to the
+MooX-BuildArgs GitHub issue tracker:
+
+[https://github.com/bluefeet/MooX-BuildArgs/issues](https://github.com/bluefeet/MooX-BuildArgs/issues)
+
 # AUTHORS
 
-    Aran Clary Deltac <bluefeet@gmail.com>
-    Peter Pentchev <roam@ringlet.net>
+```
+Aran Clary Deltac <bluefeet@gmail.com>
+Peter Pentchev <roam@ringlet.net>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+```
 
 # LICENSE
 

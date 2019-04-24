@@ -1,6 +1,15 @@
+0.025 2019-04-23 23:00:00+0000 
+  - Fix probleam with the release process
+0.024 2019-04-23 22:00:00+0000 
+  - Update to plotly.js 1.47.3
+  - Add new trace types: isosurface, sunburst, volume, waterfall
+  - Fix configure dependencies
+  - Fix type constraint issue for attributes of type color
 0.023 2019-01-20 22:00:00+0000
   - Update to plotly.js 1.43.1
   - Several improvements to Chart::Plotly::Image::Orca
+0.022 2019-01-03 22:35:00+0000
+  - Ships a local copy of plotly.js and add support for using that copy
 0.021 2018-12-23 20:00:00+0000
   - Update to plotly.js 1.43.1
   - Add new trace types: barpolar, streamtube, parcats

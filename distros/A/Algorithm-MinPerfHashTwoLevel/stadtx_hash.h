@@ -43,8 +43,6 @@
 
 #endif
 
-#define STADTX_STATIC_INLINE
-
 #ifndef STADTX_STATIC_INLINE
 #ifdef PERL_STATIC_INLINE
 #define STADTX_STATIC_INLINE PERL_STATIC_INLINE
@@ -121,8 +119,6 @@
     v ^= (v >> 46);                         \
 } STMT_END
 
-#define STADTX_SEED_BYTES (sizeof(U64) * 2)
-#define STADTX_STATE_BYTES (sizeof(U64) * 4)
 
 STADTX_STATIC_INLINE void stadtx_seed_state (
     const U8 *seed_ch,

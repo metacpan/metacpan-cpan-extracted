@@ -67,6 +67,7 @@ enum {
   SNMP_COUNTER64         = 0x06,
 };
 
+// tlow-level types this module can ecode the above (and more) into
 enum {
   BER_TYPE_BYTES,
   BER_TYPE_UTF8,
@@ -82,6 +83,7 @@ enum {
   BER_TYPE_CROAK,
 };
 
+// tuple array indices
 enum {
   BER_CLASS     = 0,
   BER_TAG       = 1,
@@ -267,7 +269,7 @@ get_w (void)
 
       res = (res << 7) | (c & 0x7f);
 
-      if (!(c & 0x80))
+      if (expect_true (!(c & 0x80)))
         return res;
 
       c = get_u8 ();
@@ -279,43 +281,34 @@ get_length (void)
 {
   UV res = get_u8 ();
 
-  if (res & 0x80)
+  if (expect_false (res & 0x80))
     {
-      int cnt = res & 0x7f;
+      U8 cnt = res & 0x7f;
+
+      // this genewrates quite ugly code, but the overhead
+      // of copying the bytes for these lengths is probably so high
+      // that a slightly inefficient get_length won't matter.
+
+      if (expect_false (cnt == 0))
+        error ("indefinite BER value lengths not supported");
+
+      if (expect_false (cnt > UVSIZE))
+        error ("BER value length too long (must fit into UV) or BER reserved value in length (X.690 8.1.3.5)");
+
+      want (cnt);
+
       res = 0;
-
-      switch (cnt)
-        {
-          case 0:
-            error ("indefinite BER value lengths not supported");
-
-          case 0x7f:
-            error ("BER reserved value in length (X.690 8.1.3.5)");
-
-          default:
-            error ("BER value length too long (must fit into UV)");
-
-#if UVSIZE > 4
-          case 8: res = (res << 8) | get_u8 ();
-          case 7: res = (res << 8) | get_u8 ();
-          case 6: res = (res << 8) | get_u8 ();
-          case 5: res = (res << 8) | get_u8 ();
-#endif
-          case 4: res = (res << 8) | get_u8 ();
-          case 3: res = (res << 8) | get_u8 ();
-          case 2: res = (res << 8) | get_u8 ();
-          case 1: res = (res << 8) | get_u8 ();
-        }
+      do
+        res = (res << 8) | *cur++;
+      while (--cnt);
     }
 
   return res;
 }
 
 static SV *
-decode_int (void)
+decode_int (UV len)
 {
-  UV len = get_length ();
-
   if (!len)
     error ("invalid BER_TYPE_INT length zero (X.690 8.3.1)");
 
@@ -346,9 +339,8 @@ decode_int (void)
 }
 
 static SV *
-decode_data (void)
+decode_data (UV len)
 {
-  UV len = get_length ();
   return newSVpvn ((char *)get_n (len), len);
 }
 
@@ -386,10 +378,8 @@ write_uv (char *buf, UV u)
 }
 
 static SV *
-decode_oid (int relative)
+decode_oid (UV len, int relative)
 {
-  UV len = get_length ();
-
   if (len <= 0)
     {
       error ("BER_TYPE_OID length must not be zero");
@@ -404,17 +394,18 @@ decode_oid (int relative)
 
   if (relative)
     app = write_uv (app, w);
-  else if (w < 2 * 40)
-    {
-      app = write_uv (app, (U8)w / 40);
-      *app++ = '.';
-      app = write_uv (app, (U8)w % 40);
-    }
   else
     {
-      app = write_uv (app, 2);
+      UV w1, w2;
+
+      if (w < 2 * 40)
+        (w1 = w / 40), (w2 = w % 40);
+      else
+        (w1 =      2), (w2 = w - 2 * 40);
+
+      app = write_uv (app, w1);
       *app++ = '.';
-      app = write_uv (app, w - 2 * 40);
+      app = write_uv (app, w2);
     }
 
   while (cur < end)
@@ -433,14 +424,12 @@ decode_oid (int relative)
 
 // TODO: this is unacceptably slow
 static SV *
-decode_ucs (int chrsize)
+decode_ucs (UV len, int chrsize)
 {
-  SV *res = NEWSV (0, 0);
-
-  UV len = get_length ();
-
   if (len & (chrsize - 1))
     croak ("BER_TYPE_UCS has an invalid number of octets (%d)", len);
+
+  SV *res = NEWSV (0, 0);
 
   while (len)
     {
@@ -490,90 +479,80 @@ decode_ber (void)
       while (cur < buf + seqend)
         av_push (av, decode_ber ());
 
-      if (cur > buf + seqend)
+      if (expect_false (cur > buf + seqend))
         croak ("CONSTRUCTED type %02x length overflow (0x%x 0x%x)\n", identifier, (int)(cur - buf), (int)seqend);
 
       res = newRV_inc ((SV *)av);
     }
   else
-    switch (profile_lookup (cur_profile, klass, tag))
-      {
-        case BER_TYPE_NULL:
-          {
-            UV len = get_length ();
+    {
+      UV len = get_length ();
 
-            if (len)
+      switch (profile_lookup (cur_profile, klass, tag))
+        {
+          case BER_TYPE_NULL:
+            if (expect_false (len))
               croak ("BER_TYPE_NULL value with non-zero length %d encountered (X.690 8.8.2)", len);
 
             res = &PL_sv_undef;
-          }
-          break;
+            break;
 
-        case BER_TYPE_BOOL:
-          {
-            UV len = get_length ();
-
-            if (len != 1)
+          case BER_TYPE_BOOL:
+            if (expect_false (len != 1))
               croak ("BER_TYPE_BOOLEAN value with invalid length %d encountered (X.690 8.2.1)", len);
 
             res = newSVcacheint (!!get_u8 ());
-          }
-          break;
+            break;
 
-        case BER_TYPE_OID:
-          res = decode_oid (0);
-          break;
+          case BER_TYPE_OID:
+            res = decode_oid (len, 0);
+            break;
 
-        case BER_TYPE_RELOID:
-          res = decode_oid (1);
-          break;
+          case BER_TYPE_RELOID:
+            res = decode_oid (len, 1);
+            break;
 
-        case BER_TYPE_INT:
-          res = decode_int ();
-          break;
+          case BER_TYPE_INT:
+            res = decode_int (len);
+            break;
 
-        case BER_TYPE_UTF8:
-          res = decode_data ();
-          SvUTF8_on (res);
-          break;
+          case BER_TYPE_UTF8:
+            res = decode_data (len);
+            SvUTF8_on (res);
+            break;
 
-        case BER_TYPE_BYTES:
-          res = decode_data ();
-          break;
+          case BER_TYPE_BYTES:
+            res = decode_data (len);
+            break;
 
-        case BER_TYPE_IPADDRESS:
-          {
-            UV len = get_length ();
+          case BER_TYPE_IPADDRESS:
+            {
+              if (len != 4)
+                croak ("BER_TYPE_IPADDRESS type with invalid length %d encountered (RFC 2578 7.1.5)", len);
 
-            if (len != 4)
-              croak ("BER_TYPE_IPADDRESS type with invalid length %d encountered (RFC 2578 7.1.5)", len);
+              U8 *data = get_n (4);
+              res = newSVpvf ("%d.%d.%d.%d", data [0], data [1], data [2], data [3]);
+            }
+            break;
 
-            U8 c1 = get_u8 ();
-            U8 c2 = get_u8 ();
-            U8 c3 = get_u8 ();
-            U8 c4 = get_u8 ();
+          case BER_TYPE_UCS2:
+            res = decode_ucs (len, 2);
+            break;
 
-            res = newSVpvf ("%d.%d.%d.%d", c1, c2, c3, c4);
-          }
-          break;
+          case BER_TYPE_UCS4:
+            res = decode_ucs (len, 4);
+            break;
 
-        case BER_TYPE_UCS2:
-          res = decode_ucs (2);
-          break;
+          case BER_TYPE_REAL:
+            error ("BER_TYPE_REAL not implemented");
 
-        case BER_TYPE_UCS4:
-          res = decode_ucs (4);
-          break;
+          case BER_TYPE_CROAK:
+            croak ("class/tag %d/%d mapped to BER_TYPE_CROAK", klass, tag);
 
-        case BER_TYPE_REAL:
-          error ("BER_TYPE_REAL not implemented");
-
-        case BER_TYPE_CROAK:
-          croak ("class/tag %d/%d mapped to BER_TYPE_CROAK", klass, tag);
-
-        default:
-          croak ("unconfigured/unsupported class/tag %d/%d", klass, tag);
-      }
+          default:
+            croak ("unconfigured/unsupported class/tag %d/%d", klass, tag);
+        }
+    }
 
   AV *av = newAV ();
   av_fill (av, BER_ARRAYSIZE - 1);
@@ -670,21 +649,21 @@ put_w (UV val)
 static U8 *
 put_length_at (UV val, U8 *cur)
 {
-  if (val < 0x7fU)
+  if (val <= 0x7fU)
     *cur++ = val;
   else
     {
       U8 *lenb = cur++;
 
 #if UVSIZE > 4
-      *cur = val >> 56; cur += *cur > 0;
-      *cur = val >> 48; cur += *cur > 0;
-      *cur = val >> 40; cur += *cur > 0;
-      *cur = val >> 32; cur += *cur > 0;
+      *cur = val >> 56; cur += val >= ((UV)1 << (8 * 7));
+      *cur = val >> 48; cur += val >= ((UV)1 << (8 * 6));
+      *cur = val >> 40; cur += val >= ((UV)1 << (8 * 5));
+      *cur = val >> 32; cur += val >= ((UV)1 << (8 * 4));
 #endif
-      *cur = val >> 24; cur += *cur > 0;
-      *cur = val >> 16; cur += *cur > 0;
-      *cur = val >>  8; cur += *cur > 0;
+      *cur = val >> 24; cur += val >= ((UV)1 << (8 * 3));
+      *cur = val >> 16; cur += val >= ((UV)1 << (8 * 2));
+      *cur = val >>  8; cur += val >= ((UV)1 << (8 * 1));
       *cur = val      ; cur += 1;
 
       *lenb = 0x80 + cur - lenb - 1;
@@ -696,23 +675,24 @@ put_length_at (UV val, U8 *cur)
 static void
 put_length (UV val)
 {
-  need (5 + val);
+  need (9 + val);
   cur = put_length_at (val, cur);
 }
 
 // return how many bytes the encoded length requires
 static int length_length (UV val)
 {
-  return val < 0x7fU
+  // use hashing with a DeBruin sequence, anyone?
+  return expect_true (val <= 0x7fU)
     ? 1
     : 2
-      + (val > 0xffU)
-      + (val > 0xffffU)
-      + (val > 0xffffffU)
+      + (val > 0x000000000000ffU)
+      + (val > 0x0000000000ffffU)
+      + (val > 0x00000000ffffffU)
 #if UVSIZE > 4
-      + (val > 0xffffffffU)
-      + (val > 0xffffffffffU)
-      + (val > 0xffffffffffffU)
+      + (val > 0x000000ffffffffU)
+      + (val > 0x0000ffffffffffU)
+      + (val > 0x00ffffffffffffU)
       + (val > 0xffffffffffffffU)
 #endif
     ;

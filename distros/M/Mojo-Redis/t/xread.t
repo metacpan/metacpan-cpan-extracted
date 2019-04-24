@@ -9,8 +9,6 @@ my $db          = $redis->db;
 my $stream_name = "test:stream:$0";
 my ($err, $len, $range, $read, $struct, @p);
 
-$redis->protocol_class($ENV{TEST_XS} ? 'Protocol::Redis::XS' : 'Protocol::Redis');
-
 note 'Fresh start';
 $db->del($stream_name);
 

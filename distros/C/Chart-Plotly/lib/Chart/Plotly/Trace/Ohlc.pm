@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Ohlc::Line;
 use Chart::Plotly::Trace::Ohlc::Stream;
 use Chart::Plotly::Trace::Ohlc::Transform;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The ohlc (short for Open-High-Low-Close) is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The tip of the lines represent the `low` and `high` values and the horizontal segments represent the `open` and `close` values. Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing items are drawn in green whereas decreasing are drawn in red.
 
@@ -94,6 +94,16 @@ has hoverinfosrc => ( is            => "rw",
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Hoverlabel", );
+
+has hovertext => ( is            => "rw",
+                   isa           => "Str|ArrayRef[Str]",
+                   documentation => "Same as `text`.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+);
 
 has ids => (
     is  => "rw",
@@ -186,8 +196,12 @@ has tickwidth => ( is            => "rw",
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Ohlc::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -248,7 +262,7 @@ Chart::Plotly::Trace::Ohlc - The ohlc (short for Open-High-Low-Close) is a style
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -342,6 +356,14 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
+=item * hovertext
+
+Same as `text`.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -408,6 +430,8 @@ Sets the width of the open/close tick marks relative to the *x* minimal interval
 
 =item * uid
 
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
+
 =item * uirevision
 
 Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
@@ -444,7 +468,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

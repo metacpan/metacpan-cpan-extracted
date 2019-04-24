@@ -882,7 +882,7 @@ package Cfn {
   has Description => (isa => 'Str', is => 'rw');
   has Transform => (isa => 'Cfn::Transform', is => 'rw', coerce => 1);
 
-  our $VERSION = '0.03';
+  our $VERSION = '0.04';
 
   has Parameters => (
     is => 'rw',

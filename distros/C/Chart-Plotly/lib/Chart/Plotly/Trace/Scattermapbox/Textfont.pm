@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattermapbox.
 
@@ -33,10 +33,14 @@ sub TO_JSON {
     return \%hash;
 }
 
-has color => ( is => "rw", );
+has color => ( is  => "rw",
+               isa => "Str", );
 
-has description => ( is      => "ro",
-                     default => "Sets the icon text font. Has an effect only when `type` is set to *symbol*.", );
+has description => (
+    is => "ro",
+    default =>
+      "Sets the icon text font (color=mapbox.layer.paint.text-color, size=mapbox.layer.layout.text-size). Has an effect only when `type` is set to *symbol*.",
+);
 
 has family => (
     is  => "rw",
@@ -63,7 +67,7 @@ Chart::Plotly::Trace::Scattermapbox::Textfont - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -150,7 +154,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

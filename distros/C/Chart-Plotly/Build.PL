@@ -13,7 +13,6 @@ my %module_build_args = (
   "configure_requires" => {
     "Const::Fast" => 0,
     "Data::Dump" => 0,
-    "Getopt::Long::Descriptive" => 0,
     "Module::Build" => "0.3601",
     "Path::Tiny" => 0,
     "Text::Template" => 0
@@ -23,7 +22,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.023",
+  "dist_version" => "0.025",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
   "recursive_test_files" => 1,
@@ -53,6 +52,8 @@ my %module_build_args = (
     "dist" => "share"
   },
   "test_requires" => {
+    "Test::Exception" => 0,
+    "Test::File::ShareDir" => 0,
     "Test::More" => 0,
     "Test::Most" => 0
   }
@@ -61,6 +62,8 @@ my %module_build_args = (
 
 my %fallback_build_requires = (
   "Module::Build" => "0.3601",
+  "Test::Exception" => 0,
+  "Test::File::ShareDir" => 0,
   "Test::More" => 0,
   "Test::Most" => 0
 );

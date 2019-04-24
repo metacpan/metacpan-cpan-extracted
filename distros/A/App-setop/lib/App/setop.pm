@@ -1,6 +1,6 @@
 package App::setop;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 1;
 # ABSTRACT: Set operations (union, intersection, difference, symmetric diff) on lines of files
@@ -17,7 +17,7 @@ App::setop - Set operations (union, intersection, difference, symmetric diff) on
 
 =head1 VERSION
 
-This document describes version 0.11 of App::setop (from Perl distribution App-setop), released on 2016-09-26.
+This document describes version 0.120 of App::setop (from Perl distribution App-setop), released on 2019-04-24.
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-setop>
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-setop>.
+Source repository is at L<https://github.com/perlancar/perl-App-setop>.
 
 =head1 BUGS
 
@@ -51,7 +51,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Domain::PublicSuffix;
-$Domain::PublicSuffix::VERSION = '0.14';
+$Domain::PublicSuffix::VERSION = '0.15';
 use strict;
 use warnings;
 use base 'Class::Accessor::Fast';
@@ -35,6 +35,9 @@ Domain::PublicSuffix - Parse a domain down to root
 
  $root = $suffix->get_root_domain('www.google.co.uk');
  # $root now contains google.co.uk
+
+ my $tld = $suffix->tld();
+ # $tld now contains co.uk
 
 =head1 DESCRIPTION
 
@@ -166,16 +169,24 @@ sub get_root_domain {
 	my $last = $self->tld_tree->{$tld};
 	my $effective_root = $tld;
 
-	while ( !$self->suffix and scalar(@domain_array) > 0 ) {
+	while ( !$self->suffix ) {
 		my $sub = pop(@domain_array);
-		next if (! defined $sub);
 
-		# check if $sub.$last is a root
+		if (!defined $sub) {
+			if (defined $last->{'RootEnable'}) {
+				$self->suffix($effective_root);
+			} else {
+				$self->{'root_domain'} = $self->suffix;
+			}
+			last;
+		}
+	
 		if ( defined $last->{$sub} and scalar(keys %{$last->{$sub}}) == 0 ) {
+			# check if $sub.$last is a root
 			$self->suffix( $sub . "." . $effective_root );
 
 		} elsif ( defined $last->{'*'} ) {
-			# wildcard means everything is an root, but check for exceptions
+			# wildcard means everything is a root, but check for exceptions
 			my $exception_flag = 0;
 			foreach my $sub_check (keys %{$last}) {
 				if ($sub_check =~ /^!/) {
@@ -196,8 +207,10 @@ sub get_root_domain {
 		} elsif ( defined $last->{'RootEnable'} and !defined $last->{$sub} ) {
 			# we have nothing left in the domain string, check
 			# if the root we have is enough
-			push( @domain_array, $sub );
 			$self->suffix($effective_root);
+
+			# Set root domain to one step below effective root.
+			$self->{'root_domain'} = join( '.', $sub, $self->suffix );
 		}
 
 		$effective_root = join( '.', $sub, $effective_root );
@@ -205,19 +218,15 @@ sub get_root_domain {
 	}
 
 	# Leave if we still haven't found an effective root
-	if ( !$self->suffix ) {
+	if ( !$self->root_domain ) {
 		$self->error('Domain not valid');
 		return;
 	}
 
-	# Check if we're left with just an root
-	if ( $self->suffix eq $domain ) {
+	# Check if we're left with just a root
+	if ( $self->root_domain eq $domain ) {
 		$self->error('Domain is already root');
-		return;
 	}
-
-	# Set root domain to one step below effective root.
-	$self->{'root_domain'} = pop(@domain_array) . "." . $self->suffix;
 
 	return $self->root_domain;
 }
@@ -251,7 +260,7 @@ sub _parse_data_file {
 		foreach my $path (@paths) {
 			$path = File::Spec->catfile( $path, "effective_tld_names.dat" );
 			if ( -e $path ) {
-				open( $dat, '<', $path )
+				open( $dat, '<:encoding(UTF-8)', $path )
 					or die "Cannot open \'" . $path . "\': " . $!;
 				@tld_lines = <$dat>;
 				close($dat);

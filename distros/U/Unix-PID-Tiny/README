@@ -1,4 +1,4 @@
-Unix-PID-Tiny version 0.91
+Unix-PID-Tiny version 0.92
 
 DOCUMENTATION
 
@@ -19,7 +19,7 @@ See DEPENDENCIES section in POD or 'PREREQ_PM' key in Makefile.PL
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008, Daniel Muey
+Copyright (C) 2019, Daniel Muey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

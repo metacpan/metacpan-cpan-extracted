@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Splom::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Splom::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Splom::Marker::Colorbar::Title;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace splom.
 
@@ -38,10 +38,14 @@ sub TO_JSON {
 }
 
 has bgcolor => ( is            => "rw",
-                 documentation => "Sets the color of padded area.", );
+                 isa           => "Str",
+                 documentation => "Sets the color of padded area.",
+);
 
 has bordercolor => ( is            => "rw",
-                     documentation => "Sets the axis line color.", );
+                     isa           => "Str",
+                     documentation => "Sets the axis line color.",
+);
 
 has borderwidth => ( is            => "rw",
                      isa           => "Num",
@@ -84,7 +88,9 @@ has nticks => (
 );
 
 has outlinecolor => ( is            => "rw",
-                      documentation => "Sets the axis line color.", );
+                      isa           => "Str",
+                      documentation => "Sets the axis line color.",
+);
 
 has outlinewidth => ( is            => "rw",
                       isa           => "Num",
@@ -148,7 +154,9 @@ has tickangle => (
 );
 
 has tickcolor => ( is            => "rw",
-                   documentation => "Sets the tick color.", );
+                   isa           => "Str",
+                   documentation => "Sets the tick color.",
+);
 
 has tickfont => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Splom::Marker::Colorbar::Tickfont", );
@@ -273,7 +281,7 @@ Chart::Plotly::Trace::Splom::Marker::Colorbar - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -488,7 +496,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

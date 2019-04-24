@@ -1,24 +1,24 @@
 ---
-name: Emacs-PDE
-version: 0.2.16
-author: []
-abstract: Perl Development Environment in emacs
+abstract: 'Perl Development Environment in emacs'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Emacs-PDE
 provides:
   Emacs::PDE:
     file: lib/Emacs/PDE.pm
-    version: !!perl/hash:version
-      original: 0.2.16
-      qv: 1
-      version:
-        - 0
-        - 2
-        - 16
+    version: v0.2.17
   Emacs::PDE::Util:
     file: lib/Emacs/PDE/Util.pm
-generated_by: Module::Build version 0.2805
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.2.17
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

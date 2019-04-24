@@ -1,3 +1,6 @@
+0.04 
+  - Implements the resources in CloudFormation spec 2.30.0 (published as of 2019-04-14)
+
 0.03 2019-03-27
   - Implements the resources in CloudFormation spec 2.28.0 (published as of 2019-03-27)
   - Fixed bug in AWS::ServiceDiscovery::Instance Properties: The InstanceAttributes

@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Violin::Stream;
 use Chart::Plotly::Trace::Violin::Transform;
 use Chart::Plotly::Trace::Violin::Unselected;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: In vertical (horizontal) violin plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one violin per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single violin is drawn. That violin position is then positioned with with `name` or with `x0` (`y0`) if provided.
 
@@ -48,6 +48,13 @@ sub type {
     return lc( $components[-1] );
 }
 
+has alignmentgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set several traces linked to the same position axis or matching axes to the same alignmentgroup. This controls whether bars compute their positional range dependently or independently.",
+);
+
 has bandwidth => (
     is  => "rw",
     isa => "Num",
@@ -71,7 +78,8 @@ has customdatasrc => ( is            => "rw",
 );
 
 has fillcolor => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Sets the fill color. Defaults to a half-transparent variant of the line color, marker color, or marker line color, whichever is available.",
 );
@@ -96,6 +104,28 @@ has hoveron => (
     isa => "Str",
     documentation =>
       "Do the hover effects highlight individual violins or sample points or the kernel density estimate or any combination of them?",
+);
+
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
+has hovertext => ( is            => "rw",
+                   isa           => "Str|ArrayRef[Str]",
+                   documentation => "Same as `text`.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
 );
 
 has ids => (
@@ -137,7 +167,14 @@ has name => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "Sets the trace name. The trace name appear as the legend item and on hover. For box traces, the name will also be used for the position coordinate, if `x` and `x0` (`y` and `y0` if horizontal) are missing and the position axis is categorical",
+      "Sets the trace name. The trace name appear as the legend item and on hover. For violin traces, the name will also be used for the position coordinate, if `x` and `x0` (`y` and `y0` if horizontal) are missing and the position axis is categorical. Note that the trace name is also used as a default value for attribute `scalegroup` (please see its description for details).",
+);
+
+has offsetgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set several traces linked to the same position axis or matching axes to the same offsetgroup where bars of the same position coordinate will line up.",
 );
 
 has opacity => ( is            => "rw",
@@ -169,7 +206,7 @@ has scalegroup => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "If there are multiple violins that should be sized according to to some metric (see `scalemode`), link them by providing a non-empty group id here shared by every trace in the same group.",
+      "If there are multiple violins that should be sized according to to some metric (see `scalemode`), link them by providing a non-empty group id here shared by every trace in the same group. If a violin's `width` is undefined, `scalegroup` will default to the trace's name. In this case, violins with the same names will be linked together",
 );
 
 has scalemode => (
@@ -234,8 +271,12 @@ has textsrc => ( is            => "rw",
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Violin::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -251,6 +292,13 @@ has visible => (
     is => "rw",
     documentation =>
       "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
+);
+
+has width => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the width of the violin in data coordinates. If *0* (default value) the width is automatically selected based on the positions of other violin traces in the same subplot.",
 );
 
 has x => ( is            => "rw",
@@ -310,7 +358,7 @@ Chart::Plotly::Trace::Violin - In vertical (horizontal) violin plots, statistics
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -376,6 +424,10 @@ Trace type.
 
 =over
 
+=item * alignmentgroup
+
+Set several traces linked to the same position axis or matching axes to the same alignmentgroup. This controls whether bars compute their positional range dependently or independently.
+
 =item * bandwidth
 
 Sets the bandwidth used to compute the kernel density estimate. By default, the bandwidth is determined by Silverman's rule of thumb.
@@ -408,6 +460,22 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 Do the hover effects highlight individual violins or sample points or the kernel density estimate or any combination of them?
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
+=item * hovertext
+
+Same as `text`.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -432,7 +500,11 @@ Sets the legend group for this trace. Traces part of the same legend group hide/
 
 =item * name
 
-Sets the trace name. The trace name appear as the legend item and on hover. For box traces, the name will also be used for the position coordinate, if `x` and `x0` (`y` and `y0` if horizontal) are missing and the position axis is categorical
+Sets the trace name. The trace name appear as the legend item and on hover. For violin traces, the name will also be used for the position coordinate, if `x` and `x0` (`y` and `y0` if horizontal) are missing and the position axis is categorical. Note that the trace name is also used as a default value for attribute `scalegroup` (please see its description for details).
+
+=item * offsetgroup
+
+Set several traces linked to the same position axis or matching axes to the same offsetgroup where bars of the same position coordinate will line up.
 
 =item * opacity
 
@@ -452,7 +524,7 @@ If *outliers*, only the sample points lying outside the whiskers are shown If *s
 
 =item * scalegroup
 
-If there are multiple violins that should be sized according to to some metric (see `scalemode`), link them by providing a non-empty group id here shared by every trace in the same group.
+If there are multiple violins that should be sized according to to some metric (see `scalemode`), link them by providing a non-empty group id here shared by every trace in the same group. If a violin's `width` is undefined, `scalegroup` will default to the trace's name. In this case, violins with the same names will be linked together
 
 =item * scalemode
 
@@ -494,6 +566,8 @@ Sets the source reference on plot.ly for  text .
 
 =item * uid
 
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
+
 =item * uirevision
 
 Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
@@ -503,6 +577,10 @@ Controls persistence of some user-driven changes to the trace: `constraintrange`
 =item * visible
 
 Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).
+
+=item * width
+
+Sets the width of the violin in data coordinates. If *0* (default value) the width is automatically selected based on the positions of other violin traces in the same subplot.
 
 =item * x
 
@@ -544,7 +622,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

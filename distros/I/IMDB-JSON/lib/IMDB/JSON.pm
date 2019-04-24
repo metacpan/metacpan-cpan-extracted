@@ -10,7 +10,7 @@ Search IMDB for a specific title, process the result and extract the JSON script
 
 package IMDB::JSON;
 
-$IMDB::JSON::VERSION = "0.03";
+$IMDB::JSON::VERSION = "0.04";
 
 use strict;
 use HTML::TokeParser;

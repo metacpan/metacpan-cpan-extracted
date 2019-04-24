@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Pointcloud::Hoverlabel;
 use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
@@ -113,13 +113,6 @@ has opacity => ( is            => "rw",
                  documentation => "Sets the opacity of the trace.",
 );
 
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
 has showlegend => (
                is            => "rw",
                isa           => "Bool",
@@ -141,8 +134,12 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -240,7 +237,7 @@ Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -341,10 +338,6 @@ Sets the trace name. The trace name appear as the legend item and on hover.
 
 Sets the opacity of the trace.
 
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
 =item * showlegend
 
 Determines whether or not an item corresponding to this trace is shown in the legend.
@@ -360,6 +353,8 @@ Sets text elements associated with each (x,y) pair. If a single string, the same
 Sets the source reference on plot.ly for  text .
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -425,7 +420,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

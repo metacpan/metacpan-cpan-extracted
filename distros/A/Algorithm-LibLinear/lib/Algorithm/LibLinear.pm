@@ -8,7 +8,7 @@ use List::Util qw/sum/;
 use Smart::Args;
 use XSLoader;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -116,16 +116,36 @@ sub find_cost_parameter {
     args
         my $self,
         my $data_set => 'Algorithm::LibLinear::DataSet',
-        my $initial => +{ isa => 'Num', default => -1.0, },
-        my $max => 'Num',
+        my $initial => +{ isa => 'Num', default => -1.0 },
         my $num_folds => 'Int',
         my $update => +{ isa => 'Bool', default => 0, };
 
-    $self->training_parameter->find_cost_parameter(
+    my ($cost, undef, $accuracy) = @{
+        $self->find_parameters(
+            data_set => $data_set,
+            initial_cost => $initial,
+            initial_loss_sensitivity => -1.0,
+            num_folds => $num_folds,
+            update => $update,
+        )
+    };
+    return [ $cost, $accuracy ];
+  }
+
+sub find_parameters {
+    args
+        my $self,
+        my $data_set => 'Algorithm::LibLinear::DataSet',
+        my $initial_cost => +{ isa => 'Num', default => -1.0, },
+        my $initial_loss_sensitivity => +{ isa => 'Num', default => -1.0, },
+        my $num_folds => 'Int',
+        my $update => +{ isa => 'Bool', default => 0, };
+
+    $self->training_parameter->find_parameters(
         $data_set->as_problem(bias => $self->bias),
         $num_folds,
-        $initial,
-        $max,
+        $initial_cost,
+        $initial_loss_sensitivity,
         $update,
     );
 }
@@ -202,7 +222,7 @@ Algorithm::LibLinear - A Perl binding for LIBLINEAR, a library for classificatio
 
 Algorithm::LibLinear is an XS module that provides features of LIBLINEAR, a fast C library for classification and regression.
 
-Current version is based on LIBLINEAR 2.21, released on Oct 5, 2018.
+Current version is based on LIBLINEAR 2.30, released on Mar 21, 2019.
 
 =head1 METHODS
 
@@ -296,12 +316,20 @@ Evaluates training parameter using N-fold cross validation method.
 Given data set will be split into N parts. N-1 of them will be used as a training set and the rest 1 part will be used as a test set.
 The evaluation iterates N times using each different part as a test set. Then average accuracy is returned as result.
 
-=head2 find_cost_parameter(data_set => $data_set, max => $max_cost, num_folds => $num_folds [, initial => -1.0] [, update => 0])
+=head2 find_cost_parameter(data_set => $data_set, num_folds => $num_folds [, initial => -1.0] [, update => 0])
 
-Find the best cost parameter in terms of cross validation result, between C<initial> and C<max>. If C<initial> parameter is omitted an appropriate value is automatically estimated.
-When true value is specified as C<update> parameter, the instance is updated to use the found cost. This behaviour is disabled by default.
+Deprecated. Use C<find_parameters> instead.
 
-Return value is an ArrayRef containing 2 values: the found cost and its cross validation score (i.e., accuracy.)
+Shorthand alias for C<find_parameters> only works on C<cost> parameter.
+Notice that C<loss_sensitivity> is affected too whne C<update> is set.
+
+=head2 find_parameters(data_set => $data_set, num_folds => $num_folds [, initial_cost => -1.0] [, initial_loss_sensitivity => -1.0] [, update => 0])
+
+Find the best parameters by N-fold cross validation. If C<initial_cost> or C<initial_loss_sensitivity> is a negative, the value is automatically calculated.
+
+When C<update> is set true, the instance is updated to use the found parameters. This behaviour is disabled by default.
+
+Return value is an ArrayRef containing 3 values: found C<cost>, found C<loss_sensitivity> and mean accuracy of cross validation with the parameters.
 
 =head2 train(data_set => $data_set)
 
@@ -328,7 +356,7 @@ L<Algorithm::SVM> - A Perl binding to LIBSVM.
 
 =head2 Algorithm::LibLinear
 
-Copyright (c) 2013-2018 Koichi SATOH. All rights reserved.
+Copyright (c) 2013-2019 Koichi SATOH. All rights reserved.
 
 The MIT License (MIT)
 
@@ -340,7 +368,7 @@ THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 
 =head2 LIBLINEAR
 
-Copyright (c) 2007-2018 The LIBLINEAR Project.
+Copyright (c) 2007-2019 The LIBLINEAR Project.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

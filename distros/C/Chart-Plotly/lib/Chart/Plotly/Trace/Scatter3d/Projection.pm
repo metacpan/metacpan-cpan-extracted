@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scatter3d::Projection::X;
 use Chart::Plotly::Trace::Scatter3d::Projection::Y;
 use Chart::Plotly::Trace::Scatter3d::Projection::Z;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter3d.
 
@@ -61,7 +61,7 @@ Chart::Plotly::Trace::Scatter3d::Projection - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

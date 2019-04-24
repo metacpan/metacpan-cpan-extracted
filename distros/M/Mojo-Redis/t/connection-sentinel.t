@@ -3,6 +3,7 @@ use Test::More;
 use Mojo::Redis;
 
 my $port   = Mojo::IOLoop::Server->generate_port;
+my $redis  = Mojo::Redis->new("redis://whatever:s3cret\@mymaster/12?sentinel=localhost:$port&sentinel=localhost:$port");
 my $conn_n = 0;
 my @messages;
 
@@ -10,7 +11,7 @@ Mojo::IOLoop->server(
   {port => $port},
   sub {
     my ($loop, $stream) = @_;
-    my $protocol = Protocol::Redis::Faster->new(api => 1);
+    my $protocol = $redis->protocol_class->new(api => 1);
     my @res = ({type => '$', data => 'OK'});
 
     push @res,
@@ -30,8 +31,7 @@ Mojo::IOLoop->server(
   }
 );
 
-my $redis = Mojo::Redis->new("redis://whatever:s3cret\@mymaster/12?sentinel=localhost:$port&sentinel=localhost:$port");
-my $db    = $redis->db;
+my $db = $redis->db;
 $db->connection->_connect;
 Mojo::IOLoop->start;
 

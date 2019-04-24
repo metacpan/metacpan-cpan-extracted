@@ -1,3 +1,4 @@
+2019-04-23	v0.04	Add PREREQ_PM to Makefile.PL for cpan testers
 2018-09-30	v0.03	Fix syntax error in syntopsis
 			Add byid() 
 

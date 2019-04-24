@@ -3,13 +3,17 @@ NAME
     preforking
 
 VERSION
-    This document describes version 0.28 of Gepok (from Perl distribution
-    Gepok), released on 2014-12-11.
+    This document describes version 0.290 of Gepok (from Perl distribution
+    Gepok), released on 2019-04-24.
 
 SYNOPSIS
     To run with plackup:
 
-     % plackup -s Gepok --daemonize
+     % plackup -s Gepok \
+         --http_ports :8081,:8082,127.0.0.1:8083 \
+         --unix_sockets /var/run/gepok.sock,/tmp/gepok.sock \
+         ...
+         --daemonize
 
     To run standalone:
 
@@ -87,6 +91,9 @@ PSGI ENVIRONMENT
         A boolean value which is set to true if client connects via Unix
         socket. (Note, you can get Unix socket path from $env->{SERVER_NAME}
         or $env->{'gepok.socket'}).
+
+CREDITS
+    Some code portion taken from Starman.
 
 ATTRIBUTES
   name => STR (default is basename of $0)
@@ -268,8 +275,19 @@ FAQ
     message when receiving request. For patches/solutions to overcome this
     problem, see: https://rt.cpan.org/Ticket/Display.html?id=71395
 
-CREDITS
-    Some code portion taken from Starman.
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Gepok>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Gepok>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Gepok>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     PSGI and Plack.
@@ -295,25 +313,12 @@ SEE ALSO
     Please drop me a message if you think other PSGI servers need to be
     mentioned.
 
-HOMEPAGE
-    Please visit the project's homepage at
-    <https://metacpan.org/release/Gepok>.
-
-SOURCE
-    Source repository is at <https://github.com/perlancar/perl-Gepok>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Gepok>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2014, 2013, 2012, 2011 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

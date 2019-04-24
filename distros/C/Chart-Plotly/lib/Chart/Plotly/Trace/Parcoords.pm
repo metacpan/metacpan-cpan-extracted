@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Parcoords::Stream;
 use Chart::Plotly::Trace::Parcoords::Tickfont;
 use Chart::Plotly::Trace::Parcoords::Transform;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: Parallel coordinates for multidimensional exploratory data analysis. The samples are specified in `dimensions`. The colors are set in `line.color`.
 
@@ -65,18 +65,6 @@ has dimensions => ( is  => "rw",
 has domain => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Domain", );
 
-has hoverinfo => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
-    documentation =>
-      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
-);
-
-has hoverinfosrc => ( is            => "rw",
-                      isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
-);
-
 has ids => (
     is  => "rw",
     isa => "ArrayRef|PDL",
@@ -92,13 +80,6 @@ has idssrc => ( is            => "rw",
 has labelfont => ( is  => "rw",
                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Labelfont", );
 
-has legendgroup => (
-    is  => "rw",
-    isa => "Str",
-    documentation =>
-      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
-);
-
 has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Line", );
 
@@ -107,26 +88,8 @@ has name => ( is            => "rw",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
 );
 
-has opacity => ( is            => "rw",
-                 isa           => "Num",
-                 documentation => "Sets the opacity of the trace.",
-);
-
 has rangefont => ( is  => "rw",
                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Rangefont", );
-
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
-has showlegend => (
-               is            => "rw",
-               isa           => "Bool",
-               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
-);
 
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Stream", );
@@ -137,8 +100,12 @@ has tickfont => ( is  => "rw",
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Parcoords::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -168,7 +135,7 @@ Chart::Plotly::Trace::Parcoords - Parallel coordinates for multidimensional expl
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -259,14 +226,6 @@ Sets the source reference on plot.ly for  customdata .
 
 =item * domain
 
-=item * hoverinfo
-
-Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
-
-=item * hoverinfosrc
-
-Sets the source reference on plot.ly for  hoverinfo .
-
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -277,29 +236,13 @@ Sets the source reference on plot.ly for  ids .
 
 =item * labelfont
 
-=item * legendgroup
-
-Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
-
 =item * line
 
 =item * name
 
 Sets the trace name. The trace name appear as the legend item and on hover.
 
-=item * opacity
-
-Sets the opacity of the trace.
-
 =item * rangefont
-
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
-=item * showlegend
-
-Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * stream
 
@@ -308,6 +251,8 @@ Determines whether or not an item corresponding to this trace is shown in the le
 =item * transforms
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -325,7 +270,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

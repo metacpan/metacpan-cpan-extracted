@@ -1,12 +1,14 @@
 package Tie::Hash::MinPerfHashTwoLevel::OnDisk;
 use strict;
 use warnings;
+our $VERSION = '0.05';
+our $DEFAULT_VARIANT = 1;
+
 # this also installs the XS routines we use into our namespace.
 use Algorithm::MinPerfHashTwoLevel ( 'hash_with_state', ':utf8_flags', ':uint_max' );
 use Exporter qw(import);
 use constant MAGIC_STR => "PH2L";
 use Carp;
-our $DEFAULT_VARIANT = 1;
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
     unmount_file
@@ -24,7 +26,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.03';
 
 sub TIEHASH {
     my ($class,$file)= @_;
@@ -275,7 +276,7 @@ sub _validate_file {
     return ($variant,$ok_msg);
 }
 
-
+1;
 __END__
 
 =head1 NAME

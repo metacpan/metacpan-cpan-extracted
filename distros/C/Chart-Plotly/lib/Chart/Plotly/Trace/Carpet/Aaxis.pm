@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Carpet::Aaxis::Tickfont;
 use Chart::Plotly::Trace::Carpet::Aaxis::Tickformatstop;
 use Chart::Plotly::Trace::Carpet::Aaxis::Title;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace carpet.
 
@@ -76,7 +76,8 @@ has cheatertype => ( is  => "rw",
                      isa => enum( [ "index", "value" ] ), );
 
 has color => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Sets default for all colors associated with this axis all at once: line, font, tick, and grid colors. Grid color is lightened by blending this with the plot background Individual pieces can override this.",
 );
@@ -94,7 +95,9 @@ has endline => (
 );
 
 has endlinecolor => ( is            => "rw",
-                      documentation => "Sets the line color of the end line.", );
+                      isa           => "Str",
+                      documentation => "Sets the line color of the end line.",
+);
 
 has endlinewidth => ( is            => "rw",
                       isa           => "Num",
@@ -114,7 +117,9 @@ has fixedrange => (is            => "rw",
 );
 
 has gridcolor => ( is            => "rw",
-                   documentation => "Sets the axis line color.", );
+                   isa           => "Str",
+                   documentation => "Sets the axis line color.",
+);
 
 has gridwidth => ( is            => "rw",
                    isa           => "Num",
@@ -137,7 +142,9 @@ has labelsuffix => ( is            => "rw",
 );
 
 has linecolor => ( is            => "rw",
-                   documentation => "Sets the axis line color.", );
+                   isa           => "Str",
+                   documentation => "Sets the axis line color.",
+);
 
 has linewidth => ( is            => "rw",
                    isa           => "Num",
@@ -145,7 +152,9 @@ has linewidth => ( is            => "rw",
 );
 
 has minorgridcolor => ( is            => "rw",
-                        documentation => "Sets the color of the grid lines.", );
+                        isa           => "Str",
+                        documentation => "Sets the color of the grid lines.",
+);
 
 has minorgridcount => ( is            => "rw",
                         isa           => "Int",
@@ -232,7 +241,9 @@ has startline => (
 );
 
 has startlinecolor => ( is            => "rw",
-                        documentation => "Sets the line color of the start line.", );
+                        isa           => "Str",
+                        documentation => "Sets the line color of the start line.",
+);
 
 has startlinewidth => ( is            => "rw",
                         isa           => "Num",
@@ -318,7 +329,7 @@ Chart::Plotly::Trace::Carpet::Aaxis - This attribute is one of the possible opti
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -558,7 +569,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -219,7 +219,7 @@ sub test_setop {
         my $cmd = join(
             " ",
             map {shell_quote($_)}
-                ($^X, "$FindBin::Bin/../bin/setop", @progargs));
+                ($^X, "$FindBin::Bin/../script/setop", @progargs));
         note "cmd: $cmd";
         my $res = run_forked($cmd, \%runopts);
 

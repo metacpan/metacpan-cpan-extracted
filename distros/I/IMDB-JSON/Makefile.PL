@@ -11,7 +11,11 @@ WriteMakefile(
             'ABSTRACT' => 'Grab useful data from IMDB',
            )
          : (),
-    
+    'PREREQ_PM' => {
+	'HTML::TokeParser'	=> '0',
+	'IO::Socket::SSL'	=> '0',
+	'JSON::XS'		=> '0'
+    }
 );
 
 sub MY::test {

@@ -23,7 +23,6 @@
          "requires" : {
             "Const::Fast" : "0",
             "Data::Dump" : "0",
-            "Getopt::Long::Descriptive" : "0",
             "Module::Build" : "0.3601",
             "Path::Tiny" : "0",
             "Text::Template" : "0"
@@ -31,6 +30,7 @@
       },
       "develop" : {
          "requires" : {
+            "Getopt::Long::Descriptive" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
@@ -65,6 +65,8 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
+            "Test::File::ShareDir" : "0",
             "Test::More" : "0",
             "Test::Most" : "0"
          }
@@ -82,7 +84,7 @@
          "web" : "https://github.com/pablrod/p5-Chart-Plotly"
       }
    },
-   "version" : "0.023",
+   "version" : "0.025",
    "x_contributors" : [
       "stphnlyd <stephanloyd9@gmail.com>",
       "weatherwax <s.g.lobo@hotmail.com>"

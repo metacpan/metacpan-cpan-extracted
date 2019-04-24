@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.25    2019-04-24 15:46:15
+        [BUGFIXES]
+         * Print a warning but don't panic on resume with lost returning
+           future (RT129303)
+
 0.24    2019-04-18 23:47:56
         [CHANGES]
          * Stop `async sub`s on ->cancel (RT129202)

@@ -16,9 +16,10 @@ require_ok $pkg;
 
 my $app = builder {
     enable "Plack::Middleware::Matomo",
+
         idsite                => "1",
-        base_url              => "https://analytics.openaire.eu/piwik.php",
-        token_auth            => "32846584f571be9b57488bf4088f30ea",
+        base_url              => "http://localhost/matomo",
+        token_auth            => "secr3t",
         view_paths            => ['record/(\w+)/*'],
         download_paths        => ['download/(\w+)/*'],
         oai_identifier_format => 'oai:test.server.org:%s',
@@ -31,7 +32,7 @@ my $app = builder {
     mount '/somethingelse' =>
         sub {[200, ['Content-Type' => 'text/plain'], ["Hello World"]]};
     mount '/matomo' => sub {
-        [200, ['Content-Type' => 'text/plain'], ["Successfully tracked."]]
+        [200, ['Content-Type' => 'text/plain'], []]
     };
 };
 

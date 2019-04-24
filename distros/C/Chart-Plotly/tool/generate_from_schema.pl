@@ -24,6 +24,7 @@ my $moose_type_for = {
     number     => 'Num',
     string     => 'Str',
     flaglist   => 'Str',
+    color      => 'Str',
     boolean    => 'Bool',
     integer    => 'Int',
     info_array => 'ArrayRef|PDL',

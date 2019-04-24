@@ -572,13 +572,15 @@ op_size(pTHX_ const OP * const baseop, struct state *st)
 #endif
 #ifdef OA_UNOP_AUX
 	case OPc_UNAUXOP: TAG;
-	    st->total_size += sizeof(struct unop_aux) + sizeof(UNOP_AUX_item) * (cUNOP_AUXx(baseop)->op_aux[-1].uv+1);
 	    op_size(aTHX_ ((UNOP *)baseop)->op_first, st);
-	    if (baseop->op_type == OP_MULTIDEREF) {
+	    switch(baseop->op_type) {
+	    case OP_MULTIDEREF:
+	    {
 		UNOP_AUX_item *items = cUNOP_AUXx(baseop)->op_aux;
 		UV actions = items->uv;
 		bool last = 0;
 		bool is_hash = 0;
+		st->total_size += sizeof(struct unop_aux) + sizeof(UNOP_AUX_item) * (cUNOP_AUXx(baseop)->op_aux[-1].uv+1);
 		while (!last) {
 		    switch (actions & MDEREF_ACTION_MASK) {
 			case MDEREF_reload:
@@ -630,6 +632,50 @@ op_size(pTHX_ const OP * const baseop, struct state *st)
 			    break;
 		    }
 		    actions >>= MDEREF_SHIFT;
+		}
+		TAG;break;
+	    }
+#ifdef OPpMULTICONCAT_STRINGIFY
+	    case OP_MULTICONCAT:
+	    {
+		UNOP_AUX_item *aux = cUNOP_AUXx(baseop)->op_aux;
+		SSize_t nargs = aux[PERL_MULTICONCAT_IX_NARGS].ssize;
+		const char *plain_pv = aux[PERL_MULTICONCAT_IX_PLAIN_PV].pv;
+		SSize_t plain_size = aux[PERL_MULTICONCAT_IX_PLAIN_LEN].ssize;
+		const char *utf8_pv = aux[PERL_MULTICONCAT_IX_UTF8_PV].pv;
+		SSize_t utf8_size = aux[PERL_MULTICONCAT_IX_UTF8_LEN].ssize;
+		const int has_variant = plain_pv && utf8_pv && plain_pv != utf8_pv;
+		st->total_size += sizeof(UNOP_AUX_item)
+		    *  (
+			PERL_MULTICONCAT_HEADER_SIZE
+			+ ((nargs + 1) * (has_variant ? 2 : 1))
+			);
+
+		if (has_variant) {
+		    st->total_size += plain_size + utf8_size;
+		} else if (plain_pv) {
+		    st->total_size += plain_size;
+		} else if (utf8_pv) {
+		    st->total_size += utf8_size;
+		} /* else surely unreachable? */
+		TAG;break;
+	    }
+#endif
+#ifdef OPpARGELEM_MASK
+	    case OP_ARGCHECK:
+		st->total_size += sizeof(UNOP_AUX_item) * 3;
+		TAG;break;
+	    case OP_ARGELEM:
+		/* This OP is a sneaky hack, and stuffs an integer into the
+		   pointer. So there is no allocation to total up. */
+		TAG;break;
+#endif
+	    default:
+		/* Unknown multiop */
+		TAG;
+		if (st->go_yell) {
+		    warn("Devel::Size: Can't calculate complete size for uknown UNOP_AUX %u\n",
+			 baseop->op_type);
 		}
 	    }
 	    TAG;break;

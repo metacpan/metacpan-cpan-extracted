@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Carpet::Font;
 use Chart::Plotly::Trace::Carpet::Hoverlabel;
 use Chart::Plotly::Trace::Carpet::Stream;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The data describing carpet axis layout is set in `y` and (optionally) also `x`. If only `y` is present, `x` the plot is interpreted as a cheater plot and is filled in using the `y` values. `x` and `y` may either be 2D arrays matching with each dimension matching that of `a` and `b`, or they may be 1D arrays with total length equal to that of `a` and `b`.
 
@@ -99,7 +99,8 @@ has cheaterslope => (
 );
 
 has color => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Sets default for all colors associated with this axis all at once: line, font, tick, and grid colors. Grid color is lightened by blending this with the plot background Individual pieces can override this.",
 );
@@ -156,13 +157,6 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
-has legendgroup => (
-    is  => "rw",
-    isa => "Str",
-    documentation =>
-      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
-);
-
 has name => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
@@ -173,24 +167,15 @@ has opacity => ( is            => "rw",
                  documentation => "Sets the opacity of the trace.",
 );
 
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
-has showlegend => (
-               is            => "rw",
-               isa           => "Bool",
-               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
-);
-
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Stream", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -254,7 +239,7 @@ Chart::Plotly::Trace::Carpet - The data describing carpet axis layout is set in 
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -386,10 +371,6 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
-=item * legendgroup
-
-Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
-
 =item * name
 
 Sets the trace name. The trace name appear as the legend item and on hover.
@@ -398,17 +379,11 @@ Sets the trace name. The trace name appear as the legend item and on hover.
 
 Sets the opacity of the trace.
 
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
-=item * showlegend
-
-Determines whether or not an item corresponding to this trace is shown in the legend.
-
 =item * stream
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -450,7 +425,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -142,14 +142,11 @@ struct SuspendedFrame {
 typedef struct {
   SV *awaiting_future;   /* the Future that 'await' is currently waiting for */
   SV *returning_future;  /* the Future that its contining CV will eventually return */
+  COP *curcop;           /* value of PL_curcop at suspend time */
   SuspendedFrame *frames;
 
   U32 padlen;
   SV **padslots;
-
-#ifdef DEBUG
-  COP *curcop;
-#endif
 } SuspendedState;
 
 #ifdef DEBUG
@@ -1576,15 +1573,9 @@ static OP *pp_await(pTHX)
 
   CV *curcv = find_runcv(0);
   CV *origcv = curcv;
-  COP *curcop = PL_curcop; /* just for debug printing purposes */
   bool defer_mortal_curcv = FALSE;
 
   SuspendedState *state = suspendedstate_get(curcv);
-
-#ifdef DEBUG
-  if(state && state->curcop)
-    curcop = state->curcop;
-#endif
 
   if(state && state->awaiting_future && CATCH_GET) {
     /* If we don't do this we get all the mess that is
@@ -1593,13 +1584,21 @@ static OP *pp_await(pTHX)
     return docatch(pp_await);
   }
 
-  TRACEPRINT("ENTER await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
+  if(state && state->curcop)
+    PL_curcop = state->curcop;
+
+  TRACEPRINT("ENTER await curcv=%p [%s:%d]\n", curcv, CopFILE(PL_curcop), CopLINE(PL_curcop));
 
   if(state && state->awaiting_future) {
-    if(!SvROK(state->returning_future))
-      panic("ARGG we lost state->returning_future\n");
+    if(!SvROK(state->returning_future) || future_is_cancelled(state->returning_future)) {
+      if(!SvROK(state->returning_future)) {
+        GV *gv = CvGV(curcv);
+        if(!CvANON(curcv))
+          warn("Suspended async sub %s::%s lost its returning future", HvNAME(GvSTASH(gv)), GvNAME(gv));
+        else
+          warn("Suspended async sub CODE(0x%p) in package %s lost its returning future", curcv, HvNAME(GvSTASH(gv)));
+      }
 
-    if(future_is_cancelled(state->returning_future)) {
       TRACEPRINT("  CANCELLED\n");
 
       PUSHMARK(SP);
@@ -1648,13 +1647,11 @@ static OP *pp_await(pTHX)
   if(future_is_ready(f)) {
     assert(CvDEPTH(curcv) > 0);
     TRACEPRINT("  READY\n");
-#ifdef DEBUG
     if(state)
       state->curcop = NULL;
-#endif
     /* This might throw */
     future_get_to_stack(f, GIMME_V);
-    TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
+    TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(PL_curcop), CopLINE(PL_curcop));
     return PL_op->op_next;
   }
 
@@ -1674,9 +1671,7 @@ static OP *pp_await(pTHX)
     TRACEPRINT("  SUSPEND reuse CV\n");
   }
 
-#ifdef DEBUG
-    state->curcop = curcop;
-#endif
+  state->curcop = PL_curcop;
 
   suspendedstate_suspend(state, origcv);
 
@@ -1699,7 +1694,7 @@ static OP *pp_await(pTHX)
   if(!SvWEAKREF(state->returning_future))
     sv_rvweaken(state->returning_future);
   if(!SvROK(state->returning_future))
-    panic("ARGH we lost the ->returning_future\n");
+    panic("ARGH we lost state->returning_future for curcv=%p\n", curcv);
 
 /* For unknown reasons, doing this on perls 5.20 or 5.22 massively breaks
  * everything.
@@ -1710,11 +1705,11 @@ static OP *pp_await(pTHX)
 #endif
 
   if(!SvROK(state->returning_future))
-    panic("ARGH we lost the ->returning_future\n");
+    panic("ARGH we lost state->returning_future for curcv=%p\n", curcv);
   if(!SvROK(state->awaiting_future))
-    panic("ARGH we lost the ->awaiting_future\n");
+    panic("ARGH we lost state->awaiting_future for curcv=%p\n", curcv);
 
-  TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
+  TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(PL_curcop), CopLINE(PL_curcop));
 
   return PL_ppaddr[OP_RETURN](aTHX);
 }

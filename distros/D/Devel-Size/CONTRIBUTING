@@ -1,0 +1,66 @@
+So you'd like to help? Cool.
+
+Bug tracking is via CPAN RT at
+https://rt.cpan.org/Dist/Display.html?Name=Devel-Size
+
+If you want to send a patch, attaching it to an RT ticket is useful. Don't worry
+if it's not perfect - it's much easier to review an adapt a patch that than to
+start from scratch. But patching this module is often hard - there are easier
+ways to help:
+
+Bug reports also useful. Please include the full `perl -V` output to give not
+just version and platform, but also the specific build options.
+
+The module is purposely relying on implementation details that may change
+underneath it, and hence is often sensitive to obscure details of the build
+choices. It has to make a lot of (naughty) assumptions about the core internals,
+so regressions happen when the core changes and the module doesn't keep up.
+This is the most frequent cause of failing tests. In this case, it's helpful to
+know what particular commit in the core caused it to break. If you have a
+suitably powerful machine, can run this automatically.
+
+If you don't have a copy yet:
+
+   git clone https://perl5.git.perl.org/perl.git
+
+(currently about 160M of download)
+
+then from the inside the checkout run a bisect. For example, if on your system
+the regression tests for Devel::Size are now failing on the current development
+version of perl but the pass with an earlier stable release version, you can run this to
+automatically find which commit broke the tests:
+
+    ./Porting/bisect.pl --module=Devel::Size
+
+See `./Porting/bisect.pl --help` for all the options; --with-module=Devel::Size
+might also be useful if you have a specific test case.
+
+Beware - even on a modern machine this might take a couple of hours. If you
+have a laptop plug it in, and best to let it run overnight or when the machine
+would otherwise be idle.
+
+If you aren't able to do this, don't worry, but if you are, awesome - sometimes
+from this it's immediately obvious what the likely cause is, which is a great
+morale boost for starting to figure out a fix.
+
+If you *are* able to do this, and want to actively help, go look to see if there
+are other open tickets without any indication of which core commit might have
+broken it, and see if you can replicate the problem locally, and if so run a
+bisect to try to find the cause.
+
+Two tools that can be very useful for diagnosing problems
+
+1) valgrind - a tool you can usually install using your OS package manager
+2) Address Sanitizer (ASAN) - options for the C compilers gcc and clang
+
+valgrind can be used to run your existing built perl binary and Devel::Size and
+report on illegal memory accesses that would otherwise would silently return
+garbage data. It's great for a quick test of an existing problematic test case,
+but slows execution down massively, and is not (yet) that useful for automatic
+bisecting.
+
+ASAN requires you to (re)build perl from source with it, which in turn requires
+invoking perl's ./Configure with non-default options, so it's a bit more
+involved. However, the slowdown is not as severe as valgrind, and it is possible
+to use it for automated bisecting.
+

@@ -43,6 +43,11 @@ lib/Cfn/Resource/AWS/ApiGatewayV2/Model.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Route.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/RouteResponse.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Stage.pm
+lib/Cfn/Resource/AWS/AppMesh/Mesh.pm
+lib/Cfn/Resource/AWS/AppMesh/Route.pm
+lib/Cfn/Resource/AWS/AppMesh/VirtualNode.pm
+lib/Cfn/Resource/AWS/AppMesh/VirtualRouter.pm
+lib/Cfn/Resource/AWS/AppMesh/VirtualService.pm
 lib/Cfn/Resource/AWS/AppStream/DirectoryConfig.pm
 lib/Cfn/Resource/AWS/AppStream/Fleet.pm
 lib/Cfn/Resource/AWS/AppStream/ImageBuilder.pm

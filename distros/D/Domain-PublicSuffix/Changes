@@ -1,5 +1,16 @@
 Revision history for Domain-PublicSuffix
 
+0.15    2019-04-23 20:00 GMT
+  - Refresh PublicSuffix list
+  - Merged pull request from Gavin Carr to explicitly open a file with UTF-8
+    encoding
+  - Bump Net::IDN::Encode requirement to 2.401 to avoid unicode issues
+  - (#3) Provide a tld and suffix even with asking get_root_domain for a valid
+    suffix that is not a valid domain. Will still report 'Domain not valid',
+    but ->suffix and ->tld will resolve.
+  - Make sure that the error condition from get_root_domain still throws when
+    a root domain is already fired, but that it still returns.
+
 0.14    2016-08-08 16:02 GMT
   - Release
 

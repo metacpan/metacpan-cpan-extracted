@@ -17,5 +17,9 @@ no_index:
   directory:
     - t
     - inc
-version: '0.03'
+requires:
+  HTML::TokeParser: '0'
+  IO::Socket::SSL: '0'
+  JSON::XS: '0'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

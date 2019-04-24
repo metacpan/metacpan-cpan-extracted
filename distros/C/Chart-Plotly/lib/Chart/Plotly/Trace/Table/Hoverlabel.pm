@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Table::Hoverlabel::Font;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -35,8 +35,20 @@ sub TO_JSON {
     return \%hash;
 }
 
+has align => (
+    is  => "rw",
+    isa => union( [ enum( [ "left", "right", "auto" ] ), "ArrayRef" ] ),
+    documentation =>
+      "Sets the horizontal alignment of the text content within hover label box. Has an effect only if the hover label text spans more two or more lines",
+);
+
+has alignsrc => ( is            => "rw",
+                  isa           => "Str",
+                  documentation => "Sets the source reference on plot.ly for  align .",
+);
+
 has bgcolor => ( is            => "rw",
-                 isa           => "Maybe[ArrayRef]",
+                 isa           => "Str|ArrayRef[Str]",
                  documentation => "Sets the background color of the hover labels for this trace",
 );
 
@@ -46,7 +58,7 @@ has bgcolorsrc => ( is            => "rw",
 );
 
 has bordercolor => ( is            => "rw",
-                     isa           => "Maybe[ArrayRef]",
+                     isa           => "Str|ArrayRef[Str]",
                      documentation => "Sets the border color of the hover labels for this trace.",
 );
 
@@ -62,7 +74,7 @@ has namelength => (
     is  => "rw",
     isa => "Int|ArrayRef[Int]",
     documentation =>
-      "Sets the length (in number of characters) of the trace name in the hover labels for this trace. -1 shows the whole name regardless of length. 0-3 shows the first 0-3 characters, and an integer >3 will show the whole name if it is less than that many characters, but if it is longer, will truncate to `namelength - 3` characters and add an ellipsis.",
+      "Sets the default length (in number of characters) of the trace name in the hover labels for all traces. -1 shows the whole name regardless of length. 0-3 shows the first 0-3 characters, and an integer >3 will show the whole name if it is less than that many characters, but if it is longer, will truncate to `namelength - 3` characters and add an ellipsis.",
 );
 
 has namelengthsrc => ( is            => "rw",
@@ -85,7 +97,7 @@ Chart::Plotly::Trace::Table::Hoverlabel - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -143,6 +155,14 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =over
 
+=item * align
+
+Sets the horizontal alignment of the text content within hover label box. Has an effect only if the hover label text spans more two or more lines
+
+=item * alignsrc
+
+Sets the source reference on plot.ly for  align .
+
 =item * bgcolor
 
 Sets the background color of the hover labels for this trace
@@ -163,7 +183,7 @@ Sets the source reference on plot.ly for  bordercolor .
 
 =item * namelength
 
-Sets the length (in number of characters) of the trace name in the hover labels for this trace. -1 shows the whole name regardless of length. 0-3 shows the first 0-3 characters, and an integer >3 will show the whole name if it is less than that many characters, but if it is longer, will truncate to `namelength - 3` characters and add an ellipsis.
+Sets the default length (in number of characters) of the trace name in the hover labels for all traces. -1 shows the whole name regardless of length. 0-3 shows the first 0-3 characters, and an integer >3 will show the whole name if it is less than that many characters, but if it is longer, will truncate to `namelength - 3` characters and add an ellipsis.
 
 =item * namelengthsrc
 
@@ -177,7 +197,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

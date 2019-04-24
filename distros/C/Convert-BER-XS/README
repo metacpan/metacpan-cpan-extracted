@@ -102,7 +102,7 @@ DESCRIPTION
 
     ":const_asn"
         ASN class values (these are 0, 1, 2 and 3, respectively - exactly
-        thw two topmost bits from the identifier octet shifted 6 bits to the
+        the two topmost bits from the identifier octet shifted 6 bits to the
         right):
 
               ASN_UNIVERSAL ASN_APPLICATION ASN_CONTEXT ASN_PRIVATE
@@ -278,7 +278,7 @@ DESCRIPTION
         multiple BER values joined together.
 
     $bindata = ber_encode $tuple[, $profile]
-        Encodes the BER tuple into a BER/DER data structure. AS with
+        Encodes the BER tuple into a BER/DER data structure. As with
         Cyber_decode>, an optional profile can be given.
 
         The encoded data should be both BER and DER ("shortest form")
@@ -368,7 +368,7 @@ DESCRIPTION
     representation to STDOUT.
 
     ber_dump $tuple[, $profile[, $prefix]]
-        In addition to specifying the BER $tuple to dump, youc an also
+        In addition to specifying the BER $tuple to dump, you can also
         specify a $profile and a $prefix string that is printed in front of
         each line.
 
@@ -386,7 +386,7 @@ DESCRIPTION
            SEQUENCE
            | OCTET_STRING     bytes  800063784300454045045400000001
            | OCTET_STRING     bytes
-           | CONTEXT (7)      bytes  CONSTRUCTED
+           | CONTEXT (7)      CONSTRUCTED
            | | INTEGER          int    1058588941
            | | INTEGER          int    0
            | | INTEGER          int    0

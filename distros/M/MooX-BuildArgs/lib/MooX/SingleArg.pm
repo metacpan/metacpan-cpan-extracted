@@ -1,13 +1,13 @@
 package MooX::SingleArg;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+=encoding utf8
 
 =head1 NAME
 
 MooX::SingleArg - Support single-argument instantiation.
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
     package Foo;
     use Moo;
@@ -24,6 +24,7 @@ use Class::Method::Modifiers qw( install_modifier );
 use Carp qw( croak );
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
 with 'MooX::BuildArgsHooks';
@@ -135,9 +136,17 @@ L<MooX::Rebuild>
 
 =back
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<MooX::BuildArgs/AUTHORS> and L<MooX::BuildArgs/LICENSE>.
+See L<MooX::BuildArgs/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<MooX::BuildArgs/AUTHORS>.
+
+=head1 LICENSE
+
+See L<MooX::BuildArgs/LICENSE>.
 
 =cut
 

@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Contourcarpet::Hoverlabel;
 use Chart::Plotly::Trace::Contourcarpet::Line;
 use Chart::Plotly::Trace::Contourcarpet::Stream;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: Plots contours on either the first carpet axis or the carpet axis with a matching `carpet` attribute. Data `z` is interpreted as matching that of the corresponding carpet axis.
 
@@ -146,7 +146,8 @@ has db => ( is            => "rw",
 );
 
 has fillcolor => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Sets the fill color if `contours.type` is *constraint*. Defaults to a half-transparent variant of the line color, marker color, or marker line color, whichever is available.",
 );
@@ -165,6 +166,16 @@ has hoverinfosrc => ( is            => "rw",
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Contourcarpet::Hoverlabel", );
+
+has hovertext => ( is            => "rw",
+                   isa           => "ArrayRef|PDL",
+                   documentation => "Same as `text`.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+);
 
 has ids => (
     is  => "rw",
@@ -212,13 +223,6 @@ has reversescale => (
       "Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.",
 );
 
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
 has showlegend => (
                is            => "rw",
                isa           => "Bool",
@@ -248,8 +252,12 @@ has transpose => ( is            => "rw",
                    documentation => "Transposes the z data.",
 );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -295,6 +303,13 @@ has zmax => (
       "Sets the upper bound of the color domain. Value should have the same units as in `z` and if set, `zmin` must be set as well.",
 );
 
+has zmid => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the mid-point of the color domain by scaling `zmin` and/or `zmax` to be equidistant to this point. Value should have the same units as in `z`. Has no effect when `zauto` is `false`.",
+);
+
 has zmin => (
     is  => "rw",
     isa => "Num",
@@ -322,7 +337,7 @@ Chart::Plotly::Trace::Contourcarpet - Plots contours on either the first carpet 
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -495,6 +510,14 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
+=item * hovertext
+
+Same as `text`.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -525,10 +548,6 @@ Sets the opacity of the trace.
 
 Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.
 
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
 =item * showlegend
 
 Determines whether or not an item corresponding to this trace is shown in the legend.
@@ -552,6 +571,8 @@ Sets the source reference on plot.ly for  text .
 Transposes the z data.
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -581,6 +602,10 @@ Determines whether or not the color domain is computed with respect to the input
 
 Sets the upper bound of the color domain. Value should have the same units as in `z` and if set, `zmin` must be set as well.
 
+=item * zmid
+
+Sets the mid-point of the color domain by scaling `zmin` and/or `zmax` to be equidistant to this point. Value should have the same units as in `z`. Has no effect when `zauto` is `false`.
+
 =item * zmin
 
 Sets the lower bound of the color domain. Value should have the same units as in `z` and if set, `zmax` must be set as well.
@@ -597,7 +622,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

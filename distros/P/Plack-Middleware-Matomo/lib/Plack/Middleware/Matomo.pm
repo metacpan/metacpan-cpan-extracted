@@ -1,10 +1,11 @@
 package Plack::Middleware::Matomo;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
 use AnyEvent::HTTP;
+use Log::Any qw($log);
 use Plack::Request;
 use Plack::Util::Accessor
     qw(apiv base_url idsite token_auth time_format oai_identifier_format view_paths download_paths);
@@ -25,6 +26,8 @@ sub call {
     my $view_paths     = $self->view_paths;
     my $download_paths = $self->download_paths;
 
+    $log->info("Entering Matomo middleware at " . $request->path);
+
     foreach my $p (@$view_paths) {
         if ($request->path =~ /$p/) {
             $id     = $1;
@@ -41,6 +44,7 @@ sub call {
     }
 
     return $res unless $action;
+    $log->info("Action: $action");
 
     my $time_format = $self->time_format // '%Y-%m-%dT%H:%M:%SZ';
     my $ip          = $self->_anonymize_ip($request->address);
@@ -50,7 +54,7 @@ sub call {
     my $rand = int(rand(10000));
 
     my $event = {
-        _id         => $request->session,
+        _id         => $request->session // '',
         action_name => $action,
         apiv        => $self->apiv // 1,
         cvar        => $cvar,
@@ -87,7 +91,17 @@ sub _push_to_matomo {
     my $uri = URI->new($self->base_url);
     $uri->query_form($event);
 
-    http_head $uri->as_string, sub {return;};
+    $log->debug("URL: " . $uri->as_string);
+
+    http_head $uri->as_string, sub {
+        my ($body, $hdr) = @_;
+
+       if ($hdr->{Status} =~ /^2/) {
+          # ok
+       } else {
+          $log->error("Could not reach analytics endpoint: $hdr->{Status} $hdr->{Reason} for " . $uri->as_string);
+       }
+   };
 }
 
 1;

@@ -23,4 +23,5 @@ on develop => sub {
   requires 'Sort::Topological';
   requires 'Template';
   requires 'Mojo::UserAgent';
+  requires 'IO::Socket::SSL';
 };

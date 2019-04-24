@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter3d.
 
@@ -54,6 +54,13 @@ has cmax => (
       "Sets the upper bound of the color domain. Has an effect only if in `line.color`is set to a numerical array. Value should have the same units as in `line.color` and if set, `line.cmin` must be set as well.",
 );
 
+has cmid => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the mid-point of the color domain by scaling `line.cmin` and/or `line.cmax` to be equidistant to this point. Has an effect only if in `line.color`is set to a numerical array. Value should have the same units as in `line.color`. Has no effect when `line.cauto` is `false`.",
+);
+
 has cmin => (
     is  => "rw",
     isa => "Num",
@@ -63,7 +70,7 @@ has cmin => (
 
 has color => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Sets thelinecolor. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `line.cmin` and `line.cmax` if set.",
 );
@@ -91,6 +98,13 @@ has reversescale => (
       "Reverses the color mapping if true. Has an effect only if in `line.color`is set to a numerical array. If true, `line.cmin` will correspond to the last color in the array and `line.cmax` will correspond to the first color.",
 );
 
+has showscale => (
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not a colorbar is displayed for this trace. Has an effect only if in `line.color`is set to a numerical array.",
+);
+
 has width => ( is            => "rw",
                isa           => "Num",
                documentation => "Sets the line width (in px).",
@@ -111,7 +125,7 @@ Chart::Plotly::Trace::Scatter3d::Line - This attribute is one of the possible op
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -172,6 +186,10 @@ Determines whether or not the color domain is computed with respect to the input
 
 Sets the upper bound of the color domain. Has an effect only if in `line.color`is set to a numerical array. Value should have the same units as in `line.color` and if set, `line.cmin` must be set as well.
 
+=item * cmid
+
+Sets the mid-point of the color domain by scaling `line.cmin` and/or `line.cmax` to be equidistant to this point. Has an effect only if in `line.color`is set to a numerical array. Value should have the same units as in `line.color`. Has no effect when `line.cauto` is `false`.
+
 =item * cmin
 
 Sets the lower bound of the color domain. Has an effect only if in `line.color`is set to a numerical array. Value should have the same units as in `line.color` and if set, `line.cmax` must be set as well.
@@ -196,6 +214,10 @@ Sets the dash style of the lines.
 
 Reverses the color mapping if true. Has an effect only if in `line.color`is set to a numerical array. If true, `line.cmin` will correspond to the last color in the array and `line.cmax` will correspond to the first color.
 
+=item * showscale
+
+Determines whether or not a colorbar is displayed for this trace. Has an effect only if in `line.color`is set to a numerical array.
+
 =item * width
 
 Sets the line width (in px).
@@ -208,7 +230,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

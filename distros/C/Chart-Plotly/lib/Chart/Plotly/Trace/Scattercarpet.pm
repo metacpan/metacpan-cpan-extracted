@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scattercarpet::Textfont;
 use Chart::Plotly::Trace::Scattercarpet::Transform;
 use Chart::Plotly::Trace::Scattercarpet::Unselected;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: Plots a scatter trace on either the first carpet axis or the carpet axis with a matching `carpet` attribute.
 
@@ -47,11 +47,9 @@ sub type {
     return lc( $components[-1] );
 }
 
-has a => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
-    documentation =>
-      "Sets the quantity of component `a` in each data point. If `a`, `b`, and `c` are all provided, they need not be normalized, only the relative values matter. If only two arrays are provided they must be normalized to match `ternary<i>.sum`.",
+has a => ( is            => "rw",
+           isa           => "ArrayRef|PDL",
+           documentation => "Sets the a-axis coordinates.",
 );
 
 has asrc => ( is            => "rw",
@@ -59,11 +57,9 @@ has asrc => ( is            => "rw",
               documentation => "Sets the source reference on plot.ly for  a .",
 );
 
-has b => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
-    documentation =>
-      "Sets the quantity of component `a` in each data point. If `a`, `b`, and `c` are all provided, they need not be normalized, only the relative values matter. If only two arrays are provided they must be normalized to match `ternary<i>.sum`.",
+has b => ( is            => "rw",
+           isa           => "ArrayRef|PDL",
+           documentation => "Sets the b-axis coordinates.",
 );
 
 has bsrc => ( is            => "rw",
@@ -105,7 +101,8 @@ has fill => (
 );
 
 has fillcolor => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Sets the fill color. Defaults to a half-transparent variant of the line color, marker color, or marker line color, whichever is available.",
 );
@@ -130,6 +127,30 @@ has hoveron => (
     isa => "Str",
     documentation =>
       "Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.",
+);
+
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
+has hovertext => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Sets hover text elements associated with each (a,b) point. If a single string, the same string appears over all the data points. If an array of strings, the items are mapped in order to the the data points in (a,b). To be seen, trace `hoverinfo` must contain a *text* flag.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
 );
 
 has ids => (
@@ -197,7 +218,7 @@ has text => (
     is  => "rw",
     isa => "Str|ArrayRef[Str]",
     documentation =>
-      "Sets text elements associated with each (a,b,c) point. If a single string, the same string appears over all the data points. If an array of strings, the items are mapped in order to the the data points in (a,b,c).",
+      "Sets text elements associated with each (a,b) point. If a single string, the same string appears over all the data points. If an array of strings, the items are mapped in order to the the data points in (a,b). If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
 );
 
 has textfont => ( is  => "rw",
@@ -238,8 +259,12 @@ has textsrc => ( is            => "rw",
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scattercarpet::Transform]", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -284,7 +309,7 @@ Chart::Plotly::Trace::Scattercarpet - Plots a scatter trace on either the first 
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -362,7 +387,7 @@ Trace type.
 
 =item * a
 
-Sets the quantity of component `a` in each data point. If `a`, `b`, and `c` are all provided, they need not be normalized, only the relative values matter. If only two arrays are provided they must be normalized to match `ternary<i>.sum`.
+Sets the a-axis coordinates.
 
 =item * asrc
 
@@ -370,7 +395,7 @@ Sets the source reference on plot.ly for  a .
 
 =item * b
 
-Sets the quantity of component `a` in each data point. If `a`, `b`, and `c` are all provided, they need not be normalized, only the relative values matter. If only two arrays are provided they must be normalized to match `ternary<i>.sum`.
+Sets the b-axis coordinates.
 
 =item * bsrc
 
@@ -414,6 +439,22 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
+=item * hovertext
+
+Sets hover text elements associated with each (a,b) point. If a single string, the same string appears over all the data points. If an array of strings, the items are mapped in order to the the data points in (a,b). To be seen, trace `hoverinfo` must contain a *text* flag.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -456,7 +497,7 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 =item * text
 
-Sets text elements associated with each (a,b,c) point. If a single string, the same string appears over all the data points. If an array of strings, the items are mapped in order to the the data points in (a,b,c).
+Sets text elements associated with each (a,b) point. If a single string, the same string appears over all the data points. If an array of strings, the items are mapped in order to the the data points in (a,b). If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
 
 =item * textfont
 
@@ -475,6 +516,8 @@ Sets the source reference on plot.ly for  text .
 =item * transforms
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -502,7 +545,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -1,4 +1,12 @@
-Revision history for App-setop
+0.120   2019-04-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update usage message (mention --cross).
+
+        - [dist] Rename bin/ to script/ to be compatible with static install
+          requirement.
+
 
 0.11    2016-09-26 (PERLANCAR)
 

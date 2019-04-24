@@ -1,10 +1,20 @@
 package Unix::PID::Tiny;
 
 use strict;
-$Unix::PID::Tiny::VERSION = 0.91;
+use warnings;
+
+our $VERSION = '0.92';
 
 sub new {
     my ( $self, $args_hr ) = @_;
+
+    my %DEFAULTS = (
+        'keep_open'           => 0,
+        'check_proc_open_fds' => 0
+    );
+
+    $args_hr ||= {};
+    %{$args_hr} = ( %DEFAULTS, %{$args_hr} );
     $args_hr->{'minimum_pid'} = 11 if !exists $args_hr->{'minimum_pid'} || $args_hr->{'minimum_pid'} !~ m{\A\d+\z}ms;    # this does what one assumes m{^\d+$} would do
 
     if ( defined $args_hr->{'ps_path'} ) {
@@ -17,7 +27,13 @@ sub new {
         $args_hr->{'ps_path'} = '';
     }
 
-    return bless { 'ps_path' => $args_hr->{'ps_path'}, 'minimum_pid' => $args_hr->{'minimum_pid'} }, $self;
+    return bless {
+        'ps_path'             => $args_hr->{'ps_path'},
+        'minimum_pid'         => $args_hr->{'minimum_pid'},
+        'keep_open'           => $args_hr->{'keep_open'},
+        'check_proc_open_fds' => $args_hr->{'check_proc_open_fds'},
+        'open_handles'        => []
+    }, $self;
 }
 
 sub kill {
@@ -102,11 +118,59 @@ sub get_pid_from_pidfile {
     return int( abs($pid) );
 }
 
+sub _sets_match {
+    my ( $left, $right ) = @_;
+
+    my $count = scalar @{$left};
+
+    return 0 unless scalar @{$right} == $count;
+
+    for ( my $i = 0; $i < $count; $i++ ) {
+        return 0 unless $left->[$i] eq $right->[$i];
+    }
+
+    return 1;
+}
+
 sub is_pidfile_running {
-    my ( $self, $pid_file ) = @_;
+    my ( $self, $pid_file, $since ) = @_;
     my $pid = $self->get_pid_from_pidfile($pid_file) || return;
-    return $pid if $self->is_pid_running($pid);
-    return;
+
+    my @pidfile_st = stat $pid_file or return;
+
+    if ( defined $since ) {
+        return if $pidfile_st[9] < $since;
+    }
+
+    if ( $self->{'check_proc_open_fds'} ) {
+        my $dir   = "/proc/$pid/fd";
+        my $found = 0;
+
+        opendir my $dh, $dir or return;
+
+        while ( my $dirent = readdir $dh ) {
+            next if $dirent eq '.' || $dirent eq '..';
+
+            my $path = "$dir/$dirent";
+            my $dest = readlink $path or next;
+            my @st   = stat $dest or next;
+
+            if ( _sets_match( [ @pidfile_st[ 0, 1 ] ], [ @st[ 0, 1 ] ] ) ) {
+                $found = 1;
+
+                last;
+            }
+        }
+
+        closedir $dh;
+
+        return unless $found;
+    }
+    else {
+        return unless $self->is_pid_running($pid);
+    }
+
+    return $pid;
 }
 
 sub pid_file {
@@ -142,7 +206,11 @@ sub pid_file {
     return;
 }
 
-*pid_file_no_cleanup = \&pid_file_no_unlink;                                                                                                                        # more intuitively named alias
+no warnings 'once';
+
+# more intuitively named alias
+*pid_file_no_cleanup = \&pid_file_no_unlink;
+use warnings 'once';
 
 sub pid_file_no_unlink {
     my ( $self, $pid_file, $newpid, $retry_conf ) = @_;
@@ -196,7 +264,13 @@ sub pid_file_no_unlink {
     }
 
     print {$pid_fh} int( abs($newpid) );
-    close $pid_fh;
+
+    if ( $self->{'keep_open'} ) {
+        push @{ $self->{'open_handles'} }, $pid_fh;
+    }
+    else {
+        close $pid_fh;
+    }
 
     return 1;
 }
@@ -219,11 +293,12 @@ __END__
 
 =head1 NAME
 
-Unix::PID::Tiny - Subset of Unix::PID functionality with smaller memory footprint
+Unix::PID::Tiny - Subset of Unix::PID functionality with smaller memory
+footprint
 
 =head1 VERSION
 
-This document describes Unix::PID::Tiny version 0.91
+This document describes Unix::PID::Tiny version 0.92.
 
 =head1 SYNOPSIS
 
@@ -242,9 +317,31 @@ Like Unix::PID but supplies only a few key functions.
 
 =head1 INTERFACE
 
-=head2 new()
+=head2 new(I<[$args_hr]>)
 
-See L<Unix::PID>'s new()
+See L<Unix::PID>'s new().  The following options can be provided in the
+optional HASH, I<$args_hr>, to enable certain extensions:
+
+=over
+
+=item B<keep_open>
+
+When a true value is provided, PID files created with pid_file() will remain
+open.
+
+=item B<check_proc_open_fds>
+
+When a true value is provided, this option will cause is_pidfile_running() to
+traverse C</proc/$pid/fd> to ensure a current file descriptor is held by a
+given process for the specified PID file.
+
+This option is only useful when B<keep_open> is also enabled, or when a pid
+file supplied by an external entity is passed to is_pidfile_running().  In
+other words, if this option is set when is_pidfile_running() is called, that
+function will always return false unless an open file descriptor is held for
+the same PID file by the process of that same PID.
+
+=back
 
 =head2 kill()
 
@@ -254,9 +351,11 @@ See L<Unix::PID>'s kill()
 
 See L<Unix::PID>'s pid_info_hash()
 
-=head2 is_pid_running()
+=head2 is_pid_running(I<$pid_file>, I<[$since]>)
 
-See L<Unix::PID>'s is_pid_running()
+See L<Unix::PID>'s is_pid_running().  The optional argument I<$since> may be
+provided, which will cause this function to not return true if the mtime of
+I<$pid_file> is earlier than the value provided in I<$since>.
 
 =head2 pid file related
 
@@ -276,11 +375,11 @@ The  "retry" configuration can also be hash ref w/ the optional keys:
 
 =over 4
 
-=item num_of_passes
+=item B<num_of_passes>
 
 This number corresponds to the the array ref version’s “first item”. Defaults to 3.
 
-=item passes_config
+=item B<passes_config>
 
 This array ref corresponds to the the array ref version’s “additional arguments”. Defaults to [1,2].
 

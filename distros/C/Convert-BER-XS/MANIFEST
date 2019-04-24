@@ -10,6 +10,8 @@ t/01_helper.t
 t/02_simple.t
 t/03_security.t
 t/04_longer.t
+t/05_bugs.t
+t/06_snmp.t
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

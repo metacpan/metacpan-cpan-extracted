@@ -13,17 +13,16 @@ my $root_domain = $suffix->get_root_domain($domain_name);
 
 if ( $suffix->error ) {
     printf( "%12s: %s\n", 'Error',       $suffix->error );
-    exit(1);
-} else {
-    printf( "%12s: %s\n", 'Root Domain', $root_domain );
-    printf( "%12s: %s\n", 'Suffix',      $suffix->suffix );
-    printf( "%12s: %s\n", 'TLD',         $suffix->tld );
 }
+printf( "%12s: %s\n", 'Root Domain', $root_domain ) if ($root_domain);
+printf( "%12s: %s\n", 'Suffix',      $suffix->suffix ) if ($suffix->suffix);
+printf( "%12s: %s\n", 'TLD',         $suffix->tld ) if ($suffix->tld);
+
 
 sub usage {
 	my ( $error ) = @_;
 	
-	print "get_root_domain - Domain::PublicSuffix " . $Domain::PublicSuffix::VERSION . "\n";
+	print "get_root_domain - Domain::PublicSuffix " . ($Domain::PublicSuffix::VERSION or 'dev') . "\n";
 	print "Usage: get_root_domain <domainname>\n";
 	
 	exit(1);

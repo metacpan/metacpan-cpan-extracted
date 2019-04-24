@@ -1,5 +1,5 @@
 package Limper::Plugin;
-$Limper::Plugin::VERSION = '0.013';
+$Limper::Plugin::VERSION = '0.014';
 use 5.10.0;
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ Limper::Plugin - placeholder for the Limper::Plugin namespace
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

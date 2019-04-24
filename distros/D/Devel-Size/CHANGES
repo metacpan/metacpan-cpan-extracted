@@ -1,5 +1,16 @@
 Revision history for Perl extension Devel::Size.
 
+0.83 2019-004-23 nicholas
+ [no changes]
+
+0.82_51 2019-04-17 nicholas
+  * Add a CONTRIBUTING file.
+
+0.82_50 2019-04-16 nicholas
+  * Fix for uninitialised reads from MULTICONCAT uncovered by [CPAN #127932]
+  * Handle allocations in MULTICONCAT's aux structure explicitly.
+  * Handle ARGCHECK and ARGELEM.
+
 0.82 2018-06-23 nicholas
   * Improve comment describing the fix in cmp_array_ro().
   * Fix some dates in this file.

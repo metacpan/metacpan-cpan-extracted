@@ -1,0 +1,52 @@
+=encoding utf8
+
+=head1 NAME
+
+Serge::Sync::Plugin::TranslationService::locize - L<Locize|https://locize.com/> synchronization plugin for L<Serge|https://serge.io/> based on L<Locize CLI|https://docs.locize.com/integration/cli>
+
+=head1 SYNOPSIS
+
+    ts
+    {
+        plugin                      locize
+
+        data
+        {
+            config_file              ./files/config/locize_config_file.yml
+            path                     ./files/resources
+        }
+    }
+
+=head1 DESCRIPTION
+
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Locize (Translation Software that is bridging the gap between translation and development),
+implemented using the command-line client for the Locize API.
+
+=head1 ATTRIBUTES
+
+=over
+
+=item I<config_file>
+
+Locize CLI path to the configuration file
+
+=item I<path>
+
+Locize CLI path to the resources.
+
+=back
+
+=head1 INSTALLATION
+
+ cpanm Serge::Sync::Plugin::TranslationService::locize
+
+=head1 AUTHOR
+
+Dragos Varovici <dvarovici.work@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Dragos Varovici.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

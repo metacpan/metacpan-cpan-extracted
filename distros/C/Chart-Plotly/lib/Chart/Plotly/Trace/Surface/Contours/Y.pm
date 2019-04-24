@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Surface::Contours::Y::Project;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace surface.
 
@@ -36,7 +36,14 @@ sub TO_JSON {
 }
 
 has color => ( is            => "rw",
-               documentation => "Sets the color of the contour lines.", );
+               isa           => "Str",
+               documentation => "Sets the color of the contour lines.",
+);
+
+has end => ( is            => "rw",
+             isa           => "Num",
+             documentation => "Sets the end contour level value. Must be more than `contours.start`",
+);
 
 has highlight => (
              is            => "rw",
@@ -45,7 +52,9 @@ has highlight => (
 );
 
 has highlightcolor => ( is            => "rw",
-                        documentation => "Sets the color of the highlighted contour lines.", );
+                        isa           => "Str",
+                        documentation => "Sets the color of the highlighted contour lines.",
+);
 
 has highlightwidth => ( is            => "rw",
                         isa           => "Num",
@@ -58,6 +67,16 @@ has project => ( is  => "rw",
 has show => ( is            => "rw",
               isa           => "Bool",
               documentation => "Determines whether or not contour lines about the y dimension are drawn.",
+);
+
+has size => ( is            => "rw",
+              isa           => "Num",
+              documentation => "Sets the step between each contour level. Must be positive.",
+);
+
+has start => ( is            => "rw",
+               isa           => "Num",
+               documentation => "Sets the starting contour level value. Must be less than `contours.end`",
 );
 
 has usecolormap => (
@@ -87,7 +106,7 @@ Chart::Plotly::Trace::Surface::Contours::Y - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -138,6 +157,10 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 Sets the color of the contour lines.
 
+=item * end
+
+Sets the end contour level value. Must be more than `contours.start`
+
 =item * highlight
 
 Determines whether or not contour lines about the y dimension are highlighted on hover.
@@ -156,6 +179,14 @@ Sets the width of the highlighted contour lines.
 
 Determines whether or not contour lines about the y dimension are drawn.
 
+=item * size
+
+Sets the step between each contour level. Must be positive.
+
+=item * start
+
+Sets the starting contour level value. Must be less than `contours.end`
+
 =item * usecolormap
 
 An alternate to *color*. Determines whether or not the contour lines are colored using the trace *colorscale*.
@@ -172,7 +203,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

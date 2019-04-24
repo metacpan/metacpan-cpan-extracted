@@ -1,0 +1,40 @@
+{
+   "abstract" : "Perl Development Environment in emacs",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Emacs-PDE",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Emacs::PDE" : {
+         "file" : "lib/Emacs/PDE.pm",
+         "version" : "v0.2.17"
+      },
+      "Emacs::PDE::Util" : {
+         "file" : "lib/Emacs/PDE/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.2.17",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

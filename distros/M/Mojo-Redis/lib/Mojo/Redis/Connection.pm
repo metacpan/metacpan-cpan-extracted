@@ -354,7 +354,7 @@ passed on to L</write_q>.
   $conn = $conn->write_q(@command => @args, undef);
 
 Will enqueue a Redis command and either resolve/reject the L<Mojo::Promise>
-or emit a L</error> or L</message> event when the Redis server responds.
+or emit a L</error> or L</response> event when the Redis server responds.
 
 This method is EXPERIMENTAL and currently meant for internal use.
 

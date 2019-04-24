@@ -20,8 +20,9 @@ use Data::Dumper;
 use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
+use HTTP::Cookies::Chrome;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -80,9 +81,31 @@ Installation of a Chrome compatible browser is required. There are some quirks
 including sporadic, but harmless, error messages issued by the browser when
 run with with DevTools.
 
+=head2 A Brief Operational Overview
+
+C<WWW::Mechanize::Chrome> (WMC) leverages developer tools built into Chrome and
+Chrome-like browsers to control a browser instance programatically. You can use
+WMC to automate tedious tasks, test web applications, and perform web scraping
+operations.
+
+Typically, WMC is used to launch both a I<host> instance of the browser and
+provide a I<client> instance of the browser. The host instance of the browser is
+visible to you on your desktop (unless the browser is running in "headless"
+mode, in which case it will not open in a window). The client instance is the
+Perl program you write with the WMC module to issue commands to control the host
+instance. As you navigate and "click" on various nodes in the client browser,
+you watch the host browser respond to these actions as if by magic.
+
+This magic happens as a result of commands that are issued from your client to
+the host using Chrome's DevTools Protocol which implements the http protocol to
+send JSON data structures. The host also responds to the client with JSON to
+describe the web pages it has loaded. WMC conveniently hides the complexity of
+the lower level communications between the client and host browsers and wraps
+them in a Perl object to provide the easy-to-use methods documented here.
+
 =head1 OPTIONS
 
-=head2 C<< WWW::Mechanize::Chrome->new %options >>
+=head2 C<< WWW::Mechanize::Chrome->new( %options ) >>
 
   my $mech = WWW::Mechanize::Chrome->new();
 
@@ -90,67 +113,109 @@ run with with DevTools.
 
 =item B<autodie>
 
-Control whether HTTP errors are fatal.
+  autodie => 0   # make HTTP errors non-fatal
 
-  autodie => 0, # make HTTP errors non-fatal
-
-The default is to have HTTP errors fatal,
-as that makes debugging much easier than expecting
-you to actually check the results of every action.
+By default, C<autodie> is set to true. If an HTTP error is encountered, the
+program dies along with its associated browser instances. This frees you from
+having to write error checks after every request. Setting this value to false
+makes HTTP errors non-fatal, allowing the program to continue running if
+there is an error.
 
 =item B<host>
 
-Specify the host where Chrome listens
+Set the host the browser listens on:
 
+  host => '192.168.1.2'
   host => 'localhost'
 
-Most likely you don't want to have Chrome listening on an outside port
-on a machine connected to the internet.
+Defaults to C<127.0.0.1>. The browser will listen for commands on the
+specified host. The host address should be inaccessible from the internet.
 
 =item B<port>
 
-Specify the port of Chrome to connect to
+  port => 9223   # set port the launched browser will use for remote operation
 
-  port => 9222
+Defaults to C<9222>. Commands to the browser will be issued through this port.
 
 =item B<tab>
 
-Specify which tab to connect to
+Specify the browser tab the Chrome browser will use:
 
   tab => 'current'
+  tab => qr/PerlMonks/
 
-If you want to connect to a tab by title, you can pass in a regular expression
-matching that title. If you want to create a new tab, pass in a false value.
+By default, a web page is opened in a new browser tab. Setting C<tab> to
+C<current> will use the current, active tab instead. Alternatively, to use an
+existing inactive tab, you can pass a regular expression to match against the
+existing tab's title. A false value implements the default behavior and a new
+tab will be created.
 
+=item B<autoclose>
+
+  autoclose => 0   # keep tab open after program end
+
+By default, C<autoclose> is set to true, closing the tab opened when running
+your code. If C<autoclose> is set to a false value, the tab will remain open
+even after the program has finished.
+
+=item B<host>
+
+Set the host the browser listens on:
+
+  host => '192.168.1.2'
+  host => 'localhost'
+
+Defaults to C<127.0.0.1>. The browser will listen for commands on the
+specified host. The host address should be inaccessible from the internet.
 =item B<log>
 
-A premade L<Log::Log4perl> object
+  log => $object   # specify the object used for logging
+
+Can be used to supply a L<Log::Log4perl> object that has been manually
+constructed.
 
 =item B<launch_exe>
 
-Specify the path to the Chrome executable.
+Set the name and/or path to the browser's executable program:
 
-The default is C<chrome> on Windows and C<google-chrome> elsewhere, as found via
-C<$ENV{PATH}>. If you want to use Chromium, you need to specify that explicitly
-via:
+  launch_exe => 'name-of-chrome-executabe'    # for non-standard executable names
+  launch_exe => '/path/to/executable'         # for non-standard paths
+  launch_exe => '/path/to/executable/chrome'  # full path
 
-    launch_exe => 'chromium-browser', # if Chromium is named chromium-browser on your OS
+By default, C<WWW::Mechanize::Chrome> will search the appropriate paths for
+Chrome's executable file based on the operating system. Use this option to set
+the path to your executable if it is in a non-standard location or if the
+executable has a non-standard name.
 
-You can also provide this information from the outside to the class
-by setting C<$ENV{CHROME_BIN}>.
+The default paths searched are those found in C<$ENV{PATH}>. For OS X, the user
+and system C<Application> directories are also searched. The default values for
+the executable file's name are C<chrome> on Windows, C<Google Chrome> on OS X,
+and C<google-chrome> elsewhere.
+
+If you want to use Chromium, you must specify that explicitly with something
+like:
+
+  launch_exe => 'chromium-browser', # if Chromium is named chromium-browser on your OS
+
+Results my vary for your operating system. Use the full path to the browser's
+executable if you are having issues. You can also set the name of the executable
+file with the C<$ENV{CHROME_BIN}> environment variable.
 
 =item B<start_url>
 
-Launch Chrome with the given URL. Normally you would use
-the C<< ->get >> method instead.
+  start_url => 'http://perlmonks.org'  # Immediately navigate to a given URL
+
+By default, the browser will open with a blank tab. Use the C<start_url> option
+to open the browser to the specified URL. More typically, the C<< ->get >>
+method is use to navigate to URLs.
 
 =item B<launch_arg>
 
-Specify additional parameters to the Chrome executable.
+Pass additional switches and parameters to the browser's executable:
 
-  launch_arg => [ "--some-new-parameter=foo" ],
+  launch_arg => [ "--some-new-parameter=foo", "--another-option" ]
 
-Interesting parameters might be
+Examples of other useful parameters include:
 
     '--start-maximized',
     '--window-size=1280x1696'
@@ -164,17 +229,23 @@ Interesting parameters might be
 
 =item B<profile>
 
-Profile directory for this session. If not given, Chrome will use your current
-user profile.
+  profile => '/path/to/profile/directory'  #  set the profile directory
+
+By default, your current user profile directory is used. Use this setting
+to change the profile directory for the browsing session.
 
 =item B<incognito>
 
-Launch Chrome in incognito mode.
+  incognito => 1   # open the browser in incognito mode
+
+Defaults to false. Set to true to launch the browser in incognito mode.
 
 =item B<data_directory>
 
-The base data directory for this session. If not given, Chrome will use your
-current base directory.
+  data_directory => '/path/to/data/directory'  #  set the data directory
+
+By default, the current data directory is used. Use this setting to change the
+base data directory for the browsing session.
 
   use File::Temp 'tempdir';
   # create a fresh Chrome every time
@@ -184,111 +255,120 @@ current base directory.
 
 =item B<startup_timeout>
 
-  startup_timeout => 20,
+  startup_timeout => 5  # set the startup timeout value
 
-The maximum number of seconds to wait until Chrome is ready. This helps on slow
-systems where Chrome takes some time starting up. The process will try every
-second to connect to Chrome.
+Defaults to 20, the maximum number of seconds to wait for the browser to launch.
+Higher or lower values can be set based on the speed of the machine. The
+process attempts to connect to the browser once each second over the duration
+of this setting.
 
 =item B<listen_host>
 
-  listen_host => 'myhostname'
+  listen_host => '192.1.168.7'  # set an IP address for listening
 
-Specify the interface where a launched Chrome process should listen. This is
-usually not needed but available if you want to connect to the launched Chrome
-process from other machines as well.
+Specifies an IP address the launched browser process should listen on. This
+option is useful for controlling the browser from another machine on your
+network.
 
 =item B<driver>
 
-A premade L<Chrome::DevToolsProtocol> object.
+  driver => $driver_object  # specify the driver object
+
+Use a L<Chrome::DevToolsProtocol> object that has been manually constructed.
 
 =item B<report_js_errors>
 
-If set to 1, after each request tests for Javascript errors and warns. Useful
-for testing with C<use warnings qw(fatal)>.
+  report_js_errors => 1  # turn javascript error reporting on
+
+Defaults to false. If true, tests for Javascript errors and warns after each
+request are run. This is useful for testing with C<use warnings qw(fatal)>.
 
 =item B<mute_audio>
 
-Mutes the audio output. This setting is enabled by default.
+  mute_audio => 0  # turn sounds on
+
+Defaults to true (sound off). A false value turns the sound on.
 
 =item B<background_networking>
 
-Enable "background networking".
+  background_networking => 1  # turn background networking on
 
-Disabled by default.
+Defaults to false (off). A true value enables background networking.
 
 =item B<client_side_phishing_detection>
 
-Enable "client side phising detection".
+  client_side_phishing_detection => 1  # turn client side phishing detection on
 
-Disabled by default.
+Defaults to false (off). A true value enables client side phishing detection.
 
 =item B<component_update>
 
-Enable "component update".
+  component_update => 1  # turn component updates on
 
-Disabled by default.
+Defaults to false (off). A true value enables component updates.
 
 =item B<default_apps>
 
-Enable "default apps".
+  default_apps => 1  # turn default apps on
 
-Disabled by default.
+Defaults to false (off). A true value enables default apps.
 
 =item B<hang_monitor>
 
-Enable "hang monitor".
+  hang_monitor => 1  # turn the hang monitor on
 
-Disabled by default.
+Defaults to false (off). A true value enables the hang monitor.
 
 =item B<hide_scrollbars>
 
-Hide scrollbars.
+  hide_scrollbars => 1  # hide the scrollbars
 
-Disabled by default.
+Defaults to false (off). A true value will hide the scrollbars.
 
 =item B<infobars>
 
-Enable "infobars".
+  infobars => 1  # turn infobars on
 
-Disabled by default.
+Defaults to false (off). A true value will turn infobars on.
 
 =item B<popup_blocking>
 
-Enable "popup blocking".
+  popup_bloacking => 1  # block popups
 
-Disabled by default.
+Defaults to false (off). A true value will block popups.
 
 =item B<prompt_on_repost>
 
-Enable "prompt on repost".
+  prompt_on_repost => 1  # allow prompts when reposting
 
-Disabled by default.
+Defaults to false (off). A true value will allow prompts when reposting.
 
 =item B<save_password_bubble>
 
-Enable the "save password" bubble.
+  save_password_bubble => 1  # allow the display of the save password bubble
 
-Disabled by default.
+Defaults to false (off). A true value allows the save password bubble to be
+displayed.
 
 =item B<sync>
 
-Enable "sync".
+  sync => 1   # turn syncing on
 
-Disabled by default.
+Defaults to false (off). A true value turns syncing on.
 
 =item B<web_resources>
 
-Enable "Web resources".
+  web_resources => 1   # turn web resources on
 
-Disabled by default.
+Defaults to false (off). A true value turns web resources on.
 
 =back
 
-You can override the class to implement the transport from the outside by
-setting C<< $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} >> to the transport class.
-This is mostly used for testing but can be useful to exclude the underlying
-websocket implementation(s) as source of bugs.
+The C<< $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} >> variable can be set to a
+different transport class to override the default L<transport
+class|Chrome::DevToolsProtcol::Transport>. This is primarily used for testing
+but can also help eliminate introducing bugs from the underlying websocket
+implementation(s).
 
 =head1 METHODS
 
@@ -298,6 +378,7 @@ sub build_command_line {
     my( $class, $options )= @_;
 
     my @program_names = $class->default_executable_names( $options->{launch_exe} );
+
     my( $program, $error) = $class->find_executable(\@program_names);
     croak $error if ! $program;
 
@@ -1255,6 +1336,12 @@ sub agent( $self, $ua ) {
     $self->chrome_version_info->{"User-Agent"}
 }
 
+=head2 C<< ->autoclose_tab >>
+
+Set the C<autoclose> option
+
+=cut
+
 sub autoclose_tab( $self, $autoclose ) {
     $self->{autoclose} = $autoclose
 }
@@ -2016,6 +2103,23 @@ sub set_download_directory_future( $self, $dir="" ) {
 
 sub set_download_directory( $self, $dir="" ) {
     $self->set_download_directory_future($dir)->get
+};
+
+=head2 C<< $mech->cookie_jar >>
+
+    my $cookies = $mech->cookie_jar
+
+Returns all the Chrome cookies in a L<HTTP::Cookies::Chrome> instance.
+Setting a cookie in there will also set the cookie in Chrome.
+
+=cut
+
+sub cookie_jar( $self ) {
+    $self->{cookie_jar} ||= do {
+        my $c = HTTP::Cookies::Chrome->new( driver => $self->driver );
+        $c->load;
+        $c
+    };
 };
 
 =head2 C<< $mech->add_header( $name => $value, ... ) >>

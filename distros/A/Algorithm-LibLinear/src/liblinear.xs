@@ -354,23 +354,28 @@ OUTPUT:
     RETVAL
 
 AV *
-ll_find_cost_parameter(self, problem_, num_folds, initial_cost, max_cost, update)
+ll_find_parameters(self, problem_, num_folds, initial_C, initial_p, update)
     struct parameter *self;
     struct problem *problem_;
     int num_folds;
-    double initial_cost;
-    double max_cost;
+    double initial_C;
+    double initial_p;
     bool update;
 CODE:
-    double cost, accuracy;
-    find_parameter_C(
-        problem_, self, num_folds, initial_cost, max_cost, &cost, &accuracy);
+    double best_C, best_p, accuracy;
+    find_parameters(
+        problem_, self, num_folds, initial_C, initial_p, &best_C, &best_p,
+        &accuracy);
     // LIBLINEAR 2.0 resets default printer function during call of
     // find_parameter_C(). So disable it again.
     set_print_string_function(dummy_puts);
-    if (update) { self->C = cost; }
+    if (update) {
+        self->C = best_C;
+        self->p = best_p;
+    }
     RETVAL = newAV();
-    av_push(RETVAL, newSVnv(cost));
+    av_push(RETVAL, newSVnv(best_C));
+    av_push(RETVAL, newSVnv(best_p));
     av_push(RETVAL, newSVnv(accuracy));
 OUTPUT:
     RETVAL

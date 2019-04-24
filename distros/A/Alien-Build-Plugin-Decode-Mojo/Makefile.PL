@@ -51,27 +51,27 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Decode/Mojo.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Decode/Mojo.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Build::Plugin" => 0,
+    "Alien::Build::Plugin" => "1.68",
     "Module::Load"         => 0,
     "URI"                  => 0
   },
   "TEST_REQUIRES" => {
     "Path::Tiny"         => 0,
     "Test2::V0"          => "0.000060",
-    "Test::Alien::Build" => 0
+    "Test::Alien::Build" => "1.68"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Alien::Build::Plugin" => 0,
+  "Alien::Build::Plugin" => "1.68",
   "Module::Load"         => 0,
   "Path::Tiny"           => 0,
   "Test2::V0"            => "0.000060",
-  "Test::Alien::Build"   => 0,
+  "Test::Alien::Build"   => "1.68",
   "URI"                  => 0
 );
 

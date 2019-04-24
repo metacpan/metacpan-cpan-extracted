@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Surface::Lighting;
 use Chart::Plotly::Trace::Surface::Lightposition;
 use Chart::Plotly::Trace::Surface::Stream;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The data the describes the coordinates of the surface is set in `z`. Data in `z` should be a {2D array}. Coordinates in `x` and `y` can either be 1D {arrays} or {2D arrays} (e.g. to graph parametric surfaces). If not provided in `x` and `y`, the x and y coordinates are assumed to be linear starting at 0 with a unit step. The color scale corresponds to the `z` values by default. For custom color scales, use `surfacecolor` which should be a {2D array}, where its bounds can be controlled using `cmin` and `cmax`.
 
@@ -66,6 +66,13 @@ has cmax => (
       "Sets the upper bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmin` must be set as well.",
 );
 
+has cmid => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the mid-point of the color domain by scaling `cmin` and/or `cmax` to be equidistant to this point. Value should have the same units as z or surfacecolor. Has no effect when `cauto` is `false`.",
+);
+
 has cmin => (
     is  => "rw",
     isa => "Num",
@@ -80,6 +87,12 @@ has colorscale => (
     is => "rw",
     documentation =>
       "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in color space, use`cmin` and `cmax`. Alternatively, `colorscale` may be a palette name string of the following list: Greys,YlGnBu,Greens,YlOrRd,Bluered,RdBu,Reds,Blues,Picnic,Rainbow,Portland,Jet,Hot,Blackbody,Earth,Electric,Viridis,Cividis.",
+);
+
+has connectgaps => (
+        is            => "rw",
+        isa           => "Bool",
+        documentation => "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in.",
 );
 
 has contours => ( is  => "rw",
@@ -119,6 +132,28 @@ has hoverinfosrc => ( is            => "rw",
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Surface::Hoverlabel", );
 
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
+has hovertext => ( is            => "rw",
+                   isa           => "Str|ArrayRef[Str]",
+                   documentation => "Same as `text`.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+);
+
 has ids => (
     is  => "rw",
     isa => "ArrayRef|PDL",
@@ -129,13 +164,6 @@ has ids => (
 has idssrc => ( is            => "rw",
                 isa           => "Str",
                 documentation => "Sets the source reference on plot.ly for  ids .",
-);
-
-has legendgroup => (
-    is  => "rw",
-    isa => "Str",
-    documentation =>
-      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
 );
 
 has lighting => ( is  => "rw",
@@ -149,9 +177,11 @@ has name => ( is            => "rw",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
 );
 
-has opacity => ( is            => "rw",
-                 isa           => "Num",
-                 documentation => "Sets the opacity of the surface.",
+has opacity => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the opacity of the surface. Please note that in the case of using high `opacity` values for example a value greater than or equal to 0.5 on two surfaces (and 0.25 with four surfaces), an overlay of multiple transparent surfaces may not perfectly be sorted in depth by the webgl API. This behavior may be improved in the near future and is subject to change.",
 );
 
 has reversescale => (
@@ -165,19 +195,6 @@ has scene => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.",
-);
-
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
-has showlegend => (
-               is            => "rw",
-               isa           => "Bool",
-               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -211,8 +228,12 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -299,7 +320,7 @@ Chart::Plotly::Trace::Surface - The data the describes the coordinates of the su
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -374,6 +395,10 @@ Determines whether or not the color domain is computed with respect to the input
 
 Sets the upper bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmin` must be set as well.
 
+=item * cmid
+
+Sets the mid-point of the color domain by scaling `cmin` and/or `cmax` to be equidistant to this point. Value should have the same units as z or surfacecolor. Has no effect when `cauto` is `false`.
+
 =item * cmin
 
 Sets the lower bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmax` must be set as well.
@@ -383,6 +408,10 @@ Sets the lower bound of the color domain. Value should have the same units as z 
 =item * colorscale
 
 Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in color space, use`cmin` and `cmax`. Alternatively, `colorscale` may be a palette name string of the following list: Greys,YlGnBu,Greens,YlOrRd,Bluered,RdBu,Reds,Blues,Picnic,Rainbow,Portland,Jet,Hot,Blackbody,Earth,Electric,Viridis,Cividis.
+
+=item * connectgaps
+
+Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in.
 
 =item * contours
 
@@ -408,6 +437,22 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
+=item * hovertext
+
+Same as `text`.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -415,10 +460,6 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 =item * idssrc
 
 Sets the source reference on plot.ly for  ids .
-
-=item * legendgroup
-
-Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * lighting
 
@@ -430,7 +471,7 @@ Sets the trace name. The trace name appear as the legend item and on hover.
 
 =item * opacity
 
-Sets the opacity of the surface.
+Sets the opacity of the surface. Please note that in the case of using high `opacity` values for example a value greater than or equal to 0.5 on two surfaces (and 0.25 with four surfaces), an overlay of multiple transparent surfaces may not perfectly be sorted in depth by the webgl API. This behavior may be improved in the near future and is subject to change.
 
 =item * reversescale
 
@@ -439,14 +480,6 @@ Reverses the color mapping if true. If true, `cmin` will correspond to the last 
 =item * scene
 
 Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.
-
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
-=item * showlegend
-
-Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -471,6 +504,8 @@ Sets the text elements associated with each z value. If trace `hoverinfo` contai
 Sets the source reference on plot.ly for  text .
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -524,7 +559,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

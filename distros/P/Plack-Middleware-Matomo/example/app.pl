@@ -21,6 +21,7 @@ use Plack::Builder;
     };
 
     get '/matomo' => sub {
+        print STDERR "Woohoo: matomo san, here we go.\n";
         status 200;
     };
 

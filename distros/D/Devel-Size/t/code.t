@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 20;
 use Devel::Size ':all';
 
 # For me, for some files locally, I'm seeing failures
@@ -145,3 +145,16 @@ my $ode_size = total_size(\&ode);
 
 cmp_ok($ode_size, '<', $two_lex_size + 768,
        '&ode is bigger than a sub with two lexicals by less than 768 bytes');
+
+# This is a copy of the simplest multiconcat test from t/opbasic/concat.t
+# Like there, this is mostly intended for ASAN to hit:
+sub multiconcat {
+    my $s = chr 0x100;
+    my $t = "\x80" x 1024;
+    $s .= "-$t-";
+    is(length($s), 1027, "utf8 dest with non-utf8 args");
+}
+
+multiconcat();
+cmp_ok(total_size(\&multiconcat), '>', 1024,
+       "pad constant makes this at least 1K");

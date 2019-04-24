@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..378\n"; }
+BEGIN { $| = 1; print "1..384\n"; }
 
 use common::sense;
 use Convert::BER::XS ':all';
@@ -54,6 +54,7 @@ fail "02020001", "X.690 8.3.2";
 fail "0208ffffffffffffffff", "X.690 8.3.2";
 
 # types
+roundtrip "020100", [ASN_UNIVERSAL, ASN_INTEGER, 0, 0];
 roundtrip "020105", [ASN_UNIVERSAL, ASN_INTEGER, 0, 5];
 roundtrip "0201ff", [ASN_UNIVERSAL, ASN_INTEGER, 0, -1];
 roundtrip "020200ff", [ASN_UNIVERSAL, ASN_INTEGER, 0, 255];

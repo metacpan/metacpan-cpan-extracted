@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Table::Header;
 use Chart::Plotly::Trace::Table::Hoverlabel;
 use Chart::Plotly::Trace::Table::Stream;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: Table view for detailed data viewing. The data are arranged in a grid of rows and columns. Most styling can be specified for columns, rows or individual cells. Table is using a column-major order, ie. the grid is represented as a vector of column vectors.
 
@@ -116,41 +116,20 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
-has legendgroup => (
-    is  => "rw",
-    isa => "Str",
-    documentation =>
-      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
-);
-
 has name => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
 );
 
-has opacity => ( is            => "rw",
-                 isa           => "Num",
-                 documentation => "Sets the opacity of the trace.",
-);
-
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
-has showlegend => (
-               is            => "rw",
-               isa           => "Bool",
-               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
-);
-
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Table::Stream", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -180,7 +159,7 @@ Chart::Plotly::Trace::Table - Table view for detailed data viewing. The data are
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -302,29 +281,15 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
-=item * legendgroup
-
-Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
-
 =item * name
 
 Sets the trace name. The trace name appear as the legend item and on hover.
 
-=item * opacity
-
-Sets the opacity of the trace.
-
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
-=item * showlegend
-
-Determines whether or not an item corresponding to this trace is shown in the legend.
-
 =item * stream
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -342,7 +307,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

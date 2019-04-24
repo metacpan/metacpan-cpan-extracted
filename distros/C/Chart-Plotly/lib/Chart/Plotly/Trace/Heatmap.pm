@@ -9,8 +9,9 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Heatmap::Colorbar;
 use Chart::Plotly::Trace::Heatmap::Hoverlabel;
 use Chart::Plotly::Trace::Heatmap::Stream;
+use Chart::Plotly::Trace::Heatmap::Transform;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: The data that describes the heatmap value-to-color mapping is set in `z`. Data in `z` can either be a {2D array} of values (ragged or not) or a 1D array of values. In the case where `z` is a {2D array}, say that `z` has N rows and M columns. Then, by default, the resulting heatmap will have N partitions along the y axis and M partitions along the x axis. In other words, the i-th row/ j-th column cell in `z` is mapped to the i-th partition of the y axis (starting from the bottom of the plot) and the j-th partition of the x-axis (starting from the left of the plot). This behavior can be flipped by using `transpose`. Moreover, `x` (`y`) can be provided with M or M+1 (N or N+1) elements. If M (N), then the coordinates correspond to the center of the heatmap cells and the cells have equal width. If M+1 (N+1), then the coordinates correspond to the edges of the heatmap cells. In the case where `z` is a 1D {array}, the x and y coordinates must be provided in `x` and `y` respectively to form data triplets.
 
@@ -101,6 +102,28 @@ has hoverinfosrc => ( is            => "rw",
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Heatmap::Hoverlabel", );
 
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\". To hide the secondary box completely, use an empty tag `<extra></extra>`.",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
+has hovertext => ( is            => "rw",
+                   isa           => "ArrayRef|PDL",
+                   documentation => "Same as `text`.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+);
+
 has ids => (
     is  => "rw",
     isa => "ArrayRef|PDL",
@@ -111,13 +134,6 @@ has ids => (
 has idssrc => ( is            => "rw",
                 isa           => "Str",
                 documentation => "Sets the source reference on plot.ly for  ids .",
-);
-
-has legendgroup => (
-    is  => "rw",
-    isa => "Str",
-    documentation =>
-      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
 );
 
 has name => ( is            => "rw",
@@ -135,19 +151,6 @@ has reversescale => (
     isa => "Bool",
     documentation =>
       "Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.",
-);
-
-has selectedpoints => (
-    is  => "rw",
-    isa => "Any",
-    documentation =>
-      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
-);
-
-has showlegend => (
-               is            => "rw",
-               isa           => "Bool",
-               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -168,13 +171,20 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Heatmap::Transform]", );
+
 has transpose => ( is            => "rw",
                    isa           => "Bool",
                    documentation => "Transposes the z data.",
 );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -303,6 +313,13 @@ has zmax => (
       "Sets the upper bound of the color domain. Value should have the same units as in `z` and if set, `zmin` must be set as well.",
 );
 
+has zmid => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the mid-point of the color domain by scaling `zmin` and/or `zmax` to be equidistant to this point. Value should have the same units as in `z`. Has no effect when `zauto` is `false`.",
+);
+
 has zmin => (
     is  => "rw",
     isa => "Num",
@@ -333,7 +350,7 @@ Chart::Plotly::Trace::Heatmap - The data that describes the heatmap value-to-col
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -436,6 +453,22 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>". To hide the secondary box completely, use an empty tag `<extra></extra>`.
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
+=item * hovertext
+
+Same as `text`.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -443,10 +476,6 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 =item * idssrc
 
 Sets the source reference on plot.ly for  ids .
-
-=item * legendgroup
-
-Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * name
 
@@ -459,14 +488,6 @@ Sets the opacity of the trace.
 =item * reversescale
 
 Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.
-
-=item * selectedpoints
-
-Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
-
-=item * showlegend
-
-Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -482,11 +503,15 @@ Sets the text elements associated with each z value.
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * transpose
 
 Transposes the z data.
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -568,6 +593,10 @@ Sets the hover text formatting rule using d3 formatting mini-languages which are
 
 Sets the upper bound of the color domain. Value should have the same units as in `z` and if set, `zmin` must be set as well.
 
+=item * zmid
+
+Sets the mid-point of the color domain by scaling `zmin` and/or `zmax` to be equidistant to this point. Value should have the same units as in `z`. Has no effect when `zauto` is `false`.
+
 =item * zmin
 
 Sets the lower bound of the color domain. Value should have the same units as in `z` and if set, `zmax` must be set as well.
@@ -588,7 +617,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

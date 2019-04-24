@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Sankey::Node;
 use Chart::Plotly::Trace::Sankey::Stream;
 use Chart::Plotly::Trace::Sankey::Textfont;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: Sankey plots for network flow data analysis. The nodes are specified in `nodes` and the links between sources and targets in `links`. The colors are set in `nodes[i].color` and `links[i].color`; otherwise defaults are used.
 
@@ -89,13 +89,6 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
-has legendgroup => (
-    is  => "rw",
-    isa => "Str",
-    documentation =>
-      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
-);
-
 has link => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Link", );
 
@@ -106,11 +99,6 @@ has name => ( is            => "rw",
 
 has node => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Node", );
-
-has opacity => ( is            => "rw",
-                 isa           => "Num",
-                 documentation => "Sets the opacity of the trace.",
-);
 
 has orientation => ( is            => "rw",
                      isa           => enum( [ "v", "h" ] ),
@@ -124,20 +112,18 @@ has selectedpoints => (
       "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
 );
 
-has showlegend => (
-               is            => "rw",
-               isa           => "Bool",
-               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
-);
-
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Stream", );
 
 has textfont => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Textfont", );
 
-has uid => ( is  => "rw",
-             isa => "Str", );
+has uid => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.",
+);
 
 has uirevision => (
     is  => "rw",
@@ -181,7 +167,7 @@ Chart::Plotly::Trace::Sankey - Sankey plots for network flow data analysis. The 
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -280,10 +266,6 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
-=item * legendgroup
-
-Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
-
 =item * link
 
 =item * name
@@ -291,10 +273,6 @@ Sets the legend group for this trace. Traces part of the same legend group hide/
 Sets the trace name. The trace name appear as the legend item and on hover.
 
 =item * node
-
-=item * opacity
-
-Sets the opacity of the trace.
 
 =item * orientation
 
@@ -304,15 +282,13 @@ Sets the orientation of the Sankey diagram.
 
 Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
 
-=item * showlegend
-
-Determines whether or not an item corresponding to this trace is shown in the legend.
-
 =item * stream
 
 =item * textfont
 
 =item * uid
+
+Assign an id to this trace, Use this to provide object constancy between traces during animations and transitions.
 
 =item * uirevision
 
@@ -338,7 +314,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -10,6 +10,7 @@ use Future;
 use Future::AsyncAwait;
 
 my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
+my $file = quotemeta __FILE__;
 
 async sub identity
 {
@@ -25,12 +26,47 @@ async sub func
    $x + 1 + [ "a", await identity $f ];
 }
 
-# unresolved
-foreach ( 1 .. 1023 ) {
+# abandoned chain
+{
    my $f1 = Future->new;
    my $fret = func( $f1, 1, 2 );
 
    undef $fret;
+   pass( 'abandoned chain does not crash' );
+}
+
+# abandoned subsequent (RT129303)
+{
+   my $f1 = Future->new;
+   my $fret = func( $f1, 3, 4 );
+
+   undef $fret;
+
+   my $warnings = "";
+   {
+      local $SIG{__WARN__} = sub { $warnings .= join "", @_ };
+      $f1->done;
+   }
+   pass( 'abandoned subsequent does not crash' );
+   like( $warnings, qr/^Suspended async sub main::func lost its returning future at $file line \d+/,
+      'warning from attempted resume' );
+}
+
+# abandoned subsequent on anon sub
+{
+   my $f1 = Future->new;
+   my $fret = (async sub { await $f1 })->();
+
+   undef $fret;
+
+   my $warnings = "";
+   {
+      local $SIG{__WARN__} = sub { $warnings .= join "", @_ };
+      $f1->done;
+   }
+   pass( 'abandoned subsequent does not crash' );
+   like( $warnings, qr/^Suspended async sub CODE\(0x[0-9a-f]+\) in package main lost its returning future at $file line \d+/,
+      'warning from attempted resume' );
 }
 
 is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,

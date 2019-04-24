@@ -1,5 +1,5 @@
 package Limper;
-$Limper::VERSION = '0.013';
+$Limper::VERSION = '0.014';
 use 5.10.0;
 use strict;
 use warnings;
@@ -27,6 +27,7 @@ sub trace   { push @{$route->{TRACE}},   @_; @_ }
 sub options { push @{$route->{OPTIONS}}, @_; @_ }
 sub patch   { push @{$route->{PATCH}},   @_; @_ }
 sub any     { push @{$route->{$_}},      @_ for keys %$route }
+sub routes  { $_[0] ? $route->{uc $_[0]} : $route }
 
 # for send_response()
 my $reasons = {
@@ -299,7 +300,7 @@ Limper - extremely lightweight but not very powerful web application framework
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -354,6 +355,10 @@ Also exportable:
 
   info warning rfc1123date
 
+Not exportable, because it is a footgun:
+
+  routes
+
 =head1 FUNCTIONS
 
 =head2 get
@@ -385,6 +390,12 @@ Note that a route to match B<HEAD> requests is automatically created as well for
 Defines a route handler for B<all> METHODs to the given path:
 
   any '/' => sub { 'Hello world!' };
+
+=head2 routes
+
+Returns all routes for all verbs, or if passed an argument the routes for that verb.
+
+WARNING: this is the actual routing data, not a copy. Meaning you can completely break everything by modifying this unless you know what you're doing.
 
 =head2 status
 
