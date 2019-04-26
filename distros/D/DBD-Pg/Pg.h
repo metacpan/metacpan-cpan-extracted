@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2000-2018 Greg Sabino Mullane and others: see the Changes file
+   Copyright (c) 2000-2019 Greg Sabino Mullane and others: see the Changes file
    Copyright (c) 1997-2000 Edmund Mergl
    Portions Copyright (c) 1994-1997 Tim Bunce
 
@@ -14,9 +14,6 @@
 static int errno;
 #include <string.h>
 #define strcasecmp(s1,s2) stricmp((s1), (s2))
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
 #else
 #include <strings.h>
 #endif

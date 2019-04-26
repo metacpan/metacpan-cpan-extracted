@@ -4,6 +4,12 @@ author:
   - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Test::MockFile: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -17,7 +23,5 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  Test::MockFile: '0'
-  Test::More: '0'
-version: '0.92'
+requires: {}
+version: '0.94'

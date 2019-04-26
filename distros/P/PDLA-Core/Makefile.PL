@@ -364,8 +364,6 @@ my @prereq = (
 	   'File::Temp'          => 0,
 	   'Filter::Util::Call'  => 0,         # for PDLA::NiceSlice
 	   'Filter::Simple'      => 0.88,      # for new PDLA::NiceSlice
-	   'Inline'              => 0.68,
-	   'Inline::C'           => 0.62,
 	   'Module::Compile'     => 0.23,      # for new PDLA::NiceSlice
 	   'Pod::Parser'         => 0,         # version TBD for PDLA::Doc
 	   'Pod::Select'         => 0,         # version TBD for PDLA::Doc
@@ -437,6 +435,12 @@ my %makefile_hash = (
                   runtime => {
                     suggests => {
                       'Astro::FITS::Header' => 0,
+                    },
+                  },
+                  test => {
+                    suggests => {
+                      'Inline' => 0.68,
+                      'Inline::C' => 0.62,
                     },
                   },
                 },

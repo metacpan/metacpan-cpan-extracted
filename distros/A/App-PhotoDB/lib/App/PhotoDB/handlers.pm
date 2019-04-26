@@ -11,10 +11,8 @@ use YAML;
 use Array::Utils qw(:all);
 use Path::Iterator::Rule;
 use File::Basename;
-use Text::TabularDisplay;
 
 use App::PhotoDB::funcs qw(/./);
-use App::PhotoDB::queries;
 
 our @EXPORT_OK = qw(
 	film_add film_load film_archive film_develop film_tag film_locate film_bulk film_annotate film_stocks film_current film_choose film_info film_search
@@ -48,7 +46,7 @@ our @EXPORT_OK = qw(
 	exhibition_add exhibition_info
 	choose_manufacturer
 	db_stats db_logs db_test
-	scan_add scan_edit scan_delete scan_search
+	scan_add scan_edit scan_delete scan_search scan_rename
 );
 
 # Add a new film to the database
@@ -115,7 +113,6 @@ sub film_develop {
 	$data{date} = $href->{date} // &prompt({default=>&today, prompt=>'What date was this film processed?', type=>'date'});
 	$data{developer_id} = $href->{developer_id} // &listchoices({db=>$db, table=>'DEVELOPER', cols=>['developer_id as id', 'name as opt'], where=>{'for_film'=>1}, inserthandler=>\&developer_add});
 	$data{directory} = $href->{directory} // &prompt({prompt=>'What directory are these scans in?'});
-	$data{photographer_id} = $href->{photographer_id} // &listchoices({db=>$db, keyword=>'photographer', table=> 'PERSON', cols=>['person_id as id', 'name as opt'], inserthandler=>\&person_add});
 	$data{dev_uses} = $href->{dev_uses} // &prompt({prompt=>'How many previous uses has the developer had?', type=>'integer'});
 	$data{dev_time} = $href->{dev_time} // &prompt({prompt=>'How long was the film developed for?', type=>'time'});
 	$data{dev_temp} = $href->{dev_temp} // &prompt({prompt=>'What temperature was the developer?', type=>'decimal'});
@@ -143,7 +140,7 @@ sub film_tag {
 	my $href = shift;
 	my $db = $href->{db};
 	my $film_id = $href->{film_id} // &film_choose({db=>$db});
-	&tag({db=>$db, film_id=>$film_id});
+	&tag({db=>$db, where=>{film_id=>$film_id}});
 	return;
 }
 
@@ -190,13 +187,10 @@ sub film_annotate {
 sub film_stocks {
 	my $href = shift;
 	my $db = $href->{db};
-	my $data = &lookupcol({db=>$db, table=>'view_film_stocks'});
-	my $rows = @$data;
-	if ($rows >= 0) {
-		print "Films currently in stock:\n";
-		foreach my $row (@$data) {
-			print "\t$row->{qty}  x\t$row->{film}\n";
-		}
+	print "Films currently in stock:\n";
+	my $rows = &tabulate({db=>$db, view=>'view_film_stocks'});
+
+	if ($rows > 0) {
 		if (&prompt({default=>'yes', prompt=>'Load a film into a camera now?', type=>'boolean'})) {
 			&film_load({db=>$db});
 		}
@@ -732,7 +726,7 @@ sub negative_tag {
 	my $href = shift;
 	my $db = $href->{db};
 	my $neg_id = $href->{negative_id} // &chooseneg({db=>$db});
-	&tag({db=>$db, negative_id=>$neg_id});
+	&tag({db=>$db, where=>{negative_id=>$neg_id}});
 	return;
 }
 
@@ -1149,7 +1143,7 @@ sub print_tag {
 	my $href = shift;
 	my $db = $href->{db};
 	my $print_id = $href->{print_id} // &prompt({prompt=>'Which print do you want to tag?', type=>'integer', required=>1});
-	&tag({db=>$db, print_id=>$print_id});
+	&tag({db=>$db, where=>{print_id=>$print_id}});
 	return;
 }
 
@@ -1764,22 +1758,27 @@ sub run_task {
 	my $href = shift;
 	my $db = $href->{db};
 
-	my @tasks = @App::PhotoDB::queries::tasks;
-	if (scalar(@tasks) == 0) {
-		print "No tasks found\n";
-		return 0;
+	my @choices = (
+		{ desc => 'Set right lens_id for all negatives taken with fixed-lens cameras',                    proc => 'update_lens_id_fixed_camera' },
+		{ desc => 'Update lens focal length per negative',                                                proc => 'update_focal_length' },
+		{ desc => 'Update dates of fixed lenses',                                                         proc => 'update_dates_of_fixed_lenses' },
+		{ desc => 'Set metering mode for negatives taken with cameras with only one metering mode',       proc => 'update_metering_modes' },
+		{ desc => 'Set exposure program for negatives taken with cameras with only one exposure program', proc => 'update_exposure_programs' },
+		{ desc => 'Set fixed lenses as lost when their camera is lost',                                   proc => 'set_fixed_lenses' },
+		{ desc => 'Set crop factor, area, and aspect ratio for negative sizes that lack it',              proc => 'update_negative_sizes' },
+		{ desc => 'Set no flash for negatives taken with cameras that don\'t support flash',              proc => 'update_negative_flash' },
+		{ desc => 'Delete log entries older than 90 days',                                                proc => 'delete_logs' },
+		{ desc => 'Update copied negatives with inherited data',                                          proc => 'update_copied_negs'},
+	);
+
+	my $action = &multiplechoice({choices => \@choices});
+
+	if (defined($action) && $choices[$action]->{proc}) {
+		my $rows = &call({db=>$db, procedure=>$choices[$action]->{proc}});
+		$rows = &unsci($rows);
+		print "Updated $rows rows\n";
+		return $rows;
 	}
-
-	for my $i (0 .. $#tasks) {
-		print "\t$i\t$tasks[$i]{desc}\n";
-	}
-
-	# Wait for input
-	my $input = &prompt({prompt=>'Please select a task', type=>'integer', required=>1});
-
-	my $sql = $tasks[$input]{'query'};
-	my $rows = &updatedata({db=>$db, sql=>$sql});
-	print "Updated $rows rows\n";
 	return;
 }
 
@@ -1788,38 +1787,22 @@ sub run_report {
 	my $href = shift;
 	my $db = $href->{db};
 
-	my @reports = @App::PhotoDB::queries::reports;
-	if (scalar(@reports) == 0) {
-		print "No reports found\n";
-		return 0;
+	my @choices = (
+		{ desc => 'Report on how many cameras in the collection are from each decade', view => 'report_cameras_by_decade', },
+		{ desc => 'Report on which lenses have been used to take most frames',         view => 'report_most_popular_lenses_relative', },
+		{ desc => 'Report on cameras that have never been to used to take a frame',    view => 'report_never_used_cameras', },
+		{ desc => 'Report on lenses that have never been used to take a frame',        view => 'report_never_used_lenses', },
+		{ desc => 'Report on the cameras that have taken most frames',                 view => 'report_total_negatives_per_camera', },
+		{ desc => 'Report on the lenses that have taken most frames',                  view => 'report_total_negatives_per_lens', },
+		{ desc => 'Report on negatives that have not been scanned',                    view => 'report_unscanned_negs', }
+	);
+
+	my $action = &multiplechoice({choices => \@choices});
+
+	if (defined($action) && $choices[$action]->{view}) {
+		&tabulate({db=>$db, view=>$choices[$action]->{view}});
 	}
-
-	for my $i (0 .. $#reports) {
-		print "\t$i\t$reports[$i]{desc}\n";
-	}
-
-	# Wait for input
-	my $input = &prompt({prompt=>'Please select a report', type=>'integer', required=>1});
-
-	my $view = $reports[$input]{'view'};
-
-	# Use SQL::Abstract
-	my $sql = SQL::Abstract->new;
-	my($stmt, @bind) = $sql->select($view);
-
-	my $sth = $db->prepare($stmt);
-	my $rows = $sth->execute(@bind);
-	my $cols = $sth->{'NAME'};
-	my @array;
-	my $table = Text::TabularDisplay->new(@$cols);
-	while (my @row = $sth->fetchrow) {
-		$table->add(@row);
-	}
-
-	print "$reports[$input]{'desc'}\n";
-	print $table->render;
-	print "\n";
-	return $rows;
+	return;
 }
 
 # Select a manufacturer using the first initial
@@ -2042,6 +2025,61 @@ sub scan_search {
 		print "All scans in the database exist on the filesystem\n";
 	}
 	return;
+}
+
+# Rename scans to include their caption in the filename
+sub scan_rename {
+	# Read in cmdline args
+	my $href = shift;
+	my $db = $href->{db};
+	my $film_id = $href->{film_id} // &film_choose({db=>$db});
+
+	# Make sure basepath is valid
+	my $basepath = &basepath;
+
+	# Find matching scans
+	my $sql = SQL::Abstract->new;
+	my($stmt, @bind) = $sql->select('scans_negs', '*', {film_id=>$film_id});
+	my $sth = $db->prepare($stmt) or die "Couldn't prepare statement: " . $db->errstr;
+	my $rows = $sth->execute(@bind);
+	$rows = &unsci($rows);
+	return if ($rows == 0);
+
+	# Loop through our result set
+	while (my $ref = $sth->fetchrow_hashref()) {
+		# First check the path is defined in MySQL
+		if (defined($ref->{'filename'})) {
+			# Now make sure the path actually exists on the system
+			if (-e "$basepath/$ref->{'directory'}/$ref->{'filename'}") {
+
+				# Sanitise description with fs-safe chars
+				my $safedesc = $ref->{'description'};
+				$safedesc =~ s/[^a-zA-Z0-9-_ ]//g;
+
+				# Generate theoretical new filename
+				my $newname;
+				if ($ref->{'print_id'}) {
+					# For prints
+					$newname = "P$ref->{print_id}-$safedesc.jpg";
+				} else {
+					# For negatives
+					$newname = "$ref->{film_id}-$ref->{frame}-$safedesc.jpg";
+				}
+
+				# Check if a change is needed
+				if ($ref->{'filename'} ne $newname) {
+					print "\t$ref->{'filename'} => $newname\n";
+
+					# Move file on fs
+					rename(&untaint("$basepath/$ref->{'directory'}/$ref->{'filename'}"), &untaint("$basepath/$ref->{'directory'}/$newname"));
+
+					# Update scan in db
+					&updaterecord({db=>$db, data=>{filename=>$newname}, table=>'SCAN', where=>{scan_id=>$ref->{scan_id}}, silent=>1});
+				}
+			}
+		}
+	}
+	return $rows;
 }
 
 # This ensures the lib loads smoothly

@@ -11,7 +11,7 @@ configure_requires:
   File::ShareDir: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,5 +36,5 @@ requires:
   Time::localtime: '0'
   Unix::Syslog: '0'
   perl: '5.006'
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

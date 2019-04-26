@@ -47,7 +47,7 @@ different apps served on the same host.
 =head2 Other web servers
 
 The proxy configuration above can also be replicated with a different
-frontend server or proxy, such as varnish, nginx, or lighttpd. 
+frontend server or proxy, such as varnish, nginx, or lighttpd.
 
 =head1 AUTHORS
 

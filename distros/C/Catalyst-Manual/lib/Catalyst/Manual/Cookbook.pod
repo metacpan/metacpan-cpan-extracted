@@ -70,7 +70,7 @@ Normally you enable the debugging info by adding the C<-Debug> flag to
 your C<use Catalyst> statement . However, you can also enable it using
 environment variable, so you can (for example) get debug info without
 modifying your application scripts. Just set C<CATALYST_DEBUG> or
-C<E<lt>MYAPPE<gt>_DEBUG> to a true value.
+C<< <MYAPP>_DEBUG >> to a true value.
 
 =head2 Sessions
 
@@ -117,56 +117,54 @@ reference.
 
 =head3 EXAMPLE
 
-  package MyApp;
-  use Moose;
-  use namespace::autoclean;
+    package MyApp;
+    use Moose;
+    use namespace::autoclean;
 
-  use Catalyst  qw/
-                         Session
-                         Session::Store::FastMmap
-                         Session::State::Cookie
-                   /;
-  extends 'Catalyst';
-  __PACKAGE__->setup;
+    use Catalyst  qw/
+                        Session
+                        Session::Store::FastMmap
+                        Session::State::Cookie
+                    /;
+    extends 'Catalyst';
+    __PACKAGE__->setup;
 
-  package MyApp::Controller::Foo;
-  use Moose;
-  use namespace::autoclean;
-  BEGIN { extends 'Catalyst::Controller' };
-  ## Write data into the session
+    package MyApp::Controller::Foo;
+    use Moose;
+    use namespace::autoclean;
+    BEGIN { extends 'Catalyst::Controller' };
+    ## Write data into the session
 
-  sub add_item : Local {
-     my ( $self, $c ) = @_;
+    sub add_item : Local {
+        my ( $self, $c ) = @_;
 
-     my $item_id = $c->req->params->{item};
+        my $item_id = $c->req->params->{item};
 
-     push @{ $c->session->{items} }, $item_id;
+        push @{ $c->session->{items} }, $item_id;
+    }
 
-  }
+    ## A page later we retrieve the data from the session:
 
-  ## A page later we retrieve the data from the session:
+    sub get_items : Local {
+        my ( $self, $c ) = @_;
 
-  sub get_items : Local {
-     my ( $self, $c ) = @_;
-
-     $c->stash->{items_to_display} = $c->session->{items};
-
-  }
+        $c->stash->{items_to_display} = $c->session->{items};
+    }
 
 
 =head3 More information
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session>
+L<Catalyst::Plugin::Session>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-State-Cookie>
+L<Catalyst::Plugin::Session::State::Cookie>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-State-URI>
+L<Catalyst::Plugin::Session::State::URI>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-FastMmap>
+L<Catalyst::Plugin::Session::Store::FastMmap>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-File>
+L<Catalyst::Plugin::Session::Store::File>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-DBI>
+L<Catalyst::Plugin::Session::Store::DBI>
 
 =head2 Configure your application
 
@@ -176,11 +174,11 @@ separate configuration file.
 
 =head3 Using Config::General
 
-L<Config::General|Config::General> is a method for creating flexible
+L<Config::General> is a method for creating flexible
 and readable configuration files. It's a great way to keep your
 Catalyst application configuration in one easy-to-understand location.
 
-Now create C<myapp.conf> in your application home:
+Now create F<myapp.conf> in your application home:
 
   name     MyApp
 
@@ -221,12 +219,12 @@ L<Catalyst> explains precedence of multiple sources for configuration
 values, how to access the values in your components, and many 'base'
 config variables used internally.
 
-See also L<Config::General|Config::General>.
+See also L<Config::General>.
 
 =head1 Skipping your VCS's directories
 
-Catalyst uses Module::Pluggable to load Models, Views, and Controllers.
-Module::Pluggable will scan through all directories and load modules
+Catalyst uses L<Module::Pluggable> to load Models, Views, and Controllers.
+L<Module::Pluggable> will scan through all directories and load modules
 it finds.  Sometimes you might want to skip some of these directories,
 for example when your version control system makes a subdirectory with
 meta-information in every version-controlled directory.  While
@@ -242,7 +240,7 @@ You can make Catalyst skip these directories using the Catalyst config:
       setup_components => { except => qr/SCCS/ },
   );
 
-See the Module::Pluggable manual page for more information on B<except>
+See the L<Module::Pluggable> manual page for more information on B<except>
 and other options.
 
 =head1 Users and Access Control
@@ -310,9 +308,9 @@ C<< $c->user >> call.
 
 Examples:
 
- Password - Simple username/password checking.
- HTTPD    - Checks using basic HTTP auth.
- TypeKey  - Check using the typekey system.
+    Password - Simple username/password checking.
+    HTTPD    - Checks using basic HTTP auth.
+    TypeKey  - Check using the typekey system.
 
 =head3 Storage backends
 
@@ -322,8 +320,8 @@ within this system; you will need to do it yourself.
 
 Examples:
 
- DBIC     - Storage using a database via DBIx::Class.
- Minimal  - Storage using a simple hash (for testing).
+    DBIC     - Storage using a database via DBIx::Class.
+    Minimal  - Storage using a simple hash (for testing).
 
 =head3 User objects
 
@@ -332,7 +330,7 @@ credential verifier, and is filled with the retrieved user information.
 
 Examples:
 
- Hash     - A simple hash of keys and values.
+    Hash     - A simple hash of keys and values.
 
 =head3 ACL authorization
 
@@ -361,67 +359,67 @@ the user is a member.
 
 =head3 EXAMPLE
 
-  package MyApp;
-  use Moose;
-  use namespace::autoclean;
-  extends qw/Catalyst/;
-  use Catalyst qw/
-    Authentication
-    Authorization::Roles
-  /;
+    package MyApp;
+    use Moose;
+    use namespace::autoclean;
+    extends qw/Catalyst/;
+    use Catalyst qw/
+        Authentication
+        Authorization::Roles
+    /;
 
-  __PACKAGE__->config(
-     authentication => {
-         default_realm => 'test',
-         realms => {
-             test => {
-                 credential => {
-                     class          => 'Password',
-                     password_field => 'password',
-                     password_type  => 'self_check',
-                 },
-                 store => {
-                     class => 'Htpasswd',
-                     file => 'htpasswd',
-                 },
-             },
-         },
-     },
-  );
+    __PACKAGE__->config(
+        authentication => {
+            default_realm => 'test',
+            realms => {
+                test => {
+                    credential => {
+                        class          => 'Password',
+                        password_field => 'password',
+                        password_type  => 'self_check',
+                    },
+                    store => {
+                        class => 'Htpasswd',
+                        file => 'htpasswd',
+                    },
+                },
+            },
+        },
+    );
 
-  package MyApp::Controller::Root;
-  use Moose;
-  use namespace::autoclean;
+    package MyApp::Controller::Root;
+    use Moose;
+    use namespace::autoclean;
 
-  BEGIN { extends 'Catalyst::Controller' }
+    BEGIN { extends 'Catalyst::Controller' }
 
-  __PACKAGE__->config(namespace => '');
+    __PACKAGE__->config(namespace => '');
 
-  sub login : Local {
-     my ($self, $c) = @_;
+    sub login : Local {
+        my ($self, $c) = @_;
 
-     if ( my $user = $c->req->params->{user}
-         and my $password = $c->req->param->{password} )
-     {
-         if ( $c->authenticate( username => $user, password => $password ) ) {
-              $c->res->body( "hello " . $c->user->name );
-         } else {
-            # login incorrect
-         }
-     }
-     else {
-         # invalid form input
-     }
-  }
+        if ( my $user = $c->req->params->{user}
+            and my $password = $c->req->param->{password} )
+        {
+            if ( $c->authenticate( username => $user, password => $password ) ) {
+                $c->res->body( "hello " . $c->user->name );
+            } else {
+                # login incorrect
+            }
+        }
+        else {
+            # invalid form input
+        }
+    }
 
-  sub restricted : Local {
-     my ( $self, $c ) = @_;
+    sub restricted : Local {
+        my ( $self, $c ) = @_;
 
-     $c->detach("unauthorized")
-       unless $c->check_user_roles( "admin" );
+        $c->detach("unauthorized")
+            unless $c->check_user_roles( "admin" );
 
-     # do something restricted here
-  }
+        # do something restricted here
+    }
 
 =head3 Using authentication in a testing environment
 
@@ -575,7 +573,7 @@ clean up in your C<end> private action instead.
 Also, it's important to note that if you restrict access to "/" then
 C<end>, C<default>, etc. will also be restricted.
 
-   MyApp->acl_allow_root_internals;
+    MyApp->acl_allow_root_internals;
 
 will create rules that permit access to C<end>, C<begin>, and C<auto> in the
 root of your app (but not in any other controller).
@@ -687,25 +685,37 @@ Response:
 
 Now follow these few steps to implement the application:
 
-1. Install Catalyst (5.61 or later), Catalyst::Plugin::XMLRPC (0.06 or
-later) and SOAP::Lite (for XMLRPCsh.pl).
+=over 4
 
-2. Create an application framework:
+=item 1.
+
+Install L<Catalyst> (5.61 or later), L<Catalyst::Plugin::XMLRPC> (0.06 or
+later) and L<SOAP::Lite> (for F<XMLRPCsh.pl>).
+
+=item 2.
+
+Create an application framework:
 
     % catalyst.pl MyApp
     ...
     % cd MyApp
 
-3. Add the XMLRPC plugin to MyApp.pm
+=item 3.
+
+Add the XMLRPC plugin to MyApp.pm
 
     use Catalyst qw/-Debug Static::Simple XMLRPC/;
 
-4. Add an API controller
+=item 4.
+
+Add an API controller
 
     % ./script/myapp_create.pl controller API
 
-5. Add a XMLRPC redispatch method and an add method with Remote
-attribute to lib/MyApp/Controller/API.pm
+=item 5.
+
+Add a XMLRPC redispatch method and an add method with Remote
+attribute to F<lib/MyApp/Controller/API.pm>
 
     sub default :Path {
         my ( $self, $c ) = @_;
@@ -724,8 +734,10 @@ class.
 The C<add> method is not a traditional action; it has no private or
 public path. Only the XMLRPC dispatcher knows it exists.
 
-6. That's it! You have built your first web service. Let's test it with
-XMLRPCsh.pl (part of SOAP::Lite):
+=item 6.
+
+That's it! You have built your first web service. Let's test it with
+F<XMLRPCsh.pl> (part of L<SOAP::Lite>):
 
     % ./script/myapp_server.pl
     ...
@@ -734,6 +746,8 @@ XMLRPCsh.pl (part of SOAP::Lite):
     > add( 1, 2 )
     --- XMLRPC RESULT ---
     '3'
+
+=back
 
 =head3 Tip
 
@@ -750,7 +764,7 @@ enforce a specific one.
 Views pertain to the display of your application.  As with models,
 Catalyst is uncommonly flexible.  The recipes below are just a start.
 
-=head2 Catalyst::View::TT
+=head2 L<Catalyst::View::TT>
 
 One of the first things you probably want to do when starting a new
 Catalyst application is set up your View. Catalyst doesn't care how you
@@ -762,13 +776,13 @@ and though there are several template systems available,
 L<Template Toolkit|Template> is probably the most popular.
 
 Once again, the Catalyst developers have done all the hard work, and
-made things easy for the rest of us. Catalyst::View::TT provides the
+made things easy for the rest of us. L<Catalyst::View::TT> provides the
 interface to Template Toolkit, and provides Helpers which let us set it
 up that much more easily.
 
 =head3 Creating your View
 
-Catalyst::View::TT provides two different helpers for us to use: TT and
+L<Catalyst::View::TT> provides two different helpers for us to use: TT and
 TTSite.
 
 =head4 TT
@@ -777,7 +791,7 @@ Create a basic Template Toolkit View using the provided helper script:
 
     script/myapp_create.pl view TT TT
 
-This will create lib/MyApp/View/MyView.pm, which is going to be pretty
+This will create F<lib/MyApp/View/MyView.pm>, which is going to be pretty
 empty to start. However, it sets everything up that you need to get
 started. You can now define which template you want and forward to your
 view. For instance:
@@ -821,19 +835,19 @@ This time, the helper sets several options for us in the generated View.
 
 =over
 
-=item
+=item *
 
-INCLUDE_PATH defines the directories that Template Toolkit should search
+C<INCLUDE_PATH> defines the directories that Template Toolkit should search
 for the template files.
 
-=item
+=item *
 
-PRE_PROCESS is used to process configuration options which are common to
+C<PRE_PROCESS> is used to process configuration options which are common to
 every template file.
 
-=item
+=item *
 
-WRAPPER is a file which is processed with each template, usually used to
+C<WRAPPER> is a file which is processed with each template, usually used to
 easily provide a common header and footer for every page.
 
 =back
@@ -842,21 +856,21 @@ In addition to setting these options, the TTSite helper also created the
 template and config files for us! In the 'root' directory, you'll notice
 two new directories: src and lib.
 
-Several configuration files in root/lib/config are called by PRE_PROCESS.
+Several configuration files in F<root/lib/config> are called by C<PRE_PROCESS>.
 
-The files in root/lib/site are the site-wide templates, called by
-WRAPPER, and display the html framework, control the layout, and provide
+The files in F<root/lib/site> are the site-wide templates, called by
+C<WRAPPER>, and display the html framework, control the layout, and provide
 the templates for the header and footer of your page. Using the template
 organization provided makes it much easier to standardize pages and make
 changes when they are (inevitably) needed.
 
 The template files that you will create for your application will go
-into root/src, and you don't need to worry about putting the <html>
-or <head> sections; just put in the content. The WRAPPER will the rest
+into root/src, and you don't need to worry about putting the C<< <html> >>
+or C<< <head> >> sections; just put in the content. The C<WRAPPER> will the rest
 of the page around your template for you.
 
 
-=head3 $c->stash
+=head3 C<< $c->stash >>
 
 Of course, having the template system include the header and footer for
 you isn't all that we want our templates to do. We need to be able to
@@ -876,7 +890,7 @@ from the template. For instance:
         $c->forward( $c->view('TT') );
     }
 
-Then, in hello.tt:
+Then, in F<hello.tt>:
 
     <strong>Hello, [% name %]!</strong>
 
@@ -911,18 +925,18 @@ This is the most basic usage, but Template Toolkit is quite powerful,
 and allows you to truly keep your presentation logic separate from the
 rest of your application.
 
-=head3 $c->uri_for()
+=head3 C<< $c->uri_for() >>
 
 One of my favorite things about Catalyst is the ability to move an
 application around without having to worry that everything is going to
 break. One of the areas that used to be a problem was with the http
 links in your template files. For example, suppose you have an
-application installed at http://www.domain.com/Calendar. The links point
-to "/Calendar", "/Calendar/2005", "/Calendar/2005/10", etc.  If you move
-the application to be at http://www.mydomain.com/Tools/Calendar, then
+application installed at C<http://www.domain.com/Calendar>. The links point
+to "C</Calendar>", "C</Calendar/2005>", "C</Calendar/2005/10>", etc.  If you move
+the application to be at C<http://www.mydomain.com/Tools/Calendar>, then
 all of those links will suddenly break.
 
-That's where $c->uri_for() comes in. This function will merge its
+That's where C<< $c->uri_for() >> comes in. This function will merge its
 parameters with either the base location for the app, or its current
 namespace. Let's take a look at a couple of examples.
 
@@ -933,8 +947,8 @@ In your template, you can use the following:
 Although the parameter starts with a forward slash, this is relative
 to the application root, not the webserver root. This is important to
 remember. So, if your application is installed at
-http://www.domain.com/Calendar, then the link would be
-http://www.mydomain.com/Calendar/Login. If you move your application
+C<http://www.domain.com/Calendar>, then the link would be
+C<http://www.mydomain.com/Calendar/Login>. If you move your application
 to a different domain or path, then that link will still be correct.
 
 Likewise,
@@ -943,18 +957,18 @@ Likewise,
 
 The first parameter does NOT have a forward slash, and so it will be
 relative to the current namespace. If the application is installed at
-http://www.domain.com/Calendar. and if the template is called from
-MyApp::Controller::Display, then the link would become
-http://www.domain.com/Calendar/Display/2005/10/24.
+C<http://www.domain.com/Calendar>. and if the template is called from
+C<MyApp::Controller::Display>, then the link would become
+C<http://www.domain.com/Calendar/Display/2005/10/24>.
 
 If you want to link to a parent uri of your current namespace you can
-prefix the arguments with multiple '../':
+prefix the arguments with multiple 'C<../>':
 
     <a href="[% c.uri_for('../../view', stashed_object.id) %]">User view</a>
 
 Once again, this allows you to move your application around without
 having to worry about broken links. But there's something else, as
-well. Since the links are generated by uri_for, you can use the same
+well. Since the links are generated by C<uri_for>, you can use the same
 template file by several different controllers, and each controller
 will get the links that its supposed to. Since we believe in Don't
 Repeat Yourself, this is particularly helpful if you have common
@@ -962,11 +976,11 @@ elements in your site that you want to keep in one file.
 
 Further Reading:
 
-L<http://search.cpan.org/perldoc?Catalyst>
+L<Catalyst>
 
-L<http://search.cpan.org/perldoc?Catalyst%3A%3AView%3A%3ATT>
+L<Catalyst::View::TT>
 
-L<http://search.cpan.org/perldoc?Template>
+L<Template>
 
 =head2 Adding RSS feeds
 
@@ -975,10 +989,10 @@ different approaches here, but the basic premise is that you forward to
 the normal view action first to get the objects, then handle the output
 differently.
 
-=head3 Using XML::Feed
+=head3 Using L<XML::Feed>
 
 Assuming we have a C<view> action that populates
-'entries' with some DBIx::Class iterator, the code would look something
+'entries' with some L<DBIx::Class> iterator, the code would look something
 like this:
 
     sub rss : Local {
@@ -1050,7 +1064,7 @@ Note the use of quotes around the filename; this ensures that any
 spaces in the filename are handled by the browser.
 
 Put this right before calling C<< $c->res->body >> and your browser
-will download a file named C<Important Orders.csv> instead of
+will download a file named F<Important Orders.csv> instead of
 C<export>.
 
 You can also use this to have the browser download content which it
@@ -1083,7 +1097,7 @@ attached. These can be one of several types.
 
 Assume our Controller module starts with the following package declaration:
 
- package MyApp::Controller::Buckets;
+    package MyApp::Controller::Buckets;
 
 and we are running our application on localhost, port 3000 (the test
 server default).
@@ -1097,19 +1111,19 @@ or an absolute path. A relative path will be relative to the
 controller namespace, an absolute path will represent an exact
 matching URL.
 
- sub my_handles : Path('handles') { .. }
+    sub my_handles : Path('handles') { .. }
 
 becomes
 
- http://localhost:3000/buckets/handles
+    http://localhost:3000/buckets/handles
 
 and
 
- sub my_handles : Path('/handles') { .. }
+    sub my_handles : Path('/handles') { .. }
 
 becomes
 
- http://localhost:3000/handles
+    http://localhost:3000/handles
 
 See also: L<Catalyst::DispatchType::Path>
 
@@ -1119,22 +1133,22 @@ When using a Local attribute, no parameters are needed, instead, the
 name of the action is matched in the URL. The namespaces created by
 the name of the controller package is always part of the URL.
 
- sub my_handles : Local { .. }
+    sub my_handles : Local { .. }
 
 becomes
 
- http://localhost:3000/buckets/my_handles
+    http://localhost:3000/buckets/my_handles
 
 =item Global
 
 A Global attribute is similar to a Local attribute, except that the
 namespace of the controller is ignored, and matching starts at root.
 
- sub my_handles : Global { .. }
+    sub my_handles : Global { .. }
 
 becomes
 
- http://localhost:3000/my_handles
+    http://localhost:3000/my_handles
 
 =item Regex
 
@@ -1142,15 +1156,15 @@ By now you should have figured that a Regex attribute is just what it
 sounds like. This one takes a regular expression, and matches starting
 from root. These differ from the rest as they can match multiple URLs.
 
- sub my_handles : Regex('^handles') { .. }
+    sub my_handles : Regex('^handles') { .. }
 
 matches
 
- http://localhost:3000/handles
+    http://localhost:3000/handles
 
 and
 
- http://localhost:3000/handles_and_other_parts
+    http://localhost:3000/handles_and_other_parts
 
 etc.
 
@@ -1161,15 +1175,15 @@ See also: L<Catalyst::DispatchType::Regex>
 A LocalRegex is similar to a Regex, except it only matches below the current
 controller namespace.
 
- sub my_handles : LocalRegex(^handles') { .. }
+    sub my_handles : LocalRegex(^handles') { .. }
 
 matches
 
- http://localhost:3000/buckets/handles
+    http://localhost:3000/buckets/handles
 
 and
 
- http://localhost:3000/buckets/handles_and_other_parts
+    http://localhost:3000/buckets/handles_and_other_parts
 
 etc.
 
@@ -1184,7 +1198,7 @@ Last but not least, there is the Private attribute, which allows you
 to create your own internal actions, which can be forwarded to, but
 won't be matched as URLs.
 
- sub my_handles : Private { .. }
+    sub my_handles : Private { .. }
 
 becomes nothing at all..
 
@@ -1201,7 +1215,7 @@ part of your namespace, you'll get an error page instead. If you want
 to find out where it was the user was trying to go, you can look in
 the request object using C<< $c->req->path >>.
 
- sub default :Path { .. }
+    sub default :Path { .. }
 
 works for all unknown URLs, in this controller namespace, or every one
 if put directly into MyApp.pm.
@@ -1213,11 +1227,11 @@ namespace of your controller. If index, default and matching Path
 actions are defined, then index will be used instead of default and
 Path.
 
- sub index :Path :Args(0) { .. }
+    sub index :Path :Args(0) { .. }
 
 becomes
 
- http://localhost:3000/buckets
+    http://localhost:3000/buckets
 
 =item begin
 
@@ -1227,11 +1241,11 @@ can be used to set up variables/data for this particular part of your
 app. A single begin action is called, its always the one most relevant
 to the current namespace.
 
- sub begin : Private { .. }
+    sub begin : Private { .. }
 
 is called once when
 
- http://localhost:3000/bucket/(anything)?
+    http://localhost:3000/bucket/(anything)?
 
 is visited.
 
@@ -1243,11 +1257,11 @@ processing to the View component. A single end action is called, its
 always the one most relevant to the current namespace.
 
 
- sub end : Private { .. }
+    sub end : Private { .. }
 
 is called once after any actions when
 
- http://localhost:3000/bucket/(anything)?
+    http://localhost:3000/bucket/(anything)?
 
 is visited.
 
@@ -1258,8 +1272,8 @@ chain of paths up to and including the ending namespace, will be
 called. (In contrast, only one of the begin/end/default actions will
 be called, the relevant one).
 
- package MyApp::Controller::Root;
- sub auto : Private { .. }
+    package MyApp::Controller::Root;
+    sub auto : Private { .. }
 
 and
 
@@ -1267,7 +1281,7 @@ and
 
 will both be called when visiting
 
- http://localhost:3000/bucket/(anything)?
+    http://localhost:3000/bucket/(anything)?
 
 =back
 
@@ -1275,13 +1289,13 @@ will both be called when visiting
 
 =head3 A word of warning
 
-You can put root actions in your main MyApp.pm file, but this is deprecated,
+You can put root actions in your main F<MyApp.pm> file, but this is deprecated,
 please put your actions into your Root controller.
 
 =head3 Flowchart
 
 A graphical flowchart of how the dispatcher works can be found on the wiki at
-L<http://dev.catalyst.perl.org/attachment/wiki/WikiStart/catalyst-flow.png>.
+L<http://dev.catalystframework.org/attachment/wiki/WikiStart/catalyst-flow.png>.
 
 =head2 DRY Controllers with Chained actions
 
@@ -1360,9 +1374,9 @@ To implement uploads in Catalyst, you need to have a HTML form similar to
 this:
 
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="hidden" name="form_submit" value="yes">
-      <input type="file" name="my_file">
-      <input type="submit" value="Send">
+        <input type="hidden" name="form_submit" value="yes">
+        <input type="file" name="my_file">
+        <input type="submit" value="Send">
     </form>
 
 It's very important not to forget C<enctype="multipart/form-data"> in
@@ -1396,11 +1410,11 @@ Code for uploading multiple files from one form needs a few changes:
 The form should have this basic structure:
 
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="hidden" name="form_submit" value="yes">
-      <input type="file" name="file1" size="50"><br>
-      <input type="file" name="file2" size="50"><br>
-      <input type="file" name="file3" size="50"><br>
-      <input type="submit" value="Send">
+        <input type="hidden" name="form_submit" value="yes">
+        <input type="file" name="file1" size="50"><br>
+        <input type="file" name="file2" size="50"><br>
+        <input type="file" name="file3" size="50"><br>
+        <input type="submit" value="Send">
     </form>
 
 And in the controller:
@@ -1425,7 +1439,7 @@ And in the controller:
         $c->stash->{template} = 'file_upload.html';
     }
 
-C<for my $field ($c-E<gt>req->upload)> loops automatically over all file
+C<< for my $field ($c->req->upload) >> loops automatically over all file
 input fields and gets input names. After that is basic file saving code,
 just like in single file upload.
 
@@ -1444,22 +1458,22 @@ action. As of version 5.30, arguments can be passed in the call to
 C<forward>; in earlier versions, you can manually set the arguments in
 the Catalyst Request object:
 
-  # version 5.30 and later:
-  $c->forward('/wherever', [qw/arg1 arg2 arg3/]);
+    # version 5.30 and later:
+    $c->forward('/wherever', [qw/arg1 arg2 arg3/]);
 
-  # pre-5.30
-  $c->req->args([qw/arg1 arg2 arg3/]);
-  $c->forward('/wherever');
+    # pre-5.30
+    $c->req->args([qw/arg1 arg2 arg3/]);
+    $c->forward('/wherever');
 
 (See the L<Catalyst::Manual::Intro> Flow_Control section for more
 information on passing arguments via C<forward>.)
 
 =head2 Chained dispatch using base classes, and inner packages.
 
-  package MyApp::Controller::Base;
-  use base qw/Catalyst::Controller/;
+    package MyApp::Controller::Base;
+    use base qw/Catalyst::Controller/;
 
-  sub key1 : Chained('/')
+    sub key1 : Chained('/')
 
 =head2 Extending RenderView (formerly DefaultEnd)
 
@@ -1476,8 +1490,8 @@ To add something to an C<end> action that is called before rendering
 method:
 
     sub end : ActionClass('RenderView') {
-      my ( $self, $c ) = @_;
-      # do stuff here; the RenderView action is called afterwards
+        my ( $self, $c ) = @_;
+        # do stuff here; the RenderView action is called afterwards
     }
 
 To add things to an C<end> action that are called I<after> rendering,
@@ -1486,9 +1500,9 @@ you can set it up like this:
     sub render : ActionClass('RenderView') { }
 
     sub end : Private {
-      my ( $self, $c ) = @_;
-      $c->forward('render');
-      # do stuff here
+        my ( $self, $c ) = @_;
+        $c->forward('render');
+        # do stuff here
     }
 
 
@@ -1505,26 +1519,26 @@ production environment.
 Static::Simple is a plugin that will help to serve static content for your
 application. By default, it will serve most types of files, excluding some
 standard Template Toolkit extensions, out of your B<root> file directory. All
-files are served by path, so if B<images/me.jpg> is requested, then
-B<root/images/me.jpg> is found and served.
+files are served by path, so if F<images/me.jpg> is requested, then
+F<root/images/me.jpg> is found and served.
 
 =head3 Usage
 
 Using the plugin is as simple as setting your use line in MyApp.pm to include:
 
- use Catalyst qw/Static::Simple/;
+    use Catalyst qw/Static::Simple/;
 
 and already files will be served.
 
 =head3 Configuring
 
 Static content is best served from a single directory within your root
-directory. Having many different directories such as C<root/css> and
-C<root/images> requires more code to manage, because you must separately
-identify each static directory--if you decide to add a C<root/js>
+directory. Having many different directories such as F<root/css> and
+F<root/images> requires more code to manage, because you must separately
+identify each static directory--if you decide to add a F<root/js>
 directory, you'll need to change your code to account for it. In
 contrast, keeping all static directories as subdirectories of a main
-C<root/static> directory makes things much easier to manage. Here's an
+F<root/static> directory makes things much easier to manage. Here's an
 example of a typical root directory structure:
 
     root/
@@ -1537,7 +1551,7 @@ example of a typical root directory structure:
     root/static/js/code.js
 
 
-All static content lives under C<root/static>, with everything else being
+All static content lives under F<root/static>, with everything else being
 Template Toolkit files.
 
 =over 4
@@ -1547,14 +1561,14 @@ Template Toolkit files.
 You may of course want to change the default locations, and make
 Static::Simple look somewhere else, this is as easy as:
 
- MyApp->config(
-    static => {
-        include_path => [
-            MyApp->path_to('/'),
-            '/path/to/my/files',
-        ],
-    },
-  );
+    MyApp->config(
+        static => {
+            include_path => [
+                MyApp->path_to('/'),
+                '/path/to/my/files',
+            ],
+        },
+    );
 
 When you override include_path, it will not automatically append the
 normal root path, so you need to add it yourself if you still want
@@ -1566,14 +1580,14 @@ served.
 If you want to force some directories to be only static, you can set
 them using paths relative to the root dir, or regular expressions:
 
- MyApp->config(
-    static => {
-        dirs => [
-            'static',
-            qr/^(images|css)/,
-        ],
-    },
-  );
+    MyApp->config(
+        static => {
+            dirs => [
+                'static',
+                qr/^(images|css)/,
+            ],
+        },
+    );
 
 =item File extensions
 
@@ -1581,28 +1595,28 @@ By default, the following extensions are not served (that is, they will
 be processed by Catalyst): B<tmpl, tt, tt2, html, xhtml>. This list can
 be replaced easily:
 
- MyApp->config(
+    MyApp->config(
         static => {
             ignore_extensions => [
                 qw/tmpl tt tt2 html xhtml/
             ],
         },
-  );
+    );
 
 =item Ignoring directories
 
 Entire directories can be ignored. If used with include_path,
 directories relative to the include_path dirs will also be ignored:
 
-  MyApp->config( static => {
+    MyApp->config( static => {
         ignore_dirs => [ qw/tmpl css/ ],
-  });
+    });
 
 =back
 
 =head3 More information
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Static-Simple/>
+L<Catalyst::Plugin::Static::Simple>
 
 =head3 Serving manually with the Static plugin with HTTP::Daemon (myapp_server.pl)
 
@@ -1620,16 +1634,16 @@ static content to the view, perhaps like this:
         my ( $self, $c ) = @_;
 
         $c->forward( 'MyApp::View::TT' )
-          unless ( $c->res->body || !$c->stash->{template} );
+            unless ( $c->res->body || !$c->stash->{template} );
     }
 
 This code will only forward to the view if a template has been
 previously defined by a controller and if there is not already data in
-C<$c-E<gt>res-E<gt>body>.
+C<< $c->res->body >>.
 
 Next, create a controller to handle requests for the /static path. Use
 the Helper to save time. This command will create a stub controller as
-C<lib/MyApp/Controller/Static.pm>.
+F<lib/MyApp/Controller/Static.pm>.
 
     $ script/myapp_create.pl controller Static
 
@@ -1681,7 +1695,7 @@ code in your Static controller:
 
 When using Apache, you can bypass Catalyst and any Static
 plugins/controllers controller by intercepting requests for the
-C<root/static> path at the server level. All that is required is to
+F<root/static> path at the server level. All that is required is to
 define a DocumentRoot and add a separate Location block for your static
 content. Here is a complete config for this application under mod_perl
 1.x:
@@ -1836,7 +1850,7 @@ L<Catalyst::Plugin::Cache::FastMmap>
 L<Catalyst::Plugin::Cache::FileCache>
 L<Catalyst::Plugin::Cache::Memcached>
 L<Catalyst::Plugin::PageCache>
-L<http://search.cpan.org/dist/Template-Toolkit/lib/Template/Manual/Config.pod#Caching_and_Compiling_Options>
+L<Template::Manual::Config/Caching and Compiling Options>
 
 =head1 Testing
 
@@ -1850,12 +1864,12 @@ alterations.
 Catalyst provides a convenient way of testing your application during
 development and before deployment in a real environment.
 
-C<Catalyst::Test> makes it possible to run the same tests both locally
+L<Catalyst::Test> makes it possible to run the same tests both locally
 (without an external daemon) and against a remote server via HTTP.
 
 =head3 Tests
 
-Let's examine a skeleton application's C<t/> directory:
+Let's examine a skeleton application's F<t/> directory:
 
     mundus:~/MyApp chansen$ ls -l t/
     total 24
@@ -1865,17 +1879,17 @@ Let's examine a skeleton application's C<t/> directory:
 
 =over 4
 
-=item C<01app.t>
+=item F<01app.t>
 
 Verifies that the application loads, compiles, and returns a successful
 response.
 
-=item C<02pod.t>
+=item F<02pod.t>
 
 Verifies that all POD is free from errors. Only executed if the C<TEST_POD>
 environment variable is true.
 
-=item C<03podcoverage.t>
+=item F<03podcoverage.t>
 
 Verifies that all methods/functions have POD coverage. Only executed if the
 C<TEST_POD> environment variable is true.
@@ -1894,7 +1908,7 @@ The first line declares how many tests we are going to run, in this case
 two. The second line tests and loads our application in test mode. The
 fourth line verifies that our application returns a successful response.
 
-C<Catalyst::Test> exports two functions, C<request> and C<get>. Each can
+L<Catalyst::Test> exports two functions, C<request> and C<get>. Each can
 take three different arguments:
 
 =over 4
@@ -1904,17 +1918,17 @@ take three different arguments:
     request('/my/path');
     request('http://www.host.com/my/path');
 
-=item An instance of C<URI>.
+=item An instance of L<URI>.
 
     request( URI->new('http://www.host.com/my/path') );
 
-=item An instance of C<HTTP::Request>.
+=item An instance of L<HTTP::Request>.
 
     request( HTTP::Request->new( GET => 'http://www.host.com/my/path') );
 
 =back
 
-C<request> returns an instance of C<HTTP::Response> and C<get> returns the
+C<request> returns an instance of L<HTTP::Response> and C<get> returns the
 content (body) of the response.
 
 =head3 Running tests locally
@@ -1945,9 +1959,9 @@ C<CATALYST_SERVER=http://localhost:3000/> is the absolute deployment URI of
 your application. In C<CGI> or C<FastCGI> it should be the host and path
 to the script.
 
-=head3 C<Test::WWW::Mechanize> and Catalyst
+=head3 L<Test::WWW::Mechanize> and Catalyst
 
-Be sure to check out C<Test::WWW::Mechanize::Catalyst>. It makes it easy to
+Be sure to check out L<Test::WWW::Mechanize::Catalyst>. It makes it easy to
 test HTML, forms and links. A short example of usage:
 
     use Test::More tests => 6;
@@ -1964,76 +1978,49 @@ test HTML, forms and links. A short example of usage:
 
 =over 4
 
-=item Catalyst::Test
+=item * L<Catalyst::Test>
 
-L<Catalyst::Test>
+=item * L<Test::WWW::Mechanize::Catalyst>
 
-=item Test::WWW::Mechanize::Catalyst
+=item * L<Test::WWW::Mechanize>
 
-L<http://search.cpan.org/dist/Test-WWW-Mechanize-Catalyst/lib/Test/WWW/Mechanize/Catalyst.pm>
+=item * L<WWW::Mechanize>
 
-=item Test::WWW::Mechanize
+=item * L<LWP::UserAgent>
 
-L<http://search.cpan.org/dist/Test-WWW-Mechanize/Mechanize.pm>
+=item * L<HTML::Form>
 
-=item WWW::Mechanize
+=item * L<HTTP::Message>
 
-L<http://search.cpan.org/dist/WWW-Mechanize/lib/WWW/Mechanize.pm>
+=item * L<HTTP::Request>
 
-=item LWP::UserAgent
+=item * L<HTTP::Request::Common>
 
-L<http://search.cpan.org/dist/libwww-perl/lib/LWP/UserAgent.pm>
+=item * L<HTTP::Response>
 
-=item HTML::Form
+=item * L<HTTP::Status>
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTML/Form.pm>
+=item * L<URI>
 
-=item HTTP::Message
+=item * L<Test::More>
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Message.pm>
+=item * L<Test::Pod>
 
-=item HTTP::Request
+=item * L<Test::Pod::Coverage>
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Request.pm>
-
-=item HTTP::Request::Common
-
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Request/Common.pm>
-
-=item HTTP::Response
-
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Response.pm>
-
-=item HTTP::Status
-
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Status.pm>
-
-=item URI
-
-L<http://search.cpan.org/dist/URI/URI.pm>
-
-=item Test::More
-
-L<http://search.cpan.org/dist/Test-Simple/lib/Test/More.pm>
-
-=item Test::Pod
-
-L<http://search.cpan.org/dist/Test-Pod/Pod.pm>
-
-=item Test::Pod::Coverage
-
-L<http://search.cpan.org/dist/Test-Pod-Coverage/Coverage.pm>
-
-=item prove (Test::Harness)
-
-L<http://search.cpan.org/dist/Test-Harness/bin/prove>
+=item * L<prove> (L<Test::Harness>)
 
 =back
 
 =head3 More Information
 
-L<http://search.cpan.org/perldoc?Catalyst::Plugin::Authorization::Roles>
-L<http://search.cpan.org/perldoc?Catalyst::Plugin::Authorization::ACL>
+=over 4
+
+=item * L<Catalyst::Plugin::Authorization::Roles>
+
+=item * L<Catalyst::Plugin::Authorization::ACL>
+
+=back
 
 =head1 AUTHORS
 

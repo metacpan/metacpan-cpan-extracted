@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode::BB;
 
@@ -9,11 +9,12 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
 
 use Future;
+use Future::AsyncAwait;
 
 use constant MODE => "BB";
 
@@ -118,7 +119,7 @@ Sets the state of multiple output pins at the same time.
 
 =cut
 
-sub _writeread
+async sub _writeread
 {
    my $self = shift;
    my ( $want_read, $pins_write, $pins_read ) = @_;
@@ -166,23 +167,22 @@ sub _writeread
       $self->{out_mask} = $out;
    }
 
-   return Future->done unless $len;
+   return unless $len;
 
-   my $f = $self->pirate->read( $len );
+   my $buf = await $self->pirate->read( $len );
 
-   return $f->then_done() if !$want_read;
-   return $f->then( sub {
-      my ( $buf ) = @_;
-      $buf = ord $buf;
+   return if !$want_read;
 
-      my $pins;
-      foreach my $pin ( keys %PIN_MASK ) {
-         my $mask = $PIN_MASK{$pin};
-         next unless $self->{dir_mask} & $mask;
-         $pins->{$pin} = !!( $buf & $mask );
-      }
-      Future->done( $pins );
-   });
+   $buf = ord $buf;
+
+   my $pins;
+   foreach my $pin ( keys %PIN_MASK ) {
+      my $mask = $PIN_MASK{$pin};
+      next unless $self->{dir_mask} & $mask;
+      $pins->{$pin} = !!( $buf & $mask );
+   }
+
+   return $pins;
 }
 
 sub write
@@ -191,7 +191,7 @@ sub write
    $self->_writeread( 0, { @_ }, [] );
 }
 
-sub _input1
+async sub _input1
 {
    my $self = shift;
    my ( $mask ) = @_;
@@ -199,10 +199,7 @@ sub _input1
    $self->{dir_mask} |= $mask;
 
    $self->pirate->write( chr( 0x40 | $self->{dir_mask} ) );
-   $self->pirate->read( 1 )->then( sub {
-      my ( $buf ) = @_;
-      return Future->done( ord( $buf ) & $mask );
-   });
+   return ord( await $self->pirate->read( 1 ) ) & $mask;
 }
 
 =head2 read
@@ -246,7 +243,7 @@ Enable or disable the C<VREG> 5V and 3.3V power outputs.
 
 =cut
 
-sub power
+async sub power
 {
    my $self = shift;
    my ( $state ) = @_;
@@ -254,7 +251,8 @@ sub power
    $state ? ( $self->{out_mask} |=  CONF_POWER )
           : ( $self->{out_mask} &= ~CONF_POWER );
    $self->pirate->write( chr( 0x80 | $self->{out_mask} ) );
-   $self->pirate->read( 1 )->then_done(); # ignore input
+   await $self->pirate->read( 1 );
+   return;
 }
 
 =head2 pullup
@@ -266,7 +264,7 @@ to the C<MISO>, C<CLK>, C<MOSI> and C<CS> pins.
 
 =cut
 
-sub pullup
+async sub pullup
 {
    my $self = shift;
    my ( $state ) = @_;
@@ -274,7 +272,8 @@ sub pullup
    $state ? ( $self->{out_mask} |=  CONF_PULLUP )
           : ( $self->{out_mask} &= ~CONF_PULLUP );
    $self->pirate->write( chr( 0x80 | $self->{out_mask} ) );
-   $self->pirate->read( 1 )->then_done(); # ignore input
+   await $self->pirate->read( 1 );
+   return;
 }
 
 =head1 PER-PIN METHODS

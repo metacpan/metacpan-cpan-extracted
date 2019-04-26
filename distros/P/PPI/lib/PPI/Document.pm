@@ -66,7 +66,7 @@ Document-specific.
 use strict;
 use Carp                          ();
 use List::Util 1.33               ();
-use Params::Util                  qw{_SCALAR0 _ARRAY0 _INSTANCE};
+use Params::Util 1.00             qw{_SCALAR0 _ARRAY0 _INSTANCE};
 use Digest::MD5                   ();
 use PPI::Util                     ();
 use PPI                           ();
@@ -75,12 +75,9 @@ use PPI::Node                     ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-use vars qw{$VERSION @ISA $errstr};
-BEGIN {
-	$VERSION = '1.236';
-	@ISA     = 'PPI::Node';
-	$errstr  = '';
-}
+our $VERSION = '1.252'; # VERSION
+
+our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
 use PPI::Document::Fragment ();
 

@@ -21,6 +21,7 @@ requires:
   Cwd: '0'
   Getopt::Long: '0'
   Sys::Hostname: '0'
+  constant: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -28,7 +29,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-Bootstrap-Perl
   homepage: http://metacpan.org/release/App-Bootstrap-Perl
   repository: git://github.com/renormalist/app-bootstrap-perl.git
-version: '0.14'
+version: '0.16'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -323,7 +324,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.14
+          tag: v0.16
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

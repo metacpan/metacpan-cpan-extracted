@@ -1,4 +1,4 @@
-# Copyright 2005-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2005-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Annotation::Git;
 use strict;
 use warnings;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 use Getopt::Long;
 
@@ -39,7 +39,7 @@ sub get_annotations {
     $command =~ s/\[\[file\]\]/$file/g;
     # print "Running [$command]\n";
     open my $c, "-|", $command
-        or warn "cover: Can't run $command: $!\n", return;
+        or warn("cover: Can't run $command: $!\n"), return;
     my @a;
     my $start = 1;
     while (<$c>) {
@@ -121,7 +121,7 @@ Devel::Cover::Annotation::Git - Annotate with git information
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2005-2018, Paul Johnson (paul@pjcj.net)
+Copyright 2005-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

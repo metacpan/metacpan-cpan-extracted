@@ -1,13 +1,13 @@
 Reading database from ...
 
 
------------------------------------------- ------ ------ ------ ------ ------
-File                                         stmt   bran   cond    sub  total
------------------------------------------- ------ ------ ------ ------ ------
-tests/Module2.pm                             25.0    n/a    n/a   25.0   25.0
-tests/module2                                94.7   50.0    n/a  100.0   92.3
-Total                                        74.0   50.0    n/a   66.6   71.0
------------------------------------------- ------ ------ ------ ------ ------
+---------------- ------ ------ ------ ------ ------
+File               stmt   bran   cond    sub  total
+---------------- ------ ------ ------ ------ ------
+tests/Module2.pm   25.0    n/a    n/a   25.0   25.0
+tests/module2      94.7   50.0    n/a  100.0   92.3
+Total              74.0   50.0    n/a   66.6   71.0
+---------------- ------ ------ ------ ------ ------
 
 
 Run: ...
@@ -19,7 +19,7 @@ Finish: ...
 tests/Module2.pm
 
 line  err   stmt   bran   cond    sub   code
-1                                       # Copyright 2002-2018, Paul Johnson (paul@pjcj.net)
+1                                       # Copyright 2002-2019, Paul Johnson (paul@pjcj.net)
 2                                       
 3                                       # This software is free.  It is licensed under the same terms as Perl itself.
 4                                       
@@ -78,7 +78,7 @@ tests/module2
 line  err   stmt   bran   cond    sub   code
 1                                       #!/usr/bin/perl
 2                                       
-3                                       # Copyright 2002-2018, Paul Johnson (paul@pjcj.net)
+3                                       # Copyright 2002-2019, Paul Johnson (paul@pjcj.net)
 4                                       
 5                                       # This software is free.  It is licensed under the same terms as Perl itself.
 6                                       

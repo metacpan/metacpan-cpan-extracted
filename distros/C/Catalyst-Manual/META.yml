@@ -4,11 +4,12 @@ author:
   - 'Catalyst Contributors, see Catalyst.pm'
   - 'Kieren Diment <zarquon@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +22,70 @@ no_index:
 requires:
   perl: '5.006'
 resources:
+  IRC: irc://irc.perl.org/#catalyst
+  MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Manual.git
-version: '5.9009'
+version: '5.9010'
+x_contributors:
+  - 'Kennedy Clark <hkclark@gmail.com>'
+  - 'Tomas Doran <bobtfish@bobtfish.net>'
+  - 'Kieren Diment <diment@gmail.com>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Jonathan Rockway <jon@jrock.us>'
+  - 'Jesse Sheidlower <jester@panix.com>'
+  - 'Brian Cassidy <bricas@cpan.org>'
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+  - 'Dan Dascalescu <bigbang7@gmail.com>'
+  - 'Rafael Kitover <rkitover@cpan.org>'
+  - 'Jason Felds <wolfman.ncsu2000@gmail.com>'
+  - 'Frederik Schwarzer <schwarzerf@gmail.com>'
+  - 'Jonathan Yu <jawnsy@cpan.org>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Matt S Trout <mst@shadowcat.co.uk>'
+  - "Lars DÉªá´�á´�á´�á´�á´¡ è¿ªæ��æ�¯ <daxim@cpan.org>"
+  - 'Jess Robinson <cpan@desert-island.me.uk>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Eden Cardim <e.cardim@shadowcat.co.uk>'
+  - 'Andrew Rodland <arodland@cpan.org>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'Matthew Horsfall <wolfsage@gmail.com>'
+  - 'Ricardo SIGNES <rjbs@cpan.org>'
+  - "Robert 'phaylon' Sedlacek <rs@474.at>"
+  - 'Shlomi Fish <shlomif@iglu.org.il>'
+  - 'Jay Kuri <jayk@cpan.org>'
+  - 'u-foka <no@se.com>'
+  - 'Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>'
+  - 'Alexander Hartmaier <abraxxa@cpan.org>'
+  - 'Peter Karman <perl@peknet.com>'
+  - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
+  - 'Gerda Shank <gshank@cpan.org>'
+  - 'Ian Wells <ijw@cack.org.uk>'
+  - 'Mark A. Stratman <stratman@gmail.com>'
+  - 'sockmonk <wes.sheldahl@gmail.com>'
+  - 'Mateu X. Hunter <hunter@missoula.org>'
+  - 'Ash Berlin <ash@cpan.org>'
+  - 'Marcus Ramberg <marcus@nordaaker.com>'
+  - 'Andy Grundman <andy@hybridized.org>'
+  - 'kostya <kostya@cpan.org>'
+  - 'Matthias Dietrich <perl@rb.ly>'
+  - 'Paul Waring <paul@xk7.net>'
+  - 'kthakore <thakore.kartik@gmail.com>'
+  - 'Ronald J Kimball <rjk@tamias.net>'
+  - 'Tom Feist <shabble@metavore.org>'
+  - 'Ton Voon <ton.voon@opsera.com>'
+  - 'Zsolt Zemancsik <darwick@cyberground.hu>'
+  - 'IÃ±igo Tejedor Arrondo <poisonbit@gmail.com>'
+  - 'Eric A. Zarko <ezarko@cpan.org>'
+  - 'Jay Hannah <jay@jays.net>'
+  - 'Eisenberger TamÃ¡s <tamas@eisenberger.hu>'
+  - 'Edwin de Graaf <egraaf@egraaf.org>'
+  - 'Jonathan "Duke" Leto <jonathan@leto.net>'
+  - 'Jonathan Otsuka <djgoku@gmail.com>'
+  - 'Alastair McGowan-Douglas <altreus@cpan.org>'
+  - 'Dominic Humphries <djh@thermeon.eu>'
+  - 'antgel <no@se.com>'
+  - 'KMX <kmx@cpan.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'David Schmidt <davewood@gmx.at>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

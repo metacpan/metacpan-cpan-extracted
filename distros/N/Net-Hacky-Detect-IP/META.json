@@ -4,7 +4,7 @@
       "Paul G Webster <daemon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://gitlab.com/paul-g-webster/PL-Net-Hacky-Detect-IP"
       }
    },
-   "version" : "0.023",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.024",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

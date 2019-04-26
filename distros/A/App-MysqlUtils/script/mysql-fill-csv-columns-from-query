@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_fill_csv_columns_from_query
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-04-23'; # DATE
+our $DATE = '2019-04-26'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ mysql-fill-csv-columns-from-query - Fill CSV columns with data from a query
 
 =head1 VERSION
 
-This document describes version 0.017 of mysql-fill-csv-columns-from-query (from Perl distribution App-MysqlUtils), released on 2019-04-23.
+This document describes version 0.018 of mysql-fill-csv-columns-from-query (from Perl distribution App-MysqlUtils), released on 2019-04-26.
 
 =head1 SYNOPSIS
 
@@ -70,6 +70,10 @@ C<*> marks required options.
 
 =over
 
+=item B<--count>, B<-c>
+
+Instead of returning the CSV rows, just return the count of rows that get filled.
+
 =item B<--database>=I<s>*
 
 =item B<--filename>=I<s>*, B<-f>
@@ -94,9 +98,11 @@ Inform that input file is in TSV (tab-separated) format instead of CSV.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<filename>
 
 Set path to configuration file.
+
+Can be specified multiple times.
 
 =item B<--config-profile>=I<s>, B<-P>
 
@@ -281,6 +287,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ count (see --count)
  database (see --database)
  filename (see --filename)
  format (see --format)

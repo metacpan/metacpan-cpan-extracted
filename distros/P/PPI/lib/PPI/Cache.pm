@@ -46,18 +46,15 @@ also be provided to C<use>.
 =cut
 
 use strict;
-use Carp          ();
-use File::Spec    ();
-use File::Path    ();
-use Storable      ();
-use Digest::MD5   ();
-use Params::Util  qw{_INSTANCE _SCALAR};
-use PPI::Document ();
+use Carp             ();
+use File::Spec       ();
+use File::Path       ();
+use Storable 2.17    ();
+use Digest::MD5 2.35 ();
+use Params::Util     qw{_INSTANCE _SCALAR};
+use PPI::Document    ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.236';
-}
+our $VERSION = '1.252'; # VERSION
 
 use constant VMS => !! ( $^O eq 'VMS' );
 

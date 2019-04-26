@@ -15,7 +15,7 @@ with Catalyst, see L<Catalyst::Manual::Tutorial>.
 
 Catalyst is an elegant web application framework, extremely flexible
 yet extremely simple. It's similar to Ruby on Rails, Spring (Java), and
-L<Maypole|Maypole>, upon which it was originally based. Its most
+L<Maypole>, upon which it was originally based. Its most
 important design philosophy is to provide easy access to all the tools
 you need to develop web applications, with few restrictions on how you
 need to use these tools. However, this does mean that it is always
@@ -196,7 +196,7 @@ There are currently two flavors of publicly available Amazon Machine
 Images (AMI) that include all the elements you'd need to begin
 developing in a fully functional Catalyst environment within
 minutes. See
-L<Catalyst::Manual::Installation|Catalyst::Manual::Installation> for
+L<Catalyst::Manual::Installation> for
 more details.
 
 
@@ -294,9 +294,9 @@ where the first C<TT> tells the script that the name of the view should
 be C<TT>, and the second that it should be a Template Toolkit view.)
 
 This gives us a process() method and we can now just do
-$c->forward('MyApp::View::TT') to render our templates. The base class
+C<< $c->forward('MyApp::View::TT') >> to render our templates. The base class
 makes process() implicit, so we don't have to say
-C<$c-E<gt>forward(qw/MyApp::View::TT process/)>.
+C<< $c->forward(qw/MyApp::View::TT process/) >>.
 
     sub hello : Global {
         my ( $self, $c ) = @_;
@@ -315,7 +315,7 @@ In practice, however, you would use a default C<end> action as supplied
 by L<Catalyst::Action::RenderView>.
 
 Also, be sure to put the template under the directory specified in
-C<$c-E<gt>config-E<gt>{root}>, or you'll end up looking at the debug
+C<< $c->config->{root} >>, or you'll end up looking at the debug
 screen.
 
 =head4 Models
@@ -402,7 +402,7 @@ gain several things: you don't have to C<use> each component, Catalyst
 will find and load it automatically at compile-time; you can
 C<forward> to the module, which can only be done to Catalyst
 components.  Only Catalyst components can be fetched with
-C<$c-E<gt>model('SomeModel')>.
+C<< $c->model('SomeModel') >>.
 
 Happily, since many people have existing Model classes that they
 would like to use with Catalyst (or, conversely, they want to
@@ -514,7 +514,7 @@ equivalent to the same controller above:
 
 =head3 ACCEPT_CONTEXT
 
-Whenever you call $c->component("Foo") you get back an object - the
+Whenever you call C<< $c->component("Foo") >> you get back an object - the
 instance of the model. If the component supports the C<ACCEPT_CONTEXT>
 method instead of returning the model itself, the return value of C<<
 $model->ACCEPT_CONTEXT( $c ) >> will be used.
@@ -562,7 +562,7 @@ In a subroutine in the  model code, we can then do this:
 Note that we still want the Catalyst models to be a thin wrapper
 around classes that will work independently of the Catalyst
 application to promote reusability of code.  Here we might just want
-to grab the $c->model('DB')->schema so as to get the connection
+to grab the C<< $c->model('DB')->schema >> so as to get the connection
 information from the Catalyst application's configuration for example.
 
 The life time of this value is B<per usage>, and not per request. To
@@ -623,7 +623,7 @@ Optionally, you can specify a B<root> parameter for templates and static
 data.  If omitted, Catalyst will try to auto-detect the directory's
 location. You can define as many parameters as you want for plugins or
 whatever you need. You can access them anywhere in your application via
-C<$context-E<gt>config-E<gt>{$param_name}>.
+C<< $context->config->{$param_name} >>.
 
 =head3 Context
 
@@ -977,9 +977,9 @@ other paths.
 
 For both C<:LocalRegex> and C<:Regex> actions, if you use capturing
 parentheses to extract values within the matching URL, those values
-are available in the C<$c-E<gt>req-E<gt>captures> array. In the above
+are available in the C<< $c->req->captures >> array. In the above
 example, "widget23" would capture "23" in the above example, and
-C<$c-E<gt>req-E<gt>captures-E<gt>[0]> would be "23". If you want to
+C<< $c->req->captures->[0] >> would be "23". If you want to
 pass arguments at the end of your URL, you must use regex action
 keys. See L</URL Path Handling> below.
 
@@ -1030,7 +1030,7 @@ forwarding from another component, you must use the absolute path to
 the method, so that a private C<bar> method in your
 C<MyApp::Controller::Catalog::Order::Process> controller must, if
 called from elsewhere, be reached with
-C<$c-E<gt>forward('/catalog/order/process/bar')>.
+C<< $c->forward('/catalog/order/process/bar') >>.
 
 =back
 
@@ -1218,7 +1218,7 @@ This.
 
 Parameters passed in the URL query string are handled with methods in
 the L<Catalyst::Request> class. The C<param> method is functionally
-equivalent to the C<param> method of C<CGI.pm> and can be used in
+equivalent to the C<param> method of L<CGI.pm|CGI> and can be used in
 modules that require this.
 
     # http://localhost:3000/catalog/view/?category=hardware&page=3
@@ -1263,13 +1263,13 @@ debugging enabled).
     }
 
 A C<forward> does not create a new request, so your request object
-(C<$c-E<gt>req>) will remain unchanged. This is a key difference between
+(C<< $c->req >>) will remain unchanged. This is a key difference between
 using C<forward> and issuing a redirect.
 
 You can pass new arguments to a C<forward> by adding them
-in an anonymous array. In this case C<$c-E<gt>req-E<gt>args>
+in an anonymous array. In this case C<< $c->req->args >>
 will be changed for the duration of the C<forward> only; upon
-return, the original value of C<$c-E<gt>req-E<gt>args> will
+return, the original value of C<< $c->req->args >> will
 be reset.
 
     sub hello : Global {
@@ -1333,7 +1333,7 @@ If you don't want or need these features then it's perfectly acceptable
         $c->stash->{message} = 'Hello World!';
         $self->check_message( $c, 'test1' );
     }
-    
+
     sub check_message {
         my ( $self, $c, $first_argument ) = @_;
         # do something...

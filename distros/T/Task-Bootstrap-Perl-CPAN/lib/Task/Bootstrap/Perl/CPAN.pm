@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 package Task::Bootstrap::Perl::CPAN;
-# git description: v0.002-2-g55afdf1
+# git description: v0.003-1-gc75ab38
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Dependencies for App::Bootstrap::Perl - CPAN bundle
-$Task::Bootstrap::Perl::CPAN::VERSION = '0.003';
+$Task::Bootstrap::Perl::CPAN::VERSION = '0.004';
 
 __END__
 
@@ -19,11 +19,13 @@ Task::Bootstrap::Perl::CPAN - Dependencies for App::Bootstrap::Perl - CPAN bundl
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 TASK CONTENTS
 
 =head2 cpan
+
+=head3 L<HTTP::Date>
 
 =head3 L<Test::Simple>
 
@@ -95,7 +97,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

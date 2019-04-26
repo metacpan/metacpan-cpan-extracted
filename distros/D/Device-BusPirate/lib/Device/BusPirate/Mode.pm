@@ -1,16 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
+
+use Future::AsyncAwait;
 
 use constant {
    CONF_CS     => 0x01,
@@ -64,7 +66,7 @@ sub pirate
    return $self->{bp};
 }
 
-sub _start_mode_and_await
+async sub _start_mode_and_await
 {
    my $self = shift;
    my ( $send, $await ) = @_;
@@ -72,11 +74,10 @@ sub _start_mode_and_await
    my $pirate = $self->pirate;
 
    $pirate->write( $send );
-   $pirate->read( length $await, "start mode" )->then( sub {
-      my ( $buf ) = @_;
-      return Future->done( $buf ) if $buf eq $await;
-      return Future->fail( "Expected '$await' response but got '$buf'" );
-   });
+   my $buf = await $pirate->read( length $await, "start mode" );
+
+   return $buf if $buf eq $await;
+   die "Expected '$await' response but got '$buf'";
 }
 
 =head2 power
@@ -144,18 +145,11 @@ sub _update_peripherals
 {
    my $self = shift;
 
-   $self->pirate->write( chr( 0x40 |
+   $self->pirate->write_expect_ack( chr( 0x40 |
       ( $self->{power}  ? CONF_POWER  : 0 ) |
       ( $self->{pullup} ? CONF_PULLUP : 0 ) |
       ( $self->{aux}    ? CONF_AUX    : 0 ) |
-      ( $self->{cs}     ? CONF_CS     : 0 ) )
-   );
-   $self->pirate->read( 1, "update peripherals" )
-      ->then( sub {
-         my( $buf ) = @_;
-         $buf eq "\x01" or return Future->fail( "Expected ACK response to _update_peripherals" );
-         return Future->done;
-      });
+      ( $self->{cs}     ? CONF_CS     : 0 ) ), "_update_peripherals" );
 }
 
 =head2 set_pwm

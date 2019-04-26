@@ -10,8 +10,8 @@ my $build = Module::Build->new(
       'Device::Chip::ProtocolBase::SPI' => 0,
       'Future' => 0,
       'Future::Mutex' => 0,
-      'Future::IO' => 0,
-      'Future::Utils' => 0,
+      'Future::IO' => '0.03',
+      'Future::AsyncAwait' => '0.25', # RT129303
       'IO::Termios' => '0.07',
       'List::Util' => '1.33',
       'Module::Pluggable' => 0,
@@ -19,6 +19,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
+      'Test::Future::Deferred' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004',

@@ -4,11 +4,12 @@ author:
   - 'Xavier Guimard <x.guimard@free.fr>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,6 +20,9 @@ no_index:
     - inc
 requires:
   Apache::Session: '1.80'
-  MongoDB: '0'
-version: '0.18'
+  MongoDB: '1.60'
+  perl: '5.010'
+resources:
+  repository: git://github.com/LemonLDAPNG/apache-session-mongodb.git
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

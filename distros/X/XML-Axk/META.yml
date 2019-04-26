@@ -35,15 +35,15 @@ no_index:
 provides:
   XML::Axk:
     file: lib/XML/Axk.pm
-    version: '0.001008'
+    version: '0.001009'
   XML::Axk::App:
     file: lib/XML/Axk/App.pm
-    version: '0.001008'
+    version: '0.001009'
   XML::Axk::Base:
     file: lib/XML/Axk/Base.pm
   XML::Axk::Core:
     file: lib/XML/Axk/Core.pm
-    version: '0.001008'
+    version: '0.001009'
   XML::Axk::DOM:
     file: lib/XML/Axk/DOM.pm
   XML::Axk::L::L1:
@@ -58,7 +58,7 @@ provides:
     file: lib/XML/Axk/Matcher/XPath.pm
   XML::Axk::Object::TinyDefaults:
     file: lib/XML/Axk/Object/TinyDefaults.pm
-    version: '0.001008'
+    version: '0.001009'
   XML::Axk::Preparse:
     file: lib/XML/Axk/Preparse.pm
   XML::Axk::SAX::BuildDOM2:
@@ -97,5 +97,8 @@ requires:
 resources:
   bugtracker: https://github.com/interpreters/axk/issues
   repository: https://github.com/interpreters/axk.git
-version: '0.001008'
+version: '0.001009'
+x_authority: cpan:CXW
+x_contributors:
+  - 'Christopher White <cxw@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

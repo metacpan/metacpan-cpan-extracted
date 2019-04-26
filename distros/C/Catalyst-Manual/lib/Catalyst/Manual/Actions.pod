@@ -1,6 +1,6 @@
 =head1 NAME
 
-Catalyst::Manual::Actions - Catalyst Reusable Actions 
+Catalyst::Manual::Actions - Catalyst Reusable Actions
 
 =head1 DESCRIPTION
 
@@ -17,9 +17,9 @@ them.
 This is pretty simple. Actions work just like the normal dispatch
 attributes you are used to, like Local or Private:
 
-  sub Hello :Local :ActionClass('SayBefore') { 
-	$c->res->output( 'Hello '.$c->stash->{what} );
-  }
+    sub Hello :Local :ActionClass('SayBefore') {
+        $c->res->output( 'Hello '.$c->stash->{what} );
+    }
 
 In this example, we expect the SayBefore action to magically populate
 stash with something relevant before C<Hello> is run.  In the next
@@ -35,23 +35,23 @@ Implementing the action itself is almost as easy. Just use
 L<Catalyst::Action> as a base class and decorate the C<execute> call in
 the Action class:
 
-  package Catalyst::Action::MyAction;
-  use Moose;
-  use namespace::autoclean;
-  
-  extends 'Catalyst::Action';
+    package Catalyst::Action::MyAction;
+    use Moose;
+    use namespace::autoclean;
 
-  before 'execute' => sub {
-    my ( $self, $controller, $c, $test ) = @_;
-    $c->stash->{what} = 'world';
-  };
+    extends 'Catalyst::Action';
 
-  after 'execute' => sub {
-      my ( $self, $controller, $c, $test ) = @_;
-      $c->stash->{foo} = 'bar';
-  };
+    before 'execute' => sub {
+        my ( $self, $controller, $c, $test ) = @_;
+        $c->stash->{what} = 'world';
+    };
 
-  __PACKAGE__->meta->make_immutable;
+    after 'execute' => sub {
+        my ( $self, $controller, $c, $test ) = @_;
+        $c->stash->{foo} = 'bar';
+    };
+
+    __PACKAGE__->meta->make_immutable;
 
 Pretty simple, huh?
 
@@ -63,50 +63,50 @@ inflexible.
 The solution to this is to use L<Catalyst::Controller::ActionRole>, which
 would make the example above look like this:
 
-  package Catalyst::ActionRole::MyActionRole;
-  use Moose::Role;
+    package Catalyst::ActionRole::MyActionRole;
+    use Moose::Role;
 
-  before 'execute' => sub {
-    my ( $self, $controller, $c, $test ) = @_;
-    $c->stash->{what} = 'world';
-  };
+    before 'execute' => sub {
+        my ( $self, $controller, $c, $test ) = @_;
+        $c->stash->{what} = 'world';
+    };
 
-  after 'execute' => sub {
-      my ( $self, $controller, $c, $test ) = @_;
-      $c->stash->{foo} = 'bar';
-  };
-  
-  1;
+    after 'execute' => sub {
+        my ( $self, $controller, $c, $test ) = @_;
+        $c->stash->{foo} = 'bar';
+    };
+
+    1;
 
 and this would be used in a controller like this:
 
-  package MyApp::Controller::Foo;
-  use Moose;
-  use namespace::autoclean;
-  BEGIN { extends 'Catalyst::Controller::ActionRole'; }
+    package MyApp::Controller::Foo;
+    use Moose;
+    use namespace::autoclean;
+    BEGIN { extends 'Catalyst::Controller::ActionRole'; }
 
-  sub foo : Does('MyActionRole') {
-      my ($self, $c) = @_;
-  }
+    sub foo : Does('MyActionRole') {
+        my ($self, $c) = @_;
+    }
 
-  1;
+    1;
 
 =head1 EXAMPLE ACTIONS
 
-=head2 Catalyst::Action::RenderView
+=head2 L<Catalyst::Action::RenderView>
 
-This is meant to decorate end actions. It's similar in operation to 
+This is meant to decorate end actions. It's similar in operation to
 L<Catalyst::Plugin::DefaultEnd>, but allows you to decide on an action
 level rather than on an application level where it should be run.
 
-=head2 Catalyst::Action::REST
+=head2 L<Catalyst::Action::REST>
 
 Provides additional syntax for dispatching based upon the HTTP method
 of the request.
 
 =head1 EXAMPLE ACTIONROLES
 
-=head2 Catalyst::ActionRole::ACL
+=head2 L<Catalyst::ActionRole::ACL>
 
 Provides ACLs for role membership by decorating your actions.
 

@@ -54,7 +54,7 @@ above modes.  Note the required mod_rewrite rule.
     )
 
 For more information on using FastCGI under Lighttpd, visit
-L<http://www.lighttpd.net/documentation/fastcgi.html>
+L<https://redmine.lighttpd.net/projects/lighttpd/wiki/Docs_ModFastCGI>
 
 
 =head2 Static file handling

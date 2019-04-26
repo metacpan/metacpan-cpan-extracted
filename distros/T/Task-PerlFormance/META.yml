@@ -21,7 +21,6 @@ requires:
   AAAA::Mail::SpamAssassin: '0'
   Benchmark::Perl::Formance: '0'
   Benchmark::Perl::Formance::Cargo: '0'
-  Benchmark::Perl::Formance::Plugin::Mandelbrot: '0'
   Benchmark::Perl::Formance::Plugin::PerlStone2015: '0'
   BenchmarkAnything::Reporter: '0'
   Class::Accessor: '0'
@@ -66,7 +65,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Task-PerlFormance
   homepage: http://metacpan.org/release/Task-PerlFormance
   repository: git://github.com/renormalist/Task-PerlFormance.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -285,7 +284,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.008
+          tag: v0.009
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

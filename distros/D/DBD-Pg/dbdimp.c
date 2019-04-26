@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2002-2018 Greg Sabino Mullane and others: see the Changes file
+  Copyright (c) 2002-2019 Greg Sabino Mullane and others: see the Changes file
   Portions Copyright (c) 2002 Jeffrey W. Baker
   Portions Copyright (c) 1997-2000 Edmund Mergl
   Portions Copyright (c) 1994-1997 Tim Bunce
@@ -21,32 +21,11 @@
 #define sb2 signed short
 #define ub2 unsigned short
 
-#if PGLIBVERSION < 80000
-
-/* Should not be called, throw errors: */
-PGresult *PQprepare(PGconn *a, const char *b, const char *c, int d, const Oid *e);
-PGresult *PQprepare(PGconn *a, const char *b, const char *c, int d, const Oid *e) {
-	if (a||b||c||d||e) d=0;
-	croak ("Called wrong PQprepare");
+#if PGLIBVERSION < 80300
+Oid lo_truncate (PGconn *conn, int fd, size_t len);
+Oid lo_truncate (PGconn *conn, int fd, size_t len) {
+	croak ("Cannot use lo_truncate unless compiled against Postgres 8.3 or later");
 }
-
-int PQserverVersion(const PGconn *a);
-int PQserverVersion(const PGconn *a) { if (!a) return 0; croak ("Called wrong PQserverVersion"); }
-
-typedef struct pg_cancel PGcancel;
-int	PQcancel(PGcancel *cancel, char *errbuf, int errbufsize);
-int	PQcancel(PGcancel *cancel, char *errbuf, int errbufsize) {
-	croak ("Called wrong PQcancel");
-}
-PGcancel *PQgetCancel(PGconn *conn);
-PGcancel *PQgetCancel(PGconn *conn) {
-	croak ("Called wrong PQgetCancel");
-}
-void PQfreeCancel(PGcancel *cancel);
-void PQfreeCancel(PGcancel *cancel) {
-	croak ("Called wrong PQfreeCancel");
-}
-
 
 #endif
 
@@ -86,7 +65,7 @@ static void _fatal_sqlstate(pTHX_ imp_dbh_t *imp_dbh);
 static ExecStatusType _sqlstate(pTHX_ imp_dbh_t *imp_dbh, PGresult *result);
 static int pg_db_rollback_commit (pTHX_ SV *dbh, imp_dbh_t *imp_dbh, int action);
 static SV *pg_st_placeholder_key (imp_sth_t *imp_sth, ph_t *currph, int i);
-static void pg_st_split_statement (pTHX_ imp_sth_t *imp_sth, int version, char *statement);
+static void pg_st_split_statement (pTHX_ imp_sth_t *imp_sth, char *statement);
 static int pg_st_prepare_statement (pTHX_ SV *sth, imp_sth_t *imp_sth);
 static int pg_st_deallocate_statement(pTHX_ SV *sth, imp_sth_t *imp_sth);
 static PGTransactionStatusType pg_db_txn_status (pTHX_ imp_dbh_t *imp_dbh);
@@ -216,27 +195,18 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
 	imp_dbh->pg_protocol = PQprotocolVersion(imp_dbh->conn);
 
 	/* Figure out this particular backend's version */
-	imp_dbh->pg_server_version = -1;
-#if PGLIBVERSION >= 80000
 	TRACE_PQSERVERVERSION;
 	imp_dbh->pg_server_version = PQserverVersion(imp_dbh->conn);
-#endif
 
-	if (imp_dbh->pg_server_version <= 0) {
-		int	cnt, vmaj, vmin, vrev;
-		const char *vers = PQparameterStatus(imp_dbh->conn, "server_version");
-
-		if (NULL != vers) {
-			cnt = sscanf(vers, "%d.%d.%d", &vmaj, &vmin, &vrev);
-			if (cnt >= 2) {
-				if (cnt == 2) /* Account for devel version e.g. 8.3beta1 */
-					vrev = 0;
-				imp_dbh->pg_server_version = (100 * vmaj + vmin) * 100 + vrev;
-			}
-		}
-		else {
-			imp_dbh->pg_server_version = PG_UNKNOWN_VERSION ;
-		}
+	if (imp_dbh->pg_server_version < 80000) {
+		TRACE_PQERRORMESSAGE;
+		strncpy(imp_dbh->sqlstate, "08001", 6); /* sqlclient_unable_to_establish_sqlconnection */
+		pg_error(aTHX_ dbh, CONNECTION_BAD, "Server version 8.0 required");
+		TRACE_PQFINISH;
+		PQfinish(imp_dbh->conn);
+		sv_free((SV *)imp_dbh->savepoints);
+		if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_db_login (error)\n", THEADER_slow);
+		return 0;
 	}
 
 	pg_db_detect_client_encoding_utf8(aTHX_ imp_dbh);
@@ -254,6 +224,7 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
 	imp_dbh->expand_array      = DBDPG_TRUE;
 	imp_dbh->txn_read_only     = DBDPG_FALSE;
 	imp_dbh->pid_number        = getpid();
+	imp_dbh->server_prepare    = DBDPG_TRUE;
 	imp_dbh->prepare_number    = 1;
 	imp_dbh->switch_prepared   = 2;
 	imp_dbh->copystate         = 0;
@@ -261,9 +232,6 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
 	imp_dbh->pg_errorlevel     = 1; /* Default */
 	imp_dbh->async_status      = 0;
 	imp_dbh->async_sth         = NULL;
-
-	/* If using server version 7.4, switch to "smart" */
-	imp_dbh->server_prepare = PGLIBVERSION >= 80000 ? 1 : 2;
 
 	/* Tell DBI that we should call destroy when the handle dies */
 	DBIc_IMPSET_on(imp_dbh);
@@ -493,19 +461,19 @@ int dbd_db_ping (SV * dbh)
 	tstatus = pg_db_txn_status(aTHX_ imp_dbh);
 	if (TRACE5_slow) TRC(DBILOGFP, "%sdbd_db_ping txn_status is %d\n", THEADER_slow, tstatus);
 
-	if (tstatus >= 4) { /* Unknown, so we err on the side of "bad" */
+	if (tstatus >= PQTRANS_UNKNOWN) { /* Unknown, so we err on the side of "bad" */
 		if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping (result: -2 unknown/bad)\n", THEADER_slow);
 		return -2;
 	}
 
 	/* No matter what state we are in, send an empty query to the backend */
-	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.7.4 */");
-	if (NULL == result) {
+	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.8.0 */");
+	status = PQresultStatus(result);
+	PQclear(result);
+	if (PGRES_FATAL_ERROR == status) {
 		/* Something very bad, usually indicating the backend is gone */
 		return -3;
 	}
-	status = PQresultStatus(result);
-	PQclear(result);
 
 	/* We expect to see an empty query most times */
 	if (PGRES_EMPTY_QUERY == status) {
@@ -975,11 +943,7 @@ int dbd_db_STORE_attrib (SV * dbh, imp_dbh_t * imp_dbh, SV * keysv, SV * valuesv
 	case 17: /* pg_server_prepare */
 
 		if (strEQ("pg_server_prepare", key)) {
-			if (SvOK(valuesv)) {
-				newval = (unsigned)SvIV(valuesv);
-			}
-			/* Default to "2" if an invalid value is passed in */
-			imp_dbh->server_prepare = 0==newval ? 0 : 1==newval ? 1 : 2;
+			imp_dbh->server_prepare = newval ? DBDPG_TRUE : DBDPG_FALSE;
 			retval = 1;
 		}
 		break;
@@ -1302,8 +1266,7 @@ SV * dbd_st_FETCH_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv)
 				y = PQftablecol(imp_sth->result, fields);
 				if (InvalidOid != x && y > 0) { /* We know what table and column this came from */
 					char statement[128];
-					snprintf(statement, sizeof(statement),
-							"SELECT attnotnull FROM pg_catalog.pg_attribute WHERE attrelid=%d AND attnum=%d", x, y);
+					sprintf(statement, "SELECT attnotnull FROM pg_catalog.pg_attribute WHERE attrelid=%d AND attnum=%d", x, y);
 					TRACE_PQEXEC;
 					result = PQexec(imp_dbh->conn, statement);
 					TRACE_PQRESULTSTATUS;
@@ -1446,7 +1409,7 @@ int dbd_st_STORE_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv, SV * valuesv
 	case 17: /* pg_server_prepare */
 
 		if (strEQ("pg_server_prepare", key)) {
-			imp_sth->server_prepare = strEQ(value,"0") ? DBDPG_FALSE : DBDPG_TRUE;
+			imp_sth->server_prepare = SvTRUE(valuesv) ? DBDPG_TRUE : DBDPG_FALSE;
 			retval = 1;
 		}
 		break;
@@ -1583,7 +1546,7 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
 {
 	dTHX;
 	D_imp_dbh_from_sth;
-	STRLEN mypos=0, wordstart, newsize; /* Used to find and set firstword */
+	STRLEN mypos=0; /* Used to find and set firstword */
 	SV **svp; /* To help parse the arguments */
 
 	statement_sv = pg_rightgraded_sv(aTHX_ statement_sv, imp_dbh->pg_utf8_flag);
@@ -1615,7 +1578,6 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
 	imp_sth->PQfmts            = NULL;
 	imp_sth->PQoids            = NULL;
 	imp_sth->prepared_by_us    = DBDPG_FALSE; /* Set to 1 when actually done preparing */
-	imp_sth->onetime           = DBDPG_FALSE; /* Allow internal shortcut */
 	imp_sth->direct            = DBDPG_FALSE;
 	imp_sth->is_dml            = DBDPG_FALSE; /* Not preparable DML until proved otherwise */
 	imp_sth->has_binary        = DBDPG_FALSE; /* Are any of the params binary? */
@@ -1635,9 +1597,7 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
 	/* Parse and set any attributes passed in */
 	if (attribs) {
 		if ((svp = hv_fetch((HV*)SvRV(attribs),"pg_server_prepare", 17, 0)) != NULL) {
-			int newval = (int)SvIV(*svp);
-			/* Default to "2" if an invalid value is passed in */
-			imp_sth->server_prepare = 0==newval ? 0 : 1==newval ? 1 : 2;
+			imp_sth->server_prepare = SvTRUE(*svp) ? DBDPG_TRUE : DBDPG_FALSE;
 		}
 		if ((svp = hv_fetch((HV*)SvRV(attribs),"pg_direct", 9, 0)) != NULL)
 			imp_sth->direct = 0==SvIV(*svp) ? DBDPG_FALSE : DBDPG_TRUE;
@@ -1656,20 +1616,18 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
 	}
 
 	/* Figure out the first word in the statement */
-	while (*statement && isSPACE(*statement)) {
+	while (isSPACE(statement[mypos]))
 		mypos++;
-		statement++;
-	}
-	if (isALPHA(*statement)) {
-		wordstart = mypos;
-		while (isALPHA(*statement)) {
+
+	if (isALPHA(statement[mypos])) {
+		STRLEN wordstart = mypos, wordlen;
+		while (isALPHA(statement[mypos]))
 			mypos++;
-			statement++;
-		}
-		newsize = mypos-wordstart;
-		New(0, imp_sth->firstword, newsize+1, char); /* freed in dbd_st_destroy */
-		Copy(statement-newsize, imp_sth->firstword, newsize, char);
-		imp_sth->firstword[newsize] = '\0';
+
+		wordlen = mypos-wordstart;
+		New(0, imp_sth->firstword, wordlen+1, char); /* freed in dbd_st_destroy */
+		Copy(statement+wordstart, imp_sth->firstword, wordlen, char);
+		imp_sth->firstword[wordlen] = '\0';
 
 		/* Note whether this is preparable DML */
 		if (0 == strcasecmp(imp_sth->firstword, "SELECT") ||
@@ -1677,21 +1635,21 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
 			0 == strcasecmp(imp_sth->firstword, "UPDATE") ||
 			0 == strcasecmp(imp_sth->firstword, "DELETE") ||
 			0 == strcasecmp(imp_sth->firstword, "VALUES") ||
+			0 == strcasecmp(imp_sth->firstword, "TABLE")  ||
 			0 == strcasecmp(imp_sth->firstword, "WITH")
 			) {
 			imp_sth->is_dml = DBDPG_TRUE;
 		}
 	}
-	statement -= mypos; /* Rewind statement */
 
 	/* Break the statement into segments by placeholder */
-	pg_st_split_statement(aTHX_ imp_sth, imp_dbh->pg_server_version, statement);
+	pg_st_split_statement(aTHX_ imp_sth, statement);
 
 	/*
 	  We prepare it right away if:
 	  1. The statement is DML
 	  2. The attribute "direct" is false
-	  3. The attribute "pg_server_prepare" is not 0
+	  3. The attribute "pg_server_prepare" is true
 	  4. The attribute "pg_prepare_now" is true
 	  5. We are compiled on a 8 or greater server
 	*/
@@ -1706,9 +1664,8 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
 
 	if (imp_sth->is_dml
 		&& !imp_sth->direct
-		&& 0 != imp_sth->server_prepare
+		&& imp_sth->server_prepare
 		&& imp_sth->prepare_now
-		&& PGLIBVERSION >= 80000
 		) {
 		if (TRACE5_slow) TRC(DBILOGFP, "%sRunning an immediate prepare\n", THEADER_slow);
 
@@ -1732,7 +1689,7 @@ static const char *placeholder_string[PLACEHOLDER_TYPE_COUNT] = {
 };
 
 /* ================================================================== */
-static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char * statement)
+static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, char * statement)
 {
 
 	/* Builds the "segment" and "placeholder" structures for a statement handle */
@@ -1745,29 +1702,13 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 
 	STRLEN sectionsize; /* Size of an allocated segment */
 
-	STRLEN backslashes; /* Counts backslashes, only used in quote section */
-
-	STRLEN dollarsize; /* Size of dollarstring */
-
-	int topdollar; /* Used to enforce sequential $1 arguments */
-
 	PGPlaceholderType placeholder_type; /* Which type we are in: one of none,?,$,: */
 
  	unsigned char ch; /* The current character being checked */
 
 	unsigned char oldch; /* The previous character */
 
-	char quote; /* Current quote or comment character: used only in those two blocks */
-
-	bool found; /* Simple boolean */
-
-	bool inside_dollar; /* Inside a dollar quoted value */
-
-	char * dollarstring = NULL; /* Dynamic string between $$ in dollar quoting */
-
-	char standard_conforming_strings = 1; /* Status 0=on 1=unknown -1=off */
-
-	STRLEN xlen; /* Because "x" is too hard to search for */
+	char non_standard_strings = -1; /* Status 0=standard 1=non_standard -1=unknown  */
 
 	int xint;
 
@@ -1851,11 +1792,12 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 
 		/* 1: A traditionally quoted section */
 		if ('\'' == ch || '"' == ch) {
-			quote = ch;
-			backslashes = 0;
-			if ('\'' == ch && 1 == standard_conforming_strings) {
+			char quote = ch;
+			STRLEN backslashes = 0;
+			bool estring = (oldch == 'E') ? DBDPG_TRUE : DBDPG_FALSE; /* E'' style string with backslash escapes */
+			if ('\'' == ch && -1 == non_standard_strings) {
 				const char * scs = PQparameterStatus(imp_dbh->conn,"standard_conforming_strings");
-				standard_conforming_strings = (NULL==scs ? 1 : strncmp(scs,"on",2));
+				non_standard_strings = (NULL==scs ? 1 : 0==strncmp(scs,"on",2) ? 0 : 1);
 			}
 
 			/* Go until ending quote character (unescaped) or end of string */
@@ -1863,12 +1805,13 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 				/* 1.1 : single quotes have no meaning in double-quoted sections and vice-versa */
 				/* 1.2 : backslashed quotes do not end the section */
 				/* 1.2.1 : backslashes have no meaning in double quoted sections */
-				/* 1.2.2 : if standard_confirming_strings is set, ignore backslashes in single quotes */
+				/* 1.2.2 : if non_standard_strings is not set, ignore backslashes in single quotes */
+				/* 1.2.3 : backslashes always escape in E'' strings */
 				if (ch == quote && (quote == '"' || 0==(backslashes&1))) {
 					quote = 0;
 				}
 				else if ('\\' == ch) {
-					if (quote == '"' || standard_conforming_strings)
+					if (quote == '"' || non_standard_strings || estring)
 						backslashes++;
 				}
 				else
@@ -1889,7 +1832,7 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 		if (('-' == ch && '-' == *statement) ||
 			('/' == ch && '*' == *statement)
 			) {
-			quote = *statement;
+			char quote = *statement;
 			/* Go until end of comment (may be newline) or end of the string */
 			while (quote && ++currpos && (ch = *statement++)) {
 				/* 2.1: dashdash only terminates at newline */
@@ -1913,8 +1856,8 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 			/* 2.5: End quote was the last character in the string */
 		} /* end comment section */
 
-		/* 3: advanced dollar quoting - only if the backend is version 8 or higher */
-		if (version >= 80000 && '$' == ch && 
+		/* 3: advanced dollar quoting */
+		if ('$' == ch &&
 			(*statement == '$' 
 			 || *statement == '_'
 			 || (*statement >= 'A' && *statement <= 'Z') 
@@ -1924,13 +1867,17 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 				or an underscore (_). Subsequent characters in an identifier or key word can be letters, underscores, 
 				digits (0-9), or dollar signs ($)
 			*/
-			sectionsize = 0; /* How far from the first dollar sign are we? */
-			found = 0; /* Have we found the end of the dollarquote? */
+			char * dollarstring = NULL; /* Dynamic string between $$ in dollar quoting */
+			STRLEN dollarsize; /* Size of dollarstring */
+			STRLEN dollaroffset = 0; /* How far from the first dollar sign are we? */
+			STRLEN xlen = 0; /* The current character we are tracing */
+			bool found = DBDPG_FALSE; /* Have we found the end of the dollarquote? */
+			bool inside_dollar = DBDPG_FALSE; /* Are we evaluating the dollar sign for the end? */
 
 			/* Scan forward until we hit the matching dollarsign */
 			while ((ch = *statement++)) {
 
-				sectionsize++;
+				dollaroffset++;
 				if ('$' == ch) {
 					found = DBDPG_TRUE;
 					break;
@@ -1948,7 +1895,7 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 
 			/* Not found? Move to the next letter after the dollarsign and move on */
 			if (!found) {
-				statement -= sectionsize;
+				statement -= dollaroffset;
 				if (!ch) {
 					ch = 1; /* So the top loop still works */
 					statement--;
@@ -1957,19 +1904,17 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 			}
 
 			/* We only need to create a dollarstring if something was between the two dollar signs */
-			if (sectionsize >= 1) {
-				New(0, dollarstring, sectionsize, char); /* note: a true array, not a null-terminated string */
-				strncpy(dollarstring, statement-sectionsize, sectionsize);
+			if (dollaroffset >= 1) {
+				New(0, dollarstring, dollaroffset, char); /* note: a true array, not a null-terminated string */
+				strncpy(dollarstring, statement-dollaroffset, dollaroffset);
 			}
 
 			/* Move on and see if the quote is ever closed */
 
-			inside_dollar=0; /* Are we evaluating the dollar sign for the end? */
-			dollarsize = sectionsize;
-			xlen=0; /* The current character we are tracing */
-			found=0;
+			dollarsize = dollaroffset;
+			found = DBDPG_FALSE;
 			while ((ch = *statement++)) {
-				sectionsize++;
+				dollaroffset++;
 				if (inside_dollar) {
 					/* Special case of $$ */
 					if (dollarsize < 1) {
@@ -1981,7 +1926,7 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 						if (xlen >= dollarsize) {
 							found = DBDPG_TRUE;
 							statement++;
-							sectionsize--;
+							dollaroffset--;
 							break;
 						}
 					}
@@ -2000,14 +1945,14 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 
 			/* If end of string, rewind one character */
 			if (0==ch) {
-				sectionsize--;
+				dollaroffset--;
 			}
 
 			if (dollarstring)
 				Safefree(dollarstring);
 
 			/* Advance our cursor to the current position */
-			currpos += sectionsize+1;
+			currpos += dollaroffset+1;
 
 			statement--; /* Rewind statement by one */
 
@@ -2129,7 +2074,7 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 			newseg->placeholder = atoi(statement-(currpos-sectionstop-1));
 		}
 		else if (PLACEHOLDER_COLON == placeholder_type) {
-			sectionsize = currpos-sectionstop;
+			STRLEN phsectionsize = currpos-sectionstop;
 			/* Have we seen this placeholder yet? */
 			for (xint=1,thisph=imp_sth->ph; NULL != thisph; thisph=thisph->nextph,xint++) {
 				/*
@@ -2137,8 +2082,8 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 				   hit when seeing :foobar2, we always use the greater of the two lengths:
 				   the length of the old name or the current name we are scanning
 				*/
-				if (0==strncmp(thisph->fooname, statement-sectionsize,
-							   strlen(thisph->fooname) > sectionsize ? strlen(thisph->fooname) : sectionsize)) {
+				if (0==strncmp(thisph->fooname, statement-phsectionsize,
+							   strlen(thisph->fooname) > phsectionsize ? strlen(thisph->fooname) : phsectionsize)) {
 					newseg->placeholder = xint;
 					newseg->ph = thisph;
 					break;
@@ -2158,9 +2103,9 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 				newph->isdefault  = DBDPG_FALSE;
 				newph->iscurrent  = DBDPG_FALSE;
 				newph->isinout    = DBDPG_FALSE;
-				New(0, newph->fooname, sectionsize+1, char); /* freed in dbd_st_destroy */
-				Copy(statement-sectionsize, newph->fooname, sectionsize, char);
-				newph->fooname[sectionsize] = '\0';
+				New(0, newph->fooname, phsectionsize+1, char); /* freed in dbd_st_destroy */
+				Copy(statement-phsectionsize, newph->fooname, phsectionsize, char);
+				newph->fooname[phsectionsize] = '\0';
 				if (NULL==currph) {
 					imp_sth->ph = newph;
 				}
@@ -2214,14 +2159,15 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 		   We follow the Pg rules: must start with $1, repeats are allowed, 
 		   numbers must be sequential. We change numphs if repeats found
 		*/
-		topdollar=0;
+		int topdollar = 0;
 		for (currseg=imp_sth->seg; NULL != currseg; currseg=currseg->nextseg) {
 			if (currseg->placeholder > topdollar)
 				topdollar = currseg->placeholder;
 		}
 		/* Make sure every placeholder from 1 to topdollar is used at least once */
 		for (xint=1; xint <= topdollar; xint++) {
-			for (found=0, currseg=imp_sth->seg; NULL != currseg; currseg=currseg->nextseg) {
+			bool found = DBDPG_FALSE;
+			for (currseg=imp_sth->seg; NULL != currseg; currseg=currseg->nextseg) {
 				if (currseg->placeholder==xint) {
 					found = DBDPG_TRUE;
 					break;
@@ -2275,7 +2221,8 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, int version, char 
 		}
 		if (imp_sth->numphs) {
 			TRC(DBILOGFP, "%sPlaceholder number, fooname, id:\n", THEADER_slow);
-			for (xlen=1,currph=imp_sth->ph; NULL != currph; currph=currph->nextph,xlen++) {
+			STRLEN xlen = 1;
+			for (currph=imp_sth->ph; NULL != currph; currph=currph->nextph,xlen++) {
 				TRC(DBILOGFP, "%s#%d FOONAME: (%s)\n",
 					THEADER_slow, (int)xlen, currph->fooname);
 			}
@@ -2308,15 +2255,10 @@ static int pg_st_prepare_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
 	PGresult *   result;
 	int          status = -1;
 	seg_t *      currseg;
-	bool         oldprepare = DBDPG_TRUE;
 	ph_t *       currph;
 	long         power_of_ten;
 
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_st_prepare_statement\n", THEADER_slow);
-
-#if PGLIBVERSION >= 80000
-	oldprepare = DBDPG_FALSE;
-#endif
 
 	Renew(imp_sth->prepare_name, 25, char); /* freed in dbd_st_destroy */
 
@@ -2327,20 +2269,11 @@ static int pg_st_prepare_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
 			imp_dbh->prepare_number);
 
 	if (TRACE5_slow)
-		TRC(DBILOGFP, "%sNew statement name (%s), oldprepare is %d\n",
-			THEADER_slow, imp_sth->prepare_name, oldprepare);
-
-	/* PQprepare was not added until 8.0 */
+		TRC(DBILOGFP, "%sNew statement name (%s)\n",
+			THEADER_slow, imp_sth->prepare_name);
 
 	execsize = imp_sth->totalsize;
-	if (oldprepare)
-		execsize += strlen("PREPARE  AS ") + strlen(imp_sth->prepare_name); /* Two spaces! */
-
 	if (imp_sth->numphs!=0) {
-		if (oldprepare) {
-			execsize += strlen("()");
-			execsize += imp_sth->numphs-1; /* for the commas */
-		}
 		for (currseg=imp_sth->seg; NULL != currseg; currseg=currseg->nextseg) {
 			if (0==currseg->placeholder)
 				continue;
@@ -2353,37 +2286,13 @@ static int pg_st_prepare_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
 			if (placeholder_digits >= 7)
 				croak("Too many placeholders!");
 			execsize += placeholder_digits+1;
-			if (oldprepare) {
-				/* The parameter type, only once per number please */
-				if (!currseg->ph->referenced)
-					execsize += strlen(currseg->ph->bind_type->type_name);
-				currseg->ph->referenced = DBDPG_TRUE;
-			}
 		}
 	}
 
 	New(0, statement, execsize+1, char); /* freed below */
 
-	if (oldprepare) {
-		sprintf(statement, "PREPARE %s", imp_sth->prepare_name);
-		if (imp_sth->numphs!=0) {
-			strcat(statement, "(");
-			for (x=0, currseg=imp_sth->seg; NULL != currseg; currseg=currseg->nextseg) {
-				if (currseg->placeholder && currseg->ph->referenced) {
-					if (x!=0)
-						strcat(statement, ",");
-					strcat(statement, currseg->ph->bind_type->type_name);
-					x=1;
-					currseg->ph->referenced = DBDPG_FALSE;
-				}
-			}
-			strcat(statement, ")");
-		}
-		strcat(statement, " AS ");
-	}
-	else {
-		statement[0] = '\0';
-	}
+	statement[0] = '\0';
+
 	/* Construct the statement, with proper placeholders */
 	for (currseg=imp_sth->seg; NULL != currseg; currseg=currseg->nextseg) {
 		if (currseg->segment != NULL)
@@ -2398,33 +2307,29 @@ static int pg_st_prepare_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
 	if (TRACE6_slow)
 		TRC(DBILOGFP, "%sPrepared statement (%s)\n", THEADER_slow, statement);
 
-	if (oldprepare) {
-		status = _result(aTHX_ imp_dbh, statement);
-	}
-	else {
-		int params = 0;
-		if (imp_sth->numbound!=0) {
-			params = imp_sth->numphs;
-			if (NULL == imp_sth->PQoids) {
-				Newz(0, imp_sth->PQoids, (unsigned int)imp_sth->numphs, Oid);
-			}
-			for (x=0,currph=imp_sth->ph; NULL != currph; currph=currph->nextph) {
-				imp_sth->PQoids[x++] = (currph->defaultval) ? 0 : (Oid)currph->bind_type->type_id;
-			}
+	int params = 0;
+	if (imp_sth->numbound!=0) {
+		params = imp_sth->numphs;
+		if (NULL == imp_sth->PQoids) {
+			Newz(0, imp_sth->PQoids, (unsigned int)imp_sth->numphs, Oid);
 		}
-		if (TSQL)
-			TRC(DBILOGFP, "PREPARE %s AS %s;\n\n", imp_sth->prepare_name, statement);
+		for (x=0,currph=imp_sth->ph; NULL != currph; currph=currph->nextph) {
+			imp_sth->PQoids[x++] = (currph->defaultval) ? 0 : (Oid)currph->bind_type->type_id;
+		}
+	}
+	if (TSQL)
+		TRC(DBILOGFP, "PREPARE %s AS %s;\n\n", imp_sth->prepare_name, statement);
 
-		TRACE_PQPREPARE;
-		result = PQprepare(imp_dbh->conn, imp_sth->prepare_name, statement, params, imp_sth->PQoids);
-		status = _sqlstate(aTHX_ imp_dbh, result);
-		if (result) {
-			TRACE_PQCLEAR;
-			PQclear(result);
-		}
-		if (TRACE6_slow)
-			TRC(DBILOGFP, "%sUsing PQprepare: %s\n", THEADER_slow, statement);
+	TRACE_PQPREPARE;
+	result = PQprepare(imp_dbh->conn, imp_sth->prepare_name, statement, params, imp_sth->PQoids);
+	status = _sqlstate(aTHX_ imp_dbh, result);
+	if (result) {
+		TRACE_PQCLEAR;
+		PQclear(result);
 	}
+	if (TRACE6_slow)
+		TRC(DBILOGFP, "%sUsing PQprepare: %s\n", THEADER_slow, statement);
+
 	Safefree(statement);
 	if (PGRES_COMMAND_OK != status) {
 		TRACE_PQERRORMESSAGE;
@@ -2517,8 +2422,8 @@ int dbd_bind_ph (SV * sth, imp_sth_t * imp_sth, SV * ph_name, SV * newvalue, IV 
 	}
 	/* dbi handle allowed for cursor variables */
 	if (SvROK(newvalue) &&!IS_DBI_HANDLE(newvalue)) {
-		if (strnEQ("DBD::Pg::DefaultValue", neatsvpv(newvalue,0), 21)
-			|| strnEQ("DBI::DefaultValue", neatsvpv(newvalue,0), 17)) {
+		if (sv_isa(newvalue, "DBD::Pg::DefaultValue")
+			|| sv_isa(newvalue, "DBI::DefaultValue")) {
 			/* This is a special type */
 			Safefree(currph->value);
 			currph->value = NULL;
@@ -2526,7 +2431,7 @@ int dbd_bind_ph (SV * sth, imp_sth_t * imp_sth, SV * ph_name, SV * newvalue, IV 
 			currph->isdefault = DBDPG_TRUE;
 			imp_sth->has_default = DBDPG_TRUE;
 		}
-		else if (strnEQ("DBD::Pg::Current", neatsvpv(newvalue,0), 16)) {
+		else if (sv_isa(newvalue, "DBD::Pg::Current")) {
 			/* This is a special type */
 			Safefree(currph->value);
 			currph->value = NULL;
@@ -2836,7 +2741,7 @@ static SV * pg_destringify_array(pTHX_ imp_dbh_t *imp_dbh, unsigned char * input
 	int    closing_braces = 0;
 
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_destringify_array (string: %s quotechar: %c)\n",
-					THEADER_slow, input, coltype->array_delimeter);
+					THEADER_slow, input, coltype->array_delimiter);
 
 	/*
 	  Note: we don't do careful balance checking here, as this is coming straight from 
@@ -2871,7 +2776,7 @@ static SV * pg_destringify_array(pTHX_ imp_dbh_t *imp_dbh, unsigned char * input
 		if (in_quote) {
 			if ('"' == *input) {
 				in_quote = 0;
-				/* String will be stored by following delim or brace */
+				/* String will be stored by following delimiter or brace */
 				input++;
 				continue;
 			}
@@ -2886,7 +2791,7 @@ static SV * pg_destringify_array(pTHX_ imp_dbh_t *imp_dbh, unsigned char * input
 			av_push(currentav, newRV_noinc((SV*)newav));
 			currentav = newav;
 		}
-		else if (coltype->array_delimeter == *input) {
+		else if (coltype->array_delimiter == *input) {
 		}
 		else if ('}' == *input) {
 		}
@@ -2897,7 +2802,7 @@ static SV * pg_destringify_array(pTHX_ imp_dbh_t *imp_dbh, unsigned char * input
 			string[section_size++] = *input;
 		}
 
-		if ('}' == *input || (coltype->array_delimeter == *input && '}' != *(input-1))) {
+		if ('}' == *input || (coltype->array_delimiter == *input && '}' != *(input-1))) {
 			string[section_size] = '\0';
 			if (0 == section_size && !seen_quotes) {
 				/* Just an empty array */
@@ -3320,7 +3225,6 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 	   4. pg_direct is true
 	   5. There are no placeholders
 	   6. pg_server_prepare is false
-	   7. pg_server_prepare is 2, but all placeholders are not bound
 	*/
 	if (!imp_sth->is_dml
 		|| imp_sth->has_default
@@ -3328,7 +3232,6 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 		|| imp_sth->direct
 		|| !imp_sth->numphs
 		|| !imp_sth->server_prepare
-		|| (2==imp_sth->server_prepare && imp_sth->numbound != imp_sth->numphs)
 		)
 		pqtype = PQTYPE_EXEC;
 	else if (0==imp_sth->switch_prepared || imp_sth->number_iterations < imp_sth->switch_prepared) {
@@ -3341,12 +3244,8 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 	/* We use the new server_side prepare style if:
 	   1. The statement is DML (DDL is not preparable)
 	   2. The attribute "pg_direct" is false
-	   3. The attribute "pg_server_prepare" is not 0
-	   4. The "onetime" attribute has not been set
-	   5. There are no DEFAULT or CURRENT values
-	   6a. The attribute "pg_server_prepare" is 1
-	   OR
-	   6b. All placeholders are bound (and "pg_server_prepare" is 2)
+	   3. The attribute "pg_server_prepare" is true
+	   4. There are no DEFAULT or CURRENT values
 	*/
 	execsize = imp_sth->totalsize; /* Total of all segments */
 
@@ -4445,9 +4344,6 @@ int pg_db_savepoint (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
 
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_savepoint (name: %s)\n", THEADER_slow, savepoint);
 
-	if (imp_dbh->pg_server_version < 80000)
-		croak("Savepoints are only supported on server version 8.0 or higher");
-
 	/* no action if AutoCommit = on or the connection is invalid */
 	if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
 		if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_savepoint (0)\n", THEADER_slow);
@@ -4494,9 +4390,6 @@ int pg_db_rollback_to (SV * dbh, imp_dbh_t * imp_dbh, const char *savepoint)
 
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_rollback_to (name: %s)\n", THEADER_slow, savepoint);
 
-	if (imp_dbh->pg_server_version < 80000)
-		croak("Savepoints are only supported on server version 8.0 or higher");
-
 	/* no action if AutoCommit = on or the connection is invalid */
 	if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
 		if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_to (0)\n", THEADER_slow);
@@ -4530,9 +4423,6 @@ int pg_db_release (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
 	char * action;
 
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_release (name: %s)\n", THEADER_slow, savepoint);
-
-	if (imp_dbh->pg_server_version < 80000)
-		croak("Savepoints are only supported on server version 8.0 or higher");
 
 	/* no action if AutoCommit = on or the connection is invalid */
 	if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
@@ -5464,7 +5354,7 @@ SV* dbd_st_canonical_names(SV *sth, imp_sth_t *imp_sth)
 			int pos = PQftablecol(imp_sth->result, fields);
 			if(pos > 0){
 				char statement[200];
-				snprintf(statement, sizeof(statement),
+				sprintf(statement, 
 					"SELECT n.nspname, c.relname, a.attname FROM pg_class c LEFT JOIN pg_namespace n ON c.relnamespace = n.oid LEFT JOIN pg_attribute a ON a.attrelid = c.oid WHERE c.oid = %d AND a.attnum = %d", oid, pos);
 				TRACE_PQEXEC;
 				result = PQexec(imp_dbh->conn, statement);

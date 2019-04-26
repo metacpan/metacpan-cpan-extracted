@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Clone qw(clone);
 use Test::More;
 
 my $pkg;
@@ -23,6 +24,8 @@ my $data = {
 	XX => "here we go", # unknown key, should be ignored
 };
 
+my $data2 = clone($data);
+
 $exporter->add($data);
 my $ris = <<EOF;
 TY  - BOOK\r
@@ -33,6 +36,8 @@ TI  - Mastering Perl\r
 ER  - \r
 EOF
 
-is $ris, $file, "RIS format ok";
+is $file, $ris, "RIS format ok";
+
+is_deeply ($data, $data2, "exporter is idempotent");
 
 done_testing;

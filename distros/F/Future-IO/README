@@ -71,6 +71,23 @@ METHODS
     Note specifically this may perform only a single sysread() call, and
     thus is not guaranteed to actually return the full length.
 
+ sysread_exactly
+
+       $f = Future::IO->sysread_exactly( $fh, $length )
+          $bytes = $f->get
+
+    Since version 0.03.
+
+    Returns a Future that will become done when exactly the given number of
+    bytes have been read from the given filehandle. It returns exactly
+    $length bytes. On EOF, the returned future will yield an empty list (or
+    undef in scalar context), even if fewer bytes have already been
+    obtained. These bytes will be lost. On any error (other than EAGAIN /
+    EWOULDBLOCK which are ignored), the future fails with a suitable error
+    message.
+
+    This may make more than one syssread() call.
+
  override_impl
 
        Future::IO->override_impl( $impl )

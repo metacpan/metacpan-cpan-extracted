@@ -39,18 +39,14 @@ use Carp                      ();
 use List::Util 1.33           ();
 use PPI::Util                 '_Document';
 use PPI::Document::Normalized ();
+use PPI::Normal::Standard     ();
+use PPI::Singletons           '%LAYER';
 
-use vars qw{$VERSION %LAYER};
-BEGIN {
-	$VERSION = '1.236';
+our $VERSION = '1.252'; # VERSION
 
-	# Registered function store
-	%LAYER = (
-		1 => [],
-		2 => [],
-	);
-}
-
+# With the registration mechanism in place, load in the main set of
+# normalization methods to initialize the store.
+PPI::Normal::Standard->import;
 
 
 
@@ -101,10 +97,6 @@ sub register {
 
 	1;
 }
-
-# With the registration mechanism in place, load in the main set of
-# normalization methods to initialize the store.
-use PPI::Normal::Standard;
 
 
 
@@ -197,7 +189,7 @@ sub process {
 	# Create the normalized Document object
 	my $Normalized = PPI::Document::Normalized->new(
 		Document  => $self->{Document},
-		version   => $VERSION,
+		version   => __PACKAGE__->VERSION,
 		functions => \@functions,
 	) or return undef;
 

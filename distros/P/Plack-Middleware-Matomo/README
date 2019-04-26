@@ -5,6 +5,8 @@ NAME
 
 SYNOPSIS
 
+        # in your bin/app.pl
+    
         builder {
             enable "Plack::Middleware::Matomo",
                 id_site => "my-service",
@@ -16,6 +18,9 @@ SYNOPSIS
                 ;
             $app;
         }
+    
+        # start your plack application with Twiggy as webserver
+        $ plackup --server Twiggy bin/app.pl
 
 CONFIGURATION
 
@@ -59,5 +64,5 @@ LICENSE
 
 SEE ALSO
 
-    Plack::Middleware, Plack::Builder
+    Plack::Middleware, Plack::Builder, Twiggy
 

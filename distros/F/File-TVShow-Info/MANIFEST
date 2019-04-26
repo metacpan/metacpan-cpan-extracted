@@ -1,0 +1,28 @@
+Changes
+lib/File/TVShow/EpisodeName.pm
+lib/File/TVShow/Info.pm
+lib/File/TVShow/Networks.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-bydate.t
+t/02-byseason.t
+t/03-byseason-showname_year.t
+t/04-rippers.t
+t/05-resolution.t
+t/06-subtitle.t
+t/07-get_attr_by_name.t
+t/08-country_support.t
+t/09-return_ints.t
+t/10-strip_name.t
+t/11-strip_episode_name.t
+t/111-TestRoutine.pl
+t/12-network.t
+t/13-clean_show_name.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

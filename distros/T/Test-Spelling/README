@@ -29,16 +29,16 @@ DESCRIPTION
     installing your module really do not need to run such tests, as it is
     unlikely that the documentation will acquire typos while in transit. :-)
 
-    You can add your own stopwords, which are words that should be ignored
+    You can add your own stop words, which are words that should be ignored
     by the spell check, like so:
 
         add_stopwords(qw(asdf thiswordiscorrect));
 
-    Adding stopwards in this fashion affects all files checked for the
+    Adding stop words in this fashion affects all files checked for the
     remainder of the test script. See Pod::Spell (which this module is built
-    upon) for a variety of ways to add per-file stopwords to each .pm file.
+    upon) for a variety of ways to add per-file stop words to each .pm file.
 
-    If you have a lot of stopwords, it's useful to put them in your test
+    If you have a lot of stop words, it's useful to put them in your test
     file's "DATA" section like so:
 
         use Test::Spelling;
@@ -75,16 +75,16 @@ FUNCTIONS
     Returns true if every POD file has correct spelling, or false if any of
     them fail. This function will show any spelling errors as diagnostics.
 
-  pod_file_spelling_ok( FILENAME[, TESTNAME ] )
+  pod_file_spelling_ok( $filename[, $testname ] )
     "pod_file_spelling_ok" will test that the given POD file has no spelling
     errors.
 
     When it fails, "pod_file_spelling_ok" will show any spelling errors as
     diagnostics.
 
-    The optional second argument TESTNAME is the name of the test. If it is
-    omitted, "pod_file_spelling_ok" chooses a default test name "POD
-    spelling for FILENAME".
+    The optional second argument is the name of the test. If it is omitted,
+    "pod_file_spelling_ok" chooses a default test name "POD spelling for
+    $filename".
 
   all_pod_files( [@dirs] )
     Returns a list of all the Perl files in each directory and its
@@ -119,6 +119,9 @@ FUNCTIONS
     this to skip tests if there is no spellchecker. Note that
     "all_pod_files_spelling_ok" will do this for you.
 
+    A full list of spellcheckers which this method might test can be found
+    in the source of the "spellchecker_candidates" method.
+
   set_spell_cmd($command)
     If you want to force this module to use a particular spellchecker, then
     you can specify which one with "set_spell_cmd". This is useful to ensure
@@ -139,6 +142,13 @@ FUNCTIONS
             return 1;
         });
 
+  set_pod_parser($object)
+    By default Pod::Spell is used to generate text suitable for
+    spellchecking from the input POD. If you want to use a different parser,
+    perhaps a customized subclass of Pod::Spell, call "set_pod_parser" with
+    an object that is-a Pod::Parser. Be sure to create a fresh parser object
+    for each file (don't use this with "all_pod_files_spelling_ok").
+
 SEE ALSO
     Pod::Spell
 
@@ -148,7 +158,7 @@ ORIGINAL AUTHOR
     Heavily based on Test::Pod by Andy Lester and brian d foy.
 
 MAINTAINER
-    Shawn M Moore "<sartak@bestpractical.com>"
+    Shawn M Moore "<code@sartak.org>"
 
 COPYRIGHT
     Copyright 2005, Ivan Tubert-Brohman, All Rights Reserved.

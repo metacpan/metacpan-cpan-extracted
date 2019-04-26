@@ -99,7 +99,7 @@ this has not been confirmed):
         use lib '/var/www/MyApp/lib';
         use MyApp;
     </Perl>
-    
+
     <Location />
         SetHandler          modperl
         PerlResponseHandler MyApp

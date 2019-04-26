@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 # shortcuts
 #  os and distros
@@ -13,6 +13,7 @@ use constant os_openbsd  => (os => 'openbsd');
 use constant os_windows  => (os => 'MSWin32');
 use constant os_darwin   => (os => 'darwin'); # really means installer=homebrew
 use constant like_debian => (linuxdistro => '~debian');
+use constant before_ubuntu_trusty  => (linuxdistrocodename => [qw(squeeze precise wheezy)]);
 use constant before_debian_stretch => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial)]);
 use constant before_ubuntu_bionic  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
 use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic)]);
@@ -351,7 +352,7 @@ sub mapping {
        [package => 'krb5']],
      ],
 
-     [cpanmod => 'Authen::SASL::Cyrus',
+     [cpanmod => ['Authen::SASL::Cyrus', 'Authen::SASL::XS'],
       [os_freebsd,
        [package => 'cyrus-sasl']],
       [like_debian,
@@ -488,6 +489,8 @@ sub mapping {
 
      [cpanmod => 'Chipcard::PCSC',
       # XXX what about freebsd?
+      [os_freebsd,
+       [package => 'pcsc-lite']],
       [like_debian,
        [package => ['bzip2', 'libpcsclite-dev', 'pkg-config | pkgconf']]]], # bzip2 needed for extraction
 
@@ -933,6 +936,16 @@ sub mapping {
       [os_darwin,
        [package => 'ldns']]],
 
+     [cpanmod => 'DNS::Unbound',
+     #[cpandist => qr{^DNS-Unbound-\d},
+      [os_freebsd,
+       [package => 'unbound']], # build problems: port's pkg-config file references ssl & crypto, but these are already in base system
+      [like_debian,
+       [package => 'libunbound-dev']],
+      [like_fedora,
+       [package => 'unbound-devel']],
+     ],
+
      [cpanmod => 'DVD::Read',
       [os_freebsd,
        [package => 'libdvdread']],
@@ -961,7 +974,7 @@ sub mapping {
        [package => 'erlang-dev']],
      ],
 
-     [cpanmod => 'EV::ADNS',
+     [cpanmod => ['EV::ADNS', 'Net::ADNS'],
       [os_freebsd,
        [package => 'adns']],
       [like_debian,
@@ -1177,7 +1190,7 @@ sub mapping {
      [cpanmod => 'GitDDL::Migrator',
       # XXX freebsd?
       [like_debian,
-       [package => 'mysql-server-5.5'], # possible alternative: mariadb-server-10.0; mysql-server-core-5.5 is not enough as resolveip is usually required
+       [package => ['mysql-server-5.7 | mysql-server-5.5']], # possible alternative: mariadb-server-10.0; mysql-server-core-5.5 is not enough as resolveip is usually required
       ]],
 
      [cpanmod => 'Git::Raw',
@@ -1340,7 +1353,7 @@ sub mapping {
       [like_debian,
        [package => 'libplot-dev']]],
 
-     [cpanmod => 'Graphics::PLplot',
+     [cpanmod => ['Graphics::PLplot', 'PDL::Graphics::PLplot'],
       [os_freebsd,
        [package => 'plplot']],
       [like_debian,
@@ -1616,7 +1629,18 @@ sub mapping {
        [package => 'libpuzzle-devel']],
      ],
 
-     [cpanmod => 'Image::LibRSVG',
+     [cpanmod => 'Image::LibRaw',
+      [os_freebsd,
+       [package => 'libraw']],
+      [like_debian,
+       [before_ubuntu_trusty, # not available in debian/wheezy
+	[package => []]],
+       [package => 'libraw-dev']],
+      [os_darwin,
+       [package => 'libraw']],
+     ],
+
+     [cpanmod => ['Image::LibRSVG', 'Gnome2::Rsvg'],
       [os_freebsd,
        [package => 'librsvg2']],
       [like_debian,
@@ -2523,6 +2547,15 @@ sub mapping {
       [like_debian,
        [package => 'libnetcdf-dev']]],
 
+     [cpanmod => 'PDL::Opt::QP',
+      [os_freebsd,
+       [package => 'blas']],
+      [like_debian,
+       [package => 'libblas-dev']],
+      [like_fedora,
+       [package => 'blas-static']],
+     ],
+
      [cpanmod => 'PerlQt',
       [like_debian,
        [linuxdistrocodename => 'squeeze',
@@ -2544,6 +2577,11 @@ sub mapping {
        [package => 'ispell']]],
 
      [cpanmod => 'Pod::Weaver::Plugin::Ditaa',
+      [like_fedora,
+       [linuxdistro => 'centos', # no ditaa for centos6 or 7
+	[package => []]],
+       # fallthrough for fedora
+      ],
       [package => 'ditaa']],
 
      [cpanmod => 'POE::Component::NomadJukebox',
@@ -2690,9 +2728,12 @@ sub mapping {
      ],
 
      [cpanmod => 'SGML::Parser::OpenSP',
-      # XXX what about freebsd?
+      # XXX freebsd has textproc/opensp, but the module requires g++, so this will fail on clang++ systems
       [like_debian,
-       [package => 'libosp-dev']]],
+       [package => 'libosp-dev']],
+      [like_fedora,
+       [package => 'opensp-devel']],
+     ],
 
      ## version mismatch
      #[cpanmod => 'SNMP',
@@ -2904,6 +2945,10 @@ sub mapping {
        [package => 'libkakasi2-dev']],
       [os_darwin,
        [package => 'kakasi']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	package => []], # N/A for centos6+7
+       [package => ['kakasi-devel', 'kakasi-dict']]],
      ],
 
      [cpanmod => 'Text::Migemo',
@@ -2911,6 +2956,15 @@ sub mapping {
        [package => 'ja-migemo']],
       [like_debian,
        [package => 'libmigemo-dev']]],
+
+     [cpanmod => 'Text::QRCode',
+      [os_freebsd,
+       [package => 'libqrencode']],
+      [like_debian,
+       [package => 'libqrencode-dev']],
+      [like_fedora,
+       [package => 'qrencode-devel']],
+     ],
 
      [cpanmod => 'Text::VimColor',
       [package => 'vim']],
@@ -2959,7 +3013,7 @@ sub mapping {
 
      [cpanmod => 'UAV::Pilot::SDL',
       [like_debian,
-       [package => ['libavcodec-dev', 'libswscale-dev']]],
+       [package => ['libavcodec-dev', 'libswscale-dev', 'libsdl1.2-dev']]],
      ],
 
      [cpanmod => 'UAV::Pilot::Video::Ffmpeg',

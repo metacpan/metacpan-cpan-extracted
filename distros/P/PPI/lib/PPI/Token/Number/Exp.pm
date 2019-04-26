@@ -31,11 +31,9 @@ represent floating point numbers with exponential notation.
 use strict;
 use PPI::Token::Number::Float ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.236';
-	@ISA     = 'PPI::Token::Number::Float';
-}
+our $VERSION = '1.252'; # VERSION
+
+our @ISA = "PPI::Token::Number::Float";
 
 =pod
 
@@ -52,6 +50,10 @@ sub literal {
 	my $neg = $mantissa =~ s/^\-//;
 	$mantissa =~ s/^\./0./;
 	$exponent =~ s/^\+//;
+
+	# Must cast exponent as numeric type, due to string type '00' exponent
+	# creating false positive condition in for() loop below, causing infinite loop
+	$exponent += 0;
 
 	# This algorithm is reasonably close to the S_mulexp10()
 	# algorithm from the Perl source code, so it should arrive

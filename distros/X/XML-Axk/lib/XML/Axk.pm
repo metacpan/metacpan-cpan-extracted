@@ -5,20 +5,12 @@ use strict;
 use warnings;
 use XML::Axk::Base;
 
-our $VERSION = '0.001008';
+our $VERSION = '0.001009';
+our $AUTHORITY = 'cpan:CXW';
 
-#use parent 'Exporter';
-#our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-#BEGIN {
-#    @EXPORT = qw();
-#    @EXPORT_OK = qw();
-#    %EXPORT_TAGS = (
-#        default => [@EXPORT],
-#        all => [@EXPORT, @EXPORT_OK]
-#    );
-#}
-
+1;
 # Docs {{{1
+__END__
 
 =head1 NAME
 
@@ -32,7 +24,4 @@ embedded usage in other Perl scripts.
 =cut
 
 # }}}1
-
-1;
-__END__
 # vi: set fdm=marker: #

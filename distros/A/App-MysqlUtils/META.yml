@@ -34,8 +34,7 @@ requires:
   List::MoreUtils: '0'
   Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.816'
-  Perinci::CmdLine::Classic: '1.770'
+  Perinci::CmdLine::Lite: '1.816'
   Perinci::Object: '0.310'
   Perinci::Sub::DepChecker: '0'
   Sah::Schema::dirname: '0'
@@ -51,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils
   homepage: https://metacpan.org/release/App-MysqlUtils
   repository: git://github.com/perlancar/perl-App-MysqlUtils.git
-version: '0.017'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -171,7 +170,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -236,9 +235,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
-      class: Dist::Zilla::Plugin::OurPkgVersion
-      name: '@Author::PERLANCAR/OurPkgVersion'
-      version: '0.15'
+      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
+      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:

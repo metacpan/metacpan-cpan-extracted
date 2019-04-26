@@ -1,5 +1,13 @@
 Revision history for Unix-PID-Tiny
 
+0.94 Wed Apr 24 16:56:09 2019
+    - declare Test::Warn, File::Slurp, File::Temp dependencies
+    - fix off-by-one test plan error
+
+0.93 Wed Apr 24 14:39:03 2019
+    - declare File::Slurp dependency (thanks xantronix!)
+    - Clarify the role of `check_proc_open_fds`
+
 0.92 Thu Apr 18 15:02:03 2019
     - thanks to xantronix for both all of these features (and some nice fixups to the tests):
         - add support for persistent PID files; allow traversing /proc/$pid/fd

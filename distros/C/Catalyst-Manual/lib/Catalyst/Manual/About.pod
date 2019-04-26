@@ -185,7 +185,7 @@ L<AxKit>, which is designed for use with XML running under mod_perl;
 L<Maypole>--upon which Catalyst was originally based--designed for the
 easy development of powerful web databases; L<Jifty>, which does a great
 deal of automation in helping to set up web sites with many complex
-features; and Ruby on Rails (see L<http://www.rubyonrails.org>), written
+features; and Ruby on Rails (see L<https://rubyonrails.org>), written
 of course in Ruby and among the most popular web development systems. It
 is not the purpose of this document to criticize or even briefly
 evaluate these other frameworks; they may be useful for you and if so we

@@ -1,5 +1,9 @@
 Revision history for Test::PDL
 
+0.14      2019-04-26
+
+ - fix for RT ticket #122194: Tests fail with PDL 2.018 (Ed J)
+
 0.13      2016-11-22
 
  - fix for RT ticket #118529: t/deep.t fails (Edward Baudrez)

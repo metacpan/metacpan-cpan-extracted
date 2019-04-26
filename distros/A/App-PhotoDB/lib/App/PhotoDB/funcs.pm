@@ -25,8 +25,9 @@ use Term::ReadLine;
 use Term::ReadLine::Perl;
 use File::Basename;
 use Time::Piece;
+use Text::TabularDisplay;
 
-our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci multiplechoice search);
+our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci multiplechoice search tabulate);
 
 =head2 prompt
 
@@ -1034,7 +1035,12 @@ sub call {
 	my $procedure = $href->{procedure};
 	my $args = $href->{args};
 
-	my $arglist = join(',', @$args);
+	my $arglist;
+	if (defined $args) {
+		$arglist = join(',', @$args);
+	} else {
+		$arglist = '';
+	}
 	my $query = "call $procedure($arglist)";
 	my $sth = $db->prepare($query);
 	my $rows = $sth->execute();
@@ -1091,36 +1097,6 @@ sub lookuplist {
 		push(@list, $row[0]);
 	}
 	return \@list;
-}
-
-=head2 updatedata
-
-Update data using a bare SQL C<UPDATE> statement. Avoid using this if possible,
-as it is dangerous. Use C<&updaterecord> instead.
-=head4 Usage
-
-    my $rows = &updatedata($db, $sql);
-
-=head4 Arguments
-
-=item * C<$db> DB handle
-
-=item * C<$query> Plain SQL UPDATE query to execute
-
-=head4 Returns
-
-The number of rows updated
-
-=cut
-
-sub updatedata {
-	my $href = shift;
-	my $db = $href->{db};		   # DB handle
-	my $query = $href->{query};	# Plain SQL query
-	my $sth = $db->prepare($query) or die "Couldn't prepare statement: " . $db->errstr;
-	my $rows = $sth->execute();
-	$rows = &unsci($rows);
-	return $rows;
 }
 
 # Return today's date according to the DB
@@ -2173,6 +2149,50 @@ sub search {
 		print "Selected $id\n";
 	}
 	return;
+}
+
+=head2 unsci
+
+Display multi-column SQL views as tabulated data.
+
+=head4 Usage
+
+    &tabulate({db=>$db, view=$view});
+
+=head4 Arguments
+
+=item * C<$db> database handle
+
+=item * C<$view> name of SQL view to print
+
+=head4 Returns
+
+Number of rows displayed
+
+=cut
+
+sub tabulate {
+	my $href = shift;
+	my $db = $href->{db};
+	my $view = $href->{view};
+
+	# Use SQL::Abstract
+	my $sql = SQL::Abstract->new;
+	my($stmt, @bind) = $sql->select($view);
+
+	my $sth = $db->prepare($stmt);
+	my $rows = $sth->execute(@bind);
+	my $cols = $sth->{'NAME'};
+	my @array;
+	my $table = Text::TabularDisplay->new(@$cols);
+	while (my @row = $sth->fetchrow) {
+		$table->add(@row);
+	}
+
+	#	print "$choices[$action]{'desc'}\n";
+	print $table->render;
+	print "\n";
+	return $rows;
 }
 
 # This ensures the lib loads smoothly

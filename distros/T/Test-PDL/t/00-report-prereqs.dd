@@ -45,7 +45,6 @@ do { my $x = {
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
                                    'Test::NoWarnings' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.006'
                                  }
                  }

@@ -1,0 +1,14 @@
+=head1 NAME
+
+XML::Axk::Bundle - namespace for plugin bundles
+
+=head1 SYNOPSIS
+
+Axk can be extended with bundles.  A bundle may implement a new backend
+or language, for example.  For ease of installation, bundles should be
+distributed as CPAN distributions under the C<XML::Axk::Bundle::> namespace.
+For example, a new language might be C<XML::Axk::Bundle::LangFoo>.
+
+Names in the C<Bundle> namespace are first-come, first-served.  Authors are
+requested to name language bundles starting with C<L> and backend bundles
+starting with C<B>, but other than that, have fun!

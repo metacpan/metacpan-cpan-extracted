@@ -1,4 +1,4 @@
-# Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -22,6 +22,8 @@ use File::Find;
 use File::Path;
 
 use Devel::Cover::Dumper;  # For debugging
+
+use constant CAN_TERM_SIZE => eval { require Term::Size };
 
 my $DB = "cover.14";  # Version of the database
 
@@ -264,21 +266,16 @@ sub merge {
     _merge_hash($self->{runs},      $from->{runs});
     _merge_hash($self->{collected}, $from->{collected});
 
-    return $self;  # TODO - what's going on here?
+    # TODO - determine whether, when the database gets big, it's quicker to
+    # merge into what's already there.  Instead of the previous two lines we
+    # would have these:
 
-    # When the database gets big, it's quicker to merge into what's
-    # already there
-
-    _merge_hash($from->{runs},      $self->{runs});
-    _merge_hash($from->{collected}, $self->{collected});
-
-    for (keys %$self) {
-        $from->{$_} = $self->{$_} unless $_ eq "runs" || $_ eq "collected";
-    }
-
-    # print STDERR "Giving ", Dumper($from);
-
-    $_[0] = $from;
+    # _merge_hash($from->{runs},      $self->{runs});
+    # _merge_hash($from->{collected}, $self->{collected});
+    # for (keys %$self) {
+        # $from->{$_} = $self->{$_} unless $_ eq "runs" || $_ eq "collected";
+    # }
+    # $_[0] = $from;
 }
 
 sub _merge_hash {
@@ -407,8 +404,14 @@ sub print_summary {
             : "n/a"
     };
 
-    my $fw = 77 - $n * 7;
-    $fw = 28 if $fw < 28;
+    my $s     = $self->{summary};
+    my @files = (grep($_ ne "Total", sort keys %$s), "Total");
+    my $max   = 5; for (@files) { $max = length if length > $max }
+    my $width = !$ENV{DEVEL_COVER_TEST_SUITE} && CAN_TERM_SIZE && -t STDOUT
+        ? (Term::Size::chars(\*STDOUT))[0]
+        : 80;
+    my $fw    = $width - $n * 7 - 3;
+    $fw       = $max if $max < $fw;
 
     no warnings "uninitialized";
     my $fmt = "%-${fw}s" . " %6s" x $n . "\n";
@@ -419,8 +422,7 @@ sub print_summary {
                  (0 .. $#{$self->{all_criteria}});
     printf $fmt, "-" x $fw, ("------") x $n;
 
-    my $s = $self->{summary};
-    for my $file (grep($_ ne "Total", sort keys %$s), "Total") {
+    for my $file (@files) {
         printf $fmt,
                trimmed_file($file, $fw),
                map { $format->($s->{$file}, $_) }
@@ -926,7 +928,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -1012,7 +1014,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

@@ -1,3 +1,12 @@
+NAME
+
+    Test::Reporter::Transport::Socket - Simple socket transport for
+    Test::Reporter
+
+VERSION
+
+    version 0.34
+
 SYNOPSIS
 
         my $report = Test::Reporter->new(
@@ -74,4 +83,16 @@ AUTHORS
       Chris Williams (BINGOS)
     
       This module inlines Config::Perl::V Copyright (C) 2009-2010 H.Merijn Brand
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by David A. Golden, Richard Dawe,
+    Chris Williams and H.Merijn Brand.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

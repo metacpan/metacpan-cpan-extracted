@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "AAAA::Mail::SpamAssassin" => 0,
     "Benchmark::Perl::Formance" => 0,
     "Benchmark::Perl::Formance::Cargo" => 0,
-    "Benchmark::Perl::Formance::Plugin::Mandelbrot" => 0,
     "Benchmark::Perl::Formance::Plugin::PerlStone2015" => 0,
     "BenchmarkAnything::Reporter" => 0,
     "Class::Accessor" => 0,
@@ -68,7 +67,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,7 +78,6 @@ my %FallbackPrereqs = (
   "AAAA::Mail::SpamAssassin" => 0,
   "Benchmark::Perl::Formance" => 0,
   "Benchmark::Perl::Formance::Cargo" => 0,
-  "Benchmark::Perl::Formance::Plugin::Mandelbrot" => 0,
   "Benchmark::Perl::Formance::Plugin::PerlStone2015" => 0,
   "BenchmarkAnything::Reporter" => 0,
   "Class::Accessor" => 0,

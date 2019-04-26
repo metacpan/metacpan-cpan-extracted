@@ -13,7 +13,7 @@ share {
     meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
     plugin Download => (
-        url     => 'https://dist.libuv.org/dist/v1.27.0',
+        url     => 'https://dist.libuv.org/dist/v1.28.0',
         version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
     );
 

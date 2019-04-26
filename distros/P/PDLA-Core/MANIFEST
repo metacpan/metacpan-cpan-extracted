@@ -32,9 +32,6 @@ Basic/Core/pdlthread.h
 Basic/Core/ppport.h
 Basic/Core/typemap
 Basic/Core/typemap.pdl
-Basic/Gen/Inline/MakePdlappInstallable.pm
-Basic/Gen/Inline/Makefile.PL
-Basic/Gen/Inline/Pdlapp.pm
 Basic/Gen/Makefile.PL
 Basic/Gen/PP.pm
 Basic/Gen/PP/CType.pm
@@ -161,12 +158,6 @@ Example/Benchmark/Bench.xs
 Example/Benchmark/Makefile.PL
 Example/Benchmark/README
 Example/Benchmark/time.pl
-Example/InlinePdlapp/Module/Makefile.PL
-Example/InlinePdlapp/Module/MyInlineMod.pm
-Example/InlinePdlapp/Module/t/myinlinemod.t
-Example/InlinePdlapp/inlpp.pl
-Example/InlinePdlapp/inlpp_link.pl
-Example/InlinePdlapp/inlppminimal.pl
 INSTALL
 INTERNATIONALIZATION
 IO/FITS/FITS.pm
@@ -269,9 +260,7 @@ t/hist.t
 t/howbig.t
 t/ica.t
 t/imagergb.t
-t/inline-comment-test.t
 t/inline-with.t
-t/inlinepdlpp.t
 t/interpol.t
 t/lgamma.t
 t/limits_normalize_dsets.t

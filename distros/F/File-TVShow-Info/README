@@ -1,0 +1,51 @@
+File-TVShow-Info
+
+This module is a reworking of Video::Filename. This module will work with TV
+Shows only and does not support identifying movies.
+
+It has enhanced support for identifying Episode names and other attributes.
+
+Note: Unlike Video::Filename Season and Episode are stored as strings. If you
+need these values as integers, please call the {attr}_to_int functions or
+manually cast the output.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::TVShow::Info
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-TVShow-Info
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-TVShow-Info
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/File-TVShow-Info
+
+    Search CPAN
+        https://metacpan.org/release/File-TVShow-Info
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2019 Adam Spann
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

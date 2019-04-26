@@ -1,7 +1,7 @@
 package Tie::Hash::MinPerfHashTwoLevel::OnDisk;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 our $DEFAULT_VARIANT = 1;
 
 # this also installs the XS routines we use into our namespace.

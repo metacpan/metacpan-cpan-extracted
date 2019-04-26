@@ -3,7 +3,7 @@ package Acme::CPANAuthors::Japanese;
 use strict;
 use warnings;
 
-our $VERSION = '0.190126';
+our $VERSION = '0.190426';
 
 use Acme::CPANAuthors::Register (
     ABUI      => 'DAISUKE ABUI',
@@ -211,6 +211,7 @@ use Acme::CPANAuthors::Register (
     KIMURA    => 'Takeshi Kimura',
     KINSAN    => 'Hitoshi Yokozawa',
     KIRIRIMOD => 'Yuichi Kiri',
+    KIRYUANZU => 'Fujiike Kyoka',
     KISEKI    => 'keita iseki',
     KITAK     => 'Keisuke Kita',
     KITAMAKI  => 'ryo kitamaki',
@@ -318,6 +319,7 @@ use Acme::CPANAuthors::Register (
     MORIYA    => 'Moriya Masaki',
     MOSA      => 'Yusuke Enomoto',
     MOTEMEN   => 'motemen',
+    MOTI      => 'Motohiko Abe',
     MOZNION   => 'Taiki Kawakami',
     MRMT      => 'Jun Morimoto',
     MSASASAKI => 'Masafumi Sasaki',
@@ -336,6 +338,7 @@ use Acme::CPANAuthors::Register (
     NAGATA    => 'Ichito Nagata',
     NAHCNUJ   => 'Junichi Hayashi',
     NAITO     => 'Naoyuki Ito',
+    NAKASHIN  => 'Shinji Nakamura',
     NAKAYAMA  => 'Yasuhiro Nakayama',
     NANTO     => 'nanto_vi (TOYAMA Nao)',
     NANZOU    => 'Takaaki Mizuno',
@@ -379,6 +382,7 @@ use Acme::CPANAuthors::Register (
     OKAWARI   => 'okawara ayato',
     OKAZUDM   => 'Kazuma Okada',
     OKLAHOMER => 'Go Hagiwara',
+    OMOHAYUI  => 'Yui Takeuchi',
     ONISHI    => 'Yasuhiro Onishi',
     OPPARA    => 'oppara',
     OSDAKIRA  => 'Akira Osada',
@@ -630,6 +634,7 @@ use Acme::CPANAuthors::Register (
     YTAKEUCH  => 'TAKEUCHI, Yoji',
     YTURTLE   => 'Satoshi Azuma',
     YUKI      => 'Yuki ANAI',
+    YUKINEA   => 'Yuki Nakagawa',
     YUKINOBU  => 'NAGAYASU Yukinobu',
     YUKIO     => 'Yukio Suzuki',
     YUMATSUMO => 'yuya matsumoto',

@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.017 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2019-04-23.
+    This document describes version 0.018 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2019-04-26.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -341,6 +341,11 @@ FUNCTIONS
     This function supports dry-run operation.
 
     Arguments ('*' denotes required arguments):
+
+    *   count => *bool*
+
+        Instead of returning the CSV rows, just return the count of rows
+        that get filled.
 
     *   database* => *str*
 

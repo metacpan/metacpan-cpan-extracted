@@ -1,5 +1,8 @@
 Revision history for Net-Hacky-Detect-IP
 
+0.024   24/04/2019 08:28
+        Added in arp -a for both windows and other
+
 0.023   08/05/2017 14:11
         A few optimisations for which commands are executed, likely RELEASE
 

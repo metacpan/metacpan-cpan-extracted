@@ -38,13 +38,13 @@ A Moose-ified version of the context class should look like this:
         $c->log->info( 'done!' );
     }
 
-You should also be aware that roles in C<< $c-E<gt>setup >> are applied
+You should also be aware that roles in C<< $c->setup >> are applied
 after the last plugin with all the benefits of using a single
 L<with()|Moose/"with (@roles)"> statement in an ordinary L<Moose> class.
 
 Your class is automatically made immutable at the end of the current file.
 
-CAVEAT: Using roles in C<< $c-E<gt>setup >> was implemented in Catalyst
+CAVEAT: Using roles in C<< $c->setup >> was implemented in Catalyst
 version 5.80004. In prior versions you might get away with
 
     after 'setup_plugins' => sub{ with(
@@ -58,14 +58,14 @@ version 5.80004. In prior versions you might get away with
 but this is discouraged and you should upgrade to 5.80004 anyway,
 because it fixes a few important regressions against 5.71
 
-CAVEAT: Using roles in C<< $c-E<gt>setup >> will not currently allow
+CAVEAT: Using roles in C<< $c->setup >> will not currently allow
 you to pass parameters to roles, or perform conflict resolution.
 Conflict detection still works as expected.
 
 =head2 ACCESSORS
 
-Most of the request-specific attributes like C<$c-E<gt>stash>,
-C<$c-E<gt>request> and C<$c-E<gt>response> have been converted to
+Most of the request-specific attributes like C<< $c->stash >>,
+C<< $c->request >> and C<< $c->response >> have been converted to
 L<Moose> attributes but without type constraints, attribute helpers or
 builder methods. This ensures that Catalyst 5.8 is fully backwards
 compatible to applications using the published API of Catalyst 5.7 but
@@ -73,7 +73,7 @@ slightly limits the gains that could be had by wielding the full power
 of L<Moose> attributes.
 
 Most of the accessors to information gathered during compile time (such
-as configuration) are managed by C<Catalyst::ClassData>, which is a 
+as configuration) are managed by L<Catalyst::ClassData>, which is a
 L<Moose>-aware version of L<Class::Data::Inheritable> but not compatible
 with L<MooseX::ClassAttribute>.
 
@@ -115,7 +115,7 @@ the actions themselves are declared:
       use namespace::autoclean;
 
       BEGIN { extends 'Catalyst::Controller'; }
-      
+
 =head2 Controller Roles
 
 It is possible to use roles to apply method modifiers on controller actions
@@ -126,8 +126,8 @@ themselves. For example
     use Moose;
     use namespace::autoclean;
     BEGIN { extends 'Catalyst::Controller' };
-    
-    sub foo : Local { 
+
+    sub foo : Local {
         my ($self, $c) = @_;
         $c->res->body('Hello ');
     }
@@ -135,24 +135,24 @@ themselves. For example
         my ($self, $c) = @_;
         $c->res->body($c->res->body . 'World');
     };
-    
+
 It is possible to have action methods with attributes inside Moose roles, using
 L<MooseX::MethodAttributes>, example:
 
     package MyApp::ControllerRole;
     use MooseX::MethodAttributes::Role;
     use namespace::autoclean;
-    
+
     sub foo : Local {
         my ($self, $c) = @_;
         ...
     }
-    
+
     package MyApp::Controller::Foo;
     use Moose;
     use namespace::autoclean;
     BEGIN { extends 'Catalyst::Controller' };
-    
+
     with 'MyApp::ControllerRole';
 
 =head1 AUTHORS

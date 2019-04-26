@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -145,11 +145,14 @@ sub set {
     # Load the current file to turn a partial set into a complete
     # set
     my %item = (
-        %{ $self->_parse_content( $path->slurp ) },
+        -f $path ? %{ $self->_parse_content( $path->slurp ) } : (),
         %$params,
     );
     my $content = $self->_deparse_content( \%item );
     #; say "Set to $path:\n$content";
+    if ( !-d $path->dirname ) {
+        $path->dirname->make_path;
+    }
     $path->spurt( $content );
     return 1;
 }
@@ -302,7 +305,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -354,6 +357,12 @@ L<Yancy>, L<Statocles>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

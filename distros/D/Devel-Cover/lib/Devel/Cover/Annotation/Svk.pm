@@ -1,4 +1,4 @@
-# Copyright 2005-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2005-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Annotation::Svk;
 use strict;
 use warnings;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 use Getopt::Long;
 use Digest::MD5;
@@ -34,7 +34,7 @@ sub new {
     bless $self, $class;
 
     open my $c, "-|", "svk info"
-        or warn "cover: Not a svk checkout: $!\n", return;
+        or warn("cover: Not a svk checkout: $!\n"), return;
     while (<$c>) {
         chomp;
         next unless s/^Depot Path: //;
@@ -43,13 +43,13 @@ sub new {
     }
 
     open $c, "-|", "svk ls -Rf $self->{depotbase}"
-        or warn "cover: Can't run svk ls: $!\n", return;
+        or warn("cover: Can't run svk ls: $!\n"), return;
     while (<$c>) {
         chomp;
         s|^\Q$self->{depotbase}\E/||;
         next unless -f $_;
 
-        open my $f, $_ or warn "cover: Can't open $_: $!\n", next;
+        open my $f, $_ or warn("cover: Can't open $_: $!\n"), next;
         $self->{md5map}{md5_fh($f)} = $_;
     }
 
@@ -65,14 +65,14 @@ sub get_annotations {
 
     print "cover: Getting svk annotation information for $file\n";
 
-    open my $fh, $file or warn "cover: Can't open file $file: $!\n", return;
+    open my $fh, $file or warn("cover: Can't open file $file: $!\n"), return;
     my $realfile = $self->{md5map}{md5_fh($fh)}
-        or warn "cover: $file is not under svk control\n", return;
+        or warn("cover: $file is not under svk control\n"), return;
 
     my $command = $self->{command};
     $command =~ s/\[\[file\]\]/$realfile/g;
     open my $c, "-|", $command
-        or warn "cover: Can't run $command: $!\n", return;
+        or warn("cover: Can't run $command: $!\n"), return;
     <$c>; <$c>;  # ignore first two lines
     while (<$c>) {
         my @a = /(\d+)\s*\(\s*(\S+)\s*(.*?)\):/;
@@ -144,7 +144,7 @@ Devel::Cover::Annotation::Svk - Annotate with svk information
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2005-2018, Paul Johnson (paul@pjcj.net)
+Copyright 2005-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

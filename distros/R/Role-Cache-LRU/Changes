@@ -1,5 +1,8 @@
 Revision history for Role-Cache-LRU
 
+0.04  2019-04-25 20:59:06 +08
+        - Fix incorrect synopsis usage
+
 0.03  2019-03-13 00:57:36 +08
         - Update module description
 

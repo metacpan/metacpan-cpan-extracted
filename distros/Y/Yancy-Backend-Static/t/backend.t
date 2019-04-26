@@ -95,6 +95,22 @@ is_deeply $item,
     },
     'set item is correct';
 
+my %contact_page = (
+    path => 'contact',
+    title => 'Contact',
+    markdown => qq{# Contact Me\n},
+);
+
+$success = $be->set( pages => 'contact', \%contact_page );
+ok $success, 'create set was successful';
+$item = $be->get( pages => 'contact' );
+is_deeply $item,
+    {
+        %contact_page,
+        html => qq{<h1>Contact Me</h1>\n},
+    },
+    'set item is correct';
+
 $success = $be->delete( pages => 'about' );
 ok $success, 'delete was successful';
 ok !-f $temp->child( "about.markdown" ), 'file is deleted';

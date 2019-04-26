@@ -33,14 +33,13 @@ lib/Catalyst/Manual/Tutorial/09_AdvancedCRUD/09_FormFu.pod
 lib/Catalyst/Manual/Tutorial/09_AdvancedCRUD/09_FormHandler.pod
 lib/Catalyst/Manual/Tutorial/10_Appendices.pod
 lib/Catalyst/Manual/WritingPlugins.pod
-maint/bump-version
-maint/Makefile.include
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
 README
 t/01-use.t
-t/author/pod-coverage.t
-t/author/pod.t
+xt/author/pod-coverage.t
+xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE                                  LICENSE file (added by Distar)

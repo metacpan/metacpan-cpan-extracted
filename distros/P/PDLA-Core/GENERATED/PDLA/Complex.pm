@@ -45,11 +45,11 @@ PDLA::Complex - handle complex numbers
 
 This module features a growing number of functions manipulating complex
 numbers. These are usually represented as a pair C<[ real imag ]> or
-C<[ angle phase ]>. If not explicitly mentioned, the functions can work
+C<[ magnitude phase ]>. If not explicitly mentioned, the functions can work
 inplace (not yet implemented!!!) and require rectangular form.
 
 While there is a procedural interface available (C<< $x/$y*$c <=> Cmul
-(Cdiv $x, $y), $c) >>), you can also opt to cast your pdl's into the
+(Cdiv ($x, $y), $c) >>), you can also opt to cast your pdl's into the
 C<PDLA::Complex> datatype, which works just like your normal piddles, but
 with all the normal perl operators overloaded.
 
@@ -173,6 +173,47 @@ An ASCII version of this plot looks like this:
  -15 ++-----+------+------+------+------+------+-----###-----+------+-----++
      0      5      10     15     20     25     30     35     40     45     50
 
+
+=head1 OPERATORS
+
+The following operators are overloaded:
+
+=over 4
+
+=item +, += (addition)
+
+=item -, -= (subtraction)
+
+=item *, *= (multiplication; L<Cmul|/Cmul>)
+
+=item /, /= (division; L<Cdiv|/Cdiv>)
+
+=item **, **= (exponentiation; L<Cpow|/Cpow>)
+
+=item atan2 (4-quadrant arc tangent)
+
+=item <=> (nonsensical comparison operator; L<Ccmp|/Ccmp>)
+
+=item sin (L<Csin|/Csin>)
+
+=item cos (L<Ccos|/Ccos>)
+
+=item exp (L<Cexp|/Cexp>)
+
+=item abs (L<Cabs|/Cabs>)
+
+=item log (L<Clog|/Clog>)
+
+=item sqrt (L<Csqrt|/Csqrt>)
+
+=item <, <=, ==, !=, >=, > (just as nonsensical as L<Ccmp|/Ccmp>)
+
+=item ++, -- (increment, decrement; they affect the real part of the complex number only)
+
+=item "" (stringification)
+
+=back
+
 =cut
 
 my $i;
@@ -194,26 +235,48 @@ sub i () { $i->copy };
 
 
 
-=head2 cplx real-valued-pdl
+=head2 cplx
 
-Cast a real-valued piddle to the complex datatype. The first dimension of
-the piddle must be of size 2. After this the usual (complex) arithmetic
-operators are applied to this pdl, rather than the normal elementwise pdl
-operators.  Dataflow to the complex parent works. Use C<sever> on the result
-if you don't want this.
+=for ref
 
+Cast a real-valued piddle to the complex datatype.
 
-=head2 complex real-valued-pdl
+The first dimension of the piddle must be of size 2. After this the
+usual (complex) arithmetic operators are applied to this pdl, rather
+than the normal elementwise pdl operators.  Dataflow to the complex
+parent works. Use C<sever> on the result if you don't want this.
+
+=for usage
+
+ cplx($real_valued_pdl)
+
+=head2 complex
+
+=for ref
 
 Cast a real-valued piddle to the complex datatype I<without> dataflow
-and I<inplace>. Achieved by merely reblessing a piddle. The first dimension of
-the piddle must be of size 2.
+and I<inplace>.
 
-=head2 real cplx-valued-pdl
+Achieved by merely reblessing a piddle. The first dimension of the
+piddle must be of size 2.
 
-Cast a complex valued pdl back to the "normal" pdl datatype. Afterwards
-the normal elementwise pdl operators are used in operations. Dataflow
-to the real parent works. Use C<sever> on the result if you don't want this.
+=for usage
+
+ complex($real_valued_pdl)
+
+=head2 real
+
+=for ref
+
+Cast a complex valued pdl back to the "normal" pdl datatype.
+
+Afterwards the normal elementwise pdl operators are used in
+operations. Dataflow to the real parent works. Use C<sever> on the
+result if you don't want this.
+
+=for usage
+
+ real($cplx_valued_pdl)
 
 =cut
 
@@ -502,7 +565,9 @@ BEGIN {*Cdiv = \&PDLA::Complex::Cdiv;
 
 =for ref
 
-Complex comparison oeprator (spaceship). It orders by real first, then by imaginary. Hm, but it is mathematical nonsense! Complex numbers cannot be ordered.
+Complex comparison operator (spaceship).
+
+Ccmp orders by real first, then by imaginary. Hm, but it is mathematical nonsense! Complex numbers cannot be ordered.
 
 =for bad
 
@@ -711,9 +776,15 @@ BEGIN {*Ccos = \&PDLA::Complex::Ccos;
 
 
 
-=head2 Ctan a [not inplace]
+=head2 Ctan
+
+=for ref
+
+Complex tangent
 
   tan (a) = -i * (exp (a*i) - exp (-a*i)) / (exp (a*i) + exp (-a*i))
+
+Does not work inplace.
 
 =cut
 
@@ -732,7 +803,7 @@ sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
 
 =for ref
 
-exp (a) = exp (real (a)) * (cos (imag (a)) + i * sin (imag (a))). Works inplace
+  exp (a) = exp (real (a)) * (cos (imag (a)) + i * sin (imag (a))). Works inplace
 
 =for bad
 
@@ -761,7 +832,7 @@ BEGIN {*Cexp = \&PDLA::Complex::Cexp;
 
 =for ref
 
-log (a) = log (cabs (a)) + i * carg (a). Works inplace
+  log (a) = log (cabs (a)) + i * carg (a). Works inplace
 
 =for bad
 
@@ -897,9 +968,13 @@ BEGIN {*Cacos = \&PDLA::Complex::Cacos;
 
 
 
-=head2 Catan cplx [not inplace]
+=head2 Catan
+
+=for ref
 
 Return the complex C<atan()>.
+
+Does not work inplace.
 
 =cut
 
@@ -1148,11 +1223,12 @@ BEGIN {*Croots = \&PDLA::Complex::Croots;
 
 
 
-=head2 re cplx, im cplx
+=head2 re, im
 
-Return the real or imaginary part of the complex number(s) given. These
-are slicing operators, so data flow works. The real and imaginary parts
-are returned as piddles (ref eq PDLA).
+Return the real or imaginary part of the complex number(s) given.
+
+These are slicing operators, so data flow works. The real and
+imaginary parts are returned as piddles (ref eq PDLA).
 
 =cut
 
@@ -1188,6 +1264,14 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub rCpolynomial {
+    my $coeffs = shift;
+    my $x = shift;
+    my $out = $x->copy;
+    _rCpolynomial_int($coeffs,$x,$out);
+    return PDLA::complex($out);
+    }
+
 
 BEGIN {*rCpolynomial = \&PDLA::Complex::rCpolynomial;
 }
@@ -1198,18 +1282,35 @@ BEGIN {*rCpolynomial = \&PDLA::Complex::rCpolynomial;
 
 # overload must be here, so that all the functions can be seen
 
-# undocumented compatibility functions
-sub Catan2($$) { Catan Cdiv $_[1], $_[0] }
-sub atan2($$)  { Catan Cdiv $_[1], $_[0] }
+# undocumented compatibility functions (thanks to Luis Mochan!)
+sub Catan2($$) { Clog( $_[1] + i*$_[0])/i }
+sub atan2($$) { Clog( $_[1] + i*$_[0])/i }
+
+
+=begin comment
+
+In _gen_biop, the '+' or '-' between the operator (e.g., '*') and the
+function that it overloads (e.g., 'Cmul') flags whether the operation
+is ('+') or is not ('-') commutative. See the discussion of argument
+swapping in the section "Calling Conventions and Magic Autogeneration"
+in "perldoc overload".
+
+This is a great example of taking almost as many lines to write cute
+generating code as it would take to just clearly and explicitly write
+down the overload.
+
+=end comment
+
+=cut
 
 sub _gen_biop {
    local $_ = shift;
    my $sub;
-   if (/(\S+)\+(\w+)/) {
+   if (/(\S+)\+(\w+)/) { #commutes
       $sub = eval 'sub { '.$2.' $_[0], ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1] }';
-   } elsif (/(\S+)\-(\w+)/) {
+   } elsif (/(\S+)\-(\w+)/) { #does not commute
       $sub = eval 'sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                       $_[2] ? '.$2.' $y, $_[0] : '.$2.' $_[0], $y }';
+                       $_[2] ? '.$2.' $y, $_[0] : '.$2.' $_[0], $y }'; #need to swap?
    } else {
       die;
    }
@@ -1223,10 +1324,10 @@ sub _gen_unop {
    ($op, eval 'sub { '.$func.' $_[0] }');
 }
 
-sub _gen_cpop {
-   ($_[0], eval 'sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                 ($_[2] ? $y <=> $_[0] : $_[0] <=> $y) '.$_[0].' 0 }');
-}
+#sub _gen_cpop {
+#   ($_[0], eval 'sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+#                 ($_[2] ? $y <=> $_[0] : $_[0] <=> $y) '.$_[0].' 0 }');
+#}
 
 sub initialize {
    # Bless a null PDLA into the supplied 1st arg package
@@ -1236,8 +1337,21 @@ sub initialize {
 
 use overload
    (map _gen_biop($_), qw(++Cadd --Csub *+Cmul /-Cdiv **-Cpow atan2-Catan2 <=>-Ccmp)),
-   (map _gen_unop($_), qw(sin@Csin cos@Ccos exp@Cexp abs@Cabs log@Clog sqrt@Csqrt abs@Cabs)),
-   (map _gen_cpop($_), qw(< <= == != >= >)),
+   (map _gen_unop($_), qw(sin@Csin cos@Ccos exp@Cexp abs@Cabs log@Clog sqrt@Csqrt)),
+#   (map _gen_cpop($_), qw(< <= == != >= >)), #segfaults with infinite recursion of the operator.
+#final ternary used to make result a scalar, not a PDLA:::Complex (thx CED!)
+    "<" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+		 PDLA::lt( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
+    "<=" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+                 PDLA::le( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
+    "==" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+                 PDLA::eq( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
+    "!=" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+                 PDLA::ne( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
+    ">=" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+                 PDLA::ge( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
+    ">" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
+                 PDLA::gt( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
    '++' => sub { $_[0] += 1 },
    '--' => sub { $_[0] -= 1 },
    '""' => \&PDLA::Complex::string
@@ -1342,16 +1456,29 @@ sub cd(;@) {
    }
 
 
-    sub sum {
-       my($x) = @_;
-       my $tmp = $x->mv(0,1)->clump(0,2)->mv(1,0)->sumover;
-       return $tmp->squeeze;
-    }
+   sub sum {
+      my($x) = @_;
+      return $x if $x->dims==1;
+      my $tmp = $x->mv(0,-1)->clump(-2)->mv(1,0)->sumover;
+      return $tmp;
+   }
 
    sub sumover{
       my $m = shift;
       PDLA::Ufunc::sumover($m->xchg(0,1));
    }
+
+   *PDLA::Complex::Csumover=\&sumover; # define through alias
+
+   *PDLA::Complex::prodover=\&Cprodover; # define through alias
+
+   sub prod {
+      my($x) = @_;
+      return $x if $x->dims==1;
+      my $tmp = $x->mv(0,-1)->clump(-2)->mv(1,0)->prodover;
+      return $tmp;
+   }
+
 
 
    sub strND {

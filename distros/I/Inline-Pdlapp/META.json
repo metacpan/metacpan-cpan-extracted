@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Inline-Pdlapp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.34",
+            "Inline" : "0.68",
+            "Inline::C" : "0.62",
+            "PDLA::Core" : "2.019104"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/pdla-inline-pdlapp/issues"
+      },
+      "homepage" : "http://pdlporters.github.io",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/pdla-inline-pdlapp",
+         "web" : "https://github.com/PDLPorters/pdla-inline-pdlapp"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "2.019105",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

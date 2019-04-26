@@ -8,7 +8,7 @@ use XML::Axk::Core;
 # Semantic versioning, packed per Perl rules.  Must always be at least one
 # digit left of the decimal, and six digits right of the decimal.  For
 # prerelease versions, put an underscore before the last three digits.
-our $VERSION = '0.001008';
+our $VERSION = '0.001009';
 
 use Getopt::Long qw(GetOptionsFromArray :config gnu_getopt);
 

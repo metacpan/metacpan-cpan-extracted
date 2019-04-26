@@ -1,26 +1,26 @@
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT;
+SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS;
+SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION;
+SET NAMES utf8;
+SET @OLD_TIME_ZONE=@@TIME_ZONE;
+SET TIME_ZONE='+00:00';
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO';
+SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0;
 DROP TABLE IF EXISTS `ACCESSORY_TYPE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ACCESSORY_TYPE` (
   `accessory_type_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this type of accessory',
   `accessory_type` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Type of accessory',
   PRIMARY KEY (`accessory_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog types of photographic accessory';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `ACCESSORY`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ACCESSORY` (
   `accessory_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this accessory',
   `accessory_type_id` int(11) DEFAULT NULL COMMENT 'ID of this type of accessory',
@@ -34,28 +34,28 @@ CREATE TABLE `ACCESSORY` (
   KEY `fk_ACCESSORY_1_idx` (`accessory_type_id`),
   CONSTRAINT `fk_ACCESSORY_1` FOREIGN KEY (`accessory_type_id`) REFERENCES `ACCESSORY_TYPE` (`accessory_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog accessories that are not tracked in more specific tables';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `PERSON`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `PERSON` (
   `person_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for the person',
   `name` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of the photographer',
   PRIMARY KEY (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog photographers';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `ARCHIVE_TYPE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ARCHIVE_TYPE` (
   `archive_type_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of archive type',
   `archive_type` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of this type of archive',
   PRIMARY KEY (`archive_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list the different types of archive available for materials';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `CONDITION`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `CONDITION` (
   `condition_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique condition ID',
   `code` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Condition shortcode (e.g. EXC)',
@@ -65,10 +65,10 @@ CREATE TABLE `CONDITION` (
   `description` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Longer description of condition',
   PRIMARY KEY (`condition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list of physical condition descriptions that can be used to evaluate equipment';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `LOG`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `LOG` (
   `log_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the log entry',
   `datetime` datetime DEFAULT NULL COMMENT 'Timestamp for the log entry',
@@ -76,10 +76,10 @@ CREATE TABLE `LOG` (
   `message` varchar(450) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Log message',
   PRIMARY KEY (`log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to store data modification logs';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `BATTERY`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `BATTERY` (
   `battery_type` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique battery ID',
   `battery_name` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Common name of the battery',
@@ -88,10 +88,10 @@ CREATE TABLE `BATTERY` (
   `other_names` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Alternative names for this kind of battery',
   PRIMARY KEY (`battery_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog of types of battery';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `PROCESS`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `PROCESS` (
   `process_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID of this development process',
   `name` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of this developmenmt process (e.g. C-41, E-6)',
@@ -99,10 +99,10 @@ CREATE TABLE `PROCESS` (
   `positive` tinyint(1) DEFAULT NULL COMMENT 'Whether this is a positive/reversal process',
   PRIMARY KEY (`process_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog chemical processes that can be used to develop film and paper';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `MANUFACTURER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `MANUFACTURER` (
   `manufacturer_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the manufacturer',
   `manufacturer` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of the manufacturer',
@@ -114,19 +114,19 @@ CREATE TABLE `MANUFACTURER` (
   PRIMARY KEY (`manufacturer_id`),
   UNIQUE KEY `manufacturer_UNIQUE` (`manufacturer`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog manufacturers of equipment and consumables';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `EXPOSURE_PROGRAM`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `EXPOSURE_PROGRAM` (
   `exposure_program_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID of exposure program as defined by EXIF tag ExposureProgram',
   `exposure_program` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of exposure program as defined by EXIF tag ExposureProgram',
   PRIMARY KEY (`exposure_program_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Exposure programs as defined by EXIF tag ExposureProgram';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `EXHIBITION`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `EXHIBITION` (
   `exhibition_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this exhibition',
   `title` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Title of the exhibition',
@@ -135,46 +135,46 @@ CREATE TABLE `EXHIBITION` (
   `end_date` date DEFAULT NULL COMMENT 'End date of the exhibition',
   PRIMARY KEY (`exhibition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to record exhibition events';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FOCUS_TYPE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FOCUS_TYPE` (
   `focus_type_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of focus type',
   `focus_type` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of focus type',
   PRIMARY KEY (`focus_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog different focusing methods';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `METERING_MODE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `METERING_MODE` (
   `metering_mode_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID of metering mode as defined by EXIF tag MeteringMode',
   `metering_mode` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of metering mode as defined by EXIF tag MeteringMode',
   PRIMARY KEY (`metering_mode_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Metering modes as defined by EXIF tag MeteringMode';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `SHUTTER_SPEED`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `SHUTTER_SPEED` (
   `shutter_speed` varchar(10) CHARACTER SET latin1 NOT NULL COMMENT 'Shutter speed in fractional notation, e.g. 1/250',
   `duration` decimal(7,5) DEFAULT NULL COMMENT 'Shutter speed in decimal notation, e.g. 0.04',
   PRIMARY KEY (`shutter_speed`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table to list all possible shutter speeds';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `SHUTTER_TYPE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `SHUTTER_TYPE` (
   `shutter_type_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the shutter type',
   `shutter_type` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of the shutter type (e.g. Focal plane, Leaf, etc)',
   PRIMARY KEY (`shutter_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog the different types of camera shutter';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `PAPER_STOCK`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `PAPER_STOCK` (
   `paper_stock_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this paper stock',
   `name` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of this paper stock',
@@ -187,49 +187,49 @@ CREATE TABLE `PAPER_STOCK` (
   KEY `fk_PAPER_STOCK_1` (`manufacturer_id`),
   CONSTRAINT `fk_PAPER_STOCK_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog different paper stocks available';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `METERING_TYPE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `METERING_TYPE` (
   `metering_type_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the metering type',
   `metering` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of the metering type (e.g. Selenium)',
   PRIMARY KEY (`metering_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog different metering technologies and cell types';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FORMAT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FORMAT` (
   `format_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this format',
   `format` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'The name of this film/sensor format',
   `digital` tinyint(1) DEFAULT NULL COMMENT 'Whether this is a digital format',
   PRIMARY KEY (`format_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalogue different film formats. These are distinct from negative sizes.';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FLASH_PROTOCOL`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FLASH_PROTOCOL` (
   `flash_protocol_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this flash protocol',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'ID of the manufacturer that introduced this flash protocol',
   `name` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of the flash protocol',
   PRIMARY KEY (`flash_protocol_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog different protocols used to communicate with flashes';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FILTER_ADAPTER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FILTER_ADAPTER` (
   `filter_adapter_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of filter adapter',
   `camera_thread` decimal(3,1) DEFAULT NULL COMMENT 'Diameter of camera-facing screw thread in mm',
   `filter_thread` decimal(3,1) DEFAULT NULL COMMENT 'Diameter of filter-facing screw thread in mm',
   PRIMARY KEY (`filter_adapter_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalogue filter adapter rings';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FILTER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FILTER` (
   `filter_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique filter ID',
   `thread` decimal(4,1) DEFAULT NULL COMMENT 'Diameter of screw thread in mm',
@@ -241,10 +241,10 @@ CREATE TABLE `FILTER` (
   KEY `fk_FILTER_1_idx` (`manufacturer_id`),
   CONSTRAINT `fk_FILTER_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog filters';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `ARCHIVE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ARCHIVE` (
   `archive_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this archive',
   `archive_type_id` int(11) DEFAULT NULL COMMENT 'ID of this type of archive',
@@ -258,10 +258,10 @@ CREATE TABLE `ARCHIVE` (
   KEY `fk_ARCHIVE_3_idx` (`archive_type_id`),
   CONSTRAINT `fk_ARCHIVE_3` FOREIGN KEY (`archive_type_id`) REFERENCES `ARCHIVE_TYPE` (`archive_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list all archives that exist for storing physical media';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `LIGHT_METER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `LIGHT_METER` (
   `light_meter_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this light meter',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'Denotes ID of manufacturer of the light meter',
@@ -281,19 +281,19 @@ CREATE TABLE `LIGHT_METER` (
   CONSTRAINT `fk_LIGHT_METER_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_LIGHT_METER_2` FOREIGN KEY (`metering_type`) REFERENCES `METERING_TYPE` (`metering_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog light meters';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `BODY_TYPE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `BODY_TYPE` (
   `body_type_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique body type ID',
   `body_type` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of camera body type (e.g. SLR, compact, etc)',
   PRIMARY KEY (`body_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog types of camera body style';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `NEGATIVE_SIZE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `NEGATIVE_SIZE` (
   `negative_size_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of negative size',
   `width` decimal(4,1) DEFAULT NULL COMMENT 'Width of the negative size in mm',
@@ -304,10 +304,10 @@ CREATE TABLE `NEGATIVE_SIZE` (
   `aspect_ratio` decimal(4,2) DEFAULT NULL COMMENT 'Aspect ratio of this negative size, expressed as a single decimal. (e.g. 3:2 is expressed as 1.5)',
   PRIMARY KEY (`negative_size_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog different negative sizes available. Negtives sizes are distinct from film formats.';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `MOUNT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `MOUNT` (
   `mount_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this lens mount',
   `mount` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of this lens mount (e.g. Canon FD)',
@@ -322,10 +322,10 @@ CREATE TABLE `MOUNT` (
   KEY `fk_MOUNT_1_idx` (`manufacturer_id`),
   CONSTRAINT `fk_MOUNT_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog different lens mount standards. This is mostly used for camera lens mounts, but can also be used for enlarger and projector lenses.';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FILMSTOCK`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FILMSTOCK` (
   `filmstock_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the filmstock',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'ID of the manufacturer of the film',
@@ -340,10 +340,10 @@ CREATE TABLE `FILMSTOCK` (
   CONSTRAINT `fk_FILMSTOCK_1` FOREIGN KEY (`process_id`) REFERENCES `PROCESS` (`process_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_manufacturer_id` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list different brands of film stock';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `DEVELOPER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `DEVELOPER` (
   `developer_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique developer ID',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'Denotes the manufacturer ID',
@@ -353,10 +353,10 @@ CREATE TABLE `DEVELOPER` (
   `chemistry` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'The key chemistry on which this developer is based (e.g. phenidone)',
   PRIMARY KEY (`developer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list film and paper developers';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `MOUNT_ADAPTER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `MOUNT_ADAPTER` (
   `mount_adapter_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of lens mount adapter',
   `lens_mount` int(11) DEFAULT NULL COMMENT 'ID of the mount used between the adapter and the lens',
@@ -370,10 +370,10 @@ CREATE TABLE `MOUNT_ADAPTER` (
   CONSTRAINT `fk_MOUNT_ADAPTER_1` FOREIGN KEY (`lens_mount`) REFERENCES `MOUNT` (`mount_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_MOUNT_ADAPTER_2` FOREIGN KEY (`camera_mount`) REFERENCES `MOUNT` (`mount_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog adapters to mount lenses on other cameras';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FILM_BULK`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FILM_BULK` (
   `film_bulk_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this bulk roll of film',
   `format_id` int(11) DEFAULT NULL COMMENT 'ID of the format of this bulk roll',
@@ -389,10 +389,10 @@ CREATE TABLE `FILM_BULK` (
   CONSTRAINT `fk_FILM_BULK_1` FOREIGN KEY (`format_id`) REFERENCES `FORMAT` (`format_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_FILM_BULK_2` FOREIGN KEY (`filmstock_id`) REFERENCES `FILMSTOCK` (`filmstock_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to record bulk film stock, from which individual films can be cut';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `TELECONVERTER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `TELECONVERTER` (
   `teleconverter_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this teleconverter',
   `mount_id` int(11) DEFAULT NULL COMMENT 'ID of the lens mount used by this teleconverter',
@@ -408,10 +408,10 @@ CREATE TABLE `TELECONVERTER` (
   CONSTRAINT `fk_TELECONVERTER_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_TELECONVERTER_2` FOREIGN KEY (`mount_id`) REFERENCES `MOUNT` (`mount_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog teleconverters (multipliers)';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `TONER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `TONER` (
   `toner_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the toner',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'ID of the manufacturer of the toner',
@@ -420,10 +420,10 @@ CREATE TABLE `TONER` (
   `stock_dilution` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Stock dilution of the toner',
   PRIMARY KEY (`toner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog paper toners that can be used during the printing process';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `ENLARGER`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ENLARGER` (
   `enlarger_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique enlarger ID',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'Manufacturer ID of the enlarger',
@@ -441,10 +441,10 @@ CREATE TABLE `ENLARGER` (
   CONSTRAINT `fk_ENLARGER_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `MANUFACTURER` (`manufacturer_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_ENLARGER_2` FOREIGN KEY (`negative_size_id`) REFERENCES `NEGATIVE_SIZE` (`negative_size_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list enlargers';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FLASH`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FLASH` (
   `flash_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of external flash unit',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'Manufacturer ID of the flash',
@@ -474,10 +474,10 @@ CREATE TABLE `FLASH` (
   CONSTRAINT `fk_FLASH_1` FOREIGN KEY (`flash_protocol_id`) REFERENCES `FLASH_PROTOCOL` (`flash_protocol_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_FLASH_2` FOREIGN KEY (`battery_type_id`) REFERENCES `BATTERY` (`battery_type`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catlog flashes, flashguns and speedlights';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `PROJECTOR`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `PROJECTOR` (
   `projector_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this projector',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'ID of the manufacturer of this projector',
@@ -494,10 +494,10 @@ CREATE TABLE `PROJECTOR` (
   CONSTRAINT `fk_PROJECTOR_2` FOREIGN KEY (`mount_id`) REFERENCES `MOUNT` (`mount_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_PROJECTOR_3` FOREIGN KEY (`negative_size_id`) REFERENCES `NEGATIVE_SIZE` (`negative_size_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog projectors (still and movie)';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `LENS`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `LENS` (
   `lens_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this lens',
   `mount_id` int(11) DEFAULT NULL COMMENT 'Denotes the ID of the lens mount, if this is an interchangeable lens',
@@ -553,10 +553,10 @@ CREATE TABLE `LENS` (
   CONSTRAINT `fk_LENS_3` FOREIGN KEY (`mount_id`) REFERENCES `MOUNT` (`mount_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_LENS_4` FOREIGN KEY (`negative_size_id`) REFERENCES `NEGATIVE_SIZE` (`negative_size_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog lenses';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `CAMERA`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `CAMERA` (
   `camera_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Auto-incremented camera ID',
   `manufacturer_id` int(11) DEFAULT NULL COMMENT 'Denotes the manufacturer of the camera.',
@@ -647,10 +647,10 @@ CREATE TABLE `CAMERA` (
   CONSTRAINT `fk_negative_size` FOREIGN KEY (`negative_size_id`) REFERENCES `NEGATIVE_SIZE` (`negative_size_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_shutter_type` FOREIGN KEY (`shutter_type_id`) REFERENCES `SHUTTER_TYPE` (`shutter_type_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table to catalog cameras - both cameras with fixed lenses and cameras with interchangeable lenses';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `MOVIE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `MOVIE` (
   `movie_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this motion picture film / movie',
   `title` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Title of this movie',
@@ -678,10 +678,10 @@ CREATE TABLE `MOVIE` (
   CONSTRAINT `fk_MOVIE_4` FOREIGN KEY (`filmstock_id`) REFERENCES `FILMSTOCK` (`filmstock_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_MOVIE_5` FOREIGN KEY (`process_id`) REFERENCES `PROCESS` (`process_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog motion picture films (movies)';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `METERING_MODE_AVAILABLE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `METERING_MODE_AVAILABLE` (
   `camera_id` int(11) NOT NULL COMMENT 'ID of camera',
   `metering_mode_id` int(11) NOT NULL COMMENT 'ID of metering mode',
@@ -690,10 +690,10 @@ CREATE TABLE `METERING_MODE_AVAILABLE` (
   CONSTRAINT `fk_METERING_MODE_AVAILABLE_1` FOREIGN KEY (`camera_id`) REFERENCES `CAMERA` (`camera_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_METERING_MODE_AVAILABLE_2` FOREIGN KEY (`metering_mode_id`) REFERENCES `METERING_MODE` (`metering_mode_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to associate cameras with available metering modes';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `EXPOSURE_PROGRAM_AVAILABLE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `EXPOSURE_PROGRAM_AVAILABLE` (
   `camera_id` int(11) NOT NULL COMMENT 'ID of camera',
   `exposure_program_id` int(11) NOT NULL COMMENT 'ID of exposure program',
@@ -703,10 +703,10 @@ CREATE TABLE `EXPOSURE_PROGRAM_AVAILABLE` (
   CONSTRAINT `fk_EXPOSURE_PROGRAM_AVAILABLE_1` FOREIGN KEY (`camera_id`) REFERENCES `CAMERA` (`camera_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_EXPOSURE_PROGRAM_AVAILABLE_2` FOREIGN KEY (`exposure_program_id`) REFERENCES `EXPOSURE_PROGRAM` (`exposure_program_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to associate cameras with available exposure programs';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `ACCESSORY_COMPAT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ACCESSORY_COMPAT` (
   `compat_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this compatibility',
   `accessory_id` int(11) NOT NULL COMMENT 'ID of the accessory',
@@ -720,10 +720,10 @@ CREATE TABLE `ACCESSORY_COMPAT` (
   CONSTRAINT `fk_ACCESSORY_COMPAT_2` FOREIGN KEY (`camera_id`) REFERENCES `CAMERA` (`camera_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_ACCESSORY_COMPAT_3` FOREIGN KEY (`lens_id`) REFERENCES `LENS` (`lens_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to define compatibility between accessories and cameras or lenses';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `SHUTTER_SPEED_AVAILABLE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `SHUTTER_SPEED_AVAILABLE` (
   `camera_id` int(11) NOT NULL COMMENT 'ID of the camera',
   `shutter_speed` varchar(10) CHARACTER SET latin1 NOT NULL COMMENT 'Shutter speed that this camera has',
@@ -733,10 +733,10 @@ CREATE TABLE `SHUTTER_SPEED_AVAILABLE` (
   CONSTRAINT `fk_SHUTTER_SPEED_AVAILABLE_1` FOREIGN KEY (`shutter_speed`) REFERENCES `SHUTTER_SPEED` (`shutter_speed`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_SHUTTER_SPEED_AVAILABLE_2` FOREIGN KEY (`camera_id`) REFERENCES `CAMERA` (`camera_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table to associate cameras with shutter speeds';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `REPAIR`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `REPAIR` (
   `repair_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for the repair job',
   `camera_id` int(11) DEFAULT NULL COMMENT 'ID of camera that was repaired',
@@ -750,10 +750,10 @@ CREATE TABLE `REPAIR` (
   CONSTRAINT `fk_REPAIR_1` FOREIGN KEY (`camera_id`) REFERENCES `CAMERA` (`camera_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_REPAIR_2` FOREIGN KEY (`lens_id`) REFERENCES `LENS` (`lens_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tabe to catalog all repairs and servicing undertaken on cameras and lenses in the collection';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `FILM`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `FILM` (
   `film_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of the film',
   `filmstock_id` int(11) DEFAULT NULL COMMENT 'ID of the filmstock used',
@@ -796,10 +796,10 @@ CREATE TABLE `FILM` (
   CONSTRAINT `fk_filmstock_id` FOREIGN KEY (`filmstock_id`) REFERENCES `FILMSTOCK` (`filmstock_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_format_id` FOREIGN KEY (`format_id`) REFERENCES `FORMAT` (`format_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to list films which consist of one or more negatives. A film can be a roll film, one or more sheets of sheet film, one or more photographic plates, etc.';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `NEGATIVE`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `NEGATIVE` (
   `negative_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this negative',
   `film_id` int(11) DEFAULT NULL COMMENT 'ID of the film that this negative belongs to',
@@ -843,10 +843,10 @@ CREATE TABLE `NEGATIVE` (
   CONSTRAINT `fk_NEGATIVE_8` FOREIGN KEY (`photographer_id`) REFERENCES `PERSON` (`person_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_NEGATIVE_9` FOREIGN KEY (`shutter_speed`) REFERENCES `SHUTTER_SPEED` (`shutter_speed`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog negatives (which includes positives/slide too). Negatives are created by cameras, belong to films and can be used to create scans or prints.';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `PRINT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `PRINT` (
   `print_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for the print',
   `negative_id` int(11) DEFAULT NULL COMMENT 'ID of the negative that this print was made from',
@@ -893,10 +893,10 @@ CREATE TABLE `PRINT` (
   CONSTRAINT `fk_PRINT_7` FOREIGN KEY (`archive_id`) REFERENCES `ARCHIVE` (`archive_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_PRINT_8` FOREIGN KEY (`printer_id`) REFERENCES `PERSON` (`person_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalog prints made from negatives';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `SCAN`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `SCAN` (
   `scan_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this scan',
   `negative_id` int(11) DEFAULT NULL COMMENT 'ID of the negative that was scanned',
@@ -912,10 +912,10 @@ CREATE TABLE `SCAN` (
   CONSTRAINT `fk_SCAN_1` FOREIGN KEY (`negative_id`) REFERENCES `NEGATIVE` (`negative_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_SCAN_2` FOREIGN KEY (`print_id`) REFERENCES `PRINT` (`print_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to record all the images that have been scanned digitally';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `TO_PRINT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `TO_PRINT` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of this table',
   `negative_id` int(11) DEFAULT NULL COMMENT 'Negative ID to be printed',
@@ -929,10 +929,10 @@ CREATE TABLE `TO_PRINT` (
   KEY `fk_TO_PRINT_1_idx` (`negative_id`),
   CONSTRAINT `fk_TO_PRINT_1` FOREIGN KEY (`negative_id`) REFERENCES `NEGATIVE` (`negative_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to catalogue negatives that should be printed';
-/*!40101 SET character_set_client = @saved_cs_client */;
+SET character_set_client = @saved_cs_client;
 DROP TABLE IF EXISTS `EXHIBIT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `EXHIBIT` (
   `exhibit_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for this exhibit',
   `exhibition_id` int(11) DEFAULT NULL COMMENT 'ID of the exhibition',
@@ -943,14 +943,14 @@ CREATE TABLE `EXHIBIT` (
   CONSTRAINT `fk_EXHIBIT_1` FOREIGN KEY (`exhibition_id`) REFERENCES `EXHIBITION` (`exhibition_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_EXHIBIT_2` FOREIGN KEY (`print_id`) REFERENCES `PRINT` (`print_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table to record which prints were displayed in which exhibitions';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+SET character_set_client = @saved_cs_client;
+SET TIME_ZONE=@OLD_TIME_ZONE;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT;
+SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS;
+SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION;
+SET SQL_NOTES=@OLD_SQL_NOTES;
 

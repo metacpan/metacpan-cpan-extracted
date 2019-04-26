@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "File::Which" => 0,
+    "HTTP::Date" => 0,
     "IO::Compress::Base" => 0,
     "IO::Tty" => 0,
     "IO::Zlib" => 0,
@@ -58,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,6 +81,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "File::Which" => 0,
+  "HTTP::Date" => 0,
   "IO::Compress::Base" => 0,
   "IO::Handle" => 0,
   "IO::Tty" => 0,

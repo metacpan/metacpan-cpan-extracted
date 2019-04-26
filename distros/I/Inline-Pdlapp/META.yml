@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Inline-Pdlapp
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+requires:
+  ExtUtils::MakeMaker: '7.34'
+  Inline: '0.68'
+  Inline::C: '0.62'
+  PDLA::Core: '2.019104'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/pdla-inline-pdlapp/issues
+  homepage: http://pdlporters.github.io
+  repository: git://github.com/PDLPorters/pdla-inline-pdlapp
+version: '2.019105'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

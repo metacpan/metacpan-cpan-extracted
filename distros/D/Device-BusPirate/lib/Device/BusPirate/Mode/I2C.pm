@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode::I2C;
 
@@ -9,11 +9,11 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
 
-use Future::Utils qw( repeat );
+use Future::AsyncAwait;
 
 use constant MODE => "I2C";
 
@@ -57,17 +57,16 @@ L<Future> instances.
 =cut
 
 # Not to be confused with start_bit
-sub start
+async sub start
 {
    my $self = shift;
 
-   $self->_start_mode_and_await( "\x02", "I2C" )->then( sub {
-      $self->pirate->read( 1, "I2C start" )
-   })->then( sub {
-      ( $self->{version} ) = @_;
-      print STDERR "PIRATE I2C STARTED\n" if PIRATE_DEBUG;
-      return Future->done( $self );
-   });
+   await $self->_start_mode_and_await( "\x02", "I2C" );
+
+   ( $self->{version} ) = await $self->pirate->read( 1, "I2C start" );
+
+   print STDERR "PIRATE I2C STARTED\n" if PIRATE_DEBUG;
+   return $self;
 }
 
 =head2 configure
@@ -95,7 +94,7 @@ my %SPEEDS = (
    '400k' => 3,
 );
 
-sub configure
+async sub configure
 {
    my $self = shift;
    my %args = @_;
@@ -111,13 +110,11 @@ sub configure
 
    $self->pirate->write( $bytes );
 
-   $self->pirate->read( length $bytes, "I2C configure" )->then( sub {
-      my ( $response ) = @_;
-      $response eq "\x01" x length $bytes or
-         return Future->fail( "Expected ACK response to I2C configure" );
+   my $response = await $self->pirate->read( length $bytes, "I2C configure" );
+   $response eq "\x01" x length $bytes or
+      die "Expected ACK response to I2C configure";
 
-      Future->done;
-   });
+   return;
 }
 
 =head2 start_bit
@@ -164,7 +161,7 @@ C<send> and C<recv> methods.
 
 =cut
 
-sub write
+async sub write
 {
    my $self = shift;
    my ( $bytes ) = @_;
@@ -172,22 +169,17 @@ sub write
    printf STDERR "PIRATE I2C WRITE %v02X\n", $bytes if PIRATE_DEBUG;
    my @chunks = $bytes =~ m/(.{1,16})/gs;
 
-   repeat {
-      my $bytes = shift;
-
+   foreach my $bytes ( @chunks ) {
       my $len_1 = length( $bytes ) - 1;
 
-      $self->pirate->write_expect_acked_data(
+      my $buf = await $self->pirate->write_expect_acked_data(
          chr( 0x10 | $len_1 ) . $bytes, length $bytes, "I2C bulk transfer"
-      )->then( sub {
-         my ( $buf ) = @_;
-         $buf =~ m/^\x00*/;
-         $+[0] == length $bytes and return Future->done;
-         Future->fail( "Received NACK after $+[0] bytes" );
-      });
-   } foreach => \@chunks,
-     while => sub { not shift->failure },
-     otherwise => sub { Future->done };
+      );
+
+      $buf =~ m/^\x00*/;
+      $+[0] == length $bytes or
+         die "Received NACK after $+[0] bytes";
+   }
 }
 
 =head2 read
@@ -199,7 +191,7 @@ each one but the final, to which is sent a NACK.
 
 =cut
 
-sub read
+async sub read
 {
    my $self = shift;
    my ( $length ) = @_;
@@ -208,22 +200,20 @@ sub read
 
    print STDERR "PIRATE I2C READING $length\n" if PIRATE_DEBUG;
 
-   repeat {
-      my $ack = shift;
+   foreach my $ack ( (1)x($length-1), (0) ) {
       $self->pirate->write( "\x04" );
 
-      $self->pirate->read( 1, "I2C read data" )->then( sub {
-         $ret .= $_[0];
-         $self->pirate->write_expect_ack( $ack ? "\x06" : "\x07", "I2C read send ACK" );
-      });
-   } foreach => [ (1) x ($length-1), 0 ],
-     while => sub { not shift->failure },
-     otherwise => sub {
-        printf STDERR "PIRATE I2C READ %v02X\n", $ret if PIRATE_DEBUG;
-        Future->done( $ret );
-     };
+      $ret .= await $self->pirate->read( 1, "I2C read data" );
+
+      await $self->pirate->write_expect_ack( $ack ? "\x06" : "\x07", "I2C read send ACK" );
+   }
+
+   printf STDERR "PIRATE I2C READ %v02X\n", $ret if PIRATE_DEBUG;
+   return $ret;
 }
 
+# TODO: Turn this into an `async sub` without ->then chaining; though currently the
+#   ->followed_by makes that trickier
 sub _i2c_txn
 {
    my $self = shift;
@@ -286,9 +276,9 @@ sub recv
    $address >= 0 and $address < 0x80 or
       croak "Invalid I2C slave address";
 
-   $self->_i2c_txn( sub {
-      $self->write( chr( $address << 1 | 1 ) )
-         ->then( sub { $self->read( $length ) });
+   $self->_i2c_txn( async sub {
+      await $self->write( chr( $address << 1 | 1 ) );
+      await $self->read( $length );
    });
 }
 
@@ -314,11 +304,11 @@ sub send_then_recv
    $address >= 0 and $address < 0x80 or
       croak "Invalid I2C slave address";
 
-   $self->_i2c_txn( sub {
-      $self->write( chr( $address << 1 | 0 ) . $bytes_out )
-         ->then( sub { $self->start_bit }) # repeated START
-         ->then( sub { $self->write( chr( $address << 1 | 1 ) ) })
-         ->then( sub { $self->read( $read_len ) })
+   $self->_i2c_txn( async sub {
+      await $self->write( chr( $address << 1 | 0 ) . $bytes_out );
+      await $self->start_bit; # repeated START
+      await $self->write( chr( $address << 1 | 1 ) );
+      await $self->read( $read_len );
    });
 }
 

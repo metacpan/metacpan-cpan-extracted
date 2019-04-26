@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -14,7 +14,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -447,7 +447,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -626,7 +626,7 @@ See the BUGS file.
 
 =head1 LICENCE
 
-Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

@@ -1,7 +1,5 @@
 package WebService::GeoIPify;
 
-our $VERSION = '0.02';
-
 use namespace::clean;
 use strictures 2;
 use utf8;
@@ -16,6 +14,8 @@ use Types::Standard qw(InstanceOf Str);
 with 'Role::Cache::LRU';
 with 'Role::REST::Client';
 
+our $VERSION = '0.03';
+
 has api_key => (
     isa => StrLength[32],
     is => 'rw',
@@ -25,13 +25,13 @@ has api_key => (
 has api_url => (
     isa => Str,
     is => 'ro',
-    default => quote_sub(q{ 'https://geo.ipify.org/api/v1' })
+    default => quote_sub(q{ 'https://geo.ipify.org/api/v1' }),
 );
 
 has api_ipify_url => (
     isa => Str,
     is => 'ro',
-    default => quote_sub(q{ 'https://api.ipify.org' })
+    default => quote_sub(q{ 'https://api.ipify.org' }),
 );
 
 sub lookup {
@@ -42,9 +42,10 @@ sub lookup {
     my $cached_ip_record = $self->get_cache($ip);
     return $cached_ip_record if (defined $cached_ip_record);
 
-    $self->set_persistent_header('User-Agent' => __PACKAGE__ . $WebService::GeoIPify::VERSION);
+    $self->set_persistent_header(
+        'User-Agent' => __PACKAGE__ . $WebService::GeoIPify::VERSION);
     $self->server($self->api_url);
-    $self->type(qq|application/json|);
+    $self->type(q|application/json|);
 
     my $queries = {
         apiKey => $self->api_key,
@@ -64,7 +65,7 @@ sub check {
 
     my $ip = $self->get($self->api_ipify_url)->data;
 
-    croak "Cannot obtain client's public IPv4 address" if (!is_ipv4($ip));
+    croak q|Cannot obtain client's public IPv4 address| if (!is_ipv4($ip));
 
     return $self->lookup($ip);
 }
@@ -73,6 +74,8 @@ sub check {
 __END__
 
 =encoding utf-8
+
+=for stopwords geoipify geolocation ipify ipv4
 
 =head1 NAME
 
@@ -93,7 +96,7 @@ IPv4 address.
 
 =head1 DEVELOPMENT
 
-Source repo at L<https://github.com/kianmeng/webservice-geoipify|https://github.com/kianmeng/webservice-geoipify>.
+Source repository at L<https://github.com/kianmeng/webservice-geoipify|https://github.com/kianmeng/webservice-geoipify>.
 
 How to contribute? Follow through the L<CONTRIBUTING.md|https://github.com/kianmeng/webservice-geoipify/blob/master/CONTRIBUTING.md> document to setup your development environment.
 

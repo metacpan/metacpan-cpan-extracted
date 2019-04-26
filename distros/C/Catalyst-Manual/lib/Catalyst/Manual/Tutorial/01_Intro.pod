@@ -103,7 +103,7 @@ platforms and versions.
 If you would prefer to install directly from CPAN and not use the
 Tutorial Virtual machine, you can download the example program and all
 the necessary dependencies to your local machine by installing the
-C<Task::Catalyst::Tutorial> distribution:
+L<Task::Catalyst::Tutorial> distribution:
 
      cpan Task::Catalyst::Tutorial
 
@@ -115,7 +115,7 @@ Subjects covered by the tutorial include:
 
 =over 4
 
-=item * 
+=item *
 
 A simple application that lists and adds books.
 
@@ -125,7 +125,7 @@ The use of L<DBIx::Class> (DBIC) for the model (including
 some of the more advanced techniques you will probably want to use in
 your applications).
 
-=item * 
+=item *
 
 How to write CRUD (Create, Read, Update, and Delete) operations in
 Catalyst.
@@ -134,25 +134,25 @@ Catalyst.
 
 Authentication ("auth").
 
-=item * 
+=item *
 
 Role-based authorization ("authz").
 
-=item * 
+=item *
 
 Attempts to provide an example showing current (5.9) Catalyst
 practices.
 
-=item * 
+=item *
 
 The use of Template Toolkit (TT).
 
-=item * 
+=item *
 
 Useful techniques for troubleshooting and debugging Catalyst
 applications.
 
-=item * 
+=item *
 
 The use of SQLite as a database (with code also provided for MySQL and
 PostgreSQL).  (Note: Because we make use of the DBIx::Class Object
@@ -160,7 +160,7 @@ Relational Mapping [ORM] layer, out our application will be database
 agnostic and can easily be used by any of the databases supported by
 DBIx::Class.)
 
-=item * 
+=item *
 
 The use of L<HTML::FormFu> or L<HTML::FormHandler>
 for automated form processing and validation.
@@ -203,7 +203,7 @@ current directory), but we will keep it short and just use "C<$>".
 
 =over 4
 
-=item 1 
+=item 1
 
 Download a Tutorial Virtual Machine image from
 L<http://cattut.shadowcat.co.uk/>
@@ -220,8 +220,8 @@ Uncompress the image on the "host machine":
 =item 3
 
 Boot the virtual machine using a tool like VMWare Player
-L<http://www.vmware.com/products/player> or VirtualBox
-L<http://www.virtualbox.org/>.
+L<https://www.vmware.com/products/workstation-player.html> or VirtualBox
+L<https://www.virtualbox.org/>.
 
 =item 4
 
@@ -244,7 +244,7 @@ machine.  You should get output along the lines of:
     ...
 
 You want the IP address on the second line below the C<eth0> interface.
-The image it design to automatically use a DHCP-assigned address.
+The image is designed to automatically use a DHCP-assigned address.
 
 
 Try to ping this IP address from your "host machine" (main desktop):
@@ -368,7 +368,7 @@ For KDE, just substitute the package name "C<kde>" for "C<gnome>" above.
 Note that C<iceweasel> is basically used to install Firefox on Debian
 boxes.  You can start it under X Windows with either the C<firefox>
 command or the C<iceweasel> command (or use the menus).  You can get
-more information on Iceweasel at L<http://wiki.debian.org/Iceweasel>.
+more information on Iceweasel at L<https://wiki.debian.org/Iceweasel>.
 
 Also, you might need to add more memory to your virtual machine if you
 want to run X Windows (or other tools that might require additional
@@ -456,15 +456,15 @@ help:
 
 =item *
 
-L<http://vmfaq.com/entry/34/>
+L<https://web.archive.org/web/20160623183717/http://vmfaq.com/index.php?View=entry&EntryID=34>
 
 =item *
 
-L<http://www.vmware.com/support/pubs/player_pubs.html>
+L<https://www.vmware.com/support/pubs/player_pubs.html>
 
 =item *
 
-L<http://www.virtualbox.org/manual/ch06.html>
+L<https://www.virtualbox.org/manual/ch06.html>
 
 =back
 
@@ -481,11 +481,11 @@ v5.80020 might show up as 5.8002):
 
 =over 4
 
-=item * 
+=item *
 
 Debian 6 (Squeeze)
 
-=item * 
+=item *
 
 Catalyst v5.90002
 
@@ -493,7 +493,7 @@ Catalyst v5.90002
 
 Catalyst::Devel v1.34
 
-=item * 
+=item *
 
 DBIx::Class v0.08195
 
@@ -510,7 +510,7 @@ Template Toolkit v2.22
 
 HTML::FormFu -- v0.09004
 
-=item * 
+=item *
 
 B<NOTE:> You can check the versions you have installed with the
 following command (note the slash before the space):
@@ -529,7 +529,7 @@ or:
 
     perl -MCatalyst::Devel -e 'print "$Catalyst::Devel::VERSION\n";'
 
-=item * 
+=item *
 
 This tutorial will show URLs in the format of C<http://localhost:3000>,
 but if you are running your web browser from outside the Tutorial
@@ -544,7 +544,7 @@ command line).
 B<Please Note:> Depending on the web browser you are using, you might
 need to hit C<Shift+Reload> or C<Ctrl+Reload> to pull a fresh page when
 testing your application at various points (see
-L<http://en.wikipedia.org/wiki/Wikipedia:Bypass_your_cache> for a
+L<https://en.wikipedia.org/wiki/Wikipedia:Bypass_your_cache> for a
 comprehensive list of options for each browser).
 
 Also, the C<-k> B<keepalive option> to the development server can be
@@ -580,4 +580,4 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
 
 Copyright 2006-2011, Kennedy Clark, under the
 Creative Commons Attribution Share-Alike License Version 3.0
-(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).
+(L<https://creativecommons.org/licenses/by-sa/3.0/us/>).

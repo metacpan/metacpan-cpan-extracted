@@ -3,7 +3,7 @@ package Devel::Cover::Html_Common;
 use strict;
 use warnings;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 use Exporter;
 
@@ -29,7 +29,7 @@ Devel::Cover::Report::Html_Common - Common code for HTML reporters
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 DESCRIPTION
 

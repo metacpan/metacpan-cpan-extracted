@@ -6,7 +6,7 @@ use warnings;
 use File::Slurp;
 use File::Temp;
 
-use Test::More tests => 86 + 1;    # +1 is for NoWarnings
+use Test::More tests => 85 + 1;    # +1 is for NoWarnings
 use Test::NoWarnings;
 
 use Test::Warn;

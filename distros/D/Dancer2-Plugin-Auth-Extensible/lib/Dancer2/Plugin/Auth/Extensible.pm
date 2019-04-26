@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible;
 
-our $VERSION = '0.706';
+our $VERSION = '0.708';
 
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use Dancer2::Core::Types qw(ArrayRef Bool HashRef Int Str);
 use Dancer2::FileUtils qw(path);
 use Dancer2::Template::Tiny;
 use File::Share qw(dist_dir);
+use HTTP::BrowserDetect;
 use List::Util qw(first);
 use Module::Runtime qw(use_module);
 use Scalar::Util qw(blessed);
@@ -213,7 +214,7 @@ has _template_tiny => (
 #
 
 plugin_hooks 'before_authenticate_user', 'after_authenticate_user',
-  'before_create_user', 'after_create_user',
+  'before_create_user', 'after_create_user', 'after_reset_code_success',
   'login_required', 'permission_denied', 'after_login_success',
   'before_logout';
 
@@ -967,8 +968,7 @@ sub _check_for_login {
 
         # The WWW-Authenticate header added varies depending on whether
         # the client is a robot or not.
-        my $ua = use_module('HTTP::BrowserDetect')
-          ->new( $request->env->{HTTP_USER_AGENT} );
+        my $ua = HTTP::BrowserDetect->new( $request->env->{HTTP_USER_AGENT} );
         my $base = $request->base;
         my $auth_method;
 
@@ -1240,7 +1240,17 @@ sub _post_login_route {
     if ($code) {
         no strict 'refs';
         my $randompw = &{ $plugin->password_generator };
-        if ( $plugin->user_password( code => $code, new_password => $randompw ) ) {
+        if (my $username = $plugin->user_password( code => $code, new_password => $randompw ) ) {
+            # Support a custom 'Change password' page or other app-based
+            # intervention after a successful reset code has been applied
+            foreach my $realm_check (@{ $plugin->realm_names }) { # $params->{realm} isn't defined at this point...
+                my $provider = $plugin->auth_provider($realm_check);
+                $params->{realm} = $realm_check if $provider->get_user_details($username);
+            }
+
+            $plugin->execute_plugin_hook( 'after_reset_code_success',
+                { username => $username, password => $randompw, realm => $params->{realm} } );
+
             return $app->forward(
                 $plugin->login_page,
                 { new_password => $randompw },
@@ -1506,14 +1516,6 @@ page.
 
 See L<http://shadow.cat/blog/matt-s-trout/humane-login-screens/> for the
 original idea for this functionality.
-
-=head1 DEFAULT LOGIN TEMPLATE
-
-A default login template is used to render the login page unless otherwise configured.
-
-This template includes a hidden field C<csrf_token> that can be used to include
-a CSRF token in the login form if desired (by using for example the Dancer2
-C<before_template> hook).
 
 =head1 CUSTOMISING C</login> AND C</login/denied>
 
@@ -2176,6 +2178,12 @@ reference of any errors from the main method or from the provider.
 =head2 login_required
 
 =head2 permission_denied
+
+=head2 after_reset_code_success
+
+Called after successful reset code has been provided. Supports a custom 'Change
+password' page or other app-based intervention after a successful reset code
+has been applied.
 
 =head2 after_login_success
 

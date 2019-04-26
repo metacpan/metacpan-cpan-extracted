@@ -2,7 +2,7 @@ package Test2::Tools::Compare;
 use strict;
 use warnings;
 
-our $VERSION = '0.000119';
+our $VERSION = '0.000120';
 
 use Carp qw/croak/;
 use Scalar::Util qw/reftype/;
@@ -994,8 +994,12 @@ If a 'precision' parameter is specified, both operands will be
 rounded to 'precision' number of fractional decimal digits and
 compared with C<eq>.
 
+  is($near_val, float($val, precision = 4), "Near 4 decimal digits");
+
 Otherwise, the check will be made within a range of +/- 'tolerance',
 with a default 'tolerance' of 1e-08.
+
+  is( $near_val, float($val, tolerance = 0.01), "Almost there...");
 
 See also C<within> and C<rounded>.
 
@@ -1327,6 +1331,11 @@ check object.
 
 B<Note:> This function can only be used inside an array, bag or subset
 builder sub, and must be called in void context.
+
+=item all_items($CHECK1, $CHECK2, ...)
+
+Add checks that apply to all items. You can put this anywhere in the bag
+block, and can call it any number of times with any number of arguments.
 
 =item end()
 

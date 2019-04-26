@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.7.4';
+my $VERSION = '3.8.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -161,9 +161,9 @@ if ($os =~ /Win32/) {
 }
 
 ## Warn about older versions
-if ($serverversion < 70400) {
+if ($serverversion < 80000) {
     print "\n****************\n";
-    print "WARNING! DBD::Pg no longer supports versions less than 7.4.\n";
+    print "WARNING! DBD::Pg no longer supports versions less than 8.0.\n";
     print "You must upgrade PostgreSQL to a newer version.\n";
     print "****************\n\n";
     exit 1;
@@ -272,7 +272,7 @@ sub constants {
     for my $line (split /\n/ => $old_constants) {
         if ($line =~ /^INC = .*strawberry.*/ ) {
             print qq(Strawberry Perl found; adjusting the INC variable;\n);
-            $line . ' -I ' . DBI::DBD::dbd_dbi_arch_dir();
+            $line .= ' -I ' . DBI::DBD::dbd_dbi_arch_dir();
             print qq(INC is now $line\n);
         }
         $new_constants .= "$line\n";

@@ -29,14 +29,12 @@ use strict;
 use PPI::Token::QuoteLike          ();
 use PPI::Token::_QuoteEngine::Full ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.236';
-	@ISA     = qw{
-		PPI::Token::_QuoteEngine::Full
-		PPI::Token::QuoteLike
-	};
-}
+our $VERSION = '1.252'; # VERSION
+
+our @ISA = qw{
+	PPI::Token::_QuoteEngine::Full
+	PPI::Token::QuoteLike
+};
 
 =pod
 

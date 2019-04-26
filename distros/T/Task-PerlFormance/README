@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Task-PerlFormance,
-version 0.008:
+version 0.009:
 
   Max dependencies for Benchmark::Perl::Formance
 
-This software is copyright (c) 2018 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

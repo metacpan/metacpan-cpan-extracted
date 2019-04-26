@@ -2,6 +2,7 @@
 Build.PL
 CONTRIBUTING.md
 Changes
+Dockerfile
 LICENSE
 MANIFEST
 META.json

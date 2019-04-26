@@ -1,6 +1,6 @@
 package Catmandu::Exporter::RIS;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -8,9 +8,10 @@ use Moo;
 
 with 'Catmandu::Exporter';
 
-my $TAGS = [qw(TY A1 A2 A3 AB AD AR AU AV BT CP CT CY ED EP ID IS J1 J2 JA JF JO
-               KW L1 L2 L3 L4 LA M1 M2 M3 N1 N2 PB PY RP SN SP T1 T2 T3 TI U1 U2
-               U3 U4 U5 UR VL Y1 Y2)];
+my $TAGS = [qw(TY A1 A2 A3 A4 AB AD AN AU AV BT C1 C2 C3 C4 C5 C6 C7 C8 CA CN
+            CP CT CY DA DB DO DP ED EP ET ID IS J1 J2 JA JF JO KW L1 L2 L3 L4
+            LA LB LK M1 M2 M3 N1 N2 NV OP PB PP PY RI RN RP SE SN SP ST T1 T2
+            T3 TA TI TT U1 U2 U3 U4 U5 UR VL VO Y1 Y2)];
 
 my $SMALL_TAG = qr/A2|AU|ED|EP|KW|PB|SP/;
 

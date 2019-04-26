@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "B::Keywords" => "1.09",
     "Exporter" => 0,
-    "PPI" => "1.220",
+    "PPI" => "1.250",
     "Scalar::Util" => 0
   },
   "TEST_REQUIRES" => {
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "PPI::Dumper" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "PPI" => "1.220",
+  "PPI" => "1.250",
   "PPI::Dumper" => 0,
   "Scalar::Util" => 0,
   "Test::More" => "0.88"

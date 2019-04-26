@@ -44,8 +44,6 @@ requires:
   File::Temp: '0'
   Filter::Simple: '0.88'
   Filter::Util::Call: '0'
-  Inline: '0.68'
-  Inline::C: '0.62'
   Module::Compile: '0.23'
   Pod::Parser: '0'
   Pod::Select: '0'
@@ -58,5 +56,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdla-core/issues
   homepage: http://pdlporters.github.io
   repository: git://github.com/PDLPorters/pdla-core
-version: '2.019103'
+version: '2.019105'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

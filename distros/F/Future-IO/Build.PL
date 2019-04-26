@@ -9,6 +9,8 @@ my $build = Module::Build->new(
       'Future' => 0,
       'Struct::Dumb' => 0,
       'Time::HiRes' => 0,
+
+      'perl' => '5.010', # //
    },
    test_requires => {
       'Test::Identity' => 0,

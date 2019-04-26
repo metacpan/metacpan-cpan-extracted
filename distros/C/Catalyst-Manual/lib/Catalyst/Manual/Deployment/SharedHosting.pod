@@ -36,7 +36,7 @@ myapp_fastcgi.fcgi and/or use a SetHandler directive):
   RewriteRule ^(.*)$ script/myapp_fastcgi.pl/$1 [PT,L]
 
 Now C<http://mydomain.com/> should now Just Work. Congratulations, now
-you can tell your friends about your new website. 
+you can tell your friends about your new website.
 
 =head1 AUTHORS
 

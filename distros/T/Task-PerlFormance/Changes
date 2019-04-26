@@ -1,5 +1,8 @@
 Revision history for Task-PerlFormance
 
+0.009     2019-04-26
+        - drop ::Plugin:Mandelbrot due to crashes
+
 0.008     2018-04-21
         - plus ::Plugin:PerlStone2015
 

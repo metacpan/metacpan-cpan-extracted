@@ -82,6 +82,7 @@ sub import {
 # }}}1
 1;
 # === Documentation ===================================================== {{{2
+__END__
 
 =pod
 
@@ -104,11 +105,6 @@ When implementing a language:
         XML::Axk::Language->import( target => caller, sp => [qw($foo @bar)],
             updater => sub { ... } );
     }
-
-If all you need is the registry:
-
-    use XML::Axk::Language ();
-    # Then do something with @XML::Axk::Language::SP_Registry.
 
 =head1 OPTIONS
 

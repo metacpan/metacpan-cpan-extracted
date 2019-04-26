@@ -1,5 +1,5 @@
 package Test::PDL;
-$Test::PDL::VERSION = '0.13';
+$Test::PDL::VERSION = '0.14';
 # ABSTRACT: Test Perl Data Language arrays (a.k.a. piddles) for equality
 
 
@@ -135,7 +135,7 @@ sub eq_pdl_diag
 sub test_pdl
 {
 	require Test::Deep::PDL;
-	my $expected = pdl( @_ );
+	my $expected = PDL::Core::pdl( @_ );
 	return Test::Deep::PDL->new( $expected );
 }
 
@@ -162,8 +162,8 @@ for my $type ( PDL::Types::types ) {
 sub set_options
 {
 	while( my( $key, $value ) = splice @_, 0, 2 ) {
-		barf( "invalid option $key" ) unless grep { $key eq $_ } keys %OPTIONS;
-		barf( "undefined value for $key" ) unless defined $value;
+		PDL::barf( "invalid option $key" ) unless grep { $key eq $_ } keys %OPTIONS;
+		PDL::barf( "undefined value for $key" ) unless defined $value;
 		$OPTIONS{ $key } = $value;
 	}
 }
@@ -183,7 +183,7 @@ Test::PDL - Test Perl Data Language arrays (a.k.a. piddles) for equality
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -520,7 +520,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Edward Baudrez.
+This software is copyright (c) 2019 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

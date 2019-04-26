@@ -1,5 +1,7 @@
 Revision history for Backup-EZ
 
+0.40    - Add feature to provide extra_rsync_opts via config file
+
 0.39    - fixed File::ShareDir accidently removed from Makefile.PL
 
 0.38    - fixed [rt.cpan.org #127940] Undeclared dependency File::ShareDir::Install

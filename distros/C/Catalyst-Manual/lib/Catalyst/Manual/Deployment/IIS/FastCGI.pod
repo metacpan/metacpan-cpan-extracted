@@ -30,7 +30,7 @@ Let us assume that our server has the following layout:
 
 FastCGI is not a standard part of IIS 6 - you have to install it
 separately. For more info and the download, go to
-L<http://www.iis.net/extensions/FastCGI>. Choose the appropriate version
+Lhttps://www.iis.net/downloads/microsoft/fastcgi-for-iis>. Choose the appropriate version
 (32-bit/64-bit); installation is quite simple (in fact no questions, no
 options).
 

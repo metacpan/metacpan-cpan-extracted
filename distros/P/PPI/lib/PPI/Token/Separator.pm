@@ -35,11 +35,9 @@ parent classes.
 use strict;
 use PPI::Token::Word ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.236';
-	@ISA     = 'PPI::Token::Word';
-}
+our $VERSION = '1.252'; # VERSION
+
+our @ISA = "PPI::Token::Word";
 
 1;
 

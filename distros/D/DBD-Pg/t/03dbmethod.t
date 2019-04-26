@@ -25,9 +25,12 @@ my $dbh = connect_database();
 if (! $dbh) {
 	plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 562;
+plan tests => 570;
 
 isnt ($dbh, undef, 'Connect to database for database handle method testing');
+
+# silence notices about implicitly created and dropped objects
+$dbh->do('set client_min_messages=warning');
 
 my ($pglibversion,$pgversion) = ($dbh->{pg_lib_version},$dbh->{pg_server_version});
 my ($schema,$schema2,$schema3) = ('dbd_pg_testschema', 'dbd_pg_testschema2', 'dbd_pg_testschema3');
@@ -45,6 +48,11 @@ $sth = $dbh->prepare($SQL);
 $sth->finish();
 $sth = $dbh->prepare_cached($SQL);
 $sth->finish();
+
+$t = 'Cannot prepare empty statement';
+$SQL = q{};
+eval { $dbh->prepare($SQL) };
+like ($@, qr{^Cannot prepare empty statement}, $t);
 
 # Populate the testing table for later use
 
@@ -171,10 +179,8 @@ is ($@, q{}, $t);
 $dbh->do("CREATE SCHEMA $schema2");
 $dbh->do("CREATE SEQUENCE $schema2.$sequence2");
 $dbh->do("CREATE SEQUENCE $schema.$sequence4");
-$dbh->{Warn} = 0;
 $dbh->do("CREATE TABLE $schema2.$table2(a INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('$schema2.$sequence2'))");
 $dbh->do("CREATE TABLE $schema.$table2(a INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('$schema.$sequence4'))");
-$dbh->{Warn} = 1;
 $dbh->do("INSERT INTO $schema2.$table2 DEFAULT VALUES");
 
 $t='DB handle method "last_insert_id" works when called with a schema not in the search path';
@@ -246,6 +252,39 @@ SKIP: {
 	$dbh->do("DROP SEQUENCE $schema2.$sequence3");
 }
 
+SKIP: {
+    skip('Cannot test GENERATED AS IDENTITY columns on pre-10 servers', 4)
+        if $pgversion < 100000;
+
+    for my $WHEN ('BY DEFAULT', 'ALWAYS') {
+        $t=qq{DB handle method "last_insert_id" works on GENERATED $WHEN AS IDENTITY column};
+
+        $dbh->do(qq{CREATE TABLE $schema."dbd_pg_test_identity_'$WHEN'" (
+	        genid INTEGER PRIMARY KEY GENERATED $WHEN AS IDENTITY (START WITH 1),
+                otheruniq INTEGER UNIQUE GENERATED $WHEN AS IDENTITY (START WITH 10),
+                otherid INTEGER GENERATED $WHEN AS IDENTITY (START WITH 20)
+	)});
+        my $returned_id = $dbh->selectrow_array(qq{INSERT INTO "dbd_pg_test_identity_'$WHEN'" DEFAULT VALUES RETURNING genid});
+        my $last_insert_id = eval {
+            $dbh->last_insert_id(undef, $schema, qq{dbd_pg_test_identity_'$WHEN'}, undef, undef);
+        };
+        is ($@, q{}, $t);
+        $t=qq{DB handle method "last_insert_id" returns PK value from multiple GENERATED $WHEN AS IDENTITY columns};
+        is ($last_insert_id, $returned_id, $t);
+        $dbh->do(qq{DROP TABLE $schema."dbd_pg_test_identity_'$WHEN'"});
+    }
+}
+
+$t='DB handle method "last_insert_id" works when the sequence name needs quoting';
+$dbh->do(q{CREATE SEQUENCE "dbd_pg_test_'seq'"});
+$dbh->do(q{CREATE TABLE "dbd_pg_test_'table'" (id integer unique default nextval($$dbd_pg_test_'seq'$$))});
+$dbh->do(q{INSERT INTO "dbd_pg_test_'table'" DEFAULT VALUES});
+
+eval { $dbh->last_insert_id(undef, undef, q{dbd_pg_test_'table'}, undef, undef) };
+is ($@, q{}, $t);
+
+$dbh->do(q{DROP TABLE "dbd_pg_test_'table'"});
+$dbh->do(q{DROP SEQUENCE "dbd_pg_test_'seq'"});
 
 $dbh->do("DROP SCHEMA $schema2");
 $dbh->do("DROP TABLE $table2");
@@ -518,7 +557,7 @@ is_deeply (\%missing, {}, $t);
 
 ## Check some of the returned fields:
 $result = $result->[0];
-is ($result->{TABLE_CAT}, undef, 'DB handle method "table_info" returns proper TABLE_CAT');
+is ($result->{TABLE_CAT}, $dbh->{pg_db}, 'DB handle method "table_info" returns proper TABLE_CAT');
 is ($result->{TABLE_NAME}, 'dbd_pg_test', 'DB handle method "table_info" returns proper TABLE_NAME');
 is ($result->{TABLE_TYPE}, 'TABLE', 'DB handle method "table_info" returns proper TABLE_TYPE');
 
@@ -560,6 +599,11 @@ $sth = $dbh->table_info(undef,undef,undef,'MATERIALIZED VIEW');
 $rows = $sth->rows();
 is ($rows, 0, $t);
 
+$t=q{DB handle method "table_info" returns correct number of rows when given a 'FOREIGN TABLE' type argument};
+$sth = $dbh->table_info(undef,undef,undef,'FOREIGN TABLE');
+$rows = $sth->rows();
+is ($rows, 0, $t);
+
 SKIP: {
 	if ($pgversion < 90300) {
 		skip 'Postgres version 9.3 or better required to create materialized views', 1;
@@ -569,6 +613,20 @@ SKIP: {
 	$sth = $dbh->table_info(undef,undef,undef,'MATERIALIZED VIEW');
 	$rows = $sth->rows();
 	is ($rows, 1, $t);
+}
+
+SKIP: {
+	if ($pgversion < 90100) {
+		skip 'Postgres version 9.1 or better required to create foreign tables', 1;
+	}
+	$dbh->do('CREATE FOREIGN DATA WRAPPER dbd_pg_testfdw');
+	$dbh->do('CREATE SERVER dbd_pg_testserver FOREIGN DATA WRAPPER dbd_pg_testfdw');
+	$dbh->do('CREATE FOREIGN TABLE dbd_pg_testforeign (c1 int) SERVER dbd_pg_testserver');
+	$t=q{DB handle method "table_info" returns correct number of rows when given a 'FOREIGN TABLE' type argument};
+	$sth = $dbh->table_info(undef,undef,undef,'FOREIGN TABLE');
+	$rows = $sth->rows();
+	is ($rows, 1, $t);
+    $dbh->rollback();
 }
 
 # Test listing catalog names
@@ -588,6 +646,8 @@ my @expected = ('LOCAL TEMPORARY',
                 'SYSTEM VIEW',
 				'MATERIALIZED VIEW',
 				'SYSTEM MATERIALIZED VIEW',
+                'FOREIGN TABLE',
+                'SYSTEM FOREIGN TABLE',
                 'TABLE',
                 'VIEW',);
 
@@ -650,7 +710,7 @@ is ($result->{pg_type}, 'integer', $t);
 
 ## Check some of the returned fields:
 my $r = $result;
-is ($r->{TABLE_CAT},   undef,               'DB handle method "column_info" returns proper TABLE_CAT');
+is ($r->{TABLE_CAT},   $dbh->{pg_db},       'DB handle method "column_info" returns proper TABLE_CAT');
 is ($r->{TABLE_NAME},  'dbd_pg_test',       'DB handle method "column_info returns proper TABLE_NAME');
 is ($r->{COLUMN_NAME}, 'id',                'DB handle method "column_info" returns proper COLUMN_NAME');
 is ($r->{DATA_TYPE},   4,                   'DB handle method "column_info" returns proper DATA_TYPE');
@@ -675,15 +735,12 @@ SKIP: {
 	}
 
     my @enumvalues = qw( foo bar baz buz );
-    {
-        local $dbh->{Warn} = 0;
 
-        $dbh->do( q{CREATE TYPE dbd_pg_enumerated AS ENUM ('foo', 'bar', 'baz', 'buz')} );
-        $dbh->do( q{CREATE TEMP TABLE dbd_pg_enum_test ( is_enum dbd_pg_enumerated NOT NULL )} );
-        if ($pgversion >= 90300) {
-            $dbh->do( q{ALTER TYPE dbd_pg_enumerated ADD VALUE 'first' BEFORE 'foo'} );
-            unshift @enumvalues, 'first';
-        }
+    $dbh->do( q{CREATE TYPE dbd_pg_enumerated AS ENUM ('foo', 'bar', 'baz', 'buz')} );
+    $dbh->do( q{CREATE TEMP TABLE dbd_pg_enum_test ( is_enum dbd_pg_enumerated NOT NULL )} );
+    if ($pgversion >= 90300) {
+        $dbh->do( q{ALTER TYPE dbd_pg_enumerated ADD VALUE 'first' BEFORE 'foo'} );
+        unshift @enumvalues, 'first';
     }
 
 	$t='DB handle method "column_info" returns proper pg_type';
@@ -717,7 +774,7 @@ is_deeply (\%missing, {}, $t);
 
 ## Check some of the returned fields:
 $r = $result->[0];
-is ($r->{TABLE_CAT},   undef,              'DB handle method "primary_key_info" returns proper TABLE_CAT');
+is ($r->{TABLE_CAT},   $dbh->{pg_db},      'DB handle method "primary_key_info" returns proper TABLE_CAT');
 is ($r->{TABLE_NAME},  'dbd_pg_test',      'DB handle method "primary_key_info" returns proper TABLE_NAME');
 is ($r->{COLUMN_NAME}, 'id',               'DB handle method "primary_key_info" returns proper COLUMN_NAME');
 is ($r->{PK_NAME},     'dbd_pg_test_pkey', 'DB handle method "primary_key_info" returns proper PK_NAME');
@@ -742,11 +799,6 @@ is_deeply (\@result, $expected, $t);
 # Test of the "statistics_info" database handle method
 #
 
-SKIP: {
-
-$dbh->{private_dbdpg}{version} >= 80000
-	or skip ('Server must be version 8.0 or higher to test database handle method "statistics_info"', 10);
-
 $t='DB handle method "statistics_info" returns undef: no table';
 $sth = $dbh->statistics_info(undef,undef,undef,undef,undef);
 is ($sth, undef, $t);
@@ -757,12 +809,21 @@ $sth = $dbh->statistics_info(undef,undef,'dbd_pg_test9',undef,undef);
 is ($sth, undef, $t);
 
 
+my $with_oids = $pgversion < 120000 ? 'WITH OIDS' : '';
+my $hash_index_idx = $with_oids ? 5 : 4;
 ## Create some tables with various indexes
 {
 	local $SIG{__WARN__} = sub {};
 
-	## Drop the third schema
-	$dbh->do("DROP SCHEMA IF EXISTS $schema3 CASCADE");
+	## Drop the third schema.
+	## PostgresSQL < 8.3 doesn't have DROP SCHEMA IF EXISTS,
+	## so check manually
+	if ($dbh->selectrow_array(
+		'SELECT 1 FROM pg_catalog.pg_namespace WHERE nspname = ?',
+		undef, $schema3
+	)) {
+		$dbh->do("DROP SCHEMA $schema3 CASCADE");
+	}
 
 	$dbh->do("CREATE TABLE $table1 (a INT, b INT NOT NULL, c INT NOT NULL, ".
 			 'CONSTRAINT dbd_pg_test1_pk PRIMARY KEY (a))');
@@ -770,44 +831,44 @@ is ($sth, undef, $t);
 	$dbh->do("CREATE UNIQUE INDEX dbd_pg_test1_index_c ON $table1(c)");
 
 	$dbh->do("CREATE TABLE $table2 (a INT, b INT, c INT, PRIMARY KEY(a,b), UNIQUE(b,c))");
-	$dbh->do("CREATE INDEX dbd_pg_test2_expr ON $table2(c,(a+b))");
+	$dbh->do("CREATE INDEX dbd_pg_test2_expr ON $table2((a+b),c)");
 
-	$dbh->do("CREATE TABLE $table3 (a INT, b INT, c INT, PRIMARY KEY(a)) WITH OIDS");
+	$dbh->do("CREATE TABLE $table3 (a INT, b INT, c INT, PRIMARY KEY(a)) $with_oids");
 	$dbh->do("CREATE UNIQUE INDEX dbd_pg_test3_index_b ON $table3(b)");
 	$dbh->do("CREATE INDEX dbd_pg_test3_index_c ON $table3 USING hash(c)");
-	$dbh->do("CREATE INDEX dbd_pg_test3_oid ON $table3(oid)");
+	$dbh->do("CREATE INDEX dbd_pg_test3_oid ON $table3(oid)") if $with_oids;
 	$dbh->do("CREATE UNIQUE INDEX dbd_pg_test3_pred ON $table3(c) WHERE c > 0 AND c < 45");
 	$dbh->commit();
 }
 
 my $correct_stats = {
 one => [
-	[ undef, $schema, $table1, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
-	[ undef, $schema, $table1, '0', undef, 'dbd_pg_test1_index_c', 'btree',  1, 'c', 'A', '0', '1', undef, 'c' ],
-	[ undef, $schema, $table1, '0', undef, 'dbd_pg_test1_pk',      'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-	[ undef, $schema, $table1, '0', undef, 'dbd_pg_test1_uc1',     'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
+	[ $dbh->{pg_db}, $schema, $table1, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
+	[ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_index_c', 'btree',  1, 'c', 'A', '0', '1', undef, 'c' ],
+	[ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_pk',      'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
+	[ $dbh->{pg_db}, $schema, $table1, '0', undef, 'dbd_pg_test1_uc1',     'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
 	],
 	two => [
-	[ undef, $schema, $table2, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
-	[ undef, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
-	[ undef, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  2, 'c', 'A', '0', '1', undef, 'c' ],
-	[ undef, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-	[ undef, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  2, 'b', 'A', '0', '1', undef, 'b' ],
-	[ undef, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  1, 'c', 'A', '0', '1', undef, 'c' ],
-	[ undef, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  2, undef, 'A', '0', '1', undef, '(a + b)' ],
+	[ $dbh->{pg_db}, $schema, $table2, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
+	[ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
+	[ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_b_key',   'btree',  2, 'c', 'A', '0', '1', undef, 'c' ],
+	[ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
+	[ $dbh->{pg_db}, $schema, $table2, '0', undef, 'dbd_pg_test2_pkey',    'btree',  2, 'b', 'A', '0', '1', undef, 'b' ],
+	[ $dbh->{pg_db}, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  1, undef, 'A', '0', '1', undef, '(a + b)' ],
+	[ $dbh->{pg_db}, $schema, $table2, '1', undef, 'dbd_pg_test2_expr',    'btree',  2, 'c', 'A', '0', '1', undef, 'c' ],
 	],
 	three => [
-	[ undef, $schema, $table3, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
-	[ undef, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
-	[ undef, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-	[ undef, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c' ],
-	[ undef, $schema, $table3, '1', undef, 'dbd_pg_test3_oid',     'btree',  1, 'oid', 'A', '0', '1', undef, 'oid' ],
-	[ undef, $schema, $table3, '1', undef, 'dbd_pg_test3_index_c', 'hashed', 1, 'c', 'A', '0', '4', undef, 'c' ],
+	[ $dbh->{pg_db}, $schema, $table3, undef, undef, undef, 'table', undef, undef, undef, '0', '0', undef, undef ],
+	[ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
+	[ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
+	[ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c' ],
+	($with_oids ? [ $dbh->{pg_db}, $schema, $table3, '1', undef, 'dbd_pg_test3_oid',     'btree',  1, 'oid', 'A', '0', '1', undef, 'oid' ] : ()),
+	[ $dbh->{pg_db}, $schema, $table3, '1', undef, 'dbd_pg_test3_index_c', 'hashed', 1, 'c', 'A', '0', '4', undef, 'c' ],
 ],
 	three_uo => [
-	[ undef, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
-	[ undef, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
-	[ undef, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c' ],
+	[ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_index_b', 'btree',  1, 'b', 'A', '0', '1', undef, 'b' ],
+	[ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pkey',    'btree',  1, 'a', 'A', '0', '1', undef, 'a' ],
+	[ $dbh->{pg_db}, $schema, $table3, '0', undef, 'dbd_pg_test3_pred',    'btree',  1, 'c', 'A', '0', '1', '((c > 0) AND (c < 45))', 'c' ],
 	],
 };
 
@@ -834,7 +895,7 @@ $t="Correct stats output for $table3";
 $sth = $dbh->statistics_info(undef,$schema,$table3,undef,undef);
 $stats = $sth->fetchall_arrayref;
 ## Too many intra-version differences to try for an exact number here:
-$correct_stats->{three}[5][11] = $stats->[5][11] = 0;
+$correct_stats->{three}[$hash_index_idx][11] = $stats->[$hash_index_idx][11] = 0;
 is_deeply ($stats, $correct_stats->{three}, $t);
 
 $t="Correct stats output for $table3 (unique only)";
@@ -856,7 +917,7 @@ is_deeply ($stats, $correct_stats->{three_uo}, $t);
 	$t="Correct stats output for $table3";
 	$sth = $dbh->statistics_info(undef,undef,$table3,undef,undef);
 	$stats = $sth->fetchall_arrayref;
-	$correct_stats->{three}[5][11] = $stats->[5][11] = 0;
+	$correct_stats->{three}[$hash_index_idx][11] = $stats->[$hash_index_idx][11] = 0;
 	is_deeply ($stats, $correct_stats->{three}, $t);
 
 	$t="Correct stats output for $table3 (unique only)";
@@ -870,7 +931,7 @@ $dbh->do("DROP TABLE $table3");
 $dbh->do("DROP TABLE $table2");
 $dbh->do("DROP TABLE $table1");
 
-} ## end of statistics_info tests
+## end of statistics_info tests
 
 #
 # Test of the "foreign_key_info" database handle method
@@ -981,11 +1042,11 @@ $t='DB handle method "foreign_key_info" works for good pk';
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,undef);
 $result = $sth->fetchall_arrayref();
 my $fk1 = [
-					 undef, ## Catalog
+					 $dbh->{pg_db}, ## Catalog
 					 $schema2, ## Schema
 					 $table1, ## Table
 					 'a', ## Column
-					 undef, ## FK Catalog
+					 $dbh->{pg_db}, ## FK Catalog
 					 $schema2, ## FK Schema
 					 $table2, ## FK Table
 					 'f2', ## FK Table
@@ -1024,11 +1085,11 @@ $t='DB handle method "foreign_key_info" works for good pk / explicit fk';
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,undef);
 $result = $sth->fetchall_arrayref();
 my $fk2 = [
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table1,
 					 'b',
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table2,
 					 'f3',
@@ -1055,11 +1116,11 @@ $t='DB handle method "foreign_key_info" works for good pk / implicit fk';
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,undef);
 $result = $sth->fetchall_arrayref();
 my $fk3 = [
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table1,
 					 'c',
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table2,
 					 'f3',
@@ -1088,11 +1149,11 @@ for my $s ($schema3, $schema2) {
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,undef);
 $result = $sth->fetchall_arrayref();
 my $fk4 = [
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table1,
 					 'a',
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table3,
 					 'ff1',
@@ -1129,11 +1190,11 @@ $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,$table2);
 $result = $sth->fetchall_arrayref();
 ## "dbd_pg_test2_fk4" FOREIGN KEY (f1, f3, f2) REFERENCES dbd_pg_test1(c, a, b)
 my $fk5 = [
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table1,
 					 'c',
-					 undef,
+					 $dbh->{pg_db},
 					 $schema2,
 					 $table2,
 					 'f1',
@@ -1959,6 +2020,10 @@ for my $type (qw/ ping pg_ping /) {
 	$dbh = connect_database({nosetup => 1});
 	isnt ($dbh, undef, $t);
 
+  SKIP: {
+
+        skip 'Cannot safely reopen sockets on Win32', 2 if $^O =~ /Win32/;
+
 	$val = $type eq 'ping' ? 0 : -3;
 	$t=qq{DB handle method "$type" returns $val after a lost network connection (outside transaction)};
 	socket_fail($dbh);
@@ -1973,6 +2038,7 @@ for my $type (qw/ ping pg_ping /) {
 	is ($dbh->$type(), $val, $t);
 
 	$type eq 'ping' and $dbh = connect_database({nosetup => 1});
+  }
 }
 
 exit;

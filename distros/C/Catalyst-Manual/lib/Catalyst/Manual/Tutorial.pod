@@ -11,7 +11,7 @@ commonly used features while focusing on real-world best practices.
 
 We suggest that you read this introduction on the web.  Make sure you are
 reading the latest version of the tutorial by visiting
-L<https://metacpan.org/module/Catalyst::Manual::Tutorial>.  Alternatively
+L<Catalyst::Manual::Tutorial>.  Alternatively
 you can use CPAN modules like L<Pod::Webserver>, L<Pod::POM::Web>,
 L<Pod::Browser> (Catalyst based), or L<CPAN::Mini::Webserver> to read a local
 copy of the tutorial.
@@ -65,8 +65,8 @@ L<Appendices|Catalyst::Manual::Tutorial::10_Appendices>
 
 =back
 
-Final code tarballs for each chapter of the tutorial are available at 
-L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/>.
+Final code tarballs for each chapter of the tutorial are available at
+L<http://dev.catalystframework.org/repos/Catalyst/trunk/examples/Tutorial/>.
 
 
 =head1 Detailed Table of Contents
@@ -74,7 +74,7 @@ L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/>.
 
 =head2 L<Chapter 1: Intro|Catalyst::Manual::Tutorial::01_Intro>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -100,7 +100,7 @@ WHERE TO GET WORKING CODE
 
 =head2 L<Chapter 2: Catalyst Basics|Catalyst::Manual::Tutorial::02_CatalystBasics>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -134,7 +134,7 @@ CREATE A SIMPLE CONTROLLER AND AN ACTION
 
 =head2 L<Chapter 3: More Catalyst Basics|Catalyst::Manual::Tutorial::03_MoreCatalystBasics>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -273,7 +273,7 @@ Return To A Manually-Specified Template
 
 =head2 L<Chapter 4: Basic CRUD|Catalyst::Manual::Tutorial::04_BasicCRUD>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -411,7 +411,7 @@ Adding Methods to Result Classes
 
 =head2 L<Chapter 5: Authentication|Catalyst::Manual::Tutorial::05_Authentication>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -509,7 +509,7 @@ Switch To Flash-To-Stash
 
 =head2 L<Chapter 6: Authorization|Catalyst::Manual::Tutorial::06_Authorization>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -551,7 +551,7 @@ ENABLE MODEL-BASED AUTHORIZATION
 
 =head2 L<Chapter 7: Debugging|Catalyst::Manual::Tutorial::07_Debugging>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -577,7 +577,7 @@ TT DEBUGGING
 
 =head2 L<Chapter 8: Testing|Catalyst::Manual::Tutorial::08_Testing>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -603,7 +603,7 @@ SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
 =head2 L<Chapter 9: Advanced CRUD|Catalyst::Manual::Tutorial::09_AdvancedCRUD>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -617,7 +617,7 @@ ADVANCED CRUD OPTIONS
 
 =head2 L<Chapter 10: Appendices|Catalyst::Manual::Tutorial::10_Appendices>
 
-Note: Click on the heading in the previous line to jump to the actual 
+Note: Click on the heading in the previous line to jump to the actual
 chapter. Below is a "table of contents" for this chapter.
 
 =over 4
@@ -663,8 +663,8 @@ APPENDIX 3: IMPROVED HASHING SCRIPT
 
 =head1 THANKS
 
-This tutorial would not have been possible without the input of many 
-different people in the Catalyst community.  In particular, the 
+This tutorial would not have been possible without the input of many
+different people in the Catalyst community.  In particular, the
 primary author would like to thank:
 
 =over 4
@@ -690,7 +690,7 @@ key Catalyst modules.
 
 Other Catalyst documentation folks like Kieren Diment, Gavin Henry,
 and Jess Robinson (including their work on the original Catalyst
-tutorial).  
+tutorial).
 
 =item *
 
@@ -707,18 +707,18 @@ PostgreSQL content in the Appendix.
 
 =item *
 
-People who have emailed me with corrections and suggestions on the 
-tutorial. As of the most recent release, this include: Florian Ragwitz, 
-Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno, Bryan 
-Roach, Ashley Berlin, David Kamholz, Kevin Old, Henning Sprang, Jeremy 
-Jones, David Kurtz, Ingo Wichmann, Shlomi Fish, Murray Walker, Adam 
-Witney and xenoterracide (Caleb Cushing). Thanks to Devin Austin for 
-coming up with an initial version of a non-TTSite wrapper page. Also, a 
-huge thank you to Kiffin Gish for all the hard work on the "database 
-depluralization" effort and Rafael Kitover for the work on updating the 
-tutorial to include foreign key support for SQLite. I'm sure I am 
-missing some names here... apologies for that (please let me know if you 
-name should be here). 
+People who have emailed me with corrections and suggestions on the
+tutorial. As of the most recent release, this include: Florian Ragwitz,
+Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno, Bryan
+Roach, Ashley Berlin, David Kamholz, Kevin Old, Henning Sprang, Jeremy
+Jones, David Kurtz, Ingo Wichmann, Shlomi Fish, Murray Walker, Adam
+Witney and xenoterracide (Caleb Cushing). Thanks to Devin Austin for
+coming up with an initial version of a non-TTSite wrapper page. Also, a
+huge thank you to Kiffin Gish for all the hard work on the "database
+depluralization" effort and Rafael Kitover for the work on updating the
+tutorial to include foreign key support for SQLite. I'm sure I am
+missing some names here... apologies for that (please let me know if you
+name should be here).
 
 =back
 
@@ -732,4 +732,4 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
 
 Copyright 2006-2010, Kennedy Clark, under the
 Creative Commons Attribution Share-Alike License Version 3.0
-(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).
+(L<https://creativecommons.org/licenses/by-sa/3.0/us/>).

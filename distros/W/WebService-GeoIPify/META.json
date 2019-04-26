@@ -92,11 +92,11 @@
          "web" : "https://github.com/kianmeng/webservice-geoipify"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Kian Meng Ang <kianmeng@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "JSON::XS version 3.04",
    "x_static_install" : 1
 }

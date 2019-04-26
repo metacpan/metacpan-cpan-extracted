@@ -1,6 +1,19 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
-0.706 Mon 17 Oct 18:37:00 GMT 2018
+0.708 Fri 26 Apr 09:47:00 GMT 2019
+
+    [BUG FIXES]
+
+    * Attempt to fix intermittent test failures (thanks Tom Hukins)
+    * Better check for HTTP::BrowserDetect to prevent strange test failures
+
+0.707 Mon 20 Dec 21:55:00 GMT 2018
+
+    [ENHANCEMENTS]
+
+    * Add after_reset_code_success hook (thanks Nathan Bailey)
+
+0.706 Mon 17 Dec 18:37:00 GMT 2018
 
     [BUG FIXES]
 

@@ -82,18 +82,18 @@
    "provides" : {
       "XML::Axk" : {
          "file" : "lib/XML/Axk.pm",
-         "version" : "0.001008"
+         "version" : "0.001009"
       },
       "XML::Axk::App" : {
          "file" : "lib/XML/Axk/App.pm",
-         "version" : "0.001008"
+         "version" : "0.001009"
       },
       "XML::Axk::Base" : {
          "file" : "lib/XML/Axk/Base.pm"
       },
       "XML::Axk::Core" : {
          "file" : "lib/XML/Axk/Core.pm",
-         "version" : "0.001008"
+         "version" : "0.001009"
       },
       "XML::Axk::DOM" : {
          "file" : "lib/XML/Axk/DOM.pm"
@@ -115,7 +115,7 @@
       },
       "XML::Axk::Object::TinyDefaults" : {
          "file" : "lib/XML/Axk/Object/TinyDefaults.pm",
-         "version" : "0.001008"
+         "version" : "0.001009"
       },
       "XML::Axk::Preparse" : {
          "file" : "lib/XML/Axk/Preparse.pm"
@@ -151,6 +151,10 @@
          "web" : "https://github.com/interpreters/axk"
       }
    },
-   "version" : "0.001008",
+   "version" : "0.001009",
+   "x_authority" : "cpan:CXW",
+   "x_contributors" : [
+      "Christopher White <cxw@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

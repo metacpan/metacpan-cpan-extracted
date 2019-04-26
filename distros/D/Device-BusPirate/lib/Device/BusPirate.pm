@@ -1,21 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
 
 use Fcntl qw( O_NOCTTY O_NDELAY );
+use Future::AsyncAwait;
 use Future::Mutex;
-use Future::IO;
-use Future::Utils qw( repeat try_repeat );
+use Future::IO 0.03; # ->sysread_exactly
 use IO::Termios 0.07; # cfmakeraw
 use Time::HiRes qw( time );
 
@@ -152,27 +152,27 @@ sub write
    $self->_syswrite( $self->{fh}, $buf );
 }
 
-sub write_expect_ack
+async sub write_expect_ack
 {
    my $self = shift;
    my ( $out, $name, $timeout ) = @_;
 
-   return $self->write_expect_acked_data( $out, 0, $name, $timeout )
-      ->then_done();
+   await $self->write_expect_acked_data( $out, 0, $name, $timeout );
+   return;
 }
 
-sub write_expect_acked_data
+async sub write_expect_acked_data
 {
    my $self = shift;
    my ( $out, $readlen, $name, $timeout ) = @_;
 
    $self->write( $out );
-   $self->read( 1 + $readlen, $name, $timeout )->then( sub {
-      my ( $buf ) = @_;
-      substr( $buf, 0, 1, "" ) eq "\x01" or
-         return Future->fail( "Expected ACK response to $name" );
-      return Future->done( $buf );
-   });
+   my $buf = await $self->read( 1 + $readlen, $name, $timeout );
+
+   substr( $buf, 0, 1, "" ) eq "\x01" or
+      die "Expected ACK response to $name";
+
+   return $buf;
 }
 
 # For Modes
@@ -184,14 +184,11 @@ sub read
    return Future->done( "" ) unless $n;
 
    my $buf = "";
-   my $f = ( repeat {
-      Future::IO->sysread( $self->{fh}, $n - length $buf )->on_done( sub {
-         $buf .= $_[0];
-      });
-   } while => sub { !$_[0]->failure and $n > length $buf } )->then( sub {
-      printf STDERR "PIRATE << %v02x\n", $buf if Device::BusPirate::PIRATE_DEBUG > 1;
-      Future->done( $buf );
-   });
+   my $f = Future::IO->sysread_exactly( $self->{fh}, $n );
+
+   $f->on_done( sub {
+      printf STDERR "PIRATE << %v02x\n", $_[0];
+   }) if Device::BusPirate::PIRATE_DEBUG > 1;
 
    return $f unless defined $name;
 
@@ -280,7 +277,7 @@ information.
 
 =cut
 
-sub enter_mode
+async sub enter_mode
 {
    my $self = shift;
    my ( $modename ) = @_;
@@ -288,25 +285,10 @@ sub enter_mode
    my $modeclass = $MODEMAP{$modename} or
       croak "Unrecognised mode '$modename'";
 
-   $self->start->then( sub {
-      ( $self->{mode} = $modeclass->new( $self ) )->start;
-   });
-}
+   await $self->start;
 
-=head2 mount_chip
-
-B<Note>: this method is now deprecated in favour of the L<Device::Chip>
-interface. This distribution provides a class,
-L<Device::Chip::Adapter::BusPirate>, suitable to connect an instance of the
-L<Device::Chip> interface to. Any previously-written Bus Pirate-specific
-chip driver classes should now be changed to target the generic
-L<Device::Chip> interface instead.
-
-=cut
-
-sub mount_chip
-{
-   croak "Device::BusPirate->mount_chip is now deprecated. Please use Device::Chip instead";
+   $self->{mode} = $modeclass->new( $self );
+   await $self->{mode}->start;
 }
 
 =head2 start
@@ -324,18 +306,18 @@ sub start
    my $self = shift;
 
    Future->wait_any(
-      $self->read( 5, "start", 2.5 )->then( sub {
-         my ( $buf ) = @_;
-         return Future->done( ( $self->{version} ) = $buf =~ m/^BBIO(\d)/ );
-      }),
-      repeat {
-         $self->write( "\0" );
-         $self->sleep( 0.05 );
-      } foreach => [ 1 .. 20 ],
-        while => sub { not shift->failure },
-        otherwise => sub {
-           Future->fail( "Timed out waiting for device to enter bitbang mode" )
-        },
+      (async sub {
+         my $buf = await $self->read( 5, "start", 2.5 );
+         ( $self->{version} ) = $buf =~ m/^BBIO(\d)/;
+         return $self->{version};
+      })->(),
+      (async sub {
+         foreach my $i ( 1 .. 20 ) {
+            $self->write( "\0" );
+            await $self->sleep( 0.05 );
+         }
+         die "Timed out waiting for device to enter bitbang mode";
+      })->(),
    );
 }
 

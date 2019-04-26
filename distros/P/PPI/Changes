@@ -1,5 +1,58 @@
 Revision history for Perl extension PPI
 
+1.252   2019-04-26 14:21:36Z
+	Summary:
+	- add support for the double diamond (<<>>) input operator
+	- adjust position of a todo marker to not catch a passing test
+
+1.250   2019-04-25 16:43:32Z
+	Summary:
+	- various smaller releng changes
+
+	Details:
+	- removed dependency on File::Remove
+	- add some tests including a TODO test for misparse bug on '(1)-1'
+	- allow tests to run without pre-determined module versions
+	- add travis-perl helper to be run before install
+	- update versions of Perl Travis tests on
+
+1.248   2019-04-25 16:08:08Z
+	Summary:
+	- parse list-embedded curlies as hash constructors
+
+1.246   2019-04-25 15:33:48Z
+	Summary:
+	- support indented here-docs
+	- fixed some typos
+
+1.244   2019-04-25 15:21:51Z
+	Summary:
+	- support key-value and index-value slices in PPI::Token::Symbol symbol method
+
+1.242   2019-04-25 14:33:56Z
+	Summary:
+	- keep exponents of 2 or more zeroes from trapping PPI in an endless loop
+
+1.240   2019-04-25 14:09:24Z
+	Summary:
+	- add support for lexical subroutines from perl-5.26
+
+1.238   2019-04-25 12:03:37Z
+	Summary:
+	- only release engineering, moved to Dist::Zilla, straightened out
+	  dependencies and fixed some formatting in Changes
+
+1.237_001 Wed 15 Nov 2017
+	Summary:
+	- support postfix dereference
+	- remove dependencies on vars, base and List::MoreUtils
+	- reduce globals and cross-package variables
+	- make xt/api.t skip/run properly
+
+	Details:
+	- convert many cross-package var accesses to var imports
+	- convert several unnecessary globals to local variables
+
 1.236 Thu 22 June 2017
 	Summary:
 	- prevent Node->child from proceeding without a valid argument
@@ -854,7 +907,7 @@ Revision history for Perl extension PPI
 	- Resolved Lexer bug CPAN #13425 ( $p{package} creates a PPI::Statement::Package )
 	  Added smarts to resolve word-started statements as ::Expression in subscripts
 	- Resolved PDOM bug CPAN #13326 ( problems in index_locations )
-	  Patch and comprehensive additional tests provided by johanl[ÄT]DarSerMan.com
+	  Patch and comprehensive additional tests provided by johanl[Ã„T]DarSerMan.com
 	- Removed dependency on Class::Autouse. Just load Tokenizer and Lexer up front.
 	- Removed dependency on File::Slurp. Only use it 3 times and it's not worth it
 	  when almost all the files we will read are under 50k.

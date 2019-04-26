@@ -1,5 +1,8 @@
 Revision history for Task-Bootstrap-Perl-CPAN
 
+0.004     2019-04-26
+        - add HTTP::Date
+
 0.003     2018-04-22
         - renamed into Task::Bootstrap::Perl::CPAN and re-uploaded
 

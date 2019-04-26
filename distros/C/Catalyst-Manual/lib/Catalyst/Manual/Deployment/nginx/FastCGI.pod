@@ -96,7 +96,7 @@ the following in your nginx config for the SSL vhost:
 =head1 MORE INFO
 
 For more information on nginx, visit:
-L<http://nginx.net>
+L<https://nginx.net>
 
 =head1 AUTHORS
 

@@ -165,7 +165,6 @@ version: $version
 					}
 
 					warn "Restarting test database $testdsn at $testdir\n";
-					my $option = '';
 					if ($^O !~ /Win32/) {
 						my $sockdir = "$testdir/data/socket";
 						if (! -e $sockdir) {
@@ -176,12 +175,8 @@ version: $version
 								}
 							}
 						}
-						$option = q{-o '-k socket'};
-						if ($version <= 8.0) {
-							$option = q{-o '-k dbdpg_test_database/data/socket'};
-						}
 					}
-					my $COM = qq{$pg_ctl $option -l $testdir/dbdpg_test.logfile -D $testdir/data start};
+					my $COM = qq{$pg_ctl -o '-k $testdir/data/socket' -l $testdir/dbdpg_test.logfile -D $testdir/data start};
 					if ($su) {
 						$COM = qq{su -m $su -c "$COM"};
 						chdir $testdir;
@@ -336,7 +331,7 @@ version: $version
 			$info = qx{$pg_ctl --help 2>&1};
 		};
 		last GETHANDLE if $@; ## Fail - pg_ctl bad
-		if (!defined $info or ($info !~ /\@postgresql\.org/ and $info !~ /run as root/)) {
+		if (!defined $info or ($info !~ /\@[a-z.-]*?postgresql\.org/ and $info !~ /run as root/)) {
 			$@ = defined $initdb ? "Bad pg_ctl output: $info" : 'Bad pg_ctl output';
 			last GETHANDLE; ## Fail - pg_ctl bad
 		}
@@ -423,6 +418,11 @@ version: $version
 			last GETHANDLE; ## Fail - bad output
 		}
 
+		## Which user do we connect as?
+		if (!$su and $info =~ /owned by user "(.+?)"/) {
+			$testuser = $1;
+		}
+
 		## Attempt to boost the system oids above an int for certain testing
 		(my $resetxlog = $initdb) =~ s/initdb/pg_resetxlog/;
 		if ($version >= 10) {
@@ -438,11 +438,6 @@ version: $version
 				};
 				## We don't really care if it worked or not!
 			}
-		}
-
-		## Which user do we connect as?
-		if (!$su and $info =~ /owned by user "(.+?)"/) {
-			$testuser = $1;
 		}
 
 		## Now we need to find an open port to use
@@ -504,13 +499,10 @@ version: $version
 			print $cfh "\n\n## DBD::Pg testing parameters\n";
 			print $cfh "port=$testport\n";
 			print $cfh "max_connections=11\n";
-			if ($version >= 8.0) {
-				print $cfh "log_statement = 'all'\n";
-				print $cfh "log_line_prefix = '%m [%p] '\n";
-			}
-			else {
-				print $cfh "silent_mode = true\n";
-			}
+			print $cfh "log_statement = 'all'\n";
+			print $cfh "log_line_prefix = '%m [%p] '\n";
+			print $cfh "log_filename = 'postgres%Y-%m-%d.log'\n";
+			print $cfh "log_rotation_size = 0\n";
 			if ($version == 8.1) {
 				print {$cfh} "redirect_stderr = on\n";
 			}
@@ -519,8 +511,6 @@ version: $version
 				print {$cfh} "logging_collector = on\n";
 			}
 			print $cfh "log_min_messages = 'DEBUG1'\n";
-			print $cfh "log_filename = 'postgres%Y-%m-%d.log'\n";
-			print $cfh "log_rotation_size = 0\n";
 
 			if ($version >= 9.4) {
 				print $cfh "wal_level = logical\n";
@@ -543,7 +533,6 @@ version: $version
 
 			## Attempt to start up the test server
 			$info = '';
-			my $option = '';
 			if ($^O !~ /Win32/) {
 				my $sockdir = "$testdir/data/socket";
 				if (! -e $sockdir) {
@@ -554,12 +543,8 @@ version: $version
 						}
 					}
 				}
-				$option = q{-o '-k socket'};
-				if ($version <= 8.0) {
-					$option = q{-o '-k dbdpg_test_database/data/socket'};
-				}
 			}
-			my $COM = qq{$pg_ctl $option -l $testdir/dbdpg_test.logfile -D $testdir/data start};
+			my $COM = qq{$pg_ctl -o '-k $testdir/data/socket' -l $testdir/dbdpg_test.logfile -D $testdir/data start};
 		    $olddir = getcwd;
 			if ($su) {
 				chdir $testdir;

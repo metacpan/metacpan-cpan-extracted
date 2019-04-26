@@ -6,6 +6,10 @@ and this project adheres to [Simple Versioning](https://drmuey.github.io/simver/
 
 ## [Unreleased]
 
+## [0.03] - 2019-04-25
+### Fixed
+- Work around https://github.com/Tux/Text-OutputFilter/issues/1 bug
+
 ## [0.02] - 2019-04-18
 ### Added
 - App::Task::tie_task()

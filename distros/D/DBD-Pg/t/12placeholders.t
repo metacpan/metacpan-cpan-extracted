@@ -17,12 +17,12 @@ my $dbh = connect_database();
 if (! $dbh) {
 	plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 257;
+plan tests => 259;
 
 my $t='Connect to database for placeholder testing';
 isnt ($dbh, undef, $t);
 
-my ($pglibversion,$pgversion) = ($dbh->{pg_lib_version},$dbh->{pg_server_version});
+my $pgversion = $dbh->{pg_server_version};
 if ($pgversion >= 80100) {
   $dbh->do('SET escape_string_warning = false');
 }
@@ -479,17 +479,12 @@ eval {
 };
 is ($@, q{}, $t);
 
-SKIP: {
-	if ($pglibversion < 80000) {
-		skip ('Skipping specific placeholder test on 7.4-compiled servers', 1);
-	}
-	$t='Calling do() with invalid crowded placeholders fails cleanly';
-	$dbh->commit();
-	eval {
-		$dbh->do(q{SELECT ??}, undef, 'public', 'error');
-	};
-	is ($dbh->state, '42601', $t);
-}
+$t='Calling do() with invalid crowded placeholders fails cleanly';
+$dbh->commit();
+eval {
+    $dbh->do(q{SELECT ??}, undef, 'public', 'error');
+};
+is ($dbh->state, '42601', $t);
 
 $t='Prepare/execute with non-DML placeholder works';
 $dbh->commit();
@@ -625,9 +620,6 @@ eval {
 };
 is ($@, q{}, $t);
 
-SKIP: {
-	skip 'Cannot run some quote tests on very old versions of Postgres', 14 if $pgversion < 80000;
-
 $t='Prepare works with placeholders after double slashes';
 eval {
 	$dbh->do(q{CREATE OPERATOR // ( PROCEDURE=bit, LEFTARG=int, RIGHTARG=int )});
@@ -685,8 +677,6 @@ SKIP: {
 	}
 }
 
-}
-
 SKIP: {
 	skip 'Cannot run backslash_quote test on Postgres < 8.2', 1 if $pgversion < 80200;
 
@@ -704,10 +694,10 @@ SKIP: {
 $dbh->rollback();
 
 SKIP: {
-	skip 'Cannot adjust standard_conforming_strings for testing on this version of Postgres', 2 if $pgversion < 80200;
+	skip 'Cannot adjust standard_conforming_strings for testing on this version of Postgres', 4 if $pgversion < 80200;
 	$t='Backslash quoting inside single quotes is parsed correctly with standard_conforming_strings off';
+	$dbh->do(q{SET standard_conforming_strings = 'off'});
 	eval {
-		$dbh->do(q{SET standard_conforming_strings = 'off'});
 		local $dbh->{Warn} = '';
 		$sth = $dbh->prepare(q{SELECT '\', ?});
 		$sth->execute();
@@ -716,12 +706,29 @@ SKIP: {
 	like ($@, qr{unterminated quoted string}, $t);
 	$dbh->rollback();
 
+	$t=q{Backslash quoting inside E'' is parsed correctly with standard_conforming_strings = 'off'};
+	eval {
+		$sth = $dbh->prepare(q{SELECT E'\'?'});
+		$sth->execute();
+		$sth->finish;
+	};
+	is ($@, q{}, $t);
+	$dbh->rollback();
+
 	$t='Backslash quoting inside single quotes is parsed correctly with standard_conforming_strings on';
 	eval {
 		$dbh->do(q{SET standard_conforming_strings = 'on'});
 		$sth = $dbh->prepare(q{SELECT '\', ?::int});
 		$sth->execute(1);
 		$sth->finish();
+	};
+	is ($@, q{}, $t);
+
+	$t=q{Backslash quoting inside E'' is parsed correctly with standard_conforming_strings = 'on'};
+	eval {
+		$sth = $dbh->prepare(q{SELECT E'\'?'});
+		$sth->execute();
+		$sth->finish;
 	};
 	is ($@, q{}, $t);
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -15,23 +15,27 @@ use warnings;
 use Cwd;
 use ExtUtils::MakeMaker;
 use File::Copy;
+require Data::Dumper;
 
 $| = 1;
 
-my $Version  = "1.31";
-my $Latest_t = "5.029002";
+my $Version  = "1.32";
+my $Latest_t = "5.029010";
 my $Author   = 'paul@pjcj.net';
 my @perlbug  = ("perlbug", "-a", $Author,
                            "-s", "Installation of Devel::Cover $Version");
 my $Perlbug  = join " ", map { / / ? "'$_'" : $_ } @perlbug;
 my %inc      = map { -d $_ ? (($_ eq "." ? $_ : Cwd::abs_path($_)) => 1) : () }
                    @INC;
-my @inc      = sort keys %inc;
+my $dumper = Data::Dumper->new( [[ sort keys %inc ]] );
+$dumper->Indent(1)->Terse(1);
+$dumper->Sortkeys(1) if $dumper->can("Sortkeys");
+chomp (my $inc_string = $dumper->Dump);
 
 open I, ">lib/Devel/Cover/Inc.pm"
     or die "Cannot open lib/Devel/Cover/Inc.pm: $!";
 print I <<"EOI";
-# Copyright 2001-2018, Paul Johnson (paul\@pjcj.net)
+# Copyright 2001-2019, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -47,7 +51,7 @@ use warnings;
 
 our \$VERSION      = "$Version";
 our \$Perl_version = '$]';
-our \@Inc          = qw( @inc );
+our \@Inc          = \@{ $inc_string };
 chomp (our \$Perl  = <<'EOV');  # Careful with \\\\ in the path
 $^X
 EOV
@@ -101,7 +105,7 @@ for my $t (readdir D) {
     print T <<EOT;
 #!$^X
 
-# Copyright 2002-2018, Paul Johnson (paul\@pjcj.net)
+# Copyright 2002-2019, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -340,7 +344,7 @@ my $opts = {
     test             => {
                             TESTS => $ENV{DEVEL_COVER_NO_TESTS}
                                          ? ""
-                                         : "t/*/*.t"
+                                         : "t/*.t t/*/*.t"
                         },
     realclean        => $] < 5.008008 ?
                         {

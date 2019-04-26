@@ -15,6 +15,7 @@ use Getopt::Long ":config", "no_ignore_case", "bundling";
 use Cwd "getcwd";
 use Sys::Hostname;
 
+my $timestamp           = ~~localtime();
 my $HOME                = $ENV{HOME} || '/opt';
 my $hostname            = hostname();
 
@@ -61,6 +62,13 @@ my $LOGFILE;
 my $COMMAND;
 my $USER;
 
+use constant {
+    NO_REINSTALL => 0,
+    REINSTALL   => 1,
+    NO_FORCE     => 0,
+    FORCE       => 1,
+};
+
 sub caller_line {
         my $i = 0;
         my ($rc, $rc_prev, $func);
@@ -95,21 +103,17 @@ sub print_and_system {
         my $bin = $cmd[0];
         my $is_cpan = $bin eq bin_cpan();
 
-        if (! $is_cpan) {
-                open(STDOUT, ">>&", $LOGFILE) || die;
-                open(STDERR, ">>&", $LOGFILE) || die;
+        open(STDOUT, ">>&", $LOGFILE) || die;
+        open(STDERR, ">>&", $LOGFILE) || die;
 
-                print $COMMAND $cmd, "\n";
-                print $LOGFILE $cmd, "\n";
-                $exitcode = system ($cmd);
+        print $COMMAND $cmd, "\n";
+        print $LOGFILE $cmd, "\n";
+        $exitcode = system ($cmd);
 
-                open(STDOUT, ">&", $OLDSTDOUT) || die;
-                open(STDERR, ">&", $OLDSTDERR) || die;
+        open(STDOUT, ">&", $OLDSTDOUT) || die;
+        open(STDERR, ">&", $OLDSTDERR) || die;
 
-                $exitcode == 0 || warn "$0($line): $cmd ($exitcode>>".($exitcode>>8).")";
-        } else {
-                cpan_command(join(" ", @cmd[1..$#cmd]));
-        }
+        $exitcode == 0 || warn "$0($line): $cmd ($exitcode>>".($exitcode>>8).")";
 }
 
 # Execute a command via system(). Output goes to normal stdout/stderr.
@@ -237,7 +241,7 @@ my @default_mirrors    = (qw( http://search.cpan.org/CPAN/ ));
 return if defined($::{"no_run"});
 print $USER "\n";
 print $USER "============================================================\n";
-print $USER "Bootstrap Perl - ".localtime()."\n";
+print $USER "Bootstrap Perl - $timestamp\n";
 print $USER "============================================================\n";
 
 # giturl "." means clone from local dir
@@ -332,7 +336,7 @@ system("mkdir -p $build_path") == 0 || die;
 setup_log();
 print $LOGFILE "\n";
 print $LOGFILE "============================================================\n";
-print $LOGFILE "Bootstrap Perl - ".localtime()."\n";
+print $LOGFILE "Bootstrap Perl - $timestamp\n";
 print $LOGFILE "============================================================\n";
 
 if (-d "$build_path_perl/.git") {
@@ -352,7 +356,9 @@ print_and_system "cd $build_path_perl && rm -f $build_path_perl/.git/index.lock"
 print_and_system "cd $build_path_perl && git reset --hard";
 print_and_system "cd $build_path_perl && git clean -dxf";
 print_and_system "cd $build_path_perl && git checkout blead";
+print_and_system "cd $build_path_perl && git stash";
 print_and_system "cd $build_path_perl && git pull";
+print_and_system "cd $build_path_perl && git stash";
 print_and_system "cd $build_path_perl && git checkout $version";
 print_and_system "cd $build_path_perl && git pull";
 
@@ -508,10 +514,15 @@ my $PERL     = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/perl5.*.*     | tail -
 my $PERLDOC  = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/perldoc5.*.*  | tail -1!;
 my $POD2TEXT = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/pod2text5.*.* | tail -1!;
 
+# cpan config
+my $CFG   = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/Config.pm/"!;
+my $MYCFG = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/MyConfig.pm/"!;
+
 print $USER "# CPAN:     $CPAN\n";
 print $USER "# PERL:     $PERL\n";
 print $USER "# PERLDOC:  $PERLDOC\n";
 print $USER "# POD2TEXT: $POD2TEXT\n";
+print $USER "# CPANCFG:  $CFG\n";
 
 my $bin_perl     = "$PREFIX/bin/perl";
 my $bin_cpan     = "$PREFIX/bin/cpan";
@@ -524,88 +535,18 @@ print_and_system "if [ ! -e $bin_cpan     ] ; then ln -sf $CPAN     $bin_cpan   
 print_and_system "if [ ! -e $bin_perldoc  ] ; then ln -sf $PERLDOC  $bin_perldoc  ; fi";
 print_and_system "if [ ! -e $bin_pod2text ] ; then ln -sf $POD2TEXT $bin_pod2text ; fi";
 
-my $bin_cpan_helper  = "$build_path/cpan_helper.pl";
-my $pipe_cpan_helper = "$build_path/cpan_helper.out";
-my $log_cpan_helper  = "$build_path/cpan_helper.log";
-my $CPAN_COMMAND;
-my $CPAN_OUTPUT;
-
-my $text_cpan_helper = <<'END_HELPER';
-        use App::Cpan;
-
-        my ($result_pipe, $logfile) = @ARGV;
-
-        open(my $LOGFILE, ">>", $logfile) || die;
-        open(STDOUT, ">&", $LOGFILE) || die;
-        open(STDERR, ">&", \*STDOUT) || die;
-        print "*** HELPER_START ".localtime()."\n";
-
-        open(my $RESULT, ">", $result_pipe) || die;
-        my $ofh = select($RESULT); $| = 1; select($ofh);
-
-        my $has_cfg = 0;
-
-        while (my $cmd = <STDIN>) {
-                chomp $cmd;
-                print "*** CPAN_COMMAND_START [$cmd]\n";
-
-                # pass cfg to run() only once
-                # run() uses @ARGV
-                @ARGV  = split / +/, $cmd;
-                if ($ARGV[0] eq '-j') {
-                        $has_cfg && do { @ARGV = @ARGV[2..$#ARGV] };
-                        $has_cfg = 1;
-                }
-                print "cmd now [", join(" ", @ARGV),"]\n";
-
-                my $rc = App::Cpan->run(@ARGV);
-                print "*** CPAN_COMMAND_END [$rc] [$cmd]\n";
-                print $RESULT $rc, "\n";
-        }
-
-        END {
-                print "*** HELPER_END [$?] ".localtime()."\n";
-        }
-END_HELPER
-
-sub cpan_helper_setup {
-        # create helper script
-        open (my $fh_helper, ">", $bin_cpan_helper) || die;
-        print $fh_helper $text_cpan_helper || die;
-        close $fh_helper;
-
-        # create fifo, helper outputs result code to it
-        print_and_system("if [ ! -p $pipe_cpan_helper ]; then mkfifo $pipe_cpan_helper; fi");
-
-        # start helper
-        open ($CPAN_COMMAND, "|-", "$PERL $bin_cpan_helper $pipe_cpan_helper $log_cpan_helper") || die;
-        my $ofh = select $CPAN_COMMAND; $| = 1; select $ofh;
-        open ($CPAN_OUTPUT, "<", $pipe_cpan_helper) || die;
-}
-
-sub cpan_command {
-        my ($cmd) = @_;
-        $cmd =~ /\S+$/; my $mod = $&;
-        local $SIG{PIPE} = sub { die "cpan helper pipe broke" };
-        print $USER $mod, "\n";
-        print $COMMAND "cpan_command ", $cmd, "\n";
-        print $LOGFILE "cpan_command ", $cmd, "\n";
-        print $CPAN_COMMAND $cmd, "\n";
-        my $rc = <$CPAN_OUTPUT>;
-        defined $rc || die "no more cpan output - module installation problem? check ~/.bootstrapperl/bootstrap-perl-build/cpan_helper.log";
-        chomp $rc;
-        $rc == 0 || die "rc is $rc";
-}
-
 sub bin_cpan { $bin_cpan || "" }
 
 # ========== cpan ==========
 
 sub install_cpan_module {
-        my ($perl, $cpan, $cfg, $force, $module) = @_;
+        my ($perl, $cpan, $cfg, $reinstall, $force, $module) = @_;
 
-        my $_f = $force ? "-f" : "";
-        if (system "$perl -M$module -e1 2> /dev/null") { # remember shell bool logic, exitcode!=0 means fail means we install
+        my $_f = ($force) ? "-f" : "";
+
+        # remember shell bool logic, exitcode!=0 means fail means we install
+
+        if (system "$perl -M$module -e1 2> /dev/null" || $reinstall) { # already exists or reinstall
             print_and_system qq{$cpan -j $cfg $_f -i $module};
         }
 }
@@ -629,9 +570,6 @@ if ($cpan)
         print_and_system qq!rm -fr $CPANBUILDDIR!;
 
         # Configure CPAN initially
-        my $CFG   = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/Config.pm/"!;
-        my $MYCFG = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/MyConfig.pm/"!;
-
         if ($forcecpancfg or ! -e $CFG) {
                 print $USER "*** CONFIGURE cpan\n";
 
@@ -674,20 +612,18 @@ if ($cpan)
         }
 
         # force a CPAN.pm with all features we need, assume old-school CPAN.pm
-        print_and_system qq{if [ -L $bin_cpan -o ! -e $bin_cpan ] ; then /bin/rm $bin_cpan ; echo "force install CPAN" | $PERL -MCPAN -e shell ; fi};
+        print_and_system qq{if [ -L $bin_cpan -o ! -e $bin_cpan ] ; then /bin/rm -f $bin_cpan ; echo "force install CPAN" | $PERL -MCPAN -e shell ; fi};
 
         # once upon a time the cpan exe missed the executable bit - set it to be sure
         print_and_system qq!chmod +x $CPAN!;
         print_and_system qq!chmod +x $bin_cpan!;
 
-        cpan_helper_setup();
-
         print $USER "*** INSTALL cpan dependencies\n";
 
         # install extended cpan toolchain; contains some "force" where we know they are really required
-        install_cpan_module($PERL, $bin_cpan, $CFG, 1, "ExtUtils::Config");
-        install_cpan_module($PERL, $bin_cpan, $CFG, 1, "YAML::XS");
-        install_cpan_module($PERL, $bin_cpan, $CFG, 1, "YAML");
+        install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "ExtUtils::Config");
+        install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "YAML::XS");
+        install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "YAML");
 
         # try really hard with some modules until we find a version
         # that fits currrent Perl
@@ -714,7 +650,7 @@ if ($cpan)
                 foreach my $dist (@{$mod_dists{$mod}}) {
                         print_and_system qq{if ! $PERL -M$mod -e1 ; then $bin_cpan -j $CFG $dist ; fi };
                 }
-                install_cpan_module($PERL, $bin_cpan, $CFG, 1, $mod);
+                install_cpan_module($PERL, $bin_cpan, $CFG, REINSTALL, NO_FORCE, $mod);
         }
 
         print_and_system qq{if ! $PERL -MIO::Compress::Base -e1 ; then $bin_cpan -j $CFG -f -i IO::Compress::Base ; fi };
@@ -733,16 +669,17 @@ if ($cpan)
 
         # install dependencies needed for CPAN itself
         foreach my $module (qw(version YAML::Syck IO::Tty Expect LWP Task::Bootstrap::Perl::CPAN)) {
-                install_cpan_module($PERL, $bin_cpan, $CFG, 1, $module);
+                install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, $module);
         }
         if ($perlformance || $perlformance_report) {
                 print $USER "AAAA::Mail::SpamAssassin (for Benchmark::Perl::Formance)\n";
-                install_cpan_module($PERL, $bin_cpan, $CFG, 1, "AAAA::Mail::SpamAssassin");
+                install_cpan_module($PERL, $bin_cpan, $CFG, REINSTALL, NO_FORCE, "AAAA::Mail::SpamAssassin");
         }
 
         # install requested modules from CPAN
         foreach my $module (@MODULES) {
-                install_cpan_module($PERL, $bin_cpan, $CFG, $forcemoduleinstall, $module);
+                print $USER "$module\n";
+                install_cpan_module($PERL, $bin_cpan, $CFG, REINSTALL, $forcemoduleinstall, $module);
         }
 } else {
         print $USER "*** SKIP bootstrapping cpan.\n";
@@ -1014,7 +951,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

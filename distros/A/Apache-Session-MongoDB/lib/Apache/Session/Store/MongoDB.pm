@@ -3,7 +3,7 @@ package Apache::Session::Store::MongoDB;
 use 5.010;
 use strict;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use MongoDB;
 
@@ -51,7 +51,7 @@ sub insert {
     $self->connection($session);
     die('no id') unless ( $session->{data}->{_session_id} );
     $session->{data}->{_id} = $session->{data}->{_session_id};
-    $self->{collection}->insert( $session->{data} );
+    $self->{collection}->insert_one( $session->{data} );
 }
 
 sub update {
@@ -76,7 +76,7 @@ sub materialize {
 sub remove {
     my ( $self, $session ) = splice @_;
     $self->connection($session);
-    $self->{collection}->remove( { _id => $session->{data}->{_session_id} } );
+    $self->{collection}->delete_one( { _id => $session->{data}->{_session_id} } );
 }
 
 sub DESTROY {

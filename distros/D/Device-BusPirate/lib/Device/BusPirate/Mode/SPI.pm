@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode::SPI;
 
@@ -9,11 +9,11 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
 
-use Future::Utils qw( repeat );
+use Future::AsyncAwait;
 use List::Util 1.33 qw( any );
 
 use constant MODE => "SPI";
@@ -61,7 +61,7 @@ L<Future> instances.
 
 =cut
 
-sub start
+async sub start
 {
    my $self = shift;
 
@@ -74,12 +74,10 @@ sub start
    $self->{cs_high} = 0;
    $self->{speed}   = 0;
 
-   $self->_start_mode_and_await( "\x01", "SPI" )->then( sub {
-      $self->pirate->read( 1, "SPI start" )->then( sub {
-         ( $self->{version} ) = @_;
-         return Future->done( $self );
-      })
-   });
+   await $self->_start_mode_and_await( "\x01", "SPI" );
+   ( $self->{version} ) = await $self->pirate->read( 1, "SPI start" );
+
+   return $self;
 }
 
 =head2 configure
@@ -236,7 +234,7 @@ This is performed atomically using the C<enter_mutex> method.
 
 =cut
 
-sub _writeread
+async sub _writeread
 {
    my $self = shift;
    my ( $bytes ) = @_;
@@ -250,20 +248,15 @@ sub _writeread
    my @chunks = $bytes =~ m/(.{1,$maxchunk})/gs;
    my $ret = "";
 
-   repeat {
-      my $bytes = shift;
-
+   foreach my $bytes ( @chunks ) {
       my $len_1 = length( $bytes ) - 1;
 
-      $self->pirate->write_expect_acked_data(
+      $ret .= await $self->pirate->write_expect_acked_data(
          chr( 0x10 | $len_1 ) . $bytes, length $bytes, "SPI bulk transfer"
-      )->then( sub {
-         $ret .= $_[0];
-         Future->done
-      });
-   } foreach => \@chunks,
-     while => sub { not shift->failure },
-     otherwise => sub { Future->done( $ret ) };
+      );
+   }
+
+   return $ret;
 }
 
 sub writeread
@@ -293,13 +286,11 @@ sub writeread_cs
    my $self = shift;
    my ( $bytes ) = @_;
 
-   $self->pirate->enter_mutex( sub {
-      $self->chip_select( $self->{cs_high} )->then( sub {
-         $self->_writeread( $bytes )
-      })->then( sub {
-         my ( $buf ) = @_;
-         $self->chip_select( !$self->{cs_high} )->then_done( $buf );
-      });
+   $self->pirate->enter_mutex( async sub {
+      await $self->chip_select( $self->{cs_high} );
+      my $buf = await $self->_writeread( $bytes );
+      await $self->chip_select( !$self->{cs_high} );
+      return $buf;
    });
 }
 

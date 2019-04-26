@@ -3,25 +3,12 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More 0.86 tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
-
 use File::Spec::Functions ':ALL';
-use File::Remove;
+use File::Temp 'tempdir';
 use PPI;
 use PPI::Transform;
 use Scalar::Util 'refaddr';
 use File::Copy;
-
-# Files to clean up
-my @cleanup;
-END {
-	foreach ( @cleanup ) {
-		File::Remove::remove( \1, $_ );
-	}
-}
-
-
-
-
 
 #####################################################################
 # Begin Tests
@@ -58,7 +45,7 @@ ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir foun
 
 # Find the .pm test files
 opendir( TESTDIR, $testdir ) or die "opendir: $!";
-my @files = map { catfile( $testdir, $_ ) } sort grep { /\.pm$/ } readdir(TESTDIR);
+my @files = sort grep { /\.pm$/ } readdir(TESTDIR);
 closedir( TESTDIR ) or die "closedir: $!";
 ok( scalar @files, 'Found at least one .pm file' );
 
@@ -69,13 +56,15 @@ ok( scalar @files, 'Found at least one .pm file' );
 #####################################################################
 # Testing
 
+my $tempdir = tempdir(CLEANUP => 1);
 foreach my $input ( @files ) {
 	# Prepare
+	my $copy   = catfile($tempdir, "${input}_copy");
+	my $copy2  = catfile($tempdir, "${input}_copy2");
+
+	$input = catfile($testdir, $input);
 	my $output = "${input}_out";
-	my $copy   = "${input}_copy";
-	my $copy2  = "${input}_copy2";
-	push @cleanup, $copy;
-	push @cleanup, $copy2;
+
 	ok( copy( $input, $copy ), "Copied $input to $copy" );
 
 	my $Original = new_ok( 'PPI::Document' => [ $input  ] );
@@ -119,9 +108,9 @@ package MyCleaner;
 use Params::Util   qw{_INSTANCE};
 use PPI::Transform ();
 
-use vars qw{@ISA};
+our @ISA;
 BEGIN {
-	@ISA = 'PPI::Transform';
+	@ISA = 'PPI::Transform'; # in a BEGIN block due to being an inline package
 }
 
 sub document {
@@ -137,10 +126,7 @@ sub new {
 	bless { }, 'Foo';
 }
 
-use vars qw{$VALUE};
-BEGIN {
-	$VALUE = '';
-}
+our $VALUE = '';
 
 sub get {
 	PPI::Document->new( \$VALUE );

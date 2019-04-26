@@ -1,5 +1,8 @@
 Revision history for WebService-IPify
 
+0.03  2019-04-25 21:14:00 +08
+        - Fix issues raised by perlcritic
+
 0.02  2019-02-09 22:16:56 +08
         - Use Role::Cache::LRU for caching
 

@@ -1,8 +1,16 @@
 Revision history for Catalyst-Manual
 
+5.9010 - 2019-04-25
+    - updated stale urls
+    - numerous typo fixes
+    - many pod syntax fixes
+    - other pod syntax cleanup
+    - added references to the RT issues queue, mailing list, and irc channel
+
 5.9009 - 2014-12-13
     - fixed a new error in the manual regarding "component" -> "components"
       (RT#99131, RT#100597, RT#100767)
+    - typo fix in 09_FormFu.pod (Jason McVeigh, RT#104585)
 
 5.9008 - 2014-07-26
     - misc small documentation tweaks (thanks Karen Etheridge, Matthew

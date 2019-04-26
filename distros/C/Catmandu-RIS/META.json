@@ -42,8 +42,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Catmandu" : "0",
-            "Catmandu::Importer::CSV" : "0",
+            "Catmandu" : "1.10",
+            "Moo" : "0",
+            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -65,8 +66,9 @@
          "web" : "https://github.com/LibreCat/Catmandu-RIS"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <nicolas.franck@ugent.be>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"

@@ -1,6 +1,22 @@
 ==================================================
-Changes from 2010-03-22 00:00:00 +0000 to present.
+Changes from 2014-04-26 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.34 at 2019-04-25 07:42:08 +0000
+-----------------------------------------
+
+  Change: d5955975458ab43dbf90fc24571f4855ce9a4585
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-25 08:42:08 +0000
+
+    Release 0.34 
+
+  Change: 96d3801da2c8bb6f97b667e5fb7b84de21ab9e5a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-25 08:41:15 +0000
+
+    Update included Config::Perl::V to 0.31 
 
 -----------------------------------------
 version 0.32 at 2015-03-21 15:11:30 +0000
@@ -34,148 +50,6 @@ version 0.30 at 2014-08-01 12:30:14 +0000
 
     Update included Config::Perl::V to CPAN version 0.21 
 
------------------------------------------
-version 0.28 at 2014-02-19 16:46:43 +0000
------------------------------------------
-
-  Change: e3805b7982d73e887d991d14e19d327a61a507d9
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-02-19 16:46:43 +0000
-
-    Update included Config::Perl::V to CPAN version 0.20 
-
------------------------------------------
-version 0.26 at 2013-08-01 09:10:18 +0000
------------------------------------------
-
-  Change: 9eeae1c8384ab245e3a48c2ca43b0c9924471727
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-01 10:10:18 +0000
-
-    Remove the Test::Compile usage as this was pulling in Capture::Tiny 
-
------------------------------------------
-version 0.24 at 2013-07-30 13:19:08 +0000
------------------------------------------
-
-  Change: 6db2339d9cbcf12a024bf83eff13c942885cdf29
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-30 14:19:08 +0000
-
-    Update included Config::Perl::V to CPAN version 0.19 
-
------------------------------------------
-version 0.22 at 2013-05-24 17:24:23 +0000
------------------------------------------
-
-  Change: 96fee34be6a2c2b144010d6cca2a0dd46d2d8f2d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-24 18:24:23 +0000
-
-    Update inlined Config::Perl::V to 0.18 
-
------------------------------------------
-version 0.20 at 2013-02-10 23:04:00 +0000
------------------------------------------
-
-  Change: 276207efb2d702eb95c7cd2e16201e3d9e91e128
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-02-10 23:04:00 +0000
-
-    Updated included Config::Perl::V to latest version 0.17 
-
------------------------------------------
-version 0.18 at 2013-01-25 16:57:48 +0000
------------------------------------------
-
-  Change: 1cf389340e1e9e7b991e389eb95440b20f1ff41b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-25 16:57:48 +0000
-
-    Updated included Config::Perl::V to latest version 
-
------------------------------------------
-version 0.16 at 2010-10-04 11:59:57 +0000
------------------------------------------
-
-  Change: f34dcadadeff787bb8b479fecf79db184d5dcc99
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2010-10-04 12:59:57 +0000
-
-    Tony Cook suggested buffering was the problem behind the errors with
-    metabase-relayd, so we check everything has flushed before closing
-    the socket now 
-
------------------------------------------
-version 0.14 at 2010-08-29 17:56:24 +0000
------------------------------------------
-
-  Change: 65d54a1f1bf50ce36e6b74529ad1b6cf95d0ccce
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2010-08-29 18:56:24 +0000
-
-    Added diagnostics when we are sending frozen data over the socket to
-    the relay 
-
------------------------------------------
-version 0.12 at 2010-07-06 19:35:14 +0000
------------------------------------------
-
-  Change: 72c6f4bf9612d2cef9226fe34d245e50428b98b0
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2010-07-06 20:35:14 +0000
-
-    Switched dist to Dist::Zilla 
-
-  Change: d895b8d6d3463a16fb4a1d8fb53a2444901aca90
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2010-07-06 16:53:17 +0000
-
-    Added arrayref option to 'host' parameter. 
-
------------------------------------------
-version 0.10 at 2010-03-28 11:07:44 +0000
------------------------------------------
-
-  Change: d2ce7324ad3376627766e8ec5383a02816e2c1dc
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2010-03-28 12:07:44 +0000
-
-    This be 0.10 
-
-  Change: 69f5163e1ba4d51d95981ceb385e3f552bc3c663
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2010-03-28 12:06:58 +0000
-
-    Updated Changes 
-
-  Change: 67b5beb75535280661abbf518b61c1553eab6cd2
-  Author: David Golden <dagolden@cpan.org>
-  Date : 2010-03-26 13:21:51 +0000
-
-    use Test::Reporter 1.57 style perl version if available 
-
------------------------------------------
-version 0.08 at 2010-03-23 18:17:38 +0000
------------------------------------------
-
-  Change: a6b37fea9ab3e6f88fe90544b11bd8dbcf6c6f28
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2010-03-23 18:17:38 +0000
-
-    Renamed the inline Config::Perl::V to TRTS::Config::Perl::V so that
-    PAUSE indexer doesn't squeal like a stabbed pig at us 
-
------------------------------------------
-version 0.06 at 2010-03-22 21:20:14 +0000
------------------------------------------
-
-  Change: 8ee597d2ab70d90ed83c780507221ef90b57f0cf
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2010-03-22 21:20:14 +0000
-
-    Inlined Config::Perl::V 
-
-================================================
-Plus 2 releases after 2010-03-22 00:00:00 +0000.
-================================================
+=================================================
+Plus 14 releases after 2014-04-26 00:00:00 +0000.
+=================================================

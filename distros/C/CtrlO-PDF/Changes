@@ -1,5 +1,9 @@
 Revision history for CtrlO::PDF
 
+0.03 Fri Apr 26 2019
+
+    * Another attempt to add the missing font files
+
 0.02 Mon Apr 15 2019
 
     * Fix failing test due to missing default font (thanks Tom Hukins). A

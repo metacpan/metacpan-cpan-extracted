@@ -14,7 +14,7 @@ Catalyst's behaviour, and this can be confusing. This document is
 written to help you understand the possibilities, current practices
 and their consequences.
 
-Please read the L<BEST PRACTICES> section before deciding on a design,
+Please read the L</BEST PRACTICES> section before deciding on a design,
 especially if you plan to release your code to CPAN. The Catalyst
 developer and user communities, which B<you are part of>, will benefit
 most if we all work together and coordinate.
@@ -68,7 +68,8 @@ there's always the IRC channel and the mailing list to discuss things.
 
 This gives a stable basis for contribution, and even more importantly,
 builds trust. The easiest way is a test application. See
-L<Catalyst::Manual::Tutorial::Testing> for more information.
+L<Catalyst::Manual::Tutorial::Testing|Catalyst::Manual::Tutorial::08_Testing>
+for more information.
 
 =back
 
@@ -102,7 +103,7 @@ try to load them as components.
 Writing a generic component that only works with Catalyst is wasteful
 of your time.  Try writing a plain perl module, and then a small bit
 of glue that integrates it with Catalyst.  See
-L<Catalyst::Model::DBIC::Schema|Catalyst::Model::DBIC::Schema> for a
+L<Catalyst::Model::DBIC::Schema> for a
 module that takes the approach.  The advantage here is that your
 "Catalyst" DBIC schema works perfectly outside of Catalyst, making
 testing (and command-line scripts) a breeze.  The actual Catalyst
@@ -110,7 +111,7 @@ Model is just a few lines of glue that makes working with the schema
 convenient.
 
 If you want the thinnest interface possible, take a look at
-L<Catalyst::Model::Adaptor|Catalyst::Model::Adaptor>.
+L<Catalyst::Model::Adaptor>.
 
 =head2 Using Moose roles to apply method modifiers
 
@@ -160,7 +161,7 @@ your module to become a recommended addition, these things will prove
 invaluable.
 
 If you're just getting started, try using
-L<CatalystX::Starter|CatalystX::Starter> to generate some example
+L<CatalystX::Starter> to generate some example
 tests for your module.
 
 =head2 Maintenance
@@ -223,7 +224,7 @@ configuration. There is of course again more than one way to do it.
 
 You can specify any valid Perl attribute on Catalyst actions you like.
 (See L<attributes/"Syntax of Attribute Lists"> for a description of
-what is valid.) These will be available on the C<Catalyst::Action>
+what is valid.) These will be available on the L<Catalyst::Action>
 instance via its C<attributes> accessor. To give an example, this
 action:
 
@@ -243,7 +244,7 @@ class|/"Component base classes">.
 =head2 Component Configuration
 
 At creation time, the class configuration of your component (the one
-available via C<$self-E<gt>config>) will be merged with possible
+available via C<< $self->config >>) will be merged with possible
 configuration settings from the applications configuration (either
 directly or via config file). This is done by Catalyst, and the
 correctly merged configuration is passed to your component's
@@ -255,7 +256,7 @@ in the controller object's hash reference, and available from the
 accessor.
 
 The C<config> accessor always only contains the original class configuration
-and you B<MUST NEVER> call $self->config to get your component configuration,
+and you B<MUST NEVER> call C<< $self->config >> to get your component configuration,
 as the data there is likely to be a subset of the correct config.
 
 For example:
@@ -312,10 +313,10 @@ method. The execute method of the action will naturally call the
 methods code. You can surround this by overriding the method in a
 subclass:
 
-  package Catalyst::Action::MyFoo; 
+  package Catalyst::Action::MyFoo;
   use Moose;
   use namespace::autoclean;
-  use MRO::Compat; 
+  use MRO::Compat;
   extends 'Catalyst::Action';
 
   sub execute {
@@ -329,12 +330,12 @@ subclass:
   1;
 
 We are using L<MRO::Compat> to ensure that you have the next::method
-call, from L<Class::C3> (in older perls), or natively (if you are using 
-perl 5.10) to re-dispatch to the original C<execute> method in the 
+call, from L<Class::C3> (in older perls), or natively (if you are using
+perl 5.10) to re-dispatch to the original C<execute> method in the
 L<Catalyst::Action> class.
 
 The Catalyst dispatcher handles an incoming request and, depending
-upon the dispatch type, will call the appropriate target or chain. 
+upon the dispatch type, will call the appropriate target or chain.
 From time to time it asks the actions themselves, or through the
 controller, if they would match the current request. That's what the
 C<match> method does.  So by overriding this, you can change on what
@@ -343,7 +344,7 @@ the action will match and add new matching criteria.
 For example, the action class below will make the action only match on
 Mondays:
 
-  package Catalyst::Action::OnlyMondays; 
+  package Catalyst::Action::OnlyMondays;
   use Moose;
   use namespace::autoclean;
   use MRO::Compat;
@@ -466,7 +467,7 @@ with some custom actions by sub-classing it:
   package MyApp::Controller::Foo;
   use Moose;
   use namespace::autoclean;
-  
+
   BEGIN { extends 'MyApp::Base::Controller::ModelBase'; }
 
   __PACKAGE__->config( model_name => 'DB::Foo',
@@ -537,7 +538,7 @@ Here is some example code for a fictional view:
   package Catalyst::View::MyView;
   use Moose;
   use namespace::autoclean;
-  
+
   extends 'Catalyst::View';
 
   sub process {
@@ -580,7 +581,7 @@ lifecycle. If your functionality needs to change some C<prepare_*> or
 C<finalize_*> stages, you won't get around a plugin.
 
 Note, if you just want to hook into such a stage, and run code before,
-or after it, then it is recommended that you use L<Moose>s method modifiers
+or after it, then it is recommended that you use L<Moose>'s method modifiers
 to do this.
 
 Another valid target for a plugin architecture are things that
@@ -637,7 +638,7 @@ A simple example like this is actually better as a L<Moose> role, for example:
       if (!blessed($_[0]) || !$_[0]->isa('Catalyst::Action'));
     return $uri;
   };
-  
+
 Note that Catalyst will load any Moose Roles in the plugin list,
 and apply them to your application class.
 
@@ -660,13 +661,13 @@ Here is a stub C<COMPONENT> method:
   package CatalystX::Component::Foo;
   use Moose;
   use namespace::autoclean;
-  
+
   extends 'Catalyst::Component';
 
   sub COMPONENT {
       my $class = shift;
       # Note: $app is like $c, but since the application isn't fully
-      # initialized, we don't want to call it $c yet.  $config 
+      # initialized, we don't want to call it $c yet.  $config
       # is a hashref of config options possibly set on this component.
       my ($app, $config) = @_;
 
@@ -727,5 +728,3 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
-
-

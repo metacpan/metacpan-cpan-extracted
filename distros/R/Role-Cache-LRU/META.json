@@ -89,11 +89,11 @@
          "web" : "https://github.com/kianmeng/role-cache-lru"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Kian Meng Ang <kianmeng@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "JSON::XS version 3.04",
    "x_static_install" : 1
 }

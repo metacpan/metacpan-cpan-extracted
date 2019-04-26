@@ -681,12 +681,17 @@ Delete a scan from the database and optionally from the filesystem
 
 Search the filesystem for scans which are not in the database, and import them
 
+=head3 scan rename
+
+Rename scans to include the caption in the filename
+
 =cut
 	$handlers{scan} = {
 		'add'    => { 'handler' => \&scan_add,    'desc' => 'Add a new scan of a negative or print to the database' },
 		'edit'   => { 'handler' => \&scan_edit,   'desc' => 'Add a new scan which is a derivative of an existing one' },
 		'delete' => { 'handler' => \&scan_delete, 'desc' => 'Delete a scan from the database and optionally from the filesystem' },
 		'search' => { 'handler' => \&scan_search, 'desc' => 'Search the filesystem for scans which are not in the database, and import them' },
+		'rename' => { 'handler' => \&scan_rename, 'desc' => 'Rename scans to include the caption in the filename', },
 	};
 
 =head2 run

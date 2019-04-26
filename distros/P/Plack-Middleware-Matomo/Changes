@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Matomo
 
+0.05  2019-04-25 12:08:00 CEST
+    - add debug messages
+    - more documentation
+
 0.04  2019-04-24 17:06:51 CEST
     - add missing prereq
 

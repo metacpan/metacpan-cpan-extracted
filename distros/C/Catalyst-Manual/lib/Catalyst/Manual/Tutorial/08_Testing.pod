@@ -83,7 +83,7 @@ directory, enter:
     $ prove -wl t
 
 There will be a lot of output because we have the C<-Debug> flag enabled
-in C<lib/MyApp.pm> (see the C<CATALYST_DEBUG=0> tip below for a quick
+in F<lib/MyApp.pm> (see the C<CATALYST_DEBUG=0> tip below for a quick
 and easy way to reduce the clutter).  Look for lines like this for
 errors:
 
@@ -95,7 +95,7 @@ The redirection used by the Authentication plugins will cause several
 failures in the default tests.  You can fix this by making the following
 changes:
 
-1) Change the line in C<t/01app.t> that reads:
+1) Change the line in F<t/01app.t> that reads:
 
     ok( request('/')->is_success, 'Request should succeed' );
 
@@ -103,7 +103,7 @@ to:
 
     ok( request('/login')->is_success, 'Request should succeed' );
 
-2) Change the line in C<t/controller_Logout.t> that reads:
+2) Change the line in F<t/controller_Logout.t> that reads:
 
     ok( request('/logout')->is_success, 'Request should succeed' );
 
@@ -111,7 +111,7 @@ to:
 
     ok( request('/logout')->is_redirect, 'Request should succeed' );
 
-3) Change the line in C<t/controller_Books.t> that reads:
+3) Change the line in F<t/controller_Books.t> that reads:
 
     ok( request('/books')->is_success, 'Request should succeed' );
 
@@ -119,7 +119,7 @@ to:
 
     ok( request('/books')->is_redirect, 'Request should succeed' );
 
-4) Add the following statement to the top of C<t/view_HTML.t>:
+4) Add the following statement to the top of F<t/view_HTML.t>:
 
     use MyApp;
 
@@ -127,13 +127,13 @@ As you can see in the C<prove> command line above, the C<-l> option (or
 C<--lib> if you prefer) is used to set the location of the Catalyst
 C<lib> directory.  With this command, you will get all of the usual
 development server debug output, something most people prefer to disable
-while running tests cases.  Although you can edit the C<lib/MyApp.pm> to
+while running tests cases.  Although you can edit the F<lib/MyApp.pm> to
 comment out the C<-Debug> plugin, it's generally easier to simply set
 the C<CATALYST_DEBUG=0> environment variable.  For example:
 
     $ CATALYST_DEBUG=0 prove -wl t
 
-During the C<t/02pod> and C<t/03podcoverage> tests, you might notice the
+During the F<t/02pod.t> and F<t/03podcoverage.t> tests, you might notice the
 C<all skipped: set TEST_POD to enable this test> warning message.  To
 execute the Pod-related tests, add C<TEST_POD=1> to the C<prove>
 command:
@@ -175,25 +175,25 @@ a user "clicking around" inside your application.  It gives you all the
 benefits of testing on a live system without the messiness of having to
 use an actual web server, and a real person to do the clicking.
 
-To create a sample test case, open the C<t/live_app01.t> file in your
+To create a sample test case, open the F<t/live_app01.t> file in your
 editor and enter the following:
 
     #!/usr/bin/env perl
-    
+
     use strict;
     use warnings;
     use Test::More;
-    
+
     # Need to specify the name of your app as arg on next line
     # Can also do:
     #   use Test::WWW::Mechanize::Catalyst "MyApp";
-    
+
     BEGIN { use_ok("Test::WWW::Mechanize::Catalyst" => "MyApp") }
-    
+
     # Create two 'user agents' to simulate two different users ('test01' & 'test02')
     my $ua1 = Test::WWW::Mechanize::Catalyst->new;
     my $ua2 = Test::WWW::Mechanize::Catalyst->new;
-    
+
     # Use a simplified for loop to do tests that are common to both users
     # Use get_ok() to make sure we can hit the base URL
     # Second arg = optional description of test (will be displayed for failed tests)
@@ -204,7 +204,7 @@ editor and enter the following:
     # Use content_contains() to match on text in the html body
     $_->content_contains("You need to log in to use this application",
         "Check we are NOT logged in") for $ua1, $ua2;
-    
+
     # Log in as each user
     # Specify username and password on the URL
     $ua1->get_ok("http://localhost/login?username=test01&password=mypass", "Login 'test01'");
@@ -214,19 +214,19 @@ editor and enter the following:
             username => 'test02',
             password => 'mypass',
         });
-    
+
     # Go back to the login page and it should show that we are already logged in
     $_->get_ok("http://localhost/login", "Return to '/login'") for $ua1, $ua2;
     $_->title_is("Login", "Check for login page") for $ua1, $ua2;
     $_->content_contains("Please Note: You are already logged in as ",
         "Check we ARE logged in" ) for $ua1, $ua2;
-    
+
     # 'Click' the 'Logout' link (see also 'text_regex' and 'url_regex' options)
     $_->follow_link_ok({n => 4}, "Logout via first link on page") for $ua1, $ua2;
     $_->title_is("Login", "Check for login title") for $ua1, $ua2;
     $_->content_contains("You need to log in to use this application",
         "Check we are NOT logged in") for $ua1, $ua2;
-    
+
     # Log back in
     $ua1->get_ok("http://localhost/login?username=test01&password=mypass",
         "Login 'test01'");
@@ -234,11 +234,11 @@ editor and enter the following:
         "Login 'test02'");
     # Should be at the Book List page... do some checks to confirm
     $_->title_is("Book List", "Check for book list title") for $ua1, $ua2;
-    
+
     $ua1->get_ok("http://localhost/books/list", "'test01' book list");
     $ua1->get_ok("http://localhost/login", "Login Page");
     $ua1->get_ok("http://localhost/books/list", "'test01' book list");
-    
+
     $_->content_contains("Book List", "Check for book list title") for $ua1, $ua2;
     # Make sure the appropriate logout buttons are displayed
     $_->content_contains("/logout\">User Logout</a>",
@@ -247,9 +247,9 @@ editor and enter the following:
         "'test01' should have a create link");
     $ua2->content_lacks("/books/form_create\">Admin Create</a>",
         "'test02' should NOT have a create link");
-    
+
     $ua1->get_ok("http://localhost/books/list", "View book list as 'test01'");
-    
+
     # User 'test01' should be able to create a book with the "formless create" URL
     $ua1->get_ok("http://localhost/books/url_create/TestTitle/2/4",
         "'test01' formless create");
@@ -260,13 +260,13 @@ editor and enter the following:
     # Try a regular expression to combine the previous 3 checks & account for whitespace
     $ua1->content_like(qr/Added book 'TestTitle'\s+by 'Stevens'\s+with a rating of 2./,
         "Regex check");
-    
+
     # Make sure the new book shows in the list
     $ua1->get_ok("http://localhost/books/list", "'test01' book list");
     $ua1->title_is("Book List", "Check logged in and at book list");
     $ua1->content_contains("Book List", "Book List page test");
     $ua1->content_contains("TestTitle", "Look for 'TestTitle'");
-    
+
     # Make sure the new book can be deleted
     # Get all the Delete links on the list page
     my @delLinks = $ua1->find_all_links(text => 'Delete');
@@ -275,14 +275,14 @@ editor and enter the following:
     # Check that delete worked
     $ua1->content_contains("Book List", "Book List page test");
     $ua1->content_like(qr/Deleted book \d+/, "Deleted book #");
-    
+
     # User 'test02' should not be able to add a book
     $ua2->get_ok("http://localhost/books/url_create/TestTitle2/2/5", "'test02' add");
     $ua2->content_contains("Unauthorized!", "Check 'test02' cannot add");
-    
+
     done_testing;
 
-The C<live_app.t> test cases uses copious comments to explain each step
+The F<live_app.t> test cases uses copious comments to explain each step
 of the process.  In addition to the techniques shown here, there are a
 variety of other methods available in L<Test::WWW::Mechanize::Catalyst>
 (for example, regex-based matching). Consult
@@ -357,13 +357,13 @@ databases.
 
 One solution is to allow the database specification to be overridden
 with an environment variable.  For example, open
-C<lib/MyApp/Model/DB.pm> in your editor and change the
-C<__PACKAGE__-E<gt>config(...> declaration to resemble:
+F<lib/MyApp/Model/DB.pm> in your editor and change the
+C<< __PACKAGE__->config(... >> declaration to resemble:
 
     my $dsn = $ENV{MYAPP_DSN} ||= 'dbi:SQLite:myapp.db';
     __PACKAGE__->config(
         schema_class => 'MyApp::Schema',
-    
+
         connect_info => {
             dsn => $dsn,
             user => '',
@@ -392,15 +392,15 @@ development (or vice versa).
 
 Setting C<$ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }> to 'testing' in your test
 script results in loading of an additional config file named
-C<myapp_testing.conf> after C<myapp.conf> which will override any
-parameters in C<myapp.conf>.
+F<myapp_testing.conf> after F<myapp.conf> which will override any
+parameters in F<myapp.conf>.
 
 You should set the environment variable in the BEGIN block of your test
 script to make sure it's set before your Catalyst application is
 started.
 
 The following is an example for a config and test script for a
-DBIx::Class model named MyDB and a controller named Foo:
+L<DBIx::Class> model named MyDB and a controller named Foo:
 
 myapp_testing.conf:
 
@@ -416,18 +416,18 @@ t/controller_Foo.t:
     use strict;
     use warnings;
     use Test::More;
-    
+
     BEGIN {
         $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX } = 'testing';
     }
-    
+
     eval "use Test::WWW::Mechanize::Catalyst 'MyApp'";
     plan $@
         ? ( skip_all => 'Test::WWW::Mechanize::Catalyst required' )
         : ( tests => 2 );
-    
+
     ok( my $mech = Test::WWW::Mechanize::Catalyst->new, 'Created mech object' );
-    
+
     $mech->get_ok( 'http://localhost/foo' );
 
 
@@ -445,4 +445,4 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
 
 Copyright 2006-2011, Kennedy Clark, under the
 Creative Commons Attribution Share-Alike License Version 3.0
-(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).
+(L<https://creativecommons.org/licenses/by-sa/3.0/us/>).

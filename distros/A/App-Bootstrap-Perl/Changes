@@ -1,5 +1,13 @@
 Revision history for App-Bootstrap-Perl
 
+0.16      2019-04-26
+        - no more App::Cpan usage, back to simple/stupid mode
+
+0.15      2019-04-25
+        - tweak timestamps in logs
+        - more robust non-existent file handling
+        - allow reinstalling modules even when existing
+
 0.14      2018-04-22
         - logs now appended - this might flood your disk, setup
           your logrotate if you are a power user

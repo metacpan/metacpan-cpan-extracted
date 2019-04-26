@@ -1,5 +1,21 @@
 Changelog for Yancy-Backend-Static
 
+0.003     2019-04-25 09:50:29+01:00 Europe/London
+
+    [Fixed]
+
+    - Fixed a missing prereq reported by CPANTS. Thanks @manwar!
+      [Github #1]
+
+0.002     2019-04-25 09:44:47+01:00 Europe/London
+
+    [Fixed]
+
+    - Fixed `set()` not working with Yancy::Command::backend::copy. The
+      `set()` method now can create new files with the given ID, and
+      should probably be preferred to `create()` (which does not require
+      an ID, but uses the `path` attribute).
+
 0.001     2019-04-19 17:05:22-05:00 America/Chicago
 
     - Initial release

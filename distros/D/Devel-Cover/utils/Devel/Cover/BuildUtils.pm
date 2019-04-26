@@ -1,4 +1,4 @@
-# Copyright 2010-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2010-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -36,8 +36,9 @@ sub find_prove {
 
 sub cpus {
     my $cpus = 1;
-    eval { chomp ($cpus = `grep -c processor /proc/cpuinfo`); };
-    $cpus
+    eval { chomp ($cpus = `grep -c processor /proc/cpuinfo 2>/dev/null`) };
+    $cpus || eval { ($cpus) = `sysctl hw.ncpu` =~ /(\d+)/ };
+    $cpus || 1
 }
 
 sub nice_cpus {
@@ -83,7 +84,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

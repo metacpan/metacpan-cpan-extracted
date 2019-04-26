@@ -85,12 +85,12 @@ Edit C<lib/MyApp.pm> and add C<Authorization::Roles> to the list:
         -Debug
         ConfigLoader
         Static::Simple
-    
+
         StackTrace
-    
+
         Authentication
         Authorization::Roles
-    
+
         Session
         Session::Store::File
         Session::State::Cookie
@@ -111,12 +111,12 @@ lines to the bottom of the file:
 
     ...
     <p>Hello [% c.user.username %], you have the following roles:</p>
-    
+
     <ul>
       [% # Dump list of roles -%]
       [% FOR role = c.user.roles %]<li>[% role %]</li>[% END %]
     </ul>
-    
+
     <p>
     [% # Add some simple role-specific logic to template %]
     [% # Use $c->check_user_roles() to check authz -%]
@@ -124,7 +124,7 @@ lines to the bottom of the file:
       [% # Give normal users a link for 'logout' %]
       <a href="[% c.uri_for('/logout') %]">User Logout</a>
     [% END %]
-    
+
     [% # Can also use $c->user->check_roles() to check authz -%]
     [% IF c.check_user_roles('admin') %]
       [% # Give admin users a link for 'create' %]
@@ -149,18 +149,18 @@ admin-level users by editing C<lib/MyApp/Controller/Books.pm> and
 updating C<url_create> to match the following code:
 
     =head2 url_create
-    
+
     Create a book with the supplied title and rating,
     with manual authorization
-    
+
     =cut
-    
+
     sub url_create :Chained('base') :PathPart('url_create') :Args(3) {
         # In addition to self & context, get the title, rating & author_id args
         # from the URL.  Note that Catalyst automatically puts extra information
         # after the "/<controller_name>/<action_name/" into @_
         my ($self, $c, $title, $rating, $author_id) = @_;
-    
+
         # Check the user's roles
         if ($c->check_user_roles('admin')) {
             # Call create() on the book model object. Pass the table
@@ -169,13 +169,13 @@ updating C<url_create> to match the following code:
                     title   => $title,
                     rating  => $rating
                 });
-    
+
             # Add a record to the join table for this book, mapping to
             # appropriate author
             $book->add_to_book_authors({author_id => $author_id});
             # Note: Above is a shortcut for this:
             # $book->create_related('book_authors', {author_id => $author_id});
-    
+
             # Assign the Book object to the stash and set template
             $c->stash(book     => $book,
                       template => 'books/create_done.tt2');
@@ -243,14 +243,14 @@ C<lib/MyApp/Schema/Result/Book.pm> and add the following method (be sure
 to add it below the "C<DO NOT MODIFY ...>" line):
 
     =head2 delete_allowed_by
-    
+
     Can the specified user delete the current book?
-    
+
     =cut
-    
+
     sub delete_allowed_by {
         my ($self, $user) = @_;
-    
+
         # Only allow delete if user has 'admin' role
         return $user->has_role('admin');
     }
@@ -261,26 +261,26 @@ C<lib/MyApp/Schema/Result/User.pm> and add the following method below
 the "C<DO NOT MODIFY ...>" line:
 
     =head2 has_role
-    
+
     Check if a user has the specified role
-    
+
     =cut
-    
+
     use Perl6::Junction qw/any/;
     sub has_role {
         my ($self, $role) = @_;
-    
+
         # Does this user posses the required role?
         return any(map { $_->role } $self->roles) eq $role;
     }
 
-Let's also add C<Perl6::Junction> to the requirements listed in
+Let's also add L<Perl6::Junction> to the requirements listed in
 Makefile.PL:
 
     requires 'Perl6::Junction';
 
-B<Note:> Feel free to use C<grep> in lieu of C<Perl6::Junction::any> if
-you prefer.  Also, please don't let the use of the C<Perl6::Junction>
+B<Note:> Feel free to use C<grep> in lieu of L<Perl6::Junction::any|Perl6::Junction/any()> if
+you prefer.  Also, please don't let the use of the L<Perl6::Junction>
 module above lead you to believe that Catalyst is somehow dependent on
 Perl 6... we are simply using that module for its
 L<easy-to-read|http://blogs.perl.org/users/marc_sebastian_jakobs/2009/11/my-favorite-module-of-the-month-perl6junction.html>
@@ -291,25 +291,25 @@ C<lib/MyApp/Controller/Books.pm> and update the C<delete> method to
 match the following code:
 
     =head2 delete
-    
+
     Delete a book
-    
+
     =cut
-    
+
     sub delete :Chained('object') :PathPart('delete') :Args(0) {
         my ($self, $c) = @_;
-    
+
         # Check permissions
         $c->detach('/error_noperms')
             unless $c->stash->{object}->delete_allowed_by($c->user->get_object);
-    
+
         # Saved the PK id for status_msg below
         my $id = $c->stash->{object}->id;
-    
+
         # Use the book object saved by 'object' and delete it along
         # with related 'book_authors' entries
         $c->stash->{object}->delete;
-    
+
         # Redirect the user back to the list page
         $c->response->redirect($c->uri_for($self->action_for('list'),
             {mid => $c->set_status_msg("Deleted book $id")}));
@@ -321,14 +321,14 @@ for the '/error_noperms' action to work.  Open
 C<lib/MyApp/Controller/Root.pm> and add this method:
 
     =head2 error_noperms
-    
+
     Permissions error screen
-    
+
     =cut
-    
+
     sub error_noperms :Chained('/') :PathPart('error_noperms') :Args(0) {
         my ($self, $c) = @_;
-    
+
         $c->stash(template => 'error_noperms.tt2');
     }
 
@@ -367,4 +367,4 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
 
 Copyright 2006-2011, Kennedy Clark, under the
 Creative Commons Attribution Share-Alike License Version 3.0
-(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).
+(L<https://creativecommons.org/licenses/by-sa/3.0/us/>).

@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use constant {
 	CMD_OK       => 2,
@@ -144,7 +144,9 @@ sub send {
 	
 	# non-blocking
 	my $delay = $self->{delay} = Mojo::IOLoop::Delay->new(ioloop => $self->_ioloop)->steps(@steps);
-	$delay->finally($self->{finally} = sub {
+	$self->{finally} = sub {
+		shift if @_ == 2; # delay
+		
 		if ($cb) {
 			my $r = $_[0];
 			unless ($r->isa('Mojo::SMTP::Client::Response')) {
@@ -152,12 +154,14 @@ sub send {
 				$r = Mojo::SMTP::Client::Response->new('', error => $r);
 			}
 			
-			$cb->($self, $r);
-			$cb = undef;
 			delete $self->{delay};
 			delete $self->{finally};
+			
+			$cb->($self, $r);
+			$cb = undef;
 		}
-	});
+	};
+	$delay->catch($self->{finally});
 	
 	# blocking
 	my $resp;
@@ -223,7 +227,7 @@ sub _make_cmd_steps {
 			$self->{stream}->timeout(0);
 			$self->{stream}->stop;
 		}
-		return;
+		return $self->{finally};
 	}
 	
 	if ( my $sub = $self->can("_cmd_$cmd") ) {
@@ -286,7 +290,7 @@ sub _cmd_starttls {
 		},
 		$self->{resp_checker},
 		sub {
-			my $delay = shift;
+			my ($delay, $resp) = @_;
 			$self->{stream}->stop;
 			$self->{stream}->timeout(0);
 			
@@ -296,7 +300,7 @@ sub _cmd_starttls {
 				$loop->remove($tid);
 				$loop->reactor->remove($sock);
 				$sock = undef;
-				$tls_cb->($delay, 0, @_>=2 ? $_[1] : 'Inactivity timeout');
+				$tls_cb->($delay, undef, @_>=2 ? $_[1] : 'Inactivity timeout');
 				$tls_cb = $delay = undef;
 			};
 			
@@ -325,7 +329,7 @@ sub _cmd_starttls {
 					$self->_make_stream($sock, $loop);
 					$self->{starttls} = 1;
 					$sock = $loop = undef;
-					$tls_cb->($delay, 1);
+					$tls_cb->($delay, $resp);
 					$tls_cb = $delay = undef;
 					return;
 				}
@@ -338,13 +342,13 @@ sub _cmd_starttls {
 			})->watch($sock, 0, 1);
 		},
 		sub {
-			my ($delay, $success, $error) = @_;
-			unless ($success) {
+			my ($delay, $resp, $error) = @_;
+			unless ($resp) {
 				$self->_rm_stream();
 				Mojo::SMTP::Client::Exception::Stream->throw($error);
 			}
 			
-			$delay->pass;
+			$delay->pass($resp);
 		}
 	);
 }
@@ -357,9 +361,9 @@ sub _cmd_auth {
 	my $type = lc($arg->{type} // 'plain');
 	
 	my $set_auth_ok = sub {
-		my $delay = shift;
+		my ($delay, $resp) = @_;
 		$self->{authorized} = 1;
-		$delay->pass;
+		$delay->pass($resp);
 	};
 	
 	if ($type eq 'plain') {

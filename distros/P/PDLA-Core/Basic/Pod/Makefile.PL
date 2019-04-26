@@ -4,36 +4,13 @@ use ExtUtils::MakeMaker;
 
 my @pods = map { $_=~s/.pod//; $_ } grep { ! m/Index.pod/ } glob("*.pod");
 
-# do we want to create PP-Inline?
-eval 'require Pod::Select';
-if (!$@) {
-    push @pods, 'PP-Inline' unless grep {/PP-Inline/} @pods;
-}
-
 my @man1 = map { $_.".pod", '$(INST_MAN1DIR)/PDLA::' . $_ . '.$(MAN1EXT)' } @pods;
 my @pms  = map { $_.".pod", '$(INST_LIBDIR)/' . $_ .".pod"} @pods;
-
-undef &MY::postamble; # suppress warning
-*MY::postamble = sub {
-  my $text = '';
-  eval 'require Pod::Select';
-  if (!$@) {
-     $text .= << "EOPS" ;
-
-PP-Inline.pod: ../Gen/Inline/Pdlapp.pm
-\t\$(PERLRUN) -MPod::Select -e "podselect('../Gen/Inline/Pdlapp.pm');" > PP-Inline.pod
-
-EOPS
-
-  }
-  $text;
-};
 
 WriteMakefile(
  'NAME' =>      'PDLA::pod',
  'MAN1PODS' =>  { @man1 },
  'MAN3PODS' =>  { },
  'PM'    =>     { @pms },
- 'clean' => {FILES => "PP-Inline.pod"},
  (eval ($ExtUtils::MakeMaker::VERSION) >= 6.57_02 ? ('NO_MYMETA' => 1) : ()),
 );

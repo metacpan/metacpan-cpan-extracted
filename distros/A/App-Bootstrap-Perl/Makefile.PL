@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "Getopt::Long" => 0,
     "Sys::Hostname" => 0,
+    "constant" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "Sys::Hostname" => 0,
   "Test::More" => 0,
   "blib" => "1.01",
+  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

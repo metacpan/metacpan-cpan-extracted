@@ -150,6 +150,8 @@ pp_deft( 'threadloop_continue',
        );
 
 pp_done;
+
+# this tests the bug with a trailing comment and *no* newline
 EOF
 
     't/all.t' => <<'EOF',
@@ -288,6 +290,92 @@ use warnings;
 use Test::More tests => 1;
 use PDLA::LiteF;
 use_ok 'PDLA::Otherpars';
+EOF
+
+);
+
+my %THREADTESTFILES = (
+    'Makefile.PL' => <<'EOF',
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+use PDLA::Core::Dev;
+my @pack = (["threadtest.pd", qw(ThreadTest PDLA::ThreadTest)]);
+sub MY::postamble {
+	pdlpp_postamble(@pack);
+};  # Add genpp rule
+WriteMakefile(pdlpp_stdargs(@pack));
+EOF
+
+    'threadtest.pd' => <<'EOF',
+# previously in t/inline-comment-test.t
+
+pp_def('testinc',
+        Pars => 'a(); [o] b()',
+        Code => q{
+           /* emulate user debugging */
+
+           /* Why doesn't this work???!!!! */
+       threadloop %{
+    /*         printf("  %f, %f\r", $a(), $b());
+             printf("  Here\n");
+        */
+
+                 /* Sanity check */
+                 $b() = $a() + 1;
+
+         %}
+
+        },
+);
+
+# make sure that if the word "threadloop" appears, later automatic threadloops
+# will not be generated, even if the original threadloop was commented-out
+
+pp_def('testinc2',
+        Pars => 'a(); [o] b()',
+        Code => q{
+           /* emulate user debugging */
+
+           /* Why doesn't this work???!!!! */
+   /*    threadloop %{
+             printf("  %f, %f\r", $a(), $b());
+             printf("  Here\n");
+         %}
+        */
+          /* Sanity check */
+          $b() = $a() + 1;
+
+        },
+);
+EOF
+
+    't/all.t' => <<'EOF',
+use strict;
+use warnings;
+use Test::More;
+use PDLA::LiteF;
+use_ok 'PDLA::ThreadTest';
+
+my $x = sequence(3,3);
+
+my $y = $x->testinc;
+
+ok(all ($y == $x+1), 'Sanity check runs correctly');
+
+# Test the inability to comment-out a threadloop. This is documented on the
+# 11th page of the PDLA::PP chapter of the PDLA book. If somebody ever fixes this
+# wart, this test will fail, in which case the book's text should be updated.
+$y = $x->testinc2;
+TODO: {
+        # Note: This test appears to fail on Cygwin and some flavors of Linux.
+        local $TODO = 'This test inexplicably passes on some machines';
+        ok(not (all $y == $x + 1), 'WART: commenting out a threadloop does not work')
+                or diag("\$x is $x and \$y is $y");
+}
+}
+
+done_testing;
 EOF
 
 );

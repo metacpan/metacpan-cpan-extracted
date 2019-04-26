@@ -30,7 +30,7 @@ my $bp = Device::BusPirate->new(
 # Check that ->read uses Future::IO
 {
    no warnings 'redefine';
-   local *Future::IO::sysread = sub {
+   local *Future::IO::sysread_exactly = sub {
       return Future->done( "DEF" );
    };
 

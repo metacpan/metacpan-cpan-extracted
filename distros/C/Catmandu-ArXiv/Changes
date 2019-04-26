@@ -1,5 +1,8 @@
 Revision history for Catmandu-ArXiv
 
+0.212  2019-04-25 10:18:43 CEST
+    - add missing prereqs
+
 0.211  2018-08-31 09:13:02 CEST
     - add missing dependency IO::Socket::SSL
 

@@ -43,11 +43,9 @@ provided by L<PPI::Statement>, L<PPI::Node> and L<PPI::Element>.
 use strict;
 use PPI::Statement ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.236';
-	@ISA     = 'PPI::Statement';
-}
+our $VERSION = '1.252'; # VERSION
+
+our @ISA = "PPI::Statement";
 
 # A null statement is not significant
 sub significant() { '' }

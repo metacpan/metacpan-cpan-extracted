@@ -113,7 +113,7 @@ $BC$
 
 	is( $sth->err, undef, q{Statement attribute 'err' is initially undef});
 
-	$dbh->do(q{SET client_min_messages = 'FATAL'});
+	$dbh->do(q{SET client_min_messages = 'ERROR'});
 
   TODO: {
 		local $TODO = q{Known bug: notice and warnings should set err to 6};
@@ -442,6 +442,9 @@ else {
 	pass ('pg_st_split_statement gave no problems with various lengths');
 }
 
+# PostgreSQL 8.1 fails with "ERROR:  stack depth limit exceeded"
+# with the default value of 2048
+$dbh->do('set max_stack_depth = 4096');
 ## Check for problems with insane number of placeholders
 for my $ph (1..13) {
 	my $total = 2**$ph;

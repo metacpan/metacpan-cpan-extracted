@@ -1,11 +1,11 @@
 package Plack::Middleware::Matomo;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
 use AnyEvent::HTTP;
-use Log::Any qw($log);
+use Log::Any '$log';
 use Plack::Request;
 use Plack::Util::Accessor
     qw(apiv base_url idsite token_auth time_format oai_identifier_format view_paths download_paths);
@@ -97,9 +97,9 @@ sub _push_to_matomo {
         my ($body, $hdr) = @_;
 
        if ($hdr->{Status} =~ /^2/) {
-          # ok
+          $log->debug("Ok matomo endpoint: $hdr->{Status} $hdr->{Reason} for " . $uri->as_string);
        } else {
-          $log->error("Could not reach analytics endpoint: $hdr->{Status} $hdr->{Reason} for " . $uri->as_string);
+          $log->error("Could not reach matomo endpoint: $hdr->{Status} $hdr->{Reason} for " . $uri->as_string);
        }
    };
 }
@@ -116,6 +116,8 @@ Plack::Middleware::Matomo - a middleware to track usage information with Matomo
 
 =head1 SYNOPSIS
 
+    # in your bin/app.pl
+
     builder {
         enable "Plack::Middleware::Matomo",
             id_site => "my-service",
@@ -127,6 +129,9 @@ Plack::Middleware::Matomo - a middleware to track usage information with Matomo
             ;
         $app;
     }
+
+    # start your plack application with Twiggy as webserver
+    $ plackup --server Twiggy bin/app.pl
 
 =head1 CONFIGURATION
 
@@ -173,6 +178,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Plack::Middleware>, L<Plack::Builder>
+L<Plack::Middleware>, L<Plack::Builder>, L<Twiggy>
 
 =cut

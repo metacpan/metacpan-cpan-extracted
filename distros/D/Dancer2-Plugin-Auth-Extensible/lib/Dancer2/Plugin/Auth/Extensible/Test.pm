@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible::Test;
 
-our $VERSION = '0.706';
+our $VERSION = '0.708';
 
 =head1 NAME
 
@@ -104,7 +104,7 @@ sub runtests {
 
     @provider_can = @$ret;
 
-    my @to_test = ($ENV{D2PAE_TEST_ONLY}) || keys %dispatch;
+    my @to_test = ($ENV{D2PAE_TEST_ONLY}) || sort keys %dispatch;
 
     foreach my $test ( @to_test ) {
         my @missing;

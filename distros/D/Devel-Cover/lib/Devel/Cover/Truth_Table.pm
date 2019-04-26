@@ -174,13 +174,14 @@ sub covered {
 
 sub error {
         return 1;
-	return $_[0]{error}[$_[1]];
+        # TODO - sort out how this should really work, or remove this report
+	# return $_[0]{error}[$_[1]];
 }
 
 package Devel::Cover::Truth_Table;
 use warnings;
 use strict;
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 #-------------------------------------------------------------------------------
 # Subroutine : new()
@@ -467,7 +468,7 @@ Devel::Cover::Truth_Table - Truth tables for coverage objects.
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

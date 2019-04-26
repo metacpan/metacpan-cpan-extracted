@@ -3,6 +3,7 @@ Changes
 lib/XML/Axk.pm
 lib/XML/Axk/App.pm
 lib/XML/Axk/Base.pm
+lib/XML/Axk/Bundle.pod
 lib/XML/Axk/Core.pm
 lib/XML/Axk/DOM.pm
 lib/XML/Axk/L/L0.pm

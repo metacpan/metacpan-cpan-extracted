@@ -24,4 +24,4 @@ requires:
   Test::Trap: '0'
   Text::OutputFilter: '0'
   Tie::Handle::Base: '0'
-version: '0.02'
+version: '0.03'

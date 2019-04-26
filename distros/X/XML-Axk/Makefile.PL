@@ -147,6 +147,12 @@ my %opts = (
             },
         },
 
+        x_authority => 'cpan:CXW',
+        x_contributors => [
+			# Use CPAN emails where possible, so MetaCPAN will pick them up.
+			'Christopher White <cxw@cpan.org>',
+        ],
+
         $provides ? (provides => $provides) : (),
 
     }, #META_MERGE

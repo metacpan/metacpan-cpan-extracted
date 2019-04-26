@@ -21,7 +21,8 @@ use Plack::Builder;
     };
 
     get '/matomo' => sub {
-        print STDERR "Woohoo: matomo san, here we go.\n";
+        # pretend to be a matomo api endpoint
+        # just return 200
         status 200;
     };
 

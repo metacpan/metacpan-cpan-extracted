@@ -1,5 +1,11 @@
 Revision history for Device-BusPirate
 
+0.18    2019-04-25 23:01:19
+        [CHANGES]
+         * Use ->sysread_exactly from Future::IO 0.03
+         * Use Future::AsyncAwait to replace less readable
+           Future::Utils::repeat loops or ->then chaining
+
 0.17    2019-04-10 02:02:05
         [CHANGES]
          * Implement the ->meta_gpios Device::Chip method

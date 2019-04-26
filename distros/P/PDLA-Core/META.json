@@ -54,8 +54,6 @@
             "File::Temp" : "0",
             "Filter::Simple" : "0.88",
             "Filter::Util::Call" : "0",
-            "Inline" : "0.68",
-            "Inline::C" : "0.62",
             "Module::Compile" : "0.23",
             "Pod::Parser" : "0",
             "Pod::Select" : "0",
@@ -75,6 +73,10 @@
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::Warn" : "0"
+         },
+         "suggests" : {
+            "Inline" : "0.68",
+            "Inline::C" : "0.62"
          }
       }
    },
@@ -91,6 +93,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.019103",
+   "version" : "2.019105",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

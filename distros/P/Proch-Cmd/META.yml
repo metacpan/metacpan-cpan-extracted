@@ -1,0 +1,23 @@
+---
+abstract: 'Execute shell commands controlling inputs and outputs'
+author:
+  - 'Andrea Telatin <andrea.telatin@quadram.ac.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proch-Cmd
+requires:
+  Data::Dumper: '2.127'
+  Digest::MD5: '2.00'
+  File::Slurp: '9999.19'
+  Storable: '2.21'
+  Time::HiRes: '1.9741'
+version: '0.001'
+x_generated_by_perl: v5.22.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

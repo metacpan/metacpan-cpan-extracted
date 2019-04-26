@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Adapter::BusPirate;
 
@@ -9,9 +9,11 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
+
+use Future::AsyncAwait;
 
 use Device::BusPirate;
 
@@ -73,69 +75,61 @@ protocol, allowing multiple chips to be shared on the same bus.
 
 sub _modename { return ( ref($_[0]) =~ m/.*::(.*?)$/ )[0] }
 
-sub make_protocol_GPIO
+async sub make_protocol_GPIO
 {
    my $self = shift;
 
    $self->{mode} and
       croak "Cannot enter GPIO protocol when " . _modename( $self->{mode} ) . " already active";
 
-   $self->{bp}->enter_mode( "BB" )->then( sub {
-      my ( $mode ) = @_;
-      $self->{mode} = $mode;
+   my $mode = await $self->{bp}->enter_mode( "BB" );
+   $self->{mode} = $mode;
 
-      $mode->configure( open_drain => 0 )
-         ->then_done(
-            Device::Chip::Adapter::BusPirate::_GPIO->new( $mode )
-         );
-   });
+   await $mode->configure( open_drain => 0 );
+
+   return Device::Chip::Adapter::BusPirate::_GPIO->new( $mode );
 }
 
-sub make_protocol_SPI
+async sub make_protocol_SPI
 {
    my $self = shift;
 
    $self->{mode} and
       croak "Cannot enter SPI protocol when " . _modename( $self->{mode} ) . " already active";
 
-   $self->{bp}->enter_mode( "SPI" )->then( sub {
-      my ( $mode ) = @_;
-      $self->{mode} = $mode;
+   my $mode = await $self->{bp}->enter_mode( "SPI" );
+   $self->{mode} = $mode;
 
-      $mode->configure( open_drain => 0 )
-         ->then_done(
-            Device::Chip::Adapter::BusPirate::_SPI->new( $mode )
-         );
-   });
+   await $mode->configure( open_drain => 0 );
+
+   return Device::Chip::Adapter::BusPirate::_SPI->new( $mode );
 }
 
-sub _enter_mode_I2C
+async sub _enter_mode_I2C
 {
    my $self = shift;
 
-   return Future->done( $self->{mode} ) if
+   return $self->{mode} if
       $self->{mode} and _modename( $self->{mode} ) eq "I2C";
 
    $self->{mode} and
       croak "Cannot enter I2C protocol when " . _modename( $self->{mode} ) . " already active";
 
-   return $self->{bp}->enter_mode( "I2C" )->then( sub {
-      my ( $mode ) = @_;
-      $self->{mode} = $mode;
+   my $mode = await $self->{bp}->enter_mode( "I2C" );
+   $self->{mode} = $mode;
 
-      $mode->configure( open_drain => 1 )->then_done( $mode );
-   });
+   await $mode->configure( open_drain => 1 );
+
+   return $mode;
 }
 
-sub make_protocol_I2C
+async sub make_protocol_I2C
 {
    my $self = shift;
 
-   $self->_enter_mode_I2C->then( sub {
-      my ( $mode ) = @_;
+   my $mode = await $self->_enter_mode_I2C;
 
-      return Future->done( Device::Chip::Adapter::BusPirate::_I2C->new( $mode ) );
-   });
+   return Device::Chip::Adapter::BusPirate::_I2C->new( $mode );
 }
 
 sub shutdown
@@ -233,10 +227,11 @@ sub read_gpios
 }
 
 # there's no more efficient way to tris_gpios than just read and ignore the result
-sub tris_gpios
+async sub tris_gpios
 {
    my $self = shift;
-   $self->read_gpios->then_done();
+   await $self->read_gpios;
+   return;
 }
 
 package
@@ -260,17 +255,16 @@ sub write_gpios
    )
 }
 
-sub read_gpios
+async sub read_gpios
 {
    my $self = shift;
    my ( $gpios ) = @_;
 
    my $mode = $self->{mode};
 
-   $mode->read( map { lc $_ } @$gpios )->then( sub {
-      my ( $vals ) = @_;
-      Future->done( { pairmap { uc $a => $b } %$vals } );
-   });
+   my $vals = await $mode->read( map { lc $_ } @$gpios );
+
+   return { pairmap { uc $a => $b } %$vals };
 }
 
 package

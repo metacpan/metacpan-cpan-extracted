@@ -23,6 +23,16 @@ BEGIN {
       plan skip_all => "Skipped: Inline not installed";
    };
 
+   # See if Inline loads without trouble, or bail out
+   eval {
+      require Inline::C;
+      plan skip_all => "Skipped: Inline::C not 0.62+"
+        if $Inline::C::VERSION < 0.62;
+      1;
+   } or do {
+      plan skip_all => "Skipped: Inline::C not installed";
+   };
+
    if( $Inline::VERSION < 0.68 ) {
       plan skip_all => "Skipped: Inline too early a version for Inline with=>'foo' form";
    }	   

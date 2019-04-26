@@ -1,6 +1,17 @@
 Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
 
-0.05  Wds Apr 24 CEST 2019
+0.08  Thurs Apr 25, 2019
+    Better build refusal logic.
+
+0.07  Weds Apr 24, 2019
+    Refuse to build on Win32, and refuse to build without 64-bit integer
+    support and little endian integers.
+
+0.06  Weds Apr 24, 2019
+    Fix building for FreeBSD. - Thanks to Slaven Slaven Rezić for the
+    various reports which lead to v0.06 and v0.05.
+
+0.05  Weds Apr 24, 2019
     Fix building under threaded perls.
 
 0.04  Tue Apr 23 20:14:18 CEST 2019

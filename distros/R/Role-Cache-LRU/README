@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
 
         package MyPackage;
+    
         use Moo;
-        use Role::Cache::LRU;
+        with 'Role::Cache::LRU';
     
         my $mp = MyPackage->new;
         $mp->set_cache('foo', {bar => 1});
@@ -19,7 +20,7 @@ DESCRIPTION
 
 DEVELOPMENT
 
-    Source repo at https://github.com/kianmeng/role-cache-lru.
+    Source repository at https://github.com/kianmeng/role-cache-lru.
 
     How to contribute? Follow through the CONTRIBUTING.md
     <https://github.com/kianmeng/role-cache-lru/blob/master/CONTRIBUTING.md>

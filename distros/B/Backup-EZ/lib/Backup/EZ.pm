@@ -36,11 +36,11 @@ Backup::EZ - Simple backups based on rsync
 
 =head1 VERSION
 
-Version 0.34
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 SYNOPSIS
 
@@ -282,46 +282,49 @@ sub _get_dest_login {
     return sprintf( '%s@%s', $username, $hostname );
 }
 
-sub _rsync_no_recursion {
-    my $self          = shift;
-    my $dir           = shift;
-    my @extra_options = @_;
-
-    my $rsync_opts = '-dlptgoD';
-    my $cmd;
-    my $login;
-
-    if ( $self->{dryrun} ) {
-        push( @extra_options, '--dry-run' );
-    }
-
-    $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
-    $login = $self->_get_dest_login;
-
-    # uncoverable branch false
-    if ( $self->_is_unit_test ) {
-        $cmd = sprintf(
-            "rsync %s $rsync_opts %s/ %s%s",
-            join( ' ', @extra_options ), $dir,
-            $self->_get_dest_tmp_dir, $dir
-        );
-    }
-    else {
-        $cmd = sprintf(
-            "rsync %s $rsync_opts -e ssh %s/ %s:%s%s",
-            join( ' ', @extra_options ),
-            $dir, $login, $self->_get_dest_tmp_dir, $dir
-        );
-    }
-
-    $cmd .= " --exclude-from " . $self->{exclude_file};
-
-    $self->_debug($cmd);
-    system($cmd);
-
-    # uncoverable branch true
-    confess if $?;
-}
+# Unused?
+# Commenting out to make it clear these are unused
+# Could consider removing
+#sub _rsync_no_recursion {
+#    my $self          = shift;
+#    my $dir           = shift;
+#    my @extra_options = @_;
+#
+#    my $rsync_opts = '-dlptgoD';
+#    my $cmd;
+#    my $login;
+#
+#    if ( $self->{dryrun} ) {
+#        push( @extra_options, '--dry-run' );
+#    }
+#
+#    $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
+#    $login = $self->_get_dest_login;
+#
+#    # uncoverable branch false
+#    if ( $self->_is_unit_test ) {
+#        $cmd = sprintf(
+#            "rsync %s $rsync_opts %s/ %s%s",
+#            join( ' ', @extra_options ), $dir,
+#            $self->_get_dest_tmp_dir, $dir
+#        );
+#    }
+#    else {
+#        $cmd = sprintf(
+#            "rsync %s $rsync_opts -e ssh %s/ %s:%s%s",
+#            join( ' ', @extra_options ),
+#            $dir, $login, $self->_get_dest_tmp_dir, $dir
+#        );
+#    }
+#
+#    $cmd .= " --exclude-from " . $self->{exclude_file};
+#
+#    $self->_debug($cmd);
+#    system($cmd);
+#
+#    # uncoverable branch true
+#    confess if $?;
+#}
 
 sub _rsync2 {
     my $self = shift;
@@ -345,6 +348,10 @@ sub _rsync2 {
 
     if ( $self->{exclude_file} ) {
         push @$extra_opts, sprintf '--exclude-from "%s"', $self->{exclude_file};
+    }
+    
+    if ( $self->{conf}->{extra_rsync_opts} ){
+        push @$extra_opts, $self->{conf}->{extra_rsync_opts};
     }
 
     $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
@@ -398,45 +405,48 @@ sub _rsync2 {
     confess if $?;
 }
 
-sub _rsync {
-    my $self          = shift;
-    my $dir           = shift;
-    my @extra_options = @_;
-
-    my $cmd;
-    my $login;
-
-    if ( $self->{dryrun} ) {
-        push( @extra_options, '--dry-run' );
-    }
-
-    $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
-    $login = $self->_get_dest_login;
-
-    # uncoverable branch false
-    if ( $self->_is_unit_test ) {
-        $cmd = sprintf(
-            "rsync %s -a %s/ %s%s",
-            join( ' ', @extra_options ), $dir,
-            $self->_get_dest_tmp_dir, $dir
-        );
-    }
-    else {
-        $cmd = sprintf(
-            "rsync %s -aze ssh %s/ %s:%s%s",
-            join( ' ', @extra_options ),
-            $dir, $login, $self->_get_dest_tmp_dir, $dir
-        );
-    }
-
-    $cmd .= " --exclude-from " . $self->{exclude_file};
-
-    $self->_debug($cmd);
-    system($cmd);
-
-    # uncoverable branch true
-    confess if $?;
-}
+# Unused?
+# Commenting out to make it clear these are unused
+# Could consider removing
+#sub _rsync {
+#    my $self          = shift;
+#    my $dir           = shift;
+#    my @extra_options = @_;
+#
+#    my $cmd;
+#    my $login;
+#
+#    if ( $self->{dryrun} ) {
+#        push( @extra_options, '--dry-run' );
+#    }
+#
+#    $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
+#    $login = $self->_get_dest_login;
+#
+#    # uncoverable branch false
+#    if ( $self->_is_unit_test ) {
+#        $cmd = sprintf(
+#            "rsync %s -a %s/ %s%s",
+#            join( ' ', @extra_options ), $dir,
+#            $self->_get_dest_tmp_dir, $dir
+#        );
+#    }
+#    else {
+#        $cmd = sprintf(
+#            "rsync %s -aze ssh %s/ %s:%s%s",
+#            join( ' ', @extra_options ),
+#            $dir, $login, $self->_get_dest_tmp_dir, $dir
+#        );
+#    }
+#
+#    $cmd .= " --exclude-from " . $self->{exclude_file};
+#
+#    $self->_debug($cmd);
+#    system($cmd);
+#
+#    # uncoverable branch true
+#    confess if $?;
+#}
 
 sub _full_backup_chunked {
     my $self = shift;

@@ -18,13 +18,14 @@ my %module_build_args = (
     "Vitali Peil"
   ],
   "dist_name" => "Catmandu-RIS",
-  "dist_version" => "0.11",
+  "dist_version" => "0.12",
   "license" => "perl",
   "module_name" => "Catmandu::RIS",
   "recursive_test_files" => 1,
   "requires" => {
-    "Catmandu" => 0,
-    "Catmandu::Importer::CSV" => 0,
+    "Catmandu" => "1.10",
+    "Moo" => 0,
+    "namespace::clean" => 0,
     "perl" => "v5.10.1"
   },
   "test_requires" => {

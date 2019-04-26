@@ -16,19 +16,32 @@ Net::Hacky::Detect::IP - Hackily try different methods of attaining local system
 
 =head1 VERSION
 
-Version 0.023
+Version 0.024
 
 =cut
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 my $tools = {
     unix => {
-        tools => [[qw(netstat -an4)],[qw(netstat -an6)],[qw(ip addr show)],[qw(ifconfig)],[qw(sockstat -4)],[qw(sockstat -6)]],
+        tools => [
+            [qw(netstat -an4)],
+            [qw(netstat -an6)],
+            [qw(ip addr show)],
+            [qw(ifconfig)],
+            [qw(sockstat -4)],
+            [qw(sockstat -6)],
+            [qw(arp -a)]
+        ],
         paths => [qw(/bin/ /sbin/ /usr/sbin/ /usr/bin/)]
     },
     windows => {
-        tools => [[qw(netstat -an)],[qw(ipconfig)],[qw(cscript)]],
+        tools => [
+            [qw(netstat -an)],
+            [qw(ipconfig)],
+            [qw(cscript)],
+            [qw(arp -a)]
+        ],
         paths => [""]
     }
 };

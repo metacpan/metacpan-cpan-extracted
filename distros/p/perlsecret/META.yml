@@ -3,13 +3,17 @@ abstract: 'Perl secret operators and constants'
 author:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::More: '0.94'
+  feature: '0'
+  if: '0'
   integer: '0'
   warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,15 +24,20 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=perlsecret
   repository: http://github.com/book/perlsecret.git
-version: '1.013'
+version: '1.014'
 x_contributors:
-  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
-  - 'Rafael Garcia-Suarez <rgs@consttype.org>'
+  - 'Lorenzo Taviani <lorenzo@cpan.org>'
+  - 'Slaven Rezić <srezic@cpan.org>'
+  - 'Mike Jones <mikejones@cpan.org>'
+  - 'Aristotle Pagaltzis <aristotle@cpan.org>'
+  - 'Rafael Garcia-Suarez <rgarcia@cpan.org>'
   - 'Toby Inkster <tobyink@cpan.org>'
   - 'Olivier Mengué <dolmen@cpan.org>'
-  - 'Keith C. Ivey <keith@iveys.org>'
-  - 'Pau Amma <pauamma@gundo.com>'
-  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
-  - 'Andy Armstrong <andy@hexten.net>'
-  - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'
-  - 'Abigail <abigail@abigail.be>'
+  - 'Keith C. Ivey <kcivey@cpan.org>'
+  - 'Pau Amma <pauamma@cpan.org>'
+  - 'Ivan Bessarabov <bessarabv@cpan.org>'
+  - 'Andy Armstrong <andya@cpan.org>'
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+  - 'Abigail <abigail@cpan.org>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

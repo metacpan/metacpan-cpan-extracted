@@ -11,7 +11,7 @@ use XML::Axk::Base qw(:all);
 use XML::Axk::Preparse;
 use Data::Dumper;
 
-our $VERSION = '0.001008';
+our $VERSION = '0.001009';
 
 =encoding UTF-8
 

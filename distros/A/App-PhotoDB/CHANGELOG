@@ -1,0 +1,32 @@
+Revision history for Perl module App::PhotoDB
+
+0.05 2019-04-25
+
+  * Add task to update negs copied from other negs (#272)
+  * Add task to clear out old logs (#265)
+  * Handle table printing in a better way (#269)
+  * Track photographer data per negative, not per film (#254)
+  * Fix bug that prevented tasks from running (#256)
+  * Minor fixes to SQL migrations
+  * Minor fixes to EXIF tagging
+
+0.04 2019-04-09
+
+  * Add actions to searches (#247, #262)
+  * Fix bug with long shutter speeds (#248)
+  * Fix crash when there are no tasks or reports (#250)
+
+0.03 2019-04-02
+
+  * Add search functionality for cameras, lenses, negatives, films and accessories (#227)
+  * Fix display numbers in scientific format (#254)
+  * Fix bug when moving scans to the right dir (#242)
+  * Fix bug creating config file on first run (#239)
+
+0.02 2019-03-27
+
+  * ReadLine fix to make it work on Ubuntu
+
+0.01 2019-03-23
+
+  * First release to CPAN.

@@ -22,7 +22,6 @@ Catalyst initializes itself in two stages:
 When the Catalyst module is imported in the main application
 module, it stores any options.
 
-
 =item 2
 
 When C<< __PACKAGE__->setup >> is called, it evaluates any
@@ -39,7 +38,7 @@ C<Catalyst> and from the selected specialized Engine module.
 Catalyst automatically loads all
 components it finds in the C<$class::Controller>, C<$class::C>,
 C<$class::Model>, C<$class::M>, C<$class::View> and C<$class::V>
-namespaces (using C<Module::Pluggable>). As each is loaded, if it has a
+namespaces (using L<Module::Pluggable>). As each is loaded, if it has a
 L<COMPONENT|Catalyst::Component/"COMPONENT"> method then this method
 will be called, and passed that component's configuration. It then returns
 an instance of the component, which becomes the C<$self> when methods in
@@ -49,7 +48,7 @@ that component are called later.
 
 Each controller has it's C<register_actions> method called. At this point,
 the subroutine attributes are retrieved from the
-L<MooseX::MethodAttributes::Role::Meta::Map|metaclass>, parsed, and used to
+L<metaclass|MooseX::MethodAttributes::Role::Meta::Map>, parsed, and used to
 build instances of L<Catalyst::Action>, which are then registered with
 the dispatcher.
 

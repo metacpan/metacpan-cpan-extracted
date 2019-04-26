@@ -110,15 +110,6 @@ METHODS
     relating to the specifics of that hardware mode. See the classes listed
     above for more information.
 
- mount_chip
-
-    Note: this method is now deprecated in favour of the Device::Chip
-    interface. This distribution provides a class,
-    Device::Chip::Adapter::BusPirate, suitable to connect an instance of
-    the Device::Chip interface to. Any previously-written Bus
-    Pirate-specific chip driver classes should now be changed to target the
-    generic Device::Chip interface instead.
-
  start
 
        $pirate->start->get

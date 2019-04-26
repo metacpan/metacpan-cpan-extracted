@@ -39,26 +39,11 @@ The Catalyst git repository can be found at:
     write: catagits@git.shadowcat.co.uk:PROJECTNAME
     browser: https://git.shadowcat.co.uk/gitweb/gitweb.cgi
 
-The Catalyst subversion repository can be found at:
-
-    svn: http://dev.catalyst.perl.org/repos/Catalyst
-    browser: http://dev.catalyst.perl.org/svnweb/Catalyst
-
 =head2 Schedule
 
 There is no dated release cycle for Catalyst. New releases will be made
 when sufficient small fixes have accumulated; or an important bugfix, or
 significant feature addition, is completed.
-
-=head2 Roadmap for features
-
-The Catalyst Roadmap is kept at
-L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=blob_plain;f=lib/Catalyst/ROADMAP.pod;hb=master>
-
-=head2 Bug list
-
-The TODO list with known bugs / deficiencies is kept at
-L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=blob_plain;f=TODO;hb=master>
 
 =head1 The Catalyst Core Team
 
@@ -176,4 +161,3 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
-

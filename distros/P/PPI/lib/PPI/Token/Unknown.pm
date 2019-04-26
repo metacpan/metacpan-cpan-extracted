@@ -30,13 +30,12 @@ object as a bug.
 use strict;
 use PPI::Token     ();
 use PPI::Exception ();
+use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';
 
-use vars qw{$VERSION @ISA $CURLY_SYMBOL};
-BEGIN {
-	$VERSION = '1.236';
-	@ISA     = 'PPI::Token';
-	$CURLY_SYMBOL = qr{\G\^[[:upper:]_]\w+\}};
-}
+our $VERSION = '1.252'; # VERSION
+
+our @ISA = "PPI::Token";
+
 
 
 
@@ -78,6 +77,15 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
+		# Postfix dereference: ->**
+		if ( $char eq '*' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		if ( $char eq '*' || $char eq '=' ) {
 			# Power operator '**' or mult-assign '*='
 			$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -92,13 +100,22 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '$' ) {
+		# Postfix dereference: ->$* ->$#*
+		if ( $char eq '*' || $char eq '#' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		if ( $char =~ /[a-z_]/i ) {
 			# Symbol
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}
 
-		if ( $PPI::Token::Magic::magic{ $c . $char } ) {
+		if ( $MAGIC{ $c . $char } ) {
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
@@ -121,13 +138,22 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '@' ) {
+		# Postfix dereference: ->@*
+		if ( $char eq '*' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		if ( $char =~ /[\w:]/ ) {
 			# Symbol
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}
 
-		if ( $PPI::Token::Magic::magic{ $c . $char } ) {
+		if ( $MAGIC{ $c . $char } ) {
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
@@ -150,6 +176,21 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '%' ) {
+		# Postfix dereference: ->%* ->%[...]
+		if ( $char eq '*' || $char eq '[' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				if ( $char eq '*' ) {
+					$t->{class} = $t->{token}->set_class( 'Cast' );
+					return 1;
+				}
+				if ( $char eq '[' ) {
+					$t->{class} = $t->{token}->set_class( 'Cast' );
+					return $t->_finalize_token->__TOKENIZER__on_char( $t );
+				}
+			}
+		}
+
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
 			# bitwise operator
@@ -158,7 +199,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a magic variable?
-		if ( $char eq '^' || $PPI::Token::Magic::magic{ $c . $char } ) {
+		if ( $char eq '^' || $MAGIC{ $c . $char } ) {
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
 		}
@@ -191,6 +232,15 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '&' ) {
+		# Postfix dereference: ->&*
+		if ( $char eq '*' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
 			# bitwise operator

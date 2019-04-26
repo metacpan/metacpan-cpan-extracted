@@ -142,6 +142,14 @@ lookup_key(pTHX_ struct mph_header *mph, SV *key_sv, SV *val_sv)
     }
 }
 
+#ifndef MPH_MAP_POPULATE
+#ifdef MAP_POPULATE
+#define MPH_MAP_POPULATE MAP_POPULATE
+#else
+#define MPH_MAP_POPULATE MAP_PREFAULT_READ
+#endif
+#endif
+
 void
 mph_mmap(pTHX_ char *file, struct mph_obj *obj) {
     struct stat st;
@@ -150,7 +158,7 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj) {
     if (fd < 0)
         croak("failed to open '%s' for read", file);
     fstat(fd,&st);
-    ptr = mmap(NULL,st.st_size,PROT_READ,MAP_SHARED | MAP_POPULATE, fd, 0);
+    ptr = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED | MPH_MAP_POPULATE, fd, 0);
     if (ptr == MAP_FAILED) {
         croak("failed to create mapping to file '%s'", file);
     }

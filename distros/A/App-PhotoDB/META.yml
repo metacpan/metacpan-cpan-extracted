@@ -20,15 +20,13 @@ name: App-PhotoDB
 provides:
   App::PhotoDB:
     file: lib/App/PhotoDB.pm
-    version: '0.04'
+    version: '0.05'
   App::PhotoDB::commands:
     file: lib/App/PhotoDB/commands.pm
   App::PhotoDB::funcs:
     file: lib/App/PhotoDB/funcs.pm
   App::PhotoDB::handlers:
     file: lib/App/PhotoDB/handlers.pm
-  App::PhotoDB::queries:
-    file: lib/App/PhotoDB/queries.pm
 requires:
   Array::Utils: '0'
   Config::IniHash: '0'
@@ -53,5 +51,5 @@ requires:
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

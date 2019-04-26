@@ -1,12 +1,12 @@
 Reading database from ...
 
 
------------------------------------------- ------ ------ ------ ------ ------
-File                                         stmt   bran   cond    sub  total
------------------------------------------- ------ ------ ------ ------ ------
-tests/cond_branch                            90.2   79.3   32.9  100.0   76.1
-Total                                        90.2   79.3   32.9  100.0   76.1
------------------------------------------- ------ ------ ------ ------ ------
+----------------- ------ ------ ------ ------ ------
+File                stmt   bran   cond    sub  total
+----------------- ------ ------ ------ ------ ------
+tests/cond_branch   90.2   79.3   32.9  100.0   76.1
+Total               90.2   79.3   32.9  100.0   76.1
+----------------- ------ ------ ------ ------ ------
 
 
 Run: ...
@@ -20,7 +20,7 @@ tests/cond_branch
 line  err   stmt   bran   cond    sub   code
 1                                       #!/usr/bin/perl
 2                                       
-3                                       # Copyright 2002-2018, Paul Johnson (paul@pjcj.net)
+3                                       # Copyright 2002-2019, Paul Johnson (paul@pjcj.net)
 4                                       
 5                                       # This software is free.  It is licensed under the same terms as Perl itself.
 6                                       

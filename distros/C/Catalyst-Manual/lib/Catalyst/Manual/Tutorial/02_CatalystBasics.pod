@@ -117,13 +117,13 @@ L<Catalyst::Manual::Tutorial::01_Intro>.
 
 Catalyst provides a number of helper scripts that can be used to quickly
 flesh out the basic structure of your application. All Catalyst projects
-begin with the C<catalyst.pl> helper (see
+begin with the F<catalyst.pl> helper (see
 L<Catalyst::Helper> for more information on helpers).
 Also note that as of Catalyst 5.7000, you will not have the helper
 scripts unless you install both L<Catalyst::Runtime>
 and L<Catalyst::Devel>.
 
-In this first chapter of the tutorial, use the Catalyst C<catalyst.pl>
+In this first chapter of the tutorial, use the Catalyst F<catalyst.pl>
 script to initialize the framework for an application called C<Hello>:
 
     $ catalyst.pl Hello
@@ -140,13 +140,13 @@ Note: If you are using Strawberry Perl on Win32, drop the ".pl"
 from the end of the "catalyst.pl" command and simply use
 "catalyst Hello".
 
-The C<catalyst.pl> helper script will display the names of the
+The F<catalyst.pl> helper script will display the names of the
 directories and files it creates:
 
     Changes               # Record of application changes
     lib                   # Lib directory for your app's Perl modules
         Hello             # Application main code directory
-            Controller    # Directory for Controller modules 
+            Controller    # Directory for Controller modules
             Model         # Directory for Models
             View          # Directory for Views
         Hello.pm          # Base application module
@@ -164,13 +164,13 @@ directories and files it creates:
         hello_server.pl   # The normal development server
         hello_test.pl     # Test your app from the command line
     t                     # Directory for tests
-        01app.t           # Test scaffold       
-        02pod.t           
-        03podcoverage.t 
+        01app.t           # Test scaffold
+        02pod.t
+        03podcoverage.t
 
 
 Catalyst will "auto-discover" modules in the Controller, Model, and View
-directories. When you use the C<hello_create.pl> script it will create Perl
+directories. When you use the F<hello_create.pl> script it will create Perl
 module scaffolds in those directories, plus test files in the "t"
 directory. The default location for templates is in the "root"
 directory. The scripts in the script directory will always start with
@@ -202,7 +202,7 @@ C<Ctrl-C> to breakout of the dev server) if you prefer.
     .----------------------------------------------------------------------------.
     | Catalyst::Plugin::ConfigLoader  0.30                                       |
     '----------------------------------------------------------------------------'
-    
+
     [debug] Loaded dispatcher "Catalyst::Dispatcher"
     [debug] Loaded engine "Catalyst::Engine"
     [debug] Found home "/home/catalyst/Hello"
@@ -213,7 +213,7 @@ C<Ctrl-C> to breakout of the dev server) if you prefer.
     +-----------------------------------------------------------------+----------+
     | Hello::Controller::Root                                         | instance |
     '-----------------------------------------------------------------+----------'
-    
+
     [debug] Loaded Private actions:
     .----------------------+--------------------------------------+--------------.
     | Private              | Class                                | Method       |
@@ -222,7 +222,7 @@ C<Ctrl-C> to breakout of the dev server) if you prefer.
     | /end                 | Hello::Controller::Root              | end          |
     | /index               | Hello::Controller::Root              | index        |
     '----------------------+--------------------------------------+--------------'
-    
+
     [debug] Loaded Path actions:
     .-------------------------------------+--------------------------------------.
     | Path                                | Private                              |
@@ -230,7 +230,7 @@ C<Ctrl-C> to breakout of the dev server) if you prefer.
     | /                                   | /index                               |
     | /                                   | /default                             |
     '-------------------------------------+--------------------------------------'
-    
+
     [info] Hello powered by Catalyst 5.90002
     HTTP::Server::PSGI: Accepting connections at http://0:3000/
 
@@ -264,14 +264,14 @@ necessary.
 =head2 The Simplest Way
 
 The Root.pm controller is a place to put global actions that usually
-execute on the root URL. Open the C<lib/Hello/Controller/Root.pm> file
+execute on the root URL. Open the F<lib/Hello/Controller/Root.pm> file
 in your editor. You will see the "index" subroutine, which is
 responsible for displaying the welcome screen that you just saw in your
 browser.
 
     sub index :Path :Args(0) {
         my ( $self, $c ) = @_;
-    
+
         # Hello World
         $c->response->body( $c->welcome_message );
     }
@@ -285,12 +285,12 @@ context provides access to "response" and "request" objects. (See
 L<Catalyst::Runtime>, L<Catalyst::Response>, and
 L<Catalyst::Request>)
 
-C<$c-E<gt>response-E<gt>body> sets the HTTP response (see
+C<< $c->response->body >> sets the HTTP response (see
 L<Catalyst::Response>), while
-C<$c-E<gt>welcome_message> is a special method that returns the welcome
+C<< $c->welcome_message >> is a special method that returns the welcome
 message that you saw in your browser.
 
-The ":Path :Args(0)" after the method name are attributes which
+The "C<:Path :Args(0)>" after the method name are attributes which
 determine which URLs will be dispatched to this method. (You might see
 ":Private" if you are using an older version of Catalyst, but using that
 with "default" or "index" is currently deprecated.  If so, you should
@@ -301,7 +301,7 @@ policy, prefers to handle URL dispatching with attributes on controller
 methods. There is a lot of flexibility in specifying which URLs to
 match.  This particular method will match all URLs, because it doesn't
 specify the path (nothing comes after "Path"), but will only accept a
-URL without any args because of the ":Args(0)".
+URL without any args because of the "C<:Args(0)>".
 
 The default is to map URLs to controller names, and because of the way
 that Perl handles namespaces through package names, it is simple to
@@ -314,11 +314,11 @@ method.
 While you leave the C<script/hello_server.pl -r> command running the
 development server in one window (don't forget the "-r" at the end!),
 open another window and add the following subroutine to your
-C<lib/Hello/Controller/Root.pm> file:
+F<lib/Hello/Controller/Root.pm> file:
 
     sub hello :Global {
         my ( $self, $c ) = @_;
-    
+
         $c->response->body("Hello, World!");
     }
 
@@ -330,7 +330,7 @@ get output similar to the following:
 
     Saw changes to the following files:
      - /home/catalyst/Hello/lib/Hello/Controller/Root.pm (modify)
-    
+
     Attempting to restart the server
     ...
     [debug] Loaded Private actions:
@@ -365,8 +365,8 @@ To create a TT view, run:
 
     $ script/hello_create.pl view HTML TT
 
-This creates the C<lib/Hello/View/HTML.pm> module, which is a subclass
-of C<Catalyst::View::TT>.
+This creates the F<lib/Hello/View/HTML.pm> module, which is a subclass
+of L<Catalyst::View::TT>.
 
 =over 4
 
@@ -389,12 +389,12 @@ indicating that you want to use a Template Toolkit view.
 
 =back
 
-If you look at C<lib/Hello/View/HTML.pm> you will find that it only
+If you look at F<lib/Hello/View/HTML.pm> you will find that it only
 contains a config statement to set the TT extension to ".tt".
 
 Now that the HTML.pm "View" exists, Catalyst will autodiscover it and be
 able to use it to display the view templates using the "process" method
-that it inherits from the C<Catalyst::View::TT> class.
+that it inherits from the L<Catalyst::View::TT> class.
 
 Template Toolkit is a very full-featured template facility, with
 excellent documentation at L<http://template-toolkit.org/>, but since
@@ -402,7 +402,7 @@ this is not a TT tutorial, we'll stick to only basic TT usage here (and
 explore some of the more common TT features in later chapters of the
 tutorial).
 
-Create a C<root/hello.tt> template file (put it in the C<root> under the
+Create a F<root/hello.tt> template file (put it in the C<root> under the
 C<Hello> directory that is the base of your application). Here is a
 simple sample:
 
@@ -413,24 +413,24 @@ simple sample:
 [% and %] are markers for the TT parts of the template. Inside you can
 access Perl variables and classes, and use TT directives. In this case,
 we're using a special TT variable that defines the name of the template
-file (C<hello.tt>).  The rest of the template is normal HTML.
+file (F<hello.tt>).  The rest of the template is normal HTML.
 
-Change the hello method in C<lib/Hello/Controller/Root.pm> to the
+Change the hello method in F<lib/Hello/Controller/Root.pm> to the
 following:
 
     sub hello :Global {
         my ( $self, $c ) = @_;
-    
+
         $c->stash(template => 'hello.tt');
     }
 
-This time, instead of doing C<$c-E<gt>response-E<gt>body()>, you are
+This time, instead of doing C<< $c->response->body() >>, you are
 setting the value of the "template" hash key in the Catalyst "stash", an
 area for putting information to share with other parts of your
 application. The "template" key determines which template will be
 displayed at the end of the request cycle. Catalyst controllers have a
 default "end" action for all methods which causes the first (or default)
-view to be rendered (unless there's a C<$c-E<gt>response-E<gt>body()>
+view to be rendered (unless there's a C<< $c->response->body() >>
 statement). So your template will be magically displayed at the end of
 your method.
 
@@ -454,15 +454,15 @@ Although this style is still relatively common, the approach we
 used previous is becoming more common because it allows you to
 set multiple stash variables in one line.  For example:
 
-    $c->stash(template => 'hello.tt', foo => 'bar', 
+    $c->stash(template => 'hello.tt', foo => 'bar',
               another_thing => 1);
 
 You can also set multiple stash values with a hashref:
 
-    $c->stash({template => 'hello.tt', foo => 'bar', 
+    $c->stash({template => 'hello.tt', foo => 'bar',
               another_thing => 1});
 
-Any of these formats work, but the C<$c-E<gt>stash(name =E<gt> value);>
+Any of these formats work, but the C<< $c->stash(name => value); >>
 style is growing in popularity -- you may wish to use it all the time
 (even when you are only setting a single value).
 
@@ -473,15 +473,15 @@ Create a controller named "Site" by executing the create script:
 
     $ script/hello_create.pl controller Site
 
-This will create a C<lib/Hello/Controller/Site.pm> file (and a test
+This will create a F<lib/Hello/Controller/Site.pm> file (and a test
 file). If you bring Site.pm up in your editor, you can see that
 there's not much there to see.
 
-In C<lib/Hello/Controller/Site.pm>, add the following method:
+In F<lib/Hello/Controller/Site.pm>, add the following method:
 
     sub test :Local {
         my ( $self, $c ) = @_;
-    
+
         $c->stash(username => 'John',
                   template => 'site/test.tt');
     }
@@ -508,7 +508,7 @@ Make a subdirectory "site" in the "root" directory.
 
     $ mkdir root/site
 
-Create a new template file in that directory named C<root/site/test.tt>
+Create a new template file in that directory named F<root/site/test.tt>
 and include a line like:
 
     <p>Hello, [% username %]!</p>
@@ -523,8 +523,6 @@ the controller.
 You can jump to the next chapter of the tutorial here:
 L<More Catalyst Basics|Catalyst::Manual::Tutorial::03_MoreCatalystBasics>
 
-
-
 =head1 AUTHORS
 
 Gerda Shank, C<gerda.shank@gmail.com>
@@ -536,4 +534,4 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
 
 Copyright 2006-2011, Kennedy Clark, under the
 Creative Commons Attribution Share-Alike License Version 3.0
-(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).
+(L<https://creativecommons.org/licenses/by-sa/3.0/us/>).

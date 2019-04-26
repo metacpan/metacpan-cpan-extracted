@@ -1,7 +1,7 @@
 package Algorithm::MinPerfHashTwoLevel;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 our $DEFAULT_VARIANT = 1;
 
 

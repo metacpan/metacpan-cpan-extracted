@@ -10,4 +10,4 @@ requires 'Net::SSLeay', '1.85';
 requires 'Plack';
 requires 'URI';
 requires 'Log::Any';
-requires 'Starman';
+requires 'Twiggy';

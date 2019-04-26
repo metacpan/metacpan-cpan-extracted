@@ -1,10 +1,9 @@
 package Catmandu::Importer::RIS;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use namespace::clean;
 use Catmandu::Sane;
-use Catmandu::Importer::CSV;
 use Catmandu::Util qw(:is :array);
 use Moo;
 

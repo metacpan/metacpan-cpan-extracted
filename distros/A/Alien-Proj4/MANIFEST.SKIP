@@ -1,0 +1,9 @@
+.travis.yml
+^blib\/
+^\.git\/
+^MYMETA\.
+\.bak$
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+\.swp$

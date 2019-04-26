@@ -9,12 +9,12 @@ use Moo::Role;
 use Sub::Quote qw(quote_sub);
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has cache => (
     isa => InstanceOf['Cache::LRU'],
     is => 'lazy',
-    builder => quote_sub(q{ Cache::LRU->new })
+    builder => quote_sub(q{ Cache::LRU->new }),
 );
 
 sub get_cache {
@@ -38,7 +38,7 @@ sub get_cache_size {
 sub set_cache_size {
     my ($self, $max) = @_;
 
-    croak "Invalid cache size!" if ($max <= 0);
+    croak q|Invalid cache size!| if ($max <= 0);
 
     return $self->cache->{size} = $max;
 }
@@ -48,6 +48,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords lru
+
 =head1 NAME
 
 Role::Cache::LRU - LRU caching role for Moo class.
@@ -55,8 +57,9 @@ Role::Cache::LRU - LRU caching role for Moo class.
 =head1 SYNOPSIS
 
     package MyPackage;
+
     use Moo;
-    use Role::Cache::LRU;
+    with 'Role::Cache::LRU';
 
     my $mp = MyPackage->new;
     $mp->set_cache('foo', {bar => 1});
@@ -65,11 +68,11 @@ Role::Cache::LRU - LRU caching role for Moo class.
 =head1 DESCRIPTION
 
 Role::Cache::LRU is a Moo's role that provides LRU caching based on
-L<Cache::LRU>.
+L<Cache::LRU|Cache::LRU>.
 
 =head1 DEVELOPMENT
 
-Source repo at L<https://github.com/kianmeng/role-cache-lru|https://github.com/kianmeng/role-cache-lru>.
+Source repository at L<https://github.com/kianmeng/role-cache-lru|https://github.com/kianmeng/role-cache-lru>.
 
 How to contribute? Follow through the L<CONTRIBUTING.md|https://github.com/kianmeng/role-cache-lru/blob/master/CONTRIBUTING.md> document to setup your development environment.
 
@@ -121,6 +124,6 @@ Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>
 
 =head1 SEE ALSO
 
-L<Cache::LRU>
+L<Cache::LRU|Cache::LRU>
 
 =cut

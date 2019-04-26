@@ -5,6 +5,8 @@ use warnings;
 
 use Carp;
 
+use Future::AsyncAwait;
+
 use Exporter 'import';
 our @EXPORT = qw(
    expect_write
@@ -58,24 +60,24 @@ sub _stringify { sprintf "%v02X", $_[0] }
    shift @expectations if !length $e->[1];
 };
 
-*Future::IO::sysread = sub {
+*Future::IO::sysread_exactly = async sub {
    shift;
    my ( undef, $length ) = @_;
 
-   Test::Future::Deferred->done_later->then( sub {
-      my $e = $expectations[0];
+   await Test::Future::Deferred->done_later;
 
-      $e and $e->[0] eq "read" or
-         croak "Unexpected sysread($length)";
+   my $e = $expectations[0];
 
-      length $e->[1] or
-         croak "No bytes for sysread($length)";
+   $e and $e->[0] eq "read" or
+      croak "Unexpected sysread($length)";
 
-      my $ret = substr( $e->[1], 0, $length, "" );
-      shift @expectations if !length $e->[1];
+   length $e->[1] or
+      croak "No bytes for sysread($length)";
 
-      return Future->done( $ret );
-   });
+   my $ret = substr( $e->[1], 0, $length, "" );
+   shift @expectations if !length $e->[1];
+
+   return $ret;
 };
 
 0x55AA;

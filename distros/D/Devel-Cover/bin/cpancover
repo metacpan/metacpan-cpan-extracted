@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2002-2018, Paul Johnson (paul@pjcj.net)
+# Copyright 2002-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@
 use 5.26.0;
 use warnings;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 use Devel::Cover::Collection;
 
@@ -156,7 +156,7 @@ cpancover - report coverage statistics on CPAN modules
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -220,7 +220,7 @@ The following exit values are returned:
 
 =head1 LICENCE
 
-Copyright 2002-2018, Paul Johnson (paul@pjcj.net)
+Copyright 2002-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

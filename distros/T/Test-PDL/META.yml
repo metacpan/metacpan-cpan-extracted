@@ -3,41 +3,42 @@ abstract: 'Test Perl Data Language arrays (a.k.a. piddles) for equality'
 author:
   - 'Edward Baudrez <ebaudrez@cpan.org>'
 build_requires:
-  Capture::Tiny: 0
-  ExtUtils::MakeMaker: 0
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  List::MoreUtils: 0
-  PDL: 2.004
-  PDL::Core: 0
-  Test::Builder::Tester: 0
-  Test::Deep: 0
-  Test::Exception: 0
-  Test::More: 0
-  Test::NoWarnings: 0
-  blib: 1.01
-  perl: 5.006
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  PDL: '2.004'
+  PDL::Core: '0'
+  Test::Builder::Tester: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-PDL
 requires:
-  Exporter: 0
-  PDL: 2.004
-  PDL::Lite: 0
-  PDL::Types: 0
-  Test::Builder: 0
-  Test::Deep::Cmp: 0
-  base: 0
-  strict: 0
-  warnings: 0
+  Exporter: '0'
+  PDL: '2.004'
+  PDL::Lite: '0'
+  PDL::Types: '0'
+  Test::Builder: '0'
+  Test::Deep::Cmp: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   homepage: https://github.com/ebaudrez/Test-PDL
   repository: https://github.com/ebaudrez/Test-PDL.git
-version: 0.13
+version: '0.14'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

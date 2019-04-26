@@ -3,7 +3,6 @@ Changes
 examples/bbio-tickit-ui.pl
 examples/set-pwm.pl
 lib/Device/BusPirate.pm
-lib/Device/BusPirate/Chip.pm
 lib/Device/BusPirate/Mode.pm
 lib/Device/BusPirate/Mode/BB.pm
 lib/Device/BusPirate/Mode/I2C.pm

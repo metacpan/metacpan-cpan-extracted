@@ -87,11 +87,11 @@ mean that it is not suitable for most deployments.
 
 =head2 Chef
 
-L<Chef|http://www.opscode.com/chef/> is an open-source systems integration
+L<Chef|https://www.chef.io/products/chef-infra/> is an open-source systems integration
 framework built specifically for automating cloud computing deployments. A
 Cookbooks demonstrating how to deploy a Catalyst application using Chef is
-available at L<http://community.opscode.com/cookbooks/catalyst> and
-L<http://github.com/melezhik/cookbooks/wiki/Catalyst-cookbook-intro>.
+available at L<https://supermarket.chef.io/cookbooks/catalyst> and
+L<https://github.com/melezhik/cookbooks/wiki/Catalyst-cookbook-intro>.
 
 =head1 AUTHORS
 

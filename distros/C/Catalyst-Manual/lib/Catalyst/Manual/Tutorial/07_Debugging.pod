@@ -70,11 +70,11 @@ camps:
 
 =over 4
 
-=item * 
+=item *
 
 Fans of C<log> and C<print> statements embedded in the code.
 
-=item * 
+=item *
 
 Fans of interactive debuggers.
 
@@ -85,12 +85,12 @@ Catalyst is able to easily accommodate both styles of debugging.
 
 =head1 LOG STATEMENTS
 
-Folks in the former group can use Catalyst's C<$c-E<gt>log> facility.
+Folks in the former group can use Catalyst's C<< $c->log >> facility.
 (See L<Catalyst::Log> for more detail.) For example, if you add the
 following code to a controller action method:
 
     $c->log->info("Starting the foreach loop here");
-    
+
     $c->log->debug("Value of \$id is: ".$id);
 
 Then the Catalyst development server will display your message along
@@ -141,13 +141,13 @@ you can obviously indent them if you prefer):
         # 'Context' that's used to 'glue together' the various components
         # that make up the application
         my ($self, $c) = @_;
-    
+
     $DB::single=1;
-    
+
         # Retrieve all of the book records as book model objects and store in the
         # stash where they can be accessed by the TT template
         $c->stash->{books} = [$c->model('DB::Book')->all];
-    
+
         # Set the TT template to use.  You will almost always want to do this
         # in your action methods.
         $c->stash->{template} = 'books/list.tt2';
@@ -170,16 +170,16 @@ simply prepend C<perl -d> to the front of C<script/myapp_server.pl>:
 
 This will start the interactive debugger and produce output similar to:
 
-    $ perl -d script/myapp_server.pl  
-    
+    $ perl -d script/myapp_server.pl
+
     Loading DB routines from perl5db.pl version 1.3
     Editor support available.
-    
+
     Enter h or `h h' for help, or `man perldebug' for more help.
-    
+
     main::(script/myapp_server.pl:16):      my $debug         = 0;
-    
-      DB<1> 
+
+      DB<1>
 
 Press the C<c> key and hit C<Enter> to continue executing the Catalyst
 development server under the debugger.  Although execution speed will be
@@ -193,7 +193,7 @@ development server will drop to the Perl debugger prompt:
 
     MyApp::Controller::Books::list(/home/catalyst/MyApp/script/../lib/MyApp/Controller/Books.pm:48):
     48:         $c->stash->{books} = [$c->model('DB::Book')->all];
-    
+
       DB<1>
 
 You now have the full Perl debugger at your disposal.  First use the
@@ -205,7 +205,7 @@ C<single-step> into methods/subroutines):
     SELECT me.id, me.title, me.rating, me.created, me.updated FROM book me:
     MyApp::Controller::Books::list(/home/catalyst/MyApp/script/../lib/MyApp/Controller/Books.pm:53):
     53:         $c->stash->{template} = 'books/list.tt2';
-    
+
       DB<1>
 
 This takes you to the next line of code where the template name is set.
@@ -226,7 +226,7 @@ Next, list the methods available on our C<Book> model:
     _calculate_score
     _collapse_cond
     <lines removed for brevity>
-    
+
       DB<2>
 
 We can also play with the model directly:
@@ -323,7 +323,7 @@ B<Note:> Matt has also suggested the following tips for Perl debugging:
 
 =over 4
 
-=item * 
+=item *
 
 Check the version of an installed module:
 
@@ -341,7 +341,7 @@ and if you are using bash aliases:
         or die qq(module \"\$m\" is not installed\\n); \
         print \$m->VERSION'"
 
-=item * 
+=item *
 
 Check if a modules contains a given method:
 
@@ -399,4 +399,4 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
 
 Copyright 2006-2011, Kennedy Clark, under the
 Creative Commons Attribution Share-Alike License Version 3.0
-(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).
+(L<https://creativecommons.org/licenses/by-sa/3.0/us/>).

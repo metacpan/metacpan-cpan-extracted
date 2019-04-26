@@ -56,48 +56,38 @@ For more unusual tasks, by all means forge onwards.
 use strict;
 use Scalar::Util    ();
 use Params::Util    qw{_STRING _INSTANCE};
-use List::MoreUtils ();
 use PPI             ();
 use PPI::Exception  ();
+use PPI::Singletons '%_PARENT';
 
-use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
-BEGIN {
-	$VERSION = '1.236';
-	$errstr  = '';
+our $VERSION = '1.252'; # VERSION
 
-	# Faster than having another method call just
-	# to set the structure finish token.
-	*_PARENT = *PPI::Element::_PARENT;
+our $errstr = "";
 
-	# Keyword -> Structure class maps
-	%ROUND = (
-		# Conditions
-		'if'     => 'PPI::Structure::Condition',
-		'elsif'  => 'PPI::Structure::Condition',
-		'unless' => 'PPI::Structure::Condition',
-		'while'  => 'PPI::Structure::Condition',
-		'until'  => 'PPI::Structure::Condition',
+# Keyword -> Structure class maps
+my %ROUND = (
+	# Conditions
+	'if'     => 'PPI::Structure::Condition',
+	'elsif'  => 'PPI::Structure::Condition',
+	'unless' => 'PPI::Structure::Condition',
+	'while'  => 'PPI::Structure::Condition',
+	'until'  => 'PPI::Structure::Condition',
 
-		# For(each)
-		'for'     => 'PPI::Structure::For',
-		'foreach' => 'PPI::Structure::For',
-	);
+	# For(each)
+	'for'     => 'PPI::Structure::For',
+	'foreach' => 'PPI::Structure::For',
+);
 
-	# Opening brace to refining method
-	%RESOLVE = (
-		'(' => '_round',
-		'[' => '_square',
-		'{' => '_curly',
-	);
-
-}
+# Opening brace to refining method
+my %RESOLVE = (
+	'(' => '_round',
+	'[' => '_square',
+	'{' => '_curly',
+);
 
 # Allows for experimental overriding of the tokenizer
-use vars qw{ $X_TOKENIZER };
-BEGIN {
-	$X_TOKENIZER ||= 'PPI::Tokenizer';
-}
-use constant X_TOKENIZER => $X_TOKENIZER;
+our $X_TOKENIZER = "PPI::Tokenizer";
+sub X_TOKENIZER { $X_TOKENIZER }
 
 
 
@@ -339,62 +329,59 @@ sub _lex_document {
 #####################################################################
 # Lex Methods - Statement Object
 
-use vars qw{%STATEMENT_CLASSES};
-BEGIN {
-	# Keyword -> Statement Subclass
-	%STATEMENT_CLASSES = (
-		# Things that affect the timing of execution
-		'BEGIN'     => 'PPI::Statement::Scheduled',
-		'CHECK'     => 'PPI::Statement::Scheduled',
-		'UNITCHECK' => 'PPI::Statement::Scheduled',
-		'INIT'      => 'PPI::Statement::Scheduled',
-		'END'       => 'PPI::Statement::Scheduled',
+# Keyword -> Statement Subclass
+my %STATEMENT_CLASSES = (
+	# Things that affect the timing of execution
+	'BEGIN'     => 'PPI::Statement::Scheduled',
+	'CHECK'     => 'PPI::Statement::Scheduled',
+	'UNITCHECK' => 'PPI::Statement::Scheduled',
+	'INIT'      => 'PPI::Statement::Scheduled',
+	'END'       => 'PPI::Statement::Scheduled',
 
-		# Special subroutines for which 'sub' is optional
-		'AUTOLOAD'  => 'PPI::Statement::Sub',
-		'DESTROY'   => 'PPI::Statement::Sub',
+	# Special subroutines for which 'sub' is optional
+	'AUTOLOAD'  => 'PPI::Statement::Sub',
+	'DESTROY'   => 'PPI::Statement::Sub',
 
-		# Loading and context statement
-		'package'   => 'PPI::Statement::Package',
-		# 'use'       => 'PPI::Statement::Include',
-		'no'        => 'PPI::Statement::Include',
-		'require'   => 'PPI::Statement::Include',
+	# Loading and context statement
+	'package'   => 'PPI::Statement::Package',
+	# 'use'       => 'PPI::Statement::Include',
+	'no'        => 'PPI::Statement::Include',
+	'require'   => 'PPI::Statement::Include',
 
-		# Various declarations
-		'my'        => 'PPI::Statement::Variable',
-		'local'     => 'PPI::Statement::Variable',
-		'our'       => 'PPI::Statement::Variable',
-		'state'     => 'PPI::Statement::Variable',
-		# Statements starting with 'sub' could be any one of...
-		# 'sub'     => 'PPI::Statement::Sub',
-		# 'sub'     => 'PPI::Statement::Scheduled',
-		# 'sub'     => 'PPI::Statement',
+	# Various declarations
+	'my'        => 'PPI::Statement::Variable',
+	'local'     => 'PPI::Statement::Variable',
+	'our'       => 'PPI::Statement::Variable',
+	'state'     => 'PPI::Statement::Variable',
+	# Statements starting with 'sub' could be any one of...
+	# 'sub'     => 'PPI::Statement::Sub',
+	# 'sub'     => 'PPI::Statement::Scheduled',
+	# 'sub'     => 'PPI::Statement',
 
-		# Compound statement
-		'if'        => 'PPI::Statement::Compound',
-		'unless'    => 'PPI::Statement::Compound',
-		'for'       => 'PPI::Statement::Compound',
-		'foreach'   => 'PPI::Statement::Compound',
-		'while'     => 'PPI::Statement::Compound',
-		'until'     => 'PPI::Statement::Compound',
+	# Compound statement
+	'if'        => 'PPI::Statement::Compound',
+	'unless'    => 'PPI::Statement::Compound',
+	'for'       => 'PPI::Statement::Compound',
+	'foreach'   => 'PPI::Statement::Compound',
+	'while'     => 'PPI::Statement::Compound',
+	'until'     => 'PPI::Statement::Compound',
 
-		# Switch statement
-		'given'     => 'PPI::Statement::Given',
-		'when'      => 'PPI::Statement::When',
-		'default'   => 'PPI::Statement::When',
+	# Switch statement
+	'given'     => 'PPI::Statement::Given',
+	'when'      => 'PPI::Statement::When',
+	'default'   => 'PPI::Statement::When',
 
-		# Various ways of breaking out of scope
-		'redo'      => 'PPI::Statement::Break',
-		'next'      => 'PPI::Statement::Break',
-		'last'      => 'PPI::Statement::Break',
-		'return'    => 'PPI::Statement::Break',
-		'goto'      => 'PPI::Statement::Break',
+	# Various ways of breaking out of scope
+	'redo'      => 'PPI::Statement::Break',
+	'next'      => 'PPI::Statement::Break',
+	'last'      => 'PPI::Statement::Break',
+	'return'    => 'PPI::Statement::Break',
+	'goto'      => 'PPI::Statement::Break',
 
-		# Special sections of the file
-		'__DATA__'  => 'PPI::Statement::Data',
-		'__END__'   => 'PPI::Statement::End',
-	);
-}
+	# Special sections of the file
+	'__DATA__'  => 'PPI::Statement::Data',
+	'__END__'   => 'PPI::Statement::End',
+);
 
 sub _statement {
 	my ($self, $Parent, $Token) = @_;
@@ -438,6 +425,8 @@ sub _statement {
 		}
 	}
 
+	my $is_lexsub = 0;
+
 	# Is it a token in our known classes list
 	my $class = $STATEMENT_CLASSES{$Token->content};
 	if ( $class ) {
@@ -448,6 +437,17 @@ sub _statement {
 			if ( !$Next->significant ) {
 				push @{$self->{delayed}}, $Next;
 				next;
+			}
+
+			# Lexical subroutine
+			if (
+				$Token->content =~ /^(?:my|our|state)$/
+				and $Next->isa( 'PPI::Token::Word' ) and $Next->content eq 'sub'
+			) {
+				# This should be PPI::Statement::Sub rather than PPI::Statement::Variable
+				$class = undef;
+				$is_lexsub = 1;
+				last;
 			}
 
 			last if
@@ -502,7 +502,7 @@ sub _statement {
 	return $class if $class;
 
 	# Handle the more in-depth sub detection
-	if ( $Token->content eq 'sub' ) {
+	if ( $is_lexsub || $Token->content eq 'sub' ) {
 		# Read ahead to the next significant token
 		my $Next;
 		while ( $Next = $self->_get_token ) {
@@ -1058,6 +1058,13 @@ sub _square {
 			# $foo[], @foo[]
 			return 'PPI::Structure::Subscript';
 		}
+		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%)/ ) {
+			my $prior = $Parent->schild(-2);
+			if ( $prior and $prior->isa('PPI::Token::Operator') and $prior->content eq '->' ) {
+				# Postfix dereference: ->@[...] ->%[...]
+				return 'PPI::Structure::Subscript';
+			}
+		}
 		# FIXME - More cases to catch
 	}
 
@@ -1065,50 +1072,47 @@ sub _square {
 	'PPI::Structure::Constructor';
 }
 
-use vars qw{%CURLY_CLASSES @CURLY_LOOKAHEAD_CLASSES};
-BEGIN {
-	# Keyword -> Structure class maps
-	%CURLY_CLASSES = (
-		# Blocks
-		'sub'  => 'PPI::Structure::Block',
-		'grep' => 'PPI::Structure::Block',
-		'map'  => 'PPI::Structure::Block',
-		'sort' => 'PPI::Structure::Block',
-		'do'   => 'PPI::Structure::Block',
-		# rely on 'continue' + block being handled elsewhere
-		# rely on 'eval' + block being handled elsewhere
+# Keyword -> Structure class maps
+my %CURLY_CLASSES = (
+	# Blocks
+	'sub'  => 'PPI::Structure::Block',
+	'grep' => 'PPI::Structure::Block',
+	'map'  => 'PPI::Structure::Block',
+	'sort' => 'PPI::Structure::Block',
+	'do'   => 'PPI::Structure::Block',
+	# rely on 'continue' + block being handled elsewhere
+	# rely on 'eval' + block being handled elsewhere
 
-		# Hash constructors
-		'scalar' => 'PPI::Structure::Constructor',
-		'='      => 'PPI::Structure::Constructor',
-		'||='    => 'PPI::Structure::Constructor',
-		'&&='    => 'PPI::Structure::Constructor',
-		'//='    => 'PPI::Structure::Constructor',
-		'||'     => 'PPI::Structure::Constructor',
-		'&&'     => 'PPI::Structure::Constructor',
-		'//'     => 'PPI::Structure::Constructor',
-		'?'      => 'PPI::Structure::Constructor',
-		':'      => 'PPI::Structure::Constructor',
-		','      => 'PPI::Structure::Constructor',
-		'=>'     => 'PPI::Structure::Constructor',
-		'+'      => 'PPI::Structure::Constructor', # per perlref
-		'return' => 'PPI::Structure::Constructor', # per perlref
-		'bless'  => 'PPI::Structure::Constructor', # pragmatic --
-		            # perlfunc says first arg is a reference, and
-			    # bless {; ... } fails to compile.
-	);
+	# Hash constructors
+	'scalar' => 'PPI::Structure::Constructor',
+	'='      => 'PPI::Structure::Constructor',
+	'||='    => 'PPI::Structure::Constructor',
+	'&&='    => 'PPI::Structure::Constructor',
+	'//='    => 'PPI::Structure::Constructor',
+	'||'     => 'PPI::Structure::Constructor',
+	'&&'     => 'PPI::Structure::Constructor',
+	'//'     => 'PPI::Structure::Constructor',
+	'?'      => 'PPI::Structure::Constructor',
+	':'      => 'PPI::Structure::Constructor',
+	','      => 'PPI::Structure::Constructor',
+	'=>'     => 'PPI::Structure::Constructor',
+	'+'      => 'PPI::Structure::Constructor', # per perlref
+	'return' => 'PPI::Structure::Constructor', # per perlref
+	'bless'  => 'PPI::Structure::Constructor', # pragmatic --
+				# perlfunc says first arg is a reference, and
+			# bless {; ... } fails to compile.
+);
 
-	@CURLY_LOOKAHEAD_CLASSES = (
-	    {},	# not used
-	    {
-		';'    => 'PPI::Structure::Block', # per perlref
-		'}'    => 'PPI::Structure::Constructor',
-	    },
-	    {
-		'=>'   => 'PPI::Structure::Constructor',
-	    },
-	);
-}
+my @CURLY_LOOKAHEAD_CLASSES = (
+	{},	# not used
+	{
+	';'    => 'PPI::Structure::Block', # per perlref
+	'}'    => 'PPI::Structure::Constructor',
+	},
+	{
+	'=>'   => 'PPI::Structure::Constructor',
+	},
+);
 
 
 # Given a parent element, and a { token to open a structure, determine
@@ -1136,6 +1140,13 @@ sub _curly {
 		if ( $content =~ /^(?:\$|\@)/ and $Element->isa('PPI::Token::Symbol') ) {
 			# $foo{}, @foo{}
 			return 'PPI::Structure::Subscript';
+		}
+		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%|\*)/ ) {
+			my $prior = $Parent->schild(-2);
+			if ( $prior and $prior->isa('PPI::Token::Operator') and $prior->content eq '->' ) {
+				# Postfix dereference: ->@{...} ->%{...} ->*{...}
+				return 'PPI::Structure::Subscript';
+			}
 		}
 		if ( $Element->isa('PPI::Structure::Block') ) {
 			# deference - ${$hash_ref}{foo}
@@ -1186,17 +1197,21 @@ sub _curly {
 	### FIXME This is possibly a bad choice, but will have to do for now.
 	return 'PPI::Structure::Block' if $Element;
 
-	# Special case: Are we the param of a core function
-	# i.e. map({ $_ => 1 } @foo)
 	if (
 		$Parent->isa('PPI::Statement')
 		and
 		_INSTANCE($Parent->parent, 'PPI::Structure::List')
 	) {
 		my $function = $Parent->parent->parent->schild(-2);
-		if ( $function and $function->content =~ /^(?:map|grep|sort)$/ ) {
-			return 'PPI::Structure::Block';
-		}
+
+		# Special case: Are we the param of a core function
+		# i.e. map({ $_ => 1 } @foo)
+		return 'PPI::Structure::Block'
+			if $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/;
+
+		# If not part of a block print, list-embedded curlies are most likely constructors
+		return 'PPI::Structure::Constructor'
+			if not $function or $function->content !~ /^(?:print|say)$/;
 	}
 
 	# We need to scan ahead.

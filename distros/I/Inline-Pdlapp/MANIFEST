@@ -1,0 +1,18 @@
+Changes
+examples/inlpp.pl
+examples/inlpp_link.pl
+examples/inlppminimal.pl
+examples/Module/Makefile.PL
+examples/Module/MyInlineMod.pm
+examples/Module/t/myinlinemod.t
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+lib/Inline/MakePdlappInstallable.pm
+lib/Inline/Pdlapp.pm
+t/00-report-prereqs.t
+t/01-checkmanifest.t
+t/inlinepdlpp.t
+xt/00-check-changelog.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2000-2018 Greg Sabino Mullane and others: see the Changes file
+  Copyright (c) 2000-2019 Greg Sabino Mullane and others: see the Changes file
   Portions Copyright (c) 1997-2000 Edmund Mergl
   Portions Copyright (c) 1994-1997 Tim Bunce
 
@@ -25,8 +25,6 @@ constant(name=Nullch)
 	char *name
 	PROTOTYPE:
 	ALIAS:
-	PG_ABSTIME            = 702
-	PG_ABSTIMEARRAY       = 1023
 	PG_ACLITEM            = 1033
 	PG_ACLITEMARRAY       = 1034
 	PG_ANY                = 2276
@@ -89,6 +87,8 @@ constant(name=Nullch)
 	PG_JSONARRAY          = 199
 	PG_JSONB              = 3802
 	PG_JSONBARRAY         = 3807
+	PG_JSONPATH           = 4072
+	PG_JSONPATHARRAY      = 4073
 	PG_LANGUAGE_HANDLER   = 2280
 	PG_LINE               = 628
 	PG_LINEARRAY          = 629
@@ -119,6 +119,7 @@ constant(name=Nullch)
 	PG_PG_DEPENDENCIES    = 3402
 	PG_PG_LSN             = 3220
 	PG_PG_LSNARRAY        = 3221
+	PG_PG_MCV_LIST        = 5017
 	PG_PG_NDISTINCT       = 3361
 	PG_PG_NODE_TREE       = 194
 	PG_PG_PROC            = 81
@@ -151,9 +152,7 @@ constant(name=Nullch)
 	PG_REGROLEARRAY       = 4097
 	PG_REGTYPE            = 2206
 	PG_REGTYPEARRAY       = 2211
-	PG_RELTIME            = 703
-	PG_RELTIMEARRAY       = 1024
-	PG_SMGR               = 210
+	PG_TABLE_AM_HANDLER   = 269
 	PG_TEXT               = 25
 	PG_TEXTARRAY          = 1009
 	PG_TID                = 27
@@ -166,8 +165,6 @@ constant(name=Nullch)
 	PG_TIMESTAMPTZARRAY   = 1185
 	PG_TIMETZ             = 1266
 	PG_TIMETZARRAY        = 1270
-	PG_TINTERVAL          = 704
-	PG_TINTERVALARRAY     = 1025
 	PG_TRIGGER            = 2279
 	PG_TSM_HANDLER        = 3310
 	PG_TSQUERY            = 3615
@@ -353,7 +350,6 @@ void do(dbh, statement, attr=Nullsv, ...)
 			imp_sth = (imp_sth_t*)(DBIh_COM(sth));
 			if (!dbdxst_bind_params(sth, imp_sth, items-2, ax+2))
 				XSRETURN_UNDEF;
-			imp_sth->onetime = 1; /* Tells dbdimp.c not to bother preparing this */
 			imp_sth->async_flag = asyncflag;
 			retval = dbd_st_execute(sth, imp_sth);
 		}
@@ -790,8 +786,6 @@ _pg_type_info (type_sv=Nullsv)
 		ST(0) = sv_2mortal( newSViv( type_num ) );
 	}
 
-#if PGLIBVERSION >= 80000
-
 void
 pg_result(dbh)
 	SV * dbh
@@ -819,8 +813,6 @@ pg_cancel(dbh)
 	CODE:
 	D_imp_dbh(dbh);
 	ST(0) = pg_db_cancel(dbh, imp_dbh) ? &PL_sv_yes : &PL_sv_no;
-
-#endif
 
 
 # -- end of DBD::Pg::db
@@ -862,8 +854,6 @@ cancel(sth)
 	D_imp_sth(sth);
 	ST(0) = dbd_st_cancel(sth, imp_sth) ? &PL_sv_yes : &PL_sv_no;
 
-#if PGLIBVERSION >= 80000
-
 void
 pg_result(sth)
 	SV * sth
@@ -878,8 +868,6 @@ pg_result(sth)
 			XST_mUNDEF(0);
 		else
 			XST_mIV(0, ret);
-
-#endif
 
 SV*
 pg_canonical_ids(sth)

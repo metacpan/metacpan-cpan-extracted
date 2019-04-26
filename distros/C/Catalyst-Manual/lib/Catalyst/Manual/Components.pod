@@ -13,7 +13,7 @@ This list may well be outdated by the time you read this, and some
 plugins may be deprecated, or, conversely, may now part of core
 L<Catalyst>. Be sure to check the Catalyst:: and CatalystX:: namespaces
 for additional components, and consult the mailing list (
-L<http://dev.catalyst.perl.org/wiki/Support> ) for advice on the current
+L<http://wiki.catalystframework.org/wiki/Support> ) for advice on the current
 status or preferred use of your chosen plugin/framework.
 
 =head1 PLUGINS
@@ -143,7 +143,7 @@ This module implements the Catalyst::Authentication API for L<Apache::AuthTkt>.
 
 =head4 L<Catalyst::Authentication::Store::DBI>
 
-Allows you to use a plain L<DBI> database connection to identify users. 
+Allows you to use a plain L<DBI> database connection to identify users.
 
 =head4 L<Catalyst::Authentication::Store::Htpasswd>
 
@@ -274,10 +274,10 @@ L<Catalyst::Plugin::ConfigLoader::YAML>
 
 =head2 L<Catalyst::Plugin::FillInForm>
 
-A plugin based on C<HTML::FillInForm>, which describes itself as a module
+A plugin based on L<HTML::FillInForm>, which describes itself as a module
 to automatically insert data from a previous HTML form into the HTML input,
-textarea, radio buttons, checkboxes, and select tags.  C<HTML::FillInForm>
-is a subclass of C<HTML::Parser> and uses it to parse the HTML and insert
+textarea, radio buttons, checkboxes, and select tags.  L<HTML::FillInForm>
+is a subclass of L<HTML::Parser> and uses it to parse the HTML and insert
 the values into the form tags.
 
 =head2 L<Catalyst::Plugin::Flavour>
@@ -445,23 +445,23 @@ Allows your Controller class to dispatch XMLRPC methods from its own class.
 
 =head2 L<Catalyst::Controller::HTML::FormFu>
 
-Catalyst integration for <HTML::FormFu>.
+Catalyst integration for L<HTML::FormFu>.
 
 =head1 MODELS
 
 =head2 L<Catalyst::Model::CDBI>
 
-The C<Class::DBI> (CDBI) model class.  It is built on top of
-C<Class::DBI::Loader>, which automates the definition of C<Class::DBI>
+The L<Class::DBI> (CDBI) model class.  It is built on top of
+L<Class::DBI::Loader>, which automates the definition of L<Class::DBI>
 sub-classes by scanning the underlying table schemas, setting up columns
 and primary keys.
 
 =head2 L<Catalyst::Model::CDBI::Plain>
 
-A neutral interface to the C<Class::DBI> module which does not attempt
+A neutral interface to the L<Class::DBI> module which does not attempt
 to automate table setup. It allows the user to manually set up
-C<Class::DBI> classes, either by doing so within the Catalyst model
-classes themselves, or by inheriting from existing C<Class::DBI>
+L<Class::DBI> classes, either by doing so within the Catalyst model
+classes themselves, or by inheriting from existing L<Class::DBI>
 classes.
 
 =head2 L<Catalyst::Model::DBIC::Schema>

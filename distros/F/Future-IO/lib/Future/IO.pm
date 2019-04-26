@@ -7,8 +7,9 @@ package Future::IO;
 
 use strict;
 use warnings;
+use 5.010;  # //
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 
@@ -87,7 +88,7 @@ sub sleep
    shift;
    my ( $secs ) = @_;
 
-   return ( $IMPL //= "Future::IO::_Impl" )->sleep( $secs );
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->sleep( $secs );
 }
 
 =head2 sysread
@@ -111,7 +112,54 @@ sub sysread
    shift;
    my ( $fh, $length ) = @_;
 
-   return ( $IMPL //= "Future::IO::_Impl" )->sysread( $fh, $length );
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->sysread( $fh, $length );
+}
+
+=head2 sysread_exactly
+
+   $f = Future::IO->sysread_exactly( $fh, $length )
+      $bytes = $f->get
+
+I<Since version 0.03.>
+
+Returns a L<Future> that will become done when exactly the given number of
+bytes have been read from the given filehandle. It returns exactly C<$length>
+bytes. On EOF, the returned future will yield an empty list (or C<undef> in
+scalar context), even if fewer bytes have already been obtained. These bytes
+will be lost. On any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are
+ignored), the future fails with a suitable error message.
+
+This may make more than one C<syssread()> call.
+
+=cut
+
+sub sysread_exactly
+{
+   shift;
+   my ( $fh, $length ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   if( my $code = $IMPL->can( "sysread_exactly" ) ) {
+      return $IMPL->$code( $fh, $length );
+   }
+
+   return _sysread_into_buffer( $IMPL, $fh, $length, '' );
+}
+
+sub _sysread_into_buffer
+{
+   my ( $IMPL, $fh, $length, $bytes ) = @_;
+
+   $IMPL->sysread( $fh, $length - length $bytes )->then( sub {
+      my ( $more ) = @_;
+      return Future->done() if !defined $more; # EOF
+
+      $bytes .= $more;
+
+      return Future->done( $bytes ) if length $bytes >= $length;
+      return _sysread_into_buffer( $IMPL, $fh, $length, $bytes );
+   });
 }
 
 =head2 override_impl
@@ -147,7 +195,7 @@ sub override_impl
 }
 
 package
-   Future::IO::_Impl;
+   Future::IO::_DefaultImpl;
 use base qw( Future );
 use Carp;
 
@@ -215,13 +263,13 @@ sub await
 {
    shift;
 
-   my $rvec = '';
-   vec( $rvec, $readers[0]->fh->fileno, 1 ) = 1 if @readers;
+   die "Cowardly refusing to sit idle and do nothing" unless @alarms || @readers;
 
    my $maxwait;
    $maxwait = $alarms[0]->time - time() if @alarms;
 
-   die "Cowardly refusing to sit idle and do nothing" unless length $rvec or defined $maxwait;
+   my $rvec = '';
+   vec( $rvec, $readers[0]->fh->fileno, 1 ) = 1 if @alarms && @readers;
 
    my $ret = ( defined $maxwait ) ?
       select( $rvec, undef, undef, $maxwait ) :
