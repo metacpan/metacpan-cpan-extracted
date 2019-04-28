@@ -1,5 +1,9 @@
 Revision history for WebService-Mocean
 
+0.05  2019-04-27 00:41:53 +08
+        - Fix build dependancies failure
+        - Fix meta details
+
 0.04  2019-02-03 23:47:56 +08
         - Load modules dynamically
         - Skip test if authenticantion token is not set

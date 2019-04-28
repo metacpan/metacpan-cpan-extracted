@@ -8,4 +8,6 @@ Revision history for Perl extension Anansi::Script.
 	- corrected HASH reference deprecations.
 0.03  Sat May 25 02:02:56 2013
 	- CPAN re-upload.
-
+0.04  Tue Apr 09 16:27:51 2019
+	- modified module dependencies in makefile.
+	- modified README to reflect module dependencies.

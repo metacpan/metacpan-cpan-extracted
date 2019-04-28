@@ -1,0 +1,20 @@
+## name UndeclaredIterator
+## failures 2
+## cut
+
+for $foo (@bar) {}
+foreach $bar (@foo) {}
+
+## name DeclaredIterator
+## failures 0
+## cut
+
+for my $foo (@bar) {}
+foreach my $bar (@foo) {}
+
+## name NoIterator
+## failures 0
+## cut
+
+for (@bar) {}
+for ($foo = 0; $foo < 5; $foo++) {}

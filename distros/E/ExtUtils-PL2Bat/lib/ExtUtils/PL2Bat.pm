@@ -1,15 +1,24 @@
 package ExtUtils::PL2Bat;
-$ExtUtils::PL2Bat::VERSION = '0.001';
+$ExtUtils::PL2Bat::VERSION = '0.002';
 use strict;
 use warnings;
 
 use 5.006;
 
-use base 'Exporter';
-our @EXPORT = qw/pl2bat/;
-
 use Config;
 use Carp qw/croak/;
+
+# In core, we can't use any other modules except those that already live in
+# lib/, so Exporter is not available to us.
+sub import {
+	my ($self, @functions) = @_;
+	@functions = 'pl2bat' if not @functions;
+	my $caller = caller;
+	for my $function (@functions) {
+		no strict 'refs';
+		*{"$caller\::$function"} = \&{$function};
+	}
+}
 
 sub pl2bat {
 	my %opts = @_;
@@ -28,17 +37,17 @@ sub pl2bat {
 
 	my $head = <<"EOT";
 	\@rem = '--*-Perl-*--
-	\@echo off
-	if "%OS%" == "Windows_NT" goto WinNT
-	perl $opts{otherargs}
+	\@set "ErrorLevel="
+	\@if "%OS%" == "Windows_NT" \@goto WinNT
+	\@perl $opts{otherargs}
 	\@set ErrorLevel=%ErrorLevel%
-	goto endofperl
+	\@goto endofperl
 	:WinNT
-	perl $opts{ntargs}
+	\@perl $opts{ntargs}
 	\@set ErrorLevel=%ErrorLevel%
-	if NOT "%COMSPEC%" == "%SystemRoot%\\system32\\cmd.exe" goto endofperl
-	if %errorlevel% == 9009 echo You do not have Perl in your PATH.
-	goto endofperl
+	\@if NOT "%COMSPEC%" == "%SystemRoot%\\system32\\cmd.exe" \@goto endofperl
+	\@if %ErrorLevel% == 9009 \@echo You do not have Perl in your PATH.
+	\@goto endofperl
 	\@rem ';
 EOT
 
@@ -47,7 +56,7 @@ EOT
 	my $tail = <<'EOT';
 	__END__
 	:endofperl
-	@"%COMSPEC%" /c exit /b %ErrorLevel%
+	@set "ErrorLevel=" & @goto _undefined_label_ 2>NUL || @"%COMSPEC%" /d/c @exit %ErrorLevel%
 EOT
 	$tail =~ s/^\s+//gm;
 
@@ -113,7 +122,7 @@ ExtUtils::PL2Bat - Batch file creation to run perl scripts on Windows
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

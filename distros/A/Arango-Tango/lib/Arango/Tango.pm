@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.007';
+$Arango::Tango::VERSION = '0.008';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -36,7 +36,7 @@ use Sub::Install qw(install_sub);
 use Sub::Name qw(subname);
 BEGIN {
     my $package = __PACKAGE__;
-    for my $m (qw'server_id version status time statistics statistics_description target_version log log_level server_availability server_mode') {
+    for my $m (qw'engine cluster_endpoint server_id version status time statistics statistics_description target_version log log_level server_availability server_mode server_role list_users') {
         install_sub {
             code => subname(
                 "${package}::$m",
@@ -95,6 +95,18 @@ sub delete_user {
     return $self->_api('delete_user', { username => $username });
 }
 
+sub user {
+    my ($self, $username) = @_;
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    return $self->_api('get_user', { username => $username });
+}
+
+sub user_databases {
+    my ($self, $username) = @_;
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    return $self->_api('get_user_databases', { username => $username });
+}
+
 1;
 
 __END__
@@ -109,7 +121,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSYS
 
@@ -221,12 +233,34 @@ Returns the id of a server in a cluster. The request will fail if the server is 
 
 Return mode information about a server.
 
+=head2 C<server_role>
+
+    my $mode = $db->server_role();
+
+Returns the role of a server in a cluster.
+
+=head2 C<cluster_endpoints>
+
+    my $endpoints = $db->cluster_endpoints;
+
+Returns an object with an attribute endpoints, which contains an array
+of objects, which each have the attribute endpoint, whose value is a
+string with the endpoint description. There is an entry for each
+coordinator in the cluster. This method only works on coordinators in
+cluster mode. In case of an error the error attribute is set to true.
+
 =head2 C<version>
 
     my $version_info = $db->version;
     my $detailed_info = $db->version( 'details' => 1 );
 
 Returns a hash reference with basic server info. Detailed information can be requested with the C<details> option.
+
+=head2 C<engine>
+
+   my $engine = $db->engine;
+
+Returns the storage engine the server is configured to use.
 
 =head2 C<statistics>
 
@@ -293,6 +327,30 @@ Creates an user. Optional parameters are C<passwd>, C<active> and C<extra>.
     $db->delete_user('username');
 
 Deletes an user.
+
+=head2 C<list_users>
+
+    $users = $db->list_users;
+
+Fetches data about all users. You need the Administrate server access level
+in order to execute this REST call. Otherwise, you will only get information
+about yourself.
+
+=head2 C<user>
+
+    $user = $db->user("john");
+
+Fetches data about the specified user. You can fetch information about
+yourself or you need the Administrate server access level in order to
+execute this REST call.
+
+=head2 C<user_databases>
+
+    $dbs = $db->user_databases("john", full => 1);
+
+Fetch the list of databases available to the specified user. You need
+Administrate for the server access level in order to execute this REST
+call.
 
 =head1 EXCEPTIONS
 

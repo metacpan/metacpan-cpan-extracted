@@ -1,20 +1,9 @@
 Changes
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Repository.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Catalyst/Helper/View/JSON.pm
 lib/Catalyst/View/JSON.pm
+maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-META.yml
-MYMETA.json
-MYMETA.yml
 t/00_compile.t
 t/01_server.t
 t/lib/TestApp.pm
@@ -24,3 +13,7 @@ t/lib/TestApp/View/JSON2.pm
 t/lib/TestAppUnicode.pm
 t/lib/TestAppUnicode/Controller/Root.pm
 t/lib/TestAppUnicode/View/JSON.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

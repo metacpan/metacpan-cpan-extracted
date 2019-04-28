@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+# read in first 45 lines from SJIS-encoded attached PDF-J file, convert to
+# UTF-8, and output in 4 different CJK+Western font combinations
+
 use File::Basename;
 use PDF::Builder;
 use PDF::Builder::Util;
@@ -76,33 +79,38 @@ my %fonts = (
 my ($pdf, $page, $gfx, $text, $y, $line);
 
 foreach my $fontname (keys %fonts) {
-    $y = 800;
+    $y = 800; # title line this page
 
-#print "processing fontname $fontname\n";
     $page = $api->page();
     $gfx = $page->gfx();
     $text = $page->text();
     delete $gfx->{'Filter'};
     my $font = $fonts{$fontname};
-#print " font = $font\n";     is a hash
     $uw->{'widthobj'} = $font;
 
     seek(DATA, $start, 0);
-    binmode(DATA, ':raw');
+    binmode(DATA, ':raw :encoding(shiftjis)');
 
     $text->textlabel(50,$y, $helv,10, $fontname, -color=>'darkred');
+    # take the first 45 lines of HERE file and output in current font
     foreach (1..45) {
-#print "at $_ in loop\n";
-	$y -= 15;
-	$line = <DATA>;
-        $line =~ s|[\012\015]+$||go;
+	$y -= 15;  # output line position
+
+	$line = <DATA>;  # get one line of data from HERE file
+	# and converts $line from SJIS to UTF-8 on the fly
+	
+        $line =~ s|[\012\015]+$||go; # remove trailing LFs and CRs
 	$text->textlabel(50,$y, $font,10, $line, -hscale=>80);
+	# note that many lines are long enough to overflow the right margin.
+	# if you wanted to use this for real, you'd probably want to do
+	# something about folding or breaking long lines.
     }
 }
 
 $api->saveas("$0.pdf");
 $api->end;
 
+# HERE document (as <DATA>) after __END__ marker, is PDF-J document
 __END__
 PDFJ - “ú–{ŒêPDF¶¬ƒ‚ƒWƒ…[ƒ‹
 

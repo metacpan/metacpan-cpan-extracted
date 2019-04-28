@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use ExtUtils::Depends;
 
-require 'common.pl';
+require './common.pl';
 my $build_hash = get_build();
 
 my $pkg = ExtUtils::Depends->new('Alien::HDF4');

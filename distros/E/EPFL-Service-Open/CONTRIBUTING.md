@@ -56,7 +56,7 @@ Release
   2. Update the file [Changes](Changes)
   3. Package the module.
   4. Upload the package to https://pause.perl.org/
-  5. Create the tag (`git tag -a v<version> -m "Tagging the v<version> release"`) 
+  5. Create the tag (`git tag -a v<version> -m "Tagging the v<version> release"`)
 
 License
 -------
@@ -64,6 +64,6 @@ License
 Apache License 2.0
 
 Original work (c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2018.  
-Modified work (c) William Belle, 2018.
+Modified work (c) William Belle, 2018-2019.
 
 See the [LICENSE](LICENSE) file for more details.

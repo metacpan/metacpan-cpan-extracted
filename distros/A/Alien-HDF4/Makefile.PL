@@ -3,8 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use Config;
-require 'common.pl';
-require 5.010;
+require './common.pl';
 
 my ($libpath, $libs) = findlibs();
 die <<EOF unless defined $libpath;
@@ -36,11 +35,11 @@ WriteMakefile(
   NAME	=> 'Alien::HDF4',
   VERSION => $version,
   MIN_PERL_VERSION => '5.010',
-  BUILD_REQUIRES	=> {
+  CONFIGURE_REQUIRES	=> {
     'IO::All'		=> 0,
     'ExtUtils::Depends'	=> '0.402',
   },
-  CONFIGURE_REQUIRES	=> {
+  BUILD_REQUIRES	=> {
     'IO::All'		=> 0,
     'ExtUtils::Depends'	=> '0.402',
   },
@@ -59,6 +58,7 @@ WriteMakefile(
       },
     },
     resources => {
+      bugtracker  => {web=>'https://github.com/PDLPorters/Alien-HDF4/issues'},
       repository => {
 	type => 'git',
 	url => 'git://github.com/PDLPorters/Alien-HDF4',

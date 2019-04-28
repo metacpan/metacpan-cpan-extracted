@@ -3,13 +3,13 @@ package Net::Async::Slack::Event::AppUninstalled;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Net::Async::Slack::EventType;
 
 =head1 NAME
 
-Net::Async::Slack::Event::AppUninstalled - A team uninstalled your Slack app.
+Net::Async::Slack::Event::AppUninstalled - Your Slack app was uninstalled.
 
 =head1 DESCRIPTION
 

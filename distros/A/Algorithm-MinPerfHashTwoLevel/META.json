@@ -44,6 +44,6 @@
          "url" : "git://github.com/demerphq/Algorithm-MinPerfHashTwoLevel.git"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

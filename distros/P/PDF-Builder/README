@@ -7,7 +7,14 @@ See Changes file for the version.
 The installable Perl package may be obtained from https://www.cpan.org, 
 as PDF::Builder.
 
-This software is Copyright (c) 2017-2018 by Phil M. Perry.
+Note that there are several "optional" libraries (Perl modules) used to extend
+and improve PDF::Builder. The installation process MAY attempt to install them 
+if not present (Makefile.PL "recommends" list). Don't panic if one or more 
+fails to install -- PDF::Builder is still quite usable. Read about it in 
+PDF::Builder::Docs. Conversely, if you need to use one or more, and they were
+not automatically installed, you will need to manually initiate an install.
+
+This software is Copyright (c) 2017-2019 by Phil M. Perry.
 
 This is free software, licensed under:
 

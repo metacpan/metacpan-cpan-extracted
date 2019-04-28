@@ -21,7 +21,7 @@ use List::Util    ();
 use PPI::Document ();
 use Params::Util  qw{_INSTANCE _CLASS _CODE _SCALAR0};
 
-our $VERSION = '1.252'; # VERSION
+our $VERSION = '1.264'; # VERSION
 
 
 

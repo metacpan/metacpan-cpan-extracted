@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -117,6 +117,7 @@ use Mojo::Base '-base';
 use Role::Tiny qw( with );
 with qw( Yancy::Backend::Role::Sync Yancy::Backend::Role::Relational );
 use Text::Balanced qw( extract_bracketed );
+use Mojo::JSON qw( true false encode_json );
 BEGIN {
     eval { require Mojo::SQLite; Mojo::SQLite->VERSION( 3 ); 1 }
         or die "Could not load SQLite backend: Mojo::SQLite version 3 or higher required\n";
@@ -135,6 +136,8 @@ sub dbschema { undef }
 sub create {
     my ( $self, $coll, $params ) = @_;
     $params = $self->normalize( $coll, $params );
+    die "No refs allowed in '$coll': " . encode_json $params
+        if grep ref, values %$params;
     my $id_field = $self->id_field( $coll );
     my $inserted_id = $self->mojodb->db->insert( $coll, $params )->last_insert_id;
     # SQLite does not have a 'returning' syntax. Assume id field is correct
@@ -143,6 +146,18 @@ sub create {
 }
 
 sub filter_table { return $_[1] !~ /^sqlite_/ }
+
+my %DEFAULT2FIXUP = (
+    NULL => undef,
+    TRUE => true,
+    FALSE => false,
+);
+sub fixup_default {
+    my ( $self, $value ) = @_;
+    return undef if !defined $value;
+    return $DEFAULT2FIXUP{ $value } if exists $DEFAULT2FIXUP{ $value };
+    $self->mojodb->db->query( 'SELECT ' . $value )->array->[0];
+}
 
 sub column_info_extra {
     my ( $self, $table, $columns ) = @_;
@@ -184,7 +199,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

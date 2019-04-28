@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   KPS9566::eval
-    length          vs   KPS9566::length
-    substr          vs   KPS9566::substr
-    ord             vs   KPS9566::ord
-    reverse         vs   KPS9566::reverse
-    getc            vs   KPS9566::getc
-    index           vs   KPS9566::index
-    rindex          vs   KPS9566::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  KPS9566::eval
+    length          vs.  KPS9566::length
+    substr          vs.  KPS9566::substr
+    ord             vs.  KPS9566::ord
+    reverse         vs.  KPS9566::reverse
+    getc            vs.  KPS9566::getc
+    index           vs.  KPS9566::index
+    rindex          vs.  KPS9566::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

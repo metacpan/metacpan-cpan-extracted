@@ -4,11 +4,11 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'             => 'Windows1252',
-    'VERSION_FROM'     => 'Windows1252.pm', # finds $VERSION
-    ($] >= 5.005 ?                   # Add these new keywords supported since 5.005
-      ('PREREQ_PM'     => {},        # e.g., Module::Name => 1.1
-       'ABSTRACT_FROM' => 'Windows1252.pm', # retrieve abstract from module
-       'AUTHOR'        => 'ina <ina@cpan.org>',
+    'VERSION_FROM'     => 'lib/Windows1252.pm', # finds $VERSION
+    ($] >= 5.005 ?                       # Add these new keywords supported since 5.005
+      ('PREREQ_PM'     => {},            # e.g., Module::Name => 1.1
+       'ABSTRACT_FROM' => 'lib/Windows1252.pm', # retrieve abstract from module
+       'AUTHOR'        => 'ina <ina@cpan.org> in a CPAN',
        'test'          => { 'TESTS' => 't/*/*.t' },
       )
       :

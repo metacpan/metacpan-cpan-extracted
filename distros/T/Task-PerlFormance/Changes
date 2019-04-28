@@ -1,10 +1,14 @@
 Revision history for Task-PerlFormance
 
+0.010     2019-04-28
+        - dropped Crypt::Primes
+        - added File::Copy::Recursive (for BPF::Plugin::RegexpCommonTS)
+
 0.009     2019-04-26
-        - drop ::Plugin:Mandelbrot due to crashes
+        - drop BPF::Plugin:Mandelbrot due to crashes
 
 0.008     2018-04-21
-        - plus ::Plugin:PerlStone2015
+        - plus BPF::Plugin:PerlStone2015
 
 0.007     2016-05-06
         - plus some useful deps, and SpamAssassin is back

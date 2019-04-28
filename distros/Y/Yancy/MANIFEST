@@ -15,7 +15,8 @@ eg/doc-site/.gitignore
 eg/doc-site/README.md
 eg/doc-site/cpanfile
 eg/doc-site/deploy.sh
-eg/doc-site/docs.db
+eg/doc-site/index.markdown
+eg/doc-site/myapp.conf
 eg/doc-site/myapp.pl
 eg/doc-site/myapp.preaction.conf
 eg/doc-site/public/screenshot-edit.png
@@ -61,6 +62,8 @@ lib/Yancy/Backend/Role/MojoAsync.pm
 lib/Yancy/Backend/Role/Relational.pm
 lib/Yancy/Backend/Role/Sync.pm
 lib/Yancy/Backend/Sqlite.pm
+lib/Yancy/Command/backend.pm
+lib/Yancy/Command/backend/copy.pm
 lib/Yancy/Controller/Yancy.pm
 lib/Yancy/Controller/Yancy/API.pm
 lib/Yancy/Controller/Yancy/MultiTenant.pm
@@ -70,16 +73,17 @@ lib/Yancy/Plugin/Auth/Basic.pm
 lib/Yancy/Plugin/Form.pm
 lib/Yancy/Plugin/Form/Bootstrap4.pm
 lib/Yancy/Util.pm
-share/run_backend_tests.pl
 share/update_resources.sh
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/api.t
 t/backend/dbic.t
+t/backend/mock.t
 t/backend/mysql.t
 t/backend/pg.t
 t/backend/sqlite.t
+t/command/backend/copy.t
 t/config.t
 t/controller/multi_tenant.t
 t/controller/yancy.t
@@ -101,7 +105,9 @@ t/lib/Yancy/Backend/Test.pm
 t/lib/Yancy/Plugin/Test.pm
 t/plugin/auth/basic.t
 t/plugin/form/bootstrap4.t
+t/schema/dbicdump.pl
 t/schema/mysql.sql
+t/schema/openapi.pl
 t/schema/pg.sql
 t/schema/sqlite.sql
 t/share/openapi-spec.json
@@ -119,3 +125,5 @@ t/share/withindex/templates/index.html.ep
 t/standalone.t
 t/util.t
 weaver.ini
+xt/run_backend_tests.pl
+xt/tmux-layout.sh

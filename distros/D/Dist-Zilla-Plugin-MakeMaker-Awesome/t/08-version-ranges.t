@@ -57,7 +57,7 @@ use Path::Tiny;
     );
 
     ok(
-        !(grep { m'[MakeMaker::Awesome] found version range' } @{ $tzil->log_messages }),
+        !(grep m'[MakeMaker::Awesome] found version range', @{ $tzil->log_messages }),
         'got no warning about probably-unparsable version range',
     );
 

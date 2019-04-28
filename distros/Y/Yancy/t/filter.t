@@ -20,49 +20,7 @@ use Digest;
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend );
 
-my $collections = {
-    people => {
-        required => [qw( name )],
-        properties => {
-            id => {
-                'x-order' => 1,
-            },
-            name => {
-                'x-order' => 2,
-                description => 'The real name of the person',
-            },
-            email => {
-                'x-order' => 3,
-                pattern => '^[^@]+@[^@]+$',
-            },
-        },
-    },
-    user => {
-        'x-id-field' => 'username',
-        'x-list-columns' => [qw( username email )],
-        required => [qw( username email password )],
-        properties => {
-            username => {
-                type => 'string',
-                'x-order' => 1,
-            },
-            email => {
-                type => 'string',
-                'x-order' => 2,
-            },
-            password => {
-                type => 'string',
-                format => 'password',
-                'x-order' => 3,
-            },
-            access => {
-                type => 'string',
-                enum => [qw( user moderator admin )],
-                'x-order' => 4,
-            },
-        },
-    },
-};
+my $collections = \%Yancy::Backend::Test::SCHEMA;
 my %data = (
     people => [
         {
@@ -231,6 +189,7 @@ subtest 'api runs filters during set' => sub {
         %{ $backend->get( user => 'doug' ) },
         password => 'qwe123',
     };
+    delete $doug->{id}; # because user.id is readOnly
     $t->put_ok( '/yancy/api/user/doug', json => $doug )
       ->status_is( 200 );
     is $backend->get( user => 'doug' )->{password},
@@ -302,6 +261,7 @@ subtest 'api uses filters on operation' => sub {
         %{ $backend->get( user => 'doug' ) },
         email => 'dOuG@pReAcTiOn.me',
     };
+    delete $doug->{id}; # because user.id is readOnly
     $t->put_ok( '/yancy/api/user/doug', json => $doug )
       ->status_is( 200 )->or( sub { diag shift->tx->res->body } );
     is $backend->get( user => 'doug' )->{email}, 'doug@preaction.me',
@@ -327,6 +287,7 @@ subtest 'api filters operation outputs' => sub {
         %{ $backend->get( user => 'doug' ) },
         email => $email,
     };
+    delete $doug->{id}; # because user.id is readOnly
     $t->put_ok( '/yancy/api/user/doug', json => $doug )
       ->status_is( 200 )->or( sub { diag shift->tx->res->body } )
       ->json_is( '/email', lc $email );

@@ -9,6 +9,8 @@ lib/Crypt/U2F/Server/Simple.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 ppport.h
 README
 t/01-lowlevel-basic.t
@@ -18,5 +20,3 @@ typemap
 u2f.c
 u2f.h
 U2F.xs
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

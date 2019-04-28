@@ -1,4 +1,9 @@
 Revision history for ExtUtils-PL2Bat
 
+0.002     2019-04-28 11:47:56+01:00 Europe/London
+          Repair PL2BAT ~ remove `echo off`; use `%COMSPEC% /d/c ...`; fix ERRORLEVEL use
+          Improve process exit operation
+          Eliminate dependency on Exporter and base
+
 0.001     2016-07-06 21:08:51+02:00 Europe/Amsterdam
           Initial release to an unsuspecting world

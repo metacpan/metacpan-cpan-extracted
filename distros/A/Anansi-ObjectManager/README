@@ -1,4 +1,4 @@
-Anansi-ObjectManager version 0.08
+Anansi-ObjectManager version 0.09
 =================================
 
 The README is used to introduce the module and provide instructions on
@@ -31,7 +31,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2013 by Kevin Treleaven
+Copyright (C) 2019 by Kevin Treleaven
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.9 or,

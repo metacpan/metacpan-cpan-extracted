@@ -6,6 +6,7 @@ use CGI::PSGI;
 use Plack::App::File;
 use Plack::Builder;
 use Plack::Util::Accessor qw(site fake_https);
+use Plack::Response;
 use XAO::Utils;
 use XAO::Web;
 
@@ -107,7 +108,22 @@ sub call {
             return $self->error_not_found();
 
         my $app=Plack::App::File->new(file => $file)->to_app();
-        return $app->($env);
+
+        my $res=$app->($env);
+
+        if($pagedesc->{'headers'}) {
+            $res=Plack::Response->new(@$res);
+            $res->headers($pagedesc->{'headers'});
+            $res=$res->finalize;
+        }
+
+        if($pagedesc->{'max_age'}) {
+            $res=Plack::Response->new(@$res);
+            $res->header('Cache-Control' => 'max-age='.$pagedesc->{'max_age'});
+            $res=$res->finalize;
+        }
+
+        return $res;
     }
 
     # If needed setting up SizeLimit to possibly restart this process

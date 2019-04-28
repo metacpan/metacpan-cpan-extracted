@@ -1,0 +1,28 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl 03TestFileNameHandling.t'
+
+#########################
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+use Test::More tests => 0;
+use Test::Carp;
+use lib '../lib/';
+use File:::Organize;
+use Cwd;
+
+#########################
+
+# Insert your test code below, the Test::More module is use()ed here so read
+# its man page ( perldoc Test::More ) for help writing this test script.
+
+our $exceptionList = "S.W.A.T.2017:S.W.A.T 2017";
+
+my $obj = File::TVShow::Organize->new();
+
+#ok($obj->_handleExceptionsDatedFileNames("S.W.A.T.2017") =~ m/S.W.A.T 2017/, "Returned S.W.A.T 2017");
+
+#testing
+done_testing();

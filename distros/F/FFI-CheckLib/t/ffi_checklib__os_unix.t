@@ -11,7 +11,7 @@ use File::Basename qw( basename );
   'corpus/unix/lib',
 );
 
-my $mock = mock_dynaloader;
+my $mock1 = mock_dynaloader;
 
 subtest 'find_lib (good)' => sub {
   my($path) = find_lib( lib => 'foo' );

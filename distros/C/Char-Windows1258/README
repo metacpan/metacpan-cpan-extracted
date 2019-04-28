@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   Windows1258::eval
-    length          vs   Windows1258::length
-    substr          vs   Windows1258::substr
-    ord             vs   Windows1258::ord
-    reverse         vs   Windows1258::reverse
-    getc            vs   Windows1258::getc
-    index           vs   Windows1258::index
-    rindex          vs   Windows1258::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  Windows1258::eval
+    length          vs.  Windows1258::length
+    substr          vs.  Windows1258::substr
+    ord             vs.  Windows1258::ord
+    reverse         vs.  Windows1258::reverse
+    getc            vs.  Windows1258::getc
+    index           vs.  Windows1258::index
+    rindex          vs.  Windows1258::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

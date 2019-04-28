@@ -1,0 +1,30 @@
+{
+   "charttitle" : "fib(F)",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::fib",
+   "chartlines" : [
+       {
+           "title" : "fib(F)/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.fib(F)" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "fib(F)/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.fib(F)" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

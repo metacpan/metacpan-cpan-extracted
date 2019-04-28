@@ -11,7 +11,7 @@ Authorization Server
 
 =head1 VERSION
 
-0.20
+0.22
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ use Net::OAuth2::AuthorizationServer::ImplicitGrant;
 use Net::OAuth2::AuthorizationServer::PasswordGrant;
 use Net::OAuth2::AuthorizationServer::ClientCredentialsGrant;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 GRANT TYPES
 
@@ -105,7 +105,7 @@ sub client_credentials_grant {
 
 L<Mojolicious::Plugin::OAuth2::Server> - A Mojolicious plugin using this module
 
-L<Mojo::JWT> - encode/decode JWTs
+L<Crypt::JWT> - encode/decode JWTs
 
 =head1 AUTHOR & CONTRIBUTORS
 

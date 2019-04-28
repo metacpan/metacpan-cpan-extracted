@@ -6,6 +6,7 @@ build_requires:
   Cwd: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  JSON::PP: '0'
   Path::Class: '0.06'
   Test::More: '0.96'
 configure_requires:
@@ -21,8 +22,11 @@ requires:
   Archive::Any::Create: '0'
   CPAN::DistnameInfo: '0'
   CPAN::Meta: '2.130880'
+  CPAN::Meta::Converter: '0'
+  CPAN::Meta::Merge: '0'
   CPAN::Meta::Requirements: '0'
   Carp: '0'
+  Data::OptList: '0'
   Encode: '0'
   File::Next: '0'
   File::Path: '0'
@@ -33,6 +37,7 @@ requires:
   Moose::Util::TypeConstraints: '0'
   Parse::CPAN::Meta: '1.4401'
   Path::Class: '0.06'
+  Storable: '0'
   Text::Template: '0'
   perl: v5.14.0
   strict: '0'
@@ -41,10 +46,10 @@ resources:
   bugtracker: https://github.com/rjbs/Module-Faker/issues
   homepage: https://github.com/rjbs/Module-Faker
   repository: https://github.com/rjbs/Module-Faker.git
-version: '0.020'
+version: '0.022'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.026003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -60,7 +65,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@RJBS/Git::GatherDir'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
@@ -81,7 +86,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@RJBS/RJBS-Outdated'
-      version: '0.054'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -93,7 +98,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@RJBS/CPAN-Outdated'
-      version: '0.054'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@RJBS/@Filter/PruneCruft'
@@ -154,13 +159,13 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::NextVersion:
           first_version: '0.001'
-          version_by_branch: 1
+          version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.20.1
           repo_root: .
       name: '@RJBS/Git::NextVersion'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
@@ -284,11 +289,11 @@ x_Dist_Zilla:
               name: '@RJBS/List'
               version: '4.015'
       name: '@RJBS/PodWeaver'
-      version: '4.009'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -301,16 +306,16 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.20.1
           repo_root: .
       name: '@RJBS/@Git/Check'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -318,12 +323,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Commit'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -331,40 +336,40 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.020'
+          tag: '0.022'
           tag_format: '%v'
-          tag_message: v%v
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Tag'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
         Dist::Zilla::Plugin::Git::Push:
           push_to:
-            - 'rjbs :'
+            - 'origin :'
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.20.1
           repo_root: .
       name: '@RJBS/@Git/Push'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.0
+          git_version: 2.20.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@RJBS/Git::Contributors'
-      version: '0.032'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -417,5 +422,5 @@ x_contributors:
   - 'Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>'
   - 'Moritz Onken <onken@netcubed.de>'
   - 'Randy Stauner <randy@magnificent-tears.com>'
-x_generated_by_perl: v5.26.1
+x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -7,6 +7,7 @@ use Config;
 os_unsupported() unless $Config{d_mmap}; # we use mmap
 die "requires 64-bit integer support (little-endian)\n"
     unless eval {
+        no warnings;
         my $int= 0x1234567801234567;
         my $str= "gE#\1xV4\22";
         my $packed= pack "Q", $int;

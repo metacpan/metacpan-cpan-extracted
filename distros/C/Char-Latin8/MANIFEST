@@ -1,11 +1,11 @@
 Char/Latin8.pm
-Latin8.pm
-Elatin8.pm
+lib/Latin8.pm
+lib/Elatin8.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Latin8/395_latin8eval_block.t
 t/Latin8/396_double_diamond.t
 t/Latin8/397_bitwise_op.t
 t/Latin8/398_non_capturing.t
+t/Latin8/399_indented_heredoc_qq.t
+t/Latin8/400_indented_heredoc_q.t
+t/Latin8/401_indented_heredoc_qx.t
+t/Latin8/402_regexp_xx.t

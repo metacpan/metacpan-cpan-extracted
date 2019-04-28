@@ -5,6 +5,7 @@ author:
 build_requires:
   File::Find: '0'
   FindBin: '0'
+  Mojo::JWT: '0.08'
   Test::Deep: '0.113'
   Test::Exception: '0.32'
   Test::Mojo: '0'
@@ -25,12 +26,12 @@ no_index:
 requires:
   Carp: '0'
   Mojolicious: '7.76'
-  Net::OAuth2::AuthorizationServer: '0.17'
+  Net::OAuth2::AuthorizationServer: '0.21'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/Humanstate/mojolicious-plugin-oauth2-server/issues
   homepage: https://metacpan.org/module/Mojolicious::Plugin::OAuth2::Server
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/mojolicious-plugin-oauth2-server
-version: '0.42'
+version: '0.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

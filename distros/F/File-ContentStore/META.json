@@ -4,11 +4,11 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
-      "git",
-      "database",
-      "wrapper"
+      "file",
+      "content-store",
+      "hardlinks"
    ],
    "license" : [
       "perl_5"
@@ -37,7 +37,7 @@
             "Carp" : "0",
             "Digest" : "0",
             "Digest::SHA" : "0",
-            "Moo" : "0",
+            "Moo" : "1.006000",
             "Path::Tiny" : "0.062",
             "Type::Params" : "0",
             "Types::Path::Tiny" : "0",
@@ -75,7 +75,7 @@
          "web" : "http://github.com/book/File-ContentStore"
       }
    },
-   "version" : "1.001",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "1.003",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

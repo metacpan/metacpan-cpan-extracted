@@ -6,7 +6,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.013'; # VERSION
+our $VERSION = '3.014'; # VERSION
 my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use Math::Trig;
@@ -1666,7 +1666,7 @@ drawCaption(['multiple text and', 'graphic objs'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 37. clip(): filled circle with box cut out
+# 37. clip(): single box cut out from filled circle
 @cellLoc = makeCellLoc(0);
 @cellSize = (170, 131); 
 $grfx->save();
@@ -1693,8 +1693,6 @@ $grfx->linewidth(2);
 $grfx->linedash();
 $grfx->circle(45,90, 30);
 $grfx->stroke();
-#$text->translate($base[0]+45, $base[1]+90);
-#$text->text_center("Hello");
 
 $grfx->restore();
 
@@ -1706,8 +1704,6 @@ $grfx->clip();
 $grfx->endpath();  # necessary for separating the clip and paint
 $grfx->circle(125,45, 30);
 $grfx->fillstroke();
-#$text->translate($base[0]+125, $base[1]+45); # "He" not clipped
-#$text->text_center("Hello");
 
 $grfx->restore();
 
@@ -1734,19 +1730,17 @@ $grfx->linewidth(1);
 $text->font($fontC, 16);
 $grfx->translate(@base);
 
-# clip port dashed square, solid circle
+# clip port dashed squares, solid circle
 $grfx->save();
 
 $grfx->linedash(3);
-$grfx->rect(40,55, 40,45);
+$grfx->rect(40,55, 40,45);  # two intersecting rectangular clip areas
 $grfx->rect(60,80, 25,25);
 $grfx->stroke();
 $grfx->linewidth(2);
 $grfx->linedash();
 $grfx->circle(45,90, 30);
 $grfx->stroke();
-#$text->translate($base[0]+45, $base[1]+90);
-#$text->text_center("Hello");
 
 $grfx->restore();
 
@@ -1757,12 +1751,11 @@ $grfx->rect(120,10, 40,45);
 $grfx->clip();
 $grfx->endpath();  # necessary for separating the clip and paint
 $grfx->rect(140,35, 25,25);
-$grfx->clip();
+$grfx->clip();  # remaining clipping area is upper right of first rectangle
+                # (the INTERSECTION of the two rectangles)
 $grfx->endpath();  # necessary for separating the clip and paint
 $grfx->circle(125,45, 30);
 $grfx->fillstroke();
-#$text->translate($base[0]+125, $base[1]+45); # "He" not clipped
-#$text->text_center("Hello");
 
 $grfx->restore();
 
@@ -1800,8 +1793,6 @@ $grfx->linewidth(2);
 $grfx->linedash();
 $grfx->circle(45,90, 30);
 $grfx->stroke();
-#$text->translate($base[0]+45, $base[1]+90);
-#$text->text_center("Hello");
 
 $grfx->restore();
 
@@ -1809,13 +1800,11 @@ $grfx->restore();
 $grfx->save();
 
 $grfx->rect(120,10, 40,45);
-$grfx->rect(140,35, 25,25);
+$grfx->rect(140,35, 25,25); # clipping area is UNION of the two (overlapping)
 $grfx->clip();
 $grfx->endpath();  # necessary for separating the clip and paint
 $grfx->circle(125,45, 30);
 $grfx->fillstroke();
-#$text->translate($base[0]+125, $base[1]+45); # "He" not clipped
-#$text->text_center("Hello");
 
 $grfx->restore();
 

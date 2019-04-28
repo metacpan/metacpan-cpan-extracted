@@ -15,6 +15,7 @@ pod_spelling_system:
     - ILUX
     - Laffan
     - SLAFFAN
+    - libyaml
 
 pod_coverage:
   skip: 0

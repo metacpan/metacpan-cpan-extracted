@@ -1,3 +1,10 @@
+0.83 Sun 28 Apr 2019 11:30:37 AM CEST
+ - Reference Inline::Module in docs related to installation (PR#68
+   @nrdvana++)
+ - create_config_file: don't accidentally skip rest of directory scanning
+   (PR#73 @eserte++)
+ - Merge per-language config, not overwrite (PR#71 @mohawk++)
+
 0.82 Sun 31 Mar 2019 04:10:24 PM CEST
  - Another fix for @INC PR#69 TINITA
 

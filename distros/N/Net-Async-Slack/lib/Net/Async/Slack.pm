@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use parent qw(IO::Async::Notifier);
 
@@ -162,6 +162,20 @@ sub send_message {
     })
 }
 
+sub join_channel {
+    my ($self, %args) = @_;
+    die 'You need to pass a channel name' unless $args{channel};
+    my @content;
+    push @content, token => $self->token;
+    push @content, name => $args{channel};
+    $self->http_post(
+        $self->endpoint(
+            'channels.join',
+        ),
+        \@content,
+    )
+}
+
 =head1 METHODS - Internal
 
 =head2 endpoints
@@ -227,7 +241,7 @@ sub oauth_request {
     my $uri = $self->endpoint(
         'oauth',
         client_id => $self->client_id,
-        scope     => 'bot',
+        scope     => 'bot,channels:write',
         state     => $state,
         %args,
     );

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDLA::Core::Dev;
 
 if ($^O =~ /win32/i) {
   write_dummy_make(unsupported('PDLA::Graphics::IIS','win32'));

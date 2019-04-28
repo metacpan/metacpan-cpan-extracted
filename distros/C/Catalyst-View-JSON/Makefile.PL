@@ -1,15 +1,97 @@
-use inc::Module::Install;
-use Module::Install::Repository;
+use strict;
+use warnings FATAL => 'all';
+use 5.006;
 
-name 'Catalyst-View-JSON';
-all_from 'lib/Catalyst/View/JSON.pm';
+my %META = (
+  name => 'Catalyst-View-JSON',
+  license => 'perl_5',
+  prereqs => {
+    configure => { requires => {
+      'ExtUtils::MakeMaker'   => 0,
+    } },
+    build => { requires => {
+    } },
+    test => {
+      requires => {
+        'Test::More'  => '0.88',
+      },
+    },
+    runtime => {
+      requires => {
+        'JSON::MaybeXS' => '1.003000',
+        'Catalyst'      => '5.60',
+        'MRO::Compat'   => 0,
+      },
+    },
+    develop   => {
+      requires => {
+      },
+    },
+  },
+  resources => {
+    repository => {
+      url => 'https://github.com/perl-catalyst/Catalyst-View-JSON.git',
+      web => 'https://github.com/perl-catalyst/Catalyst-View-JSON',
+      type => 'git',
+    },
+    bugtracker => {
+      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-View-JSON',
+      mailto => 'bug-Catalyst-View-JSON@rt.cpan.org',
+    },
+    license => [ 'http://dev.perl.org/licenses/' ],
+  },
+  no_index => {
+    directory => [ 't', 'xt' ]
+  },
+  x_breaks => {
+  },
+  x_authority => 'cpan:BOBTFISH',
+);
 
-build_requires 'Test::More';
+my %MM_ARGS = ();
 
-requires 'JSON::MaybeXS', '1.003000';
-requires 'Catalyst', 5.60;
-requires 'MRO::Compat';
-test_requires 'YAML';
+## BOILERPLATE ###############################################################
+require ExtUtils::MakeMaker;
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
 
-auto_set_repository;
-WriteAll;
+# have to do this since old EUMM dev releases miss the eval $VERSION line
+my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
+my $mymeta        = $eumm_version >= 6.57_02;
+my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
+
+($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
+($MM_ARGS{VERSION_FROM} = "lib/$MM_ARGS{NAME}.pm") =~ s{::}{/}g;
+$META{license} = [ $META{license} ]
+  if $META{license} && !ref $META{license};
+$MM_ARGS{LICENSE} = $META{license}[0]
+  if $META{license} && $eumm_version >= 6.30;
+$MM_ARGS{NO_MYMETA} = 1
+  if $mymeta_broken;
+$MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
+  unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
+
+for (qw(configure build test runtime)) {
+  my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
+  my $r = $MM_ARGS{$key} = {
+    %{$META{prereqs}{$_}{requires} || {}},
+    %{delete $MM_ARGS{$key} || {}},
+  };
+  defined $r->{$_} or delete $r->{$_} for keys %$r;
+}
+
+$MM_ARGS{MIN_PERL_VERSION} = delete $MM_ARGS{PREREQ_PM}{perl} || 0;
+
+delete $MM_ARGS{MIN_PERL_VERSION}
+  if $eumm_version < 6.47_01;
+$MM_ARGS{BUILD_REQUIRES} = {%{$MM_ARGS{BUILD_REQUIRES}}, %{delete $MM_ARGS{TEST_REQUIRES}}}
+  if $eumm_version < 6.63_03;
+$MM_ARGS{PREREQ_PM} = {%{$MM_ARGS{PREREQ_PM}}, %{delete $MM_ARGS{BUILD_REQUIRES}}}
+  if $eumm_version < 6.55_01;
+delete $MM_ARGS{CONFIGURE_REQUIRES}
+  if $eumm_version < 6.51_03;
+
+ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
+## END BOILERPLATE ###########################################################

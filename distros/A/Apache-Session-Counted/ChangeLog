@@ -1,3 +1,8 @@
+2019-04-26  Andreas Koenig  <k@UX31A>
+
+	* Release 1.119
+	* remove a noisy warning that probably was meant as a debugging aid
+
 2002-04-14  Andreas J. Koenig  <andreas.koenig@anima.de>
 
 	* Set the default timeout for retrieving foreign sessions to 10

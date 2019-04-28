@@ -1,0 +1,45 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack::Event::AppMention
+at lib/Net/Async/Slack/Event/AppMention.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack::Event::AppMention - Subscribe to only the message events that mention your app or bot
+
+=head1 DESCRIPTION
+
+Example input data:
+
+    {
+        "type": "app_mention",
+        "user": "U061F7AUR",
+        "text": "<@U0LAN0Z89> is it everything a river should be?",
+        "ts": "1515449522.000016",
+        "channel": "C0LAN2Q65",
+        "event_ts": "1515449522000016"
+    }
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Slack::EventType>
+
+L<from_json|Net::Async::Slack::EventType/from_json>, L<import|Net::Async::Slack::EventType/import>, L<new|Net::Async::Slack::EventType/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.
+

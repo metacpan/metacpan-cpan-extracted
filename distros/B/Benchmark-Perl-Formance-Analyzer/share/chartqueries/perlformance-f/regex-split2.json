@@ -1,0 +1,29 @@
+{
+   "charttitle" : "Rx.fieldsplit2 - pathological field splits",
+   "chartlines" : [
+       {
+           "title" : "rx.split2/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.Rx.regexes.fieldsplit2(F)" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "rx.split2/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.Rx.regexes.fieldsplit2(F)" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

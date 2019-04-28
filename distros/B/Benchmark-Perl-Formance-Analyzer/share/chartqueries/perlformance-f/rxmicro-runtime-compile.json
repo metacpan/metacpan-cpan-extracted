@@ -1,0 +1,29 @@
+{
+   "charttitle" : "RxMicro - regex micro benchmarks",
+   "chartlines" : [
+       {
+           "title" : "rxmicro.runtime-compile/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.RxMicro.runtime-compile(F)" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "rxmicro.runtime-compile/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.RxMicro.runtime-compile(F)" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

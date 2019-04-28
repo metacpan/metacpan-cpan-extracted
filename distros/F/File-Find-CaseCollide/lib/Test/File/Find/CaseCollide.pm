@@ -1,5 +1,5 @@
 package Test::File::Find::CaseCollide;
-$Test::File::Find::CaseCollide::VERSION = '0.0.1';
+$Test::File::Find::CaseCollide::VERSION = '0.0.2';
 use strict;
 use warnings;
 use Test::Differences (qw( eq_or_diff ));
@@ -9,7 +9,7 @@ sub verify
 {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $class, $args ) = @_;
-    my $obj = File::Find::CaseCollide->new( { dir => $args->{dir} } );
+    my $obj     = File::Find::CaseCollide->new( { dir => $args->{dir} } );
     my $results = $obj->find;
 
     return eq_or_diff( $results, {}, "No results were found." );
@@ -21,13 +21,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Test::File::Find::CaseCollide - test for collisions in filenames, differing only in case
+Test::File::Find::CaseCollide
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -37,9 +39,13 @@ version 0.0.1
     # TEST
     Test::File::Find::CaseCollide->verify( { dir => '.' } );
 
+=head1 NAME
+
+Test::File::Find::CaseCollide - test for collisions in filenames, differing only in case
+
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 METHODS
 
@@ -47,36 +53,28 @@ version 0.0.1
 
 Verifies that there are no conflicting filenames in the dir.
 
-=head1 AUTHOR
+=head1 NOTE
 
-Shlomi Fish <shlomif@cpan.org>
+I noticed that usually the following code will be faster on UNIX-like
+operating systems:
 
-=head1 COPYRIGHT AND LICENSE
+    #!/usr/bin/env perl
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+    use strict;
+    use warnings;
+    use Test::More tests => 1;
 
-This is free software, licensed under:
+    # TEST
+    is( system(q#find . -print0 | perl -n0e 'die $_ if $h{lc$_}++'#),
+        0, "case sensitive filename collision" );
 
-  The MIT (X11) License
+The shell command is:
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/file-find-casecollide/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+    find . -print0 | perl -n0e 'die $_ if $h{lc$_}++'
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Test::File::Find::CaseCollide
 
 =head2 Websites
 
@@ -174,5 +172,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-File-Find-CaseCollide>
 
   git clone https://github.com/shlomif/perl-File-Find-CaseCollide.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/file-find-casecollide/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

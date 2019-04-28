@@ -1,0 +1,29 @@
+{
+   "charttitle" : "MatrixReal.to_negative - pure perl math / data structures",
+   "chartlines" : [
+       {
+           "title" : "matrix.to-negative-one/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.MatrixReal.to_negative_one.030(F)" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "matrix.to-negative-one/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.MatrixReal.to_negative_one.030(F)" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

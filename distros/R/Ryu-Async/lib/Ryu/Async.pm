@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 =head1 NAME
 
@@ -495,6 +495,8 @@ with some truncation rules:
 
 =item * A C<Web::Async::> prefix will be replaced by C<Wa>.
 
+=item * A C<Database::Async::> prefix will be replaced by C<Da>.
+
 =item * A C<IO::Async::> prefix will be replaced by C<Ia>.
 
 =item * A C<Tickit::Async::> prefix will be replaced by C<Ta>.
@@ -513,6 +515,7 @@ sub sink {
     my ($self, %args) = @_;
     my $label = delete($args{label}) // do {
         my $label = (caller 1)[3];
+        $label =~ s/^Database::Async::/Da/g;
         $label =~ s/^Net::Async::/Na/g;
         $label =~ s/^IO::Async::/Ia/g;
         $label =~ s/^Web::Async::/Wa/g;

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Install, upgrade and examine the CPAN Testers database schema
 # PODNAME: cpantesters-schema
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -19,6 +19,9 @@ our $VERSION = '0.023';
 #pod
 #pod     # check what version our database is running
 #pod     cpantesters-schema check
+#pod
+#pod     # fetch data from the CPAN Testers API to populate our database
+#pod     cpantesters-schema fetch report --dist Yancy@1.023
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -54,7 +57,7 @@ our $VERSION = '0.023';
 use v5.24;
 use warnings;
 use Pod::Usage;
-use Getopt::Long;
+use Getopt::Long qw( GetOptionsFromArray );
 use CPAN::Testers::Schema;
 use File::Share qw( dist_dir );
 
@@ -70,7 +73,7 @@ my %tasks = (
     check => \&check,
 );
 
-$tasks{ shift @ARGV }->();
+$tasks{ shift @ARGV }->( @ARGV );
 
 sub prepare {
     my $schema = CPAN::Testers::Schema->connect_from_config;
@@ -102,7 +105,32 @@ sub install {
 
 sub upgrade {
     my $schema = CPAN::Testers::Schema->connect_from_config;
+    if ( !$schema->get_db_version() ) {
+        $schema->install( '0.000' );
+    }
     $schema->upgrade;
+}
+
+sub fetch {
+    my ( @args ) = @_;
+    my $schema = CPAN::Testers::Schema->connect_from_config;
+    GetOptionsFromArray( \my %opt, \@args,
+        'dist|d=@s',
+    );
+    my @tables = @args;
+    if ( !$opt{dist}->@* ) {
+        die "Must specify one or more --dist options";
+    }
+    for my $dist_spec ( $opt{dist}->@* ) {
+        my ( $dist, $version ) = split /\@/, $dist_spec;
+        $schema->populate_from_api(
+            {
+                dist => $dist,
+                version => $version,
+            },
+            @tables,
+        );
+    }
 }
 
 __END__
@@ -115,7 +143,7 @@ cpantesters-schema - Install, upgrade and examine the CPAN Testers database sche
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -133,6 +161,9 @@ version 0.023
 
     # check what version our database is running
     cpantesters-schema check
+
+    # fetch data from the CPAN Testers API to populate our database
+    cpantesters-schema fetch report --dist Yancy@1.023
 
 =head1 DESCRIPTION
 
@@ -163,9 +194,19 @@ upgrade script to make.
 
 L<DBIx::Class::Schema::Versioned>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

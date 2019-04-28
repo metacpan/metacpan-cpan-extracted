@@ -2,7 +2,7 @@ package Catalyst::View::JSON;
 
 use strict;
 use warnings;
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 use 5.008_001;
 
 use base qw( Catalyst::View );
@@ -290,7 +290,7 @@ doing what it is supposed to do, which is encode UTF8 automatically.
 In general this is what this view does so you shoulding need to
 mess with the encoding flag here unless you have some odd case.
 
-Also, the comment aboe regard 'browser gotcha's' was written a
+Also, the comment about regard 'browser gotcha's' was written a
 number of years ago and I can't say one way or another if those
 gotchas continue to be common in the wild.
 
@@ -307,7 +307,7 @@ this default via the C<json_encoder_args>:
 
 B<NOTE> In 2015 the use of UTF8 as encoding is widely standard so it
 is very likely you should need to do nothing to get the correct
-encoding.  The following documention will remain for historical
+encoding.  The following documentation will remain for historical
 value and backcompat needs.
 
 Due to the browser gotchas like those of Safari and Opera, sometimes

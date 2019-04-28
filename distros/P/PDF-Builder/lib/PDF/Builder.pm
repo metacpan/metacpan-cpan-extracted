@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.013'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.014'; # VERSION
+my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -96,6 +96,12 @@ L<PDF::Builder::Docs> section B<Optional Libraries> for more information.
 There are some things you should know about character encoding (for text),
 before you dive in to coding. Please go to L<PDF::Builder::Docs> B<Strings> and have a read.
 
+=head2 RENDERING ORDER
+
+Invoking "text" and "graphics" methods can lead to unexpected results (a 
+different ordering of output than intended). See L<PDF::Builder::Docs> 
+B<Rendering Order> for more information.
+
 =head2 PDF VERSIONS SUPPORTED
 
 PDF::Builder is mostly PDF 1.4-compliant, but there I<are> complications you
@@ -125,10 +131,11 @@ without needing admin privileges.
 
 This module does not work with perl's -l command-line switch.
 
-There is a file KNOWN_INCOMP which lists known incompatibilities with PDF::API2,
-in case you're thinking of porting over something from that world, or have 
-experience there and want to try PDF::Builder. There is also a file DEPRECATED
-which lists things which are planned to be removed at some point.
+There is a file INFO/KNOWN_INCOMP which lists known incompatibilities with 
+PDF::API2, in case you're thinking of porting over something from that world, 
+or have experience there and want to try PDF::Builder. There is also a file 
+INFO/DEPRECATED, which lists things which are planned to be removed at some 
+point.
 
 =head2 HISTORY
 
@@ -154,7 +161,7 @@ Release distribution is on CPAN: https://metacpan.org/pod/PDF::Builder
 
 =head1 LICENSE
 
-This software is Copyright (c) 2017-2018 by Phil M. Perry.
+This software is Copyright (c) 2017-2019 by Phil M. Perry.
 
 This is free software, licensed under:
 
@@ -165,7 +172,8 @@ The GNU Lesser General Public License (LGPL) Version 2.1, February 1999
 Copyright (C) 1991, 1999 Free Software Foundation, Inc. 59
 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-I<Please see the> LICENSE I<file in the distribution root for full details.>
+I<Please see the> INFO/LICENSE I<file in the distribution root for full
+details.>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License, as published by the Free
@@ -948,6 +956,10 @@ sub update {
 
 Save the document to $file and remove the object structure from memory.
 
+B<Caution:> Although the object C<$pdf> will still exist, it is no longer
+usable for any purpose after invoking this method! You will receive error
+messages about "can't call method new_obj on an undefined value".
+
 B<Example:>
 
     $pdf = PDF::Builder->new();
@@ -980,6 +992,10 @@ sub saveas {
 Save the document to an already-defined file (or filename) and 
 remove the object structure from memory.
 
+B<Caution:> Although the object C<$pdf> will still exist, it is no longer
+usable for any purpose after invoking this method! You will receive error
+messages about "can't call method new_obj on an undefined value".
+
 B<Example:>
 
     $pdf = PDF::Builder->new(-file => 'file_to_output');
@@ -1005,6 +1021,10 @@ sub save {
 =item $string = $pdf->stringify()
 
 Return the document as a string and remove the object structure from memory.
+
+B<Caution:> Although the object C<$pdf> will still exist, it is no longer
+usable for any purpose after invoking this method! You will receive error
+messages about "can't call method new_obj on an undefined value".
 
 B<Example:>
 
@@ -1577,7 +1597,9 @@ sub pages {
 
 Sets the global MediaBox. This defines the width and height (or corner
 coordinates, or by standard name) of the output page itself, such as the
-physical paper size. 
+physical paper size. This is normally the largest of the "boxes". If any
+subsidiary box (within it) exceeds the media box, the portion of the material 
+or boxes outside of the media box will be ignored.
 
 Note that many printers can B<not> print all the way to the
 physical edge of the paper, so you should plan to leave some blank margin,
@@ -1622,11 +1644,14 @@ sub mediabox {
 =item $pdf->cropbox($llx,$lly, $urx,$ury)
 
 Sets the global CropBox. This will define the media size to which the output
-will later be cropped (trimmed) or clipped. Note that this does B<not> itself 
-output any crop marks to guide cutting of the paper! PDF Readers should 
-consider this to be the I<visible> portion of the page, and anything found
-outside it may be clipped (invisible). By default, it is equal to the MediaBox.
-A global setting can be inherited by each page, or can be overridden.
+will later be clipped. Note that this does B<not> itself output any crop marks 
+to guide cutting of the paper! PDF Readers should consider this to be the 
+I<visible> portion of the page, and anything found outside it I<may> be clipped 
+(invisible). By default, it is equal to the MediaBox, but may be defined to be 
+smaller. A global setting can be inherited by each page, or can be overridden.
+
+Do not confuse with the C<TrimBox>, which shows where printed paper is expected
+to actually be cut.
 
 =cut
 
@@ -1644,11 +1669,15 @@ sub cropbox {
 
 =item $pdf->bleedbox($llx,$lly, $urx,$ury)
 
-Sets the global BleedBox. This is another form of CropBox, typically used in
-printing on paper where you want color (such as thumb tabs) to be printed a
-bit beyond the final paper size, to ensure that the cut goes I<through> the 
-ink, rather than accidentally leaving some white paper visible outside. 
-The default value is equal to the CropBox.
+Sets the global BleedBox. This is typically used in printing on paper, where 
+you want color (such as thumb tabs) to be printed a bit beyond the final paper 
+size, to ensure that the cut paper I<bleeds> (the cut goes I<through> the ink), 
+rather than accidentally leaving some white paper visible outside.  Allow 
+enough "bleed" over the expected trim line to account for minor variations in 
+paper handling, folding, and cutting; to avoid showing white paper at the edge. 
+The BleedBox is where printing could actually extend to; The TrimBox is 
+normally within it, where the paper would actually be cut. The default value is 
+equal to the CropBox, but is often a bit smaller.
 
 =cut
 
@@ -1666,11 +1695,11 @@ sub bleedbox {
 
 =item $pdf->trimbox($llx,$lly, $urx,$ury)
 
-Sets the global TrimBox. Another form of CropBox, it is supposed to be the
-actual dimensions of the finished page (after trimming of the paper). In some
-production environments, it is useful to have printer's instructions, cut marks,
-and so on outside of the trim box.
-The default value is equal to CropBox.
+Sets the global TrimBox. This is supposed to be the actual dimensions of the 
+finished page (after trimming of the paper). In some production environments, 
+it is useful to have printer's instructions, cut marks, and so on outside of 
+the trim box. The default value is equal to CropBox, but is often a bit smaller 
+than any BleedBox, to allow the desired "bleed" effect.
 
 =cut
 
@@ -1688,11 +1717,12 @@ sub trimbox {
 
 =item $pdf->artbox($llx,$lly, $urx,$ury)
 
-Sets the global ArtBox. Another form of CropBox, this is supposed to define 
-"the extent of the page's I<meaningful> content (including [margins])". It
-might exclude some content, such as Headlines or headings. Any
-binding or punched-holes margin would typically be outside of the ArtBox.
-The default value is equal to the CropBox.
+Sets the global ArtBox. This is supposed to define "the extent of the page's 
+I<meaningful> content (including [margins])". It might exclude some content, 
+such as Headlines or headings. Any binding or punched-holes margin would 
+typically be outside of the ArtBox, as would be page numbers and running 
+headers and footers. The default value is equal to the CropBox, although 
+normally it would be no larger than any TrimBox.
 
 =cut
 
@@ -1842,9 +1872,8 @@ sub cjkfont {
 
 =item $font = $pdf->synfont($basefont)
 
-Returns a new synthetic font object. These are modifications to a core font
-(technically, variants supplied by the font creator, not on-the-fly changes),
-where the font may be replaced by a Type1 or Type3 PostScript font.
+Returns a new synthetic font object. These are modifications to a core (or 
+other) font, where the font may be replaced by a Type1 or Type3 PostScript font.
 For details, see L<PDF::Builder::Docs> section B<Synthetic Fonts>.
 
 See also L<PDF::Builder::Resource::Font::SynFont>

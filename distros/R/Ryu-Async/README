@@ -122,6 +122,8 @@ METHODS
 
       * A Web::Async:: prefix will be replaced by Wa.
 
+      * A Database::Async:: prefix will be replaced by Da.
+
       * A IO::Async:: prefix will be replaced by Ia.
 
       * A Tickit::Async:: prefix will be replaced by Ta.

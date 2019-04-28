@@ -1,11 +1,11 @@
 Char/EUCJP.pm
-EUCJP.pm
-Eeucjp.pm
+lib/EUCJP.pm
+lib/Eeucjp.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -340,3 +340,7 @@ t/EUCJP/395_eucjpeval_block.t
 t/EUCJP/396_double_diamond.t
 t/EUCJP/397_bitwise_op.t
 t/EUCJP/398_non_capturing.t
+t/EUCJP/399_indented_heredoc_qq.t
+t/EUCJP/400_indented_heredoc_q.t
+t/EUCJP/401_indented_heredoc_qx.t
+t/EUCJP/402_regexp_xx.t

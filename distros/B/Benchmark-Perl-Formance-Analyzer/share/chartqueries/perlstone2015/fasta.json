@@ -1,0 +1,30 @@
+{
+   "charttitle" : "fasta",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::fasta",
+   "chartlines" : [
+       {
+           "title" : "fasta/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.PerlStone2015.fasta" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "fasta/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.PerlStone2015.fasta" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

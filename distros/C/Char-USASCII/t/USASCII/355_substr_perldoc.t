@@ -14,6 +14,10 @@ if ($] < 5.016) {
 }
 
 if (open(TEST,">@{[__FILE__]}.t")) {
+    open(SELF,__FILE__);
+    @_ = <SELF>;
+    close(SELF);
+    print TEST @_[0..2];
     print TEST <DATA>;
     close(TEST);
     system(qq{$^X @{[__FILE__]}.t});
@@ -22,6 +26,7 @@ if (open(TEST,">@{[__FILE__]}.t")) {
 }
 
 __END__
+
 use USASCII;
 
 my $__FILE__ = __FILE__;

@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   KOI8U::eval
-    length          vs   KOI8U::length
-    substr          vs   KOI8U::substr
-    ord             vs   KOI8U::ord
-    reverse         vs   KOI8U::reverse
-    getc            vs   KOI8U::getc
-    index           vs   KOI8U::index
-    rindex          vs   KOI8U::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  KOI8U::eval
+    length          vs.  KOI8U::length
+    substr          vs.  KOI8U::substr
+    ord             vs.  KOI8U::ord
+    reverse         vs.  KOI8U::reverse
+    getc            vs.  KOI8U::getc
+    index           vs.  KOI8U::index
+    rindex          vs.  KOI8U::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

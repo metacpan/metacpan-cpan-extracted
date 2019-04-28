@@ -1,0 +1,30 @@
+{
+   "charttitle" : "perlformance.perl5.Shootout.regexdna",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::Shootout::regexdna",
+   "chartlines" : [
+       {
+           "title" : "perlformance.perl5.Shootout.regexdna/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.Shootout.regexdna" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "perlformance.perl5.Shootout.regexdna/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.Shootout.regexdna" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

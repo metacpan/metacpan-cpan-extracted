@@ -1,11 +1,11 @@
 Char/TIS620.pm
-TIS620.pm
-Etis620.pm
+lib/TIS620.pm
+lib/Etis620.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/TIS620/395_tis620eval_block.t
 t/TIS620/396_double_diamond.t
 t/TIS620/397_bitwise_op.t
 t/TIS620/398_non_capturing.t
+t/TIS620/399_indented_heredoc_qq.t
+t/TIS620/400_indented_heredoc_q.t
+t/TIS620/401_indented_heredoc_qx.t
+t/TIS620/402_regexp_xx.t

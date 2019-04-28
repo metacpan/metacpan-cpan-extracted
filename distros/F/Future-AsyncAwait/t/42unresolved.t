@@ -69,6 +69,15 @@ async sub func
       'warning from attempted resume' );
 }
 
+# abandoned foreach loop (RT129320)
+{
+   my $f1 = Future->new;
+   my $fret = (async sub { foreach my $f ($f1) { await $f } })->();
+
+   undef $fret;
+   pass( "abandoned foreach loop does not crash" );
+}
+
 is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,
    'cxstack_ix did not grow during the test' );
 

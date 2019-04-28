@@ -1,5 +1,54 @@
 Revision history for this software.
 
+1.13  2019-04-28 00:00:00
+  - avoid Kwalitee Issue no_pod_errors
+  - avoid Kwalitee Issue use_strict
+  - add 403_podtest.t
+  - rename Sjis/JA.pm to Sjis/JA.pod
+  - created by INABA Hitoshi
+
+1.12  2019-04-15 00:00:00
+  - 098_jperlprint.t covers cygwin
+  - 213_do.t covers perl 5.26 or later
+  - 355_substr_perldoc.t with script header avoids FAIL of test
+  - add 402_regexp_xx.t
+  - skip test t/Sjis/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/Big5HKSCS/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/Big5Plus/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/GB18030/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/GBK/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/HP15/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/INFORMIXV6ALS/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/KPS9566/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/UHC/212_dbmopen.t on perl 5.028 on MSWin32
+  - support CaseFolding-12.0.0.txt
+  - created by INABA Hitoshi
+
+1.11  2018-09-22 00:00:00
+  - support indented here-documents
+  - created by INABA Hitoshi
+
+1.10  2018-09-20 00:00:00
+  - support CaseFolding-11.0.0.txt
+  - created by INABA Hitoshi
+
+1.09  2018-09-18 00:00:00
+  - exit with actual exit value
+  - change META.yml version 1.3 to 1.4
+  - remove pMakefile.PL
+  - add pmake.bat
+  - add LICENSE
+  - skip test t/Sjis/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/Big5HKSCS/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/Big5Plus/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/GB18030/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/GBK/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/HP15/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/INFORMIXV6ALS/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/KPS9566/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/UHC/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - created by INABA Hitoshi
+
 1.08  2016-07-29 00:00:00
   - support Windows 10
   - remove SjisTk module support

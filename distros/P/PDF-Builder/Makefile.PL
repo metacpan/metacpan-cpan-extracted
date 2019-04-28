@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.5503;
 my $PERL_version = '5.016000';  # can't use in "use" statement above! eval?
                                 # could read from .perl-version file otherwise
 my $MakeMaker_version = '6.5503';
-my $version = '3.013';          # PDFbuild.pl updates from 'version' file
+my $version = '3.014';          # PDFbuild.pl updates from 'version' file
 
 # EVERY RELEASE: check https://www.cpan.org/src/ "First release in each branch
 #   of Perl" (NOT "Latest releases in each branch of Perl"!) and subtract 
@@ -54,14 +54,7 @@ my %WriteMakefileArgs =
  PREREQ_PM => {
     "Compress::Zlib" => 1.0,
     "Font::TTF" => 1.04,
-    # === "optional prerequisites", used if present, but not mandatory
-    #     update t/00-all-usable.t to exclude modules using these libraries!
-    #   TBD: there is some sort of "recommends" entry, but I can't find
-    #        any documentation on it, or whether it ever tries to install
-    #        the listed modules, or whether PDF::Builder shows up in the
-    #        modules' Reverse Dependencies list
-    #"Graphics::TIFF" => 0,
-    #"Image::PNG::Libpng" => 0,
+
     # === found in CORE, so no need to explicitly list
     #"utf8" => 0,
     #"File::Temp" => 0,
@@ -95,6 +88,17 @@ my %WriteMakefileArgs =
 	  mailto => 'support2854 [at] catskilltech.com',
       },
 
+    },
+
+    # optional libraries -- nice to have but not vital for most users
+    #   if one fails to install, it might alarm the user, but installation of 
+    #     PDF::Builder can still proceed
+    #   user can remove any optional installed library if they don't need it
+    #     and want to reclaim the space
+    #   update t/00-all-usable.t to exclude modules using these libraries!
+    recommends => {
+        'Graphics::TIFF' => 0,     # TIFF image processing
+        'Image::PNG::Libpng' => 0, # advanced/fast PNG image processing
     },
 
   },

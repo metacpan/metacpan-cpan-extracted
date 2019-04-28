@@ -44,7 +44,7 @@ our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
 @SNMP::Info::Layer3::Nexus::EXPORT_OK = qw//;
 
-$VERSION = '3.67';
+$VERSION = '3.68';
 
 # NOTE: Order creates precedence
 #       Example: v_name exists in Bridge.pm and CiscoVTP.pm
@@ -292,6 +292,8 @@ after determining a more specific class using the method above.
 =over
 
 =item F<CISCO-ENTITY-VENDORTYPE-OID-MIB>
+
+=item F<CISCO-CONTEXT-MAPPING-MIB>
 
 =back
 

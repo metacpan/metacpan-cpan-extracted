@@ -22,7 +22,7 @@ use Carp          ();
 use Params::Util  qw{_STRING _INSTANCE};
 use PPI::Document ();
 
-our $VERSION = '1.252'; # VERSION
+our $VERSION = '1.264'; # VERSION
 
 our @ISA = 'PPI::Document';
 
@@ -68,21 +68,7 @@ sub new {
 		die "PPI::Document::File SUPER call returned an object of the wrong type";
 	}
 
-	# Save the filename
-	$self->{filename} = $filename;
-
 	$self;
-}
-
-=head2 filename
-
-The C<filename> accessor returns the name of the file in which the document
-is stored.
-
-=cut
-
-sub filename {
-	$_[0]->{filename};
 }
 
 =pod

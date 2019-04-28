@@ -1,0 +1,5 @@
+0.05 2019-04-27
+ - apparently both BUILD_REQUIRES *and* CONFIGURE_REQUIRES are needed
+
+0.04 2019-04-26
+ - handle no . in @INC - thanks @wlmb for report

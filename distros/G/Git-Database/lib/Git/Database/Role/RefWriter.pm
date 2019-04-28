@@ -1,5 +1,5 @@
 package Git::Database::Role::RefWriter;
-$Git::Database::Role::RefWriter::VERSION = '0.011';
+$Git::Database::Role::RefWriter::VERSION = '0.012';
 use Moo::Role;
 
 requires
@@ -19,7 +19,7 @@ Git::Database::Role::RefWriter - Abstract role for Git backends that write refer
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

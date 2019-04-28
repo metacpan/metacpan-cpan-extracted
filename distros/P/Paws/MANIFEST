@@ -16136,8 +16136,6 @@ t/10_responses/ses-verify-domain-dkim.response
 t/10_responses/ses-verify-domain-dkim.response.test.yml
 t/10_responses/ses-verify-domain-identity.response
 t/10_responses/ses-verify-domain-identity.response.test.yml
-t/10_responses/sns-CheckIfPhoneNumberIsOptedOut.response
-t/10_responses/sns-CheckIfPhoneNumberIsOptedOut.response.test.yml
 t/10_responses/sns-add-permission.response
 t/10_responses/sns-add-permission.response.test.yml
 t/10_responses/sns-confirm-subscription.response

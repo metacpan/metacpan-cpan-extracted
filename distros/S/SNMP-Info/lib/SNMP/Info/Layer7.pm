@@ -39,7 +39,7 @@ use SNMP::Info;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.67';
+$VERSION = '3.68';
 
 %MIBS = (
     %SNMP::Info::MIBS,
@@ -65,9 +65,6 @@ sub model {
     my $l7    = shift;
     my $id    = $l7->id();
     my $model = &SNMP::translateObj($id);
-
-    # Neoteris (Juniper IVE)
-    $model =~ s/^ive//i;
 
     return $model;
 }

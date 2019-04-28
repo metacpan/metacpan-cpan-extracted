@@ -37,7 +37,6 @@ my @files = (
     't/author-minimum-version.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
-    't/release-dist-manifest.t',
     't/release-distmeta.t',
     't/release-has-version.t',
     't/release-kwalitee.t',

@@ -63,8 +63,16 @@ sub execute {
     }
   }
 
+  my $last_tag = capture_stdout {
+    system 'git', 'describe', '--tags', '--abbrev=0';
+  };
+  chomp $last_tag;
+  my $changes = capture_stdout {
+    system 'git', 'log', "$last_tag..HEAD", '--format=" * %s"';
+  };
+
   my ($fh, $filename) = tempfile();
-  # TODO populate file with commit messages since last release
+  print $fh $changes;
   close $fh;
 
   my $editor = $ENV{EDITOR} // 'vi';

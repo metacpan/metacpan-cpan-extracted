@@ -25,3 +25,12 @@ WriteMakefile(
     no_index => { directory => ['examples'] },
   },
 );
+
+sub MY::postamble {
+  <<EOF;
+pure_all :: README.md
+
+README.md : \$(VERSION_FROM)
+\tpod2markdown \$< >\$\@
+EOF
+}

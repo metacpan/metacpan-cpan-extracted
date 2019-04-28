@@ -1,11 +1,11 @@
 Char/HP15.pm
-HP15.pm
-Ehp15.pm
+lib/HP15.pm
+lib/Ehp15.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -400,3 +400,7 @@ t/HP15/395_hp15eval_block.t
 t/HP15/396_double_diamond.t
 t/HP15/397_bitwise_op.t
 t/HP15/398_non_capturing.t
+t/HP15/399_indented_heredoc_qq.t
+t/HP15/400_indented_heredoc_q.t
+t/HP15/401_indented_heredoc_qx.t
+t/HP15/402_regexp_xx.t

@@ -9,7 +9,7 @@ use Carp;
 use Cwd qw(cwd abs_path);
 use PDLA::Core::Dev;
 
-our $VERSION = '2.019105';
+our $VERSION = '2.019107';
 use base qw(Inline::C);
 
 #==============================================================================
@@ -24,7 +24,7 @@ sub register {
 	   };
 }
 
-# handle BLESS, INTERNAL, NOISY - pass everything else up to Inline::C
+# handle BLESS, INTERNAL - pass everything else up to Inline::C
 sub validate {
     my $o = shift;
     $o->{ILSM} ||= {};
@@ -47,18 +47,10 @@ sub validate {
 	    $o->{ILSM}{$key} = $value;
 	    next;
 	}
-	if ($key eq 'NOISY') {
-            $o->{CONFIG}{BUILD_NOISY} = $value;
-	    next;
-	}
 	push @pass_along, $key, $value;
     }
     $o->SUPER::validate(@pass_along);
 }
-
-sub add_list { goto &Inline::C::add_list }
-sub add_string { goto &Inline::C::add_string }
-sub add_text { goto &Inline::C::add_text }
 
 #==============================================================================
 # Parse and compile C code
@@ -85,10 +77,6 @@ The following PP code was generated (caution, can be long)...
 
 END
     return $txt . $o->pd_generate . "\n*** end PP file ****\n";
-}
-
-sub config {
-    my $o = shift;
 }
 
 #==============================================================================
@@ -246,12 +234,12 @@ these docs are complete C<;)>.
 For more information on Inline in general, see L<Inline>.
 
 Some example scripts demonstrating C<Inline::Pdlapp> usage can be
-found in the F<Example/InlinePdlapp> directory.
+found in the F<examples> directory.
 
 
 C<Inline::Pdlapp> is a subclass of L<Inline::C>. Most Kudos goes to Brian I.
 
-=head1 Usage
+=head1 USAGE
 
 You never actually use C<Inline::Pdlapp> directly. It is just a support module
 for using C<Inline.pm> with C<PDLA::PP>. So the usage is always:
@@ -262,7 +250,7 @@ or
 
     bind Inline Pdlapp => ...;
 
-=head1 Examples
+=head1 EXAMPLES
 
 Pending availability of full docs a few quick examples
 that illustrate typical usage.
@@ -355,8 +343,56 @@ C<LIBS>, C<AUTO_INCLUDE> and C<BOOT>.
 	   Code => '$pd() = poidev((float) $xm(), &$COMP(idum));',
    );
 
+=head1 MAKING AN INSTALLABLE MODULE
 
-=head1 Pdlapp Configuration Options
+It is possible, using L<Inline::Module>, to create an installable F<.pm>
+file with inline PDLA code. L<PDLA::IO::HDF> is a working example. Here's
+how. You make a Perl module as usual, with a package declaration in
+the normal way. Then (assume your package is C<PDLA::IO::HDF::SD>):
+
+  package PDLA::IO::HDF::SD;
+  # ...
+  use FindBin;
+  use Alien::HDF4::Install::Files;
+  use PDLA::IO::HDF::SD::Inline Pdlapp => 'DATA',
+    package => __PACKAGE__, # if you have any pp_addxs - else don't bother
+    %{ Alien::HDF4::Install::Files->Inline('C') }, # EUD returns empty if !"C"
+    typemaps => "$FindBin::Bin/lib/PDLA/IO/HDF/typemap.hdf",
+    ;
+  # ...
+  1;
+  __DATA__
+  __Pdlapp__
+  pp_addhdr(<<'EOH');
+  /* ... */
+  EOH
+  use FindBin;
+  use lib "$FindBin::Bin/../../../../../../..";
+  require 'buildfunc.noinst';
+  # etc
+
+Note that for any files that you need to access for build purposes (they
+won't be touched during post-install runtime), L<FindBin> is useful,
+albeit slightly complicated.
+
+In the main F<.pm> body, L<FindBin> will find the build directory, as
+illustrated above. However, in the "inline" parts, C<FindBin> will be
+within the L<Inline::Module> build directory. At the time of writing,
+this is under F<.inline> within the build directory, in a subdirectory
+named after the package. The example shown above has seven F<..>: two
+for F<.inline/build>, and five more for F<PDLA/IO/HDF/SD/Inline>.
+
+The rest of the requirements are given in the L<Inline::Module>
+documentation.
+
+This technique avoids having to use L<PDLA::Core::Dev>, create a
+F<Makefile.PL>, have one directory per F<.pd>, etc. It will even build
+/ install faster, since unlike a build of an L<ExtUtils::MakeMaker>
+distribution with multiple directories, it can be built in parallel. This
+is because the EUMM build changes into each directory, and waits for each
+one to complete. This technique can run concurrently without problems.
+
+=head1 PDLAPP CONFIGURATION OPTIONS
 
 For information on how to specify Inline configuration options, see
 L<Inline>. This section describes each of the configuration options
@@ -530,13 +566,19 @@ Christian Soeller <soellermail@excite.com>
 
 =head1 SEE ALSO
 
-L<PDLA>
+=over
 
-L<PDLA::PP>
+=item L<PDLA>
 
-L<Inline>
+=item L<PDLA::PP>
 
-L<Inline::C>
+=item L<Inline>
+
+=item L<Inline::C>
+
+=item L<Inline::Module>
+
+=back
 
 =head1 COPYRIGHT
 

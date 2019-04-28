@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::MetabaseUser;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 # ABSTRACT: Legacy user information from the Metabase
 
 #pod =head1 SYNOPSIS
@@ -82,7 +82,7 @@ CPAN::Testers::Schema::Result::MetabaseUser - Legacy user information from the M
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -120,9 +120,19 @@ The e-mail address of the user.
 
 L<CPAN::Testers::Schema>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

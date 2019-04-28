@@ -6,7 +6,7 @@ use Test::More;
 use WebService::Mocean;
 
 BEGIN {
-    if (!defined $ENV{MOCEAN_API_KEY} and !defined $ENV{MOCEAN_API_SECRET}) {
+    if (!defined $ENV{MOCEAN_API_KEY} && !defined $ENV{MOCEAN_API_SECRET}) {
         plan skip_all => '$ENV{MOCEAN_API_KEY} and $ENV{MOCEAN_API_SECRET} not set, skipping live tests'
     }
 }

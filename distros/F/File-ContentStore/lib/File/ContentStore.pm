@@ -1,5 +1,5 @@
 package File::ContentStore;
-$File::ContentStore::VERSION = '1.001';
+$File::ContentStore::VERSION = '1.003';
 use 5.014;
 
 use Carp qw( croak );
@@ -214,7 +214,7 @@ File::ContentStore - A store for file content built with hard links
 
 =head1 VERSION
 
-version 1.001
+version 1.003
 
 =head1 SYNOPSIS
 

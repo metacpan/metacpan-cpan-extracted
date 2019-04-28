@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Carp;
 
@@ -424,9 +424,9 @@ L<https://rt.cpan.org/Ticket/Display.html?id=128620>
 
 =item *
 
-Devel::Cover can't see into async subs
+Regexp context gets lost over C<await> boundaries
 
-L<https://rt.cpan.org/Ticket/Display.html?id=128309>
+L<https://rt.cpan.org/Ticket/Display.html?id=129321>
 
 =back
 

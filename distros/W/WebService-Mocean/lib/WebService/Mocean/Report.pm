@@ -3,7 +3,7 @@ package WebService::Mocean::Report;
 use Moo;
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has client => (
     is => 'rw',

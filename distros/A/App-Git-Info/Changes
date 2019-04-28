@@ -1,5 +1,8 @@
 Revision history for App-Git-Info
 
+0.4.1       2019-04-27
+    - Made the output less noisy when run outside a git repository.
+
 0.4.0       2019-02-03
     - Switch from App::Rad to App::Cmd .
         - For cleaner code.

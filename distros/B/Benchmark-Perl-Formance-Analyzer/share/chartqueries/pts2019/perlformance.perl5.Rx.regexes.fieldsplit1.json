@@ -1,0 +1,30 @@
+{
+   "charttitle" : "perlformance.perl5.Rx.regexes.fieldsplit1",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::Rx",
+   "chartlines" : [
+       {
+           "title" : "perlformance.perl5.Rx.regexes.fieldsplit1/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.Rx.regexes.fieldsplit1" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "perlformance.perl5.Rx.regexes.fieldsplit1/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.Rx.regexes.fieldsplit1" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

@@ -19,16 +19,17 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  DDP: '0'
   Data::Dumper: '0'
+  ExtUtils::ModuleMaker: '0'
   Log::Any: '0'
   Scalar::Util: '0'
   Test::More: '0'
-  Test::Perl::Critic: '0'
-  Test::Simple: '0.44'
   perl: '5.014'
   strict: '0'
   utf8: '0'
   version: '0'
   warnings: '0'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

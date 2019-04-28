@@ -1,11 +1,11 @@
 Char/Arabic.pm
-Arabic.pm
-Earabic.pm
+lib/Arabic.pm
+lib/Earabic.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Arabic/395_arabiceval_block.t
 t/Arabic/396_double_diamond.t
 t/Arabic/397_bitwise_op.t
 t/Arabic/398_non_capturing.t
+t/Arabic/399_indented_heredoc_qq.t
+t/Arabic/400_indented_heredoc_q.t
+t/Arabic/401_indented_heredoc_qx.t
+t/Arabic/402_regexp_xx.t

@@ -465,3 +465,14 @@ Revision history for Regexp-Grammars
 
     * Added %% operator for separated lists
       with optional trailing separator
+
+
+1.050  Sat Apr 27 08:38:21 2019
+
+    * Improved detection of explicit space matching in rules
+      (now handles \h and \v as well as \s)
+
+    * Improved transparency of debugger so that it no longer injects
+      spurious whitespace matching after debugged constructs
+      (Thanks, Louis!)
+

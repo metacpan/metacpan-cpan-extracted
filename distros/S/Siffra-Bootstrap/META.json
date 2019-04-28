@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Siffra-Bootstrap",
    "no_index" : {
@@ -33,14 +33,17 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Config::Any" : "0",
+            "DBD::Pg" : "0",
+            "DBI" : "0",
+            "DDP" : "0",
             "Data::Dumper" : "0",
             "IO::Prompter" : "0",
             "Log::Any" : "0",
             "Scalar::Util" : "0",
             "Siffra::Tools" : "0",
             "Test::More" : "0",
-            "Test::Simple" : "0.44",
             "perl" : "5.014",
             "strict" : "0",
             "utf8" : "0",
@@ -50,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

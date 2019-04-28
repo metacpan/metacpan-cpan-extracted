@@ -1,11 +1,11 @@
 Char/Latin7.pm
-Latin7.pm
-Elatin7.pm
+lib/Latin7.pm
+lib/Elatin7.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Latin7/395_latin7eval_block.t
 t/Latin7/396_double_diamond.t
 t/Latin7/397_bitwise_op.t
 t/Latin7/398_non_capturing.t
+t/Latin7/399_indented_heredoc_qq.t
+t/Latin7/400_indented_heredoc_q.t
+t/Latin7/401_indented_heredoc_qx.t
+t/Latin7/402_regexp_xx.t

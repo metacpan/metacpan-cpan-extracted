@@ -1,0 +1,6 @@
+Revision history for perl distribution Mojolicious-Plugin-Syslog
+
+0.01 2019-04-27T22:44:31+0700
+ - Can log to syslog
+ - Can be configured using environment variables
+ - Add support for access log

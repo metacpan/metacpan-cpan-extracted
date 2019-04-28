@@ -1,5 +1,5 @@
 package App::Git::Info;
-$App::Git::Info::VERSION = '0.4.0';
+$App::Git::Info::VERSION = '0.4.1';
 # ABSTRACT: Displays a summary of information about the git repository.
 
 use strict;
@@ -21,7 +21,7 @@ App::Git::Info - Displays a summary of information about the git repository.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ version 0.4.0
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
     shlomif@telaviv1:~/conf/trunk$ git info info
     ⇒ On branch master

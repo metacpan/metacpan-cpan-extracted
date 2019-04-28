@@ -20,3 +20,15 @@ Revision history for Perl extension Anansi::ObjectManager.
 	- fixed "user" subroutine to return an array instead of a list.
 	- fixed "uses" subroutine to return an array instead of a list.
 	- modified the POD.
+0.09  Tue Apr 09 16:27:51 2019
+	- implemented a "Anansi" hash within each object instance to resolve cross module data contamination.
+	- implemented a "ObjectManager" hash within the "Anansi" hash of an object instance to store Anansi::ObjectManager specific data.
+	- modified "current" subroutine to reflect cross module contamination resolution.
+	- modified "finalise" subroutine to reflect cross module contamination resolution.
+	- modified "identification" subroutine to reflect cross module contamination resolution.
+	- modified "obsolete" subroutine to reflect cross module contamination resolution.
+	- modified "register" subroutine to reflect cross module contamination resolution.
+	- modified "registrations" subroutine to reflect cross module contamination resolution.
+	- modified "unregister" subroutine to reflect cross module contamination resolution.
+	- modified "user" subroutine to reflect cross module contamination resolution.
+	- modified "uses" subroutine to reflect cross module contamination resolution.

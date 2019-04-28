@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.42
+0.44
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode url_unescape /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -255,6 +255,7 @@ sub _authorization_request {
   my $type      = $args->{response_type} // $self->param( 'response_type' );
   my $scope     = $args->{scope}         // $self->param( 'scope' );
   my $state     = $args->{state}         // $self->param( 'state' );
+  my $user_id   = $args->{user_id}       // undef;
 
   my @scopes = $scope ? split( / /,$scope ) : ();
 
@@ -318,7 +319,7 @@ sub _authorization_request {
   if ( $res ) {
 
     return _maybe_generate_access_token(
-      $self,$mojo_url,$client_id,[ @scopes ],$state,$is_helper
+      $self,$mojo_url,$client_id,[ @scopes ],$state,$is_helper,$user_id
     ) if $type eq 'token'; # implicit grant
 
     $self->app->log->debug( "OAuth2::Server: Generating auth code for $client_id" );
@@ -328,6 +329,7 @@ sub _authorization_request {
       type            => 'auth',
       redirect_uri    => $uri,
       jwt_claims_cb   => $JWTCallback,
+      user_id         => $user_id,
     );
 
     $Grant->store_auth_code(
@@ -357,13 +359,14 @@ sub _authorization_request {
 }
 
 sub _maybe_generate_access_token {
-  my ( $self,$mojo_url,$client,$scope,$state,$is_helper ) = @_;
+  my ( $self,$mojo_url,$client,$scope,$state,$is_helper,$user_id ) = @_;
 
   my $access_token  = $Grant->token(
     client_id  => $client,
     scopes     => $scope,
     type       => 'access',
     jwt_claims_cb => $JWTCallback,
+    user_id    => $user_id,
   );
 
   $Grant->store_access_token(

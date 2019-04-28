@@ -1,0 +1,45 @@
+#! /usr/bin/perl
+# -*- mode: cperl -*-
+
+use strict;
+use warnings;
+
+my $metricprefix = "perlformance.perl5";
+my $templatefile = "TEMPLATE";
+my $metricfile = "METRICLIST";
+
+open my $M, "<", $metricfile or die "Could not read $metricfile";
+my @metriclines =
+ map { chomp; $_ }
+ grep { $_ !~ /^\s*#/ } <$M>;
+
+my $T;
+my $template;
+open $T, "<", $templatefile and do {
+        local $/; $template = <$T>;
+        close $T;
+};
+
+for my $line (@metriclines)
+{
+        my ($metric, $module) =  split(",", $line);
+        $module ||= '';
+
+        (my $shortname = $metric) =~ s/^$metricprefix\.//;
+
+        my $filename = $shortname;
+        $filename    =~ s/\(F\)$/-FASTMODE/g;
+        $filename    =~ s/[^.\w-]/_/g;
+        $filename   .= ".json";
+
+        #print STDERR "$metric - $shortname - $filename - $module\n";
+
+        my $jsonfile = $template;
+        $jsonfile =~ s/__SHORTMETRICNAME__/$shortname/g;
+        $jsonfile =~ s/__METRICNAME__/$metric/g;
+        $jsonfile =~ s/__MODULENAME__/$module/g;
+
+        open my $OUTFILE, ">", $filename or die "Could not write $filename";
+        print $OUTFILE $jsonfile;
+        close $OUTFILE;
+}

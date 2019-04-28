@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.013'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.014'; # VERSION
+my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -40,6 +40,13 @@ PDF::Builder::Content - Methods for adding graphics and text to a PDF
     # Then call the methods below to add graphics and text to the page.
     # Note that negative coordinates can have unpredictable effects, so
     # keep your coordinates non-negative!
+
+These methods add content to I<streams> output for text or graphics objects.
+Unless otherwise restricted by a check that we are in or out of text mode,
+many methods listed here apply equally to text and graphics streams. It is
+possible that there I<are> some which have no effect in one stream type or
+the other, but are currently lacking a check to prevent them from being 
+inserted into an inapplicable stream.
 
 =head1 METHODS
 
@@ -2275,8 +2282,35 @@ sub fillstroke {
 
 =item $content->clip($use_even_odd_fill)
 
+=item $content->clip()
+
 Modifies the current clipping path by intersecting it with the current
-path.
+path. Initially (a fresh page), the clipping path is the entire media. Each
+definition of a path, and a C<clip()> call, intersects the new path with the
+existing clip path, so the resulting clip path is no larger than the new path, 
+and may even be empty if the intersection is null.
+
+If any C<$use_even_odd_fill> parameter is given, use even-odd fill (B<W*>) 
+instead of winding-rule fill (B<W>). It is common usage to make the 
+C<endpath()> call (B<n>) after the C<clip()> call, to clear the path (unless 
+you want to reuse that path, such as to fill and/or stroke it to show the clip 
+path). If you want to clip text glyphs, it gets rather complicated, as a clip
+port cannot be created within a text object (that will have an effect on text). 
+See the object discussion in L<PDF::Builder::Docs> B<Rendering Order>.
+
+ my $grfxC1 = $page->gfx();
+ my $textC  = $page->text();
+ my $grfxC2 = $page->gfx();
+  ...
+ $grfxC1->save();
+ $grfxC1->endpath();
+ $grfxC1->rect(...);
+ $grfxC1->clip();
+ $grfxC1->endpath();
+  ...
+ $textC->  output text to be clipped
+  ...
+ $grfxC2->restore();
 
 =cut
 
@@ -3533,11 +3567,29 @@ sub restore {
 
 =item $content->add(@content)
 
-Add raw content to the PDF stream. You will generally want to use the
-other methods in this class instead.
+Add raw content (arbitrary string(s)) to the PDF stream. 
+You will generally want to use the other methods in this class instead,
+unless this is in order to implement some PDF operation that PDF::Builder
+does not natively support. An array of multiple strings may be given; 
+they will be concatenated with spaces between them.
+
+Be careful when doing this, as you are dabbling in the black arts, 
+directly setting PDF operations! 
+
+One interesting use is to split up an overly long object stream that is giving 
+your editor problems when exploring a PDF file. Add a newline B<add("\n")> 
+every few hundred bytes of output or so, to do this. Note that you must use 
+double quotes (quotation marks), rather than single quotes (apostrophes).
+
+Use extreme care if inserting B<BT> and B<ET> markers into the PDF stream.
+You may want to use C<textstart()> and C<textend()> calls instead, and even
+then, there are many side effects either way. It is generally not useful 
+to suspend text mode with ET/textend and BT/textstart, but it is possible, 
+if you I<really> need to do it.
 
 =cut
 
+# add to 'poststream' string (dumped by ET)
 sub add_post {
     my ($self) = shift;
 
@@ -3571,6 +3623,10 @@ sub _in_text_object {
 Marks content for compression on output.  This is done automatically
 in nearly all cases, so you shouldn't need to call this yourself.
 
+The C<new()> call can set the B<-compress> parameter to 'flate' (default) to
+compress all object streams, or 'none' to suppress compression and allow you
+to examine the output in an editor.
+
 =cut
 
 sub compressFlate {
@@ -3584,8 +3640,12 @@ sub compressFlate {
 
 =item $content->textstart()
 
-Starts a text object. You will likely want to use the C<text> method
-(text context, not text output) instead.
+Starts a text object (ignored if already in a text object). You will likely 
+want to use the C<text()> method (text I<context>, not text output) instead.
+
+Note that calling this method, besides outputting a B<BT> marker, will reset
+most text settings to their default values. In addition, B<BT> itself will
+reset some transformation matrices.
 
 =cut
 
@@ -3620,7 +3680,10 @@ sub textstart {
 
 =item $content->textend()
 
-Ends a text object.
+Ends a text object (ignored if not in a text object).
+
+Note that calling this method, besides outputting an B<ET> marker, will output
+any accumulated I<poststream> content.
 
 =cut
 

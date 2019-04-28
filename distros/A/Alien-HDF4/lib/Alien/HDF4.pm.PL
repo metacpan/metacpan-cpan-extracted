@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-require 'common.pl';
+require './common.pl';
 
 my $version = get_version();
 my $config_hash = get_build();

@@ -42,7 +42,7 @@ sub upgrade {
     }
 
     my $socket = IO::Socket::SSL->start_SSL($self->_socket, %{$self->socket_args})
-        or die "failed to start_SSL: error=$!, ssl_error=$SSL_ERROR";
+        or die "failed to start_SSL: error=$!, ssl_error=$IO::Socket::SSL_ERROR";
 
     $self->_socket($socket);
     $socket->blocking(0);

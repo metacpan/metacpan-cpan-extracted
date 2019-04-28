@@ -1,5 +1,12 @@
 Revision history for File-ContentStore
 
+1.003 2019-04-27 BOOK
+    - Produce a NA test report if perl doesn't have link()
+
+1.002 2019-02-28 BOOK
+    - Add minimum version requirement for Moo
+    - Fix keywords in META files
+
 1.001 2018-05-19 BOOK
     - Protect against symlinks entering the content store
     - Skip already linked files using an inode-digest mapping

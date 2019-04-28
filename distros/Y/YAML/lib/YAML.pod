@@ -12,7 +12,7 @@ YAML - YAML Ain't Markup Language™
 
 =head1 VERSION
 
-This document describes L<YAML> version B<1.27>.
+This document describes L<YAML> version B<1.28>.
 
 =head1 NOTE
 
@@ -405,6 +405,10 @@ deserialize code references. When set to '1' or 'deparse' it will use
 C<eval()>. Since this is potentially risky, only use this option if you know
 where your YAML has been.
 
+LoadCode must be enabled also to use the feature of evaluating typeglobs
+(because with the typeglob feature you would be able to set the variable
+C<$YAML::LoadCode> from a YAML file).
+
 =item Preserve
 
 When set to true, this option tells the Loader to load hashes into YAML::Node
@@ -716,7 +720,7 @@ Ingy döt Net <ingy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2001-2018. Ingy döt Net.
+Copyright 2001-2019. Ingy döt Net.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

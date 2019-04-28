@@ -20,129 +20,9 @@ use Scalar::Util qw( blessed );
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend );
 
-my $collections = {
-    people => {
-        required => [qw( name )],
-        type => 'object',
-        properties => {
-            id => {
-                'x-order' => 1,
-                type => 'integer',
-            },
-            name => {
-                'x-order' => 2,
-                description => 'The real name of the person',
-                'x-filter' => [ 'foobar' ],
-                type => [ qw(string null) ],
-            },
-            email => {
-                'x-order' => 3,
-                pattern => '^[^@]+@[^@]+$',
-                type => [ qw(string null) ],
-            },
-            age => {
-                'x-order' => 4,
-                type => [ qw(integer null) ],
-            },
-            contact => {
-                'x-order' => 5,
-                type => [ qw(boolean null) ],
-            },
-            birthdate => {
-                'x-order' => 6,
-                type => [ qw(string null) ],
-                format => 'date',
-            },
-        },
-    },
-    user => {
-        'x-id-field' => 'username',
-        'x-list-columns' => [qw( username email )],
-        type => 'object',
-        required => [qw( username email password )],
-        properties => {
-            id => {
-                'x-order' => 1,
-                type => 'integer',
-            },
-            username => {
-                'x-order' => 2,
-                type => 'string',
-            },
-            email => {
-                'x-order' => 3,
-                type => 'string',
-            },
-            password => {
-                'x-order' => 4,
-                type => 'string',
-                format => 'password',
-            },
-            access => {
-                'x-order' => 5,
-                type => 'string',
-                enum => [qw( user moderator admin )],
-            },
-            age => {
-                'x-order' => 6,
-                type => [qw( integer null )],
-            },
-        },
-    },
-    mojo_migrations => {
-        type => 'object',
-        required => [qw( name version )],
-        'x-id-field' => 'name',
-        properties => {
-            name => {
-                'x-order' => 1,
-                type => 'string',
-            },
-            version => {
-                'x-order' => 2,
-                type => 'integer',
-            },
-        },
-    },
-    blog => {
-        type => 'object',
-        required => [ qw( title markdown ) ],
-        properties => {
-            id => {
-              'x-order' => 1,
-              type => 'integer',
-              readOnly => 1,
-            },
-            user_id => {
-              'x-order' => 2,
-              type => [ 'integer', 'null' ],
-            },
-            title => {
-              'x-order' => 3,
-              type => [ 'string', 'null' ],
-            },
-            slug => {
-              'x-order' => 4,
-              type => [ 'string', 'null' ],
-            },
-            markdown => {
-              'x-order' => 5,
-              type => [ 'string', 'null' ],
-              format => 'markdown',
-              'x-html-field' => 'html',
-            },
-            html => {
-              type => [ 'string', 'null' ],
-              'x-order' => 6,
-              'x-hidden' => 1,
-            },
-            is_published => {
-              type => 'boolean',
-              'x-order' => 7,
-            },
-        },
-    },
-};
+my $collections = \%Yancy::Backend::Test::SCHEMA;
+$collections->{people}{properties}{name}{'x-filter'} = [ 'foobar' ];
+
 my ( $backend_url, $backend, %items ) = init_backend(
     $collections,
     people => [
@@ -353,25 +233,27 @@ subtest 'set' => sub {
         };
     };
 
-    subtest 'set date field with "" is an error' => sub {
+    subtest 'set email field to test openapi "format"' => sub {
         eval {
-            $t->app->yancy->set( people =>
-                $items{people}[0]{id},
-                { birthdate => "" },
-                properties => [ 'birthdate' ]
+            $t->app->yancy->set( user =>
+                0,
+                { email => "" },
+                properties => [ 'email' ]
             )
         };
         ok $@, 'set() dies';
-        like $@->[0]{path}, qr{/birthdate}, 'birthdate is invalid';
-        like $@->[0]{message}, qr{Does not match date format}, 'format error correct';
+        like $@->[0]{path}, qr{/email}, 'email is invalid';
+        like $@->[0]{message}, qr{Does not match email format}, 'format error correct';
     };
 
     subtest 'backend method dies' => sub {
         no strict 'refs';
         no warnings 'redefine';
         local *{$backend_class . '::set'} = sub { die "Died" };
+        my %new_person_noid = %$new_person;
+        delete $new_person_noid{id};
         eval {
-            $t->app->yancy->set( people => $set_id => { %{ $new_person } });
+            $t->app->yancy->set( people => $set_id => \%new_person_noid );
         };
         ok $@, 'set dies';
         like $@, qr{Died}, 'set dies with same error';
@@ -432,8 +314,10 @@ subtest 'create' => sub {
         no strict 'refs';
         no warnings 'redefine';
         local *{$backend_class . '::create'} = sub { die "Died" };
+        my %new_person_noid = %$new_person;
+        delete $new_person_noid{id};
         eval {
-            $t->app->yancy->create( people => { %{ $new_person } });
+            $t->app->yancy->create( people => \%new_person_noid );
         };
         ok $@, 'create dies';
         like $@, qr{Died}, 'create dies with same error';

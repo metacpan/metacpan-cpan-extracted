@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use IPC::Cmd qw/can_run/;
 
@@ -148,7 +148,7 @@ sub bootstrap {
     $self->start;
 
     for my $try ( 1 .. 5 ) {
-        my $ok = eval { $self->run_command([$self->{+CREATEDB}, '-h', $dir, 'quickdb']); 1 };
+        my $ok = eval { $self->run_command([$self->{+CREATEDB}, '-E', 'UTF8', '-h', $dir, 'quickdb']); 1 };
         my $err = $@;
         last if $ok;
         die $@ if $try == 5;

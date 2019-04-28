@@ -1,0 +1,30 @@
+{
+   "charttitle" : "05regex.fixedstr(F)",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::05regex",
+   "chartlines" : [
+       {
+           "title" : "05regex.fixedstr(F)/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.05regex.fixedstr(F)" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "05regex.fixedstr(F)/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.05regex.fixedstr(F)" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

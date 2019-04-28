@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -39,8 +39,20 @@ our $VERSION = '1.023';
 #pod This Yancy backend allows you to connect to a L<DBIx::Class> schema to
 #pod manage the data inside.
 #pod
+#pod =head1 METHODS
+#pod
 #pod See L<Yancy::Backend> for the methods this backend has and their return
 #pod values.
+#pod
+#pod =head2 read_schema
+#pod
+#pod While reading the various sources, this method will check each source's
+#pod C<result_class> for the existence of a C<yancy> method. If it exists,
+#pod that will be called, and must return the starting-point of the JSON
+#pod schema for that collection.
+#pod
+#pod A very useful possibility is for that JSON schema to just contain
+#pod C<<{ 'x-ignore' => 1 }>>.
 #pod
 #pod =head2 Backend URL
 #pod
@@ -107,6 +119,7 @@ use Role::Tiny qw( with );
 with 'Yancy::Backend::Role::Sync';
 use Scalar::Util qw( looks_like_number blessed );
 use Mojo::Loader qw( load_class );
+use Mojo::JSON qw( true encode_json );
 require Yancy::Backend::Role::Relational;
 
 has collections => ;
@@ -140,7 +153,9 @@ sub new {
 sub _rs {
     my ( $self, $coll, $params, $opt ) = @_;
     $params ||= {}; $opt ||= {};
-    my $rs = $self->dbic->resultset( $coll )->search( $params, $opt );
+    my $schema = $self->collections->{ $coll };
+    my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+    my $rs = $self->dbic->resultset( $real_coll )->search( $params, $opt );
     $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
     return $rs;
 }
@@ -154,6 +169,8 @@ sub _find {
 sub create {
     my ( $self, $coll, $params ) = @_;
     $params = $self->_normalize( $coll, $params );
+    die "No refs allowed in '$coll': " . encode_json $params
+        if grep ref, values %$params;
     my $created = $self->dbic->resultset( $coll )->create( $params );
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     return $created->$id_field;
@@ -161,16 +178,29 @@ sub create {
 
 sub get {
     my ( $self, $coll, $id ) = @_;
-    my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    my $ret = $self->_rs( $coll )->find( { $id_field => $id } );
+    my $schema = $self->collections->{ $coll };
+    my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+    my $props = $schema->{properties}
+        || $self->collections->{ $real_coll }{properties};
+    my $id_field = $schema->{ 'x-id-field' } || 'id';
+    my $ret = $self->_rs(
+        $real_coll,
+        undef,
+        { select => [ keys %$props ] },
+    )->find( { $id_field => $id } );
     return $self->_normalize( $coll, $ret );
 }
 
 sub list {
     my ( $self, $coll, $params, $opt ) = @_;
     $params ||= {}; $opt ||= {};
+    my $schema = $self->collections->{ $coll };
+    my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+    my $props = $schema->{properties}
+        || $self->collections->{ $real_coll }{properties};
     my %rs_opt = (
         order_by => $opt->{order_by},
+        select => [ keys %$props ],
     );
     if ( $opt->{limit} ) {
         die "Limit must be number" if !looks_like_number $opt->{limit};
@@ -190,6 +220,8 @@ sub list {
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
     $params = $self->_normalize( $coll, $params );
+    die "No refs allowed in '$coll'($id): " . encode_json $params
+        if grep ref, values %$params;
     if ( my $row = $self->_find( $coll, $id ) ) {
         $row->set_columns( $params );
         if ( $row->is_changed ) {
@@ -227,6 +259,9 @@ sub read_schema {
     for my $table ( @tables ) {
         # ; say "Got table $table";
         my $source = $self->dbic->source( $table );
+        my $result_class = $source->result_class;
+        $schema{ $table } = $result_class->yancy if $result_class->can('yancy');
+        $schema{ $table }{type} = 'object';
         my @columns = $source->columns;
         for my $i ( 0..$#columns ) {
             my $column = $columns[ $i ];
@@ -236,6 +271,8 @@ sub read_schema {
             my $is_auto = $c->{is_auto_increment};
             $schema{ $table }{ properties }{ $column } = {
                 $self->_map_type( $c ),
+                $is_auto ? ( readOnly => true ) : (),
+                defined( $c->{default_value} ) ? ( default => $c->{default_value} ) : (),
                 'x-order' => $i + 1,
             };
             if ( !$c->{is_nullable} && !$is_auto && !defined $c->{default_value} ) {
@@ -243,16 +280,19 @@ sub read_schema {
             }
         }
 
-        my @keys = (
-            $source->primary_columns,
-            (
-                map { @$_ } grep { scalar( @$_ ) == 1 }
-                map { [ $source->unique_constraint_columns( $_ ) ] }
-                $source->unique_constraint_names
-            ),
-        );
-        if ( @keys && $keys[0] ne 'id' ) {
-            $schema{ $table }{ 'x-id-field' } = $keys[0];
+        my %is_pk = map {$_=>1} $source->primary_columns;
+        my @unique_columns =
+            grep !$is_pk{$_}, # we know about those already
+            map @$_, grep scalar( @$_ ) == 1,
+            map [ $source->unique_constraint_columns( $_ ) ],
+            $source->unique_constraint_names;
+        my ( $pk ) = keys %is_pk;
+        if ( @unique_columns == 1 and $unique_columns[0] ne 'id' ) {
+            # favour "natural" key over "surrogate" integer one, if exists
+            $schema{ $table }{ 'x-id-field' } = $unique_columns[0];
+        }
+        elsif ( $pk && $pk ne 'id' ) {
+            $schema{ $table }{ 'x-id-field' } = $pk;
         }
     }
 
@@ -311,7 +351,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -350,8 +390,20 @@ version 1.023
 This Yancy backend allows you to connect to a L<DBIx::Class> schema to
 manage the data inside.
 
+=head1 METHODS
+
 See L<Yancy::Backend> for the methods this backend has and their return
 values.
+
+=head2 read_schema
+
+While reading the various sources, this method will check each source's
+C<result_class> for the existence of a C<yancy> method. If it exists,
+that will be called, and must return the starting-point of the JSON
+schema for that collection.
+
+A very useful possibility is for that JSON schema to just contain
+C<<{ 'x-ignore' => 1 }>>.
 
 =head2 Backend URL
 

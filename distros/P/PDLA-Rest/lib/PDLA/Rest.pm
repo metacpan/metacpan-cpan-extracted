@@ -1,5 +1,5 @@
 package PDLA::Rest;
-our $VERSION = '2.019102';
+our $VERSION = '2.019106';
 $VERSION = eval $VERSION;
 1;
 

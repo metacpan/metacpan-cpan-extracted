@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -119,6 +119,7 @@ our $VERSION = '1.023';
 #pod =cut
 
 use Mojo::Base '-base';
+use Mojo::JSON qw( encode_json );
 use Role::Tiny qw( with );
 with qw( Yancy::Backend::Role::Relational Yancy::Backend::Role::MojoAsync );
 BEGIN {
@@ -150,9 +151,17 @@ sub dbschema {
 }
 sub filter_table { 1 }
 
+sub fixup_default {
+    my ( $self, $value ) = @_;
+    return undef if !defined $value;
+    $value;
+}
+
 sub create {
     my ( $self, $coll, $params ) = @_;
     $params = $self->normalize( $coll, $params );
+    die "No refs allowed in '$coll': " . encode_json $params
+        if grep ref, values %$params;
     my $id_field = $self->id_field( $coll );
     my $id = $self->mojodb->db->insert( $coll, $params )->last_insert_id;
     # Assume the id field is correct in case we're using a different
@@ -193,7 +202,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

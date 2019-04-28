@@ -11,7 +11,7 @@ Authorization Server
 
 # VERSION
 
-0.20
+0.22
 
 # SYNOPSIS
 
@@ -62,7 +62,7 @@ See [Net::OAuth2::AuthorizationServer::ClientCredentialsGrant](https://metacpan.
 
 [Mojolicious::Plugin::OAuth2::Server](https://metacpan.org/pod/Mojolicious::Plugin::OAuth2::Server) - A Mojolicious plugin using this module
 
-[Mojo::JWT](https://metacpan.org/pod/Mojo::JWT) - encode/decode JWTs
+[Crypt::JWT](https://metacpan.org/pod/Crypt::JWT) - encode/decode JWTs
 
 # AUTHOR & CONTRIBUTORS
 

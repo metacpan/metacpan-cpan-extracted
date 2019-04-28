@@ -11,7 +11,7 @@ Yancy::Backend - Handles talking to the database.
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -24,7 +24,7 @@ version 1.023
     $item = $be->get( $collection, $id );
     $be->set( $collection, $id, $item );
     $be->delete( $collection, $id );
-    $item = $be->create( $collection, $id, $item );
+    $id = $be->create( $collection, $item );
 
 =head1 DESCRIPTION
 
@@ -211,6 +211,9 @@ of the item to update. C<$item> is the item's data to set. Returns
 a boolean that is true if a row with the given ID was found and updated,
 false otherwise.
 
+Currently the values of the data cannot be references, only simple
+scalars or JSON booleans.
+
 =head2 set_p
 
     my $promise = $be->set_p( $collection, $id );
@@ -230,6 +233,9 @@ L</set> for arguments and return values.
 Create a new item. C<$collection> is the collection name.  C<$item> is
 the item's data. Returns the ID of the row created suitable to be passed
 in to C<the get() method|/get>.
+
+Currently the values of the data cannot be references, only simple
+scalars or JSON booleans.
 
 =head2 create_p
 

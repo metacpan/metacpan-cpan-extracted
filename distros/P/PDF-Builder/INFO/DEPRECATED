@@ -28,7 +28,7 @@ linedash -full and -clear options   method in Content.pm
    favor of the "-pattern" array. A warning message is currently given. They 
    are scheduled to be removed on or after August, 2019.
 
-new_api    method in modules NamedDestination.pm and Resource.pm
+new_api         method in modules NamedDestination.pm and Resource.pm
    Also in t/deprecations.t
 
    This method was dropped in favor of using "new(PDF_object, options)". A
@@ -49,7 +49,7 @@ encode_3of9_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
    Use encode_3of9(*, 1, 0) instead. A warning message is currently given.
    encode_3of9_w_chk is scheduled to be removed on or after August, 2019.
 
-encode_3of9_ext   method in Resource/XObject/Form/BarCode/code3of9.pm
+encode_3of9_ext method in Resource/XObject/Form/BarCode/code3of9.pm
    This was rolled into encode_3of9() with a parameter some time ago.
    Use encode_3of9(*, 0, 1) instead. A warning message is currently given.
    encode_3of9_ext is scheduled to be removed on or after August, 2019.
@@ -59,48 +59,54 @@ encode_3of9_ext_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
    Use encode_3of9(*, 1, 1) instead. A warning message is currently given.
    encode_3of9_ext_w_chk is scheduled to be removed on or after August, 2019.
 
-imask    method in Resource/XObject/Image.pm
+imask           method in Resource/XObject/Image.pm
    This functionality was rolled into mask() some time ago. Simply rename any
    call to "imask" to "mask". A warning message is currently given. imask is 
    scheduled to be removed on or after August, 2019.
 
-bpc      method in Resource/XObject/Image.pm
+bpc             method in Resource/XObject/Image.pm
    This functionality was renamed to bits_per_component() some time ago. Simply 
    rename any call to "bpc" to "bits_per_component". A warning message is 
    currently given. bpc is scheduled to be removed on or after August, 2019.
 
-openScalar    method in Builder.pm
+openScalar      method in Builder.pm
    This functionality was renamed to open_scalar() some time ago. Simply 
    rename any call to "openScalar" to "open_scalar". A warning message is 
    currently given. openScalar is scheduled to be removed on or after 
    August, 2019.
 
-importpage    method in Builder.pm
+importpage      method in Builder.pm
    This functionality was renamed to import_page() some time ago. Simply 
    rename any call to "importpage" to "import_page". A warning message is 
    currently given. importpage is scheduled to be removed on or after 
    August, 2019.
 
-pdfile    method in Annotation.pm
+pdfile          method in Annotation.pm
    This functionality was renamed to pdf_file(). Simply rename any call to
    "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
    November, 2019.
 
-spline    method in Content.pm
+spline          method in Content.pm
    This functionality was renamed to qbspline() [quadratic Bezier spline].
    Simply rename any call to "spline" to "qbspline". spline is scheduled to
    be removed on or after June, 2020.
 
-pdfile    method in Outline.pm, NamedDestination.pm
+pdfile          method in Outline.pm, NamedDestination.pm
    This functionality was renamed to pdf_file(). Simply rename any call to
    "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
    October, 2020.
+
+-slant          option in Synfont.pm
+   This option was renamed to -condense, as it is the factor to condense
+   (multiply width by < 1) or expand (multiply width by > 1) text characters. 
+   Use "-condense" instead. -slant is scheduled to be removed on or after
+   January, 2021.
 
 *** If I have missed any deprecated interfaces, please let me know! ***
 
 ======= Deprecated items that already have been removed ======================
 
-Blackls1     DecodeParms hash element in Resource/XObject/Image/TIFF.pm
+Blackls1        DecodeParms hash element in Resource/XObject/Image/TIFF.pm
    Misspelling of "BlackIs1" (EYE instead of el) PDF flag. It was reported in 
    PDF::API2 bug RT 15730, but rejected. BlackIs1 has been added, and Blackls1 
    deprecated. Blackls1 will be removed (no longer set) on or after 

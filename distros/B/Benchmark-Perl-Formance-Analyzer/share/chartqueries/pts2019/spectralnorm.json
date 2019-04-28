@@ -1,0 +1,30 @@
+{
+   "charttitle" : "spectralnorm",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::spectralnorm",
+   "chartlines" : [
+       {
+           "title" : "spectralnorm/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.spectralnorm" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "spectralnorm/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.spectralnorm" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

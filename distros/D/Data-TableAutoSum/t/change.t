@@ -29,5 +29,5 @@ test_change(rows => $_->[0], cols => $_->[1]) for STANDARD_DIM;
 dies_ok { Data::TableAutoSum->new(rows => 2, cols => 2)->change }
         "should die: change called without any argument";
 
-dies_ok { Data::TableAutoSum->new(rows => 2, cols => 2)->change("$_$_") }
-        "should die: change called with a non sub-routine argument";        
+dies_ok { Data::TableAutoSum->new(rows => 2, cols => 2)->change("____") }
+        "should die: change called with a non sub-routine argument";

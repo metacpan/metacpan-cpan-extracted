@@ -1,21 +1,23 @@
-buildfunc.pm
 Changes
-HDF.pm
-Makefile.PL
 MANIFEST			This list of files
-SD/Changes
-SD/Makefile.PL
-SD/SD.pd
+Makefile.PL
+README.md
+TODO
+buildfunc.noinst
+inc/Inline/Module.pm
+lib/PDLA/IO/HDF.pm
+lib/PDLA/IO/HDF/SD.pm
+lib/PDLA/IO/HDF/VS.pm
+lib/PDLA/IO/HDF/typemap.hdf
 t/00-report-prereqs.t
 t/01-checkmanifest.t
 t/hdf_sd.t
 t/hdf_vdata.t
 t/hdf_vgroup.t
-TODO
-typemap
-VS/Changes
-VS/Makefile.PL
-VS/VS.pd
 xt/00-check-changelog.t
+lib/PDLA/IO/HDF/SD/Inline.pm
+inc/PDLA/IO/HDF/SD/Inline.pm
+lib/PDLA/IO/HDF/VS/Inline.pm
+inc/PDLA/IO/HDF/VS/Inline.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

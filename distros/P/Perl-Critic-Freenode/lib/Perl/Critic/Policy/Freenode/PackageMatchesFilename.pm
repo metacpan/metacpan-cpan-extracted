@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw(:severities :classification :ppi);
 use Path::Tiny 'path';
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 use constant DESC => 'No package matching the module filename';
 use constant EXPL => 'A Perl module file is expected to contain a matching package name, so it can be used after loading it from the filesystem. A module file that doesn\'t contain a matching package name usually indicates an error.';

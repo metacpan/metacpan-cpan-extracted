@@ -68,7 +68,19 @@ SKIP: {
     skip "Not running in cluster mode" if $@ =~ /Internal Server Error/;
 
     is ref($id), "HASH"; ## not sure, until some cluster user can confirm me
+
+    my $eps = $arango->cluster_endpoints;
+    ok exists($eps->{endpoints}); ## not sure, until some cluster user can confirm me
 }
+
+my $role = $arango->server_role;
+ok !$role->{error};
+
+### engine
+
+my $engine = $arango->engine;
+like $engine->{name}, qr/^(mmfiles|rocksdb)$/;
+
 
 ## ---
 

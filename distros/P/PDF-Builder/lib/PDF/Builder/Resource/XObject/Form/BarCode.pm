@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::XObject::Form::Hybrid';
 use strict;
 use warnings;
 
-our $VERSION = '3.013'; # VERSION
+our $VERSION = '3.014'; # VERSION
 my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Util;

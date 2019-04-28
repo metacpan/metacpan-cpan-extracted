@@ -1,0 +1,39 @@
+Contributing to the development of PDF::Builder
+
+We would appreciate the community around us chipping in with code, tests, 
+documentation, and even just bug reports and feature requests. It's better 
+knowing what users of PDF::Builder want and need, than to guess. It's not good 
+to spend a lot of time working on something that no one is interested in!
+
+You can contribute to the discussion by posting bug reports, feature requests, 
+observations, etc. to either the GitHub issues area (please tag new threads 
+accordingly) or to the Forum on catskilltech.com (please place a new topic in 
+the appropriate area).  We will cross-post from one to the other. If you don't 
+have an account on either system, and want to occasionally post something, 
+there is a contact form on the Forum where you can send in something for us to 
+post. Please do not abuse this system -- if you are regularly posting, please 
+take a minute to register on one or both systems.
+
+For code changes, a GitHub pull request, a formal patch file (e.g., "diff"), or 
+even a replacement file or manual patch will do, so long as it's clear where it 
+goes and what it does. If the volume of such work becomes excessive (i.e., a 
+burden to us), we reserve the right to limit the ways that code changes can be 
+submitted. At this point, the volume is low enough that almost anything can be 
+handled.
+
+Please do not start on a massive project (especially, new function), without 
+discussing it with us first (via email or one of the discussion areas). This 
+will save you the disappointment of seeing your hard work rejected because it 
+doesn't fit in with what's going on with the rest of the PDF::Builder project. 
+You are free to try contributing anything you want, or even to fork the project 
+if you don't like the direction it's taking (that's how PDF::Builder split off 
+from PDF::API2). Keeping in touch and coordinating with us ensures that your 
+work won't be wasted. If you have something dependent on PDF::Builder 
+functionality, but it doesn't fit our roadmap for core functionality, we may 
+suggest that you release it as a separate package on CPAN (dependent on 
+PDF::Builder), or as a new sub-package under PDF::Builder (e.g., like 
+PDF::API2::Ladder), under either our ownership or yours.
+
+Good luck, and best wishes using and helping with PDF::Builder!
+
+January, 2019

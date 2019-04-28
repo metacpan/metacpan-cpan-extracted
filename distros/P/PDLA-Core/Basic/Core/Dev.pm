@@ -409,7 +409,7 @@ sub pdlpp_postamble {
 	my $w = whereami_any();
 	$w =~ s%/((PDLA)|(Basic))$%%;  # remove the trailing subdir
 	require ExtUtils::MM;
-	my $oneliner = MM->oneliner(q{exit if \$\$ENV{DESTDIR}; use PDLA::Doc; eval { PDLA::Doc::add_module(q{$mod}); }});
+	my $oneliner = MM->oneliner(q{exit if $ENV{DESTDIR}; use PDLA::Doc; eval { PDLA::Doc::add_module(q{$mod}); }});
 	$callpack //= '';
 qq|
 

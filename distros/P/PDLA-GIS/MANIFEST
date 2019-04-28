@@ -1,0 +1,22 @@
+Changes
+GIS/Makefile.PL
+GIS/Proj.pd
+GIS/README
+GIS/TODO
+lib/PDLA/GIS.pm
+Transform/Makefile.PL
+Transform/Proj4.pd
+Transform/README
+Transform/TODO
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+t/00-report-prereqs.t
+t/01-checkmanifest.t
+t/gis_proj.t
+t/proj_transform.t
+t/proj_transform2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDLA/GIS/Proj.pm               mod=PDLA::GIS::Proj pd=GIS/Proj.pd (added by pdlpp_mkgen)
+GENERATED/PDLA/Transform/Proj4.pm        mod=PDLA::Transform::Proj4 pd=Transform/Proj4.pd (added by pdlpp_mkgen)

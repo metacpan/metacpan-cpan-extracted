@@ -1,3 +1,8 @@
+0.008  2019-04-26
+   - User admin routes (list_users, user, user_databases)
+   - Cluster metadata routes (server_role/cluster_endpoints)
+   - Server routes (engine)
+
 0.007  2019-04-24
    - Cluster metadata routes (server_id)
    - Metadata routes (target_version, log, log_level, server_availability, server_mode)

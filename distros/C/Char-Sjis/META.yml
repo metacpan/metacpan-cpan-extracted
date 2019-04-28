@@ -1,15 +1,19 @@
 --- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Sjis
+version: 1.13
 abstract: Native Encoding Support by Traditional Scripting
-version: 1.08
 author:
-  - INABA Hitoshi <ina@cpan.org>
+  - ina <ina@cpan.org>
 license: perl
+generated_by: pmake.bat
 requires:
-  ExtUtils::MakeMaker: 5.4302
   Archive::Tar: 0.072
   Compress::Zlib: 1.03
   Config: 0
+  ExtUtils::MakeMaker: 5.4302
   Fcntl: 1.03
   File::Basename: 2.6
   File::Copy: 2.02
@@ -19,11 +23,8 @@ requires:
   Test: 1.122
   Test::Harness: 1.1602
   perl: 5.005_03
+  strict: 1.01
 build_requires:
   Test: 1.122
-urls:
+resources:
   license: http://dev.perl.org/licenses/
-meta-spec:
-  version: 1.3
-  url: http://module-build.sourceforge.net/META-spec-v1.3.html
-generated_by: INABA Hitoshi <ina@cpan.org>

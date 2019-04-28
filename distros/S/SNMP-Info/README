@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.67
+    SNMP::Info - Version 3.68
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -829,6 +829,11 @@ SUBCLASSES
 
             See documentation in SNMP::Info::Layer3::Pica8 for details.
 
+        SNMP::Info::Layer3::Redlion
+            Subclass for redlion routers.
+
+            See documentation in SNMP::Info::Layer3::Redlion for details.
+
         SNMP::Info::Layer3::SonicWALL
             Subclass for generic SonicWALL devices.
 
@@ -895,7 +900,7 @@ SUBCLASSES
             See documentation in SNMP::Info::Layer7::Liebert for details.
 
         SNMP::Info::Layer7::Neoteris
-            Subclass for Juniper SSL VPN appliances.
+            Subclass for Pulse Secure / Juniper SSL VPN appliances.
 
             See documentation in SNMP::Info::Layer7::Neoteris for details.
 
@@ -1905,7 +1910,7 @@ SNMP::INFO INTERNALS
 
     $REPEATERS
         Default 20. MaxRepeaters for BULKWALK operations. See "perldoc SNMP"
-        for more info. Can change by passing BulkRepeaters option in new()
+        for more info. Can change by passing "BulkRepeaters" option in new()
 
   Data Munging Callback Subroutines
     munge_speed()

@@ -1,7 +1,7 @@
 use strict; use warnings;
 package Inline;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use Inline::denter;
 use Config;
@@ -138,20 +138,20 @@ sub import_heavy {
             Inline::Files::get_filename($pkg)
            ) {
             $o->read_inline_file;
-            $o->{CONFIG} = handle_language_config(@config);
+            $o->{CONFIG} = handle_language_config($o->{CONFIG}, @config);
         }
         elsif ($option eq 'DATA' or not $option) {
-            $o->{CONFIG} = handle_language_config(@config);
+            $o->{CONFIG} = handle_language_config($o->{CONFIG}, @config);
             push @DATA_OBJS, $o;
             return;
         }
         elsif (uc $option eq uc 'Config') {
-            $CONFIG{$pkg}{$language_id} = handle_language_config(@config);
+            $CONFIG{$pkg}{$language_id} = handle_language_config($CONFIG{$pkg}{$language_id}, @config);
             return;
         }
         else {
             $o->receive_code($option);
-            $o->{CONFIG} = handle_language_config(@config);
+            $o->{CONFIG} = handle_language_config($o->{CONFIG}, @config);
         }
     }
     else {
@@ -191,7 +191,7 @@ sub bind {
     $o->{API}{script} = $script;
     $o->{API}{language_id} = $language_id;
     $o->receive_code($code);
-    $o->{CONFIG} = handle_language_config(@config);
+    $o->{CONFIG} = handle_language_config($o->{CONFIG}, @config);
 
     $o->glue;
 }
@@ -590,6 +590,7 @@ sub handle_global_config {
 # Process the config options that apply to a particular language
 #==============================================================================
 sub handle_language_config {
+    my %merge_with = %{ shift || {} };
     my @values;
     while (@_) {
         my ($key, $value) = (uc shift, shift);
@@ -604,7 +605,7 @@ sub handle_language_config {
             push @values, $key, $value;
         }
     }
-    return {@values};
+    return {%merge_with, @values};
 }
 
 #==============================================================================
@@ -843,7 +844,6 @@ sub create_config_file {
 
     my ($lib, $mod, $register, %checked,
         %languages, %types, %modules, %suffixes);
-  LIB:
     for my $lib (@INC) {
         next unless -d File::Spec->catdir($lib,"Inline");
         opendir LIB, File::Spec->catdir($lib,"Inline")
@@ -851,7 +851,7 @@ sub create_config_file {
         while ($mod = readdir(LIB)) {
             next unless $mod =~ /\.pm$/;
             $mod =~ s/\.pm$//;
-            next LIB if ($checked{$mod}++);
+            next if ($checked{$mod}++);
             if ($mod eq 'Config') {     # Skip Inline::Config
                 warn M14_usage_Config();
                 next;

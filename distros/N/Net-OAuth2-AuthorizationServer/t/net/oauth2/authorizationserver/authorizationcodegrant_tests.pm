@@ -116,10 +116,11 @@ sub run_tests {
 		redirect_uri  => 'https://come/back',
 	);
 
-	my ( $client,$vac_error,$scopes ) = $Grant->verify_auth_code( %valid_auth_code );
+	my ( $client,$vac_error,$scopes,$user_id ) = $Grant->verify_auth_code( %valid_auth_code );
 
 	ok( $client,'->verify_auth_code, correct args' );
 	ok( ! $vac_error,'has no error' );
+	is( $user_id,$args->{no_jwt} ? undef : 1,'user_id' );
 	cmp_deeply( $scopes,[ qw/ eat sleep / ],'has scopes' );
 
 	foreach my $t (

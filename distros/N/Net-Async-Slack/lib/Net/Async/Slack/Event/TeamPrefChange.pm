@@ -3,13 +3,13 @@ package Net::Async::Slack::Event::TeamPrefChange;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Net::Async::Slack::EventType;
 
 =head1 NAME
 
-Net::Async::Slack::Event::TeamPrefChange - A team preference has been updated
+Net::Async::Slack::Event::TeamPrefChange - A preference has been updated
 
 =head1 DESCRIPTION
 
@@ -28,3 +28,12 @@ sub type { 'team_pref_change' }
 
 1;
 
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.

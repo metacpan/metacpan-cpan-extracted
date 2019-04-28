@@ -1,5 +1,5 @@
 package Git::Database::Object::Tree;
-$Git::Database::Object::Tree::VERSION = '0.011';
+$Git::Database::Object::Tree::VERSION = '0.012';
 use Moo;
 use namespace::clean;
 
@@ -110,7 +110,7 @@ Git::Database::Object::Tree - A tree object in the Git object database
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

@@ -4,12 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 use Carp;
-$Carp::Verbose = 1;
 use utf8;
 use Data::Dumper;
 use DDP;
 use Encode qw(decode encode);
 use Log::Any qw($log);
+$Carp::Verbose = 1;
 
 $| = 1;    #autoflush
 
@@ -20,7 +20,7 @@ BEGIN
     require Log::Dispatch::Email;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.01';
+    $VERSION = '0.02';
     @ISA     = qw(Log::Dispatch::Email Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default

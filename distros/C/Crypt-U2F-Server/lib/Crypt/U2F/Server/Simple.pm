@@ -8,7 +8,7 @@ use Carp;
 require Exporter;
 
 our @ISA     = qw(Exporter);
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Crypt::U2F::Server;
 

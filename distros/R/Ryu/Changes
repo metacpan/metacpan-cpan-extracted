@@ -1,5 +1,19 @@
 Revision history for Ryu
 
+1.003     2019-04-28 00:15:57+08:00 Asia/Kuala_Lumpur
+    Documentation fixes:
+
+    - Incorrect `C<>` block, thanks to MANWAR for reporting+submitting a
+    [pull request for this](https://github.com/team-at-cpan/Ryu/pull/5).
+
+    Dependencies:
+
+    - minimum Perl version is now 5.18, as reported by SREZIC earlier
+    versions get stuck on the test suite for some reason. This is quite
+    likely to be a bug in the code, but legacy Perl support is not
+    currently a priority (newer Perl versions have lots of useful bugfixes
+    and improvements!).
+
 1.002     2019-04-21 00:21:55+08:00 Asia/Kuala_Lumpur
     New features:
 

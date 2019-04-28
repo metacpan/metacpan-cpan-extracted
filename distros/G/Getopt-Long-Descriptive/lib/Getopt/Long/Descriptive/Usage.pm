@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive::Usage;
 # ABSTRACT: the usage description for GLD
-$Getopt::Long::Descriptive::Usage::VERSION = '0.103';
+$Getopt::Long::Descriptive::Usage::VERSION = '0.104';
 use List::Util qw(max);
 
 #pod =head1 SYNOPSIS
@@ -86,10 +86,15 @@ sub option_text {
     my $desc = $opt->{desc};
     my $assign;
     if ($desc eq 'spacer') {
-      my @lines = $self->_split_description($length, $opt->{spec});
+      if (ref $opt->{spec}) {
+        $string .= "${ $opt->{spec} }\n";
+        next;
+      } else {
+        my @lines = $self->_split_description($length, $opt->{spec});
 
-      $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
-      next;
+        $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
+        next;
+      }
     }
 
     ($spec, $assign) = Getopt::Long::Descriptive->_strip_assignment($spec);
@@ -285,7 +290,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 

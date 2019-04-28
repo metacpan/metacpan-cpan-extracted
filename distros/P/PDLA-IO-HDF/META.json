@@ -22,15 +22,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDLA::Core" : "2.019100"
+            "Inline::Pdlapp" : "2.019104",
+            "PDLA::Core" : "2.019103"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::HDF4" : "0",
+            "Alien::HDF4" : "0.05",
             "ExtUtils::Depends" : "0.402",
             "ExtUtils::MakeMaker" : "0",
-            "PDLA::Core" : "2.019100"
+            "Inline::Pdlapp" : "2.019104",
+            "PDLA::Core" : "2.019103"
          }
       },
       "test" : {
@@ -51,6 +53,6 @@
          "web" : "https://github.com/PDLPorters/pdla-io-hdf"
       }
    },
-   "version" : "2.019100",
+   "version" : "2.019102",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

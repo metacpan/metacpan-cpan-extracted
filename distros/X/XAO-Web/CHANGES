@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 85c422a105dcebe891844cd0f13ba1cad907fdfe
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Apr 26 16:10:25 2019 -0700
+
+    1.77 Added max_age and headers options for maptodir
+
 commit c26fcab6b96b8a2e84ab245918b36ad8ee9914b2
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Mar 2 09:35:44 2019 -0800
@@ -85,13 +91,4 @@ Author: Alexandr Ciornii <alexchorny@gmail.com>
 Date:   Sun Oct 21 11:36:38 2018 +0300
 
     Upgrade Makefile.PL
-
-commit 0a6923fda1dc15fe2a50b36ccbd5ea327b11a5b5
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Oct 19 17:34:23 2018 -0700
-
-    1.72 Dependency on XAO::Base 1.22
-    
-    No functional changes in XAO::Web, just a dependency on XAO::Base 1.22
-    for library projects support.
 

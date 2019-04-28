@@ -1,0 +1,37 @@
+---
+abstract: 'Table that calculates the results of rows and cols automatic'
+author:
+  - 'Janek Schleicher <bigj@kamelfreund.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-TableAutoSum
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Compare: '0'
+  Data::Dumper: '0'
+  List::Util: '0'
+  Math::Random: '0'
+  Params::Validate: '0'
+  Regexp::Common: '0'
+  Set::CrossProduct: '0'
+  Set::Scalar: '0'
+  Test::Builder: '0.13'
+  Test::Exception: '0'
+  Test::More: '0'
+  Tie::CSV_File: '0.06'
+  Tie::File: '0'
+resources:
+  repository: git://github.com/hanfried/Data-TableAutoSum.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

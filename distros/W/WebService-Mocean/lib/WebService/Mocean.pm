@@ -10,18 +10,18 @@ use Types::Standard qw(Str InstanceOf);
 
 use WebService::Mocean::Client;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has api_key => (
     isa => Str,
     is => 'rw',
-    required => 1
+    required => 1,
 );
 
 has api_secret => (
     isa => Str,
     is => 'rw',
-    required => 1
+    required => 1,
 );
 
 has api_url => (
@@ -76,6 +76,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords mocean sms moceansms
+
 =head1 NAME
 
 WebService::Mocean - Perl library for integration with MoceanSMS gateway,
@@ -88,45 +90,14 @@ https://moceanapi.com.
 
 =head1 DESCRIPTION
 
-WebService::Mocean is Perl library for integration with MoceanSMS gateway,
+WebService::Mocean is Perl library for integrating with MoceanSMS gateway,
 https://moceanapi.com.
 
 =head1 DEVELOPMENT
 
-Source repo at L<https://github.com/kianmeng/webservice-mocean|https://github.com/kianmeng/webservice-mocean>.
+Source repository at L<https://github.com/kianmeng/webservice-mocean|https://github.com/kianmeng/webservice-mocean>.
 
-=head2 Docker
-
-If you have Docker installed, you can build your Docker container for this
-project.
-
-    $ docker build -t webservice-mocean .
-    $ docker run -it -v $(pwd):/root webservice-mocean bash
-    # cpanm --installdeps --notest .
-
-=head2 Milla
-
-Setting up the required packages.
-
-    $ milla authordeps --missing | cpanm
-    $ milla listdeps --missing | cpanm
-
-Check you code coverage.
-
-    $ milla cover
-
-Several ways to run the test.
-
-    $ milla test
-    $ milla test --author --release
-    $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla test
-    $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla run prove t/01_instantiation.t
-    $ LOGGING=1 milla run prove t/t/02_request.t
-
-Release the module.
-
-    $ milla build
-    $ milla release
+How to contribute? Follow through the L<CONTRIBUTING.md|https://github.com/kianmeng/webservice-mocean/blob/master/CONTRIBUTING.md> document to setup your development environment.
 
 =head1 METHODS
 
@@ -175,7 +146,7 @@ Send a random code for verification to a mobile number.
 
 =head2 sms->check_verification_code($params)
 
-Check the verfication code received from your user.
+Check the verification code received from your user.
 
     my $response = $mocean_api->sms->check_verification_code({
         'mocean-reqid' => '395935',
@@ -202,6 +173,10 @@ Get the outbound SMS current status.
         'mocean-msgid' => 123456
     });
 
+=head1 AUTHOR
+
+Kian Meng, Ang E<lt>kianmeng@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2018-2019 by Kian Meng, Ang.
@@ -209,7 +184,3 @@ This software is Copyright (c) 2018-2019 by Kian Meng, Ang.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-=head1 AUTHOR
-
-Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>

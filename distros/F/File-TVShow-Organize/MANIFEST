@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00CheckTestDirectorStructures.t
+t/01TestDirectoryHandling.t
+t/02TestBaseFunctions.t
+t/03TestFileNameHandling
+t/04TestShowHashing.t
+t/05TestMainImport.t
+t/06TestSuccessfulImport.t
+t/07TestRecursiveImport.t
+t/10Clean.t
+t/test-data.tar.gz
+t/tv-shows.tar.gz
+lib/File/TVShow/Organize.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

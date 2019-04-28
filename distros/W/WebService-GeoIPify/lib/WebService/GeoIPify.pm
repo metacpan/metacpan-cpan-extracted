@@ -14,7 +14,7 @@ use Types::Standard qw(InstanceOf Str);
 with 'Role::Cache::LRU';
 with 'Role::REST::Client';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has api_key => (
     isa => StrLength[32],
@@ -80,7 +80,7 @@ __END__
 =head1 NAME
 
 WebService::GeoIPify - Perl library for ipify's Geolocation API,
-https://geo.ipify.org.
+https://geo.ipify.org and https://ipify.org.
 
 =head1 SYNOPSIS
 
@@ -134,6 +134,10 @@ Look up the public IP address of the client which made the web service call.
     my $geoipify = WebService::GeoIPify->new(api_key => '1xxxxxxxxxxxxxxxxxxxxxxxxxxxxx32');
     print $geoipify->check();
 
+=head1 AUTHOR
+
+Kian Meng, Ang E<lt>kianmeng@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2019 Kian Meng, Ang.
@@ -141,9 +145,5 @@ This software is Copyright (c) 2019 Kian Meng, Ang.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-=head1 AUTHOR
-
-Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>
 
 =cut

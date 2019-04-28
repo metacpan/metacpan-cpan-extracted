@@ -13,7 +13,7 @@ sub uniqstr (@) {
   for my $i (0 .. $#l - 1) {
     undef $l[$i] if $l[$i] eq $l[$i+1];
   }
-  return grep { defined } @_;
+  return grep { defined } @l;
 }
 
 {

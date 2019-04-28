@@ -3,7 +3,7 @@ package Perl::Critic::Freenode;
 use strict;
 use warnings;
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 1;
 
@@ -83,6 +83,10 @@ Don't use C<return> with no arguments
 =item L<Perl::Critic::Policy::Freenode::IndirectObjectNotation>
 
 Don't call methods indirectly
+
+=item L<Perl::Critic::Policy::Freenode::LexicalForeachIterator>
+
+Don't use undeclared foreach loop iterators
 
 =item L<Perl::Critic::Policy::Freenode::LoopOnHash>
 

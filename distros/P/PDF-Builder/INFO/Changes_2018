@@ -1,0 +1,376 @@
+See also Changes-ver_2 for changes released for PDF::API2, and incorporated
+into PDF::Builder.
+See also Changes_2017 for earlier version 3 release logs.
+
+3.013     2018-12-27
+
+    examples/022_truefonts-022_truefonts_diacrits_utf8-023_cjkfonts-
+      024_bdffonts-026_unifont2
+     Minor cleanup to end "dot" line.
+    3_examples.pl, 4_contrib.pl
+     Minor cleanup to contrib tests, examples -step and -cont command line
+      flag to stop after each test to allow tester to read expected results
+      description (new) and look at PDF file(s) before going on to next test,
+      or run them all in one fell swoop.
+     Note that the failure in 025_unifonts is probably reading the data line
+      right after __END__ (there is no __DATA__).
+
+    MANIFEST, 1_pc.pl, 2_t-tests.pl, 3_examples.pl, 4_contrib.pl, 
+      INFO/old/pc.bat, INFO/old/t-tests.bat, INFO/old/examples.bat, 
+      INFO/old/contrib.bat
+     Convert the various test suites from Windows .bat files to Perl .pl 
+      files, so that they may be used on any system. Some configuration may
+      need to be adjusted for Linux or Unix systems (such as directory
+      separators and available font file names). The old .bat files have been 
+      moved to INFO/old, in case you'd rather use them (they would need to 
+      first either be moved back to the root, or their internal paths updated,
+      and checked to see if they need updating). The Perl replacements are 
+      numbered in the suggested order for running them (only 3 and 4 are 
+      critical to use in that order).
+
+    examples/BarCode.pl
+      Clean up by consolidating Helvetica font declaration into one place, 
+      rather than once per barcode Xobject (much smaller output PDF file). 
+      Note that barcodes still appear to have some problems with bars merging 
+      with each other.
+
+    examples/Content.pl
+      Add a sample showing the use of multiple text and graphics objects to
+      have some text under a graphic, and other over it, and change one image
+      to show it rotated and clipped.
+
+    Makefile.PL
+      Try a different format for bugtracker entry, to point to GitHub issues
+      rather than the default RT ticket system.
+
+    t/00-all-usable.t
+      Check for optional libraries and do auto-OK only if missing. If an
+      optional library is present, do the normal "use" test.
+
+    README, MANIFEST
+      Moved README back to the root to shut up Kwalitee's complaint about no
+      README file.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Annotation.pm-NamedDestination.pm-
+      Outline.pm, lib/PDF/Builder/Basic/PDF/Utils.pm, 
+      lib/PDF/Builder/Resource/BaseFont.pm-CIDFont.pm, 
+      lib/PDF/Builder/Resource/CIDFont/CJKFont.pm, 
+      lib/PDF/Builder/Resource/Font/BdFont.pm, t/annotate.t
+      [ref RT 33497, RT 117031]
+     Consolidate PDFStr() and PDFUtf() calls (and associated is_utf() etc.
+      checks) into new function PDFString(), which is given the string and
+      usage code, and returns either PDFStr() or PDFUtf(), based on the
+      usage and whether UTF-8 is permitted for that usage, and what the
+      original string encoding was. This fixes RT 33497, and appears to fix 
+      RT 117031 too, as I have not seen any documentation that forbids UTF-8
+      characters in metadata (PDFString usage 'm'). If such turns up, I will
+      update PDF::Builder::Basic::PDF::Utils to move metadata usage from UTF-8
+      permitted to disallowed.
+
+      Various Annotation titles and labels now permit UTF-8 text. Named 
+      Destinations currently permit UTF-8, as I have not seen any restrictions 
+      against this. Outline titles permit UTF-8. The annotate t-test was
+      updated because PDFUtf() format <hex quartets> is no longer forced for
+      annotations.
+
+    lib/PDF/Builder/Resource/XObject/Image/GIF.pm [ref RT 44877]
+      Fixed library to process GIFs with 3 more types of extension blocks,
+      and updated the POD. The new extension blocks are read, but ignored,
+      so they no longer produce an error.
+
+    lib/PDF/Builder/Annotation.pm  [ref RT 117942]
+      Do some more cleanup of annotations. Unable to get same icon behavior
+      between text and file_attachment, even though the same code is produced.
+
+    lib/PDF/Builder/Resource/Font/CoreFont/verdana*.pm change "gimel" width from
+      0 to 620 (but still doesn't show up, gets "invalid character" box marker)
+    lib/PDF/Builder/Resource/Font/CoreFont/times*.pm change "macron" width from
+      333 to 520 (width was too narrow)
+    lib/PDF/Builder/Resource/Font/CoreFont/helvetica*.pm change "macron" width
+      from 333 to 580 (width was too narrow)
+    lib/PDF/Builder/Resource/Glyphs.pm, uniglyph.txt change character 'dblgrave'
+      (U+F6D6) to 'dblgravecmb' (U+030F) and add width to all CoreFont/*.pm. 
+      020_corefonts, etc. now shows a double grave accent at x0E (where 
+      available in a typeface).
+    lib/PDF/Builder/Resource/Glyphs.pm, uniglyph.txt change dotlessj from U+F6BE
+      to U+0237; still not displaying at x1F with my font collection.
+    lib/PDF/Builder/Resource/Font/CoreFont.pm, lib/PDF/examples/020_corefonts,
+      lib/PDF/Builder/Resource/Font/CoreFont/bankgothic.pm
+     enable full bankgothic (not just regular). Unfortunately, this appears to
+      be the older Bank Gothic (not "Pro"), which has only medium weight (bold, 
+      bolditalic are no different than regular and italic). Corrected widths on 
+      'mu' (increased from missing/300 to 689) and 'germandbls' (reduced from 
+      1327 to 847). bankgothic.pm is used by all four variants, so at this time
+      there appears to be no need to create bold, italic, and bolditalic 
+      versions. (other fonts have different widths for some glyphs in different
+      variants)
+    lib/PDF/Builder/Resource/Font/CoreFont/bankgothic.pm remove 'euro', as the
+      only entry in the font is named 'Euro'. add 'macron' with width.
+    lib/PDF/examples/020_corefonts-ShowFont.pl, 
+      lib/PDF/Builder/Resource/Font/BaseFont.pm core fonts with no assigned
+      width, show background of light red to flag them. Add method 
+      'wxMissingByEnc()' to flag a missing core font width.
+
+    lib/PDF/Builder/Annotation.pm enable dash pattern in -border option.
+    lib/PDF/Builder/NamedDestination.pm remove -border and -rect options
+      from POD, as there seems to be no code to implement them. A link (with
+      -rect and -border) to a Named Destination should be taken care of in the
+      Annotation module.
+
+3.012     2018-10-26
+
+   new PNG_IPL module got caught by t/00-all-usable.t on test systems that did 
+     not have Image::PNG::Libpng installed. Exclude from test, and add 
+     reminder in Makefile.PL to update 00-all-usable.t.
+
+3.011     2018-10-25
+
+   move .travis.yml.HOLD and dist.ini.old from the root to INFO/old/, to 
+     unclutter the root. It is unknown when and if they will ever be used.
+
+   lib/PDF/Builder/Annotation.pm  [ref RT 125917] minor fix to properly 
+     implement a default target page fit (-xyz), otherwise the link() 
+     method would not go to the desired target page. Some minor POD updates
+     to indicate that some functionality depends on the PDF reader (e.g.,
+     mouseover text on a link).
+   lib/PDF/Builder/Resource/XObject/Image/PNG.pm-PNG_IPL.pm
+     minor POD updates
+
+   lib/PDF/Builder/Resource/XObject/Image/PNG-PNG_IPL-TIFF-TIFF_GT.pm,
+     Makefile.PL, MANIFEST, lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm,
+     t/png.t
+    [ref RT 124349] If libpng.a and its wrapper, Image::PNG::Libpng are 
+     installed, use them to process PNG files for inclusion into a PDF 
+     document. If this library is not installed, or the user directs that 
+     it is not be used via the -nouseIPL option, the existing pure Perl 
+     PNG library (PNG.pm) will be used. The new library (PNG_IPL.pm) is 
+     considerably faster than the old one and offers support for 16 bits 
+     per sample and interlaced images*. Documentation has been updated in 
+     TIFF and TIFF_GT, and functions LA_GT() and LA_IPL() have been added 
+     to Builder to check LibraryAvailability (package availability) for 
+     Graphics::TIFF and Image::PNG::Libpng, so you can know in advance 
+     whether it is safe to try to use certain image functionality.
+
+     * interlacing is removed during processing, so it is irrelevant to
+       PDF, and 16bps channels (force PDF 1.5) can be reduced to 8bps, 
+       permitting PDF 1.4 output, by use of the -force8bps option.
+
+   Makefile.PL  try directing support issues to GitHub rather than CPAN RT
+
+   lib/PDF/Builder.pm while working on 124349, I noticed that a partially 
+    transparent RGBA PNG file (white background made transparent) with -notrans 
+    option was showing as transparent. The problem was found to be that no
+    options given in the image_png() call, such as -notrans, were being passed 
+    to the PNG image processing routine. This has been fixed.
+
+   docs/buildDoc.pl modified to first look for .pod files, and then .pm files
+    for producing documentation .html files. It still has some issues with
+    finding too much input, but is generally workable. The POD search path
+    needs further work, as references to other packages often don't work 
+    (don't produce a working link, but a severe error message).
+
+   lib/PDF/Builder.pm  internal routine proc_pages() renamed _proc_pages(),
+    walk_obj() renamed _walk_obj(), and add POD for save() method. There is a 
+    release() method that is undocumented but it's not clear whether it's 
+    internal. Improve documentation of mediabox and other *box methods.
+   lib/PDF/Builder/Annotation.pm-Matrix.pm-Outline.pm-Page.pm minor POD fixes.
+    There are a lot of low level calls (e.g., Array.pm) that perhaps should not
+    be considered as part of the User API (i.e., remove from POD).
+
+   lib/PDF/Builder/Outline.pm-NamedDestination.pm-Annotation.pm, INFO/DEPRECATED
+    deprecate pdfile() method and replace by pdf_file() (same as done earlier
+     for Annotation.pm). pdfile() will be removed on or after October, 2020.
+   lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm-TIFF.pm, INFO/DEPRECATED
+    remove warning and support for Blackls1 (should be BlackIs1).
+
+   lib/PDF/Builder/Content.pm, examples/Content.pl
+    [ref RT 124218] add -strikethru text capability similar to -underline.
+     New example of strike-through in Content.pl examples.
+
+   lib/PDF/Builder.pm  [ref #93] Bringing PDF::Builder into the 21st century
+    add -outver option (default: 1.4) to new() as output PDF version. It will
+     be increased by any PDF file read in with a higher PDF level (with message)
+     or by a call to version().
+    add -msgver option (default: 1) to output (value 1) a warning message when
+     the PDF output version is increased by verCheckInput() or verCheckOutput().
+     A value of 0 suppresses the warning messages.
+    add verCheckInput(version) to give warning if PDF just read in is of higher 
+     PDF version than the current version, and to increase the current version 
+     to that level. Implemented for reading of PDF files. 
+    WARNING: just because the PDF output version has been increased does NOT 
+     guarantee that any particular content will be handled correctly! There 
+     are many known cases of PDF 1.5 and up files being read in, that have 
+     content that PDF::Builder does not handle correctly, corrupting the 
+     resulting PDF. Pay attention to run-time warning messages that the PDF 
+     output level has been increased due to a PDF file being read in, and check 
+     the resulting file carefully.
+    add verCheckOutput(version, description) to increase the output PDF version 
+     if a PDF feature that requires a higher PDF version is requested. At this
+     time, there are no output features higher than 1.4.
+    in version(), give warning if LOWERING the output PDF version (not 
+     suppressed by -msgver).
+   lib/PDF/Builder.pm, lib/PDF/Builder/Basic/PDF/File.pm-Name.pm
+    internally store PDF version as full number (e.g., 1.4) instead of just the
+     minor version (e.g., 4), as PDF 2.0 has been announced.
+   t/02-xrefstm.t, t/03-xrefstm-index.t
+    both t-tests read in a PDF-1.5 file, so add a call to new(-outver=>1.5) to
+     silence the warning message that the maximum version is being increased.
+
+   lib/PDF/Builder/Resource/Basefont.pm-CIDFont.pm-UniFont.pm
+    fix typo variable name $ident to $indent (indentation)
+   lib/PDF/Builder/Resource/UniFont.pm
+    [ref RT 126274/#96] (reporter: fcc_del) by adding missing indentation
+     value to recursive text() call (rather than reporter's more complex fix).
+
+   lib/PDF/Builder/Content.pm
+    [ref RT 98539] (need to verify flatness function) close. According to PDF 
+     spec, there's no real way to tell by eye whether it's within tolerance, and
+     results are unpredictable if you try to force visible line segments with
+     a higher tolerance. Also update POD to clarify the range of permissible
+     tolerance values, and silently clamp the input value to be in that range.
+
+3.010     2018-08-20
+
+   .gitignore, Changes, docs/buildDoc.pl, lib/PDF/Builder/Content.pm,
+     lib/PDF/Builder/Resource/XObject/Image/PNG.com
+    fix some minor glitches discovered in final testing
+
+   lib/PDF/Builder/Basic/PDF/Array.pm-Bool.pm-Dict.pm, 
+     lib/PDF/Builder/Content.pm, lib/PDF/Builder/Resource/ColorSpace/DeviceN.pm,
+     lib/PDF/Builder/Resource/XObject/Image/PNG.pm
+    fix some minor POD errors
+
+   Changes_2017, Changes-ver_2, DEPRECATED, KNOWN_INCOMP, LICENSE, PATENTS,
+     README, SUPPORT
+    move to new INFO/ directory, as things were starting to get a little
+     crowded in the root directory. Changes and MANIFEST are used by the 
+     system and can not be moved. MANIFEST updated to reflect new structure.
+
+   Changes, Changes_2017, MANIFEST
+     split up Change logs by year, to make them easier to handle.
+
+   docs/, docs/buildDoc.pl, MANIFEST
+     provide a tool and place to build the HTML pages from PODs in the
+     PDF::Builder module sources. The .html files are NOT shipped with either
+     the Perl build or on GitHub. 
+
+   lib/PDF/Builder/Resource/XObject/Image/PNG.pm
+     [ref RT 124349] code cleanup while looking at issue of why PNG RGBA
+     processing is so incredibly slow. Suspect that the heavy use of the
+     Perl vec() call may have something to do with it. To be continued...
+
+   lib/PDF/Builder/Content.pm, examples/Content.pl, examples/Bspline.pl, 
+     t/content.t, MANIFEST, examples.bat
+    [ref CTS 8] add "bspline" method to draw a smoothly continuous curve 
+     (using blended cubic Bezier curves) through all the given points. In 
+     addition, the first and/or last points may be specified as visible or 
+     invisible straight line or curved segments in order to constrain the 
+     spline's behavior at the endpoints.
+
+   lib/PDF/Builder/Content.pm, examples/Content.pl, t/content.t, DEPRECATED
+     [ref CTS 8] change "spline" method name to "qbspline", and deprecate 
+     "spline". This is to reflect that this method is actually a piecewise 
+     (non-continuous) series of quadratic Bezier curves, and not a true spline. 
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm, MANIFEST 
+     Add POD commentary on input and output PDF version supported.
+     Move POD function details out of Builder.pm to a lower level "Docs" 
+       routine, in order to reduce the POD clutter.
+
+   .perl-version, dist.ini.old, .travis.yml.HOLD, Makefile.PL, 
+     lib/PDF/Builder.pm, lib/PDF/Builder/UniWrap.pm, MANIFEST
+    change minimum Perl release level from 5.8.6 to Perl 5.16.0, per PDF::API2. 
+     The intent is to "support major Perl versions released in the past six 
+     years, plus one major release before that one. This should provide 
+     backward compatibility for the life of most LTS server distributions, 
+     while eliminating the need to troubleshoot warnings and bugs that only 
+     show up in increasingly-ancient versions of Perl." For this release, it 
+     means that the minimum supported Perl is 5.16 (first released 2012-05-20...
+     see https://www.cpan.org/src/ "First release in each branch of Perl" for 
+     dates, NOT "Latest releases in each branch of Perl"!). The next version 
+     bump (to 5.18) should be after 2019-05-18.
+
+   lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm
+     use confess (Carp.pm) rather than die, per PDF::API2.
+
+   examples/*, examples.bat
+     moved output PDFs for several examples from the current directory to the 
+     examples directory, in the same style as the rest of the example outputs. 
+     Note that contrib.bat still outputs in the current directory.
+
+   contrib/text2pdf.pl, examples/020_corefonts--021_psfonts--021_synfonts--
+       022_truefonts--022_truefonts_diacrits_utf8--023_cjkfonts--026_unifont2--
+       ShowFont.pl, examples/Windows/Win32.pm, lib/PDF/Builder.pm, 
+     lib/PDF/Builder/Annotation.pm--Content.pm--Lite.pm--Page.pm,
+     lib/PDF/Builder/Basic/PDF/Page.pm--Pages.pm, 
+     lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm,
+     lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm, t/author-critic.t--
+       author-pod-syntax.t--font-synfont.t--font-ttf.t--font-type1.t--
+       rt120397.t--rt120450.t
+    minor code styling changes to make perlcritic (level 5) happy. Some changes 
+     from PDF::API2 for level 4/5.
+
+   t/*, contrib/pdf-debug.pl--text2pdf.pl, examples/012_pages--021_psfonts--
+       030_colorspecs--BarCode.pl--Content.pl--ContentText.pl--ShowFont.pl, 
+     lib/PDF/Builder/Annotation.pm--Content.pm--Lite.pm--Matrix.pm--Outline.pm--
+       Page.pm--Resource.pm--UniWrap.pm--Util.pm, 
+     lib/PDF/Builder/Content/Text.pm, 
+     lib/PDF/Builder/Basic/PDF/Array.pm--Dict.pm--File.pm--Filter.pm--
+       Literal.pm--Null.pm--Objind.pm--Pages.pm--String.pm, 
+     lib/PDF/Builder/Basic/PDF/Filter/FlateDecode.pm--ASCII85Decode.pm, 
+     lib/PDF/Builder/Resource/CIDFont.pm--ColorSpace.pm--ExtGState.pm--
+       Glyphs.pm, 
+     lib/PDF/Builder/Resource/CIDFont/CJKFont.pm--TrueType.pm, 
+     lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm, 
+     lib/PDF/Builder/Resource/Font/CoreFont.pm, 
+     lib/PDF/Builder/Resource/XObject/Form/BarCode.pm, 
+     lib/PDF/Builder/Resource/XObject/Image/GIF.pm
+    minor code styling changes to make perlcritic (level 4) happy, including 
+     adding explicit "return" on all routines where missing, and not using 
+     variables $a and $b ("magic" according to perlcritic). Some changes 
+     suggested by PDF::API2 for this. There are many other level 4 errors yet 
+     to be gotten rid of: "Code before warnings" and "Warnings disabled at" due 
+     to use of "no warnings", "Close filehandles as soon as possible" due to 
+     too many lines between "open" and "close" calls, "Always unpack @_ first" 
+     (perlcritic doesn't like much about using the @_ array), "Subroutine name 
+     is a homonym for a builtin function" (e.g., our own "open" in contrast to 
+     CORE::open), "Symbols are exported by default" (doesn't like @EXPORT_OK 
+     usage). Most other perlcritic level 4 complaints were permanently fixed, 
+     but a few, such as "grep" and "map" formats, have been suppressed with 
+     "no critic" statements. Those might be revisited later.
+
+   pc.bat
+     add batch file to run perlcritic
+
+   lib/PDF/Builder/Page.pm
+     a few minor code styling changes, per PDF::API2. Most of the PDF::API2 
+     changes were already in PDF::Builder, and some I declined because the 
+     style was not consistent.
+
+   examples.bat, examples/024_bdffonts, examples/examples.output
+     some minor improvements to bitmapped (BDF) display output. Bitmap font
+     support is still _very_ buggy! Does anyone actually _use_ bitmapped fonts?
+
+   lib/PDF/Builder.pm 
+     stringify() make sure return value has at least empty string for content. 
+     Several cases of -unicodemap check for true, not 1. After PDF::API2 
+     changes for perlcritic.
+
+   lib/PDF/Builder/Content.pm
+     outobjdeep() check -docompress is true, not 1. bogen() explicitly default 
+     move, larger, reverse to "false" (0). isvirtual(), ' apiistext' check for 
+     true, not 1. After PDF::API2 changes for perlcritic.
+
+   lib/PDF/Builder/Basic/PDF/File.pm
+     add support for cross-reference streams (PDF 1.5) using 64-bit field 
+     widths, per PDF::API2 changes.
+
+   .travis.yml.HOLD, MANIFEST
+     name restore (from .tgravis.yml). May attempt at some point to make use of 
+     Travis for testing. Currently my system seems to not be supportive of
+     Travis modules, and I don't have a Travis account. I vaguely recall the
+     CPAN system trying to use .travis.yml in my first release, and requiring 
+     an immediate release update, so I'm not using the name .travis.yml for now.
+
+(see Changes_2017 for earlier changes)
+(see Changes-ver_2 for changes to PDF::API2 up through 2.033)

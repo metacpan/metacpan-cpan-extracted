@@ -1,0 +1,30 @@
+{
+   "charttitle" : "Threads.threadstorm(F)",
+   "modulename" : "Benchmark::Perl::Formance",
+   "chartlines" : [
+       {
+           "title" : "Threads.threadstorm(F)/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.Threads.threadstorm(F)" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Threads.threadstorm(F)/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.Threads.threadstorm(F)" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

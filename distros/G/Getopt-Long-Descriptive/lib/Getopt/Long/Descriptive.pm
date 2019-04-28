@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
-$Getopt::Long::Descriptive::VERSION = '0.103';
+$Getopt::Long::Descriptive::VERSION = '0.104';
 use Carp qw(carp croak);
 use File::Basename ();
 use Getopt::Long 2.33;
@@ -131,7 +131,9 @@ use Getopt::Long::Descriptive::Usage;
 #pod than causing a blank line to appear in the usage message.
 #pod
 #pod If the option specification contains only one element, it will be printed in
-#pod the usage message with no other effect.
+#pod the usage message with no other effect.  If the element is a reference, its
+#pod referent will be printed as-is.  Otherwise, it will be reformatted like other
+#pod text in the usage message.
 #pod
 #pod If the option specification contains a third element, it adds extra constraints
 #pod or modifiers to the interpretation and validation of the value.  These are the
@@ -696,7 +698,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 
@@ -816,7 +818,9 @@ If the option specification (arrayref) is empty, it will have no effect other
 than causing a blank line to appear in the usage message.
 
 If the option specification contains only one element, it will be printed in
-the usage message with no other effect.
+the usage message with no other effect.  If the element is a reference, its
+referent will be printed as-is.  Otherwise, it will be reformatted like other
+text in the usage message.
 
 If the option specification contains a third element, it adds extra constraints
 or modifiers to the interpretation and validation of the value.  These are the

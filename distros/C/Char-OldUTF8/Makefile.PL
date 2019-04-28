@@ -4,11 +4,11 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'             => 'OldUTF8',
-    'VERSION_FROM'     => 'OldUTF8.pm', # finds $VERSION
-    ($] >= 5.005 ?                   # Add these new keywords supported since 5.005
-      ('PREREQ_PM'     => {},        # e.g., Module::Name => 1.1
-       'ABSTRACT_FROM' => 'OldUTF8.pm', # retrieve abstract from module
-       'AUTHOR'        => 'ina <ina@cpan.org>',
+    'VERSION_FROM'     => 'lib/OldUTF8.pm', # finds $VERSION
+    ($] >= 5.005 ?                       # Add these new keywords supported since 5.005
+      ('PREREQ_PM'     => {},            # e.g., Module::Name => 1.1
+       'ABSTRACT_FROM' => 'lib/OldUTF8.pm', # retrieve abstract from module
+       'AUTHOR'        => 'ina <ina@cpan.org> in a CPAN',
        'test'          => { 'TESTS' => 't/*/*.t' },
       )
       :

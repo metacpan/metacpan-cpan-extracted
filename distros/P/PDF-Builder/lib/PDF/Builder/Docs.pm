@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.013'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.014'; # VERSION
+my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -26,7 +26,9 @@ PDF::Builder, its installer may download and install PDF::Builder automatically.
 
 B<2.> You want to write a Perl program that uses PDF::Builder functions. In 
 addition to installing PDF::Builder from CPAN, you will want documentation on
-it. Obtain a copy of the product from GitHub (https://github.com/PhilterPaper/Perl-PDF-Builder) or as a gzipped tar file from CPAN. This includes a utility to 
+it. Obtain a copy of the product from GitHub 
+(https://github.com/PhilterPaper/Perl-PDF-Builder) or as a gzipped tar file from CPAN. 
+This includes a utility to 
 build (from POD) a library of HTML documents, as well as examples (examples/ 
 directory) and contributed sample programs (contrib/ directory).
 
@@ -73,6 +75,13 @@ you specify that it is to use the old, pure Perl library. Using the new library
 will give you improved speed, the ability to use 16 bit samples, and the 
 ability to read interlaced PNG files. See resolved bug report RT 124349, as well
 as C<image_png>, for more information.
+
+Note that the installation process I<may> attempt to install these libraries
+automatically. If it does, and fails, PDF::Builder will still be operable (just
+some advanced features may be missing). If any of these libraries are installed
+but you do not plan to use them, feel free to remove them to free up space. On
+the other hand, if they are not automatically installed and you wish to use
+them, you will have to manually initiate the installation of such modules.
 
 =head2 Strings (Character Text)
 
@@ -156,6 +165,305 @@ By the way, it is recommended that you be using I<at least> Perl 5.10 if you
 are going to be using any non-ASCII characters. Perl 5.8 may be a little
 unpredictable in handling such text.
 
+=head2 Rendering Order
+
+For better or worse, for compatibility purposes, PDF::Builder continues the 
+same rendering model as used by PDF::API2 (and possibly its predecessors). That 
+is, all graphics I<for one graphics object> are put into one record, and all 
+text output I<for one text object> goes into another 
+record. Which one is output first, is whichever is declared first. This can 
+lead to unexpected results, where items are rendered in (apparently) the 
+wrong order. That is, text and graphics items are not necessarily output 
+(rendered) in the same order as they were created in code. Two items in the 
+same object (e.g., C<$text>) I<will> be rendered in the same order as they were 
+coded, but items from different objects may not be rendered in the expected 
+order. The following example (source code and annotated PDF excerpts) will 
+hopefully illustrate the issue:
+
+ use strict;
+ use warnings;
+ use PDF::Builder;
+
+ # demonstrate text and graphics object order
+ # 
+ my $fname = "objorder";
+
+ my $paper_size = "Letter";
+
+ # see the text and graphics stream contents
+ my $pdf = PDF::Builder->new(-compress => 'none');
+ $pdf->mediabox($paper_size);
+ my $page = $pdf->page();
+ # adjust path for your operating system
+ my $fontTR = $pdf->ttfont('C:\\Windows\\Fonts\\timesbd.ttf');
+
+For the first group, you might expect the "under" line to be output, then the
+filled circle (disc) partly covering it, then the "over" line covering the
+disc, and finally a filled rectangle (bar) over both lines. What actually
+happened is that the C<$grfx> graphics object was declared first, so everything
+in that object (the disc and bar) is output first, and the text object C<$text> 
+(both lines) comes afterwards. The result is that the text lines are on I<top> 
+of the graphics drawings.
+ 
+ # ----------------------------
+ # 1. text, orange ball over, text over, bar over
+
+ my $grfx1 = $page->gfx();
+ my $text1 = $page->text();
+ $text1->font($fontTR, 20);  # 20 pt Times Roman bold
+
+ $text1->fillcolor('black');
+ $grfx1->strokecolor('blue');
+ $grfx1->fillcolor('orange');
+
+ $text1->translate(50,700);
+ $text1->text_left("This text should be under everything.");
+
+ $grfx1->circle(100,690, 30);
+ $grfx1->fillstroke();
+
+ $text1->translate(50,670);
+ $text1->text_left("This text should be over the ball and under the bar.");
+
+ $grfx1->rect(160,660, 20,70);
+ $grfx1->fillstroke();
+
+ % ---------------- group 1: define graphics object first, then text
+ 11 0 obj << /Length 690 >> stream   % obj 11 is graphics for (1)
+  0 0 1 RG    % stroke blue
+ 1 0.647059 0 rg   % fill orange
+ 130 690 m ... c h B   % draw and fill circle
+ 160 660 20 70 re B   % draw and fill bar
+ endstream endobj
+
+ 12 0 obj << /Length 438 >> stream   % obj 12 is text for (1)
+   BT  
+ /TiCBA 20 Tf   % Times Roman Bold 20pt
+ 0 0 0 rg   % fill black
+ 1 0 0 1 50 700 Tm   % position text
+ <0037 ... 0011> Tj   % "under" line
+ 1 0 0 1 50 670 Tm   % position text
+ <0037 ... 0011> Tj   % "over" line
+   ET   
+ endstream endobj
+
+The second group is the same as the first, with the only difference being
+that the text object was declared first, and then the graphics object. The
+result is that the two text lines are rendered first, and then the disc and
+bar are drawn I<over> them.
+
+ # ----------------------------
+ # 2. (1) again, with graphics and text order reversed
+
+ my $text2 = $page->text();
+ my $grfx2 = $page->gfx();
+ $text2->font($fontTR, 20);  # 20 pt Times Roman bold
+
+ $text2->fillcolor('black');
+ $grfx2->strokecolor('blue');
+ $grfx2->fillcolor('orange');
+
+ $text2->translate(50,600);
+ $text2->text_left("This text should be under everything.");
+
+ $grfx2->circle(100,590, 30);
+ $grfx2->fillstroke();
+
+ $text2->translate(50,570);
+ $text2->text_left("This text should be over the ball and under the bar.");
+
+ $grfx2->rect(160,560, 20,70);
+ $grfx2->fillstroke();
+
+ % ---------------- group 2: define text object first, then graphics
+ 13 0 obj << /Length 438 >> stream    % obj 13 is text for (2)
+   BT  
+ /TiCBA 20 Tf   % Times Roman Bold 20pt
+ 0 0 0 rg   % fill black
+ 1 0 0 1 50 600 Tm   % position text
+ <0037 ... 0011> Tj   % "under" line
+ 1 0 0 1 50 570 Tm   % position text
+ <0037 ... 0011> Tj   % "over" line
+   ET   
+ endstream endobj
+
+ 14 0 obj << /Length 690 >> stream   % obj 14 is graphics for (2)
+  0 0 1 RG   % stroke blue
+ 1 0.647059 0 rg   % fill orange
+ 130 590 m ... h B   % draw and fill circle
+ 160 560 20 70 re B   % draw and fill bar
+ endstream endobj
+
+The third group defines two text and two graphics objects, in the order that
+they are expected in. The "under" text line is output first, then the orange
+disc graphics is output, partly covering the text. The "over" text line is now
+output -- it's actually I<over> the disc, but is orange because the previous
+object stream (first graphics object) left the fill color (also used for text) 
+as orange, because we didn't explicitly set the fill color before outputting 
+the second text line. This is not "inheritance" so much as it is whatever the 
+graphics (drawing) state (used for both "graphics" and "text") is left in at 
+the end of one object, it's the state at the beginning of the next object. 
+If you wish to control this, consider surrounding the graphics or text calls
+with C<save()> and C<restore()> calls to save and restore (push and pop) the
+graphics state to what it was at the C<save()>. Finally, the bar is drawn over 
+everything.
+
+ # ----------------------------
+ # 3. (2) again, with two graphics and two text objects
+
+ my $text3 = $page->text();
+ my $grfx3 = $page->gfx();
+ $text3->font($fontTR, 20);  # 20 pt Times Roman bold
+ my $text4 = $page->text();
+ my $grfx4 = $page->gfx();
+ $text4->font($fontTR, 20);  # 20 pt Times Roman bold
+
+ $text3->fillcolor('black');
+ $grfx3->strokecolor('blue');
+ $grfx3->fillcolor('orange');
+ # $text4->fillcolor('yellow');
+ # $grfx4->strokecolor('red');
+ # $grfx4->fillcolor('purple');
+
+ $text3->translate(50,500);
+ $text3->text_left("This text should be under everything.");
+
+ $grfx3->circle(100,490, 30);
+ $grfx3->fillstroke();
+
+ $text4->translate(50,470);
+ $text4->text_left("This text should be over the ball and under the bar.");
+
+ $grfx4->rect(160,460, 20,70);
+ $grfx4->fillstroke();
+
+ % ---------------- group 3: define text1, graphics1, text2, graphics2
+ 15 0 obj << /Length 206 >> stream   % obj 15 is text1 for (3)
+   BT  
+ /TiCBA 20 Tf   % Times Roman Bold 20pt
+ 0 0 0 rg  % fill black
+ 1 0 0 1 50 500 Tm   % position text
+ <0037 ... 0011> Tj   % "under" line
+   ET   
+ endstream endobj
+
+ 16 0 obj << /Length 671 >> stream   % obj 16 is graphics1 for (3) circle
+  0 0 1 RG   % stroke blue
+ 1 0.647059 0 rg   % fill orange
+ 130 490 m ... h B   % draw and fill circle
+ endstream endobj
+
+ 17 0 obj << /Length 257 >> stream   % obj 17 is text2 for (3)
+   BT  
+ /TiCBA 20 Tf   % Times Roman Bold 20pt
+ 1 0 0 1 50 470 Tm   % position text
+ <0037 ... 0011> Tj   % "over" line
+   ET   
+ endstream endobj
+
+ 18 0 obj << /Length 20 >> stream   % obj 18 is graphics for (3) bar
+  160 460 20 70 re B   % draw and fill bar
+ endstream endobj
+
+The fourth group is the same as the third, except that we define the fill color
+for the text in the second line. This makes it clear that the "over" line (in
+yellow) was written I<after> the orange disc, and still before the bar.
+
+ # ----------------------------
+ # 4. (3) again, a new set of colors for second group
+
+ my $text3 = $page->text();
+ my $grfx3 = $page->gfx();
+ $text3->font($fontTR, 20);  # 20 pt Times Roman bold
+ my $text4 = $page->text();
+ my $grfx4 = $page->gfx();
+ $text4->font($fontTR, 20);  # 20 pt Times Roman bold
+
+ $text3->fillcolor('black');
+ $grfx3->strokecolor('blue');
+ $grfx3->fillcolor('orange');
+ $text4->fillcolor('yellow');
+ $grfx4->strokecolor('red');
+ $grfx4->fillcolor('purple');
+
+ $text3->translate(50,400);
+ $text3->text_left("This text should be under everything.");
+
+ $grfx3->circle(100,390, 30);
+ $grfx3->fillstroke();
+
+ $text4->translate(50,370);
+ $text4->text_left("This text should be over the ball and under the bar.");
+
+ $grfx4->rect(160,360, 20,70);
+ $grfx4->fillstroke();
+
+ % ---------------- group 4: define text1, graphics1, text2, graphics2 with colors for 2
+ 19 0 obj << /Length 206 >> stream   % obj 19 is text1 for (4)
+   BT  
+ /TiCBA 20 Tf   % Times Roman Bold 20pt
+ 0 0 0 rg  % fill black
+ 1 0 0 1 50 400 Tm   % position text
+ <0037 ... 0011> Tj   % "under" line
+   ET   
+ endstream endobj
+
+ 20 0 obj << /Length 671 >> stream   % obj 20 is graphics1 for (4) circle
+  0 0 1 RG   % stroke blue
+ 1 0.647059 0 rg   % fill orange
+ 130 390 m ... h B   % draw and fill circle
+ endstream endobj
+
+ 21 0 obj << /Length 266 >> stream   % obj 21 is text2 for (4)
+   BT  
+ /TiCBA 20 Tf   % Times Roman Bold 20pt
+ 1 1 0 rg   % fill yellow
+ 1 0 0 1 50 370 Tm   % position text
+ <0037 ... 0011> Tj   % "over" line
+   ET   
+ endstream endobj
+
+ 22 0 obj << /Length 52 >> stream   % obj 22 is graphics for (4) bar
+  1 0 0 RG   % stroke red
+ 0.498039 0 0.498039 rg   % fill purple
+ 160 360 20 70 re B   % draw and fill rectangle (bar)
+ endstream endobj
+
+ # ----------------------------
+ $pdf->saveas("$fname.pdf");
+
+The separation of text and graphics means that only some text methods are
+available in a graphics object, and only some graphics methods are available
+in a text object. There is much overlap, but they differ. There's really no
+reason the code couldn't have been written (in PDF::API2, or earlier) as
+outputting to a single object, which would keep everything in the same order as
+the method calls. An advantage would be less object and stream overhead in the
+PDF file. The only drawback might be that an object might more easily 
+overflow and require splitting into multiple objects, but that should be rare.
+
+You should always be able to manually split an object by simply ending output
+to the first object, and picking up with output to the second object, I<so long
+as it was created immediately after the first object.> The graphics state at
+the end of the first object should be the initial state at the beginning of the
+second object. B<However,> use caution when dealing with text objects -- the
+PDF specification states that the Text matrices are I<not> carried over from
+one object to the next (B<BT> resets them), so you may need to reset some
+settings.
+
+ $grfx1 = $page->gfx();
+ $grfx2 = $page->gfx();
+ # write a huge amount of stuff to $grfx1
+ # write a huge amount of stuff to $grfx2, picking up where $grfx1 left off
+
+In any case, now that you understand the rendering order and how the order
+of object declarations affects it, how text and graphics are drawn can now be
+completely controlled as desired. There is really no need to add another "both"
+type object that will handle all graphics and text objects, as that would
+probably be a major code bloat for very little benefit. However, it could be
+considered in the future if there is a demonstrated need for it, such as 
+serious PDF file size bloat due to the extra object overhead when interleaving
+text and graphics output.
+
 =head2 PDF Versions Supported
 
 When creating a PDF file using the functions in PDF::Builder, the output is
@@ -199,10 +507,19 @@ Perry's intent is to keep all internal methods as upwardly compatible with
 PDF::API2 as possible, although it is likely that there will be some drift
 (incompatibilities) over time. At least initially, any program written based on 
 PDF::API2 should be convertable to PDF::Builder simply by changing "API2" 
-anywhere it occurs to "Builder". See the KNOWN_INCOMP known incompatibilities
-file for further information.
+anywhere it occurs to "Builder". See the INFO/KNOWN_INCOMP known 
+incompatibilities file for further information.
 
 =head1 DETAILED NOTES ON METHODS
+
+=head2 After saving a file...
+
+Note that a PDF object such as C<$pdf> cannot continue to be used after saving
+an output PDF file or string with $pdf->C<save()>, C<saveas()>, or 
+C<stringify()>. There is some cleanup and other operations done internally 
+which make the object unusable for further operations. You will likely receive
+an error message about B<can't call method new_obj on an undefined value> if
+you try to keep using a PDF object.
 
 =head2 Preferences - set user display preferences
 
@@ -512,12 +829,37 @@ Enables kerning if data is available.
 
 =back
 
-B<Note:> even though these are called "core" fonts, they are I<not> shipped
+B<Notes:> 
+
+Even though these are called "core" fonts, they are I<not> shipped
 with PDF::Builder, but are expected to be found on the machine with the PDF
 reader. Most core fonts are installed with a PDF reader, and thus are not
 coordinated with PDF::Builder. PDF::Builder I<does> ship with core font 
 I<metrics> files (width, glyph names, etc.), but these cannot be guaranteed to 
 be in sync with what the PDF reader has installed!
+
+There are some 14 core fonts (regular, italic, bold, and bold-italic for
+Times [serif], Helvetica [sans serif], Courier [fixed pitch]; plus two symbol 
+fonts) that are supposed to be available on any PDF reader, B<although other 
+fonts with very similar metrics are often substituted.> You should I<not> count 
+on any of the 15 Windows core fonts (Bank Gothic, Georgia, Trebuchet, Verdana, 
+and two more symbol fonts) being present, especially on Linux, Mac, or other 
+non-Windows platforms. Be aware if you are producing PDFs to be read on a
+variety of different systems!
+
+If you want to ensure the widest portability for a PDF document you produce,
+you should consider using TTF fonts (instead of core fonts) and embedding them 
+in the document. This ensures that there will be no substitutions, that all
+metrics are known and match the glyphs, UTF-8 encoding can be used, and 
+that the glyphs I<will> be available on the reader's machine. At least on
+Windows platforms, most of the fonts are TTF anyway, which are used behind the
+scenes for "core" fonts, while missing most of the capabilities of TTF (now
+or possibly later in PDF::Builder) such as embedding, ligatures, UTF-8, etc.
+The downside is, obviously, that the resulting PDF file will be larger because
+it includes the font(s). There I<might> also be copyright or licensing issues 
+with the redistribution of font files in this manner (you might want to check,
+before widely distributing a PDF document with embedded fonts, although many
+I<do> permit the part of the font used, to be embedded.).
 
 See also L<PDF::Builder::Resource::Font::CoreFont>.
 
@@ -628,7 +970,42 @@ Enables kerning if data is available.
 
 =item -noembed
 
-Disables embedding of the font file.
+Disables embedding of the font file. B<Note that this is potentially hazardous,
+as the glyphs provided on the PDF reader machine may not match what was used on
+the PDF writer machine (the one running PDF::Builder)!> If you know I<for sure> that all PDF readers will be using the same TTF or OTF file you're using with
+PDF::Builder; not embedding the font may be acceptable, in return for a smaller
+PDF file size.
+
+=item -debug
+
+If set to 1 (default is 0), diagnostic information is output about the CMap
+processing.
+
+=item -usecmf
+
+If set to 1 (default is 0), the first priority is to make use of one of the
+four C<.cmap> files for CJK fonts. This is the I<old> way of processing TTF
+files. If, after all is said and done, a working I<internal> CMap hasn't been
+found (for -usecmf=>0), C<ttfont()> will fall back to using a C<.cmap> file
+if possible.
+
+=item -cmaps
+
+This flag may be set to a string listing the Platform/Encoding pairs to look 
+for of any internal CMaps in the font file, in the desired order (highest 
+priority first). If one list (comma and/or space-separated pairs) is given, it 
+is used for both Windows and non-Windows platforms (on which PDF::Builder is 
+running, I<not> the PDF reader's). Two lists, separated by a semicolon ; may be 
+given, with the first being used for a Windows platform and the second for 
+non-Windows. The default list is C<0/6 3/10 0/4 3/1 0/3; 0/6 0/4 3/10 0/3 3/1>. 
+Finally, instead of a P/E list, a string C<find_ms> may be given to tell it to 
+simply call the Font::TTF C<find_ms()> method to find a (preferably Windows) 
+internal CMap. C<-cmaps> set to 'find_ms' would emulate the I<old> way of 
+looking for CMaps. Symbol fonts (3/0) always use find_ms(), and the new default 
+lookup is (if C<.cmap> isn't used, see C<-usecmf>) to try to get a match with 
+the default list for the appropriate OS. If none can be found, find_ms() is 
+tried, and as last resort use the C<.cmap> (if available), even if C<-usecmf> 
+is not 1.
 
 =back
 
@@ -664,25 +1041,32 @@ readers and other aids to disabled users from working correctly!
 B<Examples:>
 
     $cf  = $pdf->corefont('Times-Roman', -encode => 'latin1');
-    $sf  = $pdf->synfont($cf, -slant => 0.85);  # compressed 85%
-    $sfb = $pdf->synfont($cf, -bold => 1);      # embolden by 10em
-    $sfi = $pdf->synfont($cf, -oblique => -12); # italic at -12 degrees
+    $sf  = $pdf->synfont($cf, -condense => 0.85);   # compressed 85%
+    $sfb = $pdf->synfont($cf, -bold => 1);          # embolden by 10em
+    $sfi = $pdf->synfont($cf, -oblique => -12);     # italic at -12 degrees
 
 Valid %options are:
 
 =over
 
+=item -condense
+
+Character width condense/expand factor (0.1-0.9 = condense, 1 = normal/default, 
+1.1+ = expand). It is the multiplier to apply to the width of each character.
+
 =item -slant
 
-Slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).
+B<DEPRECATED>. It is the old name for C<-condense>, and will eventually be
+removed. Use C<-condense> instead.
 
 =item -oblique
 
-Italic angle (+/-)
+Italic angle (+/- degrees, default 0), sets B<skew> of character box.
 
 =item -bold
 
-Emboldening factor (0.1+, bold = 1, heavy = 2, ...)
+Emboldening factor (0.1+, bold = 1, heavy = 2, ...), additional thickness to
+draw outline of character (with a heavier B<line width>) before filling.
 
 =item -space
 
@@ -690,11 +1074,20 @@ Additional character spacing in ems (0-1000)
 
 =item -caps
 
-0 for normal text, 1 for small caps. Note that not all lower case letters
-appear to have small caps equivalents defined for them. These include, but are
-not limited to, 'n U+0149, fi ligature U+FB01, fl ligature U+FB02, German eszet
-(sharp s) U+00DF, and doubtless others. In such cases, you may want to consider
-replacing these ligatures with separate characters: '+n, f+i, f+l, s+s, etc.
+0 for normal text, 1 for small caps. 
+Implemented by asking the font what the uppercased translation (single 
+character) is for a given character, and outputting it at 80% height and
+88% width (heavier vertical stems are better looking than a straight 80%
+scale).
+
+Note that only lower case letters which appear in the "standard" font (plane 0
+for core fonts and PS fonts) will be small-capped. This may include eszett
+(German sharp s), which becomes SS, and dotless i and j which become I and J
+respectively. There are many other accented Latin alphabet letters which I<may> 
+show up in planes 1 and higher. Ligatures (e.g., ij and ffl) do not have
+uppercase equivalents, nor does a long s. If you have text which includes such
+characters, you may want to consider preprocessing it to replace them with
+Latin character expansions (e.g., i+j and f+f+l) before small-capping.
 
 =back
 

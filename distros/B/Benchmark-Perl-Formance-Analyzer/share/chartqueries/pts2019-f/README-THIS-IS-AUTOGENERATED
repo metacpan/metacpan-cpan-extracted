@@ -1,0 +1,11 @@
+The *.json files in here are auto.generated via commands like this
+
+  ./create-query-files
+  PERLFORMANCE_QUALID=pts2019 ./create-query-files
+  PERLFORMANCE_QUALID=pts2019 METRICLIST=METRICLIST-FASTMODE ./create-query-files
+
+so do not edit them by hand but edit the input files
+
+  TEMPLATE
+  METRICLIST
+  METRICLIST-FASTMODE

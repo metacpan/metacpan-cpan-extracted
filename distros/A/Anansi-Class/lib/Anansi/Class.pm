@@ -39,7 +39,7 @@ L<Anansi::ObjectManager>.
 =cut
 
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Anansi::ObjectManager;
 
@@ -100,6 +100,41 @@ A virtual method.  Called just prior to module instance object destruction.
 
 sub finalise {
     my ($self) = @_;
+}
+
+
+=head2 identification
+
+=over 4
+
+=item self I<(Blessed Hash, Required)>
+
+An object of this namespace.
+
+=back
+
+Returns this object's unique identification or B<undef> on error.
+
+=cut
+
+
+sub identification {
+    my ($self) = @_;
+    return if(ref($self) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
+    my $result;
+    eval {
+        $result = $self->isa('Anansi::Class');
+    };
+    return if($@);
+    return if(!$result);
+    return if(!defined($self->{Anansi}));
+    return if(ref($self->{Anansi}) !~ /^HASH$/i);
+    return if(!defined(${$self->{Anansi}}{ObjectManager}));
+    return if(ref(${$self->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+    return if(!defined(${${$self->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+    return if(ref(${${$self->{Anansi}}{ObjectManager}}{IDENTIFICATION}) !~ /^$/);
+    return if(${${$self->{Anansi}}{ObjectManager}}{IDENTIFICATION} =~ /^\s*$/);
+    return ${${$self->{Anansi}}{ObjectManager}}{IDENTIFICATION};
 }
 
 
@@ -207,6 +242,28 @@ sub initialise {
 }
 
 
+=head2 namespace
+
+=over 4
+
+=item self I<(Blessed Hash, Required)>
+
+An object of this namespace.
+
+=back
+
+Returns this object's namespace or B<undef> on error.
+
+=cut
+
+
+sub namespace {
+    my ($self) = @_;
+    return if(ref($self) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
+    return ref($self);
+}
+
+
 =head2 new
 
     my $object = Anansi::Example->new();
@@ -305,7 +362,9 @@ sub used {
     my $objectManager = Anansi::ObjectManager->new();
     foreach my $key (@parameters) {
         next if(!defined($self->{$key}));
-        next if(!defined($self->{$key}->{IDENTIFICATION}));
+        next if(!defined($self->{$key}->{Anansi}));
+        next if(!defined($self->{$key}->{Anansi}->{ObjectManager}));
+        next if(!defined($self->{$key}->{Anansi}->{ObjectManager}->{IDENTIFICATION}));
         $objectManager->obsolete(
             USER => $self,
             USES => $self->{$key},
@@ -353,7 +412,9 @@ sub uses {
         USES => [values %parameters],
     );
     while(my ($key, $value) = each(%parameters)) {
-        next if(!defined($value->{IDENTIFICATION}));
+        next if(!defined($value->{Anansi}));
+        next if(!defined($value->{Anansi}->{ObjectManager}));
+        next if(!defined($value->{Anansi}->{ObjectManager}->{IDENTIFICATION}));
         $self->{$key} = $value if(!defined($self->{KEY}));
     }
 }
@@ -420,9 +481,11 @@ sub using {
     my %names;
     foreach my $name (keys(%{$self})) {
         next if(ref($self->{$name}) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
-        next if(!defined(${$self->{$name}}{IDENTIFICATION}));
-        next if(!defined($identifiers{${$self->{$name}}{IDENTIFICATION}}));
-        $names{$name} = ${$self->{$name}}{IDENTIFICATION};
+        next if(!defined(${$self->{$name}}{Anansi}));
+        next if(!defined(${${$self->{$name}}{Anansi}}{ObjectManager}));
+        next if(!defined(${${${$self->{$name}}{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+        next if(!defined($identifiers{${${${$self->{$name}}{Anansi}}{ObjectManager}}{IDENTIFICATION}}));
+        $names{$name} = ${${${$self->{$name}}{Anansi}}{ObjectManager}}{IDENTIFICATION};
     }
     if(0 == scalar(@parameters)) {
         return [(keys(%names))];
@@ -455,3 +518,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

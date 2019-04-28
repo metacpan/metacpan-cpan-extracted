@@ -30,6 +30,7 @@ t/08await-cancel.t
 t/10pad.t
 t/11contexts.t
 t/12closure.t
+t/13regexp.t
 t/20context-block.t
 t/21context-while.t
 t/22context-foreach.t

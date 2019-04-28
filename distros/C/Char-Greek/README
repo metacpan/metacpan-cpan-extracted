@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   Greek::eval
-    length          vs   Greek::length
-    substr          vs   Greek::substr
-    ord             vs   Greek::ord
-    reverse         vs   Greek::reverse
-    getc            vs   Greek::getc
-    index           vs   Greek::index
-    rindex          vs   Greek::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  Greek::eval
+    length          vs.  Greek::length
+    substr          vs.  Greek::substr
+    ord             vs.  Greek::ord
+    reverse         vs.  Greek::reverse
+    getc            vs.  Greek::getc
+    index           vs.  Greek::index
+    rindex          vs.  Greek::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

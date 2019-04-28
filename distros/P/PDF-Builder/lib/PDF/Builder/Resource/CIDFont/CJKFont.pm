@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.013'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.014'; # VERSION
+my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -73,12 +73,13 @@ sub _look_for_font {
     }
 }
 
+# identical routine in Resource/CIDFont/TrueType/FontFile.pm
 sub _look_for_cmap {
     my $fname = lc(shift);
 
     $fname =~ s/[^a-z0-9]+//gi;
     return ({%{$cmap->{$fname}}}) if defined $cmap->{$fname};
-    eval "require \"PDF/Builder/Resource/CIDFont/CMap/$fname.cmap\""; ## no critic
+    eval "require 'PDF/Builder/Resource/CIDFont/CMap/$fname.cmap'"; ## no critic
     unless ($@) {
         return({%{$cmap->{$fname}}});
     } else {
@@ -86,6 +87,8 @@ sub _look_for_cmap {
     }
 }
 
+# compare to TrueType/FontFile.pm: .data and .cmap files are apparently
+# required when using cjkfont(), so no looking at internal cmap tables
 sub new {
     my ($class, $pdf, $name, @opts) = @_;
 

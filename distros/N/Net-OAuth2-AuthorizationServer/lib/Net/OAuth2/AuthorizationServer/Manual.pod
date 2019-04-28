@@ -99,6 +99,16 @@ This is optional. If set JWTs will be returned for the auth codes, access, and
 refresh tokens. JWTs allow you to validate tokens without doing a db lookup, but
 there are certain considerations (see L<CLIENT SECRET, TOKEN SECURITY, AND JWT>)
 
+=head2 jwt_algorithm
+
+This is optional, and sets the algorithm used in the creation of JWTs (see
+L<CLIENT SECRET, TOKEN SECURITY, AND JWT>)
+
+=head2 jwt_encoding
+
+This is optional, and sets the encoding used in the creation of JWTs (see
+L<CLIENT SECRET, TOKEN SECURITY, AND JWT>)
+
 =head2 access_token_ttl
 
 The validity period of the generated access token in seconds. Defaults to 3600
@@ -618,10 +628,14 @@ random_string function. These are then base64 encoded to make sure there are no
 problems with URL encoding.
 
 If jwt_secret is set, which should be a strong secret, the tokens are created
-with the L<Mojo::JWT> module and each token should contain a jti using a call
+with the L<Crypt::JWT> module and each token should contain a jti using a call
 to Crypt::PRNG's random_string function. You can decode the tokens, typically
-with L<Mojo::JWT>, to get the information about the client and scopes - but you
+with L<Crypt::JWT>, to get the information about the client and scopes - but you
 should not trust the token unless the signature matches.
+
+If you wish to encrypt JWT, that is to say generate JWE tokens, you can set
+the jwt_encoding and jwt_algorithm attributes, these map respectively to
+the L<Crypt::JWT> enc and alg attributes - see that module's POD for more info
 
 As the JWT contains the client information and scopes you can, in theory, use
 this information to validate an auth code / access token / refresh token without
@@ -633,7 +647,7 @@ some shared store to revoke tokens, but using the jwt_secret config setting mean
 you can simplify parts of the process as the JWT will contain the client, user,
 and scope information (JWTs are also easy to debug: L<http://jwt.io>).
 
-When using JWTs expiry dates will be automatically checked (L<Mojo::JWT> has this
+When using JWTs expiry dates will be automatically checked (L<Crypt::JWT> has this
 built in to the decoding). The claims hash looks something like this:
 
   {

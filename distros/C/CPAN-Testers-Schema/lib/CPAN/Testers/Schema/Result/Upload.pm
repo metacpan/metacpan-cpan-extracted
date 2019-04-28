@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Upload;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 # ABSTRACT: Information about uploads to CPAN
 
 #pod =head1 SYNOPSIS
@@ -202,7 +202,7 @@ CPAN::Testers::Schema::Result::Upload - Information about uploads to CPAN
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -296,9 +296,19 @@ Inflated from a UNIX epoch into a L<DateTime> object.
 
 L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

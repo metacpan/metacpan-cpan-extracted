@@ -22,34 +22,31 @@ tested against 3.004 July 2017
 
 =========== broken:
 
- 024_bdffonts    this appears to want one Bitmap Distribution Format (.bdf).
-                 So far not good results... one character per page (good 
+ 024_bdffonts    Formerly named 024_bmpfonts.
+
+                 This wants one Bitmap Distribution Format (.bdf) for input.
+                 So far, not great results... one character per page (a good 
                  bitmap), then the full chart only shows bounding boxes for 
-                 characters, and other problems. No idea what width of character
-                 signifies. I have used .bdf files from Chris Cannan's 1998 
-                 "codec" distribution. Note that this example used to be named 
-                 024_bmpfonts. Much work remains to be done, including fixes 
-                 to bdffonts handling. Does anyone still use BDF fonts? If not,
-                 perhaps we should just get rid of support for them.
+                 characters, and other problems. No idea what the "width of 
+                 character" signifies. I have used .bdf files from Chris 
+                 Cannan's 1998 "codec" distribution -- they might not be 
+                 totally good. 
 
- 025_unifonts    get one message "Malformed UTF-8 character (fatal) at 
-                 025_unifonts line 95, <DATA> line 1." It seems to be reading 
-                 one of the font files in a list, and getting this error. No 
-                 output is produced. This appears to be a regular expression 
-                 substitution to remove CR and LF characters from the line 
-                 just read in from the file. The bad character is x93, 
-                 apparently from one of the Western fonts. The error happens on 
-                 KozGo-Italic + Georgia-Italic, first of 45 loops. All the 
-                 Western fonts have a U+0093 opening double quotation mark, 
-                 which is a Smart Quotes-like extension to true Latin-1. At 
-                 this point, I have no idea what was intended or what to try to 
-                 fix.
+                 Much work remains to be done, including fixes to bdffonts 
+                 handling. Does anyone still use BDF fonts? If not, perhaps we 
+                 should just get rid of support for them. Considering how many 
+                 "good" fonts there are out there (just TrueType alone, not to 
+                 mention Type 1/PS), the only use I can think of for BDF fonts 
+                 is for novelty or decorative effect, where you want a blocky, 
+                 crude letter or symbol. You certainly wouldn't want to read a 
+                 page of this stuff!
 
-                 U+0093 is normally (in Unicode) a control character (STS =
-                 Set Transmit State), while Smart Quotes x93 is an opening
-                 (left) double quote mark, U+201C. Someone needs to look at
-                 whether the supposed UTF-8 text being printed simply needs to
-                 be updated from 0093 to 201C, to make it real UTF-8.
+BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
+                 barcodes). It appears to mostly be there, but some heavy bars 
+                 seem to be merging into their neighbors, and there may be 
+                 other problems. My advice is to use the barcode functions 
+                 in production code ONLY WITH EXTREME CAUTION AND TESTING FOR 
+                 SUITABILITY, until they have been better tested and verified.
 
 =========== successful (produced reasonable looking PDF, and no messages):
 
@@ -82,7 +79,7 @@ tested against 3.004 July 2017
 
  021_synfonts    .75 slant, 12 oblique, 4 bold, and small caps variants (where
                  available) of the given core fonts, as available, for 29 core 
-                 fonts.
+                 fonts. Also, a sample page with combined variants.
 
  022_truefonts   Given one or more TrueType (.ttf) font FILES on the command
                  line, a PDF showing the characters (256 per indicated SINGLE
@@ -114,9 +111,13 @@ tested against 3.004 July 2017
                  KozMin, MyungJo) appears to be using the fixed pitch variants
                  of Latin alphabet, rather than proportional.
 
+ 025_unifonts    produces a PDF with a segment of an attached PDF-J file
+                 (SJIS encoding) rendered in four different Western+CJK font 
+                 combinations.
+
  026_unifont2    a selection of Unicode alphabets and symbols, in several
                  font faces (Helvetica Bold, Times Roman, symbols). Note that
-                 glyph name is printed at an angle, due the the length.
+                 the glyph name is printed at an angle, due to its length.
 
  030_colorspecs  displays 16 pages each of RGB, RGB Gamma 2.2, CMYK, and L*a*b
                  colorspaces, and almost 3 pages of named colors. 16 pages of
@@ -151,20 +152,15 @@ tested against 3.004 July 2017
  060_transparency  show writing opaque and translucent text by two methods.
 
 =========== other example material:
-Note that these PDFs are in the directory you ran the programs from, not the
-examples/ directory.
 
 Content.pl       demonstrate Content.pm graphics and text calls, 5 pages.
 
 ContentText.pl   demonstrate Content-related text call, 10 pages.
 
-BarCode.pl       demonstrate the bar code library, 1 page.
-  mostly looks OK, but suspect some heavy bars are merging into their neighbors
-  and there may be other problems, so my advice is NOT to use the barcodes in
-  production code until they have been tested and verified.
-
 ShowFont.pl      list glyphs in a font. output varies by font, encoding(s),
                  and font type.
+
+Bspline.pl       show off splines which connect all given points.
 
 Windows/
   027_winfont  demo Windows registry access

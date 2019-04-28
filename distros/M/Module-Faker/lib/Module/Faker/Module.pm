@@ -1,6 +1,6 @@
 package Module::Faker::Module;
 # ABSTRACT: a faked module
-$Module::Faker::Module::VERSION = '0.020';
+$Module::Faker::Module::VERSION = '0.022';
 use Moose;
 with 'Module::Faker::Appendix';
 
@@ -24,15 +24,15 @@ sub as_string {
 
   my $string = '';
 
-  for my $pkg ($self->packages) {
-    $string .= sprintf "package %s;\n", $pkg->name;
-    $string .= sprintf "our \$VERSION = '%s';\n", $pkg->version
-      if defined $pkg->version;
+  my @packages = $self->packages;
 
-    if (defined $pkg->abstract) {
-      $string .= sprintf "\n=head1 NAME\n\n%s - %s\n\n=cut\n\n",
-        $pkg->name, $pkg->abstract
-    }
+  for ($packages[0]) {
+    $string .= sprintf "\n=head1 NAME\n\n%s - %s\n\n=cut\n\n",
+      $_->name, $_->abstract // 'a cool package';
+  }
+
+  for my $pkg ($self->packages) {
+    $string .= $pkg->as_string . "\n";
   }
 
   $string .= "1\n";
@@ -53,7 +53,7 @@ Module::Faker::Module - a faked module
 
 =head1 VERSION
 
-version 0.020
+version 0.022
 
 =head1 AUTHOR
 

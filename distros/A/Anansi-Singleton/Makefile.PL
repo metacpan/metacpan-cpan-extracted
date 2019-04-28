@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Anansi::Singleton',
     VERSION_FROM      => 'lib/Anansi/Singleton.pm', # finds $VERSION
-    PREREQ_PM         => { 'Anansi::Class' => 0.01, 'Anansi::ObjectManager' => 0.01 }, # e.g., Module::Name => 1.1
+    PREREQ_PM         => { 'Anansi::Class' => 0.10, 'Anansi::ObjectManager' => 0.09, 'base' => 0 }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Anansi/Singleton.pm', # retrieve abstract from module
        AUTHOR         => 'Kevin Treleaven <kevin@treleaven.net>') : ()),

@@ -11,11 +11,11 @@ Git repository.
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -35,15 +35,11 @@ Git repository.
 =cut
 
 my %REPOSITORY_LIST = (
-
-  # IDevelop
   'bill2myprint'                => 'https://ofrf.epfl.ch',
   'elements'                    => 'https://epfl-idevelop.github.io/elements',
   'epfl-news'                   => 'https://actu.epfl.ch',
   'epfl-theme-elements'         => 'https://web2018.epfl.ch',
-  'homepage'                    => 'https://homepage.epfl.ch',
   'homepage-archiveweb.epfl.ch' => 'https://archiveweb.epfl.ch',
-  'kis-mobile'                  => 'http://m.epfl.ch',
   'kis-bootstrap'               => 'https://static.epfl.ch',
   'memento'                     => 'https://memento.epfl.ch',
   'polyblog'                    => 'https://blogs.epfl.ch',
@@ -51,7 +47,7 @@ my %REPOSITORY_LIST = (
   'press-release'               => 'https://rdp.epfl.ch',
   'science-cruise-data-management' => 'https://scdm.epfl.ch',
   'site-diffusion-mediatheque'     => 'https://mediatheque.epfl.ch',
-  'web2010'                        => 'https://www.epfl.ch',
+  'web2010'                        => 'https://www.epfl.ch/templates/',
 );
 
 use base 'Exporter';
@@ -69,7 +65,7 @@ sub getService {
   my $repository = shift;
   return if not defined $repository;
 
-  my @parts = split /\//xms, $repository;
+  my @parts   = split /\//xms, $repository;
   my $gitName = $parts[-1];
   return if not defined $gitName;
 
@@ -122,7 +118,7 @@ L<http://search.cpan.org/dist/EPFL-Service-Open/>
 Original work Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE,
 Switzerland, VPSI, 2018.
 
-Modified work Copyright William Belle, 2018.
+Modified work Copyright William Belle, 2018-2019.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

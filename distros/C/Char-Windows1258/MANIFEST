@@ -1,11 +1,11 @@
 Char/Windows1258.pm
-Windows1258.pm
-Ewindows1258.pm
+lib/Windows1258.pm
+lib/Ewindows1258.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Windows1258/395_windows1258eval_block.t
 t/Windows1258/396_double_diamond.t
 t/Windows1258/397_bitwise_op.t
 t/Windows1258/398_non_capturing.t
+t/Windows1258/399_indented_heredoc_qq.t
+t/Windows1258/400_indented_heredoc_q.t
+t/Windows1258/401_indented_heredoc_qx.t
+t/Windows1258/402_regexp_xx.t

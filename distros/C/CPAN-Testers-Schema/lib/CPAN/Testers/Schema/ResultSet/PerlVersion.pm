@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::PerlVersion;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 # ABSTRACT: Query Perl version metadata
 
 #pod =head1 SYNOPSIS
@@ -54,7 +54,7 @@ CPAN::Testers::Schema::ResultSet::PerlVersion - Query Perl version metadata
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -78,9 +78,19 @@ Filter Perl versions of the given maturity. One of C<stable> or C<dev>.
 L<CPAN::Testers::Schema::Result::PerlVersion>, L<DBIx::Class::ResultSet>,
 L<CPAN::Testers::Schema>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

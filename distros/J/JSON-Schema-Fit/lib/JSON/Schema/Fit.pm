@@ -1,5 +1,5 @@
 package JSON::Schema::Fit;
-$JSON::Schema::Fit::VERSION = '0.06';
+$JSON::Schema::Fit::VERSION = '0.07';
 # ABSTRACT: adjust data structure according to json-schema
 
 
@@ -11,9 +11,12 @@ use utf8;
 use Carp;
 
 use JSON;
+use Storable;
 use Scalar::Util qw/reftype/;
-use List::Util qw/first/;
+use List::Util qw/first none/;
 use Math::Round qw/round nearest/;
+
+
 
 
 sub booleans { return _attr('booleans', @_); }
@@ -35,13 +38,22 @@ sub strings { return _attr('strings', @_); }
 
 sub hash_keys { return _attr('hash_keys', @_); }
 
+
+
+sub fill_defaults { return _attr('fill_defaults', @_); }
+
+
+sub replace_invalid_values { return _attr('replace_invalid_values', @_); }
+
+
+
 # Store valid options as well as default values
 my %valid_option =(
     ( map { ($_ => 1) } qw!booleans numbers round_numbers strings hash_keys! ),
-    ( map { ($_ => 0) } qw!clamp_numbers! ),
+    ( map { ($_ => 0) } qw!clamp_numbers fill_defaults replace_invalid_values! ),
 );
 
-sub new { 
+sub new {
     my ($class, %opts) = @_;
     my $self = bless {}, $class;
     for my $k (keys %opts) {
@@ -67,9 +79,42 @@ sub get_adjusted {
     my ($self, $struc, $schema, $jpath) = @_;
 
     return $struc  if !ref $schema || reftype $schema ne 'HASH';
+
+    if (
+        exists $schema->{default} && (
+            !defined $struc && $self->fill_defaults ||
+            $self->replace_invalid_values && !$self->_is_valid($struc, $schema)
+        )
+    ) {
+        return $self->_default_value($schema);
+    }
+
     my $method = $self->_adjuster_by_type($schema->{type});
     return $struc  if !$method;
     return $self->$method($struc, $schema, $jpath);
+}
+
+
+sub _is_valid {
+    my ($self, $struc, $schema) = @_;
+
+    if (my $enum = $schema->{enum}) {
+        return '' if none {my $v = $_; $struc eq $v} @$enum;
+    }
+
+    return 1;
+
+
+    return grep { Compare($struc, $_) } @{$schema->{enum}};
+}
+
+
+sub _default_value {
+    my ($self, $schema) = @_;
+    return if !exists $schema->{default};
+
+    my $default = $schema->{default};
+    return ref $default ? Storable::dclone($default) : $default;
 }
 
 
@@ -142,8 +187,6 @@ sub _get_adjusted_array {
     return $result;
 }
 
-
-
 sub _get_adjusted_object {
     my ($self, $struc, $schema, $jpath) = @_;
 
@@ -174,6 +217,15 @@ sub _get_adjusted_object {
         $result->{$key} = $self->get_adjusted($struc->{$key}, $subschema, $self->_jpath($jpath, $key));
     }
 
+    if ($self->fill_defaults) {
+        for my $key (keys %$properties) {
+            next if exists $result->{$key};
+            my $subschema = $properties->{$key};
+            next if !exists $subschema->{default};
+            $result->{$key} = $self->_default_value($subschema);
+        }
+    }
+
     return $result;
 }
 
@@ -183,7 +235,7 @@ sub _jpath {
     $path //= q{$};
 
     return "$path.$key"  if $key =~ /^[_A-Za-z]\w*$/x;
-    
+
     $key =~ s/(['\\])/\\$1/gx;
     return $path . "['$key']";
 }
@@ -203,7 +255,7 @@ JSON::Schema::Fit - adjust data structure according to json-schema
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -270,6 +322,19 @@ Default: 1
 Filter out not allowed hash keys (where additionalProperties is false).
 
 Default: 1
+
+=head2 fill_defaults
+
+Fill missing values that have 'default' attribute in schema.
+
+Default: 0
+
+=head2 replace_invalid_values
+
+Replace incompatible with schema values with defaults (if defined).
+For now, only presence in 'enum' is checked.
+
+Default: 0
 
 =head1 METHODS
 

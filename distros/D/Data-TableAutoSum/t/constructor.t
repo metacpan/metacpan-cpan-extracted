@@ -6,7 +6,7 @@ use Data::TableAutoSum;
 use Data::Dumper;
 use List::Util qw/sum/;
 use Test::More;
-use t'CommonStuff;
+use t::CommonStuff;
 
 sub test_construct_table {
     my %arg = @_;
@@ -60,7 +60,7 @@ use Test::Exception;
 test_construct_table(rows => $_->[0], cols => $_->[1]) for STANDARD_DIM;
 test_construct_table(rows => [_named_rows $_->[0]], 
                      cols => [_named_cols $_->[1]]) for STANDARD_DIM;
-foreach (WRONG_NEW_PARAMS) {
-    dies_ok {Data::TableAutoSum->new(%$_)} 
-            "should die: new(".(Dumper $_).")";
+foreach my $params (WRONG_NEW_PARAMS) {
+    dies_ok {Data::TableAutoSum->new(%$params)} 
+            "should die: new(".(Dumper $params).")";
 }

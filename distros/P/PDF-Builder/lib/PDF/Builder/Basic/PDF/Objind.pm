@@ -15,8 +15,8 @@ package PDF::Builder::Basic::PDF::Objind;
 use strict;
 use warnings;
 
-our $VERSION = '3.013'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.014'; # VERSION
+my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -160,18 +160,13 @@ Makes sure that the object is fully read in, etc.
 =cut
 
 sub realise {
-   #$_[0]->{' realised'}? $_[0]: $_[0]->{' objnum'}? $_[0]->{' parent'}->read_obj(@_): $_[0];
-    my ($self) = $_[0];
+    my $self = shift;
 
-    if ($self->{' realised'}) {
-	    return $self;
-    } else {
-	    if ($self->{' objnum'}) {
-		    return $self->{' parent'}->read_obj(@_);
-	    } else {
-		    return $self;
-	    }
-    }
+    return $self if $self->{' realised'} || 
+	            !$self->{' objnum'};
+
+    $self->{' realised'} = 1;
+    return $self->{' parent'}->read_obj($self, @_);
 }
 
 =head2 $v = $r->outobjdeep($fh, $pdf, %opts)

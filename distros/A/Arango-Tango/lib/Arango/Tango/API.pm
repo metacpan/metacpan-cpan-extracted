@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.007';
+$Arango::Tango::API::VERSION = '0.008';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
 
@@ -21,15 +21,21 @@ my %API = (
     cursor_next       => { method => 'put',    uri => '{database}_api/cursor/{id}'           },
     cursor_delete     => { method => 'delete', uri => '{database}_api/cursor/{id}'           },
     list_databases    => { method => 'get',    uri => '_api/database'                        },
+    get_user_databases => { method => 'get' ,  uri => '_api/user/{username}/database',  params => { full => {type => 'boolean' } } },
+    cluster_endpoints => { method => 'get',    uri => '_api/cluster/endpoints'               },
+    engine            => { method => 'get',    uri => '_api/engine'                          },
     status            => { method => 'get',    uri => '_admin/status'                        },
     time              => { method => 'get',    uri => '_admin/time'                          },
     target_version    => { method => 'get',    uri => '_admin/database/target-version'       },
     statistics        => { method => 'get',    uri => '_admin/statistics'                    },
     log_level         => { method => 'get',    uri => '_admin/log/level'                     },
-    server_id         => { method => 'get',    uri => '/_admin/server/id'                    },
-    server_mode       => { method => 'get',    uri => '/_admin/server/mode'                  },
-    server_availability => { method => 'get',  uri => '/_admin/server/availability'          },
+    server_id         => { method => 'get',    uri => '_admin/server/id'                     },
+    server_role       => { method => 'get',    uri => '_admin/server/role'                   },
+    server_mode       => { method => 'get',    uri => '_admin/server/mode'                   },
+    server_availability => { method => 'get',  uri => '_admin/server/availability'           },
     statistics_description  => { method => 'get', uri => '_admin/statistics-description'     },
+    list_users        => { method => 'get',    uri => '_api/user'                            },
+    get_user          => { method => 'get',    uri => '_api/user/{username}'                 },
     'create_database' => {
         method  => 'post',
         uri     => '_api/database',
@@ -188,7 +194,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

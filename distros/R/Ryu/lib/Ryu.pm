@@ -3,7 +3,10 @@ package Ryu;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+# Older versions cannot complete the test suite successfully
+use 5.018;
+
+our $VERSION = '1.003';
 
 =encoding utf8
 

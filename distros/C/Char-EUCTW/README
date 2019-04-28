@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   EUCTW::eval
-    length          vs   EUCTW::length
-    substr          vs   EUCTW::substr
-    ord             vs   EUCTW::ord
-    reverse         vs   EUCTW::reverse
-    getc            vs   EUCTW::getc
-    index           vs   EUCTW::index
-    rindex          vs   EUCTW::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  EUCTW::eval
+    length          vs.  EUCTW::length
+    substr          vs.  EUCTW::substr
+    ord             vs.  EUCTW::ord
+    reverse         vs.  EUCTW::reverse
+    getc            vs.  EUCTW::getc
+    index           vs.  EUCTW::index
+    rindex          vs.  EUCTW::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

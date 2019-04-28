@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   TIS620::eval
-    length          vs   TIS620::length
-    substr          vs   TIS620::substr
-    ord             vs   TIS620::ord
-    reverse         vs   TIS620::reverse
-    getc            vs   TIS620::getc
-    index           vs   TIS620::index
-    rindex          vs   TIS620::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  TIS620::eval
+    length          vs.  TIS620::length
+    substr          vs.  TIS620::substr
+    ord             vs.  TIS620::ord
+    reverse         vs.  TIS620::reverse
+    getc            vs.  TIS620::getc
+    index           vs.  TIS620::index
+    rindex          vs.  TIS620::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

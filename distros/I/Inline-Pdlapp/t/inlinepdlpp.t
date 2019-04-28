@@ -17,7 +17,7 @@ BEGIN {
 
 use PDLA::LiteF;
 
-# use Inline 'INFO'; # use to generate lots of info
+use Inline 'INFO'; # use to generate lots of info
 eval { Inline->bind(Pdlapp => <<'EOF') };
 # simple PP definition
 

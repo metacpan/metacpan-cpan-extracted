@@ -75,7 +75,14 @@ u2fclib_verifyRegistration(ctx, buf)
 	INIT:
 		char* pk[65];
 		char kh[1000];
+		char* result;
 	PPCODE:
-		strncpy(kh,u2fclib_verifyRegistration(ctx, buf, pk),1000);
-		XPUSHs(sv_2mortal(newSVpvn(pk,65)));
-		XPUSHs(sv_2mortal(newSVpvn(kh,strlen(kh))));
+		result = u2fclib_verifyRegistration(ctx, buf, pk);
+		if(!result) {
+			XSRETURN_UNDEF;
+		}
+		else {
+			strncpy(kh,result,1000);
+			XPUSHs(sv_2mortal(newSVpvn(pk,65)));
+			XPUSHs(sv_2mortal(newSVpvn(kh,strlen(kh))));
+		}

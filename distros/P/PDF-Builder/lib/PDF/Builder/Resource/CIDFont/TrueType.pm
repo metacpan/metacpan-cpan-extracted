@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.013'; # VERSION
+our $VERSION = '3.014'; # VERSION
 my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;

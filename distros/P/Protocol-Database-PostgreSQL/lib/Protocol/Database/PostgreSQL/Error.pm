@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL::Error;
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 
 =head1 NAME
 

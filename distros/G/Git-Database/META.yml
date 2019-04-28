@@ -3,6 +3,7 @@ abstract: 'Provide access to the Git object database'
 author:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   File::Spec: '0'
@@ -20,7 +21,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 keywords:
   - git
   - database
@@ -33,73 +34,73 @@ name: Git-Database
 provides:
   Git::Database:
     file: lib/Git/Database.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Actor:
     file: lib/Git/Database/Actor.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Cogit:
     file: lib/Git/Database/Backend/Cogit.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Git:
     file: lib/Git/Database/Backend/Git.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Git::PurePerl:
     file: lib/Git/Database/Backend/Git/PurePerl.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Git::Raw::Repository:
     file: lib/Git/Database/Backend/Git/Raw/Repository.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Git::Repository:
     file: lib/Git/Database/Backend/Git/Repository.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Git::Sub:
     file: lib/Git/Database/Backend/Git/Sub.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::Git::Wrapper:
     file: lib/Git/Database/Backend/Git/Wrapper.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Backend::None:
     file: lib/Git/Database/Backend/None.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::DirectoryEntry:
     file: lib/Git/Database/DirectoryEntry.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Object::Blob:
     file: lib/Git/Database/Object/Blob.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Object::Commit:
     file: lib/Git/Database/Object/Commit.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Object::Raw:
     file: lib/Git/Database/Object/Raw.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Object::Tag:
     file: lib/Git/Database/Object/Tag.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Object::Tree:
     file: lib/Git/Database/Object/Tree.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::Backend:
     file: lib/Git/Database/Role/Backend.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::Object:
     file: lib/Git/Database/Role/Object.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::ObjectReader:
     file: lib/Git/Database/Role/ObjectReader.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::ObjectWriter:
     file: lib/Git/Database/Role/ObjectWriter.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::PurePerlBackend:
     file: lib/Git/Database/Role/PurePerlBackend.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::RefReader:
     file: lib/Git/Database/Role/RefReader.pm
-    version: '0.011'
+    version: '0.012'
   Git::Database::Role::RefWriter:
     file: lib/Git/Database/Role/RefWriter.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Cwd: '0'
   DateTime: '0'
@@ -125,11 +126,10 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Database
   repository: http://github.com/book/Git-Database.git
-version: '0.011'
+version: '0.012'
 x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
   - 'Slaven Rezić <srezic@cpan.org>'
   - 'Jacques Germishuys <jacquesg@cpan.org>'
-x_generated_by_perl: v5.28.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.70'

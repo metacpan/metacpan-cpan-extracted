@@ -8,7 +8,7 @@ examples/Module/t/myinlinemod.t
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-lib/Inline/MakePdlappInstallable.pm
+README.md
 lib/Inline/Pdlapp.pm
 t/00-report-prereqs.t
 t/01-checkmanifest.t

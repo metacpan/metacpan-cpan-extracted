@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes YAML version 1.27.
+    This document describes YAML version 1.28.
 
 NOTE
 
@@ -394,6 +394,10 @@ GLOBAL OPTIONS
       eval(). Since this is potentially risky, only use this option if you
       know where your YAML has been.
 
+      LoadCode must be enabled also to use the feature of evaluating
+      typeglobs (because with the typeglob feature you would be able to set
+      the variable $YAML::LoadCode from a YAML file).
+
     Preserve
 
       When set to true, this option tells the Loader to load hashes into
@@ -706,7 +710,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2001-2018. Ingy döt Net.
+    Copyright 2001-2019. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

@@ -1,0 +1,30 @@
+{
+   "charttitle" : "perlformance.perl5.PerlCritic.bundled",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlCritic",
+   "chartlines" : [
+       {
+           "title" : "perlformance.perl5.PerlCritic.bundled/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlCritic.bundled" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "perlformance.perl5.PerlCritic.bundled/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlCritic.bundled" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

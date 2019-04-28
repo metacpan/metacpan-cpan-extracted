@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Siffra-Logger",
    "no_index" : {
@@ -34,17 +34,24 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "DDP" : "0",
             "Data::Dumper" : "0",
             "File::Basename" : "0",
+            "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Dispatch" : "0",
             "POSIX" : "0",
-            "Test::Perl::Critic" : "0",
-            "perl" : "5.014"
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "utf8" : "0",
+            "version" : "0",
+            "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

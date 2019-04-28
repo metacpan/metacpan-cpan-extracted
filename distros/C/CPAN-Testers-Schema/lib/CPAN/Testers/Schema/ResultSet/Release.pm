@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Release;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 # ABSTRACT: Query the per-release summary testers data
 
 #pod =head1 SYNOPSIS
@@ -98,7 +98,7 @@ CPAN::Testers::Schema::ResultSet::Release - Query the per-release summary tester
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -149,9 +149,19 @@ Restrict results to only those dists that are stable. Also supported:
 
 L<DBIx::Class::ResultSet>, L<CPAN::Testers::Schema>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

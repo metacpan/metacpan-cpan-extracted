@@ -27,7 +27,7 @@ sub all {
 
 sub catch { shift->then(undef, shift) }
 
-sub clone { $_[0]->new(ioloop => $_[0]->ioloop) }
+sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
 
 sub finally {
   my ($self, $finally) = @_;
@@ -66,6 +66,12 @@ sub map {
   return $class->all(@all);
 }
 
+sub new {
+  my $self = shift->SUPER::new;
+  shift->(sub { $self->resolve(@_) }, sub { $self->reject(@_) }) if @_;
+  return $self;
+}
+
 sub race {
   my ($class, @promises) = @_;
   my $new = $promises[0]->clone;
@@ -94,8 +100,9 @@ sub timeout { shift->_timer('reject',  @_) }
 sub wait {
   my $self = shift;
   return if (my $loop = $self->ioloop)->is_running;
-  $self->finally(sub { $loop->stop });
-  $loop->start;
+  my $done;
+  $self->finally(sub { $done++; $loop->stop });
+  $loop->start until $done;
 }
 
 sub _defer {
@@ -213,7 +220,8 @@ Mojo::Promise - Promises/A+
 =head1 DESCRIPTION
 
 L<Mojo::Promise> is a Perl-ish implementation of
-L<Promises/A+|https://promisesaplus.com>.
+L<Promises/A+|https://promisesaplus.com> and a superset of
+L<ES6 Promises|https://duckduckgo.com/?q=\mdn%20Promise>.
 
 =head1 STATES
 
@@ -319,8 +327,8 @@ reason.
 
 =head2 map
 
-  my $new = Mojo::Promise->map(sub { ... }, @items);
-  my $new = Mojo::Promise->map({concurrency => 3}, sub { ... }, @items);
+  my $new = Mojo::Promise->map(sub {...}, @items);
+  my $new = Mojo::Promise->map({concurrency => 3}, sub {...}, @items);
 
 Apply a function that returns a L<Mojo::Promise> to each item in a list of
 items while optionally limiting concurrency. Returns a L<Mojo::Promise> that
@@ -343,6 +351,22 @@ These options are currently available:
 The maximum number of items that are in progress at the same time.
 
 =back
+
+=head2 new
+
+  my $promise = Mojo::Promise->new;
+  my $promise = Mojo::Promise->new(sub {...});
+
+Construct a new L<Mojo::Promise> object.
+
+  # Wrap a continuation-passing style API
+  my $promise = Mojo::Promise->new(sub {
+    my ($resolve, $reject) = @_;
+    Mojo::IOLoop->timer(5 => sub {
+      if (int rand 2) { $resolve->('Lucky!') }
+      else            { $reject->('Unlucky!') }
+    });
+  });
 
 =head2 race
 

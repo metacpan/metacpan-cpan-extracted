@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
-license: bsd
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -34,6 +34,7 @@ resources:
   bugtracker: https://github.com/bentglasstube/perl-app-sybil/issues
   homepage: https://github.com/bentglasstube/perl-app-sybil
   repository: https://github.com/bentglasstube/perl-app-sybil.git
-version: '0.5'
+version: '0.6'
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

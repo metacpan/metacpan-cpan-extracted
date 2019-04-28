@@ -47,7 +47,7 @@ use SNMP::Info::DocsisHE;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %PORTSTAT, %MUNGE);
 
-$VERSION = '3.67';
+$VERSION = '3.68';
 
 %MIBS = (
     %SNMP::Info::MIBS,         %SNMP::Info::Bridge::MIBS,
@@ -150,7 +150,7 @@ sub interfaces {
         my $port = $i_descr->{$iid};
         next unless defined $port;
 
-        my $port = SNMP::Info::munge_null($port);
+        $port = SNMP::Info::munge_null($port);
         $port =~ s/^\s+//; $port =~ s/\s+$//;
         next unless length $port;
 

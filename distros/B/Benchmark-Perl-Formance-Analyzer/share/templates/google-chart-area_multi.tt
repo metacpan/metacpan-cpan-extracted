@@ -34,7 +34,11 @@
     <li><a href="https://metacpan.org/pod/BenchmarkAnything::Evaluations">BenchmarkAnything::Evaluations</a> collecting the statistics</li>
     <li><a href="https://metacpan.org/search?q=Benchmark%3A%3APerl%3A%3AFormance%3A%3APlugin%3A%3A&search_type=authors">Benchmark::Perl::Formance plugins</a> on CPAN</li>
   </ul>
-
+  <p>
+  <ul>
+    <li>X-axis: perl version</li>
+    <li>Y-axis: execution time in seconds (<em>smaller is better</em>)</li>
+  </ul>
 [% FOREACH chunk IN chartlist %]
     <a style="float:left;" href="[% chunk.outfile %]"><div id="chart_div_[% chunk.number %]" style="width: [% width %]px; height: [% height %]px;"></div></a>
 [% END %]

@@ -1,9 +1,10 @@
 package App::Git::Info::Command::info;
-$App::Git::Info::Command::info::VERSION = '0.4.0';
+$App::Git::Info::Command::info::VERSION = '0.4.1';
 use App::Git::Info -command;
 
 use strict;
 use warnings;
+use autodie;
 use 5.016;
 
 sub abstract { "verify the presence of dependencies" }
@@ -27,8 +28,14 @@ sub execute
 {
     my ( $self, $opt, $args ) = @_;
 
+    my $ST = `git status`;
+    if ($?)
+    {
+        return;
+    }
+
     my $ret =
-        (     `git status` =~ s#\A(On branch \S+).*#⇒ $1#mrs . "\n"
+        (     $ST =~ s#\A(On branch \S+).*#⇒ $1#mrs . "\n"
             . `git status -s`
             . "⇒ Remotes:\n"
             . `git remote -v` );
@@ -52,7 +59,7 @@ App::Git::Info::Command::info
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

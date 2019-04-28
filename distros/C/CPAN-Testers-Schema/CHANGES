@@ -1,5 +1,20 @@
 Changelog for CPAN-Testers-Schema
 
+0.024     2019-04-27 15:58:52+01:00 Europe/London
+
+    [Added]
+
+    - Added 'cpantesters-schema fetch' command to download data from the
+      public API to populate a local database. This can be used for
+      testing purposes, but also to get a local copy of data for
+      reporting purposes.
+
+    [Fixed]
+
+    - 'cpantesters-schema upgrade' command will now try to install the
+      database if it is not already installed. This makes it suitable
+      for use in an auto-deploy script.
+
 0.023     2018-08-23 20:32:28-05:00 America/Chicago
 
     [Added]

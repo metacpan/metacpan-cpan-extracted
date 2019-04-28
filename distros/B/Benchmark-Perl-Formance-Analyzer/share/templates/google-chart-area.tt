@@ -25,7 +25,10 @@
     </script>
   </head>
   <body>
+    <h1>Perl::Formance - [% querybundle %] - [% title %]</h1>
     <ul>
+        <li>Back to <a href="index.html">dashboard</a></li>
+        <li>Raw numbers: <a href="raw-numbers.txt">here</a></li>
         <li>Benchmark code: <a href="https://metacpan.org/pod/[% modulename %]">[% modulename %]</a></li>
     </ul>
     <div id="chart_div" style="width: [% width %]px; height: [% height %]px;"></div>

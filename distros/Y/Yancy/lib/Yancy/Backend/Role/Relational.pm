@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -33,6 +33,11 @@ our $VERSION = '1.023';
 #pod
 #pod Called with a table name, returns a boolean of true to keep, false
 #pod to discard - typically for a system table.
+#pod
+#pod =head2 fixup_default
+#pod
+#pod Called with a column's default value, returns the corrected version,
+#pod which if C<undef> means no default.
 #pod
 #pod =head2 column_info_extra
 #pod
@@ -107,6 +112,8 @@ our $VERSION = '1.023';
 
 use Mojo::Base '-role';
 use Scalar::Util qw( blessed looks_like_number );
+use Mojo::JSON qw( true encode_json );
+use Carp qw( croak );
 
 use DBI ':sql_types';
 # only specify non-string - code-ref called with column_info row
@@ -170,7 +177,7 @@ my %IGNORE_TABLE = (
 requires qw(
     mojodb mojodb_class mojodb_prefix
     dbcatalog dbschema
-    filter_table column_info_extra
+    filter_table fixup_default column_info_extra
 );
 
 sub new {
@@ -201,8 +208,21 @@ sub id_field {
 sub list_sqls {
     my ( $self, $coll, $params, $opt ) = @_;
     my $mojodb = $self->mojodb;
-    my ( $query, @params ) = $mojodb->abstract->select( $coll, undef, $params, $opt->{order_by} );
-    my ( $total_query, @total_params ) = $mojodb->abstract->select( $coll, [ \'COUNT(*) as total' ], $params );
+    my $schema = $self->collections->{ $coll };
+    my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+    my $props = $schema->{properties}
+        || $self->collections->{ $real_coll }{properties};
+    my ( $query, @params ) = $mojodb->abstract->select(
+        $real_coll,
+        [ keys %$props ],
+        $params,
+        $opt->{order_by},
+    );
+    my ( $total_query, @total_params ) = $mojodb->abstract->select(
+        $real_coll,
+        [ \'COUNT(*) as total' ],
+        $params,
+    );
     if ( scalar grep defined, @{ $opt }{qw( limit offset )} ) {
         die "Limit must be number" if $opt->{limit} && !looks_like_number $opt->{limit};
         $query .= ' LIMIT ' . ( $opt->{limit} // 2**32 );
@@ -243,20 +263,34 @@ sub _is_type {
 sub delete {
     my ( $self, $coll, $id ) = @_;
     my $id_field = $self->id_field( $coll );
-    return !!$self->mojodb->db->delete( $coll, { $id_field => $id } )->rows;
+    my $ret = eval { $self->mojodb->db->delete( $coll, { $id_field => $id } )->rows };
+    croak "Error on delete '$coll'=$id: $@" if $@;
+    return !!$ret;
 }
 
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
     $params = $self->normalize( $coll, $params );
+    die "No refs allowed in '$coll'($id): " . encode_json $params
+        if grep ref, values %$params;
     my $id_field = $self->id_field( $coll );
-    return !!$self->mojodb->db->update( $coll, $params, { $id_field => $id } )->rows;
+    my $ret = eval { $self->mojodb->db->update( $coll, $params, { $id_field => $id } )->rows };
+    croak "Error on set '$coll'=$id: $@" if $@;
+    return !!$ret;
 }
 
 sub get {
     my ( $self, $coll, $id ) = @_;
     my $id_field = $self->id_field( $coll );
-    my $ret = $self->mojodb->db->select( $coll, undef, { $id_field => $id } )->hash;
+    my $schema = $self->collections->{ $coll };
+    my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+    my $props = $schema->{properties}
+        || $self->collections->{ $real_coll }{properties};
+    my $ret = $self->mojodb->db->select(
+        $real_coll,
+        [ keys %$props ],
+        { $id_field => $id },
+    )->hash;
     return $self->normalize( $coll, $ret );
 }
 
@@ -284,12 +318,16 @@ sub read_schema {
     s/\W//g for @table_names; # PostgreSQL quotes "user"
     for my $table ( @table_names ) {
         # ; say "Got table $table";
+        $schema{ $table }{type} = 'object';
         my $stats_info = $db->dbh->statistics_info(
             $dbcatalog, $dbschema, $table, 1, 1
         )->fetchall_arrayref( { COLUMN_NAME => 1 } );
-        my @unique_columns = map $_->{COLUMN_NAME}, @$stats_info;
         my $columns = $db->dbh->column_info( $dbcatalog, $dbschema, $table, undef )->fetchall_arrayref( {} );
         my %is_pk = map {$_=>1} $db->dbh->primary_key( $dbcatalog, $dbschema, $table );
+        my @unique_columns = grep !$is_pk{ $_ },
+            map $_->{COLUMN_NAME},
+            grep !$_->{NON_UNIQUE}, # mysql
+            @$stats_info;
         my $col2info = $self->column_info_extra( $table, $columns );
         # ; say "Got columns";
         # ; use Data::Dumper;
@@ -306,21 +344,27 @@ sub read_schema {
                 $oapitype{ type } = [ $oapitype{ type }, 'null' ];
             }
             my $auto_increment = delete $info{auto_increment};
+            my $default = $self->fixup_default( $c->{COLUMN_DEF} );
+            if ( defined $default ) {
+                $oapitype{ default } = $default;
+            }
+            $oapitype{readOnly} = true if $auto_increment;
             $schema{ $table }{ properties }{ $column } = {
                 %info,
                 %oapitype,
                 'x-order' => $c->{ORDINAL_POSITION},
             };
-            if ( ( !$c->{NULLABLE} || $is_pk{ $column } ) && !$auto_increment && !defined $c->{COLUMN_DEF} ) {
+            if ( ( !$c->{NULLABLE} || $is_pk{ $column } ) && !$auto_increment && !defined $default ) {
                 push @{ $schema{ $table }{ required } }, $column;
             }
         }
         my ( $pk ) = keys %is_pk;
-        if ( $pk && $pk ne 'id' ) {
-            $schema{ $table }{ 'x-id-field' } = $pk;
-        }
-        elsif ( !$pk && @unique_columns ) {
+        if ( @unique_columns == 1 and $unique_columns[0] ne 'id' ) {
+            # favour "natural" key over "surrogate" integer one, if exists
             $schema{ $table }{ 'x-id-field' } = $unique_columns[0];
+        }
+        elsif ( $pk && $pk ne 'id' ) {
+            $schema{ $table }{ 'x-id-field' } = $pk;
         }
         if ( $IGNORE_TABLE{ $table } ) {
             $schema{ $table }{ 'x-ignore' } = 1;
@@ -341,7 +385,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -374,6 +418,11 @@ String with the value at the start of a L<DBI> C<dsn>.
 
 Called with a table name, returns a boolean of true to keep, false
 to discard - typically for a system table.
+
+=head2 fixup_default
+
+Called with a column's default value, returns the corrected version,
+which if C<undef> means no default.
 
 =head2 column_info_extra
 

@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdla-inline-pdlapp/issues
   homepage: http://pdlporters.github.io
   repository: git://github.com/PDLPorters/pdla-inline-pdlapp
-version: '2.019105'
+version: '2.019107'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

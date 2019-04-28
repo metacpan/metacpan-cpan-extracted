@@ -1,11 +1,17 @@
 # CORBA/IDLtree.pm   IDL to symbol tree translator
 # This module is distributed under the same terms as Perl itself.
-# Copyright  (C) 1998-2018, O. Kellogg <okellogg@users.sourceforge.net>
+# Copyright  (C) 1998-2019, O. Kellogg <okellogg@users.sourceforge.net>
 # Main Authors:  Oliver Kellogg, Heiko Schroeder
 #
 # -----------------------------------------------------------------------------
 # Ver. |   Date   | Recent changes (for complete history see file Changes)
 # -----+----------+------------------------------------------------------------
+# 2.03  2019/04/27  * Fixed a bug related to Dump_Symbols whereby when using
+#                     a string array ref as the optional argument, repeated
+#                     calls to the sub would accumulate the text.
+#                   * In sub parse_members, optional argument $comment fixes
+#                     processing of trailing comment at members of struct,
+#                     exception, and valuetype.
 # 2.02  2018/08/15  * Fixed a few typos in documentation.
 #                   * Added support for IDL4 struct inheritance defined by the
 #                     Building Block Extended Data-Types:
@@ -21,7 +27,7 @@
 #                   * In sub info check for valid $currfile and @infilename
 #                     before accessing $infilename[$currfile].
 #                   * In sub error avoid code duplication by reusing the
-#                     implemenation of sub info.
+#                     implementation of sub info.
 #                   * In sub dump_symbols_internal handling of METHOD, pop
 #                     @arg only if @arg is non empty and $arg[-1] contains
 #                     the exception list.  We need these extra tests because
@@ -119,11 +125,11 @@ CORBA::IDLtree - OMG IDL to symbol tree translator
 
 =head1 VERSION
 
-Version 2.02 pre-release
+Version 2.03
 
 =cut
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 =head1 SYNOPSIS
 
@@ -1525,7 +1531,7 @@ sub parse_members {
     # returns:  -1 for error;
     #            0 for success with enclosing scope still open;
     #            1 for success with enclosing scope closed (i.e. seen '};')
-    my($symtreeref, $argref, $structref_or_vt_access) = @_;
+    my($symtreeref, $argref, $structref_or_vt_access, $comment) = @_;
     my @arg = @{$argref};
     my $structref = 0;
     my $value_member_flag = 0;
@@ -1620,8 +1626,11 @@ sub parse_members {
                 error "duplicate component name $name_found";
                 return -1;
             }
+            unless (defined $comment) {
+                $comment = comment();
+            }
             my $member_node = [ $component_type, $component_name, $dimref,
-                                annotation, comment ];
+                                annotation(), $comment ];
             if ($value_member_flag) {
                 push @{$symtreeref}, [ $value_member_flag, $member_node ];
             } else {
@@ -2609,12 +2618,16 @@ sub Parse_File_i {
             if (shift @arg ne ';') {
                 error "missing ';'";
             }
-            unless (@typestack) {  # must be closing of module or interface
+            unless (@typestack) {  # must be closing of module, interface, or valuetype
                 if (@scopestack) {
                     pop @scopestack;
                 } else {
                     error('unexpected };');
                 }
+                return $symbols;
+            }
+            if ($in_valuetype) {
+                error "Parse_File_i internal: in_valuetype true on non empty typestack";
                 return $symbols;
             }
             if (in_annotation_def()) {
@@ -2659,7 +2672,7 @@ sub Parse_File_i {
             if ($struct2vt && $type == STRUCT) {
                 convert_to_valuetype(\@structnode);
             }
-            pushsub($symbols, [ @structnode ], $in_valuetype);
+            pushsub($symbols, [ @structnode ]);
             @struct = ();
             next;
 
@@ -2768,7 +2781,6 @@ sub Parse_File_i {
             my $anno = annotation;
             my $symnode = [ VALUETYPE, $name, 0, $anno, $cmnt, curr_scope ];
             if ($vt2struct) {
-                $in_valuetype = 1;
                 push @typestack, STRUCT;
                 push @namestack, $name;
                 push @annostack, $anno;
@@ -2818,7 +2830,6 @@ sub Parse_File_i {
                         push @ancestors, $anc_type;
                     }
                     last unless (($nxttok = shift @arg) eq ',');
-                    $nxttok = shift @arg;
                 }
                 $seen_ancestors = 1;
             }
@@ -2853,6 +2864,7 @@ sub Parse_File_i {
                 unshift @prev_symroots, $symbols;
                 push @scopestack, $symnode;
                 Parse_File_i("", $in, $declarations, 1) or abort("can't go on, sorry");
+                # The closing "};" was seen in Parse_File_i and @scopestack was popped there.
                 shift @prev_symroots;
             }
             $abstract = 0;
@@ -2885,7 +2897,7 @@ sub Parse_File_i {
                 } else {
                     $vt_access = PRIVATE;
                 }
-                if (parse_members($symbols, \@arg, $vt_access) == 1) {
+                if (parse_members($symbols, \@arg, $vt_access, $cmnt) == 1) {
                     # end of type declaration was encountered
                     if (@scopestack) {
                         pop @scopestack;
@@ -2924,13 +2936,13 @@ sub Parse_File_i {
             }
             if (@arg) {
                 if ($arg[0] eq '}' or
-                        parse_members($symbols, \@arg, \@struct) == 1) {
+                        parse_members($symbols, \@arg, \@struct, $cmnt) == 1) {
                     # end of type declaration was encountered
-                    my @node = ($type, $name, [ @struct ], $anno, $cmnt, curr_scope);
+                    my $node = [ $type, $name, [ @struct ], $anno, $cmnt, curr_scope ];
                     if ($struct2vt && $type == STRUCT) {
-                        convert_to_valuetype(\@node);
+                        convert_to_valuetype($node);
                     }
-                    push @$symbols, \@node;
+                    push @$symbols, $node;
                     pop @cmntstack;
                     pop @annostack;
                     pop @namestack;
@@ -3268,11 +3280,15 @@ sub Parse_File_i {
                     }
                     last;
                 }
-                my $pmode;
-                $pmode = ($m eq 'in' ? IN : $m eq 'out' ? OUT :
-                             $m eq 'inout' ? INOUT : 0);
-                if (! $pmode or $rettype == FACTORY && $pmode != IN) {
-                    error("$name: illegal mode of parameter $pname");
+                my $pmode = ($m eq 'in'    ? &IN :
+                             $m eq 'out'   ? &OUT :
+                             $m eq 'inout' ? &INOUT : 0);
+                unless ($pmode) {
+                    error("$name parameter $pname : bad mode $m (expecting 'in', 'out', or 'inout')");
+                    last;
+                }
+                if ($rettype == FACTORY && $pmode != IN) {
+                    error("$name: FACTORY parameter $pname must have mode 'in'");
                     last;
                 }
                 my $ptype = find_node_i($typename, $symbols);
@@ -3305,12 +3321,13 @@ sub Parse_File_i {
                         last;
                     }
                 }
-                if ($in_valuetype) {
+            }
+            if ($in_valuetype) {
+                if (@exception_list) {
                     error "'raises' not yet supported in valuetype methods";
                 }
-            }
-            unless ($in_valuetype) {
-                push @{$node[SUBORDINATES]}, \@exception_list;
+            } else {
+                push @{$node[SUBORDINATES]}, [ @exception_list ];
             }
             pushsub($symbols, [ @node ], $in_valuetype);
 
@@ -3333,7 +3350,7 @@ sub Parse_File_i {
                     next;
                 }
             }
-            if (parse_members($symbols, \@arg, \@struct) == 1) {
+            if (parse_members($symbols, \@arg, \@struct, $cmnt) == 1) {
                 # end of type declaration was encountered
                 my $type = pop @typestack;
                 my $name = pop @namestack;
@@ -4391,8 +4408,7 @@ sub dump_symbols_internal {
                 my $ptype = dstypeof($$pnode[TYPE]);
                 my $pname = $$pnode[NAME];
                 my $m     = $$pnode[SUBORDINATES];
-                my $pmode;
-                $pmode = ($m == &IN ? 'in' : $m == &OUT ? 'out' : 'inout');
+                my $pmode = ($m == &IN ? 'in' : $m == &OUT ? 'out' : 'inout');
                 dsdent unless ($#arg == 0);
                 dsemit "$pmode $ptype $pname";
                 dsemit(",\n") if ($i < $#arg);
@@ -4612,6 +4628,7 @@ sub Dump_Symbols {
     } else {
         $dsoptarg = undef;
     }
+    $dstext = "";
     my $res = dump_symbols_internal($sym_array_ref);
     if ($output_file_name) {
         dsemit "#endif\n";
@@ -4863,7 +4880,7 @@ Thanks to Heiko Schroeder for contributing.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 1998-2018, Oliver M. Kellogg
+Copyright (C) 1998-2019, Oliver M. Kellogg
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

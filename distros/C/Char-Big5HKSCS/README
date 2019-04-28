@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   Big5HKSCS::eval
-    length          vs   Big5HKSCS::length
-    substr          vs   Big5HKSCS::substr
-    ord             vs   Big5HKSCS::ord
-    reverse         vs   Big5HKSCS::reverse
-    getc            vs   Big5HKSCS::getc
-    index           vs   Big5HKSCS::index
-    rindex          vs   Big5HKSCS::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  Big5HKSCS::eval
+    length          vs.  Big5HKSCS::length
+    substr          vs.  Big5HKSCS::substr
+    ord             vs.  Big5HKSCS::ord
+    reverse         vs.  Big5HKSCS::reverse
+    getc            vs.  Big5HKSCS::getc
+    index           vs.  Big5HKSCS::index
+    rindex          vs.  Big5HKSCS::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

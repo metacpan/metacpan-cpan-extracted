@@ -7,17 +7,26 @@ use lib '../lib';
 use PDF::Builder;
 use PDF::Builder::Util;
 
-my $type = 0;  # 0 = full list of core fonts
+my $type = 0;  # 0 = full list of core fonts 
                # 1 = single core font (for testing)
 	       # 2 = TTF font(s)
 	       # 3 = Type1 (PS) font(s)
 my $encoding = 'latin1';  # normally latin1
+# TBD future: -t type -e encoding and possibly font name(s) and which variant(s)
+
+# for testing, command line number is type
+if (scalar @ARGV > 0) {
+    if ($ARGV[0] > -1 && $ARGV[0] < 4) {
+	# command line type 0 1 2 or 3
+	$type = $ARGV[0];
+    }
+}
 
 my @variants = ();
 my @varLabels = ();
-# show slant example
-push @variants, {-slant=>0.750};
-push @varLabels, 'slant 0.750';
+# show condense example
+push @variants, {-condense=>0.750};
+push @varLabels, 'condense 0.750';
 # show oblique example
 push @variants, {-oblique=>12};
 push @varLabels, 'oblique 12';
@@ -91,19 +100,20 @@ if ($type == 3) {
 # character in BaseFont::textByStr returned to BaseFont::text
    #C:\\T1fonts\\URWPalladioL-Roma.pfb
   @font_list = qw( 
-    C:\\T1fonts\\gfsneohellenic\\type1\\GFSNeohellenic-Regular.pfb
-    C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfb
+    C:\\Users\\Phil\\T1fonts\\gfsneohellenic\\type1\\GFSNeohellenic-Regular.pfb
+    C:\\Users\\Phil\\T1fonts\\URWPalladioL-Roma.pfb
 		 );
-   #C:\\T1fonts\\URWPalladioL-Roma.afm
+   #C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfb
   @T1_metrics = qw(
-    C:\\T1fonts\\gfsneohellenic\\afm\\GFSNeohellenic-Regular.afm
-    C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfm
+    C:\\Users\\Phil\\T1fonts\\gfsneohellenic\\afm\\GFSNeohellenic-Regular.afm
+    C:\\Users\\Phil\\T1fonts\\URWPalladioL-Roma.afm
 		  );
-   #Palladio 
+   #C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfm
   @short_name = qw(
     Neohellenic 
-    Avant~Garde
+    Palladio 
                   );
+   #Avant~Garde
 }
 
 my ($metrics, $sname);
@@ -155,6 +165,11 @@ foreach my $fn (@font_list) {
 
     print STDERR "  ".(scalar @variants)." variants of font, each up to ".
                       (scalar @planes)." page(s)\n";
+    # Note that synfont() itself only returns a "standard" 255 character font.
+    # For characters beyond that (Unicode), you need to get plane 1, 2, etc.
+    # and run synfont() against that "font". 'fi' and 'fl' ligatures are 
+    # found on plane 1 or 2 (not plane 0 basic). It does not appear possible
+    # to replace a ligature on plane 1+ with plane 0 ASCII letters.
 
     foreach my $varNum ( 0 .. $#variants ) {
 	# 4 or so variants requested per font
@@ -268,10 +283,43 @@ foreach my $fn (@font_list) {
         } # end inner loop of 1 or more font pages
     } # end middle loop of @variants list
     
+    # print some text with a weird combination of options.
+    # only basic plane (0) $fn1 to be used.
+
+    my $font = $pdf->synfont($fn1, -caps=>1, -bold=>8, -oblique=>-15,
+                                   -condense=>3.5, -space=>300);
+    my $page = $pdf->page();
+    $page->mediabox(595,842);
+
+    my $txt = $page->text();
+    $txt->font($font, $fx);
+    my $LoremIpsum=q|Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit.|;
+    # 150% width + 300 milliems, so not much to fill up a page!
+
+    $txt->transform(-translate => [50, 800]);
+    $txt->fillcolor('black');
+    $txt->font($f1, 18);  # Hevetica labels
+    $txt->lead(18*1.25);
+    my $title = "caps 1, bold 8, oblique -15, condense 1.5, space 300.";
+    my $toprint;
+    print STDERR ".";
+    while ($title ne '') {
+        ($toprint, $title) = $txt->_text_fill_line($title, 500, 0);
+    	$txt->text($toprint);
+    	$txt->nl();
+    }
+    $txt->nl();
+    $txt->font($font, 18);
+    while ($LoremIpsum ne '') {
+    	($toprint, $LoremIpsum) = $txt->_text_fill_line($LoremIpsum, 500, 0);
+    	$txt->text($toprint);
+    	$txt->nl();
+    }
+
     $pdf->saveas("$0.$sname.pdf");
     $pdf->end();
     print STDERR "\n";
-   #last;
+   
 } # loop of typefaces  Times-Roman, Times-Italic, etc. separate files
 exit;
 

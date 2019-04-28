@@ -63,7 +63,9 @@ dist.ini
 example/wheredll.pl
 example/whichdll.pl
 lib/FFI/CheckLib.pm
+maint/cip-before-install
 t/00_diag.t
+t/ci.t
 t/ffi_checklib.t
 t/ffi_checklib__exit.t
 t/ffi_checklib__os_cygwin.t
@@ -71,7 +73,6 @@ t/ffi_checklib__os_darwin.t
 t/ffi_checklib__os_mswin32.t
 t/ffi_checklib__os_msys.t
 t/ffi_checklib__os_unix.t
-t/ffi_checklib__travis.t
 t/lib/Test2/Plugin/FauxOS.pm
 t/lib/Test2/Tools/FauxDynaLoader.pm
 t/lib/Test2/Tools/NoteStderr.pm

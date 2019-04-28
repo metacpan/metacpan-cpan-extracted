@@ -4,12 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 use Carp;
-$Carp::Verbose = 1;
 use utf8;
 use Data::Dumper;
 use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
 
 $| = 1;    #autoflush
 
@@ -52,7 +52,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -62,7 +62,7 @@ BEGIN
 } ## end BEGIN
 
 =head2 C<new()>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -73,12 +73,13 @@ BEGIN
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
 
 sub new
 {
     my ( $class, %parameters ) = @_;
+    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
 
     my $self = $class->SUPER::new( %parameters );
 
@@ -98,8 +99,6 @@ sub new
     $self->{ connection } = undef;
     $self->{ json }       = undef;
 
-    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
-
     $self->_initialize( %parameters );
 
     return $self;
@@ -115,6 +114,7 @@ sub _initialize()
 sub END
 {
     $log->debug( "END", { package => __PACKAGE__ } );
+    eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
 }
 
 #################################################### Sets
@@ -147,6 +147,10 @@ my $setDebug = sub {
 my $setPassive = sub {
     my ( $self, $value ) = @_;
     return $self->{ config }->{ passive } = $value;
+};
+my $setIdentityFile = sub {
+    my ( $self, $value ) = @_;
+    return $self->{ config }->{ identity_file } = $value;
 };
 my $setLocalDirectory = sub {
     my ( $self, $value ) = @_;
@@ -204,6 +208,7 @@ sub setConfig()
     $self->$setPort( $parameters{ port } );
     $self->$setDebug( $parameters{ debug } );
     $self->$setPassive( $parameters{ passive } );
+    $self->$setIdentityFile( $parameters{ identity_file } );
     $self->$setLocalDirectory( $parameters{ localDirectory } );
     $self->$setDirectories( $parameters{ directories } );
 
@@ -241,7 +246,7 @@ sub connect()
     }
     elsif ( uc $self->{ config }->{ protocol } eq 'LOCAL' )
     {
-        $retorno = TRUE;
+        $retorno = $self->connectLocal( %parameters );
     }
 
     return $retorno;
@@ -321,10 +326,13 @@ sub connectSFTP()
         password => $self->{ config }->{ password },
         port     => $self->{ config }->{ port } // 22,
         autodie  => 0,
-        more     => [ -o => 'StrictHostKeyChecking no' ],
+        more     => [
+            -o => 'StrictHostKeyChecking no',
+            -o => 'HostKeyAlgorithms +ssh-dss',
+        ],
     );
 
-    $args{ key_path } = [ $self->{ config }->{ identity_file } ] if $self->{ config }->{ identity_file };
+    push @{ $args{ key_path } }, $self->{ config }->{ identity_file } if $self->{ config }->{ identity_file };
     push @{ $args{ more } }, '-v' if ( $self->{ config }->{ debug } );
 
     $self->{ connection } = eval { Net::SFTP::Foreign->new( %args ); };
@@ -349,6 +357,8 @@ sub connectSFTP()
 sub connectLocal()
 {
     my ( $self, %parameters ) = @_;
+
+    return TRUE;
 }
 
 =head2 C<getActiveDirectory()>
@@ -619,13 +629,13 @@ sub unZipFile()
 sub DESTROY
 {
     my ( $self, %parameters ) = @_;
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
         $self->SUPER::DESTROY( %parameters );
-        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => TRUE } );
     }
     else
     {
@@ -691,7 +701,7 @@ LICENSE file included with this module.
 =head1 SEE ALSO
 
 perl(1).
- 
+
 =cut
 
 #################### main pod documentation end ###################

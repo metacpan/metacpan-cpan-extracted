@@ -33,7 +33,7 @@ at all by Perl, but they look like numbers to a parser.
 use strict;
 use PPI::Token::Number ();
 
-our $VERSION = '1.252'; # VERSION
+our $VERSION = '1.264'; # VERSION
 
 our @ISA = "PPI::Token::Number";
 
@@ -77,6 +77,17 @@ sub __TOKENIZER__on_char {
 	# Allow digits
 	return 1 if $char =~ /\d/o;
 
+	if( $char eq '_' ) {
+		return 1 if $t->{token}{content} !~ /\.$/;
+
+		chop $t->{token}->{content};
+		$t->{class} = $t->{token}->set_class( 'Number::Float' )
+			if $t->{token}{content} !~ /\..+\./;
+		$t->_new_token('Operator', '.');
+		$t->_new_token('Word', '_');
+		return 0;
+	}
+
 	# Is this a second decimal point in a row?  Then the '..' operator
 	if ( $char eq '.' ) {
 		if ( $t->{token}->{content} =~ /\.$/ ) {
@@ -84,7 +95,8 @@ sub __TOKENIZER__on_char {
 			# Take the . off the end of the token..
 			# and finish it, then make the .. operator.
 			chop $t->{token}->{content};
-			$t->{class} = $t->{token}->set_class( 'Number::Float' );
+			$t->{class} = $t->{token}->set_class( 'Number::Float' )
+				if $t->{token}{content} !~ /\..+\./;
 			$t->_new_token('Operator', '..');
 			return 0;
 		} else {
@@ -102,10 +114,9 @@ sub __TOKENIZER__commit {
 
 	# Capture the rest of the token
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} !~ m/\G(v\d+(?:\.\d+)+|v\d+\b)/gc ) {
-		# This was not a v-string after all (it's a word)
-		return PPI::Token::Word->__TOKENIZER__commit($t);
-	}
+	# This was not a v-string after all (it's a word);
+	return PPI::Token::Word->__TOKENIZER__commit($t)
+		if $t->{line} !~ m/\G(v\d[_\d]*(?:\.\d[_\d]*)+|v\d[_\d]*\b)/gc;
 
 	my $content = $1;
 

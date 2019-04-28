@@ -18,92 +18,25 @@ use FindBin qw( $Bin );
 use Mojo::File qw( path );
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend );
+use Mojo::JSON qw( true );
 
-my $collections = {
-    people => {
-        required => [qw( name )],
-        properties => {
-            id => {
-                type => 'integer',
-                'x-order' => 1,
-            },
-            name => {
-                type => 'string',
-                'x-order' => 2,
-                description => 'The real name of the person',
-            },
-            email => {
-                type => [ 'string', 'null' ],
-                'x-order' => 3,
-                format => 'email',
-            },
-            age => {
-                type => [qw( integer null )],
-                'x-order' => 4,
-            },
-            contact => {
-                type => [qw( boolean null )],
-                'x-order' => 5,
-            },
-            phone => {
-                type => [ 'string', 'null' ],
-                'x-order' => 6,
-                format => 'tel',
-            },
-        },
-    },
-    user => {
-        'x-id-field' => 'username',
-        'x-list-columns' => [qw( username email )],
-        required => [qw( username email password )],
-        properties => {
-            id => {
-                'x-order' => 1,
-                type => 'integer',
-            },
-            email => {
-                'x-order' => 2,
-            },
-            password => {
-                type => 'string',
-                format => 'password',
-                'x-order' => 3,
-            },
-            access => {
-                type => 'string',
-                enum => [qw( user moderator admin )],
-                'x-order' => 4,
-            },
-            username => {
-                type => 'string',
-                'x-order' => 5,
-            },
-            age => {
-                type => [qw( integer null )],
-                'x-order' => 6,
-            },
-        },
-    },
-    mojo_migrations => { 'x-ignore' => 1 },
-};
+my $collections = \%Yancy::Backend::Test::SCHEMA;
+my $collections_micro = \%Yancy::Backend::Test::SCHEMA_MICRO;
 my %data = (
     people => [
         {
-            id => 1,
             name => 'Doug Bell',
             email => 'doug@example.com',
             age => 35,
             contact => true,
         },
         {
-            id => 2,
             name => 'Joel Berger',
             email => 'joel@example.com',
             age => 51,
             contact => false,
         },
         {
-            id => 3,
             name => 'Secret Person',
             contact => false,
             age => undef, # exercise the deleting of nulls from returns
@@ -139,7 +72,7 @@ subtest 'declared collections' => \&test_api,
 subtest 'read_schema collections' => \&test_api,
     Test::Mojo->new( 'Yancy', {
         backend => $backend_url,
-        collections => $collections,
+        collections => $collections_micro,
         read_schema => 1,
     } ),
     '/yancy/api';
@@ -198,17 +131,16 @@ sub test_api {
             properties => {
                 id => {
                     'x-order' => 1,
+                    readOnly => true,
                     type => 'integer',
                 },
                 name => {
                     'x-order' => 2,
                     type => 'string',
-                    description => 'The real name of the person',
                 },
                 email => {
                     'x-order' => 3,
                     type => [ 'string', 'null' ],
-                    format => 'email',
                 },
                 age => {
                     type => [qw( integer null )],
@@ -221,7 +153,6 @@ sub test_api {
                 phone => {
                     type => [qw( string null )],
                     'x-order' => 6,
-                    format => 'tel',
                 },
             },
           } )
@@ -234,32 +165,62 @@ sub test_api {
             properties => {
                 id => {
                     'x-order' => 1,
+                    readOnly => true,
                     type => 'integer',
                 },
-                email => {
+                username => {
                     'x-order' => 2,
                     type => 'string',
                 },
-                password => {
+                email => {
                     'x-order' => 3,
+                    type => 'string',
+                    title => 'E-mail Address',
+                    format => 'email',
+                    pattern => '^[^@]+@[^@]+$',
+                },
+                password => {
+                    'x-order' => 4,
                     type => 'string',
                     format => 'password',
                 },
                 access => {
-                    'x-order' => 4,
-                    type => 'string',
-                    enum => [qw( user moderator admin )],
-                },
-                username => {
                     'x-order' => 5,
                     type => 'string',
+                    enum => [qw( user moderator admin )],
+                    default => 'user',
                 },
                 age => {
                     'x-order' => 6,
                     type => [ 'integer', 'null' ],
+                    description => 'The person\'s age',
                 },
             },
+          } )
+
+          ->json_is( '/definitions/usermini' => {
+            type => 'object',
+            'x-id-field' => 'username',
             'x-list-columns' => [qw( username email )],
+            'x-view' => { collection => 'user' },
+            properties => {
+                id => {
+                    'x-order' => 1,
+                    readOnly => true,
+                    type => 'integer',
+                },
+                username => {
+                    'x-order' => 2,
+                    type => 'string',
+                },
+                email => {
+                    'x-order' => 3,
+                    type => 'string',
+                    title => 'E-mail Address',
+                    format => 'email',
+                    pattern => '^[^@]+@[^@]+$',
+                },
+            },
           } )
 
           ->json_has( '/paths/~1people/get/responses/200' )
@@ -464,6 +425,42 @@ sub test_api {
                 total => 2,
               } );
 
+            $t->get_ok( $api_path . '/people?id=' . $items{people}[1]{id} )
+              ->status_is( 200 )
+              ->json_is( {
+                items => [
+                    {
+                        id => $items{people}[1]{id},
+                        name => 'Joel Berger',
+                        email => 'joel@example.com',
+                        age => 51,
+                        contact => false,
+                    }
+                ],
+                total => 1,
+              } );
+
+            $t->get_ok( $api_path . '/people?contact=' )
+              ->status_is( 200 )
+              ->json_is( {
+                items => [
+                    {
+                        id => $items{people}[1]{id},
+                        name => 'Joel Berger',
+                        email => 'joel@example.com',
+                        age => 51,
+                        contact => false,
+                    },
+                    {
+                        id => $items{people}[2]{id},
+                        name => 'Secret Person',
+                        contact => false,
+                    },
+                ],
+                total => 2,
+              } )
+              ->or( sub { diag explain shift->tx->res->json } );
+
         };
 
     };
@@ -522,16 +519,15 @@ sub test_api {
         my $new_person = {
             name => 'Foo',
             email => 'doug@example.com',
-            id => 1,
             age => 35,
             contact => true,
             phone => '555 555-0199',
         };
         $t->put_ok( $api_path . '/people/' . $items{people}[0]{id} => json => $new_person )
           ->status_is( 200 )
-          ->json_is( $new_person );
+          ->json_is( { %$new_person, id => $items{people}[0]{id} } );
         $new_person->{ contact } = 1;
-        is_deeply $backend->get( people => $items{people}[0]{id} ), $new_person;
+        is_deeply $backend->get( people => $items{people}[0]{id} ), { %$new_person, id => $items{people}[0]{id} };
 
         my $new_user = {
             username => 'doug',
@@ -568,16 +564,16 @@ sub test_api {
         my $new_person = {
             name => 'Flexo',
             email => undef,
-            id => 4,
             age => 3,
             contact => 0,
             phone => undef,
         };
         $t->post_ok( $api_path . '/people' => json => $new_person )
           ->status_is( 201 )
-          ->json_is( $new_person->{id} )
           ;
-        is_deeply $backend->get( people => 4 ), $new_person;
+        my $id = $t->tx->res->json;
+        is_deeply $backend->get( people => $id ), { %$new_person, id => $id }
+          or diag "got for id '$id', ", explain $backend->get( people => $id );
 
         my $new_user = {
             username => 'flexo',

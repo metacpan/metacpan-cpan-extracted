@@ -21,7 +21,7 @@ abcde ‚¨  align
 EOL
 close(TMP);
 
-$CAT = 'perl -e "print <>"';
+$CAT = 'perl -e "binmode(STDOUT); print STDOUT <>"';
 if (`$CAT Kanji_xxx.tmp` eq <<EOL) {
 ‚ ‚¢‚¤    align
 abcde ‚¨  align

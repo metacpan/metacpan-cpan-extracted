@@ -1,0 +1,30 @@
+{
+   "charttitle" : "regex.code_runtime",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::regex",
+   "chartlines" : [
+       {
+           "title" : "regex.code_runtime/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.PerlStone2015.regex.code_runtime" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "regex.code_runtime/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.PerlStone2015.regex.code_runtime" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

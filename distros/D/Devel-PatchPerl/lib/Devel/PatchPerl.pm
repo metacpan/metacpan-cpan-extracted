@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.56';
+$Devel::PatchPerl::VERSION = '1.58';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -11,7 +11,7 @@ use Devel::PatchPerl::Hints qw[hint_file];
 use Module::Pluggable search_path => ['Devel::PatchPerl::Plugin'];
 use vars qw[@ISA @EXPORT_OK];
 
-use constant CERTIFIED => 5.029008; # Anything less than this
+use constant CERTIFIED => 5.029010; # Anything less than this
 
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(patch_source);
@@ -187,6 +187,9 @@ my @patch = (
               [ \&_patch_patchlevel ],
               [ \&_patch_develpatchperlversion ],
               [ \&_patch_errno_gcc5 ],
+              [ \&_patch_conf_fwrapv ],
+              [ \&_patch_utils_h2ph ],
+              [ \&_patch_lib_h2ph ],
             ],
   },
   {
@@ -7748,6 +7751,133 @@ index e12c8bb..1a8088f 100755
 END
 }
 
+sub _patch_conf_fwrapv {
+  my $perlver = shift;
+  my $num = _norm_ver( $perlver );
+  return unless $num < 5.019011;
+  _patch(<<'FWRAPV');
+diff --git a/Configure b/Configure
+index 15b3da1769..791889a2ab 100755
+--- a/Configure
++++ b/Configure
+@@ -4643,6 +4643,22 @@ case "$gccversion" in
+     $rm -f try try.*
+ esac
+ 
++# gcc 4.9 by default does some optimizations that break perl.
++# see ticket 121505.
++#
++# The -fwrapv disables those optimizations (and probably others,) so
++# for gcc 4.9 (and later, since the optimizations probably won't go
++# away), add -fwrapv unless the user requests -fno-wrapv, which
++# disables -fwrapv, or if the user requests -fsanitize=undefined,
++# which turns the overflows -fwrapv ignores into runtime errors.
++case "$gccversion" in
++4.[3-9].*|4.[1-9][0-9]*|[5-9].*|[1-9][0-9]*)
++    case "$ccflags" in
++    *-fno-wrapv*|*-fsanitize=undefined*|*-fwrapv*) ;;
++    *) ccflags="$ccflags -fwrapv" ;;
++    esac
++esac
++
+ : What should the include directory be ?
+ : Use sysroot if set, so findhdr looks in the right place.
+ echo " "
+FWRAPV
+}
+
+sub _patch_utils_h2ph {
+  my $perlver = shift;
+  my $num = _norm_ver( $perlver );
+  return unless $num < 5.021010;
+  _patch(<<'UH2PH');
+--- utils/h2ph.PL
++++ utils/h2ph.PL
+@@ -788,6 +788,11 @@ sub build_preamble_if_necessary
+ 
+     open  PREAMBLE, ">$preamble" or die "Cannot open $preamble:  $!";
+ 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";
++        # Prevent non-portable hex constants from warning.
++        #
++        # We still produce an overflow warning if we can't represent
++        # a hex constant as an integer.
++        print PREAMBLE "no warnings qw(portable);\n";
+ 
+ 	foreach (sort keys %define) {
+ 	    if ($opt_D) {
+@@ -814,6 +819,18 @@ DEFINE
+ 		# integer:
+ 		print PREAMBLE
+ 		    "unless (defined &$_) { sub $_() { $1 } }\n\n";
++            } elsif ($define{$_} =~ /^([+-]?0x[\da-f]+)U?L{0,2}$/i) {
++                # hex integer
++                # Special cased, since perl warns on hex integers
++                # that can't be represented in a UV.
++                #
++                # This way we get the warning at time of use, so the user
++                # only gets the warning if they happen to use this
++                # platform-specific definition.
++                my $code = $1;
++                $code = "hex('$code')" if length $code > 10;
++                print PREAMBLE
++                    "unless (defined &$_) { sub $_() { $code } }\n\n";
+ 	    } elsif ($define{$_} =~ /^\w+$/) {
+ 		my $def = $define{$_};
+ 		if ($isatype{$def}) {
+UH2PH
+}
+
+sub _patch_lib_h2ph {
+  my $perlver = shift;
+  my $num = _norm_ver( $perlver );
+  return unless $num < 5.021010;
+  if ( $num >= 5.013005 ) {
+    _patch(<<'LH2PH1');
+--- lib/h2ph.t
++++ lib/h2ph.t
+@@ -48,7 +48,7 @@ $result = runperl( progfile => '_h2ph_pre.ph',
+                    stderr => 1 );
+ like( $result, qr/syntax OK$/, "preamble compiles");
+ 
+-$result = runperl( switches => ["-w"],
++$result = runperl( switches => ['-I.', "-w"],
+                    stderr => 1,
+                    prog => <<'PROG' );
+ $SIG{__WARN__} = sub { die $_[0] }; require q(lib/h2ph.pht);
+LH2PH1
+  }
+  elsif ( $num >= 5.013001 ) {
+    _patch(<<'LH2PH2');
+--- lib/h2ph.t
++++ lib/h2ph.t
+@@ -48,7 +48,7 @@ $result = runperl( progfile => '_h2ph_pre.ph',
+                    stderr => 1 );
+ like( $result, qr/syntax OK$/, "preamble compiles");
+ 
+-$result = runperl( switches => ["-w"], 
++$result = runperl( switches => ['-I.', "-w"], 
+                    stderr => 1,
+                    prog => <<'PROG' );
+ $SIG{__WARN__} = sub { die $_[0] }; require q(lib/h2ph.pht);
+LH2PH2
+  }
+  elsif ( $num >= 5.010001 ) {
+    _patch(<<'LH2PH3');
+--- lib/h2ph.t
++++ lib/h2ph.t
+@@ -41,7 +41,7 @@ $result = runperl( progfile => 'lib/h2ph.pht',
+                    stderr => 1 );
+ like( $result, qr/syntax OK$/, "output compiles");
+ 
+-$result = runperl( switches => ["-w"], 
++$result = runperl( switches => ['-I.',"-w"], 
+                    prog => '$SIG{__WARN__} = sub { die $_[0] }; require q(lib/h2ph.pht);');
+ is( $result, '', "output free of warnings" );
+ 
+LH2PH3
+  }
+}
+
 qq[patchin'];
 
 __END__
@@ -7762,7 +7892,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.56
+version 1.58
 
 =head1 SYNOPSIS
 

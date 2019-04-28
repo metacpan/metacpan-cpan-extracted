@@ -22,10 +22,12 @@ MakeMaker
 Plugin
 Robin
 Smidsrød
+Tabulo
 Timofeev
 Vladimir
 Zilla
 avar
+dev
 doy
 ether
 irc

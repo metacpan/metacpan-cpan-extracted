@@ -7,7 +7,7 @@ use List::Util 'any', 'none';
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 sub supported_parameters { () }
 sub default_severity { $SEVERITY_HIGH }
@@ -146,21 +146,13 @@ sub violates {
 					$next = $next->schild(0) if $next->isa('PPI::Structure::List');
 					$next = $next->schild(0) if $next and $next->isa('PPI::Statement::Expression');
 					if ($next and $next->isa('PPI::Token::Symbol') and $next->raw_type eq '$') {
-						# try to detect postderef, hacky for PPI that doesn't understand postderef yet
 						my $is_postderef;
 						until (!$next or ($next->isa('PPI::Token::Structure') and $next eq ';')
 							or ($next->isa('PPI::Token::Operator') and $next eq ',')) {
 							$next = $next->snext_sibling;
-							# this can just look for PPI::Token::Cast in PPI 1.237+
-							if ($next and ($next->isa('PPI::Token::Magic') or $next->isa('PPI::Token::Cast')) and ($next eq '@*' or $next eq '%*')) {
+							if ($next and $next->isa('PPI::Token::Cast') and ($next eq '@*' or $next eq '%*')) {
 								$is_postderef = 1;
 								last;
-							} elsif ($next and $next->isa('PPI::Token::Operator') and $next eq '*') {
-								my $prev = $next->sprevious_sibling;
-								if ($prev and $prev->isa('PPI::Token::Cast') and ($prev eq '@' or $prev eq '%')) {
-									$is_postderef = 1;
-									last;
-								}
 							}
 						}
 						push @violations, $self->_violation('autoderef', $elem) unless $is_postderef;

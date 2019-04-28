@@ -29,52 +29,58 @@ no_index:
 provides:
   Mojolicious::Plugin::Yancy:
     file: lib/Mojolicious/Plugin/Yancy.pm
-    version: '1.023'
+    version: '1.024'
   Yancy:
     file: lib/Yancy.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Dbic:
     file: lib/Yancy/Backend/Dbic.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Mysql:
     file: lib/Yancy/Backend/Mysql.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Pg:
     file: lib/Yancy/Backend/Pg.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Role::MojoAsync:
     file: lib/Yancy/Backend/Role/MojoAsync.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Role::Relational:
     file: lib/Yancy/Backend/Role/Relational.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Role::Sync:
     file: lib/Yancy/Backend/Role/Sync.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Backend::Sqlite:
     file: lib/Yancy/Backend/Sqlite.pm
-    version: '1.023'
+    version: '1.024'
+  Yancy::Command::backend:
+    file: lib/Yancy/Command/backend.pm
+    version: '1.024'
+  Yancy::Command::backend::copy:
+    file: lib/Yancy/Command/backend/copy.pm
+    version: '1.024'
   Yancy::Controller::Yancy:
     file: lib/Yancy/Controller/Yancy.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Controller::Yancy::API:
     file: lib/Yancy/Controller/Yancy/API.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Controller::Yancy::MultiTenant:
     file: lib/Yancy/Controller/Yancy/MultiTenant.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Plugin::Auth::Basic:
     file: lib/Yancy/Plugin/Auth/Basic.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Plugin::Form:
     file: lib/Yancy/Plugin/Form.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Plugin::Form::Bootstrap4:
     file: lib/Yancy/Plugin/Form/Bootstrap4.pm
-    version: '1.023'
+    version: '1.024'
   Yancy::Util:
     file: lib/Yancy/Util.pm
-    version: '1.023'
+    version: '1.024'
 requires:
   Digest: '0'
   Exporter: '0'
@@ -89,15 +95,16 @@ requires:
   Text::Balanced: '0'
   perl: '5.014'
 resources:
-  IRC: irc://irc.perl.org/#yancy
+  IRC: irc://irc.freenode.org/#mojo-yancy
   bugtracker: https://github.com/preaction/Yancy/issues
   homepage: http://preaction.me/yancy/
   repository: https://github.com/preaction/Yancy.git
-version: '1.023'
+version: '1.024'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Ed J <mohawk2@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Rajesh Mallah <mallah.rajesh@gmail.com>'
   - 'William Lindley <wlindley@wlindley.com>'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

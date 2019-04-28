@@ -2,7 +2,7 @@ package Test2::Tools::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use Carp qw/croak/;
 use Test2::API qw/context/;

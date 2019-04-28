@@ -5,7 +5,7 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(Apache::Session);
 use vars qw($VERSION $RELEASE_DATE);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.118 $ =~ /(\d+)\.(\d+)/;
+$VERSION = '1.119';
 $RELEASE_DATE = q$Date: 2002/04/15 12:39:07 $;
 
 use Apache::Session 1.50;
@@ -127,9 +127,9 @@ I'm trying to band-aid by creating this directory};
     my $dir = shift;
     my $levels = shift;
     my $n = 0x100 ** $levels;
-    warn "A:S:Counted: Creating directory $dir
- and $n subdirectories in $levels level(s)\n";
-    warn "A:S:Counted: This may take a while\n" if $levels>1;
+#    warn "A:S:Counted: Creating directory $dir
+# and $n subdirectories in $levels level(s)\n";
+#    warn "A:S:Counted: This may take a while\n" if $levels>1;
     require File::Path;
     $|=1;
     my $feedback =

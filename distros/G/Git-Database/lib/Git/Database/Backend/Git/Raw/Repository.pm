@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Raw::Repository;
-$Git::Database::Backend::Git::Raw::Repository::VERSION = '0.011';
+$Git::Database::Backend::Git::Raw::Repository::VERSION = '0.012';
 use Git::Raw;
 use Sub::Quote;
 use Moo;
@@ -127,7 +127,7 @@ Git::Database::Backend::Git::Raw::Repository - A Git::Database backend based on 
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

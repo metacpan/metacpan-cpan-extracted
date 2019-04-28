@@ -31,7 +31,7 @@ foreach my $with_callbacks ( 0,1 ) {
 		'Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant'
 	);
 
-	authorizationcodegrant_tests::run_tests( $Grant );
+	authorizationcodegrant_tests::run_tests( $Grant,{ no_jwt => 1 } );
 }
 
 done_testing();

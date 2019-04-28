@@ -130,6 +130,7 @@ t/25_increment.t
 t/26_bom.t
 t/27_complete.t
 t/28_foreach_qw.t
+t/29_logical_filename.t
 t/data/03_document/empty.dat
 t/data/03_document/test.dat
 t/data/05_lexer/01_simpleassign.code
@@ -276,6 +277,8 @@ t/data/08_regression/42_numeric_package.code
 t/data/08_regression/42_numeric_package.dump
 t/data/08_regression/43_nonblock_map.code
 t/data/08_regression/43_nonblock_map.dump
+t/data/08_regression/44_vstrings.code
+t/data/08_regression/44_vstrings.dump
 t/data/11_util/test.pm
 t/data/13_data/Foo.pm
 t/data/15_transform/sample1.pm
@@ -287,6 +290,7 @@ t/data/26_bom/utf8.dump
 t/data/27_complete/01y_helloworld.code
 t/data/27_complete/02n_helloworld.code
 t/data/basic.pl
+t/data/filename.pl
 t/data/test2.txt
 t/interactive.t
 t/lib/Helper.pm

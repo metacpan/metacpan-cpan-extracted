@@ -8,12 +8,17 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+Net::Async::Slack::Event::ReconnectURL - Experimental
+
 =head1 DESCRIPTION
 
-{
-"type":"reconnect_url",
-"url":"wss://mpmulti-9w2u.slack-msgs.com/websocket/Sjb...zNIE="
-}
+Example input data:
+
+    {
+        "type": "reconnect_url"
+    }
 
 =head1 INHERITED METHODS
 

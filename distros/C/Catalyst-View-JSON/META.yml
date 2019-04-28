@@ -3,29 +3,29 @@ abstract: 'JSON view for your data'
 author:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0
-  YAML: 0
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catalyst-View-JSON
 no_index:
   directory:
-    - inc
     - t
+    - xt
 requires:
-  Catalyst: 5.6
+  Catalyst: '5.60'
   JSON::MaybeXS: '1.003000'
-  MRO::Compat: 0
-  perl: 5.8.1
+  MRO::Compat: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-View-JSON
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/perl-catalyst/Catalyst-View-JSON.git
-version: '0.36'
+  repository: https://github.com/perl-catalyst/Catalyst-View-JSON.git
+version: '0.37'
+x_authority: cpan:BOBTFISH
+x_breaks: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

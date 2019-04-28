@@ -1,5 +1,13 @@
 Revision history for Future-IO
 
+0.04    2019-04-27 19:08:40
+        [CHANGES]
+         * Added ->syswrite and ->syswrite_exactly
+
+        [BUGFIXES]
+         * Implement ->sysread_exactly test a better way that shouldn't break
+           on Windows due to select() on pipes
+
 0.03    2019-04-25 22:39:55
         [CHANGES]
          * Add ->sysread_exactly

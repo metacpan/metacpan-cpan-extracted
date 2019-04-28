@@ -47,6 +47,6 @@
          "x_bugtracker" : "https://github.com/trapd00r/File-PatternMatch/issues"
       }
    },
-   "version" : "0.054",
+   "version" : "0.056",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

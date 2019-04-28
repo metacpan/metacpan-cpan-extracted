@@ -439,7 +439,7 @@ my %makefile_hash = (
                   },
                   test => {
                     suggests => {
-                      'Inline' => 0.68,
+                      'Inline' => 0.83, # fixed ILSM-finding
                       'Inline::C' => 0.62,
                     },
                   },

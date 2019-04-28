@@ -1,5 +1,14 @@
 Revision history for Future-AsyncAwait
 
+0.26    2019-04-27 12:41:11
+        [BUGFIXES]
+         * Further fixes for foreach(LIST) handling (RT129319)
+         * Handle SAVEt_FREEPV (RT129320)
+         * Cleanup itervar and SAVEt_PADSV_AND_MORTALIZE of abandoned futures
+           (RT129320)
+         * Ensure body of async sub starts with OP_NEXSTATE so as not to upset
+           Devel::Cover (thanks ilmari) (RT128309)
+
 0.25    2019-04-24 15:46:15
         [BUGFIXES]
          * Print a warning but don't panic on resume with lost returning

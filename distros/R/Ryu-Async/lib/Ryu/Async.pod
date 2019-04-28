@@ -137,6 +137,8 @@ with some truncation rules:
 
 =item * A C<Web::Async::> prefix will be replaced by C<Wa>.
 
+=item * A C<Database::Async::> prefix will be replaced by C<Da>.
+
 =item * A C<IO::Async::> prefix will be replaced by C<Ia>.
 
 =item * A C<Tickit::Async::> prefix will be replaced by C<Ta>.

@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   OldUTF8::eval
-    length          vs   OldUTF8::length
-    substr          vs   OldUTF8::substr
-    ord             vs   OldUTF8::ord
-    reverse         vs   OldUTF8::reverse
-    getc            vs   OldUTF8::getc
-    index           vs   OldUTF8::index
-    rindex          vs   OldUTF8::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  OldUTF8::eval
+    length          vs.  OldUTF8::length
+    substr          vs.  OldUTF8::substr
+    ord             vs.  OldUTF8::ord
+    reverse         vs.  OldUTF8::reverse
+    getc            vs.  OldUTF8::getc
+    index           vs.  OldUTF8::index
+    rindex          vs.  OldUTF8::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

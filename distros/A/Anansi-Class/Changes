@@ -21,3 +21,9 @@ Revision history for Perl extension Anansi::Class.
 0.09  Thu Aug 08 12:53:09 2013
 	- added "using" subroutine.
 	- modified the POD.
+0.10  Tue Apr 09 16:27:51 2019
+	- modified module dependencies in makefile to require Anansi::ObjectManager version 0.09 or greater.
+	- modified "identification" subroutine to reflect changes to Anansi::ObjectManager.
+	- modified "used" subroutine to reflect changes to Anansi::ObjectManager.
+	- modified "uses" subroutine to reflect changes to Anansi::ObjectManager.
+	- modified "using" subroutine to reflect changes to Anansi::ObjectManager.

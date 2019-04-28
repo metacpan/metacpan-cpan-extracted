@@ -25,7 +25,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.67';
+$VERSION = '3.68';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.67
+SNMP::Info - Version 3.68
 
 =head1 AUTHOR
 
@@ -991,6 +991,12 @@ Subclass for Pica8 devices.
 
 See documentation in L<SNMP::Info::Layer3::Pica8> for details.
 
+=item SNMP::Info::Layer3::Redlion
+
+Subclass for redlion routers.
+
+See documentation in L<SNMP::Info::Layer3::Redlion> for details.
+
 =item SNMP::Info::Layer3::SonicWALL
 
 Subclass for generic SonicWALL devices.
@@ -1079,7 +1085,7 @@ See documentation in L<SNMP::Info::Layer7::Liebert> for details.
 
 =item SNMP::Info::Layer7::Neoteris
 
-Subclass for Juniper SSL VPN appliances.
+Subclass for Pulse Secure / Juniper SSL VPN appliances.
 
 See documentation in L<SNMP::Info::Layer7::Neoteris> for details.
 
@@ -1390,7 +1396,7 @@ sub new {
 
     my $info = $auto_specific ? $new_obj->specify() : $new_obj;
 
-    if ( $info->debug() > 1 ) {
+    if (defined $info and ($info->debug() > 1)) {
         require mro;
         print STDERR (ref $info) ." has resolution order: \n";
         print STDERR "  $_\n" foreach @{ mro::get_linear_isa( ref $info ) };
@@ -1653,6 +1659,7 @@ sub device_type {
         674  => 'SNMP::Info::Layer3::Dell',
         1588 => 'SNMP::Info::Layer3::Foundry',
         1872 => 'SNMP::Info::Layer3::AlteonAD',
+        1890 => 'SNMP::Info::Layer3::Redlion',
         1916 => 'SNMP::Info::Layer3::Extreme',
         1991 => 'SNMP::Info::Layer3::Foundry',
         2011 => 'SNMP::Info::Layer3::Huawei',
@@ -1711,6 +1718,7 @@ sub device_type {
         664   => 'SNMP::Info::Layer2::Adtran',
         674   => 'SNMP::Info::Layer3::Dell',
         1872  => 'SNMP::Info::Layer3::AlteonAD',
+        1890  => 'SNMP::Info::Layer3::Redlion',
         1916  => 'SNMP::Info::Layer3::Extreme',
         1991  => 'SNMP::Info::Layer3::Foundry',
         2011  => 'SNMP::Info::Layer3::Huawei',
@@ -3555,7 +3563,7 @@ $NOSUCH = 1;
 =item $REPEATERS
 
 Default 20.  MaxRepeaters for BULKWALK operations.  See C<perldoc SNMP> for
-more info.  Can change by passing L<BulkRepeaters> option in new()
+more info.  Can change by passing L</BulkRepeaters> option in new()
 
 =cut
 

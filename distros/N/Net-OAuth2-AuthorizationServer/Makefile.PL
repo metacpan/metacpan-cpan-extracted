@@ -20,6 +20,7 @@ WriteMakefile(
     'CryptX'          => '0.021',
     'Mojo::JWT'       => '0.04',
     'Try::Tiny'       => '0.22',
+    'Crypt::JWT'      => '0.023',
   },
   BUILD_REQUIRES => {
     'Test::Most'      => 0,

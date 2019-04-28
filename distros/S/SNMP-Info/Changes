@@ -1,3 +1,13 @@
+Version 3.68 (2019-04-28)
+
+  [NEW FEATURES]
+
+  * initial support for redlion cellular routers (inphobia)
+
+  [ENHANCEMENTS]
+
+  * use pulsesecure mib in layer7::neoteris instead of juniper-ive
+
 Version 3.67 (2019-04-20)
 
   [NEW FEATURES]

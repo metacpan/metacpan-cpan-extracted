@@ -1,5 +1,11 @@
 Revision history for Git-Database
 
+0.012 2019-04-26 BOOK
+    - Adapted to the output of git-cat-file for git >= 2.21.0.rc0
+      (RT #129103, reported by SREZIC)
+    - Tweaked some previously generated test scripts to not load
+      backend with uninstalled prerequisites
+
 0.011 2019-01-28 BOOK
     - Improved META generation to fix two kwalitee issues:
       `build_prereq_matches_use` and `meta_yml_has_provides`

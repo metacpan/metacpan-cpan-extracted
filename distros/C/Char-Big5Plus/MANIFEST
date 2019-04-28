@@ -1,11 +1,11 @@
 Char/Big5Plus.pm
-Big5Plus.pm
-Ebig5plus.pm
+lib/Big5Plus.pm
+lib/Ebig5plus.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -400,3 +400,7 @@ t/Big5Plus/395_big5pluseval_block.t
 t/Big5Plus/396_double_diamond.t
 t/Big5Plus/397_bitwise_op.t
 t/Big5Plus/398_non_capturing.t
+t/Big5Plus/399_indented_heredoc_qq.t
+t/Big5Plus/400_indented_heredoc_q.t
+t/Big5Plus/401_indented_heredoc_qx.t
+t/Big5Plus/402_regexp_xx.t

@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   GBK::eval
-    length          vs   GBK::length
-    substr          vs   GBK::substr
-    ord             vs   GBK::ord
-    reverse         vs   GBK::reverse
-    getc            vs   GBK::getc
-    index           vs   GBK::index
-    rindex          vs   GBK::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  GBK::eval
+    length          vs.  GBK::length
+    substr          vs.  GBK::substr
+    ord             vs.  GBK::ord
+    reverse         vs.  GBK::reverse
+    getc            vs.  GBK::getc
+    index           vs.  GBK::index
+    rindex          vs.  GBK::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

@@ -30,7 +30,7 @@ if( $BUILDING_AS_PACKAGE ) {
         'ExtUtils::Manifest'       => '1.70',
         'version'                  => '0',
     );
-    $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
+    $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if "$]" < 5.008;
 
     %Extra_Test_Prereqs = (
         'File::Temp'               => '0.22',
@@ -65,7 +65,7 @@ my $MM = WriteMakefile(
         'Pod::Man'       => 0,                 # manifypods needs Pod::Man
         'File::Basename' => 0,
         'Data::Dumper'   => 0,
-        ($] > 5.008 ? (Encode => 0) : ()),
+        ("$]" > 5.008 ? (Encode => 0) : ()),
     },
     TEST_REQUIRES    => \%Extra_Test_Prereqs,
 
@@ -92,7 +92,7 @@ my $MM = WriteMakefile(
 
     CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
     BUILD_REQUIRES     => {},                  # We don't need ourself to build ourself.
-    INSTALLDIRS        => ( $] < 5.012 ? 'perl' : 'site' ),
+    INSTALLDIRS        => ( "$]" < 5.012 ? 'perl' : 'site' ),
     LICENSE            => 'perl',
     AUTHOR             => 'Michael G Schwern <schwern@pobox.com>',
 
@@ -139,8 +139,9 @@ BIN_WARN
     }
 
     sub special_targets {
-      my $make_frag = shift->SUPER::special_targets(@_);
-      return $make_frag if $Is_VMS; # not supported in MMS, MMK
+      my ( $self ) = shift;
+      my $make_frag = $self->SUPER::special_targets(@_);
+      return $make_frag if $Is_VMS or $self->is_make_type('dmake'); # not supported in MMS, MMK or by `dmake`
       $make_frag .= <<'MAKE_FRAG';
 .NOTPARALLEL: pure_all
 

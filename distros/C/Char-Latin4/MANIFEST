@@ -1,11 +1,11 @@
 Char/Latin4.pm
-Latin4.pm
-Elatin4.pm
+lib/Latin4.pm
+lib/Elatin4.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Latin4/395_latin4eval_block.t
 t/Latin4/396_double_diamond.t
 t/Latin4/397_bitwise_op.t
 t/Latin4/398_non_capturing.t
+t/Latin4/399_indented_heredoc_qq.t
+t/Latin4/400_indented_heredoc_q.t
+t/Latin4/401_indented_heredoc_qx.t
+t/Latin4/402_regexp_xx.t

@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -27,7 +27,8 @@ use Mojo::Base '-strict';
 use Exporter 'import';
 use Mojo::Loader qw( load_class );
 use Scalar::Util qw( blessed );
-our @EXPORT_OK = qw( load_backend curry currym );
+use Mojo::JSON::Pointer;
+our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs );
 
 #pod =sub load_backend
 #pod
@@ -116,6 +117,65 @@ sub currym {
             $meth, blessed( $obj );
     return curry( $sub, $obj, @args );
 }
+
+#pod =sub copy_inline_refs
+#pod
+#pod     my $subschema = copy_inline_refs( $schema, '/user' );
+#pod
+#pod Given:
+#pod
+#pod =over
+#pod
+#pod =item a "source" JSON schema (will not be mutated)
+#pod
+#pod =item a JSON Pointer into the source schema, from which to be copied
+#pod
+#pod =back
+#pod
+#pod will return another, copied standalone JSON schema, with any C<$ref>
+#pod either copied in, or if previously encountered, with a C<$ref> to the
+#pod new location.
+#pod
+#pod =cut
+
+sub copy_inline_refs {
+    my ( $schema, $pointer, $usschema, $uspointer, $refmap ) = @_;
+    $usschema //= Mojo::JSON::Pointer->new( $schema )->get( $pointer );
+    $uspointer //= '';
+    $refmap ||= {};
+    return { '$ref' => $refmap->{ $uspointer } } if $refmap->{ $uspointer };
+    $refmap->{ $pointer } = "#$uspointer"
+        unless ref $usschema eq 'HASH' and $usschema->{'$ref'};
+    return $usschema
+        unless ref $usschema eq 'ARRAY' or ref $usschema eq 'HASH';
+    my $counter = 0;
+    return [ map copy_inline_refs(
+        $schema,
+        $pointer.'/'.$counter++,
+        $_,
+        $uspointer.'/'.$counter++,
+        $refmap,
+    ), @$usschema ] if ref $usschema eq 'ARRAY';
+    # HASH
+    my $ref = $usschema->{'$ref'};
+    return { map { $_ => copy_inline_refs(
+        $schema,
+        $pointer.'/'.$_,
+        $usschema->{ $_ },
+        $uspointer.'/'.$_,
+        $refmap,
+    ) } sort keys %$usschema } if !$ref;
+    $ref =~ s:^#::;
+    return { '$ref' => $refmap->{ $ref } } if $refmap->{ $ref };
+    copy_inline_refs(
+        $schema,
+        $ref,
+        Mojo::JSON::Pointer->new( $schema )->get( $ref ),
+        $uspointer,
+        $refmap,
+    );
+}
+
 1;
 
 __END__
@@ -128,7 +188,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -198,6 +258,24 @@ Return a subref that, when called, will call given C<$method> on the
 given C<$obj> with any passed-in C<@args> first.
 
 See L</curry> for an example.
+
+=head2 copy_inline_refs
+
+    my $subschema = copy_inline_refs( $schema, '/user' );
+
+Given:
+
+=over
+
+=item a "source" JSON schema (will not be mutated)
+
+=item a JSON Pointer into the source schema, from which to be copied
+
+=back
+
+will return another, copied standalone JSON schema, with any C<$ref>
+either copied in, or if previously encountered, with a C<$ref> to the
+new location.
 
 =head1 SEE ALSO
 

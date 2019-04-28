@@ -1,2 +1,9 @@
+2.019107 2019-04-27
+ - doc use with Inline::Module
+ - zap non-working MakePdlappInstallable
+
+2.019106 2019-04-26
+ - improve test coverage
+
 2.019105 2019-04-26
  - split into own distro

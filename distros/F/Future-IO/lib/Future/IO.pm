@@ -9,13 +9,14 @@ use strict;
 use warnings;
 use 5.010;  # //
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp;
 
 # These need to be visible to sub override_impl
 my @alarms;
 my @readers;
+my @writers;
 
 our $IMPL;
 
@@ -48,12 +49,12 @@ these operations.
 
 If the C<override_impl> method is not invoked, a default implementation of
 these operations is provided. This implementation allows a single queue of
-C<sysread> calls on a single filehandle only, combined with C<sleep> calls.
-It is provided for the simple cases where modules only need one filehandle
-(most likely a single network socket or hardware device handle), allowing such
-modules to work without needing a better event system.
+C<sysread> or C<syswrite> calls on a single filehandle only, combined with
+C<sleep> calls. It is provided for the simple cases where modules only need
+one filehandle (most likely a single network socket or hardware device
+handle), allowing such modules to work without needing a better event system.
 
-If there are both C<sysread> and C<sleep> futures pending, the implementation
+If there are both read/write and C<sleep> futures pending, the implementation
 will use C<select()> to wait for either. This may be problematic on MSWin32,
 depending on what type of filehandle is involved.
 
@@ -162,6 +163,67 @@ sub _sysread_into_buffer
    });
 }
 
+=head2 syswrite
+
+   $f = Future::IO->syswrite( $fh, $bytes )
+      $written_len = $f->get
+
+I<Since version 0.04.>
+
+Returns a L<Future> that will become done when at least one byte has been
+written to the given filehandle. It may write up to all of the bytes. On any
+error (other than C<EAGAIN> / C<EWOULDBLOCK> which are ignored) the future
+fails with a suitable error message.
+
+Note specifically this may perform only a single C<sysread()> call, and thus
+is not guaranteed to actually return the full length.
+
+=cut
+
+sub syswrite
+{
+   shift;
+   my ( $fh, $bytes ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->syswrite( $fh, $bytes );
+}
+
+=head2 syswrite_exactly
+
+   $f = Future::IO->syswrite_exactly( $fh, $bytes )
+      $written_len = $f->get;
+
+I<Since version 0.04.>
+
+=cut
+
+sub syswrite_exactly
+{
+   shift;
+   my ( $fh, $bytes ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   if( my $code = $IMPL->can( "syswrite_exactly" ) ) {
+      return $IMPL->$code( $fh, $bytes );
+   }
+
+   return _syswrite_from_buffer( $IMPL, $fh, $bytes, length $bytes );
+}
+
+sub _syswrite_from_buffer
+{
+   my ( $IMPL, $fh, $bytes, $len ) = @_;
+
+   $IMPL->syswrite( $fh, $bytes )->then( sub {
+      my ( $written_len ) = @_;
+      substr $bytes, 0, $written_len, "";
+
+      return Future->done( $len ) if !length $bytes;
+      return _syswrite_from_buffer( $IMPL, $fh, $bytes, $len );
+   });
+}
+
 =head2 override_impl
 
    Future::IO->override_impl( $impl )
@@ -206,6 +268,7 @@ use Time::HiRes qw( time );
 readonly_struct Alarm => [qw( time f )];
 
 readonly_struct Reader => [qw( fh length f )];
+readonly_struct Writer => [qw( fh bytes f )];
 
 sub sleep
 {
@@ -231,6 +294,29 @@ sub sysread
       $idx++ while $idx < @readers and $readers[$idx]->f != $self;
 
       splice @readers, $idx, 1, ();
+   });
+
+   return $self;
+}
+
+sub syswrite
+{
+   my $class = shift;
+   my ( $fh, $bytes ) = @_;
+
+   croak "This implementation can only cope with a single pending filehandle in ->syswrite"
+      if @writers and $writers[-1]->fh != $fh;
+
+   my $self = $class->new;
+   push @writers, Writer( $fh, $bytes, $self );
+
+   $self->on_cancel( sub {
+      my $self = shift;
+
+      my $idx = 0;
+      $idx++ while $idx < @writers and $writers[$idx]->f != $self;
+
+      splice @writers, $idx, 1, ();
    });
 
    return $self;
@@ -263,19 +349,37 @@ sub await
 {
    shift;
 
-   die "Cowardly refusing to sit idle and do nothing" unless @alarms || @readers;
+   die "Cowardly refusing to sit idle and do nothing" unless @alarms || @readers || @writers;
 
-   my $maxwait;
-   $maxwait = $alarms[0]->time - time() if @alarms;
+   # If we always select() then problematic platforms like MSWin32 would
+   # always break. Instead, we'll only select() if we're waiting on more than
+   # one of alarm, reader, writer. If not we'll just presume the one operation
+   # we're waiting for is definitely ready right now.
 
-   my $rvec = '';
-   vec( $rvec, $readers[0]->fh->fileno, 1 ) = 1 if @alarms && @readers;
+   my $rready;
+   my $wready;
 
-   my $ret = ( defined $maxwait ) ?
-      select( $rvec, undef, undef, $maxwait ) :
-      1;
+   if( @alarms or ( @readers && @writers ) ) {
+      my $rvec = '';
+      vec( $rvec, $readers[0]->fh->fileno, 1 ) = 1 if @readers;
 
-   if( $ret and @readers ) {
+      my $wvec = '';
+      vec( $wvec, $writers[0]->fh->fileno, 1 ) = 1 if @writers;
+
+      my $maxwait;
+      $maxwait = $alarms[0]->time - time() if @alarms;
+
+      my $ret = select( $rvec, $wvec, undef, $maxwait );
+
+      $rready = $ret && @readers && vec( $rvec, $readers[0]->fh->fileno, 1 );
+      $wready = $ret && @writers && vec( $wvec, $writers[0]->fh->fileno, 1 );
+   }
+   else {
+      $rready = !!@readers;
+      $wready = !!@writers;
+   }
+
+   if( $rready ) {
       my $r = $readers[0];
 
       my $len = $r->fh->sysread( my $buf, $r->length );
@@ -296,12 +400,31 @@ sub await
          $r->f->fail( "sysread: $!\n", sysread => $r->fh, $! );
       }
    }
+   if( $wready ) {
+      my $w = $writers[0];
+
+      my $len = $w->fh->syswrite( $w->bytes );
+      if( $len ) {
+         shift @writers;
+         $w->f->done( $len );
+      }
+      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
+         # ignore it
+      }
+      else {
+         shift @writers;
+         $w->f->fail( "syswrite: $!\n", syswrite => $w->fh, $! );
+      }
+   }
 
    my $now = time();
    while( @alarms and $alarms[0]->time <= $now ) {
       ( shift @alarms )->f->done;
    }
 }
+
+# TODO: Consider implementing the _exactly variants of sysread/syswrite for
+#   efficiency
 
 =head1 THE C<$IMPL> VARIABLE
 
@@ -336,6 +459,27 @@ For example, something like the following code arrangement is recommended.
    {
       ...
    }
+
+   sub syswrite
+   {
+      ...
+   }
+
+Optionally, you can also implement L</sysread_exactly> and
+L</syswrite_exactly>:
+
+   sub sysread_exactly
+   {
+      ...
+   }
+
+   sub syswrite_exactly
+   {
+      ...
+   }
+
+If not, they will be emulated by C<Future::IO> itself, making multiple calls
+to the non-C<_exactly> versions.
 
 =head1 AUTHOR
 

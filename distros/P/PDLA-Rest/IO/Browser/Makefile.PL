@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDLA::Core::Dev;
 use File::Spec;
 eval { require Devel::CheckLib; Devel::CheckLib->import; };
 

@@ -1,0 +1,30 @@
+{
+   "charttitle" : "regex.runtime_comp_nocache",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::regex",
+   "chartlines" : [
+       {
+           "title" : "regex.runtime_comp_nocache/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.regex.runtime_comp_nocache" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "regex.runtime_comp_nocache/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [ "=",    "env_perlformance_qualid", "pts2019" ],
+                   [ "=",    "NAME", "perlformance.perl5.PerlStone2015.regex.runtime_comp_nocache" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

@@ -3,7 +3,7 @@ package Net::Async::Slack::RTM;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 
@@ -35,12 +35,17 @@ use JSON::MaybeXS;
 use Time::Moment;
 use Syntax::Keyword::Try;
 
+use IO::Async::Timer::Countdown;
 use Net::Async::WebSocket::Client;
 
 use Net::Async::Slack::Event::AccountsChanged;
+use Net::Async::Slack::Event::AppHomeOpened;
+use Net::Async::Slack::Event::AppMention;
+use Net::Async::Slack::Event::AppRateLimited;
 use Net::Async::Slack::Event::AppUninstalled;
 use Net::Async::Slack::Event::BotAdded;
 use Net::Async::Slack::Event::BotChanged;
+use Net::Async::Slack::Event::Bot;
 use Net::Async::Slack::Event::ChannelArchive;
 use Net::Async::Slack::Event::ChannelCreated;
 use Net::Async::Slack::Event::ChannelDeleted;
@@ -48,6 +53,7 @@ use Net::Async::Slack::Event::ChannelHistoryChanged;
 use Net::Async::Slack::Event::ChannelJoined;
 use Net::Async::Slack::Event::ChannelLeft;
 use Net::Async::Slack::Event::ChannelMarked;
+use Net::Async::Slack::Event::Channel;
 use Net::Async::Slack::Event::ChannelRename;
 use Net::Async::Slack::Event::ChannelUnarchive;
 use Net::Async::Slack::Event::CommandsChanged;
@@ -69,6 +75,7 @@ use Net::Async::Slack::Event::GridMigrationFinished;
 use Net::Async::Slack::Event::GridMigrationStarted;
 use Net::Async::Slack::Event::GroupArchive;
 use Net::Async::Slack::Event::GroupClose;
+use Net::Async::Slack::Event::GroupDeleted;
 use Net::Async::Slack::Event::GroupHistoryChanged;
 use Net::Async::Slack::Event::GroupJoined;
 use Net::Async::Slack::Event::GroupLeft;
@@ -86,6 +93,7 @@ use Net::Async::Slack::Event::LinkShared;
 use Net::Async::Slack::Event::ManualPresenceChange;
 use Net::Async::Slack::Event::MemberJoinedChannel;
 use Net::Async::Slack::Event::MemberLeftChannel;
+use Net::Async::Slack::Event::MessageAppHome;
 use Net::Async::Slack::Event::MessageChannels;
 use Net::Async::Slack::Event::MessageGroups;
 use Net::Async::Slack::Event::MessageIm;
@@ -95,12 +103,19 @@ use Net::Async::Slack::Event::PinAdded;
 use Net::Async::Slack::Event::PinRemoved;
 use Net::Async::Slack::Event::PrefChange;
 use Net::Async::Slack::Event::PresenceChange;
+use Net::Async::Slack::Event::PresenceQuery;
+use Net::Async::Slack::Event::PresenceSub;
 use Net::Async::Slack::Event::ReactionAdded;
 use Net::Async::Slack::Event::ReactionRemoved;
 use Net::Async::Slack::Event::ReconnectURL;
+use Net::Async::Slack::Event::ResourcesAdded;
+use Net::Async::Slack::Event::ResourcesRemoved;
+use Net::Async::Slack::Event::ScopeDenied;
+use Net::Async::Slack::Event::ScopeGranted;
 use Net::Async::Slack::Event::StarAdded;
 use Net::Async::Slack::Event::StarRemoved;
 use Net::Async::Slack::Event::SubteamCreated;
+use Net::Async::Slack::Event::SubteamMembersChanged;
 use Net::Async::Slack::Event::SubteamSelfAdded;
 use Net::Async::Slack::Event::SubteamSelfRemoved;
 use Net::Async::Slack::Event::SubteamUpdated;
@@ -114,8 +129,11 @@ use Net::Async::Slack::Event::TeamProfileDelete;
 use Net::Async::Slack::Event::TeamProfileReorder;
 use Net::Async::Slack::Event::TeamRename;
 use Net::Async::Slack::Event::TokensRevoked;
-use Net::Async::Slack::Event::UrlVerification;
+use Net::Async::Slack::Event::URLVerification;
 use Net::Async::Slack::Event::UserChange;
+use Net::Async::Slack::Event::UserResourceDenied;
+use Net::Async::Slack::Event::UserResourceGranted;
+use Net::Async::Slack::Event::UserResourceRemoved;
 use Net::Async::Slack::Event::UserTyping;
 
 use Log::Any qw($log);
@@ -145,7 +163,6 @@ sub events {
     }
 }
 
-
 =head2 send_message
 
 Sends a message to a user or channel.
@@ -169,7 +186,7 @@ sub send_message {
     my ($self, %args) = @_;
     my $id = $self->next_id($args{id});
     my $f = $self->loop->new_future;
-	$self->ws->send_frame(
+    $self->ws->send_frame(
         buffer => $json->encode({
             type    => 'message',
             id      => $id,
@@ -201,16 +218,7 @@ sub connect {
         )
     );
     $self->{ws}->connect(
-        url        => $uri,
-        host       => $uri->host,
-        ($uri->scheme eq 'wss'
-        ? (
-            service      => 443,
-            extensions   => [ qw(SSL) ],
-            SSL_hostname => $uri->host,
-        ) : (
-            service    => 80,
-        ))
+        url        => "$uri",
     )
 }
 
@@ -278,11 +286,39 @@ sub configure {
     $self->next::method(%args);
 }
 
+sub ping_timer {
+    my ($self) = @_;
+    $self->{ping_timer} ||= do {
+        $self->add_child(
+            my $timer = IO::Async::Timer::Countdown->new(
+                delay => 10,
+                on_expire => $self->curry::weak::trigger_ping,
+            )
+        );
+        $timer
+    }
+}
+
+sub trigger_ping {
+    my ($self, %args) = @_;
+    my $id = $self->next_id($args{id});
+    $self->ws->send_frame(
+        buffer => $json->encode({
+            type    => 'ping',
+            id      => $id,
+        }),
+        masked => 1
+    );
+    $self->ping_timer->reset;
+    $self->ping_timer->start if $self->ping_timer->is_expired;
+}
+
 sub _add_to_loop {
     my ($self, $loop) = @_;
     $self->add_child(
         $self->{ryu} = Ryu::Async->new
     );
+    $self->ping_timer->start;
     $self->{last_id} //= 0;
 }
 

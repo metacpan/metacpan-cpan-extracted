@@ -3,22 +3,21 @@ use strict;
 use warnings;
 
 # this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
+# and adapted to only load backend modules that have their prerequisites installed
 
 use Test::More;
+use lib 't/lib';
+use TestUtil;
 
-plan tests => 23 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+my %backends = map
+  +( join( '/', qw( Git Database Backend ), split /::/ ) . ".pm" => 1 ),
+  available_backends();
+  use Data::Dumper;print Dumper(\%backends);
 
 my @module_files = (
     'Git/Database.pm',
     'Git/Database/Actor.pm',
-    'Git/Database/Backend/Cogit.pm',
-    'Git/Database/Backend/Git.pm',
-    'Git/Database/Backend/Git/PurePerl.pm',
-    'Git/Database/Backend/Git/Raw/Repository.pm',
-    'Git/Database/Backend/Git/Repository.pm',
-    'Git/Database/Backend/Git/Sub.pm',
-    'Git/Database/Backend/Git/Wrapper.pm',
-    'Git/Database/Backend/None.pm',
+    ( sort keys %backends ),
     'Git/Database/DirectoryEntry.pm',
     'Git/Database/Object/Blob.pm',
     'Git/Database/Object/Commit.pm',
@@ -34,7 +33,7 @@ my @module_files = (
     'Git/Database/Role/RefWriter.pm'
 );
 
-
+plan tests => @module_files + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 # no fake home requested
 

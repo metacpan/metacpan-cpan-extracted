@@ -12,25 +12,30 @@ my %WriteMakefileArgs = (
     AUTHOR           => 'Luiz Benevenuto (luiz@siffra.com.br)',
     MIN_PERL_VERSION => '5.014',
     LICENSE          => 'perl',
-    INSTALLDIRS      => ($] < 5.011 ? 'perl' : 'site'),
-    PREREQ_PM => {
-        'strict'             => 0,
-        'warnings'           => 0,
-        'Test::Simple'       => 0.44,
-        'Test::More'         => 0,
-        'Test::Perl::Critic' => 0,
-        'version'            => 0,
-        'utf8'               => 0,
-        'Log::Any'           => 0,
-        'Scalar::Util'       => 0,
-        'Data::Dumper'       => 0,
+    INSTALLDIRS      => ( $] < 5.011 ? 'perl' : 'site' ),
+    PREREQ_PM        => {
+
+        # Default req
+        'strict'       => 0,
+        'warnings'     => 0,
+        'Carp'         => 0,
+        'utf8'         => 0,
+        'Data::Dumper' => 0,
+        'DDP'          => 0,
+        'Log::Any'     => 0,
+        'Scalar::Util' => 0,
+        'version'      => 0,
+        # Default req
+
+        'Test::More'            => 0,
+        'ExtUtils::ModuleMaker' => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,
         'ExtUtils::MakeMaker' => 0,
     },
     (
-        eval { ExtUtils::MakeMaker->VERSION(6.46) }
+        eval { ExtUtils::MakeMaker->VERSION( 6.46 ) }
         ? ()
         : (
             META_MERGE => {
@@ -39,19 +44,19 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git@github.com:lbenevenuto/ExtUtils-ModuleMaker-Siffra.git',
-                        web  => 'https://github.com/lbenevenuto/ExtUtils-ModuleMaker-Siffra',
+                        url  => 'git@github.com:SiffraTI/ExtUtils-ModuleMaker-Siffra.git',
+                        web  => 'https://github.com/SiffraTI/ExtUtils-ModuleMaker-Siffra',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/ExtUtils-ModuleMaker-Siffra/issues',
+                        web => 'https://github.com/SiffraTI/ExtUtils-ModuleMaker-Siffra/issues',
                     },
                 },
             }
         )
     ),
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'ExtUtils-ModuleMaker-Siffra-* *.old *.bak' },
+    clean => { FILES    => 'ExtUtils-ModuleMaker-Siffra-* *.old *.bak' },
 );
 
-WriteMakefile(%WriteMakefileArgs);
+WriteMakefile( %WriteMakefileArgs );

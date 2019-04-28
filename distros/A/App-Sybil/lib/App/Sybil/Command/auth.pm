@@ -7,7 +7,6 @@ use v5.12;
 use App::Sybil -command;
 
 use IO::Prompt::Simple 'prompt';
-use Sys::Hostname;
 
 sub abstract { 'Authenticate with github' }
 
@@ -53,7 +52,7 @@ sub execute {
   eval {
     $auth = $github->oauth->create_authorization({
       scopes => ['repo'],
-      note => 'sybil-' . hostname,
+      note => 'sybil',
     });
   };
 

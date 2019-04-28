@@ -1,3 +1,4 @@
+requires 'perl', '>= 5.024';
 requires 'parent';
 requires 'indirect';
 requires 'Digest::MD5';

@@ -1,11 +1,11 @@
 Char/UTF2.pm
-UTF2.pm
-Eutf2.pm
+lib/UTF2.pm
+lib/Eutf2.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -317,3 +317,7 @@ t/UTF2/395_utf2eval_block.t
 t/UTF2/396_double_diamond.t
 t/UTF2/397_bitwise_op.t
 t/UTF2/398_non_capturing.t
+t/UTF2/399_indented_heredoc_qq.t
+t/UTF2/400_indented_heredoc_q.t
+t/UTF2/401_indented_heredoc_qx.t
+t/UTF2/402_regexp_xx.t

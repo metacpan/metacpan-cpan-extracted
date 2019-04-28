@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "IO::Async::Timer::Periodic" => 0,
     "IO::Socket::IP" => "0.37",
     "Log::Any" => "1.050",
-    "Ryu" => "0.034",
+    "Ryu" => "1.003",
     "Ryu::Sink" => 0,
     "Ryu::Source" => 0,
     "Scalar::Util" => 0,
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "Variable::Disposition" => "0.004",
     "indirect" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,7 +90,7 @@ my %FallbackPrereqs = (
   "IO::Socket::IP" => "0.37",
   "IPC::Open3" => 0,
   "Log::Any" => "1.050",
-  "Ryu" => "0.034",
+  "Ryu" => "1.003",
   "Ryu::Sink" => 0,
   "Ryu::Source" => 0,
   "Scalar::Util" => 0,

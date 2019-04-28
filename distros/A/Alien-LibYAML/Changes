@@ -1,5 +1,12 @@
 Revision history for Alien-LibYAML
 
+2.05      2019-04-27 21:08:14 -0400
+  - Use https instead of http.
+  - Fix for fedora system install (gh#3)
+    see rt#129323, and
+    https://github.com/Perl5-FFI/FFI-CheckLib/issues/13
+  - Use Decode::Mojo plugin instead of Decode::HTML (gh#4)
+
 2.04      2018-06-13 04:23:58 -0400
   - Production release identical to 2.03_01
 

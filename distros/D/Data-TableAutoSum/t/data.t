@@ -6,23 +6,23 @@ use Data::TableAutoSum;
 use List::Util qw/sum/;
 use Test::More;
 use Test::Exception;
-use t'CommonStuff;
+use t::CommonStuff;
 
 sub test_set_and_get_data {
     my $table = Data::TableAutoSum->new(@_);
     my $rows_x_cols = [[$table->rows], [$table->cols]];
-    all_ok {$table->data(@_,"$_[0].$_[1]") == "$_[0].$_[1]"}
+    all_ok {$table->data(@_,"$_[0].$_[1]") eq "$_[0].$_[1]"}
            $rows_x_cols,
-           'data(row,col,$row.$col) == $row.$col';
-    all_ok {$table->data(@_) == "$_[0].$_[1]"}
+           'data(row,col,$row.$col) eq $row.$col';
+    all_ok {$table->data(@_) eq "$_[0].$_[1]"}
            $rows_x_cols,
-           'data(row,col) == $row.$col';
+           'data(row,col) eq $row.$col';
     all_ok {
         my $value = $table->data(@_) = "$_[1].$_[0]";
-        $value == "$_[1].$_[0]" and
-        $value == $table->data(@_)
+        $value eq "$_[1].$_[0]" and
+        $value eq $table->data(@_)
     } $rows_x_cols,
-      'data(row,col) = $col.$row == $col.$row (lvalue assign)';
+      'data(row,col) = $col.$row eq $col.$row (lvalue assign)';
 }
 
 use constant OUT_OF_RANGE_VALUES => (-9999, -1, -0.5, 0.5, "one", 1_000_000);

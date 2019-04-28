@@ -1,5 +1,12 @@
 Revision history for Protocol-Database-PostgreSQL
 
+1.002     2019-04-28 05:23:16+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Dependencies:
+
+    - due to postfix dereference, perl 5.024+ is required (thanks to ANDK for reporting)
+
 1.001     2019-04-15 05:55:03+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -4,7 +4,7 @@ package Char::Windows1252;
 # On The Naming of Modules/NAMES TO AVOID/Top-level namespaces
 # https://pause.perl.org/pause/query?ACTION=pause_namingmodules#Top_level_namespaces
 
-$VERSION = '1.08';
+$VERSION = '1.13';
 
 1;
 

@@ -5,6 +5,7 @@ use warnings;
 
 use Test::Most;
 use Test::Exception;
+use Crypt::JWT qw/ decode_jwt /;
 
 use FindBin qw/ $Bin /;
 use lib "$Bin";
@@ -71,12 +72,10 @@ done_testing();
 sub token_format_tests {
 	my ( $token,$type ) = @_;
 
-	use Mojo::JWT;
-
 	like( $token,qr/\./,'token looks like a JWT' );
 
 	cmp_deeply(
-		Mojo::JWT->new( secret => 'Some Secret Key' )->decode( $token ),
+		decode_jwt( alg => 'HS256', key => 'Some Secret Key', token => $token ),
 		{
 			'aud' => $type eq 'auth' ? 'https://come/back' : undef,
 			'client' => 'test_client',

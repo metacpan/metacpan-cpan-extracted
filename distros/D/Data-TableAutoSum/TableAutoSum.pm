@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 
 # I export nothing, so there aren't any @EXPORT* declarations
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Params::Validate qw/:all/;
 use Regexp::Common;
@@ -36,8 +36,8 @@ use constant ROW_COL_TYPE => {
     callbacks =>  {
         # scalar value
         'integer'          => sub { implies !ref($_[0]) => $_[0] =~ $RE{num}{int} },
-        'greater than 0'   => sub { implies !ref($_[0]) => ($_[0] > 0) },
-        
+            'greater than 0'   => sub { implies !ref($_[0]) => ($_[0] =~ $RE{num}{int}) && (int($_[0]) > 0) },
+
         # array ref
         'uniq identifiers' => sub { no strict 'refs';
                                     implies ref($_[0])  => is_uniq @{$_[0]} },
@@ -107,8 +107,9 @@ sub as_string {
 }
 
 sub store {
+    local $| = 1;
     my ($self, $filename) = @_;
-    open FILE, ">$filename" or die "Can't open $filename to store the table: $!";
+    open FILE, ">$filename" or die "Can't open $filename to store the table";
     print FILE $self->as_string;
     close FILE;
     return $self;

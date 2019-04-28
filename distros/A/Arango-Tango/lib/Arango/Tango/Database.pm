@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.007';
+$Arango::Tango::Database::VERSION = '0.008';
 use Arango::Tango::Cursor;
 
 use warnings;
@@ -59,7 +59,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 USAGE
 

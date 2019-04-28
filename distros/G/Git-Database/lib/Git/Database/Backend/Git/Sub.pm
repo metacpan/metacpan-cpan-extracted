@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Sub;
-$Git::Database::Backend::Git::Sub::VERSION = '0.011';
+$Git::Database::Backend::Git::Sub::VERSION = '0.012';
 use Git::Sub qw(
    cat_file
    hash_object
@@ -84,6 +84,9 @@ sub get_object_attributes {
 
     # object does not exist in the git object database
     return undef if $parts[-1] eq 'missing';
+
+    # git versions >= 2.21.0.rc0 explicitely say if a sha1 is ambiguous
+    return undef if $kind eq 'ambiguous';
 
     return {
         kind       => $kind,
@@ -178,7 +181,7 @@ Git::Database::Backend::Git::Sub - A Git::Database backend based on Git::Sub
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -227,7 +230,7 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016-2017 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2016-2019 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

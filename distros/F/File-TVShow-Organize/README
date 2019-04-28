@@ -1,0 +1,82 @@
+File-TVShow-Organize version 0.32
+============================
+
+This module makes it easier to move TV Show files into the correct Show
+folder and also place them in to the correct season or specials folder.
+This may be of use if you have a large media server which you are trying to
+keep organised.
+
+It might also be used to move files into season folders if you have merely
+dumped these files into a single folder in the beginning.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Example Usage:
+
+#!/bin/perl
+
+  use strict;
+  use warnings;
+
+  use File::TVShow::Organize;
+
+  my $obj = File::TVShow::Organize->new( {
+              Exceptions => 'S.W.A.T.2017:S.W.A.T 2017|Other:other' }
+  );
+
+  $obj->new_show_folder("/tmp/");
+  $obj->show_folder("/absolute/path/to/TV Shows");
+
+  if((!defined $obj->new_show_folder()) || (!defined $obj->show_folder())) {
+    print "Verify your paths. Something in wrong\n";
+    exit;
+  }
+
+  # Create a hash for matching file name to Folders
+  $obj->create_show_hash();
+
+  # Delete files after processing.
+  The default is to rename the files by appending ".done"
+  $obj->delete(1);
+
+  # Do not create sub folders under the the show's parent folder.
+  All files should be dumped # into the parent folder. The default is to create
+  season folders.
+  $obj->season_folder(0);
+
+  # Batch process a folder containing TV Show files
+  $obj->process_new_shows();
+
+  # Report any file names which could not be handled automatically.
+  $obj->were_there_errors();
+
+  #end of program
+
+
+  See perldoc for more examples of usage.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Video::Filename;
+File::Path;
+File::Copy;
+Carp;
+
+These files are of course accessible through CPAN
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018 by Adam Spann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::U2F::Server.
 
+0.44  Sun Apr 28 15:37:45 2019 (GMT +2)
+	- Fix segfaults if u2fclib_verifyRegistration returns 0 (RT#129341).
+	  Thanks to Colin Newell
+
 0.43  Mon Apr 18 14:21:25 2018 (GMT +2)
 	- Fix typo in POD
 	- Add "debug" option

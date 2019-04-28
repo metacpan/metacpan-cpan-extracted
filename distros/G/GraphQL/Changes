@@ -1,4 +1,5 @@
-Revision history for GraphQL
+0.34 2019-04-28
+ - List now has "name" that is its "of"'s name
 
 0.33	Thu 21 Feb 22:58:02 GMT 2019
  - update Plugin::Convert docs - thanks @aksonov

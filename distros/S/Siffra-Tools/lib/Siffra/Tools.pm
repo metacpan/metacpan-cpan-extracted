@@ -4,12 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 use Carp;
-$Carp::Verbose = 1;
 use utf8;
 use Data::Dumper;
 use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
 
 $| = 1;    #autoflush
 
@@ -27,7 +27,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -72,12 +72,9 @@ See Also   :
 sub new
 {
     my ( $class, %parameters ) = @_;
-
-    my $self = {};
-
-    $self = bless( $self, ref( $class ) || $class );
-
     $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
+
+    my $self = $class->SUPER::new( %parameters );
 
     return $self;
 } ## end sub new
@@ -100,12 +97,12 @@ sub END
 sub DESTROY
 {
     my ( $self, %parameters ) = @_;
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
-        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => TRUE } );
     }
     else
     {

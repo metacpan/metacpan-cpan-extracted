@@ -3,7 +3,7 @@ package Ryu::Async::Packet;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub new { bless { @_[1..$#_] }, $_[0] }
 

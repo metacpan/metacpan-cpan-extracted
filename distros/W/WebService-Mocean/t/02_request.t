@@ -16,7 +16,7 @@ dies_ok {
 } 'expect die on missing command';
 
 dies_ok {
-    $mocean_api->_request(undef, undef, 'gets')
+    $mocean_api->_request(undef, undef, 'gets');
 } 'expect die on invalid HTTP verb';
 
 done_testing;

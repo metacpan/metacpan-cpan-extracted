@@ -3,21 +3,21 @@ package Net::Async::Slack::Event::Bot;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 =head1 DESCRIPTION
 
-{
- "type": "bot_added",
- "bot": {
-  "id": "B024BE7LH",
-  "app_id": "A4H1JB4AZ",
-  "name": "hugbot",
-  "icons": {
-   "image_48": "https:\/\/slack.com\/path\/to\/hugbot_48.png"
-  }
- }
-}
+    {
+     "type": "bot_added",
+     "bot": {
+      "id": "B024BE7LH",
+      "app_id": "A4H1JB4AZ",
+      "name": "hugbot",
+      "icons": {
+       "image_48": "url here"
+      }
+     }
+    }
 
 =cut
 

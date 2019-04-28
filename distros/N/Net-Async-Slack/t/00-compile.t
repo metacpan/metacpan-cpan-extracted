@@ -2,15 +2,18 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 87 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 101 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Slack.pm',
     'Net/Async/Slack/Event/AccountsChanged.pm',
+    'Net/Async/Slack/Event/AppHomeOpened.pm',
+    'Net/Async/Slack/Event/AppMention.pm',
+    'Net/Async/Slack/Event/AppRateLimited.pm',
     'Net/Async/Slack/Event/AppUninstalled.pm',
     'Net/Async/Slack/Event/Bot.pm',
     'Net/Async/Slack/Event/BotAdded.pm',
@@ -44,6 +47,7 @@ my @module_files = (
     'Net/Async/Slack/Event/GridMigrationStarted.pm',
     'Net/Async/Slack/Event/GroupArchive.pm',
     'Net/Async/Slack/Event/GroupClose.pm',
+    'Net/Async/Slack/Event/GroupDeleted.pm',
     'Net/Async/Slack/Event/GroupHistoryChanged.pm',
     'Net/Async/Slack/Event/GroupJoined.pm',
     'Net/Async/Slack/Event/GroupLeft.pm',
@@ -62,6 +66,7 @@ my @module_files = (
     'Net/Async/Slack/Event/MemberJoinedChannel.pm',
     'Net/Async/Slack/Event/MemberLeftChannel.pm',
     'Net/Async/Slack/Event/Message.pm',
+    'Net/Async/Slack/Event/MessageAppHome.pm',
     'Net/Async/Slack/Event/MessageChannels.pm',
     'Net/Async/Slack/Event/MessageGroups.pm',
     'Net/Async/Slack/Event/MessageIm.pm',
@@ -70,13 +75,19 @@ my @module_files = (
     'Net/Async/Slack/Event/PinRemoved.pm',
     'Net/Async/Slack/Event/PrefChange.pm',
     'Net/Async/Slack/Event/PresenceChange.pm',
+    'Net/Async/Slack/Event/PresenceQuery.pm',
+    'Net/Async/Slack/Event/PresenceSub.pm',
     'Net/Async/Slack/Event/ReactionAdded.pm',
     'Net/Async/Slack/Event/ReactionRemoved.pm',
     'Net/Async/Slack/Event/ReconnectURL.pm',
-    'Net/Async/Slack/Event/ReconnectUrl.pm',
+    'Net/Async/Slack/Event/ResourcesAdded.pm',
+    'Net/Async/Slack/Event/ResourcesRemoved.pm',
+    'Net/Async/Slack/Event/ScopeDenied.pm',
+    'Net/Async/Slack/Event/ScopeGranted.pm',
     'Net/Async/Slack/Event/StarAdded.pm',
     'Net/Async/Slack/Event/StarRemoved.pm',
     'Net/Async/Slack/Event/SubteamCreated.pm',
+    'Net/Async/Slack/Event/SubteamMembersChanged.pm',
     'Net/Async/Slack/Event/SubteamSelfAdded.pm',
     'Net/Async/Slack/Event/SubteamSelfRemoved.pm',
     'Net/Async/Slack/Event/SubteamUpdated.pm',
@@ -90,8 +101,11 @@ my @module_files = (
     'Net/Async/Slack/Event/TeamProfileReorder.pm',
     'Net/Async/Slack/Event/TeamRename.pm',
     'Net/Async/Slack/Event/TokensRevoked.pm',
-    'Net/Async/Slack/Event/UrlVerification.pm',
+    'Net/Async/Slack/Event/URLVerification.pm',
     'Net/Async/Slack/Event/UserChange.pm',
+    'Net/Async/Slack/Event/UserResourceDenied.pm',
+    'Net/Async/Slack/Event/UserResourceGranted.pm',
+    'Net/Async/Slack/Event/UserResourceRemoved.pm',
     'Net/Async/Slack/Event/UserTyping.pm',
     'Net/Async/Slack/EventType.pm',
     'Net/Async/Slack/Message.pm',
@@ -129,7 +143,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

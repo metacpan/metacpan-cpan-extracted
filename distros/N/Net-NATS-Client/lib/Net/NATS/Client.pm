@@ -1,6 +1,6 @@
 package Net::NATS::Client;
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 use IO::Select;
 

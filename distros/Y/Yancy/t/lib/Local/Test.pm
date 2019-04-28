@@ -28,12 +28,13 @@ use Test::More ();
 use Yancy::Util qw( load_backend );
 use Yancy::Backend::Test;
 use JSON::Validator;
+use Mojo::JSON qw( true false );
 
 our @EXPORT_OK = qw( test_backend init_backend backend_common );
 
 =sub init_backend
 
-    my ( $backend, $url ) = init_backend( @items );
+    my ( $url, $backend, %out_items ) = init_backend( $schema, %items );
 
 Initialize a backend for testing with the given items. This routine will
 check the C<TEST_YANCY_BACKEND> environment variable for connection
@@ -52,7 +53,9 @@ sub init_backend {
     my %out_items;
     my $backend_url = $ENV{TEST_YANCY_BACKEND} || 'test://localhost';
     $backend = load_backend( $backend_url, $collections );
-    for my $collection ( keys %$collections ) {
+    for my $collection (
+        grep !$collections->{ $_ }{'x-view'}, keys %$collections
+    ) {
         my $id_field = $collections->{ $collection }{ 'x-id-field' } // 'id';
         for my $item ( @{ $backend->list( $collection )->{items} } ) {
             $backend->delete( $collection, $item->{ $id_field } );
@@ -62,9 +65,8 @@ sub init_backend {
         my $id_field = $collections->{ $collection }{ 'x-id-field' } // 'id';
         for my $item ( @{ $items{ $collection } } ) {
             my $id = $backend->create( $collection, $item );
-            $item->{ $id_field } = $id;
-            $item = $backend->get( $collection, $id );
-            push @{ $out_items{ $collection } }, $item;
+            my $new_item = $backend->get( $collection, $id );
+            push @{ $out_items{ $collection } }, $new_item;
             push @{ $to_delete{ $collection } }, $id;
         }
     }
@@ -77,14 +79,18 @@ END {
     }
 };
 
-# This is only for when the Test backend is being used and is
-# ignored when TEST_YANCY_BACKEND is set to something else
+# This is used by all the tests as the "one source of the truth", since
+# they all end up talking to either the mock or a real backend.
+# It therefore needs to end up matching what read_schema will give -
+# anything read_schema can't produce needs to also go in SCHEMA_MICRO below
 %Yancy::Backend::Test::SCHEMA = (
     blog => {
         type => 'object',
+        required => [qw( title markdown )],
         properties => {
             id => {
               'x-order' => 1,
+              readOnly => true,
               type => 'integer',
             },
             user_id => {
@@ -93,7 +99,7 @@ END {
             },
             title => {
               'x-order' => 3,
-              type => [ 'string', 'null' ],
+              type => 'string',
             },
             slug => {
               'x-order' => 4,
@@ -101,7 +107,7 @@ END {
             },
             markdown => {
               'x-order' => 5,
-              type => [ 'string', 'null' ],
+              type => 'string',
             },
             html => {
               type => [ 'string', 'null' ],
@@ -110,6 +116,7 @@ END {
             is_published => {
               type => 'boolean',
               'x-order' => 7,
+              default => false,
             },
         },
     },
@@ -117,6 +124,7 @@ END {
         type => 'object',
         required => [qw( name version )],
         'x-id-field' => 'name',
+        'x-ignore' => 1,
         properties => {
             name => {
                 'x-order' => 1,
@@ -134,6 +142,7 @@ END {
         properties => {
             id => {
                 'x-order' => 1,
+                readOnly => true,
                 type => 'integer',
             },
             name => {
@@ -161,9 +170,12 @@ END {
     user => {
         type => 'object',
         required => [qw( username email password )],
+        'x-id-field' => 'username',
+        'x-list-columns' => [qw( username email )],
         properties => {
             id => {
                 'x-order' => 1,
+                readOnly => true,
                 type => 'integer',
             },
             username => {
@@ -173,22 +185,110 @@ END {
             email => {
                 'x-order' => 3,
                 type => 'string',
+                title => 'E-mail Address',
+                format => 'email',
+                pattern => '^[^@]+@[^@]+$',
             },
             password => {
                 'x-order' => 4,
                 type => 'string',
+                format => 'password',
             },
             access => {
                 'x-order' => 5,
                 type => 'string',
                 enum => [qw( user moderator admin )],
+                default => 'user',
             },
             age => {
                 'x-order' => 6,
                 type => [qw( integer null )],
+                description => 'The person\'s age',
             },
         },
     },
+    usermini => {
+        type => 'object',
+        'x-id-field' => 'username',
+        'x-list-columns' => [qw( username email )],
+        'x-view' => { collection => 'user' },
+        properties => {
+            id => {
+                'x-order' => 1,
+                readOnly => true,
+                type => 'integer',
+            },
+            username => {
+                'x-order' => 2,
+                type => 'string',
+            },
+            email => {
+                'x-order' => 3,
+                type => 'string',
+                title => 'E-mail Address',
+                format => 'email',
+                pattern => '^[^@]+@[^@]+$',
+            },
+        },
+    },
+    userviewnoprops => {
+        type => 'object',
+        'x-id-field' => 'username',
+        'x-list-columns' => [qw( username email )],
+        'x-view' => { collection => 'user' },
+    },
+);
+%Yancy::Backend::Test::SCHEMA_MICRO = (
+    user => {
+        'x-list-columns' => [qw( username email )],
+        properties => {
+            email => {
+                title => 'E-mail Address',
+                format => 'email',
+                pattern => '^[^@]+@[^@]+$',
+            },
+            password => {
+                format => 'password',
+            },
+            age => {
+                description => 'The person\'s age',
+            },
+        },
+    },
+    usermini => {
+        type => 'object',
+        'x-id-field' => 'username',
+        'x-list-columns' => [qw( username email )],
+        'x-view' => { collection => 'user' },
+        properties => {
+            id => {
+                'x-order' => 1,
+                readOnly => true,
+                type => 'integer',
+            },
+            username => {
+                'x-order' => 2,
+                type => 'string',
+            },
+            email => {
+                'x-order' => 3,
+                type => 'string',
+                title => 'E-mail Address',
+                format => 'email',
+                pattern => '^[^@]+@[^@]+$',
+            },
+        },
+    },
+    userviewnoprops => {
+        type => 'object',
+        'x-id-field' => 'username',
+        'x-list-columns' => [qw( username email )],
+        'x-view' => { collection => 'user' },
+    },
+);
+@Yancy::Backend::Test::SCHEMA_ADDED_COLLS = qw(
+    usermini
+    userviewnoprops
 );
 
 =sub test_backend
@@ -207,7 +307,13 @@ is values the newly-create object will be set to, before being deleted.
 =cut
 
 sub test_backend {
-    my ( $be, $coll_name, $coll_conf, $list_key, $list, $create, $create_overlay, $set_to ) = @_;
+    my (
+        $be, $coll_name, $coll_conf,
+        $list_key, $list,
+        $list_type, # 'string' or 'integer' or 'boolean'
+        $create, $create_overlay,
+        $set_to,
+    ) = @_;
     my $id_field = $coll_conf->{ 'x-id-field' } || 'id';
     my $tb = Test::Builder->new();
 
@@ -257,6 +363,19 @@ sub test_backend {
             expect => { items => [ $list->[1] ], total => scalar @$list },
         },
 
+        $list_type eq 'boolean' ? (
+        {
+            name => 'list with search boolean true is correct',
+            method => 'list',
+            do {
+                my @expect_list = grep $_->{ $list_key }, @{ $list };
+                (
+                    args => [ $coll_name, { -bool => $list_key } ],
+                    expect => { items => \@expect_list, total => scalar @expect_list },
+                );
+            },
+        },
+        ) : (
         {
             name => 'list with search equals is correct',
             method => 'list',
@@ -269,7 +388,9 @@ sub test_backend {
                 );
             },
         },
+        ),
 
+        $list_type eq 'string' ? (
         {
             name => 'list with search starts with is correct',
             method => 'list',
@@ -299,6 +420,30 @@ sub test_backend {
         },
 
         {
+            name => 'list with order by just name (not hash) is correct',
+            method => 'list',
+            do {
+                my @expect_list = sort { $a->{ $list_key } cmp $b->{ $list_key } } @{ $list };
+                (
+                    args => [ $coll_name, {}, { order_by => $list_key } ],
+                    expect => { items => \@expect_list, total => scalar @expect_list },
+                );
+            },
+        },
+
+        {
+            name => 'list with order by array of name is correct',
+            method => 'list',
+            do {
+                my @expect_list = sort { $a->{ $list_key } cmp $b->{ $list_key } } @{ $list };
+                (
+                    args => [ $coll_name, {}, { order_by => [ $list_key ] } ],
+                    expect => { items => \@expect_list, total => scalar @expect_list },
+                );
+            },
+        },
+
+        {
             name => 'list with order by asc is correct',
             method => 'list',
             do {
@@ -321,6 +466,7 @@ sub test_backend {
                 );
             },
         },
+        ) : (),
 
         {
             name => 'get item by id',
@@ -339,8 +485,10 @@ sub test_backend {
                 $create = { %$create, $id_field => $got_id, %$create_overlay };
                 $be->get_p( $coll_name, $got_id )->then( sub {
                     my ( $got ) = @_;
-                    Test::More::is_deeply( $got, $create, 'created item correct' )
-                        or $tb->diag( $tb->explain( $got ) );
+                    my %got_maybe_noid = %$got;
+                    delete $got_maybe_noid{id} if $id_field ne 'id';
+                    Test::More::is_deeply( \%got_maybe_noid, $create, 'created item correct' )
+                        or $tb->diag( $tb->explain( [ \%got_maybe_noid, $got ] ) );
                 } )->wait;
             },
         },
@@ -354,8 +502,10 @@ sub test_backend {
                 Test::More::ok( $ok, 'set() returns boolean true if row modified' );
                 $be->get_p( $coll_name, $create->{ $id_field } )->then( sub {
                     my ( $got ) = @_;
-                    Test::More::is_deeply( $got, { %$create, %$set_to }, 'set item correct' )
-                        or $tb->diag( $tb->explain( $got ) );
+                    my %got_maybe_noid = %$got;
+                    delete $got_maybe_noid{id} if $id_field ne 'id';
+                    Test::More::is_deeply( \%got_maybe_noid, { %$create, %$set_to }, 'set item correct' )
+                        or $tb->diag( $tb->explain( [ \%got_maybe_noid, $got ] ) );
                 } )->wait;
             },
         },
@@ -403,7 +553,7 @@ sub test_backend {
             my @args = ref $test->{args} eq 'CODE' ? $test->{args}->() : @{ $test->{args} };
             my $cb = $test->{test} || sub {
                 my ( $got ) = @_;
-                Test::More::is_deeply( $got, $test->{expect} )
+                Test::More::is_deeply( $got, $test->{expect}, $name )
                     or $tb->diag( $tb->explain( $got ) );
             };
             $run->( $cb, $method, $name, @args );
@@ -439,9 +589,10 @@ sub test_backend {
         my $got_schema = $be->read_schema;
         my $expect_schema = {
             people => {
+                type => 'object',
                 required => [qw( name )],
                 properties => {
-                    id => { type => 'integer', 'x-order' => 1 },
+                    id => { type => 'integer', 'x-order' => 1, readOnly => true },
                     name => { type => 'string', 'x-order' => 2 },
                     email => { type => [ 'string', 'null' ], 'x-order' => 3 },
                     age => { type => [ 'integer', 'null' ], 'x-order' => 4 },
@@ -450,9 +601,11 @@ sub test_backend {
                 },
             },
             user => {
+                type => 'object',
+                'x-id-field' => 'username',
                 required => [qw( username email password )],
                 properties => {
-                    id => { type => 'integer', 'x-order' => 1 },
+                    id => { type => 'integer', 'x-order' => 1, readOnly => true },
                     username => { type => 'string', 'x-order' => 2 },
                     email => { type => 'string', 'x-order' => 3 },
                     password => { type => 'string', 'x-order' => 4 },
@@ -460,6 +613,7 @@ sub test_backend {
                         type => 'string',
                         enum => [qw( user moderator admin )],
                         'x-order' => 5,
+                        default => 'user',
                     },
                     age => {
                         type => [ 'integer', 'null' ],
@@ -468,17 +622,20 @@ sub test_backend {
                 },
             },
             blog => {
+                type => 'object',
+                required => [qw( title markdown )],
                 properties => {
-                    id => { type => 'integer', 'x-order' => 1 },
+                    id => { type => 'integer', 'x-order' => 1, readOnly => true },
                     user_id => { type => [ 'integer', 'null' ], 'x-order' => 2 },
-                    title => { type => [ 'string', 'null' ], 'x-order' => 3 },
+                    title => { type => 'string', 'x-order' => 3 },
                     slug => { type => [ 'string', 'null' ], 'x-order' => 4 },
-                    markdown => { type => [ 'string', 'null' ], 'x-order' => 5 },
+                    markdown => { type => 'string', 'x-order' => 5 },
                     html => { type => [ 'string', 'null' ], 'x-order' => 6 },
-                    is_published => { type => 'boolean', 'x-order' => 7 },
+                    is_published => { type => 'boolean', 'x-order' => 7, default => false },
                 },
             },
             mojo_migrations => {
+                type => 'object',
                 'x-ignore' => 1,
                 required => [qw( name version )],
                 'x-id-field' => 'name',
@@ -489,36 +646,25 @@ sub test_backend {
             },
         };
 
-        # The DBIC backend doesn't ignore modules from read_schema,
-        # since people don't create DBIC result classes for things they
-        # don't want to interact with...
-        if ( !$got_schema->{mojo_migrations}{'x-ignore'} ) {
-            delete $expect_schema->{mojo_migrations}{'x-ignore'};
-        }
-
         Test::More::is_deeply(
             $got_schema, $expect_schema, 'schema read from database is correct',
         ) or $tb->diag( $tb->explain( $got_schema ) );
 
-        $tb->subtest( 'schema validates with JSON::Validator' => sub {
+        $tb->subtest( 'single schema read from database validates with JSON::Validator' => sub {
             my $v = JSON::Validator->new(
                 coerce => { booleans => 1, numbers => 1 },
             );
             $v->formats->{ markdown } = sub { 1 };
             $v->formats->{ tel } = sub { 1 };
-            $v->schema( $expect_schema->{ $coll_name } );
-
+            my $got_table = $be->read_schema( $coll_name );
+            eval { $v->schema( $got_table ) };
+            Test::More::is( $@, '', 'schema valid' )
+                or $tb->diag( $tb->explain( $got_table ) );
             my $got = $be->get( $coll_name => $list->[0]{ $id_field } );
             my @errors = $v->validate( $got );
             $tb->ok( !@errors, 'no validation errors' )
                 or $tb->diag( $tb->explain( \@errors ) );
         } );
-
-        my $got_table = $be->read_schema( 'people' );
-        Test::More::is_deeply(
-            $got_table, $expect_schema->{ people },
-            'single schema read from database is correct',
-        ) or $tb->diag( $tb->explain( $got_table ) );
 
     });
 
@@ -538,12 +684,12 @@ sub backend_common {
     my %person_one = $insert_item->( people =>
         name => 'person One',
         email => 'one@example.com',
-        age => undef, contact => undef, phone => undef,
+        age => undef, contact => 1, phone => undef,
     );
     my %person_two = $insert_item->( people =>
         name => 'person Two',
         email => 'two@example.com',
-        age => undef, contact => undef, phone => undef,
+        age => undef, contact => 0, phone => undef,
     );
     my %person_three = (
         name => 'person Three',
@@ -554,6 +700,16 @@ sub backend_common {
         people => $collections->{ people }, # Collection
         'name', # list key
         [ \%person_one, \%person_two ], # List (already in backend)
+        'string',
+        \%person_three, # Create/Delete test
+        {}, # create overlay
+        { name => 'Set' }, # Set test
+        );
+    Test::More::subtest( 'boolean list' => \&test_backend, $backend,
+        people => $collections->{ people }, # Collection
+        'contact', # list key
+        [ \%person_one, \%person_two ], # List (already in backend)
+        'boolean',
         \%person_three, # Create/Delete test
         {}, # create overlay
         { name => 'Set' }, # Set test
@@ -563,14 +719,14 @@ sub backend_common {
         email => 'one@example.com',
         access => 'user',
         password => 'p1',
-        age => undef,
+        age => 7,
     );
     my %user_two = $insert_item->( 'user',
         username => 'two',
         email => 'two@example.com',
         access => 'moderator',
         password => 'p2',
-        age => undef,
+        age => 7,
     );
     my %user_three = (
         username => 'three',
@@ -583,10 +739,41 @@ sub backend_common {
         user => $collections->{ user }, # Collection
         'username', # list key
         [ \%user_one, \%user_two ], # List (already in backend)
+        'string',
         \%user_three, # Create/Delete test
         {}, # create overlay
         { email => 'test@example.com' }, # Set test
         );
+    Test::More::subtest( 'number list' => \&test_backend, $backend,
+        user => $collections->{ user }, # Collection
+        'age', # list key
+        [ \%user_one, \%user_two ], # List (already in backend)
+        'integer',
+        \%user_three, # Create/Delete test
+        {}, # create overlay
+        { email => 'test@example.com' }, # Set test
+        );
+    my $got = $backend->get( 'usermini', 'one' );
+    Test::More::is_deeply(
+        $got,
+        { 'email' => 'one@example.com', 'id' => 1, 'username' => 'one' },
+        'get view-of',
+    ) or Test::More::diag( Test::More::explain( $got ) );
+    $got = $backend->list( 'usermini', { username => 'one' } );
+    Test::More::is_deeply(
+        $got,
+        {
+            items => [ { 'email' => 'one@example.com', 'id' => 1, 'username' => 'one' } ],
+            total => 1,
+        },
+        'list view-of',
+    ) or Test::More::diag( Test::More::explain( $got ) );
+    $got = $backend->get( 'userviewnoprops', 'one' );
+    Test::More::is_deeply(
+        $got,
+        \%user_one,
+        'get viewnoprops',
+    ) or Test::More::diag( Test::More::explain( $got ) );
     my %blog_one = $insert_item->( 'blog',
         title => 'T 1',
         user_id => $user_one{id},
@@ -601,7 +788,7 @@ sub backend_common {
         html => '<h1>Smashing</h1>',
         slug => 't-2',
     );
-    $blog_one{is_published} = $blog_two{is_published} = 0;
+    $blog_one{is_published} = $blog_two{is_published} = false;
     my %blog_three = (
         title => 'T 3',
         user_id => $user_two{id},
@@ -613,10 +800,17 @@ sub backend_common {
         blog => $collections->{ blog }, # Collection
         'markdown', # list key
         [ \%blog_one, \%blog_two ], # List (already in backend)
+        'string',
         \%blog_three, # Create/Delete test
-        { is_published => 0 }, # create overlay
+        { is_published => false }, # create overlay
         { is_published => 1 }, # Set test
         );
+    eval { $backend->set( 'user', $user_two{username}, { comments => [] } ) };
+    Test::More::like $@, qr/No refs/, 'set blows up with array-ref data';
+    eval { $backend->create( 'user', { comments => [] } ) };
+    Test::More::like $@, qr/No refs/, 'create blows up with array-ref data';
+    eval { $backend->set( 'blog', $blog_two{id}, { is_published => false } ) };
+    Test::More::is $@, '', 'set fine with JSON boolean';
 }
 
 1;

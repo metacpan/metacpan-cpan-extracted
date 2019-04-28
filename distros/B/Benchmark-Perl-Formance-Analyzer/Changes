@@ -1,5 +1,12 @@
 Revision history for Benchmark-Perl-Formance-Analyzer
 
+0.009     2019-04-26
+        - included some forgotten github changes
+
+0.008     2019-04-26
+        - chart definitions for the pts2019 runs
+        - better log messages for debugging
+
 0.007     2016-04-25
         - auto-generate chartbundle templates
         - generate dashboard overview page

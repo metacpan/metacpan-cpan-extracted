@@ -1,11 +1,11 @@
 Char/Windows1252.pm
-Windows1252.pm
-Ewindows1252.pm
+lib/Windows1252.pm
+lib/Ewindows1252.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Windows1252/395_windows1252eval_block.t
 t/Windows1252/396_double_diamond.t
 t/Windows1252/397_bitwise_op.t
 t/Windows1252/398_non_capturing.t
+t/Windows1252/399_indented_heredoc_qq.t
+t/Windows1252/400_indented_heredoc_q.t
+t/Windows1252/401_indented_heredoc_qx.t
+t/Windows1252/402_regexp_xx.t

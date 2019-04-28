@@ -3,17 +3,21 @@ package ExtUtils::ModuleMaker::Siffra;
 use 5.014;
 use strict;
 use warnings;
+use Carp;
 use utf8;
 use Data::Dumper;
+use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
+
 
 BEGIN
 {
     require ExtUtils::ModuleMaker;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     @ISA     = qw(Exporter ExtUtils::ModuleMaker);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -127,11 +131,11 @@ END_OF_BEGIN
     $text .= $strict_line;
     $text .= $warnings_line         if $self->{ INCLUDE_WARNINGS };
     $text .= $carp_line;
-    $text .= $carp_verbose;
     $text .= $encoding_line;
     $text .= $data_dumper_line;
     $text .= $log_line;
     $text .= $scalar_util_line;
+    $text .= $carp_verbose;
     $text .= $begin_block;
     return $text;
 } ## end sub block_begin
@@ -215,16 +219,20 @@ my %WriteMakefileArgs = (
     LICENSE          => '$escaped{LICENSE}',
     INSTALLDIRS      => (\$] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM => {
-        'strict'             => 0,
-        'warnings'           => 0,
-        'Test::Simple'       => 0.44,
-        'Test::More'         => 0,
-        'Test::Perl::Critic' => 0,
-        'version'            => 0,
-        'utf8'               => 0,
-        'Log::Any'           => 0,
-        'Scalar::Util'       => 0,
-        'Data::Dumper'       => 0,
+
+        # Default req
+        'strict'       => 0,
+        'warnings'     => 0,
+        'Carp'         => 0,
+        'utf8'         => 0,
+        'Data::Dumper' => 0,
+        'DDP'          => 0,
+        'Log::Any'     => 0,
+        'Scalar::Util' => 0,
+        'version'      => 0,
+        'Test::More'   => 0,
+        # Default req
+
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,
@@ -240,12 +248,12 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git\@github.com:lbenevenuto/$nameFormat.git',
-                        web  => 'https://github.com/lbenevenuto/$nameFormat',
+                        url  => 'git\@github.com:SiffraTI/$nameFormat.git',
+                        web  => 'https://github.com/SiffraTI/$nameFormat',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/$nameFormat/issues',
+                        web => 'https://github.com/SiffraTI/$nameFormat/issues',
                     },
                 },
             }

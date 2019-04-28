@@ -10,6 +10,7 @@ with 'Net::OAuth2::AuthorizationServer::Defaults';
 
 use Test::Most;
 use Test::Exception;
+use Crypt::JWT qw/ decode_jwt /;
 use Mojo::JWT;
 
 isa_ok( my $t = Test::Defaults->new,'Test::Defaults' );
@@ -46,8 +47,9 @@ my $jwt = $t->token(
 	}
 );
 
-my $details = Mojo::JWT->new( secret => 'Some Secret Key' )
-	->decode( $jwt );
+my $details    = decode_jwt( alg => 'HS256', key => 'Some Secret Key', token => $jwt );
+my $mj_details = Mojo::JWT->new( secret => 'Some Secret Key' )
+   ->decode( $jwt );
 
 cmp_deeply(
 	$details,
@@ -66,7 +68,75 @@ cmp_deeply(
 		  'sleep',
 		]
 	},
-	'jwt_claims_cb used',
+	'jwt_claims_cb used (JWT)',
 );
+
+cmp_deeply( $details,$mj_details,'backwards compat with Mojo::JWT' );
+
+*Test::Defaults::jwt_algorithm  = sub { 'PBES2-HS512+A256KW' };
+*Test::Defaults::jwt_encryption = sub { 'A256CBC-HS512' };
+
+my $jwe = $t->token(
+	client_id     => 1,
+	scopes        => [ qw/ eat sleep / ],
+	type          => 'access',
+	redirect_uri  => 'https://foo.com/cb',
+	user_id       => 2,
+	jwt_claims_cb => sub { 
+		my ( $args ) = @_;
+		return (
+			user_id => $args->{user_id} + 1,
+			iss     => "some iss",
+			sub     => "not the passed user_id",
+		);
+	}
+);
+
+$details = decode_jwt( alg => 'PBES2-HS512+A256KW', key => 'Some Secret Key', token => $jwe );
+
+cmp_deeply(
+	$details,
+	{
+		'exp'     => ignore(),
+		'type'    => 'access',
+		'aud'     => 'https://foo.com/cb',,
+		'client'  => 1,
+		'user_id' => 3,
+		'iat'     => re( '^\d{10}$' ),
+		'jti'     => re( '^.{32}$' ),
+		'iss'     => "some iss",
+		'sub'     => "not the passed user_id",
+		'scopes'  => [
+		  'eat',
+		  'sleep',
+		]
+	},
+	'jwt_claims_cb used (JWE)',
+);
+
+*Test::Defaults::jwt_algorithm  = sub { 'none' };
+
+dies_ok(
+	sub {
+		$t->token(
+			client_id     => 1,
+			scopes        => [ qw/ eat sleep / ],
+			type          => 'access',
+			redirect_uri  => 'https://foo.com/cb',
+			user_id       => 2,
+			jwt_claims_cb => sub { 
+				my ( $args ) = @_;
+				return (
+					user_id => $args->{user_id} + 1,
+					iss     => "some iss",
+					sub     => "not the passed user_id",
+				);
+			}
+		);
+	},
+	'algorithm none throws exception'
+);
+
+like( $@,qr/'none' is not supported/,'with expected error' );
 
 done_testing();

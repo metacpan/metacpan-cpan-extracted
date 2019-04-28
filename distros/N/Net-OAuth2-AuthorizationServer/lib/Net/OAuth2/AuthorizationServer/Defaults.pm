@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Types::Standard qw/ :all /;
 use Carp qw/ croak /;
-use Mojo::JWT;
+use Crypt::JWT qw/ encode_jwt decode_jwt /;
 use Crypt::PRNG qw/ random_string /;
 use Try::Tiny;
 use Time::HiRes qw/ gettimeofday /;
@@ -15,8 +15,22 @@ use MIME::Base64 qw/ encode_base64 /;
 
 has 'jwt_secret' => (
     is       => 'ro',
+    isa      => Any,
+    required => 0,
+);
+
+has 'jwt_algorithm' => (
+    is       => 'ro',
+    isa      => Any,
+    required => 0,
+	default  => sub { 'HS256' }, # back compat with Mojo::JWT
+);
+
+has 'jwt_encoding' => (
+    is       => 'ro',
     isa      => Str,
     required => 0,
+	default  => sub { 'A128GCM' },
 );
 
 has 'access_token_ttl' => (
@@ -275,8 +289,11 @@ sub _verify_access_token_jwt {
 
     my $invalid_jwt;
     try {
-        $access_token_payload =
-            Mojo::JWT->new( secret => $self->jwt_secret )->decode( $access_token );
+        $access_token_payload = decode_jwt(
+			alg   => $self->jwt_algorithm,
+			key   => $self->jwt_secret,
+			token => $access_token,
+		);
     }
     catch {
         $invalid_jwt = 1;
@@ -330,25 +347,33 @@ sub token {
         $code = encode_base64( join( '-', $sec, $usec, rand(), random_string( 30 ) ), '' );
     }
     else {
+		if ( $self->jwt_algorithm =~ /none/i ) {
+			croak "A jwt_algorithm of 'none' is not supported as this is insecure";
+		}
+
 		my $jti = random_string( 32 );
 
-        $code = Mojo::JWT->new(
-            ( $ttl ? ( expires => time + $ttl ) : () ),
-            secret  => $self->jwt_secret,
-            set_iat => 1,
+        $code = encode_jwt(
+			allow_none => 0, # do NOT allow the "none" algorithm, as this is massively insecure
+			                 # we actually already check this above, but this is here a backup
+			alg  => $self->jwt_algorithm,
+            key  => $self->jwt_secret,
+			enc  => $self->jwt_encoding,
+
+            ( $ttl ? ( relative_exp => $ttl ) : () ),
+            auto_iat => 1,
 
             # https://tools.ietf.org/html/rfc7519#section-4
-            claims => {
+			payload => {
+				# Registered Claim Names
+				aud => $redirect_uri,         # the "audience"
+				jti => $jti,
 
-                # Registered Claim Names
-                aud => $redirect_uri,         # the "audience"
-                jti => $jti,
-
-                # Private Claim Names
-                user_id => $user_id,
-                client  => $client_id,
-                type    => $type,
-                scopes  => $scopes,
+				# Private Claim Names
+				user_id => $user_id,
+				client  => $client_id,
+				type    => $type,
+				scopes  => $scopes,
 
 				( $claims
 					? ( $claims->({
@@ -361,8 +386,8 @@ sub token {
 					}) )
 					: ()
 				),
-            },
-        )->encode;
+			},
+        );
     }
 
     return $code;

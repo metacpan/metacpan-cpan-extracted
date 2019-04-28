@@ -57,7 +57,7 @@ use only but are provided in this context for purposes of module extension.
 =cut
 
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $NAMESPACE;
 
@@ -132,11 +132,21 @@ sub current {
     if(ref($parameters{USES}) =~ /^(|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i) {
         return;
     } elsif(ref($parameters{USES}) =~ /^ARRAY$/i) {
-        $self->register($user) if(!defined($user->{IDENTIFICATION}));
-        my $userIndex = $self->identification($user->{IDENTIFICATION});
+        if(!defined($user->{Anansi})) {
+            $self->register($user);
+        } elsif(ref($user->{Anansi}) !~ /^HASH$/i) {
+            $self->register($user);
+        } elsif(!defined(${$user->{Anansi}}{ObjectManager})) {
+            $self->register($user);
+        } elsif(ref(${$user->{Anansi}}{ObjectManager}) !~ /^HASH$/i) {
+            $self->register($user);
+        } elsif(!defined(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION})) {
+            $self->register($user);
+        }
+        my $userIndex = $self->identification(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         if(!defined($userIndex)) {
             $self->register($user);
-            $userIndex = $self->identification($user->{IDENTIFICATION});
+            $userIndex = $self->identification(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         }
         my @users = ($userIndex);
         for(my $index = 0; $index < scalar(@users); $index++) {
@@ -153,11 +163,21 @@ sub current {
         }
         foreach my $uses (@{$parameters{USES}}) {
             next if(ref($uses) =~ /^(|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
-            $self->register($uses) if(!defined($uses->{IDENTIFICATION}));
-            my $usesIndex = $self->identification($uses->{IDENTIFICATION});
+            if(!defined($uses->{Anansi})) {
+                $self->register($uses);
+            } elsif(ref($uses->{Anansi}) !~ /^HASH$/i) {
+                $self->register($uses);
+            } elsif(!defined(${$uses->{Anansi}}{ObjectManager})) {
+                $self->register($uses);
+            } elsif(ref(${$uses->{Anansi}}{ObjectManager}) !~ /^HASH$/i) {
+                $self->register($uses);
+            } elsif(!defined(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION})) {
+                $self->register($uses);
+            }
+            my $usesIndex = $self->identification(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION});
             if(!defined($usesIndex)) {
                 $self->register($uses);
-                $usesIndex = $self->identification($uses->{IDENTIFICATION});
+                $usesIndex = $self->identification(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION});
             }
             if(!defined($uses->{'USER_'.$userIndex})) {
                 my $found;
@@ -168,11 +188,21 @@ sub current {
             }
         }
     } else {
-        $self->register($user) if(!defined($user->{IDENTIFICATION}));
-        my $userIndex = $self->identification($user->{IDENTIFICATION});
+        if(!defined($user->{Anansi})) {
+            $self->register($user);
+        } elsif(ref($user->{Anansi}) !~ /^HASH$/i) {
+            $self->register($user);
+        } elsif(!defined(${$user->{Anansi}}{ObjectManager})) {
+            $self->register($user);
+        } elsif(ref(${$user->{Anansi}}{ObjectManager}) !~ /^HASH$/i) {
+            $self->register($user);
+        } elsif(!defined(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION})) {
+            $self->register($user);
+        }
+        my $userIndex = $self->identification(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         if(!defined($userIndex)) {
             $self->register($user);
-            $userIndex = $self->identification($user->{IDENTIFICATION});
+            $userIndex = $self->identification(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         }
         my @users = ($userIndex);
         for(my $index = 0; $index < scalar(@users); $index++) {
@@ -188,11 +218,21 @@ sub current {
             }
         }
         my $uses = $parameters{USES};
-        $self->register($uses) if(!defined($uses->{IDENTIFICATION}));
-        my $usesIndex = $self->identification($uses->{IDENTIFICATION});
+        if(!defined($uses->{Anansi})) {
+            $self->register($uses);
+        } elsif(ref($uses->{Anansi}) !~ /^HASH$/i) {
+            $self->register($uses);
+        } elsif(!defined(${$uses->{Anansi}}{ObjectManager})) {
+            $self->register($uses);
+        } elsif(ref(${$uses->{Anansi}}{ObjectManager}) !~ /^HASH$/i) {
+            $self->register($uses);
+        } elsif(!defined(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION})) {
+            $self->register($uses);
+        }
+        my $usesIndex = $self->identification(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         if(!defined($usesIndex)) {
             $self->register($uses);
-            $usesIndex = $self->identification($uses->{IDENTIFICATION});
+            $usesIndex = $self->identification(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         }
         if(!defined($uses->{'USER_'.$userIndex})) {
             my $found;
@@ -257,7 +297,21 @@ sub finalise {
             if(scalar(@{$self->{IDENTIFICATIONS}}) == $user) {
                 $self->{'INSTANCE_'.$instance}->DESTROY();
                 if(defined($self->{'INSTANCE_'.$instance})) {
-                    delete $self->{'INSTANCE_'.$instance} if(0 == $self->{'INSTANCE_'.$instance}->{REGISTERED});
+                    if(!defined(${$self->{'INSTANCE_'.$instance}}{Anansi})) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    } elsif(ref(${$self->{'INSTANCE_'.$instance}}{Anansi}) !~ /^HASH$/i) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    } elsif(!defined(${${$self->{'INSTANCE_'.$instance}}{Anansi}}{ObjectManager})) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    } elsif(ref(${${$self->{'INSTANCE_'.$instance}}{Anansi}}{ObjectManager}) !~ /^HASH$/i) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    } elsif(!defined(${${${$self->{'INSTANCE_'.$instance}}{Anansi}}{ObjectManager}}{IDENTIFICATION})) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    } elsif(!defined(${${${$self->{'INSTANCE_'.$instance}}{Anansi}}{ObjectManager}}{REGISTERED})) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    } elsif(0 == ${${${$self->{'INSTANCE_'.$instance}}{Anansi}}{ObjectManager}}{REGISTERED}) {
+                        delete $self->{'INSTANCE_'.$instance};
+                    }
                 }
             }
         }
@@ -321,12 +375,19 @@ sub identification {
             return $index if($instance == @{$self->{IDENTIFICATIONS}}[$index]);
         }
         return if($instance !~ /^\d+$/);
-        return ${$self->{IDENTIFICATIONS}}[$instance] if(0 + $instance < scalar(@{$self->{IDENTIFICATIONS}}));
+        if(0 + $instance < scalar(@{$self->{IDENTIFICATIONS}})) {
+            return ${$self->{IDENTIFICATIONS}}[$instance];
+        }
     } else {
-        return if(!defined($instance->{IDENTIFICATION}));
-        return if($instance->{IDENTIFICATION} =~ /^\s*$/);
+        return if(!defined($instance->{Anansi}));
+        return if(ref($instance->{Anansi}) !~ /^HASH$/i);
+        return if(!defined(${$instance->{Anansi}}{ObjectManager}));
+        return if(ref(${$instance->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+        return if(!defined(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+        return if(ref(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}) !~ /^$/);
+        return if(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} !~ /^\d+$/);
         for(my $index = 0; $index < scalar(@{$self->{IDENTIFICATIONS}}); $index++) {
-            return $index if($instance->{IDENTIFICATION} == @{$self->{IDENTIFICATIONS}}[$index]);
+            return $index if(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} == @{$self->{IDENTIFICATIONS}}[$index]);
         }
     }
     return;
@@ -489,8 +550,12 @@ sub obsolete {
     return if(!defined($parameters{USER}));
     return if(ref($parameters{USER}) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
     my $user = $parameters{USER};
-    return if(!defined($user->{IDENTIFICATION}));
-    my $userIndex = $self->identification($user->{IDENTIFICATION});
+    return if(!defined($user->{Anansi}));
+    return if(ref($user->{Anansi}) !~ /^HASH$/i);
+    return if(!defined(${$user->{Anansi}}{ObjectManager}));
+    return if(ref(${$user->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+    return if(!defined(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+    my $userIndex = $self->identification(${${$user->{Anansi}}{ObjectManager}}{IDENTIFICATION});
     return if(!defined($userIndex));
     return if(!defined($self->{'INSTANCE_'.$userIndex}));
     if(!defined($parameters{USES})) {
@@ -534,8 +599,12 @@ sub obsolete {
                     }
                 }
             } else {
-                next if(!defined($uses->{IDENTIFICATION}));
-                my $usesIndex = $self->identification($uses->{IDENTIFICATION});
+                next if(!defined($uses->{Anansi}));
+                next if(ref($uses->{Anansi}) !~ /^HASH$/i);
+                next if(!defined(${$uses->{Anansi}}{ObjectManager}));
+                next if(ref(${$uses->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+                next if(!defined(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+                my $usesIndex = $self->identification(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION});
                 next if(!defined($usesIndex));
                 next if(!defined($self->{'INSTANCE_'.$usesIndex}));
                 if(defined($self->{'INSTANCE_'.$usesIndex}->{'USER_'.$userIndex})) {
@@ -555,8 +624,12 @@ sub obsolete {
         }
     } else {
         my $uses = $parameters{USES};
-        return if(!defined($uses->{IDENTIFICATION}));
-        my $usesIndex = $self->identification($uses->{IDENTIFICATION});
+        return if(!defined($uses->{Anansi}));
+        return if(ref($uses->{Anansi}) !~ /^HASH$/i);
+        return if(!defined(${$uses->{Anansi}}{ObjectManager}));
+        return if(ref(${$uses->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+        return if(!defined(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+        my $usesIndex = $self->identification(${${$uses->{Anansi}}{ObjectManager}}{IDENTIFICATION});
         return if(!defined($usesIndex));
         if(defined($self->{'INSTANCE_'.$usesIndex}->{'USER_'.$userIndex})) {
             if(!defined($self->{'INSTANCE_'.$usesIndex}->{PACKAGE})) {
@@ -639,15 +712,32 @@ until either the object instance is untied or this module has terminated.
 
 sub register {
     my ($self, $instance) = @_;
+    return 0 if(!defined($instance));
     return 0 if(ref($instance) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
-    if(!defined($instance->{IDENTIFICATION})) {
-        $instance->{IDENTIFICATION} = $self->identification();
-        push(@{$self->{IDENTIFICATIONS}}, $instance->{IDENTIFICATION});
+    if(!defined($instance->{Anansi})) {
+        $instance->{Anansi} = {};
+    } elsif(ref($instance->{Anansi}) !~ /^HASH$/i) {
+        $instance->{Anansi} = {};
+    }
+    if(!defined(${$instance->{Anansi}}{ObjectManager})) {
+        ${$instance->{Anansi}}{ObjectManager} = {};
+    } elsif(ref(${$instance->{Anansi}}{ObjectManager}) !~ /^HASH$/i) {
+        ${$instance->{Anansi}}{ObjectManager} = {};
+    }
+    if(!defined(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION})) {
+        ${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} = $self->identification();
+        push(@{$self->{IDENTIFICATIONS}}, ${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION});
+    } elsif(ref(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}) !~ /^$/) {
+        ${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} = $self->identification();
+        push(@{$self->{IDENTIFICATIONS}}, ${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION});
+    } elsif(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} !~ /^\d+$/) {
+        ${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} = $self->identification();
+        push(@{$self->{IDENTIFICATIONS}}, ${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION});
     }
     my $instanceIndex = $self->identification($instance);
     return 0 if(!defined($instanceIndex));
-    $instance->{REGISTERED} = 0 if(!defined($instance->{REGISTERED}));
-    $instance->{REGISTERED}++;
+    ${${$instance->{Anansi}}{ObjectManager}}{REGISTERED} = 0 if(!defined(${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}));
+    ${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}++;
     $self->{'INSTANCE_'.$instanceIndex} = $instance if(!defined($self->{'INSTANCE_'.$instanceIndex}));
     return 1;
 }
@@ -680,9 +770,17 @@ If no previous registrations exist then B<0> I<(zero)> will be returned.
 
 sub registrations {
     my ($self, $instance) = @_;
+    return 0 if(!defined($instance));
     return 0 if(ref($instance) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
-    return 0 if(!defined($instance->{IDENTIFICATION}));
-    return $instance->{REGISTERED};
+    return 0 if(!defined($instance->{Anansi}));
+    return 0 if(ref($instance->{Anansi}) !~ /^HASH$/i);
+    return 0 if(!defined(${$instance->{Anansi}}{ObjectManager}));
+    return 0 if(ref(${$instance->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+    return 0 if(!defined(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
+    return 0 if(ref(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}) !~ /^$/);
+    return 0 if(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION} !~ /^\d+$/);
+    return 0 if(!defined(${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}));
+    return ${${$instance->{Anansi}}{ObjectManager}}{REGISTERED};
 }
 
 
@@ -751,12 +849,21 @@ object instance from memory if the object instance is no longer tied.
 
 sub unregister {
     my ($self, $instance) = @_;
-    return 1 if(!defined($instance->{IDENTIFICATION}));
+    return 1 if(!defined($instance));
+    return 1 if(ref($instance) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
+    return 1 if(!defined($instance->{Anansi}));
+    return 1 if(ref($instance->{Anansi}) !~ /^HASH$/i);
+    return 1 if(!defined(${$instance->{Anansi}}{ObjectManager}));
+    return 1 if(ref(${$instance->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+    return 1 if(!defined(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
     my $instanceIndex = $self->identification($instance);
     return 1 if(!defined($instanceIndex));
-    $instance->{REGISTERED}--;
+    return 1 if(!defined(${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}));
+    if(0 < ${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}) {
+        ${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}--;
+    }
     return 1 if(!defined($self->{'INSTANCE_'.$instanceIndex}));
-    if(0 == $instance->{REGISTERED}) {
+    if(0 == ${${$instance->{Anansi}}{ObjectManager}}{REGISTERED}) {
         for(my $identification = 0; $identification < scalar(@{$self->{IDENTIFICATIONS}}); $identification++) {
             next if($instanceIndex == $identification);
             next if(!defined($self->{'INSTANCE_'.$identification}));
@@ -808,7 +915,11 @@ B<undef> will be returned.
 sub user {
     my ($self, $instance) = @_;
     return if(ref($instance) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
-    return if(!defined($instance->{IDENTIFICATION}));
+    return if(!defined($instance->{Anansi}));
+    return if(ref($instance->{Anansi}) !~ /^HASH$/i);
+    return if(!defined(${$instance->{Anansi}}{ObjectManager}));
+    return if(ref(${$instance->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+    return if(!defined(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
     my $instanceIndex = $self->identification($instance);
     return if(!defined($instanceIndex));
     return if(!defined($self->{'INSTANCE_'.$instanceIndex}));
@@ -864,7 +975,11 @@ returned.
 sub uses {
     my ($self, $instance) = @_;
     return if(ref($instance) =~ /^(|ARRAY|CODE|FORMAT|GLOB|HASH|IO|LVALUE|REF|Regexp|SCALAR|VSTRING)$/i);
-    return if(!defined($instance->{IDENTIFICATION}));
+    return if(!defined($instance->{Anansi}));
+    return if(ref($instance->{Anansi}) !~ /^HASH$/i);
+    return if(!defined(${$instance->{Anansi}}{ObjectManager}));
+    return if(ref(${$instance->{Anansi}}{ObjectManager}) !~ /^HASH$/i);
+    return if(!defined(${${$instance->{Anansi}}{ObjectManager}}{IDENTIFICATION}));
     my $instanceIndex = $self->identification($instance);
     return if(!defined($instanceIndex));
     return if(!defined($self->{'INSTANCE_'.$instanceIndex}));
@@ -909,3 +1024,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

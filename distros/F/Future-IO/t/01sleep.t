@@ -20,7 +20,7 @@ sub time_about(&@)
 
    my $got_time = $t1 - $t0;
    $test->ok(
-      $got_time >= $want_time * 0.9 && $got_time <= $want_time * 1.1, $name
+      $got_time >= $want_time * 0.9 && $got_time <= $want_time * 1.5, $name
    ) or
       $test->diag( sprintf "Test took %.3f seconds", $got_time );
 }

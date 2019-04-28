@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.049';
+our $VERSION = '1.050';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -985,7 +985,7 @@ sub _translate_raw_regex {
     #       but need to find a way to insert the extra ) at the other end
 
     return $debug_runtime && $regex eq '|'   ?  $regex . $debug_post
-         : $debug_runtime && $regex =~ /\S/  ?  "(?:$debug_pre($regex)$debug_post)"
+         : $debug_runtime && $regex =~ /\S/  ?  "(?#)(?:$debug_pre($regex)$debug_post(?#))"
          :                                      $regex;
 }
 
@@ -2597,10 +2597,11 @@ sub _build_grammar {
                     \( \?\?? (?&BRACED) \)   #     Embedded code blocks
                   | \s++                     #     Whitespace not followed by...
                     (?= \|                   #         ...an OR
+                      | \(\?\#\)             #         ...a null comment
                       | (?: \) \s* )? \z     #         ...the end of the rule
                       | \(\(?\?\&ws\)        #         ...an explicit ws match
                       | \(\?\??\{            #         ...an embedded code block
-                      | \\s                  #         ...an explicit space match
+                      | \\[shv]              #         ...an explicit space match
                     )
                 )
                 |
@@ -2671,7 +2672,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.049
+This document describes Regexp::Grammars version 1.050
 
 
 =head1 SYNOPSIS

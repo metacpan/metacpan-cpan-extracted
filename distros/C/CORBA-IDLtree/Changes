@@ -1,5 +1,13 @@
 Revision history for CORBA-IDLtree
 
+2.03    2019/04/27
+        * Fixed a bug related to Dump_Symbols whereby when using
+          a string array ref as the optional argument, repeated
+          calls to the sub would accumulate the text.
+        * In sub parse_members, optional argument $comment fixes
+          processing of trailing comment at members of struct,
+          exception, and valuetype.
+
 2.02    2018/08/15
         * Fixed a few typos in documentation.
         * Added support for IDL4 struct inheritance defined by the

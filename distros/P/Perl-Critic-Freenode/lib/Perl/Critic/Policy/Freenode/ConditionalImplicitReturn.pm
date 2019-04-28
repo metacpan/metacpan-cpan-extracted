@@ -9,7 +9,7 @@ use parent 'Perl::Critic::Policy';
 use List::Util 'any';
 use Perl::Critic::Freenode::Utils qw(is_empty_return is_structural_block);
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 use constant DESC => 'Subroutine may implicitly return a conditional statement';
 use constant EXPL => 'When the last statement in a subroutine is a conditional, the return value may unexpectedly be the evaluated condition.';

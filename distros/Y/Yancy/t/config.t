@@ -14,8 +14,11 @@ use FindBin qw( $Bin );
 use Mojo::File qw( path );
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend );
+use Mojo::JSON qw( true );
 
 BEGIN { $ENV{MOJO_HOME} = "".path( $Bin ); } # avoid local yancy.conf
+
+my $collections_micro = \%Yancy::Backend::Test::SCHEMA_MICRO;
 
 my ( $backend_url, $backend, %items ) = init_backend( {} );
 
@@ -26,7 +29,7 @@ subtest 'read_schema' => sub {
             config => {
                 read_schema => 1,
                 backend => $backend_url,
-                collections => {},
+                collections => $collections_micro,
             },
         );
 
@@ -37,6 +40,7 @@ subtest 'read_schema' => sub {
                 properties => {
                     id => {
                         'x-order' => 1,
+                        readOnly => true,
                         type => 'integer',
                     },
                     name => {
@@ -68,9 +72,12 @@ subtest 'read_schema' => sub {
             {
                 type => 'object',
                 required => [qw( username email password )],
+                'x-id-field' => 'username',
+                'x-list-columns' => [qw( username email )],
                 properties => {
                     id => {
                         'x-order' => 1,
+                        readOnly => true,
                         type => 'integer',
                     },
                     username => {
@@ -80,19 +87,25 @@ subtest 'read_schema' => sub {
                     email => {
                         'x-order' => 3,
                         type => 'string',
+                        title => 'E-mail Address',
+                        format => 'email',
+                        pattern => '^[^@]+@[^@]+$',
                     },
                     password => {
                         'x-order' => 4,
                         type => 'string',
+                        format => 'password',
                     },
                     access => {
                         'x-order' => 5,
                         type => 'string',
                         enum => [qw( user moderator admin )],
+                        default => 'user',
                     },
                     age => {
                         'x-order' => 6,
                         type => [qw( integer null )],
+                        description => 'The person\'s age',
                     },
                 },
             },
@@ -118,6 +131,7 @@ subtest 'read_schema' => sub {
                 properties => {
                     id => {
                         'x-order' => 1,
+                        readOnly => true,
                         type => 'integer',
                     },
                     name => {
@@ -153,13 +167,13 @@ subtest 'x-ignore' => sub {
     my $t = Test::Mojo->new( Yancy => {
         read_schema => 1,
         backend => $backend_url,
-        collections => { blog => { 'x-ignore' => 1 } },
+        collections => { people => { 'x-ignore' => 1 } },
     });
     $t->get_ok( '/yancy/api' )
       ->status_is( 200 )
       ->content_type_like( qr{^application/json} )
-      ->json_has( '/definitions/people', 'people read from schema' )
-      ->json_hasnt( '/definitions/blog', 'blog ignored from schema' )
+      ->json_has( '/definitions/user', 'user read from schema' )
+      ->json_hasnt( '/definitions/people', 'people ignored from schema' )
       ;
 };
 
@@ -169,6 +183,7 @@ subtest 'errors' => sub {
         my %missing_id = (
             collections => {
                 foo => {
+                    type => 'object',
                     properties => {
                         text => { type => 'string' },
                     },
@@ -183,6 +198,7 @@ subtest 'errors' => sub {
         my %missing_x_id = (
             collections => {
                 foo => {
+                    type => 'object',
                     'x-id-field' => 'bar',
                     properties => {
                         text => { type => 'string' },

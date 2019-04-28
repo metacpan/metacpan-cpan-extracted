@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   Sjis::eval
-    length          vs   Sjis::length
-    substr          vs   Sjis::substr
-    ord             vs   Sjis::ord
-    reverse         vs   Sjis::reverse
-    getc            vs   Sjis::getc
-    index           vs   Sjis::index
-    rindex          vs   Sjis::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  Sjis::eval
+    length          vs.  Sjis::length
+    substr          vs.  Sjis::substr
+    ord             vs.  Sjis::ord
+    reverse         vs.  Sjis::reverse
+    getc            vs.  Sjis::getc
+    index           vs.  Sjis::index
+    rindex          vs.  Sjis::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

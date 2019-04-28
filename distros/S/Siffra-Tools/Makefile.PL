@@ -14,22 +14,28 @@ my %WriteMakefileArgs = (
     LICENSE          => 'perl',
     INSTALLDIRS      => ( $] < 5.011 ? 'perl' : 'site' ),
     PREREQ_PM        => {
+
+        # Default req
         'strict'       => 0,
         'warnings'     => 0,
-        'Test::Simple' => 0.44,
-        'Test::More'   => 0,
-        'version'      => 0,
+        'Carp'         => 0,
         'utf8'         => 0,
+        'Data::Dumper' => 0,
+        'DDP'          => 0,
         'Log::Any'     => 0,
         'Scalar::Util' => 0,
-        'Data::Dumper' => 0,
+        'version'      => 0,
+        # Default req
+
+        'Test::More'   => 0,
+        'Siffra::Base' => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,
         'ExtUtils::MakeMaker' => 0,
     },
     (
-        eval { ExtUtils::MakeMaker->VERSION(6.46) }
+        eval { ExtUtils::MakeMaker->VERSION( 6.46 ) }
         ? ()
         : (
             META_MERGE => {
@@ -38,12 +44,12 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git@github.com:lbenevenuto/Siffra-Tools.git',
-                        web  => 'https://github.com/lbenevenuto/Siffra-Tools',
+                        url  => 'git@github.com:SiffraTI/Siffra-Tools.git',
+                        web  => 'https://github.com/SiffraTI/Siffra-Tools',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/Siffra-Tools/issues',
+                        web => 'https://github.com/SiffraTI/Siffra-Tools/issues',
                     },
                 },
             }
@@ -53,4 +59,4 @@ my %WriteMakefileArgs = (
     clean => { FILES    => 'Siffra-Tools-* *.old *.bak' },
 );
 
-WriteMakefile(%WriteMakefileArgs);
+WriteMakefile( %WriteMakefileArgs );

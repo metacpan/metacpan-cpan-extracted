@@ -270,3 +270,9 @@ Revision history for Perl extension Lingua::EN::Inflect.
 
     - Various bugs in documentation code debugged
       (Thanks, Kornel!)
+
+
+1.904  Sat Apr 27 22:01:03 2019
+
+    - Corrected 'cyclops', 'triceratops', etc.
+      (Thanks, Lady Aleena)

@@ -1,11 +1,11 @@
 Char/OldUTF8.pm
-OldUTF8.pm
-Eoldutf8.pm
+lib/OldUTF8.pm
+lib/Eoldutf8.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -317,3 +317,7 @@ t/OldUTF8/395_oldutf8eval_block.t
 t/OldUTF8/396_double_diamond.t
 t/OldUTF8/397_bitwise_op.t
 t/OldUTF8/398_non_capturing.t
+t/OldUTF8/399_indented_heredoc_qq.t
+t/OldUTF8/400_indented_heredoc_q.t
+t/OldUTF8/401_indented_heredoc_qx.t
+t/OldUTF8/402_regexp_xx.t

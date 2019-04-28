@@ -13,7 +13,7 @@ WriteMakefile(
   LICENSE       => 'perl',
   PREREQ_PM => {
     'Mojolicious'  => '7.76',
-    'Net::OAuth2::AuthorizationServer'  => '0.17',
+    'Net::OAuth2::AuthorizationServer'  => '0.21',
     'Carp'            => 0,
   },
   BUILD_REQUIRES => {
@@ -23,6 +23,7 @@ WriteMakefile(
     'Test::Deep'      => 0.113,
     'Test::Mojo'      => 0,
     'Test::Exception' => 0.32,
+    'Mojo::JWT'       => 0.08,
   },
   META_MERGE => {
     requires  => {

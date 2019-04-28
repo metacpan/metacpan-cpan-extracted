@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use lib 'inc'; # for Inline::Module
+use Inline::Module;
 
 my $thispackage = q(PDLA::IO::HDF);
 
@@ -8,20 +10,19 @@ my %pkghash;
 # so can output its deps at least
 eval {
   require ExtUtils::Depends;
-  my $pkg = ExtUtils::Depends->new($thispackage, qw(Alien::HDF4));
-  $pkg->set_inc(PDLA_INCLUDE());
+  my $pkg = ExtUtils::Depends->new($thispackage, qw(PDLA Alien::HDF4));
   $pkg->add_typemaps(PDLA_TYPEMAP());
-  $pkg->add_pm(
-      'HDF.pm' => '$(INST_LIBDIR)/HDF.pm',
-  );
   %pkghash = $pkg->get_makefile_vars;
 };
 
-my @coredep = ('PDLA::Core' => '2.019100');
+my @coredep = (
+  'PDLA::Core' => '2.019103',
+  'Inline::Pdlapp' => '2.019104', # PACKAGE
+);
 
 WriteMakefile(
     NAME => $thispackage,
-    VERSION_FROM => 'HDF.pm',
+    VERSION_FROM => 'lib/PDLA/IO/HDF.pm',
     %pkghash,
     'META_MERGE' => {
         "meta-spec" => { version => 2 },
@@ -38,7 +39,7 @@ WriteMakefile(
     'CONFIGURE_REQUIRES' => {
       'ExtUtils::MakeMaker' => 0,
       'ExtUtils::Depends' => '0.402',
-      'Alien::HDF4' => 0,
+      'Alien::HDF4' => '0.05',
       @coredep,
     },
     'BUILD_REQUIRES' => {
@@ -46,5 +47,13 @@ WriteMakefile(
     },
     'TEST_REQUIRES' => {
       'Test::More' => 0,
+    },
+    clean => { FILES => '.inline' },
+    postamble => {
+      inline => {
+        module => [ qw(PDLA::IO::HDF::SD PDLA::IO::HDF::VS) ],
+        ilsm => 'Inline::Pdlpp',
+        bundle => 0,
+      },
     },
 );

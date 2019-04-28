@@ -2,11 +2,11 @@ use 5.008;
 use strict;
 use warnings;
 package Task::PerlFormance;
-# git description: v0.008-1-ge3751d9
+# git description: v0.009-2-g5ff7bf6
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Max dependencies for Benchmark::Perl::Formance
-$Task::PerlFormance::VERSION = '0.009';
+$Task::PerlFormance::VERSION = '0.010';
 
 __END__
 
@@ -20,7 +20,7 @@ Task::PerlFormance - Max dependencies for Benchmark::Perl::Formance
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 TASK CONTENTS
 
@@ -47,6 +47,8 @@ version 0.009
 =head3 L<Test::More>
 
 =head3 L<File::ShareDir>
+
+=head3 L<File::Copy::Recursive>
 
 =head2 OO
 
@@ -106,7 +108,7 @@ version 0.009
 
 =head2 Primes
 
-=head3 L<Crypt::Primes>
+# =pkg Crypt::Primes
 
 =head3 L<Math::Primality>
 

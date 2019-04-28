@@ -23,6 +23,7 @@ lib/Perl/Critic/Policy/Freenode/DollarAB.pm
 lib/Perl/Critic/Policy/Freenode/Each.pm
 lib/Perl/Critic/Policy/Freenode/EmptyReturn.pm
 lib/Perl/Critic/Policy/Freenode/IndirectObjectNotation.pm
+lib/Perl/Critic/Policy/Freenode/LexicalForeachIterator.pm
 lib/Perl/Critic/Policy/Freenode/LoopOnHash.pm
 lib/Perl/Critic/Policy/Freenode/ModPerl.pm
 lib/Perl/Critic/Policy/Freenode/OpenArgs.pm
@@ -49,6 +50,7 @@ t/Freenode/DollarAB.run
 t/Freenode/Each.run
 t/Freenode/EmptyReturn.run
 t/Freenode/IndirectObjectNotation.run
+t/Freenode/LexicalForeachIterator.run
 t/Freenode/LoopOnHash.run
 t/Freenode/ModPerl.run
 t/Freenode/OpenArgs.run

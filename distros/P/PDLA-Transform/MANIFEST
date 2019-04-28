@@ -1,0 +1,18 @@
+Changes
+Cartography/Cartography.pm
+Cartography/Makefile.PL
+Cartography/earth_coast.vec.fits
+Cartography/earth_day.jpg
+Cartography/earth_night.jpg
+Makefile.PL
+transform.pd
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+m51.fits
+t/00-report-prereqs.t
+t/01-checkmanifest.t
+t/transform.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDLA/Transform.pm              mod=PDLA::Transform pd=transform.pd (added by pdlpp_mkgen)

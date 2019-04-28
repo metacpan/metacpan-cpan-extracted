@@ -23,7 +23,7 @@ Open the EPFL website (service) associated with the Git repository.
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 USAGE
 
@@ -33,7 +33,7 @@ Version 1.03
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 my ($help);
 
@@ -110,7 +110,7 @@ L<http://search.cpan.org/dist/EPFL-Service-Open/>
 Original work Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE,
 Switzerland, VPSI, 2018.
 
-Modified work Copyright William Belle, 2018.
+Modified work Copyright William Belle, 2018-2019.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

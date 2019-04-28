@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.46-2-g220bdb3
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.47-10-gbdb5d98
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Moose;
 use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
@@ -68,7 +68,7 @@ use ExtUtils::MakeMaker{{
 my {{ $WriteMakefileArgs }}
 {{
     @$extra_args ? "%WriteMakefileArgs = (\n"
-        . join('', map { "    " . $_ . ",\n" } '%WriteMakefileArgs', @$extra_args)
+        . join('', map "    $_,\n", '%WriteMakefileArgs', @$extra_args)
         . ");\n"
     : '';
 }}
@@ -103,7 +103,7 @@ around BUILDARGS => sub
     my $delimiter = delete $args->{delimiter};
     if (defined $delimiter and length($delimiter))
     {
-        foreach my $arg (grep { exists $args->{$_} } qw(WriteMakefile_arg_strs header_strs footer_strs))
+        foreach my $arg (grep exists $args->{$_}, qw(WriteMakefile_arg_strs header_strs footer_strs))
         {
             s/^\Q$delimiter\E// foreach @{$args->{$arg}};
         }
@@ -165,9 +165,9 @@ sub _build_WriteMakefile_args {
         ->as_string_hash;
     };
 
-    my %require_prereqs = map {
-        $_ => $prereqs_dump->($_, 'requires');
-    } qw(configure build test runtime);
+    my %require_prereqs = map
+        +($_ => $prereqs_dump->($_, 'requires')),
+        qw(configure build test runtime);
 
     # EUMM may soon be able to support this, but until we decide to inject a
     # higher configure-requires version, we should at least warn the user
@@ -297,7 +297,7 @@ has exe_files => (
 sub _build_exe_files {
     my ($self) = @_;
 
-    my @exe_files = map { $_->name } @{ $self->zilla->find_files(':ExecFiles') };
+    my @exe_files = map $_->name, @{ $self->zilla->find_files(':ExecFiles') };
 
     return \@exe_files;
 }
@@ -320,6 +320,8 @@ sub _build_share_dir_block {
     if ( keys %$share_dir_map ) {
         # split in two to foil CPANTS prereq_matches_use
         my $preamble = qq{use File::Shar}.qq{eDir::Install;\n};
+        $preamble .= qq{\$File::ShareDir::Install::INCLUDE_DOTFILES = 1;\n};
+        $preamble .= qq{\$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;\n};
         if ( my $dist_share_dir = $share_dir_map->{dist} ) {
             $dist_share_dir = quotemeta $dist_share_dir;
             $preamble .= qq{install_share dist => "$dist_share_dir";\n};
@@ -423,7 +425,7 @@ sub register_prereqs {
 
     $self->zilla->register_prereqs(
         { phase => 'configure', type => 'requires' },
-        'File::ShareDir::Install' => 0.03,
+        'File::ShareDir::Install' => 0.06,
     );
 
     return {};
@@ -449,7 +451,7 @@ sub setup_installer
 
     ## Sanity checks
     $self->log_fatal("can't install files with whitespace in their names")
-        if grep { /\s/ } @{$self->exe_files};
+        if grep /\s/, @{$self->exe_files};
 
     my $perl_prereq = $self->WriteMakefile_arg('MIN_PERL_VERSION');
 
@@ -489,7 +491,7 @@ sub before_build
     my $self = shift;
 
     my @makemaker_plugins =
-        grep { $_->isa('Dist::Zilla::Plugin::MakeMaker') }
+        grep $_->isa('Dist::Zilla::Plugin::MakeMaker'),
         eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->plugins : @{ $self->zilla->plugins };
 
     my @plugin_classes = map {
@@ -520,7 +522,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -710,7 +712,7 @@ dynamically at build time:
         return +{
             %{ super() },
             DIR           => [ @DIR ],
-            INC           => join(' ', map { "-I$_" } @DIR),
+            INC           => join(' ', map "-I$_", @DIR),
 
             # This used to be '-shared lib*/*.o' but that doesn't work on Win32
             LDDLFLAGS     => "-shared @OBJ",
@@ -896,7 +898,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Jesse Luehrs Robin Smidsrød Vladimir Timofeev
+=for stopwords Jesse Luehrs Robin Smidsrød Tabulo Vladimir Timofeev
 
 =over 4
 
@@ -907,6 +909,10 @@ Jesse Luehrs <doy@tozt.net>
 =item *
 
 Robin Smidsrød <robin@smidsrod.no>
+
+=item *
+
+Tabulo <dev@tabulo.net>
 
 =item *
 

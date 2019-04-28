@@ -1,5 +1,9 @@
 Revision history for WebService-IPify
 
+0.04  2019-04-27 00:16:34 +08
+        - Fix build dependancies failure
+        - Fix meta details
+
 0.03  2019-04-25 21:14:00 +08
         - Fix issues raised by perlcritic
 

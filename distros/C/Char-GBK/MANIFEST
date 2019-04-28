@@ -1,11 +1,11 @@
 Char/GBK.pm
-GBK.pm
-Egbk.pm
+lib/GBK.pm
+lib/Egbk.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -400,3 +400,7 @@ t/GBK/395_gbkeval_block.t
 t/GBK/396_double_diamond.t
 t/GBK/397_bitwise_op.t
 t/GBK/398_non_capturing.t
+t/GBK/399_indented_heredoc_qq.t
+t/GBK/400_indented_heredoc_q.t
+t/GBK/401_indented_heredoc_qx.t
+t/GBK/402_regexp_xx.t

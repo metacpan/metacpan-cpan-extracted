@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.8';
+$VERSION = '0.0.9';
 
 1;
 
@@ -67,6 +67,8 @@ Google::reCAPTCHA
 Gravatar::URL
 
 Net::Domain
+
+Net::IMAP::Simple - use for IMAP access
 
 Net::IP
 

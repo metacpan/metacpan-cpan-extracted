@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.68'; # VERSION
+our $VERSION = '1.69'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1151,7 +1151,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.68
+version 1.69
 
 =head1 SYNOPSIS
 
@@ -1536,6 +1536,31 @@ libraries at runtime.  This is passed into L<FFI::CheckLib>, so if
 your library is something like C<libarchive.so> or C<archive.dll> you
 would set this to C<archive>.  This may be a string or an array of
 strings.
+
+=item ffi_checklib
+
+This property contains two sub properties:
+
+=over 4
+
+=item share
+
+ $build->runtime_prop->{ffi_checklib}->{share} = [ ... ];
+
+Array of additional L<FFI::CheckLib> flags to pass in to C<find_lib>
+for a C<share> install.
+
+=item system
+
+Array of additional L<FFI::CheckLib> flags to pass in to C<find_lib>
+for a C<system> install.
+
+Among other things, useful for specifying the C<try_linker_script>
+flag:
+
+ $build->runtime_prop->{ffi_checklib}->{system} = [ try_linker_script => 1 ];
+
+=back
 
 =item install_type
 

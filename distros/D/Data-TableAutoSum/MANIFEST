@@ -14,3 +14,5 @@ t/change.t
 t/merge.t
 t/contains_row_col.t
 t/is_equal.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

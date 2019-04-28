@@ -358,6 +358,15 @@ the B<-P> flag to paste the lines together (this defaults to a tab).
 After this command each input file contains a single line, whose marker is
 unset.
 
+=item B<--anti-pivot>
+
+Splits all the line according to the B<-F> flag (see B<--cut> for more details)
+into multiple lines (this is not the same as adding new-lines in the middle of
+lines as with this command the multiple lines will be treated as distinct lines
+by subsequent commands).
+
+After this command, the marker of every line is unset.
+
 =item B<--transpose>
 
 Splits all the line according to the B<-F> flag (see B<--cut> for more details)

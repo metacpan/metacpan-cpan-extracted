@@ -3,7 +3,7 @@ use warnings;
 use Config;
 use IO::All;
 
-my $version = '0.03';
+my $version = '0.05';
 
 # Look for HDF4 includes/libs
 # default locations:

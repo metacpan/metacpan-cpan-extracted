@@ -10,7 +10,7 @@ sure you change the first line.
 
 =head1 NAME
 
-Net::Async::Slack::Event::SubteamCreated - A User Group has been added to the team
+Net::Async::Slack::Event::SubteamCreated - A User Group has been added to the workspace
 
 =head1 DESCRIPTION
 
@@ -27,4 +27,12 @@ Example input data:
 L<from_json|Net::Async::Slack::EventType/from_json>, L<import|Net::Async::Slack::EventType/import>, L<new|Net::Async::Slack::EventType/new>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.
 

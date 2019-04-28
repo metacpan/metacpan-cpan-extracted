@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -588,14 +588,19 @@ use Mojo::JSON qw( decode_json );
 use Mojo::Loader qw( load_class );
 use Mojo::Util qw( url_escape );
 use Sys::Hostname qw( hostname );
-use Yancy::Util qw( load_backend curry );
+use Yancy::Util qw( load_backend curry copy_inline_refs );
 use JSON::Validator::OpenAPI::Mojolicious;
+use Storable qw( dclone );
 
 has _filters => sub { {} };
 
 sub register {
     my ( $self, $app, $config ) = @_;
-    $config = { %$config }; # avoid mutating input
+
+    # Create some safe copies of data structures we're about to mutate
+    $config = { %$config };
+    $config->{collections} &&= dclone $config->{collections};
+
     my $route = $config->{route} // $app->routes->any( '/yancy' );
     $route->to( return_to => $config->{return_to} // '/' );
     $config->{api_controller} //= 'Yancy::API';
@@ -606,6 +611,7 @@ sub register {
     push @{ $app->static->paths }, $share->child( 'public' )->to_string;
     push @{ $app->renderer->paths }, $share->child( 'templates' )->to_string;
     push @{$app->routes->namespaces}, 'Yancy::Controller';
+    push @{ $app->commands->namespaces }, 'Yancy::Command';
 
     # Helpers
     $app->helper( 'yancy.config' => sub { return $config } );
@@ -695,16 +701,19 @@ sub register {
         }
 
         # Sanity check for the schema.
-        for my $schema_name ( keys %{ $config->{collections} } ) {
-            my $schema = $config->{collections}{ $schema_name };
+        for my $coll ( keys %{ $config->{collections} } ) {
+            my $schema = $config->{collections}{ $coll };
             next if $schema->{ 'x-ignore' }; # XXX Should we just delete x-ignore collections?
-            my $props = $schema->{ properties };
+            $schema->{ type } //= 'object';
+            my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+            my $props = $schema->{properties}
+                || $config->{collections}{ $real_coll }{properties};
             my $id_field = $schema->{ 'x-id-field' } // 'id';
             if ( !$props->{ $id_field } ) {
                 die sprintf "ID field missing in properties for collection '%s', field '%s'."
                     . " Add x-id-field to configure the correct ID field name, or"
                     . " add x-ignore to ignore this collection.",
-                        $schema_name, $id_field;
+                        $coll, $id_field;
             }
         }
 
@@ -872,21 +881,23 @@ sub _openapi_spec_from_schema {
             description => 'How to sort the list. A string containing one of "asc" (to sort in ascending order) or "desc" (to sort in descending order), followed by a ":", followed by the field name to sort by.',
         },
     );
-    for my $name ( keys %{ $config->{collections} } ) {
+    for my $coll ( keys %{ $config->{collections} } ) {
         # Set some defaults so users don't have to type as much
-        my $collection = $config->{collections}{ $name };
-        next if $collection->{ 'x-ignore' };
-        $collection->{ type } //= 'object';
-        my $id_field = $collection->{ 'x-id-field' } // 'id';
-        my %props = %{ $collection->{ properties } };
+        my $schema = $config->{collections}{ $coll };
+        next if $schema->{ 'x-ignore' };
+        my $id_field = $schema->{ 'x-id-field' } // 'id';
+        my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+        my $props = $schema->{properties}
+            || $config->{collections}{ $real_coll }{properties};
+        my %props = %$props;
 
-        $definitions{ $name } = $collection;
+        $definitions{ $coll } = $schema;
 
         for my $prop ( keys %props ) {
             $props{ $prop }{ type } ||= 'string';
         }
 
-        $paths{ '/' . $name } = {
+        $paths{ '/' . $coll } = {
             get => {
                 parameters => [
                     { '$ref' => '#/parameters/%24limit' },
@@ -898,7 +909,7 @@ sub _openapi_spec_from_schema {
                         type => ref $props{ $_ }{type} eq 'ARRAY'
                                 ? $props{ $_ }{type}[0] : $props{ $_ }{type},
                         description => "Filter the list by the $_ field. By default, looks for rows containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.",
-                    } } grep !exists( $props{ $_ }{'$ref'} ), keys %props,
+                    } } grep !exists( $props{ $_ }{'$ref'} ), sort keys %props,
                 ],
                 responses => {
                     200 => {
@@ -914,7 +925,7 @@ sub _openapi_spec_from_schema {
                                 items => {
                                     type => 'array',
                                     description => 'This page of items',
-                                    items => { '$ref' => "#/definitions/" . url_escape $name },
+                                    items => { '$ref' => "#/definitions/" . url_escape $coll },
                                 },
                             },
                         },
@@ -925,13 +936,13 @@ sub _openapi_spec_from_schema {
                     },
                 },
             },
-            post => {
+            $schema->{'x-view'} ? () : (post => {
                 parameters => [
                     {
                         name => "newItem",
                         in => "body",
                         required => true,
-                        schema => { '$ref' => "#/definitions/" . url_escape $name },
+                        schema => { '$ref' => "#/definitions/" . url_escape $coll },
                     },
                 ],
                 responses => {
@@ -939,7 +950,7 @@ sub _openapi_spec_from_schema {
                         description => "Entry was created",
                         schema => {
                             '$ref' => sprintf "#/definitions/%s/properties/%s",
-                                      map { url_escape $_ } $name, $id_field,
+                                      map { url_escape $_ } $coll, $id_field,
                         },
                     },
                     default => {
@@ -947,10 +958,10 @@ sub _openapi_spec_from_schema {
                         schema => { '$ref' => "#/definitions/_Error" },
                     },
                 },
-            },
+            }),
         };
 
-        $paths{ sprintf '/%s/{%s}', $name, $id_field } = {
+        $paths{ sprintf '/%s/{%s}', $coll, $id_field } = {
             parameters => [
                 {
                     name => $id_field,
@@ -967,7 +978,7 @@ sub _openapi_spec_from_schema {
                 responses => {
                     200 => {
                         description => "Item details",
-                        schema => { '$ref' => "#/definitions/" . url_escape $name },
+                        schema => { '$ref' => "#/definitions/" . url_escape $coll },
                     },
                     default => {
                         description => "Unexpected error",
@@ -976,20 +987,20 @@ sub _openapi_spec_from_schema {
                 }
             },
 
-            put => {
+            $schema->{'x-view'} ? () : (put => {
                 description => "Update a single item",
                 parameters => [
                     {
                         name => "newItem",
                         in => "body",
                         required => true,
-                        schema => { '$ref' => "#/definitions/" . url_escape $name },
+                        schema => { '$ref' => "#/definitions/" . url_escape $coll },
                     }
                 ],
                 responses => {
                     200 => {
                         description => "Item was updated",
-                        schema => { '$ref' => "#/definitions/" . url_escape $name },
+                        schema => { '$ref' => "#/definitions/" . url_escape $coll },
                     },
                     default => {
                         description => "Unexpected error",
@@ -1009,7 +1020,7 @@ sub _openapi_spec_from_schema {
                         schema => { '$ref' => '#/definitions/_Error' },
                     },
                 },
-            },
+            }),
         };
     }
 
@@ -1093,7 +1104,7 @@ sub _helper_schema {
         $c->yancy->config->{collections}{ $name } = $schema;
         return;
     }
-    return $c->yancy->config->{collections}{ $name };
+    return copy_inline_refs( $c->yancy->config->{collections}, "/$name" );
 }
 
 sub _helper_list {
@@ -1289,7 +1300,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

@@ -3,9 +3,13 @@ package Net::Async::Slack::Event::GroupJoined;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+use utf8;
+
+our $VERSION = '0.003'; # VERSION
 
 use Net::Async::Slack::EventType;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -17,7 +21,9 @@ Example input data:
 
     {
         "type": "group_joined",
-        "channel": { ... }
+        "channel": {
+            ...
+        }
     }
 
 
@@ -27,3 +33,12 @@ sub type { 'group_joined' }
 
 1;
 
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.

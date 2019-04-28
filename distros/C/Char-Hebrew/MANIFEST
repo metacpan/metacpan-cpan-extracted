@@ -1,11 +1,11 @@
 Char/Hebrew.pm
-Hebrew.pm
-Ehebrew.pm
+lib/Hebrew.pm
+lib/Ehebrew.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/Hebrew/395_hebreweval_block.t
 t/Hebrew/396_double_diamond.t
 t/Hebrew/397_bitwise_op.t
 t/Hebrew/398_non_capturing.t
+t/Hebrew/399_indented_heredoc_qq.t
+t/Hebrew/400_indented_heredoc_q.t
+t/Hebrew/401_indented_heredoc_qx.t
+t/Hebrew/402_regexp_xx.t

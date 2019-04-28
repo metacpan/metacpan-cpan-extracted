@@ -24,22 +24,26 @@ name: Database-Async
 requires:
   Class::Method::Modifiers: '0'
   Future: '0.38'
-  Future::AsyncAwait: '0.24'
+  Future::AsyncAwait: '0.26'
   IO::Async: '0.68'
   IO::Async::Notifier: '0.68'
+  List::Util: '1.50'
   Log::Any: '1.050'
   Module::Load: '0'
-  Ryu: '1.001'
-  Ryu::Async: '0.011'
+  Path::Tiny: '0.108'
+  Ryu: '1.003'
+  Ryu::Async: '0.015'
+  Syntax::Keyword::Try: '0.09'
   URI: '0'
   URI::db: '0.19'
   curry: '0'
+  indirect: '0'
   mro: '0'
   parent: '0'
   perl: '5.024'
 resources:
   bugtracker: https://github.com/team-at-cpan/Database-Async/issues
   repository: git://github.com/team-at-cpan/Database-Async.git
-version: '0.004'
+version: '0.005'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

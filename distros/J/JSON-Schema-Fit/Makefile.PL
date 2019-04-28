@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "Math::Round" => 0,
     "Scalar::Util" => 0,
+    "Storable" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Math::Round" => 0,
   "Scalar::Util" => 0,
+  "Storable" => 0,
   "Test::Deep" => 0,
   "Test::More" => 0,
   "lib" => 0,

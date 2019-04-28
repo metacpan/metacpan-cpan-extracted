@@ -1,11 +1,11 @@
 Char/KOI8U.pm
-KOI8U.pm
-Ekoi8u.pm
+lib/KOI8U.pm
+lib/Ekoi8u.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -215,3 +215,7 @@ t/KOI8U/395_koi8ueval_block.t
 t/KOI8U/396_double_diamond.t
 t/KOI8U/397_bitwise_op.t
 t/KOI8U/398_non_capturing.t
+t/KOI8U/399_indented_heredoc_qq.t
+t/KOI8U/400_indented_heredoc_q.t
+t/KOI8U/401_indented_heredoc_qx.t
+t/KOI8U/402_regexp_xx.t

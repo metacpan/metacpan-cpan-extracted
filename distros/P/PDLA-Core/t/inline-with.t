@@ -33,8 +33,8 @@ BEGIN {
       plan skip_all => "Skipped: Inline::C not installed";
    };
 
-   if( $Inline::VERSION < 0.68 ) {
-      plan skip_all => "Skipped: Inline too early a version for Inline with=>'foo' form";
+   if( $Inline::VERSION < 0.83 ) {
+      plan skip_all => "Skipped: Inline has ILSM-finding bug";
    }	   
 }
 use File::Path;

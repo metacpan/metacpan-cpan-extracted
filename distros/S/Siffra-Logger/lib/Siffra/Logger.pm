@@ -4,12 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 use Carp;
-$Carp::Verbose = 1;
 use utf8;
 use Data::Dumper;
 use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
 
 $| = 1;    #autoflush
 
@@ -23,7 +23,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.03';
+    $VERSION = '0.04';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -52,7 +52,6 @@ BEGIN
     use Log::Any::Adapter;
     use Log::Dispatch;
     use File::Basename;
-    use Data::Dumper;
     use POSIX qw/strftime/;
 
     $ENV{ LC_ALL } = $ENV{ LANG } = 'pt_BR.UTF-8';
@@ -141,12 +140,12 @@ sub DESTROY
 {
     my ( $self, %parameters ) = @_;
 
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
-        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => TRUE } );
     }
     else
     {

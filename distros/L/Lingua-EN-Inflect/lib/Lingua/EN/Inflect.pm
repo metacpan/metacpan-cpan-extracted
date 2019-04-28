@@ -7,7 +7,7 @@ use Env;
 require Exporter;
 @ISA = qw(Exporter);
 
-our $VERSION = '1.903';
+our $VERSION = '1.904';
 
 %EXPORT_TAGS =
 (
@@ -157,6 +157,10 @@ my %PL_sb_irregular_s =
     'editio princeps' => 'editiones principes',
     'starets'         => 'startsy',
     'staretz'         => 'startzy',
+    'cyclops'         => 'cyclopses',
+    'tursiops'        => 'tursiopses',
+    'triceratops'     => 'triceratopses',
+    'protoceratops'   => 'protoceratopses',
 );
 
 my %PL_sb_irregular =
@@ -1831,7 +1835,7 @@ Lingua::EN::Inflect - Convert singular to plural. Select "a" or "an".
 
 =head1 VERSION
 
-This document describes version 1.903 of Lingua::EN::Inflect
+This document describes version 1.904 of Lingua::EN::Inflect
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 Char/GB18030.pm
-GB18030.pm
-Egb18030.pm
+lib/GB18030.pm
+lib/Egb18030.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -400,3 +400,7 @@ t/GB18030/395_gb18030eval_block.t
 t/GB18030/396_double_diamond.t
 t/GB18030/397_bitwise_op.t
 t/GB18030/398_non_capturing.t
+t/GB18030/399_indented_heredoc_qq.t
+t/GB18030/400_indented_heredoc_q.t
+t/GB18030/401_indented_heredoc_qx.t
+t/GB18030/402_regexp_xx.t

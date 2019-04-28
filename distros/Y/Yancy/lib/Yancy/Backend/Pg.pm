@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -120,6 +120,7 @@ our $VERSION = '1.023';
 #pod =cut
 
 use Mojo::Base '-base';
+use Mojo::JSON qw( encode_json );
 use Role::Tiny qw( with );
 with qw( Yancy::Backend::Role::Relational Yancy::Backend::Role::MojoAsync );
 BEGIN {
@@ -147,9 +148,17 @@ sub dbschema {
 }
 sub filter_table { 1 }
 
+sub fixup_default {
+    my ( $self, $value ) = @_;
+    return undef if !defined $value or $value =~ /^nextval/i or $value eq 'NULL';
+    $self->mojodb->db->query( 'SELECT ' . $value )->array->[0];
+}
+
 sub create {
     my ( $self, $coll, $params ) = @_;
     $params = $self->normalize( $coll, $params );
+    die "No refs allowed in '$coll': " . encode_json $params
+        if grep ref, values %$params;
     my $id_field = $self->id_field( $coll );
     return $self->mojodb->db->insert( $coll, $params, { returning => $id_field } )->hash->{ $id_field };
 }
@@ -187,7 +196,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

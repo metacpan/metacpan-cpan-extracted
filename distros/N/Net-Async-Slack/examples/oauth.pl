@@ -7,11 +7,19 @@ use Net::Async::Slack;
 
 use Log::Any::Adapter qw(Stdout), log_level => 'debug';
 
+use Getopt::Long;
+
+GetOptions(
+    'host=s' => \my $host,
+    'client_id=s' => \my $client_id,
+);
+
 my $loop = IO::Async::Loop->new;
 
 $loop->add(
     my $slack = Net::Async::Slack->new(
-        client_id => '159837476818.159130832832',
+        slack_host => $host,
+        client_id => $client_id,
     )
 );
 

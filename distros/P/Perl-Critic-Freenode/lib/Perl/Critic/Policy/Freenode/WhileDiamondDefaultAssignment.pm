@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 use constant DESC => '<>/<<>>/readline/readdir/each result not explicitly assigned in while condition';
 use constant EXPL => 'When used alone in a while condition, the <>/<<>> operator, readline, readdir, and each functions assign their result to $_, but do not localize it. Assign the result to an explicit lexical variable instead (my $line = <...>, my $dir = readdir ...)';
@@ -36,12 +36,6 @@ sub violates {
 		my $middle = $statements[1];
 		return $self->violation(DESC, EXPL, $elem) if $middle->schildren
 			and $middle->schild(0)->isa('PPI::Token::QuoteLike::Readline');
-		# PPI parses double angle brackets as two shift operators
-		return $self->violation(DESC, EXPL, $elem) if $middle->schildren >= 2
-			and $middle->schild(0) eq '<<' and $middle->schild(1) eq '>>';
-		# Hack because PPI parses this case weirdly
-		return $self->violation(DESC, EXPL, $elem) if $middle->schildren >= 3
-			and $middle->schild(0) =~ m/\A<<?\z/ and $middle->schild(1)->isa('PPI::Token') and $middle->schild(2) =~ m/\A>>?\z/;;
 	} elsif ($elem eq 'while') {
 		# while (<>) {} or ... while <>
 		if ($next->isa('PPI::Structure::Condition')) {
@@ -52,12 +46,6 @@ sub violates {
 		}
 		
 		return $self->violation(DESC, EXPL, $elem) if $next->isa('PPI::Token::QuoteLike::Readline');
-		# PPI parses double angle brackets as two shift operators
-		if ($next eq '<<') {
-			my $closing = $next->snext_sibling;
-			$closing = $closing->snext_sibling if defined $closing and $closing ne '>>';
-			return $self->violation(DESC, EXPL, $elem) if defined $closing and $closing eq '>>';
-		}
 		if ($next->isa('PPI::Token::Word') and exists $bad_functions{$next} and is_function_call $next) {
 			return $self->violation(DESC, EXPL, $elem);
 		}

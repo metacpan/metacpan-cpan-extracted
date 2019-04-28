@@ -3,8 +3,6 @@ use Test::More;
 use Test::Builder;
 use Set::CrossProduct;
 
-$Data::Dumper::Indent = undef;
-
 use constant STANDARD_DIM => ([    1,    1],
                               [    1,    2],
                               [    2,    1],
@@ -33,7 +31,7 @@ sub _named_cols($) {
 }
 
 sub round($) {
-    sprintf "%.3f", shift();
+    sprintf "%i", shift();
 }
 
 sub all_ok(&$$) {

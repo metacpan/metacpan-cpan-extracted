@@ -91,6 +91,7 @@ to see when the resulting PDFs are displayed.
 021_synfonts  
   021_synfonts.NAME.pdf "1 font" = one page with 16x16 char grid
   4 pages of variants per "font" (slant, oblique, bold, small caps) 
+  and a sample page with combined variants.
  Times-Roman 
   021_synfonts.Times-Roman.pdf
    2 fonts x 4 variants
@@ -166,7 +167,9 @@ to see when the resulting PDFs are displayed.
    eventually will get around to putting in a proper one-page grid (currently filled blocks)
 
 025_unifonts
- (fails with error messages about a bad UTF-8 character)
+  025_unifonts.pdf 
+   4 pages, each one first 45 lines of embedded PDF-J file, showing one of
+   4 Western+CJK font combinations.
 
 026_unifont2
   026_unifont2.pdf
@@ -221,6 +224,10 @@ to see when the resulting PDFs are displayed.
 BarCode.pl
   BarCode.pdf
    1 page x 11 barcodes, NOT VERIFIED AS CORRECT
+
+Bspline.pl
+  Bspline.pdf
+   4 pages of showing the use of b-splines
 
 Content.pl
   Content.pdf

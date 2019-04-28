@@ -144,6 +144,7 @@ use Utils qw/array_cmp/;
         push @data,0.01113;
     }
     $stats->add_data(@data);
+    diag("variance: ",$stats->variance,"\n");
     ok($stats->variance > 0,"variance ok");
 }
 

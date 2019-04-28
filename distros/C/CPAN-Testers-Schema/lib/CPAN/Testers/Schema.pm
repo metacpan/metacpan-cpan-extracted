@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -35,6 +35,8 @@ use File::Share qw( dist_dir );
 use Path::Tiny qw( path );
 use List::Util qw( uniq );
 use base 'DBIx::Class::Schema';
+use Mojo::UserAgent;
+use DateTime::Format::ISO8601;
 
 __PACKAGE__->load_namespaces;
 __PACKAGE__->load_components(qw/Schema::Versioned/);
@@ -97,6 +99,147 @@ sub ordered_schema_versions( $self ) {
     return '0.000', @versions;
 }
 
+#pod =method populate_from_api
+#pod
+#pod     $schema->populate_from_api( \%search, @tables );
+#pod
+#pod Populate the given tables from the CPAN Testers API (L<http://api.cpantesters.org>).
+#pod C<%search> has the following keys:
+#pod
+#pod =over
+#pod
+#pod =item dist
+#pod
+#pod A distribution to populate
+#pod
+#pod =item version
+#pod
+#pod A distribution version to populate
+#pod
+#pod =item author
+#pod
+#pod Populate an author's data
+#pod
+#pod =back
+#pod
+#pod The available C<@tables> are:
+#pod
+#pod =over
+#pod
+#pod =item * upload
+#pod
+#pod =item * release
+#pod
+#pod =item * summary
+#pod
+#pod =item * report
+#pod
+#pod =back
+#pod
+#pod =cut
+
+sub populate_from_api( $self, $search, @tables ) {
+    my $ua = $self->{_ua} ||= Mojo::UserAgent->new;
+    my $base_url = $self->{_url} ||= 'http://api.cpantesters.org/v3';
+    my $dtf = DateTime::Format::ISO8601->new();
+
+    # Establish dependencies
+    my %tables = map {; $_ => 1 } @tables;
+    my @order = qw( upload summary release report );
+    # release depends on data in uploads and summary
+    if ( $tables{ release } ) {
+        @tables{qw( upload summary )} = ( 1, 1 );
+    }
+    # summary depends on data in uploads
+    if ( $tables{ summary } ) {
+        @tables{qw( upload )} = ( 1 );
+    }
+
+    # ; use Data::Dumper;
+    # ; say "Fetching tables: " . Dumper \%tables;
+
+    for my $table ( @order ) {
+        next unless $tables{ $table };
+        my $url = $base_url;
+        if ( $table eq 'upload' ) {
+            $url .= '/upload';
+            if ( $search->{dist} ) {
+                $url .= '/dist/' . $search->{dist};
+            }
+            elsif ( $search->{author} ) {
+                $url .= '/author/' . $search->{author};
+            }
+            my $tx = $ua->get( $url );
+            my @rows = map {
+                $_->{released} = $dtf->parse_datetime( $_->{released} )->epoch;
+                $_->{type} = 'cpan';
+                $_;
+            } $tx->res->json->@*;
+            $self->resultset( 'Upload' )->populate( \@rows );
+        }
+
+        if ( $table eq 'summary' ) {
+            $url .= '/summary';
+            if ( $search->{dist} ) {
+                $url .= '/' . $search->{dist};
+                if ( $search->{version} ) {
+                    $url .= '/' . $search->{version};
+                }
+            }
+            my $tx = $ua->get( $url );
+            my @rows = map {
+                my $dt = $dtf->parse_datetime( delete $_->{date} );
+                $_->{postdate} = $dt->strftime( '%Y%m' );
+                $_->{fulldate} = $dt->strftime( '%Y%m%d%H%M' );
+                $_->{state} = delete $_->{grade};
+                $_->{type} = 2;
+                $_->{tester} = delete $_->{reporter};
+                $_->{uploadid} = $self->resultset( 'Upload' )
+                                 ->search({ $_->%{qw( dist version )} })
+                                 ->first->id;
+                $_;
+            } $tx->res->json->@*;
+            # ; use Data::Dumper;
+            # ; say "Populate summary: " . Dumper \@rows;
+            $self->resultset( 'Stats' )->populate( \@rows );
+        }
+
+        if ( $table eq 'release' ) {
+            $url .= '/release';
+            if ( $search->{dist} ) {
+                $url .= '/dist/' . $search->{dist};
+                if ( $search->{version} ) {
+                    $url .= '/' . $search->{version};
+                }
+            }
+            elsif ( $search->{author} ) {
+                $url .= '/author/' . $search->{author};
+            }
+            my $tx = $ua->get( $url );
+            my @rows = map {
+                delete $_->{author}; # Author is from Upload
+                my $stats_rs = $self->resultset( 'Stats' )
+                           ->search({ $_->%{qw( dist version )} });
+                $_->{id} = $stats_rs->get_column( 'id' )->max;
+                $_->{guid} = $stats_rs->find( $_->{id} )->guid;
+                my $upload = $self->resultset( 'Upload' )
+                             ->search({ $_->%{qw( dist version )} })
+                             ->first;
+                $_->{oncpan} = $upload->type eq 'cpan';
+                $_->{uploadid} = $upload->id;
+                # XXX These are just wrong
+                $_->{distmat} = 1;
+                $_->{perlmat} = 1;
+                $_->{patched} = 1;
+                $_;
+            } $tx->res->json->@*;
+            # ; use Data::Dumper;
+            # ; say "Populate release: " . Dumper \@rows;
+            $self->resultset( 'Release' )->populate( \@rows );
+        }
+    }
+}
+
 1;
 
 __END__
@@ -109,7 +252,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -160,13 +303,60 @@ Get the available schema versions by reading the files in the share
 directory. These versions can then be upgraded to using the
 L<cpantesters-schema> script.
 
+=head2 populate_from_api
+
+    $schema->populate_from_api( \%search, @tables );
+
+Populate the given tables from the CPAN Testers API (L<http://api.cpantesters.org>).
+C<%search> has the following keys:
+
+=over
+
+=item dist
+
+A distribution to populate
+
+=item version
+
+A distribution version to populate
+
+=item author
+
+Populate an author's data
+
+=back
+
+The available C<@tables> are:
+
+=over
+
+=item * upload
+
+=item * release
+
+=item * summary
+
+=item * report
+
+=back
+
 =head1 SEE ALSO
 
 L<CPAN::Testers::Schema::Result::Stats>, L<DBIx::Class>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
 
 =head1 CONTRIBUTORS
 

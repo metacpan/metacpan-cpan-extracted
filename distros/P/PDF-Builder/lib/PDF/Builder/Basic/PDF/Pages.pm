@@ -17,8 +17,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.013'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.014'; # VERSION
+my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;
 use PDF::Builder::Basic::PDF::Dict;
@@ -153,7 +153,7 @@ appended or prepended to the document. Pages inserted in the middle of the
 document may simply be inserted in the appropriate leaf in the pages tree 
 without adding any new branches or leaves. To tidy up such a mess, it is best 
 to call C<$p->rebuild_tree()> to rebuild the pages tree into something 
-efficient.
+efficient. B<Note that C<rebuild_tree> is currently a no-op!>
 
 =cut
 
@@ -212,7 +212,7 @@ sub add_page_recurse {
             for ($pindex = 0; $pindex < $ppnum; $pindex++) {
                 last if $ppages->{'Kids'}{' val'}[$pindex] eq $self;
             }
-            $pindex = -1 if $pindex == $ppnum;
+            $pindex++ if $index == -1;
             $ppages->add_page_recurse($newpages, $pindex);
         }
     } else {

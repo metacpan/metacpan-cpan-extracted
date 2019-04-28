@@ -1,5 +1,12 @@
 Revision history for Perl extension Data::TableAutoSum.
 
+0.10  2019-04-28
+        - Add github repository
+
+0.09  2019-04-28
+        - Fix tests (too many warnings, more rounding to avoid floating errors)
+                - Fix store method (flush immediately)
+
 0.08  Mon Aug 12
         - implemented is_equal method
 

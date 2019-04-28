@@ -5,10 +5,11 @@ use strict;
 use warnings;
 use utf8;
 use Data::Dumper;
-use Data::Dumper::AutoEncode;
 use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
+
 use Config::Any;
 use IO::Prompter;
 
@@ -28,7 +29,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.03';
+    $VERSION = '0.04';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -113,8 +114,8 @@ sub _finalize()
 sub loadApplication()
 {
     my ( $self, %parameters ) = @_;
-    my $configurationFile = $parameters{ configurationFile };
     $log->debug( "loadApplication", { package => __PACKAGE__ } );
+    my $configurationFile = $parameters{ configurationFile };
 
     if ( !-e $configurationFile )
     {
@@ -166,7 +167,7 @@ sub loadApplication()
     if ( $@ )
     {
         $log->error( "Problemas ao usar o arquivo [ $self->{ configurations }->{ application }->{ fileName } ]..." );
-        return 0;
+        return FALSE;
     }
     else
     {
@@ -278,7 +279,7 @@ sub END
 sub DESTROY
 {
     my ( $self, %parameters ) = @_;
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
     if ( ${^GLOBAL_PHASE} eq 'DESTRUCT' )
     {
         $self->getExecutionInfo() if ( blessed( $self ) && $self->isa( __PACKAGE__ ) );
@@ -287,7 +288,7 @@ sub DESTROY
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
-        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => TRUE } );
     }
     else
     {

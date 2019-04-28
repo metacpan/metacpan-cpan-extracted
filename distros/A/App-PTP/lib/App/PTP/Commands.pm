@@ -546,10 +546,11 @@ sub do_paste {
 }
 
 sub do_pivot {
-  my ($content, $markers, $modes, $options, $transpose) = @_;
+  my ($content, $markers, $modes, $options, $action) = @_;
   my $m = 0;
-  if ($transpose) {
-    my $re = prepare_re($modes->{input_field}, $modes);
+  # This is unused by the 'pivot' action, but it's not a huge issue.
+  my $re = prepare_re($modes->{input_field}, $modes);
+  if ($action eq 'transpose') {
     $m = 0;
     my @lines =
         map { my $r = [split $re]; $m = max($m, scalar(@$r)); $r } @$content;
@@ -558,9 +559,14 @@ sub do_pivot {
           my $c = $_;
           join $modes->{output_field}, map { $_->[$c] // '' } @lines;
       } 0..($m - 1);
-  } else {
+  } elsif ($action eq 'pivot') {
     $m = 1;
     @$content = (join $modes->{output_field}, @$content);
+  } elsif ($action eq 'anti-pivot') {
+    @$content = map { split $re } @$content;
+    $m = @$content;
+  } else {
+    die "INTERNAL ERROR: unknown action for the pivot method: ${action}\n";
   }
   @$markers = (0) x $m;
 }

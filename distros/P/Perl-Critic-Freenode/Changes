@@ -1,3 +1,8 @@
+0.029     2019-04-26 13:12:43 EDT
+  - Added LexicalForeachIterator policy
+  - Require PPI 1.252+ allowing simplifications to the DeprecatedFeatures and
+    WhileDiamondDefaultAssignment policies
+
 0.028     2018-11-29 19:32:49 EST
   - Split out lower severity violations from DiscouragedModules policy into a
     new PreferredAlternatives policy. Perl::Critic does not support filtering

@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use AppPtpTest;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 {
   my $data = ptp([qw(--sort)], 'default_data.txt');
@@ -45,4 +45,9 @@ my $numeric_input = "20ab\n1d\n20.5\n99\nabc\n";
                  'default_data.txt');
   is($data, "\n.\\+\nfoobar=\nlast=\nab/cd\nBe\nlast\ntest\nfoobaz\n",
      'custom sort');
+}
+
+{
+  my $data = ptp([qw(--sort --unique)], \"abc\ndef\nabcd\nabc\ndef \ndef\n");
+  is($data, "abc\nabcd\ndef\ndef \n", 'unique');
 }

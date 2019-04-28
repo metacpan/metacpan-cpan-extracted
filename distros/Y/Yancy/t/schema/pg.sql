@@ -1,7 +1,7 @@
 
 CREATE TYPE access_level AS ENUM ( 'user', 'moderator', 'admin' );
 CREATE TABLE people (
-    id SERIAL,
+    id SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
     email VARCHAR,
     age INTEGER,
@@ -18,10 +18,10 @@ CREATE TABLE "user" (
 );
 CREATE TABLE blog (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES "user" ON DELETE CASCADE,
-    title TEXT,
+    user_id INTEGER,
+    title TEXT NOT NULL,
     slug TEXT,
-    markdown TEXT,
+    markdown TEXT NOT NULL,
     html TEXT,
     is_published BOOLEAN NOT NULL DEFAULT FALSE
 );

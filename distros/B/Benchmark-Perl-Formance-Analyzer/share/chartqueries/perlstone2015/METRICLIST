@@ -1,0 +1,26 @@
+# PerlStone2015 metrics
+perlformance.perl5.PerlStone2015.01overview.opmix1,Benchmark::Perl::Formance::Plugin::PerlStone2015::01overview
+perlformance.perl5.PerlStone2015.01overview.opmix2,Benchmark::Perl::Formance::Plugin::PerlStone2015::01overview
+perlformance.perl5.PerlStone2015.04control.blocks1,Benchmark::Perl::Formance::Plugin::PerlStone2015::04control
+perlformance.perl5.PerlStone2015.04control.blocks2,Benchmark::Perl::Formance::Plugin::PerlStone2015::04control
+perlformance.perl5.PerlStone2015.05regex.fixedstr,Benchmark::Perl::Formance::Plugin::PerlStone2015::05regex
+perlformance.perl5.PerlStone2015.07lists.push,Benchmark::Perl::Formance::Plugin::PerlStone2015::07lists
+perlformance.perl5.PerlStone2015.07lists.unshift,Benchmark::Perl::Formance::Plugin::PerlStone2015::07lists
+perlformance.perl5.PerlStone2015.09data.a_alloc,Benchmark::Perl::Formance::Plugin::PerlStone2015::09data
+perlformance.perl5.PerlStone2015.09data.a_copy,Benchmark::Perl::Formance::Plugin::PerlStone2015::09data
+perlformance.perl5.PerlStone2015.binarytrees,Benchmark::Perl::Formance::Plugin::PerlStone2015::binarytrees
+perlformance.perl5.PerlStone2015.fannkuch,Benchmark::Perl::Formance::Plugin::PerlStone2015::fannkuch
+perlformance.perl5.PerlStone2015.fasta,Benchmark::Perl::Formance::Plugin::PerlStone2015::fasta
+perlformance.perl5.PerlStone2015.fib,Benchmark::Perl::Formance::Plugin::PerlStone2015::fib
+perlformance.perl5.PerlStone2015.mandelbrot,Benchmark::Perl::Formance::Plugin::PerlStone2015::mandelbrot
+perlformance.perl5.PerlStone2015.nbody,Benchmark::Perl::Formance::Plugin::PerlStone2015::nbody
+perlformance.perl5.PerlStone2015.regex.backtrack,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.code_literal,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.code_runtime,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.precomp_access,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.runtime_comp,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.runtime_comp_nocache,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.split1,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.split2,Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regexdna,Benchmark::Perl::Formance::Plugin::PerlStone2015::regexdna
+perlformance.perl5.PerlStone2015.spectralnorm,Benchmark::Perl::Formance::Plugin::PerlStone2015::spectralnorm

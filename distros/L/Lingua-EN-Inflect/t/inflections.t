@@ -184,8 +184,16 @@ ok ( PART_PRES("hates") eq "hating" );
 ok ( PART_PRES("spies") eq "spying" );
 ok ( PART_PRES("skis") eq "skiing" );
 
-BEGIN { $| = 1; print "1..962\n"; }
+BEGIN { $| = 1; print "1..970\n"; }
 __DATA__
+                 Fury  ->  Furies|Furys
+                 fury  ->  furies
+                 jury  ->  juries
+              conjury  ->  conjuries
+               augury  ->  auguries
+              cyclops  ->  cyclopses
+             tursiops  ->  tursiopses
+          triceratops  ->  triceratopses
        brother-german  ->  brothers-german | brethren-german
               Tornese  ->  Tornesi
               put-off  ->  put-offs

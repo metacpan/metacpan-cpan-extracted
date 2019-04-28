@@ -14,10 +14,8 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Pod::Coverage::TrustPod' => '0',
                                       'Test::CPAN::Meta' => '0',
-                                      'Test::Pod' => '1.41',
-                                      'Test::Pod::Coverage' => '1.08'
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
@@ -57,6 +55,7 @@ do { my $x = {
                                      'Git::Wrapper' => '0'
                                    },
                    'requires' => {
+                                   'Data::Dumper' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Basename' => '0',
                                    'File::Spec' => '0',

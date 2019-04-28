@@ -1,3 +1,18 @@
+2.019106 2019-04-28
+ - carve out PDLA::Transform into another separate distro
+
+2.019105 2019-04-28
+ - zap (lots of) unneeded deps
+
+2.019104 2019-04-28
+ - rename Lib to Libtmp for windows reasons
+ - relocate tests
+ - zap PDLA::Transform::Proj4 and PDLA::GIS::Proj as now separate distro - thanks @shawnlaffan
+
+2.019103 2019-04-27
+ - zap make-targets that are only relevant for core - thanks @wlmb for report
+ - various tests now try, not use %PDLA::Config
+
 2.019102 2019-04-22
  - corrected MANIFEST so PGPLOT::Window has ppport.h in distro - thanks @eserte for report
 

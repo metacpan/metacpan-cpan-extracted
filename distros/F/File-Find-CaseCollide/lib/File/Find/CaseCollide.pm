@@ -1,5 +1,5 @@
 package File::Find::CaseCollide;
-$File::Find::CaseCollide::VERSION = '0.0.1';
+$File::Find::CaseCollide::VERSION = '0.0.2';
 use strict;
 use warnings;
 use 5.014;
@@ -55,13 +55,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-File::Find::CaseCollide - find collisions in filenames, differing only in case
+File::Find::CaseCollide
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -76,9 +78,13 @@ This tests for filenames in the same directory which differ only in lowercase
 vs uppercase letters which some filesystems do not support (e.g: "hello.txt" vs.
 "Hello.txt").
 
+=head1 NAME
+
+File::Find::CaseCollide - find collisions in filenames, differing only in case
+
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 METHODS
 
@@ -96,36 +102,9 @@ empty.
 L<https://www.jamendo.com/album/59248/sense> - Sense by LadyLau, a CC-licensed
 album.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/file-find-casecollide/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc File::Find::CaseCollide
 
 =head2 Websites
 
@@ -223,5 +202,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-File-Find-CaseCollide>
 
   git clone https://github.com/shlomif/perl-File-Find-CaseCollide.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/file-find-casecollide/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

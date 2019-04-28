@@ -1,5 +1,14 @@
 Revision history for Ryu-Async
 
+0.015     2019-04-28 00:19:50+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - very minor change to truncation rules for automatic labelling on ->sink
+
+    Dependency updates:
+
+    - pulls in latest (1.003) version of Ryu
+
 0.014     2019-01-02 00:27:05+08:00 Asia/Kuala_Lumpur
     No new features.
 

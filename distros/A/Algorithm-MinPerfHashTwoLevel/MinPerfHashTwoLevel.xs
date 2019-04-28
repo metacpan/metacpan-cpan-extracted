@@ -173,6 +173,25 @@ mph_munmap(struct mph_obj *obj) {
     close(obj->fd);
 }
 
+void
+normalize_with_flags(pTHX_ SV *sv, SV *normalized_sv, SV *is_utf8_sv, int downgrade) {
+    if (SvROK(sv)) {
+        croak("not expecting a reference in downgrade_with_flags()");
+    }
+    sv_setsv(normalized_sv,sv);
+    if (SvPOK(sv) && SvUTF8(sv)) {
+        if (downgrade)
+            sv_utf8_downgrade(normalized_sv,1);
+        if (SvUTF8(normalized_sv)) {
+            SvUTF8_off(normalized_sv);
+            sv_setiv(is_utf8_sv,1);
+        } else {
+            sv_setiv(is_utf8_sv,2);
+        }
+    } else {
+        sv_setiv(is_utf8_sv, 0);
+    }
+}
 
 MODULE = Algorithm::MinPerfHashTwoLevel		PACKAGE = Algorithm::MinPerfHashTwoLevel		
 
@@ -192,6 +211,56 @@ hash_with_state(str_sv,state_sv)
         croak("state vector must be at exactly %d bytes",(int)STADTX_SEED_BYTES);
     }
     RETVAL= stadtx_hash_with_state(state_pv,str_pv,str_len);
+}
+    OUTPUT:
+        RETVAL
+
+UV
+hash_with_state_normalized(key_sv,key_normalized_sv,key_is_utf8_sv,val_sv,val_normalized_sv,val_is_utf8_sv,idx1_sv,h2_packed_av,state_sv,n_sv)
+        SV* key_sv
+        SV* key_normalized_sv
+        SV* key_is_utf8_sv
+        SV* val_sv
+        SV* val_normalized_sv
+        SV* val_is_utf8_sv
+        SV* idx1_sv
+        AV* h2_packed_av
+        SV* state_sv
+        SV* n_sv
+    PROTOTYPE: $$$$$$$@$$
+    CODE:
+{
+    U8 *key_pv;
+    STRLEN key_len;
+    U8 *state_pv;
+    STRLEN state_len;
+    U64 h0;
+    U32 h1;
+    U32 h2;
+    U32 idx1;
+    SV **got_psv;
+
+    normalize_with_flags(aTHX_ key_sv, key_normalized_sv, key_is_utf8_sv, 1);
+    normalize_with_flags(aTHX_ val_sv, val_normalized_sv, val_is_utf8_sv, 0);
+
+    key_pv= (U8 *)SvPV(key_normalized_sv,key_len);
+    state_pv= (U8 *)SvPV(state_sv,state_len);
+    if (state_len != STADTX_STATE_BYTES) {
+        croak("state vector must be at exactly %d bytes",(int)STADTX_SEED_BYTES);
+    }
+    h0= stadtx_hash_with_state(state_pv,key_pv,key_len);
+    h1= h0 >> 32;
+    h2= h0 & 0xFFFFFFFF;
+    idx1= h1 % SvUV(n_sv);
+    sv_setuv(idx1_sv, idx1);
+    got_psv= av_fetch(h2_packed_av,idx1,1);
+    if (!got_psv)
+        croak("panic, out of memory?");
+    if (!SvPOK(*got_psv))
+        sv_setpvs(*got_psv,"");
+    sv_catpvn(*got_psv, (char *)&h2, 4); 
+
+    RETVAL = h0;
 }
     OUTPUT:
         RETVAL
@@ -261,7 +330,7 @@ calc_xor_val(max_xor_val,h2_sv,idx_sv,used_sv,used_pos)
     U32 xor_val= 0;
     STRLEN h2_strlen;
     STRLEN bucket_count;
-    char *used= SvPV(used_sv,bucket_count);
+    char *used= SvPV_force(used_sv,bucket_count);
     U32 *h2_start= (U32 *)SvPV(h2_sv,h2_strlen);
     STRLEN h2_count= h2_strlen / sizeof(U32);
     U32 *h2_end= h2_start + h2_count;
@@ -282,6 +351,7 @@ calc_xor_val(max_xor_val,h2_sv,idx_sv,used_sv,used_pos)
             RETVAL= 0;
         } else {
             *idx_start= pos;
+            used[pos]= 1;
             pos = -pos-1;
             RETVAL= (U32)pos;
         }
@@ -308,6 +378,14 @@ calc_xor_val(max_xor_val,h2_sv,idx_sv,used_sv,used_pos)
                 *idx_ptr= i;
                 h2_ptr++;
                 idx_ptr++;
+            }
+            {
+                /* update used */
+                U32 *i= idx_start;
+                while (i < idx_ptr) {
+                    used[*i] = 1;
+                    i++;
+                }
             }
             RETVAL= xor_val;
             break;
@@ -371,7 +449,8 @@ fetch_by_index(mount_sv,index,...)
     SV* key_sv= items > 2 ? ST(2) : NULL;
     SV* val_sv= items > 3 ? ST(3) : NULL;
     if (items > 4)
-       croak_xs_usage(cv,  "mount_sv, index, key_sv, val_sv");
+       croak("Error: passed too many arguments to "
+             "Tie::Hash::MinPerfHashTwoLevel::OnDisk::fetch_by_index(mount_sv, index, key_sv, val_sv)");
     RETVAL= lookup_bucket(aTHX_ obj->header,index,key_sv,val_sv);
 }
     OUTPUT:
@@ -387,7 +466,8 @@ fetch_by_key(mount_sv,key_sv,...)
     SV* val_sv= items > 2 ? ST(2) : NULL;
     struct mph_obj *obj= (struct mph_obj *)SvPV_nolen(mount_sv);
     if (items > 3)
-       croak_xs_usage(cv,  "mount_sv, index, key_sv");
+       croak("Error: passed too many arguments to "
+             "Tie::Hash::MinPerfHashTwoLevel::OnDisk::fetch_by_key(mount_sv, index, key_sv)");
     RETVAL= lookup_key(aTHX_ obj->header,key_sv,val_sv);
 }
     OUTPUT:

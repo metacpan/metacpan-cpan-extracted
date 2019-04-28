@@ -2,11 +2,16 @@ use alienfile;
 
 plugin 'PkgConfig' => 'yaml-0.1';
 
+configure {
+  requires 'Alien::Build::Plugin::Decode::Mojo';
+};
+
 share {
 
   plugin Download => (
-    url     => 'http://pyyaml.org/download/libyaml/',
+    url     => 'https://pyyaml.org/download/libyaml/',
     version => qr/^yaml-([0-9\.]+)\.tar\.gz$/,
+    decoder => 'Decode::Mojo',
   );
   plugin Extract => 'tar.gz';
 
@@ -43,4 +48,13 @@ share {
     },
   );
 
+};
+
+sys {
+  meta->after_hook(
+    gather_system => sub {
+      my($build) = @_;
+      $build->runtime_prop->{ffi_checklib}->{system} = [ try_linker_script => 1 ];
+    },
+  );
 };

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.23
+    version 0.24
 
 SYNOPSIS
 
@@ -109,6 +109,20 @@ FUNCTIONS
 
       Recursively search for libraries in any non-system paths (those
       provided via libpath above).
+
+    try_linker_script
+
+      [version 0.24]
+
+      Some vendors provide .so files that are linker scripts that point to
+      the real binary shared library. These linker scripts can be used by
+      gcc or clang, but are not directly usable by FFI::Platypus and
+      friends. On select platforms, this options will use the linker
+      command (ld) to attempt to resolve the real .so for non-binary files.
+      Since there is extra overhead this is off by default.
+
+      An example is libyaml on RedHat based Linux distributions. On Debian
+      these are handled with symlinks and no trickery is required.
 
  assert_lib
 

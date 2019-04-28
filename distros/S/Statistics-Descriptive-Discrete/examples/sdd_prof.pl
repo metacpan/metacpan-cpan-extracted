@@ -21,17 +21,17 @@ my ($t0, $elapsed);
 my $stats_discrete = Statistics::Descriptive::Discrete->new();
 my $stats_descr = Statistics::Descriptive::Full->new();
 
-print("Statistics::Descriptive, runs = $NUMRUNS, elements=$MAXELEMENTS, sample range = $HIGH\n");
+print "Statistics::Descriptive, runs = $NUMRUNS, elements=$MAXELEMENTS, sample range = $HIGH\n";
 $t0 = [gettimeofday];
 test_stats($stats_descr,1,$HIGH,$MAXELEMENTS,$NUMRUNS); #start at 1 so stats that divide by 0 will work
 $elapsed = tv_interval ( $t0, [gettimeofday]);
-print("Total time: $elapsed sec\n");
+print "Total time: $elapsed sec\n";
 
-print("Statistics::Descriptive::Discrete, runs = $NUMRUNS, elements=$MAXELEMENTS, sample range = $HIGH\n");
+print "Statistics::Descriptive::Discrete, runs = $NUMRUNS, elements=$MAXELEMENTS, sample range = $HIGH\n";
 $t0 = [gettimeofday];
 test_stats($stats_discrete,1,$HIGH,$MAXELEMENTS,$NUMRUNS); #start at 1 so stats that divide by 0 will work
 $elapsed = tv_interval ( $t0, [gettimeofday]);
-print("Total time: $elapsed sec\n");
+print "Total time: $elapsed sec\n";
 
 sub test_stats
 {
@@ -39,10 +39,10 @@ sub test_stats
 
     foreach my $run (0..$numruns-1)
     {
-        print("Run # $run\n");
+        print "Run # $run\n";
         $stats->clear();
         random_set_seed_from_phrase("Test Statistics::Descriptive::Discrete");
-        print("Adding data\n");
+        print "Adding data\n";
         foreach my $i (0..$maxelements-1)
         {
             my $randint = random_uniform_integer(1, $low, $high);

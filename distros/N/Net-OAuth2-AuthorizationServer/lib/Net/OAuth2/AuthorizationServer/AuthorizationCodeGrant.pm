@@ -125,7 +125,7 @@ with 'Net::OAuth2::AuthorizationServer::Defaults';
 use Types::Standard qw/ :all /;
 use Carp qw/ croak /;
 use MIME::Base64 qw/ decode_base64 /;
-use Mojo::JWT;
+use Crypt::JWT qw/ decode_jwt /;
 use Try::Tiny;
 
 has 'auth_code_ttl' => (
@@ -234,7 +234,7 @@ sub _verify_auth_code {
         return ( 0, 'invalid_grant' );
     }
     else {
-        return ( 1, undef, $self->auth_codes->{ $auth_code }{ scope } );
+        return ( 1, undef, @{ $self->auth_codes->{ $auth_code } }{ qw/ scope user_id / } );
     }
 
 }
@@ -254,7 +254,12 @@ sub _verify_auth_code_jwt {
     my ( $auth_code_payload,$invalid_jwt );
 
     try {
-        $auth_code_payload = Mojo::JWT->new( secret => $self->jwt_secret )->decode( $auth_code );
+        $auth_code_payload = 
+            decode_jwt(
+				alg   => $self->jwt_algorithm,
+				key   => $self->jwt_secret,
+				token => $auth_code,
+			);
     }
     catch {
         $invalid_jwt = 1;
@@ -270,8 +275,9 @@ sub _verify_auth_code_jwt {
     }
 
     my $scope = $auth_code_payload->{ scopes };
+    my $user_id = $auth_code_payload->{ user_id };
 
-    return ( $client_id, undef, $scope );
+    return ( $client_id, undef, $scope, $user_id );
 }
 
 =head1 AUTHOR

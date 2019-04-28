@@ -1,0 +1,51 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack::Event::UserResourceRemoved
+at lib/Net/Async/Slack/Event/UserResourceRemoved.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack::Event::UserResourceRemoved - User resource was removed from your app
+
+=head1 DESCRIPTION
+
+Example input data:
+
+    {
+        "token": "XXYYZZ",
+        "team_id": "TXXXXXXXX",
+        "api_app_id": "AXXXXXXXXX",
+        "event": {
+            "type": "user_resource_removed",
+            "user": "WXXXXXXXX",
+            "trigger_id": "27082968880.6048553856.5eb9c671f75c636135fdb6bb9e87b606"
+        },
+        "type": "event_callback",
+        "authed_teams": [],
+        "event_id": "EvXXXXXXXX",
+        "event_time": 1234567890
+    }
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Slack::EventType>
+
+L<from_json|Net::Async::Slack::EventType/from_json>, L<import|Net::Async::Slack::EventType/import>, L<new|Net::Async::Slack::EventType/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.
+

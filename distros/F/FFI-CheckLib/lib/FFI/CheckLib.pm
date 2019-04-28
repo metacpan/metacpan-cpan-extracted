@@ -22,11 +22,12 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.24'; # VERSION
 
 
 our $system_path = [];
 our $os ||= $^O;
+my $try_ld_on_text = 0;
 
 if($os eq 'MSWin32' || $os eq 'msys')
 {
@@ -70,6 +71,13 @@ elsif($os eq 'darwin')
 {
   push @$pattern, qr{^lib(.*?)(?:\.([0-9]+(?:\.[0-9]+)*))?\.(?:dylib|bundle)$};
 }
+elsif($os eq 'linux')
+{
+  if(-e '/etc/redhat-release' && -x '/usr/bin/ld')
+  {
+    $try_ld_on_text = 1;
+  }
+}
 
 sub _matches
 {
@@ -105,6 +113,11 @@ sub _cmp
 
 
 my $diagnostic;
+
+sub _is_binary
+{
+  -B $_[0]
+}
 
 sub find_lib
 {
@@ -164,6 +177,20 @@ sub find_lib
       # read all files from the directory
       readdir $dh;
     closedir $dh;
+
+    if($try_ld_on_text && $args{try_linker_script})
+    {
+      # This is tested in t/ci.t only
+      @maybe = map {
+        -B $_->[1] ? $_ : do {
+          my($name, $so) = @$_;
+          my $output = `/usr/bin/ld -t $so -o /dev/null -shared`;
+          $output =~ /\((.*?lib.*\.so.*?)\)/
+            ? [$name, $1]
+            : die "unable to parse ld output";
+        }
+      } @maybe;
+    }
 
     midloop:
     foreach my $lib (@maybe)
@@ -348,7 +375,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -455,6 +482,20 @@ Example:
 Recursively search for libraries in any non-system paths (those provided
 via C<libpath> above).
 
+=item try_linker_script
+
+[version 0.24]
+
+Some vendors provide C<.so> files that are linker scripts that point to
+the real binary shared library.  These linker scripts can be used by gcc
+or clang, but are not directly usable by L<FFI::Platypus> and friends.
+On select platforms, this options will use the linker command (C<ld>)
+to attempt to resolve the real C<.so> for non-binary files.  Since there
+is extra overhead this is off by default.
+
+An example is libyaml on RedHat based Linux distributions.  On Debian
+these are handled with symlinks and no trickery is required.
+
 =back
 
 =head2 assert_lib
@@ -541,7 +582,7 @@ Not exported by default.
  my $path = FFI::CheckLib::system_path;
 
 Returns the system path as a list reference.  On some systems, this is C<PATH>
-on others it might be L<LD_LIBRARY_PATH> on still others it could be something
+on others it might be C<LD_LIBRARY_PATH> on still others it could be something
 completely different.  So although you I<may> add items to this list, you should
 probably do some careful consideration before you do so.
 

@@ -70,22 +70,22 @@ SUBROUTINES
            (I don't say what are not;)
 
     Byte Oriented        Character Oriented
-    Functions       vs   Subroutines
+    Functions       vs.  Subroutines
     -------------        ----------------
-    eval            vs   Latin3::eval
-    length          vs   Latin3::length
-    substr          vs   Latin3::substr
-    ord             vs   Latin3::ord
-    reverse         vs   Latin3::reverse
-    getc            vs   Latin3::getc
-    index           vs   Latin3::index
-    rindex          vs   Latin3::rindex
-    pos             vs   (nothing)
-    m//b            vs   m//
-    s///b           vs   s///
-    split //b       vs   split //
-    tr///b          vs   tr///
-    qr//b           vs   qr//
+    eval            vs.  Latin3::eval
+    length          vs.  Latin3::length
+    substr          vs.  Latin3::substr
+    ord             vs.  Latin3::ord
+    reverse         vs.  Latin3::reverse
+    getc            vs.  Latin3::getc
+    index           vs.  Latin3::index
+    rindex          vs.  Latin3::rindex
+    pos             vs.  (nothing)
+    m//b            vs.  m//
+    s///b           vs.  s///
+    split //b       vs.  split //
+    tr///b          vs.  tr///
+    qr//b           vs.  qr//
     -------------        ----------------
 
                                             ****************                     

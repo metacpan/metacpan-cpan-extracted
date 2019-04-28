@@ -73,6 +73,10 @@ POLICIES
 
       Don't call methods indirectly
 
+    Perl::Critic::Policy::Freenode::LexicalForeachIterator
+
+      Don't use undeclared foreach loop iterators
+
     Perl::Critic::Policy::Freenode::LoopOnHash
 
       Don't loop over hashes

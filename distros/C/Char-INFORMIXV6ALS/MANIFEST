@@ -1,11 +1,11 @@
 Char/INFORMIXV6ALS.pm
-INFORMIXV6ALS.pm
-Einformixv6als.pm
+lib/INFORMIXV6ALS.pm
+lib/Einformixv6als.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -400,3 +400,7 @@ t/INFORMIXV6ALS/395_informixv6alseval_block.t
 t/INFORMIXV6ALS/396_double_diamond.t
 t/INFORMIXV6ALS/397_bitwise_op.t
 t/INFORMIXV6ALS/398_non_capturing.t
+t/INFORMIXV6ALS/399_indented_heredoc_qq.t
+t/INFORMIXV6ALS/400_indented_heredoc_q.t
+t/INFORMIXV6ALS/401_indented_heredoc_qx.t
+t/INFORMIXV6ALS/402_regexp_xx.t

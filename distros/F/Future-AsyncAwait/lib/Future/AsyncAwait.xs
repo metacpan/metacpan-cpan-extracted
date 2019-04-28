@@ -373,6 +373,14 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
             case SAVEt_SET_SVFLAGS:
               break;
 
+            case SAVEt_FREEPV:
+              Safefree(saved->cur.ptr);
+              break;
+
+            case SAVEt_PADSV_AND_MORTALIZE:
+              SvREFCNT_dec(saved->cur.sv);
+              break;
+
             default:
               fprintf(stderr, "TODO: free saved slot type %d\n", saved->type);
               break;
@@ -385,8 +393,10 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
       /* TODO: maybe free items of the el.loop */
 
 #ifdef HAVE_ITERVAR
-      if(frame->itervar)
-        fprintf(stderr, "TODO: free frame->itervar\n");
+      if(frame->itervar) {
+        SvREFCNT_dec(frame->itervar);
+        frame->itervar = NULL;
+      }
 #endif
 
       if(frame->mortals) {
@@ -516,6 +526,16 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 
         PL_comppad = pad;
         PL_curpad = PL_comppad ? AvARRAY(PL_comppad) : NULL;
+
+        break;
+      }
+
+      case SAVEt_FREEPV: {
+        PL_savestack_ix -= 2;
+        char *pv = PL_savestack[PL_savestack_ix].any_ptr;
+
+        saved->type = SAVEt_FREEPV;
+        saved->saved.ptr = pv;
 
         break;
       }
@@ -751,15 +771,7 @@ nosave:
           break;
 
 #if HAVE_PERL_VERSION(5, 24, 0)
-        case CXt_LOOP_LIST:
-          /* Safety check the above logic
-           * CXt_LOOP_LIST frame's cx->blk_oldsp has a different meaning than
-           * other frame types, but that meaning shouldn't matter provided we
-           * didn't attempt to steal any stack values or marks
-           */
-          if(frame->stacklen || frame->marklen)
-            panic("ARGH CXt_LOOP_LIST frame tried to steal stack values or marks\n");
-
+        case CXt_LOOP_LIST: {
           /* The various fields in the context structure store absolute stack
            * heights as offsets from PL_stack_base directly. When we get
            * resumed the stack will probably not be the same absolute height
@@ -779,6 +791,7 @@ nosave:
           frame->el.loop.state_u.stack.basesp = height - frame->el.loop.state_u.stack.basesp;
           frame->el.loop.state_u.stack.ix     = height - frame->el.loop.state_u.stack.ix;
           break;
+        }
 #endif
       }
 
@@ -1186,6 +1199,10 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
         PL_curpad = PL_comppad ? AvARRAY(PL_comppad) : NULL;
         break;
 
+      case SAVEt_FREEPV:
+        save_freepv(saved->saved.ptr);
+        break;
+
       case SAVEt_FREESV:
         save_freesv(saved->saved.sv);
         break;
@@ -1214,13 +1231,11 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
 #endif
 
       case SAVEt_PADSV_AND_MORTALIZE:
-        /*
         PL_curpad[saved->u.padix] = saved->saved.sv;
         save_padsv_and_mortalize(saved->u.padix);
 
         SvREFCNT_dec(PL_curpad[saved->u.padix]);
         PL_curpad[saved->u.padix] = saved->cur.sv;
-        */
         break;
 
       case SAVEt_SET_SVFLAGS:
@@ -1259,7 +1274,7 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
 #if !HAVE_PERL_VERSION(5, 24, 0)
     case CXt_LOOP_FOR:
       if(!cx->blk_loop.state_u.ary.ary) {
-        I32 height = PL_stack_sp - PL_stack_base;
+        I32 height = PL_stack_sp - PL_stack_base - frame->stacklen;
         cx->blk_loop.state_u.ary.ix = height - cx->blk_loop.state_u.ary.ix;
       }
       break;
@@ -1267,7 +1282,7 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
 
 #if HAVE_PERL_VERSION(5, 24, 0)
     case CXt_LOOP_LIST: {
-      I32 height = PL_stack_sp - PL_stack_base;
+      I32 height = PL_stack_sp - PL_stack_base - frame->stacklen;
 
       cx->blk_loop.state_u.stack.basesp = height - cx->blk_loop.state_u.stack.basesp;
       cx->blk_loop.state_u.stack.ix     = height - cx->blk_loop.state_u.stack.ix;
@@ -1826,10 +1841,11 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   body = block_end(save_ix, body);
 
   /* turn block into
-   *    PUSHMARK; eval { BLOCK }; LEAVEASYNC
+   *    NEXTSTATE; PUSHMARK; eval { BLOCK }; LEAVEASYNC
    */
 
-  OP *op = newLISTOP(OP_LINESEQ, 0, newOP(OP_PUSHMARK, 0), NULL);
+  OP *op = newSTATEOP(0, NULL, NULL);
+  op = op_append_elem(OP_LINESEQ, op, newOP(OP_PUSHMARK, 0));
 
   OP *try;
   op = op_append_elem(OP_LINESEQ, op, try = newUNOP(OP_ENTERTRY, 0, body));

@@ -38,7 +38,7 @@ use SNMP::Info::Layer7;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.67';
+$VERSION = '3.68';
 
 %MIBS = (
     %SNMP::Info::Layer7::MIBS,
@@ -49,6 +49,7 @@ $VERSION = '3.67';
     %SNMP::Info::Layer7::GLOBALS,
     'build_ver'   => 'sysBuildVersion',
     'sys_hw_desc' => 'sysHardwareVersionDesc',
+    'sys_hw_sn'   => 'sysHardwareSerialNumber',
     'cpu'         => 'resCpuUsage',
 );
 
@@ -74,7 +75,8 @@ sub os {
 }
 
 sub serial {
-    return '';
+    my $ns    = shift;
+    return $ns->sys_hw_sn() || '';
 }
 
 sub model {
@@ -194,7 +196,7 @@ C<sysHardwareVersionDesc>
 
 =item $ns->serial()
 
-Returns ''.
+C<sysHardwareSerialNumber>
 
 =back
 

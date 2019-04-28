@@ -1,0 +1,30 @@
+{
+   "charttitle" : "__SHORTMETRICNAME__",
+   "modulename" : "__MODULENAME__",
+   "chartlines" : [
+       {
+           "title" : "__SHORTMETRICNAME__/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   __SNIPPET_QUALID__
+                   [ "=",    "NAME", "__METRICNAME__" ],
+                   [ "=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "__SHORTMETRICNAME__/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   __SNIPPET_QUALID__
+                   [ "=",    "NAME", "__METRICNAME__" ],
+                   [ "!=",    "perlconfig_usethreads", "define"]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

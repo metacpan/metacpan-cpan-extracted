@@ -2,104 +2,45 @@ package Alien::Proj4;
 
 use strict;
 use warnings;
-use Config;
-use Devel::CheckLib;
+use parent qw( Alien::Base );
 
-our $VERSION = '2.019104';
+our $VERSION = '2.019107';
 
-my $find_libs = [ "libproj.$Config{dlext}", "libproj$Config{lib_ext}" ];
-my @NEEDED = qw(projects.h proj_api.h);
-my @DEFAULT_LIB = (
-  '/usr/lib64',
-  '/usr/local/lib64',
-  '/lib64',
-  '/usr/lib',
-  '/usr/local/lib',
-  '/lib',
-  split(/ /, $Config{libpth}),
-);
-my @DEFAULT_INC = (
-  '/usr/include',
-  '/usr/local/include',
-  $Config{usrinc},
-);
-my @lib_locations = @DEFAULT_LIB;
-my @inc_locations = @DEFAULT_INC;
+#  most of the following are for compat with PDLA Makefiles
+#  and should not be used by other code
+sub installed {1}
 
 sub import {
-  my ($class, $lib, $inc) = @_;
-  @lib_locations = @$lib if $lib and @$lib;
-  @inc_locations = @$inc if $inc and @$inc;
+    #  do nothing
+    return;
 }
 
 sub default_lib {
-  my ($class) = @_;
-  @DEFAULT_LIB;
+    return;
 }
 
 sub default_inc {
-  my ($class) = @_;
-  @DEFAULT_INC;
-}
-
-sub libdir {
-  my ($class) = @_;
-  foreach my $libdir ( @lib_locations ) {
-    foreach my $find_lib ( @$find_libs ) {
-      next unless -e "$libdir/$find_lib";
-      return $libdir;
-    }
-  }
+    return;
 }
 
 sub libflags {
-  my ($class) = @_;
-  my $lib_path = $class->libdir;
-  $lib_path = qq{"$lib_path"} if $lib_path =~ /\s/; # conditional as EU::Liblist::Kid doesn't understand this on Cygwin
-  my $libflags = qq{-L$lib_path -lproj -lm};
-  $libflags;
-}
-
-sub incdir {
-  my ($class) = @_;
-  my %dir2true;
-  my %stillneeded = map { ($_=>1) } @NEEDED;
-  my @inc; # array because need to keep ordering
-  foreach my $incdir ( @inc_locations ) {
-    foreach my $find_inc ( keys %stillneeded ) {
-      next unless -e "$incdir/$find_inc";
-      push @inc, $incdir unless $dir2true{$incdir};
-      $dir2true{$incdir} = 1;
-      delete $stillneeded{$find_inc};
-    }
-  }
-  @inc;
+    my ($class) = @_;
+    my $flags = join ' ',  $class->libs;
+    return $flags;
 }
 
 sub incflags {
-  my ($class) = @_;
-  join ' ', map qq{"-I$_"}, $class->incdir;
-}
-
-sub installed {
-  my ($class) = @_;
-  return 0 unless my $lib_path = $class->libdir;
-  return 0 unless my @incdirs = $class->incdir;
-  return 0 unless check_lib(
-    function=>'projPJ mypj = pj_init_plus("+proj=eqc +lon_0=0 +datum=WGS84"); if (! mypj) return 1; else return 0;',
-    header=>'proj_api.h',
-    incpath=>\@incdirs,
-    lib=>'proj',
-    libpath=>$lib_path,
-  );
-  return 1;
+    my ($class) = @_;
+    my $flags = $class->cflags;
+    return $flags;
 }
 
 # dup of code currently in PDLA::GIS::Proj
 sub load_projection_descriptions {
   my ($class) = @_;
-  my $libflags = $class->libflags;
-  my $incflags = $class->incflags;
+  my $incflags = $class->cflags;
+  my $libflags = $class->libs;
+  
   require Inline;
   Inline->bind(C => <<'EOF', inc => $incflags, libs => $libflags) unless defined &list_projections;
 #include "projects.h"
@@ -172,52 +113,71 @@ sub load_projection_information {
     return $info;
 }
 
+
 1;
 
 __END__
 
 =head1 NAME
 
-Alien::Proj4 - Give install info for already-installed proj4
+Alien::Proj4 - Compile the PROJ library, version 4
+
+=head1 BUILD STATUS
+ 
+=begin HTML
+ 
+<p>
+    <img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
+    <a href="https://travis-ci.org/shawnlaffan/perl-alien-proj4"><img src="https://travis-ci.org/shawnlaffan/perl-alien-proj4.svg?branch=master" /></a>
+    <a href="https://ci.appveyor.com/project/shawnlaffan/perl-alien-proj4"><img src="https://ci.appveyor.com/api/projects/status/3lv9qu9ea2ex3p5d?svg=true" /></a>
+</p>
+
+=end HTML
 
 =head1 SYNOPSIS
 
-In Makefile.PL:
+    use Alien::Proj4;
 
-  use Alien::Proj4 [ 'overridelibdirs' ], [ 'overrideincdirs' ];
-  my $proj4_installed = Alien::Proj4->installed;
-  my $proj4_lib = Alien::Proj4->libflags;
-  my $proj4_inc = Alien::Proj4->incflags;
-
-In a module like L<PDLA::Transform::Proj4> that wants available proj4
-projections:
-
-  my @projections = Alien::Proj4->projections;
-
+    
 =head1 DESCRIPTION
 
-If no override is given for the library or include directories, the
-defaults are used. The projections are listed using L<Inline::C>, so
-that needs to be installed.
+PROJ is a generic coordinate transformation software.  See L<https://proj4.org/about.html>.
 
-An alternative idiom to the above compile-time example of supplying
-overrides for directories is:
+This Alien package is probably most useful for compilation of other modules, e.g. L<PDLA::Rest>.
 
-  use Alien::Proj4;
-  Alien::Proj4->import(\@libdirs, undef) if @libdirs; # set to different
-  Alien::Proj4->import(undef, [ Alien::Proj4->default_inc, @incdirs ]); # add
+This is a fork of the main L<Alien::proj>, but with the major version fixed to 4.
+Later versions of the proj code have changed their API, so this ensure stability until
+dependent projects have updated.  
 
-since the overrides have no effect if C<undef> is supplied as the
-array-ref, OR the array is empty.
+The Proj library can be accessed from Perl code via the L<Geo::Proj4> package.  
 
-Note as above that there are C<default_inc> and C<default_lib> methods
-to get the defaults.
+=head1 REPORTING BUGS
 
-Currently the C<incflags> method includes a separate search for
-F<proj_api.h> and F<projects.h>. This is so that if (as in C<PJ_VERSION
-= 480>) there is no F<projects.h> supplied, you can provide one and add
-the location to the list of directories searched, using import as above.
+Please send any bugs, suggestions, or feature requests to 
+L<https://github.com/PDLPorters/Alien-Proj4/issues>.
 
-=head1 AUTHOR
+=head1 SEE ALSO
 
-Ed J
+L<Alien::proj>
+
+L<Geo:Proj4>
+
+L<Geo::GDAL::FFI>
+
+L<Alien::geos::af>
+
+
+=head1 AUTHORS
+
+Shawn Laffan, E<lt>shawnlaffan@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+Copyright 2018- by Shawn Laffan
+
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

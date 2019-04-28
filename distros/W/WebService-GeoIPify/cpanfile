@@ -10,8 +10,8 @@ requires 'REST::Client';
 requires 'Role::Cache::LRU';
 requires 'Role::REST::Client';
 requires 'Sub::Quote';
-requires 'Types::Common::String';
-requires 'Types::Standard';
+requires 'Types::Common::String', '1.004002';
+requires 'Types::Standard', '1.004002';
 
 on test => sub {
     requires 'Pod::Coverage::TrustPod';

@@ -14,20 +14,21 @@ use Future::IO;
    pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
 
    $wr->autoflush();
+   $wr->print( "BYTES" );
 
    my $f = Future::IO->sysread_exactly( $rd, 5 );
 
-   $wr->print( "BY" );
-   $f->await; # Internal implementation method
-   ok( !$f->is_ready, 'Future::IO->sysread_exactly not yet ready' );
+   my @read;
+   no warnings 'redefine';
+   local *IO::Handle::sysread = sub {
+      my ( $fh, undef, $len ) = @_;
+      push @read, $len;
+      return CORE::sysread( $fh, $_[1], 1 );
+   };
 
-   # Pipe should no longer be readable
-   my $rvec = '';
-   vec( $rvec, $rd->fileno, 1 ) = 1;
-   is( select( $rvec, undef, undef, 0.01 ), 0, '$fd filehandle not readable' );
+   is( scalar $f->get, "BYTES", 'Future::IO->sysread_exactly eventually yields all the bytes' );
 
-   $wr->print( "TES" );
-   is( scalar $f->get, "BYTES", 'Future::IO->sysread_exactly yields all bytes from pipe' );
+   is_deeply( \@read, [ 5, 4, 3, 2, 1 ], 'IO::Handle->sysread override worked' );
 }
 
 # ->sysread_exactly yielding EOF

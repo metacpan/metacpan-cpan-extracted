@@ -1,5 +1,5 @@
 package Git::Database::Role::ObjectWriter;
-$Git::Database::Role::ObjectWriter::VERSION = '0.011';
+$Git::Database::Role::ObjectWriter::VERSION = '0.012';
 use Moo::Role;
 
 requires
@@ -18,7 +18,7 @@ Git::Database::Role::ObjectWriter - Abstract role for Git backends that write ob
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

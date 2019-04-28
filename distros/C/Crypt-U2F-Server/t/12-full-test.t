@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use constant TESTS => 11;
+use constant TESTS => 18;
 
 use Test::More tests => TESTS;
 
@@ -106,7 +106,55 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         }
     );
 
-    #ok( $crypter->authenticationVerify($sign), 'Good signature' )
-    #  or diag( Crypt::U2F::Server::Simple::lastError() );
+    if ( $Authen::U2F::Tester::VERSION >= 0.03 ) {
+        ok( $crypter->authenticationVerify($sign), 'Good signature' )
+          or diag( Crypt::U2F::Server::Simple::lastError() );
+    }
+    else {
+        pass(
+'Authen::2F::Tester-0.02 signatures are not recognized by Yubico library'
+        );
+    }
     undef $crypter;
+    $crypter = Crypt::U2F::Server::Simple->new(
+        appId     => 'Perl',
+        origin    => 'Perl',
+        keyHandle => $keyHandle,
+        publicKey => $userKey,
+    );
+    ok( defined($crypter), 'new()' )
+      or diag( Crypt::U2F::Server::Simple::lastError() );
+
+    ok( $challenge = $crypter->authenticationChallenge(), 'Get auth challenge' )
+      or diag( Crypt::U2F::Server::Simple::lastError() );
+
+    $parsed = JSON::XS->new->utf8->decode($challenge);
+    ok( defined($parsed),                   'Parsing JSON string' );
+    ok( $parsed->{keyHandle} eq $keyHandle, 'KeyHandle match' );
+
+    $r = $tester->sign( 'Perl', $parsed->{challenge} . 'xx', $keyHandle );
+    ok( $r->is_success, 'Good challenge value' ) or diag( $r->error_message );
+    $sign = encode_json(
+        {
+            signatureData => $r->signature_data,
+            clientData    => $r->client_data,
+            keyHandle     => $keyHandle,
+            challenge     => $parsed->{challenge} . 'xxx',
+        }
+    );
+
+    if ( $Authen::U2F::Tester::VERSION >= 0.03 ) {
+        ok(
+            (
+                !$crypter->authenticationVerify($sign)
+                  and Crypt::U2F::Server::Simple::lastError() =~ /challenge/i
+            ),
+            'Error detected'
+        );
+    }
+    else {
+        pass(
+'Authen::2F::Tester-0.02 signatures are not recognized by Yubico library'
+        );
+    }
 }

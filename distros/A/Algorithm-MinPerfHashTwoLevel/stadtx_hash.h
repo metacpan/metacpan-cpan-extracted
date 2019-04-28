@@ -18,12 +18,12 @@
 #define ROTR64(x,r) _ROTR_SIZED(x,r,64)
 #endif
 
+#ifndef H_PERL
+
 #if !defined(U64)
     #include <stdint.h>
     #define U64 uint64_t
 #endif
-
-#ifndef PERL_SEEN_HV_FUNC_H
 
 #if !defined(U32)
 #define U32 uint32_t
@@ -40,7 +40,8 @@
 #ifndef STRLEN
 #define STRLEN int
 #endif
-
+#else
+#define U64 U64TYPE
 #endif
 
 #ifndef STADTX_STATIC_INLINE

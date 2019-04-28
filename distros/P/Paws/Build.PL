@@ -84,7 +84,7 @@ EOW
         "Jose Luis Martinez <jlmartinez\@capside.com>"
       ],
       "dist_name" => "Paws",
-      "dist_version" => "0.39",
+      "dist_version" => "0.40",
       "license" => "apache",
       "module_name" => "Paws",
       "recommends" => {

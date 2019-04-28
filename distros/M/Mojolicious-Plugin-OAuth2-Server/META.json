@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Mojolicious-Plugin-OAuth2-Server",
    "no_index" : {
@@ -24,6 +24,7 @@
          "requires" : {
             "File::Find" : "0",
             "FindBin" : "0",
+            "Mojo::JWT" : "0.08",
             "Test::Deep" : "0.113",
             "Test::Exception" : "0.32",
             "Test::Mojo" : "0",
@@ -39,7 +40,7 @@
          "requires" : {
             "Carp" : "0",
             "Mojolicious" : "7.76",
-            "Net::OAuth2::AuthorizationServer" : "0.17",
+            "Net::OAuth2::AuthorizationServer" : "0.21",
             "perl" : "5.010001"
          }
       }
@@ -57,6 +58,6 @@
          "url" : "https://github.com/Humanstate/mojolicious-plugin-oauth2-server"
       }
    },
-   "version" : "0.42",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

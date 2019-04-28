@@ -1,3 +1,8 @@
+ - update Inline dep for ILSM-finding bug
+
+2.019106 2019-04-28
+ - fix doc-install oneliner
+
 2.019105 2019-04-26
  - Inline::Pdlapp removed, in its own distro/repo now
 

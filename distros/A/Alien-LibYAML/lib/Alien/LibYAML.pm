@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 use base qw(Alien::Base);
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: Build and install libyaml, a C-based YAML parser and emitter
 
 
@@ -24,7 +24,7 @@ Alien::LibYAML - Build and install libyaml, a C-based YAML parser and emitter
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,41 @@
+Revision history for Perl extension Video::File::TVShow::Import.
+
+0.01  Sun Nov 29 20:35:23 2015
+	- original version; created by h2xs 1.23 with options
+		-XAn Video::File::TVShow::Import
+
+0.20 Sunday May 6th 2018
+	- Added features:
+		delete()
+		verbose()
+		seasonFolder()
+
+0.25 Friday May 11th 2018
+	- Documentation update. No Changes to the code base implemented
+	  - Also need to remember to update this file when changes are actually
+			made to the version releases :)
+
+0.30 Tuesday May 29th 2018
+	- Added clearShowHash function. This makes the hash empty so that a new
+		directory can be loaded within the same program without having to create
+		a new Object.
+	- Created an Examples folder with some sample programs.
+	- Implemented recursive processing in processNewShows(); This can be enabled
+		by calling $obj->recursion(1)
+	  The default behaviour is to not do recursion.
+	- Renamed 08TestSuccessfulImport.t to 06TestSuccessfulImport.t
+	- Added 07TestRecursiveImport.t
+
+0.31
+	- Added the Carp Module to the list of required modules. Its been in use for
+		a while.
+	- Removed exceptionList as a global variable. We now pass a named variable
+		to new()
+	- Migrated to snake_case in order to fit normal perl coding style.
+ 	- Changed Import to Organize
+	- Changed import_* to move_* for methods.
+	- Dropped Video:: from the module naming. It now more simply File::TVShow::*
+
+0.32 Sunday April 7th 2019
+	- Removed Video::Filename as a requirement.
+	- Now using my own module File::TVShow::Info to get information from Filename

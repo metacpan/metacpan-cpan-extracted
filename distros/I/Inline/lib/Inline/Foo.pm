@@ -3,7 +3,7 @@ package Inline::Foo;
 
 require Inline;
 our @ISA = qw(Inline);
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use Carp;
 use File::Spec;

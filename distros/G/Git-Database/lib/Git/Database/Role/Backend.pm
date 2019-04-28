@@ -1,5 +1,5 @@
 package Git::Database::Role::Backend;
-$Git::Database::Role::Backend::VERSION = '0.011';
+$Git::Database::Role::Backend::VERSION = '0.012';
 use Digest::SHA;
 
 use Git::Database::Object::Blob;
@@ -59,7 +59,7 @@ Git::Database::Role::Backend - Abstract role for a Git database backend
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

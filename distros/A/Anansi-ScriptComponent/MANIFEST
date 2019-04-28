@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-ScriptComponent.t
+lib/Anansi/ScriptComponent.pm

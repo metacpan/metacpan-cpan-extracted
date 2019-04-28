@@ -1,0 +1,65 @@
+{
+   "abstract" : "Perl Data Language",
+   "author" : [
+      "PerlDL Developers (pdl-general@lists.sourceforge.net)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDLA-GIS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Proj4" : "2.019107",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Proj4" : "2.019107",
+            "ExtUtils::MakeMaker" : "6.56",
+            "PDLA::Core" : "2.019100",
+            "PDLA::Transform" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDLA::Core" : "2.019100",
+            "PDLA::Transform" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/pdla-gis/issues"
+      },
+      "homepage" : "http://pdlporters.github.io",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/pdla-gis",
+         "web" : "https://github.com/PDLPorters/pdla-gis"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "2.019104",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

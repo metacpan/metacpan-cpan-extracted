@@ -1,7 +1,7 @@
 package Algorithm::MinPerfHashTwoLevel;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $DEFAULT_VARIANT = 1;
 
 
@@ -50,32 +50,11 @@ sub new {
     my $o= bless \%opts, $class;
     $o->{state} = seed_state($o->{seed})
         if $o->{seed};
-    $o->{variant} //= $DEFAULT_VARIANT;
+    $o->{variant}= $DEFAULT_VARIANT unless defined $o->{variant};
     $o->{variant}= int(0+$o->{variant});
     die "Unknown variant '$o->{variant}' in constructor new()"
         if ($o->{variant} > 1);
     return $o;
-}
-
-sub _utf8_normalize {
-    my ($str,$downgrade)= @_;
-    if (!defined $str) {
-        return (undef, 0);
-    }
-    my $is_utf8;
-    if (utf8::is_utf8($str)) {
-        $is_utf8= IS_UTF8;
-        if ($downgrade) {
-            utf8::downgrade($str,1);
-            if (!utf8::is_utf8($str)) {
-                $is_utf8= WAS_UTF8;
-            }
-        }
-        utf8::encode($str) if $is_utf8 == IS_UTF8;
-    } else {
-        $is_utf8= NOT_UTF8;
-    }
-    return ($str, $is_utf8);
 }
 
 # find a suitable initial seed for
@@ -124,7 +103,7 @@ sub __compute_max_xor_val {
     # then we can set it to UINT32_MAX.
     my $n_bits= sprintf "%b", $n;
     my $n_bits_sum= 0;
-    $n_bits_sum += $_ for split //, $n_bits;
+    $n_bits_sum += $_ for split m//, $n_bits;
     if ($n_bits_sum == 1) {
         return $n;
     } else {
@@ -150,27 +129,28 @@ sub _compute_first_level_inner {
     printf "max_xor_val=%d (n=%d)\n",$max_xor_val,$n
         if $debug;
 
-    my %key_to_hash;
-    my %hash_to_key;
     my @key_buckets;
     my @h2_buckets;
-    foreach my $key (sort keys %$source_hash) {
-        my ($normalized_key,$is_utf8)= _utf8_normalize($key,1);
-        my $h0= hash_with_state($normalized_key,$state);
-        if (defined(my $other_key= $hash_to_key{$h0})) {
-            print "collision on full hash '%d' for '%s' and '%s'\n",
-                $h0, $key, $other_key if $debug;
-            return;
-        }
-        my $h1= $h0 >> 32;
-        my $h2= $h0 & UINT32_MAX;
-
-        $hash_to_key{$h0}= $key;
-        $key_to_hash{$key}= $h0;
-
-        my $idx1= $h1 % $n;
-        $h2_buckets[$idx1] .= pack "L", $h2;
-        push @{$key_buckets[$idx1]}, $key;
+    keys(%$source_hash);
+    while (my ($key,$val)= each %$source_hash) {
+        my ($key_normalized, $key_is_utf8, $val_normalized, $val_is_utf8, $idx1, $h2_packed);
+        my $h0= hash_with_state_normalized(
+            $key, $key_normalized, $key_is_utf8,
+            $val, $val_normalized, $val_is_utf8,
+            $idx1, \@h2_buckets,
+            $state,
+            $n
+        );
+       
+        push @{$key_buckets[$idx1]}, {
+            h0 => $h0,
+            key => $key,
+            key_normalized => $key_normalized,
+            key_is_utf8 => $key_is_utf8,
+            val => $val,
+            val_normalized => $val_normalized,
+            val_is_utf8 => $val_is_utf8,
+        };
     }
 
     my @buckets;
@@ -202,31 +182,26 @@ sub _compute_first_level_inner {
             $size_count++;
         }
         my $idx_sv;
-        my $xor_val= calc_xor_val($max_xor_val,$h2_buckets[$idx1],$idx_sv,$used_sv,$used_pos);
+        my $xor_val= calc_xor_val($max_xor_val, $h2_buckets[$idx1], $idx_sv, $used_sv, $used_pos);
 
         if ($xor_val) {
+            
+            my $h1_bucket= $buckets[$idx1] ||= {};
+            $h1_bucket->{xor_val}= $xor_val;
+            $h1_bucket->{h1_keys}= 0+@$keys;
+            
             my @idx2= unpack "L*", $idx_sv;
             foreach my $i (0 .. $#$keys) {
-                my $key= $keys->[$i];
-                my $val= $source_hash->{$key};
+                my $key_info= $keys->[$i];
                 my $idx2= $idx2[$i];
 
-                substr($used_sv,$idx2,1,"\1");
-                my $h1_bucket= $buckets[$idx1] ||= {};
-                my $h2_bucket= $buckets[$idx2] ||= {};
-                $h1_bucket->{xor_val}= $xor_val;
-                $h1_bucket->{h1_keys}= 0+@$keys;
-                my ($key_normalized, $key_is_utf8)= _utf8_normalize($key,1);
-                my ($val_normalized, $val_is_utf8)= _utf8_normalize($val,0);
-                $h2_bucket->{idx}= $idx2;
-                $h2_bucket->{key}= $key;
-                $h2_bucket->{key_normalized}= $key_normalized;
-                $h2_bucket->{key_is_utf8}= $key_is_utf8;
-
-                $h2_bucket->{val}= $val;
-                $h2_bucket->{val_normalized}= $val_normalized;
-                $h2_bucket->{val_is_utf8}= $val_is_utf8;
-                $h2_bucket->{h0}= $key_to_hash{$key};
+                my $h2_bucket= $buckets[$idx2];
+                if ($h2_bucket) {
+                    $key_info->{$_}= $h2_bucket->{$_} 
+                        for keys %$h2_bucket;
+                }
+                $buckets[$idx2]= $key_info;
+                $key_info->{idx}= $idx2;
             }
         } else {
             printf " (%d completed, %d remaining)\nIndex '%d' not solved: %s\n",

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDLA::Core::Dev;
 
 BEGIN {
    if ( $PDLA::Config{USE_POGL} ) {

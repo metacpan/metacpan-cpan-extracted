@@ -19,16 +19,7 @@ use lib "".path( $Bin, '..', '..', 'lib' );
 use Local::Test qw( init_backend );
 use Digest;
 
-my $collections = {
-    user => {
-        properties => {
-            id => { type => 'integer' },
-            username => { type => 'string' },
-            email => { type => 'string' },
-            password => { type => 'string' },
-        },
-    },
-};
+my $collections = \%Yancy::Backend::Test::SCHEMA;
 
 my ( $backend_url, $backend, %items ) = init_backend(
     $collections,
@@ -42,6 +33,11 @@ my ( $backend_url, $backend, %items ) = init_backend(
             username => 'joel',
             email => 'joel@example.com',
             password => Digest->new( 'SHA-1' )->add( '456rty' )->b64digest,
+        },
+        {
+            username => 'nopassword',
+            email => 'none@example.com',
+            password => '',
         },
     ],
 );
@@ -128,15 +124,15 @@ subtest 'unauthenticated user cannot admin' => sub {
       ->status_is( 401, 'User is not authorized to add a user' )
       ->header_like( 'Content-Type' => qr{^application/json} )
       ;
-    $t->get_ok( '/yancy/api/user/' . $items{user}[0]{id} )
+    $t->get_ok( '/yancy/api/user/' . $items{user}[0]{username} )
       ->status_is( 401, 'User is not authorized to get a user' )
       ->header_like( 'Content-Type' => qr{^application/json} )
       ;
-    $t->put_ok( '/yancy/api/user/' . $items{user}[0]{id}, json => { } )
+    $t->put_ok( '/yancy/api/user/' . $items{user}[0]{username}, json => { } )
       ->status_is( 401, 'User is not authorized to set a user' )
       ->header_like( 'Content-Type' => qr{^application/json} )
       ;
-    $t->delete_ok( '/yancy/api/user/' . $items{user}[0]{id} )
+    $t->delete_ok( '/yancy/api/user/' . $items{user}[0]{username} )
       ->status_is( 401, 'User is not authorized to delete a user' )
       ->header_like( 'Content-Type' => qr{^application/json} )
       ;
@@ -207,17 +203,19 @@ subtest 'logged-in user can admin' => sub {
       ->status_is( 200, 'User is authorized' );
     $t->get_ok( '/yancy/api/user' )
       ->status_is( 200, 'User is authorized' );
-    $t->get_ok( '/yancy/api/user/' . $items{user}[0]{id} )
+    $t->get_ok( '/yancy/api/user/' . $items{user}[0]{username} )
       ->status_is( 200, 'User is authorized' );
 
     subtest 'api allows saving user passwords' => sub {
         my $doug = {
-            %{ $backend->get( user => $items{user}[0]{id} ) },
+            %{ $backend->get( user => $items{user}[0]{username} ) },
             password => 'qwe123',
         };
-        $t->put_ok( '/yancy/api/user/' . $items{user}[0]{id}, json => $doug )
+        my %doug_noid = %$doug;
+        delete $doug_noid{id};
+        $t->put_ok( '/yancy/api/user/' . $items{user}[0]{username}, json => \%doug_noid )
           ->status_is( 200 );
-        is $backend->get( user => $items{user}[0]{id} )->{password},
+        is $backend->get( user => $items{user}[0]{username} )->{password},
             Digest->new( 'SHA-1' )->add( 'qwe123' )->b64digest,
             'new password is digested correctly'
     };
@@ -277,6 +275,24 @@ subtest 'standalone plugin' => sub {
       ->status_is( 200, 'User is authorized for login form' )
       ->header_like( 'Content-Type' => qr{^text/html} )
       ;
+    is !$t->app->yancy->auth->check( 'nosuchuser', undef ), 1, 'rejects non-existent user';
+    my @current_history = @{ $t->app->log->history };
+    if ( @current_history ) {
+        is $current_history[-1][1], 'error',
+            'error message is logged at error level';
+        like $current_history[-1][2],
+            qr{Auth failed: User "nosuchuser" does not exist},
+            'error message is logged with backend error';
+    }
+    is !$t->app->yancy->auth->check( 'nopassword', '' ), 1, 'rejects user without password';
+    @current_history = @{ $t->app->log->history };
+    if ( @current_history ) {
+        is $current_history[-1][1], 'error',
+            'error message is logged at error level';
+        like $current_history[-1][2],
+            qr{User "nopassword" password field "password" is empty},
+            'error message is logged with backend error';
+    }
     $t->post_ok( '/login', form => {
             username => 'doug',
             password => 'qwe123',

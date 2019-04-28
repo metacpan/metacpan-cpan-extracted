@@ -3,12 +3,13 @@ package PDF::Builder::Resource::Font::CoreFont::webdings;
 use strict;
 use warnings;
 
-our $VERSION = '3.013'; # VERSION
+our $VERSION = '3.014'; # VERSION
 my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 =head1 NAME
 
 PDF::Builder::Resource::Font::CoreFont::webdings - font-specific information for WebDings symbol font
+(I<not> standard PDF core)
 
 =cut
 

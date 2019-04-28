@@ -360,9 +360,9 @@ KNOWN BUGS
 
       https://rt.cpan.org/Ticket/Display.html?id=128620
 
-      * Devel::Cover can't see into async subs
+      * Regexp context gets lost over await boundaries
 
-      https://rt.cpan.org/Ticket/Display.html?id=128309
+      https://rt.cpan.org/Ticket/Display.html?id=129321
 
 ACKNOWLEDGEMENTS
 

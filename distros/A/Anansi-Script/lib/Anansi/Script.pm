@@ -7,34 +7,34 @@ Anansi::Script - Manages how Perl script user input and process output should be
 
 =head1 SYNOPSIS
 
- #!/usr/bin/perl
+    #!/usr/bin/perl
 
- use Anansi::Script;
+    use Anansi::Script;
 
- my $OBJECT = Anansi::Script->new();
- if(defined($OBJECT)) {
-     my $channels = $OBJECT->channel();
-     if(defined($channels)) {
-         my %channelHash = map { $_ => 1 } (@{$channels});
-         if(defined($channelHash{MEDIUM})) {
-             my $medium = $OBJECT->channel('MEDIUM');
-             if('CGI' eq $medium) {
-                 $OBJECT->channel('CONTENT', << "HEREDOC"
- <html>
-  <body>
-   <p>This Perl script was run using the Common Gateway Interface.</p>
-  </body>
- </html>
- HEREDOC
-                 );
-             } elsif('SHELL' eq $medium) {
-                 $OBJECT->channel('CONTENT', 'This Perl script was run using the Shell.'."\n");
-             }
-         }
-     }
- }
+    my $OBJECT = Anansi::Script->new();
+    if(defined($OBJECT)) {
+        my $channels = $OBJECT->channel();
+        if(defined($channels)) {
+            my %channelHash = map { $_ => 1 } (@{$channels});
+            if(defined($channelHash{MEDIUM})) {
+                my $medium = $OBJECT->channel('MEDIUM');
+                if('CGI' eq $medium) {
+                    $OBJECT->channel('CONTENT', << "HEREDOC"
+    <html>
+     <body>
+      <p>This Perl script was run using the Common Gateway Interface.</p>
+     </body>
+    </html>
+    HEREDOC
+                    );
+                } elsif('SHELL' eq $medium) {
+                    $OBJECT->channel('CONTENT', 'This Perl script was run using the Shell.'."\n");
+                }
+            }
+        }
+    }
 
- 1;
+    1;
 
 =head1 DESCRIPTION
 
@@ -46,21 +46,31 @@ L<Anansi::ComponentManager> for inherited methods.
 =cut
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base qw(Anansi::ComponentManager);
 
 
-=head1 METHODS
+=head1 INHERITED METHODS
+
+=cut
+
+
+=head2 addChannel
+
+Declared in L<Anansi::ComponentManager>.
 
 =cut
 
 
 =head2 addComponent
 
- # N/A
+    $OBJECT->SUPER::addComponent(undef);
 
-An overridden inherited method to remove this functionality.
+    $OBJECT->Anansi::ComponentManager::addComponent(undef);
+
+Declared in L<Anansi::ComponentManager>.  Overridden by this module.  Redeclared
+in order to preclude inheritance.
 
 =cut
 
@@ -69,12 +79,49 @@ sub addComponent {
 }
 
 
+=head2 channel
+
+Declared in L<Anansi::ComponentManager>.
+
+=cut
+
+
+=head2 component
+
+Declared in L<Anansi::ComponentManager>.
+
+=cut
+
+
+=head2 componentIdentification
+
+Declared in L<Anansi::ComponentManager>.
+
+=cut
+
+
+=head2 components
+
+Declared in L<Anansi::ComponentManager>.
+
+=cut
+
+
+=head2 DESTROY
+
+Declared in L<Anansi::Singleton>.
+
+=cut
+
+
 =head2 finalise
 
- $OBJECT::SUPER->finalise(@_);
+    $OBJECT->SUPER::finalise(undef);
 
-An overridden virtual method called during object destruction.  Not intended to
-be directly called unless overridden by a descendant.
+    $OBJECT->Anansi::Script::finalise(undef);
+
+Declared as a virtual method in L<Anansi::Class>.  Overridden by this module.
+Indirectly called during object destruction.
 
 =cut
 
@@ -90,12 +137,35 @@ sub finalise {
 }
 
 
+=head2 fixate
+
+Declared as a virtual method in L<Anansi::Singleton>.
+
+=cut
+
+
+=head2 implicate
+
+Declared as a virtual method in L<Anansi::Class>.
+
+=cut
+
+
+=head2 import
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
 =head2 initialise
 
- $OBJECT::SUPER->initialise(@_);
+    $OBJECT::SUPER->initialise(@_);
 
-An overridden virtual method called during object creation.  Not intended to be
-directly called unless overridden by a descendant.
+    $OBJECT->Anansi::Script::initialise(@_);
+
+Declared as a virtual method in L<Anansi::Class>.  Overridden by this module.
+Indirectly called during object construction.
 
 =cut
 
@@ -107,19 +177,90 @@ sub initialise {
 }
 
 
+=head2 new
+
+Declared in L<Anansi::Singleton>.
+
+=cut
+
+
+=head2 old
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 priorities
+
+Declared in L<Anansi::ComponentManager>.
+
+=cut
+
+
+=head2 reinitialise
+
+Declared as a virtual method in L<Anansi::Singleton>.
+
+=cut
+
+
+=head2 removeChannel
+
+Declared in L<Anansi::ComponentManager>.
+
+=cut
+
+
+=head2 removeComponent
+
+    $OBJECT->SUPER::removeComponent(undef);
+
+    $OBJECT->Anansi::ComponentManager::removeComponent(undef);
+
+Declared in L<Anansi::ComponentManager>.  Overridden by this module.  Redeclared
+in order to preclude inheritance.
+
+=cut
+
+
+sub removeComponent {
+}
+
+
+=head2 used
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 uses
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head1 METHODS
+
+=cut
+
+
 =head2 channelComponent
 
- my $return = $OBJECT->channelComponent($component, 'some channel');
+    my $return = $OBJECT->channelComponent($component, 'some channel');
 
 Attempts to create a new subroutine to enable the direct use of a channel of the
 currently loaded component and define it as a channel of this module.  If a
 channel with the same name as the component channel already is defined for this
 module then it silently fails.  If a subroutine with the same name as the
 channel does not exist in this module's namespace then that subroutine name is
-used otherwise it remains anonymous.  Returns 0 (FALSE) on failure and 1 (TRUE)
-on success.
+used otherwise it remains anonymous.  Returns B<0> I<(zero)> on failure and B<1>
+I<(one)> on success.
 
 =cut
+
 
 sub channelComponent {
     my ($self, $component) = @_;
@@ -153,24 +294,22 @@ sub channelComponent {
 }
 
 
-=head2 removeComponent
+=head1 NOTES
 
- # N/A
-
-An overridden inherited method to remove this functionality.
+This module is designed to make it simple, easy and quite fast to code your
+design in perl.  If for any reason you feel that it doesn't achieve these goals
+then please let me know.  I am here to help.  All constructive criticisms are
+also welcomed.
 
 =cut
 
 
-sub removeComponent {
-}
-
-
 =head1 AUTHOR
 
-Kevin Treleaven <kevin AT treleaven DOT net>
+Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 =cut
 
 
 1;
+

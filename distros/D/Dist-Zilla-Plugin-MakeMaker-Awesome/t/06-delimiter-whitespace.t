@@ -25,7 +25,7 @@ footer = |package MY;
 footer = |use File::Spec;
 footer = |sub postamble {
 footer = |	my $self = shift;
-footer = |	my ($s2p, $psed) = map { File::Spec->catfile('script', $_) } qw/s2p psed/;
+footer = |	my ($s2p, $psed) = map File::Spec->catfile('script', $_), qw/s2p psed/;
 footer = |	return $self->SUPER::postamble . <<"END";
 footer = |$psed: $s2p
 footer = |	\$(CP) $s2p $psed
@@ -61,7 +61,7 @@ package MY;
 use File::Spec;
 sub postamble {
 	my $self = shift;
-	my ($s2p, $psed) = map { File::Spec->catfile('script', $_) } qw/s2p psed/;
+	my ($s2p, $psed) = map File::Spec->catfile('script', $_), qw/s2p psed/;
 	return $self->SUPER::postamble . <<"END";
 $psed: $s2p
 	\$(CP) $s2p $psed

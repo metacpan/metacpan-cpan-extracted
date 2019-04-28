@@ -3,13 +3,13 @@ package Net::Async::Slack::Event::TeamMigrationStarted;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Net::Async::Slack::EventType;
 
 =head1 NAME
 
-Net::Async::Slack::Event::TeamMigrationStarted - The team is being migrated between servers
+Net::Async::Slack::Event::TeamMigrationStarted - The workspace is being migrated between servers
 
 =head1 DESCRIPTION
 
@@ -26,3 +26,12 @@ sub type { 'team_migration_started' }
 
 1;
 
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.

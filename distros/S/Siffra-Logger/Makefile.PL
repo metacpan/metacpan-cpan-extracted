@@ -14,13 +14,24 @@ my %WriteMakefileArgs = (
     LICENSE          => 'perl',
     INSTALLDIRS      => ( $] < 5.011 ? 'perl' : 'site' ),
     PREREQ_PM        => {
-        'Test::Perl::Critic' => 0,
-        'Data::Dumper'       => 0,
-        'Log::Any::Adapter'  => 0,
-        'Log::Dispatch'      => 0,
-        'File::Basename'     => 0,
-        'POSIX'              => 0,
-        'Carp'               => 0,
+
+        # Default req
+        'strict'       => 0,
+        'warnings'     => 0,
+        'Carp'         => 0,
+        'utf8'         => 0,
+        'Data::Dumper' => 0,
+        'DDP'          => 0,
+        'Log::Any'     => 0,
+        'Scalar::Util' => 0,
+        'version'      => 0,
+        # Default req
+
+        'Test::More'        => 0,
+        'Log::Any::Adapter' => 0,
+        'Log::Dispatch'     => 0,
+        'File::Basename'    => 0,
+        'POSIX'             => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,
@@ -36,12 +47,12 @@ my %WriteMakefileArgs = (
                 resources      => {
                     homepage   => 'https://siffra.com.br',
                     repository => {
-                        url  => 'git@github.com:lbenevenuto/Siffra-Logger.git',
-                        web  => 'https://github.com/lbenevenuto/Siffra-Logger',
+                        url  => 'git@github.com:SiffraTI/Siffra-Logger.git',
+                        web  => 'https://github.com/SiffraTI/Siffra-Logger',
                         type => 'git',
                     },
                     bugtracker => {
-                        web => 'https://github.com/lbenevenuto/Siffra-Logger/issues',
+                        web => 'https://github.com/SiffraTI/Siffra-Logger/issues',
                     },
                 },
             }

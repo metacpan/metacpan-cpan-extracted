@@ -1,0 +1,30 @@
+{
+   "charttitle" : "FibOOSig",
+   "modulename" : "Benchmark::Perl::Formance",
+   "chartlines" : [
+       {
+           "title" : "FibOOSig/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.FibOOSig" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "FibOOSig/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.FibOOSig" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

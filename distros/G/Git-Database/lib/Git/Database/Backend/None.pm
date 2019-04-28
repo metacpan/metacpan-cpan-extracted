@@ -1,5 +1,5 @@
 package Git::Database::Backend::None;
-$Git::Database::Backend::None::VERSION = '0.011';
+$Git::Database::Backend::None::VERSION = '0.012';
 use Moo;
 use namespace::clean;
 
@@ -23,7 +23,7 @@ Git::Database::Backend::None - A minimal backend for Git::Database
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

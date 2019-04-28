@@ -1,6 +1,52 @@
 ==================================================
-Changes from 2014-02-27 00:00:00 +0000 to present.
+Changes from 2014-04-27 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.58 at 2019-04-26 15:51:27 +0000
+-----------------------------------------
+
+  Change: 1be25996c64d8e3b9ed9997facc4e07f66722f59
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 16:51:27 +0000
+
+    Release engineering for 1.58 
+
+  Change: 9acd33780d61b675239cb812777a172eb0ae4492
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 16:50:42 +0000
+
+    Merge hints from blead v5.29.10 
+
+  Change: 7753eb224020419fc199bf5bc207cce0bef93d18
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 16:46:44 +0000
+
+    Add patch to fix lib/h2ph.t 
+
+  Change: 3f58aa0bda494f4a7ff8e8d178bce25e0928efd2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 15:34:00 +0000
+
+    Added patch to fix utils/h2ph.PL 
+
+  Change: 86165ca94b2bc35ac49e99c91371e0bb269d2d72
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 14:18:44 +0000
+
+    Patch Configure for -fwrapv 
+
+  Change: 9eabda784544256a9fe1879bef9b0a0c043546f3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 10:58:03 +0000
+
+    Test hints() function as well 
+
+  Change: e1d4c88a89f3809432479113de2370a31cb68fb4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-26 10:01:03 +0000
+
+    Added test for non-existant plugin 
 
 -----------------------------------------
 version 1.56 at 2019-02-26 14:01:17 +0000
@@ -316,26 +362,6 @@ version 1.24 at 2014-05-31 08:38:25 +0000
 
     http://perl5.git.perl.org/perl.git/commit/ce861ea79 
 
------------------------------------------
-version 1.22 at 2014-04-23 21:15:10 +0000
------------------------------------------
-
-  Change: 7c1a27bdbab0089738942aaae5cf0a741bc5b377
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-04-23 22:15:10 +0000
-
-    Look for gpatch if patch is not found 
-
------------------------------------------
-version 1.20 at 2014-03-21 14:16:30 +0000
------------------------------------------
-
-  Change: 664f16a3e9c1b27b711dbd424a209d985b7801e4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-21 14:16:30 +0000
-
-    Update included hints files 
-
 =================================================
-Plus 59 releases after 2014-02-27 00:00:00 +0000.
+Plus 61 releases after 2014-04-27 00:00:00 +0000.
 =================================================

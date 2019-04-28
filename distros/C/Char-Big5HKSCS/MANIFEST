@@ -1,11 +1,11 @@
 Char/Big5HKSCS.pm
-Big5HKSCS.pm
-Ebig5hkscs.pm
+lib/Big5HKSCS.pm
+lib/Ebig5hkscs.pm
 README
 Changes
 META.yml
 Makefile.PL
-pMakefile.PL
+pmake.bat
 test.pl
 README2ND
 MANIFEST
@@ -400,3 +400,7 @@ t/Big5HKSCS/395_big5hkscseval_block.t
 t/Big5HKSCS/396_double_diamond.t
 t/Big5HKSCS/397_bitwise_op.t
 t/Big5HKSCS/398_non_capturing.t
+t/Big5HKSCS/399_indented_heredoc_qq.t
+t/Big5HKSCS/400_indented_heredoc_q.t
+t/Big5HKSCS/401_indented_heredoc_qx.t
+t/Big5HKSCS/402_regexp_xx.t

@@ -4,12 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 use Carp;
-$Carp::Verbose = 1;
 use utf8;
 use Data::Dumper;
 use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
+$Carp::Verbose = 1;
 
 $| = 1;    #autoflush
 
@@ -23,7 +23,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -51,7 +51,8 @@ BEGIN
         ( my $message = $_[ 0 ] ) =~ s/\n|\r//g;
         $log->fatal( $message, { package => __PACKAGE__ } );
 
-        die Dumper @_;    # Now terminate really
+        p @_;
+        die;    # Now terminate really
     };
 
     $SIG{ __WARN__ } = sub {
@@ -79,12 +80,11 @@ BEGIN
 sub new
 {
     my ( $class, %parameters ) = @_;
+    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
 
     my $self = {};
 
     $self = bless( $self, ref( $class ) || $class );
-
-    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
 
     return $self;
 } ## end sub new
@@ -126,7 +126,7 @@ sub AUTOLOAD
     my $called = $AUTOLOAD =~ s/.*:://r;
 
     # Is there an attribute of that name?
-    die "No such attribute: $called" unless exists $self->{ $called };
+    die "No such attribute ****[ $called ]****" unless exists $self->{ $called };
 
     # If so, return it...
     return $self->{ $called };
@@ -136,13 +136,13 @@ sub DESTROY
 {
     my ( $self, %parameters ) = @_;
 
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
 
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
-        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => TRUE } );
     }
     else
     {

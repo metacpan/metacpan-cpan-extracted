@@ -8,24 +8,25 @@ use Carp;
 use AutoLoader;
 use vars qw($VERSION $AUTOLOAD $DEBUG $Tolerance %autosubs);
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 $DEBUG = 0;
 
+#see Statistics::Descriptive documentation for use of $Tolerance
 $Tolerance = 0.0;
 
 #what subs can be autoloaded?
 %autosubs = (
   count					=> undef,
   mean					=> undef,
-	geometric_mean=> undef,
-	harmonic_mean=>undef,
+  geometric_mean=> undef,
+  harmonic_mean=>undef,
   sum					=> undef,
   mode					=> undef,
   median				=> undef,
   min					=> undef,
   max					=> undef,
-	mindex			=> undef,
-	maxdex			=> undef,
+  mindex			=> undef,
+  maxdex			=> undef,
   standard_deviation	=> undef,
   sample_range			=> undef,
   variance				=> undef,

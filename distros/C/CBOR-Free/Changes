@@ -1,0 +1,13 @@
+Revision history for Perl module CBOR::Free
+
+0.03 28 Apr 2019
+- Fix segfault when true/false are encoded as CBOR map keys.
+- Reject negatives that exceed what a 64-bit signed integer can store.
+- Accommodate 32-bit perls as best as can happen.
+
+0.02 27 Apr 2019
+- Fix older Perls that don’t define true/false booleans in C.
+- Use memcmp rather than bcmp.
+
+0.01 27 Apr 2019
+- Initial release

@@ -48,7 +48,7 @@ no longer used.  Uses L<Anansi::Class>, L<Anansi::ObjectManager> and L<base>.
 =cut
 
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use base qw(Anansi::Class);
 
@@ -308,3 +308,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

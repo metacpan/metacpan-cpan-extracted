@@ -162,6 +162,9 @@ sub validate_cut_spec {
   return \@fields;
 }
 
+# The array associated with each action contains the name of the action, the
+# method to call for that action, a copy of the current %modes, and all the
+# other arguments that should be passed to the method.
 sub action_flags {(
   'grep|g=s' =>
       sub { push @pipeline, ['grep', \&do_grep, {%modes}, $_[1]] },
@@ -233,8 +236,11 @@ sub action_flags {(
   'cut=s' => sub { push @pipeline, ['cut', \&do_cut, {%modes},
                    validate_cut_spec($_[1])] },
   'paste=s' => sub { push @pipeline, ['paste', \&do_paste, {%modes}, $_[1]] },
-  'pivot' => sub { push @pipeline, ['pivot', \&do_pivot, {%modes}, 0] },
-  'transpose' => sub { push @pipeline, ['transpose', \&do_pivot, {%modes}, 1] },
+  'pivot' => sub { push @pipeline, ['pivot', \&do_pivot, {%modes}, 'pivot'] },
+  'anti-pivot' => sub { push @pipeline, ['anti-pivot', \&do_pivot, {%modes}, 
+                                         'anti-pivot'] },
+  'transpose' => sub { push @pipeline, ['transpose', \&do_pivot, {%modes}, 
+                                        'transpose'] },
   'number-lines|nl' =>
       sub { push @pipeline, ['number-lines', \&do_number_lines, {%modes}] },
   'file-name|fn' =>

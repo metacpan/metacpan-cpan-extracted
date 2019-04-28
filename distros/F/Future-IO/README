@@ -27,15 +27,16 @@ DESCRIPTION
 
     If the override_impl method is not invoked, a default implementation of
     these operations is provided. This implementation allows a single queue
-    of sysread calls on a single filehandle only, combined with sleep
-    calls. It is provided for the simple cases where modules only need one
-    filehandle (most likely a single network socket or hardware device
-    handle), allowing such modules to work without needing a better event
-    system.
+    of sysread or syswrite calls on a single filehandle only, combined with
+    sleep calls. It is provided for the simple cases where modules only
+    need one filehandle (most likely a single network socket or hardware
+    device handle), allowing such modules to work without needing a better
+    event system.
 
-    If there are both sysread and sleep futures pending, the implementation
-    will use select() to wait for either. This may be problematic on
-    MSWin32, depending on what type of filehandle is involved.
+    If there are both read/write and sleep futures pending, the
+    implementation will use select() to wait for either. This may be
+    problematic on MSWin32, depending on what type of filehandle is
+    involved.
 
     For cases where multiple filehandles are required, or for doing more
     involved IO operations, a real implementation based on an actual event
@@ -87,6 +88,28 @@ METHODS
     message.
 
     This may make more than one syssread() call.
+
+ syswrite
+
+       $f = Future::IO->syswrite( $fh, $bytes )
+          $written_len = $f->get
+
+    Since version 0.04.
+
+    Returns a Future that will become done when at least one byte has been
+    written to the given filehandle. It may write up to all of the bytes.
+    On any error (other than EAGAIN / EWOULDBLOCK which are ignored) the
+    future fails with a suitable error message.
+
+    Note specifically this may perform only a single sysread() call, and
+    thus is not guaranteed to actually return the full length.
+
+ syswrite_exactly
+
+       $f = Future::IO->syswrite_exactly( $fh, $bytes )
+          $written_len = $f->get;
+
+    Since version 0.04.
 
  override_impl
 
@@ -141,6 +164,27 @@ THE $IMPL VARIABLE
        {
           ...
        }
+    
+       sub syswrite
+       {
+          ...
+       }
+
+    Optionally, you can also implement "sysread_exactly" and
+    "syswrite_exactly":
+
+       sub sysread_exactly
+       {
+          ...
+       }
+    
+       sub syswrite_exactly
+       {
+          ...
+       }
+
+    If not, they will be emulated by Future::IO itself, making multiple
+    calls to the non-_exactly versions.
 
 AUTHOR
 

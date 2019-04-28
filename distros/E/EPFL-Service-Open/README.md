@@ -71,6 +71,6 @@ License
 Apache License 2.0
 
 Original work (c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2018.  
-Modified work (c) William Belle, 2018.
+Modified work (c) William Belle, 2018-2019.
 
 See the [LICENSE](LICENSE) file for more details.

@@ -47,4 +47,6 @@ is $res2, "bar\n";
 note "finalize";
 print {$sock} "quit\n";
 
+$server->stop;
+
 done_testing;

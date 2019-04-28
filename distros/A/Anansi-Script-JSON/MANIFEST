@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-Script-CGI.t
+lib/Anansi/Script/CGI.pm

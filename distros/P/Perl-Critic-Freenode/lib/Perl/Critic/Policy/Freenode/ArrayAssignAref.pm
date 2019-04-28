@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref';
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 sub default_severity { $SEVERITY_MEDIUM }
 sub default_themes { 'freenode' }

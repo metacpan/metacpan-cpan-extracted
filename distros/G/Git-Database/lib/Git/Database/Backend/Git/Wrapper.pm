@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Wrapper;
-$Git::Database::Backend::Git::Wrapper::VERSION = '0.011';
+$Git::Database::Backend::Git::Wrapper::VERSION = '0.012';
 use Cwd qw( cwd );
 use Git::Wrapper;
 use Git::Version::Compare qw( ge_git );
@@ -59,6 +59,9 @@ sub get_object_attributes {
 
     # git versions >= 2.11.0.rc0 throw more verbose errors
     return undef if $parts[0] =~ /^(?:symlink|dangling|loop|notdir)$/;
+
+    # git versions >= 2.21.0.rc0 explicitely say if a sha1 is ambiguous
+    return undef if $kind eq 'ambiguous';
 
     # object does not exist in the git object database
     return undef if $parts[-1] eq 'missing';
@@ -141,7 +144,7 @@ Git::Database::Backend::Git::Wrapper - A Git::Database backend based on Git::Wra
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -176,7 +179,7 @@ and L<Git::Database::Role::RefWriter> roles.
 
 =head1 COPYRIGHT
 
-Copyright 2016-2017 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2016-2019 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

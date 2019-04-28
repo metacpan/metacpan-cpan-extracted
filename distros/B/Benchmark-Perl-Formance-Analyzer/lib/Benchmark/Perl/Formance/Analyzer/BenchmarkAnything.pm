@@ -1,7 +1,7 @@
 package Benchmark::Perl::Formance::Analyzer::BenchmarkAnything;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Benchmark::Perl::Formance - analyze results using BenchmarkAnything backend store
-$Benchmark::Perl::Formance::Analyzer::BenchmarkAnything::VERSION = '0.007';
+$Benchmark::Perl::Formance::Analyzer::BenchmarkAnything::VERSION = '0.009';
 use 5.010;
 
 use Moose;
@@ -14,7 +14,7 @@ use Data::Structure::Util 'unbless';
 use File::ShareDir 'dist_dir';
 use BenchmarkAnything::Storage::Frontend::Lib;
 use Template;
-use JSON 'decode_json';
+use JSON 'decode_json', 'encode_json';
 
 with 'MooseX::Getopt::Usage',
  'MooseX::Getopt::Usage::Role::Man';
@@ -83,6 +83,7 @@ sub _print_to_template
                     RESULTMATRIX     => JSON->new->pretty->encode($RESULTMATRIX),
                     title            => ($options->{charttitle} || ""),
                     modulename       => ($options->{modulename} || ""),
+                    querybundle      => $options->{querybundle},
                     outfile          => $outfile,
                     x_key            => $options->{x_key},
                     isStacked        => $options->{isStacked},
@@ -154,10 +155,14 @@ sub _search
         my @results;
         foreach my $q (@{$chartline_queries})
         {
+                my $url = $self->balib->{config}{benchmarkanything}{backends}{http}{base_url};
+                say STDERR "curl -s -XPUT $url/api/v1/search -d '".encode_json($q->{query})."'" if $self->debug and $url;
+                my $results = $self->balib->search($q->{query});
+                print STDERR "RESULTS: ".Dumper($results) if $self->debug;
                 push @results,
                 {
                  title   => $q->{title},
-                 results => $self->balib->search($q->{query}),
+                 results => $results,
                 };
         }
 
@@ -222,6 +227,7 @@ sub run
                                       x_key            => $self->x_key,
                                       charttitle       => ($chart->{charttitle} || $chartname),
                                       modulename       => $chart->{modulename},
+                                      querybundle      => $querybundle,
                                       isStacked        => "false", # true, false, 'relative'
                                       interpolateNulls => "true", # true, false -- only works with isStacked=false
                                       areaOpacity      => 0.0,
@@ -258,6 +264,8 @@ sub run
         open my $RAWNUMBERS, ">", $rawnumbers_file or die "Could not write to $rawnumbers_file";
         print $RAWNUMBERS $self->_rawnumbers;
         close $RAWNUMBERS;
+
+        say STDERR "Results: file://$dashboard_file" if $self->verbose;
 
         # Done
         return;
@@ -306,7 +314,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

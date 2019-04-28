@@ -1,6 +1,6 @@
 package Module::Faker::Package;
 # ABSTRACT: a faked package in a faked module
-$Module::Faker::Package::VERSION = '0.020';
+$Module::Faker::Package::VERSION = '0.022';
 use Moose;
 
 use Moose::Util::TypeConstraints;
@@ -8,6 +8,7 @@ use Moose::Util::TypeConstraints;
 has name     => (is => 'ro', isa => 'Str', required => 1);
 has version  => (is => 'ro', isa => 'Maybe[Str]');
 has abstract => (is => 'ro', isa => 'Maybe[Str]');
+has style    => (is => 'ro', default => 'legacy');
 
 has in_file  => (
   is       => 'ro',
@@ -20,6 +21,53 @@ has in_file  => (
     return "lib/$name";
   },
 );
+
+sub _format_legacy {
+  my ($self) = @_;
+
+  my $string = q{};
+
+  $string .= sprintf "package %s;\n", $self->name;
+  $string .= sprintf "our \$VERSION = '%s';\n", $self->version
+    if defined $self->version;
+
+  return $string;
+}
+
+sub _format_statement {
+  my ($self) = @_;
+
+  my $string = q{};
+
+  $string .= sprintf "package %s%s;\n",
+    $self->name,
+    (defined $self->version ? (q{ } . $self->version) : '');
+
+  return $string;
+}
+
+sub _format_block {
+  my ($self) = @_;
+
+  my $string = sprintf "package %s%s {\n\n  # Your code here\n\n}\n",
+    $self->name,
+    (defined $self->version ? (q{ } . $self->version) : '');
+
+  return $string;
+}
+
+sub as_string {
+  my ($self) = @_;
+
+  my $style = $self->style;
+
+  unless (ref $style) {
+    confess("unknown package style: $style") unless $self->can("_format_$style");
+    $style = "_format_$style";
+  }
+
+  return $self->$style;
+}
 
 subtype 'Module::Faker::Type::Packages'
   => as 'ArrayRef[Module::Faker::Package]';
@@ -39,7 +87,7 @@ Module::Faker::Package - a faked package in a faked module
 
 =head1 VERSION
 
-version 0.020
+version 0.022
 
 =head1 AUTHOR
 

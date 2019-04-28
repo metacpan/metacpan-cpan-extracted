@@ -9,12 +9,12 @@ use Test::Exception;
 use Math::Random qw/:all/;
 use t'CommonStuff;
 
-use constant TEMP_FILE => 'store_read.table';
+our $TEMP_FILE_NAME = 'store_read.table';
 
 sub test_store_read {
     my %dim = @_;
     my $orig = Data::TableAutoSum->new(%dim);
-    $orig->store(TEMP_FILE);  # print an empty table
+    $orig->store($TEMP_FILE_NAME);  # print an empty table
     
     foreach my $row ($orig->rows) {
         foreach my $col ($orig->cols) {
@@ -25,15 +25,15 @@ sub test_store_read {
     
     my $DxD = $dim{rows} . "x" . $dim{cols} . " table";
     
-    my $ret_value = $orig->store(TEMP_FILE);
+    my $ret_value = $orig->store($TEMP_FILE_NAME);
     ok $ret_value == $orig, "->store method returns the object itselfs ($DxD)";
-    open STORED_TABLE, '<', TEMP_FILE or die "Can't open the stored table: $!";
+    open STORED_TABLE, '<', $TEMP_FILE_NAME or die "Can't open the stored table: $!";
     my $stored_table = join "", (<STORED_TABLE>);
-    close STORED_TALE;
+    close STORED_TABLE;
     is $stored_table, $orig->as_string, 
        "Stored table looks like the as_string representation ($DxD)";
     
-    my $copy = Data::TableAutoSum->read(TEMP_FILE);
+    my $copy = Data::TableAutoSum->read($TEMP_FILE_NAME);
     is qt $copy->as_string, qt $orig->as_string,
        "Read stored table has the same as_string representantion as the original ($DxD)";
 }

@@ -1,5 +1,8 @@
 Revision history for FFI-CheckLib
 
+0.24      2019-04-27 09:14:34 -0400
+  - Add try_linker_script option (gh#13, gh#15)
+
 0.23      2018-11-18 00:07:49 -0500
   - Handle DLLs on Windows with "dashed" version numbers (example: foo-1-2-3.dll)
     (gh#10, gh#11, SLAFFAN++)

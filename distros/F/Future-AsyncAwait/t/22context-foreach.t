@@ -137,6 +137,44 @@ use Future::AsyncAwait;
    is( scalar $fret->get, "OK", '$fret now ready after differing stack resumes' );
 }
 
+# RT#129319 - foreach(LIST) with extra values
+{
+   my @F = map { Future->new } 0, 1, 2;
+   my $fret = (async sub {
+      my $ret = "";
+      foreach my $idx ( 0, 1, 2 ) {
+         # $ret will appear on the stack after the foreach-LIST items
+         $ret .= await $F[$idx];
+      }
+      return $ret;
+   })->();
+
+   $F[0]->done( "A" );
+   $F[1]->done( "B" );
+   $F[2]->done( "C" );
+
+   is( scalar $fret->get, "ABC", '$fret now ready after await with stack items before LIST' );
+}
+
+# RT#129319 - foreach(LIST) with extra marks
+{
+   my @F = map { Future->new } 0, 1, 2;
+   my $fret = (async sub {
+      my @values;
+      foreach my $idx ( 0, 1, 2 ) {
+         # push list creates an extra mark
+         push @values, "(", await $F[$idx], ")";
+      }
+      return join "", @values;
+   })->();
+
+   $F[0]->done( "A" );
+   $F[1]->done( "B" );
+   $F[2]->done( "C" );
+
+   is( scalar $fret->get, "(A)(B)(C)", '$fret now ready after await with stack marks before LIST' );
+}
+
 SKIP: {
    skip "IO::Async::Loop not available", 1 unless eval { require IO::Async::Loop; };
    my $loop = IO::Async::Loop->new;
