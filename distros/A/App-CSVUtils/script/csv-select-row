@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_select_row
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-04-23'; # DATE
+our $DATE = '2019-04-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-select-row - Only output specified row(s)
 
 =head1 VERSION
 
-This document describes version 0.019 of csv-select-row (from Perl distribution App-CSVUtils), released on 2019-04-23.
+This document describes version 0.020 of csv-select-row (from Perl distribution App-CSVUtils), released on 2019-04-29.
 
 =head1 SYNOPSIS
 

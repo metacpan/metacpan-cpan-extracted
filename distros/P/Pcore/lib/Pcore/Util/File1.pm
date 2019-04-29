@@ -12,7 +12,7 @@ sub tempfile (%args) {
 
     P->path( $args{prefix} )->mkpath if !-e $args{prefix};
 
-    my $path = Pcore::Util::File1::TempFile->new( "$args{prefix}/" . ( $args{name} // uuid_v4_hex ), temp => 1 );
+    my $path = Pcore::Util::File1::TempFile->new( "$args{prefix}/" . ( $args{name} // uuid_v4_hex ) . ( defined $args{suffix} ? ".$args{suffix}" : $EMPTY ), temp => 1 );
 
     $path->touch( mode => $args{mode}, umask => $args{umask} );
 

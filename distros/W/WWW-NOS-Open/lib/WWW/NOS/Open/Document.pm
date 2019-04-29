@@ -1,4 +1,4 @@
-package WWW::NOS::Open::Document 0.101;   # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open::Document v1.0.2;  # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -105,7 +105,7 @@ WWW::NOS::Open::Document - client side document in the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Document version 0.101.
+This document describes WWW::NOS::Open::Document version v1.0.2.
 
 =head1 SYNOPSIS
 

@@ -10,4 +10,4 @@ BEGIN {
     use_ok( 'Device::RAID::Poller::Backends::ZFS' ) || print "Bail out!\n";
 }
 
-#diag( "Testing Device::RAID::Poller::Backends::ZFS $Device::RAID::Poller::VERSION, Perl $], $^X" );
+#diag( "Testing Device::RAID::Poller::Backends::ZFS $Device::RAID::Poller::Backends::ZFS::VERSION, Perl $], $^X" );

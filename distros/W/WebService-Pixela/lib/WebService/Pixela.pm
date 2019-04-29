@@ -26,7 +26,7 @@ use Class::Accessor::Lite(
     /],
 );
 
-our $VERSION = "0.01";
+our $VERSION = "0.021";
 
 sub new {
     my ($class,%args) = @_;
@@ -409,12 +409,26 @@ Delete the predefined pixelation graph definition.
 
 See Also L<https://docs.pixe.la/#/delete-graph>
 
-=head4 C<< $pixela->graph->html() >>
+=head4 C<< $pixela->graph->html(%args) >>
 
 Displays the details of the graph in html format.
 (This method return html urls)
 
-See Also L<https://docs.pixe.la/#/get-graph-html>
+I<%args> might be
+
+=over
+
+=item C<< [required (autoset)] id :  Str >>
+
+It is an ID for identifying the pixelation graph.
+
+If set in an instance of WebService::Pixela::Graph, use that value.
+
+=item C<< ( line => true )  >>
+
+[optional] URI tail add line mode parameter.
+
+=back
 
 =head4 C<< $pixela->graph->pixels(%args) >>
 
@@ -436,6 +450,26 @@ I<%args> might be
 =back
 
 See Also L<https://docs.pixe.la/#/get-graph-pixels>
+
+=head4 C<< $pixela->graph->stats($id) >>
+
+Based on the registered information, get various statistics.
+
+I<$id> might be
+
+=over
+
+=item C<< [required (autoset)] id :  Str >>
+
+It is an ID for identifying the pixelation graph.
+
+If set in an instance of WebService::Pixela::Graph, use that value.
+
+=back
+
+See Also L<https://docs.pixe.la/entry/get-graph-stats>
+
+
 
 =head3 C<< $pixela->pixel >>
 

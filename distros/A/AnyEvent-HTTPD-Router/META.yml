@@ -1,0 +1,48 @@
+---
+abstract: 'Adding Routes to AnyEvent::HTTPD'
+author:
+  - 'Martin Barth (ufobat)'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-HTTPD-Router
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AnyEvent::HTTPD::Router:
+    file: lib/AnyEvent/HTTPD/Router.pm
+    version: v1.0.0
+  AnyEvent::HTTPD::Router::DefaultDispatcher:
+    file: lib/AnyEvent/HTTPD/Router/DefaultDispatcher.pm
+requires:
+  AnyEvent::HTTPD: '0'
+  common::sense: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ufobat/p5-AnyEvent-HTTPD-Router/issues
+  homepage: https://github.com/ufobat/p5-AnyEvent-HTTPD-Router
+  repository: git://github.com/ufobat/p5-AnyEvent-HTTPD-Router.git
+version: 1.0.0
+x_authority: cpan:UFOBAT
+x_contributors:
+  - 'Martin Barth <martin@senfdax.de>'
+  - 'Martin Barth <ufobat@users.noreply.github.com>'
+  - 'Paul Koschinski <koschinski@united-domains.de>'
+  - 'koschkosch <49227658+koschkosch@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

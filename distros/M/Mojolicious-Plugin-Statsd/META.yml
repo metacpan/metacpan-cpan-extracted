@@ -1,0 +1,32 @@
+---
+abstract: 'Emit to Statsd, easy!'
+author:
+  - 'Meredith Howard <mhoward@cpan.org>'
+build_requires:
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Statsd
+provides:
+  Mojolicious::Plugin::Statsd:
+    file: lib/Mojolicious/Plugin/Statsd.pm
+    version: '0.03'
+  Mojolicious::Plugin::Statsd::Adapter::Memory:
+    file: lib/Mojolicious/Plugin/Statsd/Adapter/Memory.pm
+    version: '0.03'
+  Mojolicious::Plugin::Statsd::Adapter::Statsd:
+    file: lib/Mojolicious/Plugin/Statsd/Adapter/Statsd.pm
+    version: '0.03'
+requires:
+  Mojolicious: '0'
+resources:
+  repository: git://github.com/merrilymeredith/Mojolicious-Plugin-Statsd.git
+version: '0.03'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

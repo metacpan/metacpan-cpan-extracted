@@ -1,4 +1,8 @@
-0.01 2019-04-19T04:28:37
+0.02 2019-04-29T04:26:28
+ - add simple repeat request test (Meredith Howard)
+ - 5.8 compat: no defined-or (Meredith Howard)
+
+0.01 2019-04-19T04:29:32Z
  - init changes (Meredith Howard)
  - init readme (Meredith Howard)
  - add gitignore (Meredith Howard)

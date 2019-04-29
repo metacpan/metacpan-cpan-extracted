@@ -7,24 +7,132 @@ Anansi::Script::CGI - Defines the mechanisms specific to handling web browser ex
 
 =head1 SYNOPSIS
 
- my $OBJECT = Anansi::Script::CGI->new();
+    my $OBJECT = Anansi::Script::CGI->new();
 
 =head1 DESCRIPTION
 
 This module is designed to be an optional component module for use by the
 L<Anansi::Script> component management module.  It defines the processes
 specific to handling both input and output from Perl scripts that are executed
-by a web server using the Common Gateway Interface.  See L<Anansi::Component>
-for inherited methods.
+by a web server using the Common Gateway Interface.  Uses
+L<Anansi::ComponentManager> I<(indirectly)>, L<Anansi::ScriptComponent> and
+L<base>.
 
 =cut
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-use base qw(Anansi::Component);
+use base qw(Anansi::ScriptComponent);
 
 use CGI;
+
+
+=head1 INHERITED METHODS
+
+=cut
+
+
+=head2 addChannel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 channel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 componentManagers
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 finalise
+
+    $OBJECT->SUPER::finalise();
+
+Declared in L<Anansi::Class>.  Overridden by this module.
+
+=cut
+
+
+sub finalise {
+    my ($self, %parameters) = @_;
+    $self->saveHeaders(%parameters);
+    print $self->content();
+    $self->used('CGI');
+}
+
+
+=head2 implicate
+
+Declared in L<Anansi::Class>.  Intended to be overridden by an extending module.
+
+=cut
+
+
+=head2 import
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 initialise
+
+    $OBJECT->SUPER::initialise();
+
+Declared in L<Anansi::initialise>.  Overridden by this module.
+
+=cut
+
+
+sub initialise {
+    my ($self, %parameters) = @_;
+    my $CGI = CGI->new();
+    $self->uses(
+        CGI => $CGI,
+    );
+    $self->loadHeaders(%parameters);
+    $self->loadParameters(%parameters);
+    $self->header('content-type' => 'text/html');
+    $self->content();
+}
+
+
+=head2 old
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 removeChannel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 used
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 uses
+
+Declared in L<Anansi::Class>.
+
+=cut
 
 
 =head1 METHODS
@@ -34,27 +142,17 @@ use CGI;
 
 =head2 content
 
- my $contents = $OBJECT->content();
+    my $contents = $OBJECT->content();
 
- # OR
+    my $contents = $OBJECT->channel('CONTENT');
 
- my $contents = $OBJECT->channel('CONTENT');
+    if(1 == $OBJECT->content(undef, undef));
 
- # OR
+    if(1 == $OBJECT->channel('CONTENT', undef));
 
- if(1 == $OBJECT->content(undef, undef));
+    if(1 == $OBJECT->content(undef, 'some content'));
 
- # OR
-
- if(1 == $OBJECT->channel('CONTENT', undef));
-
- # OR
-
- if(1 == $OBJECT->content(undef, 'some content'));
-
- # OR
-
- if(1 == $OBJECT->channel('CONTENT', 'some content'));
+    if(1 == $OBJECT->channel('CONTENT', 'some content'));
 
 Either returns the existing content or redefines the content.
 
@@ -75,50 +173,22 @@ sub content {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::CGI', 'CONTENT' => 'content');
-
-
-=head2 finalise
-
- $OBJECT::SUPER->finalise(@_);
-
-An overridden virtual method called during object destruction.  Not intended to
-be directly called unless overridden by a descendant.
-
-=cut
-
-
-sub finalise {
-    my ($self, %parameters) = @_;
-    $self->saveHeaders(%parameters);
-    print $self->content();
-    $self->used('CGI');
-}
+Anansi::ScriptComponent::addChannel('Anansi::Script::CGI', 'CONTENT' => 'content');
 
 
 =head2 header
 
- my $headers = $OBJECT->header();
+    my $headers = $OBJECT->header();
 
- # OR
+    my $headers = $OBJECT->channel('HEADER');
 
- my $headers = $OBJECT->channel('HEADER');
+    my $headerValue = $OBJECT->header(undef, 'header_name');
 
- # OR
+    my $headerValue = $OBJECT->channel('HEADER', 'header_name');
 
- my $headerValue = $OBJECT->header(undef, 'header_name');
+    if($OBJECT->header(undef, 'header_name' => 'header value', 'another_header' => undef, 'yet_another_header' => [1, 2, 3], 'one_more' => {'hash key' => 'some value', 'another key' => undef}));
 
- # OR
-
- my $headerValue = $OBJECT->channel('HEADER', 'header_name');
-
- # OR
-
- if($OBJECT->header(undef, 'header_name' => 'header value', 'another_header' => undef, 'yet_another_header' => [1, 2, 3], 'one_more' => {'hash key' => 'some value', 'another key' => undef}));
-
- # OR
-
- if($OBJECT->channel('HEADER', 'header_name' => 'header value', 'another_header' => undef, 'yet_another_header' => [1, 2, 3], 'one_more' => {'hash key' => 'some value', 'another key' => undef}));
+    if($OBJECT->channel('HEADER', 'header_name' => 'header value', 'another_header' => undef, 'yet_another_header' => [1, 2, 3], 'one_more' => {'hash key' => 'some value', 'another key' => undef}));
 
 Either returns an ARRAY of all the existing header names or returns the value of
 a specific header or sets the value of one or more headers.  Assigning an
@@ -186,35 +256,12 @@ sub header {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::CGI', 'HEADER' => 'header');
-
-
-=head2 initialise
-
- $OBJECT::SUPER->initialise(@_);
-
-An overridden virtual method called during object creation.  Not intended to be
-directly called unless overridden by a descendant.
-
-=cut
-
-
-sub initialise {
-    my ($self, %parameters) = @_;
-    my $CGI = CGI->new();
-    $self->uses(
-        CGI => $CGI,
-    );
-    $self->loadHeaders(%parameters);
-    $self->loadParameters(%parameters);
-    $self->header('content-type' => 'text/html');
-    $self->content();
-}
+Anansi::ScriptComponent::addChannel('Anansi::Script::CGI', 'HEADER' => 'header');
 
 
 =head2 loadHeaders
 
- $OBJECT->loadHeaders();
+    $OBJECT->loadHeaders();
 
 Loads all of the CGI headers supplied upon page REQUEST.
 
@@ -232,7 +279,7 @@ sub loadHeaders {
 
 =head2 loadParameters
 
- $OBJECT->loadParameters();
+    $OBJECT->loadParameters();
 
 Loads all of the CGI parameters supplied upon page REQUEST.
 
@@ -250,15 +297,11 @@ sub loadParameters {
 
 =head2 medium
 
- my $medium = Anansi::Script::CGI->medium();
+    my $medium = Anansi::Script::CGI->medium();
 
- # OR
+    my $medium = $OBJECT->medium();
 
- my $medium = $OBJECT->medium();
-
- # OR
-
- my $medium = $OBJECT->channel('MEDIUM');
+    my $medium = $OBJECT->channel('MEDIUM');
 
 Returns the STRING description of the medium this module is designed to handle.
 
@@ -272,32 +315,22 @@ sub medium {
     return 'CGI';
 }
 
-Anansi::Component::addChannel('Anansi::Script::CGI', 'MEDIUM' => 'medium');
+Anansi::ScriptComponent::addChannel('Anansi::Script::CGI', 'MEDIUM' => 'medium');
 
 
 =head2 parameter
 
- my $parameters = $OBJECT->parameter();
+    my $parameters = $OBJECT->parameter();
 
- # OR
+    my $parameters = $OBJECT->channel('PARAMETER');
 
- my $parameters = $OBJECT->channel('PARAMETER');
+    my $parameterValue = $OBJECT->parameter(undef, 'parameter name');
 
- # OR
+    my $parameterValue = $OBJECT->channel('PARAMETER', 'parameter name');
 
- my $parameterValue = $OBJECT->parameter(undef, 'parameter name');
+    if($OBJECT->parameter(undef, 'parameter name' => 'parameter value', 'another parameter' => undef));
 
- # OR
-
- my $parameterValue = $OBJECT->channel('PARAMETER', 'parameter name');
-
- # OR
-
- if($OBJECT->parameter(undef, 'parameter name' => 'parameter value', 'another parameter' => undef));
-
- # OR
-
- if($OBJECT->channel('PARAMETER', 'parameter name' => 'parameter value', 'another parameter' => undef));
+    if($OBJECT->channel('PARAMETER', 'parameter name' => 'parameter value', 'another parameter' => undef));
 
 Either returns an ARRAY of all the existing parameter names or returns the value
 of a specific parameter or sets the value of one or more parameters.  Assigning
@@ -332,12 +365,43 @@ sub parameter {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::CGI', 'PARAMETER' => 'parameter');
+Anansi::ScriptComponent::addChannel('Anansi::Script::CGI', 'PARAMETER' => 'parameter');
+
+
+=head2 priority
+
+    my $priority = Anansi::Script::CGI->priority();
+
+    my $priority = $OBJECT->priority();
+
+    my $priority = $OBJECT->channel('PRIORITY_OF_VALIDATE');
+
+Returns a hash of the priorities of this script component in relation to other
+script components.  Each priority is represented by a component namespace in the
+form of a key and a value of B<lower>, B<-1> I<(minus one)> or any negative
+value implying this component is of higher priority, B<higher>, B<1> I<(one)> or
+any positive value implying this component is of lower priority or B<same> or
+B<0> I<(zero)> implying this component is of the same priority.
+
+=cut
+
+
+sub priority {
+    my $self = shift(@_);
+    my $channel;
+    $channel = shift(@_) if(0 < scalar(@_));
+    my $priorities = {
+        'Anansi::Script::Shell' => 'lower',
+    };
+    return $priorities;
+}
+
+Anansi::ScriptComponent::addChannel('Anansi::Script::CGI', 'PRIORITY_OF_VALIDATE' => 'priority');
 
 
 =head2 saveHeaders
 
- $OBJECT->saveHeaders();
+    $OBJECT->saveHeaders();
 
 Prints the CGI headers.
 
@@ -366,11 +430,9 @@ sub saveHeaders {
 
 =head2 validate
 
- my $valid = $OBJECT->validate();
+    my $valid = $OBJECT->validate();
 
- # OR
-
- my $valid = $OBJECT->channel('VALIDATE_AS_APPROPRIATE');
+    my $valid = $OBJECT->channel('VALIDATE_AS_APPROPRIATE');
 
 Determines whether this module is the correct one to use for handling Perl
 script execution.
@@ -382,21 +444,30 @@ sub validate {
     my $self = shift(@_);
     my $channel;
     $channel = shift(@_) if(0 < scalar(@_));
-    return 0 if(!defined($ENV{'HTTP_HOST'}));
-    my $CGI = CGI->new();
-    # Check the HTTP_SOAPACTION environment variable.
-    return 0 if(defined($CGI->http('SOAPAction')));
-    return 1;
+    return 1 if(exists($ENV{'MOD_PERL'}));
+    return 1 if(exists($ENV{'GATEWAY_INTERFACE'}));
+    return 0;
 }
 
-Anansi::Component::addChannel('Anansi::Script::CGI', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+Anansi::ScriptComponent::addChannel('Anansi::Script::CGI', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+
+
+=head1 NOTES
+
+This module is designed to make it simple, easy and quite fast to code your
+design in perl.  If for any reason you feel that it doesn't achieve these goals
+then please let me know.  I am here to help.  All constructive criticisms are
+also welcomed.
+
+=cut
 
 
 =head1 AUTHOR
 
-Kevin Treleaven <kevin AT treleaven DOT net>
+Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 =cut
 
 
 1;
+

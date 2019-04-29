@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.008';
+$Arango::Tango::Database::VERSION = '0.009';
 use Arango::Tango::Cursor;
 
 use warnings;
@@ -45,6 +45,26 @@ sub delete_collection {
     return $self->{arango}->_api('delete_collection', { database => $self->{name}, name => $name })
 }
 
+sub delete {
+    my $self = shift;
+    return $self->{arango}->delete_database($self->{name});
+}
+
+sub get_access_level {
+    my ($self, $username, $collection) = @_;
+    return $self->{arango}->get_access_level($self->{name}, $username, $collection);
+}
+
+sub clear_access_level {
+    my ($self, $username, $collection) = @_;
+    return $self->{arango}->clear_access_level($self->{name}, $username, $collection);
+}
+
+sub set_access_level {
+    my ($self, $username, $grant, $collection) = @_;
+    return $self->{arango}->set_access_level($self->{name}, $username, $grant, $collection);
+}
+
 1;
 
 __END__
@@ -59,7 +79,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 USAGE
 
@@ -99,6 +119,33 @@ Deletes a collection.
 Performs AQL queries, returning a cursor. An optional hash of
 options can be supplied. Supported hashes corresponde to the different attributes
 available in the ArangoDB REST API (L<https://docs.arangodb.com/3.4/HTTP/AqlQueryCursor/AccessingCursors.html>).
+
+=head2 C<delete>
+
+    $db->delete;
+
+Deletes the supplied database.
+
+=head2 C<get_access_level>
+
+    $perms = $db->get_access_level($user)
+    $perms = $db->get_access_level($collection, $user)
+
+Fetch the database or collection access level for a specific user.
+
+=head2 C<set_access_level>
+
+    $db->set_access_level($user, "rw")
+    $db->set_sccess_level($collection, $user, "ro")
+
+Set the database or collection access level for a specific user.
+
+=head2 C<clear_access_level>
+
+    $db->clear_access_level($user)
+    $db->clear_sccess_level($collection, $user)
+
+Clears the database or collection access level for a specific user.
 
 =head1 AUTHOR
 

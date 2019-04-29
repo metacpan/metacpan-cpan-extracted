@@ -9,7 +9,7 @@ BEGIN {
 
 
 #
-# Copyright (C) 2016 J. Maslak
+# Copyright (C) 2016 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -29,7 +29,7 @@ MAIN: {
 
     my $result = merge(\@indata);
 
-    is(scalar(@$result), 331215, 'Merge returns the right number of ranges');
+    is(scalar(@$result), 327816, 'Merge returns the right number of ranges');
 
     my (@sorted) = sort { $a->[0] < $b->[0] } @$result;
     is(@sorted, @$result);

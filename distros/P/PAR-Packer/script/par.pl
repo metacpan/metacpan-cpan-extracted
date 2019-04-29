@@ -145,9 +145,7 @@ This is just a zip file beginning with the magic string "C<PK\003\004>".
 
 The pre-computed cache name.  A pack('Z40') string of the value of -T 
 (--tempcache) or the hash of the file, followed by C<\0CACHE>.  The hash
-of the file is calculated with L<Digest::SHA>, L<Digest::SHA1>, or 
-L<Digest::MD5>.  If none of those modules is available, the C<mtime> of
-the file is used.
+of the file is calculated with L<Digest::SHA>.
 
 A pack('N') number of the total length of FILE and PAR sections,
 followed by a 8-bytes magic string: "C<\012PAR.pm\012>".
@@ -243,7 +241,7 @@ my ($start_pos, $data_pos);
         my $nread = read _FH, $buf, $offset;
         die qq[read failed on "$progname": $!] unless $nread == $offset;
         $idx = rindex($buf, "\nPAR.pm\n");
-        last if $idx >= 0 || $offset == $size || $offset > 128 * 1024;
+        last if $idx >= 0 || $offset == $size || $offset > 256 * 1024;
         $offset *= 2;
     }
     last unless $idx >= 0;
@@ -299,26 +297,19 @@ my ($start_pos, $data_pos);
 
         return if ref $module or !$module;
 
-        my $filename = delete $require_list{$module} || do {
-            my $key;
-            foreach (keys %require_list) {
-                next unless /\Q$module\E$/;
-                $key = $_; last;
-            }
-            delete $require_list{$key} if defined($key);
-        } or return;
+        my $info = delete $require_list{$module} or return;
 
-        $INC{$module} = "/loader/$filename/$module";
+        $INC{$module} = "/loader/$info/$module";
 
         if ($ENV{PAR_CLEAN} and defined(&IO::File::new)) {
             my $fh = IO::File->new_tmpfile or die $!;
             binmode($fh);
-            print $fh $filename->{buf};
+            print $fh $info->{buf};
             seek($fh, 0, 0);
             return $fh;
         }
         else {
-            my $filename = _tempfile("$filename->{crc}.pm", $filename->{buf});
+            my $filename = _tempfile("$info->{crc}.pm", $info->{buf});
 
             open my $fh, '<', $filename or die "can't read $filename: $!";
             binmode($fh);
@@ -447,6 +438,7 @@ if ($out) {
         #local $INC{'Cwd.pm'} = __FILE__ if $^O ne 'MSWin32';
         require IO::File;
         require Archive::Zip;
+        require Digest::SHA;
     }
 
     my $par = shift(@ARGV);
@@ -518,6 +510,7 @@ if ($out) {
     if ($bundle) {
         require PAR::Heavy;
         PAR::Heavy::_init_dynaloader();
+
         init_inc();
 
         require_modules();
@@ -602,24 +595,13 @@ if ($out) {
 
     $cache_name = substr $cache_name, 0, 40;
     if (!$cache_name and my $mtime = (stat($out))[9]) {
-        my $ctx = eval { require Digest::SHA; Digest::SHA->new(1) }
-            || eval { require Digest::SHA1; Digest::SHA1->new }
-            || eval { require Digest::MD5; Digest::MD5->new };
+        my $ctx = Digest::SHA->new(1);
+        open(my $fh, "<", $out);
+        binmode($fh);
+        $ctx->addfile($fh);
+        close($fh);
 
-        # Workaround for bug in Digest::SHA 5.38 and 5.39
-        my $sha_version = eval { $Digest::SHA::VERSION } || 0;
-        if ($sha_version eq '5.38' or $sha_version eq '5.39') {
-            $ctx->addfile($out, "b") if ($ctx);
-        }
-        else {
-            if ($ctx and open(my $fh, "<$out")) {
-                binmode($fh);
-                $ctx->addfile($fh);
-                close($fh);
-            }
-        }
-
-        $cache_name = $ctx ? $ctx->hexdigest : $mtime;
+        $cache_name = $ctx->hexdigest;
     }
     $cache_name .= "\0" x (41 - length $cache_name);
     $cache_name .= "CACHE";
@@ -650,6 +632,13 @@ if ($out) {
         require File::Find;
         require Archive::Zip;
     }
+
+    # increase the chunk size for Archive::Zip so that it will find the EOCD
+    # even if more stuff (OS-specific codesigning, for example) has been appended to the pp exe
+    # OSX codesign tool appends at least 180K to a binary and so make the ChunkSize generously
+    # greater than this
+    Archive::Zip::setChunkSize(256*1024);
+
     my $zip = Archive::Zip->new;
     my $fh = IO::File->new;
     $fh->fdopen(fileno(_FH), 'r') or die "$!: $@";
@@ -732,6 +721,7 @@ sub require_modules {
     require IO::File;
     require Compress::Zlib;
     require Archive::Zip;
+    require Digest::SHA;
     require PAR;
     require PAR::Heavy;
     require PAR::Dist;
@@ -789,24 +779,14 @@ sub _set_par_temp {
                 $stmpdir .= "$Config{_delim}cache-" . $buf;
             }
             else {
-                my $ctx = eval { require Digest::SHA; Digest::SHA->new(1) }
-                    || eval { require Digest::SHA1; Digest::SHA1->new }
-                    || eval { require Digest::MD5; Digest::MD5->new };
+                require Digest::SHA; 
+                my $ctx = Digest::SHA->new(1);
+                open(my $fh, "<", $progname);
+                binmode($fh);
+                $ctx->addfile($fh);
+                close($fh);
 
-                # Workaround for bug in Digest::SHA 5.38 and 5.39
-                my $sha_version = eval { $Digest::SHA::VERSION } || 0;
-                if ($sha_version eq '5.38' or $sha_version eq '5.39') {
-                    $ctx->addfile($progname, "b") if ($ctx);
-                }
-                else {
-                    if ($ctx and open(my $fh, "<$progname")) {
-                        binmode($fh);
-                        $ctx->addfile($fh);
-                        close($fh);
-                    }
-                }
-
-                $stmpdir .= "$Config{_delim}cache-" . ( $ctx ? $ctx->hexdigest : $mtime );
+                $stmpdir .= "$Config{_delim}cache-" . $ctx->hexdigest;
             }
             close($fh);
         }
@@ -906,7 +886,7 @@ sub _par_init_env {
         $ENV{PAR_INITIALIZED} = 2;
     }
 
-    for (qw( SPAWNED TEMP CLEAN DEBUG CACHE PROGNAME ARGC ARGV_0 ) ) {
+    for (qw( SPAWNED TEMP CLEAN DEBUG CACHE PROGNAME ) ) {
         delete $ENV{'PAR_'.$_};
     }
     for (qw/ TMPDIR TEMP CLEAN DEBUG /) {

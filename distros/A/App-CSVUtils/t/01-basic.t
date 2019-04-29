@@ -22,6 +22,8 @@ write_text("$dir/no-header-1.csv", "1,2,3\n4,5,6\n7,8,9\n");
 
 write_text("$dir/1.tsv", "f1\tf2\tf3\n1\t2\t3\n4\t5\t6\n7\t8\t9\n");
 
+write_text("$dir/sort-rows.csv", qq(f1,f2\n2,andy\n1,Andy\n10,Chuck\n));
+
 # XXX test with opt: --no-header
 
 subtest csv_add_field => sub {
@@ -115,6 +117,33 @@ subtest csv_sort_fields => sub {
     # reverse example
     $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", example=>["f2","F3","f1"], reverse=>1);
     is_deeply($res, [200,"OK",qq(f1,F3,f2\n1,2,3\n4,5,6\n),{'cmdline.skip_format'=>1}], "result (reverse example)");
+};
+
+subtest csv_sort_rows => sub {
+    my $res;
+
+    # alphabetical
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"f2");
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
+    # reverse alphabetical
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"~f2");
+    is_deeply($res, [200,"OK",qq(f1,f2\n2,andy\n10,Chuck\n1,Andy\n),{'cmdline.skip_format'=>1}]);
+    # numeric
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"+f1");
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n2,andy\n10,Chuck\n),{'cmdline.skip_format'=>1}]);
+    # reverse numeric
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"-f1");
+    is_deeply($res, [200,"OK",qq(f1,f2\n10,Chuck\n2,andy\n1,Andy\n),{'cmdline.skip_format'=>1}]);
+    # ci
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"f2,+f1", ci=>1);
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n2,andy\n10,Chuck\n),{'cmdline.skip_format'=>1}]);
+
+    # by code
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_code=>'$a->[0] cmp $b->[0]');
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
+    # by code, hash
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_code=>'$a->{f1} cmp $b->{f1}', hash=>1);
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
 };
 
 subtest csv_sum => sub {
@@ -250,6 +279,100 @@ subtest csv_dump => sub {
     is_deeply($res, [200,"OK",[{field1=>'f1',field2=>'f2',field3=>'f3'},{field1=>1,field2=>2,field3=>3},{field1=>4,field2=>5,field3=>6},{field1=>7,field2=>8,field3=>9}]])
         or diag explain $res;
 
+};
+
+subtest csv_setop => sub {
+    write_text("$dir/setop1.csv", "f1,f2,f3\nv1,v2,v3\nv4,v5,v6\nv7,v8,v9\n");
+    write_text("$dir/setop2.csv", "f1,f2,f3\nv1,v2,v3\nv4,V5,v7\nv7,v8,v9\n");
+
+    my $res;
+
+    subtest intersect => sub {
+        $res = App::CSVUtils::csv_setop(op=>"intersect", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"]);
+        is($res->[2], "f1,f2,f3\nv1,v2,v3\nv7,v8,v9\n");
+
+        $res = App::CSVUtils::csv_setop(op=>"intersect", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1");
+        is($res->[2], "f1,f2,f3\nv1,v2,v3\nv4,v5,v6\nv7,v8,v9\n", "opt:compare_fields");
+
+        $res = App::CSVUtils::csv_setop(op=>"intersect", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1,f2", ignore_case=>1);
+        is($res->[2], "f1,f2,f3\nv1,v2,v3\nv4,v5,v6\nv7,v8,v9\n", "opt:ignore_case");
+
+        $res = App::CSVUtils::csv_setop(op=>"intersect", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], result_fields=>"f2,f1");
+        is($res->[2], "f2,f1\nv2,v1\nv8,v7\n", "opt:result_fields");
+    };
+
+    subtest union => sub {
+        $res = App::CSVUtils::csv_setop(op=>"union", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"]);
+        is($res->[2], "f1,f2,f3\nv1,v2,v3\nv4,v5,v6\nv7,v8,v9\nv4,V5,v7\n");
+
+        $res = App::CSVUtils::csv_setop(op=>"union", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1");
+        is($res->[2], "f1,f2,f3\nv1,v2,v3\nv4,v5,v6\nv7,v8,v9\n", "opt:compare_fields");
+
+        $res = App::CSVUtils::csv_setop(op=>"union", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1,f2", ignore_case=>1);
+        is($res->[2], "f1,f2,f3\nv1,v2,v3\nv4,v5,v6\nv7,v8,v9\n", "opt:ignore_case");
+
+        $res = App::CSVUtils::csv_setop(op=>"union", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1", result_fields=>"f2,f1");
+        is($res->[2], "f2,f1\nv2,v1\nv5,v4\nv8,v7\n", "opt:result_fields");
+    };
+
+    subtest diff => sub {
+        $res = App::CSVUtils::csv_setop(op=>"diff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"]);
+        is($res->[2], "f1,f2,f3\nv4,v5,v6\n");
+
+        $res = App::CSVUtils::csv_setop(op=>"diff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1");
+        is($res->[2], "f1,f2,f3\n", "opt:compare_fields");
+
+        $res = App::CSVUtils::csv_setop(op=>"diff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1,f2", ignore_case=>1);
+        is($res->[2], "f1,f2,f3\n", "opt:ignore_case");
+
+        $res = App::CSVUtils::csv_setop(op=>"diff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], result_fields=>"f2,f1");
+        is($res->[2], "f2,f1\nv5,v4\n", "opt:result_fields");
+    };
+
+    subtest symdiff => sub {
+        $res = App::CSVUtils::csv_setop(op=>"symdiff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"]);
+        is($res->[2], "f1,f2,f3\nv4,v5,v6\nv4,V5,v7\n");
+
+        $res = App::CSVUtils::csv_setop(op=>"symdiff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1");
+        is($res->[2], "f1,f2,f3\n", "opt:compare_fields");
+
+        $res = App::CSVUtils::csv_setop(op=>"symdiff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], compare_fields=>"f1,f2", ignore_case=>1);
+        is($res->[2], "f1,f2,f3\n", "opt:ignore_case");
+
+        $res = App::CSVUtils::csv_setop(op=>"symdiff", filenames=>["$dir/setop1.csv", "$dir/setop2.csv"], result_fields=>"f3,f1");
+        is($res->[2], "f3,f1\nv6,v4\nv7,v4\n", "opt:result_fields");
+    };
+};
+
+subtest csv_lookup_fields => sub {
+    write_text("$dir/report.csv", <<'_');
+client_id,followup_staff,followup_note,client_email,client_phone
+101,Jerry,not renewing,
+299,Jerry,still thinking over,
+734,Elaine,renewing,
+_
+
+    write_text("$dir/clients.csv", <<'_');
+id,name,email,client_phone
+101,Andy,andy@example.com,555-2983
+102,Bob,bob@acme.example.com,555-2523
+299,Cindy,cindy@example.com,555-7892
+400,Derek,derek@example.com,555-9018
+701,Edward,edward@example.com,555-5833
+734,Felipe,felipe@example.com,555-9067
+_
+
+    my $res;
+
+    $res = App::CSVUtils::csv_lookup_fields(target=>"$dir/report.csv", source=>"$dir/clients.csv", lookup_fields=>"client_id:id", fill_fields=>"client_email:email,client_phone");
+    is($res->[2], <<'_');
+client_id,followup_staff,followup_note,client_email,client_phone
+101,Jerry,"not renewing",andy@example.com,555-2983
+299,Jerry,"still thinking over",cindy@example.com,555-7892
+734,Elaine,renewing,felipe@example.com,555-9067
+_
+
+    # XXX test opt:ignore_case
 };
 
 done_testing;

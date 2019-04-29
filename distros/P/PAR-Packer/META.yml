@@ -14,7 +14,7 @@ configure_requires:
   File::Glob: '0'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,6 @@ no_index:
     - contrib
 recommends:
   Digest: '0'
-  Digest::SHA: '0'
   Module::Signature: '0'
   Tk: '0'
   Tk::ColoredButton: '0'
@@ -36,6 +35,7 @@ recommends:
 requires:
   Archive::Zip: '1.02'
   Compress::Zlib: '1.30'
+  Digest::SHA: '5.40'
   File::Temp: '0.05'
   Getopt::ArgvFile: '1.07'
   IO::Compress::Gzip: '0'
@@ -48,5 +48,5 @@ resources:
   MailingList: mailto:par@perl.org
   bugtracker: https://rt.cpan.org/Dist/Display.html?Queue=PAR-Packer
   repository: git://github.com/rschupp/PAR-Packer.git
-version: '1.047'
+version: '1.048'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

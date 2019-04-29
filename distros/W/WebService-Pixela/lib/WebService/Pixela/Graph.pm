@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = "0.01";
+our $VERSION = "0.021";
 
 sub new {
     my ($class,$pixela_client) = @_;
@@ -123,14 +123,20 @@ sub delete {
 }
 
 sub html {
-    my ($self,$id) = @_;
+    my ($self,%args) = @_;
 
     my $client = $self->client;
 
-    $id //= $self->id;
+    my $id = $args{id} // $self->id;
     croak 'require graph id' unless $id;
 
-    return $client->base_url . 'v1/users/'.$client->username.'/graphs/'.$id.'.html';
+    my $path = $client->base_url . 'v1/users/'.$client->username.'/graphs/'.$id.'.html';
+
+    if ($args{line}){
+        $path .= '?mode=line';
+    }
+
+    return $path;
 }
 
 sub pixels {
@@ -147,6 +153,18 @@ sub pixels {
     my $res  = $self->client->request_with_xuser_in_header('GET',$path,$params);
 
     return $self->client->decode() ? $res->{pixels} : $res;
+}
+
+sub stats {
+    my ($self, $id) = @_;
+
+    my $client = $self->client;
+
+    $id //= $self->id;
+    croak 'require graph id' unless $id;
+
+    my $path = 'users/'.$self->client->username.'/graphs/'.$id.'/stats';
+    return $self->client->request('GET',$path);
 }
 
 sub _color_validate  {
@@ -302,10 +320,27 @@ Delete the predefined pixelation graph definition.
 
 See Also L<https://docs.pixe.la/#/delete-graph>
 
-=head4 C<< $pixela->graph->html() >>
+=head4 C<< $pixela->graph->html(%args) >>
 
 Displays the details of the graph in html format.
 (This method return html urls)
+
+I<%args> might be
+
+=over
+
+=item C<< [required (autoset)] id :  Str >>
+
+It is an ID for identifying the pixelation graph.
+
+If set in an instance of WebService::Pixela::Graph, use that value.
+
+=item C<< ( line => true )  >>
+
+[optional] URI tail add line mode parameter.
+
+=back
+
 
 See Also L<https://docs.pixe.la/#/get-graph-html>
 
@@ -329,6 +364,24 @@ I<%args> might be
 =back
 
 See Also L<https://docs.pixe.la/#/get-graph-pixels>
+
+=head4 C<< $pixela->graph->stats($id) >>
+
+Based on the registered information, get various statistics.
+
+I<$id> might be
+
+=over
+
+=item C<< [required (autoset)] id :  Str >>
+
+It is an ID for identifying the pixelation graph.
+
+If set in an instance of WebService::Pixela::Graph, use that value.
+
+=back
+
+See Also L<https://docs.pixe.la/entry/get-graph-stats>
 
 
 =head1 LICENSE

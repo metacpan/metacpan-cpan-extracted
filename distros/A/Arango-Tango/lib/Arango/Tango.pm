@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.008';
+$Arango::Tango::VERSION = '0.009';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -11,7 +11,6 @@ use HTTP::Tiny;
 use JSON;
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
-use JSON::Schema::Fit 0.04;
 
 sub new {
     my ($package, %opts) = @_;
@@ -89,6 +88,18 @@ sub create_user {
     return $self->_api('create_user', { %opts, user => $username });
 }
 
+sub update_user {
+    my ($self, $username, %opts) = @_;
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    return $self->_api('update_user', { %opts, user => $username });
+}
+
+sub replace_user {
+    my ($self, $username, %opts) = @_;
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    return $self->_api('replace_user', { %opts, user => $username });
+}
+
 sub delete_user {
     my ($self, $username) = @_;
     die "Arango::Tango | No username suplied" unless defined $username and length $username;
@@ -107,6 +118,55 @@ sub user_databases {
     return $self->_api('get_user_databases', { username => $username });
 }
 
+sub get_access_level {
+    my ($self, $database, $username, $collection) = @_;
+    if (defined $collection && length $collection) {
+        ($username, $collection) = ($collection, $username);
+    }
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    die "Arango::Tango | No database suplied" unless defined $database and length $database;
+    if ($collection) {
+        return $self->_api('get_access_level_c', { username => $username, database => $database, collection => $collection });
+    }
+    else {
+        return $self->_api('get_access_level', { username => $username, database => $database });
+    }
+}
+
+sub clear_access_level {
+    my ($self, $database, $username, $collection) = @_;
+    if (defined $collection && length $collection) {
+        ($username, $collection) = ($collection, $username);
+    }
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    die "Arango::Tango | No database suplied" unless defined $database and length $database;
+    if ($collection) {
+        return $self->_api('clear_access_level_c', { username => $username, database => $database, collection => $collection });
+    }
+    else {
+        return $self->_api('clear_access_level', { username => $username, database => $database });
+    }
+}
+
+sub set_access_level {
+    ### 3 PARAMETERS:   DB, USER, GRANT
+    ### 4 PARAETERS:  DB, COL, USER, GRANT
+    my ($self, $database, $username, $permissions, $collection ) = @_;
+
+    if (defined $collection && length $collection) {
+        ($username, $collection, $permissions) = ($permissions, $username, $collection);
+    }
+
+    die "Arango::Tango | No username suplied" unless defined $username and length $username;
+    die "Arango::Tango | No database suplied" unless defined $database and length $database;
+    if ($collection) {
+        return $self->_api('set_access_level_c', { username => $username, database => $database, collection => $collection, grant => $permissions });
+    }
+    else {
+        return $self->_api('set_access_level', { username => $username, database => $database, grant => $permissions  });
+    }
+}
+
 1;
 
 __END__
@@ -121,7 +181,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSYS
 
@@ -168,7 +228,11 @@ and the database where it resided.
 
 =head1 METHODS
 
-=head2 new
+=head2 Constructor
+
+=over 4
+
+=item C<new>
 
       my $db = Arango::Tango->new( %options );
 
@@ -195,7 +259,124 @@ Password to be used to connect to ArangoDB. Default to the empty string.
 
 =back
 
-=head2 C<target_version>
+=back
+
+=head2 Database Manipulation
+
+=over 4
+
+=item C<list_databases>
+
+    my $databases = $db->list_databases;
+
+Queries the server about available databases. Returns an array ref of database names.
+
+=item C<create_database>
+
+    my $new_db = $db->create_database("new_db");
+
+Creates a new database, and returns a reference to a L<Arango::Tango::Database> representing it.
+
+=item C<database>
+
+    my $system_db = $db->database("_system");
+
+Opens an existing database, and returns a reference to a L<Arango::Tango::Database> representing it.
+
+=item C<delete_database>
+
+    $db->delete_database("some_db");
+
+Deletes an existing database.
+
+=item C<list_collections>
+
+    my $collections = $db->list_collections;
+
+Lists collection details without specifying a specific database;
+
+=back
+
+=head2 User Management
+
+=over 4
+
+=item C<create_user>
+
+    $db->create_user('username', passwd => "3432rfsdADF");
+
+Creates an user. Optional parameters are C<passwd>, C<active> and C<extra>.
+
+=item C<update_user>
+
+    $db->update_user('username', extra => { email => 'me@there.com' } );
+
+Updates an existing user. Optional parameters are C<passwd>, C<active> and C<extra>.
+
+=item C<replace_user>
+
+    $db->replace_user('username', extra => { email => 'me@there.com' } );
+
+Replace an existing user. Optional parameters are C<passwd>, C<active> and C<extra>.
+
+=item C<delete_user>
+
+    $db->delete_user('username');
+
+Deletes an user.
+
+=item C<list_users>
+
+    $users = $db->list_users;
+
+Fetches data about all users. You need the Administrate server access level
+in order to execute this REST call. Otherwise, you will only get information
+about yourself.
+
+=item C<user>
+
+    $user = $db->user("john");
+
+Fetches data about the specified user. You can fetch information about
+yourself or you need the Administrate server access level in order to
+execute this REST call.
+
+=item C<user_databases>
+
+    $dbs = $db->user_databases("john", full => 1);
+
+Fetch the list of databases available to the specified user. You need
+Administrate for the server access level in order to execute this REST
+call.
+
+=item C<get_access_level>
+
+    $perms = $db->get_access_level("myDatabase", "john");
+    $perms = $db->get_access_level("myDatabase", $collection, "john");
+
+Fetch the database or the collection access level for a specific user.
+
+=item C<set_access_level>
+
+    $perms = $db->set_access_level("myDatabase", "john", "rw");
+    $perms = $db->set_access_level("myDatabase", $collection, "john", "ro");
+
+Sets the database or the collection access level for a specific user.
+
+=item C<clear_access_level>
+
+    $db->clear_access_level("myDatabase", "john");
+    $db->clear_access_level("myDatabase", $collection, "john");
+
+Clears the database or the collection access level for a specific user.
+
+=back
+
+=head2 Querying Server Metadata
+
+=over 4
+
+=item C<target_version>
 
     my $ans = $db->target_version;
     $target_version = $ans->{target_version};   # might change in the future...
@@ -203,43 +384,43 @@ Password to be used to connect to ArangoDB. Default to the empty string.
 Returns the database version that this server requires.
 The version is returned in the version attribute of the result.
 
-=head2 C<log>
+=item C<log>
 
     my $logs = $db-a>log(upto => "warning");
 
 Returns fatal, error, warning or info log messages from the server’s global log.
 
-=head2 C<log_level>
+=item C<log_level>
 
     my $log_levels = $db->log_level();
 
 Returns the server’s current log level settings.
 
-=head2 C<server_availability>
+=item C<server_availability>
 
     my $info = $db->server_availability();
 
 Return availability information about a server.
 
-=head2 C<server_id>
+=item C<server_id>
 
     my $id = $db->server_id();
 
 Returns the id of a server in a cluster. The request will fail if the server is not running in cluster mode.
 
-=head2 C<server_mode>
+=item C<server_mode>
 
     my $mode = $db->server_mode();
 
 Return mode information about a server.
 
-=head2 C<server_role>
+=item C<server_role>
 
     my $mode = $db->server_role();
 
 Returns the role of a server in a cluster.
 
-=head2 C<cluster_endpoints>
+=item C<cluster_endpoints>
 
     my $endpoints = $db->cluster_endpoints;
 
@@ -249,112 +430,62 @@ string with the endpoint description. There is an entry for each
 coordinator in the cluster. This method only works on coordinators in
 cluster mode. In case of an error the error attribute is set to true.
 
-=head2 C<version>
+=item C<version>
 
     my $version_info = $db->version;
     my $detailed_info = $db->version( 'details' => 1 );
 
 Returns a hash reference with basic server info. Detailed information can be requested with the C<details> option.
 
-=head2 C<engine>
+=item C<engine>
 
    my $engine = $db->engine;
 
 Returns the storage engine the server is configured to use.
 
-=head2 C<statistics>
+=item C<statistics>
 
    my $stats = $db->statistics;
 
 Read the statistics of a server.
 
-=head2 C<statistics_description>
+=item C<statistics_description>
 
    my $stats_desc = $db->statistics_description;
 
 Statistics description
 
-=head2 C<status>
+=item C<status>
 
    my $status = $db->status;
 
 Return status information
 
-=head2 C<time>
+=item C<time>
 
    my $time = $db->time;
 
 Return system time
 
-=head2 C<list_databases>
+=back
 
-    my $databases = $db->list_databases;
+=head1 CAVEATS
 
-Queries the server about available databases. Returns an array ref of database names.
+=head2 Options Validation
 
-=head2 C<create_database>
+Most optional options are validated and fitted using
+C<JSON::Scheme::Fit>. This means that the module will try to remove
+invalid options and adapt values from valid options to valid values.
+While this can make some mistakes silently, it was preferred to dying
+at any structure problem.
 
-    my $new_db = $db->create_database("new_db");
+In future versions there might be an option to activate strict schema
+check making the module to die on an invalid options.
 
-Creates a new database, and returns a reference to a L<Arango::Tango::Database> representing it.
+=head2 Exceptions
 
-=head2 C<database>
-
-    my $system_db = $db->database("_system");
-
-Opens an existing database, and returns a reference to a L<Arango::Tango::Database> representing it.
-
-=head2 C<delete_database>
-
-    $db->delete_database("some_db");
-
-Deletes an existing database.
-
-=head2 C<list_collections>
-
-    my $collections = $db->list_collections;
-
-Lists collection details without specifying a specific database;
-
-=head2 C<create_user>
-
-    $db->create_user('username', passwd => "3432rfsdADF");
-
-Creates an user. Optional parameters are C<passwd>, C<active> and C<extra>.
-
-=head2 C<delete_user>
-
-    $db->delete_user('username');
-
-Deletes an user.
-
-=head2 C<list_users>
-
-    $users = $db->list_users;
-
-Fetches data about all users. You need the Administrate server access level
-in order to execute this REST call. Otherwise, you will only get information
-about yourself.
-
-=head2 C<user>
-
-    $user = $db->user("john");
-
-Fetches data about the specified user. You can fetch information about
-yourself or you need the Administrate server access level in order to
-execute this REST call.
-
-=head2 C<user_databases>
-
-    $dbs = $db->user_databases("john", full => 1);
-
-Fetch the list of databases available to the specified user. You need
-Administrate for the server access level in order to execute this REST
-call.
-
-=head1 EXCEPTIONS
-
-This module is written to die in any exception. Please use a try/catch module or eval, to detect them.
+This module is written to die in any exception. Please use a try/catch
+module or eval, to detect them.
 
 =head1 AUTHOR
 

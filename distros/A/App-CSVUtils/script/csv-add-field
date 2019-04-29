@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_add_field
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-04-23'; # DATE
+our $DATE = '2019-04-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-add-field - Add a field to CSV file
 
 =head1 VERSION
 
-This document describes version 0.019 of csv-add-field (from Perl distribution App-CSVUtils), released on 2019-04-23.
+This document describes version 0.020 of csv-add-field (from Perl distribution App-CSVUtils), released on 2019-04-29.
 
 =head1 SYNOPSIS
 
@@ -49,9 +49,9 @@ Usage:
 
 Your Perl code (-e) will be called for each row (excluding the header row) and
 should return the value for the new field. C<$main::row> is available and
-contains the current row, while C<$main::rownum> contains the row number (2 means
-the first data row). C<$main::field_idxs> is also available for additional
-information.
+contains the current row. C<$main::rownum> contains the row number (2 means the
+first data row). C<$csv> is the L<Text::CSV_XS> object. C<$main::field_idxs> is
+also available for additional information.
 
 Field by default will be added as the last field, unless you specify one of
 C<--after> (to put after a certain field), C<--before> (to put before a certain
@@ -77,7 +77,13 @@ Put the new field at specific position (1 means as first field).
 
 Put the new field before specified field.
 
-=item B<--eval>=I<s>*, B<-e>
+=item B<--eval-json>=I<s>, B<-e>
+
+Perl code to do munging (JSON-encoded).
+
+See C<--eval>.
+
+=item B<--eval>=I<s>*
 
 Perl code to do munging.
 

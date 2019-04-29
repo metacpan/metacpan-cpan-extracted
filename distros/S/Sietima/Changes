@@ -1,3 +1,6 @@
+1.0.4     2019-04-29 15:31:45+01:00 Europe/London
+ - make it work with App::Spec 0.005
+
 1.0.3     2017-06-22 18:26:22+01:00 Europe/London
  - fixed test failures under future Email::MIME
  - mark App::Spec 0.004_001 as not suitable (it fails when calling

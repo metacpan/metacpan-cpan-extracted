@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-our $VERSION = '0.101';
+our $VERSION = 'v1.0.2';
 
 use CGI qw/:all/;
 use HTTP::Server::Brick;
@@ -26,7 +26,7 @@ Readonly::Scalar my $SLASH          => q{/};
 
 Readonly::Array my @GETOPT_CONFIG =>
   qw(no_ignore_case bundling auto_version auto_help);
-Readonly::Array my @GETOPTIONS => ( q{port|p=s}, q{verbose|v+}, );
+Readonly::Array my @GETOPTIONS  => ( q{port|p=s}, q{verbose|v+}, );
 Readonly::Hash my %OPTS_DEFAULT => ( 'port' => $CONNECTOR_PORT, );
 
 Getopt::Long::Configure(@GETOPT_CONFIG);
@@ -34,7 +34,7 @@ my %opts = %OPTS_DEFAULT;
 Getopt::Long::GetOptions( \%opts, @GETOPTIONS ) or Pod::Usage::pod2usage(2);
 
 my $server = HTTP::Server::Brick->new( 'port' => $opts{'port'} );
-my $nos = WWW::NOS::Open->new($API_KEY);
+my $nos    = WWW::NOS::Open->new($API_KEY);
 my $nos_version =
   $nos->get_version->get_version . $SLASH . $nos->get_version->get_build;
 

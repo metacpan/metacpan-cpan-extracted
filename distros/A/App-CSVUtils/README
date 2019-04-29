@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.019 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-04-23.
+    This document describes version 0.020 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-04-29.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -26,6 +26,8 @@ DESCRIPTION
 
     *   csv-list-field-names
 
+    *   csv-lookup-fields
+
     *   csv-map
 
     *   csv-munge-field
@@ -36,7 +38,13 @@ DESCRIPTION
 
     *   csv-select-row
 
+    *   csv-setop
+
+    *   csv-sort
+
     *   csv-sort-fields
+
+    *   csv-sort-rows
 
     *   csv-sum
 
@@ -52,9 +60,9 @@ FUNCTIONS
 
     Your Perl code (-e) will be called for each row (excluding the header
     row) and should return the value for the new field. $main::row is
-    available and contains the current row, while $main::rownum contains the
-    row number (2 means the first data row). $main::field_idxs is also
-    available for additional information.
+    available and contains the current row. $main::rownum contains the row
+    number (2 means the first data row). $csv is the Text::CSV_XS object.
+    $main::field_idxs is also available for additional information.
 
     Field by default will be added as the last field, unless you specify one
     of "--after" (to put after a certain field), "--before" (to put before a
@@ -77,7 +85,7 @@ FUNCTIONS
 
         Put the new field before specified field.
 
-    *   eval* => *str*
+    *   eval* => *str|code*
 
         Perl code to do munging.
 
@@ -361,7 +369,7 @@ FUNCTIONS
 
          csv_each_row(
            filename => "users.csv",
-           eval => "\"unlink qq(/home/data/\$_->{username}.dat)\"",
+           eval => "unlink qq(/home/data/\$_->{username}.dat)",
            hash => 1
          );
 
@@ -371,7 +379,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   eval* => *str*
+    *   eval* => *str|code*
 
         Perl code.
 
@@ -429,9 +437,10 @@ FUNCTIONS
 
     This is like Perl's "grep" performed over rows of CSV. In $_, your Perl
     code will find the CSV row as an arrayref (or, if you specify "-H", as a
-    hashref). $main::row is also set to the row (always as arrayref), while
+    hashref). $main::row is also set to the row (always as arrayref).
     $main::rownum contains the row number (2 means the first data row).
-    $main::field_idxs is also available for additional information.
+    $main::csv is the Text::CSV_XS object. $main::field_idxs is also
+    available for additional information.
 
     Your code is then free to return true or false based on some criteria.
     Only rows where Perl expression returns true will be included in the
@@ -441,7 +450,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   eval* => *str*
+    *   eval* => *str|code*
 
         Perl code.
 
@@ -514,6 +523,85 @@ FUNCTIONS
 
     Return value: (any)
 
+  csv_lookup_fields
+    Usage:
+
+     csv_lookup_fields(%args) -> [status, msg, payload, meta]
+
+    Fill fields of a CSV file from another.
+
+    Example input:
+
+     # report.csv
+     client_id,followup_staff,followup_note,client_email,client_phone
+     101,Jerry,not renewing,
+     299,Jerry,still thinking over,
+     734,Elaine,renewing,
+ 
+     # clients.csv
+     id,name,email,phone
+     101,Andy,andy@example.com,555-2983
+     102,Bob,bob@acme.example.com,555-2523
+     299,Cindy,cindy@example.com,555-7892
+     400,Derek,derek@example.com,555-9018
+     701,Edward,edward@example.com,555-5833
+     734,Felipe,felipe@example.com,555-9067
+
+    To fill up the "client_email" and "client_phone" fields of "report.csv"
+    from "clients.csv", we can use: "--lookup-fields client_id:id
+    --fill-fields client_email:email,client_phone:phone". The result will
+    be:
+
+     client_id,followup_staff,followup_note,client_email,client_phone
+     101,Jerry,not renewing,andy@example.com,555-2983
+     299,Jerry,still thinking over,cindy@example.com,555-7892
+     734,Elaine,renewing,felipe@example.com,555-9067
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   count => *bool*
+
+        Do not output rows, just report the number of rows filled.
+
+    *   fill_fields* => *str*
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   ignore_case => *bool*
+
+    *   lookup_fields* => *str*
+
+    *   source* => *filename*
+
+        CSV file to lookup values from.
+
+    *   target* => *filename*
+
+        CSV file to fill fields of.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   csv_map
     Usage:
 
@@ -528,15 +616,16 @@ FUNCTIONS
 
          csv_map(
            filename => "file.csv",
-           eval => "\"INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});\"",
+           eval => "INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});",
            hash => 1
          );
 
     This is like Perl's "map" performed over rows of CSV. In $_, your Perl
     code will find the CSV row as an arrayref (or, if you specify "-H", as a
-    hashref). $main::row is also set to the row (always as arrayref), while
+    hashref). $main::row is also set to the row (always as arrayref).
     $main::rownum contains the row number (2 means the first data row).
-    $main::field_idxs is also available for additional information.
+    $main::csv is the Text::CSV_XS object. $main::field_idxs is also
+    available for additional information.
 
     Your code is then free to return a string based on some operation
     against these data. This utility will then print out the resulting
@@ -550,7 +639,7 @@ FUNCTIONS
 
         Whether to make sure each string ends with newline.
 
-    *   eval* => *str*
+    *   eval* => *str|code*
 
         Perl code.
 
@@ -594,15 +683,16 @@ FUNCTIONS
 
     Perl code (-e) will be called for each row (excluding the header row)
     and $_ will contain the value of the field, and the Perl code is
-    expected to modify it. $main::row will contain the current row array and
+    expected to modify it. $main::row will contain the current row array.
     $main::rownum contains the row number (2 means the first data row).
-    $main::field_idxs is also available for additional information.
+    $main::csv is the Text::CSV_XS object. $main::field_idxs is also
+    available for additional information.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   eval* => *str*
+    *   eval* => *str|code*
 
         Perl code to do munging.
 
@@ -773,12 +863,147 @@ FUNCTIONS
 
     Return value: (any)
 
+  csv_setop
+    Usage:
+
+     csv_setop(%args) -> [status, msg, payload, meta]
+
+    Set operation against several CSV files.
+
+    Example input:
+
+     # file1.csv
+     a,b,c
+     1,2,3
+     4,5,6
+     7,8,9
+ 
+     # file2.csv
+     a,b,c
+     1,2,3
+     4,5,7
+     7,8,9
+
+    Output of intersection ("--intersect file1.csv file2.csv"), which will
+    return common rows between the two files:
+
+     a,b,c
+     1,2,3
+     7,8,9
+
+    Output of union ("--union file1.csv file2.csv"), which will return all
+    rows with duplicate removed:
+
+     a,b,c
+     1,2,3
+     4,5,6
+     4,5,7
+     7,8,9
+
+    Output of difference ("--diff file1.csv file2.csv"), which will return
+    all rows in the first file but not in the second:
+
+     a,b,c
+     4,5,6
+
+    Output of symmetric difference ("--symdiff file1.csv file2.csv"), which
+    will return all rows in the first file not in the second, as well as
+    rows in the second not in the first:
+
+     a,b,c
+     4,5,6
+     4,5,7
+
+    You can specify "--compare-fields" to only consider some fields only,
+    for example "--union --compare-fields a,b file1.csv file2.csv":
+
+     a,b,c
+     1,2,3
+     4,5,6
+     7,8,9
+
+    Each field specified in "--compare-fields" can be specified using
+    "F1:F2:..." format to refer to different field names or indexes in each
+    file, for example if "file3.csv" is:
+
+     # file3.csv
+     Ei,Si,Bi
+     1,3,2
+     4,7,5
+     7,9,8
+
+    Then "--union --compare-fields a:Ei,b:Bi file1.csv file3.csv" will
+    result in:
+
+     a,b,c
+     1,2,3
+     4,5,6
+     7,8,9
+
+    Finally you can print out certain fields using "--result-fields".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   compare_fields => *str*
+
+    *   filenames* => *array[filename]*
+
+        Input CSV files.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   ignore_case => *bool*
+
+    *   op* => *str*
+
+        Set operation to perform.
+
+    *   result_fields => *str*
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   csv_sort_fields
     Usage:
 
      csv_sort_fields(%args) -> [status, msg, payload, meta]
 
     Sort CSV fields.
+
+    This utility sorts the order of fields in the CSV. Example input CSV:
+
+     b,c,a
+     1,2,3
+     4,5,6
+
+    Example output CSV:
+
+     a,b,c
+     3,1,2
+     6,4,5
+
+    You can also reverse the sort order ("-r"), sort case-insensitively
+    ("-i"), or provides the ordering, e.g. "--example a,c,b".
 
     This function is not exported.
 
@@ -793,6 +1018,126 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   reverse => *bool*
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_sort_rows
+    Usage:
+
+     csv_sort_rows(%args) -> [status, msg, payload, meta]
+
+    Sort CSV rows.
+
+    This utility sorts the rows in the CSV. Example input CSV:
+
+     name,age
+     Andy,20
+     Dennis,15
+     Ben,30
+     Jerry,30
+
+    Example output CSV (using "--by-fields +age" which means by age
+    numerically and ascending):
+
+     name,age
+     Dennis,15
+     Andy,20
+     Ben,30
+     Jerry,30
+
+    Example output CSV (using "--by-fields -age", which means by age
+    numerically and descending):
+
+     name,age
+     Ben,30
+     Jerry,30
+     Andy,20
+     Dennis,15
+
+    Example output CSV (using "--by-fields name", which means by name
+    ascibetically and ascending):
+
+     name,age
+     Andy,20
+     Ben,30
+     Dennis,15
+     Jerry,30
+
+    Example output CSV (using "--by-fields ~name", which means by name
+    ascibetically and descending):
+
+     name,age
+     Jerry,30
+     Dennis,15
+     Ben,30
+     Andy,20
+
+    Example output CSV (using "--by-fields +age,~name"):
+
+     name,age
+     Dennis,15
+     Andy,20
+     Jerry,30
+     Ben,30
+
+    You can also reverse the sort order ("-r"), sort case-insensitively
+    ("-i"), or provides the code ("--by-code", for example "--by-code
+    '$a->[1] <=> $b->[1] || $b->[0] cmp $a->[0]'" which is equivalent to
+    "--by-fields +age,~name"). If you use "--hash", your code will receive
+    the rows to be compared as hashref, e.g. `--hash --by-code '$a->{age}
+    <=> $b->{age} || $b->{name} cmp $a->{name}'.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   by_code => *str|code*
+
+        Perl code to do sorting.
+
+        $a and $b (or the first and second argument) will contain the two
+        rows to be compared.
+
+    *   by_fields => *str*
+
+        A comma-separated list of field sort specification.
+
+        "+FIELD" to mean sort numerically ascending, "-FIELD" to sort
+        numerically descending, "FIELD" to mean sort ascibetically
+        ascending, "~FIELD" to mean sort ascibetically descending.
+
+    *   ci => *bool*
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   hash => *bool*
+
+        Provide row in $_ as hashref instead of arrayref.
 
     *   header => *bool* (default: 1)
 
@@ -878,6 +1223,8 @@ BUGS
 
 SEE ALSO
     csvgrep.
+
+    setop.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -7,37 +7,58 @@ Anansi::Script::SOAP - Defines the mechanisms specific to handling SOAP.
 
 =head1 SYNOPSIS
 
- my $OBJECT = Anansi::Script::SOAP->new();
+    my $OBJECT = Anansi::Script::SOAP->new();
 
 =head1 DESCRIPTION
 
 This module is designed to be an optional component module for use by the
 L<Anansi::Script> component management module.  It defines the processes
 specific to handling both input and output from Perl scripts that are executed
-by a web server using the Simple Object Access Protocol.  See
-L<Anansi::Component> for inherited methods.
+by a web server using the Simple Object Access Protocol.  Uses
+L<Anansi::ComponentManager> I<(indirectly)>, L<Anansi::ScriptComponent> and
+L<base>.
 
 =cut
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-use base qw(Anansi::Component);
+use base qw(Anansi::ScriptComponent);
 
 use CGI;
 
 
-=head1 METHODS
+=head1 INHERITED METHODS
+
+=cut
+
+
+=head2 addChannel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 channel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 componentManagers
+
+Declared in L<Anansi::Component>.
 
 =cut
 
 
 =head2 finalise
 
- $OBJECT::SUPER->finalise(@_);
+    $OBJECT->SUPER::finalise();
 
-An overridden virtual method called during object destruction.  Not intended to
-be directly called unless overridden by a descendant.
+Declared in L<Anansi::Class>.  Overridden by this module.
 
 =cut
 
@@ -48,12 +69,25 @@ sub finalise {
 }
 
 
+=head2 implicate
+
+Declared in L<Anansi::Class>.  Intended to be overridden by an extending module.
+
+=cut
+
+
+=head2 import
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
 =head2 initialise
 
- $OBJECT::SUPER->initialise(@_);
+    $OBJECT->SUPER::initialise();
 
-An overridden virtual method called during object creation.  Not intended to be
-directly called unless overridden by a descendant.
+Declared in L<Anansi::Class>.  Overridden by this module.
 
 =cut
 
@@ -68,9 +102,42 @@ sub initialise {
 }
 
 
+=head2 old
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 removeChannel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 used
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 uses
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head1 METHODS
+
+=cut
+
+
 =head2 loadParameters
 
- $OBJECT->loadParameters();
+    $OBJECT->loadParameters();
 
 Loads all of the CGI parameters supplied upon page REQUEST.
 
@@ -88,15 +155,11 @@ sub loadParameters {
 
 =head2 medium
 
- my $medium = Anansi::Script::SOAP->medium();
+    my $medium = Anansi::Script::SOAP->medium();
 
- # OR
+    my $medium = $OBJECT->medium();
 
- my $medium = $OBJECT->medium();
-
- # OR
-
- my $medium = $OBJECT->channel('MEDIUM');
+    my $medium = $OBJECT->channel('MEDIUM');
 
 Returns the STRING description of the medium this module is designed to handle.
 
@@ -110,32 +173,22 @@ sub medium {
     return 'SOAP';
 }
 
-Anansi::Component::addChannel('Anansi::Script::SOAP', 'MEDIUM' => 'medium');
+Anansi::ScriptComponent::addChannel('Anansi::Script::SOAP', 'MEDIUM' => 'medium');
 
 
 =head2 parameter
 
- my $parameters = $OBJECT->parameter();
+    my $parameters = $OBJECT->parameter();
 
- # OR
+    my $parameters = $OBJECT->channel('PARAMETER');
 
- my $parameters = $OBJECT->channel('PARAMETER');
+    my $parameterValue = $OBJECT->parameter(undef, 'parameter name');
 
- # OR
+    my $parameterValue = $OBJECT->channel('PARAMETER', 'parameter name');
 
- my $parameterValue = $OBJECT->parameter(undef, 'parameter name');
+    if($OBJECT->parameter(undef, 'parameter name' => 'parameter value', 'another parameter' => undef));
 
- # OR
-
- my $parameterValue = $OBJECT->channel('PARAMETER', 'parameter name');
-
- # OR
-
- if($OBJECT->parameter(undef, 'parameter name' => 'parameter value', 'another parameter' => undef));
-
- # OR
-
- if($OBJECT->channel('PARAMETER', 'parameter name' => 'parameter value', 'another parameter' => undef));
+    if($OBJECT->channel('PARAMETER', 'parameter name' => 'parameter value', 'another parameter' => undef));
 
 Either returns an ARRAY of all the existing parameter names or returns the value
 of a specific parameter or sets the value of one or more parameters.  Assigning
@@ -170,16 +223,46 @@ sub parameter {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::SOAP', 'PARAMETER' => 'parameter');
+Anansi::ScriptComponent::addChannel('Anansi::Script::SOAP', 'PARAMETER' => 'parameter');
+
+
+=head2 priority
+
+    my $priority = Anansi::Script::SOAP->priority();
+
+    my $priority = $OBJECT->priority();
+
+    my $priority = $OBJECT->channel('PRIORITY_OF_VALIDATE');
+
+Returns a hash of the priorities of this script component in relation to other
+script components.  Each priority is represented by a component namespace in the
+form of a key and a value of B<lower>, B<-1> I<(minus one)> or any negative
+value implying this component is of higher priority, B<higher>, B<1> I<(one)> or
+any positive value implying this component is of lower priority or B<same> or
+B<0> I<(zero)> implying this component is of the same priority.
+
+=cut
+
+
+sub priority {
+    my $self = shift(@_);
+    my $channel;
+    $channel = shift(@_) if(0 < scalar(@_));
+    my $priorities = {
+        'Anansi::Script::CGI' => 'lower',
+        'Anansi::Script::Shell' => 'lower',
+    };
+    return $priorities;
+}
+
+Anansi::ScriptComponent::addChannel('Anansi::Script::SOAP', 'PRIORITY_OF_VALIDATE' => 'priority');
 
 
 =head2 validate
 
- my $valid = $OBJECT->validate();
+    my $valid = $OBJECT->validate();
 
- # OR
-
- my $valid = $OBJECT->channel('VALIDATE_AS_APPROPRIATE');
+    my $valid = $OBJECT->channel('VALIDATE_AS_APPROPRIATE');
 
 Determines whether this module is the correct one to use for handling Perl
 script execution.
@@ -193,19 +276,31 @@ sub validate {
     $channel = shift(@_) if(0 < scalar(@_));
     return 0 if(!defined($ENV{'HTTP_HOST'}));
     my $CGI = CGI->new();
-    # Check the HTTP_SOAPACTION environment variable.
-    return 0 if(!defined($CGI->http('SOAPAction')));
+    return 1 if(defined($CGI->http('SOAPAction')));
+    return 0 if(!defined($CGI->http('Content-Type')));
+    return 0 if($CGI->http('Content-Type') !~ /^application\/soap\+xml(;.*)?$/i);
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::SOAP', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+Anansi::ScriptComponent::addChannel('Anansi::Script::SOAP', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+
+
+=head1 NOTES
+
+This module is designed to make it simple, easy and quite fast to code your
+design in perl.  If for any reason you feel that it doesn't achieve these goals
+then please let me know.  I am here to help.  All constructive criticisms are
+also welcomed.
+
+=cut
 
 
 =head1 AUTHOR
 
-Kevin Treleaven <kevin AT treleaven DOT net>
+Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 =cut
 
 
 1;
+

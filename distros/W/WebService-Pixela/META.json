@@ -60,23 +60,23 @@
    "provides" : {
       "WebService::Pixela" : {
          "file" : "lib/WebService/Pixela.pm",
-         "version" : "0.01"
+         "version" : "0.021"
       },
       "WebService::Pixela::Graph" : {
          "file" : "lib/WebService/Pixela/Graph.pm",
-         "version" : "0.01"
+         "version" : "0.021"
       },
       "WebService::Pixela::Pixel" : {
          "file" : "lib/WebService/Pixela/Pixel.pm",
-         "version" : "0.01"
+         "version" : "0.021"
       },
       "WebService::Pixela::User" : {
          "file" : "lib/WebService/Pixela/User.pm",
-         "version" : "0.01"
+         "version" : "0.021"
       },
       "WebService::Pixela::Webhook" : {
          "file" : "lib/WebService/Pixela/Webhook.pm",
-         "version" : "0.01"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -90,8 +90,8 @@
          "web" : "https://github.com/AnaTofuZ/p5-WebService-Pixela"
       }
    },
-   "version" : "0.01",
+   "version" : "0.021",
    "x_authority" : "cpan:ANATOFUZ",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

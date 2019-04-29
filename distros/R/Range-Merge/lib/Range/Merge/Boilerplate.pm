@@ -1,14 +1,15 @@
 #
-# Copyright (C) 2015,2016 J. Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
-package Range::Merge::Boilerplate v0.01.11;
-# ABSTRACT: Generic Boilerplate (copied from JCM::Bootstrap)
-$Range::Merge::Boilerplate::VERSION = '1.003';
+package Range::Merge::Boilerplate;
+# ABSTRACT: Generic Boilerplate (copied from JTM::Bootstrap)
+$Range::Merge::Boilerplate::VERSION = '2.191190';
 
 use v5.22;
 use strict;
+use warnings;
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -19,7 +20,7 @@ use Smart::Comments;
 
 sub import($self, $type='script') {
     ### assert: ($type =~ m/^(?:class|role|script)$/ms)
-    
+
     my $target = caller;
 
     strict->import::into($target);
@@ -63,6 +64,8 @@ sub import($self, $type='script') {
 
     # For "switch" feature
     warnings->unimport::out_of($target, 'experimental::smartmatch');
+
+    return;
 }
 
 1;
@@ -75,22 +78,17 @@ __END__
 
 =head1 NAME
 
-Range::Merge::Boilerplate - Generic Boilerplate (copied from JCM::Bootstrap)
+Range::Merge::Boilerplate - Generic Boilerplate (copied from JTM::Bootstrap)
 
 =head1 VERSION
 
-version 1.003
+version 2.191190
 
 =head1 SYNOPSIS
 
   use Range::Merge::Boilerplate 'script';
 
 =head1 DESCRIPTION
-
-This module serves two purposes.  First, it sets some default imports,
-and turns on the strictures I've come to rely upon.  Secondly, it depends
-on a number of other modules to aid in setting up new environments (I can
-just do a "cpan JCM-Boilerplate" to install everything I need).
 
 This module optionally takes one of two parameters, 'script', 'class',
 or 'role'. If 'script' is specified, the module assumes that you do not
@@ -106,11 +104,11 @@ outside dependencies that may be undesired.
 
 =head1 AUTHOR
 
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by J. Maslak.
+This software is copyright (c) 2016-2019 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

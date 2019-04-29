@@ -110,4 +110,13 @@ like(
 my $system = $arango->database("_system");
 isa_ok($system => "Arango::Tango::Database");
 
+my $db = $arango->create_database('tmp_');  ## Recreate for more tests
+$ans = $arango->list_databases;
+ok grep { /^tmp_$/ } @$ans, "tmp_ database was created";
+
+$db->delete;  ## Delete database using method.
+$ans = $arango->list_databases;
+ok !grep { /^tmp_$/ } @$ans, "tmp_ database was deleted";
+
+
 done_testing;

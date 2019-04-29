@@ -1,17 +1,23 @@
+2.191190  2019-04-28 22:40:07-06:00 MST7MDT
+ Joelle Maslak <jmaslak@antelope.net>
+ * Add merge_discrete() for simple list of integers
+ * Satisfy Kwality
+ * Update coding standards
+
 1.003 - Aug 18, 2017
-J. Maslak <jmaslak@antelope.net>
+ Joelle Maslak <jmaslak@antelope.net>
  * Change to copyright notice
 
 1.002 - Sept 5, 2016
-J. Maslak <jmaslak@antelope.net>
+ Joelle Maslak <jmaslak@antelope.net>
  * Corrections to documentation
 
 1.001 - Sept 5, 2016
-J. Maslak <jmaslak@antelope.net>
+ Joelle Maslak <jmaslak@antelope.net>
  * Only run full BGP tests as an author test - these tests were failing
    on limited platforms within CPAN Testers because of CPU demands.
  * There are no functional changes in this version
 
 1.000 - Sept 4, 2016
-J. Maslak <jmaslak@antelope.net>
+ Joelle Maslak <jmaslak@antelope.net>
  * Initial version

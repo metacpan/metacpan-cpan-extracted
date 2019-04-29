@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2019-04-29'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,6 +33,12 @@ sub _get_csv_row {
     my $status = $csv->combine(@$row)
         or die "Error in line $i: ".$csv->error_input."\n";
     $csv->string . "\n";
+}
+
+sub _instantiate_parser_default {
+    require Text::CSV_XS;
+
+    Text::CSV_XS->new({binary=>1});
 }
 
 sub _instantiate_parser {
@@ -156,7 +162,7 @@ our %arg_filenames_0 = (
         schema => ['array*', of=>'filename*'],
         req => 1,
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         cmdline_aliases => {f=>{}},
     },
 );
@@ -190,7 +196,7 @@ our %arg_fields_1 = (
         cmdline_aliases => { F=>{} },
         req => 1,
         pos => 1,
-        greedy => 1,
+        slurpy => 1,
         element_completion => \&_complete_field,
     },
 );
@@ -202,7 +208,7 @@ our %arg_fields_or_field_pat = (
         schema => ['array*', of=>'str*'],
         cmdline_aliases => { F=>{} },
         pos => 1,
-        greedy => 1,
+        slurpy => 1,
         element_completion => \&_complete_field,
     },
     field_pat => {
@@ -214,14 +220,47 @@ our %arg_fields_or_field_pat = (
 our %arg_eval_2 = (
     eval => {
         summary => 'Perl code to do munging',
-        schema => 'str*',
+        schema => ['any*', of=>['str*', 'code*']],
         cmdline_aliases => { e=>{} },
         req => 1,
         pos => 2,
     },
 );
 
-our %args_sort = (
+our %args_sort_rows_short = (
+    reverse => {
+        schema => ['bool', is=>1],
+        cmdline_aliases => {r=>{}},
+    },
+    ci => {
+        schema => ['bool', is=>1],
+        cmdline_aliases => {i=>{}},
+    },
+    by_fields => {
+        summary => 'A comma-separated list of field sort specification',
+        description => <<'_',
+
+`+FIELD` to mean sort numerically ascending, `-FIELD` to sort numerically
+descending, `FIELD` to mean sort ascibetically ascending, `~FIELD` to mean sort
+ascibetically descending.
+
+_
+        schema => ['str*'],
+        #completion => \&_complete_sort_field_list,
+    },
+    by_code => {
+        summary => 'Perl code to do sorting',
+        description => <<'_',
+
+`$a` and `$b` (or the first and second argument) will contain the two rows to be
+compared.
+
+_
+        schema => ['any*', of=>['str*', 'code*']],
+    },
+);
+
+our %args_sort_fields = (
     sort_reverse => {
         schema => ['bool', is=>1],
     },
@@ -234,7 +273,7 @@ our %args_sort = (
     },
 );
 
-our %args_sort_short = (
+our %args_sort_fields_short = (
     reverse => {
         schema => ['bool', is=>1],
         cmdline_aliases => {r=>{}},
@@ -260,7 +299,7 @@ our %arg_with_data_rows = (
 our %arg_eval = (
     eval => {
         summary => 'Perl code',
-        schema => 'str*',
+        schema => ['any*', of=>['str*', 'code*']],
         cmdline_aliases => { e=>{} },
         req => 1,
     },
@@ -286,7 +325,8 @@ $SPEC{csvutil} = {
                 'list-field-names',
                 'delete-field',
                 'munge-field',
-                'replace-newline',
+                #'replace-newline', # not implemented in csvutil
+                'sort-rows',
                 'sort-fields',
                 'sum',
                 'avg',
@@ -295,9 +335,11 @@ $SPEC{csvutil} = {
                 'map',
                 'each-row',
                 'convert-to-hash',
-                'concat',
+                #'concat', # not implemented in csvutil
                 'select-fields',
                 'dump',
+                #'setop', # not implemented in csvutil
+                #'lookup-fields', # not implemented in csvutil
             ]],
             req => 1,
             pos => 0,
@@ -409,6 +451,7 @@ sub csvutil {
             }
             if ($action eq 'grep') {
             } elsif ($action eq 'map') {
+            } elsif ($action eq 'sort-rows') {
             } elsif ($action eq 'each-row') {
             }
         } # if i==1 (header row)
@@ -428,6 +471,7 @@ sub csvutil {
                     local $_ = $row->[$field_idx];
                     local $main::row = $row;
                     local $main::rownum = $i;
+                    local $main::csv = $csv;
                     local $main::field_idxs = \%field_idxs;
                     eval { $code->($_) };
                     die "Error while munging row ".
@@ -482,6 +526,8 @@ sub csvutil {
                     local $_;
                     local $main::row = $row;
                     local $main::rownum = $i;
+                    local $main::csv = $csv;
+                    local $main::field_idxs = \%field_idxs;
                     eval { $_ = $code->() };
                     die "Error while adding field '$args{field}' for row #$i: $@\n"
                         if $@;
@@ -578,6 +624,7 @@ sub csvutil {
                 local $_ = $args{hash} ? $rowhash : $row;
                 local $main::row = $row;
                 local $main::rownum = $i;
+                local $main::csv = $csv;
                 local $main::field_idxs = \%field_idxs;
                 $code->($row);
             }) {
@@ -599,6 +646,7 @@ sub csvutil {
                     local $_ = $args{hash} ? $rowhash : $row;
                     local $main::row = $row;
                     local $main::rownum = $i;
+                    local $main::csv = $csv;
                     local $main::field_idxs = \%field_idxs;
                     $code->($row);
                 } // '';
@@ -609,6 +657,8 @@ sub csvutil {
                     $res .= $rowres;
                 }
             }
+        } elsif ($action eq 'sort-rows') {
+            push @$rows, $row unless $i == 1;
         } elsif ($action eq 'convert-to-hash') {
             if ($i == $args{_row_number}) {
                 $selected_row = $row;
@@ -655,6 +705,77 @@ sub csvutil {
         return [200, "OK", $rows];
     }
 
+    if ($action eq 'sort-rows') {
+        if ($args{sort_by_code}) {
+            my $code0 = _compile($args{sort_by_code});
+            if ($args{hash}) {
+                $code = sub {
+                    my $rowhash_a = {};
+                    my $rowhash_b = {};
+                    for (0..$#{$fields}) {
+                        $rowhash_a->{ $fields->[$_] } = $a->[$_];
+                        $rowhash_b->{ $fields->[$_] } = $b->[$_];
+                    }
+                    local $main::a = $rowhash_a;
+                    local $main::b = $rowhash_b;
+                    $code0->($a, $b);
+                };
+            } else {
+                $code = $code0;
+            }
+        } elsif ($args{sort_by_fields}) {
+            my @fields;
+            my $code_str = "";
+            for my $field_spec (split /,/, $args{sort_by_fields}) {
+                my ($prefix, $field) = $field_spec =~ /\A([+~-]?)(.+)/;
+                my $field_idx = $field_idxs{$field};
+                return [400, "Unknown field '$field'"]
+                    unless defined $field_idx;
+                $prefix //= "";
+                if ($prefix eq '+') {
+                    $code_str .= ($code_str ? " || " : "") .
+                        "(\$a->[$field_idx] <=> \$b->[$field_idx])";
+                } elsif ($prefix eq '-') {
+                    $code_str .= ($code_str ? " || " : "") .
+                        "(\$b->[$field_idx] <=> \$a->[$field_idx])";
+                } elsif ($prefix eq '') {
+                    if ($args{sort_ci}) {
+                        $code_str .= ($code_str ? " || " : "") .
+                            "(lc(\$a->[$field_idx]) cmp lc(\$b->[$field_idx]))";
+                    } else {
+                        $code_str .= ($code_str ? " || " : "") .
+                            "(\$a->[$field_idx] cmp \$b->[$field_idx])";
+                    }
+                } elsif ($prefix eq '~') {
+                    if ($args{sort_ci}) {
+                        $code_str .= ($code_str ? " || " : "") .
+                            "(lc(\$b->[$field_idx]) cmp lc(\$a->[$field_idx]))";
+                    } else {
+                        $code_str .= ($code_str ? " || " : "") .
+                            "(\$b->[$field_idx] cmp \$a->[$field_idx])";
+                    }
+                }
+            }
+            $code = _compile($code_str);
+        } else {
+            return [400, "Please specify by_fields or by_code"];
+        }
+
+        @$rows = sort {
+            local $main::a = $a;
+            local $main::b = $b;
+            $code->($a, $b);
+        } @$rows;
+
+        if ($has_header) {
+            $csv->combine(@$fields);
+            $res .= $csv->string . "\n";
+        }
+        for my $row (@$rows) {
+            $res .= _get_csv_row($csv, $row, $i, $has_header);
+        }
+    }
+
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
 } # csvutil
 
@@ -665,9 +786,9 @@ $SPEC{csv_add_field} = {
 
 Your Perl code (-e) will be called for each row (excluding the header row) and
 should return the value for the new field. `$main::row` is available and
-contains the current row, while `$main::rownum` contains the row number (2 means
-the first data row). `$main::field_idxs` is also available for additional
-information.
+contains the current row. `$main::rownum` contains the row number (2 means the
+first data row). `$csv` is the <pm:Text::CSV_XS> object. `$main::field_idxs` is
+also available for additional information.
 
 Field by default will be added as the last field, unless you specify one of
 `--after` (to put after a certain field), `--before` (to put before a certain
@@ -741,9 +862,9 @@ $SPEC{csv_munge_field} = {
 
 Perl code (-e) will be called for each row (excluding the header row) and `$_`
 will contain the value of the field, and the Perl code is expected to modify it.
-`$main::row` will contain the current row array and `$main::rownum` contains the
-row number (2 means the first data row). `$main::field_idxs` is also available
-for additional information.
+`$main::row` will contain the current row array. `$main::rownum` contains the
+row number (2 means the first data row). `$main::csv` is the <pm:Text::CSV_XS>
+object. `$main::field_idxs` is also available for additional information.
 
 _
     args => {
@@ -807,13 +928,121 @@ sub csv_replace_newline {
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
 }
 
-$SPEC{csv_sort_fields} = {
+$SPEC{csv_sort_rows} = {
     v => 1.1,
-    summary => 'Sort CSV fields',
+    summary => 'Sort CSV rows',
+    description => <<'_',
+
+This utility sorts the rows in the CSV. Example input CSV:
+
+    name,age
+    Andy,20
+    Dennis,15
+    Ben,30
+    Jerry,30
+
+Example output CSV (using `--by-fields +age` which means by age numerically and
+ascending):
+
+    name,age
+    Dennis,15
+    Andy,20
+    Ben,30
+    Jerry,30
+
+Example output CSV (using `--by-fields -age`, which means by age numerically and
+descending):
+
+    name,age
+    Ben,30
+    Jerry,30
+    Andy,20
+    Dennis,15
+
+Example output CSV (using `--by-fields name`, which means by name ascibetically
+and ascending):
+
+    name,age
+    Andy,20
+    Ben,30
+    Dennis,15
+    Jerry,30
+
+Example output CSV (using `--by-fields ~name`, which means by name ascibetically
+and descending):
+
+    name,age
+    Jerry,30
+    Dennis,15
+    Ben,30
+    Andy,20
+
+Example output CSV (using `--by-fields +age,~name`):
+
+    name,age
+    Dennis,15
+    Andy,20
+    Jerry,30
+    Ben,30
+
+You can also reverse the sort order (`-r`), sort case-insensitively (`-i`), or
+provides the code (`--by-code`, for example `--by-code '$a->[1] <=> $b->[1] ||
+$b->[0] cmp $a->[0]'` which is equivalent to `--by-fields +age,~name`). If you
+use `--hash`, your code will receive the rows to be compared as hashref, e.g.
+`--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+
+_
     args => {
         %args_common,
         %arg_filename_0,
-        %args_sort_short,
+        %args_sort_rows_short,
+        %arg_hash,
+    },
+    args_rels => {
+        req_one => ['by_fields', 'by_code'],
+    },
+};
+sub csv_sort_rows {
+    my %args = @_;
+
+    my %csvutil_args = (
+        filename => $args{filename},
+        action => 'sort-rows',
+        sort_by_fields => $args{by_fields},
+        sort_by_code   => $args{by_code},
+        sort_reverse => $args{reverse},
+        sort_ci => $args{ci},
+        hash => $args{hash},
+    );
+
+    csvutil(%csvutil_args);
+}
+
+$SPEC{csv_sort_fields} = {
+    v => 1.1,
+    summary => 'Sort CSV fields',
+    description => <<'_',
+
+This utility sorts the order of fields in the CSV. Example input CSV:
+
+    b,c,a
+    1,2,3
+    4,5,6
+
+Example output CSV:
+
+    a,b,c
+    3,1,2
+    6,4,5
+
+You can also reverse the sort order (`-r`), sort case-insensitively (`-i`), or
+provides the ordering, e.g. `--example a,c,b`.
+
+_
+    args => {
+        %args_common,
+        %arg_filename_0,
+        %args_sort_fields_short,
     },
 };
 sub csv_sort_fields {
@@ -888,9 +1117,10 @@ $SPEC{csv_grep} = {
 
 This is like Perl's `grep` performed over rows of CSV. In `$_`, your Perl code
 will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
-`$main::row` is also set to the row (always as arrayref), while `$main::rownum`
-contains the row number (2 means the first data row). `$main::field_idxs` is
-also available for additional information.
+`$main::row` is also set to the row (always as arrayref). `$main::rownum`
+contains the row number (2 means the first data row). `$main::csv` is the
+<pm:Text::CSV_XS> object. `$main::field_idxs` is also available for additional
+information.
 
 Your code is then free to return true or false based on some criteria. Only rows
 where Perl expression returns true will be included in the result.
@@ -934,9 +1164,10 @@ $SPEC{csv_map} = {
 
 This is like Perl's `map` performed over rows of CSV. In `$_`, your Perl code
 will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
-`$main::row` is also set to the row (always as arrayref), while `$main::rownum`
-contains the row number (2 means the first data row). `$main::field_idxs` is
-also available for additional information.
+`$main::row` is also set to the row (always as arrayref). `$main::rownum`
+contains the row number (2 means the first data row). `$main::csv` is the
+<pm:Text::CSV_XS> object. `$main::field_idxs` is also available for additional
+information.
 
 Your code is then free to return a string based on some operation against these
 data. This utility will then print out the resulting string.
@@ -999,7 +1230,7 @@ _
 sub csv_each_row {
     my %args = @_;
 
-    csvutil(%args, action=>'each_row');
+    csvutil(%args, action=>'each-row');
 }
 
 $SPEC{csv_convert_to_hash} = {
@@ -1099,7 +1330,7 @@ sub csv_concat {
 
     my $num_fields = keys %res_field_idxs;
     my $res = "";
-    my $csv = _instantiate_parser(\%args);
+    my $csv = _instantiate_parser_default();
 
     # generate header
     my $status = $csv->combine(
@@ -1150,6 +1381,549 @@ sub csv_dump {
     csvutil(%args, action=>'dump');
 }
 
+$SPEC{csv_setop} = {
+    v => 1.1,
+    summary => 'Set operation against several CSV files',
+    description => <<'_',
+
+Example input:
+
+    # file1.csv
+    a,b,c
+    1,2,3
+    4,5,6
+    7,8,9
+
+    # file2.csv
+    a,b,c
+    1,2,3
+    4,5,7
+    7,8,9
+
+Output of intersection (`--intersect file1.csv file2.csv`), which will return
+common rows between the two files:
+
+    a,b,c
+    1,2,3
+    7,8,9
+
+Output of union (`--union file1.csv file2.csv`), which will return all rows with
+duplicate removed:
+
+    a,b,c
+    1,2,3
+    4,5,6
+    4,5,7
+    7,8,9
+
+Output of difference (`--diff file1.csv file2.csv`), which will return all rows
+in the first file but not in the second:
+
+    a,b,c
+    4,5,6
+
+Output of symmetric difference (`--symdiff file1.csv file2.csv`), which will
+return all rows in the first file not in the second, as well as rows in the
+second not in the first:
+
+    a,b,c
+    4,5,6
+    4,5,7
+
+You can specify `--compare-fields` to only consider some fields only, for
+example `--union --compare-fields a,b file1.csv file2.csv`:
+
+    a,b,c
+    1,2,3
+    4,5,6
+    7,8,9
+
+Each field specified in `--compare-fields` can be specified using `F1:F2:...`
+format to refer to different field names or indexes in each file, for example if
+`file3.csv` is:
+
+    # file3.csv
+    Ei,Si,Bi
+    1,3,2
+    4,7,5
+    7,9,8
+
+Then `--union --compare-fields a:Ei,b:Bi file1.csv file3.csv` will result in:
+
+    a,b,c
+    1,2,3
+    4,5,6
+    7,8,9
+
+Finally you can print out certain fields using `--result-fields`.
+
+_
+    args => {
+        %args_common,
+        %arg_filenames_0,
+        op => {
+            summary => 'Set operation to perform',
+            schema => ['str*', in=>[qw/intersect union diff symdiff/]],
+            req => 1,
+            cmdline_aliases => {
+                intersect   => {is_flag=>1, summary=>'Shortcut for --op=intersect', code=>sub{ $_[0]{op} = 'intersect' }},
+                union       => {is_flag=>1, summary=>'Shortcut for --op=union'    , code=>sub{ $_[0]{op} = 'union'     }},
+                diff        => {is_flag=>1, summary=>'Shortcut for --op=diff'     , code=>sub{ $_[0]{op} = 'diff'      }},
+                symdiff     => {is_flag=>1, summary=>'Shortcut for --op=symdiff'  , code=>sub{ $_[0]{op} = 'symdiff'   }},
+            },
+        },
+        ignore_case => {
+            schema => 'bool*',
+            cmdline_aliases => {i=>{}},
+        },
+        compare_fields => {
+            schema => ['str*'],
+        },
+        result_fields => {
+            schema => ['str*'],
+        },
+    },
+    links => [
+        {url=>'prog:setop'},
+    ],
+};
+sub csv_setop {
+    require Tie::IxHash;
+
+    my %args = @_;
+
+    my $op = $args{op};
+    my $ci = $args{ignore_case};
+    my $num_files = @{ $args{filenames} };
+
+    unless ($op ne 'cross' || $num_files > 1) {
+        return [400, "Please specify at least 2 input files for cross"];
+    }
+    unless ($num_files >= 1) {
+        return [400, "Please specify at least 1 input file"];
+    }
+
+    my @all_data_rows;   # elem=rows, one elem for each input file
+    my @all_field_idxs;  # elem=field_idxs (hash, key=column name, val=index)
+    my @all_field_names; # elem=[field1,field2,...] for 1st file, ...
+
+    # read all csv
+    for my $filename (@{ $args{filenames} }) {
+        my $csv = _instantiate_parser(\%args);
+        open my($fh), "<:encoding(utf8)", $filename or
+            return [500, "Can't open input filename '$filename': $!"];
+        my $i = 0;
+        my @data_rows;
+        my $field_idxs = {};
+        while (my $row = $csv->getline($fh)) {
+            $i++;
+            if ($i == 1) {
+                if ($args{header} // 1) {
+                    my $fields = $row;
+                    for my $field (@$fields) {
+                        unless (exists $field_idxs->{$field}) {
+                            $field_idxs->{$field} = keys(%$field_idxs);
+                        }
+                    }
+                    push @all_field_names, $fields;
+                    push @all_field_idxs, $field_idxs;
+                    next;
+                } else {
+                    my $fields = [];
+                    for (1..@$row) {
+                        $field_idxs->{"field$_"} = $_-1;
+                        push @$fields, "field$_";
+                    }
+                    push @all_field_names, $fields;
+                    push @all_field_idxs, $field_idxs;
+                }
+            }
+            push @data_rows, $row;
+        }
+        push @all_data_rows, \@data_rows;
+    } # for each filename
+
+    my @compare_fields; # elem = [fieldname-for-file1, fieldname-for-file2, ...]
+    if (defined $args{compare_fields}) {
+        my @ff = ref($args{compare_fields}) eq 'ARRAY' ?
+            @{$args{compare_fields}} : split(/,/, $args{compare_fields});
+        for my $field_idx (0..$#ff) {
+            my @ff2 = split /:/, $ff[$field_idx];
+            for (@ff2+1 .. $num_files) {
+                push @ff2, $ff2[0];
+            }
+            $compare_fields[$field_idx] = \@ff2;
+        }
+    } else {
+        for my $field_idx (0..$#{ $all_field_names[0] }) {
+            $compare_fields[$field_idx] = [
+                map { $all_field_names[0][$field_idx] } 0..$num_files-1];
+        }
+    }
+
+    my @result_fields; # elem = fieldname, ...
+    if (defined $args{result_fields}) {
+        @result_fields = ref($args{result_fields}) eq 'ARRAY' ?
+            @{$args{result_fields}} : split(/,/, $args{result_fields});
+    } else {
+        @result_fields = @{ $all_field_names[0] };
+    }
+
+    tie my(%res), 'Tie::IxHash';
+    my $res = "";
+
+    my $code_get_compare_key = sub {
+        my ($file_idx, $row_idx) = @_;
+        my $row   = $all_data_rows[$file_idx][$row_idx];
+        my $key = join "|", map {
+            my $field = $compare_fields[$_][$file_idx];
+            my $field_idx = $all_field_idxs[$file_idx]{$field};
+            my $val = defined $field_idx ? $row->[$field_idx] : "";
+            $val = uc $val if $ci;
+            $val;
+        } 0..$#compare_fields;
+        #say "D:compare_key($file_idx, $row_idx)=<$key>";
+        $key;
+    };
+
+    my $csv = _instantiate_parser_default();
+    my $code_format_result_row = sub {
+        my ($file_idx, $row) = @_;
+        my @res_row = map {
+            my $field = $result_fields[$_];
+            my $field_idx = $all_field_idxs[$file_idx]{$field};
+            defined $field_idx ? $row->[$field_idx] : "";
+        } 0..$#result_fields;
+        $csv->combine(@res_row);
+        $csv->string . "\n";
+    };
+
+    if ($op eq 'intersect') {
+        for my $file_idx (0..$num_files-1) {
+            if ($file_idx == 0) {
+                for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                    my $key = $code_get_compare_key->($file_idx, $row_idx);
+                    $res{$key} //= [1, $row_idx]; # [num_of_occurrence, row_idx]
+                }
+            } else {
+                for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                    my $key = $code_get_compare_key->($file_idx, $row_idx);
+                    if ($res{$key} && $res{$key}[0] == $file_idx) {
+                        $res{$key}[0]++;
+                    }
+                }
+            }
+
+            # build result
+            if ($file_idx == $num_files-1) {
+                #use DD; dd \%res;
+                $csv->combine(@result_fields);
+                $res .= $csv->string . "\n";
+                for my $key (keys %res) {
+                    $res .= $code_format_result_row->(
+                        0, $all_data_rows[0][$res{$key}[1]])
+                        if $res{$key}[0] == $num_files;
+                }
+            }
+        } # for file_idx
+
+    } elsif ($op eq 'union') {
+        $csv->combine(@result_fields);
+        $res .= $csv->string . "\n";
+
+        for my $file_idx (0..$num_files-1) {
+            for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                my $key = $code_get_compare_key->($file_idx, $row_idx);
+                next if $res{$key}++;
+                my $row = $all_data_rows[$file_idx][$row_idx];
+                $res .= $code_format_result_row->($file_idx, $row);
+            }
+        } # for file_idx
+
+    } elsif ($op eq 'diff') {
+        for my $file_idx (0..$num_files-1) {
+            if ($file_idx == 0) {
+                for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                    my $key = $code_get_compare_key->($file_idx, $row_idx);
+                    $res{$key} //= [$file_idx, $row_idx];
+                }
+            } else {
+                for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                    my $key = $code_get_compare_key->($file_idx, $row_idx);
+                    delete $res{$key};
+                }
+            }
+
+            # build result
+            if ($file_idx == $num_files-1) {
+                $csv->combine(@result_fields);
+                $res .= $csv->string . "\n";
+                for my $key (keys %res) {
+                    my ($file_idx, $row_idx) = @{ $res{$key} };
+                    $res .= $code_format_result_row->(
+                        0, $all_data_rows[$file_idx][$row_idx]);
+                }
+            }
+        } # for file_idx
+
+    } elsif ($op eq 'symdiff') {
+        for my $file_idx (0..$num_files-1) {
+            if ($file_idx == 0) {
+                for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                    my $key = $code_get_compare_key->($file_idx, $row_idx);
+                    $res{$key} //= [1, $file_idx, $row_idx];  # [num_of_occurrence, file_idx, row_idx]
+                }
+            } else {
+                for my $row_idx (0..$#{ $all_data_rows[$file_idx] }) {
+                    my $key = $code_get_compare_key->($file_idx, $row_idx);
+                    if (!$res{$key}) {
+                        $res{$key} = [1, $file_idx, $row_idx];
+                    } else {
+                        $res{$key}[0]++;
+                    }
+                }
+            }
+
+            # build result
+            if ($file_idx == $num_files-1) {
+                $csv->combine(@result_fields);
+                $res .= $csv->string . "\n";
+                for my $key (keys %res) {
+                    my ($num_occur, $file_idx, $row_idx) = @{ $res{$key} };
+                    $res .= $code_format_result_row->(
+                        0, $all_data_rows[$file_idx][$row_idx])
+                        if $num_occur == 1;
+                }
+            }
+        } # for file_idx
+
+    } else {
+        return [400, "Unknown/unimplemented op '$op'"];
+    }
+
+    #use DD; dd +{
+    #    compare_fields => \@compare_fields,
+    #    result_fields => \@result_fields,
+    #    all_field_idxs=>\@all_field_idxs,
+    #    all_data_rows=>\@all_data_rows,
+    #};
+
+    [200, "OK", $res, {"cmdline.skip_format"=>1}];
+}
+
+$SPEC{csv_lookup_fields} = {
+    v => 1.1,
+    summary => 'Fill fields of a CSV file from another',
+    description => <<'_',
+
+Example input:
+
+    # report.csv
+    client_id,followup_staff,followup_note,client_email,client_phone
+    101,Jerry,not renewing,
+    299,Jerry,still thinking over,
+    734,Elaine,renewing,
+
+    # clients.csv
+    id,name,email,phone
+    101,Andy,andy@example.com,555-2983
+    102,Bob,bob@acme.example.com,555-2523
+    299,Cindy,cindy@example.com,555-7892
+    400,Derek,derek@example.com,555-9018
+    701,Edward,edward@example.com,555-5833
+    734,Felipe,felipe@example.com,555-9067
+
+To fill up the `client_email` and `client_phone` fields of `report.csv` from
+`clients.csv`, we can use: `--lookup-fields client_id:id --fill-fields
+client_email:email,client_phone:phone`. The result will be:
+
+    client_id,followup_staff,followup_note,client_email,client_phone
+    101,Jerry,not renewing,andy@example.com,555-2983
+    299,Jerry,still thinking over,cindy@example.com,555-7892
+    734,Elaine,renewing,felipe@example.com,555-9067
+
+_
+    args => {
+        %args_common,
+        target => {
+            summary => 'CSV file to fill fields of',
+            schema => 'filename*',
+            req => 1,
+            pos => 0,
+        },
+        source => {
+            summary => 'CSV file to lookup values from',
+            schema => 'filename*',
+            req => 1,
+            pos => 1,
+        },
+        ignore_case => {
+            schema => 'bool*',
+            cmdline_aliases => {i=>{}},
+        },
+        fill_fields => {
+            schema => ['str*'],
+            req => 1,
+        },
+        lookup_fields => {
+            schema => ['str*'],
+            req => 1,
+        },
+        count => {
+            summary => 'Do not output rows, just report the number of rows filled',
+            schema => 'bool*',
+            cmdline_aliases => {c=>{}},
+        },
+    },
+};
+sub csv_lookup_fields {
+    my %args = @_;
+
+    my $op = $args{op};
+    my $ci = $args{ignore_case};
+
+    my @lookup_fields; # elem = [fieldname-in-target, fieldname-in-source]
+    {
+        my @ff = ref($args{lookup_fields}) eq 'ARRAY' ?
+            @{$args{lookup_fields}} : split(/,/, $args{lookup_fields});
+        for my $field_idx (0..$#ff) {
+            my @ff2 = split /:/, $ff[$field_idx], 2;
+            if (@ff2 < 2) {
+                $ff2[1] = $ff2[0];
+            }
+            $lookup_fields[$field_idx] = \@ff2;
+        }
+    }
+
+    my %fill_fields; # key=fieldname-in-target, val=fieldname-in-source
+    {
+        my @ff = ref($args{fill_fields}) eq 'ARRAY' ?
+            @{$args{fill_fields}} : split(/,/, $args{fill_fields});
+        for my $field_idx (0..$#ff) {
+            my @ff2 = split /:/, $ff[$field_idx], 2;
+            if (@ff2 < 2) {
+                $ff2[1] = $ff2[0];
+            }
+            $fill_fields{ $ff2[0] } = $ff2[1];
+        }
+    }
+
+    # read source csv
+    my @source_data_rows;
+    my %source_field_idxs;
+    my @source_field_names;
+    {
+        my $csv = _instantiate_parser(\%args);
+        open my($fh), "<:encoding(utf8)", $args{source} or
+            return [500, "Can't open '$args{source}': $!"];
+        my $i = 0;
+        while (my $row = $csv->getline($fh)) {
+            $i++;
+            if ($i == 1) {
+                if ($args{header} // 1) {
+                    @source_field_names = @$row;
+                    for my $field (@source_field_names) {
+                        unless (exists $source_field_idxs{$field}) {
+                            $source_field_idxs{$field} = keys(%source_field_idxs);
+                        }
+                    }
+                    next;
+                } else {
+                    for (1..@$row) {
+                        $source_field_idxs{"field$_"} = $_-1;
+                        push @source_field_names, "field$_";
+                    }
+                }
+            }
+            push @source_data_rows, $row;
+        }
+    }
+
+    # build lookup table
+    my %lookup_table; # key = joined lookup fields, val = source row idx
+    for my $row_idx (0..$#{source_data_rows}) {
+        my $row = $source_data_rows[$row_idx];
+        my $key = join "|", map {
+            my $field = $lookup_fields[$_][1];
+            my $field_idx = $source_field_idxs{$field};
+            my $val = defined $field_idx ? $row->[$field_idx] : "";
+            $val = lc $val if $ci;
+            $val;
+        } 0..$#lookup_fields;
+        $lookup_table{$key} //= $row_idx;
+    }
+    #use DD; dd { lookup_fields=>\@lookup_fields, fill_fields=>\%fill_fields, lookup_table=>\%lookup_table };
+
+    # fill target csv
+    my $res = "";
+    my @target_field_names;
+    my %target_field_idxs;
+    my $num_filled = 0;
+    {
+        my $csv_out = _instantiate_parser_default();
+        my $csv = _instantiate_parser(\%args);
+        open my($fh), "<:encoding(utf8)", $args{target} or
+            return [500, "Can't open '$args{target}': $!"];
+        my $i = 0;
+        while (my $row = $csv->getline($fh)) {
+            $i++;
+            if ($i == 1) {
+                if ($args{header} // 1) {
+                    $csv_out->combine(@$row);
+                    $res .= $csv_out->string . "\n";
+                    @target_field_names = @$row;
+                    for my $field (@target_field_names) {
+                        unless (exists $target_field_idxs{$field}) {
+                            $target_field_idxs{$field} = keys(%target_field_idxs);
+                        }
+                    }
+                    next;
+                } else {
+                    for (1..@$row) {
+                        $target_field_idxs{"field$_"} = $_-1;
+                        push @target_field_names, "field$_";
+                    }
+                }
+            }
+
+            my $key = join "|", map {
+                my $field = $lookup_fields[$_][0];
+                my $field_idx = $target_field_idxs{$field};
+                my $val = defined $field_idx ? $row->[$field_idx] : "";
+                $val = lc $val if $ci;
+                $val;
+            } 0..$#lookup_fields;
+
+            #say "D:looking up '$key' ...";
+            if (defined(my $row_idx = $lookup_table{$key})) {
+                #say "  D:found";
+                my $row_filled;
+                my $source_row = $source_data_rows[$row_idx];
+                for my $field (keys %fill_fields) {
+                    my $target_field_idx = $target_field_idxs{$field};
+                    next unless defined $target_field_idx;
+                    my $source_field_idx = $source_field_idxs{ $fill_fields{$field} };
+                    next unless defined $source_field_idx;
+                    $row->[$target_field_idx] =
+                        $source_row->[$source_field_idx];
+                    $row_filled++;
+                }
+                $num_filled++ if $row_filled;
+            }
+            $csv_out->combine(@$row);
+            unless ($args{count}) {
+                $res .= $csv_out->string . "\n";
+            }
+        }
+    }
+
+    if ($args{count}) {
+        [200, "OK", $num_filled];
+    } else {
+        [200, "OK", $res, {"cmdline.skip_format"=>1}];
+    }
+}
+
 1;
 # ABSTRACT: CLI utilities related to CSV
 
@@ -1165,7 +1939,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.019 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-04-23.
+This document describes version 0.020 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-04-29.
 
 =head1 DESCRIPTION
 
@@ -1191,6 +1965,8 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv-list-field-names>
 
+=item * L<csv-lookup-fields>
+
 =item * L<csv-map>
 
 =item * L<csv-munge-field>
@@ -1201,7 +1977,13 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv-select-row>
 
+=item * L<csv-setop>
+
+=item * L<csv-sort>
+
 =item * L<csv-sort-fields>
+
+=item * L<csv-sort-rows>
 
 =item * L<csv-sum>
 
@@ -1222,9 +2004,9 @@ Add a field to CSV file.
 
 Your Perl code (-e) will be called for each row (excluding the header row) and
 should return the value for the new field. C<$main::row> is available and
-contains the current row, while C<$main::rownum> contains the row number (2 means
-the first data row). C<$main::field_idxs> is also available for additional
-information.
+contains the current row. C<$main::rownum> contains the row number (2 means the
+first data row). C<$csv> is the L<Text::CSV_XS> object. C<$main::field_idxs> is
+also available for additional information.
 
 Field by default will be added as the last field, unless you specify one of
 C<--after> (to put after a certain field), C<--before> (to put before a certain
@@ -1248,7 +2030,7 @@ Put the new field at specific position (1 means as first field).
 
 Put the new field before specified field.
 
-=item * B<eval>* => I<str>
+=item * B<eval>* => I<str|code>
 
 Perl code to do munging.
 
@@ -1568,7 +2350,7 @@ Examples:
 
  csv_each_row(
    filename => "users.csv",
-   eval => "\"unlink qq(/home/data/\$_->{username}.dat)\"",
+   eval => "unlink qq(/home/data/\$_->{username}.dat)",
    hash => 1
  );
 
@@ -1582,7 +2364,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<eval>* => I<str>
+=item * B<eval>* => I<str|code>
 
 Perl code.
 
@@ -1648,9 +2430,10 @@ Examples:
 
 This is like Perl's C<grep> performed over rows of CSV. In C<$_>, your Perl code
 will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
-C<$main::row> is also set to the row (always as arrayref), while C<$main::rownum>
-contains the row number (2 means the first data row). C<$main::field_idxs> is
-also available for additional information.
+C<$main::row> is also set to the row (always as arrayref). C<$main::rownum>
+contains the row number (2 means the first data row). C<$main::csv> is the
+L<Text::CSV_XS> object. C<$main::field_idxs> is also available for additional
+information.
 
 Your code is then free to return true or false based on some criteria. Only rows
 where Perl expression returns true will be included in the result.
@@ -1661,7 +2444,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<eval>* => I<str>
+=item * B<eval>* => I<str|code>
 
 Perl code.
 
@@ -1743,6 +2526,90 @@ Return value:  (any)
 
 
 
+=head2 csv_lookup_fields
+
+Usage:
+
+ csv_lookup_fields(%args) -> [status, msg, payload, meta]
+
+Fill fields of a CSV file from another.
+
+Example input:
+
+ # report.csv
+ client_id,followup_staff,followup_note,client_email,client_phone
+ 101,Jerry,not renewing,
+ 299,Jerry,still thinking over,
+ 734,Elaine,renewing,
+ 
+ # clients.csv
+ id,name,email,phone
+ 101,Andy,andy@example.com,555-2983
+ 102,Bob,bob@acme.example.com,555-2523
+ 299,Cindy,cindy@example.com,555-7892
+ 400,Derek,derek@example.com,555-9018
+ 701,Edward,edward@example.com,555-5833
+ 734,Felipe,felipe@example.com,555-9067
+
+To fill up the C<client_email> and C<client_phone> fields of C<report.csv> from
+C<clients.csv>, we can use: C<--lookup-fields client_id:id --fill-fields
+client_email:email,client_phone:phone>. The result will be:
+
+ client_id,followup_staff,followup_note,client_email,client_phone
+ 101,Jerry,not renewing,andy@example.com,555-2983
+ 299,Jerry,still thinking over,cindy@example.com,555-7892
+ 734,Elaine,renewing,felipe@example.com,555-9067
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<count> => I<bool>
+
+Do not output rows, just report the number of rows filled.
+
+=item * B<fill_fields>* => I<str>
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
+=item * B<ignore_case> => I<bool>
+
+=item * B<lookup_fields>* => I<str>
+
+=item * B<source>* => I<filename>
+
+CSV file to lookup values from.
+
+=item * B<target>* => I<filename>
+
+CSV file to fill fields of.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 csv_map
 
 Usage:
@@ -1759,7 +2626,7 @@ Examples:
 
  csv_map(
    filename => "file.csv",
-   eval => "\"INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});\"",
+   eval => "INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});",
    hash => 1
  );
 
@@ -1767,9 +2634,10 @@ Examples:
 
 This is like Perl's C<map> performed over rows of CSV. In C<$_>, your Perl code
 will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
-C<$main::row> is also set to the row (always as arrayref), while C<$main::rownum>
-contains the row number (2 means the first data row). C<$main::field_idxs> is
-also available for additional information.
+C<$main::row> is also set to the row (always as arrayref). C<$main::rownum>
+contains the row number (2 means the first data row). C<$main::csv> is the
+L<Text::CSV_XS> object. C<$main::field_idxs> is also available for additional
+information.
 
 Your code is then free to return a string based on some operation against these
 data. This utility will then print out the resulting string.
@@ -1784,7 +2652,7 @@ Arguments ('*' denotes required arguments):
 
 Whether to make sure each string ends with newline.
 
-=item * B<eval>* => I<str>
+=item * B<eval>* => I<str|code>
 
 Perl code.
 
@@ -1832,9 +2700,9 @@ Munge a field in every row of CSV file.
 
 Perl code (-e) will be called for each row (excluding the header row) and C<$_>
 will contain the value of the field, and the Perl code is expected to modify it.
-C<$main::row> will contain the current row array and C<$main::rownum> contains the
-row number (2 means the first data row). C<$main::field_idxs> is also available
-for additional information.
+C<$main::row> will contain the current row array. C<$main::rownum> contains the
+row number (2 means the first data row). C<$main::csv> is the L<Text::CSV_XS>
+object. C<$main::field_idxs> is also available for additional information.
 
 This function is not exported.
 
@@ -1842,7 +2710,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<eval>* => I<str>
+=item * B<eval>* => I<str|code>
 
 Perl code to do munging.
 
@@ -2032,6 +2900,131 @@ Return value:  (any)
 
 
 
+=head2 csv_setop
+
+Usage:
+
+ csv_setop(%args) -> [status, msg, payload, meta]
+
+Set operation against several CSV files.
+
+Example input:
+
+ # file1.csv
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 7,8,9
+ 
+ # file2.csv
+ a,b,c
+ 1,2,3
+ 4,5,7
+ 7,8,9
+
+Output of intersection (C<--intersect file1.csv file2.csv>), which will return
+common rows between the two files:
+
+ a,b,c
+ 1,2,3
+ 7,8,9
+
+Output of union (C<--union file1.csv file2.csv>), which will return all rows with
+duplicate removed:
+
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 4,5,7
+ 7,8,9
+
+Output of difference (C<--diff file1.csv file2.csv>), which will return all rows
+in the first file but not in the second:
+
+ a,b,c
+ 4,5,6
+
+Output of symmetric difference (C<--symdiff file1.csv file2.csv>), which will
+return all rows in the first file not in the second, as well as rows in the
+second not in the first:
+
+ a,b,c
+ 4,5,6
+ 4,5,7
+
+You can specify C<--compare-fields> to only consider some fields only, for
+example C<--union --compare-fields a,b file1.csv file2.csv>:
+
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 7,8,9
+
+Each field specified in C<--compare-fields> can be specified using C<F1:F2:...>
+format to refer to different field names or indexes in each file, for example if
+C<file3.csv> is:
+
+ # file3.csv
+ Ei,Si,Bi
+ 1,3,2
+ 4,7,5
+ 7,9,8
+
+Then C<--union --compare-fields a:Ei,b:Bi file1.csv file3.csv> will result in:
+
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 7,8,9
+
+Finally you can print out certain fields using C<--result-fields>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<compare_fields> => I<str>
+
+=item * B<filenames>* => I<array[filename]>
+
+Input CSV files.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
+=item * B<ignore_case> => I<bool>
+
+=item * B<op>* => I<str>
+
+Set operation to perform.
+
+=item * B<result_fields> => I<str>
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 csv_sort_fields
 
 Usage:
@@ -2039,6 +3032,21 @@ Usage:
  csv_sort_fields(%args) -> [status, msg, payload, meta]
 
 Sort CSV fields.
+
+This utility sorts the order of fields in the CSV. Example input CSV:
+
+ b,c,a
+ 1,2,3
+ 4,5,6
+
+Example output CSV:
+
+ a,b,c
+ 3,1,2
+ 6,4,5
+
+You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
+provides the ordering, e.g. C<--example a,c,b>.
 
 This function is not exported.
 
@@ -2055,6 +3063,131 @@ A comma-separated list of field names.
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
+=item * B<reverse> => I<bool>
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 csv_sort_rows
+
+Usage:
+
+ csv_sort_rows(%args) -> [status, msg, payload, meta]
+
+Sort CSV rows.
+
+This utility sorts the rows in the CSV. Example input CSV:
+
+ name,age
+ Andy,20
+ Dennis,15
+ Ben,30
+ Jerry,30
+
+Example output CSV (using C<--by-fields +age> which means by age numerically and
+ascending):
+
+ name,age
+ Dennis,15
+ Andy,20
+ Ben,30
+ Jerry,30
+
+Example output CSV (using C<--by-fields -age>, which means by age numerically and
+descending):
+
+ name,age
+ Ben,30
+ Jerry,30
+ Andy,20
+ Dennis,15
+
+Example output CSV (using C<--by-fields name>, which means by name ascibetically
+and ascending):
+
+ name,age
+ Andy,20
+ Ben,30
+ Dennis,15
+ Jerry,30
+
+Example output CSV (using C<--by-fields ~name>, which means by name ascibetically
+and descending):
+
+ name,age
+ Jerry,30
+ Dennis,15
+ Ben,30
+ Andy,20
+
+Example output CSV (using C<--by-fields +age,~name>):
+
+ name,age
+ Dennis,15
+ Andy,20
+ Jerry,30
+ Ben,30
+
+You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
+provides the code (C<--by-code>, for example C<< --by-code '$a-E<gt>[1] E<lt>=E<gt> $b-E<gt>[1] ||
+$b-E<gt>[0] cmp $a-E<gt>[0]' >> which is equivalent to C<--by-fields +age,~name>). If you
+use C<--hash>, your code will receive the rows to be compared as hashref, e.g.
+`--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<by_code> => I<str|code>
+
+Perl code to do sorting.
+
+C<$a> and C<$b> (or the first and second argument) will contain the two rows to be
+compared.
+
+=item * B<by_fields> => I<str>
+
+A comma-separated list of field sort specification.
+
+C<+FIELD> to mean sort numerically ascending, C<-FIELD> to sort numerically
+descending, C<FIELD> to mean sort ascibetically ascending, C<~FIELD> to mean sort
+ascibetically descending.
+
+=item * B<ci> => I<bool>
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -2152,6 +3285,8 @@ feature.
 
 
 L<csvgrep>.
+
+L<setop>.
 
 =head1 AUTHOR
 

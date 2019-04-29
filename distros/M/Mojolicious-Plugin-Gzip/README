@@ -25,11 +25,10 @@ WARNING
     original file and the gzipped one in memory at once. By default,
     Mojolicious serves static files from disk, which is much more memory
     efficient. For static files, you may want to compress them ahead of
-    time or use something like a reverse proxy with Nginx
-    <https://www.nginx.com/> to serve your static files or a service like
-    Cloudlfare <https://www.cloudflare.com/>, which will compress files for
-    you. For gzipping dynamic content, you should consider using "compress"
-    in Mojolicious::Renderer instead.
+    time and use something like Mojolicious::Static::Role::Compressed to
+    serve them, or a service like Cloudlfare <https://www.cloudflare.com/>,
+    which will compress files for you. For gzipping dynamic content, you
+    should consider using "compress" in Mojolicious::Renderer instead.
 
 DESCRIPTION
 

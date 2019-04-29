@@ -16,7 +16,7 @@ Anansi::ScriptComponent - A manager template for Perl script interface interacti
         return $self->SUPER::validate(undef);
     }
 
-    Anansi::Component::addChannel('Anansi::Script::Example', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+    Anansi::ScriptComponent::addChannel('Anansi::Script::Example', 'VALIDATE_AS_APPROPRIATE' => 'validate');
 
     1;
 
@@ -29,7 +29,7 @@ correct output of concurrent script responses.
 =cut
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base qw(Anansi::Component);
 
@@ -41,9 +41,15 @@ use base qw(Anansi::Component);
 
 =head2 addChannel
 
-Declared in L<Anansi::Component>.
+Declared in L<Anansi::Component>.  Overridden by this module.
 
 =cut
+
+
+sub addChannel {
+    my ($self, %parameters) = @_;
+    return $self->SUPER::addChannel((%parameters));
+}
 
 
 =head2 channel
@@ -113,9 +119,15 @@ Declared in L<Anansi::Class>.
 
 =head2 removeChannel
 
-Declared in L<Anansi::Component>.
+Declared in L<Anansi::Component>.  Overridden by this module.
 
 =cut
+
+
+sub removeChannel {
+    my ($self, %parameters) = @_;
+    return $self->SUPER::removeChannel((%parameters));
+}
 
 
 =head2 used

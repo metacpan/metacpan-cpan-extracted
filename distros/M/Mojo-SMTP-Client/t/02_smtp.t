@@ -33,7 +33,7 @@ my @expected_cmd = (
 );
 
 for (0..4) {
-	is(scalar(<$sock>), $expected_cmd[$_].CRLF, 'right cmd was sent');
+	is(scalar(<$sock>), $expected_cmd[$_].CRLF, "right cmd was sent: $expected_cmd[$_]");
 }
 close $sock;
 kill 15, $pid;

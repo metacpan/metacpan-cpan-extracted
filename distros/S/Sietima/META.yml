@@ -3,18 +3,18 @@ abstract: 'minimal mailing list manager'
 author:
   - 'Gianni Ceccarelli <dakkar@thenautilus.net>'
 build_requires:
-  Data::Printer: '0.39'
+  Data::Printer: '0.40'
   Email::Sender::Transport::Test: '1.300031'
   Import::Into: '1.002005'
-  Path::Tiny: '0.104'
-  Test2::API: '1.302086'
-  Test2::V0: '0.000072'
-  URI: '1.71'
+  Path::Tiny: '0.108'
+  Test2::API: '1.302164'
+  Test2::V0: '0.000120'
+  URI: '1.76'
   lib: '0.63'
 configure_requires:
-  ExtUtils::MakeMaker: '7.30'
+  ExtUtils::MakeMaker: '7.36'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,24 +26,24 @@ no_index:
 requires:
   App::Spec: '>= 0.004, != 0.004_001'
   App::Spec::Run: '>= 0.004, != 0.004_001'
-  Digest::SHA: '5.96'
-  Email::Address: '1.908'
-  Email::MIME: '1.940'
+  Digest::SHA: '6.02'
+  Email::Address: '1.912'
+  Email::MIME: '1.946'
   Email::Sender: '1.300031'
   Email::Sender::Simple: '1.300031'
-  Email::Stuffer: '0.014'
-  List::AllUtils: '0.14'
-  Moo: '2.003002'
-  Moo::Role: '2.003002'
+  Email::Stuffer: '0.017'
+  List::AllUtils: '0.15'
+  Moo: '2.003004'
+  Moo::Role: '2.003004'
   MooX::Traits: '0.005'
-  Try::Tiny: '0.28'
-  Type::Library: '1.002001'
-  Type::Params: '1.002001'
-  Type::Utils: '1.002001'
-  Types::Path::Tiny: '0.005'
-  Types::Standard: '1.002001'
+  Try::Tiny: '0.30'
+  Type::Library: '1.004004'
+  Type::Params: '1.004004'
+  Type::Utils: '1.004004'
+  Types::Path::Tiny: '0.006'
+  Types::Standard: '1.004004'
   Types::URI: '0.006'
-  experimental: '0.016'
+  experimental: '0.020'
   feature: '1.42'
   namespace::clean: '0.27'
   perl: '5.024'
@@ -52,5 +52,6 @@ requires:
 resources:
   homepage: https://www.thenautilus.net/SW/Sietima/
   repository: https://www.thenautilus.net/cgit/Sietima
-version: 1.0.3
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: 1.0.4
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

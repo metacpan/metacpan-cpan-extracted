@@ -23,12 +23,16 @@ my %WriteMakefileArgs = (
     "script/csv-each-row",
     "script/csv-grep",
     "script/csv-list-field-names",
+    "script/csv-lookup-fields",
     "script/csv-map",
     "script/csv-munge-field",
     "script/csv-replace-newline",
     "script/csv-select-fields",
     "script/csv-select-row",
+    "script/csv-setop",
+    "script/csv-sort",
     "script/csv-sort-fields",
+    "script/csv-sort-rows",
     "script/csv-sum",
     "script/dump-csv"
   ],
@@ -37,18 +41,20 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Util" => "0.57",
     "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
+    "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::code" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::re" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.816",
-    "Perinci::CmdLine::Classic" => "1.770",
+    "Perinci::CmdLine::Lite" => "1.816",
     "Sah::Schema::filename" => 0,
     "Scalar::Util" => 0,
     "Sort::ByExample" => 0,
     "Text::CSV_XS" => 0,
+    "Tie::IxHash" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -61,7 +67,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.019",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,8 +77,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Complete::Util" => "0.57",
   "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
+  "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::code" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::re" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -82,14 +90,14 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.816",
-  "Perinci::CmdLine::Classic" => "1.770",
+  "Perinci::CmdLine::Lite" => "1.816",
   "Sah::Schema::filename" => 0,
   "Scalar::Util" => 0,
   "Sort::ByExample" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "Text::CSV_XS" => 0,
+  "Tie::IxHash" => 0,
   "strict" => 0,
   "warnings" => 0
 );

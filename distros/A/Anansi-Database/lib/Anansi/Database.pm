@@ -60,7 +60,7 @@ and removal of database structures and table records.
 =cut
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw(Anansi::ComponentManager);
 
@@ -508,3 +508,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

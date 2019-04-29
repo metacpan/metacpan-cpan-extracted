@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_map
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-04-23'; # DATE
+our $DATE = '2019-04-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-map - Return result of Perl code for every row
 
 =head1 VERSION
 
-This document describes version 0.019 of csv-map (from Perl distribution App-CSVUtils), released on 2019-04-23.
+This document describes version 0.020 of csv-map (from Perl distribution App-CSVUtils), released on 2019-04-29.
 
 =head1 SYNOPSIS
 
@@ -55,9 +55,10 @@ Create SQL insert statements (escaping is left as an exercise for users):
 
 This is like Perl's C<map> performed over rows of CSV. In C<$_>, your Perl code
 will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
-C<$main::row> is also set to the row (always as arrayref), while C<$main::rownum>
-contains the row number (2 means the first data row). C<$main::field_idxs> is
-also available for additional information.
+C<$main::row> is also set to the row (always as arrayref). C<$main::rownum>
+contains the row number (2 means the first data row). C<$main::csv> is the
+L<Text::CSV_XS> object. C<$main::field_idxs> is also available for additional
+information.
 
 Your code is then free to return a string based on some operation against these
 data. This utility will then print out the resulting string.
@@ -70,7 +71,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--eval>=I<s>*, B<-e>
+=item B<--eval-json>=I<s>, B<-e>
+
+Perl code (JSON-encoded).
+
+See C<--eval>.
+
+=item B<--eval>=I<s>*
 
 Perl code.
 

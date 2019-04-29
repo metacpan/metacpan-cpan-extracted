@@ -14,6 +14,7 @@ contrib/gui_pp/gpp
 contrib/gui_pp/gpp_readme.txt
 contrib/pare/pare
 contrib/pare/pare_readme.txt
+contrib/pp_osx_codesign_fix/pp_osx_codesign_fix.c
 contrib/procedural_pp/pp_old
 contrib/stdio/Stdio.pm
 contrib/stdio/Stdio_readme.txt
@@ -47,7 +48,8 @@ myldr/mktmpdir.c
 myldr/mktmpdir.h
 myldr/par_pl2c.pl
 myldr/run_with_inc.pl
-myldr/sha1.c.PL
+myldr/sha1.c
+myldr/sha1.h
 myldr/Static.in
 myldr/usernamefrompwuid.c
 myldr/utils.c
@@ -75,6 +77,7 @@ t/90-rt104635/eg/foo
 t/90-rt104635/Foo.pm
 t/90-rt104635/lib/Foo/Bar.pm
 t/90-rt122949.t
+t/90-rt127064.t
 t/90-rt59710.t
 t/Double/Colon.pm
 t/Double/Colon/Barnie.pm

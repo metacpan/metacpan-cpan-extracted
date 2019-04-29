@@ -1,0 +1,48 @@
+Changelog for Mojolicious-Plugin-Statsd
+
+0.03 2019-04-29T04:05:47
+ - init changes (Meredith Howard)
+ - Add gauge and set_add methods (Meredith Howard)
+
+0.02 2019-04-26T23:46:42Z
+ - Fix sample_rate recording (Meredith Howard)
+ - Update POD (Meredith Howard)
+ - Send sample rate with metric (Meredith Howard)
+ - tidy (Meredith Howard)
+ - Rename update_stats -> counter, to match other impls (Meredith Howard)
+ - Rename add_prefix -> with_prefix.  Drop 'copy' method (Meredith Howard)
+ - Remove 'configure' method (Meredith Howard)
+ - Update docs, drop PodWeaver (Meredith Howard)
+ - convert to dzil (Meredith Howard)
+ - rename (Meredith Howard)
+ - Only use `addr` and check STATSD_ADDR before default (Meredith Howard)
+ - Handle undefined (refused) result from UDP send (Meredith Howard)
+ - Let's just warn rather than carp (Meredith Howard)
+ - Check that socket was opened (Meredith Howard)
+ - Avoid socket constant imports (Meredith Howard)
+ - Drop adapter base class (Meredith Howard)
+ - Change default adapter to Statsd (localhost:8125) (Meredith Howard)
+ - Add missing Time::HiRes imports for timing a coderef (Meredith Howard)
+
+0.01 2019-04-26T06:53:03Z
+ - simplify arg handling here (Meredith Howard)
+ - Don't load Adapter::Memory if it's not needed (Meredith Howard)
+ - fix numbered list (Meredith Howard)
+ - add license (Meredith Howard)
+ - add readme (Meredith Howard)
+ - Use the same arg style everywhere. (Meredith Howard)
+ - Add Adapter abstract docs (Meredith Howard)
+ - Further docs. (Meredith Howard)
+ - Rename config to configure, don't store config anymore, make chainable.
+   (Meredith Howard)
+ - Synopsis work (Meredith Howard)
+ - Add plugin config, pass config thru to adapters (Meredith Howard)
+ - Test::Mojo unnecessary here (Meredith Howard)
+ - Bundle metrics in the same udp packet, test. (Meredith Howard)
+ - implement basic methods of stats plugin itself, add tests (Meredith
+   Howard)
+ - Adapters should always expect names in arrayref; drop inc/decrement from
+   interface (Meredith Howard)
+ - Get statsd basic protocol the right way. (Meredith Howard)
+ - Add Adapter::Statsd (Meredith Howard)
+ - Initial commit (Meredith Howard)

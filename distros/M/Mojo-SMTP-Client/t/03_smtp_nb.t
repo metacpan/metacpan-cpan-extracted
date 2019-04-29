@@ -46,7 +46,7 @@ my @cmd = (
 $loop->reactor->io($sock => sub {
 	my $cmd = <$sock>;
 	return unless $cmd; # socket closed
-	is($cmd, $cmd[$i++].CRLF, "right cmd $cmd[$i-1]");
+	is($cmd, $cmd[$i++].CRLF, "right cmd: $cmd[$i-1]");
 	syswrite($sock, '220 OK'.CRLF);
 });
 

@@ -191,9 +191,13 @@ lib/SPVM/Short.pm
 lib/SPVM/Short.spvm
 lib/SPVM/StringBuffer.spvm
 lib/SPVM/Stringer.spvm
+lib/SPVM/Time.c
+lib/SPVM/Time.config
+lib/SPVM/Time.spvm
 lib/SPVM/Time/Format.c
 lib/SPVM/Time/Format.config
 lib/SPVM/Time/Format.spvm
+lib/SPVM/Time/Info.spvm
 lib/SPVM/Time/Moment.c
 lib/SPVM/Time/Moment.config
 lib/SPVM/Time/Moment.spvm
@@ -206,6 +210,8 @@ README
 script/spvmcc
 solo/lib/TestCase.spvm
 solo/lib/TestCase/Allow.spvm
+solo/lib/TestCase/Callback1.spvm
+solo/lib/TestCase/Callback2.spvm
 solo/lib/TestCase/Comparator.spvm
 solo/lib/TestCase/ComparatorAnon.spvm
 solo/lib/TestCase/ComplexCalc.spvm
@@ -215,11 +221,9 @@ solo/lib/TestCase/EnumA.spvm
 solo/lib/TestCase/EnumB.spvm
 solo/lib/TestCase/EnumC.spvm
 solo/lib/TestCase/EnumD.spvm
-solo/lib/TestCase/ImplementInterface1.spvm
-solo/lib/TestCase/ImplementInterface2.spvm
+solo/lib/TestCase/ImplementCallback1.spvm
+solo/lib/TestCase/ImplementCallback2.spvm
 solo/lib/TestCase/Inline.spvm
-solo/lib/TestCase/Interface1.spvm
-solo/lib/TestCase/Interface2.spvm
 solo/lib/TestCase/List.spvm
 solo/lib/TestCase/Minimal.spvm
 solo/lib/TestCase/Point_3b.spvm
@@ -238,6 +242,7 @@ solo/spvm_build/.gitkeep
 SPVM.xs
 spvm_build/.gitkeep
 spvmdoc/jp/public/css/common.css
+spvmdoc/jp/public/exchange-api.html
 spvmdoc/jp/public/images/list-arrow.png
 spvmdoc/jp/public/images/spvm-logo.png
 spvmdoc/jp/public/index.html
@@ -308,6 +313,7 @@ t/default/if.t
 t/default/increment.t
 t/default/inline.t
 t/default/isa.t
+t/default/lexical-var.t
 t/default/lib/TestCase.spvm
 t/default/lib/TestCase/Add.spvm
 t/default/lib/TestCase/Allow.spvm
@@ -400,6 +406,7 @@ t/default/lib/TestCase/Inline.spvm
 t/default/lib/TestCase/Isa.spvm
 t/default/lib/TestCase/JSON.spvm
 t/default/lib/TestCase/JSON/Bool.spvm
+t/default/lib/TestCase/LexicalVar.spvm
 t/default/lib/TestCase/Lib/SPVM/Byte.spvm
 t/default/lib/TestCase/Lib/SPVM/CORE.c
 t/default/lib/TestCase/Lib/SPVM/CORE.config
@@ -415,6 +422,7 @@ t/default/lib/TestCase/Lib/SPVM/HTTP/URL/Encode.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/URL/Escape.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/URL/Parameters.spvm
 t/default/lib/TestCase/Lib/SPVM/Int.spvm
+t/default/lib/TestCase/Lib/SPVM/IO/File.spvm
 t/default/lib/TestCase/Lib/SPVM/IO/Socket.spvm
 t/default/lib/TestCase/Lib/SPVM/List.spvm
 t/default/lib/TestCase/Lib/SPVM/Long.spvm
@@ -422,6 +430,7 @@ t/default/lib/TestCase/Lib/SPVM/Math.spvm
 t/default/lib/TestCase/Lib/SPVM/MIME/Base64.spvm
 t/default/lib/TestCase/Lib/SPVM/Short.spvm
 t/default/lib/TestCase/Lib/SPVM/StringBuffer.spvm
+t/default/lib/TestCase/Lib/SPVM/Time.spvm
 t/default/lib/TestCase/Lib/SPVM/Time/Format.spvm
 t/default/lib/TestCase/Lib/SPVM/Time/Moment.spvm
 t/default/lib/TestCase/Lib/SPVM/Unicode.spvm
@@ -440,6 +449,7 @@ t/default/lib/TestCase/MyExe.spvm
 t/default/lib/TestCase/NumericOperator.spvm
 t/default/lib/TestCase/Object.spvm
 t/default/lib/TestCase/PACKAGE.spvm
+t/default/lib/TestCase/PackageVar.spvm
 t/default/lib/TestCase/Point_3b.spvm
 t/default/lib/TestCase/Point_3d.spvm
 t/default/lib/TestCase/Point_3f.spvm
@@ -467,7 +477,6 @@ t/default/lib/TestCase/UnaryMinus.spvm
 t/default/lib/TestCase/UnaryPlus.spvm
 t/default/lib/TestCase/Unless.spvm
 t/default/lib/TestCase/ValueTArray.spvm
-t/default/lib/TestCase/Var.spvm
 t/default/lib/TestCase/Weaken.spvm
 t/default/lib/TestCase/While.spvm
 t/default/literal-character.t
@@ -497,7 +506,6 @@ t/default/unary-minus.t
 t/default/unary-plus.t
 t/default/unless.t
 t/default/value_t_array.t
-t/default/var.t
 t/default/weaken.t
 t/default/while.t
 t/exe/exe.t

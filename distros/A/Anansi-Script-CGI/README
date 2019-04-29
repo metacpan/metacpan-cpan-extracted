@@ -1,4 +1,4 @@
-Anansi-Script-CGI version 0.02
+Anansi-Script-CGI version 0.03
 ==============================
 
 The README is used to introduce the module and provide instructions on
@@ -16,22 +16,24 @@ INSTALLATION
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Anansi::Component
+    Anansi::ScriptComponent
+    CGI
+    base
 
 COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2013 by Kevin Treleaven
+Copyright (C) 2019 by Kevin Treleaven
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.9 or,

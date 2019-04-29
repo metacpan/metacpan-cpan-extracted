@@ -8,4 +8,7 @@ Revision history for Perl extension Anansi::Script::Shell.
 	- corrected HASH reference deprecations.
 0.03  Sat May 25 02:29:52 2013
         - modified the POD.
-
+0.04  Tue Apr 09 16:27:51 2019
+	- modified the module to use Anansi::ScriptComponent instead of Anansi::Component.
+	- modified module dependencies in makefile.
+	- modified README to reflect module dependencies.

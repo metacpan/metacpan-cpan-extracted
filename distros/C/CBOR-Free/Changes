@@ -1,5 +1,8 @@
 Revision history for Perl module CBOR::Free
 
+0.04 28 Apr 2019
+- Make decoder reject true, false, null, and undefined as map keys.
+
 0.03 28 Apr 2019
 - Fix segfault when true/false are encoded as CBOR map keys.
 - Reject negatives that exceed what a 64-bit signed integer can store.

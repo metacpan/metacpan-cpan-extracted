@@ -1,0 +1,7 @@
+name = "AnyEvent-HTTPD-Router"
+badges = ["travis-ci.org"]
+authority="cpan:UFOBAT"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

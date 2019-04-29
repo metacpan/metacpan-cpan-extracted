@@ -14,6 +14,7 @@ lib/CBOR/Free/X/Base.pm
 lib/CBOR/Free/X/CannotDecode64Bit.pm
 lib/CBOR/Free/X/Incomplete.pm
 lib/CBOR/Free/X/InvalidControl.pm
+lib/CBOR/Free/X/InvalidMapKey.pm
 lib/CBOR/Free/X/InvalidUTF8.pm
 lib/CBOR/Free/X/NegativeIntTooLow.pm
 lib/CBOR/Free/X/Recursion.pm
@@ -25,6 +26,7 @@ t/array.t
 t/boolean.t
 t/dec_strings.t
 t/decode.t
+t/decode_invalid_map_keys.t
 t/errors.t
 t/examples.t
 t/float.t

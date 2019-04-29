@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_sort_fields
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-04-23'; # DATE
+our $DATE = '2019-04-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +37,30 @@ csv-sort-fields - Sort CSV fields
 
 =head1 VERSION
 
-This document describes version 0.019 of csv-sort-fields (from Perl distribution App-CSVUtils), released on 2019-04-23.
+This document describes version 0.020 of csv-sort-fields (from Perl distribution App-CSVUtils), released on 2019-04-29.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % csv-sort-fields [options] <filename>
+
+=head1 DESCRIPTION
+
+This utility sorts the order of fields in the CSV. Example input CSV:
+
+ b,c,a
+ 1,2,3
+ 4,5,6
+
+Example output CSV:
+
+ a,b,c
+ 3,1,2
+ 6,4,5
+
+You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
+provides the ordering, e.g. C<--example a,c,b>.
 
 =head1 OPTIONS
 

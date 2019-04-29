@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '0.51';
+$Test::Map::Tube::VERSION   = '0.53';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Interface to test Map::Tube features.
 
 =head1 VERSION
 
-Version 0.51
+Version 0.53
 
 =cut
 
@@ -384,7 +384,7 @@ L<http://search.cpan.org/dist/Test-Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2016 Mohammad S Anwar.
+Copyright (C) 2015 - 2019 Mohammad S Anwar.
 
 This  program  is  free software; you can redistribute it  and/or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

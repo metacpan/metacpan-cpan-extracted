@@ -1,17 +1,20 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 J. Maslak
+# Copyright (C) 2016-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
-package Range::Merge v0.01.00;
-$Range::Merge::VERSION = '1.003';
+package Range::Merge;
+$Range::Merge::VERSION = '2.191190';
+use strict;
+use warnings;
+
 use Range::Merge::Boilerplate 'script';
 
 require Exporter;
 our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(merge merge_ipv4);
+our @EXPORT_OK = qw(merge merge_discrete merge_ipv4);
 
 use List::Util qw(max);
 use Net::CIDR;
@@ -23,9 +26,34 @@ use Socket;
 
 sub merge($ranges) {
     my $sorted = _sort($ranges);
-    my $split = [];
-    _split($ranges, $split);
+    my $split  = [];
+    _split( $sorted, $split );
     return _combine($split);
+}
+
+
+sub merge_discrete($values) {
+    my $ranges = [];
+
+    my $run;
+
+    for my $num ( sort { $a <=> $b } @$values ) {
+        if ( !defined $run ) {
+            $run = [ $num, $num ];
+            push @$ranges, $run;
+        } else {
+            if ( $run->[1] == $num ) {
+                # Do nothing
+            } elsif ( $run->[1] == $num - 1 ) {
+                $run->[1] = $num;
+            } else {
+                $run = [ $num, $num ];
+                push @$ranges, $run;
+            }
+        }
+    }
+
+    return $ranges;
 }
 
 
@@ -37,9 +65,9 @@ sub merge_ipv4($cidr) {
 }
 
 sub _cidr2range($cidr) {
-    my ($ip, @a) = @$cidr;
+    my ( $ip, @a ) = @$cidr;
     my ($range) = Net::CIDR::cidr2range($ip);
-    my (@parts) = map { unpack('N', inet_aton($_)) } split(/-/, $range);
+    my (@parts) = map { unpack( 'N', inet_aton($_) ) } split( /-/, $range );
 
     return [ @parts, @a ];
 }
@@ -47,10 +75,10 @@ sub _cidr2range($cidr) {
 sub _range2cidr($ranges) {
     my @output;
     foreach my $range (@$ranges) {
-        my ($start, $end, @other) = @$range;
-        $start = inet_ntoa(pack('N', $start));
-        $end   = inet_ntoa(pack('N', $end  ));
-        foreach my $cidr (Net::CIDR::range2cidr("$start-$end")) {
+        my ( $start, $end, @other ) = @$range;
+        $start = inet_ntoa( pack( 'N', $start ) );
+        $end   = inet_ntoa( pack( 'N', $end ) );
+        foreach my $cidr ( Net::CIDR::range2cidr("$start-$end") ) {
             push @output, [ $cidr, @other ];
         }
     }
@@ -60,13 +88,13 @@ sub _range2cidr($ranges) {
 # Sorts by starting address and then by reverse (less specific to more
 # specific)
 sub _sort($ranges) {
-    my (@output) = sort { ($a->[0] <=> $b->[0]) || ($b->[1] <=> $a->[0]) } @$ranges;
+    my (@output) = sort { ( $a->[0] <=> $b->[0] ) || ( $b->[1] <=> $a->[0] ) } @$ranges;
     return \@output;
 }
 
 sub _merge($ranges) {
     my $split = [];
-    _split($ranges, $split);
+    _split( $ranges, $split );
     return _combine($split);
 }
 
@@ -75,56 +103,56 @@ sub _combine($ranges) {
 
     my $last;
     foreach my $range (@$ranges) {
-        if (!defined($last)) {
-            $last = [ @$range ];
+        if ( !defined($last) ) {
+            $last = [@$range];
             next;
         }
-        if (($last->[1] == $range->[0] - 1) && (scalar(@$last) == scalar(@$range))) {
+        if ( ( $last->[1] == $range->[0] - 1 ) && ( scalar(@$last) == scalar(@$range) ) ) {
             my $nomatch;
-            for (my $i=2; $i<scalar(@$range); $i++) {
-                if ($last->[$i] ne $range->[$i]) {
+            for ( my $i = 2; $i < scalar(@$range); $i++ ) {
+                if ( $last->[$i] ne $range->[$i] ) {
                     $nomatch = 1;
                     last;
                 }
             }
             if ($nomatch) {
                 push @output, $last;
-                $last = [ @$range ];
+                $last = [@$range];
             } else {
                 $last->[1] = $range->[1];
             }
         } else {
             push @output, $last;
-            $last = [ @$range ];
+            $last = [@$range];
         }
     }
-    if (defined($last)) { push @output, $last }
+    if ( defined($last) ) { push @output, $last }
 
     return \@output;
 }
 
-sub _split($ranges, $output, $stack = []) {
+sub _split ( $ranges, $output, $stack = [] ) {
     # Termination condition
-    if (scalar($ranges->@*) == 0) { return undef; }
+    return if scalar( $ranges->@* ) == 0;
 
     # We just repeatedly call _add_to_stack
-    foreach my $range ($ranges->@*) {
-        _add_to_stack($range, $stack, $output);
+    foreach my $range ( $ranges->@* ) {
+        _add_to_stack( $range, $stack, $output );
     }
 
     # Return stack
-    if (scalar($stack->@*)) {
+    if ( scalar( $stack->@* ) ) {
         push $output->@*, $stack->@*;
     }
 
-    return undef;
+    return;
 }
 
-sub _add_to_stack($range, $stack, $output) {
-    if (!scalar($stack->@*)) {
+sub _add_to_stack ( $range, $stack, $output ) {
+    if ( !scalar( $stack->@* ) ) {
         # Empty stack
         push $stack->@*, $range;
-        return undef;
+        return;
     }
 
     # We know the following:
@@ -133,10 +161,10 @@ sub _add_to_stack($range, $stack, $output) {
     # 2. There are no overlapping elements
     #    2a. Thus we only have to split 1 element max
     # 3. The stack has at least one element
-    
-    my (@lstack) = grep { $_->[1] < $range->[0]} @$stack;
-    my (@rstack) = grep { $_->[0] > $range->[1]} @$stack;
-    my (@mid   ) = grep { ($_->[0] <= $range->[1]) && ($_->[1] >= $range->[0])} @$stack;
+
+    my (@lstack) = grep { $_->[1] < $range->[0] } @$stack;
+    my (@rstack) = grep { $_->[0] > $range->[1] } @$stack;
+    my (@mid)    = grep { ( $_->[0] <= $range->[1] ) && ( $_->[1] >= $range->[0] ) } @$stack;
 
     # Clear stack
     @$stack = ();
@@ -146,21 +174,21 @@ sub _add_to_stack($range, $stack, $output) {
 
     # Option 1 -> No middle element, so just add the range (and the
     # right stack) to the stack
-    if (!scalar(@mid)) {
+    if ( !scalar(@mid) ) {
         push @$stack, $range, @rstack;
-        return undef;
+        return;
     }
 
     # We start with the left and right parts of the element that might
     # need to be split.
     my (@left)  = $mid[0]->@*;
     my (@right) = $mid[0]->@*;
-    
+
     # Does the ele needing split start before the range?  If so, add the piece
     # needed to the output
-    if ($left[0] < $range->[0]) {
+    if ( $left[0] < $range->[0] ) {
         @left[1] = $range->[0] - 1;
-        if ($left[0] <= $left[1]) {
+        if ( $left[0] <= $left[1] ) {
             push @$output, \@left;
         }
     }
@@ -170,32 +198,17 @@ sub _add_to_stack($range, $stack, $output) {
 
     # Does the ele needing split end after the range?  If so, add the
     # piece to the stack
-    if ($right[1] > $range->[1]) {
+    if ( $right[1] > $range->[1] ) {
         @right[0] = $range->[1] + 1;
-        if ($right[0] <= $right[1]) {
+        if ( $right[0] <= $right[1] ) {
             push @$stack, \@right;
         }
     }
 
     push @$stack, @rstack;
 
-    return undef;
+    return;
 }
-
-# Main element in the algorithm
-# sub _merge($ranges, $output, $stack) {
-# if (!scalar($stack->@*)) {
-# # Stack is empty
-# 
-# if (!scalar($ranges->@*)) {
-# return undef; # No ranges, no stack
-# }
-# 
-# push $stack->@*, unshift($ranges->@*);
-# }
-# 
-# _output_stack($output, $stack);
-# }
 
 1;
 
@@ -211,7 +224,7 @@ Range::Merge - Merges ranges of data including subset/superset ranges
 
 =head1 VERSION
 
-version 1.003
+version 2.191190
 
 =head1 SYNOPSIS
 
@@ -238,6 +251,13 @@ to write a generic range merging alogirthm that operates on integers.
 This is the soul of the C<Range::Merge> module - it merges an array
 reference of ranges (passed in as the sole argument).  The output is
 an array reference of the merged ranges.
+
+=head2 merge_discrete($values)
+
+This functionality is similar to the C<merge> function, except it simply
+takes an array reference of individual, discrete, value.
+
+The output is in standard range form.
 
 =head2 merge_ipv4($cidr)
 
@@ -285,8 +305,17 @@ In this case, we would expect the merged output to look like:
 
   [ [0,3,'foo','baz'], [4,8,'bar','baz'], [9,12,'foo','baz'] ]
 
-There is also a variation on this where, instead of a start and end integer,
-there is an IP address (IPv4 only at this point).  For example:
+There is a specialized version which is simply a list of numbers, such as:
+
+  [ 0, 1, 3, 5, 6 ]
+
+This woud return the output:
+
+  [ [0, 1], [3, 3], [5, 6] ]
+
+Yet another form is used by the C<merge_discrete()> function.  There is also
+a variation on this where, instead of a start and end integer, there is an IP
+address (IPv4 only at this point).  For example:
 
   [ [ '0.0.0.0/4' ], [ '128.0.0.0/1' ] ]
 
@@ -294,11 +323,11 @@ This form is used by the C<merge_ipv4()> function.
 
 =head1 AUTHOR
 
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by J. Maslak.
+This software is copyright (c) 2016-2019 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

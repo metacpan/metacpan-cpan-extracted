@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use constant {
 	CMD_OK       => 2,
@@ -143,7 +143,7 @@ sub send {
 	push @steps, $self->_make_cmd_steps();
 	
 	# non-blocking
-	my $delay = $self->{delay} = Mojo::IOLoop::Delay->new(ioloop => $self->_ioloop)->steps(@steps);
+	my $delay = $self->{delay} = Mojo::IOLoop::Delay->new->ioloop($self->_ioloop)->steps(@steps);
 	$self->{finally} = sub {
 		shift if @_ == 2; # delay
 		
@@ -199,8 +199,7 @@ sub _make_stream {
 		delete($self->{cleanup_cb})->() if $self->{cleanup_cb};
 		$self->_rm_stream();
 		
-		# Remaining delay steps skipped automatically somehow (at least for now)
-		$self->{finally}->($_[0]);
+		$self->{delay}->reject($_[0]);
 	};
 	
 	$self->{stream} = Mojo::IOLoop::Stream->new($sock);

@@ -21,7 +21,7 @@ our $VERSION = '0.0.0';
 
     use Device::RAID::Poller::Backends::FBSD_gmirror;
     
-    my $backend = Device::RAID::Poller::Backends::FBSD_gmirror;
+    my $backend = Device::RAID::Poller::Backends::FBSD_gmirror->new;
     
     my $usable=$backend->usable;
     my %return_hash;
@@ -38,7 +38,7 @@ our $VERSION = '0.0.0';
 
 Initiates the backend object.
 
-    my $backend = Device::RAID::Poller::Backends::FBSD_gmirror;
+    my $backend = Device::RAID::Poller::Backends::FBSD_gmirror->new;
 
 =cut
 
@@ -161,18 +161,17 @@ Returns a perl boolean for if it is usable or not.
 sub usable {
 	my $self=$_[0];
 
-	my $gmirror_bin='/sbin/gmirror';
-	my $kldstat_bin='/sbin/kldstat';
 	if (
 		( $^O !~ 'freebsd' ) ||
-		( ! -x $gmirror_bin ) ||
-		( ! -x $kldstat_bin )
+		( ! -x '/sbin/gmirror' )
 		){
 		$self->{usable}=0;
 		return 0;
 	}
 
-	system('/sbin/kldstat -q -n geom_mirror');
+	# Test for it via this instead of '/sbin/kldstat -q -n geom_mirror'
+	# as kldstat won't work if it is compiled in.
+	system('/sbin/sysctl -q kern.features.geom_mirror > /dev/null');
 	if ( $? != 0 ){
 		$self->{usable}=0;
         return 0;

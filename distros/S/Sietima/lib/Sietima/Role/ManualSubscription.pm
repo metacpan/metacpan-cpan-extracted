@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Sietima::HeaderURI;
 use namespace::clean;
 
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: adds standard list-related headers to messages
 
 with 'Sietima::Role::WithOwner';
@@ -41,7 +41,7 @@ Sietima::Role::ManualSubscription - adds standard list-related headers to messag
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

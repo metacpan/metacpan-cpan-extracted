@@ -1,4 +1,4 @@
-package WWW::NOS::Open 0.101;    # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open v1.0.2;    # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ use WWW::NOS::Open::Version;
 use WWW::NOS::Open::Video;
 
 use Readonly;
-Readonly::Scalar my $SERVER => $ENV{'NOSOPEN_SERVER'} || q{http://open.nos.nl};
+Readonly::Scalar my $SERVER  => $ENV{'NOSOPEN_SERVER'} || q{http://open.nos.nl};
 Readonly::Scalar my $TIMEOUT => 15;
 Readonly::Scalar my $AGENT   => q{WWW::NOS::Open/} . $WWW::NOS::Open::VERSION;
 Readonly::Scalar my $DATE_FORMAT      => q{%04u-%02u-%02u};
@@ -89,7 +89,7 @@ has '_version' => (
 
 sub get_version {
     my $self = shift;
-    my $url = sprintf $VERSION_PATH, $SERVER,
+    my $url  = sprintf $VERSION_PATH, $SERVER,
       URI::Escape::uri_escape( $self->get_api_key ),
       URI::Escape::uri_escape( $self->_get_default_output );
     my $response = $self->_do_request($url);
@@ -149,7 +149,7 @@ sub get_latest_articles {
 }
 
 sub __get_props {
-    my $meta = shift;
+    my $meta  = shift;
     my @props = map { $_->name } $meta->get_all_attributes;
     for (@props) {
         s/$STRIP_PRIVATE//smx;
@@ -187,7 +187,7 @@ sub _parse_resources {
     my @resources;
 
     if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+        my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
         my @xml_resources = @{ $xml->{$type} };
         while ( my $resource = shift @xml_resources ) {
             push @resources, $self->_parse_resource( $type, $resource );
@@ -214,7 +214,7 @@ sub _parse_result {
     my ( $self, $body ) = @_;
     my @documents;
     if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+        my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
         my @xml_documents = @{ $xml->{'documents'}->[0]->{'document'} };
         while ( my $hr_document = shift @xml_documents ) {
             push @documents,
@@ -290,7 +290,7 @@ sub _parse_guide {
     my ( $self, $body ) = @_;
     my @dayguides;
     if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+        my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
         my @xml_dayguides = @{ $xml->{'dayguide'} };
         while ( my $hr_dayguide = shift @xml_dayguides ) {
             push @dayguides, $self->_parse_dayguide($hr_dayguide);
@@ -421,7 +421,7 @@ WWW::NOS::Open - Perl framework for the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open version 0.101.
+This document describes WWW::NOS::Open version v1.0.2.
 
 =head1 SYNOPSIS
 
@@ -551,7 +551,7 @@ specify a server URL that is not the default Open NOS live service at
 L<http://open.nos.nl|http://open.nos.nl>.
 
 The user agent identifier used in the request to the REST API is
-C<WWW::NOS::Open/0.101>.
+C<WWW::NOS::Open/v1.0.2>.
 
 =head1 DEPENDENCIES
 

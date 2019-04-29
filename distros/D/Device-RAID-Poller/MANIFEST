@@ -1,6 +1,8 @@
 Changes
 lib/Device/RAID/Poller.pm
 lib/Device/RAID/Poller/Backends/FBSD_gmirror.pm
+lib/Device/RAID/Poller/Backends/FBSD_graid.pm
+lib/Device/RAID/Poller/Backends/FBSD_graid3.pm
 lib/Device/RAID/Poller/Backends/ZFS.pm
 lib/Device/RAID/Poller/Backends/Linux_mdadm.pm
 Makefile.PL
@@ -10,6 +12,9 @@ t/00-load.t
 t/01-load.t
 t/02-load.t
 t/03-load.t
+t/04-load.t
+t/05-load.t
+t/06-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

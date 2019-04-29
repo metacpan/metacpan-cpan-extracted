@@ -4,13 +4,13 @@
       "Roland van Ipenburg <ipenburg@xs4all.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-NOS-Open",
    "prereqs" : {
@@ -77,59 +77,59 @@
    "provides" : {
       "WWW::NOS::Open" : {
          "file" : "lib/WWW/NOS/Open.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Article" : {
          "file" : "lib/WWW/NOS/Open/Article.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::AudioFragment" : {
          "file" : "lib/WWW/NOS/Open/AudioFragment.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Broadcast" : {
          "file" : "lib/WWW/NOS/Open/Broadcast.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::DayGuide" : {
          "file" : "lib/WWW/NOS/Open/DayGuide.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Document" : {
          "file" : "lib/WWW/NOS/Open/Document.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Exceptions" : {
          "file" : "lib/WWW/NOS/Open/Exceptions.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Interface" : {
          "file" : "lib/WWW/NOS/Open/Interface.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::MediaResource" : {
          "file" : "lib/WWW/NOS/Open/MediaResource.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Resource" : {
          "file" : "lib/WWW/NOS/Open/Resource.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Result" : {
          "file" : "lib/WWW/NOS/Open/Result.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::TypeDef" : {
          "file" : "lib/WWW/NOS/Open/TypeDef.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Version" : {
          "file" : "lib/WWW/NOS/Open/Version.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       },
       "WWW::NOS::Open::Video" : {
          "file" : "lib/WWW/NOS/Open/Video.pm",
-         "version" : "0.101"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -141,6 +141,6 @@
          "url" : "https://github.com/ipenburg/WWW-NOS-Open"
       }
    },
-   "version" : "0.101",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

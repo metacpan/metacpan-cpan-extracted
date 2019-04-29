@@ -13,6 +13,11 @@ sub clean_test_environment {
     if (scalar @x) {
         $arango->delete_database("tmp_")
     }
+
+    my @y = grep { $_ eq "tmp_user_" } map { $_->{user} } @{$arango->list_users->{result}};
+    if (scalar @y) {
+        $arango->delete_user("tmp_user_");
+    }
 }
 
 

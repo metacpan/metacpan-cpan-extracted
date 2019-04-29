@@ -6,15 +6,18 @@ use warnings;
 
 use Test::More 'no_plan';
 
-use SPVM 'TestCase::Var';
+use SPVM 'TestCase::LexicalVar';
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::memory_blocks_count();
 
 # Array
 {
-  ok(TestCase::Var->var_brace);
-  ok(TestCase::Var->var_expansion);
+  ok(TestCase::LexicalVar->var_brace);
+  ok(TestCase::LexicalVar->var_expansion);
+  ok(TestCase::LexicalVar->lexical_var_upper_case);
+  ok(TestCase::LexicalVar->lexical_var_high_precidence_than_package_var);
+  ok(TestCase::LexicalVar->lexical_var_high_precidence_than_capture_var);
 }
 
 # All object is freed

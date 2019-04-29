@@ -57,6 +57,7 @@ sub read_dir ( $self, @ ) {
     return if !-d $self;
 
     my %args = (
+        abs         => 0,
         max_depth   => 1,        # 0 - unlimited
         follow_link => 1,
         is_dir      => 1,

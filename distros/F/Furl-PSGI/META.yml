@@ -16,10 +16,10 @@ name: Furl-PSGI
 provides:
   Furl::PSGI:
     file: lib/Furl/PSGI.pm
-    version: '0.01'
+    version: '0.02'
   Furl::PSGI::HTTP:
     file: lib/Furl/PSGI/HTTP.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Carp: '0'
   Furl: '0'
@@ -31,7 +31,8 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/merrilymeredith/p5-Furl-PSGI/issues
+  homepage: http://metacpan.org/release/Furl-PSGI/
   repository: git://github.com/merrilymeredith/p5-Furl-PSGI.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

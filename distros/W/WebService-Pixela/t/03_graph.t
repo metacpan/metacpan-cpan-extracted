@@ -236,9 +236,14 @@ subtest 'html' => sub {
     );
 
     my $graph = WebService::Pixela->new(username => $username, token => $token)->graph;
-    my $id    = "testid";
-    $graph->id($id);
+    my %param = ( id => 'testid');
+    $graph->id($param{id});
     is($graph->html,'https://pixe.la/v1/users/testuser/graphs/testid.html');
+
+    $graph->id(undef);
+    is($graph->html(%param),'https://pixe.la/v1/users/testuser/graphs/testid.html');
+    $param{line} = 1;
+    is($graph->html(%param),'https://pixe.la/v1/users/testuser/graphs/testid.html?mode=line');
 };
 
 subtest 'pixels' => sub {
@@ -290,6 +295,31 @@ my $mock = mock 'WebService::Pixela' => (
                 ],
         },
         'decode 0 is dumpping original json'
+    );
+};
+
+subtest 'stats' => sub {
+my $mock = mock 'WebService::Pixela' => (
+    override => [request =>
+        sub {
+            shift @_;
+            return [@_] ;
+        }],
+    );
+
+
+    my $pixela = WebService::Pixela->new(username => $username, token => $token);
+    my $graph  = $pixela->graph;
+
+    my $id = 'input_id';
+
+    my $path = 'users/'.$username.'/graphs/'. $id . '/stats';
+    is(
+        $graph->stats($id),
+        [   'GET',
+            $path,
+        ],
+        'input args call get stats method'
     );
 };
 

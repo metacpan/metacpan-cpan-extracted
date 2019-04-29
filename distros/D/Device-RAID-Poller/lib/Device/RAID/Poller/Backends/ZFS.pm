@@ -211,6 +211,18 @@ sub usable {
 		return 0;
 	}
 
+	# If this is FreeBSD, make sure ZFS is laoded.
+	# If we don't do this, the pool test will result in
+	# it being loaded, which we don't want to do.
+	if ( $^O !~ 'freebsd' ){
+		# Test for this via this method as 'kldstat -q -n zfs' will error if it is compiled in
+		system('/sbin/sysctl -q kstat.zfs.misc.arcstats.hits > /dev/null');
+		if ( $? != 0 ){
+			$self->{usable}=0;
+			return 0;
+		}
+	}
+
 	# make sure we can locate zpool
 	# Written like this as which on some Linux distros such as CentOS 7 is broken.
 	my $zpool_bin=`/bin/sh -c 'which zpool 2> /dev/null'`;

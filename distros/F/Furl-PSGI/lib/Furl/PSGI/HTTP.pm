@@ -1,5 +1,5 @@
 package Furl::PSGI::HTTP;
-$Furl::PSGI::HTTP::VERSION = '0.01';
+$Furl::PSGI::HTTP::VERSION = '0.02';
 # ABSTRACT: Furl's low-level interface, wired to PSGI
 
 use warnings;
@@ -29,7 +29,8 @@ sub connect { 1 }
 sub write_all {
   my ($self, $sock, $p, $timeout_at) = @_;
   
-  ($self->{request} //= '') .= $p;
+  $self->{request} = '' if !exists $self->{request};
+  $self->{request} .= $p;
 
   1;
 }
@@ -85,7 +86,7 @@ Furl::PSGI::HTTP - Furl's low-level interface, wired to PSGI
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

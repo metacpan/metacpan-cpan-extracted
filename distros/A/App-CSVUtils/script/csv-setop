@@ -1,0 +1,309 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_setop
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
+
+our $DATE = '2019-04-29'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '0.020'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv_setop",
+    program_name => "csv-setop",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Set operation against several CSV files
+# PODNAME: csv-setop
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv-setop - Set operation against several CSV files
+
+=head1 VERSION
+
+This document describes version 0.020 of csv-setop (from Perl distribution App-CSVUtils), released on 2019-04-29.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % csv-setop [options] <filenames> ...
+
+=head1 DESCRIPTION
+
+Example input:
+
+ # file1.csv
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 7,8,9
+ 
+ # file2.csv
+ a,b,c
+ 1,2,3
+ 4,5,7
+ 7,8,9
+
+Output of intersection (C<--intersect file1.csv file2.csv>), which will return
+common rows between the two files:
+
+ a,b,c
+ 1,2,3
+ 7,8,9
+
+Output of union (C<--union file1.csv file2.csv>), which will return all rows with
+duplicate removed:
+
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 4,5,7
+ 7,8,9
+
+Output of difference (C<--diff file1.csv file2.csv>), which will return all rows
+in the first file but not in the second:
+
+ a,b,c
+ 4,5,6
+
+Output of symmetric difference (C<--symdiff file1.csv file2.csv>), which will
+return all rows in the first file not in the second, as well as rows in the
+second not in the first:
+
+ a,b,c
+ 4,5,6
+ 4,5,7
+
+You can specify C<--compare-fields> to only consider some fields only, for
+example C<--union --compare-fields a,b file1.csv file2.csv>:
+
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 7,8,9
+
+Each field specified in C<--compare-fields> can be specified using C<F1:F2:...>
+format to refer to different field names or indexes in each file, for example if
+C<file3.csv> is:
+
+ # file3.csv
+ Ei,Si,Bi
+ 1,3,2
+ 4,7,5
+ 7,9,8
+
+Then C<--union --compare-fields a:Ei,b:Bi file1.csv file3.csv> will result in:
+
+ a,b,c
+ 1,2,3
+ 4,5,6
+ 7,8,9
+
+Finally you can print out certain fields using C<--result-fields>.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--compare-fields>=I<s>
+
+=item B<--diff*>
+
+Shortcut for --op=diff.
+
+See C<--op>.
+
+=item B<--filename>=I<s@>*, B<-f>
+
+Input CSV files.
+
+Can be specified multiple times.
+
+=item B<--filenames-json>=I<s>
+
+Input CSV files (JSON-encoded).
+
+See C<--filename>.
+
+=item B<--ignore-case>, B<-i>
+
+=item B<--intersect*>
+
+Shortcut for --op=intersect.
+
+See C<--op>.
+
+=item B<--no-header>
+
+When you declare that CSV does not have header row (`--no-header`), the fields
+will be named `field1`, `field2`, and so on.
+
+
+=item B<--op>=I<s>*
+
+Set operation to perform.
+
+Valid values:
+
+ ["intersect","union","diff","symdiff"]
+
+=item B<--result-fields>=I<s>
+
+=item B<--symdiff*>
+
+Shortcut for --op=symdiff.
+
+See C<--op>.
+
+=item B<--tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=item B<--union*>
+
+Shortcut for --op=union.
+
+See C<--op>.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv-setop csv-setop
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv-setop 'p/*/`csv-setop`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<setop>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

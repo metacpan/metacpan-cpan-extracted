@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 
@@ -60,6 +61,7 @@ typedef struct {
     STRLEN size;
     char* curbyte;
     char* end;
+    bool is_map_key;
 } decode_ctx;
 
 enum enum_sizetype {
@@ -143,6 +145,18 @@ void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
 void _croak_invalid_utf8( pTHX_ char *string ) {
     static char * words[3] = { "InvalidUTF8", NULL, NULL };
     words[1] = string;
+
+    _die( aTHX_ G_DISCARD, words);
+}
+
+void _croak_invalid_map_key( pTHX_ const char *key, STRLEN offset ) {
+    static char * words[4] = { "InvalidMapKey", NULL, NULL, NULL };
+
+    words[1] = key;
+
+    char offsetstr[20];
+    snprintf( offsetstr, 20, "%lu", offset );
+    words[2] = offsetstr;
 
     _die( aTHX_ G_DISCARD, words);
 }
@@ -648,7 +662,10 @@ SV *_decode_array( pTHX_ decode_ctx* decstate ) {
 //----------------------------------------------------------------------
 
 void _decode_to_hash( pTHX_ decode_ctx* decstate, HV *hash ) {
+    decstate->is_map_key = true;
     SV *curkey = _decode( aTHX_ decstate );
+    decstate->is_map_key = false;
+
     SV *curval = _decode( aTHX_ decstate );
 
     // This is going to be a hash key, so it can’t usefully be
@@ -900,17 +917,33 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
         case TYPE_OTHER:
             switch ((uint8_t) *(decstate->curbyte)) {
                 case CBOR_FALSE:
+                    if (decstate->is_map_key) {
+                        _croak_invalid_map_key( aTHX_ "false", decstate->curbyte- decstate->start );
+                    }
+
                     ret = newSVsv( get_sv("CBOR::Free::false", 0) );
                     ++decstate->curbyte;
                     break;
 
                 case CBOR_TRUE:
+                    if (decstate->is_map_key) {
+                        _croak_invalid_map_key( aTHX_ "true", decstate->curbyte - decstate->start );
+                    }
+
                     ret = newSVsv( get_sv("CBOR::Free::true", 0) );
                     ++decstate->curbyte;
                     break;
 
                 case CBOR_NULL:
+                    if (decstate->is_map_key) {
+                        _croak_invalid_map_key( aTHX_ "null", decstate->curbyte - decstate->start );
+                    }
+
                 case CBOR_UNDEFINED:
+                    if (decstate->is_map_key) {
+                        _croak_invalid_map_key( aTHX_ "undefined", decstate->curbyte - decstate->start );
+                    }
+
                     ret = newSVsv( &PL_sv_undef );
                     ++decstate->curbyte;
                     break;
@@ -997,14 +1030,14 @@ fake_encode( SV * value )
 SV *
 _c_encode( SV * value )
     CODE:
-        RETVAL = _encode(aTHX_ value, NULL, 0);
+        RETVAL = _encode(aTHX_ value, NULL, false);
     OUTPUT:
         RETVAL
 
 SV *
 _c_encode_canonical( SV * value )
     CODE:
-        RETVAL = _encode(aTHX_ value, NULL, 1);
+        RETVAL = _encode(aTHX_ value, NULL, true);
     OUTPUT:
         RETVAL
 
@@ -1021,6 +1054,7 @@ decode( SV *cbor )
             cborlen,
             cborstr,
             cborstr + cborlen,
+            false,
         };
 
         RETVAL = _decode( aTHX_ &decode_state );

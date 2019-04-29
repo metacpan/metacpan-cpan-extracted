@@ -61,7 +61,7 @@
    "provides" : {
       "Compress::Zstd" : {
          "file" : "lib/Compress/Zstd.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Compress::Zstd::CompressionContext" : {
          "file" : "lib/Compress/Zstd/CompressionContext.pm"
@@ -93,7 +93,7 @@
          "web" : "https://github.com/spiritloose/Compress-Zstd"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_contributors" : [
       "Jiro Nishiguchi <jiro@cpan.org>",
       "Jiro Nishiguchi <spiritloose@users.noreply.github.com>"

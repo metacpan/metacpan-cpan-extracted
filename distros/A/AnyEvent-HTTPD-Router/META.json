@@ -1,0 +1,86 @@
+{
+   "abstract" : "Adding Routes to AnyEvent::HTTPD",
+   "author" : [
+      "Martin Barth (ufobat)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-HTTPD-Router",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTPD" : "0",
+            "common::sense" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::HTTPD::Router" : {
+         "file" : "lib/AnyEvent/HTTPD/Router.pm",
+         "version" : "v1.0.0"
+      },
+      "AnyEvent::HTTPD::Router::DefaultDispatcher" : {
+         "file" : "lib/AnyEvent/HTTPD/Router/DefaultDispatcher.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router/issues"
+      },
+      "homepage" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router",
+      "repository" : {
+         "url" : "git://github.com/ufobat/p5-AnyEvent-HTTPD-Router.git",
+         "web" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router"
+      }
+   },
+   "version" : "1.0.0",
+   "x_authority" : "cpan:UFOBAT",
+   "x_contributors" : [
+      "Martin Barth <martin@senfdax.de>",
+      "Martin Barth <ufobat@users.noreply.github.com>",
+      "Paul Koschinski <koschinski@united-domains.de>",
+      "koschkosch <49227658+koschkosch@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

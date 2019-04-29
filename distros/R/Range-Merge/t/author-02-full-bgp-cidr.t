@@ -9,7 +9,7 @@ BEGIN {
 
 
 #
-# Copyright (C) 2016 J. Maslak
+# Copyright (C) 2016 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -29,7 +29,7 @@ MAIN: {
 
     my $result = merge_ipv4(\@indata);
 
-    is(scalar(@$result), 477222, 'Merge returns the right number of CIDRs');
+    is(scalar(@$result), 461222, 'Merge returns the right number of CIDRs');
 
     done_testing;
 }

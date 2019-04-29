@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Pixela
 
+0.021 2019-04-29T09:20:29Z
+    - update new API (stats)
+
 0.01 2019-03-06T01:33:52Z
 
     - original version

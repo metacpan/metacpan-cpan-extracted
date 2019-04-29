@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.008';
+$Arango::Tango::API::VERSION = '0.009';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
 
@@ -11,15 +11,15 @@ use JSON;
 use Clone 'clone';
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
-use JSON::Schema::Fit 0.02;
+use JSON::Schema::Fit 0.07;
 
 my %API = (
-    create_document   => { method => 'post',   uri => '{database}_api/document/{collection}' },
-    delete_collection => { method => 'delete', uri => '{database}_api/collection/{name}'     },
+    create_document   => { method => 'post',   uri => '{{database}}_api/document/{collection}' },
+    delete_collection => { method => 'delete', uri => '{{database}}_api/collection/{name}'     },
     delete_database   => { method => 'delete', uri => '_api/database/{name}'                 },
-    list_collections  => { method => 'get',    uri => '{database}_api/collection'            },
-    cursor_next       => { method => 'put',    uri => '{database}_api/cursor/{id}'           },
-    cursor_delete     => { method => 'delete', uri => '{database}_api/cursor/{id}'           },
+    list_collections  => { method => 'get',    uri => '{{database}}_api/collection'            },
+    cursor_next       => { method => 'put',    uri => '{{database}}_api/cursor/{id}'           },
+    cursor_delete     => { method => 'delete', uri => '{{database}}_api/cursor/{id}'           },
     list_databases    => { method => 'get',    uri => '_api/database'                        },
     get_user_databases => { method => 'get' ,  uri => '_api/user/{username}/database',  params => { full => {type => 'boolean' } } },
     cluster_endpoints => { method => 'get',    uri => '_api/cluster/endpoints'               },
@@ -36,18 +36,24 @@ my %API = (
     statistics_description  => { method => 'get', uri => '_admin/statistics-description'     },
     list_users        => { method => 'get',    uri => '_api/user'                            },
     get_user          => { method => 'get',    uri => '_api/user/{username}'                 },
+    get_access_level  => { method => 'get',    uri => '_api/user/{username}/database/{database}' },
+    clear_access_level => { method => 'delete', uri => '_api/user/{username}/database/{database}' },
+    set_access_level  => { method => 'put',    uri => '_api/user/{username}/database/{database}', params => { grant => { type => 'string', enum => [qw'rw ro none'], default => 'none' }}},
+    get_access_level_c => { method => 'get',   uri => '_api/user/{username}/database/{database}/{collection}' },
+    clear_access_level_c => { method => 'delete', uri => '_api/user/{username}/database/{database}/{collection}' },
+    set_access_level_c => { method => 'put',   uri => '_api/user/{username}/database/{database}/{collection}', params => { grant => { type => 'string', enum => [qw'rw ro none'], default => 'none' }}},
     'create_database' => {
         method  => 'post',
         uri     => '_api/database',
         params  => { name => { type => 'string' }},
-        builder => sub { 
+        builder => sub {
             my ($self, %params) = @_;
             return Arango::Tango::Database->_new(arango => $self, 'name' => $params{name});
         },
     },
    'create_collection' => {
         method  => 'post',
-        uri     => '{database}_api/collection',
+        uri     => '{{database}}_api/collection',
         params  => { name => { type => 'string' }},
         builder => sub {
             my ($self, %params) = @_;
@@ -56,7 +62,7 @@ my %API = (
     },
     'all_keys' => {
         method => 'put',
-        uri    => '{database}_api/simple/all-keys',
+        uri    => '{{database}}_api/simple/all-keys',
         params => { type => { type => 'string' }, collection => { type => 'string' } },
     },
     'version' => {
@@ -66,9 +72,9 @@ my %API = (
     },
     'create_cursor' => {
         method => 'post',
-        uri    => '{database}_api/cursor',
-        params => { 
-            query       => { type => 'string'  }, 
+        uri    => '{{database}}_api/cursor',
+        params => {
+            query       => { type => 'string'  },
             count       => { type => 'boolean' },
             batchSize   => { type => 'integer' },
             cache       => { type => 'boolean' },
@@ -103,6 +109,24 @@ my %API = (
               extra    => { type => 'object', additionalProperties => 1 },
           }
       },
+      update_user => {
+          method => 'patch',
+          uri => '_api/user/{user}',
+          params => {
+              password => { type => 'string'  },
+              active   => { type => 'boolean' },
+              extra    => { type => 'object', additionalProperties => 1 },
+          }
+      },
+      replace_user => {
+          method => 'put',
+          uri => '_api/user/{user}',
+          params => {
+              password => { type => 'string'  },
+              active   => { type => 'boolean' },
+              extra    => { type => 'object', additionalProperties => 1 },
+          }
+      },
       log => {
           method => 'get',
           uri => '_admin/log',
@@ -122,7 +146,7 @@ my %API = (
 sub _check_options {
     my ($params, $properties) = @_;
     my $schema = { type => 'object', additionalProperties => 0, properties => $properties };
-    my $prepared_data = JSON::Schema::Fit->new()->get_adjusted($params, $schema);
+    my $prepared_data = JSON::Schema::Fit->new(replace_invalid_values => 1)->get_adjusted($params, $schema);
     return $prepared_data;
 }
 
@@ -133,7 +157,7 @@ sub _api {
 
     my $params_copy = clone $params;
 
-    $uri =~ s!\{database\}! defined $params->{database} ? "_db/$params->{database}/" : "" !e;
+    $uri =~ s!\{\{database\}\}! defined $params->{database} ? "_db/$params->{database}/" : "" !e;
     $uri =~ s/\{([^}]+)\}/$params->{$1}/g;
 
     my $url = "http://" . $self->{host} . ":" . $self->{port} . "/" . $uri;
@@ -158,7 +182,7 @@ sub _api {
     }
 
     #use Data::Dumper;
-    # print STDERR "\n -- $API{$action}{method} | $url\n";
+#print STDERR " -- $API{$action}{method} | $url\n";
     #print STDERR "\n\nOPTS:\n\n", Dumper($opts);
 
     my $response = $self->{http}->request($API{$action}{method}, $url, $opts);
@@ -194,7 +218,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

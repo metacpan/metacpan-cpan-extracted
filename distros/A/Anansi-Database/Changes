@@ -6,3 +6,6 @@ Revision history for Perl extension Anansi::Database.
 0.02  Wed Jun 05 18:47:56 2013
 	- modified the POD to accommodate changes to "Anansi::Class".
 	- modified the POD to accommodate changes to "Anansi::ComponentManager".
+0.03  Tue Apr 09 16:27:51 2019
+	- modified module dependencies in makefile.
+	- modified README to reflect module dependencies.

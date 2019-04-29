@@ -1,5 +1,5 @@
-WWW::NOS::Open version 0.101
-============================
+WWW::NOS::Open version v1.0.2
+=============================
 
 This is a framework that makes makes data from the Open NOS REST API
 <http://open.nos.nl/> available in Perl.

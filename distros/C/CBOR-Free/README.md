@@ -64,6 +64,8 @@ become Perl binary strings. (This may become configurable later.)
     Note that invalid UTF-8 in a CBOR UTF-8 string is considered
     invalid input and will thus prompt a thrown exception.
 
+- CBOR null, undefined, true, and false are considered invalid input
+when given as map keys. An exception is thrown if the decoder finds these.
 - CBOR booleans become the corresponding [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) values.
 Both CBOR null and undefined become Perl undef.
 - Tags are IGNORED for now. (This may become configurable later.)

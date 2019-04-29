@@ -243,6 +243,7 @@ ext/zstd/doc/zstd_compression_format.md
 ext/zstd/doc/zstd_manual.html
 ext/zstd/examples/Makefile
 ext/zstd/examples/README.md
+ext/zstd/examples/common.h
 ext/zstd/examples/dictionary_compression.c
 ext/zstd/examples/dictionary_decompression.c
 ext/zstd/examples/multiple_simple_compression.c
@@ -252,7 +253,6 @@ ext/zstd/examples/simple_decompression.c
 ext/zstd/examples/streaming_compression.c
 ext/zstd/examples/streaming_decompression.c
 ext/zstd/examples/streaming_memory_usage.c
-ext/zstd/examples/utils.h
 ext/zstd/lib/BUCK
 ext/zstd/lib/Makefile
 ext/zstd/lib/README.md
@@ -318,7 +318,6 @@ ext/zstd/lib/dll/example/README.md
 ext/zstd/lib/dll/example/build_package.bat
 ext/zstd/lib/dll/example/fullbench-dll.sln
 ext/zstd/lib/dll/example/fullbench-dll.vcxproj
-ext/zstd/lib/dll/libzstd.def
 ext/zstd/lib/legacy/zstd_legacy.h
 ext/zstd/lib/legacy/zstd_v01.c
 ext/zstd/lib/legacy/zstd_v01.h
@@ -350,6 +349,8 @@ ext/zstd/programs/dibio.h
 ext/zstd/programs/fileio.c
 ext/zstd/programs/fileio.h
 ext/zstd/programs/platform.h
+ext/zstd/programs/timefn.c
+ext/zstd/programs/timefn.h
 ext/zstd/programs/util.c
 ext/zstd/programs/util.h
 ext/zstd/programs/windres/generate_res.bat
@@ -378,6 +379,8 @@ ext/zstd/tests/fuzz/README.md
 ext/zstd/tests/fuzz/block_decompress.c
 ext/zstd/tests/fuzz/block_round_trip.c
 ext/zstd/tests/fuzz/default.options
+ext/zstd/tests/fuzz/dictionary_decompress.c
+ext/zstd/tests/fuzz/dictionary_round_trip.c
 ext/zstd/tests/fuzz/fuzz.h
 ext/zstd/tests/fuzz/fuzz.py
 ext/zstd/tests/fuzz/fuzz_helpers.h

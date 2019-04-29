@@ -28,7 +28,7 @@ no_index:
 provides:
   Compress::Zstd:
     file: lib/Compress/Zstd.pm
-    version: '0.17'
+    version: '0.18'
   Compress::Zstd::CompressionContext:
     file: lib/Compress/Zstd/CompressionContext.pm
   Compress::Zstd::CompressionDictionary:
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/spiritloose/Compress-Zstd/issues
   homepage: https://github.com/spiritloose/Compress-Zstd
   repository: git://github.com/spiritloose/Compress-Zstd.git
-version: '0.17'
+version: '0.18'
 x_contributors:
   - 'Jiro Nishiguchi <jiro@cpan.org>'
   - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'

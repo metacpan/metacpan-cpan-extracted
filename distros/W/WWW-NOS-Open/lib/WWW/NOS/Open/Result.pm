@@ -1,4 +1,4 @@
-package WWW::NOS::Open::Result 0.101;    # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open::Result v1.0.2;    # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ WWW::NOS::Open::Result - client side search result in the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Result version 0.101.
+This document describes WWW::NOS::Open::Result version v1.0.2.
 
 =head1 SYNOPSIS
 

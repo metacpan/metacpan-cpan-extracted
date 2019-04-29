@@ -7,8 +7,11 @@ modules.
 The currently supported systems are listed below.
 
     FreeBSD GEOM mirror
-	ZFS
-	Linux mdadm
+    FreeBSD GEOM RAID3
+    FreeBSD GEOM RAID
+    ZFS
+    Linux mdadm
+    Adaptec arcconf
 
 INSTALLATION
 

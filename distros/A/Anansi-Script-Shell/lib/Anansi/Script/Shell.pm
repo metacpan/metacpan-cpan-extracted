@@ -7,21 +7,125 @@ Anansi::Script::Shell - Defines the mechanisms specific to handling command line
 
 =head1 SYNOPSIS
 
- my $OBJECT = Anansi::Script::Shell->new();
+    my $OBJECT = Anansi::Script::Shell->new();
 
 =head1 DESCRIPTION
 
 This module is designed to be an optional component module for use by the
 L<Anansi::Script> component management module.  It defines the processes
 specific to handling both input and output from Perl scripts that are executed
-from a command line.  See L<Anansi::Component> for inherited methods.
+from a command line.  Uses L<Anansi::ComponentManager> I<(indirectly)>,
+L<Anansi::ScriptComponent> and L<base>.
 
 =cut
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-use base qw(Anansi::Component);
+use base qw(Anansi::ScriptComponent);
+
+
+=head1 INHERITED METHODS
+
+=cut
+
+
+=head2 addChannel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 channel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 componentManagers
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 finalise
+
+    $OBJECT->SUPER::finalise();
+
+    $OBJECT->Anansi::Script::Shell::finalise();
+
+Declared in L<Anansi::Class>.  Overridden by this module.
+
+=cut
+
+
+sub finalise {
+    my ($self, %parameters) = @_;
+    print $self->content();
+}
+
+
+=head2 implicate
+
+Declared in L<Anansi::Class>.  Intended to be overridden by an extending module.
+
+=cut
+
+
+=head2 import
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 initialise
+
+    $OBJECT->SUPER::initialise();
+
+    $OBJECT->Anansi::Script::Shell::initialise();
+
+Declared in L<Anansi::Class>.  Overridden by this module.
+
+=cut
+
+
+sub initialise {
+    my ($self, %parameters) = @_;
+    $self->loadParameters(%parameters);
+    $self->content();
+}
+
+
+=head2 old
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 removeChannel
+
+Declared in L<Anansi::Component>.
+
+=cut
+
+
+=head2 used
+
+Declared in L<Anansi::Class>.
+
+=cut
+
+
+=head2 uses
+
+Declared in L<Anansi::Class>.
+
+=cut
 
 
 =head1 METHODS
@@ -31,23 +135,15 @@ use base qw(Anansi::Component);
 
 =head2 content
 
- my $contents = $OBJECT->content();
+    my $contents = $OBJECT->content();
 
- # OR
+    if(1 == $OBJECT->content(undef, undef));
 
- if(1 == $OBJECT->content(undef, undef));
+    if(1 == $OBJECT->channel('CONTENT', undef));
 
- # OR
+    if(1 == $OBJECT->content(undef, 'some content'));
 
- if(1 == $OBJECT->channel('CONTENT', undef));
-
- # OR
-
- if(1 == $OBJECT->content(undef, 'some content'));
-
- # OR
-
- if(1 == $OBJECT->channel('CONTENT', 'some content'));
+    if(1 == $OBJECT->channel('CONTENT', 'some content'));
 
 Either returns the existing content or redefines the content.
 
@@ -68,45 +164,12 @@ sub content {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::Shell', 'CONTENT' => 'content');
-
-
-=head2 finalise
-
- $OBJECT::SUPER->finalise(@_);
-
-An overridden virtual method called during object destruction.  Not intended to
-be directly called unless overridden by a descendant.
-
-=cut
-
-
-sub finalise {
-    my ($self, %parameters) = @_;
-    print $self->content();
-}
-
-
-=head2 initialise
-
- $OBJECT::SUPER->initialise(@_);
-
-An overridden virtual method called during object creation.  Not intended to be
-directly called unless overridden by a descendant.
-
-=cut
-
-
-sub initialise {
-    my ($self, %parameters) = @_;
-    $self->loadParameters(%parameters);
-    $self->content();
-}
+Anansi::ScriptComponent::addChannel('Anansi::Script::Shell', 'CONTENT' => 'content');
 
 
 =head2 loadParameters
 
- $OBJECT->loadParameters();
+    $OBJECT->loadParameters();
 
 Loads all of the argument values from the command line, assigning any names that
 are supplied to the values.
@@ -133,15 +196,11 @@ sub loadParameters {
 
 =head2 medium
 
- my $medium = Anansi::Script::Shell->medium();
+    my $medium = Anansi::Script::Shell->medium();
 
- # OR
+    my $medium = $OBJECT->medium();
 
- my $medium = $OBJECT->medium();
-
- # OR
-
- my $medium = $OBJECT->channel('MEDIUM');
+    my $medium = $OBJECT->channel('MEDIUM');
 
 Returns the STRING description of the medium this module is designed to handle.
 
@@ -155,32 +214,22 @@ sub medium {
     return 'SHELL';
 }
 
-Anansi::Component::addChannel('Anansi::Script::Shell', 'MEDIUM' => 'medium');
+Anansi::ScriptComponent::addChannel('Anansi::Script::Shell', 'MEDIUM' => 'medium');
 
 
 =head2 parameter
 
- my $parameters = $OBJECT->parameter();
+    my $parameters = $OBJECT->parameter();
 
- # OR
+    my $parameters = $OBJECT->channel('PARAMETER');
 
- my $parameters = $OBJECT->channel('PARAMETER');
+    my $parameterValue = $OBJECT->parameter(undef, 'parameter name');
 
- # OR
+    my $parameterValue = $OBJECT->channel('PARAMETER', 'parameter name');
 
- my $parameterValue = $OBJECT->parameter(undef, 'parameter name');
+    if($OBJECT->parameter(undef, 'parameter name' => 'parameter value', 'another parameter' => undef));
 
- # OR
-
- my $parameterValue = $OBJECT->channel('PARAMETER', 'parameter name');
-
- # OR
-
- if($OBJECT->parameter(undef, 'parameter name' => 'parameter value', 'another parameter' => undef));
-
- # OR
-
- if($OBJECT->channel('PARAMETER', 'parameter name' => 'parameter value', 'another parameter' => undef));
+    if($OBJECT->channel('PARAMETER', 'parameter name' => 'parameter value', 'another parameter' => undef));
 
 Either returns an ARRAY of all the existing parameter names or returns the value
 of a specific parameter or sets the value of one or more parameters.  Assigning
@@ -215,16 +264,14 @@ sub parameter {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::Shell', 'PARAMETER' => 'parameter');
+Anansi::ScriptComponent::addChannel('Anansi::Script::Shell', 'PARAMETER' => 'parameter');
 
 
 =head2 validate
 
- my $valid = $OBJECT->validate();
+    my $valid = $OBJECT->validate();
 
- # OR
-
- my $valid = $OBJECT->channel('VALIDATE_AS_APPROPRIATE');
+    my $valid = $OBJECT->channel('VALIDATE_AS_APPROPRIATE');
 
 Determines whether this module is the correct one to use for handling Perl
 script execution.
@@ -236,18 +283,28 @@ sub validate {
     my $self = shift(@_);
     my $channel;
     $channel = shift(@_) if(0 < scalar(@_));
-    return 0 if(defined($ENV{'HTTP_HOST'}));
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::Script::Shell', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+Anansi::ScriptComponent::addChannel('Anansi::Script::Shell', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+
+
+=head1 NOTES
+
+This module is designed to make it simple, easy and quite fast to code your
+design in perl.  If for any reason you feel that it doesn't achieve these goals
+then please let me know.  I am here to help.  All constructive criticisms are
+also welcomed.
+
+=cut
 
 
 =head1 AUTHOR
 
-Kevin Treleaven <kevin AT treleaven DOT net>
+Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 =cut
 
 
 1;
+

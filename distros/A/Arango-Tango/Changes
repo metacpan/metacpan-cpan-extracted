@@ -1,3 +1,21 @@
+0009  2019-04-29
+    
+   - Tango.pm:
+     - Get user permissions for specific database/Collection (get_access_level)
+     - Set user permissions for specific database/Collection (set_access_level)
+     - Clear user permissions for specific database/Collection (clear_access_level)        
+   - Database.pm:
+     - Delete route (delete)
+     - Obtain user access level (get_access_level)
+     - Set user access level (set_access_level)
+     - Clear user access level (clear_access_level)    
+     - Update user data (update_user)
+     - Replace user data (replace_user)    
+   - Collection.pm
+     - Obtain user access level (get_access_level)    
+     - Set user access level (set_access_level)
+     - Clear user access level (clear_access_level)        
+
 0.008  2019-04-26
    - User admin routes (list_users, user, user_databases)
    - Cluster metadata routes (server_role/cluster_endpoints)

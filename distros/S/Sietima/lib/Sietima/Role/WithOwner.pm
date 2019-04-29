@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Sietima::Types qw(Address AddressFromStr);
 use namespace::clean;
 
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: role for lists with an owner
 
 
@@ -37,7 +37,7 @@ Sietima::Role::WithOwner - role for lists with an owner
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

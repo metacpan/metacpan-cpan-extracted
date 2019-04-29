@@ -1,4 +1,4 @@
-package WWW::NOS::Open::Video 0.101;    # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open::Video v1.0.2;    # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ WWW::NOS::Open::Video - client side video in the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Video version 0.101.
+This document describes WWW::NOS::Open::Video version v1.0.2.
 
 =head1 SYNOPSIS
 

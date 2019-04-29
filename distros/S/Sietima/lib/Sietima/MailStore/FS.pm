@@ -8,7 +8,7 @@ use Sietima::Types qw(EmailMIME TagName);
 use Digest::SHA qw(sha1_hex);
 use namespace::clean;
 
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: filesystem-backed email store
 
 
@@ -132,7 +132,7 @@ Sietima::MailStore::FS - filesystem-backed email store
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

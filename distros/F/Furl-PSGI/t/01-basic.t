@@ -16,7 +16,7 @@ ok my $f = Furl::PSGI->new(app => $app),
 ok my $res = $f->get('http://foobaz.net/'),
   'Got response';
 
-ok $requests == 1,
+is $requests, 1,
   'exactly one request handled by app';
 
 is $res->status, '200',
@@ -25,6 +25,12 @@ is $res->status, '200',
 is $res->body, 'Hello World!',
   'correct body';
 
+ok $f->get('http://foobaz.net')->is_success,
+  "repeat requests... $_"
+  for 1..5;
+
+is $requests, 6,
+  'six requests handled by app now';
 
 subtest "404" => sub {
   ok my $res = Furl::PSGI

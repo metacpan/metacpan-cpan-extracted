@@ -1,3 +1,13 @@
+0.020   2019-04-29 (PERLANCAR)
+
+        - Add utilities: csv-setop, csv-sort-rows (with alias csv-sort),
+          csv-lookup-fields.
+
+        - Make $main::csv available to Perl code.
+
+        - [bugfix] A couple of fixes.
+
+
 0.019   2019-04-23 (PERLANCAR)
 
 	- Declare argument specification variables with 'our' instead of

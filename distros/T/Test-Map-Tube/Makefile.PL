@@ -19,7 +19,7 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Map::Tube'     => '3.60',
+        'Map::Tube'     => '3.61',
         'Data::Compare' => '1.25',
         'Test::Builder' => '1.001014',
     },
@@ -27,7 +27,7 @@ WriteMakefile(
     clean => { FILES => 'Test-Map-Tube-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
-        provides    => { 'Test::Map::Tube' => { file => 'lib/Test/Map/Tube.pm', version => '0.51' } },
+        provides    => { 'Test::Map::Tube' => { file => 'lib/Test/Map/Tube.pm', version => '0.53' } },
         resources   => {
             repository => {
                 type => 'git',

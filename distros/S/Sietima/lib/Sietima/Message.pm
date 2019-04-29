@@ -10,7 +10,7 @@ use Sietima::Subscriber;
 use Email::MIME;
 use namespace::clean;
 
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: an email message with an envelope
 
 
@@ -64,7 +64,7 @@ Sietima::Message - an email message with an envelope
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

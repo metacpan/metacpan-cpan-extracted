@@ -171,7 +171,7 @@ sub run_cmdline_sub($sietima,$method,$options={},$parameters={}) {
         cmd => $sietima,
         op => $method,
     });
-    $r->response(App::Spec::Run::Response->new);
+    $r->response(App::Spec::Run::Response->new(buffered=>1));
     ok(
         lives { $sietima->$method($r) },
         "calling $method should live",

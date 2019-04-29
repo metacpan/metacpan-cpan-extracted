@@ -1010,8 +1010,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               || (*compiler->bufptr) == '@'
             )
             {
-              if ((*compiler->bufptr == ':' && *(compiler->bufptr + 1) == ':')) {
-                compiler->bufptr += 2;
+              if (*compiler->bufptr == ':') {
+                if (*(compiler->bufptr + 1) == ':') {
+                  compiler->bufptr += 2;
+                }
+                else {
+                  SPVM_COMPILER_error(compiler, "Single colon \":\" in variable name is invalid at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                  compiler->bufptr += 1;
+                }
               }
               else {
                 compiler->bufptr++;
@@ -1045,13 +1051,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             
             // Package variable
-            if (isupper(var_name[1]) || strstr(var_name, "::")) {
-              return PACKAGE_VAR_NAME;
-            }
-            // Lexical variable
-            else {
-              return VAR_NAME;
-            }
+            return VAR_NAME;
           }
         }
         // Number Literal

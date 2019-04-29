@@ -1,0 +1,5 @@
+Revision history for Perl extension Anansi::Script::XML.
+
+0.01  Tue Apr 09 16:43:16 2019
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Script::XML

@@ -173,7 +173,7 @@ sub scm_id ( $self, $cb = undef ) {
                 }
 
                 # phase is unknown if remote SCM is git
-                undef $res{phase} if $self->upstream->{scm_type} eq $SCM_TYPE_GIT;
+                undef $res{phase} if !$self->upstream || $self->upstream->{scm_type} eq $SCM_TYPE_GIT;
 
                 $res->{data} = \%res;
             }

@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 use JSON qw/decode_json/;
 
-our $VERSION = "0.01";
+our $VERSION = "0.021";
 
 sub new {
     my ($class,$pixela_client) = @_;

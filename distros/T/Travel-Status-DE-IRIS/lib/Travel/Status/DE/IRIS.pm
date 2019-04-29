@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -144,11 +144,11 @@ sub new {
 	}
 
 	@{ $self->{results} } = grep {
-		my $d  = ( $_->departure // $_->arrival );
-		my $sd = $_->sched_departure // $_->sched_arrival // $d;
-		$d  = $d->subtract_datetime( $self->{datetime} );
-		$sd = $sd->subtract_datetime( $self->{datetime} );
-		not $d->is_negative and $sd->in_units('minutes') < $self->{lookahead}
+		my $d = $_->departure // $_->arrival;
+		my $s = $_->sched_arrival // $_->sched_departure // $_->arrival // $d;
+		$d = $d->subtract_datetime( $self->{datetime} );
+		$s = $s->subtract_datetime( $self->{datetime} );
+		not $d->is_negative and $s->in_units('minutes') < $self->{lookahead}
 	} @{ $self->{results} };
 
 	@{ $self->{results} }
@@ -613,7 +613,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 

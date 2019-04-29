@@ -1,4 +1,4 @@
-package WWW::NOS::Open::Interface 0.101;  # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open::Interface v1.0.2; # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ WWW::NOS::Open::Interface - Interface for the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Interface version 0.101.
+This document describes WWW::NOS::Open::Interface version v1.0.2.
 
 =head1 SYNOPSIS
 

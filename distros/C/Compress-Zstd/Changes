@@ -1,5 +1,8 @@
 Revision history for Perl extension Compress-Zstd
 
+0.18 2019-04-29T08:45:05Z
+    - zstd 1.4.0
+
 0.17 2019-03-31T12:24:15Z
     - Added experimental context and dictionary interfaces
 

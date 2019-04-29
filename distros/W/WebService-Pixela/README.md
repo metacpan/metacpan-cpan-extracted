@@ -235,12 +235,22 @@ Delete the predefined pixelation graph definition.
 
 See Also [https://docs.pixe.la/#/delete-graph](https://docs.pixe.la/#/delete-graph)
 
-#### `$pixela->graph->html()`
+#### `$pixela->graph->html(%args)`
 
 Displays the details of the graph in html format.
 (This method return html urls)
 
-See Also [https://docs.pixe.la/#/get-graph-html](https://docs.pixe.la/#/get-graph-html)
+_%args_ might be
+
+- `[required (autoset)] id :  Str`
+
+    It is an ID for identifying the pixelation graph.
+
+    If set in an instance of WebService::Pixela::Graph, use that value.
+
+- `( line => true )`
+
+    \[optional\] URI tail add line mode parameter.
 
 #### `$pixela->graph->pixels(%args)`
 
@@ -258,6 +268,20 @@ _%args_ might be
     \[optional\] Specify the end position of the period.
 
 See Also [https://docs.pixe.la/#/get-graph-pixels](https://docs.pixe.la/#/get-graph-pixels)
+
+#### `$pixela->graph->stats($id)`
+
+Based on the registered information, get various statistics.
+
+_$id_ might be
+
+- `[required (autoset)] id :  Str`
+
+    It is an ID for identifying the pixelation graph.
+
+    If set in an instance of WebService::Pixela::Graph, use that value.
+
+See Also [https://docs.pixe.la/entry/get-graph-stats](https://docs.pixe.la/entry/get-graph-stats)
 
 ### `$pixela->pixel`
 

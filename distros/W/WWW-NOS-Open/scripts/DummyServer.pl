@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-our $VERSION = '0.101';
+our $VERSION = 'v1.0.2';
 
 use CGI qw/:all/;
 use Getopt::Long;
@@ -30,9 +30,9 @@ Readonly::Scalar my $STRIP_QUERY     => qr{^/[?]}sxm;
 
 Readonly::Array my @GETOPT_CONFIG =>
   qw(no_ignore_case bundling auto_version auto_help);
-Readonly::Array my @GETOPTIONS => ( q{port|p=s}, q{verbose|v+}, );
+Readonly::Array my @GETOPTIONS  => ( q{port|p=s}, q{verbose|v+}, );
 Readonly::Hash my %OPTS_DEFAULT => ( 'port' => $CONNECTOR_PORT, );
-Readonly::Hash my %OUTPUT => (
+Readonly::Hash my %OUTPUT       => (
     'json' => q{application/json},
     'xml'  => q{text/xml},
     'php'  => q{text/plain},
@@ -630,7 +630,7 @@ sub main {
     my ( $req, $res ) = @_;
     my $uri = $req->uri;
     $uri =~ s{$STRIP_QUERY}{}smx;
-    my $q = CGI->new($uri);
+    my $q     = CGI->new($uri);
     my %param = split $SLASH, $uri;
     if ( !defined $OUTPUT{ lc $param{'output'} } ) {
         $res->add_content_utf8( $ERROR{'bad_request_invalid'} );

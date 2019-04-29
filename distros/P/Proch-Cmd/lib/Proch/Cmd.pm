@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Proch::Cmd;
 
-$Proch::Cmd::VERSION = 0.001;
+$Proch::Cmd::VERSION = 0.004;
 # ABSTRACT: Execute shell commands controlling inputs and outputs
 
 
@@ -279,11 +279,36 @@ Proch::Cmd - Execute shell commands controlling inputs and outputs
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
-  ...
+  use Proch::Cmd;
+
+
+  # The module is designed with settings affecting every execution
+  my $settings = Proch::Cmd->new(
+        command => '',
+        verbose => 1,
+        debug => 1
+  );
+
+  # Settings can be edited at any time
+  $settings->set_global('working_dir', '/hpc-home/telatina/tmp/');
+
+  # Create a new command object
+  my $c1 = Proch::Cmd->new(
+                  command => 'ls -lh /etc/passwd /etc/vimrc hello',
+                  input_files => ['/etc/passwd' , '/etc/vimrc', 'hello'],
+                  output_files => [],
+                  debug => 0,
+                  verbose => 0,
+                  object => \$object,
+  );
+
+  my $simple = $c1->simplerun();
+
+  say $simple->{output} if (! $simple->{exit_code});
 
 =head1 NAME
 
@@ -291,21 +316,66 @@ Proch::Cmd - a simple library to execute shell commands
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 METHODS
 
-=head2 method_x
+=head2 new()
 
-This method does something experimental.
+The method creates a new shell command object, with the followin properties:
 
-=head2 method_y
+=over 4
 
-This method returns a reason.
+=item I<command> [required]
+
+The shell command to execute
+
+=item I<workingdir> (default: /tmp) [important]
+
+Command temporary directory, should be the pipeline output directory, can be 
+omitted for minor commands like 'mkdir', but should be set for pipeline steps.
+
+=item I<description>
+
+Optional description of the command, for log and verbose mode
+
+=item I<input_files> (array)
+
+A list of files that must exist and be not empty before command execution
+
+=item I<output_files> (array)
+
+A list of files that must exist and be not empty after command execution
+
+=item I<die_on_error> (default: 1)
+
+If command returns non zero value, die (default behaviour)
+
+=item I<verbose>
+
+Enable verbose execution
+
+=item I<no_cache>
+
+Don't skip command execution if the command was already executed
+
+=back
+
+=head2 simplerun()
+
+Executes the shell command returning an object
+
+=head1 ACCESSORY SCRIPTS
+
+The 'scripts' directory contain a I<read_cache_files.pl> that can be used to display the 
+content of this module's cache files. The 'data' directory contain a valid example of data
+file called 'data.ok'. To view its content:
+
+  perl scripts/read_cache_files.pl -f data/data.ok
 
 =head1 AUTHOR
 
-  Andrea Telatin <andrea@telatin.com>
+Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
