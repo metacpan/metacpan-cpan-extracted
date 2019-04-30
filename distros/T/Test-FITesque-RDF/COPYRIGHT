@@ -1,0 +1,60 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Test-FITesque-RDF
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+Source: https://metacpan.org/release/Test-FITesque-RDF
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Test/FITesque/RDF.pm
+ t/01basic.t
+ t/integration-basic.t
+ t/lib/Internal/Fixture/Multi.pm
+ t/lib/Internal/Fixture/Simple.pm
+ t/unit-multi.t
+ t/unit-relative.t
+ t/unit-simple.t
+Copyright: Copyright 2019 Kjetil Kjernsmo.
+License: Expat
+
+Files: INSTALL
+ LICENSE
+ README
+ t/data/multi.ttl
+ t/data/relative.ttl
+ t/data/simple.ttl
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Expat
+ This software is Copyright (c) 2019 by Kjetil Kjernsmo.
+ 
+ This is free software, licensed under:
+ 
+   The MIT (X11) License
+
+License: Artistic-1.0
+ This software is Copyright (c) 2019 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2019 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

@@ -1,0 +1,187 @@
+<!--
+ * This software is Copyright (c) 2015, 2019 by Ashley Willis.
+ * This is free software, licensed under:
+ *   The Apache License, Version 2.0, January 2004
+ -->
+    [% IF schema.defined %]
+        <!-- query submitter -->
+        <!-- autogenerate a form from the schema -->
+
+        <!-- some debugging stuff -->
+        <pre>
+        schema keys: [% schema.keys.join(', ') %]
+        [% IF schema.error %]error: [% schema.error %] [% END %]
+        [% IF schema.clients %]known clients: [% schema.clients.join(', ') %] [% END %]
+        </pre>
+
+        <blockquote>
+            [%-# sort the keys, with mandatory ones at the top %]
+            [%- mandatory_keys = [ ] %]
+            [%- indexed_keys = [ ] %]
+            [%- optional_keys = [ ] %]
+            [%- hidden_keys = [ ] %]
+            [%- FOREACH key IN schema.params.keys.sort %]
+                [%- IF schema.params.$key.mandatory == 1 %]
+                    [%- mandatory_keys.push(key) %]
+                [%- ELSIF schema.params.$key.indexed == 1 %]
+                    [%- indexed_keys.push(key) %]
+                [%- ELSIF ! schema.params.$key.hidden == 1 %]
+                    [%- optional_keys.push(key) %]
+                [%- ELSE %]
+                    [%- hidden_keys.push(key) %]
+                [%- END %]
+            [%- END %]
+            <h1> [% schema.title %] </h1>
+            [% IF schema.subtitle %]<h3> [% schema.subtitle %] </h3>[% END %]
+
+            [% IF indexes %]
+                You can query anything that is indexed. If you use an index which is not the first in a set, you must also use the preceding indexes in that set. You can combine sets.<br />
+                Index sets:<br />
+                [% USE SimpleJson %]
+                [% FOREACH index IN indexes %]
+                    [% SimpleJson.toJson(index) %]<br />
+                [% END %]<br />
+            [% END %]
+
+            [% show_subset = 'Show Hidden Options' %]
+            [% show_all = 'Show All Options' %]
+            [% IF schema.verb == 'GET' %]
+                [% show_all = 'Show All Options (please avoid using these as they are not indexed)' %]
+                [% show_subset = 'Show Indexed Options' %]
+            [% END %]
+            <form method="[% schema.verb %]" id="query" action="[% schema.path %]"><!-- FIXME: add [% request.headers.$prepend %] ?-->
+            [% hider = optional_keys.size and (mandatory_keys.size or indexed_keys.size) %]
+            [% IF hider %]
+            <!-- note if merge(hidden_keys) to optional_keys below, it will also show them -->
+            <span style="text-decoration: underline; cursor: pointer;"
+                    onClick="toggleGroup(this, ['[% optional_keys.join('\', \'') %]'], '[% show_all %]', '[% show_subset %]');">
+                [% show_all %]
+            </span>
+            [% END %]
+            <table border="1" rules="groups" id="table">
+            [% IF schema.limit && schema.verb == 'GET' %]
+            <tbody>
+                <tr>
+                    <td>limit results to:</td>
+                    <td><input type="text" name=".limit" value="[% schema.limit %]" onClick="$(':input').removeAttr('disabled');" /></td>
+                </tr>
+            </tbody>
+            [% END %]
+            [%- FOREACH key in mandatory_keys.merge(indexed_keys).merge(optional_keys).merge(hidden_keys) %]
+            <tbody [% UNLESS schema.params.$key.mandatory == 1 or schema.params.$key.indexed or ! hider %]style="display:none;"[% END %] id="[% key %]">
+                <tr id="[% key %]">
+                [%- IF schema.params.$key.type.size == 1 && schema.params.$key.type.0 == 'map' %]
+                    <td> [% key %][%- IF schema.params.$key.mandatory == 1 %] (required)[% END %]: </td>
+                    <td>
+                        <select name="[% key %]">
+                        [%- FOREACH key2 in schema.params.$key.map.keys %]
+                            [%- IF key2 == schema.params.$key.default %]
+                            <option value="[% key2 %]" selected="selected">[% key2 %]</option>
+                            [%- ELSIF ! schema.params.$key.only || schema.params.$key.only.$key2 %]
+                            <option value="[% key2 %]">[% key2 %]</option>
+                            [%- END %]
+                        [%- END %]
+                        </select>
+                    </td>
+                [%- ELSIF schema.params.$key.type.size == 1 && schema.params.$key.type.0 == 'list' %]
+                    <td> list... <!-- FIXME --> </td>
+                [%- ELSIF schema.params.$key.type.size == 1 && schema.params.$key.type.0 == 'mailbox-list' %]
+                    <td> [%- key -%][%- IF schema.params.$key.mandatory == 1 %] (required)[% END %]: </td>
+                    <td> <textarea name="[% key %]" rows="20" autofocus="true" onClick="$(':input').removeAttr('disabled');"></textarea> </td>
+                    <td>[% IF schema.params.$key.hint %]([% schema.params.$key.hint %])[% END %]</td>
+                [%- ELSE %]
+                    <td> [%- key -%][%- IF schema.params.$key.mandatory == 1 %] (required)[% END %]: </td>
+                    <td> <input type="text" name="[% key %]" value="[% schema.params.$key.default %]" onClick="$(':input').removeAttr('disabled');" /> </td>
+                    <td>[% IF schema.params.$key.hint %]([% schema.params.$key.hint %])[% END %]</td>
+                [%- END %]
+                [%- IF schema.params.$key.repeatable == 'yes' %]
+                    <td> <input id="add_[% key %]" type="button" value="Add another for OR" onClick="addKeyInput('[% key %]');" /> </td>
+                [%- ELSIF schema.params.$key.repeatable == 'once' %]
+                    <td> <input id="add_[% key %]" type="button" value="Add another for RANGE" onClick="addKeyInput('[% key %]', 2);" /> </td>
+                [%- END %]
+                </tr>
+            </tbody>
+            [%- END %]
+            </table>
+            <input type="submit" value="submit" />
+            <input type="button" value="re-enable" onclick="$(':input').removeAttr('disabled');" />
+            </form>
+            <script>
+                $("#query").submit(function() {
+                    $('input, textarea').each(function() {
+                        $(this).val( jQuery.trim( $(this).val() ) );
+                    });
+                    $(this).find(':input[value=""]').attr("disabled", "disabled");
+                    return true;
+                });
+
+                // FIXME: at least toggleGroup() should run when returning a form because of invalid params (only the limit is shown)
+                $(document).ready(function(){
+                    if (!window.location.search == '') {
+                        window.history.replaceState(null, '', window.location.protocol + '//' +
+                                window.location.host + window.location.pathname);	// FIXME: add [% request.headers.$prepend %] ?
+                        toggleGroup(this, ['[% optional_keys.join('\', \'') %]'], '[% show_all %]', '[% show_subset %]');
+                    }
+                });
+            </script>
+        </blockquote>
+    [% ELSIF title %]
+        <!-- query results -->
+        [% USE SimpleJson %]
+        <blockquote>
+            <h1> [% title %] </h1>
+            <div id="results">
+            [% IF subtitle %]<h2> [% subtitle %] </h2>[% END %]
+            [% IF count %]Results returned: [% count %]<br />[% END %]
+            [% IF limit > 1 && limit <= count %]
+                [% IF params_str %]
+                <a href="?[% params_str %]&.limit=[% limit %]&.skip=[% limit + skip %]"> Next [% limit %] results. </a>
+                [% ELSE %]
+                <a href="?.limit=[% limit %]&.skip=[% limit + skip %]"> Next [% limit %] results. </a>
+                [% END %]
+            [% END %]
+<!-- debug
+[% mypath %] <br />
+[% client %] <br />
+[% '^' _ request.headers.$prepend _ '/tasks/(.+)$' %] <br />
+-->
+            [% IF (oid = mypath.match('^' _ request.headers.$prepend _ '/tasks/(.+)$')) %] [%-# oid = oid.0 %]
+                [% param_list = [] %]
+                [% FOREACH pair IN json.params.pairs %]
+                    [% param_list.push("$pair.key=$pair.value") %]
+                [% END %]
+                [% param_string = param_list.join('&') %]
+                [% IF json.status == -4 OR json.status == 0 %]
+                <input type="button" value="Cancel this task" onclick="modifyDocument('cancel', '[% mypath %]')" />
+                <!--
+                [%# ELSIF json.status == -2 OR json.status == -1 %]
+                <input type="button" value="Delete this task" onclick="modifyDocument('delete', '[% mypath %]')" />
+                -->
+                [% ELSIF json.status %]
+                <input type="button" value="Clone this task" onclick="window.location = '[% request.headers.$prepend %]/migration/create?[% param_string %]'" />
+                [% END %]
+                [% IF json.status == -4 OR json.status == -1 OR json.status == 0 %]
+                <input type="button" value="Reset this task" onclick="modifyDocument('reset', '[% mypath %]')" />
+                [% END %]
+            [% END %]
+            [% UNLESS result.defined %]
+                <pre>Document(s) not found.</pre>
+            [% END %]
+            [% FOREACH value in result %]
+                <pre>[% value %]</pre><br />
+                [%# SimpleJson.toJson(value) %]<br />
+            [% END %]
+            [% IF limit > 1 && limit <= count %]
+                [% IF params_str %]
+                <a href="?[% params_str %]&.limit=[% limit %]&.skip=[% limit + skip %]"> Next [% limit %] results. </a>
+                [% ELSE %]
+                <a href="?.limit=[% limit %]&.skip=[% limit + skip %]"> Next [% limit %] results. </a>
+                [% END %]
+            [% END %]
+            </div>
+        </blockquote>
+    [% ELSE %]
+        <blockquote>
+        teh error
+        </blockquote>
+    [% END %]

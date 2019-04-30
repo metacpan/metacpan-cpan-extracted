@@ -65,7 +65,12 @@ BEGIN {
 # instead of Symbol.pm
 BEGIN {
     sub gensym () {
-        return \do { local *_ };
+        if ($] < 5.006) {
+            return \do { local *_ };
+        }
+        else {
+            return undef;
+        }
     }
 
     sub qualify ($$) {

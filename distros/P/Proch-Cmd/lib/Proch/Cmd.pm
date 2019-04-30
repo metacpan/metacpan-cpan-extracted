@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Proch::Cmd;
 
-$Proch::Cmd::VERSION = 0.004;
+$Proch::Cmd::VERSION = 0.0041;
 # ABSTRACT: Execute shell commands controlling inputs and outputs
 
 
@@ -279,7 +279,7 @@ Proch::Cmd - Execute shell commands controlling inputs and outputs
 
 =head1 VERSION
 
-version 0.004
+version 0.0041
 
 =head1 SYNOPSIS
 

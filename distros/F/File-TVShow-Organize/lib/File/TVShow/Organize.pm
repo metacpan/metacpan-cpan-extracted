@@ -1,5 +1,6 @@
 package File::TVShow::Organize;
 
+use 5.10.0;
 use strict;
 use warnings;
 use Carp;
@@ -11,7 +12,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 
 # Preloaded methods go here.
 
@@ -180,7 +181,6 @@ sub process_new_shows {
     # next if ($file !~ m/s\d\de\d\d/i); # skip if SXXEXX is not present in file name
     my $showData;
     # Extract show name, Season and Episode
-    #$showData = Video::Filename::new($file);
     $showData = File::TVShow::Info->new($file);
     next if !$showData->is_tv_show();
     # Apply special handling if the show is in the _exceptionList
@@ -219,13 +219,13 @@ sub were_there_errors {
 
   my ($self) = @_;
 
-  # Check if there has been any files that Video::Filename could not handle
+  # Check if there has been any files that File::TVShow::Info could not handle
   # Check that the hash UnHandledFileNames has actually been created before
   # checking that is is not empty or you will get an error.
   if ((defined $self->{UnhandledFileNames}) && (keys $self->{UnhandledFileNames})) {
     print "\nThere were unhandled files in the directory\n";
     print "consider adding them to the exceptionList\n###\n";
-    foreach my $key (keys $self->{UnhandledFileNames}) {
+    foreach my $key (keys %{$self->{UnhandledFileNames}}) {
       print "### " .  $key . " ==> " . $self->{UnhandledFileNames}{$key} . "\n";
     }
     print "###\n";
@@ -410,6 +410,10 @@ __END__
 File::TVShow::Organize - Perl module to move TVShow Files into their
 matching Show Folder on a media server.
 
+=head1 VERSION
+
+VERSION 0.34
+
 =head1 SYNOPSIS
 
   use File::TVShow::Organize;
@@ -490,7 +494,7 @@ Works on Mac OS and *nix systems.
   If Exceptions is passed to the method we load this data into a hash
   for later use to handle naming complications.
 
-  E.G file: S.W.A.T.2017.S01E01.avi is not handled correctly by Video::Filename
+  E.G file: S.W.A.T.2017.S01E01.avi is not handled correctly by File::TVShow::Info
   so we need to know to handle this differently. Exceptions is an optional
   parameter and can be left out when calling new().
   Currently Exceptions is a scalar string.
@@ -597,7 +601,7 @@ Works on Mac OS and *nix systems.
 
   Example:
 
-  my $file = Video::Filename::new("Life.on.Mars.(US).S01E01.avi", { spaces => '.' });
+  my $file = File::TVShow::Info->new("Life.on.Mars.(US).S01E01.avi");
 
   # $file->{name} now contains "Life on Mars (US)"
   # $file->{season} now contains "01"
@@ -834,13 +838,13 @@ I have not tested anycases where file names might be
 
 =item   L<File::Copy>
 
-=item   L<Video::Filename>
+=item   L<File::TVShow::Info>
 
 =back
 
 =head1 AUTHOR
 
-Adam Spann, E<lt>adam_spann@hotmail.comE<gt>
+Adam Spann, E<lt>bans@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

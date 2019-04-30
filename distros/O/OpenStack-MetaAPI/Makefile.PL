@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "JSON" => 0,
     "Moo" => 0,
+    "Moo::Role" => 0,
     "OpenStack::Client" => "1.0006",
     "YAML::XS" => 0
   },
@@ -31,11 +32,11 @@ my %WriteMakefileArgs = (
     "Test2::Bundle::Extended" => 0,
     "Test2::Plugin::NoWarnings" => 0,
     "Test2::Tools::Explain" => 0,
-    "Test::MockModule" => 0,
+    "Test::MockModule" => "0.16",
     "Test::More" => 0,
     "URI::Encode" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,11 +51,12 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "LWP::UserAgent" => 0,
   "Moo" => 0,
+  "Moo::Role" => 0,
   "OpenStack::Client" => "1.0006",
   "Test2::Bundle::Extended" => 0,
   "Test2::Plugin::NoWarnings" => 0,
   "Test2::Tools::Explain" => 0,
-  "Test::MockModule" => 0,
+  "Test::MockModule" => "0.16",
   "Test::More" => 0,
   "URI::Encode" => 0,
   "YAML::XS" => 0

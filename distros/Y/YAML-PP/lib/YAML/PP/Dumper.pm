@@ -2,10 +2,13 @@ use strict;
 use warnings;
 package YAML::PP::Dumper;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
+use Scalar::Util qw/ blessed /;
 use YAML::PP;
 use YAML::PP::Representer;
+use YAML::PP::Writer;
+use YAML::PP::Writer::File;
 
 sub new {
     my ($class, %args) = @_;
@@ -15,6 +18,11 @@ sub new {
     );
 
     my $emitter = delete $args{emitter} || YAML::PP::Emitter->new;
+    unless (blessed($emitter)) {
+        $emitter = YAML::PP::Emitter->new(
+            %$emitter
+        );
+    }
     my $self = bless {
         representer => YAML::PP::Representer->new(
             schema => $schema,
@@ -26,16 +34,30 @@ sub new {
 
 sub representer { return $_[0]->{representer} }
 sub set_representer { $_[0]->{representer} = $_[1] }
-sub schema { return $_[0]->{schema} }
+
+sub dump {
+    my ($self, @docs) = @_;
+    $self->representer->emitter->init;
+    $self->representer->dump(@docs);
+    my $output = $self->representer->emitter->writer->output;
+    $self->representer->emitter->finish;
+    return $output;
+}
 
 sub dump_string {
     my ($self, @docs) = @_;
-    $self->representer->dump_string(@docs);
+    my $writer = YAML::PP::Writer->new;
+    $self->representer->emitter->set_writer($writer);
+    my $output = $self->dump(@docs);
+    return $output;
 }
 
 sub dump_file {
     my ($self, $file, @docs) = @_;
-    $self->representer->dump_file($file, @docs);
+    my $writer = YAML::PP::Writer::File->new(output => $file);
+    $self->representer->emitter->set_writer($writer);
+    my $output = $self->dump(@docs);
+    return $output;
 }
 
 1;

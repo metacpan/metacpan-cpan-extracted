@@ -24,8 +24,8 @@ no_index:
   directory:
     - t/lib
 requires:
-  App::Spec: '>= 0.004, != 0.004_001'
-  App::Spec::Run: '>= 0.004, != 0.004_001'
+  App::Spec: '0.005'
+  App::Spec::Run: '0.005'
   Digest::SHA: '6.02'
   Email::Address: '1.912'
   Email::MIME: '1.946'
@@ -52,6 +52,6 @@ requires:
 resources:
   homepage: https://www.thenautilus.net/SW/Sietima/
   repository: https://www.thenautilus.net/cgit/Sietima
-version: 1.0.4
+version: 1.0.5
 x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

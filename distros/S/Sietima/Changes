@@ -1,3 +1,6 @@
+1.0.5     2019-04-29 15:44:26+01:00 Europe/London
+ - *really* make it work with App::Spec 0.005
+
 1.0.4     2019-04-29 15:31:45+01:00 Europe/London
  - make it work with App::Spec 0.005
 

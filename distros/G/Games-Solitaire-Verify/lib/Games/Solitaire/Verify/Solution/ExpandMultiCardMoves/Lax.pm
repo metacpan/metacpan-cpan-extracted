@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax;
-$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax::VERSION = '0.2000';
+$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax::VERSION = '0.2100';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ laxer expansion.
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ version 0.2000
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 AUTHOR
 

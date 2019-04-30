@@ -1,5 +1,5 @@
 package CPANPLUS::YACSmoke::locallib;
-$CPANPLUS::YACSmoke::locallib::VERSION = '1.06';
+$CPANPLUS::YACSmoke::locallib::VERSION = '1.08';
 
 use 5.006;
 BEGIN {

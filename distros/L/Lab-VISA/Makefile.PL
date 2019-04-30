@@ -2,29 +2,39 @@
 use warnings;
 use strict;
 use ExtUtils::MakeMaker;
+use Config;
 
 my %visa_options = ();
 
+my $arch = $Config{ptrsize} >= 8 ? '64' : '32';
+
 if ($^O =~ /MSWin32/) {
-    # The location of 'visa32.lib' differs for 32- and 64-bit Windows.
-    my $lib64 = "C:\\Program Files (x86)\\IVI Foundation\\VISA\\WinNT\\lib\\msc\\visa32.lib";
-    my $inc64 = "C:\\Program Files (x86)\\IVI Foundation\\VISA\\WinNT\\include";
-    my $lib32 = "C:\\Program Files\\IVI Foundation\\VISA\\WinNT\\lib\\msc\\visa32.lib";
-    my $inc32 = "C:\\Program Files\\IVI Foundation\\VISA\\WinNT\\Include";
     my $lib;
     my $inc;
-    if (-e $lib32) {
-	$lib = $lib32;
-	$inc = $inc32;
+    if ($arch eq '32') {
+        # The location of 'visa32.lib' differs for 32- and 64-bit Windows.
+        my $lib64 = "C:\\Program Files (x86)\\IVI Foundation\\VISA\\WinNT\\lib\\msc\\visa32.lib";
+        my $inc64 = "C:\\Program Files (x86)\\IVI Foundation\\VISA\\WinNT\\include";
+        my $lib32 = "C:\\Program Files\\IVI Foundation\\VISA\\WinNT\\lib\\msc\\visa32.lib";
+        my $inc32 = "C:\\Program Files\\IVI Foundation\\VISA\\WinNT\\Include";
+        
+        if (-e $lib32) {
+            $lib = $lib32;
+            $inc = $inc32;
+        }
+        elsif (-e $lib64) {
+            $lib = $lib64;
+            $inc = $inc64;
+        }
     }
-    elsif (-e $lib64) {
-	$lib = $lib64;
-	$inc = $inc64;
+    else {
+        # 64 bit Perl
+        $lib = "C:\\Program Files\\IVI Foundation\\VISA\\Win64\\Lib_x64\\msc\\visa64.lib";
+        $inc = "C:\\Program Files\\IVI Foundation\\VISA\\Win64\\Include";
     }
-    
     if ($lib) {
-	$visa_options{LIBS} = "\"-l${lib}\"";
-	$visa_options{INC} = "\"-I${inc}\"";
+        $visa_options{LIBS} = "\"-l${lib}\"";
+        $visa_options{INC} = "\"-I${inc}\"";
     }
 }
 else {

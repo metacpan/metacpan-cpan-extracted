@@ -7,9 +7,9 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester;
+package Config::Model::Tester 4.001;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.007';
+
 use warnings;
 use strict;
 use locale;
@@ -43,22 +43,27 @@ eval {
     require Config::Model::BackendMgr;
 } ;
 
-use vars qw/$model $conf_file_name $conf_dir $model_to_test $app_to_test $home_for_test @tests $skip @ISA @EXPORT/;
+use vars qw/@ISA @EXPORT/;
 
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(run_tests);
 
-$File::Copy::Recursive::DirPerms = 0755;
+$File::Copy::Recursive::DirPerms = oct(755);
 
 sub setup_test {
-    my ( $test_group, $t_name, $wr_root, $trace, $t_data ) = @_;
+    my ( $test_group, $t_name, $wr_root, $trace, $test_suite_data, $t_data ) = @_;
 
     # cleanup before tests
     $wr_root->remove_tree();
-    $wr_root->mkpath( { mode => 0755 } );
+    $wr_root->mkpath( { mode => oct(755) } );
+    my ($conf_dir, $conf_file_name, $home_for_test)
+        = @$test_suite_data{qw/conf_dir conf_file_name home_for_test/};
 
-    $conf_dir =~ s!~/!$home_for_test/! if $conf_dir and $home_for_test;
+    if ($conf_dir and $home_for_test) {
+        $conf_dir =~ s!~/!$home_for_test/!;
+        $test_suite_data->{conf_dir} = $conf_dir;
+    }
 
     my $wr_dir    = $wr_root->child('test-' . $t_name);
     my $wr_dir2   = $wr_root->child('test-' . $t_name.'-w');
@@ -85,7 +90,7 @@ sub setup_test {
             }
             $destination_str =~ s!~/!$home_for_test/! if $home_for_test;
             my $destination = $wr_dir->child($destination_str) ;
-            $destination->parent->mkpath( { mode => 0755 }) ;
+            $destination->parent->mkpath( { mode => oct(755) }) ;
             my $data_file = $ex_data->child($file);
             die "cannot find $data_file" unless $data_file->exists;
             my $data = $data_file->slurp() ;
@@ -96,7 +101,7 @@ sub setup_test {
     elsif ( $ex_data->is_dir ) {
         # copy whole dir
         my $destination_dir = $conf_dir ? $wr_dir->child($conf_dir) : $wr_dir ;
-        $destination_dir->mkpath( { mode => 0755 });
+        $destination_dir->mkpath( { mode => oct(755) });
         say "dircopy ". $ex_data->stringify . '->'. $destination_dir->stringify
             if $trace ;
         dircopy( $ex_data->stringify, $destination_dir->stringify )
@@ -136,7 +141,6 @@ sub list_test_files {
 		next if $child->is_dir ;
 
 		push @file_list, '/' . $child->relative($debian_str)->stringify;
-		#push @file_list, '/'.join('/',@l) ; # build a unix-like path even on windows
 	};
 
     # don't use return sort -> undefined behavior in scalar context.
@@ -150,7 +154,7 @@ sub write_config_file {
     if ($t->{config_file}) {
         my $file = $conf_dir ? "$conf_dir/" : '';
         $file .= $t->{config_file} ;
-        $wr_dir->child($file)->parent->mkpath({mode => 0755} ) ;
+        $wr_dir->child($file)->parent->mkpath({mode => oct(755)} ) ;
     }
 }
 
@@ -436,7 +440,7 @@ sub check_added_or_removed_files {
 }
 
 sub create_second_instance {
-    my ($test_group, $t_name, $wr_dir, $wr_dir2,$t, $config_dir_override) = @_;
+    my ($model, $test_group, $t_name, $wr_dir, $wr_dir2, $test_suite_data, $t, $config_dir_override) = @_;
 
     # create another instance to read the conf file that was just written
     dircopy( $wr_dir->stringify, $wr_dir2->stringify )
@@ -446,11 +450,11 @@ sub create_second_instance {
     push @options, backend_arg => $t->{backend_arg} if $t->{backend_arg};
 
     my $i2_test = $model->instance(
-        root_class_name => $model_to_test,
+        root_class_name => $test_suite_data->{model_to_test},
         root_dir        => $wr_dir2->stringify,
         config_file     => $t->{config_file} ,
         instance_name   => "$test_group-$t_name-w",
-        application     => $app_to_test,
+        application     => $test_suite_data->{app_to_test},
         check           => $t->{load_check2} || 'yes',
         config_dir      => $config_dir_override,
         @options
@@ -465,8 +469,21 @@ sub create_second_instance {
     return $i2_root;
 }
 
-sub run_model_test {
-    my ($test_group, $test_group_conf, $do, $model, $trace, $wr_root) = @_ ;
+sub create_test_class {
+    my ($model, $config_classes) = @_;
+    return unless $config_classes;
+
+    foreach my $c ( @$config_classes) {
+        $model->create_config_class(@$c);
+    }
+}
+
+our ($model, $conf_file_name, $conf_dir, $model_to_test, $app_to_test, $home_for_test, @tests, $skip);
+
+sub load_test_suite_data {
+    my ($model_obj, $test_group, $test_group_conf) = @_;
+
+    local ($model, $conf_file_name, $conf_dir, $model_to_test, $app_to_test, $home_for_test, @tests, $skip);
 
     $skip = 0;
     undef $conf_file_name ;
@@ -474,47 +491,83 @@ sub run_model_test {
     undef $home_for_test ;
     undef $model_to_test ; # deprecated
     undef $app_to_test;
+    $model = $model_obj; # $model is used by Config::Model tests
 
     note("Beginning $test_group test ($test_group_conf)");
-    note('$model_to_test variable is deprecated. Please use $app_to_test instead') if $model_to_test;
 
-    unless ( my $return = do "./$test_group_conf" ) {
+    my $result;
+    unless ( $result = do "./$test_group_conf" ) {
         warn "couldn't parse $test_group_conf: $@" if $@;
-        warn "couldn't do $test_group_conf: $!" unless defined $return;
-        warn "couldn't run $test_group_conf" unless $return;
+        warn "couldn't do $test_group_conf: $!" unless defined $result;
+        warn "couldn't run $test_group_conf" unless $result;
     }
 
-    $app_to_test ||= $test_group;
+    my $test_suite_data;
+    if (ref($result) eq 'ARRAY') {
+        # simple list of tests
+        $test_suite_data = { tests => $result };
+    }
+    elsif (ref($result) eq 'HASH') {
+        $test_suite_data = $result;
+    }
+    else {
+        note(qq!warning: $test_group_conf should return a data structure instead of "1;". !
+                 . qq!See Config::Model::Tester for details!);
+        $test_suite_data = {
+            tests => [ @tests ],
+            skip => $skip,
+            conf_file_name  => $conf_file_name ,
+            conf_dir  => $conf_dir ,
+            home_for_test  => $home_for_test ,
+            model_to_test => $model_to_test,
+            app_to_test => $app_to_test,
+        };
+    }
 
-    if ($skip) {
+    create_test_class($model, $test_suite_data->{config_classes});
+
+    $test_suite_data->{app_to_test} ||= $test_group;
+
+    if ($test_suite_data->{skip}) {
         note("Skipped $test_group test ($test_group_conf)");
         return;
     }
 
     my ($trash, $appli_info, $applications) = Config::Model::Lister::available_models(1);
+    $test_suite_data->{appli_info} = $appli_info;
 
     # even undef, this resets the global variable there
-    Config::Model::BackendMgr::_set_test_home($home_for_test) ;
+    Config::Model::BackendMgr::_set_test_home($test_suite_data->{home_for_test}) ;
 
-    if (not defined $model_to_test) {
-        $model_to_test = $applications->{$app_to_test};
-        if (not defined $model_to_test) {
+    if (not defined $test_suite_data->{model_to_test}) {
+        $test_suite_data->{model_to_test} = $applications->{$test_suite_data->{app_to_test}};
+        if (not defined $test_suite_data->{model_to_test}) {
             my @k = sort values %$applications;
             my @files = map { $_->{_file} // 'unknown' } values %$appli_info ;
             die "Cannot find application or model for $test_group in files >@files<. Known applications are",
                 sort keys %$applications, ". Known models are >@k<. ".
-                "Check your test name (the file ending with -test-conf.pl) or set the \$app_to_test global variable\n";
+                "Check your test name (the file ending with -test-conf.pl) or set app_to_test parameter\n";
         }
     }
 
+    return $test_suite_data;
+}
+
+sub run_model_test {
+    my ($test_group, $test_group_conf, $do, $model, $trace, $wr_root) = @_ ;
+
+    my $test_suite_data = load_test_suite_data($model,$test_group, $test_group_conf);
+    my $appli_info = $test_suite_data->{appli_info};
+
     my $config_dir_override = $appli_info->{$test_group}{config_dir}; # may be undef
 
-    my $note ="$test_group uses $model_to_test model";
+    my $note ="$test_group uses ".$test_suite_data->{model_to_test}." model";
+    my $conf_file_name = $test_suite_data->{conf_file_name};
     $note .= " on file $conf_file_name" if defined $conf_file_name;
     note($note);
 
     my $idx = 0;
-    foreach my $t (@tests) {
+    foreach my $t (@{$test_suite_data->{tests}}) {
         translate_test_data($t);
         my $t_name = $t->{name} || "t$idx";
         if ( defined $do and $t_name !~ /$do/) {
@@ -524,9 +577,9 @@ sub run_model_test {
         note("Beginning subtest $test_group $t_name");
 
         my ($wr_dir, $wr_dir2, $conf_file, $ex_data, @file_list)
-            = setup_test ($test_group, $t_name, $wr_root,$trace, $t);
+            = setup_test ($test_group, $t_name, $wr_root,$trace, $test_suite_data, $t);
 
-        write_config_file($conf_dir,$wr_dir,$t);
+        write_config_file($test_suite_data->{conf_dir},$wr_dir,$t);
 
         my $inst_name = "$test_group-" . $t_name;
 
@@ -539,12 +592,12 @@ sub run_model_test {
         # eventually, we may end up with several instances of Dpkg
         # model in the same process. So we can't play with chdir
         my $inst = $model->instance(
-            root_class_name => $model_to_test,
+            root_class_name => $test_suite_data->{model_to_test},
             # need to keed root_dir to handle config files like
             # /etc/foo.ini (absolute path, like in /etc/)
             root_dir        => $wr_dir->stringify,
             instance_name   => $inst_name,
-            application     => $app_to_test,
+            application     => $test_suite_data->{app_to_test},
             config_file     => $t->{config_file} ,
             check           => $t->{load_check} || 'yes',
             config_dir      => $config_dir_override,
@@ -581,9 +634,9 @@ sub run_model_test {
 
         check_file_mode($wr_dir,$t) ;
 
-        check_added_or_removed_files ($conf_dir, $wr_dir, $t, @file_list) if $ex_data->is_dir;
+        check_added_or_removed_files ($test_suite_data->{conf_dir}, $wr_dir, $t, @file_list) if $ex_data->is_dir;
 
-        my $i2_root = create_second_instance ($test_group, $t_name, $wr_dir, $wr_dir2,$t, $config_dir_override);
+        my $i2_root = create_second_instance ($model, $test_group, $t_name, $wr_dir, $wr_dir2, $test_suite_data, $t, $config_dir_override);
 
         load_instructions ($i2_root,$t->{load2},$trace) if $t->{load2} ;
 
@@ -596,9 +649,9 @@ sub run_model_test {
             "compare original $test_group custom data with 2nd instance custom data",
         );
 
-        ok( -s "$wr_dir2/$conf_dir/$conf_file_name" ,
+        ok( -s "$wr_dir2/$test_suite_data->{conf_dir}/$test_suite_data->{conf_file_name}" ,
             "check that original $test_group file was not clobbered" )
-                if defined $conf_file_name ;
+                if defined $test_suite_data->{conf_file_name} ;
 
         check_data("second", $i2_root, $t->{wr_check}, $t->{no_warnings}) if $t->{wr_check} ;
 
@@ -628,6 +681,7 @@ sub create_model_object {
 
 sub run_tests {
     my ( $test_only_app, $do, $trace, $wr_root );
+    my $model;
     if (@_) {
         my $arg;
         note ("Calling run_tests with argument is deprecated");
@@ -690,7 +744,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.007
+version 4.001
 
 =head1 SYNOPSIS
 
@@ -711,7 +765,7 @@ Run tests with:
 =head1 DESCRIPTION
 
 This class provides a way to test configuration models with tests files.
-This class was designed to tests several models and several tests
+This class was designed to tests several models and run several tests
 cases per model.
 
 A specific layout for test files must be followed.
@@ -723,8 +777,9 @@ Each subtest is defined in a file like:
  t/model_tests.d/<app-name>-test-conf.pl
 
 This file specifies that C<app-name> (which is defined in
-C<lib/Config/Model/*.d> directory) will be used for the test cases
-defined in the C<*-test-conf.pl> file.
+C<lib/Config/Model/*.d> directory) is used for the test cases defined
+in the C<*-test-conf.pl> file. The model to test is inferred from the
+application name to test.
 
 This file contains a list of test case (explained below) and expects a
 set of files used as test data. The layout of these test data files is
@@ -734,8 +789,8 @@ explained in next section.
 
 Each test case is represented by a configuration file (not
 a directory) in the C<*-examples> directory. This configuration file
-will be used by the model to test and is copied as
-C<$confdir/$conf_file_name> using the global variables explained
+is used by the model to test and is copied as
+C<$confdir/$conf_file_name> using the test data structure explained
 below.
 
 In the example below, we have 1 app model to test: C<lcdproc> and 2 tests
@@ -752,12 +807,12 @@ C<lib/Config/Model/system.d/lcdproc>
          \-- LCDD-0.5.5      # test case for older LCDproc
 
 Subtest specification is written in C<lcdproc-test-conf.pl> file (i.e. this
-modules looks for files named  like C<< <app-name>-test-conf.pl> >>).
+module looks for files named like C<< <app-name>-test-conf.pl> >>).
 
 Subtests data is provided in files in directory C<lcdproc-examples> (
 i.e. this modules looks for test data in directory
 C<< <model-name>-examples> >>. C<lcdproc-test-conf.pl> contains
-instructions so that each file will be used as a C</etc/LCDd.conf>
+instructions so that each file is used as a C</etc/LCDd.conf>
 file during each test case.
 
 C<lcdproc-test-conf.pl> can contain specifications for more test
@@ -770,12 +825,12 @@ See L</Examples> for a link to the actual LCDproc model tests
 
 When a configuration is spread over several files, each test case is
 provided in a sub-directory. This sub-directory is copied in
-C<$conf_dir> (a global variable as explained below)
+C<conf_dir> (a test parameter as explained below)
 
 In the example below, the test specification is written in
 C<dpkg-test-conf.pl>. Dpkg layout requires several files per test case.
-C<dpkg-test-conf.pl> will contain instructions so that each directory
-under C<dpkg-examples> will be used.
+C<dpkg-test-conf.pl> contains instructions so that each directory
+under C<dpkg-examples> is used.
 
  t/model_tests.d
  \-- dpkg-test-conf.pl         # subtest specification
@@ -800,7 +855,8 @@ contains several files. The destination of the test files may depend
 on the system (e.g. the OS). For instance, system wide C<ssh_config>
 is stored in C</etc/ssh> on Linux, and directly in C</etc> on MacOS.
 
-These files are copied in a test directory using a C<setup> parameter:
+These files are copied in a test directory using a C<setup> parameter
+in test case specification:
 
   setup => {
     test_file_in_example_dir => 'destination'
@@ -815,16 +871,16 @@ Let's consider this example of 2 tests cases for ssh:
          |-- system_ssh_config
          \-- user_ssh_config
 
-Unfortunately, C<user_ssh_config> is a user file, so you specify where
-the home directory for the tests with another global variable:
+Unfortunately, C<user_ssh_config> is a user file, so you need to specify
+where is located the home directory of the test with another global parameter:
 
-  $home_for_test = '/home/joe' ;
+  home_for_test => '/home/joe' ;
 
 For Linux only, the C<setup> parameter is:
 
  setup => {
-   'system_ssh_config' => '/etc/ssh/ssh_config',
-   'user_ssh_config'   => "~/.ssh/config"
+   system_ssh_config => '/etc/ssh/ssh_config',
+   user_ssh_config   => "~/.ssh/config"
  }
 
 On the other hand, system wide config file is different on MacOS and
@@ -845,98 +901,135 @@ See the actual L<Ssh and Sshd model tests|https://github.com/dod38fr/config-mode
 
 =head2 Basic test specification
 
-Each model subtest is specified in C<< <model>-test-conf.pl >>. This file
-contains a set of global variables. (yes, global variables are often bad ideas
-in programs, but they are handy for tests):
+Each model subtest is specified in C<< <app>-test-conf.pl >>. This
+file must return a data structure containing the test
+specifications. Each test data structure contains global parameters
+(Applied to all tests cases) and test cases parameters (parameters are
+applied to the test case)
 
- # config file name (used to copy test case into test wr_root/model_tests directory)
- $conf_file_name = "fstab" ;
- # config dir where to copy the file (optional)
- #$conf_dir = "etc" ;
- # home directory for this test
- $home_for_test = '/home/joe' ;
+ use strict;
+ use warnings;
+ {
+   # global parameters
 
-Here, C<t0> file will be copied in C<wr_root/model_tests/test-t0/etc/fstab>.
+   # config file name (used to copy test case into test wr_root/model_tests directory)
+   conf_file_name => "fstab",
+   # config dir where to copy the file (optional)
+   conf_dir => "etc",
+   # home directory for this test
+   home_for_test => '/home/joe'
 
- # config model name to test
- $model_to_test = "Fstab" ;
+   tests =>  [
+     {
+       # test case 1
+       name => 'my_first_test',
+       # other test case parameters
+     },
+     {
+       # test case 2
+       name => 'my_second_test',
+       # other test case parameters
+     },
+     # ...
+   ],
+ };
 
- # list of tests. This modules looks for @tests global variable
- @tests = (
-    {
-     # test name
-     name => 't0',
-     # add optional specification here for t0 test
-    },
-    {
-     name => 't1',
-     # add optional specification here for t1 test
-    },
- );
+ # do not add 1; at the end of the file
 
- 1; # to keep Perl happy
+In the example below, C<t0> file is copied in C<wr_root/model_tests/test-t0/etc/fstab>.
 
-You can suppress warnings by specifying C<< no_warnings => 1 >>. On
-the other hand, you may also want to check for warnings specified to
-your model. In this case, you should avoid specifying C<no_warnings>
-here and specify warning tests or warning filters as mentioned below.
+ use strict;
+ use warnings;
+ {
+   # list of tests.
+   tests => [
+     {
+       # test name
+       name => 't0',
+       # add optional specification here for t0 test
+     },
+     {
+       name => 't1',
+       # add optional specification here for t1 test
+     },
+   ]
+ };
+
+You can suppress warnings by specifying C<< no_warnings => 1 >> in
+each test case. On the other hand, you may also want to check for
+warnings specified to your model. In this case, you should avoid
+specifying C<no_warnings> here and specify warning tests or warning
+filters as mentioned below.
 
 See actual L<fstab test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/fstab-test-conf.pl>.
 
 =head2 Skip a test
 
-A test file can be skipped using C<$skip> global variable.
+A test file can be skipped using C<skip> global test parameter.
 
 In this example, test is skipped when not running on a Debian system:
 
  eval { require AptPkg::Config; };
- $skip = ( $@ or not -r '/etc/debian_version' ) ? 1 : 0;
+ my $skip = ( $@ or not -r '/etc/debian_version' ) ? 1 : 0;
+
+ {
+   skip => $skip,
+   tests => [ ] ,
+ };
 
 =head2 Internal tests or backend tests
 
-Some tests will require the creation of a configuration class dedicated
+Some tests require the creation of a configuration class dedicated
 for test (typically to test corner cases on a backend).
 
-This test class can be created directly in the test specification
-by calling L<create_config_class|Config::Model/create_config_class> on
-C<$model> variable. See for instance the
+This test class can be created directly in the test specification by
+specifying tests classes in C<config_classes> global test parameter in an
+array ref. Each array element is a data structure that use
+L<create_config_class|Config::Model/create_config_class> parameters.
+See for instance the
 L<layer test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/layer-test-conf.pl>
 or the
 L<test for shellvar backend|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/backend-shellvar-test-conf.pl>.
 
+In this case, no application exist for such classes so the model to
+test must be specified in a global test parameter:
+
+  return {
+    config_classes => [ { name => "Foo" } , ... ],
+    model_to_test => "Foo",
+    tests => [ ... ]
+  };
+
 =head2 Test specification with arbitrary file names
 
-In some models like C<Multistrap>, the config file is chosen by the
+In some models, like C<Multistrap>, the config file is chosen by the
 user. In this case, the file name must be specified for each tests
 case:
 
- # not needed if test file is named multistrap-test-conf.pl
- $model_to_test = "Multistrap";
-
- @tests = (
-    {
-        name        => 'arm',
-        config_file => '/home/foo/my_arm.conf',
-        check       => {},
-    },
- );
+ {
+   tests => [ {
+       name        => 'arm',
+       config_file => '/home/foo/my_arm.conf',
+       check       => {},
+    }]
+ };
 
 See the actual L<multistrap test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/multistrap-test-conf.pl>.
 
 =head2 Backend argument
 
 Some application like systemd requires a backend argument specified by
-User (e.g. a service name for systemd). The parameter C<backend_arg>
+user (e.g. a service name for systemd). The parameter C<backend_arg>
 can be specified to emulate this behavior.
 
 =head2 Re-use test data
 
 When the input data for test is quite complex (several files), it may
-be interested to re-use these data for other tests case. Knowing that
-test name must must unique, you can re-use test data with C<data_from>
+be interesting to re-use these data for other test cases. Knowing that
+test names must be unique, you can re-use test data with C<data_from>
 parameter. For instance:
 
-  @tests = (
+  tests => [
     {
         name  => 'some-test',
         # ...
@@ -946,6 +1039,7 @@ parameter. For instance:
         data_from  => 'some-test',    # re-use data from test above
         # ...
     },
+  ]
 
 See
 L<plainfile backend test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/backend-plainfile-test-conf.pl>
@@ -954,7 +1048,7 @@ for a real life example.
 =head2 Test scenario
 
 Each subtest follow a sequence explained below. Each step of this
-sequence may be altered by adding specification in
+sequence may be altered by adding test case parameters in
 C<< <model-to-test>-test-conf.pl >>:
 
 =over
@@ -1032,9 +1126,9 @@ C<quiet> to suppress progress messages during update.
 =item *
 
 C<log4perl_update_warnings> is used to check the warnings produced
- during update. The argument is passed to C<expect> function of
- L<Test::Log::Log4Perl>. See C<load_warnings> parameter above for more
- details.
+during update. The argument is passed to C<expect> function of
+L<Test::Log::Log4Perl>. See C<load_warnings> parameter above for more
+details.
 
 =item *
 
@@ -1159,7 +1253,7 @@ Verify if a hash contains one or more keys (or keys matching a regexp):
 
 =item *
 
-Verify that a hash has B<not> a key (or a key matching a regexp):
+Verify that a hash does B<not> have a key (or a key matching a regexp):
 
  has_not_key => [
     'copyright Files' => qr/.virus$/ # silly, isn't ?
@@ -1207,12 +1301,12 @@ in an array ref:
 Check the mode of the written files:
 
   file_mode => {
-     "~/.ssh/ssh_config"     => 0600, # octal mode
-     "debian/stuff.postinst" => 0755,
+     "~/.ssh/ssh_config"     => oct(600), # better than 0600
+     "debian/stuff.postinst" => oct(755),
   }
 
 Only the last four octets of the mode are tested. I.e. the test is done with
-C< $file_mode & 07777 >
+C< $file_mode & oct(7777) >
 
 Note: this test is skipped on Windows
 
@@ -1319,6 +1413,10 @@ A regexp to filter subtest E.g.:
 
 =head1 Examples
 
+Some of these examples may still use global variables (which is
+deprecated). Such files may be considered as buggy after Aug
+2019. Please warn the author if you find one.
+
 =over
 
 =item *
@@ -1350,6 +1448,20 @@ L<backend-shellvar-test-conf.pl|https://github.com/dod38fr/config-model/blob/mas
 is a more complex example showing how to test a backend. The test is done creating a dummy model within the test specification.
 
 =back
+
+=head1 CREDITS
+
+In alphabetical order:
+
+=over 4
+
+=item *
+
+Cyrille Bollu
+
+=back
+
+Many thanks for your help.
 
 =head1 SEE ALSO
 

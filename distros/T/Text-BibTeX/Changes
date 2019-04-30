@@ -1,5 +1,8 @@
 Revision history for Perl module Text::BibTeX
 
+0.88 2019-04-29
+ * Make namebug.c compile with non std99 compiler.
+
 0.87 2019-04-06
  * Fix 0.86 release
 

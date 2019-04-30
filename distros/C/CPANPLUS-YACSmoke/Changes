@@ -1,6 +1,34 @@
 ==================================================
-Changes from 2013-12-08 00:00:00 +0000 to present.
+Changes from 2014-05-01 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.08 at 2019-04-30 10:41:37 +0000
+-----------------------------------------
+
+  Change: a9b4c90952ced2e951482db0c84915869a4904ed
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-30 11:41:37 +0000
+
+    Release engineering for 1.08 
+
+  Change: 125e585288b1dc268d48be1eedf08b4c8b380b2a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-27 16:28:55 +0000
+
+    Added test for fail in configure stage 
+
+  Change: de001814b08c63efed0c9b1beca7c90256221228
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-27 13:54:33 +0000
+
+    Added test to confirm UNKNOWN on build failure 
+
+  Change: febb08979bab5cbed473d14e36377345f6d3f4ee
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-04-27 13:10:11 +0000
+
+    Add CPANPLUS is prefering Makefile/Build.PL to test report 
 
 -----------------------------------------
 version 1.06 at 2018-12-07 10:58:51 +0000
@@ -127,5 +155,5 @@ version 0.92 at 2015-03-29 15:43:34 +0000
     Don't report if we can't resolve a prereq to an indexed version 
 
 =================================================
-Plus 30 releases after 2013-12-08 00:00:00 +0000.
+Plus 30 releases after 2014-05-01 00:00:00 +0000.
 =================================================

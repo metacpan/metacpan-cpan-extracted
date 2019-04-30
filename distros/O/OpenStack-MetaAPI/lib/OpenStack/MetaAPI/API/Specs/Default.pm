@@ -20,7 +20,7 @@ OpenStack::MetaAPI::API::Specs::Default
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 This is a void specs so we do not have to define all of them for now
 

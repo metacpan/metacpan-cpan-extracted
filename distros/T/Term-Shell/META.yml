@@ -27,10 +27,10 @@ name: Term-Shell
 provides:
   Term::Shell:
     file: lib/Term/Shell.pm
-    version: '0.10'
+    version: '0.11'
   Term::Shell::OnScopeLeave:
     file: lib/Term/Shell.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Data::Dumper: '0'
   File::Temp: '0'
@@ -46,10 +46,10 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-Shell
   homepage: http://metacpan.org/release/Term-Shell
   repository: git://git@github.com:shlomif/Term-Shell.git
-version: '0.10'
+version: '0.11'
 x_Dist_Zilla:
   perl:
-    version: '5.028001'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -333,6 +333,18 @@ x_Dist_Zilla:
       name: Runtime
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      config:
+        Dist::Zilla::Plugin::Test::Kwalitee:
+          filename: xt/release/kwalitee.t
+          skiptest: []
+      name: Test::Kwalitee
+      version: '2.12'
+    -
+      class: Dist::Zilla::Plugin::Test::TidyAll
+      name: Test::TidyAll
+      version: '0.04'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.012'
@@ -381,5 +393,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

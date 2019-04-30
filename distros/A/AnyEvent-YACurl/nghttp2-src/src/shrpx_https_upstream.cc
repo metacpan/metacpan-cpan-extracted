@@ -318,6 +318,10 @@ int htp_hdrs_completecb(http_parser *htp) {
        << "HTTP/" << req.http_major << "." << req.http_minor << "\n";
 
     for (const auto &kv : req.fs.headers()) {
+      if (kv.name == "authorization") {
+        ss << TTY_HTTP_HD << kv.name << TTY_RST << ": <redacted>\n";
+        continue;
+      }
       ss << TTY_HTTP_HD << kv.name << TTY_RST << ": " << kv.value << "\n";
     }
 
@@ -426,24 +430,26 @@ int htp_hdrs_completecb(http_parser *htp) {
     return 0;
   }
 
-  auto dconn = handler->get_downstream_connection(rv, downstream);
+  DownstreamConnection *dconn_ptr;
 
-  if (!dconn) {
-    if (rv == SHRPX_ERR_TLS_REQUIRED) {
-      upstream->redirect_to_https(downstream);
+  for (;;) {
+    auto dconn = handler->get_downstream_connection(rv, downstream);
+
+    if (!dconn) {
+      if (rv == SHRPX_ERR_TLS_REQUIRED) {
+        upstream->redirect_to_https(downstream);
+      }
+      downstream->set_request_state(DownstreamState::CONNECT_FAIL);
+
+      return -1;
     }
-    downstream->set_request_state(DownstreamState::CONNECT_FAIL);
-
-    return -1;
-  }
 
 #ifdef HAVE_MRUBY
-  auto dconn_ptr = dconn.get();
+    dconn_ptr = dconn.get();
 #endif // HAVE_MRUBY
-  if (downstream->attach_downstream_connection(std::move(dconn)) != 0) {
-    downstream->set_request_state(DownstreamState::CONNECT_FAIL);
-
-    return -1;
+    if (downstream->attach_downstream_connection(std::move(dconn)) == 0) {
+      break;
+    }
   }
 
 #ifdef HAVE_MRUBY
@@ -1427,14 +1433,16 @@ int HttpsUpstream::on_downstream_reset(Downstream *downstream, bool no_retry) {
     goto fail;
   }
 
-  dconn = handler_->get_downstream_connection(rv, downstream_.get());
-  if (!dconn) {
-    goto fail;
-  }
+  for (;;) {
+    auto dconn = handler_->get_downstream_connection(rv, downstream_.get());
+    if (!dconn) {
+      goto fail;
+    }
 
-  rv = downstream_->attach_downstream_connection(std::move(dconn));
-  if (rv != 0) {
-    goto fail;
+    rv = downstream_->attach_downstream_connection(std::move(dconn));
+    if (rv == 0) {
+      break;
+    }
   }
 
   rv = downstream_->push_request_headers();

@@ -49,7 +49,12 @@ BEGIN {
 # instead of Symbol.pm
 BEGIN {
     sub gensym () {
-        return \do { local *_ };
+        if ($] < 5.006) {
+            return \do { local *_ };
+        }
+        else {
+            return undef;
+        }
     }
 }
 
@@ -227,7 +232,7 @@ sub import {
         my $mode = (stat($filename))[2] & 0777;
         chmod $mode, "$filename.e";
 
-        close($fh) or die __FILE__, ": Can't close file: $filename.e\n";
+        close($fh) or die "Can't close file: $filename.e: $!";
     }
 
     my $fh = gensym();
@@ -353,7 +358,7 @@ sub Latin6::escape_script {
     Elatin6::_open_r($fh, $script) or die __FILE__, ": Can't open file: $script\n";
     local $/ = undef; # slurp mode
     $_ = <$fh>;
-    close($fh) or die __FILE__, ": Can't close file: $script\n";
+    close($fh) or die "Can't close file: $script: $!";
 
     if (/^ use Elatin6(?:(?>\s+)(?>[0-9\.]*))?(?>\s*); $/oxms) {
         return $_;

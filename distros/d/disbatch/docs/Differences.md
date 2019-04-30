@@ -1,3 +1,32 @@
+### Differences in Disbatch 4.2 compared to Disbatch 4.0
+
+Copyright (c) 2016, 2019 by Ashley Willis.
+
+- added QueueBalance: automatically maintain a maximum number of threads across
+  queues depending on the time of day and day of week.
+  - See [QueueBalance](QueueBalance.md) for more info
+- new routes:
+  - `POST /tasks` (replaces `POST /tasks/:queue` and `POST /tasks/:queue/:collection`)
+  - `GET /tasks` (replaces `POST /tasks/search`)
+  - `GET /tasks/:id`: returns a single task as JSON
+  - `GET /monitoring`: reports if Disbatch node(s) are running and optionally QueueBalance
+  - `GET /balance` and `POST /balance`: interface for QueueBalance
+- deprecated routes:
+  - `POST /tasks/search`: requires `Disbatch::Web::Tasks`
+  - `POST /tasks/:queue`: requires `Disbatch::Web::Tasks`
+  - `POST /tasks/:queue/:collection`: requires `Disbatch::Web::Tasks`
+  - all Disbatch 3 routes require `Disbatch::Web::V3`
+  - see [Upgrading](Upgrading.md) for more info
+- disbatch (CLI) changes:
+  - added command `tasks` (replaces `search`)
+  - deprecated command `search`: requires `Disbatch::Web::Tasks`
+- added web extensions:
+  - You can now add custom routes to the web interface, both as JSON API routes
+    and as web interface routes using `Template::Toolkit`
+  - Routes can have additional MongoDB privileges than the default
+  - See [WebExtensions](WebExtensions.md) for more info
+
+
 ### Differences in Disbatch 4 compared to Disbatch 3
 
 #### Goals achieved with rewrite:

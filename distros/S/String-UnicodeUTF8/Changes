@@ -1,5 +1,8 @@
 Revision history for String-UnicodeUTF8
 
+0.23  Mon Apr 29 17:42:20 2019
+    - Issue #1 fixed quotemeta_*
+
 0.22  Wed Mar 29 10:28:56 2017
     - Added contains_nonhuman_characters()
 

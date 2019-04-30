@@ -1,0 +1,28 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+^.git/
+^.gitignore$
+
+# Makemaker generated files and dirs.
+^Makefile$
+^blib/
+^MakeMaker-\d
+^MYMETA.yml$
+^MYMETA\.json$
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+\.bak$
+^#.*#$
+^\.#
+
+#
+cvs2svn.txt
+^doc/
+
+.tar.gz$
+^Lab-VISA-

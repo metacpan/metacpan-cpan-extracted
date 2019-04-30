@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA;
-$Lab::Moose::Connection::VISA::VERSION = '3.680';
+$Lab::Moose::Connection::VISA::VERSION = '3.681';
 #ABSTRACT: Connection back end to National Instruments' VISA library.
 
 
@@ -16,6 +16,7 @@ use Lab::VISA;
 use namespace::autoclean;
 
 use constant {
+    VI_TRUE              => $Lab::VISA::VI_TRUE,
     VI_NULL              => $Lab::VISA::VI_NULL,
     VI_SUCCESS           => $Lab::VISA::VI_SUCCESS,
     VI_SUCCESS_TERM_CHAR => $Lab::VISA::VI_SUCCESS_TERM_CHAR,
@@ -231,7 +232,7 @@ Lab::Moose::Connection::VISA - Connection back end to National Instruments' VISA
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 SYNOPSIS
 

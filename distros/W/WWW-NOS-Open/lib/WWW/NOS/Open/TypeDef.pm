@@ -1,4 +1,4 @@
-package WWW::NOS::Open::TypeDef v1.0.2;   # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open::TypeDef v1.0.3;   # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ WWW::NOS::Open::TypeDef - types for the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::TypeDef version v1.0.2.
+This document describes WWW::NOS::Open::TypeDef version v1.0.3.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.27      2019-04-30 05:38:20 -0400
+  - [AlienBuild] add clean_install property
+
 0.26      2019-02-20 08:59:17 -0500
   - [AlienBase::Wrapper::Bundle] replaces existing bundled Alien::Base::Wrapper
 

@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
 =head1 NAME
 
@@ -1371,6 +1371,58 @@ sub skip_until {
             die 'unknown type for condition: ' . $condition;
         }
     }, $src);
+}
+
+=head2 take_until
+
+Passes through items that arrive until a given condition is reached.
+
+Expects a single parameter, which can be one of the following:
+
+=over 4
+
+=item * a L<Future> instance - we will skip all items until it's marked as C<done>
+
+=item * a coderef, which we call for each item until it first returns true
+
+=item * or a L<Ryu::Source>, in which case we stop when that first emits a value
+
+=back
+
+=cut
+
+sub take_until {
+    my ($self, $condition) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
+    if(blessed($condition) && $condition->isa('Ryu::Source')) {
+        $condition->completed->on_ready(sub {
+            $log->warnf('Condition completed: %s and %s', $condition->describe, $src->describe);
+            return if $src->is_ready;
+            $log->warnf('Mark as ready');
+            shift->on_ready($src->completed);
+        });
+        $condition->first->each(sub {
+            $src->finish unless $src->is_ready
+        });
+        return $self->each_while_source($src->curry::emit, $src);
+    } else {
+        return $self->each_while_source(do {
+            if(ref($condition) eq 'CODE') {
+                my $reached = 0;
+                sub { return $src->emit($_) unless $reached ||= $condition->($_); }
+            } elsif(blessed($condition) && $condition->isa('Future')) {
+                $condition->on_fail($src->completed)->on_cancel($src->completed);
+                sub { $src->emit($_) unless $condition->is_done; }
+            } else {
+                die 'unknown type for condition: ' . $condition;
+            }
+        }, $src);
+    }
 }
 
 =head2 take

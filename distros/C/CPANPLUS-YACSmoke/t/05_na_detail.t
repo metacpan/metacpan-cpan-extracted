@@ -18,7 +18,7 @@ unless ( $Module::CoreList::released{ $] } ) {
   plan skip_all => 'This test relies on information in Module::CoreList that is not there';
 }
 else {
-  plan tests => 15;
+  plan tests => 16;
 }
 
 use_ok('CPANPLUS::YACSmoke');
@@ -57,7 +57,7 @@ TODO: {
   ok( $report =~ /\[MSG\] \[[\w: ]+\] Loading YACSmoke database ".*?"\n/s, 'Loading YACSmoke database' );
 }
 ok( $report =~ m!Test Summary Report!, 'Report contains the result of the tests' );
-
+ok( $report =~ m!CPANPLUS is prefering Build\.PL!, 'CPANPLUS is prefering Build.PL' );
 my $grade;
 capture_merged { $grade = $self->mark('Fibble-Bar-0.01'); };
 is($grade,'na','Grade was an NA');

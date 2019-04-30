@@ -3,65 +3,85 @@ abstract: 'a scalable distributed batch processing framework using MongoDB.'
 author:
   - 'Ashley Willis <ashleyw@cpan.org>'
 build_requires:
-  File::Path: '0'
-  Net::HTTP::Client: '0'
-  Test::More: '0'
+  File::Path: 0
+  Net::HTTP::Client: 0
+  Test::More: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: disbatch
 provides:
   Disbatch:
     file: lib/Disbatch.pm
-    version: '3.990'
+    version: 4.102
   Disbatch::Plugin::Demo:
     file: lib/Disbatch/Plugin/Demo.pm
-    version: '3.990'
+    version: 4.102
+  Disbatch::QueueBalance:
+    file: lib/Disbatch/QueueBalance.pm
+    version: 4.102
   Disbatch::Roles:
     file: lib/Disbatch/Roles.pm
-    version: '3.990'
+    version: 4.102
   Disbatch::Web:
     file: lib/Disbatch/Web.pm
-    version: '3.990'
+    version: 4.102
+  Disbatch::Web::Files:
+    file: lib/Disbatch/Web/Files.pm
+    version: 4.102
+  Disbatch::Web::Tasks:
+    file: lib/Disbatch/Web/Tasks.pm
+    version: 4.102
+  Disbatch::Web::V3:
+    file: lib/Disbatch/Web/V3.pm
+    version: 4.102
 requires:
-  Cpanel::JSON::XS: '0'
-  Data::Dumper: '0'
-  Encode: '0'
-  File::Slurp: '0'
-  Getopt::Long: '0'
-  IO::Wrap: '0'
-  JSON: '0'
-  LWP::UserAgent: '0'
-  Limper: '0'
-  Limper::Engine::PSGI: '0'
-  Limper::SendFile: '0'
-  Limper::SendJSON: '0'
-  Log::Log4perl: '0'
+  Clone: 0
+  Cpanel::JSON::XS: 0
+  Daemon::Control: 0
+  Data::Dumper: 0
+  Encode: 0
+  Exporter: 0
+  File::Slurp: 0
+  Getopt::Long: 0
+  IO::Wrap: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Limper: 0.014
+  Limper::Engine::PSGI: 0
+  Limper::SendFile: 0
+  Limper::SendJSON: 0
+  List::Util: 0
+  Log::Log4perl: 0
   MongoDB: v1.0.4
   MongoDB::OID: v1.0.4
-  POSIX: '0'
-  Pod::Usage: '0'
-  Safe::Isa: '0'
-  Starman: '0'
-  Sys::Hostname: '0'
-  Term::ReadKey: '0'
-  Text::CSV_XS: '0'
-  Text::Table: '0'
-  Time::Moment: '0'
-  Try::Tiny: '0'
-  Try::Tiny::Retry: '0'
-  URL::Encode: '0'
-  boolean: '0.25'
-  lib: '0'
+  POSIX: 0
+  Pod::Usage: 0
+  Safe::Isa: 0
+  Scalar::Util: 0
+  Starwoman: 0
+  Sys::Hostname: 0
+  Template: 0
+  Template::Plugin::SimpleJson: 0
+  Term::ReadKey: 0
+  Text::CSV_XS: 0
+  Text::Table: 0
+  Time::Moment: 0
+  Try::Tiny: 0
+  Try::Tiny::Retry: 0
+  URL::Encode: 0
+  boolean: 0.25
+  lib: 0
   perl: v5.12.0
-  strict: '0'
-  warnings: '0'
+  strict: 0
+  warnings: 0
 resources:
-  repository: ssh://git://stash.corp.synacor.com/7999/emg/disbatch.git
-version: '3.990'
-x_serialization_backend: 'YAML::Tiny version 1.64'
+  repository: git://github.com/rabcyr/disbatch.git
+version: 4.102
+x_generated_by_perl: v5.16.2
+x_serialization_backend: 'YAML::Tiny version 1.40'

@@ -1,3 +1,8 @@
+0.11    2019-04-30
+    - Apply https://github.com/shlomif/Term-Shell/pull/3
+        - Fix aliases.
+    - Add tidyall, TestCount, PerlCritic, PerlTidy checks.
+
 0.10    2018-12-22
     - Convert dist.ini to @SHLOMIF .
     - Add .travis.yml / Travis-CI

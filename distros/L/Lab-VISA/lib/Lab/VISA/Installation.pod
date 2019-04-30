@@ -10,8 +10,8 @@ Lab::VISA::Installation - Installation guide for Lab::VISA
 
 =over
 
-=item * Install a B<32-bit version>  of L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. Note
-that version 5.22 is not supported (see the comments below). 
+=item * Install a recent version of L<Strawberry
+Perl|http://strawberryperl.com/> (5.26 or later).
 
 =item * Install NI-VISA and the drivers required for your instruments. E.g. for GPIB you need the NI IEEE-488.2 driver.
 
@@ -22,26 +22,6 @@ that version 5.22 is not supported (see the comments below).
 =item * Have fun!
 
 =back
-
-=head2 Notes
-
-On 64-bit windows one needs a 32-bit version of perl with GNU binutils version
-<= 2.24. Otherwise linking with the NI-VISA library will fail. The reason for this
-are the following bugs in the GNU binutils:
-
-=over
-
-=item * L<binutils bug 16598|https://sourceware.org/bugzilla/show_bug.cgi?id=16598>
-
-=item * L<binutils bug 17910|https://sourceware.org/bugzilla/show_bug.cgi?id=17910>
-
-=back
-
-These are fixed in the most recent version of the binutils. Once this version
-(2.26) is included in Strawberry Perl, it should be possible to use a 64-bit
-version of perl.
-
-It is not possible to use either 32-bit or 64-bit versions of Strawberry Perl 5.22 as this version uses binutils 2.25. 
 
 =head1 Installation on Linux
 
@@ -103,6 +83,7 @@ Here is a quick test program that you can run with perl -Mblib test.pl:
   (c) 2010,2011 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, and others.
       2012      Andreas K. Hüttel
       2016      Simon Reinhardt, Andreas K. Hüttel
+      2019      Simon Reinhardt
 
 =cut
 

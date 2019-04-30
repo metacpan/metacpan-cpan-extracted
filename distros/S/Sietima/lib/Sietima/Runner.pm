@@ -3,7 +3,7 @@ use Moo;
 use Sietima::Policy;
 use namespace::clean;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: C<App::Spec::Run> for Sietima
 
 
@@ -32,7 +32,7 @@ Sietima::Runner - C<App::Spec::Run> for Sietima
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 DESCRIPTION
 

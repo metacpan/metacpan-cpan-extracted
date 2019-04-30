@@ -1,4 +1,6 @@
-### Configuring Disbatch 4
+### Configuring Disbatch 4.2
+
+Copyright (c) 2016, 2019 by Ashley Willis.
 
 #### Configure `/etc/disbatch/config.json`
 1. Copy `/etc/disbatch/config.json-example` to `/etc/disbatch/config.json`
@@ -11,9 +13,12 @@
    4. Change passwords in `auth` for the respective MongoDB users, or delete
       the field or set its value to `null` if not using MongoDB authentication
    5. Set `plugins` to the name(s) of the plugins you want accessible for queue
-      creation.
-   6. Set `activequeues` or `ignorequeues` per DEN if used
-   7. Remove the rest, which is optional and configured for development.
+      creation
+   6. Set `monitoring` to `false` if you want `GET /monitoring` to ignore checks
+   7. Set `balance.enabled` to `true` if using QueueBalance
+   8. Uncomment values in `web_extensions` if needing to use deprecated routes
+   9. Set `activequeues` or `ignorequeues` per DEN if used
+   10. Remove the rest, which is optional and configured for development
 
 See also [Configuring and Using SSL with MongoDB](SSL_MongoDB.md) and
 [Configuring and Using SSL with the Disbatch Command Interface](SSL_DCI.md).

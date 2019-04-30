@@ -49,6 +49,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -56,7 +57,7 @@
    "provides" : {
       "AnyEvent::HTTPD::Router" : {
          "file" : "lib/AnyEvent/HTTPD/Router.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "AnyEvent::HTTPD::Router::DefaultDispatcher" : {
          "file" : "lib/AnyEvent/HTTPD/Router/DefaultDispatcher.pm"
@@ -73,7 +74,7 @@
          "web" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_authority" : "cpan:UFOBAT",
    "x_contributors" : [
       "Martin Barth <martin@senfdax.de>",

@@ -1,5 +1,8 @@
 Revision history for Dir-Manifest
 
+0.0.4       2019-04-30
+    - Fix broken hyperlinks / invalid POD.
+
 0.0.3       2019-01-22
     - Added a SYNOPSIS.
 

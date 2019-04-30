@@ -1,5 +1,5 @@
 package Disbatch;
-$Disbatch::VERSION = '3.990';
+$Disbatch::VERSION = '4.102';
 use 5.12.0;
 use warnings;
 
@@ -15,8 +15,6 @@ use Safe::Isa;
 use Sys::Hostname;
 use Time::Moment;
 use Try::Tiny::Retry;
-
-my $json = Cpanel::JSON::XS->new->utf8;
 
 my $default_log4perl = {
     level => 'DEBUG',	# 'TRACE'
@@ -68,16 +66,18 @@ sub mongo {
         $username = 'disbatchd' if $self->{class} eq 'disbatch';
         $username = 'disbatch_web' if $self->{class} eq 'disbatch::web';
         $username = 'task_runner' if $self->{class} eq 'task_runner';
+        $username = 'queuebalance' if $self->{class} eq 'disbatch::queuebalance';
         $attributes{username} = $username;
         $attributes{password} = $self->{config}{auth}{$username};
         $attributes{db_name} = $self->{config}{database};
     }
-    warn "Connecting ", scalar localtime;
+    warn "Connecting ", scalar(localtime), "\n";
     $self->{mongo} = MongoDB->connect($self->{config}{mongohost}, \%attributes)->get_database($self->{config}{database}) ;
 }
 sub nodes  { $_[0]->mongo->coll('nodes') }
 sub queues { $_[0]->mongo->coll('queues') }
 sub tasks  { $_[0]->mongo->coll('tasks') }
+sub balance { $_[0]->mongo->coll('balance') }
 
 # loads the config file at startup.
 # anything in the config file at startup is static and cannot be changed without restarting disbatchd
@@ -85,7 +85,7 @@ sub load_config {
     my ($self) = @_;
     if (!defined $self->{config}) {
         $self->{config} = try {
-            $json->relaxed->decode(scalar read_file($self->{config_file}));
+            Cpanel::JSON::XS->new->utf8->relaxed->decode(scalar read_file($self->{config_file}));
         } catch {
             $self->{config}{log4perl} = $default_log4perl;
             $self->logger->logdie("Could not parse $self->{config_file}: $_");
@@ -215,18 +215,18 @@ sub update_node_status {
 sub claim_task {
     my ($self, $queue) = @_;
 
-    $self->{sort} //= 'default';
+    $queue->{sort} //= 'default';
 
     my $query  = { '$or' => [{node => undef}, {node => -1}], status => -2, queue => $queue->{_id} };
     my $update = { '$set' => {node => $self->{node}, status => -1, mtime => Time::Moment->now_utc} };
 
     my $options;
-    if ($self->{sort} eq 'fifo') {
+    if ($queue->{sort} eq 'fifo') {
         $options->{sort} = { _id => 1 };
-    } elsif ($self->{sort} eq 'lifo') {
+    } elsif ($queue->{sort} eq 'lifo') {
         $options->{sort} = { _id => -1 };
-    } elsif ($self->{sort} ne 'default') {
-        $self->logger->warn("$queue->{name}: unknown sort order '$self->{sort}' -- using default");
+    } elsif ($queue->{sort} ne 'default') {
+        $self->logger->warn("$queue->{name}: unknown sort order '$queue->{sort}' -- using default");
     }
     $self->{claimed_task} = try { $self->tasks->find_one_and_update($query, $update, $options) } catch { $self->logger->error("Could not claim task: $_"); undef };
 }
@@ -367,18 +367,18 @@ sub put_gfs {
         uploadDate => DateTime->now,
         filename   => $filename,
         chunkSize  => $chunk_size,
-        length     => length encode_utf8($content),
-        md5        => Digest::MD5->new->add(encode_utf8($content))->hexdigest,
+        length     => defined $content ? length encode_utf8($content) : 0,
+        md5        => Digest::MD5->new->add(defined $content ? encode_utf8($content) : '')->hexdigest,
     };
     if (defined $metadata) {
         die 'metadata must be a HASH' unless ref $metadata eq 'HASH';
         $file_doc->{metadata} = $metadata;
     }
-    my $files_id = $self->mongo->coll('tasks.files')->insert($file_doc);
+    my $files_id = $self->mongo->coll('tasks.files')->insert_one($file_doc)->inserted_id;
     my $n = 0;
     for (my $n = 0; length $content; $n++) {
         my $data = substr $content, 0, $chunk_size, '';
-        $self->mongo->coll('tasks.chunks')->insert({ n => $n, data => bless(\$data, 'MongoDB::BSON::String'), files_id => $files_id });
+        $self->mongo->coll('tasks.chunks')->insert_one({ n => $n, data => bless(\$data, 'MongoDB::BSON::String'), files_id => $files_id });
     }
     $files_id;
 }
@@ -394,7 +394,7 @@ sub get_gfs {
         my $query = {};
         $query->{filename} = $filename_or_id if defined $filename_or_id;
         $query->{metadata} = $metadata if defined $metadata;
-        $file_id = $self->mongo->coll('tasks.files')->find($query)->next->{_id};
+        $file_id = $self->mongo->coll('tasks.files')->find($query)->next->{_id};	# FIXME: why is this not find_one??
     }
     # this does no error-checking:
     my $result = $self->mongo->coll('tasks.chunks')->find({files_id => $file_id})->sort({n => 1})->result;
@@ -422,7 +422,7 @@ Disbatch - a scalable distributed batch processing framework using MongoDB.
 
 =head1 VERSION
 
-version 3.990
+version 4.102
 
 =head1 SUBROUTINES
 
@@ -465,6 +465,12 @@ Returns a L<MongoDB::Collection> object for collection "queues".
 Parameters: none
 
 Returns a L<MongoDB::Collection> object for collection "tasks".
+
+=item balance
+
+Parameters: none
+
+Returns a L<MongoDB::Collection> object for collection "balance".
 
 =item load_config
 
@@ -636,7 +642,7 @@ Matt Busigin
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ashley Willis.
+This software is Copyright (c) 2016, 2019 by Ashley Willis.
 
 This is free software, licensed under:
 

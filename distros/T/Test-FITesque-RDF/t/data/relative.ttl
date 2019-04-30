@@ -1,0 +1,15 @@
+@prefix test: <http://example.org/test-fixtures#> .
+@prefix deps: <http://ontologi.es/doap-deps#>.
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://example.org/my-parameters#> .
+
+
+<#test-list> a test:FixtureTable ;
+    test:fixtures <#test1> . 
+
+<#test1> a test:Test ;
+    test:handler "Internal::Fixture::Simple"^^deps:CpanId ;
+    test:param_base <http://example.org/my-parameters#> ;
+    dc:identifier "relative_uri" ;
+    test:params [ my:url </foo/> ] .
+        

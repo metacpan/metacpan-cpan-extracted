@@ -403,6 +403,22 @@ which we call for each item until it first returns true
 
 =back
 
+=head2 take_until
+
+Passes through items that arrive until a given condition is reached.
+
+Expects a single parameter, which can be one of the following:
+
+=over 4
+
+=item * a L<Future> instance - we will skip all items until it's marked as C<done>
+
+=item * a coderef, which we call for each item until it first returns true
+
+=item * or a L<Ryu::Source>, in which case we stop when that first emits a value
+
+=back
+
 =head2 take
 
 Takes a limited number of items.

@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Voltage;
-$Lab::XPRESS::Sweep::Voltage::VERSION = '3.680';
+$Lab::XPRESS::Sweep::Voltage::VERSION = '3.681';
 #ABSTRACT: Voltage sweep
 
 use Lab::XPRESS::Sweep;
@@ -25,6 +25,7 @@ sub new {
         allowed_instruments => [
             qw/
                 Lab::Instrument::Yokogawa7651 Lab::Instrument::Keithley2400
+                Lab::Moose::Instrument::KeysightE3633E
                 Lab::Instrument::YokogawaGS200 Lab::Instrument::DummySource
                 Lab::Instrument::SR830::AuxOut Lab::Moose::Instrument::DummySource
                 Lab::Moose::Instrument::YokogawaGS200 Lab::Moose::Instrument::ZI_MFLI Lab::Moose::Instrument::ZI_MFIA/
@@ -167,7 +168,7 @@ Lab::XPRESS::Sweep::Voltage - Voltage sweep
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 SYNOPSIS
 

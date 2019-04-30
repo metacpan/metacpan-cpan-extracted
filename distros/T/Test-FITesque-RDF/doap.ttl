@@ -1,0 +1,77 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wot:   <http://xmlns.com/wot/0.1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.022_01"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
+		doap-deps:on "URI::NamespaceMap 1.08"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [ doap-deps:on "Test::Deep"^^doap-deps:CpanId ], [ doap-deps:on "FindBin"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>;
+	doap:created         "2019-04-09"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/Test-FITesque-RDF>;
+	doap:helper          <http://purl.org/NET/cpan-uri/person/konobi>;
+	doap:homepage        <https://metacpan.org/release/Test-FITesque-RDF>;
+	doap:license         <http://www.opensource.org/licenses/mit-license.php>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "Test-FITesque-RDF";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-test-fitesque-rdf>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-test-fitesque-rdf&serialization=PROV-O#>;
+	];
+	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:shortdesc       "Formulate Test::FITesque fixture tables in RDF".
+
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Test-FITesque-RDF-0.001"^^xsd:string;
+	dc:issued            "2019-04-29"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK", "KjetilK";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-test-fitesque-rdf&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<http://purl.org/NET/cpan-uri/person/konobi>
+	a                    foaf:Person;
+	foaf:name            "Scott McWirther";
+	foaf:nick            "KONOBI";
+	foaf:page            <https://metacpan.org/author/KONOBI>.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:homepage        <http://kjetil.kjernsmo.net/>;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+_:B1
+	a                    wot:PubKey;
+	wot:fingerprint      "0ECC8BC6D0A2E9B93BA417267FBEE8DF3A9E4AA5".
+

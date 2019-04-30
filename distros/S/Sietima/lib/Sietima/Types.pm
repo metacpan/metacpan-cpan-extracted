@@ -13,7 +13,7 @@ use Type::Library
                    Subscriber SubscriberFromAddress SubscriberFromStr SubscriberFromHashRef
                    Transport MailStore MailStoreFromHashRef);
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: type library for Sietima
 
 
@@ -85,7 +85,7 @@ Sietima::Types - type library for Sietima
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 DESCRIPTION
 

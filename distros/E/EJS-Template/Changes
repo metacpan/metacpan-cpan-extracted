@@ -1,5 +1,8 @@
 Revision history for EJS-Template
 
+0.09    2019-04-30
+        Fix test for JavaScript::SpiderMonkey limitation (RT#129340)
+
 0.08    2017-02-07
         Fix Unicode issues
         Bugfix for SpiderMonkey-based engines

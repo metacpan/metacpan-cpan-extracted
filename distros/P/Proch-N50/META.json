@@ -1,0 +1,28 @@
+{
+   "abstract" : "Calculate N50 from a FASTA or FASTQ file without dependencies",
+   "author" : [
+      "Andrea Telatin <andrea.telatin@quadram.ac.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Proch-N50",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.022",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

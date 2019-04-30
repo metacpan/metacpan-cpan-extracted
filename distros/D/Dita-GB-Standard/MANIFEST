@@ -1,0 +1,7 @@
+Build.PL
+lib/Dita/GB/Standard.pm
+lib/Dita/GB/Standard.pm.backup
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

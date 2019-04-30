@@ -8,4 +8,4 @@ use Term::Shell;
 my $shell = Term::Shell->new;
 
 # TEST
-ok ($shell, "A Term::Shell instance was initialised.");
+ok( $shell, "A Term::Shell instance was initialised." );

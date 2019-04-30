@@ -1,0 +1,83 @@
+{
+   "abstract" : "Formulate Test::FITesque fixture tables in RDF",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-FITesque-RDF",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attean" : "0.022_01",
+            "Moo" : "1.006000",
+            "Path::Tiny" : "0",
+            "Test::FITesque" : "0",
+            "Types::Standard" : "0",
+            "Types::URI" : "0",
+            "URI::NamespaceMap" : "1.08"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Deep" : "0",
+            "Test::Modern" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Test::FITesque::RDF" : {
+         "file" : "lib/Test/FITesque/RDF.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-test-fitesque-rdf/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Test-FITesque-RDF",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-test-fitesque-rdf.git",
+         "web" : "https://github.com/kjetilk/p5-test-fitesque-rdf"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

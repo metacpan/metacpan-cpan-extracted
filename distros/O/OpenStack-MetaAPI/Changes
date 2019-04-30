@@ -1,6 +1,7 @@
 OpenStack::MetaAPI Changes
 
 NEXT
+- add Test::MockModule requirement version for 'redefine'
 - fix some test dependency issues
 
 - initial release of OpenStack::MetaAPI

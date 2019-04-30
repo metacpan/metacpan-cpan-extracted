@@ -22,4 +22,4 @@ requires:
   JE: '0'
   Test::More: '0'
   URI::Escape: '0'
-version: '0.08'
+version: '0.09'

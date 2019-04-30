@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "Astro::Coord::ECI::TLE::Iridium" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
-         "version" : "0.119"
+         "version" : "0.120"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium"
       }
    },
-   "version" : "0.119",
+   "version" : "0.120",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

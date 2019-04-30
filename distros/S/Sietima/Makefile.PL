@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Sietima",
   "PREREQ_PM" => {
-    "App::Spec" => ">= 0.004, != 0.004_001",
-    "App::Spec::Run" => ">= 0.004, != 0.004_001",
+    "App::Spec" => "0.005",
+    "App::Spec::Run" => "0.005",
     "Digest::SHA" => "6.02",
     "Email::Address" => "1.912",
     "Email::MIME" => "1.946",
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "URI" => "1.76",
     "lib" => "0.63"
   },
-  "VERSION" => "1.0.4",
+  "VERSION" => "1.0.5",
   "test" => {
     "TESTS" => "t/*.t t/tests/*.t t/tests/sietima/*.t t/tests/sietima/multi-role/*.t t/tests/sietima/role/*.t t/tests/sietima/role/subscriberonly/*.t"
   }
@@ -60,8 +60,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::Spec" => ">= 0.004, != 0.004_001",
-  "App::Spec::Run" => ">= 0.004, != 0.004_001",
+  "App::Spec" => "0.005",
+  "App::Spec::Run" => "0.005",
   "Data::Printer" => "0.40",
   "Digest::SHA" => "6.02",
   "Email::Address" => "1.912",

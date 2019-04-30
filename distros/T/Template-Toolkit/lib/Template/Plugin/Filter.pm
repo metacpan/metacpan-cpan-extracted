@@ -11,7 +11,7 @@
 #   Andy Wardley   <abw@wardley.org>
 #
 # COPYRIGHT
-#   Copyright (C) 2001-2009 Andy Wardley.  All Rights Reserved.
+#   Copyright (C) 2001-2019 Andy Wardley.  All Rights Reserved.
 #
 #   This module is free software; you can redistribute it and/or
 #   modify it under the same terms as Perl itself.
@@ -23,7 +23,7 @@ package Template::Plugin::Filter;
 use strict;
 use warnings;
 use base 'Template::Plugin';
-use Scalar::Util 'weaken';
+use Scalar::Util 'weaken', 'isweak';
 
 
 our $VERSION = 1.38;
@@ -65,7 +65,8 @@ sub factory {
     my $this = $self;
     
     # avoid a memory leak
-    weaken( $this->{_CONTEXT} ) if ref $this->{_CONTEXT};
+    weaken( $this->{_CONTEXT} ) if ref $this->{_CONTEXT}
+            && !isweak $this->{_CONTEXT};
 
     if ($self->{ _DYNAMIC }) {
         return [ sub {
@@ -385,7 +386,7 @@ Andy Wardley E<lt>abw@wardley.orgE<gt> L<http://wardley.org/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1996-2007 Andy Wardley.  All Rights Reserved.
+Copyright (C) 1996-2019 Andy Wardley.  All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

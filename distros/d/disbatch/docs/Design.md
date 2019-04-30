@@ -1,5 +1,7 @@
 ### Design of Disbatch 4
 
+Copyright (c) 2016, 2019 by Ashley Willis.
+
 This documents the Disbatch Execution Node (DEN) protocol and schema. All DENs
 using the same MongoDB database must follow this, as well as the Disbatch Task
 Runners (DTR) used by the DENs and any Disbatch Command Interfaces (DCI) using
@@ -307,6 +309,25 @@ On startup, the DEN, DCI, and DTR read a JSON format configuration file.
 
 ##### Additional settings that may be specified are:
 
+* `plugins`
+
+   An array of default allowed plugin names for queues, such as
+  `"Disbatch::Plugin::Demo"`. Default is `[]`.
+
+* `monitoring`
+
+  Set to `true` for `GET /monitoring` to check if Disbatch node(s) are running
+  and optionally QueueBalance.
+
+* `balance`
+
+  A hash of settings for QueueBalance. Keys are `enabled`, `log`, `verbose`,
+  and `pretend`.  All values are booleans.
+
+* `web_extensions`
+
+  A hash of package names and options for adding new routes to the DCI.
+
 * `task_runner`
 
   Path to the DTR. Future support will allow task runners for plugins in
@@ -324,10 +345,10 @@ On startup, the DEN, DCI, and DTR read a JSON format configuration file.
   The path to the html, js, and other web documents for the web interface.
   Default is `"/etc/disbatch/htdocs/"`.
 
-* `plugins`
+* `views_dir`
 
-   An array of default allowed plugin names for queues, such as
-  `"Disbatch::Plugin::Demo"`. Default is `[]`.
+  The path to the template files for the web interface.
+  Default is `"/etc/disbatch/views/"`.
 
 * `log4perl`
 

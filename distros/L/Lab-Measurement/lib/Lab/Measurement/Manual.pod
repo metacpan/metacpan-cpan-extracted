@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 OVERVIEW
 
@@ -145,6 +145,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 =item * L<Lab::Moose::Instrument::YokogawaGS200>
 
 =item * L<Lab::Moose::Instrument::Yokogawa7651>
+
+=item * L<Lab::Moose::Instrument::KeysightE3633E>
 
 =item * L<Lab::Moose::Instrument::DummySource>
 

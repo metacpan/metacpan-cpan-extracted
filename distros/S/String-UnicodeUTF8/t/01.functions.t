@@ -80,18 +80,18 @@ SKIP: {
 }
 
 my %uni_set = (
-    'quotemeta_bytes'   => q{I ♥ perl\\'s coolness},
-    'quotemeta_utf8'    => q{I \xe2\x99\xa5 perl\\'s coolness},
-    'quotemeta_unicode' => q{I \x{2665} perl\\'s coolness},
+    'quotemeta_bytes'   => q{I\\ ♥\\ perl\\'s\\ coolness},
+    'quotemeta_utf8'    => q{I\\ \xe2\x99\xa5\\ perl\\'s\\ coolness},
+    'quotemeta_unicode' => q{I\\ \x{2665}\\ perl\\'s\\ coolness},
 
     'unquotemeta_bytes'   => "I \xe2\x99\xa5 perl's coolness",    # always bytes, regardless of utf8 pragma
     'unquotemeta_utf8'    => "I \xe2\x99\xa5 perl's coolness",    # always bytes, regardless of utf8 pragma
     'unquotemeta_unicode' => "I \x{2665} perl's coolness",        # always unicode, regardless of utf8 pragma
 );
 my %ascii_set = (
-    'quotemeta_bytes'   => q{I love perl\\'s coolness},
-    'quotemeta_utf8'    => q{I love perl\\'s coolness},
-    'quotemeta_unicode' => q{I love perl\\'s coolness},
+    'quotemeta_bytes'   => q{I\\ love\\ perl\\'s\\ coolness},
+    'quotemeta_utf8'    => q{I\\ love\\ perl\\'s\\ coolness},
+    'quotemeta_unicode' => q{I\\ love\\ perl\\'s\\ coolness},
 
     'unquotemeta_bytes'   => qq{I love perl's coolness},          # always bytes, regardless of utf8 pragma
     'unquotemeta_utf8'    => qq{I love perl's coolness},          # always bytes, regardless of utf8 pragma

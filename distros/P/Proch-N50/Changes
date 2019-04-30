@@ -1,0 +1,16 @@
+0.022	2019-05-01
+	* Improved POD documentation
+	Ã* Fixed name in n50_algorithm.pl
+
+0.021	2019-05-01
+	* Improved POD documentation
+	* Added a demo implementation of n50.pl using Proch::N50, keeping n50_algorithm.pl that does the same but without Proch::N50
+
+0.02	2019-04-30
+	* Added this Changelog
+	* Removed unnecessary variables
+	* Fixed POD documentation
+	- TODO: Bareword filehandle: currently used as readfq() needs it
+
+0.01	2019-04-30
+	* Initial release on CPAN

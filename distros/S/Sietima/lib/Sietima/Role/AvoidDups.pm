@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Email::Address;
 use namespace::clean;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: prevent people from receiving the same message multiple times
 
 
@@ -39,7 +39,7 @@ Sietima::Role::AvoidDups - prevent people from receiving the same message multip
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

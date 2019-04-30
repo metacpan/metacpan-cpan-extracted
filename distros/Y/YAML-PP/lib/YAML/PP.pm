@@ -3,9 +3,10 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use YAML::PP::Schema;
+use YAML::PP::Schema::JSON;
 use YAML::PP::Loader;
 use YAML::PP::Dumper;
 
@@ -17,10 +18,15 @@ sub new {
 
     my $bool = delete $args{boolean};
     $bool = 'perl' unless defined $bool;
-    my $schemas = delete $args{schema} || ['Core'];
+    my $schemas = delete $args{schema} || ['JSON'];
     my $cyclic_refs = delete $args{cyclic_refs} || 'allow';
+    my $indent = $args{indent};
+    my $writer = $args{writer};
     my $parser = delete $args{parser};
-    my $emitter = delete $args{emitter};
+    my $emitter = delete $args{emitter} || {
+        indent => $indent,
+        writer => $writer,
+    };
 
     my $schema = YAML::PP::Schema->new(
         boolean => $bool,
@@ -69,7 +75,7 @@ sub default_schema {
     my $schema = YAML::PP::Schema->new(
         boolean => $args{boolean},
     );
-    $schema->load_subschemas(qw/ Core /);
+    $schema->load_subschemas(qw/ JSON /);
     return $schema;
 }
 
@@ -81,6 +87,11 @@ sub load_string {
 sub load_file {
     my ($self, $file) = @_;
     return $self->loader->load_file($file);
+}
+
+sub dump {
+    my ($self, @data) = @_;
+    return $self->dumper->dump(@data);
 }
 
 sub dump_string {
@@ -323,7 +334,7 @@ Currently loaded as single characters without validating
 
 =head2 YAML::PP::Constructor
 
-The Constructor now supports all three YAML 1.2 Schemas, Failsafe, JSON and Core.
+The Constructor now supports all three YAML 1.2 Schemas, Failsafe, JSON and JSON.
 Additionally you can choose the schema for YAML 1.1 as C<YAML1_1>.
 
 Too see what strings are resolved as booleans, numbers, null etc. look at
@@ -332,7 +343,7 @@ C<t/31.schema.t>.
 You can choose the Schema, however, the API for that is not yet fixed.
 Currently it looks like this:
 
-    my $ypp = YAML::PP->new(schema => ['JSON']); # default is 'Core' for now
+    my $ypp = YAML::PP->new(schema => ['Core']); # default is 'JSON'
 
 The Tags C<!!seq> and C<!!map> are still ignored for now.
 
@@ -470,6 +481,7 @@ The layout is like libyaml output:
         boolean => 'JSON::PP',
         schema => ['JSON'],
         cyclic_refs => 'fatal',
+        indent => 4, # use 4 spaces for dumping indentation
     );
 
 =item load_string
@@ -501,6 +513,17 @@ Output will be UTF-8 decoded
     $ypp->dump_file("file.yaml", @docs);
 
 File will be written UTF-8 encoded
+
+=item dump
+
+This will dump to a predefined writer. By default it will just use the
+L<YAML::PP::Writer> and output a string.
+
+    my $writer = MyWriter->new(\my $output);
+    my $yp = YAML::PP->new(
+        writer => $writer,
+    );
+    $yp->dump($data);
 
 =item loader
 

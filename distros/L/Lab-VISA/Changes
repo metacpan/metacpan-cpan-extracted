@@ -1,6 +1,10 @@
 History of Lab::VISA
 ====================
 
+Lab::VISA 3.20
+  * Add support for 64bit Perl on Windows
+  * Update Windows installation instructions
+
 Lab::VISA 3.05
   * minor documentation improvements and metadata fixes
 

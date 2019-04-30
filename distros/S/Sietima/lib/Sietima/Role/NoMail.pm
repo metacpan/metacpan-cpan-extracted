@@ -3,7 +3,7 @@ use Moo::Role;
 use Sietima::Policy;
 use namespace::clean;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: don't send mail to those who don't want it
 
 
@@ -28,7 +28,7 @@ Sietima::Role::NoMail - don't send mail to those who don't want it
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+# install nginx before running, restart nginx after running
+
+use 5.12.0;
+use warnings;
+
+use File::Slurp;
+use Getopt::Long;
+use Sys::Hostname;
+
+my ($keyfile, $crtfile, $target);
+GetOptions('ssl_certificate_key=s' => \$keyfile, 'ssl_certificate=s' => \$crtfile, 'target=s' => \$target);
+$target //= '/etc/nginx/conf.d/default.conf';
+
+my $hostname = hostname;
+my (undef, $dc) = split /\./, $hostname;
+$keyfile //= "/etc/nginx/mig-$dc.key";
+$crtfile //= "/etc/nginx/mig-$dc.crt";
+
+my $config = read_file '/etc/disbatch/nginx-default.conf-example';
+
+for my $file ($keyfile, $crtfile) {
+    die "File $file DNE\n" unless -e $file;
+}
+
+$config =~ s/disbatch01\.example\.com/$hostname/g;
+$config =~ s{/etc/nginx/cert\.crt}{$crtfile};
+$config =~ s{/etc/nginx/cert\.key}{$keyfile};
+
+rename $target, "$target-pre-disbatch" if -e $target;
+write_file $target, $config;

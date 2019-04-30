@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State;
-$Games::Solitaire::Verify::State::VERSION = '0.2000';
+$Games::Solitaire::Verify::State::VERSION = '0.2100';
 use warnings;
 use strict;
 
@@ -280,7 +280,7 @@ sub num_empty_columns
     {
         if ( !$self->get_column($idx)->len() )
         {
-            $count++;
+            ++$count;
         }
     }
     return $count;
@@ -821,7 +821,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 SYNOPSIS
 
@@ -856,7 +856,7 @@ version 0.2000
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 FUNCTIONS
 

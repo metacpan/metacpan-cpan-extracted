@@ -11,10 +11,7 @@ my @files = (
     't/00-compile.t',
     't/01require.t',
     't/02default.t',
-    't/03catchsmry.t',
-    't/cpan-changes.t',
-    't/pod.t',
-    't/style-trailing-space.t'
+    't/03catchsmry.t'
 );
 
 notabs_ok($_) foreach @files;

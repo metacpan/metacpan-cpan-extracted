@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
@@ -17,7 +17,9 @@ sub new {
     my ($class, %args) = @_;
     my $self = bless {
         indent => $args{indent} || 2,
+        writer => $args{writer},
     }, $class;
+    $self->init;
     return $self;
 }
 
@@ -27,9 +29,18 @@ sub indent { return $_[0]->{indent} }
 sub set_indent { $_[0]->{indent} = $_[1] }
 sub writer { $_[0]->{writer} }
 sub set_writer { $_[0]->{writer} = $_[1] }
+sub tagmap { return $_[0]->{tagmap} }
+sub set_tagmap { $_[0]->{tagmap} = $_[1] }
 
 sub init {
     my ($self) = @_;
+    unless ($self->writer) {
+        $self->set_writer(YAML::PP::Writer->new);
+    }
+    $self->set_tagmap({
+        'tag:yaml.org,2002:' => '!!',
+    });
+    $self->writer->init;
 }
 
 sub mapping_start_event {
@@ -655,16 +666,14 @@ sub stream_end_event {
 
 sub emit_tag {
     my ($self, $type, $tag) = @_;
-    if ($type eq 'scalar' and $tag =~ m/^tag:yaml.org,2002:(int|str|null|bool|binary)/) {
-        $tag = "!!$1";
+    my $map = $self->tagmap;
+    for my $key (sort keys %$map) {
+        if ($tag =~ m/^\Q$key\E(.*)/) {
+            $tag = $map->{ $key } . $1;
+            return $tag;
+        }
     }
-    elsif ($type eq 'map' and $tag =~ m/^tag:yaml.org,2002:(map|set)/) {
-        $tag = "!!$1";
-    }
-    elsif ($type eq 'seq' and $tag =~ m/^tag:yaml.org,2002:(omap|seq)/) {
-        $tag = "!!$1";
-    }
-    elsif ($tag =~ m/^(!.*)/) {
+    if ($tag =~ m/^(!.*)/) {
         $tag = "$1";
     }
     else {
@@ -679,3 +688,80 @@ sub finish {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+YAML::PP::Emitter - Emitting events
+
+=head1 SYNOPSIS
+
+    my $emitter = YAML::PP::Emitter->new(
+        indent => 4,
+    );
+
+    $emitter->init;
+
+    $emitter->stream_start_event;
+    $emitter->document_start_event({ implicit => 1 });
+    $emitter->sequence_start_event;
+    $emitter->scalar_event({ value => $input, style => $style });
+    $emitter->sequence_end_event;
+    $emitter->document_end_event({ implicit => 1 });
+    $emitter->stream_end_event;
+
+    my $yaml = $emitter->writer->output;
+    $emitter->finish;
+
+=head1 DESCRIPTION
+
+The emitter emits events to YAML. It provides methods for each event
+type. The arguments are mostly the same as the events from L<YAML::PP::Parser>.
+
+=head1 METHODS
+
+=over
+
+=item new
+
+    my $emitter = YAML::PP::Emitter->new(
+        indent => 4,
+    );
+
+Constructor. Currently takes these options:
+
+=over
+
+=item indent
+
+=item writer
+
+=back
+
+=item stream_start_event, stream_end_event, document_start_event, document_end_event, sequence_start_event, sequence_end_event, mapping_start_event, mapping_end_event, scalar_event, alias_event
+
+=item indent, set_indent
+
+Getter/setter for number of indentation spaces.
+
+TODO: Currently sequences are always zero-indented.
+
+=item writer, set_writer
+
+Getter/setter for the writer object. By default L<YAML::PP::Writer>.
+You can pass your own writer if you want to output the resulting YAML yorself.
+
+=item init
+
+Initialize
+
+=item finish
+
+=back
+
+=cut

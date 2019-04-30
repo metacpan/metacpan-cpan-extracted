@@ -1,5 +1,5 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::NOS::Open::MediaResource v1.0.2;
+package WWW::NOS::Open::MediaResource v1.0.3;
 use strict;
 use warnings;
 
@@ -36,7 +36,7 @@ WWW::NOS::Open::MediaResource - client side media resource.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::MediaResource version v1.0.2.
+This document describes WWW::NOS::Open::MediaResource version v1.0.3.
 
 =head1 SYNOPSIS
 

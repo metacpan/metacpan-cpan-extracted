@@ -6,7 +6,7 @@ use Sietima::Types qw(Address AddressFromStr);
 use List::AllUtils qw(part);
 use namespace::clean;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: munge the C<Reply-To> header
 
 
@@ -77,7 +77,7 @@ Sietima::Role::ReplyTo - munge the C<Reply-To> header
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

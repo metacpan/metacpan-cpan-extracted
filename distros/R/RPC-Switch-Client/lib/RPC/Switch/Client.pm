@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -28,6 +28,7 @@ use Encode qw(encode_utf8 decode_utf8);
 use File::Basename;
 use IO::Handle;
 use POSIX ();
+use Scalar::Util qw(refaddr);
 use Storable;
 use Sys::Hostname;
 
@@ -40,7 +41,7 @@ use MojoX::NetstringStream 0.06;
 
 
 has [qw(
-	actions address auth channels clientid conn debug json lastping
+	actions address auth cb_used channels clientid conn debug json lastping
 	log method ns ping_timeout port rpc timeout tls token who
 )];
 
@@ -64,6 +65,7 @@ sub new {
 	my $log = $args{log} // Mojo::Log->new(level => ($debug) ? 'debug' : 'info');
 
 	$self->{address} = $args{address} // '127.0.0.1';
+	$self->{cb_used} = {}; # avoid calling cb twice in a timeout scenario
 	$self->{channels} = {}; # per channel hash of waitids
 	$self->{debug} = $debug;
 	$self->{json} = $args{json} // 1;
@@ -220,9 +222,12 @@ sub call {
 	my ($done, $status, $outargs);
 	$args{waitcb} = sub {
 		($status, $outargs) = @_;
-		die "unexpected status" unless $status and $status eq RES_WAIT;
+		unless ($status and $status eq RES_WAIT) {
+			$self->log->error('unexpected status: ' . ($status // 'undef'));
+			$done++;
+			return;
+		}
 		$self->log->debug("gotta wait for $outargs");
-		#$done++ unless $status and $status eq RES_WAIT;
 	};
 	$args{resultcb} = sub {
 		($status, $outargs) = @_;
@@ -263,20 +268,23 @@ sub call_nb {
 		}
 	}
 
+	if ($timeout > 0) {
+		Mojo::IOLoop->timer($timeout => sub {
+			$rescb->(RES_TIMEOUT, "timed out after $timeout seconds");
+			$self->{cb_used}->{refaddr($rescb)} = 1
+				if defined $self->{cb_used}->{refaddr($rescb)};
+				# waiting for result notification after RES_WAIT
+			$rescb = undef;
+		});
+	}
+
 	$inargsj = decode_utf8($inargsj);
 	$self->log->debug("calling $method with '" . $inargsj . "'" . (($vtag) ? " (vtag $vtag)" : ''));
 
 	my $delay = Mojo::IOLoop->delay->steps(
 		sub {
 			my $d = shift;
-			my $end = $d->begin(0);
-			if ($timeout > 0) {
-				Mojo::IOLoop->timer($timeout => sub { 
-					$d->pass(undef, {result => [RES_TIMEOUT, {}]});
-					$end->(); 
-				});
-			}
-			$self->conn->call($method, $inargs, $end, 1);
+			$self->conn->call($method, $inargs, $d->begin(0), 1);
 		},
 		sub {
 			#print Dumper(@_);
@@ -284,9 +292,10 @@ sub call_nb {
 			if ($e) {
 				$e = $e->{error};
 				$self->log->error("call returned error: $e->{message} ($e->{code})");
-				$rescb->(RES_ERROR, "$e->{message} ($e->{code})");
+				$rescb->(RES_ERROR, "$e->{message} ($e->{code})") if $rescb;
 				return;
 			}
+			return unless $rescb; # $rescb is undef if a timeout happeded
 			my ($status, $outargs) = @{$r->{result}};
 			if ($status eq RES_WAIT) {
 				#print '@$r', Dumper($r);
@@ -301,6 +310,7 @@ sub call_nb {
 				# outargs should contain waitid
 				# autovivification ftw?
 				$self->{channels}->{$vci}->{$outargs} = $rescb;
+				$self->{cb_used}->{refaddr($rescb)} = 0;
 				$waitcb->($status, $outargs) if $waitcb;
 			} else {
 				$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
@@ -353,13 +363,14 @@ sub get_status {
 
 sub rpc_result {
 	my ($self, $c, $r) = @_;
-	#$self->log->error('got result: ' . Dumper($r));
+	#$self->log->debug('got result: ' . Dumper($r));
 	my ($status, $id, $outargs) = @{$r->{params}};
 	return unless $id;
 	my $vci = $r->{rpcswitch}->{vci};
 	return unless $vci;
 	my $rescb = delete $self->{channels}->{$vci}->{$id};
 	return unless $rescb;
+	return if delete $self->{cb_used}->{refaddr($rescb)}; # cb already called
 	$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
 	$rescb->($status, $outargs);
 	return;
@@ -475,7 +486,7 @@ sub announce {
 			$self->log->error("announce got res: $res msg: $msg");
 			return;
 		}
-                my $worker_id = $msg->{worker_id};
+		my $worker_id = $msg->{worker_id};
 		my $action = {
 			cb => $cb,
 			mode => $mode,
@@ -966,9 +977,9 @@ timeout).
 
 The RPC::Switch:Client library currently defines the following exit codes:
 
-        WORK_OK
-        WORK_PING_TIMEOUT
-        WORK_CONNECTION_CLOSED
+	WORK_OK
+	WORK_PING_TIMEOUT
+	WORK_CONNECTION_CLOSED
 
 =head2 stop
 
@@ -994,15 +1005,15 @@ Example:
   ./rpc-switch-client rpcswitch.get_methods '{}'
 
   ...
-        [
-          {
-            'foo.add' => 'adds 2 numbers'
-          },
-          {
-            'foo.div' => 'undocumented method'
-          },
+	[
+	  {
+	    'foo.add' => 'adds 2 numbers'
+	  },
+	  {
+	    'foo.div' => 'undocumented method'
+	  },
 	  ...
-        ];
+	];
 
 =item - B<rpcswitch.get_method_details>
 
@@ -1015,16 +1026,16 @@ Example:
   ./rpc-switch-client rpcswitch.get_method_details '{"method":"foo.add"}'
 
   ...
-        {
-          'doc' => {
-                     'description' => 'adds step to counter and returns counter; step defaults to 1',
-                     'outputs' => 'counter',
-                     'inputs' => 'counter, step'
-                   },
-          'b' => 'bar.add',
-          'd' => 'adds 2 numbers',
-          'c' => 'wieger'
-        }
+	{
+	  'doc' => {
+		     'description' => 'adds step to counter and returns counter; step defaults to 1',
+		     'outputs' => 'counter',
+		     'inputs' => 'counter, step'
+		   },
+	  'b' => 'bar.add',
+	  'd' => 'adds 2 numbers',
+	  'c' => 'wieger'
+	}
 
 =back
 

@@ -34,7 +34,9 @@
       "develop" : {
          "requires" : {
             "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
             "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -68,11 +70,11 @@
    "provides" : {
       "Term::Shell" : {
          "file" : "lib/Term/Shell.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Term::Shell::OnScopeLeave" : {
          "file" : "lib/Term/Shell.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -88,10 +90,10 @@
          "web" : "https://github.com/shlomif/Term-Shell"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -460,6 +462,22 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Kwalitee" : {
+                  "filename" : "xt/release/kwalitee.t",
+                  "skiptest" : []
+               }
+            },
+            "name" : "Test::Kwalitee",
+            "version" : "2.12"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
+            "name" : "Test::TidyAll",
+            "version" : "0.04"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.012"
@@ -523,7 +541,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

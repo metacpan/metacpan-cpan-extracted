@@ -4,13 +4,13 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Apache-Config-Preproc",
    "no_index" : {
@@ -52,7 +52,7 @@
    "provides" : {
       "Apache::Config::Preproc" : {
          "file" : "lib/Apache/Config/Preproc.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Apache::Config::Preproc::compact" : {
          "file" : "lib/Apache/Config/Preproc/compact.pm",
@@ -86,6 +86,5 @@
          "web" : "http://git.gnu.org.ua/cgit/acpp.git/"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "1.03"
 }

@@ -1,5 +1,5 @@
 package Dir::Manifest;
-$Dir::Manifest::VERSION = '0.0.3';
+$Dir::Manifest::VERSION = '0.0.4';
 use strict;
 use warnings;
 
@@ -104,7 +104,7 @@ Dir::Manifest
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of ke
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 METHODS
 
@@ -170,7 +170,7 @@ as values. C<'slurp_opts'> is passed to text().
 
 =head1 DEDICATION
 
-This code is dedicated to the memory of L<Jonathan Scott Duff,https://metacpan.org/author/DUFF>
+This code is dedicated to the memory of L<Jonathan Scott Duff|https://metacpan.org/author/DUFF>
 a.k.a PerlJam and perlpilot who passed away some days before the first release of
 this code. For more about him, see:
 
@@ -188,8 +188,8 @@ this code. For more about him, see:
 
 =head1 MEDIA RECOMMENDATION
 
-L<kristian vuljar,https://www.jamendo.com/artist/441226/kristian-vuljar> used to
-have a jamendo track called "Keys" based on L<Shine 4U,https://www.youtube.com/watch?v=B8ehY5tutHs> by Carmen and Camille. You can find it at L<http://www.shlomifish.org/Files/files/dirs/kristian-vuljar--keys/> .
+L<kristian vuljar|https://www.jamendo.com/artist/441226/kristian-vuljar> used to
+have a jamendo track called "Keys" based on L<Shine 4U|https://www.youtube.com/watch?v=B8ehY5tutHs> by Carmen and Camille. You can find it at L<http://www.shlomifish.org/Files/files/dirs/kristian-vuljar--keys/> .
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

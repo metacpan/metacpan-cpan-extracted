@@ -1,5 +1,5 @@
 package CPANPLUS::Config::YACSmoke;
-$CPANPLUS::Config::YACSmoke::VERSION = '1.06';
+$CPANPLUS::Config::YACSmoke::VERSION = '1.08';
 # Dist::Zilla: +PodWeaver
 #ABSTRACT: Set the environment for YACSmoking
 
@@ -27,7 +27,7 @@ CPANPLUS::Config::YACSmoke - Set the environment for YACSmoking
 
 =head1 VERSION
 
-version 1.06
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Chris Williams, Jos Boumans, Robert Rothenberg and Barbie.
+This software is copyright (c) 2019 by Chris Williams, Jos Boumans, Robert Rothenberg and Barbie.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

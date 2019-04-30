@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.06
+    version 1.08
 
 SYNOPSIS
 
@@ -234,7 +234,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2018 by Chris Williams, Jos Boumans,
+    This software is copyright (c) 2019 by Chris Williams, Jos Boumans,
     Robert Rothenberg and Barbie.
 
     This is free software; you can redistribute it and/or modify it under

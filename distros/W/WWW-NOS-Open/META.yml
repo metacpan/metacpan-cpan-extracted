@@ -17,46 +17,46 @@ name: WWW-NOS-Open
 provides:
   WWW::NOS::Open:
     file: lib/WWW/NOS/Open.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Article:
     file: lib/WWW/NOS/Open/Article.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::AudioFragment:
     file: lib/WWW/NOS/Open/AudioFragment.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Broadcast:
     file: lib/WWW/NOS/Open/Broadcast.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::DayGuide:
     file: lib/WWW/NOS/Open/DayGuide.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Document:
     file: lib/WWW/NOS/Open/Document.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Exceptions:
     file: lib/WWW/NOS/Open/Exceptions.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Interface:
     file: lib/WWW/NOS/Open/Interface.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::MediaResource:
     file: lib/WWW/NOS/Open/MediaResource.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Resource:
     file: lib/WWW/NOS/Open/Resource.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Result:
     file: lib/WWW/NOS/Open/Result.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::TypeDef:
     file: lib/WWW/NOS/Open/TypeDef.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Version:
     file: lib/WWW/NOS/Open/Version.pm
-    version: v1.0.2
+    version: v1.0.3
   WWW::NOS::Open::Video:
     file: lib/WWW/NOS/Open/Video.pm
-    version: v1.0.2
+    version: v1.0.3
 recommends:
   CGI: '0'
   Getopt::Long: '0'
@@ -104,5 +104,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/WWW-NOS-Open
-version: v1.0.2
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

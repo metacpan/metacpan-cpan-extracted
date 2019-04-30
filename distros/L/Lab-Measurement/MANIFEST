@@ -201,6 +201,7 @@ lib/Lab/Moose/Instrument/HP8596E.pm
 lib/Lab/Moose/Instrument/Keithley2400.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/KeysightB2901A.pm
+lib/Lab/Moose/Instrument/KeysightE3633E.pm
 lib/Lab/Moose/Instrument/Lakeshore340.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm

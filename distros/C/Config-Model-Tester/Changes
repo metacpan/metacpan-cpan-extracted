@@ -1,3 +1,14 @@
+4.001 2019-04-29
+
+  Main change:
+    * Deprecate global variables used in test specs. The tests now
+      should be specified with a data structure instead of using
+      global variables. Using global variable is now deprecated.
+
+  Doc changes:
+    * Update Tester doc for deprecated global variables
+    * Add credits list with Cyrille as first contributor
+
 3.007 2019-01-12
 
   New feature:

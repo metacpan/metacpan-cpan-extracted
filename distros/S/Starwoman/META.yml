@@ -1,0 +1,70 @@
+---
+abstract: 'because Starman does the same thing over and over again expecting different results'
+author:
+  - 'Ashley Willis <awillis@synacor.com>'
+build_requires:
+  LWP::UserAgent: 0
+  Test::More: 0
+  Test::Requires: 0
+configure_requires:
+  Module::Build::Tiny: 0.034
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Starwoman
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Data::Dump: 0
+  HTTP::Date: 0
+  HTTP::Parser::XS: 0
+  HTTP::Status: 0
+  Net::Server: 2.007
+  Plack: 0.9971
+  Test::TCP: 2.00
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/rabcyr/Starwoman/issues
+  homepage: https://github.com/rabcyr/Starwoman
+  repository: https://github.com/rabcyr/Starwoman.git
+version: 0.001
+x_contributors:
+  - 'Adam Guthrie <adam.guthrie@dvlgames.com>'
+  - 'Alex Vandiver <alex@chmrr.net>'
+  - 'Andrew Nelson <gan@msdnr.com>'
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+  - 'Audrey Tang <audreyt@audreyt.org>'
+  - 'Chia-liang Kao <clkao@clkao.org>'
+  - 'cho45 <cho45@lowreal.net>'
+  - 'Damyan Ivanov <dmn@debian.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Graham Barr <gbarr@pobox.com>'
+  - 'Grant McLean <grant@catalyst.net.nz>'
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
+  - 'Jeremy Krieg <Jeremy.Krieg@YourAmigo.com>'
+  - 'John Siracusa <siracusa@gmail.com>'
+  - 'Leon Brocard <acme@astray.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Paulo E. Castro <pauloedgarcastro@gmail.com>'
+  - 'Perlover <perlover@perlover.com>'
+  - 'Peter Makholm <peter@makholm.net>'
+  - 'Piotr Roszatycki <piotr.roszatycki@gmail.com>'
+  - 'Robert Sedlacek <r.sedlacek@shadowcat.co.uk>'
+  - 'Slobodan Mišković <slobodan@miskovic.ca>'
+  - 'spleenjack <spleenjack@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+x_generated_by_perl: v5.16.2
+x_serialization_backend: 'YAML::Tiny version 1.40'
+x_static_install: 1

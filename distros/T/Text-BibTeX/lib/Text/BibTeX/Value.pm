@@ -22,7 +22,7 @@ use Scalar::Util 'blessed';
 use Carp;
 
 use vars qw'$VERSION';
-$VERSION = 0.87;
+$VERSION = 0.88;
 
 =head1 NAME
 
@@ -245,7 +245,7 @@ use Carp;
 use Text::BibTeX qw(:nodetypes);
 
 use vars qw($VERSION);
-$VERSION = '0.87';
+$VERSION = '0.88';
 
 
 =head2 Text::BibTeX::SimpleValue methods

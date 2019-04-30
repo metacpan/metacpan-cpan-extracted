@@ -1,5 +1,10 @@
 Revision history for Perl extension Proc::Stat
 
+0.03  Mon Apr 29 09:20:55 PDT 2019
+	add test in Makefile.PL to require /proc/stat
+	add test in Makefile.PL to require /proc/uptime
+	add test in Makefile.PL to require LINUX
+
 0.02  Mon Apr 22 18:08:31 PDT 2019
 	correct return value of loadkid
 	Thanks to Peter Scott <peter@psdt.com>

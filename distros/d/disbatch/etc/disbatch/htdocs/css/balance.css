@@ -1,0 +1,33 @@
+/*
+ * This software is Copyright (c) 2015, 2019 by Ashley Willis.
+ * This is free software, licensed under:
+ *   The Apache License, Version 2.0, January 2004
+ */
+
+form {
+    line-height: 2em;
+}
+p {
+    margin: 5px 0;
+}
+h2 {
+    margin: 10px 0;
+    font-size: 1.2em;
+    font-weight: bold
+}
+#result {
+    margin: 10px;
+    background: #eee;
+    padding: 10px;
+    height: 300px;
+    overflow: auto;
+}
+#error,#q_error,#i_error {
+    color: red;
+}
+#body {
+  margin: 10px;
+}
+.warning {
+    color: red;
+}

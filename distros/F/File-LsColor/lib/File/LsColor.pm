@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.510';
+  $VERSION = '0.512';
   @ISA = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -32,6 +32,8 @@ BEGIN {
 
 # Skip stat:ing files for attributes like +x. This can be desired if the
 # filenames aren't real files, or for performance reasons.
+# NOTE: Perhaps we ought to make this a little configurable:
+# https://github.com/trapd00r/File-LsColor/issues/7
 our $NO_STAT = 0;
 
 # alias for compatibility reasons with File::LsColor prior to 0.300

@@ -9,5 +9,9 @@ my $command = Proch::Cmd->new(
 
 my $output = $command->simplerun();
 
-ok($output->{exit_code} == 0, "Output [pwd] returned no error");
+
+SKIP: {
+    skip "wrong version", 1 if ( $^O ne 'linux');
+    ok($output->{exit_code} == 0, "Output [pwd] returned no error");
+};
 

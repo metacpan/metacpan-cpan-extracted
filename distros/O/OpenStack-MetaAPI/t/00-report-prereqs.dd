@@ -21,6 +21,7 @@ do { my $x = {
                       'requires' => {
                                       'JSON' => '0',
                                       'Moo' => '0',
+                                      'Moo::Role' => '0',
                                       'OpenStack::Client' => '1.0006',
                                       'YAML::XS' => '0',
                                       'perl' => '5.010'
@@ -39,7 +40,7 @@ do { my $x = {
                                    'Test2::Bundle::Extended' => '0',
                                    'Test2::Plugin::NoWarnings' => '0',
                                    'Test2::Tools::Explain' => '0',
-                                   'Test::MockModule' => '0',
+                                   'Test::MockModule' => '0.16',
                                    'Test::More' => '0',
                                    'URI::Encode' => '0'
                                  }

@@ -4,7 +4,7 @@ package YAML::PP::Schema;
 use B;
 use Module::Load qw//;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 
@@ -42,7 +42,19 @@ sub new {
 
     my $self = bless {
         resolvers => {},
-        representers => {},
+        representers => {
+            'undef' => undef,
+            flags => [],
+            equals => {},
+            regex => [],
+            class_equals => {},
+            class_matches => [],
+            class_isa => [],
+            scalarref => undef,
+            refref => undef,
+            coderef => undef,
+            tied_equals => {},
+        },
         true => $true,
         false => $false,
         bool_class => $bool_class,
@@ -57,20 +69,24 @@ sub false { return $_[0]->{false} }
 sub bool_class { return $_[0]->{bool_class} }
 
 my %LOADED_SCHEMA = (
-    Failsafe => 1,
     JSON => 1,
-    Core => 1,
 );
+
 sub load_subschemas {
     my ($self, @schemas) = @_;
     my $i = 0;
     while ($i < @schemas) {
         my $item = $schemas[ $i ];
         $i++;
-        my %options;
-        while ($i < @schemas and $schemas[ $i ] =~ m/^\+(\w+)$/) {
-            my $option = $1;
-            $options{with}->{ $option } = 1;
+        my @options;
+        while ($i < @schemas
+            and (
+                $schemas[ $i ] =~ m/^[^A-Za-z]/
+                or
+                $schemas[ $i ] =~ m/^[a-zA-Z0-9]+=/
+                )
+            ) {
+            push @options, $schemas[ $i ];
             $i++;
         }
 
@@ -91,7 +107,7 @@ sub load_subschemas {
         }
         my $tags = $class->register(
             schema => $self,
-            options => \%options,
+            options => \@options,
         );
 
     }
@@ -175,41 +191,41 @@ sub add_representer {
 
     my $representers = $self->representers;
     if (my $flags = $args{flags}) {
-        my $rep = $representers->{flags} ||= [];
+        my $rep = $representers->{flags};
         push @$rep, \%args;
         return;
     }
     if (my $regex = $args{regex}) {
-        my $rep = $representers->{regex} ||= [];
+        my $rep = $representers->{regex};
         push @$rep, \%args;
         return;
     }
     if (my $regex = $args{class_matches}) {
-        my $rep = $representers->{class_matches} ||= [];
+        my $rep = $representers->{class_matches};
         push @$rep, [ $args{class_matches}, $args{code} ];
         return;
     }
     if (my $class_equals = $args{class_equals}) {
-        my $rep = $representers->{class_equals} ||= {};
+        my $rep = $representers->{class_equals};
         $rep->{ $class_equals } = {
             code => $args{code},
         };
         return;
     }
     if (my $class_isa = $args{class_isa}) {
-        my $rep = $representers->{class_isa} ||= [];
+        my $rep = $representers->{class_isa};
         push @$rep, [ $args{class_isa}, $args{code} ];
         return;
     }
     if (my $tied_equals = $args{tied_equals}) {
-        my $rep = $representers->{tied_equals} ||= {};
+        my $rep = $representers->{tied_equals};
         $rep->{ $tied_equals } = {
             code => $args{code},
         };
         return;
     }
     if (defined(my $equals = $args{equals})) {
-        my $rep = $representers->{equals} ||= {};
+        my $rep = $representers->{equals};
         $rep->{ $equals } = {
             code => $args{code},
         };
@@ -363,332 +379,6 @@ sub bool_jsonpp_false { JSON::PP::false() }
 sub bool_booleanpm_false { boolean::false() }
 
 sub bool_perl_false { !1 }
-
-
-package YAML::PP::Schema::Failsafe;
-
-use base 'YAML::PP::Schema';
-
-use YAML::PP::Common qw/ YAML_QUOTED_SCALAR_STYLE /;
-
-sub register {
-    my ($self, %args) = @_;
-    my $schema = $args{schema};
-
-    $schema->add_resolver(
-        match => [ equals => '' => '' ],
-    );
-
-    $schema->add_representer(
-        undefined => sub {
-            my ($rep, $node) = @_;
-            $node->{data} = '';
-            $node->{style} = YAML_QUOTED_SCALAR_STYLE;
-            return 1;
-        },
-    );
-    return;
-}
-
-package YAML::PP::Schema::JSON;
-use base 'YAML::PP::Schema';
-
-use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE YAML_QUOTED_SCALAR_STYLE /;
-
-my $RE_INT = qr{^(-?(?:0|[1-9][0-9]*))$};
-my $RE_FLOAT = qr{^(-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)$};
-
-sub new {
-    my ($class, %args) = @_;
-    my $self = bless {}, $class;
-    return $self;
-}
-
-sub _to_int { 0 + $_[2]->[0] }
-
-# DaTa++ && shmem++
-sub _to_float { unpack F => pack F => $_[2]->[0] }
-
-sub register {
-    my ($self, %args) = @_;
-    my $schema = $args{schema};
-
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:null',
-        match => [ equals => null => undef ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:null',
-        match => [ equals => '' => undef ],
-        implicit => 0,
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:bool',
-        match => [ equals => true => $schema->true ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:bool',
-        match => [ equals => false => $schema->false ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:int',
-        match => [ regex => $RE_INT => \&_to_int ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:float',
-        match => [ regex => $RE_FLOAT => \&_to_float ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:str',
-        match => [ all => sub { $_[1]->{value} } ],
-        implicit => 0,
-    );
-
-    $schema->add_representer(
-        undefined => sub {
-            my ($rep, $node) = @_;
-            $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-            $node->{data} = 'null';
-            return 1;
-        },
-    );
-    $schema->add_representer(
-        reftype => "*",
-        code => sub {
-            die "Dumping references not supported yet";
-        },
-    );
-
-    my $int_flags = B::SVp_IOK;
-    my $float_flags = B::SVp_NOK;
-    $schema->add_representer(
-        flags => $int_flags,
-        code => sub {
-            my ($rep, $node) = @_;
-            if (int($node->{value}) ne $node->{value}) {
-                return 0;
-            }
-            $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    );
-    my %special = ( (0+'nan').'' => '.nan', (0+'inf').'' => '.inf', (0-'inf').'' => '-.inf' );
-    $schema->add_representer(
-        flags => $float_flags,
-        code => sub {
-            my ($rep, $node) = @_;
-            # TODO is inf/nan supported in YAML JSON Schema?
-            if (exists $special{ $node->{value} }) {
-                $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-                $node->{data} = "$node->{value}";
-                return 1;
-            }
-            if (0.0 + $node->{value} ne $node->{value}) {
-                return 0;
-            }
-            if (int($node->{value}) eq $node->{value} and not $node->{value} =~ m/\./) {
-                $node->{value} .= '.0';
-            }
-            $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    );
-    $schema->add_representer(
-        equals => $_,
-        code => sub {
-            my ($rep, $node) = @_;
-            $node->{style} = YAML_QUOTED_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    ) for ("", qw/ true false null /);
-    $schema->add_representer(
-        regex => qr{$RE_INT|$RE_FLOAT},
-        code => sub {
-            my ($rep, $node) = @_;
-            $node->{style} = YAML_QUOTED_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    );
-
-    if ($schema->bool_class) {
-        $schema->add_representer(
-            class_equals => $schema->bool_class,
-            code => sub {
-                my ($rep, $node) = @_;
-                my $string = $node->{value} ? 'true' : 'false';
-                $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-                @{ $node->{items} } = $string;
-                $node->{data} = $string;
-                return 1;
-            },
-        );
-    }
-
-    return;
-}
-
-package YAML::PP::Schema::Core;
-use base 'YAML::PP::Schema';
-
-use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE YAML_QUOTED_SCALAR_STYLE /;
-
-my $RE_INT_CORE = qr{^([+-]?(?:[0-9]+))$};
-my $RE_FLOAT_CORE = qr{^([+-]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][+-]?[0-9]+)?)$};
-my $RE_INT_OCTAL = qr{^0o([0-7]+)$};
-my $RE_INT_HEX = qr{^0x([0-9a-fA-F]+)$};
-
-
-sub new {
-    my ($class, %args) = @_;
-    my $self = bless {}, $class;
-    return $self;
-}
-
-sub _from_oct { oct $_[2]->[0] }
-sub _from_hex { hex $_[2]->[0] }
-
-sub register {
-    my ($self, %args) = @_;
-    my $schema = $args{schema};
-
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:null',
-        match => [ equals => $_ => undef ],
-    ) for (qw/ null NULL Null ~ /, '');
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:bool',
-        match => [ equals => $_ => $schema->true ],
-    ) for (qw/ true TRUE True /);
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:bool',
-        match => [ equals => $_ => $schema->false ],
-    ) for (qw/ false FALSE False /);
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:int',
-        match => [ regex => $RE_INT_CORE => \&YAML::PP::Schema::JSON::_to_int ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:int',
-        match => [ regex => $RE_INT_OCTAL => \&_from_oct ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:int',
-        match => [ regex => $RE_INT_HEX => \&_from_hex ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:float',
-        match => [ regex => $RE_FLOAT_CORE => \&YAML::PP::Schema::JSON::_to_float ],
-    );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:float',
-        match => [ equals => $_ => 0 + "inf" ],
-    ) for (qw/ .inf .Inf .INF /);
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:float',
-        match => [ equals => $_ => 0 - "inf" ],
-    ) for (qw/ -.inf -.Inf -.INF /);
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:float',
-        match => [ equals => $_ => 0 + "nan" ],
-    ) for (qw/ .nan .NaN .NAN /);
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:str',
-        match => [ all => sub { $_[1]->{value} } ],
-        implicit => 0,
-    );
-
-    $schema->add_representer(
-        reftype => "*",
-        code => sub {
-            die "Dumping references not supported yet";
-        },
-    );
-
-    my $int_flags = B::SVp_IOK;
-    my $float_flags = B::SVp_NOK;
-    $schema->add_representer(
-        flags => $int_flags,
-        code => sub {
-            my ($rep, $node) = @_;
-            if (int($node->{value}) ne $node->{value}) {
-                return 0;
-            }
-            $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    );
-    my %special = ( (0+'nan').'' => '.nan', (0+'inf').'' => '.inf', (0-'inf').'' => '-.inf' );
-    $schema->add_representer(
-        flags => $float_flags,
-        code => sub {
-            my ($rep, $node) = @_;
-            if (exists $special{ $node->{value} }) {
-                $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-                $node->{data} = $special{ $node->{value} };
-                return 1;
-            }
-            if (0.0 + $node->{value} ne $node->{value}) {
-                return 0;
-            }
-            if (int($node->{value}) eq $node->{value} and not $node->{value} =~ m/\./) {
-                $node->{value} .= '.0';
-            }
-            $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    );
-    $schema->add_representer(
-        undefined => sub {
-            my ($rep, $node) = @_;
-            $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-            $node->{data} = 'null';
-            return 1;
-        },
-    );
-    $schema->add_representer(
-        equals => $_,
-        code => sub {
-            my ($rep, $node) = @_;
-            $node->{style} = YAML_QUOTED_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    ) for ("", qw/
-        true TRUE True false FALSE False null NULL Null ~
-        .inf .Inf .INF -.inf -.Inf -.INF .nan .NaN .NAN
-    /);
-    $schema->add_representer(
-        regex => qr{$RE_INT_CORE|$RE_FLOAT_CORE|$RE_INT_OCTAL|$RE_INT_HEX},
-        code => sub {
-            my ($rep, $node) = @_;
-            $node->{style} = YAML_QUOTED_SCALAR_STYLE;
-            $node->{data} = "$node->{value}";
-            return 1;
-        },
-    );
-
-    if ($schema->bool_class) {
-        $schema->add_representer(
-            class_equals => $schema->bool_class,
-            code => sub {
-                my ($rep, $node) = @_;
-                my $string = $node->{value} ? 'true' : 'false';
-                $node->{style} = YAML_PLAIN_SCALAR_STYLE;
-                @{ $node->{items} } = $string;
-                $node->{data} = $string;
-                return 1;
-            },
-        );
-    }
-
-    return;
-}
 
 1;
 

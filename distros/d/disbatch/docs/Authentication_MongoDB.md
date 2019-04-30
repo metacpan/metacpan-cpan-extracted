@@ -1,5 +1,7 @@
 ### Configuring and Using Authentication with MongoDB
 
+Copyright (c) 2016 by Ashley Willis.
+
 #### Configuring
 
 * Create a key file for multiple `mongod` processes to auth against each other,

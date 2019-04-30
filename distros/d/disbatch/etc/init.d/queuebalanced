@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# queuebalanced init file for starting up the Disbatch Queue Balance daemon
+#
+# chkconfig:   - 20 80
+# description: Starts and stops the Disbatch Queue Balance daemon
+
+# Generated at Fri Jul 18 09:56:06 2014 with Daemon::Control 0.001
+
+### BEGIN INIT INFO
+# Provides:          queuebalanced
+# Required-Start:    $syslog $remote_fs
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: queuebalanced
+# Description:       Disbatch Queue Balance daemon
+### END INIT INFO`
+
+
+
+
+
+if [ -x /etc/disbatch/queuebalanced-init ];
+then
+    /etc/disbatch/queuebalanced-init $1
+else
+    echo "Required program /etc/disbatch/queuebalanced-init not found!"
+    exit 1;
+fi

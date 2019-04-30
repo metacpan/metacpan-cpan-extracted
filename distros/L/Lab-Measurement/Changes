@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.681 2019-04-29
+  * Add driver for KeysightE3633E current/voltage source
+  * Fixes in Moose::Connection::VISA and the Lakeshore drivers
+
 3.680 2019-03-11
   * Moose LinuxGPIB connection: add support for end-of-string byte
   * Moose VISA connection: add support for end-of-string byte

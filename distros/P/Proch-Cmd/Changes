@@ -1,3 +1,8 @@
+0.005   2018-04-30
+
+  * Unit test skipped under Windows
+  * Requires perl 5.018
+
 0.004   2018-04-29
 
   * Fixed missing dependency declaration: Moose, Time::Piece

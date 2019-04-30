@@ -190,7 +190,8 @@ void free_names(struct nametype * names) {
 }
 
 void test_parsename() {
-	for (int i = 0; i < parse_string_count; ++i) {
+    int i;
+	for (i = 0; i < parse_string_count; ++i) {
 		struct nametype names = parsename(parse_strings[i],"editor");
 		print_names(names);
 		free_names(&names);

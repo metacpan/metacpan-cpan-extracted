@@ -65,7 +65,12 @@ BEGIN {
 # instead of Symbol.pm
 BEGIN {
     sub gensym () {
-        return \do { local *_ };
+        if ($] < 5.006) {
+            return \do { local *_ };
+        }
+        else {
+            return undef;
+        }
     }
 
     sub qualify ($$) {
@@ -2640,7 +2645,7 @@ sub Einformixv6als::r(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $r = -r $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($r,@_) : $r;
             }
         }
@@ -2673,7 +2678,7 @@ sub Einformixv6als::w(;*@) {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $w = -w $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($w,@_) : $w;
             }
         }
@@ -2706,7 +2711,7 @@ sub Einformixv6als::x(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -x $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -2741,7 +2746,7 @@ sub Einformixv6als::o(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $o = -o $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($o,@_) : $o;
             }
         }
@@ -2774,7 +2779,7 @@ sub Einformixv6als::R(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $R = -R $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($R,@_) : $R;
             }
         }
@@ -2807,7 +2812,7 @@ sub Einformixv6als::W(;*@) {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $W = -W $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($W,@_) : $W;
             }
         }
@@ -2840,7 +2845,7 @@ sub Einformixv6als::X(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -X $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -2875,7 +2880,7 @@ sub Einformixv6als::O(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $O = -O $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($O,@_) : $O;
             }
         }
@@ -2919,7 +2924,7 @@ sub Einformixv6als::e(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $e = -e $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($e,@_) : $e;
             }
         }
@@ -2952,7 +2957,7 @@ sub Einformixv6als::z(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $z = -z $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($z,@_) : $z;
             }
         }
@@ -2985,7 +2990,7 @@ sub Einformixv6als::s(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $s = -s $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($s,@_) : $s;
             }
         }
@@ -3018,7 +3023,7 @@ sub Einformixv6als::f(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $f = -f $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($f,@_) : $f;
             }
         }
@@ -3076,7 +3081,7 @@ sub Einformixv6als::l(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $l = -l $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($l,@_) : $l;
             }
         }
@@ -3109,7 +3114,7 @@ sub Einformixv6als::p(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $p = -p $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($p,@_) : $p;
             }
         }
@@ -3142,7 +3147,7 @@ sub Einformixv6als::S(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $S = -S $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($S,@_) : $S;
             }
         }
@@ -3175,7 +3180,7 @@ sub Einformixv6als::b(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $b = -b $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($b,@_) : $b;
             }
         }
@@ -3208,7 +3213,7 @@ sub Einformixv6als::c(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $c = -c $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($c,@_) : $c;
             }
         }
@@ -3241,7 +3246,7 @@ sub Einformixv6als::u(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $u = -u $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($u,@_) : $u;
             }
         }
@@ -3274,7 +3279,7 @@ sub Einformixv6als::g(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $g = -g $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($g,@_) : $g;
             }
         }
@@ -3386,7 +3391,7 @@ sub Einformixv6als::T(;*@) {
             $T = 1;
         }
         my $dummy_for_underline_cache = -T $fh;
-        close $fh;
+        close($fh) or die "Can't close file: $_: $!";
     }
 
     return wantarray ? ($T,@_) : $T;
@@ -3452,7 +3457,7 @@ sub Einformixv6als::B(;*@) {
             $B = 1;
         }
         my $dummy_for_underline_cache = -B $fh;
-        close $fh;
+        close($fh) or die "Can't close file: $_: $!";
     }
 
     return wantarray ? ($B,@_) : $B;
@@ -3483,7 +3488,7 @@ sub Einformixv6als::M(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $M = ($^T - $mtime) / (24*60*60);
                 return wantarray ? ($M,@_) : $M;
             }
@@ -3517,7 +3522,7 @@ sub Einformixv6als::A(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $A = ($^T - $atime) / (24*60*60);
                 return wantarray ? ($A,@_) : $A;
             }
@@ -3551,7 +3556,7 @@ sub Einformixv6als::C(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $C = ($^T - $ctime) / (24*60*60);
                 return wantarray ? ($C,@_) : $C;
             }
@@ -3594,7 +3599,7 @@ sub Einformixv6als::r_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $r = -r $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $r ? 1 : '';
             }
         }
@@ -3661,7 +3666,7 @@ sub Einformixv6als::w_() {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $w = -w $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $w ? 1 : '';
             }
         }
@@ -3685,7 +3690,7 @@ sub Einformixv6als::x_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -x $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -3711,7 +3716,7 @@ sub Einformixv6als::o_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $o = -o $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $o ? 1 : '';
             }
         }
@@ -3735,7 +3740,7 @@ sub Einformixv6als::R_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $R = -R $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $R ? 1 : '';
             }
         }
@@ -3759,7 +3764,7 @@ sub Einformixv6als::W_() {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $W = -W $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $W ? 1 : '';
             }
         }
@@ -3783,7 +3788,7 @@ sub Einformixv6als::X_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -X $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -3809,7 +3814,7 @@ sub Einformixv6als::O_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $O = -O $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $O ? 1 : '';
             }
         }
@@ -3833,7 +3838,7 @@ sub Einformixv6als::e_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $e = -e $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $e ? 1 : '';
             }
         }
@@ -3857,7 +3862,7 @@ sub Einformixv6als::z_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $z = -z $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $z ? 1 : '';
             }
         }
@@ -3881,7 +3886,7 @@ sub Einformixv6als::s_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $s = -s $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $s;
             }
         }
@@ -3905,7 +3910,7 @@ sub Einformixv6als::f_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $f = -f $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $f ? 1 : '';
             }
         }
@@ -3943,7 +3948,7 @@ sub Einformixv6als::l_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $l = -l $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $l ? 1 : '';
             }
         }
@@ -3967,7 +3972,7 @@ sub Einformixv6als::p_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $p = -p $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $p ? 1 : '';
             }
         }
@@ -3991,7 +3996,7 @@ sub Einformixv6als::S_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $S = -S $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $S ? 1 : '';
             }
         }
@@ -4015,7 +4020,7 @@ sub Einformixv6als::b_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $b = -b $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $b ? 1 : '';
             }
         }
@@ -4039,7 +4044,7 @@ sub Einformixv6als::c_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $c = -c $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $c ? 1 : '';
             }
         }
@@ -4063,7 +4068,7 @@ sub Einformixv6als::u_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $u = -u $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $u ? 1 : '';
             }
         }
@@ -4087,7 +4092,7 @@ sub Einformixv6als::g_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $g = -g $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $g ? 1 : '';
             }
         }
@@ -4137,7 +4142,7 @@ sub Einformixv6als::T_() {
         $T = 1;
     }
     my $dummy_for_underline_cache = -T $fh;
-    close $fh;
+    close($fh) or die "Can't close file: $_: $!";
 
     return $T;
 }
@@ -4173,7 +4178,7 @@ sub Einformixv6als::B_() {
         $B = 1;
     }
     my $dummy_for_underline_cache = -B $fh;
-    close $fh;
+    close($fh) or die "Can't close file: $_: $!";
 
     return $B;
 }
@@ -4194,7 +4199,7 @@ sub Einformixv6als::M_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $M = ($^T - $mtime) / (24*60*60);
                 return $M;
             }
@@ -4219,7 +4224,7 @@ sub Einformixv6als::A_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $A = ($^T - $atime) / (24*60*60);
                 return $A;
             }
@@ -4244,7 +4249,7 @@ sub Einformixv6als::C_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $C = ($^T - $ctime) / (24*60*60);
                 return $C;
             }
@@ -4632,12 +4637,12 @@ sub Einformixv6als::lstat(*) {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4658,12 +4663,12 @@ sub Einformixv6als::lstat_() {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4712,12 +4717,12 @@ sub Einformixv6als::stat(*) {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4742,12 +4747,12 @@ sub Einformixv6als::stat_() {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4777,7 +4782,7 @@ sub Einformixv6als::unlink(@) {
             }
             my $fh = gensym();
             if (_open_r($fh, $_)) {
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
 
                 # cmd.exe on Windows NT, Windows 2000, Windows XP, Windows Vista, Windows 7, Windows 8, Windows 8.1, Windows 10 or later
                 if ((defined $ENV{'OS'}) and ($ENV{'OS'} eq 'Windows_NT')) {
@@ -4797,7 +4802,7 @@ sub Einformixv6als::unlink(@) {
                 }
 
                 if (_open_r($fh, $_)) {
-                    close $fh;
+                    close($fh) or die "Can't close file: $_: $!";
                 }
                 else {
                     $unlink++;
@@ -5154,7 +5159,7 @@ ITER_DO:
                                 Mac::Files::FSpRstFLock("$realfilename.e");
                             };
                         }
-                        close $fh;
+                        close($fh) or die "Can't close file: $realfilename.e: $!";
                     }
                 }
                 else {
@@ -5183,7 +5188,7 @@ ITER_DO:
                                 Mac::Files::FSpRstFLock($realfilename);
                             };
                         }
-                        close $fh;
+                        close($fh) or die "Can't close file: $realfilename.e: $!";
                     }
 
                     if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
@@ -5215,7 +5220,7 @@ ITER_DO:
                                 Mac::Files::FSpRstFLock("$realfilename.e");
                             };
                         }
-                        close $fh;
+                        close($fh) or die "Can't close file: $realfilename.e: $!";
                     }
                 }
 
@@ -5375,7 +5380,7 @@ ITER_REQUIRE:
                             Mac::Files::FSpRstFLock("$realfilename.e");
                         };
                     }
-                    close($fh) or croak "Can't close file: $realfilename";
+                    close($fh) or croak "Can't close file: $realfilename: $!";
                 }
                 else {
                     my $fh = gensym();
@@ -5403,7 +5408,7 @@ ITER_REQUIRE:
                             Mac::Files::FSpRstFLock($realfilename);
                         };
                     }
-                    close($fh) or croak "Can't close file: $realfilename";
+                    close($fh) or croak "Can't close file: $realfilename: $!";
 
                     if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
                         CORE::require INFORMIXV6ALS;
@@ -5434,7 +5439,7 @@ ITER_REQUIRE:
                                 Mac::Files::FSpRstFLock("$realfilename.e");
                             };
                         }
-                        close($fh) or croak "Can't close file: $realfilename";
+                        close($fh) or croak "Can't close file: $realfilename: $!";
                     }
                 }
 
@@ -11125,7 +11130,7 @@ sub e_use_noimport {
         if (Einformixv6als::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
                 return qq<BEGIN { Einformixv6als::require '$expr'; }>;
@@ -11151,7 +11156,7 @@ sub e_no_nounimport {
         if (Einformixv6als::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
                 return qq<BEGIN { Einformixv6als::require '$expr'; }>;
@@ -11177,7 +11182,7 @@ sub e_use_noparam {
         if (Einformixv6als::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
 
@@ -11214,7 +11219,7 @@ sub e_no_noparam {
         if (Einformixv6als::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
                 return qq[BEGIN { Einformixv6als::require '$expr'; $module->unimport() if $module->can('unimport'); }];
@@ -11240,7 +11245,7 @@ sub e_use {
         if (Einformixv6als::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
                 return qq[BEGIN { Einformixv6als::require '$expr'; $module->import($list) if $module->can('import'); }];
@@ -11266,7 +11271,7 @@ sub e_no {
         if (Einformixv6als::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) INFORMIXV6ALS (?>\s*) ([^\x81-\x9F\xE0-\xFD;]*) ; (?>\s*) \n? $/oxms) {
                 return qq[BEGIN { Einformixv6als::require '$expr'; $module->unimport($list) if $module->can('unimport'); }];

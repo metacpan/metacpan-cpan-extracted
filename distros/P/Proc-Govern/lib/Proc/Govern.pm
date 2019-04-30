@@ -1,7 +1,7 @@
 package Proc::Govern;
 
-our $DATE = '2018-01-31'; # DATE
-our $VERSION = '0.200'; # VERSION
+our $DATE = '2019-04-30'; # DATE
+our $VERSION = '0.201'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,6 +12,8 @@ our @EXPORT_OK = qw(govern_process);
 
 our %SPEC;
 
+use IPC::Run::Patch::Setuid ();
+use IPC::Run (); # just so prereq can be detected
 use Time::HiRes qw(sleep);
 
 sub new {
@@ -129,6 +131,7 @@ If set to 1, enable load watching. Program will be suspended when system load is
 too high and resumed if system load returns to a lower limit.
 
 _
+            tags => ['category:load-control'],
         },
         load_check_every => {
             schema => [duration => default => 10],
@@ -144,6 +147,8 @@ integer, will be compared against <pm:Unix::Uptime>`->load`'s `$load1` value.
 Alternatively, you can provide a custom routine here, code should return true if
 load is considered too high.
 
+Note: `load_watch` needs to be set to true first for this to be effective.
+
 _
             tags => ['category:load-control'],
         },
@@ -155,6 +160,8 @@ Limit below which program should resume, if load watching is enabled. If
 integer, will be compared against <pm:Unix::Uptime>`->load`'s `$load1` value.
 Alternatively, you can provide a custom routine here, code should return true if
 load is considered low.
+
+Note: `load_watch` needs to be set to true first for this to be effective.
 
 _
             tags => ['category:load-control'],
@@ -252,6 +259,26 @@ _
             schema => ['bool*', is=>1],
             tags => ['category:screensaver'],
         },
+        euid => {
+            summary => 'Set EUID of command process',
+            schema => 'uint*',
+            description => <<'_',
+
+Need to be root to be able to setuid.
+
+_
+            tags => ['category:setuid'],
+        },
+        egid => {
+            summary => 'Set EGID(s) of command process',
+            schema => 'str*',
+            description => <<'_',
+
+Need to be root to be able to setuid.
+
+_
+            tags => ['category:setuid'],
+        },
     },
     args_rels => {
         'dep_all&' => [
@@ -276,8 +303,16 @@ sub govern_process {
         $self = __PACKAGE__->new;
     }
 
+    # assign and check arguments
     my %args = @_;
     $self->{args} = \%args;
+    if (defined $args{euid}) {
+        $args{euid} =~ /\A[0-9]+\z/ or die "euid has to be integer";
+    }
+    if (defined $args{egid}) {
+        $args{egid} =~ /\A[0-9]+( [0-9]+)*\z/
+            or die "egid has to be integer or integers separated by space";
+    }
 
     require Proc::Killfam if $args{killfam};
     require Screensaver::Any if $args{no_screensaver};
@@ -288,7 +323,7 @@ sub govern_process {
     my $exitcode;
 
     my $cmd = $args{command};
-    defined($cmd) or die "Please specify command\n";
+    defined($cmd) or die "Please specify command";
     ref($cmd) eq 'ARRAY' or die "Command must be arrayref of strings";
 
     my $name = $args{name};
@@ -297,8 +332,8 @@ sub govern_process {
         $name =~ s!.*/!!; $name =~ s/\W+/_/g;
         length($name) or $name = "prog";
     }
-    defined($name) or die "Please specify name\n";
-    $name =~ /\A\w+\z/ or die "Invalid name, please use letters/numbers only\n";
+    defined($name) or die "Please specify name";
+    $name =~ /\A\w+\z/ or die "Invalid name, please use letters/numbers only";
     $self->{name} = $name;
 
     if ($args{single_instance}) {
@@ -309,7 +344,7 @@ sub govern_process {
                     $args{on_multiple_instance} eq 'exit') {
                 $exitcode = 202; goto EXIT;
             } else {
-                warn "Program $name already running\n";
+                warn "Program $name already running";
                 $exitcode = 202; goto EXIT;
             }
         }
@@ -370,13 +405,19 @@ sub govern_process {
 
     my $do_start = sub {
         $start_time = time();
-        require IPC::Run;
+        IPC::Run::Patch::Setuid->import(
+            -warn_target_loaded => 0,
+            -euid => $args{euid},
+            -egid => $args{egid},
+        ) if defined $args{euid} || defined $args{egid};
         say "D:(Re)starting program $name ..." if $debug;
         $to = IPC::Run::timeout(1);
         #$self->{to} = $to;
         $h  = IPC::Run::start($cmd, \*STDIN, $out, $err, $to)
-            or die "Can't start program: $?\n";
+            or die "Can't start program: $?";
         $self->{h} = $h;
+        IPC::Run::Patch::Setuid->unimport()
+              if defined $args{euid} || defined $args{egid};
     };
 
     $do_start->();
@@ -430,7 +471,7 @@ sub govern_process {
 
         if (defined $args{timeout}) {
             if ($now - $start_time >= $args{timeout}) {
-                $err->("Timeout ($args{timeout}s), killing child ...\n");
+                $err->("Timeout ($args{timeout}s), killing child ...");
                 $self->_kill;
                 # mark with a special exit code that it's a timeout
                 $exitcode = 124;
@@ -480,7 +521,7 @@ sub govern_process {
                 $noss_screensaver = Screensaver::Any::detect_screensaver();
                 if (!$noss_screensaver) {
                     warn "Can't detect any known screensaver, ".
-                        "will skip preventing screensaver from activating\n";
+                        "will skip preventing screensaver from activating";
                     $noss = 0;
                     last NOSS;
                 }
@@ -489,7 +530,7 @@ sub govern_process {
                 );
                 if ($res->[0] != 200) {
                     warn "Can't get screensaver timeout ($res->[0]: $res->[1])".
-                        ", will skip preventing screensaver from activating\n";
+                        ", will skip preventing screensaver from activating";
                     $noss = 0;
                     last NOSS;
                 }
@@ -500,7 +541,7 @@ sub govern_process {
             );
             if ($res->[0] != 200) {
                 warn "Can't prevent screensaver from activating ".
-                    "($res->[0]: $res->[1])\n";
+                    "($res->[0]: $res->[1])";
             }
             $noss_lastprevent_time = $now;
         }
@@ -526,32 +567,74 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.200 of Proc::Govern (from Perl distribution Proc-Govern), released on 2018-01-31.
+This document describes version 0.201 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-04-30.
 
 =head1 SYNOPSIS
 
-To use via command-line (in most cases):
-
- % govproc \
-       --timeout 3600 \
-       --log-stderr-dir        /var/log/myapp/ \
-       --log-stderr-size       16M \
-       --log-stderr-histories  12 \
-   /path/to/myapp
-
-To use directly as Perl module:
+To use as Perl module:
 
  use Proc::Govern qw(govern_process);
- govern_process(
-     name       => 'myapp',
-     command    => ['/path/to/myapp', 'some', 'args'],
-     timeout    => 3600,
-     log_stderr => {
+ my $exit_code = govern_process(
+     command    => ['/path/to/myapp', 'some', 'args'], # required
+
+     name       => 'myapp',                            # optional, default will be taken from command. must be alphanum only.
+
+     # options to control number of instances
+     single_instance      => 1,               # optional. if set to 1 will fail if another instance is already running.
+                                              #           implemented with pid files.
+     pid_dir              => "/var/run",      # optional. defaults to /var/run. pid filename is '<name>.pid'
+     on_multiple_instance => "exit",          # optional. can be set to 'exit' to silently exit when another instance
+                                              #           is already running. otherwise prints an error msg.
+
+     # timeout options
+     timeout    => 3600,                      # optional, default is no timeout
+     killfam    => 1,                         # optional. can be set to 1 to kill using killfam.
+
+     # output logging options
+     log_stderr => {                          # optional, passed to File::Write::Rotate
          dir       => '/var/log/myapp',
          size      => '16M',
          histories => 12,
      },
+     log_stdout => {                          # optional, passed to File::Write::Rotate
+         dir       => '/var/log/myapp.out',
+         size      => '16M',
+         histories => 12,
+     },
+     show_stdout => 0,                        # optional. can be set to 0 to suppress stdout output. note:
+                                              #           stdout can still be logged even if not shown.
+     show_stderr => 0,                        # optional. can be set to 0 to suppress stderr output. note:
+                                              #           stderr can still be logged even if not shown.
+
+     # load control options
+     load_watch => 1,           # optional. can be set to 1 to enable load control.
+     load_high_limit => 5,      # optional, default 1.25. at what load command should be paused? can also be set
+                                #           to a coderef that returns 1 when load is considered too high.
+                                #           note: just setting load_high_limit or load_low_limit won't automatically
+                                #           enable load control.
+     load_low_limit  => 2,      # optional, default 0.25. at what load paused command should be resumed? can also
+                                #           be set to a coderef that returns 1 when load is considered low already.
+     load_check_every => 20,    # optional, default 10. frequency of load checking (in seconds).
+
+     # restart options
+     restart => 1,              # optional. if set to 1, will restart command if exit code is not zero.
+
+     # screensaver control options
+     no_screensaver => 1,       # optional. if set to 1, will prevent screensaver from being activated while command
+                                #           is running.
+
+     # setuid options
+     euid => 1000,              # optional. sets euid of command process. note: need to be root to be able to setuid.
+     egid => 1000,              # optional. sets egid(s) of command process.
  );
+
+To use via command-line:
+
+ % govproc [options] <command>...
+
+Example:
+
+ % govproc --timeout 86400 --load-watch --load-high 4 --load-low 0.75 backup-db
 
 =head1 DESCRIPTION
 
@@ -605,8 +688,6 @@ With an option to autorestart if process' memory size grow out of limit.
 =item * limit STDIN input, STDOUT/STDERR output?
 
 =item * trap/handle some signals for the child process?
-
-=item * set UID/GID?
 
 =item * provide daemon functionality?
 
@@ -666,6 +747,18 @@ Command to run.
 
 Passed to L<IPC::Run>'s C<start()>.
 
+=item * B<egid> => I<str>
+
+Set EGID(s) of command process.
+
+Need to be root to be able to setuid.
+
+=item * B<euid> => I<uint>
+
+Set EUID of command process.
+
+Need to be root to be able to setuid.
+
 =item * B<killfam> => I<bool>
 
 Instead of kill, use killfam (kill family of process).
@@ -686,12 +779,16 @@ integer, will be compared against L<Unix::Uptime>C<< -E<gt>load >>'s C<$load1> v
 Alternatively, you can provide a custom routine here, code should return true if
 load is considered too high.
 
+Note: C<load_watch> needs to be set to true first for this to be effective.
+
 =item * B<load_low_limit> => I<int|code>
 
 Limit below which program should resume, if load watching is enabled. If
 integer, will be compared against L<Unix::Uptime>C<< -E<gt>load >>'s C<$load1> value.
 Alternatively, you can provide a custom routine here, code should return true if
 load is considered low.
+
+Note: C<load_watch> needs to be set to true first for this to be effective.
 
 =item * B<load_watch> => I<bool> (default: 0)
 
@@ -870,7 +967,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

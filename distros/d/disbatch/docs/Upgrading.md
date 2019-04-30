@@ -1,3 +1,38 @@
+### Upgrading from Disbatch 4.0 to Disbatch 4.2
+
+Copyright (c) 2016, 2019 by Ashley Willis.
+
+#### Configure
+
+For new features to work, the config file must be updated and
+`disbatch-create-users` must be ran again.
+
+- For QueueBalance to work:
+  - Add `auth.queuebalance` with a password to the config file
+  - Set `balance.enabled` to `true` in the config file
+  - Rerun `disbatch-create-users`
+
+- For the new routes (`GET /tasks` and `GET /tasks/:id`) to work:
+  - Rerun `disbatch-create-users`
+
+- For the deprecated routes to work:
+  - Add this `web_extensions` section to the config file and uncomment as
+    necessary:
+
+                "web_extensions": {
+                    #"Disbatch::Web::Tasks": null,  # deprecated v4 routes: POST /tasks/search, POST /tasks/:queue, POST /tasks/:queue/:collection
+                    #"Disbatch::Web::V3": null,     # deprecated v3 routes: *-json
+                },
+
+- Rerun `disbatch-create-users`:
+  - See `perldoc disbatch-create-users` for more options. If you did the
+    default, the following should work fine:
+
+            disbatch-create-users --config /etc/disbatch/config.json --root_user root --drop_roles
+
+- Restart `disbatchd` and `disbatch-webd`, and start `queuebalanced` if used.
+
+
 ### Upgrading from Disbatch 3 to Disbatch 4
 
 #### Preliminary steps

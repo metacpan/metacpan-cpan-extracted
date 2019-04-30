@@ -15,11 +15,11 @@ use EJS::Template::Parser;
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our @CONFIG_KEYS = qw(engine escape);
 our $context;
@@ -34,18 +34,18 @@ and anything inside the tag C<< <%=...%> >> is replaced by the evaluated value.
     # Perl
     use EJS::Template;
     EJS::Template->process('source.ejs', {name => 'World'});
-    
+
     # EJS ('source.ejs')
     <% for (var i = 0; i < 3; i++) { %>
     Hello, <%= name %>!
     <% } %>
-    
+
     # Output (STDOUT)
     Hello, World!
     Hello, World!
     Hello, World!
 
-In the above example, the C<process()> method takes an input file path as the 
+In the above example, the C<process()> method takes an input file path as the
 first argument and variables passed to JavaScript as the second argument.
 The output is printed out to STDOUT by default.
 
@@ -67,7 +67,7 @@ Within C<< <%...%> >>, it is also possible to call C<print()> function:
         print("i = ", i, "\n");
       }
     %>
-    
+
     # Output
     i = 0
     i = 1
@@ -78,18 +78,18 @@ HTML-escape every individual variable. (See L</Auto-escaping> for more details.)
 
     # Perl
     my $ejs = EJS::Template->new(escape => 'html'); # Set default escape type
-    
+
     $ejs->process('sample.ejs', {
         address => '"Foo Bar" <foo.bar@example.com>', # to be escaped
         message => '<p>Hello, <i>World</i>!<p>', # not to be escaped
     });
-    
+
     # EJS ('<%=' escapes the value, while '<%:raw=' does *not*)
     <h2><%= address %></h2>
     <div>
       <%:raw= message %>
     </div>
-    
+
     # Output
     <h2>&quot;Foo Bar&quot; &lt;foo.bar@example.com&gt;</h2>
     <div>
@@ -172,7 +172,7 @@ Usage:
 
     # Simple
     EJS::Template->process([INPUT [, VARIABLES [, OUTPUT ] ] ]);
-    
+
     # Custom
     my $ejs = EJS::Template->new(...);
     $ejs->process([INPUT [, VARIABLES [, OUTPUT ] ] ]);
@@ -209,13 +209,13 @@ Examples:
 sub process {
     my ($self, $input, $variables, $output) = @_;
     local $context = ref $self ? $self : $self->new();
-    
+
     eval {
         my $parsed;
         $context->parse($input, \$parsed);
         $context->execute(\$parsed, $variables, $output);
     };
-    
+
     die $@ if $@;
     return 1;
 }
@@ -240,11 +240,11 @@ sub apply {
     my ($self, $input, $variables) = @_;
     local $context = ref $self ? $self : $self->new();
     my $output;
-    
+
     eval {
         $context->process(\$input, $variables, \$output);
     };
-    
+
     die $@ if $@;
     return $output;
 }
@@ -269,11 +269,11 @@ The semantics of INPUT and OUTPUT types are similar to C<process()>.
 sub parse {
     my ($self, $input, $parsed_output) = @_;
     local $context = ref $self ? $self : $self->new();
-    
+
     eval {
         $context->parser->parse($input, $parsed_output);
     };
-    
+
     die $@ if $@;
     return 1;
 }
@@ -294,11 +294,11 @@ The semantics of INPUT and OUTPUT types are similar to C<process()>.
 sub execute {
     my ($self, $parsed_input, $variables, $output) = @_;
     local $context = ref $self ? $self : $self->new();
-    
+
     eval {
         $context->executor->execute($parsed_input, $variables, $output);
     };
-    
+
     die $@ if $@;
     return 1;
 }
@@ -455,7 +455,7 @@ HTML-escaped automatically.
     # Input
     <% var text = "x < y < z"; %>
     <span><%= text %></span>
-    
+
     # Output
     <span>x &lt; y &lt; z</span>
 
@@ -562,7 +562,7 @@ on the JavaScript engine that is in use internally (See L</JavaScript engines>).
     sub printRefs {
         print(ref($_) || '(scalar)', "\n") foreach @_;
     }
-    
+
     EJS::Template->process(\<<END, {printRefs => \&printRefs});
     <%
       printRefs(
@@ -574,14 +574,14 @@ on the JavaScript engine that is in use internally (See L</JavaScript engines>).
       );
     %>
     END
-    
+
     # Output with JavaScript::V8
     (scalar)
     (scalar)
     ARRAY
     HASH
     CODE
-    
+
     # Output with JE
     JE::String
     JE::Number
@@ -619,6 +619,14 @@ It is also possible to specify a particular engine:
 
     EJS::Template->new(engine => 'JE')->process(...);
     EJS::Template->new(engine => 'JavaScript::SpiderMonkey')->process(...);
+
+Caveat: L<JavaScript::SpiderMonkey> (as of version 0.25) seems to have an issue
+when it is instantiated multiple times due to the shared C<$GLOBAL> object.
+As a result, C<ESJ::Template> should not be instantiated multiple times with
+C<JavaScript::SpiderMonkey> used as the engine.
+Since it could be used implicitly when it is the only installed JavaScript
+module, you may need to explicitly specify another engine such as
+L<JE> to avoid the issue.
 
 =head2 Including another EJS file
 

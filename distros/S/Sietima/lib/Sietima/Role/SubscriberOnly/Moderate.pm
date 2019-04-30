@@ -5,7 +5,7 @@ use Email::Stuffer;
 use Email::MIME;
 use namespace::clean;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: moderate messages from non-subscribers
 
 
@@ -72,6 +72,16 @@ sub show_mail_from_moderation_queue ($self,$runner,@) {
 }
 
 
+sub resume_mail_from_moderation_queue ($self,$runner,@) {
+    $self->resume($runner->parameters->{'mail-id'});
+}
+
+
+sub drop_mail_from_moderation_queue ($self,$runner,@) {
+    $self->drop($runner->parameters->{'mail-id'});
+}
+
+
 around command_line_spec => sub ($orig,$self) {
     my $spec = $self->$orig();
 
@@ -104,15 +114,11 @@ around command_line_spec => sub ($orig,$self) {
         $etc->('show'),
     };
     $spec->{subcommands}{'resume-held'} = {
-        op => sub ($self,$runner,$args) {
-            $self->resume($runner->parameters->{'mail-id'});
-        },
+        op => 'resume_mail_from_moderation_queue',
         $etc->('resume'),
     };
     $spec->{subcommands}{'drop-held'} = {
-        op => sub ($self,$runner,$args) {
-            $self->drop($runner->parameters->{'mail-id'});
-        },
+        op => 'drop_mail_from_moderation_queue',
         $etc->('drop'),
     };
 
@@ -133,7 +139,7 @@ Sietima::Role::SubscriberOnly::Moderate - moderate messages from non-subscribers
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 
@@ -203,6 +209,27 @@ This method is usually invoked from the command line, see L<<
 This method L<retrieves the email|Sietima::MailStore/retrieve_by_id>
 of the message requested from the command line, and L<prints it
 out|App::Spec::Runner/out> via the L<< C<Sietima::Runner> >> object.
+
+This method is usually invoked from the command line, see L<<
+/C<command_line_spec> >>.
+
+=head2 C<resume_mail_from_moderation_queue>
+
+  $sietima->resume_mail_from_moderation_queue($sietima_runner);
+
+This method L<retrieves the email|Sietima::MailStore/retrieve_by_id>
+of the message requested from the command line, and L<resumes|/resume>
+it.
+
+This method is usually invoked from the command line, see L<<
+/C<command_line_spec> >>.
+
+=head2 C<drop_mail_from_moderation_queue>
+
+  $sietima->drop_mail_from_moderation_queue($sietima_runner);
+
+This method L<retrieves the email|Sietima::MailStore/retrieve_by_id>
+of the message requested from the command line, and L<drops|/drop> it.
 
 This method is usually invoked from the command line, see L<<
 /C<command_line_spec> >>.

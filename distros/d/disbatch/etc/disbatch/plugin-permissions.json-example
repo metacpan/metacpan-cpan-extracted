@@ -1,0 +1,21 @@
+# This is used by bin/disbatch-create-users to give the proper permissions to the plugin.
+# Format is { collection_name: array_of_actions, ... }
+# See https://docs.mongodb.org/manual/reference/built-in-roles/ for built-in roles.
+
+# No permissions are required, but note that Disbatch::Plugin::Demo must be
+# able to do 'insert' on the 'reports' collection.
+
+{
+#    "reports": [ "insert" ],
+}
+
+# My plugins typically need the following permissions:
+#{
+#    "": [ "find" ],		# allow reading of all collections in the database
+#    "queues": [ "update" ],	# used to set threads to 0 in case of serious error
+#    "users": [ "insert", "update", "createIndex" ],
+#    "reports": [ "insert" ],
+#    "complete": [ "insert", "update", "createIndex" ],
+#    "status": [ "insert", "update", "createIndex" ],
+#    "yams": [ "insert", "update", "createIndex" ],
+#}

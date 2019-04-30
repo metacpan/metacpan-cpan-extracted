@@ -6,7 +6,7 @@ use warnings;
 use String::Unquotemeta ();
 use Module::Want 0.6 ();
 
-$String::UnicodeUTF8::VERSION = '0.22';
+$String::UnicodeUTF8::VERSION = '0.23';
 
 sub import {
     return 1 if @_ == 1;    # no-op import()
@@ -130,7 +130,7 @@ sub escape_utf8_or_unicode {
         return get_utf8($s);
     }
 
-    $s =~ s{([^!#&()*+,\-.\/0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\]\^_`abcdefghijklmnopqrstuvwxyz{|}~ ])}
+    $s =~ s{([^A-Za-z_0-9])}
         {
             my $chr = "$1";
             my $n   = ord($chr);
@@ -261,7 +261,7 @@ String::UnicodeUTF8 - non-collation related unicode/utf-8 bytes string-type-agno
 
 =head1 VERSION
 
-This document describes String::UnicodeUTF8 version 0.22
+This document describes String::UnicodeUTF8 version 0.23
 
 =head1 SYNOPSIS
 

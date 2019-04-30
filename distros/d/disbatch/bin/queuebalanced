@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use 5.12.0;
+use warnings;
+
+use Disbatch;
+use Disbatch::QueueBalance;
+use Getopt::Long;
+
+$| = 1;
+my $config_file = '/etc/disbatch/config.json';
+GetOptions('config=s' => \$config_file);
+my $qb = Disbatch::QueueBalance->new($config_file);
+while (1) {
+    $qb->update();
+    sleep 30;
+}
+
+__END__
+
+=head1 NAME
+
+queuebalanced
+
+=head1 VERSION
+
+version 4.102
+
+=head1 SYNOPSIS
+
+    ./bin/queuebalanced [--config <config_file>]
+
+=head1 DESCRIPTION
+
+Runs L<Disbatch::QueueBalance>, sleeping C<30> seconds after every call to C<update()>.
+
+The C<config_file> defaults to C</etc/disbatch/config.json>.
+
+=head1 AUTHORS
+
+Ashley Willis <awillis@synacor.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015, 2019 by Ashley Willis.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004

@@ -73,6 +73,7 @@ sub expand {
 		}
 	    }
 
+	    $pat = File::Spec->catfile($pat, '*') if -d $pat;
 	    my @filelist = glob $pat;
 	    if (@filelist) {
 		foreach my $file (@filelist) {
@@ -96,7 +97,7 @@ sub expand {
 	    }
 	    return 1;
 	} elsif ($d->name eq '$PUSH$') {
-	    if ($d->value =~ /^\"(.+)\" (\d+) (\d+)$/) {
+	    if ($d->value =~ /^\"(.+)\" (-?\d+) (-?\d+)$/) {
 		$self->context_push($1, $2, $3);
 	    }
 	    return 1;

@@ -71,7 +71,7 @@
    "provides" : {
       "Facebook::OpenGraph" : {
          "file" : "lib/Facebook/OpenGraph.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "Facebook::OpenGraph::Response" : {
          "file" : "lib/Facebook/OpenGraph/Response.pm"
@@ -88,9 +88,10 @@
          "web" : "https://github.com/oklahomer/p5-Facebook-OpenGraph"
       }
    },
-   "version" : "1.24",
+   "version" : "1.25",
    "x_contributors" : [
-      "Oklahomer <go.hagiwara@facebook.com>",
-      "Oklahomer <hagiwara.go@gmail.com>"
+      "Go Hagiwara <hagiwara.go@gmail.com>",
+      "Klaus S. Madsen <ksm@jobindex.dk>",
+      "Oklahomer <go.hagiwara@facebook.com>"
    ]
 }

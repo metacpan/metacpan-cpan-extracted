@@ -8,7 +8,7 @@ use App::Spec;
 use Sietima::Runner;
 use namespace::clean;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: run Sietima as a command-line application
 
 
@@ -48,6 +48,10 @@ sub _build_app_spec($self) {
     return App::Spec->read({
         $spec_data->%*,
         $self->extra_spec->%*,
+
+        # App::Spec 0.005 really wants a class name, even when we pass
+        # a pre-build cmd object to the Runner
+        class => ref($self->sietima),
     });
 }
 
@@ -62,8 +66,6 @@ sub _build_runner($self) {
     return Sietima::Runner->new({
         spec => $self->app_spec,
         cmd => $self->sietima,
-        # App::Spec 0.005 really wants a class name
-        class => ref($self->sietima),
     });
 }
 
@@ -81,7 +83,7 @@ Sietima::CmdLine - run Sietima as a command-line application
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

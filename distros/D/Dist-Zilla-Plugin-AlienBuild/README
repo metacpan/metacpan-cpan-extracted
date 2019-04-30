@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.26
+    version 0.27
 
 SYNOPSIS
 
@@ -58,6 +58,10 @@ PROPERTIES
 
     This is on by default. You can turn this off by setting this property
     to 0.
+
+ clean_install
+
+    Sets the clean_install property on Alien::Build::MM.
 
 SEE ALSO
 

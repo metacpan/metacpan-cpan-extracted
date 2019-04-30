@@ -1,0 +1,14 @@
+Changes
+lib/Lab/VISA/Installation.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Lab-VISA.t
+visa.i
+VISA.pm
+VISA.pod
+visa_wrap.c
+visadef.i
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -401,7 +401,7 @@ disbatch.pl - CLI to the Disbatch Command Interface (DCI).
 
 =head1 VERSION
 
-version 3.990
+version 4.102
 
 =head1 DEPRECATION NOTICE
 
@@ -537,7 +537,9 @@ Matt Busigin
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ashley Willis.
+This software is Copyright (c) 2011 by Matt Busigin.
+
+This software is Copyright (c) 2014, 2015, 2016 by Ashley Willis.
 
 This is free software, licensed under:
 

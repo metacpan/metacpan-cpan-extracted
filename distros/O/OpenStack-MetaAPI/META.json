@@ -36,6 +36,7 @@
          "requires" : {
             "JSON" : "0",
             "Moo" : "0",
+            "Moo::Role" : "0",
             "OpenStack::Client" : "1.0006",
             "YAML::XS" : "0",
             "perl" : "5.010"
@@ -54,7 +55,7 @@
             "Test2::Bundle::Extended" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
-            "Test::MockModule" : "0",
+            "Test::MockModule" : "0.16",
             "Test::More" : "0",
             "URI::Encode" : "0"
          }
@@ -63,67 +64,67 @@
    "provides" : {
       "OpenStack::MetaAPI" : {
          "file" : "lib/OpenStack/MetaAPI.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API" : {
          "file" : "lib/OpenStack/MetaAPI/API.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Compute" : {
          "file" : "lib/OpenStack/MetaAPI/API/Compute.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Images" : {
          "file" : "lib/OpenStack/MetaAPI/API/Images.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Network" : {
          "file" : "lib/OpenStack/MetaAPI/API/Network.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Service" : {
          "file" : "lib/OpenStack/MetaAPI/API/Service.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Specs" : {
          "file" : "lib/OpenStack/MetaAPI/API/Specs.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Specs::Compute::v2_0" : {
          "file" : "lib/OpenStack/MetaAPI/API/Specs/Compute/v2_0.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Specs::Compute::v2_1" : {
          "file" : "lib/OpenStack/MetaAPI/API/Specs/Compute/v2_1.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Specs::Default" : {
          "file" : "lib/OpenStack/MetaAPI/API/Specs/Default.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Specs::Network::v2" : {
          "file" : "lib/OpenStack/MetaAPI/API/Specs/Network/v2.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::API::Specs::Roles::Service" : {
          "file" : "lib/OpenStack/MetaAPI/API/Specs/Roles/Service.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::Helpers::DataAsYaml" : {
          "file" : "lib/OpenStack/MetaAPI/Helpers/DataAsYaml.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::Roles::GetFromId" : {
          "file" : "lib/OpenStack/MetaAPI/Roles/GetFromId.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::Roles::Listable" : {
          "file" : "lib/OpenStack/MetaAPI/Roles/Listable.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "OpenStack::MetaAPI::Routes" : {
          "file" : "lib/OpenStack/MetaAPI/Routes.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -137,7 +138,7 @@
          "web" : "https://github.com/atoomic/OpenStack-MetaAPI.git"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -469,7 +470,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.002",
+                  "tag" : "v0.003",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

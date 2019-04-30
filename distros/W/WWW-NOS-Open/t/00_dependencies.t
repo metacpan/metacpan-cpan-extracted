@@ -1,8 +1,8 @@
 use Test::More;
 
-if ( not $ENV{TEST_AUTHOR} ) {
+if ( not $ENV{AUTHOR_TESTING} ) {
     my $msg =
-'Author test. Set the environment variable TEST_AUTHOR to enable this test.';
+'Author test. Set the environment variable AUTHOR_TESTING to enable this test.';
     plan( skip_all => $msg );
 }
 

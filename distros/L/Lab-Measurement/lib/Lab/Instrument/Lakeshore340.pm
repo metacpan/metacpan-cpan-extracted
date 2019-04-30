@@ -1,12 +1,12 @@
 package Lab::Instrument::Lakeshore340;
+$Lab::Instrument::Lakeshore340::VERSION = '3.681';
 #ABSTRACT: Lakeshore 340 temperature controller
-$Lab::Instrument::Lakeshore340::VERSION = '3.680';
+
 use warnings;
 use strict;
 use 5.010;
 
 use Lab::Instrument;
-
 
 our @ISA = ('Lab::Instrument');
 
@@ -486,9 +486,10 @@ sub set_PID {
         die
             "unexpected value ($loop) for LOOP in sub set_PID. Expected values are between 1 and 2.";
     }
-    else {
-        die "unexpected values in sub set_PID.";
-    }
+
+    # else {
+    #     die "unexpected values in sub set_PID.";
+    # }
 
     if ( $D < 0 or $D > 200 ) {
         die
@@ -950,7 +951,7 @@ Lab::Instrument::Lakeshore340 - Lakeshore 340 temperature controller
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 SYNOPSIS
 
@@ -1160,6 +1161,7 @@ This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
   Copyright 2013-2014  Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

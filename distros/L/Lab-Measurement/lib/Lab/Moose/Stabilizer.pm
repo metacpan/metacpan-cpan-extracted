@@ -1,5 +1,5 @@
 package Lab::Moose::Stabilizer;
-$Lab::Moose::Stabilizer::VERSION = '3.680';
+$Lab::Moose::Stabilizer::VERSION = '3.681';
 #ABSTRACT: Sensor stabilizers role
 
 use 5.010;
@@ -133,7 +133,7 @@ Lab::Moose::Stabilizer - Sensor stabilizers role
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 DESCRIPTION
 

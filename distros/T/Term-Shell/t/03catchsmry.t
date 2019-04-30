@@ -1,3 +1,5 @@
+package main;
+
 use strict;
 use warnings;
 
@@ -34,6 +36,7 @@ my $sh = Term::Shell::Test->new;
     $sh->run_help;
 };
 
+# TEST
 unless ( is( $::called, 1, "catch_smry gets called for unknown methods" ) )
 {
     diag "Term::Shell did not call a custom catch_smry handler";
@@ -50,4 +53,3 @@ unless ( is( $::called, 1, "catch_smry gets called for unknown methods" ) )
     diag 'but the shell will otherwise work fine. Help is still';
     diag 'available through ``perldoc WWW::Mechanize::Shell``';
 }
-

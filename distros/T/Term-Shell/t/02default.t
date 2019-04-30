@@ -1,3 +1,4 @@
+package main;
 use strict;
 use warnings;
 
@@ -8,8 +9,10 @@ use base qw(Term::Shell);
 
 sub run_command1  { print "command1\n"; }
 sub smry_command1 { "what does command1 do?" }
-sub help_command1 {
-<<'END';
+
+sub help_command1
+{
+    <<'END';
 Help on 'command1', whatever that may be...
 END
 }
@@ -23,29 +26,35 @@ my $shell = MyShell->new;
 #=============================================================================
 # Command completions
 #=============================================================================
-my $cmds = [$shell->possible_actions('e', 'run')];
-# TEST
-is_deeply ($cmds, ['exit'], "e command");
+my $cmds = [ $shell->possible_actions( 'e', 'run' ) ];
 
-$cmds = [$shell->possible_actions('h', 'run')];
 # TEST
-is_deeply ($cmds, ['help'], "help command");
+is_deeply( $cmds, ['exit'], "e command" );
 
-$cmds = [$shell->possible_actions('c', 'run')];
+$cmds = [ $shell->possible_actions( 'h', 'run' ) ];
+
 # TEST
-is(scalar(@$cmds), 2, "c run");
+is_deeply( $cmds, ['help'], "help command" );
+
+$cmds = [ $shell->possible_actions( 'c', 'run' ) ];
+
+# TEST
+is( scalar(@$cmds), 2, "c run" );
 
 #=============================================================================
 # Help completions
 #=============================================================================
-$cmds = [$shell->possible_actions('e', 'help')];
-# TEST
-is_deeply ($cmds, ['exit'], "e completions");
+$cmds = [ $shell->possible_actions( 'e', 'help' ) ];
 
-$cmds = [$shell->possible_actions('h', 'help')];
 # TEST
-is_deeply ($cmds, ['help'], 'h completions');
+is_deeply( $cmds, ['exit'], "e completions" );
 
-$cmds = [$shell->possible_actions('c', 'help')];
+$cmds = [ $shell->possible_actions( 'h', 'help' ) ];
+
 # TEST
-is_deeply ($cmds, ['command1'], 'command1 completions');
+is_deeply( $cmds, ['help'], 'h completions' );
+
+$cmds = [ $shell->possible_actions( 'c', 'help' ) ];
+
+# TEST
+is_deeply( $cmds, ['command1'], 'command1 completions' );

@@ -4,7 +4,7 @@
 # All rights reserved
 
 package CPANPLUS::YACSmoke::ReAssemble;
-$CPANPLUS::YACSmoke::ReAssemble::VERSION = '1.06';
+$CPANPLUS::YACSmoke::ReAssemble::VERSION = '1.08';
 use vars qw/$have_Storable $Current_Lexer $Default_Lexer $Single_Char $Always_Fail/;
 
 =head1 NAME

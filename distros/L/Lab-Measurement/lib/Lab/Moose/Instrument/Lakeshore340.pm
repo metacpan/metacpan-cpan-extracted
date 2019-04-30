@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.680';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.681';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use 5.010;
@@ -64,7 +64,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Common;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use base 'Exporter';
 

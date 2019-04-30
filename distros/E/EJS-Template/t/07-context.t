@@ -15,12 +15,10 @@ my $v1 = {
             y => 4,
             z => 5,
         });
-        my $result = $context->eval("(function (i, j, k) {return i * j * k})(x, y, z)");
-        $context->print("x * y * z = ", $result, "\n");
     }
 };
 
-my $output = EJS::Template->apply(<<EJS, $v1);
+my $output = EJS::Template->new(engine => 'JE')->apply(<<EJS, $v1);
 <%
 var x = 2;
 var y = 3;
@@ -32,14 +30,15 @@ z = <%=z%>
 EJS
 
 is $output, <<OUT;
-x * y * z = 40
 x = 2
 y = 4
 z = 5
 OUT
 
-my $t1 = EJS::Template->new();
-my $t2 = EJS::Template->new();
+# Note: This test does not work with JavaScript::SpiderMonkey due to the shared
+# $GLOBAL class variable. (See comment in JavaScript::SpiderMonkey::new)
+my $t1 = EJS::Template->new(engine => 'JE');
+my $t2 = EJS::Template->new(engine => 'JE');
 
 my $v2 = {
     set_t1 => sub {

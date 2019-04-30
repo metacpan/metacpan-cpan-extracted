@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::HorneAutomovePrune;
-$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2000';
+$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2100';
 use strict;
 use warnings;
 
@@ -132,7 +132,7 @@ __END__
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 SUBROUTINES
 

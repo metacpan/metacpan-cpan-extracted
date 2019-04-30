@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use CGI qw/:all/;
 use HTTP::Server::Brick;

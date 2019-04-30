@@ -17,6 +17,10 @@ https://developers.facebook.com/bugs/597779113651383/
 
 ###############################################################################
 
+1.25 2019-04-30T00:20:02Z
+    - Fix version comparison. Thanks to ksmadsen.
+      https://github.com/oklahomer/p5-Facebook-OpenGraph/pull/21
+
 1.24 2018-04-05T02:17:07Z
     - Fix API response version comparison. Thanks to chakkit.
       https://github.com/oklahomer/p5-Facebook-OpenGraph/issues/18

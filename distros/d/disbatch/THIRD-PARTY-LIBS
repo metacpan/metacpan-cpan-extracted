@@ -1,0 +1,47 @@
+Some web browser code in `etc/disbatch/htdocs/` includes third-party libraries copyright others and licensed under their own terms.
+
+etc/disbatch/htdocs/javascripts/jquery.serialize-object.min.js
+ * jQuery serializeObject
+ * @copyright 2014, macek <paulmacek@gmail.com>
+ * @link https://github.com/macek/jquery-serialize-object
+ * @license BSD
+ * @version 2.2.0
+
+etc/disbatch/htdocs/javascripts/jquery.js
+ * jQuery JavaScript Library v1.4.2
+ * http://jquery.com/
+ *
+ * Copyright 2010, John Resig
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * Includes Sizzle.js
+ * http://sizzlejs.com/
+ * Copyright 2010, The Dojo Foundation
+ * Released under the MIT, BSD, and GPL Licenses.
+
+etc/disbatch/htdocs/css/editablegrid.css
+etc/disbatch/htdocs/css/simple.css
+etc/disbatch/htdocs/js/editablegrid.js
+etc/disbatch/htdocs/js/editablegrid_editors.js
+etc/disbatch/htdocs/js/editablegrid_renderers.js
+etc/disbatch/htdocs/js/editablegrid_utils.js
+etc/disbatch/htdocs/js/editablegrid_validators.js
+etc/disbatch/htdocs/images/bullet_arrow_up.png
+etc/disbatch/htdocs/images/bullet_arrow_down.png
+  EditableGrid
+  Copyright (c) 2012 Webismymind SPRL
+  Dual licensed under the MIT or GPL Version 2 licenses.
+  http://www.editablegrid.net/page/en/9/license.html
+  https://github.com/webismymind/editablegrid/blob/39fddf7d3aa8d9c38280b2db6e0bcfce63fab684/LICENSE.txt
+
+etc/disbatch/htdocs/javascripts/expander.js
+etc/disbatch/htdocs/images/expand.gif
+etc/disbatch/htdocs/images/collapse.gif
+  by Jessica Brown, no copyright nor license stated
+  http://www.raebear.net/jwinblad/webprogramming/expander/expander.php
+
+etc/disbatch/htdocs/css/style.css
+  This software is copyright (c) 2010 by Alexis Sukrieh.
+  This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+  https://metacpan.org/pod/distribution/Dancer/bin/dancer#COPYRIGHT-AND-LICENSE

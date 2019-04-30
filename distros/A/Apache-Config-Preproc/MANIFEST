@@ -1,3 +1,5 @@
+Apache-Config-Preproc-1.02/META.json
+Apache-Config-Preproc-1.02/META.yml
 Changes
 lib/Apache/Config/Preproc.pm
 lib/Apache/Config/Preproc/compact.pm

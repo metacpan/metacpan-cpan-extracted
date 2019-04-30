@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Windows1252
-version: 1.13
+version: 1.14
 abstract: Native Encoding Support by Traditional Scripting
 author:
   - ina <ina@cpan.org>

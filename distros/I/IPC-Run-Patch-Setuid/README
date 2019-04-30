@@ -1,0 +1,48 @@
+NAME
+    IPC::Run::Patch::Setuid - Set EUID
+
+VERSION
+    This document describes version 0.003 of IPC::Run::Patch::Setuid (from
+    Perl distribution IPC-Run-Patch-Setuid), released on 2019-04-30.
+
+SYNOPSIS
+     use IPC::Run::Patch::Setuid -euid => 1000;
+
+DESCRIPTION
+    This patch sets EUID of the child process ($>) to the specified ID after
+    forking.
+
+CONFIGURATION
+  -euid
+    Unsigned integer.
+
+  -egid
+    String. Either a single GID or multiple GID separated by space.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IPC-Run-Patch-Setuid>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-IPC-Run-Patch-Setuid>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-Run-Patch-Setuid>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    IPC::Run
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

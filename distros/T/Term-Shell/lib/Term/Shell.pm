@@ -303,24 +303,46 @@ sub summary
 #=============================================================================
 sub add_handlers
 {
-    my $o = shift;
+    my $o     = shift;
+    my $match = sub {
+        if ( my ($ret) = shift =~ /\A(run|help|smry|comp|catch|alias)_/ )
+        {
+            return $ret;
+        }
+        return;
+    };
+LOOP1:
     for my $hnd (@_)
     {
-        next unless $hnd =~ /^(run|help|smry|comp|catch|alias)_/o;
-        my $t = $1;
-        my $a = substr( $hnd, length($t) + 1 );
+        my $t = $match->($hnd);
+        next LOOP1 if !defined $t;
+        my $s = substr( $hnd, length($t) + 1 );
 
         # Add on the prefix and suffix if the command is defined
-        if ( length $a )
+        if ( length $s )
         {
-            substr( $a, 0, 0 ) = $o->cmd_prefix;
-            $a .= $o->cmd_suffix;
+            substr( $s, 0, 0 ) = $o->cmd_prefix;
+            $s .= $o->cmd_suffix;
         }
-        $o->{handlers}{$a}{$t} = $hnd;
-        if ( $o->has_aliases($a) )
+        $o->{handlers}{$s}{$t} = $hnd;
+    }
+LOOP2:
+    for my $hnd (@_)
+    {
+        my $t = $match->($hnd);
+        next LOOP2 if !defined $t;
+        my $s = substr( $hnd, length($t) + 1 );
+
+        # Add on the prefix and suffix if the command is defined
+        if ( length $s )
         {
-            my @a = $o->get_aliases($a);
-            for my $alias (@a)
+            substr( $s, 0, 0 ) = $o->cmd_prefix;
+            $s .= $o->cmd_suffix;
+        }
+        if ( $o->has_aliases($s) )
+        {
+            my @s = $o->get_aliases($s);
+            for my $alias (@s)
             {
                 substr( $alias, 0, 0 ) = $o->cmd_prefix;
                 $alias .= $o->cmd_suffix;
@@ -442,12 +464,11 @@ TERMSIZE:
 
         {
             local $^W;
-            local *STTY;
-            if ( open( STTY, "stty size |" ) )
+            if ( open( my $STTY, "-|", "stty", "size" ) )
             {
-                my $l = <STTY>;
+                my $l = <$STTY>;
                 ( $rows, $cols ) = split /\s+/, $l;
-                close STTY;
+                close $STTY;
             }
         }
     }
@@ -522,7 +543,7 @@ sub prompt
     my $line;
     my $readline = sub {
         my ( $sh, $gh ) = @{ $term->Features }{qw(setHistory getHistory)};
-        my @history = $term->GetHistory if $gh;
+        my @history = $gh ? $term->GetHistory : ();
         $term->SetHistory() if $sh;
         $line = $o->readline($prompt);
         $line = $default
@@ -744,7 +765,7 @@ sub handler
             return $o->unalias( $handlers[0], $type );
         }
     }
-    return undef;
+    return;
 }
 
 sub completions
@@ -901,6 +922,7 @@ sub find_handlers
     # Find the handlers in the given namespace:
     my %handlers;
     {
+        ## no critic
         no strict 'refs';
         my @r = keys %{ $pkg . "::" };
         $o->add_handlers(@r);
@@ -908,6 +930,7 @@ sub find_handlers
 
     # Find handlers in its base classes.
     {
+        ## no critic
         no strict 'refs';
         my @isa = @{ $pkg . "::ISA" };
         for my $pkg (@isa)
@@ -1091,7 +1114,7 @@ Term::Shell - A simple command-line shell framework.
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -1140,7 +1163,7 @@ the gory details.
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 Using Term::Shell Shells
 

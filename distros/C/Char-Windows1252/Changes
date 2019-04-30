@@ -1,5 +1,9 @@
 Revision history for this software.
 
+1.14  2019-04-30 00:00:00
+  - try https://rt.cpan.org/Public/Bug/Display.html?id=129343
+  - created by INABA Hitoshi
+
 1.13  2019-04-28 00:00:00
   - avoid Kwalitee Issue no_pod_errors
   - avoid Kwalitee Issue use_strict

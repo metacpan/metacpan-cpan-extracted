@@ -1,5 +1,7 @@
 ### Running Disbatch 4
 
+Copyright (c) 2016, 2019 by Ashley Willis.
+
 * [Configure](Configuring.md) Disbatch before running
 
 * Start, stop, restart
@@ -15,7 +17,7 @@
     This can run on the same servers as `disbatchd`, or on completely different
     ones.
 
-* Web interface, by default running on port 8080
+* Web interface, by default listening on 127.0.0.1:8080
 
   * Create a new queue by clicking on `New Queue`, entering a `Name`, selecting
     a `Type` from the drop-down menu, and clicking `Create`.
@@ -33,6 +35,18 @@
   * You can refresh the tables at any time by clicking on `Refresh`. They also
     refresh automatically every 60 seconds, and after any changes via the web
     interface.
+
+* QueueBalance
+
+  * See [QueueBalance](docs/QueueBalance.md) on how to use the tool for
+    automatically maintaining a maximum number of threads across queues depending
+    on the time of day and day of week.
+
+* Monitoring
+
+  * Disbatch now has a `GET /monitoring` endpoint as part of the web interface to
+    check the status of Disbatch and QueueBalance. See `perldoc Disbatch::Web`
+    for a full description.
 
 * CLI
 

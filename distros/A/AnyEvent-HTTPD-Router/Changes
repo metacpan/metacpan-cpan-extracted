@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::HTTPD::Router
 
+1.0.1 2019-04-29T18:48:33Z
+    - added missing Test::Exception dependency
+
 1.0.0 2019-04-29T12:10:22Z
 
     - original version

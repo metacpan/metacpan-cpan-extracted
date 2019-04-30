@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--
+ * This software is Copyright (c) 2016 by Ashley Willis.
+ * This is free software, licensed under:
+ *   The Apache License, Version 2.0, January 2004
+ -->
+<!--
+  passed: {
+    database => $disbatch->{config}{database},
+    web_extensions => [sort keys %{$disbatch->{config}{web_extensions} // {}}],
+    get_routes => [ grep { m{^/} } sort keys +{@{Limper::routes('GET')}} ]
+  }
+
+ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Disbatch Queue Browser">
+    <meta name="author" content="Ashley Willis">
+    <!-- link rel="icon" href="/favicon.ico" -->
+
+    <title>Disbatch Queue Browser ([% database %])</title>
+
+    <script src="/js/editablegrid.js"></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_renderers.js" ></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_editors.js" ></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_validators.js" ></script>
+    <!-- [DO NOT DEPLOY] --> <script src="/js/editablegrid_utils.js" ></script>
+    <!-- [DO NOT DEPLOY] - -> <script src="/js/editablegrid_charts.js" ></script -->
+    <link rel="stylesheet" type="text/css" href="/css/editablegrid.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="/css/simple.css" media="screen"/>
+    <!-- Bootstrap core CSS -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <script src="/js/queues.js"></script>
+    <style>
+//      body { font-family:'lucida grande', tahoma, verdana, arial, sans-serif; font-size:11px; }
+      h1 { font-size: 15px; }
+      a { color: #548dc4; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      table.testgrid { border-collapse: collapse; border: 1px solid #CCB; width: 800px; }
+      table.testgrid td, table.testgrid th { padding: 5px; border: 1px solid #E0E0E0; }
+      table.testgrid th { background: #E5E5E5; text-align: left; }
+      input.invalid { background: red; color: #FDFDFD; }
+      input { color: black; line-height: normal; }
+
+      body { padding-top: 50px; }
+      .starter-template { padding: 40px 15px; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Disbatch ([% database %])</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <!--
+            <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">Link</a></li>
+            -->
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">routes <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+              [% FOREACH route in get_routes %]
+                <li><a href="[% route %]">[% route %]</a></li>
+              [% END %]
+                <!--li role="separator" class="divider"></li-->
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">loaded extensions <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+              [% FOREACH ex in web_extensions %]
+                <li>[% ex %]</li>
+              [% END %]
+                <!--li role="separator" class="divider"></li-->
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="container">
+      <div class="starter-template">
+        <h1>Queues</h1>
+        <div id="tablecontent-jsdata"></div>
+        <h1>Disbatch Execution Nodes</h1> (if blank then no max threads for the DEN)
+        <div id="nodes-table"></div>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target=".create-new-queue-modal-sm">New Queue</button>
+        <div class="modal fade create-new-queue-modal-sm" tabindex="-1" role="dialog" aria-labelledby="createNewQueue">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Create new queue</h4>
+              </div>
+              <div class="modal-body">
+                <form class="form-horizontal" id="queue-form">
+                  <div class="form-group">
+                    <label for="inputName" class="col-sm-3 control-label">Name</label>
+                    <div class="col-sm-9">
+                      <!-- FIXME: require some sort of input for new queue name -->
+                      <input type="text" class="form-control number" id="inputName" placeholder="Name">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputType" class="col-sm-3 control-label">Type</label>
+                    <div class="col-sm-9">
+                      <!-- input type="text" class="form-control" id="inputType2" placeholder="Type" -->
+                      <select class="form-control" id="inputType">
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="document.getElementById('queue-form').reset()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newQueue()">Create</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-default" onclick="loadQueuesAndNodes()">Refresh</button>
+      </div>
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+  </body>
+</html>

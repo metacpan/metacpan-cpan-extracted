@@ -1,6 +1,7 @@
 package Lab::Instrument::Lakeshore33x;
+$Lab::Instrument::Lakeshore33x::VERSION = '3.681';
 #ABSTRACT: Lakeshore 33x Temperature controller
-$Lab::Instrument::Lakeshore33x::VERSION = '3.680';
+
 use strict;
 use Lab::Instrument;
 use warnings;
@@ -470,9 +471,10 @@ sub set_PID {
         die
             "unexpected value ($loop) for LOOP in sub set_PID. Expected values are between 1 and 2.";
     }
-    else {
-        die "unexpected values in sub set_PID.";
-    }
+
+    # else {
+    #     die "unexpected values in sub set_PID.";
+    # }
 
     if ( $D < 0 or $D > 200 ) {
         die
@@ -934,7 +936,7 @@ Lab::Instrument::Lakeshore33x - Lakeshore 33x Temperature controller
 
 =head1 VERSION
 
-version 3.680
+version 3.681
 
 =head1 SYNOPSIS
 
@@ -1151,6 +1153,7 @@ This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
   Copyright 2013-2014  Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

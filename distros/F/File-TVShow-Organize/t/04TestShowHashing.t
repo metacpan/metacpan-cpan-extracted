@@ -10,7 +10,7 @@ use Data::Dumper;
 use Test::More;
 use Test::Carp;
 use Cwd;
-BEGIN {use_ok( 'File::TVShow::Organize' ) };
+use File::TVShow::Organize;
 
 #########################
 

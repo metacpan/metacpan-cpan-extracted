@@ -20,6 +20,7 @@ requires:
   Storable: '2.21'
   Time::HiRes: '1.9726'
   Time::Piece: '1.1'
-version: '0.004'
+  perl: '5.018'
+version: '0.0041'
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

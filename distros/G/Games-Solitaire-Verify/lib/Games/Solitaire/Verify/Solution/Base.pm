@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::Base;
-$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2000';
+$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2100';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ sub _l
     my $s = shift;
 
     # We use this instead of the accessor for speed.
-    $s->{_ln}++;
+    ++$s->{_ln};
 
     return shift( @{ $s->{_i} } );
 }
@@ -100,11 +100,11 @@ all Games::Solitaire::Verify::Solution::* classes.
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 VERSION
 
-version 0.2000
+version 0.2100
 
 =head1 AUTHOR
 

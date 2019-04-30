@@ -21,8 +21,8 @@ Daemon::Control->new({
     stdout_file  => '/var/log/disbatchd.out',
     stderr_file  => '/var/log/disbatchd.out',
 
-    #user         => 'awillis',
-    #group        => 'systems',
+    #user         => 'migrations',
+    #group        => 'migrations',
 
     fork         => 2,
 

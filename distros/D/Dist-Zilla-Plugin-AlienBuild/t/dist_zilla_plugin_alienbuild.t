@@ -169,6 +169,34 @@ subtest 'req alien::base' => sub {
   );
 };
 
+subtest 'req alien::build::mm' => sub {
+
+  my $tzil = Builder->from_config({ dist_root => 'corpus/Alien-Foo1' }, {
+    add_files => {
+      'source/dist.ini' => simple_ini(
+        { name => 'Alien-Foo1' },
+        [ 'GatherDir'  => {} ],
+        [ 'MakeMaker'  => {} ],
+        [ 'MetaJSON'   => {} ],
+        [ 'AlienBuild' => { clean_install => 1 } ],
+      ),
+    },
+  });
+
+  $tzil->build;
+
+  my $meta = decode_json((first { $_->name eq 'META.json' } @{ $tzil->files })->content);
+
+  is(
+    $meta->{prereqs}->{configure}->{requires},
+    hash {
+      field 'Alien::Build::MM'      => '1.71';
+      etc;
+    },
+    'build prereqs',
+  );
+};
+
 done_testing;
 
 

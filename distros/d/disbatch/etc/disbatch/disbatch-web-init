@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use Daemon::Control;
 
-my @program_args = ('--listen' => ':8080', '--workers' => 10, '/etc/disbatch/app.psgi');
+my @program_args = ('--listen' => '127.0.0.1:8080', '--workers' => 10, '/etc/disbatch/app.psgi');
 
 Daemon::Control->new({
     name         => 'disbatch-web',
-    program      => 'starman',
+    program      => 'starwoman',
     program_args => \@program_args,
     directory    => '/',
 
@@ -21,8 +21,8 @@ Daemon::Control->new({
     stdout_file  => '/var/log/disbatch-web.out',
     stderr_file  => '/var/log/disbatch-web.out',
 
-    #user         => 'awillis',
-    #group        => 'systems',
+    #user         => 'migrations',
+    #group        => 'migrations',
 
     fork         => 2,
 

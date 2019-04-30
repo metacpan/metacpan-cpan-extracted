@@ -13,7 +13,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20190404;                                                        # Version
+our $VERSION = 20190429;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -76,6 +76,7 @@ sub fff($$@)                                                                    
   confess "  $m\n";                                                             # Confess
  }
 
+our @lll;                                                                       # Run log
 sub lll(@)                                                                      # Log messages including the project name if available. This method is not merged as we need to retain its prototype.
  {my (@m) = @_;                                                                 # Messages
   return unless (join '', @_) =~ m(\S)s;
@@ -84,6 +85,7 @@ sub lll(@)                                                                      
   my ($p, $f, $l) = caller();
   $m .= " at $f line $l";
 
+  push @lll, $m;                                                                # Log message
   say STDERR $m;                                                                # Say message
   $m                                                                            # Return message produced
  }
@@ -1005,7 +1007,10 @@ END
 sub nameFromString($)                                                           # Create a readable name from an arbitrary string of text.
  {my ($string) = @_;                                                            # String
   my $prefix = sub                                                              # These are well known values that are used to enhance the name if they are present in the source string
-   {if ($string =~ m(<(bookmap|concept|html|reference|task))s)
+   {if ($string =~ m(<(bookmap))s)                                              # The ghastly compromise
+     {return q(bm_);
+     }
+    if ($string =~ m(<(bookmap|concept|html|reference|task))s)                  # The correct solution
      {return substr($1, 0, 1).q(_);
      }
     q();
@@ -1020,12 +1025,15 @@ sub nameFromString($)                                                           
 sub nameFromStringRestrictedToTitle($)                                          # Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
  {my ($string) = @_;                                                            # String
   my $prefix = sub                                                              # These are well known values that are used to enhance the name if they are present in the source string
-   {if ($string =~ m(<(bookmap|concept|html|reference|task))s)
+   {if ($string =~ m(<(bookmap))s)                                              # The ghastly compromise
+     {return q(bm_);
+     }
+    if ($string =~ m(<(bookmap|concept|html|reference|task))s)                  # The correct solution
      {return substr($1, 0, 1).q(_);
      }
     q();
    }->();
-  if ($string =~ m(<title>(.*?)</title)is)
+  if ($string =~ m(title>([^<]*)<)is)                                           # Use text inside title tag id plausible
    {$string = $1 if length($1) > 8;
    }
   $string =~ s(<[^>]*>) (_)gs;                                                  # Remove xml/html tags
@@ -1092,6 +1100,18 @@ sub copyFileMd5Normalized(;$$)                                                  
      }
    }
   $out                                                                          # Return normalized image file name
+ }
+
+sub copyFileMd5NormalizedName($$@)                                              # Name a file using the GB Standard
+ {my ($content, $extension, %options) = @_;                                     # Content, extension, options
+  defined($content) or
+    confess "Content must be defined";
+  defined($extension) && $extension =~ m(\A\S{2,}\Z)s or
+    confess "Extension must be non blank and at least two characters long";
+  my $name   = nameFromString($content);                                        # Human readable component
+     $name   = nameFromStringRestrictedToTitle($content) if $options{titleOnly};# Not entirely satisfactory
+  my $md5    = fileMd5Sum($content);                                            # Md5 sum
+  fpe($name.q(_).$md5, $extension)                                              # Add extension
  }
 
 sub copyFileMd5NormalizedCreate($$$$@)                                          # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyFileMd5Normalized|/copyFileMd5Normalized> regardless of the other files in the target folders.
@@ -2861,8 +2881,8 @@ sub Data::Table::Text::Starter::logEntry($$)                                    
     my $finished = keys %{$starter->processFinishTime};                         # Number of processes finished
 
     if (!$finish and $started == 1 and $t)                                      # Title message
-     {my $n = $N ? qq(Start $N processes in parallel $M for:) :
-                   qq(Process in parallel $M:);
+     {my $n = $N ? qq(Start $N processes in parallel upto $M for:) :
+                   qq(Process in parallel upto $M:);
       $starter->say(join " ", timeStamp, "$n $t");
      }
 
@@ -3236,6 +3256,7 @@ sub updateDocumentation(;$)                                                     
   my %static;                                                                   # Static methods
   my %synonymTargetSource;                                                      # Synonyms from source to target - {$source}{$target} = 1 - can be several
   my %synonymTarget;                                                            # Synonym target - confess is more than one
+  my @synopsis;                                                                 # External synopsis to allow L<symbol> to be expanded
   my %exported;                                                                 # Exported methods
   my %userFlags;                                                                # User flags
   my $oneLineDescription = qq(\n);                                              # One line description from =head1 Name
@@ -3365,6 +3386,17 @@ END
      }
    }
 
+  for my $l(keys @lines)                                                        # Place the synopsis in a here doc block starting with my $documentationSynopsis = <<END; if this text contains L<symbol> that should be expanded. If present, the generated text will be used to generate a =head1 Synopsis section just before the description
+   {my $line = $lines[$l];
+    if ($line =~ m(\Amy \$documentationSynopsis = <<END;))
+     {for(my ($L, $N) = ($l + 1, 0); $L < @lines; ++$L, ++$N)
+       {my $nextLine = $lines[$L];
+        last if $nextLine =~ m(\AEND\Z);
+        push @synopsis, $nextLine;
+       }
+     }
+   }
+
   if (1)                                                                        # Bold method name in examples to make it easier to pick out with the slight disadvantage that the exampels can no longer be cut and paste without modification.
    {for my $m(sort keys %examples)
      {my $M = boldString($m);
@@ -3403,7 +3435,7 @@ END
     elsif ($line =~ /\A#I(?:nstall(?:ation)?)?\s+(.+)\Z/)                       # Extra install instructions
      {$install = "\\m$1\\m";
      }
-    elsif ($line =~ /\A#D/)                                                     # Switch documentation off
+    elsif ($line =~ /\A#D(off)?/)                                               # Switch documentation off
      {$level = 0;
      }
     elsif ($level and $line =~                                                  # Documentation for a generated lvalue * method = sub name comment
@@ -3742,7 +3774,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 `head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -3795,25 +3827,43 @@ sub test
 test unless caller;
 END
 
+  if (@synopsis)                                                                # Add the generated synopsis at the front if present
+   {unshift @doc, q(=head1 Synopsis), @synopsis;
+   }
 
   for(@doc)                                                                     # Expand snippets in documentation
    {s/\\m/\n\n/gs;                                                              # Double new line
     s/\\n/\n/gs;                                                                # Single new line
     s/\\x//gs;                                                                  # Break
     s/`/=/gs;
-    s(L<lvalueMethod>) (L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines>);
-    s(L<confess>)      (L<confess|http://perldoc.perl.org/Carp.html#SYNOPSIS/>);
-    s(L<die>)          (L<die|http://perldoc.perl.org/functions/die.html>);
-    s(L<eval>)         (L<eval|http://perldoc.perl.org/functions/eval.html>);
-    s(L<\$_>)          (L<\$_|http://perldoc.perl.org/perlvar.html#General-Variables>);
-    s(L<our>)          (L<our|https://perldoc.perl.org/functions/our.html>);
-    s(L<Imagemagick>)  (L<Imagemagick|https://www.imagemagick.org/script/index.php>);
-    s(L<Dita>)         (L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>);
-    s(L<DitaOT>)       (L<DITA-OT|http://www.dita-ot.org/download>);
-    s(L<Xml parser>)   (L<Xml parser|https://metacpan.org/pod/XML::Parser/>);
-    s(L<xmllint>)      (L<xmllint|http://xmlsoft.org/xmllint.html>);
-    s(L<OxygenFormat)  (L<https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html>);
-    s(L<html table>)   (L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element>);
+    s(L<ascii>)         (L<ascii|https://en.wikipedia.org/wiki/ASCII>)gis;
+    s(L<boson>)         (L<boson|https://en.wikipedia.org/wiki/Boson>)gis;
+    s(L<commandLine>)   (L<command line|https://en.wikipedia.org/wiki/Command-line_interface>)gis;
+    s(L<confess>)       (L<confess|http://perldoc.perl.org/Carp.html#SYNOPSIS/>)gis;
+    s(L<die>)           (L<die|http://perldoc.perl.org/functions/die.html>)gis;
+    s(L<Dita>)          (L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>)gis;
+    s(L<DitaOT>)        (L<DITA-OT|http://www.dita-ot.org/download>)gis;
+    s(L<eval>)          (L<eval|http://perldoc.perl.org/functions/eval.html>)gis;
+    s(L<extensions>)    (L<file name extensions|https://en.wikipedia.org/wiki/List_of_filename_extensions>)gis;
+    s(L<find>)          (L<find|https://en.wikipedia.org/wiki/Find_(Unix)>)gis;
+    s(L<gbStandard>)    (L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>)gis;
+    s(L<grep>)          (L<grep|https://en.wikipedia.org/wiki/Grep>)gis;
+    s(L<gui>)           (L<graphical user interface|https://en.wikipedia.org/wiki/Graphical_user_interface>)gis;
+    s(L<guid>)          (L<guid|https://en.wikipedia.org/wiki/Universally_unique_identifier>)gis;
+    s(L<html table>)    (L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element>)gis;
+    s(L<Imagemagick>)   (L<Imagemagick|https://www.imagemagick.org/script/index.php>)gis;
+    s(L<laser>)         (L<laser|https://en.wikipedia.org/wiki/Laser>)gis;
+    s(L<\$_>)           (L<\$_|http://perldoc.perl.org/perlvar.html#General-Variables>)gis;
+    s(L<lvalueMethod>)  (L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines>)gis;
+    s(L<md5>)           (L<md4 sum|https://en.wikipedia.org/wiki/MD5>)gis;
+    s(L<our>)           (L<our|https://perldoc.perl.org/functions/our.html>)gis;
+    s(L<OxygenFormat)   (L<https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html>)gis;
+    s(L<shell>)         (L<shell|https://en.wikipedia.org/wiki/Shell_(computing)>)gis;
+    s(L<xmllint>)       (L<xmllint|http://xmlsoft.org/xmllint.html>)gis;
+    s(L<Xml parser>)    (L<Xml parser|https://metacpan.org/pod/XML::Parser/>)gis;
+    s(L<unicode>)       (L<Unicode|https://en.wikipedia.org/wiki/Unicode>)gis;
+    s(L<utf8>)          (L<utf8|https://en.wikipedia.org/wiki/UTF-8>)gis;
+    s(L<zeroWidthSpace>)(L<zero width space|https://en.wikipedia.org/wiki/Zero-width_space>)gis;
    }
 
   my $doc = join "\n", @doc;                                                    # Documentation
@@ -3821,7 +3871,10 @@ END
   #say STDERR "Documentation\n$doc", dump(\%examples); return $doc;             # Testing
 
   unless($sourceIsString)                                                       # Update source file
-   {$source =~ s/\n+=head1 Description.+?\n+1;\n+/\n\n$doc\n1;\n/gs;            # Edit module source from =head1 description to final 1;
+   {if (@synopsis)                                                              # Remove existing synopsis if adding a generated one
+     {$source =~ s(=head1 Synopsis.*?(=head1 Description)) ($1)s;
+     }
+    $source =~ s/\n+=head1 Description.+?\n+1;\n+/\n\n$doc\n1;\n/gs;            # Edit module source from =head1 description to final 1;
 
     if ($source ne $Source)                                                     # Save source only if it has changed and came from a file
      {overWriteFile(filePathExt($perlModule, qq(backup)), $source);             # Backup module source
@@ -3866,7 +3919,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA          = qw(Exporter);
 @EXPORT       = qw(formatTable);
-@EXPORT_OK    = qw(
+@EXPORT_OK    = qw(@lll
  absFromAbsPlusRel addCertificate addLValueScalarMethods adopt appendFile
  arrayProduct arraySum arrayTimes arrayToHash asciiToHexString assertPackageRefs
  assertRef awsIp
@@ -3876,7 +3929,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  convertUnicodeToXml copyBinaryFile copyBinaryFileMd5Normalized
  copyBinaryFileMd5NormalizedCreate
  copyBinaryFileMd5NormalizedGetCompanionContent copyFile copyFileMd5Normalized
- copyFileMd5NormalizedCreate copyFileMd5NormalizedDelete
+ copyFileMd5NormalizedCreate copyFileMd5NormalizedName copyFileMd5NormalizedDelete
  copyFileMd5NormalizedGetCompanionContent copyFolder countFileExtensions
  countFileTypes createEmptyFile currentDirectory currentDirectoryAbove
  cutOutImagesInFodtFile
@@ -3919,7 +3972,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  setPartitionOnIntersectionOverUnionOfSetsOfWords
  setPartitionOnIntersectionOverUnionOfStringSets setUnion
  setUnionOfArraysOfStrings squareArray startProcess storeFile stringsAreNotEqual
- subScriptString subScriptStringUndo summarizeColumn superScriptString
+ subScriptString subScriptStringUndo sumAbsAndRel
+ summarizeColumn superScriptString
  superScriptStringUndo swapFilePrefix swapFolderPrefix
  temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
  uniqueNameFromFile updateDocumentation updatePerlModuleDocumentation userId
@@ -9566,7 +9620,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -9615,7 +9669,7 @@ use Test::Harness qw($verbose);
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 533;
+use Test::More tests => 534;
 my $haiku     = $^O =~ m(haiku)i;
 my $windows   = $^O =~ m(MSWin32)i;
 my $mac       = $^O =~ m(darwin)i;
@@ -11358,13 +11412,13 @@ END
 
 if (1) {                                                                        #TnameFromString #TnameFromStringRestrictedToTitle
 ok q(help) eq nameFromString(q(!@#$%^help___<>?><?>));
-ok q(b_The_skyscraper_analogy) eq nameFromString(<<END);
+ok q(bm_The_skyscraper_analogy) eq nameFromString(<<END);
 <bookmap id="b1">
 <title>The skyscraper analogy</title>
 </bookmap>
 END
 
-ok q(b_The_skyscraper_analogy_An_exciting_tale_of_two_skyscrapers_that_meet_in_downtown_Houston)
+ok q(bm_The_skyscraper_analogy_An_exciting_tale_of_two_skyscrapers_that_meet_in_downtown_Houston)
    eq nameFromString(<<END);
 <bookmap id="b1">
 <title>The skyscraper analogy</title>
@@ -11373,7 +11427,7 @@ An exciting tale of two skyscrapers that meet in downtown Houston
 </bookmap>
 END
 
-ok q(b_The_skyscraper_analogy) eq nameFromStringRestrictedToTitle(<<END);
+ok q(bm_The_skyscraper_analogy) eq nameFromStringRestrictedToTitle(<<END);
 <bookmap id="b1">
 <title>The skyscraper analogy</title>
 An exciting tale of two skyscrapers that meet in downtown Houston
@@ -11491,6 +11545,13 @@ function bbb()            //E
  {console.log('bbb');
  }
 END
+ }
+
+if (1) {                                                                        #TcopyFileMd5NormalizedName
+  ok copyFileMd5NormalizedName(<<END, q(txt)) eq
+<p>Hello<b>World</b></p>
+END
+q(Hello_World_6ba23858c1b4811660896c324acac6fa.txt);
  }
 
 #tttt

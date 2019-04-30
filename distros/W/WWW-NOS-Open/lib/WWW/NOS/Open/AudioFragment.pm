@@ -1,5 +1,5 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::NOS::Open::AudioFragment v1.0.2;
+package WWW::NOS::Open::AudioFragment v1.0.3;
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ WWW::NOS::Open::AudioFragment - client side audio fragment.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::AudioFragment version v1.0.2.
+This document describes WWW::NOS::Open::AudioFragment version v1.0.3.
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,19 @@
 use ExtUtils::MakeMaker;
+use vars qw($CONFIG);
+use Config;
+
+my $CC = $Config{ccname};
+my $OS = $Config{osname};
+
+unless (-e '/proc/stat' && -e '/proc/uptime') {
+  print STDERR "Requires /proc filesystem\n";
+  exit 0;
+}
+unless ($OS =~ /linux/) {
+  print STDERR "Only works on LINUX\n";
+  exit 0;
+}
+
 
 my $pkg = 'Proc::Stat';
 $pkg =~ /[^:]+$/;
@@ -13,8 +28,8 @@ my %makeparms = (
     PREREQ_PM		=> {
 			},
 # LIBS list should be a single string to be compatible with script below
-    LIBS		=> '-L/usr/local/lib',
-    INC			=> '-I/usr/local/include',
+#    LIBS		=> '-L/usr/local/lib',
+#    INC			=> '-I/usr/local/include',
     clean		=> { FILES    => "*~ tmp* auto*"},
 #    realclean		=> { FILES    => "config.h config.log config.status"},
     dist		=> {COMPRESS=>'gzip', SUFFIX=>'gz'}

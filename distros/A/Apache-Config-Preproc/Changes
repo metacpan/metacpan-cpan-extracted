@@ -1,3 +1,8 @@
+1.03 2019-04-30
+
+* Handle include statements with directory as argument
+* Fix cyclic inclusion detection on systems with negative device numbers
+
 1.02 2017-12-14
 
 * Fix cyclic inclusion detection

@@ -1,5 +1,7 @@
 ### Configuring and Using SSL with MongoDB
 
+Copyright (c) 2016 by Ashley Willis.
+
 #### Configuring
 
 This assumes you already have an SSL certificate.

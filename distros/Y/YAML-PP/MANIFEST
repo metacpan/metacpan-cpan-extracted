@@ -43,10 +43,15 @@ lib/YAML/PP/Reader.pm
 lib/YAML/PP/Render.pm
 lib/YAML/PP/Representer.pm
 lib/YAML/PP/Schema.pm
+lib/YAML/PP/Schema/Binary.pm
+lib/YAML/PP/Schema/Core.pm
+lib/YAML/PP/Schema/Failsafe.pm
+lib/YAML/PP/Schema/JSON.pm
 lib/YAML/PP/Schema/Perl.pm
 lib/YAML/PP/Schema/Tie/IxHash.pm
 lib/YAML/PP/Schema/YAML1_1.pm
 lib/YAML/PP/Writer.pm
+lib/YAML/PP/Writer/File.pm
 t/00.compile.t
 t/10.parse-valid.t
 t/11.parse-invalid.t
@@ -75,6 +80,9 @@ t/39.emitter-alias.t
 t/40.representers.t
 t/41.custom.schema.t
 t/42.tokens.t
+t/43.indent.t
+t/44.writer.t
+t/45.binary.t
 t/data/simple.yaml
 t/invalid/i032/===
 t/invalid/i032/in.yaml

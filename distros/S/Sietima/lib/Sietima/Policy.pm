@@ -5,7 +5,7 @@ use warnings;
 use feature ':5.24';
 use experimental 'signatures';
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: pragma for Sietima modules
 
 
@@ -33,7 +33,7 @@ Sietima::Policy - pragma for Sietima modules
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

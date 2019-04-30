@@ -3,6 +3,7 @@ abstract: 'Adding Routes to AnyEvent::HTTPD'
 author:
   - 'Martin Barth (ufobat)'
 build_requires:
+  Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,7 +27,7 @@ no_index:
 provides:
   AnyEvent::HTTPD::Router:
     file: lib/AnyEvent/HTTPD/Router.pm
-    version: v1.0.0
+    version: v1.0.1
   AnyEvent::HTTPD::Router::DefaultDispatcher:
     file: lib/AnyEvent/HTTPD/Router/DefaultDispatcher.pm
 requires:
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://github.com/ufobat/p5-AnyEvent-HTTPD-Router/issues
   homepage: https://github.com/ufobat/p5-AnyEvent-HTTPD-Router
   repository: git://github.com/ufobat/p5-AnyEvent-HTTPD-Router.git
-version: 1.0.0
+version: 1.0.1
 x_authority: cpan:UFOBAT
 x_contributors:
   - 'Martin Barth <martin@senfdax.de>'

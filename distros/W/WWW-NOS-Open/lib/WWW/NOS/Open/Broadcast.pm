@@ -1,4 +1,4 @@
-package WWW::NOS::Open::Broadcast v1.0.2; # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::NOS::Open::Broadcast v1.0.3; # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -80,7 +80,7 @@ WWW::NOS::Open::Broadcast - client side broadcasts in the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Broadcast version v1.0.2.
+This document describes WWW::NOS::Open::Broadcast version v1.0.3.
 
 =head1 SYNOPSIS
 

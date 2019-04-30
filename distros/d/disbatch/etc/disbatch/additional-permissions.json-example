@@ -1,0 +1,18 @@
+# This is used by bin/disbatch-create-users to set additional permissions for included roles, via --additional_perms
+# If you have Disbatch::Web load additional routes via config.web_extensions, you may need to add permissions here for 'disbatch_web'.
+# Format is { role_name: {collection_name: array_of_actions, ...}, ... }
+# You can add additional actions for collections, as well as add additional collections.
+# See https://docs.mongodb.org/manual/reference/built-in-roles/ for built-in roles.
+
+# Example for adding route(s) that can update and delete tasks:
+{
+    "disbatch_web": {
+        "tasks": [ "update", "remove" ],
+        # NOTE: for reference these are the default permissions for disbatch_web as of 4.2 (see lib/Disbatch/Roles.pm)
+        #"": [ "find", "listIndexes" ],
+        #"balance": [ "insert", "update" ],
+        #"nodes": [ "update" ],
+        #"queues": [ "insert", "update", "remove" ],
+        #"tasks": [ "insert" ],
+    },
+}

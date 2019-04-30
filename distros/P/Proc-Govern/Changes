@@ -1,3 +1,13 @@
+0.201   2019-04-30 (PERLANCAR)
+
+	- Add options: euid, egid.
+
+	- govproc CLI: Exit when there is error getting command-line options,
+	  for safety (e.g. --euid fails to be honored).
+
+	- [doc][ux] Show all arguments in Synopsis for ease of use.
+
+
 0.200   2018-01-31 (PERLANCAR)
 
 	- Require command to be arrayref, because strings now don't seem to

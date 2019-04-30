@@ -65,7 +65,12 @@ BEGIN {
 # instead of Symbol.pm
 BEGIN {
     sub gensym () {
-        return \do { local *_ };
+        if ($] < 5.006) {
+            return \do { local *_ };
+        }
+        else {
+            return undef;
+        }
     }
 
     sub qualify ($$) {
@@ -2621,7 +2626,7 @@ sub Ebig5hkscs::r(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $r = -r $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($r,@_) : $r;
             }
         }
@@ -2654,7 +2659,7 @@ sub Ebig5hkscs::w(;*@) {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $w = -w $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($w,@_) : $w;
             }
         }
@@ -2687,7 +2692,7 @@ sub Ebig5hkscs::x(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -x $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -2722,7 +2727,7 @@ sub Ebig5hkscs::o(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $o = -o $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($o,@_) : $o;
             }
         }
@@ -2755,7 +2760,7 @@ sub Ebig5hkscs::R(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $R = -R $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($R,@_) : $R;
             }
         }
@@ -2788,7 +2793,7 @@ sub Ebig5hkscs::W(;*@) {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $W = -W $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($W,@_) : $W;
             }
         }
@@ -2821,7 +2826,7 @@ sub Ebig5hkscs::X(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -X $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -2856,7 +2861,7 @@ sub Ebig5hkscs::O(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $O = -O $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($O,@_) : $O;
             }
         }
@@ -2900,7 +2905,7 @@ sub Ebig5hkscs::e(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $e = -e $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($e,@_) : $e;
             }
         }
@@ -2933,7 +2938,7 @@ sub Ebig5hkscs::z(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $z = -z $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($z,@_) : $z;
             }
         }
@@ -2966,7 +2971,7 @@ sub Ebig5hkscs::s(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $s = -s $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($s,@_) : $s;
             }
         }
@@ -2999,7 +3004,7 @@ sub Ebig5hkscs::f(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $f = -f $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($f,@_) : $f;
             }
         }
@@ -3057,7 +3062,7 @@ sub Ebig5hkscs::l(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $l = -l $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($l,@_) : $l;
             }
         }
@@ -3090,7 +3095,7 @@ sub Ebig5hkscs::p(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $p = -p $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($p,@_) : $p;
             }
         }
@@ -3123,7 +3128,7 @@ sub Ebig5hkscs::S(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $S = -S $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($S,@_) : $S;
             }
         }
@@ -3156,7 +3161,7 @@ sub Ebig5hkscs::b(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $b = -b $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($b,@_) : $b;
             }
         }
@@ -3189,7 +3194,7 @@ sub Ebig5hkscs::c(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $c = -c $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($c,@_) : $c;
             }
         }
@@ -3222,7 +3227,7 @@ sub Ebig5hkscs::u(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $u = -u $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($u,@_) : $u;
             }
         }
@@ -3255,7 +3260,7 @@ sub Ebig5hkscs::g(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $g = -g $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return wantarray ? ($g,@_) : $g;
             }
         }
@@ -3367,7 +3372,7 @@ sub Ebig5hkscs::T(;*@) {
             $T = 1;
         }
         my $dummy_for_underline_cache = -T $fh;
-        close $fh;
+        close($fh) or die "Can't close file: $_: $!";
     }
 
     return wantarray ? ($T,@_) : $T;
@@ -3433,7 +3438,7 @@ sub Ebig5hkscs::B(;*@) {
             $B = 1;
         }
         my $dummy_for_underline_cache = -B $fh;
-        close $fh;
+        close($fh) or die "Can't close file: $_: $!";
     }
 
     return wantarray ? ($B,@_) : $B;
@@ -3464,7 +3469,7 @@ sub Ebig5hkscs::M(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $M = ($^T - $mtime) / (24*60*60);
                 return wantarray ? ($M,@_) : $M;
             }
@@ -3498,7 +3503,7 @@ sub Ebig5hkscs::A(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $A = ($^T - $atime) / (24*60*60);
                 return wantarray ? ($A,@_) : $A;
             }
@@ -3532,7 +3537,7 @@ sub Ebig5hkscs::C(;*@) {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $C = ($^T - $ctime) / (24*60*60);
                 return wantarray ? ($C,@_) : $C;
             }
@@ -3575,7 +3580,7 @@ sub Ebig5hkscs::r_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $r = -r $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $r ? 1 : '';
             }
         }
@@ -3642,7 +3647,7 @@ sub Ebig5hkscs::w_() {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $w = -w $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $w ? 1 : '';
             }
         }
@@ -3666,7 +3671,7 @@ sub Ebig5hkscs::x_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -x $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -3692,7 +3697,7 @@ sub Ebig5hkscs::o_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $o = -o $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $o ? 1 : '';
             }
         }
@@ -3716,7 +3721,7 @@ sub Ebig5hkscs::R_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $R = -R $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $R ? 1 : '';
             }
         }
@@ -3740,7 +3745,7 @@ sub Ebig5hkscs::W_() {
             my $fh = gensym();
             if (_open_a($fh, $_)) {
                 my $W = -W $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $W ? 1 : '';
             }
         }
@@ -3764,7 +3769,7 @@ sub Ebig5hkscs::X_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $dummy_for_underline_cache = -X $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
             }
 
             # filename is not .COM .EXE .BAT .CMD
@@ -3790,7 +3795,7 @@ sub Ebig5hkscs::O_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $O = -O $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $O ? 1 : '';
             }
         }
@@ -3814,7 +3819,7 @@ sub Ebig5hkscs::e_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $e = -e $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $e ? 1 : '';
             }
         }
@@ -3838,7 +3843,7 @@ sub Ebig5hkscs::z_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $z = -z $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $z ? 1 : '';
             }
         }
@@ -3862,7 +3867,7 @@ sub Ebig5hkscs::s_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $s = -s $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $s;
             }
         }
@@ -3886,7 +3891,7 @@ sub Ebig5hkscs::f_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $f = -f $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $f ? 1 : '';
             }
         }
@@ -3924,7 +3929,7 @@ sub Ebig5hkscs::l_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $l = -l $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $l ? 1 : '';
             }
         }
@@ -3948,7 +3953,7 @@ sub Ebig5hkscs::p_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $p = -p $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $p ? 1 : '';
             }
         }
@@ -3972,7 +3977,7 @@ sub Ebig5hkscs::S_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $S = -S $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $S ? 1 : '';
             }
         }
@@ -3996,7 +4001,7 @@ sub Ebig5hkscs::b_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $b = -b $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $b ? 1 : '';
             }
         }
@@ -4020,7 +4025,7 @@ sub Ebig5hkscs::c_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $c = -c $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $c ? 1 : '';
             }
         }
@@ -4044,7 +4049,7 @@ sub Ebig5hkscs::u_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $u = -u $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $u ? 1 : '';
             }
         }
@@ -4068,7 +4073,7 @@ sub Ebig5hkscs::g_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my $g = -g $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 return $g ? 1 : '';
             }
         }
@@ -4118,7 +4123,7 @@ sub Ebig5hkscs::T_() {
         $T = 1;
     }
     my $dummy_for_underline_cache = -T $fh;
-    close $fh;
+    close($fh) or die "Can't close file: $_: $!";
 
     return $T;
 }
@@ -4154,7 +4159,7 @@ sub Ebig5hkscs::B_() {
         $B = 1;
     }
     my $dummy_for_underline_cache = -B $fh;
-    close $fh;
+    close($fh) or die "Can't close file: $_: $!";
 
     return $B;
 }
@@ -4175,7 +4180,7 @@ sub Ebig5hkscs::M_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $M = ($^T - $mtime) / (24*60*60);
                 return $M;
             }
@@ -4200,7 +4205,7 @@ sub Ebig5hkscs::A_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $A = ($^T - $atime) / (24*60*60);
                 return $A;
             }
@@ -4225,7 +4230,7 @@ sub Ebig5hkscs::C_() {
             my $fh = gensym();
             if (_open_r($fh, $_)) {
                 my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = CORE::stat $fh;
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
                 my $C = ($^T - $ctime) / (24*60*60);
                 return $C;
             }
@@ -4613,12 +4618,12 @@ sub Ebig5hkscs::lstat(*) {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4639,12 +4644,12 @@ sub Ebig5hkscs::lstat_() {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE; # not CORE::lstat
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4693,12 +4698,12 @@ sub Ebig5hkscs::stat(*) {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4723,12 +4728,12 @@ sub Ebig5hkscs::stat_() {
         if (CORE::open(MUST_BE_BAREWORD_AT_HERE, $_)) {
             if (wantarray) {
                 my @stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return @stat;
             }
             else {
                 my $stat = CORE::stat MUST_BE_BAREWORD_AT_HERE;
-                close MUST_BE_BAREWORD_AT_HERE;
+                close(MUST_BE_BAREWORD_AT_HERE) or die "Can't close file: $_: $!";
                 return $stat;
             }
         }
@@ -4758,7 +4763,7 @@ sub Ebig5hkscs::unlink(@) {
             }
             my $fh = gensym();
             if (_open_r($fh, $_)) {
-                close $fh;
+                close($fh) or die "Can't close file: $_: $!";
 
                 # cmd.exe on Windows NT, Windows 2000, Windows XP, Windows Vista, Windows 7, Windows 8, Windows 8.1, Windows 10 or later
                 if ((defined $ENV{'OS'}) and ($ENV{'OS'} eq 'Windows_NT')) {
@@ -4778,7 +4783,7 @@ sub Ebig5hkscs::unlink(@) {
                 }
 
                 if (_open_r($fh, $_)) {
-                    close $fh;
+                    close($fh) or die "Can't close file: $_: $!";
                 }
                 else {
                     $unlink++;
@@ -5135,7 +5140,7 @@ ITER_DO:
                                 Mac::Files::FSpRstFLock("$realfilename.e");
                             };
                         }
-                        close $fh;
+                        close($fh) or die "Can't close file: $realfilename.e: $!";
                     }
                 }
                 else {
@@ -5164,7 +5169,7 @@ ITER_DO:
                                 Mac::Files::FSpRstFLock($realfilename);
                             };
                         }
-                        close $fh;
+                        close($fh) or die "Can't close file: $realfilename.e: $!";
                     }
 
                     if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
@@ -5196,7 +5201,7 @@ ITER_DO:
                                 Mac::Files::FSpRstFLock("$realfilename.e");
                             };
                         }
-                        close $fh;
+                        close($fh) or die "Can't close file: $realfilename.e: $!";
                     }
                 }
 
@@ -5356,7 +5361,7 @@ ITER_REQUIRE:
                             Mac::Files::FSpRstFLock("$realfilename.e");
                         };
                     }
-                    close($fh) or croak "Can't close file: $realfilename";
+                    close($fh) or croak "Can't close file: $realfilename: $!";
                 }
                 else {
                     my $fh = gensym();
@@ -5384,7 +5389,7 @@ ITER_REQUIRE:
                             Mac::Files::FSpRstFLock($realfilename);
                         };
                     }
-                    close($fh) or croak "Can't close file: $realfilename";
+                    close($fh) or croak "Can't close file: $realfilename: $!";
 
                     if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
                         CORE::require Big5HKSCS;
@@ -5415,7 +5420,7 @@ ITER_REQUIRE:
                                 Mac::Files::FSpRstFLock("$realfilename.e");
                             };
                         }
-                        close($fh) or croak "Can't close file: $realfilename";
+                        close($fh) or croak "Can't close file: $realfilename: $!";
                     }
                 }
 
@@ -11106,7 +11111,7 @@ sub e_use_noimport {
         if (Ebig5hkscs::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
                 return qq<BEGIN { Ebig5hkscs::require '$expr'; }>;
@@ -11132,7 +11137,7 @@ sub e_no_nounimport {
         if (Ebig5hkscs::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
                 return qq<BEGIN { Ebig5hkscs::require '$expr'; }>;
@@ -11158,7 +11163,7 @@ sub e_use_noparam {
         if (Ebig5hkscs::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
 
@@ -11195,7 +11200,7 @@ sub e_no_noparam {
         if (Ebig5hkscs::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
                 return qq[BEGIN { Ebig5hkscs::require '$expr'; $module->unimport() if $module->can('unimport'); }];
@@ -11221,7 +11226,7 @@ sub e_use {
         if (Ebig5hkscs::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
                 return qq[BEGIN { Ebig5hkscs::require '$expr'; $module->import($list) if $module->can('import'); }];
@@ -11247,7 +11252,7 @@ sub e_no {
         if (Ebig5hkscs::_open_r($fh, $realfilename)) {
             local $/ = undef; # slurp mode
             my $script = <$fh>;
-            close($fh) or die __FILE__, ": Can't close file: $realfilename\n";
+            close($fh) or die "Can't close file: $realfilename: $!";
 
             if ($script =~ /^ (?>\s*) use (?>\s+) Big5HKSCS (?>\s*) ([^\x81-\xFE;]*) ; (?>\s*) \n? $/oxms) {
                 return qq[BEGIN { Ebig5hkscs::require '$expr'; $module->unimport($list) if $module->can('unimport'); }];

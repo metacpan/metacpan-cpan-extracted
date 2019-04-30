@@ -1,4 +1,7 @@
-Revision history for App-PlatformInfo
+0.002   2019-04-30 (PERLANCAR)
+
+	- [ux] Set Data::Dumper's Sortkeys to 1 for output consistency.
+
 
 0.001   2016-04-10 (PERLANCAR)
 

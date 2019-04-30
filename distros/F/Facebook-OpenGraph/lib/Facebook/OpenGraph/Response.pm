@@ -46,7 +46,7 @@ sub is_api_version_eq_or_later_than {
     (my $response_major, my $response_minor)
         = $self->api_version =~ m/ (\d+) \. (\d+ )/x;
 
-    return $comp_major <= $response_major && $comp_minor <= $response_minor;
+    return $comp_major < $response_major || ($comp_major == $response_major && $comp_minor <= $response_minor);
 }
 
 sub is_api_version_eq_or_older_than {
@@ -59,7 +59,7 @@ sub is_api_version_eq_or_older_than {
     (my $response_major, my $response_minor)
         = $self->api_version =~ m/ (\d+) \. (\d+ )/x;
 
-    return $response_major <= $comp_major && $response_minor <= $comp_minor;
+    return $response_major < $comp_major || ($response_major == $comp_major && $response_minor <= $comp_minor);
 }
 
 sub header {

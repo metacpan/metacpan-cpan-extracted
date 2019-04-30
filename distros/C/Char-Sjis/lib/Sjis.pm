@@ -49,7 +49,12 @@ BEGIN {
 # instead of Symbol.pm
 BEGIN {
     sub gensym () {
-        return \do { local *_ };
+        if ($] < 5.006) {
+            return \do { local *_ };
+        }
+        else {
+            return undef;
+        }
     }
 }
 
@@ -240,7 +245,7 @@ sub import {
             };
         }
 
-        close($fh) or die __FILE__, ": Can't close file: $filename.e\n";
+        close($fh) or die "Can't close file: $filename.e: $!";
     }
 
     my $fh = gensym();
@@ -393,7 +398,7 @@ sub Sjis::escape_script {
     Esjis::_open_r($fh, $script) or die __FILE__, ": Can't open file: $script\n";
     local $/ = undef; # slurp mode
     $_ = <$fh>;
-    close($fh) or die __FILE__, ": Can't close file: $script\n";
+    close($fh) or die "Can't close file: $script: $!";
 
     if (/^ use Esjis(?:(?>\s+)(?>[0-9\.]*))?(?>\s*); $/oxms) {
         return $_;

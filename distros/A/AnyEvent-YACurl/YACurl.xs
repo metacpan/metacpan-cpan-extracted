@@ -458,7 +458,7 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
             break;
         }
 
-        /* MIME posts are specified as an arrayref of hashes with a 'name' and a 'value' */
+        /* MIME posts are specified as an arrayref of hashes with a 'name' and a 'value' or 'file' */
         case CURLOPT_MIMEPOST:
         {
             if (!SvROK(parameter) || SvTYPE(SvRV(parameter)) != SVt_PVAV) {
@@ -486,20 +486,41 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
                     SV **name_sv = hv_fetchs(entry_hv, "name", FALSE);
                     if (!name_sv)
                         croak("MIMEPOST must be specified as an array of hashrefs "
-                              "containing 'name' and 'value' entries");
+                              "containing at least 'name', and one of 'value' or 'file'");
 
                     curl_mime_name(part, SvPV_nolen(*name_sv));
                 }
 
+                int have_value = 0;
+
                 {
                     SV **value_sv = hv_fetchs(entry_hv, "value", FALSE);
-                    if (!value_sv)
-                        croak("MIMEPOST must be specified as an array of hashrefs "
-                              "containing 'name' and 'value' entries");
+                    if (value_sv && SvOK(*value_sv)) {
+                        if (have_value)
+                            croak("MIMEPOST: at most one of 'value' or 'file' may be provided");
+                        have_value = 1;
 
-                    STRLEN valuelen;
-                    char *value = SvPV(*value_sv, valuelen);
-                    curl_mime_data(part, value, valuelen);
+                        STRLEN valuelen;
+                        char *value = SvPV(*value_sv, valuelen);
+                        curl_mime_data(part, value, valuelen);
+                    }
+                }
+
+                {
+                    SV **file_sv = hv_fetchs(entry_hv, "file", FALSE);
+                    if (file_sv && SvOK(*file_sv)) {
+                        if (have_value)
+                            croak("MIMEPOST: at most one of 'value' or 'file' may be provided");
+                        have_value = 1;
+
+                        STRLEN filelen;
+                        char *filename = SvPV(*file_sv, filelen);
+                        curl_mime_filedata(part, filename);
+                    }
+                }
+
+                if (!have_value) {
+                    croak("MIMEPOST: one of 'value' or 'file' is required, together with 'name'");
                 }
             }
 

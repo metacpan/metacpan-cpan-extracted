@@ -1,0 +1,14 @@
+0.003   2019-04-30 (PERLANCAR)
+
+	- Check valid -euid & -egid values, check that setuid operation
+	  succeeds.
+
+
+0.002   2019-04-30 (PERLANCAR)
+
+	- Add configuration -egid.
+
+
+0.001   2019-04-30 (PERLANCAR)
+
+        - First release.

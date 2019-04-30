@@ -3,24 +3,18 @@
 use strict;
 use warnings;
 
-use IO::All;
+use IO::All qw/ io /;
 
 my ($version) =
-    (map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-    io->file("./lib/Term/Shell.pm")->getlines()
-    )
-    ;
+    ( map { m{\Aversion *= (*[0-9\.]+)\z} ? ($1) : () }
+        io->file("./dist.ini")->getlines() );
 
-if (!defined ($version))
+if ( !defined($version) )
 {
     die "Version is undefined!";
 }
 
-my @cmd = (
-    "git", "tag", "-m",
-    "Tagging Term-Shell as $version",
-    $version,
-);
+my @cmd = ( "git", "tag", "-m", "Tagging Term-Shell as $version", $version, );
 
-print join(" ", map { /\s/ ? qq{"$_"} : $_ } @cmd), "\n";
+print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);

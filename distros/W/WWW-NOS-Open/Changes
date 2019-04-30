@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::NOS::Open.
 
+v1.0.3 Tue Apr 30 13:29:24 UTC 2019
+    - fixed RT#129371 manifest fails on Windows
+
 v1.0.2 Mon Apr 29 07:46:50 UTC 2019
     - fixed RT#129357 manifest fails
 

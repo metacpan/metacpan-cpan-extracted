@@ -1,3 +1,9 @@
+/*
+ * This software is Copyright (c) 2016 by Ashley Willis.
+ * This is free software, licensed under:
+ *   The Apache License, Version 2.0, January 2004
+ */
+
 // gets JSON from a URL, parses it, and sends to callback
 function getOrPostJSON(method, url, callback, data) {
   if (!window.XMLHttpRequest) {
@@ -68,13 +74,12 @@ function reload(grid, data) {
 window.onload = function() {
   EditableGrid.prototype.modelChanged = function(rowIndex, columnIndex, oldValue, newValue, row) {
     //alert('changed ' + rowIndex + ',' + columnIndex + '\n' + 'from: "' + oldValue + '" to "' + newValue + '"\n' + 'id: ' + row.rowId + '\n' + 'field: ' + this.getColumnName(columnIndex));
+    var data = {};
+    data[this.getColumnName(columnIndex)] = newValue;
     if (this.currentTableid == 'nodes') {
-      var data = {};
-      data[this.getColumnName(columnIndex)] = newValue;
       postJSON('/nodes/' + this.getRowAttribute(rowIndex, 'columns')[this.getColumnIndex('node')], data, loadNodes);
     } else {
-      var columnName = this.getColumnName(columnIndex);
-      postJSON('/queues/' + row.rowId, { columnName: newValue}, loadQueues);
+      postJSON('/queues/' + row.rowId, data, loadQueues);
     }
   };
 
@@ -98,6 +103,7 @@ window.onload = function() {
     { name: "id", label: "ID", datatype: "string", editable: false},
     { name: "node", label: "Node", datatype: "string", editable: false},
     { name: "maxthreads", label: "Max Threads", datatype: "integer", editable: true},
+    { name: "timestamp", label: "Timestamp", datatype: "string", editable: false},
   ];
   getJSON('/plugins', function(plugins) {
     queueLayout[1].values = {};
@@ -122,7 +128,17 @@ window.onload = function() {
   var nodesContainerid = 'nodes-table';
   var nodesTableid = 'nodes';
   var loadNodes = function() {
-    getJSON("/nodes", function(data) { load(nodesGrid, nodeLayout, data); render(nodesGrid, nodesContainerid, className, nodesTableid); });
+    //if (new Date(1534782740217+900000) < new Date()) { print("old") }
+    getJSON("/nodes", function(data) {
+      var data2 = [];
+      data.forEach(function (n) {
+        //n.timestamp = new Date(n.timestamp)
+        if (new Date(n.timestamp+900000) >= new Date()) {
+            // within the last 15 minutes
+            data2.push(n);
+        }
+      })
+      console.log(JSON.stringify(data)); load(nodesGrid, nodeLayout, data2); render(nodesGrid, nodesContainerid, className, nodesTableid); });
   }
   loadQueuesAndNodes = function() { loadQueues(); loadNodes(); }	// no var because needed for Refresh button
   newQueue = function() {		// no var because needed for New Queue button

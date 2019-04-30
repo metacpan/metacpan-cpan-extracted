@@ -1,5 +1,5 @@
 package Disbatch::Plugin::Demo;
-$Disbatch::Plugin::Demo::VERSION = '3.990';
+$Disbatch::Plugin::Demo::VERSION = '4.102';
 use 5.12.0;
 use warnings;
 
@@ -140,7 +140,7 @@ sub finish {
     $self->{report}{completed} = time;
     $self->{report}{status} = $self->{status} == 1 ? 'SUCCESS' : 'FAILED',
 
-    $self->{workerthread}->mongo->get_collection('reports')->insert($self->{report}) unless $self->{noreport} // false;
+    $self->{workerthread}->mongo->get_collection('reports')->insert_one($self->{report}) unless $self->{noreport} // false;
 
     {status => $self->{status}, stdout => $self->{stdout}, stderr => $self->{stderr}};
 }
@@ -155,7 +155,7 @@ Disbatch::Plugin::Demo - demo plugin for Disbatch
 
 =head1 VERSION
 
-version 3.990
+version 4.102
 
 =head1 DESCRIPTION
 

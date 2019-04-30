@@ -1,8 +1,8 @@
 package App::PlatformInfo;
 
-our $DATE = '2016-04-10'; # DATE
+our $DATE = '2019-04-30'; # DATE
 our $DIST = 'App-PlatformInfo'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Packed platform-info script
@@ -19,7 +19,7 @@ App::PlatformInfo - Packed platform-info script
 
 =head1 VERSION
 
-This document describes version 0.001 of App::PlatformInfo (from Perl distribution App-PlatformInfo), released on 2016-04-10.
+This document describes version 0.002 of App::PlatformInfo (from Perl distribution App-PlatformInfo), released on 2019-04-30.
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

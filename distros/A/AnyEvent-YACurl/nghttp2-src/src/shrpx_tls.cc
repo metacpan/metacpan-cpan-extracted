@@ -364,11 +364,11 @@ int tls_session_new_cb(SSL *ssl, SSL_SESSION *session) {
 
 namespace {
 SSL_SESSION *tls_session_get_cb(SSL *ssl,
-#if OPENSSL_1_1_API
+#if OPENSSL_1_1_API || LIBRESSL_2_7_API
                                 const unsigned char *id,
-#else  // !OPENSSL_1_1_API
+#else  // !(OPENSSL_1_1_API || LIBRESSL_2_7_API)
                                 unsigned char *id,
-#endif // !OPENSSL_1_1_API
+#endif // !(OPENSSL_1_1_API || LIBRESSL_2_7_API)
                                 int idlen, int *copy) {
   auto conn = static_cast<Connection *>(SSL_get_app_data(ssl));
   auto handler = static_cast<ClientHandler *>(conn->data);
@@ -961,7 +961,8 @@ SSL_CTX *create_ssl_context(const char *private_key_file, const char *cert_file,
   SSL_CTX_set_alpn_select_cb(ssl_ctx, alpn_select_proto_cb, nullptr);
 #endif // OPENSSL_VERSION_NUMBER >= 0x10002000L
 
-#if !LIBRESSL_IN_USE && OPENSSL_VERSION_NUMBER >= 0x10002000L
+#if !LIBRESSL_IN_USE && OPENSSL_VERSION_NUMBER >= 0x10002000L &&               \
+    !defined(OPENSSL_IS_BORINGSSL)
   // SSL_extension_supported(TLSEXT_TYPE_signed_certificate_timestamp)
   // returns 1, which means OpenSSL internally handles it.  But
   // OpenSSL handles signed_certificate_timestamp extension specially,
@@ -992,7 +993,8 @@ SSL_CTX *create_ssl_context(const char *private_key_file, const char *cert_file,
     }
 #  endif // !OPENSSL_1_1_1_API
   }
-#endif // !LIBRESSL_IN_USE && OPENSSL_VERSION_NUMBER >= 0x10002000L
+#endif // !LIBRESSL_IN_USE && OPENSSL_VERSION_NUMBER >= 0x10002000L &&
+       // !defined(OPENSSL_IS_BORINGSSL)
 
 #if OPENSSL_1_1_1_API
   if (SSL_CTX_set_max_early_data(ssl_ctx, tlsconf.max_early_data) != 1) {
@@ -2028,7 +2030,7 @@ StringRef get_x509_issuer_name(BlockAllocator &balloc, X509 *x) {
 #endif /* !WORDS_BIGENDIAN */
 
 StringRef get_x509_serial(BlockAllocator &balloc, X509 *x) {
-#if OPENSSL_1_1_API
+#if OPENSSL_1_1_API && !defined(OPENSSL_IS_BORINGSSL)
   auto sn = X509_get0_serialNumber(x);
   uint64_t r;
   if (ASN1_INTEGER_get_uint64(&r, sn) != 1) {
@@ -2038,7 +2040,7 @@ StringRef get_x509_serial(BlockAllocator &balloc, X509 *x) {
   r = bswap64(r);
   return util::format_hex(
       balloc, StringRef{reinterpret_cast<uint8_t *>(&r), sizeof(r)});
-#else  // !OPENSSL_1_1_API
+#else  // !OPENSSL_1_1_API || OPENSSL_IS_BORINGSSL
   auto sn = X509_get_serialNumber(x);
   auto bn = BN_new();
   auto bn_d = defer(BN_free, bn);
@@ -2068,7 +2070,7 @@ int time_t_from_asn1_time(time_t &t, const ASN1_TIME *at) {
   }
 
   t = nghttp2_timegm(&tm);
-#else  // !OPENSSL_1_1_1_API
+#else // !OPENSSL_1_1_1_API
   auto b = BIO_new(BIO_s_mem());
   if (!b) {
     return -1;
@@ -2081,7 +2083,11 @@ int time_t_from_asn1_time(time_t &t, const ASN1_TIME *at) {
     return -1;
   }
 
+#  if defined(OPENSSL_IS_BORINGSSL)
+  char *s;
+#  else
   unsigned char *s;
+#  endif
   auto slen = BIO_get_mem_data(b, &s);
   auto tt = util::parse_openssl_asn1_time_print(
       StringRef{s, static_cast<size_t>(slen)});
