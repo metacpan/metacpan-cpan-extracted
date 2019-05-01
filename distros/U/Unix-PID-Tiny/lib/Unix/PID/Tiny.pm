@@ -3,7 +3,7 @@ package Unix::PID::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 sub new {
     my ( $self, $args_hr ) = @_;
@@ -263,7 +263,7 @@ sub pid_file_no_unlink {
         goto EXISTS;
     }
 
-    print {$pid_fh} int( abs($newpid) );
+    syswrite( $pid_fh, int( abs($newpid) ) );
 
     if ( $self->{'keep_open'} ) {
         push @{ $self->{'open_handles'} }, $pid_fh;
@@ -298,7 +298,7 @@ footprint
 
 =head1 VERSION
 
-This document describes Unix::PID::Tiny version 0.94.
+This document describes Unix::PID::Tiny version 0.95.
 
 =head1 SYNOPSIS
 

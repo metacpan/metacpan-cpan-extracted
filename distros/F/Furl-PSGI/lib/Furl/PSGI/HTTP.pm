@@ -1,5 +1,5 @@
 package Furl::PSGI::HTTP;
-$Furl::PSGI::HTTP::VERSION = '0.02';
+$Furl::PSGI::HTTP::VERSION = '0.03';
 # ABSTRACT: Furl's low-level interface, wired to PSGI
 
 use warnings;
@@ -14,7 +14,7 @@ use parent 'Furl::HTTP';
 
 sub new {
   my $class = shift;
-  my $self  = $class->next::method(@_);
+  my $self  = $class->SUPER::new(@_);
 
   defined $self->{app}
     or Carp::croak "'app' attribute must be provided";
@@ -86,7 +86,7 @@ Furl::PSGI::HTTP - Furl's low-level interface, wired to PSGI
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

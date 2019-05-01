@@ -1,3 +1,17 @@
+Version 8.115 - 1 May 2019
+
+- library:
+  o fix _rpm_version() when rpm is translated
+  o use proper versionning (RT#127142)
+- testsuite:
+  o make it work with rpm < 4.14.2 again
+- cpan_testers:
+  o add missing spec file
+  o make it work with perl < 5.22.0
+  o skip network tests if we don't have a downloader
+  o update deps
+- translations updates
+
 Version 8.114 - 17 September 2018
 
 - enhanced doc

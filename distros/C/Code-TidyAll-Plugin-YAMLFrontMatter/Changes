@@ -1,7 +1,11 @@
+1.000002 2019-05-01
+
+- Use YAML::PP rather than YAML::XS
+
 1.000001 2017-07-20
 
 - BUGFIX: Handle mutliline YAML Frontmatter correctly
 
 1.000000 2017-07-13
 
-- Intial Release
+- Initial Release

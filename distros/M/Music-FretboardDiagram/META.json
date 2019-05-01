@@ -66,7 +66,7 @@
          "web" : "https://github.com/ology/Music-FretboardDiagram"
       }
    },
-   "version" : "0.1201",
+   "version" : "0.1203",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -456,6 +456,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

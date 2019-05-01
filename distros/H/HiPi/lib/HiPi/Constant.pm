@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -1027,6 +1027,160 @@ my $const = {
         HILINK_CONNSTATUS_CONNECTED      => 901,
         HILINK_CONNSTATUS_DISCONNECTED   => 902,
         HILINK_CONNSTATUS_DISCONNECTING  => 903,
+    },
+    
+    mfrc522 => {
+        ## MIFARE STATUS CODES
+        MFRC522_STATUS_OK                => 1,	#// Success
+		MFRC522_STATUS_ERROR             => 2,	#// Error in communication
+		MFRC522_STATUS_COLLISION         => 3,	#// Collission detected
+		MFRC522_STATUS_TIMEOUT           => 4,	#// Timeout in communication.
+		MFRC522_STATUS_NO_ROOM           => 5,	#// A buffer is not big enough.
+		MFRC522_STATUS_INTERNAL_ERROR    => 6,	#// Internal error in the code. Should not happen ;-)
+		MFRC522_STATUS_INVALID           => 7,	#// Invalid argument.
+		MFRC522_STATUS_CRC_WRONG         => 8,	#// The CRC_A does not match
+        
+        MFRC522_STATUS_UNSUPPORTED_TYPE  => 9,
+        MFRC522_STATUS_BLOCK_NOT_ALLOWED => 10,
+        MFRC522_STATUS_BAD_PARAM         => 11,
+        
+		MFRC522_STATUS_MIFARE_NACK       => 0xff, #// A MIFARE PICC responded with NAK.
+        
+        ## MF522 MFRC522 error codes.
+        MFRC522_ERROR_OK         => 0,         # Everything A-OK.
+        MFRC522_ERROR_NOTAGERR   => 1,         # No tag error
+        MFRC522_ERROR_ERR        => 2,         # General error
+
+        # MF522 Command word
+        MFRC522_IDLE          => 0x00,      # NO action; Cancel the current command
+        MFRC522_MEM           => 0x01,      # Store 25 byte into the internal buffer.
+        MFRC522_GENID         => 0x02,      # Generates a 10 byte random ID number.
+        MFRC522_CALCCRC       => 0x03,      # CRC Calculate or selftest.
+        MFRC522_TRANSMIT      => 0x04,      # Transmit data
+        MFRC522_NOCMDCH       => 0x07,      # No command change.
+        MFRC522_RECEIVE       => 0x08,      # Receive Data
+        MFRC522_TRANSCEIVE    => 0x0C,      # Transmit and receive data,
+        MFRC522_AUTHENT       => 0x0E,      # Authentication Key
+        MFRC522_SOFTRESET     => 0x0F,      # Reset
+
+        # Mifare_One tag command word
+        MIFARE_REQIDL            => 0x26,      # find the antenna area does not enter hibernation
+        MIFARE_REQALL            => 0x52,      # find all the tags antenna area
+        MIFARE_ANTICOLL          => 0x88,      # anti-collision
+        MIFARE_CASCADE           => 0x88,      # cascade tag
+        MIFARE_SELECTTAG         => 0x93,      # selection tag
+        MIFARE_SELECT_CL1        => 0x93,
+        MIFARE_SELECT_CL2        => 0x95,
+        MIFARE_SELECT_CL3        => 0x97,
+        MIFARE_AUTHENT1A         => 0x60,      # authentication key A
+        MIFARE_AUTHENT1B         => 0x61,      # authentication key B
+        MIFARE_READ              => 0x30,      # Read Block
+        MIFARE_WRITE             => 0xA0,      # write block
+        MIFARE_DECREMENT         => 0xC0,      # debit
+        MIFARE_INCREMENT         => 0xC1,      # recharge
+        MIFARE_RESTORE           => 0xC2,      # transfer block data to the buffer
+        MIFARE_TRANSFER          => 0xB0,      # save the data in the buffer
+        MIFARE_HALT              => 0x50,      # Sleep
+
+
+        #------------------ MFRC522 registers---------------
+        #Page 0:Command and Status
+        MFRC522_REG_Reserved00            => 0x00,
+        MFRC522_REG_CommandReg            => 0x01,
+        MFRC522_REG_CommIEnReg            => 0x02,
+        MFRC522_REG_DivIEnReg             => 0x03,
+        MFRC522_REG_CommIrqReg            => 0x04,
+        MFRC522_REG_DivIrqReg             => 0x05,
+        MFRC522_REG_ErrorReg              => 0x06,
+        MFRC522_REG_Status1Reg            => 0x07,
+        MFRC522_REG_Status2Reg            => 0x08,
+        MFRC522_REG_FIFODataReg           => 0x09,
+        MFRC522_REG_FIFOLevelReg          => 0x0A,
+        MFRC522_REG_WaterLevelReg         => 0x0B,
+        MFRC522_REG_ControlReg            => 0x0C,
+        MFRC522_REG_BitFramingReg         => 0x0D,
+        MFRC522_REG_CollReg               => 0x0E,
+        MFRC522_REG_Reserved01            => 0x0F,
+        #Page 1:Command
+        MFRC522_REG_Reserved10            => 0x10,
+        MFRC522_REG_ModeReg               => 0x11,
+        MFRC522_REG_TxModeReg             => 0x12,
+        MFRC522_REG_RxModeReg             => 0x13,
+        MFRC522_REG_TxControlReg          => 0x14,
+        MFRC522_REG_TxAutoReg             => 0x15,
+        MFRC522_REG_TxSelReg              => 0x16,
+        MFRC522_REG_RxSelReg              => 0x17,
+        MFRC522_REG_RxThresholdReg        => 0x18,
+        MFRC522_REG_DemodReg              => 0x19,
+        MFRC522_REG_Reserved11            => 0x1A,
+        MFRC522_REG_Reserved12            => 0x1B,
+        MFRC522_REG_MifareReg             => 0x1C,
+        MFRC522_REG_Reserved13            => 0x1D,
+        MFRC522_REG_Reserved14            => 0x1E,
+        MFRC522_REG_SerialSpeedReg        => 0x1F,
+        #Page 2:CFG
+        MFRC522_REG_Reserved20            => 0x20,
+        MFRC522_REG_CRCResultRegM         => 0x21,
+        MFRC522_REG_CRCResultRegH         => 0x21,
+        MFRC522_REG_CRCResultRegL         => 0x22,
+        MFRC522_REG_Reserved21            => 0x23,
+        MFRC522_REG_ModWidthReg           => 0x24,
+        MFRC522_REG_Reserved22            => 0x25,
+        MFRC522_REG_RFCfgReg              => 0x26,
+        MFRC522_REG_GsNReg                => 0x27,
+        MFRC522_REG_CWGsPReg              => 0x28,
+        MFRC522_REG_ModGsPReg             => 0x29,
+        MFRC522_REG_TModeReg              => 0x2A,
+        MFRC522_REG_TPrescalerReg         => 0x2B,
+        MFRC522_REG_TReloadRegH           => 0x2C,
+        MFRC522_REG_TReloadRegL           => 0x2D,
+        MFRC522_REG_TCounterValueRegH     => 0x2E,
+        MFRC522_REG_TCounterValueRegL     => 0x2F,
+        #Page 3:TestRegister
+        MFRC522_REG_Reserved30            => 0x30,
+        MFRC522_REG_TestSel1Reg           => 0x31,
+        MFRC522_REG_TestSel2Reg           => 0x32,
+        MFRC522_REG_TestPinEnReg          => 0x33,
+        MFRC522_REG_TestPinValueReg       => 0x34,
+        MFRC522_REG_TestBusReg            => 0x35,
+        MFRC522_REG_AutoTestReg           => 0x36,
+        MFRC522_REG_VersionReg            => 0x37,
+        MFRC522_REG_AnalogTestReg         => 0x38,
+        MFRC522_REG_TestDAC1Reg           => 0x39,
+        MFRC522_REG_TestDAC2Reg           => 0x3A,
+        MFRC522_REG_TestADCReg            => 0x3B,
+        MFRC522_REG_Reserved31            => 0x3C,
+        MFRC522_REG_Reserved32            => 0x3D,
+        MFRC522_REG_Reserved33            => 0x3E,
+        MFRC522_REG_Reserved34            => 0x3F,
+        
+        MFRC522_PICC_TYPE_UNKNOWN	        => 0,
+		MFRC522_PICC_TYPE_ISO_14443_4	    => 1,	#// PICC compliant with ISO/IEC 14443-4 
+		MFRC522_PICC_TYPE_ISO_18092         => 2, 	#// PICC compliant with ISO/IEC 18092 (NFC)
+		MFRC522_PICC_TYPE_MIFARE_MINI       => 3,	#// MIFARE Classic protocol, 320 bytes
+		MFRC522_PICC_TYPE_MIFARE_1K         => 4,	#// MIFARE Classic protocol, 1KB
+		MFRC522_PICC_TYPE_MIFARE_4K         => 5,	#// MIFARE Classic protocol, 4KB
+		MFRC522_PICC_TYPE_MIFARE_UL         => 6,	#// MIFARE Ultralight or Ultralight C
+		MFRC522_PICC_TYPE_MIFARE_PLUS       => 7,	#// MIFARE Plus
+		MFRC522_PICC_TYPE_MIFARE_DESFIRE    => 8,	#// MIFARE DESFire
+		MFRC522_PICC_TYPE_TNP3XXX           => 9,	#// Only mentioned in NXP AN 10833 MIFARE Type Identification Procedure
+		MFRC522_PICC_TYPE_NOT_COMPLETE      => 0xff,	#// SAK indicates UID is not complete.
+        
+        MIFARE_MF_ACK					=> 0xA,		#// The MIFARE Classic uses a 4 bit ACK/NAK. Any other value than 0xA is NAK.
+		MIFARE_MF_KEY_SIZE				=> 6,		#// A Mifare Crypto1 key is 6 bytes.
+        
+        MFCR522_RXGAIN_18dB				=> 0x00 << 4,	# // 000b - 18 dB, minimum
+		MFCR522_RXGAIN_23dB				=> 0x01 << 4,	# // 001b - 23 dB
+		MFCR522_RXGAIN_18dB_2			=> 0x02 << 4,	# // 010b - 18 dB, it seems 010b is a duplicate for 000b
+		MFCR522_RXGAIN_23dB_2			=> 0x03 << 4,	# // 011b - 23 dB, it seems 011b is a duplicate for 001b
+		MFCR522_RXGAIN_33dB				=> 0x04 << 4,	# // 100b - 33 dB, average, and typical default
+		MFCR522_RXGAIN_38dB				=> 0x05 << 4,	# // 101b - 38 dB
+		MFCR522_RXGAIN_43dB				=> 0x06 << 4,	# // 110b - 43 dB
+		MFCR522_RXGAIN_48dB				=> 0x07 << 4,	# // 111b - 48 dB, maximum
+		MFCR522_RXGAIN_MIN				=> 0x00 << 4,	# // 000b - 18 dB, minimum, convenience for MFCR522_RXGAIN_18dB
+		MFCR522_RXGAIN_AVG				=> 0x04 << 4,	# // 100b - 33 dB, average, convenience for MFCR522_RXGAIN_33dB
+		MFCR522_RXGAIN_MAX				=> 0x07 << 4	# // 111b - 48 dB, maximum, convenience for MFCR522_RXGAIN_48dB
+        
     },
 };
 

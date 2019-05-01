@@ -4,11 +4,12 @@ use ExtUtils::MakeMaker;
 
 sub MY::postamble
 {
+	return '' unless -d '.git';
 return <<'POST'
 pure_all :: README.md
 
 README.md : lib/$(subst ::,/,$(NAME)).pm
-	pod2markdown < '$<' > '$@.~tmp~' && $(MV) -- '$@.~tmp~' '$@'
+	pod2markdown < $< > $@.tmp && $(MV) $@.tmp $@
 POST
 }
 
@@ -18,11 +19,12 @@ WriteMakefile(
 	VERSION_FROM	  => 'lib/DBIx/Perlish.pm',
 	MIN_PERL_VERSION  => '5.14.1',
 	LICENSE           => 'bsd',
+	EXE_FILES         => ['bin/perlish-parse'],
 	PREREQ_PM         => {
-		'Keyword::Pluggable' => 1.01,
+		'Keyword::Pluggable' => 1.04,
 		'DBI'                => 0,
 		'Devel::Caller'      => 0,
-		'Pod::Markdown'      => 3.1,
+		(-d '.git') ? ('Pod::Markdown'      => 3.1) : (),
 	},
 	META_MERGE        => {
 		resources => {

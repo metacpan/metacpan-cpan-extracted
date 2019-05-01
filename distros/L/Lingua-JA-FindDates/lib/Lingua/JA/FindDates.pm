@@ -13,7 +13,7 @@ our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 # Kanji number conversion table.
 
@@ -127,20 +127,25 @@ my $alpha_era = qr/
                       # string of romaji, do not match it.
                       (?<![A-ZＡ-Ｚ])
                       (?:
-                          [H|Ｈ|S|Ｓ|T|Ｔ|M|Ｍ]
+                          [H|Ｈ|S|Ｓ|T|Ｔ|M|Ｍ|R|Ｒ]
                       )
                   /xi;
 
-# The recent era names (Heisei, Showa, Taisho, Meiji). These eras are
-# sometimes written using the letters H, S, T, and M.
+# The recent era names (Reiwa, Heisei, Showa, Taisho, Meiji). These
+# eras are sometimes written using the letters H, S, T, and
+# M. Speculatively, add R for "Reiwa".
 
-our $jera = qr/($alpha_era|平|昭|大|明|平成|昭和|大正|明治|㍻|㍼|㍽|㍾)/;
+our $jera = qr/($alpha_era|平|昭|大|明|平成|昭和|大正|明治|㍻|㍼|㍽|㍾|令和|令)/;
 
 # A map of Japanese eras to Western dates. These are the starting year
 # of the period minus one, to allow for that the first year is "heisei
 # one" rather than "heisei zero".
 
 our %jera2w = (
+    R    => 2018,
+    Ｈ   => 2018,
+    令和 => 2018,
+    令 => 2018,
     H    => 1988,
     Ｈ   => 1988,
     平成 => 1988,
@@ -922,6 +927,7 @@ sub seireki_to_nengo_make_date
     my ($data, $original, $date) = @_;
     my $year = $date->{year};
     my @eras = (
+        ['令和', 2019, 5, 1],
         ['平成', 1989, 1, 8],
         ['昭和', 1926, 12, 25],
         ['大正', 1912, 7, 30],

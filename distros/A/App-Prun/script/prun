@@ -50,7 +50,7 @@ EXAMPLES
   # of them at a time.
   for F in *.trc; do echo "tkprof \$F \${F%trc}txt"; done | $me -p 32
 
-  # Run all commands in a file (command_file), one line at a time.  Run
+  # Run all commands in a file (command_file), one command per line. Run
   # the default number of processes in parallel ($def_processes).
   # Ignore any failed processes, but do report to STDOUT any that fail.
   $me -r command_file

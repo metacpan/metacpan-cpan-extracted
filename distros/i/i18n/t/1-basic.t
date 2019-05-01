@@ -2,7 +2,7 @@
 
 use strict;
 use FindBin;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use lib "$FindBin::Bin/../lib";
 
 use i18n Path => "$FindBin::Bin/po";
@@ -25,6 +25,11 @@ is(ord(~$test), 139, 'simple negation' | '');
 
 my $test_zh = ~~"test";
 is(~~"This is a $test_zh", '這是個測試', 'nested loc' | '');
+
+{
+    package NotI18N;
+    Test::More::is($test_zh, '測試', 'outside package' | '');
+}
 
 {
     my $i18n_zh = ~~"i18n";

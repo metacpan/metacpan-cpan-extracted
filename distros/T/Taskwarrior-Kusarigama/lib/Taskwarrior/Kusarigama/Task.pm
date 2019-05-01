@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Task;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: per-task Taskwarrior::Kusarigama::Wrapper
-$Taskwarrior::Kusarigama::Task::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Task::VERSION = '0.12.0';
 use strict;
 
 use experimental 'postderef';
@@ -55,7 +55,7 @@ sub data {
 
 sub save {
     my $self = shift;
-    
+
     my $new = $self->{_wrapper}->save($self->data);
 
     %$self = %$new;
@@ -79,7 +79,7 @@ sub AUTOLOAD {
     unshift @_, [] unless 'ARRAY' eq ref $_[0];
 
     use Carp;
-    my $uuid = $self->{uuid} 
+    my $uuid = $self->{uuid}
         or croak "task doesn't have an uuid\n";
 
     push $_[0]->@*, { uuid => $uuid };
@@ -102,7 +102,7 @@ Taskwarrior::Kusarigama::Task - per-task Taskwarrior::Kusarigama::Wrapper
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -130,16 +130,16 @@ an C<uuid> to be acted upon.
 
     my $task = Taskwarrior::Kusarigama::Task->new( $wrapper, \%data );
 
-Constructor. Takes in a raw hashref of the task's 
+Constructor. Takes in a raw hashref of the task's
 attributes as would be give by C<task export>, and
-an optional C<$wrapper>, which is the 
+an optional C<$wrapper>, which is the
 L<Taskwarrior::Kusarigama::Wrapper>
 object to use. The wrapper object can also
-be passed via a C<_wrapper> attribute. 
+be passed via a C<_wrapper> attribute.
 
     # equivalent to the two-argument 'new'
-    my $task = Taskwarrior::Kusarigama::Task->new( 
-        { _wrapper => $wrapper, %data } 
+    my $task = Taskwarrior::Kusarigama::Task->new(
+        { _wrapper => $wrapper, %data }
     );
 
 =head2 clone
@@ -153,7 +153,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

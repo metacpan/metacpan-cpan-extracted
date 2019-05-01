@@ -30,7 +30,7 @@ my $meta = {
                           test      => { requires => { "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => 1.001 },
+                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => 1.002 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -45,7 +45,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 1.001,
+  "version"          => 1.002,
   "x_static_install" => 1,
 };
 

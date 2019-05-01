@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Find::Rule;
+use lib '/Users/gene/sandbox/Lingua-EN-Opinion/lib';
+use Lingua::EN::Opinion;
+use List::Util qw( sum0 );
+use Statistics::Lite qw( mean );
+use IO::Prompt::Tiny qw( prompt );
+
+my $dir    = shift || die "Usage: perl $0 /some/folder/of/text/files [prompt]\n";
+my $prompt = shift || 0;
+
+my @files = File::Find::Rule->file()->name('*.txt')->in($dir);
+
+my $total = 0;
+my $sents = 0;
+my $pos   = 0;
+my $neg   = 0;
+
+for my $file ( sort @files ) {
+    my $opinion = Lingua::EN::Opinion->new( file => $file );
+    $opinion->analyze();
+
+    my $sum = sum0 @{ $opinion->scores };
+
+    $pos++ if $sum > 0;
+    $neg++ if $sum < 0;
+
+    $total += $sum;
+    $sents += scalar @{ $opinion->sentences };
+
+    print "\n", '-' x 50, "\n", "File: $file\n\n";
+    print 'Total sentence score: ', $sum, "\n";
+    print 'Total number of sentences: ', scalar( @{ $opinion->sentences } ), "\n";
+    print 'Average sentence score: ', mean( @{ $opinion->scores } ), "\n";
+
+    if ( $prompt ) {
+        print "\n";
+        my $result = prompt('c to continue; q to quit', 'c');
+        last if $result eq 'q';
+    }
+}
+
+print "\nPositive: $pos, Negative: $neg, Total: $total, Avg: " . ($total / $sents) . "\n";

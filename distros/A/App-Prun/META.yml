@@ -3,32 +3,26 @@ abstract: 'Provides the prun script as a command line interface to L<Parallel::F
 author:
   - 'Jason McCarver <slam@parasite.cc>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Test::More: 0
-  Test::Script: '1.09'
+  Data::Dumper: '0'
+  Parallel::ForkManager: '0'
+  Test::More: '0'
+  Test::Script: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Prun
-no_index:
-  directory:
-    - .hg
-    - inc
-    - t
 requires:
-  File::Spec: 0
-  Getopt::Long: 0
-  Moo: 0
-  Parallel::ForkManager: 0
-  Storable: 0
-  namespace::clean: 0
-resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://bitbucket.org/jmccarv/app-prun
-version: '1.04'
+  Moo: '0'
+  Storable: '0'
+  namespace::clean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '1.08'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

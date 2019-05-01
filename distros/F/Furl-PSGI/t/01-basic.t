@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::V0;
+use Test::More;
 use Furl::PSGI;
 
 my $requests = 0;
@@ -32,7 +32,7 @@ ok $f->get('http://foobaz.net')->is_success,
 is $requests, 6,
   'six requests handled by app now';
 
-subtest "404" => sub {
+subtest "error 404" => sub {
   ok my $res = Furl::PSGI
     ->new(app => sub { [404, ['Content-Type' => 'text/plain'], ['Not found']] })
     ->get('http://foobaz.net/');

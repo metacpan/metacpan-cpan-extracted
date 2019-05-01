@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Core;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Set of core functions interacting with Taskwarrior
-$Taskwarrior::Kusarigama::Core::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Core::VERSION = '0.12.0';
 
 use strict;
 use warnings;
@@ -140,7 +140,7 @@ Taskwarrior::Kusarigama::Core - Set of core functions interacting with Taskwarri
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 DESCRIPTION
 
@@ -237,7 +237,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

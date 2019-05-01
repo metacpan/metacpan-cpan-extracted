@@ -1,5 +1,5 @@
 package App::Gezer;
-$App::Gezer::VERSION = '0.0.2';
+$App::Gezer::VERSION = '0.0.3';
 # ABSTRACT: HTML Postprocessor and frontend to html-minifier
 
 use strict;
@@ -212,6 +212,12 @@ s#\({5}chomp_inc[= ](['"])([^'"]+)\1\){5}#my ($l) = path("lib/$2")->lines_utf8({
                 $cb );
         }
     }
+    foreach my $rec (@raw_filenames)
+    {
+        my $temp_bn = $rec->{temp_bn};
+        $_proc_dir->child($temp_bn)
+            ->spew_raw( $temp_dir->child($temp_bn)->slurp_raw );
+    }
     foreach my $rec ( @filenames, @ad_filenames, @raw_filenames )
     {
         my $d = path("$dest_dir/$rec->{bn}");
@@ -238,7 +244,7 @@ App::Gezer - HTML Postprocessor and frontend to html-minifier
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =begin removed
 
@@ -250,6 +256,14 @@ s#\s*(</?(?:body|(?:br /)|div|head|li|ol|p|title|ul)>)\s*#$1#gms;
                 $text =~ s#\s+\z##ms;
 
 =end removed
+
+=head1 NAME
+
+App::Gezer - HTML Postprocessor and frontend to html-minifier .
+
+=head1 VERSION
+
+version 0.0.3
 
 =head1 METHODS
 

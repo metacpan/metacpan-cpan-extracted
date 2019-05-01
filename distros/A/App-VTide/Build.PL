@@ -24,6 +24,9 @@ my $builder = Module::Build->new(
         'version'             => '0.9909',
         'YAML::Syck'          => '1.29',
     },
+    recommends => {
+        'Term::Title' => 0.
+    },
     configure_requires => {
         'Module::Build' => 0.38,
     },

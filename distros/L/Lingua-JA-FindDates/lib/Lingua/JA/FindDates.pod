@@ -26,7 +26,7 @@ produces output
     blah blah blah March 16
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/synopsis.pl> in the distribution.)
 
 
     
@@ -50,7 +50,7 @@ produces output
     '三月１６日' was replaced by 'March 16'.
 
 
-(This example is included as L<F<synopsis-replace.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis-replace.pl> in the distribution.)
+(This example is included as L<F<synopsis-replace.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/synopsis-replace.pl> in the distribution.)
 
 
     
@@ -74,7 +74,7 @@ produces output
     3/16
 
 
-(This example is included as L<F<synopsis-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis-make-date.pl> in the distribution.)
+(This example is included as L<F<synopsis-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/synopsis-make-date.pl> in the distribution.)
 
 
     
@@ -89,13 +89,13 @@ produces output
     昭和64年1月1日
 
 
-(This example is included as L<F<synopsis-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis-nengo.pl> in the distribution.)
+(This example is included as L<F<synopsis-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/synopsis-nengo.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::JA::FindDates version 0.028
-corresponding to git commit L<21926e6dc89996f842a306c39d7a7f0b7554fab4|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/21926e6dc89996f842a306c39d7a7f0b7554fab4> released on Mon Nov 19 12:24:41 2018 +0900.
+This documents Lingua::JA::FindDates version 0.029
+corresponding to git commit L<2b26b4468108dd021c541a311ab964d8079b1af3|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/2b26b4468108dd021c541a311ab964d8079b1af3> released on Wed May 1 19:18:01 2019 +0900.
 
 =head1 DESCRIPTION
 
@@ -192,7 +192,7 @@ produces output
     Sa 1959/1/17。Sa 1997/12/20。
 
 
-(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/subsjdate-make-date.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/subsjdate-make-date.pl> in the distribution.)
 
 
 The first two arguments passed to your routine will be whatever you
@@ -245,7 +245,7 @@ produces output
     1959/1/17 until 12/20。
 
 
-(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/subsjdate-make-interval.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/subsjdate-make-interval.pl> in the distribution.)
 
 
 =item replace
@@ -287,7 +287,7 @@ produces output
 
     昭和64年1月1日
 
-(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/seireki-to-nengo.pl> in the distribution.)
+(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/seireki-to-nengo.pl> in the distribution.)
 
 
 This function substitutes Western-style dates with Japanese-style
@@ -306,7 +306,7 @@ produces output
 
     1989年1月1日
 
-(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/nengo-to-seireki.pl> in the distribution.)
+(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/nengo-to-seireki.pl> in the distribution.)
 
 
 This function substitutes Japanese-style "nengo" dates (年号) with
@@ -358,7 +358,7 @@ produces output
     Monday, March 19, 2012
 
 
-(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/make-date.pl> in the distribution.)
+(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/make-date.pl> in the distribution.)
 
 
 To replace the default routine C<default_make_date> with a different
@@ -380,7 +380,7 @@ produces output
 
     3/16
 
-(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/my-date.pl> in the distribution.)
+(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/my-date.pl> in the distribution.)
 
 
 Note that, depending on what dates are in your document, some of the
@@ -415,7 +415,7 @@ produces output
     Friday 19 February, 2010-Monday 19 March, 2012
 
 
-(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/default-make-date-interval.pl> in the distribution.)
+(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.029/examples/default-make-date-interval.pl> in the distribution.)
 
 
 This function is called when an interval of two dates, such as 平成３年
@@ -647,7 +647,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2018
+2008-2019
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

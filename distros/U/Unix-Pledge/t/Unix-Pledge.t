@@ -8,10 +8,11 @@
 use strict;
 use warnings;
 
+use BSD::Resource qw(RLIMIT_CORE setrlimit);
 use File::Temp;
 use IO::Socket;
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 BEGIN { use_ok('Unix::Pledge') };
 
 my $TESTS = {
@@ -78,31 +79,49 @@ my $TESTS = {
             );
         }
     },
-# Disabled this test since pledge(2) will not initially support
-# whitelists in OpenBSD 5.9
-#
-#    "Whitelist file" => {
-#        aborts => 0,
-#        run => sub {
-#            use File::Temp;
-#            my ($fh, $filename) = File::Temp::tempfile();
-#
-#            pledge("stdio rpath", ["$filename-to-some-other-file"]);
-#
-#            # File not found though it's there
-#            open(my $fh2, "<", $filename) or return;
-#            exit 1;
-#        },
-#    },
+    "Blacklist file" => {
+        aborts => 1,
+        run => sub {
+            use File::Temp;
+            my $parent = File::Temp::tempdir(CLEANUP => 0); # would break veil
+            mkdir "$parent/bad";
+            mkdir "$parent/good";
+            my (undef, $bad)  = File::Temp::tempfile('X'x10, DIR => "$parent/bad");
+            my (undef, $good) = File::Temp::tempfile('X'x10, DIR => "$parent/good");
+
+            unveil("$parent/good", 'r');
+            unveil;
+
+            open(my $fh1, '<', $bad) and return;
+            exit 1;
+        },
+    },
+    "Whitelist file" => {
+        aborts => 0,
+        run => sub {
+            use File::Temp;
+            my $parent = File::Temp::tempdir(CLEANUP => 0); # would break veil
+            my (undef, $file) = File::Temp::tempfile('X'x10, DIR => $parent);
+
+            unveil($parent, 'r');
+            unveil;
+
+            open(my $fh1, '<', $file) and return;
+            exit 1;
+        },
+    },
 };
 
-
-while (my ($name, $test) = each %$TESTS) {
-    if (fork) {
+for (sort keys %$TESTS) {
+    my ($name, $test) = ($_, $TESTS->{$_});
+    my $pid = fork;
+    die "fork: $!" unless defined $pid;
+    if ($pid) {
         wait;
         ok($test->{aborts} ? $? != 0 : $? == 0, $name);
     }
     else {
+        setrlimit(RLIMIT_CORE, 0, 0); # No core dumps from SIGABRT
         $test->{run}();
         exit 0;
     }

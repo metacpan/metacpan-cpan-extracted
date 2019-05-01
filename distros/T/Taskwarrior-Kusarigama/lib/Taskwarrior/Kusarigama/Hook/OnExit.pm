@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnExit;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins running during the exit stage
-$Taskwarrior::Kusarigama::Hook::OnExit::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Hook::OnExit::VERSION = '0.12.0';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Taskwarrior::Kusarigama::Hook::OnExit - Role for plugins running during the exit
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ version 0.11.0
 =head1 DESCRIPTION
 
 Role consumed by plugins running during the exit stage of
-the Taskwarrior hook lifecycle. 
+the Taskwarrior hook lifecycle.
 
 Requires that a C<on_exit> is implemented.
 
@@ -64,7 +64,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

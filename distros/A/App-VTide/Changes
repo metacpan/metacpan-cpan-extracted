@@ -1,5 +1,9 @@
 Revision history for App-VTide
 
+0.1.10   2019-04-30
+        Updating for release of version 0.1.10
+        Adding missing recommends section (Ivan Wills)
+
 0.1.9   2019-04-02
         Updating for release of version 0.1.9
         Split passing the title or name to pass both to stop code confusion (Ivan Wills)

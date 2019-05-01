@@ -3,7 +3,7 @@ abstract: 'PostgreSQL support for Database::Async'
 author:
   - 'Tom Molesworth <TEAM@cpan.org>'
 build_requires:
-  Database::Async: '0.004'
+  Database::Async: '0.005'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Async::Loop: '0'
@@ -37,12 +37,12 @@ no_index:
 provides:
   Database::Async::Engine::PostgreSQL:
     file: lib/Database/Async/Engine/PostgreSQL.pm
-    version: '0.003'
+    version: '0.004'
   Database::Async::Engine::PostgreSQL::DDL:
     file: lib/Database/Async/Engine/PostgreSQL/DDL.pm
-    version: '0.003'
+    version: '0.004'
 requires:
-  Database::Async: '0.004'
+  Database::Async: '0.005'
   Database::Async::Engine: '0'
   Database::Async::Query: '0'
   Future: '0.38'
@@ -65,7 +65,11 @@ requires:
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.003'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues
+  homepage: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL
+  repository: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git
+version: '0.004'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom M <tom@audioboundary.com>'

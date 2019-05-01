@@ -1,4 +1,8 @@
-0.02 2019-04-29T04:26:28
+0.03 2019-05-01T07:18:41
+ - 5.8 compat: use SUPER over next::method, allow for old Test::More
+   (Meredith Howard)
+
+0.02 2019-04-29T04:26:28Z
  - add simple repeat request test (Meredith Howard)
  - 5.8 compat: no defined-or (Meredith Howard)
 

@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::ProjectDefaults;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: assign project-level defaults when creating tasks
-$Taskwarrior::Kusarigama::Plugin::ProjectDefaults::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Plugin::ProjectDefaults::VERSION = '0.12.0';
 
 use 5.10.0;
 use strict;
@@ -60,7 +60,7 @@ Taskwarrior::Kusarigama::Plugin::ProjectDefaults - assign project-level defaults
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

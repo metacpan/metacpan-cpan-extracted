@@ -17,7 +17,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( ) );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 use constant {
     POWER_OFF                                  => 0x02,

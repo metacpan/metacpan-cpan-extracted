@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Progress;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Record progress on a task
-$Taskwarrior::Kusarigama::Plugin::Command::Progress::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Plugin::Command::Progress::VERSION = '0.12.0';
 
 use strict;
 use warnings;
@@ -83,8 +83,8 @@ sub on_command {
     for my $task ( @tasks ) {
         my $save = !$1;
 
-        my $progress = !$save ? $task->{progress} 
-                     : $2     ? $3 
+        my $progress = !$save ? $task->{progress}
+                     : $2     ? $3
                      :          ($3||1) + $task->{progress};
 
         my $goal = $task->{goal};
@@ -113,12 +113,12 @@ sub on_command {
                 my @stats;
 
                 if( my $so_far = eval { $progress /  ($span-$now) } ) {
-                    push @stats, sprintf "rate so far: %s", 
+                    push @stats, sprintf "rate so far: %s",
                         $self->formatted_rate($so_far);
                 }
 
                 if( my $needed = eval { ($task->{goal} - $progress) / $now } ) {
-                    push @stats, sprintf "rate needed: %s", 
+                    push @stats, sprintf "rate needed: %s",
                         $self->formatted_rate($needed);
                 }
 
@@ -144,7 +144,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Progress - Record progress on a task
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -152,13 +152,13 @@ version 0.11.0
 
     ... later on ...
 
-    $ task 'read ten books' progress 
+    $ task 'read ten books' progress
 
 =head1 DESCRIPTION
 
 Tasks get two new UDAs: C<goal>, which sets a
-numeric goal to reach, and C<progress>, which is 
-the current state of progress. 
+numeric goal to reach, and C<progress>, which is
+the current state of progress.
 
 Progress can be updated or asked via the C<progress> command.
 
@@ -199,7 +199,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

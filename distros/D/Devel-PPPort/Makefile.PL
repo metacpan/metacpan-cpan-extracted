@@ -34,28 +34,13 @@ my %mf = (
   OBJECT        => 'RealPPPort$(OBJ_EXT) $(O_FILES)',
   XSPROTOARG    => '-noprototypes',
   CONFIGURE     => \&configure,
-  META_MERGE    => {
-    'meta-spec' => {
-      version => 2,
-    },
-    resources => {
-      bugtracker => {
-        web => 'https://rt.perl.org/rt3/',
-      },
-      repository => {
-        type => 'git',
-        url  => 'git://perl5.git.perl.org/perl.git',
-        web  => 'https://perl5.git.perl.org/perl.git',
-      },
-    },
-  },
 );
 delete $mf{META_MERGE} unless eval { ExtUtils::MakeMaker->VERSION (6.46) };
 WriteMakefile(%mf);
 
 sub configure
 {
-  my @clean    = qw{ $(H_FILES) RealPPPort.xs RealPPPort.c };
+  my @clean    = qw{ $(H_FILES) RealPPPort.xs RealPPPort.c PPPort.pm };
   my %depend   = ('$(OBJECT)' => '$(H_FILES)');
   my @C_FILES  = qw{ module2.c module3.c },
   my %PL_FILES = (
@@ -67,9 +52,7 @@ sub configure
 
   if (eval $ExtUtils::MakeMaker::VERSION >= 6) {
     push @moreopts, AUTHOR => 'Marcus Holland-Moritz <mhx@cpan.org>';
-    if (-f 'PPPort.pm') {
-      push @moreopts, ABSTRACT_FROM => 'PPPort.pm';
-    }
+    push @moreopts, ABSTRACT_FROM => 'PPPort_pm.PL';
   }
 
   if (eval $ExtUtils::MakeMaker::VERSION >= 6.30_01) {
@@ -77,11 +60,7 @@ sub configure
     push @moreopts, LICENSE => 'perl';
   }
 
-  if ($ENV{'PERL_CORE'}) {
-    # Pods will be built by installman.
-    push @clean, 'PPPort.pm';
-  }
-  else {
+  if (not $ENV{'PERL_CORE'}) {
     # Devel::PPPort is in the core since 5.7.3
     # 5.11.0+ has site before perl
     push @moreopts, INSTALLDIRS => (
@@ -98,12 +77,39 @@ sub configure
     $depend{'apicheck.i'} = 'ppport.h';
   }
 
+  open my $fh, '<', 'PPPort_pm.PL' or die "cannot open PPPort_pm.PL for reading: $!";
+  my $version;
+  while (my $line = <$fh>) {
+    ($version) = $line =~ /^\$VERSION = '([\d.]+)';$/ and last;
+  };
+  die 'failed to extract $VERSION from PPPort_pm.PL' if not $version;
+  close $fh;
+
   return {
     C        => \@C_FILES,
     XS       => { 'RealPPPort.xs' => 'RealPPPort.c' },
     PL_FILES => \%PL_FILES,
     depend   => \%depend,
     clean    => { FILES => "@clean" },
+    META_MERGE    => {
+      'meta-spec' => { version => 2 },
+      provides => {
+        'Devel::PPPort' => {
+          file    => 'PPPort_pm.PL',
+          version => $version,
+        },
+      },
+      resources => {
+        bugtracker => {
+          web => 'https://rt.perl.org/rt3/',
+        },
+        repository => {
+          type => 'git',
+          url  => 'git://perl5.git.perl.org/perl.git',
+          web  => 'https://perl5.git.perl.org/perl.git',
+        },
+      },
+    },
     @moreopts,
   };
 }

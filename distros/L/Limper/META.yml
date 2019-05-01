@@ -15,20 +15,20 @@ name: Limper
 provides:
   Limper:
     file: lib/Limper.pm
-    version: '0.014'
+    version: '0.015'
   Limper::Engine:
     file: lib/Limper/Engine.pm
-    version: '0.014'
+    version: '0.015'
   Limper::Passphrase:
     file: lib/Limper/Passphrase.pm
-    version: '0.014'
+    version: '0.015'
   Limper::Plugin:
     file: lib/Limper/Plugin.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Exporter: '0'
   IO::Socket: '0'
   perl: v5.10.0
   strict: '0'
   warnings: '0'
-version: '0.014'
+version: '0.015'

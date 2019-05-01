@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.022
+This document describes Attean::API::Model version 0.023
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,12 @@ Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects that are
 members of the rdf:List with the specified C<< $head >> (and matching
 restricted to only the specified C<< $graph >>).
 
+To check if a certain term is a list, the C<holds> method may be used, for example:
+
+  $model->holds($head, iri('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'), undef, $graph))
+
+will return true if a given term C<$head> is a list.
+
 =item C<< get_sequence( $graph, $head ) >>
 
 Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects that are
@@ -139,7 +145,7 @@ result of an ASK query over the supplied algebra.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.022 {
+package Attean::API::Model 0.023 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -302,7 +308,7 @@ package Attean::API::Model 0.022 {
 }
 
 
-package Attean::API::MutableModel 0.022 {
+package Attean::API::MutableModel 0.023 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -394,21 +400,21 @@ package Attean::API::MutableModel 0.022 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.022 {
+package Attean::API::ETagCacheableModel 0.023 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.022 {
+package Attean::API::TimeCacheableModel 0.023 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.022 {
+package Attean::API::BulkUpdatableModel 0.023 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';

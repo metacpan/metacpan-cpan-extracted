@@ -14,7 +14,12 @@ int main() {
 EOC
 ;
 
-system("echo '$PLEDGE_CHECK' | cc -x c - > /dev/null 2>&1");
+my $aout = `mktemp`;
+system("echo '$PLEDGE_CHECK' | cc -x c - -o \"$aout\" > /dev/null 2>&1");
+{
+    local $?;
+    unlink $aout;
+}
 die "ERROR: unable to find pledge, platform not supported" if $?;
 
 WriteMakefile(
@@ -31,5 +36,8 @@ WriteMakefile(
             repository => 'git://github.com/rfarr/Unix-Pledge.git',
             bugtracker => 'https://github.com/rfarr/Unix-Pledge/issues',
         },
+    },
+    TEST_REQUIRES => {
+        'BSD::Resource' => '1',
     },
 );

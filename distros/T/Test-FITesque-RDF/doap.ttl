@@ -6,6 +6,7 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix types: <http://rdfs.org/sioc/types#> .
 @prefix wot:   <http://xmlns.com/wot/0.1/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
@@ -13,7 +14,9 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.022_01"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [
+		doap-deps:on "RDF::NS::Curated 1.002"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.023"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
 		doap-deps:on "URI::NamespaceMap 1.08"^^doap-deps:CpanId;
 	];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [ doap-deps:on "Test::Deep"^^doap-deps:CpanId ], [ doap-deps:on "FindBin"^^doap-deps:CpanId ];
@@ -27,14 +30,15 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Test-FITesque-RDF";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-test-fitesque-rdf>;
 		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-test-fitesque-rdf&serialization=PROV-O#>;
 	];
 	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
-	doap:shortdesc       "Formulate Test::FITesque fixture tables in RDF".
+	doap:shortdesc       "Formulate Test::FITesque fixture tables in RDF";
+	doap:support-forum   <irc://irc.perl.org/#perlrdf>.
 
 <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>
 	a                    doap:Version;
@@ -44,6 +48,24 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Minor tweaks";
+	dc:identifier        "Test-FITesque-RDF-0.002"^^xsd:string;
+	dc:issued            "2019-04-30"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Add more dependencies";
+	dc:identifier        "Test-FITesque-RDF-0.003"^^xsd:string;
+	dc:issued            "2019-04-30"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
@@ -70,6 +92,10 @@
 	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
 	wot:hasKey           _:B1.
+
+<irc://irc.perl.org/#perlrdf>
+	a                    types:ChatChannel;
+	dc:title             "The Perl and RDF IRC channel"@en.
 
 _:B1
 	a                    wot:PubKey;

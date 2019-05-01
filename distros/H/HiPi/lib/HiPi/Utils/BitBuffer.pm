@@ -15,7 +15,7 @@ use warnings;
 use Bit::Vector;
 use parent qw( HiPi::Class );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 __PACKAGE__->create_accessors ( qw( buffer y_buffer width height autoresize ) );
 

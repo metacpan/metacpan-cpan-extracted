@@ -1,6 +1,9 @@
 # $Id$
 package t::test_utils;
+
 package main;
+
+our %flags;
 
 sub format_value { $_[0] }
 
@@ -8,7 +11,7 @@ sub test_sql
 {
 	my ($dbop, $sub, $tname, $exp_sql, $exp_v, $exp_kf) = @_;
 	my @kf;
-	my ($sql, $v) = DBIx::Perlish::gen_sql($sub, $dbop, flavor => $main::flavor || 'pg', key_fields => \@kf);
+	my ($sql, $v) = DBIx::Perlish::gen_sql($sub, $dbop, flavor => $main::flavor || 'pg', key_fields => \@kf, %main::flags);
 	if ($dbop eq "update" && ref($exp_sql)) {
 		$exp_kf = $exp_v;
 		my $ok = 0;

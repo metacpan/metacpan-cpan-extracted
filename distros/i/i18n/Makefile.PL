@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
+use lib '.';
 use inc::Module::Install;
 
 name     'i18n';
@@ -13,4 +14,4 @@ requires 'Locale::Maketext::Simple';
 
 auto_provides;
 
-sign; WriteAll;
+WriteAll;

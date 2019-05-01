@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Measure the emotional sentiment of text
 
-our $VERSION = '0.1300';
+our $VERSION = '0.1301';
 
 use Moo;
 use strictures 2;
@@ -82,39 +82,24 @@ has nrc_scores => (
 
 
 has positive => (
-    is       => 'rw',
+    is       => 'ro',
     init_arg => undef,
-    lazy     => 1,
-    builder  => 1,
+    default  => sub { Lingua::EN::Opinion::Positive->new },
 );
-
-sub _build_positive {
-    return Lingua::EN::Opinion::Positive->new;
-}
 
 
 has negative => (
-    is       => 'rw',
+    is       => 'ro',
     init_arg => undef,
-    lazy     => 1,
-    builder  => 1,
+    default  => sub { Lingua::EN::Opinion::Negative->new },
 );
-
-sub _build_negative {
-    return Lingua::EN::Opinion::Negative->new;
-}
 
 
 has emotion => (
-    is       => 'rw',
+    is       => 'ro',
     init_arg => undef,
-    lazy     => 1,
-    builder  => 1,
+    default  => sub { Lingua::EN::Opinion::Emotion->new },
 );
-
-sub _build_emotion {
-    return Lingua::EN::Opinion::Emotion->new;
-}
 
 
 sub analyze {
@@ -293,26 +278,31 @@ Lingua::EN::Opinion - Measure the emotional sentiment of text
 
 =head1 VERSION
 
-version 0.1300
+version 0.1301
 
 =head1 SYNOPSIS
 
   use Lingua::EN::Opinion;
+
   my $opinion = Lingua::EN::Opinion->new( file => '/some/file.txt', stem => 1 );
   $opinion->analyze();
+  # Do something with $opinion->scores...
   my $score = $opinion->averaged_score(5);
   my $sentiment = $opinion->get_word('foo');
   $sentiment = $opinion->get_sentence('Mary had a little lamb.');
-  # OR
+
+  # Also:
   $opinion = Lingua::EN::Opinion->new( text => 'Mary had a little lamb...' );
   $opinion->nrc_sentiment();
-  # And now do something cool with $opinion->nrc_scores...
+  # Do something with $opinion->nrc_scores...
   $sentiment = $opinion->nrc_get_word('foo');
   $sentiment = $opinion->nrc_get_sentence('Mary had a little lamb.');
 
 =head1 DESCRIPTION
 
-A C<Lingua::EN::Opinion> object measures the emotional sentiment of text.
+A C<Lingua::EN::Opinion> object measures the emotional sentiment of
+text and saves the results in the B<scores> and B<nrc_scores>
+attributes.
 
 Please see the F<eg/> and F<t/> scripts for example usage.
 

@@ -152,6 +152,7 @@ t/data/SPECS/failing-scriptlets/postun.spec
 t/data/SPECS/failing-scriptlets/pre.spec
 t/data/SPECS/failing-scriptlets/pretrans.spec
 t/data/SPECS/failing-scriptlets/preun.spec
+t/data/SPECS/failing-scriptlets/sh.spec
 t/data/SPECS/failing-scriptlets/triggerin-1.spec
 t/data/SPECS/failing-scriptlets/triggerin-2.spec
 t/data/SPECS/failing-scriptlets/triggerpostun-1.spec

@@ -39,7 +39,7 @@ our $VERSION = '0.0.0';
 
 Initiates the backend object.
 
-    my $backend = Device::RAID::Poller::Backends::FBSD_graid3->new;
+    my $backend = Device::RAID::Poller::Backends::FBSD_graid->new;
 
 =cut
 
@@ -78,7 +78,7 @@ sub run {
 	}
 
 	# Fetch the raw gmirror status.
-	my $raw=`/sbin/graid3 status`;
+	my $raw=`/sbin/graid status`;
 	if ( $? != 0 ){
 		return %return_hash;
 	}
@@ -178,7 +178,7 @@ sub usable {
 	my $self=$_[0];
 
 	if (
-		( $^O !~ 'freebsd' ) ||
+		( $^O !~ 'freebsd' ) &&
 		( ! -x '/sbin/graid' )
 		){
 		$self->{usable}=0;

@@ -9,7 +9,6 @@ META.yml
 README
 bin/gezer
 dist.ini
-inc/Test/Run/Builder.pm
 lib/App/Gezer.pm
 t/00-compile.t
 weaver.ini

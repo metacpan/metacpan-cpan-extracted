@@ -28,14 +28,17 @@ lib/Taskwarrior/Kusarigama/Hook/OnExit.pm
 lib/Taskwarrior/Kusarigama/Hook/OnLaunch.pm
 lib/Taskwarrior/Kusarigama/Hook/OnModify.pm
 lib/Taskwarrior/Kusarigama/Plugin.pm
+lib/Taskwarrior/Kusarigama/Plugin/Blocks.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/AndAfter.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/ButBefore.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/Github.pm
+lib/Taskwarrior/Kusarigama/Plugin/Command/Mikado.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/Morning.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/Open.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/Progress.pm
 lib/Taskwarrior/Kusarigama/Plugin/Command/Wait.pm
 lib/Taskwarrior/Kusarigama/Plugin/GitCommit.pm
+lib/Taskwarrior/Kusarigama/Plugin/Morning.pm
 lib/Taskwarrior/Kusarigama/Plugin/ProjectAlias.pm
 lib/Taskwarrior/Kusarigama/Plugin/ProjectDefaults.pm
 lib/Taskwarrior/Kusarigama/Plugin/Renew.pm

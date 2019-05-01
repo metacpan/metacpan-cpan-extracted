@@ -10,11 +10,11 @@ Device::RAID::Poller::Backends::ZFS - ZFS zpool backend.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 
 =head1 SYNOPSIS
@@ -214,7 +214,7 @@ sub usable {
 	# If this is FreeBSD, make sure ZFS is laoded.
 	# If we don't do this, the pool test will result in
 	# it being loaded, which we don't want to do.
-	if ( $^O !~ 'freebsd' ){
+	if ( $^O =~ /freebsd/ ){
 		# Test for this via this method as 'kldstat -q -n zfs' will error if it is compiled in
 		system('/sbin/sysctl -q kstat.zfs.misc.arcstats.hits > /dev/null');
 		if ( $? != 0 ){

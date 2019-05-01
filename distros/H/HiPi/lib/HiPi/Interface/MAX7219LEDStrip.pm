@@ -19,7 +19,7 @@ use HiPi::Graphics::Font5x7 qw( :font );
 use Try::Tiny;
 use Carp;
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 __PACKAGE__->create_ro_accessors( qw( segments pixel_width pixel_height reverse_map ) );
 

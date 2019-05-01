@@ -2,7 +2,7 @@ NAME
     i18n - Perl Internationalization Pragma
 
 VERSION
-    This document describes version 0.10 of i18n, released October 14, 2007.
+    This document describes version 0.13 of i18n, released May 1, 2019.
 
 SYNOPSIS
     In one-liners:
@@ -87,8 +87,8 @@ AUTHORS
     Audrey Tang <cpan@audreyt.org>, Ingy döt Net <INGY@cpan.org>.
 
 COPYRIGHT
-    Copyright 2004, 2005, 2006, 2007 by Audrey Tang <cpan@audreyt.org>, Ingy
-    döt Net <INGY@cpan.org>.
+    Copyright 2004, 2005, 2006, 2007, 2019 by Audrey Tang <cpan@audreyt.org>,
+    Ingy döt Net <INGY@cpan.org>.
 
     This software is released under the MIT license cited below.
 

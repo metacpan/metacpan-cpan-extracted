@@ -15,7 +15,7 @@ use parent qw( HiPi::Pin );
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 __PACKAGE__->create_accessors( );
 

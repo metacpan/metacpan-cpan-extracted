@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1201';
+our $VERSION = '0.1203';
 
 use Moo;
 use strictures 2;
@@ -442,26 +442,16 @@ sub _draw_horiz {
 
 sub _fret_match {
     my ($self, $fret) = @_;
-    return
-        ( $self->position + $fret == 3 )
-        ||
-        ( $self->position + $fret == 5 )
-        ||
-        ( $self->position + $fret == 7 )
-        ||
-        ( $self->position + $fret == 9 )
-        ||
-        ( $self->position + $fret == 12 )
-        ||
-        ( $self->position + $fret == 15 )
-        ||
-        ( $self->position + $fret == 17 )
-        ||
-        ( $self->position + $fret == 19 )
-        ||
-        ( $self->position + $fret == 21 )
-        ||
-        ( $self->position + $fret == 24 );
+    return ( $self->position + $fret == 3 )
+        || ( $self->position + $fret == 5 )
+        || ( $self->position + $fret == 7 )
+        || ( $self->position + $fret == 9 )
+        || ( $self->position + $fret == 12 )
+        || ( $self->position + $fret == 15 )
+        || ( $self->position + $fret == 17 )
+        || ( $self->position + $fret == 19 )
+        || ( $self->position + $fret == 21 )
+        || ( $self->position + $fret == 24 );
 }
 
 sub _note_at {
@@ -495,7 +485,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1201
+version 0.1203
 
 =head1 SYNOPSIS
 
@@ -764,6 +754,10 @@ Similar modules:
 L<GD::Tab::Guitar> and L<GD::Tab::Ukulele>
 
 L<Music::Image::Chord>
+
+For a B<real> chord analyzer:
+
+L<https://www.oolimo.com/guitarchords/analyze>
 
 =head1 AUTHOR
 

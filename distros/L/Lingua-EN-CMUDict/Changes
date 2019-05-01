@@ -11,3 +11,5 @@ Revision history for Perl extension Lingua::EN::CMUDict.
 	- fixed tests to work for CPAN
 0.5   Tue Nov 8  21:00:00 2011
 	- once again fixed those tests.
+0.6   Tue Apr 30 20:00:00 2019
+      	- added inc sub directory to fix a bug

@@ -79,7 +79,7 @@
          "web" : "https://github.com/team-at-cpan/Database-Async"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }

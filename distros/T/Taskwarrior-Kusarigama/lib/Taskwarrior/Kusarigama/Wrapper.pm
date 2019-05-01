@@ -1,7 +1,7 @@
 package  Taskwarrior::Kusarigama::Wrapper;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interface to the taskwarrior's 'task' command
-$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.12.0';
 
 # TODO use Test::Pod::Snippet for that example ^^^
 
@@ -91,16 +91,16 @@ sub RUN($self,$cmd,@args) {
     $self->OUT(\@err);
 
     return @out;
-    
+
 }
 
 sub _map_to_arg ( $self, $entry ) {
 
-    if( not ref $entry ) {  # simple string 
-        # extract the attributes so that they are not dealt 
-        # with as part of the definition 
+    if( not ref $entry ) {  # simple string
+        # extract the attributes so that they are not dealt
+        # with as part of the definition
         my %opts;
-        
+
         while ( $entry =~ s/\b(?<key>[^\s:]+):(?<value>\S+)// ) {
             $opts{ $+{key} } = $+{value};
         }
@@ -177,7 +177,7 @@ Taskwarrior::Kusarigama::Wrapper - interface to the taskwarrior's 'task' command
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ beats a dark AUTOLOAD heart, which convert any method
 call into an invocation of C<task> with whatever
 parameters are passed.
 
-If the first parameter to be passed to a command is an array ref, 
+If the first parameter to be passed to a command is an array ref,
 it's understood to be a filter that will be inserted before the command.
 Also, any parameter will be a hahsref, will be also be understood as a
 key-value pair, and given the right separator (C<=> for C<rc.*> arguments, C<:> for regular ones).
@@ -208,7 +208,7 @@ For example:
 
 =head2 export
 
-As a convenience, C<export> returns the list of tasks exported (as 
+As a convenience, C<export> returns the list of tasks exported (as
 L<Taskwarrior::Kusarigama::Task> objects) instead than as raw text.
 
 =head1 AUTHOR
@@ -217,7 +217,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,61 +1,52 @@
 package WebService::Pokemon;
 
-use utf8;
+use 5.008_005;
 use strictures 2;
 use namespace::clean;
+use utf8;
 
-use CHI;
-use Digest::MD5 qw(md5_hex);
 use Moo;
-use Sereal qw(encode_sereal decode_sereal);
-use Types::Standard qw(Str);
-
-with 'Role::REST::Client';
+use Types::Standard qw(Bool Str);
+use URI::Fast qw(uri);
 
 use WebService::Pokemon::APIResourceList;
 use WebService::Pokemon::NamedAPIResource;
 
-our $VERSION = '0.09';
+with 'Role::REST::Client';
 
+use constant DEFAULT_ITEMS_PER_PAGE => 20;
+use constant DEFAULT_ITEMS_OFFSET => 0;
+
+our $VERSION = '0.10';
 
 has 'api_url' => (
-    isa     => Str,
-    is      => 'rw',
+    isa => Str,
+    is => 'rw',
     default => sub { 'https://pokeapi.co/api/v2' },
 );
 
-has cache => (
-    is      => 'rw',
-    lazy    => 1,
-    builder => 1,
+has autoload => (
+    isa => Bool,
+    is  => 'rw',
+    default => sub { 0 },
 );
-
-sub _build_cache {
-    my $self = shift;
-
-    return CHI->new(
-        driver => 'File',
-        namespace => 'restcountries',
-        root_dir => '/tmp/cache/',
-    );
-}
 
 sub BUILD {
     my ($self, $args) = @_;
 
-    foreach my $arg (keys %$args) {
+    foreach my $arg (keys %{$args}) {
         $self->$arg($args->{$arg}) if (defined $args->{$arg});
     }
 
     $self->set_persistent_header('User-Agent' => __PACKAGE__ . q| |
-          . ($WebService::Pokemon::VERSION || q||));
+            . ($WebService::Pokemon::VERSION || q||));
     $self->server($self->api_url);
 
     return $self;
 }
 
 sub _request {
-    my ($self, $resource, $name, $queries) = @_;
+    my ($self, $resource, $id_or_name, $queries) = @_;
 
     return if (!defined $resource || length $resource <= 0);
 
@@ -63,25 +54,14 @@ sub _request {
 
     # In case the api_url was updated.
     $self->server($self->api_url);
-    $self->type(qq|application/json|);
+    $self->type(q|application/json|);
 
     my $endpoint = q||;
-    $endpoint .= "/" . $resource;
-    $endpoint .= "/" . $name if (defined $name);
+    $endpoint .= qq|/$resource|;
+    $endpoint .= qq|/$id_or_name| if (defined $id_or_name);
 
-    my $response_data;
-    my $cache_key = md5_hex($endpoint . encode_sereal($queries));
-
-    my $cache_response_data = $self->cache->get($cache_key);
-    if (defined $cache_response_data) {
-        $response_data = decode_sereal($cache_response_data);
-    }
-    else {
-        my $response = $self->get($endpoint, $queries);
-        $response_data = $response->data;
-
-        $self->cache->set($cache_key, encode_sereal($response->data));
-    }
+    my $response = $self->get($endpoint, $queries);
+    my $response_data = $response->data;
 
     return $response_data;
 }
@@ -91,27 +71,58 @@ sub resource {
 
     my $queries;
     if (!defined $id_or_name) {
-        $queries->{limit} = $limit || 20;
-        $queries->{offset} = $offset || 0;
+        $queries->{limit} = $limit || DEFAULT_ITEMS_PER_PAGE;
+        $queries->{offset} = $offset || DEFAULT_ITEMS_OFFSET;
 
         my $response = $self->_request($resource, $id_or_name, $queries);
-        return WebService::Pokemon::APIResourceList->new(api => $self, response => $response);
+
+        return WebService::Pokemon::APIResourceList->new(
+            api => $self,
+            response => $response
+        );
     }
 
     my $response = $self->_request($resource, $id_or_name, $queries);
-    return WebService::Pokemon::NamedAPIResource->new(api => $self, response => $response);
+
+    return WebService::Pokemon::NamedAPIResource->new(
+        api => $self,
+        response => $response
+    );
 }
 
+sub resource_by_url {
+    my ($self, $url) = @_;
+
+    my $uri = uri($url);
+
+    my ($resource, $id_or_name);
+
+    my $split_path = $uri->split_path;
+    if (scalar @{$split_path} == 3) {
+        $resource = @{$split_path}[-1];
+    }
+    else {
+        $resource = @{$split_path}[-2];
+        $id_or_name = @{$split_path}[-1];
+    }
+
+    return $self->resource(
+        $resource, $id_or_name,
+        $uri->param('limit'),
+        $uri->param('offset'));
+}
 
 1;
 __END__
 
 =encoding utf-8
 
+=for stopwords pokemon pokémon pokeapi autoload
+
 =head1 NAME
 
-WebService::Pokemon - A module to access the Pokémon data through RESTful API
-from http://pokeapi.co.
+WebService::Pokemon - Perl library for accessing the Pokémon data,
+http://pokeapi.co.
 
 =head1 SYNOPSIS
 
@@ -131,39 +142,9 @@ WebService::Pokemon is a Perl client helper library for the Pokemon API (pokeapi
 
 =head1 DEVELOPMENT
 
-Source repo at L<https://github.com/kianmeng/webservice-pokemon|https://github.com/kianmeng/webservice-pokemon>.
+Source repository at L<https://github.com/kianmeng/webservice-pokemon|https://github.com/kianmeng/webservice-pokemon>.
 
-=head2 Docker
-
-If you have Docker installed, you can build your Docker container for this
-project.
-
-    $ docker build -t webservice-pokemon .
-    $ docker run -it -v $(pwd):/root webservice-pokemon bash
-    # cpanm --installdeps --notest .
-
-=head2 Milla
-
-Setting up the required packages.
-
-    $ milla authordeps --missing | cpanm
-    $ milla listdeps --missing | cpanm
-
-Check you code coverage.
-
-    $ milla cover
-
-Several ways to run the test.
-
-    $ milla test
-    $ milla test --author --release
-    $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla test
-    $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla run prove t/01_instantiation.t
-
-Release the module.
-
-    $ milla build
-    $ milla release
+How to contribute? Follow through the L<CONTRIBUTING.md|https://github.com/kianmeng/webservice-pokemon/blob/master/CONTRIBUTING.md> document to setup your development environment.
 
 =head1 METHODS
 
@@ -185,32 +166,17 @@ The URL of the API resource.
     my $pokemon_api = WebService::Pokemon->new;
     $pokemon_api->api_url('http://example.com/api/v2');
 
-=head3 cache
+=head3 autoload
 
-The cache directory of the HTTP reponses. By default, all cached data is stored
-as files in /tmp/cache/.
+Set this if you want to expand all fields point to external URL.
 
-    # Default cache engine is file-based storage.
-    my $pokemon_api = WebService::Pokemon->new;
-
-    # Or we define our custom cache engine with settings.
-    my $pokemon_api = WebService::Pokemon->new(
-        cache => CHI->new(
-            driver => 'File',
-            namespace => 'restcountries',
-            root_dir => $ENV{PWD} . '/tmp/cache/',
-        )
-    );
+    # Instantiate the class by setting the URL of the API endpoints.
+    my $pokemon_api = WebService::Pokemon->new({autoload => 1});
 
     # Or after the object was created.
     my $pokemon_api = WebService::Pokemon->new;
-    $pokemon_api->cache(
-        cache => CHI->new(
-            driver => 'File',
-            namespace => 'restcountries',
-            root_dir => $ENV{PWD} . '/tmp/cache/',
-        )
-    );
+    $pokemon_api->autoload(1);
+    $pokemon_api->resource('berry');
 
 =head2 resource($resource, [$name], [$limit], [$offset])
 
@@ -229,14 +195,28 @@ page, or offset by the record list.
     # Get by name.
     my $berry_firmness = $pokemon_api->resource('berry-firmnesses', 'very-soft');
 
+=head2 resource_by_url($url)
+
+Get the details of a particular resource by full URL.
+
+    # Get paginated list of available berry resource with default item size.
+    my $berries = $pokemon_api->resource_by_url('https://pokeapi.co/api/v2/berry/');
+
+    # Get paginated list of available berry resource with explicit default item size.
+    my $berries = $pokemon_api->resource_by_url('https://pokeapi.co/api/v2/berry/?limit=20&offset=40');
+
+    # Get particular berry resource.
+    my $berry = $pokemon_api->resource_by_url('https://pokeapi.co/api/v2/berry/1');
+
+=head1 AUTHOR
+
+Kian Meng, Ang E<lt>kianmeng@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Kian Meng, Ang.
+This software is Copyright (c) 2018-2019 by Kian Meng, Ang.
 
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
 
-=head1 AUTHOR
-
-Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>

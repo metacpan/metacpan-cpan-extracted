@@ -1,5 +1,6 @@
 
 devscripts/
+examples/runexample
 ^bak
 ^blib
 ^BCM2835/buildlib

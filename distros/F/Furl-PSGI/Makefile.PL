@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,21 +14,17 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Furl-PSGI",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Furl::PSGI",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Furl" => 0,
-    "Furl::HTTP" => 0,
-    "HTTP::Message::PSGI" => 0,
-    "HTTP::Parser::XS" => 0,
-    "parent" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Furl" => "3.02",
+    "HTTP::Parser::XS" => "0.11",
+    "Plack" => "1.0032"
   },
   "TEST_REQUIRES" => {
-    "Test2::V0" => 0
+    "Test::Simple" => "0.96"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,15 +32,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Furl" => 0,
-  "Furl::HTTP" => 0,
-  "HTTP::Message::PSGI" => 0,
-  "HTTP::Parser::XS" => 0,
-  "Test2::V0" => 0,
-  "parent" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Furl" => "3.02",
+  "HTTP::Parser::XS" => "0.11",
+  "Plack" => "1.0032",
+  "Test::Simple" => "0.96"
 );
 
 

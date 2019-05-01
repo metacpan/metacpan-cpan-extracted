@@ -3,7 +3,7 @@ package Database::Async::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 =head1 NAME
 
@@ -45,20 +45,27 @@ Database::Async::ORM - provides object-relational features for L<Database::Async
 =cut
 
 use Future;
+use Future::AsyncAwait;
 use Syntax::Keyword::Try;
 use Path::Tiny;
 use List::Util qw(sum0);
+use Scalar::Util qw(blessed);
 
 use Database::Async::ORM::Table;
 use Database::Async::ORM::Type;
 use Database::Async::ORM::Field;
 use Database::Async::ORM::Schema;
+use Database::Async::ORM::Extension;
 
 use Log::Any qw($log);
 
 sub new {
     my $class = shift;
-    bless { schema => [], @_ }, $class
+    bless {
+        schema => [],
+        extension => [],
+        @_
+    }, $class
 }
 
 sub add_schema {
@@ -66,8 +73,21 @@ sub add_schema {
     push $self->{schema}->@*, $schema;
 }
 
+sub add_extension {
+    my ($self, $extension) = @_;
+    push $self->{extension}->@*, $extension;
+}
+
 sub schemata {
     shift->{schema}->@*
+}
+
+sub schema_list {
+    shift->{schema}->@*
+}
+
+sub extension_list {
+    shift->{extension}->@*
 }
 
 sub schema_by_name {
@@ -77,6 +97,97 @@ sub schema_by_name {
 }
 
 sub schema_definitions { shift->{schema_definitions} //= {} }
+
+# Currently hardcoded to PostgreSQL, eventually we should be able to query
+# the engine for this information.
+sub ddl_for {
+    require Database::Async::Engine::PostgreSQL::DDL;
+    return Database::Async::Engine::PostgreSQL::DDL->new;
+}
+
+async sub apply_database_changes {
+    my ($self, $db, @actions) = @_;
+
+    my $ddl = $self->ddl_for($db);
+
+    # Optional extensions first, and we don't care if any fail
+    for my $ext ($self->extension_list) {
+        my ($name) = $ext->name;
+        try {
+            die 'invalid name for extension: ' . $name unless $name =~ /^[a-zA-Z0-9_-]+$/;
+            await $db->query(qq{create extension if not exists "$name" cascade})->void if $ext->is_optional;
+        } catch {
+            $log->warnf('Failed to install optional extension %s, ignoring: %s', $name, $@);
+        }
+    }
+
+    # All remaining steps are in a single transaction
+    await $db->query(q{begin})->void;
+
+    for my $ext (grep { not $_->is_optional } $self->extension_list) {
+        my ($name) = $ext->name;
+        await $db->query(qq{create extension if not exists "$name" cascade})->void;
+    }
+
+    my @out;
+    for my $action (@actions) {
+        if($action->isa('Database::Async::ORM::Table')) {
+            $log->tracef('Create table %s', $action->name);
+            my ($sql, @bind) = $ddl->table_info($action);
+            my %map = (
+                schema => $action->schema->name,
+                table  => $action->name
+            );
+            my @data = map { $map{$_} } @bind;
+            my (@fields) = await $db->query(
+                $sql => @data
+            )->row_hashrefs
+             ->as_list;
+            push @out, $ddl->create_table($action) unless @fields;
+        } elsif($action->isa('Database::Async::ORM::Schema')) {
+            $log->tracef('Create schema %s', $action->name);
+            my ($sql, @bind) = $ddl->schema_info($action);
+            my %map = (
+                schema => $action->name,
+            );
+            my @data = map { $map{$_} } @bind;
+            my (@schema) = await $db->query(
+                $sql => @data
+            )->row_hashrefs
+             ->as_list;
+            push @out, $ddl->create_schema($action) unless @schema;
+        } elsif($action->isa('Database::Async::ORM::Type')) {
+            $log->tracef('Create type %s', $action->name);
+            my ($sql, @bind) = $ddl->type_info($action);
+            my %map = (
+                schema => $action->schema->name,
+                type   => $action->name
+            );
+            my @data = map { $map{$_} } @bind;
+            my ($existing_type) = await $db->query(
+                $sql => @data
+            )->row_hashrefs
+             ->as_list;
+            push @out, $ddl->create_type($action) unless $existing_type;
+        } else {
+            die 'unknown thing ' . $action;
+        }
+    }
+
+    # Make sure that we have no empty queries in the list... should not be necessary,
+    # perhaps this should just bail out instead.
+    @out = grep { length } @out;
+
+    $log->debugf('Applying %d pending database migrations', 0 + @out);
+    for my $query (@out) {
+        $log->tracef('Apply SQL: %s', $query);
+        await $db->query($query)->void;
+    }
+
+    await $db->query(q{commit})->void;
+    $log->debugf('Applied %d database migrations', 0 + @out);
+    return;
+}
 
 =head2 load_from
 
@@ -109,6 +220,23 @@ sub load_from {
     $log->tracef('Loaded config %s', $cfg);
 
     my @pending;
+
+    for my $extension_name ($cfg->{extensions}{required}->@*) {
+        my $extension = Database::Async::ORM::Extension->new(
+            defined_in => $cfg->{extensions}{defined_in},
+            name       => $extension_name,
+            optional   => 0,
+        );
+        $self->add_extension($extension);
+    }
+    for my $extension_name ($cfg->{extensions}{optional}->@*) {
+        my $extension = Database::Async::ORM::Extension->new(
+            defined_in => $cfg->{extensions}{defined_in},
+            name       => $extension_name,
+            optional   => 1,
+        );
+        $self->add_extension($extension);
+    }
 
     my %pending = (type => []);
     for my $schema_name (sort keys $cfg->{schema}->%*) {
@@ -209,15 +337,29 @@ sub load_from {
             my $table_details = $item->{details};
             my $schema = $item->{schema};
             try {
+                my @parents;
+                if(my $parents = $item->{details}{parents}) {
+                    for my $parent (@$parents) {
+                        # For convenience, we allow strings for tables in the current schema
+                        my $details = ref $parent ? $parent : { name => $parent };
+                        $log->tracef('Parent table is %s', $details);
+                        my $target_schema = $schema;
+                        push @parents, (
+                            $schema->table_by_name($details->{name})
+                                or die 'parent table ' . $details->{name} . ' not found'
+                        );
+                    }
+                }
                 my $table = $self->populate_table(
-                    schema => $schema,
+                    schema  => $schema,
                     details => $table_details,
-                    name => $table_name
+                    name    => $table_name,
+                    parents => \@parents,
                 );
                 push @pending, $table;
                 ++$found;
             } catch {
-                $log->debugf('Failed to apply %s.%s - %s, moved to pending',
+                $log->tracef('Failed to apply %s.%s - %s, moved to pending',
                     $schema->name,
                     $table_name,
                     $@
@@ -261,7 +403,7 @@ sub populate_table {
     my $table_name = $args{name};
     my $table_details = $args{details};
     my $schema = $args{schema};
-    $log->infof('Add table %s as %s', $table_name, $table_details);
+    $log->tracef('Add table %s as %s', $table_name, $table_details);
     my $table = Database::Async::ORM::Table->new(
         defined_in  => $table_details->{defined_in},
         name        => $table_name,
@@ -269,6 +411,7 @@ sub populate_table {
         table       => $table_details->{table} // 'enum',
         description => $table_details->{description},
         values      => $table_details->{data},
+        parents     => $args{parents},
     );
     for my $field_details ($table_details->{fields}->@*) {
         my $type = $field_details->{type};
@@ -287,7 +430,7 @@ sub populate_table {
             type       => $type,
             %{$field_details}{grep { exists $field_details->{$_} } qw(name description)}
         );
-        $log->infof('Add field %s as %s with type %s', $field->name, $field_details, $field->type);
+        $log->tracef('Add field %s as %s with type %s', $field->name, $field_details, $field->type);
         push $table->{fields}->@*, $field;
     }
     $schema->add_table($table);

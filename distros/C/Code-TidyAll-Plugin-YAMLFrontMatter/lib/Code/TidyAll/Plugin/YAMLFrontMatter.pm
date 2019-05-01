@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 use Moo;
 
 use Encode qw( decode encode FB_CROAK );
 use Path::Tiny qw( path );
 use Try::Tiny qw( catch try );
-use YAML::XS qw( Load );
+use YAML::PP 0.006 ();
 
 extends 'Code::TidyAll::Plugin';
 
@@ -63,7 +63,7 @@ sub validate_file {
 
     my $src = path($filename)->slurp_raw;
 
-    # YAML::XS always expects things to be in UTF-8 bytes
+    # YAML::PP always expects things to be in UTF-8 bytes
     my $encoding = $self->encoding;
     try {
         $src = decode( $encoding, $src, FB_CROAK );
@@ -86,7 +86,13 @@ sub validate_file {
 
     # parse the YAML front matter.
     my $ds = try {
-        Load($yaml);
+        my $yp = YAML::PP->new(
+
+            # we do not want to create circular refs
+            cyclic_refs => 'fatal',
+
+        );
+        return $yp->load_string($yaml);
     }
     catch {
         die "Problem parsing YAML: $_";
@@ -119,7 +125,7 @@ Code::TidyAll::Plugin::YAMLFrontMatter - TidyAll plugin for validating YAML Fron
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 
@@ -147,6 +153,8 @@ It will complain if:
 =item The file isn't encoded in the configured encoding (UTF-8 by default)
 
 =item The YAML Front Matter is missing one or more configured top level keys
+
+=item The YAML Front Matter contains circular references
 
 =back
 
@@ -180,9 +188,25 @@ Bugs may be submitted through L<https://github.com/maxmind/Code-Tidyall-Plugin-Y
 
 Mark Fowler <mfowler@maxmind.com>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Dave Rolsky Greg Oschwald
+
+=over 4
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Greg Oschwald <goschwald@maxmind.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc..
+This software is copyright (c) 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

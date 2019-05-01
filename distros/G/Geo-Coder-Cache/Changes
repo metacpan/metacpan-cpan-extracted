@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Cache.
 
+0.07  Tue Apr 30 21:38:12 PDT 2019
+	- skip tests if GMAP_CLIENT and GMAP_KEY are not definfed
+
 0.06  Fri Apr  5 07:11:05 PDT 2013
 	- apply patches from Jozef Kutej <jozef.kutej@validad.net>
 	   - [rt.cpan.org #84441] upgrade to google api v3

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.28      2019-04-30 20:29:25 -0400
+  - Fixed unauthorized use of MY in PAUSE permissions.
+
 0.27      2019-04-30 05:38:20 -0400
   - [AlienBuild] add clean_install property
 

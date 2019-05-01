@@ -1,5 +1,5 @@
 package Limper;
-$Limper::VERSION = '0.014';
+$Limper::VERSION = '0.015';
 use 5.10.0;
 use strict;
 use warnings;
@@ -89,7 +89,7 @@ sub rfc1123date {
 # Formats date like "2014-08-17 00:12:41" in local time.
 sub date {
     my ($sec, $min, $hour, $mday, $mon, $year) = localtime;
-    sprintf '%04d-%02d-%02d %02d:%02d:%02d', $year + 1900, $mon, $mday, $hour, $min, $sec;
+    sprintf '%04d-%02d-%02d %02d:%02d:%02d', $year + 1900, $mon + 1, $mday, $hour, $min, $sec;
 }
 
 # Trivially log to STDOUT or STDERR
@@ -300,7 +300,7 @@ Limper - extremely lightweight but not very powerful web application framework
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

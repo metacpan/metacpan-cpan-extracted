@@ -19,7 +19,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( devicename ) );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 sub new {
     my ($class, %params) = @_;

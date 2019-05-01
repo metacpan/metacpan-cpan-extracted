@@ -52,7 +52,7 @@
    "provides" : {
       "RDF::NS::Curated" : {
          "file" : "lib/RDF/NS/Curated.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project"
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

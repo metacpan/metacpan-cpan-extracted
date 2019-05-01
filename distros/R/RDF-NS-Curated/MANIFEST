@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 SIGNATURE
 dist.ini
 doap.ttl

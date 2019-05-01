@@ -29,7 +29,7 @@ package cPanel::PublicAPI;
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 use strict;
 use Carp            ();
@@ -289,6 +289,17 @@ sub api_request {
             }
         }
 
+        if ($self->{'operating_mode'} eq 'accesshash') {
+            my $token_app = ($service eq 'whostmgr') ? 'whm' : $service;
+
+            $headers->{'Authorization'} = sprintf(
+                '%s %s:%s',
+                $token_app,
+                $self->{'user'},
+                $self->{'accesshash'},
+            );
+        }
+
         my $options = {
             headers => $headers,
         };
@@ -379,7 +390,6 @@ sub _update_operating_mode {
 
     if ( exists $self->{'accesshash'} ) {
         $self->{'accesshash'} =~ s/[\r\n]//g;
-        $self->{'ua'}->default_headers( { 'Authorization' => 'WHM ' . $self->{'user'} . ':' . $self->{'accesshash'} } );
         $self->{'operating_mode'} = 'accesshash';
     }
     elsif ( exists $self->{'pass'} ) {
@@ -419,10 +429,15 @@ sub _establish_session {
 
     if ( my $security_token = ( split /\//, $resp->{'headers'}->{'location'} )[1] ) {
         $self->{'security_tokens'}->{$service} = $security_token;
+        $self->debug("Established $service session");
         return 1;
     }
 
-    $self->error("Failed to establish session and parse security token: $resp->{'status'} $resp->{'reason'}");
+    my $details = $resp->{'reason'};
+    $details .= " ($resp->{'content'})" if $resp->{'reason'} == 599;
+
+    $self->error("Failed to establish session and parse security token: $resp->{'status'} $details");
+
     die $self->{'error'};
 }
 

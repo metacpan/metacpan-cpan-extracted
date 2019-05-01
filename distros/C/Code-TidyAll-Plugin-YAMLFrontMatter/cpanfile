@@ -3,7 +3,7 @@ requires "Encode" => "0";
 requires "Moo" => "0";
 requires "Path::Tiny" => "0";
 requires "Try::Tiny" => "0";
-requires "YAML::XS" => "0";
+requires "YAML::PP" => "0.006";
 requires "namespace::autoclean" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
@@ -50,6 +50,5 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
 };

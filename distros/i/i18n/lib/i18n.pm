@@ -1,5 +1,5 @@
 package i18n;
-$i18n::VERSION = '0.12';
+$i18n::VERSION = '0.13';
 
 use 5.006;
 use strict;
@@ -146,7 +146,7 @@ sub _do_loc {
     my $class = ref $_[0];
     my $pkg   = $_[0][PACKAGE];
 
-    ( $pkg eq caller ) and my $loc = $pkg->can('loc')
+    my $loc = $pkg->can('loc')
       or return ~"$_[0]";
 
     my @vars;
@@ -200,7 +200,7 @@ i18n - Perl Internationalization Pragma
 
 =head1 VERSION
 
-This document describes version 0.11 of i18n, released August 10, 2016.
+This document describes version 0.13 of i18n, released May 1, 2019.
 
 =head1 SYNOPSIS
 
@@ -292,7 +292,7 @@ Ingy dE<ouml>t Net E<lt>INGY@cpan.orgE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright 2004, 2005, 2006, 2007, 2016 by
+Copyright 2004, 2005, 2006, 2007, 2016, 2019 by
 Audrey Tang E<lt>cpan@audreyt.orgE<gt>,
 Ingy dE<ouml>t Net E<lt>INGY@cpan.orgE<gt>.
 

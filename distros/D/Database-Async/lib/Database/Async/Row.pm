@@ -3,7 +3,7 @@ package Database::Async::Row;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 =head1 NAME
 

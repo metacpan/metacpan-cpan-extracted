@@ -1,12 +1,15 @@
 ---
-abstract: 'A module to access the Pokémon data through RESTful API from http://pokeapi.co.'
+abstract: 'Perl library for accessing the Pokémon data, http://pokeapi.co.'
 author:
-  - 'Kian Meng, Ang.'
+  - 'Kian Meng, Ang <kianmeng@cpan.org>'
 build_requires:
   Carp: '0'
   Dist::Zilla::App::Command::cover: '0'
   File::Find: '0'
+  File::Spec: '0'
   File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Module::Build: '0.28'
   Scalar::Util: '0'
   Test::More: '0.94'
@@ -28,15 +31,12 @@ no_index:
     - t
     - xt
 requires:
-  CHI: '0'
-  Data::Serializer: '0'
-  Digest::MD5: '0'
   JSON: '0'
   Moo: '0'
   REST::Client: '0'
   Role::REST::Client: '0'
-  Sereal: '0'
   Types::Standard: '0'
+  URI::Fast: '0'
   namespace::clean: '0'
   strictures: '0'
   utf8: '0'
@@ -44,10 +44,9 @@ resources:
   bugtracker: https://github.com/kianmeng/webservice-pokemon/issues
   homepage: https://github.com/kianmeng/webservice-pokemon
   repository: https://github.com/kianmeng/webservice-pokemon.git
-version: '0.09'
+version: '0.10'
 x_contributors:
-  - 'Kian Meng Ang <kianmeng@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 0

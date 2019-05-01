@@ -10,11 +10,11 @@ Device::RAID::Poller::Backends::Adaptec_arcconf - Handles polling using the Adap
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 
 =head1 SYNOPSIS
@@ -95,7 +95,7 @@ sub run {
 			){
 			# If this matches, it should be good.
 			# Can't match just /Ready/ as it will also match "Not Ready".
-			my $bbustatus='good';
+			$bbustatus='good';
 		}elsif(
 			   defined($backup_lines[0]) &&
 			   (
@@ -103,10 +103,10 @@ sub run {
 				( $backup_lines[0] =~ /Not\ Present/ )
 				)
 			   ){
-			my $bbustatus='na';
+			$bbustatus='na';
 		}elsif( defined($backup_lines[0]) ){
 			# If we are here, we did not match it as being good or not present
-			my $bbustatus='bad';
+			$bbustatus='bad';
 		}
 
 		# Grab the LD config.
@@ -120,13 +120,13 @@ sub run {
 				$LDN=$line;
 				$dev='arcconf '.$adapter.'-'.$LDN;
 				$return_hash{devices}{$dev}={
-											 'backend'=>'FBSD_graid',
+											 'backend'=>'Adaptec_arcconf',
 											 'name'=>$dev,
 											 'good'=>[],
 											 'bad'=>[],
 											 'spare'=>[],
 											 'type'=>'unknown',
-											 'BBUstatus'=>'na',
+											 'BBUstatus'=>$bbustatus,
 											 'status'=>'unknown',
 											 };
 			}
@@ -144,21 +144,21 @@ sub run {
 					 ){
 					# Optimal appears to be the only fully good one.
 					# Reconfiguring not paired with either Suboptimal or Degraded is good
-					$return_hash{$dev}{type}='good';
+					$return_hash{devices}{$dev}{status}='good';
 				}elsif( $line =~ /Rebuilding/ ){
 					# Should match either of the two below.
 					# Suboptimal, Rebuilding
 					# Degraded, Rebuilding
-					$return_hash{$dev}{type}='rebuilding';
+					$return_hash{devices}{$dev}{status}='rebuilding';
 				}else{
 					# Anything else is bad.
-					$return_hash{$dev}{type}='bad';
+					$return_hash{devices}{$dev}{status}='bad';
 				}
-			}elsif( $line =~ /RAID level/ ){
-				$line=~s/[\t ]*RAID\ level\:[\t ]*//;
-				$return_hash{$dev}{type}=$line;
+			}elsif( $line =~ /RAID\ level/ ){
+				$line=~s/[\t ]*RAID\ level[\t ]*\:[\t ]*//;
+				$return_hash{devices}{$dev}{type}=$line;
 			}elsif( $line =~ /[\t ]*Segment [0123456789]/ ){
-				$line =~ s/[\t ]*Segment [0123456789]*\:[\t ]*//;
+				$line =~ s/[\t ]*Segment [0123456789]*[\t ]*\:[\t ]*//;
 				if ( $line =~ /Present/ ){
 					$line=~s/Present[\t ]*//;
 					push( @{ $return_hash{devices}{$dev}{good} }, $line );
@@ -169,6 +169,12 @@ sub run {
 					$line=~s/[A-Za-z\t ]*//;
 					push( @{ $return_hash{devices}{$dev}{bad} }, $line );
 				}
+			}elsif( $line =~ /Logical\ Device\ name/ ){
+				$line =~ s/[\t ]*Logical\ Device\ name[\t ]*\:[\t ]*//;
+				my $new_dev=$dev.' - '.$line;
+				$return_hash{devices}{$new_dev}= delete $return_hash{devices}{$dev};
+				$dev=$new_dev;
+				$return_hash{devices}{$dev}{name}=$dev;
 			}
 		}
 
@@ -193,15 +199,15 @@ sub usable {
 	my $self=$_[0];
 
 	if (
-		( $^O !~ 'linux' ) ||
+		( $^O !~ 'linux' ) &&
 		( $^O !~ 'freebsd' )
 		){
 		$self->{usable}=0;
 		return 0;
 	}
 
-	# make sure we can locate mdadm
-	my $mdadm_bin=`which arcconf`;
+	# make sure we can locate arcconf
+	my $arcconf_bin=`/bin/sh -c 'which arcconf 2> /dev/null'`;
 	if ( $? != 0 ){
 		$self->{usable}=0;
         return 0;

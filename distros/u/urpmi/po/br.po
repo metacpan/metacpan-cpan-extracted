@@ -301,17 +301,17 @@ msgstr ""
 #: ../gurpmi2:250 ../urpmi:615
 #, c-format
 msgid "%s of additional disk space will be used."
-msgstr "%s egor pladenn ouzhpenn a vo bet implijet."
+msgstr "%s egor pladenn ouzhpenn a vo implijet."
 
 #: ../gurpmi2:251 ../urpmi:616
 #, c-format
 msgid "%s of disk space will be freed."
-msgstr "%s egor pladenn a vo bet dieubet."
+msgstr "%s egor pladenn a vo dieubet."
 
 #: ../gurpmi2:252 ../urpmi:617
 #, c-format
 msgid "%s of packages will be retrieved."
-msgstr "%s a bakad a vo bet degaset."
+msgstr "%s a bakad a vo degaset."
 
 #: ../gurpmi2:253 ../urpmi:618
 #, c-format

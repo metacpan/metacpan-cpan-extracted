@@ -930,6 +930,36 @@ sub try_parse_funcall
 	return $sql;
 }
 
+sub in_list
+{
+	my ( $S, $sop, $list ) = @_;
+	$list //= [];
+
+	my $sql = '';
+	my $left = parse_term($S, $sop->first, not_after => 1);
+	return '1=0' unless @$list;
+
+	my $arg_limit = 
+		$S->{gen_args}->{in_arg_limit} //
+		((($S->{gen_args}->{flavor}||"") eq "oracle") ? 500 : 2_000_000_000);
+	my @args = @$list;
+	while ( @args ) {
+		my @placeholders;
+		for my $val ( splice(@args, 0, $arg_limit) ) {
+			if (( ref($val) // '') =~ /SCALAR/) {
+				push @placeholders, $$val;
+			} else {
+				push @placeholders, '?';
+				push @{$S->{values}}, $val;
+			}
+		}
+		$sql .= $left =~ / not$/ ? ' and ' : ' or ' if length $sql;
+		$sql .= "$left in (" . join(',', @placeholders) . ")";
+	}
+
+	return $sql;
+}
+
 sub try_parse_subselect
 {
 	my ($S, $sop) = @_;
@@ -940,14 +970,10 @@ sub try_parse_subselect
 
 	if (is_op($sub, "padav")) {
 		my $ary = get_padlist_scalar($S, $sub->targ, "ref only");
-		return '1=0' unless $ary && @$ary;
-		$sql = join ",", ("?") x @$ary;
-		@vals = @$ary;
+		return in_list( $S, $sop, $ary);
 	} elsif (is_unop($sub, "rv2av") && is_op($sub->first, "padsv")) {
 		my $ary = get_padlist_scalar($S, $sub->first->targ, "ref only");
-		return '1=0' unless $ary && $$ary && @$$ary;
-		$sql = join ",", ("?") x @$$ary;
-		@vals = @$$ary;
+		return in_list( $S, $sop, ${ $ary // \[] });
 	} elsif (is_listop($sub, "anonlist") or
 			 is_unop($sub, "srefgen") &&
 			 is_unop($sub->first, "null") &&
@@ -958,22 +984,20 @@ sub try_parse_subselect
 		for my $v (get_all_children($alist)) {
 			next if is_pushmark_or_padrange($v);
 			if (my ($const,$sv) = is_const($S, $v)) {
-				if (($sv->isa("B::IV") && !$sv->isa("B::PVIV")) ||
-					($sv->isa("B::NV") && !$sv->isa("B::PVNV")))
-				{
-					push @what, $const;
+				if (
+					($sv->isa("B::IV") && !$sv->isa("B::PVIV")) ||
+					($sv->isa("B::NV") && !$sv->isa("B::PVNV"))
+				) {
+					push @what, \$const;
 				} else {
-					push @what, '?';
-					push @vals, $const;
+					push @what, $const;
 				}
 			} else {
 				my ($val, $ok) = get_value($S, $v);
-				push @what, '?';
-				push @vals, $val;
+				push @what, $val;
 			}
 		}
-		bailout $S, "empty list in not valid in \"<-\"" unless @what;
-		$sql = join ",", @what;
+		return in_list($S, $sop, \@what);
 	} else {
 		my $codeop = try_get_dbfetch( $S, $sub);
 		if ($codeop) {
@@ -1181,6 +1205,10 @@ sub try_funcall
 				my $val = $terms[0]->undo;
 				@terms = ("$val from $terms[1]");
 			}
+		}
+		if (lc($func) eq 'cast' && @terms == 2) {
+			$terms[1] = $terms[1]->undo if UNIVERSAL::isa($terms[1], "DBIx::Perlish::Placeholder");
+			return "cast($terms[0] as $terms[1])";
 		}
 		return "$func(" . join(", ", @terms) . ")";
 	}
@@ -1549,6 +1577,7 @@ sub parse_complex_regex
 	} elsif ( is_svop( $op, 'const')) {
 		return want_const( $S, $op);
 	} elsif (my ($rx, $ok) = get_value($S, $op, soft => 1)) {
+		return undef unless $rx;
 		$rx =~ s/^\(\?\-\w*\:(.*)\)$/$1/; # (?-xism:moo) -> moo
 		return $rx;
 	} elsif (is_unop($op, "null")) {
@@ -1575,6 +1604,7 @@ sub parse_regex
 		bailout $S, "strange regex " . $op->name
 			unless $logop and is_logop( $logop, 'regcomp');
 		$like = parse_complex_regex( $S, $logop-> first);
+		return "" unless defined $like; # explicitly nulled like
 	}
 
 	my $lhs = parse_term($S, $op->first);
@@ -1582,16 +1612,18 @@ sub parse_regex
 	my $flavor = lc($S-> {gen_args}-> {flavor} || '');
 	my $what = 'like';
 
-	my $can_like = $like =~ /^\^?[-!%\s\w]*\$?$/; # like that begins with non-% can use indexes
-	
+	$like =~ s/\(\?\^\w+\:((?:[^\\]|\\.)*)\)/$1/g; # ignore ?^flags:
+
+	my $can_like = $like =~ /^\^?(?:[-!%\s\w]|\\.)*\$?$/; # like that begins with non-% can use indexes
+
 	if ( $flavor eq 'mysql') {
 		# mysql LIKE is case-insensitive
 		goto LIKE if not $case and $can_like;
 		$like =~ s/'/''/g;
 
-		return 
+		return
 			"$lhs ".
-			( $neg ? 'not ' : '') . 
+			( $neg ? 'not ' : '') .
 			'regexp ' .
 			( $case ? '' : 'binary ') .
 			"'$like'"
@@ -1601,11 +1633,11 @@ sub parse_regex
 		if ( $can_like) {
 			$what = 'ilike' if $case;
 			goto LIKE;
-		} 
+		}
 		$like =~ s/'/''/g;
-		return 
+		return
 			"$lhs ".
-			( $neg ? '!' : '') . 
+			( $neg ? '!' : '') .
 			'~' .
 			( $case ? '*' : '') .
 			" '$like'"
@@ -1650,12 +1682,14 @@ sub parse_regex
 		bailout $S, "Regex too complex for implementation using LIKE keyword: $like"
 			if $like =~ /(?<!\\)[\[\]\(\)\{\}\?\|]/;
 LIKE:
+		$like =~ s/\\([^A-Za-z_0-9])/$1/g; # de-quotemeta
 		my $escape = "";
 		if ($flavor eq "pg" || $flavor eq "oracle") {
 			# XXX it is possible that more flavors support like...escape
-			my $need_esc = 1 if $like =~ s/!/!!/g;
-			   $need_esc = 1 if $like =~ s/%/!%/g;
-			   $need_esc = 1 if $like =~ s/_/!_/g;
+			my $need_esc;
+			$need_esc = 1 if $like =~ s/!/!!/g;
+			$need_esc = 1 if $like =~ s/%/!%/g;
+			$need_esc = 1 if $like =~ s/_/!_/g;
 			$escape = " escape '!'" if $need_esc;
 		} else {
 			$like =~ s/%/\\%/g;
@@ -1666,8 +1700,8 @@ LIKE:
 		$like =~ s/\\\././g;
 		$like = "%$like" unless $like =~ s|^\^||;
 		$like = "$like%" unless $like =~ s|\$$||;
-		return "$lhs " . 
-			( $neg ? 'not ' : '') . 
+		return "$lhs " .
+			( $neg ? 'not ' : '') .
 			"$what '$like'$escape"
 		;
 	}
@@ -2185,7 +2219,8 @@ if (*Devel::Cover::coverage{CODE}) {
 	$_cover = sub { $Coverage->{statement}{Devel::Cover::get_key($_[0])} ||= 1 };
 }
 
-package DBIx::Perlish::Placeholder;
+package
+	DBIx::Perlish::Placeholder;
 
 use overload '""' => sub { "?" }, eq => sub { "$_[0]" eq "$_[1]" };
 

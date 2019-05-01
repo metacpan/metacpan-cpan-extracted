@@ -22,6 +22,7 @@ License: Expat
 Files: INSTALL
  LICENSE
  README
+ README.md
  t/data/multi.ttl
  t/data/relative.ttl
  t/data/simple.ttl

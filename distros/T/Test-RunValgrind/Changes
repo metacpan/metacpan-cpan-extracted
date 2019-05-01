@@ -1,5 +1,10 @@
 Revision history for Test-RunValgrind
 
+0.2.1       2019-05-01
+    - Synopsis fix
+        - https://github.com/shlomif/perl-Test-RunValgrind/pull/6
+        - Thanks to @choroba .
+
 0.2.0       2018-01-26
     - Implement 'valgrind_args'
         - https://github.com/shlomif/perl-Test-RunValgrind/issues/4

@@ -28,21 +28,24 @@ optional_features: {}
 provides:
   Test::FITesque::RDF:
     file: lib/Test/FITesque/RDF.pm
-    version: '0.001'
+    version: '0.003'
 requires:
-  Attean: 0.022_01
+  Attean: '0.023'
   Moo: '1.006000'
   Path::Tiny: '0'
+  RDF::NS::Curated: '1.002'
+  RDF::Prefixes: '0'
   Test::FITesque: '0'
   Types::Standard: '0'
   Types::URI: '0'
   URI::NamespaceMap: '1.08'
 resources:
+  IRC: irc://irc.perl.org/#perlrdf
   Identifier: http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project
   bugtracker: https://github.com/kjetilk/p5-test-fitesque-rdf/issues
   homepage: https://metacpan.org/release/Test-FITesque-RDF
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/kjetilk/p5-test-fitesque-rdf.git
-version: '0.001'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

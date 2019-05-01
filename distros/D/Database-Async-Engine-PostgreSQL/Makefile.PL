@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Database::Async::Engine::PostgreSQL",
   "PREREQ_PM" => {
-    "Database::Async" => "0.004",
+    "Database::Async" => "0.005",
     "Database::Async::Engine" => 0,
     "Database::Async::Query" => 0,
     "Future" => "0.38",
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Database::Async" => "0.004",
+    "Database::Async" => "0.005",
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Async::Loop" => 0,
@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "feature" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Database::Async" => "0.004",
+  "Database::Async" => "0.005",
   "Database::Async::Engine" => 0,
   "Database::Async::Query" => 0,
   "ExtUtils::MakeMaker" => 0,

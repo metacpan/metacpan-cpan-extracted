@@ -20,7 +20,7 @@ gezer
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ gezer - HTML Postprocessor and frontend to html-minifier
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 REQUIREMENTS
 

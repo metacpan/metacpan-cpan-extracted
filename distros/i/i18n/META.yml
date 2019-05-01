@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
 provides:
   i18n:
     file: lib/i18n.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Locale::Maketext: 0
   Locale::Maketext::Lexicon: 0
@@ -29,4 +29,4 @@ requires:
   perl: 5.6.0
 resources:
   license: http://opensource.org/licenses/mit-license.php
-version: '0.12'
+version: '0.13'

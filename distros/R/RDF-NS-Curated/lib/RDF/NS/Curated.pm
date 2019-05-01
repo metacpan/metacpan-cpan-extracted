@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '1.001';
+our $VERSION   = '1.002';
 
 sub new {
   my $class = shift;
@@ -23,6 +23,7 @@ sub new {
 						 dc11 => 'http://purl.org/dc/elements/1.1/',
 						 dcat => 'http://www.w3.org/ns/dcat#',
 						 dctype => 'http://purl.org/dc/dcmitype/',
+						 deps => 'http://ontologi.es/doap-deps#',
 						 doap => 'http://usefulinc.com/ns/doap#',
 						 dqv => 'http://www.w3.org/ns/dqv#',
 						 duv => 'http://www.w3.org/ns/duv#',

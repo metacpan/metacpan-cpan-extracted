@@ -1,9 +1,12 @@
 # $Id$
 use warnings;
 use strict;
-use Test::More tests => 25;
+use Test::More;
 use DBIx::Perlish qw/:all/;
 use t::test_utils;
+
+test_select_sql { return `xyz_seq.nextval` } "select from nothing",
+"select xyz_seq.nextval", [];
 
 $main::flavor = "pg";
 test_select_sql {
@@ -73,3 +76,4 @@ test_bad_select {
 	return next(hardware_id_seq);
 } "Sequences are not supported for this driver", qr/Sequences do not seem to be supported for this DBI flavor/;
 
+done_testing;

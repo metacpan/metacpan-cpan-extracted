@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: plugin system for the Taskwarrior task manager
-$Taskwarrior::Kusarigama::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::VERSION = '0.12.0';
 
 # TODO document the kusarigama.dir key
 1;
@@ -18,7 +18,7 @@ Taskwarrior::Kusarigama - plugin system for the Taskwarrior task manager
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ version 0.11.0
 =head1 DESCRIPTION
 
 This module provides a plugin-based way to run hooks and custom
-commands for the 
+commands for the
 cli-based task manager L<Taskwarrior|http://taskwarrior.org/>.
 
 =head2 Configuring Taskwarrior to use Taskwarrior::Kusarigama
@@ -59,12 +59,12 @@ should look like
     use Taskwarrior::Kusarigama;
 
     Taskwarrior::Kusarigama->new( raw_args => \@ARGV )
-        ->run_event( 'launch' ); # change with 'add', 'modify', 'exit' 
+        ->run_event( 'launch' ); # change with 'add', 'modify', 'exit'
                                  # for the different scripts
 
 =head3 Setting which plugins to use
 
-Then you need to tell the system with plugins to use, 
+Then you need to tell the system with plugins to use,
 either via C<task-kusarigama>
 
     $ task-kusarigama add Command::AndAfter
@@ -75,7 +75,7 @@ or directly via the Taskwarrior config command
 
 =head3 Configure the plugins
 
-The last step is to configure the different plugins. Read their 
+The last step is to configure the different plugins. Read their
 documentation to do it manually or, again, use C<task-kusarigama>.
 
     $ task-kusarigama install
@@ -93,12 +93,12 @@ Plugin names prefixed with a plus sign are left alone (minus the '+'),
 while the other ones get C<Taskwarrior::Kusarigama::Plugin::> prefixed to
 them.
 
-The Taskwarrior::Kusarigama system itself is invoked via the 
+The Taskwarrior::Kusarigama system itself is invoked via the
 scripts put in F<~/.task/hooks> by C<task-kusarigama>. The scripts
 detect in which stage they are called (launch, exit, add or modified),
-and execute all plugins that consume the associated role (e.g., 
-L<Taskwarrior::Kusarigama::Hook::OnLaunch>), in the order they have been 
-configured. 
+and execute all plugins that consume the associated role (e.g.,
+L<Taskwarrior::Kusarigama::Hook::OnLaunch>), in the order they have been
+configured.
 
 For example, this plugin will runs on a four hook stages:
 
@@ -131,14 +131,14 @@ Kusarigama defines a fifth hook role,
 L<Taskwarrior::Kusarigama::Hook::OnCommand>, to help creating
 custom commands. This role does two things: when
 C<task-kusarigama install> is run, it creates a dummy report
-such that Taskwarrior will accept C<task my_custom_command> as a 
+such that Taskwarrior will accept C<task my_custom_command> as a
 valid invocation, and then it runs as part of the C<launch>
 stage and will run the plugin code if the associated command was used.
 
 =head3 Adding custom fields to tasks
 
 Taskwarrior allows the creation of I<User-Defined Attributes> (UDAs). Plugins
-can implement a C<custom_uda> attribute that holds a hashref of 
+can implement a C<custom_uda> attribute that holds a hashref of
 new UDAs and their description. Those UDAs will then be fed to Taskwarrior's
 config via C<task-kusarigama install>, and will thereafter be available like
 any other task field.
@@ -217,7 +217,7 @@ Any plugin can abort the taskwarrior process by simply C<die>ing.
 
 =over
 
-=item L<http://techblog.babyl.ca/entry/taskwarrior> 
+=item L<http://techblog.babyl.ca/entry/taskwarrior>
 
 the original blog entry
 
@@ -229,7 +229,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

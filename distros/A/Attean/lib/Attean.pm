@@ -4,7 +4,7 @@ Attean - A Semantic Web Framework
 
 =head1 VERSION
 
-This document describes Attean version 0.022
+This document describes Attean version 0.023
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Semantic Web (RDF and SPARQL) data.
 package Attean {
 	use v5.14;
 	use warnings;
-	our $VERSION	= '0.022';
+	our $VERSION	= '0.023';
 	use Attean::API;
 	
 	use Attean::Blank;
@@ -109,7 +109,20 @@ returns undef.
 		my $self	= shift;
 		return $self->_get_plugin('stores', shift);
 	}
-	
+
+=item C<< temporary_model >> 
+
+Returns a temporary, mutable quad model based on a L<AtteanX::Store::Memory> store.
+
+=cut
+
+	sub temporary_model {
+	  my $self = shift;
+	  return Attean::MutableQuadModel->new( store => $self->get_store('Memory')->new() )
+	}
+
+
+
 =item C<< get_serializer( $NAME ) >>
 
 =item C<< get_serializer( media_type => $MEDIA_TYPE ) >>

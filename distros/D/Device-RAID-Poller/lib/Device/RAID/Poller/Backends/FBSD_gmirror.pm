@@ -162,7 +162,7 @@ sub usable {
 	my $self=$_[0];
 
 	if (
-		( $^O !~ 'freebsd' ) ||
+		( $^O !~ 'freebsd' ) &&
 		( ! -x '/sbin/gmirror' )
 		){
 		$self->{usable}=0;

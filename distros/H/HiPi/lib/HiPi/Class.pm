@@ -16,7 +16,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi;
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 #-------------------------------------------------------------------
 # On Exit Handling

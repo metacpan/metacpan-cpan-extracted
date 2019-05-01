@@ -11,8 +11,6 @@ HACKERS
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
 mktests.PL
 module2.c
 module3.c
@@ -333,7 +331,6 @@ parts/todo/5023007
 parts/todo/5023008
 parts/todo/5023009
 parts/todo/5024000
-PPPort.pm
 PPPort.xs
 ppport_h.PL
 PPPort_pm.PL
@@ -378,3 +375,5 @@ t/variables.t
 t/warn.t
 TODO
 typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

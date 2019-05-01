@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBuild 0.27 {
+package Dist::Zilla::Plugin::AlienBuild 0.28 {
 
   use 5.014;
   use Moose;
@@ -131,7 +131,8 @@ package Dist::Zilla::Plugin::AlienBuild 0.27 {
   }
 
   my $mm_code_postamble = <<'EOF2';
-{ package MY;
+{ package
+    MY;
   sub postamble {
     $abmm->mm_postamble(@_);
   }
@@ -247,7 +248,7 @@ Dist::Zilla::Plugin::AlienBuild - Use Alien::Build with Dist::Zilla
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

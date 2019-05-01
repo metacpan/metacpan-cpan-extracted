@@ -1,3 +1,8 @@
+[Changes for 0.13 - 2019-05-01]
+
+* Allow ~~ strings be localized in any context with loc() imported.
+  Contributed by: Timothe Lit
+
 [Changes for 0.12 - 2016-08-17]
 
 * Fix building; no functional changes.

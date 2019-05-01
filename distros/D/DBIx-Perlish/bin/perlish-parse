@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use DBIx::Perlish qw(:all);
+use Getopt::Long;
+use B::Terse;
+
+my %opt = (
+	flavor  => undef,
+	help    => undef,
+	deparse => undef,
+);
+
+sub usage {
+	print <<HELP;
+$0 - dump perl code as sql
+
+format:
+    perlish-parse [options] [select|update|delete] [file|-]
+
+options:
+    --help
+    --flavor   [pg|oracle]
+    --deparse
+
+HELP
+	exit 1;
+}
+
+GetOptions(\%opt,
+	"help",
+	"flavor=s",
+	"deparse",
+) or usage;
+$opt{help} and usage;
+
+sub slurp($)
+{
+	my $f = shift;
+	local $/;
+	if ( $f eq '-') {
+		return <STDIN>;
+	} else {
+		open F, '<', $f or die "Cannot open $f:$!\n";
+		return <F>;
+	}
+}
+
+my ( $mode, $text );
+if ( 0 == @ARGV ) {
+	($mode, $text) = ('select', slurp('-'));
+} elsif ( 1 == @ARGV ) {
+	if ( $ARGV[0] =~ /^(select|update|delete)$/i ) {
+		($mode, $text) = (lc($ARGV[0]), slurp('-'));
+	} elsif ( $ARGV[0] eq '-' || -e $ARGV[0]) {
+		($mode, $text) = ('select', slurp($ARGV[0]));
+	} else {
+		($mode, $text) = ('select', $ARGV[0]);
+	}
+} elsif ( 2 == @ARGV ) {
+	usage unless $ARGV[0] =~ /^(select|update|delete)$/i;
+	($mode, $text) = (lc($ARGV[0]), ( $ARGV[1] eq '-' || -e $ARGV[1] ) ? slurp($ARGV[1]) : $ARGV[1]);
+} else {
+	usage;
+}
+
+my $sub = eval "sub { $text };";
+die $@ if $@;
+
+if ( $opt{deparse} ) {
+	B::Terse::compile($sub)->();
+}
+
+my ($sql, $bind_values, $nret, %flags) = DBIx::Perlish::gen_sql($sub, $mode,
+	flavor => $opt{flavor},
+);
+print $sql, "\n";

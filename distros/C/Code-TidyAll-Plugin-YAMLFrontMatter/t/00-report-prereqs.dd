@@ -29,7 +29,6 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
                     },
@@ -40,7 +39,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'Path::Tiny' => '0',
                                       'Try::Tiny' => '0',
-                                      'YAML::XS' => '0',
+                                      'YAML::PP' => '0.006',
                                       'namespace::autoclean' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

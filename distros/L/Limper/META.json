@@ -44,22 +44,22 @@
    "provides" : {
       "Limper" : {
          "file" : "lib/Limper.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Limper::Engine" : {
          "file" : "lib/Limper/Engine.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Limper::Passphrase" : {
          "file" : "lib/Limper/Passphrase.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Limper::Plugin" : {
          "file" : "lib/Limper/Plugin.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
-   "version" : "0.014"
+   "version" : "0.015"
 }
 

@@ -1,5 +1,10 @@
 Build.PL
 Changes
+examples/mfrc522/change_keys.pl
+examples/mfrc522/dump_tag_blocks.pl
+examples/mfrc522/dump_tag_info.pl
+examples/mfrc522/module_info.pl
+examples/mfrc522/read_write.pl
 examples/microdotphat/advanced_scrolling.pl
 examples/microdotphat/clock.pl
 examples/microdotphat/fading_text.pl
@@ -152,6 +157,7 @@ lib/HiPi/Interface/MCP3008.pm
 lib/HiPi/Interface/MCP3ADC.pm
 lib/HiPi/Interface/MCP49XX.pm
 lib/HiPi/Interface/MCP4DAC.pm
+lib/HiPi/Interface/MFRC522.pm
 lib/HiPi/Interface/MicroDotPHAT.pm
 lib/HiPi/Interface/MicroDotPHAT/Font.pm
 lib/HiPi/Interface/MonoOLED.pm

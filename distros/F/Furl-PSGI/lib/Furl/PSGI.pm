@@ -1,5 +1,5 @@
 package Furl::PSGI;
-$Furl::PSGI::VERSION = '0.02';
+$Furl::PSGI::VERSION = '0.03';
 # ABSTRACT: Furl, but wired to a PSGI app
 
 use warnings;
@@ -29,7 +29,7 @@ Furl::PSGI - Furl, but wired to a PSGI app
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

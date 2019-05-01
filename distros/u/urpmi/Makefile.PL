@@ -59,7 +59,7 @@ sub install {
     # Take into account scripts in sbin under blib
     # and new manpage sections
     if ($inherited !~ s/"\$\(INST_BIN\)" "\$\(DESTINSTALL(\w*)BIN\)"/$& "\$(INST_SBIN)" "\$(DESTINSTALL$1SBIN)" "\$(INST_LIBEXEC)" "\$(DESTINSTALLLIBEXECDIR)" "\$(INST_MAN5DIR)" "\$(DESTINSTALLMAN5DIR)" "\$(INST_MAN8DIR)" "\$(DESTINSTALLMAN8DIR)"/g) {
-        die "Could not replace INST_SBIN!";
+        die "Could not replace INST_SBIN!" if $] >= 5.022000;
     }
     # install files under /etc and /var
     my $po = $with_po ? ' installpo' : '';
@@ -150,10 +150,10 @@ WriteMakefile(
 	'Filesys::Df'		=> '0',
 	'Getopt::Long'		=> '0',
 	'Locale::gettext'	=> '1.01',
-	'MDV::Distribconf'	=> '0',
+	'MDV::Distribconf'	=> '4.100',
 	'Net::LDAP'		=> '0',
 	'Time::ZoneInfo'	=> '0',
-	'URPM'			=> '5.15',
+	'URPM'			=> 'v5.16',
 	'XML::LibXML'		=> '0',
 	'XML::LibXML::Reader'	=> '0',
     },
@@ -161,6 +161,7 @@ WriteMakefile(
 	'Expect'		=> '0',
 	'File::Slurp'		=> '0',
 	'Net::Server'		=> '0',
+	'Test::More'		=> '0',
 	'Test::Pod'		=> '0',
 	'Test::Pod::Coverage'	=> '0',
     },

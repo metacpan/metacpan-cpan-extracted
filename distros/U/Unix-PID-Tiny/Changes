@@ -1,5 +1,8 @@
 Revision history for Unix-PID-Tiny
 
+0.95 Tue Apr 30 13:48:03 2019
+    - use syswrite() rather than print() to immediately write PID to file
+
 0.94 Wed Apr 24 16:56:09 2019
     - declare Test::Warn, File::Slurp, File::Temp dependencies
     - fix off-by-one test plan error

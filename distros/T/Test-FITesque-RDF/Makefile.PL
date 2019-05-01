@@ -21,12 +21,14 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "Attean" => "0.022_01",
-                                           "Moo" => "1.006000",
-                                           "Path::Tiny" => 0,
-                                           "Test::FITesque" => 0,
-                                           "Types::Standard" => 0,
-                                           "Types::URI" => 0,
+                                           "Attean"            => 0.023,
+                                           "Moo"               => "1.006000",
+                                           "Path::Tiny"        => 0,
+                                           "RDF::NS::Curated"  => 1.002,
+                                           "RDF::Prefixes"     => 0,
+                                           "Test::FITesque"    => 0,
+                                           "Types::Standard"   => 0,
+                                           "Types::URI"        => 0,
                                            "URI::NamespaceMap" => 1.08,
                                          },
                                        },
@@ -40,7 +42,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.001 },
+                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.003 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,8 +55,9 @@ my $meta = {
                                             web  => "https://github.com/kjetilk/p5-test-fitesque-rdf",
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project",
+                          x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.001,
+  "version"          => 0.003,
   "x_static_install" => 1,
 };
 

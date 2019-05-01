@@ -10,7 +10,7 @@ require Exporter;
 use base 'Exporter';
 use Keyword::Pluggable;
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 @EXPORT = qw(sql);
 @EXPORT_OK = qw(union intersect except subselect);
 %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
@@ -29,6 +29,13 @@ sub optree_version
 {
 	return 1 if $^V lt 5.22.0;
 	return 2;
+}
+
+sub lexify
+{
+	my ( $text, $insert ) = @_;
+	$insert .= 'sub ' if $$text =~ /^\s*\{/;
+	substr($$text, 0, 0, $insert);
 }
 
 sub import
@@ -66,17 +73,25 @@ sub import
 	my $iprefix = '__' . $dbh . '_execute_perlish';
 	$iprefix =~ s/\W//g;
 
+	for (
+		[fetch  => " $dbh, q(fetch), "],
+		[select => " $dbh, q(fetch), "],
+		[update => " $dbh, q(update), "],
+		[delete => " $dbh, q(delete), "],
+	) {	
+		my ($name, $code) = @$_;
+		Keyword::Pluggable::define
+			keyword    => $prefix . '_' . $name, 
+			code       => sub { lexify( $_[0], $iprefix.$code ) },
+			expression => 1,
+			package    => $pkg
+		;
+	}
 	Keyword::Pluggable::define
-		keyword    => $prefix . '_' . $$_[0], 
-		code       => $iprefix . $$_[1],
+		keyword    => $prefix . '_insert',
+		code       => $iprefix . "_insert $dbh, ",
 		expression => 1,
 		package    => $pkg
-	for
-		[fetch  => " $dbh, q(fetch),  sub "],
-		[select => " $dbh, q(fetch),  sub "],
-		[update => " $dbh, q(update), sub "],
-		[delete => " $dbh, q(delete), sub "],
-		[insert => "_insert $dbh, "],
 	;
 
 	{
@@ -433,11 +448,15 @@ sub gen_sql
 		die "unfiltered $operation is dangerous: use exec if you want it\n";
 	}
 
-	if ($S->{limit}) {
-		$sql .= " limit $S->{limit}";
-	}
-	if ($S->{offset}) {
-		$sql .= " offset $S->{offset}";
+	my $use_rownum = $args{flavor} && $args{flavor} eq "oracle";
+
+	unless ($use_rownum) {
+		if ($S->{limit}) {
+			$sql .= " limit $S->{limit}";
+		}
+		if ($S->{offset}) {
+			$sql .= " offset $S->{offset}";
+		}
 	}
 	my $v = $S->{set_values};
 	push @$v, @{$S->{ret_values}};
@@ -449,6 +468,13 @@ sub gen_sql
 		push @$v, @{$add->{vals}};
 	}
 	$sql =~ s/\s+$//;
+
+	if ( $use_rownum && ( $S->{limit} || $S->{offset} )) {
+		my @p;
+		push @p, "ROWNUM > " . $S->{offset} if $S->{offset};
+		push @p, "ROWNUM <= " . ($S->{limit} + ($S->{offset} // 0)) if $S->{limit};
+		$sql = "select * from ($sql) where " . join(' and ', @p);
+	}
 
 	return ($sql, $v, $nret, %flags);
 }

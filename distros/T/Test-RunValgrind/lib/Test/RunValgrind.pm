@@ -1,5 +1,5 @@
 package Test::RunValgrind;
-$Test::RunValgrind::VERSION = '0.2.0';
+$Test::RunValgrind::VERSION = '0.2.1';
 use strict;
 use warnings;
 
@@ -65,8 +65,8 @@ sub _init
     my ( $self, $args ) = @_;
 
     $self->_supress_stderr( $args->{supress_stderr} // 0 );
-    $self->_ignore_leaks( $args->{ignore_leaks} // 0 );
-    $self->_valgrind_args( $args->{valgrind_args} // 0 );
+    $self->_ignore_leaks( $args->{ignore_leaks}     // 0 );
+    $self->_valgrind_args( $args->{valgrind_args}   // 0 );
 
     return;
 }
@@ -144,19 +144,20 @@ Test::RunValgrind - tests that an external program is valgrind-clean.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
     use Test::More tests => 1;
+    use Test::RunValgrind;
 
     # TEST
-    Test::RunValgrind->new({})->run(
+    Test::RunValgrind->new( {} )->run(
         {
             log_fn => './expr--valgrind-log.txt',
-            prog => '/usr/bin/expr',
-            argv => [qw/5 + 6/],
-            blurb => 'valgrind likes /usr/bin/expr',
+            prog   => '/usr/bin/expr',
+            argv   => [qw/5 + 6/],
+            blurb  => 'valgrind likes /usr/bin/expr',
         }
     );
 
@@ -173,7 +174,7 @@ reuse by other projects, including fortune-mod
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 METHODS
 

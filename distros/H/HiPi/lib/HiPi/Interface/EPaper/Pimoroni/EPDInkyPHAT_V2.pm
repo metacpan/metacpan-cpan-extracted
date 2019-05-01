@@ -17,7 +17,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( ) );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 use constant {
     WRITE_RAM        => HiPi::Interface::EPaper::TypeA::WRITE_RAM(),

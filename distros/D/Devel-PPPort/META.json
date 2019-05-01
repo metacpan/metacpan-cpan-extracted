@@ -31,6 +31,12 @@
          }
       }
    },
+   "provides" : {
+      "Devel::PPPort" : {
+         "file" : "PPPort_pm.PL",
+         "version" : "3.51"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -42,6 +48,6 @@
          "web" : "https://perl5.git.perl.org/perl.git"
       }
    },
-   "version" : "3.48",
+   "version" : "3.51",
    "x_serialization_backend" : "JSON::MaybeXS version 1.004"
 }

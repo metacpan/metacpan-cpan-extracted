@@ -19,7 +19,7 @@ use HiPi::Device::SPI;
 
 __PACKAGE__->create_ro_accessors( qw( devicename hsb_mask max_channel ic devbits ) );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 sub new {
     my( $class, %userparams ) = @_;

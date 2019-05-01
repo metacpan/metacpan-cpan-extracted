@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "RDF-NS-Curated";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-rdf-ns-curated>;
@@ -93,6 +93,12 @@
 	dc:issued            "2018-02-05"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add an all method."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add author test to check the RDFa Initial Context."@en;
+		], [
 			a doap-changeset:Bugfix;
 			rdfs:label "Fix a typo bug in dc11 URI."@en;
 		], [
@@ -101,12 +107,6 @@
 		], [
 			a doap-changeset:Addition;
 			rdfs:label "Added sosa prefix."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add an all method."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add author test to check the RDFa Initial Context."@en;
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
@@ -140,6 +140,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.001.tar.gz>;
 	doap:revision        "1.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-002>
+	a                    doap:Version;
+	dc:identifier        "RDF-NS-Curated-1.002"^^xsd:string;
+	dc:issued            "2019-04-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Added deps prefixes."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.002.tar.gz>;
+	doap:revision        "1.002"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;

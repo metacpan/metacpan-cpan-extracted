@@ -3,7 +3,7 @@ package Database::Async::Engine::PostgreSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 
@@ -24,7 +24,61 @@ use Template;
 
 use Log::Any qw($log);
 
+sub new {
+    my ($class, %args) = @_;
+    bless \%args, $class;
+}
+
 =head1 METHODS
+
+=cut
+
+sub table_info {
+    my ($self, $tbl) = @_;
+    return (<<'EOS', 'schema', 'table');
+select  a.attname as "name",
+        t.typname as "type",
+        not(a.attnotnull) as "nullable",
+        (
+            select substring(
+                pg_catalog.pg_get_expr(d.adbin, d.adrelid),
+                E'\'(.*)\''
+            )
+            from pg_catalog.pg_attrdef d
+            where d.adrelid = a.attrelid
+            and d.adnum = a.attnum
+            and a.atthasdef
+        ) as "default"
+from pg_class c
+inner join pg_namespace n on n.oid = c.relnamespace
+inner join pg_attribute a on a.attrelid = c.oid
+inner join pg_type t on a.atttypid = t.oid
+where n.nspname = $1
+and c.relname = $2
+and a.attnum > 0
+order by a.attnum
+EOS
+}
+
+sub schema_info {
+    my ($self, $tbl) = @_;
+    return (<<'EOS', 'schema');
+select  n.nspname as "name"
+from pg_namespace n
+where n.nspname = $1
+EOS
+}
+
+sub type_info {
+    my ($self, $tbl) = @_;
+    return (<<'EOS', 'schema', 'type');
+select *
+from pg_catalog.pg_type t
+inner join pg_namespace n on n.oid = t.typnamespace
+where n.nspname = $1
+and t.typname = $2
+EOS
+}
 
 =head2 create_type
 
@@ -90,7 +144,7 @@ TEMPLATE
             $data,
             \my $out
         ) or die $tt->error;
-        $log->infof('Type %s definition would be: %s', $type->name, $out);
+        $log->tracef('Type %s definition would be: %s', $type->name, $out);
         $out
     };
     push @pending, do {
@@ -106,7 +160,7 @@ TEMPLATE
             $data,
             \my $out
         ) or die $tt->error;
-        $log->infof('Type %s description would be: %s', $type->name, $out);
+        $log->tracef('Type %s description would be: %s', $type->name, $out);
         $out
     } if defined $type->description;
     @pending
@@ -158,14 +212,14 @@ create [% IF table.temporary %]temporary [% END %][% IF table.unlogged %]unlogge
 [% END -%]
 )[% IF table.parents.size %] inherits (
 [% FOREACH parent IN table.parents -%]
-    "[% parent.schema %]"."[% parent.name %]"[% UNLESS loop.last %],[% END %]
+    "[% parent.schema.name %]"."[% parent.name %]"[% UNLESS loop.last %],[% END %]
 [% END -%]
 )[% END %][% IF table.tablespace %] tablespace "[% table.tablespace %]"[% END %]
 TEMPLATE
             $data,
             \my $out
         ) or die $tt->error;
-        $log->infof('Table %s definition would be: %s', $tbl->name, $out);
+        $log->tracef('Table %s definition would be: %s', $tbl->name, $out);
         $out
     };
     push @pending, do {
@@ -176,7 +230,7 @@ TEMPLATE
             $data,
             \my $out
         ) or die $tt->error;
-        $log->infof('Table %s description would be: %s', $tbl->name, $out);
+        $log->tracef('Table %s description would be: %s', $tbl->name, $out);
         $out
     } if defined $tbl->description;
     @pending;
@@ -210,7 +264,7 @@ TEMPLATE
             $data,
             \my $out
         ) or die $tt->error;
-        $log->infof('Schema %s definition would be: %s', $schema->name, $out);
+        $log->tracef('Schema %s definition would be: %s', $schema->name, $out);
         $out
     };
     push @pending, do {
@@ -221,7 +275,7 @@ TEMPLATE
             $data,
             \my $out
         ) or die $tt->error;
-        $log->infof('Schema %s description would be: %s', $schema->name, $out);
+        $log->tracef('Schema %s description would be: %s', $schema->name, $out);
         $out
     } if defined $schema->description;
     @pending;

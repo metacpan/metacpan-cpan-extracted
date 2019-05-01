@@ -3,15 +3,15 @@
 #
 # Translators:
 # Francesc Pinyol Margalef, 2012-2014
-# Davidmp <medipas@gmail.com>, 2015-2018
+# Davidmp <medipas@gmail.com>, 2015-2019
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017-2018
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2018-09-02 15:48+0000\n"
-"Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>\n"
+"PO-Revision-Date: 2019-04-29 16:35+0000\n"
+"Last-Translator: Davidmp <medipas@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/MageiaLinux/mageia/language/"
 "ca/)\n"
 "Language: ca\n"
@@ -48,7 +48,7 @@ msgstr "S'està preparant..."
 #: ../gurpm/RPMProgressDialog.pm:313
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr "S'està eliminant el paquet «%s»..."
+msgstr "S'està suprimint el paquet «%s»..."
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
@@ -284,7 +284,7 @@ msgid ""
 msgstr ""
 "No es poden instal·lar alguns paquets sol·licitats:\n"
 "%s\n"
-"Voleu continuar igualment?"
+"Voleu continuar tanmateix?"
 
 #: ../gurpmi2:119
 #, c-format
@@ -323,9 +323,9 @@ msgid ""
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Els paquets següents s'han d'eliminar per actualitzar-ne uns altres:\n"
+"Els paquets següents s'han de suprimir per actualitzar-ne uns altres:\n"
 "%s\n"
-"Voleu continuar igualment?"
+"Voleu continuar tanmanteix?"
 
 #: ../gurpmi2:250 ../urpmi:615
 #, c-format
@@ -816,7 +816,7 @@ msgstr "s'estan recuperant els fitxers rpm del mitjà «%s»..."
 #: ../urpm/install.pm:115 ../urpme:164
 #, c-format
 msgid "removing %s"
-msgstr "s'està eliminant %s"
+msgstr "s'està suprimint %s"
 
 #: ../urpm/install.pm:215
 #, c-format
@@ -831,7 +831,7 @@ msgstr "no s'ha pogut instal·lar el paquet %s"
 #: ../urpm/install.pm:245
 #, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "s'està eliminant el paquet rpm dolent (%s) de %s"
+msgstr "s'està suprimint el paquet rpm incorrecte (%s) de %s"
 
 #: ../urpm/install.pm:246 ../urpm/install.pm:374
 #, c-format
@@ -841,14 +841,14 @@ msgstr "la supressió de %s ha fallat: %s"
 #: ../urpm/install.pm:295
 #, c-format
 msgid "removing package %s"
-msgstr "s'està eliminant el paquet %s"
+msgstr "s'està suprimint el paquet %s"
 
 #: ../urpm/install.pm:341
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
 msgstr ""
-"s'ha creat una transacció per instal·lar a %s (elimina=%d, instal·la=%d, "
+"s'ha creat una transacció per instal·lar a %s (suprimeix=%d, instal·la=%d, "
 "actualitza=%d)"
 
 #: ../urpm/install.pm:344
@@ -859,7 +859,7 @@ msgstr "no s'ha pogut crear la transacció"
 #: ../urpm/install.pm:372
 #, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "s'estan eliminant els rpm instal·lats (%s) de %s "
+msgstr "s'estan suprimint els rpm instal·lats (%s) de %s "
 
 #: ../urpm/install.pm:381
 #, c-format
@@ -940,7 +940,7 @@ msgid ""
 msgstr ""
 "No hi ha prou espai al sistema de fitxers per a baixar tots els paquets (cal "
 "%s, disponible %s).\n"
-"Esteu segur que voleu continuar?"
+"Segur que voleu continuar?"
 
 #: ../urpm/main_loop.pm:138
 #, c-format
@@ -966,7 +966,7 @@ msgstr "La instal·lació ha fallat"
 #: ../urpm/main_loop.pm:159
 #, c-format
 msgid "removing installed rpms (%s)"
-msgstr "s'estan eliminant els rpm instal·lats (%s)"
+msgstr "s'estan suprimint els rpm instal·lats (%s)"
 
 #: ../urpm/main_loop.pm:185
 #, c-format
@@ -1165,7 +1165,7 @@ msgstr "s'estan seleccionant diversos mitjans: %s"
 #: ../urpm/media.pm:1312
 #, c-format
 msgid "removing medium \"%s\""
-msgstr "s'està eliminant el mitjà «%s»"
+msgstr "s'està suprimint el mitjà «%s»"
 
 #: ../urpm/media.pm:1403
 #, c-format
@@ -1433,8 +1433,8 @@ msgstr[1] ""
 #, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "Potser el voleu eliminar."
-msgstr[1] "Potser els voleu eliminar."
+msgstr[0] "Potser el voleu suprimir."
+msgstr[1] "Potser els voleu suprimir."
 
 #: ../urpm/orphans.pm:547
 #, c-format
@@ -1451,11 +1451,11 @@ msgid_plural ""
 msgstr[0] ""
 "Ara el paquet següent és orfe:\n"
 "%s\n"
-"Si el voleu eliminar, podeu executar «urpme --auto-orphans»."
+"Si el voleu suprimir, podeu executar «urpme --auto-orphans»."
 msgstr[1] ""
 "Ara els paquets següents són orfes:\n"
 "%s\n"
-"Si els voleu eliminar, podeu executar «urpme --auto-orphans»."
+"Si els voleu suprimir, podeu executar «urpme --auto-orphans»."
 
 #: ../urpm/parallel.pm:15
 #, c-format
@@ -1601,7 +1601,7 @@ msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"El paquet següent s'ha d'eliminar per actualitzar-ne uns altres:\n"
+"El paquet següent s'ha de suprimir per actualitzar-ne uns altres:\n"
 "%s"
 
 #: ../urpm/select.pm:675
@@ -1610,7 +1610,7 @@ msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Els paquets següents s'han d'eliminar per actualitzar-ne uns altres:\n"
+"Els paquets següents s'han de suprimir per actualitzar-ne uns altres:\n"
 "%s"
 
 #: ../urpm/select.pm:702
@@ -1701,12 +1701,12 @@ msgstr "  --auto         - en escollir, selecciona un paquet automàticament.\n"
 #: ../urpme:44
 #, c-format
 msgid "  --auto-orphans - remove orphans\n"
-msgstr "  --auto-orphans - elimina els orfes\n"
+msgstr "  --auto-orphans - suprimeix els orfes\n"
 
 #: ../urpme:45
 #, c-format
 msgid "  --test         - verify if the removal can be achieved correctly.\n"
-msgstr "  --test         - verifica si l'eliminació pot ser duta a terme.\n"
+msgstr "  --test         - verifica si la supressió es pot fer correctament.\n"
 
 #: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
@@ -1716,7 +1716,7 @@ msgstr "  --parallel     - urpmi distribuït a través de màquines d'àlies.\n"
 #: ../urpme:48
 #, c-format
 msgid "  --root         - use another root for rpm removal.\n"
-msgstr "  --root         - utilitza una altra arrel per a l'eliminació rpm.\n"
+msgstr "  --root         - utilitza una altra arrel per a la supressió rpm.\n"
 
 #: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
 #: ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
@@ -1763,7 +1763,7 @@ msgstr ""
 #: ../urpme:70
 #, c-format
 msgid "Only superuser is allowed to remove packages"
-msgstr "El superusuari és l'únic autoritzat per eliminar paquets"
+msgstr "El superusuari és l'únic autoritzat per suprimir paquets"
 
 #: ../urpme:103
 #, c-format
@@ -1779,27 +1779,27 @@ msgstr "paquet desconegut"
 #, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "Eliminar el paquet següent farà malbé el sistema:"
-msgstr[1] "Eliminar els paquets següents farà malbé el sistema:"
+msgstr[0] "Suprimir el paquet següent farà malbé el sistema:"
+msgstr[1] "Suprimir els paquets següents farà malbé el sistema:"
 
 #: ../urpme:123
 #, c-format
 msgid "Nothing to remove"
-msgstr "Res per eliminar"
+msgstr "Res per suprimir"
 
 #: ../urpme:140
 #, c-format
 msgid "No orphans to remove"
-msgstr "No hi ha cap orfe per eliminar"
+msgstr "No hi ha cap paquet orfe per suprimir"
 
 #: ../urpme:146
 #, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "Per complir les dependències, s'eliminarà el paquet següent:"
+msgstr[0] "Per complir les dependències, se suprimirà el paquet següent:"
 msgstr[1] ""
-"Per satisfer les dependències, s'eliminaran els %d paquets següents:"
+"Per satisfer les dependències, se suprimiran els %d paquets següents:"
 
 #: ../urpme:151
 #, c-format
@@ -1812,23 +1812,23 @@ msgstr[1] "(paquets orfes)"
 #, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
-msgstr[0] "Elimina %d paquet?"
-msgstr[1] "Elimina %d paquets?"
+msgstr[0] "Suprimeixo %d paquet?"
+msgstr[1] "Suprimeixo %d paquets?"
 
 #: ../urpme:163
 #, c-format
 msgid "testing removal of %s"
-msgstr "s'està provant l'eliminació de %s"
+msgstr "s'està provant la supressió de %s"
 
 #: ../urpme:180
 #, c-format
 msgid "Removal failed"
-msgstr "L'eliminació ha fallat"
+msgstr "La supressió ha fallat"
 
 #: ../urpme:182
 #, c-format
 msgid "Removal is possible"
-msgstr "L'eliminació és possible"
+msgstr "La supressió és possible"
 
 #: ../urpmf:31
 #, c-format
@@ -2032,9 +2032,7 @@ msgstr "  --name         - nom del paquet\n"
 #: ../urpmf:69
 #, c-format
 msgid "  --obsoletes    - obsoletes tags\n"
-msgstr ""
-"  --obsoletes     - mostra l'etiqueta obsoletes: tots els paquets que deixa "
-"obsolets.\n"
+msgstr "  --obsoletes     - etiqueta d'obsolet.\n"
 
 #: ../urpmf:70
 #, c-format
@@ -2138,7 +2136,7 @@ msgstr "    --force-key    - força l'actualització de la clau gpg.\n"
 #: ../urpmi:79
 #, c-format
 msgid "  --auto-orphans - remove orphans without asking\n"
-msgstr "  --auto-orphans - esborra els orfes sense preguntar\n"
+msgstr "  --auto-orphans - suprimeix els paquets orfes sense preguntar\n"
 
 #: ../urpmi:80 ../urpmq:52
 #, c-format
@@ -2168,7 +2166,7 @@ msgid ""
 msgstr ""
 "  --keep         - mantén els paquets existents si és possible, rebutja els "
 "paquets sol·licitats\n"
-"                   que porten a l'eliminació d'altres paquets.\n"
+"                   que comporten la supressió d'altres paquets.\n"
 
 #: ../urpmi:85
 #, c-format
@@ -2208,7 +2206,8 @@ msgstr ""
 #, c-format
 msgid "  --clean        - remove rpm from cache before anything else.\n"
 msgstr ""
-"  --clean        - esborra els rpm de la memòria cau abans de res més.\n"
+"  --clean        - suprimeix els rpm de la memòria cau abans d'una altra "
+"cosa.\n"
 
 #: ../urpmi:95
 #, c-format
@@ -2497,7 +2496,7 @@ msgid ""
 "or delete it"
 msgstr ""
 "El directori [%s] ja existeix; si us plau, useu un altre directori per a "
-"l'informe d'error o esborreu-lo"
+"l'informe d'error o suprimiu-lo"
 
 #: ../urpmi:251
 #, c-format
@@ -2599,7 +2598,7 @@ msgstr ""
 #: ../urpmi:526
 #, c-format
 msgid "removing package %s will break your system"
-msgstr "eliminar el paquet %s trencarà el vostre sistema"
+msgstr "suprimir el paquet %s farà malbé el sistema"
 
 #: ../urpmi:534
 #, c-format
@@ -2609,7 +2608,7 @@ msgid ""
 "%s\n"
 msgstr ""
 "La instal·lació no pot continuar, ja que el paquet següent \n"
-"s'ha d'eliminar per actualitzar-ne uns altres:\n"
+"s'ha de suprimir per actualitzar-ne uns altres:\n"
 "%s\n"
 
 #: ../urpmi:536
@@ -2620,7 +2619,7 @@ msgid ""
 "%s\n"
 msgstr ""
 "La instal·lació no pot continuar, ja que els paquets següents\n"
-"s'han d'eliminar per actualitzar-ne uns altres:\n"
+"s'han de suprimir per actualitzar-ne uns altres:\n"
 "%s\n"
 
 #: ../urpmi:544
@@ -2643,8 +2642,8 @@ msgstr ""
 #, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
-msgstr[0] "S'eliminarà el paquet orfe següent:"
-msgstr[1] "S'eliminaran els paquets orfes següents:"
+msgstr[0] "Se suprimirà el paquet orfe següent:"
+msgstr[1] "Se suprimiran els paquets orfes següents:"
 
 #: ../urpmi:597
 #, c-format
@@ -2887,7 +2886,7 @@ msgid ""
 "where <name> is a medium name to remove.\n"
 msgstr ""
 "ús: urpmi.removemedia (-a | <nom> ...)\n"
-"on <nom> és el nom del mitjà que s'ha d'eliminar.\n"
+"on <nom> és el nom del mitjà que s'ha de suprimir.\n"
 
 #: ../urpmi.removemedia:41
 #, c-format
@@ -2902,13 +2901,13 @@ msgstr "  -y             - coincidència difusa en noms de mitjans.\n"
 #: ../urpmi.removemedia:59
 #, c-format
 msgid "Only superuser is allowed to remove media"
-msgstr "El superusuari és l'únic autoritzat per eliminar mitjans"
+msgstr "El superusuari és l'únic autoritzat per suprimir mitjans"
 
 #: ../urpmi.removemedia:71
 #, c-format
 msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
 msgstr ""
-"no hi ha res per eliminar (utilitzeu urpmi.addmedia per afegir un mitjà)\n"
+"no hi ha res per suprimir (utilitzeu urpmi.addmedia per afegir un mitjà)\n"
 
 #: ../urpmi.removemedia:77
 #, c-format
@@ -2916,7 +2915,7 @@ msgid ""
 "the entry to remove is missing\n"
 "(one of %s)\n"
 msgstr ""
-"falta l'entrada per eliminar\n"
+"falta l'entrada per suprimir\n"
 "(una de %s)\n"
 
 #: ../urpmi.update:30
@@ -3177,7 +3176,7 @@ msgstr ""
 #, c-format
 msgid "  -c             - complete output with package to be removed.\n"
 msgstr ""
-"  -c             - sortida completa amb el paquet per eliminar.\n"
+"  -c             - sortida completa amb el paquet per suprimir.\n"
 "\n"
 
 #: ../urpmq:98
@@ -3220,7 +3219,7 @@ msgid ""
 "  -u             - remove package if a more recent version is already "
 "installed.\n"
 msgstr ""
-"  -u             - elimina el paquet si hi ha instal·lada una versió més "
+"  -u             - suprimeix el paquet si n'hi ha instal·lada una versió més "
 "nova.\n"
 
 #: ../urpmq:105

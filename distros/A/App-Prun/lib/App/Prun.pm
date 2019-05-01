@@ -1,12 +1,12 @@
+use strict;
+use warnings;
 package App::Prun;
-
-use 5.010;
-
+$App::Prun::VERSION = '1.08';
 use Moo;
 use Storable qw( freeze );  # to support testing
 use namespace::clean;
 
-our $VERSION = '1.07';
+use 5.010;
 
 has pm => ( is => 'ro', required => 1 );
 has report_failed_procs => ( is => 'ro', default => 1 );
@@ -58,11 +58,14 @@ sub _test_dump {
     exit 255;
 }
 
+# ABSTRACT: Provides the prun script as a command line interface to L<Parallel::ForkManager>.
 1;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -70,13 +73,7 @@ App::Prun - Provides the prun script as a command line interface to L<Parallel::
 
 =head1 VERSION
 
-Version 1.07
-
-=head1 SYNOPSYS
-
-    for nr in `seq 1..100`; do echo "echo command #$nr" | prun
-
-    prun command_file_to_run_in_parallel
+version 1.08
 
 =head1 DESCRIPTION
 
@@ -97,6 +94,12 @@ parallel up to a maximum number of processes at once.
 
 =back
 
+=head1 SYNOPSYS
+
+    for nr in `seq 1..100`; do echo "echo command #$nr" | prun
+
+    prun command_file_to_run_in_parallel
+
 =head1 EXAMPLES
 
 There are also examples available from the command line B<--help>.
@@ -106,7 +109,7 @@ of them at a time.
 
   for F in *.trc; do echo "tkprof $F ${F%trc}txt"; done | prun -p 32
 
-Run all commands in a file (command_file), one line at a time.  Run
+Run all commands in a file (command_file), one command per line. Run
 the default number of processes in parallel ($def_processes).
 Ignore any failed processes, but do report to STDOUT any that fail.
 
@@ -116,10 +119,6 @@ Test with the dummy_load script included in the contrib/ directory
 of this distribution:
 
   for F in `seq 1 100`; do echo "contrib/dummy_load"; done | prun
-
-=head1 AUTHOR
-
-Jason McCarver <slam@parasite.cc>
 
 =head1 SEE ALSO
 
@@ -143,11 +142,15 @@ clone it:
 
   hg clone https://bitbucket.org/jmccarv/app-prun
 
+=head1 AUTHOR
+
+Jason McCarver <slam@parasite.cc>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Jason McCarver
+This software is copyright (c) 2019 by Jasno McCarver.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

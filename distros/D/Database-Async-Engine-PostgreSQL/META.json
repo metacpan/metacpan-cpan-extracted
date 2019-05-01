@@ -49,7 +49,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Database::Async" : "0.004",
+            "Database::Async" : "0.005",
             "Database::Async::Engine" : "0",
             "Database::Async::Query" : "0",
             "Future" : "0.38",
@@ -79,7 +79,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Database::Async" : "0.004",
+            "Database::Async" : "0.005",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Async::Loop" : "0",
@@ -103,15 +103,26 @@
    "provides" : {
       "Database::Async::Engine::PostgreSQL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Database::Async::Engine::PostgreSQL::DDL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL/DDL.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
-   "version" : "0.003",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues"
+      },
+      "homepage" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git",
+         "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL"
+      }
+   },
+   "version" : "0.004",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom M <tom@audioboundary.com>"

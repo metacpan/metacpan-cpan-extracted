@@ -1,7 +1,7 @@
 NAME
 
-    WebService::Pokemon - A module to access the Pokémon data through
-    RESTful API from http://pokeapi.co.
+    WebService::Pokemon - Perl library for accessing the Pokémon data,
+    http://pokeapi.co.
 
 SYNOPSIS
 
@@ -22,39 +22,11 @@ DESCRIPTION
 
 DEVELOPMENT
 
-    Source repo at https://github.com/kianmeng/webservice-pokemon.
+    Source repository at https://github.com/kianmeng/webservice-pokemon.
 
- Docker
-
-    If you have Docker installed, you can build your Docker container for
-    this project.
-
-        $ docker build -t webservice-pokemon .
-        $ docker run -it -v $(pwd):/root webservice-pokemon bash
-        # cpanm --installdeps --notest .
-
- Milla
-
-    Setting up the required packages.
-
-        $ milla authordeps --missing | cpanm
-        $ milla listdeps --missing | cpanm
-
-    Check you code coverage.
-
-        $ milla cover
-
-    Several ways to run the test.
-
-        $ milla test
-        $ milla test --author --release
-        $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla test
-        $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla run prove t/01_instantiation.t
-
-    Release the module.
-
-        $ milla build
-        $ milla release
+    How to contribute? Follow through the CONTRIBUTING.md
+    <https://github.com/kianmeng/webservice-pokemon/blob/master/CONTRIBUTING.md>
+    document to setup your development environment.
 
 METHODS
 
@@ -77,32 +49,17 @@ METHODS
         my $pokemon_api = WebService::Pokemon->new;
         $pokemon_api->api_url('http://example.com/api/v2');
 
-  cache
+  autoload
 
-    The cache directory of the HTTP reponses. By default, all cached data
-    is stored as files in /tmp/cache/.
+    Set this if you want to expand all fields point to external URL.
 
-        # Default cache engine is file-based storage.
-        my $pokemon_api = WebService::Pokemon->new;
-    
-        # Or we define our custom cache engine with settings.
-        my $pokemon_api = WebService::Pokemon->new(
-            cache => CHI->new(
-                driver => 'File',
-                namespace => 'restcountries',
-                root_dir => $ENV{PWD} . '/tmp/cache/',
-            )
-        );
+        # Instantiate the class by setting the URL of the API endpoints.
+        my $pokemon_api = WebService::Pokemon->new({autoload => 1});
     
         # Or after the object was created.
         my $pokemon_api = WebService::Pokemon->new;
-        $pokemon_api->cache(
-            cache => CHI->new(
-                driver => 'File',
-                namespace => 'restcountries',
-                root_dir => $ENV{PWD} . '/tmp/cache/',
-            )
-        );
+        $pokemon_api->autoload(1);
+        $pokemon_api->resource('berry');
 
  resource($resource, [$name], [$limit], [$offset])
 
@@ -121,15 +78,28 @@ METHODS
         # Get by name.
         my $berry_firmness = $pokemon_api->resource('berry-firmnesses', 'very-soft');
 
+ resource_by_url($url)
+
+    Get the details of a particular resource by full URL.
+
+        # Get paginated list of available berry resource with default item size.
+        my $berries = $pokemon_api->resource_by_url('https://pokeapi.co/api/v2/berry/');
+    
+        # Get paginated list of available berry resource with explicit default item size.
+        my $berries = $pokemon_api->resource_by_url('https://pokeapi.co/api/v2/berry/?limit=20&offset=40');
+    
+        # Get particular berry resource.
+        my $berry = $pokemon_api->resource_by_url('https://pokeapi.co/api/v2/berry/1');
+
+AUTHOR
+
+    Kian Meng, Ang <kianmeng@cpan.org>
+
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 by Kian Meng, Ang.
+    This software is Copyright (c) 2018-2019 by Kian Meng, Ang.
 
     This is free software, licensed under:
 
         The Artistic License 2.0 (GPL Compatible)
-
-AUTHOR
-
-    Kian Meng, Ang <kianmeng@users.noreply.github.com>
 

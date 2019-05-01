@@ -20,7 +20,7 @@ name: App-Gezer
 provides:
   App::Gezer:
     file: lib/App/Gezer.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
   CHI: '0'
   Carp::Always: '0'
@@ -36,10 +36,10 @@ resources:
   bugtracker: https://github.com/shlomif/app-gezer/issues
   homepage: http://metacpan.org/release/App-Gezer
   repository: https://github.com/shlomif/perl-App-Gezer.git
-version: 0.0.2
+version: 0.0.3
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -395,5 +395,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

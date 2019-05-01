@@ -1,5 +1,17 @@
 Revision history for Taskwarrior-Hooks
 
+0.12.0 2019-04-30
+  [ DOCUMENTATION ]
+    - ENHANCEMENTS
+
+  [ NEW FEATURES ]
+    - adds 'Blocks' (as in, reverse of depends) plugin.
+    - adds 'Mikado' command.
+    - adds 'morning' plugin.
+
+  [ STATISTICS ]
+    - code churn: 14 files changed, 269 insertions(+), 57 deletions(-)
+
 0.11.0 2018-11-27
   [ DOCUMENTATION ]
     - Fixed minor typo in the pod. [GH#29, Mohammad S Anwar]
@@ -12,7 +24,7 @@ Revision history for Taskwarrior-Hooks
 
 0.10.0 2018-11-06
   [ ENHANCEMENTS ]
-    - In the plugin `Command::Open", added the possibility for different 
+    - In the plugin `Command::Open", added the possibility for different
       actions for the same filetype.
     - 'and-after' and 'but-before' now inherit the previous task's project.
 

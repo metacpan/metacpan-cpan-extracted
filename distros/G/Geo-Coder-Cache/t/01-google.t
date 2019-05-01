@@ -10,6 +10,7 @@ use Geo::Coder::Cache;
 
 eval "use Geo::Coder::Google";
 plan skip_all => "Geo::Coder::Google required for testing" if $@;
+plan skip_all => "Geo::Coder::Google required for testing" unless $ENV{GMAP_CLIENT} && $ENV{GMAP_KEY};
 plan tests => 3;
 
 my $geocoder = Geo::Coder::Cache->new(

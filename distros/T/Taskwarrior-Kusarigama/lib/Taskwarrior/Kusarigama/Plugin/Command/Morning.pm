@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Morning;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: run taskwarrior's garbage collection
-$Taskwarrior::Kusarigama::Plugin::Command::Morning::VERSION = '0.11.0';
+$Taskwarrior::Kusarigama::Plugin::Command::Morning::VERSION = '0.12.0';
 
 use strict;
 use warnings;
@@ -34,13 +34,16 @@ Taskwarrior::Kusarigama::Plugin::Command::Morning - run taskwarrior's garbage co
 
 =head1 VERSION
 
-version 0.11.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
     $ task morning
 
 =head1 DESCRIPTION
+
+DEPRECATED: look at L<Taskwarrior::Kusarigama::Plugin::Morning>,
+that does the same thing as this command, but automatically.
 
 By default, taskwarrior runs its garbage
 collection each time it's run. The problem is,
@@ -67,7 +70,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

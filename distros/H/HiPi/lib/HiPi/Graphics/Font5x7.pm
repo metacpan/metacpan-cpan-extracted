@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use parent qw( Exporter );
 
-our $VERSION ='0.75';
+our $VERSION ='0.76';
 
 our @EXPORT_OK = qw(  font_5_x_7  );
 

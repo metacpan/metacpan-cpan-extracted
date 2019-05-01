@@ -1,5 +1,14 @@
 Revision history for Device-RAID-Poller
 
+0.1.1	 2019-05-01/00:15
+         -Don't call sysctl on the ZFS test on Linux, only FreeBSD.
+         -Silence which for arcconf check.
+         -Fix Adaptec_arcconf BBU status cehcking.
+         -FBSD_graid now calls FBSD_graid instead of FBSD_graid3
+		 -Now includes the LD name in the return from Adaptec arcconf.
+         -Don't consider Adaptec_arcconf unusable if Linux or FreeBSD
+             is found.
+
 0.1.0	 2019-04-29/01:15
          -Add FreeBSD GEOM raid3 support.
          -Add FreeBSD GEOM raid support.
