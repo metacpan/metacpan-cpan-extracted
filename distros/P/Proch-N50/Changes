@@ -1,6 +1,19 @@
+0.031	2019-05-03
+	* Removed JSON unit test: this module has been built to only optionally require it. Even unit tests can have bugs.
+
+0.03	2019-05-02
+	* Added method _getJsonStats()_ to directly receive JSON string
+	* Expanded json unit test accordingly
+
+0.023	2019-05-01 
+	* Updated dist.ini [Dist::Zilla::Role::ModuleMetadata]
+	* Synopsis uses print instead of say
+	* Added CPAN distribution tests (CPAN Version check, POD integrity, Changes, Kwalitee...)
+	* Added unit tests for getStats() and getStats with JSON
+
 0.022	2019-05-01
 	* Improved POD documentation
-	Ã* Fixed name in n50_algorithm.pl
+	* Fixed name in n50_algorithm.pl
 
 0.021	2019-05-01
 	* Improved POD documentation

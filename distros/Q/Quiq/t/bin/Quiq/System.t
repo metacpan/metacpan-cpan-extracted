@@ -40,7 +40,9 @@ sub test_hostname : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_ip : Test(1) {
+# Der Test funktioniert unter NetBSD nicht
+
+sub test_ip : Ignore(1) {
     my $self = shift;
 
     my $ip = Quiq::System->ip;

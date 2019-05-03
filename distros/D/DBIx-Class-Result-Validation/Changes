@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-Weborama-Validation
 
+0.17    2019-02-02
+        add method to prohibit update on some fields (Frédéric Lechauve)
+
 0.16    2017-05-15
         Edit manifest to add missing file for tests
 

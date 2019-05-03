@@ -4,6 +4,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+script/generate_wmm_data.pl
 t/00-load.t
 t/01-data_year.t
 t/05-dec.t

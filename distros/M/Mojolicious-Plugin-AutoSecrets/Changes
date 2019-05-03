@@ -1,6 +1,10 @@
 Changelog for Mojolicious-Plugin-AutoSecrets
 
-0.005 2018-03-31T19:30:59
+0.006 2019-05-02T03:49:45
+ - rename (Meredith Howard)
+ - Added missing prereq autodie as reported by CPANTS. (Mohammad S Anwar)
+
+0.005 2018-03-31T19:30:59Z
  - Ensure IO::File is loaded for 5.10 (Meredith Howard)
 
 0.004 2018-03-27T22:15:35Z

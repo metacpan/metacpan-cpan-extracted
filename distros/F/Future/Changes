@@ -1,5 +1,12 @@
 Revision history for Future
 
+0.40    2019-05-03
+        [CHANGES]
+         * Added Future::Exception (RT129373)
+         * Make ->get throw a Future::Exception and ->fail recognise one
+         * Better documentation of the failure category parameter
+         * Added a properly-documented ->block_until_ready
+
 0.39    2018-09-20 14:03:05
         [CHANGES]
          * Added Test::Future::Deferred

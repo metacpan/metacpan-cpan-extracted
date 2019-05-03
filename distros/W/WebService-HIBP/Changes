@@ -1,5 +1,11 @@
 Revision history for WebService-HIBP
 
+0.14   Wed May 02 20:47:00 2019
+        Resubmit after index failure
+
+0.13   Wed Apr 24 20:01:00 2019
+        Stop throwing 404 exceptions in account, breach and pastes. RT #129297
+
 0.12   Tue Apr 02 19:25:00 2019
         Encoding passwords containing non-ascii characters correctly.  Thanks again to PCRONIN in RT #128991.
 

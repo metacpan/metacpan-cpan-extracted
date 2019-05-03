@@ -12,7 +12,9 @@ __PACKAGE__->add_columns('objectid',
                          'attribute',
                          {data_type => "varchar", is_nullable => 0, validation  => "defined"},
                          'ref_id',
-                         {data_type => "integer", is_nullable => 0, validation  => "not_null_or_not_zero"},
+                         {data_type => "integer", is_nullable => 0, validation  => ["not_null_or_not_zero", "prohibit_field_update"]},
+                         'info',
+                         {data_type => "varchar", is_nullable => 1, validation  => "prohibit_field_update"},
                          );
 __PACKAGE__->set_primary_key('objectid');
 __PACKAGE__->load_components(qw/ Result::Validation /);

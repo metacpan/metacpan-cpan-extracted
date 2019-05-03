@@ -1,3 +1,31 @@
+1.139 2019-05-01
+================
+[Quiq::AnsiColor]
+* Doku bearbeitet
+
+[Quiq::Cascm]
+* Methode edit() verbessert
+* Methode view() hinzugefügt
+* Methode repoFileToFile() hinzugefügt
+
+[Quiq::CommandLine]
+* Methode addOption() verbessert, so dass Optionen übergangen werden,
+  die keinen Wert haben.
+
+[Quiq::Database::ResultSet::Object]
+* Doku bearbeitet
+
+[Quiq::Database::Connection]
+* Methode schemas() hinzugefügt
+* Methode tableDiff() hinzugefügt
+
+[Quiq::Database::ResultSet]
+* Methode asTable() verallgmeinert, dass die Titelliste des ResultSet
+  von der Titelliste der Rows abweichen kann.
+
+[Quiq::Parameters]
+* Doku bearbeitet
+
 1.138 2019-04-22
 ================
 [Quiq::Database::Connection]

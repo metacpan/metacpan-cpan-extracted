@@ -1,5 +1,8 @@
 Revision history for signatures
 
+0.14      2019-05-03 05:39:41Z
+  - properly clear PL_lex_stuff (perl RT#134058, Dave Mitchell)
+
 0.13      2015-07-28 06:35:39Z
   - bump minimum version of B::Hooks::Parser for ::Install::Files
 

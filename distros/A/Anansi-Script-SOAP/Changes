@@ -10,3 +10,5 @@ Revision history for Perl extension Anansi::Script::SOAP.
 	- modified the module to use Anansi::ScriptComponent instead of Anansi::Component.
 	- modified module dependencies in makefile.
 	- modified README to reflect module dependencies.
+0.04  Sun Apr 28 18:23:05 2019
+	- modified Anansi::ScriptComponent module dependency in makefile.

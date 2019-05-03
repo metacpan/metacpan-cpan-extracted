@@ -16,7 +16,7 @@ name: Eval-Quosure
 provides:
   Eval::Quosure:
     file: lib/Eval/Quosure.pm
-    version: '0.001000'
+    version: '0.001001'
 requires:
   List::Util: '1.28'
   PadWalker: '2.3'
@@ -29,6 +29,6 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-Eval-Quosure.git
-version: '0.001000'
-x_generated_by_perl: v5.20.3
+version: '0.001001'
+x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

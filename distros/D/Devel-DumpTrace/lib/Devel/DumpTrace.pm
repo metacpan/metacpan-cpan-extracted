@@ -15,7 +15,7 @@ use Fcntl qw(:flock :seek);
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 my $Time_HiRes_avail;
 my $color_avail;
@@ -450,7 +450,7 @@ sub evaluate_and_display_line {
     # then don't perform variable substitution:
     #          my $k;
     #          my ($a,$b,@c);
-    #          our $ZZZ;
+    #          our $xyz;
 
     if ($code    =~ /^ \s* (my|our) \s*
                     [\$@%*\(] /x           # lexical declaration
@@ -1126,7 +1126,7 @@ Devel::DumpTrace - Evaluate and print out each line before it is executed.
 
 =head1 VERSION
 
-0.28
+0.29
 
 =head1 SYNOPSIS
 
@@ -1218,6 +1218,8 @@ of this module, especially for the basic parser.
 None of interest.
 
 =head1 VARIABLES
+
+=head2 $TRACE
 
 =head2 C<$Devel::DumpTrace::TRACE>
 
@@ -1361,14 +1363,16 @@ By default C<Devel::DumpTrace> does not evaluate statements in any "system"
 modules, which are defined as any module from a file that resides under
 an absolute path in your system's C<@INC> list of directories. If the
 C<$TRACE> variable is set to a value larger than 100, then this module
-B<will> drill down into such modules. See also L</"EXCLUDE_PKG"> and
-L</"INCLUDE_PKG"> for another way to exercise control over what packages
+B<will> drill down into such modules. See also L</"%EXCLUDE_PKG"> and
+L</"%INCLUDE_PKG"> for another way to exercise control over what packages
 this module will explore.
 
 For convenience, the C<$Devel::DumpTrace::TRACE> variable is aliased to
 the C<$Devel::Trace::TRACE> variable. This way you can enable settings
 in your program that can be used by both L<Devel::Trace|Devel::Trace>
 and C<Devel::DumpTrace>.
+
+=head2 $DUMPTRACE_FH
 
 =head2 C<$Devel::DumpTrace::DUMPTRACE_FH>
 
@@ -1393,6 +1397,12 @@ will open a file with that name and write the trace output to that file.
 B<< Backwards-incompatible change: >> in v0.06, this variable was called 
 C<XTRACE_FH>.
 
+=head2 $ARRAY_ELEM_SEPARATOR
+
+=head2 $HASH_ENTRY_SEPARATOR
+
+=head2 $HASH_PAIR_SEPARATOR
+
 =head2 C<$Devel::DumpTrace::ARRAY_ELEM_SEPARATOR = ','>
 
 =head2 C<$Devel::DumpTrace::HASH_ENTRY_SEPARATOR = ';'>
@@ -1405,6 +1415,8 @@ references. If you wish to use different delimiters for whatever reason
 (maybe your arrays have a lot of elements with commas in them),
 you can change these values.
 
+=head2 $XEVAL_SEPARATOR
+
 =head2 C<< $Devel::DumpTrace::XEVAL_SEPARATOR = ':' >>
 
 In normal (non-verbose) mode, C<Devel::DumpTrace> will display this token
@@ -1412,7 +1424,11 @@ between the name of a variable and its value (e.g., C<$c:23>). The
 default token is a colon (C<:>), but you may change it by changing
 the value of the variable C<$Devel::DumpTrace::XEVAL_SEPARATOR>.
 
-=head2 %Devel::DumpTrace::EXCLUDE_PKG, %Devel::DumpTrace::INCLUDE_PKG
+=head2 %EXCLUDE_PKG
+
+=head2 %INCLUDE_PKG
+
+=head2 C<%Devel::DumpTrace::EXCLUDE_PKG>, C<%Devel::DumpTrace::INCLUDE_PKG>
 
 Sets of packages that this module will never/always explore.
 These settings take precedence over the setting of the
@@ -1422,7 +1438,11 @@ of C<%Devel::DumpTrace::EXCLUDE_PKG> (that is, a package that is
 specified in both C<%EXCLUDE_PKG> and C<%INCLUDE_PKG> will
 be I<included>).
 
-=head2 @Devel::DumpTrace::EXCLUDE_PATTERN, @Devel::DumpTrace::INCLUDE_PATTERN
+=head2 @EXCLUDE_PATTERN
+
+=head2 @INCLUDE_PATTERN
+
+=head2 C<@Devel::DumpTrace::EXCLUDE_PATTERN>, C<@Devel::DumpTrace::INCLUDE_PATTERN>
 
 List of regular expressions representing the packages that this
 module will never/always trace through.
@@ -1707,7 +1727,7 @@ Marty O'Brien, E<lt>mob at cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2018 Marty O'Brien.
+Copyright 2010-2019 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -271,8 +271,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.006,
-built on February 15, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box distribution version 3.007,
+built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

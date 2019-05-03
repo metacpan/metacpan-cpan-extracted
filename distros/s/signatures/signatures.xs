@@ -151,6 +151,9 @@ handle_proto (pTHX_ OP *op, void *user_data) {
 		return op;
 	}
 
+	assert(PL_lex_stuff == op_sv);
+	PL_lex_stuff = NULL;
+
 	tmp = hook_toke_scan_str (aTHX_ s);
 	tmp2 = hook_parser_get_lex_stuff (aTHX);
 	hook_parser_clear_lex_stuff (aTHX);

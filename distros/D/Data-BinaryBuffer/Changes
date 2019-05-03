@@ -1,3 +1,7 @@
+0.006     2019-05-02 15:27:55+03:00 Europe/Moscow
+  * fix: Build on recent FreeBSD with clang (https://github.com/vovkasm/data-binarybuffer/issues/1)
+  * feat: Use boost::endian for conversion, improve crossplatform support (should run on macOS for ex)
+
 0.005     2013-08-24 03:25:01 Europe/Moscow
   * Fix configure tests for C++ and STL
   * Improve platform tests

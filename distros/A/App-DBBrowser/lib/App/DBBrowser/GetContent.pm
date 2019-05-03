@@ -3,7 +3,7 @@ App::DBBrowser::GetContent;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
@@ -21,7 +21,7 @@ use Term::Form              qw();
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent::Filter;
 use App::DBBrowser::GetContent::ParseFile;
-use App::DBBrowser::Opt;
+use App::DBBrowser::Opt::Set;
 
 use open ':encoding(locale)';
 
@@ -33,8 +33,6 @@ sub new {
         o => $options,
         d => $data,
     };
-    $sf->{i}{f_tmp_copy_paste} = catfile $sf->{i}{app_dir}, 'tmp_copy_and_paste.csv'; #
-    $sf->{i}{f_dir_history}    = catfile $sf->{i}{app_dir}, 'dir_history.json'; #
     bless $sf, $class;
 }
 
@@ -177,10 +175,9 @@ sub from_copy_and_paste {
     my $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
     $ax->print_sql( $sql );
     print "Multi row:\n";
-    my $file_ec = $sf->{i}{f_tmp_copy_paste};
-    local $SIG{INT} = sub { unlink $file_ec; exit };
+    my $file_fs = $sf->{i}{f_copy_paste};
     if ( ! eval {
-        open my $fh_in, '>', $file_ec or die $!;
+        open my $fh_in, '>', $file_fs or die $!;
         # STDIN
         while ( my $row = <STDIN> ) {
             print $fh_in $row;
@@ -189,16 +186,16 @@ sub from_copy_and_paste {
         1 }
     ) {
         $ax->print_error_message( $@, join ', ', @{$sf->{i}{stmt_types}}, 'copy & paste' );
-        unlink $file_ec or warn $!;
+        unlink $file_fs or warn $!;
         return;
     }
-    if ( ! -s $file_ec ) {
+    if ( ! -s $file_fs ) {
         $sql->{insert_into_args} = [];
         return;
     }
 
     PARSE: while ( 1 ) {
-        open my $fh, '<', $file_ec or die $!;
+        open my $fh, '<', $file_fs or die $!;
         $sql->{insert_into_args} = [];
         my $parse_ok;
         if ( $parse_mode_idx == 0 ) {
@@ -220,14 +217,14 @@ sub from_copy_and_paste {
             return;
         }
         elsif ( $filter_ok == -1 ) {
-            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-            $sf->{o} = $opt->set_options( _options_copy_and_paste() );
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            $sf->{o} = $opt_set->set_options( _options_copy_and_paste() );
             $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
             next PARSE;
         }
         last PARSE;
     }
-    unlink $file_ec or die $!;
+    unlink $file_fs or die $!;
     return 1;
 }
 
@@ -288,7 +285,6 @@ sub from_file {
             my $hidden = 'Choose File ' . $sf->__parse_settings_file( $parse_mode_idx );
             my @pre = ( $hidden, undef );
             my $choices = [ @pre, @files ];
-            $ENV{TC_RESET_AUTO_UP} = 0;
             # Choose
             my $idx = choose(
                 $choices,
@@ -303,14 +299,11 @@ sub from_file {
                     $old_idx = 1;
                     next FILE;
                 }
-                else {
-                    $old_idx = $idx;
-                }
+                $old_idx = $idx;
             }
-            delete $ENV{TC_RESET_AUTO_UP};
             if ( $choices->[$idx] eq $hidden ) {
-                my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-                $opt->set_options( _options_file( 1 ) );
+                my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                $opt_set->set_options( _options_file( 1 ) );
                 $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
                 next FILE;
             }
@@ -340,8 +333,8 @@ sub from_file {
                         next FILE;
                     }
                     elsif ( $filter_ok == -1 ) {
-                        my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-                        $sf->{o} = $opt->set_options( _options_file() );
+                        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                        $sf->{o} = $opt_set->set_options( _options_file() );
                         $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
                         next PARSE;
                     }
@@ -374,8 +367,8 @@ sub from_file {
                                     choose( [ 'Not a text file: "Spreadsheet::Read" used automatically' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
                                     next FILTER;
                                 }
-                                my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-                                $sf->{o} = $opt->set_options( _options_file() );
+                                my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                                $sf->{o} = $opt_set->set_options( _options_file() );
                                 $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
                                 next PARSE;
                             }
@@ -410,7 +403,6 @@ sub __directory {
         my @dirs = sort @{$h_ref->{dirs}||[]};
         my $prompt = sprintf "Choose a dir:";
         my @pre = ( undef, '  NEW search' );
-        $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
         my $idx = choose(
             [ @pre, map( '- ' . $_, @dirs ) ],
@@ -424,11 +416,8 @@ sub __directory {
                 $sf->{i}{old_dir_idx} = 0;
                 next DIR;
             }
-            else {
-                $sf->{i}{old_dir_idx} = $idx;
-            }
+            $sf->{i}{old_dir_idx} = $idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         my $dir_ec;
         if ( $idx == $#pre ) {
             $dir_ec = $sf->__new_dir_search();

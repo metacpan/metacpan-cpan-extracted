@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.138;
+our $VERSION = 1.139;
 
 use Quiq::Object;
 use Time::HiRes ();
 use Quiq::Option;
 use Quiq::FileHandle;
 use Quiq::ColumnFormat;
+use Quiq::Array;
 use Quiq::Duration;
 
 # -----------------------------------------------------------------------------
@@ -927,10 +928,10 @@ sub asTable {
     if ($info >= 3 && (my $stmt = $self->stmt)) {
         $str .= "$stmt\n\n";
     }
+    my @titles = $self->titles;
     if ($info >= 2) {
         # Kolumnenbezeichnungen
 
-        my @titles = $self->titles;
         my $l = length scalar @titles;
         for (my $i = 0; $i < @titles; $i++) {
             $str .= sprintf "%*d %s\n",$l,$i+1,$titles[$i];
@@ -939,6 +940,14 @@ sub asTable {
 
     if ($self->count) {
         my @fmt = $self->formats;
+
+        # Prüfe, ob die Titelliste des ResultSet von der Titelliste
+        # der Rows abweicht. Wenn ja, müssen wir die Werte einzeln
+        # abfragen (siehe map{} unten). Bei Raw-Datensätzen kann
+        # die Titelliste nicht abweichen.
+
+        my $asArray = $self->isRaw || Quiq::Array->eq(
+            \@titles,scalar $self->rows->[0]->titles);
 
         if ($info) {
             # Kolumnenzeile
@@ -955,7 +964,7 @@ sub asTable {
         # Tabelle
 
         for my $row ($self->rows) {
-            my @arr = $row->asArray;
+            my @arr = $asArray? $row->asArray: map {$row->$_} @titles;
             $str .= '| ';
             for (my $i = 0; $i < @arr; $i++) {
                 if ($i) {
@@ -1062,7 +1071,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.138
+1.139
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'The Gearhart-Brenan Dita Topic Content Naming Convention..'
+abstract: 'The Gearhart-Brenan Dita Topic Naming Standard.'
 author:
   - philiprbrenan@gmail.com
 build_requires: {}
@@ -15,14 +15,14 @@ name: Dita-GB-Standard
 provides:
   Dita::GB::Standard:
     file: lib/Dita/GB/Standard.pm
-    version: '20190501'
+    version: '20190504'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20190429'
+  Data::Table::Text: '20190503'
   Test2::API: '0'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190501'
+version: '20190504'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,6 +4,11 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+version 3.004: Fri  3 May 09:29:07 CEST 2019
+
+	Improvements:
+	- add imap/imap4
+
 version 3.003: Mon  3 Sep 08:16:23 CEST 2018
 
 	Fixes:

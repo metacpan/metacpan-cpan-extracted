@@ -3,7 +3,7 @@ package WebService::HIBP::Paste;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -48,7 +48,7 @@ WebService::HIBP::Paste - An instance of a paste from the Have I Been Pwned webs
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =head1 SYNOPSIS
 

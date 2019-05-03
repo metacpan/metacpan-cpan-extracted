@@ -1,28 +1,11 @@
-# Top-level filter (only include the following...)
-^(?!(?:share|script|examples|lib|inc|t|xt|maint)/|(?:(?:Makefile|Build)\.PL|CONTRIBUTING.md|README?|CHANGES|LICENSE|META\.(?:yml|json))$)
+#!include_default
 
-# Avoid version control files.
-\bRCS\b
-\bCVS\b
-,v$
-\B\.svn\b
-\b_darcs\b
-# (.git or .hg only in top-level, hence it's blocked above)
+# Avoid files used when modifying the dist
+^Makefile$
+^README.md$
+^LICENSE.txt$
 
-# Avoid temp and backup files.
-~$
-\.tmp$
-\.old$
-\.bak$
-\..*?\.sw[po]$
-\#$
-\b\.#
-\b\.nfs.
-
-# avoid OS X finder files
-\.DS_Store$
-
-# ditto for Windows
+# avoid Windows explorer files
 \bdesktop\.ini$
 \b[Tt]humbs\.db$
 
@@ -31,6 +14,7 @@
 \.rej$
 
 # Avoid plenv/carton files
+\.build$
 \bcpanfile\.snapshot$
 \blocal$
 \.perl-.*(\.installed|\.tested|version)$

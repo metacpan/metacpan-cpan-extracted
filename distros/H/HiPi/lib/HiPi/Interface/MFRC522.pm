@@ -24,7 +24,7 @@ use HiPi::Device::SPI;
 use HiPi::GPIO;
 use Carp;
 
-our $VERSION ='0.76';
+our $VERSION ='0.77';
 
 __PACKAGE__->create_accessors( qw( reset_pin gpio scanwait scaniter _allow_write_st debug ) );
 
@@ -163,7 +163,28 @@ sub init {
 	$self->write_register(MFRC522_REG_TxAutoReg, 0x40);		    #// Default 0x00. Force a 100 % ASK modulation independent of the ModGsPReg register setting
 	$self->write_register(MFRC522_REG_ModeReg, 0x3D);		    #// Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC command to 0x6363 (ISO 14443-3 part 6.2.4)
 	
-    $self->pcd_antenna_on()     						        #// Enable the antenna driver pins TX1 and TX2 (they were disabled by the reset)
+    $self->pcd_antenna_on();    						        #// Enable the antenna driver pins TX1 and TX2 (they were disabled by the reset)
+}
+
+sub init_alt {
+    my $self = shift;
+    
+    ## // Reset baud rates
+	$self->write_register(MFRC522_REG_TxModeReg, 0x00);
+	$self->write_register(MFRC522_REG_RxModeReg, 0x00);
+    
+    ## // Reset ModWidthReg
+	$self->write_register(MFRC522_REG_ModWidthReg, 0x26);
+    
+    $self->write_register(MFRC522_REG_TModeReg, 0x8D);
+    $self->write_register(MFRC522_REG_TPrescalerReg, 0x3E);
+    $self->write_register(MFRC522_REG_TReloadRegL, 0x1E);
+    $self->write_register(MFRC522_REG_TReloadRegH, 0x00);
+    
+    $self->write_register(MFRC522_REG_TxAutoReg, 0x40);
+    $self->write_register(MFRC522_REG_ModeReg, 0x3D);
+    
+    $self->pcd_antenna_on();
 }
 
 sub pcd_antenna_on {
@@ -310,7 +331,7 @@ sub scan {
                 $continue = $coderef->($uid, $serialstring);
                 $self->picc_end_session unless $continue;
             } else {
-                warn $self->get_status_code_name( $status );
+                carp $self->get_status_code_name( $status );
             }
         }
         
@@ -509,22 +530,38 @@ sub picc_is_new_tag_present  {
 	#// Reset ModWidthReg
 	$self->write_register(MFRC522_REG_ModWidthReg, 0x26);
 	    
-    my( $status, $data, $validbits ) = $self->picc_request_idl_or_all( MIFARE_REQIDL, 2 );
+    my( $status, $data, $validbits ) = $self->picc_request_active();
     
     my $result = ( $status == MFRC522_STATUS_OK || $status == MFRC522_STATUS_COLLISION );
     return $result;
     
 } # // End PICC_IsNewtagPresent()
 
-sub picc_request_idl_or_all {
+sub picc_request_active {
+    my($self) = @_;
+    my( $status, $data, $validbits ) = $self->picc_request_idl_or_wup( MIFARE_REQIDL, 2 );
+    return ( $status, $data, $validbits );
+}
+
+sub picc_request_wakeup {
+    my($self) = @_;
+    my( $status, $data, $validbits ) = $self->picc_request_idl_or_wup( MIFARE_REQALL, 2 );
+    return ( $status, $data, $validbits );
+}
+
+sub picc_request_idl_or_wup {
     my($self, $command, $getlen) = @_;
     
     # command is MIFARE_REQIDL or MIFARE_REQALL
     
 	$self->clear_bit_mask(MFRC522_REG_CollReg, 0x80);	#// ValuesAfterColl=1 => Bits received after collision are cleared.
-	my $validbits = 7;									#// For REQA and WUPA we need the short frame format - transmit only 7 bits of the last (and only) byte. TxLastBits = BitFramingReg[2..0]
+	
+    my $validbits = 7;									#// For REQA and WUPA we need the short frame format - transmit only 7 bits of the last (and only) byte. TxLastBits = BitFramingReg[2..0]
     my($status, $data);
     ( $status, $data, $validbits ) = $self->pcd_transceive_data( $command , $validbits, $getlen );
+    
+    #my $rand = int(rand(4000));
+    #print 'STATUS : ' . $self->get_status_code_name( $status ) . qq(  $rand\n);
 	
     if ($status != MFRC522_STATUS_OK) {
 		return ( $status, undef, undef );
@@ -678,7 +715,7 @@ sub picc_select {
 	#// Repeat Cascade Level loop until we have a complete UID.
 	my $uidComplete = 0;
     my $cascadeLevel = 1;
-    my @buffer = ();
+    
     my( $uidIndex, $useCascadeTag, $currentLevelKnownBits, $index, $selectDone, $txLastBits, $bufferUsed, $rxAlign );
     
     my ($respstatus, $respdata, $respvalidbits);
@@ -686,8 +723,12 @@ sub picc_select {
     
     my ( $responseIndex, $responseLength );
     
+    my @buffer = ();
+    
 	while (!$uidComplete) {
 		#// Set the Cascade Level in the SEL byte, find out if we need to use the Cascade Tag in byte 2.
+        
+        $selectDone = 0;
         
         if( $cascadeLevel == 1 ) {
             
@@ -714,14 +755,17 @@ sub picc_select {
 		
 		# // How many UID bits are known in this Cascade Level?
 		$currentLevelKnownBits = $validbits - (8 * $uidIndex);
+        
 		if ($currentLevelKnownBits < 0) {
 			$currentLevelKnownBits = 0;
 		}
+                
 		# // Copy the known bits from uid->uidByte[] to buffer[]
 		$index = 2; #// destination index in buffer[]
 		if ($useCascadeTag) {
 			$buffer[$index++] = MIFARE_CASCADE;
 		}
+        
 		my $bytesToCopy = int($currentLevelKnownBits / 8) + ($currentLevelKnownBits % 8 ? 1 : 0); # // The number of bytes needed to represent the known bits for this level.
 		
         if ($bytesToCopy) {
@@ -799,6 +843,7 @@ sub picc_select {
 			$txLastBits = $respvalidbits;
             
             if($respdata && ref($respdata)) {
+                
                 for (my $i = 0; $i < @$respdata; $i ++) {
                     last if $i > $responseLength;
                     $buffer[ $i + $responseIndex ] = $respdata->[$i];
@@ -815,7 +860,6 @@ sub picc_select {
 					$collisionPos = 32;
 				}
 				if ($collisionPos <= $currentLevelKnownBits) { #// No progress - should not happen
-                    warn 'no progress';
 					return ( MFRC522_STATUS_INTERNAL_ERROR, undef, undef );
 				}
 				#// Choose the PICC with the bit set.
@@ -1359,7 +1403,7 @@ sub write_sector_trailer {
     
     for ( $blockaddr, $key, $newA, $newB ) {
         if(!defined($_)) {
-            warn 'missing block or keys param';
+            carp 'missing block or keys param';
             return MFRC522_STATUS_BAD_PARAM;
         }
     }
@@ -1369,13 +1413,13 @@ sub write_sector_trailer {
     };
     
     unless( $self->picc_block_is_sector_trailer( $blockaddr ) ){
-        warn 'block address is not a sector trailer';
+        carp 'block address is not a sector trailer';
         return MFRC522_STATUS_BAD_PARAM;
     }
     
     if(defined($accessbitsin)) {
         unless( ref($accessbitsin) eq 'ARRAY' && scalar @$accessbitsin == 4 )  {
-            warn 'Access bits provided does not contain 4 bytes';
+            carp 'Access bits provided does not contain 4 bytes';
             return MFRC522_STATUS_BAD_PARAM;
         }
     }
@@ -1436,7 +1480,7 @@ sub picc_block_is_sector_trailer {
     my($self, $block) = @_;
     
     unless(defined($block) && $block =~ /^[0-9]+$/ ) {
-        warn 'block param must be a valid block number';
+        carp 'block param must be a valid block number';
         return 0;
     }
     if( $block < 128 ) {
@@ -1484,7 +1528,7 @@ sub write_block_data {
     
     unless( $uid && ref($uid) eq 'HASH' && defined( $uid->{'sak'})
             && $data && ref($data) eq 'ARRAY' ) {
-        warn 'bad uid or data';
+        carp 'bad uid or data';
         return MFRC522_STATUS_BAD_PARAM;
     }
     
@@ -1563,6 +1607,119 @@ sub picc_end_session {
     $self->picc_halt_active;
     $self->pcd_stop_crypto1;   
 }
+
+sub mifare_set_uid {
+    my($self, $uid, $newuid, $key) = @_;
+        
+    my $uidsize = ( $newuid && ref($newuid) eq 'ARRAY' ) ? scalar @$newuid : 0;
+	
+	#/ UID + BCC byte can not be larger than 16 together
+	if (!$newuid || !$uidsize || $uidsize > 15) {
+		carp 'New UID buffer empty, size 0, or size > 15 given';
+		return 0;
+	}
+	
+	#// Authenticate for reading
+	    
+    $key //= $self->get_default_key;
+    
+    my $status = $self->pcd_authenticate( MIFARE_AUTHENT1A , 1, $key, $uid );
+    
+	if ($status != MFRC522_STATUS_OK) {
+        carp 'Authentication failed : ' . $self->get_status_code_name( $status );
+        return 0;
+	}
+	
+	#// Read block 0
+    
+    my ( $bdstatus, $blockdata ) = $self->read_block_data( 0, $uid, $key );
+    
+	if ($bdstatus != MFRC522_STATUS_OK) {
+		carp 'Reading block 0 failed : ' . $self->get_status_code_name( $bdstatus );
+		return 0;
+	}
+    
+    my $bcc = 0;
+	
+    for (my $i = 0; $i < $uidsize; $i++ ) {
+        $blockdata->[$i] = $newuid->[$i];
+        $bcc ^= $newuid->[$i];
+    }
+    
+    $blockdata->[$uidsize] = $bcc;
+	
+	#// Stop encrypted traffic so we can send raw bytes
+	$self->pcd_stop_crypto1();
+	
+	#// Activate UID backdoor
+    unless( $self->mifare_open_uid_backdoor ) {
+        return 0;
+    }
+    
+	#// Write modified block 0 back to card
+    
+	$status = $self->mifare_write( 0, $blockdata );
+	if ($status != MFRC522_STATUS_OK) {
+		carp 'Writing block 0 failed : ' . $self->get_status_code_name( $status );
+		return 0;
+	}
+	
+	#// Wake the card up again
+	
+	$self->picc_request_wakeup;
+	
+	return 1;
+}
+
+sub mifare_open_uid_backdoor {
+    my ( $self ) = @_;
+
+#    // Magic sequence:
+#	// > 50 00 57 CD (HALT + CRC)
+#	// > 40 (7 bits only)
+#	// < A (4 bits only)
+#	// > 43
+#	// < A (4 bits only)
+#	// Then you can write to sector 0 without authenticating
+	
+	    
+    $self->picc_halt_active;
+	    
+    my $command = 0x40;
+    my $getlen = 1;
+    my $validbitssend = 7;
+    
+    my ( $status, $data, $validbits ) = $self->pcd_transceive_data( $command, $validbitssend, $getlen );
+        
+	if($status != MFRC522_STATUS_OK) {
+		carp 'Card did not respond to 0x40 after HALT command. Are you sure it is a UID changeable one? : ' . $self->get_status_code_name( $status );
+		return 0;
+	}
+    
+    # good response
+    unless( $data && ref($data) eq 'ARRAY' && scalar( @$data ) && $data->[0] == 0x0A ) {
+        carp sprintf('Got bad response on backdoor 0x40 command : %02X : validbits %s', $data->[0], $validbits);
+        return 0;
+    }
+    
+	$command = 0x43;
+	$validbitssend = 8;
+    ( $status, $data, $validbits ) = $self->pcd_transceive_data( $command, $validbitssend, $getlen );
+		
+    if($status != MFRC522_STATUS_OK) {
+        carp 'Error in communication at command 0x43, after successfully executing 0x40 : ' . $self->get_status_code_name( $status );
+		return 0;
+	}
+    
+    unless( $data && ref($data) eq 'ARRAY' && scalar( @$data ) && $data->[0] == 0x0A ) {
+        carp sprintf('Got bad response on backdoor 0x43 command : %02X : validbits %s', $data->[0], $validbits);
+        return 0;
+    }
+    
+	# // You can now write to sector 0 without authenticating!
+	return 1;
+}
+
 
 1;
 

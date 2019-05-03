@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 ##############################################################################
 # This script shows you how each graphics primitive and operation works.  It #
@@ -67,8 +67,10 @@ my $screen_height = $sinfo->{'height'};
 # are mathematically scaled.
 my $xm       = $screen_width / 1920;
 my $ym       = $screen_height / 1080;
+
 my $XX       = $screen_width;
 my $YY       = $screen_height;
+
 my $center_x = $F->{'X_CLIP'} + ($F->{'W_CLIP'} / 2);
 my $center_y = $F->{'Y_CLIP'} + ($F->{'H_CLIP'} / 2);
 my $rpi      = ($FR->{'fscreeninfo'}->{'id'} =~ /BCM270(8|9)/i) ? TRUE : FALSE;
@@ -76,10 +78,10 @@ my $rpi      = ($FR->{'fscreeninfo'}->{'id'} =~ /BCM270(8|9)/i) ? TRUE : FALSE;
 $delay *= 3 if ($rpi);    # Raspberry PI is sloooooow.  Let's give extra time for each test
 my $BW = 0;
 if ($rpi) {
-    print "Putting tennis balls on the walker, because this is a Raspberry PI\n";
+    print "Putting tennis balls on the walker, because this is a Raspberry PI (or equally slow clone)\n";
     sleep 3;
 }
-my $ALARM = ($rpi) ? 1 / 7.5 : 1 / 30;    # Set double buffering flip timeout.  Raspberry PI has less FPS
+
 my $thread;
 
 print_it($F, ' ', '00FFFFFF');
@@ -1236,32 +1238,38 @@ sub color_replace {
     my $x = $F->{'XRES'} / 4;
     my $y = $F->{'YRES'} / 4;
 
+    $F->attribute_reset();
     $F->blit_write($DORKSMILE);
-    my $pixel = $F->pixel({'x' => $XX / 2, 'y' => 50});
     $F->clip_set({ 'x' => $x, 'y' => $y, 'xx' => $x * 3, 'yy' => $y * 3 }) if ($clipped);
-    my $r = $pixel->{'red'};
-    my $g = $pixel->{'green'};
-    my $b = $pixel->{'blue'};
     my $s = time + $delay;
     while (time < $s) {
+        my $pixel = $F->pixel({'x' => $XX / 2, 'y' => $YY / 2});
+#        $F->plot({'x' => $XX /2, 'y' => $YY / 2, 'pixel_size' => 10});
+        my $r = $pixel->{'red'};
+        my $g = $pixel->{'green'};
+        my $b = $pixel->{'blue'};
+        my $a = $pixel->{'alpha'};
         my $R = int(rand(256));
         my $G = int(rand(256));
         my $B = int(rand(256));
+        my $A = 255;
+#        die Dumper($pixel,$r,$g,$b,$a);
         $F->replace_color(
             {
                 'old' => {
                     'red'   => $r,
                     'green' => $g,
-                    'blue'  => $b
+                    'blue'  => $b,
+                    'alpha' => $a
                 },
                 'new' => {
                     'red'   => $R,
                     'green' => $G,
-                    'blue'  => $B
+                    'blue'  => $B,
+                    'alpha' => $A
                 }
             }
         );
-        ($r, $g, $b) = ($R, $G, $B);
 
         if ($clipped) {
             $benchmark->{'Color Replace Clipping'}++;

@@ -53,11 +53,12 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::DZil" => 0,
+    "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::Pod" => "1.14",
     "Test::Strict" => 0
   },
-  "VERSION" => "0.0.4",
+  "VERSION" => "0.0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -92,6 +93,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Pod::Weaver::Section::Contributors" => 0,
   "Test::DZil" => 0,
+  "Test::Deep" => 0,
   "Test::More" => 0,
   "Test::Pod" => "1.14",
   "Test::Strict" => 0,

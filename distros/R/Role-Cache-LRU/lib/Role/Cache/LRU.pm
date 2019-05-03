@@ -1,7 +1,7 @@
 package Role::Cache::LRU;
 
-use namespace::clean;
 use strictures 2;
+use namespace::clean;
 
 use Cache::LRU;
 use Carp qw(croak);
@@ -9,7 +9,7 @@ use Moo::Role;
 use Sub::Quote qw(quote_sub);
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has cache => (
     isa => InstanceOf['Cache::LRU'],
@@ -110,6 +110,10 @@ Get the maximum cache size. The default maximum value is 1024.
     print $mp->get_cache_size();
     # 1024
 
+=head1 AUTHOR
+
+Kian Meng, Ang E<lt>kianmeng@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2019 Kian Meng, Ang.
@@ -117,10 +121,6 @@ This software is Copyright (c) 2019 Kian Meng, Ang.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-=head1 AUTHOR
-
-Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>
 
 =head1 SEE ALSO
 

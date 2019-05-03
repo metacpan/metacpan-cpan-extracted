@@ -3,44 +3,44 @@ abstract: 'The module to work with binary data effectively'
 author:
   - 'Vladimir Timofeev <vovkasm@gmail.com>'
 build_requires:
-  Capture::Tiny: 0
-  ExtUtils::MakeMaker: 0
-  File::Spec::Functions: 0
-  File::Temp: 0
-  List::Util: 0
-  Test::More: 0.88
-  blib: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::CBuilder: 0
-  ExtUtils::MakeMaker: 6.30
-  File::Spec: 0
+  ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-BinaryBuffer
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Data::BinaryBuffer:
     file: lib/Data/BinaryBuffer.pm
-    version: 0.005
+    version: '0.006'
 requires:
-  XSLoader: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  XSLoader: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/vovkasm/data-binarybuffer/issues
-  homepage: https://metacpan.org/release/Data-BinaryBuffer
-  repository: git://github.com/vovkasm/data-binarybuffer.git
-version: 0.005
+  homepage: https://github.com/vovkasm/data-binarybuffer
+  repository: https://github.com/vovkasm/data-binarybuffer.git
+version: '0.006'
 x_authority: cpan:VOVKASM
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

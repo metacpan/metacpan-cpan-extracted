@@ -20,7 +20,7 @@ L<Anansi::ScriptComponent> and L<base>.
 =cut
 
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base qw(Anansi::ScriptComponent);
 

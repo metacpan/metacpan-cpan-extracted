@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.138;
+our $VERSION = 1.139;
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -242,7 +242,7 @@ sub extract {
             # Existenz der Option prüfen
 
             if (!exists $opt{$key}) {
-                # Option existiert nicht. Wir übergehen die Parameter.
+                # Option existiert nicht. Wir übergehen den Parameter.
 
                 $i += $remove;
                 next;
@@ -448,7 +448,8 @@ Parameterliste, z.B. @_.
 
 Mindestanzahl an Argumenten.
 
-$ maxArgs
+=item $maxArgs
+
 Maximale Anzahl an Argumenten, C<undef> bedeutet beliebig viele.
 
 =item @optRef
@@ -520,7 +521,7 @@ sub extractToVariables {
 
 =head1 VERSION
 
-1.138
+1.139
 
 =head1 AUTHOR
 

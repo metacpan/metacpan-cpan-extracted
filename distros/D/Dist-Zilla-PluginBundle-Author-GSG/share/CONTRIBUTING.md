@@ -12,13 +12,17 @@ If you have any questions about things that aren't covered here, we can hopefull
 
 ## Getting Started
 
-If you have carton available you should just be able to run `make test`
+If you have carton available you should just be able to
+clone this repo, change to the directory, and run `make test`.
 
 ### Installing dependencies
 
-Installing [Carton](https://metacpan.org/pod/Carton) can be done with any CPAN client into whichever version of perl you want to use.
+The dependencies for this project are listed in its `cpanfile`,
+this file is usually handled by [Carton](https://metacpan.org/pod/Carton).
 
-If you don't have permission, or just don't want to install things into your system perl, you can use [App::Plenv](https://github.com/tokuhirom/plenv) and the [perl-build](https://github.com/tokuhirom/perl-build) plugin to install different versions of perl.
+Installing Carton can be done with any CPAN client into whichever version of perl you want to use.
+
+If you don't have permission, or just don't want to install things into your system perl, you can use [App::Plenv](https://github.com/tokuhirom/plenv) and the [perl-build](https://github.com/tokuhirom/perl-build) plugin, or [Perlbrew](https://perlbrew.pl/) to install different versions of perl.
 
 Once you have a version of perl to use for testing this, if you don't have a preference for a CPAN client, we recommend you use [cpanminus](https://metacpan.org/pod/App::cpanminus#Installing-to-system-perl).
 
@@ -46,7 +50,7 @@ The release of this distribution is managed by [Dist::Zilla](http://dzil.org) wh
 
 However, you probably don't need it unless you want to build a release or run author tests.
 
-In order to work with Dist::Zilla's `dzil` you will need to run `carton install` manually as the default in the Makefile uses `--without develop` to avoid heavy dependencies that are usually unnecessary.
+In order to work with Dist::Zilla's `dzil` you will need to run `carton install` manually as the Makefile uses `--without develop` to avoid unnecessary dependencies.
 
 Once those dependencies are installed, you need to use `carton exec dzil` so it can find them.
 

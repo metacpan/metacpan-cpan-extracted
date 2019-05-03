@@ -13,7 +13,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20190429;                                                        # Version
+our $VERSION = 20190503;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -239,7 +239,7 @@ sub fileSize($)                                                                 
 
 sub fileMd5Sum($)                                                               # Get the Md5 sum for a file or string
  {my ($file) = @_;                                                              # File or string
-  if ($file !~ m(\n)s and -e $file)                                             # From file
+  if ($file !~ m((\0|\n))s and -e $file)                                        # From file
    {my $s = readBinaryFile($file);
     return md5_hex($s);
    }
@@ -3836,7 +3836,7 @@ END
     s/\\n/\n/gs;                                                                # Single new line
     s/\\x//gs;                                                                  # Break
     s/`/=/gs;
-    s(L<ascii>)         (L<ascii|https://en.wikipedia.org/wiki/ASCII>)gis;
+    s(L<ascii>)         (L<Ascii|https://en.wikipedia.org/wiki/ASCII>)gis;
     s(L<boson>)         (L<boson|https://en.wikipedia.org/wiki/Boson>)gis;
     s(L<commandLine>)   (L<command line|https://en.wikipedia.org/wiki/Command-line_interface>)gis;
     s(L<confess>)       (L<confess|http://perldoc.perl.org/Carp.html#SYNOPSIS/>)gis;
@@ -3855,9 +3855,10 @@ END
     s(L<laser>)         (L<laser|https://en.wikipedia.org/wiki/Laser>)gis;
     s(L<\$_>)           (L<\$_|http://perldoc.perl.org/perlvar.html#General-Variables>)gis;
     s(L<lvalueMethod>)  (L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines>)gis;
-    s(L<md5>)           (L<md4 sum|https://en.wikipedia.org/wiki/MD5>)gis;
+    s(L<md5>)           (L<md5 sum|https://en.wikipedia.org/wiki/MD5>)gis;
     s(L<our>)           (L<our|https://perldoc.perl.org/functions/our.html>)gis;
     s(L<OxygenFormat)   (L<https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html>)gis;
+    s(L<perl>)          (L<Perl|http://www.perl.org/>)gis;
     s(L<shell>)         (L<shell|https://en.wikipedia.org/wiki/Shell_(computing)>)gis;
     s(L<xmllint>)       (L<xmllint|http://xmlsoft.org/xmllint.html>)gis;
     s(L<Xml parser>)    (L<Xml parser|https://metacpan.org/pod/XML::Parser/>)gis;

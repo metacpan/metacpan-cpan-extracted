@@ -3,7 +3,7 @@ App::DBBrowser::Table::Functions;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_number choose_a_subset );

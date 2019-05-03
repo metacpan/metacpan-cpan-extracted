@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Statsd::Adapter::Memory;
-$Mojolicious::Plugin::Statsd::Adapter::Memory::VERSION = '0.03';
+$Mojolicious::Plugin::Statsd::Adapter::Memory::VERSION = '0.04';
 use Mojo::Base -base;
 
 # scalar values: counter

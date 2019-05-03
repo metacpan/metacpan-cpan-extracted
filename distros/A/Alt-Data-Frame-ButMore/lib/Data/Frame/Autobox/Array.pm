@@ -63,7 +63,7 @@ Data::Frame::Autobox::Array - Additional Array role for Moose::Autobox
 
 =head1 VERSION
 
-version 0.0045
+version 0.0047
 
 =head1 SYNOPSIS
 

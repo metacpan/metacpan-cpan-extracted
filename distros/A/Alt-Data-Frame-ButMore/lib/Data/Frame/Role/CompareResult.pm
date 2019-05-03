@@ -28,7 +28,7 @@ Data::Frame::Role::CompareResult - Role for column compare result
 
 =head1 VERSION
 
-version 0.0045
+version 0.0047
 
 =head1 ATTRIBUTES
 

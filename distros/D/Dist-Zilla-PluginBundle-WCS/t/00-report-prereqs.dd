@@ -1,0 +1,55 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::No404s' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '6',
+                                      'Dist::Zilla::PluginBundle::Basic' => '0',
+                                      'Dist::Zilla::PluginBundle::Filter' => '0',
+                                      'Dist::Zilla::PluginBundle::Git' => '2',
+                                      'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
+                                      'Dist::Zilla::Role::PluginBundle::Easy' => '0',
+                                      'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',
+                                      'Moose' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Elemental::Transformer::List' => '0',
+                                      'Pod::Weaver::Section::Contributors' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

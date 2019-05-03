@@ -7,14 +7,14 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester 4.001;
+package Config::Model::Tester 4.002;
 # ABSTRACT: Test framework for Config::Model
 
 use warnings;
 use strict;
 use locale;
 use utf8;
-use 5.10.1;
+use 5.12.0;
 
 use Test::More;
 use Log::Log4perl 1.11 qw(:easy :levels);
@@ -474,7 +474,8 @@ sub create_test_class {
     return unless $config_classes;
 
     foreach my $c ( @$config_classes) {
-        $model->create_config_class(@$c);
+        my @parms = ref($c) eq 'HASH' ? %$c : @$c;
+        $model->create_config_class(@parms);
     }
 }
 
@@ -744,7 +745,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 4.001
+version 4.002
 
 =head1 SYNOPSIS
 
@@ -995,7 +996,7 @@ In this case, no application exist for such classes so the model to
 test must be specified in a global test parameter:
 
   return {
-    config_classes => [ { name => "Foo" } , ... ],
+    config_classes => [ { name => "Foo", element => ... } , ... ],
     model_to_test => "Foo",
     tests => [ ... ]
   };

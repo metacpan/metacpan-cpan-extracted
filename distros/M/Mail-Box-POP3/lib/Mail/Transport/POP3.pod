@@ -93,11 +93,25 @@ used, first APOP is tried, and then LOGIN.
 
 =item use_ssl => BOOLEAN
 
+To set the SSL parameters, use IO::Socket::SSL subroutine set_defaults.  Connections
+will get restarted when they are lost: you have to keep the defaults in place
+during POP actions.
+
 =item username => STRING
 
 =item via => CLASS|NAME
 
 =back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<useSSL>()
+
+Returns C<true> when SSL must be used.
 
 =back
 
@@ -414,12 +428,12 @@ service on the specified port.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 distribution version 3.004,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 distribution version 3.005,
+built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

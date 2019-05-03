@@ -3,7 +3,7 @@ App::DBBrowser::Union;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use List::MoreUtils qw( any );
 
@@ -87,7 +87,7 @@ sub union_tables {
         elsif ( $union_table eq $from_subquery ) {
             require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $union_table = $sq->choose_subquery( $union, 'union' );
+            $union_table = $sq->choose_subquery( $union );
             if ( ! defined $union_table ) {
                 next UNION_TABLE;
             }
@@ -95,7 +95,7 @@ sub union_tables {
             my $alias = $ax->alias( 'union', $union_table, $default_alias );
             $qt_union_table = $union_table . " AS " . $ax->quote_col_qualified( [ $alias ] );
             my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_union_table . " LIMIT 0" );
-            $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
             $sf->{d}{col_names}{$union_table} = $sth->{NAME};
         }
         else {

@@ -14,7 +14,7 @@ use Types::Standard qw(InstanceOf Str);
 with 'Role::Cache::LRU';
 with 'Role::REST::Client';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has api_key => (
     isa => StrLength[32],

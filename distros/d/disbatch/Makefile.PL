@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "IO::Wrap" => 0,
     "JSON" => 0,
     "LWP::UserAgent" => 0,
-    "Limper" => "0.014",
+    "Limper" => "0.015",
     "Limper::Engine::PSGI" => 0,
     "Limper::SendFile" => 0,
     "Limper::SendJSON" => 0,
@@ -69,7 +69,7 @@ my %WriteMakefileArgs = (
     "Net::HTTP::Client" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "4.102",
+  "VERSION" => "4.103",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -89,7 +89,7 @@ my %FallbackPrereqs = (
   "IO::Wrap" => 0,
   "JSON" => 0,
   "LWP::UserAgent" => 0,
-  "Limper" => "0.014",
+  "Limper" => "0.015",
   "Limper::Engine::PSGI" => 0,
   "Limper::SendFile" => 0,
   "Limper::SendJSON" => 0,

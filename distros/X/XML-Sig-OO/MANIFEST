@@ -1,0 +1,21 @@
+Changes
+exaples/dsa_priv.pem
+exaples/sign_multi_keys.pl
+exaples/sign.pl
+exaples/x509_cert.pem
+exaples/x509_key.pem
+lib/XML/Sig/OO.pm
+Makefile.PL
+MANIFEST
+README.pod
+t/cacert.pem
+t/dsaparam.pem
+t/dsa_priv.pem
+t/dsa_pub.pem
+t/idp_cert.pem
+t/sign-nopw-cert.pem
+t/x509_cert.pem
+t/x509_key.pem
+t/XML-Sig-OO.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

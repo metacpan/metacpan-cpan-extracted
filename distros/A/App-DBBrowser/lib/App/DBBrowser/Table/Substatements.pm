@@ -3,11 +3,10 @@ App::DBBrowser::Table::Substatements;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_number );
-use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
@@ -205,7 +204,6 @@ sub set {
     my $clause = 'set';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $trs = Term::Form->new();
     my $col_sep = ' ';
     $sql->{set_args} = [];
     $sql->{set_stmt} = " SET";
@@ -576,9 +574,9 @@ sub limit_offset {
         }
         if ( $choice eq $offset ) {
             if ( ! $sql->{limit_stmt} ) {
-                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{d}{driver} eq 'SQLite';   # 2 ** 63 - 1
+                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
                 # MySQL 5.7 Reference Manual - SELECT Syntax - Limit clause: SELECT * FROM tbl LIMIT 95,18446744073709551615;
-                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{d}{driver} eq 'mysql';    # 2 ** 64 - 1
+                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{i}{driver} eq 'mysql';    # 2 ** 64 - 1
             }
             $sql->{offset_stmt} = " OFFSET";
             $ax->print_sql( $sql );

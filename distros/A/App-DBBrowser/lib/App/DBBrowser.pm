@@ -2,11 +2,10 @@ package App::DBBrowser;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
-our $VERSION = '2.071';
+our $VERSION = '2.200';
 
-use Encode                qw( decode );
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
 use Getopt::Long          qw( GetOptions );
@@ -24,8 +23,9 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateTable; # required
 use App::DBBrowser::DB;
 #use App::DBBrowser::Join;        # required
-use App::DBBrowser::Opt;
-use App::DBBrowser::OptDB;
+use App::DBBrowser::Opt::Get;
+#use App::DBBrowser::Opt::Set;    # required
+#use App::DBBrowser::Opt::DBSet   # required
 #use App::DBBrowser::Subqueries;  # required
 use App::DBBrowser::Table;
 #use App::DBBrowser::Union;       # required
@@ -59,7 +59,7 @@ sub new {
 
 sub __init {
     my ( $sf ) = @_;
-    my $home = decode( 'locale', File::HomeDir->my_home() );
+    my $home = File::HomeDir->my_home();
     if ( ! $home ) {
         print "'File::HomeDir->my_home()' could not find the home directory!\n";
         print "'db-browser' requires a home directory\n";
@@ -67,27 +67,26 @@ sub __init {
     }
     my $config_home;
     if ( which( 'xdg-user-dir' ) ) {
-        $config_home = decode 'locale_fs', File::HomeDir::FreeDesktop->my_config();
+        $config_home = File::HomeDir::FreeDesktop->my_config();
     }
     else {
-        $config_home = decode 'locale_fs', File::HomeDir->my_data();
+        $config_home = File::HomeDir->my_data();
     }
-    my $app_dir;
-    if ( $config_home ) {
-        $app_dir = catdir( $config_home, 'db_browser' );
-    }
-    else {
-        $app_dir = catdir( $home, '.db_browser' );
-    }
+    my $app_dir = catdir( $config_home // $home, 'db_browser' );
     mkdir $app_dir or die $! if ! -d $app_dir;
-    $sf->{i}{home_dir}   = $home;
-    $sf->{i}{app_dir}    = $app_dir;
-    $sf->{i}{f_settings} = catfile $app_dir, 'general_settings.json';
+    $sf->{i}{home_dir}      = $home;
+    $sf->{i}{app_dir}       = $app_dir;
+    $sf->{i}{f_settings}    = catfile $app_dir, 'general_settings.json';
+    $sf->{i}{conf_file_fmt} = catfile $app_dir, 'config_%s.json';
+    $sf->{i}{f_attached_db} = catfile $app_dir, 'attached_DB.json';
+    $sf->{i}{f_dir_history} = catfile $app_dir, 'dir_history.json';
+    $sf->{i}{f_subqueries}  = catfile $app_dir, 'subqueries.json';
+    $sf->{i}{f_copy_paste}  = catfile $app_dir, 'tmp_copy_and_paste.csv';
     # check all info
 
     if ( ! eval {
-        my $opt = App::DBBrowser::Opt->new( $sf->{i}, {} );
-        $sf->{o} = $opt->read_config_files();
+        my $opt_get = App::DBBrowser::Opt::Get->new( $sf->{i}, {} );
+        $sf->{o} = $opt_get->read_config_files();
         my $help;
         GetOptions (
             'h|?|help' => \$help,
@@ -100,15 +99,17 @@ sub __init {
                     $sf->{i}{$key}{mouse} = $sf->{o}{table}{mouse};
                 }
             }
-            print CLEAR_SCREEN;
-            $sf->{o} = $opt->set_options();
+            print CLEAR_SCREEN; #
+            require App::DBBrowser::Opt::Set;
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            $sf->{o} = $opt_set->set_options;
         }
         1 }
     ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, {}, {} );
         $ax->print_error_message( $@, 'Configfile/Options' );
-        my $opt = App::DBBrowser::Opt->new( $sf->{i}, {} );
-        $sf->{o} = $opt->defaults();
+        my $opt_get = App::DBBrowser::Opt::Get->new( $sf->{i}, {} );
+        $sf->{o} = $opt_get->defaults();
         while ( $ARGV[0] && $ARGV[0] =~ /^-/ ) {
             my $arg = shift @ARGV;
             last if $arg eq '--';
@@ -126,6 +127,12 @@ sub __init {
 sub run {
     my ( $sf ) = @_;
     $sf->__init();
+    local $SIG{INT} = sub {
+        unlink $sf->{i}{f_copy_paste} if -e $sf->{i}{f_copy_paste};
+        delete $ENV{TC_RESET_AUTO_UP} if exists $ENV{TC_RESET_AUTO_UP};
+        exit;
+    };
+    $ENV{TC_RESET_AUTO_UP} = 0;
     my $lyt_v_clear = Term::Choose->new( $sf->{i}{lyt_v_clear} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
@@ -149,13 +156,11 @@ sub run {
         }
         $plugin = 'App::DBBrowser::DB::' . $plugin;
         $sf->{i}{plugin} = $plugin;
-        my $odb = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
-        my $db_opt = $odb->read_db_config_files();
         my $plui;
-        #my $driver;
+        my $driver;
         if ( ! eval {
             $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-            #$driver = $plui->get_db_driver();
+            $driver = $sf->{i}{driver} = $plui->get_db_driver();
             #die "No database driver!" if ! $driver;
             1 }
         ) {
@@ -170,13 +175,13 @@ sub run {
         my $prefix;
         my ( $user_dbs, $sys_dbs ) = ( [], [] ); #
         if ( ! eval {
-            ( $user_dbs, $sys_dbs ) = $plui->get_databases( $odb->connect_parameter( $db_opt ) );
-            $prefix = defined $user_dbs->[0] && -f $user_dbs->[0] ? '' : '- ';
+            ( $user_dbs, $sys_dbs ) = $plui->get_databases();
+            $prefix = $driver eq 'SQLite' ? '' : '- ';
             if ( $prefix ) {
-                @databases = ( map( $prefix . $_, @$user_dbs ), $sf->{o}{G}{meta} ? map( '  ' . $_, @$sys_dbs ) : () );
+                @databases = ( map( $prefix . $_, @$user_dbs ), $sf->{o}{G}{metadata} ? map( '  ' . $_, @$sys_dbs ) : () );
             }
             else {
-                @databases = ( @$user_dbs, $sf->{o}{G}{meta} ? @$sys_dbs : () );
+                @databases = ( @$user_dbs, $sf->{o}{G}{metadata} ? @$sys_dbs : () );
             }
             $sf->{i}{sqlite_search} = 0 if $sf->{i}{sqlite_search};
             1 }
@@ -215,7 +220,6 @@ sub run {
                 my $prompt = 'Choose Database:';
                 my $choices_db = [ undef, @databases ];
                 # Choose
-                $ENV{TC_RESET_AUTO_UP} = 0;
                 my $idx_db = $lyt_v_clear->choose(
                     $choices_db,
                     { prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
@@ -233,11 +237,8 @@ sub run {
                         $old_idx_db = 0;
                         next DATABASE;
                     }
-                    else {
-                        $old_idx_db = $idx_db;
-                    }
+                    $old_idx_db = $idx_db;
                 }
-                delete $ENV{TC_RESET_AUTO_UP};
             }
             $db =~ s/^[-\ ]\s// if $prefix;
 
@@ -245,7 +246,7 @@ sub run {
 
             my $dbh;
             if ( ! eval {
-                $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db) );
+                $dbh = $plui->get_db_handle( $db );
                 #$sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
                 $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR # name
                 1 }
@@ -258,15 +259,12 @@ sub run {
                 next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
                 last DB_PLUGIN;
             }
-            my $driver = $dbh->{Driver}{Name};
             $sf->{d} = {
-                db        => $db,
-                dbh       => $dbh,
-                driver    => $driver,
-                user_dbs  => $user_dbs,
-                sys_dbs   => $sys_dbs,
+                db       => $db,
+                dbh      => $dbh,
+                user_dbs => $user_dbs,
+                sys_dbs  => $sys_dbs,
             };
-            $sf->{i}{f_attached_db} = catfile $sf->{i}{app_dir}, 'attached_DB.json';
             $sf->{db_attached} = 0;
             if ( $driver eq 'SQLite' && -s $sf->{i}{f_attached_db} ) {
                 my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
@@ -295,7 +293,7 @@ sub run {
             my ( $user_schemas, $sys_schemas ) = ( [], [] );
             if ( ! eval {
                 ( $user_schemas, $sys_schemas ) = $plui->get_schemas( $dbh, $db );
-                @schemas = ( map( "- $_", @$user_schemas ), $sf->{o}{G}{meta} ? map( "  $_", @$sys_schemas ) : () );
+                @schemas = ( map( "- $_", @$user_schemas ), $sf->{o}{G}{metadata} ? map( "  $_", @$sys_schemas ) : () );
                 1 }
             ) {
                 $ax->print_error_message( $@, 'Get schema names' );
@@ -315,7 +313,7 @@ sub run {
                 }
                 elsif ( ! @schemas ) {
                     if ( $driver eq 'Pg' ) {
-                        # no @schemas if 'add meta data' is disabled with no user-schemas
+                        # no @schemas if 'metadata' is disabled with no user-schemas
                         # with an undefined schema 'information_schema' would be used
                         @schemas = ( 'public' );
                         $schema = $schemas[0];
@@ -331,7 +329,6 @@ sub run {
                     my $prompt = $db_string . ' - choose Schema:';
                     my $choices_schema = [ undef, @schemas ];
                     # Choose
-                    $ENV{TC_RESET_AUTO_UP} = 0;
                     my $idx_sch = $lyt_v_clear->choose(
                         $choices_schema,
                         { prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
@@ -350,11 +347,8 @@ sub run {
                             $old_idx_sch = 0;
                             next SCHEMA;
                         }
-                        else {
-                            $old_idx_sch = $idx_sch;
-                        }
+                        $old_idx_sch = $idx_sch;
                     }
-                    delete $ENV{TC_RESET_AUTO_UP};
                     $schema =~ s/^[-\ ]\s//;
                 }
                 $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
@@ -411,14 +405,13 @@ sub run {
                     }
                     else {
                         my $choices_table = [ $hidden, undef, map( "- $_", sort @$user_tables ) ];
-                        push @$choices_table, map( "  $_", sort @$sys_tables ) if $sf->{o}{G}{meta};
+                        push @$choices_table, map( "  $_", sort @$sys_tables ) if $sf->{o}{G}{metadata};
                         push @$choices_table, $from_subquery                   if $sf->{o}{enable}{m_derived};
                         push @$choices_table, $join                            if $sf->{o}{enable}{join};
                         push @$choices_table, $union                           if $sf->{o}{enable}{union};
                         push @$choices_table, $db_setting                      if $sf->{o}{enable}{db_settings};
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
-                        $ENV{TC_RESET_AUTO_UP} = 0;
                         my $idx_tbl = $lyt_v_clear->choose(
                             $choices_table,
                             { prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
@@ -438,17 +431,15 @@ sub run {
                                 $old_idx_tbl = 1;
                                 next TABLE;
                             }
-                            else {
-                                $old_idx_tbl = $idx_tbl;
-                            }
+                            $old_idx_tbl = $idx_tbl;
                         }
-                        delete $ENV{TC_RESET_AUTO_UP};
                     }
                     if ( $table eq $db_setting ) {
                         my $changed;
                         if ( ! eval {
-                            my $odb = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
-                            $changed = $odb->database_setting( $db );
+                            require App::DBBrowser::Opt::DBSet;
+                            my $db_opt_set = App::DBBrowser::Opt::DBSet->new( $sf->{i}, $sf->{o} );
+                            $changed = $db_opt_set->database_setting( $db );
                             1 }
                         ) {
                             $ax->print_error_message( $@, 'Database settings' );
@@ -524,6 +515,8 @@ sub run {
             }
         }
     }
+    # END of App
+    delete $ENV{TC_RESET_AUTO_UP};
 }
 
 
@@ -564,13 +557,15 @@ sub __create_drop_or_attach {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
 
     HIDDEN: while ( 1 ) {
-        my ( $create_table, $drop_table, $attach_databases, $detach_databases ) = (
-            '- CREATE table', '- DROP   table', '- Attach DB', '- Detach DB',
+        my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
+          '- CREATE Table', '- DROP Table', '- CREATE View', '- DROP View', '- Attach DB',     '- Detach DB',
         );
         my @choices;
         push @choices, $create_table if $sf->{o}{enable}{create_table};
+        push @choices, $create_view  if $sf->{o}{enable}{create_view};
         push @choices, $drop_table   if $sf->{o}{enable}{drop_table};
-        if ( $sf->{d}{driver} eq 'SQLite' ) {
+        push @choices, $drop_view    if $sf->{o}{enable}{drop_view};
+        if ( $sf->{i}{driver} eq 'SQLite' ) {
             push @choices, $attach_databases;
             push @choices, $detach_databases if $sf->{db_attached};
         }
@@ -579,7 +574,6 @@ sub __create_drop_or_attach {
         }
         my @pre = ( undef );
         # Choose
-        $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = $lyt_v_clear->choose(
             [ @pre, @choices ],
             { prompt => $sf->{d}{db_string}, index => 1, default => $old_idx, undef => '  <=' }
@@ -592,24 +586,31 @@ sub __create_drop_or_attach {
                 $old_idx = 0;
                 next HIDDEN;
             }
-            else {
-                $old_idx = $idx;
-            }
+            $old_idx = $idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         die if $idx < @pre;
         my $choice = $choices[$idx-@pre];
-        if ( $choice eq $create_table || $choice eq $drop_table ) {
+        if ( $choice =~ /^-\ (?:CREATE|DROP)/ ) {
             require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
-                if ( ! eval { $ct->create_new_table(); 1 } ) {
+                if ( ! eval { $ct->create_table(); 1 } ) {
                     $ax->print_error_message( $@, 'Create Table' );
                 }
             }
             elsif ( $choice eq $drop_table ) {
-                if ( ! eval { $ct->delete_table(); 1 } ) {
+                if ( ! eval { $ct->drop_table(); 1 } ) {
                     $ax->print_error_message( $@, 'Drop Table' );
+                }
+            }
+            elsif ( $choice eq $create_view ) {
+                if ( ! eval { $ct->create_view(); 1 } ) {
+                    $ax->print_error_message( $@, 'Create View' );
+                }
+            }
+            elsif ( $choice eq $drop_view ) {
+                if ( ! eval { $ct->drop_view(); 1 } ) {
+                    $ax->print_error_message( $@, 'Drop View' );
                 }
             }
             $sf->{old_idx_hidden} = $old_idx;
@@ -618,7 +619,7 @@ sub __create_drop_or_attach {
             $sf->{redo_table} = $table;
             return;
         }
-        elsif ( $choice eq $attach_databases || $choice eq $detach_databases ) {
+        elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
             require App::DBBrowser::AttachDB;
             my $att = App::DBBrowser::AttachDB->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $changed;
@@ -658,7 +659,7 @@ sub __derived_table {
     my $tmp = { table => '()' };
     $ax->reset_sql( $tmp );
     $ax->print_sql( $tmp );
-    my $qt_table = $sq->choose_subquery( $tmp, 'from' );
+    my $qt_table = $sq->choose_subquery( $tmp );
     if ( ! defined $qt_table ) {
         return;
     }
@@ -667,7 +668,7 @@ sub __derived_table {
     $tmp->{table} = $qt_table;
     $ax->print_sql( $tmp );
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-    $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+    $sth->execute() if $sf->{i}{driver} ne 'SQLite';
     my $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
     return $qt_table, $qt_columns;
 }
@@ -693,7 +694,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.071
+Version 2.200
 
 =head1 DESCRIPTION
 

@@ -3,13 +3,11 @@ App::DBBrowser::Auxil;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
-use Encode       qw( encode );
 use Scalar::Util qw( looks_like_number );
 
-use Encode::Locale qw();
-use JSON           qw( decode_json );
+use JSON qw( decode_json );
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
@@ -36,8 +34,14 @@ sub get_stmt {
     if ( $stmt_type eq 'Drop_table' ) {
         @tmp = ( "DROP TABLE $table" );
     }
+    elsif ( $stmt_type eq 'Drop_view' ) {
+        @tmp = ( "DROP VIEW $table" );
+    }
     elsif ( $stmt_type eq 'Create_table' ) {
         @tmp = ( sprintf "CREATE TABLE $table (%s)", join ', ', @{$sql->{create_table_cols}} );
+    }
+    elsif ( $stmt_type eq 'Create_view' ) {
+        @tmp = ( sprintf "CREATE VIEW $table AS " . $sql->{view_select_stmt} );
     }
     elsif ( $stmt_type eq 'Select' ) {
         @tmp = ( "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ) );
@@ -115,19 +119,19 @@ sub insert_into_args_info_format {
     my $tmp = [];
     if ( @{$sql->{insert_into_args}} > $max + 3 ) {
         for my $row ( @{$sql->{insert_into_args}}[ 0 .. $begin ] ) {
-            push @$tmp, $indent . join $list_sep, map { defined $_ ? $_ : '' } @$row;
+            push @$tmp, $indent . join $list_sep, map { $_ // '' } @$row;
         }
         push @$tmp, $indent . '...';
         push @$tmp, $indent . '...';
         for my $row ( @{$sql->{insert_into_args}}[ $last_i - $end .. $last_i ] ) {
-            push @$tmp, $indent . join $list_sep, map { defined $_ ? $_ : '' } @$row;
+            push @$tmp, $indent . join $list_sep, map { $_ // '' } @$row;
         }
         my $row_count = scalar( @{$sql->{insert_into_args}} );
         push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
     }
     else {
         for my $row ( @{$sql->{insert_into_args}} ) {
-            push @$tmp, $indent . join $list_sep, map { defined $_ ? $_ : '' } @$row;
+            push @$tmp, $indent . join $list_sep, map { $_ // '' } @$row;
         }
     }
     return $tmp;
@@ -240,7 +244,7 @@ sub alias {
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
     }
-    if ( $sf->{d}{driver} eq 'Pg' && ! $sf->{o}{G}{quote_identifiers} ) {
+    if ( $sf->{i}{driver} eq 'Pg' && ! $sf->{o}{G}{quote_identifiers} ) {
         return lc $alias;
     }
     return $alias;
@@ -334,7 +338,7 @@ sub column_names_and_types {
     my ( $col_names, $col_types );
     for my $table ( @$tables ) {
         my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
-        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+        $sth->execute() if $sf->{i}{driver} ne 'SQLite';
         $col_names->{$table} ||= $sth->{NAME};
         $col_types->{$table} ||= $sth->{TYPE};
     }
@@ -343,26 +347,26 @@ sub column_names_and_types {
 
 
 sub write_json {
-    my ( $sf, $file, $h_ref ) = @_;
+    my ( $sf, $file_fs, $h_ref ) = @_;
     if ( ! defined $h_ref || ! keys %$h_ref ) {
-        open my $fh, '>', encode( 'locale_fs', $file ) or die "$file: $!";
+        open my $fh, '>', $file_fs or die "$file_fs: $!";
         print $fh;
         close $fh;
         return;
     }
     my $json = JSON->new->utf8( 1 )->pretty->canonical->encode( $h_ref );
-    open my $fh, '>', encode( 'locale_fs', $file ) or die "$file: $!";
+    open my $fh, '>', $file_fs or die "$file_fs: $!";
     print $fh $json;
     close $fh;
 }
 
 
 sub read_json {
-    my ( $sf, $file ) = @_;
-    if ( ! defined $file || ! -e $file ) {
+    my ( $sf, $file_fs ) = @_;
+    if ( ! defined $file_fs || ! -e $file_fs ) {
         return {};
     }
-    open my $fh, '<', encode( 'locale_fs', $file ) or die "$file: $!";
+    open my $fh, '<', $file_fs or die "$file_fs: $!";
     my $json = do { local $/; <$fh> };
     close $fh;
     my $h_ref = {};
@@ -370,7 +374,7 @@ sub read_json {
         $h_ref = decode_json( $json ) if $json;
         1 }
     ) {
-        die "In '$file':\n$@";
+        die "In '$file_fs':\n$@";
     }
     return $h_ref;
 }

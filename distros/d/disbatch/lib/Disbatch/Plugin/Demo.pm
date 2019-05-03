@@ -1,5 +1,5 @@
 package Disbatch::Plugin::Demo;
-$Disbatch::Plugin::Demo::VERSION = '4.102';
+$Disbatch::Plugin::Demo::VERSION = '4.103';
 use 5.12.0;
 use warnings;
 
@@ -155,7 +155,7 @@ Disbatch::Plugin::Demo - demo plugin for Disbatch
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 DESCRIPTION
 

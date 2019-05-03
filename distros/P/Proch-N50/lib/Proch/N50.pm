@@ -4,11 +4,11 @@ use 5.016;
 use warnings;
 
 package Proch::N50;
-$Proch::N50::VERSION = '0.022';
+$Proch::N50::VERSION = '0.031';
 
 use File::Basename;
 use Exporter qw(import);
-our @EXPORT = qw(getStats getN50);
+our @EXPORT = qw(getStats getN50 jsonStats);
 
 
 my $hasJSON = 0;
@@ -43,7 +43,15 @@ sub getN50 {
         return 0;
     }
 }
-
+sub jsonStats {
+  my ($file) = @_;
+  my $stats = getStats($file,  'JSON');
+  if ($stats->{status} and $stats->{json}) {
+    return $stats->{json}
+  } else {
+    return undef;
+  }
+}
 sub getStats {
 
     # Parses a FASTA/FASTQ file and returns stats
@@ -159,7 +167,7 @@ Proch::N50 - Calculate N50 from a FASTA or FASTQ file without dependencies
 
 =head1 VERSION
 
-version 0.022
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -167,11 +175,11 @@ version 0.022
   my $filepath = '/path/to/assembly.fasta';
 
   # Get N50 only: getN50(file) will return an integer
-  say "N50 only:\t" ,getN50($filepath);
+  print "N50 only:\t", getN50($filepath), "\n";
 
   # Full stats
   my $seq_stats = getStats($filepath);
-  say Data::Dumper->Dump( [ $seq_stats ], [ qw(*FASTA_stats) ] );
+  print Data::Dumper->Dump( [ $seq_stats ], [ qw(*FASTA_stats) ] );
   # Will print:
   # %FASTA_stats = (
   #               'N50' => 65,
@@ -184,7 +192,7 @@ version 0.022
 
   # Get also a JSON object
   my $seq_stats_with_JSON = getStats($filepath, 'JSON');
-  say $seq_stats_with_JSON->{json};
+  print $seq_stats_with_JSON->{json}, "\n";
   # Will print:
   # {
   #    "seqs" : 6,
@@ -259,6 +267,11 @@ name of the directory containing the input file
 (pretty printed) JSON string of the object (only if JSON is installed)
 
 =back
+
+=head2 jsonStats(filepath)
+
+Returns the JSON string with basic stats (same as $result->{json} from I<getStats>(File, JSON)).
+Requires JSON installed.
 
 =head1 Dependencies
 

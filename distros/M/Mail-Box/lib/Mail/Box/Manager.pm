@@ -8,7 +8,7 @@
 
 package Mail::Box::Manager;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Reporter';
 
@@ -31,9 +31,12 @@ my @basic_folder_types =
   , [ maildir => 'Mail::Box::Maildir' ]
   , [ pop     => 'Mail::Box::POP3'    ]
   , [ pop3    => 'Mail::Box::POP3'    ]
+  , [ pops    => 'Mail::Box::POP3s'   ]
   , [ pop3s   => 'Mail::Box::POP3s'   ]
   , [ imap    => 'Mail::Box::IMAP4'   ]
   , [ imap4   => 'Mail::Box::IMAP4'   ]
+  , [ imaps   => 'Mail::Box::IMAP4s'  ]
+  , [ imap4s  => 'Mail::Box::IMAP4s'  ]
   );
 
 my @managers;  # usually only one, but there may be more around :(
@@ -53,29 +56,29 @@ sub init($)
 
     my @basic_types = reverse @basic_folder_types;
     if(my $basic = $args->{autodetect})
-    {   my %types = map { ( $_ => 1) } (ref $basic ? @$basic : ($basic));
-        @basic_types = grep { $types{$_->[0]} } @basic_types;
+    {   my %types = map +($_ => 1), ref $basic ? @$basic : $basic;
+        @basic_types = grep $types{$_->[0]}, @basic_types;
     }
 
     $self->{MBM_folder_types} = [];
-    $self->registerType(@$_) foreach @new_types, @basic_types;
+    $self->registerType(@$_) for @new_types, @basic_types;
 
     $self->{MBM_default_type} = $args->{default_folder_type} || 'mbox';
 
     # Inventory on existing folder-directories.
-    $self->{MBM_folderdirs} = [ ];
+    my $fd = $self->{MBM_folderdirs} = [ ];
     if(exists $args->{folderdir})
     {   my @dirs = $args->{folderdir};
-        @dirs = @{$dirs[0]} if ref $dirs[0];
-        push @{$self->{MBM_folderdirs}}, @dirs;
+        @dirs = @{$dirs[0]} if ref $dirs[0] eq 'ARRAY';
+        push @$fd, @dirs;
     }
 
     if(exists $args->{folderdirs})
     {   my @dirs = $args->{folderdirs};
         @dirs = @{$dirs[0]} if ref $dirs[0];
-        push @{$self->{MBM_folderdirs}}, @dirs;
+        push @$fd, @dirs;
     }
-    push @{$self->{MBM_folderdirs}}, '.';
+    push @$fd, '.';
 
     $self->{MBM_folders} = [];
     $self->{MBM_threads} = [];
@@ -88,22 +91,17 @@ sub init($)
 
 #-------------------------------------------
 
-
 sub registerType($$@)
 {   my ($self, $name, $class, @options) = @_;
     unshift @{$self->{MBM_folder_types}}, [$name, $class, @options];
     $self;
 }
 
-#-------------------------------------------
-
 
 sub folderdir()
 {   my $dirs = shift->{MBM_folderdirs} or return ();
     wantarray ? @$dirs : $dirs->[0];
 }
-
-#-------------------------------------------
 
 
 sub folderTypes()
@@ -112,8 +110,6 @@ sub folderTypes()
     $uniq{$_->[0]}++ foreach @{$self->{MBM_folder_types}};
     sort keys %uniq;
 }
-
-#-------------------------------------------
 
 
 sub defaultFolderType()
@@ -157,25 +153,32 @@ sub open(@)
         $args{folder} = $name;
     }
 
+    # Do not show password in folder name
     my $type = $args{type};
     if(!defined $type) { ; }
-    elsif($type eq 'pop3')
+    elsif($type eq 'pop3' || $type eq 'pop')
     {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
         my $srv  = $args{server_name} ||= 'localhost';
         my $port = $args{server_port} ||= 110;
         $args{folderdir} = $name = "pop3://$un\@$srv:$port";
     }
-    elsif($type eq 'pop3s')
+    elsif($type eq 'pop3s' || $type eq 'pops')
     {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
         my $srv  = $args{server_name} ||= 'localhost';
         my $port = $args{server_port} ||= 995;
         $args{folderdir} = $name = "pop3s://$un\@$srv:$port";
     }
-    elsif($type eq 'imap4')
+    elsif($type eq 'imap4' || $type eq 'imap')
     {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
         my $srv  = $args{server_name} ||= 'localhost';
         my $port = $args{server_port} ||= 143;
         $args{folderdir} = $name = "imap4://$un\@$srv:$port";
+    }
+    elsif($type eq 'imap4s' || $type eq 'imaps')
+    {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
+        my $srv  = $args{server_name} ||= 'localhost';
+        my $port = $args{server_port} ||= 993;
+        $args{folderdir} = $name = "imap4s://$un\@$srv:$port";
     }
 
     unless(defined $name && length $name)
@@ -320,14 +323,13 @@ sub close($@)
 
 sub closeAllFolders(@)
 {   my ($self, @options) = @_;
-    $_->close(@options) foreach $self->openFolders;
+    $_->close(@options) for $self->openFolders;
     $self;
 }
 
-END {map {defined $_ && $_->closeAllFolders} @managers}
+END { map defined $_ && $_->closeAllFolders, @managers }
 
 #-------------------------------------------
-
 
 sub delete($@)
 {   my ($self, $name, %args) = @_;
@@ -340,7 +342,6 @@ sub delete($@)
 }
 
 #-------------------------------------------
-
 
 sub appendMessage(@)
 {   my $self     = shift;
@@ -425,7 +426,6 @@ sub appendMessages(@)
       );
 }
 
-#-------------------------------------------
 
 
 sub copyMessage(@)
@@ -470,7 +470,6 @@ sub copyMessage(@)
     @coerced;
 }
 
-#-------------------------------------------
 
 
 sub moveMessage(@)
@@ -479,7 +478,6 @@ sub moveMessage(@)
 }
 
 #-------------------------------------------
-
 
 sub threads(@)
 {   my $self    = shift;
@@ -526,7 +524,6 @@ sub threads(@)
 }
 
 #-------------------------------------------
-
 
 sub toBeThreaded($@)
 {   my $self = shift;
@@ -575,6 +572,5 @@ sub decodeFolderURL($)
 }
 
 #-------------------------------------------
-
 
 1;

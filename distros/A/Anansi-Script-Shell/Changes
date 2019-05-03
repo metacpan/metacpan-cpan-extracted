@@ -12,3 +12,5 @@ Revision history for Perl extension Anansi::Script::Shell.
 	- modified the module to use Anansi::ScriptComponent instead of Anansi::Component.
 	- modified module dependencies in makefile.
 	- modified README to reflect module dependencies.
+0.05  Sun Apr 28 18:30:46 2019
+	- modified Anansi::ScriptComponent module dependency in makefile.

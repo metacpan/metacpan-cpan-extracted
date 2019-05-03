@@ -3,7 +3,7 @@ App::DBBrowser::Table::Substatements::Operators;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use List::MoreUtils qw( any );
 

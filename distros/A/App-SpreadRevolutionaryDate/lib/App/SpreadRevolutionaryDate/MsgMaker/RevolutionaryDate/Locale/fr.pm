@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr::VERSION = '0.18';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr::VERSION = '0.19';
 # ABSTRACT: French localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 use Moose;
@@ -61,7 +61,7 @@ has '+feast' => (
       1pomme       0céleri   1poire        1betterave  2oie
       2héliotrope  1figue    1scorsonère   2alisier    1charrue
       0salsifis    1macre    0topinambour  2endive     0dindon
-      0chervi      0cresson  1dentelaire   1grenade    1herse
+      0chervis     0cresson  1dentelaire   1grenade    1herse
       1bacchante   2azerole  1garance      2orange     0faisan
       1pistache    0macjonc  0coing        0cormier    0rouleau
     ),
@@ -395,7 +395,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr - French l
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -444,6 +444,8 @@ Sources have slight differences between them. All of them obviously include some
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 

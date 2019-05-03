@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.138;
+our $VERSION = 1.139;
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
@@ -208,7 +208,7 @@ Datei mit Repository-Pfadangabe.
 =item $package
 
 Package, dem die ausgecheckte Datei (mit reservierter Version)
-zugeordnet wird.
+beim Einchecken zugeordnet wird.
 
 =back
 
@@ -218,9 +218,10 @@ Ausgabe der CASCM-Kommandos (String)
 
 =head4 Description
 
-Checke die Workspace-Datei $repoFile aus, öffne sie im Editor und
-checke sie nach dem Editieren wieder ein (sofern sie geändert wurde).
-Vor dem Einchecken einer Änderung wird eine Rückfrage gestellt.
+Öffne die Repository-Datei $repoFile im Editor. Nach dem Verlassen
+des Editors wird geprüft, ob die Datei (eine Kopie im lokalen Verzeichnis)
+verändert wurde. Falls ja, wird die Repository-Datei ausgecheckt und
+die gänderte lokale Datei unter einer neuen Versionsnummer eingecheckt.
 
 =cut
 
@@ -229,18 +230,31 @@ Vor dem Einchecken einer Änderung wird eine Rückfrage gestellt.
 sub edit {
     my ($self,$repoFile,$package) = @_;
 
-    # Vollständigen Pfad der Repository-Datei ermitteln
+    my $output = '';
 
     my $p = Quiq::Path->new;
-    my $file = sprintf '%s/%s',$self->workspace,$repoFile;
-    if (!$p->exists($file)) {
+
+    # Vollständigen Pfad der Repository-Datei ermitteln
+    my $file = $self->repoFileToFile($repoFile);
+
+    # Prüfe, ob Package existiert und ob es auf der untersten Stufe ist
+
+    my $state = $self->packageState($package);
+    if (!$state) {
         $self->throw(
-            q~CASCM-00099: Repository file does not exist~,
-            File => $file,
+            q~CASCM-00099: Package does not exist~,
+            Package => $package,
         );
     }
-    
-    # Datei ins lokale Verzeichnis kopieren
+    elsif ($state ne $self->states->[0]) {
+        $self->throw(
+            q~CASCM-00099: Package needs to be on the lowest state~,
+            State => $state,
+            LowestState => $self->states->[0],
+        );
+    }
+
+    # Lokale Kopie der Datei erstellen
 
     my $localFile = $p->filename($file);
     my $which = 'r';
@@ -256,14 +270,24 @@ sub edit {
                 -default=>'l',
             );
             if ($which eq 'q') {
-                return '';
+                return $output;
             }
-            # Datei differiert und wird kopiert
+            # Datei differiert und wird kopiert, wenn r gewählt wurde
         }
     }
     if ($which eq 'r') {
         $p->copyToDir($file,'.');
     }
+
+    # Original-Datei mit dem Stand vor der ersten Änderung sichern
+
+    my $origFile = "$localFile.orig";
+    if (!$p->exists($origFile)) {
+        $p->copy($localFile,$origFile);
+    }
+
+    # Backup-Datei erstellen für den Vergleich nach
+    # dem Verlassen des Editors
 
     my $backupFile = "$localFile.bak";
     $p->copy($localFile,$backupFile);
@@ -278,11 +302,59 @@ sub edit {
         );
         if ($answ eq 'y') {
             my ($repoDir) = $p->split($repoFile);
-            return $self->putFiles($package,$repoDir,$localFile);
+            $output = $self->putFiles($package,$repoDir,$localFile);
         }
     }
+    elsif (!$p->compare($localFile,$origFile)) {
+        # Wir löschen die Lokale Datei und Original-Datei, wenn sie
+        # nach dem Verlassen des Editors identisch sind
+        $p->delete($origFile);
+        $p->delete($localFile);
+    }
 
-    return '';
+    # Die Backup-Datei löschen wir immer
+    $p->delete($backupFile);
+
+    return $output;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 view() - Repository-Datei ansehen
+
+=head4 Synopsis
+
+    $scm->view($repoFile);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Datei mit Repository-Pfadangabe.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Öffne die Repository-Datei $repoFile im Pager.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub view {
+    my ($self,$repoFile,$package) = @_;
+
+    my $file = $self->repoFileToFile($repoFile);
+    Quiq::Shell->exec("vi -R $file");
+
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -776,6 +848,54 @@ sub removeItems {
     }
 
     return $output;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 repoFileToFile() - Expandiere Repo-Pfad zu absolutem Pfad
+
+=head4 Synopsis
+
+    $file = $scm->repoFileToFile($repoFile);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Datei mit Repository-Pfadangabe.
+
+=back
+
+=head4 Returns
+
+Pfad (String)
+
+=head4 Description
+
+Expandiere den Reository-Dateipfad zu einem absoluten Dateipfad
+und liefere diesen zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub repoFileToFile {
+    my ($self,$repoFile) = @_;
+
+    # Vollständigen Pfad der Repository-Datei ermitteln
+
+    my $p = Quiq::Path->new;
+    my $file = sprintf '%s/%s',$self->workspace,$repoFile;
+    if (!$p->exists($file)) {
+        $self->throw(
+            q~CASCM-00099: Repository file does not exist~,
+            File => $file,
+        );
+    }
+
+    return $file;
 }
 
 # -----------------------------------------------------------------------------
@@ -1317,6 +1437,7 @@ Stufe.
 =head4 Description
 
 Liefere die Stufe $state, auf der sich Package $package befindet.
+Existiert das Package nicht, liefere einen Leerstring ('').
 
 =cut
 
@@ -1743,7 +1864,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.138
+1.139
 
 =head1 AUTHOR
 

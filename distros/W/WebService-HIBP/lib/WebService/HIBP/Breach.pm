@@ -3,7 +3,7 @@ package WebService::HIBP::Breach;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -108,7 +108,7 @@ WebService::HIBP::Breach - An instance of a breach from the Have I Been Pwned we
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =head1 SYNOPSIS
 

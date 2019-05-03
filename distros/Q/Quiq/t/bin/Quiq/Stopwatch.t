@@ -21,8 +21,7 @@ sub test_unitTest_root: Test(1) {
     my $stw = Quiq::Stopwatch->new;
     sleep 1;
     my $duration = $stw->elapsed;
-    # warn "$duration\n";
-    $self->ok($duration >= 1 && $duration < 2);
+    $self->ok($duration > 0.5 && $duration < 1.5);
 }
 
 # -----------------------------------------------------------------------------

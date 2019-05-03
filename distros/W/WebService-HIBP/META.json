@@ -34,6 +34,7 @@
          "requires" : {
             "Digest::SHA" : "0",
             "Encode" : "0",
+            "HTTP::Status" : "0",
             "JSON" : "0",
             "LWP::Protocol::https" : "6.06",
             "LWP::UserAgent" : "0",
@@ -47,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

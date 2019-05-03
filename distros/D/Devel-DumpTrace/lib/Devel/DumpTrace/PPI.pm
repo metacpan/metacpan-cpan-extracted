@@ -30,8 +30,6 @@ eval {use PPI;
 *current_position_string = *Devel::DumpTrace::current_position_string;
 *dumptrace = *Devel::DumpTrace::dumptrace;
 
-
-
 $Devel::DumpTrace::PPI::VERSION = '0.28';
 use constant ADD_IMPLICIT_ => 1;
 use constant DECORATE_FOR => 1;
@@ -79,6 +77,14 @@ sub get_source_PPI {
     return \@{$ppi_src{$file}[$line]};
 }
 
+# decorating statements with fewer elements first guarentees
+# that child statements are decorated before the parent
+sub decorate_order { 
+    $a->line_number <=> $b->line_number
+        || 
+        $a->elements <=> $b->elements
+}
+
 sub _update_ppi_src_for_file {
     my $file = shift;
 
@@ -102,7 +108,7 @@ sub _update_ppi_src_for_file {
     # be included ... ( if ($cond) { $x++ }\n   ===>   don't store  $x++ )
 
     my $statements = $doc->find('PPI::Statement') || [];
-    foreach my $element (@$statements) {
+   foreach my $element (sort decorate_order @$statements) {
 	my $_line = $element->line_number;
 
         # 0.28: the first child of a compound statement might begin with one or 
@@ -325,7 +331,7 @@ sub evaluate_and_display_line_PPI {
     # for a simple lexical declaration with no assignments,
     # don't evaluate the code:
     #           my ($a, @b, %c);
-    #           our $ZZZ;
+    #           our $xyz;
     # XXX - these expressions lifted from Devel::DumpTrace. Is that
     #       sufficient or should we analyze the PPI tokens?
 
@@ -783,22 +789,46 @@ sub __prepend_implicit_topic_to_naked_regexp {
     #
     # /pattern/    means    $_ =~ /pattern/
     #
-    # TODO: but    split(/pattern/,...)
-    #       is not split($_=~/pattern/,...)
-    # TODO: other functions that expect regexp
-    # TODO: functions that don't expect regexp but can accept them
+    # (exception:  split /foo/,$bar  is not  split $_=~/foo/,$bar
+    #  are there other functions that expect a regexp pattern?)
     #
     for (my $i = 0; $i < @$e; $i++) {
 	next unless ref($e->[$i]) =~ /^PPI::Token::Regexp/;
+
 	my $j = $i-1;
 	$j-- while $j >= 0 && ref($e->[$j]) eq 'PPI::Token::Whitespace';
-	if ($j < 0 || ref($e->[$j]) ne 'PPI::Token::Operator'
-	    || ($e->[$j] ne '=~' && $e->[$j] ne '!~')) {
 
-	    splice @$e, $i, 0,
-	    bless( { content => '$_' }, 'PPI::Token::Magic' ),
-	    bless( { content => '=~' }, 'PPI::Token::Operator' );
-	}
+        if ($j >= 0) {
+            next if $e->[$j] eq '=~' || $e->[$j] eq '!~';
+            next if ref($e->[$j]) eq 'PPI::Token::Word' && $e->[$j] eq 'split';
+        }
+        
+        if ($j < 0) {
+            # previous token in a parent statement might be 'split'
+            my $prev = $e->[0]->previous_token;
+            while ($prev && 
+                       (ref($prev) eq 'PPI::Token::Structure' ||
+                            !$prev->significant)) {
+                $prev = $prev->previous_token;
+            }
+            next if ref($prev) eq 'PPI::Token::Word' && "$prev" eq "split";
+        }
+
+        if ($i == 0) {
+            # $e->[0] seems fixed somewhere, so unshift @$e, ... does nothing
+            # but we can reassign $e->[0]'s contents and its class
+            splice @$e, 1, 0,
+                bless( { content => '=~', _location => $e->[0]->location },
+                       'PPI::Token::Operator' ),
+                $e->[0]->clone;
+            $e->[0]{content} = '$_';
+            bless $e->[0], 'PPI::Token::Magic';
+        } else {
+            splice @$e, $i, 0,
+                bless( { content => '$_' }, 'PPI::Token::Magic' ),
+                bless( { content => '=~' }, 'PPI::Token::Operator' );
+        }
+        $i += 2;
     }
     return;
 }
@@ -838,34 +868,46 @@ sub __append_implicit_topic_to_naked_builtins {
     # but         $hash{barword}
     # never means $hash{bareword $_}
     #
+    # also casts ${bareword}, @{bareword}, %{bareword}
+    # never mean *{bareword $_}
+    #
     for (my $i=0; $i<@$e; $i++) {
-	if (ref($e->[$i]) eq 'PPI::Token::Word' 
-	    && defined $implicit_{"$e->[$i]"}) {
+        next if ref($e->[$i]) ne 'PPI::Token::Word';
+        next if !$implicit_{"$e->[$i]"};
 
-	    my $j = $i + 1;
-	    my $gparent = $e->[$i]->parent && $e->[$i]->parent->parent;
-	    next if $gparent && ref($gparent) eq 'PPI::Structure::Subscript'
-		&& $gparent =~ /^{/;
-	    $j++ while $j <= @$e && ref($e->[$j]) eq 'PPI::Token::Whitespace';
-	    if ($j >= @$e || ref($e->[$j]) eq 'PPI::Token::Structure'
+        my $j = $i + 1;
+        my $gparent = $e->[$i]->parent && $e->[$i]->parent->parent;
+        if ($gparent) {
+            next if ref($gparent) eq 'PPI::Structure::Subscript' &&
+                index($gparent,"{") == 0;
+            my $prev = $gparent->previous_token;
+            $prev = $prev->previous_token while $prev && !$prev->significant;
+            next if ref($gparent) eq 'PPI::Structure::Block' &&
+                index($gparent,"{") == 0 &&
+                ref($prev) eq 'PPI::Token::Cast';
+        }
+        $j++ while $j <= @$e && ref($e->[$j]) eq 'PPI::Token::Whitespace';
+        if ($j >= @$e || ref($e->[$j]) eq 'PPI::Token::Structure'
                           || (ref($e->[$j]) eq 'PPI::Token::Operator' &&
                               ($e->[$j] eq '..' || $e->[$j] eq '...'))) {
-		if ($e->[$i] eq 'split') {
-		    # naked  split  is parsed as  split /\s+/, $_
-		    splice @$e, $i+1, 0,
-		        bless({content=>' '}, 'PPI::Token::Whitespace'),
-		        bless({content=>'m/\\s+/'},
-			      'PPI::Token::Regexp::Match'),
-		        bless({content=>','}, 'PPI::Token::Operator'),
-		        bless({content=>'$_'}, 'PPI::Token::Magic');
-		} else {
-		    splice @$e, $i+1, 0,
-		        bless({content=>' '}, 'PPI::Token::Whitespace'),
-		        bless({content=>'$_'}, 'PPI::Token::Magic');
-		}
-	    }
+            if ($e->[$i] eq 'split') {
+                # naked  split  is parsed as  split /\s+/, $_
+                splice @$e, $i+1, 0,
+                    bless({content=>' '}, 'PPI::Token::Whitespace'),
+                    bless({content=>'m/\\s+/'},
+                          'PPI::Token::Regexp::Match'),
+                    bless({content=>','}, 'PPI::Token::Operator'),
+                    bless({content=>'$_'}, 'PPI::Token::Magic');
+            } else {
+                splice @$e, $i+1, 0,
+                    bless({content=>' '}, 'PPI::Token::Whitespace'),
+                    bless({content=>'$_'}, 'PPI::Token::Magic');
+            }
 	}
     }
+
+
+    
     return;
 }
 
@@ -891,88 +933,81 @@ sub __insert_implicit_topic_into_default_foreach {
     return;
 }
 
+sub looks_like_constant_expression {
+    my $expr = shift;
+    $expr =~ s/^\s+//;
+    $expr =~ s/\s+$//;
+    $expr =~ s/.*\b(if|while|until|unless)\b//;
+    $expr =~ s/[;,]$//;
+    
+    return 1 if Scalar::Util::looks_like_number($expr);
+    return 1 if $expr =~ /^&?[A-Z_][\dA-Z_:]*$/;  # all caps bareword is probably const
+    return 0;
+}
+
 sub __insert_implicit_NR_into_flipflop {
     #   (m ... n)       means    ($.==m ... $.==n)
-    #   (m .. n)        means    ($.==m .. $.==n)    in list context only
+    #   (m .. n)        means    ($.==m .. $.==n)    in scalar context only
+    #           when  m  and/or  n  is a "constant expression"
     my $e = shift;
+  TOKENS:
     for (my $i=0; $i<@$e; $i++) {
         next unless ref($e->[$i]) eq 'PPI::Token::Operator';
         next unless $e->[$i] eq '...' || $e->[$i] eq '..';
-        if ($e->[$i] eq '..') {
-            # must also guess whether this is evaluated in scalar context
-            # some heuristics we will use:
-            #     no if preceded by 'for','foreach' keyword
-            #     no if preceded by '=' operator
-            #     yes if preceded by other assignment operator
-            #     yes if preceded by  'if','while',or 'until'
-            my $ee = $e;
-            my $ff = join '', @$e;
-            my @ref = map { ref } @$e;
-            my @oref = grep { !/::Whitespace/ && !/::Operator/
-                                  && !/::Number/ } @ref;
 
-            if (@oref == 0) {
-                $ee = $e->[0]->parent;
-                return if ref($ee) ne 'PPI::Statement::Expression';
-                $ee = $ee->parent;
-                return if ref($ee) ne 'PPI::Structure::Condition';
-                # ah, there we go. In list context PPI will call $ee
-                # a  PPI::Structure::List
-                $ee = $ee->parent;
-                return if ref($ee) !~ /^PPI::Statement/;
-                $ee = $ee->{children};
-            }
-            for (my $k=0; $k<@$ee; $k++) {
-                next if $ee->[$k] ne $ff && $ee->[$k] ne "($ff)";
-                my $l = $k+1;
-                $l++ while $l<@$ee &&
-                           'PPI::Token::Whitespace' eq ref $ee->[$l];
-                return if $l<@$ee &&
-                    (ref($ee->[$l]) ne 'PPI::Token::Structure'
-                     || $ee->[$l] ne ';') &&
-                     ref($ee->[$l]) ne 'PPI::Structure::Block';
-                $l = $k-1;
-                $l-- while $l>=0 && 'PPI::Token::Whitespace' eq ref $ee->[$l];
-                return if $l<0;
-                return if ref($ee->[$l]) ne 'PPI::Token::Word';
-                return if $ee->[$l] ne 'if' && $ee->[$l] ne 'while' &&
-                    $ee->[$l] ne 'until';
-                last;
+        if ($e->[$i] eq '..') {
+            # ..  operator is the "flip-flop" operator in scalar context
+            # but the "range" operator in list context. How can we tell
+            # which is which?
+            
+            my $p1 = $e->[$i]->parent;
+            my $p2 = $p1 && $p1->parent;
+            next if ref($p2) eq 'PPI::Structure::List';
+            if (ref($p2) ne 'PPI::Structure::Condition') {
+                for (my $j=$i-1; $j>=0; $j--) {
+                    my $ej = $e->[$j];
+                    my $rj = ref($ej);
+
+                    # assignment from X..Y is *usually* list context,
+                    # but we could be wrong about that
+                    next TOKENS if $rj eq 'PPI::Token::Operator' && $ej eq '=';
+                    
+                    if ($rj eq 'PPI::Token::Word') {
+                        next TOKENS if $ej eq 'for' || $ej eq 'foreach';
+                        last if $ej eq 'if' || $ej eq 'unless';
+                        last if $ej eq 'while' || $ej eq 'until';
+                    }
+                }
             }
         }
 
-        # token before the ... operator
-        my $j = $i - 1;
-        $j-- while $j>0 && ref($e->[$j]) eq 'PPI::Token::Whitespace';
-
-        if ($j >= 0 && ref($e->[$j]) =~ /PPI::Token::Number/) {
-            if ($j==0) {
+        # tokens before and after the flip-flop operator
+        my $pre = join('', @{$e}[0 .. $i-1]);
+        my $post = join('', @{$e}[$i+1 .. $#$e]);
+        if (looks_like_constant_expression($pre)) {
+            my $j = $i - 1;
+            $j-- while $j>0 && ref($e->[$j]) eq 'PPI::Token::Whitespace';
+            $j = 0;
+            if ($j == 0) {
                 unshift @$e,
                   bless({content => '$.', _location => $e->[$j]{_location}},
                         'PPI::Token::Magic'),
                   bless({content => '==', _location => $e->[$j]{_location}},
                         'PPI::Token::Operator');
-                return 1;
             } else {
                 splice @$e, $j, 0,
                   bless({content => '$.'}, 'PPI::Token::Magic'),
                   bless({content => '=='}, 'PPI::Token::Operator');
-                return 1;
-                # how to tell if Number represents a standalone expression?
-                # or a numerical expression like + 40
             }
+            return 1;
         }
-        # token after the ... operator
-        $j = $i + 1;
-        $j++ while $j<@$e && ref($e->[$j]) eq 'PPI::Token::Whitespace';
-        if ($j < @$e && (ref($e->[$j]) eq 'PPI::Token::Number' ||
-                         ref($e->[$j]) eq 'PPI::Token::Number::Float')) {
-            if ($j == $#$e) {
-                splice @$e, $j, 0,
-                  bless({content => '$.'}, 'PPI::Token::Magic'),
-                  bless({content => '=='}, 'PPI::Token::Operator');
-                return 1;
-            }
+        if (looks_like_constant_expression($post)) {
+            my $j = $i + 1;
+            $j++ while $j<@$e && ref($e->[$j]) eq 'PPI::Token::Whitespace';
+            splice @$e, $j, 0,
+                bless({content => '$.'}, 'PPI::Token::Magic'),
+                bless({content => '=='}, 'PPI::Token::Operator');
+            return 1;
         }
     }
     return;
@@ -1256,17 +1291,6 @@ sub __decorate_first_statement_AFTER_for_block {
     my $next = __next_sibling($element);
     return unless $next;
 
-
-    if (0) {
-        open TTY,">","/dev/tty";
-        print TTY "WANT TO DECORATE STATEMENT\n\n\t$next\n\n\nAFTER FOR";
-        print TTY "PREV STATEMENT IS\n\n\t$element\n\n",ref($element),"\n\n\n";
-        local $Data::Dumper::Indent = 0;
-        #    print TTY "\n", Dumper($element);
-        print TTY "\n",join("\n",sort keys %$element),"\n";
-        print TTY "\n";
-    }
-
     my $line = $next->line_number;
     $next->{__DECORATED__} = "end-for";
     $next->{__ENDFOR_LINE__} = "$file:$line";
@@ -1404,17 +1428,6 @@ sub __decorate_first_statement_AFTER_while_block {
     
     my $next = __next_sibling($element);
     return unless $next;
-
-
-    if (0) {
-        open TTY,">","/dev/tty";
-        print TTY "WANT TO DECORATE STATEMENT\n\n\t$next\n\n\nAFTER WHILE";
-        print TTY "PREV STATEMENT IS\n\n\t$element\n\n",ref($element),"\n\n\n";
-        local $Data::Dumper::Indent = 0;
-        #    print TTY "\n", Dumper($element);
-        print TTY "\n",join("\n",sort keys %$element),"\n";
-        print TTY "\n";
-    }
 
     my $line = $next->line_number;
     $next->{__DECORATED__} = "end-while";
@@ -1605,7 +1618,7 @@ Devel::DumpTrace::PPI - PPI-based version of Devel::DumpTrace
 
 =head1 VERSION
 
-0.28
+0.29
 
 =head1 SYNOPSIS
 
@@ -2204,7 +2217,7 @@ Marty O'Brien, E<lt>mob at cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2018 Marty O'Brien.
+Copyright 2010-2019 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

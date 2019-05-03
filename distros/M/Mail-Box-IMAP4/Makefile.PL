@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.003';
+my $VERSION = '3.004';
 
 my %prereq =
   ( Date::Parse      => 0
@@ -13,11 +13,13 @@ my %prereq =
   , File::Compare    => 0
   , File::Copy       => 0
   , File::Spec       => 0
+  , IO::Socket::IP   => 0
   , List::Util       => 0
-  , Mail::IMAPClient => 0
+  , Mail::IMAPClient => 3.42
   , Scalar::Util     => 0
   , Test::More       => 0
 
+  , Mail::Box                     => 3.007
   , Mail::Box::Manage::User       => 3
   , Mail::Box::Net                => 3
   , Mail::Box::Search             => 3
@@ -27,7 +29,7 @@ my %prereq =
   , Mail::Message::Head::Complete => 3
   , Mail::Message::Head::Delayed  => 3
   , Mail::Server                  => 3
-  , Mail::Transport::Receive      => 3
+  , Mail::Transport::Receive      => 3.004
   );
 
 foreach my $module (sort keys %prereq)
@@ -86,7 +88,7 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/mail-box-imap4/raw
 DISTDIR         = ../public_html/mail-box-imap4/source
-EXTENDS			= ../Mail-Message:../Mail-Transport:../../perl/MailBox4
+EXTENDS         = ../Mail-Message:../Mail-Transport:../Mail-Box
 
 # for POD
 FIRST_YEAR      = 2001

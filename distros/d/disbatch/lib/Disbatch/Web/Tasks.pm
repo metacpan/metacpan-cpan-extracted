@@ -1,5 +1,5 @@
 package Disbatch::Web::Tasks;
-$Disbatch::Web::Tasks::VERSION = '4.102';
+$Disbatch::Web::Tasks::VERSION = '4.103';
 use 5.12.0;
 use warnings;
 
@@ -118,7 +118,7 @@ Disbatch::Web::Tasks - Disbatch::Web routes for deprecated task search and creat
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 DEPRECATION NOTICE
 

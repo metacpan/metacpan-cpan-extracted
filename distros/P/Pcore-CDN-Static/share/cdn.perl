@@ -25,7 +25,7 @@
 
     # jQuery3
     jquery3 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v3.3.1 );
+        my $ver = version->parse( $args->{ver} // v3.4.1 );
 
         state $native_prefix = 'https://ajax.googleapis.com/ajax/libs/jquery';
 
@@ -51,7 +51,7 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala2 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v2.9.3 );
+        my $ver = version->parse( $args->{ver} // v2.9.5 );
 
         if (wantarray) {
             my @res;
@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.4.1 );
+        my $ver = version->parse( $args->{ver} // v4.4.2 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 

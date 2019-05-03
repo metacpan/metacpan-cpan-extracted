@@ -1,0 +1,258 @@
+package # hide from PAUSE
+App::DBBrowser::Opt::DBSet;
+
+use warnings;
+use strict;
+use 5.010001;
+
+use File::Spec::Functions qw( catfile );
+
+use Term::Choose       qw( choose );
+use Term::Choose::Util qw( choose_a_subset settings_menu );
+use Term::Form         qw();
+
+use App::DBBrowser::Auxil;
+use App::DBBrowser::DB;
+use App::DBBrowser::Opt::DBGet;
+
+
+sub new {
+    my ( $class, $info, $options ) = @_;
+    bless {
+        i => $info,
+        o => $options,
+    }, $class;
+}
+
+
+sub database_setting {
+    my ( $sf, $db ) = @_;
+    my $old_idx_sec = 0;
+
+    SECTION: while ( 1 ) {
+        my ( $plugin, $section );
+        if ( defined $db ) {
+            $plugin = $sf->{i}{plugin};
+            $section = $db;
+        }
+        else {
+            if ( @{$sf->{o}{G}{plugins}} == 1 ) {
+                $plugin = $sf->{o}{G}{plugins}[0];
+            }
+            else {
+                my $choices = [ undef, map( "- $_", @{$sf->{o}{G}{plugins}} ) ];
+                # Choose
+                my $idx_sec = choose(
+                    $choices,
+                    { %{$sf->{i}{lyt_v_clear}}, undef => '  <=', default => $old_idx_sec, index => 1 }
+                );
+                if ( ! defined $idx_sec || ! defined $choices->[$idx_sec] ) {
+                    return;
+                }
+                if ( $sf->{o}{G}{menu_memory} ) {
+                    if ( $old_idx_sec == $idx_sec && ! $ENV{TC_RESET_AUTO_UP} ) {
+                        $old_idx_sec = 0;
+                        next SECTION;
+                    }
+                    $old_idx_sec = $idx_sec;
+                }
+                $plugin = $choices->[$idx_sec];
+                $plugin =~ s/^-\ //;
+            }
+            $plugin = 'App::DBBrowser::DB::' . $plugin;
+            $sf->{i}{plugin} = $plugin;
+            $section = $plugin;
+        }
+        my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+        my $env_var    = $plui->env_variables();
+        my $login_data = $plui->read_arguments();
+        my $attr       = $plui->set_attributes();
+        my $items = {
+            required => [ map { {
+                    name   => 'field_' . $_->{name},
+                    prompt => exists $_->{prompt} ? $_->{prompt} : $_->{name},
+                    values => [ 'NO', 'YES' ]
+                } } @$login_data ],
+            arguments => [
+                    grep { ! $_->{secret} } @$login_data
+                ],
+            env_variables => [ map { { #
+                    name   => $_,
+                    prompt => $_,
+                    values => [ 'NO', 'YES' ]
+                } } @$env_var ],
+
+            attributes => $attr,
+        };
+        my @groups;
+        push @groups, [ 'required',      "- Fields"        ] if @{$items->{required}};
+        push @groups, [ 'arguments',     "- Login Data"    ] if @{$items->{arguments}};
+        push @groups, [ 'env_variables', "- ENV Variables" ] if @{$items->{env_variables}};
+        push @groups, [ 'attributes',    "- Attributes"    ] if @{$items->{attributes}};
+        if ( ! @groups ) {
+            choose(
+                [ 'No database settings available!' ],
+                { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' }
+            );
+            return;
+        }
+        my $prompt = defined $db ? 'DB: ' . $db . '' : '' . $plugin . '';
+        my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
+        my $db_opt = $db_opt_get->read_db_config_files();
+
+        my $changed = 0;
+        my $old_idx_group = 0;
+
+        GROUP: while ( 1 ) {
+            my $reset = '  Reset DB';
+            my @pre = ( undef );
+            my $choices = [ @pre, map( $_->[1], @groups ) ];
+            push @$choices, $reset if ! defined $db;
+            # Choose
+            my $idx_group = choose(
+                $choices,
+                { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1,
+                  default => $old_idx_group, undef => '  <=' }
+            );
+            if ( ! defined $idx_group || ! defined $choices->[$idx_group] ) {
+                if ( $sf->{write_config} ) {
+                    $sf->__write_db_config_files( $db_opt );
+                    delete $sf->{write_config};
+                    $changed++;
+                }
+                next SECTION if ! $db && @{$sf->{o}{G}{plugins}} > 1;
+                return $changed;
+            }
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $old_idx_group == $idx_group && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx_group = 0;
+                    next GROUP;
+                }
+                $old_idx_group = $idx_group;
+            }
+            if ( $choices->[$idx_group] eq $reset ) {
+                my @databases;
+                for my $section ( keys %$db_opt ) {
+                    push @databases, $section if $section ne $plugin;
+                }
+                if ( ! @databases ) {
+                    choose(
+                        [ 'No databases with customized settings.' ],
+                        { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' }
+                    );
+                    next GROUP;
+                }
+                my $choices = choose_a_subset(
+                    [ sort @databases ],
+                    { name => 'Reset DB: ', mouse => $sf->{o}{table}{mouse} }
+                );
+                if ( ! $choices->[0] ) {
+                    next GROUP;
+                }
+                for my $db ( @$choices ) {
+                    delete $db_opt->{$db};
+                }
+                $sf->{write_config}++;
+                next GROUP;;
+            }
+            my $group  = $groups[$idx_group-@pre][0];
+            if ( $group eq 'required' ) {
+                my $sub_menu = [];
+                for my $item ( @{$items->{$group}} ) {
+                    my $required = $item->{name};
+                    push @$sub_menu, [ $required, '- ' . $item->{prompt}, $item->{values} ];
+                              # db                               # global
+                    $db_opt->{$section}{$required} //= $db_opt->{$plugin}{$required} // 1; # default is required (1)
+                }
+                my $prompt = 'Required fields (' . $plugin . '):';
+                $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
+                next GROUP;
+            }
+            elsif ( $group eq 'arguments' ) {
+               for my $item ( @{$items->{$group}} ) {
+                    my $opt = $item->{name};
+                    $db_opt->{$section}{$opt} //= $db_opt->{$plugin}{$opt};
+                }
+                my $prompt = 'Default login data (' . $plugin . ')';
+                $sf->__group_readline_db( $db_opt, $section, $items->{$group}, $prompt );
+            }
+            elsif ( $group eq 'env_variables' ) {
+                my $sub_menu = [];
+                for my $item ( @{$items->{$group}} ) {
+                    my $env_variable = $item->{name};
+                    push @$sub_menu, [ $env_variable, '- ' . $item->{prompt}, $item->{values} ];
+                    $db_opt->{$section}{$env_variable} //= $db_opt->{$plugin}{$env_variable} // 0; # default is disabled (0)
+                }
+                my $prompt = 'Use ENV variables (' . $plugin . '):';
+                $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
+                next GROUP;
+            }
+            elsif ( $group eq 'attributes' ) {
+                my $sub_menu = [];
+                for my $item ( @{$items->{$group}} ) {
+                    my $opt = $item->{name};
+                    my $prompt = '- ' . ( exists $item->{prompt} ? $item->{prompt} : $item->{name} );
+                    push @$sub_menu, [ $opt, $prompt, $item->{values} ];
+                    $db_opt->{$section}{$opt} //= $db_opt->{$plugin}{$opt} // $item->{values}[$item->{default}];
+                }
+                my $prompt = 'Options (' . $plugin . '):';
+                $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
+                next GROUP;
+            }
+        }
+    }
+}
+
+
+sub __settings_menu_wrap_db {
+    my ( $sf, $db_opt, $section, $sub_menu, $prompt ) = @_;
+    my $changed = settings_menu(
+        $sub_menu, $db_opt->{$section},
+        { prompt => $prompt, mouse => $sf->{o}{table}{mouse} }
+    );
+    return if ! $changed;
+    $sf->{write_config}++;
+}
+
+
+sub __group_readline_db {
+    my ( $sf, $db_opt, $section, $items, $prompt ) = @_;
+    my $list = [ map {
+        [
+            exists $_->{prompt} ? $_->{prompt} : $_->{name},
+            $db_opt->{$section}{$_->{name}}
+        ]
+    } @{$items} ];
+    my $trs = Term::Form->new();
+    my $new_list = $trs->fill_form(
+        $list,
+        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
+    );
+    if ( $new_list ) {
+        for my $i ( 0 .. $#$items ) {
+            $db_opt->{$section}{$items->[$i]{name}} = $new_list->[$i][1];
+        }
+        $sf->{write_config}++;
+    }
+}
+
+
+sub __write_db_config_files {
+    my ( $sf, $db_opt ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
+    my $plugin = $sf->{i}{plugin};
+    $plugin=~ s/^App::DBBrowser::DB:://;
+    my $file_fs = sprintf( $sf->{i}{conf_file_fmt}, $plugin );
+    if ( defined $db_opt && %$db_opt ) {
+        $ax->write_json( $file_fs, $db_opt );
+    }
+}
+
+
+
+
+
+1;
+
+
+__END__

@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
-our $VERSION = '2.071';
+our $VERSION = '2.200';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,9 +50,15 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.071
+Version 2.200
 
-=cut
+=head1 BACKWARD INCOMPATIBLE CHANGES
+
+Backward incompatible changes introduced with C<2.200>:
+
+Perl minimum version is now C<5.10.1> instead of C<5.8.3>.
+
+New L<Plugin API|App::DBBrowser::DB>.
 
 =head1 SYNOPSIS
 
@@ -67,9 +73,7 @@ Version 2.071
 When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<HELP> shows this
 documentation - see L</OPTIONS>.
 
-If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin. The
-database is chosen automatically if only one database is available. With the C<SQLite> driver in use, the option
-I<Search directories> tells the database plugin where to search for C<SQLite> databases (defaults to the home directory).
+If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin.
 
 If C<db-browser> is called with arguments, the arguments are used as the available databases.
 
@@ -113,11 +117,11 @@ With the option I<mouse> enabled it can be used the mouse with the left mouse ke
 
 To confirm a chosen menu item use the C<Return> key.
 
-In some sub-menus it is possible to select more then one item before C<Return> is pressed (for example I<Choose Rows>
-and I<Choose Cols> from the input filters; in such sub-menus the list of items marked with the
-C<SpaceBar> are added to the chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the
-right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example to select all
-but one select the one with the C<SpaceBar> and then press C<Ctrl-SpaceBar>.
+In some sub-menus it is possible to select more then one item before C<Return> is pressed (e.g. the input filters
+I<Choose Rows> and I<Choose Cols>); in such sub-menus the list of items marked with the C<SpaceBar> are added to the
+chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the right mouse key instead of the
+C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example to select all but one select the one with the
+C<SpaceBar> and then press C<Ctrl-SpaceBar>.
 
 =head2 Read-line
 
@@ -153,8 +157,8 @@ pressed, C<read-line> returns an empty string.
 
 The elements are right-justified if they look like a number else they are left-justified.
 
-Leading and trailing spaces are removed from the elements and spaces are squashed to a single white-space if the option
-I<squash_spaces> is enabled.
+If the option I<squash_spaces> is enabled, leading and trailing spaces are removed from the elements and spaces are
+squashed to a single white-space.
 
 Tab characters (C<\t>) are replaces with a space.
 
@@ -170,19 +174,19 @@ See also the option group L</Output>.
 
 Choosing a plugin leads to the I<Databases Menu>.
 
-If there is only one plugin, the menu is not shown but the plugin is chosen automatically.
+(If there is only one plugin, the plugins menu is not shown but the plugin is chosen automatically.)
 
 =head2 Databases Menu
 
 Choosing a database leads to the I<Schemas Menu>.
 
-If there is only one database, the menu is not shown but the database is chosen automatically.
+(If there is only one database, the databases menu is not shown but the database is chosen automatically.)
 
 =head2 Schemas Menu
 
 Choosing a schema leads to the I<Tables Menu>.
 
-If there is not more than one schema, this menu is not shown but the schema is chosen automatically.
+(If there is not more than one schema, the schemas menu is not shown but the schema is chosen automatically.)
 
 =head2 Tables Menu
 
@@ -196,54 +200,51 @@ Selecting the prompt line (the database name) opens a menu with these entries:
 
 =item Create Table
 
-See L</WRITE ACCESS>
-
-This entry is available only if enabled in L</Extensions>.
-
 =item Drop Table
 
-See L</WRITE ACCESS>
+=item Create View
 
-This entry is available only if enabled in L</Extensions>.
+=item Drop View
 
 =item Attach DB
 
-I<Attache DB> is available only for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current
-database.
-
 =item Detach DB
-
-This entry is available if a C<SQLite> database has attached databases.
 
 =back
 
-=head3 Tables
+For I<Create Table>, I<Drop Table>, I<Create View> and I<Drop View> see L</WRITE ACCESS>. These entries are available if
+enabled in L</Extensions>.
 
-Choosing a table leads to the I<SQL Menu>.
+I<Attache DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the
+current database. The menu entry I<Detach DB> is available if a C<SQLite> database has attached databases.
+
+=head3 Tables Entries
+
+Choosing one of the tables leads to the I<SQL Menu>.
 
 =head3 Derived
 
 Choosing this entry allows one to enter a subquery and use it as a table.
 
-This entry is available only if enabled in L</Extensions>.
+This entry is available if enabled in L</Extensions>.
 
 =head3 Join
 
 Join tables.
 
-This entry is available only if enabled in L</Extensions>.
+This entry is available if enabled in L</Extensions>.
 
 =head3 Union
 
 Combine the result from multiple SELECT statements.
 
-This entry is available only if enabled in L</Extensions>.
+This entry is available if enabled in L</Extensions>.
 
 =head3 Settings
 
 See L</DB Settings>.
 
-This entry is available only if enabled in L</Extensions>.
+This entry is available if enabled in L</Extensions>.
 
 =head2 SQL Menu
 
@@ -265,15 +266,13 @@ Selecting this prompt line (I<Customize:>) opens a menu with these entries:
 
 =back
 
-See L</WRITE ACCESS>
-
-This entries are available only if enabled in L</Extensions>.
+See L</WRITE ACCESS>. These entries are available if enabled in L</Extensions>.
 
 =head3 Print TABLE
 
 Select I<Print TABLE> to show the result of the formed statement on the screen.
 
-=head3 The Sub-Statements
+=head3 The Sub-Statements Entries
 
 To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
 
@@ -314,9 +313,9 @@ Reset the SQL statement.
 
 =head1 WRITE ACCESS
 
-=head2 Create/Drop Table
+=head2 Create/Drop Table/View
 
-I<Create/Drop Table> can be reached by selecting the prompt-line in the L</Tables Menu> if the respective option is
+I<Create/Drop Table/View> can be reached by selecting the prompt-line in the L</Tables Menu> if the respective option is
 activated.
 
 =head3 Create Table
@@ -349,6 +348,12 @@ Selecting the prompt line of the I<Files> menu allows one to set the options des
 =head3 Drop table
 
 Drop a table. The whole table is shown before the user confirms to drop the table.
+
+=head3 Create View
+
+Before creating a view: print the required select-statement to make it available in the subquery menu.
+
+=head3 Drop View
 
 =head2 Insert Into/Update/Delete
 
@@ -506,20 +511,20 @@ Show this documentation.
 
 Shows the version and the path of the running C<db-browser> and the path of the application directory.
 
-=head2 DB Settings
+=head2 DB Options
 
-=head3 DB plugins
+=head3 DB Plugins
 
 Choose the required database plugins.
 
-=head3 DB settings
+=head3 DB Settings
 
 These driver specific I<DB Settings> are used as the default database settings.
 
 There is also in each L</Tables Menu> the entry I<Settings> (if enabled in L</Extensions>) to make database specific
 settings. If no database specific settings are set, these global (to the database plugin) I<DB Settings> are used.
 
-User defined database plugins: it depends on the plugin which items are offered to set in each option and whether the
+User defined database plugins: it depends on the plugin which items are offered to be set in each option and whether the
 selections made by the user are considered.
 
 =over
@@ -528,15 +533,15 @@ selections made by the user are considered.
 
 Set which fields are required to connect to a database.
 
-=item ENV Variables
-
-The user can choose environment variables form a list of environment variables that should be used - if set - to connect
-to the database.
-
 =item Login Data
 
 The entered login data is saved in a configuration file and used to connect to the database (the password can not be
 saved).
+
+=item ENV Variables
+
+The user can choose environment variables form a list of environment variables that should be used - if set - to connect
+to the database.
 
 =item Attributes
 
@@ -614,15 +619,13 @@ Add menu entries to menus:
 
 =over
 
-=item Add Derived
+=item Derived (table)
 
-Derived table - see L</Subqueries>.
+=item Join
 
-=item Add Join
+=item Union
 
-=item Add Union
-
-=item Add DB settings
+=item DB settings
 
 =back
 
@@ -630,9 +633,7 @@ Derived table - see L</Subqueries>.
 
 =over
 
-=item Add Derived
-
-Derived table - see L</Subqueries>.
+=item Derived (table)
 
 =back
 
@@ -640,11 +641,9 @@ Derived table - see L</Subqueries>.
 
 =over
 
-=item Add Derived
+=item Derived (table)
 
-Derived table - see L</Subqueries>.
-
-=item Add Union All
+=item Union All
 
 =back
 
@@ -656,27 +655,27 @@ Substatement additions for:
 
 =item SELECT
 
-Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item WHERE
 
-Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item GROUP BY
 
-Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item HAVING
 
-Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item ORDER BY
 
-Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item SET
 
-Values: I<None>, I<Func>, I<SQ>, I<=N> and I<Func/SQ/=N>
+I<None>, I<Func>, I<SQ>, I<=N>, I<Func/SQ/=N>
 
 =back
 
@@ -686,7 +685,7 @@ If set to I<Func>, C<f()> is shown as additionally menu entry. Selecting C<f()> 
 
 If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu.
 
-If set to I<=N>, C<=N> is shown as additionally menu entry (available only after the C<SET> in an C<UPDATE> statement).
+If set to I<=N>, C<=N> is shown as additionally menu entry (available after the C<SET> in an C<UPDATE> statement).
 Selecting C<=N> sets the column to C<NULL>.
 
 If set to I<Func/SQ> (or I<Func/SQ/=N>), C<%%> is shown as additionally menu entry. Selecting C<%%> lets one choose
@@ -715,11 +714,13 @@ entry has been chosen.
 
 =head4 Subqueries
 
-Selecting a subquery menu entry (or a derived menu entry) opens a subquery sub-menu which allows one the enter a
+Selecting a subquery menu entry (or a I<Derived> menu entry) opens a subquery sub-menu which allows one the enter a
 subquery (I<Read-Line>).
 
 If stored or temporarily stored subqueries are available, it is also possible to select one of those subqueries instead
 of entering a subquery.
+
+The subqueries are automatically enclosed in parentheses if the subqueries do not contain any parentheses.
 
 A subquery can be saved or removed in the sub-menu which opens by selecting the prompt line of a subquery menu
 (I<Choose SQ:>).
@@ -737,15 +738,19 @@ Enable write access - use with care.
 
 =over
 
-=item Insert records
+=item Insert Records
 
-=item Update records
+=item Update Records
 
-=item Delete records
+=item Delete Records
 
-=item Create table
+=item Create Table
 
-=item Drop table
+=item Drop Table
+
+=item Create View
+
+=item Drop View
 
 =back
 
@@ -772,15 +777,13 @@ derived tables which get then a default alias.
 
 =item Aggregate
 
-=item Functions
+=item Derived tables
 
-Functions in the SELECT sub-statement.
+=item Functions in the SELECT sub-statement.
 
 =item Join
 
-=item Subqueries
-
-Derived Tables and subqueries in the SELECT sub-statement.
+=item Subqueries in the SELECT sub-statement.
 
 =item Union
 
@@ -1055,7 +1058,7 @@ See L<Term::TablePrint/REQUIREMENTS>.
 
 =head2 Perl version
 
-Requires Perl version 5.8.3 or greater.
+Requires Perl version 5.10.1 or greater.
 
 =head2 Decoded strings
 

@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface );
 use HiPi qw( :max7219 );
 use HiPi::Interface::MAX7219;
 
-our $VERSION ='0.76';
+our $VERSION ='0.77';
 
 __PACKAGE__->create_accessors( qw( buffer writeflags flipped _decimals _shutdown_on_exit segmentfont ) );
 

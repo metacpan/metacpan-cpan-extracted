@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Data::Rmap" => 0,
     "Devel::OverloadInfo" => "0.005",
-    "Eval::Quosure" => "0.001",
+    "Eval::Quosure" => "0.001001",
     "Exporter::Tiny" => 0,
     "File::ShareDir" => 0,
     "Function::Parameters" => "2.001003",
@@ -92,7 +92,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::File::ShareDir" => 0
   },
-  "VERSION" => "0.0045",
+  "VERSION" => "0.0047",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -105,7 +105,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Data::Rmap" => 0,
   "Devel::OverloadInfo" => "0.005",
-  "Eval::Quosure" => "0.001",
+  "Eval::Quosure" => "0.001001",
   "Exporter::Tiny" => 0,
   "File::ShareDir" => 0,
   "FindBin" => 0,

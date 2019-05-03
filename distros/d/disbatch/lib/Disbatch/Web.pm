@@ -1,5 +1,5 @@
 package Disbatch::Web;
-$Disbatch::Web::VERSION = '4.102';
+$Disbatch::Web::VERSION = '4.103';
 use 5.12.0;
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Exporter qw/ import /;
 use File::Slurp;
 use Limper::SendFile;	# needed for public()
 use Limper::SendJSON;
-use Limper 0.014;
+use Limper 0.015;
 use MongoDB::OID 1.0.4;
 use Safe::Isa;
 use Scalar::Util qw/ looks_like_number /;
@@ -783,7 +783,7 @@ Disbatch::Web - Disbatch Command Interface (JSON REST API and web browser interf
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 EXPORTED
 

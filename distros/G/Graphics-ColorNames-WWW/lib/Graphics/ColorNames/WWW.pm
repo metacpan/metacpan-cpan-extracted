@@ -5,7 +5,7 @@ require 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 sub NamesRgbTable() {
   sub _mk_rgb { ($_[0] << 16) + ($_[1] << 8) + ($_[2]) }

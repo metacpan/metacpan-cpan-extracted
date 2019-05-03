@@ -88,13 +88,13 @@ Floating-point numbers are encoded in CBOR as IEEE 754 half-, single-,
 or double-precision. If your Perl is compiled to use “long double”
 floating-point numbers, you may see rounding errors when converting
 to/from CBOR. If that’s a problem for you, append an empty string to
-your floating-point numbers, which will cause CBOR to encode
+your floating-point numbers, which will cause CBOR::Free to encode
 them as strings.
 
 # INTEGER LIMITS
 
-CBOR handles up to 64-bit unsigned and signed integers. Most Perls
-nowadays can handle this just fine, but if yours can’t then you’ll
+CBOR handles up to 64-bit positive and negative integers. Most Perls
+nowadays can handle 64-bit integers, but if yours can’t then you’ll
 get an exception whenever trying to parse an integer that can’t be
 represented with 32 bits. This means:
 
@@ -103,12 +103,14 @@ represented with 32 bits. This means:
 
 Note that even 64-bit Perls can’t parse negatives that are less than
 \-0x8000\_0000\_0000\_0000 (-9,223,372,036,854,775,808); these also prompt an
-exception since Perl can’t handle them.
+exception since Perl can’t handle them. (It would be possible to load
+[Math::BigInt](https://metacpan.org/pod/Math::BigInt) to handle these; if that’s desirable for you,
+file a feature request.)
 
 # ERROR HANDLING
 
 Most errors are represented via instances of subclasses of
-[CBOR::Free::X](https://metacpan.org/pod/CBOR::Free::X).
+[CBOR::Free::X](https://metacpan.org/pod/CBOR::Free::X), which subclasses [X::Tiny::Base](https://metacpan.org/pod/X::Tiny::Base).
 
 # AUTHOR
 
@@ -120,9 +122,9 @@ This code is licensed under the same license as Perl itself.
 
 # SEE ALSO
 
-[CBOR::XS](https://metacpan.org/pod/CBOR::XS) is an older CBOR module on CPAN. It implements
-some behaviors around CBOR tagging that you might find useful.
-Its maintainer has [abandoned support for Perl versions from 5.22
+[CBOR::XS](https://metacpan.org/pod/CBOR::XS) is an older CBOR module on CPAN. It’s got more bells and
+whistles, so check it out if CBOR::Free lacks a feature you’d like.
+Note that [its maintainer has abandoned support for Perl versions from 5.22
 onward](http://blog.schmorp.de/2015-06-06-stableperl-faq.html), though,
 and its GPL license limits its usefulness in
 commercial [perlcc](https://metacpan.org/pod/distribution/B-C/script/perlcc.PL)

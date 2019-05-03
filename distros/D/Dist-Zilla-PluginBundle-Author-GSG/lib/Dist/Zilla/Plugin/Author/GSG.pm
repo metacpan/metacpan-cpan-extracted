@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Author::GSG;
 use Moose;
 with qw(
-    Dist::Zilla::Role::LicenseProvider
+    Dist::Zilla::Role::Plugin
 );
 use Git::Wrapper qw();
 use namespace::autoclean;
@@ -9,17 +9,18 @@ use namespace::autoclean;
 # ABSTRACT: Grant Street Group defaults CPAN dists
 # VERSION
 
-around 'BUILDARGS' => sub {
-    my ($orig, $self, $args) = @_;
+before 'BUILDARGS' => sub {
+    my ($class, $args) = @_;
 
     $args->{zilla}->{authors}
         ||= ['Grant Street Group <developers@grantstreet.com>'];
 
+    $args->{zilla}->{_license_class}    ||= 'Artistic_2_0';
     $args->{zilla}->{_copyright_holder} ||= 'Grant Street Group';
 
     if ( not $args->{zilla}->{_copyright_year} ) {
         my ( $commit, $date ) = do { local $@; eval { local $SIG{__DIE__};
-            Git::Wrapper->new('.')->RUN(
+            Git::Wrapper->new( $args->{zilla}->root )->RUN(
                 qw( rev-list --max-parents=0 --pretty=format:%ai HEAD )) } };
 
         my $year = 1900 + (localtime)[5];
@@ -31,30 +32,7 @@ around 'BUILDARGS' => sub {
 
         $args->{zilla}->{_copyright_year} = $year;
     }
-
-    return $self->$orig($args);
 };
-
-sub provide_license {
-    my ( $self, $conf ) = @_;
-
-    my $license_class = $self->zilla->_license_class || 'Artistic_2_0';
-    $license_class =~ s/^(?:Software::License::)?/Software::License::/;
-
-    {
-        local $@ = undef;
-        {
-            local $SIG{__DIE__} = 'DEFAULT';
-            eval "require $license_class";
-        }
-        die if $@;
-    }
-
-    return $license_class->new( {
-        holder => $conf->{copyright_holder},
-        year   => $conf->{copyright_year},
-    } );
-}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -71,7 +49,7 @@ Dist::Zilla::Plugin::Author::GSG - Grant Street Group defaults CPAN dists
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.6
 
 =head1 SYNOPSIS
 

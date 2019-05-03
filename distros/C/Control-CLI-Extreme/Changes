@@ -31,3 +31,10 @@ Revision history for Control-CLI-Extreme
 	  if it is desired to connect to non Extreme devices using this class
 	* Was failing to properly read attribute 'max_baud' on PassportERS family type
 	* Attribute switch_mode was getting incorrectly set to 'Stack' on standalone ExtremeXOS x440 & x670
+
+1.02	2019-05-01
+	* Updated prompt detection for ExtremeXOS to handle cases where prompt preceded by '!' or an operational
+	  status like (Demo), (Software Update Required), (orchestration vpex_peer), or anything in brackets
+	* Updated attribute() to pick up service ports 1/s1,1/s2 on new VSP7400
+	* Method attribute() was not correctly reading BaystackERS sysname if this contained spaces
+	* Updates to ExtremeXOS error patterns

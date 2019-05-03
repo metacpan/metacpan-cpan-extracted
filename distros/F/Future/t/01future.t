@@ -280,4 +280,10 @@ use Future;
    }
 }
 
+# block_until_ready
+{
+   my $future = Future->done( "result" );
+   identical( $future->block_until_ready, $future, '->block_until_ready returns invocant' );
+}
+
 done_testing;

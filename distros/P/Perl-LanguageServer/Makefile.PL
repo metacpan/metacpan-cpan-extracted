@@ -2,6 +2,32 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use FindBin ;
+use File::Basename ;
+use Cwd;
+
+my $mydir = getcwd;
+my $lexer_make = $FindBin::Bin . '/p5-Compiler-Lexer/Build.PL' ;
+my $lexer_inst = $FindBin::Bin . '/p5-Compiler-Lexer/Build' ;
+if (-e $lexer_make)
+    {
+    print "Running $lexer_make to build included Compiler::Lexer\n\n" ;
+    
+    my $dir = dirname ($lexer_make) ;
+    chdir $dir ;
+    #system ("cd '$dir' && perl '$lexer_make'") and
+    my $rc ;
+    if (!($rc = system ('perl', $lexer_make)))
+        {
+        print "Install Compiler::Lexer\n\n" ;
+        $rc = system ($lexer_inst, 'install') ;
+        }
+    if ($rc) 
+        {    
+        warn "Cannot run perl Build.PL for Compiler::Lexer. You need to install Compiler::Lexer from Github (do not use version 0.22)" ;    
+        }
+    chdir $mydir ;
+    }
 
 WriteMakefile(
     NAME             => 'Perl::LanguageServer',

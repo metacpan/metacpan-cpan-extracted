@@ -6,10 +6,10 @@ From Control::CLI::AvayaData it inherits the same support for all of the ex-Avay
 Control::CLI::Extreme currently supports:
 
       XOS Summit switches
-      VSP 4000, 7000, 7200, 8000, 9000
+      VSP 1x00, 4x00, 7x00, 8x00, 9000
+      ERS models 2500, 3x00, 4x00, 5x00
       DSG models 6248, 7648, 7480, 8032, 9032
       ERS/Passport models 1600, 8300, 8600, 8800
-      ERS models 2500, 3x00, 4x00, 5x00
       ISW industrial switches
       SR models 2330, 4134
       WLAN 91xx
@@ -115,7 +115,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Ludovico Stevens
+Copyright (C) 2019 Ludovico Stevens
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

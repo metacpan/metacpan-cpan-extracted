@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
+# Copyrights 2001-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Box::POP3;
 use vars '$VERSION';
-$VERSION = '3.004';
+$VERSION = '3.005';
 
 use base 'Mail::Box::Net';
 
@@ -27,8 +27,9 @@ use Carp;
 sub init($)
 {   my ($self, $args) = @_;
 
-    $args->{server_port} ||= 110;
-    $args->{folder}      ||= 'inbox';
+    $args->{server_port}  ||= 110;
+    $args->{folder}       ||= 'inbox';
+    $args->{message_type} ||= 'Mail::Box::POP3::Message';
 
     $self->SUPER::init($args);
 

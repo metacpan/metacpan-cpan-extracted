@@ -4,12 +4,12 @@ use Module::Build;
 my $b = Module::Build->new
  (module_name   => 'Dita::GB::Standard',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'The Gearhart-Brenan Dita Topic Content Naming Convention..',
+  dist_abstract => 'The Gearhart-Brenan Dita Topic Naming Standard.',
   license       => 'perl',
   requires      =>
    {'Carp'             =>0,
     'Data::Dump'       =>0,
-    'Data::Table::Text'=>20190429,
+    'Data::Table::Text'=>20190503,
     'Test2::API'       =>0,
     'Test::More'       =>0,
    },

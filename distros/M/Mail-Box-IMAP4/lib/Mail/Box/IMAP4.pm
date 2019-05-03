@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
+# Copyrights 2001-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Box::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.004';
 
 use base 'Mail::Box::Net';
 
@@ -105,6 +105,7 @@ sub foundIn(@)
 sub type() {'imap4'}
 
 
+
 sub close(@)
 {   my $self = shift;
     $self->SUPER::close(@_) or return ();
@@ -126,7 +127,6 @@ sub listSubFolders(@)
 sub nameOfSubfolder($;$) { $_[1] }
 
 #-------------------------------------------
-
 
 sub readMessages(@)
 {   my ($self, %args) = @_;
@@ -158,8 +158,8 @@ sub readMessages(@)
          , folder    => $self
          , seqnr     => $seqnr++
 
-	 , cache_labels => $cl
-	 , write_labels => $wl
+         , cache_labels => $cl
+         , write_labels => $wl
          , cache_head   => ($ch eq 'DELAY')
          , cache_body   => ($ch ne 'NO')
          );
@@ -175,6 +175,7 @@ sub readMessages(@)
     $self;
 }
  
+
 
 sub getHead($)
 {   my ($self, $message) = @_;
@@ -194,6 +195,7 @@ sub getHead($)
     $self->log(PROGRESS => "Loaded head of $uidl.");
     $head;
 }
+
 
 
 sub getHeadAndBody($)
@@ -233,6 +235,7 @@ sub getHeadAndBody($)
 }
 
 
+
 sub body(;$)
 {   my $self = shift;
     unless(@_)
@@ -242,6 +245,7 @@ sub body(;$)
     $self->unique();
     $self->SUPER::body(@_);
 }
+
 
 
 sub write(@)
@@ -266,6 +270,7 @@ sub delete(@)
 }
 
 
+
 sub writeMessages($@)
 {   my ($self, $args) = @_;
 
@@ -276,6 +281,7 @@ sub writeMessages($@)
 
     $self;
 }
+
 
 
 my %transporters;
@@ -310,6 +316,7 @@ sub createTransporter($@)
 }
 
 
+
 sub transporter(;$)
 {   my $self = shift;
 
@@ -338,12 +345,14 @@ sub transporter(;$)
 }
 
 
+
 sub fetch($@)
 {   my ($self, $what, @info) = @_;
     my $imap = $self->transporter or return [];
     $what = $self->messages($what) unless ref $what eq 'ARRAY';
     $imap->fetch($what, @info);
 }
+
 
 #-------------------------------------------
 

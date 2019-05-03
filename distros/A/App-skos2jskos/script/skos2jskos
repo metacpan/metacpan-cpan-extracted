@@ -5,7 +5,8 @@ our $VERSION = '0.1.6';
 
 use List::Util qw(any);
 use JSON;
-my $JSON = JSON->new->pretty->utf8->canonical;
+my $JSON        = JSON->new->utf8->canonical;
+my $JSON_PRETTY = JSON->new->utf8->canonical->pretty;
 
 ## get options
 use Getopt::Long;
@@ -112,7 +113,7 @@ SPARQL
 
 sub language {
     $_[0]->literal_value_language // do {
-        warning "missing language tag";
+        warning "missing language tag of " . $_[0];
         $opt{language};
     };
 }
@@ -120,7 +121,7 @@ sub language {
 ## Conversion methods
 sub prefLabel {
     my ( $entity, $label ) = @_;
-    return unless $label;
+    return unless isLiteral( $label, 'prefLabel' );
     my $language = language($label);
     my $value    = $label->literal_value;
     if ( ( $entity->{prefLabel}->{$language} // $value ) ne $value ) {
@@ -167,13 +168,25 @@ sub agent {
 
 sub notation {
     my ( $entity, $label ) = @_;
-    return unless $label;
+    return unless isLiteral( $label, 'notation' );
     pushUnique( $entity->{notation} //= [], $label->literal_value );
+}
+
+sub isLiteral {
+    my ( $node, $type ) = @_;
+    return unless $node;
+    if ( $node->is_literal ) {
+        return 1;
+    }
+    else {
+        warn "skipping non-literal $type: $node";
+        return 0;
+    }
 }
 
 sub note {
     my ( $entity, $note, $type ) = @_;
-    return unless $note;
+    return unless isLiteral( $note, $type );
     my $language = language($note);
     my $map      = $entity->{$type} //= {};    # language map of lists
     my $list     = $map->{$language} //= [];
@@ -190,7 +203,12 @@ sub export {
     $file = $opt{name} . "-$file" if defined $opt{name};
     $file = $opt{directory} . '/' . $file;
     open my $fh, '>', $file;
-    print $fh $JSON->encode($jskos);
+    if ( $file =~ /\.ndjson$/ ) {
+        say $fh $JSON->encode($_) for @$jskos;
+    }
+    else {
+        say $fh $JSON_PRETTY->encode($jskos);
+    }
     debug $file;
 }
 
@@ -293,7 +311,7 @@ sparql($query)->each(
 
 my $count = values %$concepts or warning "No concepts found";
 info "Exporting $count JSKOS concepts";
-export( 'concepts.json', [ map { $concepts->{$_} } sort keys %$concepts ] );
+export( 'concepts.ndjson', [ map { $concepts->{$_} } sort keys %$concepts ] );
 
 __END__
 
@@ -320,7 +338,7 @@ On success the following files are created in normalized JSON:
 
 JSKOS description of the concept scheme
 
-=item concepts.json
+=item concepts.ndjson
 
 JKSOS description of all concepts
 
@@ -348,7 +366,7 @@ Output directory to write JSKOS files to. Current directory by default.
 =item --name | -n 
 
 Filename prefix to append to exported files. E.g. C<--name foo> will create
-C<foo-scheme.json> and C<foo-concepts.json>.
+C<foo-scheme.json> and C<foo-concepts.ndjson>.
 
 =item --language | -l
 

@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Filter;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_subset choose_a_number settings_menu insert_sep );
@@ -51,7 +51,6 @@ sub input_filter {
             undef,    $input_cols, $input_rows,  $input_rows_range, $add_col,   $empty_to_null, $reset,
             $confirm, $replace,    $split_table, $merge_rows,       $split_col, $cols_to_rows,  $reparse,
         ];
-        $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
         my $idx = choose(
             $choices,
@@ -68,11 +67,8 @@ sub input_filter {
                 $old_idx = 0;
                 next FILTER;
             }
-            else {
-                $old_idx = $idx;
-            }
+            $old_idx = $idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         my $filter = $choices->[$idx];
         if ( $filter eq $reset ) {
             $sql->{insert_into_args} = [ map { [ @$_ ] } @$backup ];

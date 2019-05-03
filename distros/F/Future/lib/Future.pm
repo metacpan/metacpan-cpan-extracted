@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -18,6 +18,8 @@ use Time::HiRes qw( gettimeofday tv_interval );
 
 # we are not overloaded, but we want to check if other objects are
 require overload;
+
+require Future::Exception;
 
 our @CARP_NOT = qw( Future::Utils );
 
@@ -31,17 +33,17 @@ C<Future> - represent an operation awaiting completion
 
 =head1 SYNOPSIS
 
- my $future = Future->new;
+   my $future = Future->new;
 
- perform_some_operation(
-    on_complete => sub {
-       $future->done( @_ );
-    }
- );
+   perform_some_operation(
+      on_complete => sub {
+         $future->done( @_ );
+      }
+   );
 
- $future->on_ready( sub {
-    say "The operation is complete";
- } );
+   $future->on_ready( sub {
+      say "The operation is complete";
+   } );
 
 =head1 DESCRIPTION
 
@@ -115,34 +117,29 @@ construct its return value. If the constructor needs to perform per-instance
 setup it can override the C<new> method, and take context from the given
 instance.
 
- sub new
- {
-    my $proto = shift;
-    my $self = $proto->SUPER::new;
+   sub new
+   {
+      my $proto = shift;
+      my $self = $proto->SUPER::new;
 
-    if( ref $proto ) {
-       # Prototype was an instance
-    }
-    else {
-       # Prototype was a class
-    }
+      if( ref $proto ) {
+         # Prototype was an instance
+      }
+      else {
+         # Prototype was a class
+      }
 
-    return $self;
- }
+      return $self;
+   }
 
-If an instance provides a method called C<await>, this will be called by the
-C<get> and C<failure> methods if the instance is pending.
-
- $f->await
+If an instance overrides the L</block_until_ready> method, this will be called
+by C<get> and C<failure> if the instance is still pending.
 
 In most cases this should allow future-returning modules to be used as if they
 were blocking call/return-style modules, by simply appending a C<get> call to
 the function or method calls.
 
- my ( $results, $here ) = future_returning_function( @args )->get;
-
-The F<examples> directory in the distribution contains some examples of how
-futures might be integrated with various event systems.
+   my ( $results, $here ) = future_returning_function( @args )->get;
 
 =head2 DEBUGGING
 
@@ -151,8 +148,8 @@ or cancelled. By enabling debug tracing of objects, this fact can be checked.
 If a future object is destroyed without having been completed or cancelled, a
 warning message is printed.
 
- $ PERL_FUTURE_DEBUG=1 perl -MFuture -E 'my $f = Future->new'
- Future=HASH(0xaa61f8) was constructed at -e line 1 and was lost near -e line 0 before it was ready.
+   $ PERL_FUTURE_DEBUG=1 perl -MFuture -E 'my $f = Future->new'
+   Future=HASH(0xaa61f8) was constructed at -e line 1 and was lost near -e line 0 before it was ready.
 
 Note that due to a limitation of perl's C<caller> function within a C<DESTROY>
 destructor method, the exact location of the leak cannot be accurately
@@ -160,23 +157,23 @@ determined. Often the leak will occur due to falling out of scope by returning
 from a function; in this case the leak location may be reported as being the
 line following the line calling that function.
 
- $ PERL_FUTURE_DEBUG=1 perl -MFuture
- sub foo {
-    my $f = Future->new;
- }
+   $ PERL_FUTURE_DEBUG=1 perl -MFuture
+   sub foo {
+      my $f = Future->new;
+   }
 
- foo();
- print "Finished\n";
+   foo();
+   print "Finished\n";
 
- Future=HASH(0x14a2220) was constructed at - line 2 and was lost near - line 6 before it was ready.
- Finished
+   Future=HASH(0x14a2220) was constructed at - line 2 and was lost near - line 6 before it was ready.
+   Finished
 
 A warning is also printed in debug mode if a C<Future> object is destroyed
 that completed with a failure, but the object believes that failure has not
 been reported anywhere.
 
- $ PERL_FUTURE_DEBUG=1 perl -Mblib -MFuture -E 'my $f = Future->fail("Oops")'
- Future=HASH(0xac98f8) was constructed at -e line 1 and was lost near -e line 0 with an unreported failure of: Oops
+   $ PERL_FUTURE_DEBUG=1 perl -Mblib -MFuture -E 'my $f = Future->fail("Oops")'
+   Future=HASH(0xac98f8) was constructed at -e line 1 and was lost near -e line 0 with an unreported failure of: Oops
 
 Such a failure is considered reported if the C<get> or C<failure> methods are
 called on it, or it had at least one C<on_ready> or C<on_fail> callback, or
@@ -296,7 +293,7 @@ sub DESTROY_debug {
 
    $future = Future->done( @values )
 
-   $future = Future->fail( $exception, @details )
+   $future = Future->fail( $exception, $category, @details )
 
 I<Since version 0.26.>
 
@@ -341,7 +338,7 @@ I<Since version 0.15.>
 A convenient wrapper for calling a C<CODE> reference that is expected to
 return a future. In normal circumstances is equivalent to
 
- $future = $code->( @args )
+   $future = $code->( @args )
 
 except that if the code throws an exception, it is wrapped in a new immediate
 fail future. If the return value from the code is not a blessed C<Future>
@@ -609,68 +606,63 @@ sub done
    return $self;
 }
 
-my $warned_done_cb;
-sub done_cb
-{
-   my $self = shift;
-   $warned_done_cb or
-      $warned_done_cb++, warnings::warnif( deprecated => "Future->done_cb is now deprecated; use ->curry::done or sub {...}" );
-   return sub { $self->done( @_ ) };
-}
-
 =head2 fail
 
-   $future->fail( $exception, @details )
+   $future->fail( $exception, $category, @details )
 
 Marks that the leaf future has failed, and provides an exception value. This
 exception will be thrown by the C<get> method if called. 
 
 The exception must evaluate as a true value; false exceptions are not allowed.
-Further details may be provided that will be returned by the C<failure> method
-in list context. These details will not be part of the exception string raised
-by C<get>.
+A failure category name and other further details may be provided that will be
+returned by the C<failure> method in list context.
 
 If the future is already cancelled, this request is ignored. If the future is
 already complete with a result or a failure, an exception is thrown.
+
+If passed a L<Future::Exception> instance (i.e. an object previously thrown by
+the C<get>), the additional details will be preserved. This allows the
+additional details to be transparently preserved by such code as
+
+   ...
+   catch {
+      return Future->fail($@);
+   }
 
 =cut
 
 sub fail
 {
    my $self = shift;
-   my ( $exception, @details ) = @_;
+   my ( $exception, @more ) = @_;
 
-   $_[0] or Carp::croak "$self ->fail requires an exception that is true";
+   if( ref $exception eq "Future::Exception" ) {
+      @more = ( $exception->category, $exception->details );
+      $exception = $exception->message;
+   }
+
+   $exception or Carp::croak "$self ->fail requires an exception that is true";
 
    if( ref $self ) {
       $self->{cancelled} and return $self;
       $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->state." and cannot be ->fail'ed";
       $self->{subs} and Carp::croak "${\$self->__selfstr} is not a leaf Future, cannot be ->fail'ed";
-      $self->{failure} = [ $exception, @details ];
+      $self->{failure} = [ $exception, @more ];
       $self->_mark_ready( "failed" );
    }
    else {
       $self = $self->new;
       $self->{ready} = 1;
       $self->{ready_at} = _shortmess "failed" if DEBUG;
-      $self->{failure} = [ $exception, @details ];
+      $self->{failure} = [ $exception, @more ];
    }
 
    return $self;
 }
 
-my $warned_fail_cb;
-sub fail_cb
-{
-   my $self = shift;
-   $warned_fail_cb or
-      $warned_fail_cb++, warnings::warnif( deprecated => "Future->fail_cb is now deprecated; use ->curry::fail or sub {...}" );
-   return sub { $self->fail( @_ ) };
-}
-
 =head2 die
 
-   $future->die( $message, @details )
+   $future->die( $message, $category, @details )
 
 I<Since version 0.09.>
 
@@ -685,13 +677,13 @@ Returns the C<$future>.
 sub die :method
 {
    my $self = shift;
-   my ( $exception, @details ) = @_;
+   my ( $exception, @more ) = @_;
 
    if( !ref $exception and $exception !~ m/\n$/ ) {
       $exception .= sprintf " at %s line %d\n", (caller)[1,2];
    }
 
-   $self->fail( $exception, @details );
+   $self->fail( $exception, @more );
 }
 
 =head2 on_cancel
@@ -705,7 +697,7 @@ is ignored.
 If the future is later cancelled, the callbacks will be invoked in the reverse
 order to that in which they were registered.
 
- $on_cancel->( $future )
+   $on_cancel->( $future )
 
 If passed another C<Future> instance, the passed instance will be cancelled
 when the original future is cancelled.
@@ -745,7 +737,7 @@ is ready. If the future is already ready, invokes it immediately.
 In either case, the callback will be passed the future object itself. The
 invoked code can then obtain the list of results by calling the C<get> method.
 
- $on_ready->( $future )
+   $on_ready->( $future )
 
 If passed another C<Future> instance, the passed instance will have its
 C<done>, C<fail> or C<cancel> methods invoked when the original future
@@ -794,14 +786,58 @@ or the list of component futures it was waiting for on a convergent future. In
 scalar context it returns just the first result value.
 
 If the future is ready but failed, this method raises as an exception the
-failure string or object that was given to the C<fail> method.
+failure that was given to the C<fail> method. If additional details were given
+to the C<fail> method, an exception object is constructed to wrap them of type
+L<Future::Exception>.
 
 If the future was cancelled an exception is thrown.
 
-If it is not yet ready and is not of a subclass that provides an C<await>
-method an exception is thrown. If it is subclassed to provide an C<await>
-method then this is used to wait for the future to be ready, before returning
-the result or propagating its failure exception.
+If it is not yet ready then L</block_until_ready> is invoked to wait for a
+ready state.
+
+=cut
+
+sub get
+{
+   my $self = shift;
+   $self->block_until_ready unless $self->{ready};
+   if( my $failure = $self->{failure} ) {
+      $self->{reported} = 1;
+      my $exception = $failure->[0];
+      $exception = Future::Exception->new( @$failure ) if @$failure > 1;
+      !ref $exception && $exception =~ m/\n$/ ? CORE::die $exception : Carp::croak $exception;
+   }
+   $self->{cancelled} and Carp::croak "${\$self->__selfstr} was cancelled";
+   return $self->{result}->[0] unless wantarray;
+   return @{ $self->{result} };
+}
+
+=head2 block_until_ready
+
+   $f = $f->block_until_ready
+
+I<Since version 0.40.>
+
+Blocks until the future instance is no longer pending.
+
+Returns the invocant future itself, so it is useful for chaining.
+
+Usually, calling code would either force the future using L</get>, or use
+either C<then> chaining or C<async/await> syntax to wait for results. This
+method is useful in cases where the exception-throwing part of C<get> is not
+required, perhaps because other code will be testing the result using
+L</is_done> or similar.
+
+   if( $f->block_until_ready->is_done ) {
+      ...
+   }
+
+This method is intended for subclasses to override, but a default
+implementation for back-compatibility purposes is provided which calls the
+C<await> method. If the future is not yet ready, attempts to wait for an
+eventual result by using the underlying C<await> method, which subclasses
+should provide. The default implementation will throw an exception if called
+on a still-pending instance that does not provide an C<await> method.
 
 =cut
 
@@ -811,18 +847,11 @@ sub await
    Carp::croak "$self is not yet complete and does not provide ->await";
 }
 
-sub get
+sub block_until_ready
 {
    my $self = shift;
    until( $self->{ready} ) { $self->await }
-   if( $self->{failure} ) {
-      $self->{reported} = 1;
-      my $exception = $self->{failure}->[0];
-      !ref $exception && $exception =~ m/\n$/ ? CORE::die $exception : Carp::croak $exception;
-   }
-   $self->{cancelled} and Carp::croak "${\$self->__selfstr} was cancelled";
-   return $self->{result}->[0] unless wantarray;
-   return @{ $self->{result} };
+   return $self;
 }
 
 =head2 unwrap
@@ -834,8 +863,8 @@ I<Since version 0.26.>
 If given a single argument which is a C<Future> reference, this method will
 call C<get> on it and return the result. Otherwise, it returns the list of
 values directly in list context, or the first value in scalar. Since it
-involves an implicit C<await>, this method can only be used on immediate
-futures or subclasses that implement C<await>.
+involves an implicit blocking wait, this method can only be used on immediate
+futures or subclasses that implement L</block_until_ready>.
 
 This will ensure that an outgoing argument is definitely not a C<Future>, and
 may be useful in such cases as adapting synchronous code to fit asynchronous
@@ -868,7 +897,7 @@ all.
 
 The callback will be passed the result passed to the C<done> method.
 
- $on_done->( @result )
+   $on_done->( @result )
 
 If passed another C<Future> instance, the passed instance will have its
 C<done> method invoked when the original future completes successfully.
@@ -903,36 +932,34 @@ sub on_done
 
    $exception = $future->failure
 
-   $exception, @details = $future->failure
+   $exception, $category, @details = $future->failure
 
 If the future is ready, returns the exception passed to the C<fail> method or
 C<undef> if the future completed successfully via the C<done> method.
 
-If it is not yet ready and is not of a subclass that provides an C<await>
-method an exception is thrown. If it is subclassed to provide an C<await>
-method then this is used to wait for the future to be ready, before returning
-the result or propagating its failure exception.
+If it is not yet ready then L</block_until_ready> is invoked to wait for a
+ready state.
 
-If called in list context, will additionally yield a list of the details
-provided to the C<fail> method.
+If called in list context, will additionally yield the category name and list
+of the details provided to the C<fail> method.
 
 Because the exception value must be true, this can be used in a simple C<if>
 statement:
 
- if( my $exception = $future->failure ) {
-    ...
- }
- else {
-    my @result = $future->get;
-    ...
- }
+   if( my $exception = $future->failure ) {
+      ...
+   }
+   else {
+      my @result = $future->get;
+      ...
+   }
 
 =cut
 
 sub failure
 {
    my $self = shift;
-   until( $self->{ready} ) { $self->await }
+   $self->block_until_ready unless $self->{ready};
    return unless $self->{failure};
    $self->{reported} = 1;
    return $self->{failure}->[0] if !wantarray;
@@ -948,10 +975,10 @@ is ready, if it fails. If the future has already failed, invokes it
 immediately. If it completed successfully or was cancelled, it is not invoked
 at all.
 
-The callback will be passed the exception and details passed to the C<fail>
-method.
+The callback will be passed the exception and other details passed to the
+C<fail> method.
 
- $on_fail->( $exception, @details )
+   $on_fail->( $exception, $category, @details )
 
 If passed another C<Future> instance, the passed instance will have its
 C<fail> method invoked when the original future fails.
@@ -959,7 +986,7 @@ C<fail> method invoked when the original future fails.
 To invoke a C<done> method on a future when another one fails, use a CODE
 reference:
 
- $future->on_fail( sub { $f->done( @_ ) } );
+   $future->on_fail( sub { $f->done( @_ ) } );
 
 Returns the C<$future>.
 
@@ -1017,15 +1044,6 @@ sub cancel
    $self->_mark_ready( "cancel" );
 
    return $self;
-}
-
-my $warned_cancel_cb;
-sub cancel_cb
-{
-   my $self = shift;
-   $warned_cancel_cb or
-      $warned_cancel_cb++, warnings::warnif( deprecated => "Future->cancel_cb is now deprecated; use ->curry::cancel or sub {...}" );
-   return sub { $self->cancel };
 }
 
 =head1 SEQUENCING METHODS
@@ -1124,7 +1142,7 @@ sequence future will then be marked as complete with whatever result C<$f2>
 gave. If C<$f1> fails then the sequence future will immediately fail with the
 same failure and the code will not be invoked.
 
- $f2 = $done_code->( @result )
+   $f2 = $done_code->( @result )
 
 =head2 else
 
@@ -1134,12 +1152,12 @@ I<Since version 0.13.>
 
 Returns a new sequencing C<Future> that runs the code if the first fails. Once
 C<$f1> fails the code reference will be invoked and is passed the failure and
-details. It should return a future, C<$f2>. Once C<$f2> completes the sequence
-future will then be marked as complete with whatever result C<$f2> gave. If
-C<$f1> succeeds then the sequence future will immediately succeed with the
-same result and the code will not be invoked.
+other details. It should return a future, C<$f2>. Once C<$f2> completes the
+sequence future will then be marked as complete with whatever result C<$f2>
+gave. If C<$f1> succeeds then the sequence future will immediately succeed
+with the same result and the code will not be invoked.
 
- $f2 = $fail_code->( $exception, @details )
+   $f2 = $fail_code->( $exception, $category, @details )
 
 =head2 then I<(2 arguments)>
 
@@ -1230,7 +1248,7 @@ string names given, then the corresponding code is invoked, being passed the
 same arguments as a plain C<else> call would take, and is expected to return a
 C<Future> in the same way.
 
- $f2 = $code->( $exception, $name, @other_details )
+   $f2 = $code->( $exception, $category, @details )
 
 If C<$f1> does not fail, fails without a category name at all, or fails with a
 category name that does not match any given to the C<catch> method, then the
@@ -1337,9 +1355,9 @@ I<Since version 0.21.>
 Returns a new sequencing C<Future> that behaves like C<then>, but also passes
 the original future, C<$f1>, to any functions it invokes.
 
- $f2 = $done_code->( $f1, @result )
- $f2 = $catch_code->( $f1, $name, @other_details )
- $f2 = $fail_code->( $f1, @details )
+   $f2 = $done_code->( $f1, @result )
+   $f2 = $catch_code->( $f1, $category, @details )
+   $f2 = $fail_code->( $f1, $category, @details )
 
 This is useful for conditional execution cases where the code block may just
 return the same result of the original future. In this case it is more
@@ -1369,7 +1387,7 @@ sub then_with_f
 
    $future = $f->then_done( @result )
 
-   $future = $f->then_fail( $exception, @details )
+   $future = $f->then_fail( $exception, $category, @details )
 
 I<Since version 0.22.>
 
@@ -1400,9 +1418,9 @@ I<Since version 0.21.>
 
 Returns a new sequencing C<Future> that runs the code if the first fails.
 Identical to C<else>, except that the code reference will be passed both the
-original future, C<$f1>, and its exception and details.
+original future, C<$f1>, and its exception and other details.
 
- $f2 = $code->( $f1, $exception, @details )
+   $f2 = $code->( $f1, $exception, $category, @details )
 
 This is useful for conditional execution cases where the code block may just
 return the same result of the original future. In this case it is more
@@ -1424,7 +1442,7 @@ sub else_with_f
 
    $future = $f->else_done( @result )
 
-   $future = $f->else_fail( $exception, @details )
+   $future = $f->else_fail( $exception, $category, @details )
 
 I<Since version 0.22.>
 
@@ -1479,7 +1497,7 @@ one argument, C<$f1>. It should return a future, C<$f2>. Once C<$f2> completes
 the sequence future will then be marked as complete with whatever result
 C<$f2> gave.
 
- $f2 = $code->( $f1 )
+   $f2 = $code->( $f1 )
 
 =cut
 
@@ -2137,21 +2155,21 @@ the time the callback was saved, and restores that value at invocation time
 later on. This could be useful for preserving context during logging in a
 Future-based program.
 
- our $LOGGING_CTX;
+   our $LOGGING_CTX;
 
- no warnings 'redefine';
+   no warnings 'redefine';
 
- my $orig = Future->can( "wrap_cb" );
- *Future::wrap_cb = sub {
-    my $cb = $orig->( @_ );
+   my $orig = Future->can( "wrap_cb" );
+   *Future::wrap_cb = sub {
+      my $cb = $orig->( @_ );
 
-    my $saved_logging_ctx = $LOGGING_CTX;
+      my $saved_logging_ctx = $LOGGING_CTX;
 
-    return sub {
-       local $LOGGING_CTX = $saved_logging_ctx;
-       $cb->( @_ );
-    };
- };
+      return sub {
+         local $LOGGING_CTX = $saved_logging_ctx;
+         $cb->( @_ );
+      };
+   };
 
 At this point, any code deferred into a C<Future> by any of its callbacks will
 observe the C<$LOGGING_CTX> variable as having the value it held at the time
@@ -2185,19 +2203,19 @@ By returning a new C<Future> object each time the asynchronous function is
 called, it provides a placeholder for its eventual result, and a way to
 indicate when it is complete.
 
- sub foperation
- {
-    my %args = @_;
+   sub foperation
+   {
+      my %args = @_;
 
-    my $future = Future->new;
+      my $future = Future->new;
 
-    do_something_async(
-       foo => $args{foo},
-       on_done => sub { $future->done( @_ ); },
-    );
+      do_something_async(
+         foo => $args{foo},
+         on_done => sub { $future->done( @_ ); },
+      );
 
-    return $future;
- }
+      return $future;
+   }
 
 In most cases, the C<done> method will simply be invoked with the entire
 result list as its arguments. In that case, it is convenient to use the
@@ -2214,12 +2232,12 @@ method.
 The caller may then use this future to wait for a result using the C<on_ready>
 method, and obtain the result using C<get>.
 
- my $f = foperation( foo => "something" );
+   my $f = foperation( foo => "something" );
 
- $f->on_ready( sub {
-    my $f = shift;
-    say "The operation returned: ", $f->get;
- } );
+   $f->on_ready( sub {
+      my $f = shift;
+      say "The operation returned: ", $f->get;
+   } );
 
 =head2 Indicating Success or Failure
 
@@ -2227,17 +2245,17 @@ Because the stored exception value of a failed future may not be false, the
 C<failure> method can be used in a conditional statement to detect success or
 failure.
 
- my $f = foperation( foo => "something" );
+   my $f = foperation( foo => "something" );
 
- $f->on_ready( sub {
-    my $f = shift;
-    if( not my $e = $f->failure ) {
-       say "The operation succeeded with: ", $f->get;
-    }
-    else {
-       say "The operation failed with: ", $e;
-    }
- } );
+   $f->on_ready( sub {
+      my $f = shift;
+      if( not my $e = $f->failure ) {
+         say "The operation succeeded with: ", $f->get;
+      }
+      else {
+         say "The operation failed with: ", $e;
+      }
+   } );
 
 By using C<not> in the condition, the order of the C<if> blocks can be
 arranged to put the successful case first, similar to a C<try>/C<catch> block.
@@ -2246,29 +2264,29 @@ Because the C<get> method re-raises the passed exception if the future failed,
 it can be used to control a C<try>/C<catch> block directly. (This is sometimes
 called I<Exception Hoisting>).
 
- use Syntax::Keyword::Try;
+   use Syntax::Keyword::Try;
 
- $f->on_ready( sub {
-    my $f = shift;
-    try {
-       say "The operation succeeded with: ", $f->get;
-    }
-    catch {
-       say "The operation failed with: ", $_;
-    }
- } );
+   $f->on_ready( sub {
+      my $f = shift;
+      try {
+         say "The operation succeeded with: ", $f->get;
+      }
+      catch {
+         say "The operation failed with: ", $_;
+      }
+   } );
 
 Even neater still may be the separate use of the C<on_done> and C<on_fail>
 methods.
 
- $f->on_done( sub {
-    my @result = @_;
-    say "The operation succeeded with: ", @result;
- } );
- $f->on_fail( sub {
-    my ( $failure ) = @_;
-    say "The operation failed with: $failure";
- } );
+   $f->on_done( sub {
+      my @result = @_;
+      say "The operation succeeded with: ", @result;
+   } );
+   $f->on_fail( sub {
+      my ( $failure ) = @_;
+      say "The operation failed with: $failure";
+   } );
 
 =head2 Immediate Futures
 
@@ -2276,24 +2294,24 @@ Because the C<done> method returns the future object itself, it can be used to
 generate a C<Future> that is immediately ready with a result. This can also be
 used as a class method.
 
- my $f = Future->done( $value );
+   my $f = Future->done( $value );
 
 Similarly, the C<fail> and C<die> methods can be used to generate a C<Future>
 that is immediately failed.
 
- my $f = Future->die( "This is never going to work" );
+   my $f = Future->die( "This is never going to work" );
 
 This could be considered similarly to a C<die> call.
 
 An C<eval{}> block can be used to turn a C<Future>-returning function that
 might throw an exception, into a C<Future> that would indicate this failure.
 
- my $f = eval { function() } || Future->fail( $@ );
+   my $f = eval { function() } || Future->fail( $@ );
 
 This is neater handled by the C<call> class method, which wraps the call in
 an C<eval{}> block and tests the result:
 
- my $f = Future->call( \&function );
+   my $f = Future->call( \&function );
 
 =head2 Sequencing
 
@@ -2301,13 +2319,13 @@ The C<then> method can be used to create simple chains of dependent tasks,
 each one executing and returning a C<Future> when the previous operation
 succeeds.
 
- my $f = do_first()
-            ->then( sub {
-               return do_second();
-            })
-            ->then( sub {
-               return do_third();
-            });
+   my $f = do_first()
+              ->then( sub {
+                 return do_second();
+              })
+              ->then( sub {
+                 return do_third();
+              });
 
 The result of the C<$f> future itself will be the result of the future
 returned by the final function, if none of them failed. If any of them fails
@@ -2320,16 +2338,16 @@ an exception, the subsequent calls are not made.
 A C<wait_all> future may be used to resynchronise control flow, while waiting
 for multiple concurrent operations to finish.
 
- my $f1 = foperation( foo => "something" );
- my $f2 = foperation( bar => "something else" );
+   my $f1 = foperation( foo => "something" );
+   my $f2 = foperation( bar => "something else" );
 
- my $f = Future->wait_all( $f1, $f2 );
+   my $f = Future->wait_all( $f1, $f2 );
 
- $f->on_ready( sub {
-    say "Operations are ready:";
-    say "  foo: ", $f1->get;
-    say "  bar: ", $f2->get;
- } );
+   $f->on_ready( sub {
+      say "Operations are ready:";
+      say "  foo: ", $f1->get;
+      say "  bar: ", $f2->get;
+   } );
 
 This provides an ability somewhat similar to C<CPS::kpar()> or
 L<Async::MergePoint>.
@@ -2347,11 +2365,11 @@ sequence future constructed from it.
 In particular, it is unclear in each of the following examples what the
 behaviour of C<$f2> should be, were C<$f1> to be cancelled:
 
- $f2 = $f1->then( sub { ... } ); # plus related ->then_with_f, ...
+   $f2 = $f1->then( sub { ... } ); # plus related ->then_with_f, ...
 
- $f2 = $f1->else( sub { ... } ); # plus related ->else_with_f, ...
+   $f2 = $f1->else( sub { ... } ); # plus related ->else_with_f, ...
 
- $f2 = $f1->followed_by( sub { ... } );
+   $f2 = $f1->followed_by( sub { ... } );
 
 In the C<then>-style case it is likely that this situation should be treated
 as if C<$f1> had failed, perhaps with some special message. The C<else>-style
@@ -2372,12 +2390,12 @@ future is reused multiple times for multiple sequences or convergent trees.
 In particular, it is in clear in each of the following examples what the
 behaviour of C<$f2> should be, were C<$f1> to be cancelled:
 
- my $f_initial = Future->new; ...
- my $f1 = $f_initial->then( ... );
- my $f2 = $f_initial->then( ... );
+   my $f_initial = Future->new; ...
+   my $f1 = $f_initial->then( ... );
+   my $f2 = $f_initial->then( ... );
 
- my $f1 = Future->needs_all( $f_initial );
- my $f2 = Future->needs_all( $f_initial );
+   my $f1 = Future->needs_all( $f_initial );
+   my $f2 = Future->needs_all( $f_initial );
 
 The point of cancellation propagation is to trace backwards through stages of
 some larger sequence of operations that now no longer need to happen, because
@@ -2407,8 +2425,22 @@ see the discussion on RT96685 for more information
 
 =item *
 
+L<Future::AsyncAwait> - deferred subroutine syntax for futures
+
+Provides a neat syntax extension for writing future-based code.
+
+=item *
+
+L<Future::IO> - Future-returning IO methods
+
+Provides methods similar to core IO functions, which yield results by Futures.
+
+=item *
+
 L<Promises> - an implementation of the "Promise/A+" pattern for asynchronous
 programming
+
+A different alternative implementation of a similar idea.
 
 =item *
 
@@ -2444,7 +2476,7 @@ L<https://www.youtube.com/watch?v=u9dZgFM6FtE>
 
 =item *
 
-Consider the ability to pass the constructor an C<await> CODEref, instead of
+Consider the ability to pass the constructor a C<block> CODEref, instead of
 needing to use a subclass. This might simplify async/etc.. implementations,
 and allows the reuse of the idea of subclassing to extend the abilities of
 C<Future> itself - for example to allow a kind of Future that can report

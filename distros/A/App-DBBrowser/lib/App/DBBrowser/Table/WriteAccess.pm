@@ -3,7 +3,7 @@ App::DBBrowser::Table::WriteAccess;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( insert_sep );
@@ -37,7 +37,7 @@ sub table_write_access {
         push @stmt_types, 'Update' if $sf->{o}{enable}{update};
         push @stmt_types, 'Delete' if $sf->{o}{enable}{delete};
     }
-    elsif ( $sf->{i}{special_table} eq 'join' && $sf->{d}{driver} eq 'mysql' ) {
+    elsif ( $sf->{i}{special_table} eq 'join' && $sf->{i}{driver} eq 'mysql' ) {
         push @stmt_types, 'Update' if $sf->{o}{G}{enable}{update};
     }
     if ( ! @stmt_types ) {
@@ -78,7 +78,6 @@ sub table_write_access {
             my $choices = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
             $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose
-            $ENV{TC_RESET_AUTO_UP} = 0;
             my $idx = choose(
                 $choices,
                 { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Customize:', index => 1, default => $old_idx, undef => $sf->{i}{_back} }
@@ -92,11 +91,8 @@ sub table_write_access {
                     $old_idx = 0;
                     next CUSTOMIZE;
                 }
-                else {
-                    $old_idx = $idx;
-                }
+                $old_idx = $idx;
             }
-            delete $ENV{TC_RESET_AUTO_UP};
             my $backup_sql = $ax->backup_href( $sql );
             if ( $custom eq $cu{'set'} ) {
                 my $ok = $sb->set( $stmt_h, $sql );
@@ -265,7 +261,6 @@ sub __build_insert_stmt {
     MENU: while ( 1 ) {
         my $choices = [ undef, @cu{@cu_keys} ];
         # Choose
-        $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
             $choices,
             { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, prompt => 'Choose:', undef => '  <=' }
@@ -279,11 +274,8 @@ sub __build_insert_stmt {
                 $old_idx = 0;
                 next MENU;
             }
-            else {
-                $old_idx = $idx;
-            }
+            $old_idx = $idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         my $cols_ok = $sf->__insert_into_stmt_columns( $sql );
         if ( ! $cols_ok ) {
             next MENU;

@@ -3,3 +3,5 @@ Revision history for Perl extension Anansi::Script::JSON.
 0.01  Tue Apr 09 16:43:16 2019
 	- original version; created by h2xs 1.23 with options
 		-AX Anansi::Script::JSON
+0.02  Sun Apr 28 16:05:40 2019
+	- modified Anansi::ScriptComponent module dependency in makefile.

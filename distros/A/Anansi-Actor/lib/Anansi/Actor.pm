@@ -43,7 +43,7 @@ L<File::Find>, L<File::Spec::Functions> and L<FileHandle>.
 =cut
 
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use base qw(Anansi::Singleton);
 
@@ -489,3 +489,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

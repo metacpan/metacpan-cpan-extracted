@@ -34,7 +34,7 @@ __PACKAGE__->create_ro_accessors( qw(
 
 __PACKAGE__->create_accessors( qw( context lut_state ) );
 
-our $VERSION ='0.76';
+our $VERSION ='0.77';
 
 sub new {
     my ($class, %userparams) = @_;

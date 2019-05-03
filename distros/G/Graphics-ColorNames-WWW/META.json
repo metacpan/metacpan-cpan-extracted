@@ -1,0 +1,60 @@
+{
+   "abstract" : "WWW color names and equivalent RGB values",
+   "author" : [
+      "Claus FE<auml>rber <CFAERBER@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graphics-ColorNames-WWW",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graphics::ColorNames" : "0.32"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::ColorNames::CSS" : {
+         "file" : "lib/Graphics/ColorNames/CSS.pm",
+         "version" : "1.13"
+      },
+      "Graphics::ColorNames::IE" : {
+         "file" : "lib/Graphics/ColorNames/IE.pm",
+         "version" : "1.13"
+      },
+      "Graphics::ColorNames::SVG" : {
+         "file" : "lib/Graphics/ColorNames/SVG.pm",
+         "version" : "1.13"
+      },
+      "Graphics::ColorNames::WWW" : {
+         "file" : "lib/Graphics/ColorNames/WWW.pm",
+         "version" : "1.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

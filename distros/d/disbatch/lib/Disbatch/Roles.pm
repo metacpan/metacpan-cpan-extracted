@@ -1,5 +1,5 @@
 package Disbatch::Roles;
-$Disbatch::Roles::VERSION = '4.102';
+$Disbatch::Roles::VERSION = '4.103';
 use 5.12.0;
 use warnings;
 
@@ -136,7 +136,7 @@ Disbatch::Roles - define and create MongoDB roles and users for Disbatch
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 SUBROUTINES
 

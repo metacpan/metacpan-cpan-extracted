@@ -1,4 +1,4 @@
-use 5.008003;
+use 5.010001;
 use warnings;
 use strict;
 use ExtUtils::MakeMaker;
@@ -15,7 +15,7 @@ if ( $^O eq 'MSWin32' ) {
 
 WriteMakefile(
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.008003',
+    MIN_PERL_VERSION => '5.010001',
     LICENSE          => 'perl',
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -58,7 +58,7 @@ WriteMakefile(
         'Spreadsheet::Read'       => 0,
         'String::Unescape'        => 0,
         'SQL::Type::Guess'        => 0,
-        'Term::Choose'            => '1.646',
+        'Term::Choose'            => '1.647',
         'Term::Choose::Util'      => '0.071',
         'Term::Form'              => '0.511',
         'Term::TablePrint'        => '0.108',

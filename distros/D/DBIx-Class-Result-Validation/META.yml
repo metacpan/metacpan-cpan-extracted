@@ -16,7 +16,7 @@ name: DBIx-Class-Result-Validation
 provides:
   DBIx::Class::Result::Validation:
     file: lib/DBIx/Class/Result/Validation.pm
-    version: '0.16'
+    version: '0.17'
   DBIx::Class::Result::Validation::VException:
     file: lib/DBIx/Class/Result/Validation/VException.pm
     version: '0.16'
@@ -31,4 +31,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kolok/DBIx-Class-Result-Validation
-version: '0.16'
+version: '0.17'

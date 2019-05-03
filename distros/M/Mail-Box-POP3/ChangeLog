@@ -1,5 +1,14 @@
 
-===== ChangeLog of Mail::Box::POP3 version 3.*
+===== history of distribution Mail-Box-POP3
+
+version 3.005: Fri  3 May 09:41:53 CEST 2019
+
+	Fixes:
+	- wrong place to set default message type.
+	- transporter should differentiate between pop3 and pop3s in url().
+
+	Improvements:
+	- cleanup ::POP3 coding style.
 
 version 3.004: Sun Mar  4 15:17:07 CET 2018
 

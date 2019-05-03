@@ -21,7 +21,7 @@ sub clean_test_environment {
 }
 
 
-sub valid_env_vars {      
+sub valid_env_vars {
     return defined $ENV{ARANGO_DB_HOST} && defined $ENV{ARANGO_DB_USERNAME} && defined $ENV{ARANGO_DB_PASSWORD}
 }
 

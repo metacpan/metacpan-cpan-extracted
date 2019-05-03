@@ -1,5 +1,5 @@
 package Disbatch::QueueBalance;
-$Disbatch::QueueBalance::VERSION = '4.102';
+$Disbatch::QueueBalance::VERSION = '4.103';
 use 5.12.0;
 use warnings FATAL => 'uninitialized';
 
@@ -218,7 +218,7 @@ Disbatch::QueueBalance
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 SYNOPSIS
 

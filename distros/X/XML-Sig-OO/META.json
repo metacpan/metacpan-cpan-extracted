@@ -1,0 +1,64 @@
+{
+   "abstract" : "Modern XML Signatured validation",
+   "author" : [
+      "Mike Shipper <AKALINUX@CPAN.ORG>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Sig-OO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.42",
+            "Crypt::OpenSSL::Bignum" : "0.09",
+            "Crypt::OpenSSL::DSA" : "0.19",
+            "Crypt::OpenSSL::RSA" : "0.31",
+            "Crypt::OpenSSL::VerifyX509" : "0.10",
+            "Crypt::OpenSSL::X509" : "1.812",
+            "Data::Result" : "1.0003",
+            "Digest::SHA" : "5.96",
+            "File::Spec" : "0",
+            "MIME::Base64" : "3.15",
+            "Modern::Perl" : "1.20181021",
+            "Moo" : "2.003004",
+            "MooX::Types::MooseLike::Base" : "0.29",
+            "Ref::Util" : "0.204",
+            "Scalar::Util" : "0",
+            "XML::LibXML" : "2.0200",
+            "XML::LibXML::XPathContext" : "2.0200",
+            "namespace::clean" : "0.27"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_repository" : {
+      "type" : "git",
+      "url" : "https://github.com/akalinux/xml-sig-oo.git",
+      "web" : "https://github.com/akalinux/xml-sig-oo"
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

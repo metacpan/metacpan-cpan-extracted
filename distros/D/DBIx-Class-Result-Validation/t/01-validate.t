@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use t::app::Main;
 use t::lib::Utils;
 use Try::Tiny;
@@ -180,3 +180,38 @@ subtest "Not null or not zero Validation" => sub {
     ok (defined $error->object->result_errors->{ref_id}, "ref_id can not be equal to 0");
     is $error->object->result_errors->{ref_id}->[0], "can not be null or equal to 0", "correct message is set";
 };
+
+subtest "prohibit field update" => sub {
+    my $obj_ok;
+    $error="";
+    try{
+        $obj_ok = $schema->resultset('Object')->create({name => "prohib", my_enum => "val1", my_enum_def => "val1", attribute => "attr1", ref_id => 1});
+    }
+    catch{
+        $error = $_;
+    };
+    is $error, "", "No error set at Object creation";
+
+
+    $error="";
+    try{
+        $obj_ok = $schema->resultset('Object')->find($obj_ok->id)->update({name => "prohib1", my_enum => "val1", my_enum_def => "val1", attribute => "attr1", ref_id => 2});
+    }
+    catch{
+        $error = $_;
+    };
+    isa_ok( $error, "DBIx::Class::Result::Validation::VException", "error returned is a DBIx::Class::Result::Validation::VException");
+    ok( $error->object->result_errors, "error returned object with result_error");
+    ok (defined $error->object->result_errors->{ref_id}, "ref_id can not be updated from 1 to 2");
+
+
+    try{
+        $obj_ok = $schema->resultset('Object')->find($obj_ok->id)->update({name => "prohib1", my_enum => "val1", my_enum_def => "val1", attribute => "attr1", info => "new info"});
+    }
+    catch{
+        $error = $_;
+    };
+    ok( $error->object->result_errors, "error returned object with result_error");
+    ok (defined $error->object->result_errors->{info}, "info can not be updated from undef to new info, even if info was undef");
+};
+

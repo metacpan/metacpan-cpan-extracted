@@ -1,5 +1,5 @@
 package Gtk3;
-$Gtk3::VERSION = '0.034';
+$Gtk3::VERSION = '0.035';
 =encoding utf8
 
 =head1 NAME
@@ -60,6 +60,7 @@ and Perl packages:
   Gtk-3.0       | Gtk3
   Gdk-3.0       | Gtk3::Gdk
   GdkPixbuf-2.0 | Gtk3::Gdk
+  GdkPixdata-2.0| Gtk3::Gdk
   Pango-1.0     | Pango
 
 =cut
@@ -83,6 +84,10 @@ my $_GDK_PACKAGE = 'Gtk3::Gdk';
 my $_GDK_PIXBUF_BASENAME = 'GdkPixbuf';
 my $_GDK_PIXBUF_VERSION = '2.0';
 my $_GDK_PIXBUF_PACKAGE = 'Gtk3::Gdk';
+
+my $_GDK_PIXDATA_BASENAME = 'GdkPixdata';
+my $_GDK_PIXDATA_VERSION = '2.0';
+my $_GDK_PIXDATA_PACKAGE = 'Gtk3::Gdk';
 
 my $_PANGO_BASENAME = 'Pango';
 my $_PANGO_VERSION = '1.0';
@@ -470,6 +475,15 @@ sub import {
     version => $_GDK_PIXBUF_VERSION,
     package => $_GDK_PIXBUF_PACKAGE,
     flatten_array_ref_return_for => \@_GDK_PIXBUF_FLATTEN_ARRAY_REF_RETURN_FOR);
+
+  # In gdk-pixbuf 2.38.0, the GdkPixdata introspection information was split
+  # out into its own file.
+  if (Gtk3::Gdk::Pixbuf::CHECK_VERSION (2, 38, 0)) {
+    Glib::Object::Introspection->setup (
+      basename => $_GDK_PIXDATA_BASENAME,
+      version => $_GDK_PIXDATA_VERSION,
+      package => $_GDK_PIXDATA_PACKAGE);
+  }
 
   Glib::Object::Introspection->setup (
     basename => $_PANGO_BASENAME,
@@ -2372,7 +2386,7 @@ sub _rest_to_ref {
 }
 
 package Gtk3::Gdk::EventMask;
-$Gtk3::Gdk::EventMask::VERSION = '0.034';
+$Gtk3::Gdk::EventMask::VERSION = '0.035';
 use overload
   '==' => \&eq,
   '>=' => \&ge;

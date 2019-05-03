@@ -4,6 +4,7 @@ lib/Elatin1.pm
 README
 Changes
 META.yml
+META.json
 Makefile.PL
 pmake.bat
 test.pl

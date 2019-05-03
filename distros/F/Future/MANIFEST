@@ -1,7 +1,7 @@
 Build.PL
 Changes
-examples/io-async.pl
 lib/Future.pm
+lib/Future/Exception.pm
 lib/Future/Mutex.pm
 lib/Future/Phrasebook.pod
 lib/Future/Utils.pm
@@ -28,6 +28,7 @@ t/13needs_any.t
 t/20subclass.t
 t/21debug.t
 t/22wrap_cb.t
+t/23exception.t
 t/30utils-call.t
 t/31utils-call-with-escape.t
 t/32utils-repeat.t
@@ -38,5 +39,4 @@ t/36utils-map.t
 t/40mutex.t
 t/50test-future.t
 t/51test-future-deferred.t
-t/90legacy.t
 t/99pod.t

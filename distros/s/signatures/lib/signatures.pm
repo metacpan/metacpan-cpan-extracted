@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package signatures; # git description: v0.12-5-gde90008
+package signatures; # git description: v0.13-13-gf19ea86
 # ABSTRACT: Subroutine signatures with no source filter
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use XSLoader;
 use B::Hooks::Parser 0.12;
@@ -105,7 +105,7 @@ signatures - Subroutine signatures with no source filter
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ the returned value and the offset to C<inject>.
 
 =for Pod::Coverage setup setup_for teardown teardown_for
 
-=head1 BUGS
+=head1 LIMITATIONS
 
 =over 4
 
@@ -193,17 +193,33 @@ fine.
 
 =head1 SEE ALSO
 
+=over 4
+
+=item *
+
 L<Method::Signatures>
+
+=item *
 
 L<MooseX::Method::Signatures>
 
+=item *
+
 L<Sub::Signatures>
+
+=item *
 
 L<Attribute::Signature>
 
+=item *
+
 L<Perl6::Subs>
 
+=item *
+
 L<Perl6::Parameters>
+
+=back
 
 =head1 THANKS
 
@@ -212,13 +228,18 @@ L<Perl6::Parameters>
 Moritz Lenz and Steffen Schwigon for documentation review and
 improvement.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=signatures>
+(or L<bug-signatures@rt.cpan.org|mailto:bug-signatures@rt.cpan.org>).
+
 =head1 AUTHOR
 
 Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Peter Martini Alexandr Ciornii Father Chrysostomos Alex Kapranoff Steffen Schwigon
+=for stopwords Karen Etheridge Peter Martini Father Chrysostomos Alex Kapranoff Steffen Schwigon Alexandr Ciornii Dave Mitchell
 
 =over 4
 
@@ -232,10 +253,6 @@ Peter Martini <PeterCMartini@GMail.com>
 
 =item *
 
-Alexandr Ciornii <alexchorny@gmail.com>
-
-=item *
-
 Father Chrysostomos <sprout@cpan.org>
 
 =item *
@@ -246,9 +263,17 @@ Alex Kapranoff <alex@kapranoff.ru>
 
 Steffen Schwigon <ss5@renormalist.net>
 
+=item *
+
+Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+Dave Mitchell <davem@iabyn.com>
+
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2008 by Florian Ragwitz.
 

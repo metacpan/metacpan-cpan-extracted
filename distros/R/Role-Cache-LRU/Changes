@@ -1,5 +1,8 @@
 Revision history for Role-Cache-LRU
 
+0.05  2019-05-02 22:16:28 +08
+        - Remove duplicate contributors
+
 0.04  2019-04-25 20:59:06 +08
         - Fix incorrect synopsis usage
 

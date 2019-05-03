@@ -104,7 +104,7 @@ Data::Frame::Partial::Sugar - Partial class for data frame syntax sugar
 
 =head1 VERSION
 
-version 0.0045
+version 0.0047
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.138;
+our $VERSION = 1.139;
 
 # -----------------------------------------------------------------------------
 
@@ -281,7 +281,7 @@ sub addOption {
         
     while (@_) {
         my $opt = shift;
-        my $val = $self->value(shift);
+        my $val = shift;
 
         # Wir fügen das Option/Wert-Paar nur hinzu, wenn der Wert
         # definiert und kein Leerstring ist
@@ -290,7 +290,7 @@ sub addOption {
             if (length $$ref) {
                 $$ref .= ' ';
             }
-            $$ref .= $opt.' '.$val;
+            $$ref .= $opt.' '.$self->value($val);
         }
     }    
 
@@ -539,7 +539,7 @@ sub value {
 
 =head1 VERSION
 
-1.138
+1.139
 
 =head1 AUTHOR
 

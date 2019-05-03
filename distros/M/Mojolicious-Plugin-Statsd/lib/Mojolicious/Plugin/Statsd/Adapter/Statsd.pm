@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Statsd::Adapter::Statsd;
-$Mojolicious::Plugin::Statsd::Adapter::Statsd::VERSION = '0.03';
+$Mojolicious::Plugin::Statsd::Adapter::Statsd::VERSION = '0.04';
 use Mojo::Base -base;
 
 use IO::Socket::INET ();

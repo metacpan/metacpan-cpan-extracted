@@ -3,7 +3,8 @@ use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 
-package TestApp {
+{
+  package TestApp;
   use Mojolicious::Lite;
   plugin 'Statsd';
 

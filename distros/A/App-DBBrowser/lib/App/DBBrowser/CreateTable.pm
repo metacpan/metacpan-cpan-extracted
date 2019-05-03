@@ -3,7 +3,7 @@ App::DBBrowser::CreateTable;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use File::Basename qw( basename );
 
@@ -19,7 +19,7 @@ use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 use App::DBBrowser::GetContent;
 use App::DBBrowser::Table::WriteAccess;
-
+#use App::DBBrowser::Subqueries; # required
 
 sub new {
     my ( $class, $info, $options, $data ) = @_;
@@ -31,15 +31,28 @@ sub new {
 }
 
 
-sub delete_table {
+sub drop_table {
     my ( $sf ) = @_;
+    return $sf->__choose_drop_item( 'TABLE' );
+}
+
+
+sub drop_view {
+    my ( $sf ) = @_;
+    return $sf->__choose_drop_item( 'VIEW' );
+}
+
+
+sub __choose_drop_item {
+    my ( $sf, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sql = {};
     $ax->reset_sql( $sql );
-    my $prompt = $sf->{d}{db_string} . "\n" . 'Drop table';
+    my $tables = [ grep { $sf->{d}{tables_info}{$_}[3] eq $type } @{$sf->{d}{user_tables}} ];
+    my $prompt = $sf->{d}{db_string} . "\n" . 'Drop ' . lc $type;
     # Choose
     my $table = choose(
-        [ undef, map { "- $_" } sort @{$sf->{d}{user_tables}} ],
+        [ undef, map { "- $_" } sort @$tables ],
         { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
     );
     if ( ! defined $table || ! length $table ) {
@@ -47,14 +60,22 @@ sub delete_table {
     }
     $table =~ s/\-\s//;
     $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-    my $drop_ok = $sf->__drop_table( $sql );
+    my $drop_ok = $sf->__drop( $sql, $type );
     return $drop_ok;
 }
 
 
-sub __drop_table {
-    my ( $sf, $sql ) = @_;
-    $sf->{i}{stmt_types} = [ 'Drop_table' ];
+sub __drop {
+    my ( $sf, $sql, $type ) = @_;
+    my $stmt_type;
+    if ( $type eq 'VIEW' ) {
+        $stmt_type = 'Drop_view';
+    }
+    else {
+        $stmt_type = 'Drop_table';
+        $type = 'TABLE';
+    }
+    $sf->{i}{stmt_types} = [ $stmt_type ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->print_sql( $sql );
     # Choose
@@ -66,19 +87,26 @@ sub __drop_table {
         return;
     }
     $ax->print_sql( $sql, 'Computing: ... ' );
-    my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
-    $sth->execute();
-    my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
-    my $all_arrayref = $sth->fetchall_arrayref;
-    my $row_count = @$all_arrayref;
-    unshift @$all_arrayref, $col_names;
-    my $prompt_pt = sprintf "DROP TABLE %s     (on last look at the table)\n", $sql->{table};
-    print_table(
-        $all_arrayref,
-        { %{$sf->{o}{table}}, grid => 2, prompt => $prompt_pt, max_rows => 0,
-        keep_header => 1, table_expand => $sf->{o}{G}{info_expand} }
-    );
-    my $prompt = sprintf 'DROP TABLE %s  (%s %s)', $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
+    my $prompt = '';
+    if ( ! eval {
+        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
+        $sth->execute();
+        my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
+        my $all_arrayref = $sth->fetchall_arrayref;
+        my $row_count = @$all_arrayref;
+        unshift @$all_arrayref, $col_names;
+        my $prompt_pt = sprintf "DROP %s %s     (on last look at the %s)\n", $type, $sql->{table}, lc $type;
+        print_table(
+            $all_arrayref,
+            { %{$sf->{o}{table}}, grid => 2, prompt => $prompt_pt, max_rows => 0,
+            keep_header => 1, table_expand => $sf->{o}{G}{info_expand} }
+        );
+        $prompt = sprintf 'DROP %s %s  (%s %s)', $type, $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
+        1; }
+    ) {
+        $ax->print_error_message( $@, "Drop $type info output" );
+        $prompt = sprintf 'DROP %s %s', $type, $sql->{table};
+    }
     $prompt .= "\n\nCONFIRM:";
     # Choose
     my $choice = choose(
@@ -87,7 +115,7 @@ sub __drop_table {
     );
     $ax->print_sql( $sql );
     if ( defined $choice && $choice eq 'YES' ) {
-        my $stmt = $ax->get_stmt( $sql, 'Drop_table', 'prepare' );
+        my $stmt = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
         $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
         return 1;
     }
@@ -95,7 +123,53 @@ sub __drop_table {
 }
 
 
-sub create_new_table {
+
+sub create_view {
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    require App::DBBrowser::Subqueries;
+    my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $trs = Term::Form->new();
+    my $sql = {};
+    $ax->reset_sql( $sql );
+    $sf->{i}{stmt_types} = [ 'Create_view' ];
+
+    VIEW_NAME: while ( 1 ) {
+        $sql->{table} = '?';
+        $sql->{view_select_stmt} = '';
+        $ax->print_sql( $sql );
+        # Readline
+        my $view = $trs->readline( 'View name: ' );
+        if ( ! length $view ) {
+            return;
+        }
+        $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $view, 'VIEW' ] );
+
+        SELECT_STMT: while ( 1 ) {
+            $sql->{view_select_stmt} = '?';
+            $ax->print_sql( $sql );
+            my $select_statment = $sq->choose_subquery( $sql );
+            if ( ! defined $select_statment ) {
+                next VIEW_NAME;
+            }
+            if ( $select_statment =~ s/^([\s(]+)(?=SELECT\s)//i ) {
+                my $count = $1 =~ tr/(//;
+                while ( $count-- ) {
+                    $select_statment =~ s/\s*\)\s*\z//;
+                }
+            }
+            $sql->{view_select_stmt} = $select_statment;
+            #$ax->print_sql( $sql );
+            my $ok_create_view = $sf->__create( $sql, 'view' );
+            if ( ! $ok_create_view ) {
+                next SELECT_STMT;
+            }
+            return 1;
+        }
+    }
+}
+
+sub create_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -117,7 +191,6 @@ sub create_new_table {
         my $choices = [ undef, @cu{@cu_keys} ];
         my $prompt = $sf->{d}{db_string} . "\n" . 'Create table';
         # Choose
-        $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
             $choices,
             { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, prompt => $prompt, undef => '  <=' }
@@ -133,7 +206,6 @@ sub create_new_table {
             }
             $old_idx = $idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         push @{$sf->{i}{stmt_types}}, 'Insert';
         my $ok_input;
         if ( $custom eq $cu{create_table_plain} ) {
@@ -160,14 +232,14 @@ sub create_new_table {
             }
             last TABLE;
         }
-        my $ok_create_table = $sf->__create_table( $sql );
+        my $ok_create_table = $sf->__create( $sql, 'table' );
         if ( ! $ok_create_table ) {
             next MENU;
         }
         if ( @{$sql->{insert_into_args}} ) {
             my $ok_insert = $sf->__insert_data( $sql );
             if ( ! $ok_insert ) {
-                my $drop_ok = $sf->__drop_table( $sql );
+                my $drop_ok = $sf->__drop( $sql, 'TABLE' );
                 if ( ! $drop_ok ) {
                     return;
                 }
@@ -178,24 +250,27 @@ sub create_new_table {
 }
 
 
-sub __create_table {
-    my ( $sf, $sql ) = @_;
+sub __create {
+    my ( $sf, $sql, $type ) = @_;
+    $type = lc $type;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->print_sql( $sql );
     # Choose
     my $create_table_ok = choose(
         [ undef, '- YES' ],
-        { %{$sf->{i}{lyt_m}}, prompt => "Create table $sql->{table}?", layout => 3, undef => '- NO', index => 1 }
+        { %{$sf->{i}{lyt_m}}, prompt => "Create $type $sql->{table}?", layout => 3, undef => '- NO', index => 1 }
     );
     if ( ! $create_table_ok ) {
         return;
     }
-    my $stmt = $ax->get_stmt( $sql, 'Create_table', 'prepare' );
+    my $stmt = $ax->get_stmt( $sql, 'Create_' . $type, 'prepare' );
     if ( ! eval { $sf->{d}{dbh}->do( $stmt ); 1 } ) {
-        $ax->print_error_message( $@, 'Create table' );
+        $ax->print_error_message( $@, "Create $type" );
         return;
     };
-    delete $sql->{create_table_cols};
+    if ( exists $sql->{create_table_cols} ) {
+        delete $sql->{create_table_cols};
+    }
     return 1;
 }
 
@@ -205,7 +280,7 @@ sub __insert_data {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{i}{stmt_types} = [ 'Insert' ];
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} . " LIMIT 0" );
-    if ( $sf->{d}{driver} ne 'SQLite' ) {
+    if ( $sf->{i}{driver} ne 'SQLite' ) {
         $sth->execute();
     }
     my @columns = @{$sth->{NAME}};

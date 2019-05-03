@@ -93,12 +93,8 @@ SV *_decode( pTHX_ decode_ctx* decstate );
 
 //----------------------------------------------------------------------
 
-char * _uint_to_str(U32 num) {
-    char *numstr;
-    Newx( numstr, 24, char );
-    snprintf(numstr, 24, "%u", num);
-
-    return numstr;
+void _void_uint_to_str(STRLEN num, char *numstr, const char strlen) {
+    my_snprintf(numstr, strlen, "%lu", num);
 }
 
 void _die( pTHX_ I32 flags, char **argv ) {
@@ -107,56 +103,48 @@ void _die( pTHX_ I32 flags, char **argv ) {
 }
 
 void _croak_unrecognized(pTHX_ SV *value) {
-    char * words[3] = { "Unrecognized", NULL, NULL };
-    words[1] = SvPV_nolen(value);
+    char * words[3] = { "Unrecognized", SvPV_nolen(value), NULL };
 
     _die( aTHX_ G_DISCARD, words );
 }
 
 void _croak_incomplete( pTHX_ STRLEN lack ) {
-    char *lackstr = _uint_to_str(lack);
+    char lackstr[24];
+    _void_uint_to_str( lack, lackstr, 24 );
 
     char * words[3] = { "Incomplete", lackstr, NULL };
 
-    call_argv( "CBOR::Free::_die", G_EVAL | G_DISCARD, words );
-
-    Safefree(lackstr);
-
-    croak(NULL);
+    _die( aTHX_ G_DISCARD, words );
 }
 
 void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
     const unsigned char ord = (unsigned char) *(decstate->curbyte);
     STRLEN offset = decstate->curbyte - decstate->start;
 
-    char *ordstr = _uint_to_str(ord);
-    char *offsetstr = _uint_to_str(offset);
+    char ordstr[24];
+    char offsetstr[24];
 
-    char * words[4] = { "InvalidControl", ordstr, offsetstr, NULL };
+    _void_uint_to_str(ord, ordstr, 24);
+    _void_uint_to_str(offset, offsetstr, 24);
 
-    call_argv( "CBOR::Free::_die", G_EVAL | G_DISCARD, words );
+    char * words[] = { "InvalidControl", ordstr, offsetstr, NULL };
 
-    Safefree(ordstr);
-    Safefree(offsetstr);
-
-    croak(NULL);
+    _die( aTHX_ G_DISCARD, words );
 }
 
 void _croak_invalid_utf8( pTHX_ char *string ) {
-    static char * words[3] = { "InvalidUTF8", NULL, NULL };
-    words[1] = string;
+    char * words[3] = { "InvalidUTF8", string, NULL };
 
     _die( aTHX_ G_DISCARD, words);
 }
 
 void _croak_invalid_map_key( pTHX_ const char *key, STRLEN offset ) {
-    static char * words[4] = { "InvalidMapKey", NULL, NULL, NULL };
 
-    words[1] = key;
 
     char offsetstr[20];
-    snprintf( offsetstr, 20, "%lu", offset );
-    words[2] = offsetstr;
+    my_snprintf( offsetstr, 20, "%lu", offset );
+
+    char * words[] = { "InvalidMapKey", (char *) key, offsetstr, NULL };
 
     _die( aTHX_ G_DISCARD, words);
 }
@@ -165,28 +153,24 @@ void _croak_cannot_decode_64bit( pTHX_ const unsigned char *u64bytes, STRLEN off
     char numhex[20];
     numhex[19] = 0;
 
-    snprintf( numhex, 20, "%02x%02x_%02x%02x_%02x%02x_%02x%02x", u64bytes[0], u64bytes[1], u64bytes[2], u64bytes[3], u64bytes[4], u64bytes[5], u64bytes[6], u64bytes[7] );
+    my_snprintf( numhex, 20, "%02x%02x_%02x%02x_%02x%02x_%02x%02x", u64bytes[0], u64bytes[1], u64bytes[2], u64bytes[3], u64bytes[4], u64bytes[5], u64bytes[6], u64bytes[7] );
 
     char offsetstr[20];
-    snprintf( offsetstr, 20, "%lu", offset );
+    my_snprintf( offsetstr, 20, "%lu", offset );
 
-    static char * words[] = { "CannotDecode64Bit", NULL, NULL, NULL };
-    words[1] = (char *) numhex;
-    words[2] = offsetstr;
+    char * words[] = { "CannotDecode64Bit", numhex, offsetstr, NULL };
 
     _die( aTHX_ G_DISCARD, words );
 }
 
 void _croak_cannot_decode_negative( pTHX_ UV abs, STRLEN offset ) {
     char absstr[40];
-    snprintf(absstr, 40, sizeof(abs) == 4 ? "%lu" : "%llu", abs);
+    my_snprintf(absstr, 40, sizeof(abs) == 4 ? "%lu" : "%llu", abs);
 
     char offsetstr[20];
-    snprintf( offsetstr, 20, "%lu", offset );
+    my_snprintf( offsetstr, 20, "%lu", offset );
 
-    static char * words[] = { "NegativeIntTooLow", NULL, NULL, NULL };
-    words[1] = absstr;
-    words[2] = offsetstr;
+    char * words[] = { "NegativeIntTooLow", absstr, offsetstr, NULL };
 
     _die( aTHX_ G_DISCARD, words );
 }
@@ -1018,16 +1002,6 @@ BOOT:
     perl_is_64bit = sizeof(UV) >= 8;
 
 SV *
-fake_encode( SV * value )
-    CODE:
-        RETVAL = newSVpvn("\127", 1);
-
-        sv_catpvn( RETVAL, "abcdefghijklmnopqrstuvw", 23 );
-    OUTPUT:
-        RETVAL
-
-
-SV *
 _c_encode( SV * value )
     CODE:
         RETVAL = _encode(aTHX_ value, NULL, false);
@@ -1062,13 +1036,12 @@ decode( SV *cbor )
         if (decode_state.curbyte != decode_state.end) {
             STRLEN bytes_count = decode_state.end - decode_state.curbyte;
 
-            char *numstr = _uint_to_str(bytes_count);
+            char numstr[24];
+            _void_uint_to_str(bytes_count, numstr, 24);
 
             char * words[2] = { numstr, NULL };
 
             call_argv("CBOR::Free::_warn_decode_leftover", G_DISCARD, words);
-
-            Safefree(numstr);
         }
 
     OUTPUT:

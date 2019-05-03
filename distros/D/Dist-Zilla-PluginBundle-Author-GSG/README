@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.0.4
+    version 0.0.6
 
 SYNOPSIS
 
@@ -27,6 +27,7 @@ SYNOPSIS
         -bundle = @Basic
         -remove = MetaYAML
         -remove = UploadToCPAN
+        -remove = GatherDir
     
         # The defaults for author and license come from
         #[Author::GSG]
@@ -36,9 +37,10 @@ SYNOPSIS
         [ReadmeAnyFromPod]
     
         [StaticInstall]
+        # mode    from static_install_mode
+        # dry_run from static_install_dry_run
     
         [Pod::Weaver]
-        finder = :InstallModules
         replacer = replace_with_comment
         post_code_replacer = replace_with_nothing
         config_plugin = [ @Default, Contributors ]
@@ -54,6 +56,7 @@ SYNOPSIS
         [Git::Push]
     
         [Git::Contributors]
+        [Git::GatherDir]
     
         [GitHub::Meta]
         [GitHub::UploadRelease] # plus magic to work without releasing elsewhere
@@ -80,6 +83,16 @@ DESCRIPTION
     specific release version with the V environment variable, as described
     in the Git::NextVersion Plugin documentation.
 
+ATTRIBUTES / PARAMETERS
+
+    static_install_mode
+
+      Passed to Dist::Zilla::Plugin::StaticInstall as mode.
+
+    static_install_dry_run
+
+      Passed to Dist::Zilla::Plugin::StaticInstall as dry_run.
+
 Setting up a new dist
 
  Create your dist.ini
@@ -87,12 +100,10 @@ Setting up a new dist
     As above, you need the name and [@Author::GSG] bundle, plus any other
     changes you need.
 
-    You can override Pod::Weaver's finder by setting pod_finder.
-
  Add Dist::Zilla::PluginBundle::Author::GSG to your cpanfile
 
         on 'develop' => sub {
-            requires 'Dist::Zilla::PluginBundle::Author::GSG',
+            requires 'Dist::Zilla::PluginBundle::Author::GSG';
         };
 
     Doing this in the develop phase will cause the default Makefile not to

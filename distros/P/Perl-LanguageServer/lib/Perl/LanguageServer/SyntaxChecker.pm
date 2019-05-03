@@ -112,6 +112,7 @@ sub background_checker
         print STDERR $@ if ($@) ;    
     
         my $errout ;
+        my $out ;
         my $inc = $self -> perlinc ;
         my @inc ;
         @inc = map { ('-I', $_)} @$inc if ($inc) ;
@@ -119,11 +120,12 @@ sub background_checker
         print STDERR "start perl -c\n" ;
         my $ret = run_cmd ([$self -> perlcmd, '-c', @inc],
             "<", \$text,
+            ">", \$out,
             "2>", \$errout)
             -> recv ;
     
         my $rc = $ret >> 8 ;
-        print STDERR "perl -c rc=$rc out=$errout\n" ;
+        print STDERR "perl -c rc=$rc out=$out errout=$errout\n" ;
 
         my %diags = ( map { $_ => [] } @{$self -> files -> {$uri}{diags} || ['-'] } ) ;
         if ($rc != 0)

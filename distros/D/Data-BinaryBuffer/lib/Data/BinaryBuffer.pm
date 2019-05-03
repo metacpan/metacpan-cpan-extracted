@@ -3,7 +3,8 @@ use strict;
 use warnings;
 
 # ABSTRACT: The module to work with binary data effectively
-our $VERSION = '0.005'; # VERSION
+
+our $VERSION = '0.006';
 
 require XSLoader;
 XSLoader::load('Data::BinaryBuffer', $VERSION);
@@ -22,7 +23,7 @@ Data::BinaryBuffer - The module to work with binary data effectively
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -47,8 +48,6 @@ Perl is good for strings, bug not very nice to binary data. This class exactly f
 
 Data::BinaryBuffer is a data structure similar to the queue, but optimized to work with blocks of arbitrary size.
 You can write data to one end of buffer and read from another. Data can be written or read in various formats.
-
-=encoding utf-8
 
 =head1 METHODS
 
@@ -171,7 +170,7 @@ public review and contribution under the terms of the license.
 
 L<https://github.com/vovkasm/data-binarybuffer>
 
-  git clone git://github.com/vovkasm/data-binarybuffer.git
+  git clone https://github.com/vovkasm/data-binarybuffer.git
 
 =head1 AUTHOR
 
@@ -179,7 +178,7 @@ Vladimir Timofeev <vovkasm@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Vladimir Timofeev.
+This software is copyright (c) 2019 by Vladimir Timofeev.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.009';
+$Arango::Tango::VERSION = '0.010';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -35,7 +35,7 @@ use Sub::Install qw(install_sub);
 use Sub::Name qw(subname);
 BEGIN {
     my $package = __PACKAGE__;
-    for my $m (qw'engine cluster_endpoint server_id version status time statistics statistics_description target_version log log_level server_availability server_mode server_role list_users') {
+    for my $m (qw'engine cluster_endpoint server_id version status time statistics statistics_description target_version log log_level server_availability server_mode server_role list_users current_database') {
         install_sub {
             code => subname(
                 "${package}::$m",
@@ -52,11 +52,6 @@ sub _auth {
     return "Basic " . encode_base64url( $self->{username} . ":" . $self->{password} );
 }
 
-sub list_collections {
-    my ($self, $name) = @_;
-    return $self->_api('list_collections', { database => $name })->{result};
-}
-
 sub database {
     my ($self, $name) = @_;
     my $databases = $self->list_databases;
@@ -69,12 +64,12 @@ sub database {
 
 sub list_databases {
     my $self = shift;
-    return  $self->_api('list_databases')->{result};
+    return  $self->_api('accessible_databases')->{result};
 }
 
 sub create_database {
-    my ($self, $name) = @_;
-    return $self->_api('create_database', { name => $name });
+    my ($self, $name, %opts) = @_;
+    return $self->_api('create_database', { %opts, name => $name });
 }
 
 sub delete_database {
@@ -181,7 +176,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSYS
 
@@ -269,7 +264,8 @@ Password to be used to connect to ArangoDB. Default to the empty string.
 
     my $databases = $db->list_databases;
 
-Queries the server about available databases. Returns an array ref of database names.
+Retrieves the list of all databases the current user can access without
+specifying a different username or password.
 
 =item C<create_database>
 
@@ -289,11 +285,11 @@ Opens an existing database, and returns a reference to a L<Arango::Tango::Databa
 
 Deletes an existing database.
 
-=item C<list_collections>
+=item C<current_database>
 
-    my $collections = $db->list_collections;
+    $db->current_database;
 
-Lists collection details without specifying a specific database;
+Returns information about the current database. At the moment, to obtain an object representing it, use the C<database> method.
 
 =back
 

@@ -31,9 +31,13 @@ my $noaccel          = FALSE;
 my $threads          = Sys::CPU::cpu_count() * 2;
 my $RUNNING : shared = TRUE;
 my $default_path     = '.';
+my $new_x;
+my $new_y;
 our $GO : shared     = FALSE;
 
 GetOptions(
+    'x=i'          => \$new_x,
+    'y=i'          => \$new_y,
     'auto'         => \$auto,
     'errors'       => \$errors,
     'showall|all'  => \$showall,
@@ -98,7 +102,7 @@ my $showit = $splash;
 my @params;
 for (my $t = 0; $t < $threads; $t++) {
     foreach my $f (@devs) {
-        $params[$t] = [$f, $p, $threads, $t, $showit, $delay];
+        $params[$t] = (defined($new_x)) ? [$f, $p, $threads, $t, $showit, $delay, $new_x, $new_y] : [$f, $p, $threads, $t, $showit, $delay];
         $thrd[$t] = threads->create({'context' => 'scalar'}, \&show, @{ $params[$t] });
     }
     sleep $showit if ($showit);
@@ -364,26 +368,39 @@ sub calculate_window {
 } ## end sub calculate_window
 
 sub show {
-    my $dev     = shift;
-    my $ps      = shift;
-    my $jobs    = shift;
-    my $job     = shift;
-    my $display = shift;
-    my $delay   = shift;
+    my $dev       = shift;
+    my $ps        = shift;
+    my $jobs      = shift;
+    my $job       = shift;
+    my $display   = shift;
+    my $delay     = shift;
+    my ($nx, $ny) = @_;
 
     local $SIG{'ALRM'} = undef;
     local $SIG{'INT'}  = sub { threads->exit(); };
     local $SIG{'QUIT'} = sub { threads->exit(); };
     local $SIG{'KILL'} = sub { threads->exit(); };
 
-    my $FB = Graphics::Framebuffer->new(
+    my $FB = (defined($nx)) ?
+      Graphics::Framebuffer->new(
         'SHOW_ERRORS' => $errors,
         'RESET'       => 1,
         'SPLASH'      => $splash,
         'ACCELERATED' => !$noaccel,
         'FB_DEVICE'   => $dev,
         'SPLASH'      => $display,
-    );
+        'SIMULATED_X' => $nx,
+        'SIMULATED_Y' => $ny,
+      )
+      :
+      Graphics::Framebuffer->new(
+        'SHOW_ERRORS' => $errors,
+        'RESET'       => 1,
+        'SPLASH'      => $splash,
+        'ACCELERATED' => !$noaccel,
+        'FB_DEVICE'   => $dev,
+        'SPLASH'      => $display,
+      );
     $FB->wait_for_console(1);
     $FB->set_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
     my @pics = shuffle(@{$ps});

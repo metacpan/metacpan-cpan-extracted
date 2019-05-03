@@ -73,13 +73,65 @@ L<GraphQL::Language::Parser/parse>, or a return value from that.
 A root value that can be used by field-resolvers. The default one needs
 a code-ref, a hash-ref or an object.
 
+For instance:
+
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+  type Query { dateTimeNow: String, hi: String }
+  EOF
+  my $root_value = {
+    dateTimeNow => sub { DateTime->now->ymd },
+    hi => "Bob",
+  };
+  my $data = execute($schema, "{ dateTimeNow hi }", $root_value);
+
+will return:
+
+    {
+      data => {
+        dateTimeNow => { ymd => '20190501' },
+        hi => 'Bob',
+      }
+    }
+
+Be aware that with the default field-resolver, when it calls a method,
+that method will get called with L<GraphQL::Type::Library/$args>
+L<GraphQL::Type::Library/$context>, L<GraphQL::Type::Library/$info>. To
+override that to pass no parameters, this is suitable as a
+C<$field_resolver> parameters:
+
+    sub {
+      my ($root_value, $args, $context, $info) = @_;
+      my $field_name = $info->{field_name};
+      my $property = ref($root_value) eq 'HASH'
+        ? $root_value->{$field_name}
+        : $root_value;
+      return $property->($args, $context, $info) if ref $property eq 'CODE';
+      return $root_value->$field_name if ref $property; # no args
+      $property;
+    }
+
 =item $context_value
 
 A per-request scalar, that will be passed to field-resolvers.
 
 =item $variable_values
 
-A hash-ref, typically the decoded JSON object supplied by a client.
+A hash-ref, typically the decoded JSON object supplied by a
+client. E.g. for this query:
+
+  query q($input: TestInputObject) {
+    fieldWithObjectInput(input: $input)
+  }
+
+The C<$variable_values> will need to be a JSON object with a
+key C<input>, whose value will need to conform to the L<input
+type|GraphQL::Type::InputObject> C<TestInputObject>.
+
+The purpose of this is to avoid needing to hard-code input values in
+your query. This aids in, among other things, being able to whitelist
+individual queries as acceptable, non-abusive queries to your system;
+and being able to generate client-side code for client-side validation
+rather than including the full GraphQL system in client code.
 
 =item $operation_name
 

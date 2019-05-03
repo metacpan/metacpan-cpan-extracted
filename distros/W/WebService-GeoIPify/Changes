@@ -1,5 +1,8 @@
 Revision history for WebService-IPify
 
+0.05  2019-05-03 23:03:20 +08
+        - Fix missing provides field in META
+
 0.04  2019-04-27 00:16:34 +08
         - Fix build dependancies failure
         - Fix meta details

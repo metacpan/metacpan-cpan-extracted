@@ -1,6 +1,16 @@
 
 ===== history of Mail-Box-IMAP4
 
+version 3.004: Fri  3 May 09:24:50 CEST 2019
+
+	Fixes:
+	- xt/99pod.t was missing from git
+	- represent ssl in url()
+
+	Improvements:
+	- transporter: rename 'starttls' into 'ssl' option
+	- add ::IMAP4s for url abstraction.
+
 version 3.003: Sun Mar  4 14:58:04 CET 2018
 
 	Improvements:

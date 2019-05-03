@@ -4,21 +4,21 @@
       "Vladimir Timofeev <vovkasm@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-BinaryBuffer",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -28,16 +28,35 @@
       "configure" : {
          "requires" : {
             "ExtUtils::CBuilder" : "0",
-            "ExtUtils::MakeMaker" : "6.30",
-            "File::Spec" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.006"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Run::BeforeBuild" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Perl_5" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "inc::DistMakeMaker" : "0",
+            "perl" : "5.006"
          }
       },
       "runtime" : {
@@ -49,21 +68,21 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "0",
-            "File::Spec::Functions" : "0",
-            "File::Temp" : "0",
-            "List::Util" : "0",
-            "Test::More" : "0.88",
-            "blib" : "0"
+            "File::Spec" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Data::BinaryBuffer" : {
          "file" : "lib/Data/BinaryBuffer.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -71,14 +90,16 @@
       "bugtracker" : {
          "web" : "https://github.com/vovkasm/data-binarybuffer/issues"
       },
-      "homepage" : "https://metacpan.org/release/Data-BinaryBuffer",
+      "homepage" : "https://github.com/vovkasm/data-binarybuffer",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/vovkasm/data-binarybuffer.git",
+         "url" : "https://github.com/vovkasm/data-binarybuffer.git",
          "web" : "https://github.com/vovkasm/data-binarybuffer"
       }
    },
-   "version" : "0.005",
-   "x_authority" : "cpan:VOVKASM"
+   "version" : "0.006",
+   "x_authority" : "cpan:VOVKASM",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

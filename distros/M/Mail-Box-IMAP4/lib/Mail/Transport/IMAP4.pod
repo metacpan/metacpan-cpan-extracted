@@ -43,14 +43,6 @@ Extends L<"DESCRIPTION" in Mail::Transport::Receive|Mail::Transport::Receive/"DE
 
 Extends L<"METHODS" in Mail::Transport::Receive|Mail::Transport::Receive/"METHODS">.
  
-=over 4
-
-=item $obj-E<gt>B<url>()
-
-Represent this imap4 connection as URL.
-
-=back
-
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Transport::Receive|Mail::Transport::Receive/"Constructors">.
@@ -78,6 +70,7 @@ C<port>, C<username>, and C<password> are extracted from it.
   port          Mail::Transport  143
   proxy         Mail::Transport  undef
   retry         Mail::Transport  <false>
+  ssl                            undef
   starttls                       false
   timeout       Mail::Transport  120
   trace         Mail::Reporter   'WARNINGS'
@@ -123,9 +116,13 @@ defined by L<Mail::IMAPClient|Mail::IMAPClient>.
 
 =item retry => NUMBER|undef
 
+=item ssl => \%ssl_options|\@ssl_options
+
+You need to pass at least an empty HASH or ARRAY to enable SSL.
+
 =item starttls => BOOLEAN
 
-tart Transport Security Layer (TLS).
+Run SSL connection with StartTLS.
 
 =item timeout => SECONDS
 
@@ -203,7 +200,7 @@ example:
  $transporter->authentication('CRAM-MD5', [MY_AUTH => \&c], 'PLAIN');
 
  foreach my $pair ($transporter->authentication)
- {   my ($mechanism, $challange) = @$pair;
+ {   my ($mechanism, $challenge) = @$pair;
      ...
  }
 
@@ -212,6 +209,10 @@ example:
 Used in NTLM authentication to define the Windows domain which is
 accessed.  Initially set by L<new(domain)|Mail::Transport::IMAP4/"METHODS"> and defaults to the
 server's name.
+
+=item $obj-E<gt>B<usesSSL>()
+
+Returns a boolean.
 
 =back
 
@@ -453,12 +454,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.003,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.004,
+built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

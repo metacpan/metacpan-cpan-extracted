@@ -32,14 +32,14 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Plugin::Renderer'             => { file => 'lib/Calendar/Plugin/Renderer.pm'          , version => '0.14' },
-            'Calendar::Plugin::Renderer::Util'       => { file => 'lib/Calendar/Plugin/Renderer/Util.pm'     , version => '0.14' },
-            'Calendar::Plugin::Renderer::Text'       => { file => 'lib/Calendar/Plugin/Renderer/Text.pm'     , version => '0.14' },
-            'Calendar::Plugin::Renderer::SVG'        => { file => 'lib/Calendar/Plugin/Renderer/SVG.pm'      , version => '0.14' },
-            'Calendar::Plugin::Renderer::SVG::Page'  => { file => 'lib/Calendar/Plugin/Renderer/SVG/Page.pm' , version => '0.14' },
-            'Calendar::Plugin::Renderer::SVG::Text'  => { file => 'lib/Calendar/Plugin/Renderer/SVG/Text.pm' , version => '0.14' },
-            'Calendar::Plugin::Renderer::SVG::Box'   => { file => 'lib/Calendar/Plugin/Renderer/SVG/Box.pm'  , version => '0.14' },
-            'Calendar::Plugin::Renderer::SVG::Label' => { file => 'lib/Calendar/Plugin/Renderer/SVG/Label.pm', version => '0.14' },
+            'Calendar::Plugin::Renderer'             => { file => 'lib/Calendar/Plugin/Renderer.pm'          , version => '0.15' },
+            'Calendar::Plugin::Renderer::Util'       => { file => 'lib/Calendar/Plugin/Renderer/Util.pm'     , version => '0.15' },
+            'Calendar::Plugin::Renderer::Text'       => { file => 'lib/Calendar/Plugin/Renderer/Text.pm'     , version => '0.15' },
+            'Calendar::Plugin::Renderer::SVG'        => { file => 'lib/Calendar/Plugin/Renderer/SVG.pm'      , version => '0.15' },
+            'Calendar::Plugin::Renderer::SVG::Page'  => { file => 'lib/Calendar/Plugin/Renderer/SVG/Page.pm' , version => '0.15' },
+            'Calendar::Plugin::Renderer::SVG::Text'  => { file => 'lib/Calendar/Plugin/Renderer/SVG/Text.pm' , version => '0.15' },
+            'Calendar::Plugin::Renderer::SVG::Box'   => { file => 'lib/Calendar/Plugin/Renderer/SVG/Box.pm'  , version => '0.15' },
+            'Calendar::Plugin::Renderer::SVG::Label' => { file => 'lib/Calendar/Plugin/Renderer/SVG/Label.pm', version => '0.15' },
         },
         resources => {
             repository => {

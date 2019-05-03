@@ -1,6 +1,6 @@
 package CGI::ContactForm;
 
-$VERSION = '1.50';
+$VERSION = '1.53';
 # $Id: ContactForm.pm,v 1.76 2009/03/03 22:46:53 gunnarh Exp $
 
 =head1 NAME
@@ -194,12 +194,10 @@ On some servers, the CGI file must be located in the C<cgi-bin> directory
 that the style sheet typically needs to be located somewhere outside the
 C<cgi-bin>.
 
-=head1 DEPENDENCY
+=head1 DEPENDENCIES
 
-C<CGI::ContactForm> requires the non-standard module
-L<Mail::Sender|Mail::Sender>. If C<Mail::Sender> needs to be installed
-manually, you shall create C</www/username/cgi-bin/lib/Mail> and upload
-C<Sender.pm> to that directory.
+C<CGI::ContactForm> requires the non-standard modules L<CGI.pm|CGI> and
+L<Mail::Sender|Mail::Sender>.
 
 =head1 AUTHENTICATION
 
@@ -228,7 +226,7 @@ See the L<Mail::Sender|Mail::Sender> documentation for further guidance.
 
 =head1 AUTHOR, COPYRIGHT AND LICENSE
 
-  Copyright (c) 2003-2009 Gunnar Hjalmarsson
+  Copyright (c) 2003-2019 Gunnar Hjalmarsson
   http://www.gunnar.cc/cgi-bin/contact.pl
 
 This module is free software; you can redistribute it and/or modify it
@@ -242,7 +240,6 @@ L<Mail::Sender|Mail::Sender>
 =cut
 
 use strict;
-use CGI 'escapeHTML';
 use File::Basename;
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
@@ -265,6 +262,8 @@ BEGIN {
         exit 1;
     }
 
+    eval "use CGI 'escapeHTML'";
+    CFdie($@) if $@;
     eval "use Mail::Sender";
     CFdie($@) if $@;
 }

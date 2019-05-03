@@ -7,11 +7,12 @@ use URI::Escape();
 use LWP::UserAgent();
 use Digest::SHA();
 use Encode();
+use HTTP::Status();
 use Unicode::Normalize();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
@@ -80,6 +81,9 @@ sub breach {
         my $json = JSON::decode_json( $response->decoded_content() );
         return WebService::HIBP::Breach->new( %{$json} );
     }
+    elsif ( $response->code() == HTTP::Status::HTTP_NOT_FOUND() ) {
+        return ();
+    }
     else {
         Carp::croak( "Failed to retrieve $url:" . $response->status_line() );
     }
@@ -97,6 +101,9 @@ sub pastes {
             push @pastes, WebService::HIBP::Paste->new( %{$paste} );
         }
         return @pastes;
+    }
+    elsif ( $response->code() == HTTP::Status::HTTP_NOT_FOUND() ) {
+        return ();
     }
     else {
         Carp::croak( "Failed to retrieve $url:" . $response->status_line() );
@@ -150,6 +157,9 @@ sub account {
         }
         return @breaches;
     }
+    elsif ( $response->code() == HTTP::Status::HTTP_NOT_FOUND() ) {
+        return ();
+    }
     else {
         Carp::croak( "Failed to retrieve $url:" . $response->status_line() );
     }
@@ -188,7 +198,7 @@ WebService::HIBP - An interface to the Have I Been Pwned webservice at haveibeen
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =head1 SYNOPSIS
 

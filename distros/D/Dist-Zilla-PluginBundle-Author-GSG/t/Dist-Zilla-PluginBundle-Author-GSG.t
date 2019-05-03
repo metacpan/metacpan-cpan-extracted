@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 use Test::DZil;
+use Test::Deep qw();
 
 use Git::Wrapper;
 use File::Temp qw();
@@ -52,6 +53,10 @@ subtest 'Build a basic dist' => sub {
         }
     );
 
+    my $source_git = $tzil->plugin_named('@Author::GSG/Git::Commit')->git;
+    $source_git->add('.');
+    $source_git->commit( -a => { m => "Add new files for Git::GatherDir" });
+
     $tzil->build;
 
     my $built = $tzil->slurp_file('build/lib/External/Package.pm');
@@ -59,9 +64,34 @@ subtest 'Build a basic dist' => sub {
         qr/\QThis software is Copyright (c) 2001 - $year by $holder./,
         "Put the expected copyright in the module";
 
+    my %resources = (
+        resources => {
+            'repository' => {
+                'type' => 'git',
+                'url'  => "git://github.com/$upstream.git",
+                'web'  => "https://github.com/$upstream"
+            },
+        },
+    );
+
+    # For reasons I don't understand sometimes the GitHub::Meta
+    # Plugin doesn't find the Fetch URL, so we try to do something
+    # similar to what they do, but in the correct directory.
+    {
+        my ($url) = map /Fetch URL: (.*)/,
+                $tzil->plugin_named('@Author::GSG/Git::Push')
+                    ->git->remote( 'show', '-n', 'origin' );
+
+        unless ( $url =~ /\Q$upstream/ ) {
+            diag "Not checking 'resources', invalid Fetch URL [$url]";
+            %resources = ();
+        }
+    }
+
     is_json(
         $tzil->slurp_file('build/META.json'),
-        {   name     => 'OurExternal-Package',
+        Test::Deep::superhashof( {
+            name     => 'OurExternal-Package',
             license  => ['artistic_2'],
             abstract => 'ABSTRACT',
             author   => ['Grant Street Group <developers@grantstreet.com>'],
@@ -70,23 +100,11 @@ subtest 'Build a basic dist' => sub {
             release_status => 'stable',
             version        => '0.0.1',
 
-            resources => {
-                'repository' => {
-                    'type' => 'git',
-                    'url'  => "git://github.com/$upstream.git",
-                    'web'  => "https://github.com/$upstream"
-                }
-            },
+            %resources,
 
             dynamic_config   => 0,
             x_static_install => 1,
-
-            generated_by            => Test::Deep::ignore(),
-            prereqs                 => Test::Deep::ignore(),
-            'meta-spec'             => Test::Deep::ignore(),
-            x_generated_by_perl     => Test::Deep::ignore(),
-            x_serialization_backend => Test::Deep::ignore(),
-        },
+        } ),
         "Built the expected META.json"
     );
 };

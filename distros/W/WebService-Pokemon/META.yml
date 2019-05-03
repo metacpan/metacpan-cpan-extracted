@@ -38,13 +38,13 @@ requires:
   Types::Standard: '0'
   URI::Fast: '0'
   namespace::clean: '0'
-  strictures: '0'
+  strictures: '2'
   utf8: '0'
 resources:
   bugtracker: https://github.com/kianmeng/webservice-pokemon/issues
   homepage: https://github.com/kianmeng/webservice-pokemon
   repository: https://github.com/kianmeng/webservice-pokemon.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.28.1

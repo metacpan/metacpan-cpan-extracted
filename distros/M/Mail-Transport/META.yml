@@ -29,5 +29,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Transport.git
-version: '3.003'
+version: '3.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -1,6 +1,6 @@
 package CGI::ContactForm::MHonArc;
 
-$VERSION = '1.02';
+$VERSION = '1.53';
 # $Id: MHonArc.pm,v 1.7 2006/12/07 00:39:31 gunnarh Exp $
 
 =head1 NAME

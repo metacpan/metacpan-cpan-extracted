@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.138;
+our $VERSION = 1.139;
 
 use Term::ANSIColor ();
 
@@ -57,8 +57,8 @@ Beispiele: 'bold reverse' oder 'dark red on_green'
 
 =head2 Texte mit Colorcodes weiter verarbeiten
 
-Die im folgenden genannten Programme C<aha>, C<wkhtmltopdf> und C<less>
-sind im Debian-Repository enthalten.
+Die im folgenden genannten Programme C<aha>, C<wkhtmltopdf> sind im
+Debian-Repository enthalten.
 
 =head3 Nach PDF wandeln
 
@@ -196,7 +196,7 @@ sub str {
 
 =head1 VERSION
 
-1.138
+1.139
 
 =head1 AUTHOR
 

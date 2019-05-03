@@ -24,6 +24,7 @@ endif
 CARTON_INSTALL_FLAGS ?= --without develop
 PERL_CARTON_PERL5LIB ?= $(PERL5LIB)
 CONTRIB              ?= CONTRIBUTING.md MANIFEST.SKIP
+EXTRA_UPDATES        += $(CONTRIB)
 
 # If someone includes this Makefile, don't write the Makefile
 # target because otherwise we will overwrite their custom Makefile
@@ -57,7 +58,7 @@ clean:
 realclean: clean
 	rm -rf local
 
-update: $(CONTRIB) README.md LICENSE.txt
+update: README.md LICENSE.txt $(EXTRA_UPDATES)
 	@echo Everything is up to date
 
 README.md: $(MAIN_MODULE) dist.ini $(CPANFILE_SNAPSHOT)

@@ -1,5 +1,9 @@
 Revision history for App-skos2jskos
 
+0.2.0  2019-05-02 10:57:08 CEST
+    - Export concepts in ndjson
+    - Detect and warn on non-literals
+
 0.1.7  2019-04-15 13:26:45 CEST
     - Support skos:broader and all note types
 

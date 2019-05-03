@@ -20,12 +20,16 @@ t/meta-json.t
 t/meta-yml.t
 t/bahai.xml
 t/gregorian.xml
+t/hebrew.xml
 t/hijri.xml
+t/julian.xml
 t/persian.xml
 t/saka.xml
 t/fake-bahai.xml
 t/fake-gregorian.xml
 t/fake-hijri.xml
+t/fake-julian.xml
+t/fake-hebrew.xml
 t/fake-persian.xml
 t/fake-saka.xml
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for Calendar::Plugin::Renderer
 
+0.15  Thu May 02 15:40:00 2019
+      - Added test for Hebrew and Julian calendars.
+
 0.14  Fri Nov 02 15:35:00 2018
       - Used namespace::autoclean instead.
 

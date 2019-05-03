@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.001000'; # VERSION
+our $VERSION = '0.001001'; # VERSION
 
 use List::Util 1.28 qw(pairmap);
 use PadWalker 2.3 qw(peek_my peek_our);
@@ -67,7 +67,35 @@ sub eval {
             hintshash => undef,
         }
     );
-    return $coderef->();
+
+    my @rslt;
+    if (wantarray) {
+        @rslt = eval { $coderef->(); };
+    }
+    elsif ( defined wantarray ) {
+        $rslt[0] = eval { $coderef->(); };
+    }
+    else {
+        eval { $coderef->(); };
+    }
+    if ($@) {
+
+        # Simplify error message as sometimes part of what's come from
+        #  Sub::Quote may not be very meaningful to users.
+        # See also https://metacpan.org/source/HAARG/Sub-Quote-2.006003/lib/Sub/Quote.pm#L307
+        my $msg = $@;
+        $msg =~ s/.*\d+:.*?[\n]+//ms;
+        die $msg;
+    }
+    if (wantarray) {
+        return @rslt;
+    }
+    elsif ( defined wantarray ) {
+        return $rslt[0];
+    }
+    else {
+        return;
+    }
 }
 
 1;
@@ -84,7 +112,7 @@ Eval::Quosure - Evaluate within a caller environment
 
 =head1 VERSION
 
-version 0.001000
+version 0.001001
 
 =head1 SYNOPSIS
 
@@ -114,6 +142,15 @@ can be evaluated.
 
 Note that as this is string eval so is not secure. USE IT WITH CAUTION!
 
+=head1 CONSTRUCTION
+
+    new(Str $expr, $level=0)
+
+C<$expr> is a string. C<$level> is used like the argument of C<caller> and
+PadWalker's C<peek_my>, C<0> is for the scope that creates the quosure
+object, C<1> is for the upper scope of the scope that creates the quosure,
+and so on. 
+
 =head1 METHODS
 
 =head2 expr
@@ -139,15 +176,6 @@ Evaluate the quosure's expression in its own environment, with captured
 variables from what's obtained when the quosure's created plus specified
 by C<$additional_captures>, which is a hashref with keys be the full name
 of the variable including sigil.
-
-=head1 CONSTRUCTION
-
-    new(Str $expr, $level=0)
-
-C<$expr> is a string. C<$level> is used like the argument of C<caller> and
-PadWalker's C<peek_my>, C<0> is for the scope that creates the quosure
-object, C<1> is for the upper scope of the scope that creates the quosure,
-and so on. 
 
 =head1 SEE ALSO
 

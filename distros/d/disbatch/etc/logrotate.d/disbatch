@@ -13,3 +13,11 @@
 	rotate 7
 	compress
 }
+
+/var/log/disbatch-web.out {
+	missingok
+	copytruncate
+	notifempty
+	rotate 7
+	compress
+}

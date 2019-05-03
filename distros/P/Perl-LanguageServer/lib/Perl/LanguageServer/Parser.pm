@@ -9,7 +9,7 @@ use File::Basename ;
 
 use v5.14;
 
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+no warnings 'experimental' ;
 no warnings 'uninitialized' ;
 
 

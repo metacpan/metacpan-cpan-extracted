@@ -17,7 +17,7 @@ with 'Role::REST::Client';
 use constant DEFAULT_ITEMS_PER_PAGE => 20;
 use constant DEFAULT_ITEMS_OFFSET => 0;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 has 'api_url' => (
     isa => Str,

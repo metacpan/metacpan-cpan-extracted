@@ -4,17 +4,17 @@ NAME
 
 SYNOPSIS
 
-     my $future = Future->new;
+       my $future = Future->new;
     
-     perform_some_operation(
-        on_complete => sub {
-           $future->done( @_ );
-        }
-     );
+       perform_some_operation(
+          on_complete => sub {
+             $future->done( @_ );
+          }
+       );
     
-     $future->on_ready( sub {
-        say "The operation is complete";
-     } );
+       $future->on_ready( sub {
+          say "The operation is complete";
+       } );
 
 DESCRIPTION
 
@@ -91,34 +91,29 @@ DESCRIPTION
     per-instance setup it can override the new method, and take context
     from the given instance.
 
-     sub new
-     {
-        my $proto = shift;
-        my $self = $proto->SUPER::new;
+       sub new
+       {
+          my $proto = shift;
+          my $self = $proto->SUPER::new;
     
-        if( ref $proto ) {
-           # Prototype was an instance
-        }
-        else {
-           # Prototype was a class
-        }
+          if( ref $proto ) {
+             # Prototype was an instance
+          }
+          else {
+             # Prototype was a class
+          }
     
-        return $self;
-     }
+          return $self;
+       }
 
-    If an instance provides a method called await, this will be called by
-    the get and failure methods if the instance is pending.
-
-     $f->await
+    If an instance overrides the "block_until_ready" method, this will be
+    called by get and failure if the instance is still pending.
 
     In most cases this should allow future-returning modules to be used as
     if they were blocking call/return-style modules, by simply appending a
     get call to the function or method calls.
 
-     my ( $results, $here ) = future_returning_function( @args )->get;
-
-    The examples directory in the distribution contains some examples of
-    how futures might be integrated with various event systems.
+       my ( $results, $here ) = future_returning_function( @args )->get;
 
  DEBUGGING
 
@@ -127,8 +122,8 @@ DESCRIPTION
     can be checked. If a future object is destroyed without having been
     completed or cancelled, a warning message is printed.
 
-     $ PERL_FUTURE_DEBUG=1 perl -MFuture -E 'my $f = Future->new'
-     Future=HASH(0xaa61f8) was constructed at -e line 1 and was lost near -e line 0 before it was ready.
+       $ PERL_FUTURE_DEBUG=1 perl -MFuture -E 'my $f = Future->new'
+       Future=HASH(0xaa61f8) was constructed at -e line 1 and was lost near -e line 0 before it was ready.
 
     Note that due to a limitation of perl's caller function within a
     DESTROY destructor method, the exact location of the leak cannot be
@@ -136,23 +131,23 @@ DESCRIPTION
     scope by returning from a function; in this case the leak location may
     be reported as being the line following the line calling that function.
 
-     $ PERL_FUTURE_DEBUG=1 perl -MFuture
-     sub foo {
-        my $f = Future->new;
-     }
+       $ PERL_FUTURE_DEBUG=1 perl -MFuture
+       sub foo {
+          my $f = Future->new;
+       }
     
-     foo();
-     print "Finished\n";
+       foo();
+       print "Finished\n";
     
-     Future=HASH(0x14a2220) was constructed at - line 2 and was lost near - line 6 before it was ready.
-     Finished
+       Future=HASH(0x14a2220) was constructed at - line 2 and was lost near - line 6 before it was ready.
+       Finished
 
     A warning is also printed in debug mode if a Future object is destroyed
     that completed with a failure, but the object believes that failure has
     not been reported anywhere.
 
-     $ PERL_FUTURE_DEBUG=1 perl -Mblib -MFuture -E 'my $f = Future->fail("Oops")'
-     Future=HASH(0xac98f8) was constructed at -e line 1 and was lost near -e line 0 with an unreported failure of: Oops
+       $ PERL_FUTURE_DEBUG=1 perl -Mblib -MFuture -E 'my $f = Future->fail("Oops")'
+       Future=HASH(0xac98f8) was constructed at -e line 1 and was lost near -e line 0 with an unreported failure of: Oops
 
     Such a failure is considered reported if the get or failure methods are
     called on it, or it had at least one on_ready or on_fail callback, or
@@ -182,7 +177,7 @@ CONSTRUCTORS
 
        $future = Future->done( @values )
     
-       $future = Future->fail( $exception, @details )
+       $future = Future->fail( $exception, $category, @details )
 
     Since version 0.26.
 
@@ -212,7 +207,7 @@ CONSTRUCTORS
     A convenient wrapper for calling a CODE reference that is expected to
     return a future. In normal circumstances is equivalent to
 
-     $future = $code->( @args )
+       $future = $code->( @args )
 
     except that if the code throws an exception, it is wrapped in a new
     immediate fail future. If the return value from the code is not a
@@ -291,23 +286,32 @@ IMPLEMENTATION METHODS
 
  fail
 
-       $future->fail( $exception, @details )
+       $future->fail( $exception, $category, @details )
 
     Marks that the leaf future has failed, and provides an exception value.
     This exception will be thrown by the get method if called.
 
     The exception must evaluate as a true value; false exceptions are not
-    allowed. Further details may be provided that will be returned by the
-    failure method in list context. These details will not be part of the
-    exception string raised by get.
+    allowed. A failure category name and other further details may be
+    provided that will be returned by the failure method in list context.
 
     If the future is already cancelled, this request is ignored. If the
     future is already complete with a result or a failure, an exception is
     thrown.
 
+    If passed a Future::Exception instance (i.e. an object previously
+    thrown by the get), the additional details will be preserved. This
+    allows the additional details to be transparently preserved by such
+    code as
+
+       ...
+       catch {
+          return Future->fail($@);
+       }
+
  die
 
-       $future->die( $message, @details )
+       $future->die( $message, $category, @details )
 
     Since version 0.09.
 
@@ -328,7 +332,7 @@ IMPLEMENTATION METHODS
     If the future is later cancelled, the callbacks will be invoked in the
     reverse order to that in which they were registered.
 
-     $on_cancel->( $future )
+       $on_cancel->( $future )
 
     If passed another Future instance, the passed instance will be
     cancelled when the original future is cancelled.
@@ -350,7 +354,7 @@ USER METHODS
     The invoked code can then obtain the list of results by calling the get
     method.
 
-     $on_ready->( $future )
+       $on_ready->( $future )
 
     If passed another Future instance, the passed instance will have its
     done, fail or cancel methods invoked when the original future completes
@@ -371,14 +375,42 @@ USER METHODS
     value.
 
     If the future is ready but failed, this method raises as an exception
-    the failure string or object that was given to the fail method.
+    the failure that was given to the fail method. If additional details
+    were given to the fail method, an exception object is constructed to
+    wrap them of type Future::Exception.
 
     If the future was cancelled an exception is thrown.
 
-    If it is not yet ready and is not of a subclass that provides an await
-    method an exception is thrown. If it is subclassed to provide an await
-    method then this is used to wait for the future to be ready, before
-    returning the result or propagating its failure exception.
+    If it is not yet ready then "block_until_ready" is invoked to wait for
+    a ready state.
+
+ block_until_ready
+
+       $f = $f->block_until_ready
+
+    Since version 0.40.
+
+    Blocks until the future instance is no longer pending.
+
+    Returns the invocant future itself, so it is useful for chaining.
+
+    Usually, calling code would either force the future using "get", or use
+    either then chaining or async/await syntax to wait for results. This
+    method is useful in cases where the exception-throwing part of get is
+    not required, perhaps because other code will be testing the result
+    using "is_done" or similar.
+
+       if( $f->block_until_ready->is_done ) {
+          ...
+       }
+
+    This method is intended for subclasses to override, but a default
+    implementation for back-compatibility purposes is provided which calls
+    the await method. If the future is not yet ready, attempts to wait for
+    an eventual result by using the underlying await method, which
+    subclasses should provide. The default implementation will throw an
+    exception if called on a still-pending instance that does not provide
+    an await method.
 
  unwrap
 
@@ -389,8 +421,9 @@ USER METHODS
     If given a single argument which is a Future reference, this method
     will call get on it and return the result. Otherwise, it returns the
     list of values directly in list context, or the first value in scalar.
-    Since it involves an implicit await, this method can only be used on
-    immediate futures or subclasses that implement await.
+    Since it involves an implicit blocking wait, this method can only be
+    used on immediate futures or subclasses that implement
+    "block_until_ready".
 
     This will ensure that an outgoing argument is definitely not a Future,
     and may be useful in such cases as adapting synchronous code to fit
@@ -407,7 +440,7 @@ USER METHODS
 
     The callback will be passed the result passed to the done method.
 
-     $on_done->( @result )
+       $on_done->( @result )
 
     If passed another Future instance, the passed instance will have its
     done method invoked when the original future completes successfully.
@@ -418,29 +451,27 @@ USER METHODS
 
        $exception = $future->failure
     
-       $exception, @details = $future->failure
+       $exception, $category, @details = $future->failure
 
     If the future is ready, returns the exception passed to the fail method
     or undef if the future completed successfully via the done method.
 
-    If it is not yet ready and is not of a subclass that provides an await
-    method an exception is thrown. If it is subclassed to provide an await
-    method then this is used to wait for the future to be ready, before
-    returning the result or propagating its failure exception.
+    If it is not yet ready then "block_until_ready" is invoked to wait for
+    a ready state.
 
-    If called in list context, will additionally yield a list of the
-    details provided to the fail method.
+    If called in list context, will additionally yield the category name
+    and list of the details provided to the fail method.
 
     Because the exception value must be true, this can be used in a simple
     if statement:
 
-     if( my $exception = $future->failure ) {
-        ...
-     }
-     else {
-        my @result = $future->get;
-        ...
-     }
+       if( my $exception = $future->failure ) {
+          ...
+       }
+       else {
+          my @result = $future->get;
+          ...
+       }
 
  on_fail
 
@@ -451,10 +482,10 @@ USER METHODS
     it immediately. If it completed successfully or was cancelled, it is
     not invoked at all.
 
-    The callback will be passed the exception and details passed to the
-    fail method.
+    The callback will be passed the exception and other details passed to
+    the fail method.
 
-     $on_fail->( $exception, @details )
+       $on_fail->( $exception, $category, @details )
 
     If passed another Future instance, the passed instance will have its
     fail method invoked when the original future fails.
@@ -462,7 +493,7 @@ USER METHODS
     To invoke a done method on a future when another one fails, use a CODE
     reference:
 
-     $future->on_fail( sub { $f->done( @_ ) } );
+       $future->on_fail( sub { $f->done( @_ ) } );
 
     Returns the $future.
 
@@ -514,7 +545,7 @@ SEQUENCING METHODS
     immediately fail with the same failure and the code will not be
     invoked.
 
-     $f2 = $done_code->( @result )
+       $f2 = $done_code->( @result )
 
  else
 
@@ -524,13 +555,13 @@ SEQUENCING METHODS
 
     Returns a new sequencing Future that runs the code if the first fails.
     Once $f1 fails the code reference will be invoked and is passed the
-    failure and details. It should return a future, $f2. Once $f2 completes
-    the sequence future will then be marked as complete with whatever
-    result $f2 gave. If $f1 succeeds then the sequence future will
+    failure and other details. It should return a future, $f2. Once $f2
+    completes the sequence future will then be marked as complete with
+    whatever result $f2 gave. If $f1 succeeds then the sequence future will
     immediately succeed with the same result and the code will not be
     invoked.
 
-     $f2 = $fail_code->( $exception, @details )
+       $f2 = $fail_code->( $exception, $category, @details )
 
  then (2 arguments)
 
@@ -559,7 +590,7 @@ SEQUENCING METHODS
     invoked, being passed the same arguments as a plain else call would
     take, and is expected to return a Future in the same way.
 
-     $f2 = $code->( $exception, $name, @other_details )
+       $f2 = $code->( $exception, $category, @details )
 
     If $f1 does not fail, fails without a category name at all, or fails
     with a category name that does not match any given to the catch method,
@@ -625,9 +656,9 @@ SEQUENCING METHODS
     Returns a new sequencing Future that behaves like then, but also passes
     the original future, $f1, to any functions it invokes.
 
-     $f2 = $done_code->( $f1, @result )
-     $f2 = $catch_code->( $f1, $name, @other_details )
-     $f2 = $fail_code->( $f1, @details )
+       $f2 = $done_code->( $f1, @result )
+       $f2 = $catch_code->( $f1, $category, @details )
+       $f2 = $fail_code->( $f1, $category, @details )
 
     This is useful for conditional execution cases where the code block may
     just return the same result of the original future. In this case it is
@@ -639,7 +670,7 @@ SEQUENCING METHODS
 
        $future = $f->then_done( @result )
     
-       $future = $f->then_fail( $exception, @details )
+       $future = $f->then_fail( $exception, $category, @details )
 
     Since version 0.22.
 
@@ -654,9 +685,9 @@ SEQUENCING METHODS
 
     Returns a new sequencing Future that runs the code if the first fails.
     Identical to else, except that the code reference will be passed both
-    the original future, $f1, and its exception and details.
+    the original future, $f1, and its exception and other details.
 
-     $f2 = $code->( $f1, $exception, @details )
+       $f2 = $code->( $f1, $exception, $category, @details )
 
     This is useful for conditional execution cases where the code block may
     just return the same result of the original future. In this case it is
@@ -668,7 +699,7 @@ SEQUENCING METHODS
 
        $future = $f->else_done( @result )
     
-       $future = $f->else_fail( $exception, @details )
+       $future = $f->else_fail( $exception, $category, @details )
 
     Since version 0.22.
 
@@ -694,7 +725,7 @@ SEQUENCING METHODS
     $f2. Once $f2 completes the sequence future will then be marked as
     complete with whatever result $f2 gave.
 
-     $f2 = $code->( $f1 )
+       $f2 = $code->( $f1 )
 
  without_cancel
 
@@ -937,21 +968,21 @@ TRACING METHODS
     invocation time later on. This could be useful for preserving context
     during logging in a Future-based program.
 
-     our $LOGGING_CTX;
+       our $LOGGING_CTX;
     
-     no warnings 'redefine';
+       no warnings 'redefine';
     
-     my $orig = Future->can( "wrap_cb" );
-     *Future::wrap_cb = sub {
-        my $cb = $orig->( @_ );
+       my $orig = Future->can( "wrap_cb" );
+       *Future::wrap_cb = sub {
+          my $cb = $orig->( @_ );
     
-        my $saved_logging_ctx = $LOGGING_CTX;
+          my $saved_logging_ctx = $LOGGING_CTX;
     
-        return sub {
-           local $LOGGING_CTX = $saved_logging_ctx;
-           $cb->( @_ );
-        };
-     };
+          return sub {
+             local $LOGGING_CTX = $saved_logging_ctx;
+             $cb->( @_ );
+          };
+       };
 
     At this point, any code deferred into a Future by any of its callbacks
     will observe the $LOGGING_CTX variable as having the value it held at
@@ -976,19 +1007,19 @@ EXAMPLES
     called, it provides a placeholder for its eventual result, and a way to
     indicate when it is complete.
 
-     sub foperation
-     {
-        my %args = @_;
+       sub foperation
+       {
+          my %args = @_;
     
-        my $future = Future->new;
+          my $future = Future->new;
     
-        do_something_async(
-           foo => $args{foo},
-           on_done => sub { $future->done( @_ ); },
-        );
+          do_something_async(
+             foo => $args{foo},
+             on_done => sub { $future->done( @_ ); },
+          );
     
-        return $future;
-     }
+          return $future;
+       }
 
     In most cases, the done method will simply be invoked with the entire
     result list as its arguments. In that case, it is convenient to use the
@@ -1005,12 +1036,12 @@ EXAMPLES
     The caller may then use this future to wait for a result using the
     on_ready method, and obtain the result using get.
 
-     my $f = foperation( foo => "something" );
+       my $f = foperation( foo => "something" );
     
-     $f->on_ready( sub {
-        my $f = shift;
-        say "The operation returned: ", $f->get;
-     } );
+       $f->on_ready( sub {
+          my $f = shift;
+          say "The operation returned: ", $f->get;
+       } );
 
  Indicating Success or Failure
 
@@ -1018,17 +1049,17 @@ EXAMPLES
     the failure method can be used in a conditional statement to detect
     success or failure.
 
-     my $f = foperation( foo => "something" );
+       my $f = foperation( foo => "something" );
     
-     $f->on_ready( sub {
-        my $f = shift;
-        if( not my $e = $f->failure ) {
-           say "The operation succeeded with: ", $f->get;
-        }
-        else {
-           say "The operation failed with: ", $e;
-        }
-     } );
+       $f->on_ready( sub {
+          my $f = shift;
+          if( not my $e = $f->failure ) {
+             say "The operation succeeded with: ", $f->get;
+          }
+          else {
+             say "The operation failed with: ", $e;
+          }
+       } );
 
     By using not in the condition, the order of the if blocks can be
     arranged to put the successful case first, similar to a try/catch
@@ -1038,29 +1069,29 @@ EXAMPLES
     failed, it can be used to control a try/catch block directly. (This is
     sometimes called Exception Hoisting).
 
-     use Syntax::Keyword::Try;
+       use Syntax::Keyword::Try;
     
-     $f->on_ready( sub {
-        my $f = shift;
-        try {
-           say "The operation succeeded with: ", $f->get;
-        }
-        catch {
-           say "The operation failed with: ", $_;
-        }
-     } );
+       $f->on_ready( sub {
+          my $f = shift;
+          try {
+             say "The operation succeeded with: ", $f->get;
+          }
+          catch {
+             say "The operation failed with: ", $_;
+          }
+       } );
 
     Even neater still may be the separate use of the on_done and on_fail
     methods.
 
-     $f->on_done( sub {
-        my @result = @_;
-        say "The operation succeeded with: ", @result;
-     } );
-     $f->on_fail( sub {
-        my ( $failure ) = @_;
-        say "The operation failed with: $failure";
-     } );
+       $f->on_done( sub {
+          my @result = @_;
+          say "The operation succeeded with: ", @result;
+       } );
+       $f->on_fail( sub {
+          my ( $failure ) = @_;
+          say "The operation failed with: $failure";
+       } );
 
  Immediate Futures
 
@@ -1068,12 +1099,12 @@ EXAMPLES
     used to generate a Future that is immediately ready with a result. This
     can also be used as a class method.
 
-     my $f = Future->done( $value );
+       my $f = Future->done( $value );
 
     Similarly, the fail and die methods can be used to generate a Future
     that is immediately failed.
 
-     my $f = Future->die( "This is never going to work" );
+       my $f = Future->die( "This is never going to work" );
 
     This could be considered similarly to a die call.
 
@@ -1081,12 +1112,12 @@ EXAMPLES
     might throw an exception, into a Future that would indicate this
     failure.
 
-     my $f = eval { function() } || Future->fail( $@ );
+       my $f = eval { function() } || Future->fail( $@ );
 
     This is neater handled by the call class method, which wraps the call
     in an eval{} block and tests the result:
 
-     my $f = Future->call( \&function );
+       my $f = Future->call( \&function );
 
  Sequencing
 
@@ -1094,13 +1125,13 @@ EXAMPLES
     each one executing and returning a Future when the previous operation
     succeeds.
 
-     my $f = do_first()
-                ->then( sub {
-                   return do_second();
-                })
-                ->then( sub {
-                   return do_third();
-                });
+       my $f = do_first()
+                  ->then( sub {
+                     return do_second();
+                  })
+                  ->then( sub {
+                     return do_third();
+                  });
 
     The result of the $f future itself will be the result of the future
     returned by the final function, if none of them failed. If any of them
@@ -1114,16 +1145,16 @@ EXAMPLES
     A wait_all future may be used to resynchronise control flow, while
     waiting for multiple concurrent operations to finish.
 
-     my $f1 = foperation( foo => "something" );
-     my $f2 = foperation( bar => "something else" );
+       my $f1 = foperation( foo => "something" );
+       my $f2 = foperation( bar => "something else" );
     
-     my $f = Future->wait_all( $f1, $f2 );
+       my $f = Future->wait_all( $f1, $f2 );
     
-     $f->on_ready( sub {
-        say "Operations are ready:";
-        say "  foo: ", $f1->get;
-        say "  bar: ", $f2->get;
-     } );
+       $f->on_ready( sub {
+          say "Operations are ready:";
+          say "  foo: ", $f1->get;
+          say "  bar: ", $f2->get;
+       } );
 
     This provides an ability somewhat similar to CPS::kpar() or
     Async::MergePoint.
@@ -1139,11 +1170,11 @@ KNOWN ISSUES
     In particular, it is unclear in each of the following examples what the
     behaviour of $f2 should be, were $f1 to be cancelled:
 
-     $f2 = $f1->then( sub { ... } ); # plus related ->then_with_f, ...
+       $f2 = $f1->then( sub { ... } ); # plus related ->then_with_f, ...
     
-     $f2 = $f1->else( sub { ... } ); # plus related ->else_with_f, ...
+       $f2 = $f1->else( sub { ... } ); # plus related ->else_with_f, ...
     
-     $f2 = $f1->followed_by( sub { ... } );
+       $f2 = $f1->followed_by( sub { ... } );
 
     In the then-style case it is likely that this situation should be
     treated as if $f1 had failed, perhaps with some special message. The
@@ -1166,12 +1197,12 @@ KNOWN ISSUES
     In particular, it is in clear in each of the following examples what
     the behaviour of $f2 should be, were $f1 to be cancelled:
 
-     my $f_initial = Future->new; ...
-     my $f1 = $f_initial->then( ... );
-     my $f2 = $f_initial->then( ... );
+       my $f_initial = Future->new; ...
+       my $f1 = $f_initial->then( ... );
+       my $f2 = $f_initial->then( ... );
     
-     my $f1 = Future->needs_all( $f_initial );
-     my $f2 = Future->needs_all( $f_initial );
+       my $f1 = Future->needs_all( $f_initial );
+       my $f2 = Future->needs_all( $f_initial );
 
     The point of cancellation propagation is to trace backwards through
     stages of some larger sequence of operations that now no longer need to
@@ -1196,8 +1227,19 @@ KNOWN ISSUES
 
 SEE ALSO
 
+      * Future::AsyncAwait - deferred subroutine syntax for futures
+
+      Provides a neat syntax extension for writing future-based code.
+
+      * Future::IO - Future-returning IO methods
+
+      Provides methods similar to core IO functions, which yield results by
+      Futures.
+
       * Promises - an implementation of the "Promise/A+" pattern for
       asynchronous programming
+
+      A different alternative implementation of a similar idea.
 
       * curry - Create automatic curried method call closures for any class
       or object
@@ -1217,7 +1259,7 @@ SEE ALSO
 
 TODO
 
-      * Consider the ability to pass the constructor an await CODEref,
+      * Consider the ability to pass the constructor a block CODEref,
       instead of needing to use a subclass. This might simplify async/etc..
       implementations, and allows the reuse of the idea of subclassing to
       extend the abilities of Future itself - for example to allow a kind

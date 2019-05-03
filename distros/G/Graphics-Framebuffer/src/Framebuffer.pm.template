@@ -1,4 +1,4 @@
-6.26 Mar 15, 2019
+6.28 May 1, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -964,9 +964,9 @@ sub new {
             last if (defined($self->{'FB_DEVICE'}));
         }
     }
-    $self->{'CONSOLE'} = _slurp('/sys/class/tty/tty0/active');
-    $self->{'CONSOLE'} =~ s/\D+//gs;
-    $self->{'CONSOLE'} += 0;
+    $self->{'CONSOLE'}      = _slurp('/sys/class/tty/tty0/active');
+    $self->{'CONSOLE'}     =~ s/\D+//gs;
+    $self->{'CONSOLE'}     += 0;
     $self->{'THIS_CONSOLE'} = $self->{'CONSOLE'};
     if ( ! defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && $self->{'FB_DEVICE'} !~ /virtual/i && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                                                   # We have to be in binary mode first
@@ -1302,7 +1302,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         bless($self, $class);
     }
     if ($self->{'RESET'}) {
-        $SIG{'QUIT'} = $SIG{'INT'} = \&_reset;
+        $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = \&_reset;
     }
     $self->_gather_fonts('/usr/share/fonts');
     # Loop and find the default font.  One of these should work for Debian and Redhat variants.
@@ -1319,7 +1319,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         sleep $self->{'SPLASH'};
     }
     $self->attribute_reset();
-    if (wantarray) {
+    if (wantarray) { # For the temporarily supported (but no longer) double buffering mode
         return ($self, $self); # For those that coded for double buffering
     }
     return ($self);
@@ -1898,84 +1898,82 @@ sub plot {
         } else {
             $self->rbox({ 'x' => $x - ($width / 2), 'y' => $y - ($height / 2), 'width' => $size, 'height' => $size, 'filled' => TRUE, 'pixel_size' => 1 });
         }
+    } elsif ($self->{'ACCELERATED'}) {
+        c_plot(
+            $self->{'SCREEN'},
+            $x, $y,
+            $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
+            $self->{'INT_COLOR'},
+            $self->{'INT_B_COLOR'},
+            $self->{'COLOR_ALPHA'},
+            $self->{'DRAW_MODE'},
+            $self->{'BYTES'},
+            $self->{'BITS'},
+            $self->{'BYTES_PER_LINE'},
+            $self->{'XOFFSET'}, $self->{'YOFFSET'},
+        );
     } else {
-        if ($self->{'ACCELERATED'}) {
-            c_plot(
-                $self->{'SCREEN'},
-                $x, $y,
-                $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
-                $self->{'INT_COLOR'},
-                $self->{'INT_B_COLOR'},
-                $self->{'COLOR_ALPHA'},
-                $self->{'DRAW_MODE'},
-                $self->{'BYTES'},
-                $self->{'BITS'},
-                $self->{'BYTES_PER_LINE'},
-                $self->{'XOFFSET'}, $self->{'YOFFSET'},
-            );
-        } else {
-            # Only plot if the pixel is within the clipping region
-            unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
-                # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
-                # the history buffer.
-                unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
-                    $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $self->{'BYTES'});
-                    if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $self->{'BYTES'})) {
-                        eval {
-                            $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $self->{'BYTES'};
-                            if ($self->{'DRAW_MODE'} == NORMAL_MODE) {
-                                $c  = $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == XOR_MODE) {
-                                $c ^= $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == OR_MODE) {
-                                $c |= $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == ALPHA_MODE) {
-                                my $back  = $self->get_pixel({ 'x' => $x, 'y' => $y });
-                                my $saved = { 'main' => $self->{'COLOR'} };
-                                foreach my $color (qw( red green blue )) {
-                                    $saved->{$color} = $self->{ 'COLOR_' . uc($color) };
-                                    $back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $self->{'COLOR_ALPHA'}) + ($back->{$color} * (1 - $self->{'COLOR_ALPHA'}));
-                                }
-                                $back->{'alpha'} = min(255, $self->{'COLOR_ALPHA'} + $back->{'alpha'});
-                                $self->set_color($back);
-                                $c = $self->{'COLOR'};
-                                $self->{'COLOR'} = $saved->{'main'};
-                                foreach my $color (qw( red green blue )) {
-                                    $self->{ 'COLOR_' . uc($color) } = $saved->{$color};
-                                }
-                            } elsif ($self->{'DRAW_MODE'} == AND_MODE) {
-                                $c &= $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == ADD_MODE) {
-                                $c += $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == SUBTRACT_MODE) {
-                                $c -= $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == MULTIPLY_MODE) {
-                                $c *= $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == DIVIDE_MODE) {
-                                $c /= $self->{'COLOR'};
-                            } elsif ($self->{'DRAW_MODE'} == MASK_MODE) {
-                                if ($self->{'BITS'} == 32) {
-                                    $c = $self->{'COLOR'} if (substr($self->{'COLOR'}, 0, 3) ne substr($self->{'B_COLOR'}, 0, 3));
-                                } else {
-                                    $c = $self->{'COLOR'} if ($self->{'COLOR'} ne $self->{'B_COLOR'});
-                                }
-                            } elsif ($self->{'DRAW_MODE'} == UNMASK_MODE) {
-                                my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-                                my $raw   = $pixel->{'raw'};
-                                if ($self->{'BITS'} == 32) {
-                                    $c = $self->{'COLOR'} if (substr($raw, 0, 3) eq substr($self->{'B_COLOR'}, 0, 3));
-                                } else {
-                                    $c = $self->{'COLOR'} if ($raw eq $self->{'B_COLOR'});
-                                }
+        # Only plot if the pixel is within the clipping region
+        unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
+            # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
+            # the history buffer.
+            unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
+                $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $self->{'BYTES'});
+                if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $self->{'BYTES'})) {
+                    eval {
+                        $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $self->{'BYTES'};
+                        if ($self->{'DRAW_MODE'} == NORMAL_MODE) {
+                            $c  = $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == XOR_MODE) {
+                            $c ^= $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == OR_MODE) {
+                            $c |= $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == ALPHA_MODE) {
+                            my $back  = $self->get_pixel({ 'x' => $x, 'y' => $y });
+                            my $saved = { 'main' => $self->{'COLOR'} };
+                            foreach my $color (qw( red green blue )) {
+                                $saved->{$color} = $self->{ 'COLOR_' . uc($color) };
+                                $back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $self->{'COLOR_ALPHA'}) + ($back->{$color} * (1 - $self->{'COLOR_ALPHA'}));
                             }
-                            substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) = $c;
-                        };
-                        my $error = $@;
-                        warn __LINE__ . " $error\n" if ($error && $self->{'SHOW_ERRORS'});
-                        $self->_fix_mapping() if ($error);
-                    }
-                    $self->{'history'}->{$y}->{$x} = 1 if (exists($self->{'history'}));
+                            $back->{'alpha'} = min(255, $self->{'COLOR_ALPHA'} + $back->{'alpha'});
+                            $self->set_color($back);
+                            $c = $self->{'COLOR'};
+                            $self->{'COLOR'} = $saved->{'main'};
+                            foreach my $color (qw( red green blue )) {
+                                $self->{ 'COLOR_' . uc($color) } = $saved->{$color};
+                            }
+                        } elsif ($self->{'DRAW_MODE'} == AND_MODE) {
+                            $c &= $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == ADD_MODE) {
+                            $c += $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == SUBTRACT_MODE) {
+                            $c -= $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == MULTIPLY_MODE) {
+                            $c *= $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == DIVIDE_MODE) {
+                            $c /= $self->{'COLOR'};
+                        } elsif ($self->{'DRAW_MODE'} == MASK_MODE) {
+                            if ($self->{'BITS'} == 32) {
+                                $c = $self->{'COLOR'} if (substr($self->{'COLOR'}, 0, 3) ne substr($self->{'B_COLOR'}, 0, 3));
+                            } else {
+                                $c = $self->{'COLOR'} if ($self->{'COLOR'} ne $self->{'B_COLOR'});
+                            }
+                        } elsif ($self->{'DRAW_MODE'} == UNMASK_MODE) {
+                            my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
+                            my $raw   = $pixel->{'raw'};
+                            if ($self->{'BITS'} == 32) {
+                                $c = $self->{'COLOR'} if (substr($raw, 0, 3) eq substr($self->{'B_COLOR'}, 0, 3));
+                            } else {
+                                $c = $self->{'COLOR'} if ($raw eq $self->{'B_COLOR'});
+                            }
+                        }
+                        substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) = $c;
+                    };
+                    my $error = $@;
+                    warn __LINE__ . " $error\n" if ($error && $self->{'SHOW_ERRORS'});
+                    $self->_fix_mapping() if ($error);
                 }
+                $self->{'history'}->{$y}->{$x} = 1 if (exists($self->{'history'}));
             }
         }
     }
@@ -1993,6 +1991,99 @@ Same as 'plot' above
 sub setpixel {
     my $self = shift;
     $self->plot(shift);
+}
+
+=head2 pixel
+
+Returns the color of the pixel at coordinate x,y, if it lies within the clipping region.  It returns undefined if outside of the clipping region.
+
+=over 4
+
+ my $pixel = $fb->pixel({'x' => 20,'y' => 25});
+
+$pixel is a hash reference in the form:
+
+ {
+    'red'   => integer value, # 0 - 255
+    'green' => integer value, # 0 - 255
+    'blue'  => integer value, # 0 - 255
+    'alpha' => integer value, # 0 - 255
+    'raw'   => 16/24/32bit encoded string
+ }
+
+=back
+=cut
+
+sub pixel {
+    my $self   = shift;
+    my $params = shift;
+
+    my $x     = int($params->{'x'});
+    my $y     = int($params->{'y'});
+    my $bytes = $self->{'BYTES'};
+
+    # Values outside of the clipping area return undefined.
+    unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
+        my ($R, $G, $B);
+        my $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
+        my $color = substr($self->{'SCREEN'}, $index, $bytes);
+
+        return($color) if (exists($params->{'raw'})); # Bypass the mess below if floodfill is using this
+
+        my $color_order = $self->{'COLOR_ORDER'};
+        my $A           = $self->{'COLOR_ALPHA'};
+        if ($self->{'BITS'} == 32) {
+            if ($color_order == BGR) {
+                ($B, $G, $R, $A) = unpack("C$bytes", $color);
+            } elsif ($color_order == BRG) {
+                ($B, $R, $G, $A) = unpack("C$bytes", $color);
+            } elsif ($color_order == RGB) {
+                ($R, $G, $B, $A) = unpack("C$bytes", $color);
+            } elsif ($color_order == RBG) {
+                ($R, $B, $G, $A) = unpack("C$bytes", $color);
+            } elsif ($color_order == GRB) {
+                ($G, $R, $B, $A) = unpack("C$bytes", $color);
+            } elsif ($color_order == GBR) {
+                ($G, $B, $R, $A) = unpack("C$bytes", $color);
+            }
+        } elsif ($self->{'BITS'} == 24) {
+            if ($color_order == BGR) {
+                ($B, $G, $R) = unpack("C$bytes", $color);
+            } elsif ($color_order == BRG) {
+                ($B, $R, $G) = unpack("C$bytes", $color);
+            } elsif ($color_order == RGB) {
+                ($R, $G, $B) = unpack("C$bytes", $color);
+            } elsif ($color_order == RBG) {
+                ($R, $B, $G) = unpack("C$bytes", $color);
+            } elsif ($color_order == GRB) {
+                ($G, $R, $B) = unpack("C$bytes", $color);
+            } elsif ($color_order == GBR) {
+                ($G, $B, $R) = unpack("C$bytes", $color);
+            }
+        } elsif ($self->{'BITS'} == 16) {
+            my $C = unpack('S', $color);
+
+            $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}  < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))  & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))  & 63;
+            $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
+            $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}   < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))   & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))   & 63;
+            $R = $R << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
+            $G = $G << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
+            $B = $B << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
+        }
+        return ({ 'red' => $R, 'green' => $G, 'blue' => $B, 'alpha' => $A, 'raw' => $color });
+    }
+    return (undef);
+}
+
+=head2 get_pixel
+
+Returns the color of the pixel at coordinate x,y.  It is the same as 'pixel' above.
+
+=cut
+
+sub get_pixel {
+    my $self = shift;
+    return ($self->pixel(shift));
 }
 
 =head2 last_plot
@@ -3787,11 +3878,11 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
 
     'gradient'    => {  # optional
         'direction' => 'horizontal', # or vertical
-        'colors'    => { # 2 to any number of transitions allowed
+        'colors'    => { # 2 to any number of transitions allowed, and all colors must have the same number of transitions
             'red'   => [255,255,0], # Red to yellow to cyan
             'green' => [0,255,255],
             'blue'  => [0,0,255],
-            'alpha' => [255,255,255],
+            'alpha' => [255,255,255], # Yes, even alpha transparency can vary
         }
     },
     'texture'     => { # Same as what blit_read or load_image returns
@@ -4073,98 +4164,6 @@ Same as set_b_color
 sub set_background_color {
     my $self = shift;
     $self->set_color(shift, 'B_COLOR');
-}
-
-=head2 pixel
-
-Returns the color of the pixel at coordinate x,y.
-
-=over 4
-
- my $pixel = $fb->pixel({'x' => 20,'y' => 25});
-
-$pixel is a hash reference in the form:
-
- {
-    'red'   => integer value, # 0 - 255
-    'green' => integer value, # 0 - 255
-    'blue'  => integer value, # 0 - 255
-    'alpha' => integer value, # 0 - 255
-    'raw'   => 16/24/32bit encoded string
- }
-
-=back
-=cut
-
-sub pixel {
-    my $self   = shift;
-    my $params = shift;
-
-    my $x = int($params->{'x'});
-    my $y = int($params->{'y'});
-
-    # Values outside of the clipping area return undefined.
-    unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
-        my ($R, $G, $B);
-        my $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $self->{'BYTES'});
-        my $color = substr($self->{'SCREEN'}, $index, $self->{'BYTES'});
-
-        return($color) if (exists($params->{'raw'})); # Bypass the mess below if floodfill is using this
-
-        my $color_order = $self->{'COLOR_ORDER'};
-        my $A           = $self->{'COLOR_ALPHA'};
-        if ($self->{'BITS'} == 32) {
-            if ($color_order == BGR) {
-                ($B, $G, $R, $A) = unpack("C$bytes", $color);
-            } elsif ($color_order == BRG) {
-                ($B, $R, $G, $A) = unpack("C$bytes", $color);
-            } elsif ($color_order == RGB) {
-                ($R, $G, $B, $A) = unpack("C$bytes", $color);
-            } elsif ($color_order == RBG) {
-                ($R, $B, $G, $A) = unpack("C$bytes", $color);
-            } elsif ($color_order == GRB) {
-                ($G, $R, $B, $A) = unpack("C$bytes", $color);
-            } elsif ($color_order == GBR) {
-                ($G, $B, $R, $A) = unpack("C$bytes", $color);
-            }
-        } elsif ($self->{'BITS'} == 24) {
-            if ($color_order == BGR) {
-                ($B, $G, $R) = unpack("C$bytes", $color);
-            } elsif ($color_order == BRG) {
-                ($B, $R, $G) = unpack("C$bytes", $color);
-            } elsif ($color_order == RGB) {
-                ($R, $G, $B) = unpack("C$bytes", $color);
-            } elsif ($color_order == RBG) {
-                ($R, $B, $G) = unpack("C$bytes", $color);
-            } elsif ($color_order == GRB) {
-                ($G, $R, $B) = unpack("C$bytes", $color);
-            } elsif ($color_order == GBR) {
-                ($G, $B, $R) = unpack("C$bytes", $color);
-            }
-        } elsif ($self->{'BITS'} == 16) {
-            my $C = unpack('S', $color);
-
-            $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}  < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))  & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))  & 63;
-            $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
-            $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}   < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))   & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))   & 63;
-            $R = $R << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
-            $G = $G << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
-            $B = $B << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
-        }
-        return ({ 'red' => $R, 'green' => $G, 'blue' => $B, 'alpha' => $A, 'raw' => $color });
-    }
-    return (undef);
-}
-
-=head2 get_pixel
-
-Returns the color of the pixel at coordinate x,y.  It is the same as 'pixel' above.
-
-=cut
-
-sub get_pixel {
-    my $self = shift;
-    return ($self->pixel(shift));
 }
 
 =head2 fill

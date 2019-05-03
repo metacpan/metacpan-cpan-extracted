@@ -256,7 +256,9 @@ folder for writing, then the default will be the most recently registered
 type. (If you add more than one type at once, the first of the list is
 used.)
 
-Currently, the types are mbox, mh, maildir, pop3, pop3s, and imap4.
+Currently, the types are C<mbox>, C<mh>, C<maildir>, C<pop3>, C<pop3s>,
+C<imap4>, and C<imap4s>.  You may also use names C<pop>, C<pops>, C<imap>,
+and C<imaps>.
 
 =back
 
@@ -673,8 +675,8 @@ only useful for folders which have write or append access modes
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.006,
-built on February 15, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box distribution version 3.007,
+built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

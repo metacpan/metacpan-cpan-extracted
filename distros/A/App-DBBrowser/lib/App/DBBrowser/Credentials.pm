@@ -3,7 +3,7 @@ App::DBBrowser::Credentials;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Form qw();
 
@@ -16,28 +16,26 @@ sub new {
 
 sub get_login {
     my ( $sf, $key, $info ) = @_;
-    if ( ! $sf->{parameter}{required}{$key} ) {
+    if ( ! exists $sf->{login_data}{$key} ) {
         return;
     }
+    my $default = $sf->{login_data}{$key}{default};
+    my $no_echo = $sf->{login_data}{$key}{secret};
     my $env_var = 'DBI_' . uc $key;
-    if ( $sf->{parameter}{use_env_var}{$env_var} && exists $ENV{$env_var} ) {
+    if ( $sf->{env_var_yes}{$env_var} && exists $ENV{$env_var} ) {
         return $ENV{$env_var}; #
     }
-    elsif ( defined $sf->{parameter}{arguments}{$key} && length $sf->{parameter}{arguments}{$key} ) {
-        my $saved_value = $sf->{parameter}{arguments}{$key};
-        return $saved_value;
+    elsif ( defined $default && length $default ) {
+        return $default;
     }
     else {
-        my $keep_secret = $sf->{parameter}{secret}{$key};
-        my $prompt = ucfirst( $key ) . ':';
+        my $prompt = ucfirst( $key ) . ': ';
         my $trs = Term::Form->new();
         # Readline
-        my $new = $trs->readline( $prompt, { no_echo => $keep_secret, info => $info } );
+        my $new = $trs->readline( $prompt, { no_echo => $no_echo, info => $info } );
         return $new;
     }
 }
-
-
 
 
 

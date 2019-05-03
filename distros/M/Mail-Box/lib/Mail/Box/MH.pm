@@ -8,7 +8,7 @@
 
 package Mail::Box::MH;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Box::Dir';
 

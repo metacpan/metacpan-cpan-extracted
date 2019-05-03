@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.009';
+$Arango::Tango::API::VERSION = '0.010';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
 
@@ -14,38 +14,69 @@ use URI::Encode qw(uri_encode);
 use JSON::Schema::Fit 0.07;
 
 my %API = (
-    create_document   => { method => 'post',   uri => '{{database}}_api/document/{collection}' },
-    delete_collection => { method => 'delete', uri => '{{database}}_api/collection/{name}'     },
-    delete_database   => { method => 'delete', uri => '_api/database/{name}'                 },
-    list_collections  => { method => 'get',    uri => '{{database}}_api/collection'            },
-    cursor_next       => { method => 'put',    uri => '{{database}}_api/cursor/{id}'           },
-    cursor_delete     => { method => 'delete', uri => '{{database}}_api/cursor/{id}'           },
-    list_databases    => { method => 'get',    uri => '_api/database'                        },
-    get_user_databases => { method => 'get' ,  uri => '_api/user/{username}/database',  params => { full => {type => 'boolean' } } },
-    cluster_endpoints => { method => 'get',    uri => '_api/cluster/endpoints'               },
-    engine            => { method => 'get',    uri => '_api/engine'                          },
-    status            => { method => 'get',    uri => '_admin/status'                        },
-    time              => { method => 'get',    uri => '_admin/time'                          },
-    target_version    => { method => 'get',    uri => '_admin/database/target-version'       },
-    statistics        => { method => 'get',    uri => '_admin/statistics'                    },
-    log_level         => { method => 'get',    uri => '_admin/log/level'                     },
-    server_id         => { method => 'get',    uri => '_admin/server/id'                     },
-    server_role       => { method => 'get',    uri => '_admin/server/role'                   },
-    server_mode       => { method => 'get',    uri => '_admin/server/mode'                   },
-    server_availability => { method => 'get',  uri => '_admin/server/availability'           },
-    statistics_description  => { method => 'get', uri => '_admin/statistics-description'     },
-    list_users        => { method => 'get',    uri => '_api/user'                            },
-    get_user          => { method => 'get',    uri => '_api/user/{username}'                 },
-    get_access_level  => { method => 'get',    uri => '_api/user/{username}/database/{database}' },
+    current_database   => { method => 'get',    uri => '_api/database/current'                  },
+    delete_database    => { method => 'delete', uri => '_api/database/{name}'                   },
+    create_document    => { method => 'post',   uri => '{{database}}_api/document/{collection}' },
+    delete_collection  => { method => 'delete', uri => '{{database}}_api/collection/{name}'     },
+    collection_load    => { method => 'put',    uri => '{{database}}_api/collection/{name}/load', params => { count => { type => 'integer' } } },
+    collection_unload  => { method => 'put',    uri => '{{database}}_api/collection/{name}/unload' },
+    collection_truncate  => { method => 'put',  uri => '{{database}}_api/collection/{name}/truncate' },
+    collection_properties => { method => 'get', uri => '{{database}}_api/collection/{name}/properties' },
+    collection_set_properties => { method => 'put', uri => '{{database}}_api/collection/{name}/properties',
+                                   params => {  waitForSync => { type => 'boolean' }, journalSize => { type => 'integer' }}},
+    collection_load_indexes => { method => 'put', uri => '{{database}}_api/collection/{name}/loadIndexesIntoMemory'},
+    collection_recalculate_count => { method => 'put', uri => '{{database}}_api/collection/{name}/recalculateCount' },
+    collection_revision => { method => 'get',   uri => '{{database}}_api/collection/{name}/revision' },
+    collection_rename  => { method => 'put',    uri => '{{database}}_api/collection/{collection}/rename' , params => { name => { type => 'string' } } },
+    collection_info    => { method => 'get',    uri => '{{database}}_api/collection/{name}'     },
+    collection_rotate  => { method => 'put',    uri => '{{database}}_api/collection/{name}/rotate'   },
+    collection_checksum => { method => 'get',   uri => '{{database}}_api/collection/{name}/checksum', params => { withRevisions => { type => 'boolean' }, withData => {type=>'boolean' }}},
+    collection_count   => { method => 'get',    uri => '{{database}}_api/collection/{name}/count',    params => { withRevisions => { type => 'boolean' }, withData => {type=>'boolean' }}},
+    collection_figures => { method => 'get',    uri => '{{database}}_api/collection/{name}/figures',  params => { withRevisions => { type => 'boolean' }, withData => {type=>'boolean' }}},
+    list_collections   => { method => 'get',    uri => '{{database}}_api/collection', params => { excludeSystem => { type => 'boolean' } } },
+    cursor_next        => { method => 'put',    uri => '{{database}}_api/cursor/{id}'           },
+    cursor_delete      => { method => 'delete', uri => '{{database}}_api/cursor/{id}'           },
+    get_user_databases => { method => 'get' ,   uri => '_api/user/{username}/database',  params => { full => {type => 'boolean' } } },
+    cluster_endpoints  => { method => 'get',    uri => '_api/cluster/endpoints'               },
+    engine             => { method => 'get',    uri => '_api/engine'                          },
+    status             => { method => 'get',    uri => '_admin/status'                        },
+    time               => { method => 'get',    uri => '_admin/time'                          },
+    target_version     => { method => 'get',    uri => '_admin/database/target-version'       },
+    statistics         => { method => 'get',    uri => '_admin/statistics'                    },
+    log_level          => { method => 'get',    uri => '_admin/log/level'                     },
+    server_id          => { method => 'get',    uri => '_admin/server/id'                     },
+    server_role        => { method => 'get',    uri => '_admin/server/role'                   },
+    server_mode        => { method => 'get',    uri => '_admin/server/mode'                   },
+    server_availability => { method => 'get',  uri => '_admin/server/availability'            },
+    statistics_description  => { method => 'get', uri => '_admin/statistics-description'      },
+    list_users         => { method => 'get',    uri => '_api/user'                            },
+    get_user           => { method => 'get',    uri => '_api/user/{username}'                 },
+    accessible_databases => { method =>'get',  uri => '_api/database/user'                   },
+    get_access_level   => { method => 'get',    uri => '_api/user/{username}/database/{database}' },
     clear_access_level => { method => 'delete', uri => '_api/user/{username}/database/{database}' },
-    set_access_level  => { method => 'put',    uri => '_api/user/{username}/database/{database}', params => { grant => { type => 'string', enum => [qw'rw ro none'], default => 'none' }}},
+    set_access_level   => { method => 'put',    uri => '_api/user/{username}/database/{database}', params => { grant => { type => 'string', enum => [qw'rw ro none'], default => 'none' }}},
     get_access_level_c => { method => 'get',   uri => '_api/user/{username}/database/{database}/{collection}' },
     clear_access_level_c => { method => 'delete', uri => '_api/user/{username}/database/{database}/{collection}' },
     set_access_level_c => { method => 'put',   uri => '_api/user/{username}/database/{database}/{collection}', params => { grant => { type => 'string', enum => [qw'rw ro none'], default => 'none' }}},
-    'create_database' => {
+    'create_database'  => {
         method  => 'post',
         uri     => '_api/database',
-        params  => { name => { type => 'string' }},
+        params  => {
+            name => { type => 'string' },
+            users => {
+                items => {
+                    type => 'object',
+                    additionalProperties => 0,
+                    properties => {
+                        username => { type => 'string' },
+                        passwd   => { type => 'string'},
+                        active   => { type => 'boolean' },
+                        extra    => { type => 'object', additionalProperties => 1 }
+                    }
+                },
+                type => 'array'
+            }
+        },
         builder => sub {
             my ($self, %params) = @_;
             return Arango::Tango::Database->_new(arango => $self, 'name' => $params{name});
@@ -54,7 +85,30 @@ my %API = (
    'create_collection' => {
         method  => 'post',
         uri     => '{{database}}_api/collection',
-        params  => { name => { type => 'string' }},
+        params  => {
+            keyOptions => { type => 'object', additionalProperties => 0, params => {
+                allowUserKeys => { type => 'boolean' },
+                type          => { type => 'string', default => 'traditional', enum => [qw'traditional autoincrement uuid padded'] },
+                increment     => { type => 'integer' },
+                offset        => { type => 'integer' },
+            }},
+            journalSize       => { type => 'integer' },
+            replicationFactor => { type => 'integer' },
+            waitForSync       => { type => 'boolean' },
+            doCompact         => { type => 'boolean' },
+            shardingStrategy  => {
+                type    => 'string',
+                default => 'community-compat',
+                enum    => ['community-compat', 'enterprise-compat', 'enterprise-smart-edge-compat', 'hash', 'enterprise-hash-smart-edge']},
+            isVolatile        => { type => 'boolean' },
+            shardKeys         => { type => 'array', items => {type => 'string'} },
+            numberOfShards    => { type => 'integer' },
+            isSystem          => { type => 'booean' },
+            type              => { type => 'string', default => '2', enum => ['2', '3'] },
+            indexBuckets      => { type => 'integer' },
+            distributeShardsLike => { type => 'string' },
+            name              => { type => 'string' }
+        },
         builder => sub {
             my ($self, %params) = @_;
             return Arango::Tango::Collection->_new(arango => $self, database => $params{database}, 'name' => $params{name});
@@ -131,12 +185,12 @@ my %API = (
           method => 'get',
           uri => '_admin/log',
           params => {
-              upto   => { type => 'string' },  # fatal, error, warning, info, debug (or 0, 1, 2, 3, 4)
-              level  => { type => 'string' },  # fatal, error, warning, info, debug
+              upto   => { type => 'string', default => 'info', enum => [qw'fatal error warning info debug 0 1 2 3 4'] },
+              level  => { type => 'string', default => 'info', enum => [qw'fatal error warning info debug'] },
               size   => { type => 'integer', minimum => 0 },
               offset => { type => 'integer', minimum => 0 },
               search => { type => 'string' },
-              sort   => { type => 'string' }, # asc, desc
+              sort   => { type => 'string', default => 'asc', enum => [qw'asc desc'] }, # asc, desc
           }
       }
 );
@@ -182,7 +236,7 @@ sub _api {
     }
 
     #use Data::Dumper;
-#print STDERR " -- $API{$action}{method} | $url\n";
+#print STDERR " -- $action | $API{$action}{method} | $url\n";
     #print STDERR "\n\nOPTS:\n\n", Dumper($opts);
 
     my $response = $self->{http}->request($API{$action}{method}, $url, $opts);
@@ -218,7 +272,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 AUTHOR
 

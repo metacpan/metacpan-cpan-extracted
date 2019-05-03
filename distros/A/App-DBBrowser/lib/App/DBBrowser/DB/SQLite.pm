@@ -3,7 +3,7 @@ App::DBBrowser::DB::SQLite;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Encode                qw( encode decode );
 use File::Find            qw( find );
@@ -16,29 +16,27 @@ use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_dirs );
 
 use App::DBBrowser::Auxil;
+use App::DBBrowser::Opt::DBGet;
 
 
 sub new {
-    my ( $class, $info ) = @_;
-    my $self = {
-        driver  => 'SQLite',
-        home_dir => $info->{home_dir},
-        app_dir => $info->{app_dir},
-        reset_search_cache => $info->{reset_search_cache},
-        file_find_warnings => $info->{file_find_warnings},
+    my ( $class, $info, $opt ) = @_;
+    my $sf = {
+        i => $info,
+        o => $opt
     };
-    bless $self, $class;
+    bless $sf, $class;
 }
 
 
 sub get_db_driver {
-    my ( $self ) = @_;
-    return $self->{driver};
+    my ( $sf ) = @_;
+    return 'SQLite';
 }
 
 
 sub set_attributes {
-    my ( $self ) = @_;
+    my ( $sf ) = @_;
     return [
         { name => 'sqlite_unicode',             default => 1, values => [ 0, 1 ] },
         { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
@@ -47,28 +45,30 @@ sub set_attributes {
 
 
 sub get_db_handle {
-    my ( $self, $db, $parameter ) = @_;
-    my $dsn = "dbi:$self->{driver}:dbname=$db";
+    my ( $sf, $db ) = @_;
+    my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
+    my $attributes = $db_opt_get->attributes( $db );
+    my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
     my $dbh = DBI->connect( $dsn, '', '', {
         PrintError => 0,
         RaiseError => 1,
         AutoCommit => 1,
         ShowErrorStatement => 1,
-        %{$parameter->{attributes}},
+        %$attributes,
     } ) or die DBI->errstr;
     return $dbh;
 }
 
 
 sub get_databases {
-    my ( $self ) = @_;
+    my ( $sf ) = @_;
     return \@ARGV if @ARGV;
-    my $cache_sqlite_files = catfile $self->{app_dir}, 'cache_SQLite_files.json';
+    my $cache_sqlite_files = catfile $sf->{i}{app_dir}, 'cache_SQLite_files.json';
     my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
     my $db_cache = $ax->read_json( $cache_sqlite_files );
-    my $dirs = $db_cache->{directories} || [ $self->{home_dir} ];
+    my $dirs = $db_cache->{directories} || [ $sf->{i}{home_dir} ];
     my $databases = $db_cache->{databases} || [];
-    if ( ! $self->{reset_search_cache} && @$databases ) {
+    if ( ! $sf->{i}{sqlite_search} && @$databases ) {
         return $databases;
     }
     my ( $ok, $change ) = ( '- Confirm', '- Change' );
@@ -91,7 +91,7 @@ sub get_databases {
     $databases = [];
     local $| = 1;
     print 'Searching ... ';
-    if ( $self->{file_find_warnings} ) {
+    if ( $sf->{o}{G}{file_find_warnings} ) {
         for my $dir ( @$dirs ) {
             File::Find::find( {
                 wanted => sub {

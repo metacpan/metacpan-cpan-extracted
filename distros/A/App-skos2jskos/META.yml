@@ -35,4 +35,4 @@ resources:
   bugtracker: https://github.com/gbv/skos2jskos/issues
   homepage: https://github.com/gbv/skos2jskos
   repository: https://github.com/gbv/skos2jskos.git
-version: 0.1.7
+version: 0.2.0

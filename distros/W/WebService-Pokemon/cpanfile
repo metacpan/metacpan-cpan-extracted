@@ -1,9 +1,9 @@
-requires 'utf8';
-requires 'strictures';
 requires 'namespace::clean';
+requires 'strictures', '2';
+requires 'utf8';
 
-requires 'Moo';
 requires 'JSON';
+requires 'Moo';
 requires 'REST::Client';
 requires 'Role::REST::Client';
 requires 'Types::Standard';

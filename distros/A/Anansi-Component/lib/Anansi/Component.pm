@@ -70,7 +70,7 @@ manager.  Uses L<Anansi::Actor|Anansi::Actor>.
 =cut
 
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use base qw(Anansi::Class);
 
@@ -422,3 +422,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

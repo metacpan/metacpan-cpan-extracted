@@ -5,7 +5,7 @@ use strict;
 # On The Naming of Modules/NAMES TO AVOID/Top-level namespaces
 # https://pause.perl.org/pause/query?ACTION=pause_namingmodules#Top_level_namespaces
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 1;
 

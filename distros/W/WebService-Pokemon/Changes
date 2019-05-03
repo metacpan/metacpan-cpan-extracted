@@ -1,5 +1,9 @@
 Revision history for WebService-Pokemon
 
+0.11  2019-05-02 21:40:53 +08
+        - Fix missing module version
+        - Replace incorrect environment variable
+
 0.10  2019-05-01 19:57:09 +08
         - Autoload results by choice
         - Remove CHI caching

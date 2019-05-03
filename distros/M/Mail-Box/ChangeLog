@@ -1,6 +1,11 @@
 
 ===== ChangeLog of distribution Mail-Box version 3.*
 
+version 3.007: Fri  3 May 09:38:17 CEST 2019
+
+	Improvements:
+	- recognize imap4s
+
 version 3.006: Fri 15 Feb 09:01:51 CET 2019
 
 	Fixes:

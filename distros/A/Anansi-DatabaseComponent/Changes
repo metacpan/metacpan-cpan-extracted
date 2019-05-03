@@ -9,3 +9,9 @@ Revision history for Perl extension Anansi::DatabaseComponent.
         - modified "validate" to check more module name combinations to improve driver matching.
 0.04  Wed Jun 05 16:39:50 2013
 	- modified "validate" to use the "HANDLE" parameter.
+0.05  Tue Apr 09 16:27:51 2019
+	- modified module dependencies in makefile.
+	- modified README to reflect module dependencies.
+	- added "addChannel" subroutine.
+	- added "removeChannel" subroutine.
+	- modified the POD.

@@ -5,7 +5,7 @@ package Alt::Data::Frame::ButMore;
 use strict;
 use warnings;
 
-our $VERSION = '0.0045'; # VERSION
+our $VERSION = '0.0047'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 =head1 VERSION
 
-version 0.0045
+version 0.0047
 
 =head1 STATUS
 
@@ -85,7 +85,7 @@ As such, it supports marking missing values (C<BAD> values).
 Function signatures in docs of this library follow the
 L<Function::Parameters> conventions, for example,
 
-    function(Type1 $positional_parameter, Type2 :$named_parameter)
+    myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
 
 =head1 CONSTRUCTION
 

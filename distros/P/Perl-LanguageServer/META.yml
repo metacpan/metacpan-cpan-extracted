@@ -27,5 +27,5 @@ requires:
   JSON: '0'
   Moose: '0'
   perl: '5.014'
-version: '0.03'
+version: '0.9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

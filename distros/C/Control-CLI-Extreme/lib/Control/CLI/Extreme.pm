@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -134,7 +134,7 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{sr}		=>	'\x0d? *\x0d([^\n\x0d\x0a]+?)()((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
 	$Prm{trpz}		=>	'([^\n\x0d\x0a]+)[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?([^\n\x0d\x0a]+?)()(?:\((.+?)\))?# $',
-	$Prm{xos}		=>	'(?:\* )?([^\n\x0d\x0a]+)\.\d+ [>#] $',
+	$Prm{xos}		=>	'(?:! )?(?:\* )?(?:\([^\n\x0d\x0a\)]+\) )?([^\n\x0d\x0a]+)\.\d+ [>#] $',
 	$Prm{isw}		=>	'([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?[>#] $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
 );
@@ -147,7 +147,7 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{sr}		=>	'\x0d? *\x0dSWITCHNAME((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
 	$Prm{trpz}		=>	'SWITCHNAME[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?SWITCHNAME(?:\((.+?)\))?# $',
-	$Prm{xos}		=>	'(?:\* )?SWITCHNAME\.\d+ [>#] $',
+	$Prm{xos}		=>	'(?:! )?(?:\* )?(?:\([^\n\x0d\x0a\)]+\) )?SWITCHNAME\.\d+ [>#] $',
 	$Prm{isw}		=>	'SWITCHNAME(?:\((.+?)\))?[>#] $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
 );
@@ -212,13 +212,13 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|% MLT \d+ does not exist or it is not enabled'
 					. '|% No such VLAN'
 					. '|% Bad VLAN list format\.'
-					. '|% View name does not exist'		# snmp-server user admin read-view root write-view root notify-view root
+					. '|% View name does not exist'					# snmp-server user admin read-view root write-view root notify-view root
 					. '|% Partial configuration of \'.+?\' already exists\.'	# same as above
-					. '|% View already exists, you must first delete it\.'	# snmp-server view root 1
-					. '|% User \w+ does not exist'		# no snmp-server user admindes
-					. '|% User \'.+?\' already exists'	# snmp-server user admin md5 passwdvbn read-view root write-view root notify-view root
-					. '|% Password length must be in range:' # username add rwa role-name RW password // rwa // rwa (with password security)
-					. '|% Bad format, use forms:'		# vlan members add 71 1/6-1/7 (1/6-7 is correct)
+					. '|% View already exists, you must first delete it\.'		# snmp-server view root 1
+					. '|% User \w+ does not exist'					# no snmp-server user admindes
+					. '|% User \'.+?\' already exists'				# snmp-server user admin md5 passwdvbn read-view root write-view root notify-view root
+					. '|% Password length must be in range:' 			# username add rwa role-name RW password // rwa // rwa (with password security)
+					. '|% Bad format, use forms:'					# vlan members add 71 1/6-1/7 (1/6-7 is correct)
 				. ')',
 	$Prm{pers}		=>	'^('
 					. '\x07?\s+\^\n.+'
@@ -239,7 +239,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|There are \d+ releases already on system. Please remove 1 to proceed'
 					. '|can\'t \w+ ".+?" 0x\d+'					# delete /flash/.ssh -y : can't remove "/flash/.ssh" 0x300042
 					. '|".+?" is ambiguous in path /'				# AccDist3:5#% do
-					. '|Password change aborted\.'	# Creating snmpv3 usm user with enh-secure-mode and password does not meet complexity requirements
+					. '|Password change aborted\.'					# Creating snmpv3 usm user with enh-secure-mode and password does not meet complexity requirements
 					. '|Invalid password. Authentication failed'			# username teamnoc level ro // invalid-old-pwd // ...
 					. '|Passwords do not match. Password change aborted'		# username teamnoc level ro // valid-old-pwd // newpwd // diffpwd
 					. '|Error: Prefix List ".+?" not found'				# no ip prefix-list "<non-existent>"
@@ -264,6 +264,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 				. ')',
 	$Prm{xos}		=>	'^('
 					. '\x07?\s+\^\n.+'
+					. '|Error: .*(?:already|not)'
 				. ')',
 	$Prm{isw}		=>	'^('
 					. '\s+\^\n.+'
@@ -2353,7 +2354,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				$self->_setAttrib('fw_version', $1);
 				$self->_setAttrib('sw_version', $2);
 			};
-			$$outref =~ /sysName: +(\S+)/gc && $self->_setAttrib('sysname', $1); # \S avoids match when field is blank
+			$$outref =~ /sysName: +(\S.*)/gc && $self->_setAttrib('sysname', $1); # \S avoids match when field is blank
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -2556,7 +2557,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /SysName:          (.+)/g && $self->_setAttrib('sysname', $1);
 			$$outref =~ /System MAC:       (.+)/g && $self->_setBaseMacAttrib($1);
-			$$outref =~ /System Type:      (\S+)( \(Stack\))?/g && $self->_setModelAttrib($1);
+			$$outref =~ /System Type:      (?:VPEX )?(\S+)( \(Stack\))?/g && $self->_setModelAttrib($1);
 			$self->_setAttrib('switch_mode', 'Stack') if defined $2;
 			$$outref =~ /Image Booted:     (primary|secondary)/ && do {
 				if ($1 eq 'primary') {
@@ -3579,7 +3580,7 @@ sub _setSlotPortAttrib { # Set the Slot & Port attributes
 	# Get current attribute if partly stored
 	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
 	@ports = @{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
-	while ($$outref =~ /^(?:\s*|interface\s+ethernet|gig)?(?:(\d{1,2})[\/:])?(\d{1,2}(?:\/\d{1,2})?)/mg) {
+	while ($$outref =~ /^(?:\s*|interface\s+ethernet|gig)?(?:(\d{1,3})[\/:])?([\ds]\d?(?:\/\d{1,2})?)/mg) {
 		if (defined $1 && (!defined $currentSlot || $1 != $currentSlot)) { # New slot
 			$currentSlot = $1;
 			push(@slots, $currentSlot) unless grep {$_ eq $currentSlot} @slots;
@@ -3936,7 +3937,11 @@ XOS Summit switches
 
 =item *
 
-VSP 4000, 7000, 7200, 8000, 9000
+VSP 1x00, 4x00, 7x00, 8x00, 9000
+
+=item *
+
+ERS models 2500, 3x00, 4x00, 5x00
 
 =item *
 
@@ -3945,10 +3950,6 @@ APLS DSG models 6248, 7648, 7480, 8032, 9032
 =item *
 
 ERS/Passport models 1600, 8300, 8600, 8800
-
-=item *
-
-ERS models 2500, 3x00, 4x00, 5x00
 
 =item *
 
@@ -6103,7 +6104,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Ludovico Stevens.
+Copyright 2019 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

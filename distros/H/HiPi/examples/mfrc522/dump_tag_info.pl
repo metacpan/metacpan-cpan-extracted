@@ -18,7 +18,7 @@ sub handle_scan {
 }
 
 sub handle_timeout {
-    warn q(timeout called);
+    #warn q(timeout called);
     return 1;
 }
 

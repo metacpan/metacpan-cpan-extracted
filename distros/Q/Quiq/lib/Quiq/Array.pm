@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.138;
+our $VERSION = 1.139;
 
 use Encode ();
 use Quiq::Reference;
@@ -244,7 +244,9 @@ sub exists {
 =head4 Synopsis
 
     $val = $arr->extractKeyVal($key);
+    $val = $arr->extractKeyVal($key,$step);
     $val = $class->extractKeyVal(\@arr,$key);
+    $val = $class->extractKeyVal(\@arr,$key,$step);
 
 =head4 Alias
 
@@ -252,10 +254,12 @@ extractPair()
 
 =head4 Description
 
-Durchsuche @arr paarweise nach Element $key und liefere das folgende
+Durchsuche @arr nach Element $key und liefere das folgende
 Element $val. Beide Elemente werden aus @arr entfernt. Kommt $key
 in @arr nicht vor, liefere undef und lasse @arr unverändert.
-Vergleichsoperator ist eq.
+Vergleichsoperator ist eq. Per Default wird das Array paarweise
+durchsucht, d.h. der Defaultwert für $step ist 2. Wird $step auf
+1 gesetzt, kann jedes Element den gesuchten $key enthalten.
 
 =cut
 
@@ -264,8 +268,9 @@ Vergleichsoperator ist eq.
 sub extractKeyVal {
     my $arr = ref $_[0]? CORE::shift: CORE::splice @_,0,2;
     my $key = CORE::shift;
+    my $step = CORE::shift // 2;
 
-    for (my $i = 0; $i < @$arr; $i += 2) {
+    for (my $i = 0; $i < @$arr; $i += $step) {
         if ($arr->[$i] eq $key) {
             return scalar CORE::splice @$arr,$i,2;
         }
@@ -643,6 +648,58 @@ sub sort {
 
 # -----------------------------------------------------------------------------
 
+=head3 toHash() - Erzeuge Hash aus Array
+
+=head4 Synopsis
+
+    %hash | $hashH = $arr->toHash;
+    %hash | $hashH = $arr->toHash($val);
+    %hash | $hashH = $class->toHash(\@arr);
+    %hash | $hashH = $class->toHash(\@arr,$val);
+
+=head4 Arguments
+
+=over 4
+
+=item @$arr, @arr
+
+Array.
+
+=item $val (Default: 1)
+
+Wert.
+
+=back
+
+=head4 Returns
+
+Hash. Im Skalarkontext wird eine Referenz auf den Hash geliefert.
+
+=head4 Description
+
+    Erzeuge aus Array @$arr bzw. @arr einen Hash mit den Werten des Array
+    als Schlüssel und dem Wert $val als deren Werte und liefere diesen zurück.
+    Ist $val nicht angegeben, werden alle Werte des Hash auf 1 gesetzt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub toHash {
+    my $arr = ref $_[0]? CORE::shift: CORE::splice @_,0,2;
+    my $val = shift // 1;
+
+    # FIXME: Ist das schneller?
+    # my %hash;
+    # @hash{@$arr} = ($val) x @$arr;
+
+    my %hash = map {$_=>$val} @$arr;
+
+    return wantarray? %hash: \%hash;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Numerische Operationen
 
 =head3 gcd() - Größter gemeinsamer Teiler
@@ -1003,7 +1060,7 @@ sub restore {
 
 =head1 VERSION
 
-1.138
+1.139
 
 =head1 AUTHOR
 

@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.200    2019-05-03
+        - New plugin API
+        - Perl minimum version 5.10.1;
+        - Enable option menu_memory by default.
+        - Create and drop views.
+        - Subqueries: no clause type distinction.
+
 2.071    2019-04-18
         - extensions: fixed spelling error.
         - choose_a_subset: replaced removed option.

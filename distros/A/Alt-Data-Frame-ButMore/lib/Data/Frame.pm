@@ -497,7 +497,7 @@ sub add_column {
 
 method copy () { 
     return ref($self)->new(
-        columns   => $self->names->map( sub { $_ => $self->at($_)->copy } ), 
+        columns   => $self->names->map( sub { $_ => $self->column($_)->copy } ),
         row_names => $self->row_names->copy
     );
 }
@@ -1051,7 +1051,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0045
+version 0.0047
 
 =head1 STATUS
 
@@ -1115,7 +1115,7 @@ As such, it supports marking missing values (C<BAD> values).
 Function signatures in docs of this library follow the
 L<Function::Parameters> conventions, for example,
 
-    function(Type1 $positional_parameter, Type2 :$named_parameter)
+    myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
 
 =head1 CONSTRUCTION
 

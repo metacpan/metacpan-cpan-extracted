@@ -42,16 +42,16 @@ Anansi::DatabaseComponent - A manager template for database drivers.
         return Anansi::DatabaseComponent::validate(undef, %parameters);
     }
 
-    Anansi::Component::addChannel('Anansi::Database::Example', 'AUTOCOMMIT' => 'Anansi::DatabaseComponent::autocommit');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'COMMIT' => 'Anansi::DatabaseComponent::commit');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'CONNECT' => 'connect');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'DISCONNECT' => 'Anansi::DatabaseComponent::disconnect');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'FINISH' => 'Anansi::DatabaseComponent::finish');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'HANDLE' => 'Anansi::DatabaseComponent::handle');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'PREPARE' => 'Anansi::DatabaseComponent::prepare');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'ROLLBACK' => 'Anansi::DatabaseComponent::rollback');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'STATEMENT' => 'Anansi::DatabaseComponent::statement');
-    Anansi::Component::addChannel('Anansi::Database::Example', 'VALIDATE_AS_APPROPRIATE' => 'validate'); 
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'AUTOCOMMIT' => 'Anansi::DatabaseComponent::autocommit');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'COMMIT' => 'Anansi::DatabaseComponent::commit');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'CONNECT' => 'connect');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'DISCONNECT' => 'Anansi::DatabaseComponent::disconnect');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'FINISH' => 'Anansi::DatabaseComponent::finish');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'HANDLE' => 'Anansi::DatabaseComponent::handle');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'PREPARE' => 'Anansi::DatabaseComponent::prepare');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'ROLLBACK' => 'Anansi::DatabaseComponent::rollback');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'STATEMENT' => 'Anansi::DatabaseComponent::statement');
+    Anansi::DatabaseComponent::addChannel('Anansi::Database::Example', 'VALIDATE_AS_APPROPRIATE' => 'validate'); 
 
     1;
 
@@ -102,7 +102,7 @@ closing and various SQL interactions.  Uses L<Anansi::Actor>.
 =cut
 
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base qw(Anansi::Component);
 
@@ -151,7 +151,7 @@ See L<Anansi::Class::import|Anansi::Class/"import"> for details.
 
 =head3 initialise
 
-See L<Anansi::Class::initialise|Anansi::Class/"initialise"> for details.  A virtual method.
+See L<Anansi::Class::initialise|Anansi::Class/"initialise"> for details.  Overridden by L<Anansi::DatabaseComponent::initialise|Anansi::DatabaseComponent/"initialise">.  A virtual method.
 
 =cut
 
@@ -207,7 +207,7 @@ See L<Anansi::Class|Anansi::Class> for details.  A parent module of L<Anansi::Co
 
 =head3 addChannel
 
-See L<Anansi::Component::addChannel|Anansi::Component/"addChannel"> for details.
+See L<Anansi::Component::addChannel|Anansi::Component/"addChannel"> for details.  Overridden by L<Anansi::DatabaseComponent::addChannel|Anansi::DatabaseComponent/"addChannel">.
 
 =cut
 
@@ -228,9 +228,22 @@ See L<Anansi::Component::componentManagers|Anansi::Component/"componentManagers"
 
 =head3 removeChannel
 
-See L<Anansi::Component::removeChannel|Anansi::Component/"removeChannel"> for details.
+See L<Anansi::Component::removeChannel|Anansi::Component/"removeChannel"> for details.  Overridden by L<Anansi::DatabaseComponent::removeChannel|Anansi::DatabaseComponent/"removeChannel">.
 
 =cut
+
+
+=head2 addChannel
+
+Overrides L<Anansi::Component::addChannel|Anansi::Component/"addChannel">.
+
+=cut
+
+
+sub addChannel {
+    my ($self, %parameters) = @_;
+    return $self->SUPER::addChannel((%parameters));
+}
 
 
 =head2 autoCommit
@@ -282,7 +295,7 @@ sub autocommit {
     return 0;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'AUTOCOMMIT' => 'autocommit');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'AUTOCOMMIT' => 'autocommit');
 
 
 =head2 bind
@@ -479,7 +492,7 @@ sub commit {
     return 0;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'COMMIT' => 'commit');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'COMMIT' => 'commit');
 
 
 =head2 connect
@@ -787,7 +800,7 @@ sub connect {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'CONNECT' => 'connect');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'CONNECT' => 'connect');
 
 
 =head2 disconnect
@@ -838,7 +851,7 @@ sub disconnect {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'DISCONNECT' => 'disconnect');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'DISCONNECT' => 'disconnect');
 
 
 =head2 finalise
@@ -930,7 +943,7 @@ sub finish {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'FINISH' => 'finish');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'FINISH' => 'finish');
 
 
 =head2 handle
@@ -983,7 +996,7 @@ sub handle {
     return;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'HANDLE' => 'handle');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'HANDLE' => 'handle');
 
 
 =head2 initialise
@@ -1127,7 +1140,20 @@ sub prepare {
     return ${$self->{STATEMENTS}}{$parameters{STATEMENT}};
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'PREPARE' => 'prepare');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'PREPARE' => 'prepare');
+
+
+=head2 removeChannel
+
+Overrides L<Anansi::Component::removeChannel|Anansi::Component/"removeChannel">.
+
+=cut
+
+
+sub removeChannel {
+    my ($self, %parameters) = @_;
+    return $self->SUPER::removeChannel((%parameters));
+}
 
 
 =head2 rollback
@@ -1180,7 +1206,7 @@ sub rollback {
     return 0;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'ROLLBACK' => 'rollback');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'ROLLBACK' => 'rollback');
 
 
 =begin comment
@@ -1466,7 +1492,7 @@ sub script {
     block($variables, (@{$parameters{SCRIPT}}));
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'SCRIPT' => 'script');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'SCRIPT' => 'script');
 
 ################################################################################
 
@@ -1620,7 +1646,7 @@ sub statement {
     return $result;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'STATEMENT' => 'statement');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'STATEMENT' => 'statement');
 
 
 =head2 validate
@@ -1795,7 +1821,7 @@ sub validate {
     return 1;
 }
 
-Anansi::Component::addChannel('Anansi::DatabaseComponent', 'VALIDATE_AS_APPROPRIATE' => 'validate');
+Anansi::DatabaseComponent::addChannel('Anansi::DatabaseComponent', 'VALIDATE_AS_APPROPRIATE' => 'validate');
 
 
 =head1 NOTES
@@ -1816,3 +1842,4 @@ Kevin Treleaven <kevin I<AT> treleaven I<DOT> net>
 
 
 1;
+

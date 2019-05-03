@@ -12,13 +12,12 @@ use namespace::autoclean;
 sub configure {
     my ($self) = @_;
 
-    my $pod_finder = $self->payload->{pod_finder} || ':InstallModules';
-
     $self->add_bundle( 'Filter' => {
         -bundle => '@Basic',
         -remove => [ qw(
             MetaYAML
             UploadToCPAN
+            GatherDir
         ) ]
     } );
 
@@ -29,10 +28,13 @@ sub configure {
         'Prereqs::FromCPANfile',
         'ReadmeAnyFromPod',
 
-        'StaticInstall',
+        [   'StaticInstall' => $self->config_slice(
+            {   static_install_mode    => 'mode',
+                static_install_dry_run => 'dry_run',
+            }
+        ) ],
 
         [   'PodWeaver' => {
-                finder             => $pod_finder,
                 replacer           => 'replace_with_comment',
                 post_code_replacer => 'replace_with_nothing',
                 config_plugin      => [ '@Default', 'Contributors' ]
@@ -52,6 +54,7 @@ sub configure {
         'Git::Push',
 
         'Git::Contributors',
+        'Git::GatherDir',
 
         'GitHub::Meta',
         'Author::GSG::GitHub::UploadRelease',
@@ -117,7 +120,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.6
 
 =head1 SYNOPSIS
 
@@ -140,6 +143,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     -bundle = @Basic
     -remove = MetaYAML
     -remove = UploadToCPAN
+    -remove = GatherDir
 
     # The defaults for author and license come from
     #[Author::GSG]
@@ -149,9 +153,10 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [ReadmeAnyFromPod]
 
     [StaticInstall]
+    # mode    from static_install_mode
+    # dry_run from static_install_dry_run
 
     [Pod::Weaver]
-    finder = :InstallModules
     replacer = replace_with_comment
     post_code_replacer = replace_with_nothing
     config_plugin = [ @Default, Contributors ]
@@ -167,6 +172,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [Git::Push]
 
     [Git::Contributors]
+    [Git::GatherDir]
 
     [GitHub::Meta]
     [GitHub::UploadRelease] # plus magic to work without releasing elsewhere
@@ -195,6 +201,20 @@ You can set a specific release version with the C<V> environment variable,
 as described in the
 L<Git::NextVersion Plugin|Dist::Zilla::Plugin::Git::NextVersion> documentation.
 
+=head1 ATTRIBUTES / PARAMETERS
+
+=over
+
+=item static_install_mode
+
+Passed to L<Dist::Zilla::Plugin::StaticInstall> as C<mode>.
+
+=item static_install_dry_run
+
+Passed to L<Dist::Zilla::Plugin::StaticInstall> as C<dry_run>.
+
+=back
+
 =head1 Setting up a new dist
 
 =head2 Create your dist.ini
@@ -202,12 +222,10 @@ L<Git::NextVersion Plugin|Dist::Zilla::Plugin::Git::NextVersion> documentation.
 As above, you need the C<name> and C<[@Author::GSG]> bundle,
 plus any other changes you need.
 
-You can override L<Pod::Weaver>'s C<finder> by setting C<pod_finder>.
-
 =head2 Add Dist::Zilla::PluginBundle::Author::GSG to your cpanfile
 
     on 'develop' => sub {
-        requires 'Dist::Zilla::PluginBundle::Author::GSG',
+        requires 'Dist::Zilla::PluginBundle::Author::GSG';
     };
 
 Doing this in the C<develop> phase will cause the default Makefile

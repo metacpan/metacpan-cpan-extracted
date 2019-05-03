@@ -1,0 +1,37 @@
+=head1 NAME
+
+XML::Sig::OO - Modern XML Signatured validation
+
+=head1 DESCRIPTION
+
+L<XML::Sig::OO> is a project to create a stand alone perl module that does a good job creating and validating xml signatures.  At its core  This module is written around libxml2 better known as L<XML::LibXML>. 
+
+=head1 SYNOPSIS
+
+  use XML::Sig::OO;
+
+  my $s=new XML::Sig::OO(xml=>'<?xml version="1.0" standalone="yes"?><data><test ID="A" /><test ID="B" /></data>',key_file=>'x509_key.pem');
+  my $result=$s->sign;
+  die "Failed to sign the xml, error was: $result" unless $result;
+
+  my $xml=$result->get_data;
+  # Example checking a signature
+  my $v=new XML::Sig::OO(xml=>$xml);
+
+  my $result=$v->validate;
+
+  if($result) {
+    print "everything checks out!\n";
+  } else {
+    foreach my $chunk (@{$result->get_data}) {
+      my ($nth,$signature,$digest)=@{$chunk}{qw(nth signature digest)};
+
+      print "Results for processing chunk $nth\n";
+      print "Signature State: ".($signature ? "OK\n" : "Failed, error was $signature\n");
+      print "Digest State: ".($digest ? "OK\n" : "Failed, error was $digest\n");
+    }
+  }
+
+=head1 Limitations
+
+Currently this module only supports the use of RSA and DSA keys.

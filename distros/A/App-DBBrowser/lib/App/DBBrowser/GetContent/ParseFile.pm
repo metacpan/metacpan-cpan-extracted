@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::ParseFile;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Encode qw( decode );
 
@@ -30,7 +30,6 @@ sub new {
 
 sub __parse_file_Text_CSV { # 0
     my ( $sf, $sql, $fh ) = @_;
-    local $SIG{INT} = sub { unlink $sf->{i}{f_tmp_copy_paste}; exit };
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -69,7 +68,6 @@ sub __parse_file_Text_CSV { # 0
 
 sub __parse_file_split { # 1
     my ( $sf, $sql, $fh ) = @_;
-    local $SIG{INT} = sub { unlink $sf->{i}{f_tmp_copy_paste}; exit };
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -130,7 +128,6 @@ sub __parse_file_Spreadsheet_Read { # 2
         my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
         my @pre = ( undef );
         my $choices = [ @pre, @sheets ];
-        $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
         $sheet_idx = choose( # m
             $choices,
@@ -144,11 +141,8 @@ sub __parse_file_Spreadsheet_Read { # 2
                 $sf->{i}{old_sheet_idx} = 0;
                 return $book, $sheet_count;
             }
-            else {
-                $sf->{i}{old_sheet_idx} = $sheet_idx;
-            }
+            $sf->{i}{old_sheet_idx} = $sheet_idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         $sheet_idx = $sheet_idx - @pre + 1;
     }
     if ( $book->[$sheet_idx]{maxrow} == 0 ) {

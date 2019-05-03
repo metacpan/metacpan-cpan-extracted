@@ -61,6 +61,7 @@ t/40-csv.t
 t/41-example_data.t
 t/42-advanced.t
 t/50-sugar.t
+t/51-eval.t
 t/author-pod-syntax.t
 t/basic.t
 t/failures.t

@@ -5,7 +5,8 @@ use Test::Warnings qw(warning);
 
 use Mojolicious::Plugin::Statsd::Adapter::Statsd;
 
-package Mock::Socket {
+{
+  package Mock::Socket;
   use Mojo::Base -base;
 
   our $truncate_send = 0;

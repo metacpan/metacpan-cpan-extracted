@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.05';
+$VERSIONE = '0.06';
 use strict;
 use FindBin;
 use File::Path;
@@ -43,7 +43,7 @@ C:\> pmake install
 C:\> pmake ptar
 C:\> pmake pwget
 C:\> pmake Makefile.PL
-C:\> pmake META.yml
+C:\> pmake META(.yml|.json)?
 C:\> pmake LICENSE
 C:\> pmake dist
 END
@@ -60,7 +60,7 @@ $ ./pmake.bat install
 $ ./pmake.bat ptar
 $ ./pmake.bat pwget
 $ ./pmake.bat Makefile.PL
-$ ./pmake.bat META.yml
+$ ./pmake.bat META(.yml|.json)?
 $ ./pmake.bat LICENSE
 $ ./pmake.bat dist
 
@@ -168,7 +168,7 @@ __END__
 END
         close(FH_MAKEFILEPL);
     }
-    elsif ($target eq 'META.yml') {
+    elsif ($target =~ /^META(\.yml|\.json)?$/) {
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
         chomp(my $name_as_filesystem = <FH_MANIFEST>);
         close(FH_MANIFEST);
@@ -188,12 +188,14 @@ END
         open(FH_NAME,$name_as_filesystem) || die "Can't open file: $name_as_filesystem.\n";
         while (<FH_NAME>) {
             if ($version eq '') {
-                if (/\$VERSION\s*=\s*([^;]+);/) {
+                if (/^#/) {
+                }
+                elsif (/\$VERSION\s*=\s*([^;]+);/) {
                     $version = eval "$1";
                 }
             }
             if ($abstract eq '') {
-                if (/^$name_as_perlsyntax\s+-\s+(.+)/) {
+                if (/\b$name_as_perlsyntax\s+-\s+(.+)/) {
                     $abstract = $1;
                 }
             }
@@ -206,6 +208,7 @@ END
         die "'VERSION' not found.\n"             unless $version;
         die "'ABSTRACT' not found.\n"            unless $abstract;
 
+        # write META.yml
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
         printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract);
@@ -237,8 +240,101 @@ build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: mailto:ina@cpan.org
 END
         close(FH_METAYML);
+
+        # write META.json
+        open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
+        binmode FH_METAJSON;
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract);
+{
+    "name" : "%s",
+    "version" : "%s",
+    "abstract" : "%s",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "repository" : [
+            "mailto:ina@cpan.org"
+        ]
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        }
+    }
+}
+END
+        close(FH_METAJSON);
     }
     elsif ($target eq 'LICENSE') {
         open(FH_LICENSE,'>LICENSE') || die "Can't open file: LICENSE\n";

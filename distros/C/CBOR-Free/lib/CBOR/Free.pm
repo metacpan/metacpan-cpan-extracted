@@ -53,15 +53,15 @@ Notes on mapping Perl to CBOR:
 
 =over
 
-=item The internal state of a defined Perl scalar (e.g., whether it’s an
+=item * The internal state of a defined Perl scalar (e.g., whether it’s an
 integer, float, binary string, or UTF-8 string) determines its CBOR
 encoding.
 
-=item L<Types::Serialiser> booleans are encoded as CBOR booleans.
+=item * L<Types::Serialiser> booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
 undefined.)
 
-=item Instances of L<CBOR::Free::Tagged> are encoded as tagged values.
+=item * Instances of L<CBOR::Free::Tagged> are encoded as tagged values.
 
 =back
 
@@ -111,13 +111,13 @@ Floating-point numbers are encoded in CBOR as IEEE 754 half-, single-,
 or double-precision. If your Perl is compiled to use “long double”
 floating-point numbers, you may see rounding errors when converting
 to/from CBOR. If that’s a problem for you, append an empty string to
-your floating-point numbers, which will cause CBOR to encode
+your floating-point numbers, which will cause CBOR::Free to encode
 them as strings.
 
 =head1 INTEGER LIMITS
 
-CBOR handles up to 64-bit unsigned and signed integers. Most Perls
-nowadays can handle this just fine, but if yours can’t then you’ll
+CBOR handles up to 64-bit positive and negative integers. Most Perls
+nowadays can handle 64-bit integers, but if yours can’t then you’ll
 get an exception whenever trying to parse an integer that can’t be
 represented with 32 bits. This means:
 
@@ -131,12 +131,14 @@ represented with 32 bits. This means:
 
 Note that even 64-bit Perls can’t parse negatives that are less than
 -0x8000_0000_0000_0000 (-9,223,372,036,854,775,808); these also prompt an
-exception since Perl can’t handle them.
+exception since Perl can’t handle them. (It would be possible to load
+L<Math::BigInt> to handle these; if that’s desirable for you,
+file a feature request.)
 
 =head1 ERROR HANDLING
 
 Most errors are represented via instances of subclasses of
-L<CBOR::Free::X>.
+L<CBOR::Free::X>, which subclasses L<X::Tiny::Base>.
 
 =head1 AUTHOR
 
@@ -148,9 +150,9 @@ This code is licensed under the same license as Perl itself.
 
 =head1 SEE ALSO
 
-L<CBOR::XS> is an older CBOR module on CPAN. It implements
-some behaviors around CBOR tagging that you might find useful.
-Its maintainer has L<abandoned support for Perl versions from 5.22
+L<CBOR::XS> is an older CBOR module on CPAN. It’s got more bells and
+whistles, so check it out if CBOR::Free lacks a feature you’d like.
+Note that L<its maintainer has abandoned support for Perl versions from 5.22
 onward|http://blog.schmorp.de/2015-06-06-stableperl-faq.html>, though,
 and its GPL license limits its usefulness in
 commercial L<perlcc|https://metacpan.org/pod/distribution/B-C/script/perlcc.PL>
@@ -170,7 +172,7 @@ use CBOR::Free::Tagged;
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.04';
+    $VERSION = '0.06';
     XSLoader::load();
 }
 

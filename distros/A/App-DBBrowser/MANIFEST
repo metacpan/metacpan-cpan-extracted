@@ -14,8 +14,10 @@ lib/App/DBBrowser/GetContent.pm
 lib/App/DBBrowser/GetContent/Filter.pm
 lib/App/DBBrowser/GetContent/ParseFile.pm
 lib/App/DBBrowser/Join.pm
-lib/App/DBBrowser/Opt.pm
-lib/App/DBBrowser/OptDB.pm
+lib/App/DBBrowser/Opt/DBGet.pm
+lib/App/DBBrowser/Opt/DBSet.pm
+lib/App/DBBrowser/Opt/Get.pm
+lib/App/DBBrowser/Opt/Set.pm
 lib/App/DBBrowser/Subqueries.pm
 lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/Extensions.pm

@@ -1,5 +1,5 @@
 package Disbatch;
-$Disbatch::VERSION = '4.102';
+$Disbatch::VERSION = '4.103';
 use 5.12.0;
 use warnings;
 
@@ -422,7 +422,7 @@ Disbatch - a scalable distributed batch processing framework using MongoDB.
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 SUBROUTINES
 

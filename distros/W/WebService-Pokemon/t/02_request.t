@@ -7,8 +7,8 @@ use Test::More;
 use WebService::Pokemon;
 
 BEGIN {
-    unless ($ENV{SWAPI_LIVE}) {
-        plan skip_all => '$ENV{SWAPI_LIVE} not set, skipping live tests'
+    unless ($ENV{POKEAPI_LIVE}) {
+        plan skip_all => '$ENV{POKEAPI_LIVE} not set, skipping live tests'
     }
 }
 

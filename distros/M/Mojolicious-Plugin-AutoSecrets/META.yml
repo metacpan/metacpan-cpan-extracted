@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,14 +15,16 @@ name: Mojolicious-Plugin-AutoSecrets
 provides:
   Mojolicious::Plugin::AutoSecrets:
     file: lib/Mojolicious/Plugin/AutoSecrets.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Mojolicious: '7.15'
   Session::Token: '1.503'
-  perl: v5.10.0
+  autodie: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/merrilymeredith/p5-Mojolicious-Plugin-AutoSecrets/issues
   homepage: http://search.cpan.org/dist/Mojolicious-Plugin-AutoSecrets/
   repository: git://github.com/merrilymeredith/p5-Mojolicious-Plugin-AutoSecrets.git
-version: '0.005'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.006'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

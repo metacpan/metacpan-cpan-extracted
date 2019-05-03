@@ -1,5 +1,5 @@
 package Disbatch::Web::V3;
-$Disbatch::Web::V3::VERSION = '4.102';
+$Disbatch::Web::V3::VERSION = '4.103';
 use 5.12.0;
 use warnings;
 
@@ -315,7 +315,7 @@ Disbatch::Web::V3 - Disbatch::Web routes for deprecated v3 API
 
 =head1 VERSION
 
-version 4.102
+version 4.103
 
 =head1 DEPRECATION NOTICE
 

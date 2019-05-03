@@ -124,8 +124,11 @@ Which CLASS (extending C<Mail::Transport>) will transport the data.
 Some predefined NAMEs avoid long class names: C<mail> and C<mailx>
 are handled by the L<Mail::Transport::Mailx|Mail::Transport::Mailx> module, C<sendmail>
 and C<postfix> belong to L<Mail::Transport::Sendmail|Mail::Transport::Sendmail>, and C<smtp>
-is implemented in L<Mail::Transport::SMTP|Mail::Transport::SMTP>.  The C<pop> or C<pop3>
-protocol implementation can be found in L<Mail::Transport::POP3|Mail::Transport::POP3>.
+is implemented in L<Mail::Transport::SMTP|Mail::Transport::SMTP>.
+
+The C<pop> or C<pop3> protocol implementation can be found distribution
+L<Mail::Transport::POP3|Mail::Transport::POP3>.  For C<imap> or C<imap4>, install
+L<Mail::Transport::IMAP4|Mail::Transport::IMAP4>.
 
 =back
 
@@ -256,12 +259,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.003,
-built on September 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport distribution version 3.004,
+built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

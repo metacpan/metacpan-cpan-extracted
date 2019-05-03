@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.646';
+our $VERSION = '1.647';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -285,6 +285,9 @@ sub __choose {
         # my $signame = shift;
         exit 1;
     };
+    if ( exists $ENV{TC_RESET_AUTO_UP} ) {
+        $ENV{TC_RESET_AUTO_UP} = 0;
+    }
     $self->__init_term();
     ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
     $self->__write_first_screen();
@@ -1182,7 +1185,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.646
+Version 1.647
 
 =cut
 

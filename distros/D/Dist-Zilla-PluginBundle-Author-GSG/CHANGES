@@ -1,9 +1,143 @@
 ==================================================
-Changes from 2018-03-29 00:00:00 +0000 to present.
+Changes from 2018-05-02 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.0.4 at 2019-03-29 21:11:17 +0000
+version 0.0.6 at 2019-05-02 17:02:56 +0000
+------------------------------------------
+
+  Change: a65e53ce67e28e7dec0b426eb4f6fe78787d11bd
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-05-02 12:58:04 +0000
+
+    Merge pull request #3 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from misc-improvements
+    to master
+
+    * commit 'e05fd53a2fdb6efd31736a09dcb61f454cb4de23':
+
+    Adjust MANIFEST.SKIP to be less draconian
+
+    Switch to Git::GatherDir Plugin for speed
+
+    Pass configuration to StaticInstall Plugin 
+
+  Change: e05fd53a2fdb6efd31736a09dcb61f454cb4de23
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-30 12:39:04 +0000
+
+    Adjust MANIFEST.SKIP to be less draconian
+
+    While still trying to figure out a good way to let folks add to this
+    list, it's more important that new things get included in the dist. 
+
+  Change: cf1ced3697c395f1fc4cca7fc5cabf08e55a3b3b
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-26 14:05:23 +0000
+
+    Switch to Git::GatherDir Plugin for speed 
+
+  Change: 2cf816c2a51a0f49268dc4104b5847e4b9fd4034
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-26 11:21:25 +0000
+
+    Pass configuration to StaticInstall Plugin 
+
+------------------------------------------
+version 0.0.5 at 2019-04-24 16:36:33 +0000
+------------------------------------------
+
+  Change: f1627b95bfc9178e1f65e73c1ecb86469d85882b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-24 12:36:33 +0000
+
+    Merge pull request #1 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
+    improve-test-coverage to master
+
+    * commit 'e4bb0bea97b97acdfad68c4d972d1823966ac4b3':
+
+    Avoid test failure in strange circumstance
+
+    Allow specifying EXTRA_UPDATES in Makefile
+
+    Simplify default license setup
+
+    Make it obvious that BUILDARGS is a class method
+
+    Use the default Pod::Weaver finder
+
+    Improve CONTRIBUTING docs
+
+    Fix bug in POD example
+
+    Use superhashof() instead of ignore()ing values
+
+    Tests for Plugin::Author::GSG 
+
+  Change: e4bb0bea97b97acdfad68c4d972d1823966ac4b3
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-23 16:51:30 +0000
+
+    Avoid test failure in strange circumstance
+
+    I've only seen this failure from the cpantesters, but I don't really
+    understand why it happens, just that it does. 
+
+  Change: e3e8cab010aa134c6d5e043dfa485ff75d478bbc
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-23 13:24:11 +0000
+
+    Allow specifying EXTRA_UPDATES in Makefile 
+
+  Change: b13e033a55239a6cdae6eceb056415aa83a06106
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-23 13:24:10 +0000
+
+    Simplify default license setup 
+
+  Change: 8a89b21d050f1bf9e1a148058974be0c53533f49
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-22 13:04:33 +0000
+
+    Make it obvious that BUILDARGS is a class method 
+
+  Change: 992e44a22a75c08c837585606fa322ee3c533ec2
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-19 18:42:28 +0000
+
+    Use the default Pod::Weaver finder
+
+    This is extra complexity we don't currently need. 
+
+  Change: b86380812a6e118a04a90df9200752423121f286
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-19 15:45:29 +0000
+
+    Improve CONTRIBUTING docs 
+
+  Change: d079c02c259618a93febd03d973fb150737d13db
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-19 15:45:29 +0000
+
+    Fix bug in POD example 
+
+  Change: 66a2e7e4110e5171a3ae4770ef391781cfba56a3
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-11 15:04:25 +0000
+
+    Use superhashof() instead of ignore()ing values
+
+    For more reliable test runs. 
+
+  Change: 60d657e6231789d7dc4f6438845debbaf38fcec3
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-03-29 18:06:44 +0000
+
+    Tests for Plugin::Author::GSG 
+
+------------------------------------------
+version 0.0.4 at 2019-03-29 18:45:33 +0000
 ------------------------------------------
 
   Change: eec8519840799f3e40f218c2e7e25ff708eb3979

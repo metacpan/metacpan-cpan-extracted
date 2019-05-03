@@ -1,33 +1,35 @@
 ---
-name: Graphics-ColorNames-WWW
-version: 1.13
+abstract: 'WWW color names and equivalent RGB values'
 author:
   - 'Claus FE<auml>rber <CFAERBER@cpan.org>'
-abstract: WWW color names and equivalent RGB values
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
-  Test::More: 0
-  Test::NoWarnings: 0
-requires:
-  Graphics::ColorNames: 0.32
+  Test::More: '0'
+  Test::NoWarnings: '0'
 configure_requires:
-  Module::Build: 0.35
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graphics-ColorNames-WWW
 provides:
   Graphics::ColorNames::CSS:
     file: lib/Graphics/ColorNames/CSS.pm
-    version: 1.13
+    version: '1.13'
   Graphics::ColorNames::IE:
     file: lib/Graphics/ColorNames/IE.pm
-    version: 1.13
+    version: '1.13'
   Graphics::ColorNames::SVG:
     file: lib/Graphics/ColorNames/SVG.pm
-    version: 1.13
+    version: '1.13'
   Graphics::ColorNames::WWW:
     file: lib/Graphics/ColorNames/WWW.pm
-    version: 1.13
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: '1.14'
+requires:
+  Graphics::ColorNames: '0.32'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

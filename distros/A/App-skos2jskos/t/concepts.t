@@ -8,12 +8,16 @@ my $dir = File::Temp::tempdir();
 
 my $exit;
 sub run { system( $^X, 'script/skos2jskos', @_ ); $exit = $? >> 8 }
-sub slurp_json { local ( @ARGV, $/ ) = shift; JSON->new->utf8->decode(<>) }
+
+sub slurp_ndjson {
+    open my $fh, "<", shift;
+    [ map { JSON->new->utf8->decode($_) } <$fh> ];
+}
 
 run( '-q', 't/ex/concepts.ttl', '-d', $dir );
 ok !$exit, 'ok';
 
-my $concepts = slurp_json("$dir/concepts.json");
+my $concepts = slurp_ndjson("$dir/concepts.ndjson");
 $concepts = [ sort { $a->{uri} cmp $b->{uri} } @$concepts ];
 
 #note explain $concepts;

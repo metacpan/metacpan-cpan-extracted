@@ -14,10 +14,10 @@ t/IExplore.t
 t/SVG.t
 t/WWW.t
 t/WWW_CSS.t
-t/WWW_HTML.t
 t/WWW_IExplore.t
 t/WWW_Mozilla.t
 t/WWW_SVG.t
 LICENSE
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

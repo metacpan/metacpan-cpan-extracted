@@ -3,30 +3,7 @@
 
 #include <cstring>
 
-#include "binarybuffer-config.h"
-#if defined(HAS_ENDIAN_H)
-    #include <endian.h>
-#elif defined(HAS_SYS_ENDIAN_H)
-    #include <sys/endian.h>
-#else
-    #error Can't find hto* and *toh functions on that system
-#endif
-
-#define bb_htobe16(arg) htobe16(arg);
-#define bb_htole16(arg) htole16(arg);
-#define bb_htobe32(arg) htobe32(arg);
-#define bb_htole32(arg) htole32(arg);
-#if defined(HAS_ORIGINAL_ENDIAN_MACROS)
-#   define bb_be16toh(arg) betoh16(arg);
-#   define bb_le16toh(arg) letoh16(arg);
-#   define bb_be32toh(arg) betoh32(arg);
-#   define bb_le32toh(arg) letoh32(arg);
-#else
-#   define bb_be16toh(arg) be16toh(arg);
-#   define bb_le16toh(arg) le16toh(arg);
-#   define bb_be32toh(arg) be32toh(arg);
-#   define bb_le32toh(arg) le32toh(arg);
-#endif
+#include <boost/endian/conversion.hpp>
 
 class BinaryBuffer {
 private:
@@ -106,31 +83,25 @@ public:
             src += to_write;
         }
     }
-    template<typename T> inline T host_to_be(T val);
-    template<typename T> inline T host_from_be(T val);
-    template<typename T> inline T host_to_le(T val);
-    template<typename T> inline T host_from_le(T val);
-    template<typename T> inline T host_to_endian(T val);
-    template<typename T> inline T host_from_endian(T val);
 
     template<typename T>
     void write_integral(T val) {
         ensure_can_write_to_chunk(sizeof(T));
-        *(T*)(&_tail->data[_tail->start_off]) = host_to_be(val);
+        *(T*)(&_tail->data[_tail->start_off]) = boost::endian::native_to_big(val);
         _tail->end_off += sizeof(T);
         _size += sizeof(T);
     }
     template<typename T>
     void write_integral_be(T val) {
         ensure_can_write_to_chunk(sizeof(T));
-        *(T*)(&_tail->data[_tail->start_off]) = host_to_be(val);
+        *(T*)(&_tail->data[_tail->start_off]) = boost::endian::native_to_big(val);
         _tail->end_off += sizeof(T);
         _size += sizeof(T);
     }
     template<typename T>
     void write_integral_le(T val) {
         ensure_can_write_to_chunk(sizeof(T));
-        *(T*)(&_tail->data[_tail->start_off]) = host_to_le(val);
+        *(T*)(&_tail->data[_tail->start_off]) = boost::endian::native_to_little(val);
         _tail->end_off += sizeof(T);
         _size += sizeof(T);
     }
@@ -202,7 +173,7 @@ public:
         _size -= sizeof(T);
 
         remove_empty_chunk();
-        return host_from_be(val);
+        return boost::endian::big_to_native(val);
     }
     template<typename T>
     T read_integral_be() {
@@ -211,7 +182,7 @@ public:
         _size -= sizeof(T);
 
         remove_empty_chunk();
-        return host_from_be(val);
+        return boost::endian::big_to_native(val);
     }
     template<typename T>
     T read_integral_le() {
@@ -220,41 +191,9 @@ public:
         _size -= sizeof(T);
 
         remove_empty_chunk();
-        return host_from_le(val);
+        return boost::endian::little_to_native(val);
     }
     
 };
-
-/* host to big endian specialization */
-template<> inline uint8_t BinaryBuffer::host_to_be(uint8_t val) { return val; }
-template<> inline int8_t BinaryBuffer::host_to_be(int8_t val) { return val; }
-template<> inline uint16_t BinaryBuffer::host_to_be(uint16_t val) { return bb_htobe16(val); }
-template<> inline int16_t BinaryBuffer::host_to_be(int16_t val) { return bb_htobe16(val); }
-template<> inline uint32_t BinaryBuffer::host_to_be(uint32_t val) { return bb_htobe32(val); }
-template<> inline int32_t BinaryBuffer::host_to_be(int32_t val) { return bb_htobe32(val); }
-
-/* big endian to host specialization */
-template<> inline uint8_t BinaryBuffer::host_from_be(uint8_t val) { return val; }
-template<> inline int8_t BinaryBuffer::host_from_be(int8_t val) { return val; }
-template<> inline uint16_t BinaryBuffer::host_from_be(uint16_t val) { return bb_be16toh(val); }
-template<> inline int16_t BinaryBuffer::host_from_be(int16_t val) { return bb_be16toh(val); }
-template<> inline uint32_t BinaryBuffer::host_from_be(uint32_t val) { return bb_be32toh(val); }
-template<> inline int32_t BinaryBuffer::host_from_be(int32_t val) { return bb_be32toh(val); }
-
-/* host to little endian specialization */
-template<> inline uint8_t BinaryBuffer::host_to_le(uint8_t val) { return val; }
-template<> inline int8_t BinaryBuffer::host_to_le(int8_t val) { return val; }
-template<> inline uint16_t BinaryBuffer::host_to_le(uint16_t val) { return bb_htole16(val); }
-template<> inline int16_t BinaryBuffer::host_to_le(int16_t val) { return bb_htole16(val); }
-template<> inline uint32_t BinaryBuffer::host_to_le(uint32_t val) { return bb_htole32(val); }
-template<> inline int32_t BinaryBuffer::host_to_le(int32_t val) { return bb_htole32(val); }
-
-/* little endian to host specialization */
-template<> inline uint8_t BinaryBuffer::host_from_le(uint8_t val) { return val; }
-template<> inline int8_t BinaryBuffer::host_from_le(int8_t val) { return val; }
-template<> inline uint16_t BinaryBuffer::host_from_le(uint16_t val) { return bb_le16toh(val); }
-template<> inline int16_t BinaryBuffer::host_from_le(int16_t val) { return bb_le16toh(val); }
-template<> inline uint32_t BinaryBuffer::host_from_le(uint32_t val) { return bb_le32toh(val); }
-template<> inline int32_t BinaryBuffer::host_from_le(int32_t val) { return bb_le32toh(val); }
 
 #endif /* __BINARY_BUFFER_H__ */

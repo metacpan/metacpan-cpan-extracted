@@ -16,11 +16,11 @@ DBIx::Class::Result::Validation - DBIx::Class component to manage validation on 
 
 =head1 VERSION
 
-Version 0.14
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,10 @@ DBIx::Class::Result::Validation component create a new accessor to Result object
 This field is used to store all errors
 
 =cut
+
+
+#Numerical data_type LIST
+my @NUMERICAL_DATA_TYPE = ("tinyint", "integer", "int", "float");
 
 use base qw/ DBIx::Class Class::Accessor::Grouped /;
 __PACKAGE__->mk_group_accessors(simple => qw(result_errors));
@@ -334,6 +338,7 @@ sub validate_defined {
       unless defined $self->$field;
 }
 
+
 =head2 validate_not_empty
 
 validation of a field which can be null but can't be empty
@@ -360,6 +365,30 @@ sub validate_not_null_or_not_zero {
     $self->add_result_error( $field, "can not be null or equal to 0" )
       if !$self->$field;
 }
+
+
+=head2 validate_prohibit_field_update
+
+The value of the field can not be updated
+    
+=cut
+
+sub validate_prohibit_field_update {
+    my ($self, $field) = @_;
+   
+    if (defined $self->$field && defined $self->id){
+        my $previous_field_value = $self->get_from_storage->$field;
+        $self->add_result_error( $field, "$field has no data_type defined, it must be defined when prohibit_field_update is used") if (!defined $self->result_source->columns_info->{$field}->{data_type});
+        if ( $self->result_source->columns_info->{$field}->{data_type} ~~ @NUMERICAL_DATA_TYPE){
+            $self->add_result_error( $field, "$field can not be updated to ".$self->$field ." : Not authorized") if (!defined $previous_field_value || $previous_field_value != $self->$field);
+        }
+        else{
+            $self->add_result_error( $field, "$field can not be updated to ".$self->$field." : Not authorized") if (!defined $previous_field_value || $previous_field_value ne $self->$field);
+        }
+    }
+}
+
+
 
 1;
 __END__

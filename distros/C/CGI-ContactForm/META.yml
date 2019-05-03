@@ -1,13 +1,14 @@
 --- #YAML:1.0
 name:                CGI-ContactForm
-version:             1.50
+version:             1.53
 abstract:            Generate a web contact form
-license:             ~
+license:             perl
 author:              
     - Gunnar Hjalmarsson <cpan@gunnar.cc>
 generated_by:        ExtUtils::MakeMaker version 6.42
 distribution_type:   module
 requires:     
+    CGI:                           0
     Mail::Sender:                  0
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.3.html

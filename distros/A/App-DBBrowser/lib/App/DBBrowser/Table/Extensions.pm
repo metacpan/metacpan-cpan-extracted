@@ -3,7 +3,7 @@ App::DBBrowser::Table::Extensions;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Choose qw( choose );
 
@@ -53,7 +53,7 @@ sub extended_col {
     if ( $type eq $subquery ) {
         require App::DBBrowser::Subqueries;
         my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $subq = $new_sq->choose_subquery( $sql, $clause );
+        my $subq = $new_sq->choose_subquery( $sql );
         if ( ! defined $subq ) {
             return;
         }

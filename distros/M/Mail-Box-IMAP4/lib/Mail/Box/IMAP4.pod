@@ -11,10 +11,20 @@ Mail::Box::IMAP4 - handle IMAP4 folders as client
    is a Mail::Box
    is a Mail::Reporter
 
+ Mail::Box::IMAP4 is extended by
+   Mail::Box::IMAP4s
+
 =head1 SYNOPSIS
 
+ my $url = 'imap4://user:passwd@host:port/INBOX';
+ my $url = 'imap://user:passwd@host:port/INBOX';
+
  use Mail::Box::IMAP4;
- my $folder = Mail::Box::IMAP4->new(folder => $ENV{MAIL}, ...);
+ my $folder = Mail::Box::IMAP4->new(folder => $url, ...);
+
+ use Mail::Box::Manager;
+ my $mgr    = Mail::Box::Manager->new;
+ my $folder = $msg->open($url, retry => 3, interval => 5);
 
 =head1 DESCRIPTION
 
@@ -767,12 +777,12 @@ to copy one of these.  Copying will proceed for all other sub-folders.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.003,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.004,
+built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

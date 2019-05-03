@@ -1,5 +1,11 @@
 Revision history for Geo-Compass-Variation
 
+1.01    2019-05-02
+        - changed magic number year (2015) to use the WMM_RELEASE_YEAR constant.
+          (closes #3)
+        - fixes issue where if perl was compiled with -Duselongdouble, several
+          tests would fail (Thanks for reporting, Slaven Rezić) (fixes #6)
+
 1.00    2017-06-21
         - new _calc_year() function, uses localtime() to get the year and month
           number, normalizes the month number to an int between 1-10, returns

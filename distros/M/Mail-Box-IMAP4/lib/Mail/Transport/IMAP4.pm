@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
+# Copyrights 2001-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Transport::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.004';
 
 use base 'Mail::Transport::Receive';
 
@@ -27,14 +27,14 @@ sub init($)
     if(ref $imap)
     {   $args->{port}     = $imap->Port;
         $args->{hostname} = $imap->Server;
-	$args->{username} = $imap->User;
-	$args->{password} = $imap->Password;
+        $args->{username} = $imap->User;
+        $args->{password} = $imap->Password;
     }
     else
-    {   $args->{port}   ||= 143;
+    {   $args->{port}   ||= $args->{ssl} ? 993 : 143;
     }
 
-    $args->{via}          = 'imap4';
+    $args->{via}        ||= 'imap4';
 
     $self->SUPER::init($args) or return;
 
@@ -42,23 +42,34 @@ sub init($)
     $self->{MTI_domain} = $args->{domain};
 
     unless(ref $imap)
-    {   $imap = $self->createImapClient($imap, Starttls => $args->{starttls})
+    {   # Create the IMAP transporter
+        my @opts;
+        if(my $ssl = $args->{ssl})
+        {    $ssl = [ %$ssl ] if ref $ssl eq 'HASH';
+             push @opts, Starttls => $args->{starttls}, Ssl => $ssl;
+        }
+
+        $imap = $self->createImapClient($imap, @opts)
              or return undef;
     }
  
     $self->imapClient($imap) or return undef;
     $self->login             or return undef;
+    $self;
 }
-
 
 sub url()
 {   my $self = shift;
     my ($host, $port, $user, $pwd) = $self->remoteHost;
     my $name = $self->folderName;
-    "imap4://$user:$pwd\@$host:$port$name";
+    my $proto = $self->usesSSL ? 'imap4s' : 'imap4';
+    "$proto://$user:$pwd\@$host:$port$name";
 }
 
 #------------------------------------------
+
+
+sub usesSSL() { shift->imapClient->Ssl }
 
 
 sub authentication(@)
@@ -66,13 +77,11 @@ sub authentication(@)
 
     # What the client wants to use to login
 
-    unless(@types)
-    {   @types = exists $self->{MTI_auth} ? @{$self->{MTI_auth}} : 'AUTO';
-    }
+    @types
+        or @types = exists $self->{MTI_auth} ? @{$self->{MTI_auth}} : 'AUTO';
 
-    if(@types == 1 && $types[0] eq 'AUTO')
-    {   @types = qw/CRAM-MD5 DIGEST-MD5 PLAIN NTLM LOGIN/;
-    }
+    @types = qw/CRAM-MD5 DIGEST-MD5 PLAIN NTLM LOGIN/
+        if @types == 1 && $types[0] eq 'AUTO';
 
     $self->{MTI_auth} = \@types;
 
@@ -80,11 +89,11 @@ sub authentication(@)
     foreach my $auth (@types)
     {   push @clientside
          , ref $auth eq 'ARRAY' ? $auth
-         : $auth eq 'NTLM'      ? [NTLM  => \&Authen::NTLM::ntlm ]
-         :                        [$auth => undef];
+         : $auth eq 'NTLM'      ? [ NTLM  => \&Authen::NTLM::ntlm ]
+         :                        [ $auth => undef ];
     }
 
-    my %clientside = map { ($_->[0] => $_) } @clientside;
+    my %clientside = map +($_->[0] => $_), @clientside;
 
     # What does the server support? in its order of preference.
 
@@ -160,10 +169,11 @@ sub login(;$)
         return;
     }
 
+    my $warn_fail;
     while(1)
     {
         foreach my $auth ($self->authentication)
-        {   my ($mechanism, $challange) = @$auth;
+        {   my ($mechanism, $challenge) = @$auth;
 
             $imap->User(undef);
             $imap->Password(undef);
@@ -171,26 +181,30 @@ sub login(;$)
             $imap->Authcallback(undef);
 
             unless($imap->connect)
-	    {   $self->log(ERROR => "IMAP cannot connect to $host: "
-	                          , $imap->LastError);
-		return undef;
-	    }
+            {   $self->log(ERROR => "IMAP cannot connect to $host: "
+                  , $imap->LastError);
+                return undef;
+            }
 
             $imap->User($username);
             $imap->Password($password);
             $imap->Authmechanism($mechanism);
-            $imap->Authcallback($challange) if defined $challange;
+            $imap->Authcallback($challenge) if defined $challenge;
 
             if($imap->login)
             {
-	       $self->log(NOTICE =>
-        "IMAP4 authenication $mechanism to $username\@$host:$port successful");
+                $self->log(NOTICE => "IMAP4 authenication $mechanism to "
+                    . "$username\@$host:$port successful");
                 return $self;
             }
         }
 
         $self->log(ERROR => "Couldn't contact to $username\@$host:$port")
             , return undef if $retries > 0 && --$retries == 0;
+
+        $warn_fail++
+            or $self->log(WARNING => "Failed attempt to login $username\@$host"
+                . ", retrying ".($retries+1)." times");
 
         sleep $interval if $interval;
     }
@@ -331,11 +345,11 @@ sub setFlags($@)
         if(my $r = $labels2flags{$label})
         {   my $flag = $r->[0];
             $value = $value ? $r->[1] : !$r->[1];
-	        # exor can not be used, because value may be string
+            # exor can not be used, because value may be string
             $value ? (push @set, $flag) : (push @unset, $flag);
         }
-	else
-	{   push @nonstandard, ($label => $value);
+        else
+        {   push @nonstandard, ($label => $value);
         }
     }
 
@@ -433,12 +447,12 @@ sub fetch($@)
     while(@$lines)
     {   my $line = shift @$lines;
         next unless $line =~ /\(.*?UID\s+(\d+)/i;
-	my $id   = $+;
-	my $info = $msgs{$id} or next;  # wrong uid
+        my $id   = $+;
+        my $info = $msgs{$id} or next;  # wrong uid
 
         if($line =~ s/^[^(]* \( \s* //x )
         {   while($line =~ s/(\S+)   # field
-	                     \s+
+                              \s+
                              (?:     # value
                                  \" ( (?:\\.|[^"])+ ) \"
                                | \( ( (?:\\.|[^)])+ ) \)
@@ -447,16 +461,16 @@ sub fetch($@)
             {   $info->{uc $1} = $+;
             }
 
-	    if( $line =~ m/^\s* (\S+) [ ]*$/x )
-	    {   # Text block expected
-	        my ($key, $value) = (uc $1, '');
-	        while(@$lines)
-		{   my $extra = shift @$lines;
-		    $extra =~ s/\r\n$/\n/;
-		    last if $extra eq ")\n";
-		    $value .= $extra;
-		}
-		$info->{$key} = $value;
+            if( $line =~ m/^\s* (\S+) [ ]*$/x )
+            {   # Text block expected
+                my ($key, $value) = (uc $1, '');
+                while(@$lines)
+                {   my $extra = shift @$lines;
+                    $extra =~ s/\r\n$/\n/;
+                    last if $extra eq ")\n";
+                    $value .= $extra;
+                }
+                $info->{$key} = $value;
             }
         }
 
@@ -501,6 +515,7 @@ sub deleteFolder($)
     $imap->delete(shift);
 }
 
+#------------------------------------------
 
 sub DESTROY()
 {   my $self = shift;

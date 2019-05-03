@@ -4,7 +4,8 @@ use Test::More;
 use Test::Mojo;
 use Time::HiRes;
 
-package TestApp {
+{
+  package TestApp;
   use Mojolicious::Lite;
   plugin 'Statsd' => {adapter => 'Memory'};
 

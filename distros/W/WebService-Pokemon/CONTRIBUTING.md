@@ -35,7 +35,7 @@ Several ways to run the test.
 
     $ milla test
     $ milla test --author --release
-    $ SWAPI_LIVE=1 milla test
+    $ POKEAPI_LIVE=1 milla test
     $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla test
     $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla run prove t/00_load.t
     $ LOGGING=1 milla run prove t/00_load.t

@@ -31,7 +31,7 @@ output_is { run('-v','t/ex/scheme.ttl','-d',$dir) } join("\n",
         "$dir/scheme.json",
         "Converting concepts",
         "Exporting 0 JSKOS concepts",
-        "$dir/concepts.json", "" ),
+        "$dir/concepts.ndjson", "" ),
     "No concepts found\n",
     "convert scheme";
 ok !$exit, 'ok';

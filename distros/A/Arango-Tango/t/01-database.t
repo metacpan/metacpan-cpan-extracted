@@ -110,9 +110,16 @@ like(
 my $system = $arango->database("_system");
 isa_ok($system => "Arango::Tango::Database");
 
-my $db = $arango->create_database('tmp_');  ## Recreate for more tests
+my $db = $arango->create_database('tmp_', users => [ {username => 'tmp_user_', active => 1, extra => { email => 'me@there.com' } } ]);  ## Recreate for more tests
 $ans = $arango->list_databases;
 ok grep { /^tmp_$/ } @$ans, "tmp_ database was created";
+
+my $user = $arango->user('tmp_user_');
+is ($user->{extra}{email}, 'me@there.com');
+
+my $current = $arango->current_database;
+is $current->{result}{name}, "_system";
+ok $current->{result}{isSystem};
 
 $db->delete;  ## Delete database using method.
 $ans = $arango->list_databases;

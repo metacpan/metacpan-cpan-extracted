@@ -1,5 +1,8 @@
+Version 0.77  - 2 May 2019
+                Fix for 7 byte UID handling in MFRC522 NFC module.
+
 Version 0.76  - 1 May 2019
-                Added interface for MFRC522 RFID module.
+                Added interface for MFRC522 NFC module.
 
 Version 0.75  - 14 April 2019
                 Fix clear method in MicroDotPHAT - did not reset size to 30 x 7

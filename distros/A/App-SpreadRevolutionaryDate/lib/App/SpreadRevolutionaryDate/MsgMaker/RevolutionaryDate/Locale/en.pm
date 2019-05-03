@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en::VERSION = '0.18';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en::VERSION = '0.19';
 # ABSTRACT: English localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::en>
 
 use Moose;
@@ -445,7 +445,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en - English 
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -494,6 +494,8 @@ When L<DateTime::Calendar::FrenchRevolutionary::Locale::en> leaves some translat
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 

@@ -1,5 +1,12 @@
 Revision history for this software.
 
+1.15  2019-05-02 00:00:00
+  - fix Kwalitee Issues: main_module_version_matches_dist_version
+  - fix Extra Issues: has_meta_json
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - convert some documents to UTF-8
+  - created by INABA Hitoshi
+
 1.14  2019-04-30 00:00:00
   - try https://rt.cpan.org/Public/Bug/Display.html?id=129343
   - created by INABA Hitoshi

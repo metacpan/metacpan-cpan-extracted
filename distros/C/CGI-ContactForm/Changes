@@ -1,5 +1,21 @@
 Version history for CGI::ContactForm.
 
+v1.53 (May 2, 2019)
+    Show sensible error message in browser if CGI.pm isn't installed.
+
+    State perl as license in META.yml.
+
+    Same version number in MHonArc.pm as in ContactForm.pm.
+
+    Updated URLs in readme.html.
+
+v1.52 (May 2, 2019)
+    Fix inconsistent version number.
+
+v1.51 (May 2, 2019)
+    Make CGI a required module, since CGI.pm has been removed from
+    Perl core.
+
 v1.50 (Mar 3, 2009)
     MIME encoding (quoted-printable) of bytes representing non-ASCII
     characters.

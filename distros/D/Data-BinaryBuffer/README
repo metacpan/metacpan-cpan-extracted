@@ -2,7 +2,7 @@ NAME
     Data::BinaryBuffer - The module to work with binary data effectively
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
         use Data::BinaryBuffer;
@@ -107,13 +107,13 @@ SUPPORT
 
     <https://github.com/vovkasm/data-binarybuffer>
 
-      git clone git://github.com/vovkasm/data-binarybuffer.git
+      git clone https://github.com/vovkasm/data-binarybuffer.git
 
 AUTHOR
     Vladimir Timofeev <vovkasm@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Vladimir Timofeev.
+    This software is copyright (c) 2019 by Vladimir Timofeev.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

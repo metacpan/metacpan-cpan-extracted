@@ -3,7 +3,7 @@ App::DBBrowser::Join;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use List::MoreUtils qw( any );
 
@@ -72,7 +72,7 @@ sub join_tables {
         if ( $master eq $from_subquery ) {
             require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $master = $sq->choose_subquery( $join, 'join' );
+            $master = $sq->choose_subquery( $join );
             if ( ! defined $master ) {
                 next MASTER;
             }
@@ -92,7 +92,7 @@ sub join_tables {
         $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $master_alias ] );
         if ( $master eq $qt_master ) {
             my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_master . " AS " . $master_alias . " LIMIT 0" );
-            $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
             $sf->{d}{col_names}{$master} = $sth->{NAME};
         }
         my @bu;
@@ -195,7 +195,7 @@ sub __add_slave_with_join_condition {
         if ( $slave eq $from_subquery ) {
             require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $slave = $sq->choose_subquery( $join, 'join' );
+            $slave = $sq->choose_subquery( $join );
             if ( ! defined $slave ) {
                 next SLAVE;
             }
@@ -217,7 +217,7 @@ sub __add_slave_with_join_condition {
         $ax->print_sql( $join );
         if ( $slave eq $qt_slave ) {
             my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_slave . " AS " . $slave_alias . " LIMIT 0" );
-            $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
             $sf->{d}{col_names}{$slave} = $sth->{NAME};
         }
         if ( $join_type ne 'CROSS JOIN' ) {
@@ -367,7 +367,7 @@ sub __get_join_info {
             #$pk->{$table}{TABLE_SCHEM} =        $ref->{TABLE_SCHEM};
             $pk->{$table}{TABLE_NAME}  =        $ref->{TABLE_NAME};
             push @{$pk->{$table}{COLUMN_NAME}}, $ref->{COLUMN_NAME};
-            #push @{$pk->{$table}{KEY_SEQ}},     defined $ref->{KEY_SEQ} ? $ref->{KEY_SEQ} : $ref->{ORDINAL_POSITION};
+            #push @{$pk->{$table}{KEY_SEQ}},     $ref->{KEY_SEQ} // $ref->{ORDINAL_POSITION};
         }
     }
     my $fk = {};
@@ -376,10 +376,10 @@ sub __get_join_info {
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;
-            #$fk->{$table}{FKTABLE_SCHEM} =        defined $ref->{FKTABLE_SCHEM} ? $ref->{FKTABLE_SCHEM} : $ref->{FK_TABLE_SCHEM};
-            $fk->{$table}{FKTABLE_NAME}  =        defined $ref->{FKTABLE_NAME}  ? $ref->{FKTABLE_NAME}  : $ref->{FK_TABLE_NAME};
-            push @{$fk->{$table}{FKCOLUMN_NAME}}, defined $ref->{FKCOLUMN_NAME} ? $ref->{FKCOLUMN_NAME} : $ref->{FK_COLUMN_NAME};
-            #push @{$fk->{$table}{KEY_SEQ}},       defined $ref->{KEY_SEQ}       ? $ref->{KEY_SEQ}       : $ref->{ORDINAL_POSITION};
+            #$fk->{$table}{FKTABLE_SCHEM} =        $ref->{FKTABLE_SCHEM} // $ref->{FK_TABLE_SCHEM};
+            $fk->{$table}{FKTABLE_NAME}  =        $ref->{FKTABLE_NAME} // $ref->{FK_TABLE_NAME};
+            push @{$fk->{$table}{FKCOLUMN_NAME}}, $ref->{FKCOLUMN_NAME} // $ref->{FK_COLUMN_NAME};
+            #push @{$fk->{$table}{KEY_SEQ}},       $ref->{KEY_SEQ} // $ref->{ORDINAL_POSITION};
         }
     }
     $sf->{d}{pk_info} = $pk;

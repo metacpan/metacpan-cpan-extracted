@@ -1,5 +1,8 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.0047      2019-05-03
+    - Improve eval_tidy() error message, and make it be context-aware.
+
 0.0045      2019-04-21
     - Remove PDL::Stats::Basic and Data::Munge from dependencies.
     - Bump version requirements of some dependencies, trying to fix a

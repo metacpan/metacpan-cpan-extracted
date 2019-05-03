@@ -32,7 +32,7 @@
             "IO::Wrap" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
-            "Limper" : "0.014",
+            "Limper" : "0.015",
             "Limper::Engine::PSGI" : "0",
             "Limper::SendFile" : "0",
             "Limper::SendJSON" : "0",
@@ -73,35 +73,35 @@
    "provides" : {
       "Disbatch" : {
          "file" : "lib/Disbatch.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::Plugin::Demo" : {
          "file" : "lib/Disbatch/Plugin/Demo.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::QueueBalance" : {
          "file" : "lib/Disbatch/QueueBalance.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::Roles" : {
          "file" : "lib/Disbatch/Roles.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::Web" : {
          "file" : "lib/Disbatch/Web.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::Web::Files" : {
          "file" : "lib/Disbatch/Web/Files.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::Web::Tasks" : {
          "file" : "lib/Disbatch/Web/Tasks.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       },
       "Disbatch::Web::V3" : {
          "file" : "lib/Disbatch/Web/V3.pm",
-         "version" : "4.102"
+         "version" : "4.103"
       }
    },
    "release_status" : "stable",
@@ -112,7 +112,7 @@
          "web" : "https://github.com/rabcyr/disbatch"
       }
    },
-   "version" : "4.102",
+   "version" : "4.103",
    "x_generated_by_perl" : "v5.16.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }

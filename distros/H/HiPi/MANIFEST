@@ -1,6 +1,7 @@
 Build.PL
 Changes
 examples/mfrc522/change_keys.pl
+examples/mfrc522/change_uid.pl
 examples/mfrc522/dump_tag_blocks.pl
 examples/mfrc522/dump_tag_info.pl
 examples/mfrc522/module_info.pl

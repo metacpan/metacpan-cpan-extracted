@@ -3,7 +3,7 @@ App::DBBrowser::Table;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.010001;
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
@@ -51,7 +51,6 @@ sub on_table {
         my $choices = [ $cu{hidden}, undef, @cu{@$sub_stmts} ];
         $ax->print_sql( $sql );
         # Choose
-        $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
             $choices,
             { %{$sf->{i}{lyt_stmt_v}}, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
@@ -65,11 +64,8 @@ sub on_table {
                 $old_idx = 1;
                 next CUSTOMIZE;
             }
-            else {
-                $old_idx = $idx;
-            }
+            $old_idx = $idx;
         }
-        delete $ENV{TC_RESET_AUTO_UP};
         my $backup_sql = $ax->backup_href( $sql );
         if ( $custom eq $cu{'reset'} ) {
             $ax->reset_sql( $sql );
@@ -129,7 +125,7 @@ sub on_table {
             $write->table_write_access( $sql );
             $sf->{i}{stmt_types} = [ 'Select' ];
             $old_idx = 1;
-            $sql = $backup_sql;
+            $sql = $backup_sql; # so no need for table_write_access to return $sql
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
             local $| = 1;

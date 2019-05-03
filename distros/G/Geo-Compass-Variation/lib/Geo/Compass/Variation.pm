@@ -3,7 +3,7 @@ package Geo::Compass::Variation;
 use strict; 
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Exporter qw(import);
  
@@ -19,7 +19,7 @@ $EXPORT_TAGS{all} = [@EXPORT_OK];
 use constant {
     DEG2RAD             => atan2(1, 1) / 45,
     WMM_RELEASE_YEAR    => 2015,
-    WMM_EXPIRE_YEAR     => 2019,
+    WMM_EXPIRE_YEAR     => 2020,
     DEFAULT_ALT_ARG     => 0,
 };
 
@@ -97,7 +97,7 @@ sub mag_field {
     my $X = 0;                  # magnetic field north component in nT
     my $Y = 0;                  # east component
     my $Z = 0;                  # vertical component
-    my $t = $yr - 2015;
+    my $t = $yr - WMM_RELEASE_YEAR;
     my $r = 6371200 / $geo_r;   # radius relative to geomagnetic reference
     my $R = $r * $r;
     my @c = map cos($_ * $lon), 0 .. $#WMM;
@@ -146,7 +146,7 @@ sub _args {
     $alt = defined $alt ? $alt : DEFAULT_ALT_ARG;
     $year = defined $year ? $year : _calc_year();
 
-    if ($year < WMM_RELEASE_YEAR || $year > WMM_EXPIRE_YEAR){
+    if ($year < WMM_RELEASE_YEAR || $year >= WMM_EXPIRE_YEAR){
         die "Calculation model has expired: "
             . WMM_RELEASE_YEAR . '-' . WMM_EXPIRE_YEAR . "\n";
     }

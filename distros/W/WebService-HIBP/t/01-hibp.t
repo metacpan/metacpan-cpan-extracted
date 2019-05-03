@@ -201,6 +201,29 @@ SKIP: {
 	ACCOUNT: {
 			eval {
 				sleep 2;
+				@breaches = $hibp->account( 'does.not.exist@example.com' );
+				1;
+			} or do {
+				if ($@ =~ /429/) {
+					chomp $@;
+					diag("Retrying account with unverified:$@");
+					sleep 4 + int rand 4;
+					redo ACCOUNT;
+				} else {
+					chomp $@;
+					diag("Failed account with unverified call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
+				}
+			};
+	}
+    $count = 0;
+	@breaches = ();
+	ok((scalar @breaches == 0) && ($hibp->last_response()->code() == 404), "Correctly returned a 404 response code and an empty list of breaches for a missing email address for an account"); 
+	ACCOUNT: {
+			eval {
+				sleep 2;
 				@breaches = $hibp->account( 'test@example.com', unverified => 1 );
 			} or do {
 				if ($@ =~ /429/) {
@@ -255,6 +278,24 @@ SKIP: {
 	ACCOUNT: {
 			eval {
 				sleep 2;
+				$breach = $hibp->breach( 'ThereIsNoBreachHere' );
+				1;
+			} or do {
+				if ($@ =~ /429/) {
+					chomp $@;
+					diag("Retrying breach:$@");
+					sleep 4 + int rand 4;
+					redo ACCOUNT;
+				} else {
+					chomp $@;
+					diag("Failed breach call:$@");
+				}
+			};
+	}
+	ok((!defined $breach) && ($hibp->last_response()->code() == 404), "Correctly returned a 404 response code and undef for an non existant breach");
+	ACCOUNT: {
+			eval {
+				sleep 2;
 				$breach = $hibp->breach( 'Adobe' );
 			} or do {
 				if ($@ =~ /429/) {
@@ -305,6 +346,28 @@ SKIP: {
 	ACCOUNT: {
 			eval {
 				sleep 2;
+				@breaches = $hibp->breaches( domain => 'example.com' );
+				1;
+			} or do {
+				if ($@ =~ /429/) {
+					chomp $@;
+					diag("Retrying breaches with domain:$@");
+					sleep 4 + int rand 4;
+					redo ACCOUNT;
+				} else {
+					chomp $@;
+					diag("Failed breaches with domain call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
+				}
+			};
+	}
+	ok(scalar @breaches == 0, "Correctly returned an empty list of breaches for a missing domain name"); 
+	@breaches = ();
+	ACCOUNT: {
+			eval {
+				sleep 2;
 				@breaches = $hibp->breaches( domain => 'adobe.com' );
 			} or do {
 				if ($@ =~ /429/) {
@@ -329,6 +392,29 @@ SKIP: {
     ok( $count > 0 && $count < $previous_count,
         "Found $count breaches for adobe.com (filtering appears to work)" );
 	my @pastes;
+	PASTE: {
+			eval {
+				sleep 2;
+				@pastes = $hibp->pastes( 'does.not.exist@example.com' );
+				1;
+			} or do {
+				if ($@ =~ /429/) {
+					chomp $@;
+					diag("Retrying pastes:$@");
+					sleep 4 + int rand 4;
+					redo PASTE;
+				} else {
+					chomp $@;
+					diag("Failed pastes call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					if ($@ =~ /401/) {
+						skip("Skipping remaining tests on forbidden", 1);
+					}
+				}
+			};
+	}
+	ok((scalar @pastes == 0) && ($hibp->last_response()->code() == 404), "Correctly returned a 404 response code and an empty list of pastes for a missing email address"); 
 	PASTE: {
 			eval {
 				sleep 2;

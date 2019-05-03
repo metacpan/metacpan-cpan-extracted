@@ -1459,3 +1459,12 @@ Revision history for Graphics-Framebuffer
 
       Also made attempts at making the "_console" methods workable... they're
       flakey still.
+
+6.27  Apr 27, 2019
+
+      Moved get_pixel and pixel to a more logical location for documentation
+
+6.28  May 1, 2019
+
+      Fixed an error in get_pixel and pixel methods.  "replace_color" was
+      having issues and this was the cause.

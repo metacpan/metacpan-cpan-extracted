@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-Statsd",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mojolicious::Plugin::Statsd",
   "PREREQ_PM" => {
-    "Mojolicious" => 0
+    "Mojolicious" => "5.00"
   },
   "TEST_REQUIRES" => {
+    "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +31,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Mojolicious" => 0,
+  "Mojolicious" => "5.00",
+  "Test::More" => "0.96",
   "Test::Warnings" => 0
 );
 

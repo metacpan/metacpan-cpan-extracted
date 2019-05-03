@@ -18,10 +18,10 @@ name: Control-CLI-Extreme
 provides:
   Control::CLI::Extreme:
     file: lib/Control/CLI/Extreme.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Control::CLI: '2.02'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

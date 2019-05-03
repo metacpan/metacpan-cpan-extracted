@@ -7,7 +7,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 # VERSION
 
-version 0.0045
+version 0.0047
 
 # STATUS
 
@@ -73,8 +73,8 @@ As such, it supports marking missing values (`BAD` values).
 Function signatures in docs of this library follow the
 [Function::Parameters](https://metacpan.org/pod/Function::Parameters) conventions, for example,
 
-```
-function(Type1 $positional_parameter, Type2 :$named_parameter)
+```perl
+myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
 ```
 
 # CONSTRUCTION

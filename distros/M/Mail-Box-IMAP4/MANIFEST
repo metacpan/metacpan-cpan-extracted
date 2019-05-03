@@ -9,6 +9,8 @@ lib/Mail/Box/IMAP4/Head.pm
 lib/Mail/Box/IMAP4/Head.pod
 lib/Mail/Box/IMAP4/Message.pm
 lib/Mail/Box/IMAP4/Message.pod
+lib/Mail/Box/IMAP4s.pm
+lib/Mail/Box/IMAP4s.pod
 lib/Mail/Server/IMAP4.pm
 lib/Mail/Server/IMAP4.pod
 lib/Mail/Server/IMAP4/Fetch.pm

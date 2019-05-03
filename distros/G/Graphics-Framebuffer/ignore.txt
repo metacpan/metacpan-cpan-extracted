@@ -17,3 +17,4 @@ test*
 *.inl
 *.yml
 src/Framebuffer.pm
+subs.pl

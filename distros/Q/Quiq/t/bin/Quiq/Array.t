@@ -321,6 +321,36 @@ sub test_sort : Test(3) {
 
 # -----------------------------------------------------------------------------
 
+sub test_toHash : Test(5) {
+    my $self = shift;
+
+    # Klassenmethode
+
+    my @arr = qw/rot gelb blau/;
+
+    my $hash = Quiq::Array->toHash(\@arr);
+    $self->isDeeply($hash,{blau=>1,gelb=>1,rot=>1});
+
+    $hash = Quiq::Array->toHash(\@arr,5);
+    $self->isDeeply($hash,{blau=>5,gelb=>5,rot=>5});
+
+    my %hash = Quiq::Array->toHash(\@arr,6);
+    $self->isDeeply(\%hash,{blau=>6,gelb=>6,rot=>6});
+
+    # Objektmethode
+
+    my $arr = Quiq::Array->new([qw/rot gelb blau/]);
+
+    $hash = $arr->toHash(5);
+    $self->isDeeply($hash,{blau=>5,gelb=>5,rot=>5});
+
+    %hash = $arr->toHash(6);
+    $self->isDeeply(\%hash,{blau=>6,gelb=>6,rot=>6});
+
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_gcd : Test(5) {
     my $self = shift;
 

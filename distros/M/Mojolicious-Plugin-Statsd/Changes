@@ -1,6 +1,9 @@
 Changelog for Mojolicious-Plugin-Statsd
 
-0.03 2019-04-29T04:05:47
+0.04 2019-05-02T03:50:11
+ - Make 5.10 compatible - no package BLOCK until 5.14 (Meredith Howard)
+
+0.03 2019-04-29T04:05:47Z
  - init changes (Meredith Howard)
  - Add gauge and set_add methods (Meredith Howard)
 

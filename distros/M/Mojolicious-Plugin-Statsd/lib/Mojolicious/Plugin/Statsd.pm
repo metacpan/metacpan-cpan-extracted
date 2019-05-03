@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Statsd;
-$Mojolicious::Plugin::Statsd::VERSION = '0.03';
+$Mojolicious::Plugin::Statsd::VERSION = '0.04';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Loader;

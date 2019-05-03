@@ -53,10 +53,11 @@ my $build = Module::Build->new(
       'Module::Build' => "0.4004", # test_requires
    },
    requires => {
-      'perl' => '5.008', # fails on 5.6 smokers; no idea why
       'Carp' => '1.25', # new message format with trailing period
       'Test::Builder::Module' => 0,
       'Time::HiRes' => 0,
+
+      'perl' => '5.010', # //
    },
    test_requires => {
       'Test::Identity' => 0,

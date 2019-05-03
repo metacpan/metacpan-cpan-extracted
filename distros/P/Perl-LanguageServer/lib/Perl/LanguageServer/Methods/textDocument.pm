@@ -27,7 +27,7 @@ sub get_symbol_from_doc
         my $pos = pos ($data) ;
         my $len = length ($1) ;
         print STDERR "word: <$1> pos: $pos len: $len\n" ;
-        if ($char < $pos && $char >= $pos - $len)
+        if ($char <= $pos && $char >= $pos - $len)
             {
             print STDERR "ok\n" ;
             return $1 ;

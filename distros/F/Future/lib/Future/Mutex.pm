@@ -7,8 +7,9 @@ package Future::Mutex;
 
 use strict;
 use warnings;
+use 5.010;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Future;
 

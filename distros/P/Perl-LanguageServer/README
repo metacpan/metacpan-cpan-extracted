@@ -11,7 +11,6 @@ https://microsoft.github.io/language-server-protocol/specification
 
 To use it with Visual Studio Code, install the extention "perl"
 
-This is an early version, but already working version.
 Any comments and patches are welcome.
 
 INSTALLATION
@@ -27,6 +26,9 @@ NOTE: This module uses Compiler::Lexer. The version on cpan (0.22) is
 buggy crashes from time to time. Please use the version from github 
 (https://github.com/goccy/p5-Compiler-Lexer) until
 a new version is published to cpan.
+For your convinence a working snapshot from github of Compiler::Lexer
+is included in this distribution and will be installed when you
+run Makefile.PL
 
 To use it with Visual Studio Code, install the extention "perl"
 
@@ -39,6 +41,9 @@ perldoc command.
     perldoc Perl::LanguageServer
 
 You can also look for information at:
+
+    Github:
+        https://github.com/richterger/Perl-LanguageServer
 
     RT, CPAN's request tracker (report bugs here)
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-LanguageServer
@@ -55,7 +60,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 grichter
+Copyright (C) 2018-2019 grichter
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

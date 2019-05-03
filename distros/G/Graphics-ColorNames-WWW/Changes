@@ -1,5 +1,12 @@
 Revision history for Perl extension Graphics::ColorNames::WWW
 
+1.14  Wed May 01 00:00:00 2019
+	- remove dependency on deprecated module Graphics::ColorNames::HTML,
+	  which is no longer included in the main Graphics::ColorNames
+	  distribution
+	  FIXES: #127455: Cannot load color naming scheme module
+	  Graphics::ColorNames::HTML
+
 1.13  Sat Dec 19 00:00:00 2009
 	- better documentation
 	- fix FAIL in t/11pod_cover.t

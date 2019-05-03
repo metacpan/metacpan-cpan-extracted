@@ -84,6 +84,8 @@ $FB->cls();
 
 show($p);
 
+$FB->cls('ON') if ($delay);
+
 exit(0);
 
 sub gather {

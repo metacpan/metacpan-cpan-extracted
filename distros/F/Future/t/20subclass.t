@@ -109,12 +109,30 @@ use Test::Identity;
    $f->failure;
 }
 
-my $f_await;
+{
+   my $f = t::Future::Subclass->new;
+
+   my $called;
+   no warnings 'once';
+   local *t::Future::Subclass::block_until_ready = sub {
+      $called++;
+      identical( $_[0], $f, '->block_until_ready is called on $f' );
+      $_[0]->done( "Result here" );
+   };
+
+   is_deeply( [ $f->get ],
+              [ "Result here" ],
+              'Result from ->get' );
+
+   ok( $called, '$f->block_until_ready called' );
+}
+
 {
    my $f = t::Future::Subclass->new;
 
    my $count = 0;
-   $f_await = sub {
+   no warnings 'once';
+   local *t::Future::Subclass::await = sub {
       $count++;
       identical( $_[0], $f, '->await is called on $f' );
       $_[0]->done( "Result here" ) if $count == 2;
@@ -131,8 +149,3 @@ done_testing;
 
 package t::Future::Subclass;
 use base qw( Future );
-
-sub await
-{
-   $f_await->( @_ );
-}

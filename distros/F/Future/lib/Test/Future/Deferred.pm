@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Future );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 

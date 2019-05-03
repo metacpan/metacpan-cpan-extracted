@@ -1,6 +1,10 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.18 2019-04-10T07:07:40
+0.19 2019-05-02T15:15:05
+ - Fix typo in French feast name
+ - Fix SEE ALSO sections
+
+0.18 2019-04-10T07:07:40Z
  - Defaults locale to fr for RevolutionaryDtae and en otherwise
 
 0.17 2019-04-09T22:17:55Z

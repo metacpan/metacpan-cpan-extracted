@@ -1,4 +1,19 @@
-0009  2019-04-29
+0.010  2019-05-01
+    
+   - Tango.pm:
+     - Obtain current database;
+     - Create database support full REST options;
+     - list_databases changed to list only user-accessible databases;
+     - list_collections removed.
+   - Database.pm
+     - list_collections support excludeSystem option;
+     - create_collection supports all REST options;
+   - Collection.pm
+     - new methods: info, checksum, count, figures, load, unload, properties,
+       rotate, revision, set_properties, rename, recalculate_count, load_indexes,
+       truncate;
+    
+0.009  2019-04-29
     
    - Tango.pm:
      - Get user permissions for specific database/Collection (get_access_level)

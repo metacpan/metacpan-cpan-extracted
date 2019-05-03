@@ -29,7 +29,7 @@ for my $level (1, 2, 3) {
   open XH, '<', $file;
   my @xh = <XH>;
   close XH;
-  my $keep = 0;
+  my $keep = $ENV{KEEP} || 0;
 
   ok(@xh >= 6 && @xh <= 7, "smoke output has 6-7 lines level=$level") or $keep++;
 
@@ -50,7 +50,7 @@ for my $level (4, 5) {
   $ENV{DUMPTRACE_LEVEL} = $level;
   my $c1 = system($^X, $dmodule, "-Iblib/lib", "-Ilib",
 		  "t/ppi/smoke85.pl");
-  my $keep = 0;
+  my $keep = $ENV{KEEP} || 0;
 
   ok($c1 == 0, "ran level $level") or $keep++;
 

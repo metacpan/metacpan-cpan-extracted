@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.009';
+$Arango::Tango::Database::VERSION = '0.010';
 use Arango::Tango::Cursor;
 
 use warnings;
@@ -29,14 +29,14 @@ sub cursor {
 }
 
 sub list_collections {
-    my ($self) = @_;
-    return $self->{arango}->list_collections($self->{name});
+    my ($self, %opts) = @_;
+    return $self->{arango}->_api( list_collections => {  %opts, database => $self->{name} } )->{result};
 }
 
 sub create_collection {
-    my ($self, $name) = @_;
+    my ($self, $name, %params) = @_;
     die "Arango::Tango | Cannot create collection with empty collection or database name" unless length $name;
-    return $self->{arango}->_api('create_collection', { database => $self->{name}, name => $name })
+    return $self->{arango}->_api('create_collection', { %params, database => $self->{name}, name => $name })
 }
 
 sub delete_collection {
@@ -79,7 +79,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 USAGE
 
