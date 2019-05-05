@@ -3,6 +3,7 @@
 use Chart::GGPlot::Setup qw(:base :pdl);
 
 use Data::Frame;
+use Module::Load;
 
 use Test2::V0;
 use Test2::Tools::DataFrame;
@@ -10,6 +11,18 @@ use Test2::Tools::PDL;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(:all);
 use Chart::GGPlot qw(:all);
+
+# use all backend geom implementations for syntax test
+subtest syntax_check => sub {
+    my @geoms = qw(Bar Boxplot Path Point Line);
+    for (@geoms) {
+        my $package = "Chart::GGPlot::Backend::Plotly::Geom::$_"; 
+        eval { load $package };
+        unless (ok(!$@, "syntax check: $package")) {
+            diag $@;
+        }
+    }
+};
 
 subtest group_to_NA => sub {
     my $df1 = Data::Frame->new(
@@ -96,6 +109,34 @@ subtest group_to_NA => sub {
         ),
         $df4_retraced,
         'multiple groups, retrace'
+    );
+};
+
+subtest to_rgb => sub {
+    no warnings 'qw';
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ) ),
+        PDL::SV->new( [qw(#000000 #ffffff)] ),
+        'to_rgb([qw(black white)])'
+    );
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ), pdl(1) ),
+        PDL::SV->new( [qw(#000000 #ffffff)] ),
+        'to_rgb([qw(black white)]), pdl(1)'
+    );
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ), pdl( [ 0.2, 0.8 ] ) ),
+        PDL::SV->new( [qw{rgba(0,0,0,51) rgba(255,255,255,204)}] ),
+        'to_rgb([qw(black white)]), pdl([0.2, 0.8])'
+    );
+
+    pdl_is(
+        to_rgb( PDL::SV->new( [qw(black white)] ), pdl( [ 0.2, 1 ] ) ),
+        PDL::SV->new( [qw{rgba(0,0,0,51) #ffffff}] ),
+        'to_rgb([qw(black white)]), pdl([0.2, 1])'
     );
 };
 

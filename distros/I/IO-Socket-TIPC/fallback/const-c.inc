@@ -217,12 +217,8 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
   case 'N':
     if (memEQ(name, "TIPC_NODE_SCOPE", 15)) {
     /*                    ^                */
-#ifdef TIPC_NODE_SCOPE
       *iv_return = TIPC_NODE_SCOPE;
       return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
     }
     break;
   case 'Z':
@@ -371,12 +367,8 @@ constant_18 (pTHX_ const char *name, IV *iv_return) {
   case 'C':
     if (memEQ(name, "TIPC_CLUSTER_SCOPE", 18)) {
     /*                             ^          */
-#ifdef TIPC_CLUSTER_SCOPE
       *iv_return = TIPC_CLUSTER_SCOPE;
       return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
     }
     break;
   case 'D':
@@ -474,28 +466,30 @@ constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!/usr/bin/perl5.8.8 -w
+#!/usr/bin/perl -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw(IV)};
 my @names = (qw(AF_TIPC PF_TIPC SOL_TIPC TIPC_ADDR_ID TIPC_ADDR_MCAST
-	       TIPC_ADDR_NAME TIPC_ADDR_NAMESEQ TIPC_CFG_SRV TIPC_CLUSTER_SCOPE
-	       TIPC_CONN_SHUTDOWN TIPC_CONN_TIMEOUT TIPC_CRITICAL_IMPORTANCE
-	       TIPC_DESTNAME TIPC_DEST_DROPPABLE TIPC_ERRINFO TIPC_ERR_NO_NAME
+	       TIPC_ADDR_NAME TIPC_ADDR_NAMESEQ TIPC_CFG_SRV TIPC_CONN_SHUTDOWN
+	       TIPC_CONN_TIMEOUT TIPC_CRITICAL_IMPORTANCE TIPC_DESTNAME
+	       TIPC_DEST_DROPPABLE TIPC_ERRINFO TIPC_ERR_NO_NAME
 	       TIPC_ERR_NO_NODE TIPC_ERR_NO_PORT TIPC_ERR_OVERLOAD
 	       TIPC_HIGH_IMPORTANCE TIPC_IMPORTANCE TIPC_LOW_IMPORTANCE
-	       TIPC_MAX_USER_MSG_SIZE TIPC_MEDIUM_IMPORTANCE TIPC_NODE_SCOPE
-	       TIPC_OK TIPC_PUBLISHED TIPC_RESERVED_TYPES TIPC_RETDATA
+	       TIPC_MAX_USER_MSG_SIZE TIPC_MEDIUM_IMPORTANCE TIPC_OK
+	       TIPC_PUBLISHED TIPC_RESERVED_TYPES TIPC_RETDATA
 	       TIPC_SRC_DROPPABLE TIPC_SUBSCR_TIMEOUT TIPC_SUB_NO_BIND_EVTS
 	       TIPC_SUB_NO_UNBIND_EVTS TIPC_SUB_PORTS TIPC_SUB_SERVICE
 	       TIPC_SUB_SINGLE_EVT TIPC_TOP_SRV TIPC_WAIT_FOREVER
-	       TIPC_WITHDRAWN TIPC_ZONE_SCOPE));
+	       TIPC_WITHDRAWN TIPC_ZONE_SCOPE),
+            {name=>"TIPC_CLUSTER_SCOPE", type=>"IV", macro=>"1"},
+            {name=>"TIPC_NODE_SCOPE", type=>"IV", macro=>"1"});
 
-print constant_types(); # macro defs
+print constant_types(), "\n"; # macro defs
 foreach (C_constant ("IO::Socket::TIPC", 'constant', 'IV', $types, undef, 3, @names) ) {
     print $_, "\n"; # C constant subs
 }
-print "#### XS Section:\n";
+print "\n#### XS Section:\n";
 print XS_constant ("IO::Socket::TIPC", $types);
 __END__
    */

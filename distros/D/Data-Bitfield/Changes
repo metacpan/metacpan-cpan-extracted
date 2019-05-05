@@ -1,5 +1,9 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.03    2019-05-04 10:45:49
+        [CHANGES]
+         * Support arbitrarily-wide structures when using "bytes" formats
+
 0.02    2017-11-07 21:52:03
         [CHANGES]
          * Added 'constfield' for packing constant-value fields

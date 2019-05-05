@@ -1,0 +1,88 @@
+{
+   "abstract" : "We are Malaysian CPAN authors (Kami para penulis CPAN Malaysia).",
+   "author" : [
+      "Kian Meng, Ang <kianmeng@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Malaysian",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0.26",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0.100005",
+            "Test::CPAN::Meta" : "0.25",
+            "Test::HasVersion" : "0.014",
+            "Test::Kwalitee" : "1.28",
+            "Test::More" : "0.96",
+            "Test::Pod::Coverage" : "1.10",
+            "Test::UseAllModules" : "0.17"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::CPANAuthors::Malaysian" : {
+         "file" : "lib/Acme/CPANAuthors/Malaysian.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kianmeng/acme-cpanauthors-malaysian/issues"
+      },
+      "homepage" : "https://github.com/kianmeng/acme-cpanauthors-malaysian",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kianmeng/acme-cpanauthors-malaysian.git",
+         "web" : "https://github.com/kianmeng/acme-cpanauthors-malaysian"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04",
+   "x_static_install" : 1
+}
+

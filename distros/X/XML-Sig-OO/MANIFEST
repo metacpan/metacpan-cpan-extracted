@@ -1,4 +1,6 @@
+bin/xmlsig
 Changes
+CONTRIBUTING.md
 exaples/dsa_priv.pem
 exaples/sign_multi_keys.pl
 exaples/sign.pl

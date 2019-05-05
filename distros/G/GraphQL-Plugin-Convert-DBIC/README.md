@@ -83,7 +83,10 @@ then request any required fields of this.
 Meanwhile, the update and delete ones need to include the primary key
 fields, to indicate what to mutate, and also all non-primary key fields
 as nullable, which for update will mean leaving them unchanged, and for
-delete is to be ignored.
+delete is to be ignored. These input types are split into one input
+for the primary keys, which is a full input type to allow for multiple
+primary keys, then a wrapper input for updates, that takes one ID input,
+and a payload that due to the same requirements, is just the search input.
 
 Therefore, for the above, these input types (and an updated Query,
 and Mutation) are created:
@@ -98,10 +101,13 @@ and Mutation) are created:
       language: String
     }
 
-    input BlogMutateInput {
+    input BlogIDInput {
       id: Int!
-      title: String
-      language: String
+    }
+
+    input BlogUpdateInput {
+      id: BlogIDInput!
+      payload: BlogSearchInput!
     }
 
     input ArticleCreateInput {
@@ -115,19 +121,22 @@ and Mutation) are created:
       content: String
     }
 
-    input ArticleMutateInput {
+    input ArticleIDInput {
       id: Int!
-      title: String!
-      language: String
+    }
+
+    input ArticleUpdateInput {
+      id: ArticleIDInput!
+      payload: ArticleSearchInput!
     }
 
     type Mutation {
       createBlog(input: [BlogCreateInput!]!): [Blog]
       createArticle(input: [ArticleCreateInput!]!): [Article]
-      deleteBlog(input: [BlogMutateInput!]!): [Boolean]
-      deleteArticle(input: [ArticleMutateInput!]!): [Boolean]
-      updateBlog(input: [BlogMutateInput!]!): [Blog]
-      updateArticle(input: [ArticleMutateInput!]!): [Article]
+      deleteBlog(input: [BlogIDInput!]!): [Boolean]
+      deleteArticle(input: [ArticleIDInput!]!): [Boolean]
+      updateBlog(input: [BlogUpdateInput!]!): [Blog]
+      updateArticle(input: [ArticleUpdateInput!]!): [Article]
     }
 
     extends type Query {

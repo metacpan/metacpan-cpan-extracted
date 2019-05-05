@@ -1,3 +1,9 @@
+2.019109 2019-05-05
+ - slightly less diag in t/02-use.t
+
+2.019108 2019-05-05
+ - slightly more diag in t/02-use.t to figure out why failing
+
 2.019107 2019-04-28
  - compat with PDLA GIS - thanks @shawnlaffan
 

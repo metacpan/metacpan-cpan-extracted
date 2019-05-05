@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.33'; # VERSION
 
 use Carp;
 
@@ -415,7 +415,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 METHODS
 
@@ -491,6 +491,12 @@ Returns absolute path to test file.
   my $parameters = $self->test_file_parameters
 
 Accessor to test_file_parameters property.
+
+=head2 get_params
+
+Populates the keys C<criteria>, C<select>, C<test_parameters>, C<db_name>,
+C<cover_db>, C<cover_parameters> and C<skip> using the C<test_file> if
+available otherwise sets the default.
 
 =head2 cover_gold
 

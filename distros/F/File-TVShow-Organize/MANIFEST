@@ -11,6 +11,7 @@ t/05TestMainImport.t
 t/06TestSuccessfulImport.t
 t/07TestRecursiveImport.t
 t/10Clean.t
+t/testrules.yml
 t/test-data.tar.gz
 t/tv-shows.tar.gz
 lib/File/TVShow/Organize.pm

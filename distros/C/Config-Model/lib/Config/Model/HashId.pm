@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::HashId;
-$Config::Model::HashId::VERSION = '2.133';
+package Config::Model::HashId 2.134;
+
 use Mouse;
 use 5.10.1;
 
@@ -462,6 +462,59 @@ sub move_down {
     # is not sent if the user tries to move past last idx
 }
 
+sub _load_data_from_hash {
+    my $self = shift;
+    my %args = @_;
+    my $data = $args{data};
+    my %backup = %$data ;
+
+    my @ordered_keys;
+    my $from = '';
+
+    my $order_key = '__'.$self->element_name.'_order';
+    if ( $self->{ordered} and (defined $data->{$order_key} or defined $data->{__order} )) {
+        @ordered_keys = @{ delete $data->{$order_key} or delete $data->{__order} };
+        $from      = ' with '.$order_key;
+    }
+    elsif ( $self->{ordered} and (not $data->{__skip_order} and keys %$data > 1)) {
+        $logger->warn(
+            "HashId " . $self->location . ": loading ordered "
+                . "hash from hash ref without special key '__order'. Element "
+                . "order is not defined"
+            );
+        $from = ' without '.$order_key;
+    }
+    delete $data->{__skip_order};
+
+    if (@ordered_keys) {
+        my %data_keys = map { $_ => 1 ; } keys %$data;
+        my @left_keys;
+        foreach my $k (@ordered_keys) {
+            push @left_keys, $k unless delete $data_keys{$k};
+        }
+        if ( %data_keys or @left_keys) {
+            my @msg ;
+            push @msg, "Unlisted keys in __order:", keys %data_keys if %data_keys;
+            push @msg, "Extra keys in __order:", @left_keys if @left_keys;
+            Config::Model::Exception::LoadData->throw(
+                object     => $self,
+                message    => "load_data: ordered keys mistmatch: @msg",
+                wrong_data => \%backup,
+            );
+        }
+    }
+    my @load_keys = @ordered_keys ? @ordered_keys : sort keys %$data;
+
+    $logger->info(
+        "HashId load_data (" . $self->location .
+            ") will load idx @load_keys from hash ref $from"
+        );
+    foreach my $elt (@load_keys) {
+        my $obj = $self->fetch_with_id($elt);
+        $obj->load_data( %args, data => $data->{$elt} ) if defined $data->{$elt};
+    }
+}
+
 sub load_data {
     my $self  = shift;
     my %args  = @_ > 1 ? @_ : ( data => shift );
@@ -469,33 +522,7 @@ sub load_data {
     my $check = $self->_check_check( $args{check} );
 
     if ( ref($data) eq 'HASH' ) {
-        my @load_keys;
-        my $from = '';
-
-        my $order_key = '__'.$self->element_name.'_order';
-        if ( $self->{ordered} and (defined $data->{$order_key} or defined $data->{__order} )) {
-            @load_keys = @{ delete $data->{$order_key} or delete $data->{__order} };
-            $from      = ' with '.$order_key;
-        }
-        elsif ( $self->{ordered} and (keys %$data > 1)) {
-            $logger->warn( "HashId "
-                    . $self->location
-                    . ": loading ordered "
-                    . "hash from hash ref without special key '__order'. Element "
-                    . "order is not defined" );
-            $from = ' without '.$order_key;
-        }
-
-        @load_keys = sort keys %$data unless @load_keys;
-
-        $logger->info( "HashId load_data ("
-                . $self->location
-                . ") will load idx @load_keys from hash ref"
-                . $from );
-        foreach my $elt (@load_keys) {
-            my $obj = $self->fetch_with_id($elt);
-            $obj->load_data( %args, data => $data->{$elt} ) if defined $data->{$elt};
-        }
+        $self->_load_data_from_hash(data => $data, %args);
     }
     elsif ( ref($data) eq 'ARRAY' ) {
         $logger->info(
@@ -538,7 +565,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -637,7 +664,7 @@ an ordered hash is ignored. Ignored for non ordered hash.
 
 Parameters: C<< ( data => ( hash_ref | array_ref ) [ , check => ... , ... ]) >>
 
-Load check_list as a hash ref for standard hash. 
+Load data as a hash ref for standard hash.
 
 Ordered hash should be loaded with an array ref or with a hash
 containing a special C<__order> element. E.g. loaded with either:
@@ -647,6 +674,11 @@ containing a special C<__order> element. E.g. loaded with either:
 or
 
   { __order => ['a','b'], b => 'bar', a => 'foo' }
+
+C<__skip_order> parameter can be used if loading order is not
+important:
+
+  { __skip_order => 1, b => 'bar', a => 'foo'}
 
 load_data can also be called with a single ref parameter.
 
@@ -668,7 +700,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

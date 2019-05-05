@@ -5,7 +5,6 @@ use Chart::GGPlot::Setup;
 use Test2::V0;
 
 use Chart::GGPlot::Layer;
-use Chart::GGPlot::Layer::Functions qw(:all);
 
 is(
     Chart::GGPlot::Layer->_find_subclass( 'Geom', 'point' ),

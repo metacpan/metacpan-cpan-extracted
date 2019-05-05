@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::NodeLoader;
-$Config::Model::Role::NodeLoader::VERSION = '2.133';
+package Config::Model::Role::NodeLoader 2.134;
+
 # ABSTRACT: Load Node element in configuration tree
 
 use Mouse::Role;
@@ -26,7 +26,7 @@ sub load_node {
     my ($self, %params) = @_ ;
 
     my $config_class_name = $params{config_class_name};
-    my $config_class =  $self->config_model->get_model($config_class_name) ;
+    my $config_class =  $self->config_model->get_model_clone($config_class_name) ;
     my $node_class = $config_class->{class} || 'Config::Model::Node';
     $load_logger->debug("Loading $config_class_name ". $self->location . " with $node_class");
     Mouse::Util::load_class($node_class);
@@ -52,7 +52,7 @@ Config::Model::Role::NodeLoader - Load Node element in configuration tree
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

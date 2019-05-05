@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::Discrete;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::Standard qw(Any ArrayRef Bool CodeRef ConsumerOf InstanceOf);
@@ -199,7 +199,7 @@ Chart::GGPlot::Scale::Discrete - Discrete scale
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

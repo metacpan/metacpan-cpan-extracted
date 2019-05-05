@@ -2,6 +2,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include <math.h>
+
 // C99 required!
 // this is not just for comments, but also for
 // integer constant semantics,
@@ -102,6 +104,13 @@ static U8 *buf, *cur, *end; // buffer start, current, end
 
 #if PERL_VERSION < 18
 # define utf8_to_uvchr_buf(s,e,l) utf8_to_uvchr (s, l)
+#endif
+
+#ifndef SvREFCNT_inc_NN
+#define SvREFCNT_inc_NN(x) SvREFCNT_inc (x)
+#endif
+#ifndef SvREFCNT_dec_NN
+#define SvREFCNT_dec_NN(x) SvREFCNT_dec (x)
 #endif
 
 #if __GNUC__ >= 3
@@ -260,7 +269,7 @@ get_w (void)
   U8 c = get_u8 ();
 
   if (expect_false (c == 0x80))
-    error ("illegal BER padding (X.690 8.1.2.4.2, 8.19.2)");
+    error ("invalid BER padding (X.690 8.1.2.4.2, 8.19.2)");
 
   for (;;)
     {
@@ -290,7 +299,7 @@ get_length (void)
       // that a slightly inefficient get_length won't matter.
 
       if (expect_false (cnt == 0))
-        error ("indefinite BER value lengths not supported");
+        error ("invalid use of indefinite BER length form in primitive encoding (X.690 8.1.3.2)");
 
       if (expect_false (cnt > UVSIZE))
         error ("BER value length too long (must fit into UV) or BER reserved value in length (X.690 8.1.3.5)");
@@ -319,7 +328,7 @@ decode_int (UV len)
       U16 mask = (data [0] << 8) | data [1] & 0xff80;
 
       if (expect_false (mask == 0xff80 || mask == 0x0000))
-        error ("illegal padding in BER_TYPE_INT (X.690 8.3.2)");
+        error ("invalid padding in BER_TYPE_INT (X.690 8.3.2)");
     }
 
   int negative = data [0] & 0x80;
@@ -422,6 +431,86 @@ decode_oid (UV len, int relative)
   return newSVpvn (oid, app - oid);
 }
 
+// oh my, this is a total mess
+static SV *
+decode_real (UV len)
+{
+  SV *res;
+  U8 *beg = cur;
+
+  if (len == 0)
+    res = newSVnv (0.);
+  else
+    {
+      U8 info = get_u8 ();
+
+      if (info & 0x80)
+        {
+          // binary
+          static const U8 base[]  = { 2, 8, 16, 0 };
+          NV  S = info & 0x40 ? -1 : 1; // sign
+          NV  B = base [(info >> 4) & 3]; // base
+          NV  F = 1 << ((info >> 2) & 3); // scale factor ("shift")
+          int L = info & 3; // exponent length
+
+          if (!B)
+            croak ("BER_TYPE_REAL binary encoding uses invalid base (0x%02x)", info);
+
+          SAVETMPS;
+
+          SV *E = sv_2mortal (decode_int (L == 3 ? get_u8 () : L + 1));
+          SV *M = sv_2mortal (decode_int (len - (cur - beg)));
+
+          res = newSVnv (S * SvNV (M) * F * Perl_pow (B, SvNV (E)));
+
+          FREETMPS;
+        }
+      else if (info & 0x40)
+        {
+          // SpecialRealValue
+          U8 special = get_u8 ();
+          NV val;
+
+          switch (special)
+            {
+              case 0x40: val =  NV_INF; break;
+              case 0x41: val = -NV_INF; break;
+              case 0x42: val =  NV_NAN; break;
+              case 0x43: val = -(NV)0.; break;
+
+              default:
+                croak ("BER_TYPE_REAL SpecialRealValues invalid encoding 0x%02x (X.690 8.5.9)", special);
+            }
+
+          res = newSVnv (val);
+        }
+      else
+        {
+          // decimal
+          dSP;
+          SAVETMPS;
+          PUSHMARK (SP);
+          EXTEND (SP, 2);
+          PUSHs (sv_2mortal (newSVcacheint (info & 0x3f)));
+          PUSHs (sv_2mortal (newSVpvn (get_n (len - 1), len - 1)));
+          PUTBACK;
+          call_pv ("Convert::BER::XS::_decode_real_decimal", G_SCALAR);
+          SPAGAIN;
+          res = SvREFCNT_inc_NN (POPs);
+          PUTBACK;
+          FREETMPS;
+        }
+    }
+
+  if (cur - beg != len)
+    {
+      SvREFCNT_dec_NN (res);
+      croak ("BER_TYPE_REAL invalid content length (X.690 8,5)");
+    }
+
+  return res;
+}
+
 // TODO: this is unacceptably slow
 static SV *
 decode_ucs (UV len, int chrsize)
@@ -472,15 +561,37 @@ decode_ber (void)
 
   if (constructed)
     {
-      UV len = get_length ();
-      UV seqend = (cur - buf) + len;
+      want (1);
       AV *av = (AV *)sv_2mortal ((SV *)newAV ());
 
-      while (cur < buf + seqend)
-        av_push (av, decode_ber ());
+      if (expect_false (*cur == 0x80))
+        {
+          // indefinite length
+          ++cur;
 
-      if (expect_false (cur > buf + seqend))
-        croak ("CONSTRUCTED type %02x length overflow (0x%x 0x%x)\n", identifier, (int)(cur - buf), (int)seqend);
+          for (;;)
+            {
+              want (2);
+              if (!cur [0] && !cur [1])
+                {
+                  cur += 2;
+                  break;
+                }
+
+            av_push (av, decode_ber ());
+          }
+        }
+      else
+        {
+          UV len = get_length ();
+          UV seqend = (cur - buf) + len;
+
+          while (cur < buf + seqend)
+            av_push (av, decode_ber ());
+
+          if (expect_false (cur > buf + seqend))
+            croak ("CONSTRUCTED type %02x length overflow (0x%x 0x%x)\n", identifier, (int)(cur - buf), (int)seqend);
+        }
 
       res = newRV_inc ((SV *)av);
     }
@@ -544,7 +655,8 @@ decode_ber (void)
             break;
 
           case BER_TYPE_REAL:
-            error ("BER_TYPE_REAL not implemented");
+            res = decode_real (len);
+            break;
 
           case BER_TYPE_CROAK:
             croak ("class/tag %d/%d mapped to BER_TYPE_CROAK", klass, tag);
@@ -838,22 +950,66 @@ encode_oid (SV *oid, int relative)
   len_fixup (mark);
 }
 
-// check whether an SV is a BER tuple and returns its AV *
-static AV *
-ber_tuple (SV *tuple)
+static void
+encode_real (SV *data)
 {
-  SV *rv;
+  NV nv = SvNV (data);
 
-  if (expect_false (!SvROK (tuple) || SvTYPE ((rv = SvRV (tuple))) != SVt_PVAV))
-    croak ("BER tuple must be array-reference");
+  if (expect_false (nv == (NV)0.))
+    {
+      if (signbit (nv))
+        {
+          // negative zero
+          need (3);
+          *cur++ = 2;
+          *cur++ = 0x40;
+          *cur++ = 0x43;
+        }
+      else
+        {
+          // positive zero
+          need (1);
+          *cur++ = 0;
+        }
+    }
+  else if (expect_false (Perl_isinf (nv)))
+    {
+      need (3);
+      *cur++ = 2;
+      *cur++ = 0x40;
+      *cur++ = nv < (NV)0. ? 0x41 : 0x40;
+    }
+  else if (expect_false (Perl_isnan (nv)))
+    {
+      need (3);
+      *cur++ = 2;
+      *cur++ = 0x40;
+      *cur++ = 0x42;
+    }
+  else
+    {
+      // use decimal encoding
+      dSP;
+      SAVETMPS;
+      PUSHMARK (SP);
+      EXTEND (SP, 2);
+      PUSHs (data);
+      PUSHs (sv_2mortal (newSVcacheint (NV_DIG)));
+      PUTBACK;
+      call_pv ("Convert::BER::XS::_encode_real_decimal", G_SCALAR);
+      SPAGAIN;
 
-  if (expect_false (SvRMAGICAL (rv)))
-    croak ("BER tuple must not be tied");
+      SV *sv = POPs;
+      STRLEN l;
+      char *f = SvPV (sv, l);
 
-  if (expect_false (AvFILL ((AV *)rv) != BER_ARRAYSIZE - 1))
-    croak ("BER tuple must contain exactly %d elements, not %d", BER_ARRAYSIZE, AvFILL ((AV *)rv) + 1);
+      put_length (l);
+      memcpy (cur, f, l);
+      cur += l;
 
-  return (AV *)rv;
+      PUTBACK;
+      FREETMPS;
+    }
 }
 
 static void
@@ -883,6 +1039,25 @@ encode_ucs (SV *data, int chrsize)
       *cur++ = uchr;
     }
 }
+
+// check whether an SV is a BER tuple and returns its AV *
+static AV *
+ber_tuple (SV *tuple)
+{
+  SV *rv;
+
+  if (expect_false (!SvROK (tuple) || SvTYPE ((rv = SvRV (tuple))) != SVt_PVAV))
+    croak ("BER tuple must be array-reference");
+
+  if (expect_false (SvRMAGICAL (rv)))
+    croak ("BER tuple must not be tied");
+
+  if (expect_false (AvFILL ((AV *)rv) != BER_ARRAYSIZE - 1))
+    croak ("BER tuple must contain exactly %d elements, not %d", BER_ARRAYSIZE, AvFILL ((AV *)rv) + 1);
+
+  return (AV *)rv;
+}
+
 static void
 encode_ber (SV *tuple)
 {
@@ -982,7 +1157,8 @@ encode_ber (SV *tuple)
           break;
 
         case BER_TYPE_REAL:
-          croak ("BER_TYPE_REAL not implemented");
+          encode_real (data);
+          break;
 
         case BER_TYPE_CROAK:
           croak ("class/tag %d/%d mapped to BER_TYPE_CROAK", klass, tag);
@@ -1091,7 +1267,9 @@ ber_decode (SV *ber, SV *profile = &PL_sv_undef)
         cur = buf;
         end = buf + len;
 
+        PUTBACK;
         SV *tuple = decode_ber ();
+        SPAGAIN;
 
         EXTEND (SP, 2);
         PUSHs (sv_2mortal (tuple));
@@ -1186,7 +1364,9 @@ ber_encode (SV *tuple, SV *profile = &PL_sv_undef)
         SvPOK_only (buf_sv);
         set_buf (buf_sv);
 
+        PUTBACK;
         encode_ber (tuple);
+        SPAGAIN;
 
         SvCUR_set (buf_sv, cur - buf);
         XPUSHs (buf_sv);

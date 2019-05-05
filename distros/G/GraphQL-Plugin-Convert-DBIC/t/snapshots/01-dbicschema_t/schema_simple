@@ -18,14 +18,8 @@ input BlogCreateInput {
   title: String!
 }
 
-input BlogMutateInput {
-  content: String
-  created_time: String
+input BlogIDInput {
   id: Int!
-  location: String
-  subtitle: String
-  timestamp: DateTime
-  title: String
 }
 
 input BlogSearchInput {
@@ -44,17 +38,26 @@ type BlogTag {
 }
 
 input BlogTagCreateInput {
-  blog: BlogMutateInput!
+  blog: BlogIDInput!
   name: String!
 }
 
-input BlogTagMutateInput {
+input BlogTagIDInput {
   id: Int!
-  name: String
 }
 
 input BlogTagSearchInput {
   name: String
+}
+
+input BlogTagUpdateInput {
+  id: BlogTagIDInput!
+  payload: BlogTagSearchInput!
+}
+
+input BlogUpdateInput {
+  id: BlogIDInput!
+  payload: BlogSearchInput!
 }
 
 enum CustomType {
@@ -70,18 +73,18 @@ type Mutation {
   createPg(input: [PgCreateInput!]!): [Pg]
   createPhoto(input: [PhotoCreateInput!]!): [Photo]
   createPhotoset(input: [PhotosetCreateInput!]!): [Photoset]
-  deleteBlog(input: [BlogMutateInput!]!): [Boolean]
-  deleteBlogTag(input: [BlogTagMutateInput!]!): [Boolean]
-  deleteMysql(input: [MysqlMutateInput!]!): [Boolean]
-  deletePg(input: [PgMutateInput!]!): [Boolean]
-  deletePhoto(input: [PhotoMutateInput!]!): [Boolean]
-  deletePhotoset(input: [PhotosetMutateInput!]!): [Boolean]
-  updateBlog(input: [BlogMutateInput!]!): [Blog]
-  updateBlogTag(input: [BlogTagMutateInput!]!): [BlogTag]
-  updateMysql(input: [MysqlMutateInput!]!): [Mysql]
-  updatePg(input: [PgMutateInput!]!): [Pg]
-  updatePhoto(input: [PhotoMutateInput!]!): [Photo]
-  updatePhotoset(input: [PhotosetMutateInput!]!): [Photoset]
+  deleteBlog(input: [BlogIDInput!]!): [Boolean]
+  deleteBlogTag(input: [BlogTagIDInput!]!): [Boolean]
+  deleteMysql(input: [MysqlIDInput!]!): [Boolean]
+  deletePg(input: [PgIDInput!]!): [Boolean]
+  deletePhoto(input: [PhotoIDInput!]!): [Boolean]
+  deletePhotoset(input: [PhotosetIDInput!]!): [Boolean]
+  updateBlog(input: [BlogUpdateInput!]!): [Blog]
+  updateBlogTag(input: [BlogTagUpdateInput!]!): [BlogTag]
+  updateMysql(input: [MysqlUpdateInput!]!): [Mysql]
+  updatePg(input: [PgUpdateInput!]!): [Pg]
+  updatePhoto(input: [PhotoUpdateInput!]!): [Photo]
+  updatePhotoset(input: [PhotosetUpdateInput!]!): [Photoset]
 }
 
 type Mysql {
@@ -111,12 +114,8 @@ enum MysqlEnumColumn {
   foo
 }
 
-input MysqlMutateInput {
-  another_enum_column: MysqlAnotherEnumColumn
-  enum_column: MysqlEnumColumn
+input MysqlIDInput {
   id: String!
-  timestamp_with_tz: DateTime
-  timestamp_without_tz: DateTime
 }
 
 input MysqlSearchInput {
@@ -124,6 +123,11 @@ input MysqlSearchInput {
   enum_column: MysqlEnumColumn
   timestamp_with_tz: DateTime
   timestamp_without_tz: DateTime
+}
+
+input MysqlUpdateInput {
+  id: MysqlIDInput!
+  payload: MysqlSearchInput!
 }
 
 type Pg {
@@ -141,12 +145,8 @@ input PgCreateInput {
   timestamp_without_tz: DateTime!
 }
 
-input PgMutateInput {
-  another_enum_column: CustomType
-  enum_column: CustomType
+input PgIDInput {
   id: String!
-  timestamp_with_tz: DateTime
-  timestamp_without_tz: DateTime
 }
 
 input PgSearchInput {
@@ -154,6 +154,11 @@ input PgSearchInput {
   enum_column: CustomType
   timestamp_with_tz: DateTime
   timestamp_without_tz: DateTime
+}
+
+input PgUpdateInput {
+  id: PgIDInput!
+  payload: PgSearchInput!
 }
 
 type Photo {
@@ -192,7 +197,7 @@ input PhotoCreateInput {
   medium: String
   original: String
   original_url: String
-  photoset: PhotosetMutateInput
+  photoset: PhotosetIDInput
   region: String
   small: String
   square: String
@@ -200,25 +205,8 @@ input PhotoCreateInput {
   thumbnail: String
 }
 
-input PhotoMutateInput {
-  country: String
-  description: String
+input PhotoIDInput {
   id: String!
-  idx: Int
-  is_glen: String
-  isprimary: String
-  large: String
-  lat: String
-  locality: String
-  lon: String
-  medium: String
-  original: String
-  original_url: String
-  region: String
-  small: String
-  square: String
-  taken: DateTime
-  thumbnail: String
 }
 
 input PhotoSearchInput {
@@ -239,6 +227,11 @@ input PhotoSearchInput {
   square: String
   taken: DateTime
   thumbnail: String
+}
+
+input PhotoUpdateInput {
+  id: PhotoIDInput!
+  payload: PhotoSearchInput!
 }
 
 type Photoset {
@@ -272,7 +265,7 @@ input PhotosetCreateInput {
   farm: Int!
   idx: Int!
   needs_interstitial: Int
-  primary_photo: PhotoMutateInput
+  primary_photo: PhotoIDInput
   secret: String!
   server: String!
   timestamp: DateTime!
@@ -281,23 +274,8 @@ input PhotosetCreateInput {
   visibility_can_see_set: Int
 }
 
-input PhotosetMutateInput {
-  can_comment: Int
-  count_comments: Int
-  count_views: Int
-  date_create: Int
-  date_update: Int
-  description: String
-  farm: Int
+input PhotosetIDInput {
   id: String!
-  idx: Int
-  needs_interstitial: Int
-  secret: String
-  server: String
-  timestamp: DateTime
-  title: String
-  videos: Int
-  visibility_can_see_set: Int
 }
 
 input PhotosetSearchInput {
@@ -318,6 +296,11 @@ input PhotosetSearchInput {
   visibility_can_see_set: Int
 }
 
+input PhotosetUpdateInput {
+  id: PhotosetIDInput!
+  payload: PhotosetSearchInput!
+}
+
 type Query {
   blog(id: Int!): Blog
   blogTag(id: Int!): BlogTag
@@ -331,17 +314,11 @@ type Query {
   photos(id: [String!]!): [Photo]
   photoset(id: String!): Photoset
   photosets(id: [String!]!): [Photoset]
-  "input to search"
   searchBlog(input: BlogSearchInput!): [Blog]
-  "input to search"
   searchBlogTag(input: BlogTagSearchInput!): [BlogTag]
-  "input to search"
   searchMysql(input: MysqlSearchInput!): [Mysql]
-  "input to search"
   searchPg(input: PgSearchInput!): [Pg]
-  "input to search"
   searchPhoto(input: PhotoSearchInput!): [Photo]
-  "input to search"
   searchPhotoset(input: PhotosetSearchInput!): [Photoset]
 }
 '

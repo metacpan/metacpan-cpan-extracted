@@ -57,6 +57,7 @@ lib/Config/Model/SearchElement.pm
 lib/Config/Model/SimpleUI.pm
 lib/Config/Model/TermUI.pm
 lib/Config/Model/TreeSearcher.pm
+lib/Config/Model/TypeConstraints.pm
 lib/Config/Model/Utils/GenClassPod.pm
 lib/Config/Model/Value.pm
 lib/Config/Model/Value/LayeredInclude.pm
@@ -92,6 +93,7 @@ t/apply_fix.t
 t/array_id.t
 t/array_with_data_migration.t
 t/augment_class.t
+t/author-critic.t
 t/auto_load_model.t
 t/backend_ini.t
 t/backend_ini_with_section_map.t
@@ -111,6 +113,7 @@ t/hash_id_of_node.t
 t/hash_id_of_values.t
 t/hash_with_data_migration.t
 t/include.t
+t/instance-reset.t
 t/instance.t
 t/iterator.t
 t/lib/Config/Model/Backend/Mini.pm

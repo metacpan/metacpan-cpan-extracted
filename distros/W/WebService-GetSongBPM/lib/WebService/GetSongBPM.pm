@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the getsongbpm.com API
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 use Moo;
 use strictures 2;
@@ -14,6 +14,7 @@ use Mojo::UserAgent;
 use Mojo::JSON::MaybeXS;
 use Mojo::JSON qw( decode_json );
 use Mojo::URL;
+use Try::Tiny;
 
 
 has api_key => (
@@ -109,7 +110,13 @@ sub _handle_response {
     my $res = $tx->result;
 
     if ( $res->is_success ) {
-        $data = decode_json( $res->body );
+        my $body = $res->body;
+        try {
+            $data = decode_json($body);
+        }
+        catch {
+            croak $body, "\n";
+        };
     }
     else {
         croak "Connection error: ", $res->message;
@@ -132,7 +139,7 @@ WebService::GetSongBPM - Access to the getsongbpm.com API
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 SYNOPSIS
 

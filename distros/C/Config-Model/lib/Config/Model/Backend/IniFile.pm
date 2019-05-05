@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::IniFile;
-$Config::Model::Backend::IniFile::VERSION = '2.133';
+package Config::Model::Backend::IniFile 2.134;
+
 use Carp;
 use Mouse;
 use 5.10.0;
@@ -415,7 +415,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -743,7 +743,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -26,3 +26,4 @@ t/13_sock_stream.t
 t/20_pod.t
 t/21_xs_memory_leaks.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

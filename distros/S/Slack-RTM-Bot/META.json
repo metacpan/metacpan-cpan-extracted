@@ -63,7 +63,7 @@
    "provides" : {
       "Slack::RTM::Bot" : {
          "file" : "lib/Slack/RTM/Bot.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Slack::RTM::Bot::Client" : {
          "file" : "lib/Slack/RTM/Bot/Client.pm"
@@ -86,7 +86,7 @@
          "web" : "https://github.com/duck8823/Slack-RTM-Bot"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_contributors" : [
       "shmaeda <shmaeda@nig.ac.jp>",
       "makamaka <makamaka.donzoko@gmail.com>",

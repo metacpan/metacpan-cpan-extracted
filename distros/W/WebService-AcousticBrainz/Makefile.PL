@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Mojo::UserAgent" => 0,
     "Mojolicious" => 8,
     "Moo" => 2,
+    "Try::Tiny" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -34,11 +35,10 @@ my %WriteMakefileArgs = (
     "Mojo::Base" => 0,
     "Mojolicious" => 8,
     "Test::More" => 0,
-    "Try::Tiny" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0400",
+  "VERSION" => "0.0401",
   "test" => {
     "TESTS" => "t/*.t"
   }

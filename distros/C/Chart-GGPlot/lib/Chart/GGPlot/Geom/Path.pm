@@ -6,13 +6,15 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use List::AllUtils qw(reduce);
 use PDL::Primitive qw(which);
 
 use Chart::GGPlot::Aes;
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(:all);
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(Chart::GGPlot::Geom);
 
@@ -29,6 +31,53 @@ has '+default_aes'     => (
 );
 
 classmethod required_aes () { [qw(x y)] }
+
+my $geom_path_pod = layer_func_pod(<<'=cut');
+
+    geom_path(:$mapping=undef, :$data=undef, :$stat='identity',
+              :$position='identity', :$na_rm=false, :$show_legend='auto',
+              :$inherit_aes=true, 
+              %rest)
+
+The "path" geom connects the observations in the order in which they appear
+in the data.
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=back
+
+=cut
+
+my $geom_path_code = fun (
+        :$mapping = undef, :$data = undef,
+        :$stat = 'identity', :$position = 'identity',
+        :$na_rm = false,
+        :$show_legend = 'auto', :$inherit_aes = true,
+        %rest )
+{
+    return Chart::GGPlot::Layer->new(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => $stat,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        geom        => 'path',
+        params      => { na_rm => $na_rm, %rest },
+    );
+};
+
+classmethod ggplot_functions() {
+    return [
+        {
+            name => 'geom_path',
+            code => $geom_path_code,
+            pod => $geom_path_pod,
+        }
+    ];
+}
 
 method handle_na ($data, $params) {
 
@@ -106,7 +155,7 @@ Chart::GGPlot::Geom::Path - Class for path geom
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

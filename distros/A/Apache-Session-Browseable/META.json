@@ -71,15 +71,15 @@
       },
       "Apache::Session::Browseable::PgHstore" : {
          "file" : "lib/Apache/Session/Browseable/PgHstore.pm",
-         "version" : "v1.2.7"
+         "version" : "v1.3.0"
       },
       "Apache::Session::Browseable::PgJSON" : {
          "file" : "lib/Apache/Session/Browseable/PgJSON.pm",
-         "version" : "v1.2.7"
+         "version" : "v1.2.9"
       },
       "Apache::Session::Browseable::Postgres" : {
          "file" : "lib/Apache/Session/Browseable/Postgres.pm",
-         "version" : "v1.2.5"
+         "version" : "v1.3.1"
       },
       "Apache::Session::Browseable::Redis" : {
          "file" : "lib/Apache/Session/Browseable/Redis.pm",
@@ -150,8 +150,11 @@
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/LemonLDAPNG/Apache-Session-Browseable"
+      }
    },
-   "version" : "v1.3.0",
+   "version" : "v1.3.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -3,7 +3,7 @@ package Database::Async::Engine::PostgreSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 =head1 NAME
 
@@ -183,20 +183,30 @@ sub create_table {
             schema => $tbl->schema->name,
             (map {; $_ => $tbl->$_ } grep { defined $tbl->$_ } qw(name tablespace)),
             parents => [
-                $tbl->parents
+                map {;
+                    +{
+                        name => $_->name,
+                        schema => $_->schema->name
+                    }
+                } $tbl->parents
             ],
             fields => [
                 (map {;
-                        +{
-                            name => $_->name,
-                            type => {
-                                schema => $_->type->schema,
-                                name => $_->type->name,
-                                is_builtin => $_->type->is_builtin,
-                            },
-                            nullable => $_->nullable,
-                        }
-                    } $tbl->fields)
+                    +{
+                        name => $_->name,
+                        type => {
+                            schema => ($_->type->is_builtin
+                                ? undef
+                                : $_->type->schema
+                                ? $_->type->schema->name
+                                : $tbl->schema->name
+                            ),
+                            name => $_->type->name,
+                            is_builtin => $_->type->is_builtin,
+                        },
+                        nullable => $_->nullable,
+                    }
+                } $tbl->fields)
             ]
         }
     };
@@ -208,11 +218,11 @@ sub create_table {
 [% END -%]
 create [% IF table.temporary %]temporary [% END %][% IF table.unlogged %]unlogged [% END %]table if not exists "[% table.schema %]"."[% table.name %]" (
 [% FOREACH field IN table.fields -%]
-    "[% field.name %]" [% IF field.type.schema %]"[% field.type.schema.name %]".[% END %][% IF field.type.is_builtin; field.type.name; ELSE %]"[% field.type.name %]"[% END %][% IF !field.nullable %] not null[% END %][% UNLESS loop.last %],[% END %]
+    "[% field.name %]" [% IF field.type.schema.defined %]"[% field.type.schema %]".[% END %][% IF field.type.is_builtin; field.type.name; ELSE %]"[% field.type.name %]"[% END %][% IF !field.nullable %] not null[% END %][% UNLESS loop.last %],[% END %]
 [% END -%]
 )[% IF table.parents.size %] inherits (
 [% FOREACH parent IN table.parents -%]
-    "[% parent.schema.name %]"."[% parent.name %]"[% UNLESS loop.last %],[% END %]
+    "[% parent.schema %]"."[% parent.name %]"[% UNLESS loop.last %],[% END %]
 [% END -%]
 )[% END %][% IF table.tablespace %] tablespace "[% table.tablespace %]"[% END %]
 TEMPLATE

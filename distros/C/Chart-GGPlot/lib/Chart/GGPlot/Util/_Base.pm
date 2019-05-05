@@ -4,7 +4,7 @@ package Chart::GGPlot::Util::_Base;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Data::Frame::Util qw(:all);
 use PDL::Ufunc qw(qsorti);
@@ -33,7 +33,7 @@ fun range_ (Piddle $p, $na_rm = false, $finite = false) {
     }
     my $p = $finite ? $p->where( $p->isfinite ) : $p;
     my $class = ref($p);
-    return $class->new( [ $p->min, $p->max ] );
+    return $class->new( [ $p->minmax ] );
 }
 
 # the R seq function is implemented by seq_n and seq_by here,
@@ -119,7 +119,7 @@ Chart::GGPlot::Util::_Base - R 'base' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.33'; # VERSION
 }
 
 use DynaLoader ();
@@ -24,7 +24,7 @@ use Devel::Cover::Inc;
 
 BEGIN { $VERSION //= $Devel::Cover::Inc::VERSION }
 
-use B qw( class ppname main_cv main_start main_root walksymtable OPf_KIDS );
+use B qw( ppname main_cv main_start main_root walksymtable OPf_KIDS );
 use B::Debug;
 use B::Deparse;
 
@@ -1010,7 +1010,7 @@ sub deparse {
     my $deparse;
 
     if ($Collect) {
-        my $class = class($op);
+        my $class = B::class($op);
         my $null  = $class eq "NULL";
 
         my $name = $op->can("name") ? $op->name : "Unknown";
@@ -1078,7 +1078,7 @@ sub deparse {
             } else {
                 { local $Collect; $cond = $self->deparse($cond, 1) }
                 add_branch_cover($op, "if", "if ($cond) { }", $File, $Line);
-                while (class($false) ne "NULL" && is_ifelse_cont($false)) {
+                while (B::class($false) ne "NULL" && is_ifelse_cont($false)) {
                     my $newop   = $false->first;
                     my $newcond = $newop->first;
                     my $newtrue = $newcond->sibling;
@@ -1317,7 +1317,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ plan tests => 10;
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::DataPath', '0.04';
+    use_ok 'JIP::DataPath', '0.041';
     require_ok 'JIP::DataPath';
 
     diag(
@@ -368,71 +368,80 @@ subtest 'path()' => sub {
 subtest '_accessor()' => sub {
     plan tests => 19;
 
-    my $document = {
-        foo => {
-            wtf => 42,
-        },
-        bar => [
-            [11, 22],
-        ],
+    my $build_document = sub {
+        return {
+            foo => {
+                wtf => 42,
+            },
+            bar => [
+                [11, 22],
+            ],
+        };
     };
+
+    my $document = $build_document->();
 
     my $o = JIP::DataPath->new(document => $document);
 
-    {
-        my ($contains, $context) = $o->_accessor([]);
-        is $contains,       1;
-        is_deeply $context, $document;
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(foo)]);
-        is $contains,       1;
-        is_deeply $context, $document;
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(foo wtf)]);
-        is $contains,       1;
-        is_deeply $context, $document->{'foo'};
-    }
-
-    {
-        my ($contains, $context) = $o->_accessor([qw(bar)]);
-        is $contains,       1;
-        is_deeply $context, $document;
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(bar 0)]);
-        is $contains,       1;
-        is_deeply $context, $document->{'bar'};
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(bar 0 0)]);
-        is $contains,       1;
-        is_deeply $context, $document->{'bar'}->[0];
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(bar 0 1)]);
-        is $contains,       1;
-        is_deeply $context, $document->{'bar'}->[0];
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(1 wtf 1 wtf)]);
-        is $contains, 0;
-        is $context,  undef;
-    }
-    {
-        my ($contains, $context) = $o->_accessor([qw(wtf 1 wtf 1)]);
-        is $contains, 0;
-        is $context,  undef;
-    }
-
-    is_deeply $o->document, {
-        foo => {
-            wtf => 42,
+    my @tests = (
+        {
+            path     => [],
+            contains => 1,
+            context  => $document,
         },
-        bar => [
-            [11, 22],
-        ],
-    };
+        {
+            path     => [qw(foo)],
+            contains => 1,
+            context  => $document,
+        },
+        {
+            path     => [qw(foo wtf)],
+            contains => 1,
+            context  => $document->{'foo'},
+        },
+        {
+            path     => [qw(bar)],
+            contains => 1,
+            context  => $document,
+        },
+        {
+            path     => [qw(bar 0)],
+            contains => 1,
+            context  => $document->{'bar'},
+        },
+        {
+            path     => [qw(bar 0 0)],
+            contains => 1,
+            context  => $document->{'bar'}->[0],
+        },
+        {
+            path     => [qw(bar 0 1)],
+            contains => 1,
+            context  => $document->{'bar'}->[0],
+        },
+        {
+            path     => [qw(1 wtf 1 wtf)],
+            contains => 0,
+            context  => undef,
+        },
+        {
+            path     => [qw(wtf 1 wtf 1)],
+            contains => 0,
+            context  => undef,
+        },
+    );
+
+    foreach my $test (@tests) {
+        my ($contains, $context) = $o->_accessor($test->{'path'});
+        is(
+            $contains,
+            $test->{'contains'},
+            sprintf('contains "%s"', join(q{/}, @{ $test->{'path'} })),
+        );
+        is_deeply $context,  $test->{'context'};
+    }
+
+    # side effects
+    is_deeply $o->document, $build_document->();
 };
 

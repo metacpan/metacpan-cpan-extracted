@@ -4,7 +4,7 @@ use warnings;
 package App::Spec;
 use 5.010;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use App::Spec::Subcommand;
 use App::Spec::Option;

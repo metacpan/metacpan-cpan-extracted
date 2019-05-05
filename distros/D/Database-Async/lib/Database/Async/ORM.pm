@@ -3,7 +3,7 @@ package Database::Async::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 =head1 NAME
 
@@ -187,6 +187,54 @@ async sub apply_database_changes {
     await $db->query(q{commit})->void;
     $log->debugf('Applied %d database migrations', 0 + @out);
     return;
+}
+
+sub database_changes_as_sql {
+    my ($self, $db, @actions) = @_;
+
+    my $ddl = $self->ddl_for($db);
+
+    my @out;
+    # Optional extensions first, and we don't care if any fail
+    for my $ext ($self->extension_list) {
+        my ($name) = $ext->name;
+        try {
+            die 'invalid name for extension: ' . $name unless $name =~ /^[a-zA-Z0-9_-]+$/;
+            push @out, qq{create extension if not exists "$name" cascade} if $ext->is_optional;
+        } catch {
+            $log->warnf('Failed to install optional extension %s, ignoring: %s', $name, $@);
+        }
+    }
+
+    # All remaining steps are in a single transaction
+    push @out, q{begin};
+
+    for my $ext (grep { not $_->is_optional } $self->extension_list) {
+        my ($name) = $ext->name;
+        die 'invalid name for extension: ' . $name unless $name =~ /^[a-zA-Z0-9_-]+$/;
+        push @out, qq{create extension if not exists "$name" cascade};
+    }
+
+    for my $action (@actions) {
+        if($action->isa('Database::Async::ORM::Table')) {
+            $log->tracef('Create table %s', $action->name);
+            push @out, $ddl->create_table($action);
+        } elsif($action->isa('Database::Async::ORM::Schema')) {
+            $log->tracef('Create schema %s', $action->name);
+            push @out, $ddl->create_schema($action);
+        } elsif($action->isa('Database::Async::ORM::Type')) {
+            $log->tracef('Create type %s', $action->name);
+            push @out, $ddl->create_type($action);
+        } else {
+            die 'unknown thing ' . $action;
+        }
+    }
+
+    push @out, q{commit};
+
+    # Make sure that we have no empty queries in the list... should not be necessary,
+    # perhaps this should just bail out instead.
+    return grep { length } @out;
 }
 
 =head2 load_from
@@ -428,7 +476,7 @@ sub populate_table {
             defined_in => $table_details->{defined_in},
             table      => $table,
             type       => $type,
-            %{$field_details}{grep { exists $field_details->{$_} } qw(name description)}
+            %{$field_details}{grep { exists $field_details->{$_} } qw(name description nullable)}
         );
         $log->tracef('Add field %s as %s with type %s', $field->name, $field_details, $field->type);
         push $table->{fields}->@*, $field;

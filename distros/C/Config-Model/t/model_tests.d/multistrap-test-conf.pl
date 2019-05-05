@@ -1,16 +1,16 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
+use strict;
+use warnings;
 
-$model_to_test = "Multistrap";
-
-$from_scratch_file = <<'EOF' ;
+my $from_scratch_file = <<'EOF' ;
 ## This file was written by cme command.
 ## You can run 'cme edit multistrap' to modify this file.
 ## You may also modify the content of this file with your favorite editor.
@@ -19,7 +19,7 @@ $from_scratch_file = <<'EOF' ;
 include = /usr/share/multistrap/crosschroot.conf
 EOF
 
-@tests = (
+my @tests = (
     {
         name        => 'arm',
         config_file => '/home/foo/my_arm.conf',
@@ -63,4 +63,8 @@ EOF
     },
 );
 
-1;
+return {
+    model_to_test => "Multistrap",
+    tests => \@tests
+};
+

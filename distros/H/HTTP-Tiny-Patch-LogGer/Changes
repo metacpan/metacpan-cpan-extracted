@@ -1,3 +1,9 @@
+0.002   2019-04-21 (PERLANCAR)
+
+	- Log raw request too (to see headers like User-Agent); add
+	  configuration -log_request_content.
+
+
 0.001   2017-07-10 (PERLANCAR)
 
         - First release.

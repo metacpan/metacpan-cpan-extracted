@@ -1,0 +1,62 @@
+{
+   "abstract" : "Result class declaration syntactic-sugar that looks like DDL",
+   "author" : [
+      "Michael Conrad <mconrad@intellitree.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-ResultDDL",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0",
+            "Carp" : "0",
+            "DBIx::Class::Core" : "0",
+            "Exporter::Extensible" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nrdvana/perl-DBIx-Class-ResultDDL/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nrdvana/perl-DBIx-Class-ResultDDL.git",
+         "web" : "https://github.com/nrdvana/perl-DBIx-Class-ResultDDL"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

@@ -10,9 +10,9 @@
       "get": {
         "operationId": "dummy",
         "responses": {
-          "200": {"$ref": "../spec/dummy.json"},
-          "201": {"$ref": "./dummy.json"},
-          "202": {"$ref": "dummy.json"},
+          "200": {"description": "", "schema": {"$ref": "../spec/dummy.json"}},
+          "201": {"description": "", "schema": {"$ref": "./dummy.json"}},
+          "202": {"description": "", "schema": {"$ref": "dummy.json"}},
           "default": {"description": "Err", "schema":{"$ref": "#/definitions/error"}}
         }
       }

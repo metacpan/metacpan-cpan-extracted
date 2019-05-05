@@ -4,7 +4,7 @@ package Chart::GGPlot::Scale::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use List::AllUtils qw(pairgrep);
 use Module::Load;
@@ -50,7 +50,7 @@ my @export_ggplot = (
     )
 );
 
-our @EXPORT_OK = ( @export_ggplot, qw(find_scale) );
+our @EXPORT_OK = ( @export_ggplot, qw(find_scale scale_flip_position) );
 our %EXPORT_TAGS = (
     all    => \@EXPORT_OK,
     ggplot => \@export_ggplot,
@@ -60,32 +60,38 @@ my %scale_funcs;
 
 
 fun find_scale ($aes, $x) {
-    my $type      = scale_type($x);
-    my $func_name = join( '_', "scale", $aes, $type );
-    my $f         = $scale_funcs{$func_name};
-    return ( wantarray ? ( $f, $func_name ) : $f );
+    my $types = scale_type($x);
+
+    for my $t (@$types) {
+        my $func_name = join( '_', "scale", $aes, $t );
+        if ( my $f = $scale_funcs{$func_name} ) {
+            return ( wantarray ? ( $f, $func_name ) : $f );
+        }
+    }
+    return;
 }
 
-# TODO support various kind of types
 fun scale_type ($x) {
     if ( $x->$_DOES('PDL::Factor') ) {
-        return $x->DOES('PDL::Factor::Ordered') ? 'ordinal' : 'discrete';
+        return $x->DOES('PDL::Factor::Ordered')
+          ? [qw(ordinal discrete)]
+          : ['discrete'];
     }
     elsif ( $x->$_DOES('PDL::SV') ) {
-        return 'discrete';
+        return ['discrete'];
     }
     elsif ( $x->$_DOES('PDL::DateTime') ) {
-        return 'datetime';
+        return ['datetime'];
     }
     elsif ( $x->$_DOES('PDL') ) {
         if ( $x->type eq 'byte' ) {
-            return 'discrete';
+            return ['discrete'];
         }
         else {
-            return 'continuous';
+            return ['continuous'];
         }
     }
-    return 'identity';
+    return ['identity'];
 }
 
 fun _check_breaks_labels ( $breaks, $labels ) {
@@ -216,6 +222,7 @@ fun scale_flip_position ($scale) {
         right  => "left",
     };
     $scale->position( $switch->{ $scale->position } );
+    return $scale;
 }
 
 
@@ -717,19 +724,17 @@ sub _default_position {
     return ($aes =~ /^x/ ? 'bottom' : 'left');
 }
 
+# register scale functions within this pacakge
 fun _register_scale (Str $name, CodeRef $func) {
     $scale_funcs{$name} = $func;
 }
 
-INIT {
-    # register scale functions within this pacakge
-    use Package::Stash;
+use Package::Stash;
 
-    my $stash   = Package::Stash->new(__PACKAGE__);
-    my $symbols = $stash->get_all_symbols('CODE');
-    for my $key ( grep { /^scale_/ } keys %$symbols ) {
-        _register_scale( $key, $symbols->{$key} );
-    }
+my $stash   = Package::Stash->new(__PACKAGE__);
+my $symbols = $stash->get_all_symbols('CODE');
+for my $key ( grep { /^scale_/ } keys %$symbols ) {
+    _register_scale( $key, $symbols->{$key} );
 }
 
 1;
@@ -746,7 +751,7 @@ Chart::GGPlot::Scale::Functions - Scale functions
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 FUNCTIONS
 

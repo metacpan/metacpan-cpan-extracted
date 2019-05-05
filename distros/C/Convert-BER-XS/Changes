@@ -1,7 +1,21 @@
 Revision history for Perl extension Convert::BER::XS
 
-TODO: indefinite length encoding for constructed values
 TODO: max_depth? yes max_size? no...
+
+1.21 Sat May  4 00:57:15 CEST 2019
+	- more guesswork on what's actually in ISO 6093.
+	- reduce aggressiveness of REAL tests for higher portability.
+
+1.2  Fri Apr 26 00:27:59 CEST 2019
+	- the snmp profile wrongly decoded opaque types as ipaddress.
+        - implement the indefinite encoding (when decoding only).
+        - implement REAL encoding - implementation complexity easily
+          competes with the whole rest of BER. sheesh.
+        - lots more tests for corner cases.
+        - changed "illegal" to "invalid" in diagnostics.
+        - work around a bug in perl 5.16.3 regex matching in the testsuite.
+          soon there will be more failures in the testsuites than in the code
+          proper :/
 
 1.11 Tue Apr 23 22:16:20 CEST 2019
 	- multibyte lengths were not properly encoded when they contained

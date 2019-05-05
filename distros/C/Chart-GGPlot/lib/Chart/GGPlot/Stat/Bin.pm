@@ -6,14 +6,16 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use PDL::Primitive qw(which);
 use POSIX qw(floor);
 
 use Chart::GGPlot::Aes::Functions qw(aes);
 use Chart::GGPlot::Bins;
+use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util qw(call_if_coderef seq_n stat);
+use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
 with qw(
   Chart::GGPlot::Stat
@@ -37,6 +39,81 @@ classmethod _parameters () {
           bins binwidth boundary breaks center pad
           )
     ]
+}
+
+my $stat_bin_pod = layer_func_pod(<<'=cut');
+
+    stat_bin(:$mapping=undef, :$data=undef,
+             :$geom="bar", :$position="stack",
+             :$binwidth=undef, :$bins=undef,
+             :$center=undef, :$boundary=undef, :$breaks=undef,
+             :$pad=false,
+             :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+             %rest)
+
+Arguments:
+
+=over 4
+
+%TMPL_COMMON_ARGS%
+
+=item * $binwidth
+
+The width of the bins.
+Can be specified as a numeric value, or a function that calculates width
+from x. The default is to use C<$bins> bins that cover the range of the
+data.
+
+=item * $bins
+
+Number of bins. Overridden by C<$binwidth>. Defaults to 30.
+
+You should always override this C<$bins> or C<$binwidth>, exploring
+multiple widths to find the best to illustrate the stories in your data.
+
+=back
+
+=cut
+
+my $stat_bin_code = fun (
+    :$mapping=undef, :$data=undef,
+    :$geom="bar", :$position="stack",
+    :$binwidth=undef, :$bins=undef,
+    :$center=undef, :$boundary=undef, :$breaks=undef,
+    :$pad=false,
+    :$na_rm=false,
+    :$show_legend='auto', :$inherit_aes=true,
+    %rest )
+{                           
+    return Chart::GGPlot::Layer->new(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => 'bin',
+        geom        => $geom,
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            binwidth => $binwidth,
+            bins     => $bins,
+            center   => $center,
+            boundary => $boundary,
+            breaks   => $breaks,
+            pad      => $pad,
+            na_rm    => $na_rm,
+            %rest
+        }
+    );
+};
+
+classmethod ggplot_functions () {
+    return [
+        {
+            name => 'stat_bin',
+            code => $stat_bin_code,
+            pod  => $stat_bin_pod,
+        }
+    ];
 }
 
 method setup_params ($data, $params) {
@@ -109,7 +186,7 @@ Chart::GGPlot::Stat::Bin - Statistic method that gets histogram of data
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

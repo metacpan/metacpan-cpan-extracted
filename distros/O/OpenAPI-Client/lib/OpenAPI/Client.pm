@@ -9,7 +9,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 my $BASE = __PACKAGE__;
 my $X_RE = qr{^x-};
@@ -42,10 +42,10 @@ sub call_p {
 
 sub new {
   my ($class, $specification) = (shift, shift);
-  my $attrs = @_ == 1 ? shift : {@_};
+  my $attrs     = @_ == 1 ? shift : {@_};
   my $validator = JSON::Validator::OpenAPI::Mojolicious->new;
 
-  $validator->coerce($attrs->{coerce} // 1);
+  $validator->coerce($attrs->{coerce} // 'booleans,numbers,strings');
   $validator->ua->server->app($attrs->{app}) if $attrs->{app};
   $class = $class->_url_to_class($specification);
   _generate_class($class, $validator->load_and_validate_schema($specification, $attrs)) unless $class->isa($BASE);
@@ -81,7 +81,7 @@ HERE
 
     for my $http_method (keys %{$validator->get([paths => $path])}) {
       next if $http_method =~ $X_RE or $http_method eq 'parameters';
-      my %op_spec = %{$validator->get([paths => $path => $http_method])};
+      my %op_spec      = %{$validator->get([paths => $path => $http_method])};
       my $operation_id = $op_spec{operationId} or next;
 
       $op_spec{method}     = lc $http_method;
@@ -121,7 +121,7 @@ sub _generate_method_p {
 
   Mojo::Util::monkey_patch $class => $method_name => sub {
     my $self = shift;
-    my $tx = $self->_build_tx($op_spec, @_);
+    my $tx   = $self->_build_tx($op_spec, @_);
 
     return $self->ua->start_p($tx) unless my $err = $tx->error;
     return Mojo::Promise->new->reject($err->{message}) unless $err->{code};
@@ -425,7 +425,7 @@ instance.
 
 =item * coerce
 
-See L<JSON::Validator/coerce>. Default to 1.
+See L<JSON::Validator/coerce>. Default to "booleans,numbers,strings".
 
 =back
 

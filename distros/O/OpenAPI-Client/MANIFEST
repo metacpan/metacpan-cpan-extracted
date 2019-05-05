@@ -1,7 +1,3 @@
-.github/CONTRIBUTING.md
-.perltidyrc
-.ship.conf
-.travis.yml
 Changes
 cpanfile
 lib/Mojolicious/Command/openapi.pm

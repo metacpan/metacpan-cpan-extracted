@@ -21,7 +21,7 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'DBIx::Class::Schema' => 0,
-    'GraphQL' => '0.32', # new SDL format
+    'GraphQL' => '0.34', # List->name
     'SQL::Translator' => '0',
     'Lingua::EN::Inflect::Number' => '0',
   },

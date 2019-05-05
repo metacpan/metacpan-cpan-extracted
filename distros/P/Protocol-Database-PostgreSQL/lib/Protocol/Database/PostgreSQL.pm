@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =head1 NAME
 
@@ -203,6 +203,7 @@ use Log::Any qw($log);
 use Ryu;
 use Future;
 use Sub::Identify;
+use Unicode::UTF8;
 
 use Protocol::Database::PostgreSQL::Backend::AuthenticationRequest;
 use Protocol::Database::PostgreSQL::Backend::BackendKeyData;
@@ -1088,11 +1089,13 @@ Send COPY data to the server. Takes an arrayref and replaces any reserved charac
     sub send_copy_data  {
         my ($self, $data) = @_;
         my $content = pack 'a*', (
-            join("\t", map {
-                defined($_)
-                ? s/([\\\x08\x09\x0A\x0C\x0D])/$_charmap{$1}/ger
-                : '\N'
-            } @$data) . "\n"
+            Unicode::UTF8::encode_utf8(
+                join("\t", map {
+                    defined($_)
+                    ? s/([\\\x08\x09\x0A\x0C\x0D])/$_charmap{$1}/ger
+                    : '\N'
+                } @$data) . "\n"
+            )
         );
 
         $self->outgoing->emit(

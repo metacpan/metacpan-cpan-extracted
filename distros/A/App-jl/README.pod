@@ -1,0 +1,65 @@
+=encoding utf8
+
+
+This is Perl module B<App::jl>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1557029628"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1557029628&branch=master"/></a>
+
+=end html
+
+
+=head1 SYNOPSIS
+
+The B<jl> command allows you to recursively decode JSON in JSON string
+
+    $ echo '{"foo":"{\"bar\":\"{\\\"baz\\\":123}\"}"}' | jl
+    {
+       "foo" : {
+          "bar" : {
+             "baz" : 123
+          }
+       }
+    }
+
+
+=head1 INSTALLATION
+
+App::jl installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::jl
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+App::jl documentation is available as in POD. So you can do:
+
+    % perldoc App::jl
+
+
+=head1 REPOSITORY
+
+App::jl is hosted on github
+L<http://github.com/bayashi/App-jl>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

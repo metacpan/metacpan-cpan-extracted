@@ -30,8 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "2.12",
-            "Mojolicious::Plugin::OpenAPI" : "2.00"
+            "JSON::Validator" : "3.10",
+            "Mojolicious::Plugin::OpenAPI" : "2.14"
          }
       },
       "test" : {
@@ -52,6 +52,10 @@
          "web" : "https://github.com/jhthorsen/openapi-client"
       }
    },
-   "version" : "0.22",
+   "version" : "0.24",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>",
+      "Ed J <etj@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -36,12 +36,22 @@
             "File::Copy" : "0",
             "File::Path" : "0",
             "File::TVShow::Info" : "0",
-            "Test::Carp" : "0",
+            "IPC::Cmd" : "0",
             "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::chdir" : "0",
+            "Test::Carp" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

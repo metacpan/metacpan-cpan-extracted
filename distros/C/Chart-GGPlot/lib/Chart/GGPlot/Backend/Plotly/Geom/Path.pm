@@ -1,27 +1,29 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Path;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Bar
+# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Path
 
 use Chart::GGPlot::Class qw(:pdl);
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
 use Module::Load;
 
-use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb group_to_NA);
+use Chart::GGPlot::Backend::Plotly::Util qw(
+  cex_to_px to_rgb group_to_NA pdl_to_plotly
+);
 use Chart::GGPlot::Util qw(ifelse);
 
 sub mode {
     return 'lines';
 }
 
-classmethod marker ($df, %rest) {
+classmethod marker ($df, @rest) {
     return;
 }
 
-classmethod to_trace ($df, %rest) {
+classmethod to_trace ($df, $params, $plot) {
     $df = group_to_NA($df);
 
     my $use_webgl = $class->use_webgl($df);
@@ -37,7 +39,7 @@ classmethod to_trace ($df, %rest) {
     }
 
     my ( $x, $y ) = map { $df->at($_) } qw(x y);
-    my $marker = $class->marker( $df, %rest );
+    my $marker = $class->marker( $df, $params, $plot );
 
     my $mode = $class->mode;
     my $line;
@@ -60,9 +62,9 @@ classmethod to_trace ($df, %rest) {
         };
     }
 
-    return $plotly_trace_class->new(
-        x    => $x->unpdl,
-        y    => $y->unpdl,
+    my $trace = $plotly_trace_class->new(
+        x    => $x,
+        y    => $y,
         mode => $mode,
         maybe
           line => $line,
@@ -75,11 +77,12 @@ classmethod to_trace ($df, %rest) {
             $use_webgl
             ? ()
             : (
-                hovertext => $df->at('hovertext')->unpdl,
+                hovertext => pdl_to_plotly( $df->at('hovertext') ),
                 hoverinfo => 'text',
             )
         ),
     );
+    return $class->_adjust_trace_for_flip($trace, $plot);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -94,11 +97,11 @@ __END__
 
 =head1 NAME
 
-Chart::GGPlot::Backend::Plotly::Geom::Path - Chart::GGPlot's Plotly support for Geom::Bar
+Chart::GGPlot::Backend::Plotly::Geom::Path - Chart::GGPlot's Plotly support for Geom::Path
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

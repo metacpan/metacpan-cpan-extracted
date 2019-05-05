@@ -1,5 +1,9 @@
 Revision history for WebService-AcousticBrainz
 
+0.0401 2019-05-04 19:52:51
+    - Tidied test code.
+    - Replaced kludgy JSON detection logic.
+
 0.0400 2019-01-29 23:47:38
     - Improve documentation.
     - Add tests for incomplete fetch() arguments.

@@ -74,4 +74,5 @@ t/pdl-sv.t
 t/rlike.t
 t/subset.t
 t/traits.t
+utils/leak_trace.pl
 utils/patch_pod.pl

@@ -17,11 +17,11 @@ my ($model, $trace) = init_test();
 
 # See caveats in Test::More doc
 my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ':utf8';
-binmode STDERR, ':utf8';
+binmode $builder->output,         ":encoding(UTF-8)";
+binmode $builder->failure_output, ":encoding(UTF-8)";
+binmode $builder->todo_output,    ":encoding(UTF-8)";
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
 
 ok( 1, "compiled" );
 
@@ -34,6 +34,8 @@ my @regexp_test = (
     [ '#C',                [ 'x',  'x',  'x',           'x',            'x',  'x',      'x',        'C' ] ],
     [ '#"m C"',            [ 'x',  'x',  'x',           'x',            'x',  'x',      'x',        '"m C"' ] ],
     [ 'a=b',               [ 'a',  'x',  'x',           'x',            '=',  'x',      'b',        'x' ] ],
+    [ 'a=a~',              [ 'a',  'x',  'x',           'x',            '=',  'x',      'a~',       'x' ] ],
+    [ 'a="~"',             [ 'a',  'x',  'x',           'x',            '=',  'x',      '"~"',      'x' ] ],
     [ 'a=.foo(bar)',       [ 'a',  'x',  'x',           'x',          '=.foo','bar',   'x',        'x' ] ],
     [ 'a=.foo("b r")',     [ 'a',  'x',  'x',           'x',          '=.foo','"b r"', 'x',        'x' ] ],
     [ 'a-z=b',             [ 'a-z','x',  'x',           'x',            '=',  'x',      'b',        'x' ] ],

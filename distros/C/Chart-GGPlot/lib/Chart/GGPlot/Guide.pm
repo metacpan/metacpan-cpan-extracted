@@ -5,7 +5,7 @@ package Chart::GGPlot::Guide;
 use Chart::GGPlot::Setup;
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use parent qw(Chart::GGPlot::Params);
 
@@ -35,7 +35,7 @@ Chart::GGPlot::Guide - Role for guide
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 ATTRIBUTES
 

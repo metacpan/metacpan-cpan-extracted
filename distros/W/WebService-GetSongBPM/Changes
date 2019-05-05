@@ -1,5 +1,8 @@
 Revision history for WebService-GetSongBPM
 
+0.0302 2019-05-04 20:07:37
+    - Attempt to decode the JSON in a try-catch block.
+
 0.0301 2019-01-14 19:00:27
     - Require Mojolicious 8 to silence the cpantesters reports.
 

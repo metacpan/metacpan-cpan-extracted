@@ -1,10 +1,10 @@
 {
-   "abstract" : "manage integers containing multiple bit fields",
+   "abstract" : "manage data packed into bytes of multiple bit fields",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,7 @@
    "provides" : {
       "Data::Bitfield" : {
          "file" : "lib/Data/Bitfield.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -38,6 +38,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

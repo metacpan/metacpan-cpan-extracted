@@ -33,7 +33,6 @@
             "Carp" : "0",
             "English" : "0",
             "Exporter" : "0",
-            "JIP::ClassField" : "0.051",
             "perl" : "5.010001"
          }
       },
@@ -58,6 +57,6 @@
          "web" : "https://github.com/outtaspace/jip_datapath"
       }
    },
-   "version" : "0.04",
+   "version" : "0.041",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

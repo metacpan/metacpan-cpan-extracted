@@ -5,21 +5,27 @@ package Chart::GGPlot::Built;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
+use Data::Frame::Types qw(DataFrame);
 use List::AllUtils qw(pairmap);
-use Types::Standard qw(ArrayRef);
+use Types::Standard qw(ArrayRef ConsumerOf);
 
 use Chart::GGPlot::Types qw(:all);
 
 
-has data   => ( is => 'ro' );
-has layout => ( is => 'ro' );
-has plot   => ( is => 'ro' );
+has data          => ( is => 'ro', isa => ArrayRef [DataFrame] );
+has prestats_data => ( is => 'ro', isa => ArrayRef [DataFrame] );
+has layout        => ( is => 'ro', isa => ConsumerOf['Chart::GGPlot::Layout'] );
+has plot          => ( is => 'ro', isa => ConsumerOf['Chart::GGPlot::Plot'] );
 
 
 method layer_data ( $i = 0 ) {
     return $self->data->at($i);
+}
+
+method layer_prestats_data ( $i = 0 ) {
+    return $self->prestats_data->at($i);
 }
 
 method layer_scales ( $i = 0, $j = 0 ) {
@@ -62,7 +68,7 @@ Chart::GGPlot::Built - A processed ggplot that can be rendered
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 
@@ -75,8 +81,14 @@ an intermediate form during rendering a L<Chart::GGPlot::Plot> object.
 
 =head2 data
 
-An arrayref of data frames, one for each layer's processed data that would
+An arrayref of data frames, each for a layer's processed data that would
 later be used for rendering the plot.
+
+=head2 prestats_data
+
+An arrayref of data frames, each for a layer's processed data before stats
+are applied. Some geom implementation of some graphics backends, like
+Plotly's boxplot, may need this data.
 
 =head2 layout
 
@@ -94,10 +106,16 @@ object is created.
 
     layer_data($i=0)
 
-Helper function that returns the data associated with a given layer.
+Helper function that returns the C<data> associated with a given layer.
 C<$i> is the index of layer.
 
     my $data = $ggplot->layer_data(0);
+
+=head2 layer_prestats_data
+
+    layer_prestats_data($i=0)
+
+Similar to the C<layer_data> method but is for C<prestats_data>.
 
 =head2 layer_scales
 

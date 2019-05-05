@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 =head1 NAME
 
@@ -780,7 +780,10 @@ sub buffer {
             if(@pending >= $args{high} and $self and not $self->is_paused($src)) {
                 $self->pause($src);
             }
-            $src->emit(shift @pending) while @pending and not $src->is_paused;
+            $src->emit(shift @pending)
+                while @pending
+                and not($src->is_paused)
+                and @{$self->{children}};
             if($self) {
                 $self->resume($src) if @pending < $args{low} and $self->is_paused($src);
 

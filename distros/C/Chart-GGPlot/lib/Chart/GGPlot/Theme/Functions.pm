@@ -4,7 +4,7 @@ package Chart::GGPlot::Theme::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Chart::GGPlot::Theme;
 use Chart::GGPlot::Types qw(:all);
@@ -51,7 +51,7 @@ Chart::GGPlot::Theme::Functions - Function interface of Chart::GGPlot::Theme
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

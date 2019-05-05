@@ -8,12 +8,15 @@ use Test::Fatal;
 
 use Data::Bitfield qw( bitfield boolfield constfield );
 
-bitfield TEST =>
-   first  => boolfield(0),
-   second => boolfield(1),
-   constfield(2, 4, 0x9);
+# integer encoding
+{
+   bitfield { format => "bytes-LE" }, BYTES =>
+      first  => boolfield(0),
+      second => boolfield(1),
+      constfield(2, 4, 0x9);
 
-is( pack_TEST( first => 1, second => 1 ), 3 | 9<<2,
-   'pack_TEST' );
+   is( sprintf( "%v02x", pack_BYTES( first => 1, second => 1 ) ), "27",
+      'pack_BYTES' );
+}
 
 done_testing;

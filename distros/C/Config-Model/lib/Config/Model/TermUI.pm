@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TermUI;
-$Config::Model::TermUI::VERSION = '2.133';
+package Config::Model::TermUI 2.134;
+
 use Carp;
 use utf8;      # so literals and identifiers can be in UTF-8
 use v5.12;     # or later to get "unicode_strings" feature
@@ -238,7 +238,7 @@ Config::Model::TermUI - Interactive command line interface for cme
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -411,7 +411,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -12,17 +12,19 @@ input AuthorCreateInput {
   name: String
 }
 
-input AuthorMutateInput {
-  age: Int
+input AuthorIDInput {
   id: Int!
-  message: String
-  name: String
 }
 
 input AuthorSearchInput {
   age: Int
   message: String
   name: String
+}
+
+input AuthorUpdateInput {
+  id: AuthorIDInput!
+  payload: AuthorSearchInput!
 }
 
 type Module {
@@ -37,10 +39,8 @@ input ModuleCreateInput {
   name: String
 }
 
-input ModuleMutateInput {
-  author_id: Int
+input ModuleIDInput {
   id: Int!
-  name: String
 }
 
 input ModuleSearchInput {
@@ -48,13 +48,18 @@ input ModuleSearchInput {
   name: String
 }
 
+input ModuleUpdateInput {
+  id: ModuleIDInput!
+  payload: ModuleSearchInput!
+}
+
 type Mutation {
   createAuthor(input: [AuthorCreateInput!]!): [Author]
   createModule(input: [ModuleCreateInput!]!): [Module]
-  deleteAuthor(input: [AuthorMutateInput!]!): [Boolean]
-  deleteModule(input: [ModuleMutateInput!]!): [Boolean]
-  updateAuthor(input: [AuthorMutateInput!]!): [Author]
-  updateModule(input: [ModuleMutateInput!]!): [Module]
+  deleteAuthor(input: [AuthorIDInput!]!): [Boolean]
+  deleteModule(input: [ModuleIDInput!]!): [Boolean]
+  updateAuthor(input: [AuthorUpdateInput!]!): [Author]
+  updateModule(input: [ModuleUpdateInput!]!): [Module]
 }
 
 type Query {
@@ -62,9 +67,7 @@ type Query {
   authors(id: [Int!]!): [Author]
   module(id: Int!): Module
   modules(id: [Int!]!): [Module]
-  "input to search"
   searchAuthor(input: AuthorSearchInput!): [Author]
-  "input to search"
   searchModule(input: ModuleSearchInput!): [Module]
 }
 '

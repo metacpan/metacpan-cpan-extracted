@@ -9,7 +9,6 @@ build_requires:
   Mojo::Base: '0'
   Mojolicious: '8'
   Test::More: '0'
-  Try::Tiny: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -31,13 +30,14 @@ requires:
   Mojo::UserAgent: '0'
   Mojolicious: '8'
   Moo: '2'
+  Try::Tiny: '0'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Hooktheory
   repository: https://github.com/ology/WebService-Hooktheory
-version: '0.0405'
+version: '0.0406'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -336,4 +336,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

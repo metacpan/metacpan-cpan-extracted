@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.133';
+package Config::Model::BackendMgr 2.134;
+
 use Mouse;
 use strict;
 use warnings;
@@ -508,8 +508,8 @@ sub is_auto_write_for_type {
 
 __PACKAGE__->meta->make_immutable;
 
-package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.133';
+package Config::Model::DeprecatedHandle 2.134;
+
 our $AUTOLOAD;
 
 sub new {
@@ -552,7 +552,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -620,8 +620,8 @@ configuration data within the model.
 
 With these specifications, all configuration information is read
 during creation of a node (which triggers the creation of a backend
-manager object) and written back when L<write_back|/"write_back ( ... )">
-method is called (either on the node or on this backend manager).
+manager object) and written back when L<write_back|Config::Model::Instance/write_back>
+method is called either on the instance.
 
 =begin comment
 
@@ -813,7 +813,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

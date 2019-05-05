@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::DiscreteIdentity;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Chart::GGPlot::Util qw(:all);
 
@@ -42,7 +42,7 @@ Chart::GGPlot::Scale::DiscreteIdentity - Discrete identity scale
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

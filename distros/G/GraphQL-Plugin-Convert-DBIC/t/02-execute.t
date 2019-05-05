@@ -13,14 +13,7 @@ use_ok 'GraphQL::Plugin::Convert::DBIC';
 sub run_test {
   my ($args, $expected) = @_;
   my $got = execute(@$args);
-  is_deeply $got, $expected or diag nice_dump($got);
-}
-
-sub nice_dump {
-  my ($got) = @_;
-  local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse);
-  $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
-  Dumper $got;
+  is_deeply $got, $expected or diag explain $got;
 }
 
 my $dbic_class = 'Schema';
@@ -46,6 +39,12 @@ subtest 'execute pk + deeper query' => sub {
     photosets {
       id
       title
+      siblings: photos {
+        id
+      }
+      photos {
+        id
+      }
     }
   }
 }
@@ -74,14 +73,22 @@ EOF
             description => '',
             id => '4730337840',
             'photosets' => [
-              { id => '72157624222825789', title => 'Robot Arms' }
+              {
+                id => '72157624222825789', title => 'Robot Arms',
+                photos => [ { id => '4730337840' }, { id => '4656987762' } ],
+                siblings => [ { id => '4730337840' }, { id => '4656987762' } ],
+              },
             ],
           },
           {
             description => 'Again - receding hairpieces please!',
             id => '4730349774',
             photosets => [
-              { id => '72157624222820921', title => 'Head Museum' }
+              {
+                id => '72157624222820921', title => 'Head Museum',
+                photos => [ { id => '4730349774' } ],
+                siblings => [ { id => '4730349774' } ],
+              },
             ],
           },
         ],
@@ -161,9 +168,9 @@ query q {
 
 mutation m {
   updatePhoto(input: [
-    { id: "4656987762", locality: "Else2" }
-    { id: "4730349774", locality: "Else1" }
-    { id: "nonexistent", locality: "Else3" }
+    { id: { id: "4656987762" }, payload: { locality: "Else2" } }
+    { id: { id: "4730349774" }, payload: { locality: "Else1" } }
+    { id: { id: "nonexistent" }, payload: { locality: "Else3" } }
   ]) {
     id
     locality

@@ -5,7 +5,7 @@ package Chart::GGPlot::Geom;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Types::Standard qw(ArrayRef CodeRef);
@@ -20,6 +20,7 @@ with qw(
   Chart::GGPlot::HasDefaultAes
   Chart::GGPlot::HasNonMissingAes
   Chart::GGPlot::HasParams
+  Chart::GGPlot::HasCollectibleFunctions
 );
 
 method setup_data ($data, $params) { $data }
@@ -94,7 +95,7 @@ Chart::GGPlot::Geom - The geom role
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

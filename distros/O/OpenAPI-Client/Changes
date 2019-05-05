@@ -1,5 +1,16 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.24 2019-05-05T14:36:11+0700
+ - Fix t/command-local-with-ref.t
+
+0.23 2019-05-05T14:13:14+0700
+ - Add documentation for option --information|-I
+ - Fix deprecation warning for JSON::Validator->coerce(1) #17
+ - Fix printing YAML::XS::Boolean as "false" and "true" in dumped
+   documentation
+ - Printed documentation has $ref resolved
+   Can be turned off with JSON_VALIDATOR_REPLACE=0
+
 0.22 2019-01-25T14:45:56+0900
  - Updated documentation to use $client instead of $self
 

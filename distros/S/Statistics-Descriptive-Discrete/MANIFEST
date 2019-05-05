@@ -4,9 +4,10 @@ examples/sdd_prof.pl
 examples/statistics_discrete_ex.pl
 LICENSE
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
+META.yml
 README
+README.md
 t/00-load.t
 t/descr.t
 t/discrete.t

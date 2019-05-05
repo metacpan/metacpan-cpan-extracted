@@ -136,6 +136,7 @@ use Utils qw/array_cmp/;
 
 {
     #variance for small values
+    #on some platforms variance will be 0 on others, very very small but not zero
     #TEST
     my $stats = Statistics::Descriptive::Discrete->new;
     my @data;
@@ -145,7 +146,7 @@ use Utils qw/array_cmp/;
     }
     $stats->add_data(@data);
     diag("variance: ",$stats->variance,"\n");
-    ok($stats->variance > 0,"variance ok");
+    ok(($stats->variance >= 0) && ($stats->variance <= 3.08e-36),"variance ok");
 }
 
 {

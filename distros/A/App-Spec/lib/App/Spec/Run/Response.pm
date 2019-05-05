@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Run::Response;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use App::Spec::Run::Output;
 use Scalar::Util qw/ blessed /;
@@ -64,7 +64,7 @@ sub print_output {
     my $outputs = $self->outputs;
     push @$outputs, @out;
 
-    my $callbacks = $self->callbacks->{print_output} || {};
+    my $callbacks = $self->callbacks->{print_output} || [];
     for my $cb (@$callbacks) {
         $cb->();
     }

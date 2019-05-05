@@ -5,7 +5,7 @@ package Chart::GGPlot::Layer;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use List::AllUtils qw(pairgrep pairkeys pairmap);
 use Module::Load;
@@ -222,14 +222,11 @@ method map_statistic ( $data, $plot ) {
     #$aesthetics = compact($aesthetics);
 
     my $new = $aesthetics->hslice( $self->calculated_aes($aesthetics) );
-    #say Dumper($new->keys);
     return $data if ( $new->isempty );
 
     my $stat_data =
       Data::Frame->new(
         columns => [ pairmap { $a => $data->eval_tidy($b) } $new->flatten ] );
-    #say $stat_data->string;
-
     $plot->scales->add_defaults( $data, $new );
 
     # Transform the values, if the scale say it's ok
@@ -323,7 +320,7 @@ Chart::GGPlot::Layer - Chart::GGPlot layer
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 

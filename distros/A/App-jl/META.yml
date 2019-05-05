@@ -1,0 +1,37 @@
+---
+abstract: 'Recursive JSON decoder'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-jl
+provides:
+  App::jl:
+    file: lib/App/jl.pm
+    version: '0.04'
+requires:
+  Getopt::Long: '0'
+  JSON: '0'
+  Pod::Usage: '0'
+  Sub::Data::Recursive: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/bayashi/App-jl/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/App-jl
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

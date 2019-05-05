@@ -5,7 +5,7 @@ package Chart::GGPlot::Stat;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef CodeRef Str InstanceOf Bool);
@@ -23,6 +23,7 @@ with qw(
   Chart::GGPlot::HasDefaultAes
   Chart::GGPlot::HasNonMissingAes
   Chart::GGPlot::HasParams
+  Chart::GGPlot::HasCollectibleFunctions
 );
 
 method setup_data ( $data, $params ) { $data }
@@ -116,7 +117,7 @@ Chart::GGPlot::Stat - The stat role
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

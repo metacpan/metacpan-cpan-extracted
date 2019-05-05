@@ -5,15 +5,14 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use utf8;
 use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore;
-use Data::Frame;
+use Alt::Data::Frame::ButMore 0.0047;
 
 use Carp;
 use Data::Dumper ();
@@ -23,7 +22,6 @@ use Log::Any::Adapter;
 use Safe::Isa 1.000010 ();
 use PerlX::Maybe ();
 
-#use PerlX::Assert        ();
 use Syntax::Keyword::Try ();
 use Module::Load;
 use Moose 2.1400;
@@ -31,7 +29,6 @@ use Moose::Role               ();
 use Moose::Autobox            ();
 use MooseX::Aliases           ();
 use MooseX::MungeHas          ();
-use MooseX::LazyRequire       ();
 use MooseX::StrictConstructor ();
 use boolean                   ();
 
@@ -111,8 +108,6 @@ sub _import_tag {
         #PerlX::Assert->import::into($target);
 
         Moose::Autobox->import::into($target);
-
-        Data::Frame->import::into($target);
     }
     elsif ( $tag eq ':class' ) {
         $class->_import_tag( $target, ':base' );
@@ -122,7 +117,6 @@ sub _import_tag {
 
         Moose->import::into($target);
         MooseX::Aliases->import::into($target);
-        MooseX::LazyRequire->import::into($target);
         MooseX::MungeHas->import::into($target);
         MooseX::StrictConstructor->import::into($target);
     }
@@ -134,7 +128,6 @@ sub _import_tag {
 
         Moose::Role->import::into($target);
         MooseX::Aliases->import::into($target);
-        MooseX::LazyRequire->import::into($target);
         MooseX::MungeHas->import::into($target);
     }
     elsif ( $tag eq ':pdl' ) {
@@ -185,7 +178,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SYNOPSIS
 

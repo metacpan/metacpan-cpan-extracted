@@ -2,17 +2,14 @@
 # `make test'. After `make install' it should work as `perl 01TestDirectoryHandling.t'
 
 #########################
-
+use 5.006;
 use strict;
 use warnings;
 use Data::Dumper;
 
 use Test::More;
 use Test::Carp;
-use lib '../lib/';
 use File::TVShow::Organize;
-use File::Path;
-use File::Copy;
 use Cwd;
 
 #########################

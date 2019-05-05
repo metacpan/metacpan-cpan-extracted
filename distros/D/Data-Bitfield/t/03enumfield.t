@@ -8,15 +8,17 @@ use Test::Fatal;
 
 use Data::Bitfield qw( bitfield enumfield );
 
-bitfield TEST =>
-   first  => enumfield(0, qw( false true )),
-   second => enumfield(2, qw( zero one two three ));
+{
+   bitfield { format => "bytes-LE" }, BYTES =>
+      first  => enumfield(0, qw( false true )),
+      second => enumfield(2, qw( zero one two three ));
 
-is( pack_TEST( first => "true", second => "two" ), 9,
-   'pack_TEST' );
+   is( sprintf( "%v02x", pack_BYTES( first => "true", second => "two" ) ), "09",
+      'pack_BYTES' );
 
-is_deeply( { unpack_TEST( 9 ) }, { first => "true", second => "two" },
-   'unpack_TEST' );
+   is_deeply( { unpack_BYTES( "\x09" ) }, { first => "true", second => "two" },
+      'unpack_BYTES' );
+}
 
 is( exception {
       bitfield ANOTHER =>
@@ -27,7 +29,7 @@ is( exception {
    }, undef,
    'Non-overlapping enums' );
 
-ok( exception { pack_TEST( first => "hello" ) },
+ok( exception { pack_BYTES( first => "hello" ) },
    'Unrecognised enum value dies' );
 
 done_testing;

@@ -41,6 +41,7 @@
             "Mojo::UserAgent" : "0",
             "Mojolicious" : "8",
             "Moo" : "2",
+            "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
@@ -54,7 +55,6 @@
             "Mojo::Base" : "0",
             "Mojolicious" : "8",
             "Test::More" : "0",
-            "Try::Tiny" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -72,7 +72,7 @@
          "web" : "https://github.com/ology/WebService-AcousticBrainz"
       }
    },
-   "version" : "0.0400",
+   "version" : "0.0401",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -470,6 +470,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

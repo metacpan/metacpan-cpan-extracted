@@ -2,7 +2,6 @@ Build.PL
 Changes
 lib/Data/Bitfield.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -12,5 +11,4 @@ t/01boolfield.t
 t/02intfield.t
 t/03enumfield.t
 t/04constfield.t
-t/10bytes.t
 t/99pod.t

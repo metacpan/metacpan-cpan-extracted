@@ -8,7 +8,7 @@ use Carp;
 require Exporter;
 
 our @ISA     = qw(Exporter);
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Crypt::U2F::Server;
 
@@ -44,8 +44,8 @@ sub new {
             $errstr = Crypt::U2F::Server::u2fclib_getError();
             return;
         }
-        $refCount++;
     }
+    $refCount++;
 
     my $ctx = Crypt::U2F::Server::u2fclib_get_context();
     if ( !defined($ctx) || !$ctx ) {

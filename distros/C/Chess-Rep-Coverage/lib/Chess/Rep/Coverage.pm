@@ -1,7 +1,6 @@
 package Chess::Rep::Coverage;
-BEGIN {
-  $Chess::Rep::Coverage::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
+
 # ABSTRACT: Expose chess ply potential energy
 
 use strict;
@@ -11,19 +10,19 @@ use parent 'Chess::Rep';
 
 use constant SIZE => 7;
 
-our $VERSION = '0.1101';
+our $VERSION = '0.1102';
 
 
 sub coverage {
     my $self = shift;
 
-    # What is the state of our board?
+    # Get the state of the board
     my $fen = $self->get_fen();
 
-    # Return a bucket of piece coverages.
+    # Bucket of piece coverages to return
     my $cover = {};
 
-    # Get the set of pieces and ids.
+    # Set the numerical id => piece name lookup table
     my %pieces;
     @pieces{values %{+Chess::Rep::PIECE_TO_ID()}} = keys %{+Chess::Rep::PIECE_TO_ID()};
 
@@ -386,7 +385,6 @@ sub _usage {
     return <<USAGE;
 
 Compute probabilites of chess moves in a protective, threatening environment.
-Copyright 2012 Gene Boggs <gene\@cpan.org>
 
 Usage: perl $0 [0-9...] [0-9...] [t1,t2...] [0-9...] [p1,p2...]
 
@@ -429,7 +427,7 @@ Chess::Rep::Coverage - Expose chess ply potential energy
 
 =head1 VERSION
 
-version 0.1101
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -439,19 +437,14 @@ version 0.1101
   print $g->board();
 
   $g->set_from_fen('8/8/8/3pr3/4P3/8/8/8 w ---- - 0 1');
-  $c = $g->coverage(); # Recalculate board status
+  $g->coverage(); # Recalculate board status
   print $g->board();
-  $piece = $g->piece_at($row, $col);
-  $boolean = $g->protected($row, $col);
-  $boolean = $g->threatened($row, $col);
-  $boolean = $g->white_can_move($row, $col);
-  $boolean = $g->black_can_move($row, $col);
 
 =head1 DESCRIPTION
 
-This module exposes the "potential energy" of a chess ply by returning
-a hash reference of the board positions, pieces and their "attack or
-protection status."
+This module exposes the "potential energy" of a chess ply by returning a hash
+reference of the board positions, pieces, possible movements, and their attack
+or protection status.
 
 =head1 METHODS
 
@@ -461,10 +454,10 @@ Return a new C<Chess::Coverage> object.
 
 =head2 coverage()
 
-  $c = $gcoverage();
+  $c = $g->coverage();
 
-Set the C<cover> attribute and return a data structure, keyed on board
-position, showing
+Set the B<cover> attribute and return a data structure, keyed on board position,
+showing:
 
   occupant            => Human readable piece name
   color               => Color number of the occupant
@@ -479,16 +472,14 @@ position, showing
 
 =head2 board()
 
-  print $self->board();
+  print $g->board();
 
-Return an ASCII board layout with threats, protections and move
-statuses.
+Return an ASCII board layout with threats, protections and move statuses.
 
-Protection and threat is indicated by C<p/t>.  White and black
-movement is indicated by C<w:b>.
+Protection and threat is indicated by C<p/t>.  White and black movement is
+indicated by C<w:b>.
 
-For example, the FEN C<8/8/8/3pr3/4P3/8/8/8 w ---- - 0 1> is rendered
-as:
+For example, the FEN C<8/8/8/3pr3/4P3/8/8/8 w ---- - 0 1> is rendered as:
 
        A     B     C     D     E     F     G     H
     +-----+-----+-----+-----+-----+-----+-----+-----+
@@ -509,11 +500,10 @@ as:
   8 |     |     |     |     | 0:1 |     |     |     |
     +-----+-----+-----+-----+-----+-----+-----+-----+
 
-This means that, 1) the black pawn at D5 can move to D4 and can
-capture the white pawn at E4; 2) the white pawn at E4 can capture the
-pawn at D5 but cannot move; 3) the black rook at E5 protects the black
-pawn at D5, can capture the white pawn at E4 and can move to F5
-through H5 or E6 through E8.
+This means that, 1) the black pawn at D5 can move to D4 and can capture the
+white pawn at E4; 2) the white pawn at E4 can capture the pawn at D5 but cannot
+move; 3) the black rook at E5 protects the black pawn at D5, can capture the
+white pawn at E4 and can move to F5 through H5 or E6 through E8.
 
 =head2 move_probability()
 
@@ -523,11 +513,11 @@ Compute the "likelihood" of moving to a protected or threatened position.
 
 =head1 SEE ALSO
 
-* The code in this distribution F<examples/> and F<t/> directories.
+The code in this distribution F<examples/> and F<t/> directories.
 
-* L<Chess::Rep>
+L<Chess::Rep>
 
-* L<http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation>
+L<http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation>
 
 =head1 AUTHOR
 
@@ -535,7 +525,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

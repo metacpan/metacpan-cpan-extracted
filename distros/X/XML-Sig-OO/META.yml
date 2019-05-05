@@ -4,6 +4,8 @@ author:
   - 'Mike Shipper <AKALINUX@CPAN.ORG>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -26,7 +28,7 @@ requires:
   Crypt::OpenSSL::X509: '1.812'
   Data::Result: '1.0003'
   Digest::SHA: '5.96'
-  File::Spec: '0'
+  Gopt::Long: '2.49'
   MIME::Base64: '3.15'
   Modern::Perl: '1.20181021'
   Moo: '2.003004'
@@ -36,7 +38,7 @@ requires:
   XML::LibXML: '2.0200'
   XML::LibXML::XPathContext: '2.0200'
   namespace::clean: '0.27'
-version: '0.001'
+version: '0.002'
 x_repository:
   type: git
   url: https://github.com/akalinux/xml-sig-oo.git

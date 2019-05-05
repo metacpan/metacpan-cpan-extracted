@@ -5,7 +5,7 @@ package Chart::GGPlot::Backend;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Chart::GGPlot::Layout;
 use Chart::GGPlot::Built;
@@ -64,6 +64,10 @@ classmethod build($ggplot) {
     $data = $layout->map_position($data, true);
     $debug_data->($data, 'after map_position()');
 
+    # store prestats data.
+    # no need to copy, to save some time
+    my $prestats_data = $data;
+
     # Apply and map statistics
     $data = &$by_layer( fun( $l, $d ) { $l->compute_statistic( $d, $layout ) }
     );
@@ -114,9 +118,10 @@ classmethod build($ggplot) {
     $plot->guides->build($scales, labels => $plot->labels);
 
     return Chart::GGPlot::Built->new(
-        data   => $data,
-        layout => $layout,
-        plot   => $plot
+        data          => $data,
+        layout        => $layout,
+        plot          => $plot,
+        prestats_data => $prestats_data,
     );
 }
 
@@ -134,7 +139,7 @@ Chart::GGPlot::Backend - Role for backend classes for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 

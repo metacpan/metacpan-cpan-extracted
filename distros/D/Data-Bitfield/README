@@ -1,27 +1,61 @@
 NAME
 
-    Data::Bitfield - manage integers containing multiple bit fields
+    Data::Bitfield - manage data packed into bytes of multiple bit fields
+
+SYNOPSIS
+
+       use Data::Bitfield qw( bitfield boolfield enumfield );
+    
+       # The stat(2) st_mode field on Linux
+       bitfield MODE =>
+          format      => enumfield(12,
+             undef,     "fifo", "char", undef, "dir",    undef, "block", undef,
+             "regular", undef,  "link", undef, "socket", undef, undef,   undef ),
+          set_uid     => boolfield(11),
+          set_gid     => boolfield(10),
+          sticky      => boolfield(9),
+          user_read   => boolfield(8),
+          user_write  => boolfield(7),
+          user_exec   => boolfield(6),
+          group_read  => boolfield(5),
+          group_write => boolfield(4),
+          group_exec  => boolfield(3),
+          other_read  => boolfield(2),
+          other_write => boolfield(1),
+          other_exec  => boolfield(0);
+    
+       my %modebits = unpack_MODE( stat($path)->mode );
+
+
+       # The flag register of a Z80
+       bitfield FLAGS =>
+          sign      => boolfield(7),
+          zero      => boolfield(6),
+          halfcarry => boolfield(4),
+          parity    => boolfield(2),
+          subtract  => boolfield(1),
+          carry     => boolfield(0);
 
 DESCRIPTION
 
     This module provides a single primary function, bitfield, which creates
     helper functions in the package that calls it, to assist in managing
-    integers that encode sets of bits, called bitfields. This may be useful
-    when interacting with a low-level networking protocol, binary file
-    format, hardware devices, or similar purposes.
+    data that is encoded in sets of bits, called bitfields. This may be
+    useful when interacting with a low-level networking protocol, binary
+    file format, hardware devices, or similar purposes.
 
  bitfield
 
-     bitfield $name, %fields
+       bitfield $name, %fields
 
     Creates two new functions in the calling package whose names are
     derived from the string $name passed here. These functions will be
     symmetric opposites, which convert between a key/value list of field
-    values, and their packed integer or binary byte-string representation.
+    values, and their packed binary byte-string or integer representation.
 
-     $packed_value = pack_$name( %field_values )
+       $packed_value = pack_$name( %field_values )
     
-     %field_values = unpack_$name( $packed_value )
+       %field_values = unpack_$name( $packed_value )
 
     These two functions will work to a set of field names that match those
     field definitions given to the bitfield function that declared them.
@@ -32,7 +66,7 @@ DESCRIPTION
     Additional options may be passed by giving a HASH reference as the
     first argument, before the structure name.
 
-     bitfield { %options }, $name, %fields
+       bitfield { %options }, $name, %fields
 
     Recognised options are:
 
@@ -44,7 +78,7 @@ DESCRIPTION
       big-endian direction, and integer describes an integer numerical
       value.
 
-      Note that currently the bytes-* formats are limited to values 32bits
+      Note that currently the integer format is limited to values 32bits
       wide or smaller.
 
       Optional; will default to integer if not supplied. This default may
@@ -59,21 +93,21 @@ FIELD TYPES
 
  boolfield
 
-     boolfield( $bitnum )
+       boolfield( $bitnum )
 
     Declares a single bit-wide field at the given bit index, whose value is
     a simple boolean truth.
 
  intfield
 
-     intfield( $bitnum, $width )
+       intfield( $bitnum, $width )
 
     Declares a field of $width bits wide, starting at the given bit index,
     whose value is an integer. It will be shifted appropriately.
 
  enumfield
 
-     enumfield( $bitnum, @values )
+       enumfield( $bitnum, @values )
 
     Declares a field some number of bits wide, sufficient to store an
     integer big enough to act as an index into the list of values, starting
@@ -84,7 +118,7 @@ FIELD TYPES
 
  constfield
 
-     constfield( $bitnum, $width, $value )
+       constfield( $bitnum, $width, $value )
 
     Declares a field some number of bits wide that stores a constant value.
     This value will be packed automatically.

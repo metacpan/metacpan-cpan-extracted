@@ -14,7 +14,7 @@ my ($bin, $ber);
 
 # length 127
 $bin = ber_encode [0, ASN_OCTET_STRING,  0, "\x01" x 127];
-ok ($bin =~ /^\x04\x7f\x01{127}$/s, unpack "H*", $bin);
+ok ($bin =~ /^\x04\x7f\x01{127}/, unpack "H*", $bin);
 $ber = ber_decode $bin;
 ok (127 == length $ber->[BER_DATA]);
 

@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord::Polar;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use List::AllUtils;
 use PDL::Primitive qw(which);
@@ -32,14 +32,39 @@ sub _build_r {
 has limits =>
   ( is => 'ro', lazy => 1, builder => '_build_limits', init_arg => undef );
 
-with qw(Chart::GGPlot::Coord);
+with qw(
+  Chart::GGPlot::Coord
+  Chart::GGPlot::HasCollectibleFunctions
+);
+
+my $coord_polar_pod = <<'=cut';
+
+    coord_ploar(:$theta='x', :$start=0, :$direction=1)
+
+=cut
+
+my $coord_polar_code = fun (:$theta ='x', :$start = 0, :$direction = 1) {
+    return __PACKAGE__->new(
+        theta     => $theta,
+        start     => $start,
+        direction => ( $direction <=> 0 ) 
+    );  
+}
+
+classmethod ggplot_functions () {
+    return [
+        {
+            name => 'coord_polar',
+            code => $coord_polar_code,
+            pod  => $coord_polar_pod,
+        }
+    ];  
+}
 
 sub _build_limits {
     my $self = shift;
     return { x => $self->xlim, y => $self->ylim };
 }
-
-has '+is_linear' => ( default => sub { false } );
 
 method aspect ($details) { 1 }
 
@@ -155,7 +180,7 @@ Chart::GGPlot::Coord::Polar - The polar coordinate system
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 

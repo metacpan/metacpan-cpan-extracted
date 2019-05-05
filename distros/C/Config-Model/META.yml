@@ -3,7 +3,7 @@ abstract: 'Create tools to validate, migrate and edit configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
-  Config::Model::Tester: '3.006'
+  Config::Model::Tester: '4.002'
   Config::Model::Tester::Setup: '0'
   File::Copy: '0'
   IO::File: '0'
@@ -14,6 +14,7 @@ build_requires:
   Test::Log::Log4perl: '0'
   Test::Memory::Cycle: '0'
   Test::More: '0'
+  Test::Pod: '1.00'
   Test::Warn: '0.11'
   YAML::Tiny: '0'
   boolean: '0'
@@ -76,6 +77,6 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.133'
+version: '2.134'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -236,8 +236,6 @@ NOTE
 BUGS
     *   Code for calculating mode is not as robust as it should be.
 
-    *   Other bugs are lurking I'm sure.
-
 TODO
     *   Add rest of methods (at least ones that don't depend on original
         order of data) from Statistics::Descriptive

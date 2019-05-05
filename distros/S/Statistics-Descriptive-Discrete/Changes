@@ -1,5 +1,8 @@
 Revision history for Perl extension Statistics::Descriptive::Discrete.
 
+0.12  Sat May 4 09:56 2019
+	- Fixed bug in t/discrete.t for small variances. Test would fail on certain platforms.
+
 0.08  Fri Feb 15 10:12 2019
 	- Returned to this code after a long break...
 	- Replaced tests with tests from Statistics::Descriptive

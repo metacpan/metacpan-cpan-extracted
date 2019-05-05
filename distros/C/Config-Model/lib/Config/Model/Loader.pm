@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader;
-$Config::Model::Loader::VERSION = '2.133';
+package Config::Model::Loader 2.134;
+
 use Carp;
 use strict;
 use warnings;
@@ -423,13 +423,13 @@ sub _walk_node {
 }
 
 sub unquote {
-    map {
+    for (@_) {
         if (defined $_) {
             s/(?<!\\)\\n/\n/g;
             s/\\\\/\\/g;
             s/^"// && s/"$// && s!\\"!"!g;
         }
-    } @_;
+    }
 }
 
 sub _load_check_list {
@@ -548,7 +548,7 @@ sub _load_check_list {
 
 sub _insert_before {
     my ( $self, $element, $check, $inst, $cmdref, $before_str, @values ) = @_;
-    my $before = $before_str =~ m!^/! ? eval "qr$before_str" : $before_str;
+    my $before = ($before_str =~ s!^/!! and $before_str =~ s!/$!!) ? qr/$before_str/ : $before_str;
     $element->insert_before( $before, @values );
     return 'ok';
 }
@@ -899,7 +899,7 @@ sub _apply_regexp_on_value {
     if (defined $orig) {
         # $value may change at each run and is like s/foo/bar/ do block
         # eval is not possible
-        eval("\$orig =~ $value;"); ## no critic BuiltinFunctions::ProhibitStringyEval
+        eval("\$orig =~ $value;"); ## no critic (ProhibitStringyEval)
         my $res = $@;
         $self->_log_cmd(
             $cmd, "Applying regexp %qs to %leaf. Result is %qs.",
@@ -989,7 +989,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -1409,7 +1409,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -5,15 +5,19 @@ package Chart::GGPlot::Coord::Cartesian;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
-use Types::Standard qw(Bool Overload);
+use Types::PDL qw(Piddle1D PiddleFromAny);
+use Types::Standard qw(Maybe);
 
 use Chart::GGPlot::Util qw(:all);
 
 
-has xlim => ( is => 'ro' );
-has ylim => ( is => 'ro' );
+has [qw(xlim ylim)] => (
+    is     => 'ro',
+    isa    => Maybe [ Piddle1D->plus_coercions(PiddleFromAny) ],
+    coerce => 1,
+);
 
 has limits =>
   ( is => 'ro', lazy => 1, builder => '_build_limits', init_arg => undef );
@@ -29,9 +33,54 @@ has expand => ( is => 'ro', default => sub { true } );
 
 has default => (is => 'ro', default => sub { false } );
 
-with qw(Chart::GGPlot::Coord);
+with qw(
+  Chart::GGPlot::Coord
+  Chart::GGPlot::HasCollectibleFunctions
+);
 
-has '+is_linear' => ( default => sub { false } );
+my $coord_cartesian_pod = <<'=cut';
+
+    coord_cartesian(:$xlim=undef, :$ylim=undef, :$expand=true)
+
+The Cartesian coordinate system is the most familiar, and common, type of
+coordinate system.
+Setting limits on the coordinate system will zoom the plot (like you're
+looking at it with a magnifying glass), and will not change the underlying
+data like setting limits on a scale will.
+
+Arguments:
+
+=over 4
+
+* $xlim, $ylim 	
+
+Limits for the x and y axes.
+
+* $expand 	
+
+If true, the default, adds a small expansion factor to the limits to ensure
+that data and axes don't overlap.
+If false, limits are taken exactly from the data or C<$xlim>/C<$ylim>.
+
+=back
+
+=cut
+
+my $coord_cartesian_code = sub {
+    return __PACKAGE__->new(@_);
+};
+
+classmethod ggplot_functions () {
+    return [
+        {
+            name => 'coord_cartesian',
+            code => $coord_cartesian_code,
+            pod  => $coord_cartesian_pod,
+        }
+    ];
+}
+
+classmethod is_linear() { true }
 
 method distance ($x, $y, $panel_params) {
     my $max_dist = dist_euclidean( $panel_params->at('x_range'),
@@ -64,11 +113,11 @@ method setup_panel_params ($scale_x, $scale_y, $params = {}) {
 method scale_range ($scale, $limits=undef, $expand=true) {
     my $expansion = $expand ? $self->expand_default($scale) : pdl([ 0, 0 ]);
 
-    if ( not defined $limits ) {
+    if ( not defined $limits or $limits->isempty ) {
         return $scale->dimension($expansion);
     }
     else {
-        my $range = range( $scale->transform($limits) );
+        my $range = range_( $scale->transform($limits) );
         return expand_range( $range, $expansion->at(0), $expansion->at(1) );
     }
 }
@@ -89,7 +138,7 @@ Chart::GGPlot::Coord::Cartesian - The Cartesian coordinate system
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 ATTRIBUTES
 

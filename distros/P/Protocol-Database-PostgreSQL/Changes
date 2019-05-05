@@ -1,5 +1,14 @@
 Revision history for Protocol-Database-PostgreSQL
 
+1.003     2019-05-05 19:13:17+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - the COPY handling assumed that the caller would apply encoding, but since that wasn't
+    documented and much of the rest of the code assumes UTF-8 anyway (delimiters and newlines
+    for example), we now explicitly encode the COPY items when in text format.
+
 1.002     2019-04-28 05:23:16+08:00 Asia/Kuala_Lumpur
     No new features.
 

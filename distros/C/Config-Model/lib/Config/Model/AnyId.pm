@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId;
-$Config::Model::AnyId::VERSION = '2.133';
+package Config::Model::AnyId 2.134;
+
 use 5.010;
 
 use Mouse;
@@ -1052,7 +1052,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -1149,7 +1149,7 @@ A hash or list element must be declared with the following parameters:
 
 Mandatory element type. Must be C<hash> or C<list> to have a
 collection element.  The actual element type must be specified by
-C<cargo => type> (See L</"CAVEATS">).
+C<< cargo => type >>.
 
 =item index_type
 
@@ -1675,7 +1675,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

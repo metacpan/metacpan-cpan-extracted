@@ -1,5 +1,8 @@
 Revision history for Perl extension Traceroute::Similar.
 
+0.20  Sun May  5 10:20:11 CEST 2019
+	- fixed test case issue
+
 0.18  Sat Apr 16 17:48:44 CEST 2011
 	- fixed problem with tests and use english
 

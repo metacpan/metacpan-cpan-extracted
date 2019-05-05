@@ -5,18 +5,19 @@ use OpenAPI::Client;
 use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::Util qw(encode getopt);
 
-use constant YAML => eval 'require YAML::XS;1';
+use constant YAML    => eval 'require YAML::XS;1';
+use constant REPLACE => $ENV{JSON_VALIDATOR_REPLACE} // 1;
 
 sub _say { length && say encode('UTF-8', $_) for @_ }
 sub _warn { warn @_ }
 
 has description => 'Perform Open API requests';
-has usage => sub { shift->extract_usage . "\n" };
+has usage       => sub { shift->extract_usage . "\n" };
 
 has _client => undef;
 has _ops    => sub {
   my $client = shift->_client;
-  my $paths = $client->validator->schema->get('/paths') || {};
+  my $paths  = $client->validator->bundle({replace => REPLACE})->{paths} || {};
   my %ops;
 
   for my $path (keys %$paths) {
@@ -83,6 +84,8 @@ sub _info {
   my ($self, $op) = @_;
   my $op_spec = $self->_ops->{$op};
   return _warn qq(Could not find the given operationId "$op".\n) unless $op_spec;
+
+  local $YAML::XS::Boolean = 'JSON::PP';
   return _say YAML ? YAML::XS::Dump($op_spec) : Mojo::Util::dumper($op_spec);
 }
 
@@ -110,8 +113,11 @@ Mojolicious::Command::openapi - Perform Open API requests
 
   Usage: APPLICATION openapi SPECIFICATION OPERATION "{ARGUMENTS}" [SELECTOR|JSON-POINTER]
 
-    # Fetch /api from myapp.pl and validate the specification
+    # Fetch /api from myapp.pl and list available operationId
     ./myapp.pl openapi /api
+
+    # Fetch specification for an operationId
+    ./myapp.pl openapi /api -I addPet
 
     # Run an operation against a local application
     ./myapp.pl openapi /api listPets /pets/0
@@ -132,6 +138,9 @@ Mojolicious::Command::openapi - Perform Open API requests
     -c, --content <content>              JSON content, with body parameter data
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 20
+    -I, --information <operationId>      Dump the specification about a given
+                                         operationId. YAML::XS is preferred if
+                                         available.
     -o, --connect-timeout <seconds>      Connect timeout, defaults to the value
                                          of MOJO_CONNECT_TIMEOUT or 10
     -p, --parameter <name=value>         Specify multiple header, path, or

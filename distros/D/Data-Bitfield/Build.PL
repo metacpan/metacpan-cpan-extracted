@@ -13,7 +13,6 @@ my $build = Module::Build->new(
       'Test::More' => '0.88', # done_testing
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

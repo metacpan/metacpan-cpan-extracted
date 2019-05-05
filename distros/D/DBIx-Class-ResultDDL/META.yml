@@ -1,0 +1,29 @@
+---
+abstract: 'Result class declaration syntactic-sugar that looks like DDL'
+author:
+  - 'Michael Conrad <mconrad@intellitree.com>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-ResultDDL
+no_index: {}
+requires:
+  B::Hooks::EndOfScope: '0'
+  Carp: '0'
+  DBIx::Class::Core: '0'
+  Exporter::Extensible: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-DBIx-Class-ResultDDL/issues
+  repository: https://github.com/nrdvana/perl-DBIx-Class-ResultDDL.git
+version: '0.01'
+x_generated_by_perl: v5.20.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

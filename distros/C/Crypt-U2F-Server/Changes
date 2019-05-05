@@ -1,5 +1,10 @@
 Revision history for Perl extension Crypt::U2F::Server.
 
+0.45  Sat May 04 14:59:57 2019 (GMT +2)
+	- Fix refcount warning when multiples instances of the
+	  Crypt::U2F::Server::Simple object are created (RT#129435).
+	  Thanks to Colin Newell
+
 0.44  Sun Apr 28 15:37:45 2019 (GMT +2)
 	- Fix segfaults if u2fclib_verifyRegistration returns 0 (RT#129341).
 	  Thanks to Colin Newell
@@ -23,7 +28,8 @@ Revision history for Perl extension Crypt::U2F::Server.
     - remove unneeded files from Manifest and dist
 
 0.30  Tue Feb 03 15:00:00 2015
-	- Rename from Crypt::U2F to Crypt::U2F::Server because of imminent release of the client module
+	- Rename from Crypt::U2F to Crypt::U2F::Server because of imminent
+	  release of the client module
 
 0.10  Wed Dec 17 17:00:00 2014
 	- Initial alpha release

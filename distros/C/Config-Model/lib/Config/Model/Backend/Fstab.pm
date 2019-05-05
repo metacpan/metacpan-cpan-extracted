@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Fstab;
-$Config::Model::Backend::Fstab::VERSION = '2.133';
+package Config::Model::Backend::Fstab 2.134;
+
 use Mouse;
 use Carp;
 use Log::Log4perl qw(get_logger :levels);
@@ -73,12 +73,12 @@ sub read {
 
         # now load fs options
         $logger->trace("fs_type $type options is $options");
-        my @options = split /,/, $options;
-        map {
-            $_ = $opt_r_translate{$_} if defined $opt_r_translate{$_};
-            s/no(.*)/$1=0/;
-            $_ .= '=1' unless /=/;
-        } @options;
+        my @options = map {
+            my $o = $opt_r_translate{$_} // $_;
+            $o =~ s/no(.*)/$1=0/;
+            $o .= '=1' unless $o =~ /=/;
+            $o;
+        }  split /,/, $options;
 
         $logger->debug("Loading:@options");
         $fs_obj->fetch_element('fs_mntopts')->load( step => "@options", check => $check );
@@ -160,7 +160,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

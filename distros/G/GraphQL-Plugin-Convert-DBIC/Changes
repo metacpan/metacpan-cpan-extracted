@@ -1,4 +1,6 @@
-Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
+0.15 2019-05-04
+ - update now uses *UpdateInput = *IDInput, *SearchInput
+ - make just one field-resolver, not lots
 
 0.14 2019-04-11
  - Changed the 'to_graphql' function to accept just a DBIC schema instance

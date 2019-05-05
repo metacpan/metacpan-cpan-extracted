@@ -6,13 +6,16 @@ use Data::Frame::Role;
 use namespace::autoclean;
 
 package Tie::Data::Frame {
+    use Scalar::Util qw(weaken);
     use Types::PDL qw(Piddle);
     use Types::Standard qw(ArrayRef Value);
     use Type::Params;
 
     sub new {
         my ($class, $object) = @_;
-        return bless( { _object => $object }, $class);
+        my $self = bless( { _object => $object }, $class);
+        weaken( $self->{_object} );
+        return $self;
     }
 
     sub TIEHASH {
@@ -104,7 +107,7 @@ Data::Frame::Partial::Sugar - Partial class for data frame syntax sugar
 
 =head1 VERSION
 
-version 0.0047
+version 0.0049
 
 =head1 SYNOPSIS
 

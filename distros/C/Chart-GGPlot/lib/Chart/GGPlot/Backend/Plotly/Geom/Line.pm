@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Line;
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
@@ -24,7 +24,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Line - Chart::GGPlot's Plotly support for 
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

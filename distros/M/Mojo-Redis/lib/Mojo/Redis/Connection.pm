@@ -31,7 +31,7 @@ sub is_connected { $_[0]->{stream} && !$_[0]->{gone_away} ? 1 : 0 }
 
 sub write_p {
   my $self = shift;
-  my $p    = Mojo::Promise->new(ioloop => $self->ioloop);
+  my $p    = Mojo::Promise->new->ioloop($self->ioloop);
   $self->write_q(@_, $p);
   $self->is_connected ? $self->_write : $self->_connect;
   return $p;
@@ -200,6 +200,7 @@ sub _parse_message_cb {
           return $err if defined $err;
           push @res, $res;
         }
+
         # Only bulk string replies can contain binary-safe encoded data
         elsif ($m->{type} eq '$' and $encoding and defined $m->{data}) {
           push @res, Mojo::Util::decode($encoding, $m->{data});

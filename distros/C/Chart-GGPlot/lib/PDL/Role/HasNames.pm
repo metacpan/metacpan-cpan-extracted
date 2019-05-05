@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Role::Tiny;
 use PDL::SV ();
@@ -72,7 +72,7 @@ PDL::Role::HasNames - Role for attaching per-element names to a piddle
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 STATUS
 

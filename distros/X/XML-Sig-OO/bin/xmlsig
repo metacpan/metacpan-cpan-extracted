@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+
+use Modern::Perl;
+use XML::Sig::OO;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION="0.002";
+
+our ($fh_in,$fh_out,$xml);
+our $mode=undef;
+our $cacert=undef;
+our $key=undef;
+our $cert=undef;
+our $in='stdin';
+our $out='stdout';
+my ($help,$man);
+our %args=(
+  'mode=s'=>\$mode,
+  'cacert=s'=>\$cacert,
+  'cert=s'=>\$cert,
+  'key=s'=>\$key,
+  'in=s'=>\$in,
+  'out=s'=>\$out,
+  'man'=>\$man,
+  'help|?'=>\$help,
+);
+GetOptions(%args) or die "Error command line arguments\n";
+
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+
+
+unless(defined($mode)) {
+  die "-mode is a required option\n";
+}
+setup_io();
+if($mode=~ m/^[Ss]/s) {
+  sign();
+} elsif($mode=~ m/^[vV]/s) {
+  verify();
+} else {
+  die "-mode=(s|v) is a required option\n";
+}
+
+sub setup_io {
+  $fh_out=$out ne 'stdout' ? IO::File->new($out,'w') : \*STDOUT;
+  $fh_in=$in ne 'stdin' ? IO::File->new($in,'r') : \*STDIN;
+  die "Failed to create output file: $out, error was $!\n" unless defined($fh_out);
+  die "-in=filename is a required option in verify mode\n" unless defined($fh_in);
+  select $fh_out;
+  $xml=join '',$fh_in->getlines;
+}
+
+sub sign {
+  die "-key=filename is a required option\n" unless defined($key) && -r $key;
+  my %args=(
+    xml=>$xml,
+    key_file=>$key,
+  );
+  $args{cert}=$cert if defined($cert) && -r $cert;
+  my $s=XML::Sig::OO->new(%args);
+  my $result=$s->sign;
+  die "failed to sign file: $in, error was: $result\n" unless $result;
+  print $result->get_data;
+}
+
+sub verify {
+  my %args=(
+    xml=>$xml,
+  );
+  $args{cacert}=$cert if defined($cacert) && -r $cacert;
+  my $v=new XML::Sig::OO(%args);
+
+  # validate our xml
+  my $result=$v->validate;
+
+  if($result) {
+    print "Input xml passed validation\n";
+  } else {
+   foreach my $chunk (@{$result->get_data}) {
+     my ($nth,$signature,$digest)=@{$chunk}{qw(nth signature digest)};
+
+     print "Results for processing chunk $nth\n";
+     print "Signature State: ".($signature ? "OK\n" : "Failed, error was $signature\n");
+     print "Digest State: ".($digest ? "OK\n" : "Failed, error was $digest\n");
+   }
+  }
+
+}
+
+__END__
+
+=head1 NAME
+
+xmlsig - Command line interface to XML::SIG::OO
+
+=head1 SYNOPSIS
+
+xmlsig -mode=(s|v)
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Prints a short help message and exists
+
+=item B<-man>
+
+Prints the full manpage
+
+=item B<-mode=(s|v)>
+
+Signature mode:
+
+  -mode=s -key=filename
+
+Verify mode:
+
+  -mode=v
+
+=item B<-in=filename>
+
+When set, this acts as the input file.  The default input file is stdin.
+
+=item B<-out=filename>
+
+When set, this becomes the output file.  The default output file is stdout.
+
+=item B<-key=filename>
+
+The key used for signing.  The file format expect is pem.
+
+=item B<-cert=filename>
+
+The cert file used for signing ( only used with rsa ).  The file format expected is pem.
+
+=item B<-cacert=filename>
+
+The cacert used for validation, if not set the cacert is not checked.  The file format expected is pem.
+
+=back
+
+=head1 DESCRIPTION
+
+This is the command line interface to XML::Sig::OO. "xmsig" can be used to either sign or validate xml files from the command line.
+
+=cut

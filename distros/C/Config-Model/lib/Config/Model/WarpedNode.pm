@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::WarpedNode;
-$Config::Model::WarpedNode::VERSION = '2.133';
+package Config::Model::WarpedNode 2.134;
+
 use Mouse;
 
 use Carp qw(cluck croak);
@@ -85,14 +85,17 @@ foreach my $method (
     describe get_help get_help_as_text children get set accept_regexp/
     ) {
     # to register new methods in package
-    no strict "refs";
+    no strict "refs"; ## no critic TestingAndDebugging::ProhibitNoStrict
 
     *$method = sub {
         my $self = shift;
 
+        if ($self->check) {
+            return $self->{data}->$method(@_);
+        }
+
         # return undef if no class was warped in
-        $self->check or return undef;
-        return $self->{data}->$method(@_);
+        return ;
     };
 }
 
@@ -313,7 +316,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -563,7 +566,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

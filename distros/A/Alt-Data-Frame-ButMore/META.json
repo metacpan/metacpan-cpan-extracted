@@ -111,7 +111,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.0047",
+   "version" : "0.0049",
    "x_contributors" : [
       "Mohammad S Anwar <manwar@cpan.org>"
    ],

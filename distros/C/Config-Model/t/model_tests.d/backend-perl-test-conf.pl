@@ -1,18 +1,17 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 use Config::Model::BackendMgr;
+use strict;
+use warnings;
 
-$conf_dir = '/etc';
-$conf_file_name = 'hosts.pl';
-
-$model->create_config_class(
+my @config_classes = ({
     name => 'Host',
 
     element => [
@@ -22,8 +21,9 @@ $model->create_config_class(
         },
         dummy => {qw/type leaf value_type uniline/},
     ]
-);
-$model->create_config_class(
+});
+
+push @config_classes, {
     name => 'Hosts',
 
     rw_config => {
@@ -43,11 +43,11 @@ $model->create_config_class(
             },
         },
     ]
-);
+};
 
-$model_to_test = "Hosts";
 
-@tests = (
+
+my @tests = (
     {
         name  => 'basic',
         check => [
@@ -57,4 +57,10 @@ $model_to_test = "Hosts";
     },
 );
 
-1;
+return {
+    model_to_test => "Hosts",
+    conf_dir => '/etc',
+    conf_file_name => 'hosts.pl',
+    config_classes => \@config_classes,
+    tests => \@tests
+};

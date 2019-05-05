@@ -37,7 +37,8 @@ $step =
     . '- a_string="toto \"titi\" tata" another_string="foobar" a_string2=dod@foo.com '
     . 'a_string_to_test_newline="foo\nbar\\\\nbaz" '
     . 'lista:=a,b,c,d olist:0 X=Av - olist:1 X=Bv - listb:=b,"c c2",d listc:="dod@foo.com" '
-    . '! hash_a:X2=x hash_a:Y2=xy  hash_b:X3=xy my_check_list=X2,X3 hash_b:comment_test="#"';
+    . '! hash_a:X2=x hash_a:Y2=xy  hash_b:X3=xy my_check_list=X2,X3 hash_b:comment_test="#"'
+    . ' hash_a:"~"="~/bar" ';
 ok( $root->load( step => $step ), "set up data in tree" );
 
 eq_or_diff(
@@ -53,6 +54,22 @@ my $cds = $root->dump_tree;
 
 print "cds string:\n$cds" if $trace;
 
+subtest "test round trip" => sub {
+    my $load_inst = $model->instance(
+        root_class_name => 'Master',
+        model_file      => 'dump_load_model.pl',
+        instance_name   => 'round_trip'
+    );
+    my $round_root = $load_inst->config_root;
+    ok($round_root->load($cds), "test round trip: load");
+    my $new_cds = $round_root->dump_tree;
+    eq_or_diff(
+        [ split /\n/, $new_cds ],
+        [ split /\n/, $cds ],
+        "test round trip: dump "
+    )
+};
+
 my $orig_expect = <<'EOF' ;
 std_id:ab -
 std_id:"b d "
@@ -64,6 +81,7 @@ listb:="c c2",d
 listc:="dod@foo.com"
 hash_a:X2=x
 hash_a:Y2=xy
+hash_a:"~"="~/bar"
 hash_b:X3=xy
 hash_b:comment_test="#"
 olist:0
@@ -103,6 +121,7 @@ listb:=b,"c c2",d
 listc:="dod@foo.com"
 hash_a:X2=x
 hash_a:Y2=xy
+hash_a:"~"="~/bar"
 hash_b:X3=xy
 hash_b:comment_test="#"
 olist:0
@@ -145,6 +164,7 @@ lista:=a,b,c,d
 listc:="dod@foo.com"
 hash_a:X2=x
 hash_a:Y2=xy
+hash_a:"~"="~/bar"
 hash_b:X3=xy
 hash_b:comment_test="#"
 olist:0
@@ -190,6 +210,7 @@ lista:=a,b,c,d
 listc:="dod@foo.com"
 hash_a:X2=x
 hash_a:Y2=xy
+hash_a:"~"="~/bar"
 hash_b:X3=xy
 hash_b:comment_test="#"
 olist:0

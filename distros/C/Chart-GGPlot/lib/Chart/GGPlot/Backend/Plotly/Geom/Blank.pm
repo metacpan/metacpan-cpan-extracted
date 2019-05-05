@@ -1,14 +1,14 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Blank;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Bar 
+# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Blank
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
-classmethod to_trace ($df, %rest) { }
+classmethod to_trace ($df, $params, @rest) { }
 
 __PACKAGE__->meta->make_immutable;
 
@@ -22,11 +22,11 @@ __END__
 
 =head1 NAME
 
-Chart::GGPlot::Backend::Plotly::Geom::Blank - Chart::GGPlot's Plotly support for Geom::Bar 
+Chart::GGPlot::Backend::Plotly::Geom::Blank - Chart::GGPlot's Plotly support for Geom::Blank
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

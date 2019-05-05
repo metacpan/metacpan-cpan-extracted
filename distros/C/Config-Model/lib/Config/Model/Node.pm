@@ -1,20 +1,22 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.133';
+package Config::Model::Node 2.134;
+
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
 use Carp;
 use 5.010;
 
+use Config::Model::TypeConstraints;
+use Config::Model::Instance;
 use Config::Model::Exception;
 use Config::Model::Loader;
 use Config::Model::Dumper;
@@ -95,7 +97,8 @@ sub fetch_gist {
     return $gist;
 }
 
-has [qw/config_file element_name/] => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
+has config_file => ( is => 'ro', isa => 'Config::Model::TypeContraints::Path', required => 0 );
+has element_name => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
 
 has instance => (
     is => 'ro',
@@ -139,10 +142,8 @@ sub BUILD {
     my $class_name = $self->config_class_name;
     $logger->debug("New $class_name requested by $caller_class");
 
-    # get_model returns a cloned data structure
-    $self->model( $self->config_model->get_model($class_name) );
-
-    $self->{original_model} = dclone($self->model);
+    $self->{original_model} = $self->config_model->model($class_name);
+    $self->model( dclone($self->{original_model}) ) ;
 
     $self->check_properties;
 
@@ -1222,7 +1223,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -2001,7 +2002,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -1,0 +1,48 @@
+---
+abstract: 'Client library for the Backblaze B2 Cloud Storage Service V2 API.  '
+author:
+  - '/ BUGS'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Backblaze-B2V2Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Backblaze::B2V2Client:
+    file: lib/Backblaze/B2V2Client.pm
+    version: '1.0'
+requires:
+  Cpanel::JSON::XS: '4.11'
+  Digest::SHA: '6.02'
+  LWP::Protocol::https: '6.07'
+  MIME::Base64: '3.15'
+  Path::Tiny: '0.108'
+  URI::Escape: '3.31'
+  WWW::Mechanize: '1.91'
+  perl: '5.026001'
+resources:
+  bugtracker: https://github.com/ericschernoff/Backblaze-B2V2Client/issues
+  homepage: https://github.com/ericschernoff/Backblaze-B2V2Client
+  repository: git://github.com/ericschernoff/Backblaze-B2V2Client.git
+version: '1.0'
+x_contributors:
+  - 'Eric Chernoff <eric@mail.weaverqueue.com>'
+  - 'Eric Chernoff <ericschernoff@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,21 +1,22 @@
---- #YAML:1.0
-name:               Traceroute-Similar
-version:            0.18
-abstract:           calculate common route for a bunch of hosts
+---
+abstract: 'calculate common route for a bunch of hosts'
 author:
-    - Sven Nierlein <nierlein@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Sven Nierlein <nierlein@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Traceroute-Similar
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

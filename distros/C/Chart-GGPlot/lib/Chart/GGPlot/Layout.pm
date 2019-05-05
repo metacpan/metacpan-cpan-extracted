@@ -5,14 +5,14 @@ package Chart::GGPlot::Layout;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Data::Frame::Types qw(DataFrame);
 use Data::Munge qw(elem);
 use List::AllUtils qw(pairwise);
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle1D);
-use Types::Standard qw(ArrayRef InstanceOf HashRef Bool);
+use Types::Standard qw(ArrayRef InstanceOf HashRef Maybe);
 
 use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Coord::Functions qw(:all);
@@ -31,7 +31,10 @@ has [qw(coord_params facet_params)] => (
 
 has layout => ( is => 'rw', isa => DataFrame, init_arg => undef );
 
-has [qw(panel_scales_x panel_scales_y)] => ( is => 'rw' );
+has [qw(panel_scales_x panel_scales_y)] => (
+    is  => 'rw',
+    isa => Maybe [ArrayRef]
+);
 has panel_params => ( is => 'rwp', isa => ArrayRef [HashRef] );
 
 method setup (ArrayRef $data, $plot_data=Data::Frame->new()) {
@@ -239,16 +242,7 @@ classmethod scale_apply ($data, $vars, $method,
                 $pieces = $pieces->[0]->glue( 0, @$pieces[ 1 .. $#$pieces ] );
 
                 # Join pieces back together, if necessary
-
-                # Normally for a continuous scale, it gets only a pdl of
-                #  length 2. But below it would create a pdl of full length
-                #  of $data->nrow. We pad with bad values.
                 if ( $pieces->length ) {
-                    my $indices = $scale_indices_flattened->copy;
-                    $indices->slice(
-                        pdl( [ $pieces->length .. $indices->length - 1 ] ) ) .=
-                      'nan';
-                    $indices->setnantobad;
                     return ( $var => $pieces->slice($scale_indices_flattened) );
                 }
                 else {
@@ -273,7 +267,7 @@ Chart::GGPlot::Layout - Layout
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 

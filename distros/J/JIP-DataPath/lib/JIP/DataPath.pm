@@ -1,19 +1,16 @@
 package JIP::DataPath;
 
-use base qw(Exporter);
+use parent 'Exporter';
 
 use strict;
 use warnings;
 
-use JIP::ClassField;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.04';
+our $VERSION = '0.041';
 
 our @EXPORT_OK = qw(path);
-
-has document => (get => q{+}, set => q{-});
 
 sub path {
     my ($document) = @ARG;
@@ -21,21 +18,34 @@ sub path {
     return __PACKAGE__->new(document => $document);
 }
 
+sub document {
+    my ($self) = @ARG;
+
+    return $self->{'document'};
+}
+
 sub new {
     my ($class, %param) = @ARG;
 
     # Mandatory params
-    croak q{Mandatory argument "document" is missing}
-        unless exists $param{'document'};
+    if (!exists $param{'document'}) {
+        croak 'Mandatory argument "document" is missing';
+    }
 
-    return bless({}, $class)->_set_document($param{'document'});
+    return bless(
+        {
+            document => $param{'document'},
+        },
+        $class,
+    );
 }
 
 sub get {
     my ($self, $path_parts, $default_value) = @ARG;
 
-    return $self->document
-        if @{ $path_parts } == 0;
+    if (@{ $path_parts } == 0) {
+        return $self->document;
+    }
 
     my ($contains, $context) = $self->_accessor($path_parts);
 
@@ -57,8 +67,9 @@ sub get {
 sub get_new {
     my ($self, $path_parts, $default_value) = @ARG;
 
-    return __PACKAGE__->new(document => $self->document)
-        if @{ $path_parts } == 0;
+    if (@{ $path_parts } == 0) {
+        return __PACKAGE__->new(document => $self->document);
+    }
 
     my ($contains, $context) = $self->_accessor($path_parts);
 
@@ -78,9 +89,9 @@ sub get_new {
 }
 
 sub contains {
-    my $self = shift;
+    my ($self, @xargs) = @ARG;
 
-    my ($contains) = $self->_accessor(@ARG);
+    my ($contains) = $self->_accessor(@xargs);
 
     return $contains;
 }
@@ -116,6 +127,14 @@ sub perform {
     my ($self, $method, $path_parts, @xargs) = @ARG;
 
     return $self->$method($path_parts, @xargs);
+}
+
+sub _set_document {
+    my ($self, $document) = @ARG;
+
+    $self->{'document'} = $document;
+
+    return $self;
 }
 
 sub _accessor {
@@ -157,7 +176,7 @@ JIP::DataPath - provides a way to access data elements in a deep, complex and ne
 
 =head1 VERSION
 
-This document describes L<JIP::DataPath> version C<0.04>.
+This document describes L<JIP::DataPath> version C<0.041>.
 
 =head1 SYNOPSIS
 

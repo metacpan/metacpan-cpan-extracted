@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::ContinuousDateTime;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Types::PDL qw(Piddle PiddleFromAny);
 use Types::Standard qw(InstanceOf Maybe);
@@ -67,7 +67,7 @@ Chart::GGPlot::Scale::ContinuousDateTime - Continuous datetime scale
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

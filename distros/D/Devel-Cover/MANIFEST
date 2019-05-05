@@ -263,7 +263,6 @@ utils/cpancover.nginx
 utils/create_all_gold
 utils/create_gold
 utils/dc
-utils/install_dev_modules
 utils/mail_contributors
 utils/makeh
 utils/queue.conf

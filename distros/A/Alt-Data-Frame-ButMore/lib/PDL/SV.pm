@@ -406,7 +406,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.0047
+version 0.0049
 
 =head1 SYNOPSIS
 

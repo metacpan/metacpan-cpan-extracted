@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -69,7 +69,7 @@
          "url" : "https://github.com/PDLPorters/Alien-Proj4"
       }
    },
-   "version" : "2.019107",
+   "version" : "2.019109",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 1.68",
       "requires" : {

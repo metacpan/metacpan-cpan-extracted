@@ -8,7 +8,7 @@ use Carp;
 use AutoLoader;
 use vars qw($VERSION $AUTOLOAD $DEBUG $Tolerance %autosubs);
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 $DEBUG = 0;
 
 #see Statistics::Descriptive documentation for use of $Tolerance

@@ -1,0 +1,50 @@
+#!perl
+use strict;
+use warnings;
+use App::jl;
+
+App::jl->new(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+jl - JSON in JSON log viewer
+
+=head1 SYNOPSIS
+
+The B<jl> command allows you to recursively decode JSON in JSON string
+
+    $ echo '{"foo":"{\"bar\":\"{\\\"baz\\\":123}\"}"}' | jl
+    {
+       "foo" : {
+          "bar" : {
+             "baz" : 123
+          }
+       }
+    }
+
+=head2 OPTIONS
+
+=head3 depth
+
+The number of recursive depth. (default: 10)
+
+=head3 no-pretty
+
+If set C<no-pretty> option, then output JSON is not prettify. (default: false, Do prettify)
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<App::jl>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

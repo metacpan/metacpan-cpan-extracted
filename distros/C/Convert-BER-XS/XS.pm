@@ -411,10 +411,12 @@ use common::sense;
 use XSLoader ();
 use Exporter qw(import);
 
+use Carp ();
+
 our $VERSION;
 
 BEGIN {
-   $VERSION = 1.11;
+   $VERSION = 1.21;
    XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -470,11 +472,53 @@ $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_IPADDRESS , BER_TYPE_IPADDRESS);
 $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_COUNTER32 , BER_TYPE_INT);
 $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_UNSIGNED32, BER_TYPE_INT);
 $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_TIMETICKS , BER_TYPE_INT);
-$SNMP_PROFILE->set (ASN_APPLICATION, SNMP_OPAQUE    , BER_TYPE_IPADDRESS);
+
+# decodes REAL values according to ECMA-63
+# this is pretty strict, except it doesn't catch -0.
+# I don't have access to ISO 6093 (or BS 6727, or ANSI X.3-42)), so this is all guesswork.
+sub _decode_real_decimal {
+   my ($format, $val) = @_;
+
+   $val =~ y/,/./; # probably not in ISO-6093
+
+   if ($format == 1) {
+      $val =~ /^ \ * [+-]? [0-9]+ \z/x
+         or Carp::croak "BER_TYPE_REAL NR1 value not in NR1 format ($val) (X.690 8.5.8)";
+   } elsif ($format == 2) {
+      $val =~ /^ \ * [+-]? (?: [0-9]+\.[0-9]* | [0-9]*\.[0-9]+ ) \z/x
+         or Carp::croak "BER_TYPE_REAL NR2 value not in NR2 format ($val) (X.690 8.5.8)";
+   } elsif ($format == 3) {
+      $val =~ /^ \ * [+-] (?: [0-9]+\.[0-9]* | [0-9]*\.[0-9]+ ) [eE] [+-]? [0-9]+ \z/x
+         or Carp::croak "BER_TYPE_REAL NR3 value not in NR3 format ($val) (X.690 8.5.8)";
+   } else {
+      Carp::croak "BER_TYPE_REAL invalid decimal numerical representation format $format";
+   }
+
+   $val
+}
+
+# this is a mess, but perl's support for floating point formatting is nearly nonexistant
+sub _encode_real_decimal {
+   my ($val, $nvdig) = @_;
+
+   $val = sprintf "%.*G", $nvdig + 1, $val;
+
+   if ($val =~ /E/) {
+      $val =~ s/E(?=[^+-])/E+/;
+      $val =~ s/E/.E/ if $val !~ /\./;
+      $val =~ s/^/+/  unless $val =~ /^-/;
+
+      return "\x03$val" # NR3
+   }
+
+   $val =~ /\./
+     ? "\x02$val" # NR2
+     : "\x01$val" # NR1
+}
 
 =head2 DEBUGGING
 
-To aid debugging, you cna call the C<ber_dump> function to print a "nice"
+To aid debugging, you can call the C<ber_dump> function to print a "nice"
 representation to STDOUT.
 
 =over
@@ -735,40 +779,34 @@ to the C<$Convert::BER::XS::SNMP_PROFILE> profile.
    $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_COUNTER32 , BER_TYPE_INT);
    $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_UNSIGNED32, BER_TYPE_INT);
    $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_TIMETICKS , BER_TYPE_INT);
-   $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_OPAQUE    , BER_TYPE_IPADDRESS);
+   $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_OPAQUE    , BER_TYPE_BYTES);
    $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_COUNTER64 , BER_TYPE_INT);
 
 =head2 LIMITATIONS/NOTES
 
-This module can only en-/decode 64 bit signed and unsigned integers, and
-only when your perl supports those. So no UUID OIDs for now (unless you
-map the C<OBJECT IDENTIFIER> tag to something other than C<BER_TYPE_OID>).
+This module can only en-/decode 64 bit signed and unsigned
+integers/tags/lengths, and only when your perl supports those. So no UUID
+OIDs for now (unless you map the C<OBJECT IDENTIFIER> tag to something
+other than C<BER_TYPE_OID>).
 
 This module does not generally care about ranges, i.e. it will happily
-de-/encode 64 bit integers into an C<ASN_INTEGER> value, or a negative
+de-/encode 64 bit integers into an C<SNMP_UNSIGNED32> value, or a negative
 number into an C<SNMP_COUNTER64>.
 
 OBJECT IDENTIFIEERs cannot have unlimited length, although the limit is
 much larger than e.g. the one imposed by SNMP or other protocols, and is
 about 4kB.
 
-Indefinite length encoding is not supported.
-
 Constructed strings are decoded just fine, but there should be a way to
 join them for convenience.
 
-REAL values are not supported and will currently croak.
-
-The encoder and decoder tend to accept more formats than should be
-strictly supported - security sensitive applications are strongly advised
-to review the code first.
-
-This module has undergone little to no testing so far.
+REAL values will always be encoded in decimal form and ssometimes is
+forced into a perl "NV" type, potentially losing precision.
 
 =head2 ITHREADS SUPPORT
 
-This module is unlikely to work when the (officially discouraged) ithreads
-are in use.
+This module is unlikely to work in any other than the loading thread when
+the (officially discouraged) ithreads are in use.
 
 =head1 AUTHOR
 

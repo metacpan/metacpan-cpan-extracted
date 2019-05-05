@@ -23,7 +23,6 @@ like $data, qr/Can't fetch: No type set/, 'no type set';
 
 $ws = WebService::GetSongBPM->new(
     api_key => '1234567890',
-#    artist_id => '1234567890',
     artist  => 'van halen',
     song    => 'jump',
 );
@@ -36,18 +35,14 @@ $mock->routes->get('/search' => sub {
     my $key = $c->param('api_key');
     my $type = $c->param('type');
     my $lookup = $c->param('lookup');
-    return $c->render(status => 200, text => '{"ok" : 1}') if $key && $type && $lookup;
+    return $c->render(status => 200, json => {ok => 1}) if $key && $type && $lookup;
     return $c->render(status => 400, text => 'Missing values');
-});
-$mock->routes->get('/artist' => sub {
-    my $c = shift;
-    return $c->render(status => 400, text => 'Foo!');
 });
 $ws->ua->server->app($mock); # point our UserAgent to our new mock server
 
 $ws->base(Mojo::URL->new(''));
 
-can_ok($ws, 'fetch');
+can_ok $ws, 'fetch';
 
 $data = try { $ws->fetch } catch { $_; };
 is_deeply $data, {ok => 1}, 'fetch';

@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::FuseUI;
-$Config::Model::FuseUI::VERSION = '2.133';
+package Config::Model::FuseUI 2.134;
+
 # there's no Singleton with Mouse
 use Mouse;
 
@@ -46,7 +46,7 @@ sub getdir {
     return -EINVAL() unless ( ref $obj and $obj->can('children') );
 
     my @c = ( '..', '.', $obj->children );
-    map { s(/)($dir_char_mockup)g } @c;
+    for (@c) { s(/)($dir_char_mockup)g };
     $logger->debug( "FuseUI getdir return @c , wantarray is " . ( wantarray ? 1 : 0 ) );
     return ( @c, 0 );
 }
@@ -106,17 +106,17 @@ sub getattr {
         $size = length( fetch_as_line($obj) );
     }
     else {
+        # fuseui_obj->children does not return the right data in scalar context
         my @c = $obj->children;
-        map { s(/)($dir_char_mockup)g } @c;
         $size = @c;
     }
 
     my $mode;
     if ( $type eq 'leaf' or $type eq 'check_list' ) {
-        $mode = S_IFREG | 0644;
+        $mode = S_IFREG | oct(644);
     }
     else {
-        $mode = S_IFDIR | 0755;
+        $mode = S_IFDIR | oct(755);
     }
 
     my ( $dev, $ino, $rdev, $blocks, $gid, $uid, $nlink, $blksize ) =
@@ -327,7 +327,7 @@ Config::Model::FuseUI - Fuse virtual file interface for Config::Model
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -430,7 +430,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

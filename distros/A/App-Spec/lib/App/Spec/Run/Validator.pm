@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Run::Validator;
 
-our $VERSION = '0.005'; # VERSION;
+our $VERSION = '0.006'; # VERSION;
 
 use List::Util qw/ any /;
 use List::MoreUtils qw/ uniq /;
@@ -20,6 +20,7 @@ my %validate = (
     file => sub { $_[0] eq '-' or -f $_[0] },
     dir => sub { -d $_[0] },
     integer => sub { $_[0] =~ m/^[+-]?\d+$/ },
+    float => sub { $_[0] =~ m/^[+-]?\d+(?:\.\d+)?$/ },
     flag => sub { 1 },
     enum => sub {
         my ($value, $list) = @_;

@@ -1,17 +1,17 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model;
-$Config::Model::VERSION = '2.133';
+package Config::Model 2.134;
+
 use strict ;
 use warnings;
-use 5.10.1;
+use 5.12.0;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -123,7 +123,7 @@ has models => (
     handles => {
         model_exists  => 'exists',
         model_defined => 'defined',
-        model         => 'get',
+        _get_model    => 'get',
         _store_model  => 'set',
     },
 );
@@ -319,7 +319,8 @@ sub instance {
 
 sub instance_names {
     my $self = shift;
-    return sort keys %{ $self->instances };
+    my @all = sort keys %{ $self->instances };
+    return @all;
 }
 
 @level = qw/hidden normal important/;
@@ -417,7 +418,7 @@ sub include_backend {
     foreach my $included_class (@$included_classes) {
         # takes care of recursive include, because get_model will perform
         # includes (and normalization). Is already a dclone
-        my $included_model = $self->get_model($included_class);
+        my $included_model = $self->get_model_clone($included_class);
 
         foreach my $rw (qw/rw_config read_config write_config config_dir/) {
             if ($target_model->{$rw} and $included_model->{$rw}) {
@@ -990,7 +991,6 @@ sub translate_warped_node_info {
         $self->show_legacy_issue(
             "$config_class_name->$elt_name: using $parm parameter in "
             ."warped node is deprecated. $parm must be specified in a warp parameter."
-            ,'note' # TODO later, fall 2016 : issue a warning that may break tests
         );
         $info->{warp}{$parm} = delete $info->{$parm};
     }
@@ -1241,7 +1241,7 @@ sub include_one_class {
 
     # takes care of recursive include, because get_model will perform
     # includes (and normalization). Is already a dclone
-    my $included_model = $self->get_model($include_class);
+    my $included_model = $self->get_model_clone($include_class);
 
     # now include element in element_list (special treatment because order is
     # important)
@@ -1456,7 +1456,7 @@ sub augment_config_class_really {
     $self->store_normalized_model( $config_class_name => $new_model );
 }
 
-sub get_model {
+sub model {
     my $self              = shift;
     my $config_class_name = shift
         || die "Model::get_model: missing config class name argument";
@@ -1471,10 +1471,20 @@ sub get_model {
         $self->_store_model( $config_class_name, $model );
     }
 
-    my $model = $self->model($config_class_name)
+    return $self->_get_model($config_class_name)
         || croak "get_model error: unknown config class name: $config_class_name";
 
-    return dclone($model);
+}
+
+sub get_model {
+    my ($self,$model) = @_;
+    carp "get_model is deprecated in favor of get_model_clone";
+    $self->get_model_clone($model);
+}
+
+sub get_model_clone {
+    my ($self,$model) = @_;
+    return dclone($self->model($model));
 }
 
 # internal
@@ -1483,7 +1493,18 @@ sub get_model_doc {
 
     $done //= {};
     if ( not defined $self->normalized_model($top_class_name) ) {
-        croak "get_model_doc error : unknown config class name: $top_class_name";
+        eval { $self->model($top_class_name); };
+        if ($@) {
+            my $e = $@;
+            if ($e->isa('Config::Model::Exception::ModelDeclaration')) {
+                Config::Model::Exception::Fatal->throw(
+                    message => "Unknown configuration class : $top_class_name ($@)"
+                );
+            }
+            else {
+                $e->rethrow;
+            }
+        }
     }
 
     my @classes = ($top_class_name);
@@ -1493,7 +1514,7 @@ sub get_model_doc {
         my $class_name = shift @classes;
         next if $done->{$class_name} ;
 
-        my $c_model = $self->get_model($class_name)
+        my $c_model = $self->model($class_name)
             || croak "get_model_doc model error : unknown config class name: $class_name";
 
         my $full_name = "Config::Model::models::$class_name";
@@ -1718,7 +1739,7 @@ sub get_element_model {
     my $element_name = shift
         || die "Model::get_element_model: missing element name argument";
 
-    my $model = $self->get_model($config_class_name);
+    my $model = $self->model($config_class_name);
 
     my $element_m = $model->{element}{$element_name}
         || croak "get_element_model error: unknown element name: $element_name";
@@ -1753,7 +1774,7 @@ sub get_element_name {
         carp "get_element_name: 'for' parameter is deprecated";
     }
 
-    my $model = $self->get_model($class);
+    my $model = $self->model($class);
     my @result;
 
     # this is a bit convoluted, but the order of the returned element
@@ -1841,7 +1862,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -2609,10 +2630,19 @@ for more details on creating model plugins.
 
 =head1 Model query
 
-=head2 get_model( config_class_name )
+=head2 model
 
-Return a hash containing the model declaration (in a deep clone copy of the hash).
-You may modify the hash at leisure.
+Returns a hash containing the model declaration of the passed model
+name. Do not modify the content of the returned data structure.
+
+ my $cloned = $model->model('Foo');
+
+=head2 get_model_clone
+
+Like C<model>, returns a hash containing the model declaration of the passed model
+name, this time in a deep clone of the data structure.
+
+ my $cloned = $model->get_model_clone('Foo');
 
 =head2 generate_doc ( top_class_name , directory , [ \%done ] )
 
@@ -2669,7 +2699,7 @@ See L<cme/Logging>
 =head2 initialize_log4perl
 
 This method can be called to load L<Log::Log4perl> configuration from
-C<~/.log4config-model>, or from L</etc/log4config-model.conf> files or from
+C<~/.log4config-model>, or from C</etc/log4config-model.conf> files or from
 L<default configuration|https://github.com/dod38fr/config-model/blob/master/lib/Config/Model/log4perl.conf>.
 
 Accepts C<verbose> parameter with a list of log classes that are added
@@ -2896,7 +2926,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -37,6 +37,7 @@ do { my $x = {
                                       'Ryu::Exception' => '0',
                                       'Sub::Identify' => '0',
                                       'Time::HiRes' => '0',
+                                      'Unicode::UTF8' => '0',
                                       'constant' => '0',
                                       'indirect' => '0',
                                       'parent' => '0',

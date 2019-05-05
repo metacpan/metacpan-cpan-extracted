@@ -6,7 +6,7 @@ use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use parent qw(Chart::GGPlot::Params);
 
@@ -94,7 +94,7 @@ Chart::GGPlot::Aes - Aesthetic mappings
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 

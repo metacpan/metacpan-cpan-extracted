@@ -23,7 +23,7 @@ push @p,
 Mojo::IOLoop->timer(
   0.2 => sub {
     my $db = $redis->db;
-    Mojo::Promise->all(map { $db->xadd_p($stream_name, '*', xn => $_) } 11, 22)->finally(sub {
+    Mojo::Promise->all(map { $db->xadd_p($stream_name, '*', xn => $_) } 11, 22)->then(sub {
       push @p, $db->xlen_p($stream_name)->then(sub { $len = shift });
       push @p, $db->xrange_p($stream_name, '-', '+')->then(sub { $range = shift });
       return Mojo::Promise->all(@p);

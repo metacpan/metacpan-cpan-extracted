@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Pod;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Text::Table;
 
@@ -225,7 +225,7 @@ __END__
 
 App::Spec::Pod - Generates Pod from App::Spec objects
 
-=item SYNOPSIS
+=head1 SYNOPSIS
 
     my $generator = App::Spec::Pod->new(
         spec => $appspec,

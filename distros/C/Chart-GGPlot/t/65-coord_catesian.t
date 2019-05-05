@@ -8,14 +8,13 @@ use Data::Frame::Examples qw(mtcars);
 use Test2::V0;
 
 use Chart::GGPlot::Coord::Cartesian;
-use Chart::GGPlot::Limits qw(:all);
 
 my @cases_construction = (
     {
         params => {},
     },
     {
-        params => { xlim => xlim(0, 1), ylim => ylim(0, 1) },
+        params => { xlim => [ 0, 1 ], ylim => [ 0, 1 ] },
     },
 );
 

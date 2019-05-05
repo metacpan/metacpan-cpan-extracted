@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom;
 
 use Chart::GGPlot::Role;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use List::AllUtils qw(pairmap);
 use Types::Standard qw(ArrayRef);
@@ -54,6 +54,25 @@ classmethod _hovertext_data_for_aes ($df, $aes) {
     );
 }
 
+classmethod to_basic($data, $prestats_data, $layout, $params, $plot) {
+    return $data;
+}
+
+classmethod _adjust_trace_for_flip ($trace, $plot) {
+    if ( $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip') ) {
+        my ( $x, $y ) = ( $trace->x, $trace->y );
+        $trace->x($y);
+        $trace->y($x);
+        $trace->$_call_if_can( 'orientation', 'h' );
+
+        my $error_x = $trace->$_call_if_can('error_x');
+        my $error_y = $trace->$_call_if_can('error_y');
+        $trace->error_x($error_y) if $error_y;
+        $trace->error_y($error_x) if $error_x;
+    }
+    return $trace;
+}
+
 1;
 
 __END__
@@ -68,7 +87,7 @@ Chart::GGPlot::Backend::Plotly::Geom - Role for geom-specific details with the P
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 METHODS
 
@@ -86,7 +105,7 @@ The variable can be adjusted by like,
 
 =head2 to_trace
 
-    to_trace($df, %rest)
+    to_trace($df, $params, $plot)
 
 This shall be implemented by consumers of this role.
 It should return an arrayref of Chart::Plotly::Trace::X objects.  

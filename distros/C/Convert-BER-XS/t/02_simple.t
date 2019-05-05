@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..384\n"; }
+BEGIN { $| = 1; print "1..459\n"; }
 
 use common::sense;
 use Convert::BER::XS ':all';
@@ -93,7 +93,7 @@ fail "06053305818299", "unexpected end of message buffer";
 roundtrip "0d053305818219", [ASN_UNIVERSAL, ASN_RELATIVE_OID, 0, "51.5.16665"];
 fail "0600", "BER_TYPE_OID length";
 roundtrip "0603818055", [ASN_UNIVERSAL, ASN_OID, 0, "2.16389"];
-fail "06028001", "illegal BER padding";
+fail "06028001", "invalid BER padding";
 # first component
 roundtrip "06022777", [ASN_UNIVERSAL, ASN_OID, 0, "0.39.119"];
 roundtrip "06022877", [ASN_UNIVERSAL, ASN_OID, 0, "1.0.119"];
@@ -131,5 +131,46 @@ for my $type (
    roundtrip +(unpack "H*", pack "C C/a", $type, "234"), [ASN_UNIVERSAL, $type, 0, "234"];
 }
 
+# indefinite
+fail "02800000", "indefinite BER";
+fail "3080", "unexpected end";
+fail "308000", "unexpected end";
+roundtrip "30800000", [ASN_UNIVERSAL, ASN_SEQUENCE, 1], "3000";
+roundtrip "30800201050000", [ASN_UNIVERSAL, ASN_SEQUENCE, 1], "3003020105";
+
+# real
+fail "0901", "unexpected end";
+fail "090240", "unexpected end";
+fail "09024044", "invalid encoding";
+roundtrip "0900", [ASN_UNIVERSAL, ASN_REAL, 0, 0];
+roundtrip "09024040", [ASN_UNIVERSAL, ASN_REAL, 0, undef]; # Inf, string form not portable
+roundtrip "09024041", [ASN_UNIVERSAL, ASN_REAL, 0, undef]; # Inf, string form not portable
+roundtrip "09024042", [ASN_UNIVERSAL, ASN_REAL, 0, undef]; # nan, string form not portable
+roundtrip "09024043", [ASN_UNIVERSAL, ASN_REAL, 0, undef]; # -0 printed as 0 in all tested versions
+
+for (
+   0, -0.1, -1.00001,
+   123456789, -123456789,
+   1.234, -1.234,
+   0.123, -0.123,
+   1/256, -1/256,
+   1e30, -1e30,
+   8e30, -8e30,
+   1.2e20, -1.2e20,
+) {
+   my $ber = ber_encode [ASN_UNIVERSAL, ASN_REAL, 0, $_];
+   my $dec = ber_decode $ber;
+   ok ($_ == $dec->[BER_DATA], "real $_ == $dec->[BER_DATA]");
+}
+
+for (qw(
+   0903acfe05
+   0905adfefe0505
+   0906aefefefe0505
+   0909af0477fefefe050505
+)) {
+   my $ber = ber_decode pack "H*", $_;
+   ok ((ber_is $ber, ASN_UNIVERSAL, ASN_REAL, 0), "$_ $ber->[BER_DATA]");
+}
 
 

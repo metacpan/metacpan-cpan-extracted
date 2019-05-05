@@ -1,5 +1,9 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.0049      2019-05-05
+    - Fix a severe memory leak.
+    - Fix to_csv()'s datetime handling.
+
 0.0047      2019-05-03
     - Improve eval_tidy() error message, and make it be context-aware.
 

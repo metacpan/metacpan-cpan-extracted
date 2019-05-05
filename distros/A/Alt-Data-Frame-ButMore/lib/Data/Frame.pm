@@ -155,38 +155,37 @@ sub BUILD {
 }
 
 
+method _format_cell ($col, $ridx,
+                     :$na='BAD', :$isbad=$col->isbad)
+{
+    if ($isbad->at($ridx)) {
+        return $na;
+    }
+
+    if ( $col->$_DOES('PDL::DateTime') ) {
+        return $col->dt_at($ridx);
+    }
+    elsif ( $self->_is_numeric_column($col) ) {
+        if ( $col->type >= PDL::float ) {
+
+            # This is to fix some float precision problem with perl
+            # of nvsize=16, which can cause $df->string to get untidy
+            # float data to cause our test to fail.
+            return
+              sprintf( $doubleformat, $col->slice($ridx)->squeeze->string );
+        }
+    }
+    return $col->slice($ridx)->squeeze->string;
+}
+
 method _string() {
-    my $format_cell = sub {
-        my ( $col, $ridx ) = @_;
-
-        if ( $col->$_DOES('PDL::DateTime') ) {
-            return $col->dt_at($ridx);
-        }
-        elsif ( $self->_is_numeric_column($col) ) {
-            if ( $col->type >= PDL::float ) {
-
-                # This is to fix some float precision problem with perl
-                # of nvsize=16, which can cause $df->string to get untidy
-                # float data to cause our test to fail.
-                my $s = $col->slice($ridx)->squeeze->string;
-                if ( $s eq 'BAD' ) {
-                    return $s;
-                }
-                else {
-                    return sprintf( $doubleformat, $s );
-                }
-            }
-        }
-        return $col->slice($ridx)->squeeze->string;
-    };
-
     my @rows = ( [ '', @{ $self->column_names } ] );
     for my $r_idx ( 0 .. $self->number_of_rows - 1 ) {
         my $r = [
             $self->row_names->slice($r_idx)->squeeze->string,
             map {
                 my $col = $self->nth_column($_);
-                $format_cell->( $col, $r_idx );
+                $self->_format_cell( $col, $r_idx );
             } 0 .. $self->number_of_columns - 1
         ];
         push @rows, $r;
@@ -1051,7 +1050,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0047
+version 0.0049
 
 =head1 STATUS
 

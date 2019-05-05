@@ -7,7 +7,7 @@ use Mojo::JSON;
 use Mojo::Util;
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '2.13';
+our $VERSION = '2.14';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -26,7 +26,7 @@ has _renderer => sub {
 sub register {
   my ($self, $app, $config) = @_;
 
-  $self->validator->coerce($config->{coerce} // 1);
+  $self->validator->coerce($config->{coerce} // 'booleans,numbers,strings');
   $self->validator->load_and_validate_schema(
     $config->{url} || $config->{spec},
     {
@@ -525,7 +525,9 @@ Note that setting this attribute is discourage.
 
 See L<JSON::Validator/coerce> for possible values that C<coerce> can take.
 
-Default: 1
+Default: booleans,numbers,strings
+
+The default value will include "defaults" in the future, once that is stable enough.
 
 =head3 default_response_codes
 

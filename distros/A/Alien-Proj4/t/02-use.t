@@ -17,22 +17,21 @@ diag ('cflags: ' . Alien::Proj4->cflags);
 eval {
     diag ('Dynamic libs: ' . join ':', Alien::Proj4->dynamic_libs);
 };
-warn $@ if $@;
+diag $@ if $@;
 
 diag ('bin dir: ' . join (' ', Alien::Proj4->bin_dir));
 my @bin = Alien::Proj4->bin_dir;
-warn "no proj bin dir found via bin_dir method\n" if not @bin;
+diag "no proj bin dir found via bin_dir method\n" if not @bin;
 
 
 #  some very basic tests for the projection info
 my $info = eval {
     Alien::Proj4->load_projection_information
 };
-my $e = $@;
-ok (!$e, 'got projection information without error');
+is $@, '', 'got projection information without error';
 #  could check some of the hash contents, but not sure it's worth it
-is (ref $info, 'HASH', 'projection info is a hash ref');
-
+is ref $info, 'HASH', 'projection info is a hash ref'
+  or diag explain $info;
 
 TODO: {
     local $TODO = 'leftover from gdal, not sure we even need it given the planned usage';
@@ -44,10 +43,7 @@ TODO: {
     };
 }
 
-
-
 done_testing();
-
  
 __DATA__
 

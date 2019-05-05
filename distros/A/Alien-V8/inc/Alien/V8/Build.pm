@@ -117,6 +117,24 @@ sub ACTION_build {
         $tar->extract();
     }
     
+    # Remove -Werror from SConstruct
+    do {
+        my $in;
+        my $out;
+        open($in, '<', 'v8-3.1.5/SConstruct') || die "unable to read src/v8-3.1.5/SConstruct $!";
+        open($out, '>', 'v8-3.1.5/SConstruct.tmp') || die "unable to write src/v8-3.1.5/SConstruct.tmp $!";
+        while(!eof($in))
+        {
+          my $line = <$in>;
+          $line =~ s/'-Werror',//g; 
+          print $out $line;
+        }
+        close $in;
+        close $out;
+        unlink('v8-3.1.5/SConstruct') || die "unaable to unlink src/v8-3.1.5/SConstruct $!";
+        rename('v8-3.1.5/SConstruct.tmp', 'v8-3.1.5/SConstruct') || die "unable to rename src/v8-3.1.5/SConstruct.tmp src/v8-3.1.5/SConstruct $!";
+    };
+    
     # Build V8
     if (exists($Config{ptrsize}) && $Config{ptrsize} == 8) {
         push(@SConsArgs, "arch=x64");

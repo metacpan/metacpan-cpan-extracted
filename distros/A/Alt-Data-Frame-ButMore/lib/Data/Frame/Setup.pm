@@ -104,7 +104,7 @@ Data::Frame::Setup - Import stuffs into Data::Frame classes
 
 =head1 VERSION
 
-version 0.0047
+version 0.0049
 
 =head1 SYNOPSIS
 

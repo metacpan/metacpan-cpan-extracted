@@ -4,15 +4,15 @@ package Chart::GGPlot::Backend::Plotly::Geom::Bar;
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
 use Module::Load;
 
-use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb);
+use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb pdl_to_plotly);
 
-classmethod to_trace ($df, %rest) {
+classmethod to_trace ($df, $params, $plot) {
     load Chart::Plotly::Trace::Bar;
     load Chart::Plotly::Trace::Bar::Marker;
 
@@ -20,24 +20,25 @@ classmethod to_trace ($df, %rest) {
     my $opacity = $df->at('alpha')->setbadtoval(1);
 
     my $marker = Chart::Plotly::Trace::Bar::Marker->new(
-        color   => $fill->unpdl,
-        opacity => $opacity->unpdl,
+        color   => pdl_to_plotly( $fill,    true ),
+        opacity => pdl_to_plotly( $opacity, true ),
     );
 
-    my $x     = $df->at('x')->unpdl;
-    my $y     = ( $df->at('ymax') - $df->at('ymin') )->unpdl;
-    my $base  = $df->at('ymin')->unpdl;
-    my $width = ( $df->at('xmax') - $df->at('xmin') )->unpdl;
+    my $x     = $df->at('x');
+    my $base  = $df->at('ymin');
+    my $y     = $df->at('ymax') - $base;
+    my $width = $df->at('xmax') - $df->at('xmin');
 
-    return Chart::Plotly::Trace::Bar->new(
-        x         => $x,
-        y         => $y,
-        base      => $base,
-        width     => $width,
+    my $trace = Chart::Plotly::Trace::Bar->new(
+        x         => pdl_to_plotly($x),
+        y         => pdl_to_plotly($y),
+        base      => pdl_to_plotly( $base, true ),
+        width     => pdl_to_plotly( $width, true ),
         marker    => $marker,
-        hovertext => $df->at('hovertext')->unpdl,
+        hovertext => pdl_to_plotly( $df->at('hovertext') ),
         hoverinfo => 'text',
     );
+    return $class->_adjust_trace_for_flip($trace, $plot);
 }
 
 around _hovertext_data_for_aes( $orig, $class : $df, $aes ) {
@@ -64,7 +65,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Bar - Chart::GGPlot's Plotly support for G
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

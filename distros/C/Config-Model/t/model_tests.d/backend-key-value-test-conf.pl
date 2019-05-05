@@ -1,26 +1,19 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-
 # test inifile backend
 
-# specify where is the example file
-$conf_file_name = 'test.kv';
-$conf_dir = '/etc';
-
-# specify the name of the class to test
-$model_to_test = "IniKeyValue";
+use strict;
+use warnings;
 
 # create minimal model to test ini file backend.
-
-
-$model->create_config_class(
+my @config_classes = ({
     name => 'IniKeyValue',
     element => [
         [qw/package-status report-with/] => {
@@ -36,14 +29,23 @@ $model->create_config_class(
         config_dir  => '/etc/',
         file        => 'test.kv',
     },
-);
+});
 
 
 # the test suite
-@tests = (
+my @tests = (
     {   # test complex parameters
         name  => 'bts-control',
     },
 );
 
-1;
+return {
+    # specify where is the example file
+    conf_file_name => 'test.kv',
+    conf_dir => '/etc',
+
+    # specify the name of the class to test
+    model_to_test => "IniKeyValue",
+    config_classes => \@config_classes,
+    tests => \@tests
+};

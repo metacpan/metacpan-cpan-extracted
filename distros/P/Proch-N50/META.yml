@@ -15,9 +15,11 @@ name: Proch-N50
 provides:
   Proch::N50:
     file: lib/Proch/N50.pm
-    version: '0.031'
+    version: '0.040'
+requires:
+  perl: '5.018'
 resources:
   repository: https://github.com/telatin/bioinfo.git
-version: '0.031'
+version: '0.040'
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -5,6 +5,7 @@ use Test::More;
 use Test::Memory::Cycle;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
+use Test::Exception;
 
 use warnings;
 use strict;
@@ -15,11 +16,10 @@ my ($model, $trace) = init_test();
 # pseudo root where config files are written by config-model
 my $wr_root = setup_test_dir();
 
-my $inst = $model->instance(
-    root_class_name => 'Master',
-    instance_name   => 'test1'
-);
-ok( $inst, "created dummy instance" );
+
+throws_ok {
+    $model->generate_doc('Blork');
+} qr/Unknown configuration class/, "test generate_doc error handling";
 
 $model->generate_doc('Master') if $trace;
 

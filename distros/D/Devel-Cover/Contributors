@@ -25,9 +25,11 @@ Chisel Wright                  chisel@chizography.net
 Christian Walde                walde.christian@gmail.com
 cono                           q@cono.org.ua
 Curtis Jewell                  csjewell@cpan.org
+Dagfinn Ilmari Mannsåker       ilmari@ilmari.org
 Daisuke Maki                   dmaki@cpan.org
 Dan Collins                    dcollinsn@gmail.com
 Daniel Coupal                  dcoupal@cisco.com
+Daniel Egeberg                 daniel.egeberg@gmail.com
 Daniel Perrett                 perrettdl@googlemail.com
 Dave Rolsky                    autarch@urth.org
 David Cantrell                 david@cantrell.org.uk
@@ -42,13 +44,13 @@ Eden Hochbaum                  eden.hochbaum@gmail.com
 Emiliya Boyadjieva             emiliya.boyadjieva@sap.com
 Erwan Lemonnier                erwan@cpan.org
 Florian Ragwitz                rafl@debian.org
+Gábor Szabó                    szabgab@gmail.com
 Gisle Aas                      gisle@ActiveState.com
 Goro Fuji                      gfuji@cpan.org
 Graham Knop                    haarg@haarg.org
 Gregor Herrmann                gregoa@debian.org
 Guillaume Aubert               aubertg@cpan.org
 Guillermo O. Freschi           kedrot@gmail.com
-Gábor Szabó                    szabgab@gmail.com
 Haydn Newport                  haydn@catalyst.net.nz
 Heikki J Laaksonen             heikki.j.laaksonen@kolumbus.fi
 Heinz Knutzen                  heinz.knutzen@gmail.com
@@ -82,6 +84,7 @@ mauke
 Max Maischein                  corion@cpan.org
 Michael Carman                 mjcarman@cpan.org
 Michael G Schwern              schwern@pobox.com
+Mohammad S Anwar               mohammad.anwar@yahoo.com
 Nathan Haigh                   n.haigh@sheffield.ac.uk
 Nicholas Clark                 nick@ccl4.org
 Niko Tyni                      ntyni@debian.org
@@ -93,12 +96,14 @@ Paul Hirst                     paulhirst@bearandgiraffe.org
 Paul Johnson                   paul@pjcj.net
 Paul "LeoNerd" Evans           leonerd@leonerd.org.uk
 Philippe M. Chiasson           gozer@cpan.org
+Reini Urban                    rurban@cpan.org
 Rob Kinyon                     rob.kinyon@gmail.com
 Robert Freimuth                rfreimuth@cpan.org
 Robin Barker                   RMBarker@cpan.org
 Ruslan Zakirov                 Ruslan.Zakirov@gmail.com
 Ryan Voots                     simcop2387@simcop2387.info
 sago35                         sago35@gmail.com
+Sébastien Aperghis-Tramoni     saper@cpan.org
 Sebastian Paaske Tørholm       eckankar@gmail.com
 Sergiy Borodych                Sergiy.Borodych@gmail.com
 Slaven Rezić                   slaven@rezic.de
@@ -110,7 +115,6 @@ Steve Hay                      shay@cpan.org
 Steve Peters                   smpeters@cpan.org
 Steve Sanbeg                   sanbeg@cpan.org
 Sullivan Beck                  sbeck@cpan.org
-Sébastien Aperghis-Tramoni     saper@cpan.org
 Tatsuhiko Miyagawa             miyagawa@bulknews.net
 Thomas Dorner                  dorner (AT) cpan.org
 Todd Rinaldo                   toddr@cpan.org

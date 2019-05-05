@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojo-redis"
       }
    },
-   "version" : "3.22",
+   "version" : "3.23",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Dan Book <grinnz@grinnz.com>"

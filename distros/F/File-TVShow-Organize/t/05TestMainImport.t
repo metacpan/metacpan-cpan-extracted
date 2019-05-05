@@ -2,7 +2,7 @@
 # `make test'. After `make install' it should work as `perl 05MainTestOrganize.t'
 
 #########################
-
+use 5.006;
 use strict;
 use warnings;
 use Data::Dumper;

@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SimpleUI;
-$Config::Model::SimpleUI::VERSION = '2.133';
+package Config::Model::SimpleUI 2.134;
+
 use Carp;
 use 5.010;
 use strict;
@@ -90,7 +90,7 @@ my $ll_sub = sub {
     push @args, '*' unless @args; # default action is to list all elements
 
     my $obj = $self->{current_node};
-    map {s/\*/.*/g;} @args ;
+    for (@args) {s/\*/.*/g;} ;
     my $pattern = join ('|',@args);
 
     return $obj->describe( pattern => qr/^$pattern$/, @desc_opt );
@@ -231,7 +231,8 @@ $run_dispatch{reset} = $run_dispatch{clear};
 $run_dispatch{dump}  = $run_dispatch{tree};
 
 sub simple_ui_commands {
-    return sort keys %run_dispatch;
+    my @cmds = sort keys %run_dispatch;
+    return @cmds;
 }
 
 sub new {
@@ -338,7 +339,7 @@ Config::Model::SimpleUI - Simple interface for Config::Model
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -563,7 +564,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -35,6 +35,7 @@ lib/Mojolicious/Plugin/AssetPack/Store.pm
 lib/Mojolicious/Plugin/AssetPack/Util.pm
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/00-basic.t
 t/assets/css-0-one.css
 t/assets/css-0-two.css

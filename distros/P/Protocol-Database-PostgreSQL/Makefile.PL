@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "Ryu::Exception" => 0,
     "Sub::Identify" => 0,
     "Time::HiRes" => 0,
+    "Unicode::UTF8" => 0,
     "constant" => 0,
     "indirect" => 0,
     "parent" => 0,
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Refcount" => "0.07"
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +76,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.98",
   "Test::Refcount" => "0.07",
   "Time::HiRes" => 0,
+  "Unicode::UTF8" => 0,
   "constant" => 0,
   "indirect" => 0,
   "parent" => 0,

@@ -1,6 +1,6 @@
 package XML::Sig::OO;
 
-our $VERSION="0.001";
+our $VERSION="0.002";
 
 use Modern::Perl;
 use Moo;

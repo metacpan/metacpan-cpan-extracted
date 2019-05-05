@@ -1,5 +1,14 @@
 Revision history for Ryu
 
+1.005     2019-05-05 19:15:56+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - when there are no downstream nodes, the ->buffer node should accumulate
+    data until something is attached, to support the common pattern of
+    swapping out downstream nodes periodically (or when a threshold is reached)
+
 1.004     2019-04-30 02:03:42+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -1,14 +1,15 @@
 package Chart::GGPlot::Backend::Plotly::Util;
 
-# ABSTRACT:
+# ABSTRACT: Utilities used by Chart::GGPlot::Backend::Plotly
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Data::Munge qw(elem);
 use Graphics::Color::RGB;
-use List::AllUtils qw(pairmap reduce);
+use List::AllUtils qw(all min max pairmap pairwise reduce);
+use Memoize;
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle);
 use Types::Standard qw(Str);
@@ -21,6 +22,7 @@ our @EXPORT_OK = qw(
   br
   to_rgb
   group_to_NA
+  pdl_to_plotly
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -36,36 +38,63 @@ fun cex_to_px ($x) { pt_to_px( 12 * $x * 0.75 * 0.3 ) }
 sub br { '<br />' }
 
 # plotly does not understands some non-rgb colors like "grey35"
-fun to_rgb ($x) {
-    state $check = Type::Params::compile((Piddle | Str));
-    ($x) = $check->($x);
+fun to_rgb ($color, $alpha=pdl(1)) {
+    state $check = Type::Params::compile((Piddle | Str), Piddle);
+    ($color, $alpha) = $check->($color, $alpha);
 
     my $rgb = sub {
-        my ($color) = @_;
+        my ($c, $a) = @_;
+        unless ( $c =~ /^\#/ ) {
+             $c = _color_name_to_rgb($c);
+        }
+        return $c if $a == 1;
 
-        if ( $color =~ /^\#/ ) {
-            return $color;
+        if ( my @rgb = ( $c =~ /^#(..)(..)(..)/ ) ) {
+            $a = max( min( $a, 1 ), 0 );
+            return sprintf(
+                "rgba(%s,%s,%s,%s)",
+                ( map { hex($_) } @rgb ),
+                int( $a * 255 + 0.5 )
+            );
         }
-        else {
-            try {
-                my $c = Graphics::Color::RGB->from_color_library($color);
-                return $c->as_css_hex;
-            }
-            catch {
-                return $color;
-            }
-        }
+        return $c;
     };
 
-    if ( !ref($x) ) {
-        return $rgb->($x);
+    if ( !ref($color) ) {
+        return $rgb->($color, 1);
     }
     else {
-        my $p = PDL::SV->new( $x->unpdl->map($rgb) );
-        $p = $p->setbadif( $x->isbad ) if $x->badflag;
+        if ($alpha->length != $color->length and $alpha->length != 1) {
+            die "alpha must be of length 1 or the same length as x";
+        }
+        $alpha = $alpha->setbadtoval(1);
+        
+        my @color = $color->flatten;
+        my @rgba;
+        if ($alpha->uniq->length == 1 and $alpha->at(0) == 1) {
+            @rgba = map { $rgb->($_, 1) } @color;
+        } else {
+            my @alpha = $alpha->flatten;
+            @rgba = pairwise { $rgb->($a, $b) } @color, @alpha;
+        }
+
+        my $p = PDL::SV->new(\@rgba);
+        $p = $p->setbadif( $color->isbad ) if $color->badflag;
         return $p;
     }
 }
+
+sub _color_name_to_rgb {
+    my ($color) = @_;
+
+    try {
+        return Graphics::Color::RGB->from_color_library($color)->as_css_hex;
+    }
+    catch {
+        return $color;
+    }
+}
+memoize('_color_name_to_rgb');
 
 
 fun group_to_NA ($df, :$group_vars=['group'],
@@ -152,6 +181,35 @@ fun group_to_NA ($df, :$group_vars=['group'],
     );
 }
 
+# prepare from piddle to aref or value, to be send to Chart::Plotly
+fun pdl_to_plotly ($p, $allow_collapse=false) {
+    return [] if $p->length == 0;
+
+    if ( $p->badflag ) {
+        return $p->unpdl;
+    }
+
+    if ($allow_collapse) {
+        return $p->at(0) if $p->length == 1;
+
+        if ( $p->$_DOES('PDL::SV') ) {
+            my @lst  = $p->flatten;
+            my $elem = shift @lst;
+            if ( all { $_ eq $elem } @lst ) {
+                return $elem;
+            }
+        }
+        else {
+            my $elem = $p->at(0);
+            if ( ( $p == $elem )->all ) {
+                return $elem;
+            }
+        }
+    }
+
+    return $p->unpdl;
+}
+
 1;
 
 __END__
@@ -162,11 +220,11 @@ __END__
 
 =head1 NAME
 
-Chart::GGPlot::Backend::Plotly::Util - use Chart::GGPlot::Setup qw(:base :pdl);
+Chart::GGPlot::Backend::Plotly::Util - Utilities used by Chart::GGPlot::Backend::Plotly
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 FUNCTIONS
 

@@ -9,7 +9,7 @@ use Safe::Isa;
 use Exporter   qw< import >;
 use List::Util qw< first  >;
 
-my @EXPORT_OK = qw< rewrite_string rewrite_file >;
+our @EXPORT_OK = qw< rewrite_string rewrite_file >;
 
 my %reftype_to_reffunc = (
     SCALAR => 'is_scalarref',
@@ -29,16 +29,26 @@ sub rewrite_string {
 }
 
 sub rewrite_file {
-    my $file = shift;
-    return rewrite_doc( PPI::Document->new($file) );
+    my $file    = shift;
+    my $content = rewrite_doc( PPI::Document->new($file) );
+
+    open my $fh, '>', $file
+        or die "Failed to open file $file: $!";
+    print {$fh} $content;
+    close $fh;
+
+    return $content;
 }
 
 sub rewrite_doc {
-    my $doc            = shift;
+    my $doc            = shift or die;
     my $all_statements = $doc->find('PPI::Statement');
+    $all_statements    = [] unless defined $all_statements;
+
     my @cond_ops       = qw<or || and &&>;
     my @new_statements;
 
+    ALL_STATEMENTS:
     foreach my $statement ( @{$all_statements} ) {
         # if there's an "if()" statement, it appears as a Compound statement
         # and then each internal statement appears again,
@@ -46,9 +56,11 @@ sub rewrite_doc {
         $statement->$_isa('PPI::Statement::Compound')
             and next;
 
+        _handle_eval($statement);
+
         # find the 'ref' functions
         my $ref_subs = $statement->find( sub {
-            $_[1]->isa('PPI::Token::Word') and $_[1]->content eq 'ref'
+            $_[1]->isa('PPI::Token::Word') && $_[1]->content eq 'ref'
         }) or next;
 
         my $statement_def;
@@ -60,9 +72,13 @@ sub rewrite_doc {
             my $sib = $ref_sub;
             my ( @func_args, $reffunc_doc, @rest_of_tokens );
 
+            my @siblings_to_remove;
+
             while ( $sib = $sib->next_sibling ) {
                 # end of statement/expression
                 my $content = $sib->content;
+
+                push @siblings_to_remove, $sib;
                 $content eq ';' and last;
 
                 # we might already have a statement
@@ -89,6 +105,8 @@ sub rewrite_doc {
                             warn "Error: no match for $val_str\n";
                             next REF_STATEMENT;
                         }
+
+                        push @siblings_to_remove, $sib;
 
                         $statement_def = [ $func, \@func_args, '' ];
                     } elsif ( first { $content eq $_ } @cond_ops ) {
@@ -147,12 +165,97 @@ sub rewrite_doc {
 
             my $new_statement = ( $reffunc_doc->children )[0];
 
-            $ref_sub->parent->insert_before($new_statement);
-            $ref_sub->parent->remove;
+            # remove as much as we can
+            foreach my $element ( @siblings_to_remove ) {
+                $element->remove;
+            }
+
+            # remove the trailing space to avoid duplicate spaces
+            if ( my $next = $ref_sub->next_sibling ) {
+                $next->remove if $next->isa('PPI::Token::Whitespace');
+            }
+
+            foreach my $element ( $new_statement->children ) {
+                my $insert = $ref_sub->insert_before( $element );
+            }
+
+            $ref_sub->remove;
+
+            # update statements... to avoid PPI issues when moving elements...
+            # this is very ugly... but probably the best solution
+            $all_statements = $doc->find('PPI::Statement');
+            goto ALL_STATEMENTS;
         }
     }
 
     return "$doc";
+}
+
+
+sub _handle_eval {
+    my $statement = shift;
+    my $evals     = $statement->find( sub {
+            $_[1]->isa('PPI::Token::Word') && $_[1]->content eq 'eval';
+    }) || [];
+
+    foreach my $eval ( @{$evals} ) {
+        my $sib = $eval;
+
+        while ( $sib = $sib->next_sibling ) {
+            if ( $sib->isa('PPI::Token::Quote') ) {
+                last unless $sib->content =~ qr{\bref\b}; # shortcut
+
+                # '' - PPI::Token::Quote::Single
+                # "q{}" - PPI::Token::Quote::Literal
+                # "" - PPI::Token::Quote::Double
+                # "qq{}" - PPI::Token::Quote::Interpolate
+                my ( $content, $after, $before );
+
+                if ( $sib->isa('PPI::Token::Quote::Single') ) {
+                    $after = $before = q{'};
+                    $content = $sib->literal;
+                } elsif ( $sib->isa('PPI::Token::Quote::Double') ) {
+                    $after = $before = q{"};
+                    $content = $sib->string;
+                } elsif ( $sib->isa('PPI::Token::Quote::Literal') ) {
+                    $before = 'q{';
+                    $after  = '}';
+
+                    if ( $sib->content =~ qr{^q(.).*(.)$} ) {
+                        $before = 'q' . $1;
+                        $after  = $2;
+                    }
+
+                    $content = $sib->literal;
+                } elsif ( $sib->isa('PPI::Token::Quote::Interpolate') ) {
+                    $before = 'qq{';
+                    $after  = '}';
+
+                    if ( $sib->string =~ qr{^q(.).*(.)$} ) {
+                        $before = $1;
+                        $after  = $2;
+                    }
+
+                    $content = $sib->string;
+                }
+
+                $content
+                    or next;
+
+                # FIXME: this is very ugly....
+                # FIXME need to escape for literals but the idea is there
+                $sib->{'content'}
+                    = $before . rewrite_string($content) . $after;
+
+                # Idea:
+                # my $p = PPI::Token::Quote::Double->new( rewrite_string($content) );
+                # $sib->insert_before( $p );
+                # $sib->delete;
+                last;
+            }
+        }
+
+    }
 }
 
 sub _create_statement {
@@ -180,7 +283,7 @@ Ref::Util::Rewriter - Rewrite your code to use Ref::Util
 
 =head1 VERSION
 
-version 0.003
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -291,7 +394,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Sawyer X.
+This software is Copyright (c) 2019 by Sawyer X.
 
 This is free software, licensed under:
 

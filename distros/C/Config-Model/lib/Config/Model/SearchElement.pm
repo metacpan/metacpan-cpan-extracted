@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SearchElement;
-$Config::Model::SearchElement::VERSION = '2.133';
+package Config::Model::SearchElement 2.134;
+
 use Log::Log4perl qw(get_logger :levels);
 use Carp;
 use strict;
@@ -48,7 +48,7 @@ sub _sniff_class {
     my @lines;
     my %h;
     my $model   = $self->{model};
-    my $c_model = $model->get_model($class);
+    my $c_model = $model->get_model_clone($class);
 
     $logger->trace("sniffing config class $class");
 
@@ -333,7 +333,7 @@ Config::Model::SearchElement - Search an element in a configuration model
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -585,7 +585,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

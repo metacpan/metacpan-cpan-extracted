@@ -9,7 +9,7 @@ use Term::ANSIColor  qw(:constants colorvalid colored);
 use Getopt::Long;
 use File::Basename;
 use Proch::N50;
-
+use Data::Dumper;
 our %program = (
   'NAME'      => 'FASTx N50 CALCULATOR',
   'AUTHOR'    => 'Andrea Telatin',
@@ -103,9 +103,12 @@ foreach my $file (@ARGV) {
     print STDERR "Error parsing <$file>\n";
     next;
   }
+  say Dumper $FileStats if ($opt_debug);
   my $n50 = $FileStats->{N50};
   my $n   = $FileStats->{seqs};
   my $slen= $FileStats->{size};
+  my $min = $FileStats->{min};
+  my $max = $FileStats->{max};
 
 	# my @aux = undef;
 	# my %sizes;
@@ -127,6 +130,8 @@ foreach my $file (@ARGV) {
 		'seqs' => $n,
 		'N50'  => $n50,
 		'size' => $slen,
+    'min'  => $min,
+    'max'  => $max,
 	);
 	$output_object{$file} = \%metrics;
 }

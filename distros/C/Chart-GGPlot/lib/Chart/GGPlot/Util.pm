@@ -4,7 +4,7 @@ package Chart::GGPlot::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Data::Dumper::Concise ();
 
@@ -16,6 +16,8 @@ use Data::Frame;
 use Math::Trig ();
 use constant PI => Math::Trig::pi;
 
+use List::AllUtils qw(min);
+use Module::Load;
 use PDL::Primitive qw(which);
 use Package::Stash;
 use Types::PDL qw(Piddle1D PiddleFromAny);
@@ -44,6 +46,8 @@ my @export_all = (
       dist_euclidean dist_polar
       split_indices
       find_line_formula spiral_arc_length
+      has_groups
+      collect_functions_from_package
       ),
 );
 
@@ -246,16 +250,15 @@ fun spiral_arc_length ($a, $theta1, $theta2) {
 
 # Split indices of an indices array ref into groups
 # Return an arrayref of piddles.
-fun split_indices ((ArrayRef | Piddle1D) $indices, $n=List::AllUtils::max(@$indices)) {
-    my @rslt = map { [] } ( 0 .. $n - 1 );
+fun split_indices (Piddle1D $indices, $n=$indices->max) {
+    my @rslt = map { [] } ( 1 .. $n );
     for my $i ( 0 .. $indices->length - 1 ) {
-        my $id = $indices->at($i);
-        $id = $n if ( $id > $n );
-        $rslt[$id] //= [];
+        my $id = min($indices->at($i), $n);
         push @{ $rslt[$id] }, $i;
     }
     return [ map { pdl($_) } @rslt ];
 }
+
 
 fun resolution(Piddle1D $x, $zero=true) {
     if ($x->type < PDL::float or zero_range(range_($x, true))) {
@@ -272,6 +275,42 @@ fun resolution(Piddle1D $x, $zero=true) {
 
 fun stat($x) { $x }
 
+use constant NO_GROUP => -1;
+
+fun has_groups ($df) {
+
+    # If no group aesthetic is specified, all values of the group column
+    # equal to NO_GROUP. On the other hand, if a group aesthetic is
+    # specified, all values are different from NO_GROUP.
+    # undef is returned for 0-row data frames.
+    return undef if ( $df->nrow == 0 );
+    return ( $df->at('group')->at(0) >= 0 );
+}
+
+sub collect_functions_from_package {
+    my ($package) = @_; 
+
+    load $package;
+
+    my ($caller_package) = caller();
+    my @func_names;
+    my $funcs = $package->ggplot_functions();
+    for (@$funcs) {
+        my $name = $_->{name};
+
+        no strict 'refs';
+        if (defined &{$name}) {
+            warn qq{Duplicate function definitions for "$name". } . 
+                "Definition from package $package would mask earlier " .
+                "definition loaded into " . __PACKAGE__ . ".";
+        }
+
+        *{"${caller_package}::${name}"} = $_->{code};
+        push @func_names, $name;
+    }   
+    return @func_names;
+}
+
 1;
 
 __END__
@@ -286,7 +325,7 @@ Chart::GGPlot::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 FUNCTIONS
 
@@ -348,6 +387,20 @@ non-aliased.
 This can be used in a packge like
 
     our @EXPORT_OK = alias_color_functions(__PACKAGE__, @function_names);
+
+=head2 resolution
+
+    resolution(Piddle1D $x, $zero=true)
+
+The resolution is the smallest non-zero distance between adjacent values.
+
+If C<$x> has a single value, or an interger vector which can be assumed to
+represent a discrete value, then the resolution is 1.
+If C<$x> is a float vector, the resolution is the minimal distance between
+ajacent values in sorted C<$x>.
+
+If C<$zero> is true, 0 would be inserted into the vector, if it's does not
+already in the vector, when computing the resolution.
 
 =head2 stat
 

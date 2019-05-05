@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.133';
+package Config::Model::Value 2.134;
+
 use 5.10.1;
 
 use strict;
@@ -1488,7 +1488,7 @@ sub load_data {
 
     my $rd = ref $data;
 
-    if ( $rd and grep { $rd eq $_ } qw/ARRAY HASH SCALAR/) {
+    if ( $rd and any { $rd eq $_ } qw/ARRAY HASH SCALAR/) {
         Config::Model::Exception::LoadData->throw(
             object     => $self,
             message    => "load_data called with non scalar arg",
@@ -1915,7 +1915,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -2985,7 +2985,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

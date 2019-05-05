@@ -5,7 +5,7 @@ package Chart::GGPlot::Plot;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Autoload::AUTOCAN;
 use Data::Frame::Types qw(DataFrame);
@@ -68,6 +68,7 @@ method AUTOCAN ($method) {
         [ ( ConsumerOf ['Chart::GGPlot::Facet'] ),  'facet' ],
         [ ( ConsumerOf ['Chart::GGPlot::Layer'] ),  'add_layer' ],
         [ ( ConsumerOf ['Chart::GGPlot::Labels'] ), 'add_labels' ],
+        [ ( ConsumerOf ['Chart::GGPlot::Coord'] ),  'add_coord' ],
         [ ( ConsumerOf ['Chart::GGPlot::Guide'] ),  'add_guide' ],
         [ ( ConsumerOf ['Chart::GGPlot::Scale'] ),  'add_scale' ],
         [ ( ConsumerOf ['Chart::GGPlot::Theme'] ),  '_set__theme' ],
@@ -125,7 +126,7 @@ has scales => (
 );
 has _theme   => ( is => 'rwp', isa => InstanceOf['Chart::GGPlot::Theme'] );
 has coordinates => (
-    is      => 'rw',
+    is      => 'rwp',
     isa     => Coord,
     default => sub {
         Chart::GGPlot::Coord::Functions::coord_cartesian( default => true );
@@ -158,6 +159,10 @@ method show (HashRef $opts={}) {
 
 method save ($filename, HashRef $opts={}) {
     $self->backend->save( $self, $filename, $opts );
+}
+
+method iplot (HashRef $opts={}) {
+    $self->backend->iplot( $self, $opts );
 }
 
 
@@ -227,6 +232,12 @@ method add_scale ($scale) {
     return $self;
 }
 
+
+method add_coord($coord) {
+    $self->_set_coordinates($coord);
+    return $self;
+}
+
 classmethod make_labels($mapping) {
     state $strip = sub {    # strip_dots() in R ggplot2
         my ($aesthetic, $expr) = @_; 
@@ -266,7 +277,7 @@ Chart::GGPlot::Plot - ggplot class
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 
@@ -307,6 +318,13 @@ Implementation depends on the plotting backend.
 Export the plot to a static image file.
 Implementation depends on the plotting backend.
 
+=head2 iplot
+
+    iplot(HashRef $opts={})
+
+Generate plot for L<IPerl> in Jupyter notebook.
+Implementation depends on the plotting backend.
+
 =head2 summary
 
     summary()
@@ -341,20 +359,53 @@ You normally don't have to explicitly call this method.
 
 You normally don't have to explicitly call this method.
 
+=head2 add_coord
+
+    add_coord($coord)
+
+You normally don't have to explicitly call this method.
+
 =head1 MORE METHODS
 
 This class uses Perl's autoloading feature, to allow this class to get
 into its member methods exported functions of C<:ggplot> tag from several
 other namespaces:
 
+=over 4
+
+=item *
+
 L<Chart::GGPlot::Geom::Functions>
+
+=item *
+
 L<Chart::GGPlot::Scale::Functions>
+
+=item *
+
 L<Chart::GGPlot::Labels::Functions>
+
+=item *
+
 L<Chart::GGPlot::Limits>
+
+=item *
+
 L<Chart::GGPlot::Coord::Functions>
+
+=item *
+
 L<Chart::GGPlot::Facet::Functions>
+
+=item *
+
 L<Chart::GGPlot::Guide::Functions>
+
+=item *
+
 L<Chart::GGPlot::Theme::Defaults>
+
+=back
 
 For example, when you do
 
@@ -367,11 +418,13 @@ It internally does something like,
 
 Depend on the return type of the function it would call one of the class's
 add/set methods. In this case of C<geom_point()> we get a layer object so
-L<add_layer()> is called.
+C<add_layer()> is called.
 
 =head1 SEE ALSO
 
 L<Chart::GGPlot>
+
+L<Devel::IPerl>
 
 =head1 AUTHOR
 

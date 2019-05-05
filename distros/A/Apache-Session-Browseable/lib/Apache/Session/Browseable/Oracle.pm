@@ -6,7 +6,7 @@ use Apache::Session;
 use Apache::Session::Lock::Null;
 use Apache::Session::Browseable::Store::Oracle;
 use Apache::Session::Generate::SHA256;
-use Apache::Session::Serialize::JSON
+use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::DBI;
 
 our $VERSION = '1.2.2';

@@ -5,7 +5,7 @@ package Chart::GGPlot::HasDefaultAes;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Types::Standard qw(InstanceOf);
 
@@ -32,7 +32,7 @@ Chart::GGPlot::HasDefaultAes - The role for the 'default_aes' attr
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

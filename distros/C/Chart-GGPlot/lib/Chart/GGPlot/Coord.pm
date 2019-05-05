@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Types::Standard qw(Bool);
 
@@ -15,11 +15,10 @@ has render_axis_h => ( is => 'rw' );
 # Renders the vertical axes.
 has render_axis_v => ( is => 'rw' );
 
-# Returns the x and y ranges
-has range => ( is => 'rw' );
+with qw(Chart::GGPlot::HasCollectibleFunctions);
 
 
-has is_linear => ( is => 'ro', init_arg => undef, lazy_required => 1 );
+classmethod is_linear() { false; }
 
 
 requires 'transform';
@@ -74,11 +73,13 @@ Chart::GGPlot::Coord - The role for coordinates
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
-=head1 ATTRIBUTES
+=head1 CLASS METHODS
 
 =head2 is_linear
+
+    is_linear()
 
 Returns true if the coordinate system is linear; false otherwise.
 

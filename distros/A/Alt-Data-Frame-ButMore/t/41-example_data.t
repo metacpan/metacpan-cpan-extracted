@@ -33,7 +33,7 @@ subtest airquality => sub {
     my $tempfile = Path::Tiny->tempfile;
     $airquality->to_csv($tempfile, row_names => false, na => 'MYNA');
     my $df = Data::Frame->from_csv($tempfile, na => 'MYNA');
-    dataframe_is($df, $airquality, '$df->to_csv()');
+    dataframe_is($df, $airquality, '$df->to_csv() handles NA');
 };
 
 subtest diamonds => sub {
@@ -87,6 +87,12 @@ END_OF_TEXT
     #diag($expected);   
 
     is($economics->string, $expected, 'stringification of datetime column');
+
+    my $tempfile = Path::Tiny->tempfile;
+    $economics->to_csv($tempfile, row_names => false);
+    my $df =
+      Data::Frame->from_csv( $tempfile, dtype => { date => 'datetime' } );
+    dataframe_is($df, $economics, '$df->to_csv() handles datetime');
 };
 
 subtest iris => sub {

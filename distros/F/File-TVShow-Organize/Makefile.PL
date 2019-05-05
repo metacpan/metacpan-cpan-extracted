@@ -1,4 +1,4 @@
-use 5.012004;
+use 5.010000;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -9,8 +9,17 @@ WriteMakefile(
     PREREQ_PM         => { 'File::TVShow::Info' => 0,
                            'File::Path' => 0,
                            'File::Copy' => 0,
-                           'Test::Carp' => 0,
+                           'IPC::Cmd' => 0,
                            'Carp' => 0 }, # e.g., Module::Name => 1.1
+    TEST_REQUIRES    => {
+                          'Test::More' => 0,
+                          'File::chdir' => 0,
+                          'Test::Carp' => 0,
+                          'Cwd' => 0,
+                          'Data::Dumper' => 0,
+                          'Archive::Tar' => 0,
+
+    },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/File/TVShow/Organize.pm', # retrieve abstract from module
        AUTHOR         => 'Adam Spann <bans@cpan.org>') : ()),

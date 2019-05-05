@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use lib '.';
 use inc::latest 'Module::Build';
 
 use lib qw(inc);

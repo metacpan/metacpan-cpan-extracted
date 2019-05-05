@@ -1,4 +1,18 @@
 Revision history for Chart::GGPlot
+
+0.0003      2019-05-04
+  - New feature: basic support of geom_boxplot()
+  - New feature: coord_flip()
+  - coord_cartesian() now really supports :$xlim, :$ylim arguments.
+  - Add a Chart::GGPlot::Plot::iplot() method for convenience of plotting 
+    in Jupyter Notebook.
+  - Chart::GGPlot::Util::dollar() behavior is now more consistant. Hope
+    this can fix a unit test failure in some special environments.
+    (github #6)
+  - Performance improvements: Together with improments in
+    Alt::Data::Frame::ButMore, now for an extreme case of "diamonds" scatter    example, which is quite slow among the examples, it's become 3x faster
+    compared to before to run in exporting-to-png mode.
+  - Some doc improvements.
  
 0.0001      2019-03-18
   - First release.

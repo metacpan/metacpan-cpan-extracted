@@ -31,7 +31,7 @@ chosen module documentation carefully to set the indexes.
 
 =item L<Apache::Session::Browseable::PgHstore>: uses "hstore" field
 
-=item L<Apache::Session::Browseable::PjJSON>: uses "json/jsonb" field
+=item L<Apache::Session::Browseable::PgJSON>: uses "json/jsonb" field
 
 =back
 

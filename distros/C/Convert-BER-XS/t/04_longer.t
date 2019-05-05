@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..44\n"; }
+BEGIN { $| = 1; print "1..60\n"; }
 
 use common::sense;
 use Convert::BER::XS ':all';
@@ -425,4 +425,28 @@ d08d 549e b622 c12f 3842 5fa3 7485 3ff
 51bf d2f8 5f90 dc5d 91a0 d498 e655 ef6
 7a82 41a2 70ff 3238 bc7d 8a6b 7441 a96
 80af 2b1b 6e7a 98
+
+# indefinite encoding. invalid snmp, but valid ber.
+
+60 80 01 01 01 01 01 00
+61 80 a0 80 03 02 04 80
+03 02 04 40 00 00 00 00
+04 06 313233343536 00 00
+
+#  rfc 3416, slightly changed to roundtrip
+roundtrip
+a5 39
+02 04 54 52 5d 76
+02 01 01
+02 01 02
+30 2b
+30 0b
+06 07 2b 06 01 02 01 01 03
+05 00
+30 0d
+06 09 2b 06 01 02 01 04 16 01 02
+05 00
+30 0d
+06 09 2b 06 01 02 01 04 16 01 04
+05 00
 

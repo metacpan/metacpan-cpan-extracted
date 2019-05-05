@@ -3,7 +3,13 @@ abstract: 'Perl module to move TVShow Files into their matching Show Folder on a
 author:
   - 'Adam Spann <bans@cpan.org>'
 build_requires:
+  Archive::Tar: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
+  File::chdir: '0'
+  Test::Carp: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,7 +28,7 @@ requires:
   File::Copy: '0'
   File::Path: '0'
   File::TVShow::Info: '0'
-  Test::Carp: '0'
+  IPC::Cmd: '0'
   perl: '5.010000'
-version: '0.34'
+version: '0.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

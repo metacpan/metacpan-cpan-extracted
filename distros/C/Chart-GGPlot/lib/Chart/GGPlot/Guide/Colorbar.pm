@@ -4,7 +4,7 @@ package Chart::GGPlot::Guide::Colorbar;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use parent qw(Chart::GGPlot::Guide);
 
@@ -22,7 +22,7 @@ Chart::GGPlot::Guide::Colorbar - Colorbar guide
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

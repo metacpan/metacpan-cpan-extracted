@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper;
-$Config::Model::Dumper::VERSION = '2.133';
+package Config::Model::Dumper 2.134;
+
 use Carp;
 use strict;
 use warnings;
@@ -21,11 +21,11 @@ sub new {
 }
 
 sub quote {
-    _quote( qr/[\s"#*]/, @_ );
+    _quote( qr/[\s~"#*]/, @_ );
 }
 
 sub id_quote {
-    _quote( qr/[\s"@*<>.=#]/, @_ );
+    _quote( qr/[\s~"@*<>.=#]/, @_ );
 }
 
 sub _quote {
@@ -259,7 +259,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -394,7 +394,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

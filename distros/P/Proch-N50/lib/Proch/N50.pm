@@ -4,29 +4,28 @@ use 5.016;
 use warnings;
 
 package Proch::N50;
-$Proch::N50::VERSION = '0.031';
+$Proch::N50::VERSION = '0.040';
+use JSON::PP;
 
 use File::Basename;
 use Exporter qw(import);
 our @EXPORT = qw(getStats getN50 jsonStats);
 
 
-my $hasJSON = 0;
-
-$hasJSON = eval {
-    require JSON;
-    JSON->import();
-    1;
-};
-
 sub _n50fromHash {
     my ( $hash_ref, $total ) = @_;
     my $tlen = 0;
-    foreach my $s ( sort { $a <=> $b } keys %{$hash_ref} ) {
+    my @sorted_keys = sort { $a <=> $b } keys %{$hash_ref};
+
+    # Added in v. 0.039
+    my $max =  $sorted_keys[-1];
+    my $min =  $sorted_keys[0] ;
+
+    foreach my $s ( @sorted_keys ) {
         $tlen += $s * ${$hash_ref}{$s};
 
      # Was '>=' in my original implementation of N50. Now complies with 'seqkit'
-        return $s if ( $tlen > ( $total / 2 ) );
+        return ($s, $min, $max) if ( $tlen > ( $total / 2 ) );
     }
 
 }
@@ -86,19 +85,24 @@ sub getStats {
         $slen += $size;
         $sizes{$size}++;
     }
-    my $n50 = _n50fromHash( \%sizes, $slen );
+    my ($n50, $min, $max) = _n50fromHash( \%sizes, $slen );
 
     my $basename = basename($file);
 
     $answer->{N50}      = $n50;
+    $answer->{min}      = $min;
+    $answer->{max}      = $max;
     $answer->{seqs}     = $n;
     $answer->{size}     = $slen;
     $answer->{filename} = $basename;
     $answer->{dirname}  = dirname($file);
 
-    if ( $hasJSON and defined $wantJSON ) {
-        my $json           = JSON->new->allow_nonref;
-        my $pretty_printed = $json->pretty->encode($answer);
+    if ( defined $wantJSON ) {
+
+        my $json = JSON::PP->new->ascii->pretty->allow_nonref;
+
+        my $pretty_printed = $json->encode( $answer );
+
         $answer->{json} = $pretty_printed;
 
     }
@@ -167,7 +171,7 @@ Proch::N50 - Calculate N50 from a FASTA or FASTQ file without dependencies
 
 =head1 VERSION
 
-version 0.031
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -183,6 +187,8 @@ version 0.031
   # Will print:
   # %FASTA_stats = (
   #               'N50' => 65,
+  #               'min' => 4,
+  #               'max' => 65,
   #               'dirname' => 'data',
   #               'size' => 130,
   #               'seqs' => 6,
@@ -195,12 +201,11 @@ version 0.031
   print $seq_stats_with_JSON->{json}, "\n";
   # Will print:
   # {
-  #    "seqs" : 6,
   #    "status" : 1,
+  #    "seqs" : 6,
+  #    <...>
   #    "filename" : "small_test.fa",
   #    "N50" : "65",
-  #    "dirname" : "data",
-  #    "size" : 130
   # }
 
 =head1 NAME
@@ -233,6 +238,22 @@ total number of bp in the files
 =item I<N50> (int)
 
 the actual N50
+
+=back
+
+=over 4
+
+=item I<min> (int)
+
+Minimum length observed in FASTA/Q file
+
+=back
+
+=over 4
+
+=item I<max> (int)
+
+Maximum length observed in FASTA/Q file
 
 =back
 
@@ -271,13 +292,13 @@ name of the directory containing the input file
 =head2 jsonStats(filepath)
 
 Returns the JSON string with basic stats (same as $result->{json} from I<getStats>(File, JSON)).
-Requires JSON installed.
+Requires JSON::PP installed.
 
 =head1 Dependencies
 
 =over 4
 
-=item L<JSON> (optional)
+=item L<JSON::PP>
 
 =back
 

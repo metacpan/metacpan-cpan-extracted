@@ -364,7 +364,7 @@ DESCRIPTION
     your own LDAP or SNMP module for example.
 
   DEBUGGING
-    To aid debugging, you cna call the "ber_dump" function to print a "nice"
+    To aid debugging, you can call the "ber_dump" function to print a "nice"
     representation to STDOUT.
 
     ber_dump $tuple[, $profile[, $prefix]]
@@ -525,38 +525,32 @@ PROFILES
        $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_COUNTER32 , BER_TYPE_INT);
        $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_UNSIGNED32, BER_TYPE_INT);
        $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_TIMETICKS , BER_TYPE_INT);
-       $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_OPAQUE    , BER_TYPE_IPADDRESS);
+       $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_OPAQUE    , BER_TYPE_BYTES);
        $SNMP_PROFILE->set (ASN_APPLICATION, SNMP_COUNTER64 , BER_TYPE_INT);
 
   LIMITATIONS/NOTES
-    This module can only en-/decode 64 bit signed and unsigned integers, and
-    only when your perl supports those. So no UUID OIDs for now (unless you
-    map the "OBJECT IDENTIFIER" tag to something other than "BER_TYPE_OID").
+    This module can only en-/decode 64 bit signed and unsigned
+    integers/tags/lengths, and only when your perl supports those. So no
+    UUID OIDs for now (unless you map the "OBJECT IDENTIFIER" tag to
+    something other than "BER_TYPE_OID").
 
     This module does not generally care about ranges, i.e. it will happily
-    de-/encode 64 bit integers into an "ASN_INTEGER" value, or a negative
-    number into an "SNMP_COUNTER64".
+    de-/encode 64 bit integers into an "SNMP_UNSIGNED32" value, or a
+    negative number into an "SNMP_COUNTER64".
 
     OBJECT IDENTIFIEERs cannot have unlimited length, although the limit is
     much larger than e.g. the one imposed by SNMP or other protocols, and is
     about 4kB.
 
-    Indefinite length encoding is not supported.
-
     Constructed strings are decoded just fine, but there should be a way to
     join them for convenience.
 
-    REAL values are not supported and will currently croak.
-
-    The encoder and decoder tend to accept more formats than should be
-    strictly supported - security sensitive applications are strongly
-    advised to review the code first.
-
-    This module has undergone little to no testing so far.
+    REAL values will always be encoded in decimal form and ssometimes is
+    forced into a perl "NV" type, potentially losing precision.
 
   ITHREADS SUPPORT
-    This module is unlikely to work when the (officially discouraged)
-    ithreads are in use.
+    This module is unlikely to work in any other than the loading thread
+    when the (officially discouraged) ithreads are in use.
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

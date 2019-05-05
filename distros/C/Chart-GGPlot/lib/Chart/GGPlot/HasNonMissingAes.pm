@@ -5,7 +5,7 @@ package Chart::GGPlot::HasNonMissingAes;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Types::Standard qw(ArrayRef);
 
@@ -30,7 +30,7 @@ Chart::GGPlot::HasNonMissingAes - The role for the 'non_missing_aes' attr
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 

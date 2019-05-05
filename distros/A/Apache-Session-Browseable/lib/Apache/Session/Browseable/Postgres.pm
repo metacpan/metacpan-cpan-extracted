@@ -9,7 +9,7 @@ use Apache::Session::Generate::SHA256;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::DBI;
 
-our $VERSION = '1.2.5';
+our $VERSION = '1.3.1';
 our @ISA     = qw(Apache::Session::Browseable::DBI Apache::Session);
 
 sub populate {
@@ -24,6 +24,40 @@ sub populate {
     $self->{unserialize}  = \&Apache::Session::Serialize::JSON::unserialize;
 
     return $self;
+}
+
+sub searchOn {
+    my $class = shift;
+    my ( $args, $selectField, $value, @fields ) = @_;
+    my $res = $class->SUPER::searchOn(@_);
+
+    # Ensure fields case is preserved
+    foreach (@fields) {
+        if ( $_ ne lc($_) ) {
+            foreach my $s ( keys %$res ) {
+                $res->{$s}->{$_} = delete $res->{$s}->{ lc $_ }
+                  if $res->{$s}->{ lc $_ };
+            }
+        }
+    }
+    return $res;
+}
+
+sub searchOnExpr {
+    my $class = shift;
+    my ( $args, $selectField, $value, @fields ) = @_;
+    my $res = $class->SUPER::searchOnExpr(@_);
+
+    # Ensure fields case is preserved
+    foreach (@fields) {
+        if ( $_ ne lc($_) ) {
+            foreach my $s ( keys %$res ) {
+                $res->{$s}->{$_} = delete $res->{$s}->{ lc $_ }
+                  if $res->{$s}->{ lc $_ };
+            }
+        }
+    }
+    return $res;
 }
 
 1;

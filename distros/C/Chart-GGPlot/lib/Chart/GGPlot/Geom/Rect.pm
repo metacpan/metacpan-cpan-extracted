@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
@@ -26,6 +26,8 @@ has '+default_aes'     => (
     }
 );
 
+classmethod ggplot_functions() { ... }
+
 classmethod required_aes() { [qw(xmin xmax ymin ymax)] };
 
 __PACKAGE__->meta->make_immutable;
@@ -44,7 +46,7 @@ Chart::GGPlot::Geom::Rect - Class for rect geom
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 SEE ALSO
 

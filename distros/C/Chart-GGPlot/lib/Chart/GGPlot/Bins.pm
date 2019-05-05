@@ -5,7 +5,7 @@ package Chart::GGPlot::Bins;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(reduce pairmap);
@@ -179,7 +179,7 @@ Chart::GGPlot::Bins - Class for histogram bins
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 AUTHOR
 

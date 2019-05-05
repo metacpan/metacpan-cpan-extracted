@@ -193,7 +193,7 @@ Extra `%attributes`:
 
 - coerce
 
-    See ["coerce" in JSON::Validator](https://metacpan.org/pod/JSON::Validator#coerce). Default to 1.
+    See ["coerce" in JSON::Validator](https://metacpan.org/pod/JSON::Validator#coerce). Default to "booleans,numbers,strings".
 
 ## validator
 

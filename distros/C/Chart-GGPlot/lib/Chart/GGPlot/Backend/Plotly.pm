@@ -5,11 +5,11 @@ package Chart::GGPlot::Backend::Plotly;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.023 qw(show_plot);
+use Chart::Plotly 0.025 qw(show_plot);
 use Chart::Plotly::Plot;
 use Chart::Plotly::Image::Orca;
 
@@ -32,7 +32,7 @@ classmethod _split_on($data) {
     return [];
 }
 
-method layer_to_traces ($layer, $data, $layout, $plot) {
+method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
     return if ( $data->isempty );
 
     my $geom            = $layer->geom;
@@ -44,7 +44,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
     my $geom_params = $layer->geom_params;
     my $stat_params = $layer->stat_params;
     my $aes_params  = $layer->aes_params;
-    my $param = $geom_params->merge($stat_params)->merge($aes_params);
+    my $params = $geom_params->merge($stat_params)->merge($aes_params);
 
     my $coord  = $layout->coord;
 
@@ -99,8 +99,6 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         my $hovertext = $class_geom_impl->make_hovertext($d, \@hover_labels);
         $d->set( 'hovertext', PDL::SV->new($hovertext) );
 
-        #my $na_rm = $params->at('na_rm') // false;
-
         my @splitted_sorted;
         if ( $split_vars->length ) {
             my $fac = do {
@@ -127,7 +125,7 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
             sub {
                 my ($d) = @_;
 
-                my $trace = $class_geom_impl->to_trace($d);
+                my $trace = $class_geom_impl->to_trace($d, $params, $plot);
 
                 # If we need a legend, set legend info.
                 my $show_legend =
@@ -153,15 +151,23 @@ method layer_to_traces ($layer, $data, $layout, $plot) {
         );
     };
 
-    my $splitted = $data->split( $data->at('PANEL') );
+    my $splitted_data = $data->split( $data->at('PANEL') );
+    my $splitted_prestats_data =
+      $prestats_data->split( $prestats_data->at('PANEL') );
     return [
         pairmap {
-            my ( $panel_idx, $data ) = ( $a, $b );
+            my ( $panel_id, $panel_data ) = ( $a, $b );
 
-            my $panel_params = $layout->panel_params->at($panel_idx);
-            $panel_to_traces->( $data, $panel_params );
+            my $panel_prestats_data = $splitted_prestats_data->{$panel_id};
+            $panel_to_traces->(
+                $class_geom_impl->to_basic(
+                    $panel_data, $panel_prestats_data, $layout,
+                    $params,     $plot
+                ),
+                $layout->panel_params->at($panel_id)
+            );
         }
-        %$splitted
+        %$splitted_data
     ];
 }
 
@@ -222,10 +228,16 @@ method _to_plotly ($plot_built) {
             return ($theme->at("${elname}.${xy}") // $theme->at($elname));
         };
 
-        my $sc =
-            $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip')
-          ? $scales->{ $xy eq 'x' ? 'y' : 'x' }
-          : $scales->{$xy};
+        my $axis_name;
+        my $sc;
+        if ( $plot->coordinates->DOES('Chart::GGPlot::Coord::Flip') ) {
+            my $new_xy = $xy eq 'x' ? 'y' : 'x';
+            $axis_name = "${new_xy}axis";
+            $sc = $scales->{$new_xy};
+        } else {
+            $axis_name = "${xy}axis";
+            $sc = $scales->{$xy};
+        }
 
         my $axis_title = $sc->name // $labels->at($xy) // '';
 
@@ -270,7 +282,7 @@ method _to_plotly ($plot_built) {
         my $el_panel_grid = $theme_el->('panel_grid_major')
           // $theme->at('panel_grid');
 
-        $plotly_layout{"${xy}axis"} = {
+        $plotly_layout{$axis_name} = {
             range     => $range,
             zeroline  => JSON::false,
             autorange => JSON::false,
@@ -330,12 +342,14 @@ method _to_plotly ($plot_built) {
 
     for my $i ( 0 .. $#$layers ) {
         my $layer = $layers->[$i];
-        my $data  = $plot_built->data->[$i];
+        my $data  = $plot_built->layer_data($i);
+        my $prestats_data  = $plot_built->layer_prestats_data($i);
 
         $log->debug( "data at layer $i:\n" . $data->string ) if $log->is_debug;
 
         my $panels_traces =
-          $self->layer_to_traces( $layer, $data, $layout, $plot );
+          $self->layer_to_traces( $layer, $data, $prestats_data,
+            $layout, $plot );
         for my $panel (@$panels_traces) {
             for my $trace (@$panel) {
                 $plotly->add_trace($trace);
@@ -433,6 +447,16 @@ method save ($ggplot, $filename, HashRef $opts={}) {
     die "Failed to save image via plotly-orca" unless $good;
 }
 
+method iplot ($ggplot, HashRef $opts={}) {
+    state $plugin_registered;
+    unless ($plugin_registered) {
+        IPerl->load_plugin('Chart::Plotly');
+        $plugin_registered = 1;
+    }
+
+    return $self->ggplotly($ggplot);
+}
+
 1;
 
 __END__
@@ -447,7 +471,7 @@ Chart::GGPlot::Backend::Plotly - Plotly backend for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0001
+version 0.0003
 
 =head1 DESCRIPTION
 
@@ -465,13 +489,21 @@ Returns a L<Chart::Plotly> object.
 
     show($ggplot, HashRef $opts={})
 
-Show the plot like in web browser.
+Show the plot in web browser.
+
+On POSIX systems L<Chart::Plotly> internally uses L<Browser::Open> to open
+the browser. L<Browser::Open> has a default list of browsers and tries
+them one by one. You may want to override that behavior by set env var
+C<BROWSER> to force a browser command on your system, for example, 
+
+    export BROWSER=chromium-browser
 
 =head2 save
 
     save($ggplot, $filename, HashRef $opts={})
 
-Export the plot to a static image file.
+Export the plot to a static image file. This internally uses
+L<Chart::Plotly::Image::Orca>.
 
 Below options are supported for C<$opts>:
 
@@ -487,11 +519,19 @@ height
 
 =back
 
+=head2 iplot
+
+    iplot($ggplot, HashRef $opts={})
+
+Generate Plotly plot for L<IPerl> in Jupyter notebook.
+
 =head1 SEE ALSO
 
 L<https://plot.ly/|Plotly>
 
-L<Chart::GGPlot::Backend>, L<Chart::Plotly>
+L<Chart::GGPlot::Backend>
+
+L<Chart::Plotly>, L<Chart::Plotly::Image::Orca>
 
 =head1 AUTHOR
 

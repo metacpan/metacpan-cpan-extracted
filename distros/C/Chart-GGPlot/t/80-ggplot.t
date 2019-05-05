@@ -11,8 +11,9 @@ use Test2::Tools::PDL;
 
 use Chart::GGPlot qw(:all);
 use Chart::GGPlot::Built;
-#use Chart::GGPlot::Aes::Functions qw(:ggplot);
 use Chart::GGPlot::Util qw(NA);
+
+$Data::Frame::TOLERANCE_REL = 1e-3;
 
 subtest geom_point_1 => sub {
     my $mtcars = mtcars();
@@ -273,6 +274,55 @@ subtest geom_line_1 => sub {
         ),
         'x.labels',
     );
+};
+
+subtest geom_boxplot_1 => sub {
+    my $p = ggplot(
+        data    => mpg(),
+        mapping => aes( x => 'class', y => 'hwy' )
+    )->geom_boxplot();
+
+    isa_ok( $p, ['Chart::GGPlot::Plot'], 'ggplot()' );
+
+    my $built = $p->backend->build($p);
+    isa_ok( $built, [qw(Chart::GGPlot::Built)], '$plot->build' );
+
+    my $data = $built->data->[0]->select_columns(
+        [
+            qw(
+              ymin lower middle upper ymax notchupper notchlower
+              PANEL group ymin_final ymax_final
+              size
+              )
+        ]
+    );
+    my $data_expected = Data::Frame->new(
+        columns => [
+            ymin   => pdl( [ 23, 23, 23, 21, 15, 20,   14 ] ),
+            lower  => pdl( [ 24, 26, 26, 22, 16, 24.5, 17 ] ),
+            middle => pdl( [ 25, 27, 27, 23, 17, 26,   17.5 ] ),
+            upper  => pdl( [ 26, 29, 29, 24, 18, 30.5, 19 ] ),
+            ymax   => pdl( [ 26, 33, 32, 24, 20, 36,   22 ] ),
+            notchupper => pdl(
+                [
+                    26.41319, 27.69140, 27.74026, 23.95278,
+                    17.55009, 27.60241, 17.90132
+                ]
+            ),
+            notchlower => pdl(
+                [
+                    23.58681, 26.30860, 26.25974, 22.04722,
+                    16.44991, 24.39759, 17.09868
+                ]
+            ),
+            PANEL      => pdl(0),
+            group      => pdl( [ 0 .. 6 ] ),
+            ymin_final => pdl( [ 23, 23, 23, 17, 12, 20, 12 ] ),
+            ymax_final => pdl( [ 26, 44, 32, 24, 22, 44, 27 ] ),
+            size       => pdl(0.5),
+          ]
+    );
+    dataframe_is( $data, $data_expected, '$built->data' );
 };
 
 done_testing();

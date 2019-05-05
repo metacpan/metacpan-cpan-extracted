@@ -12,4 +12,5 @@ t/22-Backend-Traceroute.t
 t/98-Pod-Coverage.t
 t/99-Perl-Critic.t
 t/perlcriticrc
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

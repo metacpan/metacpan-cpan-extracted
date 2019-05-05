@@ -5,11 +5,7 @@
 use Test::More;
 
 BEGIN {
-  eval {
-    require Net::Traceroute;
-    my $tr = Net::Traceroute->new(host=> "localhost");
-  };
-
+  eval("require Net::Traceroute");
   if ( $@ ) {
     plan skip_all => 'Net::Traceroute not installed'
   }else{

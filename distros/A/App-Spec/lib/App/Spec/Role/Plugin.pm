@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Role::Plugin;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Moo::Role;
 

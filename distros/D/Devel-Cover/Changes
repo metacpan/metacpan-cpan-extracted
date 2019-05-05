@@ -1,5 +1,12 @@
 Devel::Cover history
 
+Release 1.33 - 26 April 2019
+ - Fix pod error (Mohammad S Anwar) (github 240)
+ - Work with cperl where class is a keyword (Reini Urban) (github 238)
+ - Restore correct behaviour on merging DBs (Daniel Egeberg) (github 232)
+ - Fix gcov output being on incorrect lines
+ - Fix cover -test with Build.PL (Dagfinn Ilmari Mannsåker) (github 241)
+
 Release 1.32 - 25 April 2019
  - Test up to 5.26.3, 5.28.3 and  5.29.10
  - Get dev environment working on MacOS

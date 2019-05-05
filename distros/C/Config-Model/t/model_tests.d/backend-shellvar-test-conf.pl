@@ -1,20 +1,20 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-use Config::Model::BackendMgr;
-
 # test shellvar backend
-$home_for_test = '/home/joe';
-$conf_file_name = 'foo.conf';
-$conf_dir = '/etc';
 
-$model->create_config_class(
+use Config::Model::BackendMgr;
+use strict;
+use warnings;
+
+
+my @config_classes = ({
     name    => "Shelly",
     element => [
         [qw/foo bar/],
@@ -28,11 +28,9 @@ $model->create_config_class(
         config_dir => '/etc',
         file       => 'foo.conf',
     }
-);
+});
 
-$model_to_test = "Shelly";
-
-@tests = (
+my @tests = (
     {    # mini (test for Debian #719256)
         name  => 'debian-719256',
         check => [
@@ -49,4 +47,11 @@ $model_to_test = "Shelly";
     }
 );
 
-1;
+return {
+    model_to_test => "Shelly",
+    home_for_test => '/home/joe',
+    conf_file_name => 'foo.conf',
+    conf_dir => '/etc',
+    config_classes => \@config_classes,
+    tests => \@tests
+};

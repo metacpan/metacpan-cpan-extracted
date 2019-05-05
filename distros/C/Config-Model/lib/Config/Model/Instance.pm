@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2018 by Dominique Dumont.
+# This software is Copyright (c) 2005-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.133';
+package Config::Model::Instance 2.134;
+
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -22,6 +22,7 @@ use File::Path;
 use Path::Tiny;
 use Log::Log4perl qw(get_logger :levels);
 
+use Config::Model::TypeConstraints;
 use Config::Model::Exception;
 use Config::Model::Node;
 use Config::Model::Loader;
@@ -236,20 +237,11 @@ has [qw/name application backend backend_arg backup/] => (
     isa => 'Maybe[Str]',
 );
 
-subtype 'RootPath' => as 'Maybe[Path::Tiny]' ;
-coerce 'RootPath' => from 'Str' => via sub { defined $_ ?  Path::Tiny::path($_) : undef ; } ;
-
 has 'root_dir' => (
     is => 'ro',
-    isa => 'RootPath',
+    isa => 'Config::Model::TypeContraints::Path',
     coerce => 1
 );
-
-sub read_root_dir {
-    my $self = shift;
-    carp "deprecated";
-    return $self->root_dir;
-}
 
 has root_path => (
     is  => 'ro',
@@ -263,23 +255,29 @@ sub _build_root_path {
     return $root_dir ? path($root_dir) : Path::Tiny->cwd;
 }
 
-# config_file cannot be a Path::Tiny object: it may be a file name
-# relative to a directory only known by a backend (e.g. a patch in
-# debian/patches directory)
-# TODO: the above argument goes down if debian/patch uses backend_arg
-has config_file => (is  => 'ro', isa => 'Maybe[Str]');
-
-has config_dir => (is  => 'ro', isa => 'Maybe[Str]');
+has [qw/config_dir config_file/] => (
+    is  => 'ro',
+    isa => 'Config::Model::TypeContraints::Path',
+    coerce => 1
+);
 
 has tree => (
     is      => 'ro',
     isa     => 'Config::Model::Node',
-    builder => 'reset_config',
+    builder => '_build_tree',
+    lazy    => 1,
+    clearer => '_clear_config',
     reader  => 'config_root',
     handles => [qw/apply_fixes deep_check grab grab_value/],
 );
 
 sub reset_config {
+    my $self = shift;
+    $self->_clear_config;
+    return $self->config_root;
+}
+
+sub _build_tree {
     my $self = shift;
 
     return $self->load_node (
@@ -586,7 +584,7 @@ sub _write_back_node {
 
         if (defined $node and ($node->needs_save or $force_write)) {
             my $dir = $args{config_dir};
-            mkpath( $dir, 0, 0755 ) if $dir and not -d $dir;
+            mkpath( $dir, 0, oct(755) ) if $dir and not -d $dir;
 
             my $res ;
             if (not $force_backend
@@ -662,7 +660,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.133
+version 2.134
 
 =head1 SYNOPSIS
 
@@ -743,7 +741,7 @@ supplied if not provided by the configuration model. (string)
 
 =item backend
 
-Specify which backend to use. See L</write_back ( ... )> for details
+Specify which backend to use. See L</write_back> for details
 
 =item backend_arg
 
@@ -1087,7 +1085,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2018 by Dominique Dumont.
+This software is Copyright (c) 2005-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

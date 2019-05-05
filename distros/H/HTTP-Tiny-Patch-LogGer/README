@@ -2,12 +2,13 @@ NAME
     HTTP::Tiny::Patch::LogGer - Log HTTP::Tiny with Log::ger
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Patch::LogGer (from
-    Perl distribution HTTP-Tiny-Patch-LogGer), released on 2017-07-10.
+    This document describes version 0.002 of HTTP::Tiny::Patch::LogGer (from
+    Perl distribution HTTP-Tiny-Patch-LogGer), released on 2019-04-21.
 
 SYNOPSIS
      use HTTP::Tiny::Patch::LogGer (
          -log_request          => 1, # default 1
+         -log_request_content  => 1, # default 1
          -log_response         => 1, # default 1
          -log_response_content => 1, # default 0
      );
@@ -18,7 +19,9 @@ DESCRIPTION
 
     *   HTTP request
 
-        Currently *NOT* the raw/on-the-wire request.
+        The raw request sent on-the-wire as well as non-raw request. The raw
+        request is not sent if connection cannot be established; that's why
+        we log both the raw as well as non-raw request.
 
     *   HTTP response
 
@@ -26,6 +29,7 @@ DESCRIPTION
 
 CONFIGURATION
   -log_request => BOOL
+  -log_request_content => BOOL
   -log_response => BOOL
     Content will not be logged though, enable "-log_response_content" for
     that.
@@ -55,7 +59,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -176,14 +176,19 @@ method to_csv ($file, :$sep=',', :$quote='"', :$na='NA',
     }
 
     # a hash to store isbad info for each column
-    my %is_bad = map { $_ => $self->at($_)->isbad; } ( $self->names->flatten );
+    my %isbad = map { $_ => $self->column($_)->isbad; } ( $self->names->flatten );
 
     for ( my $i = 0 ; $i < $self->nrow ; $i++ ) {
         my @row = (
             ( $row_names ? $row_names_data->at($i) : () ),
             (
-                map { $is_bad{$_}->at($i) ? $na : $self->at($_)->at($i); }
-                  @{ $self->names }
+                map {
+                    $self->_format_cell(
+                        $self->column($_), $i,
+                        na    => $na,
+                        isbad => $isbad{$_}
+                    );
+                } @{ $self->names }
             )
         );
         $csv->print( $fh, \@row );
@@ -204,7 +209,7 @@ Data::Frame::IO::CSV - Partial class for data frame's conversion from/to CSV
 
 =head1 VERSION
 
-version 0.0047
+version 0.0049
 
 =head1 METHODS
 
