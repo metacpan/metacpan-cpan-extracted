@@ -1,3 +1,8 @@
+0.443   2019-05-06 (PERLANCAR)
+
+	- ls: Add options --{size,mtime}-{min,max}.
+
+
 0.442   2018-10-09 (PERLANCAR)
 
 	- No functional changes.

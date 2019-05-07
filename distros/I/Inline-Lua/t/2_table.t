@@ -19,13 +19,14 @@ is_deeply(take_table(\%hsh1), \%hsh1,				"simple hash");
 is_deeply(take_table(\%hsh2), \%hsh2,				"nested hash");
 is_deeply(take_table(\@mix),  \@mix,				"mixed");
 
-ok(eq_hash(return_hash(), { key1 => 'val1', key2 => 'val2' }),  "return hash");
-ok(eq_array(return_array(), [1, 2, 3, qw/a b c/]),		"return array");
-ok(eq_hash(return_mixed(), { 1   => 1, 
-			     2   => 2, 
-			     3   => 3, 
-			     5   => 5, 
-			     key => 'val' }),			"return mixed");
+is_deeply(return_hash(), { key1 => 'val1', key2 => 'val2' },    "return hash");
+is_deeply(return_array(), [1, 2, 3, qw/a b c/],                 "return array");
+
+is_deeply(return_mixed(), { 1   => 1,
+                            2   => 2,
+                            3   => 3,
+                            5   => 5,
+                            key => 'val' },                     "return mixed");
 is_deeply(return_nested(), [1, 2, 3, [qw/a b c/]],		"return nested");
 
 __END__

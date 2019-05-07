@@ -28,14 +28,19 @@ if ($fw) {
 
 sub probe_byteloader {
   my $out = "probe.plc";
-  system "$^X -Mblib -MO=-qq,Bytecode,-H,-o$out -e'print q(ok)'";
+  # This requires the dynamic/static target C.so to be built before [cpan #120161]
+  if ($] > 5.021) {
+    require Config;
+    system "$Config::Config{make} linkext";
+  }
+  system "$^X -Mblib -MO=-qq,Bytecode,-H,-o$out -e\"print q(ok)\"";
   return "0" unless -s $out;
   my $ret = `$^X -Mblib $out`;
   unlink $out;
   if ($ret ne "ok") {
     warn "Warning: Broken perl5.22, unpatched for ByteLoader.\n".
       "  Try 'cpan App::perlall; perlall build 5.22.0 --patches=Compiler'\n".
-      "  or try cperl5.22.2\n";
+      "  or try cperl\n";
     return "0";
   }
   return "1";

@@ -26,6 +26,8 @@ use Config;
         my @candidates = (
             'lua-config',
             'pkg-config lua',
+            'pkg-config lua5.3',
+            'pkg-config lua-5.3',
             'pkg-config lua5.2',
             'pkg-config lua-5.2',
             'pkg-config lua5.1',
@@ -45,9 +47,6 @@ use Config;
                     $inc  ||= `$command --cflags`;
 
                     chomp for $libs, $inc;
-
-                    use feature qw(say);
-                    say "inc = $inc, libs = $libs";
 
                     return ( $inc, $libs );
                 }
@@ -96,7 +95,7 @@ WriteMakefile(
   'ABSTRACT' => 'Perl extension for embedding Lua scripts into Perl code',
   'AUTHOR' => 'Rob Hoelz <rob@hoelz.ro>',
   'LICENSE' => 'perl',
-  'VERSION' => '0.14',
+  'VERSION' => '0.15',
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '0'
   },
@@ -105,6 +104,9 @@ WriteMakefile(
     'Test::Exception' => '0'
   },
   'TEST_REQUIRES' => {
+    'File::Spec' => '0',
+    'IO::Handle' => '0',
+    'IPC::Open3' => '0',
     'Test::More' => '0'
   },
     DEFINE            => '',

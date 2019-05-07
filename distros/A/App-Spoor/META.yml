@@ -19,13 +19,16 @@ name: App-Spoor
 provides:
   App::Spoor:
     file: lib/App/Spoor.pm
-    version: '0.06'
+    version: '0.07'
   App::Spoor::AccessEntryParser:
     file: lib/App/Spoor/AccessEntryParser.pm
     version: '0.02'
   App::Spoor::AccessUnitFile:
     file: lib/App/Spoor/AccessUnitFile.pm
     version: '0.01'
+  App::Spoor::ApiClient:
+    file: lib/App/Spoor/ApiClient.pm
+    version: '0.07'
   App::Spoor::Config:
     file: lib/App/Spoor/Config.pm
     version: '0.01'
@@ -50,6 +53,9 @@ provides:
   App::Spoor::LoginUnitFile:
     file: lib/App/Spoor/LoginUnitFile.pm
     version: '0.01'
+  App::Spoor::OutputFormatter:
+    file: lib/App/Spoor/OutputFormatter.pm
+    version: '0.07'
   App::Spoor::ParsedEntryWriter:
     file: lib/App/Spoor/ParsedEntryWriter.pm
     version: '0.01'
@@ -68,14 +74,17 @@ provides:
   SpoorForwardHook:
     file: lib/App/Spoor/CpanelHookFile.pm
 requires:
+  Date::Format: '2.24'
   DateTime::Format::Strptime: '1.75'
   File::Tail: '1.3'
   File::Touch: '0.11'
   JSON: '2.97001'
   LWP::Protocol::https: '6.07'
+  PHP::HTTPBuildQuery: '0.09'
   Path::Tiny: '0.108'
+  Text::CSV: '1.99'
   YAML::Tiny: '1.70'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

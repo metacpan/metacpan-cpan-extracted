@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
-our $DATE = '2018-06-26'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2019-05-07'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -224,6 +224,7 @@ sub gather_files {
 
 sub register_prereqs {
     no strict 'refs';
+    require Data::Sah::Resolve;
 
     my $self = shift;
 
@@ -237,6 +238,7 @@ sub register_prereqs {
 
     for my $mod (sort keys %{$self->{_our_schema_modules} // {}}) {
         my $nsch = ${"$mod\::schema"};
+        my $rsch = Data::Sah::Resolve::resolve_schema($nsch);
         # add prereqs to XCompletion modules
         if (my $xc = $nsch->[1]{'x.completion'}) {
             my @c = ref($xc) eq 'CODE' ? () :
@@ -254,7 +256,7 @@ sub register_prereqs {
             next unless $crr && @$crr;
             for my $rule (@$crr) {
                 next unless $rule =~ /\A\w+(::\w+)*\z/;
-                my $crmod = "Data::Sah::Coerce::perl::$nsch->[0]::$rule";
+                my $crmod = "Data::Sah::Coerce::perl::$rsch->[0]::$rule";
                 next if $self->is_package_declared($crmod);
                 $self->log(["Adding prereq to %s", $crmod]);
                 $self->zilla->register_prereqs({phase=>'runtime'}, $crmod => version_from_pmversions($crmod) // 0);
@@ -279,7 +281,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.014 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-06-26.
+This document describes version 0.015 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2019-05-07.
 
 =head1 SYNOPSIS
 
@@ -350,7 +352,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

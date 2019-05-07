@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -253,6 +253,12 @@ our $VERSION = '1.024';
 #pod =back
 #pod
 #pod See L<JSON::Validator/validate> for more details.
+#pod
+#pod =head2 yancy.form
+#pod
+#pod By default, the L<Yancy::Plugin::Form::Bootstrap4> form plugin is
+#pod loaded.  You can override this with your own form plugin. See
+#pod L<Yancy::Plugin::Form> for more information.
 #pod
 #pod =head2 yancy.filter.add
 #pod
@@ -629,6 +635,10 @@ sub register {
     $app->helper( 'yancy.create' => \&_helper_create );
     $app->helper( 'yancy.validate' => \&_helper_validate );
 
+    # Default form is Bootstrap4. Any form plugin added after this will
+    # override this one
+    $app->yancy->plugin( 'Form::Bootstrap4' );
+
     $self->_helper_filter_add( undef, 'yancy.from_helper' => sub {
         my ( $field_name, $field_value, $field_conf, @params ) = @_;
         my $which_helper = shift @params;
@@ -663,6 +673,25 @@ sub register {
     $app->helper( 'yancy.filters' => sub {
         state $filters = $self->_filters;
     } );
+
+    # Create authentication for editor. We need to delay fetching this
+    # callback until after startup is complete so that any auth plugin
+    # can be added.
+    my $auth_under = sub {
+        my ( $c ) = @_;
+        my $auth_cb = $c->yancy->can( 'auth' )
+                    && $c->yancy->auth->can( 'require_user' )
+                    && $c->yancy->auth->require_user( $config->{editor}{require_user} || () );
+        if ( !$auth_cb && !exists $config->{editor}{require_user} ) {
+            state $editor_auth_dep = 0;
+            warn qq{*** Editor without authentication is deprecated and will be\n}
+                . qq{removed in v2.0. Configure an Auth plugin or set \n}
+                . qq{`editor.require_user => undef` to silence this warning\n}
+                unless $editor_auth_dep++;
+        }
+        return $auth_cb ? $auth_cb->( $c ) : 1;
+    };
+    $route = $route->under( $auth_under );
 
     # Routes
     $route->get( '/' )->name( 'yancy.index' )
@@ -1166,6 +1195,12 @@ sub _helper_set {
 
 sub _helper_create {
     my ( $c, $coll, $item ) = @_;
+
+    my $props = $c->yancy->schema( $coll )->{properties};
+    $item->{ $_ } = $props->{ $_ }{default}
+        for grep !exists $item->{ $_ } && exists $props->{ $_ }{default},
+        keys %$props;
+
     if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
         $c->app->log->error(
             sprintf 'Error validating new item in collection "%s": %s',
@@ -1174,6 +1209,7 @@ sub _helper_create {
         );
         die \@errors;
     }
+
     $item = $c->yancy->filter->apply( $coll, $item );
     my $ret = eval { $c->yancy->backend->create( $coll, $item ) };
     if ( $@ ) {
@@ -1300,7 +1336,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -1553,6 +1589,12 @@ the following keys:
 =back
 
 See L<JSON::Validator/validate> for more details.
+
+=head2 yancy.form
+
+By default, the L<Yancy::Plugin::Form::Bootstrap4> form plugin is
+loaded.  You can override this with your own form plugin. See
+L<Yancy::Plugin::Form> for more information.
 
 =head2 yancy.filter.add
 

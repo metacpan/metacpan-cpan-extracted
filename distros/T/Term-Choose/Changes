@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.648   2019-05-06
+    - Code refactoring.
+
 1.647   2019-05-02
     - Initialize env var TC_RESET_AUTO_UP with 0 if exits env var TC_RESET_AUTO_UP.
 

@@ -1,6 +1,7 @@
 package Bot::IRC::X::Feeds;
 # ABSTRACT: Bot::IRC plugin to watch and notify on changes in RSS feeds
 
+use 5.014;
 use strict;
 use warnings;
 
@@ -10,7 +11,7 @@ use LWP::Protocol::https;
 use Date::Parse 'str2time';
 use WWW::Shorten qw( TinyURL makeashorterlink );
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -80,25 +81,17 @@ sub init {
         },
     );
 
-    my $ua              = LWP::UserAgent->new;
-    my $rss             = XML::RSS->new;
-    my $interval        = ( $bot->vars->{interval} || 10 ) * 60;
-    my $max_per         = $bot->vars->{max_per} || 5;
-    my $fresh_intervals = $bot->vars->{fresh_intervals} || 2;
+    my $ua       = LWP::UserAgent->new;
+    my $rss      = XML::RSS->new;
+    my $interval = ( $bot->vars->{interval} || 10 ) * 60;
+    my $max_per  = $bot->vars->{max_per} || 5;
 
     $bot->tick(
         $interval,
         sub {
-            my ($bot) = @_;
-
-            my $seen     = $bot->store->get('seen') || {};
+            my ($bot)    = @_;
             my $now      = time;
-            my $since    = $now - $interval * $fresh_intervals;
             my $channels = $bot->channels;
-
-            for ( keys %$seen ) {
-                delete $seen->{$_} if ( $seen->{$_} < $since );
-            }
 
             for my $url ( @{ $bot->store->get('urls') || [] } ) {
                 my $res = $ua->get( $url->{url} );
@@ -114,33 +107,25 @@ sub init {
 
                 my $printed = 0;
                 for my $item ( @{ $rss->{items} } ) {
-                    my $time = str2time(
-                        ( $item->{dc} and $item->{dc}{date} ) ? $item->{dc}{date} : $item->{pubDate}
-                    );
-                    next if ( not $time or $time < $since );
-
                     my $key = join( '|',
                         $url->{url},
                         $item->{title},
                         $item->{link},
-                        $time,
                     );
-                    next if ( $seen->{$key} );
-                    $seen->{$key} = $now;
+                    next if ( $bot->store->get($key) );
+                    $bot->store->set( $key => $now );
 
-                    my $msg =
-                        'Feed: ' . $rss->channel('title') .
-                        ' [ ' . $item->{title} . ' ]' .
-                        ' (' . makeashorterlink( $item->{link} ) . ')';
-                    $msg .= ' -- ' . $item->{comments} if ( $item->{comments} );
+                    unless ( $printed++ >= $max_per ) {
+                        my $msg =
+                            'Feed: ' . $rss->channel('title') .
+                            ' [ ' . $item->{title} . ' ]' .
+                            ' (' . makeashorterlink( $item->{link} ) . ')';
+                        $msg .= ' -- ' . $item->{comments} if ( $item->{comments} );
 
-                    $bot->msg( $_, $msg ) for ( ( @{ $url->{forums} } ) ? @{ $url->{forums} } : @$channels );
-
-                    last if ( ++$printed >= $max_per );
+                        $bot->msg( $_, $msg ) for ( ( @{ $url->{forums} } ) ? @{ $url->{forums} } : @$channels );
+                    }
                 }
             }
-
-            $bot->store->set( 'seen' => $seen );
         },
     );
 
@@ -165,7 +150,7 @@ Bot::IRC::X::Feeds - Bot::IRC plugin to watch and notify on changes in RSS feeds
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Feeds.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Feeds)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Feeds/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Feeds)
@@ -179,9 +164,8 @@ version 1.03
         plugins => ['Feeds'],
         vars    => {
             x-feeds => {
-                interval        => 10,
-                max_per         => 5,
-                fresh_intervals => 2,
+                interval => 10,
+                max_per  => 5,
             }
         },
     )->run;
@@ -219,9 +203,8 @@ Setting the C<x-feeds> values allows for configuration.
         plugins => ['Feeds'],
         vars    => {
             x-feeds => {
-                interval        => 10,
-                max_per         => 5,
-                fresh_intervals => 2,
+                interval => 10,
+                max_per  => 5,
             }
         },
     )->run;
@@ -230,11 +213,6 @@ The "interval" value is the time interval between calls to feeds, measured in
 minutes.
 
 The "max_per" value is the number of items returned per feed per call.
-
-The "fresh_intervals" setting means how many intervals of time backward should
-items be considered fresh enough to report on. For example, if you set an
-interval of 5 minutes and a fresh_intervals of 3, then any item in a feed with
-a publication time older than 15 will not be reported.
 
 The default values for all are shown in the example above.
 
@@ -290,7 +268,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

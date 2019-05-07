@@ -1,6 +1,6 @@
 package App::WRT;
 
-use version; our $VERSION = version->declare("v5.0.0");
+use version; our $VERSION = version->declare("v6.0.0");
 
 use strict;
 use warnings;
@@ -10,9 +10,7 @@ use utf8;
 
 use Carp;
 use Cwd qw(getcwd abs_path);
-use Data::Dumper;
 use Encode qw(decode encode);
-use File::Find;
 use File::Spec;
 use HTML::Entities;
 use JSON;
@@ -20,12 +18,12 @@ use XML::Atom::SimpleFeed;
 
 use App::WRT::Date;
 use App::WRT::EntryStore;
+use App::WRT::FileIO;
 
-use App::WRT::HTML     qw(:all);
-use App::WRT::Image    qw(image_size);
-use App::WRT::Markup   qw(line_parse image_markup eval_perl);
-use App::WRT::Renderer qw(render);
-use App::WRT::Util     qw(dir_list get_date file_get_contents);
+use App::WRT::HTML   qw(:all);
+use App::WRT::Image  qw(image_size);
+use App::WRT::Markup qw(line_parse image_markup eval_perl);
+use App::WRT::Util   qw(dir_list get_date file_get_contents);
 
 =pod
 
@@ -170,7 +168,7 @@ any other markup understood by the script and have it handled appropriately.
 B<Interpolated variables> - actually keys to the hash underlying the App::WRT
 object, for the moment:
 
-     <perl>$self->title("About Ralph, My Dog"); return '';</perl>
+     <perl>$self->{title} = "About Ralph, My Dog"; return '';</perl>
 
      <p>The title is <em>${title}</em>.</p>
 
@@ -405,6 +403,14 @@ $default{entry_descriptions} = {
   all => 'all entries',
 };
 
+=item $default{title_cache}
+
+A hashref which contains a cache of entry titles, populated by the renderer.
+
+=cut
+
+$default{title_cache} = { };
+
 =back
 
 =head2 METHODS AND INTERNALS
@@ -491,27 +497,28 @@ something.)
 
 sub display {
   my $self = shift;
-  my (@options) = @_;
+  my (@entries) = @_;
 
   return $self->{overlay} if defined $self->{overlay};
 
-  $options[0] ||= $self->{default_entry};
+  # If no entries are defined, fall back to the default:
+  $entries[0] //= $self->{default_entry};
 
-  # Title for template head/foot:
-  $self->{title} = join ' ', map { encode_entities($_) } @options;
+  # Title for template:
+  $self->{title} = join ' ', map { encode_entities($_) } @entries;
 
   # Expand on any aliases:
-  @options = map { $self->expand_option($_) } @options;
+  @entries = map { $self->expand_alias($_) } @entries;
 
   # Hacky special case for printing the feed:
-  if ($options[0] eq $self->{feed_alias}) {
+  if ($entries[0] eq $self->{feed_alias}) {
     return $self->feed_print(
       $self->{entries}->recent_days( $self->{feed_length} )
     );
   }
 
   # To be accessed as ${content} in the template below:
-  $self->{content} = join '', map { $self->handle($_) } @options;
+  $self->{content} = join '', map { $self->handle($_) } @entries;
   return $self->fragment_slurp($self->{template_path});
 }
 
@@ -522,8 +529,7 @@ Return the text of an individual entry.
 =cut
 
 sub handle {
-  my $self = shift;
-  my ($entry) = @_;
+  my ($self, $entry) = @_;
 
   # Hashref:
   my $map = $self->{entry_map};
@@ -537,27 +543,26 @@ sub handle {
   return $map->{$pattern}->($self, $entry);
 }
 
-=item expand_option($option)
+=item expand_alias($option)
 
 Expands/converts 'all', 'new', and 'fulltext' to appropriate values.
 
+Removes trailing slashes.
+
 =cut
 
-sub expand_option {
-  my ($self, $option) = @_;
+sub expand_alias {
+  my ($self, $alias) = @_;
 
   # Take care of trailing slashes:
-  chop $option if $option =~ m{/$};
+  chop $alias if $alias =~ m{/$};
 
-  if ($option eq 'all') {
-    return reverse $self->{entries}->all_years();
-  } elsif ($option eq 'new') {
-    return $self->{entries}->recent_days(5);
-  } elsif ($option eq 'fulltext') {
-    return $self->{entries}->all_days();
-  }
+  return reverse $self->{entries}->all_years() if $alias eq 'all';
+  return $self->{entries}->recent_days(5)      if $alias eq 'new';
+  return $self->{entries}->all_days()          if $alias eq 'fulltext';
 
-  return $option;
+  # No expansion, just give back our original value:
+  return $alias;
 }
 
 =item link_bar(@extra_links)
@@ -610,19 +615,20 @@ sub year {
   my $self = shift;
   my ($year) = @_;
 
-  my ($year_file, $year_url) = $self->root_locations($year);
-
   # Year is a text file:
-  return entry_markup($self->entry($year)) if -f $year_file;
+  return entry_markup($self->entry($year))
+    if $self->{entries}->is_file($year);
 
-  # If it's not a directory, we can't do anything. Bail out:
-  return p('No such year.') if (! -d $year_file);
+  # If it's not a directory, we can't do anything further. Bail out:
+  return p('No such year.')
+    unless $self->{entries}->is_dir($year);
 
+  my ($year_file, $year_url) = $self->root_locations($year);
   my $result;
 
-  # Handle year directories with index files.
+  # Handle year directories with index files:
   $result .= $self->entry($year)
-    if -f "$year_file/index";
+    if $self->{entries}->has_index($year);
 
   my $header_text = $self->icon_markup($year, $year);
   $header_text ||= q{};
@@ -635,19 +641,23 @@ sub year {
   my $count = 0; # explicitly defined for later printing.
 
   foreach my $month (@months) {
-    my @entries = dir_list(
-      "$year_file/$month", 'low_to_high', qr/^[0-9]{1,2}$/
-    );
-    $count += @entries;
-
-    my $month_text;
-    foreach my $entry (@entries) {
-      $month_text .= a({href => "$year_url/$month/$entry/"}, $entry) . "\n";
+    my $month_text = '';
+    if ($self->{entries}->is_dir("$year/$month")) {
+      my @entries = dir_list(
+        "$year_file/$month", 'low_to_high', qr/^[0-9]{1,2}$/
+      );
+      $count += @entries;
+      foreach my $entry (@entries) {
+        $month_text .= a({href => "$year_url/$month/$entry/"}, $entry) . "\n";
+      }
     }
 
     $month_text = small("( $month_text )");
 
-    my $link = a({href => "$year_url/$month/"}, month_name($month));
+    my $link = a(
+      {href => "$year_url/$month/"},
+      App::WRT::Date::month_name($month)
+    );
 
     $year_text .= table_row(
       table_cell({class => 'datelink'}, $link),
@@ -676,32 +686,27 @@ Prints the entries in a given month (nnnn/nn).
 =cut
 
 sub month {
-  my $self = shift;
-  my ($month) = @_;
+  my ($self, $month) = @_;
 
   my ($month_file, $month_url) = $self->root_locations($month);
-
-  my $result;
 
   # If a directory exists for $month, use dir_list to slurp the entry files it
   # contains into @entry_files, sorted numerically.  Then send each entry to
   # entry_markup().
-  if (-d $month_file) {
-
+  if ($self->{entries}->is_dir($month)) {
+    my $result;
     $result .= $self->entry($month)
-      if -f "$month_file/index";
+      if $self->{entries}->has_index($month);
 
     my @entry_files = dir_list($month_file, 'high_to_low', qr/^[0-9]{1,2}$/);
-
     foreach my $entry_file (@entry_files) {
       $result .= $self->entry_stamped("$month/$entry_file");
     }
 
-  } elsif (-f $month_file) {
-    $result .= $self->entry($month);
+    return $result;
+  } elsif ($self->{entries}->is_file($month)) {
+    return $self->entry($month);
   }
-
-  return $result;
 }
 
 =item entry_stamped($entry, $level)
@@ -723,7 +728,7 @@ sub entry_stamped {
 =item entry_topic_list($entry)
 
 Get a list of topics (by tag-* files) for the entry.  This hardcodes part of a
-p1k3-specific thing which should probably be moved into wrt entirely.
+p1k3-specific thing which should be moved into wrt entirely.
 
 =cut
 
@@ -749,8 +754,7 @@ Recursively calls itself.
 =cut
 
 sub entry {
-  my $self = shift;
-  my ($entry, $level) = @_;
+  my ($self, $entry, $level) = @_;
   $level ||= 'index';
 
   # Location of entry on local filesystem, and its URL:
@@ -764,14 +768,14 @@ sub entry {
   }
 
   # For text files:
-  if (-f $entry_loc) {
+  if ($self->{entries}->is_file($entry)) {
     return $result . $self->fragment_slurp($entry_loc);
   }
 
-  return $result if ! -d $entry_loc;
+  # Past this point, we're assuming a directory.
 
   # Print index as head, if extant and a normal file:
-  if (-f "$entry_loc/index") {
+  if ($self->{entries}->has_index($entry)) {
     $result .= $self->fragment_slurp("$entry_loc/index");
   }
 
@@ -782,7 +786,7 @@ sub entry {
     # If the wrt-noexpand property is present, then don't expand sub-entries.
     # A hack.
 
-    if ($level eq 'index' || -f "$entry_loc/wrt-noexpand.prop") {
+    if ($level eq 'index' || $self->{entries}->has_prop($entry, 'wrt-noexpand')) {
       # Icons or text links:
       $result .= $self->list_contents($entry, @sub_entries);
     }
@@ -792,7 +796,6 @@ sub entry {
         next if ($se =~ $self->{binfile_expr});
         $result .= p({class => 'centerpiece'}, '+')
                  . $self->entry("$entry/$se");
-
       }
 
       # Handle links to any remaining files that match binfile_expr:
@@ -813,9 +816,10 @@ Returns "sub entries" based on the C<subentry_expr> regexp.
 =cut
 
 sub get_sub_entries {
-  my $self = shift;
-  my ($entry_loc) = @_;
+  my ($self, $entry_loc) = @_;
 
+  # index gets special treatment as the text body of an entry, rather
+  # than as a sub-entry:
   my %ignore = ('index' => 1);
 
   return grep { ! $ignore{$_} }
@@ -861,45 +865,41 @@ Calls image_size, uses filename to determine type.
 
 { my %cache;
 sub icon_markup {
-  my $self = shift;
-  my ($entry, $alt) = @_;
+  my ($self, $entry, $alt) = @_;
 
-  if ($cache{$entry . $alt}) {
-    return $cache{$entry . $alt};
+  return $cache{$entry . $alt}
+    if defined $cache{$entry . $alt};
+
+  my $icon_basepath;
+  if ($self->{entries}->is_file($entry)) {
+    $icon_basepath = "$entry.icon";
   }
-
-  my ($entry_loc, $entry_url) = $self->root_locations($entry);
-
-  my ($icon_loc, $icon_url);
-
-  if (-f $entry_loc) {
-    $icon_loc = "$entry_loc.icon";
-    $icon_url = "$entry_url.icon";
-  }
-  elsif (-d $entry_loc) {
-    $icon_loc = "$entry_loc/index.icon";
-    $icon_url = "$entry_url/index.icon";
+  elsif ($self->{entries}->is_dir($entry)) {
+    $icon_basepath = "$entry/index.icon";
   }
 
   # First suffix found will be used:
-  my (@suffixes) = qw(png jpg gif jpeg);
   my $suffix;
-  for (@suffixes) {
-    if (-e "$icon_loc.$_") {
+  for (qw(png jpg gif jpeg)) {
+    if ($self->{entries}->is_extant( "$icon_basepath.$_")) {
         $suffix = $_;
         last;
     }
   }
 
-  # fail unless there's a file with one of the above suffixes
+  # Fail unless there's a file with one of the above suffixes:
   return 0 unless $suffix;
 
-  # call image_size to slurp width & height from the image file
-  my ($width, $height) = image_size($self->{root_dir_abs} . '/' . "$icon_loc.$suffix");
+  my ($icon_loc, $icon_url) = $self->root_locations($icon_basepath);
+
+  # Slurp width & height from the image file:
+  my ($width, $height) = image_size(
+    $self->{root_dir_abs} . '/' . "$icon_loc.$suffix"
+  );
 
   return $cache{$entry . $alt} =
-       qq{<img src="$icon_url.$suffix"\n width="$width" }
-       . qq{height="$height"\n alt="$alt" />};
+      qq{<img src="$icon_url.$suffix"\n width="$width" }
+    . qq{height="$height"\n alt="$alt" />};
 }
 }
 
@@ -954,22 +954,6 @@ sub fragment_slurp {
     ($self->{embedded_perl} ? $self->eval_perl($everything) : $everything),
     $file # some context to work with
   );
-}
-
-=item month_name($number)
-
-Turn numeric dates into English.
-
-=cut
-
-sub month_name {
-  my ($number) = @_;
-
-  # "Null" is here so that $month_name[1] corresponds to January, etc.
-  my @months = qw(Null January February March April May June
-                  July August September October November December);
-
-  return $months[$number];
 }
 
 =item root_locations($file)
@@ -1030,6 +1014,7 @@ sub feed_print {
   my $feed = XML::Atom::SimpleFeed->new(
     -encoding => 'UTF-8',
     title     => $self->{title_prefix} . '::' . $self->{title},
+    subtitle  => $self->{description},
     link      => $self->{url_root},
     link      => { rel => 'self', href => $feed_url, },
     icon      => $self->{favicon_url},
@@ -1049,7 +1034,6 @@ sub feed_print {
     # Try to pull out a header:
     my ($extracted_title) = $utf8_content =~ m{<h1.*?>(.*?)</h1>}s;
     my (@subtitles)       = $utf8_content =~ m{<h2.*?>(.*?)</h2>}sg;
-
 
     if ($extracted_title) {
       $title = $extracted_title;

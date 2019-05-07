@@ -1,3 +1,10 @@
+0.006   2019-05-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add sample screenshot.
+
+
 0.005   2019-03-28 (PERLANCAR)
 
 	- Observe RSYNCCOLOR_RSYNC_CMD environment variable.

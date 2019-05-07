@@ -1,11 +1,14 @@
 bin/spoor_entry_transmitter
 bin/spoor_installer
 bin/spoor_log_follower
+bin/spoor_mailbox_event_list
+bin/spoor_report_list
 Build.PL
 Changes
 lib/App/Spoor.pm
 lib/App/Spoor/AccessEntryParser.pm
 lib/App/Spoor/AccessUnitFile.pm
+lib/App/Spoor/ApiClient.pm
 lib/App/Spoor/Config.pm
 lib/App/Spoor/CpanelHookFile.pm
 lib/App/Spoor/EntryTransmitter.pm
@@ -14,6 +17,7 @@ lib/App/Spoor/ErrorUnitFile.pm
 lib/App/Spoor/Installer.pm
 lib/App/Spoor/LoginEntryParser.pm
 lib/App/Spoor/LoginUnitFile.pm
+lib/App/Spoor/OutputFormatter.pm
 lib/App/Spoor/ParsedEntryWriter.pm
 lib/App/Spoor/ParsedFileManager.pm
 lib/App/Spoor/Security.pm
@@ -21,15 +25,19 @@ lib/App/Spoor/TransmissionFormatter.pm
 lib/App/Spoor/TransmitterUnitFile.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 README
 t/00-load.t
 t/AccessEntryParser.t
+t/ApiCient.t
 t/Config.t
 t/EntryTransmitter.t
 t/ErrorEntryParser.t
 t/Installer.t
 t/LoginEntryParser.t
 t/manifest.t
+t/OutputFormatter.t
 t/ParsedEntryWriter.t
 t/ParsedFileManager.t
 t/pod-coverage.t
@@ -37,5 +45,3 @@ t/pod.t
 t/Security.t
 t/TransmissionFormatter.t
 xt/boilerplate.t
-META.yml
-META.json

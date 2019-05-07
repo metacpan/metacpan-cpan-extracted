@@ -141,7 +141,7 @@ any other markup understood by the script and have it handled appropriately.
 B<Interpolated variables> - actually keys to the hash underlying the App::WRT
 object, for the moment:
 
-     <perl>$self->title("About Ralph, My Dog"); return '';</perl>
+     <perl>$self->{title} = "About Ralph, My Dog"; return '';</perl>
 
      <p>The title is <em>${title}</em>.</p>
 
@@ -307,6 +307,10 @@ explicitly specified.
 
 A hashref which contains a map of entry titles to entry descriptions.
 
+=item $default{title_cache}
+
+A hashref which contains a cache of entry titles, populated by the renderer.
+
 =back
 
 =head2 METHODS AND INTERNALS
@@ -343,9 +347,11 @@ something.)
 
 Return the text of an individual entry.
 
-=item expand_option($option)
+=item expand_alias($option)
 
 Expands/converts 'all', 'new', and 'fulltext' to appropriate values.
+
+Removes trailing slashes.
 
 =item link_bar(@extra_links)
 
@@ -366,7 +372,7 @@ Wraps entry() + a datestamp in entry_markup().
 =item entry_topic_list($entry)
 
 Get a list of topics (by tag-* files) for the entry.  This hardcodes part of a
-p1k3-specific thing which should probably be moved into wrt entirely.
+p1k3-specific thing which should be moved into wrt entirely.
 
 =item entry($entry)
 
@@ -400,10 +406,6 @@ Returns a nice html datestamp / breadcrumbs for a given entry.
 Read a text fragment, call line_parse() and eval_perl() to take care of
 lightweight markup sections and interpret embedded code, and then return it as
 a string. Takes one parameter, the name of the file.
-
-=item month_name($number)
-
-Turn numeric dates into English.
 
 =item root_locations($file)
 

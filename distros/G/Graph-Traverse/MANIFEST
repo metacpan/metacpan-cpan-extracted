@@ -9,5 +9,6 @@ README
 cpanfile
 dist.ini
 lib/Graph/Traverse.pm
+t/Multipath.t
 t/author-pod-syntax.t
 t/basic.t

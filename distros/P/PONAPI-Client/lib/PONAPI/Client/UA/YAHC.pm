@@ -16,19 +16,27 @@ with 'PONAPI::Client::Role::UA';
 ################################################################################
 
 has yahc => (
-    is  => 'rw',
-    isa => 'Ref',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'YAHC',
+    lazy    => 1,
+    builder => '_build_yahc',
 );
 
 has yahc_storage => (
-    is  => 'rw',
-    isa => 'Ref',
+    is      => 'ro',
+    isa     => 'Ref',
 );
 
 has scheme => (
-    is  => 'rw',
-    isa => 'Str',
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'http',
+);
+
+has ssl_options => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    deafult => sub { +{} },
 );
 
 ################################################################################
@@ -62,6 +70,7 @@ sub send_http_request {
 
     local $request->{callback} = $callback;
     local $request->{scheme} = $self->scheme;
+    local $request->{ssl_options} = $self->ssl_options;
 
     my $yahc = $self->yahc;
 
@@ -104,7 +113,7 @@ PONAPI::Client::UA::YAHC - A wrapper for a YAHC UA
 
 =head1 VERSION
 
-version 0.002010
+version 0.002011
 
 =head1 AUTHORS
 
@@ -126,7 +135,7 @@ Brian Fraser <hugmeir@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Mickey Nasriachi, Stevan Little, Brian Fraser.
+This software is copyright (c) 2019 by Mickey Nasriachi, Stevan Little, Brian Fraser.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

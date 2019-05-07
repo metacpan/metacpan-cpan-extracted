@@ -14,6 +14,7 @@ bin/lwp-mirror
 bin/lwp-request
 cpanfile
 dist.ini
+examples/handler-order.pl
 lib/LWP.pm
 lib/LWP/Authen/Basic.pm
 lib/LWP/Authen/Digest.pm

@@ -1,7 +1,7 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2018-10-09'; # DATE
-our $VERSION = '0.442'; # VERSION
+our $DATE = '2019-05-06'; # DATE
+our $VERSION = '0.443'; # VERSION
 
 use 5.010001;
 use strict;
@@ -318,6 +318,24 @@ $SPEC{list_files} = {
             schema => 'bool',
             tags => ['category:filtering'],
         },
+        size_min => {
+            #schema => 'filesize*',
+            schema => 'uint*',
+            tags => ['category:filtering'],
+        },
+        size_max => {
+            #schema => 'filesize*',
+            schema => 'uint*',
+            tags => ['category:filtering'],
+        },
+        mtime_min => {
+            schema => ['date*', 'x.perl.coerce_to'=>'float(epoch)'],
+            tags => ['category:filtering'],
+        },
+        mtime_max => {
+            schema => ['date*', 'x.perl.coerce_to'=>'float(epoch)'],
+            tags => ['category:filtering'],
+        },
     },
 };
 sub list_files {
@@ -382,8 +400,28 @@ sub list_files {
             # nothing matches
             next REC;
         }
-        if (defined $del) {
-            next REC if $del xor $rec->{is_scheduled_for_deletion};
+
+      FILTER_SIZE:
+        {
+            next REC if defined $args{size_min} &&
+                $rec->{size} < $args{size_min};
+            next REC if defined $args{size_max} &&
+                $rec->{size} > $args{size_max};
+        }
+
+      FILTER_MTIME:
+        {
+            next REC if defined $args{mtime_min} &&
+                $rec->{mtime} < $args{mtime_min};
+            next REC if defined $args{mtime_max} &&
+                $rec->{mtime} > $args{mtime_max};
+        }
+
+      FILTER_DEL:
+        {
+            if (defined $del) {
+                next REC if $del xor $rec->{is_scheduled_for_deletion};
+            }
         }
 
         push @files, $args{detail} ? $rec : $rec->{name};
@@ -867,7 +905,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.442 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2018-10-09.
+This document describes version 0.443 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2019-05-06.
 
 =head1 SYNOPSIS
 
@@ -883,7 +921,7 @@ There is also a CLI script L<pause> distributed separately in L<App::pause>.
 
 Usage:
 
- delete_files(%args) -> [status, msg, result, meta]
+ delete_files(%args) -> [status, msg, payload, meta]
 
 Delete files.
 
@@ -947,18 +985,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 delete_old_releases
 
 Usage:
 
- delete_old_releases(%args) -> [status, msg, result, meta]
+ delete_old_releases(%args) -> [status, msg, payload, meta]
 
 Delete older versions of distributions.
 
@@ -1033,18 +1072,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_dists
 
 Usage:
 
- list_dists(%args) -> [status, msg, result, meta]
+ list_dists(%args) -> [status, msg, payload, meta]
 
 List distributions.
 
@@ -1103,18 +1143,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_files
 
 Usage:
 
- list_files(%args) -> [status, msg, result, meta]
+ list_files(%args) -> [status, msg, payload, meta]
 
 List files.
 
@@ -1136,6 +1177,10 @@ Whether to return detailed records.
 
 File names/wildcard patterns.
 
+=item * B<mtime_max> => I<date>
+
+=item * B<mtime_min> => I<date>
+
 =item * B<password> => I<str>
 
 PAUSE password.
@@ -1151,6 +1196,10 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
+=item * B<size_max> => I<uint>
+
+=item * B<size_min> => I<uint>
+
 =item * B<username> => I<str>
 
 PAUSE ID.
@@ -1165,18 +1214,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_modules
 
 Usage:
 
- list_modules(%args) -> [status, msg, result, meta]
+ list_modules(%args) -> [status, msg, payload, meta]
 
 List modules (permissions).
 
@@ -1227,18 +1277,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 reindex_files
 
 Usage:
 
- reindex_files(%args) -> [status, msg, result, meta]
+ reindex_files(%args) -> [status, msg, payload, meta]
 
 Force reindexing.
 
@@ -1294,18 +1345,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 undelete_files
 
 Usage:
 
- undelete_files(%args) -> [status, msg, result, meta]
+ undelete_files(%args) -> [status, msg, payload, meta]
 
 Undelete files.
 
@@ -1365,18 +1417,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 upload_files
 
 Usage:
 
- upload_files(%args) -> [status, msg, result, meta]
+ upload_files(%args) -> [status, msg, payload, meta]
 
 Upload file(s).
 
@@ -1445,7 +1498,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1487,7 +1540,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

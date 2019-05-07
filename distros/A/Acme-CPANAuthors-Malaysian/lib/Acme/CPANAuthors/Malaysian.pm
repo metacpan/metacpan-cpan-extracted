@@ -4,7 +4,7 @@ use 5.008_005;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Acme::CPANAuthors::Register (
     KIANMENG => 'Kian Meng, Ang',
@@ -40,6 +40,7 @@ This module provides a list of Malaysian CPAN author's Pause ID mapped to name
 for L<Acme::CPANAuthors|Acme::CPANAuthors>.
 
 =head1 MAINTENANCE
+
 Send email, open a ticket, or make a pull request to add your own Pause ID and
 name.
 

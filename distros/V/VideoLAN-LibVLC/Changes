@@ -1,3 +1,7 @@
+Version 0.02 - 2019-05-06
+  - Small bug fixes
+  - Big documentation improvements
+
 Version 0.01 - 2019-02-06
   - Initial release, with basic support for instance, media, and
     mediaplayer objects, and callback-triggered video frame decoding.

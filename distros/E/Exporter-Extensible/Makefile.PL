@@ -19,15 +19,15 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "B" => 0,
     "Carp" => 0,
+    "Scalar::Util" => 0,
     "mro" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Scalar::Util" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }

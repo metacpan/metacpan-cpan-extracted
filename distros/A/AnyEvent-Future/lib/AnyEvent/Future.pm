@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package AnyEvent::Future;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base qw( Future );
 Future->VERSION( '0.05' ); # to respect subclassing
@@ -27,28 +27,28 @@ C<AnyEvent::Future> - use L<Future> with L<AnyEvent>
 
 =head1 SYNOPSIS
 
- use AnyEvent;
- use AnyEvent::Future;
+   use AnyEvent;
+   use AnyEvent::Future;
 
- my $future = AnyEvent::Future->new;
+   my $future = AnyEvent::Future->new;
 
- some_async_function( ..., cb => sub { $future->done( @_ ) } );
+   some_async_function( ..., cb => sub { $future->done( @_ ) } );
 
- print Future->await_any(
-    $future,
-    AnyEvent::Future->new_timeout( after => 10 ),
- )->get;
+   print Future->wait_any(
+      $future,
+      AnyEvent::Future->new_timeout( after => 10 ),
+   )->get;
 
 Or
 
- use AnyEvent::Future qw( as_future_cb );
+   use AnyEvent::Future qw( as_future_cb );
 
- print Future->await_any(
-    as_future_cb {
-       some_async_function( ..., cb => shift )
-    },
-    AnyEvent::Future->new_timeout( after => 10 ),
- )->get;
+   print Future->wait_any(
+      as_future_cb {
+         some_async_function( ..., cb => shift )
+      },
+      AnyEvent::Future->new_timeout( after => 10 ),
+   )->get;
 
 =head1 DESCRIPTION
 
@@ -69,23 +69,34 @@ sub as_future(&);
 
 =cut
 
-=head2 $f = AnyEvent::Future->new
+=head2 new
+
+   $f = AnyEvent::Future->new
 
 Returns a new leaf future instance, which will allow waiting for its result to
 be made available, using the C<await> method.
 
 =cut
 
-=head2 $f = AnyEvent::Future->new_delay( @args )
+=head2 new_delay
 
-=head2 $f = AnyEvent::Future->new_timeout( @args )
+   $f = AnyEvent::Future->new_delay( @args )
+
+=head2 new_timeout
+
+   $f = AnyEvent::Future->new_timeout( @args )
 
 Returns a new leaf future instance that will become ready at the time given by
 the arguments, which will be passed to the C<< AnyEvent->timer >> method.
 
 C<new_delay> returns a future that will complete successfully at the alotted
 time, whereas C<new_timeout> returns a future that will fail with the message
-C<Timeout>.
+C<Timeout>. This is provided as a simple utility for small use-cases; for a
+more find-grained control over the failure message and additional values you
+may wish to use C<new_delay> combined with the C<then_fail> method:
+
+   new_delay( after => 10 )
+      ->then_fail( "The operation timed out after 10 seconds", timeout => );
 
 =cut
 
@@ -111,7 +122,9 @@ sub new_timeout
    };
 }
 
-=head2 $f = AnyEvent::Future->from_cv( $cv )
+=head2 from_cv
+
+   $f = AnyEvent::Future->from_cv( $cv )
 
 Returns a new leaf future instance that will become ready when the given
 L<AnyEvent::CondVar> instance is ready. The success or failure result of the
@@ -144,15 +157,17 @@ sub from_cv
 
 =cut
 
-=head2 $cv = $f->as_cv
+=head2 as_cv
+
+   $cv = $f->as_cv
 
 Returns a new C<AnyEvent::CondVar> instance that wraps the given future; it
 will complete with success or failure when the future does.
 
 Note that because C<< AnyEvent::CondVar->croak >> takes only a single string
-message for the argument, any subsequent failure semantics are lost from the
-Future. To capture these as well, you may wish to use an C<on_fail> callback
-or the C<failure> method, to obtain them.
+message for the argument, any subsequent failure detail values from the future
+are lost by the condvar. To capture these as well, you may wish to use an
+C<on_fail> callback or the C<failure> method, to obtain them.
 
 =cut
 
@@ -184,13 +199,15 @@ The following utility functions are exported as a convenience.
 
 =cut
 
-=head2 $f = as_future { CODE }
+=head2 as_future
+
+   $f = as_future { CODE }
 
 Returns a new leaf future instance, which is also passed in to the block of
 code. The code is called in scalar context, and its return value is stored on
 the future. This will be deleted if the future is cancelled.
 
- $w = CODE->( $f )
+   $w = CODE->( $f )
 
 This utility is provided for the common case of wanting to wrap an C<AnyEvent>
 function which will want to receive a callback function to inform of
@@ -211,7 +228,9 @@ sub as_future(&)
    return $f;
 }
 
-=head2 $f = as_future_cb { CODE }
+=head2 as_future_cb
+
+   $f = as_future_cb { CODE }
 
 A futher shortcut to C<as_future>, where the code is passed two callback
 functions for C<done> and C<fail> directly, avoiding boilerplate in the common
@@ -228,7 +247,7 @@ sub as_future_cb(&)
 
    &as_future( sub {
       my $f = shift;
-      $code->( $f->done_cb, $f->fail_cb );
+      $code->( sub { $f->done(@_) }, sub { $f->fail(@_) } );
    });
 }
 
@@ -242,30 +261,30 @@ completion callback, and turn it into a C<Future> that can be used or combined
 with other C<Future>-based code. For example, the L<AnyEvent::HTTP> function
 called C<http_get> performs in this style.
 
- use AnyEvent::Future qw( as_future_cb );
- use AnyEvent::HTTP qw( http_get );
+   use AnyEvent::Future qw( as_future_cb );
+   use AnyEvent::HTTP qw( http_get );
 
- my $url = ...;
+   my $url = ...;
 
- my $f = as_future_cb {
-    my ( $done_cb ) = @_;
+   my $f = as_future_cb {
+      my ( $done_cb ) = @_;
 
-    http_get $url, $done_cb;
- };
+      http_get $url, $done_cb;
+   };
 
 This could of course be easily wrapped by a convenient function to return
 futures:
 
- sub http_get_future
- {
-    my @args = @_;
+   sub http_get_future
+   {
+      my @args = @_;
 
-    as_future_cb {
-       my ( $done_cb ) = @_;
+      as_future_cb {
+         my ( $done_cb ) = @_;
 
-       http_get @args, $done_cb;
-    }
- }
+         http_get @args, $done_cb;
+      }
+   }
 
 =head2 Using C<Future>s as enhanced C<CondVar>s
 
@@ -279,13 +298,13 @@ For example, rather than using the C<CondVar> C<begin> and C<end> methods, a
 set of C<CondVar>-returning functions can be converted into C<Futures>,
 combined using C<needs_all>, and converted back to a C<CondVar> again:
 
- my $cv = Future->needs_all(
-    Future::AnyEvent->from_cv( FUNC1() ),
-    Future::AnyEvent->from_cv( FUNC2() ),
-    ...
- )->as_cv;
+   my $cv = Future->needs_all(
+      Future::AnyEvent->from_cv( FUNC1() ),
+      Future::AnyEvent->from_cv( FUNC2() ),
+      ...
+   )->as_cv;
 
- my @results = $cv->recv;
+   my @results = $cv->recv;
 
 This would become yet more useful if, instead of functions that return
 C<CondVars>, we were operating on functions that return C<Future>s directly.
@@ -294,13 +313,13 @@ of them failed, we get a nice neat cancellation of outstanding work if one of
 them fails, in a way that would be much harder without the C<Future>s. For
 example, using the C<http_get_future> function from above:
 
- my $cv = Future->needs_all(
-    http_get_future( "http://url-1" ),
-    http_get_future( "http://url-2" ),
-    http_get_future( "https://url-third/secret" ),
- )->as_cv;
+   my $cv = Future->needs_all(
+      http_get_future( "http://url-1" ),
+      http_get_future( "http://url-2" ),
+      http_get_future( "https://url-third/secret" ),
+   )->as_cv;
 
- my @results = $cv->recv;
+   my @results = $cv->recv;
 
 In this case, the moment any of the HTTP GET functions fails, the ones that
 are still pending are all cancelled (by dropping their cancellation watcher
@@ -311,12 +330,12 @@ C<CondVar>; the full set of waiting semantics are implemented on these
 instances, so instead you may simply call C<get> on it to achieve the same
 effect:
 
- my $f = Future->needs_all(
-    http_get_future( "http://url-1" ),
-    ...
- );
+   my $f = Future->needs_all(
+      http_get_future( "http://url-1" ),
+      ...
+   );
 
- my @results = $f->get;
+   my @results = $f->get;
 
 This has other side advantages, such as the list-valued semantics of failures
 that can provide additional information besides just the error message, and
@@ -333,7 +352,7 @@ propagation of cancellation requests.
 Consider whether or not it would be considered "evil" to inject a new method
 into L<AnyEvent::CondVar>; namely by doing
 
- sub AnyEvent::CondVar::as_future { AnyEvent::Future->from_cv( shift ) }
+   sub AnyEvent::CondVar::as_future { AnyEvent::Future->from_cv( shift ) }
 
 =back
 

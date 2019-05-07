@@ -1,0 +1,40 @@
+---
+abstract: 'KYTProf profiler for Redis::Fast'
+author:
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-KYTProf-Profiler-Redis-Fast
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::KYTProf::Profiler::Redis::Fast:
+    file: lib/Devel/KYTProf/Profiler/Redis/Fast.pm
+    version: '0.01'
+requires:
+  Devel::KYTProf: '0.99'
+  Redis::Fast: '0'
+  perl: '5.012001'
+resources:
+  bugtracker: https://github.com/fujiwara/Devel-KYTProf-Profiler-Redis-Fast/issues
+  homepage: https://github.com/fujiwara/Devel-KYTProf-Profiler-Redis-Fast
+  repository: git://github.com/fujiwara/Devel-KYTProf-Profiler-Redis-Fast.git
+version: '0.01'
+x_authority: cpan:FUJIWARA

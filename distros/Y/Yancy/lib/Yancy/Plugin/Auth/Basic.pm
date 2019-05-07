@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -305,7 +305,7 @@ sub register {
         }
         else {
             # Render HTML response
-            $c->render( status => 401, template => 'yancy/auth/unauthorized' );
+            $c->render( status => 401, template => 'yancy/auth/unauthorized', login_route => 'yancy.login_form' );
             return;
         }
     } );
@@ -374,7 +374,7 @@ sub register {
 
 sub _get_login {
     my ( $c ) = @_;
-    return $c->render( 'yancy/auth/login',
+    return $c->render( 'yancy/auth/basic/login',
         return_to => $c->req->headers->referrer,
     );
 }
@@ -390,7 +390,7 @@ sub _post_login {
         return $c->rendered( 303 );
     }
     $c->flash( error => 'Username or password incorrect' );
-    return $c->render( 'yancy/auth/login',
+    return $c->render( 'yancy/auth/basic/login',
         status => 400,
         user => $user,
         return_to => $c->req->param( 'return_to' ),
@@ -402,7 +402,7 @@ sub _get_logout {
     my ( $c ) = @_;
     $c->yancy->auth->clear;
     $c->flash( info => 'Logged out' );
-    return $c->render( 'yancy/auth/login' );
+    return $c->render( 'yancy/auth/basic/login' );
 }
 
 1;
@@ -415,7 +415,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -666,7 +666,7 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 __DATA__
-@@ yancy/auth/login.html.ep
+@@ yancy/auth/basic/login.html.ep
 % layout 'yancy/auth';
 <main id="app" class="container-fluid">
     <div class="row justify-content-md-center">
@@ -691,18 +691,6 @@ __DATA__
                 </div>
                 <button class="btn btn-primary">Login</button>
             </form>
-        </div>
-    </div>
-</main>
-
-@@ yancy/auth/unauthorized.html.ep
-% layout 'yancy/auth';
-<main class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <h1>Unauthorized</h1>
-            <p>You are not authorized to view this page. <a href="<%= url_for
-            'yancy.login_form' %>">Please log in</a></p>
         </div>
     </div>
 </main>

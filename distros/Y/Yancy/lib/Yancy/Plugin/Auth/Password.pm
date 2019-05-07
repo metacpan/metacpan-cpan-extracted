@@ -1,0 +1,768 @@
+package Yancy::Plugin::Auth::Password;
+our $VERSION = '1.025';
+# ABSTRACT: A simple password-based auth
+
+#pod =encoding utf8
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => {
+#pod         backend => 'sqlite://myapp.db',
+#pod         collections => {
+#pod             users => {
+#pod                 properties => {
+#pod                     id => { type => 'integer', readOnly => 1 },
+#pod                     username => { type => 'string' },
+#pod                     password => { type => 'string', format => 'password' },
+#pod                 },
+#pod             },
+#pod         },
+#pod     };
+#pod     app->yancy->plugin( 'Auth::Password' => {
+#pod         collection => 'users',
+#pod         username_field => 'username',
+#pod         password_field => 'password',
+#pod         password_digest => {
+#pod             type => 'SHA-1',
+#pod         },
+#pod     } );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod B<Note:> This module is C<EXPERIMENTAL> and its API may change before
+#pod Yancy v2.000 is released.
+#pod
+#pod This plugin provides a basic password-based authentication scheme for
+#pod a site.
+#pod
+#pod =head1 CONFIGURATION
+#pod
+#pod This plugin has the following configuration options.
+#pod
+#pod =head2 collection
+#pod
+#pod The name of the Yancy collection that holds users. Required.
+#pod
+#pod =head2 username_field
+#pod
+#pod The name of the field in the collection which is the user's identifier.
+#pod This can be a user name, ID, or e-mail address, and is provided by the
+#pod user during login.
+#pod
+#pod This field is optional. If not specified, the collection's ID field will
+#pod be used. For example, if the collection uses the C<username> field as
+#pod a unique identifier, we don't need to provide a C<username_field>.
+#pod
+#pod     plugin Yancy => {
+#pod         collections => {
+#pod             users => {
+#pod                 'x-id-field' => 'username',
+#pod                 properties => {
+#pod                     username => { type => 'string' },
+#pod                     password => { type => 'string' },
+#pod                 },
+#pod             },
+#pod         },
+#pod     };
+#pod     app->yancy->plugin( 'Auth::Password' => {
+#pod         collection => 'users',
+#pod         password_digest => { type => 'SHA-1' },
+#pod     } );
+#pod
+#pod =head2 password_field
+#pod
+#pod The name of the field to use for the password. Defaults to C<password>.
+#pod
+#pod This field will automatically be set up to use the L</auth.digest> filter to
+#pod properly hash the password when updating it.
+#pod
+#pod =head2 password_digest
+#pod
+#pod This is the hashing mechanism that should be used for hashing passwords.
+#pod This value should be a hash of digest configuration. The one required
+#pod field is C<type>, and should be a type supported by the L<Digest> module:
+#pod
+#pod =over
+#pod
+#pod =item * MD5 (part of core Perl)
+#pod
+#pod =item * SHA-1 (part of core Perl)
+#pod
+#pod =item * SHA-256 (part of core Perl)
+#pod
+#pod =item * SHA-512 (part of core Perl)
+#pod
+#pod =item * Bcrypt (recommended)
+#pod
+#pod =back
+#pod
+#pod Additional fields are given as configuration to the L<Digest> module.
+#pod Not all Digest types require additional configuration.
+#pod
+#pod There is no default: Perl core provides SHA-1 hashes, but those aren't good
+#pod enough. We recommend installing L<Digest::Bcrypt> for password hashing.
+#pod
+#pod     # Use Bcrypt for passwords
+#pod     # Install the Digest::Bcrypt module first!
+#pod     app->yancy->plugin( 'Auth::Basic' => {
+#pod         password_digest => {
+#pod             type => 'Bcrypt',
+#pod             cost => 12,
+#pod             salt => 'abcdefgh♥stuff',
+#pod         },
+#pod     } );
+#pod
+#pod Digest information is stored with the password so that password digests
+#pod can be updated transparently when necessary. Changing the digest
+#pod configuration will result in a user's password being upgraded the next
+#pod time they log in.
+#pod
+#pod =head2 Sessions
+#pod
+#pod This module uses L<Mojolicious
+#pod sessions|https://mojolicious.org/perldoc/Mojolicious/Controller#session>
+#pod to store the login information in a secure, signed cookie.
+#pod
+#pod To configure the default expiration of a session, use
+#pod L<Mojolicious::Sessions
+#pod default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_expiration>.
+#pod
+#pod     use Mojolicious::Lite;
+#pod     # Expire a session after 1 day of inactivity
+#pod     app->sessions->default_expiration( 24 * 60 * 60 );
+#pod
+#pod =head1 FILTERS
+#pod
+#pod This module provides the following filters. See L<Yancy/Extended Field
+#pod Configuration> for how to use filters.
+#pod
+#pod =head2 auth.digest
+#pod
+#pod Run the field value through the configured password L<Digest> object and
+#pod store the Base64-encoded result instead.
+#pod
+#pod =head1 HELPERS
+#pod
+#pod This plugin has the following helpers.
+#pod
+#pod =head2 yancy.auth.current_user
+#pod
+#pod Get the current user from the session, if any. Returns C<undef> if no user
+#pod was found in the session.
+#pod
+#pod     my $user = $c->yancy->auth->current_user
+#pod         || return $c->render( status => 401, text => 'Unauthorized' );
+#pod
+#pod =head1 ROUTES
+#pod
+#pod This plugin creates the following L<named
+#pod routes|https://mojolicious.org/perldoc/Mojolicious/Guides/Routing#Named-routes>.
+#pod Use named routes with helpers like
+#pod L<url_for|Mojolicious::Plugin::DefaultHelpers/url_for>,
+#pod L<link_to|Mojolicious::Plugin::TagHelpers/link_to>, and
+#pod L<form_for|Mojolicious::Plugin::TagHelpers/form_for>.
+#pod
+#pod =head2 yancy.auth.password.login_form
+#pod
+#pod Display the login form. See L</TEMPLATES> below.
+#pod
+#pod =head2 yancy.auth.password.login
+#pod
+#pod Handle login by checking the user's username and password.
+#pod
+#pod =head1 TEMPLATES
+#pod
+#pod To override these templates in your application, provide your own
+#pod template with the same name.
+#pod
+#pod =head2 yancy/auth/password/login_form.html.ep
+#pod
+#pod The form to log in.
+#pod
+#pod =head2 yancy/auth/password/login.html.ep
+#pod
+#pod The page containing the form to log in. Uses the C<login_form.html.ep>
+#pod template for the form itself.
+#pod
+#pod =head2 yancy/auth/unauthorized.html.ep
+#pod
+#pod This template displays an error message that the user is not authorized
+#pod to view this page. This most-often appears when the user is not logged
+#pod in.
+#pod
+#pod =head2 yancy/auth/unauthorized.json.ep
+#pod
+#pod This template renders a JSON object with an "errors" array explaining
+#pod the error.
+#pod
+#pod =head2 layouts/yancy/auth.html.ep
+#pod
+#pod The layout that Yancy uses when displaying the login form, the
+#pod unauthorized error message, and other auth-related pages.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Yancy::Plugin::Auth>
+#pod
+#pod =cut
+
+use Mojo::Base 'Mojolicious::Plugin';
+use Yancy::Util qw( currym );
+use Digest;
+
+has log =>;
+has collection =>;
+has username_field =>;
+has password_field => 'password';
+has allow_register => 0;
+has plugin_field => undef;
+has register_fields => sub { [] };
+has moniker => 'password';
+has default_digest =>;
+has route =>;
+
+sub register {
+    my ( $self, $app, $config ) = @_;
+    $self->init( $app, $config );
+    $app->helper(
+        'yancy.auth.current_user' => currym( $self, 'current_user' ),
+    );
+    $app->helper(
+        'yancy.auth.require_user' => currym( $self, 'require_user' ),
+    );
+}
+
+sub init {
+    my ( $self, $app, $config ) = @_;
+    my $coll = $config->{collection}
+        || die "Error configuring Auth::Password plugin: No collection defined\n";
+    my $schema = $app->yancy->schema( $coll );
+    die sprintf(
+        q{Error configuring Auth::Password plugin: Collection "%s" not found}."\n",
+        $coll,
+    ) unless $schema;
+
+    $self->log( $app->log );
+    $self->collection( $coll );
+    $self->username_field( $config->{username_field} );
+    $self->password_field( $config->{password_field} || 'password' );
+    $self->default_digest( $config->{password_digest} );
+    $self->allow_register( $config->{allow_register} );
+    $self->register_fields(
+        $config->{register_fields} || $app->yancy->schema( $coll )->{required}
+    );
+    $app->yancy->filter->add( 'yancy.plugin.auth.password' => sub {
+        my ( $key, $value, $schema, @params ) = @_;
+        return $self->_digest_password( $value );
+    } );
+
+    # Update the schema to digest the password correctly
+    my $field = $schema->{properties}{ $self->password_field };
+    push @{ $field->{ 'x-filter' } ||= [] },
+        'yancy.plugin.auth.password';
+    $field->{ format } = 'password';
+    $app->yancy->schema( $coll, $schema );
+
+    # Add fields that may not technically be required by the schema, but
+    # are required for registration
+    my @user_fields = (
+        $self->username_field || $schema->{'x-id-field'} || 'id',
+        $self->password_field,
+    );
+    for my $field ( @user_fields ) {
+        if ( !grep { $_ eq $field } @{ $self->register_fields } ) {
+            unshift @{ $self->register_fields }, $field;
+        }
+    }
+
+    my $route = $config->{route} || $app->routes->any( '/yancy/auth/' . $self->moniker );
+    $route->get( 'register' )->to( cb => currym( $self, '_get_register' ) )->name( 'yancy.auth.password.register_form' );
+    $route->post( 'register' )->to( cb => currym( $self, '_post_register' ) )->name( 'yancy.auth.password.register' );
+    $route->get( 'logout' )->to( cb => currym( $self, '_get_logout' ) )->name( 'yancy.auth.password.logout' );
+    $route->get( '' )->to( cb => currym( $self, '_get_login' ) )->name( 'yancy.auth.password.login_form' );
+    $route->post( '' )->to( cb => currym( $self, '_post_login' ) )->name( 'yancy.auth.password.login' );
+    $self->route( $route );
+}
+
+sub _get_user {
+    my ( $self, $c, $username ) = @_;
+    my $coll = $self->collection;
+    my $username_field = $self->username_field;
+    my %search;
+    if ( my $field = $self->plugin_field ) {
+        $search{ $field } = $self->moniker;
+    }
+    if ( $username_field ) {
+        $search{ $username_field } = $username;
+        my ( $user ) = @{ $c->yancy->backend->list( $coll, \%search, { limit => 1 } )->{items} };
+        return $user;
+    }
+    return $c->yancy->backend->get( $coll, $username );
+}
+
+sub _digest_password {
+    my ( $self, $password ) = @_;
+    my $config = $self->default_digest;
+    my $digest_config_string = _build_digest_config_string( $config );
+    my $digest = _get_digest_by_config_string( $digest_config_string );
+    my $password_string = join '$', $digest->add( $password )->b64digest, $digest_config_string;
+    return $password_string;
+}
+
+sub _set_password {
+    my ( $self, $c, $username, $password ) = @_;
+    my $password_string = eval { $self->_digest_password( $password ) };
+    if ( $@ ) {
+        $self->log->error(
+            sprintf 'Error setting password for user "%s": %s', $username, $@,
+        );
+    }
+
+    my $id = $self->_get_id_for_username( $c, $username );
+    $c->yancy->backend->set( $self->collection, $id, { $self->password_field => $password_string } );
+}
+
+sub _get_id_for_username {
+    my ( $self, $c, $username ) = @_;
+    my $collection = $self->collection;
+    my $schema = $c->yancy->schema( $collection );
+    my $id = $username;
+    my $id_field = $schema->{'x-id-field'} || 'id';
+    my $username_field = $self->username_field;
+    if ( $username_field && $username_field ne $id_field ) {
+        $id = $self->_get_user( $c, $username )->{ $id_field };
+    }
+    return $id;
+}
+
+sub current_user {
+    my ( $self, $c ) = @_;
+    return undef unless my $session = $c->session;
+    my $username = $session->{yancy}{auth}{password} or return undef;
+    my $user = $self->_get_user( $c, $username );
+    delete $user->{ $self->password_field };
+    return $user;
+}
+
+sub login_form {
+    my ( $self, $c ) = @_;
+    return $c->render_to_string(
+        'yancy/auth/password/login_form',
+        plugin => $self,
+        return_to => $c->req->param( 'return_to' ) || $c->req->headers->referrer,
+    );
+}
+
+sub _get_login {
+    my ( $self, $c ) = @_;
+    return $c->render( 'yancy/auth/password/login',
+        plugin => $self,
+    );
+}
+
+sub _post_login {
+    my ( $self, $c ) = @_;
+    my $user = $c->param( 'username' );
+    my $pass = $c->param( 'password' );
+    if ( $self->_check_pass( $c, $user, $pass ) ) {
+        $c->session->{yancy}{auth}{password} = $user;
+        my $to = $c->req->param( 'return_to' ) // '/';
+        $c->res->headers->location( $to );
+        return $c->rendered( 303 );
+    }
+    $c->flash( error => 'Username or password incorrect' );
+    return $c->render( 'yancy/auth/password/login',
+        status => 400,
+        plugin => $self,
+        user => $user,
+        login_failed => 1,
+    );
+}
+
+sub _get_register {
+    my ( $self, $c ) = @_;
+    if ( !$self->allow_register ) {
+        $c->app->log->error( 'Registration not allowed (set allow_register)' );
+        return;
+    }
+    return $c->render( 'yancy/auth/password/register',
+        plugin => $self,
+    );
+}
+
+sub _post_register {
+    my ( $self, $c ) = @_;
+    if ( !$self->allow_register ) {
+        $c->app->log->error( 'Registration not allowed (set allow_register)' );
+        return;
+    }
+
+    my $collection = $self->collection;
+    my $schema = $c->yancy->schema( $collection );
+    my $username_field = $self->username_field || $schema->{'x-id-field'} || 'id';
+    my $password_field = $self->password_field;
+
+    my $username = $c->param( $username_field );
+    my $pass = $c->param( $self->password_field );
+    if ( $pass ne $c->param( $self->password_field . '-verify' ) ) {
+        return $c->render( 'yancy/auth/password/register',
+            status => 400,
+            plugin => $self,
+            user => $username,
+            error => 'password_verify',
+        );
+    }
+    if ( $self->_get_user( $c, $username ) ) {
+        return $c->render( 'yancy/auth/password/register',
+            status => 400,
+            plugin => $self,
+            user => $username,
+            error => 'user_exists',
+        );
+    }
+
+    # Create new user
+    my $item = {
+        $username_field => $username,
+        $password_field => $pass,
+        (
+            map { $_ => $c->param( $_ ) }
+            grep { !/^(?:$username_field|$password_field)$/ }
+            @{ $self->register_fields }
+        ),
+    };
+    my $id = eval { $c->yancy->create( $collection, $item ) };
+    if ( my $exception = $@ ) {
+        my $error = ref $exception eq 'ARRAY' ? 'validation' : 'create';
+        $c->app->log->error( 'Error creating user: ' . $exception );
+        return $c->render( 'yancy/auth/password/register',
+            status => 400,
+            plugin => $self,
+            user => $username,
+            error => $error,
+            exception => $exception,
+        );
+    }
+
+    # Get them to log in
+    $c->flash( info => 'user_created' );
+    return $c->redirect_to( 'yancy.auth.password.login' );
+}
+
+sub _get_digest {
+    my ( $type, @config ) = @_;
+    my $digest = eval {
+        Digest->new( $type, @config )
+    };
+    if ( my $error = $@ ) {
+        if ( $error =~ m{Can't locate Digest/${type}\.pm in \@INC} ) {
+            die sprintf q{Password digest type "%s" not found}."\n", $type;
+        }
+        die sprintf "Error loading Digest module: %s\n", $@;
+    }
+    return $digest;
+}
+
+sub _get_digest_by_config_string {
+    my ( $config_string ) = @_;
+    my @digest_parts = split /\$/, $config_string;
+    return _get_digest( @digest_parts );
+}
+
+sub _build_digest_config_string {
+    my ( $config ) = @_;
+    my @config_parts = (
+        map { $_, $config->{$_} } grep !/^type$/, keys %$config
+    );
+    return join '$', $config->{type}, @config_parts;
+}
+
+sub _check_pass {
+    my ( $self, $c, $username, $input_password ) = @_;
+    my $user = $self->_get_user( $c, $username );
+
+    if ( !$user ) {
+        $self->log->error(
+            sprintf 'Error checking password for user "%s": User does not exist',
+            $username
+        );
+        return undef;
+    }
+
+    my ( $user_password, $user_digest_config_string )
+        = split /\$/, $user->{ $self->password_field }, 2;
+
+    my $digest = eval { _get_digest_by_config_string( $user_digest_config_string ) };
+    if ( $@ ) {
+        die sprintf 'Error checking password for user "%s": %s', $username, $@;
+    }
+    my $check_password = $digest->add( $input_password )->b64digest;
+
+    my $success = $check_password eq $user_password;
+
+    my $default_config_string = _build_digest_config_string( $self->default_digest );
+    if ( $success && $user_digest_config_string ne $default_config_string ) {
+        # We need to re-create the user's password field using the new
+        # settings
+        $self->_set_password( $c, $username, $input_password );
+    }
+
+    return $success;
+}
+
+sub _get_logout {
+    my ( $self, $c ) = @_;
+    delete $c->session->{yancy}{auth}{password};
+    $c->flash( info => 'logout' );
+    return $c->redirect_to( 'yancy.auth.password.login_form' );
+}
+
+sub require_user {
+    my ( $self, $c ) = @_;
+    return sub {
+        my ( $c ) = @_;
+        #; say "Are you authorized? " . $c->yancy->auth->current_user;
+        $c->yancy->auth->current_user && return 1;
+        $c->stash(
+            template => 'yancy/auth/unauthorized',
+            status => 401,
+            login_route => $self->route->render,
+        );
+        $c->respond_to(
+            json => {},
+            html => {},
+        );
+        return undef;
+    };
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Yancy::Plugin::Auth::Password - A simple password-based auth
+
+=head1 VERSION
+
+version 1.025
+
+=head1 SYNOPSIS
+
+    use Mojolicious::Lite;
+    plugin Yancy => {
+        backend => 'sqlite://myapp.db',
+        collections => {
+            users => {
+                properties => {
+                    id => { type => 'integer', readOnly => 1 },
+                    username => { type => 'string' },
+                    password => { type => 'string', format => 'password' },
+                },
+            },
+        },
+    };
+    app->yancy->plugin( 'Auth::Password' => {
+        collection => 'users',
+        username_field => 'username',
+        password_field => 'password',
+        password_digest => {
+            type => 'SHA-1',
+        },
+    } );
+
+=head1 DESCRIPTION
+
+B<Note:> This module is C<EXPERIMENTAL> and its API may change before
+Yancy v2.000 is released.
+
+This plugin provides a basic password-based authentication scheme for
+a site.
+
+=encoding utf8
+
+=head1 CONFIGURATION
+
+This plugin has the following configuration options.
+
+=head2 collection
+
+The name of the Yancy collection that holds users. Required.
+
+=head2 username_field
+
+The name of the field in the collection which is the user's identifier.
+This can be a user name, ID, or e-mail address, and is provided by the
+user during login.
+
+This field is optional. If not specified, the collection's ID field will
+be used. For example, if the collection uses the C<username> field as
+a unique identifier, we don't need to provide a C<username_field>.
+
+    plugin Yancy => {
+        collections => {
+            users => {
+                'x-id-field' => 'username',
+                properties => {
+                    username => { type => 'string' },
+                    password => { type => 'string' },
+                },
+            },
+        },
+    };
+    app->yancy->plugin( 'Auth::Password' => {
+        collection => 'users',
+        password_digest => { type => 'SHA-1' },
+    } );
+
+=head2 password_field
+
+The name of the field to use for the password. Defaults to C<password>.
+
+This field will automatically be set up to use the L</auth.digest> filter to
+properly hash the password when updating it.
+
+=head2 password_digest
+
+This is the hashing mechanism that should be used for hashing passwords.
+This value should be a hash of digest configuration. The one required
+field is C<type>, and should be a type supported by the L<Digest> module:
+
+=over
+
+=item * MD5 (part of core Perl)
+
+=item * SHA-1 (part of core Perl)
+
+=item * SHA-256 (part of core Perl)
+
+=item * SHA-512 (part of core Perl)
+
+=item * Bcrypt (recommended)
+
+=back
+
+Additional fields are given as configuration to the L<Digest> module.
+Not all Digest types require additional configuration.
+
+There is no default: Perl core provides SHA-1 hashes, but those aren't good
+enough. We recommend installing L<Digest::Bcrypt> for password hashing.
+
+    # Use Bcrypt for passwords
+    # Install the Digest::Bcrypt module first!
+    app->yancy->plugin( 'Auth::Basic' => {
+        password_digest => {
+            type => 'Bcrypt',
+            cost => 12,
+            salt => 'abcdefgh♥stuff',
+        },
+    } );
+
+Digest information is stored with the password so that password digests
+can be updated transparently when necessary. Changing the digest
+configuration will result in a user's password being upgraded the next
+time they log in.
+
+=head2 Sessions
+
+This module uses L<Mojolicious
+sessions|https://mojolicious.org/perldoc/Mojolicious/Controller#session>
+to store the login information in a secure, signed cookie.
+
+To configure the default expiration of a session, use
+L<Mojolicious::Sessions
+default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_expiration>.
+
+    use Mojolicious::Lite;
+    # Expire a session after 1 day of inactivity
+    app->sessions->default_expiration( 24 * 60 * 60 );
+
+=head1 FILTERS
+
+This module provides the following filters. See L<Yancy/Extended Field
+Configuration> for how to use filters.
+
+=head2 auth.digest
+
+Run the field value through the configured password L<Digest> object and
+store the Base64-encoded result instead.
+
+=head1 HELPERS
+
+This plugin has the following helpers.
+
+=head2 yancy.auth.current_user
+
+Get the current user from the session, if any. Returns C<undef> if no user
+was found in the session.
+
+    my $user = $c->yancy->auth->current_user
+        || return $c->render( status => 401, text => 'Unauthorized' );
+
+=head1 ROUTES
+
+This plugin creates the following L<named
+routes|https://mojolicious.org/perldoc/Mojolicious/Guides/Routing#Named-routes>.
+Use named routes with helpers like
+L<url_for|Mojolicious::Plugin::DefaultHelpers/url_for>,
+L<link_to|Mojolicious::Plugin::TagHelpers/link_to>, and
+L<form_for|Mojolicious::Plugin::TagHelpers/form_for>.
+
+=head2 yancy.auth.password.login_form
+
+Display the login form. See L</TEMPLATES> below.
+
+=head2 yancy.auth.password.login
+
+Handle login by checking the user's username and password.
+
+=head1 TEMPLATES
+
+To override these templates in your application, provide your own
+template with the same name.
+
+=head2 yancy/auth/password/login_form.html.ep
+
+The form to log in.
+
+=head2 yancy/auth/password/login.html.ep
+
+The page containing the form to log in. Uses the C<login_form.html.ep>
+template for the form itself.
+
+=head2 yancy/auth/unauthorized.html.ep
+
+This template displays an error message that the user is not authorized
+to view this page. This most-often appears when the user is not logged
+in.
+
+=head2 yancy/auth/unauthorized.json.ep
+
+This template renders a JSON object with an "errors" array explaining
+the error.
+
+=head2 layouts/yancy/auth.html.ep
+
+The layout that Yancy uses when displaying the login form, the
+unauthorized error message, and other auth-related pages.
+
+=head1 SEE ALSO
+
+L<Yancy::Plugin::Auth>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

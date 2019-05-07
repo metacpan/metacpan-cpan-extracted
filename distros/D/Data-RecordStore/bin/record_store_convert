@@ -5,6 +5,7 @@ use warnings;
 
 use Data::Dumper;
 use Data::RecordStore;
+use Data::RecordStore::Converter;
 use File::Copy;
 use File::Path qw( make_path );
 

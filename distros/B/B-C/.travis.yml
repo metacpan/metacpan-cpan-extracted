@@ -5,16 +5,18 @@ perl:
   - "5.22"
   - "5.14"
   - "5.24-dbg"
+  - "5.28"
+  - "5.26"
   - "5.20"
   - "5.18"
   - "5.16"
   - "5.12"
   - "5.10"
   - "5.8"
-  - "5.14-thr"
+  #- "5.14-thr"
   - "5.22-thr"
-  - "dev"
-  - "blead"
+  #- "dev"
+  #- "blead"
 
 # "cperl-5.24.0"/"5.24c" not yet
 
@@ -22,12 +24,14 @@ perl:
 matrix:
   fast_finish: true
   allow_failures:
-    - perl: "5.24"
+    - perl: "5.28"
+    - perl: "5.26"
     - perl: "5.24-dbg"
     - perl: "5.22-thr"
     - perl: "5.8"
-    - perl: "dev"
-    - perl: "blead"
+    - perl: "5.28.1c"
+    - perl: "5.26.4c"
+    #- perl: "blead"
 
 before_install:
   - mkdir /home/travis/bin || true

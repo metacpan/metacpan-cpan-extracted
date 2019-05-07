@@ -1,5 +1,7 @@
 Revision history for PONAPI-Client
 
+0.002011     2019-May-06
+             * Fix Client::UA::YAHC work with SSL (Andrius Merkys, GH#90)
 
 0.002010     2017-Dec-05
              * Fixed sub name (Adam Taylor)

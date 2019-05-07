@@ -23,7 +23,7 @@ no_index:
     - xt
 requires:
   Graph: '0.9704'
-  perl: '5.0012'
-version: '0.02'
+  perl: '5.014'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

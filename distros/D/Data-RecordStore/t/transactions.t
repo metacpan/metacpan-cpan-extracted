@@ -34,6 +34,7 @@ my $is_windows = $^O eq 'MSWin32';
 # -----------------------------------------------------
 
 test_suite();
+test_suite(1);
 
 done_testing;
 
@@ -57,9 +58,11 @@ sub check {
 } #check
 
 sub test_suite {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
     my $dir = tempdir( CLEANUP => 1 );
 
-    my $store = Data::RecordStore->open_store( $dir );
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     check( $store, "init",
            entries => 0,
            records => 0,
@@ -464,7 +467,7 @@ sub test_suite {
        );
 
     my $dir2 = tempdir( CLEANUP => 1 );
-    my $store2 = Data::RecordStore->open_store( $dir2 );
+    my $store2 = Data::RecordStore->open_store( BASE_PATH => $dir2, MODE => $mode );
     my( @ids );
     for (1..10) {
         push @ids, $store2->stow( "x" x $_ );
@@ -502,7 +505,7 @@ sub test_suite {
     
     
     my $dir3 = tempdir( CLEANUP => 1 );
-    my $store3 = Data::RecordStore->open_store( $dir3 );
+    my $store3 = Data::RecordStore->open_store( BASE_PATH => $dir3, MODE => $mode );
     
     ( @ids ) = ();
     for (1..10) {
@@ -586,7 +589,7 @@ sub test_suite {
     
 
     my $dir4 = tempdir( CLEANUP => 1 );
-    my $store4 = Data::RecordStore->open_store( $dir );
+    my $store4 = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
 
     for (1..10) {
         push @ids, $store4->stow( 'x' x $_ );
@@ -616,7 +619,7 @@ sub test_suite {
     unlike( $@, qr/_swapout/, 'no swapout error moar multimove' );
 
     $dir = tempdir( CLEANUP => 1 );
-    $store = Data::RecordStore->open_store( $dir );
+    $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $store->stow( "NOTOUCHY" );
     $store->stow( "DELME", 3 );
      $trans = $store->use_transaction;

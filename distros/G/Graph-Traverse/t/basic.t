@@ -1,3 +1,4 @@
+# -*- mode: cperl; -*-
 use strict;
 use Test::More;
 
@@ -98,7 +99,7 @@ $g->set_vertex_attribute('Q', 'weight', 1);
     is ($paths->{B}->{weight},   3, "Traversal A->B using vertex weight");   # A has weight 0
     is ($paths->{C}->{weight},   1, "Traversal A->C using vertex weight");   # there is an A-C edge
     is ($paths->{D}->{weight},   4, "Traversal A->D using vertex weight");   # there is an A-D edge
-    ok (!defined $paths->{Q}, "Traversal A->Q, using vertex weight, should fail");
+    ok (!defined $paths->{Q}, "Traversal A->Q, with maximum vertex weight, should fail");
 }
 
 $g->set_vertex_attribute('Q', 'weight', undef);
@@ -107,6 +108,14 @@ $g->set_vertex_attribute('Q', 'weight', undef);
     my $paths = $g->traverse([qw(A)],{hash => 1, vertex => 1, max => 4, default => 0});
     is ($paths->{Q}->{weight},   4, "Traversal A->Q using vertex weight");   # A (weight=0), D (4), Q (0)
 }
+
+$g->add_cycle(qw(A X1 X2 X3));
+
+{
+    my $paths = $g->traverse('A',{hash => 1});
+    is ($paths->{X3}->{weight}, 3, "Traversal of a graph with a cycle");
+}
+
 
 done_testing;
 

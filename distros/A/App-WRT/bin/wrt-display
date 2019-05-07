@@ -104,5 +104,12 @@ if ($from_stdin) {
   (@to_display) = @ARGV;
 }
 
+# TODO: Better error reporting strategy, print this on stderr:
+foreach my $entry (@to_display) {
+  unless ($w->{entries}->is_extant($entry)) {
+    say("No such entry: $entry");
+    exit(1);
+  }
+}
 print $w->display(@to_display);
 exit(0);

@@ -1,7 +1,7 @@
 {
    "entry_dir": "./archives",
    "publish_dir": "./public",
-   "title_prefix": "p1k3",
+   "title_prefix": "wrt",
    "template": "basic",
    "description": "a test wrt site",
    "url_root": "https://example.com/",
@@ -9,7 +9,7 @@
    "favicon_url": "https://example.com/favicon.png",
    "template_dir": "./templates",
    "stylesheet_url": "https://example.com/css/p1k3.css",
-   "author": "Brennen Bearnes",
+   "author": "Example Author",
    "entry_descriptions": {
      "new": "newest entries",
      "all": "all entries"

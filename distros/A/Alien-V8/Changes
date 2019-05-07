@@ -1,3 +1,6 @@
+0.05 2019-05-06
+ - include repo etc metadata
+
 0.04 2019-05-05
  - quick patch to turn off -Werror per Google advice - thanks @plicease
 

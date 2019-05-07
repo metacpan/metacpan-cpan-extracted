@@ -21,6 +21,7 @@ eg/doc-site/myapp.pl
 eg/doc-site/myapp.preaction.conf
 eg/doc-site/public/screenshot-edit.png
 eg/doc-site/public/screenshot.png
+eg/test-app/myapp.auth.conf
 eg/test-app/myapp.conf
 eg/test-app/myapp.null.conf
 eg/test-app/myapp.pl
@@ -52,6 +53,12 @@ lib/Mojolicious/Plugin/Yancy/resources/public/yancy/popper.min.js.map
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/vue.js
 lib/Mojolicious/Plugin/Yancy/resources/templates/layouts/yancy.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/layouts/yancy/auth.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/login.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/login.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/login_form.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/register.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/unauthorized.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/unauthorized.json.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/index.html.ep
 lib/Yancy.pm
 lib/Yancy/Backend.pod
@@ -69,7 +76,12 @@ lib/Yancy/Controller/Yancy/API.pm
 lib/Yancy/Controller/Yancy/MultiTenant.pm
 lib/Yancy/Help/Config.pod
 lib/Yancy/Help/Standalone.pod
+lib/Yancy/Plugin/Auth.pm
 lib/Yancy/Plugin/Auth/Basic.pm
+lib/Yancy/Plugin/Auth/Github.pm
+lib/Yancy/Plugin/Auth/OAuth2.pm
+lib/Yancy/Plugin/Auth/Password.pm
+lib/Yancy/Plugin/Auth/Token.pm
 lib/Yancy/Plugin/Form.pm
 lib/Yancy/Plugin/Form/Bootstrap4.pm
 lib/Yancy/Util.pm
@@ -103,7 +115,12 @@ t/lib/Local/Test.pm
 t/lib/Yancy/Backend/Brokentest.pm
 t/lib/Yancy/Backend/Test.pm
 t/lib/Yancy/Plugin/Test.pm
+t/plugin/auth.t
 t/plugin/auth/basic.t
+t/plugin/auth/github.t
+t/plugin/auth/oauth2.t
+t/plugin/auth/password.t
+t/plugin/auth/token.t
 t/plugin/form/bootstrap4.t
 t/schema/dbicdump.pl
 t/schema/mysql.sql

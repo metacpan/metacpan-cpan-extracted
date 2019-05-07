@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker 6.64;
 my %WriteMakefileArgs = (
     NAME     => 'Test::Time',
     DISTNAME => 'Test-Time',
-    VERSION  => '0.07',
+    VERSION  => '0.08',
     EXE_FILES => [glob('script/*'), glob('bin/*')],
     CONFIGURE_REQUIRES => {
   "ExtUtils::MakeMaker" => "6.64"

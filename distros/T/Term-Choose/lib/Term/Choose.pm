@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.647';
+our $VERSION = '1.648';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -211,20 +211,24 @@ sub __length_list_elements {
 
 sub __init_term {
     my ( $self ) = @_;
-    my $config = { mode => 'ultra-raw', mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} };
+    my $config = {
+        mode => 'ultra-raw',
+        mouse => $self->{mouse},
+        hide_cursor => $self->{hide_cursor},
+    };
     $self->{mouse} = $self->{plugin}->__set_mode( $config );
 }
 
 
 sub __reset_term {
     my ( $self, $from_choose ) = @_;
-    if ( $from_choose ) {
-        my $up = $self->{i_row} + $self->{nr_prompt_lines};
-        print UP x $up if $up;
-        print "\r" . CLEAR_TO_END_OF_SCREEN;
-    }
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode();
+    }
+    if ( $from_choose ) {
+        my $up = $self->{i_row} + $self->{count_prompt_lines};
+        print UP x $up if $up;
+        print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
     if ( exists $self->{backup_opt} ) {
         my $backup_opt = $self->{backup_opt};
@@ -281,10 +285,6 @@ sub __choose {
     }
     $self->__copy_orig_list( $orig_list_ref );
     $self->__length_list_elements();
-    local $SIG{'INT'} = sub {
-        # my $signame = shift;
-        exit 1;
-    };
     if ( exists $ENV{TC_RESET_AUTO_UP} ) {
         $ENV{TC_RESET_AUTO_UP} = 0;
     }
@@ -315,7 +315,7 @@ sub __choose {
             if ( $self->{wantarray} && @{$self->{marked}} ) {
                 $self->{mark} = $self->__marked_rc2idx();
             }
-            my $up = $self->{i_row} + $self->{nr_prompt_lines};
+            my $up = $self->{i_row} + $self->{count_prompt_lines};
             print UP x $up if $up;
             print "\r" . CLEAR_TO_END_OF_SCREEN;
             $self->__write_first_screen();
@@ -658,7 +658,7 @@ sub __prepare_promptline {
     $prompt .= $self->{prompt};
     if ( $prompt eq '' ) {
         $self->{prompt_copy} = '';
-        $self->{nr_prompt_lines} = 0;
+        $self->{count_prompt_lines} = 0;
         return;
     }
     my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
@@ -672,7 +672,7 @@ sub __prepare_promptline {
     $self->{prompt_copy} .= "\n\r";
     # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
     #                 don't translate newline to carriage return-newline
-    $self->{nr_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
+    $self->{count_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
     if ( @color ) {
         $self->{prompt_copy} =~ s/\x{feff}/shift @color/ge;
         $self->{prompt_copy} .= RESET;
@@ -743,7 +743,7 @@ sub __write_first_screen {
     }
     $self->__prepare_promptline();
     $self->{pp_row} = $self->{page} ? 1 : 0;
-    $self->{avail_height} -= $self->{nr_prompt_lines} + $self->{pp_row};
+    $self->{avail_height} -= $self->{count_prompt_lines} + $self->{pp_row};
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
     }
@@ -1185,7 +1185,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.647
+Version 1.648
 
 =cut
 

@@ -1,5 +1,5 @@
 package School::Survey::MC;
-$School::Survey::MC::VERSION = '0.002';
+$School::Survey::MC::VERSION = '0.003';
 use strict;
 use warnings;
 # Autor: Boris Däppen, 2018
@@ -26,7 +26,7 @@ School::Survey::MC - pick multiple choice questions randomly
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

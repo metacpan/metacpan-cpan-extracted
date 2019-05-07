@@ -769,7 +769,7 @@ sub cc_harness {
 }
 
 sub tests {
-    my $in = shift || "t/TESTS";
+    my $in = shift @ARGV || "t/TESTS";
     $in = "TESTS" unless -f $in;
     undef $/;
     open TEST, "< $in" or die "Cannot open $in";
@@ -837,12 +837,17 @@ sub run_cc_test {
 	my $command;
         if ($ENV{PERL_CORE}) { # ignore ccopts
             if ($is_mswin) {
-                $command = $Config{ccflags}.' -I"..\..\lib\CORE"';
+                $command = $Config{optimize}." ".$Config{ccflags}.' -I"..\..\lib\CORE"';
             } else {
-                $command = $Config{ccflags}." -I".$coredir;
+                $command = $Config{optimize}." ".$Config{ccflags}." -I".$coredir;
+                if ($Config{ccflags} =~ /-flto/ and -s $cfile > 50000) { # too big
+                    diag ("$cfile too big, size ", -s $cfile, " use -O1")
+                      if $ENV{TEST_VERBOSE} > 1;
+                    $command =~ s/-O[23] /-O1 /;
+                }
             }
         } else {
-            $command = ExtUtils::Embed::ccopts;
+            $command = ExtUtils::Embed::ccopts();
         }
 	$command .= " -DHAVE_INDEPENDENT_COMALLOC "
 	  if $B::C::Config::have_independent_comalloc;
@@ -851,11 +856,12 @@ sub run_cc_test {
             if ($Config{ccversion} eq '12.0.8804') {
                 $command =~ s/ -opt:ref,icf//;
             }
-            $command .= " -Od" if $ENV{APPVEYOR};
+            $command .= " -Od"; # not only appveyor.
+            $command =~ s{ [/-]O[123]}{ };
             my $obj = $obj[0];
             $command =~ s/ \Q-o $exe\E / -c -Fo$obj /;
             my $cmdline = "$Config{cc} $command >NUL"; # need to silence it
-            diag ($cmdline) if $ENV{TEST_VERBOSE} and $ENV{TEST_VERBOSE} == 2;
+            diag ($cmdline) if $ENV{TEST_VERBOSE} > 1;
             run_cmd($cmdline, 20);
             $command = '';
         }
@@ -868,10 +874,9 @@ sub run_cc_test {
            ." -L../.. -l$pkg ".$Config{libs}
           : ExtUtils::Embed::ldopts('-std');
         # At least cygwin gcc-4.3 crashes with 2x -fstack-protector
-        $linkargs =~ s/-fstack-protector\b//
-          if $linkargs !~ /-fstack-protector-strong\b/
-          and $command =~ /-fstack-protector\b/
-          and $linkargs =~ /-fstack-protector\b/;
+        $linkargs =~ s/-fstack-protector //
+          if $command =~ /-fstack-protector /
+          and $linkargs =~ /-fstack-protector /;
 
         if ($^O =~ /^(cygwin|MSWin32|msys)/) {
             if (index($command, "Win32CORE") < 0) {
@@ -886,7 +891,7 @@ sub run_cc_test {
                     $linkargs .= " $win32core";
                 }
             }
-            $linkargs .= " -Od" if $ENV{APPVEYOR};
+            $linkargs .= " -Od" if $ENV{APPVEYOR} and $^O eq 'MSWin32';
         }
 	if ( -e "$coredir/$libperl" and $libperl !~ /\.$so$/) {
 	    $command .= $linkargs;
@@ -911,7 +916,7 @@ sub run_cc_test {
         my $NULL = $is_mswin ? '' : '2>/dev/null';
         my $cmdline = "$Config{cc} $command $NULL";
         if ($is_msvc) {
-            $cmdline = "$Config{ld} $linkargs -out:$exe $obj[0] $command";
+            $cmdline = "$Config{ld} $Config{optimize} $linkargs -out:$exe $obj[0] $command";
         }
 	diag ($cmdline) if $ENV{TEST_VERBOSE} and $ENV{TEST_VERBOSE} == 2;
         run_cmd($cmdline, 30);
@@ -923,8 +928,8 @@ sub run_cc_test {
                     return 1;
                 }
             }
-            if ($todo and $todo =~ /TODO/) {
-                $todo =~ s/TODO //;
+            if ($todo and $todo =~ /TODO /) {
+                $todo =~ s/TODO //g;
               TODO:
                 {
                     local $TODO = $todo;
@@ -942,17 +947,24 @@ sub run_cc_test {
         ($result,$out,$stderr) = run_cmd($exe, 5);
         if (defined($out) and !$result) {
             if ($out =~ /^$expect$/) {
-                ok(1, $todo eq '#' ? "" : " $todo");
+                if ($todo eq '#') {
+                    ok(1);
+                } else {
+                    ok(1, $todo);
+                }
                 unlink ($test, $cfile, $exe, @obj) unless $keep_c;
                 return 1;
             } else {
                 # cc test failed, double check uncompiled
-                $got = run_perl(verbose  => $ENV{TEST_VERBOSE}, # for debugging
-                                nolib    => $ENV{PERL_CORE} ? 0 : 1, # include ../lib only in CORE
-                                stderr   => 1, # to capture the "ccode.pl syntax ok"
-                                timeout  => 10,
-                                progfile => $test);
+                $got = run_perl
+                  (verbose  => $ENV{TEST_VERBOSE}, # for debugging
+                   nolib    => $ENV{PERL_CORE} ? 0 : 1, # include ../lib only in CORE
+                   stderr   => 1, # to capture the "ccode.pl syntax ok"
+                   timeout  => 10,
+                   progfile => $test);
                 if (! $? and $got =~ /^$expect$/) {
+                    $expect =~ s/\n//msg;
+                    $out =~ s/\n//msg;
                     ok(1, "$todo wanted: \"$expect\", got: \"$out\"");
                 } else {
                     ok(1, "skip also fails uncompiled");
@@ -966,13 +978,17 @@ sub run_cc_test {
         }
     }
     if ($todo and $todo =~ /TODO/) {
-	$todo =~ s/TODO //;
+	$todo =~ s/#TODO//g;
       TODO:
         {
-	    local $TODO = $todo;
-            ok(0, "$todo wanted: \"$expect\", \$\? = $?, got: \"$out\"");
+	    local $TODO = $todo ? $todo : $];
+            $expect =~ s/\n//msg;
+            $out =~ s/\n//msg;
+            ok(0, "wanted: \"$expect\", \$\? = $?, got: \"$out\"");
 	}
     } else {
+        $expect =~ s/\n//msg;
+        $out =~ s/\n//msg;
         ok(0, "wanted: \"$expect\", \$\? = $?, got: \"$out\"");
     }
     if ($stderr) {
@@ -981,6 +997,19 @@ sub run_cc_test {
     }
     unlink ($test, $cfile, $exe, @obj) unless $keep_c_fail;
     return 0;
+}
+
+my $is_CI;
+sub is_CI {
+    return $is_CI if defined $is_CI;
+    $is_CI = ($ENV{TRAVIS}
+              or $ENV{APPVEYOR}
+              or $ENV{CI}       # circle ci, drone (tea-ci), gitlab
+              # https://gitlab.com/help/ci/variables/README#variables
+              # TODO: Azure
+             )
+      ? 1 : 0;
+    return $is_CI;
 }
 
 sub prepare_c_tests {
@@ -1071,6 +1100,12 @@ CCTESTS
             $i++;
         }
     }
+    if (is_CI()
+        and ($Config{ccflags} =~ /-flto/ or $ENV{SKIP_SLOW_TESTS})
+        and $ENV{PERL_CORE}) {
+        diag "skipping slow tests, ".$#tests," => 5";
+        @tests = @tests[0..4];
+    }
 
     plan tests => scalar @tests;
     #print "1..".(scalar @tests)."\n";
@@ -1152,7 +1187,7 @@ sub plctest {
     chomp $out;
     my $ok = $out =~ /$expected/;
     if ($todo and $todo =~ /TODO/) {
-	$todo =~ s/TODO //;
+	$todo =~ s/TODO //g;
       TODO: {
 	    local $TODO = $todo;
 	    ok($ok);
@@ -1175,7 +1210,11 @@ sub ctest {
     my ($num, $expected, $backend, $base, $script, $todo) =  @_;
     my $name = $base."_$num";
     my $b = $backend; # protect against parallel test name clashes
-    #if ($] > 5.021006 and $backend =~ /^CC/i) { ok(1, "skip CC for 5.22 WIP"); return 1; } # temp 5.22
+    my $CPERL = $Config{usecperl};
+    #if ($] > 5.021006 and $backend =~ /^CC/i) { ok(1, "skip CC for 5.22 WIP"); return 1; }
+    #if ($] >= 5.025 and !$CPERL and $todo !~ /TODO /) {
+    #    $todo .= 'TODO  - no 5.26 yet';
+    #}
     $b =~ s/-(D.*|f.*|v),//g;
     $b =~ s/-/_/g;
     $b =~ s/[, ]//g;
@@ -1215,7 +1254,7 @@ sub ctest {
             ok(1, "skip MSVC"); return 1;
         }
 	if ($todo and $todo =~ /TODO/) {
-	    $todo =~ s/TODO //;
+	    $todo =~ s/TODO //g;
           TODO: {
                 local $TODO = $todo;
                 ok(undef, "failed to compile");
@@ -1240,7 +1279,7 @@ sub ctest {
             }
         }
 	if ($todo and $todo =~ /TODO/) {
-	    $todo =~ s/TODO //;
+	    $todo =~ s/TODO //g;
           TODO: {
                 local $TODO = $todo;
                 ok ($out =~ /$expected/);
@@ -1251,7 +1290,7 @@ sub ctest {
         }
     } else {
 	if ($todo and $todo =~ /TODO/) {
-	    $todo =~ s/TODO //;
+	    $todo =~ s/TODO //g;
           TODO: {
                 local $TODO = $todo;
                 ok (undef);
@@ -1294,7 +1333,7 @@ sub ccompileok {
     my $ok = -e $name or -e "$name.exe";
     if ($todo and $todo =~ /TODO/) {
       TODO: {
-	    $todo =~ s/TODO //;
+	    $todo =~ s/TODO //g;
             local $TODO = $todo;
             ok($ok);
         }
@@ -1321,6 +1360,7 @@ sub todo_tests_default {
     push @todo, 28 if $] > 5.023 and
       ($Config{cc} =~ / -m32/ or $Config{ccflags} =~ / -m32/);
     push @todo, (21, 38) if $^O eq 'cygwin'; #hangs
+    push @todo, (15,27,41..45) if $] >= 5.025 and !$CPERL;
 
     if ($what =~ /^c(|_o[1-4])$/) {
         # a regression
@@ -1360,6 +1400,7 @@ sub todo_tests_default {
 	push @todo, (29)    if $] >= 5.021006 and $what eq 'cc_o1';
 	push @todo, (24,29) if $] >= 5.021006 and $what eq 'cc_o2';
         push @todo, (103)   if $CPERL and $ITHREADS;
+        push @todo, (103)   if $^O eq 'cygwin';
         push @todo, (9,10,15,24,26,27,41..45,103) if $] > 5.023007 and !$CPERL;
     }
     push @todo, (48)   if $] > 5.007 and $] < 5.009 and $^O =~ /MSWin32|cygwin/i;

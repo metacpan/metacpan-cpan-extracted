@@ -36,12 +36,12 @@ $t->app->yancy->create( users => {
 $t->get_ok( '/' )
     ->status_is( 401 )
     ;
-$t->get_ok( '/login' )
+$t->get_ok( '/yancy/auth' )
     ->element_exists( 'input[name=username]', 'login form username field exists' )
     ->element_exists( 'input[name=password]', 'login form password field exists' )
     ;
 
-$t->post_ok( '/login', form => { username => 'test', password => '123qwe', return_to => '/' } )
+$t->post_ok( '/yancy/auth/password', form => { username => 'test', password => '123qwe', return_to => '/' } )
     ->status_is( 303 )
     ->header_is( Location => '/' )
     ;

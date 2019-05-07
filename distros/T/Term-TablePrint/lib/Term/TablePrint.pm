@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.109';
+our $VERSION = '0.110';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -94,6 +94,7 @@ sub __validate_options {
     }
 }
 
+
 sub __set_defaults {
     my ( $self ) = @_;
     $self->{binary_filter}     = 0      if ! defined $self->{binary_filter};
@@ -119,6 +120,26 @@ sub __set_defaults {
 }
 
 
+sub __reset {
+    my ( $self ) = @_;
+    print SHOW_CURSOR;
+    if ( exists $self->{backup_opt} ) {
+        my $backup_opt = $self->{backup_opt};
+        for my $key ( keys %$self ) {
+            if ( $key eq 'plugin' || $key eq 'backup_opt' ) {
+                next;
+            }
+            elsif ( exists $backup_opt->{$key} ) {
+                $self->{$key} = $backup_opt->{$key};
+            }
+            else {
+                delete $self->{$key};
+            }
+        }
+    }
+}
+
+
 sub print_table {
     if ( ref $_[0] ne 'Term::TablePrint' ) {
         return print_table( bless( { plugin => $Plugin->new() }, 'Term::TablePrint' ), @_ );
@@ -131,11 +152,17 @@ sub print_table {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
         $self->__validate_options( $opt );
     }
+    $self->__set_defaults();
+    local $| = 1;
+    print HIDE_CURSOR;
     if ( ! @$table_ref ) {
-        choose( [ 'Close with ENTER' ], { prompt => "'print_table': empty table without header row!" } );
+        choose(
+            [ 'Close with ENTER' ],
+            { prompt => "'print_table': empty table without header row!" }
+        );
+        $self->__reset();
         return;
     }
-    $self->__set_defaults();
     if ( print_columns( $self->{decimal_separator} ) != 1 ) {
         $self->{decimal_separator} = '.';
     }
@@ -153,11 +180,10 @@ sub print_table {
     else {
         $self->{row_idxs} = [ 0 .. $#$table_ref ];
     }
-    local $| = 1;
-    print HIDE_CURSOR;
     if ( $self->{choose_columns}  ) {
         $self->{chosen_cols} = $self->__choose_columns( $table_ref->[0] );
         if ( ! defined $self->{chosen_cols} ) {
+            $self->__reset();
             return;
         }
         if ( ! @{$self->{chosen_cols}} ) {
@@ -169,26 +195,13 @@ sub print_table {
     }
     $self->{orig_table} = $table_ref;
     $self->{progress} = Term::TablePrint::ProgressBar->new( {
-                            row_count => scalar @{$self->{row_idxs}},
-                            col_count => scalar @{$self->{chosen_cols}},
-                            threshold => $self->{progress_bar},
-                        } );
+        row_count => scalar @{$self->{row_idxs}},
+        col_count => scalar @{$self->{chosen_cols}},
+        threshold => $self->{progress_bar},
+    } );
     $self->__recursive_code();
-    if ( exists $self->{backup_opt} ) {
-        my $backup_opt = $self->{backup_opt};
-        for my $key ( keys %$self ) {
-            if ( $key eq 'plugin' || $key eq 'backup_opt' ) {
-                next;
-            }
-            elsif ( exists $backup_opt->{$key} ) {
-                $self->{$key} = $backup_opt->{$key};
-            }
-            else {
-                delete $self->{$key};
-            }
-        }
-    }
-    print SHOW_CURSOR;
+    $self->__reset();
+    return;
 }
 
 
@@ -197,7 +210,7 @@ sub __recursive_code {
     $self->{table_copy} = [];
     $self->__copy_table();
     $self->__calc_col_width();
-    my $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : 1;
+    my $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR;
     my $term_w = term_width() + $extra_w;
     my $w_cols = $self->__calc_avail_col_width( $term_w );
     if ( ! defined $w_cols ) {
@@ -699,7 +712,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.109
+Version 0.110
 
 =cut
 

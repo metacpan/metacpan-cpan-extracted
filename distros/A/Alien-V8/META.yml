@@ -15,12 +15,15 @@ name: Alien-V8
 provides:
   Alien::V8:
     file: lib/Alien/V8.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Archive::Tar: '1.38'
   File::ShareDir: '1.00'
   IPC::Cmd: '0.42'
 resources:
+  IRC: irc://irc.perl.org/#v8
+  bugtracker: https://github.com/mohawk2/Alien-V8/issues
   license: http://dev.perl.org/licenses/
-version: '0.04'
+  repository: https://github.com/mohawk2/Alien-V8
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

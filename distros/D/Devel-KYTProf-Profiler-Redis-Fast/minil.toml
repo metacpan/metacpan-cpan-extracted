@@ -1,0 +1,6 @@
+name = "Devel-KYTProf-Profiler-Redis-Fast"
+# badges = ["travis"]
+authority="cpan:FUJIWARA"
+
+module_maker="ModuleBuildTiny"
+

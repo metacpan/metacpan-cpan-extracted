@@ -5,13 +5,14 @@ use warnings;
 
 use Test::More;
 
-use Errno qw( EPIPE );
+use Errno qw( EINVAL EPIPE );
 use IO::Handle;
 
 use Future::IO;
 
 my $errstr_EPIPE = do {
-   local $! = EPIPE; "$!";
+   # On MSWin32 we don't get EPIPE, but EINVAL
+   local $! = $^O eq "MSWin32" ? EINVAL : EPIPE; "$!";
 };
 
 # ->syswrite success
@@ -37,8 +38,6 @@ my $errstr_EPIPE = do {
 
    ok( !eval { $f->get }, 'Future::IO->syswrite fails on EPIPE' );
 
-   # Don't check message as it'll be locale-sensitive
-   my ( $message, $category, @details ) = $f->failure;
    is_deeply( [ $f->failure ],
       [ "syswrite: $errstr_EPIPE\n", syswrite => $wr, $errstr_EPIPE ],
       'Future::IO->syswrite failure for EPIPE' );

@@ -64,6 +64,9 @@ print OUT <<'!NO!SUBS!';
 # Version 2.19, Reini Urban, 2014-07-09
 # Version 2.20, Reini Urban, 2014-07-23
 # Version 2.21, Reini Urban, 2016-06-12
+# Version 2.22, Reini Urban, 2017-07-23
+# Version 2.23, Reini Urban, 2018-10-31
+# Version 2.24, Reini Urban, 2018-11-18 (--cross)
 
 use strict;
 use warnings;
@@ -74,11 +77,12 @@ use Config;
 use Fcntl qw(:DEFAULT :flock);
 use File::Temp qw(tempfile);
 use File::Basename qw(basename dirname);
-use Cwd ();
+use File::Path qw(mkpath);
+# use Cwd;
 use Pod::Usage;
 # Time::HiRes does not work with 5.6
-# use Time::HiRes qw(gettimeofday tv_interval);
-our $VERSION = 2.21;
+use Time::HiRes qw(gettimeofday tv_interval sleep);
+our $VERSION = 2.24;
 $| = 1;
 eval { require B::C::Config; };
 
@@ -88,8 +92,8 @@ use subs qw{
     cc_harness check_read check_write checkopts_byte choose_backend
     compile_byte compile_cstyle compile_module generate_code
     grab_stash parse_argv sanity_check vprint yclept spawnit
-    gettimeofday tv_interval vsystem
-};
+    vsystem
+}; # gettimeofday tv_interval
 sub opt(*); # imal quoting
 sub is_winlike();
 sub is_win32();
@@ -236,6 +240,10 @@ sub parse_argv {
         $Options->{v} = 0+substr($v,2);
         @ARGV = grep !/^-v\d$/, @ARGV;
     }
+    if (my ($m) = grep /^-m(\w+)$/, @ARGV) { # TODO: until next arg without -
+        $Options->{m} = $1;
+        @ARGV = grep !/^-m(\w+)$/, @ARGV;
+    }
     if (grep /^-stash$/, @ARGV) {
         $Options->{stash}++;
         @ARGV = grep !/^-stash$/, @ARGV;
@@ -256,6 +264,7 @@ sub parse_argv {
         'dryrun|n',     # only print commands, do not execute
         'c',            # Compile to C only, no linking
         'check',        # pass -c to B::C and exit
+        'cross=s',      # pathto/config.sh (new since 2.24)
         'help|h',       # Help me
         'S',            # Keep generated C file
         'T',            # run the backend using perl -T
@@ -304,15 +313,15 @@ sub parse_argv {
     $Options->{Wc} .= " -DALLOW_PERL_OPTIONS" if opt('A');
 
     if( $Options->{time} or $Options->{spawn} ) {
-      eval { require Time::HiRes; }; # 5.6 has no Time::HiRes
-      if ($@) {
-        warn "--time ignored. No Time::HiRes\n" if $Options->{time};
-        $Options->{time} = 0;
-      } else {
-        *gettimeofday = *Time::HiRes::gettimeofday;
+      # eval { require Time::HiRes; }; # 5.6 has no Time::HiRes
+      # if ($@) {
+      #  warn "--time ignored. No Time::HiRes\n" if $Options->{time};
+      #  $Options->{time} = 0;
+      #} else {
+        # *gettimeofday = *Time::HiRes::gettimeofday;
         Time::HiRes::gettimeofday();
-        Time::HiRes->import('gettimeofday','tv_interval','sleep');
-      }
+        # Time::HiRes->import('gettimeofday','tv_interval','sleep');
+      #}
     }
     $logfh  = new FileHandle(">> " . opt('log')) if (opt('log'));
 
@@ -327,17 +336,21 @@ sub parse_argv {
         $Input = shift @ARGV;  # XXX: more files?
         _usage_and_die("No input file specified\n") unless $Input;
         # DWIM modules. This is bad but necessary.
-        $Options->{m} = '' if $Input =~ /\.pm\z/ and !opt('m');
+        $Options->{m} = '' if $Input =~ /\.pm\z/ and !opt('m') and !opt('r');
         vprint 1, "$0: using $Input as input file, ignoring @ARGV\n" if @ARGV;
         check_read($Input);
         check_perl($Input);
     }
 
+    if (exists $Options->{m} and opt('r')) {
+        _die("Cannot run a module\n");
+    }
     if (opt('o')) {
         $Output = opt('o');
         if (!opt('B') and is_winlike() and $Output !~ /\.[A-Za-z0-9]{3}$/) {
             $Output .= '.exe';
         }
+        $Output = relativize($Output) unless is_win32();
     } elsif (opt('B')) {
         if (opt('e')) {
             my $suffix = '.plc';
@@ -346,18 +359,37 @@ sub parse_argv {
         } else {
             $Output = basename($Input) . "c";
         }
+         $Output = relativize($Output) unless is_win32();
+     } elsif (exists $Options->{m} and !opt('e')) {
+         my $module = module_name();
+         # shared lib along auto. see algo in DynaLoader
+         my @modparts = split(/::/,$module);
+         my $modfname = $modparts[-1];
+         $modfname = &mod2fname(\@modparts) if defined &mod2fname;
+         my $modpname = join('/',@modparts);
+         my $dlext = $Config::Config{dlext};
+         my $dir = $Config::Config{sitearch}."/pcc";
+         eval { mkpath $dir; };
+         $dir = "~/.perl5/pcc" unless -w $dir;
+         if (! -d "$dir/$modpname") {
+             mkpath "$dir/$modpname"
+               or die "perlcc -m: Failed to mkdir $dir/$modpname\n";
+         }
+         $Output = "$dir/$modpname/$modfname.$dlext";
     } else {
         $Output = opt('e') ? 'a.out' : $Input;
         $Output =~ s/\.(p[lm]|t)$//;
-        if (is_winlike()) {
+        if ($Options->{m} or opt('shared')) {
+            $Output .= ".".$Config{dlext};
+        } elsif (is_winlike()) {
             if ($Output eq 'a.out') {
                 $Output = 'a.exe';
             } else {
                 $Output .= '.exe';
             }
         }
+        $Output = relativize($Output) unless is_win32();
     }
-    $Output = relativize($Output) unless is_win32();
     sanity_check();
 }
 
@@ -366,11 +398,36 @@ sub opt(*) {
     return exists($Options->{$opt}) && ($Options->{$opt} || 0);
 }
 
+sub module_name {
+    my $name = $Options->{m};
+    unless ($name) {
+        $name = $Input;
+        $name =~ s/\.p[lm]$//;
+        if (basename($name) ne $name) {
+            my $base = basename($name);
+            # find first uppercase dirname
+            my $m = '';
+            my @list = split(/\//, $name);
+            pop @list;
+            for (@list) {
+                if (/^[A-Z]/) {
+                    $m .= $_."::";
+                } elsif (/^[a-z]/) {
+                    $m = '';
+                }
+            }
+            $name = $m ? $m.$base : $base;
+        }
+    }
+    $Options->{m} = $name;
+}
+
 sub compile_module {
+    my $name = module_name();
     if ($Backend eq 'Bytecode') {
-        compile_byte('-m'.$Options->{m});
+        compile_byte("-m$name");
     } else {
-        compile_cstyle("-m".$Options->{m});
+        compile_cstyle("-m$name");
     }
 }
 
@@ -385,14 +442,14 @@ sub compile_byte {
         $opts .= $_[0].",";
     }
     my $addoptions = opt('Wb');
-    if( $addoptions ) {
-        $opts .= '-v,' if opt('v') > 4;
-        $opts .= '-DM,-DG,-DA,-DComment,' if opt('v') > 5;
-        $opts .= "$addoptions,";
-    } elsif (opt('v') > 4) {
+    if (opt('v') > 4) {
         $opts .= '-v,';
         $opts .= '-DM,-DG,-DA,-DComment,' if opt('v') > 5;
     }
+    #if ($Options->{cross}) {
+    #    $opts .= '-cross='.$Options->{cross}.',';
+    #}
+    $opts .= "$addoptions," if $addoptions;
     my $command = "$BinPerl -MO=Bytecode,$opts-o$Output $Input";
     $Input =~ s/^-e.*$/-e/;
     vprint 5, "Compiling...";
@@ -435,16 +492,18 @@ sub compile_cstyle {
     my ($cfh);
     my $testsuite = '';
     my $addoptions = '';
-    if (@_ == 1) {
-        $addoptions .= $_[0].",";
+    if (@_) {
+        $addoptions = join(",",@_);
     }
-    $addoptions .= opt('Wb');
+    $addoptions .= opt('Wb') ? opt('Wb')."," : "";
     if( $addoptions ) {
         $addoptions .= ',-Dfull' if opt('v') >= 6;
-        $addoptions .= ',-Dsp,-v' if opt('v') == 5;
+        if (opt('v') == 5) {
+            $addoptions .= opt('O') ? ',-DstFl,-v' : ',-DspF,-v';
+        }
         $addoptions .= ',';
     } elsif (opt('v') > 4) {
-        $addoptions = '-Dsp,-v,';
+        $addoptions = opt('O') ? '-DstFl,-v,' : '-DspF,-v,';
         $addoptions = '-Dfull,-v,' if opt('v') >= 6;
     }
     if (opt('f')) {
@@ -453,6 +512,10 @@ sub compile_cstyle {
     if (opt('check')) {
         $addoptions .= "-c,";
     }
+    if (opt('cross')) {
+        $addoptions .= '-cross='.$Options->{cross}.',';
+    }
+    $addoptions =~ s/,,/,/g;
 
     my $staticxs = opt('staticxs') ? "-staticxs," : '';
     warn "Warning: --staticxs on darwin is very experimental\n"
@@ -507,8 +570,7 @@ sub compile_cstyle {
     my $options = "$addoptions$testsuite$max_line_len$staticxs$stash";
     $options .= "-o$cfile" unless opt('check');
     $options = substr($options,0,-1) if substr($options,-1,1) eq ",";
-    # This has to do the write itself, so we can't keep a lock. Life
-    # sucks.
+    # This has to do the write itself, so we can't keep a lock. Life sucks.
 
     my $command = "$BinPerl$taint -MO=$Backend,$options $Input";
     vprint 5, "Compiling...";
@@ -600,7 +662,7 @@ sub cc_harness_msvc {
     $obj .= ".obj" unless $obj =~ /\.obj$/;
     my $compile = "";
     $compile = '-I"..\..\lib\CORE" ' if $ENV{PERL_CORE};
-    my $ccopts = ExtUtils::Embed::ccopts;
+    my $ccopts = ExtUtils::Embed::ccopts();
     my $optWc = opt('Wc');
     # suppress cl : Command line warning D4025 : overriding '/O1' with '/Od'
     $ccopts =~ s/\b[-\/]O.\b/-Od/ if $optWc && ($optWc =~ /\b[-\/]Od\b/);
@@ -628,6 +690,9 @@ sub cc_harness_msvc {
             $link .= ' -L"'.$libdir.'"';
         }
     }
+    if (exists $Options->{m} or $Options->{shared}) {
+      $link .= " -shared";
+    }
     # TODO: -shared,-static,-sharedxs
     if ($stash) {
         my @mods = split /,?-?u/, $stash; # XXX -U stashes
@@ -640,6 +705,7 @@ sub cc_harness_msvc {
     if ($Config{ccversion} eq '12.0.8804') {
         $link =~ s/ -opt:ref,icf//;
     }
+    $link .= " ".$Config{optimize};
     $link .= " ".opt('Wl') if opt('Wl');
     if (opt('staticxs')) { # TODO: can msvc link to dll's directly? otherwise use dlltool
         $extra_libs =~ s/^\s+|\s+$//g; # code by stengcode@gmail.com
@@ -690,10 +756,13 @@ sub cc_harness {
     my ($cfile, $stash, $extra_libs) = @_;
     use ExtUtils::Embed ();
     my $command = ExtUtils::Embed::ccopts." -o \"$Output\" \"$cfile\" ";
+    my $coredir;
     if ($ENV{PERL_CORE}) {
 !NO!SUBS!
 print OUT <<"!EXPANDED!";
-      \$command = "\$Config{ccflags} -I\\\"$srcdir\\\" -L\\\"$srcdir\\\" -o \\\"\$Output\\\" \\\"\$cfile\\\" ";
+      \$coredir = \"$srcdir\";
+      \$coredir .= \"/lib/CORE\" if \$^O eq 'MSWin32'; # forward slashes yes
+      \$command = "\$Config{optimize} \$Config{ccflags} -I\\\"\$coredir\\\" -L\\\"\$coredir\\\" -o \\\"\$Output\\\" \\\"\$cfile\\\" ";
 !EXPANDED!
 print OUT <<'!NO!SUBS!';
     }
@@ -716,7 +785,12 @@ print OUT <<'!NO!SUBS!';
         }
     }
     $command .= " -DSTATICXS" if opt('staticxs');
-    $command .= " ".opt('Wc') if opt('Wc');
+    my $optWc = opt('Wc');
+    if ($optWc) {
+        $command .= " $optWc";
+        # no override warning
+        $command =~ s/\b-O.\b/-O0/ if $optWc =~ /\b-O0\b/;
+    }
     my $ccflags = $command;
 
     my $useshrplib = $Config{useshrplib} =~ /^(true|yes)$/;
@@ -726,17 +800,21 @@ print OUT <<'!NO!SUBS!';
         my @mods = split /,?-?u/, $stash; # XXX -U stashes
         $ldopts = ExtUtils::Embed::ldopts("-std", \@mods);
     } else {
-        $ldopts = ExtUtils::Embed::ldopts("-std");
+        if ($ENV{PERL_CORE} and $^O eq 'MSWin32') {
+            $ldopts = $Config{libs};
+        } else {
+            $ldopts = ExtUtils::Embed::ldopts("-std"); # critical on mingw
+        }
     }
     $ldopts .= " ".opt('Wl') if opt('Wl');
 
     # gcc crashes with this duplicate -fstack-protector arg
     my $ldflags = $Config{ldflags};
-    if ($^O eq 'cygwin' and $ccflags =~ /-fstack-protector\b/
-                        and $ldopts =~ /-fstack-protector\b/)
+    if ($^O eq 'cygwin' and $ccflags =~ /-fstack-protector /
+                        and $ldopts =~ /-fstack-protector /)
     {
-        $ldopts =~ s/-fstack-protector\b//;
-        $ldflags =~ s/-fstack-protector\b// if $extra_libs;
+        $ldopts =~ s/-fstack-protector //;
+        $ldflags =~ s/-fstack-protector // if $extra_libs;
     }
     # another ldopts bug: ensure Win32CORE gets added, before -lperl
     if (is_winlike()) {
@@ -753,9 +831,12 @@ print OUT <<'!NO!SUBS!';
            }
         }
     }
-    my ($libperl, $libdir, $coredir) = ($Config{libperl});
+    my ($libperl, $libdir) = ($Config{libperl});
     if ($ENV{PERL_CORE}) {
-        $libdir = $coredir = "../.."; # not includedir, which is ../../lib/CORE on windows
+        # on mingw we still search for cperl52x.dll not the importlib
+        # coredir + includedir is ../../lib/CORE on windows
+        $libdir = "../..";
+        # $ldopts .= " -L$coredir" if $^O eq 'MSWin32';
     } else {
         $libdir  = $Config{prefix} . "/lib";
         $coredir = $ENV{PERL_SRC} || $Config{archlib}."/CORE";
@@ -769,6 +850,9 @@ print OUT <<'!NO!SUBS!';
         } else {
             $ldopts = $extra_libs." ".$ldopts;
         }
+    }
+    if (exists $Options->{m} or opt('shared')) {
+      $ldopts = "-shared $ldopts";
     }
     if (opt('shared')) {
         warn "--shared with useshrplib=false might not work\n" unless $useshrplib;
@@ -924,7 +1008,12 @@ sub sanity_check {
             _die("Compiling a.out is probably not what you want to do.\n");
             # You fully deserve what you get now. No you *don't*. typos happen.
         } else {
-            my $suffix = is_winlike() ? '.exe' : '';
+            my $suffix = '';
+            if (exists $Options->{m} or opt('shared')) {
+                $suffix = ".".$Config{dlext};
+            } elsif (is_winlike()) {
+              $suffix = '.exe'
+            }
             (undef, $Output) = tempfile("plcXXXXX", SUFFIX => $suffix);
             warn "$0: Will not write output on top of input file, ",
                 "compiling to $Output instead\n";
@@ -1206,6 +1295,11 @@ Compile a one-liner, much the same as C<perl -e '...'>
 
 Pass -c flag to the backend, prints all backend warnings to STDOUT
 and exits before generating and compiling code. Similar to perl -c.
+
+=item --cross pathto/config.sh
+
+Use a different C<%B::C::Config> from another F<config.sh> for
+cross-compilation. Passes -cross=path to the backend.
 
 =item -S
 

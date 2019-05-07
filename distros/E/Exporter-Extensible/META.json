@@ -4,13 +4,13 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Exporter-Extensible",
    "no_index" : {
@@ -36,6 +36,7 @@
          "requires" : {
             "B" : "0",
             "Carp" : "0",
+            "Scalar::Util" : "0",
             "mro" : "0",
             "perl" : "v5.12.0",
             "strict" : "0",
@@ -44,7 +45,6 @@
       },
       "test" : {
          "requires" : {
-            "Scalar::Util" : "0",
             "Test::More" : "0"
          }
       }
@@ -60,8 +60,8 @@
          "web" : "https://github.com/nrdvana/perl-Exporter-Extensible"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

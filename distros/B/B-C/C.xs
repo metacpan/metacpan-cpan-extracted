@@ -3,6 +3,11 @@
 #include <perl.h>
 #include <XSUB.h>
 
+#ifdef __cplusplus
+/* Static OP* initialization 2x */
+# error B-C cannot yet be compiled with C++
+#endif
+
 #ifndef PM_GETRE
 # if defined(USE_ITHREADS) && (PERL_VERSION > 8)
 #  define PM_GETRE(o)     (INT2PTR(REGEXP*,SvIVX(PL_regex_pad[(o)->op_pmoffset])))
@@ -21,8 +26,13 @@
 #ifndef RX_EXTFLAGS
 # define RX_EXTFLAGS(prog) ((prog)->extflags)
 #endif
+/* added with v5.21.11/v5.22.1c, removed with v5.29.8/v5.29.2c */
 #ifndef _OP_SIBPARENT_FIELDNAME
-# define _OP_SIBPARENT_FIELDNAME op_sibling
+# ifdef PERL_OP_PARENT
+#  define _OP_SIBPARENT_FIELDNAME op_sibparent
+# else
+#  define _OP_SIBPARENT_FIELDNAME op_sibling
+# endif
 #endif
 
 #if PERL_VERSION < 10
@@ -156,7 +166,7 @@ my_runops(pTHX)
 	if (PL_debug) {
 	    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
 		PerlIO_printf(Perl_debug_log,
-			      "WARNING: %"UVxf" changed from %"UVxf" to %"UVxf"\n",
+			      "WARNING: %" UVxf " changed from %" UVxf " to %" UVxf "\n",
 			      PTR2UV(PL_watchaddr), PTR2UV(PL_watchok),
 			      PTR2UV(*PL_watchaddr));
 #if defined(DEBUGGING) \
@@ -328,10 +338,12 @@ name_count(hv)
     B::HV hv
 PPCODE:
     PERL_UNUSED_VAR(RETVAL);
+    PERL_UNUSED_VAR(TARG);
     if (SvOOK(hv))
-      PUSHi(HvAUX(hv)->xhv_name_count);
+      mPUSHi(HvAUX(hv)->xhv_name_count);
     else 
-      PUSHi(0);
+      mPUSHi(0);
+    XSRETURN(1);
 
 #endif
 
@@ -351,9 +363,19 @@ CODE:
 OUTPUT:
     RETVAL
 
+# Needed only for the ill-designed perl5 signatures: argelem
+SV*
+aux_ptr2iv(o)
+          B::OP o
+  CODE:
+    RETVAL = newSViv(PTR2IV(cUNOP_AUXo->op_aux));
+  OUTPUT:
+    RETVAL
+
 # Return the contents of the op_aux array as a list of IV/SV/GV/PADOFFSET objects.
 # This version here returns the padoffset of SV/GV under ithreads, and not the
 # SV/GV itself. It also uses simplified mPUSH macros.
+# With MCONCAT contrary to B::aux_list always return both slots, binary and utf8.
 # The design of the upstream aux_list method deviates significantly from proper B design.
 
 void
@@ -458,7 +480,6 @@ aux_list_thr(o)
                     actions >>= MDEREF_SHIFT;
                 } /* while */
                 XSRETURN(len);
-
             } /* OP_MULTIDEREF */
 #if PERL_VERSION > 23 && defined(OP_SIGNATURE)
         case OP_SIGNATURE:
@@ -520,10 +541,52 @@ aux_list_thr(o)
                 } /* while */
               finish:
                 XSRETURN(len);
-
             } /* OP_SIGNATURE */
 #endif
+#if PERL_VERSION >= 27
+        case OP_MULTICONCAT:
+            {
+                UNOP_AUX_item *aux = cUNOP_AUXo->op_aux;
+                UNOP_AUX_item *lens;
+                char *p;
+                STRLEN len;
+                SSize_t nargs = aux[PERL_MULTICONCAT_IX_NARGS].ssize;
+
+                /* return (nargs, const string, segment len 0, 1, 2, ...) */
+
+                /* if this changes, this block of code probably needs fixing */
+                assert(PERL_MULTICONCAT_HEADER_SIZE == 5);
+                EXTEND(SP, ((SSize_t)(2 + (nargs+1))));
+                mPUSHi((IV)nargs);
+
+                p   = aux[PERL_MULTICONCAT_IX_PLAIN_PV].pv;
+                len = aux[PERL_MULTICONCAT_IX_PLAIN_LEN].ssize;
+                /* Contrary to B always return both slots, PLAIN and UTF8 */
+                if (p) {
+                  mPUSHp(p, len);
+                } else {
+                  PUSHs(&PL_sv_undef);
+                }
+
+                p   = aux[PERL_MULTICONCAT_IX_UTF8_PV].pv;
+                len = aux[PERL_MULTICONCAT_IX_UTF8_LEN].ssize;
+                if (p) {
+                  PUSHs(newSVpvn_flags(p, len, SVf_UTF8|SVs_TEMP));
+                } else {
+                  PUSHs(&PL_sv_undef);
+                }
+
+                lens = aux + PERL_MULTICONCAT_IX_LENGTHS;
+                nargs++; /* loop (nargs+1) times */
+                while (nargs--) {
+                  mPUSHi(lens->ssize);
+                  lens++;
+                }
+                break;
+            }
+#endif
         } /* switch */
+	XSRETURN(0); /* force removal of PUTBACK, return */
 
 #endif
 
@@ -536,17 +599,6 @@ PadnameGEN(padn)
 	B::PADNAME	padn
     CODE:
         RETVAL = padn->xpadn_gen;
-    OUTPUT:
-	RETVAL
-
-MODULE = B	PACKAGE = B::PADLIST	PREFIX = Padlist
-
-U32
-PadlistID(padlist)
-	B::PADLIST	padlist
-    ALIAS: B::PADLIST::OUTID = 1
-    CODE:
-        RETVAL = ix ? padlist->xpadl_outid : padlist->xpadl_id;
     OUTPUT:
 	RETVAL
 
@@ -585,7 +637,7 @@ COP_stashflags(o)
 SV*
 COP_label(o)
     B::OP  o
-PPCODE:
+  PPCODE:
     {
       STRLEN len;
       U32 flags;
@@ -608,7 +660,7 @@ PROTOTYPES: DISABLE
 U32
 _autovivification(cop)
 	B::COP	cop
-CODE:
+  CODE:
     {
       SV *hint;
       IV h;
@@ -634,8 +686,8 @@ CODE:
 	  RETVAL = 0;
       }
     }
-OUTPUT:
-  RETVAL
+  OUTPUT:
+    RETVAL
 
 
 MODULE = B__OP	PACKAGE = B::OP		PREFIX = op_
@@ -646,19 +698,19 @@ I32
 op_slabbed(op)
         B::OP        op
     PPCODE:
-	PUSHi(op->op_slabbed);
+	mPUSHi(op->op_slabbed);
 
 I32
 op_savefree(op)
         B::OP        op
     PPCODE:
-	PUSHi(op->op_savefree);
+	mPUSHi(op->op_savefree);
 
 I32
 op_static(op)
         B::OP        op
     PPCODE:
-	PUSHi(op->op_static);
+	mPUSHi(op->op_static);
 
 #endif
 
@@ -668,7 +720,7 @@ I32
 op_folded(op)
         B::OP        op
     PPCODE:
-	PUSHi(op->op_folded);
+	mPUSHi(op->op_folded);
 
 #endif
 

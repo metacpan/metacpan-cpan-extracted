@@ -1,189 +1,228 @@
 NAME
-    `AnyEvent::Future' - use Future with AnyEvent
+
+    AnyEvent::Future - use Future with AnyEvent
 
 SYNOPSIS
-     use AnyEvent;
-     use AnyEvent::Future;
 
-     my $future = AnyEvent::Future->new;
-
-     some_async_function( ..., cb => sub { $future->done( @_ ) } );
-
-     print Future->await_any(
-        $future,
-        AnyEvent::Future->new_timeout( after => 10 ),
-     )->get;
+       use AnyEvent;
+       use AnyEvent::Future;
+    
+       my $future = AnyEvent::Future->new;
+    
+       some_async_function( ..., cb => sub { $future->done( @_ ) } );
+    
+       print Future->wait_any(
+          $future,
+          AnyEvent::Future->new_timeout( after => 10 ),
+       )->get;
 
     Or
 
-     use AnyEvent::Future qw( as_future_cb );
-
-     print Future->await_any(
-        as_future_cb {
-           some_async_function( ..., cb => shift )
-        },
-        AnyEvent::Future->new_timeout( after => 10 ),
-     )->get;
+       use AnyEvent::Future qw( as_future_cb );
+    
+       print Future->wait_any(
+          as_future_cb {
+             some_async_function( ..., cb => shift )
+          },
+          AnyEvent::Future->new_timeout( after => 10 ),
+       )->get;
 
 DESCRIPTION
-    This subclass of Future integrates with AnyEvent, allowing the `await'
-    method to block until the future is ready. It allows `AnyEvent'-using
-    code to be written that returns `Future' instances, so that it can make
-    full use of `Future''s abilities, including Future::Utils, and also that
-    modules using it can provide a `Future'-based asynchronous interface of
+
+    This subclass of Future integrates with AnyEvent, allowing the await
+    method to block until the future is ready. It allows AnyEvent-using
+    code to be written that returns Future instances, so that it can make
+    full use of Future's abilities, including Future::Utils, and also that
+    modules using it can provide a Future-based asynchronous interface of
     their own.
 
     For a full description on how to use Futures, see the Future
     documentation.
 
 CONSTRUCTORS
-  $f = AnyEvent::Future->new
+
+ new
+
+       $f = AnyEvent::Future->new
+
     Returns a new leaf future instance, which will allow waiting for its
-    result to be made available, using the `await' method.
+    result to be made available, using the await method.
 
-  $f = AnyEvent::Future->new_delay( @args )
-  $f = AnyEvent::Future->new_timeout( @args )
+ new_delay
+
+       $f = AnyEvent::Future->new_delay( @args )
+
+ new_timeout
+
+       $f = AnyEvent::Future->new_timeout( @args )
+
     Returns a new leaf future instance that will become ready at the time
-    given by the arguments, which will be passed to the `AnyEvent->timer'
+    given by the arguments, which will be passed to the AnyEvent->timer
     method.
 
-    `new_delay' returns a future that will complete successfully at the
-    alotted time, whereas `new_timeout' returns a future that will fail with
-    the message `Timeout'.
+    new_delay returns a future that will complete successfully at the
+    alotted time, whereas new_timeout returns a future that will fail with
+    the message Timeout. This is provided as a simple utility for small
+    use-cases; for a more find-grained control over the failure message and
+    additional values you may wish to use new_delay combined with the
+    then_fail method:
 
-  $f = AnyEvent::Future->from_cv( $cv )
-    Returns a new leaf future instance that will become ready when the given
-    AnyEvent::CondVar instance is ready. The success or failure result of
-    the future will be the result passed to the condvar's `send' or `croak'
-    method.
+       new_delay( after => 10 )
+          ->then_fail( "The operation timed out after 10 seconds", timeout => );
+
+ from_cv
+
+       $f = AnyEvent::Future->from_cv( $cv )
+
+    Returns a new leaf future instance that will become ready when the
+    given AnyEvent::CondVar instance is ready. The success or failure
+    result of the future will be the result passed to the condvar's send or
+    croak method.
 
 METHODS
-  $cv = $f->as_cv
-    Returns a new `AnyEvent::CondVar' instance that wraps the given future;
+
+ as_cv
+
+       $cv = $f->as_cv
+
+    Returns a new AnyEvent::CondVar instance that wraps the given future;
     it will complete with success or failure when the future does.
 
-    Note that because `AnyEvent::CondVar->croak' takes only a single string
-    message for the argument, any subsequent failure semantics are lost from
-    the Future. To capture these as well, you may wish to use an `on_fail'
-    callback or the `failure' method, to obtain them.
+    Note that because AnyEvent::CondVar->croak takes only a single string
+    message for the argument, any subsequent failure detail values from the
+    future are lost by the condvar. To capture these as well, you may wish
+    to use an on_fail callback or the failure method, to obtain them.
 
 UTILITY FUNCTIONS
+
     The following utility functions are exported as a convenience.
 
-  $f = as_future { CODE }
-    Returns a new leaf future instance, which is also passed in to the block
-    of code. The code is called in scalar context, and its return value is
-    stored on the future. This will be deleted if the future is cancelled.
+ as_future
 
-     $w = CODE->( $f )
+       $f = as_future { CODE }
+
+    Returns a new leaf future instance, which is also passed in to the
+    block of code. The code is called in scalar context, and its return
+    value is stored on the future. This will be deleted if the future is
+    cancelled.
+
+       $w = CODE->( $f )
 
     This utility is provided for the common case of wanting to wrap an
-    `AnyEvent' function which will want to receive a callback function to
+    AnyEvent function which will want to receive a callback function to
     inform of completion, and which will return a watcher object reference
     that needs to be stored somewhere.
 
-  $f = as_future_cb { CODE }
-    A futher shortcut to `as_future', where the code is passed two callback
-    functions for `done' and `fail' directly, avoiding boilerplate in the
+ as_future_cb
+
+       $f = as_future_cb { CODE }
+
+    A futher shortcut to as_future, where the code is passed two callback
+    functions for done and fail directly, avoiding boilerplate in the
     common case for creating these closures capturing the future variable.
     In many cases this can reduce the code block to a single line.
 
      $w = CODE->( $done_cb, $fail_cb )
 
 EXAMPLES
-  Wrapping watcher-style `AnyEvent' functions
-    The `as_future_cb' utility provides an excellent wrapper to take the
-    common style of `AnyEvent' function that returns a watcher object and
-    takes a completion callback, and turn it into a `Future' that can be
-    used or combined with other `Future'-based code. For example, the
-    AnyEvent::HTTP function called `http_get' performs in this style.
 
-     use AnyEvent::Future qw( as_future_cb );
-     use AnyEvent::HTTP qw( http_get );
+ Wrapping watcher-style AnyEvent functions
 
-     my $url = ...;
+    The as_future_cb utility provides an excellent wrapper to take the
+    common style of AnyEvent function that returns a watcher object and
+    takes a completion callback, and turn it into a Future that can be used
+    or combined with other Future-based code. For example, the
+    AnyEvent::HTTP function called http_get performs in this style.
 
-     my $f = as_future_cb {
-        my ( $done_cb ) = @_;
-
-        http_get $url, $done_cb;
-     };
+       use AnyEvent::Future qw( as_future_cb );
+       use AnyEvent::HTTP qw( http_get );
+    
+       my $url = ...;
+    
+       my $f = as_future_cb {
+          my ( $done_cb ) = @_;
+    
+          http_get $url, $done_cb;
+       };
 
     This could of course be easily wrapped by a convenient function to
     return futures:
 
-     sub http_get_future
-     {
-        my @args = @_;
+       sub http_get_future
+       {
+          my @args = @_;
+    
+          as_future_cb {
+             my ( $done_cb ) = @_;
+    
+             http_get @args, $done_cb;
+          }
+       }
 
-        as_future_cb {
-           my ( $done_cb ) = @_;
+ Using Futures as enhanced CondVars
 
-           http_get @args, $done_cb;
-        }
-     }
-
-  Using `Future's as enhanced `CondVar's
-    While at first glance it may appear that a `Future' instance is much
-    like an AnyEvent::CondVar, the greater set of convergence methods (such
-    as `needs_all' or `needs_any'), and the various utility functions (in
+    While at first glance it may appear that a Future instance is much like
+    an AnyEvent::CondVar, the greater set of convergence methods (such as
+    needs_all or needs_any), and the various utility functions (in
     Future::Utils) makes it possible to write the same style of code in a
     more concise or powerful way.
 
-    For example, rather than using the `CondVar' `begin' and `end' methods,
-    a set of `CondVar'-returning functions can be converted into `Futures',
-    combined using `needs_all', and converted back to a `CondVar' again:
+    For example, rather than using the CondVar begin and end methods, a set
+    of CondVar-returning functions can be converted into Futures, combined
+    using needs_all, and converted back to a CondVar again:
 
-     my $cv = Future->needs_all(
-        Future::AnyEvent->from_cv( FUNC1() ),
-        Future::AnyEvent->from_cv( FUNC2() ),
-        ...
-     )->as_cv;
-
-     my @results = $cv->recv;
+       my $cv = Future->needs_all(
+          Future::AnyEvent->from_cv( FUNC1() ),
+          Future::AnyEvent->from_cv( FUNC2() ),
+          ...
+       )->as_cv;
+    
+       my @results = $cv->recv;
 
     This would become yet more useful if, instead of functions that return
-    `CondVars', we were operating on functions that return `Future's
-    directly. Because the `needs_all' will cancel any still-pending futures
-    the moment one of them failed, we get a nice neat cancellation of
-    outstanding work if one of them fails, in a way that would be much
-    harder without the `Future's. For example, using the `http_get_future'
-    function from above:
+    CondVars, we were operating on functions that return Futures directly.
+    Because the needs_all will cancel any still-pending futures the moment
+    one of them failed, we get a nice neat cancellation of outstanding work
+    if one of them fails, in a way that would be much harder without the
+    Futures. For example, using the http_get_future function from above:
 
-     my $cv = Future->needs_all(
-        http_get_future( "http://url-1" ),
-        http_get_future( "http://url-2" ),
-        http_get_future( "https://url-third/secret" ),
-     )->as_cv;
-
-     my @results = $cv->recv;
+       my $cv = Future->needs_all(
+          http_get_future( "http://url-1" ),
+          http_get_future( "http://url-2" ),
+          http_get_future( "https://url-third/secret" ),
+       )->as_cv;
+    
+       my @results = $cv->recv;
 
     In this case, the moment any of the HTTP GET functions fails, the ones
-    that are still pending are all cancelled (by dropping their cancellation
-    watcher object) and the overall `recv' call throws an exception.
+    that are still pending are all cancelled (by dropping their
+    cancellation watcher object) and the overall recv call throws an
+    exception.
 
-    Of course, there is no need to convert the outermost `Future' into a
-    `CondVar'; the full set of waiting semantics are implemented on these
-    instances, so instead you may simply call `get' on it to achieve the
-    same effect:
+    Of course, there is no need to convert the outermost Future into a
+    CondVar; the full set of waiting semantics are implemented on these
+    instances, so instead you may simply call get on it to achieve the same
+    effect:
 
-     my $f = Future->needs_all(
-        http_get_future( "http://url-1" ),
-        ...
-     );
-
-     my @results = $f->get;
+       my $f = Future->needs_all(
+          http_get_future( "http://url-1" ),
+          ...
+       );
+    
+       my @results = $f->get;
 
     This has other side advantages, such as the list-valued semantics of
     failures that can provide additional information besides just the error
     message, and propagation of cancellation requests.
 
 TODO
-    *   Consider whether or not it would be considered "evil" to inject a
-        new method into AnyEvent::CondVar; namely by doing
+
+      * Consider whether or not it would be considered "evil" to inject a
+      new method into AnyEvent::CondVar; namely by doing
 
          sub AnyEvent::CondVar::as_future { AnyEvent::Future->from_cv( shift ) }
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

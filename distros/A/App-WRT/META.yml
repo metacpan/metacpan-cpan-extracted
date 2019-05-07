@@ -15,7 +15,7 @@ name: App-WRT
 provides:
   App::WRT:
     file: lib/App/WRT.pm
-    version: v5.0.0
+    version: v6.0.0
   App::WRT::Date:
     file: lib/App/WRT/Date.pm
   App::WRT::EntryStore:
@@ -45,9 +45,8 @@ requires:
   Text::Textile: '0'
   Time::HiRes: '0'
   XML::Atom::SimpleFeed: '0.900'
-  XML::Feed: '0'
   perl: v5.10.0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: v5.0.0
+version: v6.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

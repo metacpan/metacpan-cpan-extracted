@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-03-28'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-05-06'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -74,7 +74,7 @@ rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.005 of rsynccolor (from Perl distribution App-rsynccolor), released on 2019-03-28.
+This document describes version 0.006 of rsynccolor (from Perl distribution App-rsynccolor), released on 2019-05-06.
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
 # The Gearhart-Brenan Dita Topic Naming Standard
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2019
@@ -6,7 +6,7 @@
 # podDocumentation
 
 package Dita::GB::Standard;
-our $VERSION = "20190504";
+our $VERSION = "20190505";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -15,7 +15,7 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use utf8;
 
-sub useWords{1}                                                                 #r Use word representation of md5 sum if true
+sub useWords{0}                                                                 #r Use word representation of md5 sum if true
 
 # Each word is 5 characters long so we can gain 5 bits per word using capitalization. There are 2177 words below or 11 bits - enough room to reach 16 bits per word with the 5 extra from capitalization.
 my @words = qw(aback abate abbey abhor abide abort about above abuse abyss acorn acrid actor acute adage adapt adept admit adobe adopt adore adorn adult affix after again agent agile aging agony agree ahead aisle alarm album aleck alert algae alias alibi alien align alike alive allah allay alley allot allow alloy aloft aloha alone along aloof aloud altar alter amass amaze amber amble amend amiss among ample amply amuse angel anger angle anglo angry angst ankle annex annoy annul anvil apart apple apply april apron aptly ardor arena argue aries arise armed armor aroma arose array arrow arson artsy ashen ashes asian aside askew asset atlas attic audio audit aural avail avert avoid await awake award aware awash awful awoke axiom bacon badge badly bagel baggy baker balls balmy banal bandy bangs banjo barge baron bases basic basin basis batch bated bathe baton bawdy bayou beach beady beard beast bebop beech beefy befit began begin begun beige being belch belie belly below bench beret berry berth beset bible bigot biker billy bimbo binge bingo biped birch birth bison black blade blame bland blank blare blase blast blaze bleak bleed blend bless blimp blind blink bliss blitz block blond blood bloom blown blues bluff blunt blurb blurt blush board boast bogus bongo bonus booby books boost booth booty booze bored borne bosom bossy botch bough bound bowel boxer brace braid brain brake brand brash brass brave bravo brawl brawn bread break breed bribe brick bride brief brine bring brink briny brisk broad broil broke brood brook broom broth brown brunt brush brute buddy budge buggy bugle build built bulge bulky bully bumps bumpy bunch bunny burly burnt burst bushy butte buxom buyer bylaw byway cabby cabin cable cache cacti cadet cadre caged cagey camel cameo canal candy canny canoe caper carat cards cargo carne carol carry carte carve caste catch cater catty cause cease cedar cello chafe chain chair chalk champ chant chaos chaps charm chart chase chasm cheap cheat check cheek cheer chess chest chewy chick chide chief child chili chill chime chimp china chink chirp choir choke chord chore chose chuck chump chunk churn chute cider cigar cinch circa civic civil clack claim clamp clang clank clash clasp class claus clean clear cleat cleft clerk click cliff climb cling clink cloak clock clone close cloth cloud clout clove clown clubs cluck clump clung clunk coach coals coast cobra cocky cocoa colic colon color comet comfy comic comma condo coral corny corps cotta couch cough could count court cover covet cower crack craft cramp crane crank craps crash crass crate crave crawl craze crazy creak cream credo creed creek creep crepe crept crest crick crime crimp crisp croak crock crony crook croon cross crowd crown crude cruel crumb crush crust crypt cubic curio curly curry curse curve curvy cycle cynic daddy daily dairy daisy dally dance dandy darts dated daunt dazed dealt death debit debug debut decaf decal decay decor decoy decry defer deign deity delay delta delve demon denim dense depot depth derby deter detox devil diary dicey digit dimly diner dingy dirty disco ditch ditto ditty diver dixie dizzy dodge doggy dogma dolly donna donor dopey dorky doubt dough douse dowdy downy dowry dozen drabs draft drain drake drama drank drape drawl drawn dread dream dregs dress dribs dried drier drift drill drink drive droll drone drool droop drops drove drown drunk dryer dryly dummy dumpy dunce dusty dutch dwarf dwell dwelt dying eager eagle early earth easel eaten eater eaves ebony edict edify eerie eight eject elbow elder elect elegy elfin elite elope elude elves embed ember emcee emery empty enact endow enemy enjoy ensue enter entry envoy epoch equal equip erase erect erode error erupt essay ether ethic evade event every evict evoke exact exalt excel exert exile exist expel extol extra exude exult facet faint fairy faith false famed fancy fanny farce fatal fated fatty fault fauna favor feast fecal feces feign feint felon fence ferry fetal fetch fetid fetus fever fiber field fiend fiery fifth fifty fight filch filet filly filmy filth final finch first fishy fixed fizzy fjord flail flair flake flaky flame flank flare flash flask fleck fleet flesh flick flier fling flint flirt float flock flood floor flora floss flour flout flown fluff fluid fluke flung flunk flush flute foamy focal focus foggy foist folks folly foray force forge forgo forte forth forty forum found foyer frail frame franc frank fraud freak fresh friar fried fries frill frisk frizz frond front frost froth frown froze fruit fudge fully fumes funds fungi funky funny furor furry fussy fuzzy gabby gable gaffe gaily games gamut gassy gaudy gauge gaunt gauze gavel gawky geeky geese genre genus getup ghost ghoul giant giddy girth given gizmo glade gland glare glass glaze gleam glean glide glint glitz gloat globe gloom glory gloss glove gnash gnome godly gofer going golly goner gonna goods goody gooey goofy goose gorge gotta gouge gourd grace grade graft grain grand grant grape graph grasp grass grate grave gravy graze great greed greek green greet grief grill grime grimy grind gripe grits groan groin groom grope gross group grove growl grown gruel gruff grunt guard guess guest guide guild guile guilt guise gulch gully gumbo gummy gushy gusto gusty gutsy gypsy habit hairy halve handy happy hardy harem harsh haste hasty hatch hated haunt haven havoc hazel heads heady heard heart heave heavy hedge heels hefty heist hello hence heron hertz hiker hilly hindu hinge hippo hitch hives hoard hobby hoist hokey holly homer homey honey honor hoops horde horny horse hotel hotly hound hours house hovel hover howdy huffy human humid humor hunch hurry husky hutch hyena hyper icing ideal idiom idiot igloo image imbue impel imply inane incur index inept inert infer inlet inner input inter inuit irate irish irony islam issue itchy ivory jaded jaunt jazzy jeans jelly jerky jesus jetty jewel jiffy jinks johns joint joker jolly jowls judge juice juicy jumbo jumpy junta juror kaput karat karma kayak kelly khaki kiddo kinky kiosk kitty klutz knack knead kneel knelt knife knock knoll known koala koran kudos label labor laden ladle lance lanky lapel lapse large larva laser lasso latch later latex latin laugh layer leafy leaky leapt learn lease leash least leave ledge leech leery legal leggy legit lemon leper letup levee level lever libel libra light liken lilac limbo limit lined linen liner lines lingo lists liter lithe liven liver lives livid llama loads loath lobby local lodge lofty logic loner looks loony loose loser louse lousy lover lower lowly loyal lucid lucky lumpy lunar lunch lunge lurch lurid lusty lying lynch lyric macho macro madam madly mafia magic major maker mange mango mangy mania manic manly manor maori maple march mardi marks marry marsh mason masse match mater matte mauve maxim maybe mayor mccoy means meant meaty mecca medal media melee melon mercy merge merit merry messy metal meter metro midst might miles milky mimic mince miner minor minty minus mirth miser misty mixed mixer modal model modem moist molar moldy momma mommy money month mooch moody moose moped moral mores moron morse mossy motel motif motor motto mound mount mourn mouse mousy mouth mover movie mower mucus muddy muggy mulch mumbo mummy mumps munch mural murky mushy music musty muted muzak naive naked nanny nappy nasal nasty naval navel needs needy negro neigh nerdy nerve never newly newsy niche niece nifty night ninth nippy noble nobly noise noisy nomad noose north notch noted notes novel nudge nurse nutty nylon nymph oases oasis obese occur ocean oddly offer often oiled olden oldie olive onion onset opera opium optic orbit order organ oscar other otter ought ounce outdo outer ovary overt owing owner oxide ozone paddy padre pagan pager pages pains paint palsy panda panel panic pansy pants papal paper parka parts party passe pasta paste pasty patch patio patty pause payee peace peach pearl pecan pedal peeve penal penny peppy perch peril perky pesky petal peter petty phase phone phony photo piano picky piece piety piggy pilot pinch pinup pious pique pitch pithy pivot pixel pixie pizza place plaid plain plane plank plant plate plaza plead pleat pluck plume plump plunk plush pluto poach point poise poker polar polio polka polls polyp pooch poppy porch posse potty pouch pound power prank prawn preen press price prick pride prima prime primp print prior prism privy prize probe promo prone prong proof prose proud prove prowl proxy prude prune psalm psych pubic pudgy puffy pulse punch pupil puppy puree purge purse pushy pussy putty pygmy pylon pyrex quack quail quake qualm quark quart quash queen queer quell query quest quick quiet quill quilt quirk quite quits quota quote rabbi rabid radar radii radio radon rains rainy raise rally ranch range ranks rapid raspy ratio raven rayon razor reach react ready realm rebel rebut recap recur redid refer regal rehab reign relax relay relic remit renew repay repel reply rerun resin retch revel revue rhino rhyme rider ridge rifle right rigid rigor rinse ripen risen riser risky ritzy rival river rivet roach roast robin robot rocky rodeo rogue roman roomy roost roots rotor rouge rough round rouse route rowdy royal ruddy rugby ruler rummy rumor runny rural rusty saber sadly saint salad sales salon salsa salty salve sandy santa sassy satan satin sauce saucy sauna saute saver savor savvy scads scald scale scalp scaly scant scare scarf scary scene scent scoff scold scoop scoot scope score scorn scour scout scowl scram scrap screw scrub scuba scuff sedan seedy seize sense serum serve setup seven sever sewer shack shade shady shaft shake shaky shall shame shape share shark sharp shave shawl sheaf shear sheen sheep sheer sheet sheik shelf shell shift shine shiny shirk shirt shoal shock shone shook shoot shore shorn short shout shove shown showy shred shrub shrug shuck shunt shush shyly sidle siege sieve sight silky silly since sinew singe sinus siren sissy sixth sixty skate skier skill skimp skirt skull skunk slack slain slake slang slant slash slate slave sleek sleep sleet slept slice slick slide slime slimy sling slink slope slosh sloth slump slung slunk slurp slush slyly smack small smart smash smear smell smile smirk smith smock smoke smoky snack snafu snail snake snare snarl sneak sneer snide sniff snipe snoop snore snort snout snowy snuck snuff soapy sober softy soggy solar solid solve sonic sorry sound south space spade spank spare spark spasm spate spawn speak spear speck speed spell spelt spend spent spice spicy spiel spike spill spine spire spite splat splay split spoil spoke spoof spook spool spoon sport spout spray spree sprig spurn spurt squad squat squid stack staff stage staid stain stair stake stale stalk stall stamp stand stank stare stark stars start stash state stave steak steal steam steel steep steer stern stick stiff still stilt sting stink stint stock stoic stoke stole stomp stone stony stood stool stoop store stork storm story stout stove strap straw stray strep strew strip strum strut stuck study stuff stump stung stunk stunt style suave suede sugar suite sulky sunny sunup super surge surly swamp swank swarm swear sweat sweep sweet swell swept swift swine swing swipe swirl swish swiss swoon swoop sword swore sworn swung synod syrup tabby table taboo tacit tacky taffy tails taint taken talks tally talon tango tangy taper tardy tarot tarry taste tasty taunt tawny teach tease teddy teens teeth tempo tempt tenet tenor tense tenth tepee tepid terms terra terse testy thank theft their theme there these thick thief thigh thing think third thong thorn those three threw throb throw thumb thump tiara tidal tiger tight timer times timid tinge tinny tipsy tired title tizzy toast today toefl token tongs tonic tooth topic torch torso total totem touch tough towel tower toxic toxin trace track tract trade trail train trait tramp trash trawl tread treat trend trial tribe trick trike trill tripe trite troll tromp troop trout truce truck truly trump trunk trust truth tubby tulip tummy tumor tuner tunic tutor twang tweak tweed tweet twerp twice twine twirl twist udder ulcer uncle uncut under undid undue unfit unify union unite unity untie until unzip upend upper upset urban usage usher usual usurp uteri utter vague valet valid valor value valve vapor vault vegan venom venue venus verge versa verse verve vibes video vigil vigor villa vinyl viola viper viral virgo virus visit visor vista vital vivid vocal vodka vogue voice vomit voter vouch vowel wacky wafer wager wages wagon waist waive waken waltz wanna wares waste watch water waver weary weave wedge weigh weird welsh whack whale wharf wheat wheel where which whiff while whine whirl whisk white whole whoop whose widen widow width wield wiles wimpy wince winch windy wings wiper wired wispy witch witty wives woken woman women woods woody wooly woozy words wordy works world worms worry worse worst worth would wound woven wrath wreak wreck wrest wring wrist write wrong wrote wrung wryly xerox yacht yearn years yeast yield yodel yokel young yours youth yucky yummy zebra);
@@ -58,7 +58,7 @@ sub hexAsWords($)                                                               
 
 #D1 Make and manage utf8 files                                                  # Make and manage files that conform to the L<GBStandard> and are coded in utf8.
 
-sub gbStandardFileName($$)                                                      # Return the L<GBStandard> file name given the content and extension of a proposed file.
+sub gbStandardFileName($$)                                                      #E Return the L<GBStandard> file name given the content and extension of a proposed file.
  {my ($content, $extension) = @_;                                               # Content, extension
   defined($content) or
     confess "Content must be defined";
@@ -69,12 +69,12 @@ sub gbStandardFileName($$)                                                      
   fpe($name.q(_).(useWords ? hexAsWords($md5) : $md5), $extension)              # Add extension
  }
 
-sub gbStandardCompanionFileName($)                                              # Return the name of the companion file given a file whose name complies with the L<GBStandard>.
+sub gbStandardCompanionFileName($)                                              #E Return the name of the companion file given a file whose name complies with the L<GBStandard>.
  {my ($file) = @_;                                                              # L<GBStandard> file name
   setFileExtension($file);                                                      # Remove extension to get companion file name
  }
 
-sub gbStandardCreateFile($$$;$)                                                 # Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>
+sub gbStandardCreateFile($$$;$)                                                 #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>
  {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, contents of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
   my $file   = gbStandardFileName($content, $extension);                        # Entirely satisfactory
@@ -94,7 +94,7 @@ sub gbStandardCreateFile($$$;$)                                                 
   $out
  }
 
-sub gbStandardRename($)                                                         # Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
+sub gbStandardRename($)                                                         #E Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
  {my ($file)   = @_;                                                            # File to check
   my $content  = readFile($file);                                               # Content of proposed file
   my $ext      = fe($file);                                                     # Extension of proposed file
@@ -104,7 +104,7 @@ sub gbStandardRename($)                                                         
   $proposed                                                                     # Fail - the name should be this
  }
 
-sub gbStandardCopyFile($;$)                                                     # Copy a file to the specified B<$target> folder renaming it to the L<GBStandard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GBStandard>.
+sub gbStandardCopyFile($;$)                                                     #E Copy a file to the specified B<$target> folder renaming it to the L<GBStandard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GBStandard>.
  {my ($source, $target) = @_;                                                   # Source file, target folder or a file in the target folder
   -e $source && !-d $source or                                                  # Check that the source file exists and is a file
     confess "Source file to normalize does not exist:\n$source";
@@ -128,7 +128,7 @@ sub gbStandardCopyFile($;$)                                                     
   undef
  }
 
-sub gbStandardDelete($)                                                         # Delete a file and its companion file if there is one.
+sub gbStandardDelete($)                                                         #E Delete a file and its companion file if there is one.
  {my ($file) = @_;                                                              # File to delete
   my $comp   = gbStandardCompanionFileName($file);
   unlink $_ for $comp, $file;
@@ -136,7 +136,7 @@ sub gbStandardDelete($)                                                         
 
 #D1 Make and manage binary files                                                # Make and manage files that conform to the L<GBStandard> and are in plain binary.
 
-sub gbBinaryStandardFileName($$)                                                # Return the L<GBStandard> file name given the content and extension of a proposed file.
+sub gbBinaryStandardFileName($$)                                                #E Return the L<GBStandard> file name given the content and extension of a proposed file.
  {my ($content, $extension) = @_;                                               # Content, extension
   defined($content) or
     confess "Content must be defined";
@@ -147,11 +147,11 @@ sub gbBinaryStandardFileName($$)                                                
   fpe($name.q(_).(useWords ? hexAsWords($md5) : $md5), $extension)              # Add extension
  }
 
-sub gbBinaryStandardCompanionFileName($)                                        # Return the name of the companion file given a file whose name complies with the L<GBStandard>.
+sub gbBinaryStandardCompanionFileName($)                                        #E Return the name of the companion file given a file whose name complies with the L<GBStandard>.
  {my ($file) = @_;                                                              # L<GBStandard> file name
   setFileExtension($file);                                                      # Remove extension to get companion file name
  }
-sub gbBinaryStandardCreateFile($$$;$)                                           # Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>.
+sub gbBinaryStandardCreateFile($$$;$)                                           #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>.
  {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, contents of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
   my $file   = gbBinaryStandardFileName($content, $extension);                  # Entirely satisfactory
@@ -171,7 +171,7 @@ sub gbBinaryStandardCreateFile($$$;$)                                           
   $out
  }
 
-sub gbBinaryStandardRename($)                                                   # Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
+sub gbBinaryStandardRename($)                                                   #E Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
  {my ($file)   = @_;                                                            # File to check
   my $content  = readBinaryFile($file);                                         # Content of proposed file
   my $ext      = fe($file);                                                     # Extension of proposed file
@@ -181,7 +181,7 @@ sub gbBinaryStandardRename($)                                                   
   $proposed                                                                     # Fail - the name should be this
  }
 
-sub gbBinaryStandardCopyFile($;$)                                               # Copy a file to the specified B<$target> folder renaming it to the L<GBStandard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GBStandard>.
+sub gbBinaryStandardCopyFile($;$)                                               #E Copy a file to the specified B<$target> folder renaming it to the L<GBStandard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GBStandard>.
  {my ($source, $target) = @_;                                                   # Source file, target folder or a file in the target folder
   -e $source && !-d $source or                                                  # Check that the source file exists and is a file
     confess "Source file to normalize does not exist:\n$source";
@@ -189,7 +189,7 @@ sub gbBinaryStandardCopyFile($;$)                                               
 
   if ($target and $target ne fp($source))                                       # New target folder specified
    {my $t = fpf($target, $correctName//$source);                                # Target of copy
-    copyFile($source, $t);                                                      # Copy file
+    copyBinaryFile($source, $t);                                                # Copy file
     my $comp = gbBinaryStandardCompanionFileName($source);                      # Companion file
     if (-e $comp)                                                               # Copy companion file if it exists
      {my $t = gbBinaryStandardCompanionFileName($t);                            # Target of copy
@@ -205,13 +205,17 @@ sub gbBinaryStandardCopyFile($;$)                                               
   undef
  }
 
-sub gbBinaryStandardDelete($)                                                   # Delete a file and its companion file if there is one.
+sub gbBinaryStandardDelete($)                                                   #E Delete a file and its companion file if there is one.
  {my ($file) = @_;                                                              # File to delete
   my $comp   = gbBinaryStandardCompanionFileName($file);
   unlink $_ for $comp, $file;
  }
 
 #Doff
+
+say STDERR "gbStandard Exportable Methods:\n",
+ formatTable(reportExportableMethods($0)) if 0;
+
 #-------------------------------------------------------------------------------
 # Export
 #-------------------------------------------------------------------------------
@@ -222,7 +226,18 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA          = qw(Exporter);
 @EXPORT_OK    = qw(
-
+gbBinaryStandardCompanionFileName
+gbBinaryStandardCopyFile
+gbBinaryStandardCreateFile
+gbBinaryStandardDelete
+gbBinaryStandardFileName
+gbBinaryStandardRename
+gbStandardCompanionFileName
+gbStandardCopyFile
+gbStandardCreateFile
+gbStandardDelete
+gbStandardFileName
+gbStandardRename
 );
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
@@ -259,7 +274,15 @@ standard is being used and then, for files that do not contain a B<title> tag:
 
 For files that do contain a B<title> tag the content of the B<title> tag is
 processed as described above to obtain the human readable component of the file
-name.
+name. If any of the following L<Dita> tags are found in a source file which
+also contains a B<title> tag then the following codes are prefixed to this
+file name as well:
+
+  Code      Tag
+  bm_       bookmap
+  c_        concept
+  r_        reference
+  t_        task
 
 The L<md5> component of the file name is calculated from the content of the
 file and presented as lowercase hexadecimal.
@@ -279,13 +302,6 @@ If the option to present the L<md5> sum as five letter English words is chosen
 then the standardized name for this content becomes:
 
  abc_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.xml
-
-`head2 Companion Files
-
-Each file produced by the L<GBStandard> can have a companion file of the same
-name but without an extension.  The companion file contains meta-data about the
-file such as its original location etc. which can be searched by L<grep> or
-similar.
 
 `head2 Benefits
 
@@ -347,9 +363,6 @@ This grouping signals that these files are potentially similar to each other.
 
 As the user applies the L<GBStandard> to more files, more such matches occur.
 
-Files name using the L<GBStandard> behave like L<Bosons> - they like to enter
-the same state to obtain a L<laser> like focus.
-
 `head3 Copying And Moving Files For Global Interoperability
 
 Users can copy files named using the L<GBStandard> around from folder to folder
@@ -388,6 +401,13 @@ pasted into other documents.
 Conversely, one has to use cut and paste to manipulate such file names making
 it impossible to misspell such file names in other documents.
 
+`head3 CSV files
+
+Files named using the L<GBStandard> can be safely included in csv files!
+
+Conversely, one has to use cut and paste to manipulate such file names making
+it impossible to misspell such file names in other documents.
+
 `head3 Automatic File Versioning
 
 Files named to the L<GBStandard> File names change when their content changes.
@@ -403,6 +423,11 @@ L<commandLine> tools that are used to manipulate such files enhancing the
 productivity leverage that L<commandLine> has versus L<GUI> processing.
 
 `head3 Locating Files by Their Original Names Or Other Meta-Data
+
+Each file produced by the L<GBStandard> can have a companion file of the same
+name but without an extension.  The companion file contains meta-data about the
+file such as its original location etc. which can be searched by L<grep> or
+similar.
 
 The companion file contains information about a file named using the
 L<GBStandard> such as its original file name and other meta data.
@@ -437,6 +462,12 @@ Files that are expected to contain binary data (eg .png, .jpg) should use
 method names that start with:
 
  gbBinaryStandard
+
+`head2 Documentation Copyright
+
+The documentation for this module is dual licensed with the L<gnuFDL> as well
+as the L<perlAL> in the hope that this will encourage its further dissemination
+as a universal standard.
 
 END
 
@@ -479,7 +510,15 @@ standard is being used and then, for files that do not contain a B<title> tag:
 
 For files that do contain a B<title> tag the content of the B<title> tag is
 processed as described above to obtain the human readable component of the file
-name.
+name. If any of the following L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> tags are found in a source file which
+also contains a B<title> tag then the following codes are prefixed to this
+file name as well:
+
+  Code      Tag
+  bm_       bookmap
+  c_        concept
+  r_        reference
+  t_        task
 
 The L<md5 sum|https://en.wikipedia.org/wiki/MD5> component of the file name is calculated from the content of the
 file and presented as lowercase hexadecimal.
@@ -499,13 +538,6 @@ If the option to present the L<md5 sum|https://en.wikipedia.org/wiki/MD5> sum as
 then the standardized name for this content becomes:
 
  abc_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.xml
-
-=head2 Companion Files
-
-Each file produced by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can have a companion file of the same
-name but without an extension.  The companion file contains meta-data about the
-file such as its original location etc. which can be searched by L<grep|https://en.wikipedia.org/wiki/Grep> or
-similar.
 
 =head2 Benefits
 
@@ -567,9 +599,6 @@ This grouping signals that these files are potentially similar to each other.
 
 As the user applies the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> to more files, more such matches occur.
 
-Files name using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> behave like L<Bosons> - they like to enter
-the same state to obtain a L<laser|https://en.wikipedia.org/wiki/Laser> like focus.
-
 =head3 Copying And Moving Files For Global Interoperability
 
 Users can copy files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> around from folder to folder
@@ -608,6 +637,13 @@ pasted into other documents.
 Conversely, one has to use cut and paste to manipulate such file names making
 it impossible to misspell such file names in other documents.
 
+=head3 CSV files
+
+Files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be safely included in csv files!
+
+Conversely, one has to use cut and paste to manipulate such file names making
+it impossible to misspell such file names in other documents.
+
 =head3 Automatic File Versioning
 
 Files named to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> File names change when their content changes.
@@ -623,6 +659,11 @@ L<command line|https://en.wikipedia.org/wiki/Command-line_interface> tools that 
 productivity leverage that L<command line|https://en.wikipedia.org/wiki/Command-line_interface> has versus L<graphical user interface|https://en.wikipedia.org/wiki/Graphical_user_interface> processing.
 
 =head3 Locating Files by Their Original Names Or Other Meta-Data
+
+Each file produced by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can have a companion file of the same
+name but without an extension.  The companion file contains meta-data about the
+file such as its original location etc. which can be searched by L<grep|https://en.wikipedia.org/wiki/Grep> or
+similar.
 
 The companion file contains information about a file named using the
 L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> such as its original file name and other meta data.
@@ -658,12 +699,18 @@ method names that start with:
 
  gbBinaryStandard
 
+=head2 Documentation Copyright
+
+The documentation for this module is dual licensed with the L<GNU Free Documentation License|https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License> as well
+as the L<Perl Artistic Licence|https://dev.perl.org/licenses/artistic.html> in the hope that this will encourage its further dissemination
+as a universal standard.
+
 =head1 Description
 
 The Gearhart-Brenan Dita Topic Naming Standard.
 
 
-Version "20190504".
+Version "20190505".
 
 
 The following sections describe the methods in each functional area of this
@@ -696,6 +743,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardFileName)
+
+
 =head2 gbStandardCompanionFileName($)
 
 Return the name of the companion file given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
@@ -708,6 +760,11 @@ B<Example:>
 
   ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);                             
   
+
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardCompanionFileName)
+
 
 =head2 gbStandardCreateFile($$$$)
 
@@ -755,6 +812,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardCreateFile)
+
+
 =head2 gbStandardRename($)
 
 Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>. Return the correct name for the file or  B<undef> if the name is already correct.
@@ -797,6 +859,11 @@ B<Example:>
     clearFolder($_, 10) for $d, $D;
    }
   
+
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardRename)
+
 
 =head2 gbStandardCopyFile($$)
 
@@ -842,6 +909,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardCopyFile)
+
+
 =head2 gbStandardDelete($)
 
 Delete a file and its companion file if there is one.
@@ -885,6 +957,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardDelete)
+
+
 =head1 Make and manage binary files
 
 Make and manage files that conform to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> and are in plain binary.
@@ -910,6 +987,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardFileName)
+
+
 =head2 gbBinaryStandardCompanionFileName($)
 
 Return the name of the companion file given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
@@ -922,6 +1004,11 @@ B<Example:>
 
   ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);                       
   
+
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardCompanionFileName)
+
 
 =head2 gbBinaryStandardCreateFile($$$$)
 
@@ -969,6 +1056,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardCreateFile)
+
+
 =head2 gbBinaryStandardRename($)
 
 Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>. Return the correct name for the file or  B<undef> if the name is already correct.
@@ -1011,6 +1103,11 @@ B<Example:>
     clearFolder($_, 10) for $d, $D;
    }
   
+
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardRename)
+
 
 =head2 gbBinaryStandardCopyFile($$)
 
@@ -1056,6 +1153,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardCopyFile)
+
+
 =head2 gbBinaryStandardDelete($)
 
 Delete a file and its companion file if there is one.
@@ -1099,6 +1201,11 @@ B<Example:>
    }
   
 
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardDelete)
+
+
 
 =head1 Index
 
@@ -1126,6 +1233,44 @@ B<Example:>
 11 L<gbStandardFileName|/gbStandardFileName> - Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name given the content and extension of a proposed file.
 
 12 L<gbStandardRename|/gbStandardRename> - Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+
+
+
+=head1 Exports
+
+All of the following methods can be imported via:
+
+  use Dita::GB::Standard qw(:all);
+
+Or individually via:
+
+  use Dita::GB::Standard qw(<method>);
+
+
+
+1 L<gbBinaryStandardCompanionFileName|/gbBinaryStandardCompanionFileName>
+
+2 L<gbBinaryStandardCopyFile|/gbBinaryStandardCopyFile>
+
+3 L<gbBinaryStandardCreateFile|/gbBinaryStandardCreateFile>
+
+4 L<gbBinaryStandardDelete|/gbBinaryStandardDelete>
+
+5 L<gbBinaryStandardFileName|/gbBinaryStandardFileName>
+
+6 L<gbBinaryStandardRename|/gbBinaryStandardRename>
+
+7 L<gbStandardCompanionFileName|/gbStandardCompanionFileName>
+
+8 L<gbStandardCopyFile|/gbStandardCopyFile>
+
+9 L<gbStandardCreateFile|/gbStandardCreateFile>
+
+10 L<gbStandardDelete|/gbStandardDelete>
+
+11 L<gbStandardFileName|/gbStandardFileName>
+
+12 L<gbStandardRename|/gbStandardRename>
 
 =head1 Installation
 

@@ -25,18 +25,19 @@ no_index:
 provides:
   Test::Time:
     file: lib/Test/Time.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Test::More: '0'
 resources:
   bugtracker: https://github.com/cho45/Test-Time/issues
   homepage: https://github.com/cho45/Test-Time
   repository: git://github.com/cho45/Test-Time.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'minimalist <minimalist@lavabit.com>'
   - 'motemen <motemen@gmail.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Michael Jemmeson <mjemmeson@cpan.org>'
   - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

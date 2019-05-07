@@ -35,7 +35,6 @@
             "Text::Textile" : "0",
             "Time::HiRes" : "0",
             "XML::Atom::SimpleFeed" : "0.900",
-            "XML::Feed" : "0",
             "perl" : "v5.10.0"
          }
       }
@@ -43,7 +42,7 @@
    "provides" : {
       "App::WRT" : {
          "file" : "lib/App/WRT.pm",
-         "version" : "v5.0.0"
+         "version" : "v6.0.0"
       },
       "App::WRT::Date" : {
          "file" : "lib/App/WRT/Date.pm"
@@ -73,6 +72,6 @@
          "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v5.0.0",
+   "version" : "v6.0.0",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

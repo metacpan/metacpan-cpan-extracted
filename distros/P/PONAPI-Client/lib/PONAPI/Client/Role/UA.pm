@@ -22,7 +22,7 @@ PONAPI::Client::Role::UA - An interface role for supporting UAs
 
 =head1 VERSION
 
-version 0.002010
+version 0.002011
 
 =head1 AUTHORS
 
@@ -44,7 +44,7 @@ Brian Fraser <hugmeir@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Mickey Nasriachi, Stevan Little, Brian Fraser.
+This software is copyright (c) 2019 by Mickey Nasriachi, Stevan Little, Brian Fraser.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

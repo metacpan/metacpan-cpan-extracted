@@ -1,3 +1,9 @@
+0.651   2019-05-06 (PERLANCAR)
+
+	- Rebuild with WWW::PAUSE::Simple 0.443 (--{size,mtime}-{min,max}
+	  options).
+
+
 0.650   2018-10-09 (PERLANCAR)
 
 	- No functional changes.

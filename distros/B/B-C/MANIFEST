@@ -60,6 +60,7 @@ Stash/Stash.pm
 Stash/Stash.xs
 TESTS
 Todo
+appveyor.yml
 bytecode.pl
 cc_runtime.h
 hints/darwin.pl
@@ -92,8 +93,14 @@ log.modules-5.018004
 log.modules-5.018004-nt
 log.modules-5.020003
 log.modules-5.020003-nt
-log.modules-5.022000
-log.modules-5.022000-nt
+log.modules-5.022004-nt
+log.modules-5.022005c-nt
+log.modules-5.024004-nt
+log.modules-5.024004c-nt
+log.modules-5.026003-nt
+log.modules-5.026005c-nt
+log.modules-5.028002-nt
+log.modules-5.028002c-nt
 perlcompile.pod
 perloptree.pod
 ramblings/5.22-problems.md
@@ -119,6 +126,7 @@ ramblings/module-sizes
 ramblings/more-opts.md
 ramblings/next-steps.md
 ramblings/order_of_evaluation
+ramblings/pvcow.md
 ramblings/reg.alloc
 ramblings/remark.js
 ramblings/revert-B-load-BEGIN-514.patch
@@ -135,6 +143,7 @@ ramblings/yapceu2015/B-C.p1.png
 ramblings/yapceu_2010.pod
 regen_lib.pl
 script/assemble
+script/buildcc.PL
 script/cc_harness
 script/disassemble
 script/perlcc.PL
@@ -152,6 +161,7 @@ t/bytecode.t
 t/c.t
 t/c_allow_opts.t
 t/c_argv.t
+t/c_cross.t
 t/c_o1.t
 t/c_o2.t
 t/c_o3.t
@@ -160,6 +170,7 @@ t/cc.t
 t/cc_last.t
 t/cc_o1.t
 t/cc_o2.t
+t/config.sh-arm-linux
 t/core-init.sh
 t/coreall.sh
 t/coverage.sh
@@ -273,6 +284,7 @@ t/pg.pl
 t/qr_loaded_module.pm
 t/regex-dna.pl
 t/release-testing.sh
+t/sigs.t
 t/stash.t
 t/stashes.t
 t/test10

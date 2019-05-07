@@ -43,6 +43,9 @@ no  warnings 'uninitialized';
 use Getopt::Long;
 use Pod::Usage;
 use App::WRT;
+use App::WRT::Renderer;
+
+use App::WRT::Util qw(file_put_contents);
 
 # Handle options, including help generated from the POD above.  See:
 # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
@@ -58,9 +61,17 @@ unless (-e $config_file) {
   die "No wrt config file found.  Tried: $config_file";
 }
 
-my $w = App::WRT::new_from_file($config_file);
+my $wrt = App::WRT::new_from_file($config_file);
 
-# This expects a callback to handle logging output:
-$w->render(sub { say $_[0]; });
+# This expects a callback to handle logging output and a callback to handle
+# file writing:
+
+my $renderer = App::WRT::Renderer->new(
+  $wrt,
+  sub { say $_[0]; },
+  sub { file_put_contents($_[0], $_[1]); },
+);
+
+$renderer->render();
 
 exit(0);

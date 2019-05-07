@@ -21,7 +21,6 @@ my $build = Module::Build->new(
     'Text::Textile'            => 0,
     'Time::HiRes'              => 0,
     'XML::Atom::SimpleFeed'    => '0.900',
-    'XML::Feed'                => 0,
     'perl'                     => '5.10.0',
   },
 

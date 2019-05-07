@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1734 2019-03-19 10:54:14Z willem $"
+#define XS_Id "$Id: SEC.xs 1744 2019-04-29 08:47:46Z willem $"
 
 
 =head1 NAME
@@ -49,6 +49,7 @@ extern "C" {
 
 #include <openssl/opensslv.h>
 #include <openssl/evp.h>
+#include <openssl/bn.h>
 #include <openssl/dsa.h>
 #include <openssl/ec.h>
 #include <openssl/ecdsa.h>
@@ -70,53 +71,66 @@ extern "C" {
 #endif
 
 
-#ifndef OPENSSL_VERSION_NUMBER
-#define OPENSSL_VERSION_NUMBER 0x40000000L	/* avert disaster */
+#ifndef OPENSSL_VERSION_NUMBER		/* 0xMNN00PPSL	backward compatible unto the end */
+#ifdef OPENSSL_VERSION_PRE_RELEASE
+#define _OPENSSL_VERSION_PRE_RELEASE 0x0L
+#else
+#define _OPENSSL_VERSION_PRE_RELEASE 0xfL
 #endif
-
+#define OPENSSL_VERSION_NUMBER  \
+	( (OPENSSL_VERSION_MAJOR<<28) | (OPENSSL_VERSION_MINOR<<20)  \
+	| (OPENSSL_VERSION_PATCH<<4)  | _OPENSSL_VERSION_PRE_RELEASE )
+#endif
 
 #define LIBCRYPTO_VERSION OPENSSL_VERSION_NUMBER
+
+
 #ifdef LIBRESSL_VERSION_NUMBER
-#undef  LIBCRYPTO_VERSION
-#define LIBCRYPTO_VERSION LIBRESSL_VERSION_NUMBER
-#undef  OPENSSL_VERSION_NUMBER
-#define OPENSSL_VERSION_NUMBER 0x10100000L
-#if (LIBRESSL_VERSION_NUMBER < 0x20700000L)
-#undef  OPENSSL_VERSION_NUMBER
+#undef OPENSSL_VERSION_NUMBER
+#if (LIBRESSL_VERSION_NUMBER < 0x20700000)
 #define OPENSSL_VERSION_NUMBER 0x10002000L
-#endif
+#else
+#define OPENSSL_VERSION_NUMBER 0x10100000L
 #define BN_bn2binpad(a, to, tolen) BN_bn2bin(a, to)
 #endif
+#undef LIBCRYPTO_VERSION
+#define LIBCRYPTO_VERSION LIBRESSL_VERSION_NUMBER
+#endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x30000000L)
+#ifdef OPENSSL_IS_BORINGSSL
+#define NO_ECCGOST
+#endif
+
+
+#if (OPENSSL_VERSION_NUMBER < 0x30000000)
 #define EC_POINT_set_affine_coordinates	EC_POINT_set_affine_coordinates_GFp
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x10101000L)
+#if (OPENSSL_VERSION_NUMBER < 0x10101000)
 #undef NO_EdDSA
 #define NO_EdDSA
 
 int EVP_DigestSign(EVP_MD_CTX *ctx,
-		unsigned char *sigret, size_t *siglen,
-		unsigned char *tbs, size_t tbslen)
+		unsigned char *sig, size_t *sig_len,
+		const unsigned char *data, size_t data_len)
 {
-	EVP_DigestUpdate( ctx, tbs, tbslen );
-	return EVP_DigestSignFinal( ctx, sigret, siglen );
+	EVP_DigestUpdate( ctx, data, data_len );
+	return EVP_DigestSignFinal( ctx, sig, sig_len );
 }
 
 int EVP_DigestVerify(EVP_MD_CTX *ctx,
-		unsigned char *sigret, size_t siglen,
-		unsigned char *tbs, size_t tbslen)
+		const unsigned char *sig, size_t sig_len,
+		const unsigned char *data, size_t data_len)
 {
-	EVP_DigestUpdate( ctx, tbs, tbslen );
-	return EVP_DigestVerifyFinal( ctx, sigret, siglen );
+	EVP_DigestUpdate( ctx, data, data_len );
+	return EVP_DigestVerifyFinal( ctx, sig, sig_len );
 }
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+#if (OPENSSL_VERSION_NUMBER < 0x10100000)
 #undef NO_ECCGOST
 #define NO_ECCGOST
 
@@ -166,7 +180,7 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x10001000L)
+#if (OPENSSL_VERSION_NUMBER < 0x10001000)
 #define NO_ECDSA
 #error	unsupported libcrypto version
 void malfunction() { return LIBCRYPTO_VERSION; }
@@ -194,7 +208,7 @@ int checkret(const int ret, int line)
 
 MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
 
-PROTOTYPES: DISABLE
+PROTOTYPES: ENABLE
 
 SV*
 VERSION(void)
@@ -204,7 +218,7 @@ VERSION(void)
     CODE:
 	v = (char*) SvEND(v_SV);
 	v = v - 4;
-	RETVAL = newSVpvf( "%s %8.8lx", v, LIBCRYPTO_VERSION );
+	RETVAL = newSVpvf( "%s %8.8x", v, (unsigned int) LIBCRYPTO_VERSION );
     OUTPUT:
 	RETVAL
 

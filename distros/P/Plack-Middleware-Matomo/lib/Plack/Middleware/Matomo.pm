@@ -1,6 +1,6 @@
 package Plack::Middleware::Matomo;
 
-our $VERSION = '0.05';
+our $VERSION = '0.10';
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use AnyEvent::HTTP;
 use Log::Any '$log';
 use Plack::Request;
 use Plack::Util::Accessor
-    qw(apiv base_url idsite token_auth time_format oai_identifier_format view_paths download_paths);
+    qw(apiv base_url idsite token_auth time_format oai_identifier_format view_paths download_paths ua urlref);
 use URI;
 
 use parent 'Plack::Middleware';
@@ -62,11 +62,12 @@ sub call {
         rand        => $rand,
         rec         => 1,
         token_auth  => $self->token_auth,
-        ua          => $request->user_agent // 'Mozilla',
         url         => $request->uri,
-        urlref      => $request->referer // '',
         visitIP     => $ip,
     };
+
+    $event->{ua} = $request->user_agent if $self->ua;
+    $event->{urlref} = $request->referer if $self->urlref;
 
     if ($action eq 'download') {
         $event->{download} = $request->uri;
@@ -156,6 +157,14 @@ One of these is required. Provide an array ref of regexes to match.
 =item oai_identifier_format
 
 Required. The format of the OAI identifier format of the repository.
+
+=item ua
+
+Set to 1 if user agent information should be passed to matomo.
+
+=item urlref
+
+Set to 1 if url referer should be passed to matomo.
 
 =back
 

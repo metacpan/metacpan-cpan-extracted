@@ -101,7 +101,7 @@ sub cc_harness_msvc {
       $Output = $cfile;
       $Output =~ s/\.c$/.exe/;
     }
-    my $compile = ccopts." -c @ARGV ";
+    my $compile = ccopts()." -c @ARGV ";
     if ($debug) {
       $compile .= "/Wall " if !$quiet;
       # remove conflicting flags
@@ -110,7 +110,10 @@ sub cc_harness_msvc {
       $compile =~ s/ -DNDEBUG / -DDEBUG /;
     } else {
       # avoid expensive optimisations with low memory (1-2 hours!)
-      $compile .= " -Od" if $ENV{APPVEYOR};
+      $compile .= " -Od" if $ENV{APPVEYOR} and $^O eq 'MSWin32';
+      if ($ENV{PERL_CORE} and $Config{ccflags} =~ /-flto/) { # too big
+        $compile =~ s/-O\d / -O1 /;
+      }
     }
     $compile .= "-DHAVE_INDEPENDENT_COMALLOC " if $B::C::Config::have_independent_comalloc;
     $compile .= $B::C::Config::extra_cflags;
@@ -128,11 +131,12 @@ sub cc_harness_msvc {
     } else {
         $link .= " ".ldopts("-std");
     }
+    $link .= " ".$Config{optimize};
     if ($debug) {
         $link .= " /DEBUG";
     } else {
       # avoid expensive folding with low memory
-      $link .= " /OPT:NOREF" if $ENV{APPVEYOR};
+      $link .= " /OPT:NOREF" if $ENV{APPVEYOR} and $^O eq 'MSWin32';
     }
     if (index($link, "Win32CORE") < 0) {
         my $archdir = $ENV{PERL_CORE} ? "../.." : $Config{archlib};
@@ -158,15 +162,15 @@ if ($^O eq 'MSWin32' && $Config{cc} =~ 'cl') {
 #  $linkargs =~ s/ -opt:ref,icf//;
 #}
 
-my $ccflags = $Config{ccflags};
+my $ccflags = $Config{optimize}." ".$Config{ccflags};
 # crashes on cygwin
-if ($^O eq 'cygwin' and $ccflags =~ /-fstack-protector\b/
-                    and $linkargs =~ /-fstack-protector\b/)
+if ($^O eq 'cygwin' and $ccflags =~ /-fstack-protector /
+                    and $linkargs =~ /-fstack-protector /)
 {
-  $linkargs =~ s/-fstack-protector\b//;
+  $linkargs =~ s/-fstack-protector //;
 }
 #-pedantic -Wextra -Wconversion
-if ($debug and $Config{cc} =~ /gcc/) {
+if ($debug and $Config{cc} =~ /\bgcc/ and $Config{gccversion}) {
   $ccflags .= " -ansi -Wall -Wshadow -Wcast-qual -Wwrite-strings"
     if !$quiet;
   # remove conflicting flags, esp. -s for strip
@@ -177,7 +181,7 @@ if ($debug and $Config{cc} =~ /gcc/) {
 
 # -Wl,--warn-once is not gold compatible
 $ccflags .= " --no-warn"
-  if $Config{cc} =~ /gcc/ and $quiet and $^O ne 'darwin';
+  if $Config{cc} =~ /\bgcc/ and $Config{gccversion} and $quiet and $^O ne 'darwin';
 $ccflags .= " -DHAVE_INDEPENDENT_COMALLOC" if $B::C::Config::have_independent_comalloc;
 $ccflags .= $B::C::Config::extra_cflags;
 

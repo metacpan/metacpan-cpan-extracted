@@ -63,8 +63,9 @@ $player->set_video_callbacks(
 		$p->queue_new_picture(id => ++$next_pic_id) while $p->queued_picture_count < 8
 	},
 	display => sub {
-		$player->queue_picture($cur_pic) if $cur_pic;
-		$cur_pic= $_[1]{picture};
+		my ($p, $event)= @_;
+		$p->queue_picture($cur_pic) if $cur_pic;
+		$cur_pic= $event->{picture};
 	},
 );
 $player->media(shift);

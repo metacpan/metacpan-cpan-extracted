@@ -1,12 +1,11 @@
 	The B::C, B::CC, B::Bytecode Perl Compiler Kit
 
-	Copyright (c) 1996, 1997, Malcolm Beattie
-	Copyright (c) 2008, 2009, 2010, 2011 Reini Urban
-	Copyright (c) 2012, 2013, 2014, 2015, 2016, 2017 cPanel Inc
+	Copyright (c) 1996-1997 Malcolm Beattie
+	Copyright (c) 2008-2011, 2017-2019 Reini Urban
+	Copyright (c) 2012-2017 cPanel Inc
 
-Homepage: http://www.perl-compiler.org/
-Releases: http://search.cpan.org/dist/B-C/
-Code:     http://github.com/rurban/perl-compiler/
+Releases:    http://search.cpan.org/dist/B-C/
+Code+Issues: http://github.com/rurban/perl-compiler/
   (was until 2016 at http://code.google.com/p/perl-compiler/)
 
 OVERVIEW
@@ -14,8 +13,6 @@ OVERVIEW
 Malcom Beattie's perl compiler ("perlcc") updated to 5.10 - 5.24 and cperl,
 with most bugs fixed (also for 5.6. and 5.8) and new features
 added. It compiles to C or platform-compatible Bytecode.
-
-Releases are at http://search.cpan.org/dist/B-C/
 
 Development is in the master branch at https://github.com/rurban/perl-compiler,
 the stable branch is called 'release', the newest perl releases usually don't work
@@ -28,11 +25,11 @@ Known issues:
 * run-time attributes (e.g. use open attributes, Attribute::Handlers, ...),
   but ok at compile-time.
 
-* compile-time perlio layers are not restored
-
 * some compile-time side-effects can not be reproduced when running a compiled
   binary, such as BEGIN { chdir $dir }, i.e. most system and IO calls. use
   INIT {} instead.
+
+* p5p Carp >= 1.42 is broken. 5.26++, rather use cperl.
 
 * Certain XS module using compile-time pointers need special workarounds:
 
@@ -218,6 +215,20 @@ to ensure that linked-against .so files are found at runtime too.
 
 Read about perlcc --staticxs
 
+CROSS COMPILATION
+
+Small devices often do not have enough memory or not even an installed
+compiler to compile to a compiled perl executable. In this case you
+need the target config.sh on your filesystem, and pass it as
+-cross=pathto/config.sh option to the compiler. Several host config
+values will then be replaced by its target values, so that it can be
+run on the target system with the target configuration.  Esp. for the
+target specific @INC, which must find run-time modules in its path.
+Note that the basic architecture must still match, i.e. the perl
+version and the settings for usemultiplicity and useithreads must be
+the same as on the host.  It's is strongly recommended to also have
+the same byteorder, ivsize and nvsize settings on the native host.
+
 DIFFERENCES
 
 The result of running a CC compiled Perl program can sometimes be different
@@ -349,7 +360,7 @@ LICENSE
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 Reini Urban
-2017-02-10
+2019-05-06
 
 Malcolm Beattie
 2 September 1996

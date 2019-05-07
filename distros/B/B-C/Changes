@@ -3,6 +3,51 @@
 	The Perl compiler was in CORE from alpha4 until Perl 5.9.4
 	and worked quite fine with Perl 5.6 and 5.8.
 
+1.57 2019-05-07 rurban
+        * Makefile.PL: fix wrong t/modules.pm dependency
+
+1.56 2019-05-06 rurban
+        * CC 1.16_03: Fixup illegal goto lab_0; (#425)
+        * C: Support -cross=<path/config.sh> (#428),
+        improved -m modul support compiling to a shared lib (#340)
+          (yet untested and unused),
+        add -DPERL_GLOBAL_STRUCT support,
+        fix removed _OP_SIBPARENT_FIELDNAME.
+        * skip many slow -flto tests on smokers.
+
+1.55_10 2018-11-06 rurban
+        * C: Add missing optimize flags, required with -flto
+        * tests: honor and set SKIP_SLOW_TESTS, esp.
+        for -flto and resulting CI timeouts
+
+1.55_09 2018-10-21 rurban
+        * C: Extended mconcat support (aatomic)
+
+1.55_08 2018-03-09 rurban
+        * C: fixed REGEXP since 5.27.3, issue 143.
+        * fixed t.testc.sh PERL_CORE check
+
+1.55_07 2018-03-09 rurban
+        * C: one global dJMPENV target, not multiple
+        * CC 1.16_02: one global dJMPENV target, not multiple
+        * ByteLoader 0.12: fix bytecode types, xgv_flags, xcv_flag were too small.
+          type bs_sv to also include PADNAME, PADLIST, PADNAMELIST as union.
+
+1.55_06 2017-11-24 rurban
+        Added OP_MULTICONCAT support
+
+1.55_05 2017-11-12 rurban
+        Not yet for 5.26/blead, only cperl-5.26
+
+        Fix hints/522_patched.pl dependency on C.so [cpan #120161]
+        Fixed t/sigs.t test TODOs
+        Beautified t/c*.t TODO output
+        * C: More support up to 5.25.8/v5.27.1c
+        PUSHRE replaced by SPLIT, no xpad_cop_seq, PERL_OP_PARENT, SVpbm_VALID
+        Improved dl_module_to_sofile without 2nd arg
+        Avoid CvNAMED ->GV vivification [cperl #63, toddr]
+        Support POK/PVLV REGEXP for v5.27.3/v5.27.2c
+
 1.55 2017-02-10 rurban
         * C: Support 5.24 and 5.24c (ByteLoader and CC got broken with 5.22)
         Handle cperl OP_SIGNATURE,  but not 5.26 signatures with its 3 new ops.

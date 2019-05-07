@@ -1,7 +1,7 @@
 package Acme::CPANAuthors::Indonesian;
 
-our $DATE = '2018-04-11'; # DATE
-our $VERSION = '0.051'; # VERSION
+our $DATE = '2019-05-06'; # DATE
+our $VERSION = '0.052'; # VERSION
 
 use strict;
 use warnings;
@@ -31,7 +31,7 @@ Acme::CPANAuthors::Indonesian - We are Indonesian CPAN authors (Kami para penuli
 
 =head1 VERSION
 
-This document describes version 0.051 of Acme::CPANAuthors::Indonesian (from Perl distribution Acme-CPANAuthors-Indonesian), released on 2018-04-11.
+This document describes version 0.052 of Acme::CPANAuthors::Indonesian (from Perl distribution Acme-CPANAuthors-Indonesian), released on 2019-05-06.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,9 @@ feature.
 
 =head1 SEE ALSO
 
-L<Acme::CPANAuthors> - Main class to manipulate this one
+L<Acme::CPANAuthors> - Main class to manipulate this one.
+
+L<Acme::CPANAuthors::Malaysian> - Our neighbouring country.
 
 =head1 AUTHOR
 
@@ -85,7 +87,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

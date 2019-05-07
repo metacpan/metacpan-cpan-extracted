@@ -1,7 +1,7 @@
 package Log::ger::Util;
 
-our $DATE = '2019-04-13'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2019-05-06'; # DATE
+our $VERSION = '0.028'; # VERSION
 
 use strict;
 use warnings;
@@ -28,6 +28,7 @@ sub _dump {
                 local $Data::Dumper::Quotekeys = 0;
                 local $Data::Dumper::Sortkeys = 1;
                 local $Data::Dumper::Trailingcomma = 1;
+                local $Data::Dumper::Useqq = 1; # to show "\034", possible bug in Data::Dumper
                 Data::Dumper::Dumper($_[0]);
             };
         } else {
@@ -287,7 +288,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

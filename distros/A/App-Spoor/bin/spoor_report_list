@@ -1,0 +1,27 @@
+#!/usr/bin/perl -T
+
+use strict;
+use warnings;
+use utf8;
+use v5.10;
+
+use App::Spoor::Security;
+
+App::Spoor::Security::check_config_directory($<) || die("Security concerns with the config directory. Exiting.\n");
+App::Spoor::Security::check_config_file($<) || die("Security concerns with the config file. Exiting.\n");
+
+use App::Spoor::Config;
+use App::Spoor::ApiClient;
+use App::Spoor::OutputFormatter;
+
+use LWP::UserAgent;
+use LWP::Protocol::https;
+use Sys::Hostname;
+
+my $transmission_config = App::Spoor::Config::get_transmission_config();
+my $hostname = hostname;
+
+App::Spoor::OutputFormatter::print(
+  'report',
+  App::Spoor::ApiClient::most_recent_reports($hostname, LWP::UserAgent->new, $transmission_config)
+);

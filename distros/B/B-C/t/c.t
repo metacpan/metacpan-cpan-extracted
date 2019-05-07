@@ -13,6 +13,7 @@ BEGIN {
 use strict;
 #my $DEBUGGING = ($Config{ccflags} =~ m/-DDEBUGGING/);
 #my $ITHREADS  = ($Config{useithreads});
+$ENV{SKIP_SLOW_TESTS} = 1 if $Config{ccflags} =~ /-flto|-fsanitize/;
 
 prepare_c_tests();
 
@@ -21,5 +22,6 @@ my @skip = ();
 #push @skip, 29 if $] > 5.015; #hangs at while Perl_hfree_next_entry hv.c:1670
 push @skip, (21,38) if $^O eq 'cygwin'; #hangs
 # 38 hangs in IO reading from /dev/null
+push @todo, (27,41,44,45,49) if $^O eq 'cygwin'; #SEGV
 
 run_c_tests("C", \@todo, \@skip);

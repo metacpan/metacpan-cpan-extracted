@@ -1,5 +1,8 @@
 Revision history for Graph-Traverse
 
+0.03  2019-05-06 16:34:31 MST
+        - Correct required Perl version. Standardise method parameter descriptions.
+
 0.02  2019-03-06 08:25:44 MST
         - Bump Perl version for package-with-version syntax
 

@@ -1,5 +1,42 @@
 Revision history for App::WRT
 
+v6.0.0 2019-05-06
+
+  - App::WRT::Date
+    - Move month_name() in here from App::WRT, add tests.
+  - App::WRT::EntryStore:
+    - Hash file types for entries (directory or flatfile)
+    - Use keys of file type hash for complete list of entries.
+    - has_prop($entry, $property)
+    - is_dir($entry), is_file($entry), is_extant($entry)
+    - parent_of($entry)
+    - has_index($entry)
+    - Make EntryStore cache whether a file is a flatfile or a directory, as
+      well as its existence, in a single hash.
+    - Include index flatfiles in @source_files for use by has_index()
+    - Various tests.
+  - App::WRT::FileIO
+    - Still duplicates a bunch of shit from Util, so that needs sorted.
+  - App::WRT::Renderer
+    - Convert to a proper class.
+    - Add experimental FileIO class to use in Renderer (imperfect,
+      tricky, still thinking about this).  The idea is to separate out the
+      concerns of reading and writing the filesystem.
+  - App::WRT
+    - Refactor display() and improve tests
+      - Use "@entries" instead of "@options" for clarity
+      - Handle entry names that might evaluate as false
+      - Test running display() without any params
+    - Rename expand_option() -> expand_alias(), refactor
+    - Use EntryStore::has_prop() to detect wrt-noexpand.prop
+    - year(), month(), entry() partially rewritten to use EntryStore
+    - year() should handle months which are a flatfile
+    - Refactor icon_markup() to use is_file() / is_dir() / is_extant(),
+      add tests.
+    - Add subtitle to feeds
+  - bin/wrt-ls is now a "modulino" with tests
+  - bin/display errors on non-existent entries
+
 v5.0.0 2019-04-14
 
   - Add bin/wrt-ls for listing entries in current archive

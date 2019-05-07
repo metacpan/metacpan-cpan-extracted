@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.13 May 6, 2019
+
+	Tweaks to resolve compilation errors with BoringSSL.
+
+
 **** 1.12 Mar 19, 2019
 
 	Avoid use of EC_POINT_set_affine_coordinates_GFp which is
@@ -612,4 +617,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1735 2019-03-19 10:56:00Z willem $
+$Id: Changes 1746 2019-05-06 14:26:09Z willem $

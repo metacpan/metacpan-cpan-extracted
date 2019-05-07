@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.647';
+our $VERSION = '1.648';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -176,6 +176,27 @@ sub __set_mode {
     my ( $self, $config ) = @_;
     $self->{mouse}       = $config->{mouse};        # so options passed with $config are
     $self->{hide_cursor} = $config->{hide_cursor};  # also available in __reset_mode
+    my $mode_stty;
+    if ( ! $config->{mode} ) {
+        die "No mode!";
+    }
+    elsif ( $config->{mode} eq 'ultra-raw' ) {
+        $mode_stty = 'raw';
+    }
+    elsif ( $config->{mode} eq 'cbreak' ) {
+        $mode_stty = 'cbreak';
+    }
+    else {
+        die "Invalid mode!";
+    }
+    if ( $Term_ReadKey ) {
+        Term::ReadKey::ReadMode( $config->{mode} );
+    }
+    else {
+        $Stty = `stty --save`;
+        chomp $Stty;
+        system( "stty -echo $mode_stty" ) == 0 or die $?;
+    }
     if ( $self->{mouse} ) {
         if ( $self->{mouse} == 3 ) {
             my $return = binmode STDIN, ':utf8';
@@ -209,27 +230,6 @@ sub __set_mode {
                 warn "binmode STDIN, :raw: $!\nmouse-mode disabled\n";
             }
         }
-    }
-    my $mode_stty;
-    if ( ! $config->{mode} ) {
-        die "No mode!";
-    }
-    elsif ( $config->{mode} eq 'ultra-raw' ) {
-        $mode_stty = 'raw';
-    }
-    elsif ( $config->{mode} eq 'cbreak' ) {
-        $mode_stty = 'cbreak';
-    }
-    else {
-        die "Invalid mode!";
-    }
-    if ( $Term_ReadKey ) {
-        Term::ReadKey::ReadMode( $config->{mode} );
-    }
-    else {
-        $Stty = `stty --save`;
-        chomp $Stty;
-        system( "stty -echo $mode_stty" ) == 0 or die $?;
     }
     if ( $self->{hide_cursor} ) {
         print HIDE_CURSOR;

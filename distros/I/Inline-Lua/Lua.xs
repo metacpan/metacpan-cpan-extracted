@@ -59,7 +59,8 @@ num2string (lua_Number n, I32 *klen) {
     char *str;
     STRLEN len;
     sprintf(s, LUA_NUMBER_FMT, n);
-    len = *klen = strlen(s)+1;
+    *klen = strlen(s);
+    len = *klen + 1;
     New(0, str, len, char);
     Copy(s, str, len, char);
     return str;
@@ -549,7 +550,12 @@ compile (lua, code, file, dump)
 	if (dump && status == 0) {
 	    FILE *f = fopen(file, "w");
 	    if (f) {
+#if LUA_VERSION_NUM < 503
 		lua_dump(lua, dumper, (void*)f);
+#else
+                // Lua 5.3 introduces the strip parameter for lua_dump
+		lua_dump(lua, dumper, (void*)f, 0);
+#endif
 		fclose(f);
 	    } else
 		croak("Error outputting bytecode to %s: %s\n", file, strerror(errno));

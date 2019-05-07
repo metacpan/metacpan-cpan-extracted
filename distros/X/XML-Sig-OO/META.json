@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.42",
+            "Carp" : "1.38",
             "Crypt::OpenSSL::Bignum" : "0.09",
             "Crypt::OpenSSL::DSA" : "0.19",
             "Crypt::OpenSSL::RSA" : "0.31",
@@ -40,7 +40,7 @@
             "Crypt::OpenSSL::X509" : "1.812",
             "Data::Result" : "1.0003",
             "Digest::SHA" : "5.96",
-            "Gopt::Long" : "2.49",
+            "Getopt::Long" : "2.49",
             "MIME::Base64" : "3.15",
             "Modern::Perl" : "1.20181021",
             "Moo" : "2.003004",
@@ -60,7 +60,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.002",
+   "version" : "0.005",
    "x_repository" : {
       "type" : "git",
       "url" : "https://github.com/akalinux/xml-sig-oo.git",

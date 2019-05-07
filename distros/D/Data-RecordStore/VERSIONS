@@ -1,3 +1,10 @@
+5.03 - changed the open_store interface to either take a single
+       directory or take options, which now include :
+         MODE - SINGLE || MULTI - determines if flocking should be done
+                                  on the index file
+
+         RECOD_STORE_PATH - the directory to store this record store.
+
 5.02 - change how/when the lockfile is made so that ro stores can be opened.
 
 5.01 - oops, actually record the update time that has a place waiting

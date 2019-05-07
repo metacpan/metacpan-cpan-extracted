@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.071';
+our $VERSION = '0.072';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -22,7 +22,7 @@ use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
 
 
-BEGIN {
+BEGIN { # __get_term_size
     if ( $^O eq 'MSWin32' ) {
         require Term::Choose::Win32;
     }
@@ -50,7 +50,10 @@ sub choose_dirs {
             1 }
         ) {
             print "$@";
-            choose( [ 'Press Enter:' ], { prompt => '' } );
+            choose(
+                [ 'Press Enter:' ],
+                { prompt => '', hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+            );
             $dir = dirname $dir;
             next;
         }
@@ -109,11 +112,16 @@ sub choose_dirs {
 
 sub _prepare_opt_choose_path {
     my ( $opt ) = @_;
-    $opt = {} if ! defined $opt;
+    if ( ! defined $opt ) {
+        $opt = {};
+    }
     my $dir = encode( 'locale_fs', $opt->{dir} ); # documentation ###
     if ( defined $dir && ! -d $dir ) {
         my $prompt = "Could not find the directory \"$dir\". Falling back to the home directory.";
-        choose( [ 'Press ENTER to continue' ], { prompt => $prompt, hide_cursor => $opt->{hide_cursor} } );
+        choose(
+            [ 'Press ENTER to continue' ],
+            { prompt => $prompt, hide_cursor => $opt->{hide_cursor}, mouse => $opt->{mouse} }
+        );
         $dir = File::HomeDir->my_home();
     }
     $dir = File::HomeDir->my_home()                  if ! defined $dir;
@@ -176,7 +184,10 @@ sub _choose_a_path {
             1 }
         ) {
             print "$@";
-            choose( [ 'Press Enter:' ], { prompt => '' } );
+            choose(
+                [ 'Press Enter:' ],
+                { prompt => '', hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+            );
             $dir = dirname $dir;
             next;
         }
@@ -249,7 +260,10 @@ sub _a_file {
             1 }
         ) {
             print "$@";
-            choose( [ 'Press Enter:' ], { prompt => '' } );
+            choose(
+                [ 'Press Enter:' ],
+                { prompt => '', hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+            );
             return;
         }
         while ( my $file = readdir $dh ) {
@@ -260,7 +274,10 @@ sub _a_file {
         closedir $dh;
         if ( ! @files ) {
             my $prompt =  sprintf "No files in %s.", _prepare_string( $dir );
-            choose( [ ' < ' ], { prompt => $prompt } );
+            choose(
+                [ ' < ' ],
+                { prompt => $prompt, hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+            );
             return;
         }
         my @tmp;
@@ -298,7 +315,9 @@ sub choose_a_number {
         $opt = $digits;
         $digits = 7;
     }
-    $opt = {} if ! defined $opt;
+    if ( ! defined $opt ) {
+        $opt = {};
+    }
     #####
     if ( ! defined $opt->{small_first} ) {          # 18.02.2019 # deprecated
         $opt->{small_first} = $opt->{small_on_top};
@@ -414,7 +433,9 @@ sub choose_a_number {
 
 sub choose_a_subset {
     my ( $available, $opt ) = @_;
-    $opt = {} if ! defined $opt;
+    if ( ! defined $opt ) {
+        $opt = {};
+    }
     #####
     if ( ! defined $opt->{keep_chosen} && defined $opt->{remove_chosen} ) { # 18.02.2019 # deprecated
         $opt->{keep_chosen} = $opt->{remove_chosen} ? 0 : 1;
@@ -527,7 +548,9 @@ sub choose_a_subset {
 
 sub settings_menu {
     my ( $menu, $curr, $opt ) = @_;
-    $opt = {} if ! defined $opt;
+    if ( ! defined $opt ) {
+        $opt = {};
+    }
     die "'in_place' is no longer a valid option!'" if exists $opt->{in_place} && defined $opt->{in_place}; ###
     my $info        = defined $opt->{info}         ? $opt->{info}         : '';
     my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
@@ -613,7 +636,9 @@ sub length_longest {
 
 sub print_hash {
     my ( $hash, $opt ) = @_;
-    $opt = {} if ! defined $opt;
+    if ( ! defined $opt ) {
+        $opt = {};
+    }
     my $left_margin  = defined $opt->{left_margin}  ? $opt->{left_margin}  : 1;
     my $right_margin = defined $opt->{right_margin} ? $opt->{right_margin} : 2;
     my $keys         = defined $opt->{keys}         ? $opt->{keys}         : [ sort keys %$hash ];
@@ -663,7 +688,8 @@ sub print_hash {
     return join "\n", @vals if defined wantarray;
     choose(
         [ @vals ],
-        { prompt => $prompt, layout => 3, justify => 0, mouse => $mouse, clear_screen => $clear, hide_cursor => $hide_cursor }
+        { prompt => $prompt, layout => 3, justify => 0, mouse => $mouse,
+          clear_screen => $clear, hide_cursor => $hide_cursor }
     );
 }
 
@@ -726,7 +752,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.071
+Version 0.072
 
 =cut
 

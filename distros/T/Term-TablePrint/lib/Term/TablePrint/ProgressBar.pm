@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use 5.008003;
 
-use Term::Choose::Util qw( term_width );
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( term_width );
 
 
 sub new {
@@ -34,6 +35,9 @@ sub set_progress_bar {
         return;
     }
     my $term_w = term_width();
+    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+        $term_w += WIDTH_CURSOR;
+    }
     if ( $self->{type} eq 'multi' ) {
         $self->{fmt} = "\rComputing: (" . $self->{times}-- . ") %3d%% [%s]";
     }
@@ -46,7 +50,7 @@ sub set_progress_bar {
     else {
         $self->{short_print} = 0;
     }
-    $self->{bar_w} = $term_w - length( sprintf $self->{fmt}, 100, '' ); # - 1;
+    $self->{bar_w} = $term_w - length( sprintf $self->{fmt}, 100, '' ) + 1; # +1: lenght("\r") == 1
     $self->{step} = int( $self->{total} / $self->{bar_w} || 1 );
     my $count;
     if ( $self->{type} eq 'multi' ) {

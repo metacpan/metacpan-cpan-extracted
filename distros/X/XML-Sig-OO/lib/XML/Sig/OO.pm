@@ -1,6 +1,6 @@
 package XML::Sig::OO;
 
-our $VERSION="0.002";
+our $VERSION="0.005";
 
 use Modern::Perl;
 use Moo;
@@ -18,7 +18,6 @@ use Ref::Util qw( is_plain_hashref);
 use Data::Result;
 use Carp qw(croak);
 use Scalar::Util qw(looks_like_number);
-use Data::Dumper;
 use namespace::clean;
 
 =head1 NAME
@@ -1060,7 +1059,12 @@ sub verify_x509_sig {
 
   if(defined($self->cacert)) {
     my $ca=Crypt::OpenSSL::VerifyX509->new($self->cacert);
-    return new_false Data::Result("Could not verify the x509 cert against ".$self->cacert) unless $ca->verify($cert);
+    my $result;
+    eval {$result=new_false Data::Result("Could not verify the x509 cert against ".$self->cacert) unless $ca->verify($cert)};
+    if($@) {
+      return new_false Data::Result("Error using cert file: ".$self->cacert."error was: $@");
+    }
+    return $result if defined($result);
   }
 
   my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
@@ -1612,7 +1616,6 @@ Creates the xml from the Certificate Object.
 
 sub create_x509_xml {
   my ($self,$cert)=@_;
-  print Dumper($cert);
   my $cert_text = $cert->as_string;
   return $self->build_x509_xml($cert_text);
 }

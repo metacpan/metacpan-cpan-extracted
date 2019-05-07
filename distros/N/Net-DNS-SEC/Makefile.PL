@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1733 2019-03-12 09:49:50Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1742 2019-04-16 13:12:26Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -169,7 +169,7 @@ test_cover :
 	gcov SEC.xs
 	gcov2perl SEC.xs.gcov
 	cover -summary
-	\$(NOECHO) touch SEC.c		# force partial rebuild before install
+	\$(NOECHO) \$(TOUCH) SEC.c	# force partial rebuild before install
 PlanA
 }
 

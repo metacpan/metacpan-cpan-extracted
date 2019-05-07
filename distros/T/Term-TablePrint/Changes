@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.110   2019-05-06
+        - Progressbar to the end of line.
+        - Reset options to global even if no table is printed.
+
 0.109   2019-03-29
         - Option 'grid' enabled by default.
 

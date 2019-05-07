@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.512   2019-05-06
+        - Code refactoring.
+
 0.511   2019-04-18
         - Bufix: reset_term to early.
 

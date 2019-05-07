@@ -15,13 +15,13 @@ __END__
 
 Unixish - Data transformation framework, inspired by Unix toolbox philosophy
 
-=head1 VERSION
-
-This document describes version 1.0.5 of Unixish (from Perl distribution Unixish), released on 2015-09-06.
-
 =head1 SPECIFICATION VERSION
 
  1.0
+
+=head1 VERSION
+
+This document describes version 1.0.6 of Unixish (from Perl distribution Unixish), released on 2019-05-07.
 
 =head1 ABSTRACT
 
@@ -116,7 +116,7 @@ Note that assigning an array directly doesn't work the way you think:
  # DOESN'T WORK
  $args{out} = [1, 2, 3];
 
-=item * Error messages can be logged to Log::Any
+=item * Error messages can be logged to Log::ger
 
 Standard format for error message will be specified in the future.
 
@@ -148,11 +148,27 @@ B<Data::Unixish::English::count_syllables>.
 
 L<App::dux> is a utility to access dux functions via the command-line.
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Unixish>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Unixish>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Unixish>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 SEE ALSO
 
 L<Rinci> and L<Rinci::function>, another specification to leverage functions.
 
-L<Log::Any>.
+L<Log::ger>.
 
 =head2 Similar projects on CPAN
 
@@ -176,29 +192,13 @@ many text-oriented Unix utilities (like B<wc>, B<sum>, B<head>, B<tail>, etc).
 
 =back
 
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/Unixish>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/sharyanto/perl-Unixish>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Unixish>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

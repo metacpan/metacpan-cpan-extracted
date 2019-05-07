@@ -2,14 +2,6 @@ bin/record_store_convert
 bin/recordstore_explorer
 Build.PL
 CHANGELOG
-Data-RecordStore-4.01.tar.gz
-Data-RecordStore-4.02.tar.gz
-Data-RecordStore-4.03.tar.gz
-Data-RecordStore-4.04.tar.gz
-Data-RecordStore-4.05.tar.gz
-Data-RecordStore-4.06.tar.gz
-Data-RecordStore-4.tar.gz
-Data-RecordStore-5.0.tar.gz
 lib/Data/RecordStore.pm
 lib/Data/RecordStore/Converter.pm
 LICENSE

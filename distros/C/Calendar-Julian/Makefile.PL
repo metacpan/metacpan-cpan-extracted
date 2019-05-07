@@ -24,14 +24,14 @@ WriteMakefile(
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
         'Date::Julian::Simple'       => '0.07',
-        'Calendar::Plugin::Renderer' => '0.14',
+        'Calendar::Plugin::Renderer' => '0.15',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Calendar-Julian-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Julian' => { file => 'lib/Calendar/Julian.pm', version => '0.10' },
+            'Calendar::Julian' => { file => 'lib/Calendar/Julian.pm', version => '0.11' },
         },
         resources => {
             repository => {

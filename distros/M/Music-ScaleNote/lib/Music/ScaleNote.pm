@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0501';
 
 use Carp;
 use Moo;
@@ -127,12 +127,11 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0500
+version 0.0501
 
 =head1 SYNOPSIS
 
   use Music::ScaleNote;
-  use Music::Note;
 
   my $msn = Music::ScaleNote->new(
     scale_note => 'C',
@@ -153,8 +152,8 @@ B<note_format>, and a scale position B<offset>, this module computes the new
 note.
 
 So for scale C<C D# F G A#> (C pentatonic minor), note name C<C4> (given the
-ISO format), and offset C<1> (move one note to the right), this module will
-return C<D#4>.
+ISO format), and offset C<1> (move one scale step to the right), this module
+will return C<D#4>.
 
 For offset C<-1>, C<A#3> is returned.
 
@@ -214,7 +213,7 @@ Create a new C<Music::ScaleNote> object.
 =head2 get_offset()
 
   $note = $msn->get_offset(
-    note_name   => $formatted_note_name,
+    note_name   => $note,
     note_format => $format,
     offset      => $integer,
   );
@@ -232,13 +231,19 @@ L<Music::Note>
 
 L<Music::Scales>
 
+Example usage:
+
+L<https://github.com/ology/Music/blob/master/hilbert-notes>
+
+L<https://github.com/ology/Music/blob/master/lindenmayer-midi>
+
 =head1 AUTHOR
 
 Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -38,7 +38,7 @@
       "runtime" : {
          "requires" : {
             "Graph" : "0.9704",
-            "perl" : "5.0012"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -48,7 +48,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_static_install" : 1
 }

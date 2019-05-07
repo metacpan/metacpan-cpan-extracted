@@ -33,7 +33,7 @@ no_index:
 provides:
   Acme::CPANAuthors::Malaysian:
     file: lib/Acme/CPANAuthors/Malaysian.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Acme::CPANAuthors: '0.26'
   perl: '5.008005'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/kianmeng/acme-cpanauthors-malaysian/issues
   homepage: https://github.com/kianmeng/acme-cpanauthors-malaysian
   repository: https://github.com/kianmeng/acme-cpanauthors-malaysian.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

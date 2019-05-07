@@ -1,5 +1,13 @@
 Revision history for Future-IO
 
+0.05    2019-05-07 01:00:19
+        [CHANGES]
+         * Misc small docs fixes
+
+        [BUGFIXES]
+         * Expect EINVAL on MSWin32 for pipe close write test, rather than
+           EPIPE
+
 0.04    2019-04-27 19:08:40
         [CHANGES]
          * Added ->syswrite and ->syswrite_exactly

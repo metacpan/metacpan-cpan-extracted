@@ -1,0 +1,9 @@
+Revision history for Perl extension Devel-KYTProf-Profiler-Fluent-Logger
+
+0.02 2019-05-06T15:05:44Z
+    - Fix a test failed on travis.
+
+0.01 2019-05-06T14:56:57Z
+
+    - original version
+

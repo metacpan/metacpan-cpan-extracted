@@ -1,4 +1,7 @@
 Revision history for Acme-CPANAuthors-Malaysian
 
+0.02  2019-05-06 19:17:18 +08
+        - Fix pod title misalignment
+
 0.01  2019-05-05 20:39:06 +08
         - Initial release

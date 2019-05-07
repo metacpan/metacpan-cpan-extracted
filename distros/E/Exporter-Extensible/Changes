@@ -1,3 +1,11 @@
+0.06 - 2019-04-06:
+  - Maintain weak reference to Scope object
+  - Fix module version declaration to something metacpan likes
+
+0.05 - 2019-04-05:
+  - Scope guard object now supports ->clean on demand in addition to DESTROY
+  - Documentation improvements
+
 0.04 - 2018-10-24:
   - Add autoload feature for symbols and tags.
   - More correct application of "-not".

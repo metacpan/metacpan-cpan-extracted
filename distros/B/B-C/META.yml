@@ -1,13 +1,13 @@
 ---
 abstract: 'Perl compiler'
 author:
-  - 'Malcolm Beattie (retired), Reini Urban <perl-compiler@googlegroups.com>'
+  - 'Reini Urban <rurban@cpan.org>, Malcolm Beattie (retired)'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,8 +30,7 @@ requires:
   Time::HiRes: '0'
 resources:
   bugtracker: https://github.com/rurban/perl-compiler/issues
-  homepage: http://www.perl-compiler.org
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/rurban/perl-compiler/
-version: '1.55'
+  repository: https://github.com/rurban/perl-compiler
+version: '1.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

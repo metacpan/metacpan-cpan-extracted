@@ -24,7 +24,8 @@ function help {
 
 # use the actual perl from the Makefile (perl5.8.8,
 # perl5.10.0d-nt, perl5.11.0, ...)
-PERL=`grep "^PERL =" Makefile|cut -c8-`
+PERL=`grep "^FULLPERL =" Makefile|cut -c12-`
+test -z $PERL && PERL=`grep "^PERL =" Makefile|cut -c8-`
 PERL=${PERL:-perl}
 PERL=`echo $PERL|sed -e's,^",,; s,"$,,'`
 v510=`$PERL -e'print (($] < 5.010)?0:1)'`
@@ -39,6 +40,7 @@ BASE=`basename $0`
 # if $] < 5.9 you may want to remove -Mblib for testing the core lib. -o
 #Mblib="`$PERL -e'print (($] < 5.009005) ? q() : q(-Mblib))'`"
 Mblib=${Mblib:--Iblib/arch -Iblib/lib} # B::C is now fully 5.6+5.8 backwards compatible
+test -z $PERL_CORE || Mblib=-I../../lib
 v513="`$PERL -e'print (($] < 5.013005) ? q() : q(-fno-fold,-fno-warnings,))'`"
 # OCMD=${OCMD}${v513}
 if [ -z "$Mblib" ]; then
@@ -59,6 +61,7 @@ CONT=
 # rest. -DALLOW_PERL_OPTIONS for -Dtlv
 #CCMD="$PERL $Mblib script/cc_harness -g3 -DALLOW_PERL_OPTIONS"
 CCMD="$PERL $Mblib script/cc_harness"
+test -z $PERL_CORE || CCMD="$CCMD -I../.. -L../.."
 LCMD=
 # On some perls I also had to add $archlib/DynaLoader/DynaLoader.a to libs in Config.pm
 }
@@ -288,7 +291,7 @@ result[26]="26"
 # xsub constants (constant folded). newlib: 0x200, glibc: 0x100
 tests[27]='use Fcntl ();my $a=Fcntl::O_CREAT(); print "ok" if ( $a >= 64 && &Fcntl::O_CREAT >= 64 );'
 # require $fname
-tests[28]='my($fname,$tmp_fh);while(!open($tmp_fh,">",($fname=q{ccode28_} . rand(999999999999)))){$bail++;die "Failed to create a tmp file after 500 tries" if $bail>500;}print {$tmp_fh} q{$x="ok";1;};close($tmp_fh);sleep 1;require $fname;END{unlink($fname);};print $x;'
+tests[28]='my($fname,$tmp_fh);while(!open($tmp_fh,">",($fname=q{ccode28_} . rand(999999999999)))){$bail++;die "Failed to create a tmp file after 500 tries" if $bail>500;}print {$tmp_fh} q{$x="ok";1;};close($tmp_fh);sleep 1;require "./$fname";END{unlink($fname);};print $x;'
 # multideref with static index and sv and dynamic gv ptrs
 tests[29]='my (%b,%h); BEGIN { %b=(1..8);@a=(1,2,3,4); %h=(1=>2,3=>4) } $i=0; my $l=-1; print $h->{$b->{3}},$h->{$a[-1]},$a[$i],$a[$l],$h{3}'
 result[29]='144'
@@ -532,6 +535,8 @@ tests[122]='my ($p1,$p2)=(80,80);if($p1<=23&&23<=$p2){print "telnet\n";}elsif ($
 result[122]='http'
 # issue52
 tests[123]='my $x;my $y = 1;$x and $y == 2;print $y == 1 ? "ok\n" : "fail\n";'
+# issue55
+tests[124]='LOOP:{my $sub=sub{last LOOP;}; $sub->() } print "ok";'
 # issue125 DynaLoader::bootstrap_inherit [perl #119577]
 tests[125]='use Net::LibIDN; print q(ok);'
 # saving recursive functions sometimes recurses in the compiler. this not, but Moose stucks in Pod::Simple
@@ -1438,6 +1443,15 @@ tests[4002]='use Class::XSAccessor;
 Class::XSAccessor->import(constructor => "new", accessors => [ "foo" ]);
 my $o = main::->new( foo => "ok" );
 print $o->foo,"\n";'
+tests[411]='#TODO run-time regcomp of \p{}
+our ( $q, $myre );
+BEGIN { $q = qr[\p{IsWord}] }
+eval q/$myre = qr[^$q]/; # add ^ to force the RegExp to be recompiled
+print qq[ok\n] if q[hello] =~ $myre;'
+tests[4111]='our ( $q, $myre );
+BEGIN { $q = qr[\p{IsWord}] }
+eval q/$myre = qr[$q]/; # this works
+print qq[ok\n] if q[hello] =~ $myre;'
 
 init
 

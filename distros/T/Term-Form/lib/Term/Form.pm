@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.511';
+our $VERSION = '0.512';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -33,10 +33,8 @@ sub ReadLine { 'Term::Form' }
 
 sub new {
     my $class = shift;
-    my ( $name ) = @_;
-    my $self = bless {
-        name => $name,
-    }, $class;
+    my ( $arg ) = @_;
+    my $self = bless {}, $class;
     $self->__set_defaults();
     $self->{pg} = $Plugin->new();
     return $self;
@@ -50,8 +48,9 @@ sub DESTROY {
 
 
 sub __init_term {
-    my ( $self, $hide_cursor ) = @_;
-    $self->{pg}->__set_mode( { mode => 'cbreak', hide_cursor => $hide_cursor } );
+    my ( $self ) = @_;
+    print SHOW_CURSOR;
+    $self->{pg}->__set_mode( { mode => 'cbreak', hide_cursor => 0 } );
 }
 
 
@@ -68,7 +67,7 @@ sub __reset_term {
     if ( $up ) {
         print UP x $up;
     }
-    print "\r". CLEAR_TO_END_OF_SCREEN;
+    print "\r" . CLEAR_TO_END_OF_SCREEN;
 }
 
 
@@ -84,7 +83,7 @@ sub __set_defaults {
     $self->{back}             = '   BACK';
     $self->{confirm}          = 'CONFIRM';
     $self->{read_only}        = [];
-    #$self->{show_context}    = undef;
+    $self->{show_context}     = 0;
 }
 
 
@@ -300,14 +299,13 @@ sub readline {
     }
     local $| = 1;
     $self->__init_term();
-    print SHOW_CURSOR;
-    if ( $opt->{clear_screen} ) {
-        print CLEAR_SCREEN;
-    }
     my $term_w = ( $self->{pg}->__get_term_size() )[0];
     my $m = $self->__init_readline( $opt, $term_w, $prompt );
     my $big_step = 10;
     my $up_before = 0;
+    if ( $opt->{clear_screen} ) {
+        print CLEAR_SCREEN;
+    }
 
     CHAR: while ( 1 ) {
         if ( $self->{i}{beep} ) {
@@ -322,7 +320,7 @@ sub readline {
         if ( $up_before ) {
             print UP x $up_before;
         }
-        print "\r". CLEAR_TO_END_OF_SCREEN;
+        print "\r" . CLEAR_TO_END_OF_SCREEN;
         $self->__before_readline( $opt, $m );
         $up_before = $self->{i}{pre_text_row_count};
         if ( length $self->{i}{pre_text} ) {
@@ -835,6 +833,8 @@ sub __write_first_screen {
     if ( $self->{i}{end_row} > $#$list ) {
         $self->{i}{end_row} = $#$list;
     }
+    $self->{i}{seps} = [];
+    $self->{i}{keys} = [];
     if ( $opt->{clear_screen} ) {
         print CLEAR_SCREEN;
     }
@@ -842,10 +842,8 @@ sub __write_first_screen {
         print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
     if ( defined $self->{i}{pre_text} ) {  # empty info add newline ?
-        print $self->{i}{pre_text}, "\n";
+        print $self->{i}{pre_text} . "\n";
     }
-    $self->{i}{seps} = [];
-    $self->{i}{keys} = [];
     $self->__write_screen( $list );
 }
 
@@ -891,9 +889,8 @@ sub fill_form {
     }
     my $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
     my $auto_up = $opt->{auto_up};
-    $self->__init_term();
     local $| = 1;
-    print SHOW_CURSOR;
+    $self->__init_term();
     my ( $term_w, $term_h ) = $self->{pg}->__get_term_size();
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
@@ -1174,7 +1171,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.511
+Version 0.512
 
 =cut
 
@@ -1182,7 +1179,7 @@ Version 0.511
 
     use Term::Form;
 
-    my $new = Term::Form->new( 'name' );
+    my $new = Term::Form->new();
     my $line = $new->readline( 'Prompt: ', { default => 'abc' } );
 
 

@@ -2,8 +2,8 @@ NAME
     WWW::PAUSE::Simple - An API for PAUSE
 
 VERSION
-    This document describes version 0.442 of WWW::PAUSE::Simple (from Perl
-    distribution WWW-PAUSE-Simple), released on 2018-10-09.
+    This document describes version 0.443 of WWW::PAUSE::Simple (from Perl
+    distribution WWW-PAUSE-Simple), released on 2019-05-06.
 
 SYNOPSIS
 DESCRIPTION
@@ -15,7 +15,7 @@ FUNCTIONS
   delete_files
     Usage:
 
-     delete_files(%args) -> [status, msg, result, meta]
+     delete_files(%args) -> [status, msg, payload, meta]
 
     Delete files.
 
@@ -70,7 +70,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -79,7 +79,7 @@ FUNCTIONS
   delete_old_releases
     Usage:
 
-     delete_old_releases(%args) -> [status, msg, result, meta]
+     delete_old_releases(%args) -> [status, msg, payload, meta]
 
     Delete older versions of distributions.
 
@@ -145,7 +145,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -154,7 +154,7 @@ FUNCTIONS
   list_dists
     Usage:
 
-     list_dists(%args) -> [status, msg, result, meta]
+     list_dists(%args) -> [status, msg, payload, meta]
 
     List distributions.
 
@@ -209,7 +209,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -218,7 +218,7 @@ FUNCTIONS
   list_files
     Usage:
 
-     list_files(%args) -> [status, msg, result, meta]
+     list_files(%args) -> [status, msg, payload, meta]
 
     List files.
 
@@ -238,6 +238,10 @@ FUNCTIONS
 
         File names/wildcard patterns.
 
+    *   mtime_max => *date*
+
+    *   mtime_min => *date*
+
     *   password => *str*
 
         PAUSE password.
@@ -253,6 +257,10 @@ FUNCTIONS
 
         How long to wait before retrying.
 
+    *   size_max => *uint*
+
+    *   size_min => *uint*
+
     *   username => *str*
 
         PAUSE ID.
@@ -265,7 +273,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -274,7 +282,7 @@ FUNCTIONS
   list_modules
     Usage:
 
-     list_modules(%args) -> [status, msg, result, meta]
+     list_modules(%args) -> [status, msg, payload, meta]
 
     List modules (permissions).
 
@@ -321,7 +329,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -330,7 +338,7 @@ FUNCTIONS
   reindex_files
     Usage:
 
-     reindex_files(%args) -> [status, msg, result, meta]
+     reindex_files(%args) -> [status, msg, payload, meta]
 
     Force reindexing.
 
@@ -377,7 +385,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -386,7 +394,7 @@ FUNCTIONS
   undelete_files
     Usage:
 
-     undelete_files(%args) -> [status, msg, result, meta]
+     undelete_files(%args) -> [status, msg, payload, meta]
 
     Undelete files.
 
@@ -437,7 +445,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -446,7 +454,7 @@ FUNCTIONS
   upload_files
     Usage:
 
-     upload_files(%args) -> [status, msg, result, meta]
+     upload_files(%args) -> [status, msg, payload, meta]
 
     Upload file(s).
 
@@ -507,7 +515,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -544,7 +552,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

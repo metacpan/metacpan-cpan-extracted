@@ -4,3 +4,10 @@
 0.002
   - Added command line interface xmlsig
   - added CONTRIBUTING.md
+0.003
+  - Fixed typo in make file required pkg list
+0.004
+  - Fixed bug that could cause a crash when an incomplete or invalid cacert is passed in.
+0.005
+  - Removed Data::Dumper import
+  - Changed min version of Carp to 1.38

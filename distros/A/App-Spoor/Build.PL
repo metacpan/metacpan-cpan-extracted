@@ -20,12 +20,15 @@ my $builder = Module::Build->new(
     },
     requires => {
         'Path::Tiny'                 => '0.108',
-        'YAML::Tiny'        => '1.70',
-        'File::Tail'        => '1.3',
-        'File::Touch'         => '0.11',
+        'YAML::Tiny'                 => '1.70',
+        'File::Tail'                 => '1.3',
+        'File::Touch'                => '0.11',
         'DateTime::Format::Strptime' =>  '1.75',
         'JSON'                       =>  '2.97001',
-        'LWP::Protocol::https'       => '6.07'
+        'LWP::Protocol::https'       => '6.07',
+        'PHP::HTTPBuildQuery'        => '0.09',
+        'Text::CSV'                  => '1.99',
+        'Date::Format'               => '2.24'
     },
     add_to_cleanup     => [ 'App-Spoor-*' ],
 );

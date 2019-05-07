@@ -3,12 +3,11 @@ abstract: 'Create extensible modules which export things'
 author:
   - 'Michael Conrad <mike@nrdvana.net>'
 build_requires:
-  Scalar::Util: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +19,7 @@ no_index:
 requires:
   B: '0'
   Carp: '0'
+  Scalar::Util: '0'
   mro: '0'
   perl: v5.12.0
   strict: '0'
@@ -27,6 +27,6 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-Exporter-Extensible/issues
   repository: https://github.com/nrdvana/perl-Exporter-Extensible.git
-version: '0.04'
-x_generated_by_perl: v5.24.0
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.06'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

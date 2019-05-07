@@ -11,7 +11,8 @@ BEGIN {
 use strict;
 my $DEBUGGING = ($Config{ccflags} =~ m/-DDEBUGGING/);
 #my $ITHREADS  = ($Config{useithreads});
-my $CPERL = $Config{usecperl};
+$ENV{SKIP_SLOW_TESTS} = 1 if $Config{ccflags} =~ /-flto|-fsanitize/;
+$ENV{SKIP_SLOW_TESTS} = 1 if is_CI() && $^O eq 'cygwin';
 
 prepare_c_tests();
 
@@ -19,7 +20,7 @@ my @todo  = todo_tests_default("cc");
 # skip core dumps and endless loops, like custom sort or runtime labels
 my @skip = (14,21,30,
 	    46, # unsupported: HvKEYS(%Exporter::) is 0 unless Heavy is included also
-            103, # hangs with non-DEBUGGING
+            103, # hangs with non-DEBUGGING (importing B)
 	    ((!$DEBUGGING and $] > 5.010) ? (105) : ()),
            );
 push @skip, (38) if $^O eq 'cygwin'; #hangs

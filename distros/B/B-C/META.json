@@ -1,10 +1,10 @@
 {
    "abstract" : "Perl compiler",
    "author" : [
-      "Malcolm Beattie (retired), Reini Urban <perl-compiler@googlegroups.com>"
+      "Reini Urban <rurban@cpan.org>, Malcolm Beattie (retired)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,14 +51,13 @@
       "bugtracker" : {
          "web" : "https://github.com/rurban/perl-compiler/issues"
       },
-      "homepage" : "http://www.perl-compiler.org",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/rurban/perl-compiler/"
+         "url" : "https://github.com/rurban/perl-compiler"
       }
    },
-   "version" : "1.55",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "1.57",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

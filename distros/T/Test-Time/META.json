@@ -49,7 +49,7 @@
    "provides" : {
       "Test::Time" : {
          "file" : "lib/Test/Time.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -63,13 +63,14 @@
          "web" : "https://github.com/cho45/Test-Time"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "minimalist <minimalist@lavabit.com>",
       "motemen <motemen@gmail.com>",
       "Graham Knop <haarg@haarg.org>",
       "Michael Jemmeson <mjemmeson@cpan.org>",
-      "Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>"
+      "Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>",
+      "Alexandr Ciornii <alexchorny@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

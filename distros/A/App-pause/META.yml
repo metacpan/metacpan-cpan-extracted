@@ -22,7 +22,7 @@ requires:
   Getopt::Long::Subcommand: '0.102'
   JSON::PP: '0'
   List::Util: '1.45'
-  Log::ger: '0.023'
+  Log::ger: '0.027'
   Log::ger::Output: '0.005'
   Log::ger::Output::Screen: '0.007'
   Log::ger::Util: '0.008'
@@ -32,6 +32,7 @@ requires:
   Scalar::Util::Numeric: '0'
   Scalar::Util::Numeric::PP: '0'
   Time::Duration::Parse::AsHash: '0'
+  Time::Local: '0'
   WWW::PAUSE::Simple: '0.41'
   perl: '5.010001'
   strict: '0'
@@ -40,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause
   homepage: https://metacpan.org/release/App-pause
   repository: git://github.com/perlancar/perl-App-pause.git
-version: '0.650'
+version: '0.651'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -116,7 +117,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -279,7 +280,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -347,7 +348,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

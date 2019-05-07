@@ -52,6 +52,9 @@ entry.
 
 =cut
 
+my $ENTRYTYPE_FILE = 0;
+my $ENTRYTYPE_DIR = 1;
+
 sub new {
   my $class = shift;
   my ($entry_dir) = @_;
@@ -64,38 +67,44 @@ sub new {
 
   bless $self, $class;
 
-  my @source_files;
+  my %source_files;
   my %entry_properties;
   my %property_entries;
+
   find(
     sub {
       # We skip index files, because they'll be rendered from the dir path:
-      return if /index$/;
-      if ($File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x) {
-        my $target = $1;
-        push @source_files, $target;
+      return unless $File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x;
 
-        # Build hashes of all properties of entries, and all entries of properties:
-        if ($target =~ m{(.*) / (.*) [.]prop $}x) {
-          my ($entry, $property) = ($1, $2);
+      my $target = $1;
 
-          $entry_properties{$entry} = []
-            unless defined $entry_properties{$entry};
-          push @{ $entry_properties{$entry} }, $property;
+      # Build a hash indicating:
+      #   a. that a file exists
+      #   b. whether it's a flatfile or a directory
+      if (-f $_) {
+        $source_files{$target} = $ENTRYTYPE_FILE;
+      } elsif (-d $_) {
+        $source_files{$target} = $ENTRYTYPE_DIR;
+      }
 
-          $property_entries{$property} = []
-            unless defined $property_entries{$property};
-          push @{ $property_entries{$property} }, $entry;
-        }
+      # Build hashes of all properties of entries, and all entries of properties:
+      if ($target =~ m{(.*) / (.*) [.]prop $}x) {
+        my ($entry, $property) = ($1, $2);
+
+        $entry_properties{$entry} //= [];
+        push @{ $entry_properties{$entry} }, $property;
+
+        $property_entries{$property} //= [];
+        push @{ $property_entries{$property} }, $entry;
       }
     },
     $entry_dir
   );
 
   # Stash arrayref for future use:
-  $self->{source_files} = \@source_files;
-  $self->{property_entries}   = \%property_entries;
-  $self->{entry_properties}   = \%entry_properties;
+  $self->{source_files}     = \%source_files;
+  $self->{property_entries} = \%property_entries;
+  $self->{entry_properties} = \%entry_properties;
 
   $self->generate_date_hashes();
 
@@ -113,7 +122,7 @@ This was originally in App::WRT::Renderer, so there may be some pitfalls here.
 
 sub all {
   my ($self) = shift;
-  return @{ $self->{source_files} };
+  return keys %{ $self->{source_files} };
 }
 
 =item dates_by_depth($depth)
@@ -156,7 +165,7 @@ sub dates_by_depth {
   my @by_depth = map  { $_->[0] }
                  sort { $a->[1] cmp $b->[1] }
                  map  { [$_, sortable_date_from_entry($_)] }
-                 grep m{^ $pattern $}x, @{ $self->{source_files} };
+                 grep m{^ $pattern $}x, $self->all();
 
   # Stash arrayref for future use:
   $self->{by_depth}->{$depth} = \@by_depth;
@@ -254,6 +263,29 @@ sub generate_date_hashes {
   $self->{next_dates} = { reverse %prev };
 }
 
+=item parent_of($entry)
+
+Return an entry's parent, or undef if it's at the top level.
+
+=cut
+
+sub parent_of {
+  my $self = shift;
+  my ($entry) = @_;
+
+  # Explode unless an entry actually exists in the archives:
+  unless (grep { $_ eq $entry } $self->all()) {
+    croak("No such entry: $entry");
+  }
+
+  my (@components) = split '/', $entry;
+  pop @components;
+  if (@components) {
+    return join '/', @components;
+  }
+  return undef;
+}
+
 =item previous($entry)
 
 Return the previous entry at the same depth for the given entry.
@@ -264,7 +296,7 @@ sub previous {
   return $_[0]->{prev_dates}->{ $_[1] };
 }
 
-=item previous($entry)
+=item next($entry)
 
 Return the next entry at the same depth for the given entry.
 
@@ -281,8 +313,7 @@ Return an array of any entries for the given property.
 =cut
 
 sub by_prop {
-  my $self = shift;
-  my ($property) = @_;
+  my ($self, $property) = @_;
 
   my @entries;
   if (defined $self->{property_entries}{$property}) {
@@ -292,7 +323,6 @@ sub by_prop {
   return @entries;
 }
 
-
 =item props_for($entry)
 
 Return an array of any properties for the given entry.
@@ -300,8 +330,7 @@ Return an array of any properties for the given entry.
 =cut
 
 sub props_for {
-  my $self = shift;
-  my ($entry) = @_;
+  my ($self, $entry) = @_;
 
   my @props;
   if (defined $self->{entry_properties}{$entry}) {
@@ -309,6 +338,18 @@ sub props_for {
   }
 
   return @props;
+}
+
+=item has_prop($entry, $prop)
+
+Return 1 if the given entry has the given property.
+
+=cut
+
+sub has_prop {
+  my ($self, $entry, $prop) = @_;
+  my @props = grep { $_ eq $prop } $self->props_for($entry);
+  return (@props == 1);
 }
 
 =item all_props()
@@ -319,7 +360,57 @@ Return an array of all properties.
 
 sub all_props {
   my $self = shift;
-  return keys %{ $self->{property_entries} };
+  return sort keys %{ $self->{property_entries} };
+}
+
+=item is_extant($entry)
+
+Check if a given entry exists.
+
+=cut
+
+sub is_extant {
+  my ($self, $entry) = @_;
+  return exists($self->{source_files}{$entry});
+}
+
+=item is_dir($entry)
+
+Check if an entry is a directory.
+
+=cut
+
+sub is_dir {
+  my ($self, $entry) = @_;
+  croak("No such entry: $entry") unless $self->is_extant($entry);
+  return ($self->{source_files}{$entry} == $ENTRYTYPE_DIR);
+}
+
+=item is_file($entry)
+
+Check if an entry is a flatfile.
+
+=cut
+
+sub is_file {
+  my ($self, $entry) = @_;
+  croak("No such entry: $entry") unless $self->is_extant($entry);
+  return ($self->{source_files}{$entry} == $ENTRYTYPE_FILE);
+}
+
+=item has_index($entry)
+
+Check if an entry contains an index file.
+
+TODO: Should this care about the pathological(?) case where index is a
+directory?
+
+=cut
+
+sub has_index {
+  my ($self, $entry) = @_;
+  croak("No such entry: $entry") unless $self->is_extant($entry);
+  return $self->is_extant($entry . '/index');
 }
 
 =back

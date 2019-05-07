@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/rsynccolor.pm
 script/rsynccolor
+share/images/Screenshot_20190506_181519.png
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

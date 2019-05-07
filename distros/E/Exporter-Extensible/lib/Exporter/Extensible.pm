@@ -1,10 +1,13 @@
 package Exporter::Extensible;
-BEGIN { $Exporter::Extensible::VERSION = '0.04'; }
 use v5.12;
 use strict;
 use warnings;
+use Scalar::Util;
 require MRO::Compat if $] lt '5.009005';
 require mro;
+
+# ABSTRACT: Create easy-to-extend modules which export symbols
+our $VERSION = '0.06'; # VERSION
 
 our %EXPORT_PKG_CACHE;
 our %EXPORT_TAGS_PKG_CACHE;
@@ -177,8 +180,9 @@ sub import {
 		# Then pass that list to the installer (or uninstaller)
 		$self->$method(\@flat_install);
 		# If scope requested, create the scope-guard object
-		if (my $scope= delete $self->{scope}) {
+		if (my $scope= $self->{scope}) {
 			$$scope= bless [ $self, \@flat_install ], 'Exporter::Extensible::UnimportScopeGuard';
+			Scalar::Util::weaken($self->{scope});
 		}
 		# It's entirely likely that a generator might curry $self inside the sub it generated.
 		# So, we end up with a circular reference if we're holding onto the set of all things we
@@ -187,9 +191,15 @@ sub import {
 	}
 	1;
 }
+
+sub Exporter::Extensible::UnimportScopeGuard::clean {
+	my $self= shift;
+	$self->[0]->exporter_uninstall($self->[1]) if $self->[1];
+	$self->[1]= undef; # Ignore subsequent calls
+}
+
 sub Exporter::Extensible::UnimportScopeGuard::DESTROY {
-	my ($exporter, $list)= @{+shift};
-	$exporter->exporter_uninstall($list);
+	shift->clean;
 }
 
 sub exporter_install {
@@ -480,7 +490,7 @@ sub exporter_autoload_tag {
 
 sub exporter_also_import {
 	my $self= shift;
-	ref $self && $self->{todo} or _croak('exporter_also_import can onnly be called on $self during an import()');
+	ref $self && $self->{todo} or _croak('exporter_also_import can only be called on $self during an import()');
 	push @{$self->{todo}}, @_;
 }
 
@@ -669,6 +679,8 @@ sub exporter_export {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -679,7 +691,7 @@ Exporter::Extensible - Create easy-to-extend modules which export symbols
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -780,15 +792,12 @@ convention that names beginning with dash C<-> are treated as requests for runti
 Additionally, it may consume the arguments that follow it, at the discresion of the module
 author.  This feature is designed to feel like command-line option processing.
 
-=item (Small) Namespace and inheritance pollution
+=item Inheritance and Namespace pollution
 
-This module defines an API used for the declaration and implementation of the export process.
-If you wanted to export any symbol starting with the prefix C<exporter_> then you probably
-shouldn't build on top of this exporter.
-(I could have kept these meta-methods in a separate namespace, but that would defeat the goal
-of "easy to extend".)
-
-If you want a pure class hierarchy but also export a few symbols, consider something like this:
+This module uses the package hierarchy for combining exportable sets of things.
+It also calls C<< __PACKAGE__->new >> every time a user imports something.
+If you want to make an object-oriented class but also export a few symbols, consider something
+like this:
 
     package My::Class;
     package My::Class::Exports {
@@ -797,35 +806,50 @@ If you want a pure class hierarchy but also export a few symbols, consider somet
     }
     sub import { My::Class::Exports->import_into(scalar caller, @_) }
 
+This module also defines an API used for the declaration and implementation of the export
+process (though every methods starts with C<exporter_> so it shouldn't affect you).
+If you wanted to export any symbol starting with the prefix C<exporter_> then you probably
+shouldn't build on top of this exporter.
+(I could have kept these meta-methods in a separate namespace, but that would defeat the goal
+of "easy to extend".)
+
+=item Requires Perl 5.12
+
+It is possible to support earlier perls, but hard to support the method attributes, and would
+make a mess of the code.  I see this module more for authoring fancy modern modules than for
+use as a cpan-wide standard.  If supporting old perls is important to you, I recommend just
+sticking with the core Exporter module.
+
 =back
 
 =head1 IMPORT API (for consumer)
 
 =head2 import
 
-When you call C<< use MyPackage @list >> it is equivalent to
+This is the method that gets called when you C<use DerivedModule @list>.
 
-  BEGIN {
-    require MyPackage;
-    MyPackage->import(@list)
-  }
-
-The user-facing API is mostly the same as Sub::Exporter or Exporter::Tiny, except that C<-foo>
+The user-facing API is mostly the same as L<Sub::Exporter> or L<Exporter::Tiny>, except that C<-foo>
 is not a group and there are no "collections" (though you could implement collections using
 options).
 
-The elements of C<@list> are handles as:
+The elements of C<@list> are handled according to the following patterns:
 
-=head3 C<name>, C<$name>, C<@name>, C<%name>, C<*name>, C<:name>
+=head3 Plain Name With Sigil
 
-Same as L<Exporter>, except it might be generated on the fly, and may be followed by an
-options hashref.
+  use DerivedModule 'name', '$name', '@name', '%name', '*name', ':name';
 
-=head3 C<-name>
+Same as L<Exporter>, except it might be generated on the fly, and can be followed by an
+options hashref for further control over how it gets imported.  (see L</In-line Options>)
+
+=head3 Option
+
+  use DerivedModule -name, ...;
 
 Run custom processing defined by module author, possibly consuming arguments that follow it.
 
-=head3 C<< {...} >> (Global Options)
+=head3 Global Options
+
+  use DerivedModule { ... }, ...;
 
 If the first argument to C<import> is a hashref, these fields are recognized:
 
@@ -838,14 +862,17 @@ Package name or hashref to which all symbols will be exported.  Defaults to C<ca
 =item scope
 
 Empty scalar-ref whose scope determines when to unimport the things just imported.
-After a successful import, this wil be assigned a scope-guard object whose destructor
+After a successful import, this will be assigned a scope-guard object whose destructor
 un-imports those same symbols.  This saves you the hassle of calling "no MyModule @args".
+You can also call C<< $scope->clean >> to trigger the unimport in a more direct manner.
+If you need the methods cleaned out at the end of compilation (i.e. before execution)
+you can wrap C<clean> in a C<BEGIN> block.
 
   {
     use MyModule { scope => \my $scope }, ':sugar_methods';
 	# use sugar methods
 	...
-	# you could "undef $scope" if you want them removed sooner
+	# you could "BEGIN { $scope->clean }" if you want them removed sooner
   }
   # All those symbols are now neatly removed from your package
 
@@ -911,10 +938,12 @@ Append this string to all imported names.
 
 =back
 
-=head3 C<< NAME => { ... } >> (In-line Options)
+=head3 In-line Options
 
-The arguments to C<import> are generally scalars.  If one is followed by a hashref, the hashref
-becomes the argument to the generator (if any), but may also contain:
+  use DerivedModule ':name' => { ... };
+
+The arguments to C<import> are generally plain strings.  If one is followed by a hashref,
+the hashref becomes the argument to the generator (if any), but may also contain:
 
 =over
 
@@ -924,11 +953,11 @@ Install the thing as this exact name. (no sigil, but relative to C<into>)
 
 =item -prefix
 
-Same as global option C<prefix>, limited to this one tag.
+Same as global option C<prefix>, limited to this one symbol/tag.
 
 =item -suffix
 
-Same as global option C<suffix>, limited to this one tag.
+Same as global option C<suffix>, limited to this one symbol/tag.
 
 =item -not
 
@@ -942,11 +971,13 @@ Same as global option C<replace>, limited to this one tag.
 
 =head2 import_into
 
-When you call C<use MyModule @list> you are calling C<< require MyModule; MyModule->import(@list) >>.
-It automatically picks up the calling package, and imports there.
-As a shortcut for the C<into> option, you may say C<< MyModule->import_into("SomePackage", @list) >>.
+  DerivedModule->import_into('DestinationPackage', @list);
 
-There is also a more generic way to handle this need though - see L<Import::Into>
+This is a shorthand for
+
+  DerivedModule->import({ into => 'DestinationPackage }, @list);
+
+There is also a more generic way to handle this underlying need though - see L<Import::Into>
 
 =head1 EXPORT API (for author)
 
@@ -977,7 +1008,15 @@ convenience function L</export>.
 
 =head3 export
 
-This function takes a list of keys (which must be scalars), with optional values which must be
+C<< export(@list) >> is a convenient alias for C<< __PACKAGE__->exporter_export(@list); >>
+which you receive from C<-exporter_setup>.
+
+=head3 exporter_export
+
+  __PACKAGE__->exporter_export(@things);
+  __PACKAGE__->exporter_export(qw( $foo bar ), ':baz' => \@tag_members, ... );
+
+This class method takes a list of keys (which must be scalars), with optional values which must be
 refs.  If the value is omitted, C<export> attempts to do-what-you-mean to find it.
 
 =over
@@ -1084,7 +1123,7 @@ name of the sub is used.  N may be C<'*'> or C<'?'>; see L</IMPLEMENTING OPTIONS
 =item C<< = >>, C<< =$ >>, C<< =@ >>, C<< =% >>, C<< =* >>, C<< =foo >>, C<< =$foo >>, ...
 
 This sets up the sub as a generator for the export-name.  If the word portion of the name is
-omitted, it is taken to be the sub name minus the prefix "_generate_" or "_generate$REFTYPE_".
+omitted, it is taken to be the sub name minus the prefix C<_generate_> or C<_generate$REFTYPE_>.
 See L</IMPLEMENTING GENERATORS>.
 
 =back
@@ -1172,7 +1211,7 @@ scalar name of a generator, or a coderef of the generator.
 =head1 IMPLEMENTING OPTIONS
 
 Exporter::Extensible lets you run whatever code you like when it encounters "-name" in the
-import list.  To accomodate all the different ways I wanted to use this, I decided to let the
+import list.  To accommodate all the different ways I wanted to use this, I decided to let the
 option decide how many arguments to consume.  So, the API is as follows:
 
   # By default, no arguments are captured.  A ref may not follow this option.
@@ -1212,7 +1251,7 @@ symbols as if they had been passed to L</import>, you could call L</exporter_als
 =head2 exporter_also_import
 
 This method can be used *during* a call to C<import> for an option or generator to request that
-aditional things be imported into the caller as if the caller ad requested them on the import
+aditional things be imported into the caller as if the caller had requested them on the import
 line.  For example:
 
   sub foo : Export(-) {
@@ -1232,23 +1271,23 @@ as specified to C<import> (with sigil) and C<$args> is the optional hashref the 
 given following C<$symbol>.
 
 If you wanted to implement something like L<Sub::Exporter>'s "Collectors", you can just write
-some options that take an argument and store it in the $exporter instance.  Then, your
+some options that take an argument and store it in the C<$exporter> instance.  Then, your
 generator can retrieve the values from there.
 
   package MyExports;
   use Exporter::Extensible -exporter_setup => 1;
   export(
-    # be sure to use names that won't conflict with Exporter::Extensible's internals
+    # be sure to use hash keys that won't conflict with Exporter::Extensible's internals
     '-foo(1)' => sub { $_[0]{foo}= $_[1] },
     '-bar(1)' => sub { $_[0]{bar}= $_[1] },
     '=foobar' => sub { my $foobar= $_[0]{foo} . $_[0]{bar}; sub { $foobar } },
   );
   
   package User;
-  use MyModule -foo => 'abc', -bar -> 'def', 'foobar', -foo => 'xyz', 'foobar', { -as => "x" };
+  use MyModule qw/ -foo abc -bar def foobar -foo xyz foobar /, { -as => "x" };
   # This exports a sub as "foobar" which returns "abcdef", and a sub as "x" which
-  # returns "xyzdef".  Note that if the second one didn't specify -as, it would get ignored
-  # because 'foobar' was already queued to be installed.
+  # returns "xyzdef".  Note that if the second one didn't specify {-as => "x"},
+  # it would get ignored because 'foobar' was already queued to be installed.
 
 =head1 AUTOLOADING SYMBOLS AND TAGS
 
@@ -1260,20 +1299,22 @@ symbols and tags on demand.  Simply override one of these methods:
   my $ref= $self->exporter_autoload_symbol($sym);
 
 This takes a symbol (including sigil), and returns a ref which should be installed.  The ref
-is cached, but B<not> added to the package C<%EXPORT>.  If you want that to happen, you need to
-do it yourself.  This method is called once at the end of iterating the package hierarchy, so
-you should call C<next::method> if you don't recognize the symbol.
+is cached, but B<not> added to the package C<%EXPORT> to be inherited by subclasses.  If you
+want that to happen, you need to do it yourself.  This method is called once at the end of
+checking the package hierarchy, rather than per-class of the hierarchy, so you should call
+C<next::method> if you don't recognize the symbol.
 
 =head2 exporter_autoload_tag
 
   my $arrayref= $self->exporter_autoload_tag($name);
 
 This takes a tag name (no sigil) and returns an arrayref of items which should be added to the
-tag.  The combined tag members are cached, but not added to the package C<%EXPORT_TAGS>.
-This method is called only if no package in the hierarchy defined the tag, which could cause
-confusion if a derived class wants to add a few symbols to a tag which is otherwise autoloaded
-by a parent.  This method is called once at the end of iterating the package hierarchy, so
-you should call C<next::method> to collect any inherited autoloaded members of this tag.
+tag.  The combined tag members are cached, but not added to the package C<%EXPORT_TAGS> to be
+inherited by subclasses.  This method is called only if no package in the hierarchy defined the
+tag, which could cause confusion if a derived class wants to add a few symbols to a tag which
+is otherwise autoloaded by a parent.  This method is called once at the end of iterating the
+package hierarchy, so you should call C<next::method> to collect any inherited autoloaded
+members of this tag.
 
 =head1 SEE ALSO
 
@@ -1291,14 +1332,9 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-
-# ABSTRACT: Create easy-to-extend modules which export symbols
-

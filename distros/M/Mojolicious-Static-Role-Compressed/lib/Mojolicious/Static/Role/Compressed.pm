@@ -4,7 +4,7 @@ use Mojo::Util   ();
 use Carp         ();
 use Scalar::Util ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $served_compressed_asset;
 my @compression_types = ({ext => 'br', encoding => 'br'}, {ext => 'gz', encoding => 'gzip'});
@@ -139,11 +139,12 @@ before serve_asset => sub {
     }
 
     my $accept_encoding = $req_headers->accept_encoding;
-    my @compression_possibilities
-        = defined $accept_encoding && $accept_encoding ne ''
-        ? grep { $accept_encoding =~ /$_->{encoding}/i } @compression_types
-        : ();
-    return unless @compression_possibilities;
+    return unless defined $accept_encoding && $accept_encoding ne '';
+
+    my $lc_accept_encoding = lc($accept_encoding);
+    return
+        unless my @compression_possibilities
+        = grep { index($lc_accept_encoding, lc($_->{encoding})) != -1 } @compression_types;
 
     unless ($compressed_asset and $compression_type) {
         for my $type (@compression_possibilities) {

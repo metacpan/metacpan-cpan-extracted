@@ -1,5 +1,10 @@
 Revision history for AnyEvent-Future
 
+0.04    2019-05-07 00:27:20
+        [CHANGES]
+         * Avoid ->done_cb / ->fail_cb which were removed in Future 0.40
+         * General docs style and module metadata refresh
+
 0.03    2015/05/29 17:09:20
         [CHANGES]
          * Add bidirectional conversion methods to convert between Future and

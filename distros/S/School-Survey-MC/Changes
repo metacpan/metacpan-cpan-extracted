@@ -1,5 +1,9 @@
 Revision history for School-Survey-MC
  
+0.003     2019-05-06 21:04:10+02:00 Europe/Zurich
+ - fix buggy 'say' replacement
+ - add tests which run with example input
+
 0.002     2018-12-03 08:41:12+01:00 Europe/Zurich
  - replace feature say with sub, for perl < 5.10
  - use Getopt::Args

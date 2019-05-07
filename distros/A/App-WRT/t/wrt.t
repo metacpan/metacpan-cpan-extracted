@@ -7,8 +7,11 @@ use utf8;
 use lib 'lib';
 
 use Encode;
-use Test::More tests => 4;
-use App::WRT;
+use Test::More tests => 12;
+
+# Does the module load?
+
+require_ok('App::WRT');
 
 chdir 'example';
 
@@ -39,7 +42,35 @@ chdir 'example';
     'icon_test has an image in it'
   );
 
+  my $icon_textfile = $w->icon_markup('icon_test/textfile', 'alt');
+  # diag($icon_textfile);
+  ok(
+    $icon_textfile eq q{<img src="https://example.com/icon_test/textfile.icon.png"
+ width="48" height="58"
+ alt="alt" />},
+    'got expected icon for icon_test/textfile'
+  );
+
+  my $icon_dir = $w->icon_markup('icon_test/dir', 'alt');
+  # diag($icon_dir);
+  ok(
+    $icon_dir eq q{<img src="https://example.com/icon_test/dir/index.icon.png"
+ width="48" height="58"
+ alt="alt" />},
+    'got expected icon for icon_test/dir'
+  );
+
+  my $icon_subentry = $w->icon_markup('icon_test/dir/subentry', 'alt');
+  # diag($icon_subentry);
+  ok(
+    $icon_subentry eq q{<img src="https://example.com/icon_test/dir/subentry.icon.png"
+ width="48" height="58"
+ alt="alt" />},
+    'got expected icon for icon_test/dir/subentry'
+  );
+
 # feed rendering
+
   my $feed = decode('UTF-8', $w->display($w->{feed_alias}));
   # diag($feed);
 
@@ -49,9 +80,34 @@ chdir 'example';
     'feed contains some stars'
   );
 
-# rendering static html files
+# not expanding entries with wrt-noexpand
 
-# ok(
-#   $w->render(sub { diag($_[0]); }),
-#   'render stuff'
-# );
+  my $with_noexpand = $w->display('noexpand_test');
+  # diag($with_noexpand);
+  ok(
+    $with_noexpand !~ m/SHOULD NOT DISPLAY/,
+    'noexpand_test does not contain text of sub-entry do_not_expand_me'
+  );
+
+# displaying default entry when no entries are given:
+
+  my $with_no_entries = $w->display();
+  # diag($with_no_entries);
+  ok(
+    $with_no_entries =~ m{\Q<title>wrt::new</title>\E},
+    'display the default entry (new) when no entries are given'
+  );
+
+# contents of year index files:
+
+  my $plaintext_year = $w->display('2012');
+  ok(
+    $plaintext_year =~ m/\QI'm a year which is just a flatfile.\E/,
+    "2012 as plaintext year comes through."
+  );
+
+  my $plaintext_year_index = $w->display('2013');
+  ok(
+    $plaintext_year_index =~ m/\QI'm an index file for an entire year.\E/,
+    "2013's plaintext year index comes through."
+  );

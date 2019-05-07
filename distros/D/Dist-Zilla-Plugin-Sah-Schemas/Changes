@@ -1,3 +1,9 @@
+0.015   2019-05-07 (PERLANCAR)
+
+	- [bugfix] Fix adding prereq to coerce rule modules, should be
+	  using resolved/base type name.
+
+
 0.014   2018-06-26 (PERLANCAR)
 
 	- [Bugfix] Avoid adding prereqs for packages defined by self.

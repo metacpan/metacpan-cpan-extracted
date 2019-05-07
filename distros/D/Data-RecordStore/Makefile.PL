@@ -8,6 +8,7 @@ WriteMakefile
   'NAME' => 'Data::RecordStore',
   'EXE_FILES' => [
                    'bin/record_store_convert',
+                   'bin/record_store_convert~',
                    'bin/recordstore_explorer'
                  ],
   'VERSION_FROM' => 'lib/Data/RecordStore.pm',

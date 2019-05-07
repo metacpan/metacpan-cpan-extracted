@@ -1,4 +1,4 @@
-package Graph::Traverse 0.02 {
+package Graph::Traverse 0.03 {
 
     use warnings;
     use strict;
@@ -38,6 +38,8 @@ package Graph::Traverse 0.02 {
         my $return_weights = (defined $opts && $opts->{weights});
         my $return_hash = (defined $opts && $opts->{hash});
         my $save_paths = ($return_hash) ? [] : undef;
+        # Save all nodes (default), or only the callback-flagged terminal nodes?
+        my $save_all = (defined $opts && ($opts->{all} // 1));
 
         # If option 'attribute' is defined, we accumulate weights from each edge.
         # Define 'max' to terminate when a maximum weight is achieved.
@@ -98,7 +100,7 @@ package Graph::Traverse 0.02 {
                                           path => [@{$path{$t}}, $s],
                                           weight => $newvalue };
                         $this_node->{terminal} = $terminal{$s} if exists $terminal{$s};
-                        push @{$save_paths}, $this_node;
+                        push @{$save_paths}, $this_node if ($save_all || $terminal{$s});
                     }
                     # Only save new paths, and shorter-than-previously-found paths.
                     if ((!defined $path{$s}) || ($newvalue < $weight{$s} )) {
@@ -193,9 +195,9 @@ Graph::Traverse - A traverse() method for the Graph module.
 The only method resides in the Graph package (not Graph::Traverse)
 so that any descendant of Graph can call it.
 
-=head2 traverse ( START_VERTEX, [ \{OPTS} ] );
+=head2 traverse ( $start_vertex, [ \%opts ] );
 
-=head2 traverse ( \[START_VERTICES] , [ \{OPTS} ] );
+=head2 traverse ( \@start_vertices , [ \%opts ] );
 
 Traverses edges from the start vertex (or vertices) [either a single
 vertex's name, or an array of vertex names, may be passed], finding
@@ -281,6 +283,14 @@ will be saved in the returned hash, if any.
 
 Note that multiple paths to a given vertex may cause multiple
 callbacks with varying weights.
+
+=item all
+
+Useful only when 'hash' is true and a 'cb' function is given.  If
+'all' is omitted, or is set to a nonzero value, the returned hash will
+include all vertices which were encountered in the traversal.  If
+'all' has a nonzero value, only the vertices for which the callback
+returned a nonzero value will be added to the hash.
 
 =item weights
 

@@ -1,7 +1,7 @@
 package App::rsynccolor;
 
-our $DATE = '2019-03-28'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-05-06'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Add some color to rsync output
@@ -18,13 +18,19 @@ App::rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.005 of App::rsynccolor (from Perl distribution App-rsynccolor), released on 2019-03-28.
+This document describes version 0.006 of App::rsynccolor (from Perl distribution App-rsynccolor), released on 2019-05-06.
 
 =head1 SYNOPSIS
 
 See the command-line script L<rsynccolor>.
 
+=head1 DESCRIPTION
+
+Sample screenshot:
+
 =for Pod::Coverage ^(.+)$
+
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-rsynccolor-0.006/share/images/Screenshot_20190506_181519.png" />
 
 =head1 HOMEPAGE
 

@@ -1,4 +1,9 @@
-Revision history for Unixish
+1.0.6   2019-05-07 (PERLANCAR)
+
+        - No spec changes.
+
+	- Replace mention of Log::Any with Log::ger.
+
 
 1.0.5   2015-09-06 (PERLANCAR)
 

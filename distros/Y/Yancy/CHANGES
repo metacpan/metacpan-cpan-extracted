@@ -1,5 +1,27 @@
 Changelog for Yancy
 
+1.025     2019-05-05 23:08:11-05:00 America/Chicago
+
+    [Added]
+
+    - Added new Password auth plugin. This plugin allows user to
+      register accounts and login with a password (similar to the Basic
+      auth plugin).
+    - Added simple Token auth plugin. This allows for easy API
+      authentication.
+    - Added OAuth2 auth plugin.
+    - Added Github auth plugin. This uses the OAuth2 plugin and fetches
+      useful information from the Github API.
+    - Added Auth multiplex plugin to enable multiple authentication
+      mechanisms in a single site. This allows individual users to be
+      authenticated from one or more auth mechanisms attached to the
+      same account.
+    - Added `require_user` helper for basic authorization schemes.
+    - The Bootstrap4 Form plugin is now the default form plugin if no
+      other form plugin is loaded. This allows the new Auth plugins to
+      have a way to generate fields for registering users.
+    - Added `default` value handling in `create` helper.
+
 1.024     2019-04-26 15:55:07+01:00 Europe/London
 
     [Added]

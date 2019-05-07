@@ -29,6 +29,7 @@ wrt-ls - list
     wrt ls --days   # entries for individual days
     wrt ls --months # entries for individual months 
     wrt ls --years  # entries for years
+    wrt ls --props  # all properties
 
     # Display help:
     wrt ls --help
@@ -62,62 +63,86 @@ use 5.10.0;
 
 use strict;
 use warnings;
-no  warnings 'uninitialized';
 
-use Getopt::Long;
+use Getopt::Long qw(GetOptionsFromArray);
 use Pod::Usage;
 use App::WRT;
+use Carp;
 
-# Handle options, including help generated from the POD above.  See:
-# - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
-# - https://metacpan.org/pod/Pod::Usage
-# - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
-my $config_file = 'wrt.json';
-my $list_days = 0;
-my $list_months = 0;
-my $list_years = 0;
-my $list_all = 1;
-GetOptions(
-  'config=s' => \$config_file,
-  help       => sub { pod2usage(0) },
-  days       => \$list_days,
-  months     => \$list_months,
-  years      => \$list_years,
-) or pod2usage(2);
-
-# Allow only one of --days, --months, --years.  Default to listing all entries
-# if none of these are specified.
-my $option_count = 0;
-foreach ($list_days, $list_months, $list_years) {
-  $option_count += $_;
-}
-if ($option_count > 1) {
-  die "Please specify at most one of --days, --months, or --years.";
-} elsif ($option_count == 1) {
-  $list_all = 0;
+# If invoked directly from the command-line, caller() will return undef.
+# Execute main() with a callback to print output directly, and a copy of
+# our real @ARGV:
+if (not caller()) {
+  my $output = sub { say @_; };
+  main($output, @ARGV);
+  exit(0);
 }
 
-unless (-e $config_file) {
-  die "No wrt config file found.  Tried: $config_file";
+# main() takes an output callback and an @ARGV to pass in to
+# GetOptionsFromArray().  This allows relatively simple integration
+# tests to be written.  See also: t/bin-wrt-ls.t
+sub main {
+  my ($output, @local_argv) = @_;
+
+  # Handle options, including help generated from the POD above.  See:
+  # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+  # - https://metacpan.org/pod/Pod::Usage
+  # - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+  my $config_file = 'wrt.json';
+  my $list_days = 0;
+  my $list_months = 0;
+  my $list_years = 0;
+  my $list_props = 0;
+  my $list_all = 1;
+  GetOptionsFromArray(
+    \@local_argv,
+    'config=s' => \$config_file,
+    help       => sub { pod2usage(0) },
+    days       => \$list_days,
+    months     => \$list_months,
+    years      => \$list_years,
+    props      => \$list_props,
+  ) or pod2usage(2);
+
+  # Allow only one of --days, --months, --years, --props.  Default to listing
+  # all entries if none of these are specified.
+  my $option_count = 0;
+  foreach ($list_days, $list_months, $list_years, $list_props) {
+    $option_count += $_;
+  }
+  if ($option_count > 1) {
+    croak("Please specify at most one of --days, --months, --years, --props.");
+  } elsif ($option_count == 1) {
+    $list_all = 0;
+  }
+
+  unless (-e $config_file) {
+    croak("No wrt config file found.  Tried: $config_file");
+  }
+
+  my $w = App::WRT::new_from_file($config_file);
+
+  # Define the function that'll return the base list of entries to match
+  # against:
+  my $base_list;
+  if ($list_days) {
+    $base_list = sub { $w->{entries}->all_days(); };
+  } elsif ($list_months) {
+    $base_list = sub { $w->{entries}->all_months(); };
+  } elsif ($list_years) {
+    $base_list = sub { $w->{entries}->all_years(); };
+  } elsif ($list_props) {
+    $base_list = sub { $w->{entries}->all_props(); };
+  } elsif ($list_all) {
+    $base_list = sub { $w->{entries}->all(); };
+  }
+
+  foreach my $entry ($base_list->()) {
+    # When invoked from command line, this will normally be a simple
+    # routine that does `say $entry`.  Under testing, it may instead
+    # accumulate output for checking elsewhere.
+    $output->($entry);
+  }
 }
 
-my $w = App::WRT::new_from_file($config_file);
-
-# Define the function that'll return the base list of entries to match
-# against:
-my $base_list;
-if ($list_days) {
-  $base_list = sub { $w->{entries}->all_days(); };
-} elsif ($list_months) {
-  $base_list = sub { $w->{entries}->all_months(); };
-} elsif ($list_years) {
-  $base_list = sub { $w->{entries}->all_years(); };
-} elsif ($list_all) {
-  $base_list = sub { $w->{entries}->all(); };
-}
-
-foreach my $entry ($base_list->()) {
-  say $entry;
-}
-
-exit(0);
+1;

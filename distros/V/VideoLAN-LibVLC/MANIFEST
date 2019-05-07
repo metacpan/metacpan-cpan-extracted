@@ -9,7 +9,6 @@ Makefile.PL
 Makefile.header
 PerlVLC.c
 PerlVLC.h
-README
 buffer_scalar.c
 const.list
 dist.ini

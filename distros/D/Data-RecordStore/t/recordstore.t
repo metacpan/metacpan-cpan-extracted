@@ -35,6 +35,15 @@ eval {
     test_recycle();
     test_record_silos();
     test_timing();
+
+    test_suite(1);
+    test_open(1);
+    test_locks(1);
+    test_stow_and_fetch_and_delete(1);
+    test_recycle(1);
+    test_record_silos(1);
+    test_timing(1);
+
 };
 if( $@ ) {
     fail( "got errors $@" );
@@ -45,10 +54,13 @@ done_testing;
 exit( 0 );
 
 sub test_recycle {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
     my $dir = tempdir( CLEANUP => 1 );
-    my $store = Data::RecordStore->open_store( $dir );
-
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
+    is( $store->size, 0, "Opened and empty store" );
     my $id = $store->stow( "REC1 " );
+    is( $store->size, 4096, "Store with one (one block) entry" );
     is( $id, 1, "first record id " );
     $store->stow( "REC2 " );
     $store->stow( "REC3 " );
@@ -56,13 +68,23 @@ sub test_recycle {
     $id = $store->stow( "REC5 " );
     is( $id, 5, "fifth record" );
 
-    is( $store->entry_count, 5, "Five records" );
+    is( $store->entry_count, 5, "Five entries" );
+    $store->sync;
+    is( $store->size, 5 * 4096, "Store with five one block entries" );
+    is( $store->entry_count, 5, "Five record entries" );
     $store->delete_record( 1 );
+    is( $store->size, 4 * 4096, "Four Records" );
+    is( $store->pending, 0, "No pending writes" );
     $store->delete_record( 2 );
     $store->delete_record( 3 );
     $store->delete_record( 4 );
     is( $store->record_count, 1, "one record" );
     $store->recycle_id( 5 );
+
+    is( $store->highest_entry_id, 5, 'entry count is still 5 even after recycle' );
+
+    
+    is( $store->size, 0, "no more Records" );
 
     my $nextid = $store->next_id;
     is( $id, 5, "fifth record was recycled" );
@@ -76,6 +98,9 @@ sub test_recycle {
 } #test_recycle
 
 sub test_open {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
+    
     local( *STDERR );
     my $out;
     open( STDERR, ">>", \$out );
@@ -94,7 +119,21 @@ sub test_open {
     ok( -d $dir, "directory created with ->open_store" );
     ok( -d "$dir/RECYC_SILO", "recyc silo exists with ->open_store" );
     ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ->open_store" );
+    is( $dir, $store->provider_id, "provider id" );
+    is( 'MULTI', $store->[10], "multi is default" );
 
+    # test different ways to call open_store
+    $dir = tempdir( CLEANUP => 1 );
+    $store = Data::RecordStore->open_store( BASE_PATH => $dir );
+    is( $dir, $store->provider_id, "provider id" );
+    is( 'MULTI', $store->[10], "multi is default" );
+
+    $dir = tempdir( CLEANUP => 1 );
+    $store = Data::RecordStore->open_store( MODE => $mode, BASE_PATH => $dir );
+    is( $mode, $store->[10], "mode was set" );
+    is( $dir, $store->provider_id, "provider id" );    
+
+    
     #
     # Test directory that can't be written to
     #
@@ -102,7 +141,7 @@ sub test_open {
         $dir = tempdir( CLEANUP => 1 );
         chmod 0666, $dir;
         eval {
-            $store = Data::RecordStore->open_store( $dir );
+            $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
             fail( "Was able to open store in unwritable directory" );
         };
 
@@ -113,8 +152,10 @@ sub test_open {
 } #test_open
 
 sub test_stow_and_fetch_and_delete {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
     my $dir = tempdir( CLEANUP => 1 );
-    my $store = Data::RecordStore->open_store( $dir );
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $store->stow( "SOMETHING TO STOW", 2 );
     is( $store->fetch(2), "SOMETHING TO STOW", "stow given id" );
 
@@ -212,7 +253,7 @@ sub test_stow_and_fetch_and_delete {
     }
 
     $dir = tempdir( CLEANUP => 1 );
-    $store = Data::RecordStore->open_store( $dir );
+    $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $store->stow( "FOO", 1 );
     is( $store->entry_count, 1, "ONE THING" );
     $store->stow( "BAR", 1 );
@@ -242,7 +283,7 @@ sub test_stow_and_fetch_and_delete {
 
     # test putting something big in 12, then shrinking it down and make sure it wasn't deleted
     $dir = tempdir( CLEANUP => 1 );
-    $store = Data::RecordStore->open_store( $dir );
+    $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $id = $store->stow( "X" x 4000 );
     is( $store->fetch( $id ), 'X' x 4000, 'stored okey' );
     is( $store->_get_silo( 12 )->entry_count, 1, "stored in silo 12" );
@@ -257,9 +298,11 @@ sub test_stow_and_fetch_and_delete {
 } #test_stow_and_fetch_and_delete
 
 sub test_locks {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
     my $dir = tempdir( CLEANUP => 1 );
     make_path( "$dir/LOCKS" );
-    my $store = Data::RecordStore->open_store( $dir );
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $store->lock( "FOO", "BAR", "BAZ", "BAZ" );
     
     eval {
@@ -277,7 +320,7 @@ sub test_locks {
         print $bla "CANTOPEN\n";
         chmod 0444, "$dir/ilock";
         eval {
-            my $store = Data::RecordStore->open_store( $dir );
+            my $store = Data::RecordStore->open_store( BASE_PATH => $dir );
             $store->stow( "XXX" );
             fail( "Was able to open store with unwriteable index lock file" );
         };
@@ -287,7 +330,7 @@ sub test_locks {
         make_path( "$dir/LOCKS" );
         chmod 0444, "$dir/LOCKS";
         eval {
-            $store = Data::RecordStore->open_store( $dir );
+            $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
             pass( "Was able to open store" );
             $store->lock( "FOO" );
             fail( "Data::RecordStore->lock didnt die trying to lock to unwriteable directory" );
@@ -300,7 +343,7 @@ sub test_locks {
         open my $out, '>', "$dir/LOCKS/BAR";
         chmod 0444, "$dir/LOCKS/BAR";
         eval {
-            $store = Data::RecordStore->open_store( $dir );
+            $store = Data::RecordStore->open_store( BASE_PATH => $dir );
             pass( "Was able to open store" );
             $store->lock( "FOO", "BAR", "BAZ" );
             fail( "Data::RecordStore->lock didnt die trying to lock unwriteable lock file" );
@@ -312,11 +355,13 @@ sub test_locks {
 }
 
 sub test_suite {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
     my $dir = tempdir( CLEANUP => 1 );
     my $dir2 = tempdir( CLEANUP => 1 );
     my $dir3 = tempdir( CLEANUP => 1 );
 
-    my $store = Data::RecordStore->open_store( $dir );
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     is( $store->entry_count, 0, 'no entries in new store' );
     ok( ! $store->has_id( 1 ), "no first id yet" );
     ok( ! $store->has_id( 2 ), "no second id yet" );
@@ -333,7 +378,7 @@ sub test_suite {
     # store with 3 entries
     is( $store->entry_count, 3, "store 3 entries" );
 
-    $store = Data::RecordStore->open_store( $dir );
+    $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     is( $id2, $id + 1, "Incremental object ids" );
     is( $store->fetch( $id ), "FOO FOO", "first item saved" );
     is( $store->fetch( $id2 ), "BAR BAR", "second item saved" );
@@ -366,7 +411,7 @@ sub test_suite {
     #
     # Try testing the moving of a record
     #
-    $store = Data::RecordStore->open_store( $dir3 );
+    $store = Data::RecordStore->open_store( BASE_PATH => $dir3, MODE => $mode );
 
     # 12 is 4096 - 5 = 4091, 13 is 8192 - 5 = 8187
     $id = $store->stow( "x" x 4087 ); #12
@@ -449,6 +494,9 @@ sub test_suite {
 } #test suite
 
 sub test_timing {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
+    
     no strict 'refs';
 
     my $ptr;
@@ -466,7 +514,7 @@ sub test_timing {
     $$ptr = 3;
 
     my $dir = tempdir( CLEANUP => 1 );
-    my $store = Data::RecordStore->open_store( $dir );
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $store->stow( "DATAONEZ", 1 );
 
     $$ptr = 4;
@@ -516,11 +564,14 @@ sub test_timing {
 } #test_time
 
 sub test_record_silos {
+    my $use_single = shift;
+    my $mode = $use_single ? 'SINGLE' : 'MULTI';
+
     my $dir = tempdir( CLEANUP => 1 );
 
     $Data::RecordStore::Silo::MAX_SIZE = 80;
 
-    my $store = Data::RecordStore->open_store( $dir );
+    my $store = Data::RecordStore->open_store( BASE_PATH => $dir, MODE => $mode );
     $store->empty;
 
     is( $store->entry_count, 0, "Emptied store" );

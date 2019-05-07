@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.072   2019-05-06
+        - Complete pass-through of settings.
+
 0.071   2019-02-20
         - choose_a_subset: option 'keep_chosen' replaces 'remove_chosen'.
         - choose_a_number: option 'small_on_top' renamed to 'small_first'.

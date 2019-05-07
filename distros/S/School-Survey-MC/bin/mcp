@@ -11,7 +11,7 @@ use YAML::Tiny 'LoadFile';
 use HTML::Entities;
 use Getopt::Args;
 
-sub say { print "$_\n" } # say for perl below 5.10
+sub say { print "@_\n" } # say for perl below 5.10
 
 arg quantity => (
     isa => 'Int',
@@ -139,7 +139,7 @@ mcp - pick multiple choice questions randomly
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

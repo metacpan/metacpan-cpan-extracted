@@ -1,7 +1,7 @@
 package Log::ger;
 
-our $DATE = '2019-04-13'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2019-05-06'; # DATE
+our $VERSION = '0.028'; # VERSION
 
 #IFUNBUILT
 # use strict 'subs', 'vars';
@@ -64,7 +64,6 @@ sub install_routines {
 
     if ($target eq 'package') {
 #IFUNBUILT
-#         no strict 'refs';
 #         no warnings 'redefine';
 #END IFUNBUILT
         for my $r (@$routines) {
@@ -76,7 +75,6 @@ sub install_routines {
         }
     } elsif ($target eq 'object') {
 #IFUNBUILT
-#         no strict 'refs';
 #         no warnings 'redefine';
 #END IFUNBUILT
         my $pkg = ref $target_arg;
@@ -176,7 +174,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

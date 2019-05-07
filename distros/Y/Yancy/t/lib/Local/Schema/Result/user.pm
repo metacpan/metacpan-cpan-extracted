@@ -47,6 +47,11 @@ __PACKAGE__->add_columns(
   },
   "age",
   { data_type => "integer", is_nullable => 1 },
+  plugin => {
+      data_type => 'string',
+      default_value => 'password',
+      size => 50,
+  },
 );
 __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("user_username_key", ["username"]);

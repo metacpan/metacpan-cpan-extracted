@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;  # //
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 
@@ -130,7 +130,7 @@ scalar context), even if fewer bytes have already been obtained. These bytes
 will be lost. On any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are
 ignored), the future fails with a suitable error message.
 
-This may make more than one C<syssread()> call.
+This may make more than one C<sysread()> call.
 
 =cut
 
@@ -175,7 +175,7 @@ written to the given filehandle. It may write up to all of the bytes. On any
 error (other than C<EAGAIN> / C<EWOULDBLOCK> which are ignored) the future
 fails with a suitable error message.
 
-Note specifically this may perform only a single C<sysread()> call, and thus
+Note specifically this may perform only a single C<syswrite()> call, and thus
 is not guaranteed to actually return the full length.
 
 =cut
@@ -194,6 +194,13 @@ sub syswrite
       $written_len = $f->get;
 
 I<Since version 0.04.>
+
+Returns a L<Future> that will become done when exactly the given bytes have
+been written to the given filehandle. On any error (other than C<EAGAIN> /
+C<EWOULDBLOCK> which are ignored) the future fails with a suitable error
+message.
+
+This may make more than one C<syswrite()> call.
 
 =cut
 

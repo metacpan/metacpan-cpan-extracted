@@ -95,7 +95,7 @@ sub test_open_silo {
     is( $silo->[1], 3, "record size 3" );
 
     eval {$silo = Data::RecordStore::Silo->open_silo( 'AAA', $silo_dir, 30 ); };
-    like( $@, qr/record size does not agree/, 'template and size given dont agree' );
+    like( $@, qr/record size \d+ does not agree/, 'template and size given dont agree' );
     undef $@;
 
     $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 30 );
@@ -134,17 +134,15 @@ sub test_open_silo {
         $silo = Data::RecordStore::Silo->open_silo( 'A', $dir, 20 );
         fail( "created silo that had a size and template mismatch" );
     };
-    like( $@, qr/given record size does not agree with template size/, "correct error message for template and size mismatch" );
+    like( $@, qr/given record size \d+ does not agree with template size/, "correct error message for template and size mismatch" );
     eval {
         $silo = Data::RecordStore::Silo->open_silo( 'L', $dir, 4 );
         pass( "created silo with a match between template size and given size" );
     };
     my $ndir = tempdir( CLEANUP => 1 );
     diag( " $ndir  ".(-d $ndir)." )" );
-    eval {
-        $silo = Data::RecordStore::Silo::open_silo( 'L', $ndir, 4 );
-        pass( "able to open silo with ::open_silo" );
-    };
+
+    $silo = Data::RecordStore::Silo->open_silo( 'L', $ndir, 4 );
     
 
     $silo->push( [ 100 ] );

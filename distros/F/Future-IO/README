@@ -87,7 +87,7 @@ METHODS
     EWOULDBLOCK which are ignored), the future fails with a suitable error
     message.
 
-    This may make more than one syssread() call.
+    This may make more than one sysread() call.
 
  syswrite
 
@@ -101,7 +101,7 @@ METHODS
     On any error (other than EAGAIN / EWOULDBLOCK which are ignored) the
     future fails with a suitable error message.
 
-    Note specifically this may perform only a single sysread() call, and
+    Note specifically this may perform only a single syswrite() call, and
     thus is not guaranteed to actually return the full length.
 
  syswrite_exactly
@@ -110,6 +110,13 @@ METHODS
           $written_len = $f->get;
 
     Since version 0.04.
+
+    Returns a Future that will become done when exactly the given bytes
+    have been written to the given filehandle. On any error (other than
+    EAGAIN / EWOULDBLOCK which are ignored) the future fails with a
+    suitable error message.
+
+    This may make more than one syswrite() call.
 
  override_impl
 

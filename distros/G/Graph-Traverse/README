@@ -38,9 +38,9 @@ METHODS
     The only method resides in the Graph package (not Graph::Traverse) so
     that any descendant of Graph can call it.
 
- traverse ( START_VERTEX, [ \{OPTS} ] );
+ traverse ( $start_vertex, [ \%opts ] );
 
- traverse ( \[START_VERTICES] , [ \{OPTS} ] );
+ traverse ( \@start_vertices , [ \%opts ] );
 
     Traverses edges from the start vertex (or vertices) [either a single
     vertex's name, or an array of vertex names, may be passed], finding
@@ -121,6 +121,14 @@ METHODS
 
       Note that multiple paths to a given vertex may cause multiple
       callbacks with varying weights.
+
+    all
+
+      Useful only when 'hash' is true and a 'cb' function is given. If
+      'all' is omitted, or is set to a nonzero value, the returned hash
+      will include all vertices which were encountered in the traversal. If
+      'all' has a nonzero value, only the vertices for which the callback
+      returned a nonzero value will be added to the hash.
 
     weights
 
