@@ -1,5 +1,11 @@
 Revision history for Perl extension GIS-Distance.
 
+0.18 2019-05-10T20:31:31Z
+
+ - Switch to the GNU General Public License version 3.
+ - Fixed pod error as reported by CPANTS.
+ - Documentation edits.
+
 0.17 2019-03-17T17:01:31Z
 
  - Finalize the new internal formula interface.

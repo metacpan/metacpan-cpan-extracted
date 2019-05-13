@@ -40,6 +40,36 @@ my $DBL_MAX = POSIX::DBL_MAX();
 # Start objects count
 my $start_memory_blocks_count = SPVM::memory_blocks_count();
 
+# set_exception
+{
+  # set_exception - string
+  {
+    SPVM::set_exception("あいう");
+    ok(TestCase::ExchangeAPI->set_exception);
+  }
+  
+  # set_exception - undef
+  {
+    SPVM::set_exception(undef);
+    ok(TestCase::ExchangeAPI->set_exception_undef);
+  }
+}
+
+# exception
+{
+  # exception - string
+  {
+    SPVM::set_exception("あいう");
+    is(SPVM::exception, "あいう");
+  }
+
+  # exception - undef
+  {
+    SPVM::set_exception(undef);
+    ok(!SPVM::exception);
+  }
+}
+
 # Pass hash
 {
   # Pass hash

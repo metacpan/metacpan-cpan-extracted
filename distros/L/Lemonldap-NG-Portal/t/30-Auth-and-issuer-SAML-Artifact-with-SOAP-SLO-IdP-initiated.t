@@ -132,7 +132,7 @@ m#img src="http://auth.idp.com(/saml/relaySingleLogoutSOAP)\?(relay=.*?)"#s,
         ),
         'Get image'
     );
-    expectRedirection( $res, "http://auth.idp.com/static/common/icons/ok.png");
+    expectRedirection( $res, "http://auth.idp.com/static/common/icons/ok.png" );
 
     # Test if logout is done
     switch ('issuer');

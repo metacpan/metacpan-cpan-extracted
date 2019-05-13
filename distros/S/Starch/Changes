@@ -1,5 +1,11 @@
 Revision history for Perl extension Starch.
 
+0.14 2019-05-13T02:12:11Z
+
+ - Avoid CPANTS Kwalitee check for Test2::V0.
+ - Switch to the GNU General Public License version 3.
+ - Stop using Test2::Require::Module in Test::Starch.
+
 0.13 2019-03-23T21:34:30Z
 
  - Move Test::Starch back into this distro.

@@ -1,5 +1,9 @@
 Revision history for BenchmarkAnything-Storage-Frontend-Lib
 
+0.023     2019-05-09
+        - lock process_raw_result_queue
+        - bundle_count now passed down the call chain
+
 0.022     2018-04-11
         - verbosity tweaks fitting ::Backend::SQL behaviour changes
         - adapt to changed and new operators 'not_like' and 'is_empty'

@@ -1,0 +1,65 @@
+{
+   "abstract" : "Vertically compact width-limited data formatter",
+   "author" : [
+      "mst - Matt S Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dumper-Compact",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Mu" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Dumper-Compact@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dumper-Compact"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shadow-dot-cat/Data-Dumper-Compact.git",
+         "web" : "https://github.com/shadow-dot-cat/Data-Dumper-Compact"
+      }
+   },
+   "version" : "0.002002",
+   "x_authority" : "cpan:MSTROUT",
+   "x_breaks" : {},
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

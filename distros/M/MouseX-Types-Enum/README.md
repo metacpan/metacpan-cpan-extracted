@@ -6,8 +6,8 @@ MouseX::Types::Enum - Object-oriented, Java-like enum type declaration based on 
 
 In the following example,
 
-- Three enumeration constants, `APPLE`, `ORANGE`, and `BANANA` are defined.
-- Three instance variables, `name`, `color`, and `has_seed` are defined.
+- Three enumeration constants, `APPLE`, `GRAPE`, and `BANANA` are defined.
+- Three instance variables, `name`, `color`, `price` and `has_seed` are defined.
 - A method `make_sentence($suffix)` is defined.
 
 code:
@@ -15,15 +15,15 @@ code:
     {
         package Fruits;
 
+        use strict;
+        use warnings;
+
         use Mouse;
-        use MouseX::Types::Enum (
-            APPLE  => { name => 'Apple', color => 'red' },
-            ORANGE => { name => 'Orange', color => 'orange' },
-            BANANA => { name => 'Banana', color => 'yellow', has_seed => 0 }
-        );
+        extends 'MouseX::Types::Enum';
 
         has name => (is => 'ro', isa => 'Str');
         has color => (is => 'ro', isa => 'Str');
+        has price => (is => 'ro', isa => 'Num');
         has has_seed => (is => 'ro', isa => 'Int', default => 1);
 
         sub make_sentence {
@@ -32,43 +32,50 @@ code:
             return sprintf("%s is %s%s", $self->name, $self->color, $suffix);
         }
 
-        __PACKAGE__->meta->make_immutable;
+        sub APPLE {1 => (
+            name  => 'Apple',
+            color => 'red',
+            price => 1.2,
+        )}
+        sub GRAPE {2 => (
+            name  => 'Grape',
+            color => 'purple',
+            price => 3.5,
+        )}
+        sub BANANA {3 => (
+            name     => 'Banana',
+            color    => 'yellow',
+            has_seed => 0,
+            price    => 1.5,
+        )}
+
+        __PACKAGE__->_build_enum;
+
+        1;
     }
 
-    Fruits->APPLE == Fruits->APPLE;        # 1
-    Fruits->APPLE == Fruits->ORANGE;       # ''
-    Fruits->APPLE->to_string;              # 'APPLE'
+    # equivalence
+    ok(Fruits->APPLE == Fruits->APPLE);
+    ok(Fruits->APPLE != Fruits->GRAPE);
+    ok(Fruits->APPLE != Fruits->BANANA);
 
-    Fruits->APPLE->name;                   # 'Apple';
-    Fruits->APPLE->color;                  # 'red'
-    Fruits->APPLE->has_seed;               # 1
+    # instance variable
+    is(Fruits->APPLE->name, 'Apple');
+    is(Fruits->APPLE->color, 'red');
+    is(Fruits->APPLE->price, 1.2);
 
-    Fruits->APPLE->make_sentence('!!!');   # 'Apple is red!!!'
+    # instance method
+    is(Fruits->APPLE->make_sentence('!'), 'Apple is red!');
 
-    Fruits->enums; # { APPLE  => Fruits->APPLE, ORANGE => Fruits->ORANGE, BANANA => Fruits->BANANA }
-
-If you have no need to define instance variables, you can declare enums more simply like following.
-
-    {
-        package Day;
-
-        use MouseX::Types::Enum qw/
-            Sun
-            Mon
-            Tue
-            Wed
-            Thu
-            Fri
-            Sat
-        /;
-
-        __PACKAGE__->meta->make_immutable;
-    }
-
-    Day->Sun == Day->Sun;   # 1
-    Day->Sun == Day->Mon;   # ''
-    Day->Sun->to_string;    # 'Sun'
-    Day->enums;             # { Sun => Day->Sun, Mon => Day->Mon, ... }
+    # get instance
+    is(Fruits->get(1), Fruits->APPLE);
+    is(Fruits->get(2), Fruits->GRAPE);
+    is(Fruits->get(3), Fruits->BANANA);
+    is_deeply(Fruits->all, {
+        1 => Fruits->APPLE,
+        2 => Fruits->GRAPE,
+        3 => Fruits->BANANA,
+    });
 
 # DESCRIPTION
 

@@ -1854,4 +1854,12 @@ sub import {
 }
 TEST
 
+test(<<'TEST'); # STRCMP/Batch-Interpreter-0.01/lib/Batch/Interpreter/TestSupport.pm
+sub quote_argument {
+    $_ = shift;
+    s/([\\\"])/\\$1/gi;
+    return /[\s\\\"]/ ? "\"$_\"" : $_;
+}
+TEST
+
 done_testing;

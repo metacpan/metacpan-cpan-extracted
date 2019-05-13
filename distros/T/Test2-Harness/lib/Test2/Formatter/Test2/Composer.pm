@@ -2,7 +2,7 @@ package Test2::Formatter::Test2::Composer;
 use strict;
 use warnings;
 
-our $VERSION = '0.001073';
+our $VERSION = '0.001074';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/first/;
@@ -222,7 +222,7 @@ sub render_info {
             chomp($msg = $details);
         }
 
-        ['info', $_->{tag}, $details]
+        ['info', $_->{tag}, $details, $_->{table} || ()]
     } @{$f->{info}};
 }
 

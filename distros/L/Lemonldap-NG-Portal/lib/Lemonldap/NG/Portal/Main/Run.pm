@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -240,7 +240,8 @@ sub do {
                 $req,
                 {
                     result => 1,
-                    code   => $err
+                    error  => $err,
+                    id     => $req->id
                 }
             );
         }
@@ -330,7 +331,7 @@ sub autoRedirect {
 # If $id is set to undef or if $args{force} is true, return a new session.
 sub getApacheSession {
     my ( $self, $id, %args ) = @_;
-    $args{kind} ||= "SSO";
+    $args{kind} //= "SSO";
     if ($id) {
         $self->logger->debug("Try to get $args{kind} session $id");
     }

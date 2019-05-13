@@ -4,13 +4,12 @@ package App::ElasticSearch::Utilities::QueryString::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '6.4'; # VERSION
+our $VERSION = '6.5'; # VERSION
 
 use Hash::Merge::Simple qw(clone_merge);
 use Moo::Role;
 use Ref::Util qw(is_arrayref is_hashref);
 use Types::Standard qw( Str Int );
-
 
 
 # Attributes
@@ -88,7 +87,7 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 6.4
+version 6.5
 
 =head1 ATTRIBUTES
 

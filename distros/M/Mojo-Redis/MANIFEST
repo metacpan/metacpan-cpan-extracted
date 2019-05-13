@@ -27,6 +27,7 @@ t/connection.t
 t/cursor.t
 t/db.t
 t/geo.t
+t/keyspace-listen.t
 t/method-coverage.t
 t/pipelining.t
 t/pubsub-reconnect.t

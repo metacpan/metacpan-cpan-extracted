@@ -1,5 +1,13 @@
 Revision history for BenchmarkAnything-Storage-Backend-SQL
 
+0.026     2019-05-10
+        - rework ordering in processing queued bench bundles
+          so that we can use an earlier optimization again for
+          inserting large amounts of data.
+
+0.025     2019-05-09
+        - optimizations in queue processing
+
 0.024     2018-04-11
         - tweak sql schema with more indexes
         - rework transaction handling in queue processing

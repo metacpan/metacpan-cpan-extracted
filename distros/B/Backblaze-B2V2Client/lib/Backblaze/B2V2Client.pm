@@ -2,7 +2,7 @@ package Backblaze::B2V2Client;
 # API client library for V2 of the API to Backblaze B2 object storage
 # Allows for creating/deleting buckets, listing files in buckets, and uploading/downloading files
 
-$Backblaze::B2V2Client::VERSION = '1.0';
+$Backblaze::B2V2Client::VERSION = '1.1';
 
 # our dependencies:
 use Cpanel::JSON::XS;
@@ -172,6 +172,8 @@ sub b2_upload_file {
 	# this must include valid entries for 'new_file_name' and 'bucket_name'
 	# and it has to include either the raw file contents in 'file_contents'
 	# or a valid location in 'file_location'
+	# also, you can include 'content_type' (which would be the MIME Type'
+	# if you do not want B2 to auto-determine the MIME/content-type
 
 	# did they provide a file location or path?
 	if ($args{file_location} && -e "$args{file_location}") {
@@ -193,6 +195,9 @@ sub b2_upload_file {
 		return;		
 	}	
 	
+	# default content-type
+	$args{content_type} ||= 'b2/x-auto';
+	
 	# OK, let's continue:  get the upload URL and authorization token for this bucket
 	$self->b2_get_upload_url( $args{bucket_name} );
 	
@@ -204,7 +209,7 @@ sub b2_upload_file {
 		'special_headers' => {
 			'X-Bz-File-Name' => uri_escape( $args{new_file_name} ),
 			'X-Bz-Content-Sha1' => sha1_hex( $args{file_contents} ),
-			'Content-Type' => 'b2/x-auto',
+			'Content-Type' => $args{content_type},
 		},
 	);
 	
@@ -644,7 +649,7 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
 		'new_file_name' => 'ginger_was_perfect.jpg',
 		'file_contents' => $file_contents
 	); 
-	# B2 file ID (fGUID) is in $b2client->{b2_response}{'X-Bz-File-Id'}
+	# B2 file ID (fGUID) is now in $b2client->{b2_response}{fileId}
 
 	# download that file to /opt/majestica/tmp
 	$b2client->b2_download_file_by_name('GingerAnna','ginger_was_perfect.jpg','/opt/majestica/tmp');
@@ -751,6 +756,12 @@ Example 2: Uploading when the file is loaded into a scalar:
 		'file_contents' => $file_contents
 	); 	
 
+You can also pass a 'content-type' key with the MIME type for the new
+file.  The default is 'b2/auto'.
+
+Upon a successful upload, the new GUID for the file will be available 
+in $b2client->{b2_response}{fileId} .
+	
 See: https://www.backblaze.com/b2/docs/b2_upload_file.html
 
 =head2 b2_list_file_names

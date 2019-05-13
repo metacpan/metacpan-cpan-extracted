@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose qw( choose );
+use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries;        # required
@@ -24,6 +24,7 @@ sub new {
 
 sub extended_col {
     my ( $sf, $sql, $clause ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my ( $none, $function, $subquery, $all ) = @{$sf->{i}{expand_signs}};
     my $set_to_null = '=N';
     my @values;
@@ -41,9 +42,9 @@ sub extended_col {
     }
     else {
         # Choose
-        $type = choose(
+        $type = $tc->choose(
             [ undef, @types ],
-            { %{$sf->{i}{lyt_stmt_h}}, undef => '<<' }
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $type ) {
             return;

@@ -41,6 +41,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/melmothx/text-amuse/issues"
+      },
       "homepage" : "http://amusewiki.org",
       "repository" : {
          "url" : "https://github.com/melmothx/text-amuse"
@@ -48,6 +51,6 @@
       "x_IRC" : "irc://chat.freenode.net/#amusewiki",
       "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
    },
-   "version" : "1.27",
+   "version" : "1.28",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

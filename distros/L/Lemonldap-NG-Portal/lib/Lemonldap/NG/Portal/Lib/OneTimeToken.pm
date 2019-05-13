@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Crypt::URandom;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -76,7 +76,8 @@ sub createToken {
     else {
 
         # Create a new session
-        my $tsession = $self->p->getApacheSession( undef, info => $infos );
+        my $tsession =
+          $self->p->getApacheSession( undef, info => $infos, kind => 'TOKEN' );
         $self->logger->debug("Token $tsession->{id} created");
         return $tsession->id;
     }
@@ -108,7 +109,7 @@ sub getToken {
     else {
 
         # Get token session
-        my $tsession = $self->p->getApacheSession($id);
+        my $tsession = $self->p->getApacheSession( $id, kind => 'TOKEN' );
         unless ($tsession) {
             $self->logger->notice("Bad (or expired) token $id");
             return undef;
@@ -133,7 +134,11 @@ sub updateToken {
         return $id;
     }
     else {
-        $self->p->getApacheSession( $id, $k => $v );
+        $self->p->getApacheSession(
+            $id,
+            kind => "TOKEN",
+            info => { $k => $v }
+        );
         return $id;
     }
 }

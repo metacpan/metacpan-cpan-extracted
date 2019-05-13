@@ -28,8 +28,6 @@ perl Makefile.PL
 make
 .....
 
-$Id: README.Win32 461 2016-04-04 03:32:38Z mikem-guest $
-
 1. Windows Server 2003
    ActivePerl 5.8.8.820
    VC++ 6.0

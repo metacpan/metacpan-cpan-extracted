@@ -13,6 +13,7 @@ t/accept_encoding.t
 t/asset_memory.t
 t/author-pod-syntax.t
 t/basic.t
+t/compression_types_lowercase.t
 t/compression_types_setter.t
 t/compression_types_validate.t
 t/content_type.t

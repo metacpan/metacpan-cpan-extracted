@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 5.1;
+our $VERSION = 5.2;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---

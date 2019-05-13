@@ -38,10 +38,10 @@
    "provides" : {
       "Alien::LibBigWig" : {
          "file" : "lib/Alien/LibBigWig.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.2",
+   "version" : "v0.4.3",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -1,3 +1,9 @@
+0.540   2019-05-12 (PERLANCAR)
+
+	- Complain when dist.ini specifies perl version but source code
+	  (scan_prereqs) does not, or vice versa.
+
+
 0.53    2017-07-08 (PERLANCAR)
 
 	- No functional changes.

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Constructor;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use YAML::PP;
 
@@ -96,17 +96,17 @@ sub mapping_end_event {
     $last->{type} eq 'mapping' or die "Expected mapping, but got $last->{type}";
 
     my $on_data = $last->{on_data} || sub {
-        my ($self, $hash, $list) = @_;
-        for (my $i = 0; $i < @$list; $i += 2) {
-            my ($key, $value) = @$list[ $i, $i + 1 ];
+        my ($self, $hash, $items) = @_;
+        for (my $i = 0; $i < @$items; $i += 2) {
+            my ($key, $value) = @$items[ $i, $i + 1 ];
             $key = '' unless defined $key;
             if (ref $key) {
                 $key = $self->stringify_complex($key);
             }
-            $hash->{ $key } = $value;
+            $$hash->{ $key } = $value;
         }
     };
-    $on_data->($self, $data, $ref);
+    $on_data->($self, \$data, $ref);
     push @{ $stack->[-1]->{ref} }, $data;
     if (defined(my $anchor = $last->{event}->{anchor})) {
         $self->anchors->{ $anchor }->{finished} = 1;
@@ -117,7 +117,13 @@ sub mapping_end_event {
 sub sequence_start_event {
     my ($self, $event) = @_;
     my ($data, $on_data) = $self->schema->create_sequence($self, $event);
-    my $ref = { type => 'sequence', ref => $data, data => $data, event => $event };
+    my $ref = {
+        type => 'sequence',
+        ref => [],
+        data => $data,
+        event => $event,
+        on_data => $on_data,
+    };
     my $stack = $self->stack;
 
     push @$stack, $ref;
@@ -131,8 +137,14 @@ sub sequence_end_event {
     my $stack = $self->stack;
     my $last = pop @$stack;
     $last->{type} eq 'sequence' or die "Expected mapping, but got $last->{type}";
+    my ($ref, $data) = @{ $last }{qw/ ref data /};
 
-    push @{ $stack->[-1]->{ref} }, $last->{ref};
+    my $on_data = $last->{on_data} || sub {
+        my ($self, $array, $items) = @_;
+        push @$$array, @$items;
+    };
+    $on_data->($self, \$data, $ref);
+    push @{ $stack->[-1]->{ref} }, $data;
     if (defined(my $anchor = $last->{event}->{anchor})) {
         $self->anchors->{ $anchor }->{finished} = 1;
     }

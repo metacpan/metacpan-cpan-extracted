@@ -7,7 +7,7 @@ use 5.010001;
 
 use File::Spec::Functions qw( catfile );
 
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( choose_a_subset settings_menu );
 use Term::Form         qw();
 
@@ -27,6 +27,7 @@ sub new {
 
 sub database_setting {
     my ( $sf, $db ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $old_idx_sec = 0;
 
     SECTION: while ( 1 ) {
@@ -42,9 +43,9 @@ sub database_setting {
             else {
                 my $choices = [ undef, map( "- $_", @{$sf->{o}{G}{plugins}} ) ];
                 # Choose
-                my $idx_sec = choose(
+                my $idx_sec = $tc->choose(
                     $choices,
-                    { %{$sf->{i}{lyt_v_clear}}, undef => '  <=', default => $old_idx_sec, index => 1 }
+                    { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx_sec, undef => '  <=' }
                 );
                 if ( ! defined $idx_sec || ! defined $choices->[$idx_sec] ) {
                     return;
@@ -90,9 +91,9 @@ sub database_setting {
         push @groups, [ 'env_variables', "- ENV Variables" ] if @{$items->{env_variables}};
         push @groups, [ 'attributes',    "- Attributes"    ] if @{$items->{attributes}};
         if ( ! @groups ) {
-            choose(
+            $tc->choose(
                 [ 'No database settings available!' ],
-                { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' }
+                { prompt => 'Press ENTER' }
             );
             return;
         }
@@ -109,10 +110,9 @@ sub database_setting {
             my $choices = [ @pre, map( $_->[1], @groups ) ];
             push @$choices, $reset if ! defined $db;
             # Choose
-            my $idx_group = choose(
+            my $idx_group = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1,
-                  default => $old_idx_group, undef => '  <=' }
+                { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_group, undef => '  <=' }
             );
             if ( ! defined $idx_group || ! defined $choices->[$idx_group] ) {
                 if ( $sf->{write_config} ) {
@@ -136,9 +136,9 @@ sub database_setting {
                     push @databases, $section if $section ne $plugin;
                 }
                 if ( ! @databases ) {
-                    choose(
+                    $tc->choose(
                         [ 'No databases with customized settings.' ],
-                        { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' }
+                        { prompt => 'Press ENTER' }
                     );
                     next GROUP;
                 }
@@ -223,8 +223,8 @@ sub __group_readline_db {
             $db_opt->{$section}{$_->{name}}
         ]
     } @{$items} ];
-    my $trs = Term::Form->new();
-    my $new_list = $trs->fill_form(
+    my $tf = Term::Form->new();
+    my $new_list = $tf->fill_form(
         $list,
         { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );

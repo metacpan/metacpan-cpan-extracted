@@ -1,5 +1,12 @@
 Revision history for Perl module CBOR::Free
 
+0.08 10 May 2019
+- Further decoding speed-ups.
+
+0.07 9 May 2019
+- Dramatic speed-up in both encode and decode.
+- Decode now accepts only integers or strings as map keys.
+
 0.06 3 May 2019
 - Relax Test::More version requirement a bit.
 - Add a few more tests.

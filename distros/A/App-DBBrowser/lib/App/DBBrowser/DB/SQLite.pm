@@ -12,7 +12,7 @@ use File::Spec::Functions qw( catfile );
 use DBI            qw();
 use Encode::Locale qw();
 
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( choose_dirs );
 
 use App::DBBrowser::Auxil;
@@ -72,10 +72,10 @@ sub get_databases {
         return $databases;
     }
     my ( $ok, $change ) = ( '- Confirm', '- Change' );
-    my $choice = choose(
+    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $choice = $tc->choose(
         [ undef, $ok, $change ],
-        { info => 'SQLite Databases', prompt =>  'Search path: ' . join( ', ', @$dirs ),
-          undef => '  BACK', layout => 3, clear_screen => 1 }
+        { %{$sf->{i}{lyt_v_clear}}, prompt => 'Search path: ' . join( ', ', @$dirs ), info => 'SQLite Databases' }
     );
     if ( ! defined $choice ) {
         return $databases;
@@ -83,7 +83,9 @@ sub get_databases {
     if ( $choice eq $change ) {
         my $info = 'Del ' . join( ', ', @$dirs );
         my $name = ' OK ';
-        my $new_dirs = choose_dirs( { info => "Where to search for databases?\n" . $info, name => $name } );
+        my $new_dirs = choose_dirs(
+            { name => $name, info => "Where to search for databases?\n" . $info }
+        );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;
         }
@@ -113,7 +115,10 @@ sub get_databases {
             },
             encode( 'locale_fs', $dir ) );
         }
-        choose( [ 'Press ENTER to continue' ], { prompt => 'Search finished.' } );
+        $tc->choose(
+            [ 'Press ENTER to continue' ],
+            { prompt => 'Search finished.' }
+        );
     }
     else {
         no warnings qw( File::Find );

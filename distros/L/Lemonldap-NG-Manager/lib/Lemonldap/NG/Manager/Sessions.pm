@@ -17,7 +17,7 @@ use feature 'state';
 extends 'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Common::Session::REST';
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.4';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -53,6 +53,7 @@ sub addRoutes {
 
     $self->{ipField}              ||= 'ipAddr';
     $self->{multiValuesSeparator} ||= '; ';
+    $self->{impersonationPrefix} = $conf->{impersonationPrefix} || 'real_';
     $self->{hiddenAttributes} //= "_password";
 }
 

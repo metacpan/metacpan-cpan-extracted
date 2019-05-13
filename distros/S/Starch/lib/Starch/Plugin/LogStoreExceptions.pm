@@ -1,40 +1,13 @@
 package Starch::Plugin::LogStoreExceptions;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
-
-=head1 NAME
-
-Starch::Plugin::LogStoreExceptions - Turn Starch store exceptions into log messages.
-
-=head1 SYNOPSIS
-
-    my $starch = Starch->new(
-        plugins => ['::LogStoreExceptions'],
-        ...,
-    );
-
-=head1 DESCRIPTION
-
-This plugin causes any exceptions thrown when C<set>, C<get>, or C<remove> is
-called on a store to produce an error log message instead of an exception.
-
-Typically you'll want to use this in production, as the state store being
-down is often not enough of a reason to produce 500 errors on every page.
-
-This plugin should be listed last in the plugin list so that it catches
-exceptions produced by other plugins.
-
-=cut
+our $VERSION = '0.14';
 
 use Try::Tiny;
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::ForStore
-);
+with 'Starch::Plugin::ForStore';
 
 foreach my $method (qw( set get remove )) {
     around $method => sub{
@@ -62,6 +35,30 @@ foreach my $method (qw( set get remove )) {
 1;
 __END__
 
+=encoding utf8
+
+=head1 NAME
+
+Starch::Plugin::LogStoreExceptions - Turn Starch store exceptions into log messages.
+
+=head1 SYNOPSIS
+
+    my $starch = Starch->new(
+        plugins => ['::LogStoreExceptions'],
+        ...,
+    );
+
+=head1 DESCRIPTION
+
+This plugin causes any exceptions thrown when C<set>, C<get>, or C<remove> is
+called on a store to produce an error log message instead of an exception.
+
+Typically you'll want to use this in production, as the state store being
+down is often not enough of a reason to produce 500 errors on every page.
+
+This plugin should be listed last in the plugin list so that it catches
+exceptions produced by other plugins.
+
 =head1 SUPPORT
 
 See L<Starch/SUPPORT>.
@@ -70,9 +67,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

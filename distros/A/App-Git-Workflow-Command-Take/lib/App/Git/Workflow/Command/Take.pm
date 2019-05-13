@@ -16,7 +16,7 @@ use App::Git::Workflow::Command qw/get_options/;
 use Path::Tiny;
 use File::Copy qw/copy/;
 
-our $VERSION  = 0.6;
+our $VERSION  = 0.7;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -29,6 +29,7 @@ sub run {
         'quiet|q',
         'ours|mine',
         'theirs',
+        'add|a',
     );
 
     my @conflicts = (
@@ -50,6 +51,10 @@ sub run {
             next PATH unless $conflict =~ /^\Q$path\E/;
 
             resolve($conflict);
+
+            if ( $option{add} ) {
+                $workflow->git->add($path);
+            }
 
             next CONFLICT;
         }
@@ -104,7 +109,7 @@ App::Git::Workflow::Command::Take - Resolve merge conflicts by only taking one s
 
 =head1 VERSION
 
-This documentation refers to git-take-mine version 0.6
+This documentation refers to git-take-mine version 0.7
 
 =head1 SYNOPSIS
 

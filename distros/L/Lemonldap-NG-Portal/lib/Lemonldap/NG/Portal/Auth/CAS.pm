@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Auth', 'Lemonldap::NG::Portal::Lib::CAS';
 
@@ -35,9 +35,7 @@ sub init {
     }
     $self->srvNumber( scalar @tab );
     my @list;
-
     my $portalPath = $self->conf->{portal};
-    $portalPath =~ s#^https?://[^/]+/?#/#;
 
     foreach (@tab) {
         my $name = $_;

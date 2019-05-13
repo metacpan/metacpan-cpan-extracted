@@ -69,9 +69,12 @@
           <h1 class="panel-title text-center">{{translate("sessionTitle")}} {{currentSession.id}}</h1>
         </div>
         <div class="panel-body">
-          <div class="alert alert-info">
+          <div class="alert alert-{{isValid(currentSession._utime, 'msg')}}">
             <strong>{{translate("sessionStartedAt")}}</strong>
             {{localeDate(currentSession._utime)}}
+            <span ng-if="!isValid(currentSession._utime)">
+              <b>*** {{translate("sessionExpired")}} ***</b>
+            </span>
           </div>
           <div ng-model="currentSession.nodes">
             <div ng-repeat="node in currentSession.nodes" ng-include="'session_attr.html'"></div>
@@ -118,7 +121,7 @@
         <a class="btn btn-node btn-sm" ng-click="displaySession(this)">
           <span class="glyphicon glyphicon-eye-open"></span>
         </a>
-        <span id="s-{{node.session}}" ng-click="displaySession(this)">{{localeDate(node.date)}}</span>
+        <span id="s-{{node.session}}" ng-click="displaySession(this)" ng-style="isValid(node.date, 'style')">{{localeDate(node.date)}} </span>
       </span>
     </div>
     <ol ui-tree-nodes="" ng-model="node.nodes" ng-class="{hidden: collapsed}">

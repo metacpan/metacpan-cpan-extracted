@@ -27,14 +27,16 @@ my %params = (
     },
     BUILD_REQUIRES => {},
     TEST_REQUIRES  => {
-        'File::Spec' => 0,
-        'Test::Most' => 0,
-        'lib'        => 0,
+        'File::Spec'  => 0,
+        'File::Which' => 0,
+        'Test::Most'  => 0,
+        'lib'         => 0,
     },
     PREREQ_PM => {
-        'Carp'     => 0,
-        'Exporter' => 0,
-        'strict'   => 0,
+        'Carp'       => 0,
+        'Exporter'   => 0,
+        'File::Temp' => 0,
+        'strict'     => 0,
     },
 
     META_MERGE => {

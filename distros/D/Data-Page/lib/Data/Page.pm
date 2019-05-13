@@ -1,11 +1,10 @@
-package Data::Page;
+package Data::Page; # git description: 090534c
 use Carp;
 use strict;
 use base 'Class::Accessor::Chained::Fast';
 __PACKAGE__->mk_accessors(qw(total_entries entries_per_page current_page));
 
-use vars qw($VERSION);
-$VERSION = '2.02';
+our $VERSION = '2.03';
 
 sub new {
     my $class = shift;

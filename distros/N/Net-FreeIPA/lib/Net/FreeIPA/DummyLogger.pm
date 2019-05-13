@@ -1,5 +1,5 @@
 package Net::FreeIPA::DummyLogger;
-$Net::FreeIPA::DummyLogger::VERSION = '3.0.2';
+$Net::FreeIPA::DummyLogger::VERSION = '3.0.3';
 use strict;
 use warnings;
 

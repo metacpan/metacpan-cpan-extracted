@@ -7,9 +7,8 @@ use Exporter 'import';
 use File::Basename 'dirname';
 use File::Temp;
 use HTTP::Tiny;
-use JSON::PP;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 my @request_functions = qw(get getjson head getprint getstore mirror postform postjson postfile);
 my @status_functions = qw(is_info is_success is_redirect is_error is_client_error is_server_error);
@@ -21,7 +20,18 @@ our %EXPORT_TAGS = (
 );
 
 our $UA = HTTP::Tiny->new(agent => "HTTP::Simple/$VERSION");
-our $JSON = JSON::PP->new->utf8->canonical->allow_nonref->convert_blessed;
+
+our $JSON;
+{
+  local $@;
+  if (eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.11'); 1 }) {
+    $JSON = Cpanel::JSON::XS->new->utf8->canonical->allow_nonref->convert_blessed->allow_dupkeys;
+  }
+}
+unless (defined $JSON) {
+  require JSON::PP;
+  $JSON = JSON::PP->new->utf8->canonical->allow_nonref->convert_blessed;
+}
 
 sub get {
   my ($url) = @_;
@@ -34,7 +44,7 @@ sub get {
 sub getjson {
   my ($url) = @_;
   my $res = $UA->get($url);
-  return $JSON->decode($res->{content}) if $res->{success};
+  return ref($JSON) ? $JSON->decode($res->{content}) : _load_function($JSON, 'decode_json')->($res->{content}) if $res->{success};
   croak $res->{content} if $res->{status} == 599;
   croak "$res->{status} $res->{reason}";
 }
@@ -85,7 +95,7 @@ sub postjson {
   my ($url, $data) = @_;
   my %options;
   $options{headers} = {'Content-Type' => 'application/json; charset=UTF-8'};
-  $options{content} = $JSON->encode($data);
+  $options{content} = ref($JSON) ? $JSON->encode($data) : _load_function($JSON, 'encode_json')->($data);
   my $res = $UA->post($url, \%options);
   return $res->{content} if $res->{success};
   croak $res->{content} if $res->{status} == 599;
@@ -111,6 +121,17 @@ sub is_redirect     { !!($_[0] >= 300 && $_[0] < 400) }
 sub is_error        { !!($_[0] >= 400 && $_[0] < 600) }
 sub is_client_error { !!($_[0] >= 400 && $_[0] < 500) }
 sub is_server_error { !!($_[0] >= 500 && $_[0] < 600) }
+
+sub _load_function {
+  my ($module, $function) = @_;
+  my $code = $module->can($function);
+  return $code if defined $code;
+  (my $path = $module) =~ s{::}{/}g;
+  require "$path.pm";
+  $code = $module->can($function);
+  croak "'$function' not found in package $module" unless defined $code;
+  return $code;
+}
 
 1;
 
@@ -153,8 +174,13 @@ The L<HTTP::Tiny> object used by these functions to make requests can be
 accessed as C<$HTTP::Simple::UA> (for example, to configure the timeout, or
 replace it with a compatible object like L<HTTP::Tinyish>).
 
-The JSON encoder used by the JSON functions defaults to a L<JSON::PP> instance,
-and can be accessed as C<$HTTP::Simple::JSON>.
+The JSON encoder used by the JSON functions can be accessed as
+C<$HTTP::Simple::JSON>, and defaults to a L<Cpanel::JSON::XS> object if
+L<Cpanel::JSON::XS> 4.11+ is installed, and otherwise a L<JSON::PP> object. If
+replaced with a new object, it should have UTF-8 encoding/decoding enabled
+(usually the C<utf8> option). If it is set to a string, it will be used as a
+module name that is expected to have C<decode_json> and C<encode_json>
+functions.
 
 =head1 FUNCTIONS
 

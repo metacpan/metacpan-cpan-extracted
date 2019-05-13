@@ -12,7 +12,7 @@ use Encode::Locale    qw();
 #use String::Unescape  qw( unescape );      # required
 #use Text::CSV         qw();                # required
 
-use Term::Choose qw( choose );
+use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
 
@@ -33,6 +33,7 @@ sub __parse_file_Text_CSV { # 0
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     $ax->print_sql( $sql, $waiting );
     seek $fh, 0, 0;
     my $rows_of_cols = [];
@@ -50,9 +51,9 @@ sub __parse_file_Text_CSV { # 0
             my $message =  "Text::CSV:\n";
             $message .= "Input: $error_inpunt" if defined $error_inpunt;
             $message .= "$code $str - pos:$pos rec:$rec fld:$fld";
-            choose(
+            $tc->choose(
                 [ 'Press ENTER' ],
-                { %{$sf->{i}{lyt_m}}, prompt => $message }
+                { prompt => $message }
             );
             return;
         }
@@ -97,6 +98,7 @@ sub __parse_file_split { # 1
 
 sub __parse_file_Spreadsheet_Read { # 2
     my ( $sf, $sql, $file_ec, $book ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -105,18 +107,18 @@ sub __parse_file_Spreadsheet_Read { # 2
     if ( ! defined $book ) {
         $book = Spreadsheet::Read::ReadData( $file_ec, cells => 0, attr => 0, rc => 1, strip => 0 );
         if ( ! defined $book ) {
-            choose(
+            $tc->choose(
                 [ 'Press ENTER' ],
-                { %{$sf->{i}{lyt_m}}, prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) . '!' }
+                { prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) . '!' }
             );
             return;
         }
     }
     my $sheet_count = @$book - 1; # first sheet in $book contains meta info
     if ( $sheet_count == 0 ) {
-        choose(
+        $tc->choose(
             [ 'Press ENTER' ],
-            { %{$sf->{i}{lyt_m}}, prompt => 'No Sheets in ' . decode( 'locale_fs', $file_ec ) . '!' }
+            { prompt => 'No Sheets in ' . decode( 'locale_fs', $file_ec ) . '!' }
         );
         return;
     }
@@ -129,9 +131,10 @@ sub __parse_file_Spreadsheet_Read { # 2
         my @pre = ( undef );
         my $choices = [ @pre, @sheets ];
         # Choose
-        $sheet_idx = choose( # m
+        $sheet_idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => 'Choose a sheet', default => $sf->{i}{old_sheet_idx}, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $sf->{i}{old_sheet_idx},
+              undef => '  <=' }
         );
         if ( ! defined $sheet_idx || ! defined $choices->[$sheet_idx] ) {
             return;
@@ -147,9 +150,9 @@ sub __parse_file_Spreadsheet_Read { # 2
     }
     if ( $book->[$sheet_idx]{maxrow} == 0 ) {
         my $sheet = length $book->[$sheet_idx]{label} ? $book->[$sheet_idx]{label} : 'sheet_' . $_;
-        choose(
+        $tc->choose(
             [ 'Press ENTER' ],
-            { %{$sf->{i}{lyt_m}}, prompt => $sheet . ': empty sheet!' }
+            { prompt => $sheet . ': empty sheet!' }
         );
         return $book, $sheet_count;
     }

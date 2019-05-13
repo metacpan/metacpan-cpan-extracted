@@ -1,22 +1,30 @@
 ---
-abstract: 'Cut-and-Paste-Detector for Perl code '
+abstract: 'XS Version of Code::DRY'
 author:
-  - 'hexcoder <hexcoder@cpan.org>'
+  - 'Heiko Eißfeldt <hexcoder@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::CBuilder: '0'
+  TAP::Harness: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.19'
+  perl: v5.3.0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Code-DRY
-no_index:
-  directory:
-    - t
-    - inc
-requires: {}
-version: '0.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+provides:
+  Code::DRY:
+    file: lib/Code/DRY.pm
+    version: '0.10'
+requires:
+  ExtUtils::CBuilder: '0'
+  Module::Build: '0.19'
+  TAP::Harness: '0'
+  perl: v5.3.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-no warnings 'redefine';
+no warnings 'redefine', 'once';
 
 package HTTP::Simple::TestUA;
 sub new { bless {} }
@@ -11,7 +11,6 @@ use Test::More;
 use HTTP::Simple;
 use File::Spec;
 use File::Temp;
-use JSON::PP;
 
 my $dir = File::Temp->newdir;
 my $path = File::Spec->catfile($dir, 'test');
@@ -30,6 +29,21 @@ is_deeply head('bar'), {foo => 'bar'}, 'head';
 is mirror('foo', 'bar'), 200, 'mirror';
 is_deeply postform('foo', {foo => 'bar'}), {foo => 'bar'}, 'postform';
 is_deeply postjson('foo', [{foo => 'bar'}]), '[{"foo":"bar"}]', 'postjson';
+
+{
+  local $HTTP::Simple::JSON = 'JSON::PP';
+  is_deeply getjson('[{"foo":"bar"}]'), [{foo => 'bar'}], 'getjson with decode_json';
+  is_deeply postjson('foo', [{foo => 'bar'}]), '[{"foo":"bar"}]', 'postjson with encode_json';
+
+  local $HTTP::Simple::JSON = 'HTTP::Simple::FakeJSON';
+  ok !eval { getjson('[{"foo":"bar"}]'); 1 }, 'getjson with missing json module';
+
+  local *HTTP::Simple::FakeJSON::decode_json = sub { return [] };
+  is_deeply getjson('[{"foo":"bar"}]'), [], 'getjson with fake decode_json';
+
+  local $HTTP::Simple::JSON = 'HTTP::Simple::TestUA';
+  ok !eval { getjson('[{"foo":"bar"}]'); 1 }, 'getjson with missing decode_json';
+}
 
 *HTTP::Simple::TestUA::post = sub {
   my $length = 0;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Highlight;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our @EXPORT_OK = qw/ Dump /;
 

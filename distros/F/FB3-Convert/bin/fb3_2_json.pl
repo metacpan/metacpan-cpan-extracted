@@ -420,6 +420,7 @@ sub DumpRootLevelTOC {
 		my $Title;
 		my $TotalClipped = 0;
 		if ($NodeHash->{c}[0]->{name} eq 'title') {
+			$NodeHash->{c}[0]->{'intitle'} = 1;
 			$Title = 't:"'.ExtractText($NodeHash->{c}[0]).'"';
 		}
 		for my $ChildHash (@{$NodeHash->{c}}) {
@@ -452,6 +453,11 @@ sub ExtractText {
 	my @TextArr;
 
 	for my $ChildHash (@{$NodeHash->{c}}) {
+
+		$ChildHash->{'intitle'} = 1 if exists $NodeHash->{'intitle'} && $NodeHash->{'intitle'};
+		#note внутри title нам не нужны в оглавлении
+		next if $ChildHash->{'name'} eq 'note' && exists $ChildHash->{'intitle'} && $ChildHash->{'intitle'};
+
 		push @TextArr, $ChildHash->{text} if $ChildHash->{text};
 		my $Text = ExtractText($ChildHash);
 		$Text = EscString($Text);
@@ -651,6 +657,19 @@ sub ProceedDescr {
 	$description .= ',Relations:[' . (join ",", @Relations) . ']' if scalar @Relations;
 
 	$description .= ',ArtID:"' . EscString($ArtID) . '"' if $ArtID;
+
+	my $DraftStr = '';
+	if ( my $FragmentNode = $xpc->findnodes('/fbd:fb3-description/fbd:draft-status')->[0]) {
+		$DraftStr = ',DraftStatus:{expected_chars:"'.$FragmentNode->getAttribute('expected-chars').'"'; #required
+		if (my $ExpFreq = $FragmentNode->getAttribute('expected-frequency')) {
+			$DraftStr .= ',expected_frequency:"'.$ExpFreq.'"';
+		}
+		if (my $ExpRelease = $FragmentNode->getAttribute('expected-release')) {
+			$DraftStr .= ',expected_release:"'.$ExpRelease.'"';
+		}
+		$DraftStr .= '}';
+		$description .= $DraftStr;
+	}
 
 	my $FragmentStr = '';
 	if ( my $FragmentNode = $xpc->findnodes('/fbd:fb3-description/fbd:fb3-fragment')->[0] ) {

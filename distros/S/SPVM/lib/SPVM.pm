@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0432';
+our $VERSION = '0.0433';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -70,7 +70,8 @@ CHECK {
 }
 
 
-sub set_exception_undef { SPVM::ExchangeAPI::set_exception_undef($SPVM_ENV, @_) }
+sub exception { SPVM::ExchangeAPI::exception($SPVM_ENV, @_) }
+sub set_exception { SPVM::ExchangeAPI::set_exception($SPVM_ENV, @_) }
 sub memory_blocks_count { SPVM::ExchangeAPI::memory_blocks_count($SPVM_ENV, @_) }
 sub call_sub { SPVM::ExchangeAPI::call_sub($SPVM_ENV, @_) }
 

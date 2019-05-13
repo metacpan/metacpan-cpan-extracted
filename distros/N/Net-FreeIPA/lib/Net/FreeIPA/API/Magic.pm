@@ -1,5 +1,5 @@
 package Net::FreeIPA::API::Magic;
-$Net::FreeIPA::API::Magic::VERSION = '3.0.2';
+$Net::FreeIPA::API::Magic::VERSION = '3.0.3';
 use strict;
 use warnings;
 

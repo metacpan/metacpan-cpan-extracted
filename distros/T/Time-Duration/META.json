@@ -4,13 +4,13 @@
       "Sean M Burke <sburke@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Time-Duration",
    "prereqs" : {
@@ -43,6 +43,7 @@
          "web" : "https://github.com/neilbowers/Time-Duration"
       }
    },
-   "version" : "1.20"
+   "version" : "1.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

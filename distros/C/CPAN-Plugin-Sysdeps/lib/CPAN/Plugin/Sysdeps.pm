@@ -3,11 +3,17 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 use List::Util 'first';
 
 our $TRAVERSE_ONLY; # only for testing
+
+use constant SUPPORTED_NUMERICAL_OPS => ['<','<=','==','>','>='];
+use constant SUPPORTED_NUMERICAL_OPS_RX => do {
+    my $rx = '^(' . join('|', map { quotemeta } @{SUPPORTED_NUMERICAL_OPS()}) . ')$';
+    qr{$rx};
+};
 
 sub new {
     my($class, @args) = @_;
@@ -306,12 +312,25 @@ sub _map_cpandist {
     }
 
     # smartmatch for regexp/string/array without ~~, 5.8.x compat!
+    # also add support for numerical comparisons
     my $smartmatch = sub ($$) {
 	my($left, $right) = @_;
 	if (ref $right eq 'Regexp') {
 	    return 1 if $left =~ $right;
 	} elsif (ref $right eq 'ARRAY') {
 	    return 1 if first { $_ eq $left } @$right;
+	} elsif (ref $right eq 'HASH') {
+	    for my $op (keys %$right) {
+		if ($op !~ SUPPORTED_NUMERICAL_OPS_RX) {
+		    die "Unsupported operator '$op', only supported: @{SUPPORTED_NUMERICAL_OPS()}";
+		}
+		my $val = $right->{$op};
+		my $code = 'no warnings q(numeric); $left '.$op.' $val';
+		my $res = eval $code;
+		die "Evaluation of '$code' failed: $@" if $@;
+		return 0 if !$res;
+	    }
+	    return 1;
 	} else {
 	    return 1 if $left eq $right;
 	}
@@ -347,9 +366,9 @@ sub _map_cpandist {
 		} elsif ($key eq 'os') {
 		    return 0 if !$smartmatch->($self->{os}, $match) && !$TRAVERSE_ONLY;
 		} elsif ($key eq 'osvers') {
-		    return 0 if !$smartmatch->($self->{osvers}, $match) && !$TRAVERSE_ONLY; # XXX should also be able to do numerical comparisons
+		    return 0 if !$smartmatch->($self->{osvers}, $match) && !$TRAVERSE_ONLY;
 		} elsif ($key eq 'linuxdistro') {
-		    if ($match =~ m{^~(debian|fedora)}) {
+		    if ($match =~ m{^~(debian|fedora)$}) {
 			my $method = "_is_linux_$1_like";
 			$self->_debug(' ' x $level . " translate $match to $method");
 			return 0 if !$self->$method($self->{linuxdistro}) && !$TRAVERSE_ONLY;
@@ -359,7 +378,7 @@ sub _map_cpandist {
 			return 0 if !$smartmatch->($self->{linuxdistro}, $match) && !$TRAVERSE_ONLY;
 		    }
 		} elsif ($key eq 'linuxdistroversion') {
-		    return 0 if !$smartmatch->($self->{linuxdistroversion}, $match) && !$TRAVERSE_ONLY; # XXX should do a numerical comparison instead!
+		    return 0 if !$smartmatch->($self->{linuxdistroversion}, $match) && !$TRAVERSE_ONLY;
 		} elsif ($key eq 'linuxdistrocodename') {
 		    return 0 if !$smartmatch->($self->{linuxdistrocodename}, $match) && !$TRAVERSE_ONLY; # XXX should also do a smart codename comparison additionally!
 		} elsif ($key eq 'package') {

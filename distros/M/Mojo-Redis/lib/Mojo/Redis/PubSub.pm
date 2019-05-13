@@ -18,7 +18,9 @@ sub json { ++$_[0]{json}{$_[1]} and return $_[0] }
 
 sub keyspace_listen {
   my ($self, $cb) = (shift, pop);
-  return $self->listen($self->_keyspace_key(@_), $cb);
+  my $key = $self->_keyspace_key(@_);
+  $self->{keyspace_listen}{$key} = 1;
+  return $self->listen($key, $cb);
 }
 
 sub keyspace_unlisten {
@@ -70,8 +72,8 @@ sub _keyspace_key {
   local $args->{op}  = $_[1] // $args->{op}  // '*';
   local $args->{type} = $args->{type} || ($args->{key} eq '*' ? 'keyevent' : 'keyspace');
 
-  return sprintf '__%s@%s__:%s %s', $args->{type}, $args->{db} // $self->redis->url->path->[0] // '',
-    $args->{type} eq 'keyevent' ? (@$args{qw(op key)}) : (@$args{qw(key op)});
+  return sprintf '__%s@%s__:%s', $args->{type}, $args->{db} // $self->redis->url->path->[0] // '*',
+    $args->{type} eq 'keyevent' ? $args->{op} : $args->{key};
 }
 
 sub _listen {
@@ -93,7 +95,8 @@ sub _listen {
       my ($conn, $res) = @_;    # $res = [$type, $name, $payload]
       return unless ref $res eq 'ARRAY' and @$res >= 3;
       $res->[2] = eval { from_json $res->[2] } if $self->{json}{$res->[1]};
-      for my $cb (@{$self->{chans}{$res->[1]}}) { $self->$cb($res->[2]) }
+      my $keyspace_listen = $self->{keyspace_listen}{$res->[1]};
+      for my $cb (@{$self->{chans}{$res->[1]}}) { $self->$cb($keyspace_listen ? [@$res[2, 3]] : $res->[2]) }
     }
   );
 

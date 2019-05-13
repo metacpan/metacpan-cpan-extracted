@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Finance-Bank-ID-Mandiri"
       }
    },
-   "version" : "0.381",
+   "version" : "0.382",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -363,7 +363,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

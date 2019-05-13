@@ -1,3 +1,7 @@
+0.014     2019-05-12 21:48:08+10:00 Australia/Melbourne
+ - generate and cycle node names
+ - document node_name and datacenter attributes
+
 0.013     2019-04-05 12:00:24+11:00 Australia/Melbourne
  - add find_version and skip_all_unless_version
  - croak when enabling ACLs on Consul >= 1.4.0 (not currently supported)

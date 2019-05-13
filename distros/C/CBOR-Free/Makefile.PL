@@ -32,6 +32,7 @@ WriteMakefile1(
 
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 7.12,
+        'Devel::PPPort' => 0,
     },
 
     # Because of X::Tiny
@@ -45,16 +46,12 @@ WriteMakefile1(
         'XSLoader' => 0.24,
     },
 
-    BUILD_REQUIRES => {
-        'Devel::PPPort' => 0,
-    },
-
     TEST_REQUIRES => {
         'autodie'         => 0,
         'FindBin' => 0,
         'Data::Dumper'    => 0,
         'Test::Exception' => 0,
-        'Test::More'      => 1.302140,
+        'Test::More'      => 1.302133,
         'Test::FailWarnings' => 0,
         'Test::Deep'      => 0,
     },

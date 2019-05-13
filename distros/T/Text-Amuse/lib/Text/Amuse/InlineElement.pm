@@ -187,6 +187,18 @@ sub stringify {
             return '&#160;'
         }
     }
+    elsif ($type eq 'noindent') {
+        if ($self->is_latex) {
+            return "\\noindent ";
+        }
+        else {
+            my $leading = '';
+            if ($string =~ m/\A(\s+)/) {
+                $leading = $1;
+            }
+            return "$leading<br />";
+        }
+    }
     elsif ($type eq 'br') {
         if ($self->is_latex) {
             return "\\forcelinebreak ";

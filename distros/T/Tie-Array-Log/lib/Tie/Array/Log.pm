@@ -1,7 +1,7 @@
 package Tie::Array::Log;
 
-our $DATE = '2019-04-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -124,7 +124,7 @@ Tie::Array::Log - Tied array that behaves like a regular array, but logs operati
 
 =head1 VERSION
 
-This document describes version 0.001 of Tie::Array::Log (from Perl distribution Tie-Array-Log), released on 2019-04-16.
+This document describes version 0.002 of Tie::Array::Log (from Perl distribution Tie-Array-Log), released on 2019-05-12.
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ This document describes version 0.001 of Tie::Array::Log (from Perl distribution
 
 This class implements tie interface for array but performs regular array
 operations, except logging the operation with L<Log::ger>. It's basically used
-for testing or benchmarking.
+for testing, benchmarking, and documentation only.
 
 =for Pod::Coverage ^(.+)$
 
@@ -165,6 +165,12 @@ feature.
 L<perltie>
 
 L<Log::ger>
+
+L<Tie::Scalar::Log>, L<Tie::Hash::Log>, L<Tie::Handle::Log>.
+
+L<Tie::Array>, L<Tie::StdArray>
+
+L<Tie::Simple>
 
 =head1 AUTHOR
 

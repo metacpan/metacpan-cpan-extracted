@@ -32,6 +32,8 @@ Alternatively supply some filenames:
 
   my $photos = new Panotools::Photos ('DSC_0001.JPG', 'DSC_0002.JPG');
 
+=over
+
 =cut
 
 sub new
@@ -43,7 +45,7 @@ sub new
     return $self;
 }
 
-=pod
+=item Paths
 
 Add to or get the list of image filenames:
 
@@ -62,7 +64,7 @@ sub Paths
     return map ($_->{path}, @{$self});
 }
 
-=pod
+=item Stub
 
 Construct a stub filename from the names of the first and last images in the
 list.
@@ -86,7 +88,7 @@ sub Stub
     return $path_a .'-'. $path_b;
 }
 
-=pod
+=item Bracketed
 
 Query to discover if this is a likely bracketed set.  i.e. is the total number
 of photos divisible by the number of different exposures:
@@ -118,7 +120,7 @@ sub Bracketed
     return 1;
 }
 
-=pod
+=item Layered
 
 Query to discover if this is a layered set, i.e. there is a large exposure
 difference in the set, but it isn't bracketed.
@@ -147,7 +149,7 @@ sub Layered
     return 1;
 }
 
-=pod
+=item Speeds
 
 Get a list of exposure times sorted with longest exposure first
 
@@ -174,7 +176,7 @@ sub _normalise
     return $number;
 }
 
-=pod
+=item SplitInterval
 
 Given a set of photos, split it into a one or more sets by looking at the
 variation of time interval between shots.  e.g. typically the interval between
@@ -219,7 +221,7 @@ sub SplitInterval
     return @groups;
 }
 
-=pod
+=item AverageInterval
 
 Get the average time between shots:
 
@@ -299,7 +301,7 @@ sub Rotation
 
 }
 
-=pod
+=item Eev
 
 Get an EV value for a photo, this will be guessed from partial EXIF data:
 
@@ -319,6 +321,16 @@ sub Eev
     # (A light value of 0 is defined as f/1.0 at 1 second with ISO 100)
     return sprintf ('%.3f', (2*log ($aperture) - log($et) - log($iso/100)) / log(2));
 }
+
+=item AverageRGB
+
+Find the mean average colour balance for all photos:
+
+  ($red, $green, $blue) = $photos->AverageRGB;
+
+=back
+
+=cut
 
 sub AverageRGB
 {

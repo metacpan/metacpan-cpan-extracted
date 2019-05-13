@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
      use Net::SNMP::XS;
 
-     # loading it is enough, there are no public symbols
+     # loading it is enough to speed up Net::SNMP
 
 DESCRIPTION
     This module tries to speed up Net::SNMP response packet decoding.

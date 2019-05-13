@@ -1,5 +1,5 @@
 package Net::FreeIPA::Error;
-$Net::FreeIPA::Error::VERSION = '3.0.2';
+$Net::FreeIPA::Error::VERSION = '3.0.3';
 use strict;
 use warnings;
 

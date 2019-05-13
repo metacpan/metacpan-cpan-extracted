@@ -20,11 +20,14 @@ my $client = LLNG::Manager::Test->new( {
             checkUser                      => 1,
             impersonationRule              => '$uid ne "msmith"',
             impersonationIdRule            => '$uid ne "msmith"',
+            impersonationPrefix            => 'testPrefix_',
+            securedCookie                  => 1,
+            https                          => 0,
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,
             impersonationMergeSSOgroups    => 0,
             macros                         => {
-                test_impersonation => '"$real__user/$_user"',
+                test_impersonation => '"$testPrefix__user/$_user"',
                 _whatToTrace =>
                   '$_auth eq "SAML" ? "$_user@$_idpConfKey" : $_user',
             },
@@ -54,8 +57,9 @@ ok( $res->[2]->[0] =~ m%<span trmsg="40"></span>%, ' PE40 found' )
   or explain( $res->[2]->[0], "PE40 - Bad formed user" );
 count(2);
 
-my $id = expectCookie($res);
-$client->logout($id);
+ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+count(1);
+expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
 
 ## Try to impersonate with a forbidden identity
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
@@ -82,8 +86,9 @@ m%<div class="message message-negative alert"><span trmsg="5"></span></div>%,
 ) or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
 count(2);
 
-$id = expectCookie($res);
-$client->logout($id);
+ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+count(1);
+expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
 
 ## An unauthorized user try to impersonate
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
@@ -110,8 +115,9 @@ m%<div class="message message-negative alert"><span trmsg="93"></span></div>%,
 ) or explain( $res->[2]->[0], "PE93 - Impersonation service not allowed" );
 count(2);
 
-$id = expectCookie($res);
-$client->logout($id);
+ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+count(1);
+expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
 
 ## An unauthorized user to impersonate tries to authenticate
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
@@ -132,7 +138,7 @@ ok(
 );
 count(1);
 
-$id = expectCookie($res);
+my $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
 
 # CheckUser form
@@ -260,13 +266,14 @@ ok( $res->[2]->[0] =~ m%<td class="align-middle">dwho</td>%, 'Found dwho' )
 ok( $res->[2]->[0] =~ m%<td class="align-middle">_whatToTrace</td>%,
     'Found _whatToTrace' )
   or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">real_groups</td>%,
-    'Found real_groups' )
-  or explain( $res->[2]->[0], 'real_groups' );
+ok( $res->[2]->[0] =~ m%<td class="text-left">testPrefix_groups</td>%,
+    'Found testPrefix_groups' )
+  or explain( $res->[2]->[0], 'testPrefix_groups' );
 ok( $res->[2]->[0] =~ m%<td class="text-left">su</td>%, 'Found su' )
   or explain( $res->[2]->[0], 'su' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">real_uid</td>%, 'Found real_uid' )
-  or explain( $res->[2]->[0], 'real_groups' );
+ok( $res->[2]->[0] =~ m%<td class="text-left">testPrefix_uid</td>%,
+    'Found testPrefix_uid' )
+  or explain( $res->[2]->[0], 'testPrefix_groups' );
 ok( $res->[2]->[0] =~ m%<td class="text-left">rtyler</td>%, 'Found rtyler' )
   or explain( $res->[2]->[0], 'su' );
 ok( $res->[2]->[0] =~ m%<td class="align-middle">test_impersonation</td>%,
@@ -276,6 +283,20 @@ ok( $res->[2]->[0] =~ m%<td class="align-middle">rtyler/dwho</td>%,
     'Found rtyler/dwo' )
   or explain( $res->[2]->[0], 'Found rtyler/dwo' );
 count(16);
+
+my @attributes = map /<td class="text-left">(.+)?<\/td>/g, $res->[2]->[0];
+ok( scalar @attributes == 58, 'Found 58 attributes' )
+  or print STDERR "Missing attributes -> " . scalar @attributes;
+ok( $attributes[0] eq '_auth', '_auth' ) or print STDERR Dumper( \@attributes );
+ok( $attributes[1] eq 'Demo',  'Demo' )  or print STDERR Dumper( \@attributes );
+ok( $attributes[26] eq 'uid',  'uid' )   or print STDERR Dumper( \@attributes );
+ok( $attributes[28] eq 'testPrefix__auth', 'testPrefix__auth' )
+  or print STDERR Dumper( \@attributes );
+ok( $attributes[56] eq 'testPrefix_uid', 'testPrefix_uid' )
+  or print STDERR Dumper( \@attributes );
+ok( $attributes[57] eq 'rtyler', 'rtyler' )
+  or print STDERR Dumper( \@attributes );
+count(7);
 
 $client->logout($id);
 clean_sessions();

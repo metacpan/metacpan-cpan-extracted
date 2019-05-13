@@ -7,7 +7,7 @@ require 't/test-lib.pm';
 my $mainTests = 5;
 
 SKIP: {
-    skip "Manual skip of GPG test", $mainTests if ($ENV{LLNG_SKIP_GPG_TEST});
+    skip "Manual skip of GPG test", $mainTests if ( $ENV{LLNG_SKIP_GPG_TEST} );
     eval "use IPC::Run 'run',";
     skip "Missing dependency", $mainTests if ($@);
     my $gpg = `which gpg`;

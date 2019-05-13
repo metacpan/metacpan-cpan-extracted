@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use File::Spec::Functions qw/splitpath abs2rel/;
+use 5.010;
+
+$ENV{PATH} = "$ENV{PATH}:/cygdrive/c/Program Files/Hugin/bin";
+
+my $prefix = undef;
+if ($ARGV[0] eq '-o') {shift @ARGV; $prefix = shift @ARGV}
+
+my $path_template_pto = shift || '';
+die "Usage: $0 [-o output] template.pto path/to/*/*/*.jpg" unless $path_template_pto =~ /\.pto$/i;
+
+=pod
+
+Deshake a sequence of images
+Supply remapping parameters and the location of a reference photo using a Hugin PTO project
+Bruno Postle <bruno@postle.net>, June 2018
+
+Extract JPEG frames from an existing video like so:
+ffmpeg -i webcam.mp4 webcam%08d.jpg
+
+Create a video file from a sequence of JPEG files like so:
+rm -f frames.txt; for FILE in *.jpg; do echo "file '$FILE'" >> frames.txt; done
+ffmpeg -f concat -i frames.txt output.mp4
+
+=cut
+
+# Can't use File::Temp when mixing win32 exe files with cygwin
+my $tmp_align_pto = '_tmp_align.pto';
+my $tmp_extract_pto = '_tmp_extract.pto';
+
+# Zero the existing image rotation in the template project, we will reapply after deshaking
+my $pto_template = new Panotools::Script;
+$pto_template->Read($path_template_pto);
+my (@rpy_template) = ($pto_template->Image->[0]->r, $pto_template->Image->[0]->p, $pto_template->Image->[0]->y);
+($pto_template->Image->[0]->{r}, $pto_template->Image->[0]->{p}, $pto_template->Image->[0]->{y}) = (0.0, 0.0, 0.0);
+
+# Win32 align_image_stack can't cope with a full cygwin path for the reference image, but is ok with a relative path
+my $path_anchor_image = $pto_template->Image->[0]->Path($path_template_pto);
+$path_anchor_image = abs2rel($path_anchor_image);
+
+my $inc = 1;
+for my $path_image (@ARGV)
+{
+    # Give output images either the same names as the input images, or sequential defined by the -o option
+    my @split = splitpath($path_image);
+    my $basename = pop(@split);
+    $basename = sprintf("$prefix%08d.jpg", $inc) if (defined $prefix);
+    $inc++;
+
+    # Don't worry, we won't overwrite existing files
+    next if -e $basename;
+
+    # Calculate shake for the current frame
+    system('align_image_stack', '-c', 16, '-g', 10, '--use-given-order', '-f', $pto_template->Image->[0]->v, '-p', $tmp_align_pto, $path_anchor_image, $path_image);
+    my $pto_align = new Panotools::Script;
+    $pto_align->Read($tmp_align_pto);
+    my (@rpy_shake) = ($pto_align->Image->[1]->r, $pto_align->Image->[1]->p, $pto_align->Image->[1]->y);
+
+    # Apply calculated shake and reapply saved rotation to the template project
+    my $pto_extract = $pto_template->Clone;
+    $pto_extract->Transform(@rpy_shake);
+    $pto_extract->Transform(@rpy_template);
+    $pto_extract->Write($tmp_extract_pto);
+
+    system('nona', '-m', 'JPEG', '-z', 75, '-o', $basename, $tmp_extract_pto, $path_image);
+    system('touch', '-r', $path_image, $basename);
+    say STDERR $basename;
+}
+
+unlink($tmp_align_pto, $tmp_extract_pto);
+

@@ -71,7 +71,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
-                                      'Exporter' => '0',
+                                      'Exporter::Shiny' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

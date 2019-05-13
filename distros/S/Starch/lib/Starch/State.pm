@@ -1,7 +1,7 @@
 package Starch::State;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -21,16 +21,15 @@ This is the state class used by L<Starch::Manager/state>.
 
 =cut
 
-use Types::Standard -types;
-use Types::Common::String -types;
 use Starch::Util qw( croak );
+use Types::Common::String -types;
+use Types::Standard -types;
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Role::Log
-);
+with 'Starch::Role::Log';
 
 # Declare BUILD so roles can apply method modifiers to it.
 sub BUILD { }
@@ -505,9 +504,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

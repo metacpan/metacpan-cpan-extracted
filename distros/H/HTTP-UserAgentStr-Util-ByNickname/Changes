@@ -1,3 +1,9 @@
+0.002   2019-05-10 (PERLANCAR)
+
+	- For newest_firefox & newest_chrome, give Windows when on Windows,
+	  Linux otherwise.
+
+
 0.001   2019-04-11 (PERLANCAR)
 
         - First release.

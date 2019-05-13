@@ -1,0 +1,90 @@
+{
+   "abstract" : "Curio Model for Catalyst.",
+   "author" : [
+      "Aran Clary Deltac <aran@bluefeet.dev>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Model-Curio",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.80001",
+            "Catalyst::Model" : "0",
+            "Curio" : "0.01",
+            "Module::Runtime" : "0.014",
+            "Moo" : "2.003000",
+            "Types::Common::String" : "1.002001",
+            "Types::Standard" : "1.002001",
+            "namespace::clean" : "0.27",
+            "perl" : "5.008001",
+            "strictures" : "2.000001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst::Test" : "0",
+            "FindBin" : "0",
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Helper::Model::Curio" : {
+         "file" : "lib/Catalyst/Helper/Model/Curio.pm",
+         "version" : "0.01"
+      },
+      "Catalyst::Model::Curio" : {
+         "file" : "lib/Catalyst/Model/Curio.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Catalyst-Model-Curio/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Catalyst-Model-Curio",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/Catalyst-Model-Curio.git",
+         "web" : "https://github.com/bluefeet/Catalyst-Model-Curio"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

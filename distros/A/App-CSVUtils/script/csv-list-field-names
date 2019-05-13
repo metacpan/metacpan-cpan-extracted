@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_list_field_names
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-04-29'; # DATE
+our $DATE = '2019-05-12'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-list-field-names - List field names of CSV file
 
 =head1 VERSION
 
-This document describes version 0.020 of csv-list-field-names (from Perl distribution App-CSVUtils), released on 2019-04-29.
+This document describes version 0.021 of csv-list-field-names (from Perl distribution App-CSVUtils), released on 2019-05-12.
 
 =head1 SYNOPSIS
 

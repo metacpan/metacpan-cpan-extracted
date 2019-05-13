@@ -1,5 +1,5 @@
 package Dir::Manifest::Slurp;
-$Dir::Manifest::Slurp::VERSION = '0.0.4';
+$Dir::Manifest::Slurp::VERSION = '0.0.5';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Dir::Manifest::Slurp
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 NAME
 
@@ -54,7 +54,7 @@ Dir::Manifest::Slurp - utility functions for slurping .
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 EXPORTS
 
@@ -63,11 +63,17 @@ version 0.0.4
 Returns the string with all CRLF newlines converted to LF. See
 L<https://en.wikipedia.org/wiki/Newline> .
 
-=head2 my $contents = slurp(path("foo.txt"), { lf => 1, }) # utf-8 after using as_lf
-=head2 my $contents = slurp(path("foo.txt"), { raw => 1, })
-=head2 my $contents = slurp(path("foo.txt"), { }) # utf-8
+=head2 my $contents = slurp(path("foo.txt"), { lf => 1, })
 
 Accepts a L<Path::Tiny> object and an options hash reference.
+
+UTF-8 after using as_lf .
+
+=head2 my $contents = slurp(path("foo.txt"), { raw => 1, })
+
+=head2 my $contents = slurp(path("foo.txt"), { })
+
+UTF-8
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

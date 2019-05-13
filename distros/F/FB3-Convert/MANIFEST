@@ -17,9 +17,17 @@ share/fb3_2_fb2_body.xsl
 share/fb3_2_fb2_descr.xsl
 share/fb3_to_fb2_genre.json
 share/general.xsl
+share/profiles/CoatedFOGRA27.icc
+share/profiles/sRGB_Color_Space.icc
 t/00-load.t
+t/examples/cutfb3/0_152022.fb3
+t/examples/cutfb3/0_152022.xml
 t/examples/cutfb3/195_141392.fb3
 t/examples/cutfb3/195_141392.xml
+t/examples/cutfb3/o0_img_and_links_152022.fb3
+t/examples/cutfb3/o0_img_and_links_152022.xml
+t/examples/cutfb3/o0_notesempty_152022.fb3
+t/examples/cutfb3/o0_notesempty_152022.xml
 t/examples/epub/bad_link_147166.epub
 t/examples/epub/bad_link_147166.xml
 t/examples/epub/bad_links_136561.epub
@@ -46,6 +54,8 @@ t/examples/epub/euristica_fail_109381.epub
 t/examples/epub/euristica_fail_109381.xml
 t/examples/epub/euristica_ok_109381.epub
 t/examples/epub/euristica_ok_109381.xml
+t/examples/epub/img2jpg_151718.epub
+t/examples/epub/img2jpg_151718.xml
 t/examples/epub/img_correct_and_empty_id_126503.epub
 t/examples/epub/img_correct_and_empty_id_126503.xml
 t/examples/epub/img_crazy_114117.epub

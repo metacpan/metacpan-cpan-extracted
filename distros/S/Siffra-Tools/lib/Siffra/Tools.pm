@@ -19,6 +19,19 @@ use constant {
     DEBUG => $ENV{ DEBUG } // 0,
 };
 
+my %driverConnections = (
+    pgsql => {
+        module => 'DBD::Pg',
+        dsn    => 'DBI:Pg(AutoCommit=>1,RaiseError=>1,PrintError=>1):dbname=%s;host=%s;port=%s',
+    },
+    mysql => {
+        module => 'DBD::mysql',
+    },
+    sqlite => {
+        module => 'DBD::SQLite',
+    },
+);
+
 BEGIN
 {
     binmode( STDOUT, ":encoding(UTF-8)" );
@@ -27,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.05';
+    $VERSION = '0.06';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -110,41 +123,401 @@ sub DESTROY
     }
 } ## end sub DESTROY
 
-=head2 C<getFileMD5()>
-
-  Usage     : $self->block_new_method() within text_pm_file()
-  Purpose   : Build 'new()' method as part of a pm file
-  Returns   : String holding sub new.
-  Argument  : $module: pointer to the module being built
-              (as there can be more than one module built by EU::MM);
-              for the primary module it is a pointer to $self
-  Throws    : n/a
-  Comment   : This method is a likely candidate for alteration in a subclass,
-              e.g., pass a single hash-ref to new() instead of a list of
-              parameters.
-
+=head2 C<connectDB()>
 =cut
 
-#-------------------------------------------------------------------------------
-# Retorna o MD5 do arquivo
-# Parametro 1 - Caminho e nome do arquivo a ser calculado
-# Retorna o MD5 do arquivo informado
-#-------------------------------------------------------------------------------
-sub getFileMD5($)
+sub connectDB()
+{
+    my ( $self, %parameters ) = @_;
+    $log->debug( "connectDB", { package => __PACKAGE__ } );
+
+    my ( $database, $host, $password, $port, $username, $connection );
+
+    if ( %parameters )
+    {
+        $connection = $parameters{ connection };
+        $database   = $parameters{ database };
+        $host       = $parameters{ host };
+        $password   = $parameters{ password };
+        $port       = $parameters{ port };
+        $username   = $parameters{ username };
+    } ## end if ( %parameters )
+    elsif ( defined $self->{ configurations }->{ database } )
+    {
+        $connection = $self->{ configurations }->{ database }->{ connection };
+        $database   = $self->{ configurations }->{ database }->{ database };
+        $host       = $self->{ configurations }->{ database }->{ host };
+        $password   = $self->{ configurations }->{ database }->{ password };
+        $port       = $self->{ configurations }->{ database }->{ port };
+        $username   = $self->{ configurations }->{ database }->{ username };
+    } ## end elsif ( defined $self->{ ...})
+    else
+    {
+        $log->error( "Tentando conectar mas sem configuração de DB..." );
+        return FALSE;
+    }
+
+    my $driverConnection = $driverConnections{ lc $connection };
+    if ( $driverConnection )
+    {
+        eval {
+            require DBI;
+            require "$driverConnection->{ module }";
+        };
+
+        my $dsn = sprintf( $driverConnection->{ dsn }, $database, $host, $port );
+        my ( $scheme, $driver, $attr_string, $attr_hash, $driver_dsn ) = DBI->parse_dsn( $dsn ) or die "Can't parse DBI DSN '$dsn'";
+        my $data_source = "$scheme:$driver:$driver_dsn";
+        $self->{ database }->{ connection } = eval { DBI->connect( $data_source, $username, $password, $attr_hash ); };
+
+        if ( $@ )
+        {
+            $log->error( "Erro ao conectar ao banco [ $data_source ] [ $username\@$host:$port ]." );
+            $log->error( @_ );
+            return FALSE;
+        } ## end if ( $@ )
+    } ## end if ( $driverConnection...)
+    else
+    {
+        $log->error( "Connection [ $connection ] não existe configuração..." );
+        return FALSE;
+    }
+
+    return $self->{ database }->{ connection };
+} ## end sub connectDB
+
+=head2 C<begin_work()>
+=cut
+
+sub begin_work()
+{
+    my ( $self, %parameters ) = @_;
+    if ( !defined $self->{ database }->{ connection } )
+    {
+        $log->error( "Tentando começar uma transação sem uma conexão com DB..." );
+        return FALSE;
+    }
+    my $rc = $self->{ database }->{ connection }->begin_work or die $self->{ database }->{ connection }->errstr;
+    return $rc;
+} ## end sub begin_work
+
+=head2 C<commit()>
+=cut
+
+sub commit()
+{
+    my ( $self, %parameters ) = @_;
+    if ( !defined $self->{ database }->{ connection } )
+    {
+        $log->error( "Tentando commitar uma transação sem uma conexão com DB..." );
+        return FALSE;
+    }
+    my $rc = $self->{ database }->{ connection }->commit or die $self->{ database }->{ connection }->errstr;
+    return $rc;
+} ## end sub commit
+
+=head2 C<rollback()>
+=cut
+
+sub rollback()
+{
+    my ( $self, %parameters ) = @_;
+    if ( !defined $self->{ database }->{ connection } )
+    {
+        $log->error( "Tentando reverter uma transação sem uma conexão com DB..." );
+        return FALSE;
+    }
+    my $rc = $self->{ database }->{ connection }->rollback or die $self->{ database }->{ connection }->errstr;
+    return $rc;
+} ## end sub rollback
+
+=head2 C<prepareQuery()>
+=cut
+
+sub prepareQuery
+{
+    my ( $self, %parameters ) = @_;
+    my $sql = $parameters{ sql };
+
+    my $sth = $self->{ database }->{ connection }->prepare( $sql ) or die $self->{ database }->{ connection }->errstr;
+    return $sth;
+} ## end sub prepareQuery
+
+=head2 C<doQuery()>
+=cut
+
+sub doQuery
+{
+    my ( $self, %parameters ) = @_;
+    my $sql = $parameters{ sql };
+
+    my $sth = $self->{ database }->{ connection }->do( $sql ) or die $self->{ database }->{ connection }->errstr;
+    return $sth;
+} ## end sub doQuery
+
+=head2 C<executeQuery()>
+=cut
+
+sub executeQuery()
+{
+    my ( $self, %parameters ) = @_;
+    my $sql = $parameters{ sql };
+
+    $self->connectDB() unless ( defined( $self->{ database }->{ connection } ) );
+
+    my $sth = $self->prepareQuery( sql => $sql );
+    my $res = $sth->execute() or die $self->{ database }->{ connection }->errstr;
+
+    my @rows;
+    my $line;
+    push( @rows, $line ) while ( $line = $sth->fetchrow_hashref );
+
+    return @rows;
+} ## end sub executeQuery
+
+=head2 C<teste()>
+=cut
+
+sub teste()
+{
+    my ( $self, %parameters ) = @_;
+
+    $self->{ configurations }->{ teste } = 'LALA';
+    return $self;
+} ## end sub teste
+
+=head2 C<getFileMD5()>
+-------------------------------------------------------------------------------
+ Retorna o MD5 do arquivo
+ Parametro 1 - Caminho e nome do arquivo a ser calculado
+ Retorna o MD5 do arquivo informado
+-------------------------------------------------------------------------------
+=cut
+
+sub getFileMD5()
 {
     my ( $self, %parameters ) = @_;
     my $file = $parameters{ file };
+
+    return FALSE unless ( -e $file );
+
     my $return;
-    require Digest::MD5;
+
+    eval { require Digest::MD5; };
+    if ( $@ )
+    {
+        $log->error( 'Package Digest::MD5 não encontrado...' );
+        return FALSE;
+    }
+
     if ( open( my $fh, $file ) )
     {
         binmode( $fh );
         $return = Digest::MD5->new->addfile( $fh )->hexdigest;
         close( $fh );
     } ## end if ( open( my $fh, $file...))
+    else
+    {
+        $log->error( "Não foi possível abrir o arquivo [ $file ]..." );
+    }
 
     return $return;
-} ## end sub getFileMD5($)
+} ## end sub getFileMD5
+
+=head2 C<parseBlockText()>
+=cut
+
+sub parseBlockText()
+{
+    my $me     = ( caller( 0 ) )[ 3 ];
+    my $parent = ( caller( 1 ) )[ 3 ];
+    $log->debug( "parseBlockText", { package => __PACKAGE__, file => __FILE__, me => $me, parent => $parent } );
+
+    my ( $self, %parameters ) = @_;
+    my $file        = $parameters{ file };
+    my $layout      = $parameters{ layout };
+    my $length_type = $parameters{ length_type };
+    my $retorno     = { rows => undef, error => 0, message => undef, };
+
+    if ( !$file || !-e $file )
+    {
+        $log->error( "O arquivo [ $file ] não existe..." );
+        $retorno->{ message } = 'Arquivo não existe';
+        $retorno->{ error }   = TRUE;
+        return $retorno;
+    } ## end if ( !$file || !-e $file...)
+
+    $log->info( "Começando a parsear o arquivo [ $file ]..." );
+    open FH, "<", $file or die "Erro ao abrir o arquivo [ $file ]...";
+    while ( my $linha = <FH> )
+    {
+        $linha =~ s/\n|\r//g;
+
+        my $tipo_de_registro = substr( $linha, 0, $length_type );
+        my $posicao          = 0;
+        my $auxiliar         = ();
+
+        if ( !$layout->{ $tipo_de_registro } )
+        {
+            my $msg = "Erro no layout do arquivo....";
+            $log->error( $msg );
+            $retorno->{ rows }    = undef;
+            $retorno->{ message } = $msg;
+            $retorno->{ error }   = 1;
+            return $retorno;
+        } ## end if ( !$layout->{ $tipo_de_registro...})
+        my $tamanho_da_linha_no_layout  = $layout->{ $tipo_de_registro }->{ total_length };
+        my $tamanho_da_linha_no_arquivo = length( $linha );
+
+        if ( $tamanho_da_linha_no_arquivo != $tamanho_da_linha_no_layout )
+        {
+            my $msg = "Tamanho da linha do tipo $tipo_de_registro no arquivo $file ($tamanho_da_linha_no_arquivo) esta diferente do layout ($tamanho_da_linha_no_layout)";
+            $log->error( $msg );
+            $retorno->{ rows }    = undef;
+            $retorno->{ message } = $msg;
+            $retorno->{ error }   = 1;
+            return $retorno;
+        } ## end if ( $tamanho_da_linha_no_arquivo...)
+
+        foreach my $field ( @{ $layout->{ $tipo_de_registro }->{ fields } } )
+        {
+            $auxiliar->{ $field->{ field } } = $self->trim( substr( $linha, $posicao, $field->{ length } ) );
+            $posicao += $field->{ length };
+
+            my $out = $field->{ out };
+
+            if ( $field->{ match } && $auxiliar->{ $field->{ field } } =~ /$field->{match}/ )
+            {
+                if ( $out )
+                {
+                    $out =~ s/\?\?\?/$auxiliar->{ $field->{field} }/g;
+                    $auxiliar->{ $field->{ field } } = eval( $out );
+                }
+            } ## end if ( $field->{ match }...)
+            elsif ( $out && $out !~ /\$/ )
+            {
+                $out =~ s/\?\?\?/$auxiliar->{ $field->{field} }/g;
+                $auxiliar->{ $field->{ field } } = eval( $out );
+            }
+        } ## end foreach my $field ( @{ $layout...})
+
+        push( @{ $retorno->{ rows }->{ $tipo_de_registro } }, $auxiliar );
+    } ## end while ( my $linha = <FH> ...)
+    return $retorno;
+} ## end sub parseBlockText
+
+=head2 C<trim()>
+=cut
+
+sub parseCSV()
+{
+    my ( $self, %parameters ) = @_;
+    my $file     = $parameters{ file };
+    my $sep_char = $parameters{ sep_char } // ',';
+    my $encoding = $parameters{ encoding } // 'iso-8859-1';
+    my $retorno  = { rows => undef, error => 0, message => undef, };
+
+    $log->info( "Começando a parsear o arquivo [ $file ]..." );
+
+    # Read/parse CSV
+    eval { require Text::CSV_XS; };
+
+    if ( $@ )
+    {
+        $log->error( $@ );
+        return $retorno;
+    }
+
+    my $csv = eval {
+
+        Text::CSV_XS->new(
+            {
+                binary         => 1,
+                auto_diag      => 0,
+                diag_verbose   => 0,
+                blank_is_undef => 1,
+                empty_is_undef => 1,
+                sep_char       => $sep_char,
+            }
+        );
+
+    };
+
+    if ( $@ )
+    {
+        $log->error( $@ );
+        $retorno->{ error }   = 1;
+        $retorno->{ message } = $@;
+    } ## end if ( $@ )
+    else
+    {
+        $csv->callbacks(
+            after_parse => sub {
+
+                # Limpar os espaços em branco no começo e no final de cada campo.
+                map { $_ ? ( s/^\s+|\s+$//g ) : $_ } @{ $_[ 1 ] };
+            },
+
+            #error => sub {
+            #    my ( $err, $msg, $pos, $recno, $fldno ) = @_;
+            #    Text::CSV_XS->SetDiag(0);
+            #    return;
+            #}
+        );
+        my @rows;
+        open my $fh, "<:encoding($encoding)", $file or die "$file->{path}: $!";
+
+        if ( $encoding =~ /utf-8/i )
+        {
+            my @header = $csv->header( $fh, { detect_bom => 1, munge_column_names => "uc" } );
+            $retorno->{ header } = \@header;
+        }
+        else
+        {
+            my @header = $csv->header( $fh, { munge_column_names => "uc" } );
+            $retorno->{ header } = \@header;
+        }
+
+        while ( my $row = $csv->getline( $fh ) )
+        {
+            push @rows, $row;
+        }
+        close $fh;
+
+        my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
+
+        if ( $cde > 0 && $cde != 2012 )
+        {
+            $rec--;
+            undef @rows;
+            $retorno->{ error }   = $cde;
+            $retorno->{ message } = "$str @ rec $rec, pos $pos, field $fld";
+        } ## end if ( $cde > 0 && $cde ...)
+        else
+        {
+            @{ $retorno->{ rows } } = @rows;
+        }
+    } ## end else [ if ( $@ ) ]
+
+    return $retorno;
+} ## end sub parseCSV
+
+=head2 C<trim()>
+=cut
+
+sub trim()
+{
+    my ( $self, $string ) = @_;
+
+    eval { $string =~ s/^\s+|\s+$//g; };
+
+    if ( $@ )
+    {
+        $log->error( "Erro ao fazer o trim na string $string" );
+    }
+
+    return $string;
+} ## end sub trim
 
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.

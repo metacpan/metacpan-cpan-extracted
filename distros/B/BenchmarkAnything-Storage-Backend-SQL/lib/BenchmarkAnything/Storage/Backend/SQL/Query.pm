@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - base class
-$BenchmarkAnything::Storage::Backend::SQL::Query::VERSION = '0.024';
+$BenchmarkAnything::Storage::Backend::SQL::Query::VERSION = '0.026';
 use strict;
 use warnings;
 use Digest::MD5;
@@ -141,7 +141,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

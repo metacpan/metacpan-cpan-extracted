@@ -29,7 +29,7 @@ count(2);
 
 # Try to display latest conf
 $res = &client->jsonResponse('/view/latest');
-ok( $res->{cfgNum} eq '1', 'Browser is allowed' );
+ok( $res->{cfgNum} eq '1', 'Latest conf loaded' );
 count(1);
 
 ok(
@@ -60,6 +60,12 @@ ok( $res->[1]->{captcha_mail_enabled} eq '0', 'Key found' );
 ok( 6 == keys %{ $res->[1] },                 'Right number of keys found' )
   or print STDERR Dumper($res);
 count(2);
+
+# Try to display previous conf
+$res = &client->jsonResponse('/view/1');
+ok( $res->{cfgNum} eq '1', 'Browser is allowed' )
+  or print STDERR Dumper($res);
+count(1);
 
 # Remove new conf
 `rm -rf t/conf/lmConf-2.json`;

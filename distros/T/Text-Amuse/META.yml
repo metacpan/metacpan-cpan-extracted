@@ -25,7 +25,8 @@ requires:
 resources:
   IRC: irc://chat.freenode.net/#amusewiki
   WebIRC: https://webchat.freenode.net/?channels=#amusewiki
+  bugtracker: https://github.com/melmothx/text-amuse/issues
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse
-version: '1.27'
+version: '1.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

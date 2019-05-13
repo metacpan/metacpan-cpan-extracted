@@ -6,7 +6,7 @@ use Import::Into;
 use Moo            ();
 use MooX::ShortHas ();
 
-our $VERSION = '1.190320'; # VERSION
+our $VERSION = '1.191300'; # VERSION
 
 # ABSTRACT: Moo but with less typing
 
@@ -41,7 +41,7 @@ Mu - Moo but with less typing
 
 =head1 VERSION
 
-version 1.190320
+version 1.191300
 
 =head1 SYNOPSIS
 

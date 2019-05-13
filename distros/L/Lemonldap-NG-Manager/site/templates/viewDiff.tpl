@@ -112,7 +112,7 @@
 
   <!-- //if:jsminified
     <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/conftree.min.js"></script>
-    <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/veiwDiff.min.js"></script>
+    <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/viewDiff.min.js"></script>
   //else -->
     <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/conftree.js"></script>
     <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/viewDiff.js"></script>

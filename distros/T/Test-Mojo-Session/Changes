@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Mojo::Session.
 
+1.05 2019-05-12T10:12:58Z
+    - Added support for Test::Mojo::WithRoles.
+
 1.04 2015-03-02T04:56:47Z
     - Added compatibility with Mojo 6.0
 

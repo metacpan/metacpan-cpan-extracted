@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -130,7 +130,7 @@ sub scanTree {
           || '_whatToTrace' } // "anonymous";
     $self->newConf->{cfgAuthorIP} = $self->req->address;
     $self->newConf->{cfgDate}     = time;
-    $self->newConf->{cfgVersion}  = $VERSION;
+    $self->newConf->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
     $self->newConf->{key} ||= join( '',
         map { chr( int( ord( Crypt::URandom::urandom(1) ) * 94 / 256 ) + 33 ) }
           ( 1 .. 16 ) );
@@ -536,21 +536,24 @@ sub _scanNodes {
                     }
                   );
 
+                @listCatRef = map { $_ ? $_ : () } @listCatRef;
+                @listCatNew = map { $_ ? $_ : () } @listCatNew;
                 @listCatRef = sort @listCatRef;
                 @listCatNew = sort @listCatNew;
-                hdebug( '# @listCatRef : ' . \@listCatRef );
-                hdebug( '# @listCatNew : ' . \@listCatNew );
-                for ( my $i = 0 ; $i < @listCatNew ; $i++ ) {
-                    if ( not( defined $listCatRef[$i] )
-                        or $listCatRef[$i] ne $listCatNew[$i] )
-                    {
-                        push @{ $self->changes },
-                          {
-                            key => $leaf->{id},
-                            new => $listCatNew[$i],
-                            old => $listCatRef[$i]
-                          };
-                    }
+                hdebug( '# @listCatRef : ', \@listCatRef );
+                hdebug( '# @listCatNew : ', \@listCatNew );
+
+                # Check for deleted
+                my @diff =
+                  grep !${ { map { $_, 1 } @listCatNew } }{$_}, @listCatRef;
+                if ( scalar @diff ) {
+                    $self->confChanged(1);
+                    push @{ $self->changes },
+                      {
+                        new => join( ', ', 'categoryList',      @listCatNew ),
+                        key => join( ', ', 'Deletes in cat(s)', @diff ),
+                        old => join( ', ', 'categoryList',      @listCatRef ),
+                      };
                 }
             }
             next;

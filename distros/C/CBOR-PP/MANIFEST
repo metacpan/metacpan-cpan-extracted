@@ -1,0 +1,22 @@
+.appveyor.yml
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/CBOR/PP.pm
+lib/CBOR/PP/Decode.pm
+lib/CBOR/PP/Encode.pm
+lib/CBOR/PP/Tagged.pm
+lib/CBOR/PP/X.pm
+lib/CBOR/PP/X/Base.pm
+lib/CBOR/PP/X/Recursion.pm
+t/against_cbor_xs.t
+t/examples.t
+t/general.t
+t/half_float.t
+t/hash.t
+t/utf8.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

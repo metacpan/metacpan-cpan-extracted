@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2019-04-29'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1939,7 +1939,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.020 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-04-29.
+This document describes version 0.021 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-05-12.
 
 =head1 DESCRIPTION
 
@@ -1987,7 +1987,11 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv-sum>
 
+=item * L<csv2tsv>
+
 =item * L<dump-csv>
+
+=item * L<tsv2csv>
 
 =back
 
@@ -2067,7 +2071,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_avg
 
 Usage:
@@ -2113,7 +2116,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_concat
@@ -2189,7 +2191,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_convert_to_hash
 
 Usage:
@@ -2235,7 +2236,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_delete_field
@@ -2285,7 +2285,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_dump
 
 Usage:
@@ -2331,7 +2330,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_each_row
@@ -2399,7 +2397,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_grep
@@ -2481,7 +2478,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_list_field_names
 
 Usage:
@@ -2523,7 +2519,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_lookup_fields
@@ -2609,7 +2604,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_map
 
 Usage:
@@ -2689,7 +2683,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_munge_field
 
 Usage:
@@ -2747,7 +2740,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_replace_newline
 
 Usage:
@@ -2797,7 +2789,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_select_fields
@@ -2851,7 +2842,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_select_row
 
 Usage:
@@ -2897,7 +2887,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_setop
@@ -3024,7 +3013,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 csv_sort_fields
 
 Usage:
@@ -3089,7 +3077,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_sort_rows
@@ -3214,7 +3201,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_sum

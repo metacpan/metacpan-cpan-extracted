@@ -141,7 +141,7 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     switch ('issuer');
     ok( $res = $issuer->_get( $url, query => $query, accept => 'text/html' ),
         'Push SAML response to IdP' );
-    expectRedirection($res, 'http://auth.idp.com/static/common/icons/ok.png');
+    expectRedirection( $res, 'http://auth.idp.com/static/common/icons/ok.png' );
     ok( getHeader( $res, 'Content-Security-Policy' ) !~ /frame-ancestors/,
         ' Frame can be embedded' )
       or explain( $res->[1],

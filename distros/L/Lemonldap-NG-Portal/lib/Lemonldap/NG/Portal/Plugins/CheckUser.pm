@@ -49,7 +49,7 @@ sub init {
             "Bad checkUser identities rule -> " . $hd->tsv->{jail}->error );
         return 0;
     }
-    $self->{idRule} = $rule;
+    $self->idRule($rule);
 
     return 1;
 }
@@ -288,8 +288,9 @@ sub _urlFormat {
     $port ||= '';
     $vhost =~ s/:\d+$//;
     $vhost .= $self->conf->{domain} unless ( $vhost =~ /\./ );
+
     #$appuri ||= '/';
-    return lc ("$proto$vhost$port") . "$appuri";
+    return lc("$proto$vhost$port") . "$appuri";
 }
 
 sub _userDatas {
@@ -386,6 +387,27 @@ sub _splitAttributes {
             }
         }
         push @$others, $element unless $ok;
+    }
+
+    # Sort real and spoofed attributes if required
+    if ( $self->conf->{impersonationRule} ) {
+        $self->logger->debug('Dispatching real and spoofed attributes...');
+        my ( $realAttrs, $spoofedAttrs ) = ( [], [] );
+        my $prefix = "$self->{conf}->{impersonationPrefix}";
+        while (@$others) {
+            my $element = shift @$others;
+            $self->logger->debug(
+                'Processing attribute: ' . Data::Dumper::Dumper($element) );
+            if ( $element->{key} =~ /^$prefix.+$/ ) {
+                push @$realAttrs, $element;
+                $self->logger->debug(' -> Real attribute');
+            }
+            else {
+                push @$spoofedAttrs, $element;
+                $self->logger->debug(' -> Spoofed attribute');
+            }
+        }
+        @$others = ( @$spoofedAttrs, @$realAttrs );
     }
     return [ $grps, $mcrs, $others ];
 }

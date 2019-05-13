@@ -1,0 +1,681 @@
+NAME
+    Data::Dumper::Compact - Vertically compact width-limited data formatter
+
+SYNOPSIS
+    Basic usage as a function:
+
+      use Data::Dumper::Compact 'ddc';
+  
+      warn ddc($some_data_structure);
+  
+      warn ddc($some_data_structure, \%options);
+
+    Slightly more clever usage as a function:
+
+      use Data::Dumper::Compact ddc => \%default_options;
+  
+      warn ddc($some_data_structure);
+  
+      warn ddc($some_data_structure, \%extra_options);
+
+    OO usage:
+
+      use Data::Dumper::Compact;
+  
+      warn Data::Dumper::Compact->dump($data, \%options);
+  
+      my $ddc = Data::Dumper::Compact->new(\%options);
+  
+      warn $ddc->dump($data);
+  
+      warn $ddc->dump($data, \%extra_options);
+
+DESCRIPTION
+    Data::Dumper::Compact, henceforth referred to as DDC, was born because I
+    was annoyed at valuable wasted whitespace paging through both
+    Data::Dumper and Data::Dump based logs - Data::Dump attempts to format
+    horizontally first, but then if it fails, immediately switches to
+    formatting fully vertically, rather than trying to e.g. format a six
+    element arrayref three per line.
+
+    So here's a few of the specifics (noting that all examples unless
+    otherwise specified are dumped with default options):
+
+  Arrays and Strings
+    Given arrays consisting of reasonably long strings, DDC does its best to
+    produce a sane representation within its "max_width":
+
+      [
+        1, 2, [
+          'longstringislonglongstringislonglongstringislong',
+          'longstringislonglongstringislong', 'longstringislong',
+          'longstringislonglongstringislonglongstringislong', 'longstringislong',
+          'longstringislonglongstringislong', 'longstringislong',
+          'longstringislonglongstringislong',
+          'longstringislonglongstringislonglongstringislong',
+          'longstringislonglongstringislong', 'longstringislonglongstringislong',
+          'longstringislonglongstringislonglongstringislong', 'longstringislong',
+          'longstringislong', 'longstringislonglongstringislonglongstringislong',
+          'longstringislong', 'longstringislong', 'longstringislong',
+          'longstringislonglongstringislong',
+          'longstringislonglongstringislonglongstringislong', 'a', 'b', 'c',
+          'longstringislonglongstringislonglongstringislonglongstringislong',
+          'longstringislonglongstringislonglongstringislonglongstringislong',
+          'longstringislonglongstringislonglongstringislonglongstringislong',
+        ], 3,
+      ]
+
+  Keys and Hashrefs
+    When faced with a "-foo" style value, it gets a "=>" even in an array,
+    and hash values that we can are single-line formatted:
+
+      [
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', [
+          'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+          'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+        ],
+        -blah => { baz => 'quux', foo => 'bar' },
+      ]
+
+  The String Thing
+    Strings are single quoted when DDC is absolutely sure that's safe, and
+    double quoted otherwise:
+
+      [ { -foo => {
+            bar =>
+              'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            baz => "bbbbbbbbbbbbbbbbbbbb\nbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      } } ]
+
+  Lonely hash key
+    When a single hash key can't be formatted in a oneline form within the
+    length, DDC will try spilling it to its own line:
+
+      {
+        -xxxxxxxxxxxxx => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      }
+
+    If even that isn't enough, it formats it below and indented:
+
+      { -xxxxxxxxxxxxx =>
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      }
+
+  Strings and the dot operator
+    If a string simply won't fit, DDC splits it and indents it using ".":
+
+      [ 'xyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx'
+        .'yxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxy'
+        .'xyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx'
+        .'yxyxyxyxyxyxyxyxyxyxyxyxyxyxyxy'
+      ]
+
+  Unknown unknowns
+    Anything DDC doesn't understand is passed through its "dumper" option,
+    though since Data::Dumper (at the time of writing) forgets to pass
+    through its indentation level to B::Concise, we slightly tweak that
+    behaviour on the way in for the default "dumper". But the end result
+    looks like:
+
+      { foo => { bar => sub {
+            use warnings;
+            use strict 'refs';
+            my($x, $y) = @_;
+            return $x * $y;
+      } } }
+
+  All together now
+    The full set of behaviours allows compact (and, we hope, readable)
+    versions of complex data structures. To provide one of the examples that
+    expired this module - here is the formatting under standard options for
+    a moderately complex SQL::Abstract update statement:
+
+      {
+        _ => [
+          'tree_table', -join => {
+            as => 'tree',
+            on => { 'tree.id' => 'tree_with_path.id' },
+            to => { -select => {
+                from => 'tree_with_path',
+                select => '*',
+                with_recursive => [
+                  [ 'tree_with_path', 'id', 'parent_id', 'path' ], { -select => {
+                      _ => [
+                        'id', 'parent_id', { -as =>
+                            [
+                              { -cast => { -as => [ 'id', 'char', 255 ] } },
+                              'path',
+                            ]
+                        },
+                      ],
+                      from => 'tree_table',
+                      union_all => { -select => {
+                          _ => [
+                            't.id', 't.parent_id', { -as => [
+                                { -concat => [ 'r.path', \"'/'", 't.id' ] },
+                                'path',
+                            ] },
+                          ],
+                          from => [
+                            'tree_table', -as => 't', -join => {
+                              as => 'r',
+                              on => { 't.parent_id' => 'r.id' },
+                              to => 'tree_with_path',
+                            },
+                          ],
+                      } },
+                      where => { parent_id => undef },
+                  } },
+                ],
+            } },
+          },
+        ],
+        set => { path => { -ident => [ 'tree', 'path' ] } },
+      }
+
+    And the version (generated by setting "max_width" to 40) that runs out
+    of space and thereby forces the "spill vertically" logic to kick in
+    while still attemping to be at least somewhat compact:
+
+      {
+        _ => [
+          'tree_table',
+          '-join',
+          {
+            as => 'tree',
+            on => {
+              'tree.id' => 'tree_with_path.id',
+            },
+            to => {
+              -select => {
+                from => 'tree_with_path',
+                select => '*',
+                with_recursive => [
+                  [
+                    'tree_with_path',
+                    'id',
+                    'parent_id',
+                    'path',
+                  ],
+                  {
+                    -select => {
+                      _ => [
+                        'id',
+                        'parent_id',
+                        {
+                          -as => [
+                            {
+                              -cast => {
+                                -as => [
+                                  'id',
+                                  'char',
+                                  255,
+                                ],
+                              },
+                            },
+                            'path',
+                          ],
+                        },
+                      ],
+                      from => 'tree_table',
+                      union_all => {
+                        -select => {
+                          _ => [
+                            't.id',
+                            't.parent_id',
+                            {
+                              -as => [
+                                {
+                                  -concat => [
+                                    'r.path',
+                                    \"'/'",
+                                    't.id',
+                                  ],
+                                },
+                                'path',
+                              ],
+                            },
+                          ],
+                          from => [
+                            'tree_table',
+                            '-as',
+                            't',
+                            '-join',
+                            {
+                              as => 'r',
+                              on => {
+                                't.parent_id' => 'r.id',
+                              },
+                              to => 'tree_with_path',
+                            },
+                          ],
+                        },
+                      },
+                      where => {
+                        parent_id => undef,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        set => {
+          path => {
+            -ident => [
+              'tree',
+              'path',
+            ],
+          },
+        },
+      }
+
+  Summary
+    Hopefully it's clear what the goal is, and what we've done to achieve
+    it.
+
+    While the system is already somewhat configurable, further options are
+    almost certainly implementable, although if you really want such an
+    option then we expect you to turn up with documentation and test cases
+    for it so we just have to write the code.
+
+OPTIONS
+  max_width
+    Represents the width that DDC will attempt to keep as the maximum (if
+    something overflows it in spite of our best efforts, DDC will fall back
+    to a more vertically sprawling format to at least overflow as little as
+    feasible).
+
+    Default: 78
+
+  indent_by
+    The string to indent by. To set e.g. 4 space indent, pass "' 'x4".
+
+    Default: ' ' (two spaces).
+
+  indent_width
+    How many characters one indent should be considered to be. Generally you
+    only need to manually set this if your "indent_by" is "\t".
+
+    Default: "length($self->indent_by)"
+
+  transforms
+    Set of transforms to apply on every "dump" operation. See "transform"
+    for more information.
+
+    Default: "[]"
+
+  dumper
+    The dumper function to be used for dumping things DDC doesn't
+    understand, such as coderefs, regexprefs, etc.
+
+    Defaults to the same options as Data::Dumper::Concise (which is, itself,
+    only a Data::Dumper configuration albeit it comes with Devel::Dwarn
+    which is rather more interesting) - although on top of that we add a
+    little bit of extra cleverness to make B::Deparse use the correct
+    indentation, since for some reason Data::Dumper doesn't (at the time of
+    writing) do that.
+
+    If you supply it yourself, it needs to be a single argument coderef -
+    you could for example use "\&Data::Dumper::Dumper" though that would
+    almost certainly be pointless.
+
+EXPORTS
+  ddc
+      use Data::Dumper::Compact 'ddc';
+      use Data::Dumper::Compact 'ddc' => \%options;
+
+    If the first argument to "use"/"import()" is 'ddc', a subroutine "ddc()"
+    is installed in the calling package which behaves like calling "dump".
+
+    If the second argument is a hashref, it becomes the options passed to
+    "new".
+
+    This feature is effectively sugar over "dump_cb", in that:
+
+      Data::Dumper::Compact->import(ddc => \%options)
+
+    is equivalent to:
+
+      *ddc = Data::Dumper::Compact->new(\%options)->dump_cb;
+
+METHODS
+  new
+      my $ddc = Data::Dumper::Compact->new;
+      my $ddc = Data::Dumper::Compact->new(%options);
+      my $ddc = Data::Dumper::Compact->new(\%options);
+
+    Constructor. Takes a hash or hashref of "OPTIONS"
+
+  dump
+      my $formatted = Data::Dumper::Compact->dump($data, \%options?);
+  
+      my $formatted = $ddc->dump($data, \%merge_options?);
+
+    This is the method you're going to want to call most of the time, and
+    ties together the rest of the functionality into a single
+    data-structure-to-string bundle. With just a data argument, it's
+    equivalent to:
+
+      $ddc->format( $ddc->transform( $ddc->transforms, $ddc->expand($data) );
+
+    In class method form, options provided are passed to "new"; in instance
+    method form, options if provided are merged into $ddc just for this
+    invocation.
+
+  dump_cb
+      my $cb = $ddc->dump_cb;
+
+    Returns a subroutine reference that's a curried call to "dump":
+
+      $cb->($data, \%extra_options); # equivalent to $ddc->dump(...)
+
+    Mostly useful for if you want to create a custom "ddc()" like thing:
+
+      use Data::Dumper::Compact;
+      BEGIN { *Dumper = Data::Dumper::Compact->new->dump_cb }
+
+  expand
+      my $exp = $ddc->expand($data);
+
+    Expands a data structure to DDC tagged data. The result is, recursively,
+
+      [ $type, $payload ]
+
+    where if $type is one of "string", "key", or "thing", the payload is a
+    simple string ("thing" meaning something unknown and therefore delegated
+    to "dumper"). If the type is an array:
+
+      [ array => \@values ]
+
+    and if the type is a hash:
+
+      [ hash => [ \@keys, \%value_map ] ]
+
+    where the keys provide an order for formatting, and the value map is a
+    hashref of keys to expanded values.
+
+    A plain string becomes a "string", unless it fits the "-foo" style
+    pattern that autoquotes, in which case it becomes a "key".
+
+  add_transform
+      $ddc->add_transform(sub { ... });
+      $ddc->add_transform({ hash => sub { ... }, _ => sub { ... });
+
+    Appends a transform to "$ddc->transforms", see "transform" for
+    behaviour.
+
+    Returns $ddc to enable chaining.
+
+  transform
+      my $tf_exp = $ddc->transform($tfspec, $exp);
+
+    Takes a transform specification and expanded tagged data and returns the
+    transformed expanded expression. A transform spec is an arrayref
+    containing transforms, where each transform is applied in order, so the
+    last transform added via "add_transform" will be the last one to
+    transform the data (each transform will consist of a datastructure
+    representing which parts of the $exp tree it should be called for, plus
+    subroutines representing the relevant transforms).
+
+    Transform subroutines are called as a method on the $ddc with the
+    arguments of "$type, $payload, $path" where $path is an arrayref of the
+    keys/values of the containing hashes and arrays, aggregated as DDC
+    descends through the $exp tree.
+
+    Each transform is expected to return either nothing, to indicate it
+    doesn't wish to modify the result, or a replacement expanded data
+    structure. The simplest form of transform is a subref, which gets called
+    for everything.
+
+    So, to add ' IN MICE' to every string that's part of an array under a
+    hash key called study_results, i.e.:
+
+      my $data = { study_results => [
+          'Sense Of Touch Is Formed In the Brain Before Birth'.
+          "We can't currently cure MS but a single cell could change that",
+      ] };
+  
+      my $tf_exp = $ddc->transform([ sub {
+        my ($self, $type, $payload, $path) = @_;
+        return unless $type eq 'string' and ($path->[-2]||'') eq 'study_results';
+        return [ $type, $payload.' IN MICE' ];
+      } ], $ddc->expand($data));
+
+    will return:
+
+      [ hash => [
+        [ 'study_results' ],
+        { study_results => [ array => [
+          [ string => 'Sense Of Touch Is Formed In the Brain Before Birth IN MICE' ],
+          [ string => "We can't currently cure MS but a single cell could change that IN MICE", ],
+        ] ] }
+      ] ]
+
+    If a hashref is found, then the values are expected to be transforms,
+    and DDC will use "$hashref->{$type}||$hashref->{_}" as the transform, or
+    skip if neither is present. So the previous example could be written as:
+
+      $ddc->transform([ { string => sub {
+        my ($self, $type, $payload, $path) = @_;
+        return unless ($path->[-2]||'') eq 'study_results';
+        return [ $type, $payload.' IN MICE' ];
+      } } ], $ddc->expand($data));
+
+    If the value of the spec entry itself *or* the relevant hash value is an
+    arrayref, it is assumed to contain a spec for trailing path entries,
+    with the last element being the transform subroutine. A path entry match
+    can be an exact scalar (tested via "eq" since it works fine for both
+    strings and integer array indices), regexp, "undef" to indicate "any
+    value is fine here", or a subroutine which will be called with the path
+    entry as both $_[0] and $_. So the example we've been using could also
+    be written as:
+
+      $ddc->transform([ { string => [
+        'study_results', undef,
+        sub { [ string => $_[2].' IN MICE' ] }
+      ] } ], $ddc->expand($data));
+
+    or
+
+      $ddc->transform([ { string => [
+        qr/^study_results$/, sub { 1 },
+        sub { [ string => $_[2].' IN MICE' ] }
+      ] } ], $ddc->expand($data));
+
+    Note that while the $tfspec is not passed to transform subroutines, for
+    the duration of the "transform" call the "transforms" option is
+    localised to the provided routine, so
+
+      sub {
+        my ($self, $type, $payload, $path) = @_;
+        my $tfspec = $self->transforms;
+        ...
+      }
+
+    will return the top level $tfspec passed to the transform call.
+
+    Thanks to <http://twitter.com/justsaysinmice> for the inspiration.
+
+  format
+      my $formatted = $ddc->format($exp);
+
+    Takes expanded tagged data and renders it to a formatted string,
+    suitable for printing or warning or etc.
+
+    Accepts the following type tags: "array", "list", "hash", "key",
+    "string", "thing". Arrays and hashes are formatted as compactly as
+    possible within the constraint of "max_width", but if overflow occurs
+    then DDC falls back to spilling everything vertically, so newlines are
+    used for most spacing and therefore it doesn't exceed the max width any
+    more than strictly necessary.
+
+    Strings are formatted as single quote if obvious, and double quote if
+    not.
+
+    Keys are treated as strings when present as hash values, but when an
+    element of array values, are formatted ask "the_key =>" where possible.
+
+    Lists are formatted as single line "qw()" expressions if possible, or "(
+    ... )" if not.
+
+    Arrays and hashes are formatted in the manner to which one would hope
+    readers are accustomed, except more compact.
+
+ALGORITHM
+    The following is a description of the current algorithm of DDC. We
+    reserve the right to change it for the better.
+
+    If you didn't already read the overview examples in "WHY" do that first.
+
+    Vertical mode means DDC has given up on fitting within the desired width
+    and is now just trying to not use *too* much vertical space.
+
+    Oneline mode is DDC testing to see if a single line rendering of
+    something will fit within the available space. Things will often be
+    rendered more than once since DDC is optimising for compact readable
+    output rather than raw straight line performance.
+
+  Top level formatting
+    If something is formatted and the remaining width is zero or negative,
+    DDC accepts default on "max_width" and bails out to a fully vertical
+    approach so it overflows the desired width no more than necessary.
+
+  Array formatting
+    If already in vertical mode, formats one array element per line,
+    appended with ",":
+
+      [
+        1,
+        2,
+        3
+      ]
+
+    If in possible oneline mode, formats all but the last element according
+    to the "Array element" rules, the last element according to normal
+    formatting, and joins them with ' ' in the hopes this is narrow enough.
+    Return this if oneline is forced or it fits:
+
+      [ 1, 2, 3 ]
+
+    If there's only a single internal member, tries to use the "Single entry
+    formatting" strategy to cuddle it.
+
+      [ [
+        <something inside>
+      ] ]
+
+    Otherwise, attempts to bundle things as best possible: Each element is
+    formatted according to the "Array element" rules, and multiple results
+    are concatenated together onto a single line where that still remains
+    within the available width.
+
+      [
+        'foo', 'bar', 'baz',
+        'red', 'white', 'blue',
+      ]
+
+  Array element
+    Elements are normally formatted as "$formatted.','" except if an element
+    is of type "key" in which cases it becomes "$key =>".
+
+      "whatever the smeg",
+      smeg_off =>
+
+  List formatting
+    The type "list" is synthetic and only introduced by transforms.
+
+    It is formatted identically to an arrayref except with "( )" instead of
+    "[ ]", with the exception that if it consists of only plain strings and
+    will fit onto a single line, it formats as a "qw(x y x)" style list.
+
+      qw(foo bar baz)
+      (
+        'foo',
+        'bar',
+        'baz',
+      )
+
+  Single entry formatting
+    Where possible, a single entry will be cuddled such that the opening
+    delimiters are both on the first line, and the closing delimeters both
+    on the final line, to reduce the vertical space consumption of nested
+    single entry array and/or hashrefs.
+
+      to => { -select => {
+          ...
+      } }
+
+      [ 'SRV:8FB66F32' ], [ [
+          '/opt/voice-srvc-native/bin/async-srvc-att-gateway-poller', 33,
+          'NERV::Voice::SRV::Native::AsyncSRVATTGatewayPoller::main',
+      ] ],
+
+  Hash formatting
+    If already in vertical mode, key/value pairs are formatted separated by
+    newlines, with no attention paid to key length.
+
+      {
+        foo => ...,
+        bar => ...,
+      }
+
+    If potentially in oneline mode, key/value pairs are formatted separated
+    by ', ' and the value is returned if forced or if remaining width allows
+    the oneline rendering.
+
+      { foo => ..., bar => ... }
+
+    Otherwise, all key/value pairs are formatted as "key => value" where
+    possible, but if the first line of the value is too long, the value is
+    moved to the next line and indented.
+
+      key => 'shortvalue'
+      key =>
+        'overlylongvalue'
+
+    If there's only a single such key/value pair, tries to use the "Single
+    entry formatting" strategy to cuddle it.
+
+      { zathrus => {
+          listened_to => 0,
+      } }
+
+    Otherwise returns key/value pairs indented and separated by newlines
+
+      {
+        foo => ...,
+        bar => ...,
+      }
+
+  String formatting
+    Uses single quotes if sure that's safe, double quotes otherwise.
+
+      'foo bar baz quux'
+      "could have been '' but nicer to not screw up\n the indents with a newline"
+
+    Attempts to format a string within the available width, using multiple
+    lines and the "." concatenation operator if necessary,.
+
+      'this would be an'
+      .'annoyingly long'
+      .'string'
+
+    The target width is set to 20 in vertical mode to try and not be too
+    ugly.
+
+AUTHOR
+    mst - Matt S Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2019 the Data::Dumper::Compact "AUTHOR" and "CONTRIBUTORS"
+    as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <https://dev.perl.org/licenses/>.
+

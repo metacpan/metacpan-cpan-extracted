@@ -8,6 +8,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Text/Control.pm', # finds \$VERSION
     AUTHOR       => 'Felipe M. L. Gasper ()',
     ABSTRACT_FROM => 'lib/Text/Control.pm',
+    LICENSE      => 'perl_5',
     PREREQ_PM    => {
                      'Test::More' => 0,
                     },

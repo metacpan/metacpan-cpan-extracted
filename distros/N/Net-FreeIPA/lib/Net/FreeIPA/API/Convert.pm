@@ -1,5 +1,5 @@
 package Net::FreeIPA::API::Convert;
-$Net::FreeIPA::API::Convert::VERSION = '3.0.2';
+$Net::FreeIPA::API::Convert::VERSION = '3.0.3';
 use strict;
 use warnings qw(FATAL numeric);
 

@@ -2,62 +2,75 @@ package Test::Mojo::Session;
 
 use Mojo::Base 'Test::Mojo';
 use Mojo::Util qw(b64_decode hmac_sha1_sum);
-use Mojo::JSON qw(decode_json);
+use Mojo::JSON 'decode_json';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 sub new {
-    my $self = shift->SUPER::new(@_);
-    return $self;
+  my $self = shift->SUPER::new(@_);
+  return $self;
 }
 
 sub session_has {
-    my ($self, $p, $desc) = @_;
-    $desc //= qq{session has value for JSON Pointer "$p"};
-    my $session = $self->_extract_session;
-    return $self->_test('ok', !!Mojo::JSON::Pointer->new($session)->contains($p), $desc);
+  my ($self, $p, $desc) = @_;
+  $desc //= qq{session has value for JSON Pointer "$p"};
+  my $session = $self->_extract_session;
+  return $self->_test('ok', !!Mojo::JSON::Pointer->new($session)->contains($p), $desc);
 }
 
 sub session_hasnt {
-    my ($self, $p, $desc) = @_;
-    $desc //= qq{session has no value for JSON Pointer "$p"};
-    my $session = $self->_extract_session;
-    return $self->_test('ok', !Mojo::JSON::Pointer->new($session)->contains($p), $desc);
+  my ($self, $p, $desc) = @_;
+  $desc //= qq{session has no value for JSON Pointer "$p"};
+  my $session = $self->_extract_session;
+  return $self->_test('ok', !Mojo::JSON::Pointer->new($session)->contains($p), $desc);
 }
 
 sub session_is {
-    my ($self, $p, $data, $desc) = @_;
-    $desc //= qq{session exact match for JSON Pointer "$p"};
-    my $session = $self->_extract_session;
-    return $self->_test('is_deeply', Mojo::JSON::Pointer->new($session)->get($p), $data, $desc);
+  my ($self, $p, $data, $desc) = @_;
+  $desc //= qq{session exact match for JSON Pointer "$p"};
+  my $session = $self->_extract_session;
+  return $self->_test('is_deeply', Mojo::JSON::Pointer->new($session)->get($p), $data, $desc);
 }
 
 sub session_ok {
-    my $self = shift;
-    my $session = $self->_extract_session;
-    return $self->_test('ok', !!$session, 'session ok');
+  my $self    = shift;
+  my $session = $self->_extract_session;
+  return $self->_test('ok', !!$session, 'session ok');
 }
 
 sub _extract_session {
-    my $self = shift;
+  my $self = shift;
 
-    my $app = $self->app;
-    my $session_name = $app->sessions->cookie_name;
+  my $app          = $self->app;
+  my $session_name = $app->sessions->cookie_name;
 
-    my @cookies = $self->ua->cookie_jar->all;
-    @cookies = @{$cookies[0]} if ref $cookies[0] eq 'ARRAY';
-    my ($session_cookie) = grep { $_->name eq $session_name } @cookies;
-    return unless $session_cookie;
+  my @cookies = $self->ua->cookie_jar->all;
+  @cookies = @{$cookies[0]} if ref $cookies[0] eq 'ARRAY';
+  my ($session_cookie) = grep { $_->name eq $session_name } @cookies;
+  return unless $session_cookie;
 
-    (my $value = $session_cookie->value) =~ s/--([^\-]+)$//;
-    my $sign = $1;
+  (my $value = $session_cookie->value) =~ s/--([^\-]+)$//;
+  my $sign = $1;
 
-    my $ok;
-    $sign eq hmac_sha1_sum($value, $_) and $ok = 1 for @{$app->secrets};
-    return unless $ok;
+  my $ok;
+  for (@{$app->secrets}) {
 
-    my $session = decode_json(b64_decode $value);
-    return $session;
+    if (
+
+      # Mojolicious < 8.13
+      $sign eq hmac_sha1_sum($value, $_) ||
+
+      # Mojolicious >= 8.13
+      $sign eq hmac_sha1_sum("$session_name=$value", $_)
+    ) {
+      $ok = 1;
+      last;
+    }
+  }
+  return unless $ok;
+
+  my $session = decode_json(b64_decode $value);
+  return $session;
 }
 
 1;
@@ -70,27 +83,51 @@ Test::Mojo::Session - Testing session in Mojolicious applications
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Lite;
-    use Test::More;
-    use Test::Mojo::Session;
+  use Mojolicious::Lite;
+  use Test::More;
+  use Test::Mojo::Session;
 
-    get '/set' => sub {
-        my $self = shift;
-        $self->session(s1 => 'session data');
-        $self->session(s3 => [1, 3]);
-        $self->render(text => 's1');
-    } => 'set';
+  get '/set' => sub {
+    my $self = shift;
+    $self->session(s1 => 'session data');
+    $self->session(s3 => [1, 3]);
+    $self->render(text => 's1');
+  } => 'set';
 
-    my $t = Test::Mojo::Session->new;
-    $t->get_ok('/set')
-        ->status_is(200)
-        ->session_ok
-        ->session_has('/s1')
-        ->session_is('/s1' => 'session data')
-        ->session_hasnt('/s2')
-        ->session_is('/s3' => [1, 3]);
+  my $t = Test::Mojo::Session->new;
+  $t->get_ok('/set')
+    ->status_is(200)
+    ->session_ok
+    ->session_has('/s1')
+    ->session_is('/s1' => 'session data')
+    ->session_hasnt('/s2')
+    ->session_is('/s3' => [1, 3]);
 
-    done_testing();
+  done_testing();
+
+Use L<Test::Mojo::Sesssion> via L<Test::Mojo::WithRoles>.
+
+  use Mojolicious::Lite;
+  use Test::More;
+  use Test::Mojo::WithRoles 'Session';
+
+  get '/set' => sub {
+    my $c = shift;
+    $c->session(s1 => 'session data');
+    $c->session(s3 => [1, 3]);
+    $c->render(text => 's1');
+  } => 'set';
+
+  my $t = Test::Mojo::WithRoles->new;
+  $t->get_ok('/set')
+    ->status_is(200)
+    ->session_ok
+    ->session_has('/s1')
+    ->session_is('/s1' => 'session data')
+    ->session_hasnt('/s2')
+    ->session_is('/s3' => [1, 3]);
+
+  done_testing();
 
 =head1 DESCRIPTION
 
@@ -104,30 +141,30 @@ following new ones.
 
 =head2 session_has
 
-    $t = $t->session_has('/foo');
-    $t = $t->session_has('/foo', 'session has "foo"');
+  $t = $t->session_has('/foo');
+  $t = $t->session_has('/foo', 'session has "foo"');
 
 Check if current session contains a value that can be identified using the given
 JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 session_hasnt
 
-    $t = $t->session_hasnt('/bar');
-    $t = $t->session_hasnt('/bar', 'session does not has "bar"');
+  $t = $t->session_hasnt('/bar');
+  $t = $t->session_hasnt('/bar', 'session does not has "bar"');
 
 Check if current session no contains a value that can be identified using the given
 JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 session_is
 
-    $t = $t->session_is('/pointer', 'value');
-    $t = $t->session_is('/pointer', 'value', 'right halue');
+  $t = $t->session_is('/pointer', 'value');
+  $t = $t->session_is('/pointer', 'value', 'right halue');
 
 Check the session using the given JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 session_ok
 
-    $t = $t->session_ok;
+  $t = $t->session_ok;
 
 Check for existence of the session in user agent.
 

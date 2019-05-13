@@ -12,5 +12,7 @@ lib/Perl6/Build.pm
 lib/Perl6/Build/Builder.pm
 lib/Perl6/Build/Builder/RakudoStar.pm
 lib/Perl6/Build/Builder/Source.pm
+lib/Perl6/Build/CLI.pm
+lib/Perl6/Build/Helper.pm
 script/perl6-build
 t/00_use.t

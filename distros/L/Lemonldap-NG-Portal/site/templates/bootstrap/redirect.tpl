@@ -1,21 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-  <title trspan="authPortal">Authentication portal</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Script-Type" content="text/javascript" />
-  <meta http-equiv="cache-control" content="no-cache" />
-  <link href="<TMPL_VAR NAME="STATIC_PREFIX">common/favicon.ico" rel="icon" type="image/x-icon" />
-  <link href="<TMPL_VAR NAME="STATIC_PREFIX">common/favicon.ico" rel="shortcut icon" />
- <!-- //if:jsminified
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/redirect.min.js"></script>
- //else -->
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/redirect.js"></script>
- <!-- //endif -->
-</head>
-<body>
+<TMPL_INCLUDE NAME="header.tpl">
 
+<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/redirect.min.js"></script>
 <script id="redirect" type="custom">
 <TMPL_IF NAME="HIDDEN_INPUTS">
 form
@@ -24,15 +9,23 @@ form
 </TMPL_IF>
 </script>
 
-  <h1>Redirection in progress...</h1>
+<main id="redirectcontent" class="container">
+  <div class="card border-secondary">
+    <div class="card-header text-white bg-secondary">
+      <h4 class="text-center card-title"><span trspan="redirectionInProgress">Redirection in progress...</span></h4>
+    </div>
+    <div class="card-body">
+      <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
   <noscript>
-    <p>It appears that your browser does not support Javascript.</p>
+    <div class="message message-warning alert">It appears that your browser does not support Javascript.</div>
   </noscript>
   <TMPL_IF NAME="HIDDEN_INPUTS">
     <form id="form" action="<TMPL_VAR NAME="URL">" method="<TMPL_VAR NAME="FORM_METHOD">" class="login">
       <TMPL_VAR NAME="HIDDEN_INPUTS">
       <noscript>
-        <input type="submit" value="Please click here"/>
+        <input type="submit" />
       </noscript>
     </form>
   <TMPL_ELSE>
@@ -40,6 +33,8 @@ form
       <p><a href="<TMPL_VAR NAME="URL">">Please click here</a></p>
     </noscript>
   </TMPL_IF>
-</body>
-</html>
+    </div>
+  </div>
+</main>
 
+<TMPL_INCLUDE NAME="footer.tpl">

@@ -22,11 +22,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Devel::PPPort" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
+            "Devel::PPPort" : "0",
             "ExtUtils::MakeMaker" : "7.12"
          }
       },
@@ -47,7 +48,7 @@
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::FailWarnings" : "0",
-            "Test::More" : "1.30214",
+            "Test::More" : "1.302133",
             "autodie" : "0"
          }
       }
@@ -63,6 +64,6 @@
          "web" : "https://github.com/FGasper/p5-CBOR-Free"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

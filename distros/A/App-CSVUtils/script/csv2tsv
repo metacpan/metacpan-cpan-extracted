@@ -1,0 +1,77 @@
+#!perl
+
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.021'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Text::CSV_XS;
+
+my $csv = Text::CSV_XS->new({binary=>1});
+while (my $row = $csv->getline(\*ARGV)) {
+    print join("\t", @$row), "\n";
+}
+
+# ABSTRACT: Convert CSV to TSV
+# PODNAME: csv2tsv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv2tsv - Convert CSV to TSV
+
+=head1 VERSION
+
+This document describes version 0.021 of csv2tsv (from Perl distribution App-CSVUtils), released on 2019-05-12.
+
+=head1 SYNOPSIS
+
+ % csv2tsv INPUT.csv > OUTPUT.tsv
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<tsv2csv>
+
+Other CSV-related utilities in L<App::CSVUtils>.
+
+Other TSV-related utilities in L<App::CSVUtils>.
+
+L<App::TextTableUtils>
+
+L<App::SerializeUtils>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

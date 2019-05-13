@@ -9,7 +9,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,88 +27,88 @@ no_index:
 provides:
   Starch:
     file: lib/Starch.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Factory:
     file: lib/Starch/Factory.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Manager:
     file: lib/Starch/Manager.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::AlwaysLoad:
     file: lib/Starch/Plugin/AlwaysLoad.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::Bundle:
     file: lib/Starch/Plugin/Bundle.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::CookieArgs:
     file: lib/Starch/Plugin/CookieArgs.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::CookieArgs::Manager:
     file: lib/Starch/Plugin/CookieArgs/Manager.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::CookieArgs::State:
     file: lib/Starch/Plugin/CookieArgs/State.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::DisableStore:
     file: lib/Starch/Plugin/DisableStore.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::ForManager:
     file: lib/Starch/Plugin/ForManager.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::ForState:
     file: lib/Starch/Plugin/ForState.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::ForStore:
     file: lib/Starch/Plugin/ForStore.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::LogStoreExceptions:
     file: lib/Starch/Plugin/LogStoreExceptions.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::RenewExpiration:
     file: lib/Starch/Plugin/RenewExpiration.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::RenewExpiration::Manager:
     file: lib/Starch/Plugin/RenewExpiration/Manager.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::RenewExpiration::State:
     file: lib/Starch/Plugin/RenewExpiration/State.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::ThrottleStore:
     file: lib/Starch/Plugin/ThrottleStore.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::Trace:
     file: lib/Starch/Plugin/Trace.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::Trace::Manager:
     file: lib/Starch/Plugin/Trace/Manager.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::Trace::State:
     file: lib/Starch/Plugin/Trace/State.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Plugin::Trace::Store:
     file: lib/Starch/Plugin/Trace/Store.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Role::Log:
     file: lib/Starch/Role/Log.pm
-    version: '0.13'
+    version: '0.14'
   Starch::State:
     file: lib/Starch/State.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Store:
     file: lib/Starch/Store.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Store::Layered:
     file: lib/Starch/Store/Layered.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Store::Memory:
     file: lib/Starch/Store/Memory.pm
-    version: '0.13'
+    version: '0.14'
   Starch::Util:
     file: lib/Starch/Util.pm
-    version: '0.13'
+    version: '0.14'
   Test::Starch:
     file: lib/Test/Starch.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Carp: '0'
   Digest::SHA: '0'
@@ -133,7 +133,7 @@ resources:
   bugtracker: https://github.com/bluefeet/Starch/issues
   homepage: https://github.com/bluefeet/Starch
   repository: git://github.com/bluefeet/Starch.git
-version: '0.13'
+version: '0.14'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'

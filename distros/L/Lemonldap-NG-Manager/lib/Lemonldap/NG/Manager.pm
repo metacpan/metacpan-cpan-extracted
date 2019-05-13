@@ -17,14 +17,12 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Handler::PSGI::Router';
 
 has csp => ( is => 'rw' );
-has brw => ( is => 'rw', default => 0 );
-has dif => ( is => 'rw', default => 0 );
 
 ## @method boolean init($args)
 # Launch initialization method
@@ -88,10 +86,7 @@ sub init {
     $self->csp(
         "default-src 'self' $portal;frame-ancestors 'none';form-action 'self';"
     );
-    $self->brw( $self->{viewerAllowBrowser}
-          || $conf->{viewerAllowBrowser}
-          || 0 );
-    $self->dif( $self->{viewerAllowDiff} || $conf->{viewerAllowDiff} || 0 );
+
     $self->defaultRoute( $working[0]->defaultRoute );
 
 # Find out more glyphicones at https://www.w3schools.com/icons/bootstrap_icons_glyphicons.asp
@@ -138,16 +133,23 @@ sub init {
 }
 
 sub tplParams {
-    my ($self) = @_;
-    return ( VERSION => $VERSION, ALLOWBROWSER => $self->brw );
+    my ( $self, $req ) = @_;
+    my $res = $self->brwRule->( $req, $req->{userData} ) || 0;
+    return ( VERSION => $VERSION, ALLOWBROWSER => $res );
 }
 
 sub javascript {
-    my ($self) = @_;
+    my ( $self, $req ) = @_;
+    my $res       = $self->diffRule->( $req, $req->{userData} ) || 0;
+    my $impPrefix = $self->{impersonationPrefix};
+    my $ttl       = $self->{timeout} || 72000;
+
     return
 'var formPrefix=staticPrefix+"forms/";var confPrefix=scriptname+"confs/";var viewPrefix=scriptname+"view/";'
-      . 'var allowDiff='
-      . $self->dif . ';'
+      . 'var allowDiff=' . "$res;"
+      . 'var impPrefix=' . "'"
+      . $impPrefix . "'" . ';'
+      . 'var sessionTTL=' . "$ttl;"
       . ( $self->links ? 'var links=' . to_json( $self->links ) . ';' : '' )
       . (
         $self->menuLinks

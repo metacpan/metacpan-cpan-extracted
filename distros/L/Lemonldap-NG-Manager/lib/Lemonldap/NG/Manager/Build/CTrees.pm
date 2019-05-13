@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 sub cTrees {
     return {
@@ -194,7 +194,9 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcRPMetaDataOptionsClientID',
-                            'oidcRPMetaDataOptionsClientSecret'
+                            'oidcRPMetaDataOptionsClientSecret',
+                            'oidcRPMetaDataOptionsPublic',
+                            'oidcRPMetaDataOptionsRequirePKCE',
                         ]
                     },
                     'oidcRPMetaDataOptionsUserIDAttr',
@@ -252,6 +254,7 @@ sub cTrees {
                 form  => 'simpleInputContainer',
                 nodes => [
                     'casAppMetaDataOptionsService',
+                    'casAppMetaDataOptionsUserAttribute',
                     'casAppMetaDataOptionsRule'
                 ]
             },

@@ -1,14 +1,11 @@
 package Starch::Plugin::RenewExpiration;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::Bundle
-);
+with 'Starch::Plugin::Bundle';
 
 sub bundled_plugins {
     return [qw(
@@ -19,6 +16,8 @@ sub bundled_plugins {
 
 1;
 __END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -76,9 +75,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

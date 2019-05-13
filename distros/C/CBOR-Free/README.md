@@ -64,8 +64,8 @@ become Perl binary strings. (This may become configurable later.)
     Note that invalid UTF-8 in a CBOR UTF-8 string is considered
     invalid input and will thus prompt a thrown exception.
 
-- CBOR null, undefined, true, and false are considered invalid input
-when given as map keys. An exception is thrown if the decoder finds these.
+- The only map keys that `decode()` accepts are integers and strings.
+An exception is thrown if the decoder finds anything else as a map key.
 - CBOR booleans become the corresponding [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) values.
 Both CBOR null and undefined become Perl undef.
 - Tags are IGNORED for now. (This may become configurable later.)
@@ -111,6 +111,12 @@ file a feature request.)
 
 Most errors are represented via instances of subclasses of
 [CBOR::Free::X](https://metacpan.org/pod/CBOR::Free::X), which subclasses [X::Tiny::Base](https://metacpan.org/pod/X::Tiny::Base).
+
+# SPEED
+
+CBOR::Free is pretty snappy. I find that it keeps pace with or
+surpasses [CBOR::XS](https://metacpan.org/pod/CBOR::XS), [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS), [JSON::XS](https://metacpan.org/pod/JSON::XS), [Sereal](https://metacpan.org/pod/Sereal),
+and [Data::MessagePack](https://metacpan.org/pod/Data::MessagePack).
 
 # AUTHOR
 

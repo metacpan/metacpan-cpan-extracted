@@ -1,7 +1,7 @@
 package Net::FreeIPA;
 # dzil abstract
 # ABSTRACT: Net::FreeIPA is a perl FreeIPA JSON API client class
-$Net::FreeIPA::VERSION = '3.0.2';
+$Net::FreeIPA::VERSION = '3.0.3';
 use strict;
 use warnings;
 

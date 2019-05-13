@@ -34,6 +34,24 @@ The number of recursive depth. (default: 10)
 
 If set C<no-pretty> option, then output JSON is not prettify. (default: false, Do prettify)
 
+=head3 x
+
+If set C<x> option, then JSON values are split as array by [\t\n\r] before recursively decoding.
+
+This option is useful for below case:
+
+    $ echo '{"message":"[05/09/2019 23:51:51]\t[warn]\t{\"foo\":\"bar\"}"}' | jl -x
+    {
+       "message" : [
+          "[05/09/2019 23:51:51]",
+          "[warn]",
+          {
+             "foo" : "bar"
+          }
+       ]
+    }
+
+
 =head1 AUTHOR
 
 Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

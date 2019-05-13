@@ -11,7 +11,7 @@ BEGIN {
 }
 eval { unlink 't/userdb.db' };
 
-my $maintests = 7;
+my $maintests = 14;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -92,6 +92,7 @@ SKIP: {
     );
     ok( $res->[2]->[0] =~ s#^.*(<form [^>]*CAS.*?</form>).*$#$1#s,
         'Found CAS entry' );
+
     my ( $host, $url, $query ) = expectForm($res);
     ok(
         $res = $sp->_get(
@@ -101,6 +102,30 @@ SKIP: {
         ),
         'Unauth SP request'
     );
+
+    # CAS idp must be sorted
+    my @idp = map /idploop py-3" val="(.+?)">/g, $res->[2]->[0];
+    ok( $idp[0] eq 'idp',  '1st = idp' )  or print STDERR Dumper( \@idp );
+    ok( $idp[1] eq 'idp3', '2nd = idp3' ) or print STDERR Dumper( \@idp );
+    ok( $idp[2] eq 'idp4', '3rd = idp4' ) or print STDERR Dumper( \@idp );
+    ok( $idp[3] eq 'idp2', '4th= idp2' )  or print STDERR Dumper( \@idp );
+
+    # Found Cancel button
+    ok(
+        $res->[2]->[0] =~
+qr%<a href="http://auth.sp.com\?cancel=1" class="btn btn-primary" role="button">%,
+        'Found Cancel button'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+
+    # Found CAS idp logo and display name
+    ok(
+        $res->[2]->[0] =~
+qr%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2" alt="idp4" title="idp4" />%,
+        'Found CAS idp logo'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] =~ qr%CAS1%, 'Found CAS idp display name' )
+      or print STDERR Dumper( $res->[2]->[0] );
+
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     expectForm( $res, undef, undef );
     ok(
@@ -182,15 +207,37 @@ sub sp {
                         mail => 'mail',
                         uid  => 'uid',
                     },
+                    idp3 => {
+                        cn   => 'cn',
+                        mail => 'mail',
+                        uid  => 'uid',
+                    },
+                    idp4 => {
+                        cn   => 'cn',
+                        mail => 'mail',
+                        uid  => 'uid',
+                    },
                 },
                 casSrvMetaDataOptions => {
                     idp => {
                         casSrvMetaDataOptionsUrl => 'http://auth.idp.com/cas',
-                        casSrvMetaDataOptionsGateway => 0,
+                        casSrvMetaDataOptionsGateway     => 0,
+                        casSrvMetaDataOptionsDisplayName => 'CAS1',
                     },
                     idp2 => {
                         casSrvMetaDataOptionsUrl => 'http://auth.idp.com/cas',
+                        casSrvMetaDataOptionsGateway    => 0,
+                        casSrvMetaDataOptionsSortNumber => 5,
+                    },
+                    idp3 => {
+                        casSrvMetaDataOptionsUrl => 'http://auth.idp.com/cas',
                         casSrvMetaDataOptionsGateway => 0,
+                    },
+                    idp4 => {
+                        casSrvMetaDataOptionsUrl => 'http://auth.idp.com/cas',
+                        casSrvMetaDataOptionsGateway => 0,
+                        casSrvMetaDataOptionsIcon    => 'icons/sfa_manager.png',
+                        casSrvMetaDataOptionsSortNumber => 2,
                     },
                 },
             },

@@ -1,7 +1,7 @@
 package Starch::Store;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -23,18 +23,17 @@ described in L<Starch/METHOD PROXIES>.
 
 =cut
 
-use Types::Standard -types;
+use Starch::Util qw( croak );
 use Types::Common::Numeric -types;
 use Types::Common::String -types;
-use Starch::Util qw( croak );
+use Types::Standard -types;
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Role::Log
-    MooX::MethodProxyArgs
-);
+with 'Starch::Role::Log';
+with 'MooX::MethodProxyArgs';
 
 requires qw(
     set
@@ -239,9 +238,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

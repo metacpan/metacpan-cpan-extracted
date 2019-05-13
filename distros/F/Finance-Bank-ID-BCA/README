@@ -2,8 +2,8 @@ NAME
     Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 VERSION
-    This document describes version 0.49 of Finance::Bank::ID::BCA (from
-    Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
+    This document describes version 0.500 of Finance::Bank::ID::BCA (from
+    Perl distribution Finance-Bank-ID-BCA), released on 2019-05-10.
 
 SYNOPSIS
     If you just want to download banking statements, and you use Linux/Unix,
@@ -67,6 +67,9 @@ DESCRIPTION
     (KlikBCA perorangan) and not the corporate/business version (KlikBCA
     bisnis) as the later requires VPN and token input on login. But this
     module can parse statement page from both versions.
+
+    This module has been tested with the following savings products: Tahapan
+    (IDR), BCA Dolar (USD).
 
     Warning: This module is neither offical nor is it tested to be 100%
     safe! Because of the nature of web-robots, everything may break from one
@@ -271,8 +274,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010
-    by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2015, 2014, 2013, 2012, 2011,
+    2010 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

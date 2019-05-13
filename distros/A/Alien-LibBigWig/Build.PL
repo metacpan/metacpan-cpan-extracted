@@ -33,8 +33,8 @@ my $builder = Alien::Base::ModuleBuild->new(
         protocol       => 'https',
         host           => 'github.com',
         location       => 'dpryan79/libBigWig/archive/',
-        exact_filename => '0.4.2.tar.gz',
-        exact_version  => '0.4.2',
+        exact_filename => '0.4.3.tar.gz',
+        exact_version  => '0.4.3',
     },
     alien_build_commands   => ["make lib CC=$Config{cc} CFLAGS=\"-fPIC -g -Wall -O2\""],
     alien_install_commands => [

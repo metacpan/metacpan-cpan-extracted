@@ -4,11 +4,31 @@ use strict;
 use warnings;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
+my %feature_since = (
+  say => '5.010',
+  state => '5.010',
+  switch => '5.010',
+  unicode_strings => '5.012',
+  current_sub => '5.016',
+  evalbytes => '5.016',
+  fc => '5.016',
+  arybase => '5.016',
+  unicode_eval => '5.016',
+  lexical_subs => '5.018',
+  postderef => '5.020',
+  postderef_qq => '5.020',
+  signatures => '5.020',
+  bitwise => '5.022',
+  refaliasing => '5.022',
+  declared_refs => '5.026',
+);
+
 sub register { return {
   use => {
     if => 'parse_if_args',
     base => 'parse_base_args',
     parent => 'parse_parent_args',
+    feature => 'parse_feature_args',
   },
   keyword => {
     package => 'parse_package',
@@ -90,6 +110,28 @@ sub parse_parent_args {
   }
 }
 
+sub parse_feature_args {
+  my ($class, $c, $used_module, $raw_tokens) = @_;
+
+  $c->add_perl('5.010', 'feature');
+  my $tokens = convert_string_tokens($raw_tokens);
+  if (is_version($tokens->[0])) {
+    $c->add($used_module => shift @$tokens);
+  }
+  while(my $token = shift @$tokens) {
+    next if ref $token;
+    if (exists $feature_since{$token}) {
+      $c->add_perl($feature_since{$token} => "feature $token");
+      next;
+    }
+    if ($token =~ /^:5\.([0-9]+)(\.\[0-9]+)?/) {
+      my $version = sprintf '5.%03d', $1;
+      $c->add_perl($version, $token);
+      next;
+    }
+  }
+}
+
 sub parse_begin_exit {
   my ($class, $c, $raw_tokens) = @_;
 
@@ -111,11 +153,18 @@ sub parse_package {
 
   my $tokens = convert_string_tokens($raw_tokens);
   shift @$tokens; # drop "package"
-  my $package;
-  for my $token (@$tokens) {
-    if (ref $token && $token->[1] && $token->[1] eq 'WORD') {
-      $c->add_package($token->[0]);
-      last;
+  my $token = shift @$tokens;
+  if (ref $token && $token->[1] && $token->[1] eq 'WORD') {
+    $c->add_package($token->[0]);
+  }
+  if (@$tokens) {
+    $token = shift @$tokens;
+    if (is_version($token)) {
+      $c->add_perl("5.012", "package PACKAGE VERSION");
+      $token = shift @$tokens;
+    }
+    if (ref $token && $token->[1] && $token->[1] =~ /^\{/) {
+      $c->add_perl("5.014", "package PACKAGE (VERSION) {}");
     }
   }
 }

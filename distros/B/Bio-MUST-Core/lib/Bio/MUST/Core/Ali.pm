@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.190900';
+$Bio::MUST::Core::Ali::VERSION = '0.191300';
 use Moose;
 use namespace::autoclean;
 
@@ -107,7 +107,12 @@ sub get_seq_with_id {
 
 
 sub all_new_seqs {
-    return shift->filter_seqs( sub { $_->is_new } );
+    return shift->filter_seqs( sub {     $_->is_new } );
+}
+
+
+sub all_but_new_seqs {
+    return shift->filter_seqs( sub { not $_->is_new } );
 }
 
 
@@ -246,6 +251,14 @@ sub uniformize {
     $self->trim_seqs;
     $self->pad_seqs;
 
+    return $self;
+}
+
+
+sub clear_new_tags {
+    my $self = shift;
+
+    $_->clear_new_tag for $self->all_seqs;
     return $self;
 }
 
@@ -800,7 +813,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.190900
+version 0.191300
 
 =head1 SYNOPSIS
 
@@ -1052,6 +1065,15 @@ Returns all the sequences of the Ali tagged as #NEW# (not an array reference).
 
 This method does not accept any arguments.
 
+=head2 all_but_new_seqs
+
+Returns all the sequences of the Ali except those tagged as #NEW# (not an array
+reference).
+
+    my @preexisting_seqs = $ali->all_but_new_seqs;
+
+This method does not accept any arguments.
+
 =head2 all_seq_ids
 
 Returns all the sequence ids (L<Bio::MUST::Core::SeqId> objects) of the Ali
@@ -1240,6 +1262,18 @@ useful in some circumstances, hence it is not defined as private.
     $ali->add_seq(...);
     # more editing of the Ali sequences
     $ali->uniformize;
+
+This method does not accept any arguments.
+
+=head2 clear_new_tags
+
+Clear the #NEW# tag (if any) from all the sequences of the Ali and returns it.
+
+    use aliased 'Bio::MUST::Core::Ali';
+    my $ali = Ali->load('input-42.ali');
+    $ali->clear_new_tags;
+    my @new_seqs = $ali->all_new_seqs;
+    # array should be empty
 
 This method does not accept any arguments.
 

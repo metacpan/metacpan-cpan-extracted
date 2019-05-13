@@ -1,0 +1,6 @@
+#!/bin/sh
+DIR=`dirname $0`
+rm -rf $DIR/docs
+mkdir $DIR/docs
+perl -MPod::Simple::HTMLBatch -e 'Pod::Simple::HTMLBatch::go' $DIR/../lib $DIR/docs
+open $DIR/docs/index.html

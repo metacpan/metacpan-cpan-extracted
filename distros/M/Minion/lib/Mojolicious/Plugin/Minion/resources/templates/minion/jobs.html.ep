@@ -94,24 +94,24 @@
         % my $i = 0;
         % for my $job (@$jobs) {
           % $i++;
-          % my $base = url_with->query([offset => 0]);
+          % my $base = url_with->query({offset => 0});
           <tbody>
             <tr>
               <td>
                 <input type="checkbox" name="id" value="<%= $job->{id} %>">
               </td>
               <td>
-                <a href="<%= url_for->query([id => $job->{id}]) %>">
+                <a href="<%= url_for->query({id => $job->{id}}) %>">
                   <%= $job->{id} %>
                 </a>
               </td>
               <td>
-                <a href="<%= $base->clone->query([task => $job->{task}]) %>">
+                <a href="<%= $base->clone->query({task => $job->{task}}) %>">
                   <%= $job->{task} %>
                 </a>
               </td>
               <td>
-                <a href="<%= $base->clone->query([queue => $job->{queue}]) %>">
+                <a href="<%= $base->clone->query({queue => $job->{queue}}) %>">
                   <%= $job->{queue} %>
                 </a>
               </td>

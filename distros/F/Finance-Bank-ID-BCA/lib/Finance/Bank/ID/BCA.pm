@@ -1,10 +1,12 @@
 package Finance::Bank::ID::BCA;
 
-our $DATE = '2017-07-20'; # DATE
-our $VERSION = '0.49'; # VERSION
+our $DATE = '2019-05-10'; # DATE
+our $VERSION = '0.500'; # VERSION
 
 use 5.010001;
 use Moo;
+
+use HTTP::UserAgentStr::Util::ByNickname qw(newest_firefox);
 
 extends 'Finance::Bank::ID::Base';
 
@@ -15,6 +17,8 @@ sub BUILD {
 
     $self->site("https://ibank.klikbca.com") unless $self->site;
     $self->https_host("ibank.klikbca.com")   unless $self->https_host;
+    $self->_set_default_mech unless $self->mech;
+    $self->mech->agent(newest_firefox());
 }
 
 sub _req {
@@ -77,6 +81,13 @@ sub _menu {
     my $s = $self->site;
     $self->_req(get => ["$s/nav_bar_indo/account_information_menu.htm"],
                 {id=>'accinfo_menu'});
+}
+
+sub _menu_estatement {
+    my ($self) = @_;
+    my $s = $self->site;
+    $self->_req(get => ["$s/nav_bar_indo/estatement.htm"],
+                {id=>'estatement_menu'});
 }
 
 sub list_accounts {
@@ -154,8 +165,10 @@ sub get_statement {
 
     $self->login;
     $self->_menu;
-    $self->logger->info("Getting statement for ".
-        ($args{account} ? "account `$args{account}'" : "default account")." ...");
+    $self->logger->info(
+        "Getting statement for ".
+            ($args{account} ? "account `$args{account}'" : "default account").
+            " ...");
     $self->_req(post => ["$s/accountstmt.do?value(actions)=acct_stmt"],
                 {
                     id => 'get_statement_form',
@@ -429,6 +442,51 @@ sub _ps_get_transactions {
     "";
 }
 
+sub get_estatement {
+    my ($self, %args) = @_;
+    my $s = $self->site;
+
+    $self->login;
+    $self->_menu;
+    $self->_menu_estatement;
+    $self->logger->info(
+        "Getting e-statement for ".
+            ($args{account} ? "account `$args{account}'" : "default account").
+            " ...");
+    $self->_req(post => ["$s/estatement.do?value(actions)=estmt"],
+                {
+                    id => 'get_estatement_form',
+                    after_request => sub {
+                        my ($mech) = @_;
+                        my $errmsg = $self->_get_bca_errmsg;
+                        return "BCA errmsg: $errmsg" if $errmsg;
+                        $mech->content =~ /<form/i or
+                            return "no form found, maybe we got logged out?";
+                        '';
+                    },
+                });
+    $self->_req(submit_form => [
+                                form_number => 1,
+                                fields => {
+                                    "value(monthVal)" => $args{month},
+                                    "value(yearVal)"  => $args{year},
+                                },
+                            ],
+                {
+                    id => 'get_estatement',
+                    after_request => sub {
+                        my ($mech) = @_;
+                        my $errmsg = $self->_get_bca_errmsg;
+                        return "BCA errmsg: $errmsg" if $errmsg;
+                        '';
+                    },
+                });
+    return [
+        $self->mech->response->code,
+        $self->mech->response->code,
+        $self->mech->content];
+}
+
 1;
 # ABSTRACT: Check your BCA accounts from Perl
 
@@ -444,7 +502,7 @@ Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.49 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
+This document describes version 0.500 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2019-05-10.
 
 =head1 SYNOPSIS
 
@@ -511,6 +569,9 @@ perorangan) and not the corporate/business version (KlikBCA bisnis) as the later
 requires VPN and token input on login. But this module can parse statement page
 from both versions.
 
+This module has been tested with the following savings products: Tahapan (IDR),
+BCA Dolar (USD).
+
 Warning: This module is neither offical nor is it tested to be 100% safe!
 Because of the nature of web-robots, everything may break from one day to the
 other when the underlying web interface changes.
@@ -538,7 +599,7 @@ in the distribution.
 
 =head1 METHODS
 
-=for Pod::Coverage BUILD
+=for Pod::Coverage (BUILD|get_estatement)
 
 =head2 new(%args)
 
@@ -736,7 +797,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

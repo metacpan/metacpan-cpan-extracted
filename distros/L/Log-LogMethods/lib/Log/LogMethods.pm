@@ -9,12 +9,13 @@ use Scalar::Util qw(looks_like_number);
 no warnings 'redefine';
 use Log::Log4perl;
 use Log::Log4perl::Level;
+Log::Log4perl->wrapper_register(__PACKAGE__);
 use Moo::Role;
 
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION='1.005';
+our $VERSION='1.006';
 
 # used as a place holder for extended format data
 our $CURRENT_CB;

@@ -21,7 +21,7 @@ sub TIEHASH {
         modified => 0,
     };
     foreach (
-        qw(baseUrl user password realm localStorage localStorageOptions lwpOpts lwpSslOpts)
+        qw(baseUrl user password realm localStorage localStorageOptions lwpOpts lwpSslOpts kind)
       )
     {
         $self->{$_} = $args->{$_};
@@ -116,8 +116,13 @@ sub ua {
 
 sub getJson {
     my $self = shift;
-    my $url  = shift;
-    my $resp = $self->ua->get( $self->base . $url, @_ );
+    my $id   = shift;
+    my $resp = $self->ua->get(
+        $self->base
+          . $id
+          . ( $self->{kind} ne 'SSO' ? "?kind=$self->{kind}" : '' ),
+        @_
+    );
     if ( $resp->is_success ) {
         my $res;
         eval { $res = from_json( $resp->content, { allow_nonref => 1 } ) };
@@ -155,7 +160,7 @@ sub get {
     }
 
     # No cache, use REST and set cache
-    my $res = $self->getJson("$id") or return 0;
+    my $res = $self->getJson($id) or return 0;
     $self->{data} = $res;
 
     $self->cache->set( "rest$id", $self->{data} ) if $self->{localStorage};

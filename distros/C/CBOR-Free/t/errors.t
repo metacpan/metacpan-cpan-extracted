@@ -242,6 +242,7 @@ my @incompletes = (
     [ "\xa1\x18" => 'tiny map (incomplete key)', 1 ],
     [ "\xa1\x01" => 'tiny map (missing value)', 1 ],
     [ "\xa1\x01\x47z" => 'tiny map, incomplete value', 6 ],
+    [ "\xa2\x01\x02" => 'tiny map, missing a pair', 1 ],
 
     #----------------------------------------------------------------------
 

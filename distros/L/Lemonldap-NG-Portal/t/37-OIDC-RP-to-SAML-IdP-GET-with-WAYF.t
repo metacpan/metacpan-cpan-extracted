@@ -116,7 +116,7 @@ SKIP: {
             query  => $query,
             accept => 'text/html',
 
-#            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata'
+         #            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata'
         ),
         "Push request to OP,         endpoint $url"
     );
@@ -129,7 +129,7 @@ SKIP: {
     ok(
         $res = $sp->_get(
             "/",
-            query  => "idp=".uri_escape("http://auth.idp.com/saml/metadata"),
+            query  => "idp=" . uri_escape("http://auth.idp.com/saml/metadata"),
             accept => 'text/html',
             cookie => $spPdata,
         ),
@@ -137,9 +137,6 @@ SKIP: {
     );
 
     $spPdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
-
-
-
 
     my ( $host, $tmp );
     ( $url, $query ) = expectRedirection( $res,
@@ -433,10 +430,10 @@ sub sp {
                 userDB                          => 'Same',
                 issuerDBSAMLActivation          => 0,
                 issuerDBOpenIDConnectActivation => 1,
-                samlDiscoveryProtocolURL        => 'http://discovery.example.com/',
+                samlDiscoveryProtocolURL => 'http://discovery.example.com/',
                 samlDiscoveryProtocolActivation => 1,
 
-                oidcRPMetaDataExportedVars      => {
+                oidcRPMetaDataExportedVars => {
                     rp => {
                         email       => "mail",
                         family_name => "cn",

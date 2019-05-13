@@ -291,6 +291,12 @@ typedef enum marpaESLIFSymbolPropertyBit {
   MARPAESLIF_SYMBOL_IS_TERMINAL   = 0x20
 } marpaESLIFSymbolPropertyBit_t;
 
+typedef enum marpaESLIFSymbolEventBit {
+  MARPAESLIF_SYMBOL_EVENT_COMPLETION = 0x01,
+  MARPAESLIF_SYMBOL_EVENT_NULLED     = 0x02,
+  MARPAESLIF_SYMBOL_EVENT_PREDICTION = 0x04
+} marpaESLIFSymbolEventBit_t;
+
 typedef struct marpaESLIFGrammarProperty {
   int                    leveli;                       /* Grammar level */
   int                    maxLeveli;                    /* Maximum grammar level */
@@ -359,6 +365,7 @@ typedef struct marpaESLIFSymbolProperty {
   int                          priorityi;              /* Symbol priority */
   marpaESLIFAction_t          *nullableActionp;        /* Nullable semantic */
   int                          propertyBitSet;
+  int                          eventBitSet;
 } marpaESLIFSymbolProperty_t;
 
 #ifdef __cplusplus

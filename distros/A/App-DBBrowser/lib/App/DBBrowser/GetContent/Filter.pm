@@ -5,8 +5,9 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( choose_a_subset choose_a_number settings_menu insert_sep );
+use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 
@@ -25,6 +26,7 @@ sub new {
 sub input_filter {
     my ( $sf, $sql, $default_e2n ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $backup = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
     my $waiting = 'Working ... ';
     my $confirm          = '    OK';
@@ -52,10 +54,10 @@ sub input_filter {
             $confirm, $replace,    $split_table, $merge_rows,       $split_col, $cols_to_rows,  $reparse,
         ];
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_m}}, prompt => 'Filter:', default => $old_idx, index => 1,
-              layout => 0, max_width => 90, order => 0, undef => $back }
+            { prompt => 'Filter:', layout => 0, order => 0, max_width => 90, index => 1, default => $old_idx,
+              undef => $back }
         );
         $ax->print_sql( $sql, $waiting );
         if ( ! $idx ) {
@@ -176,8 +178,8 @@ sub __choose_columns {
     # Choose
     my $col_idx = choose_a_subset(
         $header,
-        { back => '<<', confirm => $sf->{i}{ok}, index => 1, mark => $mark, layout => 0, all_by_default => 1,
-          name => 'Cols: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse}, order => 0 } # order
+        { name => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1,
+          mouse => $sf->{o}{table}{mouse}, index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0 } # order
     );
     if ( ! defined $col_idx ) {
         return;
@@ -190,6 +192,7 @@ sub __choose_columns {
 sub __choose_rows {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $aoa = $sql->{insert_into_args};
     my %group; # group rows by the number of cols
     for my $row_idx ( 0 .. $#$aoa ) {
@@ -198,7 +201,6 @@ sub __choose_rows {
     }
     # sort keys by group size
     my @keys_sorted = sort { scalar( @{$group{$b}} ) <=> scalar( @{$group{$a}} ) } keys %group;
-    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     $sql->{insert_into_args} = []; # refers to a new empty array - this doesn't delete $aoa
 
     GROUP: while ( 1 ) {
@@ -225,9 +227,9 @@ sub __choose_rows {
             }
             my @pre = ( undef );
             # Choose
-            my $idx = $stmt_v->choose(
+            my $idx = $tc->choose(
                 [ @pre, @choices_groups ],
-                { prompt => 'Choose group:', index => 1, undef => '  <=' }
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose group:', index => 1, undef => '  <=' }
             );
             if ( ! $idx ) {
                 $sql->{insert_into_args} = $aoa;
@@ -244,10 +246,10 @@ sub __choose_rows {
         while ( 1 ) {
             my @pre = ( undef, $sf->{i}{ok} );
             # Choose
-            my @idx = $stmt_v->choose(
+            my @idx = $tc->choose(
                 [ @pre, @choices_rows ],
-                { prompt => 'Choose rows:', index => 1, meta_items => [ 0 .. $#pre ],
-                  undef => '<<', include_highlighted => 2 }
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose rows:', meta_items => [ 0 .. $#pre ], include_highlighted => 2,
+                  index => 1, undef => '<<' }
             );
             $ax->print_sql( $sql );
             if ( ! $idx[0] ) {
@@ -295,8 +297,8 @@ sub __range_of_rows {
 sub __choose_range {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $aoa = $sql->{insert_into_args};
-    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my @pre = ( undef );
     my $choices;
     {
@@ -304,9 +306,9 @@ sub __choose_range {
         $choices = [ @pre, map { join ',', @$_ } @$aoa ];
     }
     # Choose
-    my $first_idx = $stmt_v->choose(
+    my $first_idx = $tc->choose(
         $choices,
-        { prompt => "Choose FIRST ROW:", index => 1, undef => '<<' }
+        { %{$sf->{i}{lyt_v}}, prompt => "Choose FIRST ROW:", index => 1, undef => '<<' }
     );
     if ( ! $first_idx ) {
         return;
@@ -315,9 +317,9 @@ sub __choose_range {
     $choices->[$first_row + @pre] = '* ' . $choices->[$first_row + @pre];
     $ax->print_sql( $sql );
     # Choose
-    my $last_idx = $stmt_v->choose(
+    my $last_idx = $tc->choose(
         $choices,
-        { prompt => "Choose LAST ROW:", default => $first_row, index => 1, undef => '<<' }
+        { %{$sf->{i}{lyt_v}}, prompt => "Choose LAST ROW:", index => 1, default => $first_row, undef => '<<' }
     );
     if ( ! $last_idx ) {
         return;
@@ -326,9 +328,9 @@ sub __choose_range {
     if ( $last_row < $first_row ) {
         $ax->print_sql( $sql );
         # Choose
-        choose(
+        $tc->choose(
             [ "Last row ($last_row) is less than First row ($first_row)!" ],
-            { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' }
+            { prompt => 'Press ENTER' }
         );
         return;
     }
@@ -389,11 +391,11 @@ sub __merge_rows {
     }
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
-    my $trs = Term::Form->new();
+    my $tf = Term::Form->new();
     # Fill_form
-    my $form = $trs->fill_form(
+    my $form = $tf->fill_form(
         $fields,
-        { prompt => 'Edit result:', auto_up => 2, confirm => '  CONFIRM', back => '  BACK   ' }
+        { prompt => 'Edit result:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
     if ( ! $form ) {
         return;
@@ -407,6 +409,7 @@ sub __merge_rows {
 
 sub __split_table {
     my ( $sf, $sql, $waiting ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $aoa = $sql->{insert_into_args};
     # Choose
     my $col_count = choose_a_number(
@@ -417,16 +420,16 @@ sub __split_table {
         return;
     }
     if ( @{$aoa->[0]} < $col_count ) {
-        choose(
+        $tc->choose(
             [ 'Chosen number bigger than the available columns!' ],
-            { %{$sf->{i}{lyt_m}}, prompt => 'Close with ENTER' }
+            { prompt => 'Close with ENTER' }
         );
         return;
     }
     if ( @{$aoa->[0]} % $col_count ) {
-        choose(
+        $tc->choose(
             [ 'The number of available columns cannot be divided by the chosen number without rest!' ],
-            { %{$sf->{i}{lyt_m}}, prompt => 'Close with ENTER' }
+            { prompt => 'Close with ENTER' }
         );
         return;
     }
@@ -452,31 +455,32 @@ sub __split_table {
 
 sub __split_column {
     my ( $sf, $sql, $waiting ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $aoa = $sql->{insert_into_args};
     my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
     my @pre = ( undef );
     # Choose
-    my $idx = choose(
+    my $idx = $tc->choose(
         [ @pre, @{$header} ],
-        { %{$sf->{i}{lyt_m}}, prompt => 'Choose Column:', index => 1 }
+        { prompt => 'Choose Column:', index => 1 }
     );
     if ( ! $idx ) {
         return;
     }
     $idx -= @pre;
-    my $trl = Term::Form->new();
+    my $tf = Term::Form->new();
     # Readline
-    my $sep = $trl->readline( 'Separator: ' );
+    my $sep = $tf->readline( 'Separator: ' );
     if ( ! defined $sep ) {
         return;
     }
     # Readline
-    my $left_trim = $trl->readline( 'Left trim: ', '\s+' );
+    my $left_trim = $tf->readline( 'Left trim: ', '\s+' );
     if ( ! defined $left_trim ) {
         return;
     }
     # Readline
-    my $right_trim = $trl->readline( 'Right trim: ', '\s+' );
+    my $right_trim = $tf->readline( 'Right trim: ', '\s+' );
     if ( ! defined $right_trim ) {
         return;
     }
@@ -499,6 +503,7 @@ sub __split_column {
 sub __search_and_replace {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
 
     SEARCH_AND_REPLACE: while ( 1 ) {
         my $mods = [ 'g', 'i', 'e', 'e' ];
@@ -512,10 +517,10 @@ sub __search_and_replace {
             my $info = sprintf $info_fmt, '', '', $mods_str;
             my @pre = ( undef, $sf->{i}{ok} );
             # Choose
-            my @idx = choose(
+            my @idx = $tc->choose(
                 [ @pre, map { "[$_]" } @$mods ],
-                { %{$sf->{i}{lyt_stmt_h}}, meta_items => [ 0 .. $#pre ], index => 1,
-                include_highlighted => 2, prompt => 'Modifieres: ', info => $info }
+                { %{$sf->{i}{lyt_h}}, prompt => 'Modifieres: ', info => $info, meta_items => [ 0 .. $#pre ],
+                include_highlighted => 2, index => 1 }
             );
             my $last;
             if ( ! $idx[0] ) {
@@ -543,9 +548,11 @@ sub __search_and_replace {
         my $mods_str = join '', $insensitive, $globally, @e_s;
         my $info = sprintf $info_fmt, '', '', $mods_str;
         $ax->print_sql( $sql, $waiting );
-        my $trl = Term::Form->new();
+        my $tf = Term::Form->new();
         # Readline
-        my $pattern = $trl->readline( 'Pattern: ', { info => $info } );
+        my $pattern = $tf->readline( 'Pattern: ',
+            { info => $info }
+        );
         if ( ! defined $pattern ) {
             next SEARCH_AND_REPLACE;
         }
@@ -553,7 +560,9 @@ sub __search_and_replace {
         $ax->print_sql( $sql, $waiting );
         my $c; # counter available in the replacement
         # Readline
-        my $replacement = $trl->readline( 'Replacement: ', { info => $info } );
+        my $replacement = $tf->readline( 'Replacement: ',
+            { info => $info }
+        );
         if ( ! defined $replacement ) {
             next SEARCH_AND_REPLACE;
         }
@@ -564,8 +573,8 @@ sub __search_and_replace {
         # Choose
         my $col_idx = choose_a_subset(
             $header,
-            { back => '<<', confirm => $sf->{i}{ok}, index => 1, layout => 0, info => $info,
-            name => 'Columns: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse}, all_by_default => 1 }
+            { name => 'Columns: ', info => $info, layout => 0, all_by_default => 1, mouse => $sf->{o}{table}{mouse},
+              index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0 }
         );
         if ( ! defined $col_idx ) {
             next SEARCH_AND_REPLACE;

@@ -26,7 +26,7 @@ no_index:
 provides:
   Backblaze::B2V2Client:
     file: lib/Backblaze/B2V2Client.pm
-    version: '1.0'
+    version: '1.1'
 requires:
   Cpanel::JSON::XS: '4.11'
   Digest::SHA: '6.02'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/ericschernoff/Backblaze-B2V2Client/issues
   homepage: https://github.com/ericschernoff/Backblaze-B2V2Client
   repository: git://github.com/ericschernoff/Backblaze-B2V2Client.git
-version: '1.0'
+version: '1.1'
 x_contributors:
   - 'Eric Chernoff <eric@mail.weaverqueue.com>'
   - 'Eric Chernoff <ericschernoff@gmail.com>'

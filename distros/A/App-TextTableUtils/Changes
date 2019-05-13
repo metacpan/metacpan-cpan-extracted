@@ -1,3 +1,9 @@
+0.005   2019-05-12 (PERLANCAR)
+
+	- [Removed] Remove tsv2csv, csv2tsv; we'll use the line-by-line
+	  (simpler, faster, streamable) version from App::CSVUtils.
+
+
 0.004   2019-01-17 (PERLANCAR)
 
 	- Add utilities: ini2*, iod2*.

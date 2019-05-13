@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use 5.010;
+use Panotools::Script;
+
+my $path_pto = shift;
+die "Can't find $path_pto" unless -e $path_pto;
+
+# Generates ffmpeg remap filter map templates from any Hugin pto file.
+# Only first image is remapped.
+# Typical command (for a single frame):
+#     pto-ffmpeg DSC_0007.pto
+#     ffmpeg -i DSC_0007.JPG -i xmap.pgm -i ymap.pgm -lavfi remap out.png
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_pto);
+$pto->InitTrafo ($path_pto);
+
+open my $pgmx, '>', "xmap.pgm";
+open my $pgmy, '>', "ymap.pgm";
+
+say $pgmx "P2";
+say $pgmx "# CREATOR: $0";
+say $pgmx join ' ', $pto->Panorama->{w}, $pto->Panorama->{h};
+say $pgmx 65535;
+
+say $pgmy "P2";
+say $pgmy "# CREATOR: $0";
+say $pgmy join ' ', $pto->Panorama->{w}, $pto->Panorama->{h};
+say $pgmy 65535;
+
+for my $y_dest (0 .. $pto->Panorama->{h} -1)
+{
+    for my $x_dest (0 .. $pto->Panorama->{w} -1)
+    {
+        my ($x_input, $y_input) = $pto->TrafoReverse (0, $x_dest, $y_dest);
+        $x_input = 65536 if $x_input < 0;
+        $x_input = 65536 if $y_input < 0;
+        say $pgmx int $x_input;
+        say $pgmy int $y_input;
+    }
+}
+
+close $pgmx;
+close $pgmy;
+
+0;
+

@@ -1,5 +1,17 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9954 2019/05/10
+  - changed scan-perl-prereqs-nqlite to use only :bundled parsers
+    by default
+  - added perl_minimum_version option
+  - added feature pragma arg parser
+  - added indented heredoc and <<$fh>> support
+  - fixed eval shortcut handling
+  - fixed parsers to treat several keywords as ops
+  - fixed various small parser issues (//, regexp after return,
+    heredoc terminator, package version/block, when modifier etc)
+  - renamed internal flags
+
 0.9904 2019/02/07
   - made sure to exclude local/core/private modules from feature
     prereqs

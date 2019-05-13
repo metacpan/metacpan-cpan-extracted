@@ -59,6 +59,7 @@ libyaml_to_perl_event(yaml_event_t *event)
     yaml_mark_t end_mark;
     SV *hash_ref_start;
     SV *hash_ref_end;
+    SV *scalar_value;
 
     perl_event = newHV();
     type = event->type;
@@ -146,11 +147,9 @@ libyaml_to_perl_event(yaml_event_t *event)
             newSViv( event->data.scalar.style ),
             0
         );
-        hv_store(
-            perl_event, "value", 5,
-            newSVpv( event->data.scalar.value, event->data.scalar.length ),
-            0
-        );
+        scalar_value = newSVpv( event->data.scalar.value, event->data.scalar.length );
+        (void)sv_utf8_decode(scalar_value);
+        hv_store( perl_event, "value", 5, scalar_value, 0 );
     }
     else if (type == YAML_ALIAS_EVENT) {
         perl_event_type = "alias_event";

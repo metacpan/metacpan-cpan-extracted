@@ -78,6 +78,7 @@ sub dotile
     my ($prefix, $left, $right, $top, $bottom) = @_;
     my $pto_tmp = $pto->Clone;
     $pto_tmp->Panorama->{n} = 'TIFF';
+    $pto_tmp->Option->{outputImageType} = 'tif';
 
     # don't bother rendering tiles outside panorama area
     return if ($left > $pto->Panorama->{w} or $top > $pto->Panorama->{h});

@@ -1,9 +1,33 @@
 ==================================================
-Changes from 2017-10-23 00:00:00 +0000 to present.
+Changes from 2018-05-08 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.03 at 2018-10-23 08:23:06 +0000
+version 0.04 at 2019-05-08 09:27:25 +0000
+-----------------------------------------
+
+  Change: 6519b8439ae642ee51b4006cf4bb05418b34d34f
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 11:26:13 +0000
+
+    Update test to reflect fixed TLSRPT lookup
+
+    Now as the TLSRPT lookup works gmail.com also seem to have such a
+    record. 
+
+  Change: aba5be5377af0969ca574de9e6bb37850f678a19
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 11:13:06 +0000
+
+    Fix TLSRPT record pattern _tcp -> _tls
+
+    The TLSRPT record was build by appending _smtp._tcp which was a
+    mistake. Must be _smtp._tls. (RFC8460)
+
+    Thanks to Jeff Forsyth for reporting this. 
+
+-----------------------------------------
+version 0.03 at 2018-10-23 08:21:09 +0000
 -----------------------------------------
 
   Change: b9902f0b5541dfd9fcf7983954ef3092e5889641

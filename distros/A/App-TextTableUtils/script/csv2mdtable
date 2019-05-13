@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -177,7 +177,7 @@ csv2mdtable - Convert/render {CSV,TSV,INI,IOD,JSON/Perl array-of-arrays} into {C
 
 =head1 VERSION
 
-This document describes version 0.004 of csv2mdtable (from Perl distribution App-TextTableUtils), released on 2019-01-17.
+This document describes version 0.005 of csv2mdtable (from Perl distribution App-TextTableUtils), released on 2019-05-12.
 
 =head1 SYNOPSIS
 
@@ -198,8 +198,6 @@ The distribution App-TextTableUtils provides the following CLIs:
 =item * L<csv2orgtable>
 
 =item * L<csv2texttable>
-
-=item * L<csv2tsv>
 
 =item * L<dd2ansitable>
 
@@ -262,8 +260,6 @@ The distribution App-TextTableUtils provides the following CLIs:
 =item * L<tsv2ansitable>
 
 =item * L<tsv2asciitable>
-
-=item * L<tsv2csv>
 
 =item * L<tsv2dd>
 

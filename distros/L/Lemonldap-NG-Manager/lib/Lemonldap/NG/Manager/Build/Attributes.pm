@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -1695,14 +1695,15 @@ sub attributes {
         vhostType    => {
             type   => 'select',
             select => [
-                { k => 'Main',         v => 'Main' },
-                { k => 'Zimbra',       v => 'ZimbraPreAuth' },
                 { k => 'AuthBasic',    v => 'AuthBasic' },
-                { k => 'SecureToken',  v => 'SecureToken' },
                 { k => 'CDA',          v => 'CDA' },
                 { k => 'DevOps',       v => 'DevOps' },
                 { k => 'DevOpsST',     v => 'DevOpsST' },
+                { k => 'Main',         v => 'Main' },
+                { k => 'OAuth2',       v => 'OAuth2' },
+                { k => 'SecureToken',  v => 'SecureToken' },
                 { k => 'ServiceToken', v => 'ServiceToken' },
+                { k => 'Zimbra',       v => 'ZimbraPreAuth' },
             ],
             default       => 'Main',
             documentation => 'Handler type',
@@ -1822,6 +1823,10 @@ sub attributes {
         casAppMetaDataOptionsService => {
             type          => 'url',
             documentation => 'CAS App service',
+        },
+        casAppMetaDataOptionsUserAttribute => {
+            type          => 'text',
+            documentation => 'CAS User attribute',
         },
         casAppMetaDataOptionsRule => {
             type          => 'text',
@@ -2771,7 +2776,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Path of CAS Server Icon',
         },
         casSrvMetaDataOptionsSortNumber => {
-            type => 'int',
+            type          => 'int',
             documentation => 'Number to sort buttons',
         },
 
@@ -2803,7 +2808,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         gpgAuthnLevel => {
             type          => 'int',
-            default       => 3,
+            default       => 5,
             documentation => 'GPG authentication level',
         },
 
@@ -3348,11 +3353,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcOPMetaDataOptionsIcon         => { type => 'text', },
         oidcOPMetaDataOptionsStoreIDToken => { type => 'bool', default => 0 },
         oidcOPMetaDataOptionsSortNumber   => { type => 'int', },
-        oidcRPMetaDataOptionsRule => {
-            type          => 'text',
-            test          => $perlExpr,
-            documentation => 'Rule to grant access to this SP',
-        },
 
         # OpenID Connect relying parties
         oidcRPMetaDataExportedVars => {
@@ -3411,6 +3411,21 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'bool',
             default       => 0,
             documentation => 'Session required for logout',
+        },
+        oidcRPMetaDataOptionsPublic => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Declare this RP as public client',
+        },
+        oidcRPMetaDataOptionsRequirePKCE => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Require PKCE',
+        },
+        oidcRPMetaDataOptionsRule => {
+            type          => 'text',
+            test          => $perlExpr,
+            documentation => 'Rule to grant access to this RP',
         },
     };
 }

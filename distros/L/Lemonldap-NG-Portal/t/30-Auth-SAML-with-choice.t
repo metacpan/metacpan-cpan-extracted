@@ -67,10 +67,13 @@ SKIP: {
 
     # IDP must be sorted
     my @idp = map /val="http:\/\/(.+?)\/saml\/metadata">/g, $res->[2]->[0];
-    ok( $idp[0] eq 'auth.idp2.com', '1st = idp2' ) or print STDERR Dumper( \@idp );
-    ok( $idp[1] eq 'auth.z_idp2.com', '2nd = z_idp2' ) or print STDERR Dumper( \@idp );
-    ok( $idp[2] eq 'auth.idp3.com', '3rd = idp3' ) or print STDERR Dumper( \@idp );
-    ok( $idp[3] eq 'auth.idp.com', '4th= idp' )  or print STDERR Dumper( \@idp );
+    ok( $idp[0] eq 'auth.idp2.com', '1st = idp2' )
+      or print STDERR Dumper( \@idp );
+    ok( $idp[1] eq 'auth.idp2_z.com', '2nd = idp2_z' )
+      or print STDERR Dumper( \@idp );
+    ok( $idp[2] eq 'auth.idp3.com', '3rd = idp3' )
+      or print STDERR Dumper( \@idp );
+    ok( $idp[3] eq 'auth.idp.com', '4th= idp' ) or print STDERR Dumper( \@idp );
 
     ok(
         $res->[2]->[0] =~
@@ -261,7 +264,7 @@ sub sp {
                         uid  => "1;uid",
                         cn   => "0;cn"
                     },
-                    z_idp2 => {
+                    idp2_z => {
                         mail => "0;mail;;",
                         uid  => "1;uid",
                         cn   => "0;cn"
@@ -305,7 +308,7 @@ sub sp {
                         samlIDPMetaDataOptionsSortNumber               => 1,
                         samlIDPMetaDataOptionsDisplayName => 'Test_Sort',
                     },
-                    z_idp2 => {
+                    idp2_z => {
                         samlIDPMetaDataOptionsEncryptionMode => 'none',
                         samlIDPMetaDataOptionsSSOBinding     => 'post',
                         samlIDPMetaDataOptionsSLOBinding     => 'post',
@@ -329,7 +332,7 @@ sub sp {
                         "uid" => "0;uid;;",
                         "cn"  => "1;cn;;",
                     },
-                    z_idp2 => {
+                    idp2_z => {
                         "uid" => "0;uid;;",
                         "cn"  => "1;cn;;",
                     },
@@ -347,9 +350,9 @@ sub sp {
                         samlIDPMetaDataXML =>
                           samlIDPMetaDataXML( 'idp3', 'HTTP-POST' )
                     },
-                    z_idp2 => {
+                    idp2_z => {
                         samlIDPMetaDataXML =>
-                          samlIDPMetaDataXML( 'z_idp2', 'HTTP-POST' )
+                          samlIDPMetaDataXML( 'idp2_z', 'HTTP-POST' )
                     },
                 },
                 samlOrganizationDisplayName => "SP",

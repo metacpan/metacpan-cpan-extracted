@@ -58,7 +58,7 @@
          "web" : "https://github.com/benningm/Test-Mock-Net-Server-Mail.git"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }

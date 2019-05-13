@@ -1,7 +1,7 @@
 package CSV::Examples;
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Example CSV files
@@ -18,7 +18,7 @@ CSV::Examples - Example CSV files
 
 =head1 VERSION
 
-This document describes version 0.002 of CSV::Examples (from Perl distribution CSV-Examples), released on 2019-04-23.
+This document describes version 0.003 of CSV::Examples (from Perl distribution CSV-Examples), released on 2019-05-12.
 
 =head1 DESCRIPTION
 

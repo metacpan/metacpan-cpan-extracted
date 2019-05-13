@@ -1,5 +1,359 @@
 Revision history for Perl extension Net::SSLeay.
 
+1.88 2019-05-10
+	- New stable release incorporating all changes from developer
+	  releases 1.86_01 to 1.86_11.
+	- From this release, Net-SSLeay is switching to an "odd/even"
+	  developer/stable release version numbering system, like that of
+	  many core modules (e.g. ExtUtils::MakeMaker): developer releases
+	  will have an odd minor version number (and the usual "_xx" suffix),
+	  and stable releases will have an even minor version number. This
+	  means there is no Net-SSLeay 1.87.
+	- Summary of major changes since version 1.85:
+	  - Mike McCauley has stepped down as maintainer. The new maintainers
+	    are Chris Novakovic, Heikki Vatiainen and Tuure Vartiainen.
+	  - The source code has moved from the now-defunct Debian Subversion
+	    server (alioth.debian.org) to GitHub
+	    (https://github.com/radiator-software/p5-net-ssleay).
+	  - Net-SSLeay is provided under the terms of the Artistic License
+	    2.0 - this has been the case since version 1.66, but references
+	    to other licenses remained in the source code, causing ambiguity.
+	  - Perl 5.8.1 or newer is now required to use Net-SSLeay. This has
+	    already been the case for some time in practice, as the test
+	    suite hasn't fully passed on Perl 5.6 for several years.
+	  - Much-improved compatibility with OpenSSL 1.1.1, and improved
+	    support for TLS 1.3.
+	  - Fixed a long-standing bug in cb_data_advanced_put() that caused
+	    memory leaks when callbacks were frequently added and removed.
+	  - Support in the test suite for "hardened" OpenSSL configurations
+	    that set a default security level of 2 or higher (e.g., in the
+	    OpenSSL packages that ship with recent versions of Debian, Fedora
+	    and Ubuntu).
+
+1.86_11 2019-05-08
+	- Clarified Net-SSLeay's licensing terms: the module distribution has
+	  been released under the terms of the Artistic License 2.0 since
+	  version 1.66; references to other licenses have been removed. Fixes
+	  RT#106314. Thanks to Kent Fredric for pointing out the ambiguity.
+	- Replace the HTTPS hosts in the external tests (some of which were
+	  no longer online) with more resilient ones. Closes issue #26.
+
+1.86_10 2019-05-04
+	- Use locally-generated certificate chain in local tests rather
+	  than the Twitter one, which changes regularly and breaks the
+	  test suite unnecessarily. Fixes RT#129201. Thanks to Petr Písař
+	  for the report and patch, and Steffen Ullrich for an alternative
+	  patch suggestion.
+	- In t/local/09_ctx_new.t, rather than checking that the functions
+	  (CTX_)get_min_proto_version and (CTX_)get_max_proto_version return
+	  0x0000 (indicating the lowest and highest versions supported by
+	  libssl respectively, which is not the case if a run-time
+	  configuration is enforcing a different minimum or maximum), just
+	  check whether the returned value is one of those mentioned on the
+	  SSL_CTX_set_min_proto_version(3) man page. Partially fixes
+	  RT#128025. Thanks to Slaven Rezić and Dmytro Zagashev for the
+	  downstream reports.
+	- Move from 1024-bit keys/certificates to 2048-bit keys/certificates
+	  across the entire test suite. This removes the need to manually
+	  set the security level to 1 in tests that used the old keys, and
+	  fixes large numbers of test failures on modern Linux distributions
+	  that set the minimum OpenSSL security level to 2. Fixes RT#126270
+	  and the remainder of RT#128025. Thanks to Petr Písař and Slaven
+	  Rezić for the downstream reports.
+	- In t/local/06_tcpecho.t and t/local/07_sslecho.t, connect to
+	  127.0.0.1 instead of localhost. This fixes these tests when
+	  executed inside a network sandbox that disrupts the behaviour of
+	  gethostbyname(). Fixes RT#128207. Thanks to Kent Fredric for the
+	  downstream report.
+
+1.86_09 2019-03-12
+	- Add missing files to MANIFEST that prevented tests from passing
+	  when installing from the 1.86_08 release tarball.
+
+1.86_08 2019-03-12
+	- Add and fix functions needed to properly implement client
+	  side session reuse for TLS 1.3 with using
+	  CTX_sess_set_new_cb. Newly exposed functions:
+	  SSL_SESSION_dup and SSL_SESSION_up_ref.
+	  Fixed functions: i2d_SSL_SESSION and d2i_SSL_SESSION.
+	  Thanks to Steffen Ullrich.
+	- Add functions functions to allow reading multiple pems from
+	  file and creating untrusted chain: These functions allow you
+	  to:
+	  - Read in a PEM file with multiple certificates as a
+	    STACK_OF(X509_INFO)
+	  - Determine the size of the STACK_OF(X509_INFO) and value at
+	    an index, which allows you to loop over the stack.
+	  - Retrieve the X509 structure from each X509_INFO structure
+	    in the stack.
+	  Then you can create a new STACK_OF(X509) and push the X509
+	  structures onto the new stack. You can then pass this
+	  STACK_OF(X509) to X509_STORE_CTX_init which will allow you
+	  to add additional untrusted certificates to the chain for
+	  verification. Exposed functions are:
+	  PEM_X509_INFO_read_bio
+	  sk_X509_INFO_num
+	  sk_X509_INFO_value
+	  sk_X509_INFO_free
+	  sk_X509_new_null
+	  sk_X509_free
+	  sk_X509_push
+	  New function implemented by Net::SSLeay:
+	  P_X509_INFO_get_x509
+	  Thanks to Marc Reisner.
+	- Add functions and constants that are necessary to verify a
+	  certificate using a hash directory outside of an SSL/TLS
+	  connection. Newly exposed functions:
+	  X509_STORE_CTX_init
+	  X509_STORE_CTX_free
+	  X509_STORE_new
+	  X509_STORE_free
+	  X509_STORE_add_lookup
+	  X509_LOOKUP_hash_dir
+	  X509_LOOKUP_add_dir
+	  Newly exposed constants:
+	  X509_FILETYPE_ASN1
+	  X509_FILETYPE_DEFAULT
+	  X509_FILETYPE_PEM
+	  Thanks to Marc Reisner.
+	- Declare n_a in ssleay_set_psk_client_callback_invoke and
+	  ssleay_ctx_set_psk_client_callback_invoke to avoid a compilation
+	  error with Perl versions below 5.8.8. Fixes RT#128030. Thanks to
+	  Graham Ollis for the report.
+	- Add X509_get0_serialNumber. Thanks to Marc Reisner.
+	- Enable Travis CI for LibreSSL 2.2.1, 2.7.5, 2.8.3 and 2.9.0
+	  on Perl 5.20 and more recent.
+	- Expose the following functions for curve and group selection:
+	  - CTX_set_ecdh_auto, set_ecdh_auto
+	  - CTX_set1_curves_list, set1_curves_list
+	  - CTX_set1_groups_list, set1_groups_list
+	  Thanks to Steffen Ullrich.
+
+1.86_07 2018-12-13
+        - Net::SSLeay::RSA_generate_key() now prefers using
+          RSA_generate_key_ex. This avois deprecated RSA_generate_key
+          and allows removing the only Android specific code in
+          SSLeay.xs. Fixes RT#127593. Thanks to Rouven Weiler.
+	- SSL_CTX_get0_param, SSL_CTX_get0_param,
+	  X509_VERIFY_PARAM_set1_host, X509_VERIFY_PARAM_add1_host,
+	  X509_VERIFY_PARAM_set_hostflags,
+	  X509_VERIFY_PARAM_get0_peername,
+	  X509_VERIFY_PARAM_set1_email, X509_VERIFY_PARAM_set1_ip and
+	  X509_VERIFY_PARAM_set1_ip_asc added in 1.83 for OpenSSL
+	  1.0.2 and later are now available with LibreSSL 2.7.0 and
+	  later.
+	- get_keyblock_size() now gets the MAC secret size from the
+	  cipher on LibreSSL 2.7.0 and later, rather than reaching
+	  into libssl internals. This effectively takes the OpenSSL
+	  1.1 code path for LibreSSL 2.7.0 instead of the OpenSSL 1.0
+	  code path.  Thanks to Alexander Bluhm.
+	- get_client_random and get_server_random now use API
+	  functions supported by LibreSSL 2.7.0 and later. Thanks to
+	  Alexander Bluhm.
+	- Add X509_check_host(), X509_check_email(), X509_check_ip(),
+	  and X509_check_ip_asc() for LibreSSL 2.5.0 and later. Thanks
+	  to Alexander Bluhm.
+        - OpenSSL_version() and OpenSSL_version_num() are available
+          with LibreSSL 2.7.0 and later. Thanks to Alexander Bluhm.
+        - Use OPENSSL_cleanse() instead of memset(). Fixes
+          RT#116599. Thanks to A. Sinan Unur.
+
+1.86_06 2018-09-29
+	- Net::SSLeay::read() and SSL_peek() now check SSL_get_error()
+	  for SSL_ERROR_ZERO_RETURN for return values <= 0 to make
+	  Net::SSLeay::read() behave more like underlying OpenSSL
+	  function SSL_read().
+	  Convenience function ssl_read_all() now does an automatic
+	  retry when ERROR_WANT_READ or ERROR_WANT_WRITE is returned
+	  with Net::SSLeay::read().
+	  Convenience function ssl_read_until() now uses
+	  Net::SSLeay::ssl_read_all() instead of
+	  Net::SSLeay::read(). Tests 07_sslecho.t and 36_verify.t were
+	  also updated to use ssl_read_all() and ssl_write_all(). The
+	  tests now also disable TLSv1.3 session tickets and ignore
+	  SIGPIPE to avoid this signal when the client has finished
+	  before server has sent session tickets and called
+	  Net::SSLeay::accept().
+	  Thanks to Petr Pisar and Sebastian Andrzej Siewior for the
+	  patches (in #RT125218).
+	- Fix a memory leak in cb_data_advanced_put. Fixes
+	  RT#127131. Noticed, investigated and patched by Paul
+	  Evans. Thanks!
+	- Enable OpenSSL 1.1.1-pre9 with Travis CI.
+	- Add SSL_CTX_set_num_tickets, SSL_CTX_get_num_tickets,
+	  SSL_set_num_ticket and SSL_get_num_tickets for controlling
+	  the number of TLSv1.3 session tickets that are issued.  Add
+	  tests in 44_sess.t. Parts taken from a larger patch by Petr
+	  Pisar of RedHat.
+	- Add SSL_CTX_set_ciphersuites and SSL_set_ciphersuites for
+	  configuring the available TLSv1.3 ciphersuites. Add tests in
+	  43_misc_functions.t and clarify SSL_client_version tests.
+	- Add SSL_CTX_set_security_level, SSL_CTX_get_security_level,
+	  SSL_set_security_level and SSL_get_security_level.
+	  Add new test file 65_security_level.t.
+	  All courtesy of Damyan Ivanov of Debian project.
+	- Fix export_keying_material return value check and context
+	  handling. SSL_export_keying_material use_context is now
+	  correctly set to non-zero value when context is an empty
+	  string. This affects values exported with TLSv1.2 and earlier.
+	  Update documentation in NetSSLeay.pod and add tests
+	  in t/local/45_export.t.
+	- Add RAND_priv_bytes. Add new test file t/local/10_rand.t for
+	  RAND_bytes, RAND_pseudo_bytes, RAND_priv_bytes, RAND_status,
+	  RAND_poll, RAND_file_name and RAND_load_file.
+	- Update documentation for RAND_*bytes return values and
+	  RAND_file_name behaviour with LibreSSL.
+	- Add SSL_SESSION_is_resumable. Add and update tests in 44_sess.t.
+	- Set OpenSSL security level to 1 in tests that use the test suite's
+	  (1024-bit) RSA keys, which allows the test suite to pass when
+	  Net-SSLeay is built against an OpenSSL with a higher default
+	  security level. Fixes RT#126987. Thanks to Petr Pisar (in
+	  RT#126270) and Damyan Ivanov (in RT#126987) for the reports and
+	  patches, and to Damyan Ivanov for the preferred patch.
+	- Add SSL_CTX_sess_set_new_cb and SSL_CTX_sess_set_remove_cb.
+	  Add new test file 44_sess.t for these and future session
+	  related tests for which no specific test file is needed.
+	- Add SSL_get_version, SSL_client_version and SSL_is_dtls.
+	- Add SSL_peek_ex, SSL_read_ex, SSL_write_ex and SSL_has_pending.
+	  Add tests in t/local/11_read.t
+	- Add SSL_CTX_set_post_handshake_auth contributed by Paul
+	  Howarth. Add SSL_set_post_handshake_auth,
+	  SSL_verify_client_post_handshake and constant
+	  SSL_VERIFY_POST_HANDSHAKE.
+	- Applied a patch to set_cert_and_key() from Damyan Ivanov,
+	  Debian Perl Group. This function now returns errors from
+	  library's error stack only when an underlying routine
+	  fails. Unrelated errors are now skipped. Fixes RT#126988.
+	- Add support for TLSv1.3 via $Net::SSLeay::ssl_version.
+	- Enhance t/local/43_misc_functions.t get_keyblock_size test
+	  to work better with AEAD ciphers.
+	- Add constants SSL_OP_ENABLE_MIDDLEBOX_COMPAT and
+	  SSL_OP_NO_ANTI_REPLAY for TLSv1.3
+	- Fix compile time DEFINE=-DSHOW_XS_DEBUG to work with
+	  non-threaded Perls. Fixes RT#127027. Thanks to SREZIC for
+	  the report. Also fix other minor compile warnings.
+
+1.86_05 2018-08-22
+	- Net-SSLeay now requires at least Perl 5.8.1. This is a
+	  formalisation of what has been the de facto case for some time,
+	  as the distribution hasn't compiled and passed its tests on Perl
+	  5.005 for several years.
+	- Increment Net::SSLeay::Handle's version number to keep it in sync
+	  with Net::SSLeay's, thus satisfying Kwalitee's consistent_version
+	  metric.
+	- Re-enable the d2i_X509_bio() test in t/local/33_x509_create_cert.t
+	  for LibreSSL. Thanks to Alexander Bluhm.
+	- Automatically detect new library names on Windows for OpenSSL
+	  1.1.0 onwards (libcrypto, libssl). Fixes part of RT#121084. Thanks
+	  to Jean-Damien Durand.
+	- Fix a typo preventing OpenSSL libraries built with the VC compiler
+	  (i.e. ones with a ".lib" suffix) from being automatically detected
+	  on Windows. Fixes part of RT#121084. Thanks to Jean-Damien Durand.
+	- Add missing call to va_end() following va_start() in TRACE().
+	  Fixes RT#126028. Thanks to Jitka Plesnikova.
+	- Added SSL_in_init() and the related functions for all
+	  libraries and their versions. All return 0 or 1 as
+	  documented by OpenSSL 1.1.1. Use of these functions is
+	  recommended over using constants returned by get_state() and
+	  state(). New constants TLS_ST_*, used by OpenSSL 1.1.0 and
+	  later, will not be made available by Net::SSLeay.
+
+1.86_04 2018-07-30
+	- Re-add SSLv3_method() for OpenSSL 1.0.2 and above. Fixes
+	  RT#101484.
+	- Don't expose ENGINE-related functions when building against
+	  OpenSSL builds without ENGINE support. Fixes RT#121538. Thanks to
+	  Paul Green.
+	- Automatically detect OpenSSL 1.0.x on VMS, and update VMS
+	  installation instructions to reflect removal of Module::Install
+	  from the build system. Fixes RT#124388. Thanks to Craig A. Berry.
+	- Prevent memory leak in OCSP_cert2ids() and OCSP_response_verify().
+	  Fixes RT#125273. Thanks to Steffen Ullrich.
+
+1.86_03 2018-07-19
+	- Convert packaging to ExtUtils::MakeMaker. Thanks to mohawk2.
+	- Module::Install is no longer a prerequisite when building
+	  from the reposistory.
+	- Re-apply patch from ETJ permitting configure and build in
+	  places with a space in the name.
+
+1.86_02 2018-07-06
+	- Removed inc/ from repository. Module::Install is now a
+	  prerequisite when building from the repository. This allowed
+	  also removing "." from Makefile.PL lib path which was added
+	  in version 1.81. These updates require no changes when
+	  building from release packages. They also help AppVeyor
+	  builds to work better with old Perls.
+
+	- Added CONTRIBUTING.md, reformatted the previous Changes
+          entry to use CPAN::Changes::Spec guidelines and removed
+          unused version control tags from comments.
+
+1.86_01 2018-07-04
+	- Net::SSLeay functionality was not changed in this release.
+
+	- Maintainer changes:
+	  - Mike McCauley, maintainer of Net-SSLeay since November 2005,
+	    has stepped down. Thanks to Mike for his 13 years of
+	    stewardship.
+	  - Net-SSLeay is now maintained by Chris Novakovic, Heikki
+	    Vatiainen and Tuure Vartiainen.
+
+	- Version control system changes:
+	  - The previous Debian-hosted SVN repository has been imported
+	    into Git. The source code is now maintained on GitHub, at
+	    https://github.com/radiator-software/p5-net-ssleay.
+
+	  - Fixes to commit metadata, branches and tags that git-svn
+	    couldn't handle or had no way of handling, were done
+	    manually or semi-automatically afterwards. For instance, the
+	    "git-svn-id:" lines that git-svn appends to commit messages
+	    were kept because Mike used SVN revision numbers in RT
+	    replies to indicate when bugs had been fixed/patches applied
+	    (which may be useful for future reference).
+
+	  - All commits were replayed onto a single master branch rather
+	    than having separate dead-end branches for the old SVN
+	    version tags (as this seems more "git-like").
+
+	  - New lightweight tags were created for each public release
+	    going back as far as the start of the SVN repository using
+	    data from MetaCPAN (cross-referencing with the changelog
+	    when it wasn't clear when a release was cut from the SVN
+	    repo).
+
+	  - Florian's and Mike's email addresses were mapped to git
+	    author/committer IDs
+
+	- Continuous integration:
+	  - Travis CI configuration was added for automated testing on
+	    Linux using 64 bit Ubuntu Trusty. Build matrix dimensions
+	    are: Perl 5.8 - 5.26 x OpenSSL 0.9.8zh - 1.1.0h. Only the
+	    currently latest version for each major Perl and OpenSSL
+	    release is chosen.
+
+	  - AppVeyor configuration was added for automated testing on
+	    Windows. Build matrix dimensions are: Perl 5.8 - 5.26 x
+	    32bit and 64bit Perl environment x Windows Server 2012R2 and
+	    Windows Server 2016. The Perl environment is Strawberry Perl
+	    and its OpenSSL is used with builds. Only the latest major
+	    versions are used, similarly to Travis CI. Net-SSLeay PPM
+	    and PPD files are made available as artifacts.
+
+	  - Added README.md with link to master branch build and test
+	    status. Did minor updates to README and other misc files.
+
+	- Release packaging:
+	  - Files t/local/43_misc_functions.t and
+	    t/local/65_ticket_sharing_2.t were missing from MANIFEST.
+
+	  - Updated inc/ directory with Module::Install 1.19. Updated
+	    Makefile.PL author and resource information. Synced
+	    SSLeay.pm under ext/ with the latest changes under
+	    inc/. Reordered use imports so that META.yml gets correctly
+	    regenerated. More Module::Install related changes will
+	    follow.
+
 1.85 2018-03-14
 	Preparations for transferring maintenace to a new maintainer
 	Fixed test failure in t/local/33_x509_create_cert.t for some version of OpenSSL.

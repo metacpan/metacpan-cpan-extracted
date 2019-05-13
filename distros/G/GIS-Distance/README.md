@@ -7,12 +7,13 @@ GIS::Distance - Calculate geographic distances.
 ```perl
 use GIS::Distance;
 
-# Use the GIS::Distance::Haversine formula by default:
+# Use the GIS::Distance::Haversine formula by default.
 my $gis = GIS::Distance->new();
 
-# Or choose a different formula:
+# Or choose a different formula.
 my $gis = GIS::Distance->new( 'Polar' );
 
+# Returns a Class::Measure object.
 my $distance = $gis->distance( $lat1, $lon1, $lat2, $lon2 );
 
 print $distance->meters();
@@ -57,13 +58,13 @@ pairs.
 - Does not return a [Class::Measure](https://metacpan.org/pod/Class::Measure) object.  Instead kilometers are always
 returned.
 - Does no argument checking.
-- Does not support ["formula\_args"](#formula_args), which are supported by at least the
-[GIS::Distance::GeoEllipsoid](https://metacpan.org/pod/GIS::Distance::GeoEllipsoid) formula.  Read more in the ["SPEED"](#speed) section.
+- Does not support formula arguments which are supported by at least the
+[GIS::Distance::GeoEllipsoid](https://metacpan.org/pod/GIS::Distance::GeoEllipsoid) formula.
 
 Calling this gets you pretty close to the fastest bare metal speed you can get.
 The speed improvements of calling this is noticeable over hundreds of thousands of
 iterations only and you've got to decide if its worth the safety and features
-you are dropping.
+you are dropping.  Read more in the ["SPEED"](#speed) section.
 
 # ARGUMENTS
 
@@ -71,9 +72,8 @@ you are dropping.
 my $gis = GIS::Distance->new( $formula );
 ```
 
-When you call `GIS::Distance-`new()> you may pass a partial or full formula
-class name as the first argument.  If you do not specify a formula then this
-defaults to `Haversive`.
+When you call `new()` you may pass a partial or full formula class name as the
+first argument.  The default is `Haversive`.
 
 If you pass a partial name, as in:
 
@@ -89,10 +89,8 @@ GIS::Distance::Haversine
 Haversine
 ```
 
-Note that a `Fast::` version of the class will be looked for first.  By default
-the `Fast::` versions of the formulas, written in C, are not available and the
-pure perl ones will be used instead.  If you would like the `Fast::` formulas
-then install [GIS::Distance::Fast](https://metacpan.org/pod/GIS::Distance::Fast) and they will be automatically used.
+Install [GIS::Distance::Fast](https://metacpan.org/pod/GIS::Distance::Fast) to get access to the `Fast::` (XS) implementations
+of the formula classes.
 
 You may globally disable the automatic use of the `Fast::` formulas by setting
 the `GIS_DISTANCE_PP` environment variable.  Although, its likely simpler to
@@ -220,10 +218,23 @@ GIS-Distance GitHub issue tracker:
 # AUTHORS
 
 ```
-Aran Clary Deltac <bluefeet@gmail.com>
+Aran Clary Deltac <aran@bluefeet.dev>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 ```
 
-# LICENSE
+# COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Copyright (C) 2003 Aran Clary Deltac
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).

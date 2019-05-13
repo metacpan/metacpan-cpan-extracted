@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::SNMP::XS
 
+1.34  Tue May  7 23:42:44 CEST 2019
+	- lessons learned from Convert::BER::XS...
+        - fix oid first component decoding for X == 2.
+        - avoid sprintf in oid decoding, for likely negligible
+          speed increase.
+        - minor code cleanups.
+
 1.33  Fri Dec 21 12:20:00 CET 2018
 	- no functional changes.
 	- use new MakeMaker feature to properly declare dependency on

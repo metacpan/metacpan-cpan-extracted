@@ -62,6 +62,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Getopt::Euclid" => 0,
     "Graphics::ColorNames" => 0,
+    "Graphics::ColorNames::HTML" => 0,
     "Graphics::ColorNames::WWW" => 0,
     "IPC::System::Simple" => 0,
     "LWP::Simple" => 0,
@@ -98,7 +99,7 @@ my %WriteMakefileArgs = (
     "Config::Any" => 0,
     "Test::Deep" => 0
   },
-  "VERSION" => "0.190900",
+  "VERSION" => "0.191300",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -122,6 +123,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Getopt::Euclid" => 0,
   "Graphics::ColorNames" => 0,
+  "Graphics::ColorNames::HTML" => 0,
   "Graphics::ColorNames::WWW" => 0,
   "IPC::System::Simple" => 0,
   "LWP::Simple" => 0,

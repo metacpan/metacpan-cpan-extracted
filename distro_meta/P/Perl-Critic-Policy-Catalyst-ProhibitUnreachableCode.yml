@@ -1,4 +1,4 @@
 ---
 distro: Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode
-version: 0.01
-author_path: B/BL/BLUEFEET/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode-0.01.tar.gz
+version: 0.02
+author_path: B/BL/BLUEFEET/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode-0.02.tar.gz

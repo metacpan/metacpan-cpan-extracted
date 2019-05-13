@@ -1,10 +1,12 @@
 package SVG::Estimate::Path::QuadraticBezier;
-$SVG::Estimate::Path::QuadraticBezier::VERSION = '1.0113';
+$SVG::Estimate::Path::QuadraticBezier::VERSION = '1.0114';
 use Moo;
 use List::Util qw/min max/;
 use Clone qw/clone/;
 
 extends 'SVG::Estimate::Path::Command';
+with 'SVG::Estimate::Role::Pythagorean';
+with 'SVG::Estimate::Role::SegmentLength';
 with 'SVG::Estimate::Role::EndToPoint';
 
 =head1 NAME
@@ -13,7 +15,7 @@ SVG::Estimate::Path::QuadraticBezier - Handles estimating quadratic bezier curve
 
 =head1 VERSION
 
-version 1.0113
+version 1.0114
 
 =head1 SYNOPSIS
 
@@ -28,7 +30,7 @@ version 1.0113
 
 =head1 INHERITANCE
 
-This class extends L<SVG::Estimate::Path::Command> and consumes L<SVG::Estimate::Role::EndToPoint>.
+This class extends L<SVG::Estimate::Path::Command> and consumes L<SVG::Estimate::Role::EndToPoint> and L<SVG::Estimate::Role::SegmentLength>
 
 =head1 METHODS
 
@@ -69,13 +71,18 @@ sub BUILDARGS {
         $args->{control} = $args->{transformer}->transform($args->{control});
     }
     $args->{end_point} = clone $args->{point};
-    $args->{shape_length}  = $class->_calculate_length($args);
-    $args->{travel_length} = 0;
-    ##Bouding box points approximated by the control points.
+    #$args->{shape_length}  = $class->_calculate_length($args);
+    my $start      = $class->this_point($args, 0);
+    my $end        = $class->this_point($args, 1);
+    ##Bounding box points approximated by the control points.
     $args->{min_x} = min $args->{start_point}->[0], $args->{control}->[0], $args->{point}->[0];
     $args->{max_x} = max $args->{start_point}->[0], $args->{control}->[0], $args->{point}->[0];
     $args->{min_y} = min $args->{start_point}->[1], $args->{control}->[1], $args->{point}->[1];
     $args->{max_y} = max $args->{start_point}->[1], $args->{control}->[1], $args->{point}->[1];
+
+    $args->{shape_length}  = $class->segment_length($args, 0, 1, $start, $end, 1e-4, 5, 0);
+    $args->{travel_length} = 0;
+
     return $args;
 }
 
@@ -104,6 +111,25 @@ sub _calculate_length {
 
     my $length = ( $A32 + $SA*$B*($SABC-$SC) + (4*$C*$A - $B*$B)*log( (2*$SA + $BA + $SABC)/($BA + $SC) ) ) / (4*($A32));
     return $length;
+}
+
+sub this_point {
+    my $class = shift;
+    my $args  = shift;
+    my $t     = shift;
+    return [
+        $class->_this_point($t, $args->{start_point}->[0], $args->{control}->[0], $args->{point}->[0]),
+        $class->_this_point($t, $args->{start_point}->[1], $args->{control}->[1], $args->{point}->[1])
+    ];
+}
+
+sub _this_point {
+    shift;
+    my ($t, $s, $c, $p) = @_;
+    return ((1 - $t)**2 * $s)
+         + (2*(1 - $t)*$t*$c)
+         + ($t**2 * $p)
+    ;
 }
 
 1;

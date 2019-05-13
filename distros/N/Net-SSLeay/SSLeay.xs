@@ -1,18 +1,18 @@
 /* SSLeay.xs - Perl module for using Eric Young's implementation of SSL
  *
- * Copyright (c) 1996-2002 Sampo Kellomaki <sampo@iki.fi>
- * Copyright (C) 2005 Florian Ragwitz <rafl@debian.org>
- * Copyright (C) 2005 Mike McCauley <mikem@airspayce.com>
+ * Copyright (c) 1996-2003 Sampo Kellomäki <sampo@iki.fi>
+ * Copyright (c) 2005-2010 Florian Ragwitz <rafl@debian.org>
+ * Copyright (c) 2005-2018 Mike McCauley <mikem@airspayce.com>
+ * Copyright (c) 2018- Chris Novakovic <chris@chrisn.me.uk>
+ * Copyright (c) 2018- Tuure Vartiainen <vartiait@radiatorsoftware.com>
+ * Copyright (c) 2018- Heikki Vatiainen <hvn@radiatorsoftware.com>
  * 
- * All Rights Reserved.
+ * All rights reserved.
  *
  * Change data removed. See Changes
  *
- * $Id: SSLeay.xs 518 2018-01-27 20:43:03Z mikem-guest $
- * 
- * The distribution and use of this module are subject to the conditions
- * listed in LICENSE file at the root of the Net-SSLeay
- * distribution (i.e. same license as Perl itself).
+ * This module is released under the terms of the Artistic License 2.0. For
+ * details, see the LICENSE file.
  */
 
 /* ####
@@ -224,6 +224,7 @@ static void TRACE(int level,char *msg,...) {
 	va_start(args,msg);
 	vsnprintf(buf,4095,msg,args);
 	warn("%s",buf);
+	va_end(args);
     }
 }
 
@@ -251,9 +252,9 @@ UV get_my_thread_id(void) /* returns threads->tid() value */
 {
     dSP;
     UV tid = 0;
+#ifdef USE_ITHREADS
     int count = 0;
 
-#ifdef USE_ITHREADS
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
@@ -520,9 +521,13 @@ int cb_data_advanced_put(void *ptr, const char* data_name, SV* data)
 
     /* first delete already stored value */
     hv_delete(L2HV, data_name, strlen(data_name), G_DISCARD);
-    if (data!=NULL)
+    if (data!=NULL) {
         if (SvOK(data))
             hv_store(L2HV, data_name, strlen(data_name), data, 0);
+        else
+            /* we're not storing data so discard it */
+            SvREFCNT_dec(data);
+    }
 
     return 1;
 }
@@ -974,6 +979,8 @@ unsigned int ssleay_set_psk_client_callback_invoke(SSL *ssl, const char *hint,
     BIGNUM *psk_bn = NULL;
     SV * cb_func;
     SV * hintsv;
+    /* this n_a is required for building with old perls: */
+    STRLEN n_a;
 
     PR1("STARTED: ssleay_set_psk_client_callback_invoke\n");
     cb_func = cb_data_advanced_get(ssl, "ssleay_set_psk_client_callback!!func");
@@ -1030,6 +1037,8 @@ unsigned int ssleay_ctx_set_psk_client_callback_invoke(SSL *ssl, const char *hin
     BIGNUM *psk_bn = NULL;
     SV * cb_func;
     SV * hintsv;
+    /* this n_a is required for building with old perls: */
+    STRLEN n_a;
 
     ctx = SSL_get_SSL_CTX(ssl);
 
@@ -1520,7 +1529,7 @@ int tlsext_ticket_key_cb_invoke(
 		croak("name must be at at most 16 bytes, got %d",(int)svlen);
 	    if (svlen == 0)
 		croak("name should not be empty");
-	    memset(name, 0, 16);
+	    OPENSSL_cleanse(name, 16);
 	    memcpy(name,pname,svlen);
 	    usable_rv_count++;
 	}
@@ -1569,6 +1578,71 @@ int tlsext_ticket_key_cb_invoke(
 
 #endif
 
+int ssleay_ssl_ctx_sess_new_cb_invoke(struct ssl_st *ssl, SSL_SESSION *sess)
+{
+    dSP;
+    int count, remove;
+    SSL_CTX *ctx;
+    SV *cb_func;
+
+    PR1("STARTED: ssleay_ssl_ctx_sess_new_cb_invoke\n");
+    ctx = SSL_get_SSL_CTX(ssl);
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ssl_ctx_sess_new_cb!!func");
+
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ssl_ctx_sess_new_cb_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(sess))));
+    PUTBACK;
+
+    count = call_sv(cb_func, G_SCALAR);
+
+    SPAGAIN;
+
+    if (count != 1)
+        croak("Net::SSLeay: ssleay_ssl_ctx_sess_new_cb_invoke perl function did not return a scalar\n");
+
+    remove = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return remove;
+}
+
+void ssleay_ssl_ctx_sess_remove_cb_invoke(SSL_CTX *ctx, SSL_SESSION *sess)
+{
+    dSP;
+    SV *cb_func;
+
+    PR1("STARTED: ssleay_ssl_ctx_sess_remove_cb_invoke\n");
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ssl_ctx_sess_remove_cb!!func");
+
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ssl_ctx_sess_remove_cb_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ctx))));
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(sess))));
+    PUTBACK;
+
+    call_sv(cb_func, G_VOID);
+
+    SPAGAIN;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+}
 
 /* ============= end of callback stuff, begin helper functions ============== */
 
@@ -1601,7 +1675,7 @@ time_t ASN1_TIME_timet(ASN1_TIME *asn1t) {
     }
 
     /* extract data and time */
-    memset(&t,0,sizeof(t));
+    OPENSSL_cleanse(&t, sizeof(t));
     if (asn1t->type == V_ASN1_UTCTIME) { /* YY - two digit year */
 	t.tm_year = (p[0]-'0')*10 + (p[1]-'0');
 	if (t.tm_year < 70) t.tm_year += 100;
@@ -1650,7 +1724,7 @@ X509 * find_issuer(X509 *cert,X509_STORE *store, STACK_OF(X509) *chain) {
 	for(i=0;i<sk_X509_num(chain);i++) {
 	    if ( X509_check_issued(sk_X509_value(chain,i),cert) == X509_V_OK ) {
 		TRACE(2,"found issuer in chain");
-		issuer = sk_X509_value(chain,i);
+		issuer = X509_dup(sk_X509_value(chain,i));
 	    }
 	}
     }
@@ -1708,7 +1782,11 @@ BOOT:
     /* initialize global shared callback data hash */
     MY_CXT.global_cb_data = newHV();
     MY_CXT.tid = get_my_thread_id();
-    PR3("BOOT: tid=%d my_perl=0x%p\n", MY_CXT.tid, my_perl);
+#ifdef USE_ITHREADS
+    PR3("BOOT: tid=%lu my_perl=%p\n", MY_CXT.tid, my_perl);
+#else
+    PR1("BOOT:\n");
+#endif
     }
 
 void
@@ -1722,7 +1800,11 @@ CODE:
      */
     MY_CXT.global_cb_data = newHV();
     MY_CXT.tid = get_my_thread_id();
-    PR3("CLONE: tid=%d my_perl=0x%p\n", MY_CXT.tid, my_perl);
+#ifdef USE_ITHREADS
+    PR3("CLONE: tid=%lu my_perl=%p\n", MY_CXT.tid, my_perl);
+#else
+    PR1("CLONE: but USE_ITHREADS not defined\n");
+#endif
 
 double
 constant(name)
@@ -1750,7 +1832,7 @@ const char *
 SSLeay_version(type=SSLEAY_VERSION)
         int type
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 
 unsigned long
 OpenSSL_version_num()
@@ -1900,6 +1982,68 @@ SSL_CTX_set_verify(ctx,mode,callback=&PL_sv_undef)
         SSL_CTX_set_verify(ctx, mode, &ssleay_verify_callback_invoke);
     }
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)
+
+void
+SSL_CTX_set_security_level(SSL_CTX * ctx, int level)
+
+int
+SSL_CTX_get_security_level(SSL_CTX * ctx)
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101007L && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+SSL_CTX_set_num_tickets(SSL_CTX *ctx, size_t num_tickets)
+
+size_t
+SSL_CTX_get_num_tickets(SSL_CTX *ctx)
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101003L && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.1.1 */
+
+void
+SSL_CTX_set_post_handshake_auth(SSL_CTX *ctx, int val)
+
+#endif
+
+void
+SSL_CTX_sess_set_new_cb(ctx, callback)
+        SSL_CTX * ctx
+        SV * callback
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_CTX_sess_set_new_cb(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ssl_ctx_sess_new_cb!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ctx, "ssleay_ssl_ctx_sess_new_cb!!func", newSVsv(callback));
+            SSL_CTX_sess_set_new_cb(ctx, &ssleay_ssl_ctx_sess_new_cb_invoke);
+        }
+
+void
+SSL_CTX_sess_set_remove_cb(ctx, callback)
+        SSL_CTX * ctx
+        SV * callback
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_CTX_sess_set_remove_cb(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ssl_ctx_sess_remove_cb!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ctx, "ssleay_ssl_ctx_sess_remove_cb!!func", newSVsv(callback));
+            SSL_CTX_sess_set_remove_cb(ctx, &ssleay_ssl_ctx_sess_remove_cb_invoke);
+        }
+
 int
 SSL_get_error(s,ret)
      SSL *              s
@@ -1990,16 +2134,20 @@ int
 SSL_get_fd(s)
      SSL *   s
 
-AV *
+void
 SSL_read(s,max=32768)
 	SSL *   s
 	int     max
     PREINIT:
 	char *buf;
 	int got;
+	int succeeded = 1;
     PPCODE:
 	New(0, buf, max, char);
+
 	got = SSL_read(s, buf, max);
+	if (got <= 0 && SSL_ERROR_ZERO_RETURN != SSL_get_error(s, got))
+	       succeeded = 0;
 
 	/* If in list context, return 2-item list:
 	 *   first return value:  data gotten, or undef on error (got<0)
@@ -2007,13 +2155,13 @@ SSL_read(s,max=32768)
 	 */
 	if (GIMME_V==G_ARRAY) {
 	    EXTEND(SP, 2);
-	    PUSHs(sv_2mortal(got>=0 ? newSVpvn(buf, got) : newSV(0)));
+	    PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, got) : newSV(0)));
 	    PUSHs(sv_2mortal(newSViv(got)));
 
 	/* If in scalar or void context, return data gotten, or undef on error. */
 	} else {
 	    EXTEND(SP, 1);
-	    PUSHs(sv_2mortal(got>=0 ? newSVpvn(buf, got) : newSV(0)));
+	    PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, got) : newSV(0)));
 	}
 
 	Safefree(buf);
@@ -2022,13 +2170,16 @@ void
 SSL_peek(s,max=32768)
 	SSL *   s
 	int     max
-	PREINIT:
+    PREINIT:
 	char *buf;
 	int got;
-	PPCODE:
+	int succeeded = 1;
+    PPCODE:
 	New(0, buf, max, char);
 
 	got = SSL_peek(s, buf, max);
+	if (got <= 0 && SSL_ERROR_ZERO_RETURN != SSL_get_error(s, got))
+	       succeeded = 0;
 
 	/* If in list context, return 2-item list:
 	 *   first return value:  data gotten, or undef on error (got<0)
@@ -2036,15 +2187,86 @@ SSL_peek(s,max=32768)
 	 */
 	if (GIMME_V==G_ARRAY) {
 	    EXTEND(SP, 2);
-	    PUSHs(sv_2mortal(got>=0 ? newSVpvn(buf, got) : newSV(0)));
+	    PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, got) : newSV(0)));
 	    PUSHs(sv_2mortal(newSViv(got)));
 	    
 	    /* If in scalar or void context, return data gotten, or undef on error. */
 	} else {
 	    EXTEND(SP, 1);
-	    PUSHs(sv_2mortal(got>=0 ? newSVpvn(buf, got) : newSV(0)));
+	    PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, got) : newSV(0)));
 	}
 	Safefree(buf);
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.1.1 */
+
+void
+SSL_read_ex(s,max=32768)
+	SSL *   s
+	int     max
+    PREINIT:
+	char *buf;
+	size_t readbytes;
+	int succeeded;
+    PPCODE:
+	Newx(buf, max, char);
+
+	succeeded = SSL_read_ex(s, buf, max, &readbytes);
+
+	/* Return 2-item list:
+	 *   first return value:  data gotten, or undef on error
+	 *   second return value: result from SSL_read_ex()
+	 */
+	EXTEND(SP, 2);
+	PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, readbytes) : newSV(0)));
+	PUSHs(sv_2mortal(newSViv(succeeded)));
+
+	Safefree(buf);
+
+
+void
+SSL_peek_ex(s,max=32768)
+	SSL *   s
+	int     max
+    PREINIT:
+	char *buf;
+	size_t readbytes;
+	int succeeded;
+    PPCODE:
+	Newx(buf, max, char);
+
+	succeeded = SSL_peek_ex(s, buf, max, &readbytes);
+
+	/* Return 2-item list:
+	 *   first return value:  data gotten, or undef on error
+	 *   second return value: result from SSL_peek_ex()
+	 */
+	EXTEND(SP, 2);
+	PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, readbytes) : newSV(0)));
+	PUSHs(sv_2mortal(newSViv(succeeded)));
+
+	Safefree(buf);
+
+void
+SSL_write_ex(s,buf)
+	SSL *   s
+    PREINIT:
+	STRLEN len;
+	size_t written;
+	int succeeded;
+    INPUT:
+	char *  buf = SvPV( ST(1), len);
+    PPCODE:
+	succeeded = SSL_write_ex(s, buf, len, &written);
+
+	/* Return 2-item list:
+	 *   first return value:  data gotten, or undef on error
+	 *   second return value: result from SSL_read_ex()
+	 */
+	EXTEND(SP, 2);
+	PUSHs(sv_2mortal(newSVuv(written)));
+	PUSHs(sv_2mortal(newSViv(succeeded)));
+
+#endif
 
 int
 SSL_write(s,buf)
@@ -2076,7 +2298,7 @@ SSL_write_partial(s,from,count,buf)
      } else
        buf = SvPV( ST(3), len);
        */
-     PR4("write_partial from=%d count=%d len=%ul\n",from,count,ulen);
+     PR4("write_partial from=%d count=%d len=%lu\n",from,count,ulen);
      /*PR2("buf='%s'\n",&buf[from]); / * too noisy */
      len = (IV)ulen;
      len -= from;
@@ -2211,6 +2433,14 @@ int
 SSL_pending(s)
      SSL *              s
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.1.0 */
+
+int
+SSL_has_pending(s)
+     SSL *              s
+
+#endif
+
 int
 SSL_CTX_set_cipher_list(s,str)
      SSL_CTX *              s
@@ -2305,34 +2535,69 @@ void
 SSL_SESSION_free(ses)
      SSL_SESSION *      ses
 
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L && !defined(LIBRESSL_VERSION_NUMBER)
+
 int
-i2d_SSL_SESSION(in,pp)
-     SSL_SESSION *      in
-     unsigned char *    &pp
+SSL_SESSION_is_resumable(ses)
+     SSL_SESSION *      ses
+
+SSL_SESSION *
+SSL_SESSION_dup(sess)
+     SSL_SESSION * sess
+
+#endif
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.1.1 */
+
+void
+SSL_set_post_handshake_auth(SSL *ssl, int val)
+
+int
+SSL_verify_client_post_handshake(SSL *ssl)
+
+#endif
+
+void
+i2d_SSL_SESSION(sess)
+	SSL_SESSION * sess
+    PPCODE:
+	STRLEN len;
+	unsigned char *pc,*pi;
+	if (!(len = i2d_SSL_SESSION(sess,NULL))) croak("invalid SSL_SESSION");
+	Newx(pc,len,unsigned char);
+	if (!pc) croak("out of memory");
+	pi = pc;
+	i2d_SSL_SESSION(sess,&pi);
+	XPUSHs(sv_2mortal(newSVpv((char*)pc,len)));
+	Safefree(pc);
+
+
+SSL_SESSION *
+d2i_SSL_SESSION(pv)
+	SV *pv
+    CODE:
+	RETVAL = NULL;
+	if (SvPOK(pv)) {
+	    const unsigned char *p;
+	    STRLEN len;
+	    p = (unsigned char*)SvPV(pv,len);
+	    RETVAL = d2i_SSL_SESSION(NULL,&p,len);
+	}
+    OUTPUT:
+	RETVAL
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+
+int
+SSL_SESSION_up_ref(sess)
+     SSL_SESSION * sess
+
+#endif
 
 int
 SSL_set_session(to,ses)
      SSL *              to
      SSL_SESSION *      ses
 
-#if OPENSSL_VERSION_NUMBER < 0x0090707fL
-#define REM3 "NOTE: before 0.9.7g"
-
-SSL_SESSION *
-d2i_SSL_SESSION(a,pp,length)
-     SSL_SESSION *      &a
-     unsigned char *    &pp
-     long               length
-
-#else
-
-SSL_SESSION *
-d2i_SSL_SESSION(a,pp,length)
-     SSL_SESSION *      &a
-     const unsigned char *    &pp
-     long               length
-
-#endif
 #define REM30 "SSLeay-0.9.0 defines these as macros. I expand them here for safety's sake"
 
 SSL_SESSION *
@@ -2474,6 +2739,49 @@ int
 SSL_want(s)
      SSL *              s
 
+ # OpenSSL 1.1.1 documents SSL_in_init and the related functions as
+ # returning 0 or 1. However, older versions and e.g. LibreSSL may
+ # return other values than 1 which we fold to 1.
+int
+SSL_in_before(s)
+     SSL *              s
+     CODE:
+     RETVAL = SSL_in_before(s) == 0 ? 0 : 1;
+     OUTPUT:
+     RETVAL
+
+int
+SSL_is_init_finished(s)
+     SSL *              s
+     CODE:
+     RETVAL = SSL_is_init_finished(s) == 0 ? 0 : 1;
+     OUTPUT:
+     RETVAL
+
+int
+SSL_in_init(s)
+     SSL *              s
+     CODE:
+     RETVAL = SSL_in_init(s) == 0 ? 0 : 1;
+     OUTPUT:
+     RETVAL
+
+int
+SSL_in_connect_init(s)
+     SSL *              s
+     CODE:
+     RETVAL = SSL_in_connect_init(s) == 0 ? 0 : 1;
+     OUTPUT:
+     RETVAL
+
+int
+SSL_in_accept_init(s)
+     SSL *              s
+     CODE:
+     RETVAL = SSL_in_accept_init(s) == 0 ? 0 : 1;
+     OUTPUT:
+     RETVAL
+
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 int
 SSL_state(s)
@@ -2570,6 +2878,33 @@ SSL_set_default_passwd_cb_userdata(ssl,data=&PL_sv_undef)
 #endif /* !LibreSSL */
 #endif /* >= 1.1.0f */
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)
+
+void
+SSL_set_security_level(SSL * ssl, int level)
+
+int
+SSL_get_security_level(SSL * ssl)
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101007L && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+SSL_set_num_tickets(SSL *ssl, size_t num_tickets)
+
+size_t
+SSL_get_num_tickets(SSL *ssl)
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101003L && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+SSL_set_ciphersuites(SSL *ssl, const char *str)
+
+#endif
+
 const BIO_METHOD *
 BIO_f_ssl()
 
@@ -2655,6 +2990,7 @@ SSL_library_init()
 
 #if OPENSSL_VERSION_NUMBER >= 0x0090700fL
 #define REM5 "NOTE: requires 0.9.7+"
+#ifndef OPENSSL_NO_ENGINE
 
 void
 ENGINE_load_builtin_engines()
@@ -2671,6 +3007,7 @@ ENGINE_set_default(e, flags)
         ENGINE * e
         int flags
 
+#endif /* OPENSSL_NO_ENGINE */
 #endif
 
 void
@@ -2694,6 +3031,26 @@ RAND_bytes(buf, num)
         RETVAL = rc;
     OUTPUT:
         RETVAL
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+RAND_priv_bytes(buf, num)
+    SV *buf
+    int num
+    PREINIT:
+        int rc;
+        unsigned char *random;
+    CODE:
+        New(0, random, num, unsigned char);
+        rc = RAND_priv_bytes(random, num);
+        sv_setpvn(buf, (const char*)random, num);
+        Safefree(random);
+        RETVAL = rc;
+    OUTPUT:
+        RETVAL
+
+#endif
 
 int
 RAND_pseudo_bytes(buf, num)
@@ -2766,7 +3123,7 @@ RAND_write_file(file_name)
 
 #define REM40 "Minimal X509 stuff..., this is a bit ugly and should be put in its own modules Net::SSLeay::X509.pm"
 
-#if OPENSSL_VERSION_NUMBER >= 0x1000200fL && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x1000200fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2050000fL)
 
 int
 X509_check_host(X509 *cert, const char *name, unsigned int flags = 0, SV *peername = &PL_sv_undef)
@@ -2869,6 +3226,13 @@ X509_get_pubkey(X509 *x)
 
 ASN1_INTEGER *
 X509_get_serialNumber(X509 *x)
+
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2080100fL)
+
+const ASN1_INTEGER *
+X509_get0_serialNumber(const X509 *x)
+
+#endif
 
 int
 X509_set_serialNumber(X509 *x, ASN1_INTEGER *serial)
@@ -3654,6 +4018,17 @@ X509V3_EXT_d2i(ext)
 X509_STORE_CTX *
 X509_STORE_CTX_new()
 
+void
+X509_STORE_CTX_init(ctx, store=NULL, x509=NULL, chain=NULL)
+     X509_STORE_CTX * ctx
+     X509_STORE * store
+     X509 * x509
+     STACK_OF(X509) * chain
+
+void
+X509_STORE_CTX_free(ctx)
+     X509_STORE_CTX * ctx
+
 int
 X509_verify_cert(x509_store_ctx)
      X509_STORE_CTX * 	x509_store_ctx
@@ -3691,6 +4066,18 @@ X509_STORE_CTX_set_cert(x509_store_ctx,x)
      X509_STORE_CTX * x509_store_ctx
      X509 * x
 
+X509_STORE *
+X509_STORE_new()
+
+void
+X509_STORE_free(store)
+    X509_STORE * store
+
+X509_LOOKUP *
+X509_STORE_add_lookup(store, method)
+    X509_STORE * store
+    X509_LOOKUP_METHOD * method
+
 int
 X509_STORE_add_cert(ctx, x)
     X509_STORE *ctx
@@ -3724,6 +4111,15 @@ X509_STORE_set1_param(ctx, pm)
     X509_VERIFY_PARAM *pm
 
 #endif
+
+X509_LOOKUP_METHOD *
+X509_LOOKUP_hash_dir()
+
+void
+X509_LOOKUP_add_dir(lookup, dir, type)
+    X509_LOOKUP * lookup
+    char * dir
+    int type
 
 int
 X509_load_cert_file(ctx, file, type)
@@ -4313,12 +4709,10 @@ SSLv2_method()
 #endif
 
 #ifndef OPENSSL_NO_SSL3
-#if OPENSSL_VERSION_NUMBER < 0x10002000L
 
 const SSL_METHOD *
 SSLv3_method()
 
-#endif
 #endif
 
 const SSL_METHOD *
@@ -5013,9 +5407,25 @@ int
 SSL_shutdown(s)
      SSL *	s
 
+const char *
+SSL_get_version(ssl)
+     const SSL * ssl
+
 int
 SSL_version(ssl)
      SSL *	ssl
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100006L && !defined(LIBRESSL_VERSION_NUMBER) /* 1.1.0-pre6 */
+
+int
+SSL_client_version(ssl)
+     const SSL * ssl
+
+int
+SSL_is_dtls(ssl)
+     const SSL * ssl
+
+#endif
 
 #define REM_MANUALLY_ADDED_1_09
 
@@ -5269,6 +5679,50 @@ EC_KEY_generate_key(curve)
 	RETVAL
 
 
+#ifdef SSL_CTRL_SET_ECDH_AUTO
+
+long
+SSL_CTX_set_ecdh_auto(ctx,onoff)
+     SSL_CTX * ctx
+     int onoff
+
+long
+SSL_set_ecdh_auto(ssl,onoff)
+     SSL * ssl
+     int onoff
+
+#endif
+
+#ifdef SSL_CTRL_SET_CURVES_LIST
+
+long
+SSL_CTX_set1_curves_list(ctx,list)
+     SSL_CTX * ctx
+     char * list
+
+long
+SSL_set1_curves_list(ssl,list)
+     SSL * ssl
+     char * list
+
+#endif
+
+#if SSL_CTRL_SET_GROUPS_LIST
+
+long
+SSL_CTX_set1_groups_list(ctx,list)
+     SSL_CTX * ctx
+     char * list
+
+long
+SSL_set1_groups_list(ssl,list)
+     SSL * ssl
+     char * list
+
+#endif
+
+
+
 #endif
 
 void *
@@ -5394,7 +5848,7 @@ SSL_set_tmp_rsa(ssl,rsa)
 
 #endif
 
-#ifdef __ANDROID__
+#if OPENSSL_VERSION_NUMBER >= 0x0090800fL
 
 RSA *
 RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
@@ -5405,24 +5859,50 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
     PREINIT:
         simple_cb_data_t* cb_data = NULL;
     CODE:
-       /* Android does not have RSA_generate_key. This equivalent is contributed by Brian Fraser for Android */
-       /* but is not portable to old OpenSSLs where RSA_generate_key_ex is not available */
+       /* openssl 0.9.8 deprecated RSA_generate_key. */
+       /* This equivalent was contributed by Brian Fraser for Android, */
+       /* but was not portable to old OpenSSLs where RSA_generate_key_ex is not available. */
+       /* It should now be more versatile. */
+       /* as of openssl 1.1.0 it is not possible anymore to generate the BN_GENCB structure directly. */
+       /* instead BN_EGNCB_new() has to be used. */
        int rc;
        RSA * ret;
        BIGNUM *e;
        e = BN_new();
+       if(!e)
+           croak("Net::SSLeay: RSA_generate_key perl function could not create BN structure.\n");
        BN_set_word(e, ee);
        cb_data = simple_cb_data_new(perl_cb, perl_data);
-       BN_GENCB new_cb;
-       BN_GENCB_set_old(&new_cb, ssleay_RSA_generate_key_cb_invoke, cb_data);
 
        ret = RSA_new();
+       if(!ret) {
+	   simple_cb_data_free(cb_data);
+	   BN_free(e);
+           croak("Net::SSLeay: RSA_generate_key perl function could not create RSA structure.\n");
+       }
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+       BN_GENCB *new_cb;
+       new_cb = BN_GENCB_new();
+       if(!new_cb) {
+	   simple_cb_data_free(cb_data);
+	   BN_free(e);
+	   RSA_free(ret);
+	   croak("Net::SSLeay: RSA_generate_key perl function could not create BN_GENCB structure.\n");
+       }
+       BN_GENCB_set_old(new_cb, ssleay_RSA_generate_key_cb_invoke, cb_data);
+       rc = RSA_generate_key_ex(ret, bits, e, new_cb);
+       BN_GENCB_free(new_cb);
+#else
+       BN_GENCB new_cb;
+       BN_GENCB_set_old(&new_cb, ssleay_RSA_generate_key_cb_invoke, cb_data);
        rc = RSA_generate_key_ex(ret, bits, e, &new_cb);
-       
-       if (rc == -1 || ret == NULL)
-           croak("Couldn't generate RSA key");
+#endif
        simple_cb_data_free(cb_data);
        BN_free(e);
+       if (rc == -1 || ret == NULL) {
+           if (ret) RSA_free(ret);
+           croak("Net::SSLeay: Couldn't generate RSA key");
+       }
        e = NULL;
        RETVAL = ret;
     OUTPUT:
@@ -5503,6 +5983,46 @@ PEM_read_bio_X509_CRL(bio,x=NULL,cb=NULL,u=NULL)
 
 X509 *
 PEM_read_bio_X509(BIO *bio,void *x=NULL,void *cb=NULL,void *u=NULL)
+
+STACK_OF(X509_INFO) *
+PEM_X509_INFO_read_bio(bio, stack=NULL, cb=NULL, u=NULL)
+    BIO * bio
+    STACK_OF(X509_INFO) * stack
+    pem_password_cb * cb
+    void * u
+
+int
+sk_X509_INFO_num(stack)
+    STACK_OF(X509_INFO) * stack
+
+X509_INFO *
+sk_X509_INFO_value(stack, index)
+    const STACK_OF(X509_INFO) * stack
+    int index
+
+void
+sk_X509_INFO_free(stack)
+    STACK_OF(X509_INFO) * stack
+
+STACK_OF(X509) *
+sk_X509_new_null()
+
+void
+sk_X509_free(stack)
+    STACK_OF(X509) * stack
+
+int
+sk_X509_push(stack, data)
+    STACK_OF(X509) * stack
+    X509 * data
+
+X509 *
+P_X509_INFO_get_x509(info)
+        X509_INFO * info
+    CODE:
+        RETVAL = info->x509;
+    OUTPUT:
+        RETVAL
 
 X509_REQ *
 PEM_read_bio_X509_REQ(BIO *bio,void *x=NULL,pem_password_cb *cb=NULL,void *u=NULL)
@@ -5585,7 +6105,7 @@ SSL_SESSION_set_master_key(s,key)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 
 void
 SSL_get_client_random(s)
@@ -5612,7 +6132,7 @@ SSL_get_client_random(s)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 
 void
 SSL_get_server_random(s)
@@ -5643,7 +6163,7 @@ int
 SSL_get_keyblock_size(s)
      SSL *   s
      CODE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
         const SSL_CIPHER *ssl_cipher;
 	int cipher = NID_undef, digest = NID_undef, mac_secret_size = 0;
 	const EVP_CIPHER *c = NULL;
@@ -5681,6 +6201,7 @@ SSL_get_keyblock_size(s)
 	int md_size = -1;
 	c = s->enc_read_ctx->cipher;
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
+	h = NULL;
 	if (s->s3)
 	    md_size = s->s3->tmp.new_mac_secret_size;
 #elif OPENSSL_VERSION_NUMBER >= 0x00909000L
@@ -6027,7 +6548,7 @@ X509_VERIFY_PARAM_lookup(name)
 void
 X509_VERIFY_PARAM_table_cleanup()
 
-#if OPENSSL_VERSION_NUMBER >= 0x10002000L && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.0.2 */
+#if (OPENSSL_VERSION_NUMBER >= 0x10002000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL) /* OpenSSL 1.0.2, LibreSSL 2.7.0 */
 
 X509_VERIFY_PARAM *
 SSL_CTX_get0_param(ctx)
@@ -6099,7 +6620,7 @@ X509_VERIFY_PARAM_set1_ip_asc(param, ipasc)
     X509_VERIFY_PARAM *param
     const char *ipasc
 
-#endif /* OpenSSL 1.0.2 */
+#endif /* OpenSSL 1.0.2, LibreSSL 2.7.0 */
 
 void
 X509_policy_tree_free(tree)
@@ -6600,7 +7121,9 @@ SSL_OCSP_cert2ids(ssl,...)
 		croak("no OCSP request for self-signed certificate");
 	    if (!(issuer = find_issuer(cert,store,chain)))
 		croak("cannot find issuer certificate");
-	    if (!(id = OCSP_cert_to_id(EVP_sha1(),cert,issuer)))
+	    id = OCSP_cert_to_id(EVP_sha1(),cert,issuer);
+	    X509_free(issuer);
+	    if (!id)
 		croak("out of memory for generating OCSP certid");
 
 	    pi = NULL;
@@ -6696,6 +7219,7 @@ SSL_OCSP_response_verify(ssl,rsp,svreq=NULL,flags=0)
 		ERR_clear_error(); /* clear error from last OCSP_basic_verify */
 		if (last && (issuer = find_issuer(last,store,chain))) {
 		    OCSP_basic_add1_cert(bsr, issuer);
+		    X509_free(issuer);
 		    TRACE(1,"run OCSP_basic_verify with issuer for last chain element");
 		    RETVAL = OCSP_basic_verify(bsr, NULL, store, flags);
 		}
@@ -6937,21 +7461,28 @@ P_alpn_selected(s)
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
 
 void
-SSL_export_keying_material(ssl, outlen, label, p)
+SSL_export_keying_material(ssl, outlen, label, context=&PL_sv_undef)
         SSL * ssl
         int outlen
+        SV * context
     PREINIT:
-        char *  out;
-        STRLEN labellen;
-        STRLEN plen;
-	int ret;
+        unsigned char *  out;
+        STRLEN llen;
+        STRLEN contextlen = 0;
+        char *context_arg = NULL;
+        int use_context = 0;
+        int ret;
     INPUT:
-        char *  label = SvPV( ST(2), labellen);
-        char *  p = SvPV( ST(3), plen);
+        char *  label = SvPV( ST(2), llen);
     PPCODE:
-	New(0, out, outlen, char);
-        ret = SSL_export_keying_material(ssl, (unsigned char*)out, outlen, label, labellen, (unsigned char*)p, plen, plen ? 1 : 0);
-        PUSHs(sv_2mortal(ret>=0 ? newSVpvn(out, outlen) : newSV(0)));
+        Newx(out, outlen, unsigned char);
+
+        if (context != &PL_sv_undef) {
+            use_context = 1;
+            context_arg = SvPV( ST(3), contextlen);
+        }
+        ret = SSL_export_keying_material(ssl, out, outlen, label, llen, (unsigned char*)context_arg, contextlen, use_context);
+        PUSHs(sv_2mortal(ret>0 ? newSVpvn((const char *)out, outlen) : newSV(0)));
         EXTEND(SP, 1);
 	Safefree(out);
 

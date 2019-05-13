@@ -1,0 +1,9 @@
+[
+  '1556933590.65383', 'Fri May  3 18:33:10 2019', 26794, 'INFO', 3,
+  [ 'SRV:8FB66F32' ], [ [
+      '/opt/voice-srvc-native/bin/async-srvc-att-gateway-poller', 33,
+      'NERV::Voice::SRV::Native::AsyncSRVATTGatewayPoller::main',
+  ] ],
+  'batch_nena_messages returned', 'OK', 6, { FILENAME => 'lqxw020323' },
+  1556933584, 'lqxw020323',
+]

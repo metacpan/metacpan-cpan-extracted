@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -52,8 +52,8 @@ sub run {
     }
 
     foreach ( sort sortByComment keys %{ $self->rules } ) {
-        $self->logger->debug( "Grant session condition -> "
-              . $self->conf->{grantSessionRules}->{$_} );
+        my $rule = $self->conf->{grantSessionRules}->{$_};
+        $self->logger->debug("Grant session condition -> $rule");
         unless ( $self->rules->{$_}->( $req, $req->sessionInfo ) ) {
             $req->userData( {} );
 
@@ -70,6 +70,7 @@ sub run {
                     return PE_OK;
                 }
                 $msg = $msg->( $req, $req->sessionInfo );
+                $self->logger->debug("Transformed message -> $msg");
                 $req->info(
                     $self->loadTemplate(
                         'simpleInfo', params => { trspan => $msg }
@@ -77,7 +78,7 @@ sub run {
                 );
                 $self->userLogger->error( 'User '
                       . $req->sessionInfo->{uid}
-                      . " was not granted to open session (rule -> $msg)" );
+                      . " was not granted to open session (rule -> $rule)" );
                 $req->urldc( $self->conf->{portal} );
                 return $req->authResult(PE_SESSIONNOTGRANTED);
             }

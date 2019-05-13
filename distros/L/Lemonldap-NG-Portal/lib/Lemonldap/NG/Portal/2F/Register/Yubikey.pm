@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -176,31 +176,23 @@ sub run {
                 return $self->p->sendError( $req, "Corrupted session", 500 );
             }
         }
-
         else {
             $self->logger->debug("No 2F Device found");
             $_2fDevices = [];
         }
 
-        my @keep = ();
-        while (@$_2fDevices) {
-            my $element = shift @$_2fDevices;
-            $self->logger->debug("Looking for 2F device to delete ...");
-            push @keep, $element unless ( $element->{epoch} eq $epoch );
-        }
-
+        # Delete Yubikey device
+        @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
         $self->logger->debug(
             "Delete 2F Device : { type => 'UBK', epoch => $epoch }");
         $self->p->updatePersistentSession( $req,
-            { _2fDevices => to_json( \@keep ) } );
-
+            { _2fDevices => to_json($_2fDevices) } );
         $self->userLogger->notice('Yubikey deletion succeed');
         return [
             200,
             [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],
             ['{"result":1}']
         ];
-
     }
     else {
         $self->logger->error("Unknown Yubikey action -> $action");

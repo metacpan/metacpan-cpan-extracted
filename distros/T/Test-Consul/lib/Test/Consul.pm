@@ -1,5 +1,5 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.013';
+$Test::Consul::VERSION = '0.014';
 # ABSTRACT: Run a consul server for testing
 
 use 5.010;
@@ -79,6 +79,16 @@ sub _build_server_port {
     return _unique_empty_port();
 }
 
+has node_name => (
+    is  => 'lazy',
+    isa => NonEmptySimpleStr,
+);
+sub _build_node_name {
+    state $node_num = 0;
+    $node_num++;
+    return "tc_node$node_num";
+}
+
 has datacenter => (
     is  => 'lazy',
     isa => NonEmptySimpleStr,
@@ -86,7 +96,7 @@ has datacenter => (
 sub _build_datacenter {
     state $dc_num = 0;
     $dc_num++;
-    return "perl-test-consul-dc$dc_num";
+    return "tc_dc$dc_num";
 }
 
 has enable_acls => (
@@ -159,7 +169,7 @@ sub start {
     my @opts;
 
     my %config = (
-        node_name  => 'perl-test-consul',
+        node_name  => $self->node_name(),
         datacenter => $self->datacenter(),
         bind_addr  => '127.0.0.1',
         ports => {
@@ -400,6 +410,14 @@ this defaults to a random unused port.
 
 The TCP port for the RPC Server address.  Consul's default is C<8300>, but
 this defaults to a random unused port.
+
+=head2 node_name
+
+The name of this node. If not provided, one will be generated.
+
+=head2 datacenter
+
+The name of the datacenter. If not provided, one will be generated.
 
 =head2 enable_acls
 

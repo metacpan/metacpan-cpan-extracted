@@ -1,6 +1,6 @@
 =pod
 
-=head2 Generated API data version v2.156
+=head2 Generated API data version v2.230
 
 =over
 
@@ -602,7 +602,7 @@ JSON data for API method automember_del
 
 =over
 
-=item cn: Automember Rule (type unicode class Str)
+=item cn: Automember Rule (arrayref of type unicode class Str)
 
 =back
 
@@ -657,6 +657,56 @@ JSON data for API method automember_find
 =item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("automember-rule") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item automember_find_orphans
+
+JSON data for API method automember_find_orphans
+
+
+    Search for orphan automember rules. The command might need to be run as
+    a privileged user user to get all orphan rules.
+    
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: A description of this auto member rule (type unicode class Str)
+
+=item type: Grouping to which the rule applies (mandatory type unicode class StrEnum)
+
+=item remove: Remove orphan automember rules (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("automember-rule") (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -969,9 +1019,9 @@ Search for an automount key.
 
 =item automountinformation: Mount information (type unicode class IA5Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -1193,9 +1243,9 @@ Search for an automount location.
 
 =item cn: Automount location name. (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -1204,43 +1254,6 @@ Search for an automount location.
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item pkey_only: Results should contain primary key attribute only ("location") (type bool class Flag)
-
-=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
-
-=back
-
-=back
-
-=cut
-
-
-
-=item automountlocation_import
-
-JSON data for API method automountlocation_import
-
-Import automount files for a specific location.
-
-=over
-
-=item Required arguments
-
-=over
-
-=item cn: Automount location name. (type unicode class Str)
-
-=item masterfile: Automount master file. (type unicode class Str)
-
-=back
-
-
-=item Options
-
-=over
-
-=item continue: Continuous operation mode. Errors are reported but the process continues. (type bool class Flag)
-
-=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -1486,9 +1499,9 @@ Search for an automount map.
 
 =item description: Description (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -1605,7 +1618,7 @@ Display an automount map.
 
 JSON data for API method batch
 
-None
+
 
 =over
 
@@ -1613,7 +1626,7 @@ None
 
 =over
 
-=item methods: Nested Methods to execute (arrayref of type object class Any)
+=item methods: Nested Methods to execute (arrayref of type dict class Dict)
 
 =back
 
@@ -1623,6 +1636,209 @@ None
 =over
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item ca_add
+
+JSON data for API method ca_add
+
+Create a CA.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Name for referencing the CA (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: Description of the purpose of the CA (type unicode class Str)
+
+=item ipacasubjectdn: Subject Distinguished Name (mandatory type DN class DNParam)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item chain: Include certificate chain in output (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item ca_del
+
+JSON data for API method ca_del
+
+Delete a CA.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Name for referencing the CA (arrayref of type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item ca_disable
+
+JSON data for API method ca_disable
+
+Disable a CA.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Name for referencing the CA (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item ca_enable
+
+JSON data for API method ca_enable
+
+Enable a CA.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Name for referencing the CA (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item ca_find
+
+JSON data for API method ca_find
+
+Search for CAs.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item cn: Name for referencing the CA (type unicode class Str)
+
+=item description: Description of the purpose of the CA (type unicode class Str)
+
+=item ipacaid: Dogtag Authority ID (type unicode class Str)
+
+=item ipacasubjectdn: Subject Distinguished Name (type DN class DNParam)
+
+=item ipacaissuerdn: Issuer Distinguished Name (type DN class DNParam)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -1662,6 +1878,99 @@ JSON data for API method ca_is_enabled
 
 
 
+=item ca_mod
+
+JSON data for API method ca_mod
+
+Modify CA configuration.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Name for referencing the CA (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: Description of the purpose of the CA (type unicode class Str)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item delattr: Delete an attribute/value pair. The option will be evaluated
+last, after all sets and adds. (arrayref of type unicode class Str)
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item rename: Rename the Certificate Authority object (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item ca_show
+
+JSON data for API method ca_show
+
+Display the properties of a CA.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Name for referencing the CA (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item chain: Include certificate chain in output (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item caacl_add
 
 JSON data for API method caacl_add
@@ -1687,6 +1996,8 @@ Create a new CA ACL.
 
 =item ipaenabledflag: Enabled (type bool class Bool)
 
+=item ipacacategory: CA category the ACL applies to (type unicode class StrEnum)
+
 =item ipacertprofilecategory: Profile category the ACL applies to (type unicode class StrEnum)
 
 =item usercategory: User category the ACL applies to (type unicode class StrEnum)
@@ -1708,6 +2019,47 @@ must be part of the schema. (arrayref of type unicode class Str)
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item caacl_add_ca
+
+JSON data for API method caacl_add_ca
+
+Add CAs to a CA ACL.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: ACL name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item ca: Certificate Authorities to add (arrayref of type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -2015,6 +2367,8 @@ Search for CA ACLs.
 
 =item ipaenabledflag: Enabled (type bool class Bool)
 
+=item ipacacategory: CA category the ACL applies to (type unicode class StrEnum)
+
 =item ipacertprofilecategory: Profile category the ACL applies to (type unicode class StrEnum)
 
 =item usercategory: User category the ACL applies to (type unicode class StrEnum)
@@ -2023,9 +2377,9 @@ Search for CA ACLs.
 
 =item servicecategory: Service category the ACL applies to (type unicode class StrEnum)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -2072,6 +2426,8 @@ Modify a CA ACL.
 
 =item ipaenabledflag: Enabled (type bool class Bool)
 
+=item ipacacategory: CA category the ACL applies to (type unicode class StrEnum)
+
 =item ipacertprofilecategory: Profile category the ACL applies to (type unicode class StrEnum)
 
 =item usercategory: User category the ACL applies to (type unicode class StrEnum)
@@ -2098,6 +2454,47 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item caacl_remove_ca
+
+JSON data for API method caacl_remove_ca
+
+Remove CAs from a CA ACL.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: ACL name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item ca: Certificate Authorities to remove (arrayref of type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -2326,15 +2723,28 @@ Search for existing certificates.
 
 =over
 
-=item No required arguments
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
 
 =item Options
 
 =over
 
-=item subject: Subject (type unicode class Str)
+=item certificate: Base-64 encoded certificate. (type Certificate class Certificate)
 
-=item revocation_reason: Reason for revoking the certificate (0-10) (type int class Int)
+=item issuer: Issuer DN (type DN class DNParam)
+
+=item revocation_reason: Reason for revoking the certificate (0-10). Type "ipa help cert" for revocation reason details.  (type int class Int)
+
+=item cacn: Name of issuing CA (type unicode class Str)
+
+=item subject: Subject (type unicode class Str)
 
 =item min_serial_number: minimum serial number (type int class Int)
 
@@ -2342,29 +2752,47 @@ Search for existing certificates.
 
 =item exactly: match the common name exactly (type bool class Flag)
 
-=item validnotafter_from: Valid not after from this date (YYYY-mm-dd) (type unicode class Str)
+=item validnotafter_from: Valid not after from this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item validnotafter_to: Valid not after to this date (YYYY-mm-dd) (type unicode class Str)
+=item validnotafter_to: Valid not after to this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item validnotbefore_from: Valid not before from this date (YYYY-mm-dd) (type unicode class Str)
+=item validnotbefore_from: Valid not before from this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item validnotbefore_to: Valid not before to this date (YYYY-mm-dd) (type unicode class Str)
+=item validnotbefore_to: Valid not before to this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item issuedon_from: Issued on from this date (YYYY-mm-dd) (type unicode class Str)
+=item issuedon_from: Issued on from this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item issuedon_to: Issued on to this date (YYYY-mm-dd) (type unicode class Str)
+=item issuedon_to: Issued on to this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item revokedon_from: Revoked on from this date (YYYY-mm-dd) (type unicode class Str)
+=item revokedon_from: Revoked on from this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item revokedon_to: Revoked on to this date (YYYY-mm-dd) (type unicode class Str)
+=item revokedon_to: Revoked on to this date (YYYY-mm-dd) (type datetime class DateTime)
 
-=item sizelimit: Maximum number of certs returned (type int class Int)
+=item pkey_only: Results should contain primary key attribute only ("certificate") (type bool class Flag)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
 =item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item user: Search for certificates with these owner users. (arrayref of type unicode class Str)
+
+=item no_user: Search for certificates without these owner users. (arrayref of type unicode class Str)
+
+=item host: Search for certificates with these owner hosts. (arrayref of type unicode class Str)
+
+=item no_host: Search for certificates without these owner hosts. (arrayref of type unicode class Str)
+
+=item service: Search for certificates with these owner services. (arrayref of type Principal class Principal)
+
+=item no_service: Search for certificates without these owner services. (arrayref of type Principal class Principal)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -2388,7 +2816,7 @@ Take a revoked certificate off hold.
 
 =over
 
-=item serial_number: Serial number in decimal or if prefixed with 0x in hexadecimal (type unicode class Str)
+=item serial_number: Serial number in decimal or if prefixed with 0x in hexadecimal (type int class Int)
 
 =back
 
@@ -2396,6 +2824,8 @@ Take a revoked certificate off hold.
 =item Options
 
 =over
+
+=item cacn: Name of issuing CA (type unicode class Str)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -2421,7 +2851,7 @@ Submit a certificate signing request.
 
 =over
 
-=item csr: CSR (type unicode class File)
+=item csr: CSR (type CertificateSigningRequest class CertificateSigningRequest)
 
 =back
 
@@ -2430,13 +2860,21 @@ Submit a certificate signing request.
 
 =over
 
-=item principal: Principal for this certificate (e.g. HTTP/test.example.com) (mandatory type unicode class Str)
-
 =item request_type: <request_type> (type unicode class Str)
 
-=item add: automatically add the principal if it doesn't exist (type bool class Flag)
-
 =item profile_id: Certificate Profile to use (type unicode class Str)
+
+=item cacn: Name of issuing CA (type unicode class Str)
+
+=item principal: Principal for this certificate (e.g. HTTP/test.example.com) (mandatory type Principal class Principal)
+
+=item add: automatically add the principal if it doesn't exist (service principals only) (type bool class Flag)
+
+=item chain: Include certificate chain in output (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -2462,7 +2900,7 @@ Revoke a certificate.
 
 =over
 
-=item serial_number: Serial number in decimal or if prefixed with 0x in hexadecimal (type unicode class Str)
+=item serial_number: Serial number in decimal or if prefixed with 0x in hexadecimal (type int class Int)
 
 =back
 
@@ -2471,7 +2909,9 @@ Revoke a certificate.
 
 =over
 
-=item revocation_reason: Reason for revoking the certificate (0-10) (type int class Int)
+=item revocation_reason: Reason for revoking the certificate (0-10). Type "ipa help cert" for revocation reason details.  (type int class Int)
+
+=item cacn: Name of issuing CA (type unicode class Str)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -2497,7 +2937,7 @@ Retrieve an existing certificate.
 
 =over
 
-=item serial_number: Serial number in decimal or if prefixed with 0x in hexadecimal (type unicode class Str)
+=item serial_number: Serial number in decimal or if prefixed with 0x in hexadecimal (type int class Int)
 
 =back
 
@@ -2506,9 +2946,19 @@ Retrieve an existing certificate.
 
 =over
 
+=item cacn: Name of issuing CA (type unicode class Str)
+
 =item out: File to store the certificate in. (type unicode class Str)
 
+=item chain: Include certificate chain in output (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -2532,7 +2982,7 @@ Check the status of a certificate signing request.
 
 =over
 
-=item request_id: Request id (type unicode class Str)
+=item request_id: Request id (type int class Int)
 
 =back
 
@@ -2540,6 +2990,442 @@ Check the status of a certificate signing request.
 =item Options
 
 =over
+
+=item cacn: Name of issuing CA (type unicode class Str)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmap_match
+
+JSON data for API method certmap_match
+
+
+    Search for users matching the provided certificate.
+
+    This command relies on SSSD to retrieve the list of matching users and
+    may return cached data. For more information on purging SSSD cache,
+    please refer to sss_cache documentation.
+    
+
+=over
+
+=item Required arguments
+
+=over
+
+=item certificate: Base-64 encoded user certificate (type Certificate class Certificate)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmapconfig_mod
+
+JSON data for API method certmapconfig_mod
+
+Modify Certificate Identity Mapping configuration.
+
+=over
+
+=item No required arguments
+
+=item Options
+
+=over
+
+=item ipacertmappromptusername: Prompt for the username when multiple identities are mapped to a certificate (type bool class Bool)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item delattr: Delete an attribute/value pair. The option will be evaluated
+last, after all sets and adds. (arrayref of type unicode class Str)
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmapconfig_show
+
+JSON data for API method certmapconfig_show
+
+Show the current Certificate Identity Mapping configuration.
+
+=over
+
+=item No required arguments
+
+=item Options
+
+=over
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_add
+
+JSON data for API method certmaprule_add
+
+Create a new Certificate Identity Mapping Rule.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: Certificate Identity Mapping Rule description (type unicode class Str)
+
+=item ipacertmapmaprule: Rule used to map the certificate with a user entry (type unicode class Str)
+
+=item ipacertmapmatchrule: Rule used to check if a certificate can be used for authentication (type unicode class Str)
+
+=item associateddomain: Domain where the user entry will be searched (arrayref of type DNSName class DNSNameParam)
+
+=item ipacertmappriority: Priority of the rule (higher number means lower priority (type int class Int)
+
+=item ipaenabledflag: Enabled (type bool class Flag)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_del
+
+JSON data for API method certmaprule_del
+
+Delete a Certificate Identity Mapping Rule.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (arrayref of type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_disable
+
+JSON data for API method certmaprule_disable
+
+Disable a Certificate Identity Mapping Rule.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_enable
+
+JSON data for API method certmaprule_enable
+
+Enable a Certificate Identity Mapping Rule.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_find
+
+JSON data for API method certmaprule_find
+
+Search for Certificate Identity Mapping Rules.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (type unicode class Str)
+
+=item description: Certificate Identity Mapping Rule description (type unicode class Str)
+
+=item ipacertmapmaprule: Rule used to map the certificate with a user entry (type unicode class Str)
+
+=item ipacertmapmatchrule: Rule used to check if a certificate can be used for authentication (type unicode class Str)
+
+=item associateddomain: Domain where the user entry will be searched (arrayref of type DNSName class DNSNameParam)
+
+=item ipacertmappriority: Priority of the rule (higher number means lower priority (type int class Int)
+
+=item ipaenabledflag: Enabled (type bool class Bool)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("rulename") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_mod
+
+JSON data for API method certmaprule_mod
+
+Modify a Certificate Identity Mapping Rule.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: Certificate Identity Mapping Rule description (type unicode class Str)
+
+=item ipacertmapmaprule: Rule used to map the certificate with a user entry (type unicode class Str)
+
+=item ipacertmapmatchrule: Rule used to check if a certificate can be used for authentication (type unicode class Str)
+
+=item associateddomain: Domain where the user entry will be searched (arrayref of type DNSName class DNSNameParam)
+
+=item ipacertmappriority: Priority of the rule (higher number means lower priority (type int class Int)
+
+=item ipaenabledflag: Enabled (type bool class Flag)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item delattr: Delete an attribute/value pair. The option will be evaluated
+last, after all sets and adds. (arrayref of type unicode class Str)
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item certmaprule_show
+
+JSON data for API method certmaprule_show
+
+Display information about a Certificate Identity Mapping Rule.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: Certificate Identity Mapping Rule name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -2615,9 +3501,9 @@ Search for Certificate Profiles.
 
 =item ipacertprofilestoreissued: Whether to store certs issued using this profile (type bool class Bool)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -2662,7 +3548,7 @@ Import a Certificate Profile.
 
 =item ipacertprofilestoreissued: Whether to store certs issued using this profile (mandatory type bool class Bool)
 
-=item file: Filename of a raw profile. The XML format is not supported. (mandatory type unicode class File)
+=item file: Filename of a raw profile. The XML format is not supported. (mandatory type unicode class Str)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -2716,7 +3602,7 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
 
-=item file: File containing profile configuration (type unicode class File)
+=item file: File containing profile configuration (type unicode class Str)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -2758,6 +3644,195 @@ Display the properties of a Certificate Profile.
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
 
 =item out: Write profile configuration to file (type unicode class Str)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item class_find
+
+JSON data for API method class_find
+
+Search for classes.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item class_show
+
+JSON data for API method class_show
+
+Display information about a class.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item full_name: Full name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item command_defaults
+
+JSON data for API method command_defaults
+
+
+
+=over
+
+=item Required arguments
+
+=over
+
+=item full_name: Full name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item params: <params> (arrayref of type unicode class Str)
+
+=item kw: <kw> (type dict class Dict)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item command_find
+
+JSON data for API method command_find
+
+Search for commands.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item command_show
+
+JSON data for API method command_show
+
+Display information about a command.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item full_name: Full name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -2825,9 +3900,9 @@ Modify configuration options.
 
 =item ipadefaultemaildomain: Default e-mail domain (type unicode class Str)
 
-=item ipasearchtimelimit: Maximum amount of time (seconds) for a search (> 0, or -1 for unlimited) (type int class Int)
+=item ipasearchtimelimit: Maximum amount of time (seconds) for a search (-1 or 0 is unlimited) (type int class Int)
 
-=item ipasearchrecordslimit: Maximum number of records to search (-1 is unlimited) (type int class Int)
+=item ipasearchrecordslimit: Maximum number of records to search (-1 or 0 is unlimited) (type int class Int)
 
 =item ipausersearchfields: A comma-separated list of fields to search in when searching for users (type unicode class IA5Str)
 
@@ -2850,6 +3925,10 @@ Modify configuration options.
 =item ipakrbauthzdata: Default types of PAC supported for services (arrayref of type unicode class StrEnum)
 
 =item ipauserauthtype: Default types of supported user authentication (arrayref of type unicode class StrEnum)
+
+=item ca_renewal_master_server: Renewal master for IPA certificate authority (type unicode class Str)
+
+=item ipadomainresolutionorder: colon-separated list of domains used for short name qualification (type unicode class Str)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -2914,7 +3993,7 @@ Show the current configuration.
 
 JSON data for API method cosentry_add
 
-None
+
 
 =over
 
@@ -2961,7 +4040,7 @@ must be part of the schema. (arrayref of type unicode class Str)
 
 JSON data for API method cosentry_del
 
-None
+
 
 =over
 
@@ -2996,7 +4075,7 @@ None
 
 JSON data for API method cosentry_find
 
-None
+
 
 =over
 
@@ -3019,9 +4098,9 @@ None
 
 =item cospriority: <cospriority> (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -3045,7 +4124,7 @@ None
 
 JSON data for API method cosentry_mod
 
-None
+
 
 =over
 
@@ -3097,7 +4176,7 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 
 JSON data for API method cosentry_show
 
-None
+
 
 =over
 
@@ -3373,7 +4452,7 @@ JSON data for API method dns_is_enabled
 
 JSON data for API method dns_resolve
 
-Resolve a host name in DNS.
+Resolve a host name in DNS. (Deprecated)
 
 =over
 
@@ -3381,7 +4460,7 @@ Resolve a host name in DNS.
 
 =over
 
-=item hostname: Hostname (type unicode class Str)
+=item hostname: Hostname (FQDN) (type unicode class Str)
 
 =back
 
@@ -3389,6 +4468,38 @@ Resolve a host name in DNS.
 =item Options
 
 =over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item dns_update_system_records
+
+JSON data for API method dns_update_system_records
+
+Update location and IPA server DNS records
+
+=over
+
+=item No required arguments
+
+=item Options
+
+=over
+
+=item dry_run: Do not update records only return expected records (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -3422,7 +4533,9 @@ Modify global DNS configuration.
 
 =item idnsallowsyncptr: Allow synchronization of forward (A, AAAA) and reverse (PTR) records (type bool class Bool)
 
-=item idnszonerefresh: Zone refresh interval (type object class DeprecatedParam)
+=item idnszonerefresh: An interval between regular polls of the name server for new DNS zones (type int class Int)
+
+=item ipadnsversion: IPA DNS version (type int class Int)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -3515,6 +4628,8 @@ For multi-valued attributes, the command replaces the values already present. (a
 
 =item addattr: Add an attribute/value pair. Format is attr=value. The attribute
 must be part of the schema. (arrayref of type unicode class Str)
+
+=item skip_overlap_check: Force DNS zone creation even if it will overlap with an existing zone. (type bool class Flag)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -3697,9 +4812,9 @@ Search for DNS forward zones.
 
 =item idnsforwardpolicy: Per-zone conditional forwarding policy. Set to "none" to disable forwarding to global forwarder for this zone. In that case, conditional zone forwarders are disregarded. (type unicode class StrEnum)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -3874,37 +4989,37 @@ Add new DNS resource record.
 
 =item arecord: Raw A records (arrayref of type unicode class ARecord)
 
-=item a_part_ip_address: IP Address (type unicode class Str)
+=item a_part_ip_address: A IP Address (type unicode class Str)
 
 =item a_extra_create_reverse: Create reverse record for this IP Address (type bool class Flag)
 
 =item aaaarecord: Raw AAAA records (arrayref of type unicode class AAAARecord)
 
-=item aaaa_part_ip_address: IP Address (type unicode class Str)
+=item aaaa_part_ip_address: AAAA IP Address (type unicode class Str)
 
 =item aaaa_extra_create_reverse: Create reverse record for this IP Address (type bool class Flag)
 
 =item a6record: Raw A6 records (arrayref of type unicode class A6Record)
 
-=item a6_part_data: Record data (type unicode class Str)
+=item a6_part_data: A6 Record data (type unicode class Str)
 
 =item afsdbrecord: Raw AFSDB records (arrayref of type unicode class AFSDBRecord)
 
-=item afsdb_part_subtype: Subtype (type int class Int)
+=item afsdb_part_subtype: AFSDB Subtype (type int class Int)
 
-=item afsdb_part_hostname: Hostname (type DNSName class DNSNameParam)
+=item afsdb_part_hostname: AFSDB Hostname (type DNSName class DNSNameParam)
 
 =item aplrecord: Raw APL records (arrayref of type unicode class APLRecord)
 
 =item certrecord: Raw CERT records (arrayref of type unicode class CERTRecord)
 
-=item cert_part_type: Certificate Type (type int class Int)
+=item cert_part_type: CERT Certificate Type (type int class Int)
 
-=item cert_part_key_tag: Key Tag (type int class Int)
+=item cert_part_key_tag: CERT Key Tag (type int class Int)
 
-=item cert_part_algorithm: Algorithm (type int class Int)
+=item cert_part_algorithm: CERT Algorithm (type int class Int)
 
-=item cert_part_certificate_or_crl: Certificate/CRL (type unicode class Str)
+=item cert_part_certificate_or_crl: CERT Certificate/CRL (type unicode class Str)
 
 =item cnamerecord: Raw CNAME records (arrayref of type unicode class CNAMERecord)
 
@@ -3914,27 +5029,27 @@ Add new DNS resource record.
 
 =item dlvrecord: Raw DLV records (arrayref of type unicode class DLVRecord)
 
-=item dlv_part_key_tag: Key Tag (type int class Int)
+=item dlv_part_key_tag: DLV Key Tag (type int class Int)
 
-=item dlv_part_algorithm: Algorithm (type int class Int)
+=item dlv_part_algorithm: DLV Algorithm (type int class Int)
 
-=item dlv_part_digest_type: Digest Type (type int class Int)
+=item dlv_part_digest_type: DLV Digest Type (type int class Int)
 
-=item dlv_part_digest: Digest (type unicode class Str)
+=item dlv_part_digest: DLV Digest (type unicode class Str)
 
 =item dnamerecord: Raw DNAME records (arrayref of type unicode class DNAMERecord)
 
-=item dname_part_target: Target (type DNSName class DNSNameParam)
+=item dname_part_target: DNAME Target (type DNSName class DNSNameParam)
 
 =item dsrecord: Raw DS records (arrayref of type unicode class DSRecord)
 
-=item ds_part_key_tag: Key Tag (type int class Int)
+=item ds_part_key_tag: DS Key Tag (type int class Int)
 
-=item ds_part_algorithm: Algorithm (type int class Int)
+=item ds_part_algorithm: DS Algorithm (type int class Int)
 
-=item ds_part_digest_type: Digest Type (type int class Int)
+=item ds_part_digest_type: DS Digest Type (type int class Int)
 
-=item ds_part_digest: Digest (type unicode class Str)
+=item ds_part_digest: DS Digest (type unicode class Str)
 
 =item hiprecord: Raw HIP records (arrayref of type unicode class HIPRecord)
 
@@ -3950,29 +5065,29 @@ Add new DNS resource record.
 
 =item locrecord: Raw LOC records (arrayref of type unicode class LOCRecord)
 
-=item loc_part_lat_deg: Degrees Latitude (type int class Int)
+=item loc_part_lat_deg: LOC Degrees Latitude (type int class Int)
 
-=item loc_part_lat_min: Minutes Latitude (type int class Int)
+=item loc_part_lat_min: LOC Minutes Latitude (type int class Int)
 
-=item loc_part_lat_sec: Seconds Latitude (type Decimal class Decimal)
+=item loc_part_lat_sec: LOC Seconds Latitude (type Decimal class Decimal)
 
-=item loc_part_lat_dir: Direction Latitude (type unicode class StrEnum)
+=item loc_part_lat_dir: LOC Direction Latitude (type unicode class StrEnum)
 
-=item loc_part_lon_deg: Degrees Longitude (type int class Int)
+=item loc_part_lon_deg: LOC Degrees Longitude (type int class Int)
 
-=item loc_part_lon_min: Minutes Longitude (type int class Int)
+=item loc_part_lon_min: LOC Minutes Longitude (type int class Int)
 
-=item loc_part_lon_sec: Seconds Longitude (type Decimal class Decimal)
+=item loc_part_lon_sec: LOC Seconds Longitude (type Decimal class Decimal)
 
-=item loc_part_lon_dir: Direction Longitude (type unicode class StrEnum)
+=item loc_part_lon_dir: LOC Direction Longitude (type unicode class StrEnum)
 
-=item loc_part_altitude: Altitude (type Decimal class Decimal)
+=item loc_part_altitude: LOC Altitude (type Decimal class Decimal)
 
-=item loc_part_size: Size (type Decimal class Decimal)
+=item loc_part_size: LOC Size (type Decimal class Decimal)
 
-=item loc_part_h_precision: Horizontal Precision (type Decimal class Decimal)
+=item loc_part_h_precision: LOC Horizontal Precision (type Decimal class Decimal)
 
-=item loc_part_v_precision: Vertical Precision (type Decimal class Decimal)
+=item loc_part_v_precision: LOC Vertical Precision (type Decimal class Decimal)
 
 =item mxrecord: Raw MX records (arrayref of type unicode class MXRecord)
 
@@ -3982,21 +5097,21 @@ Add new DNS resource record.
 
 =item naptrrecord: Raw NAPTR records (arrayref of type unicode class NAPTRRecord)
 
-=item naptr_part_order: Order (type int class Int)
+=item naptr_part_order: NAPTR Order (type int class Int)
 
-=item naptr_part_preference: Preference (type int class Int)
+=item naptr_part_preference: NAPTR Preference (type int class Int)
 
-=item naptr_part_flags: Flags (type unicode class Str)
+=item naptr_part_flags: NAPTR Flags (type unicode class Str)
 
-=item naptr_part_service: Service (type unicode class Str)
+=item naptr_part_service: NAPTR Service (type unicode class Str)
 
-=item naptr_part_regexp: Regular Expression (type unicode class Str)
+=item naptr_part_regexp: NAPTR Regular Expression (type unicode class Str)
 
-=item naptr_part_replacement: Replacement (type unicode class Str)
+=item naptr_part_replacement: NAPTR Replacement (type unicode class Str)
 
 =item nsrecord: Raw NS records (arrayref of type unicode class NSRecord)
 
-=item ns_part_hostname: Hostname (type DNSName class DNSNameParam)
+=item ns_part_hostname: NS Hostname (type DNSName class DNSNameParam)
 
 =item nsecrecord: Raw NSEC records (arrayref of type unicode class NSECRecord)
 
@@ -4014,35 +5129,43 @@ Add new DNS resource record.
 
 =item srvrecord: Raw SRV records (arrayref of type unicode class SRVRecord)
 
-=item srv_part_priority: Priority (type int class Int)
+=item srv_part_priority: Lower number means higher priority. Clients will attempt to contact the server with the lowest-numbered priority they can reach. (type int class Int)
 
-=item srv_part_weight: Weight (type int class Int)
+=item srv_part_weight: Relative weight for entries with the same priority. (type int class Int)
 
-=item srv_part_port: Port (type int class Int)
+=item srv_part_port: SRV Port (type int class Int)
 
 =item srv_part_target: The domain name of the target host or '.' if the service is decidedly not available at this domain (type DNSName class DNSNameParam)
 
 =item sshfprecord: Raw SSHFP records (arrayref of type unicode class SSHFPRecord)
 
-=item sshfp_part_algorithm: Algorithm (type int class Int)
+=item sshfp_part_algorithm: SSHFP Algorithm (type int class Int)
 
-=item sshfp_part_fp_type: Fingerprint Type (type int class Int)
+=item sshfp_part_fp_type: SSHFP Fingerprint Type (type int class Int)
 
-=item sshfp_part_fingerprint: Fingerprint (type unicode class Str)
+=item sshfp_part_fingerprint: SSHFP Fingerprint (type unicode class Str)
 
 =item tlsarecord: Raw TLSA records (arrayref of type unicode class TLSARecord)
 
-=item tlsa_part_cert_usage: Certificate Usage (type int class Int)
+=item tlsa_part_cert_usage: TLSA Certificate Usage (type int class Int)
 
-=item tlsa_part_selector: Selector (type int class Int)
+=item tlsa_part_selector: TLSA Selector (type int class Int)
 
-=item tlsa_part_matching_type: Matching Type (type int class Int)
+=item tlsa_part_matching_type: TLSA Matching Type (type int class Int)
 
-=item tlsa_part_cert_association_data: Certificate Association Data (type unicode class Str)
+=item tlsa_part_cert_association_data: TLSA Certificate Association Data (type unicode class Str)
 
 =item txtrecord: Raw TXT records (arrayref of type unicode class TXTRecord)
 
-=item txt_part_data: Text Data (type unicode class Str)
+=item txt_part_data: TXT Text Data (type unicode class Str)
+
+=item urirecord: Raw URI records (arrayref of type unicode class URIRecord)
+
+=item uri_part_priority: Lower number means higher priority. Clients will attempt to contact the URI with the lowest-numbered priority they can reach. (type int class Int)
+
+=item uri_part_weight: Relative weight for entries with the same priority. (type int class Int)
+
+=item uri_part_target: Target Uniform Resource Identifier according to RFC 3986 (type unicode class Str)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -4155,9 +5278,13 @@ Delete DNS resource record.
 
 =item txtrecord: Raw TXT records (arrayref of type unicode class TXTRecord)
 
+=item urirecord: Raw URI records (arrayref of type unicode class URIRecord)
+
 =item del_all: Delete all associated records (type bool class Flag)
 
 =item structured: Parse all raw DNS records and return them in a structured way (type bool class Flag)
+
+=item raw: <raw> (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -4297,9 +5424,11 @@ Search for DNS resources.
 
 =item txtrecord: Raw TXT records (arrayref of type unicode class TXTRecord)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item urirecord: Raw URI records (arrayref of type unicode class URIRecord)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item structured: Parse all raw DNS records and return them in a structured way (type bool class Flag)
 
@@ -4350,33 +5479,33 @@ Modify a DNS resource record.
 
 =item arecord: Raw A records (arrayref of type unicode class ARecord)
 
-=item a_part_ip_address: IP Address (type unicode class Str)
+=item a_part_ip_address: A IP Address (type unicode class Str)
 
 =item aaaarecord: Raw AAAA records (arrayref of type unicode class AAAARecord)
 
-=item aaaa_part_ip_address: IP Address (type unicode class Str)
+=item aaaa_part_ip_address: AAAA IP Address (type unicode class Str)
 
 =item a6record: Raw A6 records (arrayref of type unicode class A6Record)
 
-=item a6_part_data: Record data (type unicode class Str)
+=item a6_part_data: A6 Record data (type unicode class Str)
 
 =item afsdbrecord: Raw AFSDB records (arrayref of type unicode class AFSDBRecord)
 
-=item afsdb_part_subtype: Subtype (type int class Int)
+=item afsdb_part_subtype: AFSDB Subtype (type int class Int)
 
-=item afsdb_part_hostname: Hostname (type DNSName class DNSNameParam)
+=item afsdb_part_hostname: AFSDB Hostname (type DNSName class DNSNameParam)
 
 =item aplrecord: Raw APL records (arrayref of type unicode class APLRecord)
 
 =item certrecord: Raw CERT records (arrayref of type unicode class CERTRecord)
 
-=item cert_part_type: Certificate Type (type int class Int)
+=item cert_part_type: CERT Certificate Type (type int class Int)
 
-=item cert_part_key_tag: Key Tag (type int class Int)
+=item cert_part_key_tag: CERT Key Tag (type int class Int)
 
-=item cert_part_algorithm: Algorithm (type int class Int)
+=item cert_part_algorithm: CERT Algorithm (type int class Int)
 
-=item cert_part_certificate_or_crl: Certificate/CRL (type unicode class Str)
+=item cert_part_certificate_or_crl: CERT Certificate/CRL (type unicode class Str)
 
 =item cnamerecord: Raw CNAME records (arrayref of type unicode class CNAMERecord)
 
@@ -4386,27 +5515,27 @@ Modify a DNS resource record.
 
 =item dlvrecord: Raw DLV records (arrayref of type unicode class DLVRecord)
 
-=item dlv_part_key_tag: Key Tag (type int class Int)
+=item dlv_part_key_tag: DLV Key Tag (type int class Int)
 
-=item dlv_part_algorithm: Algorithm (type int class Int)
+=item dlv_part_algorithm: DLV Algorithm (type int class Int)
 
-=item dlv_part_digest_type: Digest Type (type int class Int)
+=item dlv_part_digest_type: DLV Digest Type (type int class Int)
 
-=item dlv_part_digest: Digest (type unicode class Str)
+=item dlv_part_digest: DLV Digest (type unicode class Str)
 
 =item dnamerecord: Raw DNAME records (arrayref of type unicode class DNAMERecord)
 
-=item dname_part_target: Target (type DNSName class DNSNameParam)
+=item dname_part_target: DNAME Target (type DNSName class DNSNameParam)
 
 =item dsrecord: Raw DS records (arrayref of type unicode class DSRecord)
 
-=item ds_part_key_tag: Key Tag (type int class Int)
+=item ds_part_key_tag: DS Key Tag (type int class Int)
 
-=item ds_part_algorithm: Algorithm (type int class Int)
+=item ds_part_algorithm: DS Algorithm (type int class Int)
 
-=item ds_part_digest_type: Digest Type (type int class Int)
+=item ds_part_digest_type: DS Digest Type (type int class Int)
 
-=item ds_part_digest: Digest (type unicode class Str)
+=item ds_part_digest: DS Digest (type unicode class Str)
 
 =item hiprecord: Raw HIP records (arrayref of type unicode class HIPRecord)
 
@@ -4422,29 +5551,29 @@ Modify a DNS resource record.
 
 =item locrecord: Raw LOC records (arrayref of type unicode class LOCRecord)
 
-=item loc_part_lat_deg: Degrees Latitude (type int class Int)
+=item loc_part_lat_deg: LOC Degrees Latitude (type int class Int)
 
-=item loc_part_lat_min: Minutes Latitude (type int class Int)
+=item loc_part_lat_min: LOC Minutes Latitude (type int class Int)
 
-=item loc_part_lat_sec: Seconds Latitude (type Decimal class Decimal)
+=item loc_part_lat_sec: LOC Seconds Latitude (type Decimal class Decimal)
 
-=item loc_part_lat_dir: Direction Latitude (type unicode class StrEnum)
+=item loc_part_lat_dir: LOC Direction Latitude (type unicode class StrEnum)
 
-=item loc_part_lon_deg: Degrees Longitude (type int class Int)
+=item loc_part_lon_deg: LOC Degrees Longitude (type int class Int)
 
-=item loc_part_lon_min: Minutes Longitude (type int class Int)
+=item loc_part_lon_min: LOC Minutes Longitude (type int class Int)
 
-=item loc_part_lon_sec: Seconds Longitude (type Decimal class Decimal)
+=item loc_part_lon_sec: LOC Seconds Longitude (type Decimal class Decimal)
 
-=item loc_part_lon_dir: Direction Longitude (type unicode class StrEnum)
+=item loc_part_lon_dir: LOC Direction Longitude (type unicode class StrEnum)
 
-=item loc_part_altitude: Altitude (type Decimal class Decimal)
+=item loc_part_altitude: LOC Altitude (type Decimal class Decimal)
 
-=item loc_part_size: Size (type Decimal class Decimal)
+=item loc_part_size: LOC Size (type Decimal class Decimal)
 
-=item loc_part_h_precision: Horizontal Precision (type Decimal class Decimal)
+=item loc_part_h_precision: LOC Horizontal Precision (type Decimal class Decimal)
 
-=item loc_part_v_precision: Vertical Precision (type Decimal class Decimal)
+=item loc_part_v_precision: LOC Vertical Precision (type Decimal class Decimal)
 
 =item mxrecord: Raw MX records (arrayref of type unicode class MXRecord)
 
@@ -4454,21 +5583,21 @@ Modify a DNS resource record.
 
 =item naptrrecord: Raw NAPTR records (arrayref of type unicode class NAPTRRecord)
 
-=item naptr_part_order: Order (type int class Int)
+=item naptr_part_order: NAPTR Order (type int class Int)
 
-=item naptr_part_preference: Preference (type int class Int)
+=item naptr_part_preference: NAPTR Preference (type int class Int)
 
-=item naptr_part_flags: Flags (type unicode class Str)
+=item naptr_part_flags: NAPTR Flags (type unicode class Str)
 
-=item naptr_part_service: Service (type unicode class Str)
+=item naptr_part_service: NAPTR Service (type unicode class Str)
 
-=item naptr_part_regexp: Regular Expression (type unicode class Str)
+=item naptr_part_regexp: NAPTR Regular Expression (type unicode class Str)
 
-=item naptr_part_replacement: Replacement (type unicode class Str)
+=item naptr_part_replacement: NAPTR Replacement (type unicode class Str)
 
 =item nsrecord: Raw NS records (arrayref of type unicode class NSRecord)
 
-=item ns_part_hostname: Hostname (type DNSName class DNSNameParam)
+=item ns_part_hostname: NS Hostname (type DNSName class DNSNameParam)
 
 =item nsecrecord: Raw NSEC records (arrayref of type unicode class NSECRecord)
 
@@ -4486,35 +5615,43 @@ Modify a DNS resource record.
 
 =item srvrecord: Raw SRV records (arrayref of type unicode class SRVRecord)
 
-=item srv_part_priority: Priority (type int class Int)
+=item srv_part_priority: Lower number means higher priority. Clients will attempt to contact the server with the lowest-numbered priority they can reach. (type int class Int)
 
-=item srv_part_weight: Weight (type int class Int)
+=item srv_part_weight: Relative weight for entries with the same priority. (type int class Int)
 
-=item srv_part_port: Port (type int class Int)
+=item srv_part_port: SRV Port (type int class Int)
 
 =item srv_part_target: The domain name of the target host or '.' if the service is decidedly not available at this domain (type DNSName class DNSNameParam)
 
 =item sshfprecord: Raw SSHFP records (arrayref of type unicode class SSHFPRecord)
 
-=item sshfp_part_algorithm: Algorithm (type int class Int)
+=item sshfp_part_algorithm: SSHFP Algorithm (type int class Int)
 
-=item sshfp_part_fp_type: Fingerprint Type (type int class Int)
+=item sshfp_part_fp_type: SSHFP Fingerprint Type (type int class Int)
 
-=item sshfp_part_fingerprint: Fingerprint (type unicode class Str)
+=item sshfp_part_fingerprint: SSHFP Fingerprint (type unicode class Str)
 
 =item tlsarecord: Raw TLSA records (arrayref of type unicode class TLSARecord)
 
-=item tlsa_part_cert_usage: Certificate Usage (type int class Int)
+=item tlsa_part_cert_usage: TLSA Certificate Usage (type int class Int)
 
-=item tlsa_part_selector: Selector (type int class Int)
+=item tlsa_part_selector: TLSA Selector (type int class Int)
 
-=item tlsa_part_matching_type: Matching Type (type int class Int)
+=item tlsa_part_matching_type: TLSA Matching Type (type int class Int)
 
-=item tlsa_part_cert_association_data: Certificate Association Data (type unicode class Str)
+=item tlsa_part_cert_association_data: TLSA Certificate Association Data (type unicode class Str)
 
 =item txtrecord: Raw TXT records (arrayref of type unicode class TXTRecord)
 
-=item txt_part_data: Text Data (type unicode class Str)
+=item txt_part_data: TXT Text Data (type unicode class Str)
+
+=item urirecord: Raw URI records (arrayref of type unicode class URIRecord)
+
+=item uri_part_priority: Lower number means higher priority. Clients will attempt to contact the URI with the lowest-numbered priority they can reach. (type int class Int)
+
+=item uri_part_weight: Relative weight for entries with the same priority. (type int class Int)
+
+=item uri_part_target: Target Uniform Resource Identifier according to RFC 3986 (type unicode class Str)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -4590,6 +5727,185 @@ Display DNS resource.
 
 
 
+=item dnsrecord_split_parts
+
+JSON data for API method dnsrecord_split_parts
+
+
+
+=over
+
+=item Required arguments
+
+=over
+
+=item name: <name> (type unicode class Str)
+
+=item value: <value> (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item dnsserver_find
+
+JSON data for API method dnsserver_find
+
+Search for DNS servers.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item idnsserverid: DNS Server name (type unicode class Str)
+
+=item idnssoamname: SOA mname (authoritative server) override (type DNSName class DNSNameParam)
+
+=item idnsforwarders: Per-server forwarders. A custom port can be specified for each forwarder using a standard format "IP_ADDRESS port PORT" (arrayref of type unicode class Str)
+
+=item idnsforwardpolicy: Per-server conditional forwarding policy. Set to "none" to disable forwarding to global forwarder for this zone. In that case, conditional zone forwarders are disregarded. (type unicode class StrEnum)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("hostname") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item dnsserver_mod
+
+JSON data for API method dnsserver_mod
+
+Modify DNS server configuration
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idnsserverid: DNS Server name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item idnssoamname: SOA mname (authoritative server) override (type DNSName class DNSNameParam)
+
+=item idnsforwarders: Per-server forwarders. A custom port can be specified for each forwarder using a standard format "IP_ADDRESS port PORT" (arrayref of type unicode class Str)
+
+=item idnsforwardpolicy: Per-server conditional forwarding policy. Set to "none" to disable forwarding to global forwarder for this zone. In that case, conditional zone forwarders are disregarded. (type unicode class StrEnum)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item delattr: Delete an attribute/value pair. The option will be evaluated
+last, after all sets and adds. (arrayref of type unicode class Str)
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item dnsserver_show
+
+JSON data for API method dnsserver_show
+
+Display configuration of a DNS server.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idnsserverid: DNS Server name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item dnszone_add
 
 JSON data for API method dnszone_add
@@ -4633,6 +5949,8 @@ Create new DNS zone (SOA record).
 
 =item dnsttl: Time to live for records at zone apex (type int class Int)
 
+=item dnsdefaultttl: Time to live for records without explicit TTL definition (type int class Int)
+
 =item dnsclass: <dnsclass> (type unicode class StrEnum)
 
 =item idnsupdatepolicy: BIND update policy (type unicode class Str)
@@ -4655,7 +5973,11 @@ For multi-valued attributes, the command replaces the values already present. (a
 =item addattr: Add an attribute/value pair. Format is attr=value. The attribute
 must be part of the schema. (arrayref of type unicode class Str)
 
-=item force: Force DNS zone creation even if nameserver is not resolvable. (type bool class Flag)
+=item skip_overlap_check: Force DNS zone creation even if it will overlap with an existing zone. (type bool class Flag)
+
+=item force: Force DNS zone creation even if nameserver is not resolvable. (Deprecated) (type bool class Flag)
+
+=item skip_nameserver_check: Force DNS zone creation even if nameserver is not resolvable. (type bool class Flag)
 
 =item ip_address: <ip_address> (type unicode class Str)
 
@@ -4856,6 +6178,8 @@ Search for DNS zones (SOA records).
 
 =item dnsttl: Time to live for records at zone apex (type int class Int)
 
+=item dnsdefaultttl: Time to live for records without explicit TTL definition (type int class Int)
+
 =item dnsclass: <dnsclass> (type unicode class StrEnum)
 
 =item idnsupdatepolicy: BIND update policy (type unicode class Str)
@@ -4872,9 +6196,9 @@ Search for DNS zones (SOA records).
 
 =item nsec3paramrecord: NSEC3PARAM record for zone in format: hash_algorithm flags iterations salt (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item forward_only: Search for forward zones only (type bool class Flag)
 
@@ -4938,6 +6262,8 @@ Modify DNS zone (SOA record).
 =item idnssoaminimum: How long should negative responses be cached (type int class Int)
 
 =item dnsttl: Time to live for records at zone apex (type int class Int)
+
+=item dnsdefaultttl: Time to live for records without explicit TTL definition (type int class Int)
 
 =item dnsclass: <dnsclass> (type unicode class StrEnum)
 
@@ -5345,9 +6671,9 @@ Search for groups.
 
 =item gidnumber: GID (use this option to set it manually) (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item private: search for private groups (type bool class Flag)
 
@@ -5578,17 +6904,13 @@ Create a new HBAC rule.
 
 =item hostcategory: Host category the rule applies to (type unicode class StrEnum)
 
-=item sourcehostcategory: <sourcehostcategory> (type object class DeprecatedParam)
+=item sourcehostcategory: Source host category the rule applies to (type unicode class StrEnum)
 
 =item servicecategory: Service category the rule applies to (type unicode class StrEnum)
 
 =item description: Description (type unicode class Str)
 
 =item ipaenabledflag: Enabled (type bool class Bool)
-
-=item sourcehost_host: <sourcehost_host> (type object class DeprecatedParam)
-
-=item sourcehost_hostgroup: <sourcehost_hostgroup> (type object class DeprecatedParam)
 
 =item externalhost: External host (arrayref of type unicode class Str)
 
@@ -5706,7 +7028,7 @@ Add services to an HBAC rule.
 
 JSON data for API method hbacrule_add_sourcehost
 
-None
+
 
 =over
 
@@ -5918,7 +7240,7 @@ Search for HBAC rules.
 
 =item hostcategory: Host category the rule applies to (type unicode class StrEnum)
 
-=item sourcehostcategory: <sourcehostcategory> (type object class DeprecatedParam)
+=item sourcehostcategory: Source host category the rule applies to (type unicode class StrEnum)
 
 =item servicecategory: Service category the rule applies to (type unicode class StrEnum)
 
@@ -5926,15 +7248,11 @@ Search for HBAC rules.
 
 =item ipaenabledflag: Enabled (type bool class Bool)
 
-=item sourcehost_host: <sourcehost_host> (type object class DeprecatedParam)
-
-=item sourcehost_hostgroup: <sourcehost_hostgroup> (type object class DeprecatedParam)
-
 =item externalhost: External host (arrayref of type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -5983,17 +7301,13 @@ Modify an HBAC rule.
 
 =item hostcategory: Host category the rule applies to (type unicode class StrEnum)
 
-=item sourcehostcategory: <sourcehostcategory> (type object class DeprecatedParam)
+=item sourcehostcategory: Source host category the rule applies to (type unicode class StrEnum)
 
 =item servicecategory: Service category the rule applies to (type unicode class StrEnum)
 
 =item description: Description (type unicode class Str)
 
 =item ipaenabledflag: Enabled (type bool class Bool)
-
-=item sourcehost_host: <sourcehost_host> (type object class DeprecatedParam)
-
-=item sourcehost_hostgroup: <sourcehost_hostgroup> (type object class DeprecatedParam)
 
 =item externalhost: External host (arrayref of type unicode class Str)
 
@@ -6015,6 +7329,8 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item rename: Rename the HBAC rule object (type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -6116,7 +7432,7 @@ Remove service and service groups from an HBAC rule.
 
 JSON data for API method hbacrule_remove_sourcehost
 
-None
+
 
 =over
 
@@ -6346,9 +7662,9 @@ Search for HBAC services.
 
 =item description: HBAC service description (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -6611,9 +7927,9 @@ Search for an HBAC service group.
 
 =item description: HBAC service group description (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -6785,7 +8101,7 @@ Simulate use of Host-based access controls
 
 =item user: User name (mandatory type unicode class Str)
 
-=item sourcehost: <sourcehost> (type object class DeprecatedParam)
+=item sourcehost: Source host (type unicode class Str)
 
 =item targethost: Target host (mandatory type unicode class Str)
 
@@ -6848,7 +8164,7 @@ Add a new host.
 
 =item random: Generate a random password to be used in bulk enrollment (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded host certificate (arrayref of type Certificate class Certificate)
 
 =item macaddress: Hardware MAC address(es) on this host (arrayref of type unicode class Str)
 
@@ -6858,9 +8174,13 @@ Add a new host.
 
 =item ipaassignedidview: Assigned ID View (type unicode class Str)
 
+=item krbprincipalauthind: Defines a whitelist for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Other values may be used for custom configurations. (arrayref of type unicode class Str)
+
 =item ipakrbrequirespreauth: Pre-authentication is required for the service (type bool class Bool)
 
 =item ipakrbokasdelegate: Client credentials may be delegated to the service (type bool class Bool)
+
+=item ipakrboktoauthasdelegate: The service is allowed to authenticate on behalf of a client (type bool class Bool)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -6921,7 +8241,7 @@ Add certificates to host entry
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded host certificate (mandatory arrayref of type Certificate class Certificate)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -6963,6 +8283,47 @@ Add hosts that can manage this host.
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item host: hosts to add (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item host_add_principal
+
+JSON data for API method host_add_principal
+
+Add new principal alias to host entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item fqdn: Host name (type unicode class Str)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -7091,7 +8452,7 @@ Delete a host.
 
 =item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
 
-=item updatedns: Remove entries from DNS (type bool class Flag)
+=item updatedns: Remove A, AAAA, SSHFP and PTR records of the host(s) managed by IPA DNS (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -7267,7 +8628,7 @@ Search for hosts.
 
 =item userpassword: Password used in bulk enrollment (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded host certificate (arrayref of type Certificate class Certificate)
 
 =item macaddress: Hardware MAC address(es) on this host (arrayref of type unicode class Str)
 
@@ -7275,9 +8636,11 @@ Search for hosts.
 
 =item ipaassignedidview: Assigned ID View (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item krbprincipalauthind: Defines a whitelist for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Other values may be used for custom configurations. (arrayref of type unicode class Str)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -7366,7 +8729,9 @@ Modify information about a host.
 
 =item random: Generate a random password to be used in bulk enrollment (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded host certificate (arrayref of type Certificate class Certificate)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
 
 =item macaddress: Hardware MAC address(es) on this host (arrayref of type unicode class Str)
 
@@ -7376,9 +8741,13 @@ Modify information about a host.
 
 =item ipaassignedidview: Assigned ID View (type unicode class Str)
 
+=item krbprincipalauthind: Defines a whitelist for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Other values may be used for custom configurations. (arrayref of type unicode class Str)
+
 =item ipakrbrequirespreauth: Pre-authentication is required for the service (type bool class Bool)
 
 =item ipakrbokasdelegate: Client credentials may be delegated to the service (type bool class Bool)
+
+=item ipakrboktoauthasdelegate: The service is allowed to authenticate on behalf of a client (type bool class Bool)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -7390,8 +8759,6 @@ must be part of the schema. (arrayref of type unicode class Str)
 last, after all sets and adds. (arrayref of type unicode class Str)
 
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
-
-=item krbprincipalname: Kerberos principal name for this host (type unicode class Str)
 
 =item updatedns: Update DNS entries (type bool class Flag)
 
@@ -7442,7 +8809,7 @@ Remove certificates from host entry
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded host certificate (mandatory arrayref of type Certificate class Certificate)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -7484,6 +8851,47 @@ Remove hosts that can manage this host.
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item host: hosts to remove (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item host_remove_principal
+
+JSON data for API method host_remove_principal
+
+Remove principal alias from a host entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item fqdn: Host name (type unicode class Str)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -7688,9 +9096,9 @@ Search for hostgroups.
 
 =item description: A description of this host-group (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -7876,7 +9284,7 @@ Display information about a hostgroup.
 
 JSON data for API method i18n_messages
 
-None
+
 
 =over
 
@@ -8021,9 +9429,9 @@ Search for an Group ID override.
 
 =item gidnumber: Group ID Number (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item fallback_to_ldap: Allow falling back to AD DC LDAP when resolving AD trusted objects. For two-way trusts only. (type bool class Flag)
 
@@ -8189,6 +9597,8 @@ Add a new User ID override.
 
 =item ipasshpubkey: SSH public key (arrayref of type unicode class Str)
 
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
+
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
 
@@ -8202,6 +9612,49 @@ must be part of the schema. (arrayref of type unicode class Str)
 =item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item idoverrideuser_add_cert
+
+JSON data for API method idoverrideuser_add_cert
+
+Add one or more certificates to the idoverrideuser entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idviewcn: ID View Name (type unicode class Str)
+
+=item ipaanchoruuid: Anchor to override (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item fallback_to_ldap: Allow falling back to AD DC LDAP when resolving AD trusted objects. For two-way trusts only. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item usercertificate: Base-64 encoded user certificate (mandatory arrayref of type Certificate class Certificate)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -8293,9 +9746,9 @@ Search for an User ID override.
 
 =item ipaoriginaluid: <ipaoriginaluid> (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item fallback_to_ldap: Allow falling back to AD DC LDAP when resolving AD trusted objects. For two-way trusts only. (type bool class Flag)
 
@@ -8358,6 +9811,8 @@ Modify an User ID override.
 
 =item ipasshpubkey: SSH public key (arrayref of type unicode class Str)
 
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
+
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
 
@@ -8378,6 +9833,49 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item rename: Rename the User ID override object (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item idoverrideuser_remove_cert
+
+JSON data for API method idoverrideuser_remove_cert
+
+Remove one or more certificates to the idoverrideuser entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idviewcn: ID View Name (type unicode class Str)
+
+=item ipaanchoruuid: Anchor to override (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item fallback_to_ldap: Allow falling back to AD DC LDAP when resolving AD trusted objects. For two-way trusts only. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item usercertificate: Base-64 encoded user certificate (mandatory arrayref of type Certificate class Certificate)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -8498,7 +9996,7 @@ modified to match the new range.
 
 =item ipanttrusteddomainname: Name of the trusted domain (type unicode class Str)
 
-=item iparangetype: ID range type, one of ipa-ad-trust-posix, ipa-ad-trust, ipa-local (type unicode class StrEnum)
+=item iparangetype: ID range type, one of ipa-ad-trust, ipa-ad-trust-posix, ipa-local (type unicode class StrEnum)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -8590,11 +10088,11 @@ Search for ranges.
 
 =item ipanttrusteddomainsid: Domain SID of the trusted domain (type unicode class Str)
 
-=item iparangetype: ID range type, one of ipa-ad-trust-posix, ipa-ad-trust, ipa-local (type unicode class StrEnum)
+=item iparangetype: ID range type, one of ipa-ad-trust, ipa-ad-trust-posix, ipa-local (type unicode class StrEnum)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -8669,9 +10167,9 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
 
-=item ipanttrusteddomainsid: <ipanttrusteddomainsid> (type object class DeprecatedParam)
+=item ipanttrusteddomainsid: Domain SID of the trusted domain (type unicode class Str)
 
-=item ipanttrusteddomainname: <ipanttrusteddomainname> (type object class DeprecatedParam)
+=item ipanttrusteddomainname: Name of the trusted domain (type unicode class Str)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -8751,6 +10249,8 @@ Add a new ID View.
 
 =item description: Description (type unicode class Str)
 
+=item ipadomainresolutionorder: colon-separated list of domains used for short name qualification (type unicode class Str)
+
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
 
@@ -8777,7 +10277,7 @@ must be part of the schema. (arrayref of type unicode class Str)
 
 JSON data for API method idview_apply
 
-Applies ID View to specified hosts or current members of specified hostgroups. If any other ID View is applied to the host, it is overriden.
+Applies ID View to specified hosts or current members of specified hostgroups. If any other ID View is applied to the host, it is overridden.
 
 =over
 
@@ -8870,9 +10370,9 @@ Search for an ID View.
 
 =item description: Description (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -8914,6 +10414,8 @@ Modify an ID View.
 =over
 
 =item description: Description (type unicode class Str)
+
+=item ipadomainresolutionorder: colon-separated list of domains used for short name qualification (type unicode class Str)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -9101,7 +10603,7 @@ JSON data for API method json_metadata
 
 JSON data for API method kra_is_enabled
 
-None
+
 
 =over
 
@@ -9251,6 +10753,222 @@ Display the current Kerberos ticket policy.
 
 
 
+=item location_add
+
+JSON data for API method location_add
+
+Add a new IPA location.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idnsname: IPA location name (type DNSName class DNSNameParam)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: IPA Location description (type unicode class Str)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item location_del
+
+JSON data for API method location_del
+
+Delete an IPA location.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idnsname: IPA location name (arrayref of type DNSName class DNSNameParam)
+
+=back
+
+
+=item Options
+
+=over
+
+=item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item location_find
+
+JSON data for API method location_find
+
+Search for IPA locations.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item idnsname: IPA location name (type DNSName class DNSNameParam)
+
+=item description: IPA Location description (type unicode class Str)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item location_mod
+
+JSON data for API method location_mod
+
+Modify information about an IPA location.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idnsname: IPA location name (type DNSName class DNSNameParam)
+
+=back
+
+
+=item Options
+
+=over
+
+=item description: IPA Location description (type unicode class Str)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item delattr: Delete an attribute/value pair. The option will be evaluated
+last, after all sets and adds. (arrayref of type unicode class Str)
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item location_show
+
+JSON data for API method location_show
+
+Display information about an IPA location.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item idnsname: IPA location name (type DNSName class DNSNameParam)
+
+=back
+
+
+=item Options
+
+=over
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item migrate_ds
 
 JSON data for API method migrate_ds
@@ -9302,7 +11020,7 @@ Migrate users and groups from DS to IPA.
 
 =item compat: Allows migration despite the usage of compat plugin (type bool class Flag)
 
-=item cacertfile: Load CA certificate of LDAP server from FILE (type unicode class File)
+=item cacertfile: Load CA certificate of LDAP server from FILE (type unicode class Str)
 
 =item use_def_group: Add migrated users without a group to a default group (default: true) (type bool class Bool)
 
@@ -9498,9 +11216,9 @@ Search for a netgroup.
 
 =item externalhost: External host (arrayref of type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item private: <private> (type bool class Flag)
 
@@ -9901,53 +11619,6 @@ Add users that can manage this token.
 
 
 
-=item otptoken_add_yubikey
-
-JSON data for API method otptoken_add_yubikey
-
-Add a new YubiKey OTP token.
-
-=over
-
-=item Required arguments
-
-=over
-
-=item ipatokenuniqueid: Unique ID (type unicode class Str)
-
-=back
-
-
-=item Options
-
-=over
-
-=item slot: YubiKey slot (type int class IntEnum)
-
-=item description: Token description (informational only) (type unicode class Str)
-
-=item ipatokenowner: Assigned user of the token (default: self) (type unicode class Str)
-
-=item ipatokendisabled: Mark the token as disabled (default: false) (type bool class Bool)
-
-=item ipatokennotbefore: First date/time the token can be used (type datetime class DateTime)
-
-=item ipatokennotafter: Last date/time the token can be used (type datetime class DateTime)
-
-=item ipatokenotpdigits: Number of digits each token code will have (type int class IntEnum)
-
-=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
-
-=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
-
-=back
-
-=back
-
-=cut
-
-
-
 =item otptoken_del
 
 JSON data for API method otptoken_del
@@ -10034,9 +11705,9 @@ Search for OTP token.
 
 =item ipatokenhotpcounter: Initial counter for the HOTP token (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -10130,7 +11801,7 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 
 JSON data for API method otptoken_remove_managedby
 
-Remove hosts that can manage this host.
+Remove users that can manage this token.
 
 =over
 
@@ -10208,11 +11879,11 @@ Display information about an OTP token.
 
 
 
-=item otptoken_sync
+=item output_find
 
-JSON data for API method otptoken_sync
+JSON data for API method output_find
 
-Synchronize an OTP token.
+Search for command outputs.
 
 =over
 
@@ -10220,7 +11891,9 @@ Synchronize an OTP token.
 
 =over
 
-=item token: Token ID (type unicode class Str)
+=item commandfull_name: Full name (type unicode class Str)
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
 
 =back
 
@@ -10229,13 +11902,130 @@ Synchronize an OTP token.
 
 =over
 
-=item user: User ID (mandatory type unicode class Str)
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
-=item password: Password (mandatory type unicode class Password)
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
-=item first_code: First Code (mandatory type unicode class Password)
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
-=item second_code: Second Code (mandatory type unicode class Password)
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item output_show
+
+JSON data for API method output_show
+
+Display information about a command output.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item commandfull_name: Full name (type unicode class Str)
+
+=item name: Name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item param_find
+
+JSON data for API method param_find
+
+Search command parameters.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item metaobjectfull_name: Full name (type unicode class Str)
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item param_show
+
+JSON data for API method param_show
+
+Display information about a command parameter.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item metaobjectfull_name: Full name (type unicode class Str)
+
+=item name: Name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -10261,7 +12051,7 @@ Set a user's password.
 
 =over
 
-=item principal: User name (type unicode class Str)
+=item principal: User name (type Principal class Principal)
 
 =item password: New Password (type unicode class Password)
 
@@ -10541,9 +12331,9 @@ Search for permissions.
 
 =item permissions: Deprecated; use ipapermright (arrayref of type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -10746,6 +12536,51 @@ Ping a remote server.
 =item Options
 
 =over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item pkinit_status
+
+JSON data for API method pkinit_status
+
+Report PKINIT status on the IPA masters
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item server_server: IPA server hostname (type unicode class Str)
+
+=item status: Whether PKINIT is enabled or disabled (type unicode class StrEnum)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -10978,9 +12813,9 @@ Search for privileges.
 
 =item description: Privilege description (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -11318,9 +13153,9 @@ Search for group password policies.
 
 =item krbpwdlockoutduration: Period for which lockout is enforced (seconds) (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -11470,7 +13305,7 @@ Add a new RADIUS proxy server.
 
 =item description: A description of this RADIUS proxy server (type unicode class Str)
 
-=item ipatokenradiusserver: The hostname or IP (with or without port) (mandatory arrayref of type unicode class Str)
+=item ipatokenradiusserver: The hostname or IP (with or without port) (mandatory type unicode class Str)
 
 =item ipatokenradiussecret: The secret used to encrypt data (mandatory type unicode class Password)
 
@@ -11562,7 +13397,7 @@ Search for RADIUS proxy servers.
 
 =item description: A description of this RADIUS proxy server (type unicode class Str)
 
-=item ipatokenradiusserver: The hostname or IP (with or without port) (arrayref of type unicode class Str)
+=item ipatokenradiusserver: The hostname or IP (with or without port) (type unicode class Str)
 
 =item ipatokenradiussecret: The secret used to encrypt data (type unicode class Password)
 
@@ -11572,9 +13407,9 @@ Search for RADIUS proxy servers.
 
 =item ipatokenusermapattribute: The username attribute on the user object (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -11617,7 +13452,7 @@ Modify a RADIUS proxy server.
 
 =item description: A description of this RADIUS proxy server (type unicode class Str)
 
-=item ipatokenradiusserver: The hostname or IP (with or without port) (arrayref of type unicode class Str)
+=item ipatokenradiusserver: The hostname or IP (with or without port) (type unicode class Str)
 
 =item ipatokenradiussecret: The secret used to encrypt data (type unicode class Password)
 
@@ -11973,9 +13808,9 @@ Search for roles.
 
 =item description: A description of this role-group (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -12171,6 +14006,34 @@ Display information about a role.
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item schema
+
+JSON data for API method schema
+
+
+
+=over
+
+=item No required arguments
+
+=item Options
+
+=over
+
+=item known_fingerprints: Fingerprint of schema cached by client (arrayref of type unicode class Str)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -12658,9 +14521,9 @@ Search for SELinux User Maps.
 
 =item ipaenabledflag: Enabled (type bool class Bool)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -12871,6 +14734,41 @@ Display the properties of a SELinux User Map rule.
 
 
 
+=item server_conncheck
+
+JSON data for API method server_conncheck
+
+Check connection to remote IPA server.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: IPA server hostname (type unicode class Str)
+
+=item remote_cn: Remote IPA server hostname (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item server_del
 
 JSON data for API method server_del
@@ -12893,6 +14791,12 @@ Delete IPA server.
 =over
 
 =item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
+
+=item ignore_topology_disconnect: Ignore topology connectivity problems after removal (type bool class Flag)
+
+=item ignore_last_of_role: Skip a check whether the last CA master or DNS server is removed (type bool class Flag)
+
+=item force: Force server removal even if it does not exist (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -12929,15 +14833,13 @@ Search for IPA servers.
 
 =item cn: IPA server hostname (type unicode class Str)
 
-=item iparepltopomanagedsuffix: Managed suffix (type unicode class Str)
-
 =item ipamindomainlevel: Minimum domain level (type int class Int)
 
 =item ipamaxdomainlevel: Maximum domain level (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -12945,7 +14847,161 @@ Search for IPA servers.
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
 =item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item topologysuffix: Search for servers with these managed suffixes. (arrayref of type unicode class Str)
+
+=item no_topologysuffix: Search for servers without these managed suffixes. (arrayref of type unicode class Str)
+
+=item in_location: Search for servers with these ipa locations. (arrayref of type DNSName class DNSNameParam)
+
+=item not_in_location: Search for servers without these ipa locations. (arrayref of type DNSName class DNSNameParam)
+
+=item servrole: Search for servers with these enabled roles. (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item server_mod
+
+JSON data for API method server_mod
+
+Modify information about an IPA server.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item cn: IPA server hostname (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item ipalocation_location: Server location (type DNSName class DNSNameParam)
+
+=item ipaserviceweight: Weight for server services (type int class Int)
+
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item delattr: Delete an attribute/value pair. The option will be evaluated
+last, after all sets and adds. (arrayref of type unicode class Str)
+
+=item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item server_role_find
+
+JSON data for API method server_role_find
+
+Find a server role on a server(s)
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item server_server: IPA server hostname (type unicode class Str)
+
+=item role_servrole: IPA server role name (type unicode class Str)
+
+=item status: Status of the role (type unicode class StrEnum)
+
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
+
+=item include_master: Include IPA master entries (type bool class Flag)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item server_role_show
+
+JSON data for API method server_role_show
+
+Show role status on a server
+
+=over
+
+=item Required arguments
+
+=over
+
+=item server_server: IPA server hostname (type unicode class Str)
+
+=item role_servrole: IPA server role name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -12986,6 +15042,8 @@ Show IPA server.
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
 =back
@@ -13000,7 +15058,7 @@ Show IPA server.
 
 JSON data for API method service_add
 
-Add a new IPA new service.
+Add a new IPA service.
 
 =over
 
@@ -13008,7 +15066,7 @@ Add a new IPA new service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13017,13 +15075,17 @@ Add a new IPA new service.
 
 =over
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded service certificate (arrayref of type Certificate class Certificate)
 
 =item ipakrbauthzdata: Override default list of supported PAC types. Use 'NONE' to disable PAC support for this service, e.g. this might be necessary for NFS services. (arrayref of type unicode class StrEnum)
+
+=item krbprincipalauthind: Defines a whitelist for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Other values may be used for custom configurations. (arrayref of type unicode class Str)
 
 =item ipakrbrequirespreauth: Pre-authentication is required for the service (type bool class Bool)
 
 =item ipakrbokasdelegate: Client credentials may be delegated to the service (type bool class Bool)
+
+=item ipakrboktoauthasdelegate: The service is allowed to authenticate on behalf of a client (type bool class Bool)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -13063,7 +15125,7 @@ Add new certificates to a service
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13080,7 +15142,7 @@ Add new certificates to a service
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded service certificate (mandatory arrayref of type Certificate class Certificate)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -13104,7 +15166,7 @@ Add hosts that can manage this service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13133,6 +15195,47 @@ Add hosts that can manage this service.
 
 
 
+=item service_add_principal
+
+JSON data for API method service_add_principal
+
+Add new principal alias to a service
+
+=over
+
+=item Required arguments
+
+=over
+
+=item krbcanonicalname: Service principal (type Principal class Principal)
+
+=item krbprincipalname: Service principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item service_allow_create_keytab
 
 JSON data for API method service_allow_create_keytab
@@ -13145,7 +15248,7 @@ Allow users, groups, hosts or host groups to create a keytab of this service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13192,7 +15295,7 @@ Allow users, groups, hosts or host groups to retrieve a keytab of this service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13239,7 +15342,7 @@ Delete an IPA service.
 
 =over
 
-=item krbprincipalname: Service principal (arrayref of type unicode class Str)
+=item krbcanonicalname: Service principal (arrayref of type Principal class Principal)
 
 =back
 
@@ -13274,7 +15377,7 @@ Disable the Kerberos key and SSL certificate of a service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13307,7 +15410,7 @@ Disallow users, groups, hosts or host groups to create a keytab of this service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13354,7 +15457,7 @@ Disallow users, groups, hosts or host groups to retrieve a keytab of this servic
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13410,13 +15513,17 @@ Search for IPA services.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
+
+=item krbprincipalname: Service principal alias (arrayref of type Principal class Principal)
 
 =item ipakrbauthzdata: Override default list of supported PAC types. Use 'NONE' to disable PAC support for this service, e.g. this might be necessary for NFS services. (arrayref of type unicode class StrEnum)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item krbprincipalauthind: Defines a whitelist for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Other values may be used for custom configurations. (arrayref of type unicode class Str)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
+
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -13426,7 +15533,7 @@ Search for IPA services.
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item pkey_only: Results should contain primary key attribute only ("principal") (type bool class Flag)
+=item pkey_only: Results should contain primary key attribute only ("canonical-principal") (type bool class Flag)
 
 =item man_by_host: Search for services with these managed by hosts. (arrayref of type unicode class Str)
 
@@ -13454,7 +15561,7 @@ Modify an existing IPA service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13463,13 +15570,19 @@ Modify an existing IPA service.
 
 =over
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item krbprincipalname: Service principal alias (arrayref of type Principal class Principal)
+
+=item usercertificate: Base-64 encoded service certificate (arrayref of type Certificate class Certificate)
 
 =item ipakrbauthzdata: Override default list of supported PAC types. Use 'NONE' to disable PAC support for this service, e.g. this might be necessary for NFS services. (arrayref of type unicode class StrEnum)
+
+=item krbprincipalauthind: Defines a whitelist for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Other values may be used for custom configurations. (arrayref of type unicode class Str)
 
 =item ipakrbrequirespreauth: Pre-authentication is required for the service (type bool class Bool)
 
 =item ipakrbokasdelegate: Client credentials may be delegated to the service (type bool class Bool)
+
+=item ipakrboktoauthasdelegate: The service is allowed to authenticate on behalf of a client (type bool class Bool)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -13512,7 +15625,7 @@ Remove certificates from a service
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13529,7 +15642,7 @@ Remove certificates from a service
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded service certificate (mandatory arrayref of type Certificate class Certificate)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -13553,7 +15666,7 @@ Remove hosts that can manage this service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13582,6 +15695,47 @@ Remove hosts that can manage this service.
 
 
 
+=item service_remove_principal
+
+JSON data for API method service_remove_principal
+
+Remove principal alias from a service
+
+=over
+
+=item Required arguments
+
+=over
+
+=item krbcanonicalname: Service principal (type Principal class Principal)
+
+=item krbprincipalname: Service principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item service_show
 
 JSON data for API method service_show
@@ -13594,7 +15748,7 @@ Display information about an IPA service.
 
 =over
 
-=item krbprincipalname: Service principal (type unicode class Str)
+=item krbcanonicalname: Service principal (type Principal class Principal)
 
 =back
 
@@ -13810,9 +15964,9 @@ Search for service delegations rule.
 
 =item cn: Delegation name (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -14097,9 +16251,9 @@ Search for service delegation target.
 
 =item cn: Delegation name (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -14327,9 +16481,11 @@ Add a new stage user.
 
 =item loginshell: Login shell (type unicode class Str)
 
-=item krbprincipalname: Kerberos principal (type unicode class Str)
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
 
 =item krbprincipalexpiration: Kerberos principal expiration (type datetime class DateTime)
+
+=item krbpasswordexpiration: User password expiration (type datetime class DateTime)
 
 =item mail: Email address (arrayref of type unicode class Str)
 
@@ -14383,7 +16539,7 @@ Add a new stage user.
 
 =item preferredlanguage: Preferred Language (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -14391,7 +16547,177 @@ For multi-valued attributes, the command replaces the values already present. (a
 =item addattr: Add an attribute/value pair. Format is attr=value. The attribute
 must be part of the schema. (arrayref of type unicode class Str)
 
-=item from_delete: Create Stage user in from a delete user (type object class DeprecatedParam)
+=item from_delete: Create Stage user in from a delete user (type bool class Bool)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_add_cert
+
+JSON data for API method stageuser_add_cert
+
+Add one or more certificates to the stageuser entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item usercertificate: Base-64 encoded user certificate (mandatory arrayref of type Certificate class Certificate)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_add_certmapdata
+
+JSON data for API method stageuser_add_certmapdata
+
+Add one or more certificate mappings to the stage user entry.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item ipacertmapdata: Certificate mapping data (arrayref of type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item issuer: Issuer of the certificate (type DN class DNParam)
+
+=item subject: Subject of the certificate (type DN class DNParam)
+
+=item certificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_add_manager
+
+JSON data for API method stageuser_add_manager
+
+Add a manager to the stage user entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item user: users to add (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_add_principal
+
+JSON data for API method stageuser_add_principal
+
+Add new principal alias to the stageuser entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -14485,9 +16811,11 @@ Search for stage users.
 
 =item loginshell: Login shell (type unicode class Str)
 
-=item krbprincipalname: Kerberos principal (type unicode class Str)
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
 
 =item krbprincipalexpiration: Kerberos principal expiration (type datetime class DateTime)
+
+=item krbpasswordexpiration: User password expiration (type datetime class DateTime)
 
 =item mail: Email address (arrayref of type unicode class Str)
 
@@ -14537,11 +16865,11 @@ Search for stage users.
 
 =item preferredlanguage: Preferred Language (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -14620,7 +16948,11 @@ Modify a stage user.
 
 =item loginshell: Login shell (type unicode class Str)
 
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
 =item krbprincipalexpiration: Kerberos principal expiration (type datetime class DateTime)
+
+=item krbpasswordexpiration: User password expiration (type datetime class DateTime)
 
 =item mail: Email address (arrayref of type unicode class Str)
 
@@ -14674,7 +17006,7 @@ Modify a stage user.
 
 =item preferredlanguage: Preferred Language (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -14696,6 +17028,176 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item rename: Rename the stage user object (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_remove_cert
+
+JSON data for API method stageuser_remove_cert
+
+Remove one or more certificates to the stageuser entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item usercertificate: Base-64 encoded user certificate (mandatory arrayref of type Certificate class Certificate)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_remove_certmapdata
+
+JSON data for API method stageuser_remove_certmapdata
+
+Remove one or more certificate mappings from the stage user entry.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item ipacertmapdata: Certificate mapping data (arrayref of type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item issuer: Issuer of the certificate (type DN class DNParam)
+
+=item subject: Subject of the certificate (type DN class DNParam)
+
+=item certificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_remove_manager
+
+JSON data for API method stageuser_remove_manager
+
+Remove a manager to the stage user entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item user: users to remove (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item stageuser_remove_principal
+
+JSON data for API method stageuser_remove_principal
+
+Remove principal alias from the stageuser entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -14855,9 +17357,9 @@ Search for Sudo Commands.
 
 =item description: A description of this command (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -15120,9 +17622,9 @@ Search for Sudo Command Groups.
 
 =item description: Group description (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -15794,9 +18296,9 @@ Search for Sudo Rule.
 
 =item ipasudorunasextgroup: External Group the commands can run as (sudorule-find only) (type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -15881,6 +18383,8 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item rename: Rename the sudo rule object (type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -16232,6 +18736,82 @@ Display Sudo Rule.
 
 
 
+=item topic_find
+
+JSON data for API method topic_find
+
+Search for help topics.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item criteria: A string searched in all relevant object attributes (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item pkey_only: Results should contain primary key attribute only ("name") (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item topic_show
+
+JSON data for API method topic_show
+
+Display information about a help topic.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item full_name: Full name (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
 =item topologysegment_add
 
 JSON data for API method topologysegment_add
@@ -16259,7 +18839,7 @@ Add a new segment.
 
 =item iparepltoposegmentrightnode: Right replication node - an IPA server (mandatory type unicode class Str)
 
-=item iparepltoposegmentdirection: Direction of replication between left and right replication node (mandatory type unicode class StrEnum)
+=item iparepltoposegmentdirection: Direction of replication between left and right replication node (type unicode class StrEnum)
 
 =item nsds5replicastripattrs: A space separated list of attributes which are removed from replication updates. (type unicode class Str)
 
@@ -16371,9 +18951,9 @@ Search for topology segments.
 
 =item nsds5replicaenabled: Whether a replication agreement is active, meaning whether replication is occurring per that agreement (type unicode class StrEnum)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -16556,7 +19136,7 @@ Add a new topology suffix to be managed.
 
 =over
 
-=item iparepltopoconfroot: LDAP suffix to be managed (mandatory type unicode class Str)
+=item iparepltopoconfroot: Managed LDAP suffix DN (mandatory type DN class DNParam)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -16619,7 +19199,7 @@ Delete a topology suffix.
 
 JSON data for API method topologysuffix_find
 
-Search for topology suffices.
+Search for topology suffixes.
 
 =over
 
@@ -16638,11 +19218,11 @@ Search for topology suffices.
 
 =item cn: Suffix name (type unicode class Str)
 
-=item iparepltopoconfroot: LDAP suffix to be managed (type unicode class Str)
+=item iparepltopoconfroot: Managed LDAP suffix DN (type DN class DNParam)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -16683,7 +19263,7 @@ Modify a topology suffix.
 
 =over
 
-=item iparepltopoconfroot: LDAP suffix to be managed (type unicode class Str)
+=item iparepltopoconfroot: Managed LDAP suffix DN (type DN class DNParam)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -16808,6 +19388,11 @@ Only trusts to Active Directory domains are supported right now.
 The command can be safely run multiple times against the same domain,
 this will cause change to trust relationship credentials on both
 sides.
+
+Note that if the command was previously run with a specific range type,
+or with automatic detection of the range type, and you want to configure a
+different range type, you may need to delete first the ID range using
+ipa idrange-del before retrying the command with the desired range type.
     
 
 =over
@@ -16845,9 +19430,11 @@ must be part of the schema. (arrayref of type unicode class Str)
 
 =item range_size: Size of the ID range reserved for the trusted domain (type int class Int)
 
-=item range_type: Type of trusted domain ID range, one of ipa-ad-trust-posix, ipa-ad-trust (type unicode class StrEnum)
+=item range_type: Type of trusted domain ID range, one of ipa-ad-trust, ipa-ad-trust-posix (type unicode class StrEnum)
 
 =item bidirectional: Establish bi-directional trust. By default trust is inbound one-way only. (type bool class Bool)
+
+=item external: Establish external trust to a domain in another forest. The trust is not transitive beyond the domain. (type bool class Bool)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -16972,9 +19559,9 @@ Search for trusts.
 
 =item ipantsidblacklistoutgoing: SID blacklist outgoing (arrayref of type unicode class Str)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -17023,6 +19610,8 @@ JSON data for API method trust_mod
 =item ipantsidblacklistincoming: SID blacklist incoming (arrayref of type unicode class Str)
 
 =item ipantsidblacklistoutgoing: SID blacklist outgoing (arrayref of type unicode class Str)
+
+=item ipantadditionalsuffixes: UPN suffixes (arrayref of type unicode class Str)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -17228,8 +19817,6 @@ Allow access from the trusted domain
 
 =item ipanttrusteddomainsid: Domain Security Identifier (type unicode class Str)
 
-=item ipanttrustpartner: Trusted domain partner (type unicode class Str)
-
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
 
@@ -17258,7 +19845,7 @@ must be part of the schema. (arrayref of type unicode class Str)
 
 JSON data for API method trustdomain_del
 
-Remove infromation about the domain associated with the trust.
+Remove information about the domain associated with the trust.
 
 =over
 
@@ -17390,11 +19977,9 @@ Search domains of the trust
 
 =item ipanttrusteddomainsid: Domain Security Identifier (type unicode class Str)
 
-=item ipanttrustpartner: Trusted domain partner (type unicode class Str)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
-
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
 
@@ -17440,8 +20025,6 @@ Modify trustdomain of the trust
 =item ipantflatname: Domain NetBIOS name (type unicode class Str)
 
 =item ipanttrusteddomainsid: Domain Security Identifier (type unicode class Str)
-
-=item ipanttrustpartner: Trusted domain partner (type unicode class Str)
 
 =item setattr: Set an attribute to a name/value pair. Format is attr=value.
 For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
@@ -17509,9 +20092,11 @@ Add a new user.
 
 =item loginshell: Login shell (type unicode class Str)
 
-=item krbprincipalname: Kerberos principal (type unicode class Str)
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
 
 =item krbprincipalexpiration: Kerberos principal expiration (type datetime class DateTime)
+
+=item krbpasswordexpiration: User password expiration (type datetime class DateTime)
 
 =item mail: Email address (arrayref of type unicode class Str)
 
@@ -17565,7 +20150,7 @@ Add a new user.
 
 =item preferredlanguage: Preferred Language (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
 
 =item nsaccountlock: Account disabled (type bool class Bool)
 
@@ -17624,7 +20209,136 @@ Add one or more certificates to the user entry
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (mandatory arrayref of type Certificate class Certificate)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item user_add_certmapdata
+
+JSON data for API method user_add_certmapdata
+
+Add one or more certificate mappings to the user entry.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item ipacertmapdata: Certificate mapping data (arrayref of type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item issuer: Issuer of the certificate (type DN class DNParam)
+
+=item subject: Subject of the certificate (type DN class DNParam)
+
+=item certificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item user_add_manager
+
+JSON data for API method user_add_manager
+
+Add a manager to the user entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item user: users to add (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item user_add_principal
+
+JSON data for API method user_add_principal
+
+Add new principal alias to the user entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -17660,10 +20374,6 @@ Delete a user.
 =item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
 
 =item preserve: <preserve> (type bool class Bool)
-
-=item preserve: Delete a user, keeping the entry available for future use (type bool class Flag)
-
-=item no_preserve: Delete a user (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
@@ -17782,9 +20492,11 @@ Search for users.
 
 =item loginshell: Login shell (type unicode class Str)
 
-=item krbprincipalname: Kerberos principal (type unicode class Str)
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
 
 =item krbprincipalexpiration: Kerberos principal expiration (type datetime class DateTime)
+
+=item krbpasswordexpiration: User password expiration (type datetime class DateTime)
 
 =item mail: Email address (arrayref of type unicode class Str)
 
@@ -17834,15 +20546,15 @@ Search for users.
 
 =item preferredlanguage: Preferred Language (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
 
 =item nsaccountlock: Account disabled (type bool class Bool)
 
 =item preserved: Preserved user (type bool class Bool)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
 =item whoami: Display user record for current Kerberos principal (type bool class Flag)
 
@@ -17923,7 +20635,11 @@ Modify a user.
 
 =item loginshell: Login shell (type unicode class Str)
 
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
 =item krbprincipalexpiration: Kerberos principal expiration (type datetime class DateTime)
+
+=item krbpasswordexpiration: User password expiration (type datetime class DateTime)
 
 =item mail: Email address (arrayref of type unicode class Str)
 
@@ -17977,7 +20693,7 @@ Modify a user.
 
 =item preferredlanguage: Preferred Language (type unicode class Str)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
 
 =item nsaccountlock: Account disabled (type bool class Bool)
 
@@ -18041,7 +20757,136 @@ Remove one or more certificates to the user entry
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
-=item usercertificate: Base-64 encoded server certificate (arrayref of type str class Bytes)
+=item usercertificate: Base-64 encoded user certificate (mandatory arrayref of type Certificate class Certificate)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item user_remove_certmapdata
+
+JSON data for API method user_remove_certmapdata
+
+Remove one or more certificate mappings from the user entry.
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item ipacertmapdata: Certificate mapping data (arrayref of type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item issuer: Issuer of the certificate (type DN class DNParam)
+
+=item subject: Subject of the certificate (type DN class DNParam)
+
+=item certificate: Base-64 encoded user certificate (arrayref of type Certificate class Certificate)
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item user_remove_manager
+
+JSON data for API method user_remove_manager
+
+Remove a manager to the user entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item user: users to remove (arrayref of type unicode class Str)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item user_remove_principal
+
+JSON data for API method user_remove_principal
+
+Remove principal alias from the user entry
+
+=over
+
+=item Required arguments
+
+=over
+
+=item uid: User login (type unicode class Str)
+
+=item krbprincipalname: Principal alias (arrayref of type Principal class Principal)
+
+=back
+
+
+=item Options
+
+=over
+
+=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
+
+=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
+
+=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -18163,7 +21008,7 @@ JSON data for API method user_status
 
 =over
 
-=item uid: User login (type unicode class Str)
+=item useruid: User login (type unicode class Str)
 
 =back
 
@@ -18177,8 +21022,6 @@ JSON data for API method user_status
 =item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
 
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
-
-=item no_members: Suppress processing of membership attributes. (type bool class Flag)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 
@@ -18262,72 +21105,11 @@ JSON data for API method user_unlock
 
 
 
-=item vault_add
-
-JSON data for API method vault_add
-
-Create a new vault.
-
-=over
-
-=item Required arguments
-
-=over
-
-=item cn: Vault name (type unicode class Str)
-
-=back
-
-
-=item Options
-
-=over
-
-=item setattr: Set an attribute to a name/value pair. Format is attr=value.
-For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
-
-=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
-must be part of the schema. (arrayref of type unicode class Str)
-
-=item service: Service name of the service vault (type unicode class Str)
-
-=item shared: Shared vault (type bool class Flag)
-
-=item username: Username of the user vault (type unicode class Str)
-
-=item description: Vault description (type unicode class Str)
-
-=item ipavaulttype: Vault type (type unicode class StrEnum)
-
-=item password: Vault password (type unicode class Str)
-
-=item password_file: File containing the vault password (type unicode class Str)
-
-=item ipavaultpublickey: Vault public key (type str class Bytes)
-
-=item public_key_file: File containing the vault public key (type unicode class Str)
-
-=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
-
-=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
-
-=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
-
-=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
-
-=back
-
-=back
-
-=cut
-
-
-
 =item vault_add_internal
 
 JSON data for API method vault_add_internal
 
-None
+
 
 =over
 
@@ -18352,7 +21134,13 @@ None
 
 =item ipavaultpublickey: Vault public key (type str class Bytes)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item setattr: Set an attribute to a name/value pair. Format is attr=value.
+For multi-valued attributes, the command replaces the values already present. (arrayref of type unicode class Str)
+
+=item addattr: Add an attribute/value pair. Format is attr=value. The attribute
+must be part of the schema. (arrayref of type unicode class Str)
+
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18397,7 +21185,7 @@ Add members to a vault.
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18448,7 +21236,7 @@ Add owners to a vault.
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18478,64 +21266,11 @@ Add owners to a vault.
 
 
 
-=item vault_archive
-
-JSON data for API method vault_archive
-
-Archive data into a vault.
-
-=over
-
-=item Required arguments
-
-=over
-
-=item cn: Vault name (type unicode class Str)
-
-=back
-
-
-=item Options
-
-=over
-
-=item service: Service name of the service vault (type unicode class Str)
-
-=item shared: Shared vault (type bool class Flag)
-
-=item username: Username of the user vault (type unicode class Str)
-
-=item data: Binary data to archive (type str class Bytes)
-
-=item in: File containing data to archive (type unicode class Str)
-
-=item password: Vault password (type unicode class Str)
-
-=item password_file: File containing the vault password (type unicode class Str)
-
-=item override_password: Override existing password (type bool class Flag)
-
-=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
-
-=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
-
-=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
-
-=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
-
-=back
-
-=back
-
-=cut
-
-
-
 =item vault_archive_internal
 
 JSON data for API method vault_archive_internal
 
-None
+
 
 =over
 
@@ -18552,7 +21287,7 @@ None
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18603,7 +21338,7 @@ Delete a vault.
 
 =item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18648,11 +21383,11 @@ Search for vaults.
 
 =item ipavaulttype: Vault type (type unicode class StrEnum)
 
-=item timelimit: Time limit of search in seconds (type int class Int)
+=item timelimit: Time limit of search in seconds (0 is unlimited) (type int class Int)
 
-=item sizelimit: Maximum number of entries returned (type int class Int)
+=item sizelimit: Maximum number of entries returned (0 is unlimited) (type int class Int)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18682,78 +21417,11 @@ Search for vaults.
 
 
 
-=item vault_mod
-
-JSON data for API method vault_mod
-
-Modify a vault.
-
-=over
-
-=item Required arguments
-
-=over
-
-=item cn: Vault name (type unicode class Str)
-
-=back
-
-
-=item Options
-
-=over
-
-=item service: Service name of the service vault (type unicode class Str)
-
-=item shared: Shared vault (type bool class Flag)
-
-=item username: Username of the user vault (type unicode class Str)
-
-=item description: Vault description (type unicode class Str)
-
-=item ipavaulttype: Vault type (type unicode class Str)
-
-=item ipavaultsalt: Vault salt (type str class Bytes)
-
-=item change_password: Change password (type bool class Flag)
-
-=item old_password: Old vault password (type unicode class Str)
-
-=item old_password_file: File containing the old vault password (type unicode class Str)
-
-=item new_password: New vault password (type unicode class Str)
-
-=item new_password_file: File containing the new vault password (type unicode class Str)
-
-=item private_key: Old vault private key (type str class Bytes)
-
-=item private_key_file: File containing the old vault private key (type unicode class Str)
-
-=item ipavaultpublickey: New vault public key (type str class Bytes)
-
-=item public_key_file: File containing the new vault public key (type unicode class Str)
-
-=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
-
-=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
-
-=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
-
-=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
-
-=back
-
-=back
-
-=cut
-
-
-
 =item vault_mod_internal
 
 JSON data for API method vault_mod_internal
 
-None
+
 
 =over
 
@@ -18789,7 +21457,7 @@ last, after all sets and adds. (arrayref of type unicode class Str)
 
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18834,7 +21502,7 @@ Remove members from a vault.
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18885,7 +21553,7 @@ Remove owners from a vault.
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -18915,64 +21583,11 @@ Remove owners from a vault.
 
 
 
-=item vault_retrieve
-
-JSON data for API method vault_retrieve
-
-Retrieve a data from a vault.
-
-=over
-
-=item Required arguments
-
-=over
-
-=item cn: Vault name (type unicode class Str)
-
-=back
-
-
-=item Options
-
-=over
-
-=item service: Service name of the service vault (type unicode class Str)
-
-=item shared: Shared vault (type bool class Flag)
-
-=item username: Username of the user vault (type unicode class Str)
-
-=item out: File to store retrieved data (type unicode class Str)
-
-=item password: Vault password (type unicode class Str)
-
-=item password_file: File containing the vault password (type unicode class Str)
-
-=item private_key: Vault private key (type str class Bytes)
-
-=item private_key_file: File containing the vault private key (type unicode class Str)
-
-=item all: Retrieve and print all attributes from the server. Affects command output. (type bool class Flag)
-
-=item raw: Print entries as stored on the server. Only affects output format. (type bool class Flag)
-
-=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
-
-=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
-
-=back
-
-=back
-
-=cut
-
-
-
 =item vault_retrieve_internal
 
 JSON data for API method vault_retrieve_internal
 
-None
+
 
 =over
 
@@ -18989,7 +21604,7 @@ None
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -19036,7 +21651,7 @@ Display information about a vault.
 
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -19106,7 +21721,7 @@ Add owners to a vault container.
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -19152,7 +21767,7 @@ Delete a vault container.
 
 =item continue: Continuous mode: Don't stop on errors. (type bool class Flag)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -19184,7 +21799,7 @@ Remove owners from a vault container.
 
 =over
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -19230,7 +21845,7 @@ Display information about a vault container.
 
 =item rights: Display the access rights of this entry (requires --all). See ipa man page for details. (type bool class Flag)
 
-=item service: Service name of the service vault (type unicode class Str)
+=item service: Service name of the service vault (type Principal class Principal)
 
 =item shared: Shared vault (type bool class Flag)
 
@@ -19243,6 +21858,32 @@ Display information about a vault container.
 =item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item no_members: Suppress processing of membership attributes. (type bool class Flag)
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut
+
+
+
+=item whoami
+
+JSON data for API method whoami
+
+Describe currently authenticated identity.
+
+=over
+
+=item No required arguments
+
+=item Options
+
+=over
+
+=item version: Client version. Used to determine if server will accept request. (type unicode class Str)
 
 =item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
 

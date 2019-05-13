@@ -1,5 +1,8 @@
 Revision history for Perl module Text::Control
 
+0.5 Sat May 11 2019
+    - BUG FIX: Escape bytes 0x1a through 0x1f.
+
 0.4 Wed Mar 6 2019
     - Convert README.pod to README.md. (No production changes.)
 

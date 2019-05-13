@@ -39,7 +39,7 @@ foreach my $i ( 0 .. 1 ) {
 
 ok(
     @{ $resBody->{details}->{__changes__} } == 20,
-    'JSON response contains 24 changes'
+    'JSON response contains 20 changes'
 ) or print STDERR Dumper($resBody);
 
 #print STDERR Dumper($resBody);

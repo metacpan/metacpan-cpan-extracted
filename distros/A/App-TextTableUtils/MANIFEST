@@ -15,7 +15,6 @@ script/csv2json
 script/csv2mdtable
 script/csv2orgtable
 script/csv2texttable
-script/csv2tsv
 script/dd2ansitable
 script/dd2asciitable
 script/dd2csv
@@ -47,7 +46,6 @@ script/json2tsv
 script/texttableutils-convert
 script/tsv2ansitable
 script/tsv2asciitable
-script/tsv2csv
 script/tsv2dd
 script/tsv2json
 script/tsv2mdtable

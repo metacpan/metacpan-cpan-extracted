@@ -1,6 +1,6 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '3.61';
+$Map::Tube::Node::VERSION   = '3.62';
 $Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,23 +9,25 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 3.61
+Version 3.62
 
 =cut
 
 use 5.006;
 use Data::Dumper;
-use Map::Tube::Types qw(Lines);
+use Map::Tube::Types qw(Lines Nodes);
 
 use Moo;
 use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
-has id   => (is => 'ro', required => 1);
-has name => (is => 'ro', required => 1);
-has link => (is => 'ro', required => 1);
-has line => (is => 'rw', isa => Lines, required => 1);
+has id    => (is => 'ro', required => 1);
+has name  => (is => 'ro', required => 1);
+has link  => (is => 'ro', required => 1);
+has links => (is => 'ro', isa => Nodes);
+has line  => (is => 'rw', isa => Lines, required => 1);
+with 'Map::Tube::Plugin::Formatter';
 
 sub as_string {
     my ($self) = @_;
@@ -52,14 +54,15 @@ It provides simple interface to the C<node> of the map.
 
 The following possible attributes for an object of type L<Map::Tube::Node>.
 
-    +------+--------------------------------------------------------------------+
-    | Key  | Description                                                        |
-    +------+--------------------------------------------------------------------+
-    | id   | Unique Node ID (required).                                         |
-    | name | Node name (required).                                              |
-    | link | Comma separated Node ID (required).                                |
-    | line | Ref to a list of objects of type Map::Tube::Line (required).       |
-    +------+--------------------------------------------------------------------+
+    +-------+------------------------------------------------------------------+
+    | Key   | Description                                                      |
+    +-------+------------------------------------------------------------------+
+    | id    | Unique Node ID (required).                                       |
+    | name  | Node name (required).                                            |
+    | link  | Comma separated Node ID (required).                              |
+    | links | Ref to a list of objects of type Map::Tube::Node (optional).     |
+    | line  | Ref to a list of objects of type Map::Tube::Line (required).     |
+    +-------+------------------------------------------------------------------+
 
 =head1 METHODS
 
@@ -74,6 +77,10 @@ Returns the station name.
 =head2 link()
 
 Returns comma separated linked station id.
+
+=head2 links()
+
+Returns ref to a list of objects of type L<Map::Tube::Node>.
 
 =head2 line()
 

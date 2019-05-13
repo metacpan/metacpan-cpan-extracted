@@ -1,6 +1,6 @@
 use IO::Pipe;
 use IO::Select;
-our ( $in, $out ) = ( IO::Pipe->new, IO::Pipe->new );
+our ( $in,  $out )  = ( IO::Pipe->new, IO::Pipe->new );
 our ( $rin, $rout ) = ( IO::Pipe->new, IO::Pipe->new );
 my $pid = fork;
 
@@ -38,20 +38,21 @@ $s->add($rin);
 sub handler {
     my (%args) = @_;
     print $in JSON::to_json( $args{req} ) . "\n";
-    while(my @ready = $s->can_read) {
+    while ( my @ready = $s->can_read ) {
         foreach $fh (@ready) {
-            if($fh == $out) {
+            if ( $fh == $out ) {
                 my $res = <$out>;
                 return JSON::from_json($res);
             }
             else {
                 my $res = <$rin>;
-                $res = $args{sub}->(JSON::from_json($res));
-                print $rout JSON::to_json($res)."\n";
+                $res = $args{sub}->( JSON::from_json($res) );
+                print $rout JSON::to_json($res) . "\n";
             }
         }
     }
 }
+
 sub end_handler {
     print $in "END\n";
 }

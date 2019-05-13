@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -314,6 +314,8 @@ sub locationRulesInit {
 # @param $args reference to the configuration hash
 sub sessionStorageInit {
     my ( $class, $conf ) = @_;
+
+    # Global session storage
     unless ( $class->tsv->{sessionStorageModule} = $conf->{globalStorage} ) {
         $class->logger->error("globalStorage required");
         return 0;
@@ -322,6 +324,20 @@ sub sessionStorageInit {
     die($@) if ($@);
     $class->tsv->{sessionStorageOptions} = $conf->{globalStorageOptions};
 
+    # OIDC session storage
+    if ( $conf->{oidcStorage} ) {
+        eval "use " . $conf->{oidcStorage};
+        die($@) if ($@);
+        $class->tsv->{oidcStorageModule}  = $conf->{oidcStorage};
+        $class->tsv->{oidcStorageOptions} = $conf->{oidcStorageOptions};
+
+    }
+    else {
+        $class->tsv->{oidcStorageModule}  = $conf->{globalStorage};
+        $class->tsv->{oidcStorageOptions} = $conf->{globalStorageOptions};
+    }
+
+    # Local session storage
     if ( $conf->{localSessionStorage} ) {
         $class->tsv->{sessionCacheModule} = $conf->{localSessionStorage};
         $class->tsv->{sessionCacheOptions} =
@@ -361,15 +377,15 @@ sub headersInit {
         $class->tsv->{headerList}->{$vhost} = [ keys %headers ];
         my $sub = '';
         foreach ( keys %headers ) {
-            my $val = $class->substitute( $headers{$_} );
-            $sub .= "('$_' => $val || ''),";
+            my $val = $class->substitute( $headers{$_} ) . " || ''";
+            $sub .= "('$_' => $val),";
         }
 
         unless ( $class->tsv->{forgeHeaders}->{$vhost} =
             $class->buildSub($sub) )
         {
             $class->tsv->{maintenance}->{$vhost} = 1;
-            $class->logger->error( "$class Unable to forge headers: "
+            $class->logger->error( "$class Unable to forge $vhost headers: "
                   . $class->tsv->{jail}->error );
         }
     }

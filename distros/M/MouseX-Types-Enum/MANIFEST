@@ -10,7 +10,6 @@ minil.toml
 t/00_compile.t
 t/01_enum.t
 t/02_synopsis.t
-t/Day.pm
 t/Fruits.pm
 META.yml
 MANIFEST

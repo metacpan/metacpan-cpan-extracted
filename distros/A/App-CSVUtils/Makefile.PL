@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -34,9 +34,12 @@ my %WriteMakefileArgs = (
     "script/csv-sort-fields",
     "script/csv-sort-rows",
     "script/csv-sum",
-    "script/dump-csv"
+    "script/csv2tsv",
+    "script/dump-csv",
+    "script/tsv2csv"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CSVUtils",
   "PREREQ_PM" => {
     "Complete::Util" => "0.57",
@@ -49,11 +52,13 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::re" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.816",
+    "Perinci::CmdLine::Base" => "1.816",
+    "Perinci::CmdLine::Classic" => "1.770",
     "Sah::Schema::filename" => 0,
     "Scalar::Util" => 0,
     "Sort::ByExample" => 0,
     "Text::CSV_XS" => 0,
+    "Text::CSV_XS::TSV" => 0,
     "Tie::IxHash" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -67,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,13 +95,15 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.816",
+  "Perinci::CmdLine::Base" => "1.816",
+  "Perinci::CmdLine::Classic" => "1.770",
   "Sah::Schema::filename" => 0,
   "Scalar::Util" => 0,
   "Sort::ByExample" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "Text::CSV_XS" => 0,
+  "Text::CSV_XS::TSV" => 0,
   "Tie::IxHash" => 0,
   "strict" => 0,
   "warnings" => 0

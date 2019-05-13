@@ -9,7 +9,7 @@ use Scalar::Util qw( looks_like_number );
 
 use JSON qw( decode_json );
 
-use Term::Choose            qw( choose );
+use Term::Choose            qw();
 use Term::Choose::Constants qw( :screen );
 use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Util      qw( term_width insert_sep );
@@ -239,7 +239,9 @@ sub alias {
     if ( $sf->{o}{alias}{$type} ) {
         my $tf = Term::Form->new();
         # Readline
-        $alias = $tf->readline( $identifier, { info => $info } );
+        $alias = $tf->readline( $identifier,
+            { info => $info }
+        );
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
@@ -326,9 +328,10 @@ sub print_error_message {
     $info = "$title:" if $title; #
     utf8::decode( $message );
     chomp( $message );
-    choose(
+    my $tc = Term::Choose->new( $sf->{i}{default} );
+    $tc->choose(
         [ 'Press ENTER to continue' ],
-        { %{$sf->{i}{lyt_m}}, prompt => $message, info => $info }
+        { prompt => $message, info => $info }
     );
 }
 

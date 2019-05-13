@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2019-05-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000471 released
+
+        * Fixed process locking problem Enabled=0.
+
+	* Cleaned up FA_Core.pm
+
+
 2019-04-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000470 released

@@ -6,13 +6,14 @@ use strict;
 use warnings;
 
 use Astro::SpaceTrack;
+use Astro::Coord::ECI::Utils qw{ max };
 use Data::Dumper;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use HTTP::Date;
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 my %opt;
 
@@ -27,6 +28,7 @@ my $ua = LWP::UserAgent->new();
 my $mask = 1;
 my $all = 0;
 my @sources;
+my @source_timestamp;
 my %found;
 my $date = 0;
 my %vsnames;
@@ -117,9 +119,18 @@ if ( $opt{merge} ) {
 #
 # Last-Modified: @{[ time2str( $date ) ]}
 
+# The following constants are unsupported, and may be modified or
+# revoked at any time. They exist to support
+# xt/author/magnitude_status.t
 EOD
 
-    print $output;
+    my $wid = max( map { length $_->[0] } @source_timestamp );
+    foreach my $src ( @source_timestamp ) {
+	( my $const = uc $src->[0] ) =~ s/ \W /_/smxg;
+	printf "use constant _%-${wid}s => '$src->[1]';\n", $const;
+    }
+
+    print "\n", $output;
 } else {
     $opt{decayed}
 	and decayed( \%found );
@@ -165,8 +176,9 @@ sub dor {
 }
 
 sub last_modified {
-    my ( $resp ) = @_;
+    my ( $source, $resp ) = @_;
     my ( $last_modified ) = $resp->header( 'Last-Modified' );
+    push @source_timestamp, [ $source, $last_modified ];
     defined $last_modified
 	or return;
     return str2time( $last_modified );
@@ -178,7 +190,7 @@ sub process {
 	and warn "Debug - GET $source: ", $rslt->status_line(), "\n";
     $rslt->is_success()
 	or die "Failed to get $source data: ", $rslt->status_line();
-    my $last_mod = last_modified( $rslt );
+    my $last_mod = last_modified( $source, $rslt );
     defined $last_mod
 	and $last_mod > $date
 	and $date = $last_mod;

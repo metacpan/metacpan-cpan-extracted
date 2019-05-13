@@ -21,4 +21,8 @@ is(
     'round-trip: to_hex() -> from_hex()',
 );
 
+for my $ord ( 0 .. 0x1f, 0x7f .. 0xff ) {
+    like( Text::Control::to_hex(chr $ord), qr<\A\\x>, "ASCII byte $ord is escaped" );
+}
+
 done_testing();

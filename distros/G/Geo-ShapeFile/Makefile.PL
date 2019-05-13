@@ -1,5 +1,10 @@
 use ExtUtils::MakeMaker;
 
+my @win32_longpath
+  = $^O eq 'MSWin32'
+  ? ('Win32::LongPath' => 0)
+  : ();
+
 WriteMakefile(
     'NAME'          => 'Geo::ShapeFile',
     'VERSION_FROM'  => 'lib/Geo/ShapeFile.pm', # finds $VERSION
@@ -13,12 +18,14 @@ WriteMakefile(
         'Tree::R'    => 0,
         'POSIX'      => 0,
         'autovivification' => 0,
+        @win32_longpath,
     },
     BUILD_REQUIRES => {
         'rlib'       => 0,
     },
     TEST_REQUIRES => {
         'rlib'       => 0,
+        'Test::Exception' => 0,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -31,7 +38,6 @@ WriteMakefile(
             bugtracker => {
                 web => 'https://github.com/shawnlaffan/Geo-ShapeFile/issues/',
             },
-
         },
     },
     ABSTRACT_FROM => 'lib/Geo/ShapeFile.pm',

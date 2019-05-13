@@ -156,7 +156,10 @@ lives_ok {
 'legal compression_types succeed';
 
 is_deeply $static->compression_types,
-    [{ext => 'abc', encoding => 'abc'}, {ext => 'd', encoding => 'd-encode'}],
+    [
+    {ext => 'abc', encoding => 'abc',      _lc_encoding => 'abc'},
+    {ext => 'd',   encoding => 'd-encode', _lc_encoding => 'd-encode'}
+    ],
     'compression_types set';
 
 # test that once we've successfully served a compressed asset, compression_types cannot be set

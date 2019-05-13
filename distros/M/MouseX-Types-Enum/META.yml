@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,15 +27,17 @@ no_index:
 provides:
   MouseX::Types::Enum:
     file: lib/MouseX/Types/Enum.pm
-    version: '1.04'
-  MouseX::Types::Enum::Base:
-    file: lib/MouseX/Types/Enum.pm
+    version: '2.01'
 requires:
+  Class::Inspector: '0'
   Mouse: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/ikenox/perl-enum/issues
-  homepage: https://github.com/ikenox/perl-enum
-  repository: git://github.com/ikenox/perl-enum.git
-version: '1.04'
+  bugtracker: https://github.com/ikenox/Perl-MouseX-Types-Enum/issues
+  homepage: https://github.com/ikenox/Perl-MouseX-Types-Enum
+  repository: git://github.com/ikenox/Perl-MouseX-Types-Enum.git
+version: '2.01'
+x_contributors:
+  - 'Naoto Ikeno <naoto.ikeno@dena.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

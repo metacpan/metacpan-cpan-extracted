@@ -136,7 +136,7 @@ if($retval>0){
 }
 
 __DATA__
-10010010:POSTBANK NDL DB PFK, 10916 Berlin
+10010010:Postbank Ndl DB PFK, 10559 Berlin
 15051732:Spk Mecklenburg-Strelitz, 17235 Neustrelitz
 16050000:Mittelbrandenbg Sparkasse, 14459 Potsdam
 18062678:VR Bank Lausitz, 3044 Cottbus
@@ -144,11 +144,11 @@ __DATA__
 20050550:Haspa Hamburg, 20454 Hamburg
 20080000:Commerzbank Hamburg, 20349 Hamburg
 21050170:Förde Sparkasse, 24103 Kiel
-25010030:POSTBANK NDL DB PFK, 30139 Hannover
+25010030:Postbank Ndl DB PFK, 30139 Hannover
 25020600:Santander Consumer Bank, 30179 Hannover
 25050180:Sparkasse Hannover, 30001 Hannover
 30050000:Ld Bk Hess-Thür, Gz, Dus, 40019 Düsseldorf
 30070010:Deutsche Bank Düsseldorf, 40189 Düsseldorf
 50951469:Sparkasse Starkenburg, 64646 Heppenheim (Bergstraße)
-54510067:POSTBANK NDL DB PFK, 67057 Ludwigshafen am Rhein
+54510067:Postbank Ndl DB PFK, 67057 Ludwigshafen am Rhein
 54651240:Spk Rhein-Haardt, 67087 Bad Dürkheim

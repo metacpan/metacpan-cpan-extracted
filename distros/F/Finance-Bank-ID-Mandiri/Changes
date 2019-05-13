@@ -1,3 +1,8 @@
+0.382   2019-05-13 (PERLANCAR)
+
+	- Handle 3-digit transaction code (found in a mcm-v201901 report).
+
+
 0.381   2019-01-29 (PERLANCAR)
 
 	- [bug][test] Forgot to add tests, and fix date conversion.

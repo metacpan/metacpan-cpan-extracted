@@ -6,7 +6,7 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Jira plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = '0.5';
+our $VERSION = '0.8';
 
 use Moose::Role;
 use JIRA::REST ();
@@ -51,13 +51,16 @@ sub _build_jira_client {
         return;
     }
 
-    unless ($config->{username} and $config->{password}) {
-        error_message('No Jira account credentials configured');
-        return;
+    my $jira_client;
+    try {
+        $jira_client = JIRA::REST->new($config->{server_url}, $config->{username}, $config->{password});
     }
+    catch {
+        error_message("Could not build JIRA client.\nEither configure username or password in your tracker config, .netrc or via Config::Identity, see perldoc JIRA::REST.\nError was:\n'%s'", $_ );
+        return;
+    };
 
-    return JIRA::REST->new($config->{server_url}, $config->{username}, $config->{password});
-
+    return $jira_client;
 }
 
 after ['_load_attribs_start','_load_attribs_continue','_load_attribs_append'] => sub {
@@ -308,7 +311,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 =head1 VERSION
 
-version 0.6
+version 0.8
 
 =head1 DESCRIPTION
 
@@ -334,13 +337,13 @@ add a hash named C<jira>, containing the following keys:
 
 The URL of the Jira instance (without a trailing slash).
 
-=head3 username [REQUIRED]
+=head3 username [OPTIONAL]
 
 Username to connect with.
 
-=head3 password [REQUIRED]
+=head3 password [OPTIONAL]
 
-Password to connect with. Beware: stored in clear text!
+Password to connect with. Beware: This is stored in clear text! Better use authentication via C<Config::Identity> via C<JIRA::REST> where the credentials can be stored GPG encrypted.
 
 =head3 log_time_spent
 
@@ -374,8 +377,8 @@ If C<--jira> is set to a valid ticket identifier:
 
 =head2 stop
 
-If <log_time_spent> is set in config, adds and entry to the worklog of the Jira ticket.
-If <set_status/stop/transition> is set in config and the current Jira ticket state is <set_status/start/target_state>, updates the status of the ticket
+If C<log_time_spent> is set in config, adds and entry to the worklog of the Jira ticket.
+If C<set_status/stop/transition> is set in config and the current Jira ticket state is C<set_status/start/target_state>, updates the status of the ticket
 
 =head1 EXAMPLE CONFIG
 
@@ -402,7 +405,7 @@ Michael Kröll <pepl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Kröll.
+This software is copyright (c) 2019 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

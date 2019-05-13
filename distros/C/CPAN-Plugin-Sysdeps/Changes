@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.59  2019-05-11
+	- mapping update
+	- support for numeric comparisons in mapping file
+
 0.58  2019-04-25
 	- mapping update
 

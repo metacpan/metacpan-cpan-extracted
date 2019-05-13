@@ -1,5 +1,9 @@
 Revision history for Perl module Date::WeekNumber
 
+0.06 2019-05-09 NEILB
+    - Updated entry in SEE ALSO for Date::WeekOfYear, to mention changes
+      that were added in 1.06, to make it compatible with this module.
+
 0.05 2015-10-25
     - Updated github repo URL (metadata, doc) after changing my github username
     - Include META.json in release tarball ([MetaJSON] in dist.ini)

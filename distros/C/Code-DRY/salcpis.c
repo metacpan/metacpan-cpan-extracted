@@ -321,8 +321,11 @@ static void induceSAandLCP(const void *T, sais_index_type *SA,
   sais_index_type start, end, stack_end; // for inducing the LCP-values
 
   sais_index_type *D; // store beginnings of buckets (not CURRENT beginnings!)
-  if ((D = SAIS_MYMALLOC(k, sais_index_type)) == NULL) { exit(-1); } // TODO: check if D is necessary!!! (first write to bucket=>0)
   sais_index_type *LastW; // store last written L or S-suffix for every bucket
+  sais_index_type *TranslateSigma; // general to effective alphabet ([0..k-1] |--> [0..sigma-1])
+  sais_index_type *LastOcc; // store last occurrences of characters
+  sais_index_type sigma = 0;       // (true) alphabet size
+  if ((D = SAIS_MYMALLOC(k, sais_index_type)) == NULL) { exit(-1); } // TODO: check if D is necessary!!! (first write to bucket=>0)
   if ((LastW = SAIS_MYMALLOC(k, sais_index_type)) == NULL) { exit(-1); }
   for (i = 0; i < k; ++i) LastW[i] = n-1; // point to $
   // todo: move memory management to sais_main
@@ -341,14 +344,11 @@ static void induceSAandLCP(const void *T, sais_index_type *SA,
   //LCP[0] = 0;
 
   // Variant 3: stack
-  sais_index_type sigma = 0;       // (true) alphabet size
-  sais_index_type *TranslateSigma; // general to effective alphabet ([0..k-1] |--> [0..sigma-1])
   if ((TranslateSigma = SAIS_MYMALLOC(k, sais_index_type)) == NULL) { exit(-1); }
   for (i = 0; i < k; ++i)  {   // calculate effective alphabet size
     TranslateSigma[i] = sigma; // (also stores values for unused characters)
     if (C[i] > 0) ++sigma;     // count characters
   }
-  sais_index_type *LastOcc; // store last occurrences of characters
   if ((LastOcc = SAIS_MYMALLOC(sigma, sais_index_type)) == NULL) { exit(-1); }
   for (i = 0; i < sigma; ++i) LastOcc[i] = -1; // init with impossible values
 

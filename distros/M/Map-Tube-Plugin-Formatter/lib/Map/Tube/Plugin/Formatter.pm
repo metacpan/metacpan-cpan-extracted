@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Formatter;
 
-$Map::Tube::Plugin::Formatter::VERSION   = '0.15';
+$Map::Tube::Plugin::Formatter::VERSION   = '0.16';
 $Map::Tube::Plugin::Formatter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,14 +9,14 @@ Map::Tube::Plugin::Formatter - Formatter plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
 use 5.006;
 use YAML;
 use JSON qw();
-use Map::Tube::Plugin::Formatter::Utils qw(xml get_data validate_object);
+use Map::Tube::Plugin::Formatter::Utils qw(xml get_data);
 
 use Moo::Role;
 use namespace::autoclean;
@@ -33,22 +33,22 @@ A very simple add-on for L<Map::Tube> to format the supported objects.
     my $map = Map::Tube::London->new;
 
     my $node = $map->get_node_by_name('Baker Street');
-    print $map->to_xml($node) ,   "\n\n";
-    print $map->to_json($node),   "\n\n";
-    print $map->to_yaml($node),   "\n\n";
-    print $map->to_string($node), "\n\n";
+    print $node->to_xml,    "\n\n";
+    print $node->to_json,   "\n\n";
+    print $node->to_yaml,   "\n\n";
+    print $node->to_string, "\n\n";
 
     my $line = $map->get_line_by_name('Metropolitan');
-    print $map->to_xml($line) ,   "\n\n";
-    print $map->to_json($line),   "\n\n";
-    print $map->to_yaml($line),   "\n\n";
-    print $map->to_string($line), "\n\n";
+    print $line->to_xml,    "\n\n";
+    print $line->to_json,   "\n\n";
+    print $line->to_yaml,   "\n\n";
+    print $line->to_string, "\n\n";
 
     my $route = $map->get_shortest_route('Baker Street', 'Wembley Park');
-    print $map->to_xml($route),   "\n\n";
-    print $map->to_json($route),  "\n\n";
-    print $map->to_yaml($route),  "\n\n";
-    print $map->to_string($route),"\n\n";
+    print $route->to_xml,   "\n\n";
+    print $route->to_json,  "\n\n";
+    print $route->to_yaml,  "\n\n";
+    print $route->to_string,"\n\n";
 
 =head1 SUPPORTED FORMATS
 
@@ -82,49 +82,47 @@ It currently supports the following objects.
 
 =head1 METHODS
 
-=head2 to_xml($object)
+=head2 to_xml()
 
-It takes an object (supported) and returns XML representation of the same.
+Returns XML representation of the object.
 
 =cut
 
 sub to_xml {
-    my ($self, $object) = @_;
-
-    validate_object($object);
+    my ($self) = @_;
 
     my $data = {};
-    if (ref($object) eq 'Map::Tube::Node') {
+    if (ref($self) eq 'Map::Tube::Node') {
         $data = {
             node => {
                 attributes => {
-                    id     => $object->id,
-                    name   => $object->name,
+                    id     => $self->id,
+                    name   => $self->name,
                 },
                 children   => {
-                    link   => [ map {{ id => $_, name => $self->get_node_by_id($_)->name }} (split /\,/,$object->link) ],
-                    line   => [ map {{ id => $_->id, name => $_->name                    }} (@{$object->line})         ],
+                    link   => [ map {{ id => $_->id, name => $_->name }} (@{$self->links}) ],
+                    line   => [ map {{ id => $_->id, name => $_->name }} (@{$self->line})  ],
                 },
             },
         };
     }
-    elsif (ref($object) eq 'Map::Tube::Line') {
+    elsif (ref($self) eq 'Map::Tube::Line') {
         $data = {
             line => {
                 attributes  => {
-                    id      => $object->id,
-                    name    => $object->name,
-                    color   => $object->color || 'undef',
+                    id      => $self->id,
+                    name    => $self->name,
+                    color   => $self->color || 'undef',
                 },
                 children    => {
-                    station => [ map {{ id => $_->id, name => $_->name }} (@{$object->get_stations}) ],
+                    station => [ map {{ id => $_->id, name => $_->name }} (@{$self->get_stations}) ],
                 },
             },
         };
     }
-    elsif (ref($object) eq 'Map::Tube::Route') {
+    elsif (ref($self) eq 'Map::Tube::Route') {
         my $children = {};
-        my $nodes    = $object->nodes;
+        my $nodes    = $self->nodes;
         my $size     = $#$nodes;
         foreach my $i (1..($size-1)) {
             push @{$children->{node}}, { name => $nodes->[$i]->as_string, order => $i };
@@ -133,8 +131,8 @@ sub to_xml {
         $data = {
             route => {
                 attributes => {
-                    from   => $object->from->as_string,
-                    to     => $object->to->as_string,
+                    from   => $self->from->as_string,
+                    to     => $self->to->as_string,
                 },
                 children   => $children,
             },
@@ -145,42 +143,40 @@ sub to_xml {
 
 }
 
-=head2 to_json($object)
+=head2 to_json()
 
-It takes an object (supported) and returns JSON representation of the same.
+Returns JSON representation of the object.
 
 =cut
 
 sub to_json {
-    my ($self, $object) = @_;
+    my ($self) = @_;
 
-    return JSON->new->utf8(1)->pretty->encode(get_data($self, $object));
+    return JSON->new->utf8(1)->pretty->encode(get_data($self));
 }
 
-=head2 to_yaml($object)
+=head2 to_yaml()
 
-It takes an object (supported) and returns YAML representation of the same.
+Returns YAML representation of the object.
 
 =cut
 
 sub to_yaml {
-    my ($self, $object) = @_;
+    my ($self) = @_;
 
-    return Dump(get_data($self, $object));
+    return Dump(get_data($self));
 }
 
-=head2 to_string($object)
+=head2 to_string()
 
-It takes an object (supported) and returns STRING representation of the same.
+Returns STRING representation of the object.
 
 =cut
 
 sub to_string {
-    my ($self, $object) = @_;
+    my ($self) = @_;
 
-    validate_object($object);
-
-    return $object->as_string;
+    return $self->as_string;
 }
 
 =head1 AUTHOR

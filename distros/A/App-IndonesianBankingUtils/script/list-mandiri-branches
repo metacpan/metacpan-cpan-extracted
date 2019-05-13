@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Business/ID/Mandiri/list_mandiri_branches
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-02-24'; # DATE
+our $DATE = '2019-05-10'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.141'; # VERSION
+our $VERSION = '0.142'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ list-mandiri-branches - Mandiri branches
 
 =head1 VERSION
 
-This document describes version 0.141 of list-mandiri-branches (from Perl distribution App-IndonesianBankingUtils), released on 2019-02-24.
+This document describes version 0.142 of list-mandiri-branches (from Perl distribution App-IndonesianBankingUtils), released on 2019-05-10.
 
 =head1 SYNOPSIS
 

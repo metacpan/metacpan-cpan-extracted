@@ -1,5 +1,8 @@
 Revision history for Crypt::Image
 
+0.14  2019-05-10T05:05:00+01:00
+      - Tidied up pod for Crypt::Image::Util.
+
 0.13  2018-10-23T19:50:00+01:00
       - Used namespace::autoclean instead.
 

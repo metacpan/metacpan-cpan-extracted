@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "script/csv2mdtable",
     "script/csv2orgtable",
     "script/csv2texttable",
-    "script/csv2tsv",
     "script/dd2ansitable",
     "script/dd2asciitable",
     "script/dd2csv",
@@ -53,7 +52,6 @@ my %WriteMakefileArgs = (
     "script/texttableutils-convert",
     "script/tsv2ansitable",
     "script/tsv2asciitable",
-    "script/tsv2csv",
     "script/tsv2dd",
     "script/tsv2json",
     "script/tsv2mdtable",
@@ -68,7 +66,7 @@ my %WriteMakefileArgs = (
     "Config::IOD::Reader" => "0.341",
     "Data::Check::Structure" => 0,
     "Data::Dumper" => 0,
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.50",
     "JSON::MaybeXS" => 0,
     "Text::ANSITable" => 0,
     "Text::ASCIITable" => 0,
@@ -87,7 +85,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -100,7 +98,7 @@ my %FallbackPrereqs = (
   "Data::Check::Structure" => 0,
   "Data::Dumper" => 0,
   "File::Spec" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,

@@ -28,7 +28,7 @@ Optional image masks are described by a 'k' line
 
   p"1262 2159 1402 2065 1468 2003"  List of node coordinates
                Coordinates are in pairs, at least three pairs are required
-                 
+
 =cut
 
 sub _defaults

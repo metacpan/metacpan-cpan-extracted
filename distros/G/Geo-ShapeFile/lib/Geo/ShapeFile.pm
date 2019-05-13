@@ -10,8 +10,10 @@ use List::Util qw /min max/;
 use Scalar::Util qw/weaken/;
 use Tree::R;
 
+use constant ON_WINDOWS => ($^O eq 'MSWin32');
+use if ON_WINDOWS, 'Win32::LongPath';
 
-our $VERSION = '2.66';
+our $VERSION = '3.00';
 
 my $little_endian_sys = unpack 'b', (pack 'S', 1 );
 
@@ -61,17 +63,17 @@ sub new {
         shapes_in_area => {},
     };
 
-    if (-f $self->{filebase} . '.shx') {
+    if ($self->file_exists ($self->{filebase} . '.shx')) {
         $self->_read_shx_header();
         $self->{has_shx} = 1;
     }
 
-    if (-f $self->{filebase} . '.shp') {
+    if ($self->file_exists ($self->{filebase} . '.shp')) {
         $self->_read_shp_header();
         $self->{has_shp} = 1;
     }
 
-    if (-f $self->{filebase} . '.dbf') {
+    if ($self->file_exists ($self->{filebase} . '.dbf')) {
         $self->_read_dbf_header();
         $self->{has_dbf} = 1;
     }
@@ -85,6 +87,39 @@ sub new {
 
     return $self;
 }
+
+sub get_file_size {
+    my ($self, $file_name) = @_;
+
+    my $file_size;
+
+    if (-e $file_name) {
+        $file_size = -s $file_name;
+    }
+    elsif (ON_WINDOWS) {
+        my $stat = statL ($file_name)
+          or die ("unable to get stat for $file_name ($^E)");
+        $file_size = $stat->{size};
+    }
+    else {
+        croak "$file_name does not exist or cannot be read, cannot get file size\n";
+    }
+
+    return $file_size;
+}
+
+sub file_exists {
+    my ($self, $file_name) = @_;
+
+    return 1 if -e $file_name;
+    
+    if (ON_WINDOWS) {
+        return testL ('e', $file_name);
+    }
+
+    return;
+}
+
 
 sub _disable_all_caching {
     my $self = shift;
@@ -274,7 +309,7 @@ sub _read_dbf_header {
 
     my $ls = $self->{dbf_header_length}
            + $self->{dbf_num_records} * $self->{dbf_record_length};
-    my $li = -s $self->{filebase} . '.dbf';
+    my $li = $self->get_file_size($self->{filebase} . '.dbf');
 
     # some shapefiles (such as are produced by the NOAA NESDIS) don't
     # have a end-of-file marker in their dbf files, Aleksandar Jelenak
@@ -423,7 +458,7 @@ sub _get_shp_shx_header_value {
     my $self = shift;
     my $val  = shift;
 
-    if (!defined ($self->{'shx_' . $val}) && !defined ($self->{'shp_' . $val})) {
+    if (!defined($self->{'shx_' . $val}) && !defined($self->{'shp_' . $val})) {
         $self->_read_shx_header();  #  ensure we load at least one of the headers
     }
 
@@ -755,13 +790,20 @@ sub _get_handle {
     my $han = $which . '_handle';
 
     if (!$self->{$han}) {
-        $self->{$han} = IO::File->new;
         my $file = join '.', $self->{filebase}, $which;
-        croak "Couldn't get file handle for $file: $!"
-          if not $self->{$han}->open($file, O_RDONLY | O_BINARY);
+        if (-e $file) {
+            $self->{$han} = IO::File->new;
+            croak "Couldn't get file handle for $file: $!"
+              if not $self->{$han}->open($file, O_RDONLY | O_BINARY);
+        }
+        elsif (ON_WINDOWS) {
+            my $fh;
+            openL (\$fh, '<', $file)
+              or croak ("unable to open $file ($^E)");
+            #$fh = IO::File->new_from_fd ($fh);
+            $self->{$han} = $fh;
+        }
         binmode $self->{$han}; # fix windows bug reported by Patrick Dughi
-        #  Maybe should handle explicitly in a destroy sub 
-        weaken $self->{han};
     }
 
     return $self->{$han};
@@ -1094,7 +1136,7 @@ Please send any bugs, suggestions, or feature requests to
 L<Geo::ShapeFile::Shape>, 
 L<Geo::ShapeFile::Point>, 
 L<Geo::Shapefile::Writer>, 
-L<Geo::GDAL>
+L<Geo::GDAL::FFI>
 
 =head1 AUTHOR
 

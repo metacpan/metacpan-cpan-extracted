@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin', 'Lemonldap::NG::Common::TOTP';
 
@@ -295,24 +295,17 @@ sub run {
                 return $self->p->sendError( $req, "Corrupted session", 500 );
             }
         }
-
         else {
             $self->logger->debug("No 2F Device found");
             $_2fDevices = [];
         }
 
         # Delete TOTP 2F device
-        my @keep = ();
-        while (@$_2fDevices) {
-            my $element = shift @$_2fDevices;
-            $self->logger->debug("Looking for 2F device to delete ...");
-            push @keep, $element unless ( $element->{epoch} eq $epoch );
-        }
-
+        @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
         $self->logger->debug(
             "Delete 2F Device : { type => 'TOTP', epoch => $epoch }");
         $self->p->updatePersistentSession( $req,
-            { _2fDevices => to_json( \@keep ) } );
+            { _2fDevices => to_json($_2fDevices) } );
         $self->userLogger->notice('TOTP deletion succeed');
         return [
             200,

@@ -18,8 +18,8 @@ ok(
             localSessionStorage => '',
             logLevel            => 'warn',
             cookieName          => 'lemonldap',
-            securedCookie       => 0,
-            https               => 0,
+            securedCookie       => 2,
+            https               => 1,
             userLogger          => 'Lemonldap::NG::Common::Logger::Null',
         }
     ),

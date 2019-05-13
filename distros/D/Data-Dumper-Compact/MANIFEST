@@ -1,0 +1,19 @@
+Changes
+ex/deep1
+ex/deep2
+ex/deep3
+ex/deep4
+ex/deep5
+ex/deep6
+ex/deep7
+ex/deep8
+lib/Data/Dumper/Compact.pm
+lib/Devel/DDCWarn.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

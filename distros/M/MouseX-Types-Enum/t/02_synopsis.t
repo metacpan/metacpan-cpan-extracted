@@ -1,84 +1,38 @@
 use strict;
+use warnings;
 use Test::More 0.98;
+use Scalar::Util qw/refaddr/;
 use Test::Exception;
 
-subtest 'Simplest usage' => sub {
-        {
-            package Day;
+BEGIN {
+    use File::Basename qw/dirname/;
+    my $dir = dirname(__FILE__);
+    push(@INC, $dir);
+}
 
-            use strict;
-            use warnings FATAL => 'all';
-            use MouseX::Types::Enum qw/
-                Sun
-                Mon
-                Tue
-                Wed
-                Thu
-                Fri
-                Sat
-                /;
+use Fruits;
 
-            __PACKAGE__->meta->make_immutable;
-        }
+# equivalence
+ok(Fruits->APPLE == Fruits->APPLE);
+ok(Fruits->APPLE != Fruits->GRAPE);
+ok(Fruits->APPLE != Fruits->BANANA);
 
-        is(Day->Sun == Day->Sun, 1);
-        is(Day->Sun == Day->Mon, '');
-        is(Day->Sun->to_string, 'Sun');
+# instance variable
+is(Fruits->APPLE->name, 'Apple');
+is(Fruits->APPLE->color, 'red');
+is(Fruits->APPLE->price, 1.2);
 
-        is_deeply(Day->enums, {
-                Sun => Day->Sun,
-                Mon => Day->Mon,
-                Tue => Day->Tue,
-                Wed => Day->Wed,
-                Thu => Day->Thu,
-                Fri => Day->Fri,
-                Sat => Day->Sat
-            });
-    };
+# instance method
+is(Fruits->APPLE->make_sentence('!'), 'Apple is red!');
 
-subtest 'Advanced usage' => sub {
-        {
-            package Fruits;
-
-            use Mouse;
-            use MouseX::Types::Enum (
-                APPLE  => { name => 'Apple', color => 'red' },
-                ORANGE => { name => 'Orange', color => 'orange' },
-                BANANA => { name => 'Banana', color => 'yellow', has_seed => 0 }
-            );
-
-            has name => (is => 'ro', isa => 'Str');
-            has color => (is => 'ro', isa => 'Str');
-            has has_seed => (is => 'ro', isa => 'Int', default => 1);
-
-            sub make_sentence {
-                my ($self, $suffix) = @_;
-                $suffix ||= "";
-                return sprintf("%s is %s%s", $self->name, $self->color, $suffix);
-            }
-
-            __PACKAGE__->meta->make_immutable;
-        }
-
-        is(Fruits->APPLE == Fruits->APPLE, 1);
-        is(Fruits->APPLE == Fruits->ORANGE, '');
-        is(Fruits->APPLE->to_string, 'APPLE');
-
-        # User-defined attributes and methods
-        is(Fruits->APPLE->name, 'Apple');
-        is(Fruits->APPLE->color, 'red');
-        is(Fruits->APPLE->has_seed, 1);
-        is(Fruits->APPLE->make_sentence('!!!'), 'Apple is red!!!');
-
-        is_deeply(
-            Fruits->enums,
-            {
-                APPLE  => Fruits->APPLE,
-                ORANGE => Fruits->ORANGE,
-                BANANA => Fruits->BANANA
-            }
-        );
-    };
-
+# get instance
+is(Fruits->get(1), Fruits->APPLE);
+is(Fruits->get(2), Fruits->GRAPE);
+is(Fruits->get(3), Fruits->BANANA);
+is_deeply(Fruits->all, {
+    1 => Fruits->APPLE,
+    2 => Fruits->GRAPE,
+    3 => Fruits->BANANA,
+});
 
 done_testing;

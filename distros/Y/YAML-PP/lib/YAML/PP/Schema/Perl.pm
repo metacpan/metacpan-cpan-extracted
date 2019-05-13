@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Perl;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use base 'YAML::PP::Schema';
 
@@ -35,28 +35,39 @@ sub register {
         }
     }
 
-    my @perl_tags = qw/ !perl /;
-    my $perl_tag = '!perl';
+    # TODO
+    # check content and deprecate old usage
+    $tagtype =~ s/perl//g;
+    my $perl_tag;
+    my @perl_tags;
+    my @tagtypes = split m/\+/, $tagtype;
+    if ($tagtypes[0] eq '!') {
+        $perl_tag = '!perl';
+    }
+    elsif ($tagtypes[0] eq '!!') {
+        $perl_tag = 'tag:yaml.org,2002:perl';
+    }
+    for my $tagtype (@tagtypes) {
+        if ($tagtype eq '!') {
+            push @perl_tags, '!perl';
+        }
+        elsif ($tagtype eq '!!') {
+            push @perl_tags, 'tag:yaml.org,2002:perl';
+        }
+    }
+
     my $perl_regex = '!perl';
     if ($tagtype eq '!') {
-        $perl_tag = '!perl';
         $perl_regex = '!perl';
-        @perl_tags = qw/ !perl /;
     }
     elsif ($tagtype eq '!!') {
-        $perl_tag = 'tag:yaml.org,2002:perl';
         $perl_regex = 'tag:yaml\\.org,2002:perl';
-        @perl_tags = 'tag:yaml.org,2002:perl';
     }
     elsif ($tagtype eq '!+!!') {
-        $perl_tag = '!perl';
         $perl_regex = '(?:tag:yaml\\.org,2002:|!)perl';
-        @perl_tags = ('!perl', 'tag:yaml.org,2002:perl');
     }
     elsif ($tagtype eq '!!+!') {
-        $perl_tag = 'tag:yaml.org,2002:perl';
         $perl_regex = '(?:tag:yaml\\.org,2002:|!)perl';
-        @perl_tags = ('tag:yaml.org,2002:perl', '!perl');
     }
 
     if (grep { $_ eq '+loadcode' } @$options) {
@@ -64,16 +75,7 @@ sub register {
             tag => "$_/code",
             match => [ all => sub {
                 my ($constructor, $event) = @_;
-                my $code = $event->{value};
-                unless ($code =~ m/^ \s* \{ .* \} \s* \z/xs) {
-                    die "Malformed code";
-                }
-                $code = "sub $code";
-                my $sub = eval $code;
-                if ($@) {
-                    die "Couldn't eval code: $@>>$code<<";
-                }
-                return $sub;
+                return $self->evaluate_code($event->{value});
             }],
             implicit => 0,
         ) for @perl_tags;
@@ -83,16 +85,8 @@ sub register {
                 my ($constructor, $event) = @_;
                 my $class = $event->{tag};
                 $class =~ s{^$perl_regex/code:}{};
-                my $code = $event->{value};
-                unless ($code =~ m/^ \s* \{ .* \} \s* \z/xs) {
-                    die "Malformed code";
-                }
-                $code = "sub $code";
-                my $sub = eval $code;
-                if ($@) {
-                    die "Couldn't eval code: $@>>$code<<";
-                }
-                return bless $sub, $class;
+                my $sub = $self->evaluate_code($event->{value});
+                return $self->object($sub, $class);
             }],
             implicit => 0,
         );
@@ -101,9 +95,7 @@ sub register {
         $schema->add_resolver(
             tag => "$_/code",
             match => [ all => sub {
-                my ($constructor, $event) = @_;
-                my $code = sub {};
-                return $code;
+                return sub {};
             }],
             implicit => 0,
         ) for @perl_tags;
@@ -113,8 +105,7 @@ sub register {
                 my ($constructor, $event) = @_;
                 my $class = $event->{tag};
                 $class =~ s{^$perl_regex/code:}{};
-                my $code = sub {};
-                return bless $code, $class;
+                return $self->object(sub {}, $class);
             }],
             implicit => 0,
         );
@@ -124,12 +115,7 @@ sub register {
         tag => "$_/regexp",
         match => [ all => sub {
             my ($constructor, $event) = @_;
-            my $regex = $event->{value};
-            if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
-                $regex = $1;
-            }
-            my $qr = qr{$regex};
-            return $qr;
+            return $self->construct_regex($event->{value});
         }],
         implicit => 0,
     ) for @perl_tags;
@@ -139,12 +125,8 @@ sub register {
             my ($constructor, $event) = @_;
             my $class = $event->{tag};
             $class =~ s{^$perl_regex/regexp:}{};
-            my $regex = $event->{value};
-            if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
-                $regex = $1;
-            }
-            my $qr = qr{$regex};
-            return bless $qr, $class;
+            my $qr = $self->construct_regex($event->{value});
+            return $self->object($qr, $class);
         }],
         implicit => 0,
     );
@@ -152,7 +134,6 @@ sub register {
     $schema->add_sequence_resolver(
         tag => "$_/array",
         on_create => sub {
-            my ($constructor, $event) = @_;
             return [];
         },
     ) for @perl_tags;
@@ -162,13 +143,12 @@ sub register {
             my ($constructor, $event) = @_;
             my $class = $event->{tag};
             $class =~ s{^$perl_regex/array:}{};
-            return bless [], $class;
+            return $self->object([], $class);
         },
     );
     $schema->add_mapping_resolver(
         tag => "$_/hash",
         on_create => sub {
-            my ($constructor, $event) = @_;
             return {};
         },
     ) for @perl_tags;
@@ -178,26 +158,18 @@ sub register {
             my ($constructor, $event) = @_;
             my $class = $event->{tag};
             $class =~ s{^$perl_regex/hash:}{};
-            return bless {}, $class;
+            return $self->object({}, $class);
         },
     );
     $schema->add_mapping_resolver(
         tag => "$_/ref",
         on_create => sub {
-            my ($constructor, $event) = @_;
             my $value = undef;
             return \$value;
         },
         on_data => sub {
             my ($constructor, $ref, $list) = @_;
-            if (@$list != 2) {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            my ($key, $value) = @$list;
-            unless ($key eq '=') {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            $$ref = $value;
+            $$$ref = $self->construct_ref($list);
         },
     ) for @perl_tags;
     $schema->add_mapping_resolver(
@@ -207,37 +179,22 @@ sub register {
             my $class = $event->{tag};
             $class =~ s{^$perl_regex/ref:}{};
             my $value = undef;
-            return bless \$value, $class;
+            return $self->object(\$value, $class);
         },
         on_data => sub {
             my ($constructor, $ref, $list) = @_;
-            if (@$list != 2) {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            my ($key, $value) = @$list;
-            unless ($key eq '=') {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            $$ref = $value;
+            $$$ref = $self->construct_ref($list);
         },
     );
     $schema->add_mapping_resolver(
         tag => "$_/scalar",
         on_create => sub {
-            my ($constructor, $event) = @_;
             my $value = undef;
             return \$value;
         },
         on_data => sub {
             my ($constructor, $ref, $list) = @_;
-            if (@$list != 2) {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            my ($key, $value) = @$list;
-            unless ($key eq '=') {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            $$ref = $value;
+            $$$ref = $self->construct_scalar($list);
         },
     ) for @perl_tags;
     $schema->add_mapping_resolver(
@@ -247,18 +204,11 @@ sub register {
             my $class = $event->{tag};
             $class =~ s{^$perl_regex/scalar:}{};
             my $value = undef;
-            return bless \$value, $class;
+            return $self->object(\$value, $class);
         },
         on_data => sub {
             my ($constructor, $ref, $list) = @_;
-            if (@$list != 2) {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            my ($key, $value) = @$list;
-            unless ($key eq '=') {
-                die "Unexpected data in $perl_regex/scalar construction";
-            }
-            $$ref = $value;
+            $$$ref = $self->construct_scalar($list);
         },
     );
 
@@ -267,7 +217,7 @@ sub register {
         code => sub {
             my ($rep, $node) = @_;
             $node->{tag} = $perl_tag . "/scalar";
-            %{ $node->{data} } = ( '=' => ${ $node->{value} } );
+            $node->{data} = $self->represent_scalar($node->{value});
         },
     );
     $schema->add_representer(
@@ -275,17 +225,15 @@ sub register {
         code => sub {
             my ($rep, $node) = @_;
             $node->{tag} = $perl_tag . "/ref";
-            %{ $node->{data} } = ( '=' => ${ $node->{value} } );
+            $node->{data} = $self->represent_ref($node->{value});
         },
     );
     $schema->add_representer(
         coderef => 1,
         code => sub {
             my ($rep, $node) = @_;
-            require B::Deparse;
-            my $deparse = B::Deparse->new("-p", "-sC");
             $node->{tag} = $perl_tag . "/code";
-            $node->{data} = $deparse->coderef2text($node->{value});
+            $node->{data} = $self->represent_code($node->{value});
         },
     );
 
@@ -308,22 +256,14 @@ sub register {
                 if ($blessed eq 'Regexp') {
                     $node->{tag} = $perl_tag . "/regexp";
                 }
-                my $regex = "$node->{value}";
-                if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
-                    $regex = $1;
-                }
-                $node->{data} = $regex;
+                $node->{data} = $self->represent_regex($node->{value});
             }
             elsif ($node->{reftype} eq 'SCALAR') {
 
                 # in perl <= 5.10 regex reftype(regex) was SCALAR
                 if ($blessed eq 'Regexp') {
                     $node->{tag} = $perl_tag . '/regexp';
-                    my $regex = "$node->{value}";
-                    if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
-                        $regex = $1;
-                    }
-                    $node->{data} = $regex;
+                    $node->{data} = $self->represent_regex($node->{value});
                 }
 
                 # In perl <= 5.10 there seemed to be no better pure perl
@@ -334,25 +274,19 @@ sub register {
                     and $node->{value} =~ m/^\(\?/
                 ) {
                     $node->{tag} = $perl_tag . '/regexp:' . $blessed;
-                    my $regex = "$node->{value}";
-                    if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
-                        $regex = $1;
-                    }
-                    $node->{data} = $regex;
+                    $node->{data} = $self->represent_regex($node->{value});
                 }
                 else {
                     # phew, just a simple scalarref
-                    %{ $node->{data} } = ( '=' => ${ $node->{value} } );
+                    $node->{data} = $self->represent_scalar($node->{value});
                 }
             }
             elsif ($node->{reftype} eq 'REF') {
-                %{ $node->{data} } = ( '=' => ${ $node->{value} } );
+                $node->{data} = $self->represent_ref($node->{value});
             }
 
             elsif ($node->{reftype} eq 'CODE') {
-                require B::Deparse;
-                my $deparse = B::Deparse->new("-p", "-sC");
-                $node->{data} = $deparse->coderef2text($node->{value});
+                $node->{data} = $self->represent_code($node->{value});
             }
             else {
                 die "Reftype '$node->{reftype}' not implemented";
@@ -362,6 +296,74 @@ sub register {
         },
     );
     return;
+}
+
+sub evaluate_code {
+    my ($self, $code) = @_;
+    unless ($code =~ m/^ \s* \{ .* \} \s* \z/xs) {
+        die "Malformed code";
+    }
+    $code = "sub $code";
+    my $sub = eval $code;
+    if ($@) {
+        die "Couldn't eval code: $@>>$code<<";
+    }
+    return $sub;
+}
+
+sub construct_regex {
+    my ($self, $regex) = @_;
+    if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
+        $regex = $1;
+    }
+    my $qr = qr{$regex};
+    return $qr;
+}
+
+sub construct_scalar {
+    my ($self, $list) = @_;
+    if (@$list != 2) {
+        die "Unexpected data in perl/scalar construction";
+    }
+    my ($key, $value) = @$list;
+    unless ($key eq '=') {
+        die "Unexpected data in perl/scalar construction";
+    }
+    return $value;
+}
+
+sub construct_ref {
+    &construct_scalar;
+}
+
+sub represent_scalar {
+    my ($self, $value) = @_;
+    return { '=' => $$value };
+}
+
+sub represent_ref {
+    &represent_scalar;
+}
+
+sub represent_code {
+    my ($self, $code) = @_;
+    require B::Deparse;
+    my $deparse = B::Deparse->new("-p", "-sC");
+    return $deparse->coderef2text($code);
+}
+
+sub represent_regex {
+    my ($self, $regex) = @_;
+    $regex = "$regex";
+    if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
+        $regex = $1;
+    }
+    return $regex;
+}
+
+sub object {
+    my ($self, $data, $class) = @_;
+    return bless $data, $class;
 }
 
 1;
@@ -417,25 +419,25 @@ that is easily exploitable since it's using string C<eval>).
 You can define the style of tags you want to support:
 
     my $yp_perl_two_one = YAML::PP->new(
-        schema => [qw/ JSON Perl tag=!!+! /],
+        schema => [qw/ JSON Perl tag=!!perl+!perl /],
     );
 
 =over
 
-=item C<!>
+=item C<!perl>
 
 Only C<!perl/type> tags are supported.
 
-=item C<!!>
+=item C<!!perl>
 
 Only C<!!perl/type> tags are supported.
 
-=item C<!+!!>
+=item C<!perl+!!perl>
 
 Both C<!perl/type> and C<!!perl/tag> are supported when loading. When dumping,
 C<!perl/type> is used.
 
-=item C<!!+!>
+=item C<!!perl+!perl>
 
 Both C<!perl/type> and C<!!perl/tag> are supported when loading. When dumping,
 C<!!perl/type> is used.
@@ -666,6 +668,69 @@ YAML:
 =item register
 
 A class method called by L<YAML::PP::Schema>
+
+=item construct_ref, represent_ref
+
+Perl variables of the type C<REF> are represented in yaml like this:
+
+    --- !perl/ref
+    =:
+      a: 1
+
+C<construct_ref> returns the perl data:
+
+    my $data = YAML::PP::Schema::Perl->construct_ref([ '=', { some => 'data' } );
+    my $data = \{ a => 1 };
+
+C<represent_ref> turns a C<REF> variable into a YAML mapping:
+
+    my $data = YAML::PP::Schema::Perl->represent_ref(\{ a => 1 });
+    my $data = { '=' => { a => 1 } };
+
+=item construct_scalar, represent_scalar
+
+Perl variables of the type C<SCALAR> are represented in yaml like this:
+
+    --- !perl/scalar
+    =: string
+
+C<construct_scalar> returns the perl data:
+
+    my $data = YAML::PP::Schema::Perl->construct_ref([ '=', 'string' );
+    my $data = \'string';
+
+C<represent_scalar> turns a C<SCALAR> variable into a YAML mapping:
+
+    my $data = YAML::PP::Schema::Perl->represent_scalar(\'string');
+    my $data = { '=' => 'string' };
+
+=item construct_regex, represent_regex
+
+C<construct_regex> returns a C<qr{}> object from the YAML string:
+
+    my $qr = YAML::PP::Schema::Perl->construct_regex('foo.*');
+
+C<represent_regex> returns a string representing the regex object:
+
+    my $string = YAML::PP::Schema::Perl->represent_regex(qr{...});
+
+=item evaluate_code, represent_code
+
+C<evaluate_code> returns a code reference from a string. The string must
+start with a C<{> and end with a C<}>.
+
+    my $code = YAML::PP::Schema::Perl->evaluate_code('{ return 23 }');
+
+C<represent_code> returns a string representation of the code reference
+with the help of B::Deparse:
+
+    my $string = YAML::PP::Schema::Perl->represent_code(sub { return 23 });
+
+=item object
+
+Does the same as C<bless>:
+
+    my $object = YAML::PP::Schema::Perl->object($data, $class);
 
 =back
 

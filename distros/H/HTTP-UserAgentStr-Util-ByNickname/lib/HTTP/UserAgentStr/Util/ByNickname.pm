@@ -1,7 +1,7 @@
 package HTTP::UserAgentStr::Util::ByNickname;
 
-our $DATE = '2019-04-11'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -44,8 +44,9 @@ sub _get {
 
     my @ua;
     if ($nickname eq 'newest_firefox') {
+        my $os = $^O eq 'MSWin32' ? 'windows' : 'linux';
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{firefox} } @ua0;
+            grep { $_->{firefox} && $_->{os} eq $os } @ua0;
     } elsif ($nickname eq 'newest_firefox_linux') {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
             grep { $_->{firefox} && $_->{os} eq 'linux' } @ua0;
@@ -53,8 +54,9 @@ sub _get {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
             grep { $_->{firefox} && $_->{os} eq 'windows' } @ua0;
     } elsif ($nickname eq 'newest_chrome') {
+        my $os = $^O eq 'MSWin32' ? 'windows' : 'linux';
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
-            grep { $_->{chrome} } @ua0;
+            grep { $_->{chrome} && $_->{os} eq $os } @ua0;
     } elsif ($nickname eq 'newest_chrome_linux') {
         @ua = sort { Versioning::Scheme::Dotted->cmp_version($b->{version}, $a->{version}) }
             grep { $_->{chrome} && $_->{os} eq 'linux' } @ua0;
@@ -90,7 +92,7 @@ HTTP::UserAgentStr::Util::ByNickname - Get popular HTTP User-Agent string by nic
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::UserAgentStr::Util::ByNickname (from Perl distribution HTTP-UserAgentStr-Util-ByNickname), released on 2019-04-11.
+This document describes version 0.002 of HTTP::UserAgentStr::Util::ByNickname (from Perl distribution HTTP-UserAgentStr-Util-ByNickname), released on 2019-05-10.
 
 =head1 SYNOPSIS
 

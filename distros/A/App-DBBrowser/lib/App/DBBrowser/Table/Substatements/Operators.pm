@@ -7,7 +7,7 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw( choose );
+use Term::Choose qw();
 use Term::Form   qw();
 
 use App::DBBrowser::Auxil;
@@ -40,12 +40,13 @@ sub build_having_col {
         $aggr =~ s/\(\S\)\z//;
         $sql->{having_stmt} .= ' ' . $aggr . "(";
         $quote_aggr          =       $aggr . "(";
+        my $tc = Term::Choose->new( $sf->{i}{default} );
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         $ax->print_sql( $sql );
         # Choose
-        my $quote_col = choose(
+        my $quote_col = $tc->choose(
             [ undef, @{$sql->{cols}} ],
-            { %{$sf->{i}{lyt_stmt_h}} }
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $quote_col ) {
             return;
@@ -60,8 +61,8 @@ sub build_having_col {
 sub add_operator_with_value {
     my ( $sf, $sql, $clause, $quote_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
-    my $trs = Term::Form->new();
+    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tf = Term::Form->new();
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
@@ -92,7 +93,10 @@ sub add_operator_with_value {
             my @pre = ( undef );
             $ax->print_sql( $sql );
             # Choose
-            $op = $stmt_h->choose( [ @pre, @operators ] );
+            $op = $tc->choose(
+                [ @pre, @operators ],
+                { %{$sf->{i}{lyt_h}} }
+            );
             if ( ! defined $op ) {
                 return;
             }
@@ -107,7 +111,10 @@ sub add_operator_with_value {
                 $sql->{$stmt} .= ' ? Func/SQ';
                 $ax->print_sql( $sql );
                 # Choose
-                $op = $stmt_h->choose( [ @pre, @operators_ext ] );
+                $op = $tc->choose(
+                    [ @pre, @operators_ext ],
+                    { %{$sf->{i}{lyt_h}} }
+                );
                 if ( ! defined $op ) {
                     $sql->{$stmt} = $bu_stmt;
                     next OPERATOR;
@@ -131,7 +138,7 @@ sub add_operator_with_value {
             $ok = 1;
         }
         elsif ( $op =~ /\s%?col%?\z/ ) {
-            $ok = $sf->__col_op( $sql, $op, $stmt, $stmt_h );
+            $ok = $sf->__col_op( $sql, $op, $stmt );
         }
         elsif ( $op =~ /REGEXP(_i)?\z/ ) {
             $ok = $sf->__regex_op( $sql, $op, $stmt, $args, $quote_col );
@@ -156,8 +163,9 @@ sub add_operator_with_value {
 
 
 sub __col_op {
-    my ( $sf, $sql, $op, $stmt, $stmt_h ) = @_;
+    my ( $sf, $sql, $op, $stmt ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $arg;
     if ( $op =~ /^(.+)\s(%?col%?)\z/ ) {
         $op = $1;
@@ -174,7 +182,10 @@ sub __col_op {
             my @pre = ( undef, $sf->{i}{ok} );
             my @choices = ( @{$sf->{aggregate}}, map( '@' . $_,  @{$sql->{aggr_cols}} ) );
             # Choose
-            my $aggr = $stmt_h->choose( [ @pre, @choices ] );
+            my $aggr = $tc->choose(
+                [ @pre, @choices ],
+                { %{$sf->{i}{lyt_h}} }
+            );
             if ( ! defined $aggr ) {
                 return;
             }
@@ -186,7 +197,10 @@ sub __col_op {
         }
         else {
             # Choose
-            $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => 'Col:' } );
+            $quote_col = $tc->choose(
+                $sql->{cols},
+                { %{$sf->{i}{lyt_h}}, prompt => 'Col:' }
+            );
         }
         if ( ! defined $quote_col ) {
             return;
@@ -237,9 +251,9 @@ sub __regex_op {
     $sql->{$stmt} .= $regex_op;
     push @{$sql->{$args}}, '...';
     $ax->print_sql( $sql );
-    my $trs = Term::Form->new();
+    my $tf = Term::Form->new();
     # Readline
-    my $value = $trs->readline( 'Pattern: ' );
+    my $value = $tf->readline( 'Pattern: ' );
     if ( ! defined $value ) {
         return;
     }
@@ -253,7 +267,7 @@ sub __regex_op {
 sub __in_op {
     my ( $sf, $sql, $op, $stmt, $args, $ext_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $trs = Term::Form->new();
+    my $tf = Term::Form->new();
     $sql->{$stmt} .= ' ' . $op;
     if ( $ext_col ) {                           #
         $ext_col =~ s/^\s*\(|\)\s*\z//g;        #
@@ -266,7 +280,7 @@ sub __in_op {
     IN: while ( 1 ) {
         $ax->print_sql( $sql );
         # Readline
-        my $value = $trs->readline( 'Value: ' );
+        my $value = $tf->readline( 'Value: ' );
         if ( ! defined $value ) {
             return;
         }
@@ -287,7 +301,7 @@ sub __in_op {
 sub __between_op {
     my ( $sf, $sql, $op, $stmt, $args ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $trs = Term::Form->new();
+    my $tf = Term::Form->new();
     $sql->{$stmt} .= ' ' . $op;
     #if ( $ext_col ) {                       #
     #    $sql->{$stmt} .= ' ' . $ext_col;    #
@@ -295,7 +309,7 @@ sub __between_op {
     #}                                       #
     $ax->print_sql( $sql );
     # Readline
-    my $value_1 = $trs->readline( 'Value 1: ' );
+    my $value_1 = $tf->readline( 'Value 1: ' );
     if ( ! defined $value_1 ) {
         return;
     }
@@ -303,7 +317,7 @@ sub __between_op {
     push @{$sql->{$args}}, $value_1;
     $ax->print_sql( $sql );
     # Readline
-    my $value_2 = $trs->readline( 'Value 2: ' );
+    my $value_2 = $tf->readline( 'Value 2: ' );
     if ( ! defined $value_2 ) {
         return;
     }
@@ -316,7 +330,7 @@ sub __between_op {
 sub __default_op {
     my ( $sf, $sql, $op, $stmt, $args, $ext_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $trs = Term::Form->new();
+    my $tf = Term::Form->new();
     $sql->{$stmt} .= ' ' . $op;
     if ( $ext_col ) {                       #
         $sql->{$stmt} .= ' ' . $ext_col;    #
@@ -325,7 +339,7 @@ sub __default_op {
     $ax->print_sql( $sql );
     my $prompt = $op =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
     # Readline
-    my $value = $trs->readline( $prompt );
+    my $value = $tf->readline( $prompt );
     if ( ! defined $value ) {
         return;
     }

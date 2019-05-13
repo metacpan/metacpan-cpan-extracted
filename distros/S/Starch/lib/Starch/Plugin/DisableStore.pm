@@ -1,7 +1,7 @@
 package Starch::Plugin::DisableStore;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -29,11 +29,10 @@ to the old store, only read.
 use Types::Standard -types;
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::ForStore
-);
+with 'Starch::Plugin::ForStore';
 
 =head1 OPTIONAL STORE ARGUMENTS
 
@@ -99,9 +98,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

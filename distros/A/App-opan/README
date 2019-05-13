@@ -24,11 +24,6 @@ SYNOPSIS
       $ opan cpanm --installdeps .
       $ opan carton install
 
-NOTA BENE
-    This is systems software, in its relatively early days. It may contain
-    horrible bugs. It may turn out to need redesigning in not entirely
-    compatible ways. I hope neither, but I can't guarantee that yet.
-
 DESCRIPTION
     Two basic approaches to using this thing. First, if you're using carton,
     you can probably completely ignore the pinning system, so just do:
@@ -240,6 +235,12 @@ DESCRIPTION
   recurring pull
     Set ENV OPAN_RECURRING_PULL to a true value to make opan automatically
     pull from upstream every 600 seconds
+
+  custom upstream
+    Set the ENV var OPAN_MIRROR to specify a cpan mirror - the default is
+    www.cpan.org. Remember that if you need to temporarily overlay your
+    overlay but only for one user, there's nothing stopping you setting
+    OPAN_MIRROR to another opan.
 
 AUTHOR
     Matt S. Trout (mst) <mst@shadowcat.co.uk>

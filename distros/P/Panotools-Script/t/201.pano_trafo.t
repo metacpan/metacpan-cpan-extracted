@@ -10,7 +10,7 @@ use Panotools::Script;
 
 my $pto = new Panotools::Script;
 
-unless (`pano_trafo`)
+unless (`pano_trafo --help`)
 {
     print STDERR "pano_trafo not found, skipping tests...\n";
     ok(1);

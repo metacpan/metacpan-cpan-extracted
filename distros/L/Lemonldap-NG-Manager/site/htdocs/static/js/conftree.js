@@ -18,6 +18,11 @@ function templates(tpl,key) {
             "title" : "casAppMetaDataOptionsService"
          },
          {
+            "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsUserAttribute",
+            "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsUserAttribute",
+            "title" : "casAppMetaDataOptionsUserAttribute"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsRule",
             "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsRule",
             "title" : "casAppMetaDataOptionsRule"
@@ -405,6 +410,20 @@ function templates(tpl,key) {
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientSecret",
                   "title" : "oidcRPMetaDataOptionsClientSecret",
                   "type" : "password"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
+                  "title" : "oidcRPMetaDataOptionsPublic",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
+                  "title" : "oidcRPMetaDataOptionsRequirePKCE",
+                  "type" : "bool"
                }
             ],
             "id" : "oidcRPMetaDataOptionsAuthentication",
@@ -1140,20 +1159,8 @@ function templates(tpl,key) {
             "id" : tpl+"s/"+key+"/"+"vhostType",
             "select" : [
                {
-                  "k" : "Main",
-                  "v" : "Main"
-               },
-               {
-                  "k" : "Zimbra",
-                  "v" : "ZimbraPreAuth"
-               },
-               {
                   "k" : "AuthBasic",
                   "v" : "AuthBasic"
-               },
-               {
-                  "k" : "SecureToken",
-                  "v" : "SecureToken"
                },
                {
                   "k" : "CDA",
@@ -1168,8 +1175,24 @@ function templates(tpl,key) {
                   "v" : "DevOpsST"
                },
                {
+                  "k" : "Main",
+                  "v" : "Main"
+               },
+               {
+                  "k" : "OAuth2",
+                  "v" : "OAuth2"
+               },
+               {
+                  "k" : "SecureToken",
+                  "v" : "SecureToken"
+               },
+               {
                   "k" : "ServiceToken",
                   "v" : "ServiceToken"
+               },
+               {
+                  "k" : "Zimbra",
+                  "v" : "ZimbraPreAuth"
                }
             ],
             "title" : "vhostType",

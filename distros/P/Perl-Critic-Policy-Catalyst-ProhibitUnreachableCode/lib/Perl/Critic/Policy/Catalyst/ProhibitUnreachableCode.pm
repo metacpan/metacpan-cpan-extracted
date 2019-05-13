@@ -1,8 +1,8 @@
 package Perl::Critic::Policy::Catalyst::ProhibitUnreachableCode;
-use 5.008001;
+our $VERSION = '0.02';
+
 use strict;
 use warnings;
-our $VERSION = '0.01';
 
 use Readonly;
 
@@ -171,8 +171,7 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::Catalyst::ProhibitUnreachableCode -
-Don't write code after an unconditional Catalyst detach.
+Perl::Critic::Policy::Catalyst::ProhibitUnreachableCode - Don't write code after an unconditional Catalyst detach.
 
 =head1 DESCRIPTION
 
@@ -233,11 +232,6 @@ Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode GitHub issue tracker:
 
 L<https://github.com/bluefeet/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode/issues>
 
-=head1 AUTHORS
-
-    Aran Clary Deltac <bluefeet@gmail.com>
-    Peter Guzis <pguzis@cpan.org>
-
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
@@ -245,18 +239,27 @@ for encouraging their employees to contribute back to the open
 source ecosystem.  Without their dedication to quality software
 development this distribution would not exist.
 
-=head1 LICENSE
+=head1 AUTHORS
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Peter Guzis <pguzis@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2019 Aran Clary Deltac
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 78
-#   indent-tabs-mode: nil
-#   c-indentation-style: bsd
-# End:
-# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

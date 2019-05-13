@@ -12,6 +12,25 @@
 
 static const char* MFILE = "SPVM/IO/File.c";
 
+int32_t SPNATIVE__SPVM__IO__File__fileno(SPVM_ENV* env, SPVM_VALUE* stack) {
+  // Self
+  void* obj_self = stack[0].oval;
+  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
+  
+  // File fh
+  void* obj_fh;
+  SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
+
+  if (fh == NULL) { SPVM_DIE("File handle must be defined", MFILE, __LINE__); }
+  
+  int32_t fno = fileno(fh);
+  
+  stack[0].ival = fno;
+
+  return SPVM_SUCCESS;
+}
+
 int32_t SPNATIVE__SPVM__IO__File__readline(SPVM_ENV* env, SPVM_VALUE* stack) {
   // Self
   void* obj_self = stack[0].oval;
@@ -20,7 +39,7 @@ int32_t SPNATIVE__SPVM__IO__File__readline(SPVM_ENV* env, SPVM_VALUE* stack) {
   // File fh
   void* obj_fh;
   SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
-  void* fh = (FILE*)env->pointer(env, obj_fh);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
 
   if (fh == NULL) {
     stack[0].oval = NULL;
@@ -98,7 +117,7 @@ int32_t SPNATIVE__SPVM__IO__File__seek(SPVM_ENV* env, SPVM_VALUE* stack) {
   // File fh
   void* obj_fh;
   SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
-  void* fh = (FILE*)env->pointer(env, obj_fh);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
   
   // Offset
   int64_t offset = stack[1].lval;
@@ -122,7 +141,7 @@ int32_t SPNATIVE__SPVM__IO__File__close(SPVM_ENV* env, SPVM_VALUE* stack) {
   // File fh
   void* obj_fh;
   SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
-  void* fh = (FILE*)env->pointer(env, obj_fh);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
   
   if (fh) {
     int32_t ret = fclose(fh);
@@ -147,7 +166,7 @@ int32_t SPNATIVE__SPVM__IO__File__read(SPVM_ENV* env, SPVM_VALUE* stack) {
   // File fh
   void* obj_fh;
   SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
-  void* fh = (FILE*)env->pointer(env, obj_fh);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
 
   // Buffer
   void* obj_buffer = stack[1].oval;
@@ -178,7 +197,9 @@ int32_t SPNATIVE__SPVM__IO__File__write(SPVM_ENV* env, SPVM_VALUE* stack) {
   // File fh
   void* obj_fh;
   SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
-  void* fh = (FILE*)env->pointer(env, obj_fh);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
+
+  int32_t length = stack[2].ival;
 
   // Buffer
   void* obj_buffer = stack[1].oval;
@@ -187,7 +208,6 @@ int32_t SPNATIVE__SPVM__IO__File__write(SPVM_ENV* env, SPVM_VALUE* stack) {
     return SPVM_SUCCESS;
   }
   char* buffer = (char*)env->belems(env, obj_buffer);
-  int32_t length = env->len(env, obj_buffer);
   
   int32_t read_length = fwrite(buffer, 1, length, fh);
   
@@ -205,7 +225,7 @@ int32_t SPNATIVE__SPVM__IO__File__putc(SPVM_ENV* env, SPVM_VALUE* stack) {
   // File fh
   void* obj_fh;
   SPVM_OFIELD(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::FileHandle", MFILE, __LINE__);
-  void* fh = (FILE*)env->pointer(env, obj_fh);
+  FILE* fh = (FILE*)env->pointer(env, obj_fh);
   
   // Char
   char ch = (char)stack[0].bval;
@@ -412,8 +432,8 @@ int32_t SPNATIVE__SPVM__IO__File__EOF(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPNATIVE__SPVM__IO__File__STDIN(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef STDIN
-  stack[0].ival = STDIN;
+#ifdef stdin
+  stack[0].ival = fileno(stdin);
 #else
   SPVM_DIE("Errno STDIN is not defined", MFILE, __LINE__);
 #endif
@@ -422,10 +442,20 @@ int32_t SPNATIVE__SPVM__IO__File__STDIN(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPNATIVE__SPVM__IO__File__STDOUT(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef STDOUT
-  stack[0].ival = STDOUT;
+#ifdef stdout
+  stack[0].ival = fileno(stdout);
 #else
   SPVM_DIE("Errno STDOUT is not defined", MFILE, __LINE__);
+#endif
+
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__IO__File__STDERR(SPVM_ENV* env, SPVM_VALUE* stack) {
+#ifdef stdout
+  stack[0].ival = fileno(stderr);
+#else
+  SPVM_DIE("Errno STDERR is not defined", MFILE, __LINE__);
 #endif
 
   return SPVM_SUCCESS;

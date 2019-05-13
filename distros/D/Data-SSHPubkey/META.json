@@ -4,7 +4,7 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -33,6 +33,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
+            "File::Temp" : "0",
             "perl" : "5.010000",
             "strict" : "0"
          }
@@ -40,6 +41,7 @@
       "test" : {
          "requires" : {
             "File::Spec" : "0",
+            "File::Which" : "0",
             "Test::Most" : "0",
             "lib" : "0"
          }
@@ -51,6 +53,6 @@
          "url" : "https://github.com/thrig/Data-SSHPubkey"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

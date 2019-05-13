@@ -3,8 +3,8 @@ NAME
     operations
 
 VERSION
-    This document describes version 0.001 of Tie::Array::Log (from Perl
-    distribution Tie-Array-Log), released on 2019-04-16.
+    This document describes version 0.002 of Tie::Array::Log (from Perl
+    distribution Tie-Array-Log), released on 2019-05-12.
 
 SYNOPSIS
      use Tie::Array::Log;
@@ -18,7 +18,7 @@ SYNOPSIS
 DESCRIPTION
     This class implements tie interface for array but performs regular array
     operations, except logging the operation with Log::ger. It's basically
-    used for testing or benchmarking.
+    used for testing, benchmarking, and documentation only.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -39,6 +39,12 @@ SEE ALSO
     perltie
 
     Log::ger
+
+    Tie::Scalar::Log, Tie::Hash::Log, Tie::Handle::Log.
+
+    Tie::Array, Tie::StdArray
+
+    Tie::Simple
 
 AUTHOR
     perlancar <perlancar@cpan.org>

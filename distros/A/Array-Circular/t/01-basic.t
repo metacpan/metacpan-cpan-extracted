@@ -19,35 +19,49 @@ is $a->loops, 0, "back to zero loops";
 
 
 subtest 'first loop' => sub {
-  $a->next for 1 .. 4;
-  $a->next;
-  is ($a->current, "one", "Wrapped around 1");
-  is ($a->loops, 1, "Been around 1 time");
+    $a->next for 1 .. 4;
+    $a->next;
+    is ($a->current, "one", "Wrapped around 1");
+    is ($a->loops, 1, "Been around 1 time");
 };
 
 subtest 'second loop' => sub {
-  $a->next for 1 .. 4;
-  $a->next;
-  is ($a->current, "one", "Wrapped around 2");
-  is ($a->loops, 2, "Been around 2 time");
+    $a->next for 1 .. 4;
+    $a->next;
+    is ($a->current, "one", "Wrapped around 2");
+    is ($a->loops, 2, "Been around 2 time");
 };
 
 subtest 'first backwards' => sub {
-  $a->previous;
-  is ($a->current, 'five', 'end of list');
-  is ($a->loops, 1, 'went down one count');
-  $a->previous for 1 .. 5;
-  is $a->loops, 0, 'went down one count';
-  $a->previous for 1 .. 5;
-  is $a->loops, -1, 'went down one count';
+    $a->previous;
+    is ($a->current, 'five', 'end of list');
+    is ($a->loops, 1, 'went down one count');
+    $a->previous for 1 .. 5;
+    is $a->loops, 0, 'went down one count';
+    $a->previous for 1 .. 5;
+    is $a->loops, -1, 'went down one count';
 
 };
 
 subtest 'test reset' => sub {
-  is $a->current, 'five', "last element";
-  is $a->reset, 'one', 'back to beginning';
-  is $a->loops, 0, "Reset loop counter too";
+    is $a->current, 'five', "last element";
+    is $a->reset, 'one', 'back to beginning';
+    is $a->loops, 0, "Reset loop counter too";
 };
+
+for ( 1 .. $a->size) {
+    subtest "test peek and size for starting index $_" => sub {
+        for (0 .. $a->size ) {
+            my $expected = $a->peek($_);
+            my $got = $a->[($_ + $a->index) % $a->size];
+            is $got, $expected, "peeking $_: $expected and $got are the same";
+        }
+    };
+}
+
+
+
+    
 
 
 done_testing;

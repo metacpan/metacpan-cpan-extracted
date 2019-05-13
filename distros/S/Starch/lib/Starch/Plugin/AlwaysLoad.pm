@@ -1,7 +1,24 @@
 package Starch::Plugin::AlwaysLoad;
-use 5.008001;
+our $VERSION = '0.14';
+
+use Moo::Role;
 use strictures 2;
-our $VERSION = '0.13';
+use namespace::clean;
+
+with 'Starch::Plugin::ForState';
+
+after BUILD => sub{
+    my ($self) = @_;
+
+    $self->data();
+
+    return;
+};
+
+1;
+__END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -21,26 +38,6 @@ from the store as soon as the state object is created.  By default
 the state data is only retrieved from the store when it is first
 accessed.
 
-=cut
-
-use Moo::Role;
-use namespace::clean;
-
-with qw(
-    Starch::Plugin::ForState
-);
-
-after BUILD => sub{
-    my ($self) = @_;
-
-    $self->data();
-
-    return;
-};
-
-1;
-__END__
-
 =head1 SUPPORT
 
 See L<Starch/SUPPORT>.
@@ -49,9 +46,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

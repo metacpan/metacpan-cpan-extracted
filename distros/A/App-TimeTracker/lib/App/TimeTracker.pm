@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = "2.027";
+our $VERSION = "2.028";
 # ABSTRACT: time tracking for impatient and lazy command line lovers
 
 use App::TimeTracker::Data::Task;
@@ -307,7 +307,7 @@ App::TimeTracker - time tracking for impatient and lazy command line lovers
 
 =head1 VERSION
 
-version 2.027
+version 2.028
 
 =head1 SYNOPSIS
 

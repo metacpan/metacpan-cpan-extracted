@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 our %EXPORT_TAGS = ( 'all' => [qw($simpleHashKeys $doubleHashKeys $specialNodeKeys $casAppMetaDataNodeKeys $casSrvMetaDataNodeKeys $oidcOPMetaDataNodeKeys $oidcRPMetaDataNodeKeys $samlIDPMetaDataNodeKeys $samlSPMetaDataNodeKeys $virtualHostKeys $specialNodeHash $authParameters $issuerParameters $samlServiceParameters $oidcServiceParameters $casServiceParameters)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -24,10 +24,10 @@ our $specialNodeHash = {
 our $doubleHashKeys = 'issuerDBGetParameters';
 our $simpleHashKeys = '(?:(?:l(?:o(?:calSessionStorageOption|goutService)|dapExportedVar|wp(?:Ssl)?Opt)|re(?:moteGlobalStorageOption|st2f(?:Verify|Init)Arg|loadUrl)|c(?:as(?:StorageOption|Attribute)|ustomAddParam|ombModule)|(?:(?:d(?:emo|bi)|facebook|webID)E|e)xportedVar|g(?:r(?:antSessionRule|oup)|lobalStorageOption)|n(?:otificationStorageOption|ginxCustomHandler)|p(?:ersistentStorageOption|ortalSkinRule)|macro)s|o(?:idcS(?:erviceMetaDataAuthnContext|torageOptions)|penIdExportedVars)|s(?:(?:amlStorageOption|laveExportedVar)s|essionDataToRemember)|a(?:ut(?:hChoiceMod|oSigninR)ules|pplicationList)|S(?:MTPTLSOpts|SLVarIf))';
 our $specialNodeKeys = '(?:(?:(?:saml(?:ID|S)|oidc[OR])P|cas(?:App|Srv))MetaDataNode|virtualHost)s';
-our $casAppMetaDataNodeKeys = 'casAppMetaData(?:Options(?:Servic|Rul)e|ExportedVars)';
+our $casAppMetaDataNodeKeys = 'casAppMetaData(?:Options(?:UserAttribut|Servic|Rul)e|ExportedVars)';
 our $casSrvMetaDataNodeKeys = 'casSrvMetaData(?:Options(?:ProxiedServices|DisplayName|SortNumber|Gateway|Renew|Icon|Url)|ExportedVars)';
 our $oidcOPMetaDataNodeKeys = 'oidcOPMetaData(?:Options(?:C(?:lient(?:Secret|ID)|heckJWTSignature|onfigurationURI)|S(?:toreIDToken|ortNumber|cope)|TokenEndpointAuthMethod|(?:JWKSTimeou|Promp)t|I(?:DTokenMaxAge|con)|U(?:iLocales|seNonce)|Display(?:Name)?|AcrValues|MaxAge)|ExportedVars|J(?:SON|WKS))';
-our $oidcRPMetaDataNodeKeys = 'oidcRPMetaData(?:Options(?:(?:PostLogoutRedirectUri|ExtraClaim)s|I(?:DToken(?:Expiration|SignAlg)|con)|Logout(?:SessionRequired|Type|Url)|AccessTokenExpiration|R(?:edirectUris|ule)|Client(?:Secret|ID)|BypassConsent|DisplayName|UserIDAttr)|ExportedVars)';
+our $oidcRPMetaDataNodeKeys = 'oidcRPMetaData(?:Options(?:I(?:DToken(?:Expiration|SignAlg)|con)|Logout(?:SessionRequired|Type|Url)|R(?:e(?:directUris|quirePKCE)|ule)|P(?:ostLogoutRedirectUris|ublic)|AccessTokenExpiration|Client(?:Secret|ID)|BypassConsent|DisplayName|ExtraClaims|UserIDAttr)|ExportedVars)';
 our $samlIDPMetaDataNodeKeys = 'samlIDPMetaData(?:Options(?:(?:Check(?:S[LS]OMessageSignatur|Audienc|Tim)|EncryptionMod|UserAttribut|DisplayNam)e|S(?:ignS[LS]OMessage|toreSAMLToken|[LS]OBinding|ortNumber)|A(?:llow(?:LoginFromIDP|ProxiedAuthn)|daptSessionUtime)|Re(?:questedAuthnContext|solutionRule|layStateURL)|Force(?:Authn|UTF8)|I(?:sPassive|con)|NameIDFormat)|ExportedAttributes|XML)';
 our $samlSPMetaDataNodeKeys = 'samlSPMetaData(?:Options(?:N(?:ameID(?:SessionKey|Format)|otOnOrAfterTimeout)|S(?:essionNotOnOrAfterTimeout|ignS[LS]OMessage)|(?:CheckS[LS]OMessageSignatur|OneTimeUs|Rul)e|En(?:ableIDPInitiatedURL|cryptionMode)|ForceUTF8)|ExportedAttributes|XML)';
 our $virtualHostKeys = '(?:vhost(?:A(?:uthnLevel|liases)|(?:Maintenanc|Typ)e|Https|Port)|(?:exportedHeader|locationRule)s|post)';

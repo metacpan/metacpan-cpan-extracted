@@ -1,3 +1,9 @@
+0.500   2019-05-10 (PERLANCAR)
+
+	- Set User-Agent to newest Firefox in an attempt to avoid being
+	  detected as 'malware' by BCA.
+
+
 0.49    2017-07-20 (PERLANCAR)
 
 	- [dist] Bump prereq version Log::ger to 0.019 for the bug fix

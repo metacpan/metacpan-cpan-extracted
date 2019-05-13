@@ -639,7 +639,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 6.4
+version 6.5
 
 =head1 SYNOPSIS
 

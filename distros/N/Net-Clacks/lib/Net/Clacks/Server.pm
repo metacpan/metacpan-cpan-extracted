@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.1;
+our $VERSION = 5.2;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -19,6 +19,7 @@ use Errno;
 use IO::Socket::IP;
 use IO::Select;
 use IO::Socket::SSL;
+use YAML::Syck;
 use MIME::Base64;
 
 # For turning off SSL session cache
@@ -103,6 +104,12 @@ sub init {
     }
     $self->{authtoken} = encode_base64($self->{config}->{username}, '') . ':' . encode_base64($self->{config}->{password}, '');
 
+    if(defined($self->{config}->{persistancefile})) {
+        $self->{persistance} = 1;
+    } else {
+        $self->{persistance} = 0;
+    }
+
     my @tcpsockets;
 
     foreach my $ip (@{$config->{ip}}) {
@@ -120,6 +127,7 @@ sub init {
     }
 
     $self->{tcpsockets} = \@tcpsockets;
+
 
     print "Ready.\n";
 
@@ -152,8 +160,21 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     $SIG{INT} = sub { $keepRunning = 0; };
     $SIG{TERM} = sub { $keepRunning = 0; };
 
+    # Restore persistance file if required
+    if($self->{persistance} && -f $self->{config}->{persistancefile}) {
+        if(open(my $ifh, '<', $self->{config}->{persistancefile})) {
+            my $line = <$ifh>;
+            close $ifh;
+            chomp $line;
+            $line = decode_base64($line);
+            $line = Load($line);
+            %clackscache = %{$line};
+        }
+    }
+
     while($keepRunning) {
         my $workCount = 0;
+        my $savecache = 0;
 
         # Check for shutdown time
         if($shutdowntime && $shutdowntime < time) {
@@ -584,6 +605,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         push @outbox, \%tmp;
                     } elsif($clients{$cid}->{buffer} =~ /^STORE\ (.+?)\=(.*)/) {
                         $clackscache{$1} = $2;
+                        $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^RETRIEVE\ (.+)/) {
                         #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
                         my $ckey = $1;
@@ -598,6 +620,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         if(defined($clackscache{$ckey})) {
                             delete $clackscache{$ckey};
                         }
+                        $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^INCREMENT\ (.+)/) {
                         my $ckey = $1;
                         my $cval = 1;
@@ -610,6 +633,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         } else {
                             $clackscache{$ckey} = $cval;
                         }
+                        $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^DECREMENT\ (.+)/) {
                         my $ckey = $1;
                         my $cval = 1;
@@ -622,6 +646,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         } else {
                             $clackscache{$ckey} = 0 - $cval;
                         }
+                        $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^KEYLIST/) {
                         $clients{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
                         foreach my $ckey (sort keys %clackscache) {
@@ -746,6 +771,18 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             }
         }
 
+        if($savecache) {
+            $savecache = 0;
+            if($self->{persistance}) {
+                my $line = Dump(\%clackscache);
+                $line = encode_base64($line, '');
+                if(open(my $ofh, '>', $self->{config}->{persistancefile})) {
+                    print $ofh $line, "\n";
+                    close $ofh;
+                }
+            }
+        }
+
         if($workCount) {
             $self->{usleep} = 0;
         } elsif($self->{usleep} < $self->{config}->{throttle}->{maxsleep}) {
@@ -767,6 +804,19 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
 
     return;
+}
+
+sub deref {
+    my ($self, $val) = @_;
+
+    return if(!defined($val));
+
+    while(ref($val) eq "SCALAR" || ref($val) eq "REF") {
+        $val = ${$val};
+        last if(!defined($val));
+    }
+
+    return $val;
 }
 
 1;

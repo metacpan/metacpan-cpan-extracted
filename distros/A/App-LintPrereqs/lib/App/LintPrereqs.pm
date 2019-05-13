@@ -1,7 +1,7 @@
 package App::LintPrereqs;
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.540'; # VERSION
 
 use 5.010001;
 use strict;
@@ -190,7 +190,7 @@ e.g.:
 
     [versions]
     Bencher=0.30
-    Log::Any::IfLOG=0.07
+    Log::ger=0.19
     ...
 
 then if there is a prereq specified less than the minimum versions,
@@ -282,8 +282,8 @@ sub lint_prereqs {
     my $ct = do {
         open my($fh), "<", "dist.ini" or die "Can't open dist.ini: $!";
         local $/;
-        binmode $fh, ":utf8";
-        ~~<$fh>;
+        binmode $fh, ":encoding(utf8)";
+        scalar <$fh>;
     };
     return [200, "Not run (no-lint-prereqs)"] if $ct =~ /^;!no[_-]lint[_-]prereqs$/m;
 
@@ -396,11 +396,16 @@ sub lint_prereqs {
     );
     log_trace("mods_from_scanned: %s", \%mods_from_scanned);
 
-    if ($mods_from_ini{Any}{perl} && $mods_from_scanned{Any}{perl}) {
+    if ($mods_from_scanned{Any}{perl}) {
+        return [500, "Perl version specified by source code ($mods_from_scanned{Any}{perl}) ".
+                    "but not specified in dist.ini"] unless $mods_from_ini{Any}{perl};
         if (version_ne($mods_from_ini{Any}{perl}, $mods_from_scanned{Any}{perl})) {
             return [500, "Perl version from dist.ini ($mods_from_ini{Any}{perl}) ".
                         "and scan_prereqs ($mods_from_scanned{Any}{perl}) mismatch"];
         }
+    } else {
+        return [500, "Perl version not specified by source code but specified in dist.ini ".
+                    "($mods_from_ini{Any}{perl})"] if $mods_from_ini{Any}{perl};
     }
 
     my $versions;
@@ -622,7 +627,7 @@ sub lint_prereqs {
             # create dist.ini~ first
             if (-f "dist.ini~") { unlink "dist.ini~" or return [500, "Can't unlink dist.ini~: $!"] }
             sysopen my($fh), "dist.ini~", O_WRONLY|O_CREAT|O_EXCL or return [500, "Can't create dist.ini~: $!"];
-            binmode $fh, ":utf8"; print $fh $ct; close $fh or return [500, "Can't write to dist.ini~: $!"];
+            binmode $fh, ":encoding(utf8)"; print $fh $ct; close $fh or return [500, "Can't write to dist.ini~: $!"];
 
             # run the commands
           FIX:
@@ -675,7 +680,7 @@ App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.53 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2017-07-08.
+This document describes version 0.540 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2019-05-12.
 
 =head1 SYNOPSIS
 
@@ -688,7 +693,7 @@ This document describes version 0.53 of App::LintPrereqs (from Perl distribution
 
 Usage:
 
- lint_prereqs(%args) -> [status, msg, result, meta]
+ lint_prereqs(%args) -> [status, msg, payload, meta]
 
 Check extraneous/missing/incorrect prerequisites in dist.ini.
 
@@ -731,7 +736,7 @@ e.g.:
 
  [versions]
  Bencher=0.30
- Log::Any::IfLOG=0.07
+ Log::ger=0.19
  ...
 
 then if there is a prereq specified less than the minimum versions,
@@ -793,7 +798,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -821,7 +826,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

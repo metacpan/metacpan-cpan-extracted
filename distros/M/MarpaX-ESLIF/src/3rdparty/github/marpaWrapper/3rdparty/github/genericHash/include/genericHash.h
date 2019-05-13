@@ -414,7 +414,9 @@ typedef struct genericHash {
 #define GENERICHASH_FIND_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, index) _GENERICHASH_FIND_REMOVE_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, index, 0)
 #define GENERICHASH_REMOVE_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, index) _GENERICHASH_FIND_REMOVE_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, index, 1)
 
-#define GENERICHASH_RESET(hashName, userDatavp) do {                    \
+/* Take care: keyStackp and valStackp are always inside hash structure, i.e. this is a RESET for them, even in FREE mode, never a RELAX */
+/* .........: subStack's are always on the stack: i.e. this is a FREE for them, even in RESET mode, RELAX is supported */
+#define _GENERICHASH_DISPOSE(hashName, userDatavp, freeb, relaxb, resetb) do { \
     int _usedi  = GENERICSTACK_USED(hashName->keyStackp);		\
     int _i;								\
     short _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL);     \
@@ -443,75 +445,36 @@ typedef struct genericHash {
               }								\
             }								\
           }								\
-          GENERICSTACK_FREE(_subKeyStackp);				\
-          GENERICSTACK_FREE(_subValStackp);				\
+          if (freeb || resetb) {                                        \
+            GENERICSTACK_FREE(_subKeyStackp);                          \
+            GENERICSTACK_FREE(_subValStackp);                           \
+          } else if (relaxb) {                                          \
+            GENERICSTACK_RELAX(_subKeyStackp);                          \
+            GENERICSTACK_RELAX(_subValStackp);                          \
+          }                                                             \
         }                                                               \
-      }                                                                 \
+      }									\
     } else {                                                            \
-      /* GENERICSTACK_FREE is NULL protected */                         \
       for (_i = 0; _i < _usedi; _i++) {					\
         if ((GENERICSTACKITEMTYPE(hashName->keyStackp, _i) == GENERICSTACKITEMTYPE_PTR) && \
             (GENERICSTACKITEMTYPE(hashName->valStackp, _i) == GENERICSTACKITEMTYPE_PTR)) { \
           genericStack_t *_subKeyStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->keyStackp, _i); \
           genericStack_t *_subValStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->valStackp, _i); \
                                                                         \
-          GENERICSTACK_FREE(_subKeyStackp);                             \
-          GENERICSTACK_FREE(_subValStackp);				\
+          if (freeb || resetb) {                                        \
+            GENERICSTACK_FREE(_subKeyStackp);                           \
+            GENERICSTACK_FREE(_subValStackp);                           \
+          } else if (relaxb) {                                          \
+            GENERICSTACK_RELAX(_subKeyStackp);                          \
+            GENERICSTACK_RELAX(_subValStackp);                          \
+          }                                                             \
         }                                                               \
-      }                                                                 \
+      }									\
     }                                                                   \
-    GENERICSTACK_RESET(hashName->keyStackp);				\
-    GENERICSTACK_RESET(hashName->valStackp);				\
-    									\
-    hashName->error = 0;						\
-    hashName->used = 0;							\
-  } while (0)
-
-#define GENERICHASH_RELAX(hashName, userDatavp) do {                    \
-    int _usedi  = GENERICSTACK_USED(hashName->keyStackp);		\
-    int _i;								\
-    short _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL);     \
-    short _valFreeFunctionb = (hashName->valFreeFunctionp != NULL);     \
                                                                         \
-    if (_keyFreeFunctionb || _valFreeFunctionb) {                       \
-      for (_i = 0; _i < _usedi; _i++) {					\
-        if ((GENERICSTACKITEMTYPE(hashName->keyStackp, _i) == GENERICSTACKITEMTYPE_PTR) && \
-            (GENERICSTACKITEMTYPE(hashName->valStackp, _i) == GENERICSTACKITEMTYPE_PTR)) { \
-          genericStack_t *_subKeyStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->keyStackp, _i); \
-          genericStack_t *_subValStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->valStackp, _i); \
-          int             _subStackusedi = GENERICSTACK_USED(_subKeyStackp); \
-          int             _j;						\
-                                                                        \
-          for (_j = 0; _j < _subStackusedi; _j++) {			\
-            if (_keyFreeFunctionb && (GENERICSTACKITEMTYPE(_subKeyStackp, _j) == GENERICSTACKITEMTYPE_PTR)) { \
-              GENERICSTACKITEMTYPE2TYPE_PTR _keyValp = GENERICSTACK_GET_PTR(_subKeyStackp, _j); \
-              if (_keyValp != NULL) {					\
-                hashName->keyFreeFunctionp(userDatavp, &_keyValp);      \
-              }								\
-            }								\
-            if (_valFreeFunctionb && (GENERICSTACKITEMTYPE(_subValStackp, _j) == GENERICSTACKITEMTYPE_PTR)) { \
-              GENERICSTACKITEMTYPE2TYPE_PTR _valValp = GENERICSTACK_GET_PTR(_subValStackp, _j); \
-              if (_valValp != NULL) {					\
-                hashName->valFreeFunctionp(userDatavp, &_valValp);      \
-              }								\
-            }								\
-          }								\
-          GENERICSTACK_RESET(_subKeyStackp);                            \
-          GENERICSTACK_RESET(_subValStackp);                            \
-        }                                                               \
-      }									\
-    } else {                                                            \
-      /* GENERICSTACK_RESET is NULL protected */                        \
-      for (_i = 0; _i < _usedi; _i++) {					\
-        if ((GENERICSTACKITEMTYPE(hashName->keyStackp, _i) == GENERICSTACKITEMTYPE_PTR) && \
-            (GENERICSTACKITEMTYPE(hashName->valStackp, _i) == GENERICSTACKITEMTYPE_PTR)) { \
-          genericStack_t *_subKeyStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->keyStackp, _i); \
-          genericStack_t *_subValStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->valStackp, _i); \
-                                                                        \
-          GENERICSTACK_RESET(_subKeyStackp);                            \
-          GENERICSTACK_RESET(_subValStackp);                            \
-        }                                                               \
-      }									\
+    if (freeb || resetb) {                                              \
+      GENERICSTACK_RESET(hashName->keyStackp);                          \
+      GENERICSTACK_RESET(hashName->valStackp);                          \
     }                                                                   \
                                                                         \
     hashName->error = 0;                                                \
@@ -520,10 +483,14 @@ typedef struct genericHash {
 
 #define GENERICHASH_FREE(hashName, userDatavp) do {                     \
     if (hashName != NULL) {						\
-      GENERICHASH_RESET(hashName, userDatavp);				\
+      _GENERICHASH_DISPOSE(hashName, userDatavp, 1 /* freeb */, 0 /* relaxb */, 0 /* resetb */); \
       free(hashName);							\
       hashName = NULL;							\
     }									\
   } while (0)
+
+#define GENERICHASH_RELAX(hashName, userDatavp) _GENERICHASH_DISPOSE(hashName, userDatavp, 0 /* freeb */, 1 /* relaxb */, 0 /* resetb */)
+
+#define GENERICHASH_RESET(hashName, userDatavp) _GENERICHASH_DISPOSE(hashName, userDatavp, 0 /* freeb */, 0 /* relaxb */, 1 /* resetb */)
 
 #endif /* GENERICHASH_H */

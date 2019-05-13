@@ -4,10 +4,12 @@ use Mojo::Util   ();
 use Carp         ();
 use Scalar::Util ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $served_compressed_asset;
-my @compression_types = ({ext => 'br', encoding => 'br'}, {ext => 'gz', encoding => 'gzip'});
+my @compression_types = (
+    {ext => 'br', encoding => 'br',   _lc_encoding => 'br'},
+    {ext => 'gz', encoding => 'gzip', _lc_encoding => 'gzip'});
 
 sub compression_types {
     return \@compression_types if @_ == 1;
@@ -33,7 +35,7 @@ sub compression_types {
 
             $exts{$_} = $encodings{$_} = 1;
 
-            push @new_types, {ext => $_, encoding => $_};
+            push @new_types, {ext => $_, encoding => $_, _lc_encoding => lc($_)};
         } elsif ($reftype eq 'HASH') {
             my ($ext, $encoding) = (delete $_->{ext}, delete $_->{encoding});
             Carp::croak 'passed empty ext'      unless defined $ext      and $ext ne '';
@@ -46,7 +48,7 @@ sub compression_types {
 
             $exts{$ext} = $encodings{$encoding} = 1;
 
-            push @new_types, {ext => $ext, encoding => $encoding};
+            push @new_types, {ext => $ext, encoding => $encoding, _lc_encoding => lc($encoding)};
         } else {
             Carp::croak 'passed illegal value to compression_types. Each value of '
                 . 'the ARRAY ref must be a scalar or a HASH ref with only the '
@@ -144,7 +146,7 @@ before serve_asset => sub {
     my $lc_accept_encoding = lc($accept_encoding);
     return
         unless my @compression_possibilities
-        = grep { index($lc_accept_encoding, lc($_->{encoding})) != -1 } @compression_types;
+        = grep { index($lc_accept_encoding, $_->{_lc_encoding}) != -1 } @compression_types;
 
     unless ($compressed_asset and $compression_type) {
         for my $type (@compression_possibilities) {
@@ -226,7 +228,7 @@ serves pre-compressed versions of static assets
   $app->static
       ->with_roles('+Compressed')
       ->compression_types(['br', {ext => 'gzip', encoding => 'gzip'}]) # default ext for gzip is 'gz'. This could also be done as ['br', 'gzip']
-      ->should_serve_asset(sub { $_->path =~ /\.(html|js|css)$/i }); # only try to serve compressed html, js, and css assets. $_ contains a Mojo::Asset::File
+      ->should_serve_asset(sub { $_->path =~ /\.(html|js|css)$/i }); # only try to serve compressed html, js, and css assets. $_ contains the Mojo::Asset::File to be served
 
   # Look for compressed versions of all assets
   $app->static

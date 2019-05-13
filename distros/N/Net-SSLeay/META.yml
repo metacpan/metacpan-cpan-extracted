@@ -1,32 +1,35 @@
 ---
 abstract: 'Perl extension for using OpenSSL'
 author:
-  - 'Maintained by Mike McCauley and Florian Ragwitz since November 2005'
+  - 'Sampo KellomÃ¤ki <sampo@iki.fi>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Mike McCauley <mikem@airspayce.com>'
+  - 'Chris Novakovic <chris@chrisn.me.uk>'
+  - 'Tuure Vartiainen <vartiait@radiatorsoftware.com>'
+  - 'Heikki Vatiainen <hvn@radiatorsoftware.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: '0'
+  Test::More: 0.60_01
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
-license: perl
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-SSLeay
 no_index:
   directory:
-    - examples
-    - ext
-    - helper_script
-    - inc
     - t
+    - inc
+    - helper_script
+    - examples
 requires:
-  MIME::Base64: 0
-  Test::More: 0.60_01
-  perl: '5.005'
+  MIME::Base64: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=net-ssleay
-  license: http://dev.perl.org/licenses/
-  repository: http://svn.debian.org/wsvn/net-ssleay
-version: '1.85'
+  repository: https://github.com/radiator-software/p5-net-ssleay
+version: '1.88'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

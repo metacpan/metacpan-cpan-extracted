@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2019-05-12'; # DATE
+our $VERSION = '0.540'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -28,7 +28,7 @@ lint-prereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.53 of lint-prereqs (from Perl distribution App-LintPrereqs), released on 2017-07-08.
+This document describes version 0.540 of lint-prereqs (from Perl distribution App-LintPrereqs), released on 2019-05-12.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ e.g.:
 
  [versions]
  Bencher=0.30
- Log::Any::IfLOG=0.07
+ Log::ger=0.19
  ...
 
 then if there is a prereq specified less than the minimum versions,
@@ -165,17 +165,15 @@ given some weird code.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -370,7 +368,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

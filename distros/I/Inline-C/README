@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Inline::C version 0.80.
+    This document describes Inline::C version 0.81.
 
 DESCRIPTION
 
@@ -347,7 +347,7 @@ C-PERL BINDINGS
     that any number of SV*s may follow. Again you will need to pop the
     values off of the Stack yourself.
 
-    See "Examples" below.
+    See "EXAMPLES" below.
 
 THE INLINE STACK MACROS
 
@@ -500,7 +500,7 @@ EXAMPLES
     file which gets included by default, automatically loads the standard C
     header files for you.
 
-        use Inline C;
+        use Inline 'C';
         greet('Ingy');
         greet(42);
         __END__
@@ -522,7 +522,7 @@ EXAMPLES
     program segfaults, a common occurrence when delving into the guts of
     Perl.
 
-        use Inline C;
+        use Inline 'C';
         greet('Ingy');
         greet(42);
         __END__
@@ -539,7 +539,7 @@ EXAMPLES
     Since we don't care about the length, we can just put PL_na there,
     which is a special variable designed for that purpose.
 
-        use Inline C;
+        use Inline 'C';
         greet('Ingy');
         greet(42);
         __END__

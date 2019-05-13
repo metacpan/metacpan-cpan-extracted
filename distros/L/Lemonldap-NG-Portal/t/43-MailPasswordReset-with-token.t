@@ -24,14 +24,14 @@ SKIP: {
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => 'error',
-                useSafeJail                => 1,
-                portalDisplayRegister      => 1,
-                authentication             => 'Demo',
-                userDB                     => 'Same',
-                passwordDB                 => 'Demo',
-                captcha_mail_enabled       => 0,
-                requireToken               => '$env->{ipAddr} !~ /127\.0\.[1-3]\.1/',
+                logLevel              => 'error',
+                useSafeJail           => 1,
+                portalDisplayRegister => 1,
+                authentication        => 'Demo',
+                userDB                => 'Same',
+                passwordDB            => 'Demo',
+                captcha_mail_enabled  => 0,
+                requireToken          => '$env->{ipAddr} !~ /127\.0\.[1-3]\.1/',
                 portalDisplayResetPassword => 1,
                 portalMainLogo             => 'common/logos/logo_llng_old.png',
             }

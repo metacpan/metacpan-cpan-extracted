@@ -4,7 +4,7 @@
 "click2Register":"انقر هنا لتأكيد تسجيل حسابك",
 "click2Reset":"انقر هنا لإعادة تعيين كلمة المرور",
 "hello":"مرحبا ",
-"mail2fSubject":"[LemonLDAP::NG] Your login code",
+"mail2fSubject":"[LemonLDAP::NG] تسجيل الدخول الخاص بك هو ",
 "mailConfirmSubject":"تأكيد إعادة تعيين كلمة المرور[LemonLDAP::NG]",
 "mailSubject":"كلمة المرور الجديدة [LemonLDAP::NG]",
 "newPwdIs":"كلمة المرور الجديدة هي",

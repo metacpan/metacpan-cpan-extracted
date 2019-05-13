@@ -2,7 +2,7 @@ NAME
   Alien::LibBigWig - Fetch/build/stash libBigWig headers and libs from https://github.com/dpryan79/libBigWig
 
 VERSION
-  Version 0.3.3
+  Version 0.4.3
 
 SYNOPSIS
   Example of finding the headers and library that Alien::HTSlib installed.
@@ -19,7 +19,7 @@ DESCRIPTION
   well-known location, "File::ShareDir::dist_dir('Alien-LibBigWig')", from
   whence other packages can make use of them.
 
-  The version installed will be version 0.3.3.
+  The version installed will be version 0.4.3.
 
 COPYRIGHT AND LICENSE
 

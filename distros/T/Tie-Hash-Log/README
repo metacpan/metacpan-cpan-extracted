@@ -1,0 +1,57 @@
+NAME
+    Tie::Hash::Log - Tied hash that behaves like a regular hash, but logs
+    operations
+
+VERSION
+    This document describes version 0.001 of Tie::Hash::Log (from Perl
+    distribution Tie-Hash-Log), released on 2019-05-12.
+
+SYNOPSIS
+     use Tie::Hash::Log;
+
+     tie my %hash, 'Tie::Hash::Log';
+
+     # use like you would a regular hash
+     $hash{one} = 'value';
+     ...
+
+DESCRIPTION
+    This class implements tie interface for hash but performs regular hash
+    operations, except logging the operation with Log::ger. It's basically
+    used for testing, benchmarking, or documentation only.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tie-Hash-Log>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tie-Hash-Log>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Hash-Log>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    perltie
+
+    Log::ger
+
+    Tie::Array::Log, Tie::Hash::Log, Tie::Handle::Log.
+
+    Tie::Hash, Tie::StdHash, Tie::ExtraHash
+
+    Tie::Simple
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

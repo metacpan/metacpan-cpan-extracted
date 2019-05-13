@@ -84,9 +84,10 @@ if ($Config{'useperlio'}) {
 
 	# Link file tests
 	SKIP: {
-		my $can_hardlink = link 't/00_lowlevel.t', 'xt/hardlink';
+		my $can_hardlink;
+		eval {  $can_hardlink = link 't/00_lowlevel.t', 'xt/hardlink'; 1 };
 
-		skip('this OS does not seem to support hard links', 1) if (!$can_hardlink);
+		skip('this OS does not seem to support hard links', 1) if (!$can_hardlink || $^O eq 'MSWin32');
 
 		# add a file and its hard link
 		@filerefs = ( 't/00_lowlevel.t', 'xt/hardlink' );

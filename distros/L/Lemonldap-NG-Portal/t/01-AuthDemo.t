@@ -41,10 +41,9 @@ ok(
     'Auth query'
 );
 count(1);
-ok(
-    $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
-    'jdoe rejected with PE_BADCREDENTIALS'
-) or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+    'jdoe rejected with PE_BADCREDENTIALS' )
+  or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )
@@ -63,16 +62,14 @@ ok(
     'Auth query'
 );
 count(1);
-ok(
-    $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
-    'dwho rejected with PE_BADCREDENTIALS'
-) or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+    'dwho rejected with PE_BADCREDENTIALS' )
+  or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
-
 
 # Try to authenticate with good password
 # --------------------------------------

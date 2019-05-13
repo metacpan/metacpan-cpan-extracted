@@ -1,7 +1,7 @@
 package Starch::Manager;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -24,23 +24,21 @@ L<Starch/METHOD PROXIES>.
 
 =cut
 
+use Digest::SHA qw( sha1_hex );
+use Scalar::Util qw( refaddr );
 use Starch::State;
 use Starch::Util qw( croak );
 use Storable qw( freeze dclone );
-use Scalar::Util qw( refaddr );
-use Digest::SHA qw( sha1_hex );
-
-use Types::Standard -types;
-use Types::Common::String -types;
 use Types::Common::Numeric -types;
+use Types::Common::String -types;
+use Types::Standard -types;
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Role::Log
-    MooX::MethodProxyArgs
-);
+with 'Starch::Role::Log';
+with 'MooX::MethodProxyArgs';
 
 # Declare BUILD so roles can apply method modifiers to it.
 sub BUILD {
@@ -337,9 +335,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

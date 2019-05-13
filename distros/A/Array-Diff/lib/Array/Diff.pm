@@ -1,12 +1,12 @@
 package Array::Diff;
+$Array::Diff::VERSION = '0.09';
 use strict;
 use warnings;
 use base qw/Class::Accessor::Fast/;
 
-use Algorithm::Diff;
+use Algorithm::Diff 1.19;
 eval q{ use Algorithm::Diff::XS; };
 
-our $VERSION = '0.07';
 
 __PACKAGE__->mk_accessors(qw/added deleted count diff_class/);
 
@@ -18,17 +18,20 @@ Array::Diff - Find the differences between two arrays
 
     my @old = ( 'a', 'b', 'c' );
     my @new = ( 'b', 'c', 'd' );
-    
+
     my $diff = Array::Diff->diff( \@old, \@new );
-    
+
     $diff->count   # 2
     $diff->added   # [ 'd' ];
     $diff->deleted # [ 'a' ];
 
 =head1 DESCRIPTION
 
-This module compares two arrays and returns the added or deleted elements
-in two separate arrays.  It's a simple wrapper around L<Algorithm::Diff>.
+This module compares two B<pre-sorted> arrays
+and returns the added or deleted elements in two separate arrays.
+It's a simple wrapper around L<Algorithm::Diff>.
+
+B<Note>: the arrays must be sorted before you call C<diff>.
 
 And if you need more complex array tools, check L<Array::Compare>.
 
@@ -59,7 +62,7 @@ examined using the corresponding methods.
 This method may be invoked as an object method, in which case it will
 recalculate the differences and repopulate the C<count>, C<added>, and
 C<removed> properties, or as a static method, in which case it will
-return a newly-created C<Array::Diff> object with the properies
+return a newly-created C<Array::Diff> object with the properties
 set appropriately.
 
 =cut
@@ -76,13 +79,12 @@ sub diff {
     while ( $diff->Next ) {
         next if $diff->Same;
 
-        $self->{count}++;
+        my @deleted = $diff->Items(1);
+        my @added = $diff->Items(2);
 
-        push @{ $self->{deleted} }, $diff->Items(1)
-            if $diff->Items(1);
-
-        push @{ $self->{added} }, $diff->Items(2)
-            if $diff->Items(2);
+        $self->{count} += @added + @deleted;
+        push @{$self->{deleted}}, @deleted if @deleted;
+        push @{$self->{added}}, @added if @added;
     }
 
     $self;
@@ -111,7 +113,27 @@ the C<added> and C<deleted> properties.
 
 =head1 SEE ALSO
 
-L<Algorithm::Diff>
+L<Array::Compare> - performs the same function as this module,
+but has options for controlling how it works.
+
+L<List::Compare> - similar functionality, but again with more options.
+
+L<Algorithm::Diff> - the underlying implementation of the diff algorithm.
+If you've got L<Algorithm::Diff::XS> installed, that will be used.
+
+L<YAML::Diff> - find difference between two YAML documents.
+
+L<HTML::Differences> - find difference between two HTML documents.
+This uses a more sane approach than L<HTML::Diff>.
+
+L<XML::Diff> - find difference between two XML documents.
+
+L<Hash::Diff> - find the differences between two Perl hashes.
+
+L<Data::Diff> - find difference between two arbitrary data structures.
+
+L<Text::Diff> - can find difference between two inputs, which can be
+data structures or file names.
 
 =head1 AUTHOR
 

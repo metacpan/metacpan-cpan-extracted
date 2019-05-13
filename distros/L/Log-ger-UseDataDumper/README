@@ -3,8 +3,8 @@ NAME
     data structures
 
 VERSION
-    This document describes version 0.001 of Log::ger::UseDataDumper (from
-    Perl distribution Log-ger-UseDataDumper), released on 2018-06-10.
+    This document describes version 0.002 of Log::ger::UseDataDumper (from
+    Perl distribution Log-ger-UseDataDumper), released on 2019-05-08.
 
 SYNOPSIS
      use Log::ger::UseDataDumper;
@@ -21,6 +21,7 @@ DESCRIPTION
      Indent => 1,
      Purity => 1,
      Terse  => 1,
+     Useqq  => 1,
 
     This module also lets you configure Data::Dumper during import (see
     example in Synopsis).
@@ -52,7 +53,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

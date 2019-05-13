@@ -1,5 +1,18 @@
 revision history for Data-SSHPubkey. see also the git repo
 
+0.06    2019-05-13
+        test for and ignore (with a warning) test errors from
+        olden versions of ssh-keygen(1) that do not support the -m
+        flag, #129536
+
+0.05    2019-05-10
+        add $max_keys limit, new convert_pubkeys (that calls
+        ssh-keygen), fix key types parsed to match what is in the
+        %ssh_pubkey_types hash
+
+0.04    2019-05-09
+        add $max_lines limit to avoid parsing too many lines
+
 0.03    2019-03-04
         support passed filehandles (pairs well with ssh-keyscan). more
         docs, more tests

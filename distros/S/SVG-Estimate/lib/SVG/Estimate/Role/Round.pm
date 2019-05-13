@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::Round;
-$SVG::Estimate::Role::Round::VERSION = '1.0113';
+$SVG::Estimate::Role::Round::VERSION = '1.0114';
 use strict;
 use Moo::Role;
 
@@ -9,7 +9,7 @@ SVG::Estimate::Role::Round - Round to the nearest thousandth
 
 =head1 VERSION
 
-version 1.0113
+version 1.0114
 
 =head1 METHODS
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.200';
+our $VERSION = '2.202';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -14,7 +14,7 @@ use Encode::Locale qw( decode_argv );
 use File::HomeDir  qw();
 use File::Which    qw( which );
 
-use Term::Choose            qw( choose );
+use Term::Choose            qw();
 use Term::Choose::Constants qw( :screen );
 use Term::TablePrint        qw( print_table );
 
@@ -39,19 +39,19 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        lyt_m         => { undef => '<<'                                                                 },
-        lyt_v_clear   => { undef => '  BACK', layout => 3,                      clear_screen => 1        },
-        lyt_stmt_h    => { undef => '<<',     layout => 1, prompt => 'Choose:', order => 0, justify => 2 },
-        lyt_stmt_v    => { undef => '  BACK', layout => 3, prompt => 'Choose:'                           },
-        quit          => 'QUIT',
-        back          => 'BACK',
-        confirm       => 'CONFIRM',
-        _quit         => '  QUIT',
-        _back         => '  BACK',
-        _continue     => '  CONTINUE',
-        _confirm      => '  CONFIRM',
-        _reset        => '  RESET',
-        ok            => '-OK-',
+        default     => { undef => '<<', prompt => 'Choose:' },
+        lyt_h       => { order => 0, justify => 2 },
+        lyt_v       => { undef => '  BACK', layout => 3, },
+        lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
+        quit        => 'QUIT',
+        back        => 'BACK',
+        confirm     => 'CONFIRM',
+        _quit       => '  QUIT',
+        _back       => '  BACK',
+        _continue   => '  CONTINUE',
+        _confirm    => '  CONFIRM',
+        _reset      => '  RESET',
+        ok          => '-OK-',
     };
     return bless { i => $info }, $class;
 }
@@ -63,6 +63,8 @@ sub __init {
     if ( ! $home ) {
         print "'File::HomeDir->my_home()' could not find the home directory!\n";
         print "'db-browser' requires a home directory\n";
+        print CLEAR_TO_END_OF_SCREEN;
+        print SHOW_CURSOR;
         exit;
     }
     my $config_home;
@@ -82,7 +84,6 @@ sub __init {
     $sf->{i}{f_dir_history} = catfile $app_dir, 'dir_history.json';
     $sf->{i}{f_subqueries}  = catfile $app_dir, 'subqueries.json';
     $sf->{i}{f_copy_paste}  = catfile $app_dir, 'tmp_copy_and_paste.csv';
-    # check all info
 
     if ( ! eval {
         my $opt_get = App::DBBrowser::Opt::Get->new( $sf->{i}, {} );
@@ -94,10 +95,7 @@ sub __init {
         );
         if ( $help ) {
             if ( $sf->{o}{table}{mouse} ) {
-                for my $key ( keys %{$sf->{i}} ) {
-                    next if $key !~ /^lyt_/;
-                    $sf->{i}{$key}{mouse} = $sf->{o}{table}{mouse};
-                }
+                $sf->{i}{default}{mouse} = $sf->{o}{table}{mouse};
             }
             print CLEAR_SCREEN; #
             require App::DBBrowser::Opt::Set;
@@ -116,28 +114,33 @@ sub __init {
         }
     }
     if ( $sf->{o}{table}{mouse} ) {
-        for my $key ( keys %{$sf->{i}} ) {
-            next if $key !~ /^lyt_/;
-            $sf->{i}{$key}{mouse} = $sf->{o}{table}{mouse};
-        }
+        $sf->{i}{default}{mouse} = $sf->{o}{table}{mouse};
     }
 }
 
+END {
+    print CLEAR_TO_END_OF_SCREEN;
+    print SHOW_CURSOR;
+}
 
 sub run {
     my ( $sf ) = @_;
-    $sf->__init();
     local $SIG{INT} = sub {
-        unlink $sf->{i}{f_copy_paste} if -e $sf->{i}{f_copy_paste};
+        unlink $sf->{i}{f_copy_paste} if defined $sf->{i}{f_copy_paste} && -e $sf->{i}{f_copy_paste};
         delete $ENV{TC_RESET_AUTO_UP} if exists $ENV{TC_RESET_AUTO_UP};
+        print CLEAR_TO_END_OF_SCREEN;
+        print SHOW_CURSOR;
         exit;
     };
+    print HIDE_CURSOR;
+    $sf->__init();
     $ENV{TC_RESET_AUTO_UP} = 0;
-    my $lyt_v_clear = Term::Choose->new( $sf->{i}{lyt_v_clear} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
+    my $old_idx_plugin = 0;
 
-    DB_PLUGIN: while ( 1 ) {
+    PLUGIN: while ( 1 ) {
 
         my $plugin;
         if ( @{$sf->{o}{G}{plugins}} == 1 ) {
@@ -146,13 +149,27 @@ sub run {
             print CLEAR_SCREEN;
         }
         else {
+            my $choices_plugins = [ undef, map { "- $_" } @{$sf->{o}{G}{plugins}} ];
             # Choose
-            $plugin = choose(
-                [ undef, @{$sf->{o}{G}{plugins}} ],
-                { %{$sf->{i}{lyt_m}}, order => 0, clear_screen => 1,
-                  justify => 2, prompt => 'DB Plugin: ', undef => $sf->{i}{quit} }
+            my $idx_plugin = $tc->choose(
+                $choices_plugins,
+                { %{$sf->{i}{lyt_v_clear}}, prompt => 'DB Plugin: ', index => 1, default => $old_idx_plugin,
+                  undef => $sf->{i}{_quit} }
             );
-            last DB_PLUGIN if ! defined $plugin;
+            if ( defined $idx_plugin ) {
+                $plugin = $choices_plugins->[$idx_plugin];
+            }
+            if ( ! defined $plugin ) {
+                last PLUGIN;
+            }
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $old_idx_plugin == $idx_plugin && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx_plugin = 0;
+                    next PLUGIN;
+                }
+                $old_idx_plugin = $idx_plugin;
+            }
+            $plugin =~ s/^[-\ ]\s//;
         }
         $plugin = 'App::DBBrowser::DB::' . $plugin;
         $sf->{i}{plugin} = $plugin;
@@ -165,8 +182,8 @@ sub run {
             1 }
         ) {
             $ax->print_error_message( $@, 'load plugin' );
-            next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-            last DB_PLUGIN;
+            next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
+            last PLUGIN;
         }
 
         # DATABASES
@@ -188,13 +205,13 @@ sub run {
         ) {
             $ax->print_error_message( $@, 'Available databases' );
             $sf->{i}{login_error} = 1;
-            next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-            last DB_PLUGIN;
+            next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
+            last PLUGIN;
         }
         if ( ! @databases ) {
             $ax->print_error_message( "$plugin: no databases found\n" );
-            next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-            last DB_PLUGIN;
+            next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
+            last PLUGIN;
         }
         my $db;
         my $old_idx_db = 0;
@@ -220,17 +237,17 @@ sub run {
                 my $prompt = 'Choose Database:';
                 my $choices_db = [ undef, @databases ];
                 # Choose
-                my $idx_db = $lyt_v_clear->choose(
+                my $idx_db = $tc->choose(
                     $choices_db,
-                    { prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
+                    { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
                 );
                 $db = undef;
                 if ( defined $idx_db ) {
                     $db = $choices_db->[$idx_db];
                 }
                 if ( ! defined $db ) {
-                    next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-                    last DB_PLUGIN;
+                    next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
+                    last PLUGIN;
                 }
                 if ( $sf->{o}{G}{menu_memory} ) {
                     if ( $old_idx_db == $idx_db && ! $ENV{TC_RESET_AUTO_UP} ) {
@@ -255,9 +272,9 @@ sub run {
                 # remove database from @databases
                 $sf->{i}{login_error} = 1;
                 $dbh->disconnect() if defined $dbh || $dbh->{Active};
-                next DATABASE  if @databases              > 1;
-                next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-                last DB_PLUGIN;
+                next DATABASE if @databases              > 1;
+                next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
+                last PLUGIN;
             }
             $sf->{d} = {
                 db       => $db,
@@ -298,9 +315,9 @@ sub run {
             ) {
                 $ax->print_error_message( $@, 'Get schema names' );
                 $dbh->disconnect();
-                next DATABASE  if @databases              > 1;
-                next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-                last DB_PLUGIN;
+                next DATABASE if @databases              > 1;
+                next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
+                last PLUGIN;
             }
             my $old_idx_sch = 0;
 
@@ -329,18 +346,18 @@ sub run {
                     my $prompt = $db_string . ' - choose Schema:';
                     my $choices_schema = [ undef, @schemas ];
                     # Choose
-                    my $idx_sch = $lyt_v_clear->choose(
+                    my $idx_sch = $tc->choose(
                         $choices_schema,
-                        { prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
+                        { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
                     );
                     if ( defined $idx_sch ) {
                         $schema = $choices_schema->[$idx_sch];
                     }
                     if ( ! defined $schema ) {
                         $dbh->disconnect();
-                        next DATABASE  if @databases              > 1;
-                        next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-                        last DB_PLUGIN;
+                        next DATABASE if @databases              > 1;
+                        next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
+                        last PLUGIN;
                     }
                     if ( $sf->{o}{G}{menu_memory} ) {
                         if ( $old_idx_sch == $idx_sch && ! $ENV{TC_RESET_AUTO_UP} ) {
@@ -371,8 +388,8 @@ sub run {
                     next SCHEMA    if @schemas                > 1;
                     $dbh->disconnect();
                     next DATABASE  if @databases              > 1;
-                    next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
-                    last DB_PLUGIN;
+                    next PLUGIN    if @{$sf->{o}{G}{plugins}} > 1;
+                    last PLUGIN;
                 }
                 my ( $user_tables, $sys_tables ) = ( [], [] );
                 for my $table ( keys %$tables_info ) {
@@ -412,9 +429,9 @@ sub run {
                         push @$choices_table, $db_setting                      if $sf->{o}{enable}{db_settings};
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
-                        my $idx_tbl = $lyt_v_clear->choose(
+                        my $idx_tbl = $tc->choose(
                             $choices_table,
-                            { prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
+                            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
                         );
                         if ( defined $idx_tbl ) {
                             $table = $choices_table->[$idx_tbl];
@@ -423,8 +440,8 @@ sub run {
                             next SCHEMA         if @schemas                > 1;
                             $dbh->disconnect();
                             next DATABASE       if @databases              > 1;
-                            next DB_PLUGIN      if @{$sf->{o}{G}{plugins}} > 1;
-                            last DB_PLUGIN;
+                            next PLUGIN         if @{$sf->{o}{G}{plugins}} > 1;
+                            last PLUGIN;
                         }
                         if ( $sf->{o}{G}{menu_memory} ) {
                             if ( $old_idx_tbl == $idx_tbl && ! $ENV{TC_RESET_AUTO_UP} ) {
@@ -454,7 +471,7 @@ sub run {
                         next TABLE;
                     }
                     if ( $table eq $hidden ) {
-                        $sf->__create_drop_or_attach( $lyt_v_clear, $table );
+                        $sf->__create_drop_or_attach( $table );
                         if ( $sf->{redo_db} ) {
                             $dbh->disconnect();
                             next DATABASE;
@@ -517,6 +534,8 @@ sub run {
     }
     # END of App
     delete $ENV{TC_RESET_AUTO_UP};
+    print CLEAR_TO_END_OF_SCREEN;
+    print SHOW_CURSOR;
 }
 
 
@@ -552,9 +571,12 @@ sub __browse_the_table {
 
 
 sub __create_drop_or_attach {
-    my ( $sf, $lyt_v_clear, $table ) = @_;
+    my ( $sf, $table ) = @_;
     my $old_idx = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 0;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
+    require App::DBBrowser::CreateTable;
+    require App::DBBrowser::AttachDB;
 
     HIDDEN: while ( 1 ) {
         my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
@@ -574,9 +596,9 @@ sub __create_drop_or_attach {
         }
         my @pre = ( undef );
         # Choose
-        my $idx = $lyt_v_clear->choose(
+        my $idx = $tc->choose(
             [ @pre, @choices ],
-            { prompt => $sf->{d}{db_string}, index => 1, default => $old_idx, undef => '  <=' }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => $sf->{d}{db_string}, index => 1, default => $old_idx, undef => '  <=' }
         );
         if ( ! $idx ) {
             return;
@@ -591,7 +613,7 @@ sub __create_drop_or_attach {
         die if $idx < @pre;
         my $choice = $choices[$idx-@pre];
         if ( $choice =~ /^-\ (?:CREATE|DROP)/ ) {
-            require App::DBBrowser::CreateTable;
+            #require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
                 if ( ! eval { $ct->create_table(); 1 } ) {
@@ -620,7 +642,7 @@ sub __create_drop_or_attach {
             return;
         }
         elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
-            require App::DBBrowser::AttachDB;
+            #require App::DBBrowser::AttachDB;
             my $att = App::DBBrowser::AttachDB->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $changed;
             if ( $choice eq $attach_databases ) {
@@ -694,7 +716,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.200
+Version 2.202
 
 =head1 DESCRIPTION
 

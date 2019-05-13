@@ -149,8 +149,8 @@ sub zeroConf {
         'locationRules'       => {
             "auth.$domain" => {
                 '(?#checkUser)^/checkuser' => '$uid eq "dwho"',
-                '(?#errors)^/lmerror/' => 'accept',
-                'default' => 'accept'
+                '(?#errors)^/lmerror/'     => 'accept',
+                'default'                  => 'accept'
             },
             "test1.$domain" => {
                 'default'  => 'accept',
@@ -162,7 +162,8 @@ sub zeroConf {
             },
             "manager.$domain" => {
                 'default' => '$uid eq "dwho" or $uid eq "rtyler"',
-                '(?#Configuration)^/(manager\.html|confs|$)' => '$uid eq "dwho"',
+                '(?#Configuration)^/(manager\.html|confs|$)' =>
+                  '$uid eq "dwho"',
                 '(?#Sessions)/sessions' => '$uid eq "dwho" or $uid eq "rtyler"',
                 '(?#Notifications)/notifications' =>
                   '$uid eq "dwho" or $uid eq "rtyler"',

@@ -784,7 +784,7 @@ static int marpaESLIFLua_installi(lua_State *L)
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_EVENTTYPE_AFTER);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_EVENTTYPE_EXHAUSTED);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_EVENTTYPE_DISCARD);
-  
+
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_VALUE_TYPE_UNDEF);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_VALUE_TYPE_CHAR);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_VALUE_TYPE_SHORT);
@@ -802,20 +802,24 @@ static int marpaESLIFLua_installi(lua_State *L)
 #ifdef MARPAESLIF_HAVE_LONG_LONG
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_VALUE_TYPE_LONG_LONG);
 #endif
-  
+
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_RULE_IS_ACCESSIBLE);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_RULE_IS_NULLABLE);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_RULE_IS_NULLING);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_RULE_IS_LOOP);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_RULE_IS_PRODUCTIVE);
-  
+
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_IS_ACCESSIBLE);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_IS_NULLABLE);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_IS_NULLING);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_IS_PRODUCTIVE);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_IS_START);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_IS_TERMINAL);
-  
+
+  MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_EVENT_COMPLETION);
+  MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_EVENT_NULLED);
+  MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOL_EVENT_PREDICTION);
+
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOLTYPE_TERMINAL);
   MARPAESLIFLUA_CREATEINTEGERCONSTANT(L, MARPAESLIF_SYMBOLTYPE_META);
 
@@ -2108,9 +2112,6 @@ static int marpaESLIFLua_marpaESLIFGrammar_newi(lua_State *L)
 {
   static const char              *funcs = "marpaESLIFLua_marpaESLIFGrammar_newi";
   marpaESLIFLuaContext_t         *marpaESLIFLuaContextp;
-  int                            ngrammari;
-  int                            i;
-  marpaESLIFGrammarDefaults_t    marpaESLIFGrammarDefaults;
   marpaESLIFLuaGrammarContext_t *marpaESLIFLuaGrammarContextp;
   marpaESLIFGrammarOption_t      marpaESLIFGrammarOption = {
     NULL, /* bytep */
@@ -2891,6 +2892,7 @@ static int  marpaESLIFLua_marpaESLIFGrammar_currentSymbolPropertiesi(lua_State *
   MARPAESLIFLUA_STORE_INTEGER      (L, "priority",                   symbolProperty.priorityi);
   MARPAESLIFLUA_STORE_ACTION       (L, "nullableAction",             symbolProperty.nullableActionp);
   MARPAESLIFLUA_STORE_INTEGER      (L, "propertyBitSet",             symbolProperty.propertyBitSet);
+  MARPAESLIFLUA_STORE_INTEGER      (L, "eventBitSet",                symbolProperty.eventBitSet);
 
   rci = 1;
   goto done;
@@ -2963,6 +2965,7 @@ static int  marpaESLIFLua_marpaESLIFGrammar_symbolPropertiesByLeveli(lua_State *
   MARPAESLIFLUA_STORE_INTEGER      (L, "priority",                   symbolProperty.priorityi);
   MARPAESLIFLUA_STORE_ACTION       (L, "nullableAction",             symbolProperty.nullableActionp);
   MARPAESLIFLUA_STORE_INTEGER      (L, "propertyBitSet",             symbolProperty.propertyBitSet);
+  MARPAESLIFLUA_STORE_INTEGER      (L, "eventBitSet",                symbolProperty.eventBitSet);
 
   rci = 1;
   goto done;
@@ -3784,7 +3787,6 @@ static short marpaESLIFLua_pushValueb(marpaESLIFLuaValueContext_t *marpaESLIFLua
   static const char       *funcs = "marpaESLIFLua_pushValueb";
   lua_State               *L     = marpaESLIFLuaValueContextp->L;
   marpaESLIFValueResult_t *marpaESLIFValueResultp;
-  marpaESLIFValueResult_t  marpaESLIFValueResult;
 
   /* fprintf(stdout, "... push value %s start\n", marpaESLIFLuaValueContextp->actions); fflush(stdout); fflush(stderr); */
   if (marpaESLIFValueResultLexemep != NULL) {

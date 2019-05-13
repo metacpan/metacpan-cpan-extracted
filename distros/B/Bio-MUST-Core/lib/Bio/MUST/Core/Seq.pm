@@ -2,7 +2,7 @@ package Bio::MUST::Core::Seq;
 # ABSTRACT: Nucleotide or protein sequence
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Seq::VERSION = '0.190900';
+$Bio::MUST::Core::Seq::VERSION = '0.191300';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -15,7 +15,8 @@ use feature qw(say);
 use Carp;
 
 use Bio::MUST::Core::Types;
-use Bio::MUST::Core::Constants qw(:seqtypes :gaps);
+use Bio::MUST::Core::Constants qw(:seqtypes :seqids :gaps);
+use aliased 'Bio::MUST::Core::SeqId';
 
 has 'seq_id' => (
     is       => 'rw',
@@ -194,13 +195,22 @@ sub trim {
 
 
 sub pad_to {
-    my $self = shift;
+    my $self  = shift;
     my $bound = shift;
 
     $self->append_seq( q{ } x ($bound - $self->seq_len) );
     return $self;
 }
 
+
+sub clear_new_tag {
+    my $self = shift;
+
+    (my $full_id = $self->full_id) =~ s{$NEW_TAG\z}{}xms;
+    $self->set_seq_id( SeqId->new( full_id => $full_id ) );
+
+    return $self;
+}
 
 # site-wise methods (0-numbered)
 
@@ -348,7 +358,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.190900
+version 0.191300
 
 =head1 SYNOPSIS
 
@@ -387,6 +397,8 @@ version 0.190900
 =head2 trim
 
 =head2 pad_to
+
+=head2 clear_new_tag
 
 =head2 all_states
 

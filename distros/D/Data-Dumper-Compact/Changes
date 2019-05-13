@@ -1,0 +1,16 @@
+Revision history for Data-Dumper-Compact
+
+0.002002 - 2019-05-10
+  - Collapse single key/value in list/array correctly
+
+0.002001 - 2019-05-09
+  - Fix stupid documentation error
+
+0.002000 - 2019-05-09
+  - Add Devel::DDCWarn in the style of Devel::Dwarn
+
+0.001001 - 2019-05-09
+  - Remove subref test because B::Deparse output varies between perl versions
+
+0.001000 - 2019-05-09
+  - initial release

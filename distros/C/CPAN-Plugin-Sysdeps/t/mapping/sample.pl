@@ -18,6 +18,14 @@ return (
     [package => 'clang']]]],
 
  [
+  cpanmod => ['FreeBSD::Version2'],
+  [os => 'freebsd',
+   [osvers => { '<', 10, '>=', 1 },
+    [package => 'gcc']],
+   [osvers => { '>=', 10 },
+    [package => 'clang']]]],
+
+ [
   cpanmod => 'Multi::Packages',
   [package => ['package-one', 'package-two']]],
 

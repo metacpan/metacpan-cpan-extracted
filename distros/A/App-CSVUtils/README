@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.020 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-04-29.
+    This document describes version 0.021 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-05-12.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -48,7 +48,11 @@ DESCRIPTION
 
     *   csv-sum
 
+    *   csv2tsv
+
     *   dump-csv
+
+    *   tsv2csv
 
 FUNCTIONS
   csv_add_field

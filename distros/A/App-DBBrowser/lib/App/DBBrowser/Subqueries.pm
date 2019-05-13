@@ -9,7 +9,7 @@ use File::Spec::Functions qw( catfile );
 
 use List::MoreUtils qw( any uniq );
 
-use Term::Choose           qw( choose );
+use Term::Choose           qw();
 use Term::Choose::LineFold qw( print_columns line_fold );
 use Term::Choose::Util     qw( term_width );
 use Term::Form             qw();
@@ -50,8 +50,8 @@ sub __tmp_history {
         push @print_history, $filled_stmt;
     }
     my @clause_history = uniq @{$sf->{i}{history}{$db}{substmt}};
-    if ( @clause_history > 8 ) {
-        $#clause_history = 7;
+    if ( @clause_history > 10 ) {
+        $#clause_history = 9;
     }
     my $tmp_history = [];
     for my $tmp ( uniq( @clause_history, @print_history ) ) {
@@ -78,6 +78,7 @@ sub __get_history {
 sub choose_subquery {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $history = $sf->__get_history();
     my $edit_sq_file = 'Choose SQ:';
     my $readline     = '  Read-Line';
@@ -87,9 +88,9 @@ sub choose_subquery {
     SUBQUERY: while ( 1 ) {
         my $choices = [ @pre, map { '- ' . $_->[1] } @$history ];
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => '', default => $old_idx, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
@@ -140,6 +141,7 @@ sub choose_subquery {
 sub __edit_sq_file {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $driver = $sf->{i}{driver};
     my $db = $sf->{d}{db};
     my @pre = ( undef );
@@ -157,9 +159,9 @@ sub __edit_sq_file {
         );
         my $info = join "\n", @tmp_info;
         # Choose
-        my $choice = choose(
+        my $choice = $tc->choose(
             [ @pre, $add, $edit, $remove ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose:', undef => '  <=', info => $info }
+            { %{$sf->{i}{lyt_v_clear}}, info => $info, undef => '  <=' }
         );
         my $changed = 0;
         if ( ! defined $choice ) {
@@ -191,6 +193,7 @@ sub __edit_sq_file {
 sub __add_subqueries {
     my ( $sf, $saved_history, $top_lines ) = @_;
     my $tf = Term::Form->new();
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $tmp_history = $sf->__tmp_history( $saved_history );
     my $used = [];
     my $readline = '  Read-Line';
@@ -210,7 +213,7 @@ sub __add_subqueries {
         my $info = join "\n", @tmp_info;
         my $choices = [ @pre, map {  '- ' . $_->[1] } @$tmp_history ];
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
             { %{$sf->{i}{lyt_v_clear}}, prompt => 'Add:', info => $info, index => 1 }
         );
@@ -227,7 +230,9 @@ sub __add_subqueries {
         }
         elsif ( $choices->[$idx] eq $readline ) {
             # Readline
-            my $stmt = $tf->readline( 'Stmt: ', { info => $info, show_context => 1, clear_screen => 1  } );
+            my $stmt = $tf->readline( 'Stmt: ',
+                { info => $info, show_context => 1, clear_screen => 1  }
+            );
             if ( ! defined $stmt || ! length $stmt ) {
                     next;
             }
@@ -236,7 +241,9 @@ sub __add_subqueries {
             }
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, term_width(), '', ' ' x length( 'Stmt: ' ) );
             # Readline
-            my $name = $tf->readline( 'Name: ', { info => $info . $folded_stmt, show_context => 1 } );
+            my $name = $tf->readline( 'Name: ',
+                { info => $info . $folded_stmt, show_context => 1 }
+            );
             if ( ! defined $name ) {
                 next;
             }
@@ -250,7 +257,9 @@ sub __add_subqueries {
             my $stmt = $used->[-1][0];
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, term_width(), '', ' ' x length( 'Stmt: ' ) );
             # Readline
-            my $name = $tf->readline( 'Name: ', { info => $info . $folded_stmt, show_context => 1 } );
+            my $name = $tf->readline( 'Name: ',
+                { info => $info . $folded_stmt, show_context => 1 }
+            );
             if ( ! defined $name ) {
                 ( $tmp_new, $tmp_history, $used ) = @{pop @$bu};
                 next;
@@ -266,6 +275,7 @@ sub __edit_subqueries {
     if ( ! @$saved_history ) {
         return;
     }
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $indexes = [];
     my @pre = ( undef, $sf->{i}{_confirm} );
     my $bu = [];
@@ -281,7 +291,7 @@ sub __edit_subqueries {
         }
         my $choices = [ @pre, @available ];
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
             { %{$sf->{i}{lyt_v_clear}}, prompt => 'Edit:', info => $info, index => 1, default => $old_idx }
         );
@@ -304,7 +314,7 @@ sub __edit_subqueries {
         }
         else {
             $idx -= @pre;
-            my @tmp_info = ( @$top_lines, 'Edit:', '  BACK', '  CONFIRM' );
+            my @tmp_info = ( @$top_lines, 'Edit:', $sf->{i}{_back}, $sf->{i}{_confirm} );
             for my $i ( 0 .. $#$saved_history ) {
                 my $stmt = $saved_history->[$i][1];
                 my $pre = '  ';
@@ -321,7 +331,9 @@ sub __edit_subqueries {
             my $info = join "\n", @tmp_info;
             my $tf = Term::Form->new();
             # Readline
-            my $stmt = $tf->readline( 'Stmt: ', { info => $info, show_context => 1, clear_screen => 1, default => $saved_history->[$idx][0] } );
+            my $stmt = $tf->readline( 'Stmt: ',
+                { info => $info, default => $saved_history->[$idx][0], show_context => 1, clear_screen => 1 }
+            );
             if ( ! defined $stmt || ! length $stmt ) {
                 next STMT;
             }
@@ -331,7 +343,9 @@ sub __edit_subqueries {
                 $default = $saved_history->[$idx][1];
             }
             # Readline
-            my $name = $tf->readline( 'Name: ', { info => $info . $folded_stmt, show_context => 1, default => $default } );
+            my $name = $tf->readline( 'Name: ',
+                { info => $info . $folded_stmt, default => $default, show_context => 1 }
+            );
             if ( ! defined $name ) {
                 next STMT;
             }
@@ -350,6 +364,7 @@ sub __remove_subqueries {
     if ( ! @$saved_history ) {
         return;
     }
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my @backup;
     my @pre = ( undef, $sf->{i}{_confirm} );
     my @remove;
@@ -363,10 +378,9 @@ sub __remove_subqueries {
         );
         my $info = join "\n", @tmp_info;
         my $choices = [ @pre, map { '- ' . $_->[1] } @$saved_history ];
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
-            { mouse => $sf->{o}{table}{mouse}, index => 1, prompt => 'Choose:',
-              layout => 3, info => $info, undef => '  BACK' }
+            { %{$sf->{i}{lyt_v}}, info => $info, index => 1 }
         );
         if ( ! $idx ) {
             if ( @backup ) {

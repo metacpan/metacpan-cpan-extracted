@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '2.019109';
+our $VERSION = '2.019110';
 
 #  most of the following are for compat with PDLA Makefiles
 #  and should not be used by other code

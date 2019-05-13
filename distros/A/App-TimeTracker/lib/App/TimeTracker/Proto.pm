@@ -272,7 +272,7 @@ App::TimeTracker::Proto - App::TimeTracker Proto Class
 
 =head1 VERSION
 
-version 2.027
+version 2.028
 
 =head1 DESCRIPTION
 

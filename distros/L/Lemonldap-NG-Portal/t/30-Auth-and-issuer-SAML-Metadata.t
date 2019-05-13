@@ -27,12 +27,19 @@ SKIP: {
 
     ok( $res = $issuer->_get('/saml/metadata/idp'), 'Get IDP metadata' );
     ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
-    ok( $res->[2]->[0] !~ m#<SPSSODescriptor#s, 'Metadata does not contain SP information' );
-    ok( $res->[2]->[0] =~ m#entityID="urn:example\.com"#s, 'IDP EntityID is overriden' );
+    ok(
+        $res->[2]->[0] !~ m#<SPSSODescriptor#s,
+        'Metadata does not contain SP information'
+    );
+    ok( $res->[2]->[0] =~ m#entityID="urn:example\.com"#s,
+        'IDP EntityID is overriden' );
 
     ok( $res = $issuer->_get('/saml/metadata/sp'), 'Get SP metadata' );
     ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
-    ok( $res->[2]->[0] !~ m#<IDPSSODescriptor#s, 'Metadata does not contain IDP information' );
+    ok(
+        $res->[2]->[0] !~ m#<IDPSSODescriptor#s,
+        'Metadata does not contain IDP information'
+    );
 
     #print STDERR Dumper($res);
 }
@@ -44,14 +51,14 @@ done_testing( count() );
 sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel               => $debug,
-                domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
-                authentication         => 'Demo',
-                userDB                 => 'Same',
-                issuerDBSAMLActivation => 1,
+                logLevel                => $debug,
+                domain                  => 'idp.com',
+                portal                  => 'http://auth.idp.com',
+                authentication          => 'Demo',
+                userDB                  => 'Same',
+                issuerDBSAMLActivation  => 1,
                 samlOverrideIDPEntityID => 'urn:example.com',
-                samlSPMetaDataOptions  => {
+                samlSPMetaDataOptions   => {
                     'sp.com' => {
                         samlSPMetaDataOptionsEncryptionMode           => 'none',
                         samlSPMetaDataOptionsSignSSOMessage           => 1,

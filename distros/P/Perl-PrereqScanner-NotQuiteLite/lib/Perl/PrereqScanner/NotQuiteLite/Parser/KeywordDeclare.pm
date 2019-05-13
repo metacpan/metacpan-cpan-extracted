@@ -15,6 +15,7 @@ sub parse_keyword_declare_args {
 
   $c->register_sub_keywords(qw/keyword/);
   $c->register_keywords(qw/keytype is unkeyword/);
+  $c->register_op_keywords(qw/is/);
 
   $c->register_sub_parser(
     'keyword',

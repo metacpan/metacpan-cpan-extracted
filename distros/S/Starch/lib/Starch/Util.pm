@@ -1,7 +1,7 @@
 package Starch::Util;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -10,9 +10,10 @@ Starch::Util - Utility functions used internally by Starch.
 =cut
 
 use Carp qw();
-use Module::Runtime qw( require_module is_module_name );
 use Module::Find qw( findallmod );
+use Module::Runtime qw( require_module is_module_name );
 
+use strictures 2;
 use namespace::clean;
 
 use Exporter qw( import );
@@ -78,9 +79,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

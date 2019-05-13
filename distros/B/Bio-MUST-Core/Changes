@@ -1,3 +1,13 @@
+0.191300  2019-05-10 08:44:29+02:00 Europe/Brussels
+    - Additions
+      - Ali: added method all_but_new_seqs
+      - Seq: added method clear_new_tag (also in Ali as clear_new_tags)
+    - Changes
+      - Listable: improved regex to capture multiple chunks (as in abbr-id-fas.pl)
+    - Fixes
+      - ColorScheme: fixed loophole in dependency resolution for Graphics::ColorNames::WWW
+      - Tree: temporarily disabled tests relying on phyml
+
 0.190900  2019-03-31 22:19:09+02:00 Europe/Brussels
     - Changes
       - all: improved warning and error messages (now prefixed by [BMC])

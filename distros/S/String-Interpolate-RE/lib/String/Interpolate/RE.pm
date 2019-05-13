@@ -6,20 +6,13 @@ use strict;
 use warnings;
 use Carp;
 
-use Exporter qw[ import ];
-our @EXPORT_OK = qw( strinterp );
+use Exporter::Shiny qw[ strinterp ];
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 ## no critic (ProhibitAccessOfPrivateData)
 
-sub strinterp {
-
-    my ( $text, $var, $opts ) = @_;
-
-    $var = {} unless defined $var;
-
-    my %opt = (
+my %Opt = (
         variable_re        => qr/\w+/,
         raiseundef         => 0,
         emptyundef         => 0,
@@ -28,21 +21,50 @@ sub strinterp {
         recurse            => 0,
         recurse_limit      => 0,
         recurse_fail_limit => 100,
-        defined $opts
-        ? ( map { ( lc $_ => $opts->{$_} ) } keys %{$opts} )
-        : (),
-    );
-    ## use critic
+);
 
-    my $fmt = $opt{format} ? ':([^}]+)' : '()';
+my $default_strinterp;
 
-    $opt{track} = {};
-    $opt{loop}  = 0;
-    $opt{fmt}   = $fmt;
+sub _generate_strinterp {
 
-    _strinterp( $text, $var, \%opt );
+    my ( $me, $name, $args ) = @_;
 
-    return $text;
+    if ( ! defined $args || ! defined $args->{opts}) {
+        return $default_strinterp || _mk_strinterp( \%Opt );
+    }
+
+    my %opt = %Opt;
+    $opt{lc $_} = $args->{opts}{$_} foreach keys %{$args->{opts}};
+    return _mk_strinterp( \%opt );
+}
+
+sub _mk_strinterp {
+
+    my $default_opt = shift;
+
+    return sub {
+
+        my ( $text, $var, $opts ) = @_;
+
+        $var = {} unless defined $var;
+
+        my %opt = %$default_opt;
+
+        if ( defined $opts ) {
+            $opt{ lc $_ } = $opts->{$_} foreach keys %$opts;
+        }
+        ## use critic
+
+        my $fmt = $opt{format} ? ':([^}]+)' : '()';
+
+        $opt{track} = {};
+        $opt{loop}  = 0;
+        $opt{fmt}   = $fmt;
+
+        _strinterp( $text, $var, \%opt );
+
+        return $text;
+    }
 }
 
 sub _strinterp {
@@ -143,13 +165,17 @@ String::Interpolate::RE - interpolate variables into strings using regular expre
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
-    use String::Interpolate::RE qw( strinterp );
+  # default formulation
+  use String::Interpolate::RE qw( strinterp );
 
-    $str = strinterp( "${Var1} $Var2", $vars, \%opts );
+  $str = strinterp( "${Var1} $Var2", $vars, \%opts );
+
+  # import with different default options.
+  use String::Interpolate::RE strinterp => { opts => { useENV => 0 } };
 
 =head1 DESCRIPTION
 
@@ -158,6 +184,22 @@ expression matching rather than Perl's built-in interpolation
 mechanism and thus hopefully does not suffer from the security
 problems inherent in using B<eval> to interpolate into strings of
 suspect ancestry.
+
+=head2 Changing the default option values
+
+The default values for L</strinterp>'s options were not all well
+thought out.  B<String::Interpolate::RE> uses L<Exporter::Tiny>,
+allowing a version of L</strinterp> with saner defaults to be
+exported.  Simply specify them when importing:
+
+  use String::Interpolate::RE strinterp => { opts => { useENV => 0 } };
+
+The subroutine may be renamed using the C<-as> option:
+
+  use String::Interpolate::RE strinterp => { -as => strinterp_noenv,
+                                             opts => { useENV => 0 } };
+
+  strinterp_noenv( ... );
 
 =head1 INTERFACE
 
@@ -312,9 +354,13 @@ __END__
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     use String::Interpolate::RE qw( strinterp );
+#pod   # default formulation
+#pod   use String::Interpolate::RE qw( strinterp );
 #pod
-#pod     $str = strinterp( "${Var1} $Var2", $vars, \%opts );
+#pod   $str = strinterp( "${Var1} $Var2", $vars, \%opts );
+#pod
+#pod   # import with different default options.
+#pod   use String::Interpolate::RE strinterp => { opts => { useENV => 0 } };
 #pod
 #pod
 #pod =head1 DESCRIPTION
@@ -324,6 +370,22 @@ __END__
 #pod mechanism and thus hopefully does not suffer from the security
 #pod problems inherent in using B<eval> to interpolate into strings of
 #pod suspect ancestry.
+#pod
+#pod =head2 Changing the default option values
+#pod
+#pod The default values for L</strinterp>'s options were not all well
+#pod thought out.  B<String::Interpolate::RE> uses L<Exporter::Tiny>,
+#pod allowing a version of L</strinterp> with saner defaults to be
+#pod exported.  Simply specify them when importing:
+#pod
+#pod   use String::Interpolate::RE strinterp => { opts => { useENV => 0 } };
+#pod
+#pod The subroutine may be renamed using the C<-as> option:
+#pod
+#pod   use String::Interpolate::RE strinterp => { -as => strinterp_noenv,
+#pod                                              opts => { useENV => 0 } };
+#pod
+#pod   strinterp_noenv( ... );
 #pod
 #pod
 #pod =head1 INTERFACE
@@ -391,6 +453,7 @@ __END__
 #pod
 #pod If true, the C<%ENV> hash will be searched for variables which are not
 #pod defined in the passed C<%var> hash.  This defaults to true.
+#pod
 #pod
 #pod =item recurse I<boolean>
 #pod

@@ -66,10 +66,10 @@ requires:
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '6.4'
+version: '6.5'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -347,7 +347,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.0
+          git_version: 2.21.0
           repo_root: .
       name: Git::NextVersion
       version: '2.045'
@@ -372,7 +372,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.0
+          git_version: 2.21.0
           repo_root: .
       name: Git::Check
       version: '2.045'
@@ -401,7 +401,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.0
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -414,11 +414,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-6.4
+          tag: release-6.5
           tag_format: release-%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.0
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -441,7 +441,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.0
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -455,7 +455,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.0
+          git_version: 2.21.0
           repo_root: .
       name: Git::Push
       version: '2.045'
@@ -515,5 +515,5 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Samit Badle <Samit.Badle@gmail.com>'
   - 'Takumi Sakamoto <takumi.saka@gmail.com>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

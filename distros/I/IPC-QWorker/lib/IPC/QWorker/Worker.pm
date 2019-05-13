@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.07'; # VERSION
+# ABSTRACT: worker process for IPC::QWorker
+our $VERSION = '0.08'; # VERSION
 
 use Carp;
 use IO::Socket;
@@ -121,5 +122,31 @@ sub _shutdown {
 
 1;
 
-# vim:ts=2:syntax=perl:
-# vim600:foldmethod=marker:
+# vim:ts=2:expandtab:syntax=perl:
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+IPC::QWorker::Worker - worker process for IPC::QWorker
+
+=head1 VERSION
+
+version 0.08
+
+=head1 AUTHOR
+
+Markus Benning <ich@markusbenning.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Markus Benning <ich@markusbenning.de>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

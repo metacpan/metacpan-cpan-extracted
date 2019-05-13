@@ -107,9 +107,16 @@ sub extractFormInfo {
             # Call kerberos.js if Kerberos is the only Auth module
             # kerberosChoice.js is used by Choice
             $self->{AjaxInitScript} =~ s/kerberosChoice/kerberos/;
-            $req->data->{customScript} .= $self->{AjaxInitScript};
-            $self->logger->debug(
-                "Send init/script -> " . $req->data->{customScript} );
+
+            # In some Combination scenarios, Kerberos may be called multiple
+            # times but we only want to add the JS once
+            unless ( $req->data->{_krbJsAlreadySent} ) {
+
+                $req->data->{customScript} .= $self->{AjaxInitScript};
+                $self->logger->debug(
+                    "Send init/script -> " . $req->data->{customScript} );
+                $req->data->{_krbJsAlreadySent} = 1;
+            }
 
             #$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );
             eval( $self->InitCmd );

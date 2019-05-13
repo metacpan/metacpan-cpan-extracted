@@ -1,5 +1,17 @@
 Revision history for Panotools::Script.
 
+0.29
+    - Fix for 5.18.1 syntax errors (Igor Yu. Vlasenko)
+    - new tool: gpano2pto - inserts Google photospheres into .pto projects
+    - ptomorph works without Proc::Background
+    - ptomorph fixes for internal paths (Paul Womack)
+    - add parallel processing to ptomorph (Kornel Benko)
+    - fix for 5.25.x test failure (SREZIC)
+    - rename pto2mk2 to pto2mk
+    - transfer Makefile.equirect.mk from Hugin
+    - new pto-ffmpeg tool to generate ffmpeg remap PGM files
+    - new nona-deshake tool to remap and deshake webcam sequences
+
 0.28
     - new tool: nona-svg - stitch a vector panorama image
     - new tool: pto2gpano - add GPano XMP metadata

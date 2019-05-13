@@ -1,17 +1,14 @@
 package Starch::Plugin::RenewExpiration::Manager;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
-use Types::Common::String -types;
 use Types::Common::Numeric -types;
+use Types::Common::String -types;
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::ForManager
-);
+with 'Starch::Plugin::ForManager';
 
 has renew_threshold => (
     is      => 'ro',

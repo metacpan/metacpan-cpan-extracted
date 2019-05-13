@@ -25,4 +25,4 @@ print $rule->Assemble;
 ok ($rule->Assemble =~ /%.1 : %.pod/);
 ok ($rule->Assemble =~ /\tpod2man --center \$\(PACKAGE\) --release \$\(PACKAGE_VERSION\) \$< \$@/);
 ok ($rule->Assemble =~ /\techo `uname -a` > \$\(TMPDIR\)\/foo/);
-ok ($rule->Assemble =~ /\tuname -a > \${TMPDIR}\/bar && echo \\"\\ \\#\\#\\#\\ \\\(woo\\!\\\)\\ \\#\\#\\#\\ \\"/);
+ok ($rule->Assemble =~ /\tuname -a > \$\{TMPDIR\}\/bar && echo \\"\\ \\#\\#\\#\\ \\\(woo\\!\\\)\\ \\#\\#\\#\\ \\"/);

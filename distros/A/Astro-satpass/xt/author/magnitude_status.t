@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use Astro::SpaceTrack 0.084;
+use Astro::Coord::ECI::TLE;
 use HTTP::Date;
 use LWP::UserAgent;
 use Test::More 0.88;	# Because of done_testing();
@@ -18,28 +19,32 @@ All it really does is to check file dates on the relevant files.
 
 EOD
 
-is last_modified(
-    'http://celestrak.com/SpaceTrack/query/visual.txt' ),
-    'Sun, 03 Mar 2019 02:50:29 GMT',
-    'Celestrak visual.txt Last-Modified';
+is_last_modified(
+    'http://celestrak.com/SpaceTrack/query/visual.txt',
+    Astro::Coord::ECI::TLE->_CELESTRAK_VISUAL(),
+    'Celestrak visual.txt',
+);
 
-is last_modified( mccants => 'vsnames' ),
-    'Thu, 25 May 2017 00:30:11 GMT',
-    'McCants vsnames.mag Last-Modified';
+is_last_modified( mccants => 'vsnames',
+    Astro::Coord::ECI::TLE->_MCCANTS_VSNAMES(),
+    'McCants vsnames.mag',
+);
 
 =begin comment
 
-is last_modified( mccants => 'mcnames' ),
+is_last_modified( mccants => 'mcnames',
     'Thu, 25 May 2017 00:09:56 GMT',
-    'McCants mcnames.mag Last-Modified';
+    'McCants mcnames.mag',
+);
 
 =end comment
 
 =cut
 
-is last_modified( mccants => 'quicksat' ),
-    'Thu, 25 May 2017 00:00:55 GMT',
-    'McCants qs.mag Last-Modified';
+is_last_modified( mccants => 'quicksat',
+    Astro::Coord::ECI::TLE->_MCCANTS_QUICKSAT(),
+    'McCants qs.mag',
+);
 
 done_testing;
 
@@ -47,22 +52,33 @@ done_testing;
     my $st;
     my $ua;
 
-    sub last_modified {
-	my ( $src, $catalog ) = @_;
+    sub is_last_modified {
+	my @arg = @_;
 	my $resp;
-	if ( defined $catalog ) {
-	    $st ||= Astro::SpaceTrack->new();
-	    $resp = $st->$src( $catalog );
-	} else {
+
+	if ( $arg[0] =~ m/ \A \w+ : /smx ) {
 	    $ua ||= LWP::UserAgent->new();
-	    $resp = $ua->head( $src );
+	    $resp = $ua->head( shift @arg );
+	} else {
+	    $st ||= Astro::SpaceTrack->new();
+	    my ( $src, $catalog ) = splice @arg, 0, 2;
+	    $resp = $st->$src( $catalog );
 	}
-	$resp->is_success()
-	    or return $resp->status_line();
-	foreach my $val ( $resp->header( 'Last-Modified' ) ) {
-	    return $val;
+
+	my ( $want, $name ) = @arg;
+
+	unless ( $resp->is_success() ) {
+	    @_ = "$name: " . $resp->status_line();
+	    goto &fail;
 	}
-	return 'No Last-Modified header found';
+
+	if ( my ( $got ) = $resp->header( 'Last-Modified' ) ) {
+	    @_ = ( $got, $want, "$name Last-Modified: $want" );
+	    goto &is;
+	}
+
+	@_ = "$name: No Last-Modified header found";
+	goto &fail;
     }
 }
 

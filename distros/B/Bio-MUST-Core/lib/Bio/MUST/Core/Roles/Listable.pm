@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.190900';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.191300';
 use Moose::Role;
 
 use autodie;
@@ -134,9 +134,9 @@ sub regex_mapper {
 
     my @abbr_ids;
     for my $long_id (@long_ids) {
-        my ($id) = $long_id =~ $regex;      # capture original id
-        $id =~ s{$NOID_CHARS}{_}xmsg;       # substitute forbidden chars
-        push @abbr_ids, $prefix . $id;
+        my @ids = $long_id =~ $regex;           # capture original id(s)
+        s{$NOID_CHARS}{_}xmsg for @ids;         # substitute forbidden chars
+        push @abbr_ids, join q{}, $prefix, @ids;
     }
 
     return Bio::MUST::Core::IdMapper->new(
@@ -241,7 +241,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.190900
+version 0.191300
 
 =head1 SYNOPSIS
 

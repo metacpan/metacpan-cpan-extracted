@@ -1,0 +1,59 @@
+NAME
+    Tie::Handle::Log - Tied filehandle that just logs operations
+
+VERSION
+    This document describes version 0.001 of Tie::Handle::Log (from Perl
+    distribution Tie-Handle-Log), released on 2019-05-12.
+
+SYNOPSIS
+     use Tie::Handle::Log;
+
+     tie *FH, 'Tie::Handle::Log';
+
+     # use like you would a regular filehandle
+     print FH "one", "two";
+     ...
+     close FH;
+
+DESCRIPTION
+    This class implements tie interface for filehandle but does nothing
+    except logging the operation with Log::ger. It's basically used for
+    testing, benchmarking, or documentation only.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tie-Handle-Log>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tie-Handle-Log>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Handle-Log>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    perltie
+
+    Log::ger
+
+    Tie::FileHandle::Log
+
+    Tie::Scalar::Log, Tie::Array::Log, Tie::Hash::Log.
+
+    Tie::Handle
+
+    Tie::Simple
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

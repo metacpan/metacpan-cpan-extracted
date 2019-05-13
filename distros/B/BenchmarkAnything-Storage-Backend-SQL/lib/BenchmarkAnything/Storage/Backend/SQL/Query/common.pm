@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query::common;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - backend base class
-$BenchmarkAnything::Storage::Backend::SQL::Query::common::VERSION = '0.024';
+$BenchmarkAnything::Storage::Backend::SQL::Query::common::VERSION = '0.026';
 use strict;
 use warnings;
 use base 'BenchmarkAnything::Storage::Backend::SQL::Query';
@@ -644,6 +644,18 @@ sub start_processing_raw_bench_bundle {
 
 }
 
+sub start_processing_raw_bench_bundle2 {
+
+    my ( $or_self, @a_vals ) = @_;
+
+    return $or_self->execute_query( "
+        UPDATE raw_bench_bundles
+        SET processing = 1
+        WHERE raw_bench_bundle_id IN (".join(',', ('?') x @a_vals).")
+    ", @a_vals );
+
+}
+
 sub update_raw_bench_bundle_set_processed {
 
     my ( $or_self, @a_vals ) = @_;
@@ -655,6 +667,34 @@ sub update_raw_bench_bundle_set_processed {
         WHERE processed=0 AND
               processing=1 AND
               raw_bench_bundle_id = ?
+    ", @a_vals );
+
+}
+
+sub update_raw_bench_bundle_set_processed2 {
+
+    my ( $or_self, @a_vals ) = @_;
+
+    return $or_self->execute_query( "
+        UPDATE raw_bench_bundles
+        SET processed=1,
+            processing=0
+        WHERE processed=0 AND
+              processing=1 AND
+              raw_bench_bundle_id IN (".join(',', ('?') x @a_vals).")
+    ", @a_vals );
+
+}
+
+sub update_raw_bench_bundle_set_processed3 {
+
+    my ( $or_self, @a_vals ) = @_;
+
+    return $or_self->execute_query( "
+        UPDATE raw_bench_bundles
+        SET processed=1,
+            processing=0
+        WHERE raw_bench_bundle_id IN (".join(',', ('?') x @a_vals).")
     ", @a_vals );
 
 }
@@ -747,6 +787,21 @@ sub select_raw_bench_bundle_for_lock {
     ", @a_vals );
 }
 
+sub select_raw_bench_bundle_for_lock2 {
+
+    my ( $or_self, $count, @a_vals ) = @_;
+
+    return $or_self->execute_query( "
+        SELECT raw_bench_bundle_id
+        FROM raw_bench_bundles
+        WHERE processed=0 AND
+              processing=0
+        ORDER BY raw_bench_bundle_id ASC
+        LIMIT ?
+        @{[$or_self->_FOR_UPDATE]}
+    ", $count, @a_vals );
+}
+
 sub select_raw_bench_bundle_for_processing {
 
     my ( $or_self, @a_vals ) = @_;
@@ -758,6 +813,21 @@ sub select_raw_bench_bundle_for_processing {
         LIMIT 1
         @{[$or_self->_FOR_UPDATE]}
     ", @a_vals );
+}
+
+sub select_raw_bench_bundle_for_processing2 {
+
+    my ( $or_self, @a_vals ) = @_;
+
+    my $q = "
+        SELECT raw_bench_bundle_serialized
+        FROM raw_bench_bundles
+        WHERE raw_bench_bundle_id IN (".join(',', ('?') x @a_vals).")
+        ORDER BY raw_bench_bundle_id ASC
+        @{[$or_self->_FOR_UPDATE]}
+    ";
+    #print STDERR "q: $q\n";
+    return $or_self->execute_query($q, @a_vals );
 }
 
 1;
@@ -778,7 +848,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

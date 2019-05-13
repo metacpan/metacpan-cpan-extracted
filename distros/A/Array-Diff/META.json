@@ -1,0 +1,50 @@
+{
+   "abstract" : "Find the differences between two arrays",
+   "author" : [
+      "Daisuke Murase <typester@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Array-Diff",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Diff" : "1.19",
+            "Class::Accessor::Fast" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/array-diff-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/array-diff-perl.git",
+         "web" : "https://github.com/neilb/array-diff-perl"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

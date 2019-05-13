@@ -28,7 +28,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_USERNOTFOUND
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
@@ -112,7 +112,8 @@ sub _reset {
         $self->logger->debug("Token given for password reset: $mailToken");
 
         # Check if token is valid
-        my $mailSession = $self->p->getApacheSession($mailToken);
+        my $mailSession =
+          $self->p->getApacheSession( $mailToken, kind => "TOKEN" );
         unless ($mailSession) {
             $self->userLogger->warn('Bad reset token');
             return PE_BADMAILTOKEN;
@@ -251,7 +252,8 @@ sub _reset {
         $infos->{_pdata} = $req->pdata;
 
         # create session
-        $mailSession = $self->p->getApacheSession( undef, info => $infos );
+        $mailSession =
+          $self->p->getApacheSession( undef, kind => "TOKEN", info => $infos );
 
         $req->id( $mailSession->id );
     }

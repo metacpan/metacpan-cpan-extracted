@@ -9,13 +9,24 @@ use Prima qw(Application);
 
 IO::Lambda::Loop::default('Prima');
 
-use vars qw(%filenos @timers $timer $deadline $event @mask $DEBUG);
+use vars qw(%filenos @timers $timer $deadline $event @mask @prima_events $DEBUG);
 
 # $DEBUG = 1;
 
 $mask[IO_READ]      = fe::Read;
 $mask[IO_WRITE]     = fe::Write;
 $mask[IO_EXCEPTION] = fe::Exception;
+
+sub CLONE
+{
+	undef %filenos;
+	undef @timers;
+	undef $timer;
+	undef $deadline;
+	undef $event;
+	undef @mask;
+	undef @prima_events;
+}
 
 sub new { bless {} , shift }
 
@@ -39,7 +50,6 @@ sub reset_mask
 	}
 }
 
-my @prima_events;
 sub io_filter    { push @prima_events, \@_; return 0 }
 sub on_read      { on_io($_[0], fe::Read)      }
 sub on_write     { on_io($_[0], fe::Write)     }

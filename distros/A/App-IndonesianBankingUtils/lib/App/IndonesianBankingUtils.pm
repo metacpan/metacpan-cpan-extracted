@@ -2,8 +2,8 @@ package App::IndonesianBankingUtils;
 
 use 5.010001;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.141'; # VERSION
+our $DATE = '2019-05-10'; # DATE
+our $VERSION = '0.142'; # VERSION
 
 1;
 # ABSTRACT: CLIs related to Indonesian banking
@@ -20,7 +20,7 @@ App::IndonesianBankingUtils - CLIs related to Indonesian banking
 
 =head1 VERSION
 
-This document describes version 0.141 of App::IndonesianBankingUtils (from Perl distribution App-IndonesianBankingUtils), released on 2019-02-24.
+This document describes version 0.142 of App::IndonesianBankingUtils (from Perl distribution App-IndonesianBankingUtils), released on 2019-05-10.
 
 =head1
 

@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Static-Role-Compressed
 
+0.03  2019-05-07 20:46:36 CDT
+        - Lowercase encodings ahead of time.
+        - Update synopsis documentation to make it clearer that the Mojo::Asset::File is for the current file to be served.
+
 0.02  2019-05-06 21:57:51 CDT
         - Use index instead of regex to detect allowed encodings from the Accept-Encoding header.
 

@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Rule::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.9'; # VERSION
+our $VERSION = '3.0.10'; # VERSION
 
 
 #
@@ -204,8 +204,6 @@ sub getHideseparator {
     goto &isHideseparator
 }
 
-1;
-
 __END__
 
 =pod
@@ -218,7 +216,7 @@ MarpaX::ESLIF::Grammar::Rule::Properties - ESLIF Grammar Rule Properties
 
 =head1 VERSION
 
-version 3.0.9
+version 3.0.10
 
 =head1 SYNOPSIS
 
@@ -384,6 +382,12 @@ Alias to isHideseparator()
 ESLIF Grammar Rule Properties.
 
 Calls to grammar's currentRuleProperties() or rulePropertiesByLevel() methods outputs an instance of this class.
+
+=head1 SEE ALSO
+
+L<MarpaX::ESLIF::Rule::PropertyBitSet>
+
+1;
 
 =head1 AUTHOR
 

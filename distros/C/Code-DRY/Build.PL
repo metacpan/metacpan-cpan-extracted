@@ -9,7 +9,7 @@ if (PurePerlRequested()) {
 }
 
 my %recommends = ();
-my %configure_requires = ('perl' => '5.8.0', 'Module::Build' => '0.19', );
+my %configure_requires = ('perl' => '5.3.0', 'Module::Build' => '0.19', );
 my %build_requires =  ( 'ExtUtils::CBuilder' => 0, 'TAP::Harness' => 0 );
 
 my %requires = ( %configure_requires, %build_requires );
@@ -35,9 +35,9 @@ my $build = Module::Build->new
      'xs_files'           => { 'DRY.xs' => 'lib/Code/DRY.xs', },
      'license'            => 'perl',
      'dist_version_from'  => 'lib/Code/DRY.pm',
-     'c_source'          => '.',
+     'c_source'          => ['.'],
      'needs_compiler'    => 1,
-     'include_dirs'      => '.',
+     'include_dirs'      => ['.'],
      'script_files'      => 'bin/CP_reporter',
     );
 

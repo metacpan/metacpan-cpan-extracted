@@ -1,9 +1,22 @@
 ==================================================
-Changes from 2018-01-03 00:00:00 +0000 to present.
+Changes from 2018-05-08 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1.01 at 2019-01-03 14:22:47 +0000
+version 1.02 at 2019-05-08 09:05:16 +0000
+-----------------------------------------
+
+  Change: 520a696374ebb9a3567b7386a306c6c42d1e93d6
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 11:04:08 +0000
+
+    Dont include local/ in cpan distribution
+
+    This adds a Prune on local/ to dist.ini and will not include the
+    folder in the cpan tar ball. 
+
+-----------------------------------------
+version 1.01 at 2019-01-03 14:20:16 +0000
 -----------------------------------------
 
   Change: b570faa5487d65fde908cdab06a7c7379ec2b45b
@@ -31,5 +44,5 @@ version 1.01 at 2019-01-03 14:22:47 +0000
     Use cpanfile for depenencies 
 
 ===============================================
-Plus 1 release after 2018-01-03 00:00:00 +0000.
+Plus 1 release after 2018-05-08 00:00:00 +0000.
 ===============================================

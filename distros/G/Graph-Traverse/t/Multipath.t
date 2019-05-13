@@ -148,7 +148,7 @@ sub filter_special_vertices {
 {
   my $paths = $g->traverse('PHX',{cb=>$to_any, end=>[$g->successors('LAX')], hash=>1, all=>0});
 
-  is (scalar %{$paths}, 2, "Finds paths to destination vertices");
+  is (scalar keys %{$paths}, 2, "Finds paths to destination vertices");
   is_deeply ([sort keys %{$paths}], [qw(LAX1 LAX2)], "Finds correct vertices");
   is ($paths->{LAX1}->{weight}, 6, "First path weight");
   is ($paths->{LAX2}->{weight}, 5, "Second path weight");
@@ -157,7 +157,7 @@ sub filter_special_vertices {
 {
   my $paths = paths_via($g, filter_special_vertices($g, qw(PHX LAX SFO)));
 
-  is (scalar %{$paths}, 1, "Finds one path to destination vertices");
+  is (scalar keys %{$paths}, 1, "Finds one path to destination vertices");
   is_deeply ([sort keys %{$paths}], [qw(SFO3)], "Finds correct vertex");
   is ($paths->{SFO3}->{weight}, 14, "Path weight");
 

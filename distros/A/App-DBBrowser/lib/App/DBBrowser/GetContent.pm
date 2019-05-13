@@ -13,7 +13,7 @@ use File::Spec::Functions qw( catfile );
 use List::MoreUtils qw( all uniq );
 use Encode::Locale  qw();
 
-use Term::Choose            qw( choose );
+use Term::Choose            qw();
 use Term::Choose::Constants qw( :screen );
 use Term::Choose::Util      qw( choose_a_dir choose_a_number );
 use Term::Form              qw();
@@ -59,14 +59,15 @@ sub __print_args {
 sub from_col_by_col {
     my ( $sf, $sql ) = @_;
     $sql->{insert_into_args} = [];
-    my $trs = Term::Form->new();
+    my $tf = Term::Form->new();
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $col_names = $sql->{insert_into_cols};
     if ( ! @$col_names ) {
         $sf->__print_args( $sql );
         # Choose a number
         my $col_count = choose_a_number( 3,
-            { small_first => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
-            back => 'Back', name => 'Number of columns: ', clear_screen => 0 }
+            { name => 'Number of columns: ', small_first => 1, mouse => $sf->{o}{table}{mouse}, confirm => 'Confirm',
+              back => 'Back', clear_screen => 0 } #
         );
         if ( ! $col_count ) {
             return;
@@ -75,9 +76,9 @@ sub from_col_by_col {
         my $col_number = 0;
         my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$col_names ];
         # Fill_form
-        my $form = $trs->fill_form(
+        my $form = $tf->fill_form(
             $fields,
-            { prompt => 'Col names:', auto_up => 2, confirm => '  CONFIRM', back => '  BACK   ' }
+            { prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
         );
         if ( ! $form ) {
             return;
@@ -92,7 +93,7 @@ sub from_col_by_col {
         COLS: for my $col_name ( @$col_names ) {
             $sf->__print_args( $sql );
             # Readline
-            my $col = $trs->readline( $col_name . ': ' );
+            my $col = $tf->readline( $col_name . ': ' );
             push @{$sql->{insert_into_args}->[$row_idxs]}, $col;
         }
         my $default = 0;
@@ -106,9 +107,9 @@ sub from_col_by_col {
             my @pre = ( undef, $sf->{i}{ok} );
             my $choices = [ @pre, $add, $del ];
             # Choose
-            my $add_row = choose(
+            my $add_row = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_stmt_h}}, prompt => '', default => $default }
+                { %{$sf->{i}{lyt_h}}, prompt => '', default => $default }
             );
             if ( ! defined $add_row ) {
                 if ( @{$sql->{insert_into_args}} ) {
@@ -127,9 +128,9 @@ sub from_col_by_col {
                 my $ok = $cf->input_filter( $sql, 1 );
                 if ( ! $ok ) {
                     # Choose
-                    my $idx = choose(
+                    my $idx = $tc->choose(
                         [ 'NO', 'YES'  ],
-                        { %{$sf->{i}{lyt_m}}, index => 1, prompt => 'Discard all entered data?' }
+                        { prompt => 'Discard all entered data?', index => 1 }
                     );
                     if ( $idx ) {
                         $sql->{insert_into_args} = [];
@@ -261,6 +262,7 @@ sub from_file {
     my ( $sf, $sql ) = @_;
     my $pf = App::DBBrowser::GetContent::ParseFile->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
 
     DIR: while ( 1 ) {
         my $dir_ec = $sf->__directory();
@@ -286,9 +288,9 @@ sub from_file {
             my @pre = ( $hidden, undef );
             my $choices = [ @pre, @files ];
             # Choose
-            my $idx = choose(
+            my $idx = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, undef => '  <=', default => $old_idx }
+                { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $choices->[$idx] ) {
                 return if $sf->{o}{insert}{history_dirs} == 1;
@@ -324,7 +326,10 @@ sub from_file {
                         next FILE;
                     }
                     if ( ! @{$sql->{insert_into_args}} ) {
-                        choose( [ 'empty file!' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
+                        $tc->choose(
+                            [ 'empty file!' ],
+                            { prompt => 'Press ENTER' }
+                        );
                         close $fh;
                         next FILE;
                     }
@@ -364,7 +369,10 @@ sub from_file {
                             }
                             elsif ( $ok == -1 ) {
                                 if ( ! -T $file_ec ) {
-                                    choose( [ 'Not a text file: "Spreadsheet::Read" used automatically' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
+                                    $tc->choose(
+                                        [ 'Not a text file: "Spreadsheet::Read" used automatically' ],
+                                        { prompt => 'Press ENTER' }
+                                    );
                                     next FILTER;
                                 }
                                 my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
@@ -387,6 +395,7 @@ sub from_file {
 sub __directory {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     if ( ! $sf->{o}{insert}{history_dirs} ) {
         return $sf->__new_dir_search();
     }
@@ -404,9 +413,9 @@ sub __directory {
         my $prompt = sprintf "Choose a dir:";
         my @pre = ( undef, '  NEW search' );
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             [ @pre, map( '- ' . $_, @dirs ) ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=', index => 1, default => $sf->{i}{old_dir_idx} }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $sf->{i}{old_dir_idx}, undef => '  <=' }
         );
         if ( ! $idx ) {
             return;
@@ -439,7 +448,9 @@ sub __new_dir_search {
     my ( $sf ) = @_;
     my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
     # Choose
-    my $dir_ec = choose_a_dir( { dir => $default_dir, mouse => $sf->{o}{table}{mouse}, clear_screen => 1, decoded => 0 } );
+    my $dir_ec = choose_a_dir(
+        { dir => $default_dir, decoded => 0, mouse => $sf->{o}{table}{mouse}, clear_screen => 1 }
+    );
     if ( $dir_ec ) {
         $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_ec;
     }

@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Formatter::Utils;
 
-$Map::Tube::Plugin::Formatter::Utils::VERSION   = '0.15';
+$Map::Tube::Plugin::Formatter::Utils::VERSION   = '0.16';
 $Map::Tube::Plugin::Formatter::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Formatter::Utils - Helper package for Map::Tube::Plugin::Form
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
@@ -17,12 +17,9 @@ use 5.006;
 use strict; use warnings;
 use Data::Dumper;
 use XML::Twig;
-use Map::Tube::Exception::MissingSupportedObject;
-use Map::Tube::Exception::InvalidSupportedObject;
-use Map::Tube::Exception::FoundUnsupportedObject;
 use parent 'Exporter';
 
-our @EXPORT_OK = qw(xml get_data validate_object);
+our @EXPORT_OK = qw(xml get_data);
 
 =head1 DESCRIPTION
 
@@ -56,17 +53,15 @@ sub xml {
 }
 
 sub get_data {
-    my ($self, $object) = @_;
-
-    validate_object($object);
+    my ($object) = @_;
 
     my $data = {};
     if (ref($object) eq 'Map::Tube::Node') {
         $data = {
             id    => $object->id,
             name  => $object->name,
-            links => [ map {{ id => $_,     name => $self->get_node_by_id($_)->name }} (split /\,/,$object->link) ],
-            lines => [ map {{ id => $_->id, name => $_->name                        }} (@{$object->line})         ],
+            links => [ map {{ id => $_->id, name => $_->name }} (@{$object->links}) ],
+            lines => [ map {{ id => $_->id, name => $_->name }} (@{$object->line})  ],
         };
     }
     elsif (ref($object) eq 'Map::Tube::Line') {
@@ -93,36 +88,6 @@ sub get_data {
     }
 
     return $data;
-}
-
-sub validate_object {
-    my ($object) = @_;
-
-    my @caller = caller(0);
-    @caller = caller(2) if $caller[3] eq '(eval)';
-
-    Map::Tube::Exception::MissingSupportedObject->throw({
-        method      => __PACKAGE__."::validate_object",
-        message     => "ERROR: No object received.",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless defined $object;
-
-    Map::Tube::Exception::InvalidSupportedObject->throw({
-        method      => __PACKAGE__."::validate_object",
-        message     => "ERROR: Invalid object received.",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless ref($object);
-
-    Map::Tube::Exception::FoundUnsupportedObject->throw({
-        method      => __PACKAGE__."::validate_object",
-        message     => "ERROR: Unsupported object received.",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless ((ref($object) eq 'Map::Tube::Node')
-                || (ref($object) eq 'Map::Tube::Line')
-                || (ref($object) eq 'Map::Tube::Route'));
 }
 
 =head1 AUTHOR

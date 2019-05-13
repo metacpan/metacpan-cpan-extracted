@@ -5,6 +5,7 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+README
 lib/Syntax/Feature/RawQuote.pm
 lib/Syntax/Keyword/RawQuote.pm
 lib/Syntax/Keyword/RawQuote.xs

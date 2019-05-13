@@ -11,15 +11,62 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
+use File::Temp ();
+
+our ( $max_keys, $max_lines, %ssh_pubkey_types );
 
 require Exporter;
 our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(&pubkeys %ssh_pubkey_types);
+our @EXPORT_OK = qw(&convert_pubkeys &pubkeys %ssh_pubkey_types);
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
-our %ssh_pubkey_types;
+# rsa or ecdsa or ed25519 with the upper case forms presumably some
+# other encoding of one of these, so set very low by default
+$max_keys = 3;
+
+# a 4096-bit RSA key is 16 lines in RFC4716, though this may need to be
+# set higher if you allow long comments, or
+$max_lines = 100;
+
 @ssh_pubkey_types{qw(ecdsa ed25519 rsa PEM PKCS8 RFC4716)} = ();
+# NOTE these are taken from the ssh-keygen(1) -t or -m options which
+# differ from the strings present in the SSH key data
+#
+#   type        public key prefix
+#   -----------------------------------
+#   ecdsa       ecdsa-sha2-nistp256 ...
+#   ed25519     ssh-ed25519 ...
+#   rsa         ssh-rsa ...
+#
+# those responsible for the confusion between these two different bits
+# of data in versions of this module prior to 0.05 have been sacked
+
+sub convert_pubkeys {
+    my ($list) = @_;
+    my @pubkeys;
+    for my $ref (@$list) {
+        if ( $ref->[0] =~ m/^(?:PEM|PKCS8|RFC4716)$/ ) {
+            # TODO perl (or CPAN module) conversion of these so don't
+            # need to call out to this ssh-keygen which is not portable
+            # to olden versions of ssh-keygen
+            my $tmp = File::Temp->new;
+            print $tmp $ref->[1];
+            my $tfile = $tmp->filename;
+            open my $fh, '-|', qw(ssh-keygen -i -m), $ref->[0], '-f', $tfile
+              or die "could not exec ssh-keygen: $!";
+            binmode $fh;
+            push @pubkeys, do { local $/; readline $fh };
+            close $fh or die "ssh-keygen failed with exit status $?";
+        } elsif ( $ref->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/ ) {
+            push @pubkeys, $ref->[1];
+        } else {
+            croak 'unknown public key type ' . $ref->[0];
+        }
+    }
+    chomp @pubkeys;
+    return \@pubkeys;
+}
 
 sub pubkeys {
     my ($input) = @_;
@@ -33,6 +80,7 @@ sub pubkeys {
     }
     my @keys;
     while ( my $line = readline $fh ) {
+        croak "too many input lines" if $. > $max_lines;
         if ( $line =~ m{^(-----BEGIN RSA PUBLIC KEY-----)} ) {
             my $key = $1;
             my ( $ok, $data ) = _until_end( $fh, '-----END RSA PUBLIC KEY-----' );
@@ -54,11 +102,12 @@ sub pubkeys {
             # for ed25519 so probably should instead be done for each
             # key type
             $line =~ m{
-              (ecdsa-sha2-nistp256|ssh-ed25519|ssh-rsa) [\t ]+?
-              ([A-Za-z0-9+/=]{64,717}) (?:[\t ]|$) }x
+              (?<prefix>(?<type>ecdsa)-sha2-nistp256|ssh-(?<type>ed25519|rsa)) [\t ]+?
+              (?<key>[A-Za-z0-9+/=]{64,717}) (?:[\t ]|$) }x
         ) {
-            push @keys, [ $1, "$1 $2" ];
+            push @keys, [ $+{type}, $+{prefix} . ' ' . $+{key} ];
         }
+        croak "too many keys" if @keys > $max_keys;
     }
     return \@keys;
 }
@@ -71,6 +120,7 @@ sub _until_end {
     my $ok;
     my $ret = '';
     while ( my $line = readline $fh ) {
+        die "too many input lines" if $. > $max_lines;
         if ( $line =~ m/^($fin)/ ) {
             $ret .= $1;
             $ok = 1;
@@ -88,12 +138,12 @@ sub _until_end {
         # RFC 4716 ignore "key file header" fields as this code pretends
         # that it cannot recognize any
         if ( $line =~ m/:/ ) {
-            if ( $line =~ m/\\$/ ) {
+            if ( $line =~ m/\\$/ ) {    # backslash continues a line
                 do {
                     $line = readline $fh;
                     return undef, "continued to EOF" if eof $fh;
                     $line =~ s/(\012|\015|\015\012)$//;
-                    return undef, "cline $. too long" if length $line > 72;
+                    return undef, "line $. too long" if length $line > 72;
                 } until $line !~ m/\\$/;
             }
             next;
@@ -185,11 +235,29 @@ cause problems if C<ssh-keygen(1)> or equivalent on some platform
 demands a specific newline sequence that is not C<$/>.
 
 The types C<PEM>, C<PKCS8>, and C<RFC4716> will need conversion for use
-with OpenSSH; see the C<-i -m ...> options to L<ssh-keygen(1)>.
+with OpenSSH; use B<convert_pubkeys> or these types could be excluded
+with something like:
 
-=head1 SUBROUTINE
+  my @pubkeys = grep { $_->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/ }
+    @{ Data::SSHPubkey::pubkeys( ... ) };
+
+or
+
+  ... = map { $_->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/ ? $_->[1] : () }
+    @{ Data::SSHPubkey::pubkeys( ... ) };
+
+to obtain only the public key material.
+
+=head1 SUBROUTINES
 
 =over 4
+
+=item B<convert_pubkeys> I<output-from-pubkeys>
+
+This subroutine converts the output of B<pubkeys> into a list of just
+the public keys, with the C<PEM>, C<PKCS8>, and C<RFC4716> types
+converted into a form suitable for use with OpenSSH, using the external
+tool L<ssh-keygen(1)> that is hopefully installed.
 
 =item B<pubkeys> I<filename-or-scalarref>
 
@@ -206,7 +274,16 @@ sublists.
 
 =back
 
-=head1 VARIABLE
+=head1 VARIABLES
+
+C<$Data::SSHPubkey::max_keys> specifies the maximum number of keys to
+parse, C<3> by default. An exception is thrown if more than C<3> keys
+are seen in the input.
+
+C<$Data::SSHPubkey::max_lines> specifies the maximum number of input
+lines this module will process before throwing an exception, C<100> by
+default. An attacker still might supply too much data with very long
+lines; webserver or other configuration to limit that may be necessary.
 
 The C<%Data::SSHPubkey::ssh_pubkey_types> hash contains as its keys the
 SSH public key types supported by this module.
@@ -225,8 +302,7 @@ L<https://github.com/thrig/Data-SSHPubkey>
 
 =head2 Known Issues
 
-Probably not enough guards or checks against hostile input (too many
-lines of input, for one).
+Probably not enough guards or checks against hostile input.
 
 Support for the C<PEM> and especially C<PKCS8> formats is a bit sloppy,
 and the base64 matching is done by a regex that may accept data that is
@@ -243,6 +319,9 @@ L<File::Slurper> or a traditional C<binmode $fh> should avoid this case
 as the key data looked for is only a subset of ASCII (header values or
 comments that are ignored by this module could be UTF-8 or possibly
 anything else).
+
+B<convert_pubkeys> calls out to (modern versions of) L<ssh-keygen(1)>;
+ideally this might instead be done via suitable CPAN modules.
 
 =head1 SEE ALSO
 

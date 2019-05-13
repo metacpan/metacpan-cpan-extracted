@@ -4,9 +4,9 @@
       "Andrey Khozov, C<avkhozov@googlemail.com>."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,7 +33,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -52,9 +52,12 @@
       }
    },
    "provides" : {
+      "Test::Mojo::Role::Session" : {
+         "file" : "lib/Test/Mojo/Role/Session.pm"
+      },
       "Test::Mojo::Session" : {
          "file" : "lib/Test/Mojo/Session.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -68,10 +71,13 @@
          "web" : "https://github.com/avkhozov/Test-Mojo-Session"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_authority" : "cpan:AVKHOZOV",
    "x_contributors" : [
-      "Renee <reb@perl-services.de>",
-      "Andrey Khozov <avkhozov@gmail.com>"
-   ]
+      "Akron <nils@diewald-online.de>",
+      "Andrey Khozov <avkhozov@gmail.com>",
+      "Renee <reb@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

@@ -20,8 +20,8 @@ Net::SSLeay::randomize();
 Net::SSLeay::load_error_strings();
 Net::SSLeay::OpenSSL_add_ssl_algorithms();
 
-my $cert = File::Spec->catfile(qw( t data cert.pem ));
-my $key  = File::Spec->catfile(qw( t data key.pem  ));
+my $cert = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
+my $key  = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 
 my $how_much = 1024 ** 2;
 

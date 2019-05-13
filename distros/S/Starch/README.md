@@ -51,11 +51,13 @@ Starch was inspired from.
 
 When setting up you need to, at a minimum, define a store:
 
-    use Starch;
-    
-    my $starch = Starch->new(
-        store => { class=>'::Memory' },
-    );
+```perl
+use Starch;
+
+my $starch = Starch->new(
+    store => { class=>'::Memory' },
+);
+```
 
 A store is a hash ref of arguments which are used for constructing the
 store object.  A store object implements a very simple interface for
@@ -77,19 +79,25 @@ on what arguments you can pass.
 
 Now that you have the `$starch` object you can create a state object:
 
-    my $state = $starch->state();
+```perl
+my $state = $starch->state();
+```
 
 This creates a new [Starch::State](https://metacpan.org/pod/Starch::State) object which you can then
 interact with:
 
-    $state->data->{some_key} = 'some_value';
+```
+$state->data->{some_key} = 'some_value';
+```
 
 The ["data" in Starch::State](https://metacpan.org/pod/Starch::State#data) attribute is a writeable hash ref
 which can contain any data you want.  This is the data which will
 be stored by, and retrieved from, the store.  Once you're done
 making changes to the data, call save:
 
-    $state->save();
+```
+$state->save();
+```
 
 This stores the state data in the store.
 
@@ -97,16 +105,22 @@ Each state gets assigned a state ID automatically, unless you specify a custom
 one when creating the state, which can be used to retrieve the state data at a
 later time.  The state ID is a randomly generated SHA-1 hex digest.
 
-    my $id = $state->id();
+```perl
+my $id = $state->id();
+```
 
 To retrieve a previously saved state pass the state ID to the
 ["state" in Starch::Manager](https://metacpan.org/pod/Starch::Manager#state) method:
 
-    my $state = $starch->state( $id );
+```perl
+my $state = $starch->state( $id );
+```
 
 And now you can access the data you previously saved:
 
-    print $state->data->{some_key}; # "some_value"
+```
+print $state->data->{some_key}; # "some_value"
+```
 
 Your framework integration, such as [Catalyst::Plugin::Starch](https://metacpan.org/pod/Catalyst::Plugin::Starch),
 will wrap up and hide away most of these details from you, but
@@ -161,19 +175,23 @@ ref must have the string `&proxy` as the first value, a package name
 as the second value, a method name as the third value, and any number
 of arguments to pass to the method after that:
 
-    [ '&proxy', $package, $method, @args ]
+```
+[ '&proxy', $package, $method, @args ]
+```
 
 Method proxies are really useful when you are configuring Starch from
 static configuration where you cannot dynamically pass a value from Perl.
 
 An example from [Starch::Store::CHI](https://metacpan.org/pod/Starch::Store::CHI) illustrates how this works:
 
-    my $starch = Starch->new(
-        store => {
-            class => '::CHI',
-            chi => ['&proxy', 'My::CHI::Builder', 'get_chi'],
-        },
-    );
+```perl
+my $starch = Starch->new(
+    store => {
+        class => '::CHI',
+        chi => ['&proxy', 'My::CHI::Builder', 'get_chi'],
+    },
+);
+```
 
 This will cause `My::CHI::Builder` to be loaded, if it hasn't already, and then
 `My::CHI::Builder->get_chi()` will be called and the return value used as
@@ -189,9 +207,11 @@ Method proxies can be used with the manager and store objects at any point in
 their arguments.  For example, if you have Perl code that builds the Starch
 configuration from the ground up you could:
 
-    my $starch = Starch->new(
-        [ '&proxy', 'My::Starch::Config', 'get_config' ],
-    );
+```perl
+my $starch = Starch->new(
+    [ '&proxy', 'My::Starch::Config', 'get_config' ],
+);
+```
 
 Which will call `get_config` on the `My::Starch::Config` package and use its
 return value as the arguments for instantiating the Starch object.
@@ -247,11 +267,13 @@ state ([Starch::State](https://metacpan.org/pod/Starch::State)), and store ([Sta
 objects.  To use a plugin pass the `plugins` argument when
 creating your Starch object:
 
-    my $starch = Starch->new(
-        plugins => ['::Trace'],
-        store => { ... },
-        ...,
-    );
+```perl
+my $starch = Starch->new(
+    plugins => ['::Trace'],
+    store => { ... },
+    ...,
+);
+```
 
 These plugins are included with the Starch distribution:
 
@@ -305,13 +327,6 @@ Starch GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch/issues](https://github.com/bluefeet/Starch/issues)
 
-# AUTHORS
-
-    Aran Clary Deltac <bluefeet@gmail.com>
-    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
-    Jonathan Scott Duff <duff@pobox.com>
-    Ismail Kerim <ismail.kerim@assurant.com>
-
 # ACKNOWLEDGEMENTS
 
 Thanks to [ZipRecruiter](https://www.ziprecruiter.com/)
@@ -319,7 +334,28 @@ for encouraging their employees to contribute back to the open
 source ecosystem.  Without their dedication to quality software
 development this distribution would not exist.
 
-# LICENSE
+# AUTHORS
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+```
+Aran Clary Deltac <bluefeet@gmail.com>
+Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+Jonathan Scott Duff <duff@pobox.com>
+Ismail Kerim <ismail.kerim@assurant.com>
+```
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 Aran Clary Deltac
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).

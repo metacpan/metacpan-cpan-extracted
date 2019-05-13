@@ -1,14 +1,11 @@
 package Starch::Plugin::RenewExpiration::State;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo::Role;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::ForState
-);
+with 'Starch::Plugin::ForState';
 
 around save => sub{
     my $orig = shift;

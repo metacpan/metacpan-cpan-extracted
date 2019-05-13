@@ -4,7 +4,7 @@
       "Naoto Ikeno <ikenox@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.17",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Inspector" : "0",
             "Mouse" : "0",
             "perl" : "5.008001"
          }
@@ -56,23 +57,24 @@
    "provides" : {
       "MouseX::Types::Enum" : {
          "file" : "lib/MouseX/Types/Enum.pm",
-         "version" : "1.04"
-      },
-      "MouseX::Types::Enum::Base" : {
-         "file" : "lib/MouseX/Types/Enum.pm"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ikenox/perl-enum/issues"
+         "web" : "https://github.com/ikenox/Perl-MouseX-Types-Enum/issues"
       },
-      "homepage" : "https://github.com/ikenox/perl-enum",
+      "homepage" : "https://github.com/ikenox/Perl-MouseX-Types-Enum",
       "repository" : {
-         "url" : "git://github.com/ikenox/perl-enum.git",
-         "web" : "https://github.com/ikenox/perl-enum"
+         "url" : "git://github.com/ikenox/Perl-MouseX-Types-Enum.git",
+         "web" : "https://github.com/ikenox/Perl-MouseX-Types-Enum"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.01",
+   "x_contributors" : [
+      "Naoto Ikeno <naoto.ikeno@dena.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

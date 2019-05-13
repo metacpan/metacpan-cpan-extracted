@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 3 0 9)
+MYPACKAGESTART (marpaESLIF 3 0 10)
 
 ###########
 # Library #
@@ -84,10 +84,25 @@ MYPACKAGEDEPENDENCY (luaunpanic    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/
 # - Using pcre2 requires setting PCRE2_CODE_UNIT_WIDTH.
 # - Embedded lua uses long double for the lua_Number
 #
+IF (HAVE_SIZEOF_LONG_LONG)
+  SET (LUA_INT_TYPE 3)             # long long
+ELSE ()
+  SET (LUA_INT_TYPE 2)             # long
+ENDIF ()
+SET (LUA_FLOAT_TYPE 3)             # long double
+
+FOREACH (_luatarget luaunpanic luaunpanic_static)
+  #
+  # luaunpanic is used internally by marpaESLIF, and setting
+  # these compile definitions will make everything that depend on
+  # luaunpanic to have them
+  #
+  TARGET_COMPILE_DEFINITIONS (${_luatarget} PUBLIC -DLUA_INT_TYPE=${LUA_INT_TYPE} -DLUA_FLOAT_TYPE=${LUA_FLOAT_TYPE})
+ENDFOREACH ()
 FOREACH (_target marpaESLIF marpaESLIF_static)
   ADD_DEPENDENCIES           (${_target} pcre2)
   TARGET_INCLUDE_DIRECTORIES (${_target} PRIVATE ${PCRE2_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/output/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/lua/include")
-  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC=1 -DMARPAESLIFLUA_EMBEDDED -DLUA_FLOAT_TYPE=3)
+  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC=1 -DMARPAESLIFLUA_EMBEDDED)
   TARGET_LINK_LIBRARIES      (${_target} PRIVATE ${PCRE2_LIBRARIES})
 ENDFOREACH ()
 

@@ -1,7 +1,7 @@
 package Finance::Bank::ID::Mandiri;
 
-our $DATE = '2019-01-29'; # DATE
-our $VERSION = '0.381'; # VERSION
+our $DATE = '2019-05-13'; # DATE
+our $VERSION = '0.382'; # VERSION
 
 use 5.010001;
 
@@ -22,7 +22,7 @@ my $re_money       = qr/(?:\d+(?:\.\d\d?)?)/;
 my $re_moneymin    = qr/(?:-?\d+(?:\.\d\d?)?)/; # allow negative
 my $re_money2      = qr/(?:[\d,]*(?:\.\d\d?)?)/; # allow starts with ., e.g. .00. formatted thousand=, decimal=.
 my $re_date1       = qr!(?:\d{2}/\d{2}/\d{4})!; # 25/12/2010
-my $re_txcode      = qr!(?:\d{4})!;
+my $re_txcode      = qr!(?:\d{3,4})!;
 
 # original version when support first added
 our $re_mcm_v201009 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
@@ -50,8 +50,7 @@ our $re_mcm_v201107 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
                          (?<amount_cr>$re_money);
                          (?<bal>$re_moneymin)!mx; # maybe? no more DR marker
 
-# this CSV is currently available when we use the indonesian language on the
-# website. what's different: a CSV (comma as field separator), a header field,
+# what's different: a CSV (comma as field separator), a header field,
 # no more currency field, two dates.
 # header: Account No,Date,Val. Date,Transaction Code,Description,Description,Reference No.,Debit,Credit,
 our $re_mcm_v201901 = qr!^(?<acc>$re_acc),
@@ -688,7 +687,7 @@ Finance::Bank::ID::Mandiri - Check your Bank Mandiri accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.381 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2019-01-29.
+This document describes version 0.382 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2019-05-13.
 
 =head1 SYNOPSIS
 

@@ -48,7 +48,7 @@ App::TimeTracker::Command::SyncViaGit - App::TimeTracker SyncViaGit plugin
 
 =head1 VERSION
 
-version 2.027
+version 2.028
 
 =head1 DESCRIPTION
 

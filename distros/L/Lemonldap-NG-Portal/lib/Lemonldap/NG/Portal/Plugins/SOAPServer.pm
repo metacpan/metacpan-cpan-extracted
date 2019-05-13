@@ -272,7 +272,7 @@ sub getAttributes {
     my ( $self, $req, $id ) = @_;
     die 'id is required' unless ($id);
 
-    my $session = $self->p->getApacheSession($id);
+    my $session = $self->p->getApacheSession( $id, kind => '' );
 
     my @tmp = ();
     unless ($session) {

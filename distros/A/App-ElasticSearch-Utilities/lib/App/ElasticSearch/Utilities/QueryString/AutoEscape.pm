@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::AutoEscape;
 use strict;
 use warnings;
 
-our $VERSION = '6.4'; # VERSION
+our $VERSION = '6.5'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Const::Fast;
@@ -13,7 +13,7 @@ use namespace::autoclean;
 use Moo;
 with 'App::ElasticSearch::Utilities::QueryString::Plugin';
 
-sub _build_priority { 75; }
+sub _build_priority { 5; }
 
 
 sub handle_token {
@@ -41,7 +41,7 @@ App::ElasticSearch::Utilities::QueryString::AutoEscape - Provides a prefix of '=
 
 =head1 VERSION
 
-version 6.4
+version 6.5
 
 =head1 SYNOPSIS
 

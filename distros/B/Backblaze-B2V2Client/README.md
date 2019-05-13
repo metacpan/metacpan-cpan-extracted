@@ -32,7 +32,7 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
                 'new_file_name' => 'ginger_was_perfect.jpg',
                 'file_contents' => $file_contents
         ); 
-        # B2 file ID (fGUID) is in $b2client->{b2_response}{'X-Bz-File-Id'}
+        # B2 file ID (fGUID) is now in $b2client->{b2_response}{fileId}
 
         # download that file to /opt/majestica/tmp
         $b2client->b2_download_file_by_name('GingerAnna','ginger_was_perfect.jpg','/opt/majestica/tmp');
@@ -138,6 +138,12 @@ Example 2: Uploading when the file is loaded into a scalar:
                 'new_file_name' => 'ginger_was_perfect.jpg',
                 'file_contents' => $file_contents
         );      
+
+You can also pass a 'content-type' key with the MIME type for the new
+file.  The default is 'b2/auto'.
+
+Upon a successful upload, the new GUID for the file will be available 
+in $b2client->{b2\_response}{fileId} .
 
 See: https://www.backblaze.com/b2/docs/b2\_upload\_file.html
 

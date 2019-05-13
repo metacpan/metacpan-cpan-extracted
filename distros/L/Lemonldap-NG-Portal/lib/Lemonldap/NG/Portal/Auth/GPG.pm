@@ -142,7 +142,7 @@ sub authenticate {
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
-    $req->sessionInfo->{gpgMail} = $req->data->{gpgMail};
+    $req->sessionInfo->{gpgMail}             = $req->data->{gpgMail};
     $req->sessionInfo->{authenticationLevel} = $self->conf->{gpgAuthnLevel};
     PE_OK;
 }

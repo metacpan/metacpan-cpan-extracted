@@ -17,6 +17,9 @@ sub get_debian_jessie_plugin_obj {
     get_plugin_obj({ os => 'linux', linuxdistro => 'debian', linuxdistroversion => 8, linuxdistrocodename => 'jessie' });
 }
 
+my @warnings;
+$SIG{__WARN__} = sub { push @warnings, @_ };
+
 {
     my $cpandist = CPAN::Distribution->new(
 					   ID => 'X/XX/XXX/Linux-Only-1.0.tar.gz',
@@ -48,9 +51,22 @@ sub get_debian_jessie_plugin_obj {
 
 {
     my $cpandist = CPAN::Distribution->new(
+					   ID => 'X/XX/XXX/FreeBSD-Version2-1.0.tar.gz',
+					   CONTAINSMODS => { 'FreeBSD::Version2' => undef },
+					  );
+    is_deeply [get_debian_jessie_plugin_obj()->_map_cpandist($cpandist)], [];
+    is_deeply [get_plugin_obj({ os => 'freebsd', osvers => '0.1-RELEASE' })->_map_cpandist($cpandist)], [];
+    is_deeply [get_plugin_obj({ os => 'freebsd', osvers => '9.1-RELEASE' })->_map_cpandist($cpandist)], ['gcc'];
+    is_deeply [get_plugin_obj({ os => 'freebsd', osvers => '10.1-RELEASE' })->_map_cpandist($cpandist)], ['clang'];
+}
+
+{
+    my $cpandist = CPAN::Distribution->new(
 					   ID => 'X/XX/XXX/Multi-Packages-1.0.tar.gz',
 					   CONTAINSMODS => { 'Multi::Packages' => undef },
 					  );
     is_deeply [get_debian_jessie_plugin_obj()->_map_cpandist($cpandist)], ['package-one', 'package-two'];
     is_deeply [get_plugin_obj({ os => 'freebsd', osvers => '10.1-RELEASE' })->_map_cpandist($cpandist)], ['package-one', 'package-two'];
 }
+
+is_deeply \@warnings, [], 'no warnings';

@@ -11,7 +11,7 @@ use Test2::Mock();
 
 use base 'Exporter';
 
-our $VERSION = '0.000120';
+our $VERSION = '0.000121';
 
 our @CARP_NOT = (__PACKAGE__, 'Test2::Mock');
 our @EXPORT = qw/mock mocked/;
@@ -308,6 +308,8 @@ plugins in ways L<Mock::Quick> would be unable to.
 =head1 SYNOPSIS
 
     my $mock = mock 'Some::Class' => (
+        track => $BOOL, # Enable/Disable tracking on subs defined below
+
         add => [
             new_method => sub { ... },
         ],
@@ -316,7 +318,10 @@ plugins in ways L<Mock::Quick> would be unable to.
         ],
         set => [
             replace_or_inject => sub { ... },
-        ]
+        ],
+
+        track => $bool, # enable/disable tracking again to effect mocks made after this point
+        ..., # Argument keys may be repeated
     );
 
     Some::Class->new_method();        # Calls the newly injected method

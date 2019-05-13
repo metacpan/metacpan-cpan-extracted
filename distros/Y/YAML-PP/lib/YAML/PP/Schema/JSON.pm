@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::JSON;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use B;
 
@@ -138,3 +138,37 @@ sub register {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+YAML::PP::Schema::JSON - YAML 1.2 JSON Schema
+
+=head1 SYNOPSIS
+
+    my $yp = YAML::PP->new( schema => ['JSON'] );
+
+=head1 DESCRIPTION
+
+With this schema, the resolution of plain values will work like in JSON.
+Everything that matches a special value will be loaded as such, other plain
+scalars will be loaded as strings.
+
+L<https://yaml.org/spec/1.2/spec.html#id2803231>
+
+=head1 METHODS
+
+=over
+
+=item register
+
+Called by YAML::PP::Schema
+
+=back
+
+=cut

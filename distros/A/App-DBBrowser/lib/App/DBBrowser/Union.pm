@@ -7,7 +7,7 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw( choose );
+use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
 
@@ -26,6 +26,7 @@ sub union_tables {
     my ( $sf ) = @_;
     $sf->{i}{stmt_types} = [ 'Union' ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
     my $union = {
@@ -58,9 +59,9 @@ sub union_tables {
         my $choices  = [ @pre, @tmp_tables, @post ];
         $ax->print_sql( $union );
         # Choose
-        my $idx_tbl = choose(
+        my $idx_tbl = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, prompt => $prompt, index => 1 }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1 }
         );
         if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
             if ( @bu ) {
@@ -126,6 +127,7 @@ sub union_tables {
 sub __union_table_columns {
     my ( $sf, $union, $union_table, $qt_union_table ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my ( $privious_cols, $void ) = ( q['^'], q[' '] );
     my $next_idx = @{$union->{subselect_data}};
     my $table_cols = [];
@@ -135,10 +137,9 @@ sub __union_table_columns {
         my @pre = ( undef, $sf->{i}{ok}, @{$union->{saved_cols}} ? $privious_cols : $void );
         $ax->print_sql( $union );
         # Choose
-        my @chosen = choose(
+        my @chosen = $tc->choose(
             [ @pre, @{$sf->{d}{col_names}{$union_table}} ],
-            { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Choose Column:',
-            meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
+            { %{$sf->{i}{lyt_h}}, prompt => 'Choose Column:', meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
         );
         if ( ! defined $chosen[0] ) {
             if ( @bu_cols ) {
@@ -178,15 +179,23 @@ sub __union_table_columns {
 sub __union_all_tables {
     my ( $sf, $union ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $choices  = [ undef, map( "- $_", @{$sf->{d}{user_tables}} ) ];
+    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my @tables_union_auto;
+    for my $table ( @{$sf->{d}{user_tables}} ) {
+        if ( $sf->{d}{tables_info}{$table}[3] ne 'TABLE' ) {
+            next;
+        }
+        push @tables_union_auto, $table;
+    }
+    my $choices  = [ undef, map( "- $_", @tables_union_auto ) ];
 
     while ( 1 ) {
-        $union->{subselect_data} = [ map { [ $_, [ '?' ] ] } @{$sf->{d}{user_tables}} ];
+        $union->{subselect_data} = [ map { [ $_, [ '?' ] ] } @tables_union_auto ];
         $ax->print_sql( $union );
         # Choose
-        my $idx_tbl = choose(
+        my $idx_tbl = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, prompt => 'One UNION table for cols:', index => 1 }
+            { %{$sf->{i}{lyt_v}}, prompt => 'One UNION table for cols:', index => 1 }
         );
         if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
             $union->{subselect_data} = [];
@@ -201,7 +210,7 @@ sub __union_all_tables {
     }
     my $qt_used_cols = $union->{subselect_data}[-1][1];
     $union->{subselect_data} = [];
-    for my $union_table ( @{$sf->{d}{user_tables}} ) {
+    for my $union_table ( @tables_union_auto ) {
         push @{$union->{subselect_data}}, [ $ax->quote_table( $sf->{d}{tables_info}{$union_table} ), $qt_used_cols ];
     }
     $ax->print_sql( $union );

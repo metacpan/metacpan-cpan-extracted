@@ -1,5 +1,5 @@
 requires "Carp" => "0";
-requires "Exporter" => "0";
+requires "Exporter::Shiny" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
 

@@ -177,10 +177,9 @@ sub pop3_user
 {
 	my ($session, $user) = @_;
 	return fail("already authorized") if exists $session->{user};
-	return fail("bad username: must be CPR:CODE, f.ex. 205674-5675:dc456gh") 
-		unless ($user//'') =~ /^(\d{6})\-?(\d{4})\:(\w+)$/;
+	return fail("bad username: must be CPR, f.ex. 205674-5675") 
+		unless ($user//'') =~ /^(\d{6})\-?(\d{4})$/;
 	$session->{user} = $1 . $2;
-	$session->{code} = $3;
 	return ok("hello");
 }
 
@@ -192,12 +191,12 @@ sub pop3_pass
 
 	$session->{obj}  = Net::Eboks->new(
 		cpr        => $session->{user},
-		activation => $session->{code},
 		password   => $session->{pass},
+		home       => $opt{keys},
 	);
 	return lambda {
 		debug("[$session->{hostname}] login");
-		context $session->{obj}->fetch_request($session->{obj}->login);
+		context $session->{obj}->fetch_request($session->{obj}->login_nemid);
 	tail {
 		my ( $uname, $error ) = @_;
 		debug("[$session->{hostname}] $error") if $error;

@@ -159,6 +159,7 @@ struct marpaESLIFSymbol {
   genericStack_t              *nullableRuleStackp;     /* Pointer to _nullableRuleStack */
   marpaESLIFAction_t          *nullableActionp;        /* Nullable semantic */
   int                          propertyBitSet;
+  int                          eventBitSet;
   genericStack_t               _lhsRuleStack;          /* Stack of rules having this symbol as LHS */
   genericStack_t              *lhsRuleStackp;          /* Pointer to stack of rules having this symbol as LHS */
   marpaESLIF_symbol_t         *exceptionp;             /* Pointer to an exception itself, the one after the '-' character */
@@ -200,8 +201,12 @@ struct marpaESLIF_grammar {
   short                  latmb;                              /* Longest acceptable token match mode */
   marpaWrapperGrammar_t *marpaWrapperGrammarStartp;          /* Grammar implementation at :start */
   marpaWrapperGrammar_t *marpaWrapperGrammarStartNoEventp;   /* Grammar implementation at :start forcing no event */
+  size_t                 nSymbolStartl;                      /* Number of lexemes at the very beginning of marpaWrapperGrammarStartp */
+  int                   *symbolArrayStartp;                  /* Lexemes at the very beginning of marpaWrapperGrammarStartp */
   marpaWrapperGrammar_t *marpaWrapperGrammarDiscardp;        /* Grammar implementation at :discard */
   marpaWrapperGrammar_t *marpaWrapperGrammarDiscardNoEventp; /* Grammar implementation at :discard forcing no event */
+  size_t                 nSymbolDiscardl;                    /* Number of lexemes at the very beginning of marpaWrapperGrammarDiscardp */
+  int                   *symbolArrayDiscardp;                /* Lexemes at the very beginning of marpaWrapperGrammarStartp */
   marpaESLIF_symbol_t   *discardp;                           /* Discard symbol, used at grammar validation */
   genericStack_t         _symbolStack;                       /* Stack of symbols */
   genericStack_t        *symbolStackp;                       /* Pointer to stack of symbols */
@@ -271,6 +276,8 @@ struct marpaESLIF_meta {
   marpaESLIFGrammar_t         _marpaESLIFGrammarLexemeClone;    /* Cloned ESLIF grammar in lexeme search mode (no event): allocated when meta is allocated */
   marpaESLIF_grammar_t        _grammar;
   marpaESLIFGrammar_t         *marpaESLIFGrammarLexemeClonep;   /* Cloned ESLIF grammar in lexeme search mode (no event) */
+  size_t                       nSymbolStartl;                   /* Number of lexemes at the very beginning of marpaWrapperGrammarStartp */
+  int                         *symbolArrayStartp;               /* Lexemes at the very beginning of marpaWrapperGrammarStartp */
 };
 
 struct marpaESLIFValue {
@@ -407,6 +414,10 @@ struct marpaESLIFRecognizer {
   genericHash_t               *beforePtrHashp;
   genericHash_t                _afterPtrHash;
   genericHash_t               *afterPtrHashp;
+
+  /* For pristine recognizers, expected terminals are always known in advance */
+  size_t                       nSymbolPristinel;
+  int                          *symbolArrayPristinep; /* This is shallow pointer! */
 };
 
 struct marpaESLIF_lexeme_data {

@@ -12,7 +12,7 @@ use FindBin               qw( $RealBin $RealScript );
 #use Pod::Usage            qw( pod2usage ); # required
 
 use Encode::Locale     qw();
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( insert_sep print_hash choose_a_number choose_a_subset settings_menu choose_a_dir );
 use Term::Form         qw();
 
@@ -118,6 +118,7 @@ sub set_options {
         my $opt_get = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
         $sf->{o} = $opt_get->read_config_files();
     }
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $groups;
     if ( $arg_groups ) {
         $groups = [ @$arg_groups ];
@@ -136,9 +137,9 @@ sub set_options {
             my @pre  = ( undef, $sf->{i}{_continue} );
             my $choices = [ @pre, map( $_->{text}, @$groups ) ];
             # Choose
-            my $grp_idx = choose(
+            my $grp_idx = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_stmt_v}}, index => 1, default => $grp_old_idx, undef => $sf->{i}{_quit} }
+                { %{$sf->{i}{lyt_v}}, index => 1, default => $grp_old_idx, undef => $sf->{i}{_quit} }
             );
             if ( ! $grp_idx ) {
                 if ( $sf->{write_config} ) {
@@ -188,9 +189,9 @@ sub set_options {
                 my @pre  = ( undef );
                 my $choices = [ @pre, map( $_->{text}, @$options ) ];
                 # Choose
-                my $opt_idx = choose(
+                my $opt_idx = $tc->choose(
                     $choices,
-                    { %{$sf->{i}{lyt_stmt_v}}, index => 1, default => $opt_old_idx, undef => '  <=' }
+                    { %{$sf->{i}{lyt_v}}, index => 1, default => $opt_old_idx, undef => '  <=' }
                 );
                 if ( ! $opt_idx ) {
                     if ( @$groups == 1 ) {
@@ -536,7 +537,10 @@ sub set_options {
 
 sub __settings_menu_wrap {
     my ( $sf, $section, $sub_menu, $prompt ) = @_;
-    my $changed = settings_menu( $sub_menu, $sf->{o}{$section}, { prompt => $prompt, mouse => $sf->{o}{table}{mouse} } );
+    my $changed = settings_menu(
+        $sub_menu, $sf->{o}{$section},
+        { prompt => $prompt, mouse => $sf->{o}{table}{mouse} }
+    );
     return if ! $changed;
     $sf->{write_config}++;
 }
@@ -550,8 +554,9 @@ sub __choose_a_subset_wrap {
     my $name = 'New: ';
     my $list = choose_a_subset(
         $available,
-        { info => $info, name => $name, prompt => $prompt, prefix => '- ', index => 0, keep_chosen => 0,
-          clear_screen => 1, mouse => $sf->{o}{table}{mouse}, back => '  BACK', confirm => '  CONFIRM' }
+        { prompt => $prompt, name => $name, info => $info, prefix => '- ', keep_chosen => 0,
+          mouse => $sf->{o}{table}{mouse}, index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
+          clear_screen => 1 }
     );
     return if ! defined $list;
     return if ! @$list;
@@ -569,9 +574,9 @@ sub __choose_a_number_wrap {
     my $name = 'New: ';
     #$info = $prompt . "\n" . $info;
     # Choose_a_number
-    my $choice = choose_a_number(
-        $digits, { prompt => $prompt, name => $name, info => $info, mouse => $sf->{o}{table}{mouse},
-                   clear_screen => 1, small_first => $small_first }
+    my $choice = choose_a_number( $digits,
+        { prompt => $prompt, name => $name, info => $info, small_first => $small_first,
+          mouse => $sf->{o}{table}{mouse}, clear_screen => 1 }
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
@@ -588,8 +593,8 @@ sub __group_readline {
             $sf->{o}{$section}{$_->{name}}
         ]
     } @{$items} ];
-    my $trs = Term::Form->new();
-    my $new_list = $trs->fill_form(
+    my $tf = Term::Form->new();
+    my $new_list = $tf->fill_form(
         $list,
         { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
@@ -609,7 +614,9 @@ sub __choose_a_dir_wrap {
         $info = '<< ' . $sf->{o}{$section}{$opt};
     }
     # Choose_a_dir
-    my $dir = choose_a_dir( { mouse => $sf->{o}{table}{mouse}, info => $info, name => 'OK ' } );
+    my $dir = choose_a_dir(
+        { name => 'OK ', info => $info, mouse => $sf->{o}{table}{mouse} }
+    );
     return if ! length $dir;
     $sf->{o}{$section}{$opt} = $dir;
     $sf->{write_config}++;

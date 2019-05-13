@@ -39,7 +39,7 @@ use Math::Trig qw/:radial pi great_circle_distance/;
 
 use Storable qw/ dclone /;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 our $CLEANUP = 1;
 $CLEANUP = 0 if defined $ENV{DEBUG};

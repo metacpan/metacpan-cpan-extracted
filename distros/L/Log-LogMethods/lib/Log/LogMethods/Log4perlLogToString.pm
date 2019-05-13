@@ -39,6 +39,7 @@ use Log::LogMethods;
 use Log::Log4perl::Appender;
 use Log::Log4perl::Layout::PatternLayout;
 use Log::Dispatch::Handle;
+Log::Log4perl->wrapper_register(__PACKAGE__);
 our $VERSION=$Log::LogMethods::VERSION;
 
 our @EXPORT=qw(LoggerToString LoggerToFh $DEFAULT_LAYOUT);

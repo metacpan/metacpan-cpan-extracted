@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 79;
+use Test::More tests => 103;
 use Net::SSLeay;
 use File::Spec;
 use IO::Socket::INET;
@@ -17,9 +17,10 @@ Net::SSLeay::add_ssl_algorithms();
 Net::SSLeay::OpenSSL_add_all_algorithms();
 
 # Our CA cert and a cert signed with it
-my $ca_pem = File::Spec->catfile('t', 'data', 'test_CA1.crt.pem');
-my $ca_dir =  File::Spec->catfile('t', 'data');
-my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
+my $ca_pem = File::Spec->catfile('t', 'data', 'test_CA1_2048.crt.pem');
+#my $ca_dir =  File::Spec->catfile('t', 'data');
+my $ca_dir =  '';
+my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard_CA1_2048.crt.pem');
 my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 
 my $pm;
@@ -92,6 +93,8 @@ SKIP: {
      client($server_addr);
 }
 
+verify_local_trust();
+
 sub test_policy_checks
 {
     my ($ctx, $cl, $ok) = @_;
@@ -121,7 +124,7 @@ sub test_policy_checks
     Net::SSLeay::X509_VERIFY_PARAM_free($pm);
 }
 
-# Currently OpenSSL specific: even the latest LibreSSL 2.6.3 does not have these
+# These need at least OpenSSL 1.0.2 or LibreSSL 2.7.0
 sub test_hostname_checks
 {
     my ($ctx, $cl, $ok) = @_;
@@ -162,12 +165,17 @@ sub test_hostname_checks
 	  is($verify_result, Net::SSLeay::X509_V_ERR_HOSTNAME_MISMATCH(), 'Verify result is X509_V_ERR_HOSTNAME_MISMATCH');
       }
 
-      # For some reason OpenSSL 1.0.2 returns undef for get0_peername. Are we doing this wrong?
+      # For some reason OpenSSL 1.0.2 and LibreSSL return undef for get0_peername. Are we doing this wrong?
       $pm2 = Net::SSLeay::get0_param($ssl);
       my $peername = Net::SSLeay::X509_VERIFY_PARAM_get0_peername($pm2);
-      is($peername, '*.example.com', 'X509_VERIFY_PARAM_get0_peername returns *.example.com')     if ($ok && Net::SSLeay::SSLeay >= 0x10100000);
-      is($peername, undef, 'X509_VERIFY_PARAM_get0_peername returns undefined for OpenSSL 1.0.2') if ($ok && Net::SSLeay::SSLeay <  0x10100000);
-      is($peername, undef, 'X509_VERIFY_PARAM_get0_peername returns undefined') if !$ok;
+      if ($ok) {
+	  is($peername, '*.example.com', 'X509_VERIFY_PARAM_get0_peername returns *.example.com')
+	      if (Net::SSLeay::SSLeay >= 0x10100000 && !Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER"));
+	  is($peername, undef, 'X509_VERIFY_PARAM_get0_peername returns undefined for OpenSSL 1.0.2 and LibreSSL')
+	      if (Net::SSLeay::SSLeay <  0x10100000 ||  Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER"));
+      } else {
+	  is($peername, undef, 'X509_VERIFY_PARAM_get0_peername returns undefined');
+      }
 
       Net::SSLeay::X509_VERIFY_PARAM_free($pm);
       Net::SSLeay::X509_VERIFY_PARAM_free($pm2);
@@ -194,6 +202,57 @@ sub test_wildcard_checks
 
       Net::SSLeay::X509_VERIFY_PARAM_free($pm);
     }
+}
+
+sub verify_local_trust {
+    my $digicert_ca = File::Spec->catfile('t', 'data', 'test_CA1.crt.pem');
+    my $twitter_chain = File::Spec->catfile('t', 'data', 'chain_leaf.crt.pem');
+
+    # read in twitter chain
+    my $bio = Net::SSLeay::BIO_new_file($twitter_chain, 'r');
+    ok(my $x509_info_sk = Net::SSLeay::PEM_X509_INFO_read_bio($bio), "PEM_X509_INFO_read_bio able to read in entire chain");
+    Net::SSLeay::BIO_free($bio);
+    # read in just twitter certificate
+    $bio = Net::SSLeay::BIO_new_file($twitter_chain, 'r');
+    ok(my $cert = Net::SSLeay::PEM_read_bio_X509($bio), "PEM_read_bio_X509 able to read in single cert from chain");
+    Net::SSLeay::BIO_free($bio);
+    # read in root CA (digicert CA)
+    $bio = Net::SSLeay::BIO_new_file($digicert_ca, 'r');
+    ok(my $ca = Net::SSLeay::PEM_read_bio_X509($bio), "PEM_read_bio_X509 able to read in root CA");
+    Net::SSLeay::BIO_free($bio);
+
+    ok(my $x509_sk = Net::SSLeay::sk_X509_new_null(), "sk_X509_new_null creates STACK_OF(X509) successfully");
+    ok(my $num = Net::SSLeay::sk_X509_INFO_num($x509_info_sk), "sk_X509_INFO_num is nonzero");
+
+    # set up STORE_CTX and verify twitter cert using only root CA, should fail due to incomplete chain
+    ok(my $store = Net::SSLeay::X509_STORE_new(), "X509_STORE_new creates new store");
+    ok(Net::SSLeay::X509_STORE_add_cert($store, $ca), "X509_STORE_add_cert CA cert");
+    ok(my $ctx = Net::SSLeay::X509_STORE_CTX_new(), "X509_STORE_CTX_new creates new store context");
+    Net::SSLeay::X509_STORE_CTX_init($ctx, $store, $cert);
+    ok(!Net::SSLeay::X509_verify_cert($ctx), 'X509_verify_cert correctly fails');
+    is(Net::SSLeay::X509_STORE_CTX_get_error($ctx),
+        Net::SSLeay::X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY(), "X509_STORE_CTX_get_error returns unable to get local issuer certificate");
+    Net::SSLeay::X509_STORE_free($store);
+    Net::SSLeay::X509_STORE_CTX_free($ctx);
+
+    # add all certificates from twitter chain to X509 stack
+    for (my $i = 0; $i < $num; $i++) {
+        ok(my $x509_info = Net::SSLeay::sk_X509_INFO_value($x509_info_sk, $i), "sk_X509_INFO_value");
+        ok(my $x509 = Net::SSLeay::P_X509_INFO_get_x509($x509_info), "P_X509_INFO_get_x509");
+        ok(Net::SSLeay::sk_X509_push($x509_sk, $x509), "sk_X509_push");
+    }
+
+    # set up STORE_CTX and verify twitter cert using root CA and chain, should succeed
+    ok($store = Net::SSLeay::X509_STORE_new(), "X509_STORE_new creates new store");
+    ok(Net::SSLeay::X509_STORE_add_cert($store, $ca), "X509_STORE_add_cert CA cert");
+    ok($ctx = Net::SSLeay::X509_STORE_CTX_new(), "X509_STORE_CTX_new creates new store context");
+    Net::SSLeay::X509_STORE_CTX_init($ctx, $store, $cert, $x509_sk);
+    ok(Net::SSLeay::X509_verify_cert($ctx), 'X509_verify_cert correctly succeeds');
+    is(Net::SSLeay::X509_STORE_CTX_get_error($ctx), Net::SSLeay::X509_V_OK(), "X509_STORE_CTX_get_error returns ok");
+    Net::SSLeay::X509_STORE_free($store);
+    Net::SSLeay::X509_STORE_CTX_free($ctx);
+
+    Net::SSLeay::sk_X509_free($x509_sk);
 }
 
 # Prepare and return a new $ssl based on callers verification needs
@@ -252,8 +311,9 @@ sub client {
     Net::SSLeay::set_fd($ssl, $cl);
     Net::SSLeay::connect($ssl);
     my $end = "end";
-    Net::SSLeay::write($ssl, $end);
-    ok($end eq Net::SSLeay::read($ssl),  'Successful termination');
+    Net::SSLeay::ssl_write_all($ssl, $end);
+    Net::SSLeay::shutdown($ssl);
+    ok($end eq Net::SSLeay::ssl_read_all($ssl), 'Successful termination');
     return;
 }
 
@@ -266,10 +326,20 @@ sub run_server
 
     return if $pid != 0;
 
+    $SIG{'PIPE'} = 'IGNORE';
     my $ctx = Net::SSLeay::CTX_new();
     Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
     my $ret = Net::SSLeay::CTX_check_private_key($ctx);
     BAIL_OUT("Server: CTX_check_private_key failed: $cert_pem, $key_pem") unless $ret == 1;
+    if (defined &Net::SSLeay::CTX_set_num_tickets) {
+        # TLS 1.3 server sends session tickets after a handhake as part of
+        # the SSL_accept(). If a client finishes all its job including closing
+        # TCP connectino before a server sends the tickets, SSL_accept() fails
+        # with SSL_ERROR_SYSCALL and EPIPE errno and the server receives
+        # SIGPIPE signal. <https://github.com/openssl/openssl/issues/6904>
+        my $ret = Net::SSLeay::CTX_set_num_tickets($ctx, 0);
+        BAIL_OUT("Session tickets disabled") unless $ret;
+    }
 
     while (1)
     {
@@ -281,10 +351,10 @@ sub run_server
 	next unless $ret == 1;
 
 	# Termination request or other message from client
-	my $msg = Net::SSLeay::read($ssl);
-	if ($msg eq 'end')
+	my $msg = Net::SSLeay::ssl_read_all($ssl);
+	if (defined $msg and $msg eq 'end')
 	{
-	    Net::SSLeay::write($ssl, 'end');
+	    Net::SSLeay::ssl_write_all($ssl, 'end');
 	    exit (0);
 	}
     }

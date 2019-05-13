@@ -1,3 +1,6 @@
+1.29 Sat 11 May 2019 10:26:54 AM CEST
+ - Fix regex for alias to match the one for anchors (PR#214 TINITA)
+
 1.28 Sun 28 Apr 2019 11:46:21 AM CEST
  - Security fix: only enable loading globs when $LoadCode is set (PR#213
    TINITA)

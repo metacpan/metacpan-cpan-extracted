@@ -16,6 +16,7 @@ Calculator
 Durand
 ESLIF
 Event
+EventBitSet
 Grammar
 Interface
 Introduction

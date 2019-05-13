@@ -1,5 +1,11 @@
+0.4.3
+  - Upgrading to 0.4.3 of libBigWig
+
+0.4.2
+  - Upgrading to 0.4.2 of libBigWig and clarifying licensing of this repository
+
 0.3.3
   - Bug fixes to libBigWig and version bump
 
 0.3.1
-  - First release in line with the libBigWig versioninig numbers
+  - First release in line with the libBigWig versioning numbers

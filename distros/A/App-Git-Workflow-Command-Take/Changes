@@ -1,5 +1,13 @@
 Revision history for App-Git-Workflow-Command-Take
 
+0.7   2019-05-08
+        Updating for release of version 0.7
+        Updated date (Ivan Wills)
+        Switching giles (Ivan Wills)
+        Skipping maniest skip (Ivan Wills)
+        Fixing manifest (Ivan Wills)
+        Adding an auto add to commit option (Ivan Wills)
+
 0.6   2018-12-16
         Updating for release of version 0.6
         Updating dependencies (Ivan Wills)

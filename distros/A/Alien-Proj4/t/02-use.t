@@ -23,6 +23,16 @@ diag ('bin dir: ' . join (' ', Alien::Proj4->bin_dir));
 my @bin = Alien::Proj4->bin_dir;
 diag "no proj bin dir found via bin_dir method\n" if not @bin;
 
+diag 'Checking dynamic lib existence';
+foreach my $file (Alien::Proj4->dynamic_libs) {
+    my $exists = -e $file;
+    my $is_link = -l $file;
+    diag "$file "
+        . ($exists  ? 'exists' : 'cannot be found')
+        . ', and '
+        . ($is_link ? 'is a symbolic link ' : 'is not a symbolic link');
+}
+
 
 #  some very basic tests for the projection info
 my $info = eval {

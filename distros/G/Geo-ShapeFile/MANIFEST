@@ -16,6 +16,7 @@ t/main_tests.t
 t/test_data/anno.aux
 t/test_data/anno.dbf
 t/test_data/anno.shp
+t/test_data/anno.shp.xml
 t/test_data/anno.shx
 t/test_data/brklinz.dbf
 t/test_data/brklinz.shp
@@ -59,6 +60,7 @@ t/test_data/poly_to_check_index.shp.xml
 t/test_data/poly_to_check_index.shx
 t/test_data/polygon.dbf
 t/test_data/polygon.shp
+t/test_data/polygon.shp.xml
 t/test_data/polygon.shx
 t/test_data/rivers.dbf
 t/test_data/rivers.sbn
@@ -84,6 +86,13 @@ t/test_data/test_shapes_in_area.dbf
 t/test_data/test_shapes_in_area.prj
 t/test_data/test_shapes_in_area.shp
 t/test_data/test_shapes_in_area.shx
+t/test_data/unicode_name_ñøß.dbf
+t/test_data/unicode_name_ñøß.sbn
+t/test_data/unicode_name_ñøß.sbx
+t/test_data/unicode_name_ñøß.shp
+t/test_data/unicode_name_ñøß.shp.xml
+t/test_data/unicode_name_ñøß.shx
+t/test_unicode_fname.t
 xt/01-has_versions.t
 xt/02-versions_all_same.t
 xt/03-has_pod.t

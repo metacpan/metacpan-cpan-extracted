@@ -28,11 +28,12 @@
          "requires" : {
             "Archive::Zip" : "0",
             "Clone" : "0",
-            "FB3" : "0.07",
+            "FB3" : "0.13",
             "File::ShareDir" : "1.00",
             "Hash::Merge" : "0",
             "Image::ExifTool" : "0",
             "Image::Info" : "0",
+            "Image::Magick" : "0",
             "Image::Size" : "0",
             "JSON::Path" : "0",
             "Lingua::Identify" : "0",
@@ -51,7 +52,7 @@
    "provides" : {
       "FB3::Convert" : {
          "file" : "lib/FB3/Convert.pm",
-         "version" : "0.28"
+         "version" : "0.31"
       },
       "FB3::Convert::Epub" : {
          "file" : "lib/FB3/Convert/Epub.pm"
@@ -69,5 +70,5 @@
          "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ]
    },
-   "version" : "0.28"
+   "version" : "0.31"
 }

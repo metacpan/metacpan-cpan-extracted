@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::MooseNCBI;
 # ABSTRACT: Wrapper class for serializing Bio::LITE::Taxonomy::NCBI object
-$Bio::MUST::Core::Taxonomy::MooseNCBI::VERSION = '0.190900';
+$Bio::MUST::Core::Taxonomy::MooseNCBI::VERSION = '0.191300';
 use Moose;
 use namespace::autoclean;
 
@@ -60,7 +60,7 @@ Bio::MUST::Core::Taxonomy::MooseNCBI - Wrapper class for serializing Bio::LITE::
 
 =head1 VERSION
 
-version 0.190900
+version 0.191300
 
 =head1 SYNOPSIS
 

@@ -132,47 +132,51 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::String" : {
          "file" : "lib/MarpaX/ESLIF/String.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
+      },
+      "MarpaX::ESLIF::Symbol::EventBitSet" : {
+         "file" : "lib/MarpaX/ESLIF/Symbol/EventBitSet.pm",
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v3.0.9"
+         "version" : "v3.0.10"
       }
    },
    "release_status" : "stable",
@@ -188,7 +192,7 @@
          "web" : "https://github.com/jddurand/c-marpaeslif"
       }
    },
-   "version" : "3.0.9",
+   "version" : "3.0.10",
    "x_authority" : "cpan:JDDPAUSE",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"

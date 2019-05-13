@@ -22,14 +22,14 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Temp" => 0,
     "HTTP::Tiny" => "0.014",
-    "JSON::PP" => 0
+    "JSON::PP" => "2.07"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "HTTP::Tiny" => "0.014",
-  "JSON::PP" => 0,
+  "JSON::PP" => "2.07",
   "Test::More" => "0.88"
 );
 

@@ -39,7 +39,7 @@
          "web" : "https://github.com/singingfish/p5-array-circular"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

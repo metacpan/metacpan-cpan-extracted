@@ -165,7 +165,7 @@ sub _register {
             and
             !$self->getRegisterSession( $req->data->{registerInfo}->{mail} ) )
         {
-            
+
             # Check if token exists
             my $token;
             if ( $self->ottRule->( $req, {} ) or $self->captcha ) {

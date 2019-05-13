@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+lib/Test/Mojo/Role/Session.pm
 lib/Test/Mojo/Session.pm
 minil.toml
 t/Test-Mojo-Session.t

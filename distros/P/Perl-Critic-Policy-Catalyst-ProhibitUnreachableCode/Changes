@@ -1,5 +1,10 @@
 Revision history for Perl extension Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode.
 
+0.02 2019-05-12T14:55:46Z
+
+ - Switch to the GNU General Public License version 3.
+ - Fix POD for CPANTS parsing.
+
 0.01 2019-03-30T00:15:52Z
 
  - First version.

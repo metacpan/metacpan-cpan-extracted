@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 # shortcuts
 #  os and distros
@@ -63,7 +63,8 @@ sub mapping {
       [os_freebsd,
        [package => ['fftw3', 'pkgconf']]],
       [like_debian,
-       [package => 'libfftw3-dev', 'pkg-config | pkgconf']]],
+       [package => ['libfftw3-dev', 'pkg-config | pkgconf']]],
+     ],
 
      [cpanmod => 'Alien::HDF4',
       [os_freebsd,
@@ -104,7 +105,7 @@ sub mapping {
 
      [cpanmod => 'Alien::libtermkey',
       [os_freebsd,
-       [osvers => qr{^\d\d+\.}, # osvers>=10, proxy check for clang system
+       [osvers => {'>=', 10}, # proxy check for clang system
 	[package => ['libtool', 'gmake', 'pkgconf', 'libtermkey']], # see also RT #91873
        ],
        [package => ['libtool', 'gmake', 'pkgconf']]],
@@ -114,6 +115,17 @@ sub mapping {
        [package => ['libtool-bin', 'libncurses5-dev']]],
       [like_fedora,
        [package => ['libtool', 'ncurses-devel']]],
+     ],
+
+     [cpanmod => 'Alien::NSS', # cannot install external package, see https://github.com/0xxon/alien-nss/issues/5#issuecomment-488220899
+      [os_freebsd,
+       [package => 'nss']],
+      [like_debian,
+       [before_ubuntu_trusty, # at least not available in debian/wheezy
+	[package => []]],
+       [package => 'libnss3-dev']],
+      [like_fedora,
+       [package => 'nss-devel']],
      ],
 
      [cpanmod => 'Alien::ProtoBuf',
@@ -316,7 +328,10 @@ sub mapping {
        [package => ['portaudio', 'pkgconf']]],
       [like_debian,
        # conflicts with libjack0
-       [package => 'portaudio19-dev']]],
+       [package => 'portaudio19-dev']],
+      [like_fedora,
+       [package => 'portaudio-devel']],
+     ],
 
      [cpanmod => 'Audio::SndFile',
       [os_freebsd,
@@ -402,7 +417,11 @@ sub mapping {
       [os_freebsd,
        [package => 'io_lib']],
       [like_debian,
-       [package => ['libstaden-read-dev', 'zlib1g-dev']]]],
+       [package => ['libstaden-read-dev', 'zlib1g-dev']]],
+      [like_fedora,
+       [linuxdistro => 'fedora', # not available for centos6+7, only for fedora28
+	[package => 'staden-io_lib-devel']]],
+     ],
 
      [cpanmod => 'Cache::Memcached::XS',
       [os_freebsd,
@@ -438,7 +457,7 @@ sub mapping {
 
      [cpanmod => 'Cairo::GObject',
       [like_fedora,
-       [linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	[package => []]],
        [package => 'cairo-gobject-devel']],
      ],
@@ -449,8 +468,7 @@ sub mapping {
       [like_debian,
        [package => 'libcapstone-dev']], # but test failures with Capstone 0.6 @ jessie
       [like_fedora,
-       [linuxdistro => 'centos',
-	linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	package => []], # N/A for centos6
        [package => 'capstone-devel']],
      ],
@@ -504,6 +522,9 @@ sub mapping {
       # Not available for FreeBSD or CentOS7
       [like_debian,
        [package => 'libcomedi-dev']],
+      [like_fedora,
+       [linuxdistro => 'fedora',
+	[package => 'comedilib-devel']]], # but still does not build
      ],
 
      [cpanmod => 'CommonMark',
@@ -820,7 +841,7 @@ sub mapping {
 	[package => 'libmysqlclient-dev']],
        [package => 'default-libmysqlclient-dev']],
       [like_fedora,
-       [linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => qr{^6\.},
 	[package => 'mysql-devel']],
        [package => 'mariadb-devel']],
       [os_darwin,
@@ -1042,7 +1063,7 @@ sub mapping {
 
      [cpanmod => 'File::Rdiff',
       [os_freebsd,
-       [package => 'librsync']],
+       [package => 'librsync2 | librsync']],
       [like_debian,
        [package => 'librsync-dev']],
       [like_fedora,
@@ -1216,7 +1237,7 @@ sub mapping {
 
      [cpanmod => 'Glib',
       [like_fedora,
-       [linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	[package => []]],
        [package => 'gobject-introspection-devel']],
       [os_darwin,
@@ -1268,6 +1289,13 @@ sub mapping {
       [like_fedora,
        [package => 'GConf2-devel']],
      ],
+
+     [cpanmod => 'Gnome2::Print',
+      [os_freebsd,
+       [package => 'libgnomeprintui']],
+      [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+       [package => 'libgnomeprintui22-devel']],
+     ],       
 
      [cpanmod => 'Gnome2::Wnck',
       [os_freebsd,
@@ -1331,7 +1359,7 @@ sub mapping {
 	[package => []]],
        [package => 'gir1.2-goocanvas-2.0']],
       [like_fedora,
-       [linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => qr{^6\.},
 	[package => []]],
        [package => 'goocanvas2-devel']],
       [os_darwin,
@@ -1351,7 +1379,10 @@ sub mapping {
       [os_freebsd,
        [package => 'plotutils']],
       [like_debian,
-       [package => 'libplot-dev']]],
+       [package => 'libplot-dev']],
+      [like_fedora,
+       [package => 'plotutils-devel']],
+     ],
 
      [cpanmod => ['Graphics::PLplot', 'PDL::Graphics::PLplot'],
       [os_freebsd,
@@ -1394,6 +1425,11 @@ sub mapping {
       # no package for freebsd or centos7
       [like_debian,
        [package => 'libappindicator-dev']],
+     ],
+
+     [cpanmod=> 'Gtk2::CV',
+      [linuxdistro => 'fedora',
+       [package => 'perlmulticore-devel']],
      ],
 
      [cpanmod => 'Gtk2::GladeXML',
@@ -1455,7 +1491,7 @@ sub mapping {
       [like_debian,
        [package => 'libgtk-3-dev']],
       [like_fedora,
-       [linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	[package => []]],
        [package => 'gtk3-devel']],
      ],
@@ -1520,6 +1556,15 @@ sub mapping {
       # ctpp2 not available for homebrew
      ],
 
+     [cpanmod => 'HTML::HTMLDoc',
+      [os_freebsd,
+       [package => 'htmldoc']],
+      [like_debian,
+       [before_ubuntu_trusty,
+	[package => []]], # not available in wheezy
+       [package => 'htmldoc']],
+     ],
+
      [cpanmod => 'HTML::Parser',
       [os_freebsd,
        [package => []]],
@@ -1535,7 +1580,7 @@ sub mapping {
       [os_freebsd,
        [package => 'neon | neon29']], # untested
       [like_debian,
-       [package => 'libneon27-dev | ibneon27-gnutls-dev']], # compilation fails: ne_cookies.h: No such file or directory
+       [package => 'libneon27-dev | libneon27-gnutls-dev']], # compilation fails: ne_cookies.h: No such file or directory
       [like_fedora,
        [package => 'neon-devel']], # compilation fails: ne_cookies.h: No such file or directory
      ],
@@ -1624,7 +1669,7 @@ sub mapping {
        [package => 'libpuzzle-dev']],
       [like_fedora,
        [linuxdistro => 'centos',
-	linuxdistroversion => qr{^7\.},
+	linuxdistroversion => {'>=', 7},
 	package => []], # for some reason not available for centos7 (but it is for centos6)
        [package => 'libpuzzle-devel']],
      ],
@@ -1720,7 +1765,7 @@ sub mapping {
 
      [cpanmod => 'Imager::File::HEIF',
       [os_freebsd,
-       [osvers => qr{^[456789]\.},
+       [osvers => {'>=', 4, '<', 10},
 	[package => []]],
        [package => 'libheif']], # but does not seem to work with freebsd 10, only with 11 and later
       [like_debian,
@@ -1804,7 +1849,7 @@ sub mapping {
       [like_fedora,
        # XXX Does not work, moar.h missing
        [linuxdistro => 'centos',
-	linuxdistroversion => qr{^6\.}, # not available
+	linuxdistroversion => {'<', 7}, # not available
 	package => []],
        [package => 'moarvm-devel']],
      ],
@@ -1871,11 +1916,13 @@ sub mapping {
        [package => 'iptables-devel']],
      ],
 
-     [cpanmod => 'JavaScript::Lite',
+     [cpanmod => ['JavaScript::Lite', 'JavaScript::SpiderMonkey'],
       [os_freebsd,
-       [package => 'spidermonkey24 | spidermonkey185 | spidermonkey170 | spidermonkey17',]], # needs something like INC=-I/usr/local/include/js-17.0, but does not work (tried 170 and 185)
+       [package => 'spidermonkey24 | spidermonkey185 | spidermonkey170 | spidermonkey17',]], # needs something like INC=-I/usr/local/include/js-17.0, but does not work (tried 170 and 185); spidermonkey52 exists also, but does not work
       [like_debian,
-       [package => 'libmozjs185-dev']], # needs something like INC=-I/usr/include/js, but does not work
+       [before_ubuntu_bionic,
+	[package => 'libmozjs185-dev']], # needs something like INC=-I/usr/include/js, but does not work
+       [package => []]], # newer debians have libmozjs-52-dev, but neither ::Lite nor ::SpiderMonkey work with it
       [like_fedora,
        [package => 'js-devel']],
      ],
@@ -1926,7 +1973,7 @@ sub mapping {
      [cpanmod => 'Lab::VISA',
       # no package for freebsd
       [like_debian,
-       [linuxdistrocodename => [qw(jessie xenial)],
+       [linuxdistrocodename => [qw(jessie xenial bionic)],
 	[package => 'libvisa-dev']],
        [package => []], # not available anymore in stretch
       ],
@@ -1951,7 +1998,7 @@ sub mapping {
 
      [cpanmod => 'LibJIT',
       [os_freebsd,
-       [osvers => qr{^9\.},
+       [osvers => {'<', 10},
 	[package => 'libjit']],
        [package => []]], # does not exist in freebsd 10 and later
       # XXX what aout debian?
@@ -2012,7 +2059,10 @@ sub mapping {
 
      [cpanmod => 'Linux::Sysfs',
       [like_debian,
-       [package => 'libsysfs-dev']]],
+       [package => 'libsysfs-dev']],
+      [like_fedora,
+       [package => 'libsysfs-devel']]
+     ],
 
      [cpanmod => ['Linux::Systemd::Journal', 'Log::Journald'],
       [like_debian,
@@ -2089,7 +2139,10 @@ sub mapping {
        [package => 'libRmath']],
       [like_debian,
        # not for small disks, installs about ~85MB
-       [package => 'r-mathlib']]],
+       [package => 'r-mathlib']],
+      [like_fedora,
+       [package => 'libRmath-devel']],
+     ],
 
      [cpanmod => 'Math::GAP',
       [package => 'gap'], # needs 1-1.2GB of disk space
@@ -2190,6 +2243,8 @@ sub mapping {
        [package => 'libdiscid']],
       [like_debian,
        [package => 'libdiscid-dev']],
+      [like_fedora,
+       [package => 'libdiscid-devel']],
      ],
 
      [cpanmod => 'NanoMsg::Raw',
@@ -2239,7 +2294,10 @@ sub mapping {
       [os_freebsd,
        [package => 'dbus-glib']],
       [like_debian,
-       [package => 'libdbus-glib-1-dev']]],
+       [package => 'libdbus-glib-1-dev']],
+      [like_fedora,
+       [package => 'dbus-glib-devel']],
+     ],
 
      [cpanmod => 'Net::ESMTP',
       [os_freebsd,
@@ -2255,8 +2313,10 @@ sub mapping {
        [package => 'pl-libgadu']],
       [like_debian,
        [package => 'libgadu-dev']],
+      [linuxdistro => 'fedora', # not available for centos6+7, only for fedora28
+       [package => 'libgadu-devel']],
       [os_darwin,
-       [package => 'libgadu']]
+       [package => 'libgadu']],
      ],
 
      [cpanmod => 'Net::Ifstat',
@@ -2274,7 +2334,10 @@ sub mapping {
       [os_freebsd,
        [package => 'loudmouth']],
       [like_debian,
-       [package => 'libloudmouth1-dev']]],
+       [package => 'libloudmouth1-dev']],
+      [like_fedora,
+       [package => 'loudmouth-devel']],
+     ],
 
      [cpanmod => 'Net::LDAPxs',
       [os_freebsd,
@@ -2325,6 +2388,10 @@ sub mapping {
        [package => 'liblo']],
       [like_debian,
        [package => 'liblo-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => qr{^7\.},
+	[package => []]], # N/A for centos7
+       [package => 'liblo-devel']],
      ],
 
      [cpanmod => 'Net::NATS::Streaming::PB',
@@ -2345,7 +2412,10 @@ sub mapping {
      [cpanmod => 'Net::LibAsyncNS',
       # it seems there's no libasyncns for freebsd
       [like_debian,
-       [package => 'libasyncns-dev']]],
+       [package => 'libasyncns-dev']],
+      [like_fedora,
+       [package => 'libasyncns-devel']],
+     ],
 
      [cpanmod => 'Net::LibNIDS',
       [os_freebsd,
@@ -2416,11 +2486,15 @@ sub mapping {
       # not available for debian/wheezy and jessie
      ],
 
-     [cpanmod => 'Net::Z3950::ZOOM',
+     [cpanmod => ['Net::Z3950::ZOOM', 'Net::Z3950::Simple2ZOOM', 'ZOOM::IRSpy'],
       [os_freebsd,
        [package => 'yaz']],
       [like_debian,
        [package => 'libyaz-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => qr{^7\.}, # available only for CentOS6, not for 7
+	[package => []]],
+       [package => 'libyaz-devel']],
       [os_darwin,
        [package => 'yaz']],
      ],
@@ -2539,7 +2613,12 @@ sub mapping {
       [os_freebsd,
        [package => ['libgnome-keyring', 'pkgconf']]],
       [like_debian,
-       [package => 'libgnome-keyring-dev']]],
+       [package => 'libgnome-keyring-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+	[package => 'gnome-keyring-devel']],
+       [package => 'libgnome-keyring-devel']],
+     ],
 
      [cpanmod => 'PDL::NetCDF',
       [os_freebsd,
@@ -2767,7 +2846,7 @@ sub mapping {
        [package => ['libpocketsphinx-dev', 'libsphinxbase-dev']]],
      ],
 
-     [cpanmod => 'Spread',
+     [cpanmod => ['Spread', 'Spread::Client::Constant'],
       [os_freebsd,
        # net/spread also exists, refering to version 3, but tests seem to pass with version 4
        [package => 'spread4']],
@@ -2807,7 +2886,10 @@ sub mapping {
       [os_freebsd,
        [package => 'hwloc']],
       [like_debian,
-       [package => 'libhwloc-dev']]],
+       [package => 'libhwloc-dev']],
+      [like_fedora,
+       [package => 'hwloc-devel']],
+     ],
 
      [cpanmod => 'Sys::Virt', # but the latest Sys::Virt usually needs the latest libvirt
       [os_freebsd,
@@ -2881,8 +2963,7 @@ sub mapping {
 	[package => []]],
        [package => 'libvterm-dev']],
       [like_fedora,
-       [linuxdistro => 'centos',
-	linuxdistroversion => qr{^6\.},
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	package => []], # N/A for centos6
        [package => 'libvterm-devel']],
       [os_darwin,
@@ -3275,6 +3356,8 @@ sub mapping {
        [package => 'libyaml-dev']],
       [like_fedora,
        [package => 'libyaml-devel']],
+      [os_darwin,
+       [package => 'libyaml']],
      ],
 
      [cpanmod => 'ZMQ::FFI',

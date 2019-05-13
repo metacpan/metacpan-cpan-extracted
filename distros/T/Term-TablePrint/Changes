@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.111   2019-05-09
+        - Term::Choose minimum version 1.648.
+        - Term::Choose::Util minimum version 0.072.
+
 0.110   2019-05-06
         - Progressbar to the end of line.
         - Reset options to global even if no table is printed.

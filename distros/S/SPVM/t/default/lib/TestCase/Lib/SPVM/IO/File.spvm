@@ -1,6 +1,20 @@
 package TestCase::Lib::SPVM::IO::File {
   use SPVM::IO::File;
 
+  sub test_fileno : int ($file : string) {
+    {
+      my $fh = SPVM::IO::File->open($file, "r");
+      
+      my $fileno = $fh->fileno;
+      
+      unless ($fileno == 3) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
   sub test_open : int ($file : string) {
     {
       my $fh = SPVM::IO::File->open($file, "r");
@@ -86,13 +100,15 @@ package TestCase::Lib::SPVM::IO::File {
         die "Can't open file $file";
       }
       {
-        my $write_length = $fh->write("abcd\n");
+        my $str = "abcd\n";
+        my $write_length = $fh->write($str, length $str);
         unless ($write_length == 5) {
           return 0;
         }
       }
       {
-        my $write_length = $fh->write("fg");
+        my $str = "fg";
+        my $write_length = $fh->write($str, length $str);
         unless ($write_length == 2) {
           return 0;
         }
@@ -152,7 +168,7 @@ package TestCase::Lib::SPVM::IO::File {
       die "Can't open file $file";
     }
     
-    my $lstrings = list([]);
+    my $lstrings = SPVM::List->new;
     while (my $line = $fh->readline) {
       $lstrings->push($line);
     }
@@ -290,7 +306,7 @@ package TestCase::Lib::SPVM::IO::File {
       die "Can't open file $file";
     }
     
-    my $lstrings = list([]);
+    my $lstrings = SPVM::List->new;
     while (my $line = $fh->readline) {
       chomp($line);
       $lstrings->push($line);

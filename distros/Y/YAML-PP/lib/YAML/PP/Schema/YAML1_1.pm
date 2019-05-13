@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::YAML1_1;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use base 'YAML::PP::Schema';
 
@@ -265,6 +265,16 @@ YAML::PP::Schema::YAML1_1 - YAML 1.1 Schema for YAML::PP
 =head1 DESCRIPTION
 
 This schema allows you to load the common YAML Types from YAML 1.1.
+
+=head1 METHODS
+
+=over
+
+=item register
+
+Called by YAML::PP::Schema
+
+=back
 
 =head1 SEE ALSO
 

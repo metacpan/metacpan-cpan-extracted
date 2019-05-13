@@ -9,3 +9,5 @@
 1.005
  - Fixed rt.cpan bug: 124761
  - added licecne perl5
+1.006
+ - All packages now: Log::Log4perl->wrapper_register(__PACKAGE__);

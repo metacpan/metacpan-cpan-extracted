@@ -516,6 +516,9 @@ sub inline_elements {
                                                 last_position => $offset + length($last_chunk),
                                                );
     die "Chunks lost during processing <$string>" unless $string eq join('', map { $_->string } @list);
+    if (@list and $list[0] and $list[0]->type eq 'br') {
+        $list[0]->type('noindent');
+    }
     return @list;
 }
 

@@ -1,0 +1,64 @@
+---
+abstract: 'Procurer of fine resources and services.'
+author:
+  - 'Aran Clary Deltac <aran@bluefeet.dev>'
+build_requires:
+  Test2::V0: '0.000094'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Curio
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Curio:
+    file: lib/Curio.pm
+    version: '0.02'
+  Curio::Declare:
+    file: lib/Curio/Declare.pm
+    version: '0.02'
+  Curio::Factory:
+    file: lib/Curio/Factory.pm
+    version: '0.02'
+  Curio::Role:
+    file: lib/Curio/Role.pm
+    version: '0.02'
+  Curio::Util:
+    file: lib/Curio/Util.pm
+    version: '0.02'
+recommends:
+  Sub::Name: '0.20'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Import::Into: '1.002005'
+  Moo: '2.003000'
+  Moo::Role: '2.003000'
+  Package::Stash: '0.36'
+  Scalar::Util: '0'
+  Types::Common::String: '1.002001'
+  Types::Standard: '1.002001'
+  namespace::clean: '0.27'
+  perl: '5.008001'
+  strictures: '2.000001'
+resources:
+  bugtracker: https://github.com/bluefeet/Curio/issues
+  homepage: https://github.com/bluefeet/Curio
+  repository: git://github.com/bluefeet/Curio.git
+version: '0.02'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

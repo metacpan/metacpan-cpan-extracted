@@ -2,7 +2,7 @@ package Mail::STS::STSRecord;
 
 use Moose;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 # ABSTRACT: a STS DNS TXT record string
 
 has 'fields' => (
@@ -38,7 +38,7 @@ Mail::STS::STSRecord - a STS DNS TXT record string
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

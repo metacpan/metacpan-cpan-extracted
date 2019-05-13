@@ -4,7 +4,7 @@ use Config;
 use Test::More;
 
 BEGIN {
-  plan skip_all => "your perl is not compiled with ithreads or is pre-5.8" unless $Config{useithreads} && $] >= 5.008;
+  plan skip_all => "your perl is not compiled with ithreads" unless $Config{useithreads};
   require threads;
 };
 
@@ -19,7 +19,7 @@ use File::Spec;
 use Net::SSLeay;
 
 my $start_time = time;
-my $file = File::Spec->catfile('t', 'data', 'key.pem');
+my $file = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 
 Net::SSLeay::randomize();
 Net::SSLeay::load_error_strings();

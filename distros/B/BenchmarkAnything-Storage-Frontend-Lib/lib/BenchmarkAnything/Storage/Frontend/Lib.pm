@@ -2,11 +2,11 @@ use 5.008;
 use strict;
 use warnings;
 package BenchmarkAnything::Storage::Frontend::Lib;
-# git description: v0.021-6-g2fd1fac
+# git description: v0.022-4-g0771090
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Basic functions to access a BenchmarkAnything store
-$BenchmarkAnything::Storage::Frontend::Lib::VERSION = '0.022';
+$BenchmarkAnything::Storage::Frontend::Lib::VERSION = '0.023';
 use Scalar::Util 'reftype';
 
 
@@ -679,21 +679,32 @@ sub process_raw_result_queue
 {
         my ($self, $count) = @_;
 
+        require LockFile::Simple;
+
+        my $lock;
+        my $lockmgr = LockFile::Simple->make(-stale => 1, -autoclean => 1);
+
+        return unless $lock = $lockmgr->trylock('/tmp/process_raw_result_queue');
+
         $count ||= 10;
 
         my $backend = $self->{config}{benchmarkanything}{backend};
         if ($backend eq 'local')
         {
-                my $dequeued_raw_bench_bundle_id;
+                my @dequeued_raw_bench_bundle_ids;
                 do {
-                        $dequeued_raw_bench_bundle_id = $self->{backend}->process_queued_multi_benchmark;
-                        $count--;
-                } until ($count < 1 or not defined($dequeued_raw_bench_bundle_id));
+                        @dequeued_raw_bench_bundle_ids = $self->{backend}->process_queued_multi_benchmark($count);
+                        #print STDERR "Processed bench_bundles: ".join(",", @dequeued_raw_bench_bundle_ids)."\n" if $self->{verbose};
+                        $count = $count - @dequeued_raw_bench_bundle_ids;
+                } until ($count < 1 or not @dequeued_raw_bench_bundle_ids);
         }
         else
         {
+                $lock->release;
                 die "benchmarkanything: only backend 'local' allowed in 'process_raw_result_queue'.\n";
         }
+
+        $lock->release;
         return;
 }
 
@@ -1052,7 +1063,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

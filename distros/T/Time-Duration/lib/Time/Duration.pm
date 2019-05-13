@@ -1,5 +1,5 @@
 package Time::Duration;
-$Time::Duration::VERSION = '1.20';
+$Time::Duration::VERSION = '1.21';
 use 5.006;
 use strict;
 use warnings;
@@ -31,22 +31,14 @@ sub concise ($) {
   return $string;
 }
 
-sub later {
-  interval(      $_[0], $_[1], ' earlier', ' later', 'right then'); }
-sub later_exact {
-  interval_exact($_[0], $_[1], ' earlier', ' later', 'right then'); }
-sub earlier {
-  interval(      $_[0], $_[1], ' later', ' earlier', 'right then'); }
-sub earlier_exact {
-  interval_exact($_[0], $_[1], ' later', ' earlier', 'right then'); }
-sub ago {
-  interval(      $_[0], $_[1], ' from now', ' ago', 'right now'); }
-sub ago_exact {
-  interval_exact($_[0], $_[1], ' from now', ' ago', 'right now'); }
-sub from_now {
-  interval(      $_[0], $_[1], ' ago', ' from now', 'right now'); }
-sub from_now_exact {
-  interval_exact($_[0], $_[1], ' ago', ' from now', 'right now'); }
+sub later          { interval(      $_[0], $_[1], ' earlier',  ' later',    'right then'); }
+sub later_exact    { interval_exact($_[0], $_[1], ' earlier',  ' later',    'right then'); }
+sub earlier        { interval(      $_[0], $_[1], ' later',    ' earlier',  'right then'); }
+sub earlier_exact  { interval_exact($_[0], $_[1], ' later',    ' earlier',  'right then'); }
+sub ago            { interval(      $_[0], $_[1], ' from now', ' ago',      'right now');  }
+sub ago_exact      { interval_exact($_[0], $_[1], ' from now', ' ago',      'right now');  }
+sub from_now       { interval(      $_[0], $_[1], ' ago',      ' from now', 'right now');  }
+sub from_now_exact { interval_exact($_[0], $_[1], ' ago',      ' from now', 'right now');  }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub duration_exact {
@@ -441,6 +433,9 @@ be a great problem for most purposes.
 
 =head1 SEE ALSO
 
+L<Time::Elapsed> - similarly converts durations to natural language,
+but in addition to English also supports Danish, German, French, and Turkish.
+
 L<Date::Interval|Date::Interval>, which is similarly named, but does
 something rather different.
 
@@ -465,8 +460,11 @@ merchantability or fitness for a particular purpose.
 
 =head1 AUTHOR
 
-Current maintainer Avi Finkel, C<avi@finkel.org>; Original author
-Sean M. Burke, C<sburke@cpan.org>
+Original author Sean M. Burke, C<sburke@cpan.org>.
+
+Then maintained by Avi Finkel, C<avi@finkel.org>.
+
+Currently maintained by Neil Bowers, C<neilb@cpan.org>.
 
 =cut
 

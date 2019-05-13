@@ -38,8 +38,13 @@ DESCRIPTION
     accessed as $HTTP::Simple::UA (for example, to configure the timeout,
     or replace it with a compatible object like HTTP::Tinyish).
 
-    The JSON encoder used by the JSON functions defaults to a JSON::PP
-    instance, and can be accessed as $HTTP::Simple::JSON.
+    The JSON encoder used by the JSON functions can be accessed as
+    $HTTP::Simple::JSON, and defaults to a Cpanel::JSON::XS object if
+    Cpanel::JSON::XS 4.11+ is installed, and otherwise a JSON::PP object.
+    If replaced with a new object, it should have UTF-8 encoding/decoding
+    enabled (usually the utf8 option). If it is set to a string, it will be
+    used as a module name that is expected to have decode_json and
+    encode_json functions.
 
 FUNCTIONS
 

@@ -1,0 +1,84 @@
+NAME
+
+    Syntax::Keyword::RawQuote - A raw quote operator for Perl
+
+SYNOPSIS
+
+        use Syntax::Keyword::RawQuote;
+        say r`I keep all of my files in \\yourserver\private`;
+    
+        use Syntax::Keyword::RawQuote -as => "qraw";
+        say qraw[Maybe the `r` keyword is too risky?];
+
+DESCRIPTION
+
+    This library provides an absolutely uninterpreted (raw) quote operator
+    for Perl, as seen in some other programming languages. While Perl
+    single-quoted strings are nearly uninterpreted, they still treat the
+    sequences \' and \\ specially, allowing a single quote to be included
+    in the string. The q operator behaves similarly, allowing the closing
+    delimiter to be backslashed, and treating \\ as a single backslash. By
+    contrast, a raw string treats every character literally, and ends at
+    the first occurrence of the closing delimiter, no matter what.
+
+WARNING
+
+    This is beta software that mucks about with the perl internals. Do not
+    use it for anything too important.
+
+SYNTAX
+
+    By default, the raw quote operator will be installed as r in the
+    lexical scope where this module is imported. If that name is
+    inconvenient, you can choose another one by providing the -as option in
+    the use statement.
+
+    The operator behaves like other quote-like operators (see "Quote and
+    Quote-like Operators" in perlop). The first non-whitespace character
+    after the operator is taken as the opening delimiter. If the opening
+    delimiter is one of the ASCII left bracket characters (one of ( [ < {),
+    then the closing delimiter is the matching right bracket (from ) ] >
+    }), otherwise it is the same as the opening delimiter. This choice of
+    delimiters allows you to choose a character that won't appear inside
+    the string.
+
+    Since editors' syntax highlighting features will probably not recognize
+    the existence of this module, you may want to use an existing quote
+    character to avoid confusing them. r"" and r'' are obvious choices, but
+    r`` (similar to Go) has the advantage that backticks hardly ever occur
+    inside of quoted strings, and it is visually distinct.
+
+METHODS
+
+ import
+
+    Enables the raw quote keyword in the current lexical scope when called
+    during compilation (use Syntax::Keyword::RawQuote). If the -as keyword
+    argument is provided, it will be used as the keyword name, otherwise
+    "r" is used.
+
+ unimport
+
+    Disables the raw quote keyword in the current lexical scope when called
+    during compilation (no Syntax::Keyword::RawQuote). If the -as keyword
+    is provided, disables that keyword specifically; otherwise, all
+    keywords installed will be disabled.
+
+syntax.pm SUPPORT
+
+    A module Syntax::Feature::RawQuote is also provided, if you prefer the
+    form use syntax 'raw_quote'. Provides all of the same features and
+    options, except that it is not possible to no syntax raw_quote => { -as
+    => 'foo' }.
+
+AUTHOR
+
+    Andrew Rodland <arodland@cpan.org>
+
+LICENSE
+
+    Copyright (c) Andrew Rodland.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

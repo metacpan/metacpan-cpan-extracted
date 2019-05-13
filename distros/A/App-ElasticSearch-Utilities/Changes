@@ -1,9 +1,48 @@
 ==================================================
-Changes from 2017-01-02 00:00:00 +0000 to present.
+Changes from 2017-05-08 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.4 at 2019-01-02 22:25:09 +0000
+version 6.5 at 2019-05-08 02:45:04 +0000
+----------------------------------------
+
+  Change: 0db6a92889a94daf54f17432b53f26a91153e4f7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-07 19:42:02 +0000
+
+    Docs ready for the 6.5 release 
+
+  Change: b0ae2e1c9a859b37c8345f1cd24152f6c74c14ef
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-07 19:41:07 +0000
+
+    Fix priority for ::QueryString::AutoEscape
+
+    Since this plugin is keyed to '=<field>:<value>', I want to make sure it
+    fires before the nested plugin and before any other expansion plugins to
+    avoid issues. 
+
+  Change: 044643c4fcb1183b1ffa46a3575bd01ab028e048
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-03-25 21:45:24 +0000
+
+    Collect node local shard dimensions and safe guard some calls to be
+    compatible with ES 5.x and 6.x 
+
+  Change: b13c4a5eb6861898d3b35d567da19838372fadcc
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-03-25 17:30:36 +0000
+
+    Report number of indexes with a block set to true. 
+
+  Change: b037da82daf1f23f4940cbb0955e8beaecb69e1b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-01-30 21:29:48 +0000
+
+    Fix the es-copy-index.pl to migrate indices from other clusters. 
+
+----------------------------------------
+version 6.4 at 2019-01-02 22:20:36 +0000
 ----------------------------------------
 
   Change: 470feb7d6e00998906849cbfb49d1904eb79cf6b
@@ -553,48 +592,6 @@ version 5.4 at 2017-10-13 19:36:20 +0000
 
     es-alias-manager.pl: relax index name checker to allow _ 
 
-----------------------------------------
-version 5.3 at 2017-03-23 01:49:52 +0000
-----------------------------------------
-
-  Change: 3becaead7ab98d420511e67ac55724eb19c3bd76
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-03-22 18:49:52 +0000
-
-    Version 5.3 Docs 
-
-  Change: 2fb6c954347fbbd3a5c8dc372effe8e84116b908
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-03-22 18:48:01 +0000
-
-    ElasticSearch 5.2.x support and enhancements
-
-    * Elasticsearch no longer supports aliased keys in the index.
-
-    Removed the uniqueness parsing for the last section of the key name. ES
-
-    v2.x and on requires the keys be fully qualified.
-
-    * es-search.pl subaggs output adjusted
-
-    Prior version injected the sub aggregations before the values, this now
-
-    append the sub aggregations to the listed output in a more readable
-
-    manner.
-
-    * Allow aggregations to be wrapped and use it to provide date_histogram
-
-    wrappers for es-search.pl
-
-    es-search.pl now supports --interval to wrap aggregations in a
-
-    date_histogram's so you can better understand what is happening with
-
-    your data.
-
-    * es_master() and --master-only added, documentation clean up. 
-
 =================================================
-Plus 59 releases after 2017-01-02 00:00:00 +0000.
+Plus 60 releases after 2017-05-08 00:00:00 +0000.
 =================================================

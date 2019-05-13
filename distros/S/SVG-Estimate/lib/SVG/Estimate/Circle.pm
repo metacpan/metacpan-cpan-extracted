@@ -1,5 +1,5 @@
 package SVG::Estimate::Circle;
-$SVG::Estimate::Circle::VERSION = '1.0113';
+$SVG::Estimate::Circle::VERSION = '1.0114';
 use Moo;
 use Math::Trig qw/pi/;
 
@@ -13,7 +13,7 @@ SVG::Estimate::Circle - Handles estimating circles.
 
 =head1 VERSION
 
-version 1.0113
+version 1.0114
 
 =head1 SYNOPSIS
 

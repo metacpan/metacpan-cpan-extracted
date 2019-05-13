@@ -1,3 +1,8 @@
-0.001   2018-06-10 (PERLANCAR) (unreleased)
+0.002   2019-05-08 (PERLANCAR)
+
+	- Default to Useqq=1 to show unprintable characters.
+
+
+0.001   2018-06-10 (PERLANCAR)
 
         - First release.

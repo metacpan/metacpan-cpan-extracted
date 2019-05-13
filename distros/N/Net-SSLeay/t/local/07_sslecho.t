@@ -13,23 +13,27 @@ BEGIN {
   plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
 }
 
-plan tests => 78;
+plan tests => 102;
+$SIG{'PIPE'} = 'IGNORE';
 
 my $sock;
 my $pid;
 
 my $port = 1212;
-my $dest_ip = gethostbyname('localhost');
+my $dest_ip = "\x7F\0\0\x01";
 my $dest_serv_params  = sockaddr_in($port, $dest_ip);
 my $port_trials = 1000;
 
 my $msg = 'ssleay-test';
-my $cert_pem = File::Spec->catfile('t', 'data', 'cert.pem');
-my $key_pem = File::Spec->catfile('t', 'data', 'key.pem');
+my $ca_cert_pem = File::Spec->catfile('t', 'data', 'test_CA1_2048.crt.pem');
+my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard_CA1_2048.crt.pem');
+my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 
 my $cert_name = (Net::SSLeay::SSLeay >= 0x0090700f) ?
-                '/C=PL/ST=Peoples Republic of Perl/L=Net::/O=Net::SSLeay/OU=Net::SSLeay developers/CN=127.0.0.1/emailAddress=rafl@debian.org' :
-                '/C=PL/ST=Peoples Republic of Perl/L=Net::/O=Net::SSLeay/OU=Net::SSLeay developers/CN=127.0.0.1/Email=rafl@debian.org';
+                '/C=US/ST=State/L=City/O=Company/OU=Unit/CN=*.example.com/emailAddress=wildcard@example.com' :
+                '/C=US/ST=State/L=City/O=Company/OU=Unit/CN=*.example.com/Email=wildcard@example.com';
+my $cert_issuer = '/C=US/O=Demo1/CN=CA1';
+my $cert_sha1_fp = '91:41:FD:7D:99:02:2E:70:91:53:EF:C6:F3:F8:9D:E2:CF:B0:5F:0C';
 
 $ENV{RND_SEED} = '1234567890123456789012345678901234567890';
 
@@ -61,6 +65,16 @@ Net::SSLeay::library_init();
     ok(Net::SSLeay::CTX_set_cipher_list($ctx, 'ALL'), 'CTX_set_cipher_list');
     my ($dummy, $errs) = Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
     ok($errs eq '', "set_cert_and_key: $errs");
+    SKIP: {
+        skip 'Disabling session tickets requires OpenSSL >= 1.1.1', 1
+	    unless defined (&Net::SSLeay::CTX_set_num_tickets);
+        # TLS 1.3 server sends session tickets after a handhake as part of
+        # the SSL_accept(). If a client finishes all its job including closing
+        # TCP connection before a server sends the tickets, SSL_accept() fails
+        # with SSL_ERROR_SYSCALL and EPIPE errno and the server receives
+        # SIGPIPE signal. <https://github.com/openssl/openssl/issues/6904>
+	ok(Net::SSLeay::CTX_set_num_tickets($ctx, 0), 'Session tickets disabled');
+    }
 
     $pid = fork();
     BAIL_OUT("failed to fork: $!") unless defined $pid;
@@ -76,8 +90,13 @@ Net::SSLeay::library_init();
             my $ssl = Net::SSLeay::new($ctx);
             ok($ssl, 'new');
 
+	    is(Net::SSLeay::in_before($ssl), 1, 'in_before is 1');
+	    is(Net::SSLeay::in_init($ssl), 1, 'in_init is 1');
+
             ok(Net::SSLeay::set_fd($ssl, fileno($ns)), 'set_fd using fileno');
             ok(Net::SSLeay::accept($ssl), 'accept');
+
+	    is(Net::SSLeay::is_init_finished($ssl), 1, 'is_init_finished is 1');
 
             ok(Net::SSLeay::get_cipher($ssl), 'get_cipher');
             like(Net::SSLeay::get_shared_ciphers($ssl), qr/(AES|RSA|SHA|CBC|DES)/, 'get_shared_ciphers');
@@ -99,7 +118,7 @@ Net::SSLeay::library_init();
 
 my @results;
 {
-    my ($got) = Net::SSLeay::sslcat('localhost', $port, $msg);
+    my ($got) = Net::SSLeay::sslcat('127.0.0.1', $port, $msg);
     push @results, [ $got eq uc($msg), 'send and received correctly' ];
 
 }
@@ -123,10 +142,10 @@ my @results;
 
     push @results, [ Net::SSLeay::get_cipher($ssl), 'get_cipher' ];
 
-    push @results, [ Net::SSLeay::write($ssl, $msg), 'write' ];
+    push @results, [ Net::SSLeay::ssl_write_all($ssl, $msg), 'write' ];
     shutdown($s, 1);
 
-    my ($got) = Net::SSLeay::read($ssl);
+    my $got = Net::SSLeay::ssl_read_all($ssl);
     push @results, [ $got eq uc($msg), 'read' ];
 
     Net::SSLeay::free($ssl);
@@ -142,10 +161,8 @@ my @results;
     my $verify_cb_2_called = 0;
     my $verify_cb_3_called = 0;
     {
-        my $cert_dir = 't/data';
-
         my $ctx = Net::SSLeay::CTX_new();
-        push @results, [ Net::SSLeay::CTX_load_verify_locations($ctx, '', $cert_dir), 'CTX_load_verify_locations' ];
+        push @results, [ Net::SSLeay::CTX_load_verify_locations($ctx, $ca_cert_pem, ''), 'CTX_load_verify_locations' ];
         Net::SSLeay::CTX_set_verify($ctx, &Net::SSLeay::VERIFY_PEER, \&verify);
 
         my $ctx2 = Net::SSLeay::CTX_new();
@@ -166,7 +183,7 @@ my @results;
             Net::SSLeay::set_fd($ssl, fileno($s));
             Net::SSLeay::connect($ssl);
 
-            Net::SSLeay::write($ssl, $msg);
+            Net::SSLeay::ssl_write_all($ssl, $msg);
 
             shutdown $s, 2;
             close $s;
@@ -220,15 +237,15 @@ my @results;
             Net::SSLeay::set_fd($ssl3, $s3);
 
             Net::SSLeay::connect($ssl1);
-            Net::SSLeay::write($ssl1, $msg);
+            Net::SSLeay::ssl_write_all($ssl1, $msg);
             shutdown $s1, 2;
 
             Net::SSLeay::connect($ssl2);
-            Net::SSLeay::write($ssl2, $msg);
+            Net::SSLeay::ssl_write_all($ssl2, $msg);
             shutdown $s2, 2;
 
             Net::SSLeay::connect($ssl3);
-            Net::SSLeay::write($ssl3, $msg);
+            Net::SSLeay::ssl_write_all($ssl3, $msg);
             shutdown $s3, 2;
 
             close $s1;
@@ -251,12 +268,12 @@ my @results;
 
     sub verify {
         my ($ok, $x509_store_ctx) = @_;
-	return 1 unless $ok; # openssl 1.0 calls us twice with ok = 0 then ok = 1
 
+        # Skip intermediate certs but propagate possible not ok condition
+        my $depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($x509_store_ctx);
+        return $ok unless $depth == 0;
 
         $verify_cb_1_called++;
-
-        push @results, [ $ok, 'verify cb' ];
 
         my $cert = Net::SSLeay::X509_STORE_CTX_get_current_cert($x509_store_ctx);
         push @results, [ $cert, 'verify cb cert' ];
@@ -271,31 +288,40 @@ my @results;
 
 	my $fingerprint =  Net::SSLeay::X509_get_fingerprint($cert, 'SHA-1');
 
-        push @results, [ $issuer  eq $cert_name, 'cert issuer'  ];
+        push @results, [ $ok == 1, 'verify is ok' ];
+        push @results, [ $issuer eq $cert_issuer, 'cert issuer' ];
         push @results, [ $subject eq $cert_name, 'cert subject' ];
         push @results, [ substr($cn, length($cn) - 1, 1) ne "\0", 'tailing 0 character is not returned from get_text_by_NID' ];
-        push @results, [ $fingerprint  eq '96:9F:25:FD:42:A7:FC:4D:8B:FF:14:76:7F:2E:07:AF:F6:A4:10:96', 'SHA-1 fingerprint'  ];
+        push @results, [ $fingerprint eq $cert_sha1_fp, 'SHA-1 fingerprint' ];
 
         return 1;
     }
 
     sub verify2 {
         my ($ok, $x509_store_ctx) = @_;
-	return 1 unless $ok;# openssl 1.0 calls us twice with ok = 0 then ok = 1
+
+        # Skip intermediate certs but propagate possible not ok condition
+        my $depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($x509_store_ctx);
+        return $ok unless $depth == 0;
+
         $verify_cb_2_called++;
-        return 1;
+        push @results, [ $ok == 1, 'verify 2 is ok' ];
+        return $ok;
     }
 
     sub verify3 {
         my ($ok, $x509_store_ctx) = @_;
-	return 1 unless $ok;# openssl 1.0 calls us twice with ok = 0 then ok = 1
+
+        # Skip intermediate certs but propagate possible not ok condition
+        my $depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($x509_store_ctx);
+        return $ok unless $depth == 0;
+
         $verify_cb_3_called++;
-        return 1;
+        push @results, [ $ok == 1, 'verify 3 is ok' ];
+        return $ok;
     }
 
     sub verify4 {
-        my ($ok, $x509_store_ctx) = @_;
-	return 1 unless $ok;# openssl 1.0 calls us twice with ok = 0 then ok = 1
         my ($cert_store, $userdata) = @_;
         push @results, [$userdata == 1, 'CTX_set_cert_verify_callback'];
         return $userdata;
@@ -330,7 +356,7 @@ my @results;
     );
 
     push @results, [ $subject eq $cert_name, 'get_peer_certificate subject' ];
-    push @results, [ $issuer  eq $cert_name, 'get_peer_certificate issuer'  ];
+    push @results, [ $issuer eq $cert_issuer, 'get_peer_certificate issuer' ];
 
     my $data = 'a' x 1024 ** 2;
     my $written = Net::SSLeay::ssl_write_all($ssl, \$data);
@@ -351,7 +377,7 @@ waitpid $pid, 0;
 push @results, [ $? == 0, 'server exited with 0' ];
 
 END {
-    Test::More->builder->current_test(51);
+    Test::More->builder->current_test(73);
     for my $t (@results) {
         ok( $t->[0], $t->[1] );
     }

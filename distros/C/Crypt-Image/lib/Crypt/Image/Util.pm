@@ -1,6 +1,6 @@
 package Crypt::Image::Util;
 
-$Crypt::Image::Util::VERSION   = '0.13';
+$Crypt::Image::Util::VERSION   = '0.14';
 $Crypt::Image::Util::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Image::Util - Helper for Crypt::Image module.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -23,14 +23,14 @@ use Crypt::Image::Axis;
 
 =head1 DESCRIPTION
 
-Utility module for Crypt::Image. Methods can be accessed directly.
+Utility module for L<Crypt::Image>. Methods can be accessed directly.
 
 =head1 METHODS
 
-=head2 cloneImage()
+=head2 cloneImage($image)
 
-It clone the given image (object of type GD::Image) and returns the clone of type
-GD::Image.
+It clones the given C<$image> (object of type L<GD::Image>) and returns the clone
+of type L<GD::Image>.
 
 =cut
 
@@ -40,10 +40,10 @@ sub cloneImage {
     return $image->clone;
 }
 
-=head2 saveImage()
+=head2 saveImage($file_name, $image, $type)
 
-Saves the given image data as given file  name  of the given type. The parameters
-are listed below in sequence:
+Saves the C<$image> data as C<$file_name> of the C<$type>. The parameters are as
+below in sequence:
 
 =over 3
 
@@ -51,7 +51,7 @@ are listed below in sequence:
 
 =item * Object of type GD::Image for the image.
 
-=item * Type of the given image.
+=item * Type of the given image (png, gif or jpg).
 
 =back
 
@@ -68,9 +68,9 @@ sub saveImage {
     close(IMAGE);
 }
 
-=head2 moveDown()
+=head2 moveDown($pixel, $number)
 
-Moves the given pixel down by given number.
+Moves the C<$pixel> down by C<$number>.
 
 =cut
 
@@ -81,9 +81,9 @@ sub moveDown {
     return $this;
 }
 
-=head2 moveUp()
+=head2 moveUp($pixel, $number)
 
-Moves the given pixel up by given number.
+Moves the C<$pixel> up by C<$number>.
 
 =cut
 
@@ -94,9 +94,9 @@ sub moveUp {
     return $this;
 }
 
-=head2 getColor()
+=head2 getColor($r, $g, $b)
 
-Returns the color index for the given R, G and B.
+Returns the color index for the given <$r>, C<$g> and C<$b>.
 
 =cut
 
@@ -107,10 +107,10 @@ sub getColor {
     return $image->colorAllocate($r, $g, $b);
 }
 
-=head2 splitInTwo()
+=head2 splitInTwo($point)
 
-It  splits  the  given  point into X, Y coordinates and returns an object of type
-Crypt::Image::Axis.
+It  splits  the  C<$point> into X, Y coordinates and returns  an  object of type
+L<Crypt::Image::Axis>.
 
 =cut
 
@@ -122,9 +122,9 @@ sub splitInTwo {
     return Crypt::Image::Axis->new('x' => $a, 'y' => $r);
 }
 
-=head2 splitInThree()
+=head2 splitInThree($point)
 
-It splits the given point into X, Y, Z coordinates  and returns an object of type
+It splits the C<$point> into X, Y, Z coordinates  and returns an  object of type
 L<Crypt::Image::Axis>.
 
 =cut
@@ -147,10 +147,11 @@ sub splitInThree {
     return Crypt::Image::Axis->new('x' => $a, 'y' => $r, 'z' => $z);
 }
 
-=head2 differenceInAxis()
+=head2 differenceInAxis($key_image, $new_image, $x, $y)
 
-It returns the absolute difference in the R, G and B of the given  key and cloned
-images at X and Y coordinates. The parameters are listed below in sequence:
+It returns the absolute  difference  in  the R, G and B of the C<$key_image> and
+cloned images at C<$x> and C<$y> coordinates. The parameters are listed below in
+sequence:
 
 =over 4
 
@@ -175,9 +176,9 @@ sub differenceInAxis {
     return (abs($k_r-$c_r), abs($k_g-$c_g), abs($k_b-$c_b));
 }
 
-=head2 getPixelColorRGB()
+=head2 getPixelColorRGB($image, $x, $y)
 
-Returns the R,G,B of the given image at the given X,Y coordinates. The parameters
+Returns the R, G, B of the C<$image> at the C<$x>, C<$y> coordinates. Parameters
 are listed below in sequence:
 
 =over 3

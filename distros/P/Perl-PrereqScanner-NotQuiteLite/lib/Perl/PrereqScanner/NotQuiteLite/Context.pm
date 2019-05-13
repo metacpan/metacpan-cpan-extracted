@@ -8,6 +8,10 @@ use Perl::PrereqScanner::NotQuiteLite::Util;
 
 my %defined_keywords = _keywords();
 
+my %default_op_keywords = map {$_ => 1} qw(
+  x eq ne and or xor cmp ge gt le lt not
+);
+
 my %default_conditional_keywords = map {$_ => 1} qw(
   if elsif unless else
 );
@@ -49,6 +53,14 @@ my %enables_utf8 = map {$_ => 1} qw(
   Mojo::Base::Che
 );
 
+my %new_keyword_since = (
+  say => '5.010',
+  state => '5.010',
+  given => '5.010',
+  when => '5.010',
+  default => '5.010',
+);
+
 my $default_g_re_prototype = qr{\G(\([^\)]*?\))};
 
 sub new {
@@ -66,6 +78,9 @@ sub new {
   }
   if ($args{suggests}) {
     $context{suggests} = CPAN::Meta::Requirements->new;
+  }
+  if ($args{perl_minimum_version}) {
+    $context{perl} = CPAN::Meta::Requirements->new;
   }
   for my $type (qw/use no method keyword sub/) {
     if (exists $args{_}{$type}) {
@@ -149,6 +164,13 @@ sub add_conditional {
 
 sub add_no {
   shift->_add('noes', @_);
+}
+
+sub add_perl {
+  my ($self, $perl, $reason) = @_;
+  return unless $self->{perl};
+  $self->_add('perl', 'perl', $perl);
+  $self->{perl_minimum_version}{$reason} = $perl;
 }
 
 sub _add {
@@ -314,10 +336,32 @@ sub token_is_keyword {
   return 0;
 }
 
+sub token_is_op_keyword {
+  my ($self, $token) = @_;
+  return 1 if exists $default_op_keywords{$token};
+  return 0 if !exists $self->{defined_op_keywords};
+  return 1 if exists $self->{defined_op_keywords}{$token};
+  return 0;
+}
+
+sub check_new_keyword {
+  my ($self, $token) = @_;
+  if (exists $new_keyword_since{$token}) {
+    $self->add_perl($new_keyword_since{$token}, $token);
+  }
+}
+
 sub register_keywords {
   my ($self, @keywords) = @_;
   for my $keyword (@keywords) {
     $self->{defined_keywords}{$keyword} = 0;
+  }
+}
+
+sub register_op_keywords {
+  my ($self, @keywords) = @_;
+  for my $keyword (@keywords) {
+    $self->{defined_op_keywords}{$keyword} = 0;
   }
 }
 
@@ -368,6 +412,18 @@ sub remove_inner_packages_from_requirements {
       next unless $self->{$rel};
       $self->{$rel}->clear_requirement($package);
     }
+  }
+}
+
+sub merge_perl {
+  my $self = shift;
+  return unless $self->{perl};
+
+  my $perl = $self->{requires}->requirements_for_module('perl');
+  if ($self->{perl}->accepts_module('perl', $perl)) {
+    delete $self->{perl_minimum_version};
+  } else {
+    $self->add(perl => $self->{perl}->requirements_for_module('perl'));
   }
 }
 

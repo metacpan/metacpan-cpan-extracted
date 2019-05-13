@@ -1,5 +1,12 @@
 Revision history for String-Interpolate-RE
 
+0.09      2019-05-09 17:01:26-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * allow strinterp's default options to be changed upon import.
+
+
 0.08      2018-11-25 00:46:16-05:00 America/New_York
 
   [ENHANCEMENT]

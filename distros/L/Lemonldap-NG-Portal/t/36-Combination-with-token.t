@@ -76,7 +76,7 @@ sub iniCmb {
                     useSafeJail    => 1,
                     authentication => 'Combination',
                     userDB         => 'Same',
-                    
+
                     combination => $expr,
                     combModules => {
                         DB => {

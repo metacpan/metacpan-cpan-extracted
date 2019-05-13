@@ -1,3 +1,5 @@
+0.004 9/05/2019
+  add peek, current_and_next/previous, and size methods
 0.003 11/02/2019
   Fix github issue #1 ->next($num) and ->prev($num) broken.
 

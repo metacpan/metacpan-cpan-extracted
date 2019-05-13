@@ -1,6 +1,6 @@
 use strictures 2;
 
-use Test::InDistDir;
+use if !(-e 'META.yml'), "Test::InDistDir";
 use Test::More;
 
 BEGIN {

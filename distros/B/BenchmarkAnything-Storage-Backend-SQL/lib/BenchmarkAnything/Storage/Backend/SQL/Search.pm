@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Search;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: searchengine support functions
-$BenchmarkAnything::Storage::Backend::SQL::Search::VERSION = '0.024';
+$BenchmarkAnything::Storage::Backend::SQL::Search::VERSION = '0.026';
 use strict;
 use warnings;
 use Data::Dumper;
@@ -229,7 +229,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

@@ -150,8 +150,18 @@ EOT
         'Arabidopsis thaliana@XWZ789#NEW#',
     ];
 
-    is_deeply [ map { $_->full_id } $ali->all_new_seqs ], $exp_new_seq_ids,
+    is_deeply [ map { $_->full_id } $ali->all_new_seqs ],     $exp_new_seq_ids,
         'got expected seq_ids for new seqs';
+
+    my $exp_pre_seq_ids = [
+        'Arabidopsis thaliana@SOS777',
+    ];
+
+    is_deeply [ map { $_->full_id } $ali->all_but_new_seqs ], $exp_pre_seq_ids,
+        'got expected seq_ids for preexisting seqs';
+
+    $ali->clear_new_tags;
+    cmp_ok $ali->all_new_seqs, '==', 0, 'rightly cleared new tags';
 }
 
 {

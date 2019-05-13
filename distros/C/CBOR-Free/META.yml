@@ -4,14 +4,15 @@ author:
   - 'Felipe Gasper (FELIPE)'
 build_requires:
   Data::Dumper: '0'
-  Devel::PPPort: '0'
+  ExtUtils::MakeMaker: '0'
   FindBin: '0'
   Test::Deep: '0'
   Test::Exception: '0'
   Test::FailWarnings: '0'
-  Test::More: '1.30214'
+  Test::More: '1.302133'
   autodie: '0'
 configure_requires:
+  Devel::PPPort: '0'
   ExtUtils::MakeMaker: '7.12'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-CBOR-Free/issues
   repository: git://github.com/FGasper/p5-CBOR-Free.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

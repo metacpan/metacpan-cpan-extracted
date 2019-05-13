@@ -1,16 +1,30 @@
 #!/usr/bin/perl
 
 # Tests for SSL_CTX_new and related functions
+# Also test handshake state machine retrieval
 
 use strict;
 use warnings;
-use Test::More tests => 40;
+use Test::More tests => 44;
 use Net::SSLeay;
 
 Net::SSLeay::randomize();
 Net::SSLeay::load_error_strings();
 Net::SSLeay::add_ssl_algorithms();
 Net::SSLeay::OpenSSL_add_all_algorithms();
+
+sub is_known_proto_version {
+    return 1 if $_[0] == 0x0000;                            # Automatic version selection
+    return 1 if $_[0] == Net::SSLeay::SSL3_VERSION();       # OpenSSL 0.9.8+
+    return 1 if $_[0] == Net::SSLeay::TLS1_VERSION();       # OpenSSL 0.9.8+
+    return 1 if $_[0] == Net::SSLeay::TLS1_1_VERSION();     # OpenSSL 0.9.8+
+    return 1 if $_[0] == Net::SSLeay::TLS1_2_VERSION();     # OpenSSL 0.9.8+
+    if (eval { Net::SSLeay::TLS1_3_VERSION() }) {
+        return 1 if $_[0] == Net::SSLeay::TLS1_3_VERSION(); # OpenSSL 1.1.1+
+    }
+
+    return;
+}
 
 # Shortcuts from SSLeay.xs
 my $ctx = Net::SSLeay::CTX_new();
@@ -31,6 +45,12 @@ ok($ctx_23_server, 'CTX_new with SSLv23_server_method');
 
 my $ctx_tls1 = Net::SSLeay::CTX_new_with_method(Net::SSLeay::TLSv1_method());
 ok($ctx_tls1, 'CTX_new with TLSv1_method');
+
+# Retrieve information about the handshake state machine
+is(Net::SSLeay::in_connect_init(Net::SSLeay::new($ctx_23_client)), 1, 'in_connect_init() is 1 for client');
+is(Net::SSLeay::in_accept_init(Net::SSLeay::new($ctx_23_client)),  0, 'in_accept_init() is 0 for client');
+is(Net::SSLeay::in_connect_init(Net::SSLeay::new($ctx_23_server)), 0, 'in_connect_init() is 0 for server');
+is(Net::SSLeay::in_accept_init(Net::SSLeay::new($ctx_23_server)),  1, 'in_accept_init() is 1 for server');
 
 # Need recent enough OpenSSL or LibreSSL for TLS_method functions
 my ($ctx_tls, $ssl_tls, $ctx_tls_client, $ssl_tls_client, $ctx_tls_server, $ssl_tls_server);
@@ -111,14 +131,14 @@ if ($ctx_tls && exists &Net::SSLeay::CTX_get_min_proto_version)
 {
     my $ver;
     $ver = Net::SSLeay::CTX_get_min_proto_version($ctx_tls);
-    is($ver, 0, 'TLS_method CTX has automatic minimum version');
+    ok(is_known_proto_version($ver), 'TLS_method CTX has known minimum version');
     $ver = Net::SSLeay::CTX_get_max_proto_version($ctx_tls);
-    is($ver, 0, 'TLS_method CTX has automatic maximum version');
+    ok(is_known_proto_version($ver), 'TLS_method CTX has known maximum version');
 
     $ver = Net::SSLeay::get_min_proto_version($ssl_tls);
-    is($ver, 0, 'SSL from TLS_method CTX has automatic minimum version');
+    ok(is_known_proto_version($ver), 'SSL from TLS_method CTX has known minimum version');
     $ver = Net::SSLeay::get_max_proto_version($ssl_tls);
-    is($ver, 0, 'SSL from TLS_method CTX has automatic maximum version');
+    ok(is_known_proto_version($ver), 'SSL from TLS_method CTX has known maximum version');
 
     # First see if our CTX has min and max settings enabled
     $ver = Net::SSLeay::CTX_get_min_proto_version($ctx_tls_client);

@@ -10,7 +10,7 @@
     "crypto-js": "x",
     "fingerprintjs2": "x",
     "font-awesome": "4.x",
-    "jquery": "2.x",
+    "jquery": "3.x",
     "jquery-ui": "x",
     "jquery.cookie": "x",
     "qrious": "x"

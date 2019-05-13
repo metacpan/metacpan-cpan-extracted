@@ -1,12 +1,12 @@
 {
    "abstract" : "Calculate geographic distances.",
    "author" : [
-      "Aran Clary Deltac <bluefeet@gmail.com>"
+      "Aran Clary Deltac <aran@bluefeet.dev>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -68,47 +68,47 @@
    "provides" : {
       "GIS::Distance" : {
          "file" : "lib/GIS/Distance.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::ALT" : {
          "file" : "lib/GIS/Distance/ALT.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Constants" : {
          "file" : "lib/GIS/Distance/Constants.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Cosine" : {
          "file" : "lib/GIS/Distance/Cosine.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Formula" : {
          "file" : "lib/GIS/Distance/Formula.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::GreatCircle" : {
          "file" : "lib/GIS/Distance/GreatCircle.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Haversine" : {
          "file" : "lib/GIS/Distance/Haversine.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::MathTrig" : {
          "file" : "lib/GIS/Distance/MathTrig.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Null" : {
          "file" : "lib/GIS/Distance/Null.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Polar" : {
          "file" : "lib/GIS/Distance/Polar.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "GIS::Distance::Vincenty" : {
          "file" : "lib/GIS/Distance/Vincenty.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -122,8 +122,11 @@
          "web" : "https://github.com/bluefeet/GIS-Distance"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

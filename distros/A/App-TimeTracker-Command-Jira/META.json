@@ -4,7 +4,7 @@
       "Michael Kr\u00f6ll <pepl@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -53,25 +53,19 @@
          }
       }
    },
-   "provides" : {
-      "App::TimeTracker::Command::Jira" : {
-         "file" : "lib/App/TimeTracker/Command/Jira.pm",
-         "version" : "0.6"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/pepl/app-timetracker-command-jira/issues"
       },
-      "homepage" : "https://github.com/pepl/App-TimeTracker-Jira",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/pepl/App-TimeTracker-Jira.git",
-         "web" : "https://github.com/pepl/App-TimeTracker-Jira"
+         "url" : "git://github.com/pepl/app-timetracker-command-jira.git",
+         "web" : "https://github.com/pepl/app-timetracker-command-jira"
       }
    },
-   "version" : "0.6",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+   "version" : "0.8",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

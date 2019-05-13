@@ -113,7 +113,7 @@ sub _redirect {
                     delete $req->pdata->{ $self->ipath };
                     delete $req->pdata->{ $self->ipath . 'Path' };
                     return $self->run( @_, @path );
-                  }
+                }
                 : ()
             )
         ]

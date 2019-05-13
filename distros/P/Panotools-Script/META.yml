@@ -1,35 +1,36 @@
---- #YAML:1.0
-name:               Panotools-Script
-version:            0.28
-abstract:           Panorama Tools scripting
+---
+abstract: 'Panorama Tools scripting'
 author:
-    - Bruno Postle <bruno@postle.net>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Bruno Postle <bruno@postle.net>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    bytes:            0
-    File::Copy:       1
-    File::Spec:       0.8
-    File::Temp:       0.1
-    Getopt::Long:     2
-    Getopt::Std:      1
-    Image::ExifTool:  9.07
-    Image::Size:      2.9
-    LWP::UserAgent:   0
-    Math::Trig:       0.1
-    Pod::Usage:       1
-    Storable:         2
-    Test::More:       0.1
-    URI:              0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Panotools-Script
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Copy: '1'
+  File::Spec: '0.8'
+  File::Temp: '0.1'
+  Getopt::Long: '2'
+  Getopt::Std: '1'
+  Image::ExifTool: '9.07'
+  Image::Size: '2.9'
+  LWP::UserAgent: '0'
+  Math::Trig: '0.1'
+  Pod::Usage: '1'
+  Storable: '2'
+  Test::More: '0.1'
+  URI: '0'
+  bytes: '0'
+version: '0.29'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

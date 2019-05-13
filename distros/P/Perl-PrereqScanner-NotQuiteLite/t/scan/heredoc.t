@@ -998,4 +998,36 @@ sub between ($) {
 }
 TEST
 
+test(<<'TEST'); # PFEIFFER/SQL-Steno-0.3.2/lib/SQL/Steno.pm
+    print <<\HELP;
+All entries are single line unless \\wrapped at 1st bol and last eol\\ or continued.\
+Queries have the form: {{!}/regexp/{i}}{=}query
+The query has lots of short-hands expanded, unless it is prefixed by the optional =.
+The fields joined with '~' are grepped if regexp is given, case-insensitively if i is given.
+
+??query     Only shows massaged query.
+!perl-code  Runs perl-code.
+>file       Next query's output to file.  In csv or yaml format if filename has that suffix.
+
+Query has the form {select|update|insert|delete}{fieldlist};tablelist{;clause} or set ...
+'select' is prepended if none of these initial keywords.
+fieldlist defaults to '*', also if Query starts with '#'.
+';' is alternately replaced by 'from' and 'where'.
+
+Abbreviations, more help with ?&{abbrev}, ?:{abbrev}, ?\{abbrev}, ?#{abbrev}, ?.{abbrev}, ?{abbrev}(
+&{Perl code}...     # only at bol, if it returns undef then skip, else prepend to ...
+&query $1;$2;...    # only at bol
+&query($1;$2;...)...    # only at bol, only replace upto )
+:macro
+:\quote(arg,...)    # split, quote & join (?\ alone needs trailing space, because \ at end continues)
+:{Perl code}        # dynamic macro
+#table #table#t
+.column .column.c   # for any table recognized in statement
+function(
+
+Characters \t\n\r get masked in output, \r\n as \R.
+Date or time 0000-00-00 -> 0000-  1970-01-01 -> 1970-  00:00:00 -> 00:  23:59:59 -> 24:
+HELP
+TEST
+
 done_testing;

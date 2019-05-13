@@ -1,0 +1,13 @@
+This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
+Some APIs *can change* with the release of the first stable release (v 0.1).
+
+0.05	2019-05-09
+	* Improved test coverage
+	* BUG FIX on getFileFormat()
+
+0.02	2019-05-07
+	* Reader parses STDIN
+	* Updated documentation
+
+0.01	2019-05-05
+	* Initial release of a working parser

@@ -1,5 +1,15 @@
 Revision history for Geo::ShapeFile.
 
+3.00 2019-05-11
+    - Release version handles unicode file names on Windows
+
+2.99_002 2019-05-10
+    - Add missing test dependency on Test::Exception,
+      thanks SREZIC for reporting
+
+2.99_001 2019-05-10
+    - Handle unicode file names on Windows
+
 2.66 2019-02-11
     - Full release of 2.65_001, with one additional definedness check (pajlpajl++)
 

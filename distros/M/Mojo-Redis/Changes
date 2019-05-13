@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-Redis
 
+3.24 2019-05-07T22:25:50+0700
+ - Fix PubSub->keyspace_listen() #42
+
 3.23 2019-05-04T21:12:25+0700
  - Fix compatibility with Mojolicious 8.15 #46
 

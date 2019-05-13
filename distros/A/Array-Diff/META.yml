@@ -1,29 +1,27 @@
 ---
 abstract: 'Find the differences between two arrays'
 author:
-  - 'Daisuke Murase <typester@cpan.org>'
+  - 'Daisuke Murase <typester@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Array-Diff
-no_index:
-  directory:
-    - inc
-    - t
-recommends:
-  Algorithm::Diff::XS: 0
 requires:
-  Algorithm::Diff: 1.19
-  Class::Accessor::Fast: 0
-  Filter::Util::Call: 0
+  Algorithm::Diff: '1.19'
+  Class::Accessor::Fast: '0'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/typester/array-diff-perl.git
-version: 0.07
+  homepage: https://github.com/neilb/array-diff-perl
+  repository: https://github.com/neilb/array-diff-perl.git
+version: '0.09'
+x_serialization_backend: 'YAML::Tiny version 1.62'

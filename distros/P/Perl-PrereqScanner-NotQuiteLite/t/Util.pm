@@ -9,7 +9,7 @@ use Exporter qw/import/;
 use File::Temp qw/tempdir/;
 use File::Basename qw/dirname/;
 use File::Path qw/mkpath rmtree/;
-use if -d ".git", "Test::FailWarnings";
+use if (-d ".git" and !$ENV{PERL_PSNQL_DEBUG}), "Test::FailWarnings";
 
 our @EXPORT = qw/
   test todo_test used test_app test_file test_cpanfile test_bin
@@ -30,6 +30,7 @@ sub test {
     my $scanner = Perl::PrereqScanner::NotQuiteLite->new(
       parsers => $PARSERS || [qw/:bundled/],
       suggests => $expected_suggests ? 1 : 0,
+      perl_minimum_version => ($ENV{PERL_PSNQL_MINVER} || 0),
     );
     ok my $context = $scanner->scan_string($string);
     if ($expected_requires) {

@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8262,7 +8262,14 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Sun, 03 Mar 2019 02:50:29 GMT
+# Last-Modified: Sat, 04 May 2019 01:10:16 GMT
+
+# The following constants are unsupported, and may be modified or
+# revoked at any time. They exist to support
+# xt/author/magnitude_status.t
+use constant _CELESTRAK_VISUAL => 'Sat, 04 May 2019 01:10:16 GMT';
+use constant _MCCANTS_VSNAMES  => 'Thu, 25 May 2017 00:30:11 GMT';
+use constant _MCCANTS_QUICKSAT => 'Thu, 25 May 2017 00:00:55 GMT';
 
 %magnitude_table = (
   '00694' => 3.5,
@@ -8306,6 +8313,8 @@ sub _next_elevation_screen {
   '13154' => 5.5,
   '13402' => 6.0,
   '13403' => 5.0,
+  '13552' => 4.9,
+  '13553' => 5.4,
   '13819' => 5.5,
   '14032' => 4.4,
   '14208' => 4.9,
@@ -8334,6 +8343,7 @@ sub _next_elevation_screen {
   '17973' => 5.0,
   '18153' => 5.5,
   '18187' => 5.0,
+  '18421' => 4.9,
   '18749' => 5.5,
   '18958' => 5.5,
   '19046' => 5.0,
@@ -8345,7 +8355,10 @@ sub _next_elevation_screen {
   '19650' => 3.5,
   '20261' => 6.0,
   '20262' => 6.4,
+  '20303' => 4.9,
   '20323' => 5.5,
+  '20362' => 5.4,
+  '20443' => 4.9,
   '20453' => 5.5,
   '20465' => 5.0,
   '20466' => 5.0,
@@ -8365,7 +8378,10 @@ sub _next_elevation_screen {
   '21820' => 5.5,
   '21876' => 5.5,
   '21938' => 5.0,
+  '21949' => 5.4,
+  '22219' => 4.4,
   '22220' => 3.5,
+  '22236' => 4.4,
   '22285' => 3.5,
   '22286' => 5.0,
   '22566' => 3.5,
@@ -8390,13 +8406,17 @@ sub _next_elevation_screen {
   '25732' => 5.0,
   '25860' => 4.5,
   '25861' => 3.5,
+  '25876' => 4.9,
+  '25977' => 6.4,
   '25979' => 4.5,
   '25994' => 3.5,
   '26070' => 3.5,
   '26473' => 3.5,
   '26474' => 3.5,
   '26874' => 4.5,
+  '26905' => 4.4,
   '26906' => 3.5,
+  '26907' => 4.4,
   '26934' => 4.5,
   '27006' => 3.5,
   '27386' => 4.5,

@@ -4,13 +4,13 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-Image",
    "no_index" : {
@@ -46,19 +46,19 @@
    "provides" : {
       "Crypt::Image" : {
          "file" : "lib/Crypt/Image.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Crypt::Image::Axis" : {
          "file" : "lib/Crypt/Image/Axis.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Crypt::Image::Params" : {
          "file" : "lib/Crypt/Image/Params.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Crypt::Image::Util" : {
          "file" : "lib/Crypt/Image/Util.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/manwar/Crypt-Image"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

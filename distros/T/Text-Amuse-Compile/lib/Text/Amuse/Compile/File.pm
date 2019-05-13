@@ -1295,14 +1295,18 @@ sub _interpolate_magic_comments {
                 \x{20}+
                 \\textbackslash\{\}
                }x;
-   $latex =~ s/^
+    my $size = qr{-?[1-9][0-9]*(?:mm|cm|pt|em)}x;
+
+    $latex =~ s/^
                 $prefix
                 ( # permitted commands
                     sloppy |
                     fussy  |
                     newpage |
                     strut |
-                    vskip\x{20}+[1-9][0-9]*(?:mm|cm|pt)
+                    flushbottom |
+                    raggedbottom |
+                    vskip \x{20}+ $size
                 )
                 \x{20}*
                 $
@@ -1316,6 +1320,16 @@ sub _interpolate_magic_comments {
                 \x{20}*
                 $
                /\\$1\{$3\}/gmx;
+
+    $latex =~ s/^
+                $prefix
+                ( enlargethispage )
+                \\ \{
+                ( $size )
+                \\ \}
+                \x{20}*
+                $
+               /\\$1\{$2\}/gmx;
 
     my $regular = qr{[^\#\$\%\&\~\^\\\{\}_]+};
     $latex =~ s/^

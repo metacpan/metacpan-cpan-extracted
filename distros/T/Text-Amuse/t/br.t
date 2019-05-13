@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Text::Amuse::Functions qw/muse_to_html muse_to_tex/;
 
 my $builder = Test::More->builder;
@@ -129,4 +129,45 @@ EOF
 
 eq_or_diff muse_to_tex($muse), $ltx, "latex ok (all 3 cases)";
 eq_or_diff muse_to_html($muse), $html, "html ok (all 3 cases)";
+
+$muse = <<'EOF';
+Test
+
+<br>Hello
+
+Here is
+<br> this
+EOF
+
+$ltx =<<'EOF';
+
+Test
+
+
+\noindent Hello
+
+
+Here is
+\forcelinebreak  this
+
+EOF
+
+$html = <<'EOF';
+
+<p>
+Test
+</p>
+
+<p>
+<br />Hello
+</p>
+
+<p>
+Here is
+<br /> this
+</p>
+EOF
+
+eq_or_diff muse_to_tex($muse), $ltx, "latex ok";
+eq_or_diff muse_to_html($muse), $html, "html ok";
 

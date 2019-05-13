@@ -24,6 +24,6 @@ no_index:
 requires:
   Graph: '0.9704'
   perl: '5.014'
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

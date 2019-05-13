@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::CubicBezier;
-$SVG::Estimate::Path::CubicBezier::VERSION = '1.0113';
+$SVG::Estimate::Path::CubicBezier::VERSION = '1.0114';
 use Moo;
 use List::Util qw/min max/;
 use Clone qw/clone/;
@@ -15,7 +15,7 @@ SVG::Estimate::Path::CubicBezier - Handles estimating cubic bezier curves.
 
 =head1 VERSION
 
-version 1.0113
+version 1.0114
 
 =head1 SYNOPSIS
 

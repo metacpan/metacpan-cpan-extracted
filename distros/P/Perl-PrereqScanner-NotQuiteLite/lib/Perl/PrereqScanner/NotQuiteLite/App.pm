@@ -28,7 +28,7 @@ sub new {
   }
 
   $opts{prereqs} = CPAN::Meta::Prereqs->new;
-  $opts{parsers} = [':installed'] unless defined $opts{parsers};
+  $opts{parsers} = [':bundled'] unless defined $opts{parsers};
   $opts{recommends} = 0 unless defined $opts{recommends};
   $opts{suggests} = 0 unless defined $opts{suggests};
   $opts{base_dir} ||= File::Spec->curdir;
@@ -77,6 +77,10 @@ sub new {
     if (eval "require $index_package; 1") {
       $opts{index} = $index_package->new;
     }
+  }
+
+  if ($opts{scan_also}) {
+    $opts{libs} ||= delete $opts{scan_also};
   }
 
   bless \%opts, $class;
@@ -282,7 +286,7 @@ sub _find_used_perl_version {
 }
 
 sub _add_test_requires {
-  my ($self, $force) = @_;  
+  my ($self, $force) = @_;
 
   if (my $test_reqs = $self->{prereqs}->requirements_for('test', 'requires')) {
     my @required_modules = $test_reqs->required_modules;
@@ -469,15 +473,137 @@ Perl::PrereqScanner::NotQuiteLite::App
 
 =head1 SYNOPSIS
 
+  scan-perl-prereqs-nqlite [options] [DIRS|FILES]
+
+  -or-
+
+  use Perl::PrereqScanner::NotQuiteLite::App;
+
+  my $app = Perl::PrereqScanner::NotQuiteLite::App->new(
+    parsers => [qw/:bundled/],
+    suggests => 1,
+    perl_minimum_version => 1,
+  );
+  my $prereqs = $app->run;
+
 =head1 DESCRIPTION
 
-This is the guts of C<scan-perl-prereqs-nqlite>.
+Perl::PrereqScanner::NotQuiteLite::App walks down a directory
+and scans appropriate files to find prerequisites.
+You usually don't need to touch this module directly, but you
+might want to if you need finer control (to use a custom CPAN index
+etc).
 
 =head1 METHODS
 
 =head2 new
 
-creates an object. See C<scan-perl-prereqs-nqlite> for options.
+creates an object. Notable options are:
+
+=over 4
+
+=item parsers
+
+Perl::PrereqScanner::NotQuiteLite::App uses all the bundled parsers
+by default, but you can change if you need your own parsers.
+See L<Perl::PrereqScanner::NotQuiteLite> for details.
+
+=item recommends, suggests, perl_minimum_version
+
+Perl::PrereqScanner::NotQuiteLite::App usually returns C<use>d
+modules only, but you can change this behavior by setting these
+options. See L<Perl::PrereqScanner::NotQuiteLite> for details.
+
+=item develop
+
+If set, Perl::PrereqScanner::NotQuiteLite::App also scans files under
+C<xt> and C<author> directories to find requirements for development.
+
+=item exclude_core
+
+If set, Perl::PrereqScanner::NotQuiteLite::App ignores prerequisites
+that are bundled with Perl (of 5.008001 by default, or of a C<use>d
+perl version if any). This requires L<Module::CoreList> version 2.99
+or above.
+
+=item perl_version
+
+You can explicitly use this option to exclude core modules of a
+specific perl version.
+
+=item allow_test_pms
+
+Perl::PrereqScanner::NotQuiteLite::App usually ignores C<.pm> files
+under C<t/> directory if they are not used in C<.t> files, considering
+they are some kind of sample files. However, this assumption may be
+wrong sometimes. If this option is set, it scans all the C<.pm> files
+under C<t/> directory, considering some of the test modules will use
+them. If L<Test::Class> (or its equivalent) is used in a test
+file, this option is implicitly set.
+
+=item base_dir
+
+Perl::PrereqScanner::NotQuiteLite::App usually starts traversing from
+the current directory. If this option is set, it starts from there.
+
+=item scan_also
+
+Perl::PrereqScanner::NotQuiteLite::App usually scans C<.pm> files
+in the base dir, C<Makefile.PL>/C<Build.PL>, files under C<lib>,
+C<t>, C<bin>, C<script(s)> directories (and C<xt>, C<author> if asked).
+If your distribution uses a different file layout, or uses extra
+directories to keep submodules, you can add (a reference to) a list
+of paths to scan.
+
+=item ignore, ignore_re
+
+Your distribution may have OS-specific modules whose prerequisites
+can not be installed in other platforms. You can specify (a reference
+to) a list of files that should not be scanned (with C<ignore> option),
+or a regular expression that matches the files (with C<ignore_re>
+option).
+
+=item features
+
+  my $app = Perl::PrereqScanner::NotQuiteLite::App->new(
+    features => {
+      'windows' => {
+        description => 'Windows support',
+        paths => ['lib/Foo/Win32.pm'],
+      }
+    },
+  );
+
+Instead of ignoring a set of files, you can use C<features> option to
+let their prerequisites belong to a specific feature that will not be
+installed unless asked. However, you are advised to create a separate
+distribution for the specific feature.
+
+=item private, private_re
+
+Your distribution may use private modules that are not uploaded to
+the CPAN and thus should not be included in C<cpanfile>. You can
+specify (a reference to) a list of those private modules (with
+C<private> option) or a regular expression that matches those modules
+(with C<private_re> option).
+
+=item use_index, index
+
+Perl::PrereqScanner::NotQuiteLite::App usually lists all the C<use>d
+modules as prerequisites, but some of them may belong to the same
+distribution. If an instance of L<CPAN::Common::Index> backend is
+passed, it is used to dedupe those prerequisites (as long as they are
+not versioned).
+
+  use CPAN::Common::Index::LocalPackage;
+  my $index = CPAN::Common::Index::LocalPackage->new(
+    { source => "$ENV{HOME}/minicpan/modules/02packages.details.txt" }
+  );
+  my $app = Perl::PrereqScanner::NotQuiteLite::App->new(
+    index => $index,
+  );
+
+=back
 
 =head2 run
 

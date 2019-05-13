@@ -2,8 +2,8 @@ NAME
     App::TextTableUtils - CLI utilities related to text tables
 
 VERSION
-    This document describes version 0.004 of App::TextTableUtils (from Perl
-    distribution App-TextTableUtils), released on 2019-01-17.
+    This document describes version 0.005 of App::TextTableUtils (from Perl
+    distribution App-TextTableUtils), released on 2019-05-12.
 
 DESCRIPTION
     This distributions provides the following command-line utilities related
@@ -22,8 +22,6 @@ DESCRIPTION
     *   csv2orgtable
 
     *   csv2texttable
-
-    *   csv2tsv
 
     *   dd2ansitable
 
@@ -86,8 +84,6 @@ DESCRIPTION
     *   tsv2ansitable
 
     *   tsv2asciitable
-
-    *   tsv2csv
 
     *   tsv2dd
 

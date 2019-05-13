@@ -109,4 +109,31 @@ $t->get_ok('/yo.txt' => {'Accept-Encoding' => 'gzip'})->status_is(200)
     ->header_is(ETag => $yo_etag_gzip)->header_is('Last-Modified' => $yo_last_modified)
     ->header_is(Vary => 'Accept-Encoding')->content_is("Yo Mojo from a gz file!\n");
 
+# test that case in Accept-Encoding doesn't matter with the default compression types
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'Gzip'})->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')->header_is('Content-Encoding' => 'gzip')
+    ->header_is(ETag => $goodbye_etag_gzip)->header_is('Last-Modified' => $goodbye_last_modified)
+    ->header_is(Vary => 'Accept-Encoding')->content_is("Goodbye Mojo from a gz file!\n");
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'GzIP'})->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')->header_is('Content-Encoding' => 'gzip')
+    ->header_is(ETag => $goodbye_etag_gzip)->header_is('Last-Modified' => $goodbye_last_modified)
+    ->header_is(Vary => 'Accept-Encoding')->content_is("Goodbye Mojo from a gz file!\n");
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'GZIP'})->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')->header_is('Content-Encoding' => 'gzip')
+    ->header_is(ETag => $goodbye_etag_gzip)->header_is('Last-Modified' => $goodbye_last_modified)
+    ->header_is(Vary => 'Accept-Encoding')->content_is("Goodbye Mojo from a gz file!\n");
+
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'Br'})->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')->header_is('Content-Encoding' => 'br')
+    ->header_is(ETag => $goodbye_etag_br)->header_is('Last-Modified' => $goodbye_last_modified)
+    ->header_is(Vary => 'Accept-Encoding')->content_is("Goodbye Mojo from a br file!\n");
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'bR'})->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')->header_is('Content-Encoding' => 'br')
+    ->header_is(ETag => $goodbye_etag_br)->header_is('Last-Modified' => $goodbye_last_modified)
+    ->header_is(Vary => 'Accept-Encoding')->content_is("Goodbye Mojo from a br file!\n");
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'BR'})->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')->header_is('Content-Encoding' => 'br')
+    ->header_is(ETag => $goodbye_etag_br)->header_is('Last-Modified' => $goodbye_last_modified)
+    ->header_is(Vary => 'Accept-Encoding')->content_is("Goodbye Mojo from a br file!\n");
+
 done_testing;

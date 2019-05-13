@@ -59,10 +59,10 @@
          "web" : "https://github.com/robn/Test-Consul"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028000"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -240,7 +240,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.013",
+                  "tag" : "0.014",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -346,7 +346,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.0",
+   "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

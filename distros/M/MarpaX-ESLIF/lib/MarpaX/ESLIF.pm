@@ -39,7 +39,7 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '3.0.9'; # VERSION
+    our $VERSION = '3.0.10'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -53,6 +53,7 @@ use MarpaX::ESLIF::Grammar::Rule::Properties;
 use MarpaX::ESLIF::Grammar::Symbol::Properties;
 use MarpaX::ESLIF::Logger::Level;
 use MarpaX::ESLIF::Symbol::PropertyBitSet;
+use MarpaX::ESLIF::Symbol::EventBitSet;
 use MarpaX::ESLIF::Symbol::Type;
 use MarpaX::ESLIF::Value::Type;
 use MarpaX::ESLIF::Rule::PropertyBitSet;
@@ -138,7 +139,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 3.0.9
+version 3.0.10
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Net::FreeIPA::RPC;
-$Net::FreeIPA::RPC::VERSION = '3.0.2';
+$Net::FreeIPA::RPC::VERSION = '3.0.3';
 use strict;
 use warnings;
 

@@ -95,8 +95,7 @@ count(1);
 ok( $res->[2]->[0] =~ m%<td class="text-left">_user</td>%,
     'Found attribute _user' )
   or explain( $res->[2]->[0], 'Attribute _user' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">dwho</td>%,
-    'Found value dwho' )
+ok( $res->[2]->[0] =~ m%<td class="text-left">dwho</td>%, 'Found value dwho' )
   or explain( $res->[2]->[0], 'Value dwho' );
 count(2);
 
@@ -123,7 +122,7 @@ count(1);
 
 # Request with good VH & user
 $query =~
-  s#url=http%3A%2F%2Ftry.example.com#url=hTTp%3A%2F%2FTest1.exAmple.cOm/UriTesT#;
+s#url=http%3A%2F%2Ftry.example.com#url=hTTp%3A%2F%2FTest1.exAmple.cOm/UriTesT#;
 
 ok(
     $res = $client->_post(
@@ -141,7 +140,8 @@ count(1);
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
 ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
-ok( $res->[2]->[0] =~ m%value="http://test1.example.com/UriTesT"%, 'Found well formatted url' )
+ok( $res->[2]->[0] =~ m%value="http://test1.example.com/UriTesT"%,
+    'Found well formatted url' )
   or explain( $res->[2]->[0], 'Well formatted url' );
 count(2);
 
@@ -196,7 +196,8 @@ count(1);
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
 ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
-ok( $res->[2]->[0] =~ m%value="http://test1.example.com:1234"%, 'Found well formatted url' )
+ok( $res->[2]->[0] =~ m%value="http://test1.example.com:1234"%,
+    'Found well formatted url' )
   or explain( $res->[2]->[0], 'Well formatted url' );
 count(2);
 

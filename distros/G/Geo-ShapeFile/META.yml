@@ -3,6 +3,7 @@ abstract: 'Perl extension for handling ESRI GIS Shapefiles.'
 author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
 build_requires:
+  Test::Exception: '0'
   rlib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,10 +26,11 @@ requires:
   POSIX: '0'
   Scalar::Util: '0'
   Tree::R: '0'
+  Win32::LongPath: '0'
   autovivification: '0'
   parent: '0'
 resources:
   bugtracker: https://github.com/shawnlaffan/Geo-ShapeFile/issues/
   repository: https://github.com/shawnlaffan/Geo-ShapeFile.git
-version: '2.66'
+version: '3.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

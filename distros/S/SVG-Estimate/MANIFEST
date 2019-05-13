@@ -31,6 +31,7 @@ lib/SVG/Estimate/Role/MakePolygon.pm
 lib/SVG/Estimate/Role/Pythagorean.pm
 lib/SVG/Estimate/Role/Round.pm
 lib/SVG/Estimate/Role/SegmentLength.pm
+lib/SVG/Estimate/Role/SummarizePoint.pm
 lib/SVG/Estimate/Shape.pm
 t/01_rect.t
 t/01_rect_with_units.t

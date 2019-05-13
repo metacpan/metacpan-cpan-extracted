@@ -1,13 +1,14 @@
-0.141   2019-02-24 (PERLANCAR)
+0.142   2019-05-10 (PERLANCAR)
 
-	- No functional changes.
+        - [build] Rebuild with updated Finance::Bank::ID::BCA (0.500).
+
+
+0.141   2019-02-24 (PERLANCAR)
 
         - [build] Rebuild with updated Data::Sah::Coerce.
 
 
 0.140   2018-06-04 (PERLANCAR)
-
-	- No functional changes.
 
         - [build] Rebuild with updated Sah coerce modules.
 
@@ -26,8 +27,6 @@
 
 
 0.11    2017-07-14 (PERLANCAR)
-
-        - No functional changes.
 
         - [build] Rebuild with packing updated modules.
 
@@ -57,8 +56,6 @@
 
 
 0.06    2016-01-18 (PERLANCAR)
-
-        - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 

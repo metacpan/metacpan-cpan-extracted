@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.28 2019-05-11
+
+ - Interpret <br> at the beginning on the paragraph as \noindent on
+   LaTeX. This is not yet documented but reflects the current usage.
+
 1.27 2019-02-28
 
  - Fix POD style (thanks @link2xt)

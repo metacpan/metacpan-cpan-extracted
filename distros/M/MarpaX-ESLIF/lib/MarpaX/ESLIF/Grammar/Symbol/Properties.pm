@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Symbol::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.9'; # VERSION
+our $VERSION = '3.0.10'; # VERSION
 
 
 #
@@ -40,7 +40,8 @@ sub new {
         'lookupResolvedLeveli'       => $args{lookupResolvedLeveli},
         'priority'                   => $args{priority},
         'nullableAction'             => $args{nullableAction},
-        'propertyBitSet'             => $args{propertyBitSet}
+        'propertyBitSet'             => $args{propertyBitSet},
+        'eventBitSet'                => $args{eventBitSet}
     };
 
     return bless $self, $pkg
@@ -269,6 +270,13 @@ sub getPropertyBitSet {
     return $self->{propertyBitSet}
 }
 
+
+sub getEventBitSet {
+    my ($self) = @_;
+
+    return $self->{eventBitSet}
+}
+
 __END__
 
 =pod
@@ -281,7 +289,7 @@ MarpaX::ESLIF::Grammar::Symbol::Properties - ESLIF Grammar Symbol Properties
 
 =head1 VERSION
 
-version 3.0.9
+version 3.0.10
 
 =head1 SYNOPSIS
 
@@ -492,6 +500,10 @@ Returns the nullable action, null if there is none
 
 Returns the low-level properties (combination of MarpaX::ESLIF::Symbol::PropertyBitSet values)
 
+=head2 $self->getEventBitSet
+
+Returns the low-level events (combination of MarpaX::ESLIF::Symbol::EventBitSet values)
+
 =head1 DESCRIPTION
 
 ESLIF Grammar Symbol Properties.
@@ -500,7 +512,7 @@ Calls to grammar's currentSymbolProperties() or symbolPropertiesByLevel() method
 
 =head1 SEE ALSO
 
-L<MarpaX::ESLIF::Symbol::Type>
+L<MarpaX::ESLIF::Symbol::Type>, L<MarpaX::ESLIF::Symbol::PropertyBitSet>, L<MarpaX::ESLIF::Symbol::EventBitSet>
 
 1;
 

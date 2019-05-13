@@ -1,0 +1,65 @@
+NAME
+    Range::ScalarIter - Generate a tied-scalar iterator for range
+
+VERSION
+    This document describes version 0.001 of Range::ScalarIter (from Perl
+    distribution Range-ScalarIter), released on 2019-05-12.
+
+SYNOPSIS
+      use Range::ScalarIter qw(range_scalariter);
+
+      my $iter = range_scalariter(1, 10);
+      while (defined(my $i = $$iter>)) { ... } # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+    You can add step:
+
+     my $iter = range_scalariter(1, 10, 2); # 1, 3, 5, 7, 9
+
+    You can use alphanumeric strings too since "++" has some extra builtin
+    magic (see perlop):
+
+     $iter = range_scalariter("zx", "aab"); # zx, zy, zz, aaa, aab
+
+    Infinite list:
+
+     $iter = range_scalariter(1, Inf); # 1, 2, 3, ...
+
+DESCRIPTION
+    PROOF OF CONCEPT.
+
+    This module offers a tied-scalar-based iterator. It's most probably
+    useful as a proof of concept only.
+
+FUNCTIONS
+  range_scalariter($start, $end [ , $step ]) => scalar
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Range-ScalarIter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Range-ScalarIter>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Range-ScalarIter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Range::Iter
+
+    Range::Iterator
+
+    Range::ArrayIter, Range::HashIter, Range::HandleIter
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

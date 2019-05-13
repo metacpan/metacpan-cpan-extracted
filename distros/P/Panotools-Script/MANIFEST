@@ -12,9 +12,11 @@ bin/erect2qtvr-gui
 bin/gigastart
 bin/gigatile
 bin/gmaptemplate
+bin/gpano2pto
 bin/jpeg2qtvr
 bin/lens-submit
 bin/match-n-shift
+bin/nona-deshake
 bin/nona-mask
 bin/nona-svg
 bin/pafextract
@@ -22,7 +24,7 @@ bin/panostart
 bin/process-masks
 bin/process-masks-gui
 bin/pto2gpano
-bin/pto2mk2
+bin/pto2mk
 bin/ptoanchor
 bin/ptobind
 bin/ptocentre
@@ -43,6 +45,7 @@ bin/ptoset
 bin/ptosort
 bin/ptosplit
 bin/ptovariable
+bin/pto-ffmpeg
 bin/ptscluster
 bin/ptsed
 bin/qtvr2erect
@@ -55,6 +58,7 @@ desktop/erect2qtvr-gui.desktop
 desktop/img2pto.desktop
 desktop/ptoinfo-gui.desktop
 desktop/README
+doc/Makefile.equirect.mk
 doc/match-n-shift.svg
 dos/make_exe.pl
 lib/Panotools/Makefile.pm
@@ -114,3 +118,4 @@ t/data/cemetery/hugin.pto
 t/data/equirectangular/equirectangular.jpg
 t/data/mask/sheep0001_mask.tif
 t/data/mask/sheep0002_mask.tif
+META.json                                Module JSON meta-data (added by MakeMaker)

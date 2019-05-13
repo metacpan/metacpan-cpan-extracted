@@ -3,6 +3,22 @@ package CBOR::Free;
 use strict;
 use warnings;
 
+use Types::Serialiser;
+
+use CBOR::Free::X;
+use CBOR::Free::Tagged;
+
+our ($VERSION);
+
+use XSLoader ();
+
+BEGIN {
+    $VERSION = '0.08';
+    XSLoader::load();
+}
+
+#----------------------------------------------------------------------
+
 =encoding utf-8
 
 =head1 NAME
@@ -83,8 +99,8 @@ become Perl binary strings. (This may become configurable later.)
 Note that invalid UTF-8 in a CBOR UTF-8 string is considered
 invalid input and will thus prompt a thrown exception.
 
-=item * CBOR null, undefined, true, and false are considered invalid input
-when given as map keys. An exception is thrown if the decoder finds these.
+=item * The only map keys that C<decode()> accepts are integers and strings.
+An exception is thrown if the decoder finds anything else as a map key.
 
 =item * CBOR booleans become the corresponding L<Types::Serialiser> values.
 Both CBOR null and undefined become Perl undef.
@@ -140,6 +156,12 @@ file a feature request.)
 Most errors are represented via instances of subclasses of
 L<CBOR::Free::X>, which subclasses L<X::Tiny::Base>.
 
+=head1 SPEED
+
+CBOR::Free is pretty snappy. I find that it keeps pace with or
+surpasses L<CBOR::XS>, L<Cpanel::JSON::XS>, L<JSON::XS>, L<Sereal>,
+and L<Data::MessagePack>.
+
 =head1 AUTHOR
 
 L<Gasper Software Consulting|http://gaspersoftware.com> (FELIPE)
@@ -162,29 +184,9 @@ applications.
 
 #----------------------------------------------------------------------
 
-use XSLoader ();
-
-use Types::Serialiser;
-
-use CBOR::Free::X;
-use CBOR::Free::Tagged;
-
-our ($VERSION);
-
-BEGIN {
-    $VERSION = '0.06';
-    XSLoader::load();
-}
-
 our ($true, $false);
 *true = *Types::Serialiser::true;
 *false = *Types::Serialiser::false;
-
-sub encode {
-    my %opts = @_[ 1 .. $#_ ];
-
-    return $opts{'canonical'} ? _c_encode_canonical($_[0]) : _c_encode($_[0]);
-}
 
 sub tag {
     return CBOR::Free::Tagged->new(@_);

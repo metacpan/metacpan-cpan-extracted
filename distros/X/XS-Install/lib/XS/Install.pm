@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.1.3';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -519,13 +519,17 @@ sub process_test {
         'TEST_XS_FILES = '.join(' ', keys %{$tp->{XS}}),
         '$(TEST_XS_FILES) :: $(FIRST_MAKEFILE) '.join(' ', @{$tp->{XSI}}).'; $(TOUCH) $(TEST_XS_FILES)',
     if has_xs($tp);
+    
+    my $perl_archive  = $win32 ? '"$(PERL_ARCHIVE)" ' : '';
+    my $ld_pre_extra  = $win32 ? '-Wl,--export-all-symbols ' : '';
+    my $ld_post_extra = $win32 ? ' -Wl,--enable-auto-image-base' : '';
         
     push @{$params->{postamble}},
         "TEST_INST_DYNAMIC = $dlpath",
         'TEST_LDFROM = $(TEST_OBJECT) '.($params->{MODULE_INFO}{SHARED_LIBS_LINKING}||''),
         '$(TEST_INST_DYNAMIC) : $(TEST_OBJECT) $(INST_DYNAMIC)'."\n".
             "\t".'$(RM_F) $@'."\n".
-            "\t".'$(LD) $(LDDLFLAGS) $(TEST_LDFROM) $(INST_DYNAMIC) $(OTHERLDFLAGS) -o $@ $(INST_DYNAMIC_FIX)'."\n".
+            "\t".'$(LD) '.$ld_pre_extra.'-o $@ $(LDDLFLAGS) $(TEST_LDFROM) $(INST_DYNAMIC) $(OTHERLDFLAGS) '.$perl_archive.'$(INST_DYNAMIC_FIX)'.$ld_post_extra."\n".
             "\t".'$(CHMOD) $(PERM_RWX) $@',
         'subdirs-test_dynamic :: $(TEST_INST_DYNAMIC)',
         'ctest :: subdirs-test_dynamic',

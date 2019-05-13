@@ -911,42 +911,42 @@ short marpaWrapperGrammar_symbolPropertyb(marpaWrapperGrammar_t *marpaWrapperGra
   genericLoggerp = marpaWrapperGrammarp->marpaWrapperGrammarOption.genericLoggerp;
   marpaGrammarp  = marpaWrapperGrammarp->marpaGrammarp;
 
-  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_accessible(%p)", marpaGrammarp);
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_accessible(%p, %d)", marpaGrammarp, symboli);
   accessiblei = marpa_g_symbol_is_accessible(marpaGrammarp, symboli);
   if (accessiblei < 0) {
     MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
     goto err;
   }
 
-  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_nullable(%p)", marpaGrammarp);
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_nullable(%p, %d)", marpaGrammarp, symboli);
   nullablei = marpa_g_symbol_is_nullable(marpaGrammarp, symboli);
   if (nullablei < 0) {
     MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
     goto err;
   }
 
-  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_nulling(%p)", marpaGrammarp);
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_nulling(%p, %d)", marpaGrammarp, symboli);
   nullingi = marpa_g_symbol_is_nulling(marpaGrammarp, symboli);
   if (nullingi < 0) {
     MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
     goto err;
   }
 
-  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_productive(%p)", marpaGrammarp);
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_productive(%p, %d)", marpaGrammarp, symboli);
   productivei = marpa_g_symbol_is_productive(marpaGrammarp, symboli);
   if (productivei < 0) {
     MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
     goto err;
   }
 
-  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_start(%p)", marpaGrammarp);
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_start(%p, %d)", marpaGrammarp, symboli);
   starti = marpa_g_symbol_is_start(marpaGrammarp, symboli);
   if (starti < 0) {
     MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
     goto err;
   }
 
-  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_terminal(%p)", marpaGrammarp);
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_terminal(%p, %d)", marpaGrammarp, symboli);
   terminali = marpa_g_symbol_is_terminal(marpaGrammarp, symboli);
   if (terminali < 0) {
     MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
@@ -962,6 +962,63 @@ short marpaWrapperGrammar_symbolPropertyb(marpaWrapperGrammar_t *marpaWrapperGra
     if (starti != 0)      { marpaWrapperSymbolPropertyBitSet |= MARPAWRAPPER_SYMBOL_IS_START;      }
     if (terminali != 0)   { marpaWrapperSymbolPropertyBitSet |= MARPAWRAPPER_SYMBOL_IS_TERMINAL;   }
     *marpaWrapperSymbolPropertyBitSetp = marpaWrapperSymbolPropertyBitSet;
+  }
+
+  MARPAWRAPPER_TRACE(genericLoggerp, funcs, "return 1");
+  return 1;
+
+ err:
+  MARPAWRAPPER_TRACE(genericLoggerp, funcs, "return 0");
+  return 0;
+}
+
+/****************************************************************************/
+short marpaWrapperGrammar_symbolEventb(marpaWrapperGrammar_t *marpaWrapperGrammarp, int symboli, int *marpaWrapperSymbolEventBitSetp)
+/****************************************************************************/
+{
+  MARPAWRAPPER_FUNCS(marpaWrapperGrammar_symbolEventb);
+  genericLogger_t                  *genericLoggerp = NULL;
+  Marpa_Grammar                     marpaGrammarp;
+  int                               completioni;
+  int                               nulledi;
+  int                               predictioni;
+  int                               marpaWrapperSymbolEventBitSet;
+
+  if (marpaWrapperGrammarp == NULL) {
+    errno = EINVAL;
+    goto err;
+  }
+
+  genericLoggerp = marpaWrapperGrammarp->marpaWrapperGrammarOption.genericLoggerp;
+  marpaGrammarp  = marpaWrapperGrammarp->marpaGrammarp;
+
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_completion_event(%p, %d)", marpaGrammarp, symboli);
+  completioni = marpa_g_symbol_is_completion_event(marpaGrammarp, symboli);
+  if (completioni < 0) {
+    MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
+    goto err;
+  }
+
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_nulled_event(%p, %d)", marpaGrammarp, symboli);
+  nulledi = marpa_g_symbol_is_nulled_event(marpaGrammarp, symboli);
+  if (nulledi < 0) {
+    MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
+    goto err;
+  }
+
+  MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_symbol_is_prediction_event(%p, %d)", marpaGrammarp, symboli);
+  predictioni = marpa_g_symbol_is_prediction_event(marpaGrammarp, symboli);
+  if (predictioni < 0) {
+    MARPAWRAPPER_MARPA_G_ERROR(genericLoggerp, marpaGrammarp);
+    goto err;
+  }
+
+  if (marpaWrapperSymbolEventBitSetp != NULL) {
+    marpaWrapperSymbolEventBitSet = MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE;
+    if (completioni != 0) { marpaWrapperSymbolEventBitSet |= MARPAWRAPPERGRAMMAR_EVENTTYPE_COMPLETION; }
+    if (nulledi != 0)     { marpaWrapperSymbolEventBitSet |= MARPAWRAPPERGRAMMAR_EVENTTYPE_NULLED;     }
+    if (predictioni != 0) { marpaWrapperSymbolEventBitSet |= MARPAWRAPPERGRAMMAR_EVENTTYPE_PREDICTION; }
+    *marpaWrapperSymbolEventBitSetp = marpaWrapperSymbolEventBitSet;
   }
 
   MARPAWRAPPER_TRACE(genericLoggerp, funcs, "return 1");

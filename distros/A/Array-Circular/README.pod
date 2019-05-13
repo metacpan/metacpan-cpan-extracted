@@ -46,7 +46,7 @@ sub next {
     return unless @$self;
 
     if ($num) {
-	carp "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
+	croak "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
 	$num--;
 	$self->next for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
     }
@@ -65,7 +65,7 @@ sub previous {
     return unless @$self;
 
     if ($num) {
-	carp "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
+	croak "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
 	$num--;
 	$self->previous for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
     }
@@ -86,6 +86,42 @@ sub reset {
     $self->me->{count} = 0;
     return $self->current;
 }
+
+sub _current_and_action {
+    my ($self, $action) = @_;
+    my $c = $self->current;
+    $self->$action;
+    return $c
+}
+
+sub current_and_next {
+    my ($self) = @_;
+    return $self->_current_and_action('next');
+}
+
+*curr_and_next = \&current_and_next;
+
+sub current_and_previous {
+    my ($self) = @_;
+    return $self->_current_and_action('previous');
+}
+
+*curr_and_prev = \&curr_and_prev;
+
+sub peek {
+    my ($self, $count) = @_;
+    $count //=1 ;
+    my $idx = ($count + $self->index) % $self->size;
+    $idx = 0 - $idx if $count < 0;
+    return $self->[$idx];
+}
+
+sub size {
+    my ($self ) = @_;
+    return scalar @$self;
+}
+
+
 
 sub DESTROY {
     my $self = shift;
@@ -164,6 +200,26 @@ Resets the current index and loop count to 0.
 
 This is the internal store that tracks the current state of the list.
 It's intended for internal use only.
+
+=head4 current_and_next / curr_and_next
+
+Convenience method to return current value then proceed next.  Same
+interface as C<next>.
+
+=head4 current_and_previous / curr_and_prev
+
+Convenience method to return current value then proceed previous.  Same
+interface as C<previous>.
+
+=head4 peek
+
+Peek n forward (defaults to 1).  Take care if you're reliant on calculating
+the number of loops as part of this.  This Returns the entry for each
+without updating the value of C<loops>.
+
+=head4 size
+
+Returns the number of elements in the list.
 
 =head2 GOTCHAS
 

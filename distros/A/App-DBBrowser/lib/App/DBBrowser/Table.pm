@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose            qw( choose );
+use Term::Choose            qw();
 use Term::Choose::Constants qw( :screen );
 
 use App::DBBrowser::Auxil;
@@ -25,7 +25,7 @@ sub new {
 
 sub on_table {
     my ( $sf, $sql ) = @_;
-    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sub_stmts = [
@@ -51,9 +51,9 @@ sub on_table {
         my $choices = [ $cu{hidden}, undef, @cu{@$sub_stmts} ];
         $ax->print_sql( $sql );
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
+            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             last CUSTOMIZE;
@@ -72,49 +72,49 @@ sub on_table {
             $old_idx = 1;
         }
         elsif ( $custom eq $cu{'select'} ) {
-            my $ok = $sb->select( $stmt_h, $sql );
+            my $ok = $sb->select( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'distinct'} ) {
-            my $ok = $sb->distinct( $stmt_h, $sql );
+            my $ok = $sb->distinct( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'aggregate'} ) {
-            my $ok = $sb->aggregate( $stmt_h, $sql );
+            my $ok = $sb->aggregate( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'where'} ) {
-            my $ok = $sb->where( $stmt_h, $sql );
+            my $ok = $sb->where( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'group_by'} ) {
-            my $ok = $sb->group_by( $stmt_h, $sql );
+            my $ok = $sb->group_by( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'having'} ) {
-            my $ok = $sb->having( $stmt_h, $sql );
+            my $ok = $sb->having( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'order_by'} ) {
-            my $ok = $sb->order_by( $stmt_h, $sql );
+            my $ok = $sb->order_by( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'limit'} ) {
-            my $ok = $sb->limit_offset( $stmt_h, $sql );
+            my $ok = $sb->limit_offset( $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
@@ -129,8 +129,8 @@ sub on_table {
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
             local $| = 1;
+            print HIDE_CURSOR; #
             print CLEAR_SCREEN;
-            print HIDE_CURSOR;
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
             my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );

@@ -4,7 +4,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 # VERSION
 
-version 0.6
+version 0.8
 
 # DESCRIPTION
 
@@ -30,13 +30,13 @@ add a hash named `jira`, containing the following keys:
 
 The URL of the Jira instance (without a trailing slash).
 
-### username \[REQUIRED\]
+### username \[OPTIONAL\]
 
 Username to connect with.
 
-### password \[REQUIRED\]
+### password \[OPTIONAL\]
 
-Password to connect with. Beware: stored in clear text!
+Password to connect with. Beware: This is stored in clear text! Better use authentication via `Config::Identity` via `JIRA::REST` where the credentials can be stored GPG encrypted.
 
 ### log\_time\_spent
 
@@ -63,8 +63,8 @@ If `--jira` is set to a valid ticket identifier:
 
 ## stop
 
-If <log\_time\_spent> is set in config, adds and entry to the worklog of the Jira ticket.
-If <set\_status/stop/transition> is set in config and the current Jira ticket state is <set\_status/start/target\_state>, updates the status of the ticket
+If `log_time_spent` is set in config, adds and entry to the worklog of the Jira ticket.
+If `set_status/stop/transition` is set in config and the current Jira ticket state is `set_status/start/target_state`, updates the status of the ticket
 
 # EXAMPLE CONFIG
 
@@ -91,7 +91,7 @@ Michael Kröll <pepl@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Kröll.
+This software is copyright (c) 2019 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

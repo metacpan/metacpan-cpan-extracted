@@ -2,6 +2,14 @@ vim:si
 Revision history for Perl extension Business::KontoCheck.
 The complete history can be found in 0_history.txt (in german).
 
+6.09:
+   - new data file blz.lut required corrections in the test files
+
+6.08:
+   - new data file blz.lut
+   - Fix for check methods C0 and E1
+   - some minor changes
+
 6.07:
    - bugfix for check methods C0 and E1
    - some minor changes

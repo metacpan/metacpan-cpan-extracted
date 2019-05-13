@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model-Tester
 #
-# This software is Copyright (c) 2013-2018 by Dominique Dumont.
+# This software is Copyright (c) 2013-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester::Setup 4.002;
+package Config::Model::Tester::Setup 4.003;
 # ABSTRACT: Common test setup functions for Config::Model
 
 use warnings;
@@ -88,7 +88,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 4.002
+version 4.003
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2018 by Dominique Dumont.
+This software is Copyright (c) 2013-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

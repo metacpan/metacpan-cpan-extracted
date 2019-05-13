@@ -61,6 +61,7 @@ typedef struct marpaESLIFPerl_stringGenerator {
 #include "c-loggerLevel-types.inc"
 #include "c-rulePropertyBitSet-types.inc"
 #include "c-symbolPropertyBitSet-types.inc"
+#include "c-symbolEventBitSet-types.inc"
 #include "c-symbol-types.inc"
 
 /* Encode constants as per the documentation */
@@ -3118,6 +3119,7 @@ CODE:
   MARPAESLIFPERL_XV_STORE_IV         (avp, "priority",                   symbolProperty.priorityi);
   MARPAESLIFPERL_XV_STORE_ACTION     (avp, "nullableAction",             symbolProperty.nullableActionp);
   MARPAESLIFPERL_XV_STORE_IV         (avp, "propertyBitSet",             symbolProperty.propertyBitSet);
+  MARPAESLIFPERL_XV_STORE_IV         (avp, "eventBitSet",                symbolProperty.eventBitSet);
 
   RETVAL = marpaESLIFPerl_call_actionp(aTHX_ boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp, "new", avp, NULL /* Perl_MarpaX_ESLIF_Valuep */, 0 /* evalb */, 0 /* evalSilentb */);
   av_undef(avp);
@@ -3170,6 +3172,7 @@ CODE:
   MARPAESLIFPERL_XV_STORE_IV         (avp, "priority",                   symbolProperty.priorityi);
   MARPAESLIFPERL_XV_STORE_ACTION     (avp, "nullableAction",             symbolProperty.nullableActionp);
   MARPAESLIFPERL_XV_STORE_IV         (avp, "propertyBitSet",             symbolProperty.propertyBitSet);
+  MARPAESLIFPERL_XV_STORE_IV         (avp, "eventBitSet",                symbolProperty.eventBitSet);
 
   RETVAL = marpaESLIFPerl_call_actionp(aTHX_ boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp, "new", avp, NULL /* Perl_MarpaX_ESLIF_Valuep */, 0 /* evalb */, 0 /* evalSilentb */);
   av_undef(avp);
@@ -4472,6 +4475,24 @@ PROTOTYPES: ENABLE
 =cut
 
 INCLUDE: xs-symbolPropertyBitSet-types.inc
+
+=for comment
+  /* ======================================================================= */
+  /* MarpaX::ESLIF::Symbol::EventBitSet                                      */
+  /* ======================================================================= */
+=cut
+
+MODULE = MarpaX::ESLIF            PACKAGE = MarpaX::ESLIF::Symbol::EventBitSet
+
+PROTOTYPES: ENABLE
+
+=for comment
+  /* ----------------------------------------------------------------------- */
+  /* MarpaX::ESLIF::Symbol::EventBitSet::constant                            */
+  /* ----------------------------------------------------------------------- */
+=cut
+
+INCLUDE: xs-symbolEventBitSet-types.inc
 
 =for comment
   /* ======================================================================= */

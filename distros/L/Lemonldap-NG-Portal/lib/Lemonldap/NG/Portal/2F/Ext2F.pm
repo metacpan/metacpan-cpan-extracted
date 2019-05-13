@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -72,7 +72,7 @@ sub run {
       )
     {
         $self->logger->error("External send command failed (code $c)");
-        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+        return PE_ERROR;
     }
 
     # Prepare form
@@ -146,6 +146,7 @@ sub launch {
         s#\$(\w+)#$session->{$1} // ''#ge;
         push @args, $_;
     }
+    $self->logger->debug( "Executing command: " . join( " ", @args ) );
     return system @args;
 }
 

@@ -133,4 +133,20 @@ $VERSION = eval $VERSION;
 use Carp;
 END
 
+test('eval (shortcut)', <<'END', {strict => 0, Carp => 0});
+use strict;
+our $VERSION = '7.24';
+$VERSION = eval($VERSION);
+
+use Carp;
+END
+
+test('eval {shortcut}', <<'END', {strict => 0, Carp => 0});
+use strict;
+our $VERSION = '7.24';
+$VERSION = eval{$VERSION};
+
+use Carp;
+END
+
 done_testing;

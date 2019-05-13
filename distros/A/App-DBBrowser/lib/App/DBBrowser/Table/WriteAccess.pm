@@ -5,9 +5,9 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( insert_sep );
-use Term::TablePrint   qw( print_table );
+use Term::TablePrint   qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -28,7 +28,7 @@ sub new {
 
 sub table_write_access {
     my ( $sf, $sql ) = @_;
-    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @stmt_types;
@@ -46,7 +46,7 @@ sub table_write_access {
 
     STMT_TYPE: while ( 1 ) {
         # Choose
-        my $stmt_type = choose(
+        my $stmt_type = $tc->choose(
             [ undef, map( "- $_", @stmt_types ) ],
             { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose SQL type:' }
         );
@@ -78,9 +78,9 @@ sub table_write_access {
             my $choices = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
             $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose
-            my $idx = choose(
+            my $idx = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Customize:', index => 1, default => $old_idx, undef => $sf->{i}{_back} }
+                { %{$sf->{i}{lyt_v}}, prompt => 'Customize:', index => 1, default => $old_idx }
             );
             if ( ! defined $idx || ! defined $choices->[$idx] ) {
                 next STMT_TYPE;
@@ -95,13 +95,13 @@ sub table_write_access {
             }
             my $backup_sql = $ax->backup_href( $sql );
             if ( $custom eq $cu{'set'} ) {
-                my $ok = $sb->set( $stmt_h, $sql );
+                my $ok = $sb->set( $sql );
                 if ( ! $ok ) {
                     $sql = $backup_sql;
                 }
             }
             elsif ( $custom eq $cu{'where'} ) {
-                my $ok = $sb->where( $stmt_h, $sql );
+                my $ok = $sb->where( $sql );
                 if ( ! $ok ) {
                     $sql = $backup_sql;
                 }
@@ -149,10 +149,11 @@ sub commit_sql {
         my $prompt = $ax->print_sql( $sql );
         $prompt .= "Affected records:";
         if ( @$all_arrayref > 1 ) {
-            print_table(
+            my $tp = Term::TablePrint->new( $sf->{o}{table} );
+            $tp->print_table(
                 $all_arrayref,
-                { %{$sf->{o}{table}}, grid => 2, prompt => $prompt, max_rows => 0,
-                keep_header => 1, table_expand => $sf->{o}{G}{info_expand} }
+                { grid => 2, prompt => $prompt, max_rows => 0, keep_header => 1,
+                  table_expand => $sf->{o}{G}{info_expand} }
             );
         }
     }
@@ -177,6 +178,7 @@ sub commit_sql {
 sub __transaction {
     my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $dbh = $sf->{d}{dbh};
     my $rolled_back;
     if ( ! eval {
@@ -189,9 +191,9 @@ sub __transaction {
         my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
         $ax->print_sql( $sql );
         # Choose
-        my $choice = choose(
+        my $choice = $tc->choose(
             [ undef,  $commit_ok ],
-            { %{$sf->{i}{lyt_stmt_v}} }
+            { %{$sf->{i}{lyt_v}} }
         );
         $ax->print_sql( $sql, $waiting );
         if ( ! defined $choice || $choice ne $commit_ok ) {
@@ -217,13 +219,14 @@ sub __transaction {
 sub __auto_commit {
     my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $dbh = $sf->{d}{dbh};
     my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
     $ax->print_sql( $sql ); #
     # Choose
-    my $choice = choose(
+    my $choice = $tc->choose(
         [ undef,  $commit_ok ],
-        { %{$sf->{i}{lyt_stmt_v}}, prompt => '' }
+        { %{$sf->{i}{lyt_v}}, prompt => '' }
     );
     $ax->print_sql( $sql, $waiting );
     if ( ! defined $choice || $choice ne $commit_ok ) {
@@ -249,6 +252,7 @@ sub __build_insert_stmt {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     $ax->reset_sql( $sql );
     my @cu_keys = ( qw/insert_col insert_copy insert_file/ );
     my %cu = (
@@ -261,9 +265,9 @@ sub __build_insert_stmt {
     MENU: while ( 1 ) {
         my $choices = [ undef, @cu{@cu_keys} ];
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, prompt => 'Choose:', undef => '  <=' }
+            { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
@@ -304,6 +308,7 @@ sub __insert_into_stmt_columns {
     my ( $sf, $sql ) = @_;
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     $sql->{insert_into_cols} = [];
     my @cols = ( @{$sql->{cols}} );
     if ( $plui->first_column_is_autoincrement( $sf->{d}{dbh}, $sf->{d}{schema}, $sf->{d}{table} ) ) {
@@ -316,10 +321,10 @@ sub __insert_into_stmt_columns {
         my @pre = ( undef, $sf->{i}{ok} );
         my $choices = [ @pre, @cols ];
         # Choose
-        my @idx = choose(
+        my @idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Columns:', index => 1,
-              meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
+            { %{$sf->{i}{lyt_h}}, prompt => 'Columns:', meta_items => [ 0 .. $#pre ], include_highlighted => 2,
+              index => 1 }
         );
         if ( ! $idx[0] ) {
             if ( ! @{$sql->{insert_into_cols}} ) {

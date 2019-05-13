@@ -22,14 +22,14 @@ WriteMakefile(
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
         'Date::Saka::Simple'         => '0.22',
-        'Calendar::Plugin::Renderer' => '0.14',
+        'Calendar::Plugin::Renderer' => '0.15',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Calendar-Saka-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Saka' => { file => 'lib/Calendar/Saka.pm', version => '1.38' },
+            'Calendar::Saka' => { file => 'lib/Calendar/Saka.pm', version => '1.39' },
         },
         resources => {
             repository => {

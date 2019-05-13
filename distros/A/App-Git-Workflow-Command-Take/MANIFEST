@@ -6,6 +6,7 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+MYMETA.json.lock
 README.pod
 t/00-load.t
 t/boilerplate.t
@@ -16,3 +17,4 @@ t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/spelling.t
+t/take.t

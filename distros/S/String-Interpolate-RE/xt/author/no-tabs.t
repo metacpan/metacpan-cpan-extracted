@@ -12,6 +12,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/format.t',
+    't/generate.t',
     't/interp.t',
     't/recurse.t',
     't/variable_re.t'

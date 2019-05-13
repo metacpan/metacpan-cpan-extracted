@@ -1,0 +1,48 @@
+NAME
+    HTTP::Tiny::NewestFirefox - HTTP::Tiny + set User-Agent to newest
+    Firefox
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::NewestFirefox (from
+    Perl distribution HTTP-Tiny-NewestFirefox), released on 2019-05-08.
+
+SYNOPSIS
+     use HTTP::Tiny::NewestFirefox;
+
+     my $res  = HTTP::Tiny->new->get("http://www.example.com/");
+
+DESCRIPTION
+    A convenient bundling of HTTP::Tiny, HTTP::Tiny::Patch::SetUserAgent,
+    and HTTP::UserAgentStr::Util::ByNickname.
+
+TODO
+    Avoid changing User-Agent globally.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-NewestFirefox>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-NewestFirefox>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-NewestFiref
+    ox>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

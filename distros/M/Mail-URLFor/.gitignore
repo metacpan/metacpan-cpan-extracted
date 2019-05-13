@@ -1,0 +1,14 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+*.swp
+pm_to_blib
+blib/
+Mail-URLFor-*
+Mail-URLFor-*/
+.releaserc
+cover_db
+MYMETA.*
+frame-*.png
+*.pl

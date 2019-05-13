@@ -161,7 +161,9 @@ CODE:
   for (i = 0; i < n; ++i) {
     isa[*sa++] = i;
   }
-  LCP[0] = 0;
+  if (n > 0) {
+    LCP[0] = 0;
+  }
   RETVAL = 0;
 MYOUTPUT:
 OUTPUT:
@@ -197,11 +199,10 @@ clip_lcp_to_fileboundaries(boundaries)
 PREINIT:
         unsigned int *lcp = LCP+1;
   const unsigned int *sa  = SA +1;
-INIT:
-        int c;
         unsigned lastb;
         unsigned file_limit;
         unsigned lastFilelimit;
+INIT:
 CODE:
   {
     const unsigned maxbound = av_len(boundaries);
@@ -226,73 +227,79 @@ fprintf(stderr, "last file boundary at (%u) is empty slot, abort\n", maxbound);
       return;
     }
     lastb = SvIV(*av_fetch(boundaries, maxbound, 0));
-    for (c = maxbound-1; c >= 0; --c) {
-      unsigned thisb;
-      if (!av_exists(boundaries, c)) {
+
+    {
+        int c;
+        for (c = maxbound-1; c >= 0; --c) {
+            unsigned thisb;
+            if (!av_exists(boundaries, c)) {
 #ifdef DEBUG_FILECLIP
 fprintf(stderr, "file boundary at (%u) is empty slot, abort\n", c);
 #endif
-        return;
-      }
-      thisb = SvIV(*av_fetch(boundaries, c, 0));
-     
-      if (thisb >= lastb) {
+                return;
+            }
+            thisb = SvIV(*av_fetch(boundaries, c, 0));
+	     
+            if (thisb >= lastb) {
 #ifdef DEBUG_FILECLIP
 fprintf(stderr, "file boundary at (%u) is not greater (%u) than previous one: (%u), abort\n", c, thisb, lastb);
 #endif
-        return;
-      }
-      lastb = thisb;
+                return;
+            }
+            lastb = thisb;
+        }
     }
-
     /* now make sure that (*sa + *lcp - 1) does not extend past their file boundary */
     lastFilelimit = ~0;
-    for (c = 1; c < n; ++c) {
+    {
+        int c;
+        for (c = 1; c < n; ++c) {
 
-      const unsigned int offset = *sa;
-      unsigned left  = 0;
-      unsigned right = maxbound;
-      unsigned minlcp;
+            const unsigned int offset = *sa;
+            unsigned left  = 0;
+            unsigned right = maxbound;
+            unsigned minlcp;
 
-      if (0 == right) {
-        file_limit = 0;
-      } else {
+            if (0 == right) {
+                file_limit = 0;
+            } else {
 
-        unsigned test = (left + right) / 2;
+                unsigned test = (left + right) / 2;
 
-        file_limit = 0;
-        while (left < right) {
-          unsigned this_fileend;
-          unsigned previous_fileend;
-          if (((test > 0 && (previous_fileend = SvIV(*av_fetch(boundaries, test-1, 0))) < offset) || test == 0)
-              && offset <= (this_fileend = SvIV(*av_fetch(boundaries, test, 0)))) {
-            file_limit = this_fileend;
-            break;
-          }
+                file_limit = 0;
+                while (left < right) {
+                    unsigned this_fileend;
+                    unsigned previous_fileend;
+                    if (((test > 0 && (previous_fileend = SvIV(*av_fetch(boundaries, test-1, 0))) < offset) || test == 0)
+                         && offset <= (this_fileend = SvIV(*av_fetch(boundaries, test, 0)))) {
+                        file_limit = this_fileend;
+                        break;
+                    }
 
-          if (test > 0 && previous_fileend >= offset) {
-            right = test;
-            test  = (left + right    ) / 2;
-          } else {
-            left  = test;
-            test  = (left + right + 1) / 2;
-          }
-        }
-      }
+                    if (test > 0 && previous_fileend >= offset) {
+                        right = test;
+                        test  = (left + right    ) / 2;
+                    } else {
+                        left  = test;
+                        test  = (left + right + 1) / 2;
+                    }
+                }
+            }
 
-      /* if previous entry is shorter than current lcp -> adjust */
-      /* if current entry is shorter than current lcp -> adjust */
-      minlcp = min(*lcp, 1+ min(lastFilelimit - *(sa -1), file_limit - *(sa)));
-      if (*lcp > minlcp) {
+            /* if previous entry is shorter than current lcp -> adjust */
+            /* if current entry is shorter than current lcp -> adjust */
+            minlcp = min(*lcp, 1+ min(lastFilelimit - *(sa -1), file_limit - *(sa)));
+            if (*lcp > minlcp) {
 #ifdef DEBUG_FILECLIP
 fprintf(stderr, "at %u: offset (%u) + lcp(%u) -1 >= file limit(%u)  or  offset(%u) + lcp(%u) - 1 >= file limit(%u)  -> set lcp from %u to %u\n", 
         c, *(sa - 1), *lcp, lastFilelimit, *sa, *lcp, file_limit, *lcp, minlcp);
 #endif
-        *lcp = minlcp;
-      }
-      lastFilelimit = file_limit;
-      ++sa;
-      ++lcp;
+                *lcp = minlcp;
+            }
+            lastFilelimit = file_limit;
+            ++sa;
+            ++lcp;
+        }
     }
   }
 

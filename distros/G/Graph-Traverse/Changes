@@ -1,5 +1,10 @@
 Revision history for Graph-Traverse
 
+0.04  2019-05-10 10:07:36 MST
+
+   - In testing: scalar of a hash, in previous Perls, returns e.g. '1/8'.
+     We want 'scalar keys...'
+
 0.03  2019-05-06 16:34:31 MST
         - Correct required Perl version. Standardise method parameter descriptions.
 

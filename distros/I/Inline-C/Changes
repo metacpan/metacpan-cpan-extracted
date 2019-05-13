@@ -1,3 +1,11 @@
+0.81 Sat 11 May 2019 12:46:41 PM CEST
+ - test - Adjust excpected number of lines in log to Inline-0.82_001 (PR#89
+   @ppisar++)
+ - Fix pod document link (PR#68 PR#90 @manwar++)
+ - Fix docs to work with strict mode (use Inline 'C'; instead of use Inline
+   C;) (PR#70 @akarelas-pt++)
+ - Add test, and Cookbook example, of array-ref arg (PR#39 @mohawk2++)
+
 0.80 Thu 18 Apr 2019 10:42:30 AM CEST
  - Apply PR#71 (ETJ++) Support perl 5.8.1 again
  - Apply PR#74 and PR#76 (WBRASWELL++) Fix Include Dir Behavior, replace -I

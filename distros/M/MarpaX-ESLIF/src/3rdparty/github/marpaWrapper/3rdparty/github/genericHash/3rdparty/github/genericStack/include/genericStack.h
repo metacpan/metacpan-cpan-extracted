@@ -54,19 +54,21 @@ const static int __genericStack_max_initial_indice = -1; /* Not used */
 #define _GENERICSTACK_MALLOC(memsetflag, size) memsetflag=1, malloc(size)
 #if GENERICSTACK_DEFAULT_LENGTH > 0
 #define _GENERICSTACK_NA_MEMSET(stackName, indiceStart, indiceEnd) do {	\
-    if (indiceStart <= indiceEnd) {					\
-      if (indiceStart <= __genericStack_max_initial_indice) {		\
+    int _indiceStart = indiceStart;                                     \
+    int _indiceEnd = indiceEnd;                                         \
+    if (_indiceStart <= _indiceEnd) {					\
+      if (_indiceStart <= __genericStack_max_initial_indice) {		\
 	int _i_for_memset;						\
-	int _i_for_memset_max = (indiceEnd >= __genericStack_max_initial_indice) ? __genericStack_max_initial_indice : indiceEnd; \
-	for (_i_for_memset = indiceStart;				\
+	int _i_for_memset_max = (_indiceEnd >= __genericStack_max_initial_indice) ? __genericStack_max_initial_indice : _indiceEnd; \
+	for (_i_for_memset = _indiceStart;				\
 	     _i_for_memset <= _i_for_memset_max;			\
 	     _i_for_extend++) {						\
 	  stackName->initialItems[_i_for_extend].type = GENERICSTACKITEMTYPE_NA; \
 	}								\
       }									\
-      if (indiceEnd > __genericStack_max_initial_indice) {		\
-	int _i_for_memset_min = (indiceStart <= __genericStack_max_initial_indice) ? 0 : indiceStart - __genericStack_max_initial_indice - 1; \
-	int _i_for_memset_max = indiceEnd - __genericStack_max_initial_indice - 1; \
+      if (_indiceEnd > __genericStack_max_initial_indice) {		\
+	int _i_for_memset_min = (_indiceStart <= __genericStack_max_initial_indice) ? 0 : _indiceStart - __genericStack_max_initial_indice - 1; \
+	int _i_for_memset_max = _indiceEnd - __genericStack_max_initial_indice - 1; \
 	for (_i_for_memset = _i_for_memset_min;				\
 	     _i_for_memset <= _i_for_memset_max;			\
 	     _i_for_extend++) {						\
@@ -77,9 +79,11 @@ const static int __genericStack_max_initial_indice = -1; /* Not used */
   } while (0)
 #else /* GENERICSTACK_DEFAULT_LENGTH > 0 */
 #define _GENERICSTACK_NA_MEMSET(stackName, indiceStart, indiceEnd) do {	\
-    if (indiceStart <= indiceEnd) {					\
-      for (_i_for_memset = indiceStart;					\
-	   _i_for_memset <= indiceEnd;					\
+    int _indiceStart = indiceStart;                                     \
+    int _indiceEnd = indiceEnd;                                         \
+    if (_indiceStart <= _indiceEnd) {					\
+      for (_i_for_memset = _indiceStart;                                \
+	   _i_for_memset <= _indiceEnd;					\
 	   _i_for_extend++) {						\
 	stackName->heapItems[_i_for_extend].type = GENERICSTACKITEMTYPE_NA; \
       }									\
@@ -94,18 +98,20 @@ const static int __genericStack_max_initial_indice = -1; /* Not used */
 #define _GENERICSTACK_MALLOC(memsetflag, size) memsetflag=0, malloc(size)
 #if GENERICSTACK_DEFAULT_LENGTH > 0
 #define _GENERICSTACK_NA_MEMSET(stackName, indiceStart, indiceEnd) do {	\
-    if (indiceStart <= indiceEnd) {					\
-      if (indiceStart <= __genericStack_max_initial_indice) {		\
-	int _i_for_memset_max = (indiceEnd >= __genericStack_max_initial_indice) ? __genericStack_max_initial_indice : indiceEnd; \
+    int _indiceStart = indiceStart;                                     \
+    int _indiceEnd = indiceEnd;                                         \
+    if (_indiceStart <= _indiceEnd) {					\
+      if (_indiceStart <= __genericStack_max_initial_indice) {		\
+	int _i_for_memset_max = (_indiceEnd >= __genericStack_max_initial_indice) ? __genericStack_max_initial_indice : _indiceEnd; \
 	int _full_length;						\
 									\
 	_full_length = _i_for_memset_max;				\
-	_full_length -= indiceStart;					\
-	memset(&(stackName->initialItems[indiceStart]), '\0', ++_full_length * sizeof(genericStackItem_t)); \
+	_full_length -= _indiceStart;					\
+	memset(&(stackName->initialItems[_indiceStart]), '\0', ++_full_length * sizeof(genericStackItem_t)); \
       }									\
-      if (indiceEnd > __genericStack_max_initial_indice) {		\
-	int _i_for_memset_min = (indiceStart <= __genericStack_max_initial_indice) ? 0 : indiceStart - __genericStack_max_initial_indice - 1; \
-	int _i_for_memset_max = indiceEnd - __genericStack_max_initial_indice - 1; \
+      if (_indiceEnd > __genericStack_max_initial_indice) {		\
+	int _i_for_memset_min = (_indiceStart <= __genericStack_max_initial_indice) ? 0 : _indiceStart - __genericStack_max_initial_indice - 1; \
+	int _i_for_memset_max = _indiceEnd - __genericStack_max_initial_indice - 1; \
 	int _full_length = _i_for_memset_max - _i_for_memset_min + 1;	\
 									\
 	memset(&(stackName->heapItems[_i_for_memset_min]), '\0', _full_length * sizeof(genericStackItem_t)); \
@@ -114,10 +120,12 @@ const static int __genericStack_max_initial_indice = -1; /* Not used */
   } while (0)
 #else /* GENERICSTACK_DEFAULT_LENGTH */
 #define _GENERICSTACK_NA_MEMSET(stackName, indiceStart, indiceEnd) do {	\
-    if (indiceStart <= indiceEnd) {					\
-      int _full_length = indiceEnd - indiceStart + 1;			\
+    int _indiceStart = indiceStart;                                     \
+    int _indiceEnd = indiceEnd;                                         \
+    if (_indiceStart <= _indiceEnd) {					\
+      int _full_length = _indiceEnd - _indiceStart + 1;			\
 									\
-      memset(&(stackName->heapItems[indiceStart]), '\0', _full_length * sizeof(genericStackItem_t)); \
+      memset(&(stackName->heapItems[_indiceStart]), '\0', _full_length * sizeof(genericStackItem_t)); \
     }									\
   } while (0)
 #endif /* GENERICSTACK_DEFAULT_LENGTH */
@@ -610,23 +618,26 @@ typedef struct genericStack {
 /* Memory release                                                         */
 /* We intentionnaly loop on size and not used.                            */
 /* ====================================================================== */
-#define GENERICSTACK_FREE(stackName) do {				\
+#define GENERICSTACK_RESET(stackName) do {				\
     if ((stackName) != NULL) {						\
       if ((stackName)->heapItems != NULL) {				\
         free((stackName)->heapItems);					\
+        (stackName)->heapLength = 0;					\
       }									\
+      (stackName)->used = 0;						\
+    }									\
+  } while (0)
+
+#define GENERICSTACK_FREE(stackName) do {				\
+    if ((stackName) != NULL) {						\
+      GENERICSTACK_RESET(stackName);                                    \
       free((stackName));						\
       (stackName) = NULL;						\
     }									\
   } while (0)
 
-#define GENERICSTACK_RESET(stackName) do {				\
+#define GENERICSTACK_RELAX(stackName) do {				\
     if ((stackName) != NULL) {						\
-      if ((stackName)->heapItems != NULL) {				\
-        free((stackName)->heapItems);					\
-        (stackName)->heapItems = NULL;					\
-      }									\
-      (stackName)->heapLength = 0;					\
       (stackName)->used = 0;						\
     }									\
   } while (0)

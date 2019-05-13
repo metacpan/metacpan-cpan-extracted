@@ -5,13 +5,13 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants
   qw( PE_OK PE_BADCREDENTIALS PE_IMPERSONATION_SERVICE_NOT_ALLOWED PE_MALFORMEDUSER );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INITIALIZATION
 
-use constant endAuth => 'run';
+use constant afterData => 'run';
 
 has rule   => ( is => 'rw', default => sub { 1 } );
 has idRule => ( is => 'rw', default => sub { 1 } );
@@ -34,7 +34,7 @@ sub init {
         $self->error( "Bad impersonation rule -> " . $hd->tsv->{jail}->error );
         return 0;
     }
-    $self->{rule} = $rule;
+    $self->rule($rule);
 
     # Parse identity rule
     $self->logger->debug( "Impersonation identities rule -> "
@@ -46,7 +46,7 @@ sub init {
             "Bad impersonation identities rule -> " . $hd->tsv->{jail}->error );
         return 0;
     }
-    $self->{idRule} = $rule;
+    $self->idRule($rule);
 
     return 1;
 }
@@ -56,7 +56,8 @@ sub init {
 sub run {
     my ( $self, $req ) = @_;
     my $spoofId = $req->param('spoofId') || $req->{user};
-    $self->logger->debug("No impersonation required") if ( $spoofId eq $req->{user} );
+    $self->logger->debug("No impersonation required")
+      if ( $spoofId eq $req->{user} );
     my $statut = PE_OK;
 
     if ( $spoofId !~ /$self->{conf}->{userControl}/o ) {
@@ -137,6 +138,15 @@ sub run {
 
     # Main session
     $self->p->updateSession( $req, $spoofSession );
+    $req->steps( [ $self->p->validSession, @{ $self->p->endAuth } ] );
+
+    # Restore _httpSession for double Cookies
+    if ( $self->conf->{securedCookie} >= 2 ) {
+        $self->p->updateSession( $req, $spoofSession,
+            $req->{sessionInfo}->{real__httpSession} );
+        $req->{sessionInfo}->{_httpSession} =
+          $req->{sessionInfo}->{real__httpSession};
+    }
     return $statut;
 }
 

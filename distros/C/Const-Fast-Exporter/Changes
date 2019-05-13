@@ -1,5 +1,8 @@
 Revision history for Perl module Const::Fast::Exporter
 
+0.02 2019-05-13 NEILB
+    - Added a bunch of "constant exporting" modules to SEE ALSO. GH#1.
+
 0.01 2017-09-15 NEILB
     - First release to CPAN
 

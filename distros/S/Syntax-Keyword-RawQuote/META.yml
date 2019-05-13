@@ -8,7 +8,7 @@ configure_requires:
   XSLoader: '0'
   perl: '5.012'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.026, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,12 +17,13 @@ name: Syntax-Keyword-RawQuote
 provides:
   Syntax::Feature::RawQuote:
     file: lib/Syntax/Feature/RawQuote.pm
-    version: '0.03'
+    version: '0.04'
   Syntax::Keyword::RawQuote:
     file: lib/Syntax/Keyword/RawQuote.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   XSLoader: '0'
   perl: '5.012'
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

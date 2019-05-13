@@ -1,5 +1,10 @@
 Revision history for Perl6-Build
 
+0.100  2019-05-11 07:18:14 JST
+  - Add https://rakudostar.com/files/star/ for rakudo-star download urls (#1)
+  - Move guts to Perl6::Build::CLI class (#1)
+  - If `p6env install` failed, show upgrade instruction (#1)
+
 0.002  2018-09-16 04:50:29 JST
   - Requires perl 5.10.1
   - Add pods to script/perl6-build

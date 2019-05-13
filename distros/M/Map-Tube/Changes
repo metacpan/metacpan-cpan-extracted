@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.62  2019-05-11T12:03:45+00:00
+      - Refactored Map::Tube::Plugin::Formatter and plugged into object directly.
+
 3.61  2019-04-17T16:00:00+00:00
       - Tidied up pod documentation.
 

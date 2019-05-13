@@ -125,7 +125,7 @@ strings, numbers and integers?
 =item Solution
 
     # vowels.pl
-    use Inline C;
+    use Inline 'C';
 
     $filename = $ARGV[0];
     die "Usage: perl vowels.pl filename\n" unless -f $filename;
@@ -335,7 +335,7 @@ How can I pass back more than one value without using the Perl Stack?
 =item Solution
 
     use Inline::Files;
-    use Inline C;
+    use Inline 'C';
 
     my ($foo, $bar);
     change($foo, $bar);
@@ -373,9 +373,42 @@ directly to them.
 =item Credits
 
 Ned Konz <ned@bike-nomad.com> brought this behavior to my attention. He also
-pointed out that he is not the world famous computer cyclist Steve Roberts
-(L<http://www.microship.com),> but he is close (L<http://bike-nomad.com).>
+pointed out that he is not the world famous computer cyclist Steve Roberts (
+L<http://www.microship.com> ), but he is close ( L<http://bike-nomad.com> ).
 Thanks Ned.
+
+=back
+
+=head2 Taking an array-ref as an argument
+
+=over
+
+=item Problem
+
+How can I take a Perl array-ref as an argument in my C function?
+
+=item Solution
+
+    SV *sum(SV *array) {
+        int total = 0;
+        int numelts, i;
+        if ((!SvROK(array))
+            || (SvTYPE(SvRV(array)) != SVt_PVAV)
+            || ((numelts = av_len((AV *)SvRV(array))) < 0)
+        ) {
+            return &PL_sv_undef;
+        }
+        for (i = 0; i <= numelts; i++) {
+            total += SvIV(*av_fetch((AV *)SvRV(array), i, 0));
+        }
+        return newSViv(total);
+    }
+
+=item Discussion
+
+This example returns C<undef> if given a non-ref, or a non-array-ref, or a ref
+to an empty array. You can see how you might expand this to take more than one
+array-ref.
 
 =back
 
@@ -1061,7 +1094,7 @@ How do I create a Hash of Lists from C?
 
 =item Solution
 
-    use Inline C;
+    use Inline 'C';
     use Data::Dumper;
 
     $hash_ref = load_data("./cartoon.txt");
@@ -1407,7 +1440,7 @@ Inline C function.
 
 =item Solution
 
-    use Inline C;
+    use Inline 'C';
 
     for(1..5) {
       c_func_1('This is the first line');

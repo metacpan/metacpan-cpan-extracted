@@ -61,7 +61,7 @@
    "provides" : {
       "Backblaze::B2V2Client" : {
          "file" : "lib/Backblaze/B2V2Client.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/ericschernoff/Backblaze-B2V2Client"
       }
    },
-   "version" : "1.0",
+   "version" : "1.1",
    "x_contributors" : [
       "Eric Chernoff <eric@mail.weaverqueue.com>",
       "Eric Chernoff <ericschernoff@gmail.com>"

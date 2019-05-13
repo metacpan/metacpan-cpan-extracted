@@ -1,6 +1,6 @@
 package Code::DRY;
 
-use 5.008000;
+use 5.003000;
 use strict;
 use warnings;
 use integer;
@@ -23,7 +23,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load( 'Code::DRY', $VERSION );
@@ -352,14 +352,16 @@ sub enter_files {
     for my $file (@{$rfiles}) {
         next if (!defined $file || $file eq '');
         # check metadata
-        my @statresult = stat($file);
-        if (0 < $#statresult) {
-            my $inode = $statresult[1]; # inode
-            if (exists $filename2inode{$inode}) {
-                $file = undef;
-                next; # avoid hard and symbolic links
+        if ($^O ne 'MSWin32') {
+            my @statresult = stat($file);
+            if (0 < $#statresult) {
+                my $inode = $statresult[1]; # inode
+                if (exists $filename2inode{$inode}) {
+            	    $file = undef;
+            	    next; # avoid hard and symbolic links
+                }
+                $filename2inode{$inode} = undef; # inode
             }
-	    $filename2inode{$inode} = undef; # inode
         }
         # preprocess files content
         if (-z $file) {

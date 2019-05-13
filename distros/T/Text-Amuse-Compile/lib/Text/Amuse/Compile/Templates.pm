@@ -349,6 +349,19 @@ a {
    text-decoration: none;
 }
 
+[% IF epub %]
+/*
+ * Workaround for Cool Reader, which as of version 3.2.9
+ * does not have default styles for blockquotes defined.
+ *
+ * These values are taken from https://www.w3schools.com/cssref/css_default_values.asp
+ * Firefox 66 uses the same styles by default.
+ */
+blockquote {
+   margin: 1em 40px;
+}
+[% END %]
+
 [% IF html %]
 div#page {
    margin:20px;

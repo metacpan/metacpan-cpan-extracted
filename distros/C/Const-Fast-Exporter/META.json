@@ -4,7 +4,7 @@
       "Neil Bowers <neilb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
          "web" : "https://github.com/neilb/Const-Fast-Exporter"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

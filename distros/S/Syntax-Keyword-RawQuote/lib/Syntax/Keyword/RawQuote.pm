@@ -7,7 +7,7 @@ use warnings;
 use XSLoader;
 
 BEGIN {
-  our $VERSION = '0.03';
+  our $VERSION = '0.04';
   our $AUTHORITY = 'cpan:ARODLAND';
   XSLoader::load(__PACKAGE__);
 }
@@ -42,7 +42,7 @@ Syntax::Keyword::RawQuote - A raw quote operator for Perl
     say r`I keep all of my files in \\yourserver\private`;
 
     use Syntax::Keyword::RawQuote -as => "qraw";
-    say qraw[Maybe the \r\ keyword is too risky?];
+    say qraw[Maybe the `r` keyword is too risky?];
 
 =head1 DESCRIPTION
 
@@ -51,9 +51,9 @@ Perl, as seen in some other programming languages. While Perl single-quoted
 strings are nearly uninterpreted, they still treat the sequences C<\'> and
 C<\\> specially, allowing a single quote to be included in the string.
 The C<q> operator behaves similarly, allowing the closing delimiter to be
-backslashed, and treating C<\\> as a single backslash. A raw string, in
-contrast, treats I<every> character literally, and ends at the first
-occurrence of the closing delimiter, no matter what.
+backslashed, and treating C<\\> as a single backslash. By contrast, a raw
+string treats I<every> character literally, and ends at the first occurrence of
+the closing delimiter, no matter what.
 
 =head1 WARNING
 
@@ -86,13 +86,13 @@ quoted strings, and it is visually distinct.
 =head2 import
 
 Enables the raw quote keyword in the current lexical scope when called during
-compilation (C<use Syntax::Feature::RawQuote>). If the C<-as> keyword argument
+compilation (C<use Syntax::Keyword::RawQuote>). If the C<-as> keyword argument
 is provided, it will be used as the keyword name, otherwise C<"r"> is used.
 
 =head2 unimport
 
 Disables the raw quote keyword in the current lexical scope when called
-during compilation (C<no Syntax::Feature::RawQuote>). If the C<-as> keyword is
+during compilation (C<no Syntax::Keyword::RawQuote>). If the C<-as> keyword is
 provided, disables that keyword specifically; otherwise, all keywords
 installed will be disabled.
 

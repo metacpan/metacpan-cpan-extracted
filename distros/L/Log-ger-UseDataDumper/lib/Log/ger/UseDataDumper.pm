@@ -1,7 +1,7 @@
 package Log::ger::UseDataDumper;
 
-our $DATE = '2018-06-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-08'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use Data::Dumper ();
 use Log::ger ();
@@ -17,6 +17,7 @@ my %default_configs = (
     Indent => 1,
     Purity => 1,
     Terse  => 1,
+    Useqq  => 1,
 );
 
 sub import {
@@ -56,7 +57,7 @@ Log::ger::UseDataDumper - Use Data::Dumper (with nicer defaults) to dump data st
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::UseDataDumper (from Perl distribution Log-ger-UseDataDumper), released on 2018-06-10.
+This document describes version 0.002 of Log::ger::UseDataDumper (from Perl distribution Log-ger-UseDataDumper), released on 2019-05-08.
 
 =head1 SYNOPSIS
 
@@ -75,6 +76,7 @@ closer to that of L<Data::Dump>:
  Indent => 1,
  Purity => 1,
  Terse  => 1,
+ Useqq  => 1,
 
 This module also lets you configure Data::Dumper during import (see example in
 Synopsis).
@@ -109,7 +111,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

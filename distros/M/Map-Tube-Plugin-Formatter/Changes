@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Plugin::Formatter
 
+0.16  Fri May 10 16:30:00 2019
+      - Streamlined to be pluggable to object directly.
+      - Removed dependency on Map::Tube::Exception.
+
 0.15  Fri Sep 07 16:00:00 2018
       - Used "namespace::autoclean" instead of "namespace::clean".
 

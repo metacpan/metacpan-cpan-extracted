@@ -1,4 +1,4 @@
 #
-# Regular cron jobs for LemonLDAP::NG
+# Regular cron jobs for LemonLDAP::NG Portal
 #
-10 1/12 * * * __APACHEUSER__ [ -x __BINDIR__/purgeCentralCache ] && __BINDIR__/purgeCentralCache
+*/10 *	* * *	__APACHEUSER__	[ -x __BINDIR__/purgeCentralCache ] && __BINDIR__/purgeCentralCache

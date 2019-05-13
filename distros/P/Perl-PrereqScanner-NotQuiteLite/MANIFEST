@@ -73,6 +73,7 @@ t/core/if.t
 t/core/parent.t
 t/inline.t
 t/later.t
+t/minimum_version.t
 t/mixin.t
 t/module_runtime.t
 t/mojo_base.t

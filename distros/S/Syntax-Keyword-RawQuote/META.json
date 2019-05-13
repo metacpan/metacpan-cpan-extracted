@@ -4,7 +4,7 @@
       "Andrew Rodland <arodland@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.018"
+            "App::ModuleBuildTiny" : "0.026"
          }
       },
       "runtime" : {
@@ -36,14 +36,15 @@
    "provides" : {
       "Syntax::Feature::RawQuote" : {
          "file" : "lib/Syntax/Feature/RawQuote.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Syntax::Keyword::RawQuote" : {
          "file" : "lib/Syntax/Keyword/RawQuote.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

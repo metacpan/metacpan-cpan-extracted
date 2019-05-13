@@ -22,7 +22,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.09';
+our $VERSION = '9.10';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -248,6 +248,21 @@ L<Minion::Command::minion::worker>, which becomes automatically available when
 an application loads L<Mojolicious::Plugin::Minion>.
 
   $ ./myapp.pl minion worker
+
+The worker process will fork a new process for every job that is being
+processed. This allows for resources such as memory to be returned to the
+operating system once a job is finished. Perl fork is very fast, so don't worry
+about the overhead.
+
+  Minion::Worker
+  |- Minion::Job [1]
+  |- Minion::Job [2]
+  +- ...
+
+By default up to four jobs will be processed in parallel, but that can be
+changed with configuration options or on demand with signals.
+
+  $ ./myapp.pl minion worker -j 12
 
 Jobs can be managed right from the command line with
 L<Minion::Command::minion::job>.
@@ -924,6 +939,8 @@ In alphabetical order:
 Andrey Khozov
 
 Brian Medley
+
+Franz Skale
 
 Hubert "depesz" Lubaczewski
 

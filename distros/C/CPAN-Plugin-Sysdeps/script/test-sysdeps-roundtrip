@@ -1,5 +1,14 @@
 #!/usr/bin/perl
 
+# A mostly private test helper. Installs system deps for
+# the listed modules via CPAN::Plugin::Sysdeps (which has
+# to be configured for CPAN.pm), and remove the installed
+# packages afterwards.
+#
+# Requires a git checkout of https://github.com/eserte/srezic-misc
+# into ~/src/srezic-misc, an active local::lib session, and probably
+# more configuration for cpan_smoke_modules
+
 use strict;
 use warnings;
 use FindBin;

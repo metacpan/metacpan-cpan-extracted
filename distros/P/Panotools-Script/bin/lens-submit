@@ -29,7 +29,7 @@ for my $path_pto (@ARGV)
     my $image = $pto->Image->[0];
 
     my $query_image = {};
-    for my $parameter qw/w h f v a b c d e g t Ra Rb Rc Rd Re Va Vb Vc Vd Vx Vy/
+    for my $parameter (qw/w h f v a b c d e g t Ra Rb Rc Rd Re Va Vb Vc Vd Vx Vy/)
     {
         $query_image->{$parameter} = $image->{$parameter}
             if defined $image->{$parameter};
@@ -50,10 +50,10 @@ for my $path_pto (@ARGV)
     }
 
     my $query_photo = {};
-    for my $parameter qw/ColorSpace ExifVersion FileType FNumber FocalLength FOV
+    for my $parameter (qw/ColorSpace ExifVersion FileType FNumber FocalLength FOV
         FocalLengthIn35mmFormat ImageHeight ImageWidth Lens LensModel LensType Make
         Model ResolutionUnit ScaleFactor35efl Software SubjectDistanceRange XResolution
-        YResolution/
+        YResolution/)
     {
         $query_photo->{$parameter} = $photo->{$parameter}
             if defined $photo->{$parameter};

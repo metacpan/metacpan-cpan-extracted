@@ -1,5 +1,5 @@
 package Time::Duration::Parse;
-$Time::Duration::Parse::VERSION = '0.14';
+$Time::Duration::Parse::VERSION = '0.15';
 use 5.006;
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ sub parse_duration {
     }
 
     # Convert hh:mm(:ss)? to something we understand
-    $timespec =~ s/\b(\d+):(\d\d):(\d\d)\b/$1h $2m $3s/g;
+    $timespec =~ s/\b(\d+):(\d\d):(\d\d(\.\d+)?)\b/$1h $2m $3s/g;
     $timespec =~ s/\b(\d+):(\d\d)\b/$1h $2m/g;
 
     my $duration = 0;
@@ -71,8 +71,10 @@ Time::Duration::Parse - Parse string that represents time duration
 Time::Duration::Parse is a module to parse human readable duration
 strings like I<2 minutes and 3 seconds> to seconds.
 
-It does the opposite of I<duration_exact> function in Time::Duration
-and is roundtrip safe. So, the following is always true.
+It does the opposite of L<Time::Duration/duration_exact> function
+in L<Time::Duration>
+and is roundtrip safe.
+So, the following is always true.
 
   use Time::Duration::Parse;
   use Time::Duration;
@@ -88,9 +90,10 @@ and is roundtrip safe. So, the following is always true.
 
   $seconds = parse_duration($string);
 
-Parses duration string and returns seconds. When it encounters an
-error in a given string, it dies an exception saying "Unknown
-timespec: blah blah blah". This function is exported by default.
+Parses duration string and returns seconds.
+When it encounters an error in a given string,
+it dies with an exception saying "Unknown timespec: blah blah blah".
+This function is exported by default.
 
 =back
 

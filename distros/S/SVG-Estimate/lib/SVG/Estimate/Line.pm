@@ -1,5 +1,5 @@
 package SVG::Estimate::Line;
-$SVG::Estimate::Line::VERSION = '1.0113';
+$SVG::Estimate::Line::VERSION = '1.0114';
 use Moo;
 
 extends 'SVG::Estimate::Shape';
@@ -11,7 +11,7 @@ SVG::Estimate::Line - Handles estimating straight lines.
 
 =head1 VERSION
 
-version 1.0113
+version 1.0114
 
 =head1 SYNOPSIS
 

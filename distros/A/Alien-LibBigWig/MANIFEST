@@ -6,6 +6,7 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+NOTICE
 README
 t/basic.t
 t/compile.t

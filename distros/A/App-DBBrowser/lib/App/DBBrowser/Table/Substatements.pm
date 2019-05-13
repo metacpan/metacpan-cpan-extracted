@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( choose_a_number );
 
 use App::DBBrowser::Auxil;
@@ -28,7 +28,7 @@ sub new {
         and           => "AND",
         or            => "OR",
     };
-    if ( $data->{driver} eq 'Pg' ) {
+    if ( $info->{driver} eq 'Pg' ) {
         $sf->{aggregate}[3] = "STRING_AGG(X)";
     }
     $sf->{i}{expand_signs}     = [ '',  'f()', 'SQ',       '%%' ];
@@ -38,9 +38,10 @@ sub new {
 
 
 sub select {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $clause = 'select';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $choices = [];
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
@@ -58,8 +59,10 @@ sub select {
     COLUMNS: while ( 1 ) {
         $ax->print_sql( $sql );
         # Choose
-        my @idx = $stmt_h->choose(
-            $choices, { meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], index => 1, include_highlighted => 2 }
+        my @idx = $tc->choose(
+            $choices,
+            { %{$sf->{i}{lyt_h}}, meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], include_highlighted => 2,
+              index => 1 }
         );
         if ( ! $idx[0] ) {
             if ( @bu ) {
@@ -91,8 +94,9 @@ sub select {
 
 
 sub distinct {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my @pre = ( undef, $sf->{i}{ok} );
     $sql->{distinct_stmt} = '';
 
@@ -100,8 +104,9 @@ sub distinct {
         my $choices = [ @pre, $sf->{distinct}, $sf->{all} ];
         $ax->print_sql( $sql );
         # Choose
-        my $select_distinct = $stmt_h->choose(
-            $choices
+        my $select_distinct = $tc->choose(
+            $choices,
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $select_distinct ) {
             if ( $sql->{distinct_stmt} ) {
@@ -119,7 +124,7 @@ sub distinct {
 
 
 sub aggregate {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     $sql->{aggr_cols} = [];
     $sql->{select_cols} = [];
 
@@ -141,14 +146,15 @@ sub aggregate {
 
 sub __add_aggregate_substmt {
     my ( $sf, $sql ) = @_;
-    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
     my $i = @{$sql->{aggr_cols}};
     $ax->print_sql( $sql );
     # Choose
-    my $aggr = $stmt_h->choose(
-        [ @pre, @{$sf->{aggregate}} ]
+    my $aggr = $tc->choose(
+        [ @pre, @{$sf->{aggregate}} ],
+        { %{$sf->{i}{lyt_h}} }
     );
     if ( ! defined $aggr ) {
         return;
@@ -165,8 +171,9 @@ sub __add_aggregate_substmt {
         if ( $aggr =~ /^(?:COUNT|GROUP_CONCAT|STRING_AGG)\z/ ) {
             $ax->print_sql( $sql );
             # Choose
-            my $all_or_distinct = $stmt_h->choose(
-                [ undef, $sf->{all}, $sf->{distinct} ]
+            my $all_or_distinct = $tc->choose(
+                [ undef, $sf->{all}, $sf->{distinct} ],
+                { %{$sf->{i}{lyt_h}} }
             );
             if ( ! defined $all_or_distinct ) {
                 return;
@@ -177,8 +184,9 @@ sub __add_aggregate_substmt {
         }
         $ax->print_sql( $sql );
         # Choose
-        my $f_col = $stmt_h->choose(
-            [ undef, @{$sql->{cols}} ]
+        my $f_col = $tc->choose(
+            [ undef, @{$sql->{cols}} ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $f_col ) {
             return;
@@ -200,10 +208,11 @@ sub __add_aggregate_substmt {
 
 
 sub set {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $clause = 'set';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $col_sep = ' ';
     $sql->{set_args} = [];
     $sql->{set_stmt} = " SET";
@@ -213,8 +222,9 @@ sub set {
     SET: while ( 1 ) {
         $ax->print_sql( $sql );
         # Choose
-        my $col = $stmt_h->choose(
-            [ @pre, @{$sql->{cols}} ]
+        my $col = $tc->choose(
+            [ @pre, @{$sql->{cols}} ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $col ) {
             if ( @bu ) {
@@ -242,10 +252,11 @@ sub set {
 
 
 sub where {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $clause = 'where';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my @cols = @{$sql->{cols}};
     my $AND_OR = '';
     $sql->{where_args} = [];
@@ -264,8 +275,9 @@ sub where {
         }
         $ax->print_sql( $sql );
         # Choose
-        my $quote_col = $stmt_h->choose(
-            [ @pre, @choices ]
+        my $quote_col = $tc->choose(
+            [ @pre, @choices ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $quote_col ) {
             if ( @bu ) {
@@ -304,8 +316,9 @@ sub where {
         if ( $count > 0 && $sql->{where_stmt} !~ /\(\z/ ) { #
             $ax->print_sql( $sql );
             # Choose
-            $AND_OR = $stmt_h->choose(
-                [ undef, $sf->{and}, $sf->{or} ]
+            $AND_OR = $tc->choose(
+                [ undef, $sf->{and}, $sf->{or} ],
+                { %{$sf->{i}{lyt_h}} }
             );
             if ( ! defined $AND_OR ) {
                 next WHERE;
@@ -332,9 +345,10 @@ sub where {
 
 
 sub group_by {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $clause = 'group_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     $sql->{group_by_stmt} = " GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{select_cols} = [];
@@ -347,9 +361,10 @@ sub group_by {
         $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
         $ax->print_sql( $sql );
         # Choose
-        my @idx = $stmt_h->choose(
+        my @idx = $tc->choose(
             $choices,
-            { meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], index => 1, include_highlighted => 2 }
+            { %{$sf->{i}{lyt_h}}, meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], include_highlighted => 2,
+              index => 1 }
         );
         if ( ! $idx[0] ) {
             if ( @{$sql->{group_by_cols}} ) {
@@ -384,10 +399,11 @@ sub group_by {
 
 
 sub having {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $clause = 'having';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my @pre = ( undef, $sf->{i}{ok} );
     my $AND_OR = '';
     $sql->{having_args} = [];
@@ -406,8 +422,9 @@ sub having {
         }
         $ax->print_sql( $sql );
         # Choose
-        my $aggr = $stmt_h->choose(
-            [ @pre, @choices ]
+        my $aggr = $tc->choose(
+            [ @pre, @choices ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $aggr ) {
             if ( @bu ) {
@@ -435,8 +452,9 @@ sub having {
         if ( $count > 0 && $sql->{having_stmt} !~ /\(\z/ ) {
             $ax->print_sql( $sql );
             # Choose
-            $AND_OR = $stmt_h->choose(
-                [ undef, $sf->{and}, $sf->{or} ]
+            $AND_OR = $tc->choose(
+                [ undef, $sf->{and}, $sf->{or} ],
+                { %{$sf->{i}{lyt_h}} }
             );
             if ( ! defined $AND_OR ) {
                 next HAVING;
@@ -468,9 +486,10 @@ sub having {
 
 
 sub order_by {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $clause = 'order_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
     my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
@@ -488,8 +507,9 @@ sub order_by {
     ORDER_BY: while ( 1 ) {
         $ax->print_sql( $sql );
         # Choose
-        my $col = $stmt_h->choose(
-            [ @pre, @cols ]
+        my $col = $tc->choose(
+            [ @pre, @cols ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $col ) {
             if ( @bu ) {
@@ -519,8 +539,9 @@ sub order_by {
         $sql->{order_by_stmt} .= $col_sep . $col;
         $ax->print_sql( $sql );
         # Choose
-        my $direction = $stmt_h->choose(
-            [ undef, $sf->{asc}, $sf->{desc} ]
+        my $direction = $tc->choose(
+            [ undef, $sf->{asc}, $sf->{desc} ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $direction ){
             ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
@@ -533,8 +554,9 @@ sub order_by {
 
 
 sub limit_offset {
-    my ( $sf, $stmt_h, $sql ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my @pre = ( undef, $sf->{i}{ok} );
     $sql->{limit_stmt}  = '';
     $sql->{offset_stmt} = '';
@@ -544,8 +566,9 @@ sub limit_offset {
         my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
         $ax->print_sql( $sql );
         # Choose
-        my $choice = $stmt_h->choose(
-            [ @pre, $limit, $offset ]
+        my $choice = $tc->choose(
+            [ @pre, $limit, $offset ],
+            { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $choice ) {
             if ( @bu ) {

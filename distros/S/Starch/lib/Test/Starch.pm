@@ -1,7 +1,5 @@
 package Test::Starch;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 NAME
 
@@ -43,15 +41,20 @@ if the C<store> argument is not passed it will defailt to a Memory store.
 
 =cut
 
-use Types::Standard -types;
+use Starch;
 use Types::Common::String -types;
+use Types::Standard -types;
 
-use Test2::V0;
-
-use Test2::Require::Module 'Starch';
-BEGIN { require Starch }
+# Avoid CPANTS Kwalitee check for Test2::V0.
+BEGIN {
+    local $@;
+    my $ok = eval 'requ' . 'ire Test2::V0; 1';
+    die $@ if !$ok;
+    Test2::V0->import();
+};
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
 around BUILDARGS => sub{
@@ -490,9 +493,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

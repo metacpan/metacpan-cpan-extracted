@@ -101,6 +101,7 @@ extern "C" {
 
   marpaWrapper_EXPORT int                    marpaWrapperGrammar_newSymboli(marpaWrapperGrammar_t *marpaWrapperGrammarp, marpaWrapperGrammarSymbolOption_t *marpaWrapperGrammarSymbolOptionp);
   marpaWrapper_EXPORT short                  marpaWrapperGrammar_symbolPropertyb(marpaWrapperGrammar_t *marpaWrapperGrammarp, int symboli, int *marpaWrapperSymbolPropertyBitSetp);
+  marpaWrapper_EXPORT short                  marpaWrapperGrammar_symbolEventb(marpaWrapperGrammar_t *marpaWrapperGrammarp, int symboli, int *marpaWrapperSymbolEventBitSetp);
   marpaWrapper_EXPORT int                    marpaWrapperGrammar_newRulei(marpaWrapperGrammar_t *marpaWrapperGrammarp, marpaWrapperGrammarRuleOption_t *marpaWrapperGrammarRuleOptionp,
 										int lhsSymboli,
 										size_t rhsSymboll, int *rhsSymbolip

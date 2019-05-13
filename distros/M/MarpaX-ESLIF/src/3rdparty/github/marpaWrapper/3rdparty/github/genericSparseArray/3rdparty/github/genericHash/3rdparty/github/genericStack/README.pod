@@ -209,7 +209,11 @@ Releases a stack that is on the heap.
 
 =head2 GENERICSTACK_RESET(stackName)
 
-Releases a stack that is on the stack.
+Releases a stack that is on the stack. It can be reused.
+
+=head2 GENERICSTACK_RELAX(stackName)
+
+Fast dispose of a stack for immediate reuse. This does not prevent the user to call C<GENERICSTACK_RESET()> or C<GENERICSTACK_FREE()>, though.
 
 =head2 GENERICSTACK_ERROR(stackName)
 

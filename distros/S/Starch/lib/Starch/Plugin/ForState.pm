@@ -1,7 +1,14 @@
 package Starch::Plugin::ForState;
-use 5.008001;
+our $VERSION = '0.14';
+
+use Moo::Role;
 use strictures 2;
-our $VERSION = '0.13';
+use namespace::clean;
+
+1;
+__END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -28,14 +35,6 @@ plugin so that Starch knows which class type it applies to.
 
 See L<Starch::Extending/PLUGINS> for more information.
 
-=cut
-
-use Moo::Role;
-use namespace::clean;
-
-1;
-__END__
-
 =head1 SUPPORT
 
 See L<Starch/SUPPORT>.
@@ -44,9 +43,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

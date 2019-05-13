@@ -39,7 +39,7 @@ my @hist = find_POST_history(''); # empty string matches everything
 diag "whole history ", explain \@hist;
 is_deeply(\@hist, [
     '0 NOMETHOD  ', # login
-    '0 env api_version version=2.156',
+    '0 env api_version version=2.230',
 ], "POST history: one non-method call from login, one call to get the api_version");
 
 ok(POST_history_ok(['NOMETHOD', 'env api_version']), "call history ok");
@@ -58,7 +58,7 @@ is($f->get_api_version(), '1.1.2', 'mocked env api_version found with id=1');
 @hist = find_POST_history('');
 diag "whole after reset history ", explain \@hist;
 is_deeply(\@hist, [
-    '1 env api_version version=2.156',
+    '1 env api_version version=2.230',
 ], "POST history after reset: one call to get the api_version with id=1 (no new login)");
 
 $f->{id} = 2;

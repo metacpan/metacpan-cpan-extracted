@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.30 2019-05-11
+
+ - Extend magic comments with more commands
+
 1.29 2019-03-31
 
  - Fix tests for Win32 (again)

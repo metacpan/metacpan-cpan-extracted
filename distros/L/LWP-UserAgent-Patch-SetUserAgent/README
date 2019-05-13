@@ -1,0 +1,71 @@
+NAME
+    LWP::UserAgent::Patch::SetUserAgent - Set User-Agent
+
+VERSION
+    This document describes version 0.001 of
+    LWP::UserAgent::Patch::SetUserAgent (from Perl distribution
+    LWP-UserAgent-Patch-SetUserAgent), released on 2019-05-10.
+
+SYNOPSIS
+    In Perl:
+
+     use LWP::UserAgent::Patch::SetUserAgent -agent => "Blah/1.0";
+
+    From command-line:
+
+     % perl -MLWP::UserAgent::Patch::SetUserAgent=-agent,'Blah/1.0' script-that-uses-lwp.pl ...
+     % HTTP_USER_AGENT=Blah/1.0 perl -MLWP::UserAgent::Patch::SetUserAgent script-that-uses-lwp.pl ...
+
+DESCRIPTION
+    This patch sets LWP::UserAgent's default User-Agent string, from
+    "libwww-perl/XXX" to a value from either "-agent" configuration or from
+    environment variable "HTTP_USER_AGENT".
+
+    You can still override it using the usual:
+
+     my $ua = LWP::UserAgent->new(
+         agent => '...',
+         ...
+     );
+
+    or
+
+     $ua->agent('...');
+
+CONFIGURATION
+  -agent
+    String.
+
+ENVIRONMENT
+  HTTP_USER_AGENT
+    String. Used to set default for "-agent" configuration.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Patch-SetUserAgent>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Patch-SetUserAgent>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Patch-S
+    etUserAgent>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    If you want to check the sent User-Agent header in requests, you can use
+    Log::ger::For::LWP.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

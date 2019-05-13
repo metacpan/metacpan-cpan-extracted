@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -58,7 +58,7 @@
    "provides" : {
       "Perl::Critic::Policy::Catalyst::ProhibitUnreachableCode" : {
          "file" : "lib/Perl/Critic/Policy/Catalyst/ProhibitUnreachableCode.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -72,8 +72,11 @@
          "web" : "https://github.com/bluefeet/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Aran Clary Deltac <aran@bluefeet.dev>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

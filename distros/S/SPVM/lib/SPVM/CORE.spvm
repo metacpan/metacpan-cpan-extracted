@@ -5,25 +5,7 @@ package SPVM::CORE {
   use SPVM::Hash;
   use SPVM::Comparator;
   use SPVM::Stringer;
-  use SPVM::FileHandle;
 
-  our $O_RDONLY : ro int;
-  our $O_WRONLY : ro int;
-  our $O_RDWR : ro int;
-  our $O_APPEND : ro int;
-  our $O_CREAT : ro int;
-  our $O_TRUNC : ro int;
-  our $SEEK_SET : ro int;
-  our $SEEK_CUR : ro int;
-  our $SEEK_END : ro int;
-  our $EOF : ro int;
-  our $STDIN : ro SPVM::FileHandle;
-  our $STDOUT : ro SPVM::FileHandle;
-  
-  BEGIN {
-    init_native_constants();
-  }
-  
   native sub chomp : void ($string : string);
   native sub rand : int ($seed_ref : int&);
   
@@ -127,15 +109,15 @@ package SPVM::CORE {
       my $result_str = new byte[$result_str_len];
       
       if ($found_pos > 0) {
-        memmove((byte[])$result_str, 0, (byte[])$str, 0, $found_pos);
+        memmoveb((byte[])$result_str, 0, (byte[])$str, 0, $found_pos);
       }
-      memmove((byte[])$result_str, $found_pos, (byte[])$replace, 0, $replace_len);
+      memmoveb((byte[])$result_str, $found_pos, (byte[])$replace, 0, $replace_len);
       
       my $str_rest_offset = $found_pos + $substr_len;
       my $str_rest_length = $str_len - $str_rest_offset;
       my $result_rest_offset = $found_pos + $replace_len;
       my $result_rest_length = $result_str_len - $result_rest_offset;
-      memmove((byte[])$result_str, $result_rest_offset, (byte[])$str, $str_rest_offset, $str_rest_length);
+      memmoveb((byte[])$result_str, $result_rest_offset, (byte[])$str, $str_rest_offset, $str_rest_length);
       
       return $result_str;
     }
@@ -145,8 +127,18 @@ package SPVM::CORE {
     }
   }
 
-  native sub memcpy : void ($dist_str : byte[], $dist_offset : int, $src_str : byte[], $src_offset : int, $length : int);
-  native sub memmove : void ($dist_str : byte[], $dist_offset : int, $src_str : byte[], $src_offset : int, $length : int);
+  native sub memcpyb : void ($dist_str : byte[], $dist_offset : int, $src_str : byte[], $src_offset : int, $length : int);
+  native sub memmoveb : void ($dist_str : byte[], $dist_offset : int, $src_str : byte[], $src_offset : int, $length : int);
+  native sub memcpys : void ($dist_str : short[], $dist_offset : int, $src_str : short[], $src_offset : int, $length : int);
+  native sub memmoves : void ($dist_str : short[], $dist_offset : int, $src_str : short[], $src_offset : int, $length : int);
+  native sub memcpyi : void ($dist_str : int[], $dist_offset : int, $src_str : int[], $src_offset : int, $length : int);
+  native sub memmovei : void ($dist_str : int[], $dist_offset : int, $src_str : int[], $src_offset : int, $length : int);
+  native sub memcpyl : void ($dist_str : long[], $dist_offset : int, $src_str : long[], $src_offset : int, $length : int);
+  native sub memmovel : void ($dist_str : long[], $dist_offset : int, $src_str : long[], $src_offset : int, $length : int);
+  native sub memcpyf : void ($dist_str : float[], $dist_offset : int, $src_str : float[], $src_offset : int, $length : int);
+  native sub memmovef : void ($dist_str : float[], $dist_offset : int, $src_str : float[], $src_offset : int, $length : int);
+  native sub memcpyd : void ($dist_str : double[], $dist_offset : int, $src_str : double[], $src_offset : int, $length : int);
+  native sub memmoved : void ($dist_str : double[], $dist_offset : int, $src_str : double[], $src_offset : int, $length : int);
   
   precompile sub index : int($source : string, $target : string, $fromIndex : int) {
     my $sourceCount = length $source;
@@ -241,7 +233,7 @@ package SPVM::CORE {
       die "Separator must not be empty string";
     }
     
-    my $separated_strings_list = list([]);
+    my $separated_strings_list = SPVM::List->new;
     
     my $match_start = 0;
     my $string_base = 0;
@@ -775,10 +767,6 @@ package SPVM::CORE {
   native sub cmulf : SPVM::Complex_2f ($z1 : SPVM::Complex_2f, $z2 : SPVM::Complex_2f);
   native sub cdivf : SPVM::Complex_2f ($z1 : SPVM::Complex_2f, $z2 : SPVM::Complex_2f);
   
-  sub list : SPVM::List ($objects : object[]) {
-    return SPVM::List->new_with_array($objects);
-  }
-
   sub hash : SPVM::Hash ($objects : object[]) {
     return SPVM::Hash->new_with_array($objects);
   }

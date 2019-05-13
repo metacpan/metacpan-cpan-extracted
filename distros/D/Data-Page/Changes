@@ -1,0 +1,71 @@
+Revision history for Perl module Data::Page:
+
+2.03      2019-05-10 03:06:05Z
+    - updated distribution tooling
+
+2.02      2009-12-07 19:45:33Z
+    - fix SQL documentation, spotted by Terrence Brannon
+    - added change_entries_per_page, patch by James Laver (ELPENGUIN)
+    - run perltidy on the modules
+
+2.01      2008-10-08 14:02:25Z
+    - add human-readable license to the documentation
+
+2.00      2004-10-20 15:30:04Z
+	- added accessors, deprecated old constructor style
+    - updated the documentation
+
+1.03      2004-07-20 14:12:50Z
+	- added skipped thanks to Valerio 
+
+1.02      2004-07-11 10:33:12Z
+	- NO NEW FUNCTIONALITY OR BUG FIXES.
+	- Removed the $proto||ref($proto) in the constructor.  This means
+	  that you can't do
+
+	    my $pager2 = $pager1->new();
+
+	  but you never wanted to do that anyway.
+
+	- Added new t/constructor.t to check constructor errors.
+	- Added t/pod.t and t/pod-coverage.t.
+	- Added some tests to t/simple.t.
+	- Test coverage is now at 100% according to Devel::Cover.
+	- (all thanks to Andy Lester)
+
+1.01      2003-11-19 10:09:48Z
+	- fixed bug where splice of an empty array was not working
+	  (spotted by Alex Monney)
+	- moved Changes to CHANGES
+
+1.00      2003-11-03 19:41:21Z
+	- bumped up to version 1.00 and added NINJA support
+
+0.18      2003-07-14 18:31:08Z
+	- patches by Ken Williams to simplify the code and fix the
+	  tests
+
+0.17      2003-05-05 15:12:58Z
+	- work around for makemaker and Build.PL interaction
+
+0.16      2003-05-04 10:02:33Z
+	- New entries_on_this_page thanks to Dominic Mitchell
+
+0.15      2003-02-11 11:15:06Z
+	- do the right thing with zero entries
+
+0.14      2002-08-20 10:08:45Z
+	- Added splice method
+
+0.13      2002-08-16 09:13:02Z
+	- New previous_page and next_page thanks to Tatsuhiko Miyagawa
+
+0.12      2001-08-28 12:52:48Z
+	- Finally released to CPAN
+
+0.02 2000-11-03
+	- Made into an OO module (+ many changes) by Leon Brocard
+
+0.01 2001-11-02
+	- Created by Leo Lapworth
+

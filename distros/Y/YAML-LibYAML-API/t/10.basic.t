@@ -5,6 +5,7 @@ use Test::More;
 
 use FindBin '$Bin';
 
+use Encode;
 use YAML::LibYAML::API;
 use YAML::LibYAML::API::XS;
 use YAML::PP::Parser;
@@ -246,6 +247,16 @@ open $fh, "<", "$Bin/data/simple.yaml.out" or die $!;
 $dump_file_yaml = do { local $/; <$fh> };
 close $fh;
 cmp_ok($dump_file_yaml, 'eq', $file_yaml, "emit_filehandle_events");
+
+$ev = [];
+$yaml = "[ö]";
+YAML::LibYAML::API::parse_string_events($yaml, $ev);
+my $value = encode_utf8 $ev->[3]->{value};
+cmp_ok($value, 'eq', "ö", "utf8 parse");
+
+$ev->[3]->{value} = decode_utf8 "ä";
+$dump = YAML::LibYAML::API::emit_string_events($ev);
+cmp_ok($dump, '=~', qr{- "\\xE4"}i, "utf8 emit");
 
 done_testing;
 

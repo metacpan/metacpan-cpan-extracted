@@ -14,6 +14,15 @@ IO::Lambda::Loop::default('AnyEvent');
 sub new   { bless {} , shift }
 sub empty { scalar(@records) ? 0 : 1 }
 
+my $reentrant = 0;
+sub _yield
+{
+	return if $reentrant;
+	$reentrant++;
+	IO::Lambda::yield(1);
+	$reentrant--;
+}
+
 sub watch
 {
 	my ( $self, $rec) = @_;
@@ -32,7 +41,7 @@ sub watch
 		cb    => sub {
 			my $nr = @records;
 			@records = grep { $_ != $rec } @records;
-			return if $nr == @records;
+			goto RETURN if $nr == @records;
 
 			$nr = pop @$rec;
 			pop @$rec while $nr--;
@@ -51,6 +60,8 @@ sub watch
 			}
 			$rec-> [WATCH_OBJ]-> io_handler($rec)
 				if $rec->[WATCH_OBJ];
+		RETURN:
+			_yield;
 		}
 	);
 
@@ -62,7 +73,7 @@ sub watch
 			cb     => sub {
 				my $nr = @records;
 				@records = grep { $_ != $rec } @records;
-				return if $nr == @records;
+				goto RETURN if $nr == @records;
 
 				$nr = pop @$rec;
 				pop @$rec while $nr--;
@@ -70,6 +81,8 @@ sub watch
 				$rec-> [WATCH_IO_FLAGS] = 0;
 				$rec-> [WATCH_OBJ]-> io_handler($rec)
 					if $rec->[WATCH_OBJ];
+			RETURN:
+				_yield;
 			}
 		);
 		push @$rec, 2;
@@ -90,20 +103,32 @@ sub after
 		cb     => sub {
 			my $nr = @records;
 			@records = grep { $_ != $rec } @records;
-			return if $nr == @records;
+			goto RETURN if $nr == @records;
 
 			pop @$rec;
 			pop @$rec;
 
 			$rec-> [WATCH_OBJ]-> io_handler($rec)
 				if $rec->[WATCH_OBJ];
+		RETURN:
+			_yield;
 		},
 	), 1;
 }
 
 sub yield
 {
-	AnyEvent-> one_event;
+	my ($self, $nonblocking) = @_;
+	return if $reentrant;
+	if ( $AnyEvent::VERSION >= 6) {
+        	my $model = $AnyEvent::MODEL;
+        	{
+        	    no strict 'refs';
+        	    ($model . '::_poll')->();
+        	}
+	} else {
+		AnyEvent->one_event;
+	}
 }
 
 sub remove

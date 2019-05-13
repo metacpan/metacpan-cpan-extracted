@@ -4,7 +4,7 @@ package App::opan;
 
 use strictures 2;
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 
 use Dist::Metadata;
 use File::Open qw(fopen);
@@ -396,12 +396,6 @@ Or, to let opan do that part for you, skip starting the server and run one of:
   $ opan cpanm --installdeps .
   $ opan carton install
 
-=head1 NOTA BENE
-
-This is systems software, in its relatively early days. It may contain
-horrible bugs. It may turn out to need redesigning in not entirely compatible
-ways. I hope neither, but I can't guarantee that yet.
-
 =head1 DESCRIPTION
 
 Two basic approaches to using this thing. First, if you're using carton, you
@@ -636,6 +630,13 @@ auth tokens.
 
 Set ENV OPAN_RECURRING_PULL to a true value to make opan automatically pull
 from upstream every 600 seconds
+
+=head2 custom upstream
+
+Set the ENV var OPAN_MIRROR to specify a cpan mirror - the default is
+www.cpan.org. Remember that if you need to temporarily overlay your overlay
+but only for one user, there's nothing stopping you setting OPAN_MIRROR to
+another opan.
 
 =head1 AUTHOR
 

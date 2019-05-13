@@ -11,7 +11,7 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Manager::Conf';
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -25,9 +25,9 @@ sub addRoutes {
     my ( $self, $conf ) = @_;
     $self->ua( Lemonldap::NG::Common::UserAgent->new($conf) );
 
-    my $hiddenPK = '';
-    $hiddenPK = $self->{viewerHiddenKeys} || $conf->{viewerHiddenKeys};
-    my @enabledPK = ();
+    my $hiddenKeys = '';
+    $hiddenKeys = $self->{viewerHiddenKeys};
+    my @enabledKeys = ();
     my @keys      = qw(virtualHosts samlIDPMetaDataNodes samlSPMetaDataNodes
       applicationList oidcOPMetaDataNodes oidcRPMetaDataNodes
       casSrvMetaDataNodes casAppMetaDataNodes
@@ -37,46 +37,37 @@ sub addRoutes {
     foreach (@keys) {
 
         # Ignore hidden ConfTree Primary Keys
-        push @enabledPK, $_
-          unless ( $hiddenPK =~ /\b$_\b/ );
+        push @enabledKeys, $_
+          unless ( $hiddenKeys =~ /\b$_\b/ );
     }
 
-    # HTML template
-    $self->addRoute( 'viewer.html', undef, ['GET'] )
-
-      # READ
-      # Special keys
-      ->addRoute(
-        view => {
-            ':cfgNum' => \@enabledPK
-        },
-        ['GET']
-      );
-
-    foreach ( split /\s+/, $hiddenPK ) {
+    # Forbid hidden keys
+    foreach ( split /\s+/, $hiddenKeys ) {
         $self->addRoute(
             view => { ':cfgNum' => { $_ => 'rejectKey' } },
             ['GET']
         );
     }
 
-    # Difference between confs
-    if ( $self->{viewerAllowDiff} ) {
-        $self->addRoute(
-            view => { diff => { ':conf1' => { ':conf2' => 'viewDiff' } } } )
-          ->addRoute( 'viewDiff.html', undef, ['GET'] );
-    }
-    unless ( $self->{viewerAllowBrowser} ) {
-        $self->addRoute(
-            view => { ':cfgNum' => 'rejectKey' },
-            ['GET']
-        );
-    }
+    # HTML templates
+    $self->addRoute( 'viewer.html', undef, ['GET'] )
+      ->addRoute( 'viewDiff.html', undef, ['GET'] )
 
-    # Other keys
-    else {
-        $self->addRoute( view => { ':cfgNum' => { '*' => 'getKey' } }, ['GET'] );
-    }
+      # READ
+      # Special keys
+      ->addRoute(
+        view => {
+            ':cfgNum' => \@enabledKeys
+        },
+        ['GET']
+      )
+
+      # Difference between confs
+      ->addRoute(
+        view => { diff => { ':conf1' => { ':conf2' => 'viewDiff' } } } )
+
+      # Other keys
+      ->addRoute( view => { ':cfgNum' => { '*' => 'viewKey' } }, ['GET'] );
 }
 
 sub getConfByNum {
@@ -86,6 +77,14 @@ sub getConfByNum {
 
 sub viewDiff {
     my ( $self, $req, @path ) = @_;
+
+    # Check Diff activation rule
+    unless ( $self->diffRule->( $req, $req->{userData} ) ) {
+        my $user = $req->{userData}->{_whatToTrace} || 'anonymous';
+        $self->userLogger->warn("$user tried to compare configurations!!!");
+        return $self->sendJSONresponse( $req, { 'value' => '_Hidden_' } );
+    }
+
     return $self->sendError( $req, 'to many arguments in path info', 400 )
       if (@path);
     my @cfgNum =
@@ -124,8 +123,32 @@ sub viewDiff {
 }
 
 sub rejectKey {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, @args ) = @_;
     return $self->sendJSONresponse( $req, { 'value' => '_Hidden_' } );
+}
+
+sub viewKey {
+    my ( $self, $req, @args ) = @_;
+    $self->logger->debug("Viewer requested URI -> $req->{env}->{REQUEST_URI}");
+
+    # Check Browser activation rule
+    if ( $self->brwRule->( $req, $req->{userData} ) ) {
+        $self->logger->debug(" No restriction");
+        $self->SUPER::getKey( $req, @args );
+    }
+    else {
+        if ( $req->{env}->{REQUEST_URI} =~ m%/view/(?:latest|\d+/\w+)$% ) {
+            $self->logger->debug(" $req->{env}->{REQUEST_URI} -> URI allowed");
+            $self->SUPER::getKey( $req, @args );
+        }
+        else {
+            $self->logger->debug(
+                " $req->{env}->{REQUEST_URI} -> URI FORBIDDEN");
+            my $user = $req->{userData}->{_whatToTrace} || 'anonymous';
+            $self->userLogger->warn("$user tried to browse configurations!!!");
+            $self->rejectKey( $req, @args );
+        }
+    }
 }
 
 1;

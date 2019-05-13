@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OIDC_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect',
@@ -150,7 +150,7 @@ sub run {
             foreach my $param (
                 qw/response_type scope client_id state redirect_uri nonce
                 response_mode display prompt max_age ui_locales id_token_hint
-                login_hint acr_values request request_uri/
+                login_hint acr_values request request_uri code_challenge code_challenge_method/
               )
             {
                 if ( $req->param($param) ) {
@@ -574,6 +574,24 @@ sub run {
             my $session_state =
               $self->createSessionState( $req->id, $client_id );
 
+            # Check if PKCE is required
+            if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                ->{oidcRPMetaDataOptionsRequirePKCE}
+                and !$oidc_request->{'code_challenge'} )
+            {
+                $self->userLogger->error(
+                    "Relying Party must use PKCE protection");
+                return $self->returnRedirectError(
+                    $req,
+                    $oidc_request->{'redirect_uri'},
+                    'invalid_request',
+                    "Code challenge is required",
+                    undef,
+                    $oidc_request->{'state'},
+                    ( $flow ne "authorizationcode" )
+                );
+            }
+
             # Authorization Code Flow
             if ( $flow eq "authorizationcode" ) {
 
@@ -586,6 +604,9 @@ sub run {
                         user_session_id => $req->id,
                         _utime          => time,
                         nonce           => $oidc_request->{'nonce'},
+                        code_challenge  => $oidc_request->{'code_challenge'},
+                        code_challenge_method =>
+                          $oidc_request->{'code_challenge_method'},
                     }
                 );
 
@@ -944,7 +965,7 @@ sub token {
     my ( $client_id, $client_secret ) =
       $self->getEndPointAuthenticationCredentials($req);
 
-    unless ( $client_id && $client_secret ) {
+    unless ($client_id) {
         $self->logger->error(
 "No authentication provided to get token, or authentication type not supported"
         );
@@ -964,11 +985,25 @@ sub token {
     }
 
     # Check client_secret
-    unless ( $client_secret eq $self->conf->{oidcRPMetaDataOptions}->{$rp}
-        ->{oidcRPMetaDataOptionsClientSecret} )
+    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+        ->{oidcRPMetaDataOptionsPublic} )
     {
-        $self->logger->error("Wrong credentials for $rp");
-        return $self->p->sendError( 'invalid_request', 400 );
+        $self->logger->debug(
+            "Relying Party $rp is public, do not check client secret");
+    }
+    else {
+        unless ($client_secret) {
+            $self->logger->error(
+"Relying Party $rp is confidential but no client secret was provided to authenticate on token endpoint"
+            );
+            return $self->p->sendError( 'invalid_request', 400 );
+        }
+        unless ( $client_secret eq $self->conf->{oidcRPMetaDataOptions}->{$rp}
+            ->{oidcRPMetaDataOptionsClientSecret} )
+        {
+            $self->logger->error("Wrong credentials for $rp");
+            return $self->p->sendError( 'invalid_request', 400 );
+        }
     }
 
     # Get code session
@@ -983,11 +1018,27 @@ sub token {
         return $self->p->sendError( $req, 'invalid_request', 400 );
     }
 
+    # Check PKCE
+    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+        ->{oidcRPMetaDataOptionsRequirePKCE} )
+    {
+        unless (
+            $self->validatePKCEChallenge(
+                $req->param('code_verifier'),
+                $codeSession->data->{'code_challenge'},
+                $codeSession->data->{'code_challenge_method'}
+            )
+          )
+        {
+            return $self->p->sendError( $req, 'invalid_grant', 400 );
+        }
+    }
+
     # Check we have the same redirect_uri value
     unless ( $req->param("redirect_uri") eq $codeSession->data->{redirect_uri} )
     {
         $self->userLogger->error( "Provided redirect_uri does not match "
-              . $codeSession->{redirect_uri} );
+              . $codeSession->data->{redirect_uri} );
         return $self->p->sendError( $req, 'invalid_request', 400 );
     }
 
@@ -1454,10 +1505,13 @@ sub metadata {
               [qw/none HS256 HS384 HS512 RS256 RS384 RS512/],
             userinfo_signing_alg_values_supported =>
               [qw/none HS256 HS384 HS512 RS256 RS384 RS512/],
+
+            # PKCE
+            code_challenge_methods_supported => [qw/plain S256/],
         }
     );
 
-    # response_modes_supported}
+    # response_modes_supported
 
     # id_token_encryption_alg_values_supported
     # id_token_encryption_enc_values_supported

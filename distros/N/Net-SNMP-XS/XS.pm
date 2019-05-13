@@ -6,7 +6,7 @@ Net::SNMP::XS - speed up Net::SNMP by decoding in XS, with limitations
 
  use Net::SNMP::XS;
 
- # loading it is enough, there are no public symbols
+ # loading it is enough to speed up Net::SNMP
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,8 @@ package Net::SNMP::XS;
 
 use common::sense;
 
+use Exporter qw(import);
+
 use Net::SNMP ();
 use Net::SNMP::PDU ();
 use Net::SNMP::Message ();
@@ -53,7 +55,7 @@ use Net::SNMP::MessageProcessing ();
 our $VERSION;
 
 BEGIN {
-   $VERSION = 1.33;
+   $VERSION = 1.34;
 
    # this overrides many methods inside Net::SNMP and it's submodules
    require XSLoader;

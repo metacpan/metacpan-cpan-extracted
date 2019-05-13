@@ -27,8 +27,8 @@ my %TRANSFER;  # set in _handshake
 
 my $client = _minSSL->new();
 my $server = _minSSL->new( cert => [
-    File::Spec->catfile('t','data','cert.pem'),
-    File::Spec->catfile('t','data','key.pem')
+    File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem'),
+    File::Spec->catfile('t', 'data', 'testcert_key_2048.pem')
 ]);
 
 
@@ -39,8 +39,27 @@ is( _handshake($client,$server), 'full', "another full handshake");
 
 # explicitly reuse session in client to check that server accepts it
 # ----------------------------------------------
-my $sess = Net::SSLeay::get1_session($client->_ssl);
-my $reuse = sub { Net::SSLeay::set_session($client->_ssl,$sess) };
+
+my ($save_session,$reuse);
+if (0) {
+    # simple version - get via get1_session and apply via set_session
+    my $saved;
+    $save_session = sub { $saved = Net::SSLeay::get1_session($client->_ssl) };
+    $reuse = sub { Net::SSLeay::set_session($client->_ssl, $saved) };
+} else {
+    # don't store the session directly but only a serialized version
+    my $saved;
+    $save_session = sub {
+	$saved = Net::SSLeay::i2d_SSL_SESSION(
+	    Net::SSLeay::get_session($client->_ssl));
+    };
+    $reuse = sub {
+	Net::SSLeay::set_session($client->_ssl,
+	    Net::SSLeay::d2i_SSL_SESSION($saved));
+    };
+}
+
+&$save_session;
 is( _handshake($client,$server,$reuse),'reuse',"handshake with reuse");
 is( _handshake($client,$server,$reuse),'reuse',"handshake again with reuse");
 
@@ -48,8 +67,8 @@ is( _handshake($client,$server,$reuse),'reuse',"handshake again with reuse");
 # should not be reused
 # ----------------------------------------------
 my $server2 = _minSSL->new( cert => [
-    File::Spec->catfile('t','data','cert.pem'),
-    File::Spec->catfile('t','data','key.pem')
+    File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem'),
+    File::Spec->catfile('t', 'data', 'testcert_key_2048.pem')
 ]);
 is( _handshake($client,$server2,$reuse),'full',"handshake with server2 is full");
 
@@ -65,7 +84,8 @@ my $keycb = sub {
 Net::SSLeay::CTX_set_tlsext_ticket_getkey_cb($server->_ctx, $keycb,$key);
 Net::SSLeay::CTX_set_tlsext_ticket_getkey_cb($server2->_ctx,$keycb,$key);
 is( _handshake($client,$server),'full',"initial full handshake with server1");
-$sess = Net::SSLeay::get1_session($client->_ssl);
+
+&$save_session;
 is( _handshake($client,$server,$reuse), 'reuse',"reuse session with server1");
 is( _handshake($client,$server2,$reuse),'reuse',"reuse session with server2");
 
@@ -113,7 +133,7 @@ ok( $TRANSFER{server} > $old_transfer{server}, 'but more data from server (new t
 # finally try to reuse the session created with new key against server1
 # this should result in a full handshake since server1 does not know newkey
 # ----------------------------------------------
-$sess = Net::SSLeay::get1_session($client->_ssl);
+&$save_session;
 is( _handshake($client,$server,$reuse),'full',"full handshake with new ticker on server1");
 
 
@@ -240,6 +260,7 @@ sub _handshake {
     sub _reset {
 	my $self = shift;
 	my $ssl = Net::SSLeay::new($self->{ctx});
+	Net::SSLeay::set_security_level($ssl, 1) if exists &Net::SSLeay::set_security_level;
 	my @bio = (
 	    Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem()),
 	    Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem()),

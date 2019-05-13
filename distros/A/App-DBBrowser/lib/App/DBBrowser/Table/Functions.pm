@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw( choose );
+use Term::Choose       qw();
 use Term::Choose::Util qw( choose_a_number choose_a_subset );
 use Term::Form         qw();
 
@@ -25,6 +25,7 @@ sub new {
 
 sub col_function {
     my ( $sf, $sql, $clause ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $changed = 0;
     my $cols;
     if ( $clause eq 'select' && ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) ) {
@@ -48,9 +49,9 @@ sub col_function {
 
     SCALAR_FUNC: while ( 1 ) {
         # Choose
-        my $function = choose(
+        my $function = $tc->choose(
             [ undef, map( "  $_", @functions_sorted ) ],
-            { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Function:', undef => '  <=' } # <= BACK
+            { %{$sf->{i}{lyt_v}}, prompt => 'Function:', undef => '  <=' } # <= BACK
         );
         if ( ! defined $function ) {
             return;
@@ -71,19 +72,23 @@ sub col_function {
 
 sub __choose_columns {
     my ( $sf, $sql, $function, $arg_count, $cols ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     if ( ! $arg_count ) {
         return;
     }
     elsif ( $arg_count == 1 ) {
         # Choose
-        return choose( [ undef, @$cols ], { %{$sf->{i}{lyt_stmt_h}}, prompt => $function . ': ', undef => '<<' } );
+        return $tc->choose(
+            [ undef, @$cols ],
+            { %{$sf->{i}{lyt_h}}, prompt => $function . ': ' }
+        );
     }
     else {
         # Choose
         return choose_a_subset(
             $cols,
-            { layout => 1, name => $function . ': ', sofar_separator => ',',
-              mouse => $sf->{o}{table}{mouse}, keep_chosen => 1 }
+            { name => $function . ': ', layout => 1, sofar_separator => ',', mouse => $sf->{o}{table}{mouse},
+              keep_chosen => 1 }
         );
     }
 }
@@ -92,6 +97,7 @@ sub __choose_columns {
 sub __prepare_col_func {
     my ( $sf, $func, $qt_col ) = @_; # $qt_col -> $arg
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $quote_f;
     if ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
         my $prompt = $func eq 'Epoch_to_Date' ? 'DATE' : 'DATETIME';
@@ -102,9 +108,9 @@ sub __prepare_col_func {
             '  **********               Second' );
         my $choices = [ undef, $microseconds, $milliseconds, $seconds ];
         # Choose
-        my $interval = choose(
+        my $interval = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, prompt => $prompt }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt }
         );
         return if ! defined $interval;
         my $div = $interval eq $microseconds ? 1000000 :
@@ -120,7 +126,7 @@ sub __prepare_col_func {
         my $info = $func . ': ' . $qt_col;
         my $name = "Decimal places: ";
         my $precision = choose_a_number( 2,
-            { info => $info, name => $name, small_first => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
+            { name => $name, info => $info, small_first => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
         );
         return if ! defined $precision;
         $quote_f = $plui->truncate( $qt_col, $precision );
@@ -133,8 +139,10 @@ sub __prepare_col_func {
     }
     elsif ( $func eq 'Concat' ) {
         my $info = "\n" . 'Concat( ' . join( ',', @$qt_col ) . ' )';
-        my $trs = Term::Form->new();
-        my $sep = $trs->readline( 'Separator: ', { info => $info } );
+        my $tf = Term::Form->new();
+        my $sep = $tf->readline( 'Separator: ',
+            { info => $info }
+        );
         return if ! defined $sep;
         $quote_f = $plui->concatenate( $qt_col, $sep );
     }

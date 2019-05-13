@@ -28,12 +28,12 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::InDistDir" => 0,
     "Test::More" => 0,
+    "if" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.190320",
+  "VERSION" => "1.191300",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,8 +49,8 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Moo::Role" => 0,
   "MooX::ShortHas" => 0,
-  "Test::InDistDir" => 0,
   "Test::More" => 0,
+  "if" => 0,
   "strict" => 0,
   "strictures" => 2,
   "warnings" => 0

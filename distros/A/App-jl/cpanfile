@@ -5,7 +5,7 @@ requires 'strict';
 requires 'warnings';
 requires 'JSON';
 requires 'Sub::Data::Recursive';
-requires 'Getopt::Long';
+requires 'Getopt::Long', '2.42';
 requires 'Pod::Usage';
 
 on 'test' => sub {

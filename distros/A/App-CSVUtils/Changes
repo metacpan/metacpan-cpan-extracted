@@ -1,3 +1,8 @@
+0.021   2019-05-12 (PERLANCAR)
+
+	- Add scripts: csv2tsv, tsv2csv.
+
+
 0.020   2019-04-29 (PERLANCAR)
 
         - Add utilities: csv-setop, csv-sort-rows (with alias csv-sort),

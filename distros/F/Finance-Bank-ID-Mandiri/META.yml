@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Bank-ID-Mandiri
   homepage: https://metacpan.org/release/Finance-Bank-ID-Mandiri
   repository: git://github.com/perlancar/perl-Finance-Bank-ID-Mandiri.git
-version: '0.381'
+version: '0.382'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -271,7 +271,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

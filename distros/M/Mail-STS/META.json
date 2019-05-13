@@ -65,27 +65,27 @@
    "provides" : {
       "Mail::STS" : {
          "file" : "lib/Mail/STS.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Mail::STS::Domain" : {
          "file" : "lib/Mail/STS/Domain.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Mail::STS::Policy" : {
          "file" : "lib/Mail/STS/Policy.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Mail::STS::SSKV" : {
          "file" : "lib/Mail/STS/SSKV.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Mail::STS::STSRecord" : {
          "file" : "lib/Mail/STS/STSRecord.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Mail::STS::TLSRPTRecord" : {
          "file" : "lib/Mail/STS/TLSRPTRecord.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -100,7 +100,7 @@
          "web" : "https://github.com/benningm/perl-Mail-STS.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }

@@ -38,7 +38,7 @@ DESCRIPTION
     "DBIx::Class::DeploymentHandler" is, as its name suggests, a tool for
     deploying and upgrading databases with DBIx::Class. It is designed to be
     much more flexible than DBIx::Class::Schema::Versioned, hence the use of
-    Moo and lots of roles.
+    Moose and lots of roles.
 
     "DBIx::Class::DeploymentHandler" itself is just a recommended set of
     roles that we think will not only work well for everyone, but will also
@@ -178,7 +178,7 @@ DONATIONS
 METHODS
     This is just a "stub" section to make clear that the bulk of
     implementation is documented in DBIx::Class::DeploymentHandler::Dad.
-    Since that is implemented using Moo class, see "ATTRIBUTES" in
+    Since that is implemented using Moose class, see "ATTRIBUTES" in
     DBIx::Class::DeploymentHandler::Dad and "ORTHODOX METHODS" in
     DBIx::Class::DeploymentHandler::Dad for available attributes to pass to
     "new", and methods callable on the resulting object.

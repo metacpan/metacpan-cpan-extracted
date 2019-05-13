@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.141'; # VERSION
+our $DATE = '2019-05-10'; # DATE
+our $VERSION = '0.142'; # VERSION
 
 use 5.010;
 use strict;
@@ -37,7 +37,7 @@ parse-bprks-statement - Parse BPR KS internet banking statement
 
 =head1 VERSION
 
-This document describes version 0.141 of parse-bprks-statement (from Perl distribution App-IndonesianBankingUtils), released on 2019-02-24.
+This document describes version 0.142 of parse-bprks-statement (from Perl distribution App-IndonesianBankingUtils), released on 2019-05-10.
 
 =head1 SYNOPSIS
 

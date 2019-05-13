@@ -57,6 +57,8 @@ sub cmd_stop {
         } );
     $stop_self->_current_command('cmd_stop');
     $stop_self->_previous_task($task);
+    # Store in original self too (for plugin usage)
+    $self->_previous_task($task);
 
     $task->stop( $stop_self->at || now() );
     if ( $task->stop < $task->start ) {
@@ -637,7 +639,7 @@ App::TimeTracker::Command::Core - App::TimeTracker Core commands
 
 =head1 VERSION
 
-version 2.027
+version 2.028
 
 =head1 CORE COMMANDS
 

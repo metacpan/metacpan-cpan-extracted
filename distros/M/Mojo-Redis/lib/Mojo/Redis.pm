@@ -9,7 +9,7 @@ use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
 use Scalar::Util 'blessed';
 
-our $VERSION = '3.23';
+our $VERSION = '3.24';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 

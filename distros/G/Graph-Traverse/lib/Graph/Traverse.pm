@@ -1,4 +1,4 @@
-package Graph::Traverse 0.03 {
+package Graph::Traverse 0.04 {
 
     use warnings;
     use strict;

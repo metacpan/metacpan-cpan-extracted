@@ -7,7 +7,7 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw( choose );
+use Term::Choose qw();
 use Term::Form   qw();
 
 use App::DBBrowser::Auxil;
@@ -26,6 +26,7 @@ sub new {
 sub attach_db {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $cur_attached;
     if ( -s $sf->{i}{f_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
@@ -44,9 +45,9 @@ sub attach_db {
             push @tmp_info, '';
             my $info = join( "\n", @tmp_info );
             my $prompt = "ATTACH DATABASE"; # \n
-            my $db = choose(
+            my $db = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_v_clear}}, info => $info, prompt => $prompt, undef => $sf->{i}{back} }
+                { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, info => $info, undef => $sf->{i}{back} }
             );
             if ( ! defined $db ) {
                 if ( @$new_attached ) {
@@ -55,20 +56,22 @@ sub attach_db {
                 }
                 return;
             }
-            my $tfr = Term::Form->new();
+            my $tf = Term::Form->new();
             push @tmp_info, "ATTACH DATABASE $db AS";
             $info = join( "\n", @tmp_info );
 
             ALIAS: while ( 1 ) {
-                my $alias = $tfr->readline( 'alias: ', { clear_screen => 1, info => $info } );
+                my $alias = $tf->readline( 'alias: ',
+                    { info => $info, clear_screen => 1 }
+                );
                 if ( ! length $alias ) {
                     last ALIAS;
                 }
                 elsif ( any { $_->[1] eq $alias } @$cur_attached, @$new_attached ) {
                     my $prompt = "alias '$alias' already used:";
-                    my $retry = choose(
+                    my $retry = $tc->choose(
                         [ undef, 'New alias' ],
-                        { %{$sf->{i}{lyt_m}}, prompt => $prompt, info => $info, undef => 'Back', clear_screen => 1 }
+                        { prompt => $prompt, info => $info, undef => $sf->{i}{back}, clear_screen => 1 }
                     );
                     last ALIAS if ! defined $retry;
                     next ALIAS;
@@ -84,11 +87,10 @@ sub attach_db {
                 push @tmp_info, map { "ATTACH DATABASE $_->[0] AS $_->[1]" } @$cur_attached, @$new_attached;
                 push @tmp_info, '';
                 my $info = join( "\n", @tmp_info );
-                my $prompt = 'Choose:';
                 my ( $ok, $more ) = ( 'OK', '++' );
-                my $choice = choose(
+                my $choice = $tc->choose(
                     [ undef, $ok, $more ],
-                    { %{$sf->{i}{lyt_m}}, prompt => $prompt, info => $info, undef => '<<', clear_screen => 1 }
+                    { info => $info, clear_screen => 1 }
                 );
                 if ( ! defined $choice ) {
                     if ( @$new_attached > 1 ) {
@@ -118,6 +120,7 @@ sub attach_db {
 sub detach_db {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $attached_db;
     if ( -s $sf->{i}{f_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
@@ -139,9 +142,9 @@ sub detach_db {
         my $prompt = "\n" . 'Choose:';
         my @pre = ( undef, $sf->{i}{_confirm} );
         # Choose
-        my $idx = choose(
+        my $idx = $tc->choose(
             [ @pre, @choices ],
-            { %{$sf->{i}{lyt_v_clear}}, info => $info, index => 1, prompt => $prompt }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, info => $info, index => 1 }
         );
         if ( ! $idx ) {
             return;

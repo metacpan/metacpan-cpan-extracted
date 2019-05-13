@@ -4,30 +4,29 @@ use warnings;
 
 use File::Spec;
 use File::Which ();
-use HTTP::Tinyish;
 use Perl6::Build::Builder;
+use Perl6::Build::Helper;
 
-our $URL = 'https://rakudo.perl6.org/downloads/star/';
-
-sub _http {
-    my $class = shift;
-    for my $try (map "HTTP::Tinyish::$_", qw(Curl Wget HTTPTiny LWP)) {
-        HTTP::Tinyish->configure_backend($try) or next;
-        $try->supports("https") or next;
-        return $try->new(agent => 'perl6-build', verify_SSL => 1);
-    }
-    die "No http clients are available";
-}
+our $URL = [
+    'https://rakudo.perl6.org/downloads/star/',
+    'https://rakudostar.com/files/star/',
+];
 
 sub available {
     my $class = shift;
-    my $res = $class->_http->get($URL);
-    if (!$res->{success}) {
-        my $msg = $res->{status} == 599 ? "\n$res->{content}" : "";
-        die "$res->{status} $res->{reason}, $URL$msg\n"
+    my @err;
+    for my $url (@$URL) {
+        my $res = Perl6::Build::Helper->HTTP(timeout => 10)->get($url);
+        if (!$res->{success}) {
+            my $msg = $res->{status} == 599 ? "\n$res->{content}" : "";
+            chomp $msg;
+            push @err, "$res->{status} $res->{reason}, $url$msg\n";
+            next;
+        }
+        my %available = map { $_ => 1 } $res->{content} =~ m{href="(rakudo-star-\d+\.\d+)\.tar\.gz"}g;
+        return reverse sort keys %available;
     }
-    my %available = map { $_ => 1 } $res->{content} =~ m{href="(rakudo-star-\d+\.\d+)\.tar\.gz"}g;
-    reverse sort keys %available;
+    die join "", @err;
 }
 
 sub new {
@@ -50,17 +49,26 @@ sub fetch {
 
 sub _fetch {
     my ($self, $version, $file) = @_;
-    my $url = "$URL$version.tar.gz";
-    warn "Fetching $url\n";
-    my $temp = join ".", $file, time, $$;
-    my $res = $self->_http->mirror($url => $temp);
-    if (!$res->{success}) {
-        unlink $temp;
-        my $msg = $res->{status} == 599 ? "\n$res->{content}" : "";
-        die "$res->{status} $res->{reason}, $url$msg\n";
+
+    my @err;
+    for my $url (map { "$_$version.tar.gz" } @$URL) {
+        warn "Fetching $url...\n";
+        my $temp = join ".", $file, int rand 10000, $$;
+        my $res = Perl6::Build::Helper->HTTP(timeout => 120)->mirror($url => $temp);
+        warn "$res->{status} $res->{reason}\n";
+        if (!$res->{success}) {
+            unlink $temp;
+            if ($res->{status} == 599) {
+                my $msg = $res->{content};
+                chomp $msg;
+                warn "$_\n" for split /\n/, $msg;
+            }
+            next;
+        }
+        rename $temp, $file;
+        return $file;
     }
-    rename $temp, $file;
-    $file;
+    die "Failed to get $version\n";
 }
 
 sub _unpack {

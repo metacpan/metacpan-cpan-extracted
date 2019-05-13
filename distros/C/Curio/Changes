@@ -1,0 +1,20 @@
+Revision history for Perl extension Curio.
+
+0.02 2019-05-10T06:50:59Z
+
+ - Support custom Curio class roles.
+ - Add the default_arguments feature.
+ - Quite a few typo fixes, rewordings, and reorganizations of the
+   main Curio documentation.
+ - When a Curio class is initialized a new fetch() method is now
+   generated and installed in the Curio class.  This new fetch() is
+   faster as it holds a closure to the factory object instead of
+   looking it up every time.
+ - Suggest a couple optional, but missing, test dependencies for
+   permutations.t to run.
+ - Switch to the GNU General Public License version 3.
+
+0.01 2019-05-09T00:42:15Z
+
+ - First release.
+

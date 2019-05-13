@@ -23,7 +23,7 @@ nona-mask
 pafextract
 panostart
 process-masks
-pto2mk2
+pto2mk
 ptoanchor
 ptobind
 ptocentre

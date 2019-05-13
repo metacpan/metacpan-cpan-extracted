@@ -6,18 +6,39 @@
 
 //#define BENCHMARK
 
-#define ASN_BOOLEAN           0x01
-#define ASN_INTEGER32         0x02
-#define ASN_OCTET_STRING      0x04
-#define ASN_NULL              0x05
-#define ASN_OBJECT_IDENTIFIER 0x06
-#define ASN_SEQUENCE          0x30
-#define ASN_IPADDRESS         0x40
-#define ASN_COUNTER32         0x41
-#define ASN_UNSIGNED32        0x42
-#define ASN_TIMETICKS         0x43
-#define ASN_OPAQUE            0x44
-#define ASN_COUNTER64         0x46
+enum {
+  // ASN_TAG
+  ASN_BOOLEAN           = 0x01,
+  ASN_INTEGER32         = 0x02,
+  ASN_BIT_STRING        = 0x03,
+  ASN_OCTET_STRING      = 0x04,
+  ASN_NULL              = 0x05,
+  ASN_OBJECT_IDENTIFIER = 0x06,
+  ASN_SEQUENCE          = 0x10,
+
+  ASN_TAG_BER           = 0x1f,
+  ASN_TAG_MASK          = 0x1f,
+
+  // primitive/constructed
+  ASN_CONSTRUCTED       = 0x20,
+
+  // ASN_CLASS
+  ASN_UNIVERSAL         = 0x00,
+  ASN_APPLICATION       = 0x40,
+  ASN_CONTEXT           = 0x80,
+  ASN_PRIVATE           = 0xc0,
+
+  ASN_CLASS_MASK        = 0xc0,
+  ASN_CLASS_SHIFT       = 6,
+
+  // ASN_APPLICATION
+  ASN_IPADDRESS         = 0x00,
+  ASN_COUNTER32         = 0x01,
+  ASN_UNSIGNED32        = 0x02,
+  ASN_TIMETICKS         = 0x03,
+  ASN_OPAQUE            = 0x04,
+  ASN_COUNTER64         = 0x06,
+};
 
 #define MAX_OID_STRLEN 4096
 
@@ -269,13 +290,13 @@ process_integer64 (void)
   if (!data)
     return 0;
 
-  if (length > 9 || (length > 8 && data [0]))
+  if (length > 8 + !data [0])
     {
       error ("INTEGER64 length too long");
       return 0;
     }
 
-  U64TYPE res = data [0] & 0x80 ? 0xffffffffffffffff : 0;
+  U64TYPE res = data [0] & 0x80 ? -1 : 0;
 
   while (length--)
     res = (res << 8) | *data++;
@@ -315,11 +336,31 @@ process_octet_string_sv (void)
 static char *
 write_uv (char *buf, U32 u)
 {
-  // the one-digit case is absolutely predominant
+  // the one-digit case is absolutely predominant, so this pays off (hopefully)
   if (u < 10)
     *buf++ = u + '0';
   else
-    buf += sprintf (buf, "%u", (unsigned int)u);
+    {
+      // this *could* be done much faster using branchless fixed-point arithmetics
+      char *beg = buf;
+
+      do
+        {
+          *buf++ = u % 10 + '0';
+          u /= 10;
+        }
+      while (u);
+
+      // reverse digits
+      char *ptr = buf;
+      while (--ptr > beg)
+        {
+          char c = *ptr;
+          *ptr = *beg;
+          *beg = c;
+          ++beg;
+        }
+    }
 
   return buf;
 }
@@ -345,9 +386,19 @@ process_object_identifier_sv (void)
     leading_dot = SvTRUE (*hv_fetch ((HV *)SvRV (msg), "_leading_dot", sizeof ("_leading_dot") - 1, 1));
 
   *app = '.'; app += ! ! leading_dot;
-  app = write_uv (app, (U8)w / 40);
-  *app++ = '.';
-  app = write_uv (app, (U8)w % 40);
+
+  {
+    UV w1, w2;
+    
+    if (w < 2 * 40)
+      (w1 = w / 40), (w2 = w % 40);
+    else
+      (w1 =      2), (w2 = w - 2 * 40);
+    
+    app = write_uv (app, w1);
+    *app++ = '.';
+    app = write_uv (app, w2);
+  }
 
   // we assume an oid component is never > 64 bytes
   while (cur < end && oid + sizeof (oid) - app > 64)
@@ -381,18 +432,18 @@ process_sv (int *found)
         res = process_integer32_sv ();
         break;
 
-      case ASN_UNSIGNED32:
-      case ASN_COUNTER32:
-      case ASN_TIMETICKS:
+      case ASN_APPLICATION | ASN_UNSIGNED32:
+      case ASN_APPLICATION | ASN_COUNTER32:
+      case ASN_APPLICATION | ASN_TIMETICKS:
         res = process_unsigned32_sv ();
         break;
 
-      case ASN_SEQUENCE:
+      case ASN_SEQUENCE | ASN_CONSTRUCTED:
         res = newSVuv (process_length ());
         break;
 
       case ASN_OCTET_STRING:
-      case ASN_OPAQUE:
+      case ASN_APPLICATION | ASN_OPAQUE:
         res = process_octet_string_sv ();
         break;
 
@@ -517,8 +568,7 @@ index (BUFOBJ self, int ndx = -1)
 
         RETVAL = cur - buf;
 }
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 U32
 _process_length (BUFOBJ self, ...)
@@ -526,15 +576,13 @@ _process_length (BUFOBJ self, ...)
         _process_sequence = 0
 	CODE:
         RETVAL = process_length ();
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 SV *
 _process_integer32 (BUFOBJ self, ...)
 	CODE:
         RETVAL = process_integer32_sv ();
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 SV *
 _process_counter (BUFOBJ self, ...)
@@ -543,8 +591,7 @@ _process_counter (BUFOBJ self, ...)
         _process_timeticks = 0
 	CODE:
         RETVAL = process_unsigned32_sv ();
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 #if IVSIZE >= 8
 
@@ -552,8 +599,7 @@ SV *
 _process_counter64 (BUFOBJ self, ...)
 	CODE:
         RETVAL = process_unsigned64_sv ();
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 #endif
 
@@ -561,8 +607,7 @@ SV *
 _process_object_identifier (BUFOBJ self, ...)
 	CODE:
         RETVAL = process_object_identifier_sv ();
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 SV *
 _process_octet_string (BUFOBJ self, ...)
@@ -570,8 +615,7 @@ _process_octet_string (BUFOBJ self, ...)
         _process_opaque = 0
 	CODE:
         RETVAL = process_octet_string_sv ();
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 SV *
 _process_ipaddress (BUFOBJ self, ...)
@@ -587,8 +631,7 @@ _process_ipaddress (BUFOBJ self, ...)
         U8 *data = getn (4, "\x00\x00\x00\x00");
         RETVAL = newSVpvf ("%d.%d.%d.%d", data [0], data [1], data [2], data [3]);
 }
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 SV *
 process (BUFOBJ self, SV *expected = &PL_sv_undef, SV *found = 0)
@@ -604,8 +647,7 @@ process (BUFOBJ self, SV *expected = &PL_sv_undef, SV *found = 0)
         if (SvOK (expected) && type != SvIV (expected))
           error ("Expected a different type than found");
 }
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 MODULE = Net::SNMP::XS		PACKAGE = Net::SNMP::PDU
 
@@ -613,8 +655,9 @@ SV *
 _process_var_bind_list (BUFOBJ self)
         CODE:
 {
-        if (get8 () != ASN_SEQUENCE)
+        if (get8 () != (ASN_SEQUENCE | ASN_CONSTRUCTED))
           error ("SEQUENCE expected at beginning of VarBindList");
+
         int seqlen = process_length ();
         U8 *end = cur + seqlen;
 
@@ -629,7 +672,7 @@ _process_var_bind_list (BUFOBJ self)
         while (cur < end && !errflag)
           {
             // SEQUENCE ObjectName ObjectSyntax
-            if (get8 () != ASN_SEQUENCE)
+            if (get8 () != (ASN_SEQUENCE | ASN_CONSTRUCTED))
               error ("SEQUENCE expected at beginning of VarBind");
             process_length ();
 
@@ -659,8 +702,7 @@ _process_var_bind_list (BUFOBJ self)
         
         RETVAL = newRV_inc ((SV *)list);
 }
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 MODULE = Net::SNMP::XS		PACKAGE = Net::SNMP
 
@@ -723,8 +765,7 @@ _index_cmp (const char *a, const char *b)
 	PROTOTYPE: $$
         CODE:
         RETVAL = strverscmp (a, b);
-        OUTPUT:
-        RETVAL
+        OUTPUT: RETVAL
 
 #endif
 

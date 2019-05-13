@@ -67,6 +67,26 @@ NAME
     This is the internal store that tracks the current state of the list.
     It's intended for internal use only.
 
+   current_and_next / curr_and_next
+
+    Convenience method to return current value then proceed next. Same
+    interface as next.
+
+   current_and_previous / curr_and_prev
+
+    Convenience method to return current value then proceed previous. Same
+    interface as previous.
+
+   peek
+
+    Peek n forward (defaults to 1). Take care if you're reliant on
+    calculating the number of loops as part of this. This Returns the entry
+    for each without updating the value of loops.
+
+   size
+
+    Returns the number of elements in the list.
+
  GOTCHAS
 
     Some array modification operations are supported. For example splice,

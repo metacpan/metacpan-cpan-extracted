@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.190900';
+$Bio::MUST::Core::SeqId::VERSION = '0.191300';
 use Moose;
 use namespace::autoclean;
 
@@ -199,8 +199,8 @@ const my @GENERA  => qw(
     4-nitrophenol
     A-2
     Activation-tagging
-    Adeno-associated
     Adeno-Associated
+    Adeno-associated
     Aids-associated
     alk-system
     Altai-like
@@ -356,8 +356,8 @@ const my @GENERA  => qw(
     Cysteine-free
     Cytophaga-like
     DCM-degrading
-    Deep-sea
     deep-sea
+    Deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Dendro-hypnum
@@ -603,8 +603,8 @@ const my @GENERA  => qw(
     PCB-dechlorinating
     Pechuel-loeschea
     Peptococcus-like
-    perchlorate-reducing
     Perchlorate-reducing
+    perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     Pfiesteria-like
@@ -6184,7 +6184,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.190900
+version 0.191300
 
 =head1 SYNOPSIS
 

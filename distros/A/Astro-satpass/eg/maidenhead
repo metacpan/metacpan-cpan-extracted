@@ -10,7 +10,7 @@ use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg };
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 my %opt = (
     precision	=> $Astro::Coord::ECI::DEFAULT_MAIDENHEAD_PRECISION,

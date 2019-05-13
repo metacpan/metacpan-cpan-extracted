@@ -1,6 +1,6 @@
 BEGIN {is(${^TAINT}, 1, '3: taint_is_on');};
 
-use Inline C;
+use Inline 'C';
 use Inline C => 'DATA';
 
 Inline->init() ;

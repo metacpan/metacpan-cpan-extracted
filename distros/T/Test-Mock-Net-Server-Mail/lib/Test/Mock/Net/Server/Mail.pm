@@ -3,7 +3,7 @@ package Test::Mock::Net::Server::Mail;
 use Moose;
 
 # ABSTRACT: mock SMTP server for use in tests
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 
 use Net::Server::Mail::ESMTP;
@@ -333,7 +333,7 @@ Test::Mock::Net::Server::Mail - mock SMTP server for use in tests
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

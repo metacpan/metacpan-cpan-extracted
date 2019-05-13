@@ -30,9 +30,11 @@ sub get_login {
     }
     else {
         my $prompt = ucfirst( $key ) . ': ';
-        my $trs = Term::Form->new();
+        my $tf = Term::Form->new();
         # Readline
-        my $new = $trs->readline( $prompt, { no_echo => $no_echo, info => $info } );
+        my $new = $tf->readline( $prompt,
+            { info => $info, no_echo => $no_echo }
+        );
         return $new;
     }
 }

@@ -23,7 +23,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.03';
+    $VERSION = '0.04';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -58,7 +58,10 @@ BEGIN
     $SIG{ __WARN__ } = sub {
         state $count = 0;
         ( my $message = $_[ 0 ] ) =~ s/\n|\r//g;
-        $log->warn( $message, { package => __PACKAGE__, count => $count++, global_phase => ${^GLOBAL_PHASE} } );
+        if ( $log )
+        {
+            $log->warn( $message, { package => __PACKAGE__, count => $count++, global_phase => ${^GLOBAL_PHASE} } );
+        }
     };
 } ## end BEGIN
 
@@ -136,9 +139,11 @@ sub DESTROY
 {
     my ( $self, %parameters ) = @_;
 
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
-
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    if ( ${^GLOBAL_PHASE} eq 'DESTRUCT' )
+    {
+        eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
+        return;
+    }
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
@@ -149,6 +154,30 @@ sub DESTROY
         # TODO
     }
 } ## end sub DESTROY
+
+=head2 C<getLogger>
+=cut
+
+sub getLogger()
+{
+    my ( $package,        $filename,        $line,        $subroutine,        $hasargs,        $wantarray,        $evaltext,        $is_require,        $hints,        $bitmask,        $hinthash )        = caller( 0 );    # EU mesmo
+    my ( $parent_package, $parent_filename, $parent_line, $parent_subroutine, $parent_hasargs, $parent_wantarray, $parent_evaltext, $parent_is_require, $parent_hints, $parent_bitmask, $parent_hinthash ) = caller( 1 );    # QUEM me chamou
+
+    my $log = Log::Any->get_logger();
+
+    $log->context->{ subroutine }        = $subroutine;
+    $log->context->{ parent_subroutine } = $parent_subroutine;
+    my ( $self, %parameters ) = @_;
+
+    $log->debug( $subroutine, { package => __PACKAGE__, file => __FILE__ } );
+
+    return $log;
+
+    # ->context = {
+    #     me     => $subroutine,
+    #     parent => $parent_subroutine
+    # };
+} ## end sub getLogger
 
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.

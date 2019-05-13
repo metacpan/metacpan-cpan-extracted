@@ -32,7 +32,7 @@ no_index:
 requires:
   ExtUtils::MakeMaker: '7.00'
   File::Spec: '0.8'
-  Inline: '0.81'
+  Inline: '0.83'
   Parse::RecDescent: '1.967009'
   Pegex: '0.66'
   perl: v5.8.1
@@ -40,6 +40,6 @@ resources:
   bugtracker: https://github.com/ingydotnet/inline-c-pm/issues
   homepage: https://github.com/ingydotnet/inline-c-pm
   repository: https://github.com/ingydotnet/inline-c-pm.git
-version: '0.80'
+version: '0.81'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

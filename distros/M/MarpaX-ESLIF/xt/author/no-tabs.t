@@ -22,6 +22,7 @@ my @files = (
     'lib/MarpaX/ESLIF/Recognizer/Interface.pod',
     'lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm',
     'lib/MarpaX/ESLIF/String.pm',
+    'lib/MarpaX/ESLIF/Symbol/EventBitSet.pm',
     'lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm',
     'lib/MarpaX/ESLIF/Symbol/Type.pm',
     'lib/MarpaX/ESLIF/Tutorial/Calculator.pod',

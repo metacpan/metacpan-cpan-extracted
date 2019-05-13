@@ -15,7 +15,7 @@ Inline::C - C Language Support for Inline
 
 =head1 VERSION
 
-This document describes L<Inline::C> version B<0.80>.
+This document describes L<Inline::C> version B<0.81>.
 
 =head1 DESCRIPTION
 
@@ -367,7 +367,7 @@ If ellipsis or C<...> is used at the end of an argument list, it means that
 any number of C<SV*>s may follow. Again you will need to pop the values off of
 the C<Stack> yourself.
 
-See L<"Examples"> below.
+See L<"EXAMPLES"> below.
 
 =head1 THE INLINE STACK MACROS
 
@@ -522,7 +522,7 @@ Notice that you do not need to C<< #include <stdio.h >>>. The C<perl.h> header
 file which gets included by default, automatically loads the standard C header
 files for you.
 
-    use Inline C;
+    use Inline 'C';
     greet('Ingy');
     greet(42);
     __END__
@@ -543,7 +543,7 @@ One problem is that C<SvPVX> doesn't automatically convert strings to numbers,
 so we get a little surprise when we try to greet C<42>. The program segfaults,
 a common occurrence when delving into the guts of Perl.
 
-    use Inline C;
+    use Inline 'C';
     greet('Ingy');
     greet(42);
     __END__
@@ -560,7 +560,7 @@ C<SvPV> returns the length of the string as it's second parameter. Since we
 don't care about the length, we can just put C<PL_na> there, which is a
 special variable designed for that purpose.
 
-    use Inline C;
+    use Inline 'C';
     greet('Ingy');
     greet(42);
     __END__

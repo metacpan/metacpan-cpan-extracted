@@ -3,9 +3,9 @@ package Text::Control;
 use strict;
 use warnings;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
-my $CTRL_PATTERN = '[\x00-\x19\x7f-\xff]';
+my $CTRL_PATTERN = '[\x00-\x1f\x7f-\xff]';
 
 =encoding utf-8
 

@@ -107,6 +107,8 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 	$scope.staticPrefix = staticPrefix
 	$scope.scriptname = scriptname
 	$scope.formPrefix = formPrefix
+	$scope.impPrefix = impPrefix
+	$scope.sessionTTL = sessionTTL
 	$scope.availableLanguages = availableLanguages
 	$scope.waiting = true
 	$scope.showM = false
@@ -320,6 +322,17 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 				if a.title > b.title then 1
 				else if a.title < b.title then -1
 				else 0
+			# Sort by real and spoofed attributes
+			real = []
+			spoof = []
+			for element in tmp
+				if element.title.match(new RegExp('^' + $scope.impPrefix + '.+$'))
+					console.log element, '-> real attribute'
+					real.push element
+				else
+					#console.log element, '-> spoofed attribute'
+					spoof.push element
+			tmp = spoof.concat real
 
 			res.push
 				title: '__attributesAndMacros__'
@@ -339,6 +352,24 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 	$scope.localeDate = (s) ->
 		d = new Date(s * 1000)
 		return d.toLocaleString()
+
+	$scope.isValid = (epoch, type) ->
+		path = $location.path()
+		now = Date.now() / 1000
+		console.log "Path", path
+		console.log "Session epoch", epoch
+		console.log "Current date", now
+		console.log "Session TTL", sessionTTL
+		isValid = now - epoch < sessionTTL || $location.path().match(/^\/persistent/)
+		if type == 'msg'
+			console.log "Return msg"
+			if isValid then return "info" else return "warning"
+		else if type == 'style'
+			console.log "Return style"
+			if isValid then return {} else return {'color': '#627990', 'font-style': 'italic'}
+		else
+			console.log "Return isValid"
+			return isValid
 
 	$scope.strToLocaleDate = (s) ->
 		arrayDate = s.match /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/
@@ -437,6 +468,8 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 	$scope.init = ->
 		$scope.waiting = true
 		$scope.data = []
+		$scope.currentScope = null
+		$scope.currentSession = null
 		$q.all [
 			$translator.init $scope.lang
 			$scope.updateTree '', $scope.data, 0, 0

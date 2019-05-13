@@ -1,7 +1,7 @@
 package GIS::Distance::ALT;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use parent 'GIS::Distance::Formula';
 
@@ -70,7 +70,7 @@ The ALT formula is intended as a much faster, but slightly less accurate,
 alternative of the L<GIS::Distance::Vincenty> formula. This formulas is
 about 5x faster than Vincenty.
 
-The code for this formula was taken from L<GIS::Distance::XS> and
+The code for this formula was taken from L<Geo::Distance::XS> and
 modified to fit.
 
 A faster (XS) version of this formula is available as
@@ -87,9 +87,9 @@ See L<GIS::Distance/SUPPORT>.
 
 See L<GIS::Distance/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<GIS::Distance/LICENSE>.
+See L<GIS::Distance/COPYRIGHT AND LICENSE>.
 
 =cut
 

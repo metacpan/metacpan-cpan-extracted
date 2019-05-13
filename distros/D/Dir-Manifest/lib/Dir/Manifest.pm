@@ -1,5 +1,5 @@
 package Dir::Manifest;
-$Dir::Manifest::VERSION = '0.0.4';
+$Dir::Manifest::VERSION = '0.0.5';
 use strict;
 use warnings;
 
@@ -104,7 +104,7 @@ Dir::Manifest
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of ke
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 METHODS
 

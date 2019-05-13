@@ -136,7 +136,7 @@ is("$f->{error}", "Error Login failed (url https://myhost.example.com/ipa/sessio
 isa_ok($args->[0], 'REST::Client', "REST::Client->POST called (but returned failure)");
 
 # new client initialised, fix the api_version for the remainder of the tests
-$f->set_api_version('2.156');
+$f->set_api_version('2.230');
 
 =head2 Test post
 
@@ -164,7 +164,7 @@ is($rc_cfg->{ca}, "/etc/ipa/ca.crt", "ca.crt set");
 is($rc_cfg->{host}, "https://myhost.example.com", "ca.crt set");
 
 is($args->[1], '/ipa/session/json', 'json url');
-is($args->[2], '{"id":100,"method":"mycommand","params":[["a","b","c"],{"int":1,"opt":"ok","version":"2.156"}]}', 'JSON API body');
+is($args->[2], '{"id":100,"method":"mycommand","params":[["a","b","c"],{"int":1,"opt":"ok","version":"2.230"}]}', 'JSON API body');
 ok(! defined($args->[3]), 'No extra headers');
 
 is_deeply($args->[0]->{_headers}, {
@@ -195,7 +195,7 @@ is($resp->{answer}, $content, 'answer attribute has undecoded response on failur
 =cut
 
 $error = undef;
-$content = '{"error":null,"id":0,"principal":"user@DOMAIN","result":{"count":1,"messages":[{"code":13001,"message":"API Version number was not sent, forward compatibility not guaranteed. Assuming servers API version, 2.156","name":"VersionMissing","type":"warning"}],"result":[{"dn":"uid=user,cn=users,cn=accounts,dc=domain","gidnumber":["1234567"],"has_keytab":true,"has_password":true,"homedirectory":["/home/user"],"loginshell":["/bin/bash"],"nsaccountlock":false,"sn":["Superman"],"uid":["user"],"uidnumber":["1234567"]}],"summary":"1 user matched","truncated":false},"version":"4.2.0"}';
+$content = '{"error":null,"id":0,"principal":"user@DOMAIN","result":{"count":1,"messages":[{"code":13001,"message":"API Version number was not sent, forward compatibility not guaranteed. Assuming servers API version, 2.230","name":"VersionMissing","type":"warning"}],"result":[{"dn":"uid=user,cn=users,cn=accounts,dc=domain","gidnumber":["1234567"],"has_keytab":true,"has_password":true,"homedirectory":["/home/user"],"loginshell":["/bin/bash"],"nsaccountlock":false,"sn":["Superman"],"uid":["user"],"uidnumber":["1234567"]}],"summary":"1 user matched","truncated":false},"version":"4.2.0"}';
 $code = 200;
 $resp = $f->rpc(mkrequest("mycommand", args => [qw(a b c)], opts => {opt => 'ok', int => 1}));
 isa_ok($resp, 'Net::FreeIPA::Response', "success rpc returns Response instance");
@@ -228,7 +228,7 @@ ok(! defined($f->{response}), "response attribute is reset on error request");
 
 # post failed
 $error = undef;
-$content = '{"error":null,"id":0,"principal":"user@DOMAIN","result":{"count":1,"messages":[{"code":13001,"message":"API Version number was not sent, forward compatibility not guaranteed. Assuming servers API version, 2.156","name":"VersionMissing","type":"warning"}],"result":[{"dn":"uid=user,cn=users,cn=accounts,dc=domain","gidnumber":["1234567"],"has_keytab":true,"has_password":true,"homedirectory":["/home/user"],"loginshell":["/bin/bash"],"nsaccountlock":false,"sn":["Superman"],"uid":["user"],"uidnumber":["1234567"]}],"summary":"1 user matched","truncated":false},"version":"4.2.0"}';
+$content = '{"error":null,"id":0,"principal":"user@DOMAIN","result":{"count":1,"messages":[{"code":13001,"message":"API Version number was not sent, forward compatibility not guaranteed. Assuming servers API version, 2.230","name":"VersionMissing","type":"warning"}],"result":[{"dn":"uid=user,cn=users,cn=accounts,dc=domain","gidnumber":["1234567"],"has_keytab":true,"has_password":true,"homedirectory":["/home/user"],"loginshell":["/bin/bash"],"nsaccountlock":false,"sn":["Superman"],"uid":["user"],"uidnumber":["1234567"]}],"summary":"1 user matched","truncated":false},"version":"4.2.0"}';
 $code = 400;
 $resp = $f->rpc(mkrequest("mycommand", [qw(a b c)], {opt => 'ok', int => 1}));
 ok(! defined($resp), "rpc with failed post is undef");
@@ -242,7 +242,7 @@ is("$f->{error}", "Error POST failed (url /ipa/session/json code 400)",
 # This is fake data with error
 $error = undef;
 $code = 200;
-$content = '{"error":{"message":"some error"},"id":0,"principal":"user@DOMAIN","result":{"count":1,"messages":[{"code":13001,"message":"API Version number was not sent, forward compatibility not guaranteed. Assuming servers API version, 2.156","name":"VersionMissing","type":"warning"}],"result":[{"dn":"uid=user,cn=users,cn=accounts,dc=domain","gidnumber":["1234567"],"has_keytab":true,"has_password":true,"homedirectory":["/home/user"],"loginshell":["/bin/bash"],"nsaccountlock":false,"sn":["Superman"],"uid":["user"],"uidnumber":["1234567"]}],"summary":"1 user matched","truncated":false},"version":"4.2.0"}';
+$content = '{"error":{"message":"some error"},"id":0,"principal":"user@DOMAIN","result":{"count":1,"messages":[{"code":13001,"message":"API Version number was not sent, forward compatibility not guaranteed. Assuming servers API version, 2.230","name":"VersionMissing","type":"warning"}],"result":[{"dn":"uid=user,cn=users,cn=accounts,dc=domain","gidnumber":["1234567"],"has_keytab":true,"has_password":true,"homedirectory":["/home/user"],"loginshell":["/bin/bash"],"nsaccountlock":false,"sn":["Superman"],"uid":["user"],"uidnumber":["1234567"]}],"summary":"1 user matched","truncated":false},"version":"4.2.0"}';
 $resp = $f->rpc(mkrequest("mycommand", args => [qw(a b c)], opts => {opt => 'ok', int => 1}));
 isa_ok($resp, 'Net::FreeIPA::Response', "rpc with error in answer Response instance");
 ok(! $resp, "false response with failed rpc with succesful post and error in answer");
@@ -272,7 +272,7 @@ is_deeply($f->{response}->{result}, {fake => 1}, "Commands in response result at
 
 isa_ok($args->[0], 'REST::Client', "REST::Client->POST called");
 is($args->[1], '/ipa/session/json', 'json url');
-is($args->[2], '{"id":101,"method":"json_metadata","params":[[],{"command":"all","version":"2.156"}]}',
+is($args->[2], '{"id":101,"method":"json_metadata","params":[[],{"command":"all","version":"2.230"}]}',
    'JSON API body for json_metadata all commands (and with version)');
 ok(! defined($args->[3]), 'No extra headers');
 

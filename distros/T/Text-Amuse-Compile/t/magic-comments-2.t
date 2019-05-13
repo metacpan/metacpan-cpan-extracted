@@ -22,11 +22,16 @@ Test
 ;  :c8:   \strut
 ;  :c8:   \newpage
 ;  :c8:   \vskip 20mm
+;  :c8:   \vskip -3em
 ; :c8: \markboth{test{escape}and}{test\me}
 ; :c8: \markboth{test teća}{Đavo}
 ; :c8: \pagestyle{myheadings}
 ; :c8: \markright{Teća Đavo}
 ; :c8: \markright{Teća {Đavo}}
+; :c8:  \enlargethispage{10em}
+; :c8:  \enlargethispage{-10mm}
+; :c8:  \flushbottom
+; :c8:  \raggedbottom
 Test
 
 MUSE
@@ -41,11 +46,16 @@ my $exp = <<'EXP';
 \strut
 \newpage
 \vskip 20mm
+\vskip -3em
 % :c8: \textbackslash{}markboth\{test\{escape\}and\}\{test\textbackslash{}me\}
 \markboth{test teća}{Đavo}
 \pagestyle{myheadings}
 \markright{Teća Đavo}
 % :c8: \textbackslash{}markright\{Teća \{Đavo\}\}
+\enlargethispage{10em}
+\enlargethispage{-10mm}
+\flushbottom
+\raggedbottom
 EXP
 
 my $wd = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});

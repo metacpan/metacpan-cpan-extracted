@@ -1,2 +1,4 @@
 name = "Starch"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"
+license = "gpl_3"

@@ -15,7 +15,7 @@ use Email::Sender::Transport::SMTP qw();
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 our $transport;
 
@@ -234,7 +234,8 @@ sub getMailSession {
 
     # Browse found sessions to check if it's a mail session
     foreach my $id ( keys %$sessions ) {
-        my $mailSession = $self->p->getApacheSession($id);
+        my $mailSession =
+          $self->p->getApacheSession( $id, ( kind => "TOKEN" ) );
         next unless ($mailSession);
         return $mailSession if ( $mailSession->data->{_type} =~ /^mail$/ );
     }
@@ -259,7 +260,8 @@ sub getRegisterSession {
 
     # Browse found sessions to check if it's a register session
     foreach my $id ( keys %$sessions ) {
-        my $registerSession = $self->p->getApacheSession($id);
+        my $registerSession =
+          $self->p->getApacheSession( $id, ( kind => "TOKEN" ) );
         next unless ($registerSession);
         return $id
           if (  $registerSession->data->{_type}

@@ -2,7 +2,7 @@ package Mail::STS::Domain;
 
 use Moose;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 # ABSTRACT: class for MTA-STS domain lookups
 
 use Time::Piece;
@@ -55,7 +55,7 @@ my $RECORDS = {
   },
   'tlsrpt' => {
     type => 'TXT',
-    name => sub { '_smtp._tcp.'.shift },
+    name => sub { '_smtp._tls.'.shift },
   },
 };
 
@@ -288,7 +288,7 @@ Mail::STS::Domain - class for MTA-STS domain lookups
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

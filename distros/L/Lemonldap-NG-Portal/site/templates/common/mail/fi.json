@@ -1,0 +1,18 @@
+{
+"accountCreated":"Tunnus on luotu, väliaikainen salasana on lähetetty sähköpostiisi.",
+"autoMail":"Tämä sähköpostiviesti lähetetään automaattisesti",
+"click2Register":"Klikkaa tästä vahvistaaksesi käyttäjätunnuksesi rekisteröinnin",
+"click2Reset":"Klikkaa tästä nollataksesi salasanasi",
+"hello":"Hei",
+"mail2fSubject":"[LemonLDAP::NG] Your login code",
+"mailConfirmSubject":"[LemonLDAP::NG] Salasanan nollauksen vahvistus",
+"mailSubject":"[LemonLDAP::NG] Uusi salasanasi",
+"newPwdIs":"Uusi salasanasi on",
+"pwdChanged":"Salasanasi on vaihdettu.",
+"pwdIs":"Sinun salasanasi on",
+"registerConfirmSubject":"[LemonLDAP::NG] Tunnuksen rekisteröinnin vahvistus",
+"registerDoneSubject":"[LemonLDAP::NG] Uusi käyttäjätunnuksesi",
+"requestIssuedFromIP":"The request was issued from IP",
+"yourLoginCodeIs":"Your login code is",
+"yourLoginIs":"Your login is"
+}

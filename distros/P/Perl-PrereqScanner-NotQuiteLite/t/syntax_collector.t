@@ -21,4 +21,8 @@ use Syntax::Collector -collect => q/
 /;
 END
 
+test('no spec', <<'END', {'Syntax::Collector' => 0});
+use Syntax::Collector;
+END
+
 done_testing;

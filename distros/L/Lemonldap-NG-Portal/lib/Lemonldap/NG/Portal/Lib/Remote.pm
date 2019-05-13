@@ -50,7 +50,7 @@ sub checkRemoteId {
                 cacheModule        => $self->conf->{localSessionStorage},
                 cacheModuleOptions => $self->conf->{localSessionStorageOptions},
                 id                 => $rId,
-                kind               => "REMOTE",
+                kind               => "SSO",
             }
         );
 

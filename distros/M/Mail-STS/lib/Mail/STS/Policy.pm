@@ -2,7 +2,7 @@ package Mail::STS::Policy;
 
 use Moose;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 # ABSTRACT: class to parse and generate RFC8461 policies
 
 
@@ -148,7 +148,7 @@ Mail::STS::Policy - class to parse and generate RFC8461 policies
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

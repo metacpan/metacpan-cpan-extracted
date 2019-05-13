@@ -1,7 +1,7 @@
 package GIS::Distance;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 sub new {
     my ($class, $formula, @args) = @_;
@@ -54,12 +54,13 @@ GIS::Distance - Calculate geographic distances.
 
     use GIS::Distance;
     
-    # Use the GIS::Distance::Haversine formula by default:
+    # Use the GIS::Distance::Haversine formula by default.
     my $gis = GIS::Distance->new();
     
-    # Or choose a different formula:
+    # Or choose a different formula.
     my $gis = GIS::Distance->new( 'Polar' );
     
+    # Returns a Class::Measure object.
     my $distance = $gis->distance( $lat1, $lon1, $lat2, $lon2 );
     
     print $distance->meters();
@@ -114,23 +115,22 @@ Does no argument checking.
 
 =item *
 
-Does not support L</formula_args>, which are supported by at least the
-L<GIS::Distance::GeoEllipsoid> formula.  Read more in the L</SPEED> section.
+Does not support formula arguments which are supported by at least the
+L<GIS::Distance::GeoEllipsoid> formula.
 
 =back
 
 Calling this gets you pretty close to the fastest bare metal speed you can get.
 The speed improvements of calling this is noticeable over hundreds of thousands of
 iterations only and you've got to decide if its worth the safety and features
-you are dropping.
+you are dropping.  Read more in the L</SPEED> section.
 
 =head1 ARGUMENTS
 
     my $gis = GIS::Distance->new( $formula );
 
-When you call C<GIS::Distance->new()> you may pass a partial or full formula
-class name as the first argument.  If you do not specify a formula then this
-defaults to C<Haversive>.
+When you call C<new()> you may pass a partial or full formula class name as the
+first argument.  The default is C<Haversive>.
 
 If you pass a partial name, as in:
 
@@ -142,10 +142,8 @@ Then the following modules will be looked for in order:
     GIS::Distance::Haversine
     Haversine
 
-Note that a C<Fast::> version of the class will be looked for first.  By default
-the C<Fast::> versions of the formulas, written in C, are not available and the
-pure perl ones will be used instead.  If you would like the C<Fast::> formulas
-then install L<GIS::Distance::Fast> and they will be automatically used.
+Install L<GIS::Distance::Fast> to get access to the C<Fast::> (XS) implementations
+of the formula classes.
 
 You may globally disable the automatic use of the C<Fast::> formulas by setting
 the C<GIS_DISTANCE_PP> environment variable.  Although, its likely simpler to
@@ -319,12 +317,25 @@ L<https://github.com/bluefeet/GIS-Distance/issues>
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <aran@bluefeet.dev>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Copyright (C) 2003 Aran Clary Deltac
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 

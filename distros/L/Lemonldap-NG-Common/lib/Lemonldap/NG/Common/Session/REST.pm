@@ -248,7 +248,7 @@ sub getApacheSession {
               Lemonldap::NG::Handler::PSGI::Main->tsv->{sessionCacheOptions},
             id    => $id,
             force => $force,
-            kind  => $mod->{kind},
+            ( $id ? () : ( kind => $mod->{kind} ) ),
             ( $info ? ( info => $info ) : () ),
         }
     );
@@ -270,6 +270,9 @@ sub getMod {
     unless ( $m = $self->sessionTypes->{$s} ) {
         $self->error('Unknown (or unconfigured) session type');
         return ();
+    }
+    if ( my $kind = $req->params('kind') ) {
+        $m->{kind} = $kind;
     }
     return $m;
 }

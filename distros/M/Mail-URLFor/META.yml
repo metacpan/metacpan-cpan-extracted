@@ -1,0 +1,36 @@
+---
+abstract: 'Create deep links into mail clients'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-URLFor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Filter::signatures: '0.09'
+  Module::Pluggable: '0'
+  Moo: '2'
+  Moo::Role: '0'
+  URI: '0'
+  URI::Escape: '0'
+  URI::mid: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/Corion/Mail-URLFor.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

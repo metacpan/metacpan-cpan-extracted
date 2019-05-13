@@ -4,14 +4,17 @@ use warnings;
 use Panotools::Script;
 use Getopt::Long;
 use Pod::Usage;
+use File::Spec;
 use Storable qw/ dclone /;
 
 my $help = 0;
 my $path_out = 'morphed.pto';
 my $p_order = undef;
+my $num_jobs = 0;
 
 GetOptions ('o|output=s' => \$path_out,
             'p|polynomial=f' => \$p_order,
+            'j|jobs=i' => \$num_jobs,
             'h|help' => \$help);
 
 pod2usage (-verbose => 2) if $help;
@@ -43,8 +46,11 @@ for my $cp (@{$pto->Control})
     $cp = $cp_new;
 }
 
+my @Parallel = ();
+
 for my $id_image (0 .. scalar @{$pto->Image} -1)
 {
+    $pto->Image->[$id_image]->{n} = '"'. $pto->Image->[$id_image]->Path ($path_pto) . '"';
     next unless defined $mapping->{$id_image};
     next unless scalar @{$mapping->{$id_image}} > 2;
 
@@ -61,25 +67,78 @@ for my $id_image (0 .. scalar @{$pto->Image} -1)
             # reduce the order of the polynomial if there are not enough control points
             $o--;
         }
-        system ('convert', $path_original, '-alpha', 'on',
+        push(@Parallel, ['convert', $path_original, '-alpha', 'on',
             '-virtual-pixel', 'transparent',
             '-distort', 'Polynomial', join ('  ', $o, @{$mapping->{$id_image}}),
-            $path_new);
+            $path_new]);
     }
     else
     {
-        system ('convert', $path_original, '-alpha', 'on',
+         push(@Parallel, ['convert', $path_original, '-alpha', 'on',
             '-virtual-pixel', 'transparent',
             '-distort', 'Shepards', join ('  ', @{$mapping->{$id_image}}),
-            $path_new);
+            $path_new]);
     }
+    $pto->Image->[$id_image]->{n} = '"'. File::Spec->rel2abs ($path_new) . '"';
+}
 
-    $pto->Image->[$id_image]->{n} = '"'. $path_new . '"';
+if ($num_jobs < 2) {
+  # switch to serial precessing
+  for my $work (@Parallel) {
+    system(@{$work});
+  }
+}
+else {
+  &do_parallel(\@Parallel, $num_jobs);
 }
 
 @{$pto->Control} = () if defined $p_order;
 
 $pto->Write ($path_out);
+
+sub background1($)
+{
+  require Proc::Background;
+  my $opts  = {'die_upon_destroy' => 1};
+  return(Proc::Background->new($opts, @_));
+}
+
+sub do_parallel($$)
+{
+    my ($rCmds, $maxprocs) = @_;
+    my @procs = ();
+    my $p;
+    for ($p = 0; $p < $maxprocs; $p++) {
+      $procs[$p] = undef;
+    }
+    for my $rcmd (@$rCmds) {
+        my $found = -1;
+        for (;;) {
+            for ($p = 0; $p < $maxprocs; $p++) {
+                if (! defined($procs[$p])) {
+                    $found = $p;
+                    last;
+                }
+                elsif (! $procs[$p]->alive) {
+                    $found = $p;
+                    $procs[$p] = undef;
+                    last;
+                }
+            }
+            last if ($found >= 0);
+            print "waiting ..\n";
+            wait;
+        }
+        $procs[$found] = &background1(@{$rcmd});
+    }
+    # wait for processes to end
+    for ($p = 0; $p < $maxprocs; $p++) {
+        if (defined($procs[$p])) {
+            $procs[$p]->wait;
+            $procs[$p] = undef;
+        }
+    }
+}
 
 __END__
 
@@ -93,6 +152,7 @@ ptomorph [options] project.pto
 
  Options:
   -h | --help           Outputs help documentation
+  -j | --jobs numb      Use that many jobs parallel if possible
   -o | --output name    Output .pto project name, defaults to 'morphed.pto'
   -p | --polynomial num Uses a polynomial best fit, num is 'order' of polynomial
                             and must be 1, 2, 3, 4 or 5

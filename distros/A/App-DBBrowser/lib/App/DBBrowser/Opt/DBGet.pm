@@ -32,6 +32,7 @@ sub read_db_config_files {
 }
 
 
+my $prev_plugin = '';
 my $db_opt;
 
 
@@ -39,6 +40,10 @@ sub attributes {
     my ( $sf, $db ) = @_;
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $plugin = $sf->{i}{plugin};
+    if ( $prev_plugin ne $plugin ) {
+        $db_opt = undef;
+        $prev_plugin = $plugin;
+    }
     # attributes added by hand to the config file: attribues are
     # only used if they have entries in the set_attributes method
     $db_opt //= $sf->read_db_config_files();
@@ -56,6 +61,10 @@ sub login_data {
     my ( $sf, $db ) = @_;
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $plugin = $sf->{i}{plugin};
+    if ( $prev_plugin ne $plugin ) {
+        $db_opt = undef;
+        $prev_plugin = $plugin;
+    }
     $db_opt //= $sf->read_db_config_files();
     my $arg = $plui->read_arguments();
     my $data = {};
@@ -70,7 +79,7 @@ sub login_data {
                 delete $sf->{i}{login_error};
             }
             else {
-                $data->{$name}{default} = $db_opt->{$db//''}{$name} // $db_opt->{$plugin}{$name} // '';
+                $data->{$name}{default} = $db_opt->{$db//''}{$name} // $db_opt->{$plugin}{$name} // undef;
             }
             $data->{$name}{secret}  = $secret;
         }
@@ -82,6 +91,11 @@ sub login_data {
 sub enabled_env_vars {
     my ( $sf, $db ) = @_;
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $plugin = $sf->{i}{plugin};
+    if ( $prev_plugin ne $plugin ) {
+        $db_opt = undef;
+        $prev_plugin = $plugin;
+    }
     $db_opt //= $sf->read_db_config_files();
     my $env_vars = $plui->env_variables();
     my $enabled_env_vars = {};

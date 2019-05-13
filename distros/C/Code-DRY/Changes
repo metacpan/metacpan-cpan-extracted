@@ -1,5 +1,17 @@
 Revision history for Perl extension Code::DRY.
 
+0.10
+	- yet another fix for Build.PL, sigh
+
+0.09
+	- bugfix #129533: disable hard link detection on Windows (but not on cygwin). Thanks Shawn
+
+0.08
+	- fix Build.PL syntax for older versions
+
+0.07
+	- fix bugs found on OpenBSD
+
 0.06
 	- fix a test for older Perls
 

@@ -63,6 +63,7 @@ t/25proto.t
 t/26fork.t
 t/27inline_maker.t
 t/28autowrap.t
+t/29refargs.t
 t/30cppflags.t
 t/31include_dirs_angle_brackets.t
 t/32include_dirs_double_quotes.t

@@ -1,9 +1,9 @@
 package BenchmarkAnything::Storage::Backend::SQL;
-# git description: v0.023-12-g9b05097
+# git description: v0.025-2-g331822e
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Autonomous SQL backend to store benchmarks
-$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.024';
+$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.026';
 use 5.008;
 use utf8;
 use strict;
@@ -401,14 +401,11 @@ sub enqueue_multi_benchmark {
 # dequeues a single bundle (can contain multiple data points)
 sub process_queued_multi_benchmark {
 
-    my ( $or_self, $hr_options ) = @_;
+    my ( $or_self, $bulkcount, $hr_options ) = @_;
 
     my $i_id;
-    my $s_serialized;
-    my $ar_data_points;
     my $ar_results_lock;
-    my $or_result_lock;
-    my $ar_results_process;
+    my @a_bench_bundle_ids;
 
     my $driver = $or_self->{query}{dbh}{Driver}{Name};
 
@@ -419,8 +416,8 @@ sub process_queued_multi_benchmark {
     # Lock single row via processing=1 so that only one worker handles it!
     eval {
         try {
-            $ar_results_lock = $or_self->{query}->select_raw_bench_bundle_for_lock;
-            $or_result_lock  = $ar_results_lock->fetchrow_hashref;
+            $ar_results_lock = $or_self->{query}->select_raw_bench_bundle_for_lock2($bulkcount);
+            @a_bench_bundle_ids  = map { $_->[0] } @{$ar_results_lock->fetchall_arrayref()};
         }
         catch {
             if (/Deadlock found when trying to get lock/) {
@@ -442,30 +439,43 @@ sub process_queued_multi_benchmark {
                 die $_;
             }
         };
-        $i_id       = $or_result_lock->{raw_bench_bundle_id};
-        if ($i_id) {
-            $or_self->{query}->start_processing_raw_bench_bundle($i_id);
 
-            # ===== process that single raw entry =====
-            require Sereal::Decoder;
+        if (@a_bench_bundle_ids) {
 
-            $ar_results_process = $or_self->{query}->select_raw_bench_bundle_for_processing($i_id);
-            $s_serialized       = $ar_results_process->fetchrow_hashref->{raw_bench_bundle_serialized};
-            $ar_data_points     = Sereal::Decoder::decode_sereal($s_serialized);
+            my @a_serialized;
+            my $ar_results_process;
 
-            # preserve order, otherwise add_multi_benchmark() would reorder to optimize insert
-            $or_self->add_multi_benchmark([$_], $hr_options) foreach @$ar_data_points;
-            $or_self->{query}->update_raw_bench_bundle_set_processed($i_id);
+            $ar_results_process = $or_self->{query}->select_raw_bench_bundle_for_processing2(@a_bench_bundle_ids);
+            @a_serialized  = map { $_->[0] } @{$ar_results_process->fetchall_arrayref()};
+            eval {
+                require Sereal::Decoder;
+
+                my @a_data_points = map {
+                    @{Sereal::Decoder::decode_sereal($_) || []};
+                } @a_serialized;
+
+                # please note, this reorders data points for efficiency,
+                # read the comments there.
+                $or_self->add_multi_benchmark(\@a_data_points, $hr_options);
+
+                # preserve order by adding each data_point separately,
+                # otherwise add_multi_benchmark() would reorder to optimize insert
+                # foreach my $hr_data_point (@a_data_points) {
+                #     $or_self->add_multi_benchmark([$hr_data_point], $hr_options);
+                # }
+            };
+            if (!$@) {
+                $or_self->{query}->update_raw_bench_bundle_set_processed3(@a_bench_bundle_ids);
+            }
         }
     };
+
     $or_self->{query}->finish_transaction($@, { silent => 1 });
 
-    # $or_self->{query}->start_transaction;
-    # eval { $or_self->{query}->unlock_raw_bench_bundle($i_id) };
-    # $or_self->{query}->finish_transaction($@, { silent => 1 });
-
     $or_self->{query}{dbh}->do("set transaction isolation level repeatable read") if $driver eq "mysql"; # reset to normal gap locking
-    return $@ ? undef : $i_id;
+    my $err = $@;
+    print STDERR "err: ".$err."\n" if $err && $or_self->{debug};
+    return ($err ? () : @a_bench_bundle_ids);
 
 }
 
@@ -487,10 +497,24 @@ sub gc {
 
 sub add_multi_benchmark {
 
+    # How ordering happens:
+    #
+    # We keep the order inside points of the same NAME and process
+    # NAMEs in order they appeared inside a group of processed
+    # bundles.
+    #
+    # However, if multiple reports were processed, where each report
+    # contains a metric A, B, and C, and we process 10 such reports at
+    # once, then the we get first 10 different As in order, then 10
+    # different B in order, then 10 different C in order, BUT NOT: the
+    # 1st A, 1st B, 1st C, then 2nd A, 2nd B, 2nd C, etc.
+
     my ( $or_self, $ar_data_points, $hr_options ) = @_;
 
     my $i_counter    = 1;
     my %h_benchmarks = ();
+    my @a_name_order = ();
+
     for my $hr_data_point ( @{$ar_data_points} ) {
 
         for my $s_param (qw/ NAME VALUE /) {
@@ -513,6 +537,7 @@ sub add_multi_benchmark {
                 UNIT    => $s_unit,
                 data    => [],
             };
+            push @a_name_order, $s_name;
         }
         else {
             $h_benchmarks{$s_name}{UNIT} ||= $s_unit;
@@ -523,7 +548,9 @@ sub add_multi_benchmark {
         $i_counter++;
 
     }
-    for my $hr_benchmark ( values %h_benchmarks ) {
+
+    foreach (@a_name_order) {
+        my $hr_benchmark = $h_benchmarks{$_};
         $or_self->add_single_benchmark( $hr_benchmark, $hr_options );
     }
 
@@ -1787,7 +1814,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

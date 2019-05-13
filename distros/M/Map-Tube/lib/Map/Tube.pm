@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.61';
+$Map::Tube::VERSION   = '3.62';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.61
+Version 3.62
 
 =cut
 
@@ -105,7 +105,6 @@ has bgcolor => (is => 'rw', isa => Color  );
 our $AUTOLOAD;
 our $PLUGINS = {
     'Map::Tube::Plugin::Graph'     => 1,
-    'Map::Tube::Plugin::Formatter' => 1,
     'Map::Tube::Plugin::FuzzyFind' => 1,
 };
 
@@ -585,22 +584,22 @@ supported by the plugin.
     my $tube = Map::Tube::London->new;
 
     my $node = $tube->get_node_by_name('Baker Street');
-    print $tube->to_xml($node) ,   "\n\n";
-    print $tube->to_json($node),   "\n\n";
-    print $tube->to_yaml($node),   "\n\n";
-    print $tube->to_string($node), "\n\n";
+    print $node->to_xml,    "\n\n";
+    print $node->to_json,   "\n\n";
+    print $node->to_yaml,   "\n\n";
+    print $node->to_string, "\n\n";
 
     my $line = $tube->get_line_by_name('Metropolitan');
-    print $tube->to_xml($line) ,   "\n\n";
-    print $tube->to_json($line),   "\n\n";
-    print $tube->to_yaml($line),   "\n\n";
-    print $tube->to_string($line), "\n\n";
+    print $line->to_xml,    "\n\n";
+    print $line->to_json,   "\n\n";
+    print $line->to_yaml,   "\n\n";
+    print $line->to_string, "\n\n";
 
     my $route = $tube->get_shortest_route('Baker Street', 'Wembley Park');
-    print $tube->to_xml($route),   "\n\n";
-    print $tube->to_json($route),  "\n\n";
-    print $tube->to_yaml($route),  "\n\n";
-    print $tube->to_string($route),"\n\n";
+    print $route->to_xml,   "\n\n";
+    print $route->to_json,  "\n\n";
+    print $route->to_yaml,  "\n\n";
+    print $route->to_string,"\n\n";
 
 Please refer to the L<documentation|Map::Tube::Plugin::Formatter> for more info.
 
@@ -947,6 +946,15 @@ sub _init_map {
     $self->lines([ values %$lines ]);
     $self->_lines($_lines);
     $self->_other_links($_other_links);
+
+    # Populate Node links as ref to Node object
+    foreach my $node_id (keys %$nodes) {
+        my $node_obj = $nodes->{$node_id};
+        foreach my $link (split /\,/,$node_obj->{link}) {
+            push @{$node_obj->{links}}, $nodes->{$link};
+        }
+    }
+
     $self->nodes($nodes);
     $self->tables($tables);
 }

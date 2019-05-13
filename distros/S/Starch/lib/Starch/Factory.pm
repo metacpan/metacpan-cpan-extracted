@@ -1,7 +1,7 @@
 package Starch::Factory;
-use 5.008001;
-use strictures 2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -17,22 +17,20 @@ Normally there is no need to interact with this class directly.
 
 =cut
 
-use Moo::Role qw();
-use Types::Standard -types;
-use Types::Common::String -types;
-use Moo::Object qw();
-use Starch::Util qw( load_prefixed_module croak );
 use Module::Runtime qw( require_module );
-
+use Moo::Object qw();
+use Moo::Role qw();
 use Starch::Manager;
 use Starch::State;
+use Starch::Util qw( load_prefixed_module croak );
+use Types::Common::String -types;
+use Types::Standard -types;
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::Bundle
-);
+with 'Starch::Plugin::Bundle';
 
 =head1 OPTIONAL ARGUMENTS
 
@@ -207,9 +205,9 @@ See L<Starch/SUPPORT>.
 
 See L<Starch/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<Starch/LICENSE>.
+See L<Starch/COPYRIGHT AND LICENSE>.
 
 =cut
 

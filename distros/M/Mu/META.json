@@ -61,8 +61,8 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::InDistDir" : "0",
             "Test::More" : "0",
+            "if" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -72,11 +72,11 @@
    "provides" : {
       "Mu" : {
          "file" : "lib/Mu.pm",
-         "version" : "1.190320"
+         "version" : "1.191300"
       },
       "Mu::Role" : {
          "file" : "lib/Mu/Role.pm",
-         "version" : "1.190320"
+         "version" : "1.191300"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://github.com/wchristian/Mu"
       }
    },
-   "version" : "1.190320",
+   "version" : "1.191300",
    "x_contributors" : [
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],

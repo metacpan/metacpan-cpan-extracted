@@ -40,14 +40,9 @@ sub new_barray_from_str {
   return SPVM::ExchangeAPI::new_barray_from_bin($env, $bin);
 }
 
-sub new_str {
-  my ($env, $string) = @_;
-  
-  my $bin = encode('UTF-8', $string);
+sub new_str { SPVM::ExchangeAPI::new_barray_from_str(@_) }
 
-  return SPVM::ExchangeAPI::new_str_from_bin($env, $bin);
-}
-
+sub new_str_from_bin { SPVM::ExchangeAPI::new_barray_from_bin(@_) }
 
 sub new_oarray {
   my ($env, $type_name, $elems) = @_;
@@ -68,6 +63,10 @@ sub new_oarray {
   }
   unless (defined $basic_type_name) {
     confess "Invalid basic_type name(first argument of SPVM::ExchangeAPI::new_oarray)";
+  }
+  
+  unless (defined $elems) {
+    return undef;
   }
   
   # Check second argument
@@ -103,6 +102,10 @@ sub new_varray {
   unless (defined $basic_type_name) {
     confess "Invalid basic_type name(first argument of SPVM::ExchangeAPI::new_varray)";
   }
+
+  unless (defined $elems) {
+    return undef;
+  }
   
   # Check second argument
   unless (ref $elems eq 'ARRAY') {
@@ -132,6 +135,10 @@ sub new_varray_from_bin {
   unless (defined $basic_type_name) {
     confess "Invalid basic_type name(first argument of SPVM::ExchangeAPI::new_varray_from_bin)";
   }
+
+  unless (defined $elems) {
+    return undef;
+  }
   
   SPVM::ExchangeAPI::_new_varray_from_bin($env, $basic_type_name, $elems);
 }
@@ -157,6 +164,24 @@ sub list {
   }
   
   return $spvm_list;
+}
+
+sub set_exception {
+  my ($env, $exception) = @_;
+  
+  $exception = encode('UTF-8', $exception);
+  
+  _set_exception($env, $exception);
+}
+
+sub exception {
+  my ($env) = @_;
+  
+  my $exception = _exception($env);
+  
+  $exception = decode('UTF-8', $exception);
+  
+  return $exception;
 }
 
 # other functions is implemented in SPVM.xs
@@ -213,7 +238,7 @@ SPVM::ExchangeAPI - SPVM Exchange API
 
 =head2 new_varray_from_bin
 
-=head2 set_exception_undef
+=head2 set_exception
 
 =head2 to_bin
 

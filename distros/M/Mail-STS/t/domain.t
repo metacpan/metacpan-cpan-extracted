@@ -30,7 +30,7 @@ ok(!$p->is_primary_secure, 'primary RR is not secure');
 ok(!defined $p->tlsa, 'has no TLSA record');
 ok(!$p->is_tlsa_secure, 'TLSA record is cannot be secure');
 
-ok(!defined $p->tlsrpt, 'has no TLSRPT record');
+ok(defined $p->tlsrpt, 'has a TLSRPT record');
 ok(defined $p->_sts, 'has STS record');
 isa_ok($p->sts, 'Mail::STS::STSRecord');
 

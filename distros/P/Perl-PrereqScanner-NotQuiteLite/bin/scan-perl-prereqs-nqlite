@@ -32,6 +32,7 @@ GetOptions(\my %opts, qw/
   develop
   blib
   use_index|use-index=s
+  perl_minimum_version
 /);
 
 if ($opts{version}) {
@@ -108,17 +109,22 @@ Print suggestions (C<use>d modules in C<eval>) as well.
 =item develop
 
 Print requirements/suggestions for developers (C<use>d modules
-in C<xt>, C<inc>, and C<author> directories) as well.
+in C<xt> and C<author> directories) as well.
+
+=item perl_minimum_version
+
+May modify required perl version if new language features are
+used without declaring the required perl version explicitly.
 
 =item exclude_core
 
-Ignore prerequisites that are bundled in the Perl core (of 5.008001
+Ignore prerequisites that are bundled with Perl (of 5.008001
 by default). This requires L<Module::CoreList> version 2.99 or
 above.
 
 =item perl_version
 
-Ignore prerequisites that are bundled in the Perl core of specific
+Ignore prerequisites that are bundled with Perl of a specific
 version. This implies C<exclude-core> as well.
 
 =item allow_test_pms

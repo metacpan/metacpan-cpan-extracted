@@ -5,10 +5,10 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.141170'
-license: unknown
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,17 +24,22 @@ no_index:
     - author
     - builder
 provides:
+  Test::Mojo::Role::Session:
+    file: lib/Test/Mojo/Role/Session.pm
   Test::Mojo::Session:
     file: lib/Test/Mojo/Session.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Mojolicious: '4.82'
 resources:
   bugtracker: https://github.com/avkhozov/Test-Mojo-Session/issues
   homepage: https://github.com/avkhozov/Test-Mojo-Session
   repository: git://github.com/avkhozov/Test-Mojo-Session.git
-version: '1.04'
+version: '1.05'
 x_authority: cpan:AVKHOZOV
 x_contributors:
-  - 'Renee <reb@perl-services.de>'
+  - 'Akron <nils@diewald-online.de>'
   - 'Andrey Khozov <avkhozov@gmail.com>'
+  - 'Renee <reb@perl-services.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

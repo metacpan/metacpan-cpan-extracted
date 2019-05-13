@@ -1,7 +1,7 @@
 package GIS::Distance::MathTrig;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use parent 'GIS::Distance::Formula';
 
@@ -56,9 +56,9 @@ See L<GIS::Distance/SUPPORT>.
 
 See L<GIS::Distance/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<GIS::Distance/LICENSE>.
+See L<GIS::Distance/COPYRIGHT AND LICENSE>.
 
 =cut
 

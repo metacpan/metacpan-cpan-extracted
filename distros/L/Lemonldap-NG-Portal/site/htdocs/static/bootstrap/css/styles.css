@@ -159,3 +159,7 @@ div.oidc_consent_message > ul {
 .fa.icon-blue {
     color: blue;
 }
+
+.progress-bar-animated {
+  width: 100%;
+}

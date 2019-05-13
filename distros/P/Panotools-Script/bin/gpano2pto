@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Panotools::Script::Line::Image;
+use Image::ExifTool;
+use File::Spec;
+use Pod::Usage;
+
+pod2usage (2) unless (scalar @ARGV);
+
+for my $path_jpeg (@ARGV)
+{
+    print "JPEG file: $path_jpeg\n";
+
+    my $exiftool = new Image::ExifTool;
+    $exiftool->Options (PrintConv => 0);
+    my $imageinfo = $exiftool->ImageInfo ($path_jpeg);
+    unless (defined $imageinfo->{ProjectionType} and $imageinfo->{ProjectionType} eq 'equirectangular')
+    {
+        print "Skipping: Incomplete XMP GPano tags\n"; next;
+    }
+    my $hfov = 360 * $imageinfo->{CroppedAreaImageWidthPixels} / $imageinfo->{FullPanoWidthPixels};
+    my $vfov = 180 * $imageinfo->{CroppedAreaImageHeightPixels} / $imageinfo->{FullPanoHeightPixels};
+    my $e = $imageinfo->{CroppedAreaTopPixels} + (($imageinfo->{CroppedAreaImageHeightPixels} - $imageinfo->{FullPanoHeightPixels}) / 2);
+
+    my $path_pto = $path_jpeg;
+    $path_pto =~ s/\.jpg/_remap.pto/i;
+    my $pto = new Panotools::Script;
+    $pto->Panorama->{f} = 19; #pannini general
+    $pto->Panorama->{v} = $hfov;
+    $pto->Panorama->{w} = $imageinfo->{CroppedAreaImageWidthPixels};
+    $pto->Panorama->{h} = $imageinfo->{CroppedAreaImageHeightPixels} + abs ($e * 2);
+    $pto->Panorama->{n} = "\"JPEG q90\"";
+    $pto->Option->{outputImageType} = 'jpg';
+    $pto->Option->{outputJPEGQuality} = 90;
+
+    $pto->Image->[0] = new Panotools::Script::Line::Image;
+    $pto->Image->[0]->{f} = 4; # equirectangular
+    $pto->Image->[0]->{v} = $hfov;
+    $pto->Image->[0]->{w} = $imageinfo->{CroppedAreaImageWidthPixels};
+    $pto->Image->[0]->{h} = $imageinfo->{CroppedAreaImageHeightPixels};
+    $pto->Image->[0]->{e} = 0 - $e;
+    $pto->Image->[0]->{n} = "\"$path_jpeg\"";
+
+    $pto->Write ($path_pto);
+}
+
+__END__
+
+=head1 NAME
+
+gpano2pto - Insert a Google photosphere into a Hugin project
+
+=head1 SYNOPSIS
+
+gpano2pto /path/to/PANO_20140225_134632.jpg /path/to/PANO_20140225_134812.jpg [...]
+
+Options: None.
+
+=head1 DESCRIPTION
+
+B<gpano2pto> is a simple tool that reads GPano XMP tags in JPEG panorama files,
+calculates the field of view and crop offsets, and creates Hugin .pto projects
+with the photograph inserted correctly.
+
+This allows further processing of panoramas such as levelling, changing
+projection, and cropping.
+
+Note that partial panoramas are supported.  So this tool does the right thing
+with panoramas less than 360 degrees, and with panoramas that have horizon
+lines above or below the middle of the image.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - March 2014.
+
+=cut

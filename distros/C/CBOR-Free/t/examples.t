@@ -83,7 +83,15 @@ for my $t (@examples) {
     ) or Devel::Peek::Dump($got);
 }
 
-diag '----------';
+# NB: Different perls have historically represented these values
+# using different strings:
+#   - Modern perls all appear to use: inf nan -inf
+#   - Some older perls used Inf NaN -Inf
+#   - Others (e.g., Strawberry 5.12.2) used 1.#INF 1.#QNAN -1.#INF
+#   - Still others (Solaris) used Infinity NaN -Infinity
+my $inf = unpack("f>", "\x7f\x80\x00\x00");
+my $nan = unpack("f>", "\x7f\xc0\x00\x00");
+my $neginf = unpack("f>", "\xff\x80\x00\x00");
 
 sub _pre_522_lc {
     return( $^V ge v5.22.0 ? $_[0] : lc $_[0] );
@@ -104,17 +112,17 @@ my @decode = (
 if (!$long_double_yn) {
     push @decode, (
         [ 1.1 => 'fb3ff199999999999a' ],
-        [ _pre_522_lc('Inf') => 'fa7f800000' ],
-        [ _pre_522_lc('NaN') => 'fa7fc00000' ],
-        [ _pre_522_lc('-Inf') => 'faff800000' ],
+        [ $inf => 'fa7f800000' ],
+        [ $nan => 'fa7fc00000' ],
+        [ $neginf => 'faff800000' ],
     );
 
     if ($is_64bit) {
         push @decode, (
            [ -4.1 => 'fbc010666666666666' ],
-            [ _pre_522_lc('Inf') => 'fb7ff0000000000000' ],
-            [ _pre_522_lc('NaN') => 'fb7ff8000000000000' ],
-            [ _pre_522_lc('-Inf') => 'fbfff0000000000000' ],
+            [ $inf => 'fb7ff0000000000000' ],
+            [ $nan => 'fb7ff8000000000000' ],
+            [ $neginf => 'fbfff0000000000000' ],
         );
     }
 }

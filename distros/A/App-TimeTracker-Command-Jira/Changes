@@ -1,5 +1,13 @@
 Revision history for App-TimeTracker-Command-Jira
 
+0.8       2019-05-09 16:24:11+02:00 Europe/Zurich
+
+    - Tidied up POD (Mohammad S Anwar)
+
+0.7       2019-05-09 15:49:11+02:00 Europe/Zurich
+
+    - Make username and password Jira credentials optional and point to option where those can be stored encrypted via Config::Identity
+
 0.6       2017-07-27 16:51:16+02:00 Europe/Zurich
 
     - Branch selection based on (immutable) ticket number (maros)

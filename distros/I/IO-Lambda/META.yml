@@ -1,28 +1,29 @@
 ---
-abstract: non-blocking I/O as lambda calculus
+abstract: 'non-blocking I/O as lambda calculus'
 author:
   - 'Dmitry Karasik <dmitry@karasik.eu.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-Lambda
 no_index:
   directory:
     - t
     - inc
 requires:
-  LWP: 0
-  Net::DNS: 0
-  Scalar::Util: 0
-  Storable: 0
-  Sub::Name: 0
-  Time::HiRes: 0
-  URI: 0
-version: 1.26
+  LWP: '0'
+  Net::DNS: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Sub::Name: '0'
+  Time::HiRes: '0'
+  URI: '0'
+version: '1.28'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

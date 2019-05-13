@@ -316,6 +316,7 @@ site/htdocs/static/languages/ar.json
 site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
 site/htdocs/static/languages/es.json
+site/htdocs/static/languages/fi.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/it.json
 site/htdocs/static/languages/nl.json
@@ -383,6 +384,7 @@ site/templates/common/bullet_go.png
 site/templates/common/key.png
 site/templates/common/mail/ar.json
 site/templates/common/mail/en.json
+site/templates/common/mail/fi.json
 site/templates/common/mail/fr.json
 site/templates/common/mail/it.json
 site/templates/common/mail/vi.json
@@ -397,7 +399,6 @@ site/templates/common/mail_register_done.tpl
 site/templates/common/notification.xsl
 site/templates/common/notifinclude.tpl
 site/templates/common/oidc_checksession.tpl
-site/templates/common/redirect.tpl
 site/templates/common/registerBrowser.tpl
 site/templates/common/script.tpl
 t/01-AuthDemo.t
@@ -438,17 +439,22 @@ t/30-SAML-Head-to-Tail-POST.t
 t/30-SAML-ReAuth-with-choice.t
 t/30-SAML-ReAuth.t
 t/30-SAML-SP-rule.t
+t/31-Auth-and-issuer-CAS-declared-app-userattr.t
 t/31-Auth-and-issuer-CAS-declared-app.t
+t/31-Auth-and-issuer-CAS-declared-apps.t
 t/31-Auth-and-issuer-CAS-default.t
 t/31-Auth-and-issuer-CAS-gateway.t
 t/31-Auth-and-issuer-CAS-proxied.t
 t/31-Auth-and-issuer-CAS-with-choice-and-cancel.t
 t/31-Auth-and-issuer-CAS-with-choice.t
 t/32-Auth-and-issuer-OIDC-authorization_code-OP-logout.t
+t/32-Auth-and-issuer-OIDC-authorization_code-public_client.t
 t/32-Auth-and-issuer-OIDC-authorization_code-with-authchoice.t
 t/32-Auth-and-issuer-OIDC-authorization_code.t
 t/32-Auth-and-issuer-OIDC-hybrid.t
 t/32-Auth-and-issuer-OIDC-implicit.t
+t/32-Auth-and-issuer-OIDC-sorted.t
+t/32-CAS-10.t
 t/32-OIDC-RP-rule.t
 t/33-Auth-and-issuer-OpenID2.t
 t/34-Auth-Proxy-and-REST-Server.t
@@ -481,11 +487,13 @@ t/40-Notifications-XML-DBI.t
 t/40-Notifications-XML-File.t
 t/40-Notifications-XML-Server.t
 t/41-Captcha.t
+t/41-Token-Global-Storage.t
 t/41-Token.t
 t/42-Register-Demo-with-captcha.t
 t/42-Register-Demo-with-token.t
 t/42-Register-Demo.t
 t/42-Register-LDAP.t
+t/42-Register-Security.t
 t/43-MailPasswordReset-Choice.t
 t/43-MailPasswordReset-DBI.t
 t/43-MailPasswordReset-LDAP.t
@@ -509,6 +517,7 @@ t/66-CDA-with-SOAP.t
 t/66-CDA.t
 t/67-CheckUser-with-token.t
 t/67-CheckUser.t
+t/68-Impersonation-with-doubleCookies.t
 t/68-Impersonation-with-merge.t
 t/68-Impersonation.t
 t/70-2F-TOTP-with-History.t
@@ -527,6 +536,7 @@ t/76-2F-Ext-with-BruteForce.t
 t/76-2F-Ext-with-CodeActivation.t
 t/76-2F-Ext-with-GrantSession.t
 t/76-2F-Ext-with-History.t
+t/77-2F-Mail-with-global-storage.t
 t/77-2F-Mail.t
 t/90-Translations.t
 t/99-pod.t

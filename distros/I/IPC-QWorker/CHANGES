@@ -1,45 +1,38 @@
 ==================================================
-Changes from 2012-08-22 00:00:00 +0000 to present.
+Changes from 2018-05-08 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.07 at 2013-08-22 11:02:37 +0000
+version 0.08 at 2019-05-08 08:52:33 +0000
 -----------------------------------------
 
-  Change: 5ea6c10580868ce4c8247336ae88599ed3661f76
-  Author: Markus Benning <me@w3r3wolf.de>
-  Date : 2013-08-22 13:02:21 +0000
+  Change: 22410bba22eac6b998ce7e68870b5a295af2f07e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 10:49:58 +0000
 
-    -add gitignore 
+    Declare compatibility with operating systems
 
-  Change: 0f51f36c7576b8c1046248dd89d95b444c69ffdc
-  Author: Markus Benning <me@w3r3wolf.de>
-  Date : 2013-08-22 13:01:15 +0000
+    This add use of Dist::Zilla::Plugin::AssertOS to make clear this
+    module was built for use on Linux. 
 
-    -remove prototypes 
+  Change: e0a87a0f0ac513d227060d41decac29b03b147fd
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 10:48:02 +0000
 
-  Change: eea903dd1b48c147ef45096a3365195f0e8fd5c7
-  Author: Markus Benning <me@w3r3wolf.de>
-  Date : 2013-08-22 12:58:15 +0000
+    Convert to cpanfile/carton dependencies 
 
-    -dzil configuration 
+  Change: da17427a45ac8361f7f668a58a8d087e9a600cda
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 10:39:50 +0000
 
-  Change: e62bb2abccbafddb4899bade5c04e4790c55658e
-  Author: Markus Benning <me@w3r3wolf.de>
-  Date : 2013-08-22 12:57:48 +0000
+    Update POD and fixed formating 
 
-    -dzilify distribution 
+  Change: d97305730e88d28c853b3118c8b8ff07d34b8c6a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2019-05-08 10:25:02 +0000
 
------------------------------------------
-version 0.06 at 2013-08-22 10:50:15 +0000
------------------------------------------
+    Update author email address 
 
-  Change: eb1b94bc86108fdc14451d9a42480ada35109c3e
-  Author: Markus Benning <me@w3r3wolf.de>
-  Date : 2013-08-22 12:50:15 +0000
-
-    -initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2018-05-08 00:00:00 +0000.
+================================================

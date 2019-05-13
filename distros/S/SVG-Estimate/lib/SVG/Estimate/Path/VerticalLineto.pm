@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::VerticalLineto;
-$SVG::Estimate::Path::VerticalLineto::VERSION = '1.0113';
+$SVG::Estimate::Path::VerticalLineto::VERSION = '1.0114';
 use Moo;
 
 extends 'SVG::Estimate::Path::Command';
@@ -11,7 +11,7 @@ SVG::Estimate::Path::VerticalLineto - Handles estimating vertical lines.
 
 =head1 VERSION
 
-version 1.0113
+version 1.0114
 
 =head1 SYNOPSIS
 

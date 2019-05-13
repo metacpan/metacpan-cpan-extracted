@@ -1557,6 +1557,7 @@ ok($tel->set_number('0174 251234')->is_valid_number, 'checking for 0174 251234')
 ok($tel->set_number('0174 271234')->is_valid_number, 'checking for 0174 271234');
 ok($tel->set_number('0174 281234')->is_valid_number, 'checking for 0174 281234');
 ok($tel->set_number('0174 291234')->is_valid_number, 'checking for 0174 291234');
+ok($tel->set_number('0174 301234')->is_valid_number, 'checking for 0174 301234');
 ok($tel->set_number('0174 311234')->is_valid_number, 'checking for 0174 311234');
 ok($tel->set_number('0174 331234')->is_valid_number, 'checking for 0174 331234');
 ok($tel->set_number('0174 341234')->is_valid_number, 'checking for 0174 341234');
@@ -2468,6 +2469,7 @@ ok($tel->set_number('0198 671234')->is_valid_number, 'checking for 0198 671234')
 ok($tel->set_number('0198 681234')->is_valid_number, 'checking for 0198 681234');
 ok($tel->set_number('0198 691234')->is_valid_number, 'checking for 0198 691234');
 ok($tel->set_number('0198 701234')->is_valid_number, 'checking for 0198 701234');
+ok($tel->set_number('0198 711234')->is_valid_number, 'checking for 0198 711234');
 ok($tel->set_number('0198 771234')->is_valid_number, 'checking for 0198 771234');
 ok($tel->set_number('0198 781234')->is_valid_number, 'checking for 0198 781234');
 ok($tel->set_number('0198 791234')->is_valid_number, 'checking for 0198 791234');
@@ -3299,6 +3301,7 @@ ok($tel->set_number('0241 681234')->is_valid_number, 'checking for 0241 681234')
 ok($tel->set_number('0241 691234')->is_valid_number, 'checking for 0241 691234');
 ok($tel->set_number('0241 901234')->is_valid_number, 'checking for 0241 901234');
 ok($tel->set_number('0241 921234')->is_valid_number, 'checking for 0241 921234');
+ok($tel->set_number('0241 951234')->is_valid_number, 'checking for 0241 951234');
 ok($tel->set_number('0241 981234')->is_valid_number, 'checking for 0241 981234');
 ok($tel->set_number('0241 701234')->is_valid_number, 'checking for 0241 701234');
 ok($tel->set_number('0241 711234')->is_valid_number, 'checking for 0241 711234');
@@ -3311,6 +3314,7 @@ ok($tel->set_number('0241 811234')->is_valid_number, 'checking for 0241 811234')
 ok($tel->set_number('0241 821234')->is_valid_number, 'checking for 0241 821234');
 ok($tel->set_number('0241 831234')->is_valid_number, 'checking for 0241 831234');
 ok($tel->set_number('0241 841234')->is_valid_number, 'checking for 0241 841234');
+ok($tel->set_number('0241 851234')->is_valid_number, 'checking for 0241 851234');
 ok($tel->set_number('0241 861234')->is_valid_number, 'checking for 0241 861234');
 ok($tel->set_number('0241 871234')->is_valid_number, 'checking for 0241 871234');
 ok($tel->set_number('0241 881234')->is_valid_number, 'checking for 0241 881234');
@@ -3612,6 +3616,7 @@ ok($tel->set_number('0247 471234')->is_valid_number, 'checking for 0247 471234')
 ok($tel->set_number('0247 481234')->is_valid_number, 'checking for 0247 481234');
 ok($tel->set_number('0247 491234')->is_valid_number, 'checking for 0247 491234');
 ok($tel->set_number('0247 511234')->is_valid_number, 'checking for 0247 511234');
+ok($tel->set_number('0247 521234')->is_valid_number, 'checking for 0247 521234');
 ok($tel->set_number('0247 531234')->is_valid_number, 'checking for 0247 531234');
 ok($tel->set_number('0247 541234')->is_valid_number, 'checking for 0247 541234');
 ok($tel->set_number('0247 551234')->is_valid_number, 'checking for 0247 551234');
@@ -3621,6 +3626,7 @@ ok($tel->set_number('0247 591234')->is_valid_number, 'checking for 0247 591234')
 ok($tel->set_number('0247 611234')->is_valid_number, 'checking for 0247 611234');
 ok($tel->set_number('0247 621234')->is_valid_number, 'checking for 0247 621234');
 ok($tel->set_number('0247 651234')->is_valid_number, 'checking for 0247 651234');
+ok($tel->set_number('0247 661234')->is_valid_number, 'checking for 0247 661234');
 ok($tel->set_number('0247 671234')->is_valid_number, 'checking for 0247 671234');
 ok($tel->set_number('0247 681234')->is_valid_number, 'checking for 0247 681234');
 ok($tel->set_number('0247 691234')->is_valid_number, 'checking for 0247 691234');
@@ -3930,6 +3936,7 @@ ok($tel->set_number('0254 661234')->is_valid_number, 'checking for 0254 661234')
 ok($tel->set_number('0254 671234')->is_valid_number, 'checking for 0254 671234');
 ok($tel->set_number('0254 681234')->is_valid_number, 'checking for 0254 681234');
 ok($tel->set_number('0254 691234')->is_valid_number, 'checking for 0254 691234');
+ok($tel->set_number('0254 701234')->is_valid_number, 'checking for 0254 701234');
 ok($tel->set_number('0254 721234')->is_valid_number, 'checking for 0254 721234');
 ok($tel->set_number('0254 731234')->is_valid_number, 'checking for 0254 731234');
 ok($tel->set_number('0254 751234')->is_valid_number, 'checking for 0254 751234');
@@ -3938,6 +3945,7 @@ ok($tel->set_number('0254 771234')->is_valid_number, 'checking for 0254 771234')
 ok($tel->set_number('0254 781234')->is_valid_number, 'checking for 0254 781234');
 ok($tel->set_number('0254 791234')->is_valid_number, 'checking for 0254 791234');
 ok($tel->set_number('0254 851234')->is_valid_number, 'checking for 0254 851234');
+ok($tel->set_number('0254 881234')->is_valid_number, 'checking for 0254 881234');
 ok($tel->set_number('0254 921234')->is_valid_number, 'checking for 0254 921234');
 ok($tel->set_number('0254 931234')->is_valid_number, 'checking for 0254 931234');
 ok($tel->set_number('0254 941234')->is_valid_number, 'checking for 0254 941234');
@@ -4013,6 +4021,7 @@ ok($tel->set_number('025 5651234')->is_valid_number, 'checking for 025 5651234')
 ok($tel->set_number('025 5661234')->is_valid_number, 'checking for 025 5661234');
 ok($tel->set_number('025 5671234')->is_valid_number, 'checking for 025 5671234');
 ok($tel->set_number('025 5681234')->is_valid_number, 'checking for 025 5681234');
+ok($tel->set_number('025 6001234')->is_valid_number, 'checking for 025 6001234');
 ok($tel->set_number('025 5001234')->is_valid_number, 'checking for 025 5001234');
 ok($tel->set_number('025 5011234')->is_valid_number, 'checking for 025 5011234');
 ok($tel->set_number('025 5061234')->is_valid_number, 'checking for 025 5061234');
@@ -4033,6 +4042,7 @@ ok($tel->set_number('0256 761234')->is_valid_number, 'checking for 0256 761234')
 ok($tel->set_number('0256 771234')->is_valid_number, 'checking for 0256 771234');
 ok($tel->set_number('0256 781234')->is_valid_number, 'checking for 0256 781234');
 ok($tel->set_number('0256 791234')->is_valid_number, 'checking for 0256 791234');
+ok($tel->set_number('0256 801234')->is_valid_number, 'checking for 0256 801234');
 ok($tel->set_number('0256 821234')->is_valid_number, 'checking for 0256 821234');
 ok($tel->set_number('0256 851234')->is_valid_number, 'checking for 0256 851234');
 ok($tel->set_number('0256 861234')->is_valid_number, 'checking for 0256 861234');
@@ -4091,6 +4101,7 @@ ok($tel->set_number('025 7661234')->is_valid_number, 'checking for 025 7661234')
 ok($tel->set_number('025 7671234')->is_valid_number, 'checking for 025 7671234');
 ok($tel->set_number('025 7681234')->is_valid_number, 'checking for 025 7681234');
 ok($tel->set_number('025 7691234')->is_valid_number, 'checking for 025 7691234');
+ok($tel->set_number('025 8001234')->is_valid_number, 'checking for 025 8001234');
 ok($tel->set_number('0257 201234')->is_valid_number, 'checking for 0257 201234');
 ok($tel->set_number('0257 211234')->is_valid_number, 'checking for 0257 211234');
 ok($tel->set_number('0257 221234')->is_valid_number, 'checking for 0257 221234');
@@ -4108,6 +4119,7 @@ ok($tel->set_number('0257 331234')->is_valid_number, 'checking for 0257 331234')
 ok($tel->set_number('0257 351234')->is_valid_number, 'checking for 0257 351234');
 ok($tel->set_number('0257 371234')->is_valid_number, 'checking for 0257 371234');
 ok($tel->set_number('0257 381234')->is_valid_number, 'checking for 0257 381234');
+ok($tel->set_number('0257 391234')->is_valid_number, 'checking for 0257 391234');
 ok($tel->set_number('0257 411234')->is_valid_number, 'checking for 0257 411234');
 ok($tel->set_number('0257 431234')->is_valid_number, 'checking for 0257 431234');
 ok($tel->set_number('0257 451234')->is_valid_number, 'checking for 0257 451234');
@@ -4140,6 +4152,7 @@ ok($tel->set_number('025 7891234')->is_valid_number, 'checking for 025 7891234')
 ok($tel->set_number('025 7001234')->is_valid_number, 'checking for 025 7001234');
 ok($tel->set_number('025 7011234')->is_valid_number, 'checking for 025 7011234');
 ok($tel->set_number('025 7061234')->is_valid_number, 'checking for 025 7061234');
+ok($tel->set_number('025 7071234')->is_valid_number, 'checking for 025 7071234');
 ok($tel->set_number('025 7081234')->is_valid_number, 'checking for 025 7081234');
 ok($tel->set_number('025 7921234')->is_valid_number, 'checking for 025 7921234');
 ok($tel->set_number('025 7931234')->is_valid_number, 'checking for 025 7931234');
@@ -4213,6 +4226,7 @@ ok($tel->set_number('0259 281234')->is_valid_number, 'checking for 0259 281234')
 ok($tel->set_number('0259 291234')->is_valid_number, 'checking for 0259 291234');
 ok($tel->set_number('0259 301234')->is_valid_number, 'checking for 0259 301234');
 ok($tel->set_number('0259 331234')->is_valid_number, 'checking for 0259 331234');
+ok($tel->set_number('0259 361234')->is_valid_number, 'checking for 0259 361234');
 ok($tel->set_number('0259 511234')->is_valid_number, 'checking for 0259 511234');
 ok($tel->set_number('0259 521234')->is_valid_number, 'checking for 0259 521234');
 ok($tel->set_number('0259 551234')->is_valid_number, 'checking for 0259 551234');
@@ -4255,6 +4269,7 @@ ok($tel->set_number('0261 231234')->is_valid_number, 'checking for 0261 231234')
 ok($tel->set_number('0261 251234')->is_valid_number, 'checking for 0261 251234');
 ok($tel->set_number('0261 261234')->is_valid_number, 'checking for 0261 261234');
 ok($tel->set_number('0261 291234')->is_valid_number, 'checking for 0261 291234');
+ok($tel->set_number('0261 331234')->is_valid_number, 'checking for 0261 331234');
 ok($tel->set_number('0261 611234')->is_valid_number, 'checking for 0261 611234');
 ok($tel->set_number('0261 621234')->is_valid_number, 'checking for 0261 621234');
 ok($tel->set_number('0261 661234')->is_valid_number, 'checking for 0261 661234');
@@ -12147,6 +12162,7 @@ ok($tel->set_number('053 9861234')->is_valid_number, 'checking for 053 9861234')
 ok($tel->set_number('053 9871234')->is_valid_number, 'checking for 053 9871234');
 ok($tel->set_number('053 9881234')->is_valid_number, 'checking for 053 9881234');
 ok($tel->set_number('053 9891234')->is_valid_number, 'checking for 053 9891234');
+ok($tel->set_number('0531 211234')->is_valid_number, 'checking for 0531 211234');
 ok($tel->set_number('0531 221234')->is_valid_number, 'checking for 0531 221234');
 ok($tel->set_number('0531 231234')->is_valid_number, 'checking for 0531 231234');
 ok($tel->set_number('0531 241234')->is_valid_number, 'checking for 0531 241234');
@@ -12272,6 +12288,7 @@ ok($tel->set_number('0536 641234')->is_valid_number, 'checking for 0536 641234')
 ok($tel->set_number('0536 651234')->is_valid_number, 'checking for 0536 651234');
 ok($tel->set_number('0536 661234')->is_valid_number, 'checking for 0536 661234');
 ok($tel->set_number('0536 671234')->is_valid_number, 'checking for 0536 671234');
+ok($tel->set_number('0536 721234')->is_valid_number, 'checking for 0536 721234');
 ok($tel->set_number('0536 751234')->is_valid_number, 'checking for 0536 751234');
 ok($tel->set_number('0536 761234')->is_valid_number, 'checking for 0536 761234');
 ok($tel->set_number('0536 771234')->is_valid_number, 'checking for 0536 771234');
@@ -13627,6 +13644,7 @@ ok($tel->set_number('0575 361234')->is_valid_number, 'checking for 0575 361234')
 ok($tel->set_number('0575 371234')->is_valid_number, 'checking for 0575 371234');
 ok($tel->set_number('0575 381234')->is_valid_number, 'checking for 0575 381234');
 ok($tel->set_number('0575 401234')->is_valid_number, 'checking for 0575 401234');
+ok($tel->set_number('0575 411234')->is_valid_number, 'checking for 0575 411234');
 ok($tel->set_number('0575 451234')->is_valid_number, 'checking for 0575 451234');
 ok($tel->set_number('0575 461234')->is_valid_number, 'checking for 0575 461234');
 ok($tel->set_number('0575 471234')->is_valid_number, 'checking for 0575 471234');
@@ -13640,6 +13658,7 @@ ok($tel->set_number('0575 661234')->is_valid_number, 'checking for 0575 661234')
 ok($tel->set_number('0575 671234')->is_valid_number, 'checking for 0575 671234');
 ok($tel->set_number('0575 681234')->is_valid_number, 'checking for 0575 681234');
 ok($tel->set_number('0575 691234')->is_valid_number, 'checking for 0575 691234');
+ok($tel->set_number('0575 711234')->is_valid_number, 'checking for 0575 711234');
 ok($tel->set_number('0575 721234')->is_valid_number, 'checking for 0575 721234');
 ok($tel->set_number('0575 731234')->is_valid_number, 'checking for 0575 731234');
 ok($tel->set_number('0575 741234')->is_valid_number, 'checking for 0575 741234');
@@ -14271,6 +14290,7 @@ ok($tel->set_number('0596 271234')->is_valid_number, 'checking for 0596 271234')
 ok($tel->set_number('0596 281234')->is_valid_number, 'checking for 0596 281234');
 ok($tel->set_number('0596 291234')->is_valid_number, 'checking for 0596 291234');
 ok($tel->set_number('0596 311234')->is_valid_number, 'checking for 0596 311234');
+ok($tel->set_number('0596 331234')->is_valid_number, 'checking for 0596 331234');
 ok($tel->set_number('0596 341234')->is_valid_number, 'checking for 0596 341234');
 ok($tel->set_number('0596 351234')->is_valid_number, 'checking for 0596 351234');
 ok($tel->set_number('0596 361234')->is_valid_number, 'checking for 0596 361234');
@@ -18998,7 +19018,6 @@ ok($tel->set_number('083 2881234')->is_valid_number, 'checking for 083 2881234')
 ok($tel->set_number('083 2891234')->is_valid_number, 'checking for 083 2891234');
 ok($tel->set_number('083 2911234')->is_valid_number, 'checking for 083 2911234');
 ok($tel->set_number('083 2921234')->is_valid_number, 'checking for 083 2921234');
-ok($tel->set_number('083 2931234')->is_valid_number, 'checking for 083 2931234');
 ok($tel->set_number('083 2941234')->is_valid_number, 'checking for 083 2941234');
 ok($tel->set_number('083 7661234')->is_valid_number, 'checking for 083 7661234');
 ok($tel->set_number('083 7671234')->is_valid_number, 'checking for 083 7671234');
@@ -25266,7 +25285,6 @@ ok(!$tel->set_number('0174 211234')->is_valid_number, 'checking for 0174 211234'
 ok(!$tel->set_number('0174 231234')->is_valid_number, 'checking for 0174 231234');
 ok(!$tel->set_number('0174 241234')->is_valid_number, 'checking for 0174 241234');
 ok(!$tel->set_number('0174 261234')->is_valid_number, 'checking for 0174 261234');
-ok(!$tel->set_number('0174 301234')->is_valid_number, 'checking for 0174 301234');
 ok(!$tel->set_number('0174 321234')->is_valid_number, 'checking for 0174 321234');
 ok(!$tel->set_number('0174 391234')->is_valid_number, 'checking for 0174 391234');
 ok(!$tel->set_number('0174 401234')->is_valid_number, 'checking for 0174 401234');
@@ -25976,7 +25994,6 @@ ok(!$tel->set_number('0197 831234')->is_valid_number, 'checking for 0197 831234'
 ok(!$tel->set_number('0197 861234')->is_valid_number, 'checking for 0197 861234');
 ok(!$tel->set_number('0197 891234')->is_valid_number, 'checking for 0197 891234');
 ok(!$tel->set_number('0198 611234')->is_valid_number, 'checking for 0198 611234');
-ok(!$tel->set_number('0198 711234')->is_valid_number, 'checking for 0198 711234');
 ok(!$tel->set_number('0198 721234')->is_valid_number, 'checking for 0198 721234');
 ok(!$tel->set_number('0198 731234')->is_valid_number, 'checking for 0198 731234');
 ok(!$tel->set_number('0198 741234')->is_valid_number, 'checking for 0198 741234');
@@ -26469,13 +26486,11 @@ ok(!$tel->set_number('0240 491234')->is_valid_number, 'checking for 0240 491234'
 ok(!$tel->set_number('0241 911234')->is_valid_number, 'checking for 0241 911234');
 ok(!$tel->set_number('0241 931234')->is_valid_number, 'checking for 0241 931234');
 ok(!$tel->set_number('0241 941234')->is_valid_number, 'checking for 0241 941234');
-ok(!$tel->set_number('0241 951234')->is_valid_number, 'checking for 0241 951234');
 ok(!$tel->set_number('0241 991234')->is_valid_number, 'checking for 0241 991234');
 ok(!$tel->set_number('0241 741234')->is_valid_number, 'checking for 0241 741234');
 ok(!$tel->set_number('0241 771234')->is_valid_number, 'checking for 0241 771234');
 ok(!$tel->set_number('0241 791234')->is_valid_number, 'checking for 0241 791234');
 ok(!$tel->set_number('0241 801234')->is_valid_number, 'checking for 0241 801234');
-ok(!$tel->set_number('0241 851234')->is_valid_number, 'checking for 0241 851234');
 ok(!$tel->set_number('0241 891234')->is_valid_number, 'checking for 0241 891234');
 ok(!$tel->set_number('0241 401234')->is_valid_number, 'checking for 0241 401234');
 ok(!$tel->set_number('0241 961234')->is_valid_number, 'checking for 0241 961234');
@@ -26653,12 +26668,10 @@ ok(!$tel->set_number('0247 401234')->is_valid_number, 'checking for 0247 401234'
 ok(!$tel->set_number('0247 411234')->is_valid_number, 'checking for 0247 411234');
 ok(!$tel->set_number('0247 451234')->is_valid_number, 'checking for 0247 451234');
 ok(!$tel->set_number('0247 501234')->is_valid_number, 'checking for 0247 501234');
-ok(!$tel->set_number('0247 521234')->is_valid_number, 'checking for 0247 521234');
 ok(!$tel->set_number('0247 581234')->is_valid_number, 'checking for 0247 581234');
 ok(!$tel->set_number('0247 601234')->is_valid_number, 'checking for 0247 601234');
 ok(!$tel->set_number('0247 631234')->is_valid_number, 'checking for 0247 631234');
 ok(!$tel->set_number('0247 641234')->is_valid_number, 'checking for 0247 641234');
-ok(!$tel->set_number('0247 661234')->is_valid_number, 'checking for 0247 661234');
 ok(!$tel->set_number('0247 801234')->is_valid_number, 'checking for 0247 801234');
 ok(!$tel->set_number('0247 831234')->is_valid_number, 'checking for 0247 831234');
 ok(!$tel->set_number('0247 871234')->is_valid_number, 'checking for 0247 871234');
@@ -26883,7 +26896,6 @@ ok(!$tel->set_number('0254 591234')->is_valid_number, 'checking for 0254 591234'
 ok(!$tel->set_number('0254 611234')->is_valid_number, 'checking for 0254 611234');
 ok(!$tel->set_number('0254 631234')->is_valid_number, 'checking for 0254 631234');
 ok(!$tel->set_number('0254 651234')->is_valid_number, 'checking for 0254 651234');
-ok(!$tel->set_number('0254 701234')->is_valid_number, 'checking for 0254 701234');
 ok(!$tel->set_number('0254 711234')->is_valid_number, 'checking for 0254 711234');
 ok(!$tel->set_number('0254 741234')->is_valid_number, 'checking for 0254 741234');
 ok(!$tel->set_number('0254 801234')->is_valid_number, 'checking for 0254 801234');
@@ -26893,7 +26905,6 @@ ok(!$tel->set_number('0254 831234')->is_valid_number, 'checking for 0254 831234'
 ok(!$tel->set_number('0254 841234')->is_valid_number, 'checking for 0254 841234');
 ok(!$tel->set_number('0254 861234')->is_valid_number, 'checking for 0254 861234');
 ok(!$tel->set_number('0254 871234')->is_valid_number, 'checking for 0254 871234');
-ok(!$tel->set_number('0254 881234')->is_valid_number, 'checking for 0254 881234');
 ok(!$tel->set_number('0254 891234')->is_valid_number, 'checking for 0254 891234');
 ok(!$tel->set_number('0254 901234')->is_valid_number, 'checking for 0254 901234');
 ok(!$tel->set_number('0254 911234')->is_valid_number, 'checking for 0254 911234');
@@ -26910,7 +26921,6 @@ ok(!$tel->set_number('0255 801234')->is_valid_number, 'checking for 0255 801234'
 ok(!$tel->set_number('0255 841234')->is_valid_number, 'checking for 0255 841234');
 ok(!$tel->set_number('0255 891234')->is_valid_number, 'checking for 0255 891234');
 ok(!$tel->set_number('025 5691234')->is_valid_number, 'checking for 025 5691234');
-ok(!$tel->set_number('025 6001234')->is_valid_number, 'checking for 025 6001234');
 ok(!$tel->set_number('025 6011234')->is_valid_number, 'checking for 025 6011234');
 ok(!$tel->set_number('025 6021234')->is_valid_number, 'checking for 025 6021234');
 ok(!$tel->set_number('025 6031234')->is_valid_number, 'checking for 025 6031234');
@@ -26930,7 +26940,6 @@ ok(!$tel->set_number('025 5901234')->is_valid_number, 'checking for 025 5901234'
 ok(!$tel->set_number('025 5911234')->is_valid_number, 'checking for 025 5911234');
 ok(!$tel->set_number('0256 711234')->is_valid_number, 'checking for 0256 711234');
 ok(!$tel->set_number('0256 741234')->is_valid_number, 'checking for 0256 741234');
-ok(!$tel->set_number('0256 801234')->is_valid_number, 'checking for 0256 801234');
 ok(!$tel->set_number('0256 811234')->is_valid_number, 'checking for 0256 811234');
 ok(!$tel->set_number('0256 831234')->is_valid_number, 'checking for 0256 831234');
 ok(!$tel->set_number('0256 841234')->is_valid_number, 'checking for 0256 841234');
@@ -26962,7 +26971,6 @@ ok(!$tel->set_number('0256 591234')->is_valid_number, 'checking for 0256 591234'
 ok(!$tel->set_number('0256 651234')->is_valid_number, 'checking for 0256 651234');
 ok(!$tel->set_number('0256 691234')->is_valid_number, 'checking for 0256 691234');
 ok(!$tel->set_number('025 7511234')->is_valid_number, 'checking for 025 7511234');
-ok(!$tel->set_number('025 8001234')->is_valid_number, 'checking for 025 8001234');
 ok(!$tel->set_number('025 8011234')->is_valid_number, 'checking for 025 8011234');
 ok(!$tel->set_number('025 8021234')->is_valid_number, 'checking for 025 8021234');
 ok(!$tel->set_number('025 8031234')->is_valid_number, 'checking for 025 8031234');
@@ -26974,7 +26982,6 @@ ok(!$tel->set_number('025 8081234')->is_valid_number, 'checking for 025 8081234'
 ok(!$tel->set_number('025 8091234')->is_valid_number, 'checking for 025 8091234');
 ok(!$tel->set_number('0257 341234')->is_valid_number, 'checking for 0257 341234');
 ok(!$tel->set_number('0257 361234')->is_valid_number, 'checking for 0257 361234');
-ok(!$tel->set_number('0257 391234')->is_valid_number, 'checking for 0257 391234');
 ok(!$tel->set_number('0257 401234')->is_valid_number, 'checking for 0257 401234');
 ok(!$tel->set_number('0257 421234')->is_valid_number, 'checking for 0257 421234');
 ok(!$tel->set_number('0257 441234')->is_valid_number, 'checking for 0257 441234');
@@ -26990,7 +26997,6 @@ ok(!$tel->set_number('025 7021234')->is_valid_number, 'checking for 025 7021234'
 ok(!$tel->set_number('025 7031234')->is_valid_number, 'checking for 025 7031234');
 ok(!$tel->set_number('025 7041234')->is_valid_number, 'checking for 025 7041234');
 ok(!$tel->set_number('025 7051234')->is_valid_number, 'checking for 025 7051234');
-ok(!$tel->set_number('025 7071234')->is_valid_number, 'checking for 025 7071234');
 ok(!$tel->set_number('025 7091234')->is_valid_number, 'checking for 025 7091234');
 ok(!$tel->set_number('025 7901234')->is_valid_number, 'checking for 025 7901234');
 ok(!$tel->set_number('025 7911234')->is_valid_number, 'checking for 025 7911234');
@@ -27026,7 +27032,6 @@ ok(!$tel->set_number('0259 311234')->is_valid_number, 'checking for 0259 311234'
 ok(!$tel->set_number('0259 321234')->is_valid_number, 'checking for 0259 321234');
 ok(!$tel->set_number('0259 341234')->is_valid_number, 'checking for 0259 341234');
 ok(!$tel->set_number('0259 351234')->is_valid_number, 'checking for 0259 351234');
-ok(!$tel->set_number('0259 361234')->is_valid_number, 'checking for 0259 361234');
 ok(!$tel->set_number('0259 371234')->is_valid_number, 'checking for 0259 371234');
 ok(!$tel->set_number('0259 381234')->is_valid_number, 'checking for 0259 381234');
 ok(!$tel->set_number('0259 391234')->is_valid_number, 'checking for 0259 391234');
@@ -27071,7 +27076,6 @@ ok(!$tel->set_number('0261 281234')->is_valid_number, 'checking for 0261 281234'
 ok(!$tel->set_number('0261 301234')->is_valid_number, 'checking for 0261 301234');
 ok(!$tel->set_number('0261 311234')->is_valid_number, 'checking for 0261 311234');
 ok(!$tel->set_number('0261 321234')->is_valid_number, 'checking for 0261 321234');
-ok(!$tel->set_number('0261 331234')->is_valid_number, 'checking for 0261 331234');
 ok(!$tel->set_number('0261 341234')->is_valid_number, 'checking for 0261 341234');
 ok(!$tel->set_number('0261 351234')->is_valid_number, 'checking for 0261 351234');
 ok(!$tel->set_number('0261 361234')->is_valid_number, 'checking for 0261 361234');
@@ -31797,7 +31801,6 @@ ok(!$tel->set_number('053 9781234')->is_valid_number, 'checking for 053 9781234'
 ok(!$tel->set_number('053 9791234')->is_valid_number, 'checking for 053 9791234');
 ok(!$tel->set_number('053 9801234')->is_valid_number, 'checking for 053 9801234');
 ok(!$tel->set_number('0531 201234')->is_valid_number, 'checking for 0531 201234');
-ok(!$tel->set_number('0531 211234')->is_valid_number, 'checking for 0531 211234');
 ok(!$tel->set_number('0531 301234')->is_valid_number, 'checking for 0531 301234');
 ok(!$tel->set_number('0531 311234')->is_valid_number, 'checking for 0531 311234');
 ok(!$tel->set_number('0531 401234')->is_valid_number, 'checking for 0531 401234');
@@ -31893,7 +31896,6 @@ ok(!$tel->set_number('0536 681234')->is_valid_number, 'checking for 0536 681234'
 ok(!$tel->set_number('0536 691234')->is_valid_number, 'checking for 0536 691234');
 ok(!$tel->set_number('0536 701234')->is_valid_number, 'checking for 0536 701234');
 ok(!$tel->set_number('0536 711234')->is_valid_number, 'checking for 0536 711234');
-ok(!$tel->set_number('0536 721234')->is_valid_number, 'checking for 0536 721234');
 ok(!$tel->set_number('0536 731234')->is_valid_number, 'checking for 0536 731234');
 ok(!$tel->set_number('0536 741234')->is_valid_number, 'checking for 0536 741234');
 ok(!$tel->set_number('0536 801234')->is_valid_number, 'checking for 0536 801234');
@@ -33113,7 +33115,6 @@ ok(!$tel->set_number('0574 871234')->is_valid_number, 'checking for 0574 871234'
 ok(!$tel->set_number('0574 891234')->is_valid_number, 'checking for 0574 891234');
 ok(!$tel->set_number('0575 261234')->is_valid_number, 'checking for 0575 261234');
 ok(!$tel->set_number('0575 391234')->is_valid_number, 'checking for 0575 391234');
-ok(!$tel->set_number('0575 411234')->is_valid_number, 'checking for 0575 411234');
 ok(!$tel->set_number('0575 421234')->is_valid_number, 'checking for 0575 421234');
 ok(!$tel->set_number('0575 431234')->is_valid_number, 'checking for 0575 431234');
 ok(!$tel->set_number('0575 441234')->is_valid_number, 'checking for 0575 441234');
@@ -33130,7 +33131,6 @@ ok(!$tel->set_number('0575 591234')->is_valid_number, 'checking for 0575 591234'
 ok(!$tel->set_number('0575 611234')->is_valid_number, 'checking for 0575 611234');
 ok(!$tel->set_number('0575 641234')->is_valid_number, 'checking for 0575 641234');
 ok(!$tel->set_number('0575 701234')->is_valid_number, 'checking for 0575 701234');
-ok(!$tel->set_number('0575 711234')->is_valid_number, 'checking for 0575 711234');
 ok(!$tel->set_number('0575 761234')->is_valid_number, 'checking for 0575 761234');
 ok(!$tel->set_number('0575 801234')->is_valid_number, 'checking for 0575 801234');
 ok(!$tel->set_number('0575 811234')->is_valid_number, 'checking for 0575 811234');
@@ -33670,7 +33670,6 @@ ok(!$tel->set_number('0595 951234')->is_valid_number, 'checking for 0595 951234'
 ok(!$tel->set_number('0595 991234')->is_valid_number, 'checking for 0595 991234');
 ok(!$tel->set_number('0596 301234')->is_valid_number, 'checking for 0596 301234');
 ok(!$tel->set_number('0596 321234')->is_valid_number, 'checking for 0596 321234');
-ok(!$tel->set_number('0596 331234')->is_valid_number, 'checking for 0596 331234');
 ok(!$tel->set_number('0596 401234')->is_valid_number, 'checking for 0596 401234');
 ok(!$tel->set_number('0596 411234')->is_valid_number, 'checking for 0596 411234');
 ok(!$tel->set_number('0596 451234')->is_valid_number, 'checking for 0596 451234');
@@ -38589,6 +38588,7 @@ ok(!$tel->set_number('083 2791234')->is_valid_number, 'checking for 083 2791234'
 ok(!$tel->set_number('083 2801234')->is_valid_number, 'checking for 083 2801234');
 ok(!$tel->set_number('083 2851234')->is_valid_number, 'checking for 083 2851234');
 ok(!$tel->set_number('083 2901234')->is_valid_number, 'checking for 083 2901234');
+ok(!$tel->set_number('083 2931234')->is_valid_number, 'checking for 083 2931234');
 ok(!$tel->set_number('083 2951234')->is_valid_number, 'checking for 083 2951234');
 ok(!$tel->set_number('083 2961234')->is_valid_number, 'checking for 083 2961234');
 ok(!$tel->set_number('083 2971234')->is_valid_number, 'checking for 083 2971234');

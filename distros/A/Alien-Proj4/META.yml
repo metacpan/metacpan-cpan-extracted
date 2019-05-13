@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/PDLPorters/Alien-Proj4/issues
   repository: https://github.com/PDLPorters/Alien-Proj4
-version: '2.019109'
+version: '2.019110'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 1.68'
   requires:

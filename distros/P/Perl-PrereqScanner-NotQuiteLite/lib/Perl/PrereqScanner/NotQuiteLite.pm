@@ -6,7 +6,7 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.9904';
+our $VERSION = '0.9905';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
@@ -74,13 +74,14 @@ my %ends_expr = map {$_ => 1} qw(
 
 my %has_sideff = map {$_ => 1} qw(
   and or xor && || //
-  if unless
+  if unless when
 );
 
 # keywords that allow /regexp/ to follow directly
 my %regexp_may_follow = map {$_ => 1} qw(
   and or cmp if elsif unless eq ne
   gt lt ge le for while until grep map not split when
+  return
 );
 
 my $re_namespace = qr/(?:::|')?(?:\w+(?:(?:::|')\w+)*)/;
@@ -257,6 +258,8 @@ sub scan_string {
   } else {
     $string =~ s/(?:\015\012|\015|\012)/\n/gs;
   }
+  $string =~ s/[ \t]+/ /g;
+  $string =~ s/(?: *\n)+/\n/gs;
 
   # FIXME
   $c->{stack} = [];
@@ -288,6 +291,7 @@ sub scan_string {
   }
 
   $c->remove_inner_packages_from_requirements;
+  $c->merge_perl;
 
   $c;
 }
@@ -350,15 +354,15 @@ sub _scan {
       }
     }
     if ($c1 eq "\n") {
-      $$rstr =~ m{\G(?>\n+)}gcs;
+      pos($$rstr)++;
       $line_top = 1;
       next;
     }
 
     $line_top = 0;
     # ignore whitespaces
-    if ($c1 eq ' ' or $c1 eq "\t") {
-      $$rstr =~ m{\G(?>[ \t]+)}gc;
+    if ($c1 eq ' ') {
+      pos($$rstr)++;
       next;
     } elsif ($c1 eq '_') {
       my $c2 = substr($$rstr, $pos + 1, 1);
@@ -380,34 +384,35 @@ sub _scan {
     } elsif ($c1 eq ';') {
       pos($$rstr) = $pos + 1;
       ($token, $token_desc, $token_type) = ($c1, ';', ';');
-      $current_scope |= F_SENTENCE_END|F_EXPR_END;
+      $current_scope |= F_STATEMENT_END|F_EXPR_END;
       next;
     } elsif ($c1 eq '$') {
       my $c2 = substr($$rstr, $pos + 1, 1);
       if ($c2 eq '#') {
         if (substr($$rstr, $pos + 2, 1) eq '{') {
           if ($$rstr =~ m{\G(\$\#\{[\w\s]+\})}gc) {
-            ($token, $token_desc, $token_type) = ($1, '$#{NAME}', 'TERM');
+            ($token, $token_desc, $token_type) = ($1, '$#{NAME}', 'EXPR');
             next;
           } else {
             pos($$rstr) = $pos + 3;
-            ($token, $token_desc, $token_type) = ('$#{', '$#{', 'TERM');
+            ($token, $token_desc, $token_type) = ('$#{', '$#{', 'EXPR');
             $stack = [$token, $pos, 'VARIABLE'];
             next;
           }
         } elsif ($$rstr =~ m{\G(\$\#(?:$re_namespace))}gc) {
-          ($token, $token_desc, $token_type) = ($1, '$#NAME', 'TERM');
+          ($token, $token_desc, $token_type) = ($1, '$#NAME', 'EXPR');
           next;
         } elsif ($prev_token_type eq 'ARROW') {
           my $c3 = substr($$rstr, $pos + 2, 1);
           if ($c3 eq '*') {
             pos($$rstr) = $pos + 3;
             ($token, $token_desc, $token_type) = ('$#*', 'VARIABLE', 'VARIABLE');
+            $c->add_perl('5.020', '->$#*');
             next;
           }
         } else {
           pos($$rstr) = $pos + 2;
-          ($token, $token_desc, $token_type) = ('$#', 'SPECIAL_VARIABLE', 'TERM');
+          ($token, $token_desc, $token_type) = ('$#', 'SPECIAL_VARIABLE', 'EXPR');
           next;
         }
       } elsif ($c2 eq '$') {
@@ -416,7 +421,7 @@ sub _scan {
           next;
         } else {
           pos($$rstr) = $pos + 2;
-          ($token, $token_desc, $token_type) = ('$$', 'SPECIAL_VARIABLE', 'TERM');
+          ($token, $token_desc, $token_type) = ('$$', 'SPECIAL_VARIABLE', 'EXPR');
           next;
         }
       } elsif ($c2 eq '{') {
@@ -426,6 +431,14 @@ sub _scan {
             $token_type = '';
             next;
           }
+        } elsif ($$rstr =~ m{\G(\$\{\^[A-Z_]+\})}gc) {
+          ($token, $token_desc, $token_type) = ($1, '${^NAME}', 'VARIABLE');
+          if ($token eq '${^CAPTURE}' or $token eq '${^CAPTURE_ALL}') {
+            $c->add_perl('5.026', '${^CAPTURE}');
+          }
+          if ($token eq '${^SAFE_LOCALES}') {
+            $c->add_perl('5.028', '${^SAFE_LOCALES}');
+          }
         } else {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('${', '${', 'VARIABLE');
@@ -434,6 +447,16 @@ sub _scan {
         if ($parent_scope & F_EXPECTS_BRACKET) {
           $current_scope |= F_SCOPE_END;
         }
+        next;
+      } elsif ($c2 eq '*' and $prev_token_type eq 'ARROW') {
+        pos($$rstr) = $pos + 2;
+        ($token, $token_desc, $token_type) = ('$*', '$*', 'VARIABLE');
+        $c->add_perl('5.020', '->$*');
+        next;
+      } elsif ($c2 eq '+' or $c2 eq '-') {
+        pos($$rstr) = $pos + 2;
+        ($token, $token_desc, $token_type) = ('$'.$c2, 'SPECIAL_VARIABLE', 'VARIABLE');
+        $c->add_perl('5.010', '$'.$c2);
         next;
       } elsif ($$rstr =~ m{$g_re_scalar_variable}gc) {
         ($token, $token_desc, $token_type) = ($1, '$NAME', 'VARIABLE');
@@ -451,10 +474,21 @@ sub _scan {
       } elsif ($c2 eq '{') {
         if ($$rstr =~ m{\G(\@\{[\w\s]+\})}gc) {
           ($token, $token_desc, $token_type) = ($1, '@{NAME}', 'VARIABLE');
+          if ($token eq '@{^CAPTURE}' or $token eq '@{^CAPTURE_ALL}') {
+            $c->add_perl('5.026', '@{^CAPTURE}');
+          }
+        } elsif ($$rstr =~ m{\G(\@\{\^[A-Z_]+\})}gc) {
+          ($token, $token_desc, $token_type) = ($1, '@{^NAME}', 'VARIABLE');
+          if ($token eq '@{^CAPTURE}' or $token eq '@{^CAPTURE_ALL}') {
+            $c->add_perl('5.026', '@{^CAPTURE}');
+          }
         } else {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('@{', '@{', 'VARIABLE');
           $stack = [$token, $pos, 'VARIABLE'];
+        }
+        if ($prev_token_type eq 'ARROW') {
+          $c->add_perl('5.020', '->@{}');
         }
         if ($parent_scope & F_EXPECTS_BRACKET) {
           $current_scope |= F_SCOPE_END;
@@ -474,15 +508,22 @@ sub _scan {
         if ($c2 eq '*') {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('@*', '@*', 'VARIABLE');
+          $c->add_perl('5.020', '->@*');
           next;
         } else {
           pos($$rstr) = $pos + 1;
           ($token, $token_desc, $token_type) = ('@', '@', 'VARIABLE');
+          $c->add_perl('5.020', '->@');
           next;
         }
       } elsif ($c2 eq '[') {
         pos($$rstr) = $pos + 2;
         ($token, $token_desc, $token_type) = ('@[', 'SPECIAL_VARIABLE', 'VARIABLE');
+        next;
+      } elsif ($c2 eq '+' or $c2 eq '-') {
+        pos($$rstr) = $pos + 2;
+        ($token, $token_desc, $token_type) = ('@'.$c2, 'SPECIAL_VARIABLE', 'VARIABLE');
+        $c->add_perl('5.010', '@'.$c2);
         next;
       } elsif ($$rstr =~ m{\G(\@(?:$re_namespace))}gc) {
         ($token, $token_desc, $token_type) = ($1, '@NAME', 'VARIABLE');
@@ -497,10 +538,18 @@ sub _scan {
       if ($c2 eq '{') {
         if ($$rstr =~ m{\G(\%\{[\w\s]+\})}gc) {
           ($token, $token_desc, $token_type) = ($1, '%{NAME}', 'VARIABLE');
+        } elsif ($$rstr =~ m{\G(\%\{\^[A-Z_]+\})}gc) {
+          ($token, $token_desc, $token_type) = ($1, '%{^NAME}', 'VARIABLE');
+          if ($token eq '%{^CAPTURE}' or $token eq '%{^CAPTURE_ALL}') {
+            $c->add_perl('5.026', '%{^CAPTURE}');
+          }
         } else {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('%{', '%{', 'VARIABLE');
           $stack = [$token, $pos, 'VARIABLE'];
+        }
+        if ($prev_token_type eq 'ARROW') {
+          $c->add_perl('5.020', '->%{');
         }
         if ($parent_scope & F_EXPECTS_BRACKET) {
           $current_scope |= F_SCOPE_END;
@@ -516,7 +565,7 @@ sub _scan {
       } elsif ($$rstr =~ m{\G(\%(?:$re_namespace))}gc) {
         ($token, $token_desc, $token_type) = ($1, '%NAME', 'VARIABLE');
         next;
-      } elsif ($prev_token_type eq 'VARIABLE' or $prev_token_type eq 'TERM') {
+      } elsif ($prev_token_type eq 'VARIABLE' or $prev_token_type eq 'EXPR') {
         pos($$rstr) = $pos + 1;
         ($token, $token_desc, $token_type) = ($c1, $c1, 'OP');
         next;
@@ -524,12 +573,19 @@ sub _scan {
         if ($c2 eq '*') {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('%*', '%*', 'VARIABLE');
+          $c->add_perl('5.020', '->%*');
           next;
         } else {
           pos($$rstr) = $pos + 1;
           ($token, $token_desc, $token_type) = ('%', '%', 'VARIABLE');
+          $c->add_perl('5.020', '->%');
           next;
         }
+      } elsif ($c2 eq '+' or $c2 eq '-') {
+        pos($$rstr) = $pos + 2;
+        ($token, $token_desc, $token_type) = ('%'.$c2, 'SPECIAL_VARIABLE', 'VARIABLE');
+        $c->add_perl('5.010', '%'.$c2);
+        next;
       } else {
         pos($$rstr) = $pos + 1;
         ($token, $token_desc, $token_type) = ($c1, $c1, 'VARIABLE');
@@ -538,7 +594,12 @@ sub _scan {
     } elsif ($c1 eq '*') {
       my $c2 = substr($$rstr, $pos + 1, 1);
       if ($c2 eq '{') {
-        if ($$rstr =~ m{\G(\*\{[\w\s]+\})}gc) {
+        if ($prev_token_type eq 'ARROW') {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('*{', '*{', 'VARIABLE');
+          $c->add_perl('5.020', '->*{}');
+          next;
+        } elsif ($$rstr =~ m{\G(\*\{[\w\s]+\})}gc) {
           ($token, $token_desc, $token_type) = ($1, '*{NAME}', 'VARIABLE');
           if ($prev_token eq 'KEYWORD' and $c->token_expects_fh_or_block_list($prev_token)) {
             $token_type = '';
@@ -561,6 +622,7 @@ sub _scan {
         } elsif ($prev_token_type eq 'ARROW') {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('**', '**', 'VARIABLE');
+          $c->add_perl('5.020', '->**');
           next;
         } else {
           pos($$rstr) = $pos + 2;
@@ -591,26 +653,37 @@ sub _scan {
         next;
       } elsif ($c2 eq '{') {
         if ($$rstr =~ m{\G(\&\{[\w\s]+\})}gc) {
-          ($token, $token_desc, $token_type) = ($1, '&{NAME}', 'TERM');
+          ($token, $token_desc, $token_type) = ($1, '&{NAME}', 'EXPR');
         } else {
           pos($$rstr) = $pos + 2;
-          ($token, $token_desc, $token_type) = ('&{', '&{', 'TERM');
+          ($token, $token_desc, $token_type) = ('&{', '&{', 'EXPR');
           $stack = [$token, $pos, 'FUNC'];
         }
         if ($parent_scope & F_EXPECTS_BRACKET) {
           $current_scope |= F_SCOPE_END;
         }
         next;
+      } elsif ($c2 eq '.') {
+        if (substr($$rstr, $pos + 2, 1) eq '=') {
+          pos($$rstr) = $pos + 3;
+          ($token, $token_desc, $token_type) = ('&.=', '&.=', 'OP');
+        } else {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('&.', '&.', 'OP');
+        }
+        $c->add_perl('5.022', '&.');
+        next;
       } elsif ($$rstr =~ m{\G(\&(?:$re_namespace))}gc) {
-        ($token, $token_desc, $token_type) = ($1, '&NAME', 'TERM');
+        ($token, $token_desc, $token_type) = ($1, '&NAME', 'EXPR');
         next;
       } elsif ($$rstr =~ m{\G(\&\$(?:$re_namespace))}gc) {
-        ($token, $token_desc, $token_type) = ($1, '&$NAME', 'TERM');
+        ($token, $token_desc, $token_type) = ($1, '&$NAME', 'EXPR');
         next;
       } elsif ($prev_token_type eq 'ARROW') {
         if ($c2 eq '*') {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('&*', '&*', 'VARIABLE');
+          $c->add_perl('5.020', '->&*');
           next;
         }
       } else {
@@ -656,7 +729,7 @@ sub _scan {
         ($token, $token_desc, $token_type) = ('-=', '-=', 'OP');
         next;
       } elsif ($$rstr =~ m{\G(\-[ABCMORSTWXbcdefgkloprstuwxz]\b)}gc) {
-        ($token, $token_desc, $token_type) = ($1, 'FILE_TEST', 'TERM');
+        ($token, $token_desc, $token_type) = ($1, 'FILE_TEST', 'EXPR');
         next;
       } else {
         pos($$rstr) = $pos + 1;
@@ -675,13 +748,13 @@ sub _scan {
       }
     } elsif ($c1 eq '`') {
       if ($$rstr =~ m{\G(?:\`($re_str_in_backticks)\`)}gcs) {
-        ($token, $token_desc, $token_type) = ([$1, q{`}], 'BACKTICK', 'TERM');
+        ($token, $token_desc, $token_type) = ([$1, q{`}], 'BACKTICK', 'EXPR');
         next;
       }
     } elsif ($c1 eq '/') {
       if ($prev_token_type eq '' or $prev_token_type eq 'OP' or ($prev_token_type eq 'KEYWORD' and $regexp_may_follow{$prev_token})) { # undoubtedly regexp
         if (my $regexp = $self->_match_regexp0($c, $rstr, $pos, 'm')) {
-          ($token, $token_desc, $token_type) = ($regexp, 'REGEXP', 'TERM');
+          ($token, $token_desc, $token_type) = ($regexp, 'REGEXP', 'EXPR');
           next;
         } else {
           # the above may fail
@@ -689,9 +762,10 @@ sub _scan {
           pos($$rstr) = $pos;
         }
       }
-      if (($prev_token_type eq '' or (!($current_scope & F_EXPR) and $prev_token_type eq 'WORD')) or ($prev_token_type eq 'KEYWORD' and @keywords and $prev_token eq $keywords[-1])) {
+      if (($prev_token_type eq '' or (!($current_scope & F_EXPR) and $prev_token_type eq 'WORD')) or ($prev_token_type eq 'KEYWORD' and @keywords and $prev_token eq $keywords[-1] and $regexp_may_follow{$prev_token})) {
+
         if (my $regexp = $self->_match_regexp0($c, $rstr, $pos)) {
-          ($token, $token_desc, $token_type) = ($regexp, 'REGEXP', 'TERM');
+          ($token, $token_desc, $token_type) = ($regexp, 'REGEXP', 'EXPR');
           next;
         } else { 
           # the above may fail
@@ -704,10 +778,12 @@ sub _scan {
         if (substr($$rstr, $pos + 2, 1) eq '=') {
           pos($$rstr) = $pos + 3;
           ($token, $token_desc, $token_type) = ('//=', '//=', 'OP');
+          $c->add_perl('5.010', '//=');
           next;
         } else {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('//', '//', 'OP');
+          $c->add_perl('5.010', '//');
           next;
         }
       }
@@ -722,7 +798,11 @@ sub _scan {
       }
     } elsif ($c1 eq '{') {
       if ($$rstr =~ m{$g_re_hash_shortcut}gc) {
-        ($token, $token_desc) = ($1, '{TERM}');
+        ($token, $token_desc) = ($1, '{EXPR}');
+        if ($current_scope & F_EVAL) {
+          $current_scope &= MASK_EVAL;
+          $c->{eval} = ($current_scope | $parent_scope) & F_EVAL ? 1 : 0;
+        }
         if ($parent_scope & F_EXPECTS_BRACKET) {
           $current_scope |= F_SCOPE_END;
           next;
@@ -746,7 +826,7 @@ sub _scan {
           $token_type = '';
           next;
         } else {
-          $token_type = 'TERM';
+          $token_type = 'EXPR';
           next;
         }
       }
@@ -769,7 +849,7 @@ sub _scan {
       }
       $stack = [$token, $pos, $stack_owner || ''];
       if ($parent_scope & F_EXPECTS_BRACKET) {
-        $current_scope |= F_SCOPE_END|F_SENTENCE_END|F_EXPR_END;
+        $current_scope |= F_SCOPE_END|F_STATEMENT_END|F_EXPR_END;
         next;
       }
       if ($prev_token_type eq 'ARROW' or $prev_token_type eq 'VARIABLE') {
@@ -777,12 +857,12 @@ sub _scan {
       } elsif ($waiting_for_a_block) {
         $waiting_for_a_block = 0;
       } else {
-        $token_type = (($current_scope | $parent_scope) & F_KEEP_TOKENS) ? 'TERM' : '';
+        $token_type = (($current_scope | $parent_scope) & F_KEEP_TOKENS) ? 'EXPR' : '';
       }
       next;
     } elsif ($c1 eq '[') {
       if ($$rstr =~ m{\G(\[(?:$re_nonblock_chars)\])}gc) {
-        ($token, $token_desc, $token_type) = ($1, '[TERM]', 'VARIABLE');
+        ($token, $token_desc, $token_type) = ($1, '[EXPR]', 'VARIABLE');
         next;
       } else {
         pos($$rstr) = $pos + 1;
@@ -793,17 +873,27 @@ sub _scan {
     } elsif ($c1 eq '(') {
       my $prototype_re = $c->prototype_re;
       if ($waiting_for_a_block and @keywords and $c->token_defines_sub($keywords[-1]) and $$rstr =~ m{$prototype_re}gc) {
-        ($token, $token_desc, $token_type) = ($1, '(PROTOTYPE)', '');
+        my $proto = $1;
+        if ($proto =~ /^\([\\\$\@\%\&\[\]\*;\+]*\)$/) {
+          ($token, $token_desc, $token_type) = ($proto, '(PROTOTYPE)', '');
+        } else {
+          ($token, $token_desc, $token_type) = ($proto, '(SIGNATURES)', '');
+          $c->add_perl('5.020', 'signatures');
+        }
         next;
       } elsif ($$rstr =~ m{\G\(((?:$re_nonblock_chars)(?<!\$))\)}gc) {
-        ($token, $token_desc, $token_type) = ([[[$1, 'TERM']]], '()', 'TERM');
+        ($token, $token_desc, $token_type) = ([[[$1, 'EXPR']]], '()', 'EXPR');
         if ($prev_token_type eq 'KEYWORD' and @keywords and $keywords[-1] eq $prev_token and !$c->token_expects_expr_block($prev_token)) {
+          if ($prev_token eq 'eval') {
+            $current_scope &= MASK_EVAL;
+            $c->{eval} = ($current_scope | $parent_scope) & F_EVAL ? 1 : 0;
+          }
           pop @keywords;
         }
         next;
       } else {
         pos($$rstr) = $pos + 1;
-        ($token, $token_desc, $token_type) = ($c1, $c1, 'TERM');
+        ($token, $token_desc, $token_type) = ($c1, $c1, 'EXPR');
         my $stack_owner;
         if (@keywords) {
           for (my $i = @keywords; $i > 0; $i--) {
@@ -821,7 +911,7 @@ sub _scan {
       pos($$rstr) = $pos + 1;
       ($token, $token_desc, $token_type) = ($c1, $c1, '');
       $unstack = $token;
-      $current_scope |= F_SENTENCE_END|F_EXPR_END;
+      $current_scope |= F_STATEMENT_END|F_EXPR_END;
       next;
     } elsif ($c1 eq ']') {
       pos($$rstr) = $pos + 1;
@@ -836,14 +926,28 @@ sub _scan {
     } elsif ($c1 eq '<') {
       my $c2 = substr($$rstr, $pos + 1, 1);
       if ($c2 eq '<'){
-        if ($$rstr =~ m{\G<<\s*(?:
-          [A-Za-z_][\w]* |
+        if ($$rstr =~ m{\G(<<(?:
+          \\. |
+          \w+ |
+          [./-] |
+          \[[^\]]*\] |
+          \{[^\}]*\} |
+          \* |
+          \? |
+          \~ |
+          \$ |
+        )*(?<!\-)>>)}gcx) {
+          ($token, $token_desc, $token_type) = ($1, '<<NAME>>', 'EXPR');
+          $c->add_perl('5.022', '<<NAME>>');
+          next;
+        } elsif ($$rstr =~ m{\G<<~?\s*(?:
+          \\?[A-Za-z_][\w]* |
           "(?:[^\\"]*(?:\\.[^\\"]*)*)" |
           '(?:[^\\']*(?:\\.[^\\']*)*)' |
           `(?:[^\\`]*(?:\\.[^\\`]*)*)`
         )}sx) {
           if (my $heredoc = $self->_match_heredoc($c, $rstr)) {
-            ($token, $token_desc, $token_type) = ($heredoc, 'HEREDOC', 'TERM');
+            ($token, $token_desc, $token_type) = ($heredoc, 'HEREDOC', 'EXPR');
             next;
           } else {
             # the above may fail
@@ -884,7 +988,7 @@ sub _scan {
         \~ |
         \$ |
       )*(?<!\-)>)}gcx) {
-        ($token, $token_desc, $token_type) = ($1, '<NAME>', 'TERM');
+        ($token, $token_desc, $token_type) = ($1, '<NAME>', 'EXPR');
         next;
       } else {
         pos($$rstr) = $pos + 1;
@@ -899,7 +1003,7 @@ sub _scan {
         next;
       }
       if ($waiting_for_a_block and @keywords and $c->token_defines_sub($keywords[-1])) {
-        while($$rstr =~ m{\G(:?[\w\s]+)}gcs) {
+        while($$rstr =~ m{\G\s*(:?\s*[\w]+)}gcs) {
           my $startpos = pos($$rstr);
           if (substr($$rstr, $startpos, 1) eq '(') {
             my @nest = '(';
@@ -925,7 +1029,11 @@ sub _scan {
             }
           }
         }
-        ($token, $token_desc, $token_type) = (substr($$rstr, $pos, pos($$rstr) - $pos), 'ATTRIBUTE', '');
+        $token = substr($$rstr, $pos, pos($$rstr) - $pos);
+        ($token_desc, $token_type) = ('ATTRIBUTE', '');
+        if ($token =~ /^:prototype\(/) {
+          $c->add_perl('5.020', ':prototype');
+        }
         next;
       } else {
         pos($$rstr) = $pos + 1;
@@ -1016,6 +1124,16 @@ sub _scan {
         pos($$rstr) = $pos + 2;
         ($token, $token_desc, $token_type) = ('|=', '|=', 'OP');
         next;
+      } elsif ($c2 eq '.') {
+        if (substr($$rstr, $pos + 2, 1) eq '=') {
+          pos($$rstr) = $pos + 3;
+          ($token, $token_desc, $token_type) = ('|.=', '|.=', 'OP');
+        } else {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('|.', '|.', 'OP');
+        }
+        $c->add_perl('5.022', '|.');
+        next;
       } else {
         pos($$rstr) = $pos + 1;
         ($token, $token_desc, $token_type) = ($c1, $c1, 'OP');
@@ -1026,6 +1144,16 @@ sub _scan {
       if ($c2 eq '=') {
         pos($$rstr) = $pos + 2;
         ($token, $token_desc, $token_type) = ('^=', '^=', 'OP');
+        next;
+      } elsif ($c2 eq '.') {
+        if (substr($$rstr, $pos + 2, 1) eq '=') {
+          pos($$rstr) = $pos + 3;
+          ($token, $token_desc, $token_type) = ('^.=', '^.=', 'OP');
+        } else {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('^.', '^.', 'OP');
+        }
+        $c->add_perl('5.022', '^.');
         next;
       } else {
         pos($$rstr) = $pos + 1;
@@ -1048,6 +1176,12 @@ sub _scan {
       if ($c2 eq '~') {
         pos($$rstr) = $pos + 2;
         ($token, $token_desc, $token_type) = ('~~', '~~', 'OP');
+        $c->add_perl('5.010', '~~');
+        next;
+      } elsif ($c2 eq '.') {
+        pos($$rstr) = $pos + 2;
+        ($token, $token_desc, $token_type) = ('~.', '~.', 'OP');
+        $c->add_perl('5.022', '~.');
         next;
       } else {
         pos($$rstr) = $pos + 1;
@@ -1068,6 +1202,7 @@ sub _scan {
         if (substr($$rstr, $pos + 2, 1) eq '.') {
           pos($$rstr) = $pos + 3;
           ($token, $token_desc, $token_type) = ('...', '...', 'OP');
+          $c->add_perl('5.012', '...');
           next;
         } else {
           pos($$rstr) = $pos + 2;
@@ -1087,12 +1222,12 @@ sub _scan {
       my $c2 = substr($$rstr, $pos + 1, 1);
       if ($c2 eq 'x') {
         if ($$rstr =~ m{\G(0x[0-9A-Fa-f_]+)}gc) {
-          ($token, $token_desc, $token_type) = ($1, 'HEX NUMBER', 'TERM');
+          ($token, $token_desc, $token_type) = ($1, 'HEX NUMBER', 'EXPR');
           next;
         }
       } elsif ($c2 eq 'b') {
         if ($$rstr =~ m{\G(0b[01_]+)}gc) {
-          ($token, $token_desc, $token_type) = ($1, 'BINARY NUMBER', 'TERM');
+          ($token, $token_desc, $token_type) = ($1, 'BINARY NUMBER', 'EXPR');
           next;
         }
       }
@@ -1105,7 +1240,7 @@ sub _scan {
       if ($n1 eq '.') {
         if ($$rstr =~ m{\G((?:\.[0-9_])+)}gc) {
           $number .= $1;
-          ($token, $token_desc, $token_type) = ($number, 'VERSION_STRING', 'TERM');
+          ($token, $token_desc, $token_type) = ($number, 'VERSION_STRING', 'EXPR');
           next;
         } elsif (substr($$rstr, $p, 2) ne '..') {
           $number .= '.';
@@ -1116,7 +1251,7 @@ sub _scan {
           $number .= $1;
         }
       }
-      ($token, $token_desc, $token_type) = ($number, 'NUMBER', 'TERM');
+      ($token, $token_desc, $token_type) = ($number, 'NUMBER', 'EXPR');
       if ($prepend) {
         $token = "$prepend$token";
         pop @tokens if @tokens and $tokens[-1][0] eq $prepend;
@@ -1126,7 +1261,7 @@ sub _scan {
     }
 
     if ($prev_token_type ne 'ARROW' and ($prev_token_type ne 'KEYWORD' or !$c->token_expects_word($prev_token))) {
-      if ($prev_token_type eq 'TERM' or $prev_token_type eq 'VARIABLE') {
+      if ($prev_token_type eq 'EXPR' or $prev_token_type eq 'VARIABLE') {
         if ($c1 eq 'x') {
           if ($$rstr =~ m{\G(x\b(?!\s*=>))}gc){
             ($token, $token_desc, $token_type) = ($1, $1, '');
@@ -1147,7 +1282,7 @@ sub _scan {
           }
         } elsif ($$rstr =~ m{\G((?:qw)\b(?!\s*=>))}gc) {
           if (my $quotelike = $self->_match_quotelike($c, $rstr, $1)) {
-            ($token, $token_desc, $token_type) = ($quotelike, 'QUOTED_WORD_LIST', 'TERM');
+            ($token, $token_desc, $token_type) = ($quotelike, 'QUOTED_WORD_LIST', 'EXPR');
             next;
           } else {
             _debug("QUOTELIKE ERROR: $@") if DEBUG;
@@ -1155,7 +1290,7 @@ sub _scan {
           }
         } elsif ($$rstr =~ m{\G((?:qx)\b(?!\s*=>))}gc) {
           if (my $quotelike = $self->_match_quotelike($c, $rstr, $1)) {
-            ($token, $token_desc, $token_type) = ($quotelike, 'BACKTICK', 'TERM');
+            ($token, $token_desc, $token_type) = ($quotelike, 'BACKTICK', 'EXPR');
             next;
           } else {
             _debug("QUOTELIKE ERROR: $@") if DEBUG;
@@ -1163,7 +1298,7 @@ sub _scan {
           }
         } elsif ($$rstr =~ m{\G(qr\b(?!\s*=>))}gc) {
           if (my $regexp = $self->_match_regexp($c, $rstr)) {
-            ($token, $token_desc, $token_type) = ($regexp, 'qr', 'TERM');
+            ($token, $token_desc, $token_type) = ($regexp, 'qr', 'EXPR');
             next;
           } else {
             _debug("QUOTELIKE ERROR: $@") if DEBUG;
@@ -1173,7 +1308,7 @@ sub _scan {
       } elsif ($c1 eq 'm') {
         if ($$rstr =~ m{\G(m\b(?!\s*=>))}gc) {
           if (my $regexp = $self->_match_regexp($c, $rstr)) {
-            ($token, $token_desc, $token_type) = ($regexp, 'm', 'TERM');
+            ($token, $token_desc, $token_type) = ($regexp, 'm', 'EXPR');
             next;
           } else {
             _debug("REGEXP ERROR: $@") if DEBUG;
@@ -1183,7 +1318,7 @@ sub _scan {
       } elsif ($c1 eq 's') {
         if ($$rstr =~ m{\G(s\b(?!\s*=>))}gc) {
           if (my $regexp = $self->_match_substitute($c, $rstr)) {
-            ($token, $token_desc, $token_type) = ($regexp, 's', 'TERM');
+            ($token, $token_desc, $token_type) = ($regexp, 's', 'EXPR');
             next;
           } else {
             _debug("SUBSTITUTE ERROR: $@") if DEBUG;
@@ -1193,7 +1328,7 @@ sub _scan {
       } elsif ($c1 eq 't') {
         if ($$rstr =~ m{\G(tr\b(?!\s*=>))}gc) {
           if (my $trans = $self->_match_transliterate($c, $rstr)) {
-            ($token, $token_desc, $token_type) = ($trans, 'tr', 'TERM');
+            ($token, $token_desc, $token_type) = ($trans, 'tr', 'EXPR');
             next;
           } else {
             _debug("TRANSLITERATE ERROR: $@") if DEBUG;
@@ -1203,7 +1338,7 @@ sub _scan {
       } elsif ($c1 eq 'y') {
         if ($$rstr =~ m{\G(y\b(?!\s*=>))}gc) {
           if (my $trans = $self->_match_transliterate($c, $rstr)) {
-            ($token, $token_desc, $token_type) = ($trans, 'y', 'TERM');
+            ($token, $token_desc, $token_type) = ($trans, 'y', 'EXPR');
             next;
           } else {
             _debug("TRANSLITERATE ERROR: $@") if DEBUG;
@@ -1224,17 +1359,22 @@ sub _scan {
         if ($$rstr =~ m{\G([^=]*?=[ \t]*\n.*?\n\.\n)}gcs) {
           $token .= $1;
           ($token_desc, $token_type) = ('FORMAT', '');
-          $current_scope |= F_SENTENCE_END|F_EXPR_END;
+          $current_scope |= F_STATEMENT_END|F_EXPR_END;
           next;
         }
       } elsif ($c->token_is_keyword($token) and ($prev_token_type ne 'KEYWORD' or !$c->token_expects_word($prev_token) or ($prev_token eq 'sub' and $token eq 'BEGIN'))) {
-        ($token_desc, $token_type) = ('KEYWORD', 'KEYWORD');
-        push @keywords, $token unless $token eq 'undef';
+        if ($c->token_is_op_keyword($token)) {
+          ($token_desc, $token_type) = ($token, 'OP');
+        } else {
+          ($token_desc, $token_type) = ('KEYWORD', 'KEYWORD');
+          $c->check_new_keyword($token);
+          push @keywords, $token unless $token eq 'undef';
+        }
       } else {
         if ($c1 eq 'v' and $token =~ /^v(?:0|[1-9][0-9]*)$/) {
           if ($$rstr =~ m{\G((?:\.[0-9][0-9_]*)+)}gc) {
             $token .= $1;
-            ($token_desc, $token_type) = ('VERSION_STRING', 'TERM');
+            ($token_desc, $token_type) = ('VERSION_STRING', 'EXPR');
             next;
           }
         }
@@ -1395,11 +1535,11 @@ sub _scan {
         }
 
         if ($stack->[0] eq '{' and @keywords and $c->token_expects_block($keywords[0]) and !$c->token_expects_block_list($keywords[-1])) {
-          $current_scope |= F_SENTENCE_END unless @tokens and ($c->token_defines_sub($keywords[-1]) or $keywords[-1] eq 'eval');
+          $current_scope |= F_STATEMENT_END unless @tokens and ($c->token_defines_sub($keywords[-1]) or $keywords[-1] eq 'eval');
         }
         $stack = undef;
       }
-      if ($current_scope & F_SENTENCE_END) {
+      if ($current_scope & F_STATEMENT_END) {
         if (($current_scope & F_KEEP_TOKENS) and @tokens) {
           my $first_token = $tokens[0][0];
           if ($first_token eq '->') {
@@ -1466,7 +1606,7 @@ sub _scan {
         }
         @tokens = ();
         @keywords = ();
-        $current_scope &= MASK_SENTENCE_END;
+        $current_scope &= MASK_STATEMENT_END;
         $caller_package = undef;
         $token = $token_type = '';
         _debug('END SENTENSE') if DEBUG;
@@ -1691,10 +1831,11 @@ sub _match_heredoc {
 
   my $startpos = pos($$rstr) || 0;
 
-  $$rstr =~ m{\G(<<\s*)}gc;
+  $$rstr =~ m{\G(?:<<(~)?\s*)}gc;
+  my $indent = $1 ? "\\s*" : "";
 
   my $label;
-  if ($$rstr =~ m{\G([A-Za-z_]\w*)}gc) {
+  if ($$rstr =~ m{\G\\?([A-Za-z_]\w*)}gc) {
     $label = $1;
   } elsif ($$rstr =~ m{
       \G ' ($re_str_in_single_quotes) '
@@ -1709,7 +1850,7 @@ sub _match_heredoc {
   my $extrapos = pos($$rstr);
   $$rstr =~ m{\G.*\n}gc;
   my $str1pos = pos($$rstr)--;
-  unless ($$rstr =~ m{\G.*?\n(?=\Q$label\E\n)}gcs) {
+  unless ($$rstr =~ m{\G.*?\n$indent(?=\Q$label\E\n)}gcs) {
     return _match_error($rstr, qq{Missing here doc terminator ('$label')});
   }
   my $ldpos = pos($$rstr);
@@ -1723,6 +1864,9 @@ sub _match_heredoc {
   ];
   substr($$rstr, $str1pos, $ld2pos - $str1pos) = '';
   pos($$rstr) = $extrapos;
+  if ($indent) {
+    $c->add_perl('5.026', '<<~');
+  }
   return $heredoc;
 }
 
@@ -2153,18 +2297,13 @@ Perl::PrereqScanner::NotQuiteLite - a tool to scan your Perl code for its prereq
   my $scanner = Perl::PrereqScanner::NotQuiteLite->new(
     parsers => [qw/:installed -UniversalVersion/],
     suggests => 1,
+    perl_minimum_version => 1,
   );
   my $context = $scanner->scan_file('path/to/file');
   my $requirements = $context->requires;
   my $recommends = $context->recommends;
   my $suggestions  = $context->suggests; # requirements in evals
   my $noes = $context->noes;
-
-=head1 BACKWARD INCOMPATIBLILITY
-
-As of 0.49_01, the internal of this module was completely rewritten.
-I'm supposing there's no one who has written their own parsers for
-the previous version, but if this assumption was wrong, let me know.
 
 =head1 DESCRIPTION
 
@@ -2183,6 +2322,11 @@ Conditional requirements or requirements loaded in a block are
 treated as recommends. Noed modules are stored separately (since 0.94).
 You may or may not need to merge them into requires.
 
+Perl::PrereqScanner::NotQuiteLite can also recognize some of
+the new language features such as C<say>, subroutine signatures,
+and postfix dereferences, to improve the minimum perl requirement
+(since 0.9905).
+
 =head1 METHODS
 
 =head2 new
@@ -2199,9 +2343,10 @@ plus modules loaded by a few common modules such as C<base>,
 C<parent>, C<if> (that are in the Perl core), and by two keywords
 exported by L<Moose> family (C<extends> and C<with>).
 
-If you need more, you can pass extra parser names to the scanner, or
-C<:installed>, which loads and registers all the installed parsers
-under C<Perl::PrereqScanner::NotQuiteLite::Parser> namespace.
+If you need more, you can pass extra parser names to the scanner,
+or C<:bundled>, which loads and registers all the parsers bundled
+with this distribution. If you have your own parsers, you can
+specify C<:installed> to load and register all the installed parsers.
 
 You can also pass a project-specific parser (that lies outside the 
 C<Perl::PrereqScanner::NotQuiteLite::Parser> namespace) by
@@ -2222,6 +2367,19 @@ C<eval> by default. If you set this option to true,
 Perl::PrereqScanner::NotQuiteLite also parses statements in C<eval>,
 and records requirements as suggestions.
 
+=item recommends
+
+Perl::PrereqScanner::NotQuiteLite usually ignores C<require>-like
+statements in a block by default. If you set this option to true,
+Perl::PrereqScanner::NotQuiteLite also records requirements in
+a block as recommendations.
+
+=item perl_minimum_version
+
+If you set this option to true, Perl::PrereqScanner::NotQuiteLite
+adds a specific version of perl as a requirement when it finds
+some of the new perl language features.
+
 =back
 
 =head2 scan_file
@@ -2235,6 +2393,10 @@ takes a string, scans and returns a ::Context object.
 =head1 SEE ALSO
 
 L<Perl::PrereqScanner>, L<Perl::PrereqScanner::Lite>, L<Module::ExtractUse>
+
+L<Perl::PrereqScanner::NotQuiteLite::App> to scan a whole distribution.
+
+L<scan-perl-prereqs-nqlite> is a command line interface of the above.
 
 =head1 AUTHOR
 

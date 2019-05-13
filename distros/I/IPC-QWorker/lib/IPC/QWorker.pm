@@ -1,17 +1,19 @@
 package IPC::QWorker;
-# ABSTRACT: processing a queue in parallel
 
 use 5.000;
 use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.07'; # VERSION
+# ABSTRACT: processing a queue in parallel
+our $VERSION = '0.08'; # VERSION
+
 our $DEBUG   = 0;
 
 use IO::Select;
 
 use IPC::QWorker::Worker;
+
 
 sub new {
     my $this  = shift;
@@ -140,31 +142,50 @@ sub stop_workers {
 }
 
 1;
+
+# vim:ts=2:expandtab:syntax=perl:
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-IPC::QWorker - Perl extension for processing a queue in parallel
+IPC::QWorker - processing a queue in parallel
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
-  
+
   my $qworker = IPC::QWorker->new();
   
   $qworker->create_workers(10,
-          'dump' => sub { my $ctx = shift();
-  							print $$.": ".Dumper(@_)."\n";
-  							 $ctx->{'count'}++; },
-          '_init' => sub { my $ctx = shift();	
-  							$ctx->{'count'} = 0 ; },
-          '_destroy' => sub { my $ctx = shift();
-  							print $$.": did ".$ctx->{'count'}." operations!\n"; }
+    'dump' => sub {
+      my $ctx = shift();
+      print $$.": ".Dumper(@_)."\n";
+      $ctx->{'count'}++;
+    },
+    '_init' => sub {
+      my $ctx = shift();	
+      $ctx->{'count'} = 0 ;
+    },
+    '_destroy' => sub {
+      my $ctx = shift();
+      print $$.": did ".$ctx->{'count'}." operations!\n";
+    }
   );
           
   foreach $i (1..120) {
-          $qworker->push_queue(IPC::QWorker::WorkUnit->new(
-                  'cmd' => 'dump',
-                  'params' => $i,
-          ));
+    $qworker->push_queue(
+      IPC::QWorker::WorkUnit->new(
+        'cmd' => 'dump',
+        'params' => $i,
+      )
+    );
   }
   
   $qworker->process_queue();
@@ -174,21 +195,16 @@ IPC::QWorker - Perl extension for processing a queue in parallel
 	# then stop all workers
   $qworker->stop_workers();
 
-=head1 ABSTRACT
-
-  This Module creates a group of child processes and feeds them with data
-  from a queue.
-
-=head1 DESCRIPTION
-
-  With this module you can fork a few child processes which know a few
-  function calls you define while creating them.
-  Later you can pass command with parameters into the queue which is
-  distributed across the child processes thru pipes(with the Storable module).
-
 =head2 EXPORT
 
 None by default.
+
+=head1 DESCRIPTION
+
+With this module you can fork a few child processes which know a few
+function calls you define while creating them.
+Later you can pass command with parameters into the queue which is
+distributed across the child processes thru pipes(with the Storable module).
 
 =head1 SEE ALSO
 
@@ -196,16 +212,13 @@ None by default.
 
 =head1 AUTHOR
 
-Markus Benning, E<lt>me@w3r3wolf.deE<gt>
+Markus Benning <ich@markusbenning.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013 by Markus Benning <me@w3r3wolf.de>
+This software is copyright (c) 2013 by Markus Benning <ich@markusbenning.de>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-# vim:ts=2:syntax=perl:
-# vim600:foldmethod=marker:

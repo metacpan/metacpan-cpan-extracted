@@ -7,9 +7,9 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose     qw( choose );
+use Term::Choose     qw();
 use Term::Form       qw();
-use Term::TablePrint qw( print_table );
+use Term::TablePrint qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries; # required
@@ -37,7 +37,7 @@ sub new {
 
 sub join_tables {
     my ( $sf ) = @_;
-    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tables = [ sort keys %{$sf->{d}{tables_info}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
@@ -56,9 +56,9 @@ sub join_tables {
         push @choices, $info;
         my @pre = ( undef );
         # Choose
-        my $master = $stmt_v->choose(
+        my $master = $tc->choose(
             [ @pre, @choices ],
-            { prompt => 'Choose MASTER table:' }
+            { %{$sf->{i}{lyt_v}}, prompt => 'Choose MASTER table:' }
         );
         if ( ! defined $master ) {
             return;
@@ -103,9 +103,9 @@ sub join_tables {
             my $enough_tables = '  Enough TABLES';
             my @pre = ( undef, $enough_tables );
             # Choose
-            my $join_type = $stmt_v->choose(
+            my $join_type = $tc->choose(
                 [ @pre, map { "- $_" } @{$sf->{join_types}} ],
-                { prompt => 'Choose Join Type:' }
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose Join Type:' }
             );
             if ( ! defined $join_type ) {
                 if ( @bu ) {
@@ -155,7 +155,7 @@ sub join_tables {
 sub __add_slave_with_join_condition {
     my ( $sf, $join, $tables, $join_type, $info ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $used = ' (used)';
     my $from_subquery = '  Derived';
     my @choices;
@@ -175,9 +175,9 @@ sub __add_slave_with_join_condition {
     SLAVE: while ( 1 ) {
         $ax->print_sql( $join );
         # Choose
-        my $slave = $stmt_v->choose(
+        my $slave = $tc->choose(
             [ @pre, @choices ],
-            { prompt => 'Add a SLAVE table:', undef => $sf->{i}{_reset} }
+            { %{$sf->{i}{lyt_v}}, prompt => 'Add a SLAVE table:', undef => $sf->{i}{_reset} }
         );
         if ( ! defined $slave ) {
             if ( @bu ) {
@@ -236,7 +236,7 @@ sub __add_slave_with_join_condition {
 
 sub __add_join_condition {
     my ( $sf, $join, $tables, $slave, $slave_alias ) = @_;
-    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
+    my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aliases_by_tables = {};
     for my $ref ( @{$join->{aliases}} ) {
@@ -262,17 +262,17 @@ sub __add_join_condition {
 
     JOIN_PREDICATE: while ( 1 ) {
         my @pre = ( undef, $AND ? $sf->{i}{_confirm} : () );
-        my $fk_pre = '- ';
+        my $fk_pre = '  '; #
 
         PRIMARY_KEY: while ( 1 ) {
             $ax->print_sql( $join );
             # Choose
-            my $pk_col = $stmt_v->choose(
+            my $pk_col = $tc->choose(
                 [ @pre,
                   map(    '- ' . $_, sort keys %avail_pk_cols ),
                   map( $fk_pre . $_, sort keys %avail_fk_cols ),
                 ],
-                { prompt => 'Choose PRIMARY KEY column:', undef => $sf->{i}{_back} }
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose PRIMARY KEY column:' }
             );
             if ( ! defined $pk_col ) {
                 if ( @bu ) {
@@ -288,9 +288,11 @@ sub __add_join_condition {
                 ( my $condition = $join->{stmt} ) =~ s/^\Q$bu_stmt\E\s//;
                 $join->{stmt} = $bu_stmt;
                 $ax->print_sql( $join );
-                my $tr = Term::Form->new();
+                my $tf = Term::Form->new();
                 # Readline
-                $condition = $tr->readline( 'Edit: ', { default => $condition, show_context => 1 } );
+                $condition = $tf->readline( 'Edit: ',
+                    { default => $condition, show_context => 1 }
+                );
                 if ( ! defined $condition ) {
                     return;
                 }
@@ -310,9 +312,9 @@ sub __add_join_condition {
         FOREIGN_KEY: while ( 1 ) {
             $ax->print_sql( $join );
             # Choose
-            my $fk_col = $stmt_v->choose(
+            my $fk_col = $tc->choose(
                 [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
-                { prompt => 'Choose FOREIGN KEY column:', undef => $sf->{i}{_back} }
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose FOREIGN KEY column:' }
             );
             if ( ! defined $fk_col ) {
                 ( $join->{stmt}, $AND ) = @{pop @bu};
@@ -349,7 +351,8 @@ sub __print_join_info {
         }
         $r++;
     }
-    print_table( $aref, { keep_header => 0, tab_width => 3, grid => 1 } );
+    my $tp = Term::TablePrint->new( $sf->{o}{table} );
+    $tp->print_table( $aref, { keep_header => 0, tab_width => 3, grid => 1 } );
 }
 
 

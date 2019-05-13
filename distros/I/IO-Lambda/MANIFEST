@@ -14,6 +14,7 @@ lib/IO/Lambda/Loop/Select.pm
 lib/IO/Lambda/Loop/Prima.pm
 lib/IO/Lambda/Loop/AnyEvent.pm
 lib/IO/Lambda/Loop/POE.pm
+lib/IO/Lambda/Loop/Glib.pm
 lib/IO/Lambda/Poll.pm
 lib/IO/Lambda/HTTP/Authen/NTLM.pm
 lib/IO/Lambda/HTTP/Authen/Negotiate.pm
@@ -59,6 +60,7 @@ eg/dbi.pl
 eg/thread.pl
 eg/fork.pl
 eg/throttle.pl
+eg/gtk.pl
 eg/bench/tcp-batch
 eg/bench/tcp-batch.bat
 eg/bench/tcp-lambda.pl

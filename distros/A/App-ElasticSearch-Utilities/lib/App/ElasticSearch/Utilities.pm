@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '6.4'; # VERSION
+our $VERSION = '6.5'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -793,8 +793,7 @@ sub es_index_stats {
     my ($index) = @_;
 
     return es_request('_stats', {
-        index     => $index,
-        uri_param => { all => 'true' },
+        index     => $index
     });
 }
 
@@ -857,7 +856,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 6.4
+version 6.5
 
 =head1 SYNOPSIS
 

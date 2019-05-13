@@ -10,4 +10,4 @@ unless ( $ENV{RELEASE_TESTING} ) {
 
 eval "use Test::CheckManifest 0.9";
 plan skip_all => "Test::CheckManifest 0.9 required" if $@;
-ok_manifest();
+ok_manifest({'exclude' => ['/_build'], 'filter' => [qr{salcpis.o|DRY\.(?:c|o|xs|bs)}xms]});

@@ -32,6 +32,7 @@ requires:
   File::Temp: '0'
   Getopt::Euclid: '0'
   Graphics::ColorNames: '0'
+  Graphics::ColorNames::HTML: '0'
   Graphics::ColorNames::WWW: '0'
   IPC::System::Simple: '0'
   LWP::Simple: '0'
@@ -64,6 +65,6 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.190900'
+version: '0.191300'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

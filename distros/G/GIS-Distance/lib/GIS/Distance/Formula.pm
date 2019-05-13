@@ -1,7 +1,7 @@
 package GIS::Distance::Formula;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Class::Measure::Length qw( length );
 use Carp qw( croak );
@@ -74,7 +74,7 @@ GIS::Distance::Formula - Formula base class.
 This is the parent class for all L<GIS::Distance> formula classes such as
 those listed at L<GIS::Distance/FORMULAS>.
 
-To author your own formula all you need to do is start here:
+To author your own formula class:
 
     package My::Formula;
     
@@ -96,8 +96,8 @@ Then use it:
     my $km = $gis->distance( @coords );
 
 The global C<$GIS::Distance::Formula::SELF> is available when your
-C<_distance()> subroutine is called if, and only of, the entry point
-was L<GIS::Distance/distance> and NOT L</GIS::Distance/distance_metal>
+C<_distance()> subroutine is called if, and only if, the entry point
+was L<GIS::Distance/distance> and NOT L<GIS::Distance/distance_metal>
 or otherwise.
 
 Much of the interface described in L<GIS::Distance> is actually
@@ -111,9 +111,9 @@ See L<GIS::Distance/SUPPORT>.
 
 See L<GIS::Distance/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<GIS::Distance/LICENSE>.
+See L<GIS::Distance/COPYRIGHT AND LICENSE>.
 
 =cut
 
