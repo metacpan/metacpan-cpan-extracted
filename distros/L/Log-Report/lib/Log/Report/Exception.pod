@@ -152,12 +152,12 @@ Produces "reason: message".
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.27,
-built on June 01, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.28,
+built on May 14, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

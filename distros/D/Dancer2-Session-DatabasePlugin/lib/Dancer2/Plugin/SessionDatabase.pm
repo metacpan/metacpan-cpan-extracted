@@ -2,7 +2,6 @@ package Dancer2::Plugin::SessionDatabase;
 
 use Modern::Perl;
 use Dancer2::Plugin; 
-use Dancer2::Plugin::Database;
 use Carp qw(croak);
 use Data::Dumper;
 
@@ -24,20 +23,14 @@ sub reset_session {
 }
 
 sub DBC { 
-    my ($conn)=@_;
-    my $dbh=database(@_); 
+    my ($self,$conn)=@_;
+    my $db=$self->find_plugin('Dancer2::Plugin::Database');
+    my $dbh=$db->database($conn); 
 
-    unless(defined($DBH)) {
+    if(defined($DBH) && $dbh ne $DBH) {
       %{$Dancer2::Session::DatabasePlugin::CACHE}=();
-      return $DBH=$dbh;
-    } unless(defined($dbh)) {
-      $DBH=undef;
-      croak "No database handle returned for $conn";
-    } elsif($DBH eq $DBH) {
-      return $dbh;
     }
 
-    %{$Dancer2::Session::DatabasePlugin::CACHE}=();
     return $DBH=$dbh;
 }
 
@@ -54,9 +47,19 @@ sub BUILD {
 
   $self->app->add_hook(
     Dancer2::Core::Hook->new(
+      name=>"engine.session.before_db",
+      code=>sub { 
+          my ($session)=@_;
+          my $dbh=$self->DBC($session->connection);
+          $session->dbh($dbh);
+        }
+      )
+  );
+  $self->app->add_hook(
+    Dancer2::Core::Hook->new(
       name=>"database_connection_lost",
       code=>sub { 
-	my ($dbh)=@_;
+        	my ($dbh)=@_;
           return unless $self->db_check($dbh);
           $self->reset_session;
         }
@@ -66,7 +69,7 @@ sub BUILD {
     Dancer2::Core::Hook->new(
       name=>"database_error",
       code=>sub { 
-	my ($err,$dbh)=@_;
+	        my ($err,$dbh)=@_;
           return unless $self->db_check($dbh);
           $self->reset_session;
       }

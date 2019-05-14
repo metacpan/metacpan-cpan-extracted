@@ -1,0 +1,16 @@
+Changelog for Mojolicious-Plugin-AutoRoutePm
+
+0.12 2019-05-14T15:17:26
+ - Add support for /url_component_pm/a/b/c that is match by a *query
+   parameter.
+
+0.11 2019-05-14T10:40:10
+ - [Minor] Add .gitignore
+ - Add prereqs and a few docs. Add automatic version number, module test
+   and changes file
+ - First public release
+
+0.10 2019-05-13T16:33:29
+ - Add FakeRelease
+ - Removed AutoVersion
+ - Initial import

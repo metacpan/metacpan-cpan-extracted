@@ -11,7 +11,7 @@ WriteMakefile(
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
     'Test::More' => 0,
-    'Test::Mojo::Session' => 1.04
+    'Test::Mojo::Session' => 1.05
   },
   PREREQ_PM => {
     'Mojolicious' => 7.13

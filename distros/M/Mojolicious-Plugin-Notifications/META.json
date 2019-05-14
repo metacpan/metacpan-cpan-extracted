@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Mojo::Session" : "1.04",
+            "Test::Mojo::Session" : "1.05",
             "Test::More" : "0"
          }
       },
@@ -47,6 +47,6 @@
          "url" : "https://github.com/Akron/Mojolicious-Plugin-Notifications"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,15 +1,16 @@
 package Daemon::Device;
 # ABSTRACT: Forking daemon device construct
 
+use 5.012;
 use strict;
 use warnings;
-use 5.0113;
+
 use Daemon::Control;
 use Carp qw( croak carp );
 use POSIX ":sys_wait_h";
 use IO::Pipe;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub new {
     my $class = shift;
@@ -170,7 +171,7 @@ sub _spawn {
             $self->{_io_dn} = $io_dn;
         }
 
-        $self->{_cpid}  = $$;
+        $self->{_cpid} = $$;
         _child($self);
         exit;
     }
@@ -202,7 +203,10 @@ sub _child {
         $self->{_child}->($self);
     }
     else {
-        sleep 1 while (1);
+        while (1) {
+            exit unless ( $self->parent_alive );
+            sleep 1;
+        }
     }
 
     return;
@@ -255,6 +259,11 @@ sub parent_hup_to_child {
     my $self = shift;
     $self->{_parent_hup_to_child} = $_[0] if (@_);
     return $self->{_parent_hup_to_child};
+}
+
+sub parent_alive {
+    my ($self) = @_;
+    return kill( 0, $self->{_ppid} );
 }
 
 sub data {
@@ -322,7 +331,7 @@ Daemon::Device - Forking daemon device construct
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Daemon-Device.svg)](https://travis-ci.org/gryphonshafer/Daemon-Device)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Daemon-Device/badge.png)](https://coveralls.io/r/gryphonshafer/Daemon-Device)
@@ -363,6 +372,7 @@ version 1.07
 
         while (1) {
             warn "Child $$ exists (heartbeat)\n";
+            exit unless ( $device->parent_alive );
             sleep 5;
         }
     }
@@ -461,6 +471,7 @@ in every child process.
 
             while (1) {
                 warn "Child $$ exists (heartbeat)\n";
+                exit unless ( $device->parent_alive );
                 sleep 5;
             }
         },
@@ -591,6 +602,23 @@ C<parent_hup_to_child> values, allowing you to change them during runtime.
 This should be done in parents. Remember that data values are copied into
 children during spawning (i.e. forking), so changing these values in children
 is meaningless.
+
+=head2 parent_alive
+
+The C<parent_alive> method returns true if the daemon parent still lives or
+false if it doesn't live. This is useful when writing child code, since a child
+should periodically check to see if it's an orphan.
+
+    exit Daemon::Device->new(
+        daemon => \%daemon_control_settings,
+        child  => sub {
+            my ($self) = @_;
+            while (1) {
+                exit unless ( $self->parent_alive );
+                sleep 1;
+            }
+        },
+    )->run;
 
 =head1 DATA
 
@@ -742,7 +770,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Log::Report::Dispatcher::Try;
 use vars '$VERSION';
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 use base 'Log::Report::Dispatcher';
 
@@ -18,6 +18,7 @@ use strict;
 use Log::Report 'log-report', syntax => 'SHORT';
 use Log::Report::Exception ();
 use Log::Report::Util      qw/%reason_code/;
+use List::Util             qw/first/;
 
 
 use overload
@@ -112,7 +113,10 @@ sub wasFatal(@)
 {   my ($self, %args) = @_;
     defined $self->{died} or return ();
 
-    my $ex = $self->{exceptions}[-1];
+    # An (hidden) eval between LR::try()s may add more messages
+    my $ex = first { $_->isFatal } @{$self->{exceptions}}
+        or return ();
+
     (!$args{class} || $ex->inClass($args{class})) ? $ex : ();
 }
 

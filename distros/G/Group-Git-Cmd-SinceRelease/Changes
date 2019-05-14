@@ -1,5 +1,15 @@
 Revision history for Group-Git-Cmd-SinceRelease
 
+0.0.12   2019-05-14
+        Updating for release of version 0.0.12
+        Adding perl 5.26 version to travis (Ivan Wills)
+        Adding config_requires section (Ivan Wills)
+        Updated date (Ivan Wills)
+        Yet more skips (Ivan Wills)
+        Skipping the skip (Ivan Wills)
+        Updating manifest skips (Ivan Wills)
+        Added auto building (Ivan Wills)
+
 0.0.11   2017-12-28
         Updating for release of version 0.0.11
         Adding better errors when no SHA found (Ivan Wills)

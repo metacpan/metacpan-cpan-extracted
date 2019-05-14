@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A plugin to automatically add routes by *.pm modules which are a Mojolicious::Controller",
+  "ABSTRACT" => "Mojolicious plugin to create routes by *.pm modules which are a controller",
   "AUTHOR" => "Emiliano Bruni <info\@ebruni.it>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -15,15 +15,27 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Mojolicious-Plugin-AutoRoutePm",
   "LICENSE" => "perl",
   "NAME" => "Mojolicious::Plugin::AutoRoutePm",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.10",
+  "PREREQ_PM" => {
+    "File::Find::Rule" => 0,
+    "Module::Load" => 0,
+    "Mojolicious" => 0
+  },
+  "TEST_REQUIRES" => {
+    "Test::UseAllModules" => 0
+  },
+  "VERSION" => "0.12",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "File::Find::Rule" => 0,
+  "Module::Load" => 0,
+  "Mojolicious" => 0,
+  "Test::UseAllModules" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

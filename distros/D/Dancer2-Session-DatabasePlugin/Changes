@@ -27,3 +27,6 @@
   -- Moved freeze and thaw functions to global variables that can be accessed and overwritten
 1.011
   -- Added new features and documentation required for supporting DBD::Sybase
+1.012
+  -- added hook engine.session.before_db
+    the hook: engine.session.before_db is now used to set the database connection in the session object at runtime.

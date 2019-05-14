@@ -146,13 +146,15 @@ share {
 
 sys {
 
-  gather sub {
-    my($build) = @_;
-    if($build->install_prop->{my_libs})
-    {
-      $build->runtime_prop->{$_} = $build->install_prop->{"my_$_"} for qw( version cflags libs );
-    }
-  };
+  meta->after_hook(
+    gather_system => sub {
+      my($build) = @_;
+      if($build->install_prop->{my_libs})
+      {
+        $build->runtime_prop->{$_} = $build->install_prop->{"my_$_"} for qw( version cflags libs );
+      }
+    },
+  );
 
 };
 

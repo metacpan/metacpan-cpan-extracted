@@ -1,5 +1,5 @@
 package Devel::PatchPerl::Plugin;
-$Devel::PatchPerl::Plugin::VERSION = '1.58';
+$Devel::PatchPerl::Plugin::VERSION = '1.60';
 #ABSTRACT: Devel::PatchPerl plugins explained
 
 use strict;
@@ -19,7 +19,7 @@ Devel::PatchPerl::Plugin - Devel::PatchPerl plugins explained
 
 =head1 VERSION
 
-version 1.58
+version 1.60
 
 =head1 DESCRIPTION
 

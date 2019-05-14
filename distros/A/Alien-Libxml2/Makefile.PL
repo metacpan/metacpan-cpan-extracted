@@ -41,10 +41,10 @@ my %WriteMakefileArgs = (
     "Test2::V0"   => "0.000060",
     "Test::Alien" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test"    => {
     "TESTS" => "t/*.t"
-    }
+  }
 );
 
 my %FallbackPrereqs = (
@@ -75,8 +75,18 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 WriteMakefile(%WriteMakefileArgs);
 
 # BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
-sub MY::postamble {
-  $abmm->mm_postamble;
+{ package
+    MY;
+
+  sub postamble {
+    $abmm->mm_postamble(@_);
+  }
+
+  sub install {
+    $abmm->can('mm_install')
+      ? $abmm->mm_install(@_)
+      : shift->SUPER::install(@_);
+  }
 }
 
 # END code inserted by Dist::Zilla::Plugin::AlienBuild

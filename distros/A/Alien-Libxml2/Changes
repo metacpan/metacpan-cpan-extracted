@@ -1,5 +1,11 @@
 Revision history for Alien-Libxml2
 
+0.09      2019-05-14 06:57:21 -0600
+  - Production release identical to 0.08_01.
+
+0.08_01   2019-05-13 22:10:45 -0600
+  - Fix bug in xml2-config logic
+
 0.07      2019-03-27 11:37:47 -0400
   - Add ability to find libxml2 via pkg-config (requires Alien::Build
     1.61 or better).  Previous methods for finding libxml2 like

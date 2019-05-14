@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.58';
+$Devel::PatchPerl::VERSION = '1.60';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -7758,8 +7758,8 @@ sub _patch_conf_fwrapv {
   _patch(<<'FWRAPV');
 diff --git a/Configure b/Configure
 index 15b3da1769..791889a2ab 100755
---- a/Configure
-+++ b/Configure
+--- Configure
++++ Configure
 @@ -4643,6 +4643,22 @@ case "$gccversion" in
      $rm -f try try.*
  esac
@@ -7892,7 +7892,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.58
+version 1.60
 
 =head1 SYNOPSIS
 

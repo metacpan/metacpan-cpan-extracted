@@ -1,5 +1,10 @@
 Revision history for Daemon::Device
 
+1.08      2019-05-13 18:03:07-07:00 America/Los_Angeles
+        - Added parent_alive method; set default child sub to use it
+        - Improved tests to expect not-perfectly-uniform signal responses
+        - Adding Perl versions to test; annual general update for 2018
+
 1.07      2016-11-11 08:45:38-08:00 America/Los_Angeles
         - Provided accessor to the Daemon::Control sub-object
 

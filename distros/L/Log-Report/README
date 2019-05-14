@@ -1,14 +1,25 @@
-==== README for Log::Report
-=    Last update: 25 May 2007, Mark Overmeer
+=== README for Log-Report version 1.28
+=   Generated on Tue May 14 09:25:07 2019 by OODoc 2.02
 
-The Log::Report module is entangled with various other modules, which
-may each take a long time to install but then are never used.  Therefore,
-these modules will produce compile-time errors.
+There are various ways to install this module:
 
-Optional modules:      Needed for:
-  Log::Dispatch and ::*  Log::Report::Dispatcher::LogDispatch
-  Log::Log4perl          Log::Report::Dispatcher::Log4perl
-  Sys::Syslog            Log::Report::Dispatcher::Syslog
-  PPI                    Log::Report::Extract::PerlPPI
-  Locale::gettext        Log::Report::Translator::Gettext
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Log-Report-1.28.tar.gz
+       tar -xf Log-Report-1.28.tar
+       cd Log-Report-1.28
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Log-Report-1.28/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Log-Report
 

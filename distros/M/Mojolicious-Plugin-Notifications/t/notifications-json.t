@@ -2,6 +2,7 @@
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
+use Mojo::ByteStream 'b';
 
 my $t = Test::Mojo->new;
 
@@ -19,6 +20,7 @@ ok(!$co->notifications('json'), 'No notification yet');
 $co->notify(warn => q/That's a warning/);
 $co->notify(error => q/That's an error message/);
 $co->notify(success => q/That's <a success story/);
+$co->notify(success => b('This is a bytestream'));
 
 is_deeply(
   $co->notifications('json',{ text =>  'cool'}),
@@ -26,7 +28,8 @@ is_deeply(
     notifications => [
       [warn => q/That's a warning/],
       [error => q/That's an error message/],
-      [success => q/That's <a success story/]
+      [success => q/That's <a success story/],
+      [success => q/This is a bytestream/]
     ]
   },
   'Notification is fine');

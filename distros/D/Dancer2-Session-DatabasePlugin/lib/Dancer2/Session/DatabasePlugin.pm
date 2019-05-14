@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION="1.0011";
+our $VERSION="1.0012";
 
 our $HANDLE_SQL_STRING=\&stub_function;
 our $HANDLE_EXECUTE=\&handle_execute;
@@ -75,6 +75,10 @@ has data_column=>(
   required=>1,
   is=>'rw',
   default=>'SESSION_DATA',
+);
+
+has dbh=>(
+  is=>'rw',
 );
 
 =head1 NAME
@@ -273,8 +277,8 @@ sub get_sth($) {
 
   my $query=$self->$method;
   my $sth;
-  $HANDLE_SQL_STRING->($method,$query,$self->dbh,$sth);
-  $sth=$self->dbh->prepare($query) unless defined($sth);
+  $HANDLE_SQL_STRING->($method,$query,$self->get_dbh,$sth);
+  $sth=$self->get_dbh->prepare($query) unless defined($sth);
 
   # only cache the statement handle if we are told too
   return $sth unless $self->cache_sth;
@@ -338,12 +342,52 @@ sub _flush {
   }
 }
 
-sub dbh {
+sub get_dbh {
   my ($self)=@_;
-  return Dancer2::Plugin::SessionDatabase::DBC($self->connection);
+  #return Dancer2::Plugin::SessionDatabase::DBC($self->connection);
+  $self->execute_hook( 'engine.session.before_db', $self );
+
+  return $self->dbh;
 }
 
-=head1 Dancer2::Plugin::Database hooks
+=head1 hooks created
+
+This package supports the default session engine hooks along with the following addtional hooks documented in this section.
+
+=cut
+
+sub supported_hooks {
+    qw/
+      engine.session.before_retrieve
+      engine.session.after_retrieve
+
+      engine.session.before_create
+      engine.session.after_create
+
+      engine.session.before_change_id
+      engine.session.after_change_id
+
+      engine.session.before_destroy
+      engine.session.after_destroy
+
+      engine.session.before_flush
+      engine.session.after_flush
+
+      engine.session.before_db
+      /;
+}
+
+=head2 engine.session.before_db
+
+This hook is run before the session engine calls the database function from Dancer2::Plugin::Database.  
+
+  hook=>'engine.session.before_db'=>sub {
+    my ($session)=@_;
+  };
+
+Note: This hook is used by Dancer2::Plugin::SessionDatabase to set the database handle in the session object at runtime.
+
+=head1 hooks used in Dancer2::Plugin::Database
 
 This package makes use of hooks provdied by Dancer2::Database::Plugin.
 

@@ -7,7 +7,15 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
-version 1.27:
+version 1.28:
+
+	Fixes:
+	- Dancer2 version 0.166001 is too old as well. [cpantesters]
+	- call to wasFatal($class)/reportFatal($class) without exception
+	  autovivified an 'undef' in the exception list. [Andrew Beverley]
+	- fatal exception not always the last in try() block.
+
+version 1.27: Fri  1 Jun 10:00:10 CEST 2018
 
 	Fixes:
 	- fix metadata [Mohammad S Anwar]

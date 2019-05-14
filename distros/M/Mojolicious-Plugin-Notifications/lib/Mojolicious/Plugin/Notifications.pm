@@ -7,15 +7,12 @@ use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # TODO:
 #   Maybe revert to tx-handler and use session instead of flash!
-
 # TODO:
 #   Support Multiple Times Loading
-# TODO:
-#   Explain camelize and :: behaviour for engine names
 # TODO:
 #   Subroutines for Engines should be given directly
 # TODO:
@@ -266,6 +263,9 @@ Notifications won't be invoked in case no notifications are
 in the queue and no further engine parameters are passed.
 Engine parameters are documented in the respective plugins.
 
+The engine's name will be camelized. If no namespace is given,
+the default namespace is C<Mojolicious::Plugin::Notifications>.
+
 In case no engine name is passed to the notifications method,
 an L<assets object|Mojolicious::Plugin::Notifications::Assets>
 is returned, bundling all registered engines' assets for use
@@ -346,7 +346,7 @@ compatible.
 =head1 HINTS
 
 As flash information is stored in the session, notifications may be lost
-in case the session expires using C<session(expires => 1)>.
+in case the session expires using C<session(expires =E<gt> 1)>.
 
 
 =head1 AVAILABILITY
@@ -356,7 +356,7 @@ in case the session expires using C<session(expires => 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2018, L<Nils Diewald|https://nils-diewald.de/>.
+Copyright (C) 2014-2019, L<Nils Diewald|https://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.

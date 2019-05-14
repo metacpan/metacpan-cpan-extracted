@@ -24,6 +24,7 @@ t/notifications-json.t
 t/notifications-mix.t
 t/notifications-plugin.t
 t/notifications-hook.t
+t/notifications-confirm.t
 t/Plugin/MyEngine.pm
 Changes
 MANIFEST

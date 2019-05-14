@@ -7,3 +7,4 @@ Makefile.PL
 README
 dist.ini
 lib/Mojolicious/Plugin/AutoRoutePm.pm
+t/00-load.t

@@ -114,8 +114,8 @@ L<styles|Mojolicious::Plugin::Notifications::Assets/styles> helper.
     my ($self, $c, $notifications) = @_;
 
     my $string = '';
-    foreach (@$notifications) {
-      $string .= '<blink class="' . $_->[0] . '">' . $_->[-1] . '</blink>';
+    foreach my $note (@$notifications) {
+      $string .= '<blink class="' . $note->[0] . '">' . $note->[-1] . '</blink>';
     };
     return $c->b($string);
   };
@@ -130,6 +130,10 @@ notifications as array references.
 The first element of the notification is the
 notification type, the last element is the message. An optional second element may
 contain further parameters in a hash reference.
+
+To support confirmations, it is necessary to support the parameters C<ok> and C<cancel>.
+If not, it is recommended to log a warning, that confirmations are not supported
+by the engine.
 
   %= notifications 'MyEngine', -no_include
 

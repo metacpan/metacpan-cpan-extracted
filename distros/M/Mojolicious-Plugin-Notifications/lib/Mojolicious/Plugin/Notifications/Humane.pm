@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Notifications::Humane;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Mojolicious::Plugin::Notifications::HTML qw/notify_html/;
 use Mojo::ByteStream 'b';
-use Mojo::Util qw/xml_escape/;
+use Mojo::Util qw/xml_escape quote/;
 use Mojo::JSON qw/encode_json decode_json/;
 use File::Spec;
 use File::Basename;
@@ -10,6 +10,8 @@ use File::Basename;
 has [qw/base_class base_timeout/];
 
 state $path = '/humane/';
+
+use constant CANCEL_WARN => 'Trying to use cancel with humane engine in M::P::Notifications';
 
 # Register plugin
 sub register {
@@ -49,6 +51,7 @@ sub notifications {
 
   # Start JavaScript snippet
   $js .= qq{<script>//<![CDATA[\n} .
+    'var x=' . quote($c->csrf_token) . ';' .
     qq!var notify=humane.create({baseCls:'humane-$base_class',timeout:! .
       $self->base_timeout . ",clickToClose:true});\n";
 
@@ -60,10 +63,48 @@ sub notifications {
   foreach (@$notify_array) {
     $notify{$_->[0]} = 1;
     $log .= '.' . $_->[0] . '(' . encode_json($_->[-1]);
-    $log .= ', ' . encode_json($_->[1]) if scalar @{$_} == 3;
+    if (scalar @{$_} == 3) {
+      my %param = %{$_->[1]};
+
+      # Remove potential labels
+      delete $param{ok_label};
+      delete $param{cancel_label};
+
+      # Confirmation notification
+      if ($param{ok}) {
+        my $url = delete $param{ok};
+        delete $param{timeout};
+
+        # Cancelation is not supported
+        if (delete $param{cancel}) {
+          $c->app->log->warn(CANCEL_WARN);
+        };
+
+        # Set timeout to 0, clickToClose is already defined
+        $param{timeout} = 0;
+
+        # Encode parameters if left
+        $log .= ', ' . encode_json(\%param) if keys %param;
+
+        # Define callback
+        $log .= ', function(){var r=new XMLHttpRequest();';
+        $log .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
+        $log .= 'r.open("POST",' . quote($url) . ');r.send("csrf_token="+x);r.send()}';
+      }
+
+      # Normal notification
+      else {
+
+        # Cancelation is not supported
+        if (delete $param{cancel}) {
+          $c->app->log->warn(CANCEL_WARN);
+        };
+        $log .= ', ' . encode_json(\%param) if keys %param;
+      };
+    };
     $log .= ')';
 
-    $noscript .= notify_html($_->[0], $_->[-1]);
+    $noscript .= notify_html($c, @{$_});
   };
   $log = "notify$log;\n" if $log;
 
@@ -171,6 +212,14 @@ which notification types are presupported.
 
 In addition to types and messages, further refinements can
 be passed at the second position.
+
+In case an C<ok> parameter is passed, this will create a
+notification that requires a click to be closed.
+The C<ok> URL will receive a POST request on closing.
+The POST will have a L<csrf_token|Mojolicious::Plugin::TagHelpers/csrf_token>
+parameter to validate.
+
+B<Confirmation is EXPERIMENTAL!>
 
 
 =head2 notifications

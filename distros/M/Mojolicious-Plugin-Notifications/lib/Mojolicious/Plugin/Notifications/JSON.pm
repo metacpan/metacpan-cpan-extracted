@@ -1,6 +1,9 @@
 package Mojolicious::Plugin::Notifications::JSON;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 
+# TODO:
+#   Probably introduce a notify_json function
+
 has key => 'notifications';
 
 # Nothing to register
@@ -21,7 +24,47 @@ sub notifications {
   if (!$json || ref $json) {
     my @msgs;
     foreach (@$notify_array) {
-      push(@msgs, [$_->[0], $_->[-1]]);
+
+      # Confirmation message
+      if (ref $_->[1] && ref $_->[1] eq 'HASH' &&
+            ($_->[1]->{ok} || $_->[1]->{cancel} || $_[1]->{confirm})) {
+        my $param = $_->[1];
+
+        my $opt = {};
+
+        # Set confirmation path
+        if ($param->{confirm}) {
+          $opt->{$param->{confirm_label} // 'confirm'} = {
+            method => 'GET',
+            url => $param->{confirm}
+          };
+        }
+
+        else {
+          # Set confirmation path
+          if ($param->{ok}) {
+            $opt->{$param->{ok_label} // 'ok'} = {
+              method => 'POST',
+              url => $param->{ok}
+            };
+          }
+
+          # Set cancelation path
+          if ($param->{cancel}) {
+            $opt->{$param->{cancel_label} // 'cancel'} = {
+              method => 'POST',
+              url => $param->{cancel}
+            };
+          };
+        };
+
+        push @msgs, [$_->[0], ''.$_->[-1], $opt];
+      }
+
+      # Normal notification
+      else {
+        push(@msgs, [$_->[0], ''.$_->[-1]]);
+      };
     };
 
     if (!$json) {
@@ -111,8 +154,50 @@ Defaults to C<notifications>.
 
 =head2 notify
 
+  $c->notify(warn => 'wrong');
+  $c->notify(confirm => { ok => '/ok', cancel => '/cancel' } => 'Please, confirm!');
+
+  $c->render(json => $c->notifications(json => { text => 'html' }));
+  # {
+  #   "notifications":[
+  #     ["warn", "wrong"],
+  #     [
+  #       "confirm",
+  #       "Please, confirm!",
+  #       {
+  #         "cancel":{
+  #           "method":"POST",
+  #           "url":"\/cancel"
+  #         },
+  #         "ok":{
+  #           "method":"POST",
+  #           "url":"\/ok"
+  #         }
+  #       }
+  #     ]
+  #   ],
+  #   "text":"example"
+  # }
+
+
 See the base L<notify|Mojolicious::Plugin::Notifications/notify> helper.
 
+In case an C<ok>, C<cancel> or C<confirm> parameter is passed,
+this will add an object containing confirmation and/or cancellation paths.
+The C<confirm> URL should point to an (HTML) endpoint a user
+can enter confirmation details. If it is given, both the C<ok> and C<cancel>
+parameters will be ignored.
+In case an C<ok_label> is passed, this will be the key for the
+confirmation object.
+In case a C<cancel_label> is passed, this will be the key
+for the cancelation object.
+In case a C<confirm_label> is passed, this will be the key
+for the confirmation object.
+
+Confirmation routes for JSON do not support CSRF protection.
+
+
+B<Confirmation is EXPERIMENTAL!>
 
 =head2 notifications
 
@@ -143,7 +228,7 @@ The name defaults to C<notifications>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

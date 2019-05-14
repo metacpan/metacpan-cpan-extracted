@@ -87,7 +87,7 @@ have a relatively large number of unique methods all of their own.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.264'; # VERSION
+our $VERSION = '1.265'; # VERSION
 
 our @ISA = "PPI::Token";
 
@@ -111,11 +111,7 @@ the here-doc, B<excluding> the terminator line.
 
 =cut
 
-sub heredoc {
-	wantarray
-		? @{shift->{_heredoc}}
-		: scalar @{shift->{_heredoc}};
-}
+sub heredoc { @{shift->{_heredoc}} }
 
 =pod
 
