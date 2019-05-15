@@ -6,6 +6,12 @@ Mark Overmeer.
 
 Plans and unwanted limitations? see README.todo
 
+version 1.62: Wed 15 May 15:14:28 CEST 2019
+
+	Fixes:
+	- empty list elements are not an error [Rob De Langhe]
+	- facet date_whiteSpace [Ferruccio Zamuner]
+
 version 1.61: Fri  9 Nov 10:51:04 CET 2018
 
 	Fixes:

@@ -35,8 +35,10 @@ lib/Cfn/Resource/AWS/ApiGateway/UsagePlan.pm
 lib/Cfn/Resource/AWS/ApiGateway/UsagePlanKey.pm
 lib/Cfn/Resource/AWS/ApiGateway/VpcLink.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Api.pm
+lib/Cfn/Resource/AWS/ApiGatewayV2/ApiMapping.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Authorizer.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Deployment.pm
+lib/Cfn/Resource/AWS/ApiGatewayV2/DomainName.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Integration.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/IntegrationResponse.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Model.pm
@@ -230,6 +232,7 @@ lib/Cfn/Resource/AWS/Greengrass/Group.pm
 lib/Cfn/Resource/AWS/Greengrass/GroupVersion.pm
 lib/Cfn/Resource/AWS/Greengrass/LoggerDefinition.pm
 lib/Cfn/Resource/AWS/Greengrass/LoggerDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/ResourceDefinition.pm
 lib/Cfn/Resource/AWS/Greengrass/ResourceDefinitionVersion.pm
 lib/Cfn/Resource/AWS/Greengrass/SubscriptionDefinition.pm
 lib/Cfn/Resource/AWS/Greengrass/SubscriptionDefinitionVersion.pm
@@ -648,6 +651,7 @@ t/cfn_json/Booelan_As_String.json
 t/cfn_json/CloudFormer.json
 t/cfn_json/CloudFront_S3.json
 t/cfn_json/CloudTrail.json
+t/cfn_json/CodeBuild_filtergroups.json
 t/cfn_json/Config.json
 t/cfn_json/DAX.json
 t/cfn_json/DAX_paramgroup.json

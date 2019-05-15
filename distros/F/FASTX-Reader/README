@@ -1,5 +1,5 @@
 This archive contains the distribution FASTX-Reader,
-version 0.05:
+version 0.06:
 
   A lightweight FASTA and FASTQ reader based on Heng Li's parser.
 

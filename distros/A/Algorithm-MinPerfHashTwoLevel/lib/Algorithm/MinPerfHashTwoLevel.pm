@@ -1,9 +1,8 @@
 package Algorithm::MinPerfHashTwoLevel;
 use strict;
 use warnings;
-our $VERSION = '0.09';
-our $DEFAULT_VARIANT = 1;
-
+our $VERSION = '0.10';
+our $DEFAULT_VARIANT = 2;
 
 use Exporter qw(import);
 
@@ -25,10 +24,13 @@ BEGIN {
 use constant \%constant;
 
 our %EXPORT_TAGS = (
-    'all' => [ qw(
-        seed_state
-        hash_with_state
-    ), sort keys %constant ],
+    'all' => [
+        '$DEFAULT_VARIANT',
+        qw(
+            seed_state
+            hash_with_state
+        ), sort keys %constant
+    ],
     'utf8_flags' => [ grep /UTF8/, sort keys %constant],
     'uint_max'   => [ grep /_MAX/, sort keys %constant]
 );
@@ -52,8 +54,11 @@ sub new {
         if $o->{seed};
     $o->{variant}= $DEFAULT_VARIANT unless defined $o->{variant};
     $o->{variant}= int(0+$o->{variant});
-    die "Unknown variant '$o->{variant}' in constructor new()"
-        if ($o->{variant} > 1);
+    $o->{compute_flags}=0;
+    $o->{compute_flags} += 1 if delete $o->{filter_undef};
+    $o->{compute_flags} += 2 if delete $o->{deterministic};
+    die "Unknown variant '$o->{variant}' in constructor new(), max known is 2"
+        if ($o->{variant} > 2);
     return $o;
 }
 
@@ -95,127 +100,22 @@ sub _compute_first_level {
         join " ", sort keys(%$source_hash));
 }
 
-sub __compute_max_xor_val {
-    my ($n,$variant)= @_;
-    # if $n is a power of two then flipping higher bits
-    # wont change the distribution of the keys, so we set
-    # max_xor_val to $n, on the other hand if it is not,
-    # then we can set it to UINT32_MAX.
-    my $n_bits= sprintf "%b", $n;
-    my $n_bits_sum= 0;
-    $n_bits_sum += $_ for split m//, $n_bits;
-    if ($n_bits_sum == 1) {
-        return $n;
-    } else {
-        return $variant ? INT32_MAX : UINT32_MAX;
-    }
-}
-
 sub _compute_first_level_inner {
     my ($self)= @_;
     my $debug= $self->{debug};
-    my $state= $self->{state};
-
-    my $variant= $self->{variant};
 
     printf "checking seed %s => state: %s\n", 
         unpack("H*",$self->{seed}), 
         unpack("H*",$self->{state}), 
         if $debug;
 
-    my $source_hash= $self->{source_hash};
-    my $n= $self->{n};
-    my $max_xor_val= __compute_max_xor_val($n,$variant);
-    printf "max_xor_val=%d (n=%d)\n",$max_xor_val,$n
-        if $debug;
-
-    my @key_buckets;
-    my @h2_buckets;
-    keys(%$source_hash);
-    while (my ($key,$val)= each %$source_hash) {
-        my ($key_normalized, $key_is_utf8, $val_normalized, $val_is_utf8, $idx1, $h2_packed);
-        my $h0= hash_with_state_normalized(
-            $key, $key_normalized, $key_is_utf8,
-            $val, $val_normalized, $val_is_utf8,
-            $idx1, \@h2_buckets,
-            $state,
-            $n
-        );
-       
-        push @{$key_buckets[$idx1]}, {
-            h0 => $h0,
-            key => $key,
-            key_normalized => $key_normalized,
-            key_is_utf8 => $key_is_utf8,
-            val => $val,
-            val_normalized => $val_normalized,
-            val_is_utf8 => $val_is_utf8,
-        };
+    my $bad_idx= compute_xs($self);
+    if ($bad_idx) {
+        printf " Index '%d' not solved, new seed required.\n", $bad_idx-1 if $debug;
+        return undef;
     }
 
-    my @buckets;
-    my $used_sv= "\0" x $n;
-
-    my @idx1= sort {
-            length($h2_buckets[$b]) <=> length($h2_buckets[$a]) ||
-            $a <=> $b
-        } grep {
-            defined $h2_buckets[$_]
-        } (0 .. ($n-1));
-    my $last_size= -1;
-    my $size_count= 0;
-    my $used_pos= $variant == 1 ? 0 : undef;
-
-    while (@idx1) {
-        my $idx1= shift @idx1;
-        my $keys= $key_buckets[$idx1];
-        my $num_keys= 0+@$keys;
-        if ($debug) {
-            if ($last_size != $num_keys) {
-                $last_size= $num_keys;
-                if ($size_count) {
-                    printf " (%d times)\n", $size_count;
-                }
-                printf "crunching buckets with %d keys", $num_keys;
-                $size_count= 0;
-            }
-            $size_count++;
-        }
-        my $idx_sv;
-        my $xor_val= calc_xor_val($max_xor_val, $h2_buckets[$idx1], $idx_sv, $used_sv, $used_pos);
-
-        if ($xor_val) {
-            
-            my $h1_bucket= $buckets[$idx1] ||= {};
-            $h1_bucket->{xor_val}= $xor_val;
-            $h1_bucket->{h1_keys}= 0+@$keys;
-            
-            my @idx2= unpack "L*", $idx_sv;
-            foreach my $i (0 .. $#$keys) {
-                my $key_info= $keys->[$i];
-                my $idx2= $idx2[$i];
-
-                my $h2_bucket= $buckets[$idx2];
-                if ($h2_bucket) {
-                    $key_info->{$_}= $h2_bucket->{$_} 
-                        for keys %$h2_bucket;
-                }
-                $buckets[$idx2]= $key_info;
-                $key_info->{idx}= $idx2;
-            }
-        } else {
-            printf " (%d completed, %d remaining)\nIndex '%d' not solved: %s\n",
-                $size_count,0+@idx1,$idx1,join ",", map { "'$_'" } "@$keys"
-                if $debug;
-            return;
-        }
-    }
-
-    printf " (%d times)\n", $size_count
-        if $debug && $size_count;
-
-    $self->{buckets}= \@buckets;
-    return \@buckets;
+    return $self->{buckets};
 }
 
 sub compute {
@@ -262,19 +162,32 @@ Computing the hash and mask is done in C (via XS).
 The process for looking up a value in a two level hash with n buckets is
 as follows:
 
-    0. compute the h0 for the key. (h1 = h0 >> 32; h2 = h0 & 0xFFFFFFFF;)
-    1. compute idx = h1 % n;
-    2. find the xor_val for bucket[idx]
+    0. compute the h0 for the key. (giving: h1 = h0 >> 32; h2 = h0 & 0xFFFFFFFF;)
+    1. compute idx1 = h1 % n;
+    2. find the xor_val for bucket[idx1]
     3. if the xor_val is zero we are done, the key is not in the hash
-    4. compute idx 
-        if variant == 0 or (int)xor_val > 0
-         idx = (h2 ^ xor_val) % n;
+    4. compute idx2:
+        if variant > 0 and int(xor_val) < 0
+            idx2 = -xor_val-1
         else
-         idx = -xor_val-1
-    5. compare the key data associated with bucket[idx] with the key provided
-    6. if they match return the desired value.
+            idx2 = INTHASH(h2 ^ xor_val) % n;
+    5. compare the key data associated with bucket[idx2] with the key provided
+    6. if they match return the desired value, otherwise the key is not in the hash.
 
-This module performs the task of computing the xor_val for each bucket.
+In essence this module performs the task of computing the xor_val for
+each bucket such that the idx2 for every element is unique, it does it in C/XS so
+that it is fast.
+
+The INTHASH() function used depends by variant, with variant 2 it is:
+
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x);
+
+which is just a simple 32 bit integer hash function I found at
+https://stackoverflow.com/a/12996028, but any decent reversible
+integer hash function would do. For variant 0 and 1 it is the identity
+function. The default is variant 2.
 
 *NOTE* in Perl a given string may have differing binary representations
 if it is encoded as utf8 or not. This module uses the same conventions
@@ -295,7 +208,8 @@ tracking the representation as a flag. See key_normalized and key_is_utf8
 Construct a new Algorithm::MinPerfHashTwoLevel object. Optional arguments
 which may be provided are 'source_hash' which is a hash reference to use
 as the source for the minimal perfect hash, 'seed' which is expected to be
-a 16 byte string, and 'debug' which is expected to be 0 or 1.
+a 16 byte string, and 'debug' which is expected to be 0 or 1, as well
+as variant, which may be 0, 1 or 2. The default is 2.
 
 =item compute
 

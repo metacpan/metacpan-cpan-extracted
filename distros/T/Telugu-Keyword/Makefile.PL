@@ -8,6 +8,7 @@ WriteMakefile(
     PREREQ_PM         => {'Mouse' => '2.5.6', 'Keyword::Declare' => '0.001013'}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Telugu/Keyword.pm', # retrieve abstract from module
     AUTHOR            => '',
-    #Value must be from legacy list of licenses here
+    EXE_FILES         => ['script/shoba'],
+	#Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
 );

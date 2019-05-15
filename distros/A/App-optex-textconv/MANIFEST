@@ -8,6 +8,7 @@ lib/App/optex/textconv.pm
 lib/App/optex/textconv/Converter.pm
 lib/App/optex/textconv/default.pm
 lib/App/optex/textconv/msdoc.pm
+lib/App/optex/textconv/pdf.pm
 minil.toml
 t/00_compile.t
 META.yml

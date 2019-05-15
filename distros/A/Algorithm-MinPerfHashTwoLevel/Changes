@@ -1,5 +1,10 @@
 Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
 
+0.10  May 14, 2019
+    Rework in XS for speed. Add a new variant 2, which has a more robust
+    construction method which has a much higher chance of finding a solution
+    for a given seed.
+
 0.09  Fri Apr 26, 2019
     Some performance optimisations.
     Fixups so we work correctly on Perl 5.8.9

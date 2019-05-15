@@ -24,7 +24,6 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.025",
-            "File::ShareDir" : "1.00",
             "perl" : "v5.8.1"
          }
       }
@@ -32,7 +31,7 @@
    "provides" : {
       "Alien::OpenSSL::Static" : {
          "file" : "lib/Alien/OpenSSL/Static.pm",
-         "version" : "1.000000"
+         "version" : "1.000001"
       }
    },
    "release_status" : "stable",
@@ -48,6 +47,6 @@
          "url" : "git://github.com/ollyg/alien-openssl-static.git"
       }
    },
-   "version" : "1.000000",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.000001",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

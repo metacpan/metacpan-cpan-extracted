@@ -1,12 +1,13 @@
 package Data::Dumper::Compact;
 
 use List::Util qw(sum);
+use Scalar::Util qw(blessed reftype);
 use Data::Dumper ();
 use Mu;
 use strictures 2;
 use namespace::clean;
 
-our $VERSION = '0.002002';
+our $VERSION = '0.002003';
 $VERSION =~ tr/_//d;
 
 sub import {
@@ -87,6 +88,12 @@ sub expand {
     ] ];
   } elsif (ref($data) eq 'ARRAY') {
     return [ array => [ map $self->expand($_), @$data ] ];
+  } elsif (
+    my $class = blessed($data)
+    and grep { $_ eq 'ARRAY' or $_ eq 'HASH' } reftype($data)
+  ) {
+    my $cursed = ref($data) eq 'ARRAY' ? [ @$data ] : { %$data };
+    return [ blessed => [ $self->expand($cursed), $class ] ];
   }
   (my $thing = $self->_dumper($data)) =~ s/\n\Z//;
 
@@ -318,6 +325,7 @@ sub _format_hash {
           $self->_indent($self->_format($p));
         }
   } @$keys;
+  local $self->{width} = $self->_next_width;
   if (@f == 1) {
     return $self->_format_single('{', '}', $f[0]);
   }
@@ -351,11 +359,18 @@ sub _format_single {
   return join("\n", $l, $self->_indent($first), $r) unless @lines;
   (my $pad = $self->indent_by) =~ s/^ //;
   my $last = $lines[-1] =~ /^[\}\]\)]/ ? (pop @lines).$pad: '';
+  local $self->{width} = $self->_next_width;
   return join("\n",
     $l.($l eq '{' ? ' ' : $pad).$first,
     (map $self->_indent($_), @lines),
     $last.$r
   );
+}
+
+sub _format_blessed {
+  my ($self, $payload) = @_;
+  my ($content, $class) = @$payload;
+  return 'bless( '.$self->_format($content).qq{, "${class}"}.' )';
 }
 
 1;
@@ -494,6 +509,17 @@ the way in for the default L</dumper>. But the end result looks like:
         my($x, $y) = @_;
         return $x * $y;
   } } }
+
+=head2 Bless you
+
+When encountering an object, if it's a blessed array or hashref, DDC will
+attempt to format that too:
+
+  [ bless( {
+      x => 3,
+      y => [ 'foo', 'bar', 'baz', 'quux', 'fleem', 'blather', 'obrien' ],
+      z => 'lololololololololololololololol',
+  }, "OhGods::Lol" ) ]
 
 =head2 All together now
 
@@ -1054,6 +1080,12 @@ lines and the C<.> concatenation operator if necessary,.
   .'string'
 
 The target width is set to 20 in vertical mode to try and not be too ugly.
+
+=head2 Object formatting
+
+Objects are tested to see if their underlying reference is an array or hash.
+If so, it's formatted with 'bless( ' prepended and ', $class)' appended. This
+so far appears to interact nicely with everything else.
 
 =head1 AUTHOR
 

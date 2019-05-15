@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Exception;
 
@@ -7,8 +10,6 @@ use FindBin;
 use Cfn;
 use File::Slurp;
 use JSON;
-
-use strict;
 
 my @tests = (
   { Resources => {

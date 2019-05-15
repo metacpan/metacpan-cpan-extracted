@@ -124,6 +124,16 @@ DESCRIPTION
             return $x * $y;
       } } }
 
+  Bless you
+    When encountering an object, if it's a blessed array or hashref, DDC
+    will attempt to format that too:
+
+      [ bless( {
+          x => 3,
+          y => [ 'foo', 'bar', 'baz', 'quux', 'fleem', 'blather', 'obrien' ],
+          z => 'lololololololololololololololol',
+      }, "OhGods::Lol" ) ]
+
   All together now
     The full set of behaviours allows compact (and, we hope, readable)
     versions of complex data structures. To provide one of the examples that
@@ -664,6 +674,11 @@ ALGORITHM
 
     The target width is set to 20 in vertical mode to try and not be too
     ugly.
+
+  Object formatting
+    Objects are tested to see if their underlying reference is an array or
+    hash. If so, it's formatted with 'bless( ' prepended and ', $class)'
+    appended. This so far appears to interact nicely with everything else.
 
 AUTHOR
     mst - Matt S Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>

@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.13",
+            "Mojolicious" : "7.24",
             "perl" : "5.010001"
          }
       }
@@ -47,6 +47,6 @@
          "url" : "https://github.com/Akron/Mojolicious-Plugin-Notifications"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

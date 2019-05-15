@@ -58,7 +58,7 @@
          "web" : "https://github.com/shadow-dot-cat/Data-Dumper-Compact"
       }
    },
-   "version" : "0.002002",
+   "version" : "0.002003",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {},
    "x_serialization_backend" : "JSON::PP version 2.27300"

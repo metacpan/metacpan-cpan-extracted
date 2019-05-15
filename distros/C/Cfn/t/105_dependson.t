@@ -1,5 +1,7 @@
-#/usr/bin/env perl
+#!/usr/bin/env perl
 
+use strict;
+use warnings;
 use Cfn;
 use Data::Dumper;
 use Test::More;

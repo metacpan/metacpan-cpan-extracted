@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Failsafe;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use YAML::PP::Common qw/ YAML_QUOTED_SCALAR_STYLE /;
 

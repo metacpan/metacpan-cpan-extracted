@@ -46,7 +46,7 @@ use App::SpreadRevolutionaryDate;
 
     return if $message->{who} eq 'freenode-connect';
 
-    if ($message->{who} eq 'RevolutionaryDat') {
+    if ($message->{who} eq 'RevolutionaryBot') {
       like($message->{body}, qr/^Nous sommes le.*, il est/, 'Spread to Freenode for channel ' . $message->{channel});
       $channels_said{$message->{channel}}++;
     }

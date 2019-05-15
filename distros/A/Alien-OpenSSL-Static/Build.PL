@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::Base::ModuleBuild '0.025';
 
-my $minver = '1.1.0f';
+my $minver = '1.1.0j';
 
 my $builder = Alien::Base::ModuleBuild->new (
     module_name => 'Alien::OpenSSL::Static',

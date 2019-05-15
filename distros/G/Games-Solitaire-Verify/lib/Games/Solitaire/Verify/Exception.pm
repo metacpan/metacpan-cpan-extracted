@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Exception;
-$Games::Solitaire::Verify::Exception::VERSION = '0.2100';
+$Games::Solitaire::Verify::Exception::VERSION = '0.2200';
 use strict;
 use warnings;
 
@@ -142,7 +142,7 @@ classes for G::S::Verify.
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ These are L<Exception:Class> exceptions for L<Games::Solitaire::Verify> .
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 FUNCTIONS
 

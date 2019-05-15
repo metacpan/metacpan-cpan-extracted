@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::HorneAutomovePrune;
-$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2100';
+$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2200';
 use strict;
 use warnings;
 
@@ -130,9 +130,22 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Games::Solitaire::Verify::HorneAutomovePrune - perform Horne Autoplay
+on a Freecell layout
+
 =head1 VERSION
 
-version 0.2100
+version 0.2200
+
+=head1 DESCRIPTION
+
+See L<https://groups.yahoo.com/neo/groups/fc-solve-discuss/search/messages?query=horne%20autoplay> .
+
+=head1 VERSION
+
+version 0.2200
 
 =head1 SUBROUTINES
 

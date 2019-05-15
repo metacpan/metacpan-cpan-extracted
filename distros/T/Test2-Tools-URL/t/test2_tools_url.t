@@ -1,4 +1,4 @@
-use Test2::V0 -no_srand => 1;
+use Test2::V0 0.000121 -no_srand => 1;
 use Test2::Tools::URL;
 
 imported_ok $_ for qw(
@@ -45,9 +45,7 @@ subtest 'non object references' => sub {
   is(
     $e = intercept { is( undef, url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given undef',
@@ -58,9 +56,7 @@ subtest 'non object references' => sub {
   is(
     $e = intercept { is( [], url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given []',
@@ -71,9 +67,7 @@ subtest 'non object references' => sub {
   is(
     $e = intercept { is( {}, url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given {}',
@@ -84,9 +78,7 @@ subtest 'non object references' => sub {
   is(
     $e = intercept { is( sub {}, url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given sub {}',
@@ -97,9 +89,7 @@ subtest 'non object references' => sub {
   is(
     $e = intercept { is( \'', url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given \\\'\'',
@@ -110,9 +100,7 @@ subtest 'non object references' => sub {
   is(
     $e = intercept { is( qr{}, url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given qr{}',
@@ -128,9 +116,7 @@ subtest 'bogus scheme' => sub {
   is(
     $e = intercept { is( "bogus://example.com", url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given bogus scheme',
@@ -147,9 +133,7 @@ subtest 'relative url' => sub {
   is(
     $e = intercept { is( "./foo/bar", url {} ) },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     'fails when given relative URL',
@@ -204,9 +188,7 @@ subtest 'component' => sub {
         )
       },
       array {
-        event Ok => sub {
-          call pass => F();
-        };
+        event 'Fail';
         etc;
       },
       "$name does not match",
@@ -227,9 +209,7 @@ subtest 'component' => sub {
       )
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     "query does not match hashref",
@@ -247,9 +227,7 @@ subtest 'component' => sub {
       )
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
+      event 'Fail';
       etc;
     },
     "query does not match array",

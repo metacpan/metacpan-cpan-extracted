@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-URL
 
+0.04      2019-05-15 06:09:39 -0600
+  - Bump requirement on Test2::Suite to latest (gh#2, gh#3)
+
 0.03      2018-04-30 15:44:51 -0400
   - Require URI 1.61 (needed for has_recognized_scheme)
 

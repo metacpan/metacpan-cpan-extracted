@@ -178,7 +178,7 @@ is_deeply($buckets,[
               "val_normalized" => "F"
             }
           ]
-);
+) or diag Dumper($buckets);
 
 %hash=map { 
     my $key= chr($_);

@@ -1,4 +1,4 @@
-# Copyrights 2006-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::Translate::Reader;
 use vars '$VERSION';
-$VERSION = '1.61';
+$VERSION = '1.62';
 
 use base 'XML::Compile::Translate';
 
@@ -793,8 +793,7 @@ sub makeList
              = UNIVERSAL::isa($tree, 'XML::LibXML::Node') ? $tree
              : ref $tree ? $tree->node : undef;
           my $v = ref $tree ? $tree->textContent : $tree;
-          my @v = grep defined, map $st->($_, $node), split " ", $v;
-          @v ? \@v : undef;
+          [ grep defined, map $st->($_, $node), split " ", $v ];
         };
 }
 

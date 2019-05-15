@@ -8,7 +8,7 @@ use Encode ();
 use parent 'Test2::Compare::Base';
 
 # ABSTRACT: Representation of a hash or array reference pointed to by a JSON pointer during deep comparison.
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub operator { 'JSON PTR' }
@@ -114,7 +114,7 @@ Test2::Compare::JSON::Pointer - Representation of a hash or array reference poin
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,7 @@ or compatible ought to work.
 
 =over 4
 
-=item L<TEst2::Tools::JSON::Pointer>
+=item L<Test2::Tools::JSON::Pointer>
 
 This is what you would use in a C<.t> file, and probably what you are interested in.
 

@@ -1,4 +1,8 @@
-0.04 
+0.05 
+  - Implements the resources in CloudFormation spec 3.0.0 (published as of 2019-05-15)
+  - AWS::Serverless::API resource up to date (not in the spec)
+
+0.04 2019-04-24
   - Implements the resources in CloudFormation spec 2.30.0 (published as of 2019-04-14)
 
 0.03 2019-03-27

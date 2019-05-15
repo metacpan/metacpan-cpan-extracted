@@ -1,12 +1,12 @@
 package Games::Solitaire::Verify::Golf;
-$Games::Solitaire::Verify::Golf::VERSION = '0.2100';
+$Games::Solitaire::Verify::Golf::VERSION = '0.2200';
 use strict;
 use warnings;
 use autodie;
 
 
 use Carp ();
-use List::Util qw/ all /;
+use List::Util qw/ sum /;
 
 use Games::Solitaire::Verify::Card      ();
 use Games::Solitaire::Verify::Column    ();
@@ -42,7 +42,9 @@ sub _init
     my ( $self, $args ) = @_;
 
     my $variant = $self->_variant( $args->{variant} );
-    if ( not exists { golf => 1, all_in_a_row => 1 }->{$variant} )
+    if (
+        not
+        exists { golf => 1, all_in_a_row => 1, black_hole => 1, }->{$variant} )
     {
         Carp::confess("Unknown variant '$variant'!");
     }
@@ -54,6 +56,19 @@ sub _init
 
     my @lines = split( /\n/, $board_string );
 
+    my $_set_found_line = sub {
+        my $foundation_str = shift;
+        if ( my ($card_s) = $foundation_str =~ m#\AFoundations: (\S{2})\z# )
+        {
+            $self->_set_found(
+                Games::Solitaire::Verify::Card->new( { string => $card_s } ) );
+        }
+        else
+        {
+            Carp::confess("Foundations str is '$foundation_str'");
+        }
+        return;
+    };
     my $foundation_str = shift(@lines);
     if ( $self->_variant eq 'golf' )
     {
@@ -70,25 +85,23 @@ sub _init
         );
 
         $foundation_str = shift(@lines);
-        if ( my ($card_s) = $foundation_str =~ m#\AFoundations: (\S{2})\z# )
-        {
-            $self->_set_found(
-                Games::Solitaire::Verify::Card->new( { string => $card_s } ) );
-        }
-        else
-        {
-            Carp::confess("Foundations str is '$foundation_str'");
-        }
+        $_set_found_line->($foundation_str);
 
     }
     else
     {
         $self->_talon( [] );
-        if ( $foundation_str ne "Foundations: -" )
+        if ( $self->_variant eq "all_in_a_row" )
         {
-            Carp::confess("Foundations str is '$foundation_str'");
+            if ( $foundation_str ne "Foundations: -" )
+            {
+                Carp::confess("Foundations str is '$foundation_str'");
+            }
         }
-
+        else
+        {
+            $_set_found_line->($foundation_str);
+        }
     }
 
     $self->_columns(
@@ -120,8 +133,10 @@ sub _set_found
 sub process_solution
 {
     my ( $self, $next_line_iter ) = @_;
-
-    my $line_num = 0;
+    my $columns         = $self->_columns;
+    my $NUM_COLUMNS     = @$columns;
+    my $line_num        = 0;
+    my $remaining_cards = sum( map { $_->len } @$columns );
 
     my $get_line = sub {
         my $ret = $next_line_iter->();
@@ -145,6 +160,8 @@ sub process_solution
     {
         die "First line is '$l' instead of 'Solved!'";
     }
+    my $IS_GOLF     = $self->_is_golf;
+    my $CHECK_EMPTY = ( $IS_GOLF or $self->_variant eq "black_hole" );
 
     # As many moves as the number of cards.
 MOVES:
@@ -153,7 +170,7 @@ MOVES:
         my ( $move_line, $move_line_idx ) = $get_line->();
 
         my $card;
-        if (    $self->_is_golf
+        if (    $IS_GOLF
             and $move_line =~ m/\ADeal talon\z/ )
         {
             if ( !@{ $self->_talon } )
@@ -173,7 +190,7 @@ MOVES:
 
         if ( !defined $card )
         {
-            if ( ( $col_idx < 0 ) or ( $col_idx >= $MAX_RANK ) )
+            if ( ( $col_idx < 0 ) or ( $col_idx >= $NUM_COLUMNS ) )
             {
                 die "Invalid column index '$col_idx' at $move_line_idx";
             }
@@ -215,7 +232,7 @@ MOVES:
         }
         else
         {
-            my $col                = $self->_columns->[$col_idx];
+            my $col                = $columns->[$col_idx];
             my $top_card           = $col->top();
             my $top_card_moved_str = $top_card->to_string();
 
@@ -235,7 +252,7 @@ MOVES:
                 if (
                     not( $delta == 1 or $delta == ( $MAX_RANK - 1 ) )
                     or (
-                            $self->_is_golf
+                            $IS_GOLF
                         and ( !$self->_wrap_ranks )
                         and (
                             (
@@ -248,19 +265,19 @@ MOVES:
                     )
                     )
                 {
-                    die "Cannot put "
-                        . $top_card->to_string()
-                        . " in the foundations that contain "
+                    die
+"Cannot put $top_card_moved_str in the foundations that contain "
                         . $found_card->to_string();
                 }
             }
             $card = $col->pop;
+            --$remaining_cards;
         }
 
         $self->_set_found($card);
-        if ( $self->_is_golf )
+        if ($CHECK_EMPTY)
         {
-            if ( all { $_->len == 0 } @{ $self->_columns } )
+            if ( $remaining_cards == 0 )
             {
                 last MOVES;
             }
@@ -284,7 +301,7 @@ of black-hole-solve (or a similar solver)
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 SYNOPSIS
 
@@ -303,11 +320,11 @@ version 0.2100
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 METHODS
 
-=head2 Games::Solitaire::Verify::Golf->new({board_string=>$str, variant =>"golf"|"all_in_a_row"})
+=head2 Games::Solitaire::Verify::Golf->new({board_string=>$str, variant =>"golf"|"all_in_a_row"|"black_hole"})
 
 Construct a new validator / verifier for the variant and the initial board string.
 

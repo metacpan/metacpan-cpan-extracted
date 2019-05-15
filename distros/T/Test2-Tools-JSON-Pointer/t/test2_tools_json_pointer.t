@@ -1,5 +1,5 @@
 use utf8;
-use Test2::V0 -no_srand => 1;
+use Test2::V0 0.000121 -no_srand => 1;
 use Test2::Tools::JSON::Pointer;
 use Test2::Util::Table ();
 
@@ -39,18 +39,19 @@ subtest 'JSON comapre fail' => sub {
          { top => json $check1 };
     },
     array {
-      event Ok   => { pass => 0 };
-      event Diag => {
-        message => match qr/Failed test/,
-      };
-      event Diag => sub {
-        call message => table (
-          header => [qw( PATH GOT OP CHECK LNs )],
-          rows   => [
-            ['{top}', '{"a":1}', 'JSON PTR', "$check1", '38' ],
-            ['{top} <JSON>->{a}', '1', 'eq', '2'],
-          ],
-        );
+      event 'Fail' => sub {
+        call info => [
+          hash {
+            field details => table (
+              header => [qw( PATH GOT OP CHECK LNs )],
+                rows   => [
+                ['{top}', '{"a":1}', 'JSON PTR', "$check1", '38' ],
+                ['{top} <JSON>->{a}', '1', 'eq', '2'],
+              ],
+            );
+            etc;
+          },
+        ];
       };
       end;
     },
@@ -63,18 +64,19 @@ subtest 'JSON comapre fail' => sub {
          { top => json('/a' => 2) };
     },
     array {
-      event Ok   => { pass => 0 };
-      event Diag => {
-        message => match qr/Failed test/,
-      };
-      event Diag => sub {
-        call message => table (
-          header => [qw( PATH GOT OP CHECK LNs )],
-          rows   => [
-            ['{top}', '{"a":1}', 'JSON PTR', "/a 2", '62' ],
-            ['{top} <JSON /a>', '1', 'eq', '2'],
-          ],
-        );
+      event 'Fail' => sub {
+        call info => [
+          hash {
+            field details => table (
+              header => [qw( PATH GOT OP CHECK LNs )],
+              rows   => [
+                ['{top}', '{"a":1}', 'JSON PTR', "/a 2", '63' ],
+                ['{top} <JSON /a>', '1', 'eq', '2'],
+              ],
+            );
+          etc;
+          },
+        ];
       };
       end;
     },
@@ -98,18 +100,19 @@ subtest 'invalid json' => sub {
          { top => json $check };
     },
     array {
-      event Ok => { pass => 0 };
-      event Diag => {
-        message => match qr/Failed test/,
-      };
-      event Diag => {
-        message => table(
-          header => [qw( PATH GOT OP CHECK LNs )],
-          rows   => [
-            [ '{top}', '{ invalid json }', 'JSON PTR', "$check", '97' ],
-            [ '{top} <JSON>', "<EXCEPTION: invalid json: $error>", '', 'valid json', '' ],
-          ],
-        ),
+      event Fail => sub {
+        call info => [
+          hash {
+            field details => table (
+              header => [qw( PATH GOT OP CHECK LNs )],
+              rows   => [
+                [ '{top}', '{ invalid json }', 'JSON PTR', "$check", '99' ],
+                [ '{top} <JSON>', "<EXCEPTION: invalid json: $error>", '', 'valid json', '' ],
+              ],
+            );
+            etc;
+          },
+        ];
       };
       end;
     },

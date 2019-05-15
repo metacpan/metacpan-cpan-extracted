@@ -1,3 +1,9 @@
+1.04 2019-05-14
+        - Updated Mojolicious dependency
+          (Thanks to Slaven Rezić!).
+        - Fixed bug in docs
+          (Thanks Mohammad S Anwar!).
+
 1.03 2019-05-13
         - Introduced 'confirmation' types.
         - Added csrf_token to confirmation routes.

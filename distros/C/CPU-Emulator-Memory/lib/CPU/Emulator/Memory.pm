@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 
-$VERSION = '1.1004';
+$VERSION = '1.1005';
 
 =head1 NAME
 
@@ -49,7 +49,9 @@ and poke16 methods.
 =item size
 
 the size of the memory to emulate.  This defaults to 64K (65536 bytes), 
-or to the length of the string passed to C<bytes>.
+or to the length of the string passed to C<bytes> (plus C<org> if
+applicable).
+.
 Note that this does *not* have to be a power of two. 
 
 =item bytes
@@ -57,12 +59,21 @@ Note that this does *not* have to be a power of two.
 A string of characters with which to initialise the memory.  Note that
 the length must match the size parameter.
 
+=item org
+
+an integer, Used in conjunction with C<bytes>, load the data at the specified
+offset in bytes
+
 =back
 
 =cut
 
 sub new {
     my($class, %params) = @_;
+    if(exists($params{bytes}) && exists($params{org})) {
+        $params{bytes} = (chr(0) x $params{org}).$params{bytes};
+    }
+
     if(!exists($params{size})) {
         if(exists($params{bytes})) {
             $params{size} = length($params{bytes});
@@ -243,7 +254,7 @@ poke().
 The size of a byte in the emulated memory is the same as that of a char
 on the host machine.  Perl only runs on machines with 8 bit bytes.
 
-If you find any others, please report them using L<http://rt.cpan.org> or by email to E<lt>bug-CPU-Emulator-Memory@rt.cpan.orgE<gt>.
+Bug reports should be made on Github or by email.
 
 =head1 FEEDBACK
 

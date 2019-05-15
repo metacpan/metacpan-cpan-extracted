@@ -10,7 +10,7 @@ use TestTools;
 use XML::Compile::Schema;
 use XML::Compile::Tester;
 
-use Test::More tests => 116;
+use Test::More tests => 124;
 
 set_compile_defaults
     elements_qualified => 'NONE';
@@ -95,6 +95,10 @@ __XML
 test_rw($schema, test2 => <<__XML, [4, 5, 6]);
 <test2> 4
   5\t  6 </test2>
+__XML
+
+test_rw($schema, test2 => <<__XML, []);
+<test2></test2>
 __XML
 
 

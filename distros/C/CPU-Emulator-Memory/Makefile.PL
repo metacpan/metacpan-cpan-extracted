@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME         => 'CPU::Emulator::Memory',
   META_MERGE => {
-    license => 'other',
+    license => 'open_source',
     resources => {
       repository => 'https://github.com/DrHyde/perl-modules-CPU-Emulator-Memory',
       bugtracker => 'https://github.com/DrHyde/perl-modules-CPU-Emulator-Memory/issues'

@@ -1,6 +1,6 @@
 package Telugu::Keyword;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Mouse;
 use utf8;
@@ -79,6 +79,8 @@ Telugu::Keyword - Perl extension to provide Telugu keywords
 
 =head1 SYNOPSIS
 
+    use strict;
+    use warnings;
     use Telugu::Keyword;
     use utf8;
     binmode STDOUT, ":encoding(UTF-8)";
@@ -164,6 +166,14 @@ This module provides keywords to write perl program in Telugu script
 =head2 ఐతే
 
    ఐతే is equivalent to if condition
+
+=head2 shoba
+
+    shoba is an executable installed with this module
+    write your program in telugu and save it in a file with .sb extension
+    use strict;use warnings;use utf8;use Telugu::Keyword;binmode STDOUT, ":encoding(UTF-8)"; are preloaded in a .sb file
+    execute .sb file with shoba command
+    ex: shoba filename.sb
 
 =head1 BUGS
 

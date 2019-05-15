@@ -140,7 +140,7 @@ by the engine.
 Possible flags (boolean parameters marked with a dash) are passed as a hash reference.
 All other parameters passed to the L<notifications> helper are simply appended.
 
-The L<bundled engines|/Bundled engines> can serve as good examples on how
+The L<bundled engines|Mojolicious::Plugin::Notifications/Bundled engines> can serve as good examples on how
 to write an engine, especially the simple
 L<HTML|Mojolicious::Plugin::Notifications::HTML> engine.
 

@@ -496,6 +496,56 @@ BEGIN {
                         "/usr/bin/";
                      return "/usr/bin/";
                   }
+                  my $w='which';
+                  if (exists
+                        $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$w}) {
+                     my $b=$Net::FullAuto::FA_Core::cmdinfo->{$object}->{$w};
+                     ($stdout,$stderr)=$handle->cmd("${b}which $cmd");
+                     my $found='';
+                     ($found,$stderr)=$handle->cmd(
+                        "if [ -f $stdout ];then echo \"FOUND\";fi");
+                     if (-1<index $found,'FOUND') {
+                        $found=~s/^(.*\/).*$/$1/;
+                        $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}=
+                           $found;
+                        return $found;
+                     } else { return '' }
+                  } else {
+                     ($stdout,$stderr)=$handle->cmd(
+                        "if [ -f /bin/$w ];then echo \"FOUND\";fi");
+                     if (-1<index $stdout,'FOUND') {
+                        $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$w}=
+                           "/bin/";
+                        ($stdout,$stderr)=$handle->cmd("/bin/$w $cmd");
+                        chomp($stdout);
+                        $stdout=~s/^(.*\/).*$/$1/;
+                        ($stdout,$stderr)=$handle->cmd(
+                           "if [ -f $stdout ];then echo \"FOUND\";fi");
+                        if (-1<index $stdout,'FOUND') {
+                           $stdout=~s/^(.*\/).*$/$1/;
+                           $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}=
+                              $stdout;
+                           return $stdout;
+                        } else { return '' }
+                     }
+                     ($stdout,$stderr)=$handle->cmd(
+                        "if [ -f /usr/bin/$w ];then echo \"FOUND\";fi");
+                     if (-1<index $stdout,'FOUND') {
+                        $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$w}=
+                           "/usr/bin/";
+                        ($stdout,$stderr)=$handle->cmd("/usr/bin/$w $cmd");
+                        chomp($stdout);
+                        $stdout=~s/^(.*\/).*$/$1/;
+                        ($stdout,$stderr)=$handle->cmd(
+                           "if [ -f $stdout ];then echo \"FOUND\";fi");
+                        if (-1<index $stdout,'FOUND') {
+                           $stdout=~s/^(.*\/).*$/$1/;
+                           $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}=
+                              $stdout;
+                           return $stdout;
+                        } else { return '' }
+                     } else { return '' }
+                  }
                }
             } else {
                unless (exists $handle->{_shell}) {
@@ -564,6 +614,8 @@ BEGIN {
          } elsif ($Net::FullAuto::FA_Core::gbp->('which')) {
             my $which=$Net::FullAuto::FA_Core::gbp->('which');
             my $found=`${which}which $cmd`;
+            chomp($found);
+            $found=~s/^(.*\/).*$/$1/;
             if (-e $found and $found!~/Command not found/i) {
                $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}=
                   $found;
@@ -8413,7 +8465,24 @@ sub getpasswd
        $local_pw,$noretry)
        =&Net::FullAuto::FA_Core::lookup_hostinfo_from_label(
        $hostlabel);
-   my $host='';
+   my $host='';my $stdout='';my $stderr='';
+   if (exists $Hosts{$hostlabel}{'cyberark'}) {
+      my $capath=$Net::FullAuto::FA_Core::gbp->('clipasswordsdk');
+      my $app_id=$Hosts{$hostlabel}{'ca_appid'}||'';
+      my $ca_das=$Hosts{$hostlabel}{'ca_das'}||'Active';
+      my $ca_host=$Hosts{$hostlabel}{'ca_host'}||'localhost';
+      my $ca_user=$Hosts{$hostlabel}{'loginid'}||$username;
+      my $cmd="${capath}clipasswordsdk GetPassword -p "
+             ."AppDescs.AppID=$app_id -p Query=\"Address="
+             ."$hostname;Username=$ca_user;DualAccountStatus="
+             ."$ca_das\" -p RequiredProps=* -o Password";
+      if ($ca_host=~/localhost/i or !$ca_host) {
+         ($stdout,$stderr)=$localhost->cmd($cmd);
+      } else {
+         # CODE TO ACCESS OTHER SERVERS FOR CYBERARK
+      }
+      return $stdout;
+   }
    my $sshport='';
    if (exists $Hosts{$hostlabel}{'sshport'}) {
       $sshport=$Hosts{$hostlabel}{'sshport'};

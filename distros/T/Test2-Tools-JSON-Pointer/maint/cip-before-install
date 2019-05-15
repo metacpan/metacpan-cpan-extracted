@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cip exec cpanm -n Path::Class Path::Tiny Test2::Tools::HTTP

@@ -56,6 +56,8 @@ my @files = (
     't/data/texts/list.txt',
     't/data/texts/texts/3.all_in_a_row.board',
     't/data/texts/texts/3.all_in_a_row.sol',
+    't/data/texts/texts/6.black_hole.board',
+    't/data/texts/texts/6.black_hole.sol',
     't/expand-solution.t',
     't/from-patsolve.t',
     't/golf.t',

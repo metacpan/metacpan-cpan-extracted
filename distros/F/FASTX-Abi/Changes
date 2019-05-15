@@ -1,0 +1,11 @@
+This is the changelog for FASTX::Abi. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
+
+0.02	2019-05-15
+  * FIXED: release test (version) was pointing to wrong module
+  * Update POD
+	* Added unit tests
+	* Added GitHub repository
+	* Added TravisCI testing
+
+0.01	2019-05-14
+	* Initial release (alpha)

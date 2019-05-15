@@ -3,7 +3,7 @@ use 5.014;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.05';
+$FASTX::Reader::VERSION = '0.06';
 #ABSTRACT: A lightweight FASTA and FASTQ reader based on Heng Li's parser.
 
 
@@ -180,7 +180,7 @@ FASTX::Reader - A lightweight FASTA and FASTQ reader based on Heng Li's parser.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

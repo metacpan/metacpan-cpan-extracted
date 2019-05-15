@@ -1,5 +1,6 @@
 Changes
 ex/deep1
+ex/deep10
 ex/deep2
 ex/deep3
 ex/deep4
@@ -7,6 +8,7 @@ ex/deep5
 ex/deep6
 ex/deep7
 ex/deep8
+ex/deep9
 lib/Data/Dumper/Compact.pm
 lib/Devel/DDCWarn.pm
 maint/Makefile.PL.include

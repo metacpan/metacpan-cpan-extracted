@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Tie::IxHash;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use base 'YAML::PP::Schema';
 
@@ -140,3 +140,15 @@ Examples:
 =cut
 
 ### END EXAMPLE
+
+=head1 METHODS
+
+=over
+
+=item register
+
+Called by YAML::PP::Schema
+
+=back
+
+=cut

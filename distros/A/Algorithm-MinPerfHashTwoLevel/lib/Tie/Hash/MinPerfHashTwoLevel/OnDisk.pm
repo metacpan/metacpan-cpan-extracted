@@ -1,11 +1,10 @@
 package Tie::Hash::MinPerfHashTwoLevel::OnDisk;
 use strict;
 use warnings;
-our $VERSION = '0.09';
-our $DEFAULT_VARIANT = 1;
+our $VERSION = '0.10';
 
 # this also installs the XS routines we use into our namespace.
-use Algorithm::MinPerfHashTwoLevel ( 'hash_with_state', ':utf8_flags', ':uint_max' );
+use Algorithm::MinPerfHashTwoLevel ( 'hash_with_state', ':utf8_flags', ':uint_max', '$DEFAULT_VARIANT' );
 use Exporter qw(import);
 use constant MAGIC_STR => "PH2L";
 use Carp;
@@ -28,9 +27,13 @@ our @EXPORT = qw();
 
 
 sub TIEHASH {
-    my ($class,$file)= @_;
-    #warn "tieing '$file':$!";
-    my $mount= mount_file($file);
+    my ($class,$file,$flags)= @_;
+    $flags ||= 0;
+    my $error;
+    my $mount= mount_file($file,$error,$flags);
+    if (!defined($mount)) {
+        die "Error in TIEHASH: $error";
+    }
     my %perl_obj= (
         mount => $mount,
         file => $file,
@@ -54,8 +57,7 @@ sub EXISTS {
 sub FIRSTKEY {
     my ($self)= @_;
     $self->{iter_idx}= 0;
-    fetch_by_index($self->{mount},$self->{iter_idx}++,my $key);
-    return $key;
+    return $self->NEXTKEY();
 }
 
 sub NEXTKEY {
@@ -123,14 +125,10 @@ sub make_file {
     my $comment= $opts{comment};
     my $debug= $opts{debug} || 0;
     my $variant= int($opts{variant});
-    die "Unknown file variant $variant" if $variant > 1 or $variant < 0;
+    die "Unknown file variant $variant" if $variant > 2 or $variant < 0;
 
     die "comment cannot contain null"
         if index($comment,"\0") >= 0;
-    
-    my $tmp_file= "$ofile.$$";
-    open my $ofh, ">", $tmp_file
-        or die "Failed to open $tmp_file for output";
 
     my $hasher= Algorithm::MinPerfHashTwoLevel->new(
         debug => $debug,
@@ -138,60 +136,15 @@ sub make_file {
         variant => $variant,
     );
     my $buckets= $hasher->compute($source_hash);
+    my $buf_length= $hasher->{buf_length};
+    my $state= $hasher->{state};
+    my $flags= 0;
+    $flags += (1<<2) if delete $opts{no_dedupe};
+    my $buf= packed($variant,$buf_length,$state,$comment,$flags,@$buckets);
 
-    my $key_flags= "\0" x _bytes(0+@$buckets,4);
-    my $val_flags= "\0" x _bytes(0+@$buckets,8);
-    my $str_buf= "\0\0" . $comment . "\0";
-    my %string_ofs=(""=>1);
-    my @data;
-    foreach my $bucket (@$buckets) {
-        vec($key_flags,$bucket->{idx},2) = $bucket->{key_is_utf8};
-        vec($val_flags,$bucket->{idx},1) = $bucket->{val_is_utf8};
-        my $key_normalized= $bucket->{key_normalized};
-        my $val_normalized= $bucket->{val_normalized};
-
-        my $key_len= length($key_normalized);
-        my $val_len= defined($val_normalized) ? length($val_normalized) : 0;
-        die "Cannot encode a key longer than 2^16-1 bytes" if $key_len > UINT16_MAX;
-        die "Cannot encode a val longer than 2^16-1 bytes" if $val_len > UINT16_MAX;
-
-        my $key_ofs = ($string_ofs{$key_normalized} ||= do {
-                my $ofs= length $str_buf;
-                $str_buf .= $key_normalized;
-                $ofs
-            });
-        my $val_ofs = (!defined($val_normalized) ? 0 : ( $string_ofs{$val_normalized} ||= do {
-                my $ofs= length $str_buf;
-                $str_buf .= $val_normalized;
-                $ofs
-            }));
-
-        push @data, $bucket->{xor_val} || 0, $key_ofs, $val_ofs, $key_len, $val_len;
-    }
-    my $table_buf= pack"(LLLSS)*", @data;
-
-    my $state= $hasher->state;
-
-    my $buf= pack( "V8Q2", (0) x 10);
-
-    my $magic_num=     unpack "V", MAGIC_STR;
-    my $count=         0+@$buckets;
-    my $state_ofs=     _append_ofs($buf, $state);
-    my $table_ofs=     _append_ofs($buf, $table_buf); # the order of these items matters
-    my $key_flags_ofs= _append_ofs($buf, $key_flags); # ...
-    my $val_flags_ofs= _append_ofs($buf, $val_flags); # ...
-    my $str_buf_ofs=   _append_ofs($buf, $str_buf);
-
-    my $table_checksum=   hash_with_state($table_buf . $key_flags . $val_flags, $state);
-    my $str_buf_checksum= hash_with_state($str_buf,                             $state);
-
-    my $header= pack( "V8Q2",
-                      $magic_num,   $variant,           0+@$buckets,      $state_ofs,
-                      $table_ofs,   $key_flags_ofs,     $val_flags_ofs,   $str_buf_ofs,
-                      $table_checksum, $str_buf_checksum );
-
-    substr($buf,0,length($header),$header);
-
+    my $tmp_file= "$ofile.$$";
+    open my $ofh, ">", $tmp_file
+        or die "Failed to open $tmp_file for output";
     print $ofh $buf
         or die "failed to print to '$tmp_file': $!";
     close $ofh
@@ -240,7 +193,7 @@ sub _validate_file {
          $table_ofs, $key_flags_ofs, $val_flags_ofs,    $str_buf_ofs,
          $table_checksum, $str_buf_checksum )= unpack "V8Q2", $head;
 
-    if ( $variant > 1 ) {
+    if ( $variant > 2 ) {
         return(undef,"file '$file' is an unknown '" . MAGIC_STR . "' variant $variant");
     }
     

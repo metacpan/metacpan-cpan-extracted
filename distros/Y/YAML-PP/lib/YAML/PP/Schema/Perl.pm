@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Perl;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use base 'YAML::PP::Schema';
 

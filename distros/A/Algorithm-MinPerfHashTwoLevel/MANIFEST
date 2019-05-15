@@ -7,8 +7,14 @@ MinPerfHashTwoLevel.xs
 ppport.h
 README
 stadtx_hash.h
+t/Algo_fail.t
 t/Algo_v0.t
 t/Algo_v1.t
+t/Algo_v2.t
+t/OnDisk.pl
 t/OnDisk.t
+t/OnDisk_v0.t
+t/OnDisk_v1.t
+t/OnDisk_v2.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

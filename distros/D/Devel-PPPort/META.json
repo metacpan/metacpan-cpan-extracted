@@ -4,13 +4,13 @@
       "Marcus Holland-Moritz <mhx@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3510, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Devel-PPPort",
    "no_index" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Devel::PPPort" : {
          "file" : "PPPort_pm.PL",
-         "version" : "3.51"
+         "version" : "3.52"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "web" : "https://perl5.git.perl.org/perl.git"
       }
    },
-   "version" : "3.51",
-   "x_serialization_backend" : "JSON::MaybeXS version 1.004"
+   "version" : "3.52",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -20,8 +20,10 @@ sub new {
     $bool = 'perl' unless defined $bool;
     my $schemas = delete $args{schema} || ['JSON'];
     my $cyclic_refs = delete $args{cyclic_refs} || 'allow';
-    my $indent = $args{indent};
-    my $writer = $args{writer};
+    my $indent = delete $args{indent};
+    my $writer = delete $args{writer};
+    my $header = delete $args{header};
+    my $footer = delete $args{footer};
     my $parser = delete $args{parser};
     my $emitter = delete $args{emitter} || {
         indent => $indent,
@@ -41,6 +43,8 @@ sub new {
     my $dumper = YAML::PP::Dumper->new(
         schema => $schema,
         emitter => $emitter,
+        header => $header,
+        footer => $footer,
     );
 
     my $self = bless {
@@ -232,6 +236,47 @@ the first if called with scalar context.
 The YAML backend is implemented in a modular way that allows to add
 custom handling of YAML tags, perl objects and data types. The inner API
 is not yet stable. Suggestions welcome.
+
+=head1 PLUGINS
+
+You can alter the behaviour of YAML::PP by using the following schema
+classes:
+
+=over
+
+=item L<YAML::PP::Schema::Failsafe>
+
+One of the three YAML 1.2 official schemas
+
+=item L<YAML::PP::Schema::JSON>
+
+One of the three YAML 1.2 official schemas. Default
+
+=item L<YAML::PP::Schema::Core>
+
+One of the three YAML 1.2 official schemas
+
+=item L<YAML::PP::Schema::YAML1_1>
+
+Schema implementing the most common YAML 1.1 types
+
+=item L<YAML::PP::Schema::Perl>
+
+Serializing Perl objects and types
+
+=item L<YAML::PP::Schema::Binary>
+
+Serializing binary data
+
+=item L<YAML::PP::Schema::Tie::IxHash>
+
+In progress. Keeping hash key order.
+
+=item L<YAML::PP::Schema::Merge>
+
+YAML 1.1 merge keys for mappings
+
+=back
 
 =head1 IMPLEMENTATION
 
@@ -482,6 +527,8 @@ The layout is like libyaml output:
         schema => ['JSON'],
         cyclic_refs => 'fatal',
         indent => 4, # use 4 spaces for dumping indentation
+        header => 1, # default 1; print document header ---
+        footer => 1, # default 0; print document footer ...
     );
 
 =item load_string

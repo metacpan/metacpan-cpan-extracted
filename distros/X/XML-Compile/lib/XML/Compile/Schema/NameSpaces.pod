@@ -148,12 +148,12 @@ This method implements L<XML::Compile::Schema::useSchema()|XML::Compile::Schema/
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.61,
-built on November 09, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.62,
+built on May 15, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

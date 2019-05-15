@@ -36,6 +36,10 @@ package Cfn::Resource::Properties::AWS::Serverless::Api {
   has BinaryMediaTypes => ( isa => 'Cfn::Value::ArrayOfPrimitives', is => 'rw', coerce => 1 );
   has Cors => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
   has Auth => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has MinimumCompressionSize => ( isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1 );
+  has AccessLogSetting => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has CanarySetting  => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has TracingEnabled => ( isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1 );
 }
 
 1;

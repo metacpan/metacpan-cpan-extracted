@@ -1,5 +1,9 @@
 Revision history for Games-Solitaire-Verify
 
+0.2200  2019-05-15
+        - Add POD to lib/Games/Solitaire/Verify/HorneAutomovePrune.pm .
+        - Add support for verifying black_hole solutions.
+
 0.2100  2019-04-29
         - Add lib/Games/Solitaire/Verify/Golf.pm and
         lib/Games/Solitaire/Verify/App/Golf.pm .

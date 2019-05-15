@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Reader;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub input { return $_[0]->{input} }
 sub set_input { $_[0]->{input} = $_[1] }
@@ -29,7 +29,7 @@ sub readline {
     unless (length $self->{input}) {
         return;
     }
-    if ( $self->{input} =~ m/\G(.*\n?)/g ) {
+    if ( $self->{input} =~ m/\G([^\r\n]*(?:\n|\r\n|\r|\z))/g ) {
         my $line = $1;
         unless (length $line) {
             $self->{input} = '';

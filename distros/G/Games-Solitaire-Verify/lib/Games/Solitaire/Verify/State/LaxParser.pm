@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State::LaxParser;
-$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.2100';
+$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.2200';
 use warnings;
 use strict;
 
@@ -80,11 +80,11 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 AUTHOR
 

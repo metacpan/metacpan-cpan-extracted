@@ -47,9 +47,11 @@ lib/YAML/PP/Schema/Binary.pm
 lib/YAML/PP/Schema/Core.pm
 lib/YAML/PP/Schema/Failsafe.pm
 lib/YAML/PP/Schema/JSON.pm
+lib/YAML/PP/Schema/Merge.pm
 lib/YAML/PP/Schema/Perl.pm
 lib/YAML/PP/Schema/Tie/IxHash.pm
 lib/YAML/PP/Schema/YAML1_1.pm
+lib/YAML/PP/Type/MergeKey.pm
 lib/YAML/PP/Writer.pm
 lib/YAML/PP/Writer/File.pm
 t/00.compile.t
@@ -83,6 +85,9 @@ t/42.tokens.t
 t/43.indent.t
 t/44.writer.t
 t/45.binary.t
+t/46.line-endings.t
+t/47.header-footer.t
+t/48.merge.t
 t/data/simple.yaml
 t/invalid/i032/===
 t/invalid/i032/in.yaml

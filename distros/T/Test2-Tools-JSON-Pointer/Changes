@@ -1,4 +1,7 @@
 Revision history for Test2-Tools-JSON-Pointer
 
+0.02      2019-05-15 06:58:03 -0600
+  - Fix compatability with latest Test2::Suite (gh#1, gh#2)
+
 0.01      2018-05-10 07:45:40 -0400
   - initial version

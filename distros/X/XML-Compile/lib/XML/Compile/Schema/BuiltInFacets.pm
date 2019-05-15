@@ -1,4 +1,4 @@
-# Copyrights 2006-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::Schema::BuiltInFacets;
 use vars '$VERSION';
-$VERSION = '1.61';
+$VERSION = '1.62';
 
 use base 'Exporter';
 
@@ -67,7 +67,7 @@ my %facets_date =  # inclusive or exclusive times is rather useless.
   , minExclusive    => \&_date_min
   , minInclusive    => \&_date_min
   , pattern         => \&_pattern
-  , whiteSpace      => \&_date_whitespace
+  , whiteSpace      => \&_date_whiteSpace
   );
 
 my %facets_duration =

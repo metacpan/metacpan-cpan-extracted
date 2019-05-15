@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode;
-$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.19';
+$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.20';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Freenode.
 
 use Moose;
@@ -59,9 +59,9 @@ around BUILDARGS => sub {
   $args->{obj} = App::SpreadRevolutionaryDate::Target::Freenode::Bot->new(
     server            => 'irc.freenode.net',
     port              => $port,
-    nick              => 'RevolutionaryDate',
-    alt_nicks         => ['RevolutionaryCalendar', 'RevolutionarybBot'],
-    name              => 'Revolutionary Calendar bot',
+    nick              => 'RevolutionaryBot',
+    alt_nicks         => ['RevolutionaryCalendar', 'RevolutionaryDate'],
+    name              => 'Revolutionary Date bot',
     flood             => 1,
     useipv6           => 1,
     ssl               => $ssl,
@@ -108,7 +108,7 @@ App::SpreadRevolutionaryDate::Target::Freenode - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

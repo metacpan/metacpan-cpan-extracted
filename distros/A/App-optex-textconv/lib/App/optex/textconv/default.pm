@@ -6,7 +6,8 @@ use warnings;
 use App::optex::textconv::Converter 'import';
 
 our @CONVERTER = (
-    [ qr/\.pdf$/i    => "pdftotext -nopgbrk \"%s\" -" ],
+# moved to pdf.pm
+#   [ qr/\.pdf$/i    => "pdftotext -nopgbrk \"%s\" -" ],
     [ qr/\.jpe?g$/i  => "exif \"%s\"" ],
     [ qr[^https?://] => "w3m -dump \"%s\"" ],
     );

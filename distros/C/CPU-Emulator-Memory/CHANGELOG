@@ -1,7 +1,10 @@
+1.1005  2019-05-14      Add 'org' arg to constructor to load initial
+                          data at an offset (RT 129572 in CPU::Emulator::Z80)
+
 1.1004  2017-04-12      Patch tests to make them work under perl 5.26
 
 1.1003  2012-05-27      Apply patch from Paulo Custodio to make 'size'
-                          param optional in constructors when i can be
+                          param optional in constructors when it can be
                           sensibly defaulted from data (RT 62381)
 
 1.1002  2010-12-26      Fix RT 62375, 62379

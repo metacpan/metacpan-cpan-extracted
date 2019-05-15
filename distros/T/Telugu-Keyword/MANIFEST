@@ -3,6 +3,10 @@ lib/Telugu/Keyword.pm
 Makefile.PL
 MANIFEST
 README
+script/shoba
 t/Telugu-Keyword.t
+Telugu-Keyword-0.03.tar.gz
+Telugu-Keyword-0.04.tar.gz
+Telugu-Keyword-0.05.tar.gz
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

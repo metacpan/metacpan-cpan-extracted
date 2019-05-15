@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
 use Cfn;
 use Test::More;
 use Data::Printer;

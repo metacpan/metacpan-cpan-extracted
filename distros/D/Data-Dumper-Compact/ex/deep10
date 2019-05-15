@@ -1,0 +1,5 @@
+[ bless( {
+    x => 3,
+    y => [ 'foo', 'bar', 'baz', 'quux', 'fleem', 'blather', 'obrien' ],
+    z => 'lololololololololololololololol',
+}, "OhGods::Lol" ) ]

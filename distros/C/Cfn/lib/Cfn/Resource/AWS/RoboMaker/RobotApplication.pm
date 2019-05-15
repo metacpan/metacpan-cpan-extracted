@@ -1,4 +1,4 @@
-# AWS::RoboMaker::RobotApplication generated from spec 2.25.0
+# AWS::RoboMaker::RobotApplication generated from spec 2.32.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::RoboMaker::RobotApplication',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::RoboMaker::RobotApplication {
     [ 'Arn','CurrentRevisionId' ]
   }
   sub supported_regions {
-    [ 'eu-west-1','us-east-1','us-west-2' ]
+    [ 'ap-northeast-1','eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

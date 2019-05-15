@@ -1,0 +1,34 @@
+#!perl
+
+use strict;
+use warnings;
+use utf8;
+use Telugu::Keyword;
+
+sub readFile {
+    my ($filename) = @_;
+    my @split = split('\.', $filename);
+    if( $#split + 1 != 2 ) {
+        die "give a filename with sb extension";
+    }
+    if( $split[1] ne 'sb') {
+        die "give a filename with sb extension";
+    }
+    else {
+        open(my $fh, '<:encoding(UTF-8)', $filename) or die "could not open file '$filename' $!";
+        my $filecontents = do { local $/; <$fh> };
+        return $filecontents;
+    }
+}
+
+my $filename = $ARGV[0];
+my $filecontents;
+if( defined $filename) {
+    $filecontents = readFile($filename);
+}
+else {
+    die "give a filename with sb extension";
+}
+
+my $program = "binmode STDOUT, ':encoding(UTF-8)';" . $filecontents;
+eval $program;

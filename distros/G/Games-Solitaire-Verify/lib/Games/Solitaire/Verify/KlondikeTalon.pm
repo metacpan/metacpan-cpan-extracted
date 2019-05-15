@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::KlondikeTalon;
-$Games::Solitaire::Verify::KlondikeTalon::VERSION = '0.2100';
+$Games::Solitaire::Verify::KlondikeTalon::VERSION = '0.2200';
 use warnings;
 use strict;
 
@@ -140,7 +140,7 @@ talon of Klondike-like games.
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ version 0.2100
 
 =head1 VERSION
 
-version 0.2100
+version 0.2200
 
 =head1 METHODS
 

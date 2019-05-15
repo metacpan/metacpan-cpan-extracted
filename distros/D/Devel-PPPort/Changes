@@ -1,5 +1,9 @@
 Revision history for Devel-PPPort
 
+ 3.52 - 2019-05-14
+
+   * fix utf8_to_uvchr_buf retval in 5.30
+
  3.51 - 2019-05-01
 
     * include the module version in metadata for proper PAUSE indexing
@@ -56,7 +60,7 @@ Revision history for Devel-PPPort
 
    * Fix D_PPP_FIX_UTF8_ERRSV macro to use errsv value from passed argument
 
-3.44 - 2018-09-19
+3.43 - 2018-09-19
 
     * Fix Devel::PPPort with Visual Studio by quoting $0.
 
