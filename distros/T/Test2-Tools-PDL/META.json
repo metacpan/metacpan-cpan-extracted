@@ -54,7 +54,7 @@
    "provides" : {
       "Test2::Tools::PDL" : {
          "file" : "lib/Test2/Tools/PDL.pm",
-         "version" : "0.0003"
+         "version" : "0.0004"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "url" : "https://github.com/stphnlyd/perl5-Test2-Tools-PDL.git"
       }
    },
-   "version" : "0.0003",
+   "version" : "0.0004",
    "x_contributors" : [
       "Mohammad S Anwar <manwar@cpan.org>"
    ],

@@ -191,6 +191,18 @@ subtest tolerance => sub {
         my $event_ok2 = $events2->[0];
         ok( $event_ok2->pass, '$TOLERANCE_REL' );
     }
+
+    {
+        local $Test2::Tools::PDL::TOLERANCE = 0;
+        local $Test2::Tools::PDL::TOLERANCE_REL = 1e-2;
+
+        my $events2 = intercept {
+            pdl_is( pdl( [-0.2763423069] ), pdl( [-0.276342] ), 'foo' );
+        };
+
+        my $event_ok2 = $events2->[0];
+        ok( $event_ok2->pass, '$TOLERANCE_REL for negative value' );
+    }
 };
 
 done_testing;

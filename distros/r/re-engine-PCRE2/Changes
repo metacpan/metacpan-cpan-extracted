@@ -1,5 +1,8 @@
 Revision history for re::engine::PCRE2
 
+0.16 Wed May 15 18:18:20 CEST 2019 rurban
+    - fix race in t/gh29-segv.t (Petr Písař PR#35)
+
 0.15 Mon 08 Apr 2019 11:30:04 AM CEST rurban
 
     - fixup 1-basic.t for v5.29.9 Variable length lookbehind support

@@ -1,3 +1,7 @@
+1.0.3     2019-05-15 16:54:46+01:00 Europe/London
+ - make it easier to subclass the various components, for example to
+   use custom feedback messages
+
 1.0.2     2018-01-12 11:51:21+00:00 Europe/London
  - some minor fixes to POD, no functional change
 

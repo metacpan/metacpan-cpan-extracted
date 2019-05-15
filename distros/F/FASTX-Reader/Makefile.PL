@@ -2,26 +2,26 @@
 use strict;
 use warnings;
 
-use 5.018;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A lightweight FASTA and FASTQ reader based on Heng Li's parser.",
+  "ABSTRACT" => "A lightweight module to parse FASTA and FASTQ files, using Heng Li's _readfq()_ method L<https://github.com/lh3/readfq>, packaged in an object oriented parser.",
   "AUTHOR" => "Andrea Telatin <andrea.telatin\@quadram.ac.uk>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "FASTX-Reader",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.018",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "FASTX::Reader",
   "PREREQ_PM" => {
     "Carp" => "1.2",
     "Data::Dumper" => "2.1",
     "FindBin" => "1.3"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }

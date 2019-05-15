@@ -1,7 +1,7 @@
 package Data::Password::zxcvbn::Match::Repeat;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: match class for repetitions of other matches
 
 
@@ -113,7 +113,7 @@ Data::Password::zxcvbn::Match::Repeat - match class for repetitions of other mat
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 DESCRIPTION
 

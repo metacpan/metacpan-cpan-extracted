@@ -24,7 +24,7 @@ of this class.
 use strict;
 use Params::Util qw{_INSTANCE};
 
-our $VERSION = '1.265'; # VERSION
+our $VERSION = '1.266'; # VERSION
 
 
 =head1 METHODS

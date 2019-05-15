@@ -3,10 +3,8 @@ use 5.014;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.06';
-#ABSTRACT: A lightweight FASTA and FASTQ reader based on Heng Li's parser.
-
-
+$FASTX::Reader::VERSION = '0.07';
+#ABSTRACT: A lightweight module to parse FASTA and FASTQ files, using Heng Li's _readfq()_ method L<https://github.com/lh3/readfq>, packaged in an object oriented parser.
 
 
 sub new {
@@ -176,11 +174,11 @@ __END__
 
 =head1 NAME
 
-FASTX::Reader - A lightweight FASTA and FASTQ reader based on Heng Li's parser.
+FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, using Heng Li's _readfq()_ method L<https://github.com/lh3/readfq>, packaged in an object oriented parser.
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -193,10 +191,9 @@ version 0.06
     print $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
   }
 
-=head1 NAME
+=head2 BUILD TEST
 
-B<FASTX::Reader> - a lightweight module to parse FASTA and FASTQ files, using Heng Li's
-readfq() method L<https://github.com/lh3/readfq>, packaged in an object oriented parser.
+=for html <a href="https://travis-ci.org/telatin/FASTQ-Parser"><img src="https://travis-ci.org/telatin/FASTQ-Parser.svg?branch=master"></a>
 
 =head1 METHODS
 

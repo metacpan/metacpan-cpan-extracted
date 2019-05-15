@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0004'; # VERSION
 
 use PDL::Lite ();
 use PDL::Primitive qw(which);
@@ -111,7 +111,8 @@ sub pdl_is {
         if ( $is_numeric
             and ( $exp->type >= PDL::float or $got->type >= PDL::float ) )
         {
-            $diff = (($got - $exp)->abs > $TOLERANCE + $TOLERANCE_REL * $exp);
+            $diff = ( ( $got - $exp )->abs >
+                  $TOLERANCE + ( $TOLERANCE_REL * $exp )->abs );
         }
         else {
             $diff = ( $got != $exp );
@@ -180,7 +181,7 @@ Test2::Tools::PDL - Test2 tools for verifying Perl Data Language piddles
 
 =head1 VERSION
 
-version 0.0003
+version 0.0004
 
 =head1 SYNOPSIS
 
@@ -220,7 +221,7 @@ This module can be configured by some module variables.
 
 These two variables are used when comparing float piddles. For
 C<pdl_is($got, $exp, ...)>, the effective tolerance is
-C<$TOLERANCE + $TOLERANCE_REL * $exp>.
+C<$TOLERANCE + abs($TOLERANCE_REL * $exp)>.
 
 Default value of C<$TOLERANCE> is same as
 C<$Test2::Compare::Float::DEFAULT_TOLERANCE>, which is C<1e-8>.

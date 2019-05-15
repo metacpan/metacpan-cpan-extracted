@@ -5,7 +5,7 @@ package PPI::Token::_QuoteEngine::Simple;
 use strict;
 use PPI::Token::_QuoteEngine ();
 
-our $VERSION = '1.265'; # VERSION
+our $VERSION = '1.266'; # VERSION
 
 our @ISA = 'PPI::Token::_QuoteEngine';
 

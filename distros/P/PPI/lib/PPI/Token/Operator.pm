@@ -43,7 +43,7 @@ use strict;
 use PPI::Token ();
 use PPI::Singletons '%OPERATOR';
 
-our $VERSION = '1.265'; # VERSION
+our $VERSION = '1.266'; # VERSION
 
 our @ISA = "PPI::Token";
 

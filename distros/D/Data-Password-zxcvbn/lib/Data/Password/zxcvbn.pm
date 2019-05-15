@@ -1,18 +1,21 @@
 package Data::Password::zxcvbn;
 use strict;
 use warnings;
+use Module::Runtime qw(use_module);
 use Data::Password::zxcvbn::MatchList;
 use Data::Password::zxcvbn::TimeEstimate qw(estimate_attack_times);
 use Exporter 'import';
 our @EXPORT_OK=qw(password_strength);
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: Dropbox's password estimation logic
 
 
 sub password_strength {
     my ($password, $opts) = @_;
 
-    my $matches = Data::Password::zxcvbn::MatchList->omnimatch(
+    my $match_list_module = $opts->{match_list_module}
+        || 'Data::Password::zxcvbn::MatchList';
+    my $matches = use_module($match_list_module)->omnimatch(
         $password, {
             user_input => $opts->{user_input},
             regexes => $opts->{regexes},
@@ -59,7 +62,7 @@ Data::Password::zxcvbn - Dropbox's password estimation logic
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -284,6 +287,14 @@ C<Data::Password::zxcvbn::Match::*> classes; if you want to I<add> a
 module, you still have to list all the built-ins in this array; L<<
 C<Data::Password::zxcvbn::Match::BruteForce> >> is special, and if
 included here, it will be ignored
+
+=item *
+
+C<match_list_module>
+
+module name to use instead of L<< C<Data::Password::zxcvbn::MatchList>
+>> to run all the computations; the module should really be a subclass
+of that default one, with maybe some customised messages
 
 =item *
 

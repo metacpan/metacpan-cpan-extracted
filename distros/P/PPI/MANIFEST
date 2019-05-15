@@ -279,6 +279,14 @@ t/data/08_regression/43_nonblock_map.code
 t/data/08_regression/43_nonblock_map.dump
 t/data/08_regression/44_vstrings.code
 t/data/08_regression/44_vstrings.dump
+t/data/08_regression/45_heredoc_w_paren_in_terminator.code
+t/data/08_regression/45_heredoc_w_paren_in_terminator.dump
+t/data/08_regression/46_heredoc_w_paren_in_terminator.code
+t/data/08_regression/46_heredoc_w_paren_in_terminator.dump
+t/data/08_regression/47_heredoc_w_paren_in_terminator.code
+t/data/08_regression/47_heredoc_w_paren_in_terminator.dump
+t/data/08_regression/48_heredoc_w_paren_in_terminator.code
+t/data/08_regression/48_heredoc_w_paren_in_terminator.dump
 t/data/11_util/test.pm
 t/data/13_data/Foo.pm
 t/data/15_transform/sample1.pm

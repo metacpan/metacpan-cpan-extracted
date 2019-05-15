@@ -55976,3 +55976,8 @@ P/PL/PLICEASE/Test2-Tools-JSON-Pointer-0.02.tar.gz
 P/PL/PLICEASE/Test2-Tools-URL-0.04.tar.gz
 M/MA/MARKOV/XML-Compile-1.62.tar.gz
 T/TI/TINITA/YAML-PP-0.015.tar.gz
+D/DA/DAKKAR/Data-Password-zxcvbn-1.0.3.tar.gz
+P/PR/PROCH/FASTX-Reader-0.07.tar.gz
+M/MI/MITHALDU/PPI-1.266.tar.gz
+R/RU/RURBAN/re-engine-PCRE2-0.16.tar.gz
+S/SL/SLOYD/Test2-Tools-PDL-0.0004.tar.gz

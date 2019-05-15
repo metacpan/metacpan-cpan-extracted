@@ -2,7 +2,7 @@ package Data::Password::zxcvbn::Match::Date;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
 use List::AllUtils 0.14 qw(max min_by);
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: match class for digit sequences that look like dates
 
 
@@ -281,7 +281,7 @@ Data::Password::zxcvbn::Match::Date - match class for digit sequences that look 
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 DESCRIPTION
 

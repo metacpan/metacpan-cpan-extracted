@@ -85,9 +85,8 @@ have a relatively large number of unique methods all of their own.
 =cut
 
 use strict;
-use PPI::Token ();
 
-our $VERSION = '1.265'; # VERSION
+our $VERSION = '1.266'; # VERSION
 
 our @ISA = "PPI::Token";
 
@@ -132,7 +131,7 @@ sub terminator {
 sub _is_terminator {
 	my ( $self, $terminator, $line, $indented ) = @_;
 	if ( $indented ) {
-		return $line =~ /^\s*$terminator$/;
+		return $line =~ /^\s*\Q$terminator\E$/;
 	} else {
 		return $line eq $terminator;
 	}

@@ -6,7 +6,7 @@ use Data::Password::zxcvbn::TimeEstimate qw(guesses_to_score);
 use Module::Runtime qw(use_module);
 use List::AllUtils 0.14 qw(max_by);
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: a collection of matches for a password
 
 
@@ -261,28 +261,48 @@ sub get_feedback {
     my $matches_count = @{$matches};
 
     if ($matches_count == 0) {
-        return {
-            warning => '',
-            suggestions => [
-                'Use a few words, avoid common phrases.',
-                'No need for symbols, digits, or uppercase letters.',
-            ],
-        };
+        return $self->feedback_for_no_matches;
     }
 
     if ($self->score > $max_score_for_feedback) {
-        return { warning => '', suggestions => [] };
+        return $self->feedback_above_threshold;
     }
 
     my $longest_match = max_by { length($_->token) } @{$matches};
     my $is_sole_match = $matches_count == 1;
     my $feedback = $longest_match->get_feedback($is_sole_match);
 
-    push @{$feedback->{suggestions}},
-        'Add another word or two. Uncommon words are better.';
-    $feedback->{warning} ||= '';
+    my $extra_feedback = $self->feedback_below_threshold;
+    push @{$feedback->{suggestions}}, @{$extra_feedback->{suggestions}};
+    $feedback->{warning} ||= $extra_feedback->{warning};
 
     return $feedback;
+}
+
+
+sub feedback_for_no_matches {
+    return {
+        warning => '',
+        suggestions => [
+            'Use a few words, avoid common phrases.',
+            'No need for symbols, digits, or uppercase letters.',
+        ],
+    };
+}
+
+
+sub feedback_above_threshold {
+    return { warning => '', suggestions => [] };
+}
+
+
+sub feedback_below_threshold {
+    return {
+        warning => '',
+        suggestions => [
+            'Add another word or two. Uncommon words are better.'
+        ],
+    };
 }
 
 1;
@@ -295,13 +315,15 @@ __END__
 
 =for :stopwords JS
 
+=for :stopwords precendence
+
 =head1 NAME
 
 Data::Password::zxcvbn::MatchList - a collection of matches for a password
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -375,7 +397,37 @@ C<Data::Password::zxcvbn::TimeEstimate::guesses_to_score>|Data::Password::zxcvbn
 
   my %feedback = %{ $match_list->get_feedback };
 
-Collects all the feedback from the L</matches>, and returns it.
+  my %feedback = %{ $match_list->get_feedback($max_score_for_feedback) };
+
+If there's no matches, returns the result of L<<
+/C<feedback_for_no_matches> >>.
+
+If the match list L</score> is above C<$max_score_for_feedback>
+(default 2), returns the result of L<< /C<feedback_above_threshold>
+>>.
+
+Otherwise, collects all the feedback from the L</matches>, and returns
+it, merged with the result of L<< /C<feedback_below_threshold> >>
+(suggestions are appended, but the warning from the matches takes
+precendence).
+
+=head2 C<feedback_for_no_matches>
+
+Returns a feedback for when the password didn't match any of our
+heuristics. It contains no warning, and some simple common
+suggestions.
+
+=head2 C<feedback_above_threshold>
+
+Returns a feedback for when the password scored above the threshold
+passed to L<< /C<get_feedback> >> (i.e. the password is "good"). It's
+an empty feedback.
+
+=head2 C<feedback_below_threshold>
+
+Returns a feedback for when the password scored below the threshold
+passed to L<< /C<get_feedback> >> (i.e. the password is "bad"). It
+suggests to add some words.
 
 =head1 AUTHOR
 

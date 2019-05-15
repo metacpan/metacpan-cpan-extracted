@@ -1,8 +1,11 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 Some APIs *can change* with the release of the first stable release (v 0.1).
 
+0.07	2019-05-15
+	* GitHub repository restructured to allow TravisCI tests
+
 0.06	2019-05-15
-	* Moved CPAN version test to xt/release
+	* BUG FIX author test moved to xt
 
 0.05	2019-05-09
 	* Improved test coverage

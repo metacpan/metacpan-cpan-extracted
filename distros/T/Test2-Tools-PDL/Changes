@@ -1,5 +1,8 @@
 Revision history
 
+0.0004      2019-05-15
+    - Bug fix: TOLERANCE_REL for negative values.
+
 0.0003      2019-03-24
     - Simplify value comparison implementation.
     - Support both $TOLERANCE and $TOLERANCE_REL.

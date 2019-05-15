@@ -4,7 +4,7 @@ with 'Data::Password::zxcvbn::Match';
 use Data::Password::zxcvbn::Combinatorics qw(nCk enumerate_substitution_maps);
 use Data::Password::zxcvbn::RankedDictionaries;
 use List::AllUtils qw(min);
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: match class for words in passwords
 
 
@@ -187,6 +187,13 @@ my $ALL_NOT_UPPER_RE = qr{\A \P{Lu}+ \z}x;
 # no characters that are *not* lowercase letters
 my $ALL_NOT_LOWER_RE = qr{\A \P{Ll}+ \z}x;
 
+
+sub does_word_start_upper { return $_[1] =~ $START_UPPER_RE }
+sub does_word_end_upper   { return $_[1] =~ $END_UPPER_RE }
+sub is_word_all_not_upper { return $_[1] =~ $ALL_NOT_UPPER_RE }
+sub is_word_all_not_lower { return $_[1] =~ $ALL_NOT_LOWER_RE }
+sub is_word_all_upper { return $_[1] =~ $ALL_NOT_LOWER_RE && $_[1] ne lc($_[1]) }
+
 sub _uppercase_variations {
     my ($self) = @_;
 
@@ -297,10 +304,10 @@ sub feedback_suggestions {
     my $word = $self->token;
     my @suggestions;
 
-    if ($word =~ $START_UPPER_RE) {
+    if ($self->does_word_start_upper($word)) {
         push @suggestions, q{Capitalization doesn't help very much};
     }
-    elsif ($word =~ $ALL_NOT_LOWER_RE && lc($word) ne $word) {
+    elsif ($self->is_word_all_upper($word)) {
         push @suggestions, 'All-uppercase is almost as easy to guess as all-lowercase';
     }
 
@@ -337,7 +344,7 @@ Data::Password::zxcvbn::Match::Dictionary - match class for words in passwords
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 DESCRIPTION
 
@@ -433,6 +440,21 @@ rank) and the C<l33t_table> should look like:
 The number of guesses is the product of the rank of the word, how many
 case combinations match it, how many substitutions were used, doubled
 if the token is reversed.
+
+=head2 C<does_word_start_upper>
+
+=head2 C<does_word_end_upper>
+
+=head2 C<is_word_all_not_upper>
+
+=head2 C<is_word_all_not_lower>
+
+=head2 C<is_word_all_upper>
+
+  if ($self->does_word_start_upper($word)) { ... }
+
+These are mainly for sub-classes, to use in L<< /C<feedback_warning>
+>> and L<< /C<feedback_suggestions> >>.
 
 =head2 C<feedback_warning>
 
