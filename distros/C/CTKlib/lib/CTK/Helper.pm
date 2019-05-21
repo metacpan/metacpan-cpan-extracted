@@ -1,265 +1,328 @@
-package CTK::Helper; # $Id: Helper.pm 193 2017-04-29 07:30:55Z minus $
+package CTK::Helper; # $Id: Helper.pm 264 2019-05-17 21:17:51Z minus $
 use strict;
+use utf8;
+
+=encoding utf8
 
 =head1 NAME
 
-CTK::Helper - Helper for building CTK scripts
+CTK::Helper - Helper for building CTK scripts. CLI user interface
 
 =head1 VIRSION
 
-Version 2.68
-
-=head1 HISTORY
-
-=over 8
-
-=item B<1.00>
-
-Init version
-
-=item B<1.01>
-
-Added documentation
-
-=item B<1.02>
-
-Documentation modified
-
-=item B<1.03>
-
-Added new types of projects
-
-=back
+Version 2.70
 
 =head1 SYNOPSIS
 
-    use CTK;
-    use CTKx;
-    use CTK::Helper;
-
-    my $c = new CTK( syspaths => 1 );
-    my $ctkx = CTKx->instance( c => $c );
-
-    my $h = new CTK::Helper (
-        -type           => TYPE,
-        -projectname    => PROJECTNAME,
-        -ctkversion     => CTK_VERSION,
-    );
-
-    my $status = $h->build();
-
+none
 
 =head1 DESCRIPTION
 
 Helper for building CTK scripts
 
-=head2 new
+No public subroutines
 
-    my $h = new CTK::Helper (
-        -type           => TYPE,
-        -projectname    => PROJECTNAME,
-        -ctkversion     => CTK_VERSION,
-    );
+=head2 nope, skip, yep
 
-Returns helper's object
+Internal use only!
 
-=head2 build
+See C<README>
 
-    my $status = $h->build();
+=head1 HISTORY
 
-Building the project
+See C<Changes> file
 
-=head2 backward_build
+=head1 DEPENDENCIES
 
-    my $status = $self->backward_build();
+L<CTK>
 
-Second pass of building. For internal use only
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+Coming soon
 
 =head1 SEE ALSO
 
-L<ctklib>, L<ctklib-tiny>
+L<CTK>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use CTKx;
-use CTK::Util qw/ :BASE /;
-use Cwd;
-use Try::Tiny;
-use Class::C3::Adopt::NEXT; #use MRO::Compat;
+use vars qw/$VERSION/;
+$VERSION = '2.70';
+
+use feature qw/say/;
+#use autouse 'Data::Dumper' => qw(Dumper); #$Data::Dumper::Deparse = 1;
+
+use base qw/ CTK::App /;
+
+use CTK;
+use CTK::Util;
+use CTK::Skel;
+use Term::ANSIColor qw/colored/;
+use File::Spec;
+use Cwd qw/getcwd/;
+use Text::SimpleTable;
+use File::Copy::Recursive qw(dircopy dirmove);
 
 use constant {
-    PROJECTNAME => 'foo',
-    SUBCLASSES  => {
-            regular => "CTK::Helper::SkelRegular",
-            module  => "CTK::Helper::SkelModule",
-            tiny    => "CTK::Helper::SkelTiny",
-        },
-    EXEMODE     => 0755,
-    DIRMODE     => 0777,
-    BOUNDARY    => qr/\-{5}BEGIN\s+FILE\-{5}(.*?)\-{5}END\s+FILE\-{5}/is,
-    STDRPLC     => {
-            PODSIG  => '=',
-            DOLLAR  => '$',
-            GMT     => sprintf("%s GMT", scalar(gmtime)),
-            YEAR    => (gmtime)[5]+1900,
-        },
+    PROJECT_NAME            => "Foo",
+    PROJECT_TYPE_DEFAULT    => "regular",
+    PROJECT_TYPES   => {
+        regular => [qw/common extra regular/],
+        module  => [qw/common module/],
+        tiny    => [qw/tiny/],
+        daemon  => [qw/common extra daemon/],
+    },
+    PROJECT_SKELS   => {
+        common  => "CTK::Skel::Common",
+        regular => "CTK::Skel::Regular",
+        module  => "CTK::Skel::Module",
+        tiny    => "CTK::Skel::Tiny",
+        daemon  => "CTK::Skel::Daemon",
+        extra   => "CTK::Skel::Extra",
+    },
+    PROJECT_VARS => [qw/
+            CTK_VERSION
+            PROJECT_NAME
+            PROJECT_NAMEL
+            PROJECT_TYPE
+            GMT
+        /],
 };
 
-use vars qw/$VERSION/;
-$VERSION = '2.68';
+__PACKAGE__->register_handler(
+    handler     => "usage",
+    description => "Usage",
+    code => sub {
+### CODE:
+    my ($self, $meta, @params) = @_;
+    say(<<USAGE);
+Usage:
+    ctklib [-dv] [-t regular|tiny|module|daemon] [-D /project/dir] create [PROJECTNAME]
+    ctklib create <PROJECTNAME>
+    ctklib create
+    ctklib test
+    ctklib -H
+    ctklib -V
+USAGE
+    return 0;
+});
 
-sub new {
-    my $class = shift;
-    my ($type,$projectname,$ctkversion) = read_attributes([
-        ['TYPE','TP','T'],
-        ['PROJECT','PROJECTNAME','NAME'],
-        ['CTKVERSION','VERSION'],
-    ],@_) if defined $_[0];
-    my $c = CTKx->instance->c();
+__PACKAGE__->register_handler(
+    handler     => "version",
+    description => "CTK Version",
+    code => sub {
+### CODE:
+    my ($self, $meta, @params) = @_;
+    say sprintf("CTK Version: %s.%s", CTK->VERSION, $self->revision);
+    return 1;
+});
 
-    my $subclass = SUBCLASSES->{$type};
-    croak "Class for $type project could not be loaded, or is an invalid name" unless $subclass;
+__PACKAGE__->register_handler(
+    handler     => "test",
+    description => "CTK Testing",
+    code => sub {
+### CODE:
+    my ($self, $meta, @params) = @_;
+    say("Testing CTK environment...");
+    my $summary = 1; # OK
 
-    unless ( $subclass->can('build') ) {
-        try {
-            eval "require $subclass";
-            die $@ if $@;
-            our @ISA = ( $subclass );
-        } catch {
-            croak "Class $subclass could not be loaded. $_";
-        };
-    }
-
-    my %rplc = %{(STDRPLC)};
-    $rplc{PROJECTNAME}    = $projectname || PROJECTNAME;
-    $rplc{PROJECTNAMEUCF} = ucfirst($rplc{PROJECTNAME});
-    $rplc{PROJECTNAMEL}   = lc($rplc{PROJECTNAME});
-    $rplc{CTKVERSION}     = $ctkversion || $c->VERSION();
-
-    return bless {
-            type    => $type,
-            projectname => $projectname || PROJECTNAME,
-            class   => $subclass,
-            boundary=> BOUNDARY,
-            pool    => [],
-            rplc    => { %rplc },
-            dirs    => [],
-        }, $class;
-}
-sub build {
-    my $self = shift;
-
-    # Переопределяем дерево каталогов
-    my @dirs = $self->dirs() if $self->can('dirs');
-
-    if (@dirs && ref($dirs[0]) eq 'HASH') {
-        $self->{dirs} = [@dirs];
-    } elsif (@dirs && ref($dirs[0]) eq 'ARRAY') {
-        $self->{dirs} = $dirs[0];
+    # CTK version
+    my $ver = CTK->VERSION;
+    if ($ver) {
+        yep("CTK version: %s", $ver);
     } else {
-        carp "Directories missing" if @dirs;
+        $summary = nope("Can't get CTK version");
     }
 
-    # Преобразуем пул в структуру @pool
-    my @pool;
-    my $boundary = $self->{boundary};
-    my $buff = $self->can('pool') ? $self->pool() : '';
-    $buff =~ s/$boundary/_bcut($1,\@pool)/ge;
-    foreach my $r (@pool) {
-        my $name = ($r =~ /^\s*name\s*\:\s*(.+?)\s*$/mi) ? $1 : '';
-        my $file = ($r =~ /^\s*file\s*\:\s*(.+?)\s*$/mi) ? $1 : '';
-        my $mode = ($r =~ /^\s*mode\s*\:\s*(.+?)\s*$/mi) ? $1 : '';
-        my $data = ($r =~ /\s*\r?\n\s*\r?\n(.+)/s) ? $1 : '';
-
-        $mode = undef unless $mode =~ /^[0-9]{1,3}$/;
-        $r = {
-                name => $name,
-                file => $file,
-                data => lf_normalize($data),
-                mode => defined $mode ? oct($mode) : undef,
-            };
-    }
-    $self->{pool} = [@pool];
-
-    my $ret = 0;
-    my $bret = 0;
-
-    # Передаем управление родительскому обработчику
-    $ret = $self->maybe::next::method();
-    return 0 unless $ret;
-
-    #Возвращаем управление назад
-    $bret = $self->backward_build();
-    return $bret;
-}
-sub backward_build {
-    my $self = shift;
-    my $c = CTKx->instance->c();
-    my $rplc = $self->{rplc};
-
-    # Постобработка директорий
-    my $dirs = $self->{dirs};
-    my $cd = cwd();
-    my $pdir = catdir($cd,$self->{projectname});
-    foreach my $d (@$dirs) {
-        my $path = CTK::catdir($cd, split(/\//,_ff($d->{path},$rplc)));
-        my $mode = defined $d->{mode} ? $d->{mode} : DIRMODE;
-        preparedir($path,$mode);
+    # CTK version
+    my $rev = $self->revision;
+    if ($rev) {
+        yep("CTK revision: %s", $rev);
+    } else {
+        $summary = nope("Can't get CTK revision");
     }
 
-    # Постобработка имен файлов и данных этих файлов
-    my $pool = $self->{pool};
-    my $overwrite = "yes";
-    foreach my $f (@$pool) {
-        my $name = $f->{name} || 'noname';
-        unless ($f->{file}) {
-            carp("Skipping file $name");
-            next;
-        }
-        my $file = CTK::catfile($cd, split(/\//,_ff($f->{file},$rplc)));
-        $overwrite = $c->cli_prompt("File \"$file\" already exists. Overwrite? :", $overwrite) if -e $file;
-        if ($overwrite =~ /^y/i) {
-            $overwrite = 'yes';
-        } else {
-            $overwrite = 'no';
-            next;
-        }
-        my $mode = $f->{mode};
-        my $data = _ff($f->{data},$rplc);
-        bsave($file,$data);
-        chmod($mode,$file) if defined($mode);
+    # Handlers list
+    my @handlers = $self->list_handlers;
+    if (@handlers) {
+        yep("Handlers: %s", join(", ", @handlers));
+    } else {
+        $summary = nope("Can't get list of handlers");
     }
+
+    # Allowed skels
+    my $skel = new CTK::Skel ( -skels => PROJECT_SKELS );
+    if (my @skels = $skel->skels) {
+        yep("Allowed skeletons: %s", join(", ", @skels));
+    } else {
+        $summary = nope("Can't get list of skeletons");
+    }
+
+    # Summary
+    if ($summary) {
+        yep("All tests was passed");
+    } else {
+        nope("Testing failed");
+    }
+    print "\n";
 
     return 1;
+});
+
+__PACKAGE__->register_handler(
+    handler     => "create",
+    description => "Project making",
+    code => sub {
+### CODE:
+    my ($self, $meta, @params) = @_;
+    my $projectname = @params ? shift @params : '';
+    my $tty = $self->option("tty");
+    my $yes = $self->option("yes") ? 1 : 0;
+    my $type = $self->option("type");
+    my $dir = $self->option("dir");
+    my %vars = (
+        CTK_VERSION => CTK->VERSION,
+        GMT => CTK::Util::dtf("%w %MON %_D %hh:%mm:%ss %YYYY %Z", time(), 'GMT'), # scalar(gmtime)." GMT"
+    );
+
+    # Project name
+    {
+        unless ($projectname) {
+            $projectname = ($tty && !$yes)
+                ? $self->cli_prompt('Project Name:', PROJECT_NAME)
+                : PROJECT_NAME;
+        }
+        $projectname =~ s/[^a-z0-9_]/X/ig;
+        if ($tty && $projectname !~ /^[A-Z]/) {
+            printf "The selected name begins with a small letter: %s\n", $projectname;
+            if (!$yes) {
+                return skip('Operation aborted')
+                    if $self->cli_prompt('Are you sure you want to continue?:','no') !~ /^\s*y/i;
+            }
+        }
+        $vars{PROJECT_NAME} = $projectname;
+        $vars{PROJECT_NAMEL} = lc($projectname);
+    }
+
+    # Project type
+    {
+        my $atypes = PROJECT_TYPES;
+        unless ($type) {
+            $type = ($tty && !$yes)
+                ? lc($self->cli_prompt(
+                        sprintf('Project type (%s):', join(", ", keys(%$atypes))),
+                        PROJECT_TYPE_DEFAULT
+                    ))
+                : PROJECT_TYPE_DEFAULT;
+        }
+        return nope('Incorrect type') unless $atypes->{$type};
+        $vars{PROJECT_TYPE} = $type;
+    }
+
+    # Directory
+    $dir ||= ($tty && !$yes)
+        ? $self->cli_prompt('Please provide destination directory:', File::Spec->catdir(getcwd(), $projectname))
+        : File::Spec->catdir(getcwd(), $projectname);
+    if (-e $dir) {
+        if ($tty) {
+            if (!$yes) {
+                return skip('Operation aborted')
+                    if $self->cli_prompt(sprintf('Directory "%s" already exists! Are you sure you want to continue?:', $dir),'no') !~ /^\s*y/i;
+            }
+        } else {
+            return skip('Directory "%s" already exists! Operation forced aborted because pipe mode is enabled', $dir);
+        }
+    }
+
+    # Summary
+    if ($tty) {
+        my $tbl = Text::SimpleTable->new(
+                [ 25, 'PARAM' ],
+                [ 57, 'VALUE / MESSAGE' ],
+            );
+        $tbl->row( $_, $vars{$_} ) for @{(PROJECT_VARS)};
+        $tbl->hr;
+        $tbl->row( "DIRECTORY", $dir );
+        print("\n",colored(['cyan on_black'], "SUMMARY TABLE:"),"\n", colored(['cyan on_black'], $tbl->draw), "\n");
+        return skip('Operation aborted') if !$yes
+            && $self->cli_prompt('All right?:','yes') !~ /^\s*y/i;
+    }
+
+    # Start building!
+    {
+        my $tmpdirobj = File::Temp->newdir(TEMPLATE => lc($projectname).'XXXXX', TMPDIR => 1);
+        my $tmpdir = $tmpdirobj->dirname;
+        my $skel = new CTK::Skel (
+                -name   => $projectname,
+                -root   => $tmpdir,
+                -skels  => PROJECT_SKELS,
+                -debug  => $tty,
+                -vars   => {
+                        CTKVERSION      => CTK->VERSION,
+                        PROJECT_VERSION => "1.00",
+                        AUTHOR          => "Mr. Anonymous",
+                        ADMIN           => "root\@example.com",
+                        HOMEPAGE        => "https://www.example.com",
+                    },
+            );
+
+        #$tmpdir = File::Spec->catdir($self->tempdir, lc($projectname));
+        printf("Creating %s project %s to %s...\n\n", $type, $projectname, $tmpdir);
+
+        my $skels = PROJECT_TYPES()->{$type} || [];
+        foreach my $s (@$skels) {
+            if ($skel->build($s, $tmpdir, {%vars})) {
+                yep("The %s files have been successfully processed", $s);
+            } else {
+                return nope("Can't build the project to \"%s\" directory", $tmpdir);
+            }
+        }
+
+        # Move to destination directory
+        if (dirmove($tmpdir, $dir)) {
+            yep("Project was successfully created!");
+            printf("\nAll the project files was located in %s directory\n", $dir);
+        } else {
+            return nope("Can't move directory from \"%s\" to \"%s\": %s", $tmpdir, $dir, $!);
+        }
+    }
+
+    return 0;
+});
+
+# Colored print
+sub yep {
+    print(colored(['green on_black'], '[  OK  ]'), ' ', sprintf(shift, @_), "\n");
+    return 1;
 }
-sub _bcut {
-    my $s = shift;
-    my $a = shift;
-    push @$a, $s;
-    return '';
+sub nope {
+    print(colored(['red on_black'], '[ FAIL ]'), ' ', sprintf(shift, @_), "\n");
+    return 0;
 }
-sub _ff {
-    # Маленький шаблонизатор
-    my $d = shift || ''; # данные
-    my $h = shift || {}; # массив
-    $d =~ s/\%(\w+?)\%/(defined $h->{$1} ? $h->{$1} : '')/eg;
-    return $d
+sub skip {
+    print(colored(['yellow on_black'], '[ SKIP ]'), ' ', sprintf(shift, @_), "\n");
+    return 1;
 }
+
 1;
+
 __END__

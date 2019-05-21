@@ -22,10 +22,15 @@ my $w = $mw->DateEntry;
 my @daynames = $w->_get_locale_daynames;
 is scalar(@daynames), 7;
 SKIP: {
+    no warnings 'uninitialized';
     skip 'accurate check only with de, en, or C locale', 1
 	if $ENV{LC_ALL} !~ m{^(de|en|C)};
     if      ($ENV{LC_ALL} =~ m{^de}) {
-	is_deeply \@daynames, [qw(So Mo Di Mi Do Fr Sa)];
+	if ($daynames[0] eq 'So.') { # seen on FreeBSD 12 and 13
+	    is_deeply \@daynames, [qw(So. Mo. Di. Mi. Do. Fr. Sa.)];
+	} else {
+	    is_deeply \@daynames, [qw(So Mo Di Mi Do Fr Sa)];
+	}
     } else {
 	is_deeply \@daynames, [qw(Sun Mon Tue Wed Thu Fri Sat)];
     }

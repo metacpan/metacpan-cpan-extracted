@@ -12,7 +12,7 @@ Promises::Cookbook::TIMTOWTDI - Counter examples to Promises
 
 =head1 VERSION
 
-version 0.99
+version 1.00
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ has no fixed-order.
 The only real issue I have with this approach is the semi-global variable usage
 (C<$product>, C<$suggestions> and C<$reviews>), but otherwise it works fine.
 
-NOTE: Again, if can think of a better way to do this that I missed,
+NOTE: Again, if you can think of a better way to do this that I missed,
 please let me know.
 
 =head1 Mojo::UserAgent
@@ -175,7 +175,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2019, 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

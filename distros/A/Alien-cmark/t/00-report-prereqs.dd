@@ -9,7 +9,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'Alien::Build' => '1.19',
-                                        'Alien::Build::MM' => '0.32',
+                                        'Alien::Build::MM' => '1.71',
                                         'Alien::Build::Plugin::Build::CMake' => '0.99',
                                         'ExtUtils::MakeMaker' => '6.52'
                                       }

@@ -9,8 +9,18 @@ ex/deep6
 ex/deep7
 ex/deep8
 ex/deep9
+ex/jdeep1
+ex/jdeep10
+ex/jdeep2
+ex/jdeep3
+ex/jdeep4
+ex/jdeep5
+ex/jdeep6
+ex/jdeep8
+ex/jdeep9
 lib/Data/Dumper/Compact.pm
 lib/Devel/DDCWarn.pm
+lib/JSON/Dumper/Compact.pm
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files

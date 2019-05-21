@@ -4,7 +4,7 @@
       "James Raspass <j.raspass@cv-library.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,21 +34,16 @@
          "requires" : {
             "perl" : "5.020"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::Deep" : "0"
-         }
       }
    },
    "provides" : {
       "WebDriver::Tiny" : {
          "file" : "lib/WebDriver/Tiny.pm",
-         "version" : "0.101"
+         "version" : "0.102"
       },
       "WebDriver::Tiny::Elements" : {
          "file" : "lib/WebDriver/Tiny/Elements.pm",
-         "version" : "0.101"
+         "version" : "0.102"
       }
    },
    "release_status" : "stable",
@@ -62,7 +57,8 @@
          "web" : "https://github.com/cv-library/WebDriver-Tiny"
       }
    },
-   "version" : "0.101",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.102",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

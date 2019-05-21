@@ -1,23 +1,29 @@
 #########################################################################
 #
-# Sergey Lepenkov (Serz Minus), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 04-ctkx.t 192 2017-04-28 20:40:38Z minus $
+# $Id: 04-ctkx.t 218 2019-04-30 09:27:42Z minus $
 #
 #########################################################################
 use strict;
 use warnings;
 
-use Test::More tests => 2;
-BEGIN { use_ok('CTKx') };
+use Test::More tests => 3;
+BEGIN {
+	use_ok('CTK');
+	use_ok('CTKx');
+};
 
-my $ctkx = CTKx->instance(c => 'foo');
-is(MyApp::get_c(), 'foo', 'MyApp::c is foo');
+my $ctk = new CTK(
+	name => "Test",
+);
+my $ctkx = CTKx->instance(ctk => $ctk);
+isa_ok(MyApp::get_ctk(), "CTK", 'MyApp::get_ctk()');
 
 1;
 
@@ -25,6 +31,6 @@ package MyApp;
 
 use CTKx;
 
-sub get_c { CTKx->instance->c }
+sub get_ctk { CTKx->instance->ctk }
 
 1;

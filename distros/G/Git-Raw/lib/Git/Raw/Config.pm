@@ -1,5 +1,5 @@
 package Git::Raw::Config;
-$Git::Raw::Config::VERSION = '0.82';
+$Git::Raw::Config::VERSION = '0.83';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Config - Git config class
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 DESCRIPTION
 
@@ -51,6 +51,12 @@ returned. If C<$name> configuration is not found, C<undef> is returned.
 =head2 str( $name [, $value ] )
 
 Retrieve the value of the C<$name> configuration field of type string. If
+C<$value> is passed, the value of the configration will be updated and
+returned. If C<$name> configuration is not found, C<undef> is returned.
+
+=head2 str_add( $name [, $value ] )
+
+Adds the value of the C<$name> configuration field of type string. If
 C<$value> is passed, the value of the configration will be updated and
 returned. If C<$name> configuration is not found, C<undef> is returned.
 

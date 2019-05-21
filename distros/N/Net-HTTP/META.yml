@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/Net-HTTP/issues
   homepage: https://github.com/libwww-perl/Net-HTTP
   repository: https://github.com/libwww-perl/Net-HTTP.git
-version: '6.18'
+version: '6.19'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -85,7 +85,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
@@ -131,11 +131,19 @@ x_Dist_Zilla:
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.004'
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200009'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::OALDERS/PodSyntaxTests'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
@@ -237,7 +245,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::OALDERS/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -258,7 +266,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::OALDERS/Git::GatherDir'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -286,21 +294,21 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.21.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.16.3
+          git_version: 2.21.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::OALDERS/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -316,6 +324,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::TravisCI::StatusBadge
       name: '@Author::OALDERS/TravisCI::StatusBadge'
       version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CheckIssues
+      name: '@Author::OALDERS/CheckIssues'
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
@@ -334,17 +346,7 @@ x_Dist_Zilla:
             - ':InstallModules'
           global: 0
           skip_version_provider: 0
-        Dist::Zilla::Plugin::RewriteVersion::Transitional:
-          _fallback_version_provider_args: {}
-          fallback_version_provider: Git::NextVersion
-        Git::NextVersion:
-          Dist::Zilla::Plugin::Git::NextVersion:
-            first_version: '0.001'
-            version_by_branch: 0
-            version_regexp: (?^:^v(.+)$)
-          Dist::Zilla::Role::Git::Repo:
-            git_version: 2.16.3
-            repo_root: .
+        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
       name: '@Author::OALDERS/@Git::VersionManager/RewriteVersion::Transitional'
       version: '0.009'
     -
@@ -365,7 +367,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -379,12 +381,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/release snapshot'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -392,16 +394,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.18
-          tag_format: v%v
-          tag_message: v%v
+          tag: v6.19
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/Git::Tag'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -433,12 +435,12 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/post-release commit'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -447,10 +449,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.21.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
-      version: '2.043'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
@@ -478,6 +480,14 @@ x_Dist_Zilla:
           to_relationship: suggests
       name: Prereqs::Soften
       version: '0.006003'
+    -
+      class: Dist::Zilla::Plugin::StaticInstall
+      config:
+        Dist::Zilla::Plugin::StaticInstall:
+          dry_run: 0
+          mode: on
+      name: StaticInstall
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -595,3 +605,4 @@ x_contributors:
   - 'Zefram <zefram@fysh.org>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

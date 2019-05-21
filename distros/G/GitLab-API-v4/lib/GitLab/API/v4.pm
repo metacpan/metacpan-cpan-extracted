@@ -1,7 +1,5 @@
 package GitLab::API::v4;
-use 5.010001;
-use strictures 2;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =encoding utf8
 
@@ -92,16 +90,16 @@ this point is vague.
 
 =cut
 
-use GitLab::API::v4::RESTClient;
-use GitLab::API::v4::Paginator;
-
-use Types::Standard -types;
-use Types::Common::String -types;
-use Types::Common::Numeric -types;
 use Carp qw( croak );
+use GitLab::API::v4::Paginator;
+use GitLab::API::v4::RESTClient;
 use Log::Any qw( $log );
+use Types::Common::Numeric -types;
+use Types::Common::String -types;
+use Types::Standard -types;
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
 sub BUILD {
@@ -10297,9 +10295,16 @@ GitLab-API-v4 GitHub issue tracker:
 
 L<https://github.com/bluefeet/GitLab-API-v4/issues>
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
+for encouraging their employees to contribute back to the open
+source ecosystem.  Without their dedication to quality software
+development this distribution would not exist.
+
 =head1 AUTHORS
 
-    Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <aran@bluefeet.dev>
     Dotan Dimet <dotan@corky.net>
     Nigel Gregoire <nigelgregoire@gmail.com>
     trunov-ms <trunov.ms@gmail.com>
@@ -10313,17 +10318,22 @@ L<https://github.com/bluefeet/GitLab-API-v4/issues>
     Kieren Diment <kieren.diment@staples.com.au>
     Dmitry Frolov <dmitry.frolov@gmail.com>
 
-=head1 ACKNOWLEDGEMENTS
+=head1 COPYRIGHT AND LICENSE
 
-Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
+Copyright (C) 2014 Aran Clary Deltac
 
-=head1 LICENSE
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 

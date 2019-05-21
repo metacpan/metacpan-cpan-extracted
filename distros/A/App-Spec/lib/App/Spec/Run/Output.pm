@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Run::Output;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Moo;
 

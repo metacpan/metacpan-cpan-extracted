@@ -1,5 +1,21 @@
 Revision history for Alien-Build
 
+1.73      2019-05-20 14:49:10 -0400
+  - Production release identical to 1.72_01
+
+1.72_01   2019-05-11 04:12:13 -0600
+  - Merged Alien-Build-Plugin-Decode-Mojo into this dist (gh#18)
+  - Put Alien -l flags first in xs_ok (gh#121 kiwiroy++)
+
+1.71_01   2019-04-30 05:41:40 -0400
+  - Add clean_install hook (gh#111, gh#114)
+  - EXPERIMENTAL Add mm_install method to Alien::Build::MM (gh#111, gh#114)
+  - EXPERIMENTAL CAUTION Add alien_clean_install target to Makefile generated
+    by Alien::Build::MM (gh#111, gh#114)
+
+1.70_01   2019-04-29 18:57:53 -0400
+  - Add alien_clean target for Alien::Build::MM (gh#118, gh#119)
+
 1.69      2019-04-27 10:59:10 -0400
   - Add runtime property ffi_checklib (gh#117)
     Related to https://github.com/Perl5-FFI/FFI-CheckLib/issues/13

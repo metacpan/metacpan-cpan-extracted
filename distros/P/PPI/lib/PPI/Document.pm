@@ -75,7 +75,7 @@ use PPI::Node                     ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-our $VERSION = '1.266'; # VERSION
+our $VERSION = '1.269'; # VERSION
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
@@ -560,7 +560,7 @@ sub index_locations {
 	my @tokens = $self->tokens;
 
 	# Whenever we hit a heredoc we will need to increment by
-	# the number of lines in it's content section when we
+	# the number of lines in its content section when we
 	# encounter the next token with a newline in it.
 	my $heredoc = 0;
 

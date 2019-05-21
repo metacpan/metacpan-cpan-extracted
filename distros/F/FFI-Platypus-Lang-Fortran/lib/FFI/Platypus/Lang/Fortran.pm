@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FFI::Platypus::Lang::Fortran::ConfigData;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 

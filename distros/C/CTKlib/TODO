@@ -1,14 +1,16 @@
 # TODO Wed Oct 24 10:31:28 2012 GMT
-# $Id: TODO 201 2017-05-02 10:37:04Z minus $
+# $Id: TODO 266 2019-05-18 07:59:05Z minus $
+
+!! export PERL5LIB=/home/minus/modules/CTKlib/lib
+!! pod2readme lib/CTK.pm
 
 # GENERAL
 
-    * Для попоулярных типов архивов создать функции получения списков содержимого архивов и
-      проработать ряд типовых операций работы с архивами.
+    * none
 
-    * CTK::Crypt - Создать функцию шифрования файлов с пом. PGP и подумать над вопросом
-      цифровой подписи и как с этим работать. Соответственно, продумать флаг создания и подписи и
-      шифорования исходя из каких-нибудь двух файлов ключей от одного и для другого
+# LONG-TERM
+
+    * GPG sign/verify
 
 # BUGS
 
@@ -16,17 +18,11 @@
 
 # REFACTORING
 
-    * CTK::Arc: fextract, fcompress - It is necessary to use FILEGLOB (#367). See fjoin for example
-
-    * CTK::Crypt: gpg_decript - It is necessary to use FILEGLOB (#367). See fjoin for example
-
-    * CTK::File: fsplit, fcopy, fmove, fdelete - It is necessary to use FILEGLOB (#367). See fjoin for example
-
-    * CTK::Net: fetch, store - It is necessary to use FILEGLOB (#367). See fjoin for example
+    * none
 
 # DOCUMENTATION
 
-    * Переводить все документы на английский!
+    * none
 
 # DIAGNOSTICS
 
@@ -36,3 +32,4 @@
 
     * none
 
+    ! svn propset svn:keywords Id

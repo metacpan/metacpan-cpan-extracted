@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
@@ -222,6 +222,8 @@ Ausgabe der CASCM-Kommandos (String)
 des Editors wird geprüft, ob die Datei (eine Kopie im lokalen Verzeichnis)
 verändert wurde. Falls ja, wird die Repository-Datei ausgecheckt und
 die gänderte lokale Datei unter einer neuen Versionsnummer eingecheckt.
+Das Package $package wird auf die unterste Stufe bewegt und wieder
+zurück bewegt, falls nötig.
 
 =cut
 
@@ -237,20 +239,13 @@ sub edit {
     # Vollständigen Pfad der Repository-Datei ermitteln
     my $file = $self->repoFileToFile($repoFile);
 
-    # Prüfe, ob Package existiert und ob es auf der untersten Stufe ist
+    # Prüfe, ob Package existiert
 
     my $state = $self->packageState($package);
     if (!$state) {
         $self->throw(
             q~CASCM-00099: Package does not exist~,
             Package => $package,
-        );
-    }
-    elsif ($state ne $self->states->[0]) {
-        $self->throw(
-            q~CASCM-00099: Package needs to be on the lowest state~,
-            State => $state,
-            LowestState => $self->states->[0],
         );
     }
 
@@ -301,8 +296,10 @@ sub edit {
             -default=>'y',
         );
         if ($answ eq 'y') {
+            $self->movePackage($self->states->[0],$package);
             my ($repoDir) = $p->split($repoFile);
             $output = $self->putFiles($package,$repoDir,$localFile);
+            $self->movePackage($state,$package);
         }
     }
     elsif (!$p->compare($localFile,$origFile)) {
@@ -1800,7 +1797,7 @@ sub runSql {
     my $udl = $self->udl;
 
     $sql = Quiq::Unindent->trimNl($sql);
-    if ($self->verbose) {
+    if ($self->verbose > 1) {
         my $a = Quiq::AnsiColor->new;
         (my $sql = $sql) =~ s/^(.*)/'> '.$a->str('bold',$1)/meg;
         if (!$udl) {
@@ -1864,7 +1861,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

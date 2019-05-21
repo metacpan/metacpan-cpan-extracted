@@ -1,18 +1,21 @@
-package MPMinus::Store::Oracle; # $Id: Oracle.pm 122 2013-05-07 13:05:41Z minus $
+package MPMinus::Store::Oracle; # $Id: Oracle.pm 266 2019-04-26 15:56:05Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
-MPMinus::Store::Oracle - Oracle
+MPMinus::Store::Oracle - Oracle MPMinus::Store::DBI interface
 
 =head1 VERSION
 
-Version 1.51
+Version 1.53
 
 =head1 SYNOPSIS
 
     use MPMinus::Store::Oracle;
-    
+
     # Oracle connect
     my $oracle = new MPMinus::Store::Oracle (
         -m          => $m, # OPTIONAL
@@ -25,11 +28,11 @@ Version 1.51
                 PrintError => 0,
             },
     )
-    
+
     my $dbh = $oracle->connect;
-    
+
     my $pingstat = $oracle->ping if $oracle;
-    
+
     # Table select (as array)
     my @result = $oracle->table($sql, @inargs);
 
@@ -52,7 +55,11 @@ Version 1.51
 
 =head1 DESCRIPTION
 
-Oracle Database independent interface for MPMinus on MPMinus::Store::DBI based.
+Oracle MPMinus::Store::DBI interface
+
+See L<MPMinus::Store::DBI>
+
+=head2 new
 
 See L<MPMinus::Store::DBI>
 
@@ -65,7 +72,7 @@ See L<MPMinus::Store::DBI>
             -user => 'root',
             -password => 'password'
       );
-    
+
     my @table = $oracle->table("select * from tablename where date = ?", "01.01.2000")
 
 =head1 HISTORY
@@ -98,36 +105,43 @@ General refactoring
 
 =back
 
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<MPMinus::Store::DBI>, L<DBD::Oracle>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
 =head1 SEE ALSO
 
-L<MPMinus::Store::DBI>, L<CTK::DBI>, L<Apache::DBI>, L<DBI>
+L<MPMinus::Store::DBI>, L<DBD::Oracle>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw($VERSION);
-$VERSION = 1.52;
+$VERSION = 1.53;
 
 use MPMinus::Store::DBI;
 use CTK::Util qw/ :API /;
@@ -137,7 +151,6 @@ sub new {
     my @in = read_attributes(MPMinus::Store::DBI::ATTR_NAMES,@_);
     my %args = (
             -driver => 'Oracle',
-            -m      => $in[0],
             -host   => $in[2],
             -name   => $in[3],
             -user   => $in[5],

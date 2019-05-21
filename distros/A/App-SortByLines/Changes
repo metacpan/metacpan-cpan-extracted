@@ -1,0 +1,12 @@
+0.002   2019-05-18 (PERLANCAR)
+
+	- [bugfix] Properly preserve (and reverse, when -r) the order of
+	  lines having the same key.
+
+	- [doc] Mention sort's -k & -s and example on how to do the
+	  equivalent using paste + sort + cut.
+
+
+0.001   2019-05-18 (PERLANCAR)
+
+        - First release.

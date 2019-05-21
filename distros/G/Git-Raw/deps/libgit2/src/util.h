@@ -30,6 +30,17 @@
 # define max(a,b) ((a) > (b) ? (a) : (b))
 #endif
 
+#if defined(__GNUC__)
+# define GIT_CONTAINER_OF(ptr, type, member) \
+	__builtin_choose_expr( \
+	    __builtin_offsetof(type, member) == 0 && \
+	    __builtin_types_compatible_p(typeof(&((type *) 0)->member), typeof(ptr)), \
+		((type *) (ptr)), \
+		(void)0)
+#else
+# define GIT_CONTAINER_OF(ptr, type, member) (type *)(ptr)
+#endif
+
 #define GIT_DATE_RFC2822_SZ  32
 
 /**
@@ -150,12 +161,13 @@ extern int git__bsearch_r(
 	void *payload,
 	size_t *position);
 
+#define git__strcmp strcmp
+#define git__strncmp strncmp
+
 extern int git__strcmp_cb(const void *a, const void *b);
 extern int git__strcasecmp_cb(const void *a, const void *b);
 
-extern int git__strcmp(const char *a, const char *b);
 extern int git__strcasecmp(const char *a, const char *b);
-extern int git__strncmp(const char *a, const char *b, size_t sz);
 extern int git__strncasecmp(const char *a, const char *b, size_t sz);
 
 extern int git__strcasesort_cmp(const char *a, const char *b);

@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 
 use CPS qw( kpar );
 
@@ -47,3 +48,5 @@ kpar(
 );
 
 is_deeply( \@result, [], 'kpar clears @_' );
+
+done_testing;

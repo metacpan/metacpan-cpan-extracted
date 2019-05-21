@@ -2,6 +2,7 @@
 Changes
 Changes.Alien-Base
 Changes.Alien-Base-Wrapper
+Changes.Alien-Build-Decode-Mojo
 Changes.Test-Alien
 INSTALL
 LICENSE
@@ -143,6 +144,7 @@ lib/Alien/Build/Plugin/Build/MSYS.pm
 lib/Alien/Build/Plugin/Build/Make.pm
 lib/Alien/Build/Plugin/Build/SearchDep.pm
 lib/Alien/Build/Plugin/Core.pod
+lib/Alien/Build/Plugin/Core/CleanInstall.pm
 lib/Alien/Build/Plugin/Core/Download.pm
 lib/Alien/Build/Plugin/Core/FFI.pm
 lib/Alien/Build/Plugin/Core/Gather.pm
@@ -154,6 +156,7 @@ lib/Alien/Build/Plugin/Decode.pod
 lib/Alien/Build/Plugin/Decode/DirListing.pm
 lib/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm
 lib/Alien/Build/Plugin/Decode/HTML.pm
+lib/Alien/Build/Plugin/Decode/Mojo.pm
 lib/Alien/Build/Plugin/Download.pod
 lib/Alien/Build/Plugin/Download/Negotiate.pm
 lib/Alien/Build/Plugin/Extract.pod
@@ -223,6 +226,7 @@ t/alien_build_plugin_build_cmake.t
 t/alien_build_plugin_build_make.t
 t/alien_build_plugin_build_msys.t
 t/alien_build_plugin_build_searchdep.t
+t/alien_build_plugin_core_cleaninstall.t
 t/alien_build_plugin_core_download.t
 t/alien_build_plugin_core_ffi.t
 t/alien_build_plugin_core_gather.t
@@ -233,6 +237,7 @@ t/alien_build_plugin_core_tail.t
 t/alien_build_plugin_decode_dirlisting.t
 t/alien_build_plugin_decode_dirlistingftpcopy.t
 t/alien_build_plugin_decode_html.t
+t/alien_build_plugin_decode_mojo.t
 t/alien_build_plugin_download_negotiate.t
 t/alien_build_plugin_extract_archivetar.t
 t/alien_build_plugin_extract_archivezip.t

@@ -6,7 +6,7 @@ use Carp qw/croak/;
 use Moo;
 use namespace::clean;
 
-has 'flotum' => ( is => 'ro', weak_ref => 1, );
+has 'flotum' => ( is => 'ro', weak_ref => 1, required => 1);
 
 has [
     qw/

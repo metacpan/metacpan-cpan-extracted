@@ -4,6 +4,8 @@
 # LSA works by first finding the set of linking terms for the A terms
 # and C terms to form sets B_A and B_C. It then finds the direct 
 # association between sets B_A and B_C
+use lib '/home/henryst/UMLS-Association/lib';
+
 use strict;
 use warnings;
 

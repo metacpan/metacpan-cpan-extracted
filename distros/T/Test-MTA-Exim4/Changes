@@ -1,5 +1,10 @@
 Revision history for Test-MTA-Exim4
 
+0.06      2019-05-19 21:27:19+01:00 Europe/London
+        Updated dzil config to use more generic starter modules
+        Fix regexp escaping in fake_exim test script
+        Add Travis CI configuration
+
 0.05      2014-03-28 09:39:15+00:00 Europe/London
         Added methods to test config options
         Added methods to test string expansion

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.99
+    version 1.01
 
 SYNOPSIS
 
@@ -64,7 +64,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Roy Storey (KIWIROY)
 
 COPYRIGHT AND LICENSE
 

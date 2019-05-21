@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::ARPEntry;
-$Device::Firewall::PaloAlto::Op::ARPEntry::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Op::ARPEntry::VERSION = '0.1.6';
 use strict;
 use warnings;
 use 5.010;
@@ -44,7 +44,7 @@ Device::Firewall::PaloAlto::Op::ARPEntry - Palo Alto firewall ARP entry
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 

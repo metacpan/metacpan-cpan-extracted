@@ -21,10 +21,10 @@ no_index:
 provides:
   BankAccount::Validator::UK:
     file: lib/BankAccount/Validator/UK.pm
-    version: '0.47'
+    version: '0.48'
   BankAccount::Validator::UK::Rule:
     file: lib/BankAccount/Validator/UK/Rule.pm
-    version: '0.47'
+    version: '0.48'
 requires:
   File::ShareDir: '1.114'
   Moo: '2.000000'
@@ -33,5 +33,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/BankAccount-Validator-UK.git
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -16,6 +16,7 @@ lib/UMLS/Association/Measures/Direct.pm
 lib/UMLS/Association/Measures/LSA.pm
 lib/UMLS/Association/Measures/LTA.pm
 lib/UMLS/Association/Measures/MWA.pm
+lib/UMLS/Association/Measures/SBC.pm
 lib/UMLS/Association/Measures/WSA.pm
 Makefile.PL
 MANIFEST			This list of files

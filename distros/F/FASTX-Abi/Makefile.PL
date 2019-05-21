@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.018;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "FASTX-Abi",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.018",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "FASTX::Abi",
   "PREREQ_PM" => {
     "Bio::Trace::ABIF" => "1.06",
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.1",
     "File::Basename" => "2.5"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

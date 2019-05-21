@@ -33,7 +33,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.02';
+    $VERSION = '0.04';
     XSLoader::load();
 }
 
@@ -220,7 +220,10 @@ sub decode_character_strings {
 #----------------------------------------------------------------------
 
 sub DESTROY {
-    _destroy_context( $_[0][0] );
+    $_[0][1] ||= do {
+        _destroy_context( $_[0][0] );
+        1;
+    };
 }
 
 #----------------------------------------------------------------------

@@ -2,6 +2,49 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2018 for earlier version 3 release logs.
 
+3.015     2019-05-19 
+
+    The keepers of CPAN declined to re-index PDF::Builder 3.014, which had many
+      reported problems with its load, so I'll kick out 3.015 earlier than I
+      normally would. Hopefully, with a good load, "Testers" will show passed/
+      failed/other on the Meta page, and PDF::Builder will show up in the
+      reverse dependencies of other products.
+
+    Perl 5.18 now required minimum level.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm-Docs.pm [ref CTS 2] allow 
+      User Unit specification for PDF (globally) and page. This permits (with 
+      suitable Readers) document sizes in excess of 200 inches.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm-Docs.pm [ref CTS 2] clean up 
+      and extend documentation on "box" methods. Allow -orient option on "box" 
+      methods to name a page's media, but present in Landscape orientation. 
+      Default Media Box of US Letter (8.5in x 11in).
+
+    lib/PDF/Builder.pm [ref RT 117184] in open(), if read-in PDF is missing an 
+      EOL after the final %%EOF, add one so that material added after isn't 
+      run-on in comment (most readers can handle this, but better to be clear).
+    lib/PDF/Builder/Basic/PDF/File.pm [ref RT 117184] an empty xref (0 0) is
+      now allowed to go through without tripping the fatal Malformed message. I
+      don't think it's legal PDF, but Acrobat Reader passes it without comment,
+      so I'll let it go (still may produce warning messages). Late add of 
+      'hybrid.pdf' to RT 117184 has a number of problems reported as warnings 
+      in PDF::Builder (Acrobat Reader is silent on them), but seems to produce 
+      an acceptable PDF. 
+
+      Also don't add an EOL after overwriting the PDF version -- there should 
+      already be one there. Finally, there doesn't seem to be any point in 
+      explicitly handling a "run-on" header comment as described in RT 117210, 
+      as we merely copy the old file to the output (with version updated if 
+      necessary). If any Readers have trouble with such and need the comment 
+      stripped out, it might be done (1. don't change object offsets, and 2. 
+      put the new comment AFTER any binary comment).
+
+    lib/PDF/Builder/Basic/PDF/Pages.pm [ref CTS 3] remove rebuild_tree() for 
+      now, as it has never been properly implemented.
+
+    Add some comments to CONTRIBUTING pointing to the Software Development Kit.
+
 3.014     2019-04-26 
     
     MANIFEST, tools/*.pl move four developmental test .pl files from root into
@@ -45,7 +88,7 @@ See also INFO/Changes_2018 for earlier version 3 release logs.
       FontFile changes not made here (.data and .cmap files are required,
       no searching of internal cmaps).
 
-    lib/PDF/Builder/Basic/PDF/File.pm, Objind.pm, Pages.pm [ref RT 121911]
+    lib/PDF/Builder/Basic/PDF/File.pm-Objind.pm-Pages.pm [ref RT 121911]
       fixes contributed by Vadim Repin to deal with the failure of adding new 
       pages to an existing document. This apparently had something to do with 
       circular references, improper 'realise' of objects, and other things.
@@ -60,10 +103,9 @@ See also INFO/Changes_2018 for earlier version 3 release logs.
       may result in (apparently wrong) unexpected order of output (rendering
       order).
 
-    lib/PDF/Builder/Content.pm, lib/PDF/Builder/Docs.pm, examples/Content.pl
-      further explanation (mostly POD) on text and graphics object
-      interactions, and especially the effect on clipping, particularly of
-      text glyphs.
+    lib/PDF/Builder/Content.pm-Docs.pm, examples/Content.pl further 
+      explanation (mostly POD) on text and graphics object interactions, and 
+      especially the effect on clipping, particularly of text glyphs.
 
     examples/022_truefonts add a flag --full (or -f) to force 65536 characters
       to be output, rather than whatever the count of CIDs is reported in the

@@ -26,15 +26,16 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::Perl::Critic" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Model" : "2.123",
+            "Config::Model" : "2.134",
             "Config::Model::ObjTreeScanner" : "0",
             "File::HomeDir" : "0",
+            "List::MoreUtils" : "0",
             "Log::Log4perl" : "1.11",
             "Path::Tiny" : "0",
             "Pod::POM" : "0",
@@ -64,7 +65,7 @@
             "Tk::Tree" : "0",
             "Try::Tiny" : "0",
             "YAML" : "0",
-            "perl" : "5.010"
+            "perl" : "5.012"
          }
       },
       "test" : {
@@ -73,6 +74,7 @@
             "Config::Model::Value" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
+            "Test::Pod" : "1.00",
             "Test::Warn" : "0.11"
          }
       }
@@ -90,8 +92,8 @@
          "web" : "https://github.com/dod38fr/config-model-tk-ui"
       }
    },
-   "version" : "1.369",
+   "version" : "1.370",
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

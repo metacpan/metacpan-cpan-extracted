@@ -1,0 +1,55 @@
+
+BEGIN {
+  unless ($ENV{RELEASE_TESTING}) {
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
+  }
+}
+
+use Test::More;
+use Device::Firewall::PaloAlto;
+
+my $fw = Device::Firewall::PaloAlto->new(verify_hostname => 0)->auth;
+ok($fw, "Firewall Object") or BAIL_OUT("Unable to connect to FW object: @{[$fw->error]}");
+
+
+
+my $test_obj = $fw->test;
+isa_ok($test_obj, 'Device::Firewall::PaloAlto::Test');
+
+my @rulebase_tests = (
+    {
+        args => { from => 'TRUST', to => 'UNTRUST', src => q(1.1.1.1), dst => q(2.2.2.2), port => 443 },
+        allow => 0,
+        rulename => 'Deny Policy',
+        index => qr(\d+),
+    },
+    {
+        args => { from => 'TUNNEL', to => 'TUNNEL', src => q(1.1.1.1), dst => q(2.2.2.2) },
+        allow => 1,
+        rulename => 'Tunnel Policy',
+        index => qr(\d+),
+    },
+    {
+        args => { from => 'TRUST', to => 'UNTRUST', src => q(1.1.1.1), dst => q(2.2.2.2), port => 22 },
+        allow => 0,
+        rulename => '__DEFAULT_DENY__',
+        index => qr(\d+),
+    },
+);
+
+for my $test (@rulebase_tests) {
+    my $a = $test_obj->rulebase( %{ $test->{args} } );
+    isa_ok( $a, 'Device::Firewall::PaloAlto::Test::Rulebase' );
+
+    is( $a->rulename, $test->{rulename}, 'Rulename matches' );
+    like( $a->index, $test->{index}, 'Index matches' );
+
+    $test->{allow} ?
+        ok( $a, 'Object has correct boolean overload (true)' )
+    :   ok( !$a, 'Object has correct boolean overload (false)' );
+    
+}
+
+
+done_testing();

@@ -1,5 +1,9 @@
-package MPMinus::Configuration; # $Id: Configuration.pm 151 2013-05-29 14:31:19Z minus $
+package MPMinus::Configuration; # $Id: Configuration.pm 278 2019-05-11 19:52:16Z minus $
 use strict;
+
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +11,7 @@ MPMinus::Configuration - Configuration of MPMinus
 
 =head1 VERSION
 
-Version 1.33
+Version 1.34
 
 =head1 SYNOPSIS
 
@@ -18,35 +22,117 @@ Version 1.33
         my $r = shift;
         my $m = MPMinus->m;
         $m->conf_init($r, __PACKAGE__);
-        
         ...
-        
         my $project = $m->conf('project');
-        
-        ...    
+        ...
     }
+
+...or:
+
+    use MPMinus::Configuration;
+
+    my $config = new MPMinus::Configuration(
+            config  => "foo.conf",
+            confdir => "conf",
+        );
 
 =head1 DESCRIPTION
 
 The module works with the configuration data of the resource on the platform mod_perl.
-The configuration data are relevant at the global level, and they are the same for all 
+The configuration data are relevant at the global level, and they are the same for all
 users at once!
+
+=head2 new
+
+    my $config = new MPMinus::Configuration(
+            r       => $r,
+            config  => "/path/to/config/file.conf", # Or modperlroot relative, e.g, "file.conf"
+            confdir => "/path/to/config/directory", # Or modperlroot relative, e.g, "conf"
+            options => {... Config::General options ...},
+        );
+
+In case of non MPMinus context returns MPMinus::Configuration object
+
+Example foo.conf file:
+
+    Foo     1
+    Bar     test
+    Flag    true
+
+Example of the "conf" structure of $config object:
+
+    print Dumper($config->{conf});
+    $VAR1 = {
+        'sid' => 'f4c11c107caa00d0',
+        'modperlroot' => '/var/www/foo.localhost',
+        'modperl_root' => '/var/www/foo.localhost',
+        'hitime' => '1555517289.83407',
+        'confdir' => '/var/www/foo.localhost/conf',
+        'config' => '/var/www/foo.localhost/foo.conf',
+        'foo' => 1
+        'bar' => 'test',
+        'flag' => 1,
+    }
+
+=over 8
+
+=item config
+
+Specifies absolute or relative path to config-file.
+If the value is not set then the value gets from dir_config() will be used - "Config"
+
+=item confdir
+
+Specifies absolute or relative path to config-dir.
+If the value is not set then the value gets from dir_config() will be used - "ConfDir"
+
+=item options
+
+Options of L<Config::General>
+
+=item r
+
+Optional. Apache2::Request object
+
+=back
 
 =head1 METHODS
 
 =over 8
 
+=item B<config_error>
+
+    my $error = $config->config_error;
+
+Returns error string if occurred any errors while creating the object or reading the configuration file
+
 =item B<conf_init>
 
     $m->conf_init( $r, $pkg );
 
-=item B<conf, get_conf, config, get_config>
+NOTE! For MPMinus context only!
+
+=item B<conf, get_conf, config, get_config, val>
+
+In MPMinus context:
 
     my $value = $m->conf( 'key' );
+    my $config_hash = $m->config(); # Returns hash structure
+
+In MPMinus::Configuration context:
+
+    my $value = $config->val( 'key' );
+    my $value = $config->conf( 'key' );
+    my $config_hash = $config->config(); # Returns hash structure
+
+Gets value from config structure/object by key or config-hash
 
 =item B<set_conf, set_config>
 
-    $m->set_conf( 'key', $value );
+    $m->set_conf( 'key', "value" );
+    $config->set_conf( 'key', "value" );
+
+Sets value to config structure/object by key
 
 =back
 
@@ -80,70 +166,183 @@ Added locked_keys parameter
 
 =back
 
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+C<mod_perl2>, L<CTK>, L<Config::General>, L<Try::Tiny>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+C<mod_perl2>, L<CTK::Util>, L<Config::General>
+
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use CTK::Util qw/ :BASE /; # Утилитарий
-use MPMinus::MainTools; # Модуль для двух функций getHiTime и getSID
+use vars qw($VERSION);
+$VERSION = 1.34;
+
+use Apache2::ServerRec ();
+use Apache2::RequestRec ();
+use Apache2::RequestUtil ();
+use APR::Table ();
+use APR::Pool ();
+
 use Config::General;
 use Try::Tiny;
+use File::Spec ();
 
-use vars qw($VERSION);
-$VERSION = 1.33;
+use Carp;
+use CTK::Util qw/ :BASE /;
+use MPMinus::Util qw/getHiTime getSID/;
+
+use constant {
+    CONF_DIR    => "conf",
+    LOG_DIR     => "log",
+    LOCKED      => [qw/
+            hitime sid
+        /],
+    VALID_DVARS => { # KEY => "DEFAULT"
+        modperlroot => undef,
+        config      => undef,
+        confdir     => undef,
+        debug       => undef,
+    },
+};
+
+sub new {
+    my $class = shift;
+    my %args = @_;
+    my $r = $args{r} // Apache2::RequestUtil->request;
+
+    # Set %ENV
+    # $r->subprocess_env() unless exists($ENV{REQUEST_METHOD});
+
+    # Set DVars
+    my %tmp = %{(VALID_DVARS)};
+    my %dvars = ();
+    while(my ($key, $val) = each %tmp) { $dvars{$key} = $r->dir_config($key) // $val }
+
+    # Debug
+    $dvars{"debug"} = ($dvars{"debug"} && $dvars{"debug"} =~ /^(1|on|y|t|enable)/i) ? 1 : 0;
+
+    # Create object
+    my $self = bless {
+        status  => 0,
+        error   => "",
+        files   => [],
+        conf    => {
+            %dvars,
+            hitime => getHiTime(),
+            sid    => getSID(16, 'm'),
+        },
+    }, $class;
+
+    # Set paths
+    my $root = $dvars{modperlroot} // $r->document_root // '.';
+    $self->{conf}->{modperlroot} = $root;
+    $self->{conf}->{modperl_root} = $root;
+    my $confdir = $args{confdir} || $dvars{confdir} || CONF_DIR;
+    $confdir = File::Spec->catdir($root, $confdir) unless File::Spec->file_name_is_absolute($confdir);
+    $self->{conf}->{confdir} = $confdir;
+    my $fileconf = $args{config} || $dvars{config} || $r->dir_config('FileConf');
+    unless ($fileconf) {
+        $self->{error} = "Config file not specified";
+        return $self;
+    }
+    $fileconf = File::Spec->catfile($root, $fileconf) unless File::Spec->file_name_is_absolute($fileconf);
+    $self->{conf}->{config} = $fileconf;
+    unless (-e $fileconf) {
+        $self->{error} = sprintf("Config file not found: %s", $fileconf);
+        return $self;
+    }
+
+    # Loading
+    my $tmpopts = $args{options} || {};
+    my %options = %$tmpopts;
+    $options{"-ConfigFile"}         = $fileconf;
+    $options{"-ConfigPath"}         ||= [$root, $confdir, CONF_DIR];
+    $options{"-ApacheCompatible"}   = 1 unless exists $options{"-ApacheCompatible"};
+    $options{"-LowerCaseNames"}     = 1 unless exists $options{"-LowerCaseNames"};
+    $options{"-AutoTrue"}           = 1 unless exists $options{"-AutoTrue"};
+    my $cfg;
+    try {
+        $cfg = new Config::General( %options );
+    } catch {
+        $self->{error} = $_;
+        return $self;
+    };
+    my %newconfig = $cfg->getall if $cfg && $cfg->can('getall');
+    $self->{files} = [$cfg->files] if $cfg && $cfg->can('files');
+
+    # Set only unlocked keys
+    my %lkeys = ();
+    foreach my $k (keys(%dvars), @{(LOCKED)}) { $lkeys{$k} = 1 }
+    foreach my $k (keys(%newconfig)) { $self->{conf}->{$k} = $newconfig{$k} if $k && !$lkeys{$k} }
+    $self->{status} = 1;
+    $self->{error} = "";
+
+    return $self;
+}
 
 sub conf_init {
-    # Инициализация. Запускается из главного хэндлера!!
     my $m = shift;
-    croak("The method call is made ActionCheck not in the style of OOP") unless ref($m) =~ /MPMinus/;
-    my $r   = shift;
-    croak("Object Apache2::RequestRec not defined") unless ref($r) eq 'Apache2::RequestRec';
-    my $pkg = shift || ''; # Пакет, который вызвал инициализацию
-    croak("Package name missing!") unless $pkg && $pkg =~ /Handlers$/;
-    
-    # Устанавливаем главнный объект Apache2::RequestRec и зависимые пакеты
+    croak("The conf_init() method can only be called for the MPMinus object") unless ref($m) =~ /MPMinus/;
+    my $r = shift;
+    croak("Apache2::RequestRec Object is not defined") unless ref($r) eq 'Apache2::RequestRec';
+    my $pkg = shift || ''; # Caller package
+    carp("Package name missing!") && return 0 unless $pkg && $pkg =~ /Handlers$/;
+
+    # Set %ENV
+    unless ($r->is_perl_option_enabled('SetupEnv')) {
+        $r->subprocess_env() unless exists($ENV{REQUEST_METHOD});
+    }
+
+    # Set Apache2::RequestRec object as node of MPMinus
     $m->set(r => $r);
-    my $s = $r->server; # сервер
-    my $c = $r->connection; # Соединение 
-    
-    # Внутренний массив
+    my $s = $r->server;
+    my $c = $r->connection;
+
+    # Temp hash
     my %conf;
 
     ##########################################################################
-    # !!! Параметры, устанавливаемые каждый перезапуск !!!
+    ## Session-context variables
     ##########################################################################
 
-    # Пакет должен возглавлять список
+    # Package name and iterator
     my $i = $m->conf('package') ? ($m->conf('package')->[1] + 1) : 0;
-    $i = 1 if $i > 65534; # На случай переполнения стека
-    $conf{package} = [$pkg,$i]; # Полное имя пакета и количество инициализаций за дочку. 0 - первый раз
-    
-    # Доопределяем параметры
-    $conf{sid}    = getSID(16,'m'); # ID Сессии (SID) - Для контроля сессии
+    $i = 1 if $i > 65534;
+    $conf{package} = [$pkg,$i];
+
+    # SID and HITime
     $conf{hitime} = getHiTime();
+    $conf{sid}    = getSID(16, 'm'); # Session ID (SID) - For session control
 
     #
-    # Основные значения (НЕ РЕДАКТИРУЕМЫЕ)
+    # NON EDITABLE variables
     #
     my $prj = '';
     if ($pkg =~ /([^\:]+?)\:\:Handlers$/) {
@@ -154,35 +353,30 @@ sub conf_init {
         $conf{project} = '';
         $conf{prefix} = '';
     }
-    $conf{preffix} = $conf{prefix}; # Для обратной совместимости потом удалить !! 
 
     #
-    # Переменные "окружения" Apache
+    # Apache ENVs
     #
-    $conf{request_uri}    = $r->uri() || ""; # полученная GET строка
-    $conf{request_method} = $r->method() || ""; # полученная метода
-    $conf{remote_addr}    = $c->remote_ip || ""; # IP клиента
-    $conf{remote_user}    = $r->user() || ""; # Имя пользователя 
-
-    $conf{server_admin}   = $s->server_admin() || ""; # Адрес электронной почты
-    $conf{server_name}    = $s->server_hostname() || ""; # Имя сервера (главного хоста)
-    $conf{server_port}    = $s->port() || 80; # Порт сервера (главного хоста)
-    # HTTP_HOST = SERVER_NAME:SERVER_PORT if SERVER_PORT <> {80|443}
-    $conf{http_host}    = $r->hostname() || ""; # Имя хоста (виртуального хоста, обращения)
-    if ($conf{server_port} != 80 and $conf{server_port} != 443 and $conf{server_name} eq $conf{http_host}) {
-        $conf{http_host} = join ':', $conf{server_name}, $conf{server_port};
+    $conf{request_uri}    = $r->uri() // "";
+    $conf{request_method} = $r->method() || "";
+    $conf{remote_addr}    = $c->remote_ip || "";
+    $conf{remote_user}    = $r->user() // "";
+    $conf{server_admin}   = $s->server_admin() || "";
+    $conf{server_name}    = $s->server_hostname() // "";
+    $conf{server_port}    = $s->port() || $r->subprocess_env('SERVER_PORT') || 80;
+    $conf{http_host}      = $r->hostname() // "";
+    $conf{https}          = exists($ENV{HTTPS}) && $ENV{HTTPS} ? 1 : 0;
+    unless ($conf{https}) {
+        my $req_scheme = $r->subprocess_env('REQUEST_SCHEME') || "http";
+        $conf{https} = $req_scheme =~ /ps/ ? 1 : 0;
     }
+    $conf{document_root}  = $r->document_root // '';
+    $conf{modperl_root}   = $r->dir_config('ModperlRoot') // $conf{document_root};
 
-    # АБСОЛЮТНЫЙ путь от корня сервера до корня сайта. Базовый путь для ресурса
-    $conf{document_root} =  $r->document_root || '';
-    # АБСОЛЮТНЫЙ путь от корня сервера до корня modperl. Базовый путь для modperl (от него отталкиваемся !!)
-    $conf{modperl_root} = $r->dir_config('ModperlRoot') || $conf{document_root};
-
-    # Список заблокированных ключей
+    # List of LOCKED keys
     my @locked_keys = keys %conf;
-    
-    # Не производим действий в случае если инициализация вызывается не первый раз!
-    # То что получилось закидываем в глобавльный объект
+
+    # Nothing to do if iterator > 0
     if ($i > 0) {
         my %tconf = %{$m->get('conf')};
         foreach (keys %conf) { $tconf{$_} = $conf{$_} }
@@ -191,132 +385,74 @@ sub conf_init {
     }
 
     ##########################################################################
-    # !!! Параметры, устанавливаемые только 1 раз на жизнь всех процессов !!!
+    ## Instance-context variables
     ##########################################################################
-    my $modperl_root = $conf{modperl_root}; # Этот путь для всех умолчаний !!
-    
-    # Формируем имя конфигурационного файла. Например, foo.conf 
-    $conf{fileconf} = $r->dir_config('FileConf') || catfile($modperl_root,$conf{prefix}.".conf");
+    my $modperl_root = $conf{modperl_root};
+
+    # Name of configuration file, e.g., foo.conf
+    $conf{fileconf} = $r->dir_config('Config') || $r->dir_config('FileConf') || File::Spec->catfile($modperl_root, $conf{prefix}.".conf");
     $conf{configloadstatus} = 0; # See _loadconfig
-    
-    #
-    # Относительные пути к директориям (относительно document_root)
-    #
-    $conf{dir_conf}  = "conf";  # Директория к файлам конфигурации
-    $conf{dir_logs}  = "log";   # Директория к логам относительно document_root
-    $conf{dir_cache} = "cache"; # Директория к файлам кэша
-    $conf{dir_db}    = "db";    # Директория к файловым данным
-    $conf{dir_shtml} = "shtml"; # Директория к файлам шаблонов и файлов ssi
-    
-    #
-    # Абсолютные пути к директориям относительно корня сервера (НЕ РЕДАКТИРУЕМЫЕ)
-    #
+
+    # Absolute paths
     my $logdir = syslogdir();
     unless (-e $logdir) {
-        $logdir = catdir($modperl_root, $conf{dir_logs});
+        $logdir = File::Spec->catdir($modperl_root, LOG_DIR);
         preparedir($logdir) unless -e $logdir;
     }
     $conf{logdir} = $logdir;
-    $conf{confdir} = $r->dir_config('ConfDir') || catdir($modperl_root,$conf{dir_conf});
+    $conf{confdir} = $r->dir_config('ConfDir') || File::Spec->catdir($modperl_root, CONF_DIR);
 
-    #
-    # Имена фалов (НЕ РЕДАКТИРУЕМЫЕ)
-    #
+    # NON EDITABLE file names
 
-    # Префиксные имена файлов
-    my $fprefix = ($conf{prefix} ? ('mpminus-'.$conf{prefix}.'_') : 'mpminus-'); # Префикс имён
-    $conf{file_error}   = $fprefix."error.log";   # Имя файла ошибок (log)
-    $conf{file_debug}   = $fprefix."debug.log";   # Имя файла отладки (log)
-    $conf{file_connect} = $fprefix."connect.log"; # Имя файла соединений с БД (log)
-    $conf{file_mail}    = $fprefix."mail.log";    # Имя файла писем (log)
-    $conf{file_mpminfo} = "mpminfo.shtml";        # Имя файла шаблона mpminfo (shtml)
-    
-    # Абсолютные пути (НЕ РЕДАКТИРУЕМЫЕ)
-    $conf{errorlog} = catfile($logdir,$conf{file_error});
-    $conf{debuglog} = catfile($logdir,$conf{file_debug});
+    # URLs
+    my $url_mask = "%s://%s";
+    my $scheme = ($conf{https} || $conf{server_port} == 443) ? "https" : "http";
+    my ($p_host, $p_port) = ($conf{server_name}, $conf{server_port});
+    if ($conf{http_host} =~ /^(.+?)\:(\d+)$/) { ($p_host, $p_port) = ($1, $2) }
+    elsif ($conf{http_host} =~ /^(.+?)$/) { $p_host = $1 }
+    if ($p_port != 80 and $p_port != 443) { # port = ***
+        $conf{url} = sprintf($url_mask, $scheme, join(':', $p_host, $p_port));
+    } else { # port is std
+        $conf{url} = sprintf($url_mask, $scheme, $p_host);
+    }
 
-    # Базовые URL
-    my $urlsfx = '';
-    my $urlpfx = 'http://';
-    $urlsfx = ':'.$conf{server_port} if (1 
-        and $conf{server_port} != 80
-        and $conf{server_port} != 443
-        and $conf{http_host}
-        and $conf{http_host} !~ /\:\d+$/
-       );
-    $urlpfx = 'https://' if $conf{server_port} == 443;
-    $conf{url}        = $urlpfx.$conf{http_host}.$urlsfx;
-    $conf{urls}       = "https://".$conf{http_host}.$urlsfx;
-    $conf{url_shtml}  = $conf{url}.'/'.$conf{dir_shtml};
-    $conf{urls_shtml} = $conf{urls}.'/'.$conf{dir_shtml};
+    # Flags (directives with _ as prefix and suffix)
+    $conf{"debug"} = $r->dir_config('Debug') // 0;
+    $conf{"debug"} = ($conf{"debug"} && $conf{"debug"} =~ /^(1|on|y|t|enable)/i) ? 1 : 0;
+    push @locked_keys, qw/debug/; # Block!
 
-    #
-    # Флаги (директивы с преффиксом и суффиксом _ )
-    #
-    $conf{_debug_}         = $r->dir_config('_debug_') || 0; # Флаг отладки
-    $conf{_errorsendmail_} = $r->dir_config('_errorsendmail_') || 0; # Флаг отправки сообщения по почте при ошибках
-    $conf{_sendmail_}      = $r->dir_config('_sendmail_') || 0; # Флаг отправки сообщения (для всех)
-    $conf{_syslog_}        = $r->dir_config('_syslog_') || 0; # Флаг использования Apache для отработки функций log и debug
-    push @locked_keys, qw/_debug_ _errorsendmail_ _sendmail_/; # блокируем!
-
-    push @locked_keys, grep {/dir|file|log|url/} keys(%conf); # блокируем!
+    push @locked_keys, grep {/dir|file|log|url/} keys(%conf); # Block!
     push @locked_keys, qw/configloadstatus locked_keys/;
     $conf{locked_keys} = [sort(@locked_keys)];
-    
-    #
-    # SMTP (почта)
-    #
-    $conf{smtp_host} = $r->dir_config('smtp_host') || '';
-    $conf{smtp_user} = $r->dir_config('smtp_user') || '';
-    $conf{smtp_password} = $r->dir_config('smtp_password') || '';
 
-    #
-    # База данных (любая)
-    #
-    for (qw/
-            db_driver db_dsn db_host db_name db_port db_user db_password 
-            db_timeout_connect db_timeout_request
-           /
-        ) {
-            $conf{$_} = defined $r->dir_config($_) ? $r->dir_config($_) : '';
-    }
-    
-    #
-    # База данных MySQL
-    #
-    for (qw/ db_mysql_host db_mysql_name db_mysql_user db_mysql_password /) {
-        $conf{$_} = defined $r->dir_config($_) ? $r->dir_config($_) : '';
-    }
-
-    #
-    # База данных Oracle
-    #
-    for (qw/ db_oracle_host db_oracle_name db_oracle_user db_oracle_password /) {
-        $conf{$_} = defined $r->dir_config($_) ? $r->dir_config($_) : '';
-    }
-
-    #
-    # стандарты вывода и прочие параметры
-    #
-    $conf{content_type} = $r->dir_config('content_type') || ''; # Дефолтный Content-type
-
-    # То что получилось закидываем в глобавльный объект, предварительно дозагрузив данные из внешеней конфигурации
-    _loadconfig(\%conf, @locked_keys); # Чтение файла конфигурации
+    # Loading from file and merge with config-data
+    _loadconfig(\%conf, @locked_keys);
     $m->set(conf=>{%conf});
+
     return 1;
 }
 sub conf {
-    # Прочитать указанный параметр конфигурации
     my $self = shift;
     my $key  = shift;
     return undef unless $self->{conf};
+    return $self->{conf} unless defined $key;
+    return $self->{conf}->{$key};
+}
+sub val {
+    my $self = shift;
+    my $key  = shift;
+    if (ref($self) eq 'MPMinus') {
+        carp("This method for calls via MPMinus::Configuration object only");
+        return undef;
+    }
+    return undef unless $self->{conf};
+    return undef unless defined $key;
     return $self->{conf}->{$key};
 }
 sub get_conf { goto &conf };
 sub config { goto &conf };
 sub get_config { goto &conf };
 sub set_conf {
-    # Установить указанный параметр конфигурации
     my $self = shift;
     my $key  = shift;
     my $val  = shift;
@@ -324,17 +460,22 @@ sub set_conf {
     $self->{conf}->{$key} = $val;
 }
 sub set_config { goto &set_conf };
+sub config_error {
+    my $self = shift;
+    return $self->{error} // "";
+}
+
 sub _loadconfig {
     my $lconf = shift;
-    my @lkeys = @_;
     return 0 unless $lconf && ref($lconf) eq 'HASH';
     return 0 unless $lconf->{fileconf} && -e $lconf->{fileconf};
-    
-    # Пытаемся прочитать конфигурационные данные
+    my %lkeys = ();
+    for (@_) { $lkeys{$_} = 1 }
+
     my $cfg;
     try {
-        $cfg = new Config::General( 
-            -ConfigFile         => $lconf->{fileconf}, 
+        $cfg = new Config::General(
+            -ConfigFile         => $lconf->{fileconf},
             -ConfigPath         => [$lconf->{modperl_root}, $lconf->{confdir}],
             -ApacheCompatible   => 1,
             -LowerCaseNames     => 1,
@@ -343,21 +484,16 @@ sub _loadconfig {
     } catch {
         carp($_);
     };
-    
+
     my %newconfig = $cfg->getall if $cfg && $cfg->can('getall');
     $lconf->{configfiles} = [];
     $lconf->{configfiles} = [$cfg->files] if $cfg && $cfg->can('files');
-    
-    # Записываем только разрешенные ключики
-    foreach my $k (keys(%newconfig)) {
-        $lconf->{$k} = $newconfig{$k} if 1 == 1
-            && $k
-            && !(grep {$_ eq $k} @lkeys) 
-    }
-    
+
+    # Set only unlocked keys
+    foreach my $k (keys(%newconfig)) { $lconf->{$k} = $newconfig{$k} if $k && !$lkeys{$k} }
+
     $lconf->{configloadstatus} = 1 if %newconfig;
     return 1;
 }
 
 1;
-

@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::MojoAsync;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -62,18 +62,18 @@ sub delete_p {
 }
 
 sub get_p {
-    my ( $self, $coll, $id ) = @_;
-    my $id_field = $self->id_field( $coll );
-    my $schema = $self->collections->{ $coll };
-    my $real_coll = ( $schema->{'x-view'} || {} )->{collection} // $coll;
+    my ( $self, $schema_name, $id ) = @_;
+    my $id_field = $self->id_field( $schema_name );
+    my $schema = $self->schema->{ $schema_name };
+    my $real_schema_name = ( $schema->{'x-view'} || {} )->{schema} // $schema_name;
     my $props = $schema->{properties}
-        || $self->collections->{ $real_coll }{properties};
+        || $self->schema->{ $real_schema_name }{properties};
     my $db = $self->mojodb->db;
     return $db->select_p(
-        $real_coll,
+        $real_schema_name,
         [ keys %$props ],
         { $id_field => $id },
-    )->then( sub { $self->normalize( $coll, shift->hash ) } );
+    )->then( sub { $self->normalize( $schema_name, shift->hash ) } );
 }
 
 sub list_p {
@@ -113,7 +113,7 @@ Yancy::Backend::Role::MojoAsync - A role to give a relational backend relational
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

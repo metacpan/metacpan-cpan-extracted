@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::IPUserMap;
-$Device::Firewall::PaloAlto::Op::IPUserMap::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Op::IPUserMap::VERSION = '0.1.6';
 use strict;
 use warnings;
 use 5.010;
@@ -40,7 +40,7 @@ Device::Firewall::PaloAlto::Op::IPUserMap - Palo Alto IP to user mapping entry.
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 

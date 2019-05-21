@@ -1,159 +1,309 @@
-package CTK::Crypt; # $Id: Crypt.pm 193 2017-04-29 07:30:55Z minus $
-use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::Crypt; # $Id: Crypt.pm 250 2019-05-09 12:09:57Z minus $
+use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
-CTK::Crypt - Cryptography
+CTK::Crypt - Cryptography frontend module
 
 =head1 VERSION
 
-Version 1.71
+Version 1.72
 
 =head1 SYNOPSIS
 
-    $c->gpg_decript(
-            -in      => CTK::catfile($DATADIR,'in','test.txt.asc'), # Source encripted-file
-            -out     => CTK::catfile($DATADIR,'out','test.txt'),    # Destination decripted-file
-            -gpghome => '', # RESERVED
-            -certdir => '', # Certificate directory. Default: ./data/cert
-            -pubkey  => '', # Public key file. Default: ./data/cert/public.key
-            -privkey => '', # Private key file. Default: ./data/cert/private.key
-            -pass    => '', # Passphrase
-        );
+    use CTK::Util qw/gpg_init gpg_encrypt gpg_decrypt/;
+
+    my $gpg_instance = gpg_init(
+        -gpgbin     => "/usr/bin/gpg",
+        -gpghome    => "/gpg/homedir",
+        -gpgconf    => "/gpg/homedir/gpg.conf",
+        -gpgopts    => ["verbose", "yes"],
+        -publickey  => "/path/to/public.key",
+        -privatekey => "/path/to/private.key",
+        -password   => "passphrase", # Key password
+        -recipient  => "anonymous@example.com", # Email, user id, keyid, or keygrip
+    ) or die("Can't create crypter");
+
+    gpg_encrypt(
+        -infile => "MyDocument.txt",
+        -outfile=> "MyDocument.txt.asc",
+        -armor  => "yes",
+    ) or die( $CTK::Crypt::ERROR );
+
+    gpg_decrypt(
+        -infile => "MyDocument.txt.asc",
+        -outfile=> "MyDocument.txt",
+    ) or die( $CTK::Crypt::ERROR );
+
+    tcd_encrypt( "file.txt", "file.tcd" )
+        or die( $CTK::Crypt::ERROR );
+
+    tcd_decrypt( "file.tcd", "file.txt" )
+        or die( $CTK::Crypt::ERROR );
 
 =head1 DESCRIPTION
 
-See L<http://www.gnupg.org> (GPG4Win - L<http://gpg4win.org>) for details
+Cryptography frontend module
 
-=head2 gpg_decript
+=over 8
 
-    $c->gpg_decript(
-            -in      => CTK::catfile($DATADIR,'in','test.txt.asc'), # Source encripted-file
-            -out     => CTK::catfile($DATADIR,'out','test.txt'),    # Destination decripted-file
-            -gpghome => '', # RESERVED
-            -certdir => '', # Certificate directory. Default: ./data/cert
-            -pubkey  => '', # Public key file. Default: ./data/cert/public.key
-            -privkey => '', # Private key file. Default: ./data/cert/private.key
-            -pass    => '', # Passphrase
-        );
+=item B<gpg_init>
 
-PGP Decrypting the files group
+    my $gpg_instance = gpg_init(
+        -gpgbin     => "/usr/bin/gpg",
+        -gpghome    => "/gpg/homedir",
+        -gpgconf    => "/gpg/homedir/gpg.conf",
+        -gpgopts    => ["verbose", "yes"],
+        -publickey  => "/path/to/public.key",
+        -privatekey => "/path/to/private.key",
+        -password   => "passphrase", # Key password
+        -recipient  => "anonymous@example.com", # Email, user id, keyid, or keygrip
+    ) or die("Can't create crypter");
+
+Initialize GPG instance
+
+See L<CTK::Crypt::GPG>
+
+=item B<gpg_decrypt>
+
+    $gpg_instance->decrypt(
+        -infile => "MyDocument.txt.asc",
+        -outfile=> "MyDocument.txt",
+    ) or die( $CTK::Crypt::ERROR );
+
+GPG (PGP) Decrypting the files
+
+See L<CTK::Crypt::GPG>
+
+=item B<gpg_encrypt>
+
+    $gpg_instance->encrypt(
+        -infile => "MyDocument.txt",
+        -outfile=> "MyDocument.txt.asc",
+        -armor  => "yes",
+    ) or die( $CTK::Crypt::ERROR );
+
+GPG (PGP) Encrypting the files
+
+See L<CTK::Crypt::GPG>
+
+=item B<tcd_decrypt>
+
+    tcd_decrypt( "file.tcd", "file.txt" )
+        or die( $CTK::Crypt::ERROR );
+
+TCD04 Decrypting files
+
+=item B<tcd_encrypt>
+
+    tcd_encrypt( "file.txt", "file.tcd" )
+        or die( $CTK::Crypt::ERROR );
+
+TCD04 Encrypting files
+
+=back
+
+=head1 TAGS
+
+=over 8
+
+=item B<:all>
+
+Will be exported all functions
+
+=item B<:tcd04>
+
+Will be exported following functions:
+
+    tcd_encrypt, tcd_decrypt
+
+=item B<:gpg>
+
+Will be exported following functions:
+
+    gpg_init, gpg_encrypt, gpg_decrypt
+
+=back
+
+=head1 HISTORY
+
+See C<Changes> file
+
+=head1 DEPENDENCIES
+
+L<CTK::Crypt::GPG>, L<CTK::Crypt::TCD04>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+L<CTK::Crypt::GPG>, L<CTK::Crypt::TCD04>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use constant {
-    # GPG (GNUPG)
-    GPGBIN    => 'gpg',
-    GPGHOME   => 'gpg',
-    CERTDIR   => 'cert',
-    PUBRING   => 'public.key',
-    SECRING   => 'private.key',
-};
+use vars qw/$VERSION @EXPORT_OK %EXPORT_TAGS $ERROR/;
+$VERSION = '1.72';
 
-use vars qw/$VERSION/;
-$VERSION = '1.71';
+use base qw/Exporter/;
 
-use CTK::Util qw(:API :FORMAT :UTIL);
+use IO::File;
+use CTK::Crypt::GPG;
+use CTK::Crypt::TCD04;
 
-sub gpg_decript {
-    # Дешифровка файла с помощью команды gpg
-    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
+use constant BUFFER_SIZE => 32 * 1024; # 32kB
 
-    my @args = @_;
-    my ($ifile, $ofile, $gpghome, $certdir, $pubkey, $seckey, $pass);
-       ($ifile, $ofile, $gpghome, $certdir, $pubkey, $seckey, $pass) =
-            read_attributes([
-                ['IN','FILEIN','INPUT','FILESRC','SRC','INFILE'],
-                ['OUT','FILEOUT','OUTPUT','FILEDST','DST','OUTFILE'],
-                ['GPGHOME','GPGDIR','DIRGPG','HOMEGPG','GPG'],
-                ['CERTDIR','DIRCERT','CERT','CERTS','CRT'],
-                ['PUBLIC','PUBLICKEY','PUP','PUBKEY','PUBRING'],
-                ['PRIVATE','PRIV','PRIVATEKEY','SEC','SECKEY','SECRET','SECRETKEY','PRIVKEY','PRIVRING','SECRING'],
-                ['PASS','PASSWORD','PASSPHRASE'],
-            ],@args) if defined $args[0];
+@EXPORT_OK = (qw/
+        gpg_init gpg_encrypt gpg_decrypt
+        tcd_encrypt tcd_decrypt
+    /);
 
-    return 0 unless $ifile;
-    return 0 unless $ofile;
-    $gpghome ||= catfile($CTK::DATADIR,GPGHOME);
-    $certdir ||= catfile($CTK::DATADIR,CERTDIR);
-    $pubkey  ||= catfile($certdir,PUBRING);
-    $seckey  ||= catfile($certdir,SECRING);
-    $pass      = '' unless defined $pass;
+%EXPORT_TAGS = (
+        tcd04 => [qw/tcd_encrypt tcd_decrypt/],
+        gpg   => [qw/gpg_init gpg_encrypt gpg_decrypt/],
+        all   => [@EXPORT_OK],
+    );
 
-    preparedir($gpghome) unless -e $gpghome;
-    preparedir($certdir) unless -e $certdir;
+my $GPG_INSTANCE;
 
-    my @cmd = (GPGBIN);
-    push @cmd, "--lock-multiple";
-    push @cmd, "--compress-algo", 1;
-    push @cmd, "--cipher-algo", "cast5";
-    push @cmd, "--force-v3-sigs";
-    push @cmd, "--yes";
-
-    unless (CTK::WIN) {
-        push @cmd, "--options", CTK::NULL;
-        push @cmd, "--homedir", $certdir;
-        push @cmd, "--keyring", $pubkey;
-        push @cmd, "--secret-keyring",$seckey;
-        push @cmd, "--passphrase", $pass if defined $pass;
-    }
-
-    push @cmd, "-t";
-    push @cmd, "-o", $ofile;
-    push @cmd, $ifile;
-    push @cmd, CTK::ERR2OUT;
-
-    my $rprresult = procexec(\@cmd);
-
-    if (-e $ofile) {
-        #CTK::debug("OK: File GnuPG decription to \"$ofile\"");
-        return 1;
-    } else {
-        #CTK::debug("FAILED: File GnuPG decription to \"$ofile\"\n");
-        #CTK::debug($rprresult);
-        carp("FAILED: File GnuPG decription to \"$ofile\"\n$rprresult"); #unless CTK::debugmode();
+sub gpg_init {
+    return $GPG_INSTANCE = CTK::Crypt::GPG->new(@_);
+}
+sub gpg_encrypt {
+    $ERROR = "";
+    my $st = $GPG_INSTANCE->encrypt(@_);
+    $ERROR = $GPG_INSTANCE->error unless $st;
+    return $st;
+}
+sub gpg_decrypt {
+    $ERROR = "";
+    my $st = $GPG_INSTANCE->decrypt(@_);
+    $ERROR = $GPG_INSTANCE->error unless $st;
+    return $st;
+}
+sub tcd_encrypt {
+    my $filein = shift;
+    my $fileout = shift;
+    unless (defined($filein) && length($filein) && -e $filein) {
+        $ERROR = sprintf("File not found \"%s\"", $filein // "");
         return 0;
     }
+    unless (defined($fileout) && length($fileout)) {
+        $ERROR = "Incorrect target file";
+        return 0;
+    }
+    $ERROR = "";
+
+    my $infh = IO::File->new($filein, "r") or do {
+        $ERROR = sprintf("Can't open file \"%s\": %s", $filein, $!);
+        return 0;
+    };
+    $infh->binmode() or do {
+        $ERROR = sprintf("Can't switch to binmode file \"%s\": %s", $filein, $!);
+        return 0;
+    };
+    my $outfh = IO::File->new($fileout, "w") or do {
+        $ERROR = sprintf("Can't open file \"%s\": %s", $fileout, $!);
+        return 0;
+    };
+    $outfh->binmode() or do {
+        $ERROR = sprintf("Can't switch to binmode file \"%s\": %s", $fileout, $!);
+        return 0;
+    };
+
+    my $tcd = new CTK::Crypt::TCD04;
+    my $buf;
+    while ( $infh->read ( $buf, BUFFER_SIZE/2 ) ) {
+        $outfh->write($tcd->encrypt($buf), BUFFER_SIZE) or do {
+            $ERROR = sprintf("Can't write file \"%s\": %s", $fileout, $!);
+            return 0;
+        };
+    }
+
+    $outfh->close or do {
+        $ERROR = sprintf("Can't close file \"%s\": %s", $fileout, $!);
+        return 0;
+    };
+    $infh->close or do {
+        $ERROR = sprintf("Can't close file \"%s\": %s", $filein, $!);
+        return 0;
+    };
+    return 1;
+}
+sub tcd_decrypt {
+    my $filein = shift;
+    my $fileout = shift;
+    unless (defined($filein) && length($filein) && -e $filein) {
+        $ERROR = sprintf("File not found \"%s\"", $filein // "");
+        return 0;
+    }
+    unless (defined($fileout) && length($fileout)) {
+        $ERROR = "Incorrect target file";
+        return 0;
+    }
+    $ERROR = "";
+
+    my $infh = IO::File->new($filein, "r") or do {
+        $ERROR = sprintf("Can't open file \"%s\": %s", $filein, $!);
+        return 0;
+    };
+    $infh->binmode() or do {
+        $ERROR = sprintf("Can't switch to binmode file \"%s\": %s", $filein, $!);
+        return 0;
+    };
+    my $outfh = IO::File->new($fileout, "w") or do {
+        $ERROR = sprintf("Can't open file \"%s\": %s", $fileout, $!);
+        return 0;
+    };
+    $outfh->binmode() or do {
+        $ERROR = sprintf("Can't switch to binmode file \"%s\": %s", $fileout, $!);
+        return 0;
+    };
+
+    my $tcd = new CTK::Crypt::TCD04;
+    my $buf;
+    while ( $infh->read ( $buf, BUFFER_SIZE ) ) {
+        $outfh->write($tcd->decrypt($buf), BUFFER_SIZE/2) or do {
+            $ERROR = sprintf("Can't write file \"%s\": %s", $fileout, $!);
+            return 0;
+        };
+    }
+
+    $outfh->close or do {
+        $ERROR = sprintf("Can't close file \"%s\": %s", $fileout, $!);
+        return 0;
+    };
+    $infh->close or do {
+        $ERROR = sprintf("Can't close file \"%s\": %s", $filein, $!);
+        return 0;
+    };
+    return 1;
 }
 
 1;
+
 __END__
-
-Домашний каталог: /home/gpg
-
-1. Проверяем, а не имеем ли мы уже установленный сертификат для расшифровки?
-
- gpg --options /dev/null --no-secmem-warning --homedir /home/gpg
-     --keyring /home/gpg/pubring.gpg --secret-keyring /home/gpg/secring.gpg -k
-
-2. Если НЕ имеем, то импортируем его:
-
- gpg --options /dev/null --no-secmem-warning --homedir /home/gpg
-     --keyring /home/gpg/pubring.gpg --secret-keyring /home/gpg/secring.gpg --import /home/gpg/cyberplat.asc
-
-3. Далее смотрим опять. Появился?
-
- gpg --options /dev/null --no-secmem-warning --homedir /home/gpg
-     --keyring /home/gpg/pubring.gpg --secret-keyring /home/gpg/secring.gpg -k
-
-4. Снимаем пароль!
-
- gpg --options /dev/null --no-secmem-warning --homedir /home/gpg
-     --keyring /home/gpg/pubring.gpg --secret-keyring /home/gpg/secring.gpg --edit-key cyberplat
 

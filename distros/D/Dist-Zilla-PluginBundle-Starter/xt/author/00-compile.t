@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3;
+plan tests => 4;
 
 my @module_files = (
     'Dist/Zilla/MintingProfile/Starter.pm',
-    'Dist/Zilla/PluginBundle/Starter.pm'
+    'Dist/Zilla/PluginBundle/Starter.pm',
+    'Dist/Zilla/Starter.pm'
 );
 
 

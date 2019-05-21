@@ -1,5 +1,5 @@
 use Test2::Require::Module 'Test2::Tools::JSON::Pointer';
-use Test2::V0 -no_srand => 1;
+use Test2::V0 0.000121 -no_srand => 1;
 use Test2::Tools::HTTP;
 use Test2::Tools::JSON::Pointer;
 use Test2::Require::Internet -tcp => [ $ENV{TEST2_TOOLS_HTTP_HTTPBIN_HOST} || 'httpbin.org', $ENV{TEST2_TOOLS_HTTP_HTTPBIN_PORT} || 80 ];
@@ -249,10 +249,8 @@ subtest 'gzip' => sub {
       );
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
-      etc;
+      event 'Fail';
+      end;
     },
   );
 
@@ -266,10 +264,8 @@ subtest 'gzip' => sub {
       );
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
-      etc;
+      event 'Fail';
+      end;
     },
   );
 

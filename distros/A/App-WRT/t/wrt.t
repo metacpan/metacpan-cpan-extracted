@@ -111,3 +111,5 @@ chdir 'example';
     $plaintext_year_index =~ m/\QI'm an index file for an entire year.\E/,
     "2013's plaintext year index comes through."
   );
+
+# displaying years 

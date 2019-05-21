@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 5;
+use Test::More;
 
 use CPS qw( kseq );
 
@@ -35,3 +36,5 @@ is( $result, "AB", 'kseq async still unfinished after 1 poke' );
 (shift @pokes)->();
 
 is( $result, "ABC", 'kseq async now finished after 2 pokes' );
+
+done_testing;

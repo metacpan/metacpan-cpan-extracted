@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 
 use CPS qw( kloop );
 
@@ -68,3 +69,5 @@ kloop(
 );
 
 is_deeply( \@result, [], 'kloop clears @_ in $klast' );
+
+done_testing;

@@ -1,3 +1,7 @@
+0.004     2019-05-20 16:16:20 EDT
+  - Use clean_install for Alien::Build::MM to clean up any dynamic libraries lingering from previous versions.
+    You may need to reinstall XS modules build against Alien::cmark if you had version 0.002 or older installed previously.
+
 0.003     2019-04-12 18:32:31 EDT
   - Isolate dynamic libraries in a share install so XS code is built statically
 

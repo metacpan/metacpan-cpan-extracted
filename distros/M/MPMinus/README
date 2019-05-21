@@ -1,250 +1,877 @@
-$Id: README 224 2017-04-04 10:27:41Z minus $
-
+$Id: README 284 2019-05-18 08:18:32Z minus $
 .___  ___. .______   .___  ___.  __  .__   __.  __   __    ____.
 |   \/   | |   _  \  |   \/   | |  | |  \ |  | |  | |  |  /    |
 |  \  /  | |  |_)  | |  \  /  | |  | |   \|  | |  | |  | |   (-`
-|  |\/|  | |   ___/  |  |\/|  | |  | |  . `  | |  | |  |  \   \    
-|  |  |  | |  |      |  |  |  | |  | |  |\   | |  `-'  | .-)   |   
-|__|  |__| | _|      |__|  |__| |__| |__| \__|  \_____/  |____/    
+|  |\/|  | |   ___/  |  |\/|  | |  | |  . `  | |  | |  |  \   \
+|  |  |  | |  |      |  |  |  | |  | |  |\   | |  `-'  | .-)   |
+|__|  |__| | _|      |__|  |__| |__| |__| \__|  \_____/  |____/
 
 NAME
 
+    MPMinus::Manual - What is MPMinus, and how do I use it
+
+TERMS
+
+    Apache
+
+      Apache web server version 2+. This web server is the only server
+      supporting MPMinus. MPMinus developed on the basis of the mod_perl2
+      model, as an Apache module.
+
+    m
+
+      It is general MPMinus object that provides most methods for access to
+      MPMinus functionality
+
+    mod_perl
+
+      mod_perl brings together the full power of the Perl programming
+      language and the Apache HTTP server. You can use Perl to manage
+      Apache, respond to requests for web pages and much more.
+
+      See http://perl.apache.org/
+
+    MPM
+
+      Acronym (ModPerl2 Minus), base namespace of all installed MPMinus
+      projects.
+
+DESCRIPTION
+
     MPMinus - mod_perl2 Web Application Framework
 
-VERSION
+    This framework will help You create mod_perl2 sites and REST API
+    services
 
-    Version 1.20
+ HOW TO START?
+
+    INSTALL
+
+          cpan install MPMinus
+
+      or
+
+          cpanm MPMinus
+
+    CREATING A NEW PROJECT
+
+          mpminus create Foo -d foo.localhost
+
+      Creates Foo project in ./foo.localhost
+
+      For about switches:
+
+          mpminus -H
+
+    INSTALL PROJECT
+
+          cd ./foo.localhost
+          perl Makefile.PL
+          make
+          make test
+          make install
+          make clean
+
+      Copy configuration file from ./src directory to Apache directory and
+      restart it!
+
+      You can distributin your new created project using dist command:
+
+          make dist
+
+      Done! Your tar.gz file is already here!
+
+          MPM-Foo-1.00.tar.gz
+
+    TESTING
+
+          lynx foo.localhost
+
+      Profit!
+
+CONFIGURATION
+
+    Configuration parameters are initialized in the MPM::MyApp::Handlers
+    package, that cals via Apache web server config file.
+
+        sub handler {
+            my $r = shift;
+            my $m = MPMinus->m;
+            $m->conf_init($r, __PACKAGE__);
     
-FILE STRUCTURE OF YOUR PROJECTS
+            ...
+    
+            my $project = $m->conf('project');
+    
+            ...
+        }
 
-/                                                [ DocumentRoot /  ModperlRoot ]
-+- cache                                             [ Cache dir for TemplateM ]
-+- conf                                        [ Extended setting files *.conf ]
-+- css                                                             [ CSS-files ]
-+- data                                               [ Any static shared data ]
-+- db                     [ Local private storages: sessions, coockies and etc ]
-+- files             [ Shared static files by MIME: swf, flv, avi, mp3 and etc ]
-+- img                                                         [ Static images ]
-+- inc                                                              [ Inclides ]
-+- js                                                       [ JavaScript files ]
-+- lib                                            [ Libraries for installation ]
-|  +- MPM                                                      [ MPM namespace ]
-|     +- Project                             [ Uniq unix-style name of project ]
-|     |  +- Handlers.pm                                             [ Handlers ]
-|     |  +- Index.pm                                              [ Index file ]
-|     |  +- Root.pm                                              [ Root record ]
-|     |  +- Info.pm                                     [ Info (Kernel) record ]
-|     |  +- Foo.pm                                               [ Foo handler ]
-|     |  +- Bar.pm                                              [ Bar handlers ]
-|     |  +- Baz.pm                                              [ Baz handlers ]
-|     +- Project.pm            [ Uniq unix-style name of project  - descriptor ]
-+- log                                                                  [ Logs ]
-+- shtml                                                           [ Templates ]
-|  +- error                                                      [ Error pages ]
-|  |  +- ssi                                       [ SSI files for error pages ]
-|  +- default.shtml                   [ Default template (for root record: / ) ]
-|  +- mpminfo.shtml          [ Info (Kernel) template (for record: /Info.mpm ) ]
-|  +- foo.shtml                                             [ Template for foo ]
-|  +- bar.xml                                               [ Template for bar ]
-|  +- baz.html                                              [ Template for baz ]
-|  +- ssi                                                  [ General SSI files ]
-+- src                                  [ Sources, examples, templates and etc ]
-+- t                                                                   [ Tests ]
-+- Project.conf                                   [ Custom settings of Project ]
-+- CHANGES                                                      [ Your changes ]
-+- INSTALL                                         [ Installation instructions ]
-+- LICENSE                                                      [ License file ]
-+- MANIFEST                                                    [ List of files ]
-+- META.yml                                              [ META file for maker ]
-+- README                                                        [ README file ]
-+- TODO                                                            [ TODO-list ]
-+- Makefile.PL                                                         [ Maker ]
-+- favicon.ico                                            [ Favorite icon file ]
-+- robots.txt                                                   [ Robot's file ]
+    For accessing to configuration variables you can use getter methods
+    conf or get_conf also setter method - set_conf. See
+    MPMinus::Configuration
 
-COMMON CONSTANTS
+ APACHE PER-DIRECTORY VARIABLES
 
- -2  Apache2::Const::DONE
- -1  Apache2::Const::DECLINED
- 0   Apache2::Const::OK
- 302 Apache2::Const::REDIRECT
- 401 Apache2::Const::AUTH_REQUIRED
- 403 Apache2::Const::FORBIDDEN
- 404 Apache2::Const::NOT_FOUND
- 500 Apache2::Const::SERVER_ERROR
+    Apache per-directory variables is variables that specified by the
+    PerlSetVar and PerlAddVar directives in Apache config files, eg:
 
-HTTP 1.1 STATUS CODES ORDERED BY NAMES
+        PerlSetVar ModperlRoot /var/www/foo.localhost
 
- 202 Apache2::Const::HTTP_ACCEPTED 
- 502 Apache2::Const::HTTP_BAD_GATEWAY 
- 400 Apache2::Const::HTTP_BAD_REQUEST 
- 409 Apache2::Const::HTTP_CONFLICT 
- 100 Apache2::Const::HTTP_CONTINUE 
- 201 Apache2::Const::HTTP_CREATED 
- 417 Apache2::Const::HTTP_EXPECTATION_FAILED 
-     Apache2::Const::HTTP_FAILED_DEPENDENCY 
- 403 Apache2::Const::HTTP_FORBIDDEN 
- 504 Apache2::Const::HTTP_GATEWAY_TIME_OUT 
- 410 Apache2::Const::HTTP_GONE 
-     Apache2::Const::HTTP_INSUFFICIENT_STORAGE 
- 500 Apache2::Const::HTTP_INTERNAL_SERVER_ERROR 
- 411 Apache2::Const::HTTP_LENGTH_REQUIRED 
-     Apache2::Const::HTTP_LOCKED 
- 405 Apache2::Const::HTTP_METHOD_NOT_ALLOWED 
- 301 Apache2::Const::HTTP_MOVED_PERMANENTLY 
- 302 Apache2::Const::HTTP_MOVED_TEMPORARILY 
- 300 Apache2::Const::HTTP_MULTIPLE_CHOICES 
-     Apache2::Const::HTTP_MULTI_STATUS 
- 203 Apache2::Const::HTTP_NON_AUTHORITATIVE 
- 406 Apache2::Const::HTTP_NOT_ACCEPTABLE 
-     Apache2::Const::HTTP_NOT_EXTENDED 
- 404 Apache2::Const::HTTP_NOT_FOUND 
- 501 Apache2::Const::HTTP_NOT_IMPLEMENTED 
- 304 Apache2::Const::HTTP_NOT_MODIFIED 
- 204 Apache2::Const::HTTP_NO_CONTENT 
- 200 Apache2::Const::HTTP_OK 
- 206 Apache2::Const::HTTP_PARTIAL_CONTENT 
- 402 Apache2::Const::HTTP_PAYMENT_REQUIRED 
- 412 Apache2::Const::HTTP_PRECONDITION_FAILED 
-     Apache2::Const::HTTP_PROCESSING 
- 407 Apache2::Const::HTTP_PROXY_AUTHENTICATION_REQUIRED 
- 416 Apache2::Const::HTTP_RANGE_NOT_SATISFIABLE 
- 413 Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE 
- 408 Apache2::Const::HTTP_REQUEST_TIME_OUT 
- 414 Apache2::Const::HTTP_REQUEST_URI_TOO_LARGE 
- 205 Apache2::Const::HTTP_RESET_CONTENT 
- 303 Apache2::Const::HTTP_SEE_OTHER 
- 503 Apache2::Const::HTTP_SERVICE_UNAVAILABLE 
- 101 Apache2::Const::HTTP_SWITCHING_PROTOCOLS 
- 307 Apache2::Const::HTTP_TEMPORARY_REDIRECT 
- 401 Apache2::Const::HTTP_UNAUTHORIZED 
-     Apache2::Const::HTTP_UNPROCESSABLE_ENTITY 
- 415 Apache2::Const::HTTP_UNSUPPORTED_MEDIA_TYPE 
-     Apache2::Const::HTTP_UPGRADE_REQUIRED 
- 305 Apache2::Const::HTTP_USE_PROXY 
-     Apache2::Const::HTTP_VARIANT_ALSO_VARIES
+    For more information about per-directory variables see
+    http://perl.apache.org/docs/2.0/api/Apache2/RequestUtil.html
 
-HTTP 1.1 STATUS CODES
+    For MPMinus projects allowed following directives:
 
-Informational 1xx:
- 100 HTTP_CONTINUE                        Continue
- 101 HTTP_SWITCHING_PROTOCOLS             Switching Protocols
+    confdir
 
-Successful 2xx:
- 200 HTTP_OK                              OK
- 201 HTTP_CREATED                         Created
- 202 HTTP_ACCEPTED                        Accepted
- 203 HTTP_NON_AUTHORITATIVE               Non-Authoritative Information
- 204 HTTP_NO_CONTENT                      No Content
- 205 HTTP_RESET_CONTENT                   Reset Content
- 206 HTTP_PARTIAL_CONTENT                 Partial Content
+          PerlSetVar confdir /var/www/foo.localhost
+      
+          my $confdir = $m->conf("confdir");
 
-Redirection 3xx:
- 300 HTTP_MULTIPLE_CHOICES                Multiple Choices
- 301 HTTP_MOVED_PERMANENTLY               Moved Permanently
- 302 HTTP_MOVED_TEMPORARILY               Found
- 303 HTTP_SEE_OTHER                       See Other
- 304 HTTP_NOT_MODIFIED                    Not Modified
- 305 HTTP_USE_PROXY                       Use Proxy
- 306                                      (Unused)
- 307 HTTP_TEMPORARY_REDIRECT              Temporary Redirect
+      This directive sets directory (path) for searching configuration
+      files of current project
 
-Client Error 4xx:
- 400 HTTP_BAD_REQUEST                     Bad Request
- 401 HTTP_UNAUTHORIZED                    Unauthorized
- 402 HTTP_PAYMENT_REQUIRED                Payment Required
- 403 HTTP_FORBIDDEN                       Forbidden
- 404 HTTP_NOT_FOUND                       Not Found
- 405 HTTP_METHOD_NOT_ALLOWED              Method Not Allowed
- 406 HTTP_NOT_ACCEPTABLE                  Not Acceptable
- 407 HTTP_PROXY_AUTHENTICATION_REQUIRED   Proxy Authentication Required
- 408 HTTP_REQUEST_TIMEOUT                 Request Timeout
- 409 HTTP_CONFLICT                        Conflict
- 410 HTTP_GONE                            Gone
- 411 HTTP_LENGTH REQUIRED                 Length Required
- 412 HTTP_PRECONDITION_FAILED             Precondition Failed
- 413 HTTP_REQUEST_ENTITY_TOO_LARGE        Request Entity Too Large
- 414 HTTP_REQUEST_URI_TOO_LARGE           Request-URI Too Long
- 415 HTTP_UNSUPPORTED_MEDIA_TYPE          Unsupported Media Type
- 416 HTTP_RANGE_NOT_SATISFIABLE           Requested Range Not Satisfiable
- 417 HTTP_EXPECTATION_FAILED              Expectation Failed
+      Default: <DOCUMENT_ROOT>/conf
 
-Server Error 5xx:
- 500 HTTP_INTERNAL_SERVER_ERROR           Internal Server Error
- 501 HTTP_NOT IMPLEMENTED                 Not Implemented
- 502 HTTP_BAD_GATEWAY                     Bad Gateway
- 503 HTTP_SERVICE_UNAVAILABLE             Service Unavailable
- 504 HTTP_GATEWAY_TIME_OUT                Gateway Timeout
- 505 HTTP_VERSION_NOT_SUPPORTED           HTTP Version Not Supported        
+    config, configfiles
 
-MVC SKEL TRANSACTION
+          PerlSetVar config /var/www/foo.localhost/foo.conf
+      
+          my $config_file = $m->conf("fileconf");
+          my $config_file = $m->conf("configfiles")->[0];
 
-                                  +-------+
-    04/26/13                      | Start |
-                                  +-------+
-                                      |
-                                ++---------++
-                                || caccess ||
-                                ++---------++
-                                     |
-                               status is true?
-                                     /\
-                      _____yes______/  \____no__ 
-                     |              \  /        |
-               status < 300?         \/         |
-                     /\                    ++-------++
-            ___yes__/  \____no___          || cdeny ||
-           |        \  /         |         ++-------++
-      event ~ go?    \/          |______________|
-           /\                             |
-     _no__/  \__yes__                     |
-    |     \  /       |                    |
-    |      \/   ++--------++              |
-    |           || ccheck ||              |
-    |           ++--------++              |
-    |                |                    |
-    |          status is true?            |
-    |                /\                   |
-    |         __no__/  \___yes_           |
-    |        |      \  /       |          |
-    |        |       \/   ++-------++     |
-    |        |            || mproc ||     |
-    |        |            ++-------++     |
-    |________|_________________|          |
-                               |          |
-                         status < 300?    |
-                               /\         |
-                       __yes__/  \____no__|
-                      |       \  /        |
-                 ++-------++   \/         |
-                 || vform ||              |
-                 ++-------++              |
-                      |                   |
-                      |___________________|
-                                     |
-                                 +--------+
-                                 | Finish |
-                                 +--------+
+      In configuration file specifies configuration file. In handlers the
+      getter method $m->conf("configfiles") returns array of loaded
+      configuration files; the method $m->conf("fileconf") returns main
+      loaded file
 
-SEE ALSO
+      Default: <DOCUMENT_ROOT>/lc(<PROJCET_NAME>).conf
 
-   perldoc MPMinus::Manual
+    debug
 
-     @            @@    
-     @@@  @    @  @@@@   
-    @@@@@@@    @@@@@@@@  
-   @@@@@@@@    @@@@@@@@  
-    @@@@@@      @@@@@@   
-     @@@@        @@@@    
-     @@@          @@@    
-  @@@@@ @@@@@@@@@@ @@@@@ 
- @@@@@@ @@@@@@@@@W @@@@@@
- @@@@@@ @@@@@@@@@@ @@@@@@
- @@@@@@ @@@@@@@@@@ @@@@@@
-  @@@@@ @@@@@@@@@@ @@@@@ 
-     @@@          @@@    
-     @@@@         @@@    
-    @@@@@        @@@@@   
-    @@@@@@@    @@@@@@@@  
-    @@@@@@@    @@@@@@@   
-     @@@  @    @@ @@@    
+          PerlSetVar debug on
+      
+          $m->log_eror("Oops!") if $m->conf("debug");
+
+      Debug flag. The argument can be: on/off; enable/disable; yes/no;
+      true/false and 1/0 The $m->conf("debug") returns boolean value: 1 --
+      on, 0 -- off
+
+      Default: off
+
+    modperlroot
+
+          PerlSetVar modperlroot /var/www/foo.localhost
+      
+          my $root = $m->conf("modperlroot");
+
+      Sets alternate of DOCUMENT_ROOT. Optional directive
+
+      Default eq <DOCUMENT_ROOT>
+
+ READ-ONLY MPMINUS PARAMETERS
+
+    Parameters that You can read only
+
+  GENERAL PARAMETERS
+
+    configloadstatus
+
+          print "Configuration has been loaded!" if $m->conf("configloadstatus");
+
+      Return boolean status of loading configuration files
+
+      Default: 0
+
+    hitime
+
+          print $m->conf("hitime"); # 1556209483.07221
+
+      Returns inited High-precision time value in seconds with 5-dig
+      precision
+
+    locked_keys
+
+          my $array = $m->conf("locked_keys");
+
+      Returns reference to list of locked directives (for read only)
+
+      Default:
+
+          [confdir, configloadstatus, debug, document_root, fileconf, hitime,
+          http_host, https, locked_keys,logdir, modperl_root, package,
+          prefix, project, remote_addr, remote_user, request_method,
+          request_uri, server_admin, server_name, server_port, sid, url]
+
+    logdir
+
+          my $dir = $m->conf("logdir");
+
+      Returns system log-directory
+
+      Default: /var/log
+
+    package
+
+          my $vals = $m->conf("package"); # [MPM::Foo::Handlers, 0]
+          my $package = $vals->[0];
+          my $count = $vals->[1];
+
+      Returns reference to list. First value is package of initializer;
+      second value is counter, number of request on child process
+
+  PROJECT PARAMETERS
+
+    Parameters describing the current project
+
+    document_root, modperl_root
+
+          my $vals = $m->conf("document_root"); # /var/www/foo.localhost
+
+      Returns DOCUMENT_ROOT directory
+
+    prefix
+
+          my $prefix = $m->conf("prefix"); # foo
+
+      Returns the project name in lowercase
+
+    project
+
+          my $name = $m->conf("project"); # Foo
+
+      Returns the project name
+
+    server_admin
+
+          my $server_admin = $m->conf("server_admin"); # root@localhost
+
+      Returns SERVER_ADMIN
+
+    server_name
+
+          my $server_name = $m->conf("server_name"); # foo.localhost
+
+      Returns SERVER_NAME
+
+    server_port
+
+          my $server_port = $m->conf("server_port"); # 80
+
+      Returns SERVER_PORT
+
+      Default: 80
+
+    url
+
+          my $url = $m->conf("url"); # http://foo.localhost
+
+      Returns URL of this server
+
+  REQUEST PARAMETERS
+
+    Parameters set for each HTTP request
+
+    http_host
+
+          my $http_host = $m->conf("http_host"); # foo.localhost
+
+      Returns hostname from the "Host" header of request
+
+    https
+
+          print "Is HTTPS!" if $m->conf("https");
+
+      Returns HTTPS flag if current request was make via HTTPS protocol
+
+      Default: 0
+
+    remote_addr
+
+          my $remote_addr = $m->conf("remote_addr"); # 127.0.0.1
+
+      Returns current IP (IPv4 or IPv6) address of client
+
+      Default: 127.0.0.1
+
+    remote_user
+
+          my $remote_user = $m->conf("remote_user");
+
+      Returns current username from request header
+
+    request_method
+
+          my $request_method = $m->conf("request_method");
+
+      Returns HTTP current request method
+
+      Default: GET
+
+    request_uri
+
+          my $path_string = $m->conf("request_uri");
+
+      Returns path-string of current HTTP request
+
+      Default: /
+
+      Example: /mpminfo
+
+    sid
+
+          my $sid = $m->conf("sid"); # 802a28bffa20f4dc
+
+      Returns SessionID, 16 hex random characters, session signature
+
+ DEPRECATED PARAMETERS
+
+    Following list contains deprecated and actually not existing parameters
+    and directives.
+
+    Flags
+
+          _debug_, _errorsendmail_, _sendmail_, _syslog_
+
+    Files and directories
+
+          file_connect, file_debug, file_error, file_mail, file_mpminfo,
+          dir_cache, dir_conf, dir_db, dir_logs, dir_shtml
+
+    Misc
+
+          errorlog, debuglog, url_shtml, urls, urls_shtml
+
+    All listed parameters now are prohibited to use.
+
+ USER DEFINED MPMINUS PARAMETERS
+
+    All .conf files of current project contains only user directives. The
+    value of each directive of configuration files can be read or modified
+    using getters and setters
+
+  MULTISTORE CONFIGURATION
+
+    The following construction is used to configure the Multistore
+    mechanism:
+
+      <store foo>
+        dsn   DBI:mysql:database=TEST;host=192.168.1.1
+        user  login
+        pass  password
+        <Attr>
+          mysql_enable_utf8 1
+          RaiseError        0
+          PrintError        0
+        </Attr>
+      </store>
+      <store bar>
+        dsn   DBI:Oracle:FOOSID
+        user  login
+        pass  password
+        <Attr>
+          RaiseError        0
+          PrintError        0
+        </Attr>
+      </store>
+      <store baz>
+        dsn   DBI:Oracle:BARSID
+        user  login
+        pass  password
+        <Attr>
+          RaiseError        0
+          PrintError        0
+        </Attr>
+      </store>
+
+    The accessor methods detailed described in "EXAMPLE" in
+    MPMinus::Store::MultiStore example
+
+API
+
+    A classic example of a site created with MPMinus contains 5 mandatory
+    files:
+
+        MPM/MyApp.pm
+        MPM/MyApp/Handlers.pm
+        MPM/MyApp/Index.pm
+        MPM/MyApp/Info.pm
+        MPM/MyApp/Root.pm
+
+    For example see eg/MPM/MyApp.pm file(s)
+
+    MyApp.pm
+
+      Your POD documentation file. Contains also the projects version and
+      any meta-info of Your project. Usually does not contain any program
+      code.
+
+    Handlers.pm
+
+      The first and very important file of Your project! The file contains
+      handler-definition for mod_perl2
+
+      See eg/MPM/MyApp/Handlers.pm file for example
+
+    Index.pm
+
+      The file contains list of enabled (plugged) modules of Your project.
+      By default enabled Root and Info modules only. For examle:
+
+          use base qw/
+              MPM::MyApp::Root
+              MPM::MyApp::Info
+          /;
+
+      You can extends this list yours modules
+
+    Info.pm
+
+      Main information file. Contains usually code:
+
+          sub record {
+              (
+                  -uri      => '/mpminfo',
+                  -response => sub { shift->mpminfo },
+              )
+          }
+
+    Root.pm
+
+      File of root controller ("/" string as path of URL)
+
+      See eg/MPM/MyApp/Root.pm file for example
+
+ MAIN METHODS
+
+    All main methods detailed described in MPMinus
+
+ MVC SKEL TRANSACTION METHODS
+
+    The "MVC SKEL TRANSACTION" or "MST" -- is an ideological concept!
+
+    All methods of the MST detailed described in MPMinus::Transaction
+
+ LOG METHODS
+
+    All log methods detailed described in MPMinus::Log
+
+APACHE HANDLERS
+
+    All available Apache handlers detailed described in mod_perl man pages
+    http://perl.apache.org/
+
+    The MPMinus by default only works with some of the basic HTTP handlers:
+
+        PerlInitHandler
+        PerlAccessHandler
+        PerlAuthenHandler
+        PerlAuthzHandler
+        PerlTypeHandler
+        PerlFixupHandler
+        PerlResponseHandler
+        PerlLogHandler
+        PerlCleanupHandler
+
+    NOTE! MPMinus use modperl handler type only! See
+    http://perl.apache.org/docs/2.0/user/config/config.html
+
+        SetHandler modperl
+        PerlOptions +GlobalRequest
+
+    ...or in Handlers.pm (handler):
+
+        $r->handler('modperl')
+
+    See also MPMinus::BaseHandlers and
+    http://perl.apache.org/docs/2.0/user/handlers/http.html
+
+ FILTERS
+
+    Filters are supported but not used in the MPMinus base configuration.
+
+    See http://perl.apache.org/docs/2.0/user/handlers/filters.html
+
+        sub handler {
+            ...
+            $r->add_output_filter(\&OutputFilterHandler);
+            $r->add_input_filter(\&InputFilterHandler);
+            ...
+        }
+
+    See also "FILTERS" in MPMinus::BaseHandlers
+
+DISPATCHING
+
+    The MPMinus provides URL-to-Action dispatching using the "MVC SKEL
+    Transaction" pattern
+
+    Supported dispatching types:
+
+        Location, Regexp, LocArr и MixArr.
+
+    Location
+
+      Simple base dispatching by request URI (path based)
+
+      In Apache config file:
+
+          <Location ~ ^/$>
+              PerlInitHandler MPM::MyApp::Handlers
+          </Location>
+
+      In MPM::MyApp::Root:
+
+          sub record {
+              (
+                  -uri => '/',
+                  ...
+              )
+          }
+
+      Fast and pretty!
+
+    Regexp
+
+      Regexp dispatching
+
+      In Apache config file:
+
+          <Location ~ ^\/[a-zA-Z0-9]{16}\/?$>
+              PerlInitHandler MPM::MyApp::Handlers
+          </Location>
+
+      In MPM::MyApp::Root:
+
+          sub record {
+              (
+                  -uri => ['REGEXP', 'root', qr/^\/[a-zA-Z0-9]{16}\/?$/],
+                  ...
+              )
+          }
+
+    LocArr
+
+      Multiple path matching
+
+      In Apache config file:
+
+          <Location ~ \.[mM][pP][mM]$>
+              PerlInitHandler MPM::MyApp::Handlers
+          </Location>
+          <Location ~ ^/$>
+              PerlInitHandler MPM::MyApp::Handlers
+          </Location>
+
+      In MPM::MyApp::Root:
+
+          sub record {
+              (
+                  -uri => ['LOCARR', 'root', ['/','/root.mpm','/index.mpm']],
+                  ...
+              )
+          }
+
+    MixArr
+
+      Mixed dispatching
+
+      In Apache config file:
+
+          <Location ~ \.[mM][pP][mM]$>
+              PerlInitHandler MPM::MyApp::Handlers
+          </Location>
+          <Location ~ ^/$>
+              PerlInitHandler MPM::MyApp::Handlers
+          </Location>
+
+      In MPM::MyApp::Root:
+
+          sub record {
+              (
+                  -uri => ['MIXARR', 'root', ['/', qr/^\/(root|index)\.mpm$/]],
+                  ...
+              )
+          }
+
+ MVC TERMS
+
+    Model
+
+      See MPMinus::Store::MultiStore, MPMinus::Store::MySQL,
+      MPMinus::Store::Oracle, MPMinus::Store::DBI
+
+    View
+
+      See Template::Toolkit, Mason, HTML::Template, TemplateM and etc.
+
+    Controller
+
+      All Your MPM::MyApp::XXX classes!
+
+ MVC SKEL TRANSACTION
+
+    The MVC SKEL Transaction is a pattern, concept of application
+    development
+
+        sub record {(
+            ...
+    
+            # Обработчики
+            -init     => \&hInit,
+            -fixup    => \&hFixup,
+            -response => \&hResponse,
+            -cleanup  => \&hCleanup,
+    
+            -meta     => {
+                registration => {
+                    handler => {
+                        chck => \&registration_chck,
+                        form => [\&registration_form, \&default_form,],
+                        proc => \&registration_proc,
+                        access => sub { 1 },
+                        deny => sub { 1 },
+                    },
+                    content_type => 'text/html; charset=UTF-8',
+                    foo => 'qwe',
+                    bar => 'rty',
+                    baz => 123,
+                    ...
+                },
+        )}
+
+    The "registration" is a name from action QUERY_STRING param, e.g:
+
+        ?action=registration
+
+    The "handler" contains MVC SKEL hooks definitions:
+
+        chck, form, proc, access, deny
+
+    running phases of the hooks:
+
+        Phase    Type
+       --------+------
+        access | DUAL
+        deny   | HTTP
+        chck   | BOOL
+        proc   | HTTP
+        form   | HTTP
+
+    BOOL
+
+      In array context only!
+
+      Each defined handler in array is executed until the value "0" (false)
+      or Apache2::Const::OK returns
+
+    HTTP
+
+      In array context only!
+
+      Each defined handler in array is executed until an HTTP status value
+      greater than or equal to 300 (REDIRECTIONS AND ERRORS) is returned
+
+    DUAL
+
+      Compilable with the pair of conditions BOOL and HTTP types
+
+    The "MVC SKEL Transaction" behavior scheme:
+
+                                      +-------+
+        04/26/13                      | Start |
+                                      +-------+
+                                          |
+                                    ++---------++
+                                    || caccess ||
+                                    ++---------++
+                                         |
+                                   status is true?
+                                         /\
+                          _____yes______/  \____no__
+                         |              \  /        |
+                   status < 300?         \/         |
+                         /\                    ++-------++
+                ___yes__/  \____no___          || cdeny ||
+               |        \  /         |         ++-------++
+          event ~ go?    \/          |______________|
+               /\                             |
+         _no__/  \__yes__                     |
+        |     \  /       |                    |
+        |      \/   ++--------++              |
+        |           || ccheck ||              |
+        |           ++--------++              |
+        |                |                    |
+        |          status is true?            |
+        |                /\                   |
+        |         __no__/  \___yes_           |
+        |        |      \  /       |          |
+        |        |       \/   ++-------++     |
+        |        |            || mproc ||     |
+        |        |            ++-------++     |
+        |________|_________________|          |
+                                   |          |
+                             status < 300?    |
+                                   /\         |
+                           __yes__/  \____no__|
+                          |       \  /        |
+                     ++-------++   \/         |
+                     || vform ||              |
+                     ++-------++              |
+                          |                   |
+                          |___________________|
+                                         |
+                                     +--------+
+                                     | Finish |
+                                     +--------+
+
+EXAMPLES
+
+    See eg on CPAN web-sites, e.g, https://metacpan.org/release/MPMinus Or
+    content of a directory in distrib-tarball file
+
+APACHE CONSTANTS
+
+    List of constants specific to Apache features see also
+    http://perl.apache.org/docs/2.0/api/Apache2/Const.html
+
+ COMMON CONSTANTS
+
+        -2  Apache2::Const::DONE
+        -1  Apache2::Const::DECLINED
+        0   Apache2::Const::OK
+        302 Apache2::Const::REDIRECT
+        401 Apache2::Const::AUTH_REQUIRED
+        403 Apache2::Const::FORBIDDEN
+        404 Apache2::Const::NOT_FOUND
+        500 Apache2::Const::SERVER_ERROR
+
+ HTTP 1.1 STATUS CODES ORDERED BY NAMES
+
+        202 Apache2::Const::HTTP_ACCEPTED
+        502 Apache2::Const::HTTP_BAD_GATEWAY
+        400 Apache2::Const::HTTP_BAD_REQUEST
+        409 Apache2::Const::HTTP_CONFLICT
+        100 Apache2::Const::HTTP_CONTINUE
+        201 Apache2::Const::HTTP_CREATED
+        417 Apache2::Const::HTTP_EXPECTATION_FAILED
+            Apache2::Const::HTTP_FAILED_DEPENDENCY
+        403 Apache2::Const::HTTP_FORBIDDEN
+        504 Apache2::Const::HTTP_GATEWAY_TIME_OUT
+        410 Apache2::Const::HTTP_GONE
+            Apache2::Const::HTTP_INSUFFICIENT_STORAGE
+        500 Apache2::Const::HTTP_INTERNAL_SERVER_ERROR
+        411 Apache2::Const::HTTP_LENGTH_REQUIRED
+            Apache2::Const::HTTP_LOCKED
+        405 Apache2::Const::HTTP_METHOD_NOT_ALLOWED
+        301 Apache2::Const::HTTP_MOVED_PERMANENTLY
+        302 Apache2::Const::HTTP_MOVED_TEMPORARILY
+        300 Apache2::Const::HTTP_MULTIPLE_CHOICES
+            Apache2::Const::HTTP_MULTI_STATUS
+        203 Apache2::Const::HTTP_NON_AUTHORITATIVE
+        406 Apache2::Const::HTTP_NOT_ACCEPTABLE
+            Apache2::Const::HTTP_NOT_EXTENDED
+        404 Apache2::Const::HTTP_NOT_FOUND
+        501 Apache2::Const::HTTP_NOT_IMPLEMENTED
+        304 Apache2::Const::HTTP_NOT_MODIFIED
+        204 Apache2::Const::HTTP_NO_CONTENT
+        200 Apache2::Const::HTTP_OK
+        206 Apache2::Const::HTTP_PARTIAL_CONTENT
+        402 Apache2::Const::HTTP_PAYMENT_REQUIRED
+        412 Apache2::Const::HTTP_PRECONDITION_FAILED
+            Apache2::Const::HTTP_PROCESSING
+        407 Apache2::Const::HTTP_PROXY_AUTHENTICATION_REQUIRED
+        416 Apache2::Const::HTTP_RANGE_NOT_SATISFIABLE
+        413 Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE
+        408 Apache2::Const::HTTP_REQUEST_TIME_OUT
+        414 Apache2::Const::HTTP_REQUEST_URI_TOO_LARGE
+        205 Apache2::Const::HTTP_RESET_CONTENT
+        303 Apache2::Const::HTTP_SEE_OTHER
+        503 Apache2::Const::HTTP_SERVICE_UNAVAILABLE
+        101 Apache2::Const::HTTP_SWITCHING_PROTOCOLS
+        307 Apache2::Const::HTTP_TEMPORARY_REDIRECT
+        401 Apache2::Const::HTTP_UNAUTHORIZED
+            Apache2::Const::HTTP_UNPROCESSABLE_ENTITY
+        415 Apache2::Const::HTTP_UNSUPPORTED_MEDIA_TYPE
+            Apache2::Const::HTTP_UPGRADE_REQUIRED
+        305 Apache2::Const::HTTP_USE_PROXY
+            Apache2::Const::HTTP_VARIANT_ALSO_VARIES
+
+ HTTP 1.1 STATUS CODES
+
+    Informational 1xx:
+
+          100 HTTP_CONTINUE                        Continue
+          101 HTTP_SWITCHING_PROTOCOLS             Switching Protocols
+
+    Successful 2xx:
+
+          200 HTTP_OK                              OK
+          201 HTTP_CREATED                         Created
+          202 HTTP_ACCEPTED                        Accepted
+          203 HTTP_NON_AUTHORITATIVE               Non-Authoritative Information
+          204 HTTP_NO_CONTENT                      No Content
+          205 HTTP_RESET_CONTENT                   Reset Content
+          206 HTTP_PARTIAL_CONTENT                 Partial Content
+
+    Redirection 3xx:
+
+          300 HTTP_MULTIPLE_CHOICES                Multiple Choices
+          301 HTTP_MOVED_PERMANENTLY               Moved Permanently
+          302 HTTP_MOVED_TEMPORARILY               Found
+          303 HTTP_SEE_OTHER                       See Other
+          304 HTTP_NOT_MODIFIED                    Not Modified
+          305 HTTP_USE_PROXY                       Use Proxy
+          306                                      (Unused)
+          307 HTTP_TEMPORARY_REDIRECT              Temporary Redirect
+
+    Client Error 4xx:
+
+          400 HTTP_BAD_REQUEST                     Bad Request
+          401 HTTP_UNAUTHORIZED                    Unauthorized
+          402 HTTP_PAYMENT_REQUIRED                Payment Required
+          403 HTTP_FORBIDDEN                       Forbidden
+          404 HTTP_NOT_FOUND                       Not Found
+          405 HTTP_METHOD_NOT_ALLOWED              Method Not Allowed
+          406 HTTP_NOT_ACCEPTABLE                  Not Acceptable
+          407 HTTP_PROXY_AUTHENTICATION_REQUIRED   Proxy Authentication Required
+          408 HTTP_REQUEST_TIMEOUT                 Request Timeout
+          409 HTTP_CONFLICT                        Conflict
+          410 HTTP_GONE                            Gone
+          411 HTTP_LENGTH REQUIRED                 Length Required
+          412 HTTP_PRECONDITION_FAILED             Precondition Failed
+          413 HTTP_REQUEST_ENTITY_TOO_LARGE        Request Entity Too Large
+          414 HTTP_REQUEST_URI_TOO_LARGE           Request-URI Too Long
+          415 HTTP_UNSUPPORTED_MEDIA_TYPE          Unsupported Media Type
+          416 HTTP_RANGE_NOT_SATISFIABLE           Requested Range Not Satisfiable
+          417 HTTP_EXPECTATION_FAILED              Expectation Failed
+
+    Server Error 5xx:
+
+          500 HTTP_INTERNAL_SERVER_ERROR           Internal Server Error
+          501 HTTP_NOT IMPLEMENTED                 Not Implemented
+          502 HTTP_BAD_GATEWAY                     Bad Gateway
+          503 HTTP_SERVICE_UNAVAILABLE             Service Unavailable
+          504 HTTP_GATEWAY_TIME_OUT                Gateway Timeout
+          505 HTTP_VERSION_NOT_SUPPORTED           HTTP Version Not Supported
+
+THANKS
+
+    Thanks to Dmitry Klimov for technical translating
+    http://fla-master.com.
+
+AUTHOR
+
+    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+
+COPYRIGHT
+
+    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See LICENSE file and https://dev.perl.org/licenses/
+

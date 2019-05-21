@@ -10,7 +10,7 @@ use namespace::clean;
 use Net::Flotum::Object::CreditCard;
 use URI::Escape;
 
-has 'flotum' => ( is => 'ro',  weak_ref => 1, );
+has 'flotum' => ( is => 'ro',  weak_ref => 1, required => 1);
 has 'id'     => ( is => 'rwp', required => 1 );
 has 'loaded' => ( is => 'rwp', default  => 0 );
 

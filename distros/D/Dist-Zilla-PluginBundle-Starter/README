@@ -20,14 +20,24 @@ SYNOPSIS
       managed_versions = 1 ; uses the main module version, and bumps module versions after release
       regenerate = LICENSE ; copy LICENSE to root after release or dzil regenerate
 
+      [@Starter::Git]      ; variant bundle for git workflows
+
 DESCRIPTION
     The "[@Starter]" plugin bundle for Dist::Zilla is designed to do the
     minimal amount of work to release a complete distribution reliably. It
     is similar in purpose to [@Basic], but with additional features to stay
     up to date and allow greater customization. The selection of included
     plugins is intended to be unopinionated and unobtrusive, so that it is
-    usable for any well-formed CPAN distribution. If you're just getting
-    started with Dist::Zilla, check out the tutorials at <http://dzil.org>.
+    usable for any well-formed CPAN distribution.
+
+    If you're just getting started with Dist::Zilla or CPAN distribution
+    building, check out the Dist::Zilla::Starter guide.
+
+    For a variant of this bundle with built-in support for a git-based
+    workflow, see [@Starter::Git].
+
+    For one-line initialization of a new "[@Starter]"-based distribution,
+    try Dist::Zilla::MintingProfile::Starter.
 
     Migrating from "[@Basic]" is easy for most cases. Most of the bundle is
     the same, so just make sure to remove any extra plugins that
@@ -48,14 +58,6 @@ DESCRIPTION
     without actually uploading to CPAN.
 
       $ FAKE_RELEASE=1 dzil release
-
-    For a detailed overview of how this plugin bundle works, see "PHASES".
-
-    For one-line initialization of a new "[@Starter]"-based distribution,
-    try Dist::Zilla::MintingProfile::Starter.
-
-    For a variant of this bundle with built-in support for a git-based
-    workflow, see [@Starter::Git].
 
     Another simple way to use Dist::Zilla is with Dist::Milla, an
     opinionated bundle that requires no configuration and performs all of
@@ -120,8 +122,8 @@ OPTIONS
     module, and set all other module versions to match in the build.
     [NextRelease] replaces "{{$NEXT}}" in your Changes file with a line
     containing the distribution version and build date/time. Finally,
-    [BumpVersionAfterRelease] will bump the versions in your module files
-    after a release.
+    [BumpVersionAfterRelease] will bump the versions in your source module
+    files after a release.
 
     When using this option, you must have the distribution version set in
     your main module in a form like "our $VERSION = '1.234';", rather than
@@ -313,7 +315,7 @@ CONFIGURING
       ExecDir.dir = script
 
   Versions
-    When using the "managed_versions" option, the added plugins can be
+    When using the "managed_versions" option, the additional plugins can be
     directly configured in various ways to suit your versioning needs.
 
       [@Starter]
@@ -325,114 +327,6 @@ CONFIGURING
       BumpVersionAfterRelease.munge_makefile_pl = 0
       NextRelease.filename = ChangeLog
       NextRelease.format = %-5v %{yyyy-MM-dd}d
-
-PHASES
-    The plugins in this bundle, and any additional plugins you include in
-    dist.ini, each execute code within one or more phases when a Dist::Zilla
-    command such as "dzil test" is run. You can see a full listing of the
-    phases used by the plugins in your dist.ini with the command "dzil
-    dumpphases".
-
-  BeforeBuild
-    The distribution build consists of several phases, starting with
-    -BeforeBuild. No plugins in this bundle execute during this phase by
-    default.
-
-  FileGatherer
-    In the -FileGatherer phase, many plugins add files to the distribution;
-    in "[@Starter]" this includes the plugins [GatherDir], [MetaYAML],
-    [MetaJSON], [License], [Pod2Readme], [PodSyntaxTests],
-    [Test::ReportPrereqs], [Test::Compile], [MakeMaker] (or the configured
-    installer plugin), and [Manifest].
-
-  EncodingProvider
-    In the -EncodingProvider phase, a plugin may set the encoding for
-    gathered files. No plugins in this bundle execute during this phase by
-    default.
-
-  FilePruner
-    In the -FilePruner phase, gathered files may be excluded from the
-    distribution. In "[@Starter]" this is handled by the plugins
-    [PruneCruft] and [ManifestSkip].
-
-  FileMunger
-    In the -FileMunger phase, files in the distribution may be modified. In
-    "[@Starter]" the plugin [Test::Compile] runs during this phase in order
-    to update its test file to test all gathered modules and scripts. When
-    using the "managed_versions" option, the [RewriteVersion] and
-    [NextRelease] plugins also operate during this phase.
-
-  PrereqSource
-    In the -PrereqSource phase, plugins can add prerequisites to the
-    distribution. In "[@Starter]" the plugins [PodSyntaxTests],
-    [Test::ReportPrereqs], [Test::Compile], and [MakeMaker] (or the
-    configured installer plugin) add prereqs during this phase.
-
-  InstallTool
-    In the -InstallTool phase, the installer's Makefile.PL or Build.PL is
-    generated in the distribution. In "[@Starter]", [MakeMaker] or the
-    configured installer plugin handles this phase.
-
-  AfterBuild
-    The -AfterBuild phase concludes the distribution build. No plugins in
-    this bundle execute during this phase by default.
-
-  BuildRunner
-    The -BuildRunner phase executes the configure and build phases of the
-    "Phases" in CPAN::Meta::Spec in a built distribution. In "[@Starter]",
-    [MakeMaker] or the configured installer plugin handles this phase.
-
-  TestRunner
-    The -TestRunner phase executes the test phase of the "Phases" in
-    CPAN::Meta::Spec. In "[@Starter]", [MakeMaker] (or the configured
-    installer plugin) and [RunExtraTests] handle this phase.
-
-  BeforeRelease
-    The -BeforeRelease phase prepares a built distribution for release. In
-    "[@Starter]", the plugins [TestRelease], [ConfirmRelease], and
-    [UploadToCPAN] (to ensure PAUSE username and password are available)
-    execute during this phase. In [@Starter::Git], the plugin [Git::Check]
-    executes during this phase.
-
-  Releaser
-    The -Releaser phase releases the distribution to CPAN. In "[@Starter]",
-    [UploadToCPAN] (or [FakeRelease]) handles this phase.
-
-  AfterRelease
-    The -AfterRelease phase concludes the distribution release process. No
-    plugins in this bundle execute during this phase by default. When using
-    the "managed_versions" option, the [NextRelease] and
-    [BumpVersionAfterRelease] plugins execute during this phase. When using
-    the "regenerate" option, the [CopyFilesFromRelease] plugin executes
-    during this phase. In [@Starter::Git], the plugins [Git::Commit],
-    [Git::Tag], and [Git::Push] execute during this phase.
-
-  MetaProvider
-    The -MetaProvider phase executes when required rather than at a specific
-    time. In "[@Starter]", the [MetaConfig], [MetaProvides::Package], and
-    [MetaNoIndex] plugins provide metadata in this phase.
-
-  VersionProvider
-    The -VersionProvider phase executes when required rather than at a
-    specific time. No plugins in this bundle execute during this phase by
-    default. When using the "managed_versions" option, the [RewriteVersion]
-    plugin acts as version provider.
-
-  ShareDir
-    The -ShareDir phase executes when required rather than at a specific
-    time. In "[@Starter]", the [ShareDir] plugin handles this phase.
-
-  Regenerator
-    The -Regenerator phase is a quasi-phase which executes when "dzil
-    regenerate" is run. When using the "regenerate" option, the
-    [Regenerate::AfterReleasers] plugin promotes [CopyFilesFromRelease] to
-    also execute during this phase.
-
-  Other
-    The operation of some plugins may not neatly fit into a particular
-    phase. In "[@Starter]", the [ExecDir] plugin marks a directory as
-    containing executables, which can be used by installer plugins such as
-    [MakeMaker].
 
 EXTENDING
     This bundle includes a basic set of plugins for releasing a
@@ -451,8 +345,8 @@ EXTENDING
 
   Changelog
     To automatically add the new release version to the distribution
-    changelog, use [NextRelease]. To ensure the release has changelog
-    entries, use [CheckChangesHasContent].
+    changelog, use [NextRelease] as the "managed_versions" option does. To
+    ensure the release has changelog entries, use [CheckChangesHasContent].
 
   Git
     To better integrate with a git workflow, use the plugins from [@Git], as
@@ -465,8 +359,10 @@ EXTENDING
     [MetaResources].
 
   Prereqs
-    To automatically set distribution prereqs from a cpanfile, use
-    [Prereqs::FromCPANfile]. To specify prereqs manually, use [Prereqs].
+    To specify distribution prereqs in a cpanfile, use
+    [Prereqs::FromCPANfile]. To specify prereqs in dist.ini, use [Prereqs].
+    To automatically guess the distribution's prereqs by parsing the code,
+    use [AutoPrereqs].
 
 BUGS
     Report any issues on the public bugtracker.
@@ -482,7 +378,7 @@ COPYRIGHT AND LICENSE
       The Artistic License 2.0 (GPL Compatible)
 
 SEE ALSO
-    Dist::Zilla, Dist::Zilla::PluginBundle::Basic,
-    Dist::Zilla::PluginBundle::Starter::Git, Dist::Milla,
-    Dist::Zilla::MintingProfile::Starter
+    Dist::Zilla, Dist::Zilla::PluginBundle::Basic, Dist::Zilla::Starter,
+    Dist::Zilla::PluginBundle::Starter::Git,
+    Dist::Zilla::MintingProfile::Starter, Dist::Milla
 

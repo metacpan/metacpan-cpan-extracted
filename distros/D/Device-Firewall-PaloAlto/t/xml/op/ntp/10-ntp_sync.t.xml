@@ -1,0 +1,15 @@
+<response status="success"><result>
+  <synched>0.ubuntu.pool.ntp.org</synched>
+  <ntp-server-1>
+    <status>synched</status>
+    <authentication-type>none</authentication-type>
+    <reachable>yes</reachable>
+    <name>0.ubuntu.pool.ntp.org</name>
+  </ntp-server-1>
+  <ntp-server-2>
+    <status>rejected</status>
+    <authentication-type>none</authentication-type>
+    <reachable>no</reachable>
+    <name>1.au.pool.ntp.org</name>
+  </ntp-server-2>
+</result></response>

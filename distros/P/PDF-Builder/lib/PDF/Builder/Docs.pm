@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.014'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.015'; # VERSION
+my $LAST_UPDATE = '3.015'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -535,6 +535,8 @@ Controls viewing preferences for the PDF.
 
 =over
 
+=over
+
 =item -fullscreen
 
 Full-screen mode, with no menu bar, window controls, or any other window visible.
@@ -549,7 +551,11 @@ Document outline visible.
 
 =back
 
+=back
+
 =head3 Page Layout Options
+
+=over
 
 =over
 
@@ -571,7 +577,11 @@ Display the pages in two columns, with oddnumbered pages on the right.
 
 =back
 
+=back
+
 =head3 Viewer Options
+
+=over
 
 =over
 
@@ -624,6 +634,8 @@ Print duplex by default and flip on the short edge of the sheet.
 =item -duplexfliplongedge
 
 Print duplex by default and flip on the long edge of the sheet.
+
+=back
 
 =back
 
@@ -781,6 +793,271 @@ parameter is to be retained unchanged.
 
     $xml = $pdf->xmpMetadata($xml);
     print "PDF metadata now reads: $xml\n";
+
+=head2 "BOX" METHODS
+
+B<A general note:> Use care if specifying a different Media Box (or other "box")
+for a page, than the global "box" setting, to define the whole "chain" of boxes
+on the page, to avoid surprises. For example, to define a global Media Box 
+(paper size) and a global Crop Box, and then define a new page-level Media Box 
+I<without> defining a new page-level Crop Box, may give odd results in the
+resultant cropping. Such combinations are not well defined.
+
+All dimensions in boxes default to the default User Unit, which is points (1/72 
+inch). Note that the PDF specification limits sizes and coordinates to 14400
+User Units (200 inches, for the default User Unit of one point), and Adobe 
+products (so far) follow this limit for Acrobat and Distiller. It is worth 
+noting that other PDF writers and readers may choose to ignore the 14400 unit 
+limit, with or without the use of a specified User Unit. Therefore, PDF::Builder
+does not enforce any limits on coordinates -- it's I<your> responsibility to
+consider what readers and other PDF tools may be used with a PDF you produce!
+Also note that earlier Acrobat readers had coordinate limits as small as 3240
+User Units (45 inches), and I<minimum> media size of 72 or 3 User Units.
+
+=head3 User Units
+
+=over
+
+=item $pdf->userunit($number)
+
+The default User Unit in the PDF coordinate system is one point (1/72 inch). You
+can think of it as a scale factor to enable larger (or even, smaller) documents.
+This method may be used (for PDF 1.6 and higher) to set the User Unit to some
+number of points. For example, C<userunit(72)> will set the scale multiplier to
+72.0 points per User Unit, or 1 inch to the User Unit. Any number greater than
+zero is acceptable, although some readers and tools may not handle User Units of
+less than 1.0 very well.
+
+Not all readers respect the User Unit, if you give one, or handle it in exactly
+the same way. Adobe Distiller, for one, does not use it. How User Units are 
+handled may vary from reader to reader. Adobe Acrobat, at this writing, respects
+User Unit in version 7.0 and up, but limits it to 75000 (giving a maximum
+document size of 15 million inches or 236.7 miles or 381 km). Other readers and
+PDF tools may allow a larger (or smaller) limit. 
+
+B<Your Mileage May Vary:> Some readers ignore a global
+User Unit setting and do I<not> have pages inherit it (PDF::Builder duplicates 
+it on each page to simulate inheritance). Some readers may give spurious
+warnings about truncated content when a Media Box is changed while User Units
+are being used. Some readers do strange things with Crop Boxes when a User Unit 
+is in effect.
+
+Depending on the reader used, the effect of a larger User Unit (greater than 1)
+may mean lower resolution (chunkier or coarser appearance) in the rendered 
+document. If you're printing something the size of a highway billboard, this may
+not matter to you, but you should be aware of the possibility (even with 
+fractional coordinates). Conversely, a User Unit of less than 1.0 (if permitted)
+reduces the allowable size of your document, but I<may> result in greater
+resolution.
+
+A global (PDF level) User Unit setting is inherited by each page (an action by
+PDF::Builder, not necessarily automatically done by the reader), or can be 
+overridden by calling userunit in the page. Do not give more than one global 
+userunit setting, as only the last one will be used.
+Setting a page's User Unit (if C<< $page-> >> instead) is permitted (overriding
+the global setting for this page). However, many sources recommend against 
+doing this, as results may not be as expected (once again, depending on the
+quirks of the reader).
+
+Remember to call C<userunit> I<before> calling anything having to do with page
+or box sizes, or coordinates. Especially when setting 'named' box sizes, the 
+methods need to know the current User Unit so that named page sizes (in points)
+may be scaled down to the current User Unit.
+
+=back
+
+=head3 Media Box
+
+=over
+
+=item $pdf->mediabox($name)
+
+=item $pdf->mediabox($name, -orient => 'orientation' )
+
+=item $pdf->mediabox($w,$h)
+
+=item $pdf->mediabox($llx,$lly, $urx,$ury)
+
+Sets the global Media Box (or page's Media Box, if C<< $page-> >> instead). 
+This defines the width and height (or by corner
+coordinates, or by standard name) of the output page itself, such as the
+physical paper size. This is normally the largest of the "boxes". If any
+subsidiary box (within it) exceeds the media box, the portion of the material 
+or boxes outside of the media box will be ignored.
+
+Note that many printers can B<not> print all the way to the
+physical edge of the paper, so you should plan to leave some blank margin,
+even outside of any crop marks and bleeds. Printers and on-screen readers are 
+free to discard any content found outside the Media Box, and printers may 
+discard some material just inside the Media Box.
+
+A I<global> Media Box is B<required> by the PDF spec; if not given, PDF::Builder
+will set the global Media Box to US Letter size (8.5in x 11in).
+This is the media size that will be used for all pages if you do not specify 
+a C<mediabox> call on a page. That is,
+a global (PDF level) mediabox setting is inherited by each page, or can be 
+overridden by setting mediabox in the page. Do not give more than one global 
+mediabox setting, as only the last one will be used.
+
+If you give a single string name (e.g., 'A4'), you may optionally add an
+orientation to turn the page 90 degrees into Landscape mode: 
+C<< -orient => 'L' >> or C<< -orient => 'l' >>. C<-orient> is the only option
+recognized, and a string beginning with an 'L' or 'l' (for Landscape) is the 
+only value of interest (anything else is treated as Portrait mode).
+
+The lower left corner does not I<have> to be 0,0. It can be any values you want,
+including negative values (so long as the resulting media's sides are at least 
+one point long). C<mediabox> sets the coordinate system (including the origin) 
+of the graphics and text that will be drawn, as well as for subsequent "boxes". 
+It's even possible to give any two opposite corners (such as upper left and 
+lower right). The coordinate system will be rearranged (by the Reader) to 
+still be the conventional minimum C<x> and C<y> in the lower left (i.e., you 
+can't make C<y> I<increase> from top to bottom!).
+
+B<Example:>
+
+    $pdf = PDF::Builder->new();
+    $pdf->mediabox('A4');
+    ...
+    $pdf->saveas('our/new.pdf');
+
+    $pdf = PDF::Builder->new();
+    $pdf->mediabox(595, 842);
+    ...
+    $pdf->saveas('our/new.pdf');
+
+    $pdf = PDF::Builder->new;
+    $pdf->mediabox(0, 0, 595, 842);
+    ...
+    $pdf->saveas('our/new.pdf');
+
+See the L<PDF::Builder::Resource::PaperSizes> source code for the full list of
+supported names (aliases) and their dimensions in points. You are free to add
+additional paper sizes, if you wish. See also the C<getPaperSizes> call in
+L<PDF::Builder::Util>. These names (aliases) are also usable in
+other "box" calls, although useful only if the "box" is the same size as the 
+full media (Media Box).
+
+=back
+
+=head3 Crop Box
+
+=over
+
+=item $pdf->cropbox($name)
+
+=item $pdf->cropbox($name, -orient => 'orientation')
+
+=item $pdf->cropbox($w,$h)
+
+=item $pdf->cropbox($llx,$lly, $urx,$ury)
+
+Sets the global Crop Box (or page's Crop Box, if C<< $page-> >> instead). 
+This will define the media size to which the output will 
+later be I<clipped>. Note that this does B<not> itself output any crop marks 
+to guide cutting of the paper! PDF Readers should consider this to be the 
+I<visible> portion of the page, and anything found outside it I<may> be clipped 
+(invisible). By default, it is equal to the Media Box, but may be defined to be 
+smaller, in the coordinates set by the Media Box. A global setting will be 
+inherited by each page, but can be overridden on a per-page basis.
+
+Do not confuse with the C<Trim Box>, which shows where printed paper is expected
+to actually be cut. Some PDF Readers may reduce the visible "paper" background
+to the size of the crop box; others may simply omit any content outside it.
+
+A global (PDF level) cropbox setting is inherited by each page, or can be 
+overridden by setting cropbox in the page.
+As with C<mediabox>, only one crop box may be set at this (PDF) level.
+As with C<mediabox>, a named media size may have an orientation (l or L) for 
+Landscape mode. 
+
+=back
+
+=head3 Bleed Box
+
+=over
+
+=item $pdf->bleedbox($name)
+
+=item $pdf->bleedbox($name, -orient => 'orientation')
+
+=item $pdf->bleedbox($w,$h)
+
+=item $pdf->bleedbox($llx,$lly, $urx,$ury)
+
+Sets the global Bleed Box (or page's Bleed Box, if C<< $page-> >> instead). 
+This is typically used in printing on paper, where you want 
+ink or color (such as thumb tabs) to be printed a bit beyond the final paper 
+size, to ensure that the cut paper I<bleeds> (the cut goes I<through> the ink), 
+rather than accidentally leaving some white paper visible outside.  Allow 
+enough "bleed" over the expected trim line to account for minor variations in 
+paper handling, folding, and cutting; to avoid showing white paper at the edge. 
+The Bleed Box is where printing could actually extend to; The Trim Box is 
+normally within it, where the paper would actually be cut. The default value is 
+equal to the Crop Box, but is often a bit smaller.
+
+A global (PDF level) bleedbox setting is inherited by each page, or can be 
+overridden by setting bleedbox in the page.
+As with C<mediabox>, only one bleed box may be set at this (PDF) level.
+As with C<mediabox>, a named media size may have an orientation (l or L) for 
+Landscape mode. 
+
+=back
+
+=head3 Trim Box
+
+=over
+
+=item $pdf->trimbox($name)
+
+=item $pdf->trimbox($name, -orient => 'orientation')
+
+=item $pdf->trimbox($w,$h)
+
+=item $pdf->trimbox($llx,$lly, $urx,$ury)
+
+Sets the global Trim Box (or page's Trim Box, if C<< $page-> >> instead). 
+This is supposed to be the actual dimensions of the 
+finished page (after trimming of the paper). In some production environments, 
+it is useful to have printer's instructions, cut marks, and so on outside of 
+the trim box. The default value is equal to Crop Box, but is often a bit 
+smaller than any Bleed Box, to allow the desired "bleed" effect.
+
+A global (PDF level) trimbox setting is inherited by each page, or can be 
+overridden by setting trimbox in the page.
+As with C<mediabox>, only one trim box may be set at this (PDF) level.
+As with C<mediabox>, a named media size may have an orientation (l or L) for 
+Landscape mode. 
+
+=back
+
+=head3 Art Box
+
+=over
+
+=item $pdf->artbox($name)
+
+=item $pdf->artbox($name, -orient => 'orientation')
+
+=item $pdf->artbox($w,$h)
+
+=item $pdf->artbox($llx,$lly, $urx,$ury)
+
+Sets the global Art Box (or page's Art Box, if C<< $page-> >> instead). 
+This is supposed to define "the extent of the page's 
+I<meaningful> content (including [margins])". It might exclude some content, 
+such as Headlines or headings. Any binding or punched-holes margin would 
+typically be outside of the Art Box, as would be page numbers and running 
+headers and footers. The default value is equal to the Crop Box, although 
+normally it would be no larger than any Trim Box.
+
+A global (PDF level) artbox setting is inherited by each page, or can be 
+overridden by setting artbox in the page.
+As with C<mediabox>, only one art box may be set at this (PDF) level.
+As with C<mediabox>, a named media size may have an orientation (l or L) for 
+Landscape mode. 
+
+=back
 
 =head2 FONT METHODS
 
@@ -972,7 +1249,8 @@ Enables kerning if data is available.
 
 Disables embedding of the font file. B<Note that this is potentially hazardous,
 as the glyphs provided on the PDF reader machine may not match what was used on
-the PDF writer machine (the one running PDF::Builder)!> If you know I<for sure> that all PDF readers will be using the same TTF or OTF file you're using with
+the PDF writer machine (the one running PDF::Builder)!> If you know I<for sure> 
+that all PDF readers will be using the same TTF or OTF file you're using with
 PDF::Builder; not embedding the font may be acceptable, in return for a smaller
 PDF file size.
 

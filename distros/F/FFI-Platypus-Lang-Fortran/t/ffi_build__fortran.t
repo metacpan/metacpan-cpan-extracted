@@ -12,6 +12,8 @@ use File::Path qw( rmtree );
 use FFI::Platypus 0.51;
 use File::Glob qw( bsd_glob );
 
+$ENV{FFI_PLATYPUS_DLERROR} = 1;
+
 subtest 'Fortran' => sub {
 
   plan skip_all => 'Test requires Fortran compiler'
@@ -77,6 +79,15 @@ subtest 'Fortran' => sub {
     {
       diag capture_merged {
         my @cmd = ('nm', $build->file->path);
+        print "+ @cmd\n";
+        system @cmd;
+        ();
+      };
+    }
+    if(my $ldd = FFI::Build::Platform->which('ldd'))
+    {
+      diag capture_merged {
+        my @cmd = ('ldd', $build->file->path);
         print "+ @cmd\n";
         system @cmd;
         ();

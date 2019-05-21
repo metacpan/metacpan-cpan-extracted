@@ -1,5 +1,9 @@
 Revision history for Perl module FFI::Platypus::Lang::Fortran
 
+0.10 2019-05-16 06:08:20 -0600
+  - Improve filtering of fortran flags to exclude C/C++ specific flags
+    (for FFI::Build::File::Fortran)
+
 0.09 2018-09-26 10:55:19 -0600
   - Improve filtering of fortran flags to exclude C/C++ specific flags
 

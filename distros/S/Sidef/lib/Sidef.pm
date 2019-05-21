@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.016;
 
-    our $VERSION = '3.70';
+    our $VERSION = '3.80';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -307,14 +307,16 @@ package Sidef {
         my ($type) = @_;
 
         if (index($type, 'Sidef::') == 0) {
-            $type = substr($type, rindex($type, '::') + 2);
-        }
-        else {
-            $type =~ s/^(?:_::)?main:://
-              or $type =~ s/^_:://;
+
+            if ($type =~ /::[0-9]+::/) {
+                $type = substr($type, $+[0]);
+            }
+            else {
+                $type = substr($type, rindex($type, '::') + 2);
+            }
         }
 
-        $type =~ s/[0-9]{8}\z//r;
+        $type =~ s/^main:://r;
     }
 
     sub normalize_method {

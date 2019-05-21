@@ -62,6 +62,14 @@ Aliases: I<map>
 
 =cut
 
+=head2 array_identity
+
+Block.array_identity() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cache
 
 Block.cache() -> I<Obj>
@@ -132,9 +140,33 @@ Return the
 
 =cut
 
+=head2 identity
+
+Block.identity() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 if
 
 Block.if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_identity
+
+Block.is_identity() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 list_identity
+
+Block.list_identity() -> I<Obj>
 
 Return the
 
@@ -159,6 +191,14 @@ Return the
 =head2 nth
 
 Block.nth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 null_identity
+
+Block.null_identity() -> I<Obj>
 
 Return the
 

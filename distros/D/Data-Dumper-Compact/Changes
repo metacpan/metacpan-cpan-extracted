@@ -1,5 +1,14 @@
 Revision history for Data-Dumper-Compact
 
+0.003002 - 2019-05-16
+  - Doc improvements for JSON::Dumper::Compact
+
+0.003001 - 2019-05-16
+  - Bugfix: actually export the right subroutine name
+
+0.003000 - 2019-05-16
+  - JSON dumping and rehydrating support
+
 0.002003 - 2019-05-15
   - Render blessed hashrefs and arrayrefs using DDC logic
 

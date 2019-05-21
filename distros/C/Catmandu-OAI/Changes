@@ -1,5 +1,8 @@
 Revision history for Catmandu-OAI
 
+0.19  2019-05-20 15:06:05 CEST
+  - Adding a strict option for the importer
+
 0.18  2017-10-17 13:50:01 CEST
   - Adding a Catmandu::Store implementation of OAI-PMH
   - Retry options should ignore OAI errors

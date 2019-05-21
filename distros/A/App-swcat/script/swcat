@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-05-20'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010;
 use strict;
@@ -16,7 +16,9 @@ my $cli = Perinci::CmdLine::Any->new(
     url => $prefix,
     log => 1,
     subcommands => {
-        'list' => {url=>"${prefix}list"},
+        'list' => {url=>"${prefix}list"}, # old alias for list-installed, for backward compatibility
+        'list-installed' => {url=>"${prefix}list_installed"},
+        'list-cpan' => {url=>"${prefix}list_cpan"},
         'latest-version' => {url=>"${prefix}latest_version"},
         'available-versions' => {url=>"${prefix}available_versions"},
         'download-url' => {url=>"${prefix}download_url"},
@@ -41,7 +43,7 @@ swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.010 of swcat (from Perl distribution App-swcat), released on 2019-01-15.
+This document describes version 0.011 of swcat (from Perl distribution App-swcat), released on 2019-05-20.
 
 =head1 SYNOPSIS
 
@@ -112,7 +114,15 @@ multiple software names or one or more patterns.
 
 =head2 B<list>
 
-List known software in the catalog.
+List known software in the catalog (from installed Software::Catalog::SW::* modules).
+
+=head2 B<list-cpan>
+
+List available known software in the catalog (from Software::Catalog::SW::* modules on CPAN).
+
+=head2 B<list-installed>
+
+List known software in the catalog (from installed Software::Catalog::SW::* modules).
 
 =head2 B<release-note>
 
@@ -277,6 +287,24 @@ See C<--software-or-pattern>.
 
 =back
 
+=head2 Options for subcommand list-cpan
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--lcpan>
+
+=back
+
+=head2 Options for subcommand list-installed
+
+=over
+
+=item B<--detail>, B<-l>
+
+=back
+
 =head2 Options for subcommand release-note
 
 =over
@@ -370,6 +398,15 @@ List of available configuration parameters:
  softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand list
+
+ detail (see --detail)
+
+=head2 Configuration for subcommand list-cpan
+
+ detail (see --detail)
+ lcpan (see --lcpan)
+
+=head2 Configuration for subcommand list-installed
 
  detail (see --detail)
 

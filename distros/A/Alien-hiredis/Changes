@@ -1,3 +1,7 @@
+0.007     2019-05-20 15:52:46 EDT
+  - Use clean_install for Alien::Build::MM to clean up any dynamic libraries lingering from previous versions.
+    You may need to reinstall XS modules built against Alien::hiredis if you had version 0.005 or older installed previously.
+
 0.006     2019-04-12 18:36:17 EDT
   - Isolate dynamic libraries in a share install so XS code is built statically.
 

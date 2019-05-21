@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -1392,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

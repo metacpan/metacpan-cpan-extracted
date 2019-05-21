@@ -28,6 +28,7 @@ lib/FFI/Platypus/Lang/Fortran.pm
 lib/Module/Build/FFI/Fortran.pm
 lib/Module/Build/FFI/Fortran/ExtUtilsF77.pm
 LICENSE
+maint/cip-before-install
 maint/releaseprep
 MANIFEST			This list of files
 META.json

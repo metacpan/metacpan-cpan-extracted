@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -519,9 +519,82 @@ sub extractToVariables {
 
 # -----------------------------------------------------------------------------
 
+=head3 extractToObject() - Extrahiere Parameter und speichere Optionen in Objekt
+
+=head4 Synopsis
+
+    ($argA,$opt) = $class->extractToObject(\@params,$minArgs,$maxArgs,@optVal);
+
+=head4 Arguments
+
+=over 4
+
+=item @params
+
+Parameterliste, z.B. @_.
+
+=item $minArgs
+
+Mindestanzahl an Argumenten.
+
+=item $maxArgs
+
+Maximale Anzahl an Argumenten, C<undef> bedeutet beliebig viele.
+
+=item @optVal
+
+Liste der Optionen und ihrer Defaultwerte.
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $argA
+
+Referenz auf die Liste der extrahierten Argumente.
+
+=item $opt
+
+Hash-Objekt mit den Optionen aus @params gemäß @optVal.
+
+=back
+
+=head4 Description
+
+Extrahiere Argumente und Optionen aus der Parameterliste @params.
+Enthält die Parameterliste unbekannte Optionen oder zu wenige
+oder zu viele Argumente, wird eine Exception geworfen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub extractToObject {
+    my ($class,$paramA,$minArgs,$maxArgs) = splice @_,0,4;
+
+    my ($argA,$opt) = $class->extract(0,0,undef,$paramA,$maxArgs,@_);
+    if (@$argA < $minArgs) {
+        $class->throw(
+            q~PARAM-00099: not enough arguments~,
+        );
+    }
+    elsif (@$paramA) {
+        $class->throw(
+            q~PARAM-00099: Unexpected parameter(s)~,
+            Parameters => "@_",
+        );
+    }
+
+    return ($argA,$opt);
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

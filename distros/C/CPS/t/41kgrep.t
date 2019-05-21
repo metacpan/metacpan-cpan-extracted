@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 use CPS::Functional qw( kgrep );
 
@@ -22,3 +23,5 @@ kgrep(
 is_deeply( \@nums, [ 2, 4 ], 'kgrep sync - @nums' );
 
 @nums = ();
+
+done_testing;

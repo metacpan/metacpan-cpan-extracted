@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Run;
 use 5.010;
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use App::Spec::Run::Validator;
 use App::Spec::Run::Response;

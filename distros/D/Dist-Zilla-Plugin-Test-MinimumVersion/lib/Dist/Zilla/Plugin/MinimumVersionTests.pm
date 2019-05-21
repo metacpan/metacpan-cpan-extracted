@@ -4,17 +4,27 @@ use warnings;
 
 package Dist::Zilla::Plugin::MinimumVersionTests;
 # ABSTRACT: Release tests for minimum required versions
-our $VERSION = '2.000008'; # VERSION
+
+our $VERSION = '2.000009';
+
 use Moose;
 extends 'Dist::Zilla::Plugin::Test::MinimumVersion';
 
+use namespace::autoclean;
+
+#pod =head1 SYNOPSIS
+#pod
+#pod In C<dist.ini>:
+#pod
+#pod     [Test::MinimumVersion]
+#pod
+#pod =cut
 
 before register_component => sub {
     warn '!!! [MinimumVersionTests] is deprecated and will be removed in a future release; replace it with [Test::MinimumVersion]';
 };
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 1;
 
 __END__
@@ -29,9 +39,7 @@ Dist::Zilla::Plugin::MinimumVersionTests - Release tests for minimum required ve
 
 =head1 VERSION
 
-version 2.000008
-
-=for test_synopsis BEGIN { die "SKIP: Synopsis isn't Perl code" }
+version 2.000009
 
 =head1 SYNOPSIS
 
@@ -39,23 +47,16 @@ In C<dist.ini>:
 
     [Test::MinimumVersion]
 
-=head1 AVAILABILITY
+=head1 SUPPORT
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-MinimumVersion/>.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-MinimumVersion>
+(or L<bug-Dist-Zilla-Plugin-Test-MinimumVersion@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-MinimumVersion@rt.cpan.org>).
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::MinimumVersion/>.
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion/issues>.
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHORS
 
@@ -71,7 +72,7 @@ Marcel Grünauer <marcel@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2010 by Mike Doherty.
 

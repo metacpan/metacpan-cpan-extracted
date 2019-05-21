@@ -13,11 +13,11 @@ Device::RAID::Poller - Basic RAID status poller, returning RAID disk devices, ty
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 
 =head1 SYNOPSIS

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use IO::Framed ();
-use Module::Load ();
+use Module::Runtime ();
 use Socket ();
 
 use Protocol::DBus::X ();
@@ -43,7 +43,7 @@ sub _set_mechanism {
         my $module = __PACKAGE__ . "::Mechanism::$mechanism";
 
         my $err = $@;
-        if (!eval { Module::Load::load($module); 1 } ) {
+        if (!eval { Module::Runtime::require_module($module); 1 } ) {
             DEBUG && print STDERR "Failed to load $mechanism authn module: $@";
             return 0;
         }

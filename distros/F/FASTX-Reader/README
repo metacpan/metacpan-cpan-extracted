@@ -1,7 +1,7 @@
 This archive contains the distribution FASTX-Reader,
-version 0.07:
+version 0.09:
 
-  A lightweight module to parse FASTA and FASTQ files, using Heng Li's _readfq()_ method L<https://github.com/lh3/readfq>, packaged in an object oriented parser.
+  A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
 This software is Copyright (c) 2019 by Andrea Telatin.
 

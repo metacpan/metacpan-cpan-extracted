@@ -1,5 +1,11 @@
 Revision history for Perl module App::AppSpec
 
+0.004 2019-05-18 20:58:36+02:00
+
+    - Generated spec into a module instead of using YAML file
+    - Require App::Spec 0.008
+    - Fix 'appspec completion --name' option (was ignored before)
+
 0.003 2019-04-22 13:32:14+02:00
 
     - Fix typo (PR#1 @errietta)

@@ -4,40 +4,43 @@ INSTALLATION INSTRUCTIONS
     make
     make test
     make install
-    mpm
-
-DIST CREATING
-
-    perl Makefile.PL
-    make
-    make test
-    make skel
-    make tardist
-
-    * Full archive and summs need copy to dist.mnshome.info
-
-DEVELOPING RUNNING
-
-    cd MPMinus
-    perl -Ilib bin\mpm --share=src -d 
-
-CREATE NEW VERSION (FOR DEVELOPER ONLY)
-
-    * README         -- In documentation
-    * CHANGES        -- Result of command: localtime | gclip
-    * lib/MPMinus.pm -- In documentation (VERSION) & in code $VERSION
-    * lib/MPMinus/Manual.pod -- In documentation (VERSION)
-    * bin/mpm        -- In documentation (VERSION)
-    * t/01-use.t     -- In test case
+    make clean
 
 REQUIREMENTS & DEPENDENCIES
 
-Programs:
-
-    * Apache 2
+    * Apache 2.2 and above
     * mod_perl2
 
-Perl modules:
+CPAN NOTES
 
-    See Makefile.PL
+Run command first:
 
+  cpan
+
+Please answer to question as:
+
+    What approach do you want? (Choose 'local::lib', 'sudo' or 'manual')
+    [local::lib] sudo
+
+INSTALLATION ON UBUNTU 16.04 AND ABOVE
+
+    apt update
+    apt upgrade
+    apt-get install apache2 apache2-dev libapache2-mod-perl2 libapache2-mod-perl2-dev
+    apt-get install libclass-c3-adopt-next-perl libconfig-general-perl \
+      libdbi-perl libfile-copy-recursive-perl libjson-xs-perl libmro-compat-perl \
+      libtest-simple-perl libtext-simpletable-perl libtry-tiny-perl liburi-perl \
+      libyaml-libyaml-perl libcgi-pm-perl libapache-dbi-perl \
+      libtemplate-perl libemail-mime-encodings-perl
+    cpan install MPMinus
+
+INSTALLATION ON CENTOS LINUX 7.5 AND ABOVE
+
+  yum update
+    yum install epel-release mod_perl mod_perl-devel
+    yum install perl-CPAN perl-Config-General perl-Encode perl-DBI \
+      perl-CGI perl-Digest-MD5 perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest \
+    perl-File-Copy-Recursive perl-File-Temp perl-JSON-XS perl-MRO-Compat \
+    perl-PathTools perl-Perl-OSType perl-Template-Toolkit perl-Test-Simple \
+    perl-Time-HiRes perl-Try-Tiny perl-URI perl-YAML
+  cpan install MPMinus

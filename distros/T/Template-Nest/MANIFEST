@@ -1,12 +1,23 @@
 Changes
+lib/Template/Nest.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 t/00_methods.t
 t/01_render.t
+t/02_defaults.t
+t/03_params.t
+t/04_indent.t
+t/05_escapes.t
+t/06_bad_params.t
+t/templates/escapes.html
+t/templates/escapes_e.html
+t/templates/nested_default_contents.html
+t/templates/nested_default_outer.html
 t/templates/table.html
-t/templates/tr.html
 t/templates/td.html
-lib/Template/Nest.pm
+t/templates/tr.html
+t/templates/tr_default.html
+t/templates/tr_default_ns.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -92,6 +92,8 @@ if (defined $args{P}) {
 
 # Test mode
 if (defined $args{t}) {
+
+    local $args{c} = 0;
     my @argv = splice(@ARGV);
 
     require Encode;
@@ -147,9 +149,15 @@ else {
         require Encode;
         Encode::decode_utf8($args{E});
       }
-      : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
+      : defined($ARGV[0]) ? do {
         $script_name = shift @ARGV;
-        read_script($script_name);
+        if ($script_name eq '-') {
+            local $/;
+            <STDIN>;
+        }
+        else {
+            read_script($script_name);
+        }
       }
       : (-t STDIN) ? do { code_interactive(); exit 0; }
       :              do { local $/;           <STDIN> };
@@ -418,13 +426,17 @@ sub code_interactive {
     my $valid_lines = '';
     my ($vars, $ref_vars_refs);
 
-    my $history_support = $term->can('ReadHistory') && $term->can('WriteHistory');
+    my $history_support = $term->can('ReadHistory') && $term->can('Attribs');
     my $history_file    = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
 
     if ($history_support) {
+
         if (not -e $history_file) {
             open my $fh, '>', $history_file;
         }
+
+        my $attr = $term->Attribs;
+        $attr->{inhibit_completion} = 1;
 
         $term->ReadHistory($history_file);
     }
@@ -484,7 +496,9 @@ This program is distributed in the hope that it will be
 useful, but without any warranty; without even the implied
 warranty of merchantability or fitness for a particular purpose.
 
-See http://www.perlfoundation.org/artistic_license_2_0 for more information.
+For more information, see:
+    https://github.com/trizen/sidef
+    https://www.perlfoundation.org/artistic-license-20.html
 
 EOT
                 redo MAINLOOP;
@@ -552,7 +566,7 @@ EOT
 
         if ($history_support) {
             if ($line =~ /\R/) {
-                $term->addhistory($line);
+                $term->addhistory($line =~ s/\R/\r/gr);
             }
             $term->append_history(1, $history_file);
         }

@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use CPS qw( dropk );
 
@@ -28,3 +29,5 @@ is( $result, "hello", 'idenity in scalar context' );
 
 my @result = $identity->( 10, 20, 30 );
 is_deeply( \@result, [ 10, 20, 30 ], 'identity in list context' );
+
+done_testing;

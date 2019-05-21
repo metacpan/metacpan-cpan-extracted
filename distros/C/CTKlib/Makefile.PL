@@ -2,84 +2,77 @@
 use strict;
 use ExtUtils::MakeMaker;
 
-my $MSWIN = $^O =~ /mswin/i ? 1 : 0;
+use constant MSWIN => $^O =~ /mswin/i ? 1 : 0;
 
 my $build_requires = {
-        'ExtUtils::MakeMaker'   => 6.60,
-        'Test::More'            => 0.94,
+        'Test::Simple'          => 1,    # libtest-simple-perl
     };
+
 my $prereq_pm = {
-        'Archive::Extract'      => 0.58,
-        'Archive::Tar'          => 1.80,
-        'Archive::Zip'          => 1.30,
-        'Class::C3::Adopt::NEXT'=> 0.13,
+        'Class::C3::Adopt::NEXT'=> 0.13, # libclass-c3-adopt-next-perl
         'Class::Singleton'      => 1.40,
-        'Config::General'       => 2.00,
+        'Config::General'       => 2.00, # libconfig-general-perl
+        'DBI'                   => 1.63, # libdbi-perl
         'ExtUtils::MakeMaker'   => 6.60,
         'File::Copy'            => 2.00,
-        'File::Copy::Recursive' => 0.38,
-        'File::Find'            => 1.00,
+        'File::Copy::Recursive' => 0.38, # libfile-copy-recursive-perl
+        'File::Find'            => 0,
         'File::Path'            => 2.00,
         'File::Pid'             => 1.00,
         'File::Spec'            => 0.82,
-        'HTTP::Headers'         => 5.80,
-        'HTTP::Request'         => 5.80,
-        'HTTP::Response'        => 5.80,
-        'IO::Handle'            => 1.20,
+        'File::Temp'            => 0,
+        'IO'                    => 0,
+        'IO::String'            => 1.08, # libio-all-perl
         'IPC::Open3'            => 1.00,
-        'LWP'                   => 5.80,
-        'LWP::MediaTypes'       => 6.00,
-        'LWP::UserAgent'        => 5.80,
-        'MIME::Base64'          => 3.00,
-        'MIME::Lite'            => 3.00,
-        'Moose'                 => 2.00,
+        'JSON'                  => 2.90, # libjson-perl libjson-xs-perl
+        'List::Util'            => 1.45, # libscalar-list-utils-perl
+        'MIME::Base64'          => 3.00, # libemail-mime-encodings-perl
+        'MIME::Lite'            => 3.00, # libmime-lite-perl
+        'MRO::Compat'           => 0.12, # libmro-compat-perl
         'Net::FTP'              => 2.60,
         'Perl::OSType'          => 1.00,
         'Symbol'                => 1.05,
-        'Term::ReadKey'         => 2.10,
-        'Term::ReadLine'        => 1.04,
-        'Test::More'            => 0.94,
-        'Text::ParseWords'      => 3.27,
+        'Sys::Syslog'           => 0,
+        'Term::ANSIColor'       => 4.03,
+        'Text::SimpleTable'     => 2.00, # libtext-simpletable-perl
         'Time::HiRes'           => 1.97,
         'Time::Local'           => 1.20,
-        'URI'                   => 1.60,
+        'Try::Tiny'             => 0.27, # libtry-tiny-perl
+        'URI'                   => 1.60, # liburi-perl
+        'XML::Simple'           => 2.22, # libxml-simple-perl
         'XSLoader'              => 0.01,
-        'YAML'                  => 0.73,
-        'namespace::autoclean'  => 0.13,
+        'YAML'                  => 0.73, # libyaml-perl
+        'YAML::XS'              => 0.40, # libyaml-libyaml-perl
     };
-$prereq_pm->{'Sys::SigAction'}  =  0.15 unless $MSWIN;
+$prereq_pm->{'Sys::SigAction'}  =  0.20 unless MSWIN; # libsys-sigaction-perl
 
 my $exefiles = [qw(
         bin/ctklib
-        bin/ctklib-tiny
     )];
-push @$exefiles, (qw(bin/pv.exe)) if $MSWIN;
 
 WriteMakefile(
     'NAME'                  => 'CTK',
     'DISTNAME'              => 'CTKlib',
-    'MIN_PERL_VERSION'      => 5.010001,
-    'DIR'                   => ['xs'],
+    'MIN_PERL_VERSION'      => 5.016001,
     'VERSION_FROM'          => 'lib/CTK.pm',
-    'ABSTRACT_FROM'         => 'lib/CTK.pm',
+    'XS_VERSION'            => '1.00',
+    'ABSTRACT'              => 'Command-line ToolKit library (CTKlib)',
     'BUILD_REQUIRES'        => $build_requires,
     'PREREQ_PM'             => $prereq_pm,
     'EXE_FILES'             => $exefiles,
-    'AUTHOR'                => 'Sergey Lepenkov (Serz Minus) <minus@mail333.com>',
-    'LICENSE'               => 'lgpl',
+    'AUTHOR'                => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
+    'LICENSE'               => 'perl',
     'META_MERGE' => {
         recommends => {
-            'DBI'           => 0,
             'Data::Dumper'  => 0,
         },
         resources => {
             homepage        => 'http://www.serzik.com',
             repository      => 'http://svn.serzik.com/CTKlib/trunk',
-            license         => 'http://opensource.org/licenses/lgpl-license.php',
+            license         => 'https://dev.perl.org/licenses',
         },
     },
-
+    clean => {
+        FILES => '*.log *.tmp src/*.tmp src/dst src/dst2',
+    },
 );
-
-# For Test::Distribution patch
-eval { require File::Copy; File::Copy::copy("CHANGES","ChangeLog"); 1 } unless $MSWIN;

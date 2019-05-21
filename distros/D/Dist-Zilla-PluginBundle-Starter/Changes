@@ -1,3 +1,9 @@
+v3.0.3    2019-05-19 12:12:06 EDT
+  - Updates and fixes to Dist::Zilla::Starter guide.
+
+v3.0.2    2019-05-17 23:35:46 EDT
+  - Added Dist::Zilla::Starter guide.
+
 v3.0.1    2018-09-25 14:05:14 EDT
   - Enable inherit_version in [MetaProvides::Package] when managed_versions is used to prevent a possible race condition.
 

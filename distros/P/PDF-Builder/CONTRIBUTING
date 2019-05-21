@@ -14,6 +14,12 @@ there is a contact form on the Forum where you can send in something for us to
 post. Please do not abuse this system -- if you are regularly posting, please 
 take a minute to register on one or both systems.
 
+First of all, please read the section "Sofware Development Kit" under 
+PDF::Builder::Docs. This will be of interest if you want to do anything beyond 
+simply installing PDF::Builder as a prerequisite for some other package. You 
+can also get to this via "SOME SPECIAL NOTES" section of the root documentation 
+(PDF::Builder).
+
 For code changes, a GitHub pull request, a formal patch file (e.g., "diff"), or 
 even a replacement file or manual patch will do, so long as it's clear where it 
 goes and what it does. If the volume of such work becomes excessive (i.e., a 

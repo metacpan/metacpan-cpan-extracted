@@ -22,6 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "JSON" : "0",
+            "Scalar::Util" : "0",
             "Test::More" : "0"
          }
       },
@@ -35,12 +37,12 @@
             "Keyword::Declare" : "0.001010",
             "Moo" : "2.003004",
             "MooX::LazierAttributes" : "1.07008",
-            "MooX::ValidateSubs" : "1.012003",
+            "MooX::ValidateSubs" : "1.012004",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

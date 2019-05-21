@@ -1,4 +1,13 @@
-Revision history for Text-WideChar-Util
+0.170   2019-05-17 (PERLANCAR)
+
+	- Add Hiragana, Katakana, and Hangul to CJK regex (suggested by Jacques
+	  Deguest).
+
+	- Add option keep_trailing_space to wrap() & mbwrap() (suggested by
+	  Jacques Deguest).
+
+	- [doc] Mention Text::NonWideChar::Util.
+
 
 0.16    2015-07-29 (PERLANCAR)
 

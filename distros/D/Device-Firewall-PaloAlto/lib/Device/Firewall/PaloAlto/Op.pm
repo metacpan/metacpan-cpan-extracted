@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op;
-$Device::Firewall::PaloAlto::Op::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Op::VERSION = '0.1.6';
 
 use strict;
 use warnings;
@@ -12,6 +12,8 @@ use Device::Firewall::PaloAlto::Op::VirtualRouter;
 use Device::Firewall::PaloAlto::Op::Tunnels;
 use Device::Firewall::PaloAlto::Op::GlobalCounters;
 use Device::Firewall::PaloAlto::Op::IPUserMaps;
+use Device::Firewall::PaloAlto::Op::HA;
+use Device::Firewall::PaloAlto::Op::NTP;
 
 use XML::LibXML;
 
@@ -26,6 +28,22 @@ sub new {
     my ($fw) = @_;
 
     return bless { fw => $fw }, $class;
+}
+
+
+sub vsys {
+    my $self = shift;
+    my ($vsys_id) = @_;
+
+    my $vsys_string = "vsys$vsys_id";
+    my $r = $self->_send_op_cmd('set system setting target-vsys', $vsys_string);
+
+    if ($r) {
+        $self->{fw}{active_vsys_id} = $vsys_id;
+        return $self;
+    } else {
+        return $r;
+    }
 }
 
 
@@ -95,11 +113,26 @@ sub ip_user_mapping {
 }
 
 
+sub ha {
+    my $self = shift;
+
+    return Device::Firewall::PaloAlto::Op::HA->_new( $self->_send_op_cmd('show high-availability state') );
+}
+
+
+sub ntp {
+    my $self = shift;
+
+    return Device::Firewall::PaloAlto::Op::NTP->_new( $self->_send_op_cmd('show ntp') );
+}
+
+
+
+
 
 sub _send_op_cmd {
     my $self = shift;
     my ($cmd, $var) = @_;
-
 
     return $self->{fw}->_send_request(type => 'op', cmd => _gen_op_xml($cmd, $var));
 }
@@ -160,7 +193,7 @@ Device::Firewall::PaloAlto::Op - Operations module for Palo Alto firewalls
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 
@@ -176,6 +209,12 @@ This module holds methods that perform operation commands on the firewall.
 =head2 new
 
 The C<new()> method can be used, but in general it's easier to call the C<op()> method from the L<Device::Firewall::PaloAlto> module.
+
+=head2 vsys
+
+Sets the virtual system (vsys) ID to which calls will be applied. By default vsys 1 is used.
+
+On success reutrns the Device::Firewall::PaloAlto::Op object so calls can be chained together. On failure it returns a L<Class::Error> object.
 
 =head2 system_info
 
@@ -209,13 +248,33 @@ Returns a L<Device::Firewall::PaloAlto::Op::VirtualRouter> object representing a
 
 Returns a L<Device::Firewall::PaloAlto::Op::Tunnels> object representing the current active IPSEC tunnels.
 
+    my $tunnels = $fw->op->tunnels
+    my $client_site = $tunnels->gw('remote_site_gw');
+
 =head2 global_counters
 
 Returns a L<Device::Firewall::PaloAlto::Op::GlobalCounters> object representing the global counters.
 
+    # Extract out the drop alerts alerts
+    my $counters = $fw->op->global_counters;
+    my @drop_counter = grep { $_->severity eq 'drop' } $counters->to_array;
+
 =head2 ip_user_mapping
 
-Returns IP to user mappings
+Returns a L<Device::Firewall::PaloAlto::Op::IPUserMaps> objects representing the current active IP to user mappings on the device.
+
+    my $maps = $fw->op->ip_user_mapping;
+    my @mappings = grep { $_->user eq 'greg.foleta' } $map->to_array;
+
+=head2 ha
+
+Returns a L<Device::Firewall::PaloAlto::Op::HA> object representing the current high availability state of the firewall.
+
+    my $ha_info = $fw->op->ha;
+
+=head2 ntp
+
+Returns a L<Device::Firewall::PaloAlto::Op::NTP> object reresenting the current NTP synchronisation status of the firewall.
 
 =head1 AUTHOR
 

@@ -11,6 +11,7 @@ cpanfile
 dist.ini
 lib/Dist/Zilla/MintingProfile/Starter.pm
 lib/Dist/Zilla/PluginBundle/Starter.pm
+lib/Dist/Zilla/Starter.pm
 profiles/default/Module.pm
 profiles/default/plugins.ini
 profiles/default/profile.ini

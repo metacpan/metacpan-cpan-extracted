@@ -78,7 +78,7 @@ sub test_unitTest : Test(4) {
     }
     $self->is($doc->toFormattedString,$xml2);
 
-    # 2. Knoten hinzfügen
+    # 2. Knoten hinzufügen
 
     for my $per ($doc->findnodes('//PERSON')) {
         my $nam = $doc->createElement('NACHNAME');

@@ -11,7 +11,7 @@ lib/Sim/OPT/Report.pm
 lib/Sim/OPT/Descend.pm
 lib/Sim/OPT/Takechance.pm
 lib/Sim/OPT/Parcoord3d.pm
-#lib/Sim/OPT/Modish.pm
+lib/Sim/OPT/Modish.pm
 lib/Sim/OPT/Interlinear.pm
 examples/optw.tar.gz
 META.yml                                 Module YAML meta-data (added by MakeMaker)

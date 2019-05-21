@@ -184,6 +184,22 @@ Return the
 
 =cut
 
+=head2 avg
+
+Array.avg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 avg_by
+
+Array.avg_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bindex
 
 Array.bindex() -> I<Obj>
@@ -544,6 +560,16 @@ Return the
 
 =cut
 
+=head2 each_2d
+
+Array.each_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<each_2D>
+
+=cut
+
 =head2 each_cons
 
 Array.each_cons() -> I<Obj>
@@ -761,6 +787,16 @@ Array.grep() -> I<Obj>
 Return the
 
 Aliases: I<select>
+
+=cut
+
+=head2 grep_2d
+
+Array.grep_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_2D>
 
 =cut
 
@@ -1027,6 +1063,16 @@ Array.map() -> I<Obj>
 Return the
 
 Aliases: I<collect>
+
+=cut
+
+=head2 map_2d
+
+Array.map_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<map_2D>
 
 =cut
 
@@ -1510,6 +1556,14 @@ Return the
 
 =cut
 
+=head2 split
+
+Array.split() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ssub
 
 Array.ssub() -> I<Obj>
@@ -1517,6 +1571,16 @@ Array.ssub() -> I<Obj>
 Return the
 
 Aliases: I<scalar_sub>
+
+=cut
+
+=head2 stack
+
+Array.stack() -> I<Obj>
+
+Return the
+
+Aliases: I<stack_by>
 
 =cut
 

@@ -19,6 +19,8 @@ alien_rc q{
     return 'default';
   }
 
+  1;
+
 };
 
 subtest 'compiles okay' => sub {

@@ -36,6 +36,7 @@
             "URI" : "0",
             "XML::LibXML" : "0",
             "XML::Twig" : "0",
+            "overload" : "0",
             "parent" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -46,86 +47,107 @@
          "requires" : {
             "Test::More" : "0",
             "Test::UseAllModules" : "0",
-            "Test::Warn" : "0"
+            "Test::Warn" : "0",
+            "lib" : "0"
          }
       }
    },
    "provides" : {
       "Device::Firewall::PaloAlto" : {
          "file" : "lib/Device/Firewall/PaloAlto.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::API" : {
          "file" : "lib/Device/Firewall/PaloAlto/API.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Errors" : {
          "file" : "lib/Device/Firewall/PaloAlto/Errors.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::JSON" : {
          "file" : "lib/Device/Firewall/PaloAlto/JSON.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::ARPEntry" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/ARPEntry.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::ARPTable" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/ARPTable.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::GlobalCounter" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/GlobalCounter.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::GlobalCounters" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/GlobalCounters.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
+      },
+      "Device::Firewall::PaloAlto::Op::HA" : {
+         "file" : "lib/Device/Firewall/PaloAlto/Op/HA.pm",
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::IPUserMap" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/IPUserMap.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::IPUserMaps" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/IPUserMaps.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::Interface" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/Interface.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::Interfaces" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/Interfaces.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
+      },
+      "Device::Firewall::PaloAlto::Op::NTP" : {
+         "file" : "lib/Device/Firewall/PaloAlto/Op/NTP.pm",
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::Route" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/Route.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::SysInfo" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/SysInfo.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::Tunnel" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/Tunnel.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::Tunnels" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/Tunnels.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::Op::VirtualRouter" : {
          "file" : "lib/Device/Firewall/PaloAlto/Op/VirtualRouter.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
+      },
+      "Device::Firewall::PaloAlto::Test" : {
+         "file" : "lib/Device/Firewall/PaloAlto/Test.pm",
+         "version" : "v0.1.6"
+      },
+      "Device::Firewall::PaloAlto::Test::NATPolicy" : {
+         "file" : "lib/Device/Firewall/PaloAlto/Test/NATPolicy.pm",
+         "version" : "v0.1.6"
+      },
+      "Device::Firewall::PaloAlto::Test::Rulebase" : {
+         "file" : "lib/Device/Firewall/PaloAlto/Test/Rulebase.pm",
+         "version" : "v0.1.6"
       },
       "Device::Firewall::PaloAlto::UserID" : {
          "file" : "lib/Device/Firewall/PaloAlto/UserID.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       }
    },
    "release_status" : "stable",
@@ -140,7 +162,7 @@
          "web" : "https://github.com/gregfoletta/Device-Firewall-PaloAlto"
       }
    },
-   "version" : "0.1.5",
+   "version" : "0.1.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.029000"
@@ -334,7 +356,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.1.5",
+                  "tag" : "v0.1.6",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -501,37 +523,6 @@
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Run::BeforeBuild",
-            "config" : {
-               "Dist::Zilla::Plugin::Run::Role::Runner" : {
-                  "fatal_errors" : 1,
-                  "quiet" : 0,
-                  "run" : [
-                     "test -f Makefile.PL && rm Makefile.PL"
-                  ],
-                  "version" : "0.047"
-               }
-            },
-            "name" : "Run::BeforeBuild",
-            "version" : "0.047"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Run::AfterBuild",
-            "config" : {
-               "Dist::Zilla::Plugin::Run::Role::Runner" : {
-                  "fatal_errors" : 1,
-                  "quiet" : 0,
-                  "run" : [
-                     "cp %d/Makefile.PL ./",
-                     "git status --porcelain | grep 'M Makefile.PL' && git commit -m 'auto-committed by dist.ini' Makefile.PL || echo Makefile.PL up to date"
-                  ],
-                  "version" : "0.047"
-               }
-            },
-            "name" : "Run::AfterBuild",
-            "version" : "0.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

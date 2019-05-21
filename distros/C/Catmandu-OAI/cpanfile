@@ -8,6 +8,8 @@ on 'test', sub {
 };
 
 requires 'Catmandu', '>=1.0306';
+requires 'Catmandu::XML', '0.16';
+requires 'XML::LibXML', 0;
 requires 'HTTP::OAI', '>=4.03';
 requires 'Moo', '>=1.0';
 requires 'XML::Struct', '>=0.18';

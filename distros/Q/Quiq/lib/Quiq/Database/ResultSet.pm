@@ -5,13 +5,13 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Object;
 use Time::HiRes ();
 use Quiq::Option;
 use Quiq::FileHandle;
-use Quiq::ColumnFormat;
+use Quiq::Properties;
 use Quiq::Array;
 use Quiq::Duration;
 
@@ -555,135 +555,24 @@ sub formats {
 
     if (!$self->{'formatA'} || $force) {
         my $rowA = $self->{'rows'};
-        my $titles = $self->{'titles'};
-    
-        my $isRaw = $self->isRaw;
-    
+        my $titleA = $self->{'titles'};
+
         my @fmt;
-        for (my $i = 0; $i < @$titles; $i++) {
-            my $type = 'd';
-            my $length = 0;
-            my $before = 0; # max. Anzahl Zeichen vor den Nachkommastellen
-            my $scale = 0;  # max. Anzahl Nachkommastellen
-            my $null = 0;
-            my $mask = 0;
-    
-            my $title = $titles->[$i];
+        for (my $i = 0; $i < @$titleA; $i++) {
+            my $title = $titleA->[$i];
+
+            my $prp = Quiq::Properties->new;
             for my $row (@$rowA) {
-                my $val = $isRaw? $row->[$i]: $row->$title;
-    
-                # Anzahl Nullwerte
-    
-                if ($val eq '') {
-                    $null++; # Nullwerte zählen
-                    next;
-                }
-    
-                # Typ ermitteln
-    
-                my $msk = 0;
-                if ($type eq 't') {
-                    $msk = $val =~ tr/\n\r\t\0\\//;
-                }
-                elsif ($type eq 's') {
-                    if ($val =~ tr/\n\r//) {
-                        $type = 't';
-                        redo;
-                    }
-                    $msk = $val =~ tr/\n\r\t\0\\//;
-                }
-                elsif ($type eq 'd' && $val !~ /^-?\d+$/) {
-                    $type = 'f';
-                    redo;
-                }
-                elsif ($type eq 'f' && $val !~ /^-?(\d*\.\d+$|\d+)$/) {
-                    $type = 's';
-                    $before = $scale = 0;
-                    redo;
-                }
-    
-                # Maximallänge ermitteln
-    
-                my $len = length $val;
-                if ($len > $length) {
-                    $length = $len;
-                }
-    
-                # Nachkommastellen ermitteln
-    
-                if ($type eq 'f') {
-                    # Ziffer vorm Dezimalpunkt kann fehlen (Oracle)
-                    $val =~ /^-?(\d*)(\.(\d+))?$/ or die;
-    
-                    # Anzahl Nachkommastellen
-    
-                    my $n = defined($3)? length($3): 0;
-                    $scale = $n if $n > $scale;
-    
-                    # Anzahl Zeichen vor den Nachkommastellen
-                    # (einschl. Punkt und Vorzeichen)
-                    # Korrektur für Oracle-Zahlen zw. 1 und -1
-    
-                    my $m = length($val)-$n;
-                    $m++ if $1 eq ''; # .N oder -.N (Oracle-Fix)
-                    $before = $m if $m > $before;
-                }
-    
-                # Maximalanzahl der zu maskierenden Zeichen
+                $prp->analyze($self->isRaw? $row->[$i]: $row->$title);
                 
-                if ($msk > $mask) {
-                    $mask = $msk;
-                }
             }
-    
-            if ($length == 0) {
-                $type = 's';
-            }
-    
-            # Die max. Feldlänge ist im Falle von Fließkommazahlen
-            # die Summe aus der max. Anzahl an Nachkommastellen plus
-            # der maximalen Anzahl an Zeichen davor.
-    
-            if ($type eq 'f') {
-                $length = $before+$scale;
-            }
-    
-            push @fmt,Quiq::ColumnFormat->new($type,$length,$scale,
-                $null,$mask);
+            push @fmt,$prp;
         }
         $self->{'formatA'} = \@fmt;
     }
 
     my $fmtA = $self->{'formatA'};
     return wantarray? @$fmtA: $fmtA;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 align() - Liefere die Ausrichtung der Kolumnen
-
-=head4 Synopsis
-
-    @aligns | $alignA = $tab->align;
-
-=head4 Description
-
-Aktuell werden die Angaben 'left' und 'right' für die Ausrichtung
-von HTML-Tabellenzellen geliefert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub align {
-    my $self = shift;
-
-    my @align;
-    for my $fmt (@{$self->formats}) {
-        push @align,$fmt->htmlAlign;
-    }
-
-    return wantarray? @align: \@align;
 }
 
 # -----------------------------------------------------------------------------
@@ -848,11 +737,11 @@ Numerierung der Kolumnen, Anzahl Zeilen, Ausführungszeit.
 
 =item Z<>2
 
-Inforationsumfang 1 plus Liste der Kolumnennamen.
+Informationsumfang 1 plus Liste der Kolumnennamen.
 
 =item Z<>3
 
-Inforationsumfang 2 plus SQL-Statement.
+Informationsumfang 2 plus SQL-Statement.
 
 =back
 
@@ -955,7 +844,7 @@ sub asTable {
             $str .= "\n";
             for (my $i = 0; $i < @fmt; $i++) {
                 my $numWidth = length $i+1;
-                my $width = $fmt[$i]->width+3;
+                my $width = abs($fmt[$i]->width)+3;
                 $str .= sprintf '%d%s',$i+1,(' ' x ($width-$numWidth));
             }
             $str .= "\n";
@@ -970,7 +859,7 @@ sub asTable {
                 if ($i) {
                     $str .= ' | ';
                 }
-                $str .= $fmt[$i]->asFixedWidthString($arr[$i]);
+                $str .= $fmt[$i]->format('text',$arr[$i]);
             }
             $str .= " |\n";
         }
@@ -1071,7 +960,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

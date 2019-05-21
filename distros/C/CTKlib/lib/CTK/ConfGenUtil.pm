@@ -1,5 +1,8 @@
-package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 192 2017-04-28 20:40:38Z minus $
+package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 222 2019-05-01 14:44:03Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,14 +10,11 @@ CTK::ConfGenUtil - Config::General structure utility functions
 
 =head1 VERSION
 
-Version 2.66
+Version 2.68
 
 =head1 SYNOPSIS
 
-    use CTK;
     use CTK::ConfGenUtil;
-    my $c = new CTK;
-    my $config = $c->config;
 
     # <Foo>
     #   <Bar>
@@ -49,13 +49,13 @@ Version 2.66
     #   </Bar>
     # </Foo>
     is_scalar( $foo );
-    say "Is scalar : ", is_scalar($config, 'foo/bar/baz') ? 'OK' : 'NO'; # OK
+    print "Is scalar : ", is_scalar($config, 'foo/bar/baz') ? 'OK' : 'NO'; # OK
 
     is_array( $foo );
-    say "Is array  : ", is_array($config, 'foo/bar/qux') ? 'OK' : 'NO'; # OK
+    print "Is array  : ", is_array($config, 'foo/bar/qux') ? 'OK' : 'NO'; # OK
 
     is_hash( $foo );
-    say "Is hash   : ", is_hash($config, 'foo/bar') ? 'OK' : 'NO';  # OK
+    print "Is hash   : ", is_hash($config, 'foo/bar') ? 'OK' : 'NO';  # OK
 
 =head1 DESCRIPTION
 
@@ -132,13 +132,19 @@ functions. This function returns just true if the given key is hash (reference)
     is_hash( $bar );
     is_hash( $config, 'foo/bar' );
 
-=item B<exists>
-
-Reserved. Coming soon
-
-This method returns just true if the given key exists in the config.
-
 =back
+
+=head1 HISTORY
+
+See C<Changes> file
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
 
 =head1 SEE ALSO
 
@@ -146,30 +152,28 @@ L<Config::General::Extended>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '2.66';
+$VERSION = '2.68';
 
 use base qw/Exporter/;
-our @EXPORT = qw/ node value array hash is_value is_scalar is_array is_hash exists /;
+our @EXPORT = qw/ node value array hash is_value is_scalar is_array is_hash /;
 
 sub node {
-    # Получение подструктуры относительно структуры заданной в первом аргументе.
     #
     #  getnode( $config, [qw/foo bar baz/] )
     #  getnode( $config, qw/foo bar baz/ )
@@ -189,31 +193,25 @@ sub node {
         push @rar, split(/\//, $_) for (grep {$_} ($ar,@_));
     }
 
-    # Пробегаемся вглубь
     my $tnode = \%rcc;
     my $laststat = 0;
 
-    # Ищем стандартным способом
     foreach my $k (@rar) {
         #debug $k;
-        if ($tnode && (ref($tnode) eq 'HASH') && defined $tnode->{$k}) {
+        if ($tnode && (ref($tnode) eq 'HASH') && defined($tnode->{$k})) {
             $tnode = $tnode->{$k};
             $laststat = 1;
         } else {
-            #debug "Мимо ($k) :(";
             #debug Dumper($tnode);
             $laststat = 0;
             next;
         }
     }
-
-    # Ищем НЕстандартным способом
-    if (!$laststat && @arcc && defined $arcc[0]) {
+    if (!$laststat && @arcc && defined($arcc[0])) {
         my $kk = pop(@rar) || '';
         if ($kk) {
-            #debug "Попали на массив :)";
             foreach my $an (@arcc) {
-                if ($an && (ref($an) eq 'HASH') && defined $an->{$kk}) {
+                if ($an && (ref($an) eq 'HASH') && defined($an->{$kk})) {
                     $tnode = $an->{$kk};
                     $laststat = 1;
                     last;
@@ -225,11 +223,10 @@ sub node {
     return $laststat ? $tnode : undef;
 }
 sub value {
-    # Получение скалярного значения или undef
     my $node = shift;
-    $node = node($node,@_) if defined $_[0];
+    $node = node($node, @_) if defined($_[0]);
     if ($node && ref($node) eq 'ARRAY') {
-        return exists $node->[0] ? $node->[0] : undef;
+        return exists($node->[0]) ? $node->[0] : undef;
     } elsif (defined($node) && !ref($node)) {
         return $node
     } else {
@@ -237,9 +234,8 @@ sub value {
     }
 }
 sub array {
-    # Получение смассива значениий или пустой массив (ссылка на него)
     my $node = shift;
-    $node = node($node,@_) if defined $_[0];
+    $node = node($node, @_) if defined $_[0];
     if ($node && ref($node) eq 'ARRAY') {
         return $node;
     } elsif (defined($node) && !ref($node)) {
@@ -249,9 +245,8 @@ sub array {
     }
 }
 sub hash {
-    # Получение хэша значениий или пустой хэш (ссылка на него)
     my $node = shift || {};
-    $node = node($node,@_) if defined $_[0];
+    $node = node($node, @_) if defined $_[0];
     if ($node && ref($node) eq 'HASH') {
         return $node;
     } else {
@@ -259,28 +254,25 @@ sub hash {
     }
 }
 sub is_hash {
-    # Возвращает истину если значение является хэшем (ссылкой на него)
     my $node = shift;
-    $node = node($node,@_) if defined $_[0];
+    $node = node($node, @_) if defined($_[0]);
     return 1 if $node && ref($node) eq 'HASH';
     return;
 }
 sub is_array {
-    # Возвращает истину если значение является массивом (ссылкой на него)
     my $node = shift;
-    $node = node($node,@_) if defined $_[0];
+    $node = node($node,@_) if defined($_[0]);
     return 1 if $node && ref($node) eq 'ARRAY';
     return;
 }
 sub is_value {
-    # Возвращает истину если значение является скаляром
     my $node = shift;
-    $node = node($node,@_) if defined $_[0];
-    return 1 if defined $node && !ref($node);
+    $node = node($node, @_) if defined($_[0]);
+    return 1 if defined($node) && !ref($node);
     return;
 }
 sub is_scalar { goto &is_value }
-sub exists { 1 } # Coming soon
 
 1;
+
 __END__

@@ -7,6 +7,8 @@
 #  of unique terms in B_A, NP1, the count of unique terms in B_C, and NPP, 
 #  the total number of unique terms in the dataset (the vocabulary size).  
 #  The association is then found using these counts.
+use lib '/home/henryst/UMLS-Association/lib';
+
 use strict;
 use warnings;
 package UMLS::Association::Measures::LTA;

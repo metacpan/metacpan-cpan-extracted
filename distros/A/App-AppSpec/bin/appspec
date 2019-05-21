@@ -6,14 +6,13 @@ use warnings;
 use 5.010;
 use Data::Dumper;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use App::Spec;
 use App::AppSpec;
-use File::Share qw/ dist_file /;
+use App::AppSpec::Spec qw/ $SPEC /;
 
-my $specfile = dist_file("App-AppSpec", "appspec-spec.yaml");
-my $spec = App::Spec->read($specfile);
+my $spec = App::Spec->read($SPEC);
 my $run = $spec->runner;
 $run->run;
 

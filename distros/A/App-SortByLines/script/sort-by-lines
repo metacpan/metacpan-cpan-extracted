@@ -1,0 +1,225 @@
+#!perl
+
+our $DATE = '2019-05-18'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+
+my %Opts = (
+    reverse => 0,
+    numeric => 0,
+    ignore_case => 0,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'ignore-case|f'  => \$Opts{ignore_case},
+        'numeric-sort|n' => \$Opts{numeric},
+        'reverse|r'      => \$Opts{reverse},
+        'help|h'        => sub {
+            print <<USAGE;
+Usage:
+  sort-by-lines [OPTIONS]... FILE1 FILE2
+
+Examples:
+
+  # Sort by length of lines
+  % sort-by-lines -n file.txt <(perl -nE'say length' file.txt)
+
+Options:
+  --ignore-case, -f
+  --numeric-sort, -n
+  --reverse, -r
+
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    do { warn "sort-by-lines: Error in GetOptions\n"; exit 99 } if !$res;
+    do { warn "sort-by-lines: Please specify two input files\n"; exit 99 } unless @ARGV == 2;
+    do { warn "sort-by-lines: Cannot use '-' for both files\n"; exit 99 } if $ARGV[0] eq '-' && $ARGV[1] eq '-';
+}
+
+sub run {
+    # read lines
+    my ($fh1, $fh2);
+    if ($ARGV[0] eq '-') {
+        $fh1 = \*STDIN;
+    } else {
+        open $fh1, "<", $ARGV[0]
+            or die "sort-by-lines: Can't open file1 '$ARGV[0]': $!\n";
+    }
+    if ($ARGV[1] eq '-') {
+        $fh2 = \*STDIN;
+    } else {
+        open $fh2, "<", $ARGV[1]
+            or die "sort-by-lines: Can't open file2 '$ARGV[1]': $!\n";
+    }
+
+    my ($eof1, $eof2);
+    my $linenum = 0;
+    my @lines;
+    while (1) {
+        my $line1;
+        unless ($eof1) {
+            $linenum++;
+            $line1 = <$fh1>;
+            $eof1++ unless defined $line1;
+        }
+        my $line2;
+        unless ($eof2) {
+            $line2 = <$fh2>;
+            $eof2++ unless defined $line2;
+        }
+        last if $eof1;
+        push @lines, [
+            $line1,
+            $Opts{ignore_case} ? lc($line2 // '') : ($line2 // ''),
+            $linenum,
+        ];
+    }
+
+    {
+        no warnings 'numeric';
+        if ($Opts{reverse}) {
+            if ($Opts{numeric}) {
+                @lines = sort { $b->[1] <=> $a->[1] || $b->[2] <=> $a->[2] } @lines;
+            } else {
+                @lines = sort { $b->[1] cmp $a->[1] || $b->[2] <=> $a->[2] } @lines;
+            }
+        } else {
+            if ($Opts{numeric}) {
+                @lines = sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] } @lines;
+            } else {
+                @lines = sort { $a->[1] cmp $b->[1] || $a->[2] <=> $b->[2] } @lines;
+            }
+        }
+    }
+
+    for (@lines) { print $_->[0] }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Sort lines of text by other lines of text as keys
+# PODNAME: sort-by-lines
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sort-by-lines - Sort lines of text by other lines of text as keys
+
+=head1 VERSION
+
+This document describes version 0.002 of sort-by-lines (from Perl distribution App-SortByLines), released on 2019-05-18.
+
+=head1 SYNOPSIS
+
+ % sort-by-lines [OPTION]... FILE1 FILE2
+
+Sample command:
+
+ % sort-by-lines file.txt <(perl -nE'say length' file.txt)
+
+You can use C<"-"> (in at most one of the files) to mean standard input. Tip:
+You can use process substitution in bash.
+
+Sample input file F<file.txt>:
+
+ one
+ two
+ three
+ four
+
+Sample output:
+
+ one
+ two
+ four
+ three
+
+=head1 DESCRIPTION
+
+This utility sorts lines of text by other lines of text as keys.
+
+=head1 EXIT CODES
+
+0 on success.
+
+1 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item --ignore-case, -i
+
+=item --numeric-sort, -n
+
+=item --reverse, -r
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SortByLines>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SortByLines>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SortByLines>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<https://en.wikipedia.org/wiki/Schwartzian_transform> in Perl 5.
+
+Unary sort or "sort by" implementations in other languages like Perl 6, Python,
+etc.
+
+Unix command B<sort>, particularly the C<-k> (C<--key>) option. To do a
+schwartzian transform on the command-line, using the Tab character to separate
+the key and value (meaning Tab character in FILE2 will confuse the result):
+
+ % paste FILE2 FILE1 | sort -s -k1,2n | cut -f2-
+
+Also notice the use of C<-s> (C<--stable>) option to preseve the order of lines
+of the same length. Thanks to Ed Morton for the above tip
+(L<https://stackoverflow.com/questions/56200144/how-to-sort-lines-of-text-by-other-lines-of-text-as-keys/56200757>).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

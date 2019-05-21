@@ -2,17 +2,19 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 use utf8;
+use strict;
+use warnings;
 
 # this file is used by test script
 
-[
+return [
     [
         name    => 'SubSlave2',
         gist => 'subslave2 with aa2:{aa2}',

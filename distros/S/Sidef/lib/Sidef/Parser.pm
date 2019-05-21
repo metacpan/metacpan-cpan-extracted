@@ -128,7 +128,6 @@ package Sidef::Parser {
                   if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
                 | with\b                                     (?{ bless({}, 'Sidef::Types::Block::With') })
                 | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
-                | try\b                                      (?{ Sidef::Types::Block::Try->new })
                 | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
                 | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
                 | return\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::Return') })
@@ -242,7 +241,6 @@ package Sidef::Parser {
                   while
                   given
                   with
-                  try
                   continue
                   import
                   include
@@ -640,7 +638,7 @@ package Sidef::Parser {
         $self->parse_whitespace(code => $opt{code});
 
         # Alpha-numeric method name
-        if (/\G($self->{method_name_re})/goc) {
+        if (/\G((?:SUPER::)*$self->{method_name_re})/goc) {
             return ($1, 0, '');
         }
 
@@ -756,7 +754,8 @@ package Sidef::Parser {
 
             push @vars, $declaration;
 
-            (defined($end_delim) && /\G\h*,\h*/gc) || last;
+            (defined($end_delim) && (/\G\h*,\h*/gc || /\G\h*(?:#.*)?+(?=\R)/gc)) || last;
+
             $self->parse_whitespace(code => $opt{code});
         }
 
@@ -799,6 +798,7 @@ package Sidef::Parser {
 
             my $ref_type;
             if (defined($+{type})) {
+
                 my $type = $+{type};
                 my $obj  = $self->parse_expr(code => \$type);
 
@@ -837,7 +837,7 @@ package Sidef::Parser {
                                   );
             }
 
-            my ($subset, $subset_blocks);
+            my ($subset);
             if (defined($end_delim) and m{\G<<?\h*}gc) {
                 my ($subset_name) = /\G($self->{var_name_re})/goc;
 
@@ -858,10 +858,6 @@ package Sidef::Parser {
                                        );
 
                 $subset = $obj;
-
-                if (ref($obj) eq 'Sidef::Variable::Subset' and exists($obj->{blocks})) {
-                    $subset_blocks = $obj->{blocks};
-                }
             }
 
             my ($value, $where_expr, $where_block);
@@ -900,11 +896,14 @@ package Sidef::Parser {
                              : (),
                              defined($where_block)   ? (where_block   => $where_block)   : (),
                              defined($where_expr)    ? (where_expr    => $where_expr)    : (),
-                             defined($subset_blocks) ? (subset_blocks => $subset_blocks) : (),
                             },
                             'Sidef::Variable::Variable'
                            );
 #>>>
+
+            if (exists($opt{callback})) {
+                $opt{callback}->($obj);
+            }
 
             if (!$opt{private} and $var_name ne '') {
                 unshift @{$self->{vars}{$class_name}},
@@ -922,7 +921,7 @@ package Sidef::Parser {
             }
 
             push @var_objs, $obj;
-            (defined($end_delim) && /\G\h*,\h*/gc) || last;
+            (defined($end_delim) && (/\G\h*,\h*/gc || /\G\h*(?:#.*)?+(?=\R)/gc)) || last;
 
             if ($opt{params} and $obj->{slurpy}) {
                 $self->fatal_error(
@@ -1169,11 +1168,14 @@ package Sidef::Parser {
                 my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
                 if (/\G\h*=\h*/gc) {
-                    my $args = $self->parse_obj(code => $opt{code}, multiline => 1) // $self->fatal_error(
-                                                                  code  => $_,
-                                                                  pos   => pos($_),
-                                                                  error => "expected an expression after variable declaration",
-                    );
+
+                    my $args = $self->parse_obj(code => $opt{code}, multiline => 1);
+
+                    $args // $self->fatal_error(
+                                                code  => $_,
+                                                pos   => pos($_),
+                                                error => "expected an expression after variable declaration",
+                                               );
 
                     $init_obj->{args} = $args;
                 }
@@ -1225,13 +1227,43 @@ package Sidef::Parser {
             # Declaration of constants and static variables
             if (/\G(define|const|static)\b\h*/gc) {
                 my $type = $1;
+                my $line = $self->{line};
+
+                my @var_objs;
+
+                my $callback = sub {
+                    my ($v) = @_;
+
+                    my $name       = $v->{name};
+                    my $class_name = $v->{class};
+
+                    my $var = (
+                                 $type eq 'define' ? bless($v, 'Sidef::Variable::Define')
+                               : $type eq 'static' ? bless($v, 'Sidef::Variable::Static')
+                               : $type eq 'const'  ? bless($v, 'Sidef::Variable::Const')
+                               :                     die "[PARSER ERROR] Invalid variable type: $type"
+                              );
+
+                    push @var_objs, $var;
+
+                    unshift @{$self->{vars}{$class_name}},
+                      {
+                        obj   => $var,
+                        name  => $name,
+                        count => 0,
+                        type  => $type,
+                        line  => $line,
+                      };
+                };
+
                 my $vars = $self->parse_init_vars(
-                                                  code    => $opt{code},
-                                                  type    => $type,
-                                                  private => 1,
+                                                  code     => $opt{code},
+                                                  type     => $type,
+                                                  private  => 1,
+                                                  callback => $callback,
                                                  );
 
-                foreach my $var (@{$vars}) {
+                foreach my $var (@var_objs) {
                     my $name = $var->{name};
                     if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
                         $self->fatal_error(
@@ -1242,74 +1274,31 @@ package Sidef::Parser {
                     }
                 }
 
-                if (@{$vars} == 1 and /\G\h*=\h*/gc) {
+                if (@var_objs == 1 and /\G\h*=\h*/gc) {
 
-                    my $v          = $vars->[0];
-                    my $name       = $v->{name};
-                    my $class_name = $v->{class};
-
+                    my $var = $var_objs[0];
                     my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
+
                     $obj // $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 2,
-                                               error => qq{expected an expression after $type "$name"},
+                                               error => qq{expected an expression after $type "$var->{name}"},
                                               );
 
-#<<<
-                    my $var =
-                      $type eq 'define'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
-                      : $type eq 'static'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
-                      : $type eq 'const'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                      : die "[PARSER ERROR] Invalid variable type: $type";
-#>>>
-
-                    unshift @{$self->{vars}{$class_name}},
-                      {
-                        obj   => $var,
-                        name  => $name,
-                        count => 0,
-                        type  => $type,
-                        line  => $self->{line},
-                      };
-
-                    return $var;
+                    $var->{value} = $obj;
                 }
 
-                my @var_objs;
-                foreach my $v (@{$vars}) {
+                my $const_init = bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
 
-                    my $obj        = $v->{value};
-                    my $name       = $v->{name};
-                    my $class_name = $v->{class};
-
-#<<<
-                    my $var = (
-                               $type eq 'define'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
-                               : $type eq 'static'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
-                               : $type eq 'const'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                               : die "[PARSER ERROR] Invalid variable type: $type"
-                              );
-#>>>
-
-                    push @var_objs, $var;
-
-                    unshift @{$self->{vars}{$class_name}},
-                      {
-                        obj   => $var,
-                        name  => $name,
-                        count => 0,
-                        type  => $type,
-                        line  => $self->{line},
-                      };
+                if (/\G\h*=\h*/gc) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - 2,
+                                       error => qq{the correct syntax is: `$type(x = ..., y = ...)`},
+                                      );
                 }
 
-                return bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
+                return $const_init;
             }
 
             # Struct declaration
@@ -1407,28 +1396,15 @@ package Sidef::Parser {
                         my $code = $name;
                         my $type = $self->parse_expr(code => \$code);
 
-                        if (ref($type) eq 'Sidef::Variable::Subset') {
-                            if (exists $type->{blocks}) {
-                                push @{$subset->{blocks}}, @{$type->{blocks}};
-                            }
-                        }
-
                         push @{$subset->{inherits}}, $type;
 
                         /\G,\h*/gc && redo;
                     }
                 }
-                else {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_),
-                                       error => "expected a parent type (e.g.: subset $name < Number)",
-                                      );
-                }
 
                 if (/\G(?=\{)/) {
                     my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
-                    push @{$subset->{blocks}}, $block;
+                    $subset->{block} = $block;
                 }
 
                 return $subset;
@@ -1510,6 +1486,7 @@ package Sidef::Parser {
                 my $name       = '';
                 my $class_name = $self->{class};
                 my $built_in_obj;
+
                 if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
 
                     ($name, $class_name) = $self->get_name_and_class($1);
@@ -1525,12 +1502,16 @@ package Sidef::Parser {
                     }
                 }
 
-                if ($type ne 'class') {
+                if ($type eq 'method') {
                     $name = (
-                               /\G($self->{var_name_re})\h*/goc ? $1
-                             : $type eq 'method' && /\G($self->{operators_re})\h*/goc ? $+
-                             :                                                          ''
+                               /\G($self->{method_name_re})\h*/goc ? $1
+                             : /\G($self->{operators_re})\h*/goc   ? $+
+                             :                                       ''
                             );
+                    ($name, $class_name) = $self->get_name_and_class($name);
+                }
+                elsif ($type ne 'class') {
+                    $name = /\G($self->{var_name_re})\h*/goc ? $1 : '';
                     ($name, $class_name) = $self->get_name_and_class($name);
                 }
 
@@ -1576,7 +1557,9 @@ package Sidef::Parser {
                         $parent   = $var->{obj};
                         $has_kids = 1;
 
-                        push @{$var->{obj}{value}{kids}}, $obj;
+                        #~ push @{$var->{obj}{value}{kids}}, $obj;
+                        $parent->{has_kids} = 1;
+                        $obj->{parent}      = $parent;
                     }
                 }
 
@@ -1884,6 +1867,20 @@ package Sidef::Parser {
             if (/\Gloop\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
                 return bless({block => $block}, 'Sidef::Types::Block::Loop');
+            }
+
+            # "try/catch" construct
+            if (/\Gtry\h*(?=\{)/gc) {
+                my $try_block = $self->parse_block(code => $opt{code});
+                my $obj = bless({try => $try_block}, 'Sidef::Types::Block::Try');
+
+                $self->parse_whitespace(code => $opt{code});
+
+                if (/\Gcatch\h*(?=\{)/gc) {
+                    $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
+                }
+
+                return $obj;
             }
 
             # "gather/take" construct
@@ -2594,23 +2591,13 @@ package Sidef::Parser {
 
                 if (/\G(?=\h*:?=(?![=~>]))/) {
 
-                    my $var = bless({name => $name, class => $class}, 'Sidef::Variable::Global');
-
                     if (not $self->{interactive}) {
                         warn "[WARNING] Implicit declaration of global variable `$name`"
                           . " at $self->{file_name} line $self->{line}\n";
                     }
 
-                    unshift @{$self->{vars}{$class}},
-                      {
-                        obj   => $var,
-                        name  => $name,
-                        count => 0,
-                        type  => 'global',
-                        line  => $self->{line},
-                      };
-
-                    return $var;
+                    my $code = "global $name";
+                    return $self->parse_expr(code => \$code);
                 }
 
                 # Method call in functional style (deprecated -- use `::name()` instead)
@@ -3342,15 +3329,6 @@ package Sidef::Parser {
                 if (ref($obj) eq 'Sidef::Types::Block::Do' and /\G\h*while\b/gc) {
                     my $arg = $self->parse_obj(code => $opt{code});
                     push @{$struct{$self->{class}}[-1]{call}}, {keyword => 'while', arg => [$arg]};
-                }
-
-                # Try-catch construct
-                if (ref($obj) eq 'Sidef::Types::Block::Try') {
-                    $self->parse_whitespace(code => $opt{code});
-                    if (/\G\h*catch\b/gc) {
-                        my $arg = $self->parse_obj(code => $opt{code});
-                        push @{$struct{$self->{class}}[-1]{call}}, {method => 'catch', arg => [$arg]};
-                    }
                 }
 
                 # Parse array and hash fetchers ([...] and {...})

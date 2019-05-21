@@ -1,5 +1,11 @@
 Revision history for Geo-Compass-Variation
 
+1.02    2019-05-19
+        - added generate_wmm_data.pl script, along with 2015v2 data in a new
+          script directory
+        - updated code and tests to be compliant with 2015 v2 WMM data
+          (closes #4)
+
 1.01    2019-05-02
         - changed magic number year (2015) to use the WMM_RELEASE_YEAR constant.
           (closes #3)

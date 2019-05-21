@@ -2,8 +2,8 @@ NAME
     App::swcat - Software catalog
 
 VERSION
-    This document describes version 0.010 of App::swcat (from Perl
-    distribution App-swcat), released on 2019-01-15.
+    This document describes version 0.011 of App::swcat (from Perl
+    distribution App-swcat), released on 2019-05-20.
 
 SYNOPSIS
     See swcat script.
@@ -157,7 +157,78 @@ FUNCTIONS
 
      list(%args) -> [status, msg, payload, meta]
 
-    List known software in the catalog.
+    List known software in the catalog (from installed
+    Software::Catalog::SW::* modules).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   cache_period => *int*
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_cpan
+    Usage:
+
+     list_cpan(%args) -> [status, msg, payload, meta]
+
+    List available known software in the catalog (from
+    Software::Catalog::SW::* modules on CPAN).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   cache_period => *int*
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   detail => *bool*
+
+    *   lcpan => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_installed
+    Usage:
+
+     list_installed(%args) -> [status, msg, payload, meta]
+
+    List known software in the catalog (from installed
+    Software::Catalog::SW::* modules).
 
     This function is not exported.
 

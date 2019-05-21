@@ -1,5 +1,8 @@
 Revision history for App-skos2jskos
 
+0.2.1  2019-05-16 13:05:33 CEST
+    - Remove some tests to avoid installation failure
+
 0.2.0  2019-05-02 10:57:08 CEST
     - Export concepts in ndjson
     - Detect and warn on non-literals

@@ -1,3 +1,49 @@
+1.140 2019-05-16
+================
+[Quiq::Cascm]
+* Methode edit() um automatischen demoten und promoten erweitert
+* Logausgabe SQL optional gemacht
+
+[Quiq::ColumnFormat]
+* Klasse durch Klasse Quiq::Properties ersetzt
+
+[Quiq::Database::Connection]
+* Cachepfad um UDL ergänzt
+* Doku tableDiff() erweitert
+
+[Quiq::Database::DataAnalysis]
+* Klasse implementiert
+
+[Quiq::Database::ResultSet]
+* Methode formats() auf Quiq::Properties umgestellt
+
+[Quiq::Gnuplot::*]
+* Klassen hinzugefügt
+
+[Quiq::Parameters]
+* Methode extractToObject() hinzugefügt
+
+[Quiq::Path]
+* Methode nexExtension() hinzugefügt
+
+[Quiq::Properties]
+* Klasse hinzugefügt
+
+[Quiq::Sdoc::*]
+* Klassen entfernt
+
+[Quiq::Ssh]
+* Klasse hinzugefügt
+
+[Quiq::Table]
+* Klasse hinzugefügt
+
+[Quiq::TableRow]
+* Klasse hinzugefügt
+
+[Quiq::Udl]
+* Kosmetik
+
 1.139 2019-05-01
 ================
 [Quiq::AnsiColor]
@@ -80,7 +126,7 @@ Link-Generierung für POD verbessert.
 [Quiq::Database::Connection]
 * DBMS MSSQL eingeführt.
 
-[Quiq::Sdoc::Node]
+[Sdoc1::Node]
 * Link-Generierung für POD korrigiert.
 
 [Quiq::Cascm]
@@ -218,7 +264,7 @@ Konstruktor-Option -warnings hinzugefügt.
 
 Methode loadPage() hinzugefügt.
 
-[Quiq::Sdoc::Code]
+[Sdoc1::Code]
 Kosmetik.
 
 [Quiq::AnsiColor]
@@ -236,7 +282,7 @@ Fehlermeldung bei nicht-existentem Schlüssel verbessert.
 [Quiq::Path]
 Methode checkFileSecurity() hinzugefügt.
 
-[Quiq::Sdoc]
+[Sdoc1]
 Methoden code(), paragraph() hinzugefügt.
 
 Methode section() verallgemeinert.
@@ -406,7 +452,7 @@ Dokumentation bearbeitet.
 [Quiq::Database::ResultSet::Object]
 Methode index() um Option -unique erweitert.
 
-[Quiq::Fibu::*]
+[Fibu::*]
 Klassen hinzugefügt.
 
 [Quiq::FFmpeg]

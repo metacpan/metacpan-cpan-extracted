@@ -35,7 +35,7 @@
             "Call::Context" : "0",
             "IO::Framed" : "0.15",
             "IO::SigGuard" : "0.13",
-            "Module::Load" : "0",
+            "Module::Runtime" : "0",
             "Promise::ES6" : "0",
             "X::Tiny" : "0",
             "parent" : "0",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/FGasper/p5-Protocol-DBus"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -53,6 +53,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Build/Make.pm"               => "\$(INST_LIB)/Alien/Build/Plugin/Build/Make.pm",
     "lib/Alien/Build/Plugin/Build/SearchDep.pm"          => "\$(INST_LIB)/Alien/Build/Plugin/Build/SearchDep.pm",
     "lib/Alien/Build/Plugin/Core.pod"                    => "\$(INST_LIB)/Alien/Build/Plugin/Core.pod",
+    "lib/Alien/Build/Plugin/Core/CleanInstall.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Core/CleanInstall.pm",
     "lib/Alien/Build/Plugin/Core/Download.pm"            => "\$(INST_LIB)/Alien/Build/Plugin/Core/Download.pm",
     "lib/Alien/Build/Plugin/Core/FFI.pm"                 => "\$(INST_LIB)/Alien/Build/Plugin/Core/FFI.pm",
     "lib/Alien/Build/Plugin/Core/Gather.pm"              => "\$(INST_LIB)/Alien/Build/Plugin/Core/Gather.pm",
@@ -64,6 +65,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Decode/DirListing.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Decode/DirListing.pm",
     "lib/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm",
     "lib/Alien/Build/Plugin/Decode/HTML.pm"              => "\$(INST_LIB)/Alien/Build/Plugin/Decode/HTML.pm",
+    "lib/Alien/Build/Plugin/Decode/Mojo.pm"              => "\$(INST_LIB)/Alien/Build/Plugin/Decode/Mojo.pm",
     "lib/Alien/Build/Plugin/Download.pod"                => "\$(INST_LIB)/Alien/Build/Plugin/Download.pod",
     "lib/Alien/Build/Plugin/Download/Negotiate.pm"       => "\$(INST_LIB)/Alien/Build/Plugin/Download/Negotiate.pm",
     "lib/Alien/Build/Plugin/Extract.pod"                 => "\$(INST_LIB)/Alien/Build/Plugin/Extract.pod",
@@ -125,7 +127,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.69",
+  "VERSION" => "1.73",
   "test"    => {
     "TESTS" => "t/*.t"
   }

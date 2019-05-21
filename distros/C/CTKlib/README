@@ -1,426 +1,458 @@
-$Id: README 200 2017-05-01 08:51:48Z minus $
-##############################################################################
-#                                                                            #
-#                                                                            #
-# THIS FILE DESCRIBES PRINCIPLES WORKING WITH CTKlib                         #
-#                                                                            #
-# NOTE: THE FILE IS WRITTEN IN RUSSIAN. WORK IS UNDERWAY TO TRANSLATE IT     #
-# INTO ENGLISH. IN THE NEXT RELEASE, EVERYTHING WILL CHANGE.                 #
-#                                                   THANK FOR UNDERSTANDING. #
-#                                                                            #
-##############################################################################
-
 NAME
-    CTKlib - Command-line ToolKit library (CTK). Command line interface (CLI)
+
+    CTK - Command-line ToolKit library (CTKlib)
 
 VERSION
-    Version 1.18
+
+    Version 2.00
+
+NOTE
+
+    The 2.00 version of this library is not compatible with earlier
+    versions
 
 SYNOPSIS
 
-    use CTK;
-
-    use CTK qw/ ...TAGS... /
-
-    use CTK qw/ ...VARIABLES, FUNCTIONS AND PROCEDURES... /
-
-ABSTRACT
-    Проект CTKlib содержит несколько библиотек работы с механизмами обслуживающие командную строку
-
-    SVN: http://svn.serzik.com/CTKlib/trunk
-         svn co http://svn.serzik.com/CTKlib/trunk CTKlib
+        use CTK;
+    
+        my $ctk = new CTK;
+        my $ctk = new CTK (
+            project => 'MyApp',
+            configfile  => '/path/to/conf/file.conf',
+            logfile     => '/path/to/log/file.log',
+        );
 
 DESCRIPTION
 
-The project ... blah-blah-blah
+    CTKlib - is library that provides "extended-features" (utilities) for
+    your robots written on Perl. Most of the functions and methods this
+    module written very simple language and easy to understand. To work
+    with CTKlib, you just need to start using it!
 
-Библиотека, призванная объеденить в себе основной инструментарий для создания роботов.
-CTK включает в себя механиз работы с командной строкой, отправки почты, соединения с БД,
-соединения с HTTP/FTP/SSH и прочими серверами с целью передачи информации и выполнения удаленных
-команд... и много-много других утилит, встроенных в один проект, который достаточно использовать
-с помощью вызова use CTK
+ new
 
-CTK состоит из 2-х ветвей - из утилитарной (процедурной) и функциональной (объектной). Утилитарная
-ветвь обеспечивает доступ к часто используемым функциям, которые можно условно разделить на группы.
-Это функции работы с датой и временем, функции конвертирования форматов, базовые функции работы с
-файлами и директориями, а также другие функции, которые всегда можно найти в пакете CTK::Util.
+        my $ctk = new CTK;
+        my $ctk = new CTK (
+            project => 'MyApp',
+            configfile  => '/path/to/conf/file.conf',
+            logfile     => '/path/to/log/file.log',
+        );
 
-Функциональная же ветвь, позволяет оперировать макрообъектами, каждый условный класс таких объектов
-носит свое имя: CTK::Arc (работа с архивами), CTK::File (работа с файлами), CTK::Net (работа с сетевыми
-ресурсами) и т.д. Все методы этих классов вызываются через главный объект CTK: $c? например:
+    Main constructor. All the params are optional
 
-    package main;
-    use CTK qw/ $DATADIR /
-    ...
-    1;
-    package my::mainlib;
-    my $c = new CTK; # Строим главный объект
-    ...
-    $c->frm( -in => CTK::catfile($CTK::DATADIR,'in') );
-    ...
-    1;
+    configfile
 
-В приведенном примере произойдет удаление содержимого каталога in в каталоге данных $CTK::DATADIR.
+          configfile => '/etc/myapp/myapp.conf'
 
-Импорт значения $CTK::DATADIR управляется в главном модуле машей программы или же при явном вызове, напроимер:
+      Path to the configuration file of the your project
 
-    package my::mainlib;
-    use CTK qw/ $DATADIR /
-    my $c = new CTK; # Строим главный объект
-    ...
-    $c->frm( -in => CTK::catfile($DATADIR,'in') );
-    ...
-    1;
+      Default: /etc/<PREFIX>/<PREFIX>.conf
 
-VARIABLES, FUNCTIONS AND PROCEDURES
+    datadir
 
-    Глобальные переменные
+          datadir => '/path/to/your/data/dir'
 
-    $TM        - Счетчик времени
-    $EXEDIR    - Директория где лежит вызываемый скрипт
-    $DATADIR   - Директория для данных (пользовательский каталог)
-    $CONFDIR   - Директория конфигурации (пользовательский каталог)
-    $CONFFILE  - Главный конфигурационный файл
-    $LOGDIR    - Директория где лежит логфайл
-    $LOGFILE   - Сам файл лога
-    %OPT       - Список опций командной строки
-    @OPTSYSDEF - Список опций по умолчанию, можно переопределять пользователем
+      Directory for application data storing
 
-    Базовые функции
+      Default: <getcwd()> (current directory)
 
-    say        - Функция say как в perl 6
-    debug      - Отладка - экран и лог если установлены опции -ld или -d
-    tms        - Таймштамп. Стандартный вывод времени
-    exception  - Процедура обработки исключений
-    testmode   - Функция возвращает результат тестового режима, используется в булевом контексте
-    debugmode  - Функция возвращает результат режима отладки, используется в булевом и INT контексте
-    logmode    - Функция возвращает результат режима логирования, используется в булевом контексте
+    debug
+
+          debug => 1
+          debug => 'on'
+          debug => 'yes'
+
+      Debug mode
+
+      Default: 0
+
+    ident
+
+          ident => "test"
+
+      Ident string for logs and debugging
+
+      Default: ""
+
+    log
+
+          log => 1
+          log => 'on'
+          log => 'yes'
+
+      Log mode
+
+      Default: 0
+
+    logdir
+
+          logdir => '/var/log/myapp'
+
+      Log directory of project
+
+      Default: /var/log/<PREFIX>
+
+    logfile
+
+          logfile => '/var/log/myapp/myapp.log'
+
+      Full path to the log file
+
+      Default: /var/log/<PREFIX>/<PREFIX>.log
+
+    options
+
+          options => {foo => 'bar'}
+
+      Command-line options, hash-ref structure. See Getopt::Long
+
+      Default: {}
+
+    plugins
+
+          plugins => [qw/ test /]
+          plugins => "test"
+
+      Array ref of plugin list or plugin name as scalar:
+
+      Default: []
+
+    prefix
+
+          prefix => "myapp"
+
+      Prefix of the Your project
+
+      Default: lc(<PROJECT>)
+
+    project
+
+          project => "MyApp"
+          name => "MyApp"
+
+      Project name
+
+      Default: $FindBin::Script without file extension
+
+    root
+
+          root => "/etc/myapp"
+
+      Root dir of project
+
+      Default: /etc/<PREFIX>
+
+    suffix
+
+          suffix => "devel"
+          suffix => "alpha"
+          suffix => "beta"
+          suffix => ".dev"
+
+      Suffix of the your project. Can use in plugins
+
+      Default: ""
+
+    tempdir
+
+          tempdir => "/tmp/myapp"
+
+      Temp directory of project
+
+      Default: /tmp/<PREFIX>
+
+    tempfile
+
+          tempfile => "/tmp/myapp/myapp.tmp"
+
+      Temp file of project
+
+      Default: /tmp/<PREFIX>/<PREFIX>.tmp
+
+    test
+
+          test => 1
+          test => 'on'
+          test => 'yes'
+
+      Test mode
+
+      Default: 0
+
+    verbose
+
+          verbose => 1
+          verbose => 'on'
+          verbose => 'yes'
+
+      Verbose mode
+
+      Default: 0
+
+ again
+
+    For internal use only (plugins). Please not call this function
+
+ configfile
+
+        my $configfile = $ctk->configfile;
+        $ctk->configfile("/path/to/config/file.conf");
+
+    Gets and sets configfile value
+
+ datadir
+
+        my $datadir = $ctk->datadir;
+        $ctk->datadir("/path/to/data/dir");
+
+    Gets and sets datadir value
+
+ debug
+
+        $ctk->debug( "Message" );
+
+    Prints debug information on STDOUT if is set debug mode. Also sends
+    message to log if log mode is enabled
+
+ debugmode
+
+        $ctk->debugmode;
+
+    Returns debug flag. 1 - on, 0 - off
+
+ error
+
+        my $error = $ctk->error;
+
+    Returns error string if occurred any errors while creating the object
+
+        $ctk->error("error text");
+
+    Sets new error message and returns it. Also prints message on STDERR if
+    is set verbose mode and sends message to log if log mode is enabled
+
+ exedir
+
+        my $exedir = $ctk->exedir;
+
+    Gets exedir value
+
+ load
+
+        $ctk->load("My::Foo::Package");
+
+    Internal method for loading modules.
+
+    Returns loading status: 0 - was not loaded; 1 - was loaded
+
+ load_plugins
+
+        my $summary_status = $self->load_plugins( @plugins );
+
+    Loads list of plugins and returns summary status
+
+ logdir
+
+        my $logdir = $ctk->logdir;
+        $ctk->logdir("/path/to/log/dir");
+
+    Gets and sets logdir value
+
+ logfile
+
+        my $logfile = $ctk->logfile;
+        $ctk->logfile("/path/to/log/file.log");
+
+    Gets and sets logfile value
+
+ logmode
+
+        $ctk->logmode;
+
+    Returns log flag. 1 - on, 0 - off
+
+ origin
+
+        my $args = $ctk->origin();
+
+    Returns hash-ref structure to all origin arguments
+
+ option
+
+        my $value = $ctk->option("key");
+
+    Returns option value by key
+
+        my $options = $ctk->option;
+
+    Returns hash-ref structure to all options
+
+    See "options"
+
+ project, prefix, suffix
+
+        my $project_name = $ctk->projtct;
+        my $prefix = $ctk->prefix;
+        my $suffix = $ctk->suffix;
+
+    Returns project, prefix and suffix values
+
+ revision
+
+        my $revision = $ctk->revision;
+
+    Returns revision value
+
+ root
+
+        my $my_root = $ctk->root; # /etc/<PREFIX>
+
+    Gets my root dir value
+
+ silentmode
+
+        $ctk->silentmode;
+
+    Returns the verbose flag in the opposite value. 0 - verbose, 1 -
+    silent.
+
+    See "verbosemode"
+
+ status
+
+        my $status = $ctk->status;
+
+    Returns boolean status of creating and using the object
+
+ tempfile
+
+        my $tempfile = $ctk->tempfile;
+        $ctk->tempfile("/path/to/temp/file.tmp");
+
+    Gets and sets tempfile value
+
+ tempdir
+
+        my $tempdir = $ctk->tempdir;
+        $ctk->tempdir("/path/to/temp/dir");
+
+    Gets and sets tempdir value
+
+ testmode
+
+        $ctk->testmode;
+
+    Returns test flag. 1 - on, 0 - off
+
+ tms
+
+        print $ctk->tms;
+
+    Returns timestamp. For example: +0.0080 sec
+
+ verbosemode
+
+        $ctk->verbosemode;
+
+    Returns verbose flag. 1 - on, 0 - off
+
+    See "silentmode"
+
+VARIABLES
+
+        use CTK qw/ WIN NULL TONULL ERR2OUT PREFIX /;
+        use CTK qw/ :constants /
+
+    ERR2OUT
+
+      Returns string:
+
+          2>&1
+
+    NULL
+
+      Returns NULL device path or name for Windows platforms
+
+    %PLUGIN_ALIAS_MAP
+
+      This hash is using for sets aliases of plugins, e.g.:
+
+          use CTK qw/ %PLUGIN_ALIAS_MAP /;
+          $PLUGIN_ALIAS_MAP{myplugin} = "My::Custom::Plugin::Module";
+
+    PREFIX
+
+      Return default prefix: ctk
+
+    TONULL
+
+      Returns string:
+
+          >/dev/null 2>&1
+
+    WIN
+
+      Returns 1 if Windows platform
 
 TAGS
 
-    ALL     - импортируются все глобальные переменные и все базовые функции
+    :constants
 
-    BASE    - импортируются основные глобальные переменные и все базовые функции
+      Will be exported following variables:
 
-    VARS    - импортируются все глобальные переменные
+          WIN, NULL, TONULL, ERR2OUT, PREFIX
 
-    FUNC, FUNCS, SUB, SUBS - импортируются все базовые функции
+    :variables
 
-OPTIONS
+      Will be exported following variables:
 
-    Опции, или иными сломами пары имя-значение глобального хеша %OPT нужны для вашей программы,
-    но стоит учесть тот немаловажный факт, что некоторые из них используется и самым модулем CTK
-    и потому являются зарезервированными. К таким зарезервированным именам опций относится
-    следующий набор опций:
-
-        debug
-        log
-        signature
-        testmode
-
-    Эти опции определены в стандартном массиве @OPTSYSDEF
-
-Пакетная работа с архивами
-
-    fextract - извлечение файлов из архивов с двумя способами: внешним и внутренним.
-
-    Внешний способ является приоритетным, т.к. снижает нагрузку на скрипт. Внешний способ базируется
-    на системном вызове той программы, которая определяется по расширению файла архива.
-
-    Внутренний способ более ресурсоемкий и хорош в случае когда имеется четкое представление какой
-    архив подлежит обработке и насколько он велик.
-
-    # Извлечение файлов внешним способом
-    $c->fextract(
-            -in     => CTK::catfile($CTK::DATADIR,'in'),  # путь до файлов архивов
-            -out    => CTK::catfile($CTK::DATADIR,'out'), # путь к папке для извлеченных файлов
-            -method => 'ext',           # Указатель что речь идет о внешнем извлечении, можно опустить
-            -list   => qr/rar/,         # Маска (ругулярное выражение) на отбор файлов каталога IN
-            -arcdef => $config->{arc},  # Секция определений из конфигурационного файла, Hashref
-        );
-
-    # Извлечение файлов внутренним способом
-    $c->fextract(
-            -in     => CTK::catfile($CTK::DATADIR,'in'),  # путь до файлов архивов
-            -out    => CTK::catfile($CTK::DATADIR,'out'), # путь к папке для извлеченных файлов
-            -method => 'zip',           # Указатель что речь идет о внешнем извлечении, можно опустить
-            -list   => qr/zip/,         # Маска (ругулярное выражение) на отбор файлов каталога IN
-            -arcdef => $config->{arc},  # Секция определений из конфигурационного файла, Hashref
-        );
-
-    fcompress - сжатие файлов, внешним способом.
-
-    # Сжатие файла внешним способом
-    $c->fcompress(
-            -in     => CTK::catfile($CTK::DATADIR,'in'),  # путь до файлов для сжатия
-            -out    => CTK::catfile($CTK::DATADIR,'out','ttt.rar'), # Конечное имя файла архива
-            -list   => qr//,           # Маска (ругулярное выражение) на отбор файлов каталога IN
-            -arcdef => $config->{arc}, # Секция определений из конфигурационного файла, Hashref
-        );
-
-    Внутренний способ не реализован ввиду непрактичного использования.
-
-Пакетная работа с файлами
-
-    fsplit - Разрезание файлов по строкам. Используется только текстовый режим достпуа.
-
-    Для того чтобы очень большие файлы разбивать на строки, существует функция fsplit, которая
-    сделает это!
-
-    $c->fsplit(
-            -in     => CTK::catfile($CTK::DATADIR,'in'),  # путь до файлов для обработки
-            -out    => CTK::catfile($CTK::DATADIR,'out'), # путь до итоговых файлов после обработки
-            -n      => 100, # количество строк на которые необходимо разбивать файлы
-            -format => '[FILENAME]_%03d.[FILEEXT]', # Формат каждого итогового файла
-            -list   => qr//, # Маска (ругулярное выражение) на отбор файлов каталога IN
-        );
-
-    fcopy, fcp - Копирование файлов
-
-    $c->fcopy(
-            -in     => CTK::catfile($CTK::DATADIR,'in'),  # путь до файлов для обработки
-            -out    => CTK::catfile($CTK::DATADIR,'out'), # путь до итоговых файлов после обработки
-            -format => '[FILE].copy', # Формат каждого итогового файла
-            -list   => qr//, # Маска (ругулярное выражение) на отбор файлов каталога IN
-        );
-
-    fmove, fmv - Перенос файла
-
-    $c->fmv(
-            -in     => CTK::catfile($CTK::DATADIR,'in'),  # путь до файлов для обработки
-            -out    => CTK::catfile($CTK::DATADIR,'out'), # путь до итоговых файлов после обработки
-            -format => '[FILE].copy', # Формат каждого итогового файла
-            -list   => qr//, # Маска (ругулярное выражение) на отбор файлов каталога IN
-        );
-
-    fdelete, fdel, frm - Удаление файла
-
-    $c->frm(
-            -in     => CTK::catfile($CTK::DATADIR,'in'), # путь до файлов для обработки
-            -list   => qr//, # Маска (ругулярное выражение) на отбор файлов каталога IN
-        );
-
-Пакетная работа с удаленными сетевыми ресурсами
-
-    Для работы с удаленными системами требуется хэш коннекта. Для работы с FTP такой хэш выглядит как:
-
-    my %ftpct = (
-        ftphost     => '192.168.1.1',
-        ftpuser     => 'login',
-        ftppassword => 'password',
-        ftpdir      => '~/activa', #activa
-        #ftpattr     => {},
-    );
-
-    my %httpct = (
-        method     => 'GET',
-        url        => 'http://yandex.ru/robots.txt',
-        #login      => 'login',
-        #password   => 'password',
-        #utf8       => 1,
-    );
-
-    my %uaopt = (
-        agent                   => "Mozilla/4.0",
-        max_redirect            => 10,
-        requests_redirectable   => ['GET','HEAD','POST'],
-        keep_alive              => 1,
-        env_proxy               => 1,
-    );
-
-    Далее по тексту будет использоваться он
-
-    fetch, get, download - Получение файлов, их скачка
-
-    $c->fetch(
-            -connect  => {%ftpct},   # Данные соединения
-            -protocol => 'ftp',      # Протокол работы, в частности, FTP
-            -dir      => $DATADIR,   # Директория (полный путь) где будут лежать принятые файлы
-            -cmd      => 'copyuniq', # Команда: copy / copyuniq / move / moveuniq
-            -mode     => 'bin',      # Режим доступа к файлам: ascii / binary (bin)
-            -list     => qr//,       # Маска (ругулярное выражение) на отбор файлов из источника
-        );
-
-    my $stat = $c->fetch(
-            -connect  => {%httpct},  # Данные соединения
-            -uaopt    => {%uaopt},   # Опции UserAgent (необязательны)
-            -protocol => 'http',     # Протокол работы, в частности, HTTP, может быть HTTPS
-            -dir      => $DATADIR,   # Директория (полный путь) где будут лежать принятые файлы (необязательно)
-            #-file    => '123.html', # Имя файла (необязательно)
-            #-uacode  => sub { },    # Исполняемый код для обэекта LWP::UserAgent (первый параметр)
-            #-reqcode => sub { },    # Исполняемый код для обэекта HTTP::Request (первый параметр)
-            #-rescode => sub { },    # Исполняемый код для обэекта HTTP::Response (первый параметр)
-        );
-    debug("STATUS: ",$stat);
-
-    # Простой способ получения текстовых страниц сайтов
-    my $html = $c->fetch(
-            -connect  => {
-                    method     => 'GET',
-                    url        => 'http://yandex.ru/robots.txt',
-                },
-            -protocol => 'http',
-            #-utf8     => 1,
-        );
-    debug("DATA:\n\n",$html,"\n");
-
-    Если опустить имя файла и директорию, то вывод будет передан в переменную $stat.
-
-    ВАЖНОЕ ЗАМЕЧАНИЕ!!! Этот путь приема (скачивания) файлов работает только с небольшими файлами,
-    для загрузки больших объемов лучим решением будет использование сторонних программ, таких как
-    wget, fetch, lwp-download и других аналогов.
-
-    Наглядным примером использования uacode, reqcode и rescode, будет вывод заголовков сл. образом:
-
-        -rescode => sub { debug(CTK::Net::_debug_http(@_))  },
-
-    Функция CTK::Net::_debug_http возвращает подробную информацию о запросе.
-
-    Команды бывают:
-
-    copy        - Копирование файла
-    copyuniq    - Копирование только уникальных файлов
-    move        - Перемещение файла
-    moveuniq    - Перемещение только уникальных файлов
-
-    store, put, upload - Отправка файлов, их загрузка
-
-    $c->store(
-            -connect  => {%ftpct},   # Данные соединения
-            -protocol => 'ftp',      # Протокол работы, в частности, FTP
-            -dir      => $DATADIR,   # Директория (полный путь) где лежат файлы для отправки
-            -cmd      => 'copyuniq', # Команда: copy / copyuniq / move / moveuniq
-            -mode     => 'bin',      # Режим доступа к файлам: ascii / binary (bin)
-            -file     => 'sg1.bat',  # Список или имя файлов или маска отбора
-        );
-
-Работа с базами данных и хранилищами
-
-    Для работы необходимо подключить модуль CTK::DBI в том пакете, откуда будут производиться вызовы.
-
-    # Соединение с БД mysql
-    my $oracle = new CTK::DBI(
-            -dsn  => 'DBI:mysql:database=mvcskel;host=192.168.100.1',
-            -user => 'login',
-            -pass => 'password',
-        );
-    debug($oracle->field("select sysdate() from dual"));
-
-    # Соединение с БД Oracle
-    if (testmode) {
-        my $oracle = new CTK::DBI(
-            -dsn  => $config->{oracle}{prodt}{dsn},
-            -user => $config->{oracle}{prodt}{user},
-            -pass => $config->{oracle}{prodt}{password},
-        );
-        debug($oracle->field("select sysdate from dual"));
-    }
-
-Отправка писем
-
-    my $send = CTK::sendmail(
-        -to         => (testmode() ? $config->{sendmail}{testmail} : $config->{sendmail}{to}),
-        -cc         => $config->{sendmail}{cc},
-        -from       => $config->{sendmail}{from},
-        -type       => $config->{sendmail}{type},
-        -smtp       => $config->{sendmail}{smtp},
-        -subject    => 'моя тема',
-        -message    => 'мое сообщение',
-        -attach => [
-                {Type=>'text/plain', Path=>$CTK::LOGFILE, Filename=>'log.txt', Disposition=>'attachment',},
-                {Type=>'text/plain', Data=>'document 1 content', Filename=>'doc1.txt', Disposition=>'attachment',},
-                {Type=>'text/plain', Data=>'document 2 content', Filename=>'doc2.txt', Disposition=>'attachment',},
-            ],
-    );
-    debug($send ? 'письмо ушло :)' : 'письмо НЕ ушло :(');
-
-Шифрование и защины, криптография
-
-    gpg_decript - Дешифрование файлов с помощью утилиты GPG (GnuPG)
-
-    Сайт проекта: http://www.gnupg.org/ (GPG4Win - http://gpg4win.org/)
-
-    Дешифрование ведется по уже установленным файлам ключей
-
-    $c->gpg_decript(
-            -in      => CTK::catfile($DATADIR,'in','test.txt.asc'), # путь до файлов для рашифровки
-            -out     => CTK::catfile($DATADIR,'out','test.txt'),    # путь до файла после обработки
-            -gpghome => '', # ЗАРЕЗЕРВИРОВАНО
-            -certdir => '', # путь до каталога с сертификатами. По умолчанию каталог ./data/cert
-            -pubkey  => '', # Путь до файла публичного (открытого) ключа. По умолчанию ./data/cert/public.key
-            -privkey => '', # Путь до файла приватного (закрытого) ключа. По умолчанию ./data/cert/private.key
-            -pass    => '', # Пароль для закрытого ключа. По умолчанию - спросит
-        );
-
-Работа с командной строкой
-
-    cli_prompt - Вызов командной строки, запрос на ввод строкойвой переменной
-
-    my $v = $c->cli_prompt('Your name:', 'anonymous');
-    debug( "Your name: $v" );
-
-    Первым параметром указывается приглашение, вторым - значение по умолчанию
-
-    cli_prompt3 - Вызов cli_prompt последовательно 3 раза для целей корректного введения значения
-
-    my $v = $c->cli_prompt3('Your name:');
-    debug( "Your name: $v" );
-
-    Первым параметром указывается приглашение, вторым - значение по умолчанию
-
-    cli_select - Вызов спсика для выбора значения из него. Используется таже командная строка но
-    с той лишь разницей что ожидается определенное значение из предложенного списка этих значений
-
-    my $v = $c->cli_select('Your select:',[qw/foo bar baz/],'bar');
-    debug( "Your select: $v" );
-
-    Первым параметром указывается строка приглашения на ввод значения, вторым параметром - ссылка на
-    массив содержащий список значений и третий параметр - значение по умолчанию.
-
-    cli_select3 - Вызов cli_select последовательно 3 раза для целей корректного введения значения
-
-    my $v = $c->cli_select3('Your select:',[qw/foo bar baz/],'foo');
-    debug( "Your select: $v" );
-
-    Первым параметром указывается строка приглашения на ввод значения, вторым параметром - ссылка на
-    массив содержащий список значений и третий параметр - значение по умолчанию.
-
-
-EXAMPLES
-
-Статья по Moose: http://ni-al.ru/index.php/Perl::Moose::Conept
-
-Получение списка всех утилитарных экспортированных функций
-
-perl -MCTK::Util -e "print join qq/\n/, sort {$a cmp $b} @{$CTK::Util::EXPORT_TAGS{ATOM}}" | gclip
-
-ENVIRONMENT
-    No environment variables are used.
-
-BUGS
-    Please report them.
-
-SEE ALSO
-    "Perl", ...
-
-DIAGNOSTICS
-    The usual warnings if it cannot read or write the files involved.
+          %PLUGIN_ALIAS_MAP
 
 HISTORY
-    See CHANGES file
 
-TODO
+    1.00 / 18.06.2012
+
+      Init version
+
+    2.00 Mon Apr 29 10:36:06 MSK 2019
+
+      New edition of the library
+
+    See Changes file
+
+DEPENDENCIES
+
+    Class::C3::Adopt::NEXT, Config::General, DBI, ExtUtils::MakeMaker,
+    File::Copy, File::Path, File::Pid, File::Spec, File::Temp, IO,
+    IO::String, IPC::Open3, JSON, List::Util, MIME::Base64, MIME::Lite,
+    MRO::Compat, Net::FTP, Perl::OSType, Sys::SigAction, Sys::Syslog
+    Term::ANSIColor, Test::Simple, Text::SimpleTable, Time::HiRes,
+    Time::Local, Try::Tiny, URI, XML::Simple, YAML::XS
+
+TO DO
+
     See TODO file
 
-LICENSE
-    See LICENSE file
+BUGS
 
-THANKS
-    Thanks to me for ...
+    * none noted
+
+SEE ALSO
+
+    perl
 
 AUTHOR
-    Sergey Lepenkov (Serz Minus) http://www.serzik.com <minus@mail333.com>.
 
-COPYRIGHTS
-    Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+
+COPYRIGHT
+
+    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See LICENSE file and https://dev.perl.org/licenses
 

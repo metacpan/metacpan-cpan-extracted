@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::ARPTable;
-$Device::Firewall::PaloAlto::Op::ARPTable::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Op::ARPTable::VERSION = '0.1.6';
 use strict;
 use warnings;
 use 5.010;
@@ -18,13 +18,14 @@ sub _new {
     my ($api_return) = @_;
     my %arp_table;
 
+
     # Copy across the maximum and total enties in the table
     @arp_table{qw(max_entries total_entries)} = @{$api_return->{result}}{qw(max total)};
 
-    my @entries = @{$api_return->{result}{entries}{entry}};
+    my $arp_entries = $api_return->{result}{entries}{entry} // [];
 
     # The ARP table is keyed on the IP address.
-    $arp_table{entries} = { map { $_->{ip} => Device::Firewall::PaloAlto::Op::ARPEntry->_new($_) } @entries };
+    $arp_table{entries} = { map { $_->{ip} => Device::Firewall::PaloAlto::Op::ARPEntry->_new($_) } @{ $arp_entries } };
 
     return bless \%arp_table, $class;
 }
@@ -66,7 +67,7 @@ Device::Firewall::PaloAlto::Op::ARPTable - Palo Alto firewall ARP table
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 

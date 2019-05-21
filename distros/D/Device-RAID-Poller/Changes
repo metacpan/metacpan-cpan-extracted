@@ -1,5 +1,8 @@
 Revision history for Device-RAID-Poller
 
+0.1.2	 2019-05-17/18:30
+         -Silence which for mdadm check.
+
 0.1.1	 2019-05-01/00:15
          -Don't call sysctl on the ZFS test on Linux, only FreeBSD.
          -Silence which for arcconf check.

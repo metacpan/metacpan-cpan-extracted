@@ -1,16 +1,17 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Sergey Lepenkov (Serz Minus), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 00-trailingspace.t 158 2017-01-31 16:14:06Z minus $
+# $Id$
 #
 # For Notapad++: [ \t]+\r\n -> \r\n
+# For Sublime  : [ \t]+\n
 #
 #########################################################################
 use strict;
@@ -24,11 +25,13 @@ plan tests => 1;
 
 my $finder = Test::TrailingSpace->new({
        root => '.',
-       filename_regex => qr/(?:\.(?:t|pm|pl|cgi|xs|c|h|pod|PL|conf)|README|CHANGES|TODO|LICENSE)\z/,
+       filename_regex => qr/(?:\.(?:t|pm|pl|cgi|xs|c|h|pod|PL|conf)|CHANGES|TODO)\z/,
+       abs_path_prune_re => qr(\Asrc),
    });
 
 # TEST
 $finder->no_trailing_space("No trailing space was found");
 
 1;
+
 __END__

@@ -1,5 +1,5 @@
 {
-   "abstract" : "search for a pattern in a CSV file and display results in a table",
+   "abstract" : "search for patterns in a CSV and display results in a table",
    "author" : [
       "Neil Bowers <neilb@cpan.org>"
    ],
@@ -44,7 +44,7 @@
          "web" : "https://github.com/neilb/csvgrep"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

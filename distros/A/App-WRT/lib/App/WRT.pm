@@ -1,6 +1,6 @@
 package App::WRT;
 
-use version; our $VERSION = version->declare("v6.0.0");
+use version; our $VERSION = version->declare("v6.2.3");
 
 use strict;
 use warnings;
@@ -623,7 +623,6 @@ sub year {
   return p('No such year.')
     unless $self->{entries}->is_dir($year);
 
-  my ($year_file, $year_url) = $self->root_locations($year);
   my $result;
 
   # Handle year directories with index files:
@@ -635,28 +634,30 @@ sub year {
 
   $result .= heading("${header_text}${year}", 3);
 
-  my @months = dir_list($year_file, 'high_to_low', qr/^[0-9]{1,2}$/);
+  my @months = reverse $self->{entries}->months_for($year);
 
   my $year_text;
   my $count = 0; # explicitly defined for later printing.
 
   foreach my $month (@months) {
     my $month_text = '';
-    if ($self->{entries}->is_dir("$year/$month")) {
-      my @entries = dir_list(
-        "$year_file/$month", 'low_to_high', qr/^[0-9]{1,2}$/
-      );
-      $count += @entries;
-      foreach my $entry (@entries) {
-        $month_text .= a({href => "$year_url/$month/$entry/"}, $entry) . "\n";
-      }
+    my @days = $self->{entries}->days_for($month);
+    $count += @days;
+
+    foreach my $day (@days) {
+      my ($day_file, $day_url) = $self->root_locations($day);
+      $month_text .= a(
+        { href => "${day_url}/" },
+        $self->{entries}->basename($day)
+      ) . "\n";
     }
 
     $month_text = small("( $month_text )");
 
+    my ($month_file, $month_url) = $self->root_locations($month);
     my $link = a(
-      {href => "$year_url/$month/"},
-      App::WRT::Date::month_name($month)
+      { href => "${month_url}/" },
+      App::WRT::Date::month_name($self->{entries}->basename($month))
     );
 
     $year_text .= table_row(
@@ -690,21 +691,22 @@ sub month {
 
   my ($month_file, $month_url) = $self->root_locations($month);
 
-  # If a directory exists for $month, use dir_list to slurp the entry files it
-  # contains into @entry_files, sorted numerically.  Then send each entry to
-  # entry_markup().
+  # If $month is a directory, render those of its children with day-like names:
   if ($self->{entries}->is_dir($month)) {
     my $result;
-    $result .= $self->entry($month)
+    $result = $self->entry($month)
       if $self->{entries}->has_index($month);
 
-    my @entry_files = dir_list($month_file, 'high_to_low', qr/^[0-9]{1,2}$/);
-    foreach my $entry_file (@entry_files) {
-      $result .= $self->entry_stamped("$month/$entry_file");
+    my @days = reverse $self->{entries}->days_for($month);
+
+    foreach my $day (@days) {
+      $result .= $self->entry_stamped($day);
     }
 
     return $result;
   } elsif ($self->{entries}->is_file($month)) {
+    # If $month is a file, it should just be rendered as a regular entry, more
+    # or less:
     return $self->entry($month);
   }
 }
@@ -748,8 +750,7 @@ sub entry_topic_list {
 
 =item entry($entry)
 
-Returns the contents of a given entry. Calls dir_list and icon_markup.
-Recursively calls itself.
+Returns the contents of a given entry.  May recurse, slightly.
 
 =cut
 
@@ -958,7 +959,7 @@ sub fragment_slurp {
 
 =item root_locations($file)
 
-Given a file/entry, return the appropriate concatenations with entry_dir and
+Given an entry, return the appropriate concatenations with entry_dir and
 url_root.
 
 =cut

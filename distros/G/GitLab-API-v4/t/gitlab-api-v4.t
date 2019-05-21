@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
-use 5.010001;
 use strictures 2;
 
-use Test2::V0;
 use Test2::Require::AuthorTesting;
+use Test2::V0;
 
-use JSON qw();
 use IPC::Cmd qw();
+use JSON qw();
 
 my $json = JSON->new->allow_nonref();
 

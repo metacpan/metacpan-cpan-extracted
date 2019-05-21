@@ -1,0 +1,16 @@
+{
+  "name": "lite",
+  "description": "",
+  "version": "0.0.1",
+  "devDependencies": {},
+  "dependencies": {
+    "rollup": "^1.12.3",
+    "rollup-plugin-bundle-html": "^0.1.5",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-livereload": "^1.0.0",
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "rollup-plugin-svelte": "^5.0.3",
+    "rollup-plugin-terser": "^4.0.4",
+    "svelte": "^3.4.1"
+  }
+}

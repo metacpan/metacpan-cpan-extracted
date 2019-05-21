@@ -10,7 +10,7 @@ cpan: 1
 
 # paths to skip while create the CPAN distributive
 cpan_manifest_skip:
-    - \Ashare/data/geoip.+[.](?:dat|mmdb)\z
+    - \Ashare/data/geoip.+[.]mmdb\z
 
 meta:
     homepage:       # project homepage url

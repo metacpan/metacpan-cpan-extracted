@@ -1,5 +1,8 @@
-package CTKx; # $Id: CTKx.pm 192 2017-04-28 20:40:38Z minus $
+package CTKx; # $Id: CTKx.pm 217 2019-04-30 09:15:34Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ CTKx - User extension CTK
 
 =head1 VERSION
 
-Version 1.01
+Version 2.00
 
 =head1 SYNOPSIS
 
@@ -16,25 +19,23 @@ Version 1.01
     use CTK;
     use CTKx;
 
-    my $ctkx = CTKx->instance( c => new CTK );
+    my $ctkx = CTKx->instance( ctk => new CTK );
 
     package MyApp;
 
     my $c = CTKx->instance->c;
-
-=head1 ABSTRACT
-
-CTKx - User extension CTK
+    my $ctk = CTKx->instance->ctk;
 
 =head1 DESCRIPTION
 
 Extension for working with CTK as "Singleton Pattern"
 
-=head2 c
+=head2 c, ctk
 
     my $c = CTKx->instance->c;
+    my $ctk = CTKx->instance->ctk;
 
-Returns c-object
+Returns ctk-object
 
 =head1 HISTORY
 
@@ -44,9 +45,13 @@ Returns c-object
 
 Init version
 
+=item B<1.00 Mon 29 Apr 22:26:18 MSK 2019>
+
+New edition
+
 =back
 
-See C<CHANGES> file for details
+See C<Changes> file for details
 
 =head1 DEPENDENCIES
 
@@ -64,34 +69,30 @@ See C<TODO> file
 
 C<perl>, L<Class::Singleton>
 
-=head1 DIAGNOSTICS
-
-The usual warnings if it can't read or write the files involved.
-
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use base qw/Class::Singleton/;
-use vars qw($VERSION);
-$VERSION = '1.01';
+use vars qw/$VERSION/;
+$VERSION = '2.00';
 
-sub c { shift->{c} }
+sub c { shift->{ctk} }
+sub ctk { shift->{ctk} }
 
 1;
 
-
+__END__

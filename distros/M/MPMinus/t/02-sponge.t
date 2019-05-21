@@ -1,24 +1,24 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Serz Minus (Lepenkov Sergey), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
-# 
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+#
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-sponge.t 127 2013-05-08 07:27:01Z minus $
+# $Id: 02-sponge.t 265 2019-04-26 11:07:29Z minus $
 #
 #########################################################################
 use Test::More tests => 9;
-BEGIN { 
+BEGIN {
     use_ok('MPMinus::Store::DBI');
 }
 
 my $o = new_ok(MPMinus::Store::DBI => [
         -driver => 'Sponge',
-        -attr   => { 
+        -attr   => {
                 RaiseError => 1,
                 PrintError => 0,
             },

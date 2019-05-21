@@ -6,7 +6,7 @@ use 5.01001;
 use parent 'Test2::Tools::HTTP::UA';
 
 # ABSTRACT: Mojo user agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new
@@ -146,7 +146,7 @@ Test2::Tools::HTTP::UA::Mojo - Mojo user agent wrapper for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

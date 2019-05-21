@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.014'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.015'; # VERSION
+my $LAST_UPDATE = '3.015'; # manually update whenever code is changed
 
 use POSIX qw(floor);
 use Scalar::Util qw(weaken);
@@ -41,6 +41,23 @@ sub new {
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
+
+    # copy global UU (if exists) to local, possibly to be overridden
+    # we can access UserUnit (should be not 1.0, if exists) but not userUnit
+    if (defined $self->{'Parent'}->{'UserUnit'}) {
+	my $UU = $self->{'Parent'}->{'UserUnit'}->{'val'};
+        $self->{' userUnit'} = $UU;
+	# AND set the local one if global is not 1.0
+	# (some readers don't let a page inherit the global UU)
+	if ($UU != 1.0) {
+	    $self->userunit($UU);
+        }
+    } else {
+	# not setting a global userUnit, so default this one to 1.0
+        $self->{' userUnit'} = 1;
+	# don't set a local UserUnit for now
+    }
+
     return $self;
 }
 
@@ -76,24 +93,65 @@ sub update {
     return $self;
 }
 
-=item $page->mediabox($w,$h)
+=item $page->userunit($value)
 
-=item $page->mediabox($llx,$lly, $urx,$ury)
-
-=item $page->mediabox($alias)
-
-Sets the mediabox.  This method supports the following aliases I<and more>:
-'4A0', '2A0', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6',
-'4B0', '2B0', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6',
-'LETTER', 'BROADSHEET', 'LEDGER', 'TABLOID', 'LEGAL',
-'EXECUTIVE', and '36X36'. 
-See L<PDF::Builder::Resource::PaperSizes> code for the full list.
+Sets the User Unit for this one page.  
+See L<PDF::Builder::Docs> "BOX" METHODS/User Units for more information.
 
 =cut
 
+sub userunit {
+    my ($self, $value) = @_;
+
+    if (float($value) <= 0.0) {
+	warn "Invalid User Unit value '$value', set to 1.0";
+	$value = 1.0;
+    }
+
+    # assume that even if $value is 1.0, it's being called for some reason
+    # (perhaps overriding non-1.0 global setting)
+    PDF::Builder->verCheckOutput(1.6, "set User Unit");
+    $self->{' userUnit'} = float($value);  # this is local (page) UU
+    $self->{'UserUnit'} = PDFNum(float($value));
+
+    return $self;
+}
+
 sub _set_bbox {
-    my ($box, $self, @values) = @_;
-    $self->{$box} = PDFArray( map { PDFNum(float($_)) } page_size(@values) );
+    my ($box, $self, @corners) = @_;
+
+    # if 1 or 3 elements in @corners, and [0] contains a letter, it's a name
+    my $isName = 0;
+    if (scalar @corners && $corners[0] =~ m/[a-z]/i) { $isName = 1; }
+
+    if (scalar @corners == 3) {
+	# have a name and one option (-orient)
+	my ($name, %opts) = @corners;
+        @corners = page_size(($name)); # now 4 numeric values
+	if (defined $opts{'-orient'}) {
+	    if ($opts{'-orient'} =~ m/^l/i) { # 'landscape' or just 'l'
+                # 0 0 W H -> 0 0 H W
+		my $temp;
+		$temp = $corners[2]; $corners[2] = $corners[3]; $corners[3] = $temp;
+	    }
+	}
+    } else {
+	# name without [-orient] option, or numeric coordinates given
+        @corners = page_size(@corners);
+    }
+
+    # scale down size if User Unit given (e.g., Letter => 0 0 8.5 11)
+    # we have a global userUnit, and possibly a page userUnit overriding it
+    if ($isName) {
+        my $UU = $self->{' userUnit'};
+        if ($UU != 1.0) {
+	    for (my $i=0; $i<4; $i++) {
+	        $corners[$i] /= $UU;
+	    }
+        }
+    }
+
+    $self->{$box} = PDFArray( map { PDFNum(float($_)) } @corners );
     return $self;
 }
 
@@ -114,13 +172,27 @@ sub _get_bbox {
     return @media;
 }
 
+=item $page->mediabox($alias)
+
+=item $page->mediabox($alias, -orient => 'orientation')
+
+=item $page->mediabox($w,$h)
+
+=item $page->mediabox($llx,$lly, $urx,$ury)
+
+Sets the Media Box for this one page.  
+See L<PDF::Builder::Docs> "BOX" METHODS/Media Box for more information.
+
+=cut
+
 sub mediabox {
     return _set_bbox('MediaBox', @_);
 }
 
 =item ($llx,$lly, $urx,$ury) = $page->get_mediabox()
 
-Gets the mediabox based on best estimates or the default.
+Gets the Media Box corner coordinates based on best estimates or the default.
+These are in the order given in a mediabox call (4 coordinates).
 
 =cut
 
@@ -130,13 +202,16 @@ sub get_mediabox {
     return _get_bbox($self, [qw(MediaBox CropBox BleedBox TrimBox ArtBox)]);
 }
 
+=item $page->cropbox($alias)
+
+=item $page->cropbox($alias, -orient => 'orientation')
+
 =item $page->cropbox($w,$h)
 
 =item $page->cropbox($llx,$lly, $urx,$ury)
 
-=item $page->cropbox($alias)
-
-Sets the cropbox. This method supports the same aliases as mediabox.
+Sets the Crop Box for this one page.  
+See L<PDF::Builder::Docs> "BOX" METHODS/Crop Box for more information.
 
 =cut
 
@@ -146,7 +221,7 @@ sub cropbox {
 
 =item ($llx,$lly, $urx,$ury) = $page->get_cropbox()
 
-Gets the cropbox based on best estimates or the default.
+Gets the Crop Box based on best estimates or the default.
 
 =cut
 
@@ -156,13 +231,16 @@ sub get_cropbox {
     return _get_bbox($self, [qw(CropBox MediaBox BleedBox TrimBox ArtBox)]);
 }
 
+=item $page->bleedbox($alias)
+
+=item $page->bleedbox($alias, -orient => 'orientation')
+
 =item $page->bleedbox($w,$h)
 
 =item $page->bleedbox($llx,$lly, $urx,$ury)
 
-=item $page->bleedbox($alias)
-
-Sets the bleedbox. This method supports the same aliases as mediabox.
+Sets the Bleed Box for this one page.  
+See L<PDF::Builder::Docs> "BOX" METHODS/Bleed Box for more information.
 
 =cut
 
@@ -172,7 +250,7 @@ sub bleedbox {
 
 =item ($llx,$lly, $urx,$ury) = $page->get_bleedbox()
 
-Gets the bleedbox based on best estimates or the default.
+Gets the Bleed Box based on best estimates or the default.
 
 =cut
 
@@ -182,13 +260,16 @@ sub get_bleedbox {
     return _get_bbox($self, [qw(BleedBox CropBox MediaBox TrimBox ArtBox)]);
 }
 
+=item $page->trimbox($alias)
+
+=item $page->trimbox($alias, -orient => 'orientation')
+
 =item $page->trimbox($w,$h)
 
 =item $page->trimbox($llx,$lly, $urx,$ury)
 
-=item $page->trimbox($alias)
-
-Sets the trimbox. This method supports the same aliases as mediabox.
+Sets the Trim Box for this one page.  
+See L<PDF::Builder::Docs> "BOX" METHODS/Trim Box for more information.
 
 =cut
 
@@ -198,7 +279,7 @@ sub trimbox {
 
 =item ($llx,$lly, $urx,$ury) = $page->get_trimbox()
 
-Gets the trimbox based on best estimates or the default.
+Gets the Trim Box based on best estimates or the default.
 
 =cut
 
@@ -208,13 +289,16 @@ sub get_trimbox {
     return _get_bbox($self, [qw(TrimBox CropBox MediaBox ArtBox BleedBox)]);
 }
 
+=item $page->artbox($alias)
+
+=item $page->artbox($alias, -orient => 'orientation')
+
 =item $page->artbox($w,$h)
 
 =item $page->artbox($llx,$lly, $urx,$ury)
 
-=item $page->artbox($alias)
-
-Sets the artbox. This method supports the same aliases as mediabox.
+Sets the Art Box for this one page.  
+See L<PDF::Builder::Docs> "BOX" METHODS/Art Box for more information.
 
 =cut
 
@@ -224,7 +308,7 @@ sub artbox {
 
 =item ($llx,$lly, $urx,$ury) = $page->get_artbox()
 
-Gets the artbox based on best estimates or the default.
+Gets the Art Box based on best estimates or the default.
 
 =cut
 

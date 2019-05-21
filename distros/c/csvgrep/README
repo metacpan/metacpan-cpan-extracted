@@ -1,7 +1,7 @@
 This archive contains the distribution csvgrep,
-version 0.07:
+version 0.08:
 
-  search for a pattern in a CSV file and display results in a table
+  search for patterns in a CSV and display results in a table
 
 This software is copyright (c) 2017 by Neil Bowers.
 

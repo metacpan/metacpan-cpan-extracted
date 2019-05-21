@@ -4,17 +4,17 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::RichtextCustomField;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =encoding utf8
 
 =head1 NAME
 
-RT-Extension-RichtextCustomField - CF with wysiwyg editor
+RT::Extension::RichtextCustomField - CF with wysiwyg editor
 
 =head1 DESCRIPTION
 
-Provide a new type of L<custom field|RT::CustomField>, similar to Text but with wysiwyg editor when editing value.
+Provide a new type of L<custom field|https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html>, similar to Text but with wysiwyg editor when editing value.
 
 =head1 RT VERSION
 
@@ -31,6 +31,15 @@ Works with RT 4.2 or greater
 =item C<make install>
 
 May need root permissions
+
+=item Patch your RT
+
+C<RichtextCustomField> requires a small patch to allow  L<custom fields|https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html> with C<Richtext> type to be chosen as recipient for extracting from a L<ticket|https://docs.bestpractical.com/rt/4.4.4/RT/Ticket.html> into an L<article|https://docs.bestpractical.com/rt/4.4.4/RT/Article.pm>. I<You have to apply this patch if you need this feature, and only in this case.>
+
+For RT 4.4 or lower, apply the included patch:
+
+    cd /opt/rt4 # Your location may be different
+    patch -p1 < /download/dir/RT-Extension-RichtextCustomField/patches/4.4-add-Richtext-CFs-ExtractArticleFromTicket.patch
 
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 

@@ -1,95 +1,121 @@
-SYNOPSIS
+NAME
+    Text::WideChar::Util - Routines for text containing wide characters
 
+VERSION
+    This document describes version 0.170 of Text::WideChar::Util (from Perl
+    distribution Text-WideChar-Util), released on 2019-05-17.
+
+SYNOPSIS
      use Text::WideChar::Util qw(
          mbpad pad mbswidth mbswidth_height mbtrunc trunc mbwrap wrap);
-    
+
      # get width as well as number of lines
      say mbswidth_height("red\n红色"); # => [4, 2]
-    
+
      # wrap text to a certain column width
      say mbwrap("....", 40);
-    
+
      # pad (left, right, center) text to specified column width, handle multilines
      say mbpad("foo", 10);                          # => "foo       "
      say mbpad("红色", 10, "left");                 # => "      红色"
      say mbpad("foo\nbarbaz\n", 10, "center", "."); # => "...foo....\n..barbaz..\n"
-    
+
      # truncate text to a certain column width
      say mbtrunc("红色",  2); # => "红"
      say mbtrunc("红色",  3); # => "红"
      say mbtrunc("红red", 3); # => "红r"
 
 DESCRIPTION
-
     This module provides routines for dealing with text containing wide
     characters (wide meaning occupying more than 1 column width in
     terminal).
 
+INTERNAL NOTES
+    Should we wrap at hyphens? Probably not. Both Emacs as well as
+    Text::Wrap do not.
+
 FUNCTIONS
-
- mbswidth($text) => INT
-
+  mbswidth($text) => INT
     Like Text::CharWidth's mbswidth(), except implemented using
     Unicode::GCString->new($text)->columns.
 
- mbswidth_height($text) => [INT, INT]
-
+  mbswidth_height($text) => [INT, INT]
     Like mbswidth(), but also gives height (number of lines). For example,
-    mbswidth_height("foobar\nb\n") gives [6, 3].
+    "mbswidth_height("foobar\nb\n")" gives [6, 3].
 
- length_height($text) => [INT, INT]
-
+  length_height($text) => [INT, INT]
     This is the non-wide version of mbswidth_height() and can be used if
     your text only contains printable ASCII characters and newlines.
 
- mbwrap($text, $width, \%opts) => STR
+  mbwrap($text, $width, \%opts) => STR
+    Wrap $text to $width columns. Replaces multiple whitespaces with a
+    single space.
 
-    Wrap $text to $width columns. It uses mbswidth() instead of Perl's
-    length() which works on a per-character basis. Has some support for
-    wrapping Kanji/CJK (Chinese/Japanese/Korean) text which do not have
-    whitespace between words.
+    It uses mbswidth() instead of Perl's length() which works on a
+    per-character basis. Has some support for wrapping Kanji/CJK
+    (Chinese/Japanese/Korean) text which do not have whitespace between
+    words.
 
     Options:
 
-      * tab_width => INT (default: 8)
+    *   tab_width => INT (default: 8)
 
-      Set tab width.
+        Set tab width.
 
-      Note that tab will only have effect on the indent. Tab between text
-      will be replaced with a single space.
+        Note that tab will only have effect on the indent. Tab between text
+        will be replaced with a single space.
 
-      * flindent => STR
+    *   flindent => STR
 
-      First line indent. If unspecified, will be deduced from the first
-      line of text.
+        First line indent. If unspecified, will be deduced from the first
+        line of text.
 
-      * slindent => STD
+    *   slindent => STD
 
-      Subsequent line indent. If unspecified, will be deduced from the
-      second line of text, or if unavailable, will default to empty string
-      ("").
+        Subsequent line indent. If unspecified, will be deduced from the
+        second line of text, or if unavailable, will default to empty string
+        ("").
 
-      * return_stats => BOOL (default: 0)
+    *   return_stats => BOOL (default: 0)
 
-      If set to true, then instead of returning the wrapped string,
-      function will return [$wrapped, $stats] where $stats is a hash
-      containing some information like max_word_width, min_word_width.
+        If set to true, then instead of returning the wrapped string,
+        function will return "[$wrapped, $stats]" where $stats is a hash
+        containing some information like "max_word_width", "min_word_width".
+
+    *   keep_trailing_space => BOOL (default: 0)
+
+        If set to true, then trailing space that separates words will be
+        kept at the end of wrapped lines. This option is useful if you want
+        to rejoin the lines later. Without this option set to true, wrapping
+        this line at width=4 (quotes shown):
+
+         "some long   line"
+
+        will result in:
+
+         "some"
+         "long"
+         "line"
+
+        While if this option is set to true, the result will be:
+
+         "some "
+         "long "
+         "line"
 
     Performance: ~450/s on my Core i5 1.7GHz laptop for a 1KB of text.
 
- wrap($text, $width, \%opts) => STR
-
+  wrap($text, $width, \%opts) => STR
     Like mbwrap(), but uses character-based length() instead of column
     width-wise mbswidth(). Provided as an alternative to the venerable
-    Text::Wrap's wrap() but with a different behaviour. This module's
-    wrap() can reflow newline and its behavior is more akin to Emacs (try
-    reflowing a paragraph in Emacs using M-q).
+    Text::Wrap's wrap() but with a different behaviour. This module's wrap()
+    can reflow newline and its behavior is more akin to Emacs (try reflowing
+    a paragraph in Emacs using "M-q").
 
     Performance: ~2000/s on my Core i5 1.7GHz laptop for a ~1KB of text.
     Text::Wrap::wrap() on the other hand is ~2500/s.
 
- mbpad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
-
+  mbpad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
     Return $text padded with $padchar to $width columns. $which is either
     "r" or "right" for padding on the right (the default if not specified),
     "l" or "left" for padding on the right, or "c" or "center" or "centre"
@@ -98,33 +124,39 @@ FUNCTIONS
     $padchar is whitespace if not specified. It should be string having the
     width of 1 column.
 
- pad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
-
+  pad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
     The non-wide version of mbpad(), just like in mbwrap() vs wrap().
 
- mbtrunc($text, $width) => STR
-
+  mbtrunc($text, $width) => STR
     Truncate $text to $width columns. It uses mbswidth() instead of Perl's
     length(), so it can handle wide characters.
 
     Does *not* handle multiple lines.
 
- trunc($text, $width) => STR
+  trunc($text, $width) => STR
+    The non-wide version of mbtrunc(), just like in mbwrap() vs wrap(). This
+    is actually not much more than Perl's "substr($text, 0, $width)".
 
-    The non-wide version of mbtrunc(), just like in mbwrap() vs wrap().
-    This is actually not much more than Perl's substr($text, 0, $width).
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-WideChar-Util>.
 
-INTERNAL NOTES
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-WideChar-Util>.
 
-    Should we wrap at hyphens? Probably not. Both Emacs as well as
-    Text::Wrap do not.
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-WideChar-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Unicode::GCString which is consulted for visual width of characters.
     Text::CharWidth is about 2.5x faster but it gives weird results (-1 for
-    characters like "\n" and "\t") and my Strawberry Perl installation
-    fails to build it.
+    characters like "\n" and "\t") and my Strawberry Perl installation fails
+    to build it.
 
     Text::ANSI::Util which can also handle text containing wide characters
     as well ANSI escape codes.
@@ -133,13 +165,17 @@ SEE ALSO
     comparable speed, though wrapping result might differ slightly. And the
     module currently uses Text::CharWidth.
 
-POD ERRORS
+    Text::NonWideChar::Util contains non-wide version of some of the
+    abovementioned routines (the non-wide version of the routines will
+    eventually be moved here).
 
-    Hey! The above document had some coding errors, which are explained
-    below:
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    Around line 7:
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014, 2013 by
+    perlancar@cpan.org.
 
-      Non-ASCII character seen before =encoding in
-      'mbswidth_height("red\n红色");'. Assuming UTF-8
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

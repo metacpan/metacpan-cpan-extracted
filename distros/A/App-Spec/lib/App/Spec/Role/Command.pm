@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Spec::Role::Command;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use YAML::PP;
 use List::Util qw/ any /;

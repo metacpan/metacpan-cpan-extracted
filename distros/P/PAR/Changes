@@ -1,3 +1,21 @@
+1.016  2019-05-20
+
+  - Fix #129312: Code signing for OSX
+    
+    Avoid Archive::Zip::Archive error "can't find EOCD signature" for pp'ed
+    executables with lots of stuff appended (e.g. by OSX codesign):
+    temporarily increase Archive::Zip::ChunkSize around the call to
+    Archive::Zip::readFromFileHandle().
+    
+    Note this is prerequisite for the corresponding fix in PAR::Packer.
+
+  - Fix: Archive::Unzip::Burst::unzip result is ignored and _extract_inc
+    does always the slow way, too
+
+    PR from Vit Spinka <vit.spinka@gmail.com>, thanks!
+
+  - Show debug messages if $ENV{PERL_DL_DEBUG} is true
+
 1.015  2017-04-13
 
   - Fix RT#120722 (Reason for Module::Signature dependency unclear since 2008)

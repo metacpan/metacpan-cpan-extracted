@@ -1,0 +1,16 @@
+.perltidyrc
+Changes
+cpanfile
+lib/SVG/.QRCode.pm.swp
+lib/SVG/QRCode.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-basic.t
+t/01-object.t
+t/02-function.t
+t/resources/Grapejuice_7x7_red.svg
+t/resources/Tekki_5x5_black.svg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

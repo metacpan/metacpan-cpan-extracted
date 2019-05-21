@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 use CPS::Functional qw( kmap );
 
@@ -22,3 +23,5 @@ kmap(
 is_deeply( \@nums, [ 2, 4, 6 ], 'kmap sync - @nums' );
 
 @nums = ();
+
+done_testing;

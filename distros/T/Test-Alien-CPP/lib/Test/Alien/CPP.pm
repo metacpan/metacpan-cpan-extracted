@@ -9,7 +9,7 @@ use Text::ParseWords qw( shellwords );
 use base qw( Exporter );
 
 # ABSTRACT: Testing tools for Alien modules for projects that use C++
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 
 our @EXPORT = @Test::Alien::EXPORT;
@@ -49,7 +49,7 @@ sub xs_ok
       my $value = delete $xs->{$stage{$name}}->{$name};
       ref($value) eq 'ARRAY' ? @$value : shellwords($value);
     };
-    $xs->{$stage{$name}}->{$name} = [@new, @old];
+    $xs->{$stage{$name}}->{$name} = [@old, @new];
   }
   warn "extra Module::Build option: $_" for keys %cppguess;
 
@@ -70,7 +70,7 @@ Test::Alien::CPP - Testing tools for Alien modules for projects that use C++
 
 =head1 VERSION
 
-version 0.99
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,11 @@ See L<Test::Alien> for further details on how this test works.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 

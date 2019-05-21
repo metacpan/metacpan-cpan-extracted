@@ -1,5 +1,5 @@
 package Git::Raw::Odb::Backend::Loose;
-$Git::Raw::Odb::Backend::Loose::VERSION = '0.82';
+$Git::Raw::Odb::Backend::Loose::VERSION = '0.83';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Odb::Backend::Loose - Git loose object database backend class
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 DESCRIPTION
 

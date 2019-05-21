@@ -13,18 +13,36 @@ package Sidef::Types::Block::Block {
       q{""}   => sub {
         my ($self) = @_;
 
-        my $name = Sidef::normalize_type($self->{name});
-        my $addr = Scalar::Util::refaddr($self->{code});
-        my @vars = map { ($_->{slurpy} ? '*' : '') . Sidef::normalize_type($_->{name}) . ($_->{has_value} ? '=(nil)' : '') }
-          @{$_[0]->{vars}};
+        my $name = $self->_name;
+        my $addr = Scalar::Util::refaddr($self);
+
+        my @vars = map {
+                (defined($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
+              . ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '')
+              . Sidef::normalize_type($_->{name})
+              . (defined($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
+              . ($_->{has_value} ? ' = nil' : '')
+        } @{$self->{vars}};
 
         (
          $self->{type} eq 'block'
          ? ('{' . (@vars ? ('|' . join(',', @vars) . '|') : ''))
-         : ('func (' . join(',', @vars) . ') {')
+         : ('func (' . join(', ', @vars) . ') {')
         )
           . " #`($name|$addr) ... }";
       };
+
+    sub _name {
+        my ($self) = @_;
+        $self->{_name} //= Sidef::normalize_type(
+                                                 (
+                                                    exists($self->{class})     ? ($self->{class} . '.')
+                                                  : exists($self->{namespace}) ? ($self->{namespace} . '::')
+                                                  :                              ''
+                                                 )
+                                                 . ($self->{name} // '__FUNC__')
+                                                );
+    }
 
     sub new {
         my (undef, %opt) = @_;
@@ -35,6 +53,26 @@ package Sidef::Types::Block::Block {
                %opt
               },
           __PACKAGE__;
+    }
+
+#<<<
+    use constant {
+                  IDENTITY       => __PACKAGE__->new(is_identity => 1, name => 'Block.IDENTITY',       code => sub { $_[0] }),
+                  NULL_IDENTITY  => __PACKAGE__->new(is_identity => 1, name => 'Block.NULL_IDENTITY',  code => sub { }),
+                  LIST_IDENTITY  => __PACKAGE__->new(is_identity => 1, name => 'Block.LIST_IDENTITY',  code => sub { (@_) }),
+                  ARRAY_IDENTITY => __PACKAGE__->new(is_identity => 1, name => 'Block.ARRAY_IDENTITY', code => sub { Sidef::Types::Array::Array->new(@_) }),
+                 };
+#>>>
+
+    sub identity       { IDENTITY }
+    sub list_identity  { LIST_IDENTITY }
+    sub array_identity { ARRAY_IDENTITY }
+    sub null_identity  { NULL_IDENTITY }
+
+    sub is_identity {
+        $_[0]->{is_identity}
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub run {
@@ -52,7 +90,13 @@ package Sidef::Types::Block::Block {
     sub _multiple_dispatch {
         my ($self, @args) = @_;
 
-        my @methods = ($self, exists($self->{kids}) ? @{$self->{kids}} : ());
+#<<<
+        my @methods = (
+            $self,
+            (exists($self->{kids})     ? @{$self->{kids}}  : ()),
+            (exists($self->{fallback}) ? $self->{fallback} : ())
+        );
+#>>>
 
         if (defined($self->{class}) and defined($self->{name})) {
 
@@ -83,6 +127,10 @@ package Sidef::Types::Block::Block {
 
                         if (exists($method->{kids})) {
                             push @methods, @{$method->{kids}};
+                        }
+
+                        if (exists($method->{fallback})) {
+                            push @methods, $method->{fallback};
                         }
 
                         if (--$limit == 0) {
@@ -161,7 +209,10 @@ package Sidef::Types::Block::Block {
                         }
 
                         if (exists($var->{subset})) {
-                            UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
+
+                            if (UNIVERSAL::isa($var->{subset}, 'Sidef::Object::Object')) {
+                                UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
+                            }
 
                             if (exists($var->{where_block})) {
                                 $var->{where_block}($value) || next OUTER;
@@ -170,9 +221,8 @@ package Sidef::Types::Block::Block {
                                 $value eq $var->{where_expr} or next OUTER;
                             }
 
-                            if (exists $var->{subset_blocks}) {
-                                (List::Util::all { $_->($value) } @{$var->{subset_blocks}}) || next OUTER;
-                            }
+                            my $sub = UNIVERSAL::can($var->{subset}, '__subset_validation__');
+                            ($sub ? $sub->($value) : 1) || next OUTER;
                         }
 
                         push @pos_args, $value;
@@ -195,10 +245,6 @@ package Sidef::Types::Block::Block {
                         if (exists $var->{where_block}) {
                             $var->{where_block}($value) || next OUTER;
                         }
-
-                        if (exists $var->{subset_blocks}) {
-                            (List::Util::all { $_->($value) } @{$var->{subset_blocks}}) || next OUTER;
-                        }
                     }
                     elsif (exists $var->{where_expr}) {
                         $var->{where_expr} eq $seen{$var->{name}} or next OUTER;
@@ -220,7 +266,7 @@ package Sidef::Types::Block::Block {
             return ($method, $method->{code}->(@pos_args));
         }
 
-        my $name = Sidef::normalize_type($self->{name} // '__FUNC__');
+        my $name = $self->_name;
 
         die "[ERROR] $self->{type} `$name` does not match $name("
           . join(', ',
@@ -242,10 +288,7 @@ package Sidef::Types::Block::Block {
           . join(
             "\n    ",
             map {
-                    (exists($_->{namespace}) ? ($_->{namespace} . '::') : '')
-                  . (exists($_->{class}) ? (Sidef::normalize_type($_->{class}) . '.') : '')
-                  . Sidef::normalize_type($_->{name}) . '('
-                  . join(
+                $_->_name . '(' . join(
                     ', ',
                     map {
                             (exists($_->{slurpy}) ? '*' : '')
@@ -275,22 +318,22 @@ package Sidef::Types::Block::Block {
         if (exists $self->{returns}) {
 
             if ($#{$self->{returns}} != $#objs) {
-                die qq{[ERROR] Wrong number of return values from $self->{type} }
-                  . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
-                  . qq{$self->{name}\(): got }
-                  . @objs
+                die qq{[ERROR] Wrong number of return values from $self->{type} `}
+                  . $self->_name
+                  . "`: got "
+                  . scalar(@objs)
                   . ", but expected "
-                  . @{$self->{returns}};
+                  . scalar(@{$self->{returns}}) . "\n";
             }
 
             foreach my $i (0 .. $#{$self->{returns}}) {
                 if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or UNIVERSAL::isa($objs[$i], $self->{returns}[$i]))) {
-                    die qq{[ERROR] Invalid return-type from $self->{type} }
-                      . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
-                      . qq{$self->{name}\(): got `}
+                    die qq{[ERROR] Invalid return-type for value[$i] from $self->{type} `}
+                      . $self->_name
+                      . "`: got `"
                       . Sidef::normalize_type(ref($objs[$i]))
                       . qq{`, but expected `}
-                      . Sidef::normalize_type($self->{returns}[$i]) . "`";
+                      . Sidef::normalize_type($self->{returns}[$i]) . "`\n";
                 }
             }
         }
@@ -381,7 +424,31 @@ package Sidef::Types::Block::Block {
 
             return scalar {dump => ($ref . "->_set_str('${type}', '${str}')")};
         }
-        elsif ($ref eq 'Sidef::Types::Block::Block') {
+
+        if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {
+
+            my $module = (
+                          ref($obj->{module})
+                          ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__)
+                          : qq{"$obj->{module}"}
+                         );
+
+            my $module_name = ref($obj->{module}) || $obj->{module};
+
+            my $code = {
+                dump => qq{
+                    do {
+                        use $ref;
+                        eval "require $module_name";
+                        bless({ module => $module }, "$ref");
+                    }
+                }
+                       };
+
+            return $code;
+        }
+
+        if ($ref eq 'Sidef::Types::Block::Block') {
             die "[ERROR] Blocks cannot be serialized!";
         }
 
@@ -400,8 +467,8 @@ package Sidef::Types::Block::Block {
 
         if ($pid == 0) {
             srand();
-            my $obj = $self->call(@args);
-            print $fh scalar Data::Dump::Filtered::dump_filtered($obj, \&__fdump);
+            my @objs = ($self->call(@args));
+            print $fh scalar Data::Dump::Filtered::dump_filtered(@objs, \&__fdump);
             exit 0;
         }
 
@@ -478,6 +545,7 @@ package Sidef::Types::Block::Block {
     sub for {
         my ($self, @objs) = @_;
         _iterate($self, @objs);
+        $self;
     }
 
     *each    = \&for;

@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use WebDriver::Tiny::Elements;
-use Test::Deep;
 use Test::More tests => 15;
 
 sub make { bless [ 'd', @_ ], 'WebDriver::Tiny::Elements' }
@@ -44,6 +43,6 @@ is_deeply [ $e->split ],
 is_deeply $e->append( make( 10, 11 ), make(12) ), [ 'd', 1 .. 12 ],
     '->append';
 
-cmp_bag [ @{ $e->append( make( 6, 9 ) )->uniq } ], [ 'd', 1 .. 9 ], '->uniq';
+is_deeply [ sort @{ $e->append( make( 6, 9 ) )->uniq } ], [ 1 .. 9, 'd' ], '->uniq';
 
 is_deeply $e, [ 'd', 1 .. 9 ], 'Original is unaffected';

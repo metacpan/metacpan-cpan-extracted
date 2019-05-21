@@ -44,6 +44,7 @@
             "Math::Polygon::Tree" : "0",
             "Math::Round" : "0",
             "Math::Trig" : "0",
+            "Regexp::Common" : "0",
             "Set::Intersection" : "0",
             "Statistics::Basic" : "0",
             "Storable" : "0",
@@ -53,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.337",
+   "version" : "0.373",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

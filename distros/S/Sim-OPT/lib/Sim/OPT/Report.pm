@@ -1404,7 +1404,7 @@ Sim::OPT::Report.
 
 =head1 DESCRIPTION
 
-Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results. Sim::OPT::Report performs two kinds of action. The first, which is required only by certain simulation programs, is that of making the simulation program write the results in a user-specified text format. This functionality is platform-specific and is presently implemented only for ESP-r (EnergyPlus does not require that). The second functionality is that of gathering the results in a user-specified manner. That functionality is based on pattern-matching and is not simulation-program-specific.
+Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results. Sim::OPT::Report performs two kinds of action. The first, which is required only by certain simulation programs, is that of making the simulation program write the results in a user-specified text format. This functionality is platform-specific and is presently implemented only for ESP-r (EnergyPlus does not require that). The second functionality is that of collecting the results in a user-specified manner. That functionality is based on pattern-matching and is not simulation-program-specific.
 
 =head2 EXPORT
 
@@ -1412,7 +1412,7 @@ Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results. 
 
 =head1 SEE ALSO
 
-Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. Additionally, reference to the source code may be made.
+Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution.
 
 =head1 AUTHOR
 
@@ -1420,7 +1420,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -263,10 +263,15 @@ INTERNAL METHODS
     file, to check how the single address passed routes. The output of the
     command is parsed and passed back in the results.
 
-    The results structure is hash that looks like:- { all_ok => # no
-    invocation errors deliverable => # number of deliverable addresses
-    undeliverable => # number of undeliverable addresses total => # total
-    number of addresses addresses => {} }
+    The results structure is a hash that looks like:-
+
+        {
+            all_ok        => # no invocation errors
+            deliverable   => # number of deliverable addresses
+            undeliverable => # number of undeliverable addresses
+            total         => # total number of addresses
+            addresses     => {}
+        }
 
     The addresses part of the structure has one key for each resultant
     address, the value of which is another hash, which may contain the
@@ -322,33 +327,13 @@ ACKNOWLEDGEMENTS
     changes were made as a new module in a name space that is intended for
     use by similar modules for other MTAs.
 
-INSTALLATION
-
-    See perlmodinstall for information and options on installing Perl
-    modules.
-
-BUGS AND LIMITATIONS
-
-    You can make new bug reports, and view existing ones, through the web
-    interface at
-    http://rt.cpan.org/Public/Dist/Display.html?Name=Test-MTA-Exim4.
-
-AVAILABILITY
-
-    The project homepage is https://metacpan.org/release/Test-MTA-Exim4.
-
-    The latest version of this module is available from the Comprehensive
-    Perl Archive Network (CPAN). Visit http://www.perl.com/CPAN/ to find a
-    CPAN site near you, or see
-    https://metacpan.org/module/Test::MTA::Exim4/.
-
 AUTHOR
 
     Nigel Metheringham <nigelm@cpan.org>
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2014 by Nigel Metheringham.
+    This software is copyright (c) 2019 by Nigel Metheringham.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

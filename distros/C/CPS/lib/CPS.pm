@@ -8,7 +8,7 @@ package CPS;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
 
@@ -54,6 +54,19 @@ BEGIN {
 C<CPS> - manage flow of control in Continuation-Passing Style
 
 =head1 OVERVIEW
+
+=over 4
+
+B<Note>: This module is entirely deprecated now. It is maintained for
+compatibility for any code still using it, but please consider rewriting to
+use L<Future> instead, which offers a far neater method of representing
+asynchronous program and data flow. In addition, L<Future::AsyncAwait> can
+further improve readability of C<Future>-based code by letting it use the
+familiar kinds of Perl control structure while still being asynchronous.
+
+At some later date this entire C<CPS> module distribution may be deleted.
+
+=back
 
 The functions in this module implement or assist the writing of programs, or
 parts of them, in Continuation Passing Style (CPS). Briefly, CPS is a style
@@ -663,15 +676,19 @@ invoke it indirectly.
 
 =item *
 
+L<Future> - represent an operation awaiting completion
+
+=item *
+
+L<Future::AsyncAwait> - deferred subroutine syntax for futures
+
+=item *
+
 L<CPS::Functional> - functional utilities in Continuation-Passing Style
 
 =item *
 
 L<http://en.wikipedia.org/wiki/Continuation-passing_style> on wikipedia
-
-=item *
-
-L<Coro> - co-routines in Perl
 
 =back
 

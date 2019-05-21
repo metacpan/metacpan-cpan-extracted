@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tk-DateEntry",
    "no_index" : {
@@ -37,18 +37,16 @@
             "I18N::Langinfo" : "0",
             "Text::Bidi" : "0",
             "Tk::FireButton" : "0"
-         },
-         "requires" : {
-            "Tk" : "400"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/eserte/tk-dateentry.git"
       }
    },
-   "version" : "1.42",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.43",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

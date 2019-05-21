@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use CPS qw( kdescendd kdescendb );
 
@@ -37,3 +38,5 @@ kdescendb(
 );
 
 is( $ret, "53124", 'kdescendb sync $ret' );
+
+done_testing;

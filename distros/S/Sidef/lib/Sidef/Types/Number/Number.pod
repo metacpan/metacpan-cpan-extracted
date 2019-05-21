@@ -459,25 +459,6 @@ Example:
 
 =cut
 
-=head2 as_cfrac
-
-    n.as_cfrac
-    n.as_cfrac(k)
-
-Compute C<k> terms of the continued-fraction expansion of C<n>.
-
-Example:
-
-    say sqrt(12).as_cfrac(6)    # [3, 2, 6, 2, 6, 2]
-
-Can also be used to compute very good rational approximations to a given real number:
-
-    say Num.pi.as_cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 1146408/364913
-
-When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
-
-=cut
-
 =head2 as_dec
 
     n.as_dec
@@ -857,6 +838,27 @@ Aliases: I<ceiling>
 
 =cut
 
+=head2 cfrac
+
+    n.cfrac
+    n.cfrac(k)
+
+Compute C<k> terms of the simple continued-fraction expansion of C<n>.
+
+Example:
+
+    say sqrt(12).cfrac(6)    # [3, 2, 6, 2, 6, 2, 6]
+
+Can also be used to compute very good rational approximations to a given real number:
+
+    say Num.pi.cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 4272943/1360120
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+
+Aliases: I<as_cfrac>
+
+=cut
+
 =head2 chebyshev_T
 
     chebyshevT(n, x)
@@ -1041,6 +1043,16 @@ Number.cyclotomic() -> I<Obj>
 Return the
 
 Aliases: I<cyclotomic_polynomial>
+
+=cut
+
+=head2 dconv
+
+Number.dconv() -> I<Obj>
+
+Return the
+
+Aliases: I<dirichlet_convolution>
 
 =cut
 
@@ -1394,6 +1406,14 @@ Return the
 
 =cut
 
+=head2 fermat_factor
+
+Number.fermat_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -1454,6 +1474,14 @@ Return the
 
 =cut
 
+=head2 gpf
+
+Number.gpf() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 hamdist
 
 Number.hamdist() -> I<Obj>
@@ -1505,8 +1533,6 @@ Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
 Number.holf_factor() -> I<Obj>
 
 Return the
-
-Aliases: I<fermat_factor>
 
 =cut
 
@@ -1788,6 +1814,14 @@ Return the
 
 =cut
 
+=head2 is_composite
+
+Number.is_composite() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_congruent
 
 Number.is_congruent() -> I<Obj>
@@ -1799,6 +1833,14 @@ Return the
 =head2 is_coprime
 
 Number.is_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_cube
+
+Number.is_cube() -> I<Obj>
 
 Return the
 
@@ -1839,6 +1881,14 @@ Return the
 =head2 is_fermat_pseudoprime
 
 Number.is_fermat_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_fibonacci_pseudoprime
+
+Number.is_fibonacci_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -1976,6 +2026,14 @@ Return the
 
 =cut
 
+=head2 is_perrin_pseudoprime
+
+Number.is_perrin_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_plumb_pseudoprime
 
 Number.is_plumb_pseudoprime() -> I<Obj>
@@ -2057,6 +2115,14 @@ Return the
 =head2 is_prob_prime
 
 Number.is_prob_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_prob_squarefree
+
+Number.is_prob_squarefree() -> I<Obj>
 
 Return the
 
@@ -2414,6 +2480,14 @@ Return the
 
 =cut
 
+=head2 lpf
+
+Number.lpf() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lsb
 
 Number.lsb() -> I<Obj>
@@ -2683,6 +2757,14 @@ Return the
 =head2 num2perm
 
 Number.num2perm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 numify
+
+Number.numify() -> I<Obj>
 
 Return the
 

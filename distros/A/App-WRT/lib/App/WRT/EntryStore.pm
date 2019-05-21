@@ -67,6 +67,7 @@ sub new {
 
   bless $self, $class;
 
+  my @entries;
   my %source_files;
   my %entry_properties;
   my %property_entries;
@@ -77,6 +78,9 @@ sub new {
       return unless $File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x;
 
       my $target = $1;
+
+      # Build an ordered array of entries:
+      push @entries, $target;
 
       # Build a hash indicating:
       #   a. that a file exists
@@ -101,7 +105,9 @@ sub new {
     $entry_dir
   );
 
-  # Stash arrayref for future use:
+
+  # Stash refs for future use:
+  $self->{entries}          = \@entries;
   $self->{source_files}     = \%source_files;
   $self->{property_entries} = \%property_entries;
   $self->{entry_properties} = \%entry_properties;
@@ -122,7 +128,7 @@ This was originally in App::WRT::Renderer, so there may be some pitfalls here.
 
 sub all {
   my ($self) = shift;
-  return keys %{ $self->{source_files} };
+  return @{ $self->{entries} };
 }
 
 =item dates_by_depth($depth)
@@ -188,6 +194,23 @@ Convenience wrappers for dates_by_depth().
 sub all_years  { return $_[0]->dates_by_depth(1); }
 sub all_months { return $_[0]->dates_by_depth(2); }
 sub all_days   { return $_[0]->dates_by_depth(3); }
+
+=item days_for($month), months_for($year)
+
+Convenience wrappers for extracting days or months in a given month
+or year.
+
+=cut
+
+sub days_for {
+  my ($self, $container) = @_;
+  return grep { m{^ \Q$container\E / }x } $self->all_days();
+}
+
+sub months_for {
+  my ($self, $year) = @_;
+  return grep { m{^ \Q$year\E / }x } $self->all_months();
+}
 
 =item recent_by_depth($depth, $entry_count)
 
@@ -263,20 +286,18 @@ sub generate_date_hashes {
   $self->{next_dates} = { reverse %prev };
 }
 
-=item parent_of($entry)
+=item parent($entry)
 
 Return an entry's parent, or undef if it's at the top level.
 
 =cut
 
-sub parent_of {
+sub parent {
   my $self = shift;
   my ($entry) = @_;
 
   # Explode unless an entry actually exists in the archives:
-  unless (grep { $_ eq $entry } $self->all()) {
-    croak("No such entry: $entry");
-  }
+  croak("No such entry: $entry") unless $self->is_extant($entry);
 
   my (@components) = split '/', $entry;
   pop @components;
@@ -284,6 +305,23 @@ sub parent_of {
     return join '/', @components;
   }
   return undef;
+}
+
+=item children($entry)
+
+Return an entry's (immediate) children.
+
+=cut
+
+sub children {
+  my $self = shift;
+  my ($entry) = @_;
+
+  # Explode unless an entry actually exists in the archives:
+  croak("No such entry: $entry") unless $self->is_extant($entry);
+
+  # A cheesy regexp solution to this problem:
+  return grep { m{^ \Q$entry\E / [^/]+ $}x } $self->all();
 }
 
 =item previous($entry)
@@ -411,6 +449,18 @@ sub has_index {
   my ($self, $entry) = @_;
   croak("No such entry: $entry") unless $self->is_extant($entry);
   return $self->is_extant($entry . '/index');
+}
+
+=item basename($entry)
+
+Get a base name (i.e., filename without path) for a given entry.
+
+=cut
+
+sub basename {
+  my ($self, $entry) = @_;
+  my @parts = split '/', $entry;
+  return pop @parts; 
 }
 
 =back

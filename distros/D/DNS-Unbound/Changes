@@ -1,5 +1,12 @@
 Revision history for Perl module DNS::Unbound
 
+0.04 Sun, 19 May 2019
+- BUG FIX: Prevent excess destruction of context struct.
+- OPTIMIZATION: Store ints as IV rather than NV.
+
+0.03 - Thu, 16 May 2019
+- Fix bugtracker in Makefile.PL.
+
 0.02 - Mon, 25 March 2019
 - Resolve configure_requires issue.
 - Fix dangling “1;” in POD.

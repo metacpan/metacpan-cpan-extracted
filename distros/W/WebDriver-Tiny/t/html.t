@@ -9,7 +9,7 @@ $elem->html;
 
 reqs_are [ [
     POST => '/execute/sync',
-    {   args   => [ { ELEMENT => 123 } ],
+    {   args   => [ { 'element-6066-11e4-a52e-4f735466cecf' => 123 } ],
         script => 'return arguments[0].outerHTML',
     },
 ] ], '$elem->html';

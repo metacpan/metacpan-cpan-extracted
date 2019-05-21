@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form::Bootstrap4;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: Generate forms using Bootstrap 4
 
 #pod =head1 SYNOPSIS
@@ -13,7 +13,7 @@ our $VERSION = '1.025';
 #pod     # See Yancy::Controller::Yancy for routing
 #pod     app->routes->get( '/people/:id/edit' )->to(
 #pod         'yancy#set',
-#pod         collection => 'people',
+#pod         schema => 'people',
 #pod         template => 'edit_people',
 #pod     );
 #pod     app->start;
@@ -233,7 +233,7 @@ Yancy::Plugin::Form::Bootstrap4 - Generate forms using Bootstrap 4
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -246,7 +246,7 @@ version 1.025
     # See Yancy::Controller::Yancy for routing
     app->routes->get( '/people/:id/edit' )->to(
         'yancy#set',
-        collection => 'people',
+        schema => 'people',
         template => 'edit_people',
     );
     app->start;
@@ -318,7 +318,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

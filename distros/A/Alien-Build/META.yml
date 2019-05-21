@@ -47,11 +47,11 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '1.69'
+version: '1.73'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'
-  - 'Roy Storey'
+  - 'Roy Storey (KIWIROY)'
   - 'Ilya Pavlov'
   - 'David Mertens (run4flat)'
   - 'Mark Nunberg (mordy, mnunberg)'

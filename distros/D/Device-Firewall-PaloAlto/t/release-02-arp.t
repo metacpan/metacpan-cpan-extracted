@@ -31,24 +31,14 @@ for my $arp_entry (@arp_entries) {
 }
     
 
+### Test Module ###
 
+my $test = $fw->test;
+isa_ok($test, 'Device::Firewall::PaloAlto::Test');
 
-## EMPTY TABLE
-
-my $empty_tbl_api = {
-    result => {
-        dp => "dp0",
-        entries => {},
-        max => 250,
-        timeout => 1800,
-        total => 0
-    },
-    status => "success"
-};
-    
-
-
-
-
+ok( $test->arp('10.101.10.11', '10.101.10.11'), 'Valid entries' );
+ok( !$test->arp('192.0.2.1', '192.0.2.2'), 'Invalid entries' );
+ok( !$test->arp('10.101.10.11', '192.0.2.1'), 'Valid and invalud entries' );
+ok( $test->arp(), 'No entries' );
 
 done_testing();

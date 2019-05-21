@@ -3,40 +3,40 @@ abstract: 'manage flow of control in Continuation-Passing Style'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Fatal: 0
-  Test::Identity: 0
-  Test::More: 0
-  Test::Refcount: 0
+  Test::Fatal: '0'
+  Test::Identity: '0'
+  Test::More: '0'
+  Test::Refcount: '0'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CPS
 provides:
   CPS:
     file: lib/CPS.pm
-    version: 0.18
+    version: '0.19'
   CPS::Functional:
     file: lib/CPS/Functional.pm
-    version: 0.18
-  CPS::Future:
-    file: lib/CPS/Future.pm
-    version: 0.18
+    version: '0.19'
   CPS::Governor:
     file: lib/CPS/Governor.pm
-    version: 0.18
+    version: '0.19'
   CPS::Governor::Deferred:
     file: lib/CPS/Governor/Deferred.pm
-    version: 0.18
+    version: '0.19'
   CPS::Governor::Simple:
     file: lib/CPS/Governor/Simple.pm
-    version: 0.18
+    version: '0.19'
 recommends:
-  Sub::Name: 0
+  Sub::Name: '0'
 requires:
-  Future: 0
+  Future: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.18
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

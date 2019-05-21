@@ -15,15 +15,17 @@ name: FASTX-Abi
 provides:
   FASTX::Abi:
     file: lib/FASTX/Abi.pm
-    version: '0.02'
+    version: '0.04'
 requires:
   Bio::Trace::ABIF: '1.06'
   Carp: '1.2'
   Data::Dumper: '2.1'
   File::Basename: '2.5'
-  perl: '5.018'
+  perl: '5.016'
 resources:
-  repository: https://github.com/telatin/FASTX-Abi
-version: '0.02'
+  bugtracker: https://github.com/telatin/FASTX-Abi/issues
+  homepage: https://github.com/telatin/FASTX-Abi
+  repository: https://github.com/telatin/FASTX-Abi.git
+version: '0.04'
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,5 +1,5 @@
 package Git::Raw::Worktree;
-$Git::Raw::Worktree::VERSION = '0.82';
+$Git::Raw::Worktree::VERSION = '0.83';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Worktree - Git worktree class
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,14 @@ Add a new worktree.
 =head2 lookup( $repo, $name )
 
 Lookup a worktree.
+
+=head2 name( )
+
+Retrieve the name of the worktree.
+
+=head2 path( )
+
+Retrieve the filesystem path for the worktree.
 
 =head2 repository( )
 

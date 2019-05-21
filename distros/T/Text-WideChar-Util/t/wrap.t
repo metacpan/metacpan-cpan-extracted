@@ -15,7 +15,7 @@ use Text::WideChar::Util qw(wrap mbwrap);
 
 {
     my $u = <<_;
-I dont wan't to go home. Where do you want to go? I'll keep you company. Mr Goh,
+I dont wan't to go home.  Where do you want to go? I'll keep you company. Mr Goh,
 I'm fine. You don't have to keep me company.
 _
 #--------1---------2---------3---------4
@@ -26,6 +26,20 @@ Goh, I'm fine. You don't have to keep me
 company.
 _
     is(wrap($u, 40), $w, "single paragraph");
+}
+
+{
+    my $u = <<_;
+I dont wan't to go home.  Where do you want to go? I'll keep you company. Mr Goh,
+I'm fine. You don't have to keep me company.
+_
+#--------1---------2---------3---------4
+    my $w = join("", map {"$_\n"} (
+"I dont wan't to go home. Where do you ",
+"want to go? I'll keep you company. Mr ",
+"Goh, I'm fine. You don't have to keep me ",
+"company."));
+    is(wrap($u, 40, {keep_trailing_space=>1}), $w, "opt:keep_trailing_space=1");
 }
 
 {
@@ -189,6 +203,7 @@ subtest "tab_width option (flindent)" => sub {
 subtest "chop long word" => sub {
     is(wrap("1234567890",  5), "12345\n67890");
     is(wrap("12345678901", 5), "12345\n67890\n1");
+    is(wrap("12345678901", 5, {keep_trailing_space=>1}), "12345\n67890\n1");
     is(wrap("  12345678901", 5), "  \n12345\n67890\n1");
     is(wrap("  12345678901", 5, {slindent=>" "}), "  \n 1234\n 5678\n 901");
 };
@@ -243,6 +258,11 @@ aku mau 吃饭吃
 kuingat kamu.
 _
     is(mbwrap($input, 15), $res);
+    $res = join('', map {"$_\n"} (
+'aku mau 吃饭吃',
+'饭吃饭吃饭 ',
+'kuingat kamu.'));
+    is(mbwrap($input, 15, {keep_trailing_space=>1}), $res, "opt:keep_trailing_space=1 & cjk");
 };
 
 DONE_TESTING:

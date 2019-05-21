@@ -12,6 +12,7 @@ package Sidef::Types::Set::Set {
       q{0+}   => sub { scalar(CORE::keys(%{$_[0]})) },
       q{""}   => \&_dump;
 
+    use Sidef::Types::Block::Block;
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
@@ -68,14 +69,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C = %$A;
-        foreach my $key (CORE::keys(%$B)) {
-            if (!CORE::exists($C{$key})) {
-                $C{$key} = $B->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::union($B);
     }
 
     *or = \&union;
@@ -87,15 +81,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C;
-
-        foreach my $key (CORE::keys(%$A)) {
-            if (CORE::exists($B->{$key})) {
-                $C{$key} = $A->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::intersection($B);
     }
 
     *and = \&intersection;
@@ -107,15 +93,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C;
-
-        foreach my $key (CORE::keys(%$A)) {
-            if (!CORE::exists($B->{$key})) {
-                $C{$key} = $A->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::difference($B);
     }
 
     *sub  = \&difference;
@@ -128,21 +106,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C;
-
-        foreach my $key (CORE::keys(%$A)) {
-            if (!CORE::exists($B->{$key})) {
-                $C{$key} = $A->{$key};
-            }
-        }
-
-        foreach my $key (CORE::keys(%$B)) {
-            if (!CORE::exists($A->{$key})) {
-                $C{$key} = $B->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::symmetric_difference($B);
     }
 
     *xor     = \&symmetric_difference;
@@ -183,14 +147,34 @@ package Sidef::Types::Set::Set {
     sub map {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
         my %new;
         foreach my $key (CORE::keys(%$self)) {
-            my $value = $block->run($self->{$key});
-            $new{$serialize->($value)} = $value;
+            foreach my $value ($block->run($self->{$key})) {
+                $new{$serialize->($value)} = $value;
+            }
         }
 
         bless \%new, ref($self);
     }
+
+    sub map_2d {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+            foreach my $value ($block->run(@{$self->{$key}})) {
+                $new{$serialize->($value)} = $value;
+            }
+        }
+
+        bless \%new, ref($self);
+    }
+
+    *map_2D = \&map_2d;
 
     sub collect {
         my ($self, $block) = @_;
@@ -206,6 +190,8 @@ package Sidef::Types::Set::Set {
     sub grep {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
         my %new;
         foreach my $key (CORE::keys(%$self)) {
             my $value = $self->{$key};
@@ -218,6 +204,24 @@ package Sidef::Types::Set::Set {
     }
 
     *select = \&grep;
+
+    sub grep_2d {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+            my $value = $self->{$key};
+            if ($block->run(@$value)) {
+                $new{$key} = $value;
+            }
+        }
+
+        bless \%new, ref($self);
+    }
+
+    *grep_2D = \&grep_2d;
 
     sub count_by {
         my ($self, $block) = @_;
@@ -293,6 +297,18 @@ package Sidef::Types::Set::Set {
 
         $self;
     }
+
+    sub each_2d {
+        my ($self, $block) = @_;
+
+        foreach my $value (CORE::values(%$self)) {
+            $block->run(@$value);
+        }
+
+        $self;
+    }
+
+    *each_2D = \&each_2d;
 
     sub sort_by {
         my ($self, $block) = @_;
@@ -387,6 +403,45 @@ package Sidef::Types::Set::Set {
     sub join {
         my ($self, @rest) = @_;
         $self->to_a->join(@rest);
+    }
+
+    sub all {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        foreach my $key (CORE::keys(%$self)) {
+            $block->run($self->{$key})
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub any {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        foreach my $key (CORE::keys(%$self)) {
+            $block->run($self->{$key})
+              && return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub none {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        foreach my $key (CORE::keys(%$self)) {
+            $block->run($self->{$key})
+              && return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub _dump {

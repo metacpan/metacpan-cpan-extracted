@@ -83,7 +83,9 @@ my @mailbox_events_data = (
     id => '456-GHI',
     host => 'spoor2.test.com',
     mailbox_address => 'anothervictim@test.com',
-    ip => '10.1.1.2',
+    ip_actor => {
+      ip_address => '10.1.1.2',
+    },
     event_time => 1555588110,
     type => 'forward_removed'
   },
@@ -91,7 +93,9 @@ my @mailbox_events_data = (
     id => '123-ABC',
     host => 'spoor.test.com',
     mailbox_address => 'victim@test.com',
-    ip => '10.1.1.1',
+    ip_actor => {
+      ip_address => '10.1.1.1',
+    },
     event_time => 1555513150,
     type => 'login'
   }

@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.014'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.015'; # VERSION
+my $LAST_UPDATE = '3.015'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -265,6 +265,10 @@ sub new {
     weaken $self->{'catalog'};
     $self->{'fonts'} = {};
     $self->{'pagestack'} = [];
+
+    $self->{'pdf'}->{' userUnit'} = 1.0; # default global User Unit
+    $self->mediabox('letter');  # default to US Letter 8.5in x 11in 
+
     if (exists $options{'-compress'}) {
       $self->{'forcecompress'} = $options{'-compress'};
       # at this point, no validation of given value! none/flate (0/1).
@@ -338,6 +342,11 @@ sub open {
     while (not $disk_fh->eof()) {
         $disk_fh->read($data, 512);
         $scalar_fh->print($data);
+    }
+    # check if final %%EOF lacks a carriage return on the end (add one)
+    if ($data =~ m/%%EOF$/) {
+       #print "open() says missing final EOF\n";
+        $scalar_fh->print("\n");
     }
     $disk_fh->close();
     $scalar_fh->seek(0, 0);
@@ -458,7 +467,6 @@ sub open_scalar {
     $self->{'pdf'}->{' version'} ||= 1.4; # default minimum
     # if version higher than desired output PDF level, give warning and
     # bump up desired output PDF level
-#print "open_scalar read version=".($self->{'pdf'}->{' version'})." and outVer=$outVer\n";
     $self->verCheckInput($self->{'pdf'}->{' version'});
 
     my @pages = _proc_pages($self->{'pdf'}, $self->{'pages'});
@@ -1589,147 +1597,191 @@ sub pages {
     return scalar @{$self->{'pagestack'}};
 }
 
+# set global User Unit scale factor (default 1.0)
+
+=item $pdf->userunit($value)
+
+Sets the global UserUnit, defining the scale factor to multiply any size or
+coordinate by. For example, C<userunit(72)> results in a User Unit of 72 points,
+or 1 inch.
+
+See L<PDF::Builder::Docs> "BOX" METHODS/User Units for more information.
+
+=cut
+
+sub userunit {
+    my ($self, $value) = @_;
+
+    if (float($value) <= 0.0) {
+	warn "Invalid User Unit value '$value', set to 1.0";
+	$value = 1.0;
+    }
+
+    PDF::Builder->verCheckOutput(1.6, "set User Unit");
+    $self->{'pdf'}->{' userUnit'} = float($value);
+    $self->{'pages'}->{'UserUnit'} = PDFNum(float($value));
+    if (defined $self->{'pages'}->{'MediaBox'}) { # should be default letter
+	if ($value != 1.0) { # divide points by User Unit
+            my @corners = ( 0, 0, 612/$value, 792/$value );
+            $self->{'pages'}->{'MediaBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
+	}
+    }
+
+    return $self;
+}
+
+# utility to handle calling page_size, and name with or without -orient setting
+sub _bbox {
+    my ($self, @corners) = @_;
+
+    # if 1 or 3 elements in @corners, and [0] contains a letter, it's a name
+    my $isName = 0;
+    if (scalar @corners && $corners[0] =~ m/[a-z]/i) { $isName = 1; }
+
+    if (scalar @corners == 3) {
+	    # name plus one option (-orient)
+	    my ($name, %opts) = @corners;
+	    @corners = page_size(($name)); # now 4 numeric values
+	    if (defined $opts{'-orient'}) {
+	        if ($opts{'-orient'} =~ m/^l/i) { # 'landscape' or just 'l'
+		        # 0 0 W H -> 0 0 H W
+		        my $temp;
+		        $temp = $corners[2]; $corners[2] = $corners[3]; $corners[3] = $temp;
+	        }
+	    }
+    } else {
+	# name without [-orient] option, or numeric coordinates given
+	@corners = page_size(@corners);
+    }
+
+    my $UU = $self->{'pdf'}->{' userUnit'};
+    # scale down size if User Unit given (e.g., Letter => 0 0 8.5 11)
+    if ($isName && $UU != 1.0) {
+	for (my $i=0; $i<4; $i++) {
+	    $corners[$i] /= $UU;
+	}
+    }
+
+    return (@corners);
+}
+
 =item $pdf->mediabox($name)
+
+=item $pdf->mediabox($name, -orient => 'orientation')
 
 =item $pdf->mediabox($w,$h)
 
 =item $pdf->mediabox($llx,$lly, $urx,$ury)
 
-Sets the global MediaBox. This defines the width and height (or corner
+Sets the global MediaBox, defining the width and height (or by corner
 coordinates, or by standard name) of the output page itself, such as the
-physical paper size. This is normally the largest of the "boxes". If any
-subsidiary box (within it) exceeds the media box, the portion of the material 
-or boxes outside of the media box will be ignored.
+physical paper size. 
 
-Note that many printers can B<not> print all the way to the
-physical edge of the paper, so you should plan to leave some blank margin,
-even outside of any crop marks and bleeds. Printers and on-screen readers are 
-free to discard any content found outside the MediaBox, and printers may 
-discard some material just inside the MediaBox.
-
-It is required; if not given, the displayed media size is unpredictable. 
-A global setting can be inherited by each page, or can be overridden.
-
-B<Example:>
-
-    $pdf = PDF::Builder->new();
-    $pdf->mediabox('A4');
-    ...
-    $pdf->saveas('our/new.pdf');
-
-    $pdf = PDF::Builder->new();
-    $pdf->mediabox(595, 842);
-    ...
-    $pdf->saveas('our/new.pdf');
-
-    $pdf = PDF::Builder->new;
-    $pdf->mediabox(0, 0, 595, 842);
-    ...
-    $pdf->saveas('our/new.pdf');
+See L<PDF::Builder::Docs> "BOX" METHODS/Media Box for more information.
 
 =cut
 
 sub mediabox {
-    my ($self, $x1,$y1, $x2,$y2) = @_;
+    my ($self, @corners) = @_;
+    @corners = $self->_bbox(@corners);
 
-    $self->{'pages'}->{'MediaBox'} = PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1, $x2,$y2));
+    $self->{'pages'}->{'MediaBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
 
     return $self;
 }
 
 =item $pdf->cropbox($name)
 
+=item $pdf->cropbox($name, -orient => 'orientation')
+
 =item $pdf->cropbox($w,$h)
 
 =item $pdf->cropbox($llx,$lly, $urx,$ury)
 
 Sets the global CropBox. This will define the media size to which the output
-will later be clipped. Note that this does B<not> itself output any crop marks 
-to guide cutting of the paper! PDF Readers should consider this to be the 
-I<visible> portion of the page, and anything found outside it I<may> be clipped 
-(invisible). By default, it is equal to the MediaBox, but may be defined to be 
-smaller. A global setting can be inherited by each page, or can be overridden.
+will later be clipped. 
 
-Do not confuse with the C<TrimBox>, which shows where printed paper is expected
-to actually be cut.
+See L<PDF::Builder::Docs> "Box" Methods/Crop Box for more information.
 
 =cut
 
 sub cropbox {
-    my ($self, $x1,$y1, $x2,$y2) = @_;
+    my ($self, @corners) = @_;
+    @corners = $self->_bbox(@corners);
 
-    $self->{'pages'}->{'CropBox'} = PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1, $x2,$y2) );
+    $self->{'pages'}->{'CropBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
 
     return $self;
 }
 
 =item $pdf->bleedbox($name)
 
+=item $pdf->bleedbox($name, -orient => 'orientation')
+
 =item $pdf->bleedbox($w,$h)
 
 =item $pdf->bleedbox($llx,$lly, $urx,$ury)
 
-Sets the global BleedBox. This is typically used in printing on paper, where 
-you want color (such as thumb tabs) to be printed a bit beyond the final paper 
-size, to ensure that the cut paper I<bleeds> (the cut goes I<through> the ink), 
-rather than accidentally leaving some white paper visible outside.  Allow 
-enough "bleed" over the expected trim line to account for minor variations in 
-paper handling, folding, and cutting; to avoid showing white paper at the edge. 
-The BleedBox is where printing could actually extend to; The TrimBox is 
-normally within it, where the paper would actually be cut. The default value is 
-equal to the CropBox, but is often a bit smaller.
+Sets the global BleedBox. This is typically used for hard copy printing where
+you want ink to go to the edge of the cut paper.
+
+See L<PDF::Builder::Docs> "Box" Methods/Bleed Box for more information.
 
 =cut
 
 sub bleedbox {
-    my ($self, $x1,$y1, $x2,$y2) = @_;
+    my ($self, @corners) = @_;
+    @corners = $self->_bbox(@corners);
 
-    $self->{'pages'}->{'BleedBox'} = PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1, $x2,$y2));
+    $self->{'pages'}->{'BleedBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
 
     return $self;
 }
 
 =item $pdf->trimbox($name)
 
+=item $pdf->trimbox($name, -orient => 'orientation')
+
 =item $pdf->trimbox($w,$h)
 
 =item $pdf->trimbox($llx,$lly, $urx,$ury)
 
 Sets the global TrimBox. This is supposed to be the actual dimensions of the 
-finished page (after trimming of the paper). In some production environments, 
-it is useful to have printer's instructions, cut marks, and so on outside of 
-the trim box. The default value is equal to CropBox, but is often a bit smaller 
-than any BleedBox, to allow the desired "bleed" effect.
+finished page (after trimming of the paper). 
+
+See L<PDF::Builder::Docs> "Box" Methods/Trim Box for more information.
 
 =cut
 
 sub trimbox {
-    my ($self, $x1,$y1, $x2,$y2) = @_;
+    my ($self, @corners) = @_;
+    @corners = $self->_bbox(@corners);
 
-    $self->{'pages'}->{'TrimBox'} = PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1, $x2,$y2));
+    $self->{'pages'}->{'TrimBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
 
     return $self;
 }
 
 =item $pdf->artbox($name)
 
+=item $pdf->artbox($name, -orient => 'orientation')
+
 =item $pdf->artbox($w,$h)
 
 =item $pdf->artbox($llx,$lly, $urx,$ury)
 
 Sets the global ArtBox. This is supposed to define "the extent of the page's 
-I<meaningful> content (including [margins])". It might exclude some content, 
-such as Headlines or headings. Any binding or punched-holes margin would 
-typically be outside of the ArtBox, as would be page numbers and running 
-headers and footers. The default value is equal to the CropBox, although 
-normally it would be no larger than any TrimBox.
+I<meaningful> content". 
+
+See L<PDF::Builder::Docs> "Box" Methods/Art Box for more information.
 
 =cut
 
 sub artbox {
-    my ($self, $x1,$y1, $x2,$y2) = @_;
+    my ($self, @corners) = @_;
+    @corners = $self->_bbox(@corners);
 
-    $self->{'pages'}->{'ArtBox'} = PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1, $x2,$y2) );
+    $self->{'pages'}->{'ArtBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
 
     return $self;
 }
@@ -2513,7 +2565,7 @@ Returns a new or existing named destination object.
 
 sub named_destination {
     my ($self, $cat, $name, $obj) = @_;
-    my $root=$self->{'catalog'};
+    my $root = $self->{'catalog'};
 
     $root->{'Names'} ||= PDFDict();
     $root->{'Names'}->{$cat} ||= PDFDict();

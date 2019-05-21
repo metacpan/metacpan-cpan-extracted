@@ -1,13 +1,16 @@
-package MPMinus::Store::MultiStore; # $Id: MultiStore.pm 143 2013-05-21 09:13:44Z minus $
+package MPMinus::Store::MultiStore; # $Id: MultiStore.pm 273 2019-05-08 10:44:56Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
-MPMinus::Store::MultiStore - Multistoring
+MPMinus::Store::MultiStore - Multistoring MPMinus::Store::DBI interface
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -15,9 +18,7 @@ Version 1.04
 
     # Multistoring
     my $mso = new MPMinus::Store::MultiStore (
-            -m   => $m, # OPTIONAL
             -mso => {
-                
                 foo => {
                     -dsn    => 'DBI:mysql:database=TEST;host=192.168.1.1',
                     -user   => 'login',
@@ -28,7 +29,6 @@ Version 1.04
                         PrintError => 0,
                     },
                 },
-                
                 bar => {
                     -dsn    => 'DBI:Oracle:SID',
                     -user   => 'login',
@@ -37,12 +37,12 @@ Version 1.04
                         RaiseError => 0,
                         PrintError => 0,
                     },
-                }, 
+                },
             },
         );
 
     my @stores = $mso->stores; # foo, bar
-    
+
     $mso->set(baz => new MPMinus::Store::DBI( {
                 -dsn    => 'DBI:Oracle:BAZSID',
                 -user   => 'login',
@@ -53,18 +53,28 @@ Version 1.04
                 },
             })
         );
-        
+
     my @stores = $mso->stores; # foo, bar, baz
-    
+
     my $foo = $mso->get('foo');
     my $foo = $mso->store('foo');
     my $foo = $mso->foo;
 
 =head1 DESCRIPTION
 
-Multistoring Database independent interface for MPMinus on MPMinus::Store::DBI based.
+Multistoring MPMinus::Store::DBI interface
 
 See L<MPMinus::Store::DBI>
+
+=head2 new
+
+    my $mso = new MPMinus::Store::MultiStore (
+            -mso => { ... },
+        );
+
+Returns MultiStore object
+
+See also L<MPMinus::Store::DBI>
 
 =head1 METHODS
 
@@ -108,7 +118,7 @@ Returns current connections as list (array)
 
     use MPMinus::Store::MultiStore;
     use MPMinus::MainTools qw/ msoconf2args /;
-    
+
     sub InitHandler {
         my $pkg = shift;
         my $m = shift;
@@ -121,31 +131,30 @@ Returns current connections as list (array)
             }
         } else {
             $m->set( multistore => new MPMinus::Store::MultiStore (
-                -m   => $m,
                 -mso => { msoconf2args($m->conf('store')) },
                 )
             );
         }
-    
+
         return __PACKAGE__->SUPER::InitHandler($m);
     }
-    
+
     ...
-    
+
     package MPM::foo::Test;
     use strict;
 
     sub response {
         my $m = shift;
-        
+
         my $mso = $m->multistore;
-        
-        my $data = $mso->foo->errstr 
+
+        my $data = $mso->foo->errstr
             ? $mso->foo->errstr
             : $mso->foo->field('select sysdate() from dual');
-        
+
         ...
-        
+
         return Apache2::Const::OK;
     }
 
@@ -186,53 +195,61 @@ In conf/mso.conf file:
 
 =over 8
 
-=item B<1.00 / 13.11.2010>
+=item B<1.00 13.11.2010>
 
 Init version
 
-=item B<1.01 / 22.12.2010>
+=item B<1.01 22.12.2010>
 
 Added method for getting list of stores
 
-=item B<1.02 / Wed Apr 24 14:53:38 2013 MSK>
+=item B<1.02 Wed Apr 24 14:53:38 2013 MSK>
 
 General refactoring
 
 =back
 
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<MPMinus::Store::DBI>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
 =head1 SEE ALSO
 
-L<MPMinus::Store::DBI>, L<CTK::DBI>, L<Apache::DBI>, L<DBI>
+L<MPMinus::Store::DBI>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw($VERSION);
-$VERSION = 1.04;
+$VERSION = 1.05;
 
 use MPMinus::Store::DBI;
 use CTK::Util qw/ :API /;
+use MPMinus::Log;
 
 sub new {
     my $class = shift;
@@ -244,55 +261,55 @@ sub new {
     my $s = $in[1] || {};
     unless ($s && ref($s) eq 'HASH') {
         $s = {};
-        # Тут читаем данные конфигурации (на перспективу)
+        # For future -- loading data configuration
         # $s = ...
     }
-    my @stores = keys %$s; # Принимаем значения всех соединений
-    
-    # пробегаемся по всем соединениям и устанавливаем их в общий массив
+    my @stores = keys %$s; # Get all stores
+    my $pkg = scalar(caller(0));
+    my $logger = new MPMinus::Log( sprintf("[%s] ", $pkg) );
+
     my $ret = {};
     foreach my $store (@stores) {
         my $sc = $s->{$store};
         if ($sc && ref($sc) eq 'HASH') {
-            $sc->{-m} = $m if $m;
+            $sc->{"-m"} = $m if $m;
             $ret->{$store} = new MPMinus::Store::DBI(%$sc);
         } else {
             $ret->{$store} = undef;
         }
     }
-    
+
     return bless {
             m => $m,
             s => {%$s},
+            logger => $logger,
             stores => $ret,
         }, $class;
 }
-sub stores {
-    # Возврат списка коннектов
+sub stores { # List of stores
     my $self = shift;
     my $stores = $self->{stores};
     return ($stores && ref($stores) eq 'HASH') ? keys(%$stores) : ();
 }
-sub get {
-    # Возврат конкретного соединения
+sub get { # Get story by name
     my $self = shift;
     my $name = shift;
     if ($name && $self->{stores} && $self->{stores}->{$name}) {
         return $self->{stores}->{$name};
     } else {
-        carp("Can't find store \"$name\"");
+        $self->{logger}->log_error("Can't find store \"$name\"");
     }
     return undef;
 }
 sub store { goto &get };
 sub set {
-    # Установка конкретного соединения
     my $self = shift;
     my $name = shift;
     my $value = shift;
-    carp("Key name undefined") && return undef unless $name;
-    carp("Value incorrect or is't MPMinus::Store::DBI object") && return undef unless $value && ref($value) eq 'MPMinus::Store::DBI';
-    
+    $self->{logger}->log_error("Key name undefined") && return undef
+        unless $name;
+    $self->{logger}->log_error("Value incorrect or is't MPMinus::Store::DBI object") && return undef
+        unless $value && ref($value) eq 'MPMinus::Store::DBI';
     $self->{stores}->{$name} = $value;
 }
 sub AUTOLOAD {
@@ -301,11 +318,10 @@ sub AUTOLOAD {
     my $AL = $AUTOLOAD;
     my $ss = undef;
     $ss = $1 if $AL=~/\:\:([^\:]+)$/;
-    
     if ($ss && $self->{stores} && $self->{stores}->{$ss}) {
         return $self->{stores}->{$ss};
     } else {
-        carp("Can't find store \"$ss\"");
+        $self->{logger}->log_error(sprintf("Can't find store \"%s\"", $ss // ""));
     }
     return undef;
 }

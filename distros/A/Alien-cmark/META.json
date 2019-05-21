@@ -34,7 +34,7 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.19",
-            "Alien::Build::MM" : "0.32",
+            "Alien::Build::MM" : "1.71",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
             "ExtUtils::MakeMaker" : "6.52"
          }
@@ -66,7 +66,7 @@
    "provides" : {
       "Alien::cmark" : {
          "file" : "lib/Alien/cmark.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -82,10 +82,10 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -133,17 +133,12 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
             "name" : "@Author::DBOOK/MetaProvides::Package",
             "version" : "2.004003"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
-            "name" : "@Author::DBOOK/Prereqs::FromCPANfile",
-            "version" : "0.08"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -195,7 +190,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion",
@@ -267,7 +262,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::Commit",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -276,7 +271,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -289,7 +284,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -332,7 +327,7 @@
                }
             },
             "name" : "@Author::DBOOK/Commit_Version_Bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -349,7 +344,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -386,7 +381,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Regenerate::AfterReleasers",
@@ -476,8 +471,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000036",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@Author::DBOOK/InstallGuide",
-            "version" : "1.200012"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
@@ -500,9 +501,31 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "RuntimeRequires",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::AlienBuild",
             "name" : "AlienBuild",
-            "version" : "0.26"
+            "version" : "0.28"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -569,7 +592,7 @@
       }
    },
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.26",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.28",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
@@ -590,7 +613,7 @@
       "Dan Book <grinnz@grinnz.com>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

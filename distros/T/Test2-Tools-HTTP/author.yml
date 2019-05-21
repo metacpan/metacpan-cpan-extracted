@@ -13,6 +13,7 @@ pod_spelling_system:
     - tx
     - ua
     - rebless
+    - subtests
 
 pod_coverage:
   skip: 0

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,9 +23,7 @@ recommends:
   I18N::Langinfo: '0'
   Text::Bidi: '0'
   Tk::FireButton: '0'
-requires:
-  Tk: '400'
 resources:
   repository: git://github.com/eserte/tk-dateentry.git
-version: '1.42'
+version: '1.43'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

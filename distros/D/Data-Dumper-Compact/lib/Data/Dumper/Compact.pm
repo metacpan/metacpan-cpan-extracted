@@ -7,16 +7,17 @@ use Mu;
 use strictures 2;
 use namespace::clean;
 
-our $VERSION = '0.002003';
+our $VERSION = '0.003002';
 $VERSION =~ tr/_//d;
 
 sub import {
   my ($class, $ddc, $opts) = @_;
-  return unless ($ddc||'') eq 'ddc';
+  return unless defined($ddc);
+  die "Don't know how to export '$ddc'" unless ($ddc||'') =~ /^[jd]dc$/;
   my $targ = caller;
   my $cb = $class->new($opts||{})->dump_cb;
   no strict 'refs';
-  *{"${targ}::ddc"} = $cb;
+  *{"${targ}::${ddc}"} = $cb;
 }
 
 ro max_width => default => 78;
@@ -62,8 +63,8 @@ lazy dumper => sub {
 
 sub _dumper { $_[0]->dumper->($_[1]) }
 
-sub dump {
-  my ($self, $data, $opts) = @_;
+sub _optify {
+  my ($self, $opts, $method, @args) = @_;
   # if we're an object, localize anything provided in the options,
   # and also blow away the dependent attributes if indent_by is changed
   ref($self) and $opts
@@ -71,7 +72,15 @@ sub dump {
     and $opts->{indent_by}
     and delete @{$self}{grep !$opts->{$_}, qw(indent_width dumper)};
   ref($self) or $self = $self->new($opts||{});
-  $self->format($self->transform($self->transforms, $self->expand($data)));
+  $self->$method(@args);
+}
+
+sub dump {
+  my ($self, $data, $opts) = @_;
+  $self->_optify($opts, sub {
+    my ($self) = @_;
+    $self->format($self->transform($self->transforms, $self->expand($data)));
+  });
 }
 
 sub dump_cb {
@@ -88,12 +97,8 @@ sub expand {
     ] ];
   } elsif (ref($data) eq 'ARRAY') {
     return [ array => [ map $self->expand($_), @$data ] ];
-  } elsif (
-    my $class = blessed($data)
-    and grep { $_ eq 'ARRAY' or $_ eq 'HASH' } reftype($data)
-  ) {
-    my $cursed = ref($data) eq 'ARRAY' ? [ @$data ] : { %$data };
-    return [ blessed => [ $self->expand($cursed), $class ] ];
+  } elsif (blessed($data) and my $ret = $self->_expand_blessed($data)) {
+    return $ret;
   }
   (my $thing = $self->_dumper($data)) =~ s/\n\Z//;
 
@@ -102,6 +107,13 @@ sub expand {
     return [ ($string =~ /^-[a-zA-Z]\w*$/ ? 'key' : 'string') => $string ];
   }
   return [ thing => $thing ];
+}
+
+sub _expand_blessed {
+  my ($self, $blessed) = @_;
+  return unless grep { $_ eq 'ARRAY' or $_ eq 'HASH' } reftype($blessed);
+  my $cursed = reftype($blessed) eq 'ARRAY' ? [ @$blessed ] : { %$blessed };
+  return [ blessed => [ $self->expand($cursed), blessed($blessed) ] ];
 }
 
 sub transform {
@@ -289,18 +301,23 @@ sub _format_arraylike {
   return join("\n", $l, (map $self->_indent($_), @lines), $r);
 }
 
+sub _format_hashkey {
+  my ($self, $key) = @_;
+  ($key =~ /^-?[a-zA-Z_]\w*$/
+    ? $key
+    # stick a space on the front to force dumping of e.g. 123, then strip it
+    : do {
+       s/^" //, s/"\n\Z// for my $s = $self->_dumper(" $key");
+       $self->_format_string($s)
+    }
+  ).' =>';
+}
+
 sub _format_hash {
   my ($self, $payload) = @_;
   my ($keys, $hash) = @$payload;
   my %k = (map +(
-    $_ => ($_ =~ /^-?[a-zA-Z_]\w*$/
-      ? $_
-        # stick a space on the front to force dumping of e.g. 123, then strip it
-      : do {
-           s/^" //, s/"\n\Z// for my $s = $self->_dumper(" $_");
-           $self->_format_string($s)
-        }
-    ).' =>'), @$keys
+    $_ => $self->_format_hashkey($_)), @$keys
   );
   if ($self->{vertical}) {
     return join("\n", '{',

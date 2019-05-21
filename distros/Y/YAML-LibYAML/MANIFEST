@@ -41,6 +41,7 @@ t/alias.t
 t/api.t
 t/ascii.t
 t/author-pod-syntax.t
+t/binary.t
 t/blessed.t
 t/boolean-boolean.t
 t/boolean-invalid.t

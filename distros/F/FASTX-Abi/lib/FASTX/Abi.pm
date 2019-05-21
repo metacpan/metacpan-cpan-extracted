@@ -1,13 +1,33 @@
 package FASTX::Abi;
-use 5.018;
+use 5.016;
 use warnings;
 use Carp qw(confess);
 use Bio::Trace::ABIF;
 use Data::Dumper;
 use File::Basename;
-$FASTX::Abi::VERSION = '0.02';
+
+$FASTX::Abi::VERSION = '0.04';
 #ABSTRACT: Read Sanger trace file (chromatograms) in FASTQ format. For traces called with I<hetero> option, the ambiguities will be split into two sequences to allow usage from NGS tools that usually do not understand IUPAC ambiguities.
 
+our @valid_new_attributes = ('filename', 'trim_ends', 'wnd', 'min_qual', 'bad_bases', 'keep_abi');
+our @valid_obj_attributes = (
+  'diff',             # number of ambiguous bases
+  'diff_array',       # array of ambiguous bases position
+  'sequence_name',    # sequence name from filename
+  'instrument',       # Instrument
+  'avg_peak_spacing', # Avg Peak Spacing in chromas
+  'version',          # version chromatograms
+  'chromas',          # Bio::Trace::ABIF object
+
+  'hetero',           # ambiguity
+  'seq1',             # Sequence 1 (non ambiguous, allele1)
+  'seq2',             # Sequence 2 (non ambiguous, allele2)
+  'sequence',         # Sequence, trimmed
+  'quality',          # Quality, trimmed
+  'raw_sequence',     # Raw sequence
+  'raw_quality',      # Raw quality
+  'iso_seq'           # Sequence are equal
+);
 
 our %iupac = (
  'R' => 'AG',
@@ -28,11 +48,16 @@ sub new {
         trim_ends => $args->{trim_ends},  # Trim low quality ends (bool)
         min_qual  => $args->{min_qual},   # Minimum quality
         wnd       => $args->{wnd},        # Window for end trimming
-        bad_bases => $args->{bad_bases},  #
+        bad_bases => $args->{bad_bases},  # Number of low qual bases per $window_width
+        keep_abi  => $args->{keep_abi},   # Do not destroy $self->{chromas} after use
     };
 
-
-
+    #check valid inputs:
+    for my $input (sort keys %{ $args } ) {
+      if ( ! grep( /^$input$/, @valid_new_attributes ) ) {
+        confess("Method new() does not accept \"$input\" attribute. Valid attributes are:\n", join(', ', @valid_new_attributes));
+      }
+    }
 
     # CHECK INPUT FILE
     # -----------------------------------
@@ -67,9 +92,23 @@ sub new {
     $object->{wnd}       = 10 unless defined $object->{wnd};
     $object->{min_qual}  = 20 unless defined $object->{min_qual};
     $object->{bad_bases} = 4  unless defined $object->{bad_bases};
+    $object->{keep_abi}  = 0  unless defined $object->{keep_abi};
+    
     # GET SEQUENCE FROM AB1 FILE
     # -----------------------------------
     my $seq = _get_sequence($self);
+    if ($self->{keep_abi} == 0) {
+      $self->{chromas} = undef;
+    }
+
+    #check valid attributes:
+    for my $input (sort keys %{ $self} ) {
+      if ( ! grep( /^$input$/, @valid_new_attributes, @valid_obj_attributes ) ) {
+        confess("Method new() does not accept \"$input\" attribute. Valid attributes are:\n", join(', ', @valid_new_attributes, @valid_obj_attributes));
+      }
+    }
+
+
     return $object;
 }
 
@@ -101,9 +140,9 @@ sub get_fastq {
 sub get_trace_info {
   my $self   = shift;
   my $data;
-  $data->{instrument} = $self->{chromas}->official_instrument_name();
-  $data->{version}    = $self->{chromas}->abif_version();
-  $data->{avg_peak_spacing} = $self->{chromas}->avg_peak_spacing();
+  $data->{instrument} = $self->{instrument};
+  $data->{version}    = $self->{version};
+  $data->{avg_peak_spacing} = $self->{avg_peak_spacing};
 
   return $data;
 }
@@ -189,6 +228,10 @@ sub _get_sequence {
      }
 
 
+     $self->{instrument} = $self->{chromas}->official_instrument_name();
+     $self->{version}    = $self->{chromas}->abif_version();
+     $self->{avg_peak_spacing} = $self->{chromas}->avg_peak_spacing();
+
 }
 
 1;
@@ -205,7 +248,7 @@ FASTX::Abi - Read Sanger trace file (chromatograms) in FASTQ format. For traces 
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -223,11 +266,14 @@ version 0.02
 
 =head1 HETERO CALLING (IUPAC AMBIGUITIES)
 
-When sequencing with Sanger a mix of molecules (i.e. PCR product from heterozigous genome) containing a single-base polimorphisms,
+When Sanger-sequencing a mix of molecules (i.e. PCR product from heterozigous genome) containing a single-base polimorphisms,
 B<if> the I<.ab1> file is called using the I<hetero modality> the sequence stored in the file will contain ambiguous bases (i.e. using DNA IUPAC characters).
 
 This module is designed to produce NGS-compatible FASTQ, so when ambiguous bases are detected the two "alleles" will be split into two sequences
 (of course, if more SNPs are present in the same trace, the output I<cannot> be phased).
+The image below shows a trace file (.ab1) with a valid variant and a low quality end.
+
+=for HTML <p><img src="https://raw.githubusercontent.com/telatin/FASTX-Abi/master/img/chromatogram.png" alt="Sanger trace AB1" /></p>
 
 =head1 METHODS
 
@@ -241,6 +287,7 @@ When creating a new object the only B<required> argument is I<filename>.
     min_qual   => 22,
     wnd        => 16,
     bad_bases  => 2,
+    keep_abi   => 1,      # keep Bio::Trace::ABIF object in $self->{chromas} after use
   });
 
   # Raw sequence and quality:

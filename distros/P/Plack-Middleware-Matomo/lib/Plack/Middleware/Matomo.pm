@@ -1,6 +1,6 @@
 package Plack::Middleware::Matomo;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use strict;
 use warnings;
@@ -63,7 +63,7 @@ sub call {
         rec         => 1,
         token_auth  => $self->token_auth,
         url         => $request->uri,
-        visitIP     => $ip,
+        cip     => $ip,
     };
 
     $event->{ua} = $request->user_agent if $self->ua;

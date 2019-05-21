@@ -4,7 +4,7 @@
       "Marco Fontani <MFONTANI@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "3.39",
+            "Map::Tube" : "3.62",
             "Moo" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010_000",
@@ -54,7 +54,7 @@
    "provides" : {
       "Map::Tube::Milan" : {
          "file" : "lib/Map/Tube/Milan.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,8 @@
          "web" : "https://github.com/mfontani/Map-Tube-Milan"
       }
    },
-   "version" : "0.004",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

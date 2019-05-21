@@ -6,6 +6,8 @@
 #  its n11,n1p,np1 to make more associated terms more or less important.
 #  The shared B to C set associaiton is then found using the weighted B
 #  terms to produce the final association score.
+use lib '/home/henryst/UMLS-Association/lib';
+
 use strict;
 use warnings;
 

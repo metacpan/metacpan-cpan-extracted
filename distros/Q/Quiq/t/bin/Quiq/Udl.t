@@ -167,7 +167,7 @@ sub test_asString_string : Test(2) {
     my $self = shift;
 
     my $udlStr1 = 'dbi#oracle:xyz%admin:koala3@pluto.gaga.de;file=/tmp/xyz';
-    my $udlStr2 = 'dbi#oracle:xyz%admin:*****@pluto.gaga.de;file=/tmp/xyz';
+    my $udlStr2 = 'dbi#oracle:xyz%admin:*@pluto.gaga.de;file=/tmp/xyz';
 
     my $obj = Quiq::Udl->new(
         api=>'dbi',

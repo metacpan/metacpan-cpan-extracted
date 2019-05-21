@@ -2,14 +2,12 @@ package #
 Devel::CheckOS;
 
 use strict;
+use warnings;
 use Exporter;
 
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
+use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.71';
-
-# localising prevents the warningness leaking out of this module
-local $^W = 1;    # use warnings is a 5.6-ism
+our $VERSION = '1.81';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(os_is os_isnt die_if_os_is die_if_os_isnt die_unsupported list_platforms list_family_members);
@@ -169,12 +167,15 @@ should Just Work anyway.
 my ($re_Devel, $re_AssertOS);
 
 sub list_platforms {
+    # need to lazily load these cos the module gets use()d in Makefile.PL,
+    # at which point pre-reqs might not be installed. This function isn't
+    # used in Makefile.PL so we can live without 'em.
     eval " # only load these if needed
         use File::Find::Rule;
         use File::Spec;
     ";
-    
     die($@) if($@);
+    
     if (!$re_Devel) {
         my $case_flag = File::Spec->case_tolerant ? '(?i)' : '';
         $re_Devel    = qr/$case_flag ^Devel$/x;
@@ -263,7 +264,7 @@ and please feel free to upload the results to the CPAN.
 =head1 BUGS and FEEDBACK
 
 I welcome feedback about my code, including constructive criticism.
-Bug reports should be made using L<http://rt.cpan.org/> or by email.
+Bug reports should be made using L<https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues>.
 
 You will need to include in your bug report the exact value of $^O, what
 the OS is called (eg Windows Vista 64 bit Ultimate Home Edition), and,
@@ -311,6 +312,11 @@ Thanks to Paul Green for some information about VOS.
 
 Thanks to Yanick Champoux for a patch to let Devel::AssertOS support
 negative assertions.
+
+Thanks to Brian Fraser for adding Android support.
+
+Thanks to Dale Evans for Debian detection, a bunch of Mac OS X specific version
+detection modules, and perl 5.6 support.
 
 =head1 SOURCE CODE REPOSITORY
 

@@ -1,4 +1,4 @@
-FROM perl:5.26
+FROM perl:5.28
 
 RUN cpanm -n Test::Deep URI
 

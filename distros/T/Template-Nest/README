@@ -1,4 +1,4 @@
-Template-Nest version 0.04
+Template-Nest version 0.06
 ==========================
 
 Template::Nest - manipulate a generic template structure via a perl hash
@@ -18,12 +18,11 @@ This module requires these other modules and libraries:
 
   Carp
   File::Spec
+  Data::Dumper
 
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
-
-Copyright (C) 2018 by Tom Gracey
+Copyright (C) 2019 by Tom Gracey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.1 or,

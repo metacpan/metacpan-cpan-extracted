@@ -16,13 +16,15 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
-    },
+    	'JSON' => '0',
+		'Scalar::Util' => '0'
+	},
     PREREQ_PM => {
 		'Keyword::Declare' => '0.001010',
         'Moo' => '2.003004',
         'MooX::LazierAttributes' => '1.07008',
-		'MooX::ValidateSubs' => '1.012003',
-    },
+		'MooX::ValidateSubs' => '1.012004',
+	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-Purple-*' },
 );

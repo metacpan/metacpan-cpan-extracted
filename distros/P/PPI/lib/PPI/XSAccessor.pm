@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use PPI ();
 
-our $VERSION = '1.266'; # VERSION
+our $VERSION = '1.269'; # VERSION
 
 
 

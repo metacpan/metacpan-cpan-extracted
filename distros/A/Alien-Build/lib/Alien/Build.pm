@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.69'; # VERSION
+our $VERSION = '1.73'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -96,7 +96,7 @@ sub load
     $class->meta;
   }};
 
-  my @preload = qw( Core::Setup Core::Download Core::FFI Core::Override );
+  my @preload = qw( Core::Setup Core::Download Core::FFI Core::Override Core::CleanInstall );
   push @preload, @Alien::Build::rc::PRELOAD;
   push @preload, split ';', $ENV{ALIEN_BUILD_PRELOAD}
     if defined $ENV{ALIEN_BUILD_PRELOAD};
@@ -765,6 +765,16 @@ sub test
 }
 
 
+sub clean_install
+{
+  my($self) = @_;
+  if($self->install_type eq 'share')
+  {
+    $self->_call_hook("clean_install");
+  }
+}
+
+
 sub system
 {
   my($self, $command, @args) = @_;
@@ -1151,7 +1161,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.69
+version 1.73
 
 =head1 SYNOPSIS
 
@@ -1788,6 +1798,16 @@ The C<gather_system> hook will be executed.
 
 Run the test phase
 
+=head2 clean_install
+
+ $build->clean_install
+
+Clean files from the final install location.  The default implementation removes all
+files recursively except for the C<_alien> directory.  This is helpful when you have
+an old install with files that may break the new build.
+
+For a non-share install this doesn't do anything.
+
 =head2 system
 
  $build->system($command);
@@ -2046,7 +2066,7 @@ Contributors:
 
 Diab Jerius (DJERIUS)
 
-Roy Storey
+Roy Storey (KIWIROY)
 
 Ilya Pavlov
 

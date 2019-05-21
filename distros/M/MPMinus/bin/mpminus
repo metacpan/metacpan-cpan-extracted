@@ -1,0 +1,146 @@
+#!/usr/bin/perl -w
+use strict; # $Id: mpminus 282 2019-05-18 06:24:19Z minus $
+use utf8;
+
+=encoding utf-8
+
+=head1 NAME
+
+mpminus - MPMinus helper application
+
+=head1 SYNOPSIS
+
+    mpminus [options] [commands [arguments]]
+
+    mpminus [-v] [-D /path/to/output/directory] [-t TYPE] create [PROJECTNAME]
+
+=head1 DESCRIPTION
+
+This tool can helps You to create a new MPMinus project
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-D PATH, --dir=PATH>
+
+Specifies directory to new project saving
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-s, --silent>
+
+Enable silent mode. Does not display most information
+
+=item B<-t TYPE, --type=TYPE>
+
+Set the type of project. Allowed: regular (default), simple, rest
+
+=item B<-v, --verbose>
+
+Verbose option
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<create>
+
+    mpminus [-v] [-D /path/to/output/directory] [-t TYPE] create [PROJECTNAME]
+
+Create new project by project name
+
+=item B<test>
+
+    mpminus test
+
+Tests work environment and shows result as summary table
+
+=back
+
+=head1 ARGUMENTS
+
+Some of the commands use arguments. For more information, see
+the description of a specific command
+
+=head1 DEPENDENCIES
+
+L<CTK>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 SEE ALSO
+
+L<CTK>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
+
+=cut
+
+use feature qw/say/;
+use Getopt::Long;
+use Pod::Usage;
+use MPMinus::Helper;
+
+use constant {
+    CMDDEFAULT  => 'usage',
+};
+
+my %options;
+Getopt::Long::Configure("bundling");
+GetOptions(\%options,
+    # NoUsed keys map:
+    #
+    # a A b B c C d   e E
+    # f F g G     i I j J
+    # k K l L m M n N o O
+    # p P q Q r R s S   T
+    # u U   V w W x X y Y
+    # z Z
+    "help|usage|h",         # Show help page
+    "longhelp|H",           # Show long help page
+    "verbose|v",            # Verbose mode
+    "dir|D=s",              # Save output data
+    "type|t=s",             # Project type
+    "silent|s",             # Silent mode
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options{longhelp};
+$options{tty} = ( $options{silent} || !(-t STDOUT)) ? 0 : 1;
+my $command = @ARGV ? shift @ARGV : CMDDEFAULT;
+my @arguments = @ARGV ? @ARGV : ();
+
+my $app = new MPMinus::Helper(
+        debug   => $options{tty},
+        verbose => $options{verbose},
+        datadir => $options{dir},
+        options => \%options,
+    );
+$command = CMDDEFAULT unless grep { $_ eq $command } ($app->list_handlers);
+
+my $exitval = $app->run($command, @arguments) ? 0 : 1;
+printf STDERR "%s\n", $app->error if $exitval && $app->error;
+exit $exitval;

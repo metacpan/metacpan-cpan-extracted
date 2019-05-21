@@ -9,7 +9,6 @@ META.yml
 Makefile.PL
 README
 alienfile
-cpanfile
 dist.ini
 lib/Alien/hiredis.pm
 t/00-report-prereqs.dd

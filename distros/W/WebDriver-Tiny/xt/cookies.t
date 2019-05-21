@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 
-use Test::Deep;
 use Test::More;
 use WebDriver::Tiny;
 
@@ -15,30 +14,32 @@ $drv->get('http://httpd:8080');
 
 is_deeply $drv->cookies, {}, 'No cookies';
 
-$drv->cookie( foo => 'bar' );
-$drv->cookie( baz => 'qux', path => '/' );
+my $expiry = time + 9;
+
+$drv->cookie( foo => 'bar', expiry => $expiry );
+$drv->cookie( baz => 'qux', expiry => $expiry, path => '/' );
 
 my $cookie = {
     domain   => 'httpd',
-    expiry   => re('^\d+'),
-    httpOnly => bool(0),
+    expiry   => $expiry,
+    httpOnly => $JSON::PP::false,
     name     => 'foo',
     path     => '/',
-    secure   => bool(0),
+    secure   => $JSON::PP::false,
     value    => 'bar',
 };
 
-cmp_deeply $drv->cookie('foo'), $cookie, 'Cookie "foo" exists';
+is_deeply $drv->cookie('foo'), $cookie, 'Cookie "foo" exists';
 
-cmp_deeply $drv->cookies, {
+is_deeply $drv->cookies, {
     foo => $cookie,
     baz => {
         domain   => 'httpd',
-        expiry   => re('^\d+'),
-        httpOnly => bool(0),
+        expiry   => $expiry,
+        httpOnly => $JSON::PP::false,
         name     => 'baz',
         path     => '/',
-        secure   => bool(0),
+        secure   => $JSON::PP::false,
         value    => 'qux',
     },
 }, 'Cookies exists';

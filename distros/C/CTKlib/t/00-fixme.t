@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Sergey Lepenkov (Serz Minus), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 00-fixme.t 249 2017-04-12 15:38:51Z minus $
+# $Id$
 #
 #########################################################################
 use strict;
@@ -23,4 +23,5 @@ run_tests(
 );
 
 1;
+
 __END__

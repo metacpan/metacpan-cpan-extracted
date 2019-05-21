@@ -115,7 +115,7 @@ package Sidef::Object::Object {
 
     sub object_id {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(Scalar::Util::refaddr($self));
+        Sidef::Types::Number::Number->_set_uint(Scalar::Util::refaddr($self));
     }
 
     *refaddr = \&object_id;
@@ -265,8 +265,7 @@ package Sidef::Object::Object {
             @parents;
         };
 
-        Sidef::Types::Array::Array->new(
-                                  [map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj) || $obj)]);
+        Sidef::Types::Array::Array->new([$extract_parents->(CORE::ref($obj) || $obj)]);
     }
 
     sub interpolate {

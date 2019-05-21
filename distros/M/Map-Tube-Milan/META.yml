@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ name: Map-Tube-Milan
 provides:
   Map::Tube::Milan:
     file: lib/Map/Tube/Milan.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   File::Share: '0'
-  Map::Tube: '3.39'
+  Map::Tube: '3.62'
   Moo: '0'
   namespace::autoclean: '0'
   perl: 5.010_000
@@ -32,5 +32,6 @@ requires:
 resources:
   bugtracker: https://github.com/mfontani/Map-Tube-Milan/issues
   repository: git://github.com/mfontani/Map-Tube-Milan.git
-version: '0.004'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.005'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

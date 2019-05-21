@@ -19,11 +19,8 @@ my $author1 = 'Sam Henry <henryst@vcu.edu>';
 WriteMakefile(
               'NAME'		  => 'UMLS::Association',
               'VERSION_FROM' => 'lib/UMLS/Association.pm',
-              'PREREQ_PM'      => {'DBI' => '0',
-				      'DBD::mysql' => '0',
-                                      'Text::NSP' => '0', 
-                                      'UMLS::Interface' => '0', 
-                                      'File::Spec' => '3.31',
+              'PREREQ_PM'      => {  'Text::NSP' => '0', 
+                                     'File::Spec' => '3.31',
                                       'File::Path' => '2.08',
                                       'Graph::Directed' => '0'},
               'EXE_FILES'         => [("utils/umls-association.pl", "utils/CUICollector.pl", "utils/umls-association-runDataSet.pl")], 

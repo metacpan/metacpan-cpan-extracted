@@ -7,6 +7,7 @@ use Time::Local();
 use Time::Zone::Olson();
 use POSIX();
 use Config;
+use English qw( -no_match_vars );
 use Time::Local();
 use File::Find();
 use Digest::SHA();
@@ -31,11 +32,15 @@ diag("TZ environment variable is untainted as $ENV{TZ}");
 my $perl_date = 0;
 my $bsd_date = 0;
 my $test_gnu_date = `TZ="Australia/Melbourne" date -d "2015/02/28 11:00:00" +"%Y/%m/%d %H:%M:%S" 2>&1`;
-chomp $test_gnu_date;
+if (defined $test_gnu_date) {
+	chomp $test_gnu_date;
+}
 if (($test_gnu_date) && ($test_gnu_date eq '2015/02/28 11:00:00')) {
 } else {
 	my $test_bsd_date = `TZ="Australia/Melbourne" date -r 1425081600 +"%Y/%m/%d %H:%M:%S" 2>&1`;
-	chomp $test_bsd_date;
+	if (defined $test_bsd_date) {
+		chomp $test_bsd_date;
+	}
 	if (($test_bsd_date) && ($test_bsd_date eq '2015/02/28 11:00:00')) {
 		$bsd_date = 1;
 	} else {
@@ -46,7 +51,9 @@ if (($test_gnu_date) && ($test_gnu_date eq '2015/02/28 11:00:00')) {
 ok($timezone->timezone() =~ /^\w+(\/\w+)?$/, "\$timezone->timezone() parses correctly");
 ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->areas()");
 ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
+if (ref $timezone eq 'Time::Zone::Olson') {
 ok($timezone->comment('Australia/Melbourne') eq 'Victoria', "\$timezone->comment('Australia/Melbourne') returns 'Victoria'");
+}
 diag(`zdump -v /usr/share/zoneinfo/$ENV{TZ} | head -n 10`);
 if ($bsd_date) {
 	diag("bsd test of early date:" . `TZ="Australia/Melbourne" date -r "-2172355201" +"%Y/%m/%d %H:%M:%S" 2>&1`);
@@ -56,7 +63,6 @@ if ($bsd_date) {
 }
 
 my $count = 0;
-my $time_local_has_negative_problems;
 foreach my $area ($timezone->areas()) {
 	foreach my $location ($timezone->locations($area)) {
 		if ( $ENV{RELEASE_TESTING} ) {
@@ -68,14 +74,13 @@ foreach my $area ($timezone->areas()) {
 		foreach my $transition_time ($timezone->transition_times()) {
 			if (($Config{archname} !~ /^(?:amd64|x86_64)/) && ($transition_time > (2 ** 31) - 1)) {
 			} elsif (($Config{archname} !~ /^(?:amd64|x86_64)/) && ($transition_time < -2 ** 31)) {
-			} elsif ($^O eq 'MSWin32') { # Win32 platforms will not have historical time records
 			} else {
 				eval { gmtime $transition_time } or do { next };
 				my $correct_date = get_external_date($area, $location, $transition_time);
 				my $test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time));
 				SKIP: {
 					if ($correct_date) {
-						ok($test_date eq $correct_date, "Matched $test_date to $correct_date for $area/$location for \$timezone->local_time");
+						ok($test_date eq $correct_date, "Matched $test_date to $correct_date for $area/$location for \$timezone->local_time($transition_time)");
 					} else {
 						skip("system 'date' command did not produce any output at all for $area/$location", 1);
 					}
@@ -242,7 +247,95 @@ sub get_external_date {
 		die "Failed to parse transition time $unix_time";
 	}
 	my $formatted_date;
-	if ($perl_date) {
+	if ($^O eq 'MSWin32') {
+		my $perl_path = 'perl';
+		if ($^X =~ /^([\w\\.:]+)/) {
+			($perl_path) = ($1);
+		} else {
+			die "Failed to parse $^X";
+		}
+
+		my %mapping = Time::Zone::Olson::Win32->mapping();
+		my $win32_time_zone = $mapping{"$area/$location"};
+		require Win32::API;
+		
+		my $timezone_specific_registry_path = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones\\" . $mapping{"$area/$location"};
+		Win32API::Registry::RegOpenKeyEx(Win32API::Registry::HKEY_LOCAL_MACHINE(), $timezone_specific_registry_path, 0, Win32API::Registry::KEY_QUERY_VALUE(), my $timezone_specific_subkey) or Carp::croak( "Failed to open LOCAL_MACHINE\\$timezone_specific_registry_path:$EXTENDED_OS_ERROR");
+		Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Dlt', [], [], my $daylight_name, []) or Carp::croak("Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\TZI:$EXTENDED_OS_ERROR");
+		Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Std', [], [], my $standard_name, []) or Carp::croak("Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\TZI:$EXTENDED_OS_ERROR");
+		Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'TZI', [], [], my $binary, []) or Carp::croak("Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\TZI:$EXTENDED_OS_ERROR");
+		my ($bias, $standard_bias, $daylight_bias, $standard_year, $standard_month, $standard_day_of_week, $standard_week, $standard_hour, $standard_minute, $standard_second, $standard_millisecond, $daylight_year, $daylight_month, $daylight_day_of_week, $daylight_week, $daylight_hour, $daylight_minute, $daylight_second, $daylight_millisecond) = unpack 'lllSSSSSSSSSSSSSSSS', $binary;
+		Win32::API::Struct->typedef(SYSTEMTIME => qw(
+			WORD wYear;
+			WORD wMonth;
+			WORD wDayOfWeek;
+			WORD wDay;
+			WORD wHour;
+			WORD wMinute;
+			WORD wSecond;
+			WORD wMilliseconds;
+		));
+		Win32::API::Struct->typedef(TIME_ZONE_INFORMATION => qw(
+			LONG       Bias;
+			WCHAR      StandardName[32];
+			SYSTEMTIME StandardDate;
+			LONG       StandardBias;
+			WCHAR      DaylightName[32];
+			SYSTEMTIME DaylightDate;
+			LONG       DaylightBias;
+		));
+
+		my $tzi = Win32::API::Struct->new('TIME_ZONE_INFORMATION');
+		$tzi->{Bias} = $bias;
+		$tzi->{StandardName} = $standard_name;
+		$tzi->{StandardDate}{wYear} = $standard_year;
+		$tzi->{StandardDate}{wMonth} = $standard_month;
+		$tzi->{StandardDate}{wDayOfWeek} = $standard_day_of_week;
+		$tzi->{StandardDate}{wDay} = $standard_week;
+		$tzi->{StandardDate}{wHour} = $standard_hour;
+		$tzi->{StandardDate}{wMinute} = $standard_minute;
+		$tzi->{StandardDate}{wSecond} = $standard_second;
+		$tzi->{StandardDate}{wMilliseconds} = $standard_millisecond;
+		$tzi->{StandardBias} = $standard_bias;
+		$tzi->{DaylightName} = $daylight_name;
+		$tzi->{DaylightDate}{wYear} = $daylight_year;
+		$tzi->{DaylightDate}{wMonth} = $daylight_month;
+		$tzi->{DaylightDate}{wDayOfWeek} = $daylight_day_of_week;
+		$tzi->{DaylightDate}{wDay} = $daylight_week;
+		$tzi->{DaylightDate}{wHour} = $daylight_hour;
+		$tzi->{DaylightDate}{wMinute} = $daylight_minute;
+		$tzi->{DaylightDate}{wSecond} = $daylight_second;
+		$tzi->{DaylightDate}{wMilliseconds} = $daylight_millisecond;
+		$tzi->{DaylightBias} = $daylight_bias;
+
+		my $gmt_time = Win32::API::Struct->new('SYSTEMTIME');
+		$gmt_time->{wYear} = ((gmtime($unix_time))[5])  + 1900;
+		$gmt_time->{wMonth} = ((gmtime($unix_time))[4]) + 1;
+		$gmt_time->{wDayOfWeek} = ((gmtime($unix_time))[6]);
+		$gmt_time->{wDay} = ((gmtime($unix_time))[3]);
+		$gmt_time->{wHour} = ((gmtime($unix_time))[2]);
+		$gmt_time->{wMinute} = ((gmtime($unix_time))[1]);
+		$gmt_time->{wSecond} = ((gmtime($unix_time))[0]);
+		$gmt_time->{wMilliseconds} = 0;
+
+		my $local_time = Win32::API::Struct->new('SYSTEMTIME');
+		$local_time->{wYear} = 0;
+		$local_time->{wMonth} = 0;
+		$local_time->{wDayOfWeek} = 0;
+		$local_time->{wDay} = 0;
+		$local_time->{wHour} = 0;
+		$local_time->{wMinute} = 0;
+		$local_time->{wSecond} = 0;
+		$local_time->{wMilliseconds} = 0;
+		
+		my $system_time_to_tz_specific_local_time = Win32::API::More->new("kernel32", "BOOL WINAPI SystemTimeToTzSpecificLocalTime(LPTIME_ZONE_INFORMATION lpTimeZone, LPSYSTEMTIME lpUniversalTime, LPSYSTEMTIME lpLocalTime);");
+		my $result = $system_time_to_tz_specific_local_time->Call($tzi,$gmt_time, $local_time);
+		if ($result == 0) { warn "Failed SystemTimeToTzSpecificLocalTime:$^E" }
+		foreach my $key (sort {$a cmp $b } keys %{$local_time}) {
+			$local_time->{$key} =~ s/^(\d)$/0$1/smx;
+		}
+		$formatted_date = $local_time->{wYear} . q[/] . $local_time->{wMonth} . q[/] . $local_time->{wDay} . q[ ] . $local_time->{wHour} . q[:] . $local_time->{wMinute} . q[:] . $local_time->{wSecond};
+	} elsif ($perl_date) {
 		$formatted_date = `TZ="$area/$location" perl -MPOSIX -e 'print POSIX::strftime("%Y/%m/%d %H:%M:%S", localtime($untainted_unix_time))'`;
 	} elsif ($bsd_date) {
 		$formatted_date = `TZ="$area/$location" date -r $untainted_unix_time +"%Y/%m/%d %H:%M:%S"`;
@@ -307,6 +400,19 @@ sub guess_tz {
 		}
 		if (defined $guessed) {
 			return $guessed;
+		}
+	} elsif ($^O eq 'MSWin32') {
+		require Win32API::Registry;
+		my $current_timezone_registry_path = 'SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
+		Win32API::Registry::RegOpenKeyEx(Win32API::Registry::HKEY_LOCAL_MACHINE(), $current_timezone_registry_path, 0, Win32API::Registry::KEY_QUERY_VALUE(), my $current_timezone_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:" . Win32API::Registry::regLastError());
+		Win32API::Registry::RegQueryValueEx($current_timezone_registry_key, 'TimeZoneKeyName', [], my $type, my $win32_timezone_name, []) or die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\TimeZoneKeyName:" . Win32API::Registry::regLastError();
+		Win32API::Registry::RegCloseKey($current_timezone_registry_key) or die "Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:" . Win32API::Registry::regLastError();
+		require Time::Zone::Olson::Win32;
+		my %mapping = Time::Zone::Olson::Win32->mapping();
+		foreach my $key (sort { $a cmp $b } keys %mapping) {
+			if ($mapping{$key} eq $win32_timezone_name) {
+				return $key;
+			}
 		}
 	}
 	return 'Australia/Melbourne';

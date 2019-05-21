@@ -4,6 +4,9 @@ use Test::Output;
 use File::Temp;
 use JSON;
 
+plan skip_all => "skip tests because of warning about Locale::Country and Locale::Codes"
+  if $] >= 5.028;
+
 my $dir = File::Temp::tempdir();
 
 my $exit;

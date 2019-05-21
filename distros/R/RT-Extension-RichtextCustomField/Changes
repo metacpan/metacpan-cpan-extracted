@@ -1,5 +1,11 @@
 Revision history for RT-Extension-RichtextCustomField
 
+0.05 2019-05-17
+ - Add patch to RT to allow Richtext CFs as recipient when extracting
+   from a ticket into an article
+   (close https://github.com/gibus/RT-Extension-RichtextCustomField/issues/2
+    thanks to tbrumm)
+
 0.03 2017-06-21
  - Add comprehensive tests
  - Upgrade Module::Install and other included modules

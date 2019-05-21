@@ -3,10 +3,11 @@ name: appspec
 appspec: { version: 0.001 }
 title: Utilities for spec files for App::Spec cli apps
 class: App::AppSpec
-markup: swim
+markup: pod
 description: |
-  This script is a collection of tools for authors of [App::Spec] command line
+  This script is a collection of tools for authors of L<App::Spec> command line
   scripts.
+
     # generate completion
     % appspec completion --bash path/to/spec.yaml
     # generate pod
@@ -25,13 +26,12 @@ subcommands:
       shell script for tab completion.
     op: cmd_completion
     options:
-    - spec: name=s --name of the program (optional, override the value from the spec)
-    - spec: zsh --for zsh
-    - spec: bash --for bash
+    - name=s --name of the program (optional, override the value from the spec)
+    - zsh --for zsh
+    - bash --for bash
     parameters:
     - &param_spec_file
-      spec: +spec_file= +file --Path to the spec file (use '-' for standard input)
-      description: spec file
+      +spec_file= +file --Path to the spec file (use '-' for standard input)
 
   new:
     summary: Create new app
@@ -40,15 +40,18 @@ subcommands:
       This command creates a skeleton for a new app.
       It will create a directory for your app and write a skeleton
       spec file.
+
+      Example:
+
+        appspec new --name myprogram --class App::MyProgram App-MyProgram
+
     parameters:
-      - spec: path=s --Path to the distribution directory (default is 'Dist-Name' in current directory)
+      - path=s --Path to the distribution directory (default is 'Dist-Name' in current directory)
     options:
-    - spec: name|n=s --The (file) name of the app
-      required: true
-    - spec: class|c=s --The main class name for your app implementation
-      required: true
-    - spec: overwrite|o --Overwrite existing dist directory
-    - spec: with-subcommands|s --Create an app with subcommands
+    - +name|n=s --The (file) name of the app
+    - +class|c=s --The main class name for your app implementation
+    - overwrite|o --Overwrite existing dist directory
+    - with-subcommands|s --Create an app with subcommands
 
   pod:
     summary: Generate pod
@@ -63,11 +66,11 @@ subcommands:
     summary: Validate spec file
     description: |
       This command takes a spec file and validates it against the current
-      [App::Spec] schema.
+      L<App::Spec> schema.
     op: cmd_validate
     parameters:
     - *param_spec_file
     options:
-    - spec: color|C --output colorized
+    - color|C --output colorized
 
 # vim:et:sts=2:sws=2:sw=2:foldmethod=indent

@@ -21,6 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'MooX::ReturnModifiers' => '0.09',
 		'Type::Tiny' => '1.002000', 
+		'B' => 0,
 		'Moo' => 0,
         'Carp' => 0,
     },

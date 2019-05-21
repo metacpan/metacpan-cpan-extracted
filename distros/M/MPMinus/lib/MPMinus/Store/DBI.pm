@@ -1,13 +1,16 @@
 package MPMinus::Store::DBI; # $Id$
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
-MPMinus::Store::DBI - Database independent interface for MPMinus on CTK::DBI based
+MPMinus::Store::DBI - Simple database interface based on CTK::DBI
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -15,7 +18,6 @@ Version 1.00
 
     # MySQL connect
     my $mysql = new MPMinus::Store::DBI (
-        -m          => $m, # OPTIONAL
         -dsn        => 'DBI:mysql:database=TEST;host=192.168.1.1',
         -user       => 'login',
         -pass       => 'password',
@@ -27,19 +29,17 @@ Version 1.00
                 PrintError => 0,
             },
     ); # See CTK::DBI
-    
+
     # MySQL connect (old style, without DSN)
     my $mysql = new MPMinus::Store::DBI (
         -m          => $m, # OPTIONAL
-        
         -driver     => 'mysql', # Driver name. See DBI module
             # Available drivers:
-            #  CSV, DBM, ExampleP, File, Gofer, ODBC, Oracle, 
+            #  CSV, DBM, ExampleP, File, Gofer, ODBC, Oracle,
             #  Pg, Proxy, SQLite, Sponge, mysql
         -host       => '192.168.1.1',
         -port       => '3306', # default
         -database   => 'TEST',
-        
         -user       => 'login',
         -pass       => 'password',
         -attr       => {
@@ -50,11 +50,11 @@ Version 1.00
     );
 
     my $dbh = $mysql->connect;
-    
+
     my $pingstat = $mysql->ping if $mysql;
-    
+
     $mysql->reconnect() unless $pingstat;
-    
+
     # Table select (as array)
     my @result = $mysql->table($sql, @inargs);
 
@@ -77,17 +77,37 @@ Version 1.00
 
 =head1 DESCRIPTION
 
-Database independent interface for MPMinus on CTK::DBI based.
+Simple database interface based on CTK::DBI
 
 =head2 DEBUG
 
-Set $MPMinus::Store::DBI::DEBUG_FORCE = 1 for enable debugging in STDERR where object $m undefined
-
-Coming soon
+You can set $MPMinus::Store::DBI::DEBUG_FORCE = 1 to enable forced debugging
 
 =head1 METHODS
 
 =over 8
+
+=item B<new>
+
+    my $mysql = new MPMinus::Store::DBI (
+        -m          => $m, # OPTIONAL
+        -driver     => 'mysql', # Driver name. See DBI module
+            # Available drivers:
+            #  CSV, DBM, ExampleP, File, Gofer, ODBC, Oracle,
+            #  Pg, Proxy, SQLite, Sponge, mysql
+        -host       => '192.168.1.1',
+        -port       => '3306', # default
+        -database   => 'TEST',
+        -user       => 'login',
+        -pass       => 'password',
+        -attr       => {
+                mysql_enable_utf8 => 1,
+                RaiseError => 0,
+                PrintError => 0,
+            },
+    );
+
+Returns MPMinus::Store::DBI object. See also L<CTK::DBI>
 
 =item B<ping>
 
@@ -117,25 +137,24 @@ See L<DBI/"METHODS_COMMON_TO_ALL_HANDLES">
 
 =item B<Handler example>
 
-    package MPM::foo::Handlers;
+    package MPM::Foo::Handlers;
     use strict;
-    
+
     use MPMinus::Store::DBI;
-    
+
     sub handler {
         my $r = shift;
         my $m = MPMinus->m;
-    
+
         ...
-        
+
         # MySQL connect
         $m->set_node(
             mysql => new MPMinus::Store::DBI (
-                -m      => $m,
                 -dsn    => 'DBI:mysql:database=NAME;host=HOST',
                 -user   => 'USER',
                 -pass   => 'PASSWORD',
-                -attr   => { 
+                -attr   => {
                     mysql_enable_utf8 => 1,
                     RaiseError => 0,
                     PrintError => 0,
@@ -143,37 +162,37 @@ See L<DBI/"METHODS_COMMON_TO_ALL_HANDLES">
                 },
             )
         ) unless $m->mysql;
-        
+
         ...
-        
+
     }
-    
-    package MPM::foo::Test;
+
+    package MPM::Foo::Test;
     use strict;
 
     sub response {
         my $m = shift;
-        
+
         my @data = $m->mysql->table('select * from table');
-        
+
         ...
-        
+
         return Apache2::Const::OK;
     }
 
 =item B<Handler example with reconnection>
 
-    package MPM::foo::Handlers;
+    package MPM::Foo::Handlers;
     use strict;
-    
+
     use MPMinus::Store::DBI;
-    
+
     sub handler {
         my $r = shift;
         my $m = MPMinus->m;
-    
+
         ...
-        
+
         # MySQL connect/reconnect
         if ($m->mysql) {
             $m->mysql->reconnect unless $m->mysql->ping;
@@ -181,11 +200,10 @@ See L<DBI/"METHODS_COMMON_TO_ALL_HANDLES">
             # eval 'sub CTK::DBI::_error {1}'; # For supressing CTK::DBI errors
             $m->set_node(
                 mysql => new MPMinus::Store::DBI (
-                    -m      => $m,
                     -dsn    => 'DBI:mysql:database=NAME;host=HOST',
                     -user   => 'USER',
                     -pass   => 'PASSWORD',
-                    -attr   => { 
+                    -attr   => {
                         mysql_enable_utf8 => 1,
                         RaiseError => 0,
                         PrintError => 0,
@@ -194,21 +212,21 @@ See L<DBI/"METHODS_COMMON_TO_ALL_HANDLES">
                 )
             );
         }
-        
+
         ...
-        
+
     }
-    
-    package MPM::foo::Test;
+
+    package MPM::Foo::Test;
     use strict;
 
     sub response {
         my $m = shift;
-        
+
         my @data = $m->mysql->table('select * from table');
-        
+
         ...
-        
+
         return Apache2::Const::OK;
     }
 
@@ -229,6 +247,7 @@ See L<DBI/"METHODS_COMMON_TO_ALL_HANDLES">
 =item B<Sponge example>
 
     use MPMinus::Store::DBI;
+    use Data::Dumper;
 
     $MPMinus::Store::DBI::DEBUG_FORCE = 1;
     my $o = new MPMinus::Store::DBI(
@@ -262,36 +281,43 @@ Init version
 
 =back
 
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+C<mod_perl2>, L<DBI>, L<CTK::DBI>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
 =head1 SEE ALSO
 
-L<CTK::DBI>, L<Apache::DBI>, L<DBI>
+L<DBI>, L<CTK::DBI>, L<Apache::DBI>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw($VERSION $DEBUG_FORCE);
-$VERSION = 1.00;
+$VERSION = 1.01;
 
 use constant {
         ATTR_NAMES => [
@@ -310,26 +336,30 @@ use constant {
     };
 
 use DBI;
-use base qw/CTK::DBI/;
 use CTK::Util qw/ :API /;
+use MPMinus::Log;
 
-sub new { 
+use base qw/CTK::DBI/;
+
+sub new {
     my $class = shift;
     my @in = read_attributes(ATTR_NAMES,@_);
-    
-    # Основные атрибуты соединения MySQL
-    my $m       = $in[0];
+
+    my $m       = $in[0]; # Optional
     my $dsn     = $in[1] || '';
     my $host    = $in[2] || '';
     my $db      = $in[3] || '';
     my $port    = $in[4] || '';
-    my $user    = $in[5] || '';
-    my $pass    = $in[6] || '';
+    my $user    = $in[5] // '';
+    my $pass    = $in[6] // '';
     my $driver  = $in[7] || '';
     my $toc     = $in[8] || 0;
     my $tor     = $in[9] || 0;
     my $attr    = $in[10] || undef;
-    
+
+    my $pkg = scalar(caller(0));
+    my $logger = new MPMinus::Log( sprintf("[%s] ", $pkg) );
+
     unless ($dsn) {
         my @adrivers = DBI->available_drivers();
         if (grep {$driver eq $_} @adrivers) {
@@ -349,10 +379,10 @@ sub new {
                     .($port?";port=$port":'');
             }
         } else {
-            carp("Driver \"$driver\" not availebled. Available drivers: ",join(", ",@adrivers));
+            $logger->log_crit("Driver \"$driver\" not availebled. Available drivers: ",join(", ",@adrivers));
         }
     }
-    my %args = ( 
+    my %args = (
             -dsn  => $dsn,
             -user => $user,
             -pass => $pass,
@@ -365,16 +395,14 @@ sub new {
         my $obj = $class->SUPER::new(%args);
         $obj = bless({}, $class) unless $obj && ref($obj) eq __PACKAGE__;
         $obj->{m} = $m;
+        $obj->{logger} = $logger;
         return $obj unless $obj->{dbh};
-        if ($m && ref($m) eq 'MPMinus') {
-            $m->debug("--- CONNECT {$dsn} AS $obj ---");
-        } else {
-            carp("--- CONNECT {$dsn} AS $obj ---") if $DEBUG_FORCE;
-        }
+        $logger->log_debug(sprintf("--- CONNECT {%s} AS %s ---", $dsn, ref($obj))) if $DEBUG_FORCE;
         return $obj if $obj;
     } else {
         return bless({
-                m=>$m,
+                m       => $m,
+                logger  => $logger,
             }, $class);
     }
     return undef;
@@ -390,9 +418,9 @@ sub ping {
 sub reconnect {
     my $self = shift;
 
-    my $m = $self->{m};
+    my $logger = $self->{logger};
     my $dsn = $self->{dsn};
-    
+
     # See CTK::DBI::DBI_CONNECT
     $self->{dbh} = CTK::DBI::DBI_CONNECT(
             $dsn,
@@ -402,11 +430,7 @@ sub reconnect {
             $self->{connect_to},
         );
     if ($self->{dbh}) {
-        if ($m && ref($m) eq 'MPMinus') {
-            $m->debug("--- RECONNECT {$dsn} AS $self ---");
-        } else {
-            carp("--- RECONNECT {$dsn} AS $self ---") if $DEBUG_FORCE;
-        }
+        $logger->log_debug(sprintf("--- RECONNECT {%s} AS %s ---", $dsn, ref($self))) if $DEBUG_FORCE;
         return 1;
     }
     return undef;
@@ -430,14 +454,14 @@ sub DESTROY {
     my $self = shift;
     my $dsn = '';
     $dsn = $self->{dsn} if $self->{dsn};
-    my $m = '';
-    $m = $self->{m} if $self->{m};
-    
-    if ($dsn && $self->{dbh}) {
-        if($m && ref($m) eq 'MPMinus') {
-            $m->debug("--- DISCONNECT {$dsn} ---");
+    my $logger = '';
+    $logger = $self->{logger} if $self->{logger};
+    if ($DEBUG_FORCE && $dsn && $self->{dbh}) {
+        my $msg = sprintf("--- DISCONNECT (DESTROY) {%s} ---", $dsn);
+        if($logger && ref($logger) eq 'MPMinus::Log') {
+            $logger->log_debug($msg);
         } else {
-            carp("--- DISCONNECT {$dsn} ---") if $DEBUG_FORCE;
+            warn($msg."\n");
         }
     }
 }

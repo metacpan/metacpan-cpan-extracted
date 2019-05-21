@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::DateEntry.
 
+1.43
+	- fix failing test on FreeBSD systems (RT #129385)
+
 1.42
 	- fix MANIFEST accident
 

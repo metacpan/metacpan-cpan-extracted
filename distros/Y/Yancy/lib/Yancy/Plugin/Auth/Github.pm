@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Github;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: Authenticate using Github's OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -11,7 +11,7 @@ our $VERSION = '1.025';
 #pod     app->yancy->plugin( 'Auth::Github' => {
 #pod         client_id => 'CLIENT_ID',
 #pod         client_secret => $ENV{ OAUTH_GITHUB_SECRET },
-#pod         collection => 'users',
+#pod         schema => 'users',
 #pod         username_field => 'username',
 #pod         # TODO: Get other user information from Github, requesting
 #pod         # scopes if necessary
@@ -61,7 +61,7 @@ our $VERSION = '1.025';
 #pod =cut
 
 use Mojo::Base 'Yancy::Plugin::Auth::OAuth2';
-use Yancy::Util qw( currym match );
+use Yancy::Util qw( currym match derp );
 use Mojo::UserAgent;
 use Mojo::URL;
 
@@ -69,14 +69,18 @@ has moniker => 'github';
 has authorize_url => 'https://github.com/login/oauth/authorize';
 has token_url => 'https://github.com/login/oauth/access_token';
 has api_url => 'https://api.github.com/';
-has collection =>;
+has schema =>;
 has username_field =>;
 has plugin_field => 'plugin';
-has allow_register => 1;
+has allow_register => 0;
 
 sub init {
     my ( $self, $app, $config ) = @_;
-    for my $attr ( qw( collection username_field plugin_field allow_register ) ) {
+    if ( $config->{collection} ) {
+        $self->schema( $config->{collection} );
+        derp "'collection' configuration in Auth::Github is now 'schema'. Please fix your configuration.\n";
+    }
+    for my $attr ( qw( schema username_field plugin_field allow_register ) ) {
         next if !$config->{ $attr };
         $self->$attr( $config->{ $attr } );
     }
@@ -101,8 +105,8 @@ sub current_user {
 
 sub _get_user {
     my ( $self, $c, $username ) = @_;
-    my $coll = $self->collection;
-    my $schema = $c->yancy->schema( $coll );
+    my $schema_name = $self->schema;
+    my $schema = $c->yancy->schema( $schema_name );
     my $username_field = $self->username_field;
     my %search;
     if ( my $field = $self->plugin_field ) {
@@ -110,10 +114,10 @@ sub _get_user {
     }
     if ( $username_field && $username_field ne $schema->{'x-id-field'} ) {
         $search{ $username_field } = $username;
-        my ( $user ) = @{ $c->yancy->backend->list( $coll, \%search, { limit => 1 } )->{items} };
+        my ( $user ) = @{ $c->yancy->backend->list( $schema_name, \%search, { limit => 1 } )->{items} };
         return $user;
     }
-    return $c->yancy->backend->get( $coll, $username );
+    return $c->yancy->backend->get( $schema_name, $username );
 }
 
 #pod =method require_user
@@ -197,10 +201,16 @@ sub handle_token_p {
             $c->render( text => 'Error getting Github login: ' . $tx->res->body );
         }
         $c->session->{yancy}{ $self->moniker }{ github_login } = $login;
-        if ( !$self->_get_user( $c, $login ) && $self->allow_register ) {
-            my $schema = $c->yancy->schema( $self->collection );
+        if ( !$self->_get_user( $c, $login ) ) {
+            if ( !$self->allow_register ) {
+                $c->stash(
+                    status => 403,
+                );
+                die 'Registration of new users is not allowed',
+            }
+            my $schema = $c->yancy->schema( $self->schema );
             $c->yancy->create(
-                $self->collection,
+                $self->schema,
                 { $self->username_field || $schema->{'x-id-field'} || 'id' => $login },
             );
         }
@@ -223,7 +233,7 @@ Yancy::Plugin::Auth::Github - Authenticate using Github's OAuth2 provider
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -234,7 +244,7 @@ version 1.025
     app->yancy->plugin( 'Auth::Github' => {
         client_id => 'CLIENT_ID',
         client_secret => $ENV{ OAUTH_GITHUB_SECRET },
-        collection => 'users',
+        schema => 'users',
         username_field => 'username',
         # TODO: Get other user information from Github, requesting
         # scopes if necessary
@@ -310,7 +320,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

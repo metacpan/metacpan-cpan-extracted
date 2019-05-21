@@ -1,32 +1,35 @@
-package MPMinus::Transaction; # $Id: Transaction.pm 218 2013-10-01 15:22:22Z minus $
+package MPMinus::Transaction; # $Id: Transaction.pm 274 2019-05-09 18:52:43Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
-MPMinus::Transaction - MVC SKEL transaction
+MPMinus::Transaction - MVC SKEL Transaction (MST) pattern
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
     my $q = new CGI;
-    my ($actObject,$actEvent) = split /[,]/, $q->param('action') || '';
+    my ($actObject, $actEvent) = split /[,]/, $q->param('action') || '';
     $actObject = 'default' unless $actObject && $m->ActionCheck($actObject);
     $actEvent = $actEvent && $actEvent =~ /go/ ? 'go' : '';
-    
+
     $r->content_type( $m->getActionRecord($actObject)->{content_type} );
-    
+
     my $status = $m->ActionTransaction($actObject,$actEvent);
-    
+
     my $status = $m->ActionExecute($actObject,'cdeny');
 
 =head1 DESCRIPTION
 
-Working with MVC SKEL transactions.
+Working with MVC SKEL Transactions (MST) pattern.
 
-See MVC SKEL transaction C<DESCRIPTION> file or L<MPMinus::Manual> 
+See MVC SKEL Transaction L<MPMinus::Manual>
 
 =head1 METHODS
 
@@ -60,35 +63,48 @@ Returns meta record of $actObject
 
 =back
 
+=head1 HISTORY
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<MPMinus>, L<CTK::Util>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+L<MPMinus>, L<CTK::Util>
+
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw($VERSION);
-$VERSION = 1.05;
+$VERSION = 1.06;
 
+use Carp;
 use Apache2::Const;
-use CTK::Util qw/ :API /;
 
 use constant {
         HOOKS => { # Returned values of hooks / Types of hooks
@@ -115,75 +131,67 @@ use constant {
             },
     };
 
-sub ActionTransaction {
-    # Основная транзакция (возвращает код возврата)
+sub ActionTransaction { # Returns status - 0 or HTTP_* codes
     my $m = shift || '';
     my $key = shift || return 0;
     my $event = shift || '';
-    croak("The method call is made ActionTransaction not in the style of OOP") unless ref($m) =~ /MPMinus/;
-    
-    my $sts = 0; 
-    
-    # Выполнение процедуры доступа (false - deny; true - allow)
+    croak("The method call is made ActionTransaction not in the style of MPMinus") unless ref($m) =~ /MPMinus/;
+
+    my $sts = 0;
+
+    # Access action (false - deny; true - allow)
     $sts = ActionExecute($m,$key,'caccess');
-    
-    # Проверка на доступ
+
+    # Oops! No access!
     unless ($sts) {
-        # Проверка не прошла - запуск обработчика cdeny
+        # Call cdeny
         $sts = ActionExecute($m,$key,'cdeny');
         return $sts;
     }
-    return $sts if $sts >= 300; # Возврат если код 300 и более (анализируется результат caccess)
-      
-    # Запуск процесса если есть событие и удачно выполнилась проверка (валидация) параметров
+    return $sts if $sts >= 300; # Returns HTTP_* if code >= 300 (data from caccess)
+
+    # Run process (mproc) if $event defined and cchck returns valid value
     $sts = ActionExecute($m,$key,'mproc') if (($event =~ /go/i) && ActionExecute($m,$key,'cchck'));
-    return $sts if $sts >= 300; # Возврат если код 300 и более
-    
-    # Показываем форму
-    $sts = ActionExecute($m,$key,'vform'); 
+    return $sts if $sts >= 300; # Returns HTTP_* if code >= 300 (data from mproc)
+
+    # Show form
+    $sts = ActionExecute($m,$key,'vform');
     return $sts;
 }
 sub ActionExecute {
-    # Выполнить один или несколько процедур обработчиков до первого 0-го (false) кода возврата
+    # Run one or more handlers until first negative (false) return code
     my $m = shift || '';
     my $key = shift || return 0;
     my $hook = shift || return 0;
     my @params = @_;
-    croak("The method call is made ActionExecute not in the style of OOP") unless ref($m) =~ /MPMinus/;
+    croak("The method call is made ActionExecute not in the style of MPMinus") unless ref($m) =~ /MPMinus/;
 
-    return 0 unless ActionCheck($m,$key); # Если ключа нет -- выход
+    return 0 unless ActionCheck($m,$key); # Return if key is not found
     my %hooks = %{(HOOKS)};
-    return 0 unless grep {$_ eq $hook} keys %hooks; # Возврат 0 если неопределен контекст того что возвращать (default)
+    return 0 unless grep {$_ eq $hook} keys %hooks; # Return 0 if context is not defined (default)
 
-    # принимаем хендлер обработчика .mpm
+    # Get handler
     my $grec = $m->drec;
     my $rec = $grec->{actions}{$key}{handler};
     my $phase = _getPhaseByAlias($rec,$hook);
-    
-    #$m->debug("> Running $hook");
-    
-    #no strict 'refs'; # Добавлено для возможности доступа к ссылкам как процедурам
+
     if (ref($phase) eq 'CODE') {
-        # Выполняем код
-        #$m->debug("> -- $hook -> CODE");
+        # Run code
         return $phase->($m,@params)
     } elsif (ref($phase) eq 'ARRAY') {
-        # Выполняем каскад кодов до первой неудачи
         my $status;
         foreach (@$phase) {
-            # $m->debug($_->($m,@params));
             $status = (ref($_) eq 'CODE') ? $_->($m,@params) : 0;
-            #$m->debug("> $hook -> CODE[$status]");
             my $typ = $hooks{$hook}{type};
-            
+
             if ($typ eq 'BOOL') {
-                last unless $status; # Выход если хотябы кто-то вернул значение false
+                last unless $status; # Return if false
             } elsif ($typ eq 'HTTP') {
-                # Выход если ответ >=300 (REDIRECTIONS AND ERRORS)
+                # Return if >=300 (REDIRECTIONS AND ERRORS)
                 last unless (($status =~ /^[+\-]?\d+$/) && $status < 300);
             } elsif ($typ eq 'DUAL') {
-                last unless $status; # Выход если хотябы кто-то вернул значение false
-                # Выход если ответ 0 (OK) или >=300 (REDIRECTIONS AND ERRORS)
+                # Return if 0 (OK) or >=300 (REDIRECTIONS AND ERRORS)
+                last unless $status; # Return if false
                 last unless (($status =~ /^[+\-]?\d+$/) && $status < 300);
             } else { # VOID and etc.
                 $status = Apache2::Const::OK;
@@ -191,7 +199,6 @@ sub ActionExecute {
         }
         return $status;
     } else {
-        #$m->debug("> -- $hook -> VOID");
         return 0;
     }
     return 0;
@@ -199,26 +206,26 @@ sub ActionExecute {
 sub ActionCheck {
     my $m = shift || '';
     my $key = shift || return 0;
-    croak("The method call is made ActionCheck not in the style of OOP") unless ref($m) =~ /MPMinus/;
+    croak("The method call is made ActionCheck not in the style of MPMinus") unless ref($m) =~ /MPMinus/;
     return $m->drec->{actions}{$key} ? 1 : 0;
 }
 sub getActionRecord {
-    # Прочитать метаопределения по ключу или все
     my $m = shift || '';
     my $key = shift;
-    croak("The method call is made getActionRecord not in the style of OOP") unless ref($m) =~ /MPMinus/;
+    croak("The method call is made getActionRecord not in the style of MPMinus") unless ref($m) =~ /MPMinus/;
     my $grec = $m->drec;
     if ($key) {
         return $grec->{actions}{$key} ? $grec->{actions}{$key} : undef;
     }
     return $grec->{actions};
 }
+
 sub _getPhaseByAlias {
     my $rec = shift || {};
     my $hook = shift || '_';
     my %hooks = %{(HOOKS)};
     my $aliases = $hooks{$hook}{aliases};
-    
+
     my $ret;
     foreach (@$aliases) {
         if ($rec->{$_} && ref($rec->{$_})) {
@@ -226,7 +233,8 @@ sub _getPhaseByAlias {
             last;
         }
     }
-    
+
     return $ret;
 }
+
 1;

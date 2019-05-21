@@ -6,7 +6,7 @@ use URI;
 use parent 'Test2::Tools::HTTP::UA';
 
 # ABSTRACT: Global LWP user agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 my %orig;
@@ -98,7 +98,7 @@ Test2::Tools::HTTP::UA::LWPClass - Global LWP user agent wrapper for Test2::Tool
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

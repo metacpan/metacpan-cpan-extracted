@@ -1,7 +1,7 @@
 package App::lcpan::Bootstrap;
 
-our $DATE = '2019-01-07'; # DATE
-our $VERSION = '20190107.0.0'; # VERSION
+our $DATE = '2019-05-20'; # DATE
+our $VERSION = '20190520.0.0'; # VERSION
 
 1;
 # ABSTRACT: Bootstrap database for lcpan
@@ -18,7 +18,7 @@ App::lcpan::Bootstrap - Bootstrap database for lcpan
 
 =head1 VERSION
 
-This document describes version 20190107.0.0 of App::lcpan::Bootstrap (from Perl distribution App-lcpan-Bootstrap), released on 2019-01-07.
+This document describes version 20190520.0.0 of App::lcpan::Bootstrap (from Perl distribution App-lcpan-Bootstrap), released on 2019-05-20.
 
 =head1 SYNOPSIS
 

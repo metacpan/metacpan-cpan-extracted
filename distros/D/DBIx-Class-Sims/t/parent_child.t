@@ -437,15 +437,19 @@ sims_test "Accept a hashref for children" => {
 
 sims_test "Connect to the parent by reference" => {
   spec => {
-    Artist => 1,
+    Artist => 3,
     Album  => {
       name => 'foo',
-      artist => \"Artist[0]",
+      artist => \"Artist[1]",
     },
   },
   expect => {
-    Artist => { id => 1, name => re('.+') },
-    Album => { id => 1, name => 'foo', artist_id => 1 },
+    Artist => [
+      { id => 1, name => re('.+') },
+      { id => 2, name => re('.+') },
+      { id => 3, name => re('.+') },
+    ],
+    Album => { id => 1, name => 'foo', artist_id => 2 },
   },
 };
 
@@ -474,6 +478,48 @@ sims_test "Connect to the right parent by reference" => {
       { id => 3, name => re('.+'), artist_id => 1 },
     ],
   },
+};
+
+sims_test "Connect to the parent by reference" => {
+  spec => {
+    Artist => { name => 'foo' },
+    Album  => { name => \'Artist[0].name', artist => \'Artist[0]' },
+  },
+  expect => {
+    Artist => [
+      { id => 1, name => 'foo' },
+    ],
+    Album => { id => 1, name => 'foo', artist_id => 1 },
+  },
+};
+
+# These tests verify the allow_relationship_column_name parameter
+sims_test "Can use column name" => {
+  spec => {
+    Artist => { name => 'bar' },
+    Album => {
+      name => 'foo',
+      artist_id => 1,
+    },
+  },
+  expect => {
+    Artist => { id => 1, name => 'bar' },
+    Album => { id => 1, name => 'foo', artist_id => 1 },
+  },
+};
+
+sims_test "Cannot use column name" => {
+  spec => [
+    {
+      Artist => { name => 'bar' },
+      Album => {
+        name => 'foo',
+        artist_id => 1,
+      },
+    },
+    { allow_relationship_column_names => 0 },
+  ],
+  dies => qr/DBIx::Class::Sims::Runner::run\(\): Cannot use column artist_id - use relationship artist/s,
 };
 
 done_testing;

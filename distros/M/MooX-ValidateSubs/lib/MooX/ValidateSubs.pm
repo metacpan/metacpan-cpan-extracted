@@ -4,12 +4,22 @@ use strict;
 use warnings;
 
 use MooX::ReturnModifiers;
-
-our $VERSION = '1.012003';
+use B;
+our $VERSION = '1.012004';
 
 sub import {
 	my $target	= caller;
 	my %modifiers = return_modifiers($target);
+	
+	my $raise_context_error = sub {
+		my ($error, $c) = @_;
+		if (ref $error) {
+			my $gv = B::svref_2object($c)->GV;
+			$error->{context}->{file} = $gv->FILE;
+			$error->{context}->{line} = $gv->LINE;
+		}
+		die $error;
+	};
 
 	my $validate_subs = sub {
 		my @attr = @_;
@@ -24,12 +34,17 @@ sub import {
 						$name,
 						sub {
 							my ( $orig, $self, @params ) = @_;
+							my @caller = caller;
+    				
 							my $current_spec = $self->$store_spec;
 
 							if ( my $param_spec = $current_spec->{params} ) {
-								@params = $self->_validate_sub(
+								@params = eval { $self->_validate_sub(
 									$name, 'params', $param_spec, @params
-								);
+								) };
+								if ($@) {
+									$raise_context_error->($@, $orig);
+								}
 							}
 
 							if (my $keys = $current_spec->{keys}) {
@@ -40,9 +55,12 @@ sub import {
 							@params = $self->$orig(@params);
 
 							if ( my $param_spec = $current_spec->{returns} ) {
-								@params = $self->_validate_sub(
+								@params = eval { $self->_validate_sub(
 									$name, 'returns', $param_spec, @params
-								);
+								) };
+								if ($@) {
+									$raise_context_error->($@, $orig);
+								}
 							}
 
 							return wantarray ? @params : shift @params;
@@ -73,7 +91,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.012003
+Version 1.012004
 
 =cut
 

@@ -1,5 +1,8 @@
-package CTK::CLI; # $Id: CLI.pm 193 2017-04-29 07:30:55Z minus $
-use Moose::Role; # use Data::Dumper; $Data::Dumper::Deparse = 1;
+package CTK::CLI; # $Id: CLI.pm 253 2019-05-09 19:32:24Z minus $
+use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,47 +10,51 @@ CTK::CLI - Command line interface
 
 =head1 VERSION
 
-Version 1.71
+Version 1.72
 
 =head1 SYNOPSIS
 
-    my $v = $c->cli_prompt('Your name:', 'anonymous');
+    use CTK::CLI qw/cli_prompt cli_select/;
+
+    my $v = cli_prompt('Your name:', 'anonymous');
     debug( "Your name: $v" );
 
-    my $v = $c->cli_prompt3('Your name:');
-    debug( "Your name: $v" );
-
-    my $v = $c->cli_select('Your select:',[qw/foo bar baz/],'bar');
+    my $v = cli_select('Your select:',[qw/foo bar baz/],'bar');
     debug( "Your select: $v" );
 
-    my $v = $c->cli_select3('Your select:',[qw/foo bar baz/]);
+or in CTK context (as plugin):
+
+    my $v = $ctk->cli_prompt('Your name:', 'anonymous');
+    debug( "Your name: $v" );
+
+    my $v = $ctk->cli_select('Your select:',[qw/foo bar baz/],'bar');
     debug( "Your select: $v" );
 
 =head1 DESCRIPTION
 
 Command line interface. Prompt and select methods
 
-=head2 cli_prompt, cli_prompt3
+=head2 cli_prompt
 
-    my $v = $c->cli_prompt('Your name:', 'anonymous');
+    my $v = cli_prompt('Your name:', 'anonymous');
     debug( "Your name: $v" );
 
-    my $v = $c->cli_prompt3('Your name:');
-    debug( "Your name: $v" );
+Show prompt string for typing data
 
-Show prompt string for typing data.
-The second method asks for data entry three times in case of incorrect attempts
+=head2 cli_select
 
-=head2 cli_select, cli_select3
-
-    my $v = $c->cli_select('Your select:',[qw/foo bar baz/],'bar');
+    my $v = cli_select('Your select:',[qw/foo bar baz/],'bar');
     debug( "Your select: $v" );
 
-    my $v = $c->cli_select3('Your select:',[qw/foo bar baz/]);
-    debug( "Your select: $v" );
+Show prompt string for select item
 
-Show prompt string for select item.
-The second method asks for data entry three times in case of incorrect attempts
+=head1 HISTORY
+
+See C<Changes> file
+
+=head1 DEPENDENCIES
+
+L<ExtUtils::MakeMaker>
 
 =head1 TO DO
 
@@ -70,95 +77,68 @@ The second method asks for data entry three times in case of incorrect attempts
     }
     print "\n";
 
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+L<ExtUtils::MakeMaker>
+
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses>
 
 =cut
 
-use vars qw/$VERSION/;
-$VERSION = '1.71';
+use vars qw/$VERSION @EXPORT_OK/;
+$VERSION = '1.72';
 
-use CTK::Util qw(:API);
+use base qw/Exporter/;
+
 use ExtUtils::MakeMaker qw/prompt/;
 
+@EXPORT_OK = (qw/
+        cli_prompt cli_select
+    /);
+
 sub cli_prompt {
-    # Командная строка, строка запроса
     # my $a = prompt('Input value a', '123');
-    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
+    my $self; $self = shift if (@_ && $_[0] && ref($_[0]));
     my $msg = shift;
     my $def = shift;
-
-    return prompt($msg,$def)
-}
-sub cli_prompt3 {
-    # выполняет операцию cli_prompt 3 раза и возвращает результат
-    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
-    my $msg = shift;
-    my $v = '';
-    my $i = 0;
-    while ($i < 3) {$i++;
-        $v = prompt($msg);
-        last if defined($v) && $v ne '';
-        CTK::say();
-    }
-    return $v;
+    return prompt($msg, $def)
 }
 sub cli_select {
-    # Возвращает выбранное значение
-    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
+    my $self; $self = shift if (@_ && $_[0] && ref($_[0]));
     my $msg = shift;
     my $sel = shift || [];
     my $def = shift;
 
     my $v = _cli_select($sel);
     my $d = defined($def) ? $def : $v->[1];
-    CTK::say($v->[1]) if $v->[0];
+    print($v->[1],"\n") if $v->[0];
     $v = cli_prompt(defined($msg) ? $msg : '', $d);
     $v = _cli_select($sel, $v);
 
     return $v->[0] ? '' : $v->[1];
 }
-sub cli_select3 {
-    # выполняет операцию cli_select 3 раза и возвращает результат
-    my $self; $self = shift if (@_ && $_[0] && ref($_[0]) eq 'CTK');
-    my $msg = shift;
-    my $sel = shift || [];
-    my $def = shift;
 
-    unless ($sel && (!ref($sel) || ref($sel) eq 'ARRAY')) {
-        carp("cli_select3: Call syntax error");
-        $sel = [];
-    }
-
-    my $v = _cli_select($sel);
-    my $d = defined($def) ? $def : $v->[1];
-    my $i = 0;
-    while ($i < 3) {$i++;
-        CTK::say($v->[1]) if $v->[0];
-        $v = cli_prompt(defined($msg) ? $msg : '', $d);
-        $v = _cli_select($sel, $v);
-        last unless ($v->[0]);
-        CTK::say();
-    }
-    return $v->[0] ? '' : $v->[1];
-}
 sub _cli_select {
-    # Возвращает либо значение, либо ряд значений, либо выбранное значение
-    # Первый элемент - 0 - значение/выбранное значение
-    #                  1 - Варианты (список в виде строк)
+    # Returns value or list of value, or defult value
+    # First element - 0 - value/default value
+    #                 1 - List of values
     my $v = shift;
     my $sel = shift;
     if (defined $v) {
@@ -182,7 +162,5 @@ sub _cli_select {
 }
 
 1;
+
 __END__
-
-
-

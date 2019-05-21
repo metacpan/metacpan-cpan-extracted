@@ -9,7 +9,7 @@ use Stash::REST;
 use JSON::MaybeXS;
 use Furl;
 
-has 'flotum_api' => ( is => 'rw', default => 'https://api.flotum.com' );
+has 'flotum_api' => ( is => 'rw', default => 'https://flotum-api.appcivico.com' );
 has 'timeout'    => ( is => 'ro', default => 10 );
 
 has 'stash' => ( is => 'ro', lazy => 1, builder => '_build_stash' );

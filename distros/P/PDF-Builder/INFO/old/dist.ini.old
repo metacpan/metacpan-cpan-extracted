@@ -1,5 +1,5 @@
 name = PDF-Builder
-version = 3.014
+version = 3.015   # have stopped updating, until used again
 author  = Phil Perry <phil4597@catskilltech.com>
 license = LGPL_2_1
 copyright_holder = Phil Perry
@@ -13,7 +13,7 @@ repository.type = git
 format = %-9v %{yyyy-MM-dd}d
 
 [Prereqs]
-perl = v5.16.0
+perl = v5.18.0
 Compress::Zlib = 1.0
 Font::TTF = 1.04
 

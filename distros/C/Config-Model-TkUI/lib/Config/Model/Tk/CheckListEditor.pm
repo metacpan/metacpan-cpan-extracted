@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::CheckListEditor;
-$Config::Model::Tk::CheckListEditor::VERSION = '1.369';
+package Config::Model::Tk::CheckListEditor 1.370;
+
 use strict;
 use warnings;
 use Carp;
@@ -83,7 +83,8 @@ sub Populate {
     # setup item help change when mouse hovers listbox items
     my $b_sub = sub {
         my $index = $lb->nearest($lb->pointery - $lb->rooty);
-        state $selected //= '';
+        state $selected;
+        $selected //= '';
         if ($selected ne $choice[$index]) {
             $selected = $choice[$index];
             $cw->set_value_help($selected);
@@ -222,14 +223,14 @@ sub store {
     my %set = map { $_ => 1; } map { $choice[$_] } $lb->curselection;
     my $cl = $cw->{leaf};
 
-    map {
-        if ( $set{$_} and not $cl->is_checked($_) ) {
-            $cl->check($_);
+    foreach my $c (@choice) {
+        if ( $set{$c} and not $cl->is_checked($c) ) {
+            $cl->check($c);
         }
-        elsif ( not $set{$_} and $cl->is_checked($_) ) {
-            $cl->uncheck($_);
+        elsif ( not $set{$c} and $cl->is_checked($c) ) {
+            $cl->uncheck($c);
         }
-    } @choice;
+    }
 
     $cw->{store_cb}->();
 }

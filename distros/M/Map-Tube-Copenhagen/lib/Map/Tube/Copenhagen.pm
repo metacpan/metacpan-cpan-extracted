@@ -1,6 +1,6 @@
 package Map::Tube::Copenhagen;
 
-$Map::Tube::Copenhagen::VERSION   = '0.03';
+$Map::Tube::Copenhagen::VERSION   = '0.04';
 $Map::Tube::Copenhagen::AUTHORITY = 'cpan:SLU';
 
 =begin html
@@ -8,6 +8,10 @@ $Map::Tube::Copenhagen::AUTHORITY = 'cpan:SLU';
 <p>
     <a href="https://travis-ci.org/soren/Map-Tube-Copenhagen"><img
         src="https://travis-ci.org/soren/Map-Tube-Copenhagen.svg?branch=master"/></a>
+    <a href="https://coveralls.io/github/soren/Map-Tube-Copenhagen?branch=master"><img
+        src="https://coveralls.io/repos/github/soren/Map-Tube-Copenhagen/badge.svg?branch=master"/></a>
+    <a href="https://metacpan.org/release/Map-Tube-Copenhagen"><img
+        src="https://badge.fury.io/pl/Map-Tube-Copenhagen.svg"/></a>
 </p>
 
 =end html
@@ -18,7 +22,7 @@ Map::Tube::Copenhagen - Interface to the Copenhagen Metro map
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

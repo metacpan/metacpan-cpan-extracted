@@ -1,5 +1,5 @@
 package PAR;
-$PAR::VERSION = '1.015';
+$PAR::VERSION = '1.016';
 
 use 5.006;
 use strict;
@@ -48,7 +48,7 @@ To use F<Hello.pm> from F<./foo.par>:
     % perl -MPAR=./foo.par -MHello
     % perl -MPAR=./foo -MHello          # the .par part is optional
 
-Same thing, but search F<foo.par> in the C<@INC>;
+Same thing, but search F<foo.par> in C<@INC>:
 
     % perl -MPAR -Ifoo.par -MHello
     % perl -MPAR -Ifoo -MHello          # ditto
@@ -213,13 +213,13 @@ extracted libraries, and do not clean it up after execution.
 
 =item *
 
-If I<PAR_GLOBAL_TEMP> is not set, but I<PAR_CLEAN> is specified, set
-I<PAR_GLOBAL_TEMP> to C<I<TEMP>/par-I<USER>/temp-I<PID>/>, cleaning it
+If I<PAR_GLOBAL_TEMP> is not set, but I<PAR_GLOBAL_CLEAN> is specified, set
+I<PAR_GLOBAL_TEMP> to C<I<TEMP>/par-I<USERHEX>/temp-I<PID>/>, cleaning it
 after execution.
 
 =item *
 
-If both are not set,  use C<I<TEMP>/par-I<USER>/cache-I<HASH>/> as the
+If both are not set,  use C<I<TEMP>/par-I<USERHEX>/cache-I<HASH>/> as the
 I<PAR_GLOBAL_TEMP>, reusing any existing files inside.
 
 =back
@@ -239,9 +239,11 @@ of them exists, I<.> is used.
 
 =item *
 
-I<USER> is the user name, or SYSTEM if none can be found.  On Win32, 
-this is C<$Win32::LoginName>.  On Unix, this is C<$ENV{USERNAME}> or 
-C<$ENV{USER}>.
+I<USERHEX> is derived from the user name, or SYSTEM if none can be found.
+On Win32, this is C<$Win32::LoginName>.
+On Unix, this is C<$ENV{USERNAME}> or C<$ENV{USER}>.
+Encode the raw bytes of the user name each as two hex digits
+to obtain I<USERHEX>.
 
 =item *
 
@@ -695,50 +697,44 @@ sub _extract_inc {
     {
         mkdir($inc, 0755);
 
-        undef $@;
-        if (!$is_handle) {
-          # First try to unzip the *fast* way.
-          eval {
-            require Archive::Unzip::Burst;
-            Archive::Unzip::Burst::unzip($file_or_azip_handle, $inc)
-              and die "Could not unzip '$file_or_azip_handle' into '$inc'. Error: $!";
-              die;
-          };
+        EXTRACT: {
+            my $zip;
+            if ($is_handle) {
+                $zip = $file_or_azip_handle;
+            } else {
+                # First try to unzip the *fast* way.
+                eval {
+                    require Archive::Unzip::Burst;
+                    Archive::Unzip::Burst::unzip($file_or_azip_handle, $inc) == AZ_OK;
+                } and last EXTRACT;
 
-          # This means the fast module is there, but didn't work.
-          if ($@ =~ /^Could not unzip/) {
-            die $@;
-          }
-        }
+                # Either failed to load Archive::Unzip::Burst or 
+                # Archive::Unzip::Burst::unzip failed: fallback to slow way.
+                open my $fh, '<', $file_or_azip_handle
+                  or die "Cannot find '$file_or_azip_handle': $!";
+                binmode($fh);
+                bless($fh, 'IO::File');
 
-        # either failed to load Archive::Unzip::Burst or got 
-        # an Archive::Zip handle: fallback to slow way.
-        if ($is_handle || $@) {
-          my $zip;
-          if (!$is_handle) {
-            open my $fh, '<', $file_or_azip_handle
-              or die "Cannot find '$file_or_azip_handle': $!";
-            binmode($fh);
-            bless($fh, 'IO::File');
+                # Temporarily increase Archive::Zip::ChunkSize so that we may find
+                # the EOCD even if stuff has been appended (e.g.by OSX codesign)
+                # to the zip/executable.
+                Archive::Zip::setChunkSize(-s $fh);
+                $zip = Archive::Zip->new;
+                $zip->readFromFileHandle($fh, $file_or_azip_handle) == AZ_OK
+                    or die "Read '$file_or_azip_handle' error: $!";
+                Archive::Zip::setChunkSize(64 * 1024);
+            }
 
-            $zip = Archive::Zip->new;
-            $zip->readFromFileHandle($fh, $file_or_azip_handle) == AZ_OK
-                or die "Read '$file_or_azip_handle' error: $!";
-          }
-          else {
-            $zip = $file_or_azip_handle;
-          }
-
-          for ( $zip->memberNames() ) {
-              s{^/}{};
-              my $outfile =  File::Spec->catfile($inc, $_);
-              next if -e $outfile and not -w _;
-              $zip->extractMember($_, $outfile);
-              # Unfortunately Archive::Zip doesn't have an option
-              # NOT to restore member timestamps when extracting, hence set 
-              # it to "now" (making it younger than the canary file).
-              utime(undef, undef, $outfile);
-          }
+            for ( $zip->memberNames() ) {
+                s{^/}{};
+                my $outfile =  File::Spec->catfile($inc, $_);
+                next if -e $outfile and not -w _;
+                $zip->extractMember($_, $outfile);
+                # Unfortunately Archive::Zip doesn't have an option
+                # NOT to restore member timestamps when extracting, hence set 
+                # it to "now" (making it younger than the canary file).
+                utime(undef, undef, $outfile);
+            }
         }
 
         $ArchivesExtracted{$is_handle ? $file_or_azip_handle->fileName() : $file_or_azip_handle} = $inc;

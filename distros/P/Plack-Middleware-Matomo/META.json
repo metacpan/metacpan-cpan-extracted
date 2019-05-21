@@ -65,7 +65,7 @@
          "web" : "https://github.com/vpeil/Plack-Middleware-Matomo"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"

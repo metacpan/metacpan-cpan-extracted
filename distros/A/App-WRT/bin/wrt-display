@@ -105,7 +105,7 @@ if ($from_stdin) {
 }
 
 # TODO: Better error reporting strategy, print this on stderr:
-foreach my $entry (@to_display) {
+foreach my $entry (map { $w->expand_alias($_) } @to_display) {
   unless ($w->{entries}->is_extant($entry)) {
     say("No such entry: $entry");
     exit(1);

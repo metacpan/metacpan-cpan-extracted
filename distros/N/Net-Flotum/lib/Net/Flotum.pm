@@ -1,7 +1,7 @@
 package Net::Flotum;
 use strict;
 use 5.008_005;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use warnings;
 use utf8;

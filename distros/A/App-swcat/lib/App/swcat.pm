@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-05-20'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -259,9 +259,10 @@ sub _cache_result {
     $res;
 }
 
-$SPEC{list} = {
+$SPEC{list_installed} = {
     v => 1.1,
-    summary => 'List known software in the catalog',
+    summary => 'List known software in the catalog '.
+        '(from installed Software::Catalog::SW::* modules)',
     args => {
         %args_common,
         detail => {
@@ -270,7 +271,7 @@ $SPEC{list} = {
         },
     },
 };
-sub list {
+sub list_installed {
     require PERLANCAR::Module::List;
 
     my %args = @_;
@@ -296,6 +297,70 @@ sub list {
     }
 
     [200, "OK", \@rows];
+}
+
+# for backward compatibility
+$SPEC{list} = $SPEC{list_installed};
+*list = \&list_installed;
+
+$SPEC{list_cpan} = {
+    v => 1.1,
+    summary => 'List available known software in the catalog '.
+        '(from Software::Catalog::SW::* modules on CPAN)',
+    args => {
+        %args_common,
+        detail => {
+            schema => ['bool*', is=>1],
+            cmdline_aliases => {l=>{}},
+        },
+        lcpan => {
+            schema => 'bool*',
+        },
+    },
+};
+sub list_cpan {
+    my %args = @_;
+
+    my @methods = $args{lcpan} ?
+        ('lcpan', 'metacpan') : ('metacpan', 'lcpan');
+
+  METHOD:
+    for my $method (@methods) {
+        if ($method eq 'lcpan') {
+            unless (eval { require App::lcpan::Call; 1 }) {
+                warn "App::lcpan::Call is not installed, skipped listing ".
+                    "modules from local CPAN mirror\n";
+                next METHOD;
+            }
+            my $res = App::lcpan::Call::call_lcpan_script(
+                argv => [qw/mods --namespace Software::Catalog::SW/],
+            );
+            return $res if $res->[0] != 200;
+            return [200, "OK",
+                    [map {my $w = $_; $w =~ s/\ASoftware::Catalog::SW:://; $w }
+                         grep {/Software::Catalog::SW::/} sort @{$res->[2]}]];
+        } elsif ($method eq 'metacpan') {
+            unless (eval { require MetaCPAN::Client; 1 }) {
+                warn "MetaCPAN::Client is not installed, skipped listing ".
+                    "modules from MetaCPAN\n";
+                next METHOD;
+            }
+            my $mcpan = MetaCPAN::Client->new;
+            my $rs = $mcpan->module({
+                'module.name'=>'Software::Catalog::SW::*',
+            });
+            my @res;
+            while (my $row = $rs->next) {
+                my $mod = $row->module->[0]{name};
+                say "D: mod=$mod" if $ENV{DEBUG};
+                $mod =~ s/\ASoftware::Catalog::SW:://;
+                push @res, $mod unless grep {$mod eq $_} @res;
+            }
+            warn "Empty result from MetaCPAN\n" unless @res;
+            return [200, "OK", [sort(@res)]];
+        }
+    }
+    return [412, "Can't find a way to list CPAN mirrors"];
 }
 
 sub _get_arg_softwares_or_patterns {
@@ -519,7 +584,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.010 of App::swcat (from Perl distribution App-swcat), released on 2019-01-15.
+This document describes version 0.011 of App::swcat (from Perl distribution App-swcat), released on 2019-05-20.
 
 =head1 SYNOPSIS
 
@@ -570,6 +635,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 available_versions
 
 Usage:
@@ -606,6 +672,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 download_url
@@ -650,6 +717,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 latest_version
 
 Usage:
@@ -692,13 +760,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list
 
 Usage:
 
  list(%args) -> [status, msg, payload, meta]
 
-List known software in the catalog.
+List known software in the catalog (from installed Software::Catalog::SW::* modules).
 
 This function is not exported.
 
@@ -728,6 +797,87 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+
+
+=head2 list_cpan
+
+Usage:
+
+ list_cpan(%args) -> [status, msg, payload, meta]
+
+List available known software in the catalog (from Software::Catalog::SW::* modules on CPAN).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arch> => I<software::arch>
+
+=item * B<cache_period> => I<int>
+
+=item * B<db_path> => I<filename>
+
+Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+
+=item * B<detail> => I<bool>
+
+=item * B<lcpan> => I<bool>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 list_installed
+
+Usage:
+
+ list_installed(%args) -> [status, msg, payload, meta]
+
+List known software in the catalog (from installed Software::Catalog::SW::* modules).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arch> => I<software::arch>
+
+=item * B<cache_period> => I<int>
+
+=item * B<db_path> => I<filename>
+
+Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+
+=item * B<detail> => I<bool>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 release_note

@@ -42,13 +42,30 @@ sub register {
 
   $self->_migrate_from_assetpack;
   $self->_render_to_file($app, 'package.json');
-  $self->_render_to_file($app, 'webpack.config.js');
-  $self->_render_to_file($app, 'webpack.custom.js', $self->_custom_file);
-  $self->_render_to_file($app, 'my_app.js', $self->assets_dir->child('my_app.js'))
-    if $self->{files}{'webpack.custom.js'}[0] eq 'generated';
+
+  if ($ENV{MOJO_WEBPACK_CONFIG}) {
+    $self->{files}{'webpack.config.js'} = [custom => path($ENV{MOJO_WEBPACK_CONFIG})->to_abs];
+  }
+  else {
+    $self->_render_to_file($app, 'webpack.config.js');
+    $self->_render_to_file($app, 'webpack.custom.js', $self->_custom_file);
+    $self->_render_to_file($app, 'my_app.js', $self->assets_dir->child('my_app.js'))
+      if $self->{files}{'webpack.custom.js'}[0] eq 'generated';
+  }
+
   $self->_install_node_deps;
   $self->_webpack_run($app);
   $self->_install_shim($app) if $config->{shim};
+}
+
+sub _binary {
+  my $self        = shift;
+  my $config_file = $self->{files}{'webpack.config.js'}[1];
+
+  return
+      $ENV{MOJO_WEBPACK_BINARY} ? $ENV{MOJO_WEBPACK_BINARY}
+    : $config_file =~ /\brollup\./ ? path($config_file->dirname, qw(node_modules .bin rollup))->to_string
+    :                                path($config_file->dirname, qw(node_modules .bin webpack))->to_string;
 }
 
 sub _build_custom_file {
@@ -63,6 +80,11 @@ sub _install_node_deps {
 
   my $CWD = Mojolicious::Plugin::Webpack::CWD->new($package_file->dirname);
   system qw(npm install) if %{$package_json->{dependencies}} and !-d 'node_modules';
+
+  if ($self->dependencies->{core} eq 'rollup') {
+    $self->dependencies->{core}
+      = [qw(rollup rollup-plugin-node-resolve rollup-plugin-commonjs rollup-plugin-terser rollup-plugin-bundle-html)];
+  }
 
   for my $preset ('core', @{$self->process}) {
     for my $module (@{$self->dependencies->{$preset} || []}) {
@@ -206,7 +228,7 @@ sub _webpack_run {
   map { warn "[Webpack] $_=$env->{$_}\n" } grep {/^(NODE_|WEBPACK_)/} sort keys %$env if DEBUG;
 
   my $config_file = $self->{files}{'webpack.config.js'}[1];
-  my @cmd         = $ENV{MOJO_WEBPACK_BINARY} || path($config_file->dirname, qw(node_modules .bin webpack))->to_string;
+  my @cmd         = ($self->_binary);
   my @extra       = split /\s+/, +($ENV{MOJO_WEBPACK_BUILD} || '');
   push @cmd, '--config' => $config_file->to_string;
   push @cmd, '--progress', '--profile', '--verbose' if $ENV{MOJO_WEBPACK_VERBOSE};

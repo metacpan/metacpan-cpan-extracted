@@ -50,6 +50,7 @@ sub _parse_argv {
 
   getopt \@argv,
     'b|backend=s' => \$ENV{MOJO_MORBO_BACKEND},
+    'c|config=s'  => \$ENV{MOJO_WEBPACK_CONFIG},
     'h|help'      => \my $help,
     'l|listen=s'  => \my @listen,
     'm|mode=s'    => \$ENV{MOJO_MODE},
@@ -107,6 +108,8 @@ Mojolicious::Command::Author::webpack - Mojolicious HTTP, WebSocket and Webpack 
   Options:
     -b, --backend <name>           Morbo backend to use for reloading, defaults
                                    to "Poll"
+    -c, --config <file>            If you want to use a custom config file, such
+                                   as "rollup.config.js" for https://rollupjs.org.
     -h, --help                     Show this message
     -l, --listen <location>        One or more locations you want to listen on,
                                    defaults to the value of MOJO_LISTEN or

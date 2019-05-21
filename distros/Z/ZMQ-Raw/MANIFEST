@@ -28,6 +28,7 @@ deps/libzmq/RELICENSE/JohanMabille.md
 deps/libzmq/RELICENSE/Quuxplusone.md
 deps/libzmq/RELICENSE/README.md
 deps/libzmq/RELICENSE/SRombauts.md
+deps/libzmq/RELICENSE/SergheiNovac.md
 deps/libzmq/RELICENSE/SylvainCorlay.md
 deps/libzmq/RELICENSE/TTimo.md
 deps/libzmq/RELICENSE/WenbinHou.md
@@ -71,6 +72,7 @@ deps/libzmq/RELICENSE/drodri.md
 deps/libzmq/RELICENSE/eburkitt.md
 deps/libzmq/RELICENSE/egomotion.md
 deps/libzmq/RELICENSE/emtr.md
+deps/libzmq/RELICENSE/ericsson.md
 deps/libzmq/RELICENSE/evoskuil.md
 deps/libzmq/RELICENSE/ezhikus.md
 deps/libzmq/RELICENSE/f18m.md
@@ -94,9 +96,11 @@ deps/libzmq/RELICENSE/hoditohod.md
 deps/libzmq/RELICENSE/hpsaturn.md
 deps/libzmq/RELICENSE/ianbarber.md
 deps/libzmq/RELICENSE/imatix.md
+deps/libzmq/RELICENSE/ipa.md
 deps/libzmq/RELICENSE/jacquesg.md
 deps/libzmq/RELICENSE/jakecobb.md
 deps/libzmq/RELICENSE/jcourreges.md
+deps/libzmq/RELICENSE/jean-airoldie.md
 deps/libzmq/RELICENSE/jemc.md
 deps/libzmq/RELICENSE/jimklimov.md
 deps/libzmq/RELICENSE/jkryl.md
@@ -123,11 +127,15 @@ deps/libzmq/RELICENSE/mipaaa.md
 deps/libzmq/RELICENSE/mkluwe.md
 deps/libzmq/RELICENSE/mkoppanen.md
 deps/libzmq/RELICENSE/montoyaedu.md
+deps/libzmq/RELICENSE/moretromain.md
 deps/libzmq/RELICENSE/mystfit.md
 deps/libzmq/RELICENSE/naos_ltd.md
 deps/libzmq/RELICENSE/natano.md
+deps/libzmq/RELICENSE/neheb.md
+deps/libzmq/RELICENSE/normano.md
 deps/libzmq/RELICENSE/ojura.md
 deps/libzmq/RELICENSE/olafmandel.md
+deps/libzmq/RELICENSE/omegastick.md
 deps/libzmq/RELICENSE/opedroso.md
 deps/libzmq/RELICENSE/opensource-kymetacorp.md
 deps/libzmq/RELICENSE/panlinux.md

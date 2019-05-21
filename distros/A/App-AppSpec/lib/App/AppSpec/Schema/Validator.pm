@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::AppSpec::Schema::Validator;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use App::Spec;
 use File::Share qw/ dist_file /;

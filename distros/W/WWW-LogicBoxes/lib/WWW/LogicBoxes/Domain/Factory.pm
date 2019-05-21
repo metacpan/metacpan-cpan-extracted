@@ -8,7 +8,7 @@ use WWW::LogicBoxes::DomainTransfer;
 
 use Carp;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 # ABSTRACT: Domain Factory for Building Domain Objects from Responses
 
 sub construct_from_response {

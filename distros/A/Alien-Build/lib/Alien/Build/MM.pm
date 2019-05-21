@@ -8,15 +8,15 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.69'; # VERSION
+our $VERSION = '1.73'; # VERSION
 
 
 sub new
 {
   my($class, %prop) = @_;
-  
+
   my $self = bless {}, $class;
-  
+
   my %meta = map { $_ => $prop{$_} } grep /^my_/, keys %prop;
 
   my $build = $self->{build} =
@@ -26,13 +26,13 @@ sub new
       meta_prop => \%meta,
     )
   ;
-  
+
   if(%meta)
   {
     $build->meta->add_requires(configure => 'Alien::Build::MM' => '1.20');
     $build->meta->add_requires(configure => 'Alien::Build' => '1.20');
   }
-  
+
   if(defined $prop{alienfile_meta})
   {
     $self->{alienfile_meta} = $prop{alienfile_meta};
@@ -41,7 +41,9 @@ sub new
   {
     $self->{alienfile_meta} = 1;
   }
-  
+
+  $self->{clean_install} = $prop{clean_install};
+
   $self->build->load_requires('configure');
   $self->build->root;
   $self->build->checkpoint;
@@ -62,10 +64,16 @@ sub alienfile_meta
 }
 
 
+sub clean_install
+{
+  shift->{clean_install};
+}
+
+
 sub mm_args
 {
   my($self, %args) = @_;
-  
+
   if($args{DISTNAME})
   {
     $self->build->set_stage(Path::Tiny->new("blib/lib/auto/share/dist/$args{DISTNAME}")->absolute->stringify);
@@ -96,9 +104,9 @@ sub mm_args
   {
     Carp::croak "DISTNAME is required";
   }
-  
+
   my $ab_version = '0.25';
-  
+
   $args{CONFIGURE_REQUIRES} = Alien::Build::_merge(
     'Alien::Build::MM' => $ab_version,
     %{ $args{CONFIGURE_REQUIRES} || {} },
@@ -125,15 +133,15 @@ sub mm_args
   {
     die "unknown install type: @{[ $self->build->install_type ]}"
   }
-  
+
   $args{PREREQ_PM} = Alien::Build::_merge(
     'Alien::Build' => $ab_version,
     %{ $args{PREREQ_PM} || {} },
   );
- 
+
   #$args{META_MERGE}->{'meta-spec'}->{version} = 2;
   $args{META_MERGE}->{dynamic_config} = 1;
-  
+
   if($self->alienfile_meta)
   {
     $args{META_MERGE}->{x_alienfile} = {
@@ -147,7 +155,7 @@ sub mm_args
       },
     };
   }
-  
+
   $self->build->checkpoint;
   %args;
 }
@@ -155,14 +163,26 @@ sub mm_args
 
 sub mm_postamble
 {
-  my($self) = @_;
-  
+  # NOTE: older versions of the Alien::Build::MM documentation
+  # didn't include $mm and @rest args, so anything that this
+  # method uses them for has to be optional.
+  # (as of this writing they are unused, but are being added
+  #  to match the way mm_install works).
+
+  my($self, $mm, @rest) = @_;
+
   my $postamble = '';
-  
+
   # remove the _alien directory on a make realclean:
   $postamble .= "realclean :: alien_realclean\n" .
                 "\n" .
                 "alien_realclean:\n" .
+                "\t\$(RM_RF) _alien\n\n";
+
+  # remove the _alien directory on a make clean:
+  $postamble .= "clean :: alien_clean\n" .
+                "\n" .
+                "alien_clean:\n" .
                 "\t\$(RM_RF) _alien\n\n";
 
   my $dirs = $self->build->meta_prop->{arch}
@@ -189,14 +209,14 @@ sub mm_postamble
   $postamble .= "alien_build : _alien/mm/build\n\n" .
                 "_alien/mm/build : _alien/mm/download\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e build\n\n";
-  
+
   # append to all
   $postamble .= "pure_all :: _alien/mm/build\n\n";
-  
+
   $postamble .= "subdirs-test_dynamic subdirs-test_static subdirs-test :: alien_test\n\n";
   $postamble .= "alien_test :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e test\n\n";
-  
+
   # prop
   $postamble .= "alien_prop :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop\n\n";
@@ -206,8 +226,29 @@ sub mm_postamble
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop install\n\n";
   $postamble .= "alien_prop_runtime :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop runtime\n\n";
-  
+
+  # install
+  $postamble .= "alien_clean_install : _alien/mm/prefix\n" .
+                "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e clean_install\n\n";
+
   $postamble;
+}
+
+
+sub mm_install
+{
+  # NOTE: older versions of the Alien::Build::MM documentation
+  # didn't include this method, so anything that this method
+  # does has to be optional
+
+  my($self, $mm, @rest) = @_;
+
+  my $section = do {
+    package MY;
+    $mm->SUPER::install(@rest);
+  };
+
+  "install :: alien_clean_install\n\n$section";
 }
 
 sub import
@@ -218,7 +259,7 @@ sub import
     if($arg eq 'cmd')
     {
       package main;
-      
+
       *_args = sub
       {
         my $build = Alien::Build->resume('alienfile', '_alien');
@@ -226,14 +267,14 @@ sub import
         $build->load_requires($build->install_type);
         ($build, @ARGV)
       };
-      
+
       *_touch = sub {
         my($name) = @_;
         my $path = Path::Tiny->new("_alien/mm/$name");
         $path->parent->mkpath;
         $path->touch;
       };
-      
+
       *prefix = sub
       {
         my($build, $type, $perl, $site, $vendor) = _args();
@@ -254,16 +295,16 @@ sub import
         $build->checkpoint;
         _touch('prefix');
       };
-      
+
       *version = sub
       {
         my($build, $version) = _args();
-        
+
         $build->runtime_prop->{perl_module_version} = $version;
         $build->checkpoint;
         _touch('version');
       };
-      
+
       *download = sub
       {
         my($build) = _args();
@@ -271,11 +312,11 @@ sub import
         $build->checkpoint;
        _touch('download');
       };
-      
+
       *build = sub
       {
         my($build) = _args();
-        
+
         $build->build;
 
         my $distname = $build->install_prop->{mm}->{distname};
@@ -287,10 +328,10 @@ sub import
           my $archfile = $archdir->child($archdir->basename . '.txt');
           $archfile->spew('Alien based distribution with architecture specific file in share');
         }
-        
+
         my $cflags = $build->runtime_prop->{cflags};
         my $libs   = $build->runtime_prop->{libs};
-        
+
         if(($cflags && $cflags !~ /^\s*$/)
         || ($libs   && $libs   !~ /^\s*$/))
         {
@@ -310,28 +351,35 @@ sub import
             "=cut\n",
           );
         }
-        
+
         $build->checkpoint;
         _touch('build');
       };
-      
+
       *test = sub
       {
         my($build) = _args();
         $build->test;
         $build->checkpoint;
       };
-      
+
+      *clean_install = sub
+      {
+        my($build) = _args();
+        $build->clean_install;
+        $build->checkpoint;
+      };
+
       *dumpprop = sub
       {
         my($build, $type) = _args();
-        
+
         my %h = (
           meta    => $build->meta_prop,
           install => $build->install_prop,
           runtime => $build->runtime_prop,
         );
-        
+
         require Alien::Build::Util;
         print Alien::Build::Util::_dump($type ? $h{$type} : \%h);
       }
@@ -353,7 +401,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.69
+version 1.73
 
 =head1 SYNOPSIS
 
@@ -373,7 +421,11 @@ In your C<Makefile.PL>:
  ));
  
  sub MY::postamble {
-   $abmm->mm_postamble;
+   $abmm->mm_postamble(@_);
+ }
+
+ sub MY::install {
+   $abmm->mm_install(@_);
  }
 
 In your C<lib/Alien/Libfoo.pm>:
@@ -431,6 +483,24 @@ The L<Alien::Build> instance.
 
 Set to a false value, in order to turn off the x_alienfile meta
 
+=head2 clean_install
+
+ my $bool = $abmm->clean_install;
+
+Set to a true value, in order to clean the share directory prior to
+installing.  If you use this you have to make sure that you install
+the install handler in your C<Makefile.PL>:
+
+ $abmm = Alien::Build::MM->new(
+   clean_install => 1,
+ );
+ 
+ ...
+ 
+ sub MY::install {
+   $abmm->mm_install(@_);
+ }
+
 =head1 METHODS
 
 =head2 mm_args
@@ -442,6 +512,7 @@ Adjust the arguments passed into C<WriteMakefile> as needed by L<Alien::Build>.
 =head2 mm_postamble
 
  my $postamble $abmm->mm_postamble;
+ my $postamble $abmm->mm_postamble($mm);
 
 Returns the postamble for the C<Makefile> needed for L<Alien::Build>.
 This adds the following C<make> targets which are normally called when
@@ -466,11 +537,32 @@ Downloads the source from the internet.  Does nothing for a system install.
 Build from source (if a share install).  Gather configuration (for either
 system or share install).
 
-=item alien_prop
+=item alien_prop, alien_prop_meta, alien_prop_install, alien_prop_runtime
 
 Prints the meta, install and runtime properties for the Alien.
 
+=item alien_realclean, alien_clean
+
+Removes the alien specific files.  These targets are executed when you call
+the C<realclean> and C<clean> targets respectively.
+
+=item alien_clean_install
+
+Cleans out the Alien's share directory.  Caution should be used in invoking
+this target directly, as if you do not understand what you are doing you
+are likely to break your already installed Alien.
+
 =back
+
+=head2 mm_install
+
+ sub MY::install {
+   $abmm->mm_install(@_);
+ }
+
+B<EXPERIMENTAL>
+
+Adds an install rule to clean the final install dist directory prior to installing.
 
 =head1 SEE ALSO
 
@@ -484,7 +576,7 @@ Contributors:
 
 Diab Jerius (DJERIUS)
 
-Roy Storey
+Roy Storey (KIWIROY)
 
 Ilya Pavlov
 

@@ -1,7 +1,17 @@
 Revision history for Map::Tube::Copenhagen
 
-0.01  2017-12-18
-      - First version, released.
+0.04  2019-05-18
+      - Bumped to use current version of Map::Tube
+      - Fixed manifest test
+      - Added coveralls integration and badge
+      - Added (meta)cpan badge again
+      
+0.03  2017-12-18
+      - Fixed documentation
+      - Removed (meta)cpan badge
 
 0.02  2017-12-18
       - Updated documentation including adding badges
+
+0.01  2017-12-18
+      - First version, released.

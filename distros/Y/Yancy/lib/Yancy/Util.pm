@@ -1,11 +1,11 @@
 package Yancy::Util;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Yancy::Util qw( load_backend );
-#pod     my $be = load_backend( 'test://localhost', $collections );
+#pod     my $be = load_backend( 'test://localhost', $schema );
 #pod
 #pod     use Yancy::Util qw( curry );
 #pod     my $helper = curry( \&_helper_sub, @args );
@@ -35,17 +35,18 @@ use Mojo::Loader qw( load_class );
 use Scalar::Util qw( blessed );
 use Mojo::JSON::Pointer;
 use Mojo::JSON qw( to_json );
+use Carp qw( carp );
 
-our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match );
+our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp );
 
 #pod =sub load_backend
 #pod
-#pod     my $backend = load_backend( $backend_url, $collections );
-#pod     my $backend = load_backend( { $backend_name => $arg }, $collections );
+#pod     my $backend = load_backend( $backend_url, $schema );
+#pod     my $backend = load_backend( { $backend_name => $arg }, $schema );
 #pod
 #pod Get a Yancy backend from the given backend URL, or from a hash reference
-#pod with a backend name and optional argument. The C<$collections> hash is
-#pod the configured collections for this backend.
+#pod with a backend name and optional argument. The C<$schema> hash is
+#pod the configured JSON schema for this backend.
 #pod
 #pod A backend URL should begin with a name followed by a colon. The first
 #pod letter of the name will be capitalized, and used to build a class name
@@ -62,11 +63,11 @@ our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match );
 #pod =cut
 
 sub load_backend {
-    my ( $config, $collections ) = @_;
+    my ( $config, $schema ) = @_;
     my ( $type, $arg );
     if ( !ref $config ) {
         ( $type ) = $config =~ m{^([^:]+)};
-        $arg = $config
+        $arg = $config;
     }
     else {
         ( $type, $arg ) = %{ $config };
@@ -75,7 +76,7 @@ sub load_backend {
     if ( my $e = load_class( $class ) ) {
         die ref $e ? "Could not load class $class: $e" : "Could not find class $class";
     }
-    return $class->new( $arg, $collections );
+    return $class->new( $arg, $schema );
 }
 
 #pod =sub curry
@@ -246,6 +247,28 @@ sub match {
     return $passes == keys %test;
 }
 
+#pod =sub derp
+#pod
+#pod     derp "This feature is deprecated in file '%s'", $file;
+#pod
+#pod Print out a deprecation message as a warning. A message will only be
+#pod printed once for each set of arguments from each caller.
+#pod
+#pod =cut
+
+our %DERPED;
+sub derp(@) {
+    my @args = @_;
+    my $key = to_json [ caller, @args ];
+    return if $DERPED{ $key };
+    if ( $args[0] !~ /\.$/ ) {
+        $args[0] .= '.';
+    }
+    local $Carp::CarpLevel = 1;
+    carp sprintf( $args[0], @args[1..$#args] );
+    $DERPED{ $key } = 1;
+}
+
 1;
 
 __END__
@@ -258,12 +281,12 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
     use Yancy::Util qw( load_backend );
-    my $be = load_backend( 'test://localhost', $collections );
+    my $be = load_backend( 'test://localhost', $schema );
 
     use Yancy::Util qw( curry );
     my $helper = curry( \&_helper_sub, @args );
@@ -284,12 +307,12 @@ This module contains utility functions for Yancy.
 
 =head2 load_backend
 
-    my $backend = load_backend( $backend_url, $collections );
-    my $backend = load_backend( { $backend_name => $arg }, $collections );
+    my $backend = load_backend( $backend_url, $schema );
+    my $backend = load_backend( { $backend_name => $arg }, $schema );
 
 Get a Yancy backend from the given backend URL, or from a hash reference
-with a backend name and optional argument. The C<$collections> hash is
-the configured collections for this backend.
+with a backend name and optional argument. The C<$schema> hash is
+the configured JSON schema for this backend.
 
 A backend URL should begin with a name followed by a colon. The first
 letter of the name will be capitalized, and used to build a class name
@@ -361,6 +384,13 @@ data structure. See L<SQL::Abstract/WHERE CLAUSES> for the full syntax.
 
 Not all of SQL::Abstract's syntax is supported yet, so patches are welcome.
 
+=head2 derp
+
+    derp "This feature is deprecated in file '%s'", $file;
+
+Print out a deprecation message as a warning. A message will only be
+printed once for each set of arguments from each caller.
+
 =head1 SEE ALSO
 
 L<Yancy>
@@ -371,7 +401,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

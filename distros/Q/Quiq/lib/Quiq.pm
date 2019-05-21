@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 =encoding utf8
 
@@ -57,10 +57,6 @@ L<Quiq::ClassLoader> - Lade Perl-Klassen automatisch
 =item *
 
 L<Quiq::Color> - Eine Farbe des RGB-Farbraums
-
-=item *
-
-L<Quiq::ColumnFormat> - Format einer Text-Kolumne
 
 =item *
 
@@ -136,6 +132,10 @@ L<Quiq::Database::Cursor> - Datenbank-Cursor
 
 =item *
 
+L<Quiq::Database::DataAnalysis> - Führe Datenanalyse durch
+
+=item *
+
 L<Quiq::Database::ResultSet> - Liste von Datensätzen (abstrakt)
 
 =item *
@@ -204,22 +204,6 @@ L<Quiq::FFmpeg> - Konstruiere eine FFmpeg-Kommandozeile
 
 =item *
 
-L<Quiq::Fibu::Bankbuchung> - Buchung von einem Postbank-Konto
-
-=item *
-
-L<Quiq::Fibu::BankbuchungListe> - Liste von Buchungen von einem Postbank-Konto
-
-=item *
-
-L<Quiq::Fibu::Buchung> - Fibu-Buchung
-
-=item *
-
-L<Quiq::Fibu::BuchungListe> - Liste von Fibu-Buchungen
-
-=item *
-
 L<Quiq::File::Audio> - Informationen über Audio-Datei
 
 =item *
@@ -237,6 +221,26 @@ L<Quiq::FileHandle> - Datei-Handle
 =item *
 
 L<Quiq::Formatter> - Formatierung von Werten
+
+=item *
+
+L<Quiq::Gnuplot::Arrow> - Gnuplot-Arrow
+
+=item *
+
+L<Quiq::Gnuplot::Graph> - Gnuplot-Graph
+
+=item *
+
+L<Quiq::Gnuplot::Label> - Gnuplot-Label
+
+=item *
+
+L<Quiq::Gnuplot::Plot> - Gnuplot-Plot
+
+=item *
+
+L<Quiq::Gnuplot::Process> - Gnuplot-Prozess
 
 =item *
 
@@ -512,6 +516,10 @@ L<Quiq::Progress> - Berechne Fortschrittsinformation
 
 =item *
 
+L<Quiq::Properties> - Eigenschaften einer Menge von skalaren Werten
+
+=item *
+
 L<Quiq::Record> - Verarbeitung von Text-Records
 
 =item *
@@ -521,90 +529,6 @@ L<Quiq::Reference> - Operationen auf Referenzen
 =item *
 
 L<Quiq::Rsync> - Aufruf von rsync von Perl aus
-
-=item *
-
-L<Quiq::Sdoc> - Sdoc-Generator
-
-=item *
-
-L<Quiq::Sdoc::Box> - Kasten
-
-=item *
-
-L<Quiq::Sdoc::BridgeHead> - Zwischenüberschrift
-
-=item *
-
-L<Quiq::Sdoc::Code> - Code-Abschnitt
-
-=item *
-
-L<Quiq::Sdoc::Document> - Sdoc-Dokument
-
-=item *
-
-L<Quiq::Sdoc::Figure> - Bild
-
-=item *
-
-L<Quiq::Sdoc::Include> - Einbinden von externen Inhalten
-
-=item *
-
-L<Quiq::Sdoc::Item> - Listenelement
-
-=item *
-
-L<Quiq::Sdoc::KeyValRow> - Zeile einer Schlüssel/Wert-Tabelle
-
-=item *
-
-L<Quiq::Sdoc::KeyValTable> - Schlüssel/Wert-Tabelle
-
-=item *
-
-L<Quiq::Sdoc::Line> - Zeile einer Sdoc-Quelldatei
-
-=item *
-
-L<Quiq::Sdoc::Link> - Definition eines Link
-
-=item *
-
-L<Quiq::Sdoc::List> - Liste
-
-=item *
-
-L<Quiq::Sdoc::Node> - Basisklasse für die Knoten eines Sdoc-Dokuments (abstrakt)
-
-=item *
-
-L<Quiq::Sdoc::PageBreak> - Seitenumbruch
-
-=item *
-
-L<Quiq::Sdoc::Paragraph> - Paragraph
-
-=item *
-
-L<Quiq::Sdoc::Quote> - Zitat-Abschnitt
-
-=item *
-
-L<Quiq::Sdoc::Row> - Zeile einer Tabelle
-
-=item *
-
-L<Quiq::Sdoc::Section> - Abschnittsüberschrift
-
-=item *
-
-L<Quiq::Sdoc::Table> - Tabelle
-
-=item *
-
-L<Quiq::Sdoc::TableOfContents> - Inhaltsverzeichnis
 
 =item *
 
@@ -640,6 +564,10 @@ L<Quiq::SqlPlus> - Erzeuge Code für SQL*Plus
 
 =item *
 
+L<Quiq::Ssh> - Führe Kommando per SSH aus
+
+=item *
+
 L<Quiq::Stacktrace> - Generiere und visualisiere einen Stacktrace
 
 =item *
@@ -657,6 +585,14 @@ L<Quiq::String> - Operationen auf Zeichenketten
 =item *
 
 L<Quiq::System> - Information über das System und seine Umgebung
+
+=item *
+
+L<Quiq::Table> - Tabelle
+
+=item *
+
+L<Quiq::TableRow> - Tabellenzeile
 
 =item *
 
@@ -750,7 +686,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

@@ -11,7 +11,7 @@ Yancy::Help::Standalone - How to run Yancy without writing Perl code
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -80,15 +80,15 @@ provides.
 
 =over
 
-=item * C<< yancy->list( $collection ) >> - Get a list of items
+=item * C<< yancy->list( $schema ) >> - Get a list of items
 
-=item * C<< yancy->get( $collection, $id ) >> - Get a single item
+=item * C<< yancy->get( $schema, $id ) >> - Get a single item
 
-=item * C<< yancy->set( $collection, $id, $data ) >> - Update an item
+=item * C<< yancy->set( $schema, $id, $data ) >> - Update an item
 
-=item * C<< yancy->delete( $collection, $id ) >> - Delete an item
+=item * C<< yancy->delete( $schema, $id ) >> - Delete an item
 
-=item * C<< yancy->create( $collection, $data ) >> - Create an item
+=item * C<< yancy->create( $schema, $data ) >> - Create an item
 
 =back
 
@@ -142,7 +142,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

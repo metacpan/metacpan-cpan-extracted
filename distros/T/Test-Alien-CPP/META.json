@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -39,7 +39,7 @@
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::CBuilder" : "0.27",
             "ExtUtils::CppGuess" : "0",
             "Test2::Require" : "0.000060",
             "Test::Alien" : "1.00",
@@ -50,6 +50,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "Test2::V0" : "0.000060",
             "perl" : "5.008001"
          }
@@ -58,17 +59,23 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Test-Alien-CPP/issues"
+         "web" : "https://github.com/Perl5-Alien/Test-Alien-CPP/issues"
       },
       "homepage" : "https://metacpan.org/pod/Test::Alien::CPP",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Test-Alien-CPP.git",
-         "web" : "https://github.com/plicease/Test-Alien-CPP"
+         "url" : "git://github.com/Perl5-Alien/Test-Alien-CPP.git",
+         "web" : "https://github.com/Perl5-Alien/Test-Alien-CPP"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.99",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.01",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Roy Storey (KIWIROY)"
+   ],
+   "x_generated_by_perl" : "v5.29.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_use_unsafe_inc" : 0
 }
 

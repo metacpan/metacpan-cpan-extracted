@@ -4,6 +4,14 @@ NAME
 DESCRIPTION
     See skos2jskos command line script.
 
+INSTALLATION
+      cpanm App::skos2jskos
+
+    To speed up installation, install required Perl modules as system
+    packages, e.g.
+
+      sudo apt-get install librdf-query-perl librdf-query-client-perl
+
 AUTHOR
     Jakob Voss <voss@gbv.de>
 

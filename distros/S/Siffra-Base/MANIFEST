@@ -1,12 +1,14 @@
 Changes
+dist.sh
+install.sh
 lib/Siffra/Base.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
+realclean.sh
 t/001_load.t
-t/perlcritic.t
 t/pod-coverage.t
 t/pod.t
 Todo

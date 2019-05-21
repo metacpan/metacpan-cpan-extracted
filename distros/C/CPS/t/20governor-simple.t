@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 
 use CPS::Governor::Simple;
 
@@ -28,3 +29,5 @@ is( $called, 4, '$called is 4 after $gov->enter storing kleave' );
 $poke->();
 
 is( $called, 5, '$called is 5 after invoking stored kleave' );
+
+done_testing;

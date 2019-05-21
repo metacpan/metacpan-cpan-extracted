@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 
 use strict;
 
-our $VERSION = '3.014'; # VERSION
+our $VERSION = '3.015'; # VERSION
 my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter;

@@ -29,7 +29,7 @@ WriteMakefile1(
     PREREQ_PM    => {
         'parent'    => 0,
         'X::Tiny'   => 0,
-        'Module::Load'  => 0,
+        'Module::Runtime'  => 0,
         'Call::Context' => 0,
         'IO::Framed' => 0.15,
         'IO::SigGuard' => 0.13,

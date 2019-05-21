@@ -1,5 +1,8 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2019.0515
+	- minimum prereq Map::Tube version is now v3.62
+
 2018.1209
 	- data changes:
 	  - S75 now to Ostbahnhof

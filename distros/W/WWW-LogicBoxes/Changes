@@ -1,3 +1,6 @@
+v1.10.0 2019-05-20
+  - Added support for resending of the RAA Verification email
+
 v1.9.0 2016-12-07
   - Handle domus contacts that do not have nexus data
   - Added QueuedForDeletion as possible domain status

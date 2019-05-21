@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -93,14 +93,16 @@ our $VERSION = '1.025';
 #pod
 #pod =item *
 #pod
-#pod L<The Auth::Basic plugin|Yancy::Plugin::Auth::Basic> provides a simple,
-#pod password-based authentication system for the Yancy editor and your
-#pod website.
+#pod L<The Auth plugin|Yancy::Plugin::Auth> provides an API that allows you
+#pod to enable multiple authentication mechanisms for your site, including
+#pod L<users creating website accounts|Yancy::Plugin::Auth::Password>, or
+#pod users using their L<Github login|Yancy::Plugin::Auth::Github> or other
+#pod L<OAuth2 authentication|Yancy::Plugin::Auth::OAuth2>.
 #pod
 #pod =item *
 #pod
 #pod L<The Form plugin|Yancy::Plugin::Form> can generate forms for the
-#pod configured collections, or for individual fields. There are included
+#pod configured schema, or for individual fields. There are included
 #pod form generators for L<Bootstrap 4|Yancy::Plugin::Form::Bootstrap4>.
 #pod
 #pod =back
@@ -133,7 +135,7 @@ our $VERSION = '1.025';
 #pod
 #pod =item * L<jQuery|http://jquery.com> (version 3.2.1) Copyright JS Foundation and other contributors (MIT License)
 #pod
-#pod =item * L<Bootstrap|http://getbootstrap.com> (version 4.0.0) Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
+#pod =item * L<Bootstrap|http://getbootstrap.com> (version 4.3.1) Copyright 2011-2019 the Bootstrap Authors and Twitter, Inc. (MIT License)
 #pod
 #pod =item * L<Popper.js|https://popper.js.org> (version 1.13.0) Copyright 2017 Federico Zivolo (MIT License)
 #pod
@@ -195,7 +197,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -284,14 +286,16 @@ Yancy comes with plugins to enhance your website.
 
 =item *
 
-L<The Auth::Basic plugin|Yancy::Plugin::Auth::Basic> provides a simple,
-password-based authentication system for the Yancy editor and your
-website.
+L<The Auth plugin|Yancy::Plugin::Auth> provides an API that allows you
+to enable multiple authentication mechanisms for your site, including
+L<users creating website accounts|Yancy::Plugin::Auth::Password>, or
+users using their L<Github login|Yancy::Plugin::Auth::Github> or other
+L<OAuth2 authentication|Yancy::Plugin::Auth::OAuth2>.
 
 =item *
 
 L<The Form plugin|Yancy::Plugin::Form> can generate forms for the
-configured collections, or for individual fields. There are included
+configured schema, or for individual fields. There are included
 form generators for L<Bootstrap 4|Yancy::Plugin::Form::Bootstrap4>.
 
 =back
@@ -324,7 +328,7 @@ This project bundles some other projects with the following licenses:
 
 =item * L<jQuery|http://jquery.com> (version 3.2.1) Copyright JS Foundation and other contributors (MIT License)
 
-=item * L<Bootstrap|http://getbootstrap.com> (version 4.0.0) Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
+=item * L<Bootstrap|http://getbootstrap.com> (version 4.3.1) Copyright 2011-2019 the Bootstrap Authors and Twitter, Inc. (MIT License)
 
 =item * L<Popper.js|https://popper.js.org> (version 1.13.0) Copyright 2017 Federico Zivolo (MIT License)
 
@@ -373,7 +377,7 @@ William Lindley <wlindley@wlindley.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

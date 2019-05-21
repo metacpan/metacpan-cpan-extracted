@@ -1,5 +1,8 @@
-package MPMinus::Helper::Util; # $Id: Util.pm 224 2017-04-04 10:27:41Z minus $
+package MPMinus::Helper::Util; # $Id: Util.pm 281 2019-05-16 16:53:58Z minus $
 use strict;
+use utf8;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MPMinus::Helper::Util - MPMinus Helper's utility
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -21,6 +24,12 @@ MPMinus Helper's utility
 
 =over 8
 
+=item B<back2slash>
+
+    print back2slash(" C:\foo\bar "); # C:/foo/bar
+
+Convert backslashes to slashes in strings
+
 =item B<cleanProjectName>
 
     my $name = cleanProjectName( "foo" );
@@ -29,28 +38,32 @@ Returns clean name of project
 
 =item B<cleanServerName>
 
-    my $name = cleanServerName( "localhost:80" );
+    my $name = cleanServerName( "localhost" );
 
 Returns clean name of server
-
-=item B<cleanServerNameF>
-
-    my $name = cleanServerNameF( "localhost" );
-
-Returns clean name of server as file
 
 =item B<getApache>, B<getApache2>
 
     my $hash = getApache();
+    my $value = getApache("APACHE_VERSION"); # => '2.0418'
 
-Returns HTTPD_ROOT, SERVER_CONFIG_FILE, SERVER_VERSION and APACHE_VERSION as hash structure
+Returns HTTPD_ROOT, SERVER_CONFIG_FILE, SERVER_VERSION and etc., as hash structure
 (reference).
 
-=item B<newconfig>
+    {
+      'SERVER_VERSION' => '2.4.18',
+      'HTTPD_ROOT' => '/etc/apache2',
+      'SERVER_CONFIG_FILE' => '/etc/apache2/apache2.conf',
+      'APACHE_VERSION' => '2.0418',
+      'APACHE_SIGN' => 24,
+      'APACHE_LOG_DIR' => '/var/log/apache2',
+    };
 
-    my $config = newconfig( $c );
+=item B<load_metadata>
 
-Returns new configuration
+    my %meta = load_metadata("meta.yml");
+
+Returns metadata from YAML file
 
 =item B<to_void>
 
@@ -60,49 +73,69 @@ Returns '' (void) if undefined $value else - returns $value
 
 =back
 
+=head1 HISTORY
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<CTK>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+Coming soon
+
+=head1 SEE ALSO
+
+L<CTK>
+
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@serzik.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use vars qw($VERSION);
-$VERSION = 1.03;
+use vars qw($VERSION @EXPORT_OK);
+$VERSION = 1.05;
 
 use base qw /Exporter/;
-our @EXPORT = qw(
+@EXPORT_OK = qw(
         getApache getApache2
-        newconfig
         to_void
-        cleanProjectName
-        cleanServerName
-        cleanServerNameF
+        cleanProjectName cleanServerName
+        load_metadata
+        back2slash
     );
 
-use CTK::Util qw/ :ALL /;
+use Carp;
+use CTK::Util qw/ :BASE :EXT /;
 use CTK::ConfGenUtil;
+use YAML::XS ();
+use JSON::XS ();
 use Try::Tiny;
+use File::Spec;
 
+# Get (HTTP_ROOT, SERVER_CONFIG_FILE, SERVER_VERSION, APACHE_VERSION, APACHE_SIGN, APACHE_LOG_DIR)
+my %A2;
 sub getApache2 {
-    # Процедура получения (HTTP_ROOT, SERVER_CONFIG_FILE, SERVER_VERSION, APACHE_VERSION) исходя из данных запущенного APACHE
+    my $key = shift;
+    if (%A2) { return $key ? $A2{uc($key)} : {%A2} }
+
     my $httpdata;
     my $httpdpath;
     if (isostype("Windows")) {
@@ -112,7 +145,7 @@ sub getApache2 {
             $httpdata = execute(qq{$httpdpath -V});
         } else {
             if ($httpdpath =~ /^(apache.+?)\s+\d+\s+\S+\s+(.+?)\1\s*$/im) {
-                $httpdpath = catfile($2,'httpd.exe');
+                $httpdpath = File::Spec->catfile($2,'httpd.exe');
                 $httpdata  = execute(qq{$httpdpath -V});
             } else {
                 $httpdpath = '';
@@ -122,23 +155,25 @@ sub getApache2 {
     } else {
         # Fix #198
         my @err;
-        foreach my $httpd (qw/httpd apache apachectl apache2ctl apache2 apache22/) {
+        foreach my $httpd (qw/apache2ctl apachectl httpd apache2 apache22 apache/) {
             my $cmd = qq{$httpd -V};
+            my $e = "";
             try {
-                $httpdata = execute($cmd)
+                $httpdata = execute($cmd, undef, \$e);
+                push @err, $e if $e;
             } catch {
                 push @err, sprintf("%s: %s", $cmd, $_)
             };
             last if $httpdata && $httpdata =~ /HTTPD_ROOT/im;
         }
-        carp(join "\n", @err) if (!$httpdata) && @err
+        carp(join "\n", @err) if ((!$httpdata) && @err)
     }
-    
+
     my $httpd_root          = $httpdata =~ /HTTPD_ROOT\="(.+?)"/m ? $1 : '';
     my $server_config_file  = $httpdata =~ /SERVER_CONFIG_FILE\="(.+?)"/m ? $1 : '';
     my $sver                = $httpdata =~ /version\:\s+[a-z]+\/([0-9.]+)/im ? $1 : '';
     my $aver                = 0;
-    
+
     if ($sver =~ /([0-9]+)\.([0-9]+)\.([0-9]+)/) {
         $aver = $1 + ($2/100) + ($3/10000);
     } elsif ($sver =~ /([0-9]+)\.([0-9]+)/) {
@@ -146,156 +181,108 @@ sub getApache2 {
     } elsif ($sver =~ /([0-9]+)/) {
         $aver = $1;
     }
-    
+
     my $httpdconfig = '';
     if ($server_config_file && $httpd_root) {
-        $httpdconfig = catfile($httpd_root,$server_config_file);
+        $httpdconfig = File::Spec->catfile($httpd_root,$server_config_file);
     }
-    
+
     my $acc = '';
     unless ($httpdconfig && -e $httpdconfig) {
         foreach (split /[\/\\]/, $httpdpath) {
-            $acc = $acc ? catfile($acc,$_) : $_;
-            
-            $httpdconfig = catfile($acc,$server_config_file);
+            $acc = $acc ? File::Spec->catfile($acc,$_) : $_;
+            $httpdconfig = File::Spec->catfile($acc,$server_config_file);
             if ($httpdconfig && (-e $httpdconfig) && ((-f $httpdconfig) || (-l $httpdconfig))) {
                 last;
             }
         }
     }
-    
-    return {
-            HTTPD_ROOT          => $acc || $httpd_root, 
-            SERVER_CONFIG_FILE  => $httpdconfig || '',
-            SERVER_VERSION      => $sver,
-            APACHE_VERSION      => $aver,
-        };
+    $acc ||= $httpd_root;
 
+    # APACHE_SIGN
+    my $sign = 0;
+    if ($aver) {
+        my $major = int($aver*1);
+        my $minor = int(($aver - $major) * 100);
+        $sign = ($major*10+$minor);
+    }
+
+    # APACHE_LOG_DIR
+    my $alogdir = ($aver && $aver >= 2.04) ? '${APACHE_LOG_DIR}' : "logs";
+    my @atlds = (
+        File::Spec->catdir(CTK::Util::syslogdir(), "apache2"),
+        File::Spec->catdir(CTK::Util::syslogdir(), "httpd"),
+        File::Spec->catdir($acc, "logs"),
+    );
+    foreach my $ald (@atlds) {
+        if (-e $ald) {
+            $alogdir = $ald;
+            last;
+        }
+    }
+
+    %A2 = (
+        HTTPD_ROOT          => $acc,
+        SERVER_CONFIG_FILE  => $httpdconfig || '',
+        SERVER_VERSION      => $sver,
+        APACHE_VERSION      => $aver,
+        APACHE_SIGN         => $sign,
+        APACHE_LOG_DIR      => $alogdir,
+    );
+    return $key ? $A2{uc($key)} : {%A2};
 }
 sub getApache { goto &getApache2 }
-sub newconfig {
-    # Запрос данных конфигурации
-    my $c = shift;
-    my $cfg = $c->config();
-    
-    my %newcfg = (
-            Include => 'conf/*.conf',
-        );
-
-    my ($k,$v,$d) = ('','','');
-    my $apache = getApache();
-
-    # Apache HTTPD_ROOT
-    $k = "HttpdRoot";
-    $newcfg{$k} = $c->cli_prompt('Apache HTTPD_ROOT:', _void(value($cfg,lc($k)) || $apache->{HTTPD_ROOT}));
-
-    # Apache SERVER_CONFIG_FILE
-    $k = "ServerConfigFile";
-    $newcfg{$k} = $c->cli_prompt('Apache SERVER_CONFIG_FILE:', _void(value($cfg,lc($k)) || $apache->{SERVER_CONFIG_FILE}));
-    
-    # Apache configuration
-    my %apacheconfig;
-    if ((-e $newcfg{ServerConfigFile}) && -e $newcfg{HttpdRoot}) {
-        my $apacheconf = new Config::General(
-            -ConfigFile       => $newcfg{ServerConfigFile},
-            -ConfigPath       => [$newcfg{HttpdRoot}],
-            -ApacheCompatible => 1,
-            -LowerCaseNames   => 1,
-        );
-        %apacheconfig = $apacheconf->getall;
-    }
-    
-    # ModperlRoot
-    $k = "ModperlRoot";
-    my @mpvs = ('none', _void(webdir()), 'custom'
-        );
-    my $vks = value($apacheconfig{documentroot} || '');
-    unshift(@mpvs,$vks) if $vks;
-    $v = $c->cli_select('ModperlRoot directory:',\@mpvs,1);
-    $v = $c->cli_prompt('ModperlRoot directory:',_void(value($cfg,lc($k))),) if ($v && $v eq 'custom');
-    $newcfg{$k} = ($v && $v eq 'none') ? undef : $v;
-    
-    # NameVirtualHost
-    $k = "NameVirtualHost";
-    my $namevirtualhost = array($apacheconfig{namevirtualhost} || ['*:80']);
-    push @$namevirtualhost, 'custom','none';
-    $v = $c->cli_select('NameVirtualHost:', $namevirtualhost, 1);
-    $v = $c->cli_prompt('NameVirtualHost:',_void(value($cfg,lc($k))),) if ($v && $v eq 'custom');
-    $newcfg{$k} = ($v && $v eq 'none') ? undef : $v;
-
-    # ServerName
-    $k = "ServerName";
-    my $servername = array($apacheconfig{servername} || ['localhost']);
-    push @$servername, 'custom','none';
-    $v = $c->cli_select('ServerName (host):', $servername, 1);
-    $v = $c->cli_prompt('ServerName (host):',_void(value($cfg,lc($k))),) if ($v && $v eq 'custom');
-    $newcfg{$k} = ($v && $v eq 'none') ? undef : $v;
-
-    # ErrorMail
-    $k = "ErrorMail";
-    my $errormail = array($apacheconfig{serveradmin} || ['root@localhost']);
-    push @$errormail, 'custom','none';
-    $v = $c->cli_select('ErrorMail (ServerAdmin):', $errormail, 1);
-    $v = $c->cli_prompt('ErrorMail: (ServerAdmin):',_void(value($cfg,lc($k))),) if ($v && $v eq 'custom');
-    $newcfg{$k} = ($v && $v eq 'none') ? undef : $v;
-
-    # SMTP
-    $k = "SMTP";
-    $newcfg{$k} = $c->cli_prompt('SMTP server:', _void(value($cfg,lc($k))));
-    
-    # MailTo
-    $k = "MailTo";
-    $newcfg{$k} = $c->cli_prompt('Address MailTO:', _void(value($cfg,lc($k)) || $newcfg{ErrorMail}));
-    
-    # MailCC
-    $k = "MailCC";
-    $newcfg{$k} = $c->cli_prompt('Address MailCC:', _void(value($cfg,lc($k))));
-    
-    # MailFrom
-    $k = "MailFrom";
-    $newcfg{$k} = $c->cli_prompt('Address MailFrom:', _void(value($cfg,lc($k)) || $newcfg{ErrorMail}));
-
-    # MailCharset
-    $k = "MailCharset";
-    $newcfg{$k} = $c->cli_prompt('Mail Charset for translating into UTF8:', _void(value($cfg,lc($k)) || 'Windows-1251'));
-    
-    # MailCmd
-    $k = "MailCmd";
-    $newcfg{$k} = $c->cli_prompt('Mail program (sendmail):', _void(value($cfg,lc($k)) || '/usr/sbin/sendmail'));
-
-    # MailFlag
-    $k = "MailFlag";
-    $newcfg{$k} = $c->cli_prompt('Mail program\'s flag:', _void(value($cfg,lc($k)) || '-t'));
-    
-    return { %newcfg };
-}
 sub to_void { goto &_void }
 sub cleanProjectName {
-    # Правка (чистка) имени проекта
+    # Cleaning project name
     my $pn = _void(shift);
     $pn =~ s/[^a-z0-9_]/X/ig;
     return $pn;
 }
 sub cleanServerName {
-    # Правка (чистка) имени сервера (сайта)
+    # Cleaning server name
     my $sn = _void(shift);
-    $sn =~ s/[^a-z0-9_\-.:]/X/ig;
+    $sn =~ s/[^a-z0-9_\-.]/X/ig;
     return $sn;
 }
-sub cleanServerNameF {
-    # Правка (чистка) имени сервера (сайта) в стандарте имен файлов
-    my $sn = _void(shift);
-    $sn =~ s/[^a-z0-9_\-.]//ig;
-    return $sn;
+sub load_metadata {
+    my $metaf = shift || '';
+    my $meta = {};
+    if ($metaf && -e $metaf) {
+        if ($metaf =~ /\.ya?ml$/) {
+            try {
+                $meta = YAML::XS::LoadFile($metaf);
+            } catch {
+                carp(sprintf("Can't load META file %s: %s", $metaf, $_));
+            };
+        } elsif ($metaf =~ /\.json$/) {
+            try {
+                my $json_text = CTK::Util::bload($metaf, 1) // "";
+                $meta = JSON::XS->new->decode($json_text);
+            } catch {
+                carp(sprintf("Can't load META file %s: %s", $metaf, $_));
+            };
+        } else {
+            carp(sprintf("Incorrect META file format: %s", $metaf));
+        }
+    } else {
+        carp(sprintf("Can't load META file %s", $metaf));
+    }
+    return %$meta;
+}
+sub back2slash {
+    my $s = shift // return "";
+    $s =~ s/\\/\//g;
+    return $s;
 }
 
 sub _void {
-    # Возвращает '' (void) место undef
+    # Returns '' (void) if undef
     my $v = shift;
     return '' unless defined $v;
     return $v;
 }
+
 1;
 
 __END__
-

@@ -1,6 +1,10 @@
 #ifndef __clipper_myinit_h_
 #define __clipper_myinit_h_
 
+// fix build error under clang for pre-5.18 Perls
+#undef dNOOP
+#define dNOOP struct Perl___notused_struct
+
 #include "clipper.hpp"
 
 using namespace ClipperLib;

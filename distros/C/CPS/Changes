@@ -1,5 +1,12 @@
 Revision history for CPS
 
+0.19    2019-05-20 11:31:46
+        [CHANGES]
+         * Removed CPS::Future and unit test for it
+         * Added deprecation warning and SEE ALSO links to Future and
+           Future::AsyncAwait
+         * Build script updates and unit test style fixes
+
 0.18    CHANGES:
          * Moved CPS::Future out to its own distribution, Future. Retained a
            small back-compat wrapper for now

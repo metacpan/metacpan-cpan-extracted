@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -18,8 +18,8 @@ use POSIX ();
 use Quiq::FileHandle;
 use Quiq::Array;
 use Quiq::String;
-use Quiq::Digest;
 use Quiq::Path;
+use Quiq::Digest;
 use Quiq::TempFile;
 use Quiq::Database::Cursor;
 use Time::HiRes ();
@@ -207,6 +207,12 @@ sub new {
             $udlObj->asString(-secure=>1),
             POSIX::strftime('%Y-%m-%d %H:%M:%S',localtime),
         );
+    }
+
+    if (defined $cacheDir) {
+        # Wir ergänzen den Cache-Verzeichnispfad um den UDL-String
+        $cacheDir .= '/'.$udlObj->asString(-secure=>1);
+        $self->set(cacheDir=>$cacheDir);
     }
 
     # Strict-Modus aktivieren
@@ -1345,13 +1351,14 @@ sub sql {
     my $cacheOp = ''; # damit per eq verglichen werden kann
     my $cacheFile;
     if (defined($cache) && $stmt) {
-        my $cacheDir = $self->{'cacheDir'};
-        $cacheFile = $cacheDir.'/'.Quiq::Digest->md5($stmt);
         my $p = Quiq::Path->new;
+        my $cacheDir = $self->{'cacheDir'};
+        $p->mkdir($cacheDir);
+        $cacheFile = $cacheDir.'/'.Quiq::Digest->md5($stmt);
         if ((my $exists = $p->exists($cacheFile)) &&
-                (!$cache || CORE::time-$p->mtime($cacheFile) < $cache)) {
-            # Cachedatei existiert und ist noch gültig,
-            # d.h. wir lesen die Datensätze aud dem Cache.
+                ($cache == 0 || CORE::time-$p->mtime($cacheFile) < $cache)) {
+            # Cachedatei existiert und ist noch gültig (0 = ewige
+            # Gültigkeit), d.h. wir lesen die Datensätze aud dem Cache.
             $cacheOp = 'r';
         }
         else {
@@ -4039,37 +4046,42 @@ Tabellenname, mit oder ohne Schema-Präfix.
 
 =head4 Options
 
+Im folgenden ist @titles ein Array von Kolumnennamen und $ttitles
+eine kommaseparierte Liste von Kolumnennamen.
+
 =over 4
 
-=item -columns => \@titles (Default: I<Kolumnen Tabelle 1>)
+=item -columns => \@titles | $titles (Default: I<Kolumnen Tabelle 1>)
 
-Kolumnen, die bei beiden Tabellen selektiert werden.
+Kolumnen, die verglichen werden.
 
-=item -ignoreColumns => \@titles
+=item -ignoreColumns => \@titles | $titles
 
-Kolumnen, die ignoriert werden.
+Kolumnen, die ignoriert werden. Diese Option ist nützlich, wenn
+alle Kolumnen verglichen werden sollen, bis auf die mit dieser
+Option genannten.
 
 =item -limit => $n (Default: 10)
 
-Begrenze die Größe der Differenzmengen (s.u.) auf jeweils N Zeilen.
+Begrenze die Größe der beiden Differenzmengen (s.u.) auf jeweils N Zeilen.
 D.h. es werden maximal 2 * N Zeilen geliefert. Darüber hinausgehende
 Differenzen werden nicht berücksichtigt. Limit 0 bedeutet, es
 gibt keine Begrenzung.
 
-=item -sortColumns => \@titles (Default: I<Kolumnen>)
+=item -sortColumns => \@titles | $titles (Default: I<Kolumnen>)
 
-Kolumnen, nach denen die Differenzliste sortiert wird.
+Kolumnen, nach denen die Gesamt-Differenzliste sortiert wird.
 
 =back
 
 =head4 Description
 
 Die Methode untersucht zwei strukturell identische Tabellen hinsichtlich
-etwaig vorhandener Daten-Differenzen. Sie tut dies mittels SQL ist
-dadurch auch auf großen Datenmengen sehr schnell. Dies geschieht durch
-die Bildung der zwei Differenzmengen
+etwaig vorhandener Daten-Differenzen. Sie tut dies mittels SQL und ist
+dadurch auch auf großen Datenmengen sehr schnell. Der Vergleich
+geschieht durch die Bildung der zwei Differenzmengen
 
-    -- Alle Zeilen die in Tabelle 1, aber nicht in Tabelle 2 vorkommen
+    -- Alle Zeilen in Tabelle 1, die nicht in Tabelle 2 vorkommen
     
     SELECT
         COLUMNS1
@@ -4085,7 +4097,7 @@ die Bildung der zwei Differenzmengen
 
 und
 
-    -- Alle Zeilen die in Tabelle 2, aber nicht in Tabelle 1 vorkommen
+    -- Alle Zeilen in Tabelle 2, die nicht in Tabelle 1 vorkommen
     
     SELECT
         COLUMNS2
@@ -4099,7 +4111,7 @@ und
     ORDER BY
         COLUMNS2
 
-Sind die Tabelleninhalte identisch, sind beide Differenzmengen leer.
+Sind beide Differenzmengen leer, sind die Tabellen identisch.
 
 Die beiden Differenzmengen werden in einer Ergebnismenge zusammengefasst
 und als ResultSet-Objekt zurückgeliefert. Die Herkunft einer Row wird
@@ -4108,10 +4120,11 @@ bezeichnet, Tabelle 2 mit 'B'.
 
 =head4 Example
 
-Vergleich über das Programm quiq-db-table-diff, das ein Frontend
-zur Methode tableDiff() darstellt:
+Vergleich der Tabelle q68t999 in den Schemata xv882js und xv882js_test_01
+über das Programm quiq-db-table-diff, das ein Frontend zur Methode
+tableDiff() darstellt:
 
-    $ quiq-db-table-diff dbi#postgresql:dsstest%xv882js:Tul1pZok@tdca.ruv.de:5432 xv882js.q68t999 xv882js_test_01.q68t999
+    $ quiq-db-table-diff dbi#postgresql:dsstest%xv882js:*@tdca.ruv.de:5432 xv882js.q68t999 xv882js_test_01.q68t999
      1 sourceTable
      2 pgmname
      3 tabname
@@ -4667,7 +4680,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

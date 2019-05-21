@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::GlobalCounter;
-$Device::Firewall::PaloAlto::Op::GlobalCounter::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Op::GlobalCounter::VERSION = '0.1.6';
 use strict;
 use warnings;
 use 5.010;
@@ -44,7 +44,7 @@ Device::Firewall::PaloAlto::Op::GlobalCounter - Palo Alto firewall global system
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,7 @@ solutions.
 
 =head1 VERSION
 
-version 0.2200
+version 0.2201
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ L<Games::Solitaire::Verify>.
 
 =head1 VERSION
 
-version 0.2200
+version 0.2201
 
 =head1 COMMAND LINE OPTIONS
 

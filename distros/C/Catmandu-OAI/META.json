@@ -50,12 +50,14 @@
       "runtime" : {
          "requires" : {
             "Catmandu" : "1.0306",
+            "Catmandu::XML" : "0.16",
             "HTTP::OAI" : "4.03",
             "IO::Socket::SSL" : "1.993",
             "IO::String" : "0",
             "MODS::Record" : "0.11",
             "Moo" : "1.0",
             "URI" : "0",
+            "XML::LibXML" : "0",
             "XML::Struct" : "0.18",
             "perl" : "v5.10.1"
          }
@@ -81,7 +83,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-OAI"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
       "Christian Pietsch <christian.pietsch@uni-bielefeld.de>",
       "Jakob Voss <voss@gbv.de>",
@@ -92,6 +94,6 @@
       "Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

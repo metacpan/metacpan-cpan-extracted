@@ -20,8 +20,8 @@ name: Math-Clipper
 provides:
   Math::Clipper:
     file: lib/Math/Clipper.pm
-    version: '1.28'
+    version: '1.29'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.28'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

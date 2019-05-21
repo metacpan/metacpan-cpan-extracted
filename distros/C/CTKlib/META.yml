@@ -1,67 +1,63 @@
 ---
-abstract: 'Command-line ToolKit library (CTKlib). Command line interface (CLI)'
+abstract: 'Command-line ToolKit library (CTKlib)'
 author:
-  - 'Sergey Lepenkov (Serz Minus) <minus@mail333.com>'
+  - 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.6
-  Test::More: 0.94
+  Test::Simple: '1'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CTKlib
 no_index:
   directory:
     - t
     - inc
 recommends:
-  DBI: 0
-  Data::Dumper: 0
+  Data::Dumper: '0'
 requires:
-  Archive::Extract: 0.58
-  Archive::Tar: 1.8
-  Archive::Zip: 1.3
-  Class::C3::Adopt::NEXT: 0.13
-  Class::Singleton: 1.4
-  Config::General: 2
-  ExtUtils::MakeMaker: 6.6
-  File::Copy: 2
-  File::Copy::Recursive: 0.38
-  File::Find: 1
-  File::Path: 2
-  File::Pid: 1
-  File::Spec: 0.82
-  HTTP::Headers: 5.8
-  HTTP::Request: 5.8
-  HTTP::Response: 5.8
-  IO::Handle: 1.2
-  IPC::Open3: 1
-  LWP: 5.8
-  LWP::MediaTypes: 6
-  LWP::UserAgent: 5.8
-  MIME::Base64: 3
-  MIME::Lite: 3
-  Moose: 2
-  Net::FTP: 2.6
-  Perl::OSType: 1
-  Symbol: 1.05
-  Term::ReadKey: 2.1
-  Term::ReadLine: 1.04
-  Test::More: 0.94
-  Text::ParseWords: 3.27
-  Time::HiRes: 1.97
-  Time::Local: 1.2
-  URI: 1.6
-  XSLoader: 0.01
-  YAML: 0.73
-  namespace::autoclean: 0.13
-  perl: 5.010001
+  Class::C3::Adopt::NEXT: '0.13'
+  Class::Singleton: '1.4'
+  Config::General: '2'
+  DBI: '1.63'
+  ExtUtils::MakeMaker: '6.6'
+  File::Copy: '2'
+  File::Copy::Recursive: '0.38'
+  File::Find: '0'
+  File::Path: '2'
+  File::Pid: '1'
+  File::Spec: '0.82'
+  File::Temp: '0'
+  IO: '0'
+  IO::String: '1.08'
+  IPC::Open3: '1'
+  JSON: '2.9'
+  List::Util: '1.45'
+  MIME::Base64: '3'
+  MIME::Lite: '3'
+  MRO::Compat: '0.12'
+  Net::FTP: '2.6'
+  Perl::OSType: '1'
+  Symbol: '1.05'
+  Sys::SigAction: '0.2'
+  Sys::Syslog: '0'
+  Term::ANSIColor: '4.03'
+  Text::SimpleTable: '2'
+  Time::HiRes: '1.97'
+  Time::Local: '1.2'
+  Try::Tiny: '0.27'
+  URI: '1.6'
+  XML::Simple: '2.22'
+  XSLoader: '0.01'
+  YAML: '0.73'
+  YAML::XS: '0.4'
+  perl: '5.016001'
 resources:
   homepage: http://www.serzik.com
-  license: http://opensource.org/licenses/lgpl-license.php
+  license: https://dev.perl.org/licenses
   repository: http://svn.serzik.com/CTKlib/trunk
-version: 1.18
+version: '2.00'

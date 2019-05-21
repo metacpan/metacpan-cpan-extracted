@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -12,7 +12,7 @@ our $VERSION = '1.025';
 #pod     app->yancy->plugin( 'Form::Bootstrap4' );
 #pod     app->routes->get( '/people/:id/edit' )->to(
 #pod         'yancy#set',
-#pod         collection => 'people',
+#pod         schema => 'people',
 #pod         template => 'edit_people',
 #pod     );
 #pod     app->start;
@@ -126,19 +126,19 @@ our $VERSION = '1.025';
 #pod
 #pod =head2 yancy->form->field_for
 #pod
-#pod     my $html = $c->yancy->form->field_for( $collection, $name );
-#pod     %= $c->yancy->form->field_for( $collection, $name );
+#pod     my $html = $c->yancy->form->field_for( $schema, $name );
+#pod     %= $c->yancy->form->field_for( $schema, $name );
 #pod
-#pod Generate a field for the given C<$collection> and property C<$name>. The
+#pod Generate a field for the given C<$schema> and property C<$name>. The
 #pod field will include a C<< <label> >>, the appropriate input (C<< <input>
 #pod >>, C<< <select> >>, or otherwise ), and any descriptive text.
 #pod
 #pod =head2 yancy->form->form_for
 #pod
-#pod     my $html = $c->yancy->form->form_for( $collection, %opt );
-#pod     %= $c->yancy->form->plugin( $collection, %opt );
+#pod     my $html = $c->yancy->form->form_for( $schema, %opt );
+#pod     %= $c->yancy->form->plugin( $schema, %opt );
 #pod
-#pod Generate a form to edit an item from the given C<$collection>. The form
+#pod Generate a form to edit an item from the given C<$schema>. The form
 #pod will include all the fields, a CSRF token, and a single button to submit
 #pod the form.
 #pod
@@ -188,7 +188,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -200,7 +200,7 @@ version 1.025
     app->yancy->plugin( 'Form::Bootstrap4' );
     app->routes->get( '/people/:id/edit' )->to(
         'yancy#set',
-        collection => 'people',
+        schema => 'people',
         template => 'edit_people',
     );
     app->start;
@@ -314,19 +314,19 @@ how Yancy translates JSON schema into forms.
 
 =head2 yancy->form->field_for
 
-    my $html = $c->yancy->form->field_for( $collection, $name );
-    %= $c->yancy->form->field_for( $collection, $name );
+    my $html = $c->yancy->form->field_for( $schema, $name );
+    %= $c->yancy->form->field_for( $schema, $name );
 
-Generate a field for the given C<$collection> and property C<$name>. The
+Generate a field for the given C<$schema> and property C<$name>. The
 field will include a C<< <label> >>, the appropriate input (C<< <input>
 >>, C<< <select> >>, or otherwise ), and any descriptive text.
 
 =head2 yancy->form->form_for
 
-    my $html = $c->yancy->form->form_for( $collection, %opt );
-    %= $c->yancy->form->plugin( $collection, %opt );
+    my $html = $c->yancy->form->form_for( $schema, %opt );
+    %= $c->yancy->form->plugin( $schema, %opt );
 
-Generate a form to edit an item from the given C<$collection>. The form
+Generate a form to edit an item from the given C<$schema>. The form
 will include all the fields, a CSRF token, and a single button to submit
 the form.
 
@@ -357,7 +357,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

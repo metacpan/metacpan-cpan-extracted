@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 # copyright at the end of the file in the pod section
 
-package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.369';
+package Config::Model::TkUI 1.370;
+
 use 5.10.1;
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ use Tk::FontDialog;
 use Tk::Pod;
 use Tk::Pod::Text;    # for findpod
 
-use Config::Model 2.123; # New style of backend
+use Config::Model 2.134; # reset config
 
 use Config::Model::Tk::LeafEditor;
 use Config::Model::Tk::CheckListEditor;
@@ -133,20 +133,23 @@ sub Populate {
         $warn_img = $cw->Photo( -file => $icon_path . 'dialog-warning.png' );
 
         # snatched from openclipart-png
-        $tool_img            = $cw->Photo( -file => $icon_path . 'tools_nicu_buculei_01.png' );
-
+        $tool_img = $cw->Photo( -file => $icon_path . 'tools_nicu_buculei_01.png' );
 
         # snatched from gnome gnome-icon-theme package
-        map {$gnome_img{$_}     = $cw->Photo( -file => $icon_path . "gnome-$_.png"); }
-         qw/next previous window-close gtk-execute/;
+        foreach my $img_name (qw/next previous window-close gtk-execute/) {
+            $gnome_img{$img_name} = $cw->Photo(
+                -file => $icon_path . "gnome-$img_name.png"
+            );
+        }
     }
 
-    foreach my $parm (qw/-root/) {
-        my $attr = $parm;
-        $attr =~ s/^-//;
-        $cw->{$attr} = delete $args->{$parm}
-            or croak "Missing $parm arg\n";
+    if ($args->{-root}) {
+        carp "TkUI: -root parameter is deprecated in favor of -instance";
+        my $root = delete $args->{-root};
+        $cw->{instance} = $root->instance;
     }
+
+    $cw->{instance} //= delete $args->{-instance};
 
     foreach my $parm (qw/-store_sub -quit/) {
         my $attr = $parm;
@@ -157,7 +160,7 @@ sub Populate {
     my $extra_menu = delete $args->{'-extra-menu'} || [];
 
     my $title = delete $args->{'-title'}
-        || $0 . " " . $cw->{root}->config_class_name;
+        || $0 . " " . $cw->{instance}->config_root->config_class_name;
 
     # check unknown parameters
     croak "Unknown parameter ", join( ' ', keys %$args ) if %$args;
@@ -176,7 +179,8 @@ sub Populate {
 
     my $file_items = [
         [ qw/command wizard -command/, sub { $cw->wizard } ],
-        [ qw/command reload -command/, sub { $cw->reload } ],
+        [ command => 'redraw tree', -command => sub { $cw->reload } ],
+        [ command => 'reload from file', -command => sub { $cw->ask_reset; } ],
         [ command => 'check for errors',     -command => sub { $cw->check(1) } ],
         [ command => 'check for warnings',   -command => sub { $cw->check( 1, 1 ) } ],
         [ command => 'show unsaved changes', -command => sub { $cw->show_changes; } ],
@@ -190,7 +194,7 @@ sub Populate {
             command  => 'debug ...',
             -command => sub {
                 require Tk::ObjScanner;
-                Tk::ObjScanner::scan_object( $cw->{root} );
+                Tk::ObjScanner::scan_object( $cw->{instance}->config_root );
                 }
         ],
         [ command => 'quit (Ctrl-q)', -command => sub { $cw->quit } ],
@@ -409,7 +413,6 @@ my $pom = $parser->parse_file(__FILE__)
     || die $parser->error();
 
 my $help_text;
-my $todo_text;
 my $info_text;
 foreach my $head1 ( $pom->head1() ) {
     $help_text = Pod::POM::View::Text->view_head1($head1)
@@ -445,7 +448,7 @@ sub add_help_menu {
         $db->Show;
     };
 
-    my $class   = $cw->{root}->config_class_name;
+    my $class   = $cw->{instance}->config_root->config_class_name;
     my $man_sub = sub {
         $cw->Pod(
             -tree       => 0,
@@ -551,7 +554,7 @@ sub save {
         }
         else {
             $logger->info("Saving data in $trace_dir directory with instance write_back");
-            eval { $cw->{root}->instance->write_back(@wb_args); };
+            eval { $cw->{instance}->write_back(@wb_args); };
         }
 
         if ($@) {
@@ -577,11 +580,45 @@ sub save {
 
 }
 
+sub ask_reset {
+    my $text = "Discard changes and reload from file ?";
+    my $cw = shift;
+
+    if ( $cw->{instance}->needs_save ) {
+        my $answer = $cw->Dialog(
+            -title          => "reload from file",
+            -text           => $text,
+            -buttons        => [ qw/yes cancel/, 'show changes' ],
+            -default_button => 'yes',
+        )->Show;
+
+        if ( $answer eq 'yes' ) {
+            $cw->do_reset;
+        }
+        elsif ( $answer =~ /show/ ) {
+            $cw->show_changes( sub { $cw->ask_reset } );
+        }
+    }
+    else {
+        $cw->do_reset;
+    }
+}
+
+sub do_reset {
+    my $cw = shift;
+    $cw->{instance}->reset_config;
+
+    # this line can be removed after Config::Model 2.135
+    $cw->{instance}->clear_changes;
+
+    $cw->reload;
+}
+
 sub quit {
     my $cw = shift;
     my $text = shift || "Save data ?";
 
-    if ( $cw->{root}->instance->needs_save ) {
+    if ( $cw->{instance}->needs_save ) {
         my $answer = $cw->Dialog(
             -title          => "quit",
             -text           => $text,
@@ -602,7 +639,6 @@ sub quit {
     else {
         $cw->self_destroy;
     }
-
 }
 
 
@@ -622,7 +658,7 @@ sub show_changes {
     my $cw = shift;
     my $cb = shift;
 
-    my $changes       = $cw->{root}->instance->list_changes;
+    my $changes       = $cw->{instance}->list_changes;
     my $change_widget = $cw->Toplevel;
     $change_widget->Scrolled('ROText')->pack( -expand => 1, -fill => 'both' )
         ->insert( '1.0', $changes );
@@ -656,11 +692,11 @@ sub apply_filter {
         my $loc = $leaf_object->location;
         my $action = '';
         if ( $cw->{show_only_custom} ) {
-             $action = 'show' if $leaf_object->has_data ;
+            $action = $leaf_object->has_data ? 'show' : 'hide';
         }
-        elsif ( $cw->{hide_empty_values} ) {
-            my $v = $leaf_object->fetch(qw/mode user check no/);
-            $action = 'hide' unless (defined $v and length($v));
+        if ( $cw->{hide_empty_values} ) {
+            my $v = $leaf_object->fetch(qw/ check no/);
+            $action = (defined $v and length($v)) ? 'show' : 'hide';
         }
         $action = 'show' if $loc eq $fd_path;
         $data_ref->{return} = $data_ref->{actions}{$loc} = $action ;
@@ -682,18 +718,13 @@ sub apply_filter {
         my $obj = $node->fetch_element($element_name);
         my $loc = $obj->location;
 
-        # custom code using $data_ref
-        if ($cw->{hide_empty_values}) {
-            $data_ref->{actions}{$loc} //= 'hide' unless $obj->has_data;
-        }
-
         # resume exploration
-        my $hash_action = '';
-        map {
+        my $hash_action = $cw->{hide_empty_values} ? 'hide' : '';
+        foreach my $key (@keys) {
             my $inner_ref = { actions => $data_ref->{actions} };
-            $scanner->scan_hash($inner_ref, $node, $element_name, $_);
+            $scanner->scan_hash($inner_ref, $node, $element_name, $key);
             $hash_action = $combine_hash{$hash_action}{$inner_ref->{return}};
-        } @keys ;
+        }
         $hash_action = 'show' if $loc eq $fd_path;
         $data_ref->{return} = $data_ref->{actions}{$loc} = $hash_action;
     };
@@ -702,7 +733,7 @@ sub apply_filter {
         my ($scanner, $data_ref,$node, @element_list) = @_ ;
         my $node_loc = $node->location;
 
-        my $node_action = '';
+        my $node_action = $cw->{hide_empty_values} ? 'hide' : '';
         foreach my $elt ( @element_list ) {
             my $filter_action = '';
             if (length($elt_filter) > 2) {
@@ -737,7 +768,7 @@ sub apply_filter {
     ) ;
 
     my %force_display_path = ();
-    $scan->scan_node(\%force_display_path, $cw->{root}) ;
+    $scan->scan_node(\%force_display_path, $cw->{instance}->config_root) ;
 
     return $force_display_path{actions};
 }
@@ -761,18 +792,19 @@ sub reload {
 
     my $tree = $cw->{tktree};
 
-    my $instance_name = $cw->{root}->instance->name;
+    my $instance_name = $cw->{instance}->name;
+    my $root = $cw->{instance}->config_root;
 
     my $new_drawing = not $tree->infoExists($instance_name);
 
-    my $sub = sub {
+    my $scan_root = sub {
         my $opening = shift ;
-        $tree->itemConfigure($instance_name, 2, -text => $cw->{root}->fetch_gist);
-        $cw->{scanner}->scan_node( [ $instance_name, $cw, $opening, $actions ], $cw->{root} );
+        $tree->itemConfigure($instance_name, 2, -text => $root->fetch_gist);
+        $cw->{scanner}->scan_node( [ $instance_name, $cw, $opening, $actions, $force_display_path ], $root );
     };
 
     if ($new_drawing) {
-        $tree->add( $instance_name, -data => [ $sub, $cw->{root} ] );
+        $tree->add( $instance_name, -data => [ $scan_root, $root ] );
         $tree->itemCreate( $instance_name, 0, -text => $instance_name, );
         $tree->itemCreate( $instance_name, 2, -text => '' );
         $tree->setmode( $instance_name, 'close' );
@@ -780,9 +812,7 @@ sub reload {
     }
 
     # the first parameter indicates that we are opening the root
-    $sub->( 1 );
-    $tree->see($force_display_path)
-        if ( $force_display_path and $tree->info( exists => $force_display_path ) );
+    $scan_root->( 1 );
     $cw->{editor}->reload if defined $cw->{editor};
 }
 
@@ -829,7 +859,9 @@ sub on_cut_buffer_dump {
 
         # if hash create keys
         my @keys = ( $sel =~ /\n/m ) ? split( /\n/, $sel ) : ($sel);
-        map { $obj->fetch_with_id($_) } @keys;
+        foreach my $key (@keys) {
+            $obj->fetch_with_id($key);
+        };
     }
     elsif ( $type eq 'list') {
         if ( $obj->get_cargo_type =~ /node/ ) {
@@ -899,7 +931,7 @@ my %elt_mode = (
 
 sub disp_obj_elt {
     my ( $scanner, $data_ref, $node,    @orig_element_list ) = @_;
-    my ( $path,    $cw,       $opening, $actions )      = @$data_ref;
+    my ( $path,    $cw,       $opening, $actions, $force_display_path ) = @$data_ref;
     my $tkt  = $cw->{tktree};
     my $mode = $tkt->getmode($path);
     my $elt_filter = $cw->{elt_filter_value} ;
@@ -924,7 +956,7 @@ sub disp_obj_elt {
     foreach my $elt (@element_list) {
         my $newpath  = "$path." . to_path($elt);
         my $scan_sub = sub {
-            $scanner->scan_element( [ $newpath, $cw,  $opening, $actions ], $node, $elt );
+            $scanner->scan_element( [ $newpath, $cw,  $opening, $actions, $force_display_path ], $node, $elt );
         };
         my @data = ( $scan_sub, $node->fetch_element($elt) );
 
@@ -968,8 +1000,25 @@ sub disp_obj_elt {
 
         $cw->show_single_list_value ($tkt, $obj, $newpath,  $tkt->getmode($newpath) eq 'open' ? 1 : 0);
 
+        if ( $force_display_path and $force_display_path eq $elt_loc ) {
+            $cw->force_display($newpath, $elt_loc);
+        }
+        if (not $force_display_path and $cw->{location} eq $elt_loc) {
+            $cw->force_display($newpath, $elt_loc);
+        }
+
         $prevpath = $newpath;
     }
+}
+
+sub force_display {
+    my ($cw, $path, $loc) = @_;
+    $logger->debug("force_display called on $path, location $loc");
+    my $tree = $cw->{tktree};
+    $tree->see($path);
+    $tree->selectionClear();
+    $tree->selectionSet($path, $path);
+    $cw->{location} = $loc;
 }
 
 # show a list like a leaf value when the list contains *one* item
@@ -986,13 +1035,15 @@ sub show_single_list_value {
         disp_leaf(undef,[ $path, $cw ], $obj->parent, $obj->element_name, 0, $obj->fetch_with_id(0));
     }
     else {
-        map {$tkt->itemDelete( $path, $_ ) if $tkt->itemExists($path, $_);} qw/1 2 3/;
+        foreach my $column (qw/1 2 3/) {
+            $tkt->itemDelete( $path, $column ) if $tkt->itemExists($path, $column);
+        };
     }
 }
 
 sub disp_hash {
     my ( $scanner, $data_ref, $node, $element_name, @idx ) = @_;
-    my ( $path, $cw, $opening, $actions ) = @$data_ref;
+    my ( $path, $cw, $opening, $actions, $force_display_path ) = @$data_ref;
     my $tkt  = $cw->{tktree};
     my $mode = $tkt->getmode($path);
     $logger->trace("disp_hash    path is $path  mode $mode (@idx)");
@@ -1019,7 +1070,10 @@ sub disp_hash {
     foreach my $idx (@idx) {
         my $newpath  = $path . '.' . to_path($idx);
         my $scan_sub = sub {
-            $scanner->scan_hash( [ $newpath, $cw,  $opening, $actions ], $node, $element_name, $idx );
+            $scanner->scan_hash(
+                [ $newpath, $cw,  $opening, $actions, $force_display_path ],
+                $node, $element_name, $idx
+            );
         };
 
         my $eltmode = $elt_mode{$elt_type};
@@ -1070,15 +1124,14 @@ sub disp_hash {
         my $gist = $elt_type =~ /node/ ? $elt->fetch_with_id($idx)->fetch_gist : '';
         $tkt->itemCreate( $newpath, 2, -text => $gist );
 
-        my $elt_loc = $node_loc;
-        $elt_loc .= ' ' if $elt_loc;
-
-        # need to keep regexp identical to the one from C::M::Anything:composite_name
-        # so that force_display_path (aka force_display_path may work)
-        $elt_loc .= $element_name . ':' . ( $idx =~ /\W/ ? '"' . $idx . '"' : $idx );
+        my $elt_loc = $sub_elt->location;
 
         # hide new entry if hash is not yet opened
         $cw->setmode( 'hash', $newpath, $eltmode, $elt_loc, $opening, $actions, $scan_sub );
+
+        if ( $force_display_path and $force_display_path eq $elt_loc ) {
+            $cw->force_display($newpath, $elt_loc)
+        }
 
         $prevpath = $newpath;
     }
@@ -1120,6 +1173,9 @@ sub setmode {
         # counter-intuitive: want to display [-] if force opening and not leaf item
         $tkt->setmode( $newpath => 'close' ) if ( $force_open and $eltmode ne 'none' );
     }
+    elsif ($force_close) {
+        $tkt->hide( -entry => $newpath );
+    }
     else {
         $tkt->close($newpath);
     }
@@ -1133,7 +1189,9 @@ sub trim_value {
     my $cw    = shift;
     my $value = shift;
 
-    return undef unless defined $value;
+    # undef value required lest Tk dies with:
+    # value for "-text" missing at /usr/lib/x86_64-linux-gnu/perl5/5.28/Tk.pm line 251
+    return undef unless defined $value; ## no critic(Subroutines::ProhibitExplicitReturnUndef)
 
     $value =~ s/\n/ /g;
     $value = substr( $value, 0, 15 ) . '...' if length($value) > 15;
@@ -1153,7 +1211,7 @@ sub disp_check_list {
     my $std_v = $leaf_object->fetch('standard');
     $tkt->itemCreate( $path, 3, -text => $cw->trim_value($std_v) );
 
-    if ( $std_v ne $value ) {
+    if ( $leaf_object->has_data ) {
         $tkt->itemCreate( $path, 1, -itemtype => 'image', -image => $cust_img );
     }
     else {
@@ -1171,15 +1229,15 @@ sub disp_leaf {
     my $value = $leaf_object->fetch( check => 'no', silent => 1 );
     my $tkt   = $cw->{tktree};
 
-    my ( $is_customised, $img, $has_error, $has_warning );
-    {
-        no warnings qw/uninitialized/;
-        $is_customised = !!( defined $value and ( $std_v ne $value ) );
-        $img         = $cust_img if $is_customised;
-        $has_warning = !!$leaf_object->warning_msg;
-        $img         = $warn_img if $has_warning;
-        $has_error   = !!$leaf_object->error_msg;
-        $img         = $error_img if $has_error;
+    my $img;
+    if (!!$leaf_object->error_msg) {
+        $img = $error_img;
+    }
+    elsif (!!$leaf_object->warning_msg) {
+        $img = $warn_img;
+    }
+    elsif ($leaf_object->has_data) {
+        $img = $cust_img;
     }
 
     if ( defined $img ) {
@@ -1189,9 +1247,9 @@ sub disp_leaf {
             -image    => $img
         );
     }
-    else {
-        # remove image when value is identical to standard value
-        $tkt->itemDelete( $path, 1 ) if $tkt->itemExists( $path, 1 );
+    elsif ($tkt->itemExists( $path, 1 )) {
+        # remove image
+        $tkt->itemDelete( $path, 1 ) ;
     }
 
     $tkt->itemCreate( $path, 2, -text => $cw->trim_value($value) );
@@ -1272,7 +1330,6 @@ sub create_element_widget {
     my $tree = $cw->{tktree};
 
     unless ( defined $tree_path ) {
-
         # pointery and rooty are common widget method and must called on
         # the right widget to give accurate results
         $tree_path = $tree->nearest( $tree->pointery - $tree->rooty );
@@ -1288,10 +1345,6 @@ sub create_element_widget {
         }
         $obj = $data_ref->[1];
         weaken($obj);
-
-        #my $loc = $data_ref->[1]->location;
-
-        #$obj = $cw->{root}->grab($loc);
     }
 
     my $loc  = $obj->location;
@@ -1421,7 +1474,7 @@ sub setup_wizard {
     # main widget
     my $tk_font = $cw->cget('-font');
     return $cw->ConfigModelWizard(
-        -root   => $cw->{root},
+        -root   => $cw->{instance}->config_root,
         -end_cb => $end_sub,
         -font => $tk_font,
     );
@@ -1445,7 +1498,7 @@ sub create_find_widget {
         -relief  => 'flat',
     )->pack( -side => 'left' );
 
-    my $searcher = $cw->{root}->tree_searcher( type => 'all' );
+    my $searcher = $cw->{instance}->config_root->tree_searcher( type => 'all' );
 
     my $search = '';
     my @result;
@@ -1489,7 +1542,11 @@ sub find_item {
     my $find_frame = $cw->Subwidget('find_frame');
 
     # search the tree, store the result
-    @$result = $searcher->search($$search_ref) unless @$result;
+    if (not @$result) {
+        $logger->debug("Running search on $$search_ref");
+        @$result = $searcher->search($$search_ref);
+        $logger->trace("Search on $$search_ref result: @$result");
+    }
 
     # and jump in the list widget any time next is hit.
     if (@$result) {
@@ -1502,7 +1559,7 @@ sub find_item {
         my $path = $result->[0];
         $cw->{old_path} = $path;
 
-        $cw->force_element_display( $cw->{root}->grab($path) );
+        $cw->force_element_display( $cw->{instance}->config_root->grab($path) );
     }
 }
 1;
@@ -1524,12 +1581,11 @@ Config::Model::TkUI - Tk GUI to edit config data through Config::Model
  my $model = Config::Model -> new ;
  my $inst = $model->instance (root_class_name => 'a_config_class',
                               instance_name   => 'test');
- my $root = $inst -> config_root ;
 
  # Tk part
  my $mw = MainWindow-> new ;
  $mw->withdraw ;
- $mw->ConfigModelUI (-root => $root) ;
+ $mw->ConfigModelUI (-instance => $inst) ;
 
  MainLoop ;
 

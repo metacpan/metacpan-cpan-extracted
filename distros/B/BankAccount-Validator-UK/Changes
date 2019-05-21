@@ -1,5 +1,8 @@
 Revision history for BankAccount::Validator::UK
 
+0.48  2019-05-19T03:45:00:+01:00
+      - Fixed the source data valacdos.txt.
+
 0.47  2019-04-30T11:30:00:+01:00
       - Updated the valacdos.txt (v5.70)
 

@@ -31,10 +31,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Starter:
     file: lib/Dist/Zilla/MintingProfile/Starter.pm
-    version: v3.0.1
+    version: v3.0.3
   Dist::Zilla::PluginBundle::Starter:
     file: lib/Dist/Zilla/PluginBundle/Starter.pm
-    version: v3.0.1
+    version: v3.0.3
+  Dist::Zilla::Starter:
+    file: lib/Dist/Zilla/Starter.pm
+    version: v3.0.3
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::BumpVersionAfterRelease: '0'
@@ -81,12 +84,12 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#distzilla
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter/issues
-  homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Starter
+  homepage: https://metacpan.org/pod/Dist::Zilla::Starter
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter.git
-version: v3.0.1
+version: v3.0.3
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::lib
@@ -119,7 +122,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.14.4
+          git_version: 2.20.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -143,10 +146,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
       name: Git::Check
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -192,12 +195,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Commit
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -205,16 +208,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.0.1
+          tag: v3.0.3
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -240,12 +243,12 @@ x_Dist_Zilla:
             - (?^u:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Commit_Version_Bump
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -254,10 +257,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
       name: Git::Push
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -275,7 +278,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:
@@ -395,7 +398,7 @@ x_Dist_Zilla:
           inherit_version: '0'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Starter/MetaProvides::Package'
       version: '2.004003'
@@ -458,5 +461,5 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

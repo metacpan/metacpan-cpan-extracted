@@ -54,7 +54,8 @@ demo :: pure_all
 
 EOF
 
-    if (defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk") {
+    my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
+    if ($is_devel_host) {
 	$postamble .= <<'EOF';
 
 PERL_TEST_DISTRIBUTION_OPTS=not podcover

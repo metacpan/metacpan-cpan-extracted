@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -9,7 +9,7 @@ our $VERSION = '1.025';
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
 #pod         backend => 'pg://localhost/mysite',
-#pod         collections => {
+#pod         schema => {
 #pod             users => {
 #pod                 required => [ 'username', 'password' ],
 #pod                 properties => {
@@ -21,7 +21,7 @@ our $VERSION = '1.025';
 #pod         },
 #pod     };
 #pod     app->yancy->plugin( 'Auth::Basic' => {
-#pod         collection => 'users',
+#pod         schema => 'users',
 #pod         username_field => 'username',
 #pod         password_field => 'password',
 #pod         password_digest => {
@@ -30,6 +30,10 @@ our $VERSION = '1.025';
 #pod     } );
 #pod
 #pod =head1 DESCRIPTION
+#pod
+#pod B<NOTE>: This plugin is deprecated and will be removed in Yancy v2.000. Please
+#pod switch to the new pluggable auth L<Yancy::Plugin::Auth> or the new password
+#pod auth L<Yancy::Plugin::Auth::Password>.
 #pod
 #pod This plugin provides a basic authentication and authorization scheme for
 #pod a L<Mojolicious> site using L<Yancy>. If a user is authenticated, they are
@@ -41,22 +45,22 @@ our $VERSION = '1.025';
 #pod
 #pod =over
 #pod
-#pod =item collection
+#pod =item schema
 #pod
-#pod The name of the Yancy collection that holds users. Required.
+#pod The name of the Yancy schema that holds users. Required.
 #pod
 #pod =item username_field
 #pod
-#pod The name of the field in the collection which is the user's identifier.
+#pod The name of the field in the schema which is the user's identifier.
 #pod This can be a user name, ID, or e-mail address, and is provided by the
 #pod user during login.
 #pod
-#pod This field is optional. If not specified, the collection's ID field will
-#pod be used. For example, if the collection uses the C<username> field as
+#pod This field is optional. If not specified, the schema's ID field will
+#pod be used. For example, if the schema uses the C<username> field as
 #pod a unique identifier, we don't need to provide a C<username_field>.
 #pod
 #pod     plugin Yancy => {
-#pod         collections => {
+#pod         schema => {
 #pod             users => {
 #pod                 'x-id-field' => 'username',
 #pod                 properties => {
@@ -67,7 +71,7 @@ our $VERSION = '1.025';
 #pod         },
 #pod     };
 #pod     app->yancy->plugin( 'Auth::Basic' => {
-#pod         collection => 'users',
+#pod         schema => 'users',
 #pod         password_digest => { type => 'SHA-1' },
 #pod     } );
 #pod
@@ -223,22 +227,13 @@ our $VERSION = '1.025';
 #pod
 #pod     $c->yancy->auth->clear;
 #pod
-#pod =head1 SUBCLASSING AND CUSTOM AUTH
-#pod
-#pod This class is intended to be extended for custom authentication modules.
-#pod You can replace any of the templates or helpers (above) that you need
-#pod after calling this class's C<register> method.
-#pod
-#pod If this API is not enough to implement your authentication module,
-#pod please let me know and we can add a solution. If all authentication
-#pod modules have the same API, it will be better for users.
-#pod
 #pod =head1 SEE ALSO
 #pod
-#pod L<Digest>
+#pod L<Yancy::Plugin::Auth>, L<Digest>
 #pod
 #pod =cut
 
+use Yancy::Util qw( derp );
 use Mojo::Base 'Mojolicious::Plugin';
 use Digest;
 
@@ -248,12 +243,14 @@ sub register {
     die "Error configuring Auth::Basic plugin: No password digest type defined\n"
         unless $config->{password_digest} && $config->{password_digest}{type};
 
-    my $coll = $config->{collection}
+    my $coll = $config->{schema} || $config->{collection}
         || die "Error configuring Auth::Basic plugin: No collection defined\n";
     die sprintf(
         q{Error configuring Auth::Basic plugin: Collection "%s" not found}."\n",
         $coll,
-    ) unless $app->yancy->config->{collections}{$coll};
+    ) unless $app->yancy->schema( $coll );
+
+    derp "The Auth::Basic plugin is deprecated and will be removed in Yancy v2.000. Please migrate to the Auth::Password module.\n";
 
     my $username_field = $config->{username_field};
     my $password_field = $config->{password_field} || 'password';
@@ -276,7 +273,11 @@ sub register {
         my ( $name, $value, $field ) = @_;
         return $digest->add( $value )->b64digest;
     } );
-    push @{ $app->yancy->config->{collections}{$coll}{properties}{$password_field}{'x-filter'} }, 'auth.digest';
+
+    # Add the password filter so editing passwords in the editor works
+    my $schema = $app->yancy->schema( $coll );
+    push @{ $schema->{properties}{$password_field}{'x-filter'} }, 'auth.digest';
+    $app->yancy->schema( $coll, $schema );
 
     # Add login pages
     my $route = $config->{route} || $app->yancy->route;
@@ -415,14 +416,14 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
     plugin Yancy => {
         backend => 'pg://localhost/mysite',
-        collections => {
+        schema => {
             users => {
                 required => [ 'username', 'password' ],
                 properties => {
@@ -434,7 +435,7 @@ version 1.025
         },
     };
     app->yancy->plugin( 'Auth::Basic' => {
-        collection => 'users',
+        schema => 'users',
         username_field => 'username',
         password_field => 'password',
         password_digest => {
@@ -443,6 +444,10 @@ version 1.025
     } );
 
 =head1 DESCRIPTION
+
+B<NOTE>: This plugin is deprecated and will be removed in Yancy v2.000. Please
+switch to the new pluggable auth L<Yancy::Plugin::Auth> or the new password
+auth L<Yancy::Plugin::Auth::Password>.
 
 This plugin provides a basic authentication and authorization scheme for
 a L<Mojolicious> site using L<Yancy>. If a user is authenticated, they are
@@ -456,22 +461,22 @@ This plugin has the following configuration options.
 
 =over
 
-=item collection
+=item schema
 
-The name of the Yancy collection that holds users. Required.
+The name of the Yancy schema that holds users. Required.
 
 =item username_field
 
-The name of the field in the collection which is the user's identifier.
+The name of the field in the schema which is the user's identifier.
 This can be a user name, ID, or e-mail address, and is provided by the
 user during login.
 
-This field is optional. If not specified, the collection's ID field will
-be used. For example, if the collection uses the C<username> field as
+This field is optional. If not specified, the schema's ID field will
+be used. For example, if the schema uses the C<username> field as
 a unique identifier, we don't need to provide a C<username_field>.
 
     plugin Yancy => {
-        collections => {
+        schema => {
             users => {
                 'x-id-field' => 'username',
                 properties => {
@@ -482,7 +487,7 @@ a unique identifier, we don't need to provide a C<username_field>.
         },
     };
     app->yancy->plugin( 'Auth::Basic' => {
-        collection => 'users',
+        schema => 'users',
         password_digest => { type => 'SHA-1' },
     } );
 
@@ -638,19 +643,9 @@ Clear the currently logged-in user (logout).
 
     $c->yancy->auth->clear;
 
-=head1 SUBCLASSING AND CUSTOM AUTH
-
-This class is intended to be extended for custom authentication modules.
-You can replace any of the templates or helpers (above) that you need
-after calling this class's C<register> method.
-
-If this API is not enough to implement your authentication module,
-please let me know and we can add a solution. If all authentication
-modules have the same API, it will be better for users.
-
 =head1 SEE ALSO
 
-L<Digest>
+L<Yancy::Plugin::Auth>, L<Digest>
 
 =head1 AUTHOR
 
@@ -658,7 +653,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

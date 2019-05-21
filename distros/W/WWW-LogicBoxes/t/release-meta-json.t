@@ -8,7 +8,5 @@ BEGIN {
 }
 
 
-use Test::More;
-eval 'use Test::CPAN::Meta::JSON';
-plan skip_all => 'Test::CPAN::Meta::JSON required for testing META.json' if $@;
+use Test::CPAN::Meta::JSON;
 meta_json_ok();

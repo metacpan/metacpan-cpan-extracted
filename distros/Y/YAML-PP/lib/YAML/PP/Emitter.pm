@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
@@ -341,6 +341,9 @@ sub scalar_event {
     my $last = $stack->[-1];
     my $indent = $last->{indent};
     my $value = $info->{value};
+    unless (utf8::is_utf8($value)) {
+        utf8::upgrade($value);
+    }
 
     my $props = '';
     my $anchor = $info->{anchor};
@@ -404,6 +407,10 @@ sub scalar_event {
             $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value =~ m/[: \t]\z/) {
+            $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
+        }
+        elsif ($value =~ m/[^\x20-\x3A\x3B-\x7E\x85\xA0-\x{D7FF}\x{E000}-\x{FEFE}\x{FF00}-\x{FFFD}\x{10000}-\x{10FFFF}]/) {
+            # TODO exclude ,[]{} in flow collections
             $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         else {

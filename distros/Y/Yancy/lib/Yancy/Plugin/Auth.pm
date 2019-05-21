@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -7,7 +7,7 @@ our $VERSION = '1.025';
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
 #pod         backend => 'sqlite://myapp.db',
-#pod         collections => {
+#pod         schema => {
 #pod             users => {
 #pod                 properties => {
 #pod                     id => { type => 'integer', readOnly => 1 },
@@ -23,7 +23,7 @@ our $VERSION = '1.025';
 #pod         },
 #pod     };
 #pod     app->yancy->plugin( 'Auth' => {
-#pod         collection => 'users',
+#pod         schema => 'users',
 #pod         username_field => 'username',
 #pod         password_field => 'password',
 #pod         plugin_field => 'plugin',
@@ -54,13 +54,13 @@ our $VERSION = '1.025';
 #pod
 #pod This plugin has the following configuration options.
 #pod
-#pod =head2 collection
+#pod =head2 schema
 #pod
-#pod The name of the Yancy collection that holds users. Required.
+#pod The name of the Yancy schema that holds users. Required.
 #pod
 #pod =head2 username_field
 #pod
-#pod The name of the field in the collection which is the user's identifier.
+#pod The name of the field in the schema which is the user's identifier.
 #pod This can be a user name, ID, or e-mail address, and is provided by the
 #pod user during login.
 #pod
@@ -83,14 +83,14 @@ our $VERSION = '1.025';
 #pod Each of this module's configuration keys will be used as the default for
 #pod all the other auth plugins. Other plugins can override this
 #pod configuration individually. For example, users and tokens can be stored
-#pod in different collections:
+#pod in different schemas:
 #pod
 #pod     app->yancy->plugin( 'Auth' => {
 #pod         plugins => [
 #pod             [
 #pod                 'Password',
 #pod                 {
-#pod                     collection => 'users',
+#pod                     schema => 'users',
 #pod                     username_field => 'username',
 #pod                     password_field => 'password',
 #pod                     password_digest => { type => 'SHA-1' },
@@ -99,7 +99,7 @@ our $VERSION = '1.025';
 #pod             [
 #pod                 'Token',
 #pod                 {
-#pod                     collection => 'tokens',
+#pod                     schema => 'tokens',
 #pod                     token_field => 'token',
 #pod                 },
 #pod             ],
@@ -151,6 +151,10 @@ our $VERSION = '1.025';
 #pod =item * L<Yancy::Plugin::Auth::Password>
 #pod
 #pod =item * L<Yancy::Plugin::Auth::Token>
+#pod
+#pod =item * L<Yancy::Plugin::Auth::OAuth2>
+#pod
+#pod =item * L<Yancy::Plugin::Auth::Github>
 #pod
 #pod =back
 #pod
@@ -308,14 +312,14 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
     plugin Yancy => {
         backend => 'sqlite://myapp.db',
-        collections => {
+        schema => {
             users => {
                 properties => {
                     id => { type => 'integer', readOnly => 1 },
@@ -331,7 +335,7 @@ version 1.025
         },
     };
     app->yancy->plugin( 'Auth' => {
-        collection => 'users',
+        schema => 'users',
         username_field => 'username',
         password_field => 'password',
         plugin_field => 'plugin',
@@ -393,13 +397,13 @@ with L<Yancy::Util/match>.
 
 This plugin has the following configuration options.
 
-=head2 collection
+=head2 schema
 
-The name of the Yancy collection that holds users. Required.
+The name of the Yancy schema that holds users. Required.
 
 =head2 username_field
 
-The name of the field in the collection which is the user's identifier.
+The name of the field in the schema which is the user's identifier.
 This can be a user name, ID, or e-mail address, and is provided by the
 user during login.
 
@@ -422,14 +426,14 @@ hash reference of configuration.
 Each of this module's configuration keys will be used as the default for
 all the other auth plugins. Other plugins can override this
 configuration individually. For example, users and tokens can be stored
-in different collections:
+in different schemas:
 
     app->yancy->plugin( 'Auth' => {
         plugins => [
             [
                 'Password',
                 {
-                    collection => 'users',
+                    schema => 'users',
                     username_field => 'username',
                     password_field => 'password',
                     password_digest => { type => 'SHA-1' },
@@ -438,7 +442,7 @@ in different collections:
             [
                 'Token',
                 {
-                    collection => 'tokens',
+                    schema => 'tokens',
                     token_field => 'token',
                 },
             ],
@@ -491,6 +495,10 @@ standalone, if desired).
 
 =item * L<Yancy::Plugin::Auth::Token>
 
+=item * L<Yancy::Plugin::Auth::OAuth2>
+
+=item * L<Yancy::Plugin::Auth::Github>
+
 =back
 
 =head1 AUTHOR
@@ -499,7 +507,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

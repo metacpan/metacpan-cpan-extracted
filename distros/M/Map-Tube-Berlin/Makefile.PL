@@ -4,7 +4,7 @@ use File::ShareDir::Install;
 
 install_share dist => 'share';
 
-my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk";
+my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
 
 my $build_requires = {
     BUILD_REQUIRES => {
@@ -16,7 +16,7 @@ my $prereq_pm = {
         'Moo'              => 0,
         'namespace::clean' => 0,
         'File::Share'      => 0,
-        'Map::Tube'        => '3.40',
+        'Map::Tube'        => '3.62',
     }
 };
 

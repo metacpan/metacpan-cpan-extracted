@@ -4,13 +4,13 @@
       "Sam Henry <henryst@vcu.edu>, Andriy Mulyar <andriy.mulyar@gmail.com>, Bridget McInnes <btmcinnes@vcu.edu, Keith Herbert <herbertkb@vcu.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "UMLS-Association",
    "no_index" : {
@@ -32,16 +32,14 @@
       },
       "runtime" : {
          "requires" : {
-            "DBD::mysql" : "0",
-            "DBI" : "0",
             "File::Path" : "2.08",
             "File::Spec" : "3.31",
             "Graph::Directed" : "0",
-            "Text::NSP" : "0",
-            "UMLS::Interface" : "0"
+            "Text::NSP" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.17"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
 }

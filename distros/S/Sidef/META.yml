@@ -1,14 +1,14 @@
 ---
 abstract: 'The Sidef Programming Language'
 author:
-  - 'Daniel Șuteu   (<trizen@protonmail.com>)'
+  - 'Daniel Șuteu   (<trizen@cpan.org>)'
   - 'Ioana Fălcușan (<ioanaflavia@gmail.com>)'
 build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '3.70'
+    version: '3.80'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -154,5 +154,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '3.70'
+version: '3.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

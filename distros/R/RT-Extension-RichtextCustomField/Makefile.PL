@@ -2,7 +2,7 @@ use inc::Module::Install;
 use utf8;
 
 RTx 'RT-Extension-RichtextCustomField';
-license 'gplv3';
+license 'gpl_3';
 repository 'https://github.com/gibus/RT-Extension-RichtextCustomField';
 
 requires_rt('4.0.0');

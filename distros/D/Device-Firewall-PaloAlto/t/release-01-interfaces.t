@@ -44,5 +44,13 @@ for my $interface (@interfaces) {
 
 
 
+## Test Module ##
+
+my $test = $fw->test;
+
+ok( $test->interfaces('ethernet1/1', 'loopback.1', 'vlan.32'), 'Test interfaces up' );
+ok( !$test->interfaces('ethernet1/1', 'ethernet1/4', 'ethernet1/5'), 'Test up and down interfaces' );
+ok( !$test->interfaces('ethernet1/4', 'ethernet1/7'), 'Test all down interfaces' );
+ok( !$test->interfaces('ethernet1/1', 'ethernet2/2'), 'Test missing interfaces' );
 
 done_testing();

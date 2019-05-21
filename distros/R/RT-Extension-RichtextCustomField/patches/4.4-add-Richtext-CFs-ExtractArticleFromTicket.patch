@@ -1,0 +1,12 @@
+diff --git a/share/html/Articles/Article/ExtractFromTicket.html b/share/html/Articles/Article/ExtractFromTicket.html
+index 5c263d2cd..280331d70 100644
+--- a/share/html/Articles/Article/ExtractFromTicket.html
++++ b/share/html/Articles/Article/ExtractFromTicket.html
+@@ -97,6 +97,7 @@ my     $CustomFields = $ClassObj->ArticleCustomFields();
+ $CustomFields->Limit(FIELD => 'Type', OPERATOR => '=', VALUE => 'Text');
+ $CustomFields->Limit(FIELD => 'Type', OPERATOR => '=', VALUE => 'Wikitext');
+ $CustomFields->Limit(FIELD => 'Type', OPERATOR => '=', VALUE => 'Freeform');
++$CustomFields->Limit(FIELD => 'Type', OPERATOR => '=', VALUE => 'Richtext');
+ </%init>
+ <%ARGS>
+ $Class => undef

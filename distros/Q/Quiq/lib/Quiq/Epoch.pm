@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Time::HiRes ();
 use POSIX ();
@@ -135,7 +135,7 @@ sub as {
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

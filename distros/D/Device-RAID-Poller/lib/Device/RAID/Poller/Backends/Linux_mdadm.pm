@@ -221,7 +221,7 @@ sub usable {
 	}
 
 	# make sure we can locate mdadm
-	my $mdadm_bin=`which mdadm`;
+	my $mdadm_bin=`/bin/sh -c 'which mdadm 2> /dev/null'`;
 	if ( $? != 0 ){
 		$self->{usable}=0;
         return 0;

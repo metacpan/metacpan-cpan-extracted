@@ -13,11 +13,11 @@ App::Spoor::OutputFormatter
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 SYNOPSIS
@@ -112,7 +112,7 @@ sub __print_mailbox_events {
       $record_hash->{host},
       $record_hash->{type},
       $record_hash->{mailbox_address},
-      $record_hash->{ip}
+      $record_hash->{ip_actor}{ip_address}
     );
 
     $csv->print($output_handle, \@transformed_record);

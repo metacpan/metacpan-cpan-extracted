@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Errors;
-$Device::Firewall::PaloAlto::Errors::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Errors::VERSION = '0.1.6';
 use strict;
 use warnings;
 use 5.010;
@@ -23,12 +23,7 @@ sub ERROR {
     $errno //= 0;
     
     # Are we in a one liner? If so, we croak out straight away
-    my ($sub, $file, $inc);
-    while (!defined $sub or $sub ne 'main') { 
-        ($sub, $file) = caller(++$inc);
-    } 
-    
-    croak $errstring if $file eq '-e';
+    croak $errstring if (caller())[1] eq '-e';
 
     return Class::Error->new($errstring, $errno);
 }
@@ -47,7 +42,7 @@ Device::Firewall::PaloAlto::Errors - Parent class for errors.
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 

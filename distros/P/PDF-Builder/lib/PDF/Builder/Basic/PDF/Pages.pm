@@ -17,7 +17,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.014'; # VERSION
+our $VERSION = '3.015'; # VERSION
 my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;
@@ -151,11 +151,14 @@ be greater than the number of pages currently in the document, to append.
 This method only guarantees to provide a reasonable pages tree if pages are
 appended or prepended to the document. Pages inserted in the middle of the
 document may simply be inserted in the appropriate leaf in the pages tree 
-without adding any new branches or leaves. To tidy up such a mess, it is best 
-to call C<$p->rebuild_tree()> to rebuild the pages tree into something 
-efficient. B<Note that C<rebuild_tree> is currently a no-op!>
+without adding any new branches or leaves. 
 
 =cut
+
+# -- removed from end of second para:
+#To tidy up such a mess, it is best 
+#to call C<$p->rebuild_tree()> to rebuild the pages tree into something 
+#efficient. B<Note that C<rebuild_tree> is currently a no-op!>
 
 sub add_page {
     my ($self, $page, $pnum) = @_;
@@ -229,23 +232,23 @@ sub add_page_recurse {
     return;
 } # end of add_page_recurse()
 
-=head2 $root_pages = $p->rebuild_tree([@pglist])
-
-B<WARNING: Not yet implemented. Do not attempt to use!>
-
-Rebuilds the pages tree to make a nice balanced tree that conforms to Adobe
-recommendations. If passed a C<@pglist> then the tree is built for that list of
-pages. No check is made of whether the C<@pglist> contains pages.
-
-Returns the top of the tree for insertion in the root object.
-
-=cut
+#=head2 $root_pages = $p->rebuild_tree([@pglist])
+#
+#B<WARNING: Not yet implemented. Do not attempt to use!>
+#
+#Rebuilds the pages tree to make a nice balanced tree that conforms to Adobe
+#recommendations. If passed a C<@pglist> then the tree is built for that list of
+#pages. No check is made of whether the C<@pglist> contains pages.
+#
+#Returns the top of the tree for insertion in the root object.
+#
+#=cut
 
 # TBD where's the code?
-sub rebuild_tree {
-    my ($self, @pglist) = @_;
-    return;
-}
+#sub rebuild_tree {
+#    my ($self, @pglist) = @_;
+#    return;
+#}
 
 =head2 @pglist = $p->get_pages()
 

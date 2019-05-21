@@ -16,7 +16,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-our $VERSION = '3.014'; # VERSION
+our $VERSION = '3.015'; # VERSION
 my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 # =============

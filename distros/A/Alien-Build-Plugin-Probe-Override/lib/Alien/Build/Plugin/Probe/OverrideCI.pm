@@ -7,7 +7,7 @@ use Path::Tiny qw( path );
 use File::chdir;
 
 # ABSTRACT: Override logic for continuous integration
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub init
@@ -58,7 +58,7 @@ Alien::Build::Plugin::Probe::OverrideCI - Override logic for continuous integrat
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

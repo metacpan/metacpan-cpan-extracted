@@ -433,33 +433,15 @@ Close the current window.
  $drv->window_maximize('current');   # Same as above.
  $drv->window_maximize('foo');       # Maximize window "foo".
 
-=head3 window_position
+=head3 window_rect
 
-The following get the window's position, returning a list of C<x> and C<y>.
+The following gets the current window's size and position, returning a hashref with keys for C<width> and C<height> and coordinates C<x> and C<y>.
 
- my ( $x, $y ) = $drv->window_position;              # Get position of current window.
- my ( $x, $y ) = $drv->window_position('current');   # Same as above.
- my ( $x, $y ) = $drv->window_position('foo');       # Get position of window "foo".
+ my $window = $drv->window_rect; # Get size and position of current window.
 
-The following set the window's position, returning C<$self> to allow chaining.
+The following sets the current window's size and position, returning C<$self> to allow chaining.
 
- $drv->window_position( $x, $y );                    # Set position of current window.
- $drv->window_position( current => $x, $y );         # Same as above.
- $drv->window_position( foo     => $x, $y );         # Set position of window "foo".
-
-=head3 window_size
-
-The following get the window's size, returning a list of C<width> and C<height>.
-
- my ( $w, $h ) = $drv->window_size;                  # Get size of current window.
- my ( $w, $h ) = $drv->window_size('current');       # Same as above.
- my ( $w, $h ) = $drv->window_size('foo');           # Get size of window "foo".
-
-The following set the window's size, returning C<$self> to allow chaining.
-
- $drv->window_size( $w, $h );                        # Set size of current window.
- $drv->window_size( current => $w, $h );             # Same as above.
- $drv->window_size( foo     => $w, $h );             # Set size of window "foo".
+ $drv->window_rect( 640, 480, 10, 20 ); # Set size and position of current window.
 
 =head3 window_switch
 

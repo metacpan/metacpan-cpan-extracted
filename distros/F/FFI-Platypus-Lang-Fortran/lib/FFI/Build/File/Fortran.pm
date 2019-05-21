@@ -7,7 +7,7 @@ use base qw( FFI::Build::File::C );
 use constant default_suffix => '.f';
 use constant default_encoding => ':utf8';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -41,6 +41,18 @@ sub ld
 {
   my($self) = @_;
   $self->platform->for;
+}
+
+sub _filter
+{
+  grep { $_ ne '-no-cpp-precomp' && $_ !~ /^-[DI]/ } @_;
+}
+
+# TODO: this should use a public interface
+sub _base_args
+{
+  my($self) = @_;
+  map { ref $_ ? [_filter(@$_)] : _filter($_) } $self->SUPER::_base_args;
 }
 
 1;

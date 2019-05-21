@@ -1,17 +1,14 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use Test::More;
 
-BEGIN {
-   eval { require Sub::Name } or
-      plan skip_all => "No Sub::Name";
-}
-
 use CPS qw( kloop kforeach gkforeach );
 
-plan tests => 3;
+eval { require Sub::Name } or
+   plan skip_all => "No Sub::Name";
 
 sub callers
 {
@@ -70,6 +67,8 @@ is_deeply( \@callers,
               [ 'main::__ANON__', 'TestGovernor::poke' ],
            ],
            '@callers after gkforeach on deferred governor' );
+
+done_testing;
 
 package TestGovernor;
 use base qw( CPS::Governor );

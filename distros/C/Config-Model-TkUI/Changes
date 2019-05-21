@@ -1,3 +1,22 @@
+1.370 2019-05-19
+
+  UI improvements:
+    * Add "reload from file" button (gh #10)
+    * File->reload menu button is renamed to "Reload tree" which
+      is more accurate
+
+  Bug fixes:
+    * Scroll tree widget after a search so the searched item is seen.
+    * Fix "hide empty value" button: Now empty elements are also
+      hidden, which is very practical to edit config of application
+      featuring a gazillion elements like ssh or systemd.
+    * Show selected element in tree widget after "Reload tree" button.
+
+  Misc changes:
+    * dist.ini: require perl 5.12
+    * dist.ini: update copyright year
+    * Require Config::Model 2.134
+
 1.369 2019-01-13
 
   Bug fix:

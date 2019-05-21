@@ -1,5 +1,9 @@
-package MPMinus::Util; # $Id: Util.pm 128 2013-05-08 12:35:26Z minus $
+package MPMinus::Util; # $Id: Util.pm 280 2019-05-14 06:47:06Z minus $
+
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,195 +11,112 @@ MPMinus::Util - Utility functions
 
 =head1 VERSION
 
-Version 1.12
+Version 1.25
 
 =head1 SYNOPSIS
 
-    use base qw/ MPMinus::Util /;
+    use MPMinus::Util;
+
+    my $fsecs = getHiTime();
+    my $sid = getSID( 20 );
+
+    my $login = MPMinus::Util::correct_loginpass( "anonymous" ); # 'anonymous'
+    my $md5_apache = MPMinus::Util::get_md5_apache( "password" );
+    my $md5_unix = MPMinus::Util::get_md5_unix( "password" );
 
 =head1 DESCRIPTION
 
-The module works with the fundamental tools for the configuration mod_perl level
+MPMinus utilities
 
-=over 8
+=head1 FUNCTIONS
 
-=item B<exception>
+=head2 getHiTime
 
-    my $excstat = exception( $message );
+    my $fsecs = getHiTime();
 
-Write exception information to file and sending e-mail messages if its text contains the 
-substring "[SENDMAIL]" and on the flag _errorsendmail_
+Returns a floating seconds since the epoch. See function L<Time::HiRes/gettimeofday>
 
-    $message - Log (exception) message
+Please note! This function is not exported automatically!
 
-=item B<debug>
+=head2 get_md5_apache
 
-    my $debugstat = debug( $message, $verbose, $file );
+    my $md5_apache = get_md5_apache( "password" );
 
-Write debugging information to file
+Returns MD5-hash digest of "password" value in apache notation
 
-    $message - Log (debug) message
-    
-    $verbose - System information flag. 1 - verbose mode, on / 0 - regular mode, off
+Please note! This function is not exported automatically!
 
-    $file - Log file (absolute). Default as: <modperl_root>/mpminus-<prefix>_debug.log.
-    If the flag _syslog_ the value is ignored - the message is written to the Apache logfile.
+=head2 get_md5_unix
 
-It should be noted that if the flag is omitted then the output information _debug_ be ignored.    
+    my $md5_unix = get_md5_unix( "password" );
 
-=item B<log>
+Returns MD5-hash digest of "password" value in unix notation
 
-    my $logstat = $m->log( $message, $level, $file, $separator );
+=head2 getSID
 
-Main logging method
+    my $sid = getSID( $length, $chars );
+    my $sid = getSID( 16, "m" ); # 16 successful chars consisting of MD5 hash
+    my $sid = getSID( 20 ); # 20 successful chars consisting of a set of chars 0-9A-Z
+    my $sid = getSID(); # 16 successful chars consisting of a set of chars 0-9A-Z
 
-    $message - Log message
+Function returns Session-ID (SID)
 
-    $level - logging level. It may be either a numeric or string value of the form:
-    
-        debug   -- 0 (default)
-        info    -- 1
-        notice  -- 2
-        warning -- 3
-        error   -- 4
-        crit    -- 5
-        alert   -- 6
-        emerg   -- 7
-        fatal   -- 8
-        except  -- 9
-    
-    $file - Log File (absolute). Default as: <modperl_root>/mpminus-<prefix>_error.log. 
-    If the flag _syslog_ the value is ignored - the message is written to the Apache logfile
-    
-    $separator - Log-record separator char's string. Default as char(32): ' '
+$chars - A string containing a collection of characters or code:
 
-=item B<log_debug>
+    d - characters 0-9
+    w - characters A-Z
+    h - HEX characters 0-9A-F
+    m - Digest::MD5 function from Apache::Session::Generate::MD5
+      - default characters 0-9A-Z
 
-Alias for call: $m->log( $message, 'debug' )
+=head2 correct_loginpass
 
-=item B<log_info>
+    my $login = correct_loginpass( "anonymous" ); # 'anonymous'
+    my $password = correct_loginpass( "{MOON}" ); # ''
 
-Alias for call: $m->log( $message, 'info' )
+Correcting a login or password. Issued lc() format username / password thatmust not contain
+characters other than those listed:
 
-=item B<log_notice>
+    a-zA-Z0-9.,-_!@#$%^&*+=/\~|:;
 
-Alias for call: $m->log( $message, 'notice' )
+Otherwise, it returns an empty value ('')
 
-=item B<log_warning>
+Please note! This function is not exported automatically!
 
-Alias for call: $m->log( $message, 'warning' )
+=head2 msoconf2args
 
-=item B<log_warn>
-
-Alias for call: $m->log( $message, 'warning' )
-
-=item B<log_error>
-
-Alias for call: $m->log( $message, 'error' )
-
-=item B<log_err>
-
-Alias for call: $m->log( $message, 'error' )
-
-=item B<log_crit>
-
-Alias for call: $m->log( $message, 'crit' )
-
-=item B<log_alert>
-
-Alias for call: $m->log( $message, 'alert' )
-
-=item B<log_emerg>
-
-Alias for call: $m->log( $message, 'emerg' )
-
-=item B<log_fatal>
-
-Alias for call: $m->log( $message, 'fatal' )
-
-=item B<log_except>
-
-Alias for call: $m->log( $message, 'except' )
-
-=item B<log_exception>
-
-Alias for call: $m->log( $message, 'except' )
-
-=item B<sendmail, send_mail>
-
-    my $sendstatus = $m->sendmail(
-        -to         => $m->conf('server_admin'),
-        -cc         => 'foo@example.com',   ### OPTIONAL
-        -from       => sprintf('"%s" <%s>',$m->conf('server_name'),$m->conf('server_admin')),
-        -subject    => 'Subject',
-        -message    => 'Message',
-        
-        # Encoding/Types
-        -type       => 'text/plain',        ### OPTIONAL
-        -charset    => 'windows-1251',      ### OPTIONAL
-        
-        # Program sendmail
-        -sendmail   => '/usr/sbin/sendmail',### OPTIONAL
-        -flags      => '-t',                ### OPTIONAL
-        
-        # SMTP
-        -smtp       => ($m->conf('smtp_host') || ''),    ### OPTIONAL
-        -smtpuser   => ($m->conf('smtp_user') || ''),    ### OPTIONAL
-        -smtppass   => ($m->conf('smtp_password') || ''),### OPTIONAL
-        
-        # Attaches
-        -attach => [                        ### OPTIONAL
-                { 
-                    Type=>'text/plain', 
-                    Data=>'document 1 content', 
-                    Filename=>'doc1.txt', 
-                    Disposition=>'attachment',
-                },
-                
-                {
-                    Type=>'text/plain', 
-                    Data=>'document 2 content', 
-                    Filename=>'doc2.txt', 
-                    Disposition=>'attachment',
-                },
-                
-                ### ... ###
-            ],
+    my %args = msoconf2args($m->conf('store'));
+    my $mso = new MPMinus::Store::MultiStore(
+        -m   => $m,
+        -mso => \%args,
     );
 
-If you need to send a letter with only one attachment:
+Converting MSO configuration section to MultiStore -mso arguments
 
-    -attach => {
-        Type=>'text/html', 
-        Data=>$att, 
-        Filename=>'response.htm', 
-        Disposition=>'attachment',
-    },
+In conf/mso.conf:
 
-or
+    <store foo>
+        dsn   DBI:mysql:database=NAME;host=HOST
+        user  login
+        pass  password
+        <Attr>
+            mysql_enable_utf8 1
+            RaiseError        0
+            PrintError        0
+        </Attr>
+    </store>
 
-    -attach => {
-        Type=>'image/gif', 
-        Path=>'aaa000123.gif',
-        Filename=>'logo.gif', 
-        Disposition=>'attachment',
-    },
+    <store bar>
+        dsn   DBI:Oracle:SID
+        user  login
+        pass  password
+        <Attr>
+            RaiseError        0
+            PrintError        0
+        </Attr>
+    </store>
 
-Sending mail via L<CTK::Util/sendmail>
-
-=item B<syslog, logsys>
-
-    my $logstat = $m->syslog( $message, $level );
-
-Apache logging to the Apache logfile (ErrorLog of your virtualhost)
-
-$level can take the following values:
-
-    debug (default), info, notice, warning, error, crit, alert, emerg, fatal, except
-
-The function returns work status
-
-=back
+Please note! This function is not exported automatically!
 
 =head1 HISTORY
 
@@ -209,262 +130,257 @@ Init version on base mod_main 1.00.0002
 
 Module is merged into the global module level
 
-=item B<1.11 / Wed Apr 24 14:53:38 2013 MSK>
+=item B<1.11 / 12.01.2009>
+
+Fixed bugs in functions *datatime*
+
+=item B<1.12 / 27.02.2009>
+
+Module is merged into the global module level
+
+=item B<1.20 / 28.04.2011>
+
+Binary file's mode supported
+
+=item B<1.21 / 14.05.2011>
+
+modified functions tag and slash
+
+=item B<1.22 / 19.10.2011>
+
+Added function datetime2localtime and localtime2datetime as alias for localtime2date_time.
+
+Added alias current_datetime for current_date_time
+
+=item B<1.23 / Wed Apr 24 14:53:38 2013 MSK>
 
 General refactoring
 
+=item B<1.24 / Wed May  8 15:37:02 2013 MSK>
+
+Added function msoconf2args
+
 =back
+
+See C<Changes> file
+
+=head1 DEPENDENCIES
+
+C<mod_perl2>, L<CTK>, L<Time::HiRes>, L<Digest::MD5>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+C<mod_perl2>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw($VERSION);
-$VERSION = 1.12;
+$VERSION = 1.25;
+
+
+use base qw/Exporter/;
+our @EXPORT = qw/
+        getHiTime
+        getSID
+
+    /;
+our @EXPORT_OK = (@EXPORT, qw/
+        msoconf2args
+        correct_loginpass
+        get_md5_apache
+        get_md5_unix
+    /);
+
+use Time::HiRes qw(gettimeofday);
+use Digest::MD5;
+use CTK::ConfGenUtil qw/hash/;
 
 use constant {
-    LOGLEVELS       => { 
-        'debug'   => 0,
-        'info'    => 1,
-        'notice'  => 2,
-        'warning' => 3,
-        'error'   => 4,
-        'crit'    => 5,
-        'alert'   => 6,
-        'emerg'   => 7,
-        'fatal'   => 8,
-        'except'  => 9,
-    },
+    ITOA64  => './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
 };
 
-use Apache2::Const qw/ :log /;
-use MPMinus::MainTools;
-use CTK::Util qw/ :BASE /; # Утилитарий
-use MIME::Lite;
-use FileHandle;
+sub getHiTime {
+    return gettimeofday() * 1;
+}
+sub getSID {
+    my $length = shift || 16;
+    my $chars    = shift || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-sub log {
-    #
-    # Процедура логирования данных.
-    # !!! Используется для ПРИКЛАДНЫХ а не системных нужд
-    #
-    # IN:
-    #   message - сообщение.
-    #   level   - Уровень записи лога (см. процедуру syslog())
-    #   file    - АБСОЛЮТНЫЙ путь и имя файла куда писать. По умолчанию используется файл default.log TEMP-директории
-    #   sep     - Разделитель значений. По умолчанию пробел
-    #
-    my $self    = shift;
-    my $message = shift;
-    $message = '' unless defined $message;
-    my $level   = shift || 'debug';
-    my $file    = shift || $self->conf('errorlog');
-    my $sep     = shift;
-    $sep = ' ' unless defined $sep;
-    
-    my $usesyslog = $self->conf('_syslog_') ? 1 : 0;
-    
-    # Определяем уровень
-    my $loglevels = LOGLEVELS;
-    my %levels  = %$loglevels;
-    my %rlevels = reverse %$loglevels;
-    my $ll;
-    if (defined($level) && ($level =~ /^[0-9]+$/) && defined $rlevels{$level}) {
-        $ll = $rlevels{$level};
-    } elsif (defined($level) && ($level =~ /^[a-z0-9]+$/i) && defined $levels{lc($level)}) {
-        $ll = lc($level);
+    # Copyright(c) 2000, 2001 Jeffrey William Baker (jwbaker@acm.org)
+    # Distribute under the Perl License
+    # Source: Apache::Session::Generate::MD5
+    return substr(
+        Digest::MD5::md5_hex(
+            Digest::MD5::md5_hex(
+                time() . {} . rand() . $$
+            )
+        ), 0, $length) if $chars =~ /^\s*m\s*$/i;
+
+    $chars = "0123456789" if $chars =~ /^\s*d\s*$/i;
+    $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if $chars =~ /^\s*w\s*$/i;
+    $chars = "0123456789ABCDEF" if $chars =~ /^\s*h\s*$/i;
+
+    my @rows = split //, $chars;
+
+    my $retv = '';
+    for (my $i=0; $i<$length; $i++) {
+        $retv .= $rows[int(rand(length($chars)-1))]
+    }
+
+    return "$retv"
+}
+sub msoconf2args {
+    my $mso_conf = shift;
+    my @stores = $mso_conf && ref($mso_conf) eq 'HASH' ? keys(%$mso_conf) : ();
+    my %args = ();
+    for (@stores) {
+        my $store = hash($mso_conf, $_);
+        $args{$_} = {};
+        while (my ($key, $value) = each %$store) {
+            $args{$_}{"-".$key} = $value
+        }
+    }
+    return %args;
+}
+sub correct_loginpass {
+    my $v = shift || '';
+    return "" if $v =~ /[^a-zA-Z0-9.,-_!@#\$%^&*+=\/\\~|]|[:;]/g;
+    return lc($v);
+}
+
+#
+# MD5 Apache notation
+#
+sub get_md5_apache {
+    my $password = shift // return "";
+    return _md5_crypt(q/$apr1$/, $password, _get_salt());
+}
+sub get_md5_unix {
+    my $password = shift // return "";
+    return _md5_crypt(q/$1$/, $password, _get_salt());
+}
+sub _get_salt {
+    my($salt,$i, $rand);
+    $rand=0;
+    my (@itoa64) = (0 .. 9,'a' .. 'z','A' .. 'Z');
+    $salt = '';
+    for ($i = 0; $i < 8; $i++) {
+      srand(time + $rand + $$);
+      $rand = rand(25*29*17 + $rand);
+      $salt .=  $itoa64[$rand & $#itoa64];
+    }
+    return $salt; # crypt($passwd,$salt);
+}
+sub _to64 {
+    my ($v, $n) = @_;
+    my $ret = '';
+    while (--$n >= 0) {
+        $ret .= substr(ITOA64, $v & 0x3f, 1);
+        $v >>= 6;
+    }
+    return $ret;
+}
+sub _md5_crypt {
+    my($Magic, $pw, $salt) = @_;
+    my $passwd;
+
+    if ( defined $salt ) {
+        $salt =~ s/^\Q$Magic//; # Take care of the magic string if
+                                # if present.
+        $salt =~ s/^(.*)\$.*$/$1/; # Salt can have up to 8 chars...
+        $salt = substr($salt, 0, 8);
     } else {
-        $ll = 'debug'; # Обработчик по умолчанию
+        $salt = ''; # in case no salt was proffered
+        $salt .= substr(ITOA64, int(rand(64)+1),1)
+            while length($salt) < 8;
     }
-    my $llc = $levels{$ll} || 0; # числовое значени
-    
-    # Смотрим на уровень лога f($ll), если он установлен < чем LogLevl заданный конфигурацией то просто выходим
-    my $llsys = $self->r->server->loglevel();
-    $llsys = Apache2::Const::LOG_EMERG unless defined $llsys;
-    my $llcalc = 0; # debug (default)
-    if ($llsys == Apache2::Const::LOG_DEBUG) { $llcalc = 0 }
-    elsif ($llsys == Apache2::Const::LOG_INFO) { $llcalc = 1 }
-    elsif ($llsys == Apache2::Const::LOG_NOTICE) { $llcalc = 2 }
-    elsif ($llsys == Apache2::Const::LOG_WARNING) { $llcalc = 3 }
-    elsif ($llsys == Apache2::Const::LOG_ERR) { $llcalc = 4 }
-    elsif ($llsys == Apache2::Const::LOG_CRIT) { $llcalc = 5 }
-    elsif ($llsys == Apache2::Const::LOG_ALERT) { $llcalc = 6 }
-    elsif ($llsys == Apache2::Const::LOG_EMERG) { $llcalc = 7 }
-    else { $llcalc = 7 }
-    
-    unless (($llc == 0) && $self->conf('_debug_')) { # если передан level=debug и установлен флаг дебага - пропскаем проверку!
-        return 0 if $llc < $llcalc;
-    }
-    
-    # Формируем выходную строку
-    my @sl;
-    unless ($usesyslog) {
-        @sl = (
-            sprintf('[%s]',dtf("%w %MON %DD %hh:%mm:%ss %YYYY")), # Tue Feb 02 16:15:18 2013
-            sprintf('[%s]',$ll),
-            sprintf('[client %s]',$self->conf('remote_addr')),
-        );
-    }
-    push @sl, sprintf('[sid %s]',$self->conf('sid'));
-    push @sl, sprintf('[user %s]',$self->conf('remote_user')) if $self->conf('remote_user');
-    push @sl, sprintf('[uri %s]',$self->conf('request_uri'));
-    push @sl, $message;
-    my $logstring = join($sep, @sl);
 
-    # Запись!
-    return syslog($self,$logstring,$level) if $usesyslog; # В системный лог
-    return _log_flush($file, $logstring); # В свой лог. Тут сложнее, идет заморочка с файлами
-}
-sub log_debug { shift->log(shift,'debug') };
-sub log_info { shift->log(shift,'info') };
-sub log_notice { shift->log(shift,'notice') };
-sub log_warning { shift->log(shift,'warning') };
-sub log_warn { goto &log_warning };
-sub log_error { shift->log(shift,'error') };
-sub log_err { goto &log_error };
-sub log_crit { shift->log(shift,'crit') };
-sub log_alert { shift->log(shift,'alert') };
-sub log_emerg { shift->log(shift,'emerg') };
-sub log_fatal { shift->log(shift,'fatal') };
-sub log_except { shift->log(shift,'except') };
-sub log_exception { goto &log_except };
-sub _log_flush {
-    # сбрасываем буфер в файл, возвращая статус операции
-    my $fn = shift;
-    my $buffer = shift;
-    return 0 unless defined $fn;
-        
-    my $fh = FileHandle->new($fn,'a');
-    unless ($fh) {
-        carp(defined($!) ? $! : "Can't open file \"$fn\"");
-        return 0;
-    }
-    
-    $fh->print(defined($buffer) ? $buffer : '',"\n");
-    $fh->close();
+    my $ctx = new Digest::MD5; # Here we start the calculation
+    $ctx->add($pw); # Original password...
+    $ctx->add($Magic); # ...our magic string...
+    $ctx->add($salt); # ...the salt...
 
-    return 1;
-}
-sub syslog {
-    #
-    # Процедура использует функцию апача для вставки записей в лог
-    #
-    # IN:
-    #   message - сообщение.
-    #   level   - Уровень записи лога (см. процедуру syslog())
-    #
-    my $self    = shift;
-    my $message = shift;
-    my $level   = shift || 'debug'; # emerg(), alert(), crit(), error(), warn(), notice(), info(), debug()
-    my $msg = translate(defined($message) ? $message : '');
-    
-    my $r = Apache2::RequestUtil->request;
-    my $rlog = $r->log;
-    
-    if ($level eq 'except')  {      # 9 exception (emerg alias)
-        $rlog->emerg($msg);
-    } elsif ($level eq 'fatal') {   # 8 fatal (emerg alias)
-        $rlog->emerg($msg);
-    } elsif ($level eq 'emerg') {   # 7 system is unusable
-        $rlog->emerg($msg);
-    } elsif ($level eq 'alert') {   # 6 action must be taken immediately
-        $rlog->alert($msg);
-    } elsif ($level eq 'crit') {    # 5 critical conditions
-        $rlog->crit($msg);
-    } elsif ($level eq 'error' or $level eq 'err') { # 4 error conditions
-        $rlog->error($msg);
-    } elsif ($level eq 'warn' or $level eq 'warning') { # 3 warning conditions
-        $rlog->warn($msg);
-    } elsif ($level eq 'notice') {  # 2 normal but significant condition
-        $rlog->notice($msg);
-    } elsif ($level eq 'info') {    # 1 informational
-        $rlog->info($msg);
-    } else {                        # 0 debug-level messages (default)
-        $rlog->debug($msg);
-    }
-    return 1;
-    
-}
-sub logsys { goto &syslog };
-sub debug {
-    #
-    # Процедура отладки. Записывает в отладочный файл информацию.
-    # !!! Используется для ПРИКЛАДНЫХ а не системных нужд
-    #
-    # IN:
-    #    $message - сообщение
-    #    $verbose - флаг системной информации. 1 - включить добавление системной информации / 0 - выкл
-    #    $file    - ИМЯ файла для отладки. По умолчанию - $CONF{file_debug}
-    #
-    my $self    = shift;
-    my $message = shift;
-    $message = '' unless defined $message;
-    my $verbose = shift || 0;
-    my $file    = shift || $self->conf('debuglog');
-    
-    return 0 unless $self->conf('_debug_');
-    
-    # Берем значение по умолчанию если оно не задано
-    my $buff = '';
-    if ($verbose) {
-        my ($pkg, $fn, $ln) = caller;
-        my $tm = sprintf "%+.*f",4, (getHiTime() - $self->conf('hitime'));
-        $buff = "[time $tm] [package $pkg] [file $fn] [line $ln]".($message ? ' '  : '').$message;
-    } else {
-        $buff = $message;
-    }
-    $self->log($buff,'debug',$file);
+    my ($final) = new Digest::MD5;
+    $final->add($pw);
+    $final->add($salt);
+    $final->add($pw);
+    $final = $final->digest;
 
-}
-sub exception {
-    # Процедура реагирования на exception
-    my $self = shift;
-    my $message = shift;
-    $message = '' unless defined $message;
-    
-    # Анализ @_ и если первый элемент списка содержит преффикс [SENDMAIL],
-    if ($message =~ /\[SENDMAIL\]/) {
-        $message =~ s/\[SENDMAIL\]//;
-        
-        # Отправляем письмо администратору
-        CTK::Util::send_mail(
-            -to         => $self->conf('server_admin'),
-            -from       => sprintf('"%s" <%s>',$self->conf('server_name'),$self->conf('server_admin')),
-            -subject    => sprintf('MPMinus internal error on "%s"',$self->conf('server_name')),
-            -message    => $message,
-            -type       => 'text/html',
-            -smtp       => ($self->conf('smtp_host') || ''),
-            -smtpuser   => ($self->conf('smtp_user') || ''),
-            -smtppass   => ($self->conf('smtp_password') || ''),
-        ) if $self->conf('_errorsendmail_');
+    my $pl;
+    for ($pl = length($pw); $pl > 0; $pl -= 16) {
+        $ctx->add(substr($final, 0, $pl > 16 ? 16 : $pl));
     }
-    $self->log_except($message);
+
+    # Now the 'weird' xform
+    my $i;
+    for ($i = length($pw); $i; $i >>= 1) {
+        if ($i & 1) { $ctx->add(pack("C", 0)); }
+        # This comes from the original version,
+        # where a memset() is done to $final
+        # before this loop.
+        else { $ctx->add(substr($pw, 0, 1)); }
+    }
+    $final = $ctx->digest;
+
+    # The following is supposed to make
+    # things run slower. In perl, perhaps
+    # it'll be *really* slow!
+    my $ctx1;
+    for ($i = 0; $i < 1000; $i++) {
+        $ctx1 = new Digest::MD5;
+        if ($i & 1) { $ctx1->add($pw); }
+        else { $ctx1->add(substr($final, 0, 16)); }
+        if ($i % 3) { $ctx1->add($salt); }
+        if ($i % 7) { $ctx1->add($pw); }
+        if ($i & 1) { $ctx1->add(substr($final, 0, 16)); }
+        else { $ctx1->add($pw); }
+        $final = $ctx1->digest;
+    }
+
+    # Final xform
+    $passwd = '';
+    $passwd .= _to64(int(unpack("C", (substr($final, 0, 1))) << 16)
+            | int(unpack("C", (substr($final, 6, 1))) << 8)
+            | int(unpack("C", (substr($final, 12, 1)))), 4);
+    $passwd .= _to64(int(unpack("C", (substr($final, 1, 1))) << 16)
+            | int(unpack("C", (substr($final, 7, 1))) << 8)
+            | int(unpack("C", (substr($final, 13, 1)))), 4);
+    $passwd .= _to64(int(unpack("C", (substr($final, 2, 1))) << 16)
+            | int(unpack("C", (substr($final, 8, 1))) << 8)
+            | int(unpack("C", (substr($final, 14, 1)))), 4);
+    $passwd .= _to64(int(unpack("C", (substr($final, 3, 1))) << 16)
+            | int(unpack("C", (substr($final, 9, 1))) << 8)
+            | int(unpack("C", (substr($final, 15, 1)))), 4);
+    $passwd .= _to64(int(unpack("C", (substr($final, 4, 1))) << 16)
+            | int(unpack("C", (substr($final, 10, 1))) << 8)
+            | int(unpack("C", (substr($final, 5, 1)))), 4);
+    $passwd .= _to64(int(unpack("C", substr($final, 11, 1))), 2);
+
+    $final = '';
+    return $Magic . $salt . q/$/ . $passwd;
 }
-sub sendmail {
-    # Отправка письма с помощью модуля CTK::Util::send_mail
-    my $self = shift;
-    return 0 unless $self->conf('_sendmail_'); # Если запрещёно отправлять письма то выход со статусом 0
-    return CTK::Util::send_mail(@_);
-}
-sub send_mail { goto &sendmail };
+
 1;

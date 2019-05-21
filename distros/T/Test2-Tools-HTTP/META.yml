@@ -7,13 +7,13 @@ build_requires:
   Test2::Mock: '0.000060'
   Test2::Require::Module: '0.000060'
   Test2::Tools::URL: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,6 +39,7 @@ resources:
   bugtracker: https://github.com/plicease/Test2-Tools-HTTP/issues
   homepage: https://metacpan.org/pod/Test2::Tools::HTTP
   repository: git://github.com/plicease/Test2-Tools-HTTP.git
-version: '0.08'
+version: '0.09'
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

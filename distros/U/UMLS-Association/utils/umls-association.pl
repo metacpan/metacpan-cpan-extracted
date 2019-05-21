@@ -31,20 +31,22 @@ The measure used to calculate the assocation. Recommended = x2
 
 The package uses the Text::NSP package to do the calculation. 
 The measure included within this package are: 
-    
-    1.  Dice Coefficient
-    2.  Fishers exact test - left sided
-    3.  Fishers exact test - right sided
-    4.  Fishers twotailed test - right sided
-    5.  Jaccard Coefficient
-    6.  Log-likelihood ratio
-    7.  Mutual Information
-    8.  Odds Ratio
-    9.  Pointwise Mutual Information
-    10. Phi Coefficient
-    11. Pearson's Chi Squared Test
-    12. Poisson Stirling Measure
-    13. T-score
+
+    1.  Frequency
+    2.  Random
+    3.  Dice Coefficient
+    4.  Fishers exact test - left sided
+    5.  Fishers exact test - right sided
+    6.  Fishers twotailed test - right sided
+    7.  Jaccard Coefficient
+    8.  Log-likelihood ratio
+    9.  Mutual Information
+    10.  Odds Ratio
+    11.  Pointwise Mutual Information
+    12. Phi Coefficient
+    13. Pearson's Chi Squared Test
+    14. Poisson Stirling Measure
+    15. T-score
 
 =head1 OPTIONS
 
@@ -167,6 +169,8 @@ this program; if not, write to:
  Boston, MA  02111-1307, USA.
 
 =cut
+use lib '/home/henryst/UMLS-Association/lib/';
+
 use UMLS::Association;
 use Getopt::Long;
 
@@ -294,19 +298,20 @@ sub showHelp() {
     print "--measure MEASURE        The measure to use to calculate the\n";
     print "                         assocation. Valid measures are: \n";
     print "0.  Frequency - just n11 (freq)\n";
-    print "1.  Dice Coefficient (dice) \n";
-    print "2.  Fishers exact test - left sided (leftFisher)\n";
-    print "3.  Fishers exact test - right sided (rightFisher)\n";
-    print "4.  Fishers twotailed test - right sided (twotailed)\n";
-    print "5.  Jaccard Coefficient (jaccard)\n";
-    print "6.  Log-likelihood ratio (ll)\n"; 
-    print "7.  Mutual Information (tmi)\n";
-    print "8.  Odds Ratio (odds)\n";
-    print "9.  Pointwise Mutual Information (pmi)\n";
-    print "10. Phi Coefficient (phi)\n";
-    print "11. Pearson's Chi Squared Test (x2)\n";
-    print "12. Poisson Stirling Measure (ps)\n";
-    print "13. T-score (tscore) \n\n";
+    print "1.  Random - a random number between 0 and 1 (random)\n";
+    print "2.  Dice Coefficient (dice) \n";
+    print "3.  Fishers exact test - left sided (leftFisher)\n";
+    print "4.  Fishers exact test - right sided (rightFisher)\n";
+    print "5.  Fishers twotailed test - right sided (twotailed)\n";
+    print "6.  Jaccard Coefficient (jaccard)\n";
+    print "7.  Log-likelihood ratio (ll)\n"; 
+    print "8.  Mutual Information (tmi)\n";
+    print "9.  Odds Ratio (odds)\n";
+    print "10.  Pointwise Mutual Information (pmi)\n";
+    print "11. Phi Coefficient (phi)\n";
+    print "12. Pearson's Chi Squared Test (x2)\n";
+    print "13. Poisson Stirling Measure (ps)\n";
+    print "14. T-score (tscore) \n\n";
 
     print "EXAMPLE:\n";
     print "perl umls-association.pl C0000726,C001554 C0870221 --matrix ../Demos/Datasets/sampleMatrix --measure x2\n\n";

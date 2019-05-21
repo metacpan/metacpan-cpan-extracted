@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
         )
     ),
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES    => 'Siffra-Base-* *.old *.bak' },
+    clean => { FILES    => 'Siffra-Base-* *.old *.bak MANIFEST' },
 );
 
 WriteMakefile( %WriteMakefileArgs );

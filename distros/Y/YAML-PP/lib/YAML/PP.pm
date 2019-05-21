@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -231,7 +231,7 @@ This allows to process continuous streams additionally to a fixed input
 file or string.
 
 The YAML::PP frontend will currently load all documents, and return only
-the first if called with scalar context.
+the last if called with scalar context.
 
 The YAML backend is implemented in a modular way that allows to add
 custom handling of YAML tags, perl objects and data types. The inner API
@@ -551,7 +551,10 @@ UTF-8 decoding will be done automatically
     my $yaml = $ypp->dump_string($doc1, $doc2);
     my $yaml = $ypp->dump_string(@docs);
 
-Output will be UTF-8 decoded
+Input data should be UTF-8 decoded. If not, it will be upgraded with
+C<utf8::upgrade>.
+
+Output will be UTF-8 decoded.
 
 =item dump_file
 
@@ -559,7 +562,10 @@ Output will be UTF-8 decoded
     $ypp->dump_file("file.yaml", $doc1, $doc2);
     $ypp->dump_file("file.yaml", @docs);
 
-File will be written UTF-8 encoded
+Input data should be UTF-8 decoded. If not, it will be upgraded with
+C<utf8::upgrade>.
+
+File will be written UTF-8 encoded.
 
 =item dump
 

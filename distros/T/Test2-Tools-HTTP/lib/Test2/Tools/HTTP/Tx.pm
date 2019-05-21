@@ -6,7 +6,7 @@ use Test2::API ();
 use Carp ();
 
 # ABSTRACT: Object representing the last transaction for Test2::Tools::HTTP
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub req { shift->{req} }
@@ -95,7 +95,7 @@ Test2::Tools::HTTP::Tx - Object representing the last transaction for Test2::Too
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

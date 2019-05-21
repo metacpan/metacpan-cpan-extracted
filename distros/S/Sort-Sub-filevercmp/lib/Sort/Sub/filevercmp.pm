@@ -1,0 +1,114 @@
+package Sort::Sub::filevercmp;
+
+our $DATE = '2019-05-18'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+sub gen_sorter {
+    require Sort::filevercmp;
+    my ($is_reverse, $is_ci) = @_;
+
+    sub {
+        no strict 'refs';
+
+        my $caller = caller();
+        my $a = @_ ? $_[0] : ${"$caller\::a"};
+        my $b = @_ ? $_[1] : ${"$caller\::b"};
+
+        my $cmp;
+
+        if ($is_ci) {
+            $cmp = Sort::filevercmp::filevercmp(lc $a, lc $b);
+        } else {
+            $cmp = Sort::filevercmp::filevercmp($a, $b);
+        }
+        $is_reverse ? -1*$cmp : $cmp;
+    };
+}
+
+1;
+# ABSTRACT: Sort using filevercmp
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sort::Sub::filevercmp - Sort using filevercmp
+
+=head1 VERSION
+
+This document describes version 0.001 of Sort::Sub::filevercmp (from Perl distribution Sort-Sub-filevercmp), released on 2019-05-18.
+
+=head1 SYNOPSIS
+
+Generate sorter (accessed as variable) via L<Sort::Sub> import:
+
+ use Sort::Sub '$filevercmp'; # use '$filevercmp<i>' for case-insensitive sorting, '$filevercmp<r>' for reverse sorting
+ my @sorted = sort $filevercmp ('item', ...);
+
+Generate sorter (accessed as subroutine):
+
+ use Sort::Sub 'filevercmp<ir>';
+ my @sorted = sort {filevercmp} ('item', ...);
+
+Generate directly without Sort::Sub:
+
+ use Sort::Sub::filevercmp;
+ my $sorter = Sort::Sub::filevercmp::gen_sorter(
+     ci => 1,      # default 0, set 1 to sort case-insensitively
+     reverse => 1, # default 0, set 1 to sort in reverse order
+ );
+ my @sorted = sort $sorter ('item', ...);
+
+Use in shell/CLI with L<sortsub> (from L<App::sortsub>):
+
+ % some-cmd | sortsub filevercmp
+ % some-cmd | sortsub filevercmp --ignore-case -r
+
+=head1 DESCRIPTION
+
+=for Pod::Coverage ^(gen_sorter)$
+
+=head1 ENVIRONMENT
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Sort-Sub-filevercmp>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Sort-Sub-filevercmp>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-filevercmp>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Sort::filevercmp>
+
+L<Sort::Sub>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

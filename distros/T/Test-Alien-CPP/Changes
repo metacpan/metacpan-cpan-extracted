@@ -1,5 +1,12 @@
 Revision history for Test-Alien-CPP
 
+1.01      2019-05-20 14:51:27 -0400
+  - Bump required version of ExtUtils::CBuilder for C++ compat
+  - Moved to Perl5-Alien GitHub org
+
+1.00_01   2019-05-08 05:38:57 -0600
+  - Put libstdc++ last (KIWIROY++, mohawk++)
+
 0.99      2017-10-02 15:35:12 -0400
   - Test for bug in Test::Alien::Build fixed in 1.21 (gh#1)
 

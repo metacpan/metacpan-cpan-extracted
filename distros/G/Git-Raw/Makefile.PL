@@ -248,7 +248,7 @@ if ($Config{usethreads} && !$is_sunpro) {
 }
 
 my @deps = glob 'deps/libgit2/deps/{http-parser,zlib}/*.c';
-my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c,streams/*.c}';
+my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c,streams/*.c,allocators/*.c}';
 
 if (!$library_opts{'ssl'}{'use'} && !$is_osx) {
 	push @srcs, 'deps/libgit2/src/hash/hash_generic.c';
@@ -368,12 +368,13 @@ my %WriteMakefileArgs = (
     "File::Spec::Unix" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
     "Time::Local" => 0
   },
-  "VERSION" => "0.82",
+  "VERSION" => "0.83",
   "test" => {
     "TESTS" => "t/*.t"
   }

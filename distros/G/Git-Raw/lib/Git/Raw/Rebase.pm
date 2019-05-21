@@ -1,5 +1,5 @@
 package Git::Raw::Rebase;
-$Git::Raw::Rebase::VERSION = '0.82';
+$Git::Raw::Rebase::VERSION = '0.83';
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ Git::Raw::Rebase - Git rebase class
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 DESCRIPTION
 
@@ -108,6 +108,22 @@ Get the number of operations that are to be applied.
 
 Get all operations that are to be applied. Returns a list of
 L<Git::Raw::Rebase::Operation> objects.
+
+=head2 orig_head_name( )
+
+Get the original HEAD ref name.
+
+=head2 orig_head_id( )
+
+Get the original HEAD id.
+
+=head2 onto_name( )
+
+Get the onto ref name.
+
+=head2 onto_id( )
+
+Get the onto id.
 
 =head1 AUTHOR
 

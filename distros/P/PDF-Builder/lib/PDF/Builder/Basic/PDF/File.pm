@@ -16,8 +16,8 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '3.014'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.015'; # VERSION
+my $LAST_UPDATE = '3.015'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -223,6 +223,7 @@ sub open {
     my ($class, $filename, $update) = @_;
 
     my ($fh, $buffer);
+    my $comment = ''; # any comment jammed into the PDF header
     my $self = $class->_new();
 
     if (ref $filename) {
@@ -251,8 +252,11 @@ sub open {
     $self->{' version'} = $1;
     # can't run verCheckInput() yet, as full ' version' not set
     if (defined $2 && length($2) > 0) {
-       #$comment = $2;  TBD later, save for output as comment
-       print STDERR "Warning: PDF header contains extra text '$2', ignored as comment.\n";
+       $comment = $2;  # save for output as comment
+#print STDERR "Warning: PDF header contains extra text '$comment', is ignored.\n";
+       # since we just echo the original header + comment, unles that causes
+       # problems in some Readers, we can just leave it be (no call to strip
+       # out inline comment and create a separate comment further along).
     }
 
     $fh->seek(0, 2);            # go to end of file
@@ -340,12 +344,16 @@ sub append_file {
 
     my $fh = $self->{' INFILE'};
 
-    # hack to upgrade pdf-version number to support
-    # requested features in higher versions than
-    # the pdf was originally created.
+    # hack to upgrade pdf-version number to support requested features in 
+    # higher versions than the pdf was originally created. WARNING: new version
+    # must be exactly SAME length as the old (e.g., 1.6 replacing 1.4), or
+    # problems are likely with overwriting header. perhaps some day we will
+    # need to check the old version being ovewritten, and adjust something to
+    # avoid corrupting the file.
     my $version = $self->{' version'} || 1.4;
     $fh->seek(0, 0);
-    $fh->print("%PDF-$version\n");
+    # assume that any existing EOL after version will be reused
+    $fh->print("%PDF-$version");
 
     my $tdict = PDFDict();
     $tdict->{'Prev'} = PDFNum($self->{' loc'});
@@ -408,9 +416,14 @@ sub create_file {
 
     $self->{' OUTFILE'} = $fh;
     $fh->print('%PDF-' . ($self->{' version'} || '1.4') . "\n");
-    $fh->print("%\xC6\xCD\xCD\xB5\n");   # and some binary stuff in a comment
-    # TBD does this "binary stuff" have any meaning? They're not UTF-8
-    # TBD future output as comments any comments read in from PDF files
+    $fh->print("%\xC6\xCD\xCD\xB5\n");   # and some binary stuff in a comment.
+
+    # PDF spec requires 4 or more "binary" bytes (128 or higher value) in a
+    # comment immediately following the PDF-x.y header, to alert reader that
+    # there is binary data. Actual values are apparently arbitrary. This DOES
+    # mean that other comments can NOT be inserted between the header and the
+    # binary comment! PDF::Builder always outputs this comment, so is always
+    # claiming binary data (no harm done?).
 
     return $self;
 }
@@ -1161,6 +1174,7 @@ sub readxrtr {
 	#   more lenient for some writers, allowing 1 or more whitespace
 	my $subsection_count = 0;
 	my $entry_format_error = 0;
+	my $xrefListEmpty = 0;
 
         while ($buf =~ m/^$ws_char*([0-9]+)$ws_char+([0-9]+)$ws_char*$cr(.*?)$/s) {
             my $old_buf = $buf;
@@ -1179,6 +1193,7 @@ sub readxrtr {
 	    #   skip over entry reads and go to next subsection
 	    if ($xnum < 1) { 
 		print STDERR "Warning: xref subsection has 0 entries. Skipped.\n";
+		    $xrefListEmpty = 1;
 	        next; 
 	    }
 
@@ -1238,7 +1253,7 @@ sub readxrtr {
 	#     risky and could end up corrupting the free list.
 	#   there's no guarantee that a proper free list will result, but any
 	#     error should hopefully be caught further on
-	if (!exists $xlist->{'0'}) {
+	if (!exists $xlist->{'0'} && !$xrefListEmpty) {
 	    # for now, 1 subsection starting with 1, and only object 1 in
 	    #   free list, try to fix up
 	    if ($subsection_count == 1 && exists $xlist->{'1'}) {
@@ -1536,6 +1551,8 @@ sub out_trailer {
         delete $tdict->{'Length'};
         $self->ship_out();
     } else {
+	# delete may be moved later by Vadim closer to where XRefStm created
+	delete $tdict->{'XRefStm'};
 	# almost the original code
         $fh->print("xref\n", @out, "trailer\n");
         $tdict->outobjdeep($fh, $self);

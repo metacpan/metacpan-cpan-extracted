@@ -4,6 +4,6 @@ use Distar 0.001;
 
 author 'mst - Matt S Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
 
-manifest_include ex => qr/deep.*/;
+manifest_include ex => qr/j?deep.*/;
 
 1;

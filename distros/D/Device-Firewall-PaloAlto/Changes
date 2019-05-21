@@ -1,3 +1,11 @@
+0.1.6 - * Added a Test module with the ability to test interfaces, routes, ARP as 
+        well as testing the security and NAT rulebase
+        * Added HA and NTP operation commands
+        * Added better one-liner handing with the fw() sub
+        * Documentation updates
+        * Various fixes
+
+
 0.1.5 - (2019-04-10) Documentation Updates
 
 0.1.4 - (2019-04-10) 

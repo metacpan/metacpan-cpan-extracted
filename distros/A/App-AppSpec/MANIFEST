@@ -11,6 +11,7 @@ bin/appspec
 dist.ini
 lib/App/AppSpec.pm
 lib/App/AppSpec/Schema/Validator.pm
+lib/App/AppSpec/Spec.pm
 lib/appspec.pod
 share/appspec-spec.yaml
 share/completion/bash/appspec.bash
@@ -18,3 +19,4 @@ share/completion/zsh/_appspec
 t/00.load.t
 t/02.pod-cover.t
 t/11.validate-spec.t
+tools/generate-spec-pm.pl

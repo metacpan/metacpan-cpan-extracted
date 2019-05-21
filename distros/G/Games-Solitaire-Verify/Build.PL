@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Games-Solitaire-Verify",
-  "dist_version" => "0.2200",
+  "dist_version" => "0.2201",
   "license" => "mit",
   "module_name" => "Games::Solitaire::Verify",
   "recursive_test_files" => 1,

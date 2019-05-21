@@ -1,10 +1,10 @@
 # NAME
 
-RT-Extension-RichtextCustomField - CF with wysiwyg editor
+RT::Extension::RichtextCustomField - CF with wysiwyg editor
 
 # DESCRIPTION
 
-Provide a new type of [custom field](https://metacpan.org/pod/RT::CustomField), similar to Text but with wysiwyg editor when editing value.
+Provide a new type of [custom field](https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html), similar to Text but with wysiwyg editor when editing value.
 
 # RT VERSION
 
@@ -17,6 +17,15 @@ Works with RT 4.2 or greater
 - `make install`
 
     May need root permissions
+
+- Patch your RT
+
+    `RichtextCustomField` requires a small patch to allow  [custom fields](https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html) with `Richtext` type to be chosen as recipient for extracting from a [ticket](https://docs.bestpractical.com/rt/4.4.4/RT/Ticket.html) into an [article](https://docs.bestpractical.com/rt/4.4.4/RT/Article.pm). _You have to apply this patch if you need this feature, and only in this case._
+
+    For RT 4.4 or lower, apply the included patch:
+
+        cd /opt/rt4 # Your location may be different
+        patch -p1 < /download/dir/RT-Extension-RichtextCustomField/patches/4.4-add-Richtext-CFs-ExtractArticleFromTicket.patch
 
 - Edit your `/opt/rt4/etc/RT_SiteConfig.pm`
 

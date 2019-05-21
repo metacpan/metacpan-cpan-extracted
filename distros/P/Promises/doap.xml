@@ -70,6 +70,24 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:Mohammad.Anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Perlover</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perlover@perlover.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Peter Valdemar Mørch</foaf:name>
+      <foaf:mbox rdf:resource="mailto:peter@morch.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Ricardo Signes</foaf:name>
       <foaf:mbox rdf:resource="mailto:rjbs@cpan.org" />
     </foaf:Person>
@@ -102,6 +120,12 @@
     <foaf:Person>
       <foaf:name>Tom van der Woerdt</foaf:name>
       <foaf:mbox rdf:resource="mailto:tom.vanderwoerdt@booking.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
     </foaf:Person>
   </helper>
   <helper>
@@ -206,6 +230,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.98</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-22</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.99</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-29</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

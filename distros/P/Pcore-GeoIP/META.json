@@ -53,7 +53,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Geo::IP" : "v1.45.0",
             "Pcore" : "v0.22.2"
          }
       }
@@ -70,6 +69,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-geoip/overview"
       }
    },
-   "version" : "v1.3.5",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "v1.4.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

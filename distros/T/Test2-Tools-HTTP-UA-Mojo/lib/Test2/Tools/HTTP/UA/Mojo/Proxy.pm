@@ -5,7 +5,7 @@ use warnings;
 use Mojo::Base 'Mojo::UserAgent::Proxy';
 
 # ABSTRACT: Proxy class for Test2::Tools::HTTP::UA::Mojo
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 has 'apps';
@@ -40,7 +40,7 @@ Test2::Tools::HTTP::UA::Mojo::Proxy - Proxy class for Test2::Tools::HTTP::UA::Mo
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

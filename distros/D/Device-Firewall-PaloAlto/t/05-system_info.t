@@ -2,19 +2,17 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 5;
+use Test::More tests => 3;
 use Device::Firewall::PaloAlto::API;
 use Device::Firewall::PaloAlto::Op::SysInfo;
 
-open(my $fh, '<:encoding(UTF8)', './t/xml/05-system_info.t.xml') or BAIL_OUT('Could not open XML file');
+use lib 't/lib';
+use Local::TestSupport qw(pseudo_api_call);
 
-ok( $fh, 'XML file' ); 
-my $xml = do { local $/ = undef, <$fh> };
-ok( $xml, 'XML response' );
-
-my $api = Device::Firewall::PaloAlto::API::_check_api_response($xml);
-
-my $sysinfo = Device::Firewall::PaloAlto::Op::SysInfo->_new($api);
+my $sysinfo = pseudo_api_call(
+    './t/xml/op/system_info/system_info.xml', 
+    sub { Device::Firewall::PaloAlto::Op::SysInfo->_new(@_) }
+);
 
 isa_ok( $sysinfo, 'Device::Firewall::PaloAlto::Op::SysInfo' );
 

@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-HTTP-UA-Mojo
 
+0.04      2019-05-15 21:12:09 -0600
+  - Fix compatability with latest version of Test2::Suite (gh#2)
+
 0.03      2018-06-04 07:16:20 -0400
   - Bump requirement of Mojolicious::Plugin::MountPSGI to 0.13 (eserte++ gh#1)
 

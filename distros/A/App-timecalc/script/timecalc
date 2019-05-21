@@ -1,0 +1,207 @@
+#!perl
+
+## no critic (InputOutput::RequireBriefOpen)
+
+our $DATE = '2019-05-18'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+sub get_options {
+    require Getopt::Long;
+
+    my %opts;
+    Getopt::Long::GetOptions(
+        '--help|h|?', \$opts{help},
+        '--version|v', \$opts{version},
+
+    );
+
+    if ($opts{help}) {
+        print <<_;
+Usage:
+  timecalc [OPTIONS]
+
+Options:
+  --help, -h, -?
+  --version, -v
+_
+        exit 0;
+    } elsif ($opts{version}) {
+        say "timecalc version $::VERSION";
+        exit 0;
+    }
+}
+
+sub eval_loop {
+    require App::timecalc;
+    require File::HomeDir;
+    require IO::Stty;
+    require Term::ReadLine;
+
+    my $term = Term::ReadLine->new('timecalc');
+    my $prompt = "> ";
+    my $OUT = $term->OUT || \*STDOUT;
+
+    my $histfile = File::HomeDir->my_home . "/.timecalc_history";
+
+    # load history from file
+    if ($term->Features->{setHistory} && (-r $histfile)) {
+        #$log->tracef("Loading history from %s ...", $histfile);
+        open(my $fh, '<', $histfile)
+            or die "Can't open history file $histfile: $!\n";
+        chomp(my @history = <$fh>);
+        $term->SetHistory(@history);
+    }
+
+    my $sub_save_hist = sub {
+        require List::Util::Uniq;
+        if ($term->Features->{getHistory}) {
+            my $fh;
+            if (open $fh, ">", $histfile) {
+                print $fh "$_\n" for
+                    List::Util::Uniq::uniq_adj(
+                        grep { length } $term->GetHistory
+                    );
+            }
+        }
+    };
+
+    local $SIG{INT} = sub {
+        # save history when we are interrupted
+        $sub_save_hist->();
+        print STDERR "Interrupted\n";
+        if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+            IO::Stty::stty(\*STDIN, 'echo');
+        }
+        exit 1;
+    };
+
+    #local $SIG{__DIE__} = sub {
+    #    IO::Stty::stty(\*STDIN, 'echo');
+    #    die @_;
+    #};
+
+    # some workaround for Term::ReadLine
+    my $attribs = $term->Attribs;
+    if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+        # TR::Gnu traps our INT handler
+        # ref: http://www.perlmonks.org/?node_id=1003497
+        $attribs->{catch_signals} = 0;
+    } elsif ($term->ReadLine eq 'Term::ReadLine::Perl') {
+        # TR::Perl messes up colors
+        # doesn't do anything?
+        #$term->ornaments(0);
+        #$attribs->{term_set} = ["", "", "", ""];
+    }
+
+    while ( defined ($_ = $term->readline($prompt)) ) {
+        my $res;
+        if ($_ eq 'help' || $_ eq '?') {
+            say "Type time expression into the prompt, e.g.: 19:10-20:45 -00:05.";
+            say "For more details on available features, 'man timecalc'.";
+            say "";
+            next;
+        } elsif ($_ eq 'exit' || $_ eq 'quit') {
+            last;
+        }
+        eval { $res = App::timecalc::eval_time_expr($_) };
+        if ($@) {
+            warn "Error: $@\n";
+        } else {
+            print $OUT $res, "\n";
+        }
+        # double?
+        #$term->addhistory($_) if /\S/;
+    }
+
+    $sub_save_hist->();
+}
+
+### main
+
+get_options();
+eval_loop();
+
+# ABSTRACT: Time calculation
+# PODNAME: timecalc
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+timecalc - Time calculation
+
+=head1 VERSION
+
+This document describes version 0.001 of timecalc (from Perl distribution App-timecalc), released on 2019-05-18.
+
+=head1 SYNOPSIS
+
+ % timecalc
+
+ > +01:20
+ +01:20
+
+ > +01:20 -00:30
+ +00:50
+
+ > +01:00 17:00-18:10
+ +02:10
+
+ > +01:00 17:00-18:10 19:30-19:45 -00:04
+ +02:21
+
+=head1 DESCRIPTION
+
+This is a command-line utility to perform time calculations. Currently it
+undestands a combination of:
+
+ +hh:mm
+ -hh:mm
+ hh:mm - hh:mm
+
+=head1 FAQ
+
+=head1 FILES
+
+=head2 ~/.timecalc_history
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-timecalc>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-timecalc>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-timecalc>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<datecalc>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

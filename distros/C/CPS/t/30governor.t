@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use CPS qw( gkwhile gkforeach );
 use CPS::Governor::Simple;
@@ -18,3 +19,5 @@ $count = 0;
 gkforeach( $gov, [ 1 .. 5 ], sub { ++$count; $_[1]->() }, sub {} );
 
 is( $count, 5, '$count is 5 after gkforeach' );
+
+done_testing;

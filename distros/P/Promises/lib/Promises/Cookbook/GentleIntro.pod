@@ -12,13 +12,13 @@ Promises::Cookbook::GentleIntro - All you need to know about Promises
 
 =head1 VERSION
 
-version 0.99
+version 1.00
 
 =head1 All you need to know about Promises
 
 =encoding utf8
 
-If you have every done any async programming, you will be familiar with
+If you have ever done any async programming, you will be familiar with
 "callback hell", where one callback calls another, calls another, calls
 another... Promises give us back a top-to-bottom coding style, making async
 code easier to manage and understand. It looks like synchronous code, but
@@ -242,9 +242,7 @@ exception or rethrow it.
     ->then(
         sub {
             my $count = shift;
-            if ( $count > 100 ) {
-                die "Count too high!"
-            }
+            die "Count too high!" if $count > 100;
             return $count
         }
     )->then(
@@ -257,12 +255,9 @@ exception or rethrow it.
             warn "We have a problem: $error";
             die $error;
         }
-    )
     )->then(
         undef,  # no resolved handler
-        sub {
-            return 1;
-        }
+        sub { return 1; }
     )-> then(
         sub {
             my $count = shift;
@@ -494,7 +489,7 @@ which uses L<Promises> will automatically use the specified backend.
 =head2 Recursing safely with with C<done()>
 
 One of the cool things about working with promises is that the return value
-gets passed down the chain as if we the code were synchronous. However that is
+gets passed down the chain as if the code were synchronous. However that is
 not always what we want.
 
 Imagine that we want to process every line in a file, which could be millions
@@ -618,7 +613,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2019, 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

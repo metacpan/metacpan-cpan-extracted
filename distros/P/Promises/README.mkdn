@@ -4,7 +4,7 @@ Promises - An implementation of Promises in Perl
 
 # VERSION
 
-version 0.99
+version 1.00
 
 # SYNOPSIS
 
@@ -218,7 +218,7 @@ cookbook entry below.
 
 - `resolved( @values )`
 
-    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) resolved with 
+    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) resolved with
     the provided `@values`. Purely a shortcut for
 
     ```perl
@@ -228,7 +228,7 @@ cookbook entry below.
 
 - `rejected( @values )`
 
-    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) rejected with 
+    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) rejected with
     the provided `@values`. Purely a shortcut for
 
     ```perl
@@ -241,7 +241,7 @@ cookbook entry below.
     Accepts a list of [Promises::Promise](https://metacpan.org/pod/Promises::Promise) objects and then
     returns a [Promises::Promise](https://metacpan.org/pod/Promises::Promise) object which will be called
     once all the `@promises` have completed (either as an error
-    or as a success). 
+    or as a success).
 
     The eventual result of the returned promise
     object will be an array of all the results of each
@@ -250,7 +250,7 @@ cookbook entry below.
     at least one of the promises fail.
 
     If `collect` is passed a value that is not a promise, it'll be wrapped
-    in an arrayref and passed through. 
+    in an arrayref and passed through.
 
     ```perl
     my $p1 = deferred;
@@ -270,7 +270,7 @@ cookbook entry below.
 - `collect_hash( @promises )`
 
     Like `collect`, but flatten its returned arrayref into a single
-    hash-friendly list. 
+    hash-friendly list.
 
     `collect_hash` can be useful to a structured hash instead
     of a long list of promise values.
@@ -320,7 +320,7 @@ cookbook entry below.
     Note that all promise values of the key/value pairs passed to `collect_hash`
     must return a scalar or nothing, as returning more than one value would
     mess up the returned hash format. If a promise does return more than
-    one value, `collect_hash` will consider it as having failed. 
+    one value, `collect_hash` will consider it as having failed.
 
     If you know that a
     promise can return more than one value, you can do:
@@ -342,13 +342,23 @@ cookbook entry below.
 - [Promises/A+ spec](http://promises-aplus.github.io/promises-spec/)
 - [Promises/A spec](http://wiki.commonjs.org/wiki/Promises/A)
 
+## Perl Alternatives
+
+- [Future](https://metacpan.org/pod/Future)
+- [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise)
+
+    Part of the [Mojolicious](https://metacpan.org/pod/Mojolicious) package.
+
+- [Promise::ES6](https://metacpan.org/pod/Promise::ES6)
+- [Promise::Tiny](https://metacpan.org/pod/Promise::Tiny)
+
 # AUTHOR
 
 Stevan Little <stevan.little@iinteractive.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2019, 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

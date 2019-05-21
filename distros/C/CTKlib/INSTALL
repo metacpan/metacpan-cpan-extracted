@@ -6,18 +6,31 @@ INSTALLATION INSTRUCTIONS
     make install
     make clean
 
-DIST CREATING
+INSTALLATION ON UBUNTU 16.04 AND ABOVE
 
-    perl Makefile.PL
-    make
-    make test
-    make tardist
-    make clean
+    apt update
+    apt upgrade
+    apt-get install gcc
+    apt-get install libclass-c3-adopt-next-perl libconfig-general-perl libdbi-perl \
+      libfile-copy-recursive-perl libio-all-perl libjson-perl libjson-xs-perl \
+      libscalar-list-utils-perl libemail-mime-encodings-perl libmime-lite-perl \
+      libmro-compat-perl libtext-simpletable-perl libtry-tiny-perl liburi-perl \
+      libxml-simple-perl libyaml-perl libyaml-libyaml-perl libsys-sigaction-perl \
+      libtest-simple-perl
+    cpan install CTK
+
+INSTALLATION ON CENTOS LINUX 7.5 AND ABOVE
+
+    yum update
+    yum install epel-release
+    yum install perl-CPAN perl-Config-General perl-Encode perl-DBI \
+      perl-ExtUtils-MakeMaker perl-File-Copy-Recursive perl-File-Temp \
+      perl-JSON-XS perl-MRO-Compat perl-PathTools perl-Perl-OSType perl-Test-Simple \
+      perl-Time-HiRes perl-Try-Tiny perl-YAML
+    cpan install CTK
 
 CREATE NEW VERSION (FOR DEVELOPER ONLY)
 
-    * README         -- In documentation
+    * README         -- pod2readme lib/CTK.pm
     * CHANGES        -- Result of command: gmtime | gclip
     * lib/CTK.pm     -- In documentation (VERSION) & in code $VERSION
-    * bin/ctklib     -- In documentation (VERSION)
-    * t/01-use.t     -- In test case

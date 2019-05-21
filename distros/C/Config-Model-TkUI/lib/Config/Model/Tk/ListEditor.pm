@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::ListEditor;
-$Config::Model::Tk::ListEditor::VERSION = '1.369';
+package Config::Model::Tk::ListEditor 1.370;
+
 use strict;
 use warnings;
 use Carp;
@@ -27,7 +27,7 @@ my @fxe1   = qw/-fill x    -expand 1/;
 my @fx     = qw/-fill    x /;
 my $logger = Log::Log4perl::get_logger("Tk::ListEditor");
 
-my ( $up_img, $down_img, $rm_img, $eraser_img, $remove_img, $sort_img );
+my ( $up_img, $down_img, $eraser_img, $remove_img, $sort_img );
 *icon_path = *Config::Model::TkUI::icon_path;
 
 my $entry_width = 20;
@@ -187,7 +187,6 @@ sub reset_value {
           $cargo_type eq 'leaf'
         ? $list->fetch_all_values( check => 'no' )
         : $list->fetch_all_indexes;
-    map { $_ = '<undef>' unless defined $_ } @insert;
     $cw->{tklist}->insert( end => @insert );
 
     return ( $cargo_type, \@insert );
@@ -497,14 +496,8 @@ sub remove_selection {
     $cw->{store_cb}->();
 
     # redraw the list content
-    $tklist->delete( 0, 'end' );
-    my $cargo_type = $list->cargo_type;
-    my @insert =
-          $cargo_type eq 'leaf'
-        ? $list->fetch_all_values( check => 'no' )
-        : $list->fetch_all_indexes;
-    map { $_ = '<undef>' unless defined $_ } @insert;
-    $tklist->insert( end => @insert );
+    $cw->reset_value;
+
     $cw->update_warning($list);
 }
 

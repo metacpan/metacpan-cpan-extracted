@@ -99,11 +99,11 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.69",
+   "version" : "1.73",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
-      "Roy Storey",
+      "Roy Storey (KIWIROY)",
       "Ilya Pavlov",
       "David Mertens (run4flat)",
       "Mark Nunberg (mordy, mnunberg)",

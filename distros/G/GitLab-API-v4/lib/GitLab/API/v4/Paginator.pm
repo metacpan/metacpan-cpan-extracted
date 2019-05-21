@@ -1,7 +1,5 @@
 package GitLab::API::v4::Paginator;
-use 5.010001;
-use strictures 2;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =encoding utf8
 
@@ -17,11 +15,12 @@ simplifies things a bit.
 
 =cut
 
-use Types::Standard -types;
-use Types::Common::String -types;
 use Carp qw( croak );
+use Types::Common::String -types;
+use Types::Standard -types;
 
 use Moo;
+use strictures 2;
 use namespace::clean;
 
 =head1 REQUIRED ARGUMENTS
@@ -223,9 +222,9 @@ See L<GitLab::API::v4/SUPPORT>.
 
 See L<GitLab::API::v4/AUTHORS>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-See L<GitLab::API::v4/LICENSE>.
+See L<GitLab::API::v4/COPYRIGHT AND LICENSE>.
 
 =cut
 

@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001074';
+our $VERSION = '0.001076';
 
 use Carp qw/croak confess/;
 use List::Util qw/first/;
@@ -79,12 +79,12 @@ sub output_filenames {
 
     my $dir = $self->{+DIR};
 
-    my $in_file    = File::Spec->catfile($dir, 'stdin');
-    my $out_file   = File::Spec->catfile($dir, 'stdout');
-    my $err_file   = File::Spec->catfile($dir, 'stderr');
-    my $event_file = File::Spec->catfile($dir, 'events.jsonl');
+    my $in_file   = File::Spec->catfile($dir, 'stdin');
+    my $out_file  = File::Spec->catfile($dir, 'stdout');
+    my $err_file  = File::Spec->catfile($dir, 'stderr');
+    my $event_dir = File::Spec->catfile($dir, 'events');
 
-    return ($in_file, $out_file, $err_file, $event_file);
+    return ($in_file, $out_file, $err_file, $event_dir);
 }
 
 1;

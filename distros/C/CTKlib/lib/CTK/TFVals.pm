@@ -1,5 +1,8 @@
-package CTK::TFVals; # $Id: TFVals.pm 192 2017-04-28 20:40:38Z minus $
+package CTK::TFVals; # $Id: TFVals.pm 222 2019-05-01 14:44:03Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ CTK::TFVals - True & False values conversions
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -205,11 +208,25 @@ This function returns true if argument value >= 0 && < 2**$x
 
     is_intx( $value, $x );
 
+=item B<is_void>
+
+    print "Void" if is_void({});
+
+Returns true if the structure contains useful data.
+Useful data - this data is different from the value undef
+
+=item B<isnt_void>, B<is_not_void>
+
+    print "NOT Void" if isnt_void({foo=>undef});
+
+Returns true if the structure does not contain any nested useful data.
+Useful data - this data is different from the value undef
+
 =back
 
 =head2 TAGS
 
-=head3 ALL
+=head3 :ALL
 
 Export all subroutines:
 
@@ -222,58 +239,71 @@ L</"tv2int8">, L</"is_int8">,
 L</"tv2int16">, L</"is_int16">,
 L</"tv2int32">, L</"is_int32">,
 L</"tv2int64">, L</"is_int64">,
-L</"tv2intx">, L</"is_intx">
+L</"tv2intx">, L</"is_intx">,
+L</"is_void">, L</"isnt_void">, L</"is_not_void">
 
-=head3 DEFAULT
+=head3 :DEFAULT
 
 L</"uv2zero">, L</"uv2null">, L</"uv2empty">, L</"uv2void">,
 L</"fv2undef">, L</"fv2zero">, L</"fv2null">, L</"fv2empty">, L</"fv2void">,
 L</"tv2num">, L</"tv2int">, L</"tv2flt">
 
-=head3 UNDEF
+=head3 :UNDEF
 
 L</"uv2zero">, L</"uv2null">, L</"uv2empty">, L</"uv2void">
 
-=head3 FALSE
+=head3 :FALSE
 
 L</"fv2undef">, L</"fv2zero">, L</"fv2null">, L</"fv2empty">, L</"fv2void">
 
-=head3 TRUE
+=head3 :TRUE
 
 L</"tv2num">, L</"tv2number">, L</"tv2flt">, L</"tv2float">, L</"tv2int">,
 L</"tv2int8">, L</"tv2int16">, L</"tv2int32">, L</"tv2int64">, L</"tv2intx">
 
-=head3 CHCK
+=head3 :CHCK, :CHECK
 
 L</"is_num">, L</"is_flt">, L</"is_int">, L</"is_int8">, L</"is_int16">,
-L</"is_int32">, L</"is_int64">, L</"is_intx">
+L</"is_int32">, L</"is_int64">, L</"is_intx">,
+L</"is_void">, L</"isnt_void">, L</"is_not_void">
 
-=head1 SEE ALSO
+=head1 HISTORY
 
-L<CTK>
+See C<Changes> file
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 use base qw /Exporter/;
+
+use Carp;
+
+use constant MAX_DEPTH => 32;
 
 # default
 our @EXPORT = (qw/
@@ -293,7 +323,10 @@ our @EXPORT_OK = (qw/
         tv2int32 is_int32
         tv2int64 is_int64
         tv2intx is_intx
+        is_void isnt_void is_not_void
     /);
+
+# Tags
 our %EXPORT_TAGS = (
         DEFAULT  => [@EXPORT],
         ALL      => [@EXPORT_OK],
@@ -310,6 +343,11 @@ our %EXPORT_TAGS = (
             /],
         CHCK     => [qw/
                 is_num is_flt is_int is_int8 is_int16 is_int32 is_int64 is_intx
+                is_void isnt_void is_not_void
+            /],
+        CHECK    => [qw/
+                is_num is_flt is_int is_int8 is_int16 is_int32 is_int64 is_intx
+                is_void isnt_void is_not_void
             /],
     );
 
@@ -429,4 +467,38 @@ sub is_intx($$) {
     return 0;
 }
 
+sub is_void {
+    my $struct = shift;
+    my $depth = fv2zero(shift);
+    return 1 unless defined($struct); # CATCHED! THIS IS REAL UNDEFINED VALUE
+    return 0 if defined($struct) && !ref($struct); # VALUE, NOT REFERENCE
+    if (is_int($depth) && $depth > 0) {
+        croak("Depth value MUST BE between 0 and 255") unless is_int8($depth);
+    } else {
+        croak("Depth value IS NOT integer") unless is_int($depth);
+    }
+    $depth++;
+    return 0 if $depth >= MAX_DEPTH; # Exit from the recursion
+
+    my $t = ref($struct);
+    if ($t eq 'SCALAR') {
+        return is_void($$struct, $depth)
+    } elsif ($t eq 'ARRAY') {
+        for (@$struct) {
+          return 0 unless is_void($_, $depth);
+        }
+        return 1; # DEFINED DATA NOT FOUND - VOID
+    } elsif ($t eq 'HASH') {
+        return 0 if keys(%$struct);
+        return 1; # DEFINED DATA NOT FOUND - VOID
+    }
+
+    # CODE, REF, GLOB, LVALUE, FORMAT, IO, VSTRING and Regexp are not supported here
+    return 0; # NOT VOID
+}
+sub is_not_void {is_void(@_) ? 0 : 1}
+sub isnt_void { goto &is_not_void }
+
 1;
+
+__END__

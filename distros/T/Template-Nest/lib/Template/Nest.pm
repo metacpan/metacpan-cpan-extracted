@@ -6,21 +6,36 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub new{
 	my ($class,%opts) = @_;
-	my $self = {%opts};
 
-	#defaults
-    $self->{comment_delims} = [ '<!--','-->' ] unless $self->{comment_delims};
-    $self->{token_delims} = [ '<%','%>' ] unless $self->{token_delims};
-	$self->{name_label} = 'NAME' unless $self->{name_label};
-    $self->{template_dir} = '' unless defined $self->{template_dir};
-	$self->{template_ext} = '.html' unless defined $self->{template_ext};
-	$self->{show_labels} = 0 unless defined $self->{show_labels};
+
+    # defaults:
+    my $self = {
+        comment_delims => [ '<!--','-->' ],
+        token_delims => [ '<%','%>' ],
+        name_label => 'NAME',
+        template_dir => '',
+        template_ext => '.html',
+        show_labels => 0,
+        defaults => {},
+        defaults_namespace_char => '.',
+        fixed_indent => 0,
+        die_on_bad_params => 1,
+        escape_char => "\\"
+    };
 
 	bless $self,$class;
+
+    if ( %opts ){
+        for my $k (keys %opts){
+            confess "$k is not a valid option" unless defined $self->can($k);
+            $self->$k( $opts{$k} );
+        }
+    }
+
 	return $self;
 }
 
@@ -39,6 +54,36 @@ sub template_hash{
     $self->{template_hash} = $template_hash if $template_hash;
     return $self->{template_hash};
 }
+
+
+sub defaults{
+    my ($self,$defaults) = @_;
+
+    if ( $defaults ){
+
+        confess "defaults should be a hashref" unless ref $defaults eq ref {};
+        $self->{defaults} = $defaults;
+
+    }
+
+    return $self->{defaults};
+}
+
+
+sub defaults_namespace_char{
+    my ($self,$char) = @_;
+
+    if ( defined $char ){
+        if ( $char eq '' ){
+            $self->{defaults_namespace_char} = '';
+        } else {
+            confess "defaults_namespace_char should be a single character or ''" unless $char =~ /./;
+            $self->{defaults_namespace_char} = $char;
+        }
+    }
+
+    return $self->{defaults_namespace_char};
+}
 	
 
 sub comment_delims{
@@ -55,11 +100,17 @@ sub token_delims{
     my ($self,$delim1,$delim2) = @_;
     
     if (defined $delim1 ){
-        $delim2 = $delim2 || '';
+
+        if ( ref $delim1 eq ref [] ){
+            ($delim1,$delim2) = @$delim1;
+        }
+
+        $delim2 ||= '';
         $self->{'token_delims'} = [ $delim1, $delim2 ];
     }
     return $self->{'token_delims'};
 }
+
 
 
 sub show_labels{
@@ -84,6 +135,44 @@ sub name_label{
 	$self->{name_label} = $label if $label;
 	return $self->{name_label};
 }
+
+
+sub fixed_indent{
+    my ($self,$indent) = @_;
+
+    if ( defined $indent ){
+        confess "Expected 0 or 1 but got $indent" unless $indent == 0 or $indent == 1;
+        $self->{fixed_indent} = $indent;
+    }
+
+    return $self->{fixed_indent};
+}
+
+
+sub die_on_bad_params{
+    my ($self,$should_die) = @_;
+
+    if ( defined $should_die ){
+        confess "Expected 0 or 1 but got $should_die" unless $should_die == 0 or $should_die == 1;
+        $self->{die_on_bad_params} = $should_die;
+    }
+
+    return $self->{die_on_bad_params};
+}
+
+
+
+sub escape_char{
+    my ($self,$char) = @_;
+
+    if (defined $char){
+        confess "escape_char should be a single character or ''" unless $char eq '' or $char =~ /./;
+        $self->{escape_char} = $char;
+    }
+
+    return $self->{escape_char};
+}
+
 
 
 sub render{
@@ -140,7 +229,7 @@ sub _render_hash{
 sub _render_array{
 
     my ($self, $arr, $delim) = @_;
-    die "Expected an array. Instead got a ".ref($arr) unless ref($arr) =~ /array/i;
+    confess "Expected an array. Instead got a ".ref($arr) unless ref($arr) =~ /array/i;
     my $html = '';
     foreach my $comp (@$arr){
         $html.= $delim if ($delim && $html);
@@ -149,6 +238,7 @@ sub _render_array{
     return $html;
 
 }
+
 
 
 sub _get_template{
@@ -165,7 +255,7 @@ sub _get_template{
         );
 
         my $fh;
-        open $fh,'<',$filename or die "Could not open file $filename: $!";
+        open $fh,'<',$filename or confess "Could not open file $filename: $!";
 
         my $text = '';
         while( my $line = <$fh> ){
@@ -174,55 +264,167 @@ sub _get_template{
 
     }
 
+    $template =~ s/\n$//;
     return $template;
 }
 
 
 
 
+sub params{
+    my ($self,$template_name) = @_;
 
-sub _fill_in{
-    my ($self,$template_name,$template,$param) = @_;
-
-
+    my $template = $self->_get_template( $template_name );
     my @frags = split( /\\\\/, $template );
     my $tda = $self->{token_delims}[0];
     my $tdb = $self->{token_delims}[1];
 
-    foreach my $param_name (keys %$param){
+    my %rem;
+    for my $i (0..$#frags){
+        my @f = $frags[$i] =~ m/(?<!\\)$tda(.*?)$tdb/g;
+        for my $f ( @f ){
+            $f =~ s/^\s*//;
+            $f =~ s/\s*$//;
+            $rem{$f} = 1;
+        }
+    }
+    
+    my @params = sort(keys %rem);
+    return \@params;
+}
+
+
+
+
+sub _fill_in{
+    my ($self,$template_name,$template,$param) = @_;
+    # this sub has grown a little unwieldy
+    # but doesn't break naturally
+    # TODO re-param and break up (if it gets any bigger?)
+
+    my $esc = $self->{escape_char};
+    my @frags;
+
+    if ( $esc ){
+        @frags = split( /\Q$esc$esc\E/, $template );
+    } else {
+        @frags = ( $template );
+    }
+
+    my $tda = $self->{token_delims}[0];
+    my $tdb = $self->{token_delims}[1];
+
+    # first, attempt to replace the parameters we were provided
+    foreach my $param_name (keys %$param){ 
 
         my $param_val = $param->{$param_name};
         
         my $replaced = 0;
+
+        if ( $self->{fixed_indent} ){ #if fixed_indent we need to add spaces during the replacement
+            for my $i (0..$#frags){
+                my @spaces_repl;
+                if ( $esc ){
+                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(?<!\Q$esc\E)($tda\s+$param_name\s+$tdb)/g;
+                } else {
+                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)($tda\s+$param_name\s+$tdb)/g;
+                }
+
+                while(@spaces_repl){
+                    my $sp = shift @spaces_repl;
+                    my $repl = shift @spaces_repl;
+                    my $param_out = $param_val;
+                    $param_out =~ s/\n/\n$sp/g;
+
+                    if ( $esc ){
+                        $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)$repl/$param_out/;
+                    } else {
+                        $replaced = 1 if $frags[$i] =~ s/$repl/$param_out/;
+                    }
+                }
+            }
+        } else { #if no fixed_indent global search/replace is probably quicker
+            for my $i (0..$#frags){
+                if ( $esc ){
+                    $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s+$param_name\s+$tdb/$param_val/g;
+                } else {
+                    $replaced = 1 if $frags[$i] =~ s/$tda\s+$param_name\s+$tdb/$param_val/g;
+                }
+            }
+        }
+
+        if ( $self->{die_on_bad_params} ){
+            confess "Could not replace template param '$param_name': token does not exist in template '$template_name'" unless $replaced;
+        }
+    }
+
+    # now handle remaining, unreplaced tokens
+    if ( %{$self->{defaults}} ){
+        # defaults were provided, so we need to find out if any tokens match defaults
+        my $char = $self->{defaults_namespace_char};
         for my $i (0..$#frags){
 
-            $replaced = 1 if $frags[$i] =~ s/(?<!\\)$tda\s*$param_name\s*$tdb/$param_val/g;
+            my @rem = $frags[$i] =~ m/(?<!\\)$tda\s+(.*?)\s+$tdb/g;
+            my %rem;
+            for my $name ( @rem ){;
+#                $name =~ s/^\s*//;
+#                $name =~ s/\s*$//;
+                $rem{$name} = 1
+            }
 
+            for my $name (keys %rem){
+                my @parts = ( $name );
+                @parts = split( /\Q$char\E/, $name ) if $char;
+                my $val = $self->_get_default_val($self->{defaults},@parts);
+                $frags[$i] =~ s/(?<!\\)$tda\s+$name\s+$tdb/$val/;
+            }
+            
+            if ( $esc ){
+                $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s.*?\s$tdb//g;
+            } else {
+                $frags[$i] =~ s/$tda\s.*?\s$tdb//g;
+            }
         }
-        confess "Could not replace template param '$param_name': token does not exist in template '$template_name'" unless $replaced;
 
+    } else {
+
+        # we don't have any defaults, so quicker to directly remove any params that weren't specified
+        for my $i (0..$#frags){
+            if ( $esc ){
+                $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s.*?\s$tdb//g;
+            } else {
+                $frags[$i] =~ s/$tda\s.*?\s$tdb//g;
+            }
+        }
     }
 
-    # replace any params that weren't specified with ''
-    for my $i (0..$#frags){
 
-        $frags[$i] =~ s/(?<!\\)$tda.*?$tdb//g;
-
+    if ( $esc ){
+        for my $i (0..$#frags){
+            $frags[$i] =~ s/\Q$esc\E//gs;
+        }
     }
 
-    for my $i (0..$#frags){
-        $frags[$i] =~ s/\\//gs;
-    }
 
-    my $text = join('\\',@frags);
-
+    my $text = $esc? join($esc,@frags): $frags[0];
     return $text;
-
 }
 
     
-    
 
+sub _get_default_val{
+    my ($self,$ref,@parts) = @_;
+
+    if ( @parts == 1 ){
+        my $val = $ref->{$parts[0]} || '';
+        return $val;
+    } else {
+        my $ref_name = shift @parts;
+        my $new_ref = $ref->{ $ref_name };
+        return '' unless $new_ref;
+        return $self->_get_default_val( $new_ref, @parts );
+    }
+}
 
 
 
@@ -276,7 +478,8 @@ Template::Nest - manipulate a generic template structure via a perl hash
 	};
 
 	my $nest = Template::Nest->new(
-		template_dir => '/html/templates/dir'
+		template_dir => '/html/templates/dir',
+        fixed_indent => 1
 	);
 
 	print $nest->render( $page );
@@ -307,72 +510,136 @@ Template::Nest - manipulate a generic template structure via a perl hash
 
 =head1 DESCRIPTION
 
-This is L<HTML::Template::Nest>, but the dependency on C<HTML::Template> is dropped, and the module is made generic (ie not specific to C<HTML>) for the following reasons:
+There are a wide number of templating options out there, and many are far more longstanding than L<Template::Nest>. However, his module takes a different approach to many other systems, and in the author's opinion this results in a better separation of "control" from "view".
 
-=over
+The philosophy behind this module is simple: don't allow any processing of any kind in the template. Treat templates as dumb pieces of text which only have holes to be filled in. No template loops, no template ifs etc. Regard ifs and loops as control processing, which should be in your main code and not in your templates.
 
-=item 1
+One effect of this is to make your templates language independent. If you use L<Text::Template> then you embed Perl inside your template, which would make using the same templates on e.g. a Java based system impossible. If you use one of the many modules that have invented their own templating "language" - such as Template Toolkit - you are going to have to learn that language I<as well as> having the language dependence problem.
 
-Given L<HTML::Template::Nest> only uses the C<TMPL_VAR> parameter from L<HTML::Template>, hauling around the rest of L<HTML::Template> is unnecessary baggage
+Worse than that, if you can have processing inside your template, how do you decide which goes where? Exactly what criteria do you use to decide what should be "template processing" and what should be "program processing"? How easy is it then going to be for a newcomer to understand how your system works with logic spread all over the place?
 
-=item 2
+Lets go one step further to hammer home the point. Say you use Template Toolkit to template HTML. What kind of file is your template? Well, it's a C<.tt2>. What is that exactly? Well it's not an .html file, and nor is it a program. If you want visibility on what's in it, you're going to have to pick your way through the code, because you can't run it standalone, and it won't display in a browser.
 
-There's no reason to restrict this to C<HTML> either in name or function - this is a system of combining templates, which can be of any arbitrary format
+Indeed if templates have any kind of processing at all on board, I put it to you that they B<aren't templates> at all. (You wouldn't call a PHP script a template, would you?)
 
-=back
+The L<Template::Nest> philosophy is that if you are templating something, your templates should be little chunks of that something, and nothing more. So when templating html, each template should be a standalone chunk of html, you can save it with file extension .html, and you can go ahead and display it standalone in a browser. 
+
+Personally I have never liked complex templating systems like Mason, Template Toolkit etc. - I am forced to put up with them because of their near-ubiquity, but in my experience their usage often leads to some truly outrageous messes. I don't think this is surprising, because with processing in your template, how can you really have MVC? "Control" and "View" are not separate.
 
 
-Let me take a moment to explain why I think L<Template::Nest> is the I<only> templating system that makes any sense.
+=head2 L<Template::Nest> vs L<HTML::Template::Nest> vs L<HTML::Template>
 
-The description for L<Text::Template> says the following in the C<Philosophy> section:
+I initially chose L<HTML::Template> for my own projects because it can be used simply with the C<TMPL_VAR> tag. Slot all your templates together in your code, fill in the template parameters, and you have a straightforward templating system which doesn't violate MVC.
 
-"When people make a template module like this one, they almost always start by inventing a special syntax for substitutions. For example, they build it so that a string like %%VAR%% is replaced with the value of $VAR. Then they realize the need extra formatting, so they put in some special syntax for formatting. Then they need a loop, so they invent a loop syntax. Pretty soon they have a new little template language.
+So I originally wrote L<HTML::Template::Nest> as a wrapper around L<HTML::Template>. But since L<HTML::Template::Nest> only uses the C<TMPL_VAR> tag (and not C<TMPL_LOOP>, C<TMPL_IF> etc.) why bother with the L<HTML::Template> dependency at all? So L<Template::Nest> was born.
 
-This approach has two problems: First, their little language is crippled. If you need to do something the author hasn't thought of, you lose. Second: Who wants to learn another language? You already know Perl, so why not use it?"
+(It is not recommended to use the old L<HTML::Template::Nest> module any more.)
 
-These paragraphs agree with the philosophy of L<Template::Nest>, in that you shouldn't need to invent a new language to fill in templates. However, the L<Text::Template> description continues:
 
-"Text::Template templates are programmed in Perl. You embed Perl code in your template, with { at the beginning and } at the end."
+=head1 WHAT'S NEW IN v0.05?
 
-At this point the philosophy behind L<Text::Template> and L<Template::Nest> part ways. In the L<Template::Nest> philosophy I<templates are not "programmed" at all>. There should never be any code "embedded" in any template. Furthermore I<it is not a template if it has processing embedded in it>.
+=head2 Preloading of defaults
 
-The L<Template::Nest> philosophy has the following:
+I want to keep this module lightweight and simple, but one minor irritation with C<v0.04> and below is lack of any means to provide defaults. Often you have template parameters you want to take directly from some centralised config, so in C<v0.04> and below you would need to do:
 
-=over
+    my $config = get_config_from_somewhere();
 
-=item 1
+    my $output1 = $nest->render({
+        'NAME' => 'some_template',
+        'config.variable1' => $config->{variable1},
+        'config.variable2' => $config->{variable2}
+    });
 
-Templates are nothing other than dull, inanimate pieces of text with holes in them to fill in, similar to children's colouring templates
+    my $output2 = $nest->render({                   
+        'NAME' => 'some_template',
+        'config.variable1' => $config->{variable1},  # same crap all over again
+        'config.variable2' => $config->{variable2}   # and it was annoying enough
+    });                                              # the first time
+        
+Obviously this is tedious and a deal-breaker for a larger project. So C<v0.05> allows you to preload config variables thus:
 
-=item 2
+    my $config = get_config_from_somewhere();
 
-Templates have no intelligence and are not capable of formatting text, testing conditions or performing loops. This stuff is I<control> processing and should not occur in the template. Given that you already have text formatting, conditional processing and loops in the body of your code, why have any in your "template"? And how do you decide which of this processing goes in your template and which in the body of your code?
+    $nest->defaults( $config );
 
-=item 3
+    my $output1 = $nest->render({
+        NAME => 'some_template'
+        
+        # no need for anything here
 
-By virtue of the above points, templates should be I<language independent>. They should not care which language is used to fill them in. You should be able to port your template library over from perl to python to java etc. without needing to rewrite anything in the library, such that they combine together in the same way to give the original output.
+    });
 
-=back
+    # ... etc.
 
-I suggest that I<there is only one way> to solve the problem which adheres to points 1 to 3 (above). The overall template structure I<must> be provided to a builder which recursively fills in the template variables I<from the outside>. 
+See C<defaults> below for more details.
 
-Just like a database, there must be only one particular "schema" of templates which suits a given situation (it must satisfy similar logical rules, such as "one table has many table rows" etc). And there is no room for variation within the templates, since they contain no processing. Thus there is only one way to solve the problem.
 
-Thus C<Template::Nest> is the I<only templating system which makes sense>.
+=head2 Maintaining indent
 
-=over
+In C<v0.04> if you had:
 
-=item *
+ # template_1
+ <div>
+      <% contents %>
+ </div>
 
-Specify the structure including conditionals, loops, formatting in I<the code>.
+ # template_2
 
-=item *
+ <strong>
+      TO INFINITY AND BEYOND!
+ </strong>
+ 
+and then you did
 
-Create all the templates that are needed so they can be repeated where necessary and filled in recursively
+ $nest->render({
+    NAME => 'template_1',
+    contents => {
+        NAME => 'template_2'
+    }
+ });
 
-=back
+You would get:
 
-=head2 An example
+ <div>
+      <strong>
+     TO INFINITY AND BEYOND
+ </strong>
+ </div>
+
+Note the indenting. Not pretty! (However this is completely accurate in terms of replacing the C<contents> token; no extra characters are added or removed during the replacement)
+
+So now you can 
+
+ $nest->fixed_indent(1);
+
+with the result:
+
+ <div>
+     <strong>
+          TO INFINITY AND BEYOND!
+     </strong>
+ </div>
+
+Be aware this involves left padding nested templates so that each new line in the nested template gets the same spacing as the token it was replacing. ie space characters are added in during the replacement.
+
+
+=head2 Inspect template parameters
+
+L<HTML::Template> allows you to ask what parameters are in a template. L<Template::Nest> now has the same capability via the C<params> method.
+
+
+=head2 better escaping
+
+C<v0.04> assumed you wanted to use a backslash as an escape character. In v<0.05> you can choose a different character, or switch off escaping altogether. See the L<escape_char> method.
+
+
+=head2 allow parameters which don't exist
+
+L<Template::Nest> C<v0.04> assumes you want to drop out with an error if you try and populate a template with a parameter (name) that doesn't exist. In C<v0.05> you can set it to ignore parameters that don't exist. See L<die_on_bad_params>.
+
+
+
+=head1 AN EXAMPLE
 
 Lets say you have a template for a letter (if you can remember what that is!), and a template for an address. Using L<HTML::Template> you might do something like this:
 
@@ -534,120 +801,9 @@ Now the processing is entirely in the Perl. Of course, if you need to fill in yo
 C<Template::Nest> is far simpler, and makes far more sense!
 
 
-=head2 Some differences from L<HTML::Template::Nest>
 
-=over
-
-=item *
-
-L<Template::Nest> introduces the ability to specify templates via a hashref, rather than assuming templates are stored in files in a specific directory. This could be useful if your templates are defined programmatically, or extracted from database fields etc. See the L<template_hash> method for more information.
-
-=item *
-
-L<Template::Nest> allows the tokens (to be replaced) to be specified in arbitrary format. ie. you can have tokens of format C<<% token_name %>>, C<[% token_name %]> - or whatever token delimiters suit your project.
-
-=item *
-
-The ugly C<TMPL_VAR> format of token used in L<HTML::Template> is abandoned - it is unnecessary since the other C<TMPL_IF>, C<TMPL_LOOP> etc. token types are not used. Token delimiters now default to the mason style delimiters (C<<%> and C<%>>) - but any arbitrary token delimiters can be set - see L<token_delims>.
-
-=item *
-
-Some minor renaming has taken place. In C<Html::Template::Nest> there were C<comment_tokens>. Moving forward I want to refer to C<tokens> as the things being replaced in the template. So C<comment_tokens> has become C<comment_delims> (and C<token_delims> has been introduced as above).
-
-=item *
-
-the method C<to_html> has been replaced by C<render> since L<Template::Nest> does not specifically deal with C<html> any more
-
-=back
 
 =head1 METHODS
-
-=head2 new
-
-constructor for a Template::Nest object. 
-
-    my $nest = Template::Nest->new( %opts );
-
-%opts can contain any of the methods Template::Nest accepts. For example you can do:
-
-    my $nest = Template::Nest->new( template_dir => '/my/template/dir' );
-
-or equally:
-
-    my $nest = Template::Nest->new();
-    $nest->template_dir( '/my/template/dir' );
-
-
-=head2 name_label
-
-The default is NAME (all-caps, case-sensitive). Of course if NAME is interpreted as the filename of the template, then you can't use NAME as one of the variables in your template. ie
-
-    <% NAME %>
-
-will never get populated. If you really are adamant about needing to have a template variable called 'NAME' - or you have some other reason for wanting an alternative label point to your template filename, then you can set name_label:
-
-    $nest->name_label( 'GOOSE' );
-
-    #and now
-
-    my $component = {
-        GOOSE => 'name_of_my_component'
-        ...
-    };
-
-
-=head2 show_labels
-
-Get/set the show_labels property. This is a boolean with default 0. Setting this to 1 results in adding comments to the output so you can identify which template output text came from. This is useful in development when you have many templates. E.g. adding 
-
-    $nest->show_labels(1);
-
-to the example in the synopsis results in the following:
-
-    <!-- BEGIN page -->
-    <html>
-        <head>
-            <style>
-                div { 
-                    padding: 20px;
-                    margin: 20px;
-                    background-color: yellow;
-                }
-            </style>
-        </head>
-
-        <body>
-            
-    <!-- BEGIN box -->
-    <div>
-        First nested box
-    </div>
-    <!-- END box -->
-
-    <!-- BEGIN box -->
-    <div>
-        Second nested box
-    </div>
-    <!-- END box -->
-
-        </body>
-    </html>
-    <!-- END page -->
-
-What if you're not templating html, and you still want labels? Then you should set L<comment_delims> to whatever is appropriate for the thing you are templating.
-
-
-=head2 token_delims
-
-Get/set the delimiters that define a token (to be replaced). token_delims is a 2 element arrayref - corresponding to the opening and closing delimiters. For example
-
-    $nest->token_delims( '[%', '%]' );
-
-would mean that L<Template::Nest> would now recognise and interpolate tokens in the format
-
-    [% token_name %]
-
-The default token_delims are the mason style delimiters C<<%> and C<%>>. Note that for C<HTML> the token delimiters C<<!--%> and C<%-->> make a lot of sense, since they allow raw templates (ie that have not had values filled in) to render as good C<HTML>.
 
 
 =head2 comment_delims
@@ -668,70 +824,293 @@ You can set the second comment token as an empty string if the language you are 
     $nest->comment_delims([ '#','' ]);
 
 
+=head2 defaults
 
-=head2 template_dir
+Provide a hashref of default values to have L<Template::Nest> auto-fill matching parameters (no matter where they are found in the template tree). For example:
 
-Get/set the dir where Template::Nest looks for your templates. E.g.
+    my $nest = Template::Nest->new(
+        token_delims => ['<!--%','%-->']
+    });
 
-    $nest->template_dir( '/my/template/dir' );
+    # box.html:
+    <div class='box'>
+        <!--% contents %-->
+    </div>
 
-Now if I have
+    # link.html:
+    <a href="<--% soup_website_url %-->">Soup of the day is <!--% todays_soup %--> !</a>
 
-    my $component = {
-        NAME => 'hello',
-        ...
-    }
-
-and template_ext = '.html', we'll expect to find the template at
-
-    /my/template/dir/hello.html
-
-
-Note that if you have some kind of directory structure for your templates (ie they are not all in the same directory), you can do something like this:
-
-    my $component = {
-        NAME => '/my/component/location',
-        contents => 'some contents or other'
+    my $page = {
+        NAME => 'box',
+        contents => {
+            NAME => 'link',
+            todays_soup => 'French Onion Soup'
+        }
     };
 
-Template::Nest will then prepend NAME with template_dir, append template_ext and look in that location for the file. So in our example if template_dir = '/my/template/dir' and template_ext = '.html' then the template file will be expected to exist at
+    my $html = $nest->render( $page );
 
-/my/template/dir/my/component/location.html
+    print "$html\n";
+
+    # prints:
+    
+    <div class='box'>
+        <a href="">Soup of the day is French Onion Soup !</a>
+    </div>
+
+    # Note the blank "href" value - because we didn't pass it as a default, or specify it explicitly
+    # Now lets set some defaults:
+
+    $nest->defaults({
+        soup_website_url => 'http://www.example.com/soup-addicts',
+        some_other_url => 'http://www.example.com/some-other-url' #any default that doesn't appear
+    });                                                           #in any template is simply ignored
+
+    $html = $nest->render( $page );
+
+    # this time "href" is populated:
+
+    <div class='box'>
+        <a href="http://www.example.com/soup-addicts">Soup of the day is French Onion Soup</a>
+    </div>
+
+    # Alternatively provide the value explicitly and override the default:
+
+    $page = {
+        NAME => 'box',
+        contents => {
+            NAME => 'link',
+            todays_soup => 'French Onion Soup',
+            soup_website_url => 'http://www.example.com/soup-url-override'
+        }
+    };
+
+    $html = $nest->render( $html );
+
+    # result:
+
+    <div class='box'>
+        <a href='http://www.example.com/soup-url-override'
+    </div>
+
+ie. C<defaults> allows you to preload your C<$nest> with any values which you expect to remain constant throughout your project.
 
 
-Of course if you want components to be nested arbitrarily, it might not make sense to contain them in a prescriptive directory structure. 
+
+You can also B<namespace> your default values. Say you think it's a better idea to differentiate parameters coming from config from those you are expecting to explicitly pass in. You can do something like this:
+
+    # link.html:
+    <a href="<--% config.soup_website_url %-->">Soup of the day is <!--% todays_soup %--> !</a>
+
+ie you are reserving the C<config.> prefix for parameters you are expecting to come from the config. To set the defaults in this case you could do this:
+
+    my $defaults = {
+        'config.soup_website_url' => 'http://www.example.com/soup-addicts',
+        'config.some_other_url' => 'http://www.example.com/some-other-url'
+    
+        #...
+    };
+
+    $nest->defaults( $defaults );
+
+but writing 'config.' repeatedly is a bit effortful, so L<Template::Nest> allows you to do the following:
+
+    my $defaults = {
+
+        config => {
+
+            soup_website_url => 'http://www.example.com/soup-addicts',
+            some_other_url => 'http://www.example.com/some-other-url'
+    
+            #...
+        },
+
+        some_other_namespace => {
+
+            # other params?
+
+        }
+
+    };
 
 
-=head2 template_ext
+    $nest->defaults( $defaults );
+    $nest->defaults_namespace_char('.'); # not actually necessary, as '.' is the default
 
-Get/set the template extension. This is so you can save typing your template extension all the time if it's always the same. The default is '.html' - however, there is no reason why this templating system could not be used to construct any other type of file (or why you could not use another extension even if you were producing html). So e.g. if you are wanting to manipulate javascript files:
+    # Now L<Template::Nest> will replace C<config.soup_website_url> with what
+    # it finds in
 
-    $nest->template_ext('.js');
+    $defaults->{config}{soup_website_url}
 
-then
-
-    my $js_file = {
-        NAME => 'some_js_file'
-        ...
-    }
-
-So here HTML::Template::Nest will look in template_dir for 
-
-some_js_file.js
+See L<defaults_namespace_char>.
 
 
-If you don't want to specify a particular template_ext (presumably because files don't all have the same extension) - then you can do
 
-    $nest->template_ext('');
 
-In this case you would need to have NAME point to the full filename. ie
+=head2 defaults_namespace_char
 
-    $nest->template_ext('');
+Allows you to provide a "namespaced" defaults hash rather than just a flat one. ie instead of doing this:
+
+    $nest->defaults({
+        variable1 => 'value1',
+        variable2 => 'value2',
+
+        # ...
+
+    });
+
+You can do this:
+
+    $nest->defaults({        
+        namespace1 => {
+            variable1 => 'value1',
+            variable2 => 'value2'
+        },
+
+        namespace2 => {
+            variable1 => 'value3',
+            variable2 => 'value4
+        }
+    });
+
+Specify your C<defaults_namespace_char> to tell L<Template::Nest> how to match these defaults in your template:
+
+    $nest->defaults_namespace_char('-');
+
+so now the token
+
+    <% namespace1-variable1 %>
+
+will be replaced with C<value2>. Note the default C<defaults_namespace_char> is a fullstop (period) character.
+
+
+=head2 die_on_bad_params
+
+The name of this method is stolen from L<HTML::Template>, because it basically does the same thing. If you attempt to populate a template with a parameter that doesn't exist (ie the name is not found in the template) then this normally results in an error. This default behaviour is recommended in most circumstances as it guards against typos and sloppy code. However, there may be circumstances where you want processing to carry on regardless. In this case set C<die_on_bad_params> to 0:
+
+    $nest->die_on_bad_params(0);
+
+
+=head2 escape_char
+
+On rare occasions you may actually want to use the exact character string you are using for your token delimiters in one of your templates. e.g. say you are using token_delims C<[%> and C<%]>, and you have this in your template:
+
+    Hello [% name %],
+
+        did you know we are using token delimiters [% and %] in our templates?
+
+    lots of love
+    Roger
+
+Clearly in this case we are a bit stuck because L<Template::Nest> is going to think C<[% and %]> is a token to be replaced. Not to worry, we can I<escape> the opening token delimiter:
+
+    Hello [% name %],
+
+        did you know we are using token delimiters \[% and %] in our templates?
+
+    lots of love
+    Roger
+
+In the output the backslash will be removed, and the C<[% and %]> will get printed verbatim. 
+
+C<escape_char> is set to be a backslash by default. This means if you want an actual backslash to be printed, you would need a double backslash in your template.
+
+You can change the escape character if necessary:
+
+    $nest->escape_char('X');
+
+or you can turn it off completely if you are confident you'll never want to escape anything. Do so by passing in the empty string to C<escape_char>:
+
+    $nest->escape_char('');
+
+
+=head2 fixed_indent
+
+Intended to improve readability when inspecting nested templates. Consider the following example:
+
+    my $nest = Template::Nest->new(
+        token_delims => ['<!--%','%-->']
+    });
+
+    # box.html
+    <div class='box'>
+        <!--% contents %-->
+    </div>
+
+    # photo.html
+    <div>
+        <img src='/some_image.jpg'>
+    </div>
+    
+    $nest->render({
+        NAME => 'box',
+        contents => 'image'
+    });
+
+    # Output:
+
+    <div class='box'>
+        <div>
+        <img src='/some_image.jpg'>
+    </div>
+    </div>
+
+Note the ugly indenting. In fact this is completely correct behaviour in terms of faithfully replacing the token 
+
+    <!--% contents %-->
+
+with the C<photo.html> template - the nested template starts exactly from where the token was placed, and each character is printed verbatim, including the new lines.
+
+However, a lot of the time we really want output that looks like this:
+
+    <div class='box'>
+        <div>
+            <image src='/some_image.jpg'>  # the indent is maintained
+        </div>                             # for every line in the child
+    </div>                                 # template
+
+To get this more readable output, then set C<fixed_indent> to 1:
+
+    $nest->fixed_indent(1);
+
+Bear in mind that this will result in extra space characters being inserted into the output.
+
+
+
+=head2 name_label
+
+The default is NAME (all-caps, case-sensitive). Of course if NAME is interpreted as the filename of the template, then you can't use NAME as one of the variables in your template. ie
+
+    <% NAME %>
+
+will never get populated. If you really are adamant about needing to have a template variable called 'NAME' - or you have some other reason for wanting an alternative label point to your template filename, then you can set name_label:
+
+    $nest->name_label( 'GOOSE' );
+
+    #and now
 
     my $component = {
-        NAME => 'hello.html',
+        GOOSE => 'name_of_my_component'
         ...
-    }
+    };
+
+
+
+=head2 new
+
+constructor for a Template::Nest object. 
+
+    my $nest = Template::Nest->new( %opts );
+
+%opts can contain any of the methods Template::Nest accepts. For example you can do:
+
+    my $nest = Template::Nest->new( template_dir => '/my/template/dir' );
+
+or equally:
+
+    my $nest = Template::Nest->new();
+    $nest->template_dir( '/my/template/dir' );
+
 
 
 =head2 render
@@ -780,9 +1159,131 @@ e.g.
     </div>
 
 
+
+=head2 show_labels
+
+Get/set the show_labels property. This is a boolean with default 0. Setting this to 1 results in adding comments to the output so you can identify which template output text came from. This is useful in development when you have many templates. E.g. adding 
+
+    $nest->show_labels(1);
+
+to the example in the synopsis results in the following:
+
+    <!-- BEGIN page -->
+    <html>
+        <head>
+            <style>
+                div { 
+                    padding: 20px;
+                    margin: 20px;
+                    background-color: yellow;
+                }
+            </style>
+        </head>
+
+        <body>
+            
+    <!-- BEGIN box -->
+    <div>
+        First nested box
+    </div>
+    <!-- END box -->
+
+    <!-- BEGIN box -->
+    <div>
+        Second nested box
+    </div>
+    <!-- END box -->
+
+        </body>
+    </html>
+    <!-- END page -->
+
+What if you're not templating html, and you still want labels? Then you should set L<comment_delims> to whatever is appropriate for the thing you are templating.
+
+
+
+=head2 template_dir
+
+Get/set the dir where Template::Nest looks for your templates. E.g.
+
+    $nest->template_dir( '/my/template/dir' );
+
+Now if I have
+
+    my $component = {
+        NAME => 'hello',
+        ...
+    }
+
+and template_ext = '.html', we'll expect to find the template at
+
+    /my/template/dir/hello.html
+
+
+Note that if you have some kind of directory structure for your templates (ie they are not all in the same directory), you can do something like this:
+
+    my $component = {
+        NAME => '/my/component/location',
+        contents => 'some contents or other'
+    };
+
+Template::Nest will then prepend NAME with template_dir, append template_ext and look in that location for the file. So in our example if C<template_dir = '/my/template/dir'> and C<template_ext = '.html'> then the template file will be expected to exist at
+
+ /my/template/dir/my/component/location.html
+
+
+Of course if you want components to be nested arbitrarily, it might not make sense to contain them in a prescriptive directory structure. 
+
+
+=head2 template_ext
+
+Get/set the template extension. This is so you can save typing your template extension all the time if it's always the same. The default is '.html' - however, there is no reason why this templating system could not be used to construct any other type of file (or why you could not use another extension even if you were producing html). So e.g. if you are wanting to manipulate javascript files:
+
+    $nest->template_ext('.js');
+
+then
+
+    my $js_file = {
+        NAME => 'some_js_file'
+        ...
+    }
+
+So here HTML::Template::Nest will look in template_dir for 
+
+some_js_file.js
+
+
+If you don't want to specify a particular template_ext (presumably because files don't all have the same extension) - then you can do
+
+    $nest->template_ext('');
+
+In this case you would need to have NAME point to the full filename. ie
+
+    $nest->template_ext('');
+
+    my $component = {
+        NAME => 'hello.html',
+        ...
+    }
+
+
+
+=head2 token_delims
+
+Get/set the delimiters that define a token (to be replaced). token_delims is a 2 element arrayref - corresponding to the opening and closing delimiters. For example
+
+    $nest->token_delims( '[%', '%]' );
+
+would mean that L<Template::Nest> would now recognise and interpolate tokens in the format
+
+    [% token_name %]
+
+The default token_delims are the mason style delimiters C<<%> and C<%>>. Note that for C<HTML> the token delimiters C<<!--%> and C<%-->> make a lot of sense, since they allow raw templates (ie that have not had values filled in) to render as good C<HTML>.
+
+
 =head1 SEE ALSO
 
-L<HTML::Template::Nest> L<HTML::Template> L<Text::Template>
+L<HTML::Template::Nest> L<HTML::Template> L<Text::Template> L<Mason> L<Template::Toolkit> 
 
 =head1 AUTHOR
 
@@ -790,14 +1291,13 @@ Tom Gracey tomgracey@gmail.com
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Tom Gracey
+Copyright (C) 2019 by Tom Gracey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
 
 
 

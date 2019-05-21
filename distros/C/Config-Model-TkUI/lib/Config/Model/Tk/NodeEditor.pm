@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::NodeEditor;
-$Config::Model::Tk::NodeEditor::VERSION = '1.369';
+package Config::Model::Tk::NodeEditor 1.370;
+
 use strict;
 use warnings;
 use Carp;
@@ -98,8 +98,6 @@ sub fill_pane {
 
     my %is_elt_drawn = map { ( $_ => 1 ) } keys %{ $cw->{elt_widgets} || {} };
 
-    my %values;
-    my %modified;
     my $prev_elt;
     my $font = $cw->{my_font}; #cget('-font');
 
@@ -182,7 +180,10 @@ sub fill_pane {
     }
 
     # destroy leftover widgets (may occur with warp mechanism)
-    map { my $w = delete $cw->{elt_widgets}{$_}; $w->destroy } keys %is_elt_drawn;
+    foreach my $widget ( keys %is_elt_drawn) {
+        my $w = delete $cw->{elt_widgets}{$widget};
+        $w->destroy;
+    }
 }
 
 sub add_accept_entry {

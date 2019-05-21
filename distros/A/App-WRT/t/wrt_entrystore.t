@@ -6,7 +6,7 @@ use warnings;
 use lib 'lib';
 
 use Data::Dumper;
-use Test::More tests => 21;
+use Test::More tests => 28;
 use App::WRT;
 
 chdir 'example';
@@ -23,7 +23,7 @@ chdir 'example';
 # listing out of all source files:
 
   my (@all_source_files) = $w->{entries}->all();
-  my $expected_count = 31;
+  my $expected_count = 34;
   diag("got " . scalar @all_source_files . " source files.");
   ok(
     scalar @all_source_files == $expected_count,
@@ -41,24 +41,52 @@ chdir 'example';
 
   my (@all_day_entries) = $w->{entries}->all_days();
   ok(
-    scalar @all_day_entries == 2,
-    'got 2 day entries from example archive, as expected'
+    scalar @all_day_entries == 3,
+    'got 3 day entries from example archive, as expected'
   );
 
 # listing entries like 2014/1 for a month:
 
   my (@all_month_entries) = $w->{entries}->all_months();
   ok(
-    scalar @all_month_entries == 3,
-    'got 3 month entries from example archive, as expected'
+    scalar @all_month_entries == 4,
+    'got 4 month entries from example archive, as expected'
   );
 
 # listing entries like 2014 for a year:
 
   my (@all_year_entries) = $w->{entries}->all_years();
   ok(
-    scalar @all_year_entries == 3,
-    'got 3 year entries from example archive, as expected'
+    scalar @all_year_entries == 4,
+    'got 4 year entries from example archive, as expected'
+  );
+
+# listing days contained by a month or year:
+
+  my (@days_for_jan) = $w->{entries}->days_for('2014/1');
+  my @expected_days_for_jan = ('2014/1/1', '2014/1/2');
+  is_deeply(
+    \@days_for_jan,
+    \@expected_days_for_jan,
+    'got expected days for january 2014'
+  );
+
+  my (@days_for_1952) = $w->{entries}->days_for('1952');
+  my @expected_days_for_1952 = ('1952/2/13');
+  is_deeply(
+    \@days_for_1952,
+    \@expected_days_for_1952,
+    'got expected days for 1952'
+  );
+
+# listing months contained by a year:
+
+  my (@months_for_2013) = $w->{entries}->months_for('2013');
+  my @expected_months_for_2013 = ('2013/1', '2013/2');
+  is_deeply(
+    \@months_for_2013,
+    \@expected_months_for_2013,
+    'got expected months for 2013'
   );
 
 # next / previous
@@ -106,14 +134,14 @@ chdir 'example';
 
 # finding parents of entries:
 
-  my $date_parent = $w->{entries}->parent_of('2014/1/2');
+  my $date_parent = $w->{entries}->parent('2014/1/2');
   ok(
     $date_parent eq '2014/1',
     'found correct parent for 2014/1/2'
   );
   # diag($date_parent);
 
-  my $icon_parent = $w->{entries}->parent_of('icon_test');
+  my $icon_parent = $w->{entries}->parent('icon_test');
   ok(
     ! defined $icon_parent,
     'found no parent for icon_test'
@@ -121,12 +149,21 @@ chdir 'example';
   # diag($icon_parent);
 
   eval {
-    $w->{entries}->parent_of('i_do_not_exist');
+    $w->{entries}->parent('i_do_not_exist');
   };
   ok(
     $@,
     "croaked on trying to find parent of a nonexistent entry"
   );
+
+# finding children of entries
+
+  my @children = $w->{entries}->children('2013');
+  ok(
+    @children == 3,
+    "got 3 children for 2013"
+  );
+  # diag(join ', ', @children);
 
 # checking whether entries are directories, flatfiles, etc.
 
@@ -155,6 +192,23 @@ chdir 'example';
   ok(
     ! $w->{entries}->has_index('icon_test/textfile'),
     'icon_test/textfile does not have an index'
+  );
+
+# basename of an entry:
+
+  ok(
+    $w->{entries}->basename('1969/2/1') eq '1',
+    'got an expected basename for a day'
+  );
+
+  ok(
+    $w->{entries}->basename('1969/2') eq '2',
+    'got an expected basename for a month' 
+  );
+
+  ok(
+    $w->{entries}->basename('1969') eq '1969',
+    'got an expected basename for a year' 
   );
 
   # diag(Dumper($w->{entries}->{entry_properties}));

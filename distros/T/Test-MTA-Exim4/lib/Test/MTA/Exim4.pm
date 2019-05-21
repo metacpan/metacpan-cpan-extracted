@@ -7,7 +7,7 @@ use base qw(Class::Accessor::Fast);
 use IPC::Cmd qw[can_run run];
 use Test::Builder;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 __PACKAGE__->mk_accessors(qw[ debug]);
@@ -453,7 +453,7 @@ sub _run_exim_bv {
                     (.*)                        # and the rest of the line in $2
                     $
                  }ix
-                ) {
+            ) {
                 my $type = lc($1);
                 my $res  = lc($2);
                 $type =~ tr/a-z/_/cs;
@@ -637,11 +637,7 @@ __END__
 
 =pod
 
-=for test_synopsis 1;
-__END__
-
-=for stopwords acknowledgements mtas Maischein checkable exim exim4 recognised subitem
-subitems vapourware CPAN behaviour homepage ok
+=encoding UTF-8
 
 =head1 NAME
 
@@ -649,7 +645,13 @@ Test::MTA::Exim4 - Test Anything interface for testing Exim4 configurations
 
 =head1 VERSION
 
-version 0.05
+version 0.06
+
+=for test_synopsis 1;
+__END__
+
+=for stopwords acknowledgements mtas Maischein checkable exim exim4 recognised subitem
+subitems vapourware CPAN behaviour homepage ok
 
 =head1 SYNOPSIS
 
@@ -909,10 +911,15 @@ Runs C<exim -bt> (address test mode) with the appropriate configuration file,
 to check how the single address passed routes. The output of the command is
 parsed and passed back in the results.
 
-The results structure is hash that looks like:-     {         all_ok        =>
-# no invocation errors         deliverable   => # number of deliverable
-addresses         undeliverable => # number of undeliverable addresses        
-total         => # total number of addresses         addresses     => {}     }
+The results structure is a hash that looks like:-
+
+    {
+        all_ok        => # no invocation errors
+        deliverable   => # number of deliverable addresses
+        undeliverable => # number of undeliverable addresses
+        total         => # total number of addresses
+        addresses     => {}
+    }
 
 The C<addresses> part of the structure has one key for each resultant address,
 the value of which is another hash, which may contain the following items:-
@@ -970,30 +977,13 @@ Maischein. It is structured differently, and is currently very experimental
 module in a name space that is intended for use by similar modules for other
 MTAs.
 
-=head1 INSTALLATION
-
-See perlmodinstall for information and options on installing Perl modules.
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Test-MTA-Exim4>.
-
-=head1 AVAILABILITY
-
-The project homepage is L<https://metacpan.org/release/Test-MTA-Exim4>.
-
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Test::MTA::Exim4/>.
-
 =head1 AUTHOR
 
 Nigel Metheringham <nigelm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Nigel Metheringham.
+This software is copyright (c) 2019 by Nigel Metheringham.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

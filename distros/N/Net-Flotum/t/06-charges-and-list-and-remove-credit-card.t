@@ -2,6 +2,7 @@ use common::sense;
 use Test::More;
 use JSON::MaybeXS;
 use Furl;
+use Time::Piece;
 
 use_ok('Net::Flotum');
 ok( my $flotum = Net::Flotum->new( merchant_api_key => 'm-just-testing' ), 'new ok' );
@@ -27,7 +28,8 @@ ok( $cc->{valid_until}, 'request has a time to expire.' );
 
 my $furl = Furl->new( timeout => 25 );
 
-my $req = $furl->post(
+my $date = localtime->strftime('%Y%m');
+my $req  = $furl->post(
     $cc->{href},
     [ 'content-type' => 'application/json' ],    # headers
     encode_json(
@@ -35,7 +37,7 @@ my $req = $furl->post(
             name_on_card => 'This is a fake credit card',
             csc          => '123',
             number       => '5268590528188853',
-            validity     => '201801',
+            validity     => $date,
             brand        => 'mastercard'
         }
     ),
@@ -44,7 +46,6 @@ my $req = $furl->post(
 ok( $req->is_success, 'request ok' );
 
 my $credit_card = decode_json $req->content;
-
 ok( $credit_card->{id}, 'credit card id' );
 
 diag "creating charge";
@@ -112,7 +113,7 @@ my $card = $cards[0];
 
 is( $card->mask,             '5268*********853', 'mask ok' );
 is( $card->conjecture_brand, 'mastercard',       'brand is ok' );
-is( $card->validity,         '201801',           'validity is ok' );
+is( $card->validity,         $date,              'validity is ok' );
 
 diag "removing credit card";
 is( $cards[0]->remove, '1', 'removed' );

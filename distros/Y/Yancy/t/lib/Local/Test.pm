@@ -159,6 +159,7 @@ END {
             },
             contact => {
                 'x-order' => 5,
+                default => 0,
                 type => [qw( boolean null )],
             },
             phone => {
@@ -216,7 +217,7 @@ END {
         type => 'object',
         'x-id-field' => 'username',
         'x-list-columns' => [qw( username email )],
-        'x-view' => { collection => 'user' },
+        'x-view' => { schema => 'user' },
         properties => {
             id => {
                 'x-order' => 1,
@@ -240,7 +241,7 @@ END {
         type => 'object',
         'x-id-field' => 'username',
         'x-list-columns' => [qw( username email )],
-        'x-view' => { collection => 'user' },
+        'x-view' => { schema => 'user' },
     },
 );
 %Yancy::Backend::Test::SCHEMA_MICRO = (
@@ -264,7 +265,7 @@ END {
         type => 'object',
         'x-id-field' => 'username',
         'x-list-columns' => [qw( username email )],
-        'x-view' => { collection => 'user' },
+        'x-view' => { schema => 'user' },
         properties => {
             id => {
                 'x-order' => 1,
@@ -288,7 +289,7 @@ END {
         type => 'object',
         'x-id-field' => 'username',
         'x-list-columns' => [qw( username email )],
-        'x-view' => { collection => 'user' },
+        'x-view' => { schema => 'user' },
     },
 );
 @Yancy::Backend::Test::SCHEMA_ADDED_COLLS = qw(
@@ -601,7 +602,7 @@ sub test_backend {
                     name => { type => 'string', 'x-order' => 2 },
                     email => { type => [ 'string', 'null' ], 'x-order' => 3 },
                     age => { type => [ 'integer', 'null' ], 'x-order' => 4 },
-                    contact => { type => [ 'boolean', 'null' ], 'x-order' => 5 },
+                    contact => { type => [ 'boolean', 'null' ], default => 0, 'x-order' => 5 },
                     phone => { type => [ 'string', 'null' ], 'x-order' => 6 },
                 },
             },

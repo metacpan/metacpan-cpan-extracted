@@ -3,9 +3,8 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Keyword::Declare;
-use Data::Dumper;
 
 sub import {
 	keytype GATTRS is m{
@@ -21,6 +20,10 @@ sub import {
 				is (?&PerlNWS)
 					(?:(?!qw)(?&PerlQualifiedIdentifier)|
 					(?&PerlList))
+				|
+				use (?&PerlNWS)
+					(?:(?&PerlQualifiedIdentifier)\s*(?&PerlList)|(?:(?!qw)(?&PerlQualifiedIdentifier)|
+					(?&PerlList)))
 			)?+
 	}xms;
 	keytype SATTRS is m{
@@ -37,6 +40,7 @@ sub import {
 			package $class;
 			use Moo::Role;
 			$attrs{with}
+			$attrs{use}
 			$body
 		}|;
 		return '';
@@ -50,6 +54,7 @@ sub import {
 			use MooX::ValidateSubs;
 			$attrs{is}
 			$attrs{with}
+			$attrs{use}
 			$body
 			1;
 		}|;
@@ -76,8 +81,11 @@ sub _parse_role_attrs {
 	my @roles = @_;
 	my %attrs;
 	for (@roles) {
-		$_ =~ m/(with|allow|is)(.*)/i;
-		$attrs{$1} = [] unless $attrs{$1};
+		if ($_ =~ m/\s*use\s*((?!qw)(?&PerlQualifiedIdentifier))\s*((?&PerlList)) $PPR::GRAMMAR/xms) {
+			push @{$attrs{use}}, sprintf "%s %s", $1, $2;
+			next;
+		}
+		$_ =~ m/(with|allow|is|use)(.*)/i;
 		push @{$attrs{$1}}, eval $2 || $2;
 	}
 	return %attrs;
@@ -91,6 +99,7 @@ sub _set_class_role_attrs {
 	}
 	$attrs{is} = $attrs{is} ? sprintf "extends qw/%s/;\n", join ' ', @{$attrs{is}} : '';
 	$attrs{with} = $attrs{with} ? sprintf "with qw/%s/;\n", join ' ', @{$attrs{with}} : '';
+	$attrs{use} = $attrs{use} ? join('', map { sprintf("use %s;\n", $_) } @{$attrs{use}}) : '';
 	$body =~ s/(^{)|(}$)//g;
 	return $body, %attrs;
 }
@@ -105,7 +114,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -121,7 +130,7 @@ Version 0.02
 		private six { 'six' }
 	};
 
-	class Hello with qw/World/ allow qw/main/ {
+	class Hello with qw/World/ allow qw/main/ use Scalar::Util qw/reftype/ use qw/JSON/ {
 		use Types::Standard qw/Str HashRef ArrayRef Object/;
 
 		attributes
@@ -137,6 +146,8 @@ Version 0.02
 
 		public four { return $_[1]->{message} }
 		private five { return $_[0]->six }
+		public ten { reftype bless {}, 'Flat::World' }
+		public eleven { encode_json { flat => "world" } }
 	};
 
 	class Night is qw/Hello/ {

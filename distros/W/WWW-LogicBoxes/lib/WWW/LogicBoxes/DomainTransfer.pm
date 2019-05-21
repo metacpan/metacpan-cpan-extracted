@@ -13,7 +13,7 @@ use WWW::LogicBoxes::PrivateNameServer;
 
 use DateTime;
 
-our $VERSION = '1.9.0'; # VERSION
+our $VERSION = '1.10.0'; # VERSION
 # ABSTRACT: LogicBoxes Domain Transfer In Progress Representation
 
 has id => (

@@ -1,5 +1,11 @@
-package MPMinus; # $Id: MPMinus.pm 224 2017-04-04 10:27:41Z minus $
+package MPMinus; # $Id: MPMinus.pm 280 2019-05-14 06:47:06Z minus $
+
+require 5.016;
+
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +13,7 @@ MPMinus - mod_perl2 Web Application Framework
 
 =head1 VERSION
 
-Version 1.20
+Version 1.21
 
 =head1 SYNOPSIS
 
@@ -19,11 +25,21 @@ MPMinus - mod_perl2 Web Application Framework
 
 =head1 DESCRIPTION
 
-See C<README> file first and L<MPMinus::Manual>
+See L<MPMinus::Manual> first
 
 =head1 METHODS
 
 =over 8
+
+=item B<new>
+
+    my $m = new MPMinus();
+    my $m = new MPMinus( "My::App" );
+    my $m = new MPMinus( __PACKAGE__ );
+
+Returns MPMinus object.
+
+First argument is optional. Specifies caller package name.
 
 =item B<conf, config, get_conf, get_config>
 
@@ -43,6 +59,13 @@ Returns all Dispatcher records
 
 Returns current Dispatcher record. See L<MPMinus::Dispatcher>
 
+=item B<get_apache_version>
+
+    my $ver = MPMinus::get_apache_version();
+    my $ver = $m->get_apache_version();
+
+Returns normalized Apache version
+
 =item B<get, get_node>
 
     my $r = get('r');
@@ -55,7 +78,7 @@ Getting node by name
     my $m = MPMinus->m;
 
     # Used in the Apache handlers
-    my $m = shift;    
+    my $m = shift;
 
 Returns main MPMinus object
 
@@ -88,7 +111,7 @@ For example (in handler of MPM::foo::Handlers module):
 
     # Set r as Apache2::RequestRec object
     $m->set( r => $r );
-    
+
     # Set mysql as MPMinus::Store::MySQL object
     $m->set( mysql => new MPMinus::Store::MySQL(
             -m => $m,
@@ -107,7 +130,7 @@ For example (in handler of MPM::foo::Handlers module):
 
 =item B<set_conf, set_config>
 
-    $m->set_conf("LOCALHOST", $m->conf('http_host') =~ /localhost|workstation/ ? 1 : 0); 
+    $m->set_conf("LOCALHOST", $m->conf('http_host') =~ /localhost|workstation/ ? 1 : 0);
 
 Setting configuration value
 
@@ -119,7 +142,7 @@ See C<CHANGES> file
 
 =head1 DEPENDENCIES
 
-L<CTK>, L<Apache2>, L<TemplateM>
+C<mod_perl2>, L<CTK>
 
 =head1 TO DO
 
@@ -131,67 +154,67 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-C<perl>, L<CTK>, L<CTK::Util>, L<TemplateM>
+C<mod_perl2>, L<CTK::Util>
 
 =head1 THANKS
 
-Thanks to Dmitry Klimov for technical translating C<http://fla-master.com>.
+Thanks to Dmitry Klimov for technical translating L<http://fla-master.com>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@serzik.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/ $VERSION $PATCH_20141100055 /;
-$VERSION = "1.20";
+$VERSION = "1.21";
 $PATCH_20141100055 = 0;
 
+# Imports MPMinus base methods from this module-list!
 use base qw/
         MPMinus::Configuration
         MPMinus::Transaction
-        MPMinus::Util
-        MPMinus::Debug::Info
+        MPMinus::Info
+        MPMinus::Log
     /;
 
-use Apache2::ServerUtil;
-use Apache2::Connection;
-    
+use mod_perl2;
+use Apache2::RequestIO ();
+use Apache2::RequestRec ();
+use Apache2::RequestUtil ();
+use Apache2::ServerRec ();
+use Apache2::ServerUtil ();
+use Apache2::Connection ();
+use Apache2::Util ();
+use APR::Table ();
+
+use Apache2::Const -compile => qw/ :common :http /;
+use APR::Const -compile => qw/ :common /;
+
 use Carp; # qw/carp croak cluck confess/
-# carp    -- просто пишем
-# croak   -- просто пишем и убиваем
-# cluck   -- пишем но с подробностями
-# confess -- пишем с подробностями и убиваем
 
 our @ISA;
 
 sub import {
     my $class = shift;
-    my $callerp = caller(0);
+    my $callerp = scalar(caller(0));
     if ($callerp =~ /^(.+)\:\:Handlers$/) {
         my $pnamespace = $1;
-        push @ISA, $pnamespace unless grep {$_ eq $pnamespace} @ISA; 
+        push @ISA, $pnamespace unless grep {$_ eq $pnamespace} @ISA;
         $class->new($callerp);
     }
-    
+
     # Patch: http://osdir.com/ml/modperl.perl.apache.org/2014-11/msg00055.html
     unless ($PATCH_20141100055) {
         my $sver = _get_server_version();
@@ -204,92 +227,86 @@ sub import {
 sub new {
     my $class = shift;
     my $caller = shift;
-    
-    # Получаем название пакета
-    my $pnamespace = _search_pnamespace($caller || caller(0));
+
+    # Get package name
+    my $pnamespace = _search_pnamespace($caller || scalar(caller(0)));
     no strict 'refs';
-    
+
     my $self = bless {
         namespace     => $pnamespace,
     }, $class;
-    
-    # Присваиваем подструктуре новый объект
-    ${"${pnamespace}::glob"} = $self;
-    
-    return ${"${pnamespace}::glob"};
+
+    # Set object as object
+    ${"${pnamespace}::_mpminus_glob"} = $self;
+
+    return ${"${pnamespace}::_mpminus_glob"};
 }
-sub m {
-    # Возвращает указатель на объект
+sub m { # Returns current object
     my $self = shift;
-    my $caller = shift || caller(0);
+    my $caller = shift || scalar(caller(0));
     my $pnamespace = _search_pnamespace($caller);
     no strict 'refs';
-    return ${"$pnamespace\:\:glob"};
+    return ${"$pnamespace\:\:_mpminus_glob"};
 }
 sub glob { goto &m };
-sub r {
-    # Получение объекта (ноды) запроса
+sub r { # Returns Apache2::RequestRec object from current m-object
     my $self = shift;
     return undef unless $self->{r};
     return $self->{r};
 }
 sub req { goto &r };
-sub drec {
-    # Получение строки записи диспетчера
+sub drec { # Returns dispatcher record by name
     my $self = shift;
     return undef unless $self->{drec};
     return $self->{drec};
 }
 sub drecord { goto &drec };
 sub record { goto &drec };
-sub set_node {
-    # Добавить ноду к глобальному массиву
+sub set_node { # Sets node to object
     my $self = shift;
     my $node = shift;
     my $data = shift;
     $self->{$node} = $data;
 }
 sub set { goto &set_node };
-sub get_node {
-    # Прочитать ноду из глобального массива
+sub get_node { # Returns node from object
     my $self = shift;
     my $node = shift;
     return $self->{$node};
 }
 sub get { goto &get_node };
-sub mysql {
-    # вернуть объект бд MySQL
+sub mysql { # Returns MySQL node
     my $self = shift;
     return undef unless $self->{mysql};
     return $self->{mysql};
 }
-sub oracle {
-    # вернуть объект бд Oracle
+sub oracle { # Returns Oracle node
     my $self = shift;
     return undef unless $self->{oracle};
     return $self->{oracle};
 }
-sub multistore {
-    # вернуть объект MultiStore
+sub multistore { # Returns MultiStore DBI node
     my $self = shift;
     return undef unless $self->{multistore};
     return $self->{multistore};
 }
-sub disp {
-    # вернуть объект диспетчера disp
+sub disp { # Returns dispatcher node
     my $self = shift;
     return undef unless $self->{disp};
     return $self->{disp};
 }
 sub dispatcher { goto &disp };
-sub namespace {
+sub namespace { # Returns current namespace
     my $self = shift;
     return $self->{namespace};
 }
+sub get_apache_version { goto &_get_server_version };
+
 sub _search_pnamespace {
     my $clr = shift;
     my ($pn) = grep {$clr =~ /$_/ } @ISA;
-    croak("Missing 'use MPMinus' in module $clr\:\:Handlers") unless $pn;
+    #croak("Missing 'use MPMinus' in module $clr\:\:Handlers") unless $pn;
+    return $clr unless $pn;
     return $pn;
 }
 sub _get_server_version {
@@ -305,18 +322,17 @@ sub _get_server_version {
     }
     return 0
 }
-sub AUTOLOAD {
-    # Это своего рода интерфейс ко всем свойствам через объектную модель
-    # если такого свойства не окажится, то значит ругаемся карпом !!
+
+sub AUTOLOAD { # Interface to nodes by names of undefined subroutines
     my $self = shift;
     our $AUTOLOAD;
     my $AL = $AUTOLOAD;
     my $ss = undef;
     $ss = $1 if $AL=~/\:\:([^\:]+)$/;
-    if ($ss && $self->{$ss}) {
+    if ($ss && defined($self->{$ss})) {
         return $self->{$ss};
     } else {
-        carp("Can't find MPMinus node \"$ss\"");
+        carp(sprintf("Can't find MPMinus node \"%s\"", $ss));
     }
     return undef;
 }

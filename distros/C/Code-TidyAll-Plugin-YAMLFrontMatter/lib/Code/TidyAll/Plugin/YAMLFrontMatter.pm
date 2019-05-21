@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
 use Moo;
 
@@ -88,6 +88,18 @@ sub validate_file {
     my $ds = try {
         my $yp = YAML::PP->new(
 
+            # Insist on YAML 1.1.  Jekyl uses SafeYAML to parse YAML
+            # which will either use Syck (via "YAML") or LibYAML
+            # (via "Psych") to parse the YAML, so what YAML it can
+            # use is a matter of debate.  However, since this module
+            # is a linter, we can make up our own rules, and they are
+            # that you have to write your frontmatter only in the
+            # YAML 1.1 spec.  Todo: Make this insist in the most
+            # compatible YAML (i.e. freak out if someone uses "y"
+            # instead of "true") if YAML::PP ever supports such
+            # an option.
+            schema => ['YAML1_1'],
+
             # we do not want to create circular refs
             cyclic_refs => 'fatal',
 
@@ -125,7 +137,7 @@ Code::TidyAll::Plugin::YAMLFrontMatter - TidyAll plugin for validating YAML Fron
 
 =head1 VERSION
 
-version 1.000002
+version 1.000003
 
 =head1 SYNOPSIS
 

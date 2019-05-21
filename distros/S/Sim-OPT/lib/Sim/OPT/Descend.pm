@@ -1607,7 +1607,7 @@ Sim::OPT::Descend.
 
 =head1 DESCRIPTION
 
-Sim::OPT::Descent is a module collaborating with the Sim::OPT module for performing block coordinate descent, or parallel blocks search, or free mixes of the two. It closes the circularly recursive loop formed by Sim::OPT -> Sim::OPT::Morph -> Sim::OPT::Sim -> Sim::OPT::Report::retrieve -> Sim::OPT::Report::report -> Sim::OPT::Descent, which repeats at every block search cycle.
+Sim::OPT::Descent is a module collaborating with the Sim::OPT module for performing block coordinate descent or parallel blocks search, or free mixes of the two. It closes the circularly recursive loop formed by Sim::OPT -> Sim::OPT::Morph -> Sim::OPT::Sim -> Sim::OPT::Report::report -> Sim::OPT::Descent, which repeats at every search cycle.
 
 The objective function for rating the performances of the candidate solutions can be obtained by the weighting of objective functions (performance indicators) performed by the Sim::OPT::Report module, which follows user-specified criteria.
 

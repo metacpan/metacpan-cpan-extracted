@@ -21,6 +21,9 @@ No user-serviceable parts inside.
 # NOTE: Don't "use" any module here, esp. one that is an XS module or 
 # whose "use" could cause the loading of an XS module thru its dependencies.
 
+# enable debug/trace messages from DynaLoader perl code
+my $dl_debug = $ENV{PERL_DL_DEBUG} || 0;
+
 my ($bootstrap, $dl_findfile);  # Caches for code references
 my ($cache_key);                # The current file to find
 my $is_insensitive_fs = (
@@ -34,6 +37,9 @@ sub _init_dynaloader {
     return if $bootstrap;
     return unless eval { require DynaLoader; DynaLoader::dl_findfile(); 1 };
 
+    print STDERR "PAR::Heavy: pre-hooks to Dynaloader's key methods\n"
+        if $dl_debug;
+
     $bootstrap   = \&DynaLoader::bootstrap;
     $dl_findfile = \&DynaLoader::dl_findfile;
 
@@ -45,12 +51,23 @@ sub _init_dynaloader {
 
 # Return the cached location of .dll inside PAR first, if possible.
 sub _dl_findfile {
-    return $FullCache{$cache_key} if exists $FullCache{$cache_key};
+    print STDERR "PAR::Heavy::_dl_findfile($cache_key)\n" if $dl_debug;
+
+    if (exists $FullCache{$cache_key}) {
+        print STDERR " found in FullCache as $FullCache{$cache_key}\n"
+            if $dl_debug;
+        return $FullCache{$cache_key};
+    }
     if ($is_insensitive_fs) {
         # We have a case-insensitive filesystem...
         my ($key) = grep { lc($_) eq lc($cache_key) } keys %FullCache;
-        return $FullCache{$key} if defined $key;
+        if (defined $key) {
+            print STDERR " found case-insensitively in FullCache as $FullCache{$key}\n"
+                if $dl_debug;
+            return $FullCache{$key};
+        }
     }
+    print STDERR " fall back to DynaLoader::dl_findfile\n" if $dl_debug;
     return $dl_findfile->(@_);
 }
 

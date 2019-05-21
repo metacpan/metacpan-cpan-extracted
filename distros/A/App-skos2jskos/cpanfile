@@ -8,5 +8,4 @@ requires 'JSON';
 
 test_requires 'Test::More';
 test_requires 'Test::Output';
-test_requires 'Test::PerlTidy';
 test_requires 'Test::RequiresInternet';

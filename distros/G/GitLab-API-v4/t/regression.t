@@ -1,16 +1,16 @@
 #!/usr/bin/env perl
-use 5.010001;
 use strictures 2;
 
-use Test2::V0;
 use Test2::Require::AuthorTesting;
+use Test2::V0;
 
 use Log::Any::Adapter 'TAP';
-use Path::Tiny;
 use MIME::Base64 qw( decode_base64 );
+use Path::Tiny;
 
-use GitLab::API::v4;
 use GitLab::API::v4::Config;
+use GitLab::API::v4::WWWClient;
+use GitLab::API::v4;
 
 my $config = GitLab::API::v4::Config->new();
 my $api = GitLab::API::v4->new( $config->args() );
@@ -39,17 +39,23 @@ subtest projects => sub{
         );
         ok( $upload->{url}, 'got an upload response' );
 
-        my $download_url = URI->new( $api->url() );
-        my $site_path = $download_url->path();
-        $site_path =~ s{/api/v4/?$}{};
+        my $www_base_url = $api->url();
+        $www_base_url =~ s{/api/v4.*$}{};
+
+        my $www_client = GitLab::API::v4::WWWClient->new(
+            url => $www_base_url,
+        );
+
+        $www_client->sign_in(
+            'root',
+            $ENV{GITLAB_API_V4_ROOT_PASSWORD},
+        );
+
         my $project_path = $project->{path_with_namespace};
         my $upload_path = $upload->{url};
-        $download_url->path( join_paths( $site_path, $project_path, $upload_path ) );
+        my $download_path = "$project_path/$upload_path";
 
-        my $res = HTTP::Tiny->new->get(
-            $download_url,
-            { headers=>$api->_auth_headers() },
-        );
+        my $res = $www_client->get( $download_path );
         is( $res->{content}, $file_content, 'upload_file_to_project worked' );
     };
 

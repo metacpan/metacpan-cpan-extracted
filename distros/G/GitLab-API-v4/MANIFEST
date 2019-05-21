@@ -74,8 +74,12 @@ cpanfile
 lib/GitLab/API/v4.pm
 lib/GitLab/API/v4/Config.pm
 lib/GitLab/API/v4/Constants.pm
+lib/GitLab/API/v4/Mock.pm
+lib/GitLab/API/v4/Mock/Engine.pm
+lib/GitLab/API/v4/Mock/RESTClient.pm
 lib/GitLab/API/v4/Paginator.pm
 lib/GitLab/API/v4/RESTClient.pm
+lib/GitLab/API/v4/WWWClient.pm
 minil.toml
 script/gitlab-api-v4
 t/gitlab-api-v4.t

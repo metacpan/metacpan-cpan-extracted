@@ -1,7 +1,7 @@
 package Text::WideChar::Util;
 
-our $DATE = '2015-07-29'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2019-05-17'; # DATE
+our $VERSION = '0.170'; # VERSION
 
 use 5.010001;
 use locale;
@@ -89,7 +89,8 @@ our $re_cjk = qr/(?:
                  |   \p{Block=CJK_Unified_Ideographs}
                  |   \p{Block=CJK_Unified_Ideographs_Extension_A}
                  |   \p{Block=CJK_Unified_Ideographs_Extension_B}
-                     #|   \p{Block=CJK_Unified_Ideographs_Extension_C}
+                 |   \p{Hiragana}\p{Katakana}\p{Hangul}\x{30fc}
+                #|   \p{Block=CJK_Unified_Ideographs_Extension_C}
                      [\x{3002}\x{ff0c}]
                  )/x;
 our $re_cjk_class = qr/[
@@ -103,6 +104,7 @@ our $re_cjk_class = qr/[
                            \p{Block=CJK_Unified_Ideographs}
                            \p{Block=CJK_Unified_Ideographs_Extension_A}
                            \p{Block=CJK_Unified_Ideographs_Extension_B}
+                           \p{Hiragana}\p{Katakana}\p{Hangul}\x{30fc}
                            \x{3002}
                            \x{ff0c}
                       ]/x;
@@ -117,6 +119,7 @@ our $re_cjk_negclass = qr/[^
                               \p{Block=CJK_Unified_Ideographs}
                               \p{Block=CJK_Unified_Ideographs_Extension_A}
                               \p{Block=CJK_Unified_Ideographs_Extension_B}
+                              \p{Hiragana}\p{Katakana}\p{Hangul}\x{30fc}
                               \x{3002}
                               \x{ff0c}
                       ]/x;
@@ -134,9 +137,10 @@ sub _wrap {
     my $tw = $opts->{tab_width} // 8;
     die "Please specify a positive tab width" unless $tw > 0;
     my $optfli  = $opts->{flindent};
-    my $optfliw = _get_indent_width($is_mb, $optfli, $tw) if defined $optfli;
+    my $optfliw = defined $optfli ? _get_indent_width($is_mb, $optfli, $tw) : undef;
     my $optsli  = $opts->{slindent};
-    my $optsliw = _get_indent_width($is_mb, $optsli, $tw) if defined $optsli;
+    my $optsliw = defined $optsli ? _get_indent_width($is_mb, $optsli, $tw) : undef;
+    my $optkts  = $opts->{keep_trailing_space} // 0;
     my @res;
 
     my @para = split /(\n(?:[ \t]*\n)+)/, $text;
@@ -272,11 +276,13 @@ sub _wrap {
                             }
                             my $word2 = substr($word, length($res->[0]));
                             #say "D:truncated CJK word: $word -> $res->[0] & $res->[1], remaining=$word2";
+                            $prev_ws_after = 0;
                             $word = $word2;
                             $wordw = mbswidth($word);
                         }
 
                         # move the word to the next line
+                        push @res, " " if $prev_ws_after && $optkts;
                         push @res, "\n", $sli;
                         $y++;
 
@@ -421,7 +427,7 @@ Text::WideChar::Util - Routines for text containing wide characters
 
 =head1 VERSION
 
-This document describes version 0.16 of Text::WideChar::Util (from Perl distribution Text-WideChar-Util), released on 2015-07-29.
+This document describes version 0.170 of Text::WideChar::Util (from Perl distribution Text-WideChar-Util), released on 2019-05-17.
 
 =head1 SYNOPSIS
 
@@ -449,6 +455,11 @@ This document describes version 0.16 of Text::WideChar::Util (from Perl distribu
 This module provides routines for dealing with text containing wide characters
 (wide meaning occupying more than 1 column width in terminal).
 
+=head1 INTERNAL NOTES
+
+Should we wrap at hyphens? Probably not. Both Emacs as well as Text::Wrap do
+not.
+
 =head1 FUNCTIONS
 
 =head2 mbswidth($text) => INT
@@ -468,10 +479,12 @@ only contains printable ASCII characters and newlines.
 
 =head2 mbwrap($text, $width, \%opts) => STR
 
-Wrap C<$text> to C<$width> columns. It uses mbswidth() instead of Perl's
-length() which works on a per-character basis. Has some support for wrapping
-Kanji/CJK (Chinese/Japanese/Korean) text which do not have whitespace between
-words.
+Wrap C<$text> to C<$width> columns. Replaces multiple whitespaces with a single
+space.
+
+It uses mbswidth() instead of Perl's length() which works on a per-character
+basis. Has some support for wrapping Kanji/CJK (Chinese/Japanese/Korean) text
+which do not have whitespace between words.
 
 Options:
 
@@ -498,6 +511,26 @@ text, or if unavailable, will default to empty string (C<"">).
 If set to true, then instead of returning the wrapped string, function will
 return C<< [$wrapped, $stats] >> where C<$stats> is a hash containing some
 information like C<max_word_width>, C<min_word_width>.
+
+=item * keep_trailing_space => BOOL (default: 0)
+
+If set to true, then trailing space that separates words will be kept at the end
+of wrapped lines. This option is useful if you want to rejoin the lines later.
+Without this option set to true, wrapping this line at width=4 (quotes shown):
+
+ "some long   line"
+
+will result in:
+
+ "some"
+ "long"
+ "line"
+
+While if this option is set to true, the result will be:
+
+ "some "
+ "long "
+ "line"
 
 =back
 
@@ -540,25 +573,6 @@ Does *not* handle multiple lines.
 The non-wide version of mbtrunc(), just like in mbwrap() vs wrap(). This is
 actually not much more than Perl's C<< substr($text, 0, $width) >>.
 
-=head1 INTERNAL NOTES
-
-Should we wrap at hyphens? Probably not. Both Emacs as well as Text::Wrap do
-not.
-
-=head1 SEE ALSO
-
-L<Unicode::GCString> which is consulted for visual width of characters.
-L<Text::CharWidth> is about 2.5x faster but it gives weird results (-1 for
-characters like "\n" and "\t") and my Strawberry Perl installation fails to
-build it.
-
-L<Text::ANSI::Util> which can also handle text containing wide characters as
-well ANSI escape codes.
-
-L<Text::WrapI18N> which provides an alternative to wrap()/mbwrap() with
-comparable speed, though wrapping result might differ slightly. And the module
-currently uses Text::CharWidth.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Text-WideChar-Util>.
@@ -575,13 +589,31 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Unicode::GCString> which is consulted for visual width of characters.
+L<Text::CharWidth> is about 2.5x faster but it gives weird results (-1 for
+characters like "\n" and "\t") and my Strawberry Perl installation fails to
+build it.
+
+L<Text::ANSI::Util> which can also handle text containing wide characters as
+well ANSI escape codes.
+
+L<Text::WrapI18N> which provides an alternative to wrap()/mbwrap() with
+comparable speed, though wrapping result might differ slightly. And the module
+currently uses Text::CharWidth.
+
+L<Text::NonWideChar::Util> contains non-wide version of some of the
+abovementioned routines (the non-wide version of the routines will eventually be
+moved here).
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

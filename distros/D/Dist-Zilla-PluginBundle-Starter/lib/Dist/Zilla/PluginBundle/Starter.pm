@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v3.0.1';
+our $VERSION = 'v3.0.3';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -229,6 +229,8 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   managed_versions = 1 ; uses the main module version, and bumps module versions after release
   regenerate = LICENSE ; copy LICENSE to root after release or dzil regenerate
 
+  [@Starter::Git]      ; variant bundle for git workflows
+
 =head1 DESCRIPTION
 
 The C<[@Starter]> plugin bundle for L<Dist::Zilla> is designed to do the
@@ -236,9 +238,16 @@ minimal amount of work to release a complete distribution reliably. It is
 similar in purpose to L<[@Basic]|Dist::Zilla::PluginBundle::Basic>, but with
 additional features to stay up to date and allow greater customization. The
 selection of included plugins is intended to be unopinionated and unobtrusive,
-so that it is usable for any well-formed CPAN distribution. If you're just
-getting started with L<Dist::Zilla>, check out the tutorials at
-L<http://dzil.org>.
+so that it is usable for any well-formed CPAN distribution.
+
+If you're just getting started with L<Dist::Zilla> or CPAN distribution
+building, check out the L<Dist::Zilla::Starter> guide.
+
+For a variant of this bundle with built-in support for a git-based workflow,
+see L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
+
+For one-line initialization of a new C<[@Starter]>-based distribution, try
+L<Dist::Zilla::MintingProfile::Starter>.
 
 Migrating from C<[@Basic]> is easy for most cases. Most of the bundle is the
 same, so just make sure to remove any extra plugins that C<[@Starter]> already
@@ -260,14 +269,6 @@ release process (including any version bumping and commits!) without actually
 uploading to CPAN.
 
   $ FAKE_RELEASE=1 dzil release
-
-For a detailed overview of how this plugin bundle works, see L</"PHASES">.
-
-For one-line initialization of a new C<[@Starter]>-based distribution, try
-L<Dist::Zilla::MintingProfile::Starter>.
-
-For a variant of this bundle with built-in support for a git-based workflow,
-see L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
 
 Another simple way to use L<Dist::Zilla> is with L<Dist::Milla>, an opinionated
 bundle that requires no configuration and performs all of the tasks in
@@ -338,7 +339,7 @@ match in the build. L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> replaces
 C<{{$NEXT}}> in your F<Changes> file with a line containing the distribution
 version and build date/time. Finally,
 L<[BumpVersionAfterRelease]|Dist::Zilla::Plugin::BumpVersionAfterRelease> will
-bump the versions in your module files after a release.
+bump the versions in your source module files after a release.
 
 When using this option, you B<must> have the distribution version set in your
 main module in a form like C<our $VERSION = '1.234';>, rather than in
@@ -597,8 +598,8 @@ L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> default) for executable scripts.
 
 =head2 Versions
 
-When using the L</"managed_versions"> option, the added plugins can be directly
-configured in various ways to suit your versioning needs.
+When using the L</"managed_versions"> option, the additional plugins can be
+directly configured in various ways to suit your versioning needs.
 
   [@Starter]
   revision = 3
@@ -609,168 +610,6 @@ configured in various ways to suit your versioning needs.
   BumpVersionAfterRelease.munge_makefile_pl = 0
   NextRelease.filename = ChangeLog
   NextRelease.format = %-5v %{yyyy-MM-dd}d
-
-=head1 PHASES
-
-The plugins in this bundle, and any additional plugins you include in
-F<dist.ini>, each execute code within one or more phases when a L<Dist::Zilla>
-command such as L<< C<dzil test>|Dist::Zilla::App::Command::test >> is run. You
-can see a full listing of the phases used by the plugins in your F<dist.ini>
-with the command L<< C<dzil dumpphases>|Dist::Zilla::App::Command::dumpphases >>.
-
-=head2 BeforeBuild
-
-The distribution build consists of several phases, starting with
-L<-BeforeBuild|Dist::Zilla::Role::BeforeBuild>. No plugins in this bundle
-execute during this phase by default.
-
-=head2 FileGatherer
-
-In the L<-FileGatherer|Dist::Zilla::Role::FileGatherer> phase, many plugins add
-files to the distribution; in C<[@Starter]> this includes the plugins
-L<[GatherDir]|Dist::Zilla::Plugin::GatherDir>,
-L<[MetaYAML]|Dist::Zilla::Plugin::MetaYAML>, 
-L<[MetaJSON]|Dist::Zilla::Plugin::MetaJSON>,
-L<[License]|Dist::Zilla::Plugin::License>,
-L<[Pod2Readme]|Dist::Zilla::Plugin::Pod2Readme>,
-L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>,
-L<[Test::ReportPrereqs]|Dist::Zilla::Plugin::Test::ReportPrereqs>,
-L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>,
-L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
-plugin), and L<[Manifest]|Dist::Zilla::Plugin::Manifest>.
-
-=head2 EncodingProvider
-
-In the L<-EncodingProvider|Dist::Zilla::Role::EncodingProvider> phase, a plugin
-may set the encoding for gathered files. No plugins in this bundle execute
-during this phase by default.
-
-=head2 FilePruner
-
-In the L<-FilePruner|Dist::Zilla::Role::FilePruner> phase, gathered files may
-be excluded from the distribution. In C<[@Starter]> this is handled by the
-plugins L<[PruneCruft]|Dist::Zilla::Plugin::PruneCruft> and
-L<[ManifestSkip]|Dist::Zilla::Plugin::ManifestSkip>.
-
-=head2 FileMunger
-
-In the L<-FileMunger|Dist::Zilla::Role::FileMunger> phase, files in the
-distribution may be modified. In C<[@Starter]> the plugin
-L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile> runs during this phase
-in order to update its test file to test all gathered modules and scripts. When
-using the L</"managed_versions"> option, the
-L<[RewriteVersion]|Dist::Zilla::Plugin::RewriteVersion> and
-L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> plugins also operate during
-this phase.
-
-=head2 PrereqSource
-
-In the L<-PrereqSource|Dist::Zilla::Role::PrereqSource> phase, plugins can add
-prerequisites to the distribution. In C<[@Starter]> the plugins
-L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>,
-L<[Test::ReportPrereqs]|Dist::Zilla::Plugin::Test::ReportPrereqs>,
-L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>, and
-L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
-plugin) add prereqs during this phase.
-
-=head2 InstallTool
-
-In the L<-InstallTool|Dist::Zilla::Role::InstallTool> phase, the installer's
-F<Makefile.PL> or F<Build.PL> is generated in the distribution. In
-C<[@Starter]>, L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> or the configured
-installer plugin handles this phase.
-
-=head2 AfterBuild
-
-The L<-AfterBuild|Dist::Zilla::Role::AfterBuild> phase concludes the
-distribution build. No plugins in this bundle execute during this phase by
-default.
-
-=head2 BuildRunner
-
-The L<-BuildRunner|Dist::Zilla::Role::BuildRunner> phase executes the configure
-and build phases of the L<CPAN::Meta::Spec/"Phases"> in a built distribution.
-In C<[@Starter]>, L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> or the
-configured installer plugin handles this phase.
-
-=head2 TestRunner
-
-The L<-TestRunner|Dist::Zilla::Role::TestRunner> phase executes the test phase
-of the L<CPAN::Meta::Spec/"Phases">. In C<[@Starter]>,
-L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
-plugin) and L<[RunExtraTests]|Dist::Zilla::Plugin::RunExtraTests> handle this
-phase.
-
-=head2 BeforeRelease
-
-The L<-BeforeRelease|Dist::Zilla::Role::BeforeRelease> phase prepares a built
-distribution for release. In C<[@Starter]>, the plugins
-L<[TestRelease]|Dist::Zilla::Plugin::TestRelease>,
-L<[ConfirmRelease]|Dist::Zilla::Plugin::ConfirmRelease>, and
-L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> (to ensure PAUSE username
-and password are available) execute during this phase. In
-L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>, the plugin
-L<[Git::Check]|Dist::Zilla::Plugin::Git::Check> executes during this phase.
-
-=head2 Releaser
-
-The L<-Releaser|Dist::Zilla::Role::Releaser> phase releases the distribution to
-CPAN. In C<[@Starter]>, L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> (or
-L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>) handles this phase.
-
-=head2 AfterRelease
-
-The L<-AfterRelease|Dist::Zilla::Plugin::AfterRelease> phase concludes the
-distribution release process. No plugins in this bundle execute during this
-phase by default. When using the L</"managed_versions"> option, the
-L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> and
-L<[BumpVersionAfterRelease]|Dist::Zilla::Plugin::BumpVersionAfterRelease>
-plugins execute during this phase. When using the L</"regenerate"> option, the
-L<[CopyFilesFromRelease]|Dist::Zilla::Plugin::CopyFilesFromRelease> plugin
-executes during this phase. In
-L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>, the plugins
-L<[Git::Commit]|Dist::Zilla::Plugin::Git::Commit>,
-L<[Git::Tag]|Dist::Zilla::Plugin::Git::Tag>, and
-L<[Git::Push]|Dist::Zilla::Plugin::Git::Push> execute during this phase.
-
-=head2 MetaProvider
-
-The L<-MetaProvider|Dist::Zilla::Role::MetaProvider> phase executes when
-required rather than at a specific time. In C<[@Starter]>, the
-L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>,
-L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>, and
-L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex]> plugins provide metadata in
-this phase.
-
-=head2 VersionProvider
-
-The L<-VersionProvider|Dist::Zilla::Role::VersionProvider> phase executes when
-required rather than at a specific time. No plugins in this bundle execute
-during this phase by default. When using the L</"managed_versions"> option, the
-L<[RewriteVersion]|Dist::Zilla::Plugin::RewriteVersion> plugin acts as version
-provider.
-
-=head2 ShareDir
-
-The L<-ShareDir|Dist::Zilla::Role::ShareDir> phase executes when required
-rather than at a specific time. In C<[@Starter]>, the
-L<[ShareDir]|Dist::Zilla::Plugin::ShareDir> plugin handles this phase.
-
-=head2 Regenerator
-
-The L<-Regenerator|Dist::Zilla::Role::Regenerator> phase is a quasi-phase which
-executes when L<< C<dzil regenerate>|Dist::Zilla::App::Command::regenerate >>
-is run. When using the L</"regenerate"> option, the
-L<[Regenerate::AfterReleasers]|Dist::Zilla::Plugin::Regenerate::AfterReleasers>
-plugin promotes L<[CopyFilesFromRelease]|Dist::Zilla::Plugin::CopyFilesFromRelease>
-to also execute during this phase.
-
-=head2 Other
-
-The operation of some plugins may not neatly fit into a particular phase. In
-C<[@Starter]>, the L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> plugin marks a
-directory as containing executables, which can be used by installer plugins
-such as L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker>.
 
 =head1 EXTENDING
 
@@ -795,8 +634,8 @@ L<[LicenseFromModule]|Dist::Zilla::Plugin::LicenseFromModule>.
 =head2 Changelog
 
 To automatically add the new release version to the distribution changelog,
-use L<[NextRelease]|Dist::Zilla::Plugin::NextRelease>. To ensure the release
-has changelog entries, use
+use L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> as the L</"managed_versions">
+option does. To ensure the release has changelog entries, use
 L<[CheckChangesHasContent]|Dist::Zilla::Plugin::CheckChangesHasContent>.
 
 =head2 Git
@@ -815,9 +654,11 @@ manually, use L<[MetaResources]|Dist::Zilla::Plugin::MetaResources>.
 
 =head2 Prereqs
 
-To automatically set distribution prereqs from a L<cpanfile>, use
+To specify distribution prereqs in a L<cpanfile>, use
 L<[Prereqs::FromCPANfile]|Dist::Zilla::Plugin::Prereqs::FromCPANfile>. To
-specify prereqs manually, use L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>.
+specify prereqs in F<dist.ini>, use L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>.
+To automatically guess the distribution's prereqs by parsing the code, use
+L<[AutoPrereqs]|Dist::Zilla::Plugin::AutoPrereqs>.
 
 =head1 BUGS
 
@@ -838,5 +679,5 @@ This is free software, licensed under:
 =head1 SEE ALSO
 
 L<Dist::Zilla>, L<Dist::Zilla::PluginBundle::Basic>,
-L<Dist::Zilla::PluginBundle::Starter::Git>, L<Dist::Milla>,
-L<Dist::Zilla::MintingProfile::Starter>
+L<Dist::Zilla::Starter>, L<Dist::Zilla::PluginBundle::Starter::Git>,
+L<Dist::Zilla::MintingProfile::Starter>, L<Dist::Milla>

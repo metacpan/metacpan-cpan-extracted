@@ -1,6 +1,6 @@
 package Promises;
 our $AUTHORITY = 'cpan:YANICK';
-$Promises::VERSION = '0.99';
+$Promises::VERSION = '1.00';
 # ABSTRACT: An implementation of Promises in Perl
 
 use strict;
@@ -13,13 +13,13 @@ our $WARN_ON_UNHANDLED_REJECT = 0;
 
 use Sub::Exporter -setup => {
 
-    collectors => [ 
+    collectors => [
         'backend' => \'_set_backend',
         'warn_on_unhandled_reject' => \'_set_warn_on_unhandled_reject',
     ],
-    exports    => [qw[ 
-        deferred resolved rejected 
-        collect collect_hash 
+    exports    => [qw[
+        deferred resolved rejected
+        collect collect_hash
     ]]
 };
 
@@ -30,7 +30,7 @@ sub _set_warn_on_unhandled_reject {
         # only brings the big guns if asked for
 
         *Promises::Deferred::DESTROY = sub {
-    
+
             return unless $WARN_ON_UNHANDLED_REJECT;
 
             my $self = shift;
@@ -44,11 +44,11 @@ sub _set_warn_on_unhandled_reject {
                 Data::Dumper->new([$self->result])->Terse(1)->Dump;
 
             chomp $dump;
-            $dump =~ s/\n/ /g;
+            $dump =~ s/\n\s*/ /g;
 
             warn "Promise's rejection ", $dump,
                 " was not handled",
-                ( ' at ', join ' line ', @{$self->{_caller}} ) x !! $self->{_caller}, "\n";
+                ($self->{_caller} ? ( ' at ', join ' line ', @{$self->{_caller}} ) : ()) , "\n";
         };
     }
 }
@@ -66,7 +66,7 @@ sub _set_backend {
 
 }
 
-sub deferred(;&) { 
+sub deferred(;&) {
     my $promise = $Backend->new;
 
     if ( my $code = shift ) {
@@ -82,57 +82,32 @@ sub deferred(;&) {
 sub resolved { deferred->resolve(@_) }
 sub rejected { deferred->reject(@_)  }
 
-sub collect_hash { 
-    collect(@_)->then( sub { 
-    map { 
+sub collect_hash {
+    collect(@_)->then( sub {
+    map {
         my @values = @$_;
         die "'collect_hash' promise returned more than one value: [@{[ join ', ', @values ]} ]\n"
             if @values > 1;
 
         @values == 1 ? $values[0] : undef;
-    } @_ }) 
+    } @_ })
 }
 
 sub collect {
     my @promises = @_;
 
-    my $all_done  = $Backend->new;
-    my $results   = [];
-    my $remaining = scalar @promises;
-    foreach my $i ( 0 .. $#promises ) {
-        my $p = $promises[$i];
+    my $all_done = resolved();
 
-        # if it's not a Promise, it's something 
-        # that is already resolved
-        unless ( 
-            grep { ref $p eq $_ }
-                 qw/ Promises::Promise Promises::Deferred / 
-        ) {
-            $results->[$i] = [ $p ];
-            $remaining--;
-            next;
-        }
-
-        $p->then(
-            sub {
-                $results->[$i] = [@_];
-                $remaining--;
-                if (   $remaining == 0
-                    && $all_done->status ne $all_done->REJECTED )
-                {
-                    $all_done->resolve(@$results);
-                }
-            },
-            sub { $all_done->reject(@_) },
-        );
+    for my $p ( @promises ) {
+        my @results;
+        $all_done = $all_done->then( sub {
+            @results = @_;
+            return $p;
+        } )->then(sub{ ( @results, [ @_ ] ) } );
     }
 
-    $all_done->resolve(@$results)
-        if $remaining == 0 and $all_done->is_in_progress;
-
-    $all_done->promise;
+    return $all_done;
 }
-
 
 1;
 
@@ -146,7 +121,7 @@ Promises - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 0.99
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -375,7 +350,7 @@ Can take a coderef, which will be dealt with as a C<then> argument.
 
 =item C<resolved( @values )>
 
-Creates an instance of L<Promises::Deferred> resolved with 
+Creates an instance of L<Promises::Deferred> resolved with
 the provided C<@values>. Purely a shortcut for
 
     my $promise = deferred;
@@ -383,7 +358,7 @@ the provided C<@values>. Purely a shortcut for
 
 =item C<rejected( @values )>
 
-Creates an instance of L<Promises::Deferred> rejected with 
+Creates an instance of L<Promises::Deferred> rejected with
 the provided C<@values>. Purely a shortcut for
 
     my $promise = deferred;
@@ -394,7 +369,7 @@ the provided C<@values>. Purely a shortcut for
 Accepts a list of L<Promises::Promise> objects and then
 returns a L<Promises::Promise> object which will be called
 once all the C<@promises> have completed (either as an error
-or as a success). 
+or as a success).
 
 The eventual result of the returned promise
 object will be an array of all the results of each
@@ -403,7 +378,7 @@ to C<collect> originally, wrapped in arrayrefs, or the first error if
 at least one of the promises fail.
 
 If C<collect> is passed a value that is not a promise, it'll be wrapped
-in an arrayref and passed through. 
+in an arrayref and passed through.
 
     my $p1 = deferred;
     my $p2 = deferred;
@@ -421,7 +396,7 @@ in an arrayref and passed through.
 =item C<collect_hash( @promises )>
 
 Like C<collect>, but flatten its returned arrayref into a single
-hash-friendly list. 
+hash-friendly list.
 
 C<collect_hash> can be useful to a structured hash instead
 of a long list of promise values.
@@ -467,7 +442,7 @@ could be rewritten as
 Note that all promise values of the key/value pairs passed to C<collect_hash>
 must return a scalar or nothing, as returning more than one value would
 mess up the returned hash format. If a promise does return more than
-one value, C<collect_hash> will consider it as having failed. 
+one value, C<collect_hash> will consider it as having failed.
 
 If you know that a
 promise can return more than one value, you can do:
@@ -497,13 +472,29 @@ promise can return more than one value, you can do:
 
 =back
 
+=head2 Perl Alternatives
+
+=over
+
+=item L<Future>
+
+=item L<Mojo::Promise>
+
+Part of the L<Mojolicious> package.
+
+=item L<Promise::ES6>
+
+=item L<Promise::Tiny>
+
+=back
+
 =head1 AUTHOR
 
 Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2019, 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use CPS qw( kforeach );
 
@@ -42,3 +43,5 @@ kforeach(
 );
 
 is_deeply( \@nums, [ 4, 5, "finished" ], 'kforeach sync - @nums' );
+
+done_testing;

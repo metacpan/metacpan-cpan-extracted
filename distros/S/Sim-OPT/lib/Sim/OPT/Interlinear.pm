@@ -2128,7 +2128,7 @@ Sim::OPT::Interlinear
 
 
 Interlinear is a program for computing the missing values in multivariate datasieries through a strategy entailing distance-weighting the nearest-neihbouring gradients between points in an n-dimensional space.
-The program can adopts a distance-weighted gradient-based strategy. The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients, then utilizes recursively the gradients neighbouring near each unknown point to define it, weighting the candidates by distance. In this strategy, the curvatures in the space derive from the fact that in this calculation a local sample of the near-neighbouring gradients is used, which vary for each point. The strategy in question is adopted in Interlinear since version 0.103. Before that version, the gradients were calculated on a global basis.
+The program adopts a distance-weighted gradient-based strategy. The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients, then utilizes recursively the gradients neighbouring near each unknown point to define it, weighting the candidates by distance. In this strategy, the curvatures in the space are reconstructed by exploiting the fact that in this calculation a local sample of the near-neighbouring gradients is used, which vary for each point. The strategy in question is adopted in Interlinear since version 0.103. Before that version, the gradients were calculated on a global basis.
 Besides the described strategy, a), the following metamodelling strategies are utilized by Interlinear:
 
 b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
@@ -2137,18 +2137,16 @@ c) pure nearest neighbour (a strategy of last resort. One may want to use it to 
 
 Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
 For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
-To work well with a latin hypercube sampling, it is necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
+To work well with a latin hypercube sampling, it is usually necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
-If the configuration file is incomplete or missing, the program adopts its own defaults, exploiting the distance-weighted gradient-based strategy.
-
-The only variable that must mandatorily be specified in a configuration file is $sourcefile : the Unix path to the source file containining the dataseries.
-
-The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting in the last column the objective function values, in the rows in which they are present.
+If the configuration file is incomplete or missing, the program will adopt its own defaults, exploiting the distance-weighted gradient-based strategy.
+in the last column in the last column
+The only variable that must mandatorily be specified in a configuration file is $sourcefile: the Unix path to the source file containining the dataseries. The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting the objective function valuesin the last column in the last column, at the rows in which they are present.
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
 
-Here below an example is shown of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
+Here below is an example of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
 
 
 1,1,1,1.234
@@ -2171,7 +2169,7 @@ Here below an example is shown of multivatiate dataseries of 3 parameters assumi
 
 
 Note that the parameter listings cannot be incomplete. Just the objective function entries can be.
-The program converts this format into the one liked by Sim::OPTS, which is the following, in which the indices of the tensor are expressed more clearly:
+The program converts this format into the one preferred by Sim::OPTS, which is the following:
 
 
 1-1_2-1_3-1,9.234
@@ -2193,10 +2191,10 @@ The program converts this format into the one liked by Sim::OPTS, which is the f
 1-3_2-3_3-3
 
 
-After some computations, Interlinear will output a new dataseries, with the missing values filled in.
-This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful for saving computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
+After some computations, Interlinear will output a new dataseries with the missing values filled in.
+This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful, for example, to save computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-The number of computations required for the creation of a metamodel in OPT increases exponencially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
+The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
 
 To call Interlinear as a Perl function:
 use Sim::OPT::Interlinear;
@@ -2211,7 +2209,7 @@ If "./configfile.pl" is not specified, the program goes with the defaults.
 
 Or to begin with a dialogue question:
 ./Interlinear.pm interstart;
-
+.
 
 =head2 EXPORT
 
@@ -2223,7 +2221,7 @@ interlinear, interstart.
 =head1 AUTHOR
 
 
-Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
+Gian Luca Brunetti (2018-19) E<lt>gianluca.brunetti@polimi.itE<gt>
 
 
 =head1 COPYRIGHT AND LICENSE

@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.014'; # VERSION
+our $VERSION = '3.015'; # VERSION
 my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 # command line:
@@ -47,7 +47,7 @@ my (@example_list, @example_results);
   push @example_results, "create examples/022_truefonts_diacrits_utf8.<font name>.pdf, showing one\n page of characters and a page with a combining diacritic.\n";
 
   push @example_list, "023_cjkfonts";
-  push @example_results, "create examples/023_cjkfonts.<font name>.pdf, showing many pages of characters\n (plus a page of Latin text) for each of 4 variants (regular, bold, italic,\n and bold-italic.\n";
+  push @example_results, "create examples/023_cjkfonts.<font name>.pdf, showing many pages of characters\n (plus a page of Latin text) for each of 4 variants (regular, bold, italic,\n and bold-italic. Note that Latin text may be proportional or fixed pitch.\n";
 
   # require provision of a BDF font in %args
   push @example_list, "024_bdffonts";

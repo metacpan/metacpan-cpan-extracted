@@ -5,7 +5,7 @@ use base qw(PDF::Builder::Content PDF::Builder::Content::Text PDF::Builder::Reso
 use strict;
 use warnings;
 
-our $VERSION = '3.014'; # VERSION
+our $VERSION = '3.015'; # VERSION
 my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;

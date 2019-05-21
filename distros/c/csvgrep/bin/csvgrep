@@ -7,6 +7,8 @@ use Text::CSV_XS;
 use Text::Table::Tiny qw/ generate_table /;
 use Getopt::Long;
 
+binmode(STDOUT, ":utf8");
+
 my $SHOW_COUNT_THRESHOLD = 7;
 my $usage_string         = "usage: $0 [-h] [-d <dir>] [-i] <pattern> <file>\n";
 my $case_insensitive     = 0;
@@ -15,7 +17,6 @@ my $column_spec;
 
 
 my ($pattern, $filename) = process_command_line();
-binmode(STDOUT, ':utf8');
 show_matching_rows($pattern, $filename);
 exit 0;
 

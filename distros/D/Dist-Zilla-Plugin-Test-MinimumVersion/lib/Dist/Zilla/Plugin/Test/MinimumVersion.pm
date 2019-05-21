@@ -2,14 +2,23 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::MinimumVersion;
+package Dist::Zilla::Plugin::Test::MinimumVersion; # git description: v2.000008-17-g357a037
 # ABSTRACT: Author tests for minimum required versions
-our $VERSION = '2.000008'; # VERSION
+
+our $VERSION = '2.000009';
 
 use Moose;
-extends 'Dist::Zilla::Plugin::InlineFiles';
-with 'Dist::Zilla::Role::TextTemplate',
+with
+    'Dist::Zilla::Role::FileGatherer',
+    'Dist::Zilla::Role::FileMunger',
+    'Dist::Zilla::Role::TextTemplate',
     'Dist::Zilla::Role::PrereqSource';
+
+use Sub::Exporter::ForMethods 'method_installer'; # method_installer returns a sub.
+use Data::Section 0.004 # fixed header_re
+    { installer => method_installer }, '-setup';
+use List::Util 'first';
+use namespace::autoclean;
 
 has max_target_perl => (
     is => 'ro',
@@ -17,19 +26,50 @@ has max_target_perl => (
     predicate => 'has_max_target_perl',
 );
 
-around add_file => sub {
-    my ($orig, $self, $file) = @_;
-    $self->$orig(
-        Dist::Zilla::File::InMemory->new({
-            name => $file->name,
-            content => $self->fill_in_string(
-                $file->content,
-                { (version => $self->max_target_perl)x!!$self->has_max_target_perl }
-            ),
-        })
-    );
+use constant FILENAME => 'xt/author/minimum-version.t';  # could be configurable, someday..
+
+around dump_config => sub
+{
+    my ($orig, $self) = @_;
+    my $config = $self->$orig;
+
+    $config->{+__PACKAGE__} = +{
+        max_target_perl => $self->max_target_perl,
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
+    };
+    return $config;
 };
 
+sub gather_files
+{
+    my $self = shift;
+
+    require Dist::Zilla::File::InMemory;
+    $self->add_file(
+        Dist::Zilla::File::InMemory->new(
+            name => FILENAME,
+            content => ${$self->section_data(FILENAME)},
+        )
+    );
+}
+
+sub munge_files
+{
+    my $self = shift;
+
+    my $file = first { $_->name eq FILENAME } @{ $self->zilla->files };
+    $file->content(
+        $self->fill_in_string(
+            $file->content,
+            { (version => $self->max_target_perl)x!!$self->has_max_target_perl }
+        )
+    );
+    return;
+}
+
+#pod =for Pod::Coverage register_prereqs
+#pod
+#pod =cut
 
 sub register_prereqs {
     my $self = shift;
@@ -43,8 +83,33 @@ sub register_prereqs {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 1;
+
+#pod =head1 SYNOPSIS
+#pod
+#pod In C<dist.ini>:
+#pod
+#pod     [Test::MinimumVersion]
+#pod     max_target_perl = 5.10.1
+#pod
+#pod 1;
+#pod __END__
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod =for Pod::Coverage FILENAME gather_files munge_files register_prereqs
+#pod
+#pod This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing a
+#pod L<Test::MinimumVersion> test:
+#pod
+#pod   xt/author/minimum-version.t - a standard Test::MinimumVersion test
+#pod
+#pod You should provide the highest perl version you want to require as
+#pod C<target_max_version>. If you accidentally use perl features that are newer
+#pod than that version number, then the test will fail, and you can go change
+#pod whatever bumped up the minimum perl version required.
+#pod
+#pod =cut
 
 =pod
 
@@ -56,12 +121,7 @@ Dist::Zilla::Plugin::Test::MinimumVersion - Author tests for minimum required ve
 
 =head1 VERSION
 
-version 2.000008
-
-=for Pod::Coverage register_prereqs
-
-=for test_synopsis 1;
-__END__
+version 2.000009
 
 =head1 SYNOPSIS
 
@@ -70,7 +130,14 @@ In C<dist.ini>:
     [Test::MinimumVersion]
     max_target_perl = 5.10.1
 
+1;
+__END__
+
 =head1 DESCRIPTION
+
+=for Pod::Coverage register_prereqs
+
+=for Pod::Coverage FILENAME gather_files munge_files register_prereqs
 
 This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing a
 L<Test::MinimumVersion> test:
@@ -82,23 +149,16 @@ C<target_max_version>. If you accidentally use perl features that are newer
 than that version number, then the test will fail, and you can go change
 whatever bumped up the minimum perl version required.
 
-=head1 AVAILABILITY
+=head1 SUPPORT
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-MinimumVersion/>.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-MinimumVersion>
+(or L<bug-Dist-Zilla-Plugin-Test-MinimumVersion@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Test-MinimumVersion@rt.cpan.org>).
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::MinimumVersion/>.
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion/issues>.
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHORS
 
@@ -114,7 +174,31 @@ Marcel Grünauer <marcel@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Marcel Gruenauer Chris Weyl Kent Fredric
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Marcel Gruenauer <hanekomu@gmail.com>
+
+=item *
+
+Chris Weyl <cweyl@alumni.drew.edu>
+
+=item *
+
+Kent Fredric <kentfredric@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2010 by Mike Doherty.
 
@@ -125,10 +209,10 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 ___[ xt/author/minimum-version.t ]___
-#!perl
+use strict;
+use warnings;
 
 use Test::More;
-
 use Test::MinimumVersion;
 {{ $version
     ? "all_minimum_version_ok( qq{$version} );"

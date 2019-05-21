@@ -8,16 +8,17 @@ appspec - Utilities for spec files for App::Spec cli apps
 
 =head1 DESCRIPTION
 
-This script is a collection of tools for authors of L<App::Spec> command line scripts.
+This script is a collection of tools for authors of L<App::Spec> command line
+scripts.
 
-    # generate completion
-    % appspec completion --bash path/to/spec.yaml
-    # generate pod
-    % appspec pod path/to/spec.yaml
-    # validate your spec file
-    % appspec validate path/to/spec.yaml
-    # generate a new App::Spec app skeleton
-    % appspec new --class App::foo --name foo --with-subcommands
+  # generate completion
+  % appspec completion --bash path/to/spec.yaml
+  # generate pod
+  % appspec pod path/to/spec.yaml
+  # validate your spec file
+  % appspec validate path/to/spec.yaml
+  # generate a new App::Spec app skeleton
+  % appspec new --class App::foo --name foo --with-subcommands
 
 
 =head2 GLOBAL OPTIONS
@@ -33,8 +34,8 @@ This script is a collection of tools for authors of L<App::Spec> command line sc
 
 Generate completion for a specified spec file
 
-
-This command takes a spec file and outputs the corresponding shell script for tab completion.
+This command takes a spec file and outputs the corresponding
+shell script for tab completion.
 
 
 Options:
@@ -53,16 +54,21 @@ Parameters:
 
 Create new app
 
+This command creates a skeleton for a new app.
+It will create a directory for your app and write a skeleton
+spec file.
 
-This command creates a skeleton for a new app. It will create a directory for your app and write a skeleton spec file.
+Example:
+
+  appspec new --name myprogram --class App::MyProgram App-MyProgram
 
 
 Options:
 
-    --name -n                The (file) name of the app                     
-    --class -c               The main class name for your app implementation
-    --overwrite -o           Overwrite existing dist directory (flag)       
-    --with-subcommands -s    Create an app with subcommands (flag)          
+    --name -n              *  The (file) name of the app                     
+    --class -c             *  The main class name for your app implementation
+    --overwrite -o            Overwrite existing dist directory (flag)       
+    --with-subcommands -s     Create an app with subcommands (flag)          
 
 Parameters:
 
@@ -74,8 +80,8 @@ Parameters:
 
 Generate pod
 
-
-This command takes a spec file and outputs the generated pod documentation.
+This command takes a spec file and outputs the generated pod
+documentation.
 
 
 Parameters:
@@ -88,8 +94,8 @@ Parameters:
 
 Validate spec file
 
-
-This command takes a spec file and validates it against the current L<App::Spec> schema.
+This command takes a spec file and validates it against the current
+L<App::Spec> schema.
 
 
 Options:
@@ -106,7 +112,6 @@ Parameters:
 
 Show command help
 
-
 Options:
 
     --all     (flag)
@@ -119,7 +124,6 @@ Options:
 Information and utilities for this app
 
 
-
 =head3 _meta completion
 
     appspec _meta completion <subcommands>
@@ -127,13 +131,11 @@ Information and utilities for this app
 Shell completion functions
 
 
-
 =head3 _meta completion generate
 
     appspec _meta completion generate [options]
 
 Generate self completion
-
 
 Options:
 
@@ -149,13 +151,11 @@ Options:
 Pod documentation
 
 
-
 =head3 _meta pod generate
 
     appspec _meta pod generate
 
 Generate self pod
-
 
 
 

@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::LeafEditor;
-$Config::Model::Tk::LeafEditor::VERSION = '1.369';
+package Config::Model::Tk::LeafEditor 1.370;
+
 use strict;
 use warnings;
 use Carp;
@@ -111,7 +111,10 @@ sub Populate {
         $lb->insert( 'end', $leaf->get_choice );
         my $idx = 0;
         if ( defined $$vref ) {
-            map { $lb->selectionSet($idx) if $_ eq $$vref; $idx++ } @choice;
+            foreach my $c (@choice) {
+                $lb->selectionSet($idx) if $c eq $$vref;
+                $idx++;
+            }
         }
         $lb->bind( '<Button-1>', sub { $cw->try( $lb->get( $lb->curselection() ) ) } );
         $cw->add_buttons($ed_frame);
@@ -345,7 +348,7 @@ sub exec_external_editor {
     die "IO::Handle->new failed." unless defined $h;
 
     my $ed = $ENV{EDITOR} . ' ' . $pt->canonpath;
-    $cw->{ed_pid} = open $h, $ed . ' 2>&1 |';
+    $cw->{ed_pid} = open( $h, '|-', $ed );
 
     if ( not defined $cw->{ed_pid} ) {
         $cw->Dialog(

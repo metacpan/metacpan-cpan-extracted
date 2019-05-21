@@ -57,6 +57,7 @@ subtest 'read_schema' => sub {
                     },
                     contact => {
                         type => [qw( boolean null )],
+                        default => 0,
                         'x-order' => 5,
                     },
                     phone => {
@@ -153,6 +154,7 @@ subtest 'read_schema' => sub {
                     },
                     contact => {
                         type => [qw( boolean null )],
+                        default => 0,
                         'x-order' => 5,
                     },
                     phone => {
@@ -197,7 +199,7 @@ subtest 'errors' => sub {
         );
         eval { Yancy->new( config => \%missing_id ) };
         ok $@, 'configuration dies';
-        like $@, qr{ID field missing in properties for collection 'foo', field 'id'},
+        like $@, qr{ID field missing in properties for schema 'foo', field 'id'},
             'error is correct';
 
         my %missing_x_id = (
@@ -213,7 +215,7 @@ subtest 'errors' => sub {
         );
         eval { Yancy->new( config => \%missing_x_id ) };
         ok $@, 'configuration dies';
-        like $@, qr{ID field missing in properties for collection 'foo', field 'bar'},
+        like $@, qr{ID field missing in properties for schema 'foo', field 'bar'},
             'error is correct';
 
         my %ignored_missing_id = (
@@ -230,14 +232,14 @@ subtest 'errors' => sub {
         ok !$@, 'configuration succeeds' or diag $@;
     };
 
-    subtest 'no collections AND openapi' => sub {
+    subtest 'no schema AND openapi' => sub {
         eval { Yancy->new( config => {
             openapi => {},
             backend => $backend_url,
             collections => {},
         } ) };
-        ok $@, 'openapi AND collections should be fatal';
-        like $@, qr{Cannot pass both openapi AND \(collections or read_schema\)};
+        ok $@, 'openapi AND schema should be fatal';
+        like $@, qr{Cannot pass both openapi AND \(schema or read_schema\)};
     };
 
 };

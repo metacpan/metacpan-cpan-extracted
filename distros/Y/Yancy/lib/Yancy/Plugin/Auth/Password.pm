@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -9,7 +9,7 @@ our $VERSION = '1.025';
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
 #pod         backend => 'sqlite://myapp.db',
-#pod         collections => {
+#pod         schema => {
 #pod             users => {
 #pod                 properties => {
 #pod                     id => { type => 'integer', readOnly => 1 },
@@ -20,7 +20,7 @@ our $VERSION = '1.025';
 #pod         },
 #pod     };
 #pod     app->yancy->plugin( 'Auth::Password' => {
-#pod         collection => 'users',
+#pod         schema => 'users',
 #pod         username_field => 'username',
 #pod         password_field => 'password',
 #pod         password_digest => {
@@ -36,26 +36,58 @@ our $VERSION = '1.025';
 #pod This plugin provides a basic password-based authentication scheme for
 #pod a site.
 #pod
+#pod =head2 Migrate from Auth::Basic
+#pod
+#pod To migrate from the deprecated L<Yancy::Plugin::Auth::Basic> module, you
+#pod should set the C<migrate_digest> config setting to the C<password_digest>
+#pod settings from your Auth::Basic configuration. If they are the same as your
+#pod current password digest settings, you don't need to do anything at all.
+#pod
+#pod     # Migrate from Auth::Basic, which had SHA-1 passwords, to
+#pod     # Auth::Password using SHA-256 passwords
+#pod     app->yancy->plugin( 'Auth::Password' => {
+#pod         schema => 'users',
+#pod         username_field => 'username',
+#pod         password_field => 'password',
+#pod         migrate_digest => {
+#pod             type => 'SHA-1',
+#pod         },
+#pod         password_digest => {
+#pod             type => 'SHA-256',
+#pod         },
+#pod     } );
+#pod
+#pod     # Migrate from Auth::Basic, which had SHA-1 passwords, to
+#pod     # Auth::Password using SHA-1 passwords
+#pod     app->yancy->plugin( 'Auth::Password' => {
+#pod         schema => 'users',
+#pod         username_field => 'username',
+#pod         password_field => 'password',
+#pod         password_digest => {
+#pod             type => 'SHA-1',
+#pod         },
+#pod     } );
+#pod
 #pod =head1 CONFIGURATION
 #pod
 #pod This plugin has the following configuration options.
 #pod
-#pod =head2 collection
+#pod =head2 schema
 #pod
-#pod The name of the Yancy collection that holds users. Required.
+#pod The name of the Yancy schema that holds users. Required.
 #pod
 #pod =head2 username_field
 #pod
-#pod The name of the field in the collection which is the user's identifier.
+#pod The name of the field in the schema which is the user's identifier.
 #pod This can be a user name, ID, or e-mail address, and is provided by the
 #pod user during login.
 #pod
-#pod This field is optional. If not specified, the collection's ID field will
-#pod be used. For example, if the collection uses the C<username> field as
+#pod This field is optional. If not specified, the schema's ID field will
+#pod be used. For example, if the schema uses the C<username> field as
 #pod a unique identifier, we don't need to provide a C<username_field>.
 #pod
 #pod     plugin Yancy => {
-#pod         collections => {
+#pod         schema => {
 #pod             users => {
 #pod                 'x-id-field' => 'username',
 #pod                 properties => {
@@ -66,7 +98,7 @@ our $VERSION = '1.025';
 #pod         },
 #pod     };
 #pod     app->yancy->plugin( 'Auth::Password' => {
-#pod         collection => 'users',
+#pod         schema => 'users',
 #pod         password_digest => { type => 'SHA-1' },
 #pod     } );
 #pod
@@ -208,11 +240,11 @@ our $VERSION = '1.025';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
-use Yancy::Util qw( currym );
+use Yancy::Util qw( currym derp );
 use Digest;
 
 has log =>;
-has collection =>;
+has schema =>;
 has username_field =>;
 has password_field => 'password';
 has allow_register => 0;
@@ -221,6 +253,11 @@ has register_fields => sub { [] };
 has moniker => 'password';
 has default_digest =>;
 has route =>;
+
+# The Auth::Basic digest configuration to migrate from. Auth::Basic did
+# not store the digest information in the password, so we need to fix
+# it.
+has migrate_digest =>;
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -235,22 +272,25 @@ sub register {
 
 sub init {
     my ( $self, $app, $config ) = @_;
-    my $coll = $config->{collection}
-        || die "Error configuring Auth::Password plugin: No collection defined\n";
-    my $schema = $app->yancy->schema( $coll );
+    my $schema_name = $config->{schema} || $config->{collection}
+        || die "Error configuring Auth::Password plugin: No schema defined\n";
+    derp "'collection' configuration in Auth::Token is now 'schema'. Please fix your configuration.\n"
+        if $config->{collection};
+    my $schema = $app->yancy->schema( $schema_name );
     die sprintf(
         q{Error configuring Auth::Password plugin: Collection "%s" not found}."\n",
-        $coll,
+        $schema_name,
     ) unless $schema;
 
     $self->log( $app->log );
-    $self->collection( $coll );
+    $self->schema( $schema_name );
     $self->username_field( $config->{username_field} );
     $self->password_field( $config->{password_field} || 'password' );
     $self->default_digest( $config->{password_digest} );
+    $self->migrate_digest( $config->{migrate_digest} );
     $self->allow_register( $config->{allow_register} );
     $self->register_fields(
-        $config->{register_fields} || $app->yancy->schema( $coll )->{required}
+        $config->{register_fields} || $app->yancy->schema( $schema_name )->{required}
     );
     $app->yancy->filter->add( 'yancy.plugin.auth.password' => sub {
         my ( $key, $value, $schema, @params ) = @_;
@@ -262,7 +302,7 @@ sub init {
     push @{ $field->{ 'x-filter' } ||= [] },
         'yancy.plugin.auth.password';
     $field->{ format } = 'password';
-    $app->yancy->schema( $coll, $schema );
+    $app->yancy->schema( $schema_name, $schema );
 
     # Add fields that may not technically be required by the schema, but
     # are required for registration
@@ -287,7 +327,7 @@ sub init {
 
 sub _get_user {
     my ( $self, $c, $username ) = @_;
-    my $coll = $self->collection;
+    my $schema_name = $self->schema;
     my $username_field = $self->username_field;
     my %search;
     if ( my $field = $self->plugin_field ) {
@@ -295,10 +335,10 @@ sub _get_user {
     }
     if ( $username_field ) {
         $search{ $username_field } = $username;
-        my ( $user ) = @{ $c->yancy->backend->list( $coll, \%search, { limit => 1 } )->{items} };
+        my ( $user ) = @{ $c->yancy->backend->list( $schema_name, \%search, { limit => 1 } )->{items} };
         return $user;
     }
-    return $c->yancy->backend->get( $coll, $username );
+    return $c->yancy->backend->get( $schema_name, $username );
 }
 
 sub _digest_password {
@@ -320,13 +360,13 @@ sub _set_password {
     }
 
     my $id = $self->_get_id_for_username( $c, $username );
-    $c->yancy->backend->set( $self->collection, $id, { $self->password_field => $password_string } );
+    $c->yancy->backend->set( $self->schema, $id, { $self->password_field => $password_string } );
 }
 
 sub _get_id_for_username {
     my ( $self, $c, $username ) = @_;
-    my $collection = $self->collection;
-    my $schema = $c->yancy->schema( $collection );
+    my $schema_name = $self->schema;
+    my $schema = $c->yancy->schema( $schema_name );
     my $id = $username;
     my $id_field = $schema->{'x-id-field'} || 'id';
     my $username_field = $self->username_field;
@@ -398,8 +438,8 @@ sub _post_register {
         return;
     }
 
-    my $collection = $self->collection;
-    my $schema = $c->yancy->schema( $collection );
+    my $schema_name = $self->schema;
+    my $schema = $c->yancy->schema( $schema_name );
     my $username_field = $self->username_field || $schema->{'x-id-field'} || 'id';
     my $password_field = $self->password_field;
 
@@ -432,7 +472,7 @@ sub _post_register {
             @{ $self->register_fields }
         ),
     };
-    my $id = eval { $c->yancy->create( $collection, $item ) };
+    my $id = eval { $c->yancy->create( $schema_name, $item ) };
     if ( my $exception = $@ ) {
         my $error = ref $exception eq 'ARRAY' ? 'validation' : 'create';
         $c->app->log->error( 'Error creating user: ' . $exception );
@@ -493,6 +533,18 @@ sub _check_pass {
     my ( $user_password, $user_digest_config_string )
         = split /\$/, $user->{ $self->password_field }, 2;
 
+    my $force_upgrade = 0;
+    if ( !$user_digest_config_string ) {
+        # This password must have come from the Auth::Basic module,
+        # which did not have digest configuration stored with the
+        # password. So, we need to know what kind of digest to use, and
+        # we need to fix the password.
+        $user_digest_config_string = _build_digest_config_string(
+            $self->migrate_digest || $self->default_digest
+        );
+        $force_upgrade = 1;
+    }
+
     my $digest = eval { _get_digest_by_config_string( $user_digest_config_string ) };
     if ( $@ ) {
         die sprintf 'Error checking password for user "%s": %s', $username, $@;
@@ -502,7 +554,7 @@ sub _check_pass {
     my $success = $check_password eq $user_password;
 
     my $default_config_string = _build_digest_config_string( $self->default_digest );
-    if ( $success && $user_digest_config_string ne $default_config_string ) {
+    if ( $success && ( $force_upgrade || $user_digest_config_string ne $default_config_string ) ) {
         # We need to re-create the user's password field using the new
         # settings
         $self->_set_password( $c, $username, $input_password );
@@ -549,14 +601,14 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
     plugin Yancy => {
         backend => 'sqlite://myapp.db',
-        collections => {
+        schema => {
             users => {
                 properties => {
                     id => { type => 'integer', readOnly => 1 },
@@ -567,7 +619,7 @@ version 1.025
         },
     };
     app->yancy->plugin( 'Auth::Password' => {
-        collection => 'users',
+        schema => 'users',
         username_field => 'username',
         password_field => 'password',
         password_digest => {
@@ -583,28 +635,60 @@ Yancy v2.000 is released.
 This plugin provides a basic password-based authentication scheme for
 a site.
 
+=head2 Migrate from Auth::Basic
+
+To migrate from the deprecated L<Yancy::Plugin::Auth::Basic> module, you
+should set the C<migrate_digest> config setting to the C<password_digest>
+settings from your Auth::Basic configuration. If they are the same as your
+current password digest settings, you don't need to do anything at all.
+
+    # Migrate from Auth::Basic, which had SHA-1 passwords, to
+    # Auth::Password using SHA-256 passwords
+    app->yancy->plugin( 'Auth::Password' => {
+        schema => 'users',
+        username_field => 'username',
+        password_field => 'password',
+        migrate_digest => {
+            type => 'SHA-1',
+        },
+        password_digest => {
+            type => 'SHA-256',
+        },
+    } );
+
+    # Migrate from Auth::Basic, which had SHA-1 passwords, to
+    # Auth::Password using SHA-1 passwords
+    app->yancy->plugin( 'Auth::Password' => {
+        schema => 'users',
+        username_field => 'username',
+        password_field => 'password',
+        password_digest => {
+            type => 'SHA-1',
+        },
+    } );
+
 =encoding utf8
 
 =head1 CONFIGURATION
 
 This plugin has the following configuration options.
 
-=head2 collection
+=head2 schema
 
-The name of the Yancy collection that holds users. Required.
+The name of the Yancy schema that holds users. Required.
 
 =head2 username_field
 
-The name of the field in the collection which is the user's identifier.
+The name of the field in the schema which is the user's identifier.
 This can be a user name, ID, or e-mail address, and is provided by the
 user during login.
 
-This field is optional. If not specified, the collection's ID field will
-be used. For example, if the collection uses the C<username> field as
+This field is optional. If not specified, the schema's ID field will
+be used. For example, if the schema uses the C<username> field as
 a unique identifier, we don't need to provide a C<username_field>.
 
     plugin Yancy => {
-        collections => {
+        schema => {
             users => {
                 'x-id-field' => 'username',
                 properties => {
@@ -615,7 +699,7 @@ a unique identifier, we don't need to provide a C<username_field>.
         },
     };
     app->yancy->plugin( 'Auth::Password' => {
-        collection => 'users',
+        schema => 'users',
         password_digest => { type => 'SHA-1' },
     } );
 
@@ -760,7 +844,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

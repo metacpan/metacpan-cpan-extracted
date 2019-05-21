@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use Test::More;
 
@@ -8,9 +9,6 @@ use CPS qw( kwhile );
 
 if( $] < 5.008 ) {
    plan skip_all => "weaken() doesn't work before 5.8";
-}
-else {
-   plan tests => 3;
 }
 
 my $destroycount = 0;
@@ -49,6 +47,8 @@ $poke->();
 undef $poke;
 
 is( $destroycount, 1, 'Destroyed after second poke' );
+
+done_testing;
 
 package DestroyCounter;
 

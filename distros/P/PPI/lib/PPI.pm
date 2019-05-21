@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 
 # Set the version for CPAN
-our $VERSION = '1.266'; # VERSION
+our $VERSION = '1.269'; # VERSION
 
 our ( $XS_COMPATIBLE, @XS_EXCLUDE ) = ( '0.845' );
 
@@ -113,7 +113,7 @@ the statement being parsed.
 The information might not just be elsewhere in the file, it might not even be
 in the same file at all. It might also not be able to determine this
 information without the prior execution of a C<BEGIN {}> block, or the
-loading and execution of one or more external modules. Or worse the &dothis
+loading and execution of one or more external modules. Or worse the C<&dothis>
 function may not even have been written yet.
 
 B<When parsing Perl as code, you must also execute it>
@@ -169,7 +169,7 @@ at once. For the academics, parsing Perl suffers from the "Halting Problem".
 
 Once you can accept that we will never be able to parse Perl well enough
 to meet the standards of things that treat Perl as code, it is worth
-re-examining C<why> we want to "parse" Perl at all.
+re-examining I<why> we want to "parse" Perl at all.
 
 What are the things that people might want a "Perl parser" for?
 
@@ -294,7 +294,7 @@ anyone wanting to help out is encouraged to contact the author.
 =head2 General Layout
 
 PPI is built upon two primary "parsing" components, L<PPI::Tokenizer>
-and L<PPI::Lexer>, and a large tree of about 50 classes which implement
+and L<PPI::Lexer>, and a large tree of about 70 classes which implement
 the various the I<Perl Document Object Model> (PDOM).
 
 The PDOM is conceptually similar in style and intent to the regular DOM or
@@ -373,7 +373,7 @@ syntax.
 
 =head2 The PDOM Class Tree
 
-The following lists all of the 67 current PDOM classes, listing with indentation
+The following lists all of the 72 current PDOM classes, listing with indentation
 based on inheritance.
 
    PPI::Element
@@ -544,7 +544,7 @@ via the included L<PPI::Dumper>).
 
 Please note that in this example, strings are only listed for the
 B<actual> L<PPI::Token> that contains that string. Structures are listed
-with the type of brace characters it represents noted.
+with the type of brace characters they represent noted.
 
 The L<PPI::Dumper> module can be used to generate similar trees yourself.
 
@@ -647,7 +647,7 @@ some cases).
 
 The L<PPI::Token::Quote> and L<PPI::Token::QuoteLike> classes provide
 abstract base classes for the many and varied types of quote and
-quote-like things in Perl. However, much of the actual quote login is
+quote-like things in Perl. However, much of the actual quote logic is
 implemented in a separate quote engine, based at
 L<PPI::Token::_QuoteEngine>.
 

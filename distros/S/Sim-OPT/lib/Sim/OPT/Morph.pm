@@ -465,7 +465,7 @@ sub morph
 							my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
 							#say $tee "NOW MODIFICATION TYPE! $modification_type ";
 
-							if ( ( $stepsvar > 1) and ( not ( eval ( $skip ) ) ) )
+							if ( ( $stepsvar > 0 ) and ( not ( eval ( $skip ) ) ) )
 							{
 
 								##########################################
@@ -747,7 +747,8 @@ sub morph
 
 
 
-								if ( ( $countvar_after > $countvar ) or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
+								if ( ( $countvar_after > $countvar )
+									or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
 								{
 									my ( @expected_instances, @expected_tos );
 
@@ -4899,34 +4900,34 @@ sub use_modish
 	#use strict;
 	#use warnings;
 
-				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
+			my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 
-				my @applytype = @$applytype_ref;
-				my @use_modish = @{ $use_modish_ref->[ $countop ] };
-				my $pathhere = "$to/cfg/$fileconfig";
-				say $tee "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+			my @applytype = @$applytype_ref;
+			my @use_modish = @{ $use_modish_ref->[ $countop ] };
+			my $pathhere = "$to/cfg/$fileconfig";
+			say $tee "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-				my @menus = @$menus_ref;
-				my %dowhat = %$dowhat_ref;
+			my @menus = @$menus_ref;
+			my %dowhat = %$dowhat_ref;
 
-				my %numvertmenu = %{ $menus[0] };
-				my %vertnummenu = %{ $menus[1] };
+			my %numvertmenu = %{ $menus[0] };
+			my %vertnummenu = %{ $menus[1] };
 
-				my %numletter = %numvertmenu;
+			my %numletter = %numvertmenu;
 
-				if ( @use_modish )
+			if ( @use_modish )
+			{
+				foreach $cycle_ref ( @use_modish )
 				{
-					foreach $cycle_ref ( @use_modish )
-					{
-						my @cycle = @$cycle_ref; #say $tee "\@cycle " . dump( @cycle );
+					my @cycle = @$cycle_ref; #say $tee "\@cycle " . dump( @cycle );
 
-						my $shortmodishdefpath;
-						if ( ref $cycle[0] )
-						{
-                          $shortmodishdefpath_ref = shift( @cycle ) ;
-						}
-						my $modishdefpath = "$to" . "$shortmodishdefpath_ref->[0]" ;
+					my $shortmodishdefpath;
+					if ( ref $cycle[0] )
+					{
+                        $shortmodishdefpath_ref = shift( @cycle ) ;
+					}
+					my $modishdefpath = "$to" . "$shortmodishdefpath_ref->[0]" ;
 
 			my $zonenumber = $cycle[0]; #say $tee "\$zonenumber " . dump( $zonenumber );
 			my $shdname = $to . $cycle[1]; #say $tee "\$shdname " . dump( $shdname );
@@ -4988,8 +4989,8 @@ YYY
 			}
 			else
 			{
-				say $tee "NO .mod.shda FILE HERE. STOPPING.";####################
-				die;
+				die "NO .mod.shda FILE HERE. STOPPING.";####################
+				;
 			}
 		}
 	}
@@ -6533,15 +6534,15 @@ Sim::OPT::Morph.
 
 =head1 DESCRIPTION
 
-Sim::OPT::Morph is morphing program for preparing model instances (in text format) to be given to simulation programs in design-aimed explorations. Sim::OPT::Morph is controlled by the Sim::OPT module, which manages the structure of searches.
+Sim::OPT::Morph is morphing program for preparing model instances (in text format) to be given to simulation programs, usually in design-aimed explorations. Sim::OPT::Morph is controlled by the Sim::OPT module, which manages the structure of the searches.
 
-More specifically, Sim::OPT::Morph can manipulate the text files constituting the description of models for simulation programs. The general function dedicated to that aim recognizes variables by position on the page (determined by row number and position of the list element in that row - no embedding of markers in files) and modifies them through linear variations - so to perform translations ("linear" option), or rotations ("2drotation" option), or text substitution ("wordchange" option) -, and possibly propagation of constraint with user-defined rules.
+Sim::OPT::Morph can manipulate the text files constituting the description of models for simulation programs. The general function dedicated to that aim recognizes variables by position on the page (determined by row number and position of the list element in that row) and modifies them with operations like translations, rotations or text substitution, and possibly with propagation of constraints.
 
-Additionally, Sim::OPT::Morph features several specialized functions which are specific to the ESP-r building performance simulation platform; those functions can manage the simulation program directly, through the shell, or by manipulating model configuration files. Some of these functionalities involve operations in which the Radiance lighting performance simulation platform is called through ESP-r.
+Additionally, Sim::OPT::Morph features several specialized functions which are specific to the ESP-r building performance simulation platform. Those functions can manage the simulation program directly, through the shell, or by manipulating model configuration files. Some of these functionalities involve operations in which the Radiance lighting performance simulation platform is called via ESP-r.
 
-The morphing instructions must be written in a configuration file whose name will be asked at the launch of Sim::OPT. This distribution includes two examples of such files: an OPT's configuration file for an ESP-r model and an OPT's configuration for an EnergyPlus model for the same building and the same morphing operations. (EnergyPlus is another building simulation platform.)
+The morphing instructions must be written in a configuration file whose name will be asked at the launch of Sim::OPT. This distribution includes some examples of such files an ESP-r model and an EnergyPlus model.
 
-Configuration files for propagation of constraints may be specified in addition to a configuration file. Propagation of constraints can be used to direct the morphing of models and give to the morphing operations greater flexibility. Propagation of constraints can target the model configuration files and/or, in the case of ESP-r, trigger modification operations performed through the shell and regarding geometry, solar shadings, mass/flow network and controls.
+Propagation of constraints can target the model configuration files and/or, in the case of ESP-r, trigger modification operations performed through the shell and regarding geometry, solar shadings, mass/flow network and controls.
 
 =head2 EXPORT
 
@@ -6549,7 +6550,7 @@ Configuration files for propagation of constraints may be specified in addition 
 
 =head1 SEE ALSO
 
-Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. Additionally, reference to the source code may be made.
+Annotated examples can be found in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation.
 
 =head1 AUTHOR
 
@@ -6557,7 +6558,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

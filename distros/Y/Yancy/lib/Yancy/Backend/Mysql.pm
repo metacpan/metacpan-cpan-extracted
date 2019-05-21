@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -56,9 +56,9 @@ our $VERSION = '1.025';
 #pod     # User+Pass Host and DB
 #pod     mysql://user:pass@example.com/mydb
 #pod
-#pod =head2 Collections
+#pod =head2 Schema Names
 #pod
-#pod The collections for this backend are the names of the tables in the
+#pod The schema names for this backend are the names of the tables in the
 #pod database.
 #pod
 #pod So, if you have the following schema:
@@ -74,11 +74,11 @@ our $VERSION = '1.025';
 #pod         email VARCHAR(255) NULL
 #pod     );
 #pod
-#pod You could map that schema to the following collections:
+#pod You could map that to the following schema:
 #pod
 #pod     {
 #pod         backend => 'mysql://user@/mydb',
-#pod         collections => {
+#pod         schema => {
 #pod             People => {
 #pod                 required => [ 'name', 'email' ],
 #pod                 properties => {
@@ -139,7 +139,13 @@ our %IGNORE_TABLE = (
     dbix_class_schema_versions => 1,
 );
 
-has collections =>;
+has schema =>;
+sub collections {
+    require Carp;
+    Carp::carp( '"collections" method is now "schema"' );
+    shift->schema( @_ );
+}
+
 has mojodb =>;
 use constant mojodb_class => 'Mojo::mysql';
 use constant mojodb_prefix => 'mysql';
@@ -202,7 +208,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -258,9 +264,9 @@ Some examples:
     # User+Pass Host and DB
     mysql://user:pass@example.com/mydb
 
-=head2 Collections
+=head2 Schema Names
 
-The collections for this backend are the names of the tables in the
+The schema names for this backend are the names of the tables in the
 database.
 
 So, if you have the following schema:
@@ -276,11 +282,11 @@ So, if you have the following schema:
         email VARCHAR(255) NULL
     );
 
-You could map that schema to the following collections:
+You could map that to the following schema:
 
     {
         backend => 'mysql://user@/mydb',
-        collections => {
+        schema => {
             People => {
                 required => [ 'name', 'email' ],
                 properties => {
@@ -324,7 +330,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2019 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

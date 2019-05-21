@@ -118,11 +118,10 @@ this program; if not, write to:
  Boston, MA  02111-1307, USA.
 
 =cut
+use lib '/home/henryst/UMLS-Association/lib/';
 
 use UMLS::Association;
 use Getopt::Long;
-
-my $DEFAULT_MEASURE = "tscore";
 
 #############################################
 #  Get Options and params

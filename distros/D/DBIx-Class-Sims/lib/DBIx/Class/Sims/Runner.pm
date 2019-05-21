@@ -105,7 +105,7 @@ sub create_search {
   my %cols = map { $_ => 1 } $source->columns;
   my $search = {
     (map {
-      $_ => $cond->{$_}
+      'me.' . $_ => $cond->{$_}
     } grep {
       # Make sure this column exists and is an actual value. Assumption is that
       # a non-reference is a value and a reference is a sims-spec.
@@ -164,6 +164,12 @@ sub fix_fk_dependencies {
     my $fk_name = $short_source->($rel_info);
     my $rs = $self->schema->resultset($fk_name);
 
+    if (!$self->{allow_relationship_column_names}) {
+      if ($col ne $rel_name && exists $item->{$col}) {
+        die "Cannot use column $col - use relationship $rel_name";
+      }
+    }
+
     my $cond;
     my $proto = delete($item->{$rel_name}) // delete($item->{$col});
     if ($proto) {
@@ -181,22 +187,39 @@ sub fix_fk_dependencies {
       }
       # Use a referenced row
       elsif (ref($proto) eq 'SCALAR') {
-        my ($table, $idx) = ($$proto =~ /(.+)\[(\d+)\]$/);
-        unless ($table && defined $idx) {
-          die "Unsure what to do about $name->$rel_name():" . np($proto);
-        }
-        unless (exists $self->{rows}{$table}) {
-          die "No rows in $table to reference\n";
-        }
-        unless (exists $self->{rows}{$table}[$idx]) {
-          die "Not enough ($idx) rows in $table to reference\n";
-        }
-
-        $cond = { $fkcol => $self->{rows}{$table}[$idx]->$fkcol };
+        $cond = {
+          $fkcol => $self->convert_backreference(
+            $name, $rel_name, $$proto, $fkcol,
+          ),
+        };
       }
       else {
         die "Unsure what to do about $name->$rel_name():" . np($proto);
       }
+    }
+
+    # If the child's column is within a UK, add a check to the $rs that ensures
+    # we cannot pick a parent that's already being used.
+    my @constraints = $self->unique_constraints_containing($name, $col);
+    if (@constraints) {
+      # First, find the inverse relationship. If it doesn't exist or if there
+      # is more than one, then die.
+      my @inverse = $self->find_inverse_relationships(
+        $fk_name, $rel_name, $fkcol,
+      );
+      if (@inverse == 0) {
+        die "Cannot find an inverse relationship for ${name}->${rel_name}\n";
+      }
+      elsif (@inverse > 1) {
+        die "Too many inverse relationships for ${name}->${rel_name}\n";
+      }
+
+      # We cannot add this relationship to the $cond because that would result
+      # in an infinite loop. So, restrict the $rs here.
+      $rs = $rs->search(
+        { join('.', $inverse[0]->{rel}, $inverse[0]->{col}) => undef },
+        { join => $inverse[0]->{rel} },
+      );
     }
 
     my $col_info = $source->column_info($col);
@@ -216,7 +239,7 @@ sub fix_fk_dependencies {
 
     my $parent;
     unless ($meta->{create}) {
-      $parent = $rs->search(undef, { rows => 1 })->first;
+      $parent = $rs->search(undef, { rows => 1 })->single;
 
       # This occurs when a FK condition was specified, but the column is
       # nullable. We want to defer these because self-referential values need
@@ -280,6 +303,41 @@ sub fix_fk_dependencies {
   sub clear_pending { %pending = (); }
 }
 
+sub find_inverse_relationships {
+  my $self = shift;
+  my ($name, $rel_name, $fkcol) = @_;
+
+  my $source = $self->schema->source($name);
+
+  my @inverses;
+  foreach my $rel_name ( $source->relationships ) {
+    my $rel_info = $source->relationship_info($rel_name);
+    next if $is_fk->($rel_info);
+
+    push @inverses, {
+      rel => $rel_name,
+      col => $foreign_fk_col->($rel_info),
+    };
+  }
+
+  return @inverses;
+}
+
+sub unique_constraints_containing {
+  my $self = shift;
+  my ($name, $column) = @_;
+
+  my $source = $self->schema->source($name);
+  my @uniques = map {
+    [ $source->unique_constraint_columns($_) ]
+  } $source->unique_constraint_names();
+
+  return grep {
+    my $coldef = $_;
+    grep { $column eq $_ } @$coldef
+  } @uniques;
+}
+
 sub find_by_unique_constraints {
   my $self = shift;
   my ($name, $item) = @_;
@@ -321,6 +379,49 @@ sub find_by_unique_constraints {
     return $row;
   }
   return;
+}
+
+sub convert_backreference {
+  my $self = shift;
+  my ($name, $attr, $proto, $default_method) = @_;
+
+  my ($table, $idx, $methods) = ($proto =~ /(.+)\[(\d+)\](?:\.(.+))?$/);
+  unless ($table && defined $idx) {
+    die "Unsure what to do about $name->$attr => $proto\n";
+  }
+  unless (exists $self->{rows}{$table}) {
+    die "No rows in $table to reference\n";
+  }
+  unless (exists $self->{rows}{$table}[$idx]) {
+    die "Not enough ($idx) rows in $table to reference\n";
+  }
+
+  if ($methods) {
+    my @chain = split '\.', $methods;
+    my $obj = $self->{rows}{$table}[$idx];
+    $obj = $obj->$_ for @chain;
+    return $obj;
+  }
+  elsif ($default_method) {
+    return $self->{rows}{$table}[$idx]->$default_method;
+  }
+  else {
+    die "No method to call at $name->$attr => $proto\n";
+  }
+}
+
+sub fix_values {
+  my $self = shift;
+  my ($name, $item) = @_;
+
+  while (my ($attr, $value) = each %{$item}) {
+    # Decode a backreference
+    if (ref($value) eq 'SCALAR') {
+      $item->{$attr} = $self->convert_backreference(
+        $name, $attr, $$value,
+      );
+    }
+  }
 }
 
 sub fix_child_dependencies {
@@ -617,6 +718,7 @@ sub create_item {
   $self->{hooks}{preprocess}->($name, $source, $item);
 
   my ($child_deps, $deferred_fks) = $self->fix_fk_dependencies($name, $item);
+  $self->fix_values($name, $item);
 
   #warn "Creating $name (".np($item).")\n";
   my $row = $self->find_by_unique_constraints($name, $item);
@@ -674,7 +776,7 @@ sub run {
     }
 
     # Things were passed in, but don't exist in the schema.
-    if ($self->{strict_mode} && %still_to_use) {
+    if (!$self->{ignore_unknown_tables} && %still_to_use) {
       my $msg = "The following names are in the spec, but not the schema:\n";
       $msg .= join ',', sort keys %still_to_use;
       $msg .= "\n";

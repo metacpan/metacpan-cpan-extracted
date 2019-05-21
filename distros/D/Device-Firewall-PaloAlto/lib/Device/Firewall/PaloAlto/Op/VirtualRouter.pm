@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::VirtualRouter;
-$Device::Firewall::PaloAlto::Op::VirtualRouter::VERSION = '0.1.5';
+$Device::Firewall::PaloAlto::Op::VirtualRouter::VERSION = '0.1.6';
 use strict;
 use warnings;
 use 5.010;
@@ -18,14 +18,17 @@ sub _new {
     my ($api_return) = @_;
     my %virtual_router;
 
-    my @routes = @{$api_return->{result}{entry}};
+    # Return the Class::Error
+    return $api_return unless $api_return;
+
+    my $routes = $api_return->{result}{entry} // [];
 
     # We have all of the routes - however due to ECMP we may have two or more routes with the same destination.
     # We key our routes by destination, so there should be only one 'Route' object.
     # All the properties of the route are the same except for 'interface', 'nexthop' and 'age'. Thus these
     # become arrays. 
 
-    for my $route (@routes) {
+    for my $route (@{$routes}) {
         # Is the route active? If not, skip it.
         # This isn't the ideal implementation - would rather call the
         # Route object method. FIXME
@@ -78,7 +81,7 @@ Device::Firewall::PaloAlto::Op::VirtualRouter - new module
 
 =head1 VERSION
 
-version 0.1.5
+version 0.1.6
 
 =head1 SYNOPSIS
 

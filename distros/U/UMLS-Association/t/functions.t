@@ -6,9 +6,11 @@
 #  This scripts tests all of the functions in Association.pm
 
 #use Test::Simple tests => 31;
+use lib '/home/henryst/UMLS-Association/lib';
+
 use UMLS::Association;
 
-BEGIN { $| = 1; print "1..31\n"; }
+BEGIN { $| = 1; print "1..32\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 $loaded = 1;
@@ -222,6 +224,21 @@ push @cuiSets2, \@cuiSet2b;
 
 
 #########################################################
+#                  Sample 2 Direct
+#########################################################
+$testText = "Sample 2 Direct noOrder";
+$option_hash{'noorder'} = 1;
+$option_hash{'lta'} = 0;
+$option_hash{'mwa'} = 0;
+$option_hash{'lsa'} = 0;
+$option_hash{'sbc'} = 0;
+$option_hash{'wsa'} = 0;
+$association = UMLS::Association->new(\%option_hash); 
+$score = $association->calculateAssociation_termPair('C0000012', 'C0000013', 'freq');
+
+ok ($score == 11, $testText.' 0');
+
+#########################################################
 #                  Sample 2 LTA
 #########################################################
 $testText = "Sample 2 LTA ordered";
@@ -277,7 +294,6 @@ $option_hash{'noorder'} = 1;
 $association = UMLS::Association->new(\%option_hash); 
 $scoresRef = $association->calculateAssociation_setPairList(\@cuiSets1, \@cuiSets2, $option_hash{'measure'});
 ok (${$scoresRef}[0] == $goldScores[0], $testText.' 0');
-ok (${$scoresRef}[1] == $goldScores[1], $testText.' 1');
 
 
 #########################################################

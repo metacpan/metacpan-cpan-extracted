@@ -8,7 +8,7 @@ use Term::ANSIColor;
 use YAML::PP;
 use File::Basename qw/ dirname /;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use base 'App::Spec::Run::Cmd';
 
@@ -25,11 +25,15 @@ sub cmd_completion {
     my ($self, $run) = @_;
     my $options = $run->options;
     my $parameters = $run->parameters;
+    my $name = $options->{name};
 
     my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
     die "Specify which shell" unless $shell;
 
     my $spec = $self->_read_spec($run);
+    if (defined $name) {
+        $spec->name($name);
+    }
     my $completion = $spec->generate_completion(
         shell => $shell,
     );

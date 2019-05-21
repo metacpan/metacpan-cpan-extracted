@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use CPS qw( liftk );
 
@@ -30,3 +31,5 @@ my @words;
 $ksplitwords->( "my message here", sub { @words = @_ } );
 
 is_deeply( \@words, [qw( my message here )], 'liftk works on list-returning functions' );
+
+done_testing;

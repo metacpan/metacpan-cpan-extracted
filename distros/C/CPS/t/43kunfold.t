@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 use CPS::Functional qw( kunfold );
 
@@ -26,3 +27,5 @@ kunfold(
 );
 
 is_deeply( \@nums, [ 1, 2, 3, 4 ], 'kunfold sync - @nums' );
+
+done_testing;

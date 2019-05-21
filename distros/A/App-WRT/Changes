@@ -1,5 +1,32 @@
 Revision history for App::WRT
 
+v6.2.3 2019-05-16
+
+  - bin/wrt-display: correctly expand new, fulltext, all
+
+v6.2.2 2019-05-16
+
+  - EntryStore: stash sorted list of all entries as found
+
+v6.2.1 2019-05-16
+
+  - bin/wrt-help
+    - list more subcommands
+    - fix display of utility name
+
+v6.2.0 2019-05-16
+
+  - EntryStore: Add methods for further slicing entry list:
+    - Days by month or year
+    - Months by year
+    - Immediate children and parents of entries
+    - basename($entry)
+
+v6.1.0 2019-05-16
+
+  - Add bin/wrt-help and bin/wrt-version
+    - Includes -h, --help, -v, --version, -v aliases.
+
 v6.0.0 2019-05-06
 
   - App::WRT::Date

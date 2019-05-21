@@ -11,7 +11,11 @@ README.md
 data/hetero.ab1
 data/mt.ab1
 dist.ini
+img/chromatogram.png
 lib/FASTX/Abi.pm
+paper/paper.bib
+paper/paper.md
+scripts/strip.pl
 setup.sh
 t/00-pod.t
 t/01-pod-coverage.t
@@ -19,10 +23,15 @@ t/02-perl-min.t
 t/03-minimum-standards.t
 t/05-changes.t
 t/10_basic_test.t
+t/10_basic_test0.t
 t/11_parse_no_hetero.t
 t/12_parse_hetero.t
 t/13_got_FASTQ.t
 t/14_chroma_info.t
+t/15_invalid_input_attributes.t
+t/16_keep_trace.t
+xt/private/after.sh
+xt/private/before.sh
 xt/prototype.pl.txt
 xt/release/04-version.future
 xt/use_module.pl

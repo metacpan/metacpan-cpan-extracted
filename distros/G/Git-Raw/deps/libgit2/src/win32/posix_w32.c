@@ -33,6 +33,10 @@
 # define SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE 0x02
 #endif
 
+#ifndef SYMBOLIC_LINK_FLAG_DIRECTORY
+# define SYMBOLIC_LINK_FLAG_DIRECTORY 0x01
+#endif
+
 /* Allowable mode bits on Win32.  Using mode bits that are not supported on
  * Win32 (eg S_IRWXU) is generally ignored, but Wine warns loudly about it
  * so we simply remove them.
@@ -397,14 +401,18 @@ int p_readlink(const char *path, char *buf, size_t bufsiz)
 int p_symlink(const char *target, const char *path)
 {
 	git_win32_path target_w, path_w;
-	wchar_t *target_p;
+	DWORD dwFlags;
 
 	if (git_win32_path_from_utf8(path_w, path) < 0 ||
 		git__utf8_to_16(target_w, MAX_PATH, target) < 0)
 		return -1;
 
-	if (!CreateSymbolicLinkW(path_w, target_w,
-	    SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE))
+	dwFlags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
+
+	if (GetFileAttributesW(target_w) & FILE_ATTRIBUTE_DIRECTORY)
+		dwFlags |= SYMBOLIC_LINK_FLAG_DIRECTORY;
+
+	if (!CreateSymbolicLinkW(path_w, target_w, dwFlags))
 		return -1;
 
 	return 0;
@@ -517,6 +525,58 @@ int p_creat(const char *path, mode_t mode)
 	return p_open(path, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
+int p_fallocate(int fd, off_t offset, off_t len)
+{
+	HANDLE fh = (HANDLE)_get_osfhandle(fd);
+	LARGE_INTEGER zero, position, oldsize, newsize;
+	size_t size;
+
+	if (fh == INVALID_HANDLE_VALUE) {
+		errno = EBADF;
+		return -1;
+	}
+
+	if (offset < 0 || len <= 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (git__add_sizet_overflow(&size, offset, len)) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	zero.u.LowPart = 0;
+	zero.u.HighPart = 0;
+
+	newsize.u.LowPart = (size & 0xffffffff);
+
+#if (SIZE_MAX > UINT32_MAX)
+	newsize.u.HighPart = size >> 32;
+#else
+	newsize.u.HighPart = 0;
+#endif
+
+	if (!GetFileSizeEx(fh, &oldsize)) {
+		set_errno();
+		return -1;
+	}
+
+	/* POSIX emulation: attempting to shrink the file is ignored */
+	if (oldsize.QuadPart >= newsize.QuadPart)
+		return 0;
+
+	if (!SetFilePointerEx(fh, zero, &position, FILE_CURRENT) ||
+	    !SetFilePointerEx(fh, newsize, NULL, FILE_BEGIN) ||
+	    !SetEndOfFile(fh) ||
+	    !SetFilePointerEx(fh, position, 0, FILE_BEGIN)) {
+		set_errno();
+		return -1;
+	}
+
+	return 0;
+}
+
 int p_utimes(const char *path, const struct p_timeval times[2])
 {
 	git_win32_path wpath;
@@ -533,7 +593,7 @@ int p_utimes(const char *path, const struct p_timeval times[2])
 		attrs_new = attrs_orig & ~FILE_ATTRIBUTE_READONLY;
 
 		if (!SetFileAttributesW(wpath, attrs_new)) {
-			giterr_set(GITERR_OS, "failed to set attributes");
+			git_error_set(GIT_ERROR_OS, "failed to set attributes");
 			return -1;
 		}
 	}
@@ -853,7 +913,7 @@ int p_rename(const char *from, const char *to)
 int p_recv(GIT_SOCKET socket, void *buffer, size_t length, int flags)
 {
 	if ((size_t)((int)length) != length)
-		return -1; /* giterr_set will be done by caller */
+		return -1; /* git_error_set will be done by caller */
 
 	return recv(socket, buffer, (int)length, flags);
 }
@@ -861,7 +921,7 @@ int p_recv(GIT_SOCKET socket, void *buffer, size_t length, int flags)
 int p_send(GIT_SOCKET socket, const void *buffer, size_t length, int flags)
 {
 	if ((size_t)((int)length) != length)
-		return -1; /* giterr_set will be done by caller */
+		return -1; /* git_error_set will be done by caller */
 
 	return send(socket, buffer, (int)length, flags);
 }

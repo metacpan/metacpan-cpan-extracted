@@ -581,7 +581,7 @@ Sim::OPT::Sim.
 
 =head1 DESCRIPTION
 
-Sim::OPT::Sim is the module used by Sim::OPT to launch the simulations once the models have been built. Sim::OPT::Sim's presently existing functionalities can be used to launch simulations in ESP-r and EnergyPlus. The possibility to call simulation programs other than the cited two may be pursued through modifications of the code dedicated to EnergyPlus (which is actually meant as an example of a generic case). This portion of code may be actually constituted by the single line launching the simulation program through the shell.
+Sim::OPT::Sim is the module used by Sim::OPT to launch the simulations once the models have been built. Sim::OPT::Sim's presently existing functionalities can be used to launch simulations in ESP-r and EnergyPlus. The possibility to call simulation programs other than the cited two may be pursued through modifications of the code dedicated to EnergyPlus (which is actually meant as an example of a generic case). This code portion may be actually constituted by the single line launching the simulation program through the shell.
 
 =head2 EXPORT
 
@@ -589,7 +589,7 @@ Sim::OPT::Sim is the module used by Sim::OPT to launch the simulations once the 
 
 =head1 SEE ALSO
 
-Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. Additionally, reference to the source code may be made.
+Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. 
 
 =head1 AUTHOR
 

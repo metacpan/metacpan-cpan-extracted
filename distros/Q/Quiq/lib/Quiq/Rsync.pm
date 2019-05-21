@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Option;
 use File::Rsync ();
@@ -35,7 +35,7 @@ L<Quiq::Object>
     Quiq::Rsync->exec('/src/dir1/','/dest/dir2');
     
     # Änderungen anzeigen, aber nicht durchführen
-    Quiq::Rsync->exec($src,$dest,-dryRun => 1);
+    Quiq::Rsync->exec($src,$dest,-dryRun=>1);
 
 =head1 DESCRIPTION
 
@@ -203,7 +203,7 @@ sub exec {
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

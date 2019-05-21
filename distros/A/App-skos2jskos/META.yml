@@ -5,7 +5,6 @@ author:
 build_requires:
   Test::More: '0'
   Test::Output: '0'
-  Test::PerlTidy: '0'
   Test::RequiresInternet: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
@@ -35,4 +34,4 @@ resources:
   bugtracker: https://github.com/gbv/skos2jskos/issues
   homepage: https://github.com/gbv/skos2jskos
   repository: https://github.com/gbv/skos2jskos.git
-version: 0.2.0
+version: 0.2.1

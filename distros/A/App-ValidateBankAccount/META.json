@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "BankAccount::Validator::UK" : "0.47",
+            "BankAccount::Validator::UK" : "0.48",
             "Encode::Locale" : "1.05",
             "Moo" : "2.000000",
             "MooX::Options" : "4.023",
@@ -46,11 +46,11 @@
    "provides" : {
       "App::ValidateBankAccount" : {
          "file" : "lib/App/ValidateBankAccount.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "App::ValidateBankAccount::Option" : {
          "file" : "lib/App/ValidateBankAccount/Option.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/manwar/App-ValidateBankAccount"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

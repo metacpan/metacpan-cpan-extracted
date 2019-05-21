@@ -404,17 +404,40 @@ package Sidef::Types::Set::Bag {
     sub map {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
         my %new;
         foreach my $key (CORE::keys(%$self)) {
 
-            my $elem  = $self->{$key};
-            my $value = $block->run($elem->{value});
+            my $elem = $self->{$key};
 
-            ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            foreach my $value ($block->run($elem->{value})) {
+                ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            }
         }
 
         bless \%new, ref($self);
     }
+
+    sub map_2d {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+
+            my $elem = $self->{$key};
+
+            foreach my $value ($block->run(@{$elem->{value}})) {
+                ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            }
+        }
+
+        bless \%new, ref($self);
+    }
+
+    *map_2D = \&map_2d;
 
     sub collect {
         my ($self, $block) = @_;
@@ -429,6 +452,8 @@ package Sidef::Types::Set::Bag {
 
     sub grep {
         my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my %new;
         foreach my $key (CORE::keys(%$self)) {
@@ -448,6 +473,30 @@ package Sidef::Types::Set::Bag {
     }
 
     *select = \&grep;
+
+    sub grep_2d {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+
+            my $elem  = $self->{$key};
+            my $value = $elem->{value};
+
+            if ($block->run(@$value)) {
+                $new{$key} = {
+                              value => $value,
+                              count => $elem->{count},
+                             };
+            }
+        }
+
+        bless \%new, ref($self);
+    }
+
+    *grep_2D = \&grep_2d;
 
     sub count_by {
         my ($self, $block) = @_;
@@ -580,6 +629,21 @@ package Sidef::Types::Set::Bag {
 
         $self;
     }
+
+    sub each_2d {
+        my ($self, $block) = @_;
+
+        foreach my $elem (CORE::values(%$self)) {
+            my $value = $elem->{value};
+            foreach my $i (1 .. $elem->{count}) {
+                $block->run(@$value);
+            }
+        }
+
+        $self;
+    }
+
+    *each_2D = \&each_2d;
 
     sub each_kv {
         my ($self, $block) = @_;

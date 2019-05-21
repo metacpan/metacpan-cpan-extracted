@@ -1,5 +1,4 @@
-requires 'Pcore',   v0.22.2;
-requires 'Geo::IP', v1.45.0;
+requires 'Pcore', v0.22.2;
 feature linux => sub {
     requires 'MaxMind::DB::Reader::XS', v1.0.5;
 };

@@ -4,7 +4,7 @@ Code::TidyAll::Plugin::YAMLFrontMatter - TidyAll plugin for validating YAML Fron
 
 # VERSION
 
-version 1.000002
+version 1.000003
 
 # SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.69
+    version 1.73
 
 SYNOPSIS
 
@@ -600,6 +600,17 @@ METHODS
 
     Run the test phase
 
+ clean_install
+
+     $build->clean_install
+
+    Clean files from the final install location. The default implementation
+    removes all files recursively except for the _alien directory. This is
+    helpful when you have an old install with files that may break the new
+    build.
+
+    For a non-share install this doesn't do anything.
+
  system
 
      $build->system($command);
@@ -847,7 +858,7 @@ AUTHOR
 
     Diab Jerius (DJERIUS)
 
-    Roy Storey
+    Roy Storey (KIWIROY)
 
     Ilya Pavlov
 

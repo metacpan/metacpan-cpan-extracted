@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.139;
+our $VERSION = '1.140';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -421,7 +421,7 @@ sub apiClass {
 
 =item -secure => $bool (Default: 0)
 
-Ersetze das Passwort durch (fünf) Sterne.
+Ersetze das Passwort durch einen Stern.
 
 =back
 
@@ -473,7 +473,7 @@ sub asString {
         }
         if ($password) {
             if ($secure) {
-                $password = '*****';
+                $password = '*';
             }
             $str .= ":$password";
         }
@@ -733,7 +733,7 @@ sub udl {
 
 =head1 VERSION
 
-1.139
+1.140
 
 =head1 AUTHOR
 

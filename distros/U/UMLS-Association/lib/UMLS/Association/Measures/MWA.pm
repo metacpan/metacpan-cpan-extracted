@@ -12,6 +12,8 @@
 # BjC. We then take the minimum between ABj and BjC for each Bj and average 
 # over all BjC. This imitates the average of minimum information flow between 
 # A and C between each shared linking term, Bj. 
+use lib '/home/henryst/UMLS-Association/lib';
+
 use strict;
 use warnings;
 

@@ -1,0 +1,28 @@
+---
+abstract: 'Generate SVG based QR Code.'
+author:
+  - 'Rolf Stöckli <tekki@cpan.org>'
+build_requires:
+  Test::More: '0.90'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-QRCode
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Text::QRCode: '0.05'
+resources:
+  bugtracker: https://github.com/Tekki/svg-qrcode/issues
+  homepage: https://github.com/Tekki/svg-qrcode
+  repository: https://github.com/Tekki/svg-qrcode.git
+version: '0.01'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny qw( path );
 
 # ABSTRACT: Override on a per-alien basis
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub init
@@ -30,7 +30,7 @@ sub init
             {
               if($override =~ /^(system|share|default)$/)
               {
-                $build->log("ovveride for $class => $override");
+                $build->log("override for $class => $override");
                 return $override;
               }
               else
@@ -61,7 +61,7 @@ Alien::Build::Plugin::Probe::Override - Override on a per-alien basis
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

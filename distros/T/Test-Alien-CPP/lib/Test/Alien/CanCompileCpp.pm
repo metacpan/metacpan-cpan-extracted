@@ -3,14 +3,14 @@ package Test::Alien::CanCompileCpp;
 use strict;
 use warnings;
 use base 'Test2::Require';
+use ExtUtils::CBuilder 0.27;
 
 # ABSTRACT: Skip a test file unless a C++ compiler is available
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 
 sub skip
 {
-  require ExtUtils::CBuilder;
   ExtUtils::CBuilder->new->have_cplusplus ? undef : 'This test requires a compiler.';
 }
 
@@ -28,7 +28,7 @@ Test::Alien::CanCompileCpp - Skip a test file unless a C++ compiler is available
 
 =head1 VERSION
 
-version 0.99
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,11 @@ be available.  Otherwise the test will be skipped.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 

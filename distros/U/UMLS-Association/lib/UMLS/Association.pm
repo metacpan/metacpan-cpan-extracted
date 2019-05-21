@@ -77,6 +77,9 @@ for all configuration options:
 More information is provided in the INSTALL file. 
 
 =cut
+use lib '/home/henryst/UMLS-Association/lib';
+use lib '/home/henryst/Text-NSP-1.31/lib';
+
 package UMLS::Association;
 
 use Fcntl;
@@ -91,7 +94,7 @@ my $pkg = "UMLS::Association";
 
 use vars qw($VERSION);
 
-$VERSION = '0.17';
+$VERSION = '0.19';
 
 my $errorhandler     = ""; 
 my $statfinder_G = "";   
@@ -416,6 +419,9 @@ sub _calculateAssociation_fromObservedCounts {
     my $includename = ""; my $usename = "";  my $ngram = 2; #NOTE: calculation actually change slightly with 3-grams, 4-grams, etc... does it make enough of a difference to matter?
     if ($statistic eq "freq") {
 	return $n11;
+    }
+    elsif($statistic eq "random") {
+	return rand();
     }
     elsif($statistic eq "ll")  { 
 	$usename = 'Text::NSP::Measures::'.$ngram.'D::MI::'.$statistic;

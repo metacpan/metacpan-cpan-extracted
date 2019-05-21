@@ -5,7 +5,7 @@ use 5.010_001;
 
 use strictures 2;
 
-our $VERSION = '0.310001';
+our $VERSION = '0.320000';
 
 {
   # Do **NOT** import a clone() function into the DBIx::Class::Schema namespace
@@ -178,6 +178,13 @@ sub load_sims {
       %{$opts->{toposort} // {}},
     );
 
+    my $strict_mode = $opts->{strict_mode} // 0;
+    if ($strict_mode) {
+      $opts->{ignore_unknown_tables} //= 0;
+      $opts->{allow_relationship_column_names} //= 0;
+      $opts->{die_on_failure} //= 1;
+    }
+
     my $runner = DBIx::Class::Sims::Runner->new(
       parent => $self,
       schema => $schema,
@@ -189,7 +196,8 @@ sub load_sims {
       # Set this to false to throw a warning if a non-null auto-increment column
       # has a value set. It defaults to false. Set to true to disable.
       allow_pk_set_value => $opts->{allow_pk_set_value} // 0,
-      strict_mode => $opts->{strict_mode} // 1,
+      ignore_unknown_tables => $opts->{ignore_unknown_tables} // 0,
+      allow_relationship_column_names => $opts->{allow_relationship_column_names} // 1,
     );
 
     $rows = eval {
@@ -400,7 +408,7 @@ C<< $rv, $addl? = DBIx::Class::Sims->load_sims( $schema, $spec, ?$opts ) >>
 
 This method will load the rows requested in C<$spec>, plus any additional rows
 necessary to make those rows work. This includes any parent rows (as defined by
-C<belongs_to>) and per any constraints defined in C<$opts->{constraints}>. If
+C<belongs_to>) and per any constraints defined in C<< $opts->{constraints} >>. If
 need-be, you can pass in hooks (as described below) to manipulate the data.
 
 load_sims does all of its work within a call to L<DBIx::Class::Schema/txn_do>.
@@ -670,6 +678,41 @@ back from the C<< load_sims() >> call.
 This also only works for belongs_to relationships. Since all parents are created
 before all children, the Sims cannot back-reference into children.
 
+=head3 Methods of References
+
+Let's say you want to create something where an attribute needs to have the same
+value as a parent's attribute. You can do it as so:
+
+  {
+      Parent => {
+          name => 'foo',
+          Child => {
+              name => \"Parent[0].name",
+          },
+      },
+  }
+
+All the rules of back-references apply. This will only work for method calls
+that do not require parameters.
+
+You can chain method calls as well. For example:
+
+  {
+      Artist => {
+          name => 'They Might Be Giants',
+      },
+      Album => {
+          artist => \'Artist[0]',
+          name => 'Flood',
+      },
+      Track => {
+          album => \'Album[0]',
+          name => \'Album[0].artist.name',
+      },
+  }
+
+(Yes, TMBG released a song called "TMBG". If only the album was also "TMBG" ...)
+
 =head2 Notes
 
 =over 4
@@ -722,11 +765,38 @@ This defaults to 1.
 
 If set, this will be the srand() seed used for this invocation.
 
-=head2 strict_mode
+=head2 ignore_unknown_tables
 
-If set to 0, this will ignore table names that don't exist in the schema.
+If set to 1, this will ignore table names that don't exist in the schema.
+Otherwise, it will raise an error.
+
+This defaults to 0.
+
+=head2 allow_relationship_column_names
+
+If set to 0, this will raise an error if relationship is specified with the
+column name instead of the relationship name.
+
+If they are the same, this will not raise an error. (This is generally a bad
+idea, but some schemas do this.)
 
 This defaults to 1.
+
+=head2 strict_mode
+
+This sets the following options:
+
+=over 4
+
+=item * C<< ignore_unknown_tables => 0 >>
+
+=item * C<< allow_relationship_column_names => 0 >>
+
+=item * C<< die_on_failure => 1 >>
+
+=back
+
+If you have explicitly set one of these options, it will override strict_mode.
 
 =head2 toposort
 
@@ -743,13 +813,13 @@ hooks:
 
 =item * preprocess
 
-This receives C<$name, $source, $spec> and expects nothing in return. C<$spec>
-is the hashref that will be passed to C<<$schema->resultset($name)->create()>>.
+This receives C<$name, $source, $spec> and ignores any return value. C<$spec>
+is the hashref that will be passed to C<< $schema->resultset($name)->create() >>.
 This hook is expected to modify C<$spec> as needed.
 
 =item * postprocess
 
-This receives C<$name, $source, $row> and expects nothing in return. This hook
+This receives C<$name, $source, $row> and ignores any return value. This hook
 is expected to modify the newly-created row object as needed.
 
 =back

@@ -1,4 +1,4 @@
-use Test2::V0 -no_srand => 1;
+use Test2::V0 0.000121 -no_srand => 1;
 use Test2::Tools::HTTP;
 use Test2::Mock;
 use HTTP::Request;
@@ -315,10 +315,8 @@ subtest 'http_response' => sub {
       );
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
-      etc;
+      event 'Fail';
+      end;
     },
   );
 
@@ -676,10 +674,8 @@ subtest 'headers' => sub {
       );
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
-      etc;
+      event 'Fail';
+      end;
     },
   );
 
@@ -703,10 +699,8 @@ subtest 'headers' => sub {
       );
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
-      etc;
+      event 'Fail';
+      end;
     },
   );
 
@@ -720,10 +714,8 @@ subtest 'headers' => sub {
       );
     },
     array {
-      event Ok => sub {
-        call pass => F();
-      };
-      etc;
+      event 'Fail';
+      end;
     },
   );
 

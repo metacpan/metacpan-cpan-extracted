@@ -1,9 +1,12 @@
-package WebDriver::Tiny 0.101;
+package WebDriver::Tiny 0.102;
 
 use 5.020;
-use feature qw/postderef signatures/;
+use feature qw/lexical_subs postderef signatures/;
 use warnings;
 no  warnings 'experimental';
+
+# https://www.w3.org/TR/webdriver/#elements
+my sub ELEMENT_ID :prototype() {'element-6066-11e4-a52e-4f735466cecf'}
 
 # Allow "cute" $drv->('selector') syntax.
 #
@@ -21,7 +24,7 @@ use WebDriver::Tiny::Elements;
 our @CARP_NOT = 'WebDriver::Tiny::Elements';
 
 sub import {
-    # From http://www.w3.org/TR/webdriver/#sendkeys
+    # https://www.w3.org/TR/webdriver/#sendkeys
     state $chars = {
         WD_NULL            => 57344, WD_CANCEL     => 57345,
         WD_HELP            => 57346, WD_BACK_SPACE => 57347,
@@ -76,14 +79,15 @@ sub new($class, %args) {
     $args{path} //= '';
 
     my $self = bless [
-        # FIXME Keep alive can make PhantomJS return a 400 bad request :-S.
-        HTTP::Tiny->new( keep_alive => 0 ),
+        HTTP::Tiny->new,
         "http://$args{host}:$args{port}$args{path}/session",
         $args{base_url} // '',
     ], $class;
 
     my $reply = $self->_req(
-        POST => '', { desiredCapabilities => $args{capabilities} // {} } );
+        POST => '',
+        { capabilities => { alwaysMatch => $args{capabilities} // {} } },
+    );
 
     $self->[1] .= '/' . $reply->{sessionId};
 
@@ -106,9 +110,9 @@ sub  html($self) { $self->_req( GET => '/source' ) }
 sub title($self) { $self->_req( GET => '/title'  ) }
 sub   url($self) { $self->_req( GET => '/url'    ) }
 
-sub    back($self) { $self->_req( POST   => '/back'    ); $self }
-sub forward($self) { $self->_req( POST   => '/forward' ); $self }
-sub refresh($self) { $self->_req( POST   => '/refresh' ); $self }
+sub    back($self) { $self->_req( POST => '/back'    ); $self }
+sub forward($self) { $self->_req( POST => '/forward' ); $self }
+sub refresh($self) { $self->_req( POST => '/refresh' ); $self }
 
 sub status {
     # /status is the only path without the session prefix, so surpress it.
@@ -187,7 +191,7 @@ sub find($self, $selector, %args) {
             { using => $method, value => "$selector" },
         );
 
-        @ids = map values %$_, $reply->@*;
+        @ids = map $_->{+ELEMENT_ID}, @$reply;
 
         @ids = grep {
             $drv->_req( GET => "/element/$_/displayed" )
@@ -206,11 +210,9 @@ sub find($self, $selector, %args) {
 }
 
 my $js = sub($path, $self, $script, @args) {
-
     # Currently only takes the first ID in the collection, this should change.
-    $_ = { ELEMENT => $_->[1] }
+    $_ = { ELEMENT_ID, $_->[1] }
         for grep ref eq 'WebDriver::Tiny::Elements', @args;
-
     $self->_req( POST => $path, { script => $script, args => \@args } );
 };
 
@@ -226,16 +228,14 @@ sub get($self, $url) {
     $self;
 }
 
-sub screenshot {
-    my ( $self, $file ) = @_;
-
+sub screenshot($self, $file = undef) {
     require MIME::Base64;
 
     my $data = MIME::Base64::decode_base64(
         $self->_req( GET => '/screenshot' )
     );
 
-    if ( @_ == 2 ) {
+    if ( defined $file ) {
         open my $fh, '>', $file or die $!;
         print $fh $data;
         close $fh or die $!;
@@ -246,7 +246,7 @@ sub screenshot {
     $data;
 }
 
-sub user_agent { $js->( '/execute/sync', $_[0], 'return window.navigator.userAgent') }
+sub user_agent($self) { $js->( '/execute/sync', $self, 'return window.navigator.userAgent') }
 
 sub  window($self) { $self->_req( GET => '/window'         ) }
 sub windows($self) { $self->_req( GET => '/window/handles' ) }
@@ -271,15 +271,13 @@ sub window_rect {
     $self;
 }
 
-sub window_switch( $self, $handle) {
+sub window_switch($self, $handle) {
     $self->_req( POST => '/window', { handle => $handle } );
 
     $self;
 }
 
-sub _req {
-    my ( $self, $method, $path, $args ) = @_;
-
+sub _req($self, $method, $path, $args = undef) {
     my $reply = $self->[0]->request(
         $method,
         $self->[1] . $path,
@@ -299,6 +297,6 @@ sub _req {
     $value;
 }
 
-sub DESTROY { $_[0]->_req( DELETE => '' ) if $_[0][3] && $_[0][0] }
+sub DESTROY($self) { $self->_req( DELETE => '' ) if $self->[0] && $self->[3] }
 
 1;

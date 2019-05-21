@@ -30,12 +30,22 @@ our $TESTS = {
 plan tests => scalar keys $TESTS->%*;
 
 for my $ip ( keys $TESTS->%* ) {
-    ok( P->geoip->country->country_code_by_addr($ip) eq $TESTS->{$ip}, 'country_code_by_addr_' . $ip );
+    ok( P->geoip->country->record_for_address($ip)->{country}->{iso_code} eq $TESTS->{$ip}, 'country_code_by_addr_' . $ip );
 }
 
 done_testing scalar keys $TESTS->%*;
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 33                   | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

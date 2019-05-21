@@ -29,7 +29,7 @@ requires:
   Call::Context: '0'
   IO::Framed: '0.15'
   IO::SigGuard: '0.13'
-  Module::Load: '0'
+  Module::Runtime: '0'
   Promise::ES6: '0'
   X::Tiny: '0'
   parent: '0'
@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Protocol-DBus/issues
   repository: git://github.com/FGasper/p5-Protocol-DBus.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

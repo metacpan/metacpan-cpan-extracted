@@ -1,6 +1,5 @@
 package Time::Zone::Olson;
 
-use 5.010;
 use strict;
 use warnings;
 
@@ -12,7 +11,7 @@ use English qw( -no_match_vars );
 use DirHandle();
 use POSIX();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -65,6 +64,11 @@ sub _EVERY_ONE_HUNDRED_YEARS               { return 100 }
 sub _DEFAULT_DST_START_HOUR                { return 2 }
 sub _DEFAULT_DST_END_HOUR                  { return 2 }
 
+sub _TZ_DEFINITION_KEYS {
+    return
+      qw(std_name std_sign std_hours std_minutes std_seconds dst_name dst_sign dst_hours dst_minutes dst_seconds start_julian_without_feb29 end_julian_withou_feb29 start_julian_with_feb29 end_julian_with_feb29 start_month end_month start_week end_week start_day end_day start_hour end_hour start_minute end_minute start_second end_second);
+}
+
 sub _TIMEZONE_FULL_NAME_REGEX {
     return qr/(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?/smx;
 }
@@ -83,17 +87,26 @@ my $_tzdata_cache  = {};
 sub _DEFAULT_ZONEINFO_DIRECTORY { return $_default_zoneinfo_directory }
 
 sub new {
-    my ( $class, $params ) = @_;
+    my ( $class, %params ) = @_;
     my $self = {};
     bless $self, $class;
-    $self->directory( $params->{directory}
-          || $ENV{TZDIR}
-          || _DEFAULT_ZONEINFO_DIRECTORY() );
-    if ( defined $params->{offset} ) {
-        $self->offset( $params->{offset} );
+    if (   ( $OSNAME eq 'MSWin32' )
+        && ( !$params{directory} )
+        && ( !$ENV{TZDIR} ) )
+    {
+        require Time::Zone::Olson::Win32;
+        bless $self, 'Time::Zone::Olson::Win32';
     }
     else {
-        $self->timezone( $params->{timezone} || $ENV{TZ} );
+        $self->directory( $params{directory}
+              || $ENV{TZDIR}
+              || _DEFAULT_ZONEINFO_DIRECTORY() );
+    }
+    if ( defined $params{offset} ) {
+        $self->offset( $params{offset} );
+    }
+    else {
+        $self->timezone( $params{timezone} || $ENV{TZ} );
     }
     return $self;
 }
@@ -101,7 +114,7 @@ sub new {
 sub directory {
     my ( $self, $new ) = @_;
     my $old = $self->{directory};
-    if ( @_ > 1 ) {
+    if ( defined $new ) {
         $self->{directory} = $new;
     }
     return $old;
@@ -110,7 +123,7 @@ sub directory {
 sub offset {
     my ( $self, $new ) = @_;
     my $old = $self->{offset};
-    if ( @_ > 1 ) {
+    if ( defined $new ) {
         $self->{offset} = $new;
         delete $self->{tz};
     }
@@ -118,10 +131,10 @@ sub offset {
 }
 
 sub equiv {
-    my ( $self, $time_zone, $from_time ) = @_;
-    $from_time //= time;
+    my ( $self, $compare_time_zone, $from_time ) = @_;
+    $from_time = defined $from_time ? $from_time : time;
     my $class = ref $self;
-    my $compare = $class->new( { 'timezone' => $time_zone } );
+    my $compare = $class->new( 'timezone' => $compare_time_zone );
     my %offsets_compare;
     foreach my $transition_time ( $compare->transition_times() ) {
         if ( $transition_time >= $from_time ) {
@@ -150,9 +163,63 @@ sub equiv {
                 return;
             }
         }
-        return 1;
+        if ( $self->_tz_definition_equiv($compare) ) {
+            return 1;
+        }
     }
     return;
+}
+
+sub _tz_definition_equiv {
+    my ( $self, $compare ) = @_;
+    my $current_time_zone = $self->timezone();
+    my $compare_time_zone = $compare->timezone();
+    if ( ( defined $self->{_tzdata}->{$current_time_zone}->{tz_definition} )
+        && (
+            defined $compare->{_tzdata}->{$compare_time_zone}->{tz_definition} )
+      )
+    {
+        my $current_tz_definition =
+          $self->{_tzdata}->{$current_time_zone}->{tz_definition};
+        my $compare_tz_definition =
+          $compare->{_tzdata}->{$compare_time_zone}->{tz_definition};
+        foreach my $key ( _TZ_DEFINITION_KEYS() ) {
+            next if ( $key eq 'std_name' );
+            next if ( $key eq 'dst_name' );
+            if (    ( defined $current_tz_definition->{$key} )
+                and ( defined $compare_tz_definition->{$key} ) )
+            {
+                if ( ( $key eq 'std_sign' ) or ( $key eq 'dst_sign' ) ) {
+                    if ( $current_tz_definition->{$key} ne
+                        $compare_tz_definition->{$key} )
+                    {
+                        return;
+                    }
+                }
+                else {
+                    if ( $current_tz_definition->{$key} !=
+                        $compare_tz_definition->{$key} )
+                    {
+                        return;
+                    }
+                }
+            }
+            elsif ( defined $current_tz_definition->{$key} ) {
+                return;
+            }
+            elsif ( defined $compare_tz_definition->{$key} ) {
+                return;
+            }
+        }
+    }
+    elsif ( defined $self->{_tzdata}->{$current_time_zone}->{tz_definition} ) {
+        return;
+    }
+    elsif ( defined $compare->{_tzdata}->{$compare_time_zone}->{tz_definition} )
+    {
+        return;
+    }
+    return 1;
 }
 
 sub _timezones {
@@ -263,19 +330,43 @@ sub location {
 sub timezone {
     my ( $self, $new ) = @_;
     my $old = $self->{tz};
-    if ( @_ > 1 ) {
+    if ( defined $new ) {
         if ( defined $new ) {
             my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
-            if ( $new !~ /^$timezone_full_name_regex$/smx ) {
+            if ( $new =~ /^$timezone_full_name_regex$/smx ) {
+                $self->{area}     = $LAST_PAREN_MATCH{area};
+                $self->{location} = $LAST_PAREN_MATCH{location};
+                if (   ( $OSNAME eq 'MSWin32' )
+                    && ( !defined $self->directory() ) )
+                {
+                    my %mapping = Time::Zone::Olson::Win32->mapping();
+                    if ( !defined $mapping{$new} ) {
+                        Carp::croak(
+"'$new' is not an timezone in the existing Win32 registry"
+                        );
+                    }
+                }
+                else {
+                    my $path = File::Spec->catfile( $self->directory(), $new );
+                    if ( !-f $path ) {
+                        Carp::croak(
+"'$new' is not an timezone in the existing Olson database"
+                        );
+                    }
+                }
+            }
+            elsif ( my $tz_definition =
+                $self->_parse_tz_variable( $new, 'TZ' ) )
+            {
+                $self->{_tzdata}->{$new} = {
+                    tz_definition    => $tz_definition,
+                    transition_times => [],
+                    no_tz_file       => 1,
+                };
+            }
+            else {
                 Carp::croak(
                     "'$new' does not have a valid format for a TZ timezone");
-            }
-            $self->{area}     = $LAST_PAREN_MATCH{area};
-            $self->{location} = $LAST_PAREN_MATCH{location};
-            my $path = File::Spec->catfile( $self->directory(), $new );
-            if ( !-f $path ) {
-                Carp::croak(
-                    "'$new' is not an timezone in the existing Olson database");
             }
         }
         $self->{tz} = $new;
@@ -301,7 +392,7 @@ sub _is_leap_year {
     return $leap_year;
 }
 
-sub _in_dst_according_to_tz {
+sub _in_dst_according_to_v2_tz_rule {
     my ( $self, $check_time, $tz_definition ) = @_;
 
     if (   ( defined $tz_definition->{start_day} )
@@ -343,8 +434,8 @@ sub _in_dst_according_to_tz {
             }
         }
         else {
-            if (   ( $check_time < $dst_start_time )
-                || ( $dst_end_time < $check_time ) )
+            if (   ( $check_time >= $dst_start_time )
+                || ( $dst_end_time >= $check_time ) )
             {
                 return 1;
             }
@@ -430,7 +521,9 @@ sub _get_tz_offset_according_to_v2_tz_rule {
     my $tz_definition = $self->{_tzdata}->{$tz}->{tz_definition};
     if ( defined $tz_definition->{std_name} ) {
         if ( defined $tz_definition->{dst_name} ) {
-            if ( $self->_in_dst_according_to_tz( $time, $tz_definition ) ) {
+            if ( $self->_in_dst_according_to_v2_tz_rule( $time, $tz_definition )
+              )
+            {
                 $isdst  = 1;
                 $gmtoff = $tz_definition->{dst_offset_in_seconds};
                 $abbr   = $tz_definition->{dst_name};
@@ -629,7 +722,10 @@ sub _gm_time {
         return @gmtime;
     }
     else {
-        return POSIX::strftime( '%a %b %e %H:%M:%S %Y', @gmtime );
+        my $formatted_date = POSIX::strftime( '%a %b %d %H:%M:%S %Y', @gmtime );
+        $formatted_date =~
+          s/^(\w+[ ]\w+[ ])0(\d+[ ])/$1 $2/smx;    # %e doesn't work on Win32
+        return $formatted_date;
     }
 }
 
@@ -907,6 +1003,8 @@ sub _get_isdst_gmtoff_abbr_calculating_for_time_local {
         $offset_found = 1;
     }
     elsif ( !$transition_time_found ) {
+        my $tz_definition = $self->{_tzdata}->{$tz}->{tz_definition};
+        $time -= $tz_definition->{dst_offset_in_seconds} || 0;
         ( $isdst, $gmtoff, $abbr ) =
           $self->_get_tz_offset_according_to_v2_tz_rule($time);
         if ( defined $gmtoff ) {
@@ -1313,19 +1411,12 @@ qr/(?:$end_julian_without_feb29_regex|$end_julian_with_feb29_regex|$end_month_we
       )
     {
         my $tz_definition = { tz => $tz_variable };
-        foreach my $key (
-            qw(std_name std_sign std_hours std_minutes std_seconds dst_name dst_sign dst_hours dst_minutes dst_seconds start_julian_without_feb29 end_julian_withou_feb29 start_julian_with_feb29 end_julian_with_feb29 start_month end_month start_week end_week start_day end_day start_hour end_hour start_minute end_minute start_second end_second)
-          )
-        {
+        foreach my $key ( _TZ_DEFINITION_KEYS() ) {
             if ( defined $LAST_PAREN_MATCH{$key} ) {
                 $tz_definition->{$key} = $LAST_PAREN_MATCH{$key};
             }
         }
         $self->_initialise_undefined_tz_definition_values($tz_definition);
-        $tz_definition->{std_offset_in_seconds} =
-          $self->_std_offset_in_seconds($tz_definition);
-        $tz_definition->{dst_offset_in_seconds} =
-          $self->_dst_offset_in_seconds($tz_definition);
         return $tz_definition;
     }
     else {
@@ -1347,16 +1438,33 @@ sub _dst_offset_in_seconds {
           _MINUTES_IN_ONE_HOUR() *
           _SECONDS_IN_ONE_MINUTE();
     }
+    else {
+        $dst_offset_in_seconds +=
+          ( $tz_definition->{std_hours} ) *
+          _MINUTES_IN_ONE_HOUR() *
+          _SECONDS_IN_ONE_MINUTE();
+        if ( defined $tz_definition->{std_minutes} ) {
+            $dst_offset_in_seconds +=
+              $tz_definition->{std_minutes} * _SECONDS_IN_ONE_MINUTE();
+        }
+    }
     if (   ( defined $tz_definition->{dst_sign} )
         && ( $tz_definition->{dst_sign} eq q[-] ) )
     {
     }
-    else {
+    elsif ( defined $tz_definition->{dst_hours} ) {
         $dst_offset_in_seconds *= _NEGATIVE_ONE();
     }
-    if ( $dst_offset_in_seconds == 0 ) {
-        $dst_offset_in_seconds = $tz_definition->{std_offset_in_seconds} +
-          ( _MINUTES_IN_ONE_HOUR() * _SECONDS_IN_ONE_MINUTE() );
+    elsif (( defined $tz_definition->{std_sign} )
+        && ( $tz_definition->{std_sign} eq q[-] ) )
+    {
+        $dst_offset_in_seconds +=
+          _MINUTES_IN_ONE_HOUR() * _SECONDS_IN_ONE_MINUTE();
+    }
+    else {
+        $dst_offset_in_seconds *= _NEGATIVE_ONE();
+        $dst_offset_in_seconds +=
+          _MINUTES_IN_ONE_HOUR() * _SECONDS_IN_ONE_MINUTE();
     }
     return $dst_offset_in_seconds;
 }
@@ -1411,6 +1519,10 @@ sub _initialise_undefined_tz_definition_values {
       defined $tz_definition->{end_second}
       ? $tz_definition->{end_second}
       : 0;
+    $tz_definition->{std_offset_in_seconds} =
+      $self->_std_offset_in_seconds($tz_definition);
+    $tz_definition->{dst_offset_in_seconds} =
+      $self->_dst_offset_in_seconds($tz_definition);
     return;
 }
 
@@ -1499,32 +1611,38 @@ sub _read_v2_tzfile {
 sub _read_tzfile {
     my ($self) = @_;
     my $tz = $self->timezone();
-    my $path = File::Spec->catfile( $self->directory, $tz );
-    my $handle = FileHandle->new($path)
-      or Carp::croak("Failed to open $path for reading:$EXTENDED_OS_ERROR");
-    my @stat = stat $handle
-      or Carp::croak("Failed to stat $path:$EXTENDED_OS_ERROR");
-    my $last_modified = $stat[ _STAT_MTIME_IDX() ];
-    if (   ( $self->{_tzdata}->{$tz}->{last_modified} )
-        && ( $self->{_tzdata}->{$tz}->{last_modified} == $last_modified ) )
+    if (   ( exists $self->{_tzdata}->{$tz}->{no_tz_file} )
+        && ( $self->{_tzdata}->{$tz}->{no_tz_file} ) )
     {
-    }
-    elsif (( $_tzdata_cache->{$tz} )
-        && ( $_tzdata_cache->{$tz}->{last_modified} )
-        && ( $_tzdata_cache->{$tz}->{last_modified} == $last_modified ) )
-    {
-        $self->{_tzdata}->{$tz} = $_tzdata_cache->{$tz};
     }
     else {
-        binmode $handle;
-        my $header = $self->_read_header( $handle, $path );
-        $self->_read_v1_tzfile( $handle, $path, $header, $tz );
-        $self->_read_v2_tzfile( $handle, $path, $header, $tz );
-        $self->{_tzdata}->{$tz}->{last_modified} = $last_modified;
-        $_tzdata_cache->{$tz} = $self->{_tzdata}->{$tz};
+        my $path = File::Spec->catfile( $self->directory, $tz );
+        my $handle = FileHandle->new($path)
+          or Carp::croak("Failed to open $path for reading:$EXTENDED_OS_ERROR");
+        my @stat = stat $handle
+          or Carp::croak("Failed to stat $path:$EXTENDED_OS_ERROR");
+        my $last_modified = $stat[ _STAT_MTIME_IDX() ];
+        if (   ( $self->{_tzdata}->{$tz}->{last_modified} )
+            && ( $self->{_tzdata}->{$tz}->{last_modified} == $last_modified ) )
+        {
+        }
+        elsif (( $_tzdata_cache->{$tz} )
+            && ( $_tzdata_cache->{$tz}->{last_modified} )
+            && ( $_tzdata_cache->{$tz}->{last_modified} == $last_modified ) )
+        {
+            $self->{_tzdata}->{$tz} = $_tzdata_cache->{$tz};
+        }
+        else {
+            binmode $handle;
+            my $header = $self->_read_header( $handle, $path );
+            $self->_read_v1_tzfile( $handle, $path, $header, $tz );
+            $self->_read_v2_tzfile( $handle, $path, $header, $tz );
+            $self->{_tzdata}->{$tz}->{last_modified} = $last_modified;
+            $_tzdata_cache->{$tz} = $self->{_tzdata}->{$tz};
+        }
+        close $handle
+          or Carp::croak("Failed to close $path:$EXTENDED_OS_ERROR");
     }
-    close $handle
-      or Carp::croak("Failed to close $path:$EXTENDED_OS_ERROR");
     return;
 }
 
@@ -1550,7 +1668,7 @@ Time::Zone::Olson - Provides an interface to the Olson timezone database
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -1558,8 +1676,8 @@ Version 0.12
 
     use Time::Zone::Olson();
 
-    my $time_zone = Time::Zone::Olson->new({ timezone => 'Australia/Melbourne' }); # set timezone at creation time
-    my $now = $time_zone->time_local($seconds, $minutes, $hours, $day, $month, $year); # convert from Australia/Melbourne time
+    my $time_zone = Time::Zone::Olson->new( timezone => 'Australia/Melbourne' ); # set timezone at creation time
+    my $now = $time_zone->time_local($seconds, $minutes, $hours, $day, $month, $year); # convert for Australia/Melbourne time
     foreach my $area ($time_zone->areas()) {
         foreach my $location ($time_zone->locations($area)) {
             $time_zone->timezone("$area/$location");
@@ -1578,7 +1696,7 @@ Time::Zone::Olson was designed to produce the same result as a 64bit copy of the
 
 =head2 new
 
-Time::Zone::Olson->new() will return a new timezone object.  It accepts a hash reference as a parameter with an optional C<timezone> key, which contains an Olson timezone value, such as 'Australia/Melbourne'.  The hash reference also allows a C<directory> key, with the file system location of the Olson timezone database as a value.
+Time::Zone::Olson->new() will return a new timezone object.  It accepts a hash as a parameter with an optional C<timezone> key, which contains an Olson timezone value, such as 'Australia/Melbourne'.  The hash also allows a C<directory> key, with the file system location of the Olson timezone database as a value.
 
 Both of these parameters default to C<$ENV{TZ}> and C<$ENV{TZDIR}> respectively.
 
@@ -1708,7 +1826,7 @@ Time::Zone::Olson requires no configuration files or environment variables.  How
 
 =head1 DEPENDENCIES
 
-Time::Zone::Olson requires Perl 5.10 or better.  For environments where the unpack 'q' parameter is not supported, the following module is also required
+Time::Zone::Olson requires Perl 5.6 or better.  For environments where the unpack 'q' parameter is not supported, the following module is also required
 
 =over
 
@@ -1722,6 +1840,8 @@ L<Math::Int64|Math::Int64>
 None reported
 
 =head1 BUGS AND LIMITATIONS
+
+On Win32 platforms, the Olson TZ database is usually unavailable.  In an attempt to provide a workable alternative, the Win32 Registry is interrogated and translated to allow Olson timezones (such as Australia/Melbourne) to be used on Win32 nodes.  Therefore, the use of Time::Zone::Olson should be cross-platform compatible, but the actual results may be different, depending on the compatibility of the Win32 Registry timezones and the Olson TZ database.
 
 Please report any bugs or feature requests to C<bug-time-zone-olson at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson>.  I will be notified, and then you'll
@@ -1745,7 +1865,7 @@ David Dick, C<< <ddick at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 David Dick.
+Copyright 2019 David Dick.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

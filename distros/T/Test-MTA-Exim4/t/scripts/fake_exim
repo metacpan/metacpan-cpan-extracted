@@ -12,8 +12,7 @@ sub do_bv {
         "Copyright (c) University of Cambridge, 1995 - 2007\n",
         "Berkeley DB: Sleepycat Software: Berkeley DB 4.3.29: (June 16, 2006)\n",
         "Support for: crypteq iconv() IPv6 OpenSSL move_frozen_messages Content_Scanning DKIM Old_Demime\n",
-        (
-            "Lookups (built-in): lsearch wildlsearch nwildlsearch iplsearch cdb dbm",
+        (   "Lookups (built-in): lsearch wildlsearch nwildlsearch iplsearch cdb dbm",
             " dbmnz dnsdb dsearch ldap ldapdn ldapm mysql nis nis0 passwd\n"
         ),
         "Authenticators: cram_md5 dovecot plaintext\n",
@@ -24,7 +23,8 @@ sub do_bv {
         "OpenSSL runtime version: OpenSSL 0.9.8a 11 Oct 2005\n"
     );
     if ( $config && ( $config =~ /duff/ ) ) {
-        print( "2009-08-13 14:53:51 Exim configuration error in line 1 of $config:\n", "  main option \"crap\" unknown\n" );
+        print( "2009-08-13 14:53:51 Exim configuration error in line 1 of $config:\n",
+            "  main option \"crap\" unknown\n" );
         exit(1);
     }
     else {
@@ -73,11 +73,11 @@ sub do_be {
     my $config = shift;
     my $string = shift;
 
-    if ( $string =~ /lookup{(\w+)}/ ) {
+    if ( $string =~ /lookup\{(\w+)\}/ ) {
         print $1 eq 'postmaster' ? "root\n" : "\n";
     }
     else {
-	print "$string\n";
+        print "$string\n";
     }
 }
 
@@ -129,7 +129,7 @@ sub do_bt {
         }
         elsif (/^-be/) {
             do_be(@ARGV);
-	    exit;
+            exit;
         }
         elsif (/^-bt/) {
             $addr_mode++;

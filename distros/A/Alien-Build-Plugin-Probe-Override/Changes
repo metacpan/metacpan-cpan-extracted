@@ -1,4 +1,8 @@
 Revision history for Alien-Build-Plugin-Probe-Override
 
+0.02      2019-05-20 09:24:32 -0400
+  - Fix bug in test that relies on $build->log returning true
+  - Move to Perl5-Alien GitHub org
+
 0.01      2017-09-05 13:22:31 -0400
   - initial version

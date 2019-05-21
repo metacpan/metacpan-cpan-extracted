@@ -1,11 +1,12 @@
 use warnings;
 use strict;
 
-use Data::Dumper;
+use Data::Dump qw(dd);
 
-open my $fh, '<', 'script/wmm.com' or die $!;
+my $file = -e 'script/wmm.com' ? 'script/wmm.com' : 'wmm.com';
 
-my @current_list;
+open my $fh, '<', $file or die $!;
+
 my @wmm;
 
 while (my $line = <$fh>){
@@ -17,19 +18,16 @@ while (my $line = <$fh>){
     last if $line =~ /^99999999/;
 
     $line =~ s/^\s+//;
-    my $test = $line;
 
-    (my $one, my $two, my @vars) = $line =~ /^(\d+)\s+(\d+)/;
+    (my $current_list, my $list_position, my @wmm_data) = split /\s+/, $line;
 
-#    print "$one, $two, $line\n";
+    push @{ $wmm[$current_list]->[$list_position] }, @wmm_data;
+}
 
-    if ($one != $two){
-        push @current_list, [$test];
-    }
-    else {
-        push @wmm, [@current_list];
-        @current_list = ();
+for (@wmm){
+    for my $inner (@{ $_}){
+        print "$inner\n";
     }
 }
 
-print Dumper \@wmm;
+dd \@wmm;

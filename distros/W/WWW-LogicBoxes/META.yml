@@ -19,11 +19,12 @@ build_requires:
   Test::More: '0'
   Test::Warn: '0'
   lib: '0'
-  perl: '5.01301'
+  perl: '5.013006'
 configure_requires:
   Module::Build: '0.28'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -55,10 +56,11 @@ requires:
   XML::LibXML::Simple: '0'
   namespace::autoclean: '0'
   overload: '0'
-  perl: '5.01301'
+  perl: '5.013006'
 resources:
   bugtracker: https://github.com/drzigman/www-logicboxes/issues
   homepage: http://search.cpan.org/dist/WWW-LogicBoxes
   repository: git://github.com/drzigman/www-logicboxes.git
-version: 1.9.0
-x_serialization_backend: 'YAML::Tiny version 1.62'
+version: 1.10.0
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.70'

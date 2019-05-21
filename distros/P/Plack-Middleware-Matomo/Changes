@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-Matomo
 
+0.11  2019-05-20 13:20:39 CEST
+    - rename parameter visitIP to cip
+
 0.10  2019-05-06 12:28:54 CEST
     - make 'ua' and 'urlref' optional paramters to be passed
       to matomo

@@ -1,0 +1,41 @@
+NAME
+    App::timecalc - Time calculator
+
+VERSION
+    This document describes version 0.001 of App::timecalc (from Perl
+    distribution App-timecalc), released on 2019-05-18.
+
+SYNOPSIS
+    See included script timecalc.
+
+DESCRIPTION
+FUNCTIONS
+  eval_time_expr
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-timecalc>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-timecalc>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-timecalc>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    datecalc from App::datecalc. datecalc might be modified to include
+    timecalc's features.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

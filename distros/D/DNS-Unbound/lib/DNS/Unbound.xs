@@ -38,7 +38,7 @@ _ub_ctx_get_option( struct ub_ctx *ctx, const char* opt)
         if (fate) {
 
             // On failure, return a plain SV that gives the error.
-            RETVAL = newSVnv(fate);
+            RETVAL = newSViv(fate);
         }
         else {
             SV *val = newSVpv(str, 0);
@@ -67,7 +67,7 @@ _resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
         retval = ub_resolve(ctx, SvPV_nolen(name), type, class, &result);
 
         if (retval != 0) {
-            RETVAL = newSVnv(retval);
+            RETVAL = newSViv(retval);
         }
         else {
             SV *val;
@@ -88,10 +88,10 @@ _resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
             val = newSVpv(result->qname, 0);
             hv_stores(rh, "qname", val);
 
-            val = newSVnv(result->qtype);
+            val = newSViv(result->qtype);
             hv_stores(rh, "qtype", val);
 
-            val = newSVnv(result->qclass);
+            val = newSViv(result->qclass);
             hv_stores(rh, "qclass", val);
 
             hv_stores(rh, "data", newRV_inc((SV *)data));
@@ -99,25 +99,25 @@ _resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
             val = newSVpv(result->canonname, 0);
             hv_stores(rh, "canonname", val);
 
-            val = newSVnv(result->rcode);
+            val = newSViv(result->rcode);
             hv_stores(rh, "rcode", val);
 
-            val = newSVnv(result->havedata);
+            val = newSViv(result->havedata);
             hv_stores(rh, "havedata", val);
 
-            val = newSVnv(result->nxdomain);
+            val = newSViv(result->nxdomain);
             hv_stores(rh, "nxdomain", val);
 
-            val = newSVnv(result->secure);
+            val = newSViv(result->secure);
             hv_stores(rh, "secure", val);
 
-            val = newSVnv(result->bogus);
+            val = newSViv(result->bogus);
             hv_stores(rh, "bogus", val);
 
             val = newSVpv(result->why_bogus, 0);
             hv_stores(rh, "why_bogus", val);
 
-            val = newSVnv(result->ttl);
+            val = newSViv(result->ttl);
             hv_stores(rh, "ttl", val);
 
             RETVAL = newRV_inc((SV *)rh);

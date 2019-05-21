@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-HTTP
 
+0.09      2019-05-15 20:40:04 -0600
+  - Fix compatability with latest version of Test2::Suite (gh#1)
+
 0.08      2018-06-02 15:47:39 -0400
   - Require HTTP::Message 6.07 for API reasons
 

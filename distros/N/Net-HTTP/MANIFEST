@@ -23,4 +23,5 @@ t/http.t
 t/live-https.t
 t/live.t
 tidyall.ini
+xt/author/pod-syntax.t
 xt/rt-112313.t

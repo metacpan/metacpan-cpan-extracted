@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 15;
+use Test::More;
 
 use CPS::Governor::Deferred;
 
@@ -71,3 +72,5 @@ is( $called, 3, '$called is 3 after first again' );
 $gov->prod;
 
 is( $called, 6, '$called is 6 after poke' );
+
+done_testing;

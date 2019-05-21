@@ -1,5 +1,8 @@
-package MPMinus::Dispatcher; # $Id: Dispatcher.pm 146 2013-05-29 09:07:40Z minus $
+package MPMinus::Dispatcher; # $Id: Dispatcher.pm 274 2019-05-09 18:52:43Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MPMinus::Dispatcher - URL Dispatching
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -19,11 +22,11 @@ Version 1.03
     sub handler {
         my $r = shift;
         my $m = MPMinus->m;
-    
+
         $m->set(
                 disp => new MPMinus::Dispatcher($m->conf('project'),$m->namespace)
             ) unless $m->disp;
-    
+
         ...
 
         return Apache2::Const::OK;
@@ -54,7 +57,7 @@ URL Dispatching
 
     package MPM::foo::test;
     use strict;
-    
+
     ...
 
     $disp->set(
@@ -64,12 +67,16 @@ URL Dispatching
             -init     => \&init,
             -response => \&response,
             -cleanup  => \&cleanup,
-            
+
             ... and other handlers's keys , see later ...
-            
+
             -meta     => {}, # See MPMinus::Transaction
-            
+
         );
+
+=item B<default>
+
+Returns Apache2::Const::NOT_FOUND only
 
 =back
 
@@ -93,35 +100,49 @@ Supported handlers:
 
 See L<MPMinus::BaseHandlers/"HTTP PROTOCOL HANDLERS"> for details
 
+=head1 HISTORY
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+C<mod_perl2>, L<CTK>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+C<mod_perl2>, L<CTK::Util>
+
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://serzik.ru> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw($VERSION);
-$VERSION = 1.03;
+$VERSION = 1.04;
 
 use Apache2::Const;
-use CTK::Util qw/ :API /; # Утилитарий
+use Carp;
+use CTK::Util qw/ :API /;
 
 sub new {
     my $class = shift;
@@ -130,34 +151,32 @@ sub new {
           ['NAMESPACE', 'NS']
         ],@_);
 
-    # Основные атрибуты
     my $namespace = $in[1] || '';
     my %args = (
-            project   => $in[0] || '', # Имя проекта
-            namespace => $namespace,   # пространство имен для определения проектного модуля Index
-            records   => {},           # Записи (URIs)
+            project   => $in[0] || '', # Project name
+            namespace => $namespace,   # Namespace
+            records   => {},           # URIs
         );
 
     my $self = bless \%args, $class;
-   
-    # Первая запись. Запись по умолчанию (NOT_FOUND)
+
+    # NOT_FOUND
     $self->set('default');
 
-    # Принимаем проектную единицу
+    # Get project sub-module from *::Index.pm
     eval "
         use $namespace\::Index;
         $namespace\::Index\::init(\$self);
-    "; 
+    ";
     croak("Error initializing the module $namespace\::Index\: $@") if $@;
-    
+
     return $self;
 }
 sub set {
-    # Установщик данных для указанной записи
     my $self = shift;
     my @in = read_attributes([
           ['URI','URL','REQUEST','KEY'], # 0
-          
+
           # HTTP Protocol Handlers
           ['POSTREADREQUEST','HPOSTREADREQUEST','POSTREADREQUESTHANDLER'],  # 1
           ['TRANS','HTRANS','TRANSHANDLER'],                                # 2
@@ -172,86 +191,79 @@ sub set {
           ['RESPONSE','HRESPONSE','RESPONSEHANDLER'],                       # 11
           ['LOG','HLOG','LOGHANDLER'],                                      # 12
           ['CLEANUP','HCLEANUP','CLEANUPHANDLER'],                          # 13
-          
+
           ['ACTION','ACTIONS','META'], # 14
-          
+
         ],@_);
 
-    # Устанавливаем запись
     my $uri = $in[0];
     my $uniqname;
     my $type = 'location';
     my %params;
     if (ref($uri) eq 'ARRAY') {
-        # Не простая диспетчерезация
+        # ARRAY dispatching
         croak("Invalid URI in the definition section of the called module") unless $uri->[0];
         if (lc($uri->[0]) eq 'regexp') {
             $type     = 'regexp';
-            $uniqname = $uri->[1] || 'undefined'; # Уникальное имя
+            $uniqname = $uri->[1] || 'undefined'; # Uniq name
             %params = (
                 regexp => $uri->[2] || qr/^undefined$/
-            )
+            );
         } elsif (lc($uri->[0]) eq 'locarr') {
             $type     = 'locarr';
-            $uniqname = $uri->[1] || 'undefined'; # Уникальное имя
+            $uniqname = $uri->[1] || 'undefined'; # Uniq name
             %params = (
                 locarr => $uri->[2] || []
-            )
+            );
         } elsif (lc($uri->[0]) eq 'mixarr') {
             $type     = 'mixarr';
-            $uniqname = $uri->[1] || 'undefined'; # Уникальное имя
+            $uniqname = $uri->[1] || 'undefined'; # Uniq name
             %params = (
                 mixarr => $uri->[2] || []
-            )            
+            );
         } else {
             croak("Wrong type dispatch called module!")
         }
     } else {
-        # Простая диспетчеризация
+        # Simple dispatching
         $uniqname = $uri;
     }
-    
+
     $self->{records}->{$uniqname} = {
             Postreadrequest => $in[1] || sub { Apache2::Const::OK },
-            Trans           => $in[2] || sub { Apache2::Const::OK },
-            Maptostorage    => $in[3] || sub { Apache2::Const::OK },
+            Trans           => $in[2] || sub { Apache2::Const::DECLINED },
+            Maptostorage    => $in[3] || sub { Apache2::Const::DECLINED },
             Init            => $in[4] || sub { Apache2::Const::OK },
             headerparser    => $in[5] || sub { Apache2::Const::OK },
             Access          => $in[6] || sub { Apache2::Const::OK },
-            Authen          => $in[7] || sub { Apache2::Const::OK },
-            Authz           => $in[8] || sub { Apache2::Const::OK },
-            Type            => $in[9] || sub { Apache2::Const::OK },
+            Authen          => $in[7] || sub { Apache2::Const::DECLINED },
+            Authz           => $in[8] || sub { Apache2::Const::DECLINED },
+            Type            => $in[9] || sub { Apache2::Const::DECLINED },
             Fixup           => $in[10] || sub { Apache2::Const::OK },
-            Response        => $in[11] || \&default, # Самый главный обработчик!
+            Response        => $in[11] || \&default, # Main handler!
             Log             => $in[12] || sub { Apache2::Const::OK },
             Cleanup         => $in[13] || sub { Apache2::Const::OK },
-            
-            type     => $type,         # Тип диспетчеризации
-            params   => {%params},     # Параметры (внутренние)
-            actions  => $in[14] || {}, # События
+
+            type     => $type,
+            params   => {%params}, # Internal params
+            actions  => $in[14] || {}, # Actions
         };
-    
 }
 sub get {
-    # возвращаем обработчик
     my $self = shift;
     my @in = read_attributes([
           ['URI','URI','REQUEST','KEY'],
         ],@_);
     my $uri = $in[0] || 'default';
     my $ret = $uri;
-    
-    # Процесс определения соответствующего хэндлера состоит из ступеней.
-    # Каждая ступень выполняется если не найдено искомое в предыдущей!
-    
-    # ступень 1
-    # поиск по конкретному location
+
+    # Stage 1
+    # Searching by location
     $ret = 'default' unless grep {$_ eq $uri} keys %{$self->{records}};
-    
-    # ступень 2
-    # поиск по массиву многих location
+
+    # Stage 2
+    # Searching by ARRAY of location
     if ($ret eq 'default') {
-        # поиск результативного ключа
         my @locarr_keys = grep {$self->{records}->{$_}->{type} eq 'locarr'} keys %{$self->{records}};
         foreach my $key (@locarr_keys) {
             $ret = $key if grep {$uri eq $_} @{$self->{records}->{$key}->{params}->{locarr}};
@@ -259,10 +271,9 @@ sub get {
         $ret ||= 'default';
     }
 
-    # ступень 3
-    # поиск по массиву многих location и Regexp
+    # Stage 3
+    # Searching by ARRAY of location and Regexp
     if ($ret eq 'default') {
-        # поиск результативного ключа
         my @mixarr_keys = grep {$self->{records}->{$_}->{type} eq 'mixarr'} keys %{$self->{records}};
         foreach my $key (@mixarr_keys) {
             $ret = $key if grep {
@@ -277,9 +288,8 @@ sub get {
         $ret ||= 'default';
     }
 
-    
-    # ступень 4
-    # поиск по regexp
+    # Stage 4
+    # Searching by regexp only
     if ($ret eq 'default') {
         my @regexp_keys = grep {$self->{records}->{$_}->{type} eq 'regexp'} keys %{$self->{records}};
         if (@regexp_keys) {
@@ -287,7 +297,7 @@ sub get {
             $ret ||= 'default';
         }
     }
-   
+
     return $self->{records}->{$ret};
 }
 sub default { Apache2::Const::NOT_FOUND };

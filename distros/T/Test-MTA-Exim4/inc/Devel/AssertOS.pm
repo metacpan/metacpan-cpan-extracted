@@ -4,13 +4,9 @@ Devel::AssertOS;
 use Devel::CheckOS;
 
 use strict;
+use warnings;
 
-use vars qw($VERSION);
-
-$VERSION = '1.21';
-
-# localising prevents the warningness leaking out of this module
-local $^W = 1;    # use warnings is a 5.6-ism
+our $VERSION = '1.21';
 
 =head1 NAME
 
@@ -59,7 +55,7 @@ sub import {
 =head1 BUGS and FEEDBACK
 
 I welcome feedback about my code, including constructive criticism.
-Bug reports should be made using L<http://rt.cpan.org/> or by email.
+Bug reports should be made using L<https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues>.
 
 You will need to include in your bug report the exact value of $^O, what
 the OS is called (eg Windows Vista 64 bit Ultimate Home Edition), and,

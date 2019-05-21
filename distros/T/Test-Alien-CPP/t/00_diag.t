@@ -10,6 +10,7 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Data::Dumper
   ExtUtils::CBuilder
   ExtUtils::CppGuess
   ExtUtils::MakeMaker
@@ -23,9 +24,8 @@ $modules{$_} = $_ for qw(
 $post_diag = sub {
   require ExtUtils::CppGuess;
   my %cppguess = ExtUtils::CppGuess->new->module_build_options;
-  foreach my $key (sort keys %cppguess) {
-    diag sprintf("%30s = %s\n", $key, $cppguess{$key});
-  }
+  use Data::Dumper qw( Dumper );
+  diag Dumper(\%cppguess);
 };
 
 my @modules = sort keys %modules;

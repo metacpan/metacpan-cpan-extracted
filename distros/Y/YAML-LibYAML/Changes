@@ -1,3 +1,8 @@
+0.78 Sat 18 May 2019 06:35:21 PM CEST
+ - Fix double free/core dump when Dump()ing binary data, see issue#91
+   (tinita)
+ - Update config.h from libyaml (tinita)
+
 0.77 Mon 15 Apr 2019 10:55:13 PM CEST
  - Update libyaml to version 0.2.2. Most important change for users is that
    plain urls in flow style can be parsed now. Example: `[ http://yaml.org

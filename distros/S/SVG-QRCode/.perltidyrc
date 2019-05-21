@@ -1,0 +1,12 @@
+  -pbp
+  -l=80
+  -mbl=2
+  -i=2
+  -ci=2
+  -vt=0
+  -pt=2
+  -bt=2
+  -sbt=2
+  -isbc
+  -asc
+  -ce

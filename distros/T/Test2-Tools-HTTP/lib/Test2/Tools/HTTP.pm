@@ -47,7 +47,7 @@ foreach my $short (qw( code message content content_type content_length content_
 }
 
 # ABSTRACT: Test HTTP / PSGI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 my $tx;
@@ -611,7 +611,7 @@ Test2::Tools::HTTP - Test HTTP / PSGI
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -1035,9 +1035,12 @@ L<LWP::UserAgent> object.
 
 =item L<LWP::Protocol::PSGI>
 
-Provides a similar functionality to L<Test::LWP::UserAgent>, but registers apps globally with L<LWP::UserAgent> so that you don't even
-need access to a specific L<LWP::UserAgent> object.  Also doesn't work with anything that is not an L<LWP::UserAgent> object.  It
-is worth reading the section "DIFFERENCES WITH OTHER MODULES" in this modules documentation before you decide which module to use.
+Provides a similar functionality to L<Test::LWP::UserAgent>, but registers apps globally using L<LWP::Protocol> so that you do not
+need access to a specific L<LWP::UserAgent> object.  Does not work with anything that is not an L<LWP::UserAgent> object.
+L<Test2::Tools::HTTP::UA> provides similar functionality, but is an abstraction layer which can be used with any appropriately
+adapted user agent class or instance, although we use L<LWP::UserAgent> by default.  Support for L<Mojo::UserAgent> and L<HTTP::AnyUA>
+is available, although not bundled with this distribution.  One advantage of this abstraction is that it
+can be used to instrument either a single instance or all objects belonging to a particular class.
 
 =back
 

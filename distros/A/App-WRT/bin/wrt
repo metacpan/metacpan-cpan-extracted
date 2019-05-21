@@ -41,30 +41,20 @@ Brennen Bearnes <code@p1k3.com>
 
 =cut
 
-print_help() {
-  echo "wrt - a writing tool"
-  echo
-  echo "Usage: $0 [command] [args]"
-  echo "    wrt init        Initialize a wrt repository"
-  echo "    wrt display     Print HTML for entries"
-  echo "    wrt render-all  Render all defined entries to filesystem"
-  echo "    wrt addprop     Add a property to an entry"
-  echo "    wrt findprop    Find entries containing certain properties"
-  echo "    wrt -h          Print this help message"
-  echo
-  echo "You must specify a command."
-  exit 1
-}
-
 if [ $# -lt 1 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-  print_help
+  # No subcommand given or help requested:
+  exec wrt-help
+elif [ "$1" = "--version" ] || [ "$1" = "-v" ]; then
+  # Version info requested:
+  exec wrt-version
+else
+  # We should hand off to a requested subcommand:
+  subprog="wrt-$1"
 fi
-
-subprog="wrt-$1"
 
 # Make sure that the command we've been given exists:
 command -v "$subprog" >/dev/null 2>&1 || {
-  echo "wrt: '$1' is not a wrt command.  See 'wrt -h'."
+  echo "wrt: '$1' is not a wrt command.  See 'wrt help'."
   exit 1
 }
 

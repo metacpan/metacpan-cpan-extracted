@@ -1,5 +1,8 @@
-package CTK::FilePid; # $Id: FilePid.pm 192 2017-04-28 20:40:38Z minus $
+package CTK::FilePid; # $Id: FilePid.pm 250 2019-05-09 12:09:57Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ CTK::FilePid - File::Pid patched interface
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -29,8 +32,6 @@ Version 1.02
       $pidfile->remove;
   }
 
-
-
 =head1 DESCRIPTION
 
 This software manages a pid file for you. It will create a pid file,
@@ -39,31 +40,53 @@ the pid file.
 
 See L<File::Pid> for details
 
+=head2 running
+
+Patched method. See L<File::Pid/"running">
+
+=head1 HISTORY
+
+See C<Changes> file
+
+=head1 DEPENDENCIES
+
+L<File::Pid>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+L<File::Pid>
+
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2012 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = 1.02;
+$VERSION = 1.03;
 
 use base qw/File::Pid/;
 
 sub running {
-    #print "\n\n!!!!!!! THIS !!!!!!\n\n";
     my $self = shift;
     my $pid  = $self->_get_pid_from_file;
 
@@ -72,6 +95,6 @@ sub running {
            : undef;
 }
 
-
 1;
+
 __END__

@@ -12,6 +12,7 @@ use Test::More;
 use Tk;
 use Tk::DateEntry;
 
+no warnings 'uninitialized';
 plan skip_all => 'need a German locale for this test'
     if $ENV{LC_ALL} !~ m{^de};
 

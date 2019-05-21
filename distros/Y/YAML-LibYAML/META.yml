@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/ingydotnet/yaml-libyaml-pm/issues
   homepage: https://github.com/ingydotnet/yaml-libyaml-pm
   repository: https://github.com/ingydotnet/yaml-libyaml-pm.git
-version: '0.77'
+version: '0.78'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -5,7 +5,7 @@ use warnings;
 use URI;
 
 # ABSTRACT: App container class for Test2::Tools::HTTP
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 {
@@ -103,7 +103,7 @@ Test2::Tools::HTTP::Apps - App container class for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
-package CTK::DBI; # $Id: DBI.pm 193 2017-04-29 07:30:55Z minus $
+package CTK::DBI; # $Id: DBI.pm 250 2019-05-09 12:09:57Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ CTK::DBI - Database independent interface for CTKlib
 
 =head1 VERSION
 
-Version 2.27
+Version 2.29
 
 =head1 SYNOPSIS
 
@@ -51,7 +54,7 @@ Version 2.27
 
 =head1 DESCRIPTION
 
-For example: debug($oracle->field("select sysdate() from dual"));
+For example: print($mso->field("select sysdate() from dual"));
 
 =head2 new
 
@@ -116,35 +119,55 @@ Get (select) record from database as array or hash
 
 Get (select) table from database as array or hash
 
+=head1 HISTORY
+
+See C<Changes> file
+
+=head1 DEPENDENCIES
+
+L<DBI>, L<Sys::SigAction>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
+
+=head1 SEE ALSO
+
+L<DBI>, L<Sys::SigAction>
+
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
+use Carp;
 use CTK::Util qw( :API );
 
 use constant {
     WIN             => $^O =~ /mswin/i ? 1 : 0,
-    TIMEOUT_CONNECT => 5,  # timeout connect
-    TIMEOUT_REQUEST => 60, # timeout request
+    TIMEOUT_CONNECT => 60, # timeout of connect
+    TIMEOUT_REQUEST => 60, # timeout of request
 };
 
 our $CTK_DBI_DEBUG = 0;
 use vars qw/$VERSION/;
-$VERSION = '2.27';
+$VERSION = '2.29';
 
 my $LOAD_SigAction = 0;
 eval 'use Sys::SigAction';
@@ -178,7 +201,7 @@ sub new {
         $CTK_DBI_DEBUG = 1;
     }
 
-    # Основные атрибуты соединения
+    # General arguments
     my %args = (
             dsn         => $in[0] || '',
             user        => $in[1] || '',
@@ -189,26 +212,26 @@ sub new {
             dbh         => undef,
         );
 
-    # Инициализируем соединение
+    # Connect
     $args{dbh} = DBI_CONNECT(@args{qw/dsn user password attr connect_to/});
 
-    # Коннект СОСТОЯЛСЯ
+    # Ok
     _debug("--- DBI CONNECT {".$args{dsn}."} ---");
 
     my $self = bless {%args}, $class;
     return $self;
 }
 sub connect {
-    # Возвращаем заголвок указывающий на объект соединения dbh
+    # Returns dbh
     my $self = shift;
     return $self->{dbh};
 }
 sub disconnect {
-    # Принудительно разрываем связь до наступления DESTROY
+    # before DESTROY
     my $self = shift;
     DBI_DISCONNECT ($self->{dbh}) if $self->{dbh};
-    # Дисконнект СОСТОЯЛСЯ
-    _debug("--- DBI DISCONNECT {".($self->{dsn} || '')."} ---"); # на момент деструктура
+    # Ok
+    _debug("--- DBI DISCONNECT {".($self->{dsn} || '')."} ---");
 }
 sub field {
     my $self = shift;
@@ -228,7 +251,7 @@ sub table {
 }
 sub tableh {
     my $self = shift;
-    my $key_field = shift; # Ключи конструктора (http://search.cpan.org/~timb/DBI-1.607/DBI.pm#fetchall_hashref)
+    my $key_field = shift; # See keys (http://search.cpan.org/~timb/DBI-1.607/DBI.pm#fetchall_hashref)
     DBI_EXECUTE_TABLEH($self->{dbh},$key_field,$self->{request_to},@_)
 }
 sub execute {
@@ -237,25 +260,24 @@ sub execute {
 }
 sub DESTROY {
     my $self = shift;
-    #debug ('-> Выполнился деструктор с объектом: '.($self || ':('));
     $self->disconnect();
 }
 sub DBI_CONNECT {
-    # Соединение с базой данных DBI
+    # Connect
     # $dbh = DBI_CONNECT($dsn, $user, $password, $attr)
     # IN:
     #   <DSN>      - DSN
-    #   <USER>     - Имя пользователя БД
-    #   <PASSWORD> - Пароль пользователя БД
-    #   <ATTR>     - Атрибуты DBD::* (ссылка на хеш, см. модуль драйвера)
+    #   <USER>     - DB Username
+    #   <PASSWORD> - DB Password
+    #   <ATTR>     - Attributes DBD::* (hash-ref)
     # OUT:
     #   $dbh - DataBase Handler Object
     #
     my $db_dsn      = shift || ''; # DSN
-    my $db_user     = shift // ''; # Имя пользователя базы данных
-    my $db_password = shift // ''; # пароль пользователя базы данных
-    my $db_attr     = shift || {}; # атрибуты - например {ORACLE_enable_utf8 => 1}
-    my $db_tocnt    = shift || TIMEOUT_CONNECT; # Таймаут для коннекта
+    my $db_user     = shift // '';
+    my $db_password = shift // '';
+    my $db_attr     = shift || {}; # E.g., {ORACLE_enable_utf8 => 1}
+    my $db_tocnt    = shift || TIMEOUT_CONNECT;
 
     my $dbh;
 
@@ -263,7 +285,7 @@ sub DBI_CONNECT {
     my $count_connect_msg = 'OK';  # TRUE
     eval {
         local $SIG{ALRM} = sub { die "Connecting timeout \"$db_dsn\"" } unless $LOAD_SigAction;
-        my $h = Sys::SigAction::set_sig_handler( 'ALRM' ,sub { die "Connecting timeout \"$db_dsn\"" } );
+        my $h = Sys::SigAction::set_sig_handler( 'ALRM', sub { die "Connecting timeout \"$db_dsn\"" } );
         eval {
             alarm($db_tocnt); #implement 2 second time out
             unless ($dbh = DBI->connect($db_dsn, "$db_user", "$db_password", $db_attr)) {
@@ -276,52 +298,44 @@ sub DBI_CONNECT {
         die $@ if $@;
     };
     if ( $@ ) {
-        # Все плохо
+        # Error
         $count_connect     = 0; # FALSE
         $count_connect_msg = $@;
     }
     unless ($count_connect) {
-        # Все плохо :(
+        # Error :(
         _error("[".__PACKAGE__.": Connecting error \"$db_dsn\"] $count_connect_msg");
     }
 
     return $dbh;
 }
 sub DBI_DISCONNECT {
-    # Закрытие соединения с базой данных
-    # $rc = DBI_DISCONNECT ($dbh)
-    # IN:
-    #   $dbh - DataBase Handler Object
-    # OUT:
-    #   $rc - объект состояния RC или 0 в случае неудачи
-    #
     my $dbh = shift || return 0;
     my $rc = $dbh->disconnect;
-
     return $rc;
 }
 sub DBI_EXECUTE_FIELD {
-    # Получение единственного значения (поле)
+    # Get field
     # $result = DBI_EXECUTE_FIELD($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
-    #   $sql - SQL запрос
-    #   [@inargs] - Аргументы для биндинга
+    #   $sql - SQL
+    #   [@inargs] - For binding
     # OUT:
-    #   $result - Первый [0] массив принятых данных (НЕ ССЫЛКА)
+    #   $result - First [0] value
 
     my @result = DBI_EXECUTE_RECORD(@_);
     return $result[0] || '';
 }
 sub DBI_EXECUTE_RECORD {
-    # Получение множество значений (строку, запись)
+    # Returns one record (array)
     # @result = DBI_EXECUTE_RECORD($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
-    #   $sql - SQL запрос
-    #   [@inargs] - Аргументы для биндинга
+    #   $sql - SQL
+    #   [@inargs] - Binding arguments
     # OUT:
-    #   @result - массив принятых данных (НЕ ССЫЛКА)
+    #   @result - Array of data
     my $sth = DBI_EXECUTE(@_);
     return undef unless $sth;
     my @result = $sth->fetchrow_array;
@@ -329,14 +343,14 @@ sub DBI_EXECUTE_RECORD {
     return @result;
 }
 sub DBI_EXECUTE_RECORDH {
-    # Получение множество значений (строку, запись) в виде хэша
+    # Returns one record (hash)
     # %result = DBI_EXECUTE_RECORDH($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
-    #   $sql - SQL запрос
-    #   [@inargs] - Аргументы для биндинга
+    #   $sql - SQL
+    #   [@inargs] - Binding arguments
     # OUT:
-    #   %result - хеш принятых данных (НЕ ССЫЛКА)
+    #   %result - Hash of data
     my $sth = DBI_EXECUTE(@_);
     return undef unless $sth;
     my %result = %{$sth->fetchrow_hashref || {}};
@@ -344,32 +358,31 @@ sub DBI_EXECUTE_RECORDH {
     return %result;
 }
 sub DBI_EXECUTE_TABLE {
-    # Получение всех значений (таблицу а не ссылку на неё как кажется на первый взгляд)
+    # Get all data (table)
     # @result = DBI_EXECUTE_TABLE($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
-    #   $sql - SQL запрос
-    #   [@inargs] - Аргументы для биндинга
+    #   $sql - SQL
+    #   [@inargs] - Binding arguments
     # OUT:
-    #   @result - массив принятых данных (НЕ ССЫЛКА)
+    #   @result - Array
 
     my $sth = DBI_EXECUTE(@_);
     return undef unless $sth;
     my @result = @{$sth->fetchall_arrayref};
     $sth->finish;
-    # while (my @tbl_content=$sth->fetchrow_array) {push @result, [@tbl_content]} # Старый метод. На всякий
     return @result;
 }
 sub DBI_EXECUTE_TABLEH {
-    # Получение всех значений (таблицу а не ссылку на неё как кажется на первый взгляд)
+    # Get all data (table)
     # %result = DBI_EXECUTE_TABLEH($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
-    #   $key_field - Ключи конструктора (http://search.cpan.org/~timb/DBI-1.607/DBI.pm#fetchall_hashref)
-    #   $sql - SQL запрос
-    #   [@inargs] - Аргументы для биндинга
+    #   $key_field - Key (http://search.cpan.org/~timb/DBI-1.607/DBI.pm#fetchall_hashref)
+    #   $sql - SQL
+    #   [@inargs] - Binding arguments
     # OUT:
-    #   Rresult - хеш хешей принятых данных (НЕ ССЫЛКА)
+    #   Rresult - Hash of Hashes
     my $dbh       = shift;
     my $key_field = shift;
 
@@ -380,25 +393,25 @@ sub DBI_EXECUTE_TABLEH {
     return %result;
 }
 sub DBI_EXECUTE {
-    # Выполнение запроса.
+    # Execute
     # $sth = DBI_EXECUTE($dbh, $sql, @inargs)
     # IN:
     #   $dbh - DataBase Handler Object
     #   $tor - TimeOut of Request
-    #   $sql - SQL запрос
-    #   [@inargs] - Аргументы для биндинга
+    #   $sql - SQL
+    #   [@inargs] - Binding arguments
     # OUT:
-    #   $sth_ex - Объект выполнения для дальнейшего финиширования результата
+    #   $sth_ex - statement header
 
     my $dbh = shift || return 0;
-    my $tor = shift || TIMEOUT_REQUEST; # Таймаут для выполнения запроса
+    my $tor = shift || TIMEOUT_REQUEST;
     my $sql = shift || return 0;
 
     my @inargs = ();
     @inargs = @_ if exists $_[0];
     my $argb = "";
     my @repsrgs = @inargs;
-    $argb = sprintf("Params: %s", join(", ", map {defined $_ ? sprintf("\"%s\"",$_) : 'undef'} @repsrgs)) if exists $inargs[0];
+    $argb = sprintf("Params: %s", join(", ", map {defined($_) ? sprintf("\"%s\"",$_) : 'undef'} @repsrgs)) if exists $inargs[0];
 
     my $sth_ex = $dbh->prepare($sql);
     unless ($sth_ex) {
@@ -427,7 +440,7 @@ sub DBI_EXECUTE {
         $count_execute_msg = $@;
     }
     unless ($count_execute) {
-        # Все плохо
+        # Error
         _error("[".__PACKAGE__.": Executing error: $sql".($argb?" / $argb":'')."] $count_execute_msg");
         return undef;
     }
@@ -436,4 +449,7 @@ sub DBI_EXECUTE {
 }
 sub _debug { $CTK_DBI_DEBUG ? carp(@_) : 1 }
 sub _error { carp(@_) }
+
 1;
+
+__END__

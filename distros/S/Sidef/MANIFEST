@@ -372,6 +372,7 @@ scripts/RosettaCode/floyd_warshall_algorithm.sf
 scripts/RosettaCode/fork.sf
 scripts/RosettaCode/formatted_numeric_output.sf
 scripts/RosettaCode/formatted_numeric_output_1.sf
+scripts/RosettaCode/free_polyominoes_enumeration.sf
 scripts/RosettaCode/french_republican_calendar.sf
 scripts/RosettaCode/function_composition.sf
 scripts/RosettaCode/function_definition.sf
@@ -609,6 +610,7 @@ scripts/RosettaCode/vogel_s_approximation_method.sf
 scripts/RosettaCode/vogel_s_approximation_method_2.sf
 scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/water_collected_between_towers.sf
+scripts/RosettaCode/word_break_problem.sf
 scripts/RosettaCode/word_wrap.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
@@ -634,6 +636,7 @@ scripts/Tests/arithmetic_evaluation.sf
 scripts/Tests/arithmetic_geometric_mean.sf
 scripts/Tests/array_and_hash_lookup.sf
 scripts/Tests/array_and_hash_lvalues.sf
+scripts/Tests/array_any_all.sf
 scripts/Tests/array_autovivification.sf
 scripts/Tests/array_binary_search.sf
 scripts/Tests/array_binsert.sf
@@ -658,6 +661,7 @@ scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
 scripts/Tests/bitonic_sorter.sf
+scripts/Tests/block_identities.sf
 scripts/Tests/block_return.sf
 scripts/Tests/box_the_compass.sf
 scripts/Tests/break.sf
@@ -716,7 +720,10 @@ scripts/Tests/escape_unescape.sf
 scripts/Tests/euler_and_bernoulli_numbers.sf
 scripts/Tests/eval.sf
 scripts/Tests/execute_system_command.sf
+scripts/Tests/expression_call.sf
+scripts/Tests/extended_builtin_class.sf
 scripts/Tests/extreme_floating_point_values.sf
+scripts/Tests/fforks.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf
@@ -729,6 +736,7 @@ scripts/Tests/for_in_with_user_objects.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf
+scripts/Tests/func_scoping.sf
 scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
 scripts/Tests/functional_style.sf
@@ -738,6 +746,7 @@ scripts/Tests/get_value_cyclic_references.sf
 scripts/Tests/getopt.sf
 scripts/Tests/given_when.sf
 scripts/Tests/global_variables.sf
+scripts/Tests/goto.sf
 scripts/Tests/greatest_subsequential_sum.sf
 scripts/Tests/group_precedence.sf
 scripts/Tests/hailstone.sf
@@ -747,6 +756,7 @@ scripts/Tests/hash_autovivification.sf
 scripts/Tests/hash_concat.sf
 scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf
+scripts/Tests/hash_selection.sf
 scripts/Tests/hash_sort.sf
 scripts/Tests/heap_s_algorithm_iter.sf
 scripts/Tests/heap_s_algorithm_rec.sf
@@ -760,6 +770,7 @@ scripts/Tests/ilog.sf
 scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/implicit_numberic_conversions.sf
 scripts/Tests/infix_methods.sf
+scripts/Tests/inherited_blocks.sf
 scripts/Tests/integer_limits.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
@@ -832,6 +843,7 @@ scripts/Tests/multi_methods.sf
 scripts/Tests/multi_var_assignment.sf
 scripts/Tests/multiline_expressions.sf
 scripts/Tests/multiple_dispatch.sf
+scripts/Tests/multiple_dispatch_builtin_class.sf
 scripts/Tests/multiple_dispatch_inheritance_1.sf
 scripts/Tests/multiple_dispatch_inheritance_2.sf
 scripts/Tests/multiple_dispatch_inheritance_3.sf
@@ -910,6 +922,7 @@ scripts/Tests/run_length_encoding_3.sf
 scripts/Tests/same_fringe.sf
 scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
+scripts/Tests/set_any_all.sf
 scripts/Tests/set_consolidation.sf
 scripts/Tests/set_operations.sf
 scripts/Tests/sets_1.sf
@@ -924,6 +937,9 @@ scripts/Tests/sierpinski_penta.sf
 scripts/Tests/sierpinski_sidef.sf
 scripts/Tests/sierpinski_triangle_90.sf
 scripts/Tests/sierpinski_x.sf
+scripts/Tests/slurpy_const.sf
+scripts/Tests/slurpy_define.sf
+scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf

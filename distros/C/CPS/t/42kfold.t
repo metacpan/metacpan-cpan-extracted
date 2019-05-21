@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use CPS::Functional qw( kfoldl kfoldr );
 
@@ -33,3 +34,5 @@ kfoldr(
 );
 
 is( $ret, "(1+(2+3))", 'kfoldr sync - @nums' );
+
+done_testing;

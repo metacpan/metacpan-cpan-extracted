@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Sergey Lepenkov (Serz Minus), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -26,23 +26,34 @@ eval "use Pod::Coverage $verpc";
 plan skip_all => "Pod::Coverage $verpc required for testing POD coverage" if $@;
 plan skip_all => "Currently a developer-only test" unless -d '.svn' || -d ".git";
 
-my $skip = {
+# Modules white list
+my @trust = qw(
+
+);
+
+# Functions white list
+my %skip = (
     trustme => [
-        qr/CP1251toUTF8/,
-        qr/UTF8toCP1251/,
         qr/^[A-Z_0-9]+$/,
     ],
-};
+);
 
-#all_pod_coverage_ok($skip);
-my @classes = (qw/
-	CTK CTKx CTK::CPX CTK::DBI CTK::Helper CTK::Util
-	CTK::Arc CTK::Crypt CTK::File CTK::Net
-	CTK::CLI CTK::Log CTK::Status
-	CTK::ConfGenUtil CTK::TFVals
-    /);
-plan tests => scalar(@classes);
-pod_coverage_ok( $_, $skip ) for @classes;
+my @modules;
+foreach my $l (all_modules()) {
+    push @modules, $l unless grep {$l eq $_} @trust;
+}
+
+if ( @modules ) {
+    plan tests => scalar @modules;
+    for my $module ( @modules ) {
+        my $thismsg = "Pod coverage on $module";
+        pod_coverage_ok( $module, \%skip, $thismsg );
+    }
+} else {
+    plan tests => 1;
+    ok( 1, "No modules found." );
+}
 
 1;
+
 __END__
