@@ -20,14 +20,24 @@ my @tests = (
     'Ninja@en@' => [ 'Ninja@en', undef ],
     'rdf_type' => [ 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' ],
     '<rdf:type>' => [ 'rdf:type' ],
+);
+
+my @tests_ns = (
     'geo:48.2010,16.3695,183' => [ 'geo:48.2010,16.3695,183' ],
     'geo_Point' => [ 'http://www.w3.org/2003/01/geo/wgs84_pos#Point' ],
 );
 
 while (defined (my $input = shift @tests)) {
     my ($expect, $object, $error) = shift @tests;
-    decode_aref 
-        { 'x:subject' => { '<x:predicate>' => $input } },
+    decode_aref { 'x:subject' => { '<x:predicate>' => $input } },
+        callback => sub { shift; shift; $object = \@_; };
+    is_deeply $object, $expect, "\"$input\"";
+}
+
+while (defined (my $input = shift @tests_ns)) {
+    my ($expect, $object, $error) = shift @tests_ns;
+    decode_aref { 'x:subject' => { '<x:predicate>' => $input } },
+        ns => { geo => 'http://www.w3.org/2003/01/geo/wgs84_pos#' },
         callback => sub { shift; shift; $object = \@_; };
     is_deeply $object, $expect, "\"$input\"";
 }

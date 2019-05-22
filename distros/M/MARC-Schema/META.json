@@ -72,7 +72,7 @@
          "web" : "https://github.com/jorol/MARC-Schema"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "Johann Rolschewski <jorol@cpan.org>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"

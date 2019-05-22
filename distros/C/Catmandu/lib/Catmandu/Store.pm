@@ -2,7 +2,7 @@ package Catmandu::Store;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Hash::Util::FieldHash qw(fieldhash);
 use Catmandu::Util qw(require_package);
@@ -14,11 +14,12 @@ with 'Catmandu::Logger';
 
 has bag_class => (is => 'ro', default => sub {ref($_[0]) . '::Bag'},);
 
-has default_bag => (is => 'lazy');
+has default_bag     => (is => 'lazy');
 has default_plugins => (is => 'ro', default => sub {[]},);
+has default_options => (is => 'ro', default => sub {+{}},);
 has bag_options => (is => 'ro', init_arg => 'bags', default => sub {+{}},);
-has key_prefix => (is => 'lazy', default => sub {'_'},);
-has id_key => (is => 'lazy', alias => 'id_field');
+has key_prefix  => (is => 'lazy', default => sub {'_'},);
+has id_key      => (is => 'lazy', alias => 'id_field');
 
 sub key_for {
     $_[0]->key_prefix . $_[1];
@@ -36,14 +37,14 @@ sub new_bag {
     my ($self, $name, $opts) = @_;
     $opts ||= {};
     $opts->{store} = $self;
-    $opts->{name} = $name // $self->default_bag;
-    if (my $default = $self->bag_options->{$name}) {
-        $opts = {%$default, %$opts};
-    }
+    $opts->{name}  = $name // $self->default_bag;
+    my $default_opts = $self->default_options;
+    my $bag_opts     = $self->bag_options->{$opts->{name}} //= {};
+    $opts = {%$default_opts, %$bag_opts, %$opts};
 
     my $pkg = require_package(delete($opts->{class}) // $self->bag_class);
     my $default_plugins = $self->default_plugins;
-    my $plugins = delete($opts->{plugins}) // [];
+    my $plugins         = delete($opts->{plugins}) // [];
     if (@$default_plugins || @$plugins) {
         $pkg = $pkg->with_plugins(@$default_plugins, @$plugins);
     }
@@ -53,10 +54,15 @@ sub new_bag {
 {
     fieldhash my %bag_instances;
 
+    sub bags {
+        my ($self) = @_;
+        $bag_instances{$self} ||= {};
+    }
+
     sub bag {
         my ($self, $name) = @_;
         $name ||= $self->default_bag;
-        $bag_instances{$self}{$name} ||= $self->new_bag($name);
+        $self->bags->{$name} ||= $self->new_bag($name);
     }
 }
 

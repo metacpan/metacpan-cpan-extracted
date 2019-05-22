@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 
 if (-e '/usr/share/zoneinfo') {
 } elsif (-e '/usr/lib/zoneinfo') {
+} elsif (-e '/usr/share/lib/zoneinfo') { # solaris
 } elsif (($ENV{TZDIR}) && (-e $ENV{TZDIR})) {
 } elsif ($^O eq 'MSWin32') {
 } else {
@@ -22,7 +23,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Time/Zone/Olson.pm',
     LICENSE          => 'perl',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -34,9 +35,11 @@ WriteMakefile(
 	$^O eq 'MSWin32' ? ( 'Win32::API' => 0 ) : (),
 	'XML::LibXML' => 0,
 	'LWP::UserAgent' => 0,
+	'LWP::Protocol::https' => 6.06,
 	'HTTP::Request' => 0,
 	'Fcntl' => 0,
 	'File::Temp' => 0,
+	$^O eq 'MSWin32' ? ( 'Win32' => 0 ) : (),
     },
     PREREQ_PM => {
 	'Carp' => 0,

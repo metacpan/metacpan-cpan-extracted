@@ -1,0 +1,27 @@
+---
+expected:
+  content: (root) CMD (/usr/lib64/sa/sa1 1 1)
+  date: 2016-11-19
+  date_raw: 2016-11-19T20:50:01.749659+01:00
+  datetime_obj: ~
+  datetime_raw: 2016-11-19T20:50:01.749659+01:00
+  datetime_str: 2016-11-19T19:50:01.749659Z
+  domain: ~
+  epoch: 1479585001.749659
+  facility: ~
+  facility_int: ~
+  host: janus
+  host_raw: janus
+  message: 'CROND[14400]: (root) CMD (/usr/lib64/sa/sa1 1 1)'
+  message_raw: '2016-11-19T20:50:01.749659+01:00 janus CROND[14400]: (root) CMD (/usr/lib64/sa/sa1 1 1)'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: CROND
+  program_pid: 14400
+  program_raw: 'CROND[14400]'
+  program_sub: ~
+  time: 19:50:01.749659
+name: High Precision Dates
+string: '2016-11-19T20:50:01.749659+01:00 janus CROND[14400]: (root) CMD (/usr/lib64/sa/sa1 1 1)'

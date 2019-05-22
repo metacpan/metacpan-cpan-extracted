@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Frame.
 
+1.20 Wed 22 May 11:15:40 CEST 2019
+   - bugfix: tests for IPv4 & IPv6 DNS resolutions
+   => https://rt.cpan.org/Ticket/Display.html?id=129409
+
 1.19 Thu 17 May 13:59:33 CEST 2018
    - bugfix: test 13 when DNS getHostIpv6Addr() returns an IPv4 mapped to an IPv6 address
    => https://rt.cpan.org/Ticket/Display.html?id=124780

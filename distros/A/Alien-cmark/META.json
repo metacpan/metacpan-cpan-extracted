@@ -34,7 +34,7 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.19",
-            "Alien::Build::MM" : "1.71",
+            "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
             "ExtUtils::MakeMaker" : "6.52"
          }
@@ -66,7 +66,7 @@
    "provides" : {
       "Alien::cmark" : {
          "file" : "lib/Alien/cmark.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -271,7 +271,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.005",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -525,7 +525,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AlienBuild",
             "name" : "AlienBuild",
-            "version" : "0.28"
+            "version" : "0.29"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -592,7 +592,7 @@
       }
    },
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.28",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",

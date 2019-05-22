@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.28 {
+package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.29 {
 
   use 5.014;
   use Moose;
@@ -147,7 +147,7 @@ Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle - Bundle a copy of Alien::Base::
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 

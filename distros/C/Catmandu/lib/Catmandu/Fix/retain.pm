@@ -2,62 +2,40 @@ package Catmandu::Fix::retain;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
-with 'Catmandu::Fix::Base';
+with 'Catmandu::Fix::Builder';
 
-has paths => (fix_arg => 'collect', default => sub {[]});
+has paths => (fix_arg => 'collect', default => sub {[]},);
 
-sub emit {
-    my ($self, $fixer) = @_;
-    my $paths   = $self->paths;
-    my $var     = $fixer->var;
-    my $tmp_var = $fixer->generate_var;
-    my $perl    = $fixer->emit_declare_vars($tmp_var, '{}');
-    for (@$paths) {
-        my $path = $fixer->split_path($_);
-        my $key  = pop @$path;
-        $perl .= $fixer->emit_walk_path(
-            $var, $path,
-            sub {
-                my ($var) = @_;
-                $fixer->emit_get_key(
-                    $var, $key,
-                    sub {
-                        my ($var) = @_;
-                        $fixer->emit_create_path(
-                            $tmp_var,
-                            [@$path, $key],
-                            sub {
-                                my ($tmp_var) = @_;
-                                "${tmp_var} = ${var};";
-                            }
-                        );
-                    }
-                );
+sub _build_fixer {
+    my ($self) = @_;
+    my $paths    = [map {as_path($_)} @{$self->paths}];
+    my $getters  = [map {$_->getter} @$paths];
+    my $creators = [map {$_->creator} @$paths];
+
+    sub {
+        my $data = $_[0];
+        my $temp = {};
+        for (my $i = 0; $i < @$getters; $i++) {
+            my $getter  = $getters->[$i];
+            my $creator = $creators->[$i];
+            my $values  = $getter->($data);
+            while (@$values) {
+                $creator->($temp, shift @$values);
             }
-        );
-    }
-
-    # clear data
-    $perl .= $fixer->emit_clear_hash_ref($var);
-
-    # copy tmp data
-    $perl .= $fixer->emit_foreach_key(
-        $tmp_var,
-        sub {
-            my ($key) = @_;
-            "${var}\->{${key}} = ${tmp_var}\->{${key}};";
         }
-    );
-
-    # free tmp data
-    $perl .= "undef ${tmp_var};";
-    $perl;
+        undef %$data;
+        for my $key (keys %$temp) {
+            $data->{$key} = $temp->{$key};
+        }
+        $data;
+    };
 }
 
 1;

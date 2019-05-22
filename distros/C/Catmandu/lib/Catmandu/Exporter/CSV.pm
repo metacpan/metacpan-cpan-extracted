@@ -2,7 +2,7 @@ package Catmandu::Exporter::CSV;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Text::CSV;
 use Moo;
@@ -11,10 +11,18 @@ use namespace::clean;
 with 'Catmandu::TabularExporter';
 
 has csv          => (is => 'lazy');
-has sep_char     => (is => 'ro', default => sub {','});
 has quote_char   => (is => 'ro', default => sub {'"'});
 has escape_char  => (is => 'ro', default => sub {'"'});
 has always_quote => (is => 'ro');
+has sep_char => (
+    is      => 'ro',
+    default => sub {','},
+    coerce  => sub {
+        my $sep_char = $_[0];
+        $sep_char =~ s/(\\[abefnrt])/"qq{$1}"/gee;
+        return $sep_char;
+    }
+);
 
 sub _build_csv {
     my ($self) = @_;
@@ -42,14 +50,24 @@ sub add {
             $val;
         } @$fields
     ];
-    my $fh = $self->fh;
 
-    # header
+    $self->_print_header;
+    $self->csv->print($self->fh, $row);
+}
+
+sub commit {
+    my ($self) = @_;
+
+    # ensure header gets printed even if there are no records
+    $self->_print_header;
+}
+
+sub _print_header {
+    my ($self) = @_;
     if (!$self->count && $self->header) {
-        $self->csv->print($fh, $self->columns || $fields);
+        my $row = $self->columns || $self->fields;
+        $self->csv->print($self->fh, $row) if $row && @$row;
     }
-
-    $self->csv->print($fh, $row);
 }
 
 1;
@@ -91,7 +109,7 @@ Catmandu::Exporter::CSV - a CSV exporter
 
     $exporter->add($hashref);
 
-    printf "exported %d objects\n" , $exporter->count;
+    printf "exported %d items\n" , $exporter->count;
 
 =head1 DESCRIPTION
 

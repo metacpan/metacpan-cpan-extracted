@@ -5,10 +5,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile
  ( NAME      => 'MailTools'
  , DISTNAME  => 'MailTools'
- , VERSION   => '2.20'
- , AUTHOR    => 'Mark Overmeer'
+ , VERSION   => '2.21'
+ , AUTHOR    => 'Mark Overmeer <markov@cpan.org>'
  , ABSTRACT  => 'Various ancient e-mail related modules'
- , LICENSE   => 'perl'
+ , LICENSE   => 'perl_5'
 
  , PREREQ_PM =>
    { Net::SMTP   => 1.03
@@ -33,9 +33,9 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-MailTools.git'
               , web  => 'https://github.com/markov2/perl5-MailTools'
               }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
           }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
  );
 

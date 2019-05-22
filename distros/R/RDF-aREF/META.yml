@@ -5,11 +5,12 @@ author:
 build_requires:
   JSON: '0'
   RDF::Trine: '0'
+  Test::Pod: '0'
   Unicode::Normalize: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +31,10 @@ resources:
   bugtracker: https://github.com/nichtich/RDF-aREF/issues
   homepage: https://github.com/nichtich/RDF-aREF
   repository: https://github.com/nichtich/RDF-aREF.git
-version: '0.27'
+version: '0.28'
 x_contributors:
+  - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Jakob Voss <jakob@nichtich.de>'
   - 'Jakob Voss <voss@gbv.de>'
+  - 'Jakob Voß <voss@gbv.de>'
+  - 'Wayne Schneider <wayne@indexdata.com>'

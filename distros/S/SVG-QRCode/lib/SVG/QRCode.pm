@@ -1,14 +1,17 @@
 package SVG::QRCode;
 use strict;
 use warnings;
+use utf8;
+use v5.24;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use Exporter 'import';
 our @EXPORT_OK = qw|plot_qrcode|;
 
-use Carp 'croak';
 use Text::QRCode;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %defaults = (
   casesensitive => 0,
@@ -20,31 +23,26 @@ my %defaults = (
   version       => 0,
 );
 
+# functions
+
+sub plot_qrcode ($text, $params = {}) {
+  return __PACKAGE__->new($params)->plot($text);
+}
+
 # constructor
 
-sub new {
-  my $class  = shift;
-  my $params = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+sub new ($class, $params = {}) {
   for (keys %defaults) {
     $params->{$_} ||= $defaults{$_};
   }
 
-  my $self = {param => $params,};
+  my $self = {param => $params};
   return bless $self, $class;
-}
-
-# functions
-
-sub plot_qrcode {
-  my $text = shift or croak 'Not enough arguments for plot_qrcode!';
-  return __PACKAGE__->new(@_)->plot($text);
 }
 
 # methods
 
-sub param {
-  my ($self, $name, $newvalue) = @_;
-
+sub param ($self, $name, $newvalue = undef) {
   if (defined $newvalue) {
     $self->{param}{$name} = $newvalue || $defaults{$name};
     delete $self->{plotter};
@@ -54,9 +52,7 @@ sub param {
   }
 }
 
-sub plot {
-  my ($self, $text) = @_;
-  croak 'Not enough arguments for plot!' unless defined $text;
+sub plot ($self, $text) {
   my %p = %{$self->{param}};
 
   $self->{plotter} ||= Text::QRCode->new(%p);
@@ -107,20 +103,22 @@ sub plot {
 
 =head1 NAME
 
-SVG::QRCode - Generate SVG based QR Code.
+SVG::QRCode - Generate SVG based QR Code
 
 =head1 SYNOPSIS
 
     use SVG::QRCode;
 
     my $qrcode = SVG::QRCode->new(
-      casesensitive => 0,
-      darkcolor     => 'black',
-      level         => 'M',
-      lightcolor    => 'white',
-      margin        => 10,
-      size          => 5,
-      version       => 0,
+      {
+        casesensitive => 0,
+        darkcolor     => 'black',
+        level         => 'M',
+        lightcolor    => 'white',
+        margin        => 10,
+        size          => 5,
+        version       => 0,
+      }
     );
     my $svg  = $qrcode->plot('https://perldoc.pl');
     my $svg2 = $qrcode->param(darkcolor => 'red')->plot('https://perldoc.pl');
@@ -148,7 +146,7 @@ Creates a QR Code using the provided text and parameters.
 
 =head2 new
     
-    $qrcode = SVG::QRCode->new(%params);
+    $qrcode = SVG::QRCode->new(\%params);
 
 Creates a new QR Code plotter. Accepted parameters are:
 
@@ -164,7 +162,7 @@ Color of the dots. Default C<'black'>.
 
 =item level
 
-Error correction level, one of C<'M'>, C<'L'>, C<'Q'>, C<'H'>. Default C<'L'>.
+Error correction level, one of C<'L'> (low), C<'M'> (medium), C<'Q'> (quartile), C<'H'> (high). Default C<'M'>.
 
 =item lightcolor
 
@@ -206,7 +204,7 @@ L<Text::QRCode>.
 
 =head1 AUTHOR & COPYRIGHT
 
-Copyright (C) 2019, Rolf Stöckli (Tekki).
+Copyright (C) 2019, Tekki (Rolf Stöckli).
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 

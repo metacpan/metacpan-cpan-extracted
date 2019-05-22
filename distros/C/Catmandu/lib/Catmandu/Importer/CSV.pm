@@ -2,7 +2,7 @@ package Catmandu::Importer::CSV;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Text::CSV;
 use List::Util qw(reduce);
@@ -11,7 +11,7 @@ use namespace::clean;
 
 with 'Catmandu::Importer';
 
-has csv => (is => 'ro', lazy => 1, builder => '_build_csv');
+has csv      => (is => 'ro', lazy => 1, builder => '_build_csv');
 has sep_char => (
     is      => 'ro',
     default => sub {','},

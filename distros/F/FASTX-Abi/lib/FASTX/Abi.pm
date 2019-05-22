@@ -6,7 +6,7 @@ use Bio::Trace::ABIF;
 use Data::Dumper;
 use File::Basename;
 
-$FASTX::Abi::VERSION = '0.04';
+$FASTX::Abi::VERSION = '0.05';
 #ABSTRACT: Read Sanger trace file (chromatograms) in FASTQ format. For traces called with I<hetero> option, the ambiguities will be split into two sequences to allow usage from NGS tools that usually do not understand IUPAC ambiguities.
 
 our @valid_new_attributes = ('filename', 'trim_ends', 'wnd', 'min_qual', 'bad_bases', 'keep_abi');
@@ -26,7 +26,8 @@ our @valid_obj_attributes = (
   'quality',          # Quality, trimmed
   'raw_sequence',     # Raw sequence
   'raw_quality',      # Raw quality
-  'iso_seq'           # Sequence are equal
+  'iso_seq',          # Sequence are equal
+  'discard',          # Low quality sequence
 );
 
 our %iupac = (
@@ -93,7 +94,8 @@ sub new {
     $object->{min_qual}  = 20 unless defined $object->{min_qual};
     $object->{bad_bases} = 4  unless defined $object->{bad_bases};
     $object->{keep_abi}  = 0  unless defined $object->{keep_abi};
-    
+    $object->{discard}   = 0;
+
     # GET SEQUENCE FROM AB1 FILE
     # -----------------------------------
     my $seq = _get_sequence($self);
@@ -103,6 +105,8 @@ sub new {
 
     #check valid attributes:
     for my $input (sort keys %{ $self} ) {
+      # [this is a developer's safety net]
+      # uncoverable condition false
       if ( ! grep( /^$input$/, @valid_new_attributes, @valid_obj_attributes ) ) {
         confess("Method new() does not accept \"$input\" attribute. Valid attributes are:\n", join(', ', @valid_new_attributes, @valid_obj_attributes));
       }
@@ -175,15 +179,25 @@ sub _get_sequence {
         #You can change these parameters by explicitly passing arguments to this method
         #(the default values are $window_width = 20, $bad_bases_threshold = 4, $quality_threshold = 20).
         # Note that Sequencing Analysis counts the bases starting from one, so you have to add one to the return values to get consistent results.
-        my ($b, $e) = $abif->clear_range(
+
+        my ($begin_pos, $end_pos) = $abif->clear_range(
                                     $self->{wnd},
                                     $self->{bad_bases},
                                     $self->{min_qual},
+
                                    );
-             if ($b>0 and $e>0) {
-                my $l = $e-$b+1;
-                $self->{sequence} = substr($self->{sequence}, $b, $l);
-                $self->{quality}  = substr($self->{quality} , $b, $l);
+
+# This can be tested with low quality chromatograms 
+# *TODO* to ask for some bad trace
+
+# uncoverable branch false
+# uncoverable condition left
+# uncoverable condition right
+
+             if ($begin_pos>0 and $end_pos>0) {
+                my $hi_qual_length = $end_pos-$begin_pos+1;
+                $self->{sequence} = substr($self->{sequence}, $begin_pos, $hi_qual_length);
+                $self->{quality}  = substr($self->{quality} , $begin_pos, $hi_qual_length);
              } else {
                 $self->{discard} = 1;
              }
@@ -248,7 +262,7 @@ FASTX::Abi - Read Sanger trace file (chromatograms) in FASTQ format. For traces 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

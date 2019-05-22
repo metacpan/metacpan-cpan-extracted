@@ -29,7 +29,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -79,6 +79,8 @@ sub new
     my $self = $class->SUPER::new( %parameters );
     $self->{ beachmarck }->{ started } = time();
 
+    $self->{ configurations } = \%parameters;
+
     $self->_initialize( %parameters );
     return $self;
 } ## end sub new
@@ -115,7 +117,7 @@ sub loadApplication()
 {
     my ( $self, %parameters ) = @_;
     $log->debug( "loadApplication", { package => __PACKAGE__ } );
-    my $configurationFile = $parameters{ configurationFile };
+    my $configurationFile = $self->{ configurations }->{ configurationFile };
 
     if ( !-e $configurationFile )
     {
@@ -151,16 +153,16 @@ sub loadApplication()
     } ## end if ( !-e $configurationFile...)
 
     my @configFiles = ( $configurationFile );
-    my $configAny = Config::Any->load_files( { files => \@configFiles, flatten_to_hash => 1, use_ext => 1 } );
+    my $configAny   = Config::Any->load_files( { files => \@configFiles, flatten_to_hash => 1, use_ext => 1 } );
 
     foreach my $configFile ( keys %$configAny )
     {
         $self->{ configurations }->{ $_ } = $configAny->{ $configFile }->{ $_ } foreach ( keys %{ $configAny->{ $configFile } } );
     }
 
-    $log->info( "Configurações lidas com sucesso na aplicação [  $self->{ configurations }->{ application }->{ name } ]..." );
+    $log->info( "Configurações lidas com sucesso na aplicação [ $self->{ configurations }->{ application }->{ name } ]..." );
 
-    $log->error( 'Falta passar nome da biblioteca' ) if ( $self->{ configurations }->{ application }->{ package } !~ /^\D/ );
+    $log->error( 'Falta passar nome do package' ) if ( $self->{ configurations }->{ application }->{ package } !~ /^\D/ );
 
     eval "use $self->{ configurations }->{ application }->{ fileName };";    ## Usando o módulo.
 
@@ -179,53 +181,8 @@ sub loadApplication()
         }
     } ## end else [ if ( $@ ) ]
 
-    if ( $self->{ configurations }->{ databases } )
-    {
-        $log->info( "Conectando nos bancos..." );
-
-        while ( my ( $key, $values ) = each( %{ $self->{ configurations }->{ databases } } ) )
-        {
-            if ( !$self->connectDatabase( %$values ) )
-            {
-
-                return FALSE;
-            }
-        } ## end while ( my ( $key, $values...))
-
-    } ## end if ( $self->{ configurations...})
     return TRUE;
 } ## end sub loadApplication
-
-=head2 C<connectDatabase()>
-=cut
-
-sub connectDatabase()
-{
-    my ( $self, %parameters ) = @_;
-    $log->debug( "connectDatabase", { package => __PACKAGE__ } );
-
-    my ( $database, $host, $password, $port, $username, $connection, $alias );
-
-    $database   = $parameters{ database };
-    $host       = $parameters{ host };
-    $password   = $parameters{ password };
-    $port       = $parameters{ port };
-    $username   = $parameters{ username };
-    $connection = $parameters{ connection };
-    $alias      = $parameters{ alias } // 'mainDB';
-
-    use DBI;
-    use DBD::Pg;
-    $self->{ databases }->{ connection }->{ $alias } = eval { DBI->connect( "DBI:Pg:dbname=$database;host=$host;port=$port", $username, $password, { RaiseError => 1, PrintError => 0 } ); };
-
-    if ( $@ )
-    {
-        $log->error( "Erro ao conectar ao banco [ $username\@$host:$port ]." );
-        $log->debug( $@ );
-    }
-
-    return $self->{ databases }->{ connection }->{ $alias };
-} ## end sub connectDatabase
 
 =head2 C<run()>
 =cut
@@ -279,7 +236,6 @@ sub END
 sub DESTROY
 {
     my ( $self, %parameters ) = @_;
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
     if ( ${^GLOBAL_PHASE} eq 'DESTRUCT' )
     {
         $self->getExecutionInfo() if ( blessed( $self ) && $self->isa( __PACKAGE__ ) );
@@ -292,7 +248,7 @@ sub DESTROY
     }
     else
     {
-        # TODO
+        $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
     }
 
     Siffra::Bootstrap->SUPER::DESTROY;

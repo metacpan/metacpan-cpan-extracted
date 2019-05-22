@@ -2,13 +2,13 @@ package Catmandu::Logger;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo::Role;
 use Log::Any ();
 use namespace::clean;
 
-has log => (is => 'lazy', init_arg => undef);
+has log          => (is => 'lazy', init_arg => undef);
 has log_category => (is => 'lazy');
 
 {

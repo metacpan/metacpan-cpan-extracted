@@ -2,7 +2,7 @@ package Catmandu::Cmd::import;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use parent 'Catmandu::Cmd';
 use Catmandu;
@@ -16,7 +16,7 @@ sub command_opt_spec {
         ["preprocess|pp",  ""],
         ["start=i",        ""],
         ["total=i",        ""],
-        ["delete",         "delete existing objects first"],
+        ["delete",         "delete existing items first"],
         ["transaction|tx", "wrap in a transaction"],
     );
 }
@@ -27,7 +27,7 @@ sub command {
     my ($from_args, $from_opts, $into_args, $into_opts)
         = $self->_parse_options($args);
 
-    my $from = Catmandu->importer($from_args->[0], $from_opts);
+    my $from     = Catmandu->importer($from_args->[0], $from_opts);
     my $into_bag = delete $into_opts->{bag};
     my $into = Catmandu->store($into_args->[0], $into_opts)->bag($into_bag);
 
@@ -50,15 +50,15 @@ sub command {
         my $n = $into->add_many($from);
         $into->commit;
         if ($opts->verbose) {
-            say STDERR $n == 1 ? "imported 1 object" : "imported $n objects";
+            say STDERR $n == 1 ? "imported 1 item" : "imported $n items";
             say STDERR "done";
         }
     };
 
     if ($opts->transaction) {
         $self->usage_error("Bag isn't transactional")
-            if !$into->does('Catmandu::Transactional');
-        $into->transaction($tx);
+            if !$into->store->does('Catmandu::Transactional');
+        $into->store->transaction($tx);
     }
     else {
         $tx->();
@@ -73,7 +73,7 @@ __END__
 
 =head1 NAME
 
-Catmandu::Cmd::import - import objects into a store
+Catmandu::Cmd::import - import items into a store
 
 =head1 EXAMPLES
 

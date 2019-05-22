@@ -1,3 +1,9 @@
+0.1.8 - * 
+
+0.1.7 - * Fixed issue with one-liners not croaking errors
+        * fw() sub in one-liners now autmatically calls auth()
+        * Documentation updates
+
 0.1.6 - * Added a Test module with the ability to test interfaces, routes, ARP as 
         well as testing the security and NAT rulebase
         * Added HA and NTP operation commands

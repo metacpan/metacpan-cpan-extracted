@@ -2,7 +2,7 @@ package Catmandu::Iterable;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Catmandu::Util qw(:is :check);
 use Time::HiRes qw(gettimeofday tv_interval);
@@ -74,7 +74,7 @@ sub slice {
                     return $data;
                 }
                 return;
-                }
+            }
         }
     );
 }
@@ -115,7 +115,7 @@ sub tap {
                     return $data;
                 }
                 return;
-                }
+            }
         }
     );
 }
@@ -157,8 +157,10 @@ sub map {
         sub {
             sub {
                 state $next = $self->generator;
-                $sub->($next->() // return);
-                }
+                state @buff;
+                @buff = $sub->($next->() // return) unless @buff;
+                shift @buff;
+            }
         }
     );
 }
@@ -256,7 +258,7 @@ sub take {
                         $sub->($data) && return $data;
                     }
                     return;
-                    }
+                }
             }
         );
     }
@@ -275,7 +277,7 @@ sub take {
                         $sub->($data) || return $data;
                     }
                     return;
-                    }
+                }
             }
         );
     }
@@ -344,7 +346,7 @@ sub group {
                 }
 
                 Catmandu::ArrayIterator->new($group);
-                }
+            }
         }
     );
 }
@@ -370,7 +372,7 @@ sub interleave {
                     }
                 }
                 return;
-                }
+            }
         }
     );
 }
@@ -425,7 +427,7 @@ sub format {
     my ($self, %opts) = @_;
     $opts{header}  //= 1;
     $opts{col_sep} //= " | ";
-    my @cols = $opts{cols} ? @{$opts{cols}} : ();
+    my @cols        = $opts{cols} ? @{$opts{cols}} : ();
     my @col_lengths = map length, @cols;
 
     my $rows = $self->map(
@@ -466,7 +468,7 @@ sub stop_if {
                 my $data = $next->() // return;
                 $sub->($data) && return;
                 $data;
-                }
+            }
         }
     );
 }
@@ -489,7 +491,7 @@ __END__
 
 =head1 NAME
 
-Catmandu::Iterable - Base class for all iterable Catmandu classes
+Catmandu::Iterable - Base role for all iterable Catmandu classes
 
 =head1 SYNOPSIS
 
@@ -803,7 +805,9 @@ Returns true if all the items generate a true value when executing callback.
 
 =head2 map(\&callback)
 
-Returns a new Iterator containing for each item the result of the callback.
+Returns a new Iterator containing for each item the result of the callback. If
+the callback returns multiple or no items, the resulting iterator will grow or
+shrink.
 
 =head2 reduce([START],\&callback)
 

@@ -1,6 +1,6 @@
 package Catmandu::SRU;
 
-our $VERSION = '0.421';
+our $VERSION = '0.422';
 
 =head1 NAME
 
@@ -70,6 +70,8 @@ Catmandu::SRU - Catmandu module for working with SRU data
 =item L<Catmandu::Importer::SRU::Parser::meta>
 
 =item L<Catmandu::Importer::SRU::Parser::mods>
+
+=item L<Catmandu::Importer::SRU::Parser::picaxml>
 
 =back
 

@@ -6,6 +6,7 @@ use File::Basename 'basename';
 use FindBin;
 use Config;
 use File::Path 'mkpath';
+use File::Spec;
 
 use SPVM::Builder;
 
@@ -22,7 +23,7 @@ use lib "$FindBin::Bin/default/lib";
   system($spvmcc_cmd) == 0
     or die "Can't execute command $spvmcc_cmd:$!";
 
-  my $execute_cmd = 't/spvm_build/work/exe/myexe';
+  my $execute_cmd = File::Spec->catfile(qw/t spvm_build work exe myexe/);
   system($execute_cmd) == 0
     or die "Can't execute command $spvmcc_cmd:$!";
 }

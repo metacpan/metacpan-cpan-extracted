@@ -781,7 +781,8 @@ PP(pp_formline)
 			 * for safety */
 			grow = linemax;
 			while (linemark--)
-			    s += UTF8SKIP(s);
+			    s += UTF8_SAFE_SKIP(s,
+                                            (U8 *) SvEND(PL_formtarget));
 			linemark = s - (U8*)SvPVX(PL_formtarget);
 		    }
 		    /* Easy. They agree.  */
@@ -4218,7 +4219,7 @@ S_require_file(pTHX_ SV *sv)
                         }
 
                         if (c == e && isIDFIRST_lazy_if_safe(name, e, utf8)) {
-                            sv_catpv(msg, " (you may need to install the ");
+                            sv_catpvs(msg, " (you may need to install the ");
                             for (c = name; c < e; c++) {
                                 if (*c == '/') {
                                     sv_catpvs(msg, "::");
@@ -4227,14 +4228,14 @@ S_require_file(pTHX_ SV *sv)
                                     sv_catpvn(msg, c, 1);
                                 }
                             }
-                            sv_catpv(msg, " module)");
+                            sv_catpvs(msg, " module)");
                         }
 		    }
 		    else if (memENDs(name, len, ".h")) {
-			sv_catpv(msg, " (change .h to .ph maybe?) (did you run h2ph?)");
+			sv_catpvs(msg, " (change .h to .ph maybe?) (did you run h2ph?)");
 		    }
 		    else if (memENDs(name, len, ".ph")) {
-			sv_catpv(msg, " (did you run h2ph?)");
+			sv_catpvs(msg, " (did you run h2ph?)");
 		    }
 
 		    /* diag_listed_as: Can't locate %s */

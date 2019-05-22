@@ -184,8 +184,9 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
   SPVM_OP* op_cur = op_root;
   int32_t finish = 0;
   while (op_cur) {
-    int32_t rel_line = op_cur->line - sub->op_sub->line;
-    if (op_cur->line >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+    int32_t lines_count = op_cur->line - sub->op_sub->line + 1;
+
+    if (lines_count > SPVM_LIMIT_C_LINES_MAX_COUNT) {
       SPVM_COMPILER_error(compiler, "Too many lines at %s line %d\n", op_cur->file, op_cur->line);
       return;
     }
@@ -520,7 +521,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               SPVM_LIST_pop(check_ast_info->op_switch_stack);
 
-              if (package->info_switch_infos->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+              if (package->info_switch_infos->length > SPVM_LIMIT_C_SWITCHES_MAX_COUNT) {
                 SPVM_COMPILER_error(compiler, "Too many switch at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
@@ -1815,22 +1816,34 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Left operand of + operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
+              // SPVM::Complex_2f
+              if (SPVM_TYPE_is_value_complex_float_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_float_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
               }
+              // SPVM::Complex_2d
+              else if (SPVM_TYPE_is_value_complex_double_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_double_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
+              }
+              else {
+                // Left operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Left operand of + operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
 
-              // Right operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Right operand of + operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
-              }
-              
-              // Apply binary numeric convertion
-              SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
-              if (compiler->error_count > 0) {
-                return;
+                // Right operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Right operand of + operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
+                
+                // Apply binary numeric convertion
+                SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
+                if (compiler->error_count > 0) {
+                  return;
+                }
               }
                                               
               break;
@@ -1839,22 +1852,34 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Left operand of - operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
+              // SPVM::Complex_2f
+              if (SPVM_TYPE_is_value_complex_float_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_float_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
               }
+              // SPVM::Complex_2d
+              else if (SPVM_TYPE_is_value_complex_double_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_double_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
+              }
+              else {
+                // Left operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Left operand of - operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
 
-              // Right operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Right operand of - operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
-              }
-              
-              // Apply binary numeric convertion
-              SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
-              if (compiler->error_count > 0) {
-                return;
+                // Right operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Right operand of - operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
+                
+                // Apply binary numeric convertion
+                SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
+                if (compiler->error_count > 0) {
+                  return;
+                }
               }
               
               break;
@@ -1863,22 +1888,34 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Left operand of * operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
+              // SPVM::Complex_2f
+              if (SPVM_TYPE_is_value_complex_float_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_float_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
               }
-
-              // Right operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Right operand of * operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
+              // SPVM::Complex_2d
+              else if (SPVM_TYPE_is_value_complex_double_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_double_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
               }
+              else {
+                // Left operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Left operand of * operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
 
-              // Apply binary numeric convertion
-              SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
-              if (compiler->error_count > 0) {
-                return;
+                // Right operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Right operand of * operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
+
+                // Apply binary numeric convertion
+                SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
+                if (compiler->error_count > 0) {
+                  return;
+                }
               }
               
               break;
@@ -1887,22 +1924,34 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Left operand of / operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
+              // SPVM::Complex_2f
+              if (SPVM_TYPE_is_value_complex_float_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_float_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
               }
+              // SPVM::Complex_2d
+              else if (SPVM_TYPE_is_value_complex_double_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+                && SPVM_TYPE_is_value_complex_double_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  // OK
+              }
+              else {
+                // Left operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Left operand of / operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
 
-              // Right operand must be numeric type
-              if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "Right operand of / operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
-                return;
-              }
-              
-              // Apply binary numeric convertion
-              SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
-              if (compiler->error_count > 0) {
-                return;
+                // Right operand must be numeric type
+                if (!SPVM_TYPE_is_numeric_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                  SPVM_COMPILER_error(compiler, "Right operand of / operator must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
+                }
+                
+                // Apply binary numeric convertion
+                SPVM_OP_CHECKER_apply_binary_numeric_convertion(compiler, op_cur->first, op_cur->last);
+                if (compiler->error_count > 0) {
+                  return;
+                }
               }
 
               break;
@@ -5006,9 +5055,14 @@ void SPVM_OP_CHECKER_resolve_packages(SPVM_COMPILER* compiler) {
         SPVM_COMPILER_error(compiler, "value_t package have at least one field at %s line %d\n", package->op_package->file, package->op_package->line);
         return;
       }
+      // Minilal value fields length is 1
+      else if (package->fields->length < SPVM_LIMIT_C_VALUE_FIELDS_MIN_COUNT) {
+        SPVM_COMPILER_error(compiler, "Neet at least one field at %s line %d\n", package->op_package->file, package->op_package->line);
+        return;
+      }
       // Max fields length is 16
-      else if (package->fields->length > SPVM_LIMIT_C_VALUE_T_FIELDS_LENGTH_MAX) {
-        SPVM_COMPILER_error(compiler, "Too many fields at %s line %d\n", package->op_package->file, package->op_package->line);
+      else if (package->fields->length > SPVM_LIMIT_C_VALUE_FIELDS_MAX_COUNT) {
+        SPVM_COMPILER_error(compiler, "Too many value fields at %s line %d\n", package->op_package->file, package->op_package->line);
         return;
       }
       else {
@@ -5169,8 +5223,8 @@ void SPVM_OP_CHECKER_resolve_packages(SPVM_COMPILER* compiler) {
           last_arg_type = arg_type;
         }
       }
-      if (arg_allow_count > 255) {
-        SPVM_COMPILER_error(compiler, "Over argument limit at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
+      if (arg_allow_count > SPVM_LIMIT_C_SUB_ARGS_MAX_COUNT) {
+        SPVM_COMPILER_error(compiler, "Too many argument definitions at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
         return;
       }
       

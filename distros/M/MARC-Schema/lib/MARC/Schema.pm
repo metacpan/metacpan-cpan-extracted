@@ -3,7 +3,7 @@ package MARC::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Cpanel::JSON::XS;
 use File::Share ':all';
@@ -50,19 +50,16 @@ sub check {
     return map {$self->check_field($_, %options)} @$record;
 }
 
-sub _error {
-    my $field = shift;
-    return {tag => $field->[0], @_};
-}
-
 sub check_field {
     my ($self, $field, %options) = @_;
 
-    my $spec = $self->{fields}->{$field->[0]};
+    my $tag = $field->[0];
+
+    my $spec = $self->{fields}->{$tag};
 
     if (!$spec) {
         if (!$options{ignore_unknown_fields}) {
-            return _error($field, message => 'unknown field');
+            return ({tag => $tag, error => 'unknown field', type => 'field'});
         }
         else {
             return ();
@@ -71,15 +68,17 @@ sub check_field {
 
     if ($options{counter} && !$spec->{repeatable}) {
         if ($options{counter}{$field->[0]}++) {
-            return _error(
-                $field,
-                repeatable => 'false',
-                message    => 'field is not repeatable'
+            return (
+                {
+                    tag   => $tag,
+                    error => 'field is not repeatable',
+                    type  => 'field',
+                }
             );
         }
     }
 
-    my %errors;
+    my @errors;
     if ($spec->{subfields}) {
         my %sfcounter;
         my (undef, undef, undef, @subfields) = @$field;
@@ -89,15 +88,23 @@ sub check_field {
 
             if ($sfspec) {
                 if (!$sfspec->{repeatable} && $sfcounter{$code}++) {
-                    $errors{$code} = {
-                        message    => 'subfield is not repeatable',
-                        label      => $sfspec->{label},
-                        repeatable => 'false'
-                    };
+                    push @errors,
+                        {
+                        tag   => $tag,
+                        error => 'subfield is not repeatable',
+                        type  => 'subfield',
+                        value => $code,
+                        };
                 }
             }
             elsif (!$options{ignore_unknown_subfields}) {
-                $errors{$code} = {message => 'unknown subfield'};
+                push @errors,
+                    {
+                    tag   => $tag,
+                    error => "unknown subfield",
+                    type  => 'subfield',
+                    value => $code,
+                    };
             }
         }
     }
@@ -113,7 +120,13 @@ sub check_field {
             # everything is ok
         }
         else {
-            $errors{ind1} = {message => "unknown indicator1 value '$code'"};
+            push @errors,
+                {
+                tag   => $tag,
+                error => 'unknown first indicator',
+                type  => 'indicator',
+                value => $code,
+                };
         }
     }
 
@@ -128,11 +141,17 @@ sub check_field {
             # everything is ok
         }
         else {
-            $errors{ind2} = {message => "unknown indicator2 value '$code'"};
+            push @errors,
+                {
+                tag   => $tag,
+                error => 'unknown second indicator',
+                type  => 'indicator',
+                value => $code,
+                };
         }
     }
 
-    return %errors ? _error($field, subfields => \%errors) : ();
+    return @errors;
 }
 
 1;
@@ -190,7 +209,9 @@ MARC::Schema - Specification of the MARC21 format
     my @check = $schema->check($record);
 
     # via the command line
-    $ marcvalidate --file t/camel.mrc --type RAW
+    $ marcvalidate t/camel.mrc
+    $ marcvalidate --schema marc_schema.json t/camel.mrc
+    $ marcvalidate --type XML marc.xml
 
 =head1 DESCRIPTION
 
@@ -226,11 +247,9 @@ Don't report subfields not included in the schema.
 
 =back
 
-Errors are given as list of hash reference with keys C<label>, C<message>,
-C<repeatable>, C<subfields> and C<tag> of the violated field. If key
-C<subfields> is set, the field contained invalid subfields. The error field
-C<message> contains a human-readable error message which for each violated
-field and/or subfield;
+Errors are given as list of hash references with keys C<error>, C<tag>, 
+C<type> and C<value> of the violated field. C<error> contains a 
+human-readable error message for each violated field and/or subfield.
 
 =head2 check_field( $field [, %options ] )
 

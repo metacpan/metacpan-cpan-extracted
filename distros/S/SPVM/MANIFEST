@@ -1,5 +1,6 @@
 appveyor.yml
 Changes
+DEVELOPMENT.txt
 examples/native/eigen/eigen.pl
 examples/native/eigen/lib/Eigen.config
 examples/native/eigen/lib/Eigen.cpp
@@ -139,9 +140,7 @@ lib/SPVM/CORE.spvm
 lib/SPVM/Data.pm
 lib/SPVM/Data/Array.pm
 lib/SPVM/Data/Package.pm
-lib/SPVM/Document/ExchangeAPI.pod
 lib/SPVM/Document/Extension.pod
-lib/SPVM/Document/Language.pod
 lib/SPVM/Document/NativeAPI.pod
 lib/SPVM/Double.pm
 lib/SPVM/Double.spvm
@@ -200,22 +199,18 @@ lib/SPVM/Short.spvm
 lib/SPVM/ShortList.spvm
 lib/SPVM/StringBuffer.spvm
 lib/SPVM/Stringer.spvm
+lib/SPVM/StringList.spvm
 lib/SPVM/Time.c
 lib/SPVM/Time.config
 lib/SPVM/Time.spvm
-lib/SPVM/Time/Format.c
-lib/SPVM/Time/Format.config
-lib/SPVM/Time/Format.spvm
 lib/SPVM/Time/Info.spvm
-lib/SPVM/Time/Moment.c
-lib/SPVM/Time/Moment.config
-lib/SPVM/Time/Moment.spvm
-lib/SPVM/Time/tm_9i.spvm
+lib/SPVM/Unicode.c
+lib/SPVM/Unicode.config
 lib/SPVM/Unicode.spvm
 Makefile.PL
 MANIFEST			This list of files
 ppport.h
-README
+README.md
 script/spvmcc
 solo/lib/TestCase.spvm
 solo/lib/TestCase/Allow.spvm
@@ -387,6 +382,8 @@ t/default/lib/TestCase/CompileError/TypeCantBeDetectedUndef.spvm
 t/default/lib/TestCase/CompileError/TypeCantBeDetectedUndefDefault.spvm
 t/default/lib/TestCase/CompileError/UnaryMinus/NotNumeric.spvm
 t/default/lib/TestCase/CompileError/UnaryPlus/NotNumeric.spvm
+t/default/lib/TestCase/CompileError/Value/Fields17.spvm
+t/default/lib/TestCase/CompileError/Value/FieldsZero.spvm
 t/default/lib/TestCase/CompileError/Weaken/ArrayNotObject.spvm
 t/default/lib/TestCase/CompileError/Weaken/HashNotObject.spvm
 t/default/lib/TestCase/Complex.spvm
@@ -447,9 +444,8 @@ t/default/lib/TestCase/Lib/SPVM/MIME/Base64.spvm
 t/default/lib/TestCase/Lib/SPVM/Short.spvm
 t/default/lib/TestCase/Lib/SPVM/ShortList.spvm
 t/default/lib/TestCase/Lib/SPVM/StringBuffer.spvm
+t/default/lib/TestCase/Lib/SPVM/StringList.spvm
 t/default/lib/TestCase/Lib/SPVM/Time.spvm
-t/default/lib/TestCase/Lib/SPVM/Time/Format.spvm
-t/default/lib/TestCase/Lib/SPVM/Time/Moment.spvm
 t/default/lib/TestCase/Lib/SPVM/Unicode.spvm
 t/default/lib/TestCase/LINEN.spvm
 t/default/lib/TestCase/LINER.spvm
@@ -460,6 +456,12 @@ t/default/lib/TestCase/Literal/Integer.spvm
 t/default/lib/TestCase/Literal/String.spvm
 t/default/lib/TestCase/Literal/Undef.spvm
 t/default/lib/TestCase/LogicalOperator.spvm
+t/default/lib/TestCase/Matrix4_16b.spvm
+t/default/lib/TestCase/Matrix4_16d.spvm
+t/default/lib/TestCase/Matrix4_16f.spvm
+t/default/lib/TestCase/Matrix4_16i.spvm
+t/default/lib/TestCase/Matrix4_16l.spvm
+t/default/lib/TestCase/Matrix4_16s.spvm
 t/default/lib/TestCase/Minimal.spvm
 t/default/lib/TestCase/Multiply.spvm
 t/default/lib/TestCase/MyExe.spvm
@@ -493,7 +495,8 @@ t/default/lib/TestCase/Term.spvm
 t/default/lib/TestCase/UnaryMinus.spvm
 t/default/lib/TestCase/UnaryPlus.spvm
 t/default/lib/TestCase/Unless.spvm
-t/default/lib/TestCase/ValueTArray.spvm
+t/default/lib/TestCase/Value.spvm
+t/default/lib/TestCase/ValueArray.spvm
 t/default/lib/TestCase/Weaken.spvm
 t/default/lib/TestCase/While.spvm
 t/default/literal-character.t
@@ -522,7 +525,8 @@ t/default/term.t
 t/default/unary-minus.t
 t/default/unary-plus.t
 t/default/unless.t
-t/default/value_t_array.t
+t/default/value.t
+t/default/value_array.t
 t/default/weaken.t
 t/default/while.t
 t/exe/exe.t

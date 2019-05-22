@@ -9,6 +9,7 @@ lib/Pod/Simple/DumpAsXML.pm
 lib/Pod/Simple/HTML.pm
 lib/Pod/Simple/HTMLBatch.pm
 lib/Pod/Simple/HTMLLegacy.pm
+lib/Pod/Simple/JustPod.pm
 lib/Pod/Simple/LinkSection.pm
 lib/Pod/Simple/Methody.pm
 lib/Pod/Simple/Progress.pm
@@ -131,6 +132,7 @@ t/fcodes_l.t
 t/fcodes_s.t
 t/for.t
 t/fornot.t
+t/github_issue_79.t
 t/heads.t
 t/html01.t
 t/html02.t
@@ -143,6 +145,9 @@ t/junk1.pod
 t/junk1o.txt
 t/junk2.pod
 t/junk2o.txt
+t/JustPod01.t
+t/JustPod02.t
+t/JustPod_corpus.t
 t/linkclas.t
 t/output.t
 t/perlcyg.pod
@@ -155,6 +160,7 @@ t/puller.t
 t/pulltitl.t
 t/reinit.t
 t/render.t
+t/rtf_utf8.t
 t/search05.t
 t/search10.t
 t/search12.t

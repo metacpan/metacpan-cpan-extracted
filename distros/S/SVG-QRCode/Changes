@@ -1,4 +1,8 @@
 Revision history for perl distribution SVG::QRCode
 
+0.02 2019-05-21T06:49:47+0200
+  - Require Perl 5.24.
+  - Improve documentation.
+
 0.01 2019-05-19T14:44:04+0200
- - First release.
+  - First release.

@@ -1,7 +1,6 @@
 .perltidyrc
 Changes
 cpanfile
-lib/SVG/.QRCode.pm.swp
 lib/SVG/QRCode.pm
 Makefile.PL
 MANIFEST			This list of files

@@ -330,8 +330,14 @@ CLASS METHODS
  exporter([NAME])
 
     Return an instance of Catmandu::Exporter with name NAME (or the default
-    when no name is given). The NAME is set in the configuration file (see
+    when no name is given). The NAME can be in a configuration file (see
     'importer').
+
+ validator([NAME])
+
+    Return an instance of Catmandu::Validator with name NAME (or the
+    default when no name is given). The NAME can be in a configuration file
+    (see 'importer').
 
  export($data,[NAME])
 
@@ -450,6 +456,10 @@ EXPORTS
 
       Same as Catmandu->exporter.
 
+    validator
+
+      Same as Catmandu->validator.
+
     export
 
       Same as Catmandu->export.
@@ -541,6 +551,14 @@ SEE ALSO
     documentation
 
       http://librecat.org/Catmandu/
+
+    blog
+
+      https://librecatproject.wordpress.com/
+
+    step-by-step introduction from basics
+
+      https://librecatproject.wordpress.com/2014/12/01/day-1-getting-catmandu/
 
     command line client
 

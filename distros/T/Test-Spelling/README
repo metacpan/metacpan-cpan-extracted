@@ -56,7 +56,7 @@ DESCRIPTION
 
 FUNCTIONS
   all_pod_files_spelling_ok( [@files/@directories] )
-    Checks all the files for POD spelling. It gathers all_pod_files() on
+    Checks all the files for POD spelling. It gathers "all_pod_files" on
     each file/directory, and declares a "plan" in Test::More for you (one
     test for each file), so you must not call "plan" yourself.
 

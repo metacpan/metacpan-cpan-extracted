@@ -15,7 +15,8 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Text::QRCode' => '0.05'
+  'Text::QRCode' => '0.05',
+  'perl' => '5.024'
 }
 ,
   META_MERGE     => {

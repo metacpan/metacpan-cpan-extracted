@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Errors;
-$Device::Firewall::PaloAlto::Errors::VERSION = '0.1.6';
+$Device::Firewall::PaloAlto::Errors::VERSION = '0.1.8';
 use strict;
 use warnings;
 use 5.010;
@@ -21,11 +21,21 @@ sub ERROR {
     my ($errstring, $errno) = @_;
 
     $errno //= 0;
-    
+
     # Are we in a one liner? If so, we croak out straight away
-    croak $errstring if (caller())[1] eq '-e';
+    croak $errstring if in_one_liner();
 
     return Class::Error->new($errstring, $errno);
+}
+
+
+sub in_one_liner {
+    my $level = 0;
+    my $filename;
+    my @call_info;
+
+    while (@call_info = caller($level++)) { $filename = $call_info[1] };
+    return $filename eq '-e' ? 1 : 0;
 }
 
 1;
@@ -42,7 +52,7 @@ Device::Firewall::PaloAlto::Errors - Parent class for errors.
 
 =head1 VERSION
 
-version 0.1.6
+version 0.1.8
 
 =head1 SYNOPSIS
 

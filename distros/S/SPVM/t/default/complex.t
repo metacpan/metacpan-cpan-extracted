@@ -18,6 +18,8 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
   ok(TestCase::Complex->test_csub_min());
   ok(TestCase::Complex->test_cmul());
   ok(TestCase::Complex->test_cmul_min());
+  ok(TestCase::Complex->test_cdiv());
+  ok(TestCase::Complex->test_cdiv_min());
   ok(TestCase::Complex->test_caddf());
   ok(TestCase::Complex->test_caddf_min());
   ok(TestCase::Complex->test_csubf());
@@ -26,10 +28,10 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
   ok(TestCase::Complex->test_cmulf_min());
   ok(TestCase::Complex->test_cdivf());
   ok(TestCase::Complex->test_cdivf_min());
-  ok(TestCase::Complex->test_new_fcomplex());
-  ok(TestCase::Complex->test_new_dcomplex());
-  ok(TestCase::Complex->test_new_fcomplex_array());
-  ok(TestCase::Complex->test_new_dcomplex_array());
+  ok(TestCase::Complex->test_complexf());
+  ok(TestCase::Complex->test_complex());
+  ok(TestCase::Complex->test_complex_farray());
+  ok(TestCase::Complex->test_complex_array());
 }
 
 # All object is freed

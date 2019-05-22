@@ -24,7 +24,9 @@ my @files = (
     't/03-trial.t',
     't/04-underscore.t',
     't/05-skip_main_module.t',
-    't/06-overwrite.t'
+    't/06-overwrite.t',
+    't/07-semantic.t',
+    't/08-build_exceptions.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

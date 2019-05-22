@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"            => "0.000060",
     "YAML"                 => 0
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.29",
   "test"    => {
     "TESTS" => "t/*.t"
   }

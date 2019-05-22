@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::Tunnels;
-$Device::Firewall::PaloAlto::Op::Tunnels::VERSION = '0.1.6';
+$Device::Firewall::PaloAlto::Op::Tunnels::VERSION = '0.1.8';
 use strict;
 use warnings;
 use 5.010;
@@ -59,7 +59,7 @@ Device::Firewall::PaloAlto::Op::Tunnels - Palo Alto IPSEC security associations
 
 =head1 VERSION
 
-version 0.1.6
+version 0.1.8
 
 =head1 SYNOPSIS
 

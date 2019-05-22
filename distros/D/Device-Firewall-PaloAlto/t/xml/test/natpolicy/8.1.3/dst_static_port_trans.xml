@@ -1,0 +1,5 @@
+<!-- fw()->auth->debug->test->nat_policy(from => 'TRUST', to => 'UNTRUST', src_ip => q(192.168.130.3), dst_ip => q(192.168.130.1), dst_port => 83)->to_json -->
+<response cmd="status" status="success"><result><rules>
+	<entry>Destination Static with Port Translation</entry>
+</rules>
+</result></response>

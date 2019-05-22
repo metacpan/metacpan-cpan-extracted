@@ -1,0 +1,27 @@
+---
+expected:
+  content: 'pam_unix(sshd:session): session opened for user brad by (uid=0)'
+  date: 2018-05-19
+  date_raw: May 19 22:03:29
+  datetime_obj: ~
+  datetime_raw: May 19 22:03:29
+  datetime_str: 2018-05-19T22:03:29Z
+  domain: ~
+  epoch: 1526767409
+  facility: ~
+  facility_int: ~
+  host: janus
+  host_raw: janus
+  message: 'sshd[10173]: pam_unix(sshd:session): session opened for user brad by (uid=0)'
+  message_raw: 'May 19 22:03:29 janus sshd[10173]: pam_unix(sshd:session): session opened for user brad by (uid=0)'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: sshd
+  program_pid: 10173
+  program_raw: 'sshd[10173]'
+  program_sub: ~
+  time: 22:03:29
+name: OpenSSH Log sample
+string: 'May 19 22:03:29 janus sshd[10173]: pam_unix(sshd:session): session opened for user brad by (uid=0)'

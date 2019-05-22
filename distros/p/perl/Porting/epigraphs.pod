@@ -17,6 +17,71 @@ Consult your favorite dictionary for details.
 
 =head1 EPIGRAPHS
 
+=head2 v5.30.0-RC2 - Derek Walcott
+
+Announced on 2019-05-17 by Sawyer X
+
+  The truest writers are those who see language not as linguistic process but
+  as a living element.
+
+    -- Derek Walcott
+
+=head2 v5.30.0-RC1 - Marcel Proust
+
+L<Announced on 2019-05-11 by Sawyer X|https://www.nntp.perl.org/group/perl.perl5.porters/2019/05/msg254750.html>
+
+  If a little dreaming is dangerous, the cure for it is not to dream
+  less but to dream more, to dream all the time.
+
+    -- Marcel Proust
+
+=head2 v5.29.10 - Maya Angelou, Alone
+
+L<Announced on 2019-04-20 by Sawyer X|https://www.nntp.perl.org/group/perl.perl5.porters/2019/04/msg254467.html>
+
+  Lying, thinking
+  Last night
+  How to find my soul a home
+  Where water is not thirsty
+  And bread loaf is not stone
+  I came up with one thing
+  And I don't believe I'm wrong
+  That nobody,
+  But nobody
+  Can make it out here alone.
+
+  Alone, all alone
+  Nobody, but nobody
+  Can make it out here alone.
+
+  There are some millionaires
+  With money they can't use
+  Their wives run round like banshees
+  Their children sing the blues
+  They've got expensive doctors
+  To cure their hearts of stone.
+  But nobody
+  No, nobody
+  Can make it out here alone.
+
+  Alone, all alone
+  Nobody, but nobody
+  Can make it out here alone.
+
+  Now if you listen closely
+  I'll tell you what I know
+  Storm clouds are gathering
+  The wind is gonna blow
+  The race of man is suffering
+  And I can hear the moan,
+  'Cause nobody,
+  But nobody
+  Can make it out here alone.
+
+  Alone, all alone
+  Nobody, but nobody
+  Can make it out here alone.
+
 =head2 v5.29.9 - Sir Arthur Conan Doyle, The Adventure of the Dancing Men
 
 L<Announced on 2019-03-21 by Zak Elep|https://www.nntp.perl.org/group/perl.perl5.porters/2019/03/msg253978.html>
@@ -218,6 +283,25 @@ L<Announced on 2018-07-20 by Steve Hay|https://www.nntp.perl.org/group/perl.perl
 L<Announced on 2018-06-26 by Sawyer X|http://nntp.perl.org/group/perl.perl5.porters/251297>
 
   Courage is the only antidote for danger.
+
+=head2 v5.28.2 - Edward Lear, ed. Vivien Noakes, "The Complete Nonsense and Other Verse": The Jumblies
+
+L<Announced on 2019-04-19 by Steve Hay|http://www.nntp.perl.org/group/perl.perl5.porters/2019/04/msg254456.html>
+
+  They went to sea in a Sieve, they did,
+    In a Sieve they went to sea:
+  In spite of all their friends could say,
+  On a winter's morn, on a stormy day,
+    In a Sieve they went to sea!
+  And when the Sieve turned round and round,
+  And every one cried, 'You'll all be drowned!'
+  They called aloud, 'Our Sieve ain't big,
+  But we don't care a button! we don't care a fig!
+    In a Sieve we'll go to sea!'
+      Far and few, far and few,
+        Are the lands where the Jumblies live;
+      Their heads are green, and their hands are blue,
+        And they went to sea in a Sieve.
 
 =head2 v5.28.2-RC1 - Edward Lear, ed. Vivien Noakes, "The Complete Nonsense and Other Verse": The Quangle Wangle's Hat
 

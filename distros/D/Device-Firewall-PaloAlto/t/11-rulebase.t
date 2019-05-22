@@ -4,7 +4,7 @@ use 5.010;
 
 use Test::More tests => 15;
 use Device::Firewall::PaloAlto::API;
-use Device::Firewall::PaloAlto::Test::Rulebase;
+use Device::Firewall::PaloAlto::Test::SecPolicy;
 
 use lib 't/lib';
 use Local::TestSupport qw(pseudo_api_call);
@@ -14,9 +14,9 @@ use Local::TestSupport qw(pseudo_api_call);
 # permitted
 my $r = pseudo_api_call(
     't/xml/test/rulebase/flow_permit.xml', 
-    sub { Device::Firewall::PaloAlto::Test::Rulebase->_new(@_) }
+    sub { Device::Firewall::PaloAlto::Test::SecPolicy->_new(@_) }
 );
-isa_ok( $r, 'Device::Firewall::PaloAlto::Test::Rulebase' );
+isa_ok( $r, 'Device::Firewall::PaloAlto::Test::SecPolicy' );
 
 ok( $r, 'Permitted flow is true' );
 is( $r->rulename, 'Tunnel Policy', 'Permit flow rulename' );
@@ -29,9 +29,9 @@ is( $r->index, 4, 'Permit flow index' );
 # DENIED
 $r = pseudo_api_call(
     't/xml/test/rulebase/flow_deny.xml', 
-    sub { Device::Firewall::PaloAlto::Test::Rulebase->_new(@_) }
+    sub { Device::Firewall::PaloAlto::Test::SecPolicy->_new(@_) }
 );
-isa_ok( $r, 'Device::Firewall::PaloAlto::Test::Rulebase' );
+isa_ok( $r, 'Device::Firewall::PaloAlto::Test::SecPolicy' );
 
 ok( !$r, 'Denied flow is false' );
 is( $r->rulename, 'Deny Policy', 'Deny flow rulename' );
@@ -42,9 +42,9 @@ is( $r->index, 2, 'Deny flow index' );
 # rule
 $r = pseudo_api_call(
     't/xml/test/rulebase/flow_default_deny.xml', 
-    sub { Device::Firewall::PaloAlto::Test::Rulebase->_new(@_) }
+    sub { Device::Firewall::PaloAlto::Test::SecPolicy->_new(@_) }
 );
-isa_ok( $r, 'Device::Firewall::PaloAlto::Test::Rulebase' );
+isa_ok( $r, 'Device::Firewall::PaloAlto::Test::SecPolicy' );
 
 ok( !$r, 'Default deny rule is false' );
 is( $r->rulename, '__DEFAULT_DENY__', 'Defauly deny rulename' );

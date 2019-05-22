@@ -7,12 +7,27 @@
     and <https://metacpan.org/release/MailTools>
 
 MailTools is one of the oldest modules on CPAN.  It started off in 1995,
-the year Perl 5.0 got released!
+the year Perl 5.0 got released!  That's just in the beginning of the
+MIME standards.
 
-**Please note:** Email has become more complex over the years.  These
-modules only understand very basic emails and fairly simple emails.
-Later, this module got extended by the MIME::Entity modules... but when
-you start all over, please look at Mail::Box!
+Email has become more complex over the years.  The components of
+MailTools only understand very basic emails and fairly simple mime
+headers.  Fixing some things will break existing applications.
+
+The only reason for still maintaining it, is because it is used as example
+in many books and therefore applications still use it.  Not because it
+is good.  Sometimes it is good enough, though.
+
+Later, this module got extended by the MIME::Entity modules to support
+multiparts and more smartness.  But even those modules are quite limited,
+considering modern emails.
+
+**Please note:** When you start all over, please consider Mail::Box!
+For a feature overview, take a look at the
+[MailBox overview](http://perl.overmeer.net/mailbox/html/Mail_Box-Overview/)
+and
+[MailBox features](http://perl.overmeer.net/mailbox/html/Mail_Box-Index/)
+pages.
 
 ## Development &rarr; Release
 

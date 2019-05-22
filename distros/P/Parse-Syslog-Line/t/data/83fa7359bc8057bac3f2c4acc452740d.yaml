@@ -1,0 +1,27 @@
+---
+expected:
+  content: restart (remote reception).
+  date: 2018-01-01
+  date_raw: Jan  1 00:00:00
+  datetime_obj: ~
+  datetime_raw: Jan  1 00:00:00
+  datetime_str: 2018-01-01T00:00:00Z
+  domain: ~
+  epoch: 1514764800
+  facility: ~
+  facility_int: ~
+  host: example
+  host_raw: example
+  message: 'syslogd 1.2.3: restart (remote reception).'
+  message_raw: 'Jan  1 00:00:00 example syslogd 1.2.3: restart (remote reception).'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: syslogd
+  program_pid: ~
+  program_raw: syslogd 1.2.3
+  program_sub: 1.2.3
+  time: 00:00:00
+name: Syslog reset
+string: 'Jan  1 00:00:00 example syslogd 1.2.3: restart (remote reception).'

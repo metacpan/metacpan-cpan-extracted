@@ -1,5 +1,9 @@
 # Changelog for RDF-aREF
 
+0.28  2019-05-22 08:45:57 CEST
+  - Fix test with custom namespace map (#21)
+  - Fix nameStartChar and nameChar in RDF::aREF::Decoder
+
 0.27  2016-04-13 10:13:27 CEST
   - Fix test failure caused by RDF::NS (#20)
 

@@ -2,21 +2,25 @@ package Catmandu::Fix::Condition::less_than;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
+use Catmandu::Util qw(is_value);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
 has path  => (fix_arg => 1);
 has value => (fix_arg => 1);
 
-with 'Catmandu::Fix::Condition::SimpleAllTest';
+with 'Catmandu::Fix::Condition::Builder::Simple';
 
-sub emit_test {
-    my ($self, $var) = @_;
-    my $value = $self->value;
-    "is_value(${var}) && ${var} < int('$value')";
+sub _build_value_tester {
+    my ($self) = @_;
+    my $value = int($self->value);
+    sub {
+        my $v = $_[0];
+        is_value($v) && $v < $value;
+    };
 }
 
 1;

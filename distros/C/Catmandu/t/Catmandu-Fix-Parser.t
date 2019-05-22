@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
 use Test::Deep;
 use Test::Exception;
@@ -175,11 +176,44 @@ throws_ok {
 }
 'Catmandu::FixParseError', 'syntax errors throw FixParseError';
 
+# use
+
+{
+    lives_ok {$parser->parse(q|use(t.fix)|)};
+    lives_ok {
+        $parser->parse(q|use(t.fix) t.fix.test() if t.fix.is_42(n) end|)
+    };
+    lives_ok {
+        $parser->parse(q|use(t.fix, as: my) if my.is_42(n) my.test() end|)
+    };
+    throws_ok {$parser->parse(q|if exists(n) use(t.fix) end t.fix.test()|)}
+    'Catmandu::FixParseError';
+    throws_ok {$parser->parse(q|if exists(n) use(t.fix) end t.fix.test()|)}
+    qr/Unknown namespace/;
+}
+
+# block
+
+{
+    lives_ok {$parser->parse(q|block end|)};
+    throws_ok {$parser->parse(q|block upcase(foo)|)}
+    'Catmandu::FixParseError';
+    cmp_deeply $parser->parse(
+        "block upcase(foo) end block downcase(foo) end"),
+        [$upcase_foo, $downcase_foo];
+    lives_ok {
+        $parser->parse(q|block use(t.fix, as: my) my.test() end|)
+    };
+    throws_ok {$parser->parse(q|block use(t.fix, as: my) end) my.test()|)}
+    'Catmandu::FixParseError';
+}
+
 # bare strings
 
 {
     my $fixes = $parser->parse(q|add_field(022, 022)|);
-    is $fixes->[0]->path, '022';
+    my $path  = $fixes->[0]->path;
+    is "$path", '022';
 }
 
 # string and regex escapes

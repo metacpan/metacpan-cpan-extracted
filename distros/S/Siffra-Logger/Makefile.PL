@@ -32,6 +32,8 @@ my %WriteMakefileArgs = (
         'Log::Dispatch'     => 0,
         'File::Basename'    => 0,
         'POSIX'             => 0,
+        'Log::Dispatch::Email::Siffra' => 0,
+        'Log::Any::Adapter::Dispatch'  => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,

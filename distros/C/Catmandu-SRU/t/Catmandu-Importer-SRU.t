@@ -4,7 +4,8 @@ use Test::More;
 use Test::Exception;
 use Catmandu::Importer::SRU;
 use Catmandu::Importer::SRU::Parser::marcxml;
-require 't/lib/MockFurl.pm';
+use lib 't/lib';
+use MockFurl;
 
 my $pkg;
 
@@ -23,8 +24,8 @@ my %options = (
 );
 
 ok my $importer = Catmandu::Importer::SRU->new(%options);
-is_deeply $importer->first,
-    [
+my $rec      = $importer->next;
+my $expected = [
     'oai_dc:dc',
     {
         'xmlns:dc'     => 'http://purl.org/dc/elements/1.1/',
@@ -39,19 +40,21 @@ is_deeply $importer->first,
             ['2013']
         ]
     ]
-    ],
-    'first';
+];
 
-is_deeply $importer->first,
-    [
+is_deeply $rec, $expected, 'first';
+
+$rec      = $importer->next;
+$expected = [
     'oai_dc:dc',
     {
         'xmlns:dc'     => 'http://purl.org/dc/elements/1.1/',
         'xmlns:oai_dc' => 'http://www.openarchives.org/OAI/2.0/oai_dc/'
     },
     [['dc:title', {}, ['Another Title']]]
-    ],
-    'second';
+];
+
+is_deeply $rec, $expected, 'second';
 
 my $reader = XML::Struct::Reader->new(ns => 'strip', attributes => 0);
 $options{parser} = sub {
@@ -59,9 +62,10 @@ $options{parser} = sub {
         XML::LibXML::Reader->new(string => $_[0]->{recordData}->toString));
 };
 $importer = Catmandu::Importer::SRU->new(%options);
-note explain $importer->first;
-is_deeply $importer->first, [dc => [['title' => ['Another Title']]]],
-    'reader options';
+$importer->next;
+$rec      = $importer->next;
+$expected = [dc => [['title' => ['Another Title']]]];
 
+is_deeply $rec, $expected, 'reader options';
 
 done_testing;

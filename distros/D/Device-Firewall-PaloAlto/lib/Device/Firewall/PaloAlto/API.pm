@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::API;
-$Device::Firewall::PaloAlto::API::VERSION = '0.1.6';
+$Device::Firewall::PaloAlto::API::VERSION = '0.1.8';
 use strict;
 use warnings;
 use 5.010;
@@ -16,8 +16,6 @@ use Device::Firewall::PaloAlto::Errors qw(ERROR);
 # VERSION
 # PODNAME
 # ABSTRACT: Palo Alto firewall API module
-
-
 
 
 # Sends a request to the firewall. The query string parameters come from the key/value 
@@ -149,7 +147,7 @@ Device::Firewall::PaloAlto::API - Palo Alto firewall API module
 
 =head1 VERSION
 
-version 0.1.6
+version 0.1.8
 
 =head1 DESCRIPTION
 

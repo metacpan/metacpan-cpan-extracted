@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provides an interface to the Olson timezone database",
+   "abstract" : "Provides an Olson timezone database interface",
    "author" : [
       "David Dick <ddick@cpan.org>"
    ],
@@ -39,7 +39,7 @@
             "File::Spec" : "0",
             "FileHandle" : "0",
             "POSIX" : "0",
-            "perl" : "5.006",
+            "perl" : "5.01",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -51,6 +51,7 @@
             "File::Find" : "0",
             "File::Temp" : "0",
             "HTTP::Request" : "0",
+            "LWP::Protocol::https" : "6.06",
             "LWP::UserAgent" : "0",
             "Test::More" : "0",
             "Time::Local" : "0",
@@ -59,6 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

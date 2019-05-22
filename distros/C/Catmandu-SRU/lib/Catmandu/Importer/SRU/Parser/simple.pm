@@ -3,9 +3,9 @@ use strict;
 use XML::LibXML::Simple ();
 use Moo;
 
-our $VERSION = '0.421';
+our $VERSION = '0.422';
 
-has xmlsimple => (is => 'ro', default => sub { XML::LibXML::Simple->new });
+has xmlsimple => (is => 'ro', default => sub {XML::LibXML::Simple->new});
 
 sub parse {
     my ($self, $record) = @_;

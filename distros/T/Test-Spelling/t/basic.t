@@ -1,6 +1,7 @@
 use Test::Tester;
 use Test::More;
 use Test::Spelling;
+use utf8;
 
 BEGIN {
     if (!has_working_spellchecker()) {
@@ -22,6 +23,13 @@ check_test(sub { pod_file_spelling_ok('t/corpus/bad-pod.pm', 'bad pod has no err
     ok   => 0,
     name => 'bad pod has no errors',
     diag => "Errors:\n    incorectly",
+});
+
+add_stopwords("ünıçöđé");
+
+check_test(sub { pod_file_spelling_ok('t/corpus/unicode-pod.pm', 'unicode pod has no errors') }, {
+    ok   => 1,
+    name => 'unicode pod has no errors',
 });
 
 done_testing;

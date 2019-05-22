@@ -1,0 +1,27 @@
+---
+expected:
+  content: DHCPINFORM from 172.16.2.137 via vlan3
+  date: 2018-01-01
+  date_raw: Jan  1 00:00:00
+  datetime_obj: ~
+  datetime_raw: Jan  1 00:00:00
+  datetime_str: 2018-01-01T00:00:00Z
+  domain: example.com
+  epoch: 1514764800
+  facility: user
+  facility_int: 8
+  host: dev
+  host_raw: dev.example.com
+  message: 'dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'
+  message_raw: '<11>Jan  1 00:00:00 dev.example.com dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'
+  offset: Z
+  preamble: 11
+  priority: err
+  priority_int: 3
+  program_name: dhcpd
+  program_pid: ~
+  program_raw: dhcpd
+  program_sub: ~
+  time: 00:00:00
+name: Dotted hostname
+string: '<11>Jan  1 00:00:00 dev.example.com dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'

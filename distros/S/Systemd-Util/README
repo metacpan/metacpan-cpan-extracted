@@ -1,0 +1,74 @@
+NAME
+    Systemd::Util - Some utility routines related to Systemd
+
+VERSION
+    This document describes version 0.001 of Systemd::Util (from Perl
+    distribution Systemd-Util), released on 2019-05-22.
+
+FUNCTIONS
+  systemd_is_running
+    Usage:
+
+     systemd_is_running() -> [status, msg, payload, meta]
+
+    Check if systemd is running.
+
+    Will return payload of 1 if systemd is running, 0 if not running,
+    "undef" if cannot determine for sure. The result metadata "func.note"
+    will give more details. The following heuristics are currently used:
+
+    1. Check if /sbin/init exists, if it does not the return 0.
+    2. Check if /sbin/init is a symlink to something with /systemd/ in its
+    name. If yes, then we return 1. We use Cwd's "realpath()" instead of
+    "readlink()" here, to handle multiple redirection.
+    3. Check if /lib/systemd/systemd exists. Return 0 otherwise.
+    4. Check if /sbin/init is a hardlink to /lib/systemd/systemd by
+    comparing its inode. Return 1 if it is.
+    5. Return undef otherwise, since we detect that /lib/systemd/systemd
+    exists (systemd is installed) but we cannot be sure if it is running or
+    not.
+
+    When used as a CLI, this routine will exit 0 if systemd is running, 1 if
+    systemd is not running, or 99 if cannot determine for sure. To see the
+    more detailed note, you can run the CLI with "--json" to return the
+    whole enveloped response.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Systemd-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Systemd-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Systemd-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

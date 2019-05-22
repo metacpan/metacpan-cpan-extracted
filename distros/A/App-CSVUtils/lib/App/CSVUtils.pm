@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2019-05-21'; # DATE
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1939,7 +1939,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.021 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-05-12.
+This document describes version 0.022 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-05-21.
 
 =head1 DESCRIPTION
 
@@ -1986,6 +1986,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-sort-rows>
 
 =item * L<csv-sum>
+
+=item * L<csv2ltsv>
 
 =item * L<csv2tsv>
 
@@ -2071,6 +2073,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_avg
 
 Usage:
@@ -2116,6 +2119,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_concat
@@ -2191,6 +2195,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_convert_to_hash
 
 Usage:
@@ -2236,6 +2241,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_delete_field
@@ -2285,6 +2291,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_dump
 
 Usage:
@@ -2330,6 +2337,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_each_row
@@ -2397,6 +2405,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_grep
@@ -2478,6 +2487,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_list_field_names
 
 Usage:
@@ -2519,6 +2529,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_lookup_fields
@@ -2604,6 +2615,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_map
 
 Usage:
@@ -2683,6 +2695,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_munge_field
 
 Usage:
@@ -2740,6 +2753,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_replace_newline
 
 Usage:
@@ -2789,6 +2803,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_select_fields
@@ -2842,6 +2857,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_select_row
 
 Usage:
@@ -2887,6 +2903,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_setop
@@ -3013,6 +3030,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_sort_fields
 
 Usage:
@@ -3077,6 +3095,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_sort_rows
@@ -3203,6 +3222,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_sum
 
 Usage:
@@ -3251,6 +3271,22 @@ Return value:  (any)
 
 =for Pod::Coverage ^(csvutil)$
 
+=head1 FAQ
+
+=head2 My CSV does not have a header?
+
+Use the C<--no-header> option. Fields will be named C<field1>, C<field2>, and so
+on.
+
+=head2 My data is TSV, not CSV?
+
+Use the C<--tsv> option.
+
+=head2 I have a big CSV and the utilities are too slow or eat too much RAM!
+
+These utilities are not (yet) optimized, patches welcome. If your CSV is very
+big, perhaps a C-based solution is what you need.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
@@ -3268,6 +3304,12 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::TSVUtils>
+
+L<App::LTSVUtils>
+
+L<App::SerializeUtils>
 
 
 L<csvgrep>.

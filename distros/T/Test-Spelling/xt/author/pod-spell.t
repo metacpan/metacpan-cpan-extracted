@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Alders
+Anwar
 Brohman
 CPAN
 Chase
@@ -21,8 +22,12 @@ Golden
 Ivan
 Karen
 Kent
+Kivanc
+Mengué
+Mohammad
 Moore
 Olaf
+Olivier
 Randy
 Shawn
 Sibley
@@ -32,15 +37,19 @@ Test
 Thomas
 Tubert
 Whitener
+Yazan
 brian
 capoeirab
 dagolden
+dolmen
 ether
 foy
 github
 itub
 kentfredric
+kivancyazan
 lib
+mohammad
 olaf
 preprocessing
 randy

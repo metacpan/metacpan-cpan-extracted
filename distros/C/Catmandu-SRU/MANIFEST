@@ -39,3 +39,4 @@ t/files/mods.xml
 t/files/picaxml.xml
 t/files/sru_oai_dc.xml
 t/lib/MockFurl.pm
+t/lib/MockFurlMany.pm

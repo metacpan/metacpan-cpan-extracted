@@ -6,7 +6,7 @@ use Cpanel::JSON::XS;
 
 use Moo;
 
-our $VERSION = '0.421';
+our $VERSION = '0.422';
 
 sub parse {
     my ($self, $record) = @_;
@@ -14,7 +14,7 @@ sub parse {
     my $xml = $record->{recordData}->toString();
 
     my $importer = Catmandu::Importer::MODS->new(file => \$xml);
-    my $mods = $importer->first;
+    my $mods     = $importer->first;
 
     if (defined $mods) {
         my $id = $mods->get_identifier->{_body};

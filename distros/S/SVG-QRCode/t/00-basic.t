@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use utf8;
+use v5.24;
 ## no critic (StringyEval)
 
 use Test::More;

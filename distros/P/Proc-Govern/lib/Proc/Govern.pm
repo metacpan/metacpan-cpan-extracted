@@ -1,11 +1,12 @@
 package Proc::Govern;
 
-our $DATE = '2019-04-30'; # DATE
-our $VERSION = '0.201'; # VERSION
+our $DATE = '2019-05-22'; # DATE
+our $VERSION = '0.205'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(govern_process);
@@ -24,7 +25,7 @@ sub new {
 sub _suspend {
     my $self = shift;
     my $h = $self->{h};
-    say "D:Suspending program ..." if $self->{debug};
+    log_debug "[govproc] Suspending child ...";
     if (@{ $h->{KIDS} }) {
         my @args = (STOP => (map { $_->{PID} } @{ $h->{KIDS} }));
         if ($self->{args}{killfam}) {
@@ -41,7 +42,7 @@ sub _suspend {
 sub _resume {
     my $self = shift;
     my $h = $self->{h};
-    say "D:Resuming program ..." if $self->{debug};
+    log_debug "[govproc] Resuming child ...";
     if (@{ $h->{KIDS} }) {
         my @args = (CONT => (map { $_->{PID} } @{ $h->{KIDS} }));
         if ($self->{args}{killfam}) {
@@ -59,7 +60,7 @@ sub _kill {
     my $self = shift;
     my $h = $self->{h};
     $self->_resume if $self->{suspended};
-    say "D:Killing program ..." if $self->{debug};
+    log_debug "[govproc] Killing child ...";
     $self->{restart} = 0;
     $h->kill_kill;
 }
@@ -90,6 +91,8 @@ _
         command => {
             schema => ['array*' => of => 'str*'],
             req => 1,
+            pos => 0,
+            slurpy => 1,
             summary => 'Command to run',
             description => <<'_',
 
@@ -111,7 +114,7 @@ _
         },
         pid_dir => {
             summary => 'Directory to put PID file in',
-            schema => 'str*',
+            schema => 'dirname*',
         },
         on_multiple_instance => {
             schema => ['str*' => in => ['exit']],
@@ -134,7 +137,7 @@ _
             tags => ['category:load-control'],
         },
         load_check_every => {
-            schema => [duration => default => 10],
+            schema => [duration => {default => 10, 'x.perl.coerce_rules'=>['str_human']}],
             summary => 'Frequency of load checking',
             tags => ['category:load-control'],
         },
@@ -224,7 +227,7 @@ _
             tags => ['category:output-control'],
         },
         timeout => {
-            schema => ['int*'],
+            schema => ['duration*', 'x.perl.coerce_rules'=>['str_human']],
             summary => 'Apply execution time limit, in seconds',
             description => <<'_',
 
@@ -240,13 +243,13 @@ _
             tags => ['category:timeout'],
         },
         restart => {
-            schema => [bool => default => 1],
+            schema => ['bool'],
             summary => 'If set to true, do restart',
             tags => ['category:restart'],
         },
         # not yet defined
         #restart_delay => {
-        #    schema => ['duration*', default=>0],
+        #    schema => ['duration*', default=>0, 'x.perl.coerce_rules'=>['str_human']],
         #    tags => ['category:restart'],
         #},
         #check_alive => {
@@ -256,12 +259,17 @@ _
         #},
         no_screensaver => {
             summary => 'Prevent screensaver from being activated',
-            schema => ['bool*', is=>1],
+            schema => ['true*'],
             tags => ['category:screensaver'],
+        },
+        no_sleep => {
+            summary => 'Prevent system from sleeping',
+            schema => ['true*'],
+            tags => ['category:power-management'],
         },
         euid => {
             summary => 'Set EUID of command process',
-            schema => 'uint*',
+            schema => 'unix::local_uid*',
             description => <<'_',
 
 Need to be root to be able to setuid.
@@ -307,18 +315,28 @@ sub govern_process {
     my %args = @_;
     $self->{args} = \%args;
     if (defined $args{euid}) {
-        $args{euid} =~ /\A[0-9]+\z/ or die "euid has to be integer";
+        # coerce from username
+        unless ($args{euid} =~ /\A[0-9]+\z/) {
+            my @pw = getpwnam $args{euid};
+            $args{euid} = $pw[2] if @pw;
+        }
+        $args{euid} =~ /\A[0-9]+\z/
+            or die "euid ('$args{euid}') has to be integer";
     }
     if (defined $args{egid}) {
+        # coerce from groupname
+        unless ($args{egid} =~ /\A[0-9]+( [0-9]+)*\z/) {
+            my @gr = getgrnam $args{egid};
+            $args{egid} = $gr[2] if @gr;
+        }
         $args{egid} =~ /\A[0-9]+( [0-9]+)*\z/
-            or die "egid has to be integer or integers separated by space";
+            or die "egid ('$args{egid}') has to be integer or ".
+            "integers separated by space";
     }
 
     require Proc::Killfam if $args{killfam};
     require Screensaver::Any if $args{no_screensaver};
-
-    my $debug = $ENV{DEBUG};
-    $self->{debug} = $debug;
+    require PowerManagement::Any if $args{no_sleep};
 
     my $exitcode;
 
@@ -358,47 +376,83 @@ sub govern_process {
     my $lwhigh = $args{load_high_limit}  // 1.25;
     my $lwlow  = $args{load_low_limit}   // 0.25;
 
-    my $noss   = $args{no_screensaver};
+    my $noss    = $args{no_screensaver};
+    my $nosleep = $args{no_sleep};
 
     ###
 
     my $out;
-    if ($args{log_stdout}) {
-        require File::Write::Rotate;
-        my %fwrargs = %{$args{log_stdout}};
-        $fwrargs{dir}    //= "/var/log";
-        $fwrargs{prefix}   = $name;
-        my $fwr = File::Write::Rotate->new(%fwrargs);
-        $out = sub {
-            print STDOUT $_[0]//'' if $showout;
-            # XXX prefix with timestamp, how long script starts,
-            $_[0] =~ s/^/STDOUT: /mg;
-            $fwr->write($_[0]);
-        };
-    } else {
-        $out = sub {
-            print STDOUT $_[0]//'' if $showout;
-        };
+  LOG_STDOUT: {
+        if ($args{log_stdout}) {
+            require File::Write::Rotate;
+            my %fwrargs = %{$args{log_stdout}};
+            $fwrargs{dir}    //= "/var/log";
+            $fwrargs{prefix}   = $name;
+            my $fwr = File::Write::Rotate->new(%fwrargs);
+            $out = sub {
+                print STDOUT $_[0]//'' if $showout;
+                # XXX prefix with timestamp, how long script starts,
+                $_[0] =~ s/^/STDOUT: /mg;
+                $fwr->write($_[0]);
+            };
+        } else {
+            $out = sub {
+                print STDOUT $_[0]//'' if $showout;
+            };
+        }
     }
 
     my $err;
-    if ($args{log_stderr}) {
-        require File::Write::Rotate;
-        my %fwrargs = %{$args{log_stderr}};
-        $fwrargs{dir}    //= "/var/log";
-        $fwrargs{prefix}   = $name;
-        my $fwr = File::Write::Rotate->new(%fwrargs);
-        $err = sub {
-            print STDERR $_[0]//'' if $showerr;
-            # XXX prefix with timestamp, how long script starts,
-            $_[0] =~ s/^/STDERR: /mg;
-            $fwr->write($_[0]);
-        };
-    } else {
-        $err = sub {
-            print STDERR $_[0]//'' if $showerr;
-        };
+  LOG_STDERR: {
+        if ($args{log_stderr}) {
+            require File::Write::Rotate;
+            my %fwrargs = %{$args{log_stderr}};
+            $fwrargs{dir}    //= "/var/log";
+            $fwrargs{prefix}   = $name;
+            my $fwr = File::Write::Rotate->new(%fwrargs);
+            $err = sub {
+                print STDERR $_[0]//'' if $showerr;
+                # XXX prefix with timestamp, how long script starts,
+                $_[0] =~ s/^/STDERR: /mg;
+                $fwr->write($_[0]);
+            };
+        } else {
+            $err = sub {
+                print STDERR $_[0]//'' if $showerr;
+            };
+        }
     }
+
+    my $prevented_sleep;
+  PREVENT_SLEEP: {
+        last unless $nosleep;
+        my $res = PowerManagement::Any::sleep_is_prevented();
+        unless ($res->[0] == 200) {
+            log_warn "Cannot check if sleep is being prevented (%s), ".
+                "will not be preventing sleep", $res;
+            last;
+        }
+        if ($res->[2]) {
+            log_info "Sleep is already being prevented";
+            last;
+        }
+        $res = PowerManagement::Any::prevent_sleep();
+        unless ($res->[0] == 200 || $res->[0] == 304) {
+            log_warn "Cannot prevent sleep (%s), will be running anyway", $res;
+            last;
+        }
+        log_info "Prevented sleep (%s)", $res;
+        $prevented_sleep++;
+    }
+
+    my $do_unprevent_sleep = sub {
+        return unless $prevented_sleep;
+        my $res = PowerManagement::Any::unprevent_sleep();
+        unless ($res->[0] == 200 || $res->[0] == 304) {
+            log_warn "Cannot unprevent sleep (%s)", $res;
+        }
+        $prevented_sleep = 0;
+    };
 
     my $start_time; # for timeout
     my ($to, $h);
@@ -410,7 +464,7 @@ sub govern_process {
             -euid => $args{euid},
             -egid => $args{egid},
         ) if defined $args{euid} || defined $args{egid};
-        say "D:(Re)starting program $name ..." if $debug;
+        log_debug "[govproc] (Re)starting program $name ...";
         $to = IPC::Run::timeout(1);
         #$self->{to} = $to;
         $h  = IPC::Run::start($cmd, \*STDIN, $out, $err, $to)
@@ -423,14 +477,16 @@ sub govern_process {
     $do_start->();
 
     local $SIG{INT} = sub {
-        say "D:Received INT signal" if $debug;
+        log_debug "[govproc] Received INT signal";
         $self->_kill;
+        $do_unprevent_sleep->();
         exit 1;
     };
 
     local $SIG{TERM} = sub {
-        say "D:Received TERM signal" if $debug;
+        log_debug "[govproc] Received TERM signal";
         $self->_kill;
+        $do_unprevent_sleep->();
         exit 1;
     };
 
@@ -439,7 +495,7 @@ sub govern_process {
     $chld_handler = sub {
         $SIG{CHLD} = $chld_handler;
         if ($self->{restart}) {
-            say "D:Child died" if $debug;
+            log_debug "[govproc] Child died";
             $do_start->();
         }
     };
@@ -450,7 +506,7 @@ sub govern_process {
 
   MAIN_LOOP:
     while (1) {
-        #say "D:main loop" if $debug;
+        #log_debug "[govproc] main loop";
         if (!$self->{suspended}) {
             # re-set timer, it might be reset by suspend/resume?
             $to->start(1);
@@ -471,7 +527,7 @@ sub govern_process {
 
         if (defined $args{timeout}) {
             if ($now - $start_time >= $args{timeout}) {
-                $err->("Timeout ($args{timeout}s), killing child ...");
+                $err->("Timeout ($args{timeout}s), killing child ...\n");
                 $self->_kill;
                 # mark with a special exit code that it's a timeout
                 $exitcode = 124;
@@ -480,7 +536,7 @@ sub govern_process {
         }
 
         if ($lw && (!$lastlw_time || $lastlw_time <= ($now-$lwfreq))) {
-            say "D:Checking load" if $debug;
+            log_debug "[govproc] Checking load";
             if (!$self->{suspended}) {
                 my $is_high;
                 if (ref($lwhigh) eq 'CODE') {
@@ -491,7 +547,7 @@ sub govern_process {
                     $is_high = $load[0] >= $lwhigh;
                 }
                 if ($is_high) {
-                    say "D:Load is too high" if $debug;
+                    log_debug "[govproc] Load is too high";
                     $self->_suspend;
                 }
             } else {
@@ -504,7 +560,7 @@ sub govern_process {
                     $is_low = $load[0] <= $lwlow;
                 }
                 if ($is_low) {
-                    say "D:Load is low" if $debug;
+                    log_debug "[govproc] Load is low";
                     $self->_resume;
                 }
             }
@@ -516,7 +572,7 @@ sub govern_process {
             last unless $noss;
             last unless !$noss_lastprevent_time ||
                 $noss_lastprevent_time <= ($now-$noss_timeout+5);
-            say "D:Preventing screensaver from activating" if $debug;
+            log_debug "[govproc] Preventing screensaver from activating ...";
             if (!$noss_lastprevent_time) {
                 $noss_screensaver = Screensaver::Any::detect_screensaver();
                 if (!$noss_screensaver) {
@@ -548,6 +604,8 @@ sub govern_process {
 
     } # MAINLOOP
 
+    $do_unprevent_sleep->();
+
   EXIT:
     return $exitcode || 0;
 }
@@ -567,7 +625,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.201 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-04-30.
+This document describes version 0.205 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-05-22.
 
 =head1 SYNOPSIS
 
@@ -622,6 +680,10 @@ To use as Perl module:
      # screensaver control options
      no_screensaver => 1,       # optional. if set to 1, will prevent screensaver from being activated while command
                                 #           is running.
+
+     # power management options
+     no_sleep => 1,             # optional. if set to 1, will prevent system from sleeping while command is running.
+                                #           this includes hybrid sleep, suspend, and hibernate.
 
      # setuid options
      euid => 1000,              # optional. sets euid of command process. note: need to be root to be able to setuid.
@@ -753,7 +815,7 @@ Set EGID(s) of command process.
 
 Need to be root to be able to setuid.
 
-=item * B<euid> => I<uint>
+=item * B<euid> => I<unix::local_uid>
 
 Set EUID of command process.
 
@@ -818,20 +880,24 @@ L<File::Write::Rotate>'s constructor as well as used as name of PID file.
 
 If not given, will be taken from command.
 
-=item * B<no_screensaver> => I<bool>
+=item * B<no_screensaver> => I<true>
 
 Prevent screensaver from being activated.
+
+=item * B<no_sleep> => I<true>
+
+Prevent system from sleeping.
 
 =item * B<on_multiple_instance> => I<str>
 
 Can be set to C<exit> to silently exit when there is already a running instance.
 Otherwise, will print an error message C<< Program E<lt>NAMEE<gt> already running >>.
 
-=item * B<pid_dir> => I<str>
+=item * B<pid_dir> => I<dirname>
 
 Directory to put PID file in.
 
-=item * B<restart> => I<bool> (default: 1)
+=item * B<restart> => I<bool>
 
 If set to true, do restart.
 
@@ -851,7 +917,7 @@ Implemented using L<Proc::PID::File>. You will also normally have to set
 C<pid_dir>, unless your script runs as root, in which case you can use the
 default C</var/run>.
 
-=item * B<timeout> => I<int>
+=item * B<timeout> => I<duration>
 
 Apply execution time limit, in seconds.
 
@@ -890,11 +956,6 @@ which will create two parent processes (three actually, B<loadwatch> apparently
 forks first).
 
 =head1 ENVIRONMENT
-
-=head2 DEBUG => bool
-
-If set to true, will display debugging output to STDERR, e.g. when
-stopping/starting a process.
 
 =head1 HOMEPAGE
 

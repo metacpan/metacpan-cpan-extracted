@@ -1,0 +1,27 @@
+---
+expected:
+  content: 'FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)'
+  date: 2018-01-01
+  date_raw: Jan 1 11:28:13
+  datetime_obj: ~
+  datetime_raw: Jan 1 11:28:13
+  datetime_str: 2018-01-01T11:28:13Z
+  domain: example.com
+  epoch: 1514806093
+  facility: local0
+  facility_int: 128
+  host: filer-201
+  host_raw: filer-201.example.com
+  message: '[filer-201:scsitarget.ispfct.targetReset:notice]: FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)'
+  message_raw: '<134>Jan 1 11:28:13 filer-201.example.com [filer-201:scsitarget.ispfct.targetReset:notice]: FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)'
+  offset: Z
+  preamble: 134
+  priority: info
+  priority_int: 6
+  program_name: scsitarget.ispfct.targetReset
+  program_pid: ~
+  program_raw: '[filer-201:scsitarget.ispfct.targetReset:notice]'
+  program_sub: ~
+  time: 11:28:13
+name: NetApp Filer Alt2
+string: '<134>Jan 1 11:28:13 filer-201.example.com [filer-201:scsitarget.ispfct.targetReset:notice]: FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)'

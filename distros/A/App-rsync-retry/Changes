@@ -1,3 +1,8 @@
+0.005   2019-05-21 (PERLANCAR)
+
+	- Add script: rsync-retry-on-all.
+
+
 0.004   2019-04-17 (PERLANCAR)
 
 	- Observe RSYNC_RETRY_ON, RSYNC_RETRY_ON_ALL.

@@ -2,23 +2,27 @@ package Catmandu::Fix::reverse;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
+with 'Catmandu::Fix::Builder';
+
 has path => (fix_arg => 1);
 
-with 'Catmandu::Fix::SimpleGetValue';
-
-sub emit_value {
-    my ($self, $var, $fixer) = @_;
-
-    "if (is_array_ref(${var})) {"
-        . "${var} = [reverse(\@{${var}})];" . "}"
-        . "elsif (is_string(${var})) {"
-        . "${var} = scalar(reverse(${var}));" . "}";
+sub _build_fixer {
+    my ($self) = @_;
+    as_path($self->path)->updater(
+        if_array_ref => sub {
+            [reverse(@{$_[0]})];
+        },
+        if_string => sub {
+            scalar(reverse($_[0]));
+        },
+    );
 }
 
 1;

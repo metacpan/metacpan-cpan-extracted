@@ -120,20 +120,14 @@ sub get_config_runtime {
   # Config
   my $bconf;
   if (-f $config_file) {
-    open my $config_fh, '<', $config_file
-      or confess "Can't open $config_file: $!";
-    my $config_content = do { local $/; <$config_fh> };
-    $bconf = eval "$config_content";
-    if (my $messge = $@) {
-      confess "Can't parser $config_file: $@";
-    }
+    $bconf = SPVM::Builder::Util::load_config($config_file);
   }
   else {
     if ($category eq 'native') {
       confess "Can't find $config_file: $@";
     }
     else {
-      $bconf = SPVM::Builder::Config->new_default;
+      $bconf = SPVM::Builder::Config->new_c99;
     }
   }
   
@@ -240,16 +234,10 @@ sub compile {
   # Config
   my $bconf;
   if (-f $config_file) {
-    open my $config_fh, '<', $config_file
-      or confess "Can't open $config_file: $!";
-    my $config_content = do { local $/; <$config_fh> };
-    $bconf = eval "$config_content";
-    if (my $messge = $@) {
-      confess "Can't parser $config_file: $@";
-    }
+    $bconf = SPVM::Builder::Util::load_config($config_file);
   }
   else {
-    $bconf = SPVM::Builder::Config->new_default;;
+    $bconf = SPVM::Builder::Config->new_c99;;
   }
 
   # Quiet output
@@ -379,16 +367,10 @@ sub link {
   # Config
   my $bconf;
   if (-f $config_file) {
-    open my $config_fh, '<', $config_file
-      or confess "Can't open $config_file: $!";
-    my $config_content = do { local $/; <$config_fh> };
-    $bconf = eval "$config_content";
-    if (my $messge = $@) {
-      confess "Can't parser $config_file: $@";
-    }
+    $bconf = SPVM::Builder::Util::load_config($config_file);
   }
   else {
-    $bconf = SPVM::Builder::Config->new_default;;
+    $bconf = SPVM::Builder::Config->new_c99;;
   }
 
   # Quiet output
@@ -408,7 +390,7 @@ sub link {
   for my $sub_name (@$sub_names) {
     my $category = $self->category;
     my $category_uc = uc $category;
-    my $cfunc_name = "SPVM_${category_uc}_${package_name}::$sub_name";
+    my $cfunc_name = "SP${category_uc}__${package_name}::$sub_name";
     $cfunc_name =~ s/:/_/g;
     push @$cfunc_names, $cfunc_name;
   }

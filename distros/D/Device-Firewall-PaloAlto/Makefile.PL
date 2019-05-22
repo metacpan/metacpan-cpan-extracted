@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Interact with the Palo Alto firwall API",
+  "ABSTRACT" => "Interact with the Palo Alto firewall API",
   "AUTHOR" => "Greg Foletta <greg\@foletta.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.1.6",
+  "VERSION" => "0.1.8",
   "test" => {
     "TESTS" => "t/*.t"
   }

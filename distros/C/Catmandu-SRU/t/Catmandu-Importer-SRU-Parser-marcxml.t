@@ -4,8 +4,9 @@ use Test::More;
 use Test::Exception;
 use Catmandu::Importer::SRU;
 use utf8;
-
-require 't/lib/MockFurl.pm';
+use lib 't/lib';
+use MockFurl;
+use MockFurlMany;
 
 my $pkg;
 
@@ -115,8 +116,8 @@ note("Testing namespace prefix");
     ok exists $records->[0]->{record}, 'marc has record';
     is_deeply $records->[0]->{record}->[0],
         ['LDR', ' ', ' ', '_', '00000ndd a2200000 u 4500'], 'marc has leader';
-    is_deeply $records->[0]->{record}->[1], ['001', ' ', ' ', '_', '004641415'],
-        'marc has controlfield';
+    is_deeply $records->[0]->{record}->[1],
+        ['001', ' ', ' ', '_', '004641415'], 'marc has controlfield';
     is_deeply $records->[0]->{record}->[-1],
         [
         '852',

@@ -7,6 +7,9 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -29,7 +32,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Exporter' => '0',
+                                      'Exporter' => '5.57',
                                       'File::Spec' => '0',
                                       'IPC::Run3' => '0',
                                       'Pod::Spell' => '0',
@@ -37,7 +40,7 @@ do { my $x = {
                                       'Test::Builder' => '0',
                                       'Text::Wrap' => '0',
                                       'base' => '0',
-                                      'perl' => '5.006',
+                                      'perl' => '5.008',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

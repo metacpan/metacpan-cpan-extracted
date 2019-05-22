@@ -65,7 +65,11 @@ test_encoder $encoder => 'object',
     {
         type => 'uri',
         value => 'http://www.w3.org/2006/vcard/ns#street-address',
-    } => '<http://www.w3.org/2006/vcard/ns#street-address>',
+    } => 'vcard_street-address',
+    {
+        type => 'uri',
+        value => 'http://undefinednamespace.foo/thing'
+    } => '<http://undefinednamespace.foo/thing>',
     {
         type  => 'literal',
         value => 'hello, world!',
@@ -113,7 +117,8 @@ test_encoder $encoder => 'bnode',
 test_encoder $encoder => 'qname',
     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => 'rdf_type',
     'http://schema.org/Review' => 'schema_Review',
-    'http://www.w3.org/2006/vcard/ns#street-address' => undef,
+    'http://www.w3.org/2006/vcard/ns#street-address' => 'vcard_street-address',
+    'http://undefinednamespace.foo/thing' => undef
 ;
 
 # encoder methods with ns => 0

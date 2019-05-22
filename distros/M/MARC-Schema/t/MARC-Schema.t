@@ -7,7 +7,7 @@ use MARC::Schema;
 {
     my $schema = MARC::Schema->new();
     isa_ok $schema, 'MARC::Schema';
-    can_ok $schema, qw(check _error _initialize _load_schema);
+    can_ok $schema, qw(check _initialize _load_schema);
     ok $schema->{fields}, 'load default schema';
     ok $schema->{fields}->{LDR}, 'got a schema definition';
     is $schema->{fields}->{LDR}->{positions}->{'00-04'}->{label},
@@ -56,26 +56,32 @@ use MARC::Schema;
                 '1',                                          '8',
                 '2',
             ],
-            ['999', undef, undef, '_', 'not a standard field'],
             ['130', 'a',   'x',   'a', 'test'],
-            ['240', '1',   'x',   'a', 'test']
+            ['240', '1',   'x',   'a', 'test'],
+            ['999', undef, undef, '_', 'not a standard field'],
         ]
     };
 
     my $schema = MARC::Schema->new();
     my @check  = $schema->check($record);
-    is $check[0]->{message}, 'field is not repeatable',
+    ok @check > 0, 'got errors';
+    is $check[0]->{error}, 'field is not repeatable',
         'field is not repeatable';
-    is $check[1]->{subfields}->{a}->{message}, q{subfield is not repeatable},
+    is $check[0]->{tag},  '001',   'got field tag';
+    is $check[0]->{type}, 'field', 'got error type';
+    is $check[1]->{error}, 'subfield is not repeatable',
         'subfield is not repeatable';
-    is $check[1]->{subfields}->{x}->{message}, 'unknown subfield',
-        'unknown subfield';
-    is $check[2]->{message}, 'unknown field', 'unknown field';
-    is $check[3]->{subfields}->{ind1}->{message},
-        'unknown indicator1 value \'a\'', 'unknown indicator1 value \'a\'';
-    is $check[4]->{subfields}->{ind2}->{message},
-        'unknown indicator2 value \'x\'', 'unknown indicator2 value \'x\'';
-    ok @check == 5, 'not more than 5 errors';
+    is $check[1]->{value}, 'a',                'got subfield code';
+    is $check[1]->{type},  'subfield',         'got error type';
+    is $check[2]->{error}, 'unknown subfield', 'unknown subfield';
+    is $check[3]->{error}, 'unknown first indicator',
+        'unknown first indicator';
+    is $check[3]->{value}, 'a',         'got first indicator code';
+    is $check[3]->{type},  'indicator', 'got error type';
+    is $check[4]->{error}, 'unknown second indicator',
+        'unknown second indicator';
+    is $check[5]->{error}, 'unknown field', 'unknown field';
+    is $check[5]->{type},  'field',         'got error type';
 }
 
 done_testing;

@@ -1,5 +1,11 @@
 Revision history for Geo-Compass-Variation
 
+1.03    2019-05-21
+        - fix issue where tests were failing if perl was compiled with
+          uselongdouble (thanks for reporting, Slaven Rezić)
+        - updated module documentation to reflect the most recent WMM data
+          update
+
 1.02    2019-05-19
         - added generate_wmm_data.pl script, along with 2015v2 data in a new
           script directory

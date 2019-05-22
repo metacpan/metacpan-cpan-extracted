@@ -41,7 +41,9 @@ add_block_preprocessor(sub {
     my $name = $block->name;
     my $configuration = $block->configuration;
     my $backend = $block->backend;
+    my $backend_name = $block->backend_name || 'test_backend';
     my $upstream = $block->upstream;
+    my $upstream_name = $block->upstream_name || 'test';
     my $test = $block->test;
     my $sites_d = $block->sites_d || '';
     my $ServerPort = $Test::Nginx::Util::ServerPort;
@@ -71,12 +73,12 @@ _EOC_
         server {
             listen $ServerPort;
 
-            server_name test_backend backend;
+            server_name $backend_name backend;
 
             $backend
         }
 
-        upstream test_backend {
+        upstream $backend_name {
             server 127.0.0.1:$ServerPort;
         }
 
@@ -89,12 +91,12 @@ _EOC_
         server {
             listen $ServerPort;
 
-            server_name test;
+            server_name $upstream_name;
 
             $upstream
         }
 
-        upstream test {
+        upstream $upstream_name {
             server 127.0.0.1:$ServerPort;
         }
 _EOC_
@@ -205,7 +207,7 @@ my $write_nginx_config = sub {
 
     my $apicast_cmd = "APICAST_CONFIGURATION_LOADER='test' $apicast_cli start --test";
 
-    if (defined $configuration_file) {
+    if (defined $configuration_file && $configuration_file) {
         $apicast_cmd .= " --configuration $configuration_file"
     } else {
         $configuration_file = "";
@@ -224,6 +226,7 @@ return {
     master_process = '$MasterProcessEnabled',
     daemon = '$DaemonEnabled',
     error_log = '$err_log_file',
+    timer_resolution = false,
     log_level = '$LogLevel',
     pid = '$PidFile',
     lua_code_cache = 'on',

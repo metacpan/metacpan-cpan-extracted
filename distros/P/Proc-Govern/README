@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.201 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2019-04-30.
+    This document describes version 0.205 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2019-05-22.
 
 SYNOPSIS
     To use as Perl module:
@@ -57,6 +57,10 @@ SYNOPSIS
          # screensaver control options
          no_screensaver => 1,       # optional. if set to 1, will prevent screensaver from being activated while command
                                     #           is running.
+
+         # power management options
+         no_sleep => 1,             # optional. if set to 1, will prevent system from sleeping while command is running.
+                                    #           this includes hybrid sleep, suspend, and hibernate.
 
          # setuid options
          euid => 1000,              # optional. sets euid of command process. note: need to be root to be able to setuid.
@@ -172,7 +176,7 @@ FUNCTIONS
 
         Need to be root to be able to setuid.
 
-    *   euid => *uint*
+    *   euid => *unix::local_uid*
 
         Set EUID of command process.
 
@@ -244,9 +248,13 @@ FUNCTIONS
 
         If not given, will be taken from command.
 
-    *   no_screensaver => *bool*
+    *   no_screensaver => *true*
 
         Prevent screensaver from being activated.
+
+    *   no_sleep => *true*
+
+        Prevent system from sleeping.
 
     *   on_multiple_instance => *str*
 
@@ -254,11 +262,11 @@ FUNCTIONS
         running instance. Otherwise, will print an error message "Program
         <NAME> already running".
 
-    *   pid_dir => *str*
+    *   pid_dir => *dirname*
 
         Directory to put PID file in.
 
-    *   restart => *bool* (default: 1)
+    *   restart => *bool*
 
         If set to true, do restart.
 
@@ -279,7 +287,7 @@ FUNCTIONS
         normally have to set "pid_dir", unless your script runs as root, in
         which case you can use the default "/var/run".
 
-    *   timeout => *int*
+    *   timeout => *duration*
 
         Apply execution time limit, in seconds.
 
@@ -312,10 +320,6 @@ FAQ
     apparently forks first).
 
 ENVIRONMENT
-  DEBUG => bool
-    If set to true, will display debugging output to STDERR, e.g. when
-    stopping/starting a process.
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Proc-Govern>.

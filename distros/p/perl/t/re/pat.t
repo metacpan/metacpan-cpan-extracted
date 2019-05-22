@@ -6,6 +6,7 @@
 
 use strict;
 use warnings;
+no warnings 'experimental::vlb';
 use 5.010;
 
 sub run_tests;
@@ -20,10 +21,11 @@ BEGIN {
     require './loc_tools.pl';
     set_up_inc('../lib', '.', '../ext/re');
 }
-    skip_all('no re module') unless defined &DynaLoader::boot_DynaLoader;
-    skip_all_without_unicode_tables();
 
-plan tests => 848;  # Update this when adding/deleting tests.
+skip_all('no re module') unless defined &DynaLoader::boot_DynaLoader;
+skip_all_without_unicode_tables();
+
+plan tests => 863;  # Update this when adding/deleting tests.
 
 run_tests() unless caller;
 
@@ -319,7 +321,7 @@ sub run_tests {
 
 	#  Defaults assumed if this fails
 	eval { require Config; };
-        $::reg_infty   = $Config::Config{reg_infty} // 32767;
+        $::reg_infty   = $Config::Config{reg_infty} // 65535;
         $::reg_infty_m = $::reg_infty - 1;
         $::reg_infty_p = $::reg_infty + 1;
         $::reg_infty_m = $::reg_infty_m;   # Suppress warning.
@@ -339,6 +341,11 @@ sub run_tests {
         like($@, qr/^\QQuantifier in {,} bigger than/, $message);
         eval "'aaa' =~ /a{1,$::reg_infty_p}/";
         like($@, qr/^\QQuantifier in {,} bigger than/, $message);
+
+        # It should be 'a' x 2147483647, but that exhausts memory on
+        # reasonably sized modern machines
+        like('a' x $::reg_infty_p, qr/a{1,}/,
+             "{1,} matches more times than REG_INFTY");
     }
 
     {
@@ -1347,6 +1354,7 @@ EOP
         unlike "\x{100}", qr/(?i:\w)/, "(?i: shouldn't lose the passed in /a";
         use re '/aa';
         unlike 'k', qr/(?i:\N{KELVIN SIGN})/, "(?i: shouldn't lose the passed in /aa";
+        unlike 'k', qr'(?i:\N{KELVIN SIGN})', "(?i: shouldn't lose the passed in /aa";
     }
 
     {
@@ -1462,7 +1470,17 @@ EOP
         # test that this is true for 1..100
         # Note that this test causes the engine to recurse at runtime, and
         # hence use a lot of C stack.
+
+        # Compiling for all 100 nested captures blows the stack under
+        # clang and ASan; reduce.
+        my $max_captures = $Config{ccflags} =~ /sanitize/ ? 20 : 100;
+
         for my $i (1..100) {
+            if ($i > $max_captures) {
+                pass("skipping $i buffers under ASan aa");
+                pass("skipping $i buffers under ASan aba");
+                next;
+            }
             my $capture= "a";
             $capture= "($capture)" for 1 .. $i;
             for my $mid ("","b") {
@@ -1870,6 +1888,26 @@ EOF_CODE
             like($got[5],qr/Error: Infinite recursion via empty pattern/,
            "empty pattern in regex codeblock: produced the right exception message" );
         }
+
+    # This test is based on the one directly above, which happened to
+    # leak. Repeat the test, but stripped down to the bare essentials
+    # of the leak, which is to die while executing a regex which is
+    # already the current regex, thus causing the saved outer set of
+    # capture offsets to leak. The test itself doesn't do anything
+    # except sit around hoping not to be triggered by ASan
+    {
+        eval {
+            my $s = "abcd";
+            $s =~ m{([abcd]) (?{ die if $1 eq 'd'; })}gx;
+            $s =~ //g;
+            $s =~ //g;
+            $s =~ //g;
+        };
+        pass("call to current regex doesn't leak");
+    }
+
+
+
     {
         # [perl #130495] /x comment skipping stopped a byte short, leading
         # to assertion failure or 'malformed utf-8 character" warning
@@ -1913,6 +1951,10 @@ EOP
     }
     {
         # buffer overflow
+
+        # This test also used to leak - fixed by the commit which added
+        # this line.
+
         fresh_perl_is("BEGIN{\$^H=0x200000}\ns/[(?{//xx",
                       "Unmatched [ in regex; marked by <-- HERE in m/[ <-- HERE (?{/ at (eval 1) line 1.\n",
                       {}, "buffer overflow for regexp component");
@@ -1943,9 +1985,124 @@ EOP
     }
     {   # [perl $132227]
         fresh_perl_is("('0ba' . ('ss' x 300)) =~ m/0B\\N{U+41}" . $sharp_s x 150 . '/i and print "1\n"',  1,{},"Use of sharp s under /di that changes to /ui");
+
+        # A variation, but as far as khw knows not part of 132227
+        fresh_perl_is("'0bssa' =~ m/0B" . $sharp_s . "\\N{U+41}" . '/i and print "1\n"',  1,{},"Use of sharp s under /di that changes to /ui");
     }
     {   # [perl $132164]
         fresh_perl_is('m m0*0+\Rm', "",{},"Undefined behavior in address sanitizer");
+    }
+    {   # [perl #133642]
+        fresh_perl_is('no warnings "experimental::vlb";
+                      m/((?<=(0?)))/', "",{},"Was getting 'Double free'");
+    }
+    {   # [perl #133782]
+        # this would panic on DEBUGGING builds
+        fresh_perl_is(<<'CODE', "ok\nok\n",{}, 'Bad length magic was left on $^R');
+while( "\N{U+100}bc" =~ /(..?)(?{$^N})/g ) {
+  print "ok\n" if length($^R)==length("$^R");
+}
+CODE
+    }
+    {   # [perl #133871], ASAN/valgrind out-of-bounds access
+        fresh_perl_like('qr/(?|(())|())|//', qr/syntax error/, {}, "[perl #133871]");
+    }
+    {   # [perl #133921], segfault
+        fresh_perl_is('qr0||ß+p00000F00000ù\Q00000ÿ00000x00000x0c0e0\Qx0\Qx0\x{0c!}\;\;î0\x ÿÿÿþ   ù\Q`\Qx` {0c!}e;   ù\ò`\Qm`\x{0c!}\;\;îçÿ  ç   ! F  /;îçÿù\Q   xÿÿÿÿ   ù   `x{0c!}e;   ù\Q`\Qx`\x{c!}\;\;îç!}\;îçÿù\Q \x ÿÿÿÿ  >=\Qx`\Qx`  ù\ò`\Qx`\x{0c!};\;îçÿ  F n0t0 c  d;t    ù  ç  !00000000000000000000000m/0000000000000000000000000000000m/\x{){} )|i', "", {}, "[perl #133921]");
+        fresh_perl_is('|ß+W0ü0r0\Qx0\Qx0x0c0G00000000000000000O000000000x0x0x0c!}\;îçÿù\Q0 \x ÿÿÿÿ   ù\Q`\Qx` {0d ;   ù\ò`\Qm`\x{0c!}\;\;îçÿ  ç   ! F  /;îçÿù\Q   xÿÿÿÿ   ù   `x{0c!};   ù\Q`\Qq`\x{c!}\;\;îç!}\;îçÿù\Q \x ÿÿÿÿ  >=\Qx`\Qx`  ù\ò`\Qx`\x{0c!};\;îçÿ  0000000F m0t0 c  d;t    ù  ç  !00000000000000000000000m/0000000000000000000000000000000m/\x{){} )|i', "", {}, "[perl #133921]");
+
+fresh_perl_is('s|ß+W0ü0f0\Qx0\Qx0x0c0G0xgive0000000000000O0h000x0 \xòÿÿÿ  ù\Q`\Q
+
+
+
+
+	ç
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+x{0c!}\;\;çÿ  q0/i0/! F  /;îçÿù\Q   xÿÿÿÿ   ù   `x{0c!}e;   ù\Q`\Qx`\x{0c!}\;ÿÿÿÿ!}\;îçÿù\Q\x ÿÿÿÿ  >=\Qx`\Qx`  ù\ò`ÿ  >=\Qx`\Qx`  ù\ò`\Qx`\x{0c!};\;îçÿ  u00000F 000t0 p  d?    ù  ç  !00000000000000000000000m/0000000000000000000000000000000m/0 \   } )|i', "", {}, "[perl #133921]");
+
+        fresh_perl_is('a aú  úv sWtrt \ó||ß+Wüef ù\Qx`\Qx`\x{1c!gGnuc given1111111111111O1111each111\jx` \x òÿÿÿ   ù\Qx`\Q
+
+
+
+
+
+	ç
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+x{1c!}\;\;îçÿp  qr/elsif/! eF  /;îçÿù\Q   xÿÿÿÿ   ùHQx   `Lx{1c!}e;   ù\Qx`\Qx`\x{1c!}\;ÿÿÿÿc!}\;îçÿù\Qx\x ÿÿÿÿ  >=\Qx`\Qx`  ù\òx`ÿ  >=\Qx`\Qx`  ù\òx`\Qx`\x{1c!}8;\;îçÿp  unshifteF normat0 cmp  d?not    ùp  ç  !0000000000000000000000000m/00000000000000000000000000000000m/0R \   } )|\aï||K??p¿ÿÿfúd{\{gri{\x{1x/}  ð¹NuntiÀh', "", {}, "[perl #133921]");
+
+    fresh_perl_is('s|ß+W0ü0f0\Qx0\Qx0x0c0g0c 000n0000000000000O0h000x0 \xòÿÿÿ  ù\Q`\Q
+
+
+
+
+
+	ç
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+x{0c!}\;\;îçÿ  /0f/! F  /;îçÿù\Q   xÿÿÿÿ   ù   `x{0c!};   ù\Q`\Qx`\x{0c!}\;ÿÿÿÿ!}\;îçÿù\Q\x ÿÿÿÿ  >=\Qx`\Qx`  ù\ò`ÿ  >=\Qx`\Qx`  ù\ò`\Qx`\x{0c!};\;îçÿ  000t0F 000t0 p  d?n    ù  ç  !00000000000000000000000m/0000000000000000000000000000000m/ \   } )|i', "", {}, "[perl #133933]");
+    }
+
+    {   # perl #133998]
+        fresh_perl_is('print "\x{110000}" =~ qr/(?l)|[^\S\pC\s]/', 1, {},
+        '/[\S\s]/l works');
+    }
+
+    {   # perl #133995]
+        use utf8;
+        fresh_perl_is('"έδωσαν ελληνικήვე" =~ m/[^0](?=0)0?/', "",
+                      {wide_chars => 1},
+                      '[^0] doesnt crash on UTF-8 target string');
+    }
+
+    {   # [perl #133992]  This is a tokenizer bug of parsing a pattern
+        fresh_perl_is(q:$z = do {
+                                use utf8;
+                                "q!ÑÐµÑÑ! =~ m'"
+                        };
+                        $z .= 'è(?#';
+                        $z .= "'";
+                        eval $z;:, "", {}, 'foo');
     }
 
 } # End of sub run_tests

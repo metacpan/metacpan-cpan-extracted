@@ -1,0 +1,28 @@
+---
+expected:
+  content: Host 00:1B:21:4B:7B:5D in vlan 1 is flapping between port Gi6/37 and port Gi6/38
+  date: 2018-01-01
+  date_raw: Jan 1 00:10:02
+  datetime_obj: ~
+  datetime_raw: Jan 1 00:10:02
+  datetime_str: 2018-01-01T00:10:02Z
+  domain: ~
+  epoch: 1514765402
+  facility: local7
+  facility_int: 184
+  host: 10.43.0.10
+  host_raw: 10.43.0.10
+  message: '%C4K_EBM-4-HOSTFLAPPING: Host 00:1B:21:4B:7B:5D in vlan 1 is flapping between port Gi6/37 and port Gi6/38'
+  message_raw: '<188>Jan 1 00:10:02 10.43.0.10 1813056: Jan 1 00:15:02: %C4K_EBM-4-HOSTFLAPPING: Host 00:1B:21:4B:7B:5D in vlan 1 is flapping between port Gi6/37 and port Gi6/38'
+  ntp: ok
+  offset: Z
+  preamble: 188
+  priority: warn
+  priority_int: 4
+  program_name: '%C4K_EBM-4-HOSTFLAPPING'
+  program_pid: ~
+  program_raw: '%C4K_EBM-4-HOSTFLAPPING'
+  program_sub: ~
+  time: 00:10:02
+name: Cisco Catalyst
+string: '<188>Jan 1 00:10:02 10.43.0.10 1813056: Jan 1 00:15:02: %C4K_EBM-4-HOSTFLAPPING: Host 00:1B:21:4B:7B:5D in vlan 1 is flapping between port Gi6/37 and port Gi6/38'

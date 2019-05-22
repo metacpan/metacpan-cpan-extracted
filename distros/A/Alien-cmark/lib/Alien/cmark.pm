@@ -3,7 +3,7 @@ package Alien::cmark;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use parent 'Alien::Base';
 

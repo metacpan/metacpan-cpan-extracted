@@ -1,5 +1,5 @@
 This archive contains the distribution FASTX-Abi,
-version 0.04:
+version 0.05:
 
   Read Sanger trace file (chromatograms) in FASTQ format. For traces called with I<hetero> option, the ambiguities will be split into two sequences to allow usage from NGS tools that usually do not understand IUPAC ambiguities.
 

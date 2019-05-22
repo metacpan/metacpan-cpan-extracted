@@ -49,9 +49,11 @@ require_ok $pkg;
 
 my $i = T::Importer->new;
 ok $i->does('Catmandu::Iterable');
+ok $i->can('_http_client'), 'provides a http client for internal use';
 
 $i = T::Importer->new(file => \"World");
 is_deeply $i->to_array, [{hello => "World"}], 'import from string reference';
+is_deeply $i->to_array, [], 'importers can only iterate once';
 
 $i = T::Importer->new(file => \"Hello\nWorld");
 is join('', $i->fh->getlines), "Hello\nWorld", "import all";

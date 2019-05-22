@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use utf8;
+use v5.24;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use FindBin;
 use Test::More;
@@ -26,20 +29,19 @@ is $svg, slurp("$FindBin::Bin/resources/Tekki_5x5_black.svg"),
   'Content is correct';
 
 $text = 'Szőlőlé';
-ok $svg = &$plot($text, darkcolor => 'red', size => 7), 'Plot with unicode text';
+ok $svg = &$plot($text, {darkcolor => 'red', size => 7}),
+  'Plot with unicode text';
 is $svg, slurp("$FindBin::Bin/resources/Grapejuice_7x7_red.svg"),
   'Content is correct';
 
-eval { &$plot };
-like $@, qr/Not enough arguments for plot_qrcode!/, 'Correct error';
+eval {&$plot};
+like $@, qr/Too few arguments for subroutine/, 'Correct error';
 
 done_testing();
 
 # utils
 
-sub slurp {
-  my ($path) = @_;
-
+sub slurp ($path) {
   CORE::open my $file, '<', $path or die qq{Can't open file "$path": $!};
   my $ret = my $content = '';
   while ($ret = $file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
@@ -48,9 +50,7 @@ sub slurp {
   return $content;
 }
 
-sub spurt {
-  my ($path, $content) = (shift, join '', @_);
-
+sub spurt ($path, $content) {
   CORE::open my $file, '>', $path or die qq{Can't open file "$path": $!};
   ($file->syswrite($content) // -1) == length $content
     or die qq{Can't write to file "$path": $!};

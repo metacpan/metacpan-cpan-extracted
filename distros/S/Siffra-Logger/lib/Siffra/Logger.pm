@@ -7,7 +7,6 @@ use Carp;
 use utf8;
 use Data::Dumper;
 use DDP;
-use Log::Any qw($log);
 use Scalar::Util qw(blessed);
 $Carp::Verbose = 1;
 
@@ -23,7 +22,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -135,23 +134,6 @@ BEGIN
 
     Log::Any::Adapter->set( 'Dispatch', dispatcher => $dispatcher );
 } ## end BEGIN
-
-sub DESTROY
-{
-    my ( $self, %parameters ) = @_;
-
-    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => FALSE } );
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-
-    if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
-    {
-        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => TRUE } );
-    }
-    else
-    {
-        # TODO
-    }
-} ## end sub DESTROY
 
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.

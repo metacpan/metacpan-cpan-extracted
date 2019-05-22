@@ -2,22 +2,14 @@ package Catmandu::Fix::Condition::any_equal;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
 use namespace::clean;
-use Catmandu::Fix::Has;
 
-has path  => (fix_arg => 1);
-has value => (fix_arg => 1);
+extends 'Catmandu::Fix::Condition::all_equal';
 
-with 'Catmandu::Fix::Condition::SimpleAnyTest';
-
-sub emit_test {
-    my ($self, $var) = @_;
-    my $value = $self->value;
-    "is_value(${var}) && ${var} eq '$value'";
-}
+sub _build_mode {'any'}
 
 1;
 

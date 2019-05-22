@@ -36,9 +36,10 @@ Mail::Send - Simple electronic mail interface
 
 L<Mail::Send|Mail::Send> creates e-mail messages without using the L<Mail::Header|Mail::Header>
 knowledge, which means that all escaping and folding must be done by
-you!  Simplicity has its price.
+you!  Also: do not forget to escape leading dots.  Simplicity has its price.
 
-When you have time, take a look at Mail::Transport
+When you have time, take a look at Mail::Transport which is part of
+the MailBox suite.
 
 =head1 METHODS
 
@@ -48,8 +49,9 @@ When you have time, take a look at Mail::Transport
 
 =item Mail::Send-E<gt>B<new>(PAIRS)
 
-A list of header fields (provided as key-value PAIRS) can be
-used to initialize the object.
+A list of header fields (provided as key-value PAIRS) can be used to
+initialize the object, limited to the few provided as method: C<to>,
+C<subject>, C<cc>, and C<bcc>.  For other header fields, use L<add()|Mail::Send/"Header fields">.
 
 =back
 
@@ -86,7 +88,10 @@ the LIST of values after modification.
 
 The %options are used to initiate a mailer object via
 L<Mail::Mailer::new()|Mail::Mailer/"Constructors">.  Then L<Mail::Mailer::open()|Mail::Mailer/"Constructors"> is called
-with the knowledge collected in this Mail::Send object.
+with the knowledge collected in this C<Mail::Send> object.
+
+Be warned: this module implements raw smtp, which means that you have
+to escape lines which start with a dot, by adding one in front.
 
 =back
 

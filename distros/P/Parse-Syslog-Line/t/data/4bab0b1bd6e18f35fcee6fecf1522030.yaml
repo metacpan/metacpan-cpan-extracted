@@ -1,0 +1,27 @@
+---
+expected:
+  content: '[ssl_acc] 10.0.0.1 - bob [01/Jan/2015:10:55:37 +0000] "/xui/update/configuration/alert/statusmenu/coloradvisory" 200 1702'
+  date: 2018-01-01
+  date_raw: Jan 1 10:55:37
+  datetime_obj: ~
+  datetime_raw: Jan 1 10:55:37
+  datetime_str: 2018-01-01T10:55:37Z
+  domain: example.com
+  epoch: 1514804137
+  facility: local6
+  facility_int: 176
+  host: f5lb-201
+  host_raw: f5lb-201.example.com
+  message: 'info logger: [ssl_acc] 10.0.0.1 - bob [01/Jan/2015:10:55:37 +0000] "/xui/update/configuration/alert/statusmenu/coloradvisory" 200 1702'
+  message_raw: '<182>Jan 1 10:55:37 f5lb-201.example.com info logger: [ssl_acc] 10.0.0.1 - bob [01/Jan/2015:10:55:37 +0000] "/xui/update/configuration/alert/statusmenu/coloradvisory" 200 1702'
+  offset: Z
+  preamble: 182
+  priority: info
+  priority_int: 6
+  program_name: logger
+  program_pid: ~
+  program_raw: info logger
+  program_sub: ~
+  time: 10:55:37
+name: F5 includes level
+string: '<182>Jan 1 10:55:37 f5lb-201.example.com info logger: [ssl_acc] 10.0.0.1 - bob [01/Jan/2015:10:55:37 +0000] "/xui/update/configuration/alert/statusmenu/coloradvisory" 200 1702'

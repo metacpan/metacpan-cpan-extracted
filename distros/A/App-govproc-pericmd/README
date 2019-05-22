@@ -1,0 +1,43 @@
+NAME
+    App::govproc::pericmd - Perinci::CmdLine-based variant of govproc CLI
+
+VERSION
+    This document describes version 0.001 of App::govproc::pericmd (from
+    Perl distribution App-govproc-pericmd), released on 2019-05-22.
+
+SYNOPSIS
+    See the included script govproc-pericmd.
+
+DESCRIPTION
+    This distribution carries govproc-pericmd, the govproc CLI utility based
+    on Perinci::CmdLine, mainly for testing. Normal users should still use
+    the official govproc from Proc::Govern that is lighter and has fewer
+    dependencies.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-govproc-pericmd>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-govproc-pericmd>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-govproc-pericmd>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Proc::Govern
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

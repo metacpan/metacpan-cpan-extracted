@@ -67,7 +67,11 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "Path::Tiny" : "0",
+            "Perl::Critic::More" : "1.003",
+            "Perl::Critic::Pulp" : "96",
             "Test::DZil" : "0",
+            "Test::Exception" : "0",
+            "Test::Pod::Coverage" : "1.10",
             "Test::Version" : "0.04"
          }
       }
@@ -84,8 +88,10 @@
          "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_contributors" : [
+      "Alceu Rodrigues de Freitas Junior <alceu.junior@quintoandar.com.br>",
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexei Znamensky <russoz@cpan.org>",
       "Christian Walde <walde.christian@googlemail.com>",

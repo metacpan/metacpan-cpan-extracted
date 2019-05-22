@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use v5.10;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use RDF::aREF::Query;
 use RDF::aREF::Decoder;
@@ -13,70 +13,86 @@ use Carp qw(croak);
 
 use parent 'Exporter';
 our @EXPORT = qw(decode_aref encode_aref aref_query aref_query_map);
-our %EXPORT_TAGS = (all => [@EXPORT]);
+our %EXPORT_TAGS = ( all => [@EXPORT] );
 
 our @CARP_NOT = qw(RDF::aREF::Query RDF::aREF::Decoder RDF::aREF::Encoder);
 
-sub decode_aref(@) { ## no critic
-    my ($aref, %options) = @_;
+sub decode_aref(@) {    ## no critic
+    my ( $aref, %options ) = @_;
     RDF::aREF::Decoder->new(%options)->decode($aref);
 }
 
-sub encode_aref(@) { ## no critic
-    my ($source, %options) = @_;
+sub encode_aref(@) {    ## no critic
+    my ( $source, %options ) = @_;
     my $encoder = RDF::aREF::Encoder->new(%options);
     my $aref = $options{to} // {};
 
-    if (blessed $source and $source->isa('RDF::Trine::Iterator')) {
+    if ( blessed $source and $source->isa('RDF::Trine::Iterator') ) {
         $encoder->add_iterator( $source, $aref );
-    } elsif (blessed $source and $source->DOES('Attean::API::TripleIterator')) {
+    }
+    elsif ( blessed $source and $source->DOES('Attean::API::TripleIterator') ) {
         $encoder->add_iterator( $source, $aref );
-    } elsif (blessed $source and $source->isa('RDF::Trine::Model')) {
+    }
+    elsif ( blessed $source and $source->isa('RDF::Trine::Model') ) {
         $encoder->add_iterator( $source->as_stream, $aref );
-    } elsif (blessed $source and $source->DOES('Attean::API::TripleStore')) {
+    }
+    elsif ( blessed $source and $source->DOES('Attean::API::TripleStore') ) {
         $encoder->add_iterator( $source->get_triples, $aref );
-    } elsif (ref $source and reftype $source eq 'HASH') {
+    }
+    elsif ( ref $source and reftype $source eq 'HASH' ) {
         $encoder->add_hashref( $source, $aref );
-    } elsif (!ref $source) {
+    }
+    elsif ( !ref $source ) {
         eval { require RDF::Trine::Model; require RDF::Trine::Parser };
-        croak "RDF::Trine missing: encoding aREF from URL or file not supported!" if $@;
+        croak
+          "RDF::Trine missing: encoding aREF from URL or file not supported!"
+          if $@;
         my $model = RDF::Trine::Model->new;
+
         # TODO: directly use iterator
-        if ($source =~ qr{^https?://}) {
-            RDF::Trine::Parser->parse_url_into_model($source, $model); 
-        } elsif (-f $source) {
+        if ( $source =~ qr{^https?://} ) {
+            RDF::Trine::Parser->parse_url_into_model( $source, $model );
+        }
+        elsif ( -f $source ) {
             my $parser = RDF::Trine::Parser->guess_parser_by_filename($source);
-            $parser->parse_file_into_model("file://$source", $source, $model)
-        } else {
+            $parser->parse_file_into_model( "file://$source", $source, $model );
+        }
+        else {
             croak 'invalid RDF graph, given as string';
         }
         $encoder->add_iterator( $model->as_stream, $aref );
     }
-    
+
     return $aref;
 }
 
-sub aref_query(@) { ## no critic
-    my ($graph, $origin, @queries) = @_ < 3 ? ($_[0], undef, $_[1]) : @_;
-    RDF::aREF::Query->new( query => join '|', @queries )->apply($graph, $origin);
+sub aref_query(@) {    ## no critic
+    my ( $graph, $origin, @queries ) = @_ < 3 ? ( $_[0], undef, $_[1] ) : @_;
+    RDF::aREF::Query->new( query => join '|', @queries )
+      ->apply( $graph, $origin );
 }
 
-sub aref_query_map(@) { ## no critic
-    my ($graph, $origin, $map) = @_ < 3 ? ($_[0], undef, $_[1]) : @_;
+sub aref_query_map(@) {    ## no critic
+    my ( $graph, $origin, $map ) = @_ < 3 ? ( $_[0], undef, $_[1] ) : @_;
 
     my %record;
-    
-    while (my ($query, $field) = each %$map) {
-        my @values = aref_query( $origin ? ($graph, $origin, $query)
-                                         : ($graph, $query) );
+
+    while ( my ( $query, $field ) = each %$map ) {
+        my @values = aref_query(
+            $origin
+            ? ( $graph, $origin, $query )
+            : ( $graph, $query )
+        );
         if (@values) {
-            if ($record{$field}) {
-                if (ref $record{$field}) {
-                    push @{$record{$field}}, @values;
-                } else {
+            if ( $record{$field} ) {
+                if ( ref $record{$field} ) {
+                    push @{ $record{$field} }, @values;
+                }
+                else {
                     $record{$field} = [ $record{$field}, @values ];
                 }
-            } else {
+            }
+            else {
                 $record{$field} = @values > 1 ? \@values : $values[0];
             }
         }
@@ -146,6 +162,13 @@ encoding of RDF graphs in form of arrays, hashes, and Unicode strings. This
 module provides methods for decoding from aREF data to RDF triples
 (L<RDF::aREF::Decoder>), for encoding RDF data in aREF (L<RDF::aREF::Encoder>),
 and for querying parts of an RDF graph (L<RDF::aREF::Query>).
+
+=head1 WARNING
+
+B<aREF> has been an attempt to solve problems that meanwhile have largely been
+solved by L<JSON-LD|https://json-ld.org/>. Despite aRef having its own
+benefits, please consider using a more established technology (JSON-LD)
+instead!
 
 =head1 EXPORTED FUNCTIONS
 

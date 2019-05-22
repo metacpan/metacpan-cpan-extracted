@@ -2,7 +2,7 @@ package Catmandu;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Catmandu::Env;
 use Catmandu::Util qw(:is);
@@ -17,6 +17,7 @@ use Sub::Exporter -setup => {
         fixer              => curry_method,
         importer           => curry_method,
         exporter           => curry_method,
+        validator          => curry_method,
         export             => curry_method,
         export_to_string   => curry_method,
         import_from_string => curry_method
@@ -120,6 +121,11 @@ sub default_exporter_package {$_[0]->_env->default_exporter_package}
 sub exporter {
     my $class = shift;
     $class->_env->exporter(@_);
+}
+
+sub validator {
+    my $class = shift;
+    $class->_env->validator(@_);
 }
 
 sub export {
@@ -517,7 +523,12 @@ package name is given in the config or as a param.
 =head2 exporter([NAME])
 
 Return an instance of L<Catmandu::Exporter> with name NAME (or the default when
-no name is given).  The NAME is set in the configuration file (see 'importer').
+no name is given).  The NAME can be in a configuration file (see 'importer').
+
+=head2 validator([NAME])
+
+Return an instance of L<Catmandu::Validator> with name NAME (or the default when
+no name is given).  The NAME can be in a configuration file (see 'importer').
 
 =head2 export($data,[NAME])
 
@@ -638,6 +649,10 @@ Same as C<< Catmandu->importer >>.
 
 Same as C<< Catmandu->exporter >>.
 
+=item validator
+
+Same as C<< Catmandu->validator >>.
+
 =item export
 
 Same as C<< Catmandu->export >>.
@@ -731,6 +746,14 @@ See L<Config::Onion> for more information on how this works.
 =item documentation
 
 L<http://librecat.org/Catmandu/>
+
+=item blog
+
+L<https://librecatproject.wordpress.com/>
+
+=item step-by-step introduction from basics
+
+L<https://librecatproject.wordpress.com/2014/12/01/day-1-getting-catmandu/>
 
 =item command line client
 

@@ -1,5 +1,17 @@
 Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
 
+0.14  May 22, 2019
+    Sigh. Yet another rerelease of the v0.11 changes, missed an upstream commit.
+    There is no version 0.13, that is an unlucky number.
+
+0.12  May 22, 2019
+    Fixup MANIFEST. Otherwise identical to 0.11
+
+0.11  May 21, 2019
+    Switch to a deterministic seed construction, and avoid use of rand()
+    when construction fails. Switch to a full file checksum, and from 16
+    byte alignment to 8 byte alignment. Test improvements.
+
 0.10  May 14, 2019
     Rework in XS for speed. Add a new variant 2, which has a more robust
     construction method which has a much higher chance of finding a solution

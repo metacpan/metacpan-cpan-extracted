@@ -4,8 +4,8 @@ VERSION
 SYNOPSIS
         use Time::Zone::Olson();
 
-        my $time_zone = Time::Zone::Olson->new({ timezone => 'Australia/Melbourne' }); # set timezone at creation time
-        my $now = $time_zone->time_local($seconds, $minutes, $hours, $day, $month, $year); # convert from Australia/Melbourne time
+        my $time_zone = Time::Zone::Olson->new( timezone => 'Australia/Melbourne' ); # set timezone at creation time
+        my $now = $time_zone->time_local($seconds, $minutes, $hours, $day, $month, $year); # convert for Australia/Melbourne time
         foreach my $area ($time_zone->areas()) {
             foreach my $location ($time_zone->locations($area)) {
                 $time_zone->timezone("$area/$location");
@@ -29,10 +29,10 @@ DESCRIPTION
 SUBROUTINES/METHODS
   new
     Time::Zone::Olson->new() will return a new timezone object. It accepts a
-    hash reference as a parameter with an optional `timezone' key, which
-    contains an Olson timezone value, such as 'Australia/Melbourne'. The
-    hash reference also allows a `directory' key, with the file system
-    location of the Olson timezone database as a value.
+    hash as a parameter with an optional `timezone' key, which contains an
+    Olson timezone value, such as 'Australia/Melbourne'. The hash also
+    allows a `directory' key, with the file system location of the Olson
+    timezone database as a value.
 
     Both of these parameters default to `$ENV{TZ}' and `$ENV{TZDIR}'
     respectively.
@@ -173,7 +173,7 @@ DIAGNOSTICS
         The designated file is shorter than expected. The file could be
         corrupt?
 
-    `The tz defintion at the end of %s could not be read in %d bytes'
+    `The tz definition at the end of %s could not be read in %d bytes'
         The designated file is longer than expected. Maybe the timezone
         version is greater than the currently recognized 3?
 
@@ -181,7 +181,7 @@ DIAGNOSTICS
         There has been a file system error while reading from the designated
         path. The file could be corrupt?
 
-    `Failed to parse the tz defintion of %s from %s'
+    `Failed to parse the tz definition of %s from %s'
         This is probably a bug in Time::Zone::Olson in failing to parse the
         `TZ' variable at the end of the file.
 
@@ -201,6 +201,14 @@ INCOMPATIBILITIES
     None reported
 
 BUGS AND LIMITATIONS
+    On Win32 platforms, the Olson TZ database is usually unavailable. In an
+    attempt to provide a workable alternative, the Win32 Registry is
+    interrogated and translated to allow Olson timezones (such as
+    Australia/Melbourne) to be used on Win32 nodes. Therefore, the use of
+    Time::Zone::Olson should be cross-platform compatible, but the actual
+    results may be different, depending on the compatibility of the Win32
+    Registry timezones and the Olson TZ database.
+
     Please report any bugs or feature requests to `bug-time-zone-olson at
     rt.cpan.org', or through the web interface at
     http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson. I will
@@ -215,7 +223,7 @@ AUTHOR
     David Dick, `<ddick at cpan.org>'
 
 LICENSE AND COPYRIGHT
-    Copyright 2015 David Dick.
+    Copyright 2019 David Dick.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

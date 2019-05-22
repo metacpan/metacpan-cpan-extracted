@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_sum
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-05-12'; # DATE
+our $DATE = '2019-05-21'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-sum - Output a summary row which are arithmetic sums of data rows
 
 =head1 VERSION
 
-This document describes version 0.021 of csv-sum (from Perl distribution App-CSVUtils), released on 2019-05-12.
+This document describes version 0.022 of csv-sum (from Perl distribution App-CSVUtils), released on 2019-05-21.
 
 =head1 SYNOPSIS
 

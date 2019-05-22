@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/jorol/MARC-Schema/issues
   homepage: https://github.com/jorol/MARC-Schema
   repository: https://github.com/jorol/MARC-Schema.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

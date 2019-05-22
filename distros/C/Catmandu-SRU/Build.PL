@@ -18,12 +18,12 @@ my %module_build_args = (
     "Wouter Willaert, C<< <wouterw\@inuits.eu> >>"
   ],
   "dist_name" => "Catmandu-SRU",
-  "dist_version" => "0.421",
+  "dist_version" => "0.422",
   "license" => "perl",
   "module_name" => "Catmandu::SRU",
   "recursive_test_files" => 1,
   "requires" => {
-    "Catmandu" => "0.9204",
+    "Catmandu" => "1.000",
     "Catmandu::MODS" => "0.31",
     "Cpanel::JSON::XS" => "3.0213",
     "Furl" => "0.41",

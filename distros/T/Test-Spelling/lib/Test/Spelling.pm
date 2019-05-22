@@ -1,9 +1,9 @@
 package Test::Spelling;
-use 5.006;
+
 use strict;
 use warnings;
 
-use base 'Exporter';
+use Exporter qw(import);
 use Pod::Spell;
 use Test::Builder;
 use Text::Wrap;
@@ -11,7 +11,7 @@ use File::Spec;
 use IPC::Run3;
 use Symbol 'gensym';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 our @EXPORT = qw(
     pod_file_spelling_ok
@@ -101,9 +101,10 @@ sub invalid_words_in {
 
     my $document = '';
     open my $handle, '>', \$document;
+    open my $infile, '<:encoding(UTF-8)', $file;
 
     # save digested POD to the string $document
-    get_pod_parser()->parse_from_file($file, $handle);
+    get_pod_parser()->parse_from_filehandle($infile, $handle);
 
     my @words = _get_spellcheck_results($document);
 
@@ -321,7 +322,7 @@ L<add_stopwords> will be changed and documented properly.
 
 =head2 all_pod_files_spelling_ok( [@files/@directories] )
 
-Checks all the files for POD spelling. It gathers L<all_pod_files()> on each
+Checks all the files for POD spelling. It gathers L</all_pod_files> on each
 file/directory, and declares a L<Test::More/plan> for you (one test for each
 file), so you must not call C<plan> yourself.
 

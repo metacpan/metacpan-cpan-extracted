@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 
+plan( skip_all => "Test::CheckManifest is broken - https://github.com/reneeb/Test-CheckManifest/issues/20" );
+
 unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );
 }

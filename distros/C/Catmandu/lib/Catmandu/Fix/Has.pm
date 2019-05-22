@@ -2,7 +2,7 @@ package Catmandu::Fix::Has;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Class::Method::Modifiers qw(install_modifier);
 
@@ -21,7 +21,7 @@ sub import {
             return $orig->($attr, %opts)
                 unless exists $opts{fix_arg} || exists $opts{fix_opt};
 
-            $opts{is} //= 'ro';
+            $opts{is}       //= 'ro';
             $opts{init_arg} //= $attr;
 
             my $arg = {key => $opts{init_arg}};

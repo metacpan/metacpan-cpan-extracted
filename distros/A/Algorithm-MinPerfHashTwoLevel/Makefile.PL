@@ -24,11 +24,16 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/Algorithm/MinPerfHashTwoLevel.pm', # retrieve abstract from module
        AUTHOR         => 'Yves Orton <yorton@(none)>') : ()),
     LIBS              => [''], # e.g., '-lm'
+    LICENSE           => 'perl',
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
     OPTIMIZE          => '-O3',
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
+    BUILD_REQUIRES      => {
+        "ExtUtils::MakeMaker"   => 7.36,
+        "Test::More"            => 1.302164,
+    },
     META_MERGE => {
         resources => {
             repository => {

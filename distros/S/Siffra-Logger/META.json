@@ -39,7 +39,9 @@
             "File::Basename" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Dispatch" : "0",
             "Log::Dispatch" : "0",
+            "Log::Dispatch::Email::Siffra" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Test::More" : "0",
@@ -52,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,0 +1,116 @@
+NAME
+    PowerManagement::Any - Common interface to some power management tasks
+
+VERSION
+    This document describes version 0.003 of PowerManagement::Any (from Perl
+    distribution PowerManagement-Any), released on 2019-05-22.
+
+NOTES
+FUNCTIONS
+  prevent_sleep
+    Usage:
+
+     prevent_sleep() -> [status, msg, payload, meta]
+
+    Prevent system from sleeping.
+
+    Will also prevent system from hybrid sleeping, suspending, or
+    hibernating. The effect is permanent; you need to "unprevent_sleep()" to
+    reverse the effect.
+
+    Note that this does not prevent screen blanking or locking (screensaver
+    activating); see Screensaver::Any for routines that disable screensaver.
+
+    On systems that run Systemd, this is implemented by masking the
+    sleep.target. It automatically also prevents suspend.target,
+    hybrid-sleep.target, and hibernate.target from activating.
+
+    Not implemented yet for other systems. Patches welcome.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  sleep_is_prevented
+    Usage:
+
+     sleep_is_prevented() -> [status, msg, payload, meta]
+
+    Check if sleep has been prevented.
+
+    See "prevent_sleep()" for more details.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  unprevent_sleep
+    Usage:
+
+     unprevent_sleep() -> [status, msg, payload, meta]
+
+    Reverse the effect of prevent_sleep().
+
+    See "prevent_sleep()" for more details.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PowerManagement-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-PowerManagement-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PowerManagement-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -44,11 +44,17 @@ The smtp mailer does not handle C<Cc> and C<Bcc> lines, neither their
 C<Resent-*> fellows. The C<Debug> options enables debugging output
 from C<Net::SMTP>.
 
+[added 2.21] You may also use the C<< StartTLS => 1 >> options to upgrade the
+connection with STARTTLS.  You need C<libnet> version 1.28 (2014) for this
+to work.
+
 You may also use the C<< Auth => [ $user, $password ] >> option for SASL
 authentication. To make this work, you have to install the L<Authen::SASL>
 distribution yourself: it is not automatically installed.
 
 =item C<smtps>
+
+This option is B<deprecated> when you have C<libnet> 1.28 (2014) and above.
 
 Use the smtp over ssl protocol via L<Net::SMTP::SSL> to deliver the mail.
 Usage is identical to C<smtp>. You have to install Authen::SASL as

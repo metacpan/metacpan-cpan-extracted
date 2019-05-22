@@ -5,8 +5,6 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Catmandu::Store::Hash;
-use Catmandu::Store::File::Simple;
-use Catmandu::Store::File::Memory;
 use utf8;
 
 my $pkg;
@@ -26,7 +24,7 @@ note("Hash stores");
 {
     my $stores = [Catmandu::Store::Hash->new, Catmandu::Store::Hash->new,];
     my $store = $pkg->new(stores => $stores);
-    my $bag = $store->bag;
+    my $bag   = $store->bag;
 
     $bag->add_many($data);
     is_deeply $bag->to_array, $data;

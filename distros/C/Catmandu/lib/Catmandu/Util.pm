@@ -2,7 +2,7 @@ package Catmandu::Util;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Exporter qw(import);
 use Sub::Quote    ();
@@ -114,7 +114,7 @@ sub TIESCALAR { }
 sub io {
     my ($arg, %opts) = @_;
     my $binmode = $opts{binmode} || $opts{encoding} || ':encoding(UTF-8)';
-    my $mode = $opts{mode} || 'r';
+    my $mode    = $opts{mode}    || 'r';
     my $io;
 
     if (is_scalar_ref($arg)) {
@@ -195,7 +195,9 @@ sub read_json {
 # Split a path on . or /, but not on \/ or \.
 sub split_path {
     my ($path) = @_;
-    return [map {s/\\(?=[\.\/])//g; $_} split /(?<!\\)[\.\/]/, trim($path)];
+    $path = trim($path);
+    $path =~ s/^\$[\.\/]//;
+    return [map {s/\\(?=[\.\/])//g; $_} split /(?<!\\)[\.\/]/, $path];
 }
 
 sub join_path {
@@ -215,7 +217,7 @@ sub normalize_path {    # taken from Dancer::FileUtils
 sub segmented_path {
     my ($id, %opts) = @_;
     my $segment_size = $opts{segment_size} || 3;
-    my $base_path = $opts{base_path};
+    my $base_path    = $opts{base_path};
     $id =~ s/[^0-9a-zA-Z]+//g;
     my @path = unpack "(A$segment_size)*", $id;
     defined $base_path
@@ -317,7 +319,7 @@ sub data_at {
         $path = split_path($path);
     }
     my $create = $opts{create};
-    my $_key = $opts{_key} // $opts{key};
+    my $_key   = $opts{_key} // $opts{key};
     if (defined $opts{key} && $create && @$path) {
         push @$path, $_key;
     }
@@ -641,7 +643,7 @@ sub use_lib {
 }
 
 sub pod_section {
-    my $class = is_ref($_[0]) ? ref(shift) : shift;
+    my $class   = is_ref($_[0]) ? ref(shift) : shift;
     my $section = uc(shift);
 
     unless (-r $class) {
@@ -939,8 +941,7 @@ Returns a copy of C<$array> without the head.
 
 =item array_uniq($array)
 
-Returns a copy of C<$array> with all duplicates removed. Comparison is done
-with C<is_same()>.
+Returns a copy of C<$array> with all duplicates removed.
 
 =item array_split($array | $string)
 

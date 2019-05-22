@@ -1,5 +1,8 @@
 Revision history for Catmandu-SRU
 
+0.422  2019-05-22 11:28:26 CEST
+  - Fixing tests
+
 0.421  2018-03-26 10:23:27 CEST
   - Fixing test
 

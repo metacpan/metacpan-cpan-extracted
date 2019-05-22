@@ -190,7 +190,7 @@ subtest 'req alien::build::mm' => sub {
   is(
     $meta->{prereqs}->{configure}->{requires},
     hash {
-      field 'Alien::Build::MM'      => '1.71';
+      field 'Alien::Build::MM'      => '1.74';
       etc;
     },
     'build prereqs',

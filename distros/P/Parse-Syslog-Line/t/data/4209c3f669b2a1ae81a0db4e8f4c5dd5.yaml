@@ -1,0 +1,27 @@
+---
+expected:
+  content: (root) CMD (/usr/libexec/atrun)
+  date: 2018-01-01
+  date_raw: Jan  1 08:15:00
+  datetime_obj: ~
+  datetime_raw: Jan  1 08:15:00
+  datetime_str: 2018-01-01T08:15:00Z
+  domain: ~
+  epoch: 1514794500
+  facility: cron
+  facility_int: 72
+  host: ~
+  host_raw: ~
+  message: '/usr/sbin/cron[73991]: (root) CMD (/usr/libexec/atrun)'
+  message_raw: '<78>Jan  1 08:15:00 /usr/sbin/cron[73991]: (root) CMD (/usr/libexec/atrun)'
+  offset: Z
+  preamble: 78
+  priority: info
+  priority_int: 6
+  program_name: /usr/sbin/cron
+  program_pid: 73991
+  program_raw: '/usr/sbin/cron[73991]'
+  program_sub: ~
+  time: 08:15:00
+name: FreeBSD cron
+string: '<78>Jan  1 08:15:00 /usr/sbin/cron[73991]: (root) CMD (/usr/libexec/atrun)'

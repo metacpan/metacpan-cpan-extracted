@@ -1,6 +1,21 @@
 
 ==== version history for MailTools
 
+version 2.21: Tue 21 May 16:26:30 CEST 2019
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+
+	Improvements:
+	- add more to the README
+	- add Mail::Mailer option StartSSL for smtp backend
+	  rt.cpan.org#125871 [Guilhem Moulin]
+	- deprecate Mail::Mailer backend smtps
+	- document need for escaping docs for Mail::Send
+	  rt.cpan.org#129627 [Jonathan Kamens]
+	- document limit on parameters for Mail::Send::new()
+	  rt.cpan.org#129633 [Sven Neuhaus]
+
 version 2.20: Mon 22 Jan 18:14:44 CET 2018
 
 	Improvements:

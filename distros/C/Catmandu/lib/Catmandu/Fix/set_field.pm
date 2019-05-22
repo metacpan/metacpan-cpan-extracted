@@ -2,33 +2,21 @@ package Catmandu::Fix::set_field;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
-use Clone qw(clone);
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
-with 'Catmandu::Fix::Base';
+with 'Catmandu::Fix::Builder';
 
-has path => (fix_arg => 1);
-has value => (fix_arg => 1, default => sub {undef;});
+has path  => (fix_arg => 1);
+has value => (fix_arg => 1, default => sub {undef});
 
-sub emit {
-    my ($self, $fixer) = @_;
-    my $path = $fixer->split_path($self->path);
-    my $key  = pop @$path;
-    my $value
-        = defined $self->value ? $fixer->emit_value($self->value) : 'undef';
-
-    $fixer->emit_walk_path(
-        $fixer->var,
-        $path,
-        sub {
-            my $var = shift;
-            $fixer->emit_set_key($var, $key, $value);
-        }
-    );
+sub _build_fixer {
+    my ($self) = @_;
+    as_path($self->path)->setter($self->value);
 }
 
 1;

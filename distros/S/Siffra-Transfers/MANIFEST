@@ -1,14 +1,16 @@
-MANIFEST
-README
-LICENSE
-Todo
 Changes
+dist.sh
+install.sh
+lib/Siffra/Transfers.pm
+LICENSE
+Makefile.PL
+MANIFEST
 MANIFEST.SKIP
+README
+t/001_load.t
+t/perlcritic.t
 t/pod-coverage.t
 t/pod.t
-t/perlcritic.t
-Makefile.PL
-lib/Siffra/Transfers.pm
-t/001_load.t
+Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

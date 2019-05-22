@@ -1,5 +1,11 @@
 Revision history for Perl extension Test::Map::Tube.
 
+0.54  Tue May 21 11:35:00 2019
+      - Updated dependency on Map::Tube v3.62.
+
+0.53  Sun Apr 28 11:55:00 2019
+      - Updated copyright year details.
+
 0.52  Fri Apr 26 18:05:00 2019
       - Updated dependency on Map::Tube v3.61.
 

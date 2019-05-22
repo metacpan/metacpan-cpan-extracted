@@ -4,9 +4,9 @@
       "Yves Orton <yorton@(none)>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.36",
+            "Test::More" : "1.302164"
          }
       },
       "configure" : {
@@ -44,6 +45,6 @@
          "url" : "git://github.com/demerphq/Algorithm-MinPerfHashTwoLevel.git"
       }
    },
-   "version" : "0.10",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

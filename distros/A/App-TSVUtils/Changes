@@ -1,3 +1,11 @@
+0.002   2019-05-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention App::CSVUtils and App::LTSVUtils; update that
+	  csv2tsv, tsv2csv are now in App-CSVUtils.
+
+
 0.001   2019-04-23 (PERLANCAR)
 
          - First release.

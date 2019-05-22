@@ -1,5 +1,12 @@
 Revision history for Test-Spelling
 
+0.23      2019-05-21
+  - Fixed some documentation errors (Mohammad S Anwar)
+  - Added unicode support (Kivanc Yazan, GH PR#10)
+  - Bump Perl prereq to 5.8 now that we support unicode
+  - Don't inherit from Exporter (Olivier Mengué, GH PR#9)
+  - Bump Exporter prereq to 5.57
+
 0.22      2019-04-24
   - Zero-code-change release encompassing everything from 0.21
   - Resolves RT#120425 . in @INC should no longer be an issue

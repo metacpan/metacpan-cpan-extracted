@@ -1,7 +1,7 @@
 package App::TSVUtils;
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-21'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -114,7 +114,7 @@ App::TSVUtils - CLI utilities related to TSV
 
 =head1 VERSION
 
-This document describes version 0.001 of App::TSVUtils (from Perl distribution App-TSVUtils), released on 2019-04-23.
+This document describes version 0.002 of App::TSVUtils (from Perl distribution App-TSVUtils), released on 2019-05-21.
 
 =head1 DESCRIPTION
 
@@ -182,7 +182,12 @@ feature.
 
 =head1 SEE ALSO
 
-L<App::SerializeUtils> provides utilities like L<tsv2csv>, etc.
+L<App::SerializeUtils>
+
+L<App::LTSVUtils> (which includes utilities like L<ltsv2tsv>, L<tsv2ltsv>, among
+others).
+
+L<App::CSVUtils> (which includes L<csv2tsv>, L<tsv2csv> among others).
 
 =head1 AUTHOR
 

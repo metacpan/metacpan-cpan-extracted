@@ -1,0 +1,28 @@
+---
+expected:
+  content: Configured from console by vty0 (10.100.0.68)
+  date: 2018-01-01
+  date_raw: Jan 1 12:22:26
+  datetime_obj: ~
+  datetime_raw: Jan 1 12:22:26
+  datetime_str: 2018-01-01T12:22:26Z
+  domain: ~
+  epoch: 1514809346
+  facility: local7
+  facility_int: 184
+  host: 1.2.3.4
+  host_raw: 1.2.3.4
+  message: '%SYS-5-CONFIG_I: Configured from console by vty0 (10.100.0.68)'
+  message_raw: '<189>Jan 1 12:22:26 1.2.3.4 5971: *Jan 1 02:54:25: %SYS-5-CONFIG_I: Configured from console by vty0 (10.100.0.68)'
+  ntp: not configured
+  offset: Z
+  preamble: 189
+  priority: notice
+  priority_int: 5
+  program_name: '%SYS-5-CONFIG_I'
+  program_pid: ~
+  program_raw: '%SYS-5-CONFIG_I'
+  program_sub: ~
+  time: 12:22:26
+name: Cisco NTP Unconfigured
+string: '<189>Jan 1 12:22:26 1.2.3.4 5971: *Jan 1 02:54:25: %SYS-5-CONFIG_I: Configured from console by vty0 (10.100.0.68)'

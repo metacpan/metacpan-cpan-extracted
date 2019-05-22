@@ -63,10 +63,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "Path::Tiny"          => 0,
+    "Perl::Critic::More"  => "1.003",
+    "Perl::Critic::Pulp"  => 96,
     "Test::DZil"          => 0,
+    "Test::Exception"     => 0,
+    "Test::Pod::Coverage" => "1.10",
     "Test::Version"       => "0.04"
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -82,7 +86,11 @@ my %FallbackPrereqs = (
   "MooseX::Types::Perl"               => 0,
   "PPI"                               => 0,
   "Path::Tiny"                        => 0,
+  "Perl::Critic::More"                => "1.003",
+  "Perl::Critic::Pulp"                => 96,
   "Test::DZil"                        => 0,
+  "Test::Exception"                   => 0,
+  "Test::Pod::Coverage"               => "1.10",
   "Test::Version"                     => "0.04",
   "namespace::autoclean"              => 0
 );

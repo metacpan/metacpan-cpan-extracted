@@ -11,7 +11,13 @@ use English qw( -no_match_vars );
 use DirHandle();
 use POSIX();
 
-our $VERSION = '0.13';
+BEGIN {
+    if ( $OSNAME eq 'MSWin32' ) {
+        require Win32API::Registry;
+    }
+}
+
+our $VERSION = '0.14';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -73,6 +79,14 @@ sub _TIMEZONE_FULL_NAME_REGEX {
     return qr/(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?/smx;
 }
 
+sub _WIN32_ERROR_FILE_NOT_FOUND {
+    return 2;
+}    # ERROR_FILE_NOT_FOUND from winerror.h
+
+sub _WIN32_ERROR_NO_MORE_ITEMS {
+    return 259;
+}    # ERROR_NO_MORE_ITEMS from winerror.h
+
 my $_default_zoneinfo_directory = '/usr/share/zoneinfo';
 if ( -e $_default_zoneinfo_directory ) {
 }
@@ -80,9 +94,478 @@ else {
     if ( -e '/usr/lib/zoneinfo' ) {
         $_default_zoneinfo_directory = '/usr/lib/zoneinfo';
     }
+    elsif ( -e '/usr/share/lib/zoneinfo' ) {    # solaris
+        $_default_zoneinfo_directory = '/usr/share/lib/zoneinfo';
+    }
 }
 my $_zonetab_cache = {};
 my $_tzdata_cache  = {};
+
+# source of olson => win32 timezones
+# used to be http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml
+# now is     https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml
+
+my %olson_to_win32_timezones = (
+    'Africa/Abidjan'                 => 'Greenwich Standard Time',
+    'Africa/Accra'                   => 'Greenwich Standard Time',
+    'Africa/Addis_Ababa'             => 'E. Africa Standard Time',
+    'Africa/Algiers'                 => 'W. Central Africa Standard Time',
+    'Africa/Asmera'                  => 'E. Africa Standard Time',
+    'Africa/Bamako'                  => 'Greenwich Standard Time',
+    'Africa/Bangui'                  => 'W. Central Africa Standard Time',
+    'Africa/Banjul'                  => 'Greenwich Standard Time',
+    'Africa/Bissau'                  => 'Greenwich Standard Time',
+    'Africa/Blantyre'                => 'South Africa Standard Time',
+    'Africa/Brazzaville'             => 'W. Central Africa Standard Time',
+    'Africa/Bujumbura'               => 'South Africa Standard Time',
+    'Africa/Cairo'                   => 'Egypt Standard Time',
+    'Africa/Casablanca'              => 'Morocco Standard Time',
+    'Africa/Ceuta'                   => 'Romance Standard Time',
+    'Africa/Conakry'                 => 'Greenwich Standard Time',
+    'Africa/Dakar'                   => 'Greenwich Standard Time',
+    'Africa/Dar_es_Salaam'           => 'E. Africa Standard Time',
+    'Africa/Djibouti'                => 'E. Africa Standard Time',
+    'Africa/Douala'                  => 'W. Central Africa Standard Time',
+    'Africa/El_Aaiun'                => 'Morocco Standard Time',
+    'Africa/Freetown'                => 'Greenwich Standard Time',
+    'Africa/Gaborone'                => 'South Africa Standard Time',
+    'Africa/Harare'                  => 'South Africa Standard Time',
+    'Africa/Johannesburg'            => 'South Africa Standard Time',
+    'Africa/Juba'                    => 'E. Africa Standard Time',
+    'Africa/Kampala'                 => 'E. Africa Standard Time',
+    'Africa/Khartoum'                => 'E. Africa Standard Time',
+    'Africa/Kigali'                  => 'South Africa Standard Time',
+    'Africa/Kinshasa'                => 'W. Central Africa Standard Time',
+    'Africa/Lagos'                   => 'W. Central Africa Standard Time',
+    'Africa/Libreville'              => 'W. Central Africa Standard Time',
+    'Africa/Lome'                    => 'Greenwich Standard Time',
+    'Africa/Luanda'                  => 'W. Central Africa Standard Time',
+    'Africa/Lubumbashi'              => 'South Africa Standard Time',
+    'Africa/Lusaka'                  => 'South Africa Standard Time',
+    'Africa/Malabo'                  => 'W. Central Africa Standard Time',
+    'Africa/Maputo'                  => 'South Africa Standard Time',
+    'Africa/Maseru'                  => 'South Africa Standard Time',
+    'Africa/Mbabane'                 => 'South Africa Standard Time',
+    'Africa/Mogadishu'               => 'E. Africa Standard Time',
+    'Africa/Monrovia'                => 'Greenwich Standard Time',
+    'Africa/Nairobi'                 => 'E. Africa Standard Time',
+    'Africa/Ndjamena'                => 'W. Central Africa Standard Time',
+    'Africa/Niamey'                  => 'W. Central Africa Standard Time',
+    'Africa/Nouakchott'              => 'Greenwich Standard Time',
+    'Africa/Ouagadougou'             => 'Greenwich Standard Time',
+    'Africa/Porto-Novo'              => 'W. Central Africa Standard Time',
+    'Africa/Sao_Tome'                => 'Greenwich Standard Time',
+    'Africa/Tripoli'                 => 'Libya Standard Time',
+    'Africa/Tunis'                   => 'W. Central Africa Standard Time',
+    'Africa/Windhoek'                => 'Namibia Standard Time',
+    'America/Adak'                   => 'Aleutian Standard Time',
+    'America/Anchorage'              => 'Alaskan Standard Time',
+    'America/Anguilla'               => 'SA Western Standard Time',
+    'America/Antigua'                => 'SA Western Standard Time',
+    'America/Araguaina'              => 'Tocantins Standard Time',
+    'America/Argentina/La_Rioja'     => 'Argentina Standard Time',
+    'America/Argentina/Rio_Gallegos' => 'Argentina Standard Time',
+    'America/Argentina/Salta'        => 'Argentina Standard Time',
+    'America/Argentina/San_Juan'     => 'Argentina Standard Time',
+    'America/Argentina/San_Luis'     => 'Argentina Standard Time',
+    'America/Argentina/Tucuman'      => 'Argentina Standard Time',
+    'America/Argentina/Ushuaia'      => 'Argentina Standard Time',
+    'America/Aruba'                  => 'SA Western Standard Time',
+    'America/Asuncion'               => 'Paraguay Standard Time',
+    'America/Bahia'                  => 'Bahia Standard Time',
+    'America/Bahia_Banderas'         => 'Central Standard Time (Mexico)',
+    'America/Barbados'               => 'SA Western Standard Time',
+    'America/Belem'                  => 'SA Eastern Standard Time',
+    'America/Belize'                 => 'Central America Standard Time',
+    'America/Blanc-Sablon'           => 'SA Western Standard Time',
+    'America/Boa_Vista'              => 'SA Western Standard Time',
+    'America/Bogota'                 => 'SA Pacific Standard Time',
+    'America/Boise'                  => 'Mountain Standard Time',
+    'America/Buenos_Aires'           => 'Argentina Standard Time',
+    'America/Cambridge_Bay'          => 'Mountain Standard Time',
+    'America/Campo_Grande'           => 'Central Brazilian Standard Time',
+    'America/Cancun'                 => 'Eastern Standard Time (Mexico)',
+    'America/Caracas'                => 'Venezuela Standard Time',
+    'America/Catamarca'              => 'Argentina Standard Time',
+    'America/Cayenne'                => 'SA Eastern Standard Time',
+    'America/Cayman'                 => 'SA Pacific Standard Time',
+    'America/Chicago'                => 'Central Standard Time',
+    'America/Chihuahua'              => 'Mountain Standard Time (Mexico)',
+    'America/Coral_Harbour'          => 'SA Pacific Standard Time',
+    'America/Cordoba'                => 'Argentina Standard Time',
+    'America/Costa_Rica'             => 'Central America Standard Time',
+    'America/Creston'                => 'US Mountain Standard Time',
+    'America/Cuiaba'                 => 'Central Brazilian Standard Time',
+    'America/Curacao'                => 'SA Western Standard Time',
+    'America/Danmarkshavn'           => 'UTC',
+    'America/Dawson'                 => 'Pacific Standard Time',
+    'America/Dawson_Creek'           => 'US Mountain Standard Time',
+    'America/Denver'                 => 'Mountain Standard Time',
+    'America/Detroit'                => 'Eastern Standard Time',
+    'America/Dominica'               => 'SA Western Standard Time',
+    'America/Edmonton'               => 'Mountain Standard Time',
+    'America/Eirunepe'               => 'SA Pacific Standard Time',
+    'America/El_Salvador'            => 'Central America Standard Time',
+    'America/Fort_Nelson'            => 'US Mountain Standard Time',
+    'America/Fortaleza'              => 'SA Eastern Standard Time',
+    'America/Glace_Bay'              => 'Atlantic Standard Time',
+    'America/Godthab'                => 'Greenland Standard Time',
+    'America/Goose_Bay'              => 'Atlantic Standard Time',
+    'America/Grand_Turk'             => 'Turks And Caicos Standard Time',
+    'America/Grenada'                => 'SA Western Standard Time',
+    'America/Guadeloupe'             => 'SA Western Standard Time',
+    'America/Guatemala'              => 'Central America Standard Time',
+    'America/Guayaquil'              => 'SA Pacific Standard Time',
+    'America/Guyana'                 => 'SA Western Standard Time',
+    'America/Halifax'                => 'Atlantic Standard Time',
+    'America/Havana'                 => 'Cuba Standard Time',
+    'America/Hermosillo'             => 'US Mountain Standard Time',
+    'America/Indiana/Knox'           => 'Central Standard Time',
+    'America/Indiana/Marengo'        => 'US Eastern Standard Time',
+    'America/Indiana/Petersburg'     => 'Eastern Standard Time',
+    'America/Indiana/Tell_City'      => 'Central Standard Time',
+    'America/Indiana/Vevay'          => 'US Eastern Standard Time',
+    'America/Indiana/Vincennes'      => 'Eastern Standard Time',
+    'America/Indiana/Winamac'        => 'Eastern Standard Time',
+    'America/Indianapolis'           => 'US Eastern Standard Time',
+    'America/Inuvik'                 => 'Mountain Standard Time',
+    'America/Iqaluit'                => 'Eastern Standard Time',
+    'America/Jamaica'                => 'SA Pacific Standard Time',
+    'America/Jujuy'                  => 'Argentina Standard Time',
+    'America/Juneau'                 => 'Alaskan Standard Time',
+    'America/Kentucky/Monticello'    => 'Eastern Standard Time',
+    'America/Kralendijk'             => 'SA Western Standard Time',
+    'America/La_Paz'                 => 'SA Western Standard Time',
+    'America/Lima'                   => 'SA Pacific Standard Time',
+    'America/Los_Angeles'            => 'Pacific Standard Time',
+    'America/Louisville'             => 'Eastern Standard Time',
+    'America/Lower_Princes'          => 'SA Western Standard Time',
+    'America/Maceio'                 => 'SA Eastern Standard Time',
+    'America/Managua'                => 'Central America Standard Time',
+    'America/Manaus'                 => 'SA Western Standard Time',
+    'America/Marigot'                => 'SA Western Standard Time',
+    'America/Martinique'             => 'SA Western Standard Time',
+    'America/Matamoros'              => 'Central Standard Time',
+    'America/Mazatlan'               => 'Mountain Standard Time (Mexico)',
+    'America/Mendoza'                => 'Argentina Standard Time',
+    'America/Menominee'              => 'Central Standard Time',
+    'America/Merida'                 => 'Central Standard Time (Mexico)',
+    'America/Metlakatla'             => 'Alaskan Standard Time',
+    'America/Mexico_City'            => 'Central Standard Time (Mexico)',
+    'America/Miquelon'               => 'Saint Pierre Standard Time',
+    'America/Moncton'                => 'Atlantic Standard Time',
+    'America/Monterrey'              => 'Central Standard Time (Mexico)',
+    'America/Montevideo'             => 'Montevideo Standard Time',
+    'America/Montreal'               => 'Eastern Standard Time',
+    'America/Montserrat'             => 'SA Western Standard Time',
+    'America/Nassau'                 => 'Eastern Standard Time',
+    'America/New_York'               => 'Eastern Standard Time',
+    'America/Nipigon'                => 'Eastern Standard Time',
+    'America/Nome'                   => 'Alaskan Standard Time',
+    'America/Noronha'                => 'UTC-02',
+    'America/North_Dakota/Beulah'    => 'Central Standard Time',
+    'America/North_Dakota/Center'    => 'Central Standard Time',
+    'America/North_Dakota/New_Salem' => 'Central Standard Time',
+    'America/Ojinaga'                => 'Mountain Standard Time',
+    'America/Panama'                 => 'SA Pacific Standard Time',
+    'America/Pangnirtung'            => 'Eastern Standard Time',
+    'America/Paramaribo'             => 'SA Eastern Standard Time',
+    'America/Phoenix'                => 'US Mountain Standard Time',
+    'America/Port-au-Prince'         => 'Haiti Standard Time',
+    'America/Port_of_Spain'          => 'SA Western Standard Time',
+    'America/Porto_Velho'            => 'SA Western Standard Time',
+    'America/Puerto_Rico'            => 'SA Western Standard Time',
+    'America/Punta_Arenas'           => 'SA Eastern Standard Time',
+    'America/Rainy_River'            => 'Central Standard Time',
+    'America/Rankin_Inlet'           => 'Central Standard Time',
+    'America/Recife'                 => 'SA Eastern Standard Time',
+    'America/Regina'                 => 'Canada Central Standard Time',
+    'America/Resolute'               => 'Central Standard Time',
+    'America/Rio_Branco'             => 'SA Pacific Standard Time',
+    'America/Santa_Isabel'           => 'Pacific Standard Time (Mexico)',
+    'America/Santarem'               => 'SA Eastern Standard Time',
+    'America/Santiago'               => 'Pacific SA Standard Time',
+    'America/Santo_Domingo'          => 'SA Western Standard Time',
+    'America/Sao_Paulo'              => 'E. South America Standard Time',
+    'America/Scoresbysund'           => 'Azores Standard Time',
+    'America/Sitka'                  => 'Alaskan Standard Time',
+    'America/St_Barthelemy'          => 'SA Western Standard Time',
+    'America/St_Johns'               => 'Newfoundland Standard Time',
+    'America/St_Kitts'               => 'SA Western Standard Time',
+    'America/St_Lucia'               => 'SA Western Standard Time',
+    'America/St_Thomas'              => 'SA Western Standard Time',
+    'America/St_Vincent'             => 'SA Western Standard Time',
+    'America/Swift_Current'          => 'Canada Central Standard Time',
+    'America/Tegucigalpa'            => 'Central America Standard Time',
+    'America/Thule'                  => 'Atlantic Standard Time',
+    'America/Thunder_Bay'            => 'Eastern Standard Time',
+    'America/Tijuana'                => 'Pacific Standard Time (Mexico)',
+    'America/Toronto'                => 'Eastern Standard Time',
+    'America/Tortola'                => 'SA Western Standard Time',
+    'America/Vancouver'              => 'Pacific Standard Time',
+    'America/Whitehorse'             => 'Pacific Standard Time',
+    'America/Winnipeg'               => 'Central Standard Time',
+    'America/Yakutat'                => 'Alaskan Standard Time',
+    'America/Yellowknife'            => 'Mountain Standard Time',
+    'Antarctica/Casey'               => 'Central Pacific Standard Time',
+    'Antarctica/Davis'               => 'SE Asia Standard Time',
+    'Antarctica/DumontDUrville'      => 'West Pacific Standard Time',
+    'Antarctica/Macquarie'           => 'Central Pacific Standard Time',
+    'Antarctica/Mawson'              => 'West Asia Standard Time',
+    'Antarctica/McMurdo'             => 'New Zealand Standard Time',
+    'Antarctica/Palmer'              => 'SA Eastern Standard Time',
+    'Antarctica/Rothera'             => 'SA Eastern Standard Time',
+    'Antarctica/Syowa'               => 'E. Africa Standard Time',
+    'Antarctica/Vostok'              => 'Central Asia Standard Time',
+    'Arctic/Longyearbyen'            => 'W. Europe Standard Time',
+    'Asia/Aden'                      => 'Arab Standard Time',
+    'Asia/Almaty'                    => 'Central Asia Standard Time',
+    'Asia/Amman'                     => 'Jordan Standard Time',
+    'Asia/Anadyr'                    => 'Russia Time Zone 11',
+    'Asia/Aqtau'                     => 'West Asia Standard Time',
+    'Asia/Aqtobe'                    => 'West Asia Standard Time',
+    'Asia/Ashgabat'                  => 'West Asia Standard Time',
+    'Asia/Atyrau'                    => 'West Asia Standard Time',
+    'Asia/Baghdad'                   => 'Arabic Standard Time',
+    'Asia/Bahrain'                   => 'Arab Standard Time',
+    'Asia/Baku'                      => 'Azerbaijan Standard Time',
+    'Asia/Bangkok'                   => 'SE Asia Standard Time',
+    'Asia/Barnaul'                   => 'Altai Standard Time',
+    'Asia/Beirut'                    => 'Middle East Standard Time',
+    'Asia/Bishkek'                   => 'Central Asia Standard Time',
+    'Asia/Brunei'                    => 'Singapore Standard Time',
+    'Asia/Calcutta'                  => 'India Standard Time',
+    'Asia/Chita'                     => 'Transbaikal Standard Time',
+    'Asia/Choibalsan'                => 'Ulaanbaatar Standard Time',
+    'Asia/Colombo'                   => 'Sri Lanka Standard Time',
+    'Asia/Damascus'                  => 'Syria Standard Time',
+    'Asia/Dhaka'                     => 'Bangladesh Standard Time',
+    'Asia/Dili'                      => 'Tokyo Standard Time',
+    'Asia/Dubai'                     => 'Arabian Standard Time',
+    'Asia/Dushanbe'                  => 'West Asia Standard Time',
+    'Asia/Famagusta'                 => 'Turkey Standard Time',
+    'Asia/Gaza'                      => 'West Bank Standard Time',
+    'Asia/Hebron'                    => 'West Bank Standard Time',
+    'Asia/Hong_Kong'                 => 'China Standard Time',
+    'Asia/Hovd'                      => 'W. Mongolia Standard Time',
+    'Asia/Irkutsk'                   => 'North Asia East Standard Time',
+    'Asia/Jakarta'                   => 'SE Asia Standard Time',
+    'Asia/Jayapura'                  => 'Tokyo Standard Time',
+    'Asia/Jerusalem'                 => 'Israel Standard Time',
+    'Asia/Kabul'                     => 'Afghanistan Standard Time',
+    'Asia/Kamchatka'                 => 'Russia Time Zone 11',
+    'Asia/Karachi'                   => 'Pakistan Standard Time',
+    'Asia/Katmandu'                  => 'Nepal Standard Time',
+    'Asia/Khandyga'                  => 'Yakutsk Standard Time',
+    'Asia/Krasnoyarsk'               => 'North Asia Standard Time',
+    'Asia/Kuala_Lumpur'              => 'Singapore Standard Time',
+    'Asia/Kuching'                   => 'Singapore Standard Time',
+    'Asia/Kuwait'                    => 'Arab Standard Time',
+    'Asia/Macau'                     => 'China Standard Time',
+    'Asia/Magadan'                   => 'Magadan Standard Time',
+    'Asia/Makassar'                  => 'Singapore Standard Time',
+    'Asia/Manila'                    => 'Singapore Standard Time',
+    'Asia/Muscat'                    => 'Arabian Standard Time',
+    'Asia/Nicosia'                   => 'GTB Standard Time',
+    'Asia/Novokuznetsk'              => 'North Asia Standard Time',
+    'Asia/Novosibirsk'               => 'N. Central Asia Standard Time',
+    'Asia/Omsk'                      => 'Omsk Standard Time',
+    'Asia/Qostanay'                  => 'Central Asia Standard Time',
+    'Asia/Oral'                      => 'West Asia Standard Time',
+    'Asia/Phnom_Penh'                => 'SE Asia Standard Time',
+    'Asia/Pontianak'                 => 'SE Asia Standard Time',
+    'Asia/Pyongyang'                 => 'North Korea Standard Time',
+    'Asia/Qatar'                     => 'Arab Standard Time',
+    'Asia/Qyzylorda'                 => 'Central Asia Standard Time',
+    'Asia/Rangoon'                   => 'Myanmar Standard Time',
+    'Asia/Riyadh'                    => 'Arab Standard Time',
+    'Asia/Saigon'                    => 'SE Asia Standard Time',
+    'Asia/Sakhalin'                  => 'Sakhalin Standard Time',
+    'Asia/Samarkand'                 => 'West Asia Standard Time',
+    'Asia/Seoul'                     => 'Korea Standard Time',
+    'Asia/Shanghai'                  => 'China Standard Time',
+    'Asia/Singapore'                 => 'Singapore Standard Time',
+    'Asia/Srednekolymsk'             => 'Russia Time Zone 10',
+    'Asia/Taipei'                    => 'Taipei Standard Time',
+    'Asia/Tashkent'                  => 'West Asia Standard Time',
+    'Asia/Tbilisi'                   => 'Georgian Standard Time',
+    'Asia/Tehran'                    => 'Iran Standard Time',
+    'Asia/Thimphu'                   => 'Bangladesh Standard Time',
+    'Asia/Tokyo'                     => 'Tokyo Standard Time',
+    'Asia/Tomsk'                     => 'Tomsk Standard Time',
+    'Asia/Ulaanbaatar'               => 'Ulaanbaatar Standard Time',
+    'Asia/Urumqi'                    => 'Central Asia Standard Time',
+    'Asia/Ust-Nera'                  => 'Vladivostok Standard Time',
+    'Asia/Vientiane'                 => 'SE Asia Standard Time',
+    'Asia/Vladivostok'               => 'Vladivostok Standard Time',
+    'Asia/Yakutsk'                   => 'Yakutsk Standard Time',
+    'Asia/Yekaterinburg'             => 'Ekaterinburg Standard Time',
+    'Asia/Yerevan'                   => 'Caucasus Standard Time',
+    'Atlantic/Azores'                => 'Azores Standard Time',
+    'Atlantic/Bermuda'               => 'Atlantic Standard Time',
+    'Atlantic/Canary'                => 'GMT Standard Time',
+    'Atlantic/Cape_Verde'            => 'Cape Verde Standard Time',
+    'Atlantic/Faeroe'                => 'GMT Standard Time',
+    'Atlantic/Madeira'               => 'GMT Standard Time',
+    'Atlantic/Reykjavik'             => 'Greenwich Standard Time',
+    'Atlantic/South_Georgia'         => 'UTC-02',
+    'Atlantic/St_Helena'             => 'Greenwich Standard Time',
+    'Atlantic/Stanley'               => 'SA Eastern Standard Time',
+    'Australia/Adelaide'             => 'Cen. Australia Standard Time',
+    'Australia/Brisbane'             => 'E. Australia Standard Time',
+    'Australia/Broken_Hill'          => 'Cen. Australia Standard Time',
+    'Australia/Currie'               => 'Tasmania Standard Time',
+    'Australia/Darwin'               => 'AUS Central Standard Time',
+    'Australia/Eucla'                => 'Aus Central W. Standard Time',
+    'Australia/Hobart'               => 'Tasmania Standard Time',
+    'Australia/Lindeman'             => 'E. Australia Standard Time',
+    'Australia/Lord_Howe'            => 'Lord Howe Standard Time',
+    'Australia/Melbourne'            => 'AUS Eastern Standard Time',
+    'Australia/Perth'                => 'W. Australia Standard Time',
+    'Australia/Sydney'               => 'AUS Eastern Standard Time',
+    'CST6CDT'                        => 'Central Standard Time',
+    'EST5EDT'                        => 'Eastern Standard Time',
+    'Etc/GMT'                        => 'UTC',
+    'Etc/GMT+1'                      => 'Cape Verde Standard Time',
+    'Etc/GMT+10'                     => 'Hawaiian Standard Time',
+    'Etc/GMT+11'                     => 'UTC-11',
+    'Etc/GMT+12'                     => 'Dateline Standard Time',
+    'Etc/GMT+2'                      => 'UTC-02',
+    'Etc/GMT+3'                      => 'SA Eastern Standard Time',
+    'Etc/GMT+4'                      => 'SA Western Standard Time',
+    'Etc/GMT+5'                      => 'SA Pacific Standard Time',
+    'Etc/GMT+6'                      => 'Central America Standard Time',
+    'Etc/GMT+7'                      => 'US Mountain Standard Time',
+    'Etc/GMT+8'                      => 'UTC-08',
+    'Etc/GMT+9'                      => 'UTC-09',
+    'Etc/GMT-1'                      => 'W. Central Africa Standard Time',
+    'Etc/GMT-10'                     => 'West Pacific Standard Time',
+    'Etc/GMT-11'                     => 'Central Pacific Standard Time',
+    'Etc/GMT-12'                     => 'UTC+12',
+    'Etc/GMT-13'                     => 'Tonga Standard Time',
+    'Etc/GMT-14'                     => 'Line Islands Standard Time',
+    'Etc/GMT-2'                      => 'South Africa Standard Time',
+    'Etc/GMT-3'                      => 'E. Africa Standard Time',
+    'Etc/GMT-4'                      => 'Arabian Standard Time',
+    'Etc/GMT-5'                      => 'West Asia Standard Time',
+    'Etc/GMT-6'                      => 'Central Asia Standard Time',
+    'Etc/GMT-7'                      => 'SE Asia Standard Time',
+    'Etc/GMT-8'                      => 'Singapore Standard Time',
+    'Etc/GMT-9'                      => 'Tokyo Standard Time',
+    'Etc/UTC'                        => 'UTC',
+    'Europe/Amsterdam'               => 'W. Europe Standard Time',
+    'Europe/Andorra'                 => 'W. Europe Standard Time',
+    'Europe/Astrakhan'               => 'Astrakhan Standard Time',
+    'Europe/Athens'                  => 'GTB Standard Time',
+    'Europe/Belgrade'                => 'Central Europe Standard Time',
+    'Europe/Berlin'                  => 'W. Europe Standard Time',
+    'Europe/Bratislava'              => 'Central Europe Standard Time',
+    'Europe/Brussels'                => 'Romance Standard Time',
+    'Europe/Bucharest'               => 'GTB Standard Time',
+    'Europe/Budapest'                => 'Central Europe Standard Time',
+    'Europe/Busingen'                => 'W. Europe Standard Time',
+    'Europe/Chisinau'                => 'E. Europe Standard Time',
+    'Europe/Copenhagen'              => 'Romance Standard Time',
+    'Europe/Dublin'                  => 'GMT Standard Time',
+    'Europe/Gibraltar'               => 'W. Europe Standard Time',
+    'Europe/Guernsey'                => 'GMT Standard Time',
+    'Europe/Helsinki'                => 'FLE Standard Time',
+    'Europe/Isle_of_Man'             => 'GMT Standard Time',
+    'Europe/Istanbul'                => 'Turkey Standard Time',
+    'Europe/Jersey'                  => 'GMT Standard Time',
+    'Europe/Kaliningrad'             => 'Kaliningrad Standard Time',
+    'Europe/Kiev'                    => 'FLE Standard Time',
+    'Europe/Kirov'                   => 'Russian Standard Time',
+    'Europe/Lisbon'                  => 'GMT Standard Time',
+    'Europe/Ljubljana'               => 'Central Europe Standard Time',
+    'Europe/London'                  => 'GMT Standard Time',
+    'Europe/Luxembourg'              => 'W. Europe Standard Time',
+    'Europe/Madrid'                  => 'Romance Standard Time',
+    'Europe/Malta'                   => 'W. Europe Standard Time',
+    'Europe/Mariehamn'               => 'FLE Standard Time',
+    'Europe/Minsk'                   => 'Belarus Standard Time',
+    'Europe/Monaco'                  => 'W. Europe Standard Time',
+    'Europe/Moscow'                  => 'Russian Standard Time',
+    'Europe/Oslo'                    => 'W. Europe Standard Time',
+    'Europe/Paris'                   => 'Romance Standard Time',
+    'Europe/Podgorica'               => 'Central Europe Standard Time',
+    'Europe/Prague'                  => 'Central Europe Standard Time',
+    'Europe/Riga'                    => 'FLE Standard Time',
+    'Europe/Rome'                    => 'W. Europe Standard Time',
+    'Europe/Samara'                  => 'Russia Time Zone 3',
+    'Europe/San_Marino'              => 'W. Europe Standard Time',
+    'Europe/Sarajevo'                => 'Central European Standard Time',
+    'Europe/Saratov'                 => 'Astrakhan Standard Time',
+    'Europe/Simferopol'              => 'Russian Standard Time',
+    'Europe/Skopje'                  => 'Central European Standard Time',
+    'Europe/Sofia'                   => 'FLE Standard Time',
+    'Europe/Stockholm'               => 'W. Europe Standard Time',
+    'Europe/Tallinn'                 => 'FLE Standard Time',
+    'Europe/Tirane'                  => 'Central Europe Standard Time',
+    'Europe/Ulyanovsk'               => 'Astrakhan Standard Time',
+    'Europe/Uzhgorod'                => 'FLE Standard Time',
+    'Europe/Vaduz'                   => 'W. Europe Standard Time',
+    'Europe/Vatican'                 => 'W. Europe Standard Time',
+    'Europe/Vienna'                  => 'W. Europe Standard Time',
+    'Europe/Vilnius'                 => 'FLE Standard Time',
+    'Europe/Volgograd'               => 'Russian Standard Time',
+    'Europe/Warsaw'                  => 'Central European Standard Time',
+    'Europe/Zagreb'                  => 'Central European Standard Time',
+    'Europe/Zaporozhye'              => 'FLE Standard Time',
+    'Europe/Zurich'                  => 'W. Europe Standard Time',
+    'Indian/Antananarivo'            => 'E. Africa Standard Time',
+    'Indian/Chagos'                  => 'Central Asia Standard Time',
+    'Indian/Christmas'               => 'SE Asia Standard Time',
+    'Indian/Cocos'                   => 'Myanmar Standard Time',
+    'Indian/Comoro'                  => 'E. Africa Standard Time',
+    'Indian/Kerguelen'               => 'West Asia Standard Time',
+    'Indian/Mahe'                    => 'Mauritius Standard Time',
+    'Indian/Maldives'                => 'West Asia Standard Time',
+    'Indian/Mauritius'               => 'Mauritius Standard Time',
+    'Indian/Mayotte'                 => 'E. Africa Standard Time',
+    'Indian/Reunion'                 => 'Mauritius Standard Time',
+    'MST7MDT'                        => 'Mountain Standard Time',
+    'PST8PDT'                        => 'Pacific Standard Time',
+    'Pacific/Apia'                   => 'Samoa Standard Time',
+    'Pacific/Auckland'               => 'New Zealand Standard Time',
+    'Pacific/Bougainville'           => 'Bougainville Standard Time',
+    'Pacific/Chatham'                => 'Chatham Islands Standard Time',
+    'Pacific/Easter'                 => 'Easter Island Standard Time',
+    'Pacific/Efate'                  => 'Central Pacific Standard Time',
+    'Pacific/Enderbury'              => 'Tonga Standard Time',
+    'Pacific/Fakaofo'                => 'Tonga Standard Time',
+    'Pacific/Fiji'                   => 'Fiji Standard Time',
+    'Pacific/Funafuti'               => 'UTC+12',
+    'Pacific/Galapagos'              => 'Central America Standard Time',
+    'Pacific/Gambier'                => 'UTC-09',
+    'Pacific/Guadalcanal'            => 'Central Pacific Standard Time',
+    'Pacific/Guam'                   => 'West Pacific Standard Time',
+    'Pacific/Honolulu'               => 'Hawaiian Standard Time',
+    'Pacific/Johnston'               => 'Hawaiian Standard Time',
+    'Pacific/Kiritimati'             => 'Line Islands Standard Time',
+    'Pacific/Kosrae'                 => 'Central Pacific Standard Time',
+    'Pacific/Kwajalein'              => 'UTC+12',
+    'Pacific/Majuro'                 => 'UTC+12',
+    'Pacific/Marquesas'              => 'Marquesas Standard Time',
+    'Pacific/Midway'                 => 'UTC-11',
+    'Pacific/Nauru'                  => 'UTC+12',
+    'Pacific/Niue'                   => 'UTC-11',
+    'Pacific/Norfolk'                => 'Norfolk Standard Time',
+    'Pacific/Noumea'                 => 'Central Pacific Standard Time',
+    'Pacific/Pago_Pago'              => 'UTC-11',
+    'Pacific/Palau'                  => 'Tokyo Standard Time',
+    'Pacific/Pitcairn'               => 'UTC-08',
+    'Pacific/Ponape'                 => 'Central Pacific Standard Time',
+    'Pacific/Port_Moresby'           => 'West Pacific Standard Time',
+    'Pacific/Rarotonga'              => 'Hawaiian Standard Time',
+    'Pacific/Saipan'                 => 'West Pacific Standard Time',
+    'Pacific/Tahiti'                 => 'Hawaiian Standard Time',
+    'Pacific/Tarawa'                 => 'UTC+12',
+    'Pacific/Tongatapu'              => 'Tonga Standard Time',
+    'Pacific/Truk'                   => 'West Pacific Standard Time',
+    'Pacific/Wake'                   => 'UTC+12',
+    'Pacific/Wallis'                 => 'UTC+12',
+);
 
 sub _DEFAULT_ZONEINFO_DIRECTORY { return $_default_zoneinfo_directory }
 
@@ -94,8 +577,7 @@ sub new {
         && ( !$params{directory} )
         && ( !$ENV{TZDIR} ) )
     {
-        require Time::Zone::Olson::Win32;
-        bless $self, 'Time::Zone::Olson::Win32';
+        $self->{_win32_registry} = 1;
     }
     else {
         $self->directory( $params{directory}
@@ -224,6 +706,25 @@ sub _tz_definition_equiv {
 
 sub _timezones {
     my ($self) = @_;
+    if ( $self->win32_registry() ) {
+        return $self->_win32_timezones();
+    }
+    else {
+        return $self->_unix_timezones();
+    }
+}
+
+sub _win32_timezones {
+    my ($self)  = @_;
+    my $class   = ref $self;
+    my %mapping = $class->win32_mapping();
+    $self->{_zones} = [ keys %mapping ];
+    my @sorted_zones = sort { $a cmp $b } @{ $self->{_zones} };
+    return @sorted_zones;
+}
+
+sub _unix_timezones {
+    my ($self) = @_;
     my $path = File::Spec->catfile( $self->directory(), 'zone.tab' );
     my $handle = FileHandle->new($path)
       or Carp::croak("Failed to open $path for reading:$EXTENDED_OS_ERROR");
@@ -309,6 +810,9 @@ sub comment {
     my ( $self, $tz ) = @_;
     $tz ||= $self->timezone();
     $self->_timezones();
+    if ( $self->win32_registry() ) {
+        $self->_read_win32_tzfile($tz);
+    }
     if ( defined $self->{_comments}->{$tz} ) {
         return $self->{_comments}->{$tz};
     }
@@ -336,13 +840,11 @@ sub timezone {
             if ( $new =~ /^$timezone_full_name_regex$/smx ) {
                 $self->{area}     = $LAST_PAREN_MATCH{area};
                 $self->{location} = $LAST_PAREN_MATCH{location};
-                if (   ( $OSNAME eq 'MSWin32' )
-                    && ( !defined $self->directory() ) )
-                {
-                    my %mapping = Time::Zone::Olson::Win32->mapping();
+                if ( $self->win32_registry() ) {
+                    my %mapping = Time::Zone::Olson->win32_mapping();
                     if ( !defined $mapping{$new} ) {
                         Carp::croak(
-"'$new' is not an timezone in the existing Win32 registry"
+"'$new' is not an time zone in the existing Win32 registry"
                         );
                     }
                 }
@@ -350,7 +852,7 @@ sub timezone {
                     my $path = File::Spec->catfile( $self->directory(), $new );
                     if ( !-f $path ) {
                         Carp::croak(
-"'$new' is not an timezone in the existing Olson database"
+"'$new' is not an time zone in the existing Olson database"
                         );
                     }
                 }
@@ -1334,7 +1836,7 @@ sub _read_tz_definition {
     if ( defined $result ) {
         if ( $result == _MAX_LENGTH_FOR_TRAILING_TZ_DEFINITION() ) {
             Carp::croak(
-                    "The tz defintion at the end of $path could not be read in "
+                "The tz definition at the end of $path could not be read in "
                   . _MAX_LENGTH_FOR_TRAILING_TZ_DEFINITION()
                   . ' bytes' );
         }
@@ -1421,7 +1923,7 @@ qr/(?:$end_julian_without_feb29_regex|$end_julian_with_feb29_regex|$end_month_we
     }
     else {
         Carp::croak(
-            "Failed to parse the tz defintion of $tz_variable from $path");
+            "Failed to parse the tz definition of $tz_variable from $path");
     }
 }
 
@@ -1608,10 +2110,78 @@ sub _read_v2_tzfile {
     return;
 }
 
+sub _read_win32_tzfile {
+    my ( $self, $tz ) = @_;
+    if ( $self->{_tzdata}->{$tz}->{tz_definition} ) {
+        return;
+    }
+    my $timezone_specific_registry_path =
+"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones\\$olson_to_win32_timezones{$tz}";
+    Win32API::Registry::RegOpenKeyEx(
+        Win32API::Registry::HKEY_LOCAL_MACHINE(),
+        $timezone_specific_registry_path,
+        0,
+        Win32API::Registry::KEY_QUERY_VALUE(),
+        my $timezone_specific_subkey,
+      )
+      or Carp::croak(
+"Failed to open LOCAL_MACHINE\\$timezone_specific_registry_path:$EXTENDED_OS_ERROR"
+      );
+    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Dlt', [],
+        [], my $daylight_name, [] )
+      or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dlt:$EXTENDED_OS_ERROR"
+      );
+    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Std', [],
+        [], my $standard_name, [] )
+      or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Std:$EXTENDED_OS_ERROR"
+      );
+    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Display',
+        [], [], my $comment, [] )
+      or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Std:$EXTENDED_OS_ERROR"
+      );
+    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'TZI', [],
+        [], my $binary, [] )
+      or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\TZI:$EXTENDED_OS_ERROR"
+      );
+
+    my %mapping = Time::Zone::Olson->win32_mapping();
+
+    $self->{_comments}->{$tz} = $comment;
+
+    my $tz_definition = $self->_unpack_win32_tzi_structure($binary);
+
+    $tz_definition->{std_name} = $standard_name;
+    $tz_definition->{dst_name} = $daylight_name;
+
+    $self->_initialise_undefined_tz_definition_values($tz_definition);
+    $self->{_tzdata}->{$tz}->{tz_definition} = $tz_definition;
+    $self->{_tzdata}->{$tz}->{transition_times} =
+      $self->_read_win32_transition_times( $timezone_specific_subkey,
+        $timezone_specific_registry_path );
+
+    Win32API::Registry::RegCloseKey($timezone_specific_subkey)
+      or Carp::croak(
+"Failed to close LOCAL_MACHINE\\$timezone_specific_registry_path:$EXTENDED_OS_ERROR"
+      );
+    return;
+}
+
+sub win32_registry {
+    my ($self) = @_;
+    return $self->{_win32_registry};
+}
+
 sub _read_tzfile {
     my ($self) = @_;
     my $tz = $self->timezone();
-    if (   ( exists $self->{_tzdata}->{$tz}->{no_tz_file} )
+    if ( $self->win32_registry() ) {
+        $self->_read_win32_tzfile($tz);
+    }
+    elsif (( exists $self->{_tzdata}->{$tz}->{no_tz_file} )
         && ( $self->{_tzdata}->{$tz}->{no_tz_file} ) )
     {
     }
@@ -1646,6 +2216,173 @@ sub _read_tzfile {
     return;
 }
 
+sub _unpack_win32_tzi_structure {
+    my ( $self, $binary ) = @_;
+    my (
+        $bias,            $standard_bias,        $daylight_bias,
+        $standard_year,   $standard_month,       $standard_day_of_week,
+        $standard_day,    $standard_hour,        $standard_minute,
+        $standard_second, $standard_millisecond, $daylight_year,
+        $daylight_month,  $daylight_day_of_week, $daylight_day,
+        $daylight_hour,   $daylight_minute,      $daylight_second,
+        $daylight_millisecond
+    ) = unpack 'lllSSSSSSSSSSSSSS', $binary;
+    my $negative_one        = _NEGATIVE_ONE();
+    my $minutes_in_one_hour = _MINUTES_IN_ONE_HOUR();
+    my $tz_definition       = {
+        ( ( $bias + $standard_bias ) < 0 ? ( std_sign => q[-] ) : () ),
+        std_hours => int(
+            ( $bias + $standard_bias ) /
+              _SECONDS_IN_ONE_MINUTE() *
+              ( ( $bias + $standard_bias ) < 0 ? $negative_one : 1 )
+        ),
+        std_minutes => (
+            (
+                ( $bias + $standard_bias ) < 0
+                ? $minutes_in_one_hour -
+                  ( ( $bias + $standard_bias ) % $minutes_in_one_hour )
+                : ( $bias + $standard_bias ) % $minutes_in_one_hour
+            ) % $minutes_in_one_hour
+        ),
+        (
+            $standard_month != 0
+            ? (
+                ( ( $bias + $daylight_bias ) < 0 ? ( dst_sign => q[-] ) : () ),
+                dst_hours => int(
+                    ( $bias + $daylight_bias ) /
+                      _SECONDS_IN_ONE_MINUTE() *
+                      ( ( $bias + $daylight_bias ) < 0 ? $negative_one : 1 )
+                ),
+                dst_minutes => (
+                    (
+                        ( $bias + $daylight_bias ) < 0
+                        ? $minutes_in_one_hour -
+                          ( ( $bias + $daylight_bias ) % $minutes_in_one_hour )
+                        : ( $bias + $daylight_bias ) % $minutes_in_one_hour
+                    ) % $minutes_in_one_hour
+                ),
+                start_month => $daylight_month,
+                end_month   => $standard_month,
+                start_week  => $daylight_day,
+                end_week    => $standard_day,
+                start_day   => $daylight_day_of_week,
+                end_day     => $standard_day_of_week,
+                end_hour    => $standard_hour
+              )
+            : ()
+        ),
+    };
+    return $tz_definition;
+}
+
+sub _read_win32_transition_times {
+    my ( $self, $timezone_specific_subkey, $timezone_specific_registry_path ) =
+      @_;
+    my @transition_times;
+    if (
+        Win32API::Registry::RegOpenKeyEx(
+            $timezone_specific_subkey, 'Dynamic DST',
+            0,                         Win32API::Registry::KEY_QUERY_VALUE(),
+            my $timezone_dst_subkey
+        )
+      )
+    {
+        Win32API::Registry::RegQueryValueEx( $timezone_dst_subkey,
+            'FirstEntry', [], [], my $dword, [] )
+          or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST\\FirstEntry:$EXTENDED_OS_ERROR"
+          );
+        my $first_entry = unpack 'I', $dword;
+        Win32API::Registry::RegQueryValueEx( $timezone_dst_subkey, 'LastEntry',
+            [], [], $dword, [] )
+          or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST\\LastEntry:$EXTENDED_OS_ERROR"
+          );
+        my $last_entry = unpack 'I', $dword;
+        for my $year ( $first_entry .. $last_entry ) {
+            Win32API::Registry::RegQueryValueEx( $timezone_dst_subkey, $year,
+                [], [], my $binary, [] )
+              or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST\\$year:$EXTENDED_OS_ERROR"
+              );
+            my $tz_definition = $self->_unpack_win32_tzi_structure($binary);
+        }
+    }
+    elsif (
+        Win32API::Registry::regLastError() == _WIN32_ERROR_FILE_NOT_FOUND() )
+    {
+    }
+    else {
+        Carp::croak(
+"Failed to open LOCAL_MACHINE\\$timezone_specific_registry_path:$EXTENDED_OS_ERROR"
+        );
+    }
+    return \@transition_times;
+}
+
+sub win32_mapping {
+    my %returned_timezones;
+    if ( $OSNAME eq 'MSWin32' ) {
+        my $timezone_database_registry_path =
+          'SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones';
+        Win32API::Registry::RegOpenKeyEx(
+            Win32API::Registry::HKEY_LOCAL_MACHINE(),
+            $timezone_database_registry_path,
+            0,
+            Win32API::Registry::KEY_QUERY_VALUE() |
+              Win32API::Registry::KEY_ENUMERATE_SUB_KEYS(),
+            my $timezone_database_subkey,
+          )
+          or Carp::croak(
+"Failed to open LOCAL_MACHINE\\$timezone_database_registry_path:$EXTENDED_OS_ERROR"
+          );
+        my $enumerate_timezones = 1;
+        my $timezone_index      = 0;
+        my %local_windows_timezones;
+        while ($enumerate_timezones) {
+            if (
+                Win32API::Registry::RegEnumKeyEx(
+                    $timezone_database_subkey, $timezone_index, my $buffer, [],
+                    [], [], [], [],
+                )
+              )
+            {
+                $local_windows_timezones{$buffer} = 1;
+            }
+            elsif ( Win32API::Registry::regLastError() ==
+                _WIN32_ERROR_NO_MORE_ITEMS() )
+            {    # ERROR_NO_MORE_TIMES from winerror.h
+                $enumerate_timezones = 0;
+            }
+            else {
+                Carp::croak(
+"Failed to read from LOCAL_MACHINE\\$timezone_database_registry_path:$EXTENDED_OS_ERROR"
+                );
+            }
+            $timezone_index += 1;
+        }
+        Win32API::Registry::RegCloseKey($timezone_database_subkey)
+          or Carp::croak(
+"Failed to close LOCAL_MACHINE\\$timezone_database_registry_path:$EXTENDED_OS_ERROR"
+          );
+        foreach
+          my $timezone ( sort { $a cmp $b } keys %olson_to_win32_timezones )
+        {
+            if (
+                $local_windows_timezones{ $olson_to_win32_timezones{$timezone} }
+              )
+            {
+                $returned_timezones{$timezone} =
+                  $olson_to_win32_timezones{$timezone};
+            }
+        }
+    }
+    else {
+        %returned_timezones = %olson_to_win32_timezones;
+    }
+    return %returned_timezones;
+}
+
 sub reset_cache {
     my ($self) = @_;
     if ( ref $self ) {
@@ -1664,7 +2401,7 @@ sub reset_cache {
 __END__
 =head1 NAME
 
-Time::Zone::Olson - Provides an interface to the Olson timezone database
+Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
@@ -1688,15 +2425,17 @@ Version 0.13
 
 =head1 DESCRIPTION
 
-Time::Zone::Olson is intended to provide a simple interface to the Olson database that is available on most UNIX systems.  It provides an interface to list common time zones, such as Australia/Melbourne that are stored in the zone.tab file, and localtime/Time::Local::timelocal replacements to translate times to and from the users timezone, without changing the timezone used by Perl.  This allows logging/etc to be conducted in the system's local time.
+Time::Zone::Olson is intended to provide a simple interface to the Olson database that is available on most UNIX systems.  It provides an interface to list common time zones, such as Australia/Melbourne that are stored in the zone.tab file, and localtime/Time::Local::timelocal replacements to translate times to and from the users time zone, without changing the time zone used by Perl.  This allows logging/etc to be conducted in the system's local time.
 
-Time::Zone::Olson was designed to produce the same result as a 64bit copy of the L<date(1)|date(1)> command.
+Time::Zone::Olson was designed to produce the same result as a 64 bit copy of the L<date(1)|date(1)> command.
+
+Time::Zone::Olson will attempt to function even without an actual Olson database on Win32 platforms by translating information available in the Win32 registry.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-Time::Zone::Olson->new() will return a new timezone object.  It accepts a hash as a parameter with an optional C<timezone> key, which contains an Olson timezone value, such as 'Australia/Melbourne'.  The hash also allows a C<directory> key, with the file system location of the Olson timezone database as a value.
+Time::Zone::Olson->new() will return a new time zone object.  It accepts a hash as a parameter with an optional C<timezone> key, which contains an Olson time zone value, such as 'Australia/Melbourne'.  The hash also allows a C<directory> key, with the file system location of the Olson time zone database as a value.
 
 Both of these parameters default to C<$ENV{TZ}> and C<$ENV{TZDIR}> respectively.
 
@@ -1710,57 +2449,65 @@ The locations($area) object method will return a list of the locations (such as 
 
 =head2 comment
 
-The comment($timezone) object method will return the matching comment from the zone.tab file for the timezone parameter.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">
+The comment($timezone) object method will return the matching comment from the zone.tab file for the time zone parameter.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Win32 platforms, it will return the contents of the Display registry setting.  For example, for C<"Australia/Melbourne">, it would return "(UTC+10) Canberra, Melbourne, Sydney".
 
 =head2 directory
 
-This object method can be used to get or set the root directory of the Olson database, usually located at /usr/share/zoneinfo.
+This method can be used to get or set the root directory of the Olson database, usually located at /usr/share/zoneinfo.
 
 =head2 timezone
 
-This object method can be used to get or set the timezone, which will affect all future calls to L</local_time> or L</time_local>.  The parameter for this method should be in the Olson format of a timezone, such as C<"Australia/Melbourne">.
+This method can be used to get or set the time zone, which will affect all future calls to L</local_time> or L</time_local>.  The parameter for this method should be in the Olson format of a time zone, such as C<"Australia/Melbourne">.
 
 =head2 equiv
 
-This object method takes a timezone name as a parameter.  It then compares the transition times and offsets for the currently set timezone to the transition times and offsets for the specified timezone and returns true if they match exactly from the current time.  The second optional parameter can specify the start time to use when comparing the two time zones.
+This method takes a time zone name as a parameter.  It then compares the transition times and offsets for the currently set time zone to the transition times and offsets for the specified time zone and returns true if they match exactly from the current time.  The second optional parameter can specify the start time to use when comparing the two time zones.
 
 =head2 offset
 
-This object method can be used to get or set the offset for all L</local_time> or L</time_local> calls.  The offset should be specified in minutes from GMT.
+This method can be used to get or set the offset for all L</local_time> or L</time_local> calls.  The offset should be specified in minutes from GMT.
 
 =head2 area
 
-This object method will return the area component of the current timezone, such as Australia
+This method will return the area component of the current time zone, such as Australia
 
 =head2 location
 
-This object method will return the location component of the current timezone, such as Melbourne
+This method will return the location component of the current time zone, such as Melbourne
 
 =head2 local_offset
 
-This object method takes the same arguments as C<localtime> but returns the appropriate offset from GMT in minutes.  This can to used as a C<offset> parameter to a subsequent call to Time::Zone::Olson.
+This method takes the same arguments as C<localtime> but returns the appropriate offset from GMT in minutes.  This can to used as a C<offset> parameter to a subsequent call to Time::Zone::Olson.
 
 =head2 local_time
 
-This object method has the same signature as the 64 bit version of the C<localtime> function.  That is, it accepts up to a 64 bit signed integer as the sole argument and returns the C<(seconds, minutes, hours, day, month, year, wday, yday, isdst)> definition for the timezone for the object.  The timezone used to calculate the local time may be specified as a parameter to the L</new> method or via the L</timezone> method.
+This method has the same signature as the 64 bit version of the C<localtime> function.  That is, it accepts up to a 64 bit signed integer as the sole argument and returns the C<(seconds, minutes, hours, day, month, year, wday, yday, isdst)> definition for the time zone for the object.  The time zone used to calculate the local time may be specified as a parameter to the L</new> method or via the L</timezone> method.
 
 =head2 time_local
 
-This object method has the same signature as the 64 bit version of the C<Time::Local::timelocal> function.  That is, it accepts C<(seconds, minutes, hours, day, month, year, wday, yday, isdst)> as parameters in a list and returns the correct UNIX time in seconds according to the current timezone for the object.  The timezone used to calculate the local time may be specified as a parameter to the L</new> method or via the L</timezone> method. 
+This method has the same signature as the 64 bit version of the C<Time::Local::timelocal> function.  That is, it accepts C<(seconds, minutes, hours, day, month, year, wday, yday, isdst)> as parameters in a list and returns the correct UNIX time in seconds according to the current time zone for the object.  The time zone used to calculate the local time may be specified as a parameter to the L</new> method or via the L</timezone> method. 
 
 During a time zone change such as +11 GMT to +10 GMT, there will be two possible UNIX times that can result in the same local time.  In this case, like C<Time::Local::timelocal>, this function will return the lower of the two times.
 
 =head2 transition_times
 
-This object method can be used to get the list of transition times for the current timezone.  This method is only intended for testing the results of Time::Zone::Olson.
+This method can be used to get the list of transition times for the current time zone.  This method is only intended for testing the results of Time::Zone::Olson.
 
 =head2 leap_seconds
 
-This object method can be used to get the list of leap seconds for the current timezone.  This method is only intended for testing the results of Time::Zone::Olson.
+This method can be used to get the list of leap seconds for the current time zone.  This method is only intended for testing the results of Time::Zone::Olson.
 
 =head2 reset_cache
 
-This object or class method can be used to reset the cache.  This method is only intended for testing the results of Time::Zone::Olson.  In actual use, cached values are only used if the C<mtime> of the relevant files has not changed.
+This method can be used to reset the cache.  This method is only intended for testing the results of Time::Zone::Olson.  In actual use, cached values are only used if the C<mtime> of the relevant files has not changed.
+
+=head2 win32_mapping 
+
+This method will return a hash containing the mapping between Windows time zones and Olson time zones.  This method is only intended for testing the results of Time::Zone::Olson.
+
+=head2 win32_registry
+
+This method will return true if the object is using the Win32 registry for Olson tz calculations.  Otherwise it will return false.
 
 =head1 DIAGNOSTICS
 
@@ -1768,23 +2515,23 @@ This object or class method can be used to reset the cache.  This method is only
 
 =item C<< %s is not a TZ file >>
 
-The designated path did not have the C<TZif> prefix at the start of the file.  Maybe either the directory or the timezone name is incorrect?
+The designated path did not have the C<TZif> prefix at the start of the file.  Maybe either the directory or the time zone name is incorrect?
 
 =item C<< Failed to read header from %s:%s >>
 
-The designated file encountered an error reading either the V1 or V2 headers
+The designated file encountered an error reading either the version 1 or version 2 headers
 
 =item C<< Failed to read entire header from %s.  %d bytes were read instead of the expected %d >>
 
 The designated file is shorter than expected
 
-=item C<< %s is not an timezone in the existing Olson database >>
+=item C<< %s is not an time zone in the existing Olson database >>
 
-The designated timezone could not be found on the file system.  The timezone is expected to be in the designated directory + the timezone name, for example, /usr/share/zoneinfo/Australia/Melbourne
+The designated time zone could not be found on the file system.  The time zone is expected to be in the designated directory + the time zone name, for example, /usr/share/zoneinfo/Australia/Melbourne
 
-=item C<< %s does not have a valid format for a TZ timezone >>
+=item C<< %s does not have a valid format for a TZ time zone >>
 
-The designated timezone name could not be matched by the regular expression for a timezone in Time::Zone::Olson
+The designated time zone name could not be matched by the regular expression for a time zone in Time::Zone::Olson
 
 =item C<< Failed to close %s:%s >>
 
@@ -1792,11 +2539,11 @@ There has been a file system error while reading or closing the designated path
 
 =item C<< Failed to open %s for reading:%s >>
 
-There has been a file system error while opening the the designated path.  This could be permissions related, or the timezone in question doesn't exist?
+There has been a file system error while opening the the designated path.  This could be permissions related, or the time zone in question doesn't exist?
 
 =item C<< Failed to stat %s:%s >>
 
-There has been a file system error while doing a L<stat|perlfunc/"stat"> on the designated path.  This could be permissions related, or the timezone in question doesn't exist?
+There has been a file system error while doing a L<stat|perlfunc/"stat"> on the designated path.  This could be permissions related, or the time zone in question doesn't exist?
 
 =item C<< Failed to read %s from %s:%s >>
 
@@ -1806,17 +2553,29 @@ There has been a file system error while reading from the designated path.  The 
 
 The designated file is shorter than expected.  The file could be corrupt?
 
-=item C<< The tz defintion at the end of %s could not be read in %d bytes >>
+=item C<< The tz definition at the end of %s could not be read in %d bytes >>
 
-The designated file is longer than expected.  Maybe the timezone version is greater than the currently recognized 3?
+The designated file is longer than expected.  Maybe the time zone version is greater than the currently recognized 3?
 
 =item C<< Failed to read tz definition from %s:% >>
 
 There has been a file system error while reading from the designated path.  The file could be corrupt?
 
-=item C<< Failed to parse the tz defintion of %s from %s >>
+=item C<< Failed to parse the tz definition of %s from %s >>
 
 This is probably a bug in Time::Zone::Olson in failing to parse the C<TZ> variable at the end of the file.
+
+=item C<< Failed to open %s:%s >>
+
+There has been an error while opening the the designated registry entry.
+
+=item C<< Failed to read from %s:%s >>
+
+There has been an file system error while reading from the registry.
+
+=item C<< Failed to close %s:%s >>
+
+There has been an error while reading or closing the designated registry entry
 
 =back
 
@@ -1826,7 +2585,7 @@ Time::Zone::Olson requires no configuration files or environment variables.  How
 
 =head1 DEPENDENCIES
 
-Time::Zone::Olson requires Perl 5.6 or better.  For environments where the unpack 'q' parameter is not supported, the following module is also required
+Time::Zone::Olson requires Perl 5.10 or better.  For environments where the unpack 'q' parameter is not supported, the following module is also required
 
 =over
 
@@ -1841,7 +2600,7 @@ None reported
 
 =head1 BUGS AND LIMITATIONS
 
-On Win32 platforms, the Olson TZ database is usually unavailable.  In an attempt to provide a workable alternative, the Win32 Registry is interrogated and translated to allow Olson timezones (such as Australia/Melbourne) to be used on Win32 nodes.  Therefore, the use of Time::Zone::Olson should be cross-platform compatible, but the actual results may be different, depending on the compatibility of the Win32 Registry timezones and the Olson TZ database.
+On Win32 platforms, the Olson TZ database is usually unavailable.  In an attempt to provide a workable alternative, the Win32 Registry is interrogated and translated to allow Olson time zones (such as Australia/Melbourne) to be used on Win32 nodes.  Therefore, the use of Time::Zone::Olson should be cross-platform compatible, but the actual results may be different, depending on the compatibility of the Win32 Registry time zones and the Olson TZ database.
 
 Please report any bugs or feature requests to C<bug-time-zone-olson at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson>.  I will be notified, and then you'll
@@ -1856,6 +2615,9 @@ L<DateTime::TimeZone|DateTime::TimeZone>
 
 =item *
 L<DateTime::TimeZone::Tzfile|DateTime::TimeZone::Tzfile>
+
+=item *
+L<DateTime::TimeZone::Local::Win32|DateTime::TimeZone::Local::Win32>
 
 =back
 

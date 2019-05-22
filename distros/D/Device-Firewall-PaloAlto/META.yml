@@ -1,5 +1,5 @@
 ---
-abstract: 'Interact with the Palo Alto firwall API'
+abstract: 'Interact with the Palo Alto firewall API'
 author:
   - 'Greg Foletta <greg@foletta.org>'
 build_requires:
@@ -19,76 +19,76 @@ name: Device-Firewall-PaloAlto
 provides:
   Device::Firewall::PaloAlto:
     file: lib/Device/Firewall/PaloAlto.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::API:
     file: lib/Device/Firewall/PaloAlto/API.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Errors:
     file: lib/Device/Firewall/PaloAlto/Errors.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::JSON:
     file: lib/Device/Firewall/PaloAlto/JSON.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op:
     file: lib/Device/Firewall/PaloAlto/Op.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::ARPEntry:
     file: lib/Device/Firewall/PaloAlto/Op/ARPEntry.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::ARPTable:
     file: lib/Device/Firewall/PaloAlto/Op/ARPTable.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::GlobalCounter:
     file: lib/Device/Firewall/PaloAlto/Op/GlobalCounter.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::GlobalCounters:
     file: lib/Device/Firewall/PaloAlto/Op/GlobalCounters.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::HA:
     file: lib/Device/Firewall/PaloAlto/Op/HA.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::IPUserMap:
     file: lib/Device/Firewall/PaloAlto/Op/IPUserMap.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::IPUserMaps:
     file: lib/Device/Firewall/PaloAlto/Op/IPUserMaps.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::Interface:
     file: lib/Device/Firewall/PaloAlto/Op/Interface.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::Interfaces:
     file: lib/Device/Firewall/PaloAlto/Op/Interfaces.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::NTP:
     file: lib/Device/Firewall/PaloAlto/Op/NTP.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::Route:
     file: lib/Device/Firewall/PaloAlto/Op/Route.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::SysInfo:
     file: lib/Device/Firewall/PaloAlto/Op/SysInfo.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::Tunnel:
     file: lib/Device/Firewall/PaloAlto/Op/Tunnel.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::Tunnels:
     file: lib/Device/Firewall/PaloAlto/Op/Tunnels.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Op::VirtualRouter:
     file: lib/Device/Firewall/PaloAlto/Op/VirtualRouter.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Test:
     file: lib/Device/Firewall/PaloAlto/Test.pm
-    version: v0.1.6
+    version: v0.1.8
   Device::Firewall::PaloAlto::Test::NATPolicy:
     file: lib/Device/Firewall/PaloAlto/Test/NATPolicy.pm
-    version: v0.1.6
-  Device::Firewall::PaloAlto::Test::Rulebase:
-    file: lib/Device/Firewall/PaloAlto/Test/Rulebase.pm
-    version: v0.1.6
+    version: v0.1.8
+  Device::Firewall::PaloAlto::Test::SecPolicy:
+    file: lib/Device/Firewall/PaloAlto/Test/SecPolicy.pm
+    version: v0.1.8
   Device::Firewall::PaloAlto::UserID:
     file: lib/Device/Firewall/PaloAlto/UserID.pm
-    version: v0.1.6
+    version: v0.1.8
 requires:
   Carp: '0'
   Class::Error: '0'
@@ -114,7 +114,7 @@ resources:
   bugtracker: https://github.com/gregfoletta/Device-Firewall-PaloAlto/issues
   homepage: https://github.com/gregfoletta/Device-Firewall-PaloAlto
   repository: https://github.com/gregfoletta/Device-Firewall-PaloAlto.git
-version: 0.1.6
+version: 0.1.8
 x_Dist_Zilla:
   perl:
     version: '5.029000'
@@ -265,7 +265,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.1.6
+          tag: v0.1.8
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

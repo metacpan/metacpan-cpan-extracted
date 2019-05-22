@@ -2,7 +2,7 @@ package Catmandu::Exporter::Count;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
 use namespace::clean;
@@ -43,6 +43,8 @@ This exporter exports nothing and just counts the number of items found
 in the input data.
 
 =head1 SEE ALSO
+
+L<Catmandu::Cmd::count>
 
 L<Catmandu::Exporter::Null>
 

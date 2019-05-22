@@ -19,11 +19,17 @@ corpus/DZT/lib/DZT8.pm
 corpus/DZT/t/basic.t
 corpus/eDZT/dist.ini
 corpus/eDZT/lib/DZT0.pm
+corpus/error1/dist.ini
+corpus/error1/lib/DZT0.pm
+corpus/error2/dist.ini
+corpus/error2/lib/DZT0.pm
 corpus/oDZT/dist.ini
 corpus/oDZT/lib/oDZT.pm
 corpus/sDZT/dist.ini
 corpus/sDZT/lib/DZT0.pm
 corpus/sDZT/lib/DZT1.pm
+corpus/semanticDZT/dist.ini
+corpus/semanticDZT/lib/semanticDZT.pm
 corpus/vDZT/dist.ini
 corpus/vDZT/lib/vDZT.pm
 lib/Dist/Zilla/Plugin/OurPkgVersion.pm
@@ -38,6 +44,8 @@ t/03-trial.t
 t/04-underscore.t
 t/05-skip_main_module.t
 t/06-overwrite.t
+t/07-semantic.t
+t/08-build_exceptions.t
 t/author-critic.t
 t/author-eol.t
 t/author-minimum-version.t

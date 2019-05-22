@@ -1,0 +1,7 @@
+name = "vars-i"
+badges = ["metacpan"]
+
+module_maker = "ExtUtilsMakeMaker"
+static_install = "auto"
+
+tag_format="v%v"

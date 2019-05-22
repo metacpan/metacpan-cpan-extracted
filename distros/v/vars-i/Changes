@@ -1,9 +1,31 @@
-Revision history for Perl module vars::i
+Revision history for Perl distribution vars-i
 
+1.07 2019-05-22T01:30:08Z
+    - Updated documentation
+    - Production release
 
-0.01 Mon Nov  3 03:05:49 2003
-	- original version; created by ExtUtils::ModuleMaker 0.32
+1.06 2019-05-15T14:05:21Z (TRIAL RELEASE)
+    - Fixed metadata
+
+1.05 2019-05-14T13:39:22Z (TRIAL RELEASE)
+    - Back under the vars::i name
+    - Updated documentation
+
+1.04 2019-04-26T20:49:06Z (TRIAL RELEASE)
+    (as Acme::CXW::vars::i)
+    - Switched to Minilla for maintenance
+
+1.03 2019-03-27 (TRIAL RELEASE)
+    (as Acme::CXW::vars::i)
+    - Prohibit special names
+    - 100% test coverage!
+
+1.02 2019-03-25 (TRIAL RELEASE)
+    (as Acme::CXW::vars::i)
+    - Update to run on Perl 5.22+
+
+1.01 2003-11-03
+    - original version; created by ExtUtils::ModuleMaker 0.32
     - injected http://perlmonks.org/index.pl?node_id=264096
     - wrote tests
     - uploaded to cpan (finally)
-

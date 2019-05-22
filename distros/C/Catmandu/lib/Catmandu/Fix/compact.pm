@@ -1,35 +1,21 @@
 package Catmandu::Fix::compact;
 
 use Catmandu::Sane;
+
+our $VERSION = '1.2001';
+
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use Catmandu::Fix::Has;
 
-with 'Catmandu::Fix::Base';
+with 'Catmandu::Fix::Builder';
 
 has path => (fix_arg => 1);
 
-sub emit {
-    my ($self, $fixer) = @_;
-    my $path = $fixer->split_path($self->path);
-    my $key  = pop @$path;
-
-    $fixer->emit_walk_path(
-        $fixer->var,
-        $path,
-        sub {
-            my $var = shift;
-            $fixer->emit_get_key(
-                $var, $key,
-                sub {
-                    my $var = shift;
-
-                    "if (is_array_ref(${var})) {"
-                        . "${var} = [grep defined, \@{${var}}];" . "}";
-                }
-            );
-        }
-    );
-
+sub _build_fixer {
+    my ($self) = @_;
+    as_path($self->path)
+        ->updater(if_array_ref => sub {[grep defined, @{$_[0]}]});
 }
 
 =head1 NAME

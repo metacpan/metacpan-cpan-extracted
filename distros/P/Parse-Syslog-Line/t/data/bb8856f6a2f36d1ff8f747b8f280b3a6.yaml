@@ -1,0 +1,28 @@
+---
+expected:
+  content: IPSEC SETUP FAILED for local:1.2.3.4 local_id:1.2.3.4 remote:4.5.6.7 remote_id:4.5.6.7 IKE profile:foo fvrf:None fail_reason:IPSec Proposal failure fail_class_cnt:14
+  date: 2018-01-01
+  date_raw: Jan 1 19:12:19
+  datetime_obj: ~
+  datetime_raw: Jan 1 19:12:19
+  datetime_str: 2018-01-01T19:12:19Z
+  domain: company.tld
+  epoch: 1514833939
+  facility: local7
+  facility_int: 184
+  host: router
+  host_raw: router.company.tld
+  message: '%CRYPTO-5-IPSEC_SETUP_FAILURE: IPSEC SETUP FAILED for local:1.2.3.4 local_id:1.2.3.4 remote:4.5.6.7 remote_id:4.5.6.7 IKE profile:foo fvrf:None fail_reason:IPSec Proposal failure fail_class_cnt:14'
+  message_raw: '<189>Jan 1 19:12:19 router.company.tld 11815005: Jan 1 2014 19:12:18.454 CET: %CRYPTO-5-IPSEC_SETUP_FAILURE: IPSEC SETUP FAILED for local:1.2.3.4 local_id:1.2.3.4 remote:4.5.6.7 remote_id:4.5.6.7 IKE profile:foo fvrf:None fail_reason:IPSec Proposal failure fail_class_cnt:14'
+  ntp: ok
+  offset: Z
+  preamble: 189
+  priority: notice
+  priority_int: 5
+  program_name: '%CRYPTO-5-IPSEC_SETUP_FAILURE'
+  program_pid: ~
+  program_raw: '%CRYPTO-5-IPSEC_SETUP_FAILURE'
+  program_sub: ~
+  time: 19:12:19
+name: Cisco Date Insanity
+string: '<189>Jan 1 19:12:19 router.company.tld 11815005: Jan 1 2014 19:12:18.454 CET: %CRYPTO-5-IPSEC_SETUP_FAILURE: IPSEC SETUP FAILED for local:1.2.3.4 local_id:1.2.3.4 remote:4.5.6.7 remote_id:4.5.6.7 IKE profile:foo fvrf:None fail_reason:IPSec Proposal failure fail_class_cnt:14'

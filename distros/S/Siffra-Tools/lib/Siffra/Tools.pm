@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.06';
+    $VERSION = '0.07';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -371,7 +371,7 @@ sub parseBlockText()
 
         if ( $tamanho_da_linha_no_arquivo != $tamanho_da_linha_no_layout )
         {
-            my $msg = "Tamanho da linha do tipo $tipo_de_registro no arquivo $file ($tamanho_da_linha_no_arquivo) esta diferente do layout ($tamanho_da_linha_no_layout)";
+            my $msg = "Tamanho da linha [ $. ] do tipo $tipo_de_registro no arquivo $file ($tamanho_da_linha_no_arquivo) esta diferente do layout ($tamanho_da_linha_no_layout)";
             $log->error( $msg );
             $retorno->{ rows }    = undef;
             $retorno->{ message } = $msg;
@@ -386,8 +386,18 @@ sub parseBlockText()
 
             my $out = $field->{ out };
 
-            if ( $field->{ match } && $auxiliar->{ $field->{ field } } =~ /$field->{match}/ )
+            if ( $field->{ match } )
             {
+                if ( $auxiliar->{ $field->{ field } } !~ /$field->{match}/ )
+                {
+                    my $msg = "O campo [ $auxiliar->{ $field->{ field } } ] não corresponde a regra de validação [ $field->{match} ]...";
+                    $log->error( $msg );
+                    $retorno->{ rows }    = undef;
+                    $retorno->{ message } = $msg;
+                    $retorno->{ error }   = 1;
+                    return $retorno;
+                } ## end if ( $auxiliar->{ $field...})
+
                 if ( $out )
                 {
                     $out =~ s/\?\?\?/$auxiliar->{ $field->{field} }/g;
@@ -406,7 +416,7 @@ sub parseBlockText()
     return $retorno;
 } ## end sub parseBlockText
 
-=head2 C<trim()>
+=head2 C<parseCSV()>
 =cut
 
 sub parseCSV()

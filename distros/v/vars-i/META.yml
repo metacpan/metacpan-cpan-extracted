@@ -1,11 +1,42 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         vars-i
-version:      1.01
-version_from: lib/vars/i.pm
-installdirs:  site
+---
+abstract: 'Perl pragma to declare and simultaneously initialize global variables.'
+author:
+  - 'D.H. <podmaster@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.999, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: vars-i
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  vars::i:
+    file: lib/vars/i.pm
+    version: '1.07'
 requires:
-    Test::More:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Carp: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/cxw42/Perl-vars-i/issues
+  homepage: https://github.com/cxw42/Perl-vars-i
+  repository: git://github.com/cxw42/Perl-vars-i.git
+version: '1.07'
+x_contributors:
+  - 'Christopher White <cxw@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.021 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-05-12.
+    This document describes version 0.022 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-05-21.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -47,6 +47,8 @@ DESCRIPTION
     *   csv-sort-rows
 
     *   csv-sum
+
+    *   csv2ltsv
 
     *   csv2tsv
 
@@ -1210,6 +1212,18 @@ FUNCTIONS
 
     Return value: (any)
 
+FAQ
+  My CSV does not have a header?
+    Use the "--no-header" option. Fields will be named "field1", "field2",
+    and so on.
+
+  My data is TSV, not CSV?
+    Use the "--tsv" option.
+
+  I have a big CSV and the utilities are too slow or eat too much RAM!
+    These utilities are not (yet) optimized, patches welcome. If your CSV is
+    very big, perhaps a C-based solution is what you need.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-CSVUtils>.
@@ -1226,6 +1240,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    App::TSVUtils
+
+    App::LTSVUtils
+
+    App::SerializeUtils
+
     csvgrep.
 
     setop.

@@ -1,3 +1,11 @@
+0.022   2019-05-21 (PERLANCAR)
+
+	- Add csv2ltsv script (ltsv2csv not yet).
+
+	- [doc] Mention App::TSVUtils and App::LTSVUtils; update that
+	  csv2tsv, tsv2csv are now included by us.
+
+
 0.021   2019-05-12 (PERLANCAR)
 
 	- Add scripts: csv2tsv, tsv2csv.

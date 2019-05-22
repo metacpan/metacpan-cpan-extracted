@@ -1,7 +1,7 @@
 This archive contains the distribution Device-Firewall-PaloAlto,
-version 0.1.6:
+version 0.1.8:
 
-  Interact with the Palo Alto firwall API
+  Interact with the Palo Alto firewall API
 
 This software is copyright (c) 2019 by Greg Foletta.
 

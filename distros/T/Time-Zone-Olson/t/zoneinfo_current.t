@@ -68,7 +68,8 @@ if ($timezone->location()) {
 ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->areas()");
 ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
 if ($^O eq 'MSWin32') {
-	ok(1, "\$timezone->comment() is not enabled for $^O");
+	diag("$^O comment for Australia/Melbourne is '" . $timezone->comment('Australia/Melbourne') . "'");
+	ok($timezone->comment('Australia/Melbourne') =~ /Canberra/smx, "\$timezone->comment('Australia/Melbourne') contains /Canberra/");
 } else {
 	ok($timezone->comment('Australia/Melbourne') eq 'Victoria', "\$timezone->comment('Australia/Melbourne') returns 'Victoria'");
 }
@@ -128,7 +129,9 @@ ok($revert_time <= $now, "\$timezone->time_local(\$timezone->local_time(\$now)) 
 
 $timezone->timezone("Australia/Melbourne");
 
-ok($timezone->equiv("Australia/Hobart") && !$timezone->equiv("Australia/Perth") && ($^O eq 'MSWin32' or !$timezone->equiv("Australia/Hobart", 0)), "Successfully compared Melbourne to Perth and Hobart timezones");
+if ($^O ne 'MSWin32') {
+	ok($timezone->equiv("Australia/Hobart") && !$timezone->equiv("Australia/Perth") && !$timezone->equiv("Australia/Hobart", 0), "Successfully compared Melbourne to Perth and Hobart timezones");
+}
 Test::More::done_testing();
 
 sub get_external_date {
@@ -141,7 +144,7 @@ sub get_external_date {
 	}
 	my $formatted_date;
 	if ($^O eq 'MSWin32') {
-		my %mapping = Time::Zone::Olson::Win32->mapping();
+		my %mapping = Time::Zone::Olson->win32_mapping();
 		my $win32_time_zone = $mapping{"$area/$location"};
 		require Win32::API;
 		
@@ -291,10 +294,43 @@ sub guess_tz {
 		require Win32API::Registry;
 		my $current_timezone_registry_path = 'SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
 		Win32API::Registry::RegOpenKeyEx(Win32API::Registry::HKEY_LOCAL_MACHINE(), $current_timezone_registry_path, 0, Win32API::Registry::KEY_QUERY_VALUE(), my $current_timezone_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:" . Win32API::Registry::regLastError());
-		Win32API::Registry::RegQueryValueEx($current_timezone_registry_key, 'TimeZoneKeyName', [], my $type, my $win32_timezone_name, []) or die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\TimeZoneKeyName:" . Win32API::Registry::regLastError();
+		my $win32_timezone_name;
+		if (Win32API::Registry::RegQueryValueEx($current_timezone_registry_key, 'TimeZoneKeyName', [], my $type, $win32_timezone_name, [])) {
+		} elsif ($! == POSIX::ENOENT()) {
+		} else {
+			die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\TimeZoneKeyName:" . Win32API::Registry::regLastError();
+		}
+		if ($win32_timezone_name) {
+		} else {
+			Win32API::Registry::RegQueryValueEx($current_timezone_registry_key, 'StandardName', [], my $type, my $standard_name, []) or die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\StandardName:" . Win32API::Registry::regLastError();
+			my ($description, $major, $minor, $build, $id) = Win32::GetOSVersion();
+			my $old_timezone_registry_path;
+			if ($id < 2) {
+				$old_timezone_registry_path = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Time Zones';
+			} else {
+				$old_timezone_registry_path = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones';
+			}
+			Win32API::Registry::RegOpenKeyEx(Win32API::Registry::HKEY_LOCAL_MACHINE(), $old_timezone_registry_path, 0, Win32API::Registry::KEY_QUERY_VALUE() | Win32API::Registry::KEY_ENUMERATE_SUB_KEYS(), my $old_timezone_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$old_timezone_registry_path:" . Win32API::Registry::regLastError());
+			my $enumerate_timezones = 1;
+			my $old_timezone_registry_index = 0;
+			while ($enumerate_timezones) {
+				if (Win32API::Registry::RegEnumKeyEx($old_timezone_registry_key, $old_timezone_registry_index, my $subkey_name, [], [], [], [], [],)) {
+					Win32API::Registry::RegOpenKeyEx($old_timezone_registry_key, $subkey_name, 0, Win32API::Registry::KEY_QUERY_VALUE(), my $old_timezone_specific_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$old_timezone_registry_path\\$subkey_name:" . Win32API::Registry::regLastError());
+					Win32API::Registry::RegQueryValueEx($old_timezone_specific_registry_key, 'Std', [], my $type, my $local_language_timezone_name, []) or die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\$subkey_name\\Std:" . Win32API::Registry::regLastError();
+					if ($local_language_timezone_name eq $standard_name) {
+						$win32_timezone_name = $subkey_name
+					}
+				} elsif ( Win32API::Registry::regLastError() == 259 ) { # ERROR_NO_MORE_TIMES from winerror.h
+					$enumerate_timezones = 0;
+				} else {
+					Carp::croak("Failed to read from LOCAL_MACHINE\\$old_timezone_registry_path:$EXTENDED_OS_ERROR");
+				}
+				    $old_timezone_registry_index += 1;
+			}
+			Win32API::Registry::RegCloseKey($old_timezone_registry_key) or Carp::croak("Failed to close LOCAL_MACHINE\\$old_timezone_registry_path:$EXTENDED_OS_ERROR");
+		}
 		Win32API::Registry::RegCloseKey($current_timezone_registry_key) or die "Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:" . Win32API::Registry::regLastError();
-		require Time::Zone::Olson::Win32;
-		my %mapping = Time::Zone::Olson::Win32->mapping();
+		my %mapping = Time::Zone::Olson->win32_mapping();
 		foreach my $key (sort { $a cmp $b } keys %mapping) {
 			if ($mapping{$key} eq $win32_timezone_name) {
 				return $key;

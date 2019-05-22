@@ -1,0 +1,45 @@
+---
+expected:
+  SDATA:
+    ACTION: outbound
+    DPT: 55233
+    DST: 71.198.187.165
+    ID: 57140 DF
+    LEN: 60
+    OUT: eth0
+    PREC: 0x00
+    PROTO: TCP
+    RES: 0x00 SYN
+    SPT: 47070
+    SRC: 148.251.14.68
+    TOS: 0x00
+    TTL: 64
+    URGP: 0
+    WINDOW: 14600
+  content: 'iptables - ACTION=outbound IN= OUT=eth0 SRC=148.251.14.68 DST=71.198.187.165 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=57140 DF PROTO=TCP SPT=47070 DPT=55233 WINDOW=14600 RES=0x00 SYN URGP=0'
+  date: 2018-05-20
+  date_raw: May 20 06:40:46
+  datetime_obj: ~
+  datetime_raw: May 20 06:40:46
+  datetime_str: 2018-05-20T06:40:46Z
+  domain: ~
+  epoch: 1526798446
+  facility: ~
+  facility_int: ~
+  host: janus
+  host_raw: janus
+  message: 'kernel: iptables - ACTION=outbound IN= OUT=eth0 SRC=148.251.14.68 DST=71.198.187.165 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=57140 DF PROTO=TCP SPT=47070 DPT=55233 WINDOW=14600 RES=0x00 SYN URGP=0'
+  message_raw: 'May 20 06:40:46 janus kernel: iptables - ACTION=outbound IN= OUT=eth0 SRC=148.251.14.68 DST=71.198.187.165 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=57140 DF PROTO=TCP SPT=47070 DPT=55233 WINDOW=14600 RES=0x00 SYN URGP=0'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: kernel
+  program_pid: ~
+  program_raw: kernel
+  program_sub: ~
+  time: 06:40:46
+name: iptables entry with key/values
+options:
+  AutoDetectKeyValues: 1
+string: 'May 20 06:40:46 janus kernel: iptables - ACTION=outbound IN= OUT=eth0 SRC=148.251.14.68 DST=71.198.187.165 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=57140 DF PROTO=TCP SPT=47070 DPT=55233 WINDOW=14600 RES=0x00 SYN URGP=0'

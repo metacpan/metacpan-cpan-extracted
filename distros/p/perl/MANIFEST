@@ -1,4 +1,5 @@
 .dir-locals.el			Emacs control file
+.lgtm.yml			LGTM.com configuration file
 .metaconf-exclusions.txt	Symbols that should ignored when generating Configure
 .travis.yml		continuous integration on github (where enabled)
 amigaos4/amigaio.c	AmigaOS4 port
@@ -139,8 +140,6 @@ cpan/AutoLoader/lib/AutoLoader.pm	Autoloader base class
 cpan/AutoLoader/lib/AutoSplit.pm	Split up autoload functions
 cpan/AutoLoader/t/01AutoLoader.t	See if AutoLoader works
 cpan/AutoLoader/t/02AutoSplit.t		See if AutoSplit works
-cpan/B-Debug/Debug.pm	Compiler Debug backend
-cpan/B-Debug/t/debug.t	See if B::Debug works
 cpan/bignum/lib/bigint.pm		bigint
 cpan/bignum/lib/bignum.pm		bignum
 cpan/bignum/lib/bigrat.pm		bigrat
@@ -246,6 +245,7 @@ cpan/Config-Perl-V/t/30_plv5240.t		Config::Perl::V
 cpan/Config-Perl-V/t/31_plv52511.t		Config::Perl::V
 cpan/Config-Perl-V/t/32_plv5261rc1.t		Config::Perl::V
 cpan/Config-Perl-V/t/33_plv52711r.t		Config::Perl::V
+cpan/Config-Perl-V/t/34_plv5280.t		Config::Perl::V
 cpan/Config-Perl-V/V.pm				Config::Perl::V
 cpan/CPAN/lib/App/Cpan.pm		helper package for CPAN.pm
 cpan/CPAN/lib/CPAN.pm			Interface to Comprehensive Perl Archive Network
@@ -456,12 +456,17 @@ cpan/DB_File/DB_File.pm		Berkeley DB extension Perl module
 cpan/DB_File/DB_File.xs		Berkeley DB extension external subroutines
 cpan/DB_File/DB_File_BS		Berkeley DB extension mkbootstrap fodder
 cpan/DB_File/dbinfo		Berkeley DB database version checker
+cpan/DB_File/hints/bitrig.pl
 cpan/DB_File/hints/dynixptx.pl	Hint for DB_File for named architecture
+cpan/DB_File/hints/minix.pl
+cpan/DB_File/hints/netbsd.pl
+cpan/DB_File/hints/openbsd.pl
 cpan/DB_File/hints/sco.pl	Hint for DB_File for named architecture
 cpan/DB_File/Makefile.PL	Berkeley DB extension makefile writer
 cpan/DB_File/t/db-btree.t	See if DB_File works
 cpan/DB_File/t/db-hash.t	See if DB_File works
 cpan/DB_File/t/db-recno.t	See if DB_File works
+cpan/DB_File/t/db-threads.t	See if DB_File works
 cpan/DB_File/typemap		Berkeley DB extension interface types
 cpan/DB_File/version.c		Berkeley DB extension interface version check
 cpan/Digest/Digest.pm		Digest extensions
@@ -624,12 +629,12 @@ cpan/Encode/t/undef.t
 cpan/Encode/t/unibench.pl		benchmark script
 cpan/Encode/t/Unicode.t			test script
 cpan/Encode/t/use-Encode-Alias.t
-cpan/Encode/t/utf8messages.t
 cpan/Encode/t/utf8ref.t			test script
 cpan/Encode/t/utf8strict.t		test script
 cpan/Encode/t/utf8warnings.t
 cpan/Encode/t/whatwg-aliases.json
 cpan/Encode/t/whatwg-aliases.t
+cpan/Encode/t/xml.t
 cpan/Encode/TW/Makefile.PL		Encode extension
 cpan/Encode/TW/TW.pm			Encode extension
 cpan/Encode/ucm/8859-1.ucm		Unicode Character Map
@@ -1130,6 +1135,8 @@ cpan/IO-Compress/t/cz-03zlib-v1.t			IO::Compress
 cpan/IO-Compress/t/cz-06gzsetp.t			IO::Compress
 cpan/IO-Compress/t/cz-08encoding.t			IO::Compress
 cpan/IO-Compress/t/cz-14gzopen.t			IO::Compress
+cpan/IO-Compress/t/files/meta.xml
+cpan/IO-Compress/t/files/test.ods
 cpan/IO-Compress/t/globmapper.t				IO::Compress
 cpan/IO-Socket-IP/lib/IO/Socket/IP.pm			IO::Socket::IP
 cpan/IO-Socket-IP/t/00use.t				IO::Socket::IP tests
@@ -1195,6 +1202,8 @@ cpan/JSON-PP/t/000_load.t
 cpan/JSON-PP/t/001_utf8.t
 cpan/JSON-PP/t/002_error.t
 cpan/JSON-PP/t/003_types.t
+cpan/JSON-PP/t/004_dwiw_encode.t
+cpan/JSON-PP/t/005_dwiw_decode.t
 cpan/JSON-PP/t/006_pc_pretty.t
 cpan/JSON-PP/t/007_pc_esc.t
 cpan/JSON-PP/t/008_pc_base.t
@@ -1209,9 +1218,11 @@ cpan/JSON-PP/t/016_tied.t
 cpan/JSON-PP/t/017_relaxed.t
 cpan/JSON-PP/t/018_json_checker.t
 cpan/JSON-PP/t/019_incr.t
+cpan/JSON-PP/t/020_faihu.t
 cpan/JSON-PP/t/020_unknown.t
-cpan/JSON-PP/t/021_evans_bugrep.t
+cpan/JSON-PP/t/021_evans.t
 cpan/JSON-PP/t/022_comment_at_eof.t
+cpan/JSON-PP/t/052_object.t
 cpan/JSON-PP/t/099_binary.t
 cpan/JSON-PP/t/104_sortby.t
 cpan/JSON-PP/t/105_esc_slash.t
@@ -1226,7 +1237,7 @@ cpan/JSON-PP/t/114_decode_prefix.t
 cpan/JSON-PP/t/115_tie_ixhash.t
 cpan/JSON-PP/t/116_incr_parse_fixed.t
 cpan/JSON-PP/t/117_numbers.t
-cpan/JSON-PP/t/_unicode_handling.pm
+cpan/JSON-PP/t/118_boolean_values.t
 cpan/JSON-PP/t/gh_28_json_test_suite.t
 cpan/JSON-PP/t/gh_29_trailing_false_value.t
 cpan/JSON-PP/t/rt_116998_wrong_character_offset.t
@@ -1264,77 +1275,6 @@ cpan/libnet/t/smtp.t		libnet
 cpan/libnet/t/smtp_ipv6.t
 cpan/libnet/t/smtp_ssl.t
 cpan/libnet/t/time.t		libnet
-cpan/Locale-Codes/lib/Locale/Codes.pm		Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes.pod		Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/Changes.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/Constants.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Country.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Country.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/Country_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Country_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Currency.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Currency.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/Currency_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Currency_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangExt.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangExt.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/LangExt_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangExt_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangFam.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangFam.pod	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangFam_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangFam_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Language.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Language.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/Language_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Language_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangVar.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangVar.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/LangVar_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/LangVar_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Script.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Script.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Codes/Script_Codes.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Script_Retired.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Codes/Types.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Country.pm		Locale::Codes
-cpan/Locale-Codes/lib/Locale/Country.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Currency.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Currency.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Language.pm	Locale::Codes
-cpan/Locale-Codes/lib/Locale/Language.pod	Locale::Codes documentation
-cpan/Locale-Codes/lib/Locale/Script.pm		Locale::Codes
-cpan/Locale-Codes/lib/Locale/Script.pod		Locale::Codes documentation
-cpan/Locale-Codes/t/country_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/country_old.t	Locale::Codes tests
-cpan/Locale-Codes/t/country_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/currency_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/currency_old.t	Locale::Codes tests
-cpan/Locale-Codes/t/currency_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/do_tests.pl	Locale::Codes tests
-cpan/Locale-Codes/t/errors.1.t	Locale::Codes tests
-cpan/Locale-Codes/t/errors.2.t	Locale::Codes tests
-cpan/Locale-Codes/t/langext_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/langext_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/langfam_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/langfam_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/language_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/language_old.t	Locale::Codes tests
-cpan/Locale-Codes/t/language_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/langvar_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/langvar_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/script_func.t	Locale::Codes tests
-cpan/Locale-Codes/t/script_old.t	Locale::Codes tests
-cpan/Locale-Codes/t/script_oo.t	Locale::Codes tests
-cpan/Locale-Codes/t/testfunc.pl			Locale::Codes tests
-cpan/Locale-Codes/t/vals_country.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_currency.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_error.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_langext.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_langfam.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_language.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_langvar.pl	Locale::Codes tests
-cpan/Locale-Codes/t/vals_script.pl	Locale::Codes tests
 cpan/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
 cpan/Locale-Maketext-Simple/t/0-signature.t			Locale::Simple tests
 cpan/Locale-Maketext-Simple/t/1-basic.t				Locale::Simple tests
@@ -1348,7 +1288,6 @@ cpan/Locale-Maketext-Simple/t/po_without_i_default/fr.po	Locale::Simple tests
 cpan/Math-BigInt/lib/Math/BigFloat.pm		An arbitrary precision floating-point arithmetic package
 cpan/Math-BigInt/lib/Math/BigInt.pm	An arbitrary precision integer arithmetic package
 cpan/Math-BigInt/lib/Math/BigInt/Calc.pm	Pure Perl module to support Math::BigInt
-cpan/Math-BigInt/lib/Math/BigInt/CalcEmu.pm	Pure Perl module to support Math::BigInt
 cpan/Math-BigInt/lib/Math/BigInt/Lib.pm
 cpan/Math-BigInt/t/_e_math.t		Helper routine in BigFloat for _e math
 cpan/Math-BigInt/t/alias.inc		Support for BigInt tests
@@ -1370,6 +1309,8 @@ cpan/Math-BigInt/t/bigints.t		See if BigInt.pm works
 cpan/Math-BigInt/t/biglog.t		Test the log function
 cpan/Math-BigInt/t/bigroot.t		Test the broot function
 cpan/Math-BigInt/t/blucas-mbi.t
+cpan/Math-BigInt/t/bnok-mbf.t
+cpan/Math-BigInt/t/bnok-mbi.t
 cpan/Math-BigInt/t/bnstr-mbf.t		Test Math::BigInt
 cpan/Math-BigInt/t/bnstr-mbi.t		Test Math::BigInt
 cpan/Math-BigInt/t/bsstr-mbf.t		Test Math::BigInt
@@ -1385,6 +1326,7 @@ cpan/Math-BigInt/t/dparts-mbf.t		Test Math::BigInt
 cpan/Math-BigInt/t/dparts-mbi.t		Test Math::BigInt
 cpan/Math-BigInt/t/eparts-mbf.t		Test Math::BigInt
 cpan/Math-BigInt/t/eparts-mbi.t		Test Math::BigInt
+cpan/Math-BigInt/t/from_base-mbi.t
 cpan/Math-BigInt/t/from_bin-mbf.t	Test Math::BigInt
 cpan/Math-BigInt/t/from_bin-mbi.t
 cpan/Math-BigInt/t/from_hex-mbf.t	Test Math::BigInt
@@ -1427,6 +1369,7 @@ cpan/Math-BigInt/t/sub_ali.t		Tests for aliases in BigInt subclasses
 cpan/Math-BigInt/t/sub_mbf.t		Empty subclass test of BigFloat
 cpan/Math-BigInt/t/sub_mbi.t		Empty subclass test of BigInt
 cpan/Math-BigInt/t/sub_mif.t		Test A & P with subclasses using mbimbf.inc
+cpan/Math-BigInt/t/to_base-mbi.t
 cpan/Math-BigInt/t/trap.t		Test whether trap_nan and trap_inf work
 cpan/Math-BigInt/t/upgrade.inc		Actual tests for upgrade.t
 cpan/Math-BigInt/t/upgrade.t		Test if use Math::BigInt(); under upgrade works
@@ -1451,12 +1394,10 @@ cpan/Math-BigRat/lib/Math/BigRat.pm	Math::BigRat
 cpan/Math-BigRat/t/big_ap.t		Math::BigRat test
 cpan/Math-BigRat/t/bigfltpm.inc		Math::BigRat test
 cpan/Math-BigRat/t/bigfltrt.t		Math::BigRat test
-cpan/Math-BigRat/t/biglog.t		Math::BigRat test
 cpan/Math-BigRat/t/bigrat.t		Math::BigRat test
 cpan/Math-BigRat/t/bigratpm.inc		Math::BigRat test
 cpan/Math-BigRat/t/bigratpm.t		Math::BigRat test
 cpan/Math-BigRat/t/bigratup.t		test under $Math::BigInt::upgrade
-cpan/Math-BigRat/t/bigroot.t		Math::BigRat test
 cpan/Math-BigRat/t/bitwise.t		Math::BigRat test
 cpan/Math-BigRat/t/hang.t		Math::BigRat test for bug #34584 - hang in exp()
 cpan/Math-BigRat/t/Math/BigRat/Test.pm	Math::BigRat test helper
@@ -1896,6 +1837,11 @@ cpan/podlators/t/data/basic.ovr			podlators test
 cpan/podlators/t/data/basic.pod			podlators test
 cpan/podlators/t/data/basic.txt			podlators test
 cpan/podlators/t/data/perl.conf			podlators test
+cpan/podlators/t/data/snippets/color/escape-wrapping
+cpan/podlators/t/data/snippets/color/tag-width
+cpan/podlators/t/data/snippets/color/tag-wrapping
+cpan/podlators/t/data/snippets/color/width
+cpan/podlators/t/data/snippets/color/wrapping
 cpan/podlators/t/data/snippets/man/agrave
 cpan/podlators/t/data/snippets/man/backslash-man-ref
 cpan/podlators/t/data/snippets/man/bullet-after-nonbullet
@@ -1945,11 +1891,18 @@ cpan/podlators/t/data/snippets/man/utf8-verbatim
 cpan/podlators/t/data/snippets/man/x-whitespace
 cpan/podlators/t/data/snippets/man/x-whitespace-entry
 cpan/podlators/t/data/snippets/README			podlators test
+cpan/podlators/t/data/snippets/termcap/escape-wrapping
+cpan/podlators/t/data/snippets/termcap/tag-width
+cpan/podlators/t/data/snippets/termcap/tag-wrapping
+cpan/podlators/t/data/snippets/termcap/width
+cpan/podlators/t/data/snippets/termcap/wrapping
 cpan/podlators/t/data/snippets/text/cpp			podlators test
 cpan/podlators/t/data/termcap			podlators test
 cpan/podlators/t/docs/pod.t			podlators test
 cpan/podlators/t/docs/pod-spelling.t			podlators test
+cpan/podlators/t/docs/spdx-license.t			podlators test
 cpan/podlators/t/docs/synopsis.t			podlators test
+cpan/podlators/t/docs/urls.t			podlators test
 cpan/podlators/t/general/basic.t			podlators test
 cpan/podlators/t/general/filehandle.t			podlators test
 cpan/podlators/t/general/pod-parser.t			podlators test
@@ -2303,6 +2256,7 @@ cpan/Test-Simple/lib/Test2/EventFacet/Control.pm
 cpan/Test-Simple/lib/Test2/EventFacet/Error.pm
 cpan/Test-Simple/lib/Test2/EventFacet/Hub.pm
 cpan/Test-Simple/lib/Test2/EventFacet/Info.pm
+cpan/Test-Simple/lib/Test2/EventFacet/Info/Table.pm
 cpan/Test-Simple/lib/Test2/EventFacet/Meta.pm
 cpan/Test-Simple/lib/Test2/EventFacet/Parent.pm
 cpan/Test-Simple/lib/Test2/EventFacet/Plan.pm
@@ -2457,6 +2411,7 @@ cpan/Test-Simple/t/Legacy_And_Test2/builder_loaded_late.t
 cpan/Test-Simple/t/Legacy_And_Test2/diag_event_on_ok.t
 cpan/Test-Simple/t/Legacy_And_Test2/hidden_warnings.t
 cpan/Test-Simple/t/Legacy_And_Test2/preload_diag_note.t
+cpan/Test-Simple/t/Legacy_And_Test2/thread_init_warning.t
 cpan/Test-Simple/t/lib/Dev/Null.pm
 cpan/Test-Simple/t/lib/Dummy.pm
 cpan/Test-Simple/t/lib/MyOverload.pm
@@ -2491,9 +2446,12 @@ cpan/Test-Simple/t/regression/694_note_diag_return_values.t
 cpan/Test-Simple/t/regression/696-intercept_skip_all.t
 cpan/Test-Simple/t/regression/721-nested-streamed-subtest.t
 cpan/Test-Simple/t/regression/757-reset_in_subtest.t
+cpan/Test-Simple/t/regression/812-todo.t
+cpan/Test-Simple/t/regression/817-subtest-todo.t
 cpan/Test-Simple/t/regression/buffered_subtest_plan_buffered.t
 cpan/Test-Simple/t/regression/builder_does_not_init.t
 cpan/Test-Simple/t/regression/errors_facet.t
+cpan/Test-Simple/t/regression/fork_first.t
 cpan/Test-Simple/t/regression/inherit_trace.t
 cpan/Test-Simple/t/regression/no_name_in_subtest.t
 cpan/Test-Simple/t/regression/todo_and_facets.t
@@ -2646,6 +2604,7 @@ cpan/Unicode-Collate/Collate/Locale/be.pl	Unicode::Collate
 cpan/Unicode-Collate/Collate/Locale/bn.pl		Unicode::Collate
 cpan/Unicode-Collate/Collate/Locale/ca.pl			Unicode::Collate
 cpan/Unicode-Collate/Collate/Locale/cs.pl			Unicode::Collate
+cpan/Unicode-Collate/Collate/Locale/cu.pl
 cpan/Unicode-Collate/Collate/Locale/cy.pl			Unicode::Collate
 cpan/Unicode-Collate/Collate/Locale/da.pl			Unicode::Collate
 cpan/Unicode-Collate/Collate/Locale/de_at_ph.pl			Unicode::Collate
@@ -2760,6 +2719,7 @@ cpan/Unicode-Collate/t/loc_ca.t			Unicode::Collate
 cpan/Unicode-Collate/t/loc_cjk.t		Unicode::Collate
 cpan/Unicode-Collate/t/loc_cjkc.t		Unicode::Collate
 cpan/Unicode-Collate/t/loc_cs.t			Unicode::Collate
+cpan/Unicode-Collate/t/loc_cu.t
 cpan/Unicode-Collate/t/loc_cy.t			Unicode::Collate
 cpan/Unicode-Collate/t/loc_cyrl.t			Unicode::Collate
 cpan/Unicode-Collate/t/loc_da.t			Unicode::Collate
@@ -3030,6 +2990,7 @@ dist/Data-Dumper/t/trailing_comma.t	See if Data::Dumper::Trailingcomma works
 dist/Data-Dumper/t/values.t	See if Data::Dumper::Values works
 dist/Data-Dumper/Todo		Data pretty printer, futures
 dist/Devel-PPPort/apicheck_c.PL		Devel::PPPort apicheck generator
+dist/Devel-PPPort/Changes			Devel::PPPort Changes file
 dist/Devel-PPPort/devel/buildperl.pl	Devel::PPPort perl version builder
 dist/Devel-PPPort/devel/devtools.pl	Devel::PPPort development utilities
 dist/Devel-PPPort/devel/mkapidoc.sh	Devel::PPPort apidoc collector
@@ -3039,6 +3000,7 @@ dist/Devel-PPPort/devel/regenerate	Devel::PPPort API re-generator
 dist/Devel-PPPort/devel/scanprov	Devel::PPPort provided API scanner
 dist/Devel-PPPort/HACKERS		Devel::PPPort hackers documentation
 dist/Devel-PPPort/Makefile.PL		Devel::PPPort makefile writer
+dist/Devel-PPPort/MANIFEST.SKIP		Devel::PPPort manifest skip file
 dist/Devel-PPPort/mktests.PL		Devel::PPPort test file writer
 dist/Devel-PPPort/module2.c		Devel::PPPort test file
 dist/Devel-PPPort/module3.c		Devel::PPPort test file
@@ -3191,6 +3153,7 @@ dist/Devel-PPPort/parts/inc/gv		Devel::PPPort include
 dist/Devel-PPPort/parts/inc/HvNAME	Devel::PPPort include
 dist/Devel-PPPort/parts/inc/limits	Devel::PPPort include
 dist/Devel-PPPort/parts/inc/magic	Devel::PPPort include
+dist/Devel-PPPort/parts/inc/magic_defs	Devel::PPPort include
 dist/Devel-PPPort/parts/inc/memory	Devel::PPPort include
 dist/Devel-PPPort/parts/inc/mess	Devel::PPPort include
 dist/Devel-PPPort/parts/inc/misc	Devel::PPPort include
@@ -3629,14 +3592,16 @@ dist/Net-Ping/t/120_udp_inst.t		Ping Net::Ping
 dist/Net-Ping/t/130_tcp_inst.t		Ping Net::Ping
 dist/Net-Ping/t/140_stream_inst.t	Ping Net::Ping
 dist/Net-Ping/t/150_syn_inst.t		Ping Net::Ping
-dist/Net-Ping/t/190_alarm.t		Ping Net::Ping
+dist/Net-Ping/t/190_alarm.t			Ping Net::Ping
 dist/Net-Ping/t/200_ping_tcp.t		Ping Net::Ping
 dist/Net-Ping/t/250_ping_hires.t	Ping Net::Ping
 dist/Net-Ping/t/300_ping_stream.t	Ping Net::Ping
 dist/Net-Ping/t/400_ping_syn.t		Ping Net::Ping
 dist/Net-Ping/t/410_syn_host.t		Ping Net::Ping
+dist/Net-Ping/t/420_ping_syn_port.t	Ping Net::Ping
 dist/Net-Ping/t/450_service.t		Ping Net::Ping
 dist/Net-Ping/t/500_ping_icmp.t		Ping Net::Ping
+dist/Net-Ping/t/501_ping_icmpv6.t	Ping Net::Ping
 dist/Net-Ping/t/510_ping_udp.t		Ping Net::Ping
 dist/Net-Ping/t/520_icmp_ttl.t		Ping Net::Ping
 dist/PathTools/Changes			Changelog for PathTools dist
@@ -3702,6 +3667,7 @@ dist/Storable/hints/gnuknetbsd.pl	Hint for Storable for named architecture
 dist/Storable/hints/hpux.pl		Hint for Storable for named architecture
 dist/Storable/hints/linux.pl		Hint for Storable for named architecture
 dist/Storable/Makefile.PL		Storable extension
+dist/Storable/MANIFEST			Storable MANIFEST file
 dist/Storable/README			Storable extension
 dist/Storable/stacksize			compute stack sizes
 dist/Storable/Storable.xs		Storable extension
@@ -3716,7 +3682,6 @@ dist/Storable/t/code.t			See if Storable works
 dist/Storable/t/compat01.t		See if Storable works
 dist/Storable/t/compat06.t		See if Storable works
 dist/Storable/t/croak.t			See if Storable works
-dist/Storable/t/CVE-2015-1592.inc	See if Storable works
 dist/Storable/t/CVE-2015-1592.t		See if Storable works
 dist/Storable/t/dclone.t		See if Storable works
 dist/Storable/t/destroy.t		Test Storable in global destructon
@@ -3965,22 +3930,6 @@ ext/Amiga-Exec/Exec.xs	Amiga::Exec extension
 ext/Amiga-Exec/Makefile.PL			Amiga::Exec extension
 ext/Amiga-Exec/tagtypes.h	Amiga::Exec extension
 ext/Amiga-Exec/typemap		Amiga::Exec extension
-ext/arybase/arybase.pm		For $[
-ext/arybase/arybase.xs		For $[
-ext/arybase/ptable.h		For $[
-ext/arybase/t/aeach.t		For $[
-ext/arybase/t/aelem.t		For $[
-ext/arybase/t/akeys.t		For $[
-ext/arybase/t/arybase.t		For $[
-ext/arybase/t/aslice.t		For $[
-ext/arybase/t/av2arylen.t	For $[
-ext/arybase/t/index.t		For $[
-ext/arybase/t/lslice.t		For $[
-ext/arybase/t/pos.t		For $[
-ext/arybase/t/scope.t		For $[
-ext/arybase/t/scope_0.pm	For $[
-ext/arybase/t/splice.t		For $[
-ext/arybase/t/substr.t		For $[
 ext/attributes/attributes.pm		For "sub foo : attrlist"
 ext/attributes/attributes.xs		For "sub foo : attrlist"
 ext/B/B.pm		Compiler backend support functions and methods
@@ -4233,6 +4182,7 @@ ext/POSIX/POSIX.xs		POSIX extension external subroutines
 ext/POSIX/t/export.t		Test @EXPORT and @EXPORT_OK
 ext/POSIX/t/iscrash		See if POSIX isxxx() crashes with threads on Win32
 ext/POSIX/t/math.t		Basic math tests for POSIX
+ext/POSIX/t/mb.t		Multibyte function tests for POSIX
 ext/POSIX/t/posix.t		See if POSIX works
 ext/POSIX/t/sigaction.t		See if POSIX::sigaction works
 ext/POSIX/t/sigset.t		See if POSIX::SigSet works
@@ -4282,6 +4232,7 @@ ext/SDBM_File/sdbm.h	SDBM kit
 ext/SDBM_File/SDBM_File.pm	SDBM extension Perl module
 ext/SDBM_File/SDBM_File.xs	SDBM extension external subroutines
 ext/SDBM_File/t/constants.t	See if SDBM_File constants work
+ext/SDBM_File/t/corrupt.t	See if SDBM_File handles corrupt files
 ext/SDBM_File/t/prep.t		See if SDBM_File with extra argument works
 ext/SDBM_File/t/sdbm.t		See if SDBM_File works
 ext/SDBM_File/tune.h	SDBM kit
@@ -4526,6 +4477,7 @@ hints/linux.sh			Hints for named architecture
 hints/linux-android.sh		Hints for named architecture
 hints/lynxos.sh			Hints for named architecture
 hints/midnightbsd.sh		Hints for named architecture
+hints/minix.sh			Hints for named architecture
 hints/mips.sh			Hints for named architecture
 hints/mirbsd.sh			Hints for named architecture
 hints/mpc.sh			Hints for named architecture
@@ -4702,6 +4654,8 @@ lib/perl5db/t/proxy-constants	Tests for the Perl debugger
 lib/perl5db/t/rt-104168		Tests for the Perl debugger
 lib/perl5db/t/rt-120174		Tests for the Perl debugger
 lib/perl5db/t/rt-121509-restart-after-chdir		Tests for the Perl debugger
+lib/perl5db/t/rt-124203		Test threads in the Perl debugger
+lib/perl5db/t/rt-124203b	Test threads in the Perl debugger
 lib/perl5db/t/rt-61222		Tests for the Perl debugger
 lib/perl5db/t/rt-66110		Tests for the Perl debugger
 lib/perl5db/t/source-cmd-test.perldb		Tests for the Perl debugger
@@ -4784,7 +4738,9 @@ lib/unicore/DAge.txt				Unicode character database
 lib/unicore/DCoreProperties.txt			Unicode character database
 lib/unicore/DNormalizationProps.txt		Unicode character database
 lib/unicore/EastAsianWidth.txt			Unicode character database
+lib/unicore/EmojiData.txt			Unicode character database
 lib/unicore/EmojiSources.txt			Unicode character database
+lib/unicore/EquivalentUnifiedIdeograph.txt	Unicode character database
 lib/unicore/extracted/DBidiClass.txt		Unicode character database
 lib/unicore/extracted/DBinaryProperties.txt	Unicode character database
 lib/unicore/extracted/DCombiningClass.txt	Unicode character database
@@ -4818,6 +4774,7 @@ lib/unicore/ScriptExtensions.txt		Unicode character database
 lib/unicore/Scripts.txt				Unicode character database
 lib/unicore/SpecialCasing.txt			Unicode character database
 lib/unicore/StandardizedVariants.txt		Unicode character database
+lib/unicore/uni_keywords.pl			Indices into array in charclass_invlists.h
 lib/unicore/UnicodeData.txt			Unicode character database
 lib/unicore/version				The version of the Unicode
 lib/unicore/VerticalOrientation.txt		Unicode character database
@@ -5071,6 +5028,7 @@ pod/perl5262delta.pod		Perl changes in version 5.26.2
 pod/perl5263delta.pod		Perl changes in version 5.26.3
 pod/perl5280delta.pod		Perl changes in version 5.28.0
 pod/perl5281delta.pod		Perl changes in version 5.28.1
+pod/perl5282delta.pod		Perl changes in version 5.28.2
 pod/perl561delta.pod		Perl changes in version 5.6.1
 pod/perl56delta.pod		Perl changes in version 5.6
 pod/perl581delta.pod		Perl changes in version 5.8.1
@@ -5458,6 +5416,7 @@ t/io/errno.t			See if $! is correctly set
 t/io/errnosig.t			Test case for restoration $! when leaving signal handlers
 t/io/fflush.t			See if auto-flush on fork/exec/system/qx works
 t/io/fs.t			See if directory manipulations work
+t/io/getcwd.t			See if Internals::getcwd is sane
 t/io/inplace.t			See if inplace editing works
 t/io/iofile.t			See if we can load IO::File on demand
 t/io/iprefix.t			See if inplace editing works with prefixes
@@ -5465,6 +5424,7 @@ t/io/layers.t			See if PerlIO layers work
 t/io/nargv.t			See if nested ARGV stuff works
 t/io/open.t			See if open works
 t/io/openpid.t			See if open works for subprocesses
+t/io/paragraph_mode.t			See if paragraph mode works
 t/io/perlio.t			See if PerlIO works
 t/io/perlio_fail.t		See if bad layers fail
 t/io/perlio_leaks.t		See if PerlIO layers are leaking
@@ -5489,6 +5449,7 @@ t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
 t/lib/Count.pm			Helper for t/op/method.t
 t/lib/croak.t			Test calls to Perl_croak() in the C source.
+t/lib/croak/gv			Test croak calls from gv.c
 t/lib/croak/mg			Test croak calls from mg.c
 t/lib/croak/op			Test croak calls from op.c
 t/lib/croak/pp			Test croak calls from pp.c
@@ -5510,6 +5471,7 @@ t/lib/Devel/switchd_goto.pm	Module for t/run/switchd.t
 t/lib/feature/bundle		Tests for feature bundles
 t/lib/feature/implicit		Tests for implicit loading of feature.pm
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
+t/lib/feature/removed		Tests for enabling/disabling removed feature
 t/lib/feature/say		Tests for enabling/disabling say feature
 t/lib/feature/switch		Tests for enabling/disabling switch feature
 t/lib/h2ph.h			Test header file for h2ph
@@ -5648,7 +5610,6 @@ t/op/anonsub.t			See if anonymous subroutines work
 t/op/append.t			See if . works
 t/op/args.t			See if operations on @_ work
 t/op/array.t			See if array operations work
-t/op/array_base.t		Tests for the remnant of $[
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/attrhand.t			See if attribute handlers work
 t/op/attrproto.t		See if the prototype attribute works
@@ -5833,6 +5794,7 @@ t/op/tiehandle.t		See if tie for handles works
 t/op/time.t			See if time functions work
 t/op/time_loop.t		Test that very large values don't hang gmtime and localtime.
 t/op/tr.t			See if tr works
+t/op/tr_latin1.t		See if tr works, but file isn't encoded in UTF-8
 t/op/undef.t			See if undef works
 t/op/universal.t		See if UNIVERSAL class works
 t/op/unlink.t			See if unlink works
@@ -5907,7 +5869,14 @@ t/porting/utils.t		Check that utility scripts still compile
 t/re/alpha_assertions.t		See if things like '(*postive_lookahed:...) work properly
 t/re/anyof.t			See if bracketed char classes [...] compile properly
 t/re/charset.t			See if regex modifiers like /d, /u work properly
-t/re/fold_grind.t		See if case folding works properly
+t/re/fold_grind.pl		Core file to see if regex case folding works properly
+t/re/fold_grind_8.t		Wrapper for fold_grind.pl for /l testing with a UTF-8 locale
+t/re/fold_grind_a.t		Wrapper for fold_grind.pl for /a testing
+t/re/fold_grind_aa.t		Wrapper for fold_grind.pl for /aa testing
+t/re/fold_grind_d.t		Wrapper for fold_grind.pl for /d testing
+t/re/fold_grind_l.t		Wrapper for fold_grind.pl for /l testing with a C locale
+t/re/fold_grind_T.t		Wrapper for fold_grind.pl for /l testing with a Turkic locale
+t/re/fold_grind_u.t		Wrapper for fold_grind.pl for /u testing
 t/re/keep_tabs.t		Tests where \t can't be expanded.
 t/re/no_utf8_pm.t		Verify utf8.pm doesn't get loaded unless required
 t/re/overload.t		Test against string corruption in pattern matches on overloaded objects
@@ -5973,6 +5942,7 @@ t/re/uniprops07.t		Test unicode \p{} regex constructs
 t/re/uniprops08.t		Test unicode \p{} regex constructs
 t/re/uniprops09.t		Test unicode \p{} regex constructs
 t/re/uniprops10.t		Test unicode \p{} regex constructs
+t/re/user_prop_race_thr.t	Test races in user-defined \p{} under threads
 t/README			Instructions for regression tests
 t/run/cloexec.t			Test close-on-exec.
 t/run/dtrace.pl			For dtrace.t

@@ -1,5 +1,8 @@
 Revision history for Time-Zone-Olson
 
+0.14    Tue May 21 18:37:00 2019
+       Added support for Solaris.  Merging of preliminary Win32 code into the main module.
+
 0.13    Mon May 20 18:37:00 2019
        Preliminary support for Win32.  Coping with TZ environment variables such as 'AEST-10AEDT,M10.1.0,M4.1.0/3'.  Changed signature of new method.
 

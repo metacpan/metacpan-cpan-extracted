@@ -3,7 +3,7 @@ use strict;
 use Moo;
 
 sub parse {
-	my ($self, $record) = @_;
+    my ($self, $record) = @_;
 
     my $pica = $record->{recordData};
 
@@ -11,14 +11,14 @@ sub parse {
     my $id = undef;
 
     for my $field ($pica->getChildrenByLocalName('datafield')) {
-        my $tag = $field->getAttribute('tag');
-        my $occ = $field->getAttribute('occurrence');
+        my $tag       = $field->getAttribute('tag');
+        my $occ       = $field->getAttribute('occurrence');
         my @subfields = ();
         for my $subfield ($field->getChildrenByLocalName('subfield')) {
             my $code  = $subfield->getAttribute('code');
             my $value = $subfield->textContent;
             push @subfields, $code, $value;
-			$id = $value if $tag eq '003@' and $code eq '0';
+            $id = $value if $tag eq '003@' and $code eq '0';
         }
         push @record, [$tag, $occ, @subfields];
     }

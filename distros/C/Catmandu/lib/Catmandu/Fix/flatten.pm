@@ -2,21 +2,28 @@ package Catmandu::Fix::flatten;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
+use Catmandu::Util::Path qw(as_path);
+use Catmandu::Util qw(is_array_ref);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
 has path => (fix_arg => 1);
 
-with 'Catmandu::Fix::SimpleGetValue';
+with 'Catmandu::Fix::Builder';
 
-sub emit_value {
-    my ($self, $var) = @_;
-    "if (is_array_ref(${var})) {"
-        . "${var} = [map { ref \$_ eq 'ARRAY' ? \@\$_ : \$_ } \@{${var}}] "
-        . "while grep ref \$_ eq 'ARRAY', \@{${var}};" . "}";
+sub _build_fixer {
+    my ($self) = @_;
+    as_path($self->path)->updater(
+        if_array_ref => sub {
+            my $data = $_[0];
+            $data = [map {is_array_ref($_) ? @$_ : $_} @$data]
+                while grep {is_array_ref($_)} @$data;
+            $data;
+        }
+    );
 }
 
 1;

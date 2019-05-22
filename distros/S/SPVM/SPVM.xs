@@ -199,6 +199,7 @@ compile_spvm(...)
     for (int32_t package_id = 0; package_id < compiler->packages->length; package_id++) {
       SPVM_PACKAGE* package = SPVM_LIST_fetch(compiler->packages, package_id);
       const char* package_name = package->name;
+      
       const char* module_file = package->module_file;
       SV* sv_module_file = sv_2mortal(newSVpv(module_file, 0));
 
@@ -1152,8 +1153,7 @@ _new_varray(...)
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, basic_type_name);
   
   if (basic_type == NULL) {
-    const char* basic_type_name = &runtime->string_pool[basic_type->name_id];
-    croak("Can't load %s at %s line %d\n", basic_type_name, MFILE, __LINE__);
+    croak("Not found %s at %s line %d\n", basic_type_name, MFILE, __LINE__);
   }
   
   // New array
@@ -1284,35 +1284,43 @@ _new_varray_from_bin(...)
   int32_t field_length = package->fields_length;
 
   int32_t array_length;
-
+  
+  
+  int32_t field_width;
   switch (first_field->basic_type_id) {
     case SPVM_BASIC_TYPE_C_ID_BYTE: {
-      array_length = binary_length/ field_length;
+      field_width = 1;
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_SHORT: {
-      array_length = binary_length / field_length / 2;
+      field_width = 2;
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_INT: {
-      array_length = binary_length / field_length / 4;
+      field_width = 4;
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_LONG: {
-      array_length = binary_length / field_length / 8;
+      field_width = 8;
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-      array_length = binary_length / field_length / 4;
+      field_width = 4;
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-      array_length = binary_length / field_length / 8;
+      field_width = 8;
       break;
     }
     default:
       assert(0);
   }
+  
+  if (binary_length % (field_length * field_width) != 0) {
+    croak("Invalid binary data size at %s line %d", MFILE, __LINE__);
+  }
+  
+  array_length = binary_length / field_length / field_width;
 
   SPVM_OBJECT* array = env->new_varray_raw(env, basic_type->id, array_length);
 
@@ -1323,42 +1331,42 @@ _new_varray_from_bin(...)
     case SPVM_BASIC_TYPE_C_ID_BYTE: {
       int8_t* elems = env->belems(env, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length);
+        memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_SHORT: {
       int16_t* elems = env->selems(env, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * 2);
+        memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_INT: {
       int32_t* elems = env->ielems(env, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * 4);
+        memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_LONG: {
       int64_t* elems = env->lelems(env, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * 8);
+        memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_FLOAT: {
       float* elems = env->felems(env, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * 4);
+        memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
     case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
       double* elems = env->delems(env, array);
       if (array_length > 0) {
-        memcpy(elems, binary, field_length * array_length * 8);
+        memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
@@ -1488,12 +1496,12 @@ call_sub(...)
     croak("Subroutine not found %s %s at %s line %d\n", package_name, sub_signature, MFILE, __LINE__);
   }
 
-  SPVM_VALUE stack[SPVM_LIMIT_C_STACK_MAX];
+  SPVM_VALUE stack[SPVM_LIMIT_C_SUB_ARGS_MAX_COUNT];
   
   int32_t ref_stack_top = 0;
-  SPVM_VALUE ref_stack[SPVM_LIMIT_C_STACK_MAX];
+  SPVM_VALUE ref_stack[SPVM_LIMIT_C_SUB_ARGS_MAX_COUNT];
 
-  int32_t ref_stack_ids[SPVM_LIMIT_C_STACK_MAX];
+  int32_t ref_stack_ids[SPVM_LIMIT_C_SUB_ARGS_MAX_COUNT];
   
   // Arguments
   int32_t args_contain_ref = 0;
@@ -1829,6 +1837,7 @@ call_sub(...)
         case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
         {
           if (SvOK(sv_value)) {
+            // Convert Perl array to SPVM object
             if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
               
               SV* sv_elems = sv_value;
@@ -1998,6 +2007,35 @@ call_sub(...)
                         SV** sv_value_ptr = av_fetch(av_elems, i, 0);
                         SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
                         elems[i] = (double)SvNV(sv_value);
+                      }
+                    }
+                    
+                    // New sv array
+                    SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::Data::Array");
+                    sv_value = sv_array;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_ANY_OBJECT: {
+                    // New array
+                    void* array = env->new_oarray_raw(env, SPVM_BASIC_TYPE_C_ID_ANY_OBJECT, length);
+
+                    // Increment reference count
+                    env->inc_ref_count(env, array);
+
+                    {
+                      int32_t i;
+                      for (i = 0; i < length; i++) {
+                        SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                        SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                        if (SvOK(sv_value)) {
+                          if (!sv_derived_from(sv_value, "SPVM::Data")) {
+                            croak("Element of %dth argument of %s::%s() must inherit SPVM::Data object at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+                          }
+                          env->set_oelem(env, array, i, SPVM_XS_UTIL_get_object(sv_value));
+                        }
+                        else {
+                          env->set_oelem(env, array, i, NULL);
+                        }
                       }
                     }
                     
@@ -2579,7 +2617,8 @@ call_sub(...)
     default:
       assert(0);
   }
-  
+
+  // Restore reference value
   if (args_contain_ref) {
     for (int32_t arg_index = 0; arg_index < sub->arg_ids_length; arg_index++) {
       SV* sv_value = ST(arg_index + arg_start);
@@ -2710,7 +2749,7 @@ call_sub(...)
       }
     }
   }
-
+  
   // Exception
   if (excetpion_flag) {
     void* exception = env->exception(env);

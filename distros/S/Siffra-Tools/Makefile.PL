@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
         'Siffra::Base' => 0,
         'Digest::MD5'  => 0,
         'Text::CSV_XS' => 0,
+        'JSON::XS'     => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,

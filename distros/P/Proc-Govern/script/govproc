@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-04-30'; # DATE
-our $VERSION = '0.201'; # VERSION
+our $DATE = '2019-05-22'; # DATE
+our $VERSION = '0.205'; # VERSION
 
 use 5.010;
 use strict;
@@ -45,7 +45,7 @@ my $success = GetOptions(
     "load-every=i"           => sub { $opts{load_watch} = 1; $opts{load_check_every} = $_[1] },
     "killfam"                => sub { $opts{killfam} = 1 },
     "no-screensaver"         => \$opts{no_screensaver},
-    "euid=i"                 => \$opts{euid},
+    "euid=s"                 => \$opts{euid},
     "egid=s"                 => \$opts{egid},
 );
 unless ($success) {
@@ -156,7 +156,7 @@ govproc - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.201 of govproc (from Perl distribution Proc-Govern), released on 2019-04-30.
+This document describes version 0.205 of govproc (from Perl distribution Proc-Govern), released on 2019-05-22.
 
 =head1 SYNOPSIS
 

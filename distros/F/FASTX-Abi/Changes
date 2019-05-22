@@ -1,19 +1,23 @@
 This is the changelog for FASTX::Abi. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 
 
+0.05	2019-05-17
+	* Extended existing unit tests; New unit test on trimming behaviour
+	* FIXED: Property 'discard' was previously not covered
+
 0.04	2019-05-16
 	* Added unit tests on "keep_abi"
 	* Update README.md
 
 0.03	2019-05-16
-	* *NEW* new() has attribute 'keep_abi' to preserve chromas object, otherwise deleted (_get_trace_info()_ changed accordingly)
+	* NEW: new() has attribute 'keep_abi' to preserve chromas object, otherwise deleted (_get_trace_info()_ changed accordingly)
 	* new() now validates input attributes and object generated attributes; dies if unexpected value is passed (improves code self-documentation)
 	* New unit tests
 	* Updated TravisCI configuration; Updated Dist::Zilla configuration linking GitHub and cleaning scripts (xt/private/)
 	* POD updates
 
 0.02	2019-05-14
-	* *FIXED* release test (version) was pointing to wrong module
+	* FIXED: release test (version) was pointing to wrong module
 	* Update POD
 	* Added unit tests
 	* Added GitHub repository

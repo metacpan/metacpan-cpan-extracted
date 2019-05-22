@@ -43,11 +43,11 @@ Test::MockFile - Allows tests to validate code that can interact with files with
 
 =head1 VERSION
 
-Version 0.018
+Version 0.019
 
 =cut
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 our %files_being_mocked;
 
@@ -76,6 +76,7 @@ A strict mode is even provided which can throw a die when files are accessed dur
 
     use Test::MockFile;
 
+    # Be sure to assign the output of mocks, they disappear when they go out of scope
     my $mock_file = Test::MockFile->file("/foo/bar", "contents\ngo\nhere");
     open(my $fh, "<", "/foo/bar") or die; # Does not actually open the file on disk.
     say "ok" if -e $fh;
@@ -111,8 +112,8 @@ For example:
     use Test::MockFile qw/strict/;
 
     # This will not die.
-    Test::MockFile->file("/bar", "...");
-    Test::MockFile->symlink("/foo", "/bar");
+    my $file = Test::MockFile->file("/bar", "...");
+    my $symlink = Test::MockFile->symlink("/foo", "/bar");
     -l "/foo" or print "ok\n";
     open(my $fh, ">", "/foo");
     
@@ -344,7 +345,7 @@ sub dir {
 
 When creating mocked files or directories, we default their stats to:
 
-    Test::MockFile->new( $file, $contents, {
+    my $mattrs = Test::MockFile->file( $file, $contents, {
             'dev'       => 0,        # stat[0]
             'inode'     => 0,        # stat[1]
             'mode'      => $mode,    # stat[2]
@@ -357,16 +358,16 @@ When creating mocked files or directories, we default their stats to:
             'ctime'     => $now,     # stat[10]
             'blksize'   => 4096,     # stat[11]
             'fileno'    => undef,    # fileno()
-    };
+    } );
     
 You'll notice that mode, size, and blocks have been left out of this. Mode is set to 666 (for files) or 777 (for directories), xored against the current umask.
 Size and blocks are calculated based on the size of 'contents' a.k.a. the fake file.
 
 When you want to override one of the defaults, all you need to do is specify that when you declare the file or directory. The rest will continue to default.
 
-    Test::MockFile->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
+    my $mfile = Test::MockFile->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
 
-    Test::MockFile->dir("/sbin", "...", { mode => 0700 }));
+    my $mdir = Test::MockFile->dir("/sbin", "...", { mode => 0700 }));
 
 =head2 new
     
@@ -1038,6 +1039,12 @@ BEGIN {
             }
         }
 
+        # Allows for scalar file handles.
+        if ( ref $_[2] && ref $_[2] eq 'SCALAR' ) {
+            goto \&CORE::open if _goto_is_available();
+            return CORE::open( $_[0], $_[1], $_[2] );
+        }
+
         my $abs_path = _find_file_or_fh( $_[2], 1 );    # Follow the link.
         die if ( !$abs_path );
         die if $abs_path eq BROKEN_SYMLINK;
@@ -1181,7 +1188,7 @@ BEGIN {
 
         # O_APPEND
         if ( $sysopen_mode & O_APPEND ) {
-            $_[0]->{'tell'} = length( $mock_file->{'contents'} );
+            seek $_[0], length $mock_file->{'contents'}, 0;
         }
 
         return 1;

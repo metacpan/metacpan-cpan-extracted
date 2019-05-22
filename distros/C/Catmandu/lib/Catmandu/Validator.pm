@@ -2,7 +2,7 @@ package Catmandu::Validator;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Catmandu::Util qw(:is);
 use Moo::Role;
@@ -116,7 +116,7 @@ __END__
 
 =head1 NAME
 
-Catmandu::Validator - Namespace for packages that can validate records in Catmandu.
+Catmandu::Validator - Namespace for packages that can validate items in Catmandu
 
 =head1 SYNOPSIS
 
@@ -161,6 +161,8 @@ Catmandu::Validator - Namespace for packages that can validate records in Catman
         my $record = shift;
         publish_record($record);
     });
+
+See L<Catmandu::Fix::validate> and L<Catmandu::Fix::Condition::valid> to use validators in fixes (L<Catmandu::Fix>).
 
 =head1 DESCRIPTION
 
@@ -215,6 +217,8 @@ Returns the number of invalid records from the last validate operation.
 
 =head1 SEE ALSO
 
-L<Catmandu::Validator::Simple>, L<Catmandu::Iterable>
+L<Catmandu::Validator::Env> and L<Catmandu::Validator::Simple>.
+
+L<Catmandu::Iterable>
 
 =cut

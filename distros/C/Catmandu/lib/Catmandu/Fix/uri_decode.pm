@@ -2,21 +2,23 @@ package Catmandu::Fix::uri_decode;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
-use Encode      ();
-use URI::Escape ();
+use Catmandu::Util::Path qw(as_path);
+use Encode qw(decode_utf8);
+use URI::Escape qw(uri_unescape);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
+with 'Catmandu::Fix::Builder';
+
 has path => (fix_arg => 1);
 
-with 'Catmandu::Fix::SimpleGetValue';
-
-sub emit_value {
-    my ($self, $var) = @_;
-    "${var} = Encode::decode_utf8(URI::Escape::uri_unescape(${var}));";
+sub _build_fixer {
+    my ($self) = @_;
+    as_path($self->path)
+        ->updater(if_string => sub {decode_utf8(uri_unescape($_[0]))});
 }
 
 1;

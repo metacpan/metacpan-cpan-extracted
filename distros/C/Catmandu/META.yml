@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,8 +45,7 @@ requires:
   Hash::Merge::Simple: '0'
   IO::Handle::Util: '0.01'
   LWP::UserAgent: '0'
-  List::MoreUtils: '0.33'
-  List::MoreUtils::XS: '0'
+  List::MoreUtils: '0.401'
   Log::Any: '0'
   Log::Any::Adapter: '0'
   MIME::Types: '0'
@@ -56,6 +55,7 @@ requires:
   Parser::MGC: '0.15'
   Path::Iterator::Rule: '0'
   Path::Tiny: '0'
+  String::CamelCase: '0'
   Sub::Exporter: '0.982'
   Sub::Quote: '0'
   Text::CSV: '1.21'
@@ -74,7 +74,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu/issues
   homepage: https://github.com/LibreCat/Catmandu
   repository: https://github.com/LibreCat/Catmandu.git
-version: '1.0606'
+version: '1.2001'
 x_contributors:
   - 'Christian Pietsch <chr.pietsch+github@googlemail.com>'
   - 'Dave Sherohman <dsheroh@cpan.org>'
@@ -86,6 +86,7 @@ x_contributors:
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Magnus Enger <magnus@enger.priv.no>'
+  - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
   - 'Nicolas Franck <njfranck@cpan.org>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
@@ -96,4 +97,6 @@ x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
   - 'Upasana Shukla <me@upasana.me>'
   - 'Vitali Peil <vpeil@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 0

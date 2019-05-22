@@ -13,194 +13,37 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include "mph2l.h"
 
-#ifndef STADTX_SEED_BYTES
-#define STADTX_SEED_BYTES (sizeof(U64) * 2)
-#endif
-#ifndef STADTX_STATE_BYTES
-#define STADTX_STATE_BYTES (sizeof(U64) * 4)
-#endif
 
-#ifndef MPH_MAP_POPULATE
-#ifdef MAP_POPULATE
-#define MPH_MAP_POPULATE MAP_POPULATE
-#else
-#define MPH_MAP_POPULATE MAP_PREFAULT_READ
-#endif
-#endif
+MPH_STATIC_INLINE void
+sv_set_from_bucket(pTHX_ SV *sv, U8 *strs, const U32 ofs, const U32 len, const U32 idx, const U8 *flags, const U32 bits) {
+    U8 *ptr;
+    U8 is_utf8;
+    if (ofs) {
+        ptr= (strs) + (ofs);
+        GETBITS(is_utf8,flags,idx,bits);
+    } else {
+        ptr= 0;
+        is_utf8= 0;
+    }
+    /* note that sv_setpvn() will cause the sv to
+     * become undef if ptr is 0 */
+    sv_setpvn_mg((sv),ptr,len);
+    if (is_utf8 > 1) {
+        sv_utf8_upgrade(sv);
+    }
+    else
+    if (is_utf8) {
+        SvUTF8_on(sv);
+    }
+    else
+    if (ptr) {
+        SvUTF8_off(sv);
+    }
+}
 
-#define MPH_KEYSV_IDX               0
-#define MPH_KEYSV_H1_KEYS           1
-#define MPH_KEYSV_XOR_VAL           2
-#define MPH_KEYSV_H0                3
-#define MPH_KEYSV_KEY               4
-#define MPH_KEYSV_KEY_NORMALIZED    5
-#define MPH_KEYSV_KEY_IS_UTF8       6
-#define MPH_KEYSV_VAL               7
-#define MPH_KEYSV_VAL_NORMALIZED    8
-#define MPH_KEYSV_VAL_IS_UTF8       9
-
-#define MPH_KEYSV_VARIANT           10
-#define MPH_KEYSV_COMPUTE_FLAGS     11
-#define MPH_KEYSV_STATE             12
-#define MPH_KEYSV_SOURCE_HASH       13
-#define MPH_KEYSV_BUF_LENGTH        14
-#define MPH_KEYSV_BUCKETS           15
-
-#define COUNT_MPH_KEYSV 16
-
-#define MPH_F_FILTER_UNDEF          (1<<0)
-#define MPH_F_DETERMINISTIC         (1<<1)
-#define MPH_F_NO_DEDUPE             (1<<2)
-#define MPH_F_VALIDATE              (1<<3)
-
-#define MPH_MOUNT_ERROR_OPEN_FAILED     (-1)
-#define MPH_MOUNT_ERROR_FSTAT_FAILED    (-2)
-#define MPH_MOUNT_ERROR_TOO_SMALL       (-3)
-#define MPH_MOUNT_ERROR_BAD_SIZE        (-4)
-#define MPH_MOUNT_ERROR_MAP_FAILED      (-5)
-#define MPH_MOUNT_ERROR_BAD_MAGIC       (-6)
-#define MPH_MOUNT_ERROR_BAD_VERSION     (-7)
-#define MPH_MOUNT_ERROR_CORRUPT_OFFSETS (-8)
-#define MPH_MOUNT_ERROR_CORRUPT_TABLE   (-9)
-#define MPH_MOUNT_ERROR_CORRUPT_STR_BUF (-10)
-
-#define MAGIC_DECIMAL 1278363728 /* PH2L */
-#define MAGIC_BIG_ENDIAN_DECIMAL 1346908748
-
-#ifndef av_top_index
-#define av_top_index(x) av_len(x)
-#endif
-
-typedef struct {
-    SV *sv;
-    U32 hash;
-} sv_with_hash;
-
-typedef struct {
-    sv_with_hash keysv[COUNT_MPH_KEYSV];
-} my_cxt_t;
-
-#define MPH_INIT_KEYSV(idx, str) STMT_START {                           \
-    MY_CXT.keysv[idx].sv = newSVpvn((str ""), (sizeof(str) - 1));       \
-    PERL_HASH(MY_CXT.keysv[idx].hash, (str ""), (sizeof(str) - 1));     \
-} STMT_END
-
-#define hv_fetch_ent_with_keysv(hv,keysv_idx,lval)                      \
-    hv_fetch_ent(hv,MY_CXT.keysv[keysv_idx].sv,lval,MY_CXT.keysv[keysv_idx].hash);
-
-#define hv_store_ent_with_keysv(hv,keysv_idx,val_sv)                    \
-    hv_store_ent(hv,MY_CXT.keysv[keysv_idx].sv,val_sv,MY_CXT.keysv[keysv_idx].hash);
-
-#define hv_copy_with_keysv(hv1,hv2,keysv_idx) STMT_START {              \
-    HE *got_he= hv_fetch_ent_with_keysv(hv1,keysv_idx,0);               \
-    if (got_he) {                                                       \
-        SV *got_sv= HeVAL(got_he);                                      \
-        hv_store_ent_with_keysv(hv2,keysv_idx,got_sv);                  \
-        SvREFCNT_inc(got_sv);                                           \
-    }                                                                   \
-} STMT_END
-
-#define hv_setuv_with_keysv(hv,keysv_idx,uv)                            \
-STMT_START {                                                            \
-    HE *got_he= hv_fetch_ent_with_keysv(hv,keysv_idx,1);                \
-    if (got_he) sv_setuv(HeVAL(got_he),uv);                             \
-} STMT_END
-
-#define HASH2INDEX(x,h2,xor_val,bucket_count,variant) STMT_START {      \
-        x= h2 ^ xor_val;                                                \
-        if (variant > 1) {                                              \
-        /* see: https://stackoverflow.com/a/12996028                    \
-         * but we could use any similar integer hash function. */       \
-            x = ((x >> 16) ^ x) * 0x45d9f3b;                            \
-            x = ((x >> 16) ^ x) * 0x45d9f3b;                            \
-            x = ((x >> 16) ^ x);                                        \
-        }                                                               \
-        x %= bucket_count;                                              \
-} STMT_END
-
-struct mph_header {
-    U32 magic_num;
-    U32 variant;
-    U32 num_buckets;
-    U32 state_ofs;
-
-    U32 table_ofs;
-    U32 key_flags_ofs;
-    U32 val_flags_ofs;
-    U32 str_buf_ofs;
-
-    U64 table_checksum;
-    U64 str_buf_checksum;
-};
-
-struct mph_bucket {
-    union {
-        U32 xor_val;
-        I32 index;
-    };
-    U32 key_ofs;
-    U32 val_ofs;
-    U16 key_len;
-    U16 val_len;
-};
-
-struct mph_obj {
-    size_t bytes;
-    struct mph_header *header;
-    int fd;
-};
-
-#ifndef CHAR_BITS
-#define CHAR_BITS 8
-#endif
-
-#define _BITSDECL(idx,bits) \
-    const U64 bitpos= idx * bits;                           \
-    const U64 bytepos= bitpos / CHAR_BITS;                  \
-    const U8 shift= bitpos % CHAR_BITS;                     \
-    const U8 bitmask= ( 1 << bits ) - 1
-
-#define GETBITS(into,flags,idx,bits) STMT_START {           \
-    _BITSDECL(idx,bits);                                    \
-    into= ((flags)[bytepos] >> shift) & bitmask;            \
-} STMT_END
-
-#define SETBITS(value,flags,idx,bits) STMT_START {          \
-    _BITSDECL(idx,bits);                                    \
-    const U8 v= value;                                      \
-    (flags)[bytepos] &= ~(bitmask << shift);                \
-    (flags)[bytepos] |= ((v & bitmask) << shift);           \
-} STMT_END
-
-#define sv_set_from_bucket(sv,strs,ofs,len,idx,flags,bits) \
-STMT_START {                                            \
-    U8 *ptr;                                            \
-    U8 is_utf8;                                         \
-    if (ofs) {                                          \
-        ptr= (strs) + (ofs);                            \
-        GETBITS(is_utf8,flags,idx,bits);                \
-    } else {                                            \
-        ptr= 0;                                         \
-        is_utf8= 0;                                     \
-    }                                                   \
-    /* note that sv_setpvn() will cause the sv to       \
-     * become undef if ptr is 0 */                      \
-    sv_setpvn_mg((sv),ptr,len);                         \
-    if (is_utf8 > 1) {                                  \
-        sv_utf8_upgrade(sv);                            \
-    }                                                   \
-    else                                                \
-    if (is_utf8) {                                      \
-        SvUTF8_on(sv);                                  \
-    }                                                   \
-    else                                                \
-    if (ptr) {                                          \
-        SvUTF8_off(sv);                                 \
-    }                                                   \
-} STMT_END
-
-int
+MPH_STATIC_INLINE int
 lookup_bucket(pTHX_ struct mph_header *mph, U32 index, SV *key_sv, SV *val_sv)
 {
     struct mph_bucket *bucket;
@@ -211,15 +54,15 @@ lookup_bucket(pTHX_ struct mph_header *mph, U32 index, SV *key_sv, SV *val_sv)
     bucket= (struct mph_bucket *)((char *)mph + mph->table_ofs) + index;
     strs= (U8 *)mph + mph->str_buf_ofs;
     if (key_sv) {
-        sv_set_from_bucket(key_sv,strs,bucket->key_ofs,bucket->key_len,index,((U8*)mph)+mph->key_flags_ofs,2);
+        sv_set_from_bucket(aTHX_ key_sv,strs,bucket->key_ofs,bucket->key_len,index,((U8*)mph)+mph->key_flags_ofs,2);
     }
     if (val_sv) {
-        sv_set_from_bucket(val_sv,strs,bucket->val_ofs,bucket->val_len,index,((U8*)mph)+mph->val_flags_ofs,1);
+        sv_set_from_bucket(aTHX_ val_sv,strs,bucket->val_ofs,bucket->val_len,index,((U8*)mph)+mph->val_flags_ofs,1);
     }
     return 1;
 }
 
-int
+MPH_STATIC_INLINE int
 lookup_key(pTHX_ struct mph_header *mph, SV *key_sv, SV *val_sv)
 {
     U8 *strs= (U8 *)mph + mph->str_buf_ofs;
@@ -259,7 +102,7 @@ lookup_key(pTHX_ struct mph_header *mph, SV *key_sv, SV *val_sv)
     got_key_pv= strs + bucket->key_ofs;
     if (bucket->key_len == key_len && memEQ(key_pv,got_key_pv,key_len)) {
         if (val_sv) {
-            sv_set_from_bucket(val_sv,strs,bucket->val_ofs,bucket->val_len,index,((U8*)mph)+mph->val_flags_ofs,1);
+            sv_set_from_bucket(aTHX_ val_sv,strs,bucket->val_ofs,bucket->val_len,index,((U8*)mph)+mph->val_flags_ofs,1);
         }
         return 1;
     }
@@ -272,6 +115,7 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
     struct mph_header *head;
     int fd = open(file, O_RDONLY, 0);
     void *ptr;
+    U32 alignment;
 
     if (error)
         sv_setpvs(error,"");
@@ -289,11 +133,6 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
         if (error)
             sv_setpvf(error,"file '%s' is too small to be a valid PH2L file", file);
         return MPH_MOUNT_ERROR_TOO_SMALL;
-    }
-    if (st.st_size % 16) {
-        if (error)
-            sv_setpvf(error,"file '%s' does not have a size which is a multiple of 16 bytes", file);
-        return MPH_MOUNT_ERROR_BAD_SIZE;
     }
     ptr = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED | MPH_MAP_POPULATE, fd, 0);
     if (ptr == MAP_FAILED) {
@@ -314,10 +153,17 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
             sv_setpvf(error,"file '%s' is not a PH2L file", file);
         return MPH_MOUNT_ERROR_BAD_MAGIC;
     }
-    if (head->variant > 2) {
+    if (head->variant > 3) {
         if (error)
             sv_setpvf(error,"unknown version '%d' in '%s'", head->variant, file);
         return MPH_MOUNT_ERROR_BAD_VERSION;
+    }
+    alignment = head->variant < 3 ? sizeof(U64)*2 : sizeof(U64);
+
+    if (st.st_size % alignment) {
+        if (error)
+            sv_setpvf(error,"file '%s' does not have a size which is a multiple of 16 bytes", file);
+        return MPH_MOUNT_ERROR_BAD_SIZE;
     }
     if (
         head->table_ofs < head->state_ofs           ||
@@ -328,24 +174,39 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
     ) {
         if (error)
             sv_setpvf(error,"corrupt header offsets in '%s'", file);
-        return MPH_MOUNT_ERROR_CORRUPT_OFFSETS;
+        return MPH_MOUNT_ERROR_BAD_OFFSETS;
     }
-    if (flags && MPH_F_VALIDATE) {
+    if (flags & MPH_F_VALIDATE) {
         char *start= ptr;
         char *state_pv= start + head->state_ofs;
         char *str_buf_start= start + head->str_buf_ofs;
         char *str_buf_end= start + st.st_size;
-        U64 table_checksum= stadtx_hash_with_state(state_pv, start + head->table_ofs, head->str_buf_ofs - head->table_ofs);
-        U64 str_buf_checksum= stadtx_hash_with_state(state_pv, start + head->str_buf_ofs, st.st_size - head->str_buf_ofs );
-        if (head->table_checksum != table_checksum) {
-            if (error)
-                sv_setpvf(error,"table checksum '%016lx' != '%016lx' in file '%s'",table_checksum,head->table_checksum,file);
-            return MPH_MOUNT_ERROR_CORRUPT_TABLE;
-        }
-        if (head->str_buf_checksum != str_buf_checksum) {
-            if (error)
-                sv_setpvf(error,"table checksum '%016lx' != '%016lx' in file '%s'",str_buf_checksum,head->str_buf_checksum,file);
-            return MPH_MOUNT_ERROR_CORRUPT_STR_BUF;
+
+        if (head->variant >= 3) {
+            U64 have_file_checksum= stadtx_hash_with_state(state_pv, start, st.st_size - sizeof(U64));
+            U64 want_file_checksum= *((U64 *)(str_buf_end - sizeof(U64)));
+            if (have_file_checksum != want_file_checksum) {
+                if (error)
+                    sv_setpvf(error,"file checksum '%016lx' != '%016lx' in file '%s'",
+                        have_file_checksum,want_file_checksum,file);
+                return MPH_MOUNT_ERROR_CORRUPT_FILE;
+            }
+        } else {
+            U64 str_buf_checksum;
+            U64 table_checksum= stadtx_hash_with_state(state_pv, start + head->table_ofs, head->str_buf_ofs - head->table_ofs);
+            if (head->table_checksum != table_checksum) {
+                if (error)
+                    sv_setpvf(error,"table checksum '%016lx' != '%016lx' in file '%s'",table_checksum,head->table_checksum,file);
+                return MPH_MOUNT_ERROR_CORRUPT_TABLE;
+            }
+
+            str_buf_checksum= stadtx_hash_with_state(state_pv, start + head->str_buf_ofs,
+                st.st_size - head->str_buf_ofs - (head->variant > 2 ? sizeof(U64) : 0) );
+            if (head->str_buf_checksum != str_buf_checksum) {
+                if (error)
+                    sv_setpvf(error,"str buf checksum '%016lx' != '%016lx' in file '%s'",str_buf_checksum,head->str_buf_checksum,file);
+                return MPH_MOUNT_ERROR_CORRUPT_STR_BUF;
+            }
         }
     }
     return head->variant;
@@ -792,26 +653,7 @@ MODULE = Algorithm::MinPerfHashTwoLevel		PACKAGE = Algorithm::MinPerfHashTwoLeve
 
 BOOT:
 {
-  {
-    MY_CXT_INIT;
-    MPH_INIT_KEYSV(MPH_KEYSV_IDX,"idx");
-    MPH_INIT_KEYSV(MPH_KEYSV_H1_KEYS,"h1_keys");
-    MPH_INIT_KEYSV(MPH_KEYSV_XOR_VAL,"xor_val");
-    MPH_INIT_KEYSV(MPH_KEYSV_H0,"h0");
-    MPH_INIT_KEYSV(MPH_KEYSV_KEY,"key");
-    MPH_INIT_KEYSV(MPH_KEYSV_KEY_NORMALIZED,"key_normalized");
-    MPH_INIT_KEYSV(MPH_KEYSV_KEY_IS_UTF8,"key_is_utf8");
-    MPH_INIT_KEYSV(MPH_KEYSV_VAL,"val");
-    MPH_INIT_KEYSV(MPH_KEYSV_VAL_NORMALIZED,"val_normalized");
-    MPH_INIT_KEYSV(MPH_KEYSV_VAL_IS_UTF8,"val_is_utf8");
-
-    MPH_INIT_KEYSV(MPH_KEYSV_VARIANT,"variant");
-    MPH_INIT_KEYSV(MPH_KEYSV_COMPUTE_FLAGS,"compute_flags");
-    MPH_INIT_KEYSV(MPH_KEYSV_STATE,"state");
-    MPH_INIT_KEYSV(MPH_KEYSV_SOURCE_HASH,"source_hash");
-    MPH_INIT_KEYSV(MPH_KEYSV_BUF_LENGTH,"buf_length");
-    MPH_INIT_KEYSV(MPH_KEYSV_BUCKETS,"buckets");
-  }
+    MPH_INIT_ALL_KEYSV();
 }
 
 UV
@@ -1017,8 +859,8 @@ compute_xs(self_hv)
 MODULE = Algorithm::MinPerfHashTwoLevel		PACKAGE = Tie::Hash::MinPerfHashTwoLevel::OnDisk
 
 SV *
-packed(version_sv,buf_length_sv,state_sv,comment_sv,flags,buckets_av)
-        SV* version_sv
+packed_xs(variant,buf_length_sv,state_sv,comment_sv,flags,buckets_av)
+        U32 variant
         SV* buf_length_sv
         SV* state_sv
         SV* comment_sv
@@ -1035,11 +877,16 @@ packed(version_sv,buf_length_sv,state_sv,comment_sv,flags,buckets_av)
     STRLEN state_len;
     char *state_pv= SvPV(state_sv, state_len);
     
-    U32 state_rlen= _roundup(state_len,16);
-    U32 table_rlen= _roundup(sizeof(struct mph_bucket) * bucket_count,16);
-    U32 key_flags_rlen= _roundup((bucket_count * 2 + 7 ) / 8,16);
-    U32 val_flags_rlen= _roundup((bucket_count + 7) / 8,16);
-    U32 str_rlen= _roundup(buf_length + 2 + (SvOK(comment_sv) ? sv_len(comment_sv)+1 : 1),16);
+    U32 alignment= variant < 3 ? 2*sizeof(U64) : sizeof(U64);
+    U32 state_rlen= _roundup(state_len,alignment);
+    U32 table_rlen= _roundup(sizeof(struct mph_bucket) * bucket_count,alignment);
+    U32 key_flags_rlen= _roundup((bucket_count * 2 + 7 ) / 8,alignment);
+    U32 val_flags_rlen= _roundup((bucket_count + 7) / 8,alignment);
+    U32 str_rlen= _roundup( buf_length
+                            + 2
+                            + ( SvOK(comment_sv) ? sv_len(comment_sv) + 1 : 1 )
+                            + ( variant < 3 ? 0 : 2 + 8 ),
+                            alignment );
 
     U32 total_size=
         + header_rlen
@@ -1073,7 +920,7 @@ packed(version_sv,buf_length_sv,state_sv,comment_sv,flags,buckets_av)
     head= (struct mph_header *)start;
 
     head->magic_num= 1278363728;
-    head->variant= SvUV(version_sv);
+    head->variant= variant;
     head->num_buckets= bucket_count;
     head->state_ofs= header_rlen;
     head->table_ofs= head->state_ofs + state_rlen;
@@ -1091,8 +938,8 @@ packed(version_sv,buf_length_sv,state_sv,comment_sv,flags,buckets_av)
 
     Copy(state_pv,state,state_len,char);
     pv= SvPV(comment_sv,pv_len);
-    Copy(pv,str_buf_pos,pv_len+1,char);
-    str_buf_pos += pv_len + 1;
+    Copy(pv,str_buf_pos,pv_len,char);
+    str_buf_pos += pv_len + 1; /* +1 to add a trailing null */
 
     for (i= 0; i < bucket_count; i++) {
         SV **got= av_fetch(buckets_av,i,0);
@@ -1123,21 +970,25 @@ packed(version_sv,buf_length_sv,state_sv,comment_sv,flags,buckets_av)
             croak("panic: out of memory? no val_is_utf8_he for %u",i);
         }
     }
-    {
-        U32 actual_size= str_buf_pos - start;
-        U32 r= actual_size % 16;
-        if (r) {
-            U32 add = 16 - r;
-            str_buf_pos += add;
-            actual_size += add;
-        }
-        SvCUR_set(sv_buf, actual_size);
-        SvPOK_on(sv_buf);
-        if (0)
-            warn ("original estimate: %d actual: %d saved:%i\n", total_size, actual_size, (int)(total_size - actual_size));
+    if (variant > 2) {
+        *str_buf_pos =   0; str_buf_pos++;
+        *str_buf_pos = 128; str_buf_pos++;
     }
-    head->table_checksum= stadtx_hash_with_state(state_pv, start + head->table_ofs, head->str_buf_ofs - head->table_ofs);
-    head->str_buf_checksum= stadtx_hash_with_state(state_pv, str_buf_start, str_buf_pos - str_buf_start);
+    {
+        U32 r= (str_buf_pos - start) % alignment;
+        if (r) {
+            str_buf_pos += (alignment - r);
+        }
+    }
+    if (variant > 2) {
+        *((U64 *)str_buf_pos)= stadtx_hash_with_state(state, start, str_buf_pos - start);
+        str_buf_pos += sizeof(U64);
+    } else {
+        head->table_checksum= stadtx_hash_with_state(state_pv, start + head->table_ofs, head->str_buf_ofs - head->table_ofs);
+        head->str_buf_checksum= stadtx_hash_with_state(state_pv, str_buf_start, str_buf_pos - str_buf_start);
+    }
+    SvCUR_set(sv_buf, str_buf_pos - start);
+    SvPOK_on(sv_buf);
     RETVAL= sv_buf;
 }
     OUTPUT:
@@ -1178,18 +1029,6 @@ unmount_file(mount_sv)
 }
 
 
-UV
-num_buckets(mount_sv)
-        SV* mount_sv
-    PROTOTYPE: $
-    CODE:
-{
-    struct mph_obj *obj= (struct mph_obj *)SvPV_nolen(mount_sv);
-    RETVAL= obj->header->num_buckets;
-}
-    OUTPUT:
-        RETVAL
-
 int
 fetch_by_index(mount_sv,index,...)
         SV* mount_sv
@@ -1224,3 +1063,54 @@ fetch_by_key(mount_sv,key_sv,...)
 }
     OUTPUT:
         RETVAL
+
+
+SV *
+get_comment(self_hv)
+        HV* self_hv
+    ALIAS:
+            get_hdr_magic_num = 1
+            get_hdr_variant = 2
+            get_hdr_num_buckets = 3
+            get_hdr_state_ofs = 4
+            get_hdr_table_ofs = 5
+            get_hdr_key_flags_ofs = 6
+            get_hdr_val_flags_ofs = 7
+            get_hdr_str_buf_ofs = 8
+            get_hdr_table_checksum = 9
+            get_hdr_str_buf_checksum = 10
+            get_state = 11
+    PREINIT:
+        dMY_CXT;
+    PROTOTYPE: $
+    CODE:
+{
+    struct mph_obj *obj;
+    SV *mount_sv;
+    char *start;
+    HE *got= hv_fetch_ent_with_keysv(self_hv,MPH_KEYSV_MOUNT,0);
+    if (!got)
+        croak("must be mounted to use this function");
+    mount_sv= HeVAL(got);
+    if (!mount_sv || !SvPOK(mount_sv))
+        croak("$self->'mount' is expected to be a string!");
+    obj= (struct mph_obj *)SvPV_nolen(mount_sv);
+    start= (char *)obj->header;
+    switch(ix) {
+        case  0: RETVAL= newSVpv(start + obj->header->str_buf_ofs + 2,0); break;
+        case  1: RETVAL= newSVuv(obj->header->magic_num); break;
+        case  2: RETVAL= newSVuv(obj->header->variant); break;
+        case  3: RETVAL= newSVuv(obj->header->num_buckets); break;
+        case  4: RETVAL= newSVuv(obj->header->state_ofs); break;
+        case  5: RETVAL= newSVuv(obj->header->table_ofs); break;
+        case  6: RETVAL= newSVuv(obj->header->key_flags_ofs); break;
+        case  7: RETVAL= newSVuv(obj->header->val_flags_ofs); break;
+        case  8: RETVAL= newSVuv(obj->header->str_buf_ofs); break;
+        case  9: RETVAL= newSVuv(obj->header->table_checksum); break;
+        case 10: RETVAL= newSVuv(obj->header->str_buf_checksum); break;
+        case 11: RETVAL= newSVpvn(start + obj->header->state_ofs, STADTX_STATE_BYTES); break;
+    }
+}
+    OUTPUT:
+        RETVAL
+

@@ -15,7 +15,7 @@ use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 use Ref::Util      qw( is_arrayref );
 
-our $VERSION = '4.4';
+our $VERSION = '4.5';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -100,6 +100,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(parse_syslog_line);
 our @EXPORT_OK = qw(
     parse_syslog_line
+    parse_syslog_lines
     preamble_priority preamble_facility
     %LOG_FACILITY %LOG_PRIORITY
     get_syslog_timezone set_syslog_timezone
@@ -114,10 +115,10 @@ our %EXPORT_TAGS = (
 # Regex to Extract Data
 const my %RE => (
     IPv4            => qr/(?>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/,
-    preamble        => qr/(?>^\<(\d+)\>)/,
-    year            => qr/(?>^(\d{4}) )/,
-    date            => qr/(?>^([A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2}))/,
-    date_long => qr/^(?>
+    preamble        => qr/^\<(\d+)\>/,
+    year            => qr/^(\d{4}) /,
+    date            => qr/^([A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2})/,
+    date_long => qr/^
             (?:[0-9]{4}\s+)?                # Year: Because, Cisco
             ([.*])?                         # Cisco adds a * for no ntp, and a . for configured but out of sync
             [a-zA-Z]{3}\s+[0-9]+            # Date: Jan  1
@@ -127,18 +128,18 @@ const my %RE => (
             (?:\.[0-9]{3,6})?               # Time: .DDD(DDD) ms resolution
             (?:\s+[A-Z]{3,4})?              # Timezone, ZZZ or ZZZZ
             (?:\:?)                         # Cisco adds a : after the second timestamp
-    )/x,
-    date_iso8601    => qr/(?>^(
+    /x,
+    date_iso8601    => qr/^(
             [0-9]{4}(?:\-[0-9]{2}){2}        # Date YYYY-MM-DD
             (?:\s|T)                         # Date Separator T or ' '
             [0-9]{2}(?:\:[0-9]{2}){1,2}      # Time HH:MM:SS
             (?:\.(?:[0-9]{3}){1,2})?         # Time: .DDD millisecond or .DDDDDD microsecond resolution
             (?:[Zz]|[+\-][0-9]{2}\:[0-9]{2}) # UTC Offset +DD:MM or 'Z' indicating UTC-0
-    ))/x,
+    )/x,
     host            => qr/^\s*([^:\s]+)\s+/,
     cisco_hates_you => qr/^\s*[0-9]*:\s+/,
     program_raw     => qr/^\s*([^\[][^:]+):\s*/,
-    program_name    => qr/^([^\[\(\ ]+)/,
+    program_name    => qr/^([^\[\(\ ]+)(.*)/,
     program_sub     => qr/(?>\(([^\)]+)\))/,
     program_pid     => qr/(?>\[([^\]]+)\])/,
     program_netapp  => qr/(?>\[([^\]]+)\]:\s*)/,
@@ -163,6 +164,9 @@ sub parse_syslog_line {
     # Initialize everything to undef
     my %msg =  $PruneEmpty ? () : %_empty_msg;
     $msg{message_raw} = $raw_string unless $PruneRaw;
+
+    # Lines that begin with a space aren't syslog messages, skip
+    return \%msg if $raw_string =~ /^\s/;
 
     #
     # grab the preamble:
@@ -197,7 +201,7 @@ sub parse_syslog_line {
         $msg{date_raw} = $msg{datetime_raw};
 
         if ( $DateParsing ) {
-            # if User wants to fight with dates himself, let him :)
+            # if User wants to fight with dates themselves, let them :)
             if( $FmtDate && ref $FmtDate eq 'CODE' ) {
                 @msg{qw(date time epoch datetime_str)} = $FmtDate->($msg{datetime_raw});
             }
@@ -291,12 +295,18 @@ sub parse_syslog_line {
         if( $raw_string =~ s/$RE{program_raw}//o ) {
             $msg{program_raw} = $1;
             my $progStr = join ' ', grep {!exists $INT_PRIORITY{$_}} split /\s+/, $msg{program_raw};
-            if( defined $progStr && length $progStr) {
-                if( ($msg{program_name}) = ($progStr =~ /$RE{program_name}/o) ) {
-                    if (length $msg{program_name} != length $msg{program_raw} ) {
-                        (($msg{program_pid}) = ($progStr =~ /$RE{program_pid}/o))
-                            || (($msg{program_sub}) = ($progStr =~ /$RE{program_sub}/o))
+            if( $progStr =~ /$RE{program_name}/o ) {
+                $msg{program_name} = $1;
+                my $remainder      = $2;
+                if ( $remainder ) {
+                    ($msg{program_pid}) = ($remainder =~ /$RE{program_pid}/o);
+                    ($msg{program_sub}) = ($remainder =~ /$RE{program_sub}/o);
+                    if( !$msg{program_sub}  ) {
+                        ($msg{program_sub}) = ($remainder =~ /^(?:[\/\s])?([^\[(]+)/o);
                     }
+                }
+                if( $msg{program_name} !~ m{^/} && $msg{program_name} =~ tr{/}{} ) {
+                    @msg{qw(program_name program_sub)} = split m{/}, $msg{program_name}, 2;
                 }
             }
         }
@@ -345,14 +355,14 @@ sub parse_syslog_line {
             };
         }
     }
-    elsif( $AutoDetectKeyValues && $msg{content} =~ /\s[a-zA-Z\.0-9\-_]+=\S+/ ) {
+    elsif( $AutoDetectKeyValues && $msg{content} =~ /(?:^|\s)[a-zA-Z\.0-9\-_]+=\S+/ ) {
         my %sdata = ();
-        while( $msg{content} =~ /\s\K(?>([a-zA-Z\.0-9\-_]++))=(\S+(?:\s+\S+)*?)(?=(?:\s*[,;]|$|\s+[a-zA-Z\.0-9\-_]+=))/g ) {
+        while( $msg{content} =~ /(?:^|\s)\K(?>([a-zA-Z\.0-9\-_]++))=(\S+(?:\s+\S+)*?)(?=(?:\s*[,;]|$|\s+[a-zA-Z\.0-9\-_]+=))/g ) {
             my ($k,$v) = ($1,$2);
-            # Remove Trailing Brackets
-            chop($v) if $v =~ /[)\]>]$/;
-            # Remove Leading Brackets
-            $v = substr($v,1) if $v =~ /^[(\[<]/;
+            # Remove Trailing Characters
+            $v =~ s/[)\]>,;'"]+$//;
+            # Remove Leading Characters
+            $v =~ s/^[(\[<'"]+//;
             if( exists $sdata{$k} ) {
                 if( is_arrayref($sdata{$k}) ) {
                     push @{ $sdata{$k} }, $v;
@@ -384,6 +394,35 @@ sub parse_syslog_line {
     #
     # Return our hash reference!
     return \%msg;
+}
+
+
+{
+    my $buffer = '';
+    sub parse_syslog_lines {
+        my @lines = map { split /\r?\n/, $_ } grep { defined } @_;
+        my @structured = ();
+        if( @lines ) {
+            while( my $line = shift @lines ) {
+                if( $line =~ /^\s/ ) {
+                    $buffer .= "\n" . $line;
+                    next;
+                }
+                else {
+                    push @structured, parse_syslog_line($buffer);
+                    $buffer = $line;
+                }
+            }
+        }
+        else {
+            # grab the remaining buffer
+            push @structured, parse_syslog_line($buffer)
+                if length $buffer;
+            $buffer = '';
+        }
+        return @structured;
+    }
+
 }
 
 
@@ -453,7 +492,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 4.4
+version 4.5
 
 =head1 SYNOPSIS
 
@@ -668,6 +707,32 @@ A convenient function which sets the syslog timezone to UTC and sets the config
 variables accordingly.  Automatically sets $NormaizeToUTC and datetime_str will
 be set to the UTC equivalent.
 
+=head2 parse_syslog_lines
+
+Returns a list of hashes of the lines interpretted.
+
+When passed one or more line of text, attempts to parse that text as syslog data.  This function
+varies from C<parse_syslog_line> in that it handles multi-line messages.  The caveat to this, is
+after the last iteration of the loop, you to call the function by itself to get the last message.
+
+    use strict;
+    use warnings;
+    use DDP;
+    use Parse::Syslog::Line qw(parse_syslog_lines);
+
+    while(<>) {
+        foreach my $log ( parse_syslog_lines($_) ) {
+            p($log);
+        }
+    }
+    p($_) for parse_syslog_lines();
+
+This function holds a parsing buffer which it flushes any time it encounters a
+line in the stream that starts with non-whitespace.  Any lines beginning with
+whitespace will be assumed to be a continuation of the previous line.
+
+It is not exported by default.
+
 =head2 preamble_priority
 
 Takes the Integer portion of the syslog messsage and returns
@@ -766,15 +831,11 @@ A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
 L<https://metacpan.org/release/Parse-Syslog-Line>
 
-=item *
-
-RT: CPAN's Bug Tracker
-
-The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
-
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Syslog-Line>
-
 =back
+
+=head2 Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/Parse-Syslog-Line/issues>
 
 =head2 Source Code
 

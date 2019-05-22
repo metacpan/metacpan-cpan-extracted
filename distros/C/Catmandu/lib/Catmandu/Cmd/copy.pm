@@ -2,7 +2,7 @@ package Catmandu::Cmd::copy;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use parent 'Catmandu::Cmd';
 use Catmandu;
@@ -21,7 +21,7 @@ sub command_opt_spec {
         ["query=s",        ""],
         ["sru-sortkeys=s", ""],
         ["sort=s",         ""],
-        ["delete",         "delete existing objects first"],
+        ["delete",         "delete existing items first"],
         ["transaction|tx", "wrap in a transaction"],
     );
 }
@@ -67,15 +67,15 @@ sub command {
         my $n = $into->add_many($from);
         $into->commit;
         if ($opts->verbose) {
-            say STDERR $n == 1 ? "copied 1 object" : "copied $n objects";
+            say STDERR $n == 1 ? "copied 1 item" : "copied $n items";
             say STDERR "done";
         }
     };
 
     if ($opts->transaction) {
         $self->usage_error("Bag isn't transactional")
-            if !$into->does('Catmandu::Transactional');
-        $into->transaction($tx);
+            if !$into->store->does('Catmandu::Transactional');
+        $into->store->transaction($tx);
     }
     else {
         $tx->();
@@ -90,7 +90,7 @@ __END__
 
 =head1 NAME
 
-Catmandu::Cmd::copy - copy objects from one store to another
+Catmandu::Cmd::copy - copy items from one store to another
 
 =head1 EXAMPLES
 

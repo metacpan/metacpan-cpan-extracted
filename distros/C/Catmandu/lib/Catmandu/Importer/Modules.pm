@@ -2,7 +2,7 @@ package Catmandu::Importer::Modules;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Module::Info;
 use File::Spec;
@@ -29,6 +29,8 @@ has pattern => (is => 'ro',);
 
 has primary => (is => 'ro',);
 
+has about => (is => 'ro', default => sub {1});
+
 sub generator {
     my ($self) = @_;
 
@@ -40,7 +42,7 @@ sub generator {
         # array of [ $directory => $namespace ]
         state $search = [
             map {
-                my $ns = $_;
+                my $ns    = $_;
                 my $parts = [map {grep length, split(/::/, $_)} $ns];
                 map {[File::Spec->catdir($_, @$parts) => $ns]} @{$self->inc};
             } @{$self->namespace}
@@ -96,9 +98,13 @@ sub generator {
                     close($fh);
                 }
 
-                my $about = pod_section($file, 'NAME');
-                $about =~ s/^[^-]+(\s*-?\s*)?|\n.*$//sg;
-                $data->{about} = $about if $about ne '';
+                if ($self->about) {
+                    my $about = pod_section($file, 'NAME');
+                    $about =~ s/[^-]+(\s*-?\s*)?//;
+                    $about =~ s/\n/ /mg;
+                    $about =~ s/ *$//;
+                    $data->{about} = $about if $about ne '';
+                }
 
                 return $data;
             }
@@ -172,6 +178,11 @@ Filter modules by the given regex pattern
 =item primary
 
 Filter modules to the first module of each name
+
+=item about
+
+Include short description as given in the NAME section of each module's
+documentation.  Enabled by default.
 
 =back
 

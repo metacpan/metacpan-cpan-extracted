@@ -2,8 +2,8 @@ NAME
     App::TSVUtils - CLI utilities related to TSV
 
 VERSION
-    This document describes version 0.001 of App::TSVUtils (from Perl
-    distribution App-TSVUtils), released on 2019-04-23.
+    This document describes version 0.002 of App::TSVUtils (from Perl
+    distribution App-TSVUtils), released on 2019-05-21.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -55,7 +55,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    App::SerializeUtils provides utilities like tsv2csv, etc.
+    App::SerializeUtils
+
+    App::LTSVUtils (which includes utilities like ltsv2tsv, tsv2ltsv, among
+    others).
+
+    App::CSVUtils (which includes csv2tsv, tsv2csv among others).
 
 AUTHOR
     perlancar <perlancar@cpan.org>

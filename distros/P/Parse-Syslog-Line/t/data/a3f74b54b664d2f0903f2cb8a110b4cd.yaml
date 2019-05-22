@@ -1,0 +1,27 @@
+---
+expected:
+  content: 'disconnect from unknown[139.28.175.150]'
+  date: 2018-05-19
+  date_raw: May 19 22:05:47
+  datetime_obj: ~
+  datetime_raw: May 19 22:05:47
+  datetime_str: 2018-05-19T22:05:47Z
+  domain: ~
+  epoch: 1526767547
+  facility: ~
+  facility_int: ~
+  host: janus
+  host_raw: janus
+  message: 'postfix/smtps/smtpd[11513]: disconnect from unknown[139.28.175.150]'
+  message_raw: 'May 19 22:05:47 janus postfix/smtps/smtpd[11513]: disconnect from unknown[139.28.175.150]'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: postfix
+  program_pid: 11513
+  program_raw: 'postfix/smtps/smtpd[11513]'
+  program_sub: smtps/smtpd
+  time: 22:05:47
+name: Postfix program_sub test
+string: 'May 19 22:05:47 janus postfix/smtps/smtpd[11513]: disconnect from unknown[139.28.175.150]'

@@ -184,15 +184,11 @@ esac
 
 : is Cwd static or dynamic
 static_cwd='define'
-storable_limit_dep=''
-storable_type=''
 list_util_dep='$(PERL_EXE)'
 for f in $dynamic_ext; do
    case $f in
        Cwd) static_cwd='undef' ;;
        List/Util) list_util_dep=lib/auto/List/Util/Util.$dlext ;;
-       Storable) storable_limit_dep=lib/auto/Storable/Storable.$dlext
-                 storable_type='dynamic' ;;
    esac
 done
 
@@ -229,7 +225,6 @@ for f in $static_ext; do
 $this_target: lib/auto/List/Util/Util\$(LIB_EXT)" ;;
 	Unicode/Normalize) extra_dep="$extra_dep
 $this_target: uni.data" ;;
-        Storable) storable_type='static' ;;
     esac
 done
 
@@ -591,7 +586,7 @@ esac
 
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
-perltoc_pod_prereqs = extra.pods pod/perl5282delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
+perltoc_pod_prereqs = extra.pods pod/perl5300delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
 generated_pods = pod/perltoc.pod $(perltoc_pod_prereqs)
 generated_headers = uudmap.h bitcount.h mg_data.h
 
@@ -1155,9 +1150,9 @@ pod/perlintern.pod: $(MINIPERL_EXE) autodoc.pl embed.fnc
 pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
 	$(MINIPERL) pod/perlmodlib.PL -q
 
-pod/perl5282delta.pod: pod/perldelta.pod
-	$(RMS) pod/perl5282delta.pod
-	$(LNS) perldelta.pod pod/perl5282delta.pod
+pod/perl5300delta.pod: pod/perldelta.pod
+	$(RMS) pod/perl5300delta.pod
+	$(LNS) perldelta.pod pod/perl5300delta.pod
 
 extra.pods: $(MINIPERL_EXE)
 	-@test ! -f extra.pods || rm -f `cat extra.pods`
@@ -1187,26 +1182,6 @@ no_install no-install: install-notify
 
 install: install-all
 !NO!SUBS!
-
-if test "$storable_type" != "" ; then
-
-case "$static_cwd" in
-undef) storable_limit_dep="$storable_limit_dep lib/auto/Cwd/Cwd.$dlext" ;;
-esac
-
-$spitshell >>$Makefile <<EOT
-
-dist/Storable/lib/Storable/Limit.pm : \$(PERL_EXE) dist/Storable/stacksize $storable_limit_dep
-	cd dist/Storable ; \$(LDLIBPTH) \$(MAKE) lib/Storable/Limit.pm
-
-lib/Storable/Limit.pm : dist/Storable/lib/Storable/Limit.pm
-	test -d lib/Storable || mkdir lib/Storable
-	cp dist/Storable/lib/Storable/Limit.pm lib/Storable/Limit.pm
-EOT
-
-common_build_deps="$common_build_deps lib/Storable/Limit.pm"
-
-fi
 
 for name in all notify silent strip verbose; do
     flags="--$name";
@@ -1426,6 +1401,14 @@ _cleaner1:
 # run once if nothhing is passed in. It is such a great help.
 
 # Some systems do not support "?", so keep these files separate.
+
+# The Time::HiRes Makefile *should* remove dist/Time-HiRes/xdefine for 'clean',
+# but it's possible to get a rebuilt checkout into a state where it can't run
+# distclean, and can't recover until the file is gone.
+# There's no harm in adding it to the top level 'distclean' target - it should
+# anyway by then, and miniperl is long gone.
+# Add new rules before that line - the next line (rm -f so_locations ...) is
+# used as a placeholder by a regen script.
 _cleaner2:
 	-rm -f core.*perl.*.? t/core.perl.*.? .?*.c
 	rm -f core *perl.core t/core t/*perl.core core.* t/core.*
@@ -1443,6 +1426,7 @@ _cleaner2:
 	rm -f pod2htmd.tmp
 	rm -rf pod/perlfunc pod/perlipc
 	-rmdir ext/B/lib
+	-rm -f dist/Time-HiRes/xdefine
 	rm -f so_locations $(LIBPERL_NONSHR) $(MINIPERL_NONSHR)
 	-rmdir lib/version lib/threads lib/inc/ExtUtils lib/inc lib/encoding
 	-rmdir lib/autodie/exception lib/autodie/Scope lib/autodie lib/XS
@@ -1450,24 +1434,24 @@ _cleaner2:
 	-rmdir lib/Unicode/Collate/CJK lib/Unicode/Collate lib/Tie/Hash
 	-rmdir lib/Thread lib/Text lib/Test2/Util lib/Test2/Tools
 	-rmdir lib/Test2/IPC/Driver lib/Test2/IPC lib/Test2/Hub/Interceptor
-	-rmdir lib/Test2/Hub lib/Test2/Formatter lib/Test2/EventFacet
-	-rmdir lib/Test2/Event/TAP lib/Test2/Event lib/Test2/API lib/Test2
-	-rmdir lib/Test/use lib/Test/Tester lib/Test/Builder/Tester
-	-rmdir lib/Test/Builder/IO lib/Test/Builder lib/Test lib/Term
-	-rmdir lib/TAP/Parser/YAMLish lib/TAP/Parser/SourceHandler
-	-rmdir lib/TAP/Parser/Scheduler lib/TAP/Parser/Result
-	-rmdir lib/TAP/Parser/Iterator lib/TAP/Parser lib/TAP/Harness
-	-rmdir lib/TAP/Formatter/File lib/TAP/Formatter/Console
-	-rmdir lib/TAP/Formatter lib/TAP lib/Sys/Syslog lib/Sys lib/Sub
-	-rmdir lib/Search lib/Scalar lib/Pod/Text lib/Pod/Simple
-	-rmdir lib/Pod/Perldoc lib/PerlIO/via lib/PerlIO lib/Perl
-	-rmdir lib/Parse/CPAN lib/Parse lib/Params lib/Net/FTP lib/Module/Load
-	-rmdir lib/Module/CoreList lib/Module lib/Memoize lib/Math/BigInt
-	-rmdir lib/Math/BigFloat lib/Math lib/MIME lib/Locale/Maketext
-	-rmdir lib/Locale/Codes lib/Locale lib/List/Util lib/List lib/JSON/PP
-	-rmdir lib/JSON lib/IPC lib/IO/Uncompress/Adapter lib/IO/Uncompress
-	-rmdir lib/IO/Socket lib/IO/Compress/Zlib lib/IO/Compress/Zip
-	-rmdir lib/IO/Compress/Gzip lib/IO/Compress/Base
+	-rmdir lib/Test2/Hub lib/Test2/Formatter lib/Test2/EventFacet/Info
+	-rmdir lib/Test2/EventFacet lib/Test2/Event/TAP lib/Test2/Event
+	-rmdir lib/Test2/API lib/Test2 lib/Test/use lib/Test/Tester
+	-rmdir lib/Test/Builder/Tester lib/Test/Builder/IO lib/Test/Builder
+	-rmdir lib/Test lib/Term lib/TAP/Parser/YAMLish
+	-rmdir lib/TAP/Parser/SourceHandler lib/TAP/Parser/Scheduler
+	-rmdir lib/TAP/Parser/Result lib/TAP/Parser/Iterator lib/TAP/Parser
+	-rmdir lib/TAP/Harness lib/TAP/Formatter/File
+	-rmdir lib/TAP/Formatter/Console lib/TAP/Formatter lib/TAP
+	-rmdir lib/Sys/Syslog lib/Sys lib/Sub lib/Search lib/Scalar
+	-rmdir lib/Pod/Text lib/Pod/Simple lib/Pod/Perldoc lib/PerlIO/via
+	-rmdir lib/PerlIO lib/Perl lib/Parse/CPAN lib/Parse lib/Params
+	-rmdir lib/Net/FTP lib/Module/Load lib/Module/CoreList lib/Module
+	-rmdir lib/Memoize lib/Math/BigInt lib/Math/BigFloat lib/Math lib/MIME
+	-rmdir lib/Locale/Maketext lib/Locale lib/List/Util lib/List
+	-rmdir lib/JSON/PP lib/JSON lib/IPC lib/IO/Uncompress/Adapter
+	-rmdir lib/IO/Uncompress lib/IO/Socket lib/IO/Compress/Zlib
+	-rmdir lib/IO/Compress/Zip lib/IO/Compress/Gzip lib/IO/Compress/Base
 	-rmdir lib/IO/Compress/Adapter lib/IO/Compress lib/IO
 	-rmdir lib/I18N/LangTags lib/I18N lib/Hash/Util lib/Hash lib/HTTP
 	-rmdir lib/Filter/Util lib/Filter lib/File/Spec lib/ExtUtils/Typemaps

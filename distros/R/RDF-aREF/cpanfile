@@ -8,4 +8,5 @@ on test => sub {
     requires 'JSON';
     requires 'RDF::Trine';
     requires 'Unicode::Normalize';
+    requires 'Test::Pod';
 };

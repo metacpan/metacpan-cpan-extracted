@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op;
-$Device::Firewall::PaloAlto::Op::VERSION = '0.1.6';
+$Device::Firewall::PaloAlto::Op::VERSION = '0.1.8';
 
 use strict;
 use warnings;
@@ -193,7 +193,7 @@ Device::Firewall::PaloAlto::Op - Operations module for Palo Alto firewalls
 
 =head1 VERSION
 
-version 0.1.6
+version 0.1.8
 
 =head1 SYNOPSIS
 

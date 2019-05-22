@@ -1,6 +1,6 @@
 package Device::Firewall::PaloAlto::Test;
-$Device::Firewall::PaloAlto::Test::VERSION = '0.1.6';
-use Device::Firewall::PaloAlto::Test::Rulebase;
+$Device::Firewall::PaloAlto::Test::VERSION = '0.1.8';
+use Device::Firewall::PaloAlto::Test::SecPolicy;
 use Device::Firewall::PaloAlto::Test::NATPolicy;
 
 use strict;
@@ -53,7 +53,7 @@ sub arp {
 
 
 
-sub rulebase {
+sub sec_policy {
     my $self = shift;
     my (%args) = @_;
     my %tags;
@@ -63,10 +63,10 @@ sub rulebase {
     my @tag_translation = (
         { tag => 'from', default => 'any' },
         { tag => 'to', default => 'any' },
-        { arg => 'src', tag => 'source', default => '' },
-        { arg => 'dst', tag => 'destination', default => '' },
+        { arg => 'src_ip', tag => 'source', default => '' },
+        { arg => 'dst_ip', tag => 'destination', default => '' },
         { tag => 'protocol', default => 6 },
-        { arg => 'port', tag => 'destination-port', default => 80 },
+        { arg => 'dst_port', tag => 'destination-port', default => 80 },
         { arg => 'app', tag => 'application', default => 'any' },
         { tag => 'category', default => 'any' },
         { arg => 'user', tag => 'source-user', default => 'any' },
@@ -81,7 +81,7 @@ sub rulebase {
         $tags{ $xlate->{tag} } = $args{$arg} // $xlate->{default};
     }
 
-    return Device::Firewall::PaloAlto::Test::Rulebase->_new(
+    return Device::Firewall::PaloAlto::Test::SecPolicy->_new(
         $self->{fw}->_send_request(type => 'op', cmd => _gen_test_xml('security-policy-match', %tags))
     );
 }
@@ -126,7 +126,6 @@ sub nat_policy {
         $self->{fw}->_send_request(type => 'op', cmd => _gen_test_xml('nat-policy-match', %tags))
     );
 }
-
 
 
 sub _gen_rulebase_test_xml {
@@ -175,8 +174,6 @@ sub _gen_test_xml {
 
 
 
-
-
 1;
 
 __END__
@@ -191,7 +188,7 @@ Device::Firewall::PaloAlto::Test - Test module for Palo Alto firewalls
 
 =head1 VERSION
 
-version 0.1.6
+version 0.1.8
 
 =head1 SYNOPSIS
 
@@ -239,19 +236,19 @@ Takes a list of IP address and returns true if all of them have entries in the A
 
 ARP entries are considered valid if their state is 'static' or 'complete'.
 
-=head2 rulebase
+=head2 sec_policy
 
 This function takes arguments related to a traffic flow through the firewall and determines the action the security rulebase would have taken on the flow.
 
-It returns a L<Device::Firewall::PaloAlto::Test::Rulebase> object.
+It returns a L<Device::Firewall::PaloAlto::Test::SecPolicy> object.
 
-    my $result = $fw->test->rulebase(
+    my $result = $fw->test->sec_policy {
         from => 'Trust',
         to => 'Untrust',
-        src => '192.0.2.1',
-        dst => '203.0.113.1',
+        src_ip => '192.0.2.1',
+        dst_ip => '203.0.113.1',
         protocol => 6,
-        port => 443,
+        dst_port => 443,
         app => 'any',
         category => 'any',
         user => 'test\test_user'

@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 4.4
+version 4.5
 
 # SYNOPSIS
 
@@ -219,6 +219,32 @@ A convenient function which sets the syslog timezone to UTC and sets the config
 variables accordingly.  Automatically sets $NormaizeToUTC and datetime\_str will
 be set to the UTC equivalent.
 
+## parse\_syslog\_lines
+
+Returns a list of hashes of the lines interpretted.
+
+When passed one or more line of text, attempts to parse that text as syslog data.  This function
+varies from `parse_syslog_line` in that it handles multi-line messages.  The caveat to this, is
+after the last iteration of the loop, you to call the function by itself to get the last message.
+
+    use strict;
+    use warnings;
+    use DDP;
+    use Parse::Syslog::Line qw(parse_syslog_lines);
+
+    while(<>) {
+        foreach my $log ( parse_syslog_lines($_) ) {
+            p($log);
+        }
+    }
+    p($_) for parse_syslog_lines();
+
+This function holds a parsing buffer which it flushes any time it encounters a
+line in the stream that starts with non-whitespace.  Any lines beginning with
+whitespace will be assumed to be a continuation of the previous line.
+
+It is not exported by default.
+
 ## preamble\_priority
 
 Takes the Integer portion of the syslog messsage and returns
@@ -285,11 +311,9 @@ in addition to those websites please use your favorite search engine to discover
 
     [https://metacpan.org/release/Parse-Syslog-Line](https://metacpan.org/release/Parse-Syslog-Line)
 
-- RT: CPAN's Bug Tracker
+## Bugs / Feature Requests
 
-    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
-
-    [https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Syslog-Line](https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Syslog-Line)
+This module uses the GitHub Issue Tracker: [https://github.com/reyjrar/Parse-Syslog-Line/issues](https://github.com/reyjrar/Parse-Syslog-Line/issues)
 
 ## Source Code
 

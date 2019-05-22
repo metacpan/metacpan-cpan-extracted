@@ -1,5 +1,5 @@
 {
-   "abstract" : "Generate SVG based QR Code.",
+   "abstract" : "Generate SVG based QR Code",
    "author" : [
       "Rolf Stöckli <tekki@cpan.org>"
    ],
@@ -30,7 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Text::QRCode" : "0.05"
+            "Text::QRCode" : "0.05",
+            "perl" : "5.024"
          }
       },
       "test" : {
@@ -51,7 +52,7 @@
          "web" : "https://github.com/Tekki/svg-qrcode"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

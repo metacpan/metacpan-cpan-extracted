@@ -3,10 +3,10 @@ BEGIN { plan(tests => 6) }
 
 use Net::Frame::Layer qw(:consts :subs);
 
-my $host = 'gomor.org';
-my $ip6 = '2001:41d0:2:1a47::2';
-my $ip6v4mapping = '::ffff:94.23.25.71';
-my $ip4 = '94.23.25.71';
+my $host = 'google.com';
+my $ip6 = qr{^[a-f0-9:]+$};
+my $ip6v4mapping = qr{^::ffff:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$};
+my $ip4 = qr{^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$};
 
 #
 # IPv4 functions
@@ -14,11 +14,11 @@ my $ip4 = '94.23.25.71';
 ok(
    sub {
       my $ip = getHostIpv4Addr($host);
-      if ($ip eq $ip4) {
+      if ($ip =~ $ip4) {
          print "[+] $ip\n";
          return 1;  # OK
       }
-      print "[-] $ip\n";
+      printf(STDERR "[-] 1: $ip\n");
       return 0;  # NOK
    },
    1,
@@ -32,7 +32,7 @@ ok(
          print "[+] ".unpack('H*', $a)."\n";
          return 1;  # OK
       }
-      print "[-] ".unpack('H*', $a)."\n";
+      printf(STDERR "[-] 2: ".unpack('H*', $a)."\n");
       return 0;  # NOK
    },
    1,
@@ -46,7 +46,7 @@ ok(
          print "[+] $a\n";
          return 1;  # OK
       }
-      print "[-] $a\n";
+      printf(STDERR "[-] 3: $a\n");
       return 0;  # NOK
    },
    1,
@@ -59,11 +59,11 @@ ok(
 ok(
    sub {
       my $ip = getHostIpv6Addr($host);
-      if ($ip eq $ip6 || $ip eq $ip6v4mapping) {
+      if ($ip =~ $ip6 || $ip =~ $ip6v4mapping) {
          print "[+] $ip\n";
          return 1;  # OK
       }
-      print "[-] $ip\n";
+      printf(STDERR "[-] 4: $ip\n");
       return 0;  # NOK
    },
    1,
@@ -72,12 +72,12 @@ ok(
 
 ok(
    sub {
-      my $a = inet6Aton($ip6);
-      if ($a && unpack('H*', $a) eq '200141d000021a470000000000000002') {
+      my $a = inet6Aton('::1');
+      if ($a && unpack('H*', $a) eq '00000000000000000000000000000001') {
          print "[+] ".unpack('H*', $a)."\n";
          return 1;  # OK
       }
-      print "[-] ".unpack('H*', $a)."\n";
+      printf(STDERR "[-] 5: ".unpack('H*', $a)."\n");
       return 0;  # NOK
    },
    1,
@@ -86,12 +86,12 @@ ok(
 
 ok(
    sub {
-      my $a = inet6Ntoa(pack('H*', '200141d000021a470000000000000002'));
-      if ($a && $a eq $ip6) {
+      my $a = inet6Ntoa(pack('H*', '00000000000000000000000000000001'));
+      if ($a && $a =~ $ip6) {
          print "[+] $a\n";
          return 1;  # OK
       }
-      print "[-] $a\n";
+      printf(STDERR "[-] 6: $a\n");
       return 0;  # NOK
    },
    1,

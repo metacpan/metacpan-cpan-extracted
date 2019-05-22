@@ -2,9 +2,10 @@ package Catmandu::Importer;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
-use Catmandu::Util qw(io data_at is_value is_string is_array_ref is_hash_ref);
+use Catmandu::Util qw(io is_value is_string is_array_ref is_hash_ref);
+use Catmandu::Util::Path qw(as_path);
 use LWP::UserAgent;
 use HTTP::Request ();
 use URI           ();
@@ -14,11 +15,13 @@ use namespace::clean;
 
 with 'Catmandu::Logger';
 with 'Catmandu::Iterable';
+with 'Catmandu::IterableOnce';
 with 'Catmandu::Fixable';
 with 'Catmandu::Serializer';
 
 around generator => sub {
     my ($orig, $self) = @_;
+
     my $generator = $orig->($self);
 
     if (my $fixer = $self->_fixer) {
@@ -26,13 +29,12 @@ around generator => sub {
     }
 
     if (defined(my $path = $self->data_path)) {
+        my $getter = as_path($path)->getter;
         return sub {
             state @buf;
             while (1) {
                 return shift @buf if @buf;
-
-                # TODO use something faster than data_at
-                @buf = data_at($path, $generator->() // return);
+                @buf = @{$getter->($generator->() // return)};
                 next;
             }
         };
@@ -55,9 +57,9 @@ has http_agent           => (is => 'ro', predicate => 1);
 has http_max_redirect    => (is => 'ro', predicate => 1);
 has http_timeout         => (is => 'ro', default => sub {180});  # LWP default
 has http_verify_hostname => (is => 'ro', default => sub {1});
-has http_retry  => (is => 'ro', predicate => 1);
-has http_timing => (is => 'ro', predicate => 1);
-has http_body   => (is => 'ro', predicate => 1);
+has http_retry           => (is => 'ro', predicate => 1);
+has http_timing          => (is => 'ro', predicate => 1);
+has http_body            => (is => 'ro', predicate => 1);
 has _http_client => (
     is       => 'ro',
     lazy     => 1,
@@ -97,12 +99,12 @@ sub _build_file {
 
 sub _build_fh {
     my ($self) = @_;
-    my $file = $self->file;
-    my $body;
-    if (is_string($file) && $file =~ m!^https?://!) {
-        my $req = HTTP::Request->new($self->http_method, $file,
-            $self->http_headers);
 
+    my $file = $self->file;
+
+    # get remote content
+    if (is_string($file) && $file =~ m!^https?://!) {
+        my $body;
         if ($self->has_http_body) {
             $body = $self->http_body;
 
@@ -127,44 +129,13 @@ sub _build_fh {
                     }
                 }
             }
-
-            $req->content($body);
         }
 
-        my $res = $self->_http_client->request($req);
+        my $content = $self->_http_request(
+            $self->http_method, $file, $self->http_headers,
+            $body,              $self->_http_timing_tries,
+        );
 
-        if (   $res->code =~ /^408|500|502|503|504$/
-            && $self->_http_timing_tries)
-        {
-            my @tries = @{$self->_http_timing_tries};
-            while (my $sleep = shift @tries) {
-                sleep $sleep;
-                $res = $self->_http_client->request($req->clone);
-                last if $res->code !~ /^408|500|502|503|504$/;
-            }
-        }
-
-        if (!$res->is_success) {
-            my $res_headers = [];
-            for my $header ($res->header_field_names) {
-                my $val = $res->header($header);
-                push @$res_headers, $header, $val;
-            }
-            Catmandu::HTTPError->throw(
-                {
-                    code             => $res->code,
-                    message          => $res->status_line,
-                    url              => $file,
-                    method           => $self->http_method,
-                    request_headers  => $self->http_headers,
-                    request_body     => $body,
-                    response_headers => $res_headers,
-                    response_body    => $res->decoded_content,
-                }
-            );
-        }
-
-        my $content = $res->decoded_content;
         return io(\$content, mode => 'r', binmode => $_[0]->encoding);
     }
 
@@ -204,6 +175,50 @@ sub _build_http_client {
     $ua->protocols_allowed([qw(http https)]);
     $ua->env_proxy;
     $ua;
+}
+
+sub _http_request {
+    my ($self, $method, $url, $headers, $body, $timing_tries) = @_;
+
+    my $client = $self->_http_client;
+
+    my $req = HTTP::Request->new($method, $url, $headers || []);
+    $req->content($body) if defined $body;
+
+    my $res = $client->request($req);
+
+    if ($res->code =~ /^408|500|502|503|504$/ && $timing_tries) {
+        my @tries = @$timing_tries;
+        while (my $sleep = shift @tries) {
+            sleep $sleep;
+            $res = $client->request($req->clone);
+            last if $res->code !~ /^408|500|502|503|504$/;
+        }
+    }
+
+    my $res_body = $res->decoded_content;
+
+    unless ($res->is_success) {
+        my $res_headers = [];
+        for my $header ($res->header_field_names) {
+            my $val = $res->header($header);
+            push @$res_headers, $header, $val;
+        }
+        Catmandu::HTTPError->throw(
+            {
+                code             => $res->code,
+                message          => $res->status_line,
+                url              => $url,
+                method           => $method,
+                request_headers  => $headers,
+                request_body     => $body,
+                response_headers => $res_headers,
+                response_body    => $res_body,
+            }
+        );
+    }
+
+    $res_body;
 }
 
 sub readline {
@@ -414,13 +429,13 @@ Verify the SSL certificate.
 =item http_retry
 
 Maximum times to retry the HTTP request if it temporarily fails. Default is not
-to retry.  See L<LWP::User::UserAgent::Determined> for the HTTP status codes
+to retry.  See L<LWP::UserAgent::Determined> for the HTTP status codes
 that initiate a retry.
 
 =item http_timing
 
 Maximum times and timeouts to retry the HTTP request if it temporarily fails. Default is not
-to retry.  See L<LWP::User::UserAgent::Determined> for the HTTP status codes
+to retry.  See L<LWP::UserAgent::Determined> for the HTTP status codes
 that initiate a retry and the format of the timing value.
 
 =back

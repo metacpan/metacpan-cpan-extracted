@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/parse-syslog-line.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Parse::Syslog::Line",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -38,20 +38,25 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "CLI::Helpers" => 0,
     "Data::Dumper" => 0,
     "DateTime" => "1.23",
     "DateTime::TimeZone" => "2.13",
+    "Digest::MD5" => 0,
     "File::Spec" => 0,
+    "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Path::Tiny" => 0,
     "Storable" => 0,
     "Test::Deep" => 0,
     "Test::MockTime" => 0,
     "Test::More" => 0,
     "Time::Moment" => 0,
-    "bignum" => 0
+    "bignum" => 0,
+    "lib" => 0
   },
-  "VERSION" => "4.4",
+  "VERSION" => "4.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,15 +64,18 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CLI::Helpers" => 0,
   "Carp" => 0,
   "Const::Fast" => 0,
   "Data::Dumper" => 0,
   "Data::Printer" => 0,
   "DateTime" => "1.23",
   "DateTime::TimeZone" => "2.13",
+  "Digest::MD5" => 0,
   "English" => 0,
   "Exporter" => 0,
   "File::Spec" => 0,
+  "FindBin" => 0,
   "Getopt::Long::Descriptive" => 0,
   "HTTP::Date" => 0,
   "IO::Handle" => 0,
@@ -76,6 +84,7 @@ my %FallbackPrereqs = (
   "Module::Load" => 0,
   "Module::Loaded" => 0,
   "POSIX" => 0,
+  "Path::Tiny" => 0,
   "Pod::Usage" => 0,
   "Ref::Util" => 0,
   "Storable" => 0,
@@ -85,6 +94,7 @@ my %FallbackPrereqs = (
   "Time::Moment" => 0,
   "YAML" => 0,
   "bignum" => 0,
+  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

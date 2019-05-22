@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Implementation for clean_install hook.
-our $VERSION = '1.73'; # VERSION
+our $VERSION = '1.74'; # VERSION
 
 
 sub init
@@ -19,16 +19,19 @@ sub init
       my $root = Path::Tiny->new(
         $build->runtime_prop->{prefix}
       );
-      foreach my $child ($root->children)
+      if(-d $root)
       {
-        if($child->basename eq '_alien')
+        foreach my $child ($root->children)
         {
-          $build->log("keeping  $child");
-        }
-        else
-        {
-          $build->log("removing $child");
-          $child->remove_tree({ safe => 0});
+          if($child->basename eq '_alien')
+          {
+            $build->log("keeping  $child");
+          }
+          else
+          {
+            $build->log("removing $child");
+            $child->remove_tree({ safe => 0});
+          }
         }
       }
     }
@@ -49,7 +52,7 @@ Alien::Build::Plugin::Core::CleanInstall - Implementation for clean_install hook
 
 =head1 VERSION
 
-version 1.73
+version 1.74
 
 =head1 SYNOPSIS
 

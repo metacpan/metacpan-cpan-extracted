@@ -3,7 +3,7 @@ package Catmandu::Importer::SRU::Parser::marcxml;
 use Moo;
 use XML::LibXML;
 
-our $VERSION = '0.421';
+our $VERSION = '0.422';
 
 sub parse {
     my ($self, $record) = @_;
@@ -14,7 +14,7 @@ sub parse {
     my $id = undef;
 
     for my $field ($marc->getChildrenByLocalName('*')) {
-        my $name = $field->localname;
+        my $name  = $field->localname;
         my $value = $field->textContent // '';
         if ($name eq 'leader') {
             push @out, ['LDR', ' ', ' ', '_', $value];

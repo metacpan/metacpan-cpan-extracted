@@ -1,0 +1,92 @@
+#!perl
+
+our $DATE = '2019-05-21'; # DATE
+our $VERSION = '0.022'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+use Text::CSV_XS;
+
+my %Opt = (
+    header => 1,
+);
+GetOptions(
+    'no-header' => sub { $Opt{header} = 0 },
+);
+
+my $csv = Text::CSV_XS->new({binary=>1});
+my $i = 0;
+my $header_row;
+while (my $row = $csv->getline(\*ARGV)) {
+    if (++$i == 1) {
+        if ($Opt{header}) {
+            $header_row = $row;
+            for (@$row) { s/:/_/g }
+            next;
+        } else {
+            $header_row = [map { "field".($_+1) } 0..$#{$row}];
+        }
+    }
+    print join("\t", map { "$header_row->[$_]:$row->[$_]" } 0..$#{$row}), "\n";
+}
+
+# ABSTRACT: Convert CSV to LTSV
+# PODNAME: csv2ltsv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv2ltsv - Convert CSV to LTSV
+
+=head1 VERSION
+
+This document describes version 0.022 of csv2ltsv (from Perl distribution App-CSVUtils), released on 2019-05-21.
+
+=head1 SYNOPSIS
+
+ % csv2ltsv INPUT.csv > OUTPUT.ltsv
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<ltsv2csv>
+
+L<App::CSVUtils>
+
+L<App::LTSVUtils>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,5 +1,15 @@
 Revision history for Perl extension Test-APIcast
 
+0.22 2019-05-21T11:29:12Z
+   - Ability to ignore configuration file.
+
+0.21 2019-05-21T07:41:01Z
+   - Fix configurable upstream and backend names.
+
+0.20 2019-05-21T06:52:44Z
+   - Disable timer resolution.
+   - Configurable upstream and backend name.
+
 0.19 2018-11-30T08:38:17Z
    - Revert the fix for missing directives.
 

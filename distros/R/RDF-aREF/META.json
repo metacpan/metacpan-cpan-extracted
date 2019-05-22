@@ -4,7 +4,7 @@
       "Jakob Voß"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -26,12 +26,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.8",
+            "Dist::Milla" : "v1.0.15",
             "Test::Pod" : "1.41"
          }
       },
@@ -49,6 +49,7 @@
          "requires" : {
             "JSON" : "0",
             "RDF::Trine" : "0",
+            "Test::Pod" : "0",
             "Unicode::Normalize" : "0"
          }
       }
@@ -65,10 +66,13 @@
          "web" : "https://github.com/nichtich/RDF-aREF"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_contributors" : [
+      "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Jakob Voss <jakob@nichtich.de>",
-      "Jakob Voss <voss@gbv.de>"
+      "Jakob Voss <voss@gbv.de>",
+      "Jakob Voß <voss@gbv.de>",
+      "Wayne Schneider <wayne@indexdata.com>"
    ]
 }
 

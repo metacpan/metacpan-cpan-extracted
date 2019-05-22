@@ -34,7 +34,7 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.61",
-            "Alien::Build::MM" : "1.71",
+            "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Build::Make" : "0.99",
             "ExtUtils::MakeMaker" : "6.52"
          }
@@ -67,7 +67,7 @@
    "provides" : {
       "Alien::hiredis" : {
          "file" : "lib/Alien/hiredis.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#redis"
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -272,7 +272,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.007",
+                  "tag" : "0.008",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -548,7 +548,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AlienBuild",
             "name" : "AlienBuild",
-            "version" : "0.28"
+            "version" : "0.29"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -615,7 +615,7 @@
       }
    },
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.28",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",

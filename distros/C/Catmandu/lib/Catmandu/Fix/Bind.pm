@@ -2,7 +2,7 @@ package Catmandu::Fix::Bind;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo::Role;
 use Package::Stash;
@@ -48,7 +48,7 @@ sub emit {
 
     #---The subfixer is only provided for backwards compatibility
     # with older Bind implementations and is deprecated
-    my $sub_fixer = Catmandu::Fix->new(fixes => $self->__fixes__);
+    my $sub_fixer     = Catmandu::Fix->new(fixes => $self->__fixes__);
     my $sub_fixer_var = $fixer->capture($sub_fixer);
 
     #---

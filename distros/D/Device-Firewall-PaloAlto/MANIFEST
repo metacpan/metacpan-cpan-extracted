@@ -29,7 +29,7 @@ lib/Device/Firewall/PaloAlto/Op/Tunnels.pm
 lib/Device/Firewall/PaloAlto/Op/VirtualRouter.pm
 lib/Device/Firewall/PaloAlto/Test.pm
 lib/Device/Firewall/PaloAlto/Test/NATPolicy.pm
-lib/Device/Firewall/PaloAlto/Test/Rulebase.pm
+lib/Device/Firewall/PaloAlto/Test/SecPolicy.pm
 lib/Device/Firewall/PaloAlto/UserID.pm
 t/00-load.t
 t/00-new.t
@@ -43,6 +43,7 @@ t/08-user_id.t
 t/09-ha.t
 t/10-ntp.t
 t/11-rulebase.t
+t/12-natpolicy.t
 t/lib/Local/TestSupport.pm
 t/release-00-integration.t
 t/release-01-interfaces.t
@@ -53,7 +54,8 @@ t/release-05-tunnels.t
 t/release-06-global_counters.t
 t/release-07-user_id.t
 t/release-08-ha.t
-t/release-09-rulebase.t
+t/release-09-sec_rulebase.t
+t/release-10-nat_rulebase.t
 t/xml/07-global_counters.t.xml
 t/xml/08-user_id.t.xml
 t/xml/op/arp/arp_entries.xml
@@ -76,6 +78,12 @@ t/xml/op/tunnels/ipsec_no_tunnels.xml
 t/xml/op/tunnels/ipsec_up.xml
 t/xml/op/virtual_router/vr_no_routes.xml
 t/xml/op/virtual_router/vr_with_routes.xml
+t/xml/test/natpolicy/8.1.3/dst_dyn_port_trans.xml
+t/xml/test/natpolicy/8.1.3/dst_static_port_trans.xml
+t/xml/test/natpolicy/8.1.3/no_nat_hit.xml
+t/xml/test/natpolicy/8.1.3/source_dynamic_ip.xml
+t/xml/test/natpolicy/8.1.3/source_dynamic_ip_port.xml
+t/xml/test/natpolicy/8.1.3/source_static_bidir.xml
 t/xml/test/rulebase/flow_default_deny.xml
 t/xml/test/rulebase/flow_deny.xml
 t/xml/test/rulebase/flow_permit.xml

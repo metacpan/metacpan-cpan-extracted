@@ -2,30 +2,22 @@ package Catmandu::Fix::random;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
+use Catmandu::Util::Path qw(as_path);
 use Moo;
 use namespace::clean;
 use Catmandu::Fix::Has;
 
-with 'Catmandu::Fix::Base';
+with 'Catmandu::Fix::Builder';
 
 has path => (fix_arg => 1);
 has max  => (fix_arg => 1);
 
-sub emit {
-    my ($self, $fixer) = @_;
-    my $path = $fixer->split_path($self->path);
-    my $max  = $fixer->emit_value($self->max);
-
-    $fixer->emit_create_path(
-        $fixer->var,
-        $path,
-        sub {
-            my $var = shift;
-            "${var} = int(rand(${max}));";
-        }
-    );
+sub _build_fixer {
+    my ($self) = @_;
+    my $max = $self->max;
+    as_path($self->path)->creator(sub {int(rand($max))});
 }
 
 1;

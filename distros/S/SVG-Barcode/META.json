@@ -1,0 +1,58 @@
+{
+   "abstract" : "Base class for SVG 1D and 2D codes",
+   "author" : [
+      "Rolf Stöckli <tekki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SVG-Barcode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.24.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mock::MonkeyPatch" : "0.04",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tekki/svg-barcode/issues"
+      },
+      "homepage" : "https://github.com/Tekki/svg-barcode",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tekki/svg-barcode.git",
+         "web" : "https://github.com/Tekki/svg-barcode"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

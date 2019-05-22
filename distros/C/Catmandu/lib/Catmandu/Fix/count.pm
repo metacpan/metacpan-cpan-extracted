@@ -2,22 +2,25 @@ package Catmandu::Fix::count;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use namespace::clean;
 use Catmandu::Fix::Has;
 
+with 'Catmandu::Fix::Builder';
+
 has path => (fix_arg => 1);
 
-with 'Catmandu::Fix::SimpleGetValue';
-
-sub emit_value {
-    my ($self, $var) = @_;
-    "if (is_array_ref(${var})) {"
-        . "${var} = scalar \@{${var}};"
-        . "} elsif (is_hash_ref(${var})) {"
-        . "${var} = scalar keys \%{${var}};" . "}";
+sub _build_fixer {
+    my ($self) = @_;
+    as_path($self->path)->updater(
+        if => [
+            array_ref => sub {scalar @{$_[0]}},
+            hash_ref  => sub {scalar keys %{$_[0]}},
+        ],
+    );
 }
 
 1;

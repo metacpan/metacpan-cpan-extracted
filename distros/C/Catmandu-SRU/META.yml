@@ -27,7 +27,7 @@ no_index:
     - t
     - xt
 requires:
-  Catmandu: '0.9204'
+  Catmandu: '1.000'
   Catmandu::MODS: '0.31'
   Cpanel::JSON::XS: '3.0213'
   Furl: '0.41'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-SRU/issues
   homepage: https://github.com/LibreCat/Catmandu-SRU
   repository: https://github.com/LibreCat/Catmandu-SRU.git
-version: '0.421'
+version: '0.422'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

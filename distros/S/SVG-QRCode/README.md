@@ -1,19 +1,21 @@
 # NAME
 
-SVG::QRCode - Generate SVG based QR Code.
+SVG::QRCode - Generate SVG based QR Code
 
 # SYNOPSIS
 
     use SVG::QRCode;
 
     my $qrcode = SVG::QRCode->new(
-      casesensitive => 0,
-      darkcolor     => 'black',
-      level         => 'M',
-      lightcolor    => 'white',
-      margin        => 10,
-      size          => 5,
-      version       => 0,
+      {
+        casesensitive => 0,
+        darkcolor     => 'black',
+        level         => 'M',
+        lightcolor    => 'white',
+        margin        => 10,
+        size          => 5,
+        version       => 0,
+      }
     );
     my $svg  = $qrcode->plot('https://perldoc.pl');
     my $svg2 = $qrcode->param(darkcolor => 'red')->plot('https://perldoc.pl');
@@ -41,7 +43,7 @@ Creates a QR Code using the provided text and parameters.
 
 ## new
 
-    $qrcode = SVG::QRCode->new(%params);
+    $qrcode = SVG::QRCode->new(\%params);
 
 Creates a new QR Code plotter. Accepted parameters are:
 
@@ -55,7 +57,7 @@ Creates a new QR Code plotter. Accepted parameters are:
 
 - level
 
-    Error correction level, one of `'M'`, `'L'`, `'Q'`, `'H'`. Default `'L'`.
+    Error correction level, one of `'L'` (low), `'M'` (medium), `'Q'` (quartile), `'H'` (high). Default `'M'`.
 
 - lightcolor
 
@@ -95,6 +97,6 @@ Creates a QR Code.
 
 # AUTHOR & COPYRIGHT
 
-Copyright (C) 2019, Rolf Stöckli (Tekki).
+Copyright (C) 2019, Tekki (Rolf Stöckli).
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

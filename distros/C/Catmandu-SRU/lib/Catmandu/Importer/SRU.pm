@@ -10,7 +10,7 @@ use Carp;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 
-our $VERSION = '0.421';
+our $VERSION = '0.422';
 
 with 'Catmandu::Importer';
 
@@ -105,19 +105,24 @@ sub _hashify {
     $xc->registerNs("srw", $NS_SRW);
     $xc->registerNs("d",   $NS_SRW_DIAGNOSTIC);
 
-    my $meta = { requestUrl => $self->url };
+    my $meta    = {requestUrl => $self->url};
     my $records = {};
 
     for ($xc->findnodes('/srw:searchRetrieveResponse')) {
 
         for ($xc->findnodes('./srw:diagnostics/d:diagnostic', $_)) {
-            my %diag = ( uri => $xc->findvalue('./d:uri', $_) );
-            $diag{message} = $_ for grep { $_ ne '' } ($xc->findvalue('./d:message', $_));
-            $diag{details} = $_ for grep { $_ ne '' } ($xc->findvalue('./d:details', $_));
+            my %diag = (uri => $xc->findvalue('./d:uri', $_));
+            $diag{message} = $_
+                for grep {$_ ne ''} ($xc->findvalue('./d:message', $_));
+            $diag{details} = $_
+                for grep {$_ ne ''} ($xc->findvalue('./d:details', $_));
             push @{$meta->{diagnostics}}, \%diag;
         }
 
-        for my $tag (qw(version numberOfRecords resultSetId resultSetIdleTime nextRecordPosition)) {
+        for my $tag (
+            qw(version numberOfRecords resultSetId resultSetIdleTime nextRecordPosition)
+            )
+        {
             for ($xc->findnodes("./srw:$tag", $_)) {
                 $meta->{$tag} = $xc->findvalue(".", $_);
             }
@@ -128,17 +133,12 @@ sub _hashify {
                 $meta->{$tag} = {};
                 for ($xc->findnodes('./*', $_)) {
                     if (defined $_->prefix) {
-                        $xc->registerNs($_->prefix,
-                            $_->namespaceURI());
+                        $xc->registerNs($_->prefix, $_->namespaceURI());
                     }
-                    my $ns_uri = $_->namespaceURI;
-                    my $subTagName
-                        = is_string($ns_uri)
-                        && $ns_uri eq $NS_SRW
-                        ? $_->localname
-                        : $_->tagName;
-                    $meta->{$tag}->{$subTagName}
-                        = $xc->findvalue(".", $_);
+                    my $ns_uri     = $_->namespaceURI;
+                    my $subTagName = is_string($ns_uri)
+                        && $ns_uri eq $NS_SRW ? $_->localname : $_->tagName;
+                    $meta->{$tag}->{$subTagName} = $xc->findvalue(".", $_);
                 }
             }
         }
@@ -154,7 +154,7 @@ sub _hashify {
         {
             my $recordSchema  = $xc->findvalue('./srw:recordSchema',  $_);
             my $recordPacking = $xc->findvalue('./srw:recordPacking', $_);
-            my $recordData = $xc->find('./srw:recordData/*', $_)->pop();
+            my $recordData     = $xc->find('./srw:recordData/*', $_)->pop();
             my $recordPosition = $xc->findvalue('./srw:recordPosition', $_);
 
             # Copy all the root level namespaces to the record Element.
@@ -168,16 +168,17 @@ sub _hashify {
                 }
             }
 
-            push @{$records->{record}}, {
+            push @{$records->{record}},
+                {
                 recordSchema   => $recordSchema,
                 recordPacking  => $recordPacking,
                 recordData     => $recordData,
                 recordPosition => $recordPosition
-            };
+                };
         }
     }
 
-    return { records => $records, meta => $meta };
+    return {records => $records, meta => $meta};
 }
 
 sub url {
@@ -221,7 +222,7 @@ sub _nextRecordSet {
     my $set  = $hash->{'records'}->{'record'};
 
     # return records and metareference to a array.
-    { record => \@{$set}, meta => $meta };
+    {record => \@{$set}, meta => $meta};
 }
 
 # Internal: gets the next record from our current resultset.
@@ -261,7 +262,8 @@ sub _emit_diagnostics {
     my ($self, $hash) = @_;
 
     for my $diag (@{$hash->{meta}{diagnostics} // []}) {
-        warn join ' : ', grep { defined } map { $diag->{$_} } qw(uri message details);
+        warn join ' : ',
+            grep {defined} map {$diag->{$_}} qw(uri message details);
     }
 }
 
@@ -301,7 +303,7 @@ sub count {
         . '&maximumRecords=0';
 
     # fetch the xml response and hashify it.
-    my $xml = $self->_request($url)->{content};
+    my $xml  = $self->_request($url)->{content};
     my $hash = $self->_hashify($xml);
 
     $self->_emit_diagnostics($hash);

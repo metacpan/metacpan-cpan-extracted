@@ -1,6 +1,6 @@
 package Sim::OPT::Modish;
 #!/usr/bin/perl
-# Modish, version 0.249.
+# Modish, version 0.263.
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # The subroutine createconstrdbfile has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
 # All rights reserved, 2015-19.
@@ -2456,14 +2456,18 @@ sub pursue
 
 
   my ( $t_ref, $clmlines_ref, %t, @clmlines );
-  if ( ( not( -e $clmavgs ) ) and ( "getweather" ~~ @calcprocedures ) )
+  if ( ( not( -e $clmavgs ) )
+  #and ( "getweather" ~~ @calcprocedures )
+  )
   {
     ( $t_ref, $clmlines_ref ) = getsolar( \%paths );
     %t = %{ $t_ref };
     @clmlines = @{ $clmlines_ref };
   }
 
-  if ( ( scalar( @clmlines ) == 0 ) and ( "getweather" ~~ @calcprocedures ) )
+  if ( ( scalar( @clmlines ) == 0 )
+  #and ( "getweather" ~~ @calcprocedures )
+  )
   {
     open( CLMAVGS, "$clmavgs" ) or die;
     @clmlines = <CLMAVGS>;
@@ -2607,10 +2611,20 @@ sub pursue
             $countlithour++;
             my $hour = ( $counthour + 1) ;
 
-            my $dir = $avgs{dir}{$monthnum}{$hour}; #say REPORT "HERE \$dir: $dir";
-            my $diff = $avgs{diff}{$monthnum}{$hour}; #say REPORT "HERE \$diff: $diff";
-            my $alt = $avgs{alt}{$monthnum}{$hour}; #say REPORT "HERE \$alt: $alt";
-            my $azi = $avgs{azi}{$monthnum}{$hour}; #say REPORT "HERE \$azi: $azi";
+            my ( $dir, $diff );
+
+            if ( "getweather" ~~ @calcprocedures )
+            {
+              $dir = $avgs{dir}{$monthnum}{$hour}; #say REPORT "HERE \$dir: $dir";
+              $diff = $avgs{diff}{$monthnum}{$hour}; #say REPORT "HERE \$diff: $diff";
+            }
+
+            my $alt = $avgs{alt}{$monthnum}{$hour}; #print "\$alt: $alt ";
+            my $azi = $avgs{azi}{$monthnum}{$hour}; #print " \$azi: $azi ";
+            #print " \$monthnum: $monthnum ";
+            #say " \$hour: $hour";
+
+
 
             my $countpoint = 0;
 
@@ -2654,19 +2668,6 @@ sub pursue
             my $skycond = $skycondition{$monthnum};
 
 
-            #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
-            if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
-            {
-              if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
-              # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
-              if ( $dir == 0 ){ $dir = 0.0001; say "IMPOSED \$dir = 0.0001;"; say REPORT "IMPOSED \$dir = 0.0001;"; }
-              if ( $diff == 0 ){ $diff = 0.0001; say "IMPOSED \$diff = 0.0001;"; say REPORT "IMPOSED \$diff = 0.0001;"; }
-            }
-            # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
-            # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
-
-
-
             if ( not( "alldiff" ~~ @calcprocedures )
                   and ( ( "getweather" ~~ @calcprocedures )
                     or ( ( "gensky" ~~ @calcprocedures ) and ( "altcalcdiff" ~~ @calcprocedures ) )
@@ -2679,6 +2680,18 @@ sub pursue
                   or ( ( "composite" ~~ @calcprocedures )
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) )
               {
+
+                #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
+                #if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
+                # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
+
+                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                {
+                  if ( $dir == 0 ){ $dir = 0.0001; say "IMPOSED \$dir = 0.0001;"; say REPORT "IMPOSED \$dir = 0.0001;"; }
+                  if ( $diff == 0 ){ $diff = 0.0001; say "IMPOSED \$diff = 0.0001;"; say REPORT "IMPOSED \$diff = 0.0001;"; }
+                }
+                # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
+                # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
 
                 if ( "gendaylit" ~~ @calcprocedures )
                 {
@@ -2719,15 +2732,39 @@ sub pursue
                     @returns = `gensky $monthnum $day $hour -c -g $groundrefl -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gensky $monthnum $day $hour -c -g $groundrefl -a $lat -o $long -m $standardmeridian";
                   }
-                  #say "gensky $monthnum $day $hour -s -g $groundrefl -a $lat -o $long -m $standardmeridian";
+                  #say "gensky -ang $alt $azi -s -g $groundrefl -a $lat -o $long -m $standardmeridian";
                 }
 
-                my $newline;
-                my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
-                $altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
-                if ( $altreturn <= 0 )
+                #my $newline;
+                #my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
+                #$altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
+                #if ( $altreturn <= 0 )
+                #{
+                #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
+                #}
+
+                foreach my $li ( @returns )
                 {
-                  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
+                  if ( $li =~ /Warning: sun altitude below zero/ )
+                  {
+                    if ( $skycond eq "clear" )
+                    {
+                      @returns = `gensky -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
+                      #say REPORT "gensky " . dump( @returns );
+                    }
+                    elsif ( $skycond eq "cloudy" )
+                    {
+                      @returns = `gensky -ang 0.0001 $azi +i -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi +i -g 0 -a $lat -o $long -m $standardmeridian";
+                    }
+                    elsif ( $skycond eq "overcast" )
+                    {
+                      @returns = `gensky -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian";
+                    }
+                    last;
+                  }
                 }
 
 
@@ -2797,13 +2834,13 @@ solar source sun
                 say REPORT "IN CALCULATIONS FOR DIFFUSE RADIATION, cycle " . ( $countrad + 1 ) . ", \$hour: $hour, \$surfnum: $surfnum, \$month: $month";
 
 
-                my $newline;
-                my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
-                $altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
-                if ( $altreturn <= 0 )
-                {
-                  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
-                }
+                #my $newline;
+                #my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
+                #$altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
+                #if ( $altreturn <= 0 )
+                #{
+                #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
+                #}
 
                 #open( SKYFILE, "$skyfile" ) or die;
                 #my @lines = <SKYFILE>;
@@ -2899,6 +2936,18 @@ solar source sun
                 or ( ( not( "noreflections" ~~ @calcprocedures ) and not( "composite" ~~ @calcprocedures ) and not( "radical" ~~ @calcprocedures )
                   and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) or ( "plain" ~~ @calcprocedures ) ) )
               {
+
+                #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
+                #if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
+                # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
+
+                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                {
+                  if ( $dir == 0 ){ $dir = 0.0001; say "IMPOSED \$dir = 0.0001;"; say REPORT "IMPOSED \$dir = 0.0001;"; }
+                  if ( $diff == 0 ){ $diff = 0.0001; say "IMPOSED \$diff = 0.0001;"; say REPORT "IMPOSED \$diff = 0.0001;"; }
+                }
+                # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
+                # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
 
                 my $thisgref;
                 unless ( ( $countrad == 5 ) or ( $countrad == 6 )
@@ -3001,19 +3050,19 @@ solar source sun
                   {
                     if ( $skycond eq "clear" )
                     {
-                      @returns = `gensky $monthnum $day $hour +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky $monthnum $day $hour +s -g $thisgref -a $lat -o $long -m $standardmeridian";
+                      @returns = `gensky -ang 0.0001 $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
                       #say REPORT "gensky " . dump( @returns );
                     }
                     elsif ( $skycond eq "cloudy" )
                     {
-                      @returns = `gensky $monthnum $day $hour +i -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky $monthnum $day $hour +i -g $thisgref -a $lat -o $long -m $standardmeridian";
+                      @returns = `gensky -ang 0.0001 $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian";
                     }
                     elsif ( $skycond eq "overcast" )
                     {
-                      @returns = `gensky $monthnum $day $hour -c -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky $monthnum $day $hour -c -g $thisgref -a $lat -o $long -m $standardmeridian";
+                      @returns = `gensky -ang 0.0001 $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian";
                     }
                     last;
                   }
@@ -3022,13 +3071,13 @@ solar source sun
 
                 say REPORT "IN CALCULATIONS FOR TOTAL RADIATION, cycle " . ( $countrad + 1 ) . ", \$hour: $hour, \$surfnum: $surfnum, \$month: $month";
 
-                my $newline;
-                my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
-                $altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
-                if ( $altreturn <= 0 )
-                {
-                  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
-                }
+                #my $newline;
+                #my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
+                #$altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
+                #if ( $altreturn <= 0 )
+                #{
+                #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
+                #}
 
                 foreach my $el ( @returns )
                 {
@@ -3147,6 +3196,19 @@ solar source sun
               if ( ( ( "composite" ~~ @calcprocedures ) and ( $countrad == 5 ) )
                 or ( ( "radical" ~~ @calcprocedures ) and ( ( $countrad == 5 ) or ( $countrad == 6 ) ) ) )
               {
+
+                #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
+                #if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
+                # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
+
+                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                {
+                  if ( $dir == 0 ){ $dir = 0.0001; say "IMPOSED \$dir = 0.0001;"; say REPORT "IMPOSED \$dir = 0.0001;"; }
+                  if ( $diff == 0 ){ $diff = 0.0001; say "IMPOSED \$diff = 0.0001;"; say REPORT "IMPOSED \$diff = 0.0001;"; }
+                }
+                # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
+                # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
+
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
                 {
                   @returns = `gendaylit -ang $alt $azi +s -g 0 -W $dir 0 -a $lat -o $long -m $standardmeridian`;
@@ -3236,19 +3298,19 @@ solar source sun
                   {
                     if ( $skycond eq "clear" )
                     {
-                      @returns = `gensky $monthnum $day $hour +s -g 0 -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky $monthnum $day $hour +s -g 0 -a $lat -o $long -m $standardmeridian";
+                      @returns = `gensky -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
                       #say REPORT "gensky " . dump( @returns );
                     }
                     elsif ( $skycond eq "cloudy" )
                     {
-                      @returns = `gensky $monthnum $day $hour +i -g 0 -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky $monthnum $day $hour +i -g 0 -a $lat -o $long -m $standardmeridian";
+                      @returns = `gensky -ang 0.0001 $azi +i -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi +i -g 0 -a $lat -o $long -m $standardmeridian";
                     }
                     elsif ( $skycond eq "overcast" )
                     {
-                      @returns = `gensky $monthnum $day $hour -c -g 0 -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky $monthnum $day $hour -c -g 0 -a $lat -o $long -m $standardmeridian";
+                      @returns = `gensky -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gensky -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian";
                     }
                     last;
                   }
@@ -3258,13 +3320,13 @@ solar source sun
 
                 say REPORT "IN CALCULATIONS FOR DIRECT RADIATION, cycle " . ( $countrad + 1 ) . ", \$hour: $hour, \$surfnum: $surfnum, \$month: $month";
 
-                my $newline;
-                my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
-                $altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
-                if ( $altreturn <= 0 )
-                {
-                  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
-                }
+                #my $newline;
+                #my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
+                #$altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
+                #if ( $altreturn <= 0 )
+                #{
+                #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
+                #}
 
                 #say "RETURNS3: " . dump( @returns );
 
@@ -5924,6 +5986,10 @@ sub getsolar
       my $decl = 23.45 * sin( deg2rad( 280.1 + 0.9863 * $daynums{$m} ) );
       my $declrad = deg2rad($decl);
 
+                                                       #A                                                                          #B
+      #my $timeq = ( 0.1645 *          sin( deg2rad( ( 1.978 * $daynums{$m}  )- 160.22 ) )        ) - ( 0.1255 *            cos( #deg2rad( ( 0.989 * $daynums{$m} )- 80.11 ) )          )               #B
+      #  - ( 0.025 *                       sin( deg2rad( ( 0.989 * $daynums{$m}  ) - 80.11 ) ) );  #say "\$timeq: $timeq";
+
       my $timeq = ( 9.87 * sin( deg2rad( ( 1.978 * $daynums{$m}  )- 160.22 ) ) ) - ( 7.53 * cos( deg2rad( ( 0.989 * $daynums{$m} )- 80.11 ) ) )
         - ( 1.5 * sin( deg2rad( ( 0.989 * $daynums{$m}  ) - 80.11 ) ) );  #say "\$timeq: $timeq";
 
@@ -6687,22 +6753,19 @@ modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );  (Which means: calculate for z
 modish is a program for altering the shading values calculated by the ESP-r building simulation platform to take into account reflections from obstructions.
 More precisely, modish brings into account the reflective effect of solar obstructions on solar gains on building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface.
 
-The effect of solar reflections is taken into account at each hour on the basis of the ratios
-between the irradiances measured at the models' surfaces in: a) the original model; b) a transitional model derived from that.
-
-The irradiances are calculated through Radiance and derive from the following building models: a) a model in which the solar obstructions have their true reflectivity ; b) a model in which the solar obstructions are completely black.
+The effect of solar reflections is taken into account at each hour on the basis of the ratios between the irradiances measured at the models' surfaces in a model anologue of the original one, and a twin fictiotious model derived from that. The irradiances are calculated through Radiance and derive from a model in which the solar obstructions have their true reflectivity and a model in which the solar obstructions are black.
 
 The value given by 1 minus those irradiance ratios gives the diffuse shading factors that are put in the ISH file in place of the original values.
 
-The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: the ".mod.shda" file is usable by ESP-r. It features the newly calculated shading factors; the ".report.shda" file lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. Note that when the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor may be negative, and the irradiance ratio will be greater than 1.
+The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: a ".mod.shda" file which is usable by ESP-r and features the new shading factors; a ".report.shda" file which lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. When the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor can be negative, and the irradiance ratio is greater than 1.
 
 To this procedure another procedure can be chained to take additionally into account in the shading effect of the obstrucontions with respect to the radiation reflected from the ground.
 
-Finally, modish is capable of calculating the shading factors from scratch by the means of the Radiance raytracer.
+Finally, modish is capable of calculating the shading factors from scratch.
 
 At the moment, the documentation describing how these operations are obtained and other information is inserted at the beginning of the source code.
 
-The settings for managing modish are specified in a configuration file in the example folder and written as a comment at the beginning of the source code. This file must be named "modish_defaults.pl" and be placed in the same directory from which modish is called, together with the "fix.sh" and the "perlfix.pl" file.
+The settings for managing modish are specified in the "modish_defaults.pl" configuration file in the example folder and also written as a comment at the beginning of the source code. This file must be placed in the same directory from which modish is called, together with the files "fix.sh" and the "perlfix.pl".
 
 To launch modish, if it is installed as a Perl module:
 
@@ -6713,7 +6776,7 @@ modish( "PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg", zone_number, surface_1_numbe
 Example:
 modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );
 
-If instead the file Modish.pm is used by itself, as a script, it has to be launched from the command like with:
+If instead the file Modish.pm is used as a script, it has to be launched from the command like with:
 
 perl ./modish PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg zone_number surface_1_number surface_2_number surface_n_number
 
@@ -6721,17 +6784,15 @@ For example:
 
 perl ./modish.pl/home/x/model/cfg/model.cfg 1 7 9 (which means: calculate for zone 1, surfaces 7 and 9.)
 
-The path of the ESP-r model configuration path has to be specified in full, like in the example above.
+The path of the ESP-r model configuration file has to be specified in full, like in the example above.
 
-To be sure that the code works as a script, the header "package" etc. should be transformed in a comment.
+To be sure that the code works as a script, the header "package" etc. should be transformed into a comment.
 
 In calculating the irradiance ratios, the program defaults to: 5 direction vectors; diffuse reflections: 2 ; direct reflections: 7; surface grid: 2 x 2; distance from the surface for calculating the irradiances: 0.01 (metres).
 
-For the program to work correctly, the materials, construction and optics databases must be local to the ESP-r model.
+For the program to work correctly, the ESP-r model materials, construction and optics databases must be local to the model.
 
-modish should works with Linux and hopefully still the Mac.
-
-Here below is an example of configuration file ("modish_defaults.pl") that the author uses. Explanations are written in the comments at the beginning of the source code.
+Here below is an example of configuration file. Explanations are written in the comments at the beginning of the source code.
 
 
 ___
@@ -6751,7 +6812,7 @@ $add = " -ad 512 -aa 0.5 -dc .25 -dr 2 -ss 1 -st .05 -ds .04 -dt .02 -bv "; #RAD
 
 =head1 AUTHOR
 
-Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
+Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>. The subroutine "createconstrdbfile" has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
 
 =head1 COPYRIGHT AND LICENSE
 

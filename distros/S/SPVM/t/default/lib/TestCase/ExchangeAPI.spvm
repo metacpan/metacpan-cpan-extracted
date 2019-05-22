@@ -6,9 +6,125 @@ package TestCase::ExchangeAPI {
   use TestCase::Point_3l;
   use TestCase::Point_3f;
   use TestCase::Point_3d;
+  use TestCase::Minimal;
   
   sub FLOAT_PRECICE : float () { return 16384.5f; }
   sub DOUBLE_PRECICE : double () { return 65536.5; }
+
+  sub return_undef : TestCase::Minimal () {
+    
+    return undef;
+  }
+
+  sub return_array : TestCase::Minimal[] () {
+    
+    my $minimal = new TestCase::Minimal[2];
+    $minimal->[0] = new TestCase::Minimal;
+    $minimal->[0]->set_x(1);
+    $minimal->[0]->set_y(2);
+    $minimal->[1] = new TestCase::Minimal;
+    $minimal->[1]->set_x(3);
+    $minimal->[1]->set_y(4);
+    
+    return $minimal;
+  }
+
+  sub return_oarray : oarray () {
+    
+    my $minimal = new TestCase::Minimal[2];
+    $minimal->[0] = new TestCase::Minimal;
+    $minimal->[0]->set_x(1);
+    $minimal->[0]->set_y(2);
+    $minimal->[1] = new TestCase::Minimal;
+    $minimal->[1]->set_x(3);
+    $minimal->[1]->set_y(4);
+    
+    return $minimal;
+  }
+
+  sub return_byte_value : TestCase::Point_3b () {
+    my $point : TestCase::Point_3b;
+    $point->{x} = 1;
+    $point->{y} = 2;
+    $point->{z} = INT8_MIN();
+    
+    return $point;
+  }
+  
+  sub return_short_value : TestCase::Point_3s () {
+    my $point : TestCase::Point_3s;
+    $point->{x} = 1;
+    $point->{y} = 2;
+    $point->{z} = INT16_MIN();
+    
+    return $point;
+  }
+
+  sub return_int_value : TestCase::Point_3i () {
+    my $point : TestCase::Point_3i;
+    $point->{x} = 1;
+    $point->{y} = 2;
+    $point->{z} = INT32_MIN();
+    
+    return $point;
+  }
+
+  sub return_long_value : TestCase::Point_3l () {
+    my $point : TestCase::Point_3l;
+    $point->{x} = 1;
+    $point->{y} = 2;
+    $point->{z} = INT64_MIN();
+    
+    return $point;
+  }
+
+  sub return_float_value : TestCase::Point_3f () {
+    my $point : TestCase::Point_3f;
+    $point->{x} = 1;
+    $point->{y} = 2;
+    $point->{z} = FLT_MIN();
+    
+    return $point;
+  }
+
+  sub return_double_value : TestCase::Point_3d () {
+    my $point : TestCase::Point_3d;
+    $point->{x} = 1;
+    $point->{y} = 2;
+    $point->{z} = DBL_MIN();
+    
+    return $point;
+  }
+
+  sub return_byte : byte () {
+    
+    return INT8_MIN();
+  }
+  
+  sub return_short : short () {
+    
+    return INT16_MIN();
+  }
+
+  sub return_int : int () {
+    
+    return INT32_MIN();
+  }
+
+  sub return_long : long () {
+    
+    return INT64_MIN();
+  }
+
+  sub return_float : float () {
+    
+    return FLT_MIN();
+  }
+
+  sub return_double : double () {
+    
+    return DBL_MIN();
+  }
 
   sub set_exception : int () {
     my $exception = $@;
@@ -41,6 +157,30 @@ package TestCase::ExchangeAPI {
   
   sub string_argments_and_return_value : string ($string1 : string, $string2 : string) {
     return $string1 . $string2;
+  }
+
+  sub call_sub_value_arg_byte : TestCase::Point_3b ($point : TestCase::Point_3b) {
+    return $point;
+  }
+
+  sub call_sub_value_arg_short : TestCase::Point_3s ($point : TestCase::Point_3s) {
+    return $point;
+  }
+
+  sub call_sub_value_arg_int : TestCase::Point_3i ($point : TestCase::Point_3i) {
+    return $point;
+  }
+
+  sub call_sub_value_arg_long : TestCase::Point_3l ($point : TestCase::Point_3l) {
+    return $point;
+  }
+
+  sub call_sub_value_arg_float : TestCase::Point_3f ($point : TestCase::Point_3f) {
+    return $point;
+  }
+
+  sub call_sub_value_arg_double : TestCase::Point_3d ($point : TestCase::Point_3d) {
+    return $point;
   }
   
   sub call_sub_value_ref_numeric_ref_mixed_arg : void ($point1 : TestCase::Point_3i&, $value1 : int&, $point2 : TestCase::Point_3i&, $value2 : int&) {
@@ -553,9 +693,196 @@ package TestCase::ExchangeAPI {
     return 0;
   }
 
+  sub spvm_new_varray_byte : int ($points : TestCase::Point_3b[]) {
+    
+    if ($points->[0]{x} == INT8_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_short : int ($points : TestCase::Point_3s[]) {
+    
+    if ($points->[0]{x} == INT16_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
   sub spvm_new_varray_int : int ($points : TestCase::Point_3i[]) {
     
     if ($points->[0]{x} == INT32_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_long : int ($points : TestCase::Point_3l[]) {
+    
+    if ($points->[0]{x} == INT64_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_float : int ($points : TestCase::Point_3f[]) {
+    
+    if ($points->[0]{x} == FLT_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_double : int ($points : TestCase::Point_3d[]) {
+    
+    if ($points->[0]{x} == DBL_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_binary_byte : int ($points : TestCase::Point_3b[]) {
+    if ($points->[0]{x} == INT8_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_binary_short : int ($points : TestCase::Point_3s[]) {
+    if ($points->[0]{x} == INT16_MIN()) {
       if ($points->[0]{y} == 1) {
         if ($points->[0]{z} == 2) {
           if ($points->[1]{x} == 3) {
@@ -605,4 +932,83 @@ package TestCase::ExchangeAPI {
     
     return 0;
   }
+
+  sub spvm_new_varray_binary_long : int ($points : TestCase::Point_3l[]) {
+    if ($points->[0]{x} == INT64_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_binary_float : int ($points : TestCase::Point_3f[]) {
+    if ($points->[0]{x} == FLT_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_new_varray_binary_double : int ($points : TestCase::Point_3d[]) {
+    if ($points->[0]{x} == DBL_MIN()) {
+      if ($points->[0]{y} == 1) {
+        if ($points->[0]{z} == 2) {
+          if ($points->[1]{x} == 3) {
+            if ($points->[1]{y} == 4) {
+              if ($points->[1]{z} == 5) {
+                if ($points->[2]{x} == 6) {
+                  if ($points->[2]{y} == 7) {
+                    if ($points->[2]{z} == 8) {
+                      if (@$points == 3) {
+                        return 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
 }

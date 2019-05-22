@@ -2,7 +2,7 @@ package Catmandu::Cmd;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0606';
+our $VERSION = '1.2001';
 
 use parent qw(App::Cmd::Command);
 use Catmandu::Util qw(is_array_ref pod_section);
@@ -119,7 +119,7 @@ sub _build_fixer {
     }
     Catmandu::Fix->new(
         preprocess => $opts->preprocess ? 1 : 0,
-        fixes => $opts->fix,
+        fixes      => $opts->fix,
     );
 }
 

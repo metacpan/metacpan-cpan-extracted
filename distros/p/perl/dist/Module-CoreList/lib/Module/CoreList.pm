@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20190419';
+our $VERSION = '5.20190522';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -347,6 +347,8 @@ sub changes_between {
     5.029008 => '2019-02-20',
     5.029009 => '2019-03-20',
     5.028002 => '2019-04-19',
+    5.029010 => '2019-04-20',
+    5.030000 => '2019-05-22',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -16231,6 +16233,61 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.029010 => {
+        delta_from => 5.029009,
+        changed => {
+            'B::Op_private'         => '5.029010',
+            'Config'                => '5.02901',
+            'Cwd'                   => '3.78',
+            'Data::Dumper'          => '2.174',
+            'ExtUtils::CBuilder'    => '0.280231',
+            'ExtUtils::CBuilder::Base'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Unix'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::VMS'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows::BCC'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows::GCC'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::Windows::MSVC'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::aix'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::android'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::cygwin'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::darwin'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::dec_osf'=> '0.280231',
+            'ExtUtils::CBuilder::Platform::os2'=> '0.280231',
+            'File::Spec'            => '3.78',
+            'File::Spec::AmigaOS'   => '3.78',
+            'File::Spec::Cygwin'    => '3.78',
+            'File::Spec::Epoc'      => '3.78',
+            'File::Spec::Functions' => '3.78',
+            'File::Spec::Mac'       => '3.78',
+            'File::Spec::OS2'       => '3.78',
+            'File::Spec::Unix'      => '3.78',
+            'File::Spec::VMS'       => '3.78',
+            'File::Spec::Win32'     => '3.78',
+            'I18N::Langinfo'        => '0.18',
+            'Module::CoreList'      => '5.20190420',
+            'Module::CoreList::Utils'=> '5.20190420',
+            'Module::Metadata'      => '1.000036',
+            'POSIX'                 => '1.88',
+            'Storable'              => '3.15',
+            'Unicode'               => '12.1.0',
+        },
+        removed => {
+        }
+    },
+    5.030000 => {
+        delta_from => 5.02901,
+        changed => {
+            'B::Op_private'         => '5.030000',
+            'Config'                => '5.03',
+            'Devel::PPPort'         => '3.52',
+            'Module::CoreList'      => '5.20190522',
+            'Module::CoreList::Utils'=> '5.20190522',
+            'XS::Typemap'           => '0.17',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -17219,6 +17276,20 @@ sub is_core
         removed => {
         }
     },
+    5.029010 => {
+        delta_from => 5.029009,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.030000 => {
+        delta_from => 5.02901,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -17234,7 +17305,6 @@ sub is_core
     'Archive::Tar::File'    => 'cpan',
     'AutoLoader'            => 'cpan',
     'AutoSplit'             => 'cpan',
-    'B::Debug'              => 'cpan',
     'CPAN'                  => 'cpan',
     'CPAN::Author'          => 'cpan',
     'CPAN::Bundle'          => 'cpan',
@@ -17397,41 +17467,13 @@ sub is_core
     'JSON::PP::Boolean'     => 'cpan',
     'List::Util'            => 'cpan',
     'List::Util::XS'        => 'cpan',
-    'Locale::Codes'         => 'cpan',
-    'Locale::Codes::Constants'=> 'cpan',
-    'Locale::Codes::Country'=> 'cpan',
-    'Locale::Codes::Country_Codes'=> 'cpan',
-    'Locale::Codes::Country_Retired'=> 'cpan',
-    'Locale::Codes::Currency'=> 'cpan',
-    'Locale::Codes::Currency_Codes'=> 'cpan',
-    'Locale::Codes::Currency_Retired'=> 'cpan',
-    'Locale::Codes::LangExt'=> 'cpan',
-    'Locale::Codes::LangExt_Codes'=> 'cpan',
-    'Locale::Codes::LangExt_Retired'=> 'cpan',
-    'Locale::Codes::LangFam'=> 'cpan',
-    'Locale::Codes::LangFam_Codes'=> 'cpan',
-    'Locale::Codes::LangFam_Retired'=> 'cpan',
-    'Locale::Codes::LangVar'=> 'cpan',
-    'Locale::Codes::LangVar_Codes'=> 'cpan',
-    'Locale::Codes::LangVar_Retired'=> 'cpan',
-    'Locale::Codes::Language'=> 'cpan',
-    'Locale::Codes::Language_Codes'=> 'cpan',
-    'Locale::Codes::Language_Retired'=> 'cpan',
-    'Locale::Codes::Script' => 'cpan',
-    'Locale::Codes::Script_Codes'=> 'cpan',
-    'Locale::Codes::Script_Retired'=> 'cpan',
-    'Locale::Country'       => 'cpan',
-    'Locale::Currency'      => 'cpan',
-    'Locale::Language'      => 'cpan',
     'Locale::Maketext::Simple'=> 'cpan',
-    'Locale::Script'        => 'cpan',
     'MIME::Base64'          => 'cpan',
     'MIME::QuotedPrint'     => 'cpan',
     'Math::BigFloat'        => 'cpan',
     'Math::BigFloat::Trace' => 'cpan',
     'Math::BigInt'          => 'cpan',
     'Math::BigInt::Calc'    => 'cpan',
-    'Math::BigInt::CalcEmu' => 'cpan',
     'Math::BigInt::FastCalc'=> 'cpan',
     'Math::BigInt::Lib'     => 'cpan',
     'Math::BigInt::Trace'   => 'cpan',
@@ -17605,6 +17647,7 @@ sub is_core
     'Test2::EventFacet::Error'=> 'cpan',
     'Test2::EventFacet::Hub'=> 'cpan',
     'Test2::EventFacet::Info'=> 'cpan',
+    'Test2::EventFacet::Info::Table'=> 'cpan',
     'Test2::EventFacet::Meta'=> 'cpan',
     'Test2::EventFacet::Parent'=> 'cpan',
     'Test2::EventFacet::Plan'=> 'cpan',
@@ -17689,7 +17732,6 @@ sub is_core
     'Archive::Tar'          => undef,
     'Archive::Tar::Constant'=> undef,
     'Archive::Tar::File'    => undef,
-    'B::Debug'              => undef,
     'CPAN'                  => undef,
     'CPAN::Author'          => undef,
     'CPAN::Bundle'          => undef,
@@ -17852,41 +17894,13 @@ sub is_core
     'JSON::PP::Boolean'     => 'https://github.com/makamaka/JSON-PP/issues',
     'List::Util'            => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Scalar-List-Utils',
     'List::Util::XS'        => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Scalar-List-Utils',
-    'Locale::Codes'         => undef,
-    'Locale::Codes::Constants'=> undef,
-    'Locale::Codes::Country'=> undef,
-    'Locale::Codes::Country_Codes'=> undef,
-    'Locale::Codes::Country_Retired'=> undef,
-    'Locale::Codes::Currency'=> undef,
-    'Locale::Codes::Currency_Codes'=> undef,
-    'Locale::Codes::Currency_Retired'=> undef,
-    'Locale::Codes::LangExt'=> undef,
-    'Locale::Codes::LangExt_Codes'=> undef,
-    'Locale::Codes::LangExt_Retired'=> undef,
-    'Locale::Codes::LangFam'=> undef,
-    'Locale::Codes::LangFam_Codes'=> undef,
-    'Locale::Codes::LangFam_Retired'=> undef,
-    'Locale::Codes::LangVar'=> undef,
-    'Locale::Codes::LangVar_Codes'=> undef,
-    'Locale::Codes::LangVar_Retired'=> undef,
-    'Locale::Codes::Language'=> undef,
-    'Locale::Codes::Language_Codes'=> undef,
-    'Locale::Codes::Language_Retired'=> undef,
-    'Locale::Codes::Script' => undef,
-    'Locale::Codes::Script_Codes'=> undef,
-    'Locale::Codes::Script_Retired'=> undef,
-    'Locale::Country'       => undef,
-    'Locale::Currency'      => undef,
-    'Locale::Language'      => undef,
     'Locale::Maketext::Simple'=> undef,
-    'Locale::Script'        => undef,
     'MIME::Base64'          => undef,
     'MIME::QuotedPrint'     => undef,
     'Math::BigFloat'        => undef,
     'Math::BigFloat::Trace' => undef,
     'Math::BigInt'          => undef,
     'Math::BigInt::Calc'    => undef,
-    'Math::BigInt::CalcEmu' => undef,
     'Math::BigInt::FastCalc'=> undef,
     'Math::BigInt::Lib'     => undef,
     'Math::BigInt::Trace'   => undef,
@@ -18060,6 +18074,7 @@ sub is_core
     'Test2::EventFacet::Error'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Hub'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Info'=> 'http://github.com/Test-More/test-more/issues',
+    'Test2::EventFacet::Info::Table'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Meta'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Parent'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Plan'=> 'http://github.com/Test-More/test-more/issues',

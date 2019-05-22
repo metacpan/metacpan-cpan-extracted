@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBuild 0.28 {
+package Dist::Zilla::Plugin::AlienBuild 0.29 {
 
   use 5.014;
   use Moose;
@@ -69,7 +69,7 @@ package Dist::Zilla::Plugin::AlienBuild 0.28 {
       $self->zilla->register_prereqs({
         phase => 'configure',
         type  => 'requires',
-      }, 'Alien::Build::MM' => '1.71');
+      }, 'Alien::Build::MM' => '1.74');
     }
 
     foreach my $phase (keys %$prereqs)
@@ -248,7 +248,7 @@ Dist::Zilla::Plugin::AlienBuild - Use Alien::Build with Dist::Zilla
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 

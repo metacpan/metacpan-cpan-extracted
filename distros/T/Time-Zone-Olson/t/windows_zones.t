@@ -6,7 +6,7 @@ use File::Temp();
 use Fcntl();
 use XML::LibXML();
 use Test::More;
-use Time::Zone::Olson::Win32();
+use Time::Zone::Olson();
 use LWP::UserAgent();
 use HTTP::Request();
 use Encode();
@@ -48,9 +48,21 @@ if (defined $response && $response->is_success()) {
 			}
 		}
 	}
-	my %module_mapping = Time::Zone::Olson::Win32->mapping();
+	my $todo;
+	if ($^O eq 'MSWin32') {
+		require Win32;
+		my $display_name = Win32::GetOSDisplayName();
+		my $os_name = Win32::GetOSName();
+		my ($description, $major, $minor, $build, $id) = Win32::GetOSVersion();
+		if ($major < 10) { # below Windows 10
+			$todo = "$os_name does not have all timezones";
+		}
+		diag("Current version of Windows is $major - $display_name ($os_name)");
+	}
+	local $TODO = $todo;
+	my %module_mapping = Time::Zone::Olson->win32_mapping();
 	foreach my $olson_time_zone (sort { $a cmp $b } keys %olson_to_win32_mapping) {
-		ok($module_mapping{$olson_time_zone}, "$olson_time_zone can be found in Time::Zone::Olson::Win32->mapping()");
+		ok($module_mapping{$olson_time_zone}, "$olson_time_zone can be found in Time::Zone::Olson->win32_mapping()");
 	}
 } elsif (defined $response) {
 	diag "Failed to download $url:" . $response->status_line();
@@ -66,7 +78,7 @@ if ( $OSNAME eq 'MSWin32' ) {
 	while ($enumerate_timezones) {
 		if (Win32API::Registry::RegEnumKeyEx($timezone_database_subkey, $timezone_index, my $buffer, [], [], [], [], [])) {
 			$local_windows_timezones{$buffer} = 1;
-		} elsif ( Win32API::Registry::regLastError() == 259 ) {    # ERROR_NO_MORE_TIMES from winerror.h
+		} elsif ( Win32API::Registry::regLastError() == 259 ) { # ERROR_NO_MORE_TIMES from winerror.h
 			$enumerate_timezones = 0;
 		} else {
 			Carp::croak("Failed to read from LOCAL_MACHINE\\$timezone_database_registry_path:$EXTENDED_OS_ERROR");
@@ -74,7 +86,7 @@ if ( $OSNAME eq 'MSWin32' ) {
 		$timezone_index += 1;
 	}
 	Win32API::Registry::RegCloseKey($timezone_database_subkey) or Carp::croak("Failed to close LOCAL_MACHINE\\$timezone_database_registry_path:$EXTENDED_OS_ERROR");
-	my %win32_mapping = Time::Zone::Olson::Win32->mapping();
+	my %win32_mapping = Time::Zone::Olson->win32_mapping();
 	foreach my $timezone (sort { $a cmp $b } keys %local_windows_timezones) {
 		my $found;
 		foreach my $olson_timezone (sort { $a cmp $b } keys %win32_mapping) {
@@ -84,19 +96,23 @@ if ( $OSNAME eq 'MSWin32' ) {
 		}
 		TODO: {
 			local $TODO = "Known missing case" if ($timezone =~ /^(?:
-										Kamchatka|
-										Mid\-Atlantic|
-										Magallanes|
-										Qyzylorda|
-										Sao[ ]Tome|
-										Saratov|
-										Sudan|
-										Volgograd
-									)[ ]Standard[ ]Time$/smx);
-			ok($found, "Successfully found mapping for $timezone in olson tz database");
+											(?:
+												Kamchatka|
+												Magallanes|
+												Mexico|
+												Mid\-Atlantic|
+												Qyzylorda|
+												Sao[ ]Tome|
+												Saratov|
+												Sudan|
+												Volgograd
+											)[ ]Standard[ ]Time(?:[ ]2)?|
+											UTC[+]13
+										)$/smx);
+			ok($found, "Successfully found Win32 timezone $timezone in olson tz mapping");
 		}
 		if (!$found) {
-			diag("Unable to locate with win32 timezone $timezone in the olson tz database");
+			diag("Unable to locate Win32 timezone $timezone in the olson tz mapping");
 		}
 	}
 }
