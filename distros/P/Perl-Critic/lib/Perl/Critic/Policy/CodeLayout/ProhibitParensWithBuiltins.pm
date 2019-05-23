@@ -5,14 +5,12 @@ use strict;
 use warnings;
 use Readonly;
 
-use List::MoreUtils qw{any};
-
 use Perl::Critic::Utils qw{
     :booleans :severities :data_conversion :classification :language
 };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.132';
+our $VERSION = '1.134';
 
 #-----------------------------------------------------------------------------
 

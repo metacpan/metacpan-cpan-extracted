@@ -1,9 +1,71 @@
 ==================================================
-Changes from 2018-01-25 00:00:00 +0000 to present.
+Changes from 2018-05-22 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.06 at 2019-01-25 03:09:07 +0000
+version 0.07 at 2019-05-22 15:48:54 +0000
+-----------------------------------------
+
+  Change: 4c9d699eca9612d59ed8cce11182ec6f2dca142e
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2019-05-22 08:48:41 +0000
+
+    Update contributors 
+
+  Change: 33371a016e8717455d87b737f7324605ab1f39b3
+  Author: Josh Lavin <jdigory@users.noreply.github.com>
+  Date : 2019-05-21 09:38:14 +0000
+
+    Merge pull request #5 from kianmeng/missing-endpoints
+
+    Add missing endpoints from API doc 
+
+  Change: a47f7df3d50e3730ef7c9cba19ef820e90c04bd2
+  Author: Kian-Meng, Ang <kianmeng@cpan.org>
+  Date : 2019-05-10 23:05:15 +0000
+
+    Add missing endpoints from API doc
+
+    List of endpoints: - Batch Webhooks - Connected Sites - Facebook Ads
+    - Google Ads - Landing Pages - Member Tags - Ping - Reporting -
+    Search Campaigns - Search Members - Verified Domains 
+
+  Change: 0d052b1f9890cf44e43073acd638ae4645683770
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2019-01-25 09:16:57 +0000
+
+    v0.06 
+
+  Change: 4e428e1dc1d0268c7c5f2f40bf82ab4c52c2fbfb
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2019-01-25 09:16:56 +0000
+
+    Localize attribute names
+
+    avoid clashing with role 
+
+  Change: 4b09c759e964b8e9329d7e6b3c15ce6d63e03671
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2019-01-25 09:16:53 +0000
+
+    Revert "Add cpanfile, pin Web::API to working version"
+
+    This reverts commit 99f86fe3ff7a6a4fea7f21c23ae1de10e45a8ac5. 
+
+  Change: 9411c1b29cd2931378cf2940093986d0bd4ce350
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2019-01-25 09:16:50 +0000
+
+    v0.05 
+
+  Change: bc128f74473c76275ac9dd1799177256f91ea41d
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2019-01-25 09:16:45 +0000
+
+    Add cpanfile, pin Web::API to working version 
+
+-----------------------------------------
+version 0.06 at 2019-01-25 03:08:51 +0000
 -----------------------------------------
 
   Change: d7c68ffe49cedd68b4ee6e663dc3837545e7c3a4
@@ -73,5 +135,5 @@ version 0.05 at 2019-01-19 00:35:36 +0000
     v0.04 
 
 ================================================
-Plus 4 releases after 2018-01-25 00:00:00 +0000.
+Plus 4 releases after 2018-05-22 00:00:00 +0000.
 ================================================

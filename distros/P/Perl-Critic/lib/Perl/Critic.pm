@@ -22,7 +22,7 @@ use Perl::Critic::Utils qw< :characters hashify shebang_line >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.132';
+our $VERSION = '1.134';
 
 Readonly::Array our @EXPORT_OK => qw(critique);
 
@@ -215,8 +215,10 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =for stopwords DGR INI-style API -params pbp refactored ActivePerl ben Jore
-Dolan's Twitter Alexandr Ciornii Ciornii's downloadable
+Dolan's Twitter Alexandr Ciornii Ciornii's downloadable O'Regan Hukins Omer Gazit Zacks Howarth Walde Rolsky Jakub Wilk Trosien Creenan Balhatchet Paaske Tørholm Raspass Tonkin Katz Berndt Sergey Gabor Szabo Knop Eldridge Steinbrunner Kimmel Guillaume Aubert Anirvan Chatterjee Rinaldo Ollis Etheridge Brømsø Slaven Rezić Szymon Nieznański Oschwald
 
 =head1 NAME
 
@@ -261,10 +263,16 @@ called C<perlcritic-gui>.  You can get a free community edition of ActivePerl
 from L<http://www.activestate.com>.
 
 
+=head1 PREREQUISITES
+
+Perl::Critic runs on Perl back to Perl 5.6.1. It relies on the L<PPI>
+module to do the heavy work of parsing Perl.
+
+
 =head1 INTERFACE SUPPORT
 
-This is considered to be a public class.  Any changes to its interface will go
-through a deprecation cycle.
+The C<Perl::Critic> module is considered to be a public class. Any
+changes to its interface will go through a deprecation cycle.
 
 
 =head1 CONSTRUCTOR
@@ -827,8 +835,6 @@ L<Config::Tiny>
 
 L<Exception::Class>
 
-L<File::HomeDir>
-
 L<File::Spec>
 
 L<File::Spec::Unix>
@@ -934,6 +940,52 @@ and Sharon, my wife - For putting up with my all-night code sessions.
 Thanks also to the Perl Foundation for providing a grant to support Chris
 Dolan's project to implement twenty PBP policies.
 L<http://www.perlfoundation.org/april_1_2007_new_grant_awards>
+
+Thanks also to this incomplete laundry list of folks who have contributed
+to Perl::Critic in some way:
+Gregory Oschwald,
+Mike O'Regan,
+Tom Hukins,
+Omer Gazit,
+Evan Zacks,
+Paul Howarth,
+Sawyer X,
+Christian Walde,
+Dave Rolsky,
+Jakub Wilk,
+Roy Ivy III,
+Oliver Trosien,
+Glenn Fowler,
+Matt Creenan,
+Alex Balhatchet,
+Sebastian Paaske Tørholm,
+Stuart A Johnston,
+Dan Book,
+Steven Humphrey,
+James Raspass,
+Nick Tonkin,
+Harrison Katz,
+Douglas Sims,
+Mark Fowler,
+Alan Berndt,
+Neil Bowers,
+Sergey Romanov,
+Gabor Szabo,
+Graham Knop,
+Mike Eldridge,
+David Steinbrunner,
+Kirk Kimmel,
+Guillaume Aubert,
+Dave Cross,
+Anirvan Chatterjee,
+Todd Rinaldo,
+Graham Ollis,
+Karen Etheridge,
+Jonas Brømsø,
+Olaf Alders,
+Jim Keenan,
+Slaven Rezić,
+Szymon Nieznański.
 
 
 =head1 AUTHOR

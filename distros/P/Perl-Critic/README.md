@@ -43,10 +43,15 @@ Also, ActivePerl includes a very slick graphical interface to Perl-Critic
 called `perlcritic-gui`.  You can get a free community edition of ActivePerl
 from [http://www.activestate.com](http://www.activestate.com).
 
+# PREREQUISITES
+
+Perl::Critic runs on Perl back to Perl 5.6.1. It relies on the [PPI](https://metacpan.org/pod/PPI)
+module to do the heavy work of parsing Perl.
+
 # INTERFACE SUPPORT
 
-This is considered to be a public class.  Any changes to its interface will go
-through a deprecation cycle.
+The `Perl::Critic` module is considered to be a public class. Any
+changes to its interface will go through a deprecation cycle.
 
 # CONSTRUCTOR
 
@@ -587,8 +592,6 @@ Perl::Critic requires the following modules:
 
 [Exception::Class](https://metacpan.org/pod/Exception::Class)
 
-[File::HomeDir](https://metacpan.org/pod/File::HomeDir)
-
 [File::Spec](https://metacpan.org/pod/File::Spec)
 
 [File::Spec::Unix](https://metacpan.org/pod/File::Spec::Unix)
@@ -691,6 +694,52 @@ and Sharon, my wife - For putting up with my all-night code sessions.
 Thanks also to the Perl Foundation for providing a grant to support Chris
 Dolan's project to implement twenty PBP policies.
 [http://www.perlfoundation.org/april\_1\_2007\_new\_grant\_awards](http://www.perlfoundation.org/april_1_2007_new_grant_awards)
+
+Thanks also to this incomplete laundry list of folks who have contributed
+to Perl::Critic in some way:
+Gregory Oschwald,
+Mike O'Regan,
+Tom Hukins,
+Omer Gazit,
+Evan Zacks,
+Paul Howarth,
+Sawyer X,
+Christian Walde,
+Dave Rolsky,
+Jakub Wilk,
+Roy Ivy III,
+Oliver Trosien,
+Glenn Fowler,
+Matt Creenan,
+Alex Balhatchet,
+Sebastian Paaske Tørholm,
+Stuart A Johnston,
+Dan Book,
+Steven Humphrey,
+James Raspass,
+Nick Tonkin,
+Harrison Katz,
+Douglas Sims,
+Mark Fowler,
+Alan Berndt,
+Neil Bowers,
+Sergey Romanov,
+Gabor Szabo,
+Graham Knop,
+Mike Eldridge,
+David Steinbrunner,
+Kirk Kimmel,
+Guillaume Aubert,
+Dave Cross,
+Anirvan Chatterjee,
+Todd Rinaldo,
+Graham Ollis,
+Karen Etheridge,
+Jonas Brømsø,
+Olaf Alders,
+Jim Keenan,
+Slaven Rezić,
+Szymon Nieznański.
 
 # AUTHOR
 

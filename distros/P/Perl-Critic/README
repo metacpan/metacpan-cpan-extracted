@@ -37,9 +37,13 @@ DESCRIPTION
     Perl-Critic called "perlcritic-gui". You can get a free community
     edition of ActivePerl from <http://www.activestate.com>.
 
+PREREQUISITES
+    Perl::Critic runs on Perl back to Perl 5.6.1. It relies on the PPI
+    module to do the heavy work of parsing Perl.
+
 INTERFACE SUPPORT
-    This is considered to be a public class. Any changes to its interface
-    will go through a deprecation cycle.
+    The "Perl::Critic" module is considered to be a public class. Any
+    changes to its interface will go through a deprecation cycle.
 
 CONSTRUCTOR
     "new( [ -profile => $FILE, -severity => $N, -theme => $string, -include
@@ -584,8 +588,6 @@ PREREQUISITES
 
     Exception::Class
 
-    File::HomeDir
-
     File::Spec
 
     File::Spec::Unix
@@ -684,6 +686,18 @@ CREDITS
     Thanks also to the Perl Foundation for providing a grant to support
     Chris Dolan's project to implement twenty PBP policies.
     <http://www.perlfoundation.org/april_1_2007_new_grant_awards>
+
+    Thanks also to this incomplete laundry list of folks who have
+    contributed to Perl::Critic in some way: Gregory Oschwald, Mike O'Regan,
+    Tom Hukins, Omer Gazit, Evan Zacks, Paul Howarth, Sawyer X, Christian
+    Walde, Dave Rolsky, Jakub Wilk, Roy Ivy III, Oliver Trosien, Glenn
+    Fowler, Matt Creenan, Alex Balhatchet, Sebastian Paaske Tørholm, Stuart
+    A Johnston, Dan Book, Steven Humphrey, James Raspass, Nick Tonkin,
+    Harrison Katz, Douglas Sims, Mark Fowler, Alan Berndt, Neil Bowers,
+    Sergey Romanov, Gabor Szabo, Graham Knop, Mike Eldridge, David
+    Steinbrunner, Kirk Kimmel, Guillaume Aubert, Dave Cross, Anirvan
+    Chatterjee, Todd Rinaldo, Graham Ollis, Karen Etheridge, Jonas Brømsø,
+    Olaf Alders, Jim Keenan, Slaven Rezić, Szymon Nieznański.
 
 AUTHOR
     Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>

@@ -6,7 +6,7 @@
 # podDocumentation
 
 package Dita::GB::Standard;
-our $VERSION = "20190505";
+our $VERSION = "20190506";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -710,7 +710,7 @@ as a universal standard.
 The Gearhart-Brenan Dita Topic Naming Standard.
 
 
-Version "20190505".
+Version "20190506".
 
 
 The following sections describe the methods in each functional area of this

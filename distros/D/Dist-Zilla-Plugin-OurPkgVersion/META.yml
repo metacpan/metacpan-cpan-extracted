@@ -6,11 +6,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Path::Tiny: '0'
-  Perl::Critic::More: '1.003'
-  Perl::Critic::Pulp: '96'
   Test::DZil: '0'
   Test::Exception: '0'
-  Test::Pod::Coverage: '1.10'
   Test::Version: '0.04'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -40,7 +37,7 @@ resources:
   bugtracker: https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues
   homepage: https://metacpan.org/dist/Dist-Zilla-Plugin-OurPkgVersion
   repository: git://github.com/plicease/dist-zilla-plugin-ourpkgversion.git
-version: '0.16'
+version: '0.18'
 x_contributors:
   - 'Alceu Rodrigues de Freitas Junior <alceu.junior@quintoandar.com.br>'
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
@@ -56,5 +53,5 @@ x_contributors:
   - 'Michael Conrad <mike@nrdvana.net>'
   - 'Michael Jemmeson <mjemmeson@cpan.org>'
   - 'Stephan Loyd <stephanloyd9@gmail.com>'
-x_generated_by_perl: v5.29.9
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

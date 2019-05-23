@@ -8,8 +8,6 @@ use Readonly;
 
 use Exporter 'import';
 
-use List::MoreUtils qw(any);
-
 use Perl::Critic::Utils qw{ :characters :data_conversion };
 use Perl::Critic::Exception::Fatal::Internal qw{ &throw_internal };
 use Perl::Critic::Exception::Configuration::Option::Global::ParameterValue
@@ -17,7 +15,7 @@ use Perl::Critic::Exception::Configuration::Option::Global::ParameterValue
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.132';
+our $VERSION = '1.134';
 
 #-----------------------------------------------------------------------------
 

@@ -32,6 +32,7 @@ corpus/semanticDZT/dist.ini
 corpus/semanticDZT/lib/semanticDZT.pm
 corpus/vDZT/dist.ini
 corpus/vDZT/lib/vDZT.pm
+dist.ini
 lib/Dist/Zilla/Plugin/OurPkgVersion.pm
 maint/cip-before-install
 perlcritic.rc
@@ -61,3 +62,4 @@ t/release-distmeta.t
 t/release-kwalitee.t
 t/release-meta-json.t
 t/release-unused-vars.t
+weaver.ini

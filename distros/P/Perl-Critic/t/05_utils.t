@@ -20,7 +20,7 @@ use Perl::Critic::Utils;
 
 use Test::More tests => 156;
 
-our $VERSION = '1.132';
+our $VERSION = '1.134';
 
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );
@@ -418,7 +418,7 @@ sub test_parse_arg_list {
         [
                 q/foo( { bar() }, {}, 'blah' )/
             =>  [
-                    ' { bar() }',
+                    [ '{ bar() }' ],
                     [ qw< {} > ],
                     [ q<'blah'> ],
                 ],

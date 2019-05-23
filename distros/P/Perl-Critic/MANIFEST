@@ -47,6 +47,7 @@ lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitBooleanGrep.pm
 lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitComplexMappings.pm
 lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitLvalueSubstr.pm
 lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitReverseSortBlock.pm
+lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitShiftRef.pm
 lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitSleepViaSelect.pm
 lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitStringyEval.pm
 lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitStringySplit.pm
@@ -83,7 +84,6 @@ lib/Perl/Critic/Policy/ControlStructures/ProhibitYadaOperator.pm
 lib/Perl/Critic/Policy/Documentation/PodSpelling.pm
 lib/Perl/Critic/Policy/Documentation/RequirePackageMatchesPodName.pm
 lib/Perl/Critic/Policy/Documentation/RequirePodAtEnd.pm
-lib/Perl/Critic/Policy/Documentation/RequirePodLinksIncludeText.pm
 lib/Perl/Critic/Policy/Documentation/RequirePodSections.pm
 lib/Perl/Critic/Policy/ErrorHandling/RequireCarping.pm
 lib/Perl/Critic/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.pm
@@ -269,6 +269,7 @@ t/BuiltinFunctions/ProhibitBooleanGrep.run
 t/BuiltinFunctions/ProhibitComplexMappings.run
 t/BuiltinFunctions/ProhibitLvalueSubstr.run
 t/BuiltinFunctions/ProhibitReverseSortBlock.run
+t/BuiltinFunctions/ProhibitShiftRef.run
 t/BuiltinFunctions/ProhibitSleepViaSelect.run
 t/BuiltinFunctions/ProhibitStringyEval.run
 t/BuiltinFunctions/ProhibitStringySplit.run
@@ -300,7 +301,6 @@ t/ControlStructures/ProhibitUntilBlocks.run
 t/ControlStructures/ProhibitYadaOperator.run
 t/Documentation/RequirePackageMatchesPodName.run
 t/Documentation/RequirePodAtEnd.run
-t/Documentation/RequirePodLinksIncludeText.run
 t/Documentation/RequirePodSections.run
 t/ErrorHandling/RequireCarping.run
 t/ErrorHandling/RequireCheckingReturnValueOfEval.run

@@ -9,15 +9,13 @@ use English qw(-no_match_vars);
 use Readonly;
 
 use File::Spec;
-use List::Util qw(first);
-use List::MoreUtils qw(uniq any);
 
 use Perl::Critic::Utils qw<
     :booleans :characters :classification hashify :severities words_from_string
 >;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.132';
+our $VERSION = '1.134';
 
 #-----------------------------------------------------------------------------
 

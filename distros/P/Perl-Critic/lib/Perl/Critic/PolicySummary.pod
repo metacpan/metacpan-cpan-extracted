@@ -36,6 +36,10 @@ Use 4-argument C<substr> instead of writing C<substr($foo, 2, 6) = $bar>. [Defau
 
 Forbid $b before $a in sort blocks. [Default severity 1]
 
+=head2 L<BuiltinFunctions::ProhibitShiftRef|Perl::Critic::Policy::BuiltinFunctions::ProhibitShiftRef>
+
+Prohibit C<\shift> in code [Default severity 3]
+
 =head2 L<BuiltinFunctions::ProhibitSleepViaSelect|Perl::Critic::Policy::BuiltinFunctions::ProhibitSleepViaSelect>
 
 Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>. [Default severity 5]
@@ -179,10 +183,6 @@ The C<=head1 NAME> section should match the package. [Default severity 1]
 =head2 L<Documentation::RequirePodAtEnd|Perl::Critic::Policy::Documentation::RequirePodAtEnd>
 
 All POD should be after C<__END__>. [Default severity 1]
-
-=head2 L<Documentation::RequirePodLinksIncludeText|Perl::Critic::Policy::Documentation::RequirePodLinksIncludeText>
-
-Provide text to display with your pod links. [Default severity 2]
 
 =head2 L<Documentation::RequirePodSections|Perl::Critic::Policy::Documentation::RequirePodSections>
 

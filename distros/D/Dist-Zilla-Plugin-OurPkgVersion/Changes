@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-OurPkgVersion
 
+0.18      2019-05-22
+  - Fix git deploy snafoo (plicease--)
+
+0.17      2019-05-22
+  - Fix prereqs: some developer prereqs were leaking into the list of test
+    prereqs (gh#13, gh#14)
+
 0.16      2019-05-21
   - Add semantic_version option.
 

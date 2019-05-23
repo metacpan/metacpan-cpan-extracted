@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
 # Lint xml files in parallel using xmllint and report the pass/failure rate.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
@@ -8,14 +8,16 @@
 # What sort of tag is on the end of the link?
 # Report resolved, unresolved, missing links - difficult because of forking
 # Check that the file actually has a lint section in read and do something about it if it does not
-# Create a sha256 of the parse tree minus the topic id for use in file reuse - create a framework for file reuse
 # Separate reference fixup into a separate framework (like Dita::Conversion)
 # Show number of compressed errors on Lint summary line
 # Highlight error counts in bold using boldText() or perhaps enclosed alphanumerics
-# Relint in parallel
+# Relint load data in parallel
+# option to print xmllint comamnd
+# inputFile=>name unicode seems to be failing
+# Lots more tests needed
 
 package Data::Edit::Xml::Lint;
-our $VERSION = 20181215;
+our $VERSION = 20190524;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -23,6 +25,7 @@ use Carp qw(cluck confess);
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use Digest::SHA qw(sha256_hex);
+use Time::HiRes qw(time);
 use Encode;
 
 #D1 Constructor                                                                 # Construct a new linter
@@ -44,9 +47,11 @@ genLValueScalarMethods(qw(errors));                                             
 genLValueScalarMethods(qw(errorText));                                          # Text of uncompressed lint errors detected by xmllint over all files.
 genLValueScalarMethods(qw(file));                                               # File that the xml should be written to or read from by L<lint|/lint>, L<read|/read> or L<relint|/relint>.
 genLValueScalarMethods(qw(fileNumber));                                         # File number - assigned by the caller to help debugging transformations.
+genLValueScalarMethods(qw(lineNumber));                                         # The file and line number of the caller so we can identify which request for lint gave rise to a particular file
 genLValueScalarMethods(qw(guid));                                               # Guid or id of the outermost tag - if not supplied the first definition encountered in each file will be used on the basis that all Dita topics require an id.
 genLValueScalarMethods(qw(header));                                             # The first line: the xml header extracted from L<source|/source>.
 genLValueScalarMethods(qw(idDefs));                                             # {id} = count - the number of times this id is defined in the xml contained in this L<file|/file>.
+genLValueScalarMethods(qw(inputFile));                                          # The file from which this xml was obtained.
 genLValueScalarMethods(qw(labelDefs));                                          # {label or id} = id - the id of the node containing a L<label|Data::Edit::Xml/Labels> defined on the xml.
 genLValueScalarMethods(qw(labels));                                             # Optional parse tree to supply L<labels|Data::Edit::Xml/Labels> for the current L<source|/source> as the labels are present in the parse tree not in the string representing the parse tree.
 genLValueScalarMethods(qw(linted));                                             # Date the lint was performed by L<lint|/lint>.  We avoid adding a time as well because this then induces much longer sync times with AWS S3.
@@ -64,11 +69,13 @@ my @pids;                                                                       
 
 sub lint($@)                                                                    # Store some xml in a L<files|/file>, apply xmllint in parallel and update the source file with the results
  {my ($lint, %attributes) = @_;                                                 # Linter, attributes to be recorded as xml comments
+  $lint->lineNumber = join ' ', caller;
   &lintOP(1, @_);
  }
 
 sub lintNOP($@)                                                                 # Store some xml in a L<files|/file>, apply xmllint in series and update the source file with the results
  {my ($lint, %attributes) = @_;                                                 # Linter, attributes to be recorded as xml comments
+  $lint->lineNumber = join ' ', caller;
   &lintOP(0, @_);
  }
 
@@ -93,7 +100,8 @@ sub lintOP($$@)                                                                 
   my $file = $lint->file;                                                       # File to be written to
   confess "File name contains a new line:\n$file\n" if $file =~ m/\n/s;         # Complain if the source file contains a new line
 
-  for(qw(author catalog ditaType dtds file fileNumber guid project title))      # Map parameters to attributes
+  for(qw(author catalog ditaType dtds file fileNumber lineNumber),              # Map parameters to attributes
+      qw(inputFile guid project title))
    {my $a = $lint->$_;
     $attributes{$_} = $a if $a;
    }
@@ -104,7 +112,7 @@ sub lintOP($$@)                                                                 
   $attributes{header} = $lines[0];
   $attributes{sha256} = sha256_hex(encode("ascii", $source));                   # Digest of source string
 
-  my $time   = "<!--linted: ".dateStamp." -->\n";                               # Time stamp marks the start of the added comments
+  my $time   = "<!--linted: ".dateTimeStamp." -->";                             # Time stamp marks the start of the added comments
   my $attr   = &formatAttributes({%attributes});                                # Attributes to be recorded with the xml
 
   my $labels = sub                                                              # Process any labels in the parse tree
@@ -171,14 +179,23 @@ sub lintOP($$@)                                                                 
     $r
    }->();
 
-  if (my @errors = qx($c))                                                      # Perform lint and add errors as comments
-   {my $s = readFile($file);
-    my $e = join '', map {chomp; "<!-- $_ -->\n"} @errors;
-    my $n = $lint->errors = int @errors / 3;                                    # Three lines per error message
+  my $errors = qx($c);                                                          # Perform lint
+  my @errors = split /\n/, $errors;                                             # Each error line
 
-    my $t = "<!--errors: $n -->";
-    my $c = &compressErrors(@errors);                                           # Compress the errors per Micaela
-    overWriteFile($file, "$source\n$time$e\n$t$c");                             # Update xml file with errors
+  if (@errors and $errors !~ m(parser error : Document is empty)s)              # Add errors as comments. Docuement is empty seems to imply that a second process is preparing to lint the same file - if so we will let it record the error count
+   {my @e;                                                                      # Wrap errors in comments
+    for my $e(@errors)                                                          # Each error
+     {$e =~ s(\-+)   (-)gs;                                                     # Remove multiple hypens which would prevent reparses
+      $e =~ s(\s*\Z) ()s;                                                       # Remove any trailing white space
+      $e =~ s(\n)    ( )gs;                                                     # Repace in line new lines
+      push @e, "<!-- $e -->\n";
+     }
+    my $e = join '', @e;                                                        # Error block
+    my $n = $lint->errors = int @errors / 3;                                    # Three lines per error message
+    my $t = "<!--errors: $n -->";                                               # Number of errors
+    my $z = &compressErrors(@errors);                                           # Compress the errors per Micaela
+    my $w = "$source\n$e\n$t$z";                                                # Text to write
+    overWriteFile($file, $w);                                                   # Update xml file with errors
    }
   else                                                                          # No errors detected
    {$lint->errors = 0;
@@ -186,6 +203,11 @@ sub lintOP($$@)                                                                 
 
   exit if $inParallel;
  } # lint
+
+sub squeezeDitaRef($)                                                           #S Squeeze a string so it can be safely stored inside blank separated list inside an xml comment.
+ {my ($ref) = @_;                                                               # String to squeeze
+  $ref =~ s((\s+|--)) (_)gsr;                                                   # Squeeze!
+ }
 
 sub compressErrors(@)                                                           #PS Compress the errors so we cound the ones that do not look similar. Errors typically occupy three lines with the last line containing ^ at the end to mark the location of the error.
  {my (@errors) = @_;                                                            # Errors
@@ -199,6 +221,7 @@ sub compressErrors(@)                                                           
    {my $c =  s(-:\d+?:) ()sr;                                                   # Remove line number
        $c =~ s(\s+\^\Z) ()s;                                                    # Remove error pointer
        $c =~ s(expected:.*) ()s;                                                # Remove expected
+       $c =~ s(\-\-+) (-)gs;                                                    # Remove multiple hyphens as they cause relint errors at 2019.05.07 03:52:28
     $c{$c}++;
    }                                                                            # Format compressed errors block
   if (my $n = scalar(keys %c))
@@ -220,7 +243,7 @@ sub nolint($@)                                                                  
 
 # for(qw(author ditaType file guid project title))                              # Map parameters to attributes
   for(qw(author catalog ditaType docType dtds errors file guid header idDefs),
-      qw(labelDefs labels linted processes project sha256),
+      qw(inputFile labelDefs labels linted processes project sha256),
       qw(source title))
    {my $a = $lint->$_;
     $attributes{$_}  = $a if $a;
@@ -253,7 +276,7 @@ sub formatAttributes(%)                                                         
 
 sub read($)                                                                     #S Reread a linted xml L<file|/file> and extract the L<attributes|/Attributes> associated with the L<lint|/lint>
  {my ($file) = @_;                                                              # File containing xml
-  my $s = readBinaryFile($file);                                                # Read xml from file
+  my $s = readFile($file);                                                      # Read xml from file
   my %a = $s =~ m/<!--(\w+):\s+(.+?)\s+-->/igs;                                 # Get attributes
   my @a = split m/\n/, $s;                                                      # Split into lines
   my $l = {};                                                                   # Reconstructed labels
@@ -293,6 +316,7 @@ sub read($)                                                                     
 #    header              =>  $a[0],                                             # Available in end of file comments
 #    docType             =>  $a[1],
     idDefs              =>  $d,
+    labels              =>  undef,                                              #  2019.03.16 01:42:37 property of the parse tree only
     labelDefs           =>  $l,
     reusedInProject     => [sort keys %$r],
     compressedErrorText => [@C],
@@ -315,19 +339,39 @@ sub waitProcessing($)                                                           
 
 sub clear(@)                                                                    #S Clear the results of a prior run
  {my (@foldersAndExtensions) = @_;                                              # Directories to clear and extensions of files to remove
+  cluck "Deprecated in favour of clear Folder";
   my @f = &searchDirectoryTreesForMatchingFiles(@_);                            # The matching files
   for my $file(@f)                                                              # Unlink the matching files
    {unlink $file;
    }
  } # clear
 
+sub lintAttributes($)                                                           #S Get all the attributes minus the source of all the linted files in the specified folder
+ {my ($folder) = @_;                                                            # Folder to search
+  my @l;
+  my @f = searchDirectoryTreesForMatchingFiles($folder);                        # All files
+  for my $file(@f)                                                              # Each file
+   {next unless $file =~ m(\.(dita(map)?|xml)\Z)s;                              # Skip files that are not xml files
+     if (my $l = &read($file))                                                  # Load lint details if possible
+     {delete $$l{$_} for qw(errorText preferredSource source);                  # Remove attributes that take a lot of space
+      push @l, $l;
+     }
+   }
+  @l                                                                            # Lint attributes array
+ }
+
 sub relint($$$@)                                                                #S Locate all the L<labels or id|Data::Edit::Xml/Labels> in the specified L<files|/file>, analyze the map of labels and ids with B<analysisSub> parse each L<file|/file>, process each parse with B<processSub>, then L<lint/lint> the reprocessed xml back to the original L<file|/file> - this allows you to reprocess the contents of each L<file|/file> with knowledge of where L<labels or id|Data::Edit::Xml/Labels> are located in the other L<files|/file> associated with a L<project|/project>. The B<analysisSub>(linkmap = {project}{labels or id>}=[file, id]) should return true if the processing of each file is to be performed subsequently. The B<processSub>(parse tree representation of a file, id and label mapping, reloaded linter) should return true if a L<lint|/lint> is required to save the results after each L<file|/file> has been processed else false. Optionally, the B<analysisSub> may set the L<preferredSource|/preferredSource> attribute to indicate the preferred representation of the xml.
  {my ($processes, $analysisSub, $processSub, @foldersAndExtensions) = @_;       # Maximum number of processes to use, analysis 𝘀𝘂𝗯, Process 𝘀𝘂𝗯, folders and extensions of files to process (recursively)
   my @files = searchDirectoryTreesForMatchingFiles(@foldersAndExtensions);      # Search for files to relint
   my $links;                                                                    # {project}{label or id} = [file, label or id] : the file containing  each label or id in each project
   my $fileToGuid;                                                               # {file name} to guid
-  for my $file(@files)                                                          # Reload each file to reprocess
-   {my $lint = Data::Edit::Xml::Lint::read($file);                              # Reconstructed linter
+  my $files = @files;
+  for my $i(keys @files)                                                        # Reload each file to reprocess
+   {my $file = $files[$i];
+    #lll " $i/$files Data::Edit::Xml::Lint::relint file: $file";
+
+    my $lint = Data::Edit::Xml::Lint::read($file);                              # Reconstructed linter
+
     next unless $lint->project;                                                 # File has the right format
     if (my $g = $lint->guid)                                                    # Record file to guid mapping
      {if (my $lintFile = $lint->file)
@@ -359,40 +403,48 @@ sub relint($$$@)                                                                
      }
    }
 
+  #lll "Data::Edit::Xml::Lint::relint: Linkmap completed";                      # Progress
+
   if ($analysisSub->($links, $fileToGuid))                                      # Analyze links and guids
-   {for my $file(@files)                                                        # Reload, reparse, process, lint each file
-     {my $lint = Data::Edit::Xml::Lint::read($file);                            # Reconstructed linter
-      next unless $lint and $lint->project;                                     # Confirm that we read a file in the expected format
-      next unless $lint->source;                                                # Files without source are assumed to have been written to store some attributes
-      my $x = eval{Data::Edit::Xml::new($lint->source)};                        # Reparse source trapping errors
-      $@ and cluck "$@\nFailed to parse file:\n$file";                          # Xml file failed to parse
-      next if $@ or !$x;
-
-      if (my $links = $lint->labelDefs)                                         # Reload labels
-       {my $r;                                                                  # {primary id}[label]
-        for my $source(sort keys %$links)                                       # Construct primary id to labels
-         {my $target = $links->{$source};
-          push @{$r->{$target}}, $source unless $source eq $target;             # No need to reverse the primary id
-         }
-
-        $x->by(sub                                                              # Reload labels
-         {my ($o) = @_;
-          if (defined($o->attr(qw(id))) and my $i = $o->id)                     # Id if defined
-           {if (my $labels = $r->{$i})                                          # Labels for this id if present
-             {for my $label(@$labels)                                           # Each label for this id
-               {$o->addLabels($label);                                          # Add the label
-               }
-             }
-           }
-         });
-       }
+   {for my $i(keys @files)                                                      # Reload, reparse, process, lint each file
+     {my $file = $files[$i];
+      #lll " $i/$files Data::Edit::Xml::Lint::relint: link file: $file";
 #FORK
       &waitProcessing($processes);                                              # Wait until enough sub processes have completed
       if (my $pid = fork())                                                     # Perform process sub in parallel
        {push @pids, $pid;
        }
       else
-       {if ($processSub->($x, $links->{$lint->project}, $fileToGuid, $lint))    # Call user method to process parse tree with labels in place and the location of all the labels and ids
+       {my $lint = Data::Edit::Xml::Lint::read($file);                          # Reconstructed linter
+        confess "Unable to read lint data for file: $file\n"
+          unless $lint and $lint->project;                                      # Confirm that we read a file in the expected format
+        confess "No source for file: $file\n"
+          unless $lint->source;                                                 # Files without source are assumed to have been written to store some attributes
+
+        my $x = eval{Data::Edit::Xml::new($lint->source)};                      # Reparse source trapping errors
+        $@  and confess "$@\nFailed to parse file:\n$file\n";                   # Xml file failed to parse
+        !$x and confess "Failed to parse file:\n$file\n";                       # Xml file failed to parse
+
+        if (my $links = $lint->labelDefs)                                       # Reload labels
+         {my $r;                                                                # {primary id}[label]
+          for my $source(sort keys %$links)                                     # Construct primary id to labels
+           {my $target = $links->{$source};
+            push @{$r->{$target}}, $source unless $source eq $target;           # No need to reverse the primary id
+           }
+
+          $x->by(sub                                                            # Reload labels
+           {my ($o) = @_;
+            if (defined($o->attr(qw(id))) and my $i = $o->id)                   # Id if defined
+             {if (my $labels = $r->{$i})                                        # Labels for this id if present
+               {for my $label(@$labels)                                         # Each label for this id
+                 {$o->addLabels($label);                                        # Add the label
+                 }
+               }
+             }
+           });
+         }
+
+        if ($processSub->($x, $links->{$lint->project}, $fileToGuid, $lint))    # Call user method to process parse tree with labels in place and the location of all the labels and ids
          {my $l = $lint;                                                        # Shorten name
           my $s = $l->preferredSource // $x->prettyString;                      # Representation of xml
           $l->source = join "\n", $l->header, $l->docType, $s;                  # Reconstruct source
@@ -401,11 +453,12 @@ sub relint($$$@)                                                                
 
           $l->lintNOP(%a);                                                      # Lint reprocessed source
          }
-        exit;
+
+        exit;                                                                   # Finished relint of file in parallel
        }
      }
    }
-  waitAllProcesses();
+  waitAllProcesses();                                                           # Wait for all processes to complete
  } # relint
 
 sub resolveUniqueLink($$)                                                       #S Return the unique (file, leading id) of the specified link in the link map or () if no such definition exists
@@ -425,32 +478,44 @@ sub urlEncode($)                                                                
   $s =~ s(\s) (%20)gsr;
  }
 
-sub resolveDitaLink($$$$)                                                       #S Return the unique (file, leading id, topic ) of the specified link in the link map or () if no such definition exists
+sub resolveDitaLink($$$$)                                                       #S Given a specified B<$link>Return the unique (file, leading id, topic ) of the specified link in the link map or () if no such definition exists
  {my ($linkMap, $fileToGuid, $link, $sourceFile) = @_;                          # Link map, file map, label, file we are resolving from
+
   if ($link =~ m(\s)s)                                                          # Complain about any white space in the label
    {cluck "Whitespace in label removed: $link";
     $link =~ s(\s) ()gs;                                                        # Remove white space from label
    }
-  my $l = $linkMap->{$link};                                                    # Attempt to resolve link
-  $l       or die "No such link =$link=\n";
-  @$l == 1 or die "Not a unique link =$link=\n";
 
-  my ($targetFile, $id) = @{$l->[0]};                                           # (file, id)
-  my $topicId = $fileToGuid->{$targetFile};                                     # Topic id for target file
-  $topicId or die "No topic id recorded for file $targetFile";
+  if (my $l = $linkMap->{$link})                                                # Attempt to resolve link
+   {if (@$l == 1)                                                               # Require a unique target
+     {my ($targetFile, $id) = @{$l->[0]};                                       # (file, id)
 
-  if ($sourceFile eq $targetFile)                                               # Link in same file
-   {return urlEncode("#$topicId/$id");
-   }
-  else                                                                          # Link to a different file
-   {my $f = $targetFile =~ s(\A.*\/) ()r;
-    if ($topicId ne $id)                                                        # Link to sub topic in different file
-     {return urlEncode("$f#$topicId/$id");
+      if (my $topicId = $fileToGuid->{$targetFile})                             # Topic id for target file
+       {if ($sourceFile eq $targetFile)                                         # Link in same file
+         {return urlEncode("#$topicId/$id");
+         }
+        else                                                                    # Link to a different file
+         {my $f = $targetFile =~ s(\A.*\/) ()r;
+          if ($topicId ne $id)                                                  # Link to sub topic in different file
+           {return urlEncode("$f#$topicId/$id");
+           }
+          else                                                                  # Link to topic in different file
+           {return urlEncode("$f#$topicId");
+           }
+         }
+       }
+      else
+       {warn "Data::Edit::Xml::Lint No topic id recorded for file $targetFile";
+       }
      }
-    else                                                                        # Link to topic in different file
-     {return urlEncode("$f#$topicId");
+    else
+     {warn "Data::Edit::Xml::Lint Not a unique link =$link=\n";
      }
    }
+  else
+   {warn "Data::Edit::Xml::Lint No such link =$link=\n";                        # Xref will report any failures in detail
+   }
+  undef                                                                         # Resolution failed
  } # resolveDitaLink;
 
 sub reuseInProject($)                                                           #PS Record the reuse of an item in the named project
@@ -681,34 +746,40 @@ END
                   keys %files;
 
   if (my $filesFail = @filesFail)
-   {push @report, <<END;
-
+   {my @r;
+    for my $n(1..@filesFail)
+     {my ($errors, $project, $file) = @{$filesFail[$n-1]};
+      push @r, [$n, $errors, $file];
+     }
+    push @report, <<END, formatTable(\@r, <<END2);
 
 FailingFiles: $totalNumberOfFails  Files that failed to pass lint by number of compressed errors
-   #  Errors  Project       File
+
 END
-    for(1..@filesFail)
-     {push @report, sprintf("%4d  %6d  %-12.12s  %s\n", $_, @{$filesFail[$_-1]});
-     }
+#       Failing File number
+Errors  The number of errors in this file
+File    The file with errors
+END2
    }
 
   if (my $N = scalar keys %CE)                                                  # Compressed errors
    {my @ce = sort {$b->[0] <=> $a->[0]}
              map  {[$CE{$_}, $_]}
              keys %CE;
-    push @report, <<END;
 
-
-CompressedErrorMessagesByCount: $N
-
- Count  Message
-END
+    my @e;
     for(@ce)
      {my ($count, $message) = @$_;
       $message =~ s(\A<!--) ()gs;
       $message =~ s(-->\Z)  ()gs;
-      push @report, sprintf("%6d %s\n", $count, $message);
+      push @e, [$count, split /:/, $message];
      }
+    push @report, <<END, formatTableBasic(\@e);
+
+
+CompressedErrorMessagesByCount: $N
+
+END
    }
 
   if (my $N = scalar keys %docTypes)                                            # Document type summary
@@ -742,6 +813,35 @@ END
    }, 'Data::Edit::Xml::Lint::Report';
  } # report
 
+sub fixDitaXrefHrefs($@)                                                        # Fix the dita xref href attributes in the corpus determined by B<foldersAndExtensions>.
+ {my ($maximumNumberOfProcesses, @foldersAndExtensions) = @_;                   # Maximum number of processes to run in parallel, folders and file extensions to process.
+  relint($maximumNumberOfProcesses,                                             # Reprocess all the files
+  sub                                                                           # Analysis sub
+   {my ($linkMap, $filesToGuids) = @_;                                          # Link map, files to guids
+    1
+   },
+  sub                                                                           # Reprocess sub
+   {my ($x, $linkMap, $filesToGuids, $lint) = @_;
+    my $count;                                                                  # Count the number of changes made
+    $x->by(sub                                                                  # Look for xrefs in parse tree
+     {my ($r) = @_;
+      if ($r->at_xref)
+       {if (my $h = $r->href)                                                   # Href
+         {if ($h !~ m(#)s)                                                      # If the href has a # in it we assume that it has already been fixed!
+           {if (my $H = resolveDitaLink
+                         ($linkMap, $filesToGuids, $h, $lint->file))
+             {$r->href = $H;                                                    # Fix href
+              ++$count;
+             }
+           }
+         }
+       }
+     });
+
+    $count
+   }, @foldersAndExtensions);
+ }
+
 #D2 Attributes
 
 if (1)
@@ -761,6 +861,33 @@ if (1)
   genLValueScalarMethods(qw(totalCompressedErrorsFileByFile));                  # Total number of errors summed file by file
   genLValueScalarMethods(qw(totalCompressedErrors));                            # Number of compressed errors
   genLValueScalarMethods(qw(totalErrors));                                      # Total number of errors
+ }
+
+sub createTest($$$;$)                                                           #P Create a test file
+ {my ($project, $source, $target, $additional) = @_;                            # Project name, source of topic, target of references, additional text for topic
+  $additional //= '';
+  [$project, $source, $target, $additional, <<END]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//HPE//DTD HPE DITA Concept//EN" "concept.dtd" []>
+<concept id="c_${project}_${source}">
+ <title>project=$project source=$source target=$target</title>
+ <conbody id="b_${project}_${source}">
+   <p>See: <xref href="B_${project}_${target}"/></p>$additional
+ </conbody>
+</concept>
+END
+ }
+
+sub createTests                                                                 #P Create some tests
+ {my @tests;
+  for my $project(qw(aaa bbb ccc ddd))
+   {push @tests,
+     (createTest($project, 1, 1),
+      createTest($project, 2, 1),
+      createTest($project, 3, 2),
+      createTest($project, 4, 3));
+   }
+  @tests
  }
 
 #D podDocumentation
@@ -978,6 +1105,11 @@ File that the xml should be written to or read from by L<lint|/lint>, L<read|/re
 File number - assigned by the caller to help debugging transformations.
 
 
+=head3 lineNumber :lvalue
+
+The file and line number of the caller so we can identify which request for lint gave rise to a particular file
+
+
 =head3 guid :lvalue
 
 Guid or id of the outermost tag - if not supplied the first definition encountered in each file will be used on the basis that all Dita topics require an id.
@@ -991,6 +1123,11 @@ The first line: the xml header extracted from L<source|/source>.
 =head3 idDefs :lvalue
 
 {id} = count - the number of times this id is defined in the xml contained in this L<file|/file>.
+
+
+=head3 inputFile :lvalue
+
+The file from which this xml was obtained.
 
 
 =head3 labelDefs :lvalue
@@ -1063,6 +1200,18 @@ Store some xml in a L<files|/file>, apply xmllint in series and update the sourc
   1  $lint        Linter
   2  %attributes  Attributes to be recorded as xml comments
 
+=head2 squeezeDitaRef($)
+
+Squeeze a string so it can be safely stored inside blank separated list inside an xml comment.
+
+     Parameter  Description
+  1  $ref       String to squeeze
+
+This is a static method and so should be invoked as:
+
+  Data::Edit::Xml::Lint::squeezeDitaRef
+
+
 =head2 nolint($@)
 
 Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
@@ -1103,6 +1252,27 @@ Clear the results of a prior run
 This is a static method and so should be invoked as:
 
   Data::Edit::Xml::Lint::clear
+
+
+=head2 lintAttributes($)
+
+Get all the attributes minus the source of all the linted files in the specified folder
+
+     Parameter  Description
+  1  $folder    Folder to search
+
+B<Example:>
+
+
+  if (1)
+   {my @a = 𝗹𝗶𝗻𝘁𝗔𝘁𝘁𝗿𝗶𝗯𝘂𝘁𝗲𝘀($outDir);
+    ok $_->project eq q(aaa) for @a;
+   }
+
+
+This is a static method and so should be invoked as:
+
+  Data::Edit::Xml::Lint::lintAttributes
 
 
 =head2 relint($$$@)
@@ -1147,7 +1317,7 @@ This is a static method and so should be invoked as:
 
 =head2 resolveDitaLink($$$$)
 
-Return the unique (file, leading id, topic ) of the specified link in the link map or () if no such definition exists
+Given a specified B<$link>Return the unique (file, leading id, topic ) of the specified link in the link map or () if no such definition exists
 
      Parameter    Description
   1  $linkMap     Link map
@@ -1249,6 +1419,20 @@ Analyse the results of prior L<lints|/lint> and return a hash reporting various 
 This is a static method and so should be invoked as:
 
   Data::Edit::Xml::Lint::report
+
+
+=head2 fixDitaXrefHrefs($@)
+
+Fix the dita xref href attributes in the corpus determined by B<foldersAndExtensions>.
+
+     Parameter                  Description
+  1  $maximumNumberOfProcesses  Maximum number of processes to run in parallel
+  2  @foldersAndExtensions      Folders and file extensions to process.
+
+B<Example:>
+
+
+  𝗳𝗶𝘅𝗗𝗶𝘁𝗮𝗫𝗿𝗲𝗳𝗛𝗿𝗲𝗳𝘀(1, $outDir, "xml");
 
 
 =head2 Attributes
@@ -1399,6 +1583,21 @@ This is a static method and so should be invoked as:
   Data::Edit::Xml::Lint::p4
 
 
+=head2 createTest($$$$)
+
+Create a test file
+
+     Parameter    Description
+  1  $project     Project name
+  2  $source      Source of topic
+  3  $target      Target of references
+  4  $additional  Additional text for topic
+
+=head2 createTests()
+
+Create some tests
+
+
 
 =head1 Index
 
@@ -1417,115 +1616,129 @@ This is a static method and so should be invoked as:
 
 7 L<countLinkTargets|/countLinkTargets> - Count the number of targets this link resolves to.
 
-8 L<ditaType|/ditaType> - Optional Dita topic type(concept|task|troubleshooting|reference) of the xml - only needed if you want to generate an SDL file map.
+8 L<createTest|/createTest> - Create a test file
 
-9 L<docType|/docType> - The second line: the document type extracted from the L<source|/source>.
+9 L<createTests|/createTests> - Create some tests
 
-10 L<docTypes|/docTypes> - Array of [number of errors, L<project|/project>, L<files|/file>] ordered from least to most errors
+10 L<ditaType|/ditaType> - Optional Dita topic type(concept|task|troubleshooting|reference) of the xml - only needed if you want to generate an SDL file map.
 
-11 L<dtds|/dtds> - Optional directory containing the DTDs used to validate the xml.
+11 L<docType|/docType> - The second line: the document type extracted from the L<source|/source>.
 
-12 L<errors|/errors> - Total number of uncompressed lint errors detected by xmllint over all files.
+12 L<docTypes|/docTypes> - Array of [number of errors, L<project|/project>, L<files|/file>] ordered from least to most errors
 
-13 L<errorText|/errorText> - Text of uncompressed lint errors detected by xmllint over all files.
+13 L<dtds|/dtds> - Optional directory containing the DTDs used to validate the xml.
 
-14 L<failingFiles|/failingFiles> - {docType}++ - Hash of document types encountered
+14 L<errors|/errors> - Total number of uncompressed lint errors detected by xmllint over all files.
 
-15 L<failingProjects|/failingProjects> - [Projects with xmllint errors]
+15 L<errorText|/errorText> - Text of uncompressed lint errors detected by xmllint over all files.
 
-16 L<file|/file> - File that the xml should be written to or read from by L<lint|/lint>, L<read|/read> or L<relint|/relint>.
+16 L<failingFiles|/failingFiles> - {docType}++ - Hash of document types encountered
 
-17 L<fileNumber|/fileNumber> - File number - assigned by the caller to help debugging transformations.
+17 L<failingProjects|/failingProjects> - [Projects with xmllint errors]
 
-18 L<filter|/filter> - File selection filter
+18 L<file|/file> - File that the xml should be written to or read from by L<lint|/lint>, L<read|/read> or L<relint|/relint>.
 
-19 L<formatAttributes|/formatAttributes> - Format the attributes section of the output file
+19 L<fileNumber|/fileNumber> - File number - assigned by the caller to help debugging transformations.
 
-20 L<guid|/guid> - Guid or id of the outermost tag - if not supplied the first definition encountered in each file will be used on the basis that all Dita topics require an id.
+20 L<filter|/filter> - File selection filter
 
-21 L<header|/header> - The first line: the xml header extracted from L<source|/source>.
+21 L<fixDitaXrefHrefs|/fixDitaXrefHrefs> - Fix the dita xref href attributes in the corpus determined by B<foldersAndExtensions>.
 
-22 L<idDefs|/idDefs> - {id} = count - the number of times this id is defined in the xml contained in this L<file|/file>.
+22 L<formatAttributes|/formatAttributes> - Format the attributes section of the output file
 
-23 L<labelDefs|/labelDefs> - {label or id} = id - the id of the node containing a L<label|Data::Edit::Xml/Labels> defined on the xml.
+23 L<guid|/guid> - Guid or id of the outermost tag - if not supplied the first definition encountered in each file will be used on the basis that all Dita topics require an id.
 
-24 L<labels|/labels> - Optional parse tree to supply L<labels|Data::Edit::Xml/Labels> for the current L<source|/source> as the labels are present in the parse tree not in the string representing the parse tree.
+24 L<header|/header> - The first line: the xml header extracted from L<source|/source>.
 
-25 L<lint|/lint> - Store some xml in a L<files|/file>, apply xmllint in parallel and update the source file with the results
+25 L<idDefs|/idDefs> - {id} = count - the number of times this id is defined in the xml contained in this L<file|/file>.
 
-26 L<linted|/linted> - Date the lint was performed by L<lint|/lint>.
+26 L<inputFile|/inputFile> - The file from which this xml was obtained.
 
-27 L<lintNOP|/lintNOP> - Store some xml in a L<files|/file>, apply xmllint in series and update the source file with the results
+27 L<labelDefs|/labelDefs> - {label or id} = id - the id of the node containing a L<label|Data::Edit::Xml/Labels> defined on the xml.
 
-28 L<lintOP|/lintOP> - Store some xml in a L<files|/file>, apply xmllint in parallel or series and update the source file with the lint results in text format so as to be be easy to  search with grep.
+28 L<labels|/labels> - Optional parse tree to supply L<labels|Data::Edit::Xml/Labels> for the current L<source|/source> as the labels are present in the parse tree not in the string representing the parse tree.
 
-29 L<multipleLabelDefs|/multipleLabelDefs> - Return ([L<project|/project>; L<source label or id|Data::Edit::Xml/Labels>; targets count]*) of all L<labels or id|Data::Edit::Xml/Labels> that have multiple definitions
+29 L<lineNumber|/lineNumber> - The file and line number of the caller so we can identify which request for lint gave rise to a particular file
 
-30 L<multipleLabelDefsReport|/multipleLabelDefsReport> - Return a L<report|/report> showing L<labels and id|Data::Edit::Xml/Labels> with multiple definitions in each L<project|/project> ordered by most defined
+30 L<lint|/lint> - Store some xml in a L<files|/file>, apply xmllint in parallel and update the source file with the results
 
-31 L<new|/new> - Create a new xml linter - call this method statically as in L<Data::Edit::Xml::Lint|/new> and then fill in the relevant L<Attributes>.
+31 L<lintAttributes|/lintAttributes> - Get all the attributes minus the source of all the linted files in the specified folder
 
-32 L<nolint|/nolint> - Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
+32 L<linted|/linted> - Date the lint was performed by L<lint|/lint>.
 
-33 L<numberOfFiles|/numberOfFiles> - Number of L<files|/file> encountered
+33 L<lintNOP|/lintNOP> - Store some xml in a L<files|/file>, apply xmllint in series and update the source file with the results
 
-34 L<numberOfProjects|/numberOfProjects> - Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
+34 L<lintOP|/lintOP> - Store some xml in a L<files|/file>, apply xmllint in parallel or series and update the source file with the lint results in text format so as to be be easy to  search with grep.
 
-35 L<p4|/p4> - Format a fraction as a percentage to 4 decimal places
+35 L<multipleLabelDefs|/multipleLabelDefs> - Return ([L<project|/project>; L<source label or id|Data::Edit::Xml/Labels>; targets count]*) of all L<labels or id|Data::Edit::Xml/Labels> that have multiple definitions
 
-36 L<passingProjects|/passingProjects> - [Projects with no xmllint errors]
+36 L<multipleLabelDefsReport|/multipleLabelDefsReport> - Return a L<report|/report> showing L<labels and id|Data::Edit::Xml/Labels> with multiple definitions in each L<project|/project> ordered by most defined
 
-37 L<passRatePercent|/passRatePercent> - Total number of passes as a percentage of all input files
+37 L<new|/new> - Create a new xml linter - call this method statically as in L<Data::Edit::Xml::Lint|/new> and then fill in the relevant L<Attributes>.
 
-38 L<preferredSource|/preferredSource> - Preferred representation of the xml source, used by L<relint|/relint> to supply a preferred representation for the source.
+38 L<nolint|/nolint> - Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
 
-39 L<print|/print> - A printable L<report|/report> of the above
+39 L<numberOfFiles|/numberOfFiles> - Number of L<files|/file> encountered
 
-40 L<processes|/processes> - Maximum number of xmllint processes to run in parallel - 8 by default if linting in parallel is being used.
+40 L<numberOfProjects|/numberOfProjects> - Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
 
-41 L<project|/project> - Optional L<project|/project> name to allow error counts to be aggregated by L<project|/project> and to allow L<id and labels|Data::Edit::Xml/Labels> to be scoped to the L<files|/file> contained in each L<project|/project>.
+41 L<p4|/p4> - Format a fraction as a percentage to 4 decimal places
 
-42 L<read|/read> - Reread a linted xml L<file|/file> and extract the L<attributes|/Attributes> associated with the L<lint|/lint>
+42 L<passingProjects|/passingProjects> - [Projects with no xmllint errors]
 
-43 L<relint|/relint> - Locate all the L<labels or id|Data::Edit::Xml/Labels> in the specified L<files|/file>, analyze the map of labels and ids with B<analysisSub> parse each L<file|/file>, process each parse with B<processSub>, then L<lint/lint> the reprocessed xml back to the original L<file|/file> - this allows you to reprocess the contents of each L<file|/file> with knowledge of where L<labels or id|Data::Edit::Xml/Labels> are located in the other L<files|/file> associated with a L<project|/project>.
+43 L<passRatePercent|/passRatePercent> - Total number of passes as a percentage of all input files
 
-44 L<report|/report> - Analyse the results of prior L<lints|/lint> and return a hash reporting various statistics and a L<printable|/print> report
+44 L<preferredSource|/preferredSource> - Preferred representation of the xml source, used by L<relint|/relint> to supply a preferred representation for the source.
 
-45 L<resolveDitaLink|/resolveDitaLink> - Return the unique (file, leading id, topic ) of the specified link in the link map or () if no such definition exists
+45 L<print|/print> - A printable L<report|/report> of the above
 
-46 L<resolveFileToGuid|/resolveFileToGuid> - Return the unique definition of the specified link in the link map or undef if no such definition exists
+46 L<processes|/processes> - Maximum number of xmllint processes to run in parallel - 8 by default if linting in parallel is being used.
 
-47 L<resolveUniqueLink|/resolveUniqueLink> - Return the unique (file, leading id) of the specified link in the link map or () if no such definition exists
+47 L<project|/project> - Optional L<project|/project> name to allow error counts to be aggregated by L<project|/project> and to allow L<id and labels|Data::Edit::Xml/Labels> to be scoped to the L<files|/file> contained in each L<project|/project>.
 
-48 L<reusedInProject|/reusedInProject> - List of projects in which this file is reused, which can be set via L<reuseFileInProject|/reuseFileInProject> every time you discover another project in which a file is reused.
+48 L<read|/read> - Reread a linted xml L<file|/file> and extract the L<attributes|/Attributes> associated with the L<lint|/lint>
 
-49 L<reuseFileInProject|/reuseFileInProject> - Record the reuse of the specified file in the specified project
+49 L<relint|/relint> - Locate all the L<labels or id|Data::Edit::Xml/Labels> in the specified L<files|/file>, analyze the map of labels and ids with B<analysisSub> parse each L<file|/file>, process each parse with B<processSub>, then L<lint/lint> the reprocessed xml back to the original L<file|/file> - this allows you to reprocess the contents of each L<file|/file> with knowledge of where L<labels or id|Data::Edit::Xml/Labels> are located in the other L<files|/file> associated with a L<project|/project>.
 
-50 L<reuseInProject|/reuseInProject> - Record the reuse of an item in the named project
+50 L<report|/report> - Analyse the results of prior L<lints|/lint> and return a hash reporting various statistics and a L<printable|/print> report
 
-51 L<sha256|/sha256> - Sha256 hash of the string containing the xml processed by L<lint|/lint> or L<read|/read>.
+51 L<resolveDitaLink|/resolveDitaLink> - Given a specified B<$link>Return the unique (file, leading id, topic ) of the specified link in the link map or () if no such definition exists
 
-52 L<singleLabelDefs|/singleLabelDefs> - Return ([L<project|/project>; label or id]*) of all labels or ids that have a single definition
+52 L<resolveFileToGuid|/resolveFileToGuid> - Return the unique definition of the specified link in the link map or undef if no such definition exists
 
-53 L<singleLabelDefsReport|/singleLabelDefsReport> - Return a L<report|/report> showing L<label or id|Data::Edit::Xml/Labels> with just one definitions ordered by L<project|/project>, L<label name|Data::Edit::Xml/Labels>
+53 L<resolveUniqueLink|/resolveUniqueLink> - Return the unique (file, leading id) of the specified link in the link map or () if no such definition exists
 
-54 L<source|/source> - The source Xml to be written to L<file|/file> and linted.
+54 L<reusedInProject|/reusedInProject> - List of projects in which this file is reused, which can be set via L<reuseFileInProject|/reuseFileInProject> every time you discover another project in which a file is reused.
 
-55 L<timestamp|/timestamp> - Timestamp of report
+55 L<reuseFileInProject|/reuseFileInProject> - Record the reuse of the specified file in the specified project
 
-56 L<title|/title> - Optional title of the xml - only needed if you want to generate an SDL file map.
+56 L<reuseInProject|/reuseInProject> - Record the reuse of an item in the named project
 
-57 L<totalCompressedErrors|/totalCompressedErrors> - Number of compressed errors
+57 L<sha256|/sha256> - Sha256 hash of the string containing the xml processed by L<lint|/lint> or L<read|/read>.
 
-58 L<totalCompressedErrorsFileByFile|/totalCompressedErrorsFileByFile> - Total number of errors summed file by file
+58 L<singleLabelDefs|/singleLabelDefs> - Return ([L<project|/project>; label or id]*) of all labels or ids that have a single definition
 
-59 L<totalErrors|/totalErrors> - Total number of errors
+59 L<singleLabelDefsReport|/singleLabelDefsReport> - Return a L<report|/report> showing L<label or id|Data::Edit::Xml/Labels> with just one definitions ordered by L<project|/project>, L<label name|Data::Edit::Xml/Labels>
 
-60 L<urlEncode|/urlEncode> - Return a url encoded string
+60 L<source|/source> - The source Xml to be written to L<file|/file> and linted.
 
-61 L<waitAllProcesses|/waitAllProcesses> - Wait for all L<lints|/lint> to finish - this is a static method, call as Data::Edit::Xml::Lint::wait
+61 L<squeezeDitaRef|/squeezeDitaRef> - Squeeze a string so it can be safely stored inside blank separated list inside an xml comment.
 
-62 L<waitProcessing|/waitProcessing> - Wait for a processor to become available
+62 L<timestamp|/timestamp> - Timestamp of report
+
+63 L<title|/title> - Optional title of the xml - only needed if you want to generate an SDL file map.
+
+64 L<totalCompressedErrors|/totalCompressedErrors> - Number of compressed errors
+
+65 L<totalCompressedErrorsFileByFile|/totalCompressedErrorsFileByFile> - Total number of errors summed file by file
+
+66 L<totalErrors|/totalErrors> - Total number of errors
+
+67 L<urlEncode|/urlEncode> - Return a url encoded string
+
+68 L<waitAllProcesses|/waitAllProcesses> - Wait for all L<lints|/lint> to finish - this is a static method, call as Data::Edit::Xml::Lint::wait
+
+69 L<waitProcessing|/waitProcessing> - Wait for a processor to become available
 
 =head1 Installation
 
@@ -1542,7 +1755,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -1569,13 +1782,21 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>103;
+use warnings FATAL=>qw(all);
+use Test::More;
 use Test::SharedFork;
 use Data::Edit::Xml;
 
-#Test::More->builder->output("/dev/null");                                      # Show only errors during testing - but this must be commented out for production
+Test::More->builder->output("/dev/null")                                        # Show only errors during testing
+  if ((caller(1))[0]//'Data::Edit::Xml::Lint') eq "Data::Edit::Xml::Lint";
+
+if ($^O =~ m(linux)i)
+ {plan tests => 106;
+ }
+else
+ {plan skip_all => 'Only Linux is supported';
+ }
 
 if (qx(xmllint --version 2>&1) !~ m/using libxml/)                              # Skip tests if xmllint is not installed
  {my $n = Test::More->builder->expected_tests;
@@ -1585,39 +1806,13 @@ if (qx(xmllint --version 2>&1) !~ m/using libxml/)                              
  }
 
 my $outDir = "out";                                                             # Output directory
-
-sub createTest($$;$)                                                           # Create a test
- {my ($project, $source, $target, $additional) = @_;
-  $additional //= '';
-  [$project, $source, $target, $additional, <<END]
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE concept PUBLIC "-//HPE//DTD HPE DITA Concept//EN" "concept.dtd" []>
-<concept id="c_${project}_${source}">
- <title>project=$project source=$source target=$target</title>
- <conbody id="b_${project}_${source}">
-   <p>See: <xref href="B_${project}_${target}"/></p>$additional
- </conbody>
-</concept>
-END
- }
-
-sub tests                                                                       # Create tests
- {my @tests;
-  for my $project(qw(aaa bbb ccc ddd))
-   {push @tests,
-     (createTest($project, 1, 1),
-      createTest($project, 2, 1),
-      createTest($project, 3, 2),
-      createTest($project, 4, 3));
-   }
-  @tests
- }
+clearFolder($outDir, 1e2);
 
 # Test without file reuse
 my @lints;                                                                      # Lints for each test
 my %tests;                                                                      # Tests by title
 
-for my $test(tests)                                                             # Each test within the current project
+for my $test(createTests)                                                       # Each test within the current project
  {my ($project, $source, $target, $additional, $xml) = @$test;
 
   my $x = Data::Edit::Xml::new($xml);
@@ -1886,3 +2081,64 @@ sub labelsInXml
            c_ddd_4  => [["out/ddd4.xml", "c_ddd_4"]],
          },
 }}
+
+clearFolder($outDir, 1e2);
+
+#-------------------------------------------------------------------------------
+# Test xref linking
+#-------------------------------------------------------------------------------
+
+my $xrefSource = [q(aaa1), <<'END'];
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//HPE//DTD HPE DITA Concept//EN" "concept.dtd" []>
+<concept id="sourceTopic">
+  <title>Source of xref</title>
+  <conbody>
+    <p><xref href="targetTagLabel"/></p>
+  </conbody>
+</concept>
+<!--linted: 2019-03-12 at 16:40:17 -->
+<!--author: author@author.com -->
+<!--definition: sourceTopic -->
+<!--docType: <!DOCTYPE concept PUBLIC "-//HPE//DTD HPE DITA Concept//EN" "concept.dtd" []> -->
+<!--file: out/aaa1.xml -->
+<!--foo: 1 -->
+<!--guid: sourceTopic -->
+<!--header: <?xml version="1.0" encoding="UTF-8"?> -->
+<!--project: aaa -->
+<!--sha256: 3f75bcceaca8b9f3e1a40f0ad939136ee135c87443427fca9e4147d979f17527 -->
+END
+
+my $xrefTarget = [q(aaa2), <<'END'];
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//HPE//DTD HPE DITA Concept//EN" "concept.dtd" []>
+<concept id="targetTopic">
+  <title>Target of xref</title>
+  <conbody>
+    <p id="targetTag">Target</p>
+  </conbody>
+</concept>
+<!--linted: 2019-03-12 at 16:40:17 -->
+<!--author: author@author.com -->
+<!--definition: targetTopic -->
+<!--definition: targetTag -->
+<!--docType: <!DOCTYPE concept PUBLIC "-//HPE//DTD HPE DITA Concept//EN" "concept.dtd" []> -->
+<!--file: out/aaa2.xml -->
+<!--foo: 1 -->
+<!--guid: targetTopic -->
+<!--header: <?xml version="1.0" encoding="UTF-8"?> -->
+<!--project: aaa -->
+<!--sha256: 3f75bcceaca8b9f3e1a40f0ad939136ee135c87443427fca9e4147d979f17527 -->
+<!--labels: targetTopic targetTopicLabel -->
+<!--labels: targetTag   targetTagLabel -->
+END
+
+owf(fpe($outDir, $$_[0], q(xml)), $$_[1]) for $xrefSource, $xrefTarget;
+
+fixDitaXrefHrefs(1, $outDir, "xml");                                            #TfixDitaXrefHrefs
+ok readFile(fpe($outDir, $$xrefSource[0], q(xml))) =~ m(xref href="aaa2.xml#targetTopic/targetTag")s;
+
+if (1)                                                                          #TlintAttributes
+ {my @a = lintAttributes($outDir);
+  ok $_->project eq q(aaa) for @a;
+ }

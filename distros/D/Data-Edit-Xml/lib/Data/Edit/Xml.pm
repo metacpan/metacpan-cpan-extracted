@@ -18,7 +18,7 @@
 # is* should account for neighbouring empty text nodes
 
 package Data::Edit::Xml;
-our $VERSION = 20190421;
+our $VERSION = 20190523;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -38,12 +38,21 @@ sub new(;$@)                                                                    
   shift @_ while @_ && ref($_[0]);                                              # Remove any leading references to find the actual string or file to be parsed
   my ($source, %options) = @_;                                                  # Assign parameters - the one higher up is for documentation only
   checkKeys(\%options,                                                          # Check report options
-    {lineNumbers => <<'END',
-If true then save the line number.column number at which tag starts and ends on
-the xtrf attribute of each node.
+   {lineNumbers => <<'END',
+Save the line number.column number at which tag starts and ends on
+the xtrf attribute of each node if true.
 END
-     inputFile => <<'END',
-The name of the input file containing the source xml to be parsed.
+    input       => <<'END',
+Specifies the string or file name containing the source xml to be parsed if true
+END
+    inputString => <<'END',
+Specifies the string of xml to be parsed if true
+END
+    inputFile   => <<'END',
+Specifies the name of the input file containing the source xml to be parsed if true.
+END
+    errorsFile  => <<'END',
+Specifies the file to which any parse errors will be written to. By default this file is named: B<zzzParseErrors/out.data>.
 END
     });
   if (@_)
@@ -392,7 +401,12 @@ sub expandIncludes($)                                                           
      {my $href = $o->attr(q(href));                                             # Remove dots and slashes from front of file name
       my $in   = $x->inputFile;
       my $file = absFromAbsPlusRel($in, $href);
-      my $i = Data::Edit::Xml::new($file);                                      # Parse the new source file
+      my $i = eval{Data::Edit::Xml::new($file)};                                # Parse the new source file
+
+      if ($@)                                                                   # Report any errors encountered in expansion
+       {confess "Failed to expand href $href in file $in\n$@";
+       }
+
       $i->expandIncludes;                                                       # Rescan for any internal includes
       $o->replaceWith($i);                                                      # Replace include statement
      }
@@ -407,7 +421,14 @@ sub prettyString($;$)                                                           
  {my ($node, $depth) = @_;                                                      # Start node, optional depth.
   $depth //= 0;                                                                 # Start depth if none supplied
 
-  return $node->text.($node->isLast ? q() : qq(\n)) if $node->isText;           # Add a new line after contiguous blocks of text to offset next node
+# return $node->text.($node->isLast ? q() : qq(\n)) if $node->isText;           # Add a new line after contiguous blocks of text to offset next node
+
+  if ($node->isText)                                                            # Text block
+   {my $t = $node->text =~ s( *\n) (\n)gsr;                                     # Collapse spaces before new line
+    return $t if $node->isLast;                                                 # The following tag will deal with the new line
+    return $t.qq(\n) unless $t =~ m(\n\Z)s;                                     # Separate from next tag with a new line
+    return $t;                                                                  # Text already has a new line and so no additional separator required
+   }
 
   my $t = $node->tag;                                                           # Not text so it has a tag
   my $content = $node->content;                                                 # Sub nodes
@@ -1161,7 +1182,7 @@ sub down($$@)                                                                   
   $node
  }
 
-sub downX($$)                                                                   # Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die>. The traversal is halted if the called sub does  L<die> on any call with the reason in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables> The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.\mReturns the start node regardless of the outcome of calling B<sub>.
+sub downX($$)                                                                   # Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die>. The traversal is halted for the entire L<parse|/parse> tree if the called sub does L<die> with the reason returned in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.\mReturns the start node regardless of the outcome of calling B<sub>.
  {my ($node, $sub) = @_;                                                        # Start node, sub to call
   eval {$node->downX2($sub)};                                                   # Trap any errors that occur
   $node
@@ -1173,11 +1194,18 @@ sub downX2($$@)                                                                 
   $_->downX2($sub, $node, @context) for $node->contents;                        # Recurse to process sub nodes in deeper context
  }
 
-sub downX22($$@)                                                                #P Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
- {my ($node, $sub, @context) = @_;                                              # Starting node, sub to call for each sub node, accumulated context.
-  &$sub(local $_ = $node, @context);                                            # Process specified node first
-  $_->downX($sub, $node, @context) for $node->contents;                         # Recurse to process sub nodes in deeper context
+sub downToDie($$)                                                               # Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.\mReturns the start node regardless of the outcome of calling B<sub>.
+ {my ($node, $sub) = @_;                                                        # Start node, sub to call
+  $node->downToDie2($sub);
   $node
+ }
+
+sub downToDie2($$@)                                                             #P Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.\mReturns the start node regardless of the outcome of calling B<sub>.
+ {my ($node, $sub, @context) = @_;                                              # Starting node, sub to call, accumulated context.
+  eval {&$sub(local $_ = $node, @context)};                                     # Process specified node last
+  unless($@)                                                                    # Skip sub tree if sub died while processing parent
+   {$_->downToDie2($sub, $node, @context) for $node->contents;                  # Recurse to process sub nodes in deeper context
+   }
  }
 
 sub downList($@)                                                                #C Return a list of all the nodes at and below a specified B<$node> in pre-order or the empty list if the B<$node> is not in the optional B<@context>.
@@ -1279,6 +1307,11 @@ sub parseLineLocation($)                                                        
  {my ($loc) = @_;                                                               # Location
   my ($l, $c, $L, $C) = split m/[.:]/, $loc;                                    # Position of node in source
 
+  for my $n($l, $c, $L)                                                         # Check that some-one else is not using xtrf for some other reason
+   {return () unless $n and $n =~ m(\A\d+\Z)s;
+   }
+  return () if $L and $L !~ m(\A\d+\Z)s;
+
   unless(defined $C)                                                            # Same line
    {$C = $L;
     $L = 0;
@@ -1292,9 +1325,11 @@ sub lineLocation($)                                                             
  {my ($node) = @_;                                                              # Node
   my $loc  = $node->attr(q(xtrf));                                              # Location of node in source
   return q() unless $loc;                                                       # No location specified
-  my ($l, $c, $L, $C) = parseLineLocation $loc;                                 # Position of node in source
-
-  if (defined($l) and defined($L) and $l eq $L)                                 # All on one line
+  my @c = my ($l, $c, $L, $C) = parseLineLocation $loc;                         # Position of node in source
+  for(@c)
+   {return q() unless defined $_;
+   }
+  if ($l eq $L)                                                                 # All on one line
    {return qq(on line $l from $c to $C)                                         # Single line
    }
   qq(from line $l at $c to line $L at $C)                                       # Spans two or more lines
@@ -2751,6 +2786,116 @@ sub moveEndBefore($$@)                                                          
   confess "To is not a child or succeeding sibling of node";                    # Cannot do the requested operation
  }
 
+# Move a block                                                                  # Move a block of siblings to a new position
+
+sub moveBlockFirst($$$@)                                                        #C Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> first under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $end, $parent, @context) = @_;                                    # First sibling, last sibling, parent to move first under, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapTo($end, q(grab));                                        # Grab the nodes in the block
+  $parent->putFirstCut($w);                                                     # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockLast($$$@)                                                         #C Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> last under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $end, $parent, @context) = @_;                                    # First sibling, last sibling, parent to move last under, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapTo($end, q(grab));                                        # Grab the nodes in the block
+  $parent->putLastCut($w);                                                      # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockAfter($$$@)                                                        #C Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> after the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $end, $after, @context) = @_;                                     # First sibling, last sibling, node to move after, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapTo($end, q(grab));                                        # Grab the nodes in the block
+  $after->putNextCut($w);                                                       # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockBefore($$$@)                                                       #C Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> before the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $end, $before, @context) = @_;                                    # First sibling, last sibling, node to move before, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapTo($end, q(grab));                                        # Grab the nodes in the block
+  $before->putPrevCut($w);                                                      # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockToLastFirst($$@)                                                   #C Move the siblings starting with B<$node> in the optional context first under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $parent, @context) = @_;                                          # Start sibling, parent to move first under, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapToLast(q(grab));                                          # Grab the nodes in the block
+  $parent->putFirstCut($w);                                                     # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockToLastLast($$@)                                                    #C Move the block of siblings starting with B<$node> in the optional context last under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $parent, @context) = @_;                                          # First sibling, parent to move last under, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapToLast(q(grab));                                          # Grab the nodes in the block
+  $parent->putLastCut($w);                                                      # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockToLastAfter($$@)                                                   #C Move the block of siblings starting with B<$node> in the optional context after the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $after, @context) = @_;                                           # First sibling, node to move after, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapToLast(q(grab));                                          # Grab the nodes in the block
+  $after->putNextCut($w);                                                       # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockToLastBefore($$@)                                                  #C Move the block of siblings starting with B<$node> in the optional context before the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $before, @context) = @_;                                          # First sibling, node to move before, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapToLast(q(grab));                                          # Grab the nodes in the block
+  $before->putPrevCut($w);                                                      # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockFromFirstFirst($$@)                                                #C Move the siblings starting with B<$node> in the optional context first under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $parent, @context) = @_;                                          # Start sibling, parent to move first under, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapFromFirst(q(grab));                                       # Grab the nodes in the block
+  $parent->putFirstCut($w);                                                     # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockFromFirstLast($$@)                                                 #C Move the block of siblings starting with B<$node> in the optional context last under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $parent, @context) = @_;                                          # First sibling, parent to move last under, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapFromFirst(q(grab));                                       # Grab the nodes in the block
+  $parent->putLastCut($w);                                                      # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockFromFirstAfter($$@)                                                #C Move the block of siblings starting with B<$node> in the optional context after the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $after, @context) = @_;                                           # First sibling, node to move after, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapFromFirst(q(grab));                                       # Grab the nodes in the block
+  $after->putNextCut($w);                                                       # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
+sub moveBlockFromFirstBefore($$@)                                               #C Move the block of siblings starting with B<$node> in the optional context before the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+ {my ($start, $before, @context) = @_;                                          # First sibling, node to move before, optional context
+  return undef if @context and !$start->at(@context);                           # Not in specified context
+  my $w = $start->wrapFromFirst(q(grab));                                       # Grab the nodes in the block
+  $before->putPrevCut($w);                                                      # Move block
+  $w->unwrap;                                                                   # Unwrap block in new position
+  $start                                                                        # Success
+ }
+
 #D2 Add selectively                                                             # Add new nodes unless they already exist.
 
 sub addFirst($$%)                                                               # Add a new node L<first|/first> below the specified B<$node> and return the new node unless a node with that tag already exists in which case return the existing B<$node>.
@@ -3102,6 +3247,38 @@ sub zipDown($@)                                                                 
   return undef if @context and !$node->at(@context);                            # Node not in specified context
   undef while $node->zipDownOnce;                                               # Zip down for as long as possible
   $node                                                                         # Return node in new position
+ }
+
+sub splitAndWrapFromStart($$$@)                                                 #C Split the child nodes of B<$parent> on the child nodes with a tag of B<$split> wrapping the splitting node  and all preceding nodes from the previous splitting node or the start with the specified B<$wrap>ping node with optional B<%attributes>.  Returns an array of the wrapping nodes created.
+ {my ($parent, $split, $wrap, %attributes) = @_;                                # Parent node, tag of splitting nodes, tag for wrapping node, attributes for wrapping nodes
+  my @s = $parent->c($split);                                                   # Splitting nodes
+  my @w;                                                                        # Wrapping nodes
+  for my $i(reverse keys @s)                                                    # Each splitting node
+   {my $s = $s[$i];
+    if ($i)                                                                     # From previous split
+     {push @w, $s[$i-1]->next->wrapTo($s, $wrap, %attributes);                  # Save wrapping node
+     }
+    else                                                                        # From start
+     {push @w, $s->wrapFromFirst($wrap, %attributes);                           # Save wrapping node
+     }
+   }
+  @w
+ }
+
+sub splitAndWrapToEnd($$$@)                                                     #C Split the child nodes of B<$parent> on the child nodes with a tag of B<$split> wrapping the splitting node  and all following nodes up until the next splitting node or the end with the specified B<$wrap>ping node with optional B<%attributes>.  Returns an array of the wrapping nodes created.
+ {my ($parent, $split, $wrap, %attributes) = @_;                                # Parent node, tag of splitting nodes, tag for wrapping node, attributes for wrapping nodes
+  my @s = $parent->c($split);                                                   # Splitting nodes
+  my @w;                                                                        # Wrapping nodes
+  for my $i(keys @s)                                                            # Each splitting node
+   {my $s = $s[$i];
+    if ($i != $#s)                                                              # More splits to come
+     {push @w, $s->wrapTo($s[$i+1]->prev, $wrap, %attributes);                  # Save wrapping node
+     }
+    else                                                                        # Last splitting node
+     {push @w, $s->wrapToLast($wrap, %attributes);                              # Save wrapping node
+     }
+   }
+  @w
  }
 
 #D2 Replace                                                                     # Replace nodes in the L<parse|/parse> tree with nodes or text
@@ -4307,6 +4484,14 @@ sub countAttrValues($;$)                                                        
   $count                                                                        # Count
  }
 
+sub countAttrNamesAndValues($;$)                                                # Return a reference to a hash showing the number of instances of each attribute name and value on and below the specified B<$node>.
+ {my ($node, $count) = @_;                                                      # Node, count of attributes so far.
+  $count //= {};                                                                # Counts
+  $count->{$_}{$node->attr($_)}++ for $node->getAttrs;                          # Attribute names and values from current tag
+  $_->countAttrNamesAndValues($count) for $node->contents;                      # Each contained node
+  $count                                                                        # Count
+ }
+
 sub countOutputClasses($$)                                                      # Count instances of outputclass attributes
  {my ($node, $count) = @_;                                                      # Node, count so far.
   $count //= {};                                                                # Counts
@@ -4923,6 +5108,42 @@ sub fixEntryRowSpan($)                                                          
   $entry
  }
 
+sub ditaConvertDlToUl($)                                                        # Convert a L<Dita> B<$dl> to a B<ul> if each B<dlentry> has only B<dt> or B<dl> elements but not both.  Return B<undef> if such a conversion is not possible else return the new B<ul> node.
+ {my ($dl) = @_;                                                                # Dl
+  return undef unless $dl->at_dl;                                               # Check start tag
+
+  my @e; my @l;
+  for my $e($dl->c_dlentry)                                                     # Each dlentry
+   {my @t = $e->c_dt;                                                           # dt elements
+    my @d = $e->c_dd;                                                           # dd elements
+    return undef if @d and @t;                                                  # Mixed entry suppresses the conversion
+    push @e, $e;                                                                # Unwrap thee elements later
+    push @l, @t, @d;                                                            # Convert these elements to li
+   }
+
+  $_->unwrap    for @e;                                                         # Unwrap dlentry
+  $_->change_li for @l;                                                         # Change dt/dd to li
+  $dl->change_ul;                                                               # Change dl to ul and return
+ }
+
+sub ditaConvertFromHtmlDl($)                                                    # Convert a B<Html> B<$dl> to a L<Dita> B<dl> or return B<undef> if this is not possible.
+ {my ($dl) = @_;                                                                # Dl
+  return undef unless $dl->at_dl;                                               # Check start tag
+
+  my $t;                                                                        # Last entry
+  for my $e(reverse @$dl)                                                       # Each dt/dd
+   {if ($e->at_dt)                                                              # dt
+     {if ($t)                                                                   # Wrap to last entry with dlentry
+       {$t = $e->wrapTo($t->prev, q(dlentry));
+       }
+      else                                                                      # Wrap to end with dlentry
+       {$t = $e->wrapToLast(q(dlentry));
+       }
+     }
+   }
+  $dl
+ }
+
 sub ditaConvertSimpleTableToTable($)                                            # Convert a L<Dita> B<simpletable> to a B<table>.
  {my ($simpleTable) = @_;                                                       # Simple table
   $simpleTable->at_simpletable or confess "Not on a simple table";              # Not a simpletable
@@ -5056,7 +5277,7 @@ sub ditaConvertConceptToTask($)                                                 
   $concept
  }
 
-sub ditaConvertReferenceToConcept($)                                            # Convert a Dita B<reference> to a B<concept> by unwrapping sections. Return B<undef> if the conversion is not possible because there are no B<ol> else return the specified B<$concept> as as B<task>.
+sub ditaConvertReferenceToConcept($)                                            # Convert a Dita B<reference> to a B<concept> by unwrapping sections. Return B<undef> if the conversion is not possible because there are no B<ol> else return the specified B<$reference> as as B<concept>.
  {my ($reference) = @_;                                                         # Reference
   $reference->at_reference or confess "Not a reference";                        # Check we are on reference
 
@@ -5073,7 +5294,7 @@ sub ditaConvertReferenceToConcept($)                                            
   $reference                                                                    # Return reference as a concept
  }
 
-sub ditaConvertReferenceToTask($)                                               # Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>. Return B<undef> if the conversion is not possible because there are no such B<ol> else return the specified B<$concept> as as B<task>.
+sub ditaConvertReferenceToTask($)                                               # Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>. Return B<undef> if the conversion is not possible because there are no such B<ol> else return the specified B<$reference> as as B<task>.
  {my ($reference) = @_;                                                         # Reference
   $reference->at_reference or confess "Not a reference";                        # Check we are on reference
 
@@ -5095,7 +5316,7 @@ sub ditaConvertReferenceToTask($)                                               
   confess "Unable to convert reference to task";
  }
 
-sub ditaConvertConceptToReference($)                                            # Convert a Dita B<concept> to a B<refernce>. Return B<undef> if the conversion is not possible else return the specified B<$concept> as as B<task>.
+sub ditaConvertConceptToReference($)                                            # Convert a Dita B<concept> to a B<reference>. Return B<undef> if the conversion is not possible else return the specified B<$concept> as as B<reference>.
  {my ($concept) = @_;                                                           # Concept
   $concept->at_concept or confess "Not a concept";                              # Check we are on concept
 
@@ -5137,6 +5358,41 @@ sub ditaConvertTopicToTask($)                                                   
   $x->at_task                                                                   # Succeeded if we now have a task
  }
 
+sub ditaConvertSectionToConcept($)                                              # Convert a Dita B<$section> to a B<concept>. Return B<undef> if the conversion is not possible else return the specified B<$section> as as B<concept>.
+ {my ($section) = @_;                                                           # Section
+  $section->at_section or confess "Not a section, its a ",-t $section;          # Check we are on a section
+
+  my $title = $section->first_title;                                            # Locate any existing title
+
+  my $concept = $section->change_concept;                                       # Change section to concept
+     $concept->wrapContentWith_conbody;
+
+  if ($title)                                                                   # Move title into position
+   {$concept->putFirstCut($title);
+   }
+  else
+   {$concept->putFirst($concept->newTag_title);
+   }
+
+  $concept                                                                      # Return concept
+ }
+
+sub ditaConvertSectionToReference($)                                            # Convert a Dita B<$section> to a B<reference>. Return B<undef> if the conversion is not possible else return the specified B<$section> as as B<reference>.
+ {my ($section) = @_;                                                           # Section
+  if (my $c = $section->ditaConvertSectionToConcept)                            # First convert section to concept
+   {return $c->ditaConvertConceptToReference;                                   # Second convert concept to reference
+   }
+  undef                                                                         # Conversion not possible
+ }
+
+sub ditaConvertSectionToTask($)                                                 # Convert a Dita B<$section> to a B<task>. Return B<undef> if the conversion is not possible else return the specified B<$section> as as B<task>.
+ {my ($section) = @_;                                                           # Section
+  if (my $c = $section->ditaConvertSectionToConcept)                            # First convert section to concept
+   {return $c->ditaConvertConceptToTask;                                        # Second convert concept to task
+   }
+  undef                                                                         # Conversion not possible
+ }
+
 sub ditaObviousChanges($)                                                       # Make obvious changes to a L<parse|/parse> tree to make it look more like L<Dita>.
  {my ($node) = @_;                                                              # Node
 
@@ -5161,6 +5417,7 @@ sub ditaObviousChanges($)                                                       
       para         => q(p),
       quote        => q(q),
       replaceable  => q(varname),
+      span         => q(div),                                                   # Span to div at 2019.05.19 18:59:50
       subscript    => q(sub),
       variablelist => q(dl),
       varlistentry => q(dlentry),
@@ -5178,6 +5435,7 @@ sub ditaObviousChanges($)                                                       
       fig       => [[qw(role outputclass)],   [qw(xml:id id)]],
       example   => [[qw(role outputclass)]],
       imagedata => [[qw(contentwidth width)], [qw(fileref href)]],
+      image     => [[qw(src href)]],                                            # Image source at 2019.05.19 19:04:50
      );
 
     for my $old(sort keys %change)                                              # Perform requested tag changes
@@ -5324,6 +5582,9 @@ sub ditaSampleBookMap(%)                                                        
     $author
     <source/>
     <category/>
+    <keywords>
+      <keyword/>
+    </keywords>
     <prodinfo>
       <prodname product=""/>
       <vrmlist>
@@ -5332,6 +5593,11 @@ sub ditaSampleBookMap(%)                                                        
       <prognum/>
       <brand/>
     </prodinfo>
+    <bookchangehistory>
+      <approved>
+        <revisionid/>
+      </approved>
+    </bookchangehistory>
     <bookrights>
       <copyrfirst>
         $year
@@ -5398,9 +5664,9 @@ sub ditaPrettyPrintWithHeaders($)                                               
  }
 
 sub htmlHeadersToSections($)                                                    # Position sections just before html header tags so that subsequently the document can be divided into L<sections|/divideDocumentIntoSections>.
- {my ($node) = @_;                                                              # Parse tree
+ {my ($tree) = @_;                                                              # Parse tree
 
-  $node->by(sub                                                                 # Move each section definition upwards so that its parent is another section. Intervening container tags such as <div> or <span> should have been unwrapped by this point as they might move the section further back than is desired.
+  $tree->by(sub                                                                 # Move each section definition upwards so that its parent is another section. Intervening container tags such as <div> or <span> should have been unwrapped by this point as they might move the section further back than is desired.
    {my ($o) = @_;
     if ($o->tag =~ m(\Ah(\d)\Z)i)
      {my $level = $1;
@@ -5415,17 +5681,21 @@ sub getSectionHeadingLevel($)                                                   
   $o->attr(qq(level))
  }
 
-sub divideDocumentIntoSections($$)                                              # Divide a L<parse|/parse> tree into sections by moving non B<section> tags into their corresponding B<section> so that the B<section> tags expand until they are contiguous. The sections are then cut out by applying the specified sub to each B<section> tag in the L<parse|/parse> tree. The specified sub will receive the containing B<topicref> and the B<section> to be cut out as parameters allowing a reference to the cut out section to be inserted into the B<topicref>.
- {my ($node, $cutSub) = @_;                                                     # Parse tree, cut out sub
+sub unwrapSingleParentsOfSection($)                                             #P Unwrap single parents of section: in word documents the header is often buried in a list to gain a section number - here we remove these unnecessary items
+ {my ($tree) = @_;                                                              # Parse tree
 
-  $node->by(sub                                                                 # In word documents the header is often buried in a list to gain a section number - here we remove these unnecessary items
+  $tree->by(sub
    {my ($o) = @_;
     if ($o->at(qq(section)))
      {$o->unwrapParentsWithSingleChild;
      }
    });
+ }
 
-  $node->by(sub                                                                 # Place each non heading node in its corresponding heading node
+sub extendSectionToNextSection($)                                               #P Extend a section tag until it meets the next section tag
+ {my ($tree) = @_;                                                              # Parse tree
+
+  $tree->by(sub                                                                 # Place each non heading node in its corresponding heading node
    {my ($o) = @_;
     if (my $h = getSectionHeadingLevel($o))
      {while(my $n = $o->next)
@@ -5435,8 +5705,12 @@ sub divideDocumentIntoSections($$)                                              
        }
      }
    });
+ }
 
-  $node->by(sub                                                                 # Place each sub section in its containing section
+sub structureAdjacentSectionsByLevel($)                                         #P Structure adjacent sections by level
+ {my ($tree) = @_;                                                              # Parse tree
+
+  $tree->by(sub                                                                 # Place each sub section in its containing section
    {my ($o) = @_;
     if (my $h = getSectionHeadingLevel($o))
      {while(my $n = $o->next)
@@ -5446,6 +5720,14 @@ sub divideDocumentIntoSections($$)                                              
        }
      }
    });
+ }
+
+sub divideDocumentIntoSections($$)                                              # Divide a L<parse|/parse> tree into sections by moving non B<section> tags into their corresponding B<section> so that the B<section> tags expand until they are contiguous. The sections are then cut out by applying the specified sub to each B<section> tag in the L<parse|/parse> tree. The specified sub will receive the containing B<topicref> and the B<section> to be cut out as parameters allowing a reference to the cut out section to be inserted into the B<topicref>.
+ {my ($node, $cutSub) = @_;                                                     # Parse tree, cut out sub
+
+  $node->unwrapSingleParentsOfSection;                                          # In word documents the header is often buried in a list to gain a section number - here we remove these unnecessary items
+  $node->extendSectionToNextSection;                                            # Place each non heading node in its corresponding heading node
+  $node->structureAdjacentSectionsByLevel;                                      # Place each sub section in its containing section
 
   $node->by(sub                                                                 # Wrap each section in topicrefs
    {my ($o) = @_;
@@ -5462,6 +5744,15 @@ sub divideDocumentIntoSections($$)                                              
       $cutSub->($p, $o);
      }
    });
+ }
+
+sub divideHtmlDocumentIntoSections($)                                           # Divide a L<parse|/parse> tree representing an html document into sections based on the heading tags.
+ {my ($tree) = @_;                                                              # Parse tree
+  $tree->htmlHeadersToSections;
+  $tree->extendSectionToNextSection;                                            # Place each non heading node in its corresponding heading node
+  $tree->structureAdjacentSectionsByLevel;                                      # Place each sub section in its containing section
+  $tree->by(sub{$_->change(q(title), qr(\Ah\d\Z)i)});                           # Move each section definition upwards so that its parent is another section. Intervening container tags such as <div> or <span> should have been unwrapped by this point as they might move the section further back than is desired.
+  $tree->by(sub{$_->renameAttr_level_outputclass if $_->at_section});           # Change level to outputclass
  }
 
 sub ditaParagraphToNote($;$)                                                    # Convert all <p> nodes to <note> if the paragraph starts with 'Note:', optionally wrapping the content of the <note> with a <p>
@@ -5966,7 +6257,7 @@ Produces:
 Edit data held in the XML format.
 
 
-Version 20190421.
+Version 20190523.
 
 
 The following sections describe the methods in each functional area of this
@@ -8421,7 +8712,7 @@ B<Example:>
 
 =head3 byX($$)
 
-Post-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted if the called sub does  L<die> on any call with the reason in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables> The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Post-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted if the called sub does  L<die|http://perldoc.perl.org/functions/die.html> on any call with the reason in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables> The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
 
 Returns the start node regardless of the outcome of calling B<sub>.
 
@@ -8637,7 +8928,7 @@ B<Example:>
 
 =head3 downX($$)
 
-Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted if the called sub does  L<die> on any call with the reason in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables> The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted for the entire L<parse|/parse> tree if the called sub does L<die|http://perldoc.perl.org/functions/die.html> with the reason returned in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
 
 Returns the start node regardless of the outcome of calling B<sub>.
 
@@ -8654,6 +8945,50 @@ B<Example:>
    {my ($node, $sub) = @_;                                                        # Start node, sub to call
     eval {$node->downX2($sub)};                                                   # Trap any errors that occur
     $node
+   }
+
+
+=head3 downToDie($$)
+
+Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die|http://perldoc.perl.org/functions/die.html>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+
+Returns the start node regardless of the outcome of calling B<sub>.
+
+     Parameter  Description
+  1  $node      Start node
+  2  $sub       Sub to call
+
+B<Example:>
+
+
+  if (1) {
+
+    my $a = Data::Edit::Xml::new(<<END);
+  <a>
+    <b>
+      <c/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+    my @a;
+    $a->𝗱𝗼𝘄𝗻𝗧𝗼𝗗𝗶𝗲(sub
+     {confess if -t $_ eq q(b);
+      push @a, -t $_;
+     });
+
+    is_deeply [@a], [qw(a d e)];
+
+    my @b;
+    $a->𝗱𝗼𝘄𝗻𝗧𝗼𝗗𝗶𝗲(sub
+     {confess if -t $_ eq q(c);
+      push @b, -t $_;
+     });
+
+    is_deeply [@b], [qw(a b d e)];
    }
 
 
@@ -15143,6 +15478,548 @@ B<Example:>
    }
 
 
+=head3 moveBlockFirst($$$@)
+
+Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> first under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $end       Last sibling
+  3  $parent    Parent to move first under
+  4  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a/>
+    <b/>
+    <c/>
+    <d/>
+    <e/>
+    <f>
+      <g/>
+    </f>
+    <h/>
+  </x>
+  END
+    my ($a, $b, $c, $d, $e, $g, $f, $h) = $x->byList;
+
+    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗶𝗿𝘀𝘁($d, $f, qw(c x));
+
+    ok -p $x eq <<END;
+  <x>
+    <a/>
+    <b/>
+    <e/>
+    <f>
+      <c/>
+      <d/>
+      <g/>
+    </f>
+    <h/>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockLast($$$@)
+
+Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> last under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $end       Last sibling
+  3  $parent    Parent to move last under
+  4  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a/>
+    <b/>
+    <c/>
+    <d/>
+    <e/>
+    <f>
+      <g/>
+    </f>
+    <h/>
+  </x>
+  END
+    my ($a, $b, $c, $d, $e, $g, $f, $h) = $x->byList;
+
+    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗟𝗮𝘀𝘁($d, $f, qw(c x));
+
+    ok -p $x eq <<END;
+  <x>
+    <a/>
+    <b/>
+    <e/>
+    <f>
+      <g/>
+      <c/>
+      <d/>
+    </f>
+    <h/>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockAfter($$$@)
+
+Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> after the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $end       Last sibling
+  3  $after     Node to move after
+  4  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(q(<x><a/><b/><c/><d/><e/><f/><g/><h/></x>));
+
+    my ($a, $b, $c, $d, $e, $f, $g, $h) = $x->byList;
+
+    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗔𝗳𝘁𝗲𝗿($d, $f, qw(c x));
+
+    ok -C $x eq q(<a/><b/><e/><f/><c/><d/><g/><h/>);
+   }
+
+
+=head3 moveBlockBefore($$$@)
+
+Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> before the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $end       Last sibling
+  3  $before    Node to move before
+  4  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(q(<x><a/><b/><c/><d/><e/><f/><g/><h/></x>));
+
+    my ($a, $b, $c, $d, $e, $f, $g, $h) = $x->byList;
+
+    $f->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗕𝗲𝗳𝗼𝗿𝗲($g, $b, qw(f x));
+
+    ok -C $x eq q(<a/><f/><g/><b/><c/><d/><e/><h/>);
+   }
+
+
+=head3 moveBlockToLastFirst($$@)
+
+Move the siblings starting with B<$node> in the optional context first under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     Start sibling
+  2  $parent    Parent to move first under
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a/>
+    <b/>
+    <c/>
+  </x>
+  END
+    my ($a, $b, $c) = $x->byList;
+
+    $b->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗙𝗶𝗿𝘀𝘁($a);
+
+    ok -p $x eq <<END;
+  <x>
+    <a>
+      <b/>
+      <c/>
+    </a>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockToLastLast($$@)
+
+Move the block of siblings starting with B<$node> in the optional context last under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $parent    Parent to move last under
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a>
+      <b/>
+      <c/>
+      <d/>
+    </a>
+    <e>
+      <f/>
+      <g/>
+      <h/>
+    </e>
+  </x>
+  END
+    my ($b, $c, $d, $a, $f, $g, $h, $e) = $x->byList;
+
+    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗟𝗮𝘀𝘁($e);
+
+    ok -p $x eq <<END;
+  <x>
+    <a>
+      <b/>
+    </a>
+    <e>
+      <f/>
+      <g/>
+      <h/>
+      <c/>
+      <d/>
+    </e>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockToLastAfter($$@)
+
+Move the block of siblings starting with B<$node> in the optional context after the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $after     Node to move after
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a>
+      <b/>
+      <c/>
+      <d/>
+    </a>
+    <e/>
+  </x>
+  END
+    my ($b, $c, $d, $a, $e) = $x->byList;
+
+    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗔𝗳𝘁𝗲𝗿($e);
+
+    ok -p $x eq <<END;
+  <x>
+    <a>
+      <b/>
+    </a>
+    <e/>
+    <c/>
+    <d/>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockToLastBefore($$@)
+
+Move the block of siblings starting with B<$node> in the optional context before the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $before    Node to move before
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a/>
+    <b>
+      <c/>
+      <d/>
+      <e/>
+    </b>
+  </x>
+  END
+    my ($a, $c, $d, $e, $b) = $x->byList;
+
+    $d->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗕𝗲𝗳𝗼𝗿𝗲($b);
+
+    ok -p $x eq <<END;
+  <x>
+    <a/>
+    <d/>
+    <e/>
+    <b>
+      <c/>
+    </b>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockFromFirstFirst($$@)
+
+Move the siblings starting with B<$node> in the optional context first under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     Start sibling
+  2  $parent    Parent to move first under
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a>
+      <b/>
+      <c/>
+      <d/>
+    </a>
+    <e>
+      <f/>
+      <g/>
+      <h/>
+    </e>
+  </x>
+  END
+    my ($b, $c, $d, $a, $f, $g, $h, $e) = $x->byList;
+
+    $g->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗙𝗶𝗿𝘀𝘁($a);
+
+    ok -p $x eq <<END;
+  <x>
+    <a>
+      <f/>
+      <g/>
+      <b/>
+      <c/>
+      <d/>
+    </a>
+    <e>
+      <h/>
+    </e>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockFromFirstLast($$@)
+
+Move the block of siblings starting with B<$node> in the optional context last under the specified B<$parent> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $parent    Parent to move last under
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a/>
+    <b/>
+    <c/>
+  </x>
+  END
+    my ($a, $b, $c) = $x->byList;
+
+    $b->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗟𝗮𝘀𝘁($c);
+
+    ok -p $x eq <<END;
+  <x>
+    <c>
+      <a/>
+      <b/>
+    </c>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockFromFirstAfter($$@)
+
+Move the block of siblings starting with B<$node> in the optional context after the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $after     Node to move after
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a>
+      <b/>
+      <c/>
+      <d/>
+    </a>
+    <e/>
+  </x>
+  END
+    my ($b, $c, $d, $a, $e) = $x->byList;
+
+    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗔𝗳𝘁𝗲𝗿($e);
+    owf(q(/home/phil/z/z/z/out.xml), -p $x);
+
+    ok -p $x eq <<END;
+  <x>
+    <a>
+      <d/>
+    </a>
+    <e/>
+    <b/>
+    <c/>
+  </x>
+  END
+   }
+
+
+=head3 moveBlockFromFirstBefore($$@)
+
+Move the block of siblings starting with B<$node> in the optional context before the specified B<$after> node. Returns B<$node> if the move was made successfully, else confess that the specified move is impossible.
+
+     Parameter  Description
+  1  $start     First sibling
+  2  $before    Node to move before
+  3  @context   Optional context
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <x>
+    <a/>
+    <b>
+      <c/>
+      <d/>
+      <e/>
+    </b>
+  </x>
+  END
+    my ($a, $c, $d, $e, $b) = $x->byList;
+
+    $d->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗕𝗲𝗳𝗼𝗿𝗲($b);
+    owf(q(/home/phil/z/z/z/out.xml), -p $x);
+
+    ok -p $x eq <<END;
+  <x>
+    <a/>
+    <c/>
+    <d/>
+    <b>
+      <e/>
+    </b>
+  </x>
+  END
+   }
+
+
 =head2 Add selectively
 
 Add new nodes unless they already exist.
@@ -16390,7 +17267,7 @@ B<Example:>
 
    ok  $e->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($a->first);                                                    # b invalidated by zipDownOnce
    $e->zipDown;
-   owf(q(/home/phil/z/z/z/out.xml), -p $a);
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -16540,7 +17417,7 @@ B<Example:>
 
    ok  $e->splitTo($a->first);                                                    # b invalidated by 𝘇𝗶𝗽𝗗𝗼𝘄𝗻𝗢𝗻𝗰𝗲
    $e->zipDown;
-   owf(q(/home/phil/z/z/z/out.xml), -p $a);
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -16671,7 +17548,7 @@ B<Example:>
 
    ok  $e->splitTo($a->first);                                                    # b invalidated by zipDownOnce
    $e->𝘇𝗶𝗽𝗗𝗼𝘄𝗻;
-   owf(q(/home/phil/z/z/z/out.xml), -p $a);
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -16681,6 +17558,198 @@ B<Example:>
         </d>
       </c>
     </b>
+  </a>
+  END
+   }
+
+
+=head3 splitAndWrapFromStart($$$@)
+
+Split the child nodes of B<$parent> on the child nodes with a tag of B<$split> wrapping the splitting node  and all preceding nodes from the previous splitting node or the start with the specified B<$wrap>ping node with optional B<%attributes>.  Returns an array of the wrapping nodes created.
+
+     Parameter    Description
+  1  $parent      Parent node
+  2  $split       Tag of splitting nodes
+  3  $wrap        Tag for wrapping node
+  4  %attributes  Attributes for wrapping nodes
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+
+    my $A = Data::Edit::Xml::new(<<END);
+  <a>
+    <PP/>
+    <b>
+      <c/>
+    </b>
+    <QQ/>
+    <b>
+      <d/>
+    </b>
+    <RR/>
+    <b>
+      <e/>
+    </b>
+    <SS/>
+  </a>
+  END
+
+    my $a = $A->clone;
+    ok 3 == $a->𝘀𝗽𝗹𝗶𝘁𝗔𝗻𝗱𝗪𝗿𝗮𝗽𝗙𝗿𝗼𝗺𝗦𝘁𝗮𝗿𝘁(qw(b B));
+
+    ok -p $a eq <<END;
+  <a>
+    <B>
+      <PP/>
+      <b>
+        <c/>
+      </b>
+    </B>
+    <B>
+      <QQ/>
+      <b>
+        <d/>
+      </b>
+    </B>
+    <B>
+      <RR/>
+      <b>
+        <e/>
+      </b>
+    </B>
+    <SS/>
+  </a>
+  END
+
+
+    my $b = $A->clone;
+    ok 3 == $b->splitAndWrapToEnd(qw(b B));
+
+    ok -p $b eq <<END;
+  <a>
+    <PP/>
+    <B>
+      <b>
+        <c/>
+      </b>
+      <QQ/>
+    </B>
+    <B>
+      <b>
+        <d/>
+      </b>
+      <RR/>
+    </B>
+    <B>
+      <b>
+        <e/>
+      </b>
+      <SS/>
+    </B>
+  </a>
+  END
+   }
+
+
+=head3 splitAndWrapToEnd($$$@)
+
+Split the child nodes of B<$parent> on the child nodes with a tag of B<$split> wrapping the splitting node  and all following nodes up until the next splitting node or the end with the specified B<$wrap>ping node with optional B<%attributes>.  Returns an array of the wrapping nodes created.
+
+     Parameter    Description
+  1  $parent      Parent node
+  2  $split       Tag of splitting nodes
+  3  $wrap        Tag for wrapping node
+  4  %attributes  Attributes for wrapping nodes
+
+Use the optional B<@context> parameter to test the context of the specified
+B<$node> as understood by method L<at|/at>. If the context is supplied and
+B<$node> is not in this context then this method returns B<undef> immediately.
+
+
+
+B<Example:>
+
+
+  if (1) {
+
+    my $A = Data::Edit::Xml::new(<<END);
+  <a>
+    <PP/>
+    <b>
+      <c/>
+    </b>
+    <QQ/>
+    <b>
+      <d/>
+    </b>
+    <RR/>
+    <b>
+      <e/>
+    </b>
+    <SS/>
+  </a>
+  END
+
+    my $a = $A->clone;
+    ok 3 == $a->splitAndWrapFromStart(qw(b B));
+
+    ok -p $a eq <<END;
+  <a>
+    <B>
+      <PP/>
+      <b>
+        <c/>
+      </b>
+    </B>
+    <B>
+      <QQ/>
+      <b>
+        <d/>
+      </b>
+    </B>
+    <B>
+      <RR/>
+      <b>
+        <e/>
+      </b>
+    </B>
+    <SS/>
+  </a>
+  END
+
+
+    my $b = $A->clone;
+    ok 3 == $b->𝘀𝗽𝗹𝗶𝘁𝗔𝗻𝗱𝗪𝗿𝗮𝗽𝗧𝗼𝗘𝗻𝗱(qw(b B));
+
+    ok -p $b eq <<END;
+  <a>
+    <PP/>
+    <B>
+      <b>
+        <c/>
+      </b>
+      <QQ/>
+    </B>
+    <B>
+      <b>
+        <d/>
+      </b>
+      <RR/>
+    </B>
+    <B>
+      <b>
+        <e/>
+      </b>
+      <SS/>
+    </B>
   </a>
   END
    }
@@ -20434,20 +21503,32 @@ Return a reference to a hash showing the number of instances of each tag on and 
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);
-  <a A="A" B="B" C="C">
-    <b  B="B" C="C">
-      <c  C="C">
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <a A="A1" B="B1" C="C1">
+    <b  B="B1" C="C1">
+      <c  C="C1">
       </c>
       <c/>
     </b>
-    <b  C="C">
-      <c/>
+    <b  B="B2">
+      <c C="C2"/>
     </b>
   </a>
   END
 
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗧𝗮𝗴𝗡𝗮𝗺𝗲𝘀,  { a => 1, b => 2, c => 3 };
+    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗧𝗮𝗴𝗡𝗮𝗺𝗲𝘀,
+     {a => 1, b => 2, c => 3};
+
+    is_deeply $x->countAttrNames,
+     {A => 1, B => 3, C => 4};
+
+    is_deeply $x->countAttrValues,
+     {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
+
+    is_deeply $x->countAttrNamesAndValues,
+     {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
+   }
 
 
 =head2 countAttrNames($$)
@@ -20461,20 +21542,32 @@ Return a reference to a hash showing the number of instances of each attribute o
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);
-  <a A="A" B="B" C="C">
-    <b  B="B" C="C">
-      <c  C="C">
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <a A="A1" B="B1" C="C1">
+    <b  B="B1" C="C1">
+      <c  C="C1">
       </c>
       <c/>
     </b>
-    <b  C="C">
-      <c/>
+    <b  B="B2">
+      <c C="C2"/>
     </b>
   </a>
   END
 
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗡𝗮𝗺𝗲𝘀, { A => 1, B => 2, C => 4 };
+    is_deeply $x->countTagNames,
+     {a => 1, b => 2, c => 3};
+
+    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗡𝗮𝗺𝗲𝘀,
+     {A => 1, B => 3, C => 4};
+
+    is_deeply $x->countAttrValues,
+     {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
+
+    is_deeply $x->countAttrNamesAndValues,
+     {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
+   }
 
 
 =head2 countAttrNamesOnTagExcluding($@)
@@ -20502,20 +21595,71 @@ Return a reference to a hash showing the number of instances of each attribute v
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);
-  <a A="A" B="B" C="C">
-    <b  B="B" C="C">
-      <c  C="C">
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <a A="A1" B="B1" C="C1">
+    <b  B="B1" C="C1">
+      <c  C="C1">
       </c>
       <c/>
     </b>
-    <b  C="C">
-      <c/>
+    <b  B="B2">
+      <c C="C2"/>
     </b>
   </a>
   END
 
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗩𝗮𝗹𝘂𝗲𝘀, { A => 1, B => 2, C => 4 };
+    is_deeply $x->countTagNames,
+     {a => 1, b => 2, c => 3};
+
+    is_deeply $x->countAttrNames,
+     {A => 1, B => 3, C => 4};
+
+    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗩𝗮𝗹𝘂𝗲𝘀,
+     {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
+
+    is_deeply $x->countAttrNamesAndValues,
+     {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
+   }
+
+
+=head2 countAttrNamesAndValues($$)
+
+Return a reference to a hash showing the number of instances of each attribute name and value on and below the specified B<$node>.
+
+     Parameter  Description
+  1  $node      Node
+  2  $count     Count of attributes so far.
+
+B<Example:>
+
+
+  if (1) {
+    my $x = Data::Edit::Xml::new(<<END);
+  <a A="A1" B="B1" C="C1">
+    <b  B="B1" C="C1">
+      <c  C="C1">
+      </c>
+      <c/>
+    </b>
+    <b  B="B2">
+      <c C="C2"/>
+    </b>
+  </a>
+  END
+
+    is_deeply $x->countTagNames,
+     {a => 1, b => 2, c => 3};
+
+    is_deeply $x->countAttrNames,
+     {A => 1, B => 3, C => 4};
+
+    is_deeply $x->countAttrValues,
+     {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
+
+    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗡𝗮𝗺𝗲𝘀𝗔𝗻𝗱𝗩𝗮𝗹𝘂𝗲𝘀,
+     {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
+   }
 
 
 =head2 countOutputClasses($$)
@@ -22348,6 +23492,97 @@ B<Example:>
    }
 
 
+=head2 ditaConvertDlToUl($)
+
+Convert a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<$dl> to a B<ul> if each B<dlentry> has only B<dt> or B<dl> elements but not both.  Return B<undef> if such a conversion is not possible else return the new B<ul> node.
+
+     Parameter  Description
+  1  $dl        Dl
+
+B<Example:>
+
+
+  if (1) {
+
+    my $a = Data::Edit::Xml::new(<<END);
+  <dl>
+    <dlentry><dt>A</dt><dt>B</dt><dt>C</dt></dlentry>
+    <dlentry><dd>a</dd><dd>b</dd><dd>b</dd></dlentry>
+  </dl>
+  END
+
+    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗗𝗹𝗧𝗼𝗨𝗹;
+
+    ok -p $a eq <<END;
+  <ul>
+    <li>A</li>
+    <li>B</li>
+    <li>C</li>
+    <li>a</li>
+    <li>b</li>
+    <li>b</li>
+  </ul>
+  END
+
+    my $b = Data::Edit::Xml::new(<<END);
+  <dl>
+    <dlentry><dt>A</dt><dd>a</dd></dlentry>
+  </dl>
+  END
+
+    ok !$a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗗𝗹𝗧𝗼𝗨𝗹;
+   }
+
+
+=head2 ditaConvertFromHtmlDl($)
+
+Convert a B<Html> B<$dl> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<dl> or return B<undef> if this is not possible.
+
+     Parameter  Description
+  1  $dl        Dl
+
+B<Example:>
+
+
+  if (1) {
+    my $a = Data::Edit::Xml::new(<<END);
+  <dl>
+    <dt>t11</dt>
+    <dd>d11</dd>
+    <dd>d12</dd>
+    <dt>t21</dt>
+    <dd>d21</dd>
+    <dd>d22</dd>
+    <dt>t31</dt>
+    <dd>d31</dd>
+    <dd>d32</dd>
+  </dl>
+  END
+
+    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗙𝗿𝗼𝗺𝗛𝘁𝗺𝗹𝗗𝗹;
+
+    ok -p $a eq <<END;
+  <dl>
+    <dlentry>
+      <dt>t11</dt>
+      <dd>d11</dd>
+      <dd>d12</dd>
+    </dlentry>
+    <dlentry>
+      <dt>t21</dt>
+      <dd>d21</dd>
+      <dd>d22</dd>
+    </dlentry>
+    <dlentry>
+      <dt>t31</dt>
+      <dd>d31</dd>
+      <dd>d32</dd>
+    </dlentry>
+  </dl>
+  END
+   }
+
+
 =head2 ditaConvertSimpleTableToTable($)
 
 Convert a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<simpletable> to a B<table>.
@@ -22373,7 +23608,6 @@ B<Example:>
   END
 
     $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗶𝗺𝗽𝗹𝗲𝗧𝗮𝗯𝗹𝗲𝗧𝗼𝗧𝗮𝗯𝗹𝗲;
-  # owf(q(/home/phil/z/z/z/out.xml), -p $a);
 
     ok -p $a eq <<END;
   <table>
@@ -22564,7 +23798,6 @@ B<Example:>
   END
 
    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗧𝗮𝘀𝗸;
-  #owf(q(/home/phil/z/z/z/out.xml), -p $a);
 
    ok nws(-p $a) eq nws(<<END);
   <task id="x1">
@@ -22693,7 +23926,7 @@ B<Example:>
 
 =head2 ditaConvertReferenceToConcept($)
 
-Convert a Dita B<reference> to a B<concept> by unwrapping sections. Return B<undef> if the conversion is not possible because there are no B<ol> else return the specified B<$concept> as as B<task>.
+Convert a Dita B<reference> to a B<concept> by unwrapping sections. Return B<undef> if the conversion is not possible because there are no B<ol> else return the specified B<$reference> as as B<concept>.
 
      Parameter   Description
   1  $reference  Reference
@@ -22767,7 +24000,7 @@ B<Example:>
 
 =head2 ditaConvertReferenceToTask($)
 
-Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>. Return B<undef> if the conversion is not possible because there are no such B<ol> else return the specified B<$concept> as as B<task>.
+Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>. Return B<undef> if the conversion is not possible because there are no such B<ol> else return the specified B<$reference> as as B<task>.
 
      Parameter   Description
   1  $reference  Reference
@@ -22821,7 +24054,7 @@ B<Example:>
 
 =head2 ditaConvertConceptToReference($)
 
-Convert a Dita B<concept> to a B<refernce>. Return B<undef> if the conversion is not possible else return the specified B<$concept> as as B<task>.
+Convert a Dita B<concept> to a B<reference>. Return B<undef> if the conversion is not possible else return the specified B<$concept> as as B<reference>.
 
      Parameter  Description
   1  $concept   Concept
@@ -22907,7 +24140,6 @@ B<Example:>
   END
 
    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗧𝗼𝗽𝗶𝗰𝗧𝗼𝗧𝗮𝘀𝗸;
-  owf(q(/home/phil/z/z/z/22.xml), -p $a);
 
    ok nws(-p $a) eq nws(<<END);
   <task id="c1">
@@ -22921,6 +24153,109 @@ B<Example:>
           <cmd/>
         </step>
   Click
+      </steps>
+      <result/>
+    </taskbody>
+  </task>
+  END
+   }
+
+
+=head2 ditaConvertSectionToConcept($)
+
+Convert a Dita B<$section> to a B<concept>. Return B<undef> if the conversion is not possible else return the specified B<$section> as as B<concept>.
+
+     Parameter  Description
+  1  $section   Section
+
+B<Example:>
+
+
+  if (1) {
+    my $a = Data::Edit::Xml::new(<<END);
+  <section>
+    <title>title</title>
+    <p>text</p>
+  </section>
+  END
+
+    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗖𝗼𝗻𝗰𝗲𝗽𝘁 eq <<END
+  <concept>
+    <title>title</title>
+    <conbody>
+      <p>text</p>
+    </conbody>
+  </concept>
+  END
+   }
+
+
+=head2 ditaConvertSectionToReference($)
+
+Convert a Dita B<$section> to a B<reference>. Return B<undef> if the conversion is not possible else return the specified B<$section> as as B<reference>.
+
+     Parameter  Description
+  1  $section   Section
+
+B<Example:>
+
+
+  if (1) {
+    my $a = Data::Edit::Xml::new(<<END);
+  <section>
+    <title>title</title>
+    <p>text</p>
+  </section>
+  END
+
+  # say STDERR "AAAA
+", -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗥𝗲𝗳𝗲𝗿𝗲𝗻𝗰𝗲;
+    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗥𝗲𝗳𝗲𝗿𝗲𝗻𝗰𝗲 eq <<END
+  <reference id="GUID-a9f0f71b-5bae-90ac-7c6d-5a605a053be4">
+    <title>title</title>
+    <refbody>
+      <section>
+        <p>text</p>
+      </section>
+    </refbody>
+  </reference>
+  END
+   }
+
+
+=head2 ditaConvertSectionToTask($)
+
+Convert a Dita B<$section> to a B<task>. Return B<undef> if the conversion is not possible else return the specified B<$section> as as B<task>.
+
+     Parameter  Description
+  1  $section   Section
+
+B<Example:>
+
+
+  if (1) {
+    my $a = Data::Edit::Xml::new(<<END);
+  <section>
+    <title>title</title>
+    <ol>
+      <li>step1</li>
+      <li>step2</li>
+    </ol>
+  </section>
+  END
+
+    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗧𝗮𝘀𝗸 eq <<END
+  <task>
+    <title>title</title>
+    <taskbody>
+      <context/>
+      <steps>
+        <step>
+          <cmd>step1</cmd>
+        </step>
+        <step>
+          <cmd>step2</cmd>
+        </step>
       </steps>
       <result/>
     </taskbody>
@@ -23063,17 +24398,18 @@ B<Example:>
 
   if (1) {
 
-  ok nws(Data::Edit::Xml::𝗱𝗶𝘁𝗮𝗦𝗮𝗺𝗽𝗹𝗲𝗕𝗼𝗼𝗸𝗠𝗮𝗽
-   (author=>q(mim),
-    chapters=>Data::Edit::Xml::new(<<END),
+    my $a = Data::Edit::Xml::𝗱𝗶𝘁𝗮𝗦𝗮𝗺𝗽𝗹𝗲𝗕𝗼𝗼𝗸𝗠𝗮𝗽
+     (author=>q(mim),
+      chapters=>Data::Edit::Xml::new(<<END));
   <a>
     <b>
       <c/>
     </b>
   </a>
   END
-   )->prettyString) eq nws(<<END);
-  <bookmap id="GUID-e12a690e-93a1-9072-c41e-ef5c258ff9d1">
+
+  ok -p $a eq <<END;
+  <bookmap id="GUID-3b04e859-bc04-ac2d-e4bb-f0f99b2a8f90">
     <booktitle>
       <mainbooktitle/>
     </booktitle>
@@ -23082,6 +24418,9 @@ B<Example:>
       <author>mim</author>
       <source/>
       <category/>
+      <keywords>
+        <keyword/>
+      </keywords>
       <prodinfo>
         <prodname product=""/>
         <vrmlist>
@@ -23090,6 +24429,11 @@ B<Example:>
         <prognum/>
         <brand/>
       </prodinfo>
+      <bookchangehistory>
+        <approved>
+          <revisionid/>
+        </approved>
+      </bookchangehistory>
       <bookrights>
         <copyrfirst>
           <year/>
@@ -23175,7 +24519,7 @@ B<Example:>
 Position sections just before html header tags so that subsequently the document can be divided into L<sections|/divideDocumentIntoSections>.
 
      Parameter  Description
-  1  $node      Parse tree
+  1  $tree      Parse tree
 
 B<Example:>
 
@@ -23313,6 +24657,57 @@ B<Example:>
       "4" => "<section level=\"2\">N  <h2>h2</h2>NN  H2NN</section>N",
 
       "5" => "<section level=\"4\">N  <h4>h4</h4>NN  H4NN</section>N",
+
+
+=head2 divideHtmlDocumentIntoSections($)
+
+Divide a L<parse|/parse> tree representing an html document into sections based on the heading tags.
+
+     Parameter  Description
+  1  $tree      Parse tree
+
+B<Example:>
+
+
+  if (1) {
+
+    my $a = Data::Edit::Xml::new(<<END);
+  <a>
+    <h1>HH11</h1>    text1
+      <h2>HH22</h2>  text2
+      <h2>HH22</h2>  text3
+        <h4>HH44</h4>text4
+      <h1>HH11</h1>  text5
+  </a>
+  END
+
+    $a->𝗱𝗶𝘃𝗶𝗱𝗲𝗛𝘁𝗺𝗹𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝗜𝗻𝘁𝗼𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝘀;
+
+    ok nws(-p $a) eq nws(<<END);
+  <a>
+    <section outputclass="1">
+      <title>HH11</title>
+  text1
+      <section outputclass="2">
+        <title>HH22</title>
+  text2
+      </section>
+      <section outputclass="2">
+        <title>HH22</title>
+  text3
+        <section outputclass="4">
+          <title>HH44</title>
+  text4
+        </section>
+      </section>
+    </section>
+    <section outputclass="1">
+      <title>HH11</title>
+  text5
+    </section>
+  </a>
+  END
+   }
 
 
 =head2 ditaParagraphToNote($$)
@@ -23868,13 +25263,15 @@ Pre-order traversal of a L<parse|/parse> tree or sub tree calling the specified 
   2  $sub       Sub to call
   3  @context   Accumulated context.
 
-=head2 downX22($$@)
+=head2 downToDie2($$@)
 
-Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die|http://perldoc.perl.org/functions/die.html>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+
+Returns the start node regardless of the outcome of calling B<sub>.
 
      Parameter  Description
   1  $node      Starting node
-  2  $sub       Sub to call for each sub node
+  2  $sub       Sub to call
   3  @context   Accumulated context.
 
 =head2 parseLineLocation($)
@@ -24043,6 +25440,27 @@ Get the heading level from a section tag.
 
      Parameter  Description
   1  $o         Node
+
+=head2 unwrapSingleParentsOfSection($)
+
+Unwrap single parents of section: in word documents the header is often buried in a list to gain a section number - here we remove these unnecessary items
+
+     Parameter  Description
+  1  $tree      Parse tree
+
+=head2 extendSectionToNextSection($)
+
+Extend a section tag until it meets the next section tag
+
+     Parameter  Description
+  1  $tree      Parse tree
+
+=head2 structureAdjacentSectionsByLevel($)
+
+Structure adjacent sections by level
+
+     Parameter  Description
+  1  $tree      Parse tree
 
 =head2 printAttributesReplacingIdsWithLabels($)
 
@@ -24277,443 +25695,485 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 88 L<countAttrNames|/countAttrNames> - Return a reference to a hash showing the number of instances of each attribute on and below the specified B<$node>.
 
-89 L<countAttrNamesOnTagExcluding|/countAttrNamesOnTagExcluding> - Count the number of attributes owned by the specified B<$node> that are not in the specified list.
+89 L<countAttrNamesAndValues|/countAttrNamesAndValues> - Return a reference to a hash showing the number of instances of each attribute name and value on and below the specified B<$node>.
 
-90 L<countAttrValues|/countAttrValues> - Return a reference to a hash showing the number of instances of each attribute value on and below the specified B<$node>.
+90 L<countAttrNamesOnTagExcluding|/countAttrNamesOnTagExcluding> - Count the number of attributes owned by the specified B<$node> that are not in the specified list.
 
-91 L<countLabels|/countLabels> - Return the count of the number of labels at a node.
+91 L<countAttrValues|/countAttrValues> - Return a reference to a hash showing the number of instances of each attribute value on and below the specified B<$node>.
 
-92 L<countOutputClasses|/countOutputClasses> - Count instances of outputclass attributes
+92 L<countLabels|/countLabels> - Return the count of the number of labels at a node.
 
-93 L<countTagNames|/countTagNames> - Return a reference to a hash showing the number of instances of each tag on and below the specified B<$node>.
+93 L<countOutputClasses|/countOutputClasses> - Count instances of outputclass attributes
 
-94 L<countTags|/countTags> - Count the number of tags in a L<parse|/parse> tree.
+94 L<countTagNames|/countTagNames> - Return a reference to a hash showing the number of instances of each tag on and below the specified B<$node>.
 
-95 L<crc|/crc> - Insert a comment consisting of a code and an optional reason as text into the L<parse|/parse> tree to indicate the location of changes to the L<parse|/parse> tree.
+95 L<countTags|/countTags> - Count the number of tags in a L<parse|/parse> tree.
 
-96 L<createGuidId|/createGuidId> - Create an id for the specified B<$node> from the md5Sum of its content moving any existing id to the labels associated with the B<$node> and return the existing B<$node>.
+96 L<crc|/crc> - Insert a comment consisting of a code and an optional reason as text into the L<parse|/parse> tree to indicate the location of changes to the L<parse|/parse> tree.
 
-97 L<createPatch|/createPatch> - Create a patch that moves the source L<parse|/parse> tree to the target L<parse|/parse> tree node as long as they have the same tag and id structure with each id being unique.
+97 L<createGuidId|/createGuidId> - Create an id for the specified B<$node> from the md5Sum of its content moving any existing id to the labels associated with the B<$node> and return the existing B<$node>.
 
-98 L<createRequiredCleanUp|/createRequiredCleanUp> - Create a required clean up node
+98 L<createPatch|/createPatch> - Create a patch that moves the source L<parse|/parse> tree to the target L<parse|/parse> tree node as long as they have the same tag and id structure with each id being unique.
 
-99 L<cText|/cText> - Return an array of all the text nodes immediately below the specified B<$node>.
+99 L<createRequiredCleanUp|/createRequiredCleanUp> - Create a required clean up node
 
-100 L<cut|/cut> - Cut out and return the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree.
+100 L<cText|/cText> - Return an array of all the text nodes immediately below the specified B<$node>.
 
-101 L<cutIfEmpty|/cutIfEmpty> - Cut out and return the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree if it is empty.
+101 L<cut|/cut> - Cut out and return the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree.
 
-102 L<Data::Edit::Xml::Patch::install|/Data::Edit::Xml::Patch::install> - Replay a patch created by L<createPatch|/createPatch> against a L<parse|/parse> tree that has the same tag and id structure with each id being unique.
+102 L<cutIfEmpty|/cutIfEmpty> - Cut out and return the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree if it is empty.
 
-103 L<deleteAttr|/deleteAttr> - Delete the named attribute in the specified B<$node>, optionally check its value first, return the node regardless.
+103 L<Data::Edit::Xml::Patch::install|/Data::Edit::Xml::Patch::install> - Replay a patch created by L<createPatch|/createPatch> against a L<parse|/parse> tree that has the same tag and id structure with each id being unique.
 
-104 L<deleteAttrs|/deleteAttrs> - Delete the specified attributes of the specified B<$node> without checking their values and return the node.
+104 L<deleteAttr|/deleteAttr> - Delete the named attribute in the specified B<$node>, optionally check its value first, return the node regardless.
 
-105 L<deleteAttrsInTree|/deleteAttrsInTree> - Delete the specified attributes of the specified B<$node> and all the nodes under it and return the specified B<$node>.
+105 L<deleteAttrs|/deleteAttrs> - Delete the specified attributes of the specified B<$node> without checking their values and return the node.
 
-106 L<deleteAttrValueAtInTree|/deleteAttrValueAtInTree> - Delete all instances of the specified B<$attribute> with the specified B<$value> in the specified B<@context> in the specified B<$tree> and return the modified B<$tree>.
+106 L<deleteAttrsInTree|/deleteAttrsInTree> - Delete the specified attributes of the specified B<$node> and all the nodes under it and return the specified B<$node>.
 
-107 L<deleteConditions|/deleteConditions> - Delete conditions applied to a node and return the node.
+107 L<deleteAttrValueAtInTree|/deleteAttrValueAtInTree> - Delete all instances of the specified B<$attribute> with the specified B<$value> in the specified B<@context> in the specified B<$tree> and return the modified B<$tree>.
 
-108 L<deleteContent|/deleteContent> - Delete the content of the specified B<$node>.
+108 L<deleteConditions|/deleteConditions> - Delete conditions applied to a node and return the node.
 
-109 L<deleteLabels|/deleteLabels> - Delete the specified labels in the specified B<$node> or all labels if no labels have are specified and return that node.
+109 L<deleteContent|/deleteContent> - Delete the content of the specified B<$node>.
 
-110 L<depth|/depth> - Returns the depth of the specified B<$node>, the  depth of a root node is zero.
+110 L<deleteLabels|/deleteLabels> - Delete the specified labels in the specified B<$node> or all labels if no labels have are specified and return that node.
 
-111 L<depthProfile|/depthProfile> - Returns the depth profile of the tree rooted at the specified B<$node>.
+111 L<depth|/depth> - Returns the depth of the specified B<$node>, the  depth of a root node is zero.
 
-112 L<diff|/diff> - Return () if the dense string representations of the two nodes are equal, else up to the first N (default 16) characters of the common prefix before the point of divergence and the remainder of the string representation of each node from the point of divergence.
+112 L<depthProfile|/depthProfile> - Returns the depth profile of the tree rooted at the specified B<$node>.
 
-113 L<disconnectLeafNode|/disconnectLeafNode> - Remove a leaf node from the parse tree and make it into its own parse tree.
+113 L<diff|/diff> - Return () if the dense string representations of the two nodes are equal, else up to the first N (default 16) characters of the common prefix before the point of divergence and the remainder of the string representation of each node from the point of divergence.
 
-114 L<disordered|/disordered> - Return the first node that is out of the specified order when performing a pre-ordered traversal of the L<parse|/parse> tree.
+114 L<disconnectLeafNode|/disconnectLeafNode> - Remove a leaf node from the parse tree and make it into its own parse tree.
 
-115 L<ditaAddColSpecToTGroup|/ditaAddColSpecToTGroup> - Add the specified B<$number> of column specification to a specified B<$tgroup> which does not have any already.
+115 L<disordered|/disordered> - Return the first node that is out of the specified order when performing a pre-ordered traversal of the L<parse|/parse> tree.
 
-116 L<ditaAddPadEntriesToTGroupRows|/ditaAddPadEntriesToTGroupRows> - Adding padding entries to a tgroup to make sure every row has the same number of entries
+116 L<ditaAddColSpecToTGroup|/ditaAddColSpecToTGroup> - Add the specified B<$number> of column specification to a specified B<$tgroup> which does not have any already.
 
-117 L<ditaConvertConceptToReference|/ditaConvertConceptToReference> - Convert a Dita B<concept> to a B<refernce>.
+117 L<ditaAddPadEntriesToTGroupRows|/ditaAddPadEntriesToTGroupRows> - Adding padding entries to a tgroup to make sure every row has the same number of entries
 
-118 L<ditaConvertConceptToTask|/ditaConvertConceptToTask> - Convert a Dita B<concept> to a B<task> by representing B<ol> as B<steps>.
+118 L<ditaConvertConceptToReference|/ditaConvertConceptToReference> - Convert a Dita B<concept> to a B<reference>.
 
-119 L<ditaConvertReferenceToConcept|/ditaConvertReferenceToConcept> - Convert a Dita B<reference> to a B<concept> by unwrapping sections.
+119 L<ditaConvertConceptToTask|/ditaConvertConceptToTask> - Convert a Dita B<concept> to a B<task> by representing B<ol> as B<steps>.
 
-120 L<ditaConvertReferenceToTask|/ditaConvertReferenceToTask> - Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>.
+120 L<ditaConvertDlToUl|/ditaConvertDlToUl> - Convert a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<$dl> to a B<ul> if each B<dlentry> has only B<dt> or B<dl> elements but not both.
 
-121 L<ditaConvertSimpleTableToTable|/ditaConvertSimpleTableToTable> - Convert a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<simpletable> to a B<table>.
+121 L<ditaConvertFromHtmlDl|/ditaConvertFromHtmlDl> - Convert a B<Html> B<$dl> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<dl> or return B<undef> if this is not possible.
 
-122 L<ditaConvertTopicToTask|/ditaConvertTopicToTask> - Convert a topic that is not already a task into a task
+122 L<ditaConvertReferenceToConcept|/ditaConvertReferenceToConcept> - Convert a Dita B<reference> to a B<concept> by unwrapping sections.
 
-123 L<ditaCouldConvertConceptToTask|/ditaCouldConvertConceptToTask> - Check whether a concept could be converted to a task
+123 L<ditaConvertReferenceToTask|/ditaConvertReferenceToTask> - Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>.
 
-124 L<ditaFixTGroupColSpec|/ditaFixTGroupColSpec> - Fix the colspec attribute and colspec nodes of the specified B<$tgroup>.
+124 L<ditaConvertSectionToConcept|/ditaConvertSectionToConcept> - Convert a Dita B<$section> to a B<concept>.
 
-125 L<ditaListToChoices|/ditaListToChoices> - Change the specified B<$list> to B<choices>.
+125 L<ditaConvertSectionToReference|/ditaConvertSectionToReference> - Convert a Dita B<$section> to a B<reference>.
 
-126 L<ditaListToSteps|/ditaListToSteps> - Change the specified B<$node> to B<steps> and its contents to B<cmd\step> optionally only in the specified context.
+126 L<ditaConvertSectionToTask|/ditaConvertSectionToTask> - Convert a Dita B<$section> to a B<task>.
 
-127 L<ditaListToStepsUnordered|/ditaListToStepsUnordered> - Change the specified B<$node> to B<steps-unordered> and its contents to B<cmd\step> optionally only in the specified context.
+127 L<ditaConvertSimpleTableToTable|/ditaConvertSimpleTableToTable> - Convert a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> B<simpletable> to a B<table>.
 
-128 L<ditaListToSubSteps|/ditaListToSubSteps> - Change the specified B<$node> to B<substeps> and its contents to B<cmd\step> optionally only in the specified context.
+128 L<ditaConvertTopicToTask|/ditaConvertTopicToTask> - Convert a topic that is not already a task into a task
 
-129 L<ditaListToTable|/ditaListToTable> - Convert a list to a table in situ - as designed by MiM.
+129 L<ditaCouldConvertConceptToTask|/ditaCouldConvertConceptToTask> - Check whether a concept could be converted to a task
 
-130 L<ditaMaximumNumberOfEntriesInATGroupRow|/ditaMaximumNumberOfEntriesInATGroupRow> - Return the maximum number of entries in the rows of the specified B<$table> or B<undef> if not a table.
+130 L<ditaFixTGroupColSpec|/ditaFixTGroupColSpec> - Fix the colspec attribute and colspec nodes of the specified B<$tgroup>.
 
-131 L<ditaMergeLists|/ditaMergeLists> - Merge the specified B<$node> with the preceding or following list or steps or substeps if possible and return the specified B<$node> regardless.
+131 L<ditaListToChoices|/ditaListToChoices> - Change the specified B<$list> to B<choices>.
 
-132 L<ditaMergeListsOnce|/ditaMergeListsOnce> - Merge the specified B<$node> with the preceding or following list or steps or substeps if possible and return the specified B<$node> regardless.
+132 L<ditaListToSteps|/ditaListToSteps> - Change the specified B<$node> to B<steps> and its contents to B<cmd\step> optionally only in the specified context.
 
-133 L<ditaObviousChanges|/ditaObviousChanges> - Make obvious changes to a L<parse|/parse> tree to make it look more like L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
+133 L<ditaListToStepsUnordered|/ditaListToStepsUnordered> - Change the specified B<$node> to B<steps-unordered> and its contents to B<cmd\step> optionally only in the specified context.
 
-134 L<ditaParagraphToNote|/ditaParagraphToNote> - Convert all <p> nodes to <note> if the paragraph starts with 'Note:', optionally wrapping the content of the <note> with a <p>
+134 L<ditaListToSubSteps|/ditaListToSubSteps> - Change the specified B<$node> to B<substeps> and its contents to B<cmd\step> optionally only in the specified context.
 
-135 L<ditaPrettyPrintWithHeaders|/ditaPrettyPrintWithHeaders> - Add xml headers for the dita document type indicated by the specified L<parse|/parse> tree to a pretty print of the parse tree.
+135 L<ditaListToTable|/ditaListToTable> - Convert a list to a table in situ - as designed by MiM.
 
-136 L<ditaRemoveTGroupTrailingEmptyEntries|/ditaRemoveTGroupTrailingEmptyEntries> - Remove empty trailing entry
+136 L<ditaMaximumNumberOfEntriesInATGroupRow|/ditaMaximumNumberOfEntriesInATGroupRow> - Return the maximum number of entries in the rows of the specified B<$table> or B<undef> if not a table.
 
-137 L<ditaSampleBookMap|/ditaSampleBookMap> - Sample bookmap
+137 L<ditaMergeLists|/ditaMergeLists> - Merge the specified B<$node> with the preceding or following list or steps or substeps if possible and return the specified B<$node> regardless.
 
-138 L<ditaSampleConcept|/ditaSampleConcept> - Sample concept
+138 L<ditaMergeListsOnce|/ditaMergeListsOnce> - Merge the specified B<$node> with the preceding or following list or steps or substeps if possible and return the specified B<$node> regardless.
 
-139 L<ditaSampleTask|/ditaSampleTask> - Sample task
+139 L<ditaObviousChanges|/ditaObviousChanges> - Make obvious changes to a L<parse|/parse> tree to make it look more like L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
 
-140 L<ditaStepsToChoices|/ditaStepsToChoices> - Change the specified B<$node> to B<choices>.
+140 L<ditaParagraphToNote|/ditaParagraphToNote> - Convert all <p> nodes to <note> if the paragraph starts with 'Note:', optionally wrapping the content of the <note> with a <p>
 
-141 L<ditaStepsToList|/ditaStepsToList> - Change the specified B<$node> to a node with name B<$tag> or to B<ol> if B<$tag> is not supplied and its B<cmd\step> content to B<li> to create a list optionally only in the specified context.
+141 L<ditaPrettyPrintWithHeaders|/ditaPrettyPrintWithHeaders> - Add xml headers for the dita document type indicated by the specified L<parse|/parse> tree to a pretty print of the parse tree.
 
-142 L<ditaTGroupStatistics|/ditaTGroupStatistics> - Return statistics about the rows in a given table
+142 L<ditaRemoveTGroupTrailingEmptyEntries|/ditaRemoveTGroupTrailingEmptyEntries> - Remove empty trailing entry
 
-143 L<ditaTopicHeaders|/ditaTopicHeaders> - Add xml headers for the dita document type indicated by the specified L<parse|/parse> tree
+143 L<ditaSampleBookMap|/ditaSampleBookMap> - Sample bookmap
 
-144 L<ditaXrefs|/ditaXrefs> - Make obvious changes to all the B<xref>s found in a L<parse|/parse> tree to make them more useful in L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
+144 L<ditaSampleConcept|/ditaSampleConcept> - Sample concept
 
-145 L<divideDocumentIntoSections|/divideDocumentIntoSections> - Divide a L<parse|/parse> tree into sections by moving non B<section> tags into their corresponding B<section> so that the B<section> tags expand until they are contiguous.
+145 L<ditaSampleTask|/ditaSampleTask> - Sample task
 
-146 L<down|/down> - Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node.
+146 L<ditaStepsToChoices|/ditaStepsToChoices> - Change the specified B<$node> to B<choices>.
 
-147 L<downList|/downList> - Return a list of all the nodes at and below a specified B<$node> in pre-order or the empty list if the B<$node> is not in the optional B<@context>.
+147 L<ditaStepsToList|/ditaStepsToList> - Change the specified B<$node> to a node with name B<$tag> or to B<ol> if B<$tag> is not supplied and its B<cmd\step> content to B<li> to create a list optionally only in the specified context.
 
-148 L<downReverse|/downReverse> - Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node.
+148 L<ditaTGroupStatistics|/ditaTGroupStatistics> - Return statistics about the rows in a given table
 
-149 L<downReverseList|/downReverseList> - Return a list of all the nodes at and below a specified B<$node> in reverse pre-order or the empty list if the B<$node> is not in the optional B<@context>.
+149 L<ditaTopicHeaders|/ditaTopicHeaders> - Add xml headers for the dita document type indicated by the specified L<parse|/parse> tree
 
-150 L<downReverseX|/downReverseX> - Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node.
+150 L<ditaXrefs|/ditaXrefs> - Make obvious changes to all the B<xref>s found in a L<parse|/parse> tree to make them more useful in L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
 
-151 L<downWhileFirst|/downWhileFirst> - Move down from the specified B<$node> as long as each lower node is a first node.
+151 L<divideDocumentIntoSections|/divideDocumentIntoSections> - Divide a L<parse|/parse> tree into sections by moving non B<section> tags into their corresponding B<section> so that the B<section> tags expand until they are contiguous.
 
-152 L<downWhileHasSingleChild|/downWhileHasSingleChild> - Move down from the specified B<$node> as long as it has a single child else return undef.
+152 L<divideHtmlDocumentIntoSections|/divideHtmlDocumentIntoSections> - Divide a L<parse|/parse> tree representing an html document into sections based on the heading tags.
 
-153 L<downWhileLast|/downWhileLast> - Move down from the specified B<$node> as long as each lower node is a last node.
+153 L<down|/down> - Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node.
 
-154 L<downX|/downX> - Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>.
+154 L<downList|/downList> - Return a list of all the nodes at and below a specified B<$node> in pre-order or the empty list if the B<$node> is not in the optional B<@context>.
 
-155 L<downX2|/downX2> - Pre-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node.
+155 L<downReverse|/downReverse> - Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node.
 
-156 L<downX22|/downX22> - Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node.
+156 L<downReverseList|/downReverseList> - Return a list of all the nodes at and below a specified B<$node> in reverse pre-order or the empty list if the B<$node> is not in the optional B<@context>.
 
-157 L<equals|/equals> - Return the first node if the two L<parse|/parse> trees have identical representations via L<string|/string>, else B<undef>.
+157 L<downReverseX|/downReverseX> - Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node.
 
-158 L<equalsIgnoringAttributes|/equalsIgnoringAttributes> - Return the first node if the two L<parse|/parse> trees have identical representations via L<string|/string> if the specified attributes are ignored, else B<undef>.
+158 L<downToDie|/downToDie> - Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>.
 
-159 L<expandIncludes|/expandIncludes> - Expand the includes mentioned in a L<parse|/parse> tree: any tag that ends in B<include> is assumed to be an include directive.
+159 L<downToDie2|/downToDie2> - Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>.
 
-160 L<findByForestNumber|/findByForestNumber> - Find the node with the specified L<forest number|/forestNumberTrees> as made visible on the id attribute by L<prettyStringNumbered|/prettyStringNumbered> in the L<parse|/parse> tree containing the specified B<$node> and return the found node or B<undef> if no such node exists.
+160 L<downWhileFirst|/downWhileFirst> - Move down from the specified B<$node> as long as each lower node is a first node.
 
-161 L<findById|/findById> - Find a node in the parse tree under the specified B<$node> with the specified B<$id>.
+161 L<downWhileHasSingleChild|/downWhileHasSingleChild> - Move down from the specified B<$node> as long as it has a single child else return undef.
 
-162 L<findByNumber|/findByNumber> - Find the node with the specified number as made visible by L<prettyStringNumbered|/prettyStringNumbered> in the L<parse|/parse> tree containing the specified B<$node> and return the found node or B<undef> if no such node exists.
+162 L<downWhileLast|/downWhileLast> - Move down from the specified B<$node> as long as each lower node is a last node.
 
-163 L<findByNumbers|/findByNumbers> - Find the nodes with the specified numbers as made visible by L<prettyStringNumbered|/prettyStringNumbered> in the L<parse|/parse> tree containing the specified B<$node> and return the found nodes in a list with B<undef> for nodes that do not exist.
+163 L<downX|/downX> - Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>.
 
-164 L<findMatchingSubTrees|/findMatchingSubTrees> - Find nodes in the parse tree whose sub tree matches the specified B<$subTree> excluding any of the specified B<$attributes>.
+164 L<downX2|/downX2> - Pre-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node.
 
-165 L<first|/first> - Return the first node below the specified B<$node> optionally checking the first node's context.
+165 L<equals|/equals> - Return the first node if the two L<parse|/parse> trees have identical representations via L<string|/string>, else B<undef>.
 
-166 L<firstBy|/firstBy> - Return a list of the first instance of each specified tag encountered in a post-order traversal from the specified B<$node> or a hash of all first instances if no tags are specified.
+166 L<equalsIgnoringAttributes|/equalsIgnoringAttributes> - Return the first node if the two L<parse|/parse> trees have identical representations via L<string|/string> if the specified attributes are ignored, else B<undef>.
 
-167 L<firstContextOf|/firstContextOf> - Return the first node encountered in the specified context in a depth first post-order traversal of the L<parse|/parse> tree.
+167 L<expandIncludes|/expandIncludes> - Expand the includes mentioned in a L<parse|/parse> tree: any tag that ends in B<include> is assumed to be an include directive.
 
-168 L<firstDown|/firstDown> - Return a list of the first instance of each specified tag encountered in a pre-order traversal from the specified B<$node> or a hash of all first instances if no tags are specified.
+168 L<extendSectionToNextSection|/extendSectionToNextSection> - Extend a section tag until it meets the next section tag
 
-169 L<firstIn|/firstIn> - Return the first child node matching one of the named tags under the specified parent node.
+169 L<findByForestNumber|/findByForestNumber> - Find the node with the specified L<forest number|/forestNumberTrees> as made visible on the id attribute by L<prettyStringNumbered|/prettyStringNumbered> in the L<parse|/parse> tree containing the specified B<$node> and return the found node or B<undef> if no such node exists.
 
-170 L<firstInIndex|/firstInIndex> - Return the specified B<$node> if it is first in its index and optionally L<at|/at> the specified context else B<undef>
+170 L<findById|/findById> - Find a node in the parse tree under the specified B<$node> with the specified B<$id>.
 
-171 L<firstn|/firstn> - Return the B<$n>'th first node below the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+171 L<findByNumber|/findByNumber> - Find the node with the specified number as made visible by L<prettyStringNumbered|/prettyStringNumbered> in the L<parse|/parse> tree containing the specified B<$node> and return the found node or B<undef> if no such node exists.
 
-172 L<firstNot|/firstNot> - Return the first child node that does not match any of the named B<@tags> under the specified parent B<$node>.
+172 L<findByNumbers|/findByNumbers> - Find the nodes with the specified numbers as made visible by L<prettyStringNumbered|/prettyStringNumbered> in the L<parse|/parse> tree containing the specified B<$node> and return the found nodes in a list with B<undef> for nodes that do not exist.
 
-173 L<firstOf|/firstOf> - Return an array of the nodes that are continuously first under their specified parent node and that match the specified list of tags.
+173 L<findMatchingSubTrees|/findMatchingSubTrees> - Find nodes in the parse tree whose sub tree matches the specified B<$subTree> excluding any of the specified B<$attributes>.
 
-174 L<firstSibling|/firstSibling> - Return the first sibling of the specified B<$node> in the optional B<@context> else B<undef>
+174 L<first|/first> - Return the first node below the specified B<$node> optionally checking the first node's context.
 
-175 L<firstText|/firstText> - Return the first node under the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
+175 L<firstBy|/firstBy> - Return a list of the first instance of each specified tag encountered in a post-order traversal from the specified B<$node> or a hash of all first instances if no tags are specified.
 
-176 L<firstTextMatches|/firstTextMatches> - Return the first node under the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
+176 L<firstContextOf|/firstContextOf> - Return the first node encountered in the specified context in a depth first post-order traversal of the L<parse|/parse> tree.
 
-177 L<firstUntil|/firstUntil> - Go first from the specified B<$node> and continue deeper firstly until a first child node matches the specified B<@context> or return B<undef> if there is no such node.
+177 L<firstDown|/firstDown> - Return a list of the first instance of each specified tag encountered in a pre-order traversal from the specified B<$node> or a hash of all first instances if no tags are specified.
 
-178 L<firstUntilText|/firstUntilText> - Go first from the specified B<$node> and continue deeper firstly until a text node is encountered whose parent matches the specified B<@context> or return B<undef> if there is no such node.
+178 L<firstIn|/firstIn> - Return the first child node matching one of the named tags under the specified parent node.
 
-179 L<firstWhile|/firstWhile> - Go first from the specified B<$node> and continue deeper firstly as long as each first child node matches one of the specified B<@tags>.
+179 L<firstInIndex|/firstInIndex> - Return the specified B<$node> if it is first in its index and optionally L<at|/at> the specified context else B<undef>
 
-180 L<fixEntryColSpan|/fixEntryColSpan> - Fix the colspan on an entry assumed to be under row, tbody, tgroup with @cols and colspecs' set
+180 L<firstn|/firstn> - Return the B<$n>'th first node below the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
-181 L<fixEntryRowSpan|/fixEntryRowSpan> - Fix the rowspan on an entry
+181 L<firstNot|/firstNot> - Return the first child node that does not match any of the named B<@tags> under the specified parent B<$node>.
 
-182 L<fixTable|/fixTable> - Fix the specified B<$table> so that each row has the same number of entries with this number reflected in the tgroup.
+182 L<firstOf|/firstOf> - Return an array of the nodes that are continuously first under their specified parent node and that match the specified list of tags.
 
-183 L<fixTGroup|/fixTGroup> - Fix the specified B<$tgroup> so that each row has the same number of entries with this number reflected in the tgroup.
+183 L<firstSibling|/firstSibling> - Return the first sibling of the specified B<$node> in the optional B<@context> else B<undef>
 
-184 L<forestNumberTrees|/forestNumberTrees> - Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source.
+184 L<firstText|/firstText> - Return the first node under the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
 
-185 L<formatOxygenMessage|/formatOxygenMessage> - Write an error message in Oxygen format
+185 L<firstTextMatches|/firstTextMatches> - Return the first node under the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
 
-186 L<from|/from> - Return a list consisting of the specified node and its following siblings optionally including only those nodes that match one of the tags in the specified list.
+186 L<firstUntil|/firstUntil> - Go first from the specified B<$node> and continue deeper firstly until a first child node matches the specified B<@context> or return B<undef> if there is no such node.
 
-187 L<fromTo|/fromTo> - Return a list of the nodes between the specified start and end nodes optionally including only those nodes that match one of the tags in the specified list.
+187 L<firstUntilText|/firstUntilText> - Go first from the specified B<$node> and continue deeper firstly until a text node is encountered whose parent matches the specified B<@context> or return B<undef> if there is no such node.
 
-188 L<getAttrs|/getAttrs> - Return a sorted list of all the attributes on the specified B<$node>.
+188 L<firstWhile|/firstWhile> - Go first from the specified B<$node> and continue deeper firstly as long as each first child node matches one of the specified B<@tags>.
 
-189 L<getLabels|/getLabels> - Return the names of all the labels set on a node.
+189 L<fixEntryColSpan|/fixEntryColSpan> - Fix the colspan on an entry assumed to be under row, tbody, tgroup with @cols and colspecs' set
 
-190 L<getSectionHeadingLevel|/getSectionHeadingLevel> - Get the heading level from a section tag.
+190 L<fixEntryRowSpan|/fixEntryRowSpan> - Fix the rowspan on an entry
 
-191 L<giveEveryIdAGuid|/giveEveryIdAGuid> - Give a guid to every node in the specified B<$tree> that has an id attribute, saving any existing id attribute as a label, and return the count of the number of such replacements made.
+191 L<fixTable|/fixTable> - Fix the specified B<$table> so that each row has the same number of entries with this number reflected in the tgroup.
 
-192 L<go|/go> - Return the node reached from the specified B<$node> via the specified L<path|/path>: (index positionB<?>)B<*> where index is the tag of the next node to be chosen and position is the optional zero based position within the index of those tags under the current node.
+192 L<fixTGroup|/fixTGroup> - Fix the specified B<$tgroup> so that each row has the same number of entries with this number reflected in the tgroup.
 
-193 L<goFish|/goFish> - A debug version of L<go|/go> that returns additional information explaining any failure to reach the node identified by the L<path|/path>.
+193 L<forestNumberTrees|/forestNumberTrees> - Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source.
 
-194 L<hasSingleChild|/hasSingleChild> - Return the only child of the specified B<$node> if the child is the only node under its parent ignoring any surrounding blank text and has the optional specified context, else return B<undef>.
+194 L<formatOxygenMessage|/formatOxygenMessage> - Write an error message in Oxygen format
 
-195 L<hasSingleChildText|/hasSingleChildText> - Return the only child of the specified B<$node> if the child is a text node and the child is the only node under its parent ignoring any surrounding blank text and the child has the optional specified context, else return B<undef>.
+195 L<from|/from> - Return a list consisting of the specified node and its following siblings optionally including only those nodes that match one of the tags in the specified list.
 
-196 L<hasSingleChildToDepth|/hasSingleChildToDepth> - Return the specified B<$node> if it has single children to at least the specified depth else return B<undef>.
+196 L<fromTo|/fromTo> - Return a list of the nodes between the specified start and end nodes optionally including only those nodes that match one of the tags in the specified list.
 
-197 L<height|/height> - Returns the height of the tree rooted at the specified B<$node>.
+197 L<getAttrs|/getAttrs> - Return a sorted list of all the attributes on the specified B<$node>.
 
-198 L<howFar|/howFar> - Return how far the first node is from the second node along a path through their common ancestor.
+198 L<getLabels|/getLabels> - Return the names of all the labels set on a node.
 
-199 L<howFarAbove|/howFarAbove> - Return how far the first node is  L<above|/above> the second node is or B<0> if the first node is not strictly L<above|/above> the second node.
+199 L<getSectionHeadingLevel|/getSectionHeadingLevel> - Get the heading level from a section tag.
 
-200 L<howFarBelow|/howFarBelow> - Return how far the first node is  L<below|/below> the second node is or B<0> if the first node is not strictly L<below|/below> the second node.
+200 L<giveEveryIdAGuid|/giveEveryIdAGuid> - Give a guid to every node in the specified B<$tree> that has an id attribute, saving any existing id attribute as a label, and return the count of the number of such replacements made.
 
-201 L<howFirst|/howFirst> - Return the depth to which the specified B<$node> is L<first|/isFirst> else B<0>.
+201 L<go|/go> - Return the node reached from the specified B<$node> via the specified L<path|/path>: (index positionB<?>)B<*> where index is the tag of the next node to be chosen and position is the optional zero based position within the index of those tags under the current node.
 
-202 L<howLast|/howLast> - Return the depth to which the specified B<$node> is L<last|/isLast> else B<0>.
+202 L<goFish|/goFish> - A debug version of L<go|/go> that returns additional information explaining any failure to reach the node identified by the L<path|/path>.
 
-203 L<howOnlyChild|/howOnlyChild> - Return the depth to which the specified B<$node> is an L<only child|/isOnlyChild> else B<0>.
+203 L<hasSingleChild|/hasSingleChild> - Return the only child of the specified B<$node> if the child is the only node under its parent ignoring any surrounding blank text and has the optional specified context, else return B<undef>.
 
-204 L<htmlHeadersToSections|/htmlHeadersToSections> - Position sections just before html header tags so that subsequently the document can be divided into L<sections|/divideDocumentIntoSections>.
+204 L<hasSingleChildText|/hasSingleChildText> - Return the only child of the specified B<$node> if the child is a text node and the child is the only node under its parent ignoring any surrounding blank text and the child has the optional specified context, else return B<undef>.
 
-205 L<htmlTables|/htmlTables> - Return a string of html representing a L<parse|/parse> tree.
+205 L<hasSingleChildToDepth|/hasSingleChildToDepth> - Return the specified B<$node> if it has single children to at least the specified depth else return B<undef>.
 
-206 L<htmlTableToDita|/htmlTableToDita> - Convert an L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> table.
+206 L<height|/height> - Returns the height of the tree rooted at the specified B<$node>.
 
-207 L<index|/index> - Return the index of the specified B<$node> in its parent index.
+207 L<howFar|/howFar> - Return how far the first node is from the second node along a path through their common ancestor.
 
-208 L<indexIds|/indexIds> - Return a map of the ids at and below the specified B<$node>.
+208 L<howFarAbove|/howFarAbove> - Return how far the first node is  L<above|/above> the second node is or B<0> if the first node is not strictly L<above|/above> the second node.
 
-209 L<indexNode|/indexNode> - Merge multiple text segments and set parent and parser after changes to a node
+209 L<howFarBelow|/howFarBelow> - Return how far the first node is  L<below|/below> the second node is or B<0> if the first node is not strictly L<below|/below> the second node.
 
-210 L<invert|/invert> - Swap a parent and child node where the child is the only child of the parent and return the parent.
+210 L<howFirst|/howFirst> - Return the depth to which the specified B<$node> is L<first|/isFirst> else B<0>.
 
-211 L<invertFirst|/invertFirst> - Swap a parent and child node where the child is the first child of the parent by placing the parent last in the child.
+211 L<howLast|/howLast> - Return the depth to which the specified B<$node> is L<last|/isLast> else B<0>.
 
-212 L<invertLast|/invertLast> - Swap a parent and child node where the child is the last child of the parent by placing the parent first in the child.
+212 L<howOnlyChild|/howOnlyChild> - Return the depth to which the specified B<$node> is an L<only child|/isOnlyChild> else B<0>.
 
-213 L<isAllBlankText|/isAllBlankText> - Return the specified B<$node> if the specified B<$node>, optionally in the specified context, does not contain anything or if it does contain something it is all white space else return B<undef>.
+213 L<htmlHeadersToSections|/htmlHeadersToSections> - Position sections just before html header tags so that subsequently the document can be divided into L<sections|/divideDocumentIntoSections>.
 
-214 L<isBlankText|/isBlankText> - Return the specified B<$node> if the specified B<$node> is a text node, optionally in the specified context, and contains nothing other than white space else return B<undef>.
+214 L<htmlTables|/htmlTables> - Return a string of html representing a L<parse|/parse> tree.
 
-215 L<isEmpty|/isEmpty> - Confirm that the specified B<$node> is empty, that is: the specified B<$node> has no content, not even a blank string of text.
+215 L<htmlTableToDita|/htmlTableToDita> - Convert an L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> table.
 
-216 L<isFirst|/isFirst> - Return the specified B<$node> if it is first under its parent and optionally has the specified context, else return B<undef>
+216 L<index|/index> - Return the index of the specified B<$node> in its parent index.
 
-217 L<isFirstText|/isFirstText> - Return the specified B<$node> if the specified B<$node> is a text node, the first node under its parent and that the parent is optionally in the specified context, else return B<undef>.
+217 L<indexIds|/indexIds> - Return a map of the ids at and below the specified B<$node>.
 
-218 L<isFirstToDepth|/isFirstToDepth> - Return the specified B<$node> if it is first to the specified depth else return B<undef>
+218 L<indexNode|/indexNode> - Merge multiple text segments and set parent and parser after changes to a node
 
-219 L<isLast|/isLast> - Return the specified B<$node> if it is last under its parent and optionally has the specified context, else return B<undef>
+219 L<invert|/invert> - Swap a parent and child node where the child is the only child of the parent and return the parent.
 
-220 L<isLastText|/isLastText> - Return the specified B<$node> if the specified B<$node> is a text node, the last node under its parent and that the parent is optionally in the specified context, else return B<undef>.
+220 L<invertFirst|/invertFirst> - Swap a parent and child node where the child is the first child of the parent by placing the parent last in the child.
 
-221 L<isLastToDepth|/isLastToDepth> - Return the specified B<$node> if it is last to the specified depth else return B<undef>
+221 L<invertLast|/invertLast> - Swap a parent and child node where the child is the last child of the parent by placing the parent first in the child.
 
-222 L<isOnlyChild|/isOnlyChild> - Return the specified B<$node> if it is the only node under its parent ignoring any surrounding blank text.
+222 L<isAllBlankText|/isAllBlankText> - Return the specified B<$node> if the specified B<$node>, optionally in the specified context, does not contain anything or if it does contain something it is all white space else return B<undef>.
 
-223 L<isOnlyChildBlankText|/isOnlyChildBlankText> - Return the specified B<$node> if it is a blank text node and an only child else return B<undef>.
+223 L<isBlankText|/isBlankText> - Return the specified B<$node> if the specified B<$node> is a text node, optionally in the specified context, and contains nothing other than white space else return B<undef>.
 
-224 L<isOnlyChildText|/isOnlyChildText> - Return the specified B<$node> if it is a text node and it is an only child else and its parent is in the specified optional context else return B<undef>.
+224 L<isEmpty|/isEmpty> - Confirm that the specified B<$node> is empty, that is: the specified B<$node> has no content, not even a blank string of text.
 
-225 L<isOnlyChildToDepth|/isOnlyChildToDepth> - Return the specified B<$node> if it and its ancestors are L<only children|/isOnlyChild> to the specified depth else return B<undef>.
+225 L<isFirst|/isFirst> - Return the specified B<$node> if it is first under its parent and optionally has the specified context, else return B<undef>
 
-226 L<isText|/isText> - Return the specified B<$node> if the specified B<$node> is a text node, optionally in the specified context, else return B<undef>.
+226 L<isFirstText|/isFirstText> - Return the specified B<$node> if the specified B<$node> is a text node, the first node under its parent and that the parent is optionally in the specified context, else return B<undef>.
 
-227 L<jsonString|/jsonString> - Return a Json representation of a parse tree
+227 L<isFirstToDepth|/isFirstToDepth> - Return the specified B<$node> if it is first to the specified depth else return B<undef>
 
-228 L<jsonString2|/jsonString2> - Return a Json representation of a parse tree
+228 L<isLast|/isLast> - Return the specified B<$node> if it is last under its parent and optionally has the specified context, else return B<undef>
 
-229 L<jsonToXml|/jsonToXml> - Convert a json string representing an xml parse tree into an xml parse tree
+229 L<isLastText|/isLastText> - Return the specified B<$node> if the specified B<$node> is a text node, the last node under its parent and that the parent is optionally in the specified context, else return B<undef>.
 
-230 L<jsonToXml2|/jsonToXml2> - Convert a json string to an xml parse tree
+230 L<isLastToDepth|/isLastToDepth> - Return the specified B<$node> if it is last to the specified depth else return B<undef>
 
-231 L<labelsInTree|/labelsInTree> - Return a hash of all the labels in a tree
+231 L<isOnlyChild|/isOnlyChild> - Return the specified B<$node> if it is the only node under its parent ignoring any surrounding blank text.
 
-232 L<last|/last> - Return the last node below the specified B<$node> optionally checking the last node's context.
+232 L<isOnlyChildBlankText|/isOnlyChildBlankText> - Return the specified B<$node> if it is a blank text node and an only child else return B<undef>.
 
-233 L<lastBy|/lastBy> - Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified B<$node> or a hash of all last instances if no tags are specified.
+233 L<isOnlyChildText|/isOnlyChildText> - Return the specified B<$node> if it is a text node and it is an only child else and its parent is in the specified optional context else return B<undef>.
 
-234 L<lastContextOf|/lastContextOf> - Return the last node encountered in the specified context in a depth first reverse pre-order traversal of the L<parse|/parse> tree.
+234 L<isOnlyChildToDepth|/isOnlyChildToDepth> - Return the specified B<$node> if it and its ancestors are L<only children|/isOnlyChild> to the specified depth else return B<undef>.
 
-235 L<lastDown|/lastDown> - Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified B<$node> or a hash of all last instances if no tags are specified.
+235 L<isText|/isText> - Return the specified B<$node> if the specified B<$node> is a text node, optionally in the specified context, else return B<undef>.
 
-236 L<lastIn|/lastIn> - Return the last child node matching one of the named tags under the specified parent node.
+236 L<jsonString|/jsonString> - Return a Json representation of a parse tree
 
-237 L<lastInIndex|/lastInIndex> - Return the specified B<$node> if it is last in its index and optionally L<at|/at> the specified context else B<undef>
+237 L<jsonString2|/jsonString2> - Return a Json representation of a parse tree
 
-238 L<lastn|/lastn> - Return the B<$n>'th last node below the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+238 L<jsonToXml|/jsonToXml> - Convert a json string representing an xml parse tree into an xml parse tree
 
-239 L<lastNot|/lastNot> - Return the last child node that does not match any of the named B<@tags> under the specified parent B<$node>.
+239 L<jsonToXml2|/jsonToXml2> - Convert a json string to an xml parse tree
 
-240 L<lastOf|/lastOf> - Return an array of the nodes that are continuously last under their specified parent node and that match the specified list of tags.
+240 L<labelsInTree|/labelsInTree> - Return a hash of all the labels in a tree
 
-241 L<lastSibling|/lastSibling> - Return the last sibling of the specified B<$node> in the optional B<@context> else B<undef>
+241 L<last|/last> - Return the last node below the specified B<$node> optionally checking the last node's context.
 
-242 L<lastText|/lastText> - Return the last node under the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
+242 L<lastBy|/lastBy> - Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified B<$node> or a hash of all last instances if no tags are specified.
 
-243 L<lastTextMatches|/lastTextMatches> - Return the last node under the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
+243 L<lastContextOf|/lastContextOf> - Return the last node encountered in the specified context in a depth first reverse pre-order traversal of the L<parse|/parse> tree.
 
-244 L<lastUntil|/lastUntil> - Go last from the specified B<$node> and continue deeper lastly until a last child node matches the specified B<@context> or return B<undef> if there is no such node.
+244 L<lastDown|/lastDown> - Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified B<$node> or a hash of all last instances if no tags are specified.
 
-245 L<lastUntilText|/lastUntilText> - Go last from the specified B<$node> and continue deeper lastly until a last child text node matches the specified B<@context> or return B<undef> if there is no such node.
+245 L<lastIn|/lastIn> - Return the last child node matching one of the named tags under the specified parent node.
 
-246 L<lastWhile|/lastWhile> - Go last from the specified B<$node> and continue deeper lastly as long as each last child node matches one of the specified B<@tags>.
+246 L<lastInIndex|/lastInIndex> - Return the specified B<$node> if it is last in its index and optionally L<at|/at> the specified context else B<undef>
 
-247 L<lineLocation|/lineLocation> - Return the line number.
+247 L<lastn|/lastn> - Return the B<$n>'th last node below the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
-248 L<listConditions|/listConditions> - Return a list of conditions applied to a node.
+248 L<lastNot|/lastNot> - Return the last child node that does not match any of the named B<@tags> under the specified parent B<$node>.
 
-249 L<location|/location> - Return the line number.
+249 L<lastOf|/lastOf> - Return an array of the nodes that are continuously last under their specified parent node and that match the specified list of tags.
 
-250 L<matchAfter|/matchAfter> - Confirm that the string representing the tags following the specified B<$node> matches a regular expression where each pair of tags is separated by a single space.
+250 L<lastSibling|/lastSibling> - Return the last sibling of the specified B<$node> in the optional B<@context> else B<undef>
 
-251 L<matchAfter2|/matchAfter2> - Confirm that the string representing the tags following the specified B<$node> matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.
+251 L<lastText|/lastText> - Return the last node under the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
 
-252 L<matchBefore|/matchBefore> - Confirm that the string representing the tags preceding the specified B<$node> matches a regular expression where each pair of tags is separated by a single space.
+252 L<lastTextMatches|/lastTextMatches> - Return the last node under the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
 
-253 L<matchBefore2|/matchBefore2> - Confirm that the string representing the tags preceding the specified B<$node> matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.
+253 L<lastUntil|/lastUntil> - Go last from the specified B<$node> and continue deeper lastly until a last child node matches the specified B<@context> or return B<undef> if there is no such node.
 
-254 L<matchesNextTags|/matchesNextTags> - Return the specified b<$node> if the siblings following the specified B<$node> L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
+254 L<lastUntilText|/lastUntilText> - Go last from the specified B<$node> and continue deeper lastly until a last child text node matches the specified B<@context> or return B<undef> if there is no such node.
 
-255 L<matchesNode|/matchesNode> - Return the B<$first> node if it matches the B<$second> node's tag and the specified B<@attributes> else return B<undef>.
+255 L<lastWhile|/lastWhile> - Go last from the specified B<$node> and continue deeper lastly as long as each last child node matches one of the specified B<@tags>.
 
-256 L<matchesPrevTags|/matchesPrevTags> - Return the specified b<$node> if the siblings prior to the specified B<$node> L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
+256 L<lineLocation|/lineLocation> - Return the line number.
 
-257 L<matchesSubTree|/matchesSubTree> - Return the B<$first> node if it L<matches|/matchesNode> the B<$second> node and the nodes under the first node match the corresponding nodes under the second node, else return B<undef>.
+257 L<listConditions|/listConditions> - Return a list of conditions applied to a node.
 
-258 L<matchesText|/matchesText> - Returns an array of regular expression matches in the text of the specified B<$node> if it is text node and it matches the specified regular expression and optionally has the specified context otherwise returns an empty array.
+258 L<location|/location> - Return the line number.
 
-259 L<matchNodesByRepresentation|/matchNodesByRepresentation> - Creates a hash of arrays of nodes that have the same representation in the specified B<$tree>.
+259 L<matchAfter|/matchAfter> - Confirm that the string representing the tags following the specified B<$node> matches a regular expression where each pair of tags is separated by a single space.
 
-260 L<matchTree|/matchTree> - Return a list of nodes that match the specified tree of match expressions, else B<()> if one or more match expressions fail to match nodes in the tree below the specified start node.
+260 L<matchAfter2|/matchAfter2> - Confirm that the string representing the tags following the specified B<$node> matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.
 
-261 L<mergeDuplicateChildWithParent|/mergeDuplicateChildWithParent> - Merge a parent node with its only child if their tags are the same and their attributes do not collide other than possibly the id in which case the parent id is used.
+261 L<matchBefore|/matchBefore> - Confirm that the string representing the tags preceding the specified B<$node> matches a regular expression where each pair of tags is separated by a single space.
 
-262 L<mergeLikeElements|/mergeLikeElements> - Merge two of the same elements into one, retaining the order of any children.
+262 L<matchBefore2|/matchBefore2> - Confirm that the string representing the tags preceding the specified B<$node> matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.
 
-263 L<mergeLikeNext|/mergeLikeNext> - Merge a B<$node> in an optional context with the next node if the two have the same tag by placing the next node first in the current B<$node> and unwrapping the next node.
+263 L<matchesNextTags|/matchesNextTags> - Return the specified b<$node> if the siblings following the specified B<$node> L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
 
-264 L<mergeLikePrev|/mergeLikePrev> - Merge a B<$node> in an optional context with the previous node if the two have the same tag by placing the previous node first in the current B<$node> and unwrapping the previous node.
+264 L<matchesNode|/matchesNode> - Return the B<$first> node if it matches the B<$second> node's tag and the specified B<@attributes> else return B<undef>.
 
-265 L<moveAttrs|/moveAttrs> - Move all the attributes of the source node to the target node, or, just the named attributes if the optional list of attributes to move is supplied, overwriting any existing attributes in the target node and return the source node.
+265 L<matchesPrevTags|/matchesPrevTags> - Return the specified b<$node> if the siblings prior to the specified B<$node> L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
 
-266 L<moveEndAfter|/moveEndAfter> - Move the end of a B<$node> to just after the specified B<$target> node assuming that the B<$target> node is either a subsequent sibling or a child of B<$node>.
+266 L<matchesSubTree|/matchesSubTree> - Return the B<$first> node if it L<matches|/matchesNode> the B<$second> node and the nodes under the first node match the corresponding nodes under the second node, else return B<undef>.
 
-267 L<moveEndBefore|/moveEndBefore> - Move the end of a B<$node> to just before the specified B<$target> node assuming that the B<$target> node is either a subsequent sibling or a child of B<$node>.
+267 L<matchesText|/matchesText> - Returns an array of regular expression matches in the text of the specified B<$node> if it is text node and it matches the specified regular expression and optionally has the specified context otherwise returns an empty array.
 
-268 L<moveEndLast|/moveEndLast> - Move the end of a B<$node> to contain all of its following siblings as children.
+268 L<matchNodesByRepresentation|/matchNodesByRepresentation> - Creates a hash of arrays of nodes that have the same representation in the specified B<$tree>.
 
-269 L<moveLabels|/moveLabels> - Move all the labels from the source node to the target node and return the source node.
+269 L<matchTree|/matchTree> - Return a list of nodes that match the specified tree of match expressions, else B<()> if one or more match expressions fail to match nodes in the tree below the specified start node.
 
-270 L<moveNewAttrs|/moveNewAttrs> - Move all the attributes of the source node to the target node, or, just the named attributes if the optional list of attributes to copy is supplied, without overwriting any existing attributes in the target node and return the source node.
+270 L<mergeDuplicateChildWithParent|/mergeDuplicateChildWithParent> - Merge a parent node with its only child if their tags are the same and their attributes do not collide other than possibly the id in which case the parent id is used.
 
-271 L<moveStartAfter|/moveStartAfter> - Move the start end of a B<$node> to just after the specified B<$target> node assuming that the B<$target> node is either a preceding sibling or a child of B<$node>.
+271 L<mergeLikeElements|/mergeLikeElements> - Merge two of the same elements into one, retaining the order of any children.
 
-272 L<moveStartBefore|/moveStartBefore> - Move the start of a B<$node> to just before the specified B<$target> node assuming that the B<$target> node is either a preceding sibling or a child of B<$node>.
+272 L<mergeLikeNext|/mergeLikeNext> - Merge a B<$node> in an optional context with the next node if the two have the same tag by placing the next node first in the current B<$node> and unwrapping the next node.
 
-273 L<moveStartFirst|/moveStartFirst> - Move the start of a B<$node> to contain all of its preceding siblings as children.
+273 L<mergeLikePrev|/mergeLikePrev> - Merge a B<$node> in an optional context with the previous node if the two have the same tag by placing the previous node first in the current B<$node> and unwrapping the previous node.
 
-274 L<new|/new> - Create a new parse tree - call this method statically as in Data::Edit::Xml::new(file or string) to parse a file or string B<or> with no parameters and then use L</input>, L</inputFile>, L</inputString>, L</errorFile>  to provide specific parameters for the parse, then call L</parse> to perform the parse and return the parse tree.
+274 L<moveAttrs|/moveAttrs> - Move all the attributes of the source node to the target node, or, just the named attributes if the optional list of attributes to move is supplied, overwriting any existing attributes in the target node and return the source node.
 
-275 L<newTag|/newTag> - Create a new non text node.
+275 L<moveBlockAfter|/moveBlockAfter> - Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> after the specified B<$after> node.
 
-276 L<newText|/newText> - Create a new text node.
+276 L<moveBlockBefore|/moveBlockBefore> - Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> before the specified B<$after> node.
 
-277 L<newTree|/newTree> - Create a new tree.
+277 L<moveBlockFirst|/moveBlockFirst> - Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> first under the specified B<$parent> node.
 
-278 L<next|/next> - Return the node next to the specified B<$node>, optionally checking the next node's context.
+278 L<moveBlockFromFirstAfter|/moveBlockFromFirstAfter> - Move the block of siblings starting with B<$node> in the optional context after the specified B<$after> node.
 
-279 L<nextIn|/nextIn> - Return the nearest sibling after the specified B<$node> that matches one of the named tags or B<undef> if there is no such sibling node.
+279 L<moveBlockFromFirstBefore|/moveBlockFromFirstBefore> - Move the block of siblings starting with B<$node> in the optional context before the specified B<$after> node.
 
-280 L<nextn|/nextn> - Return the B<$n>'th next node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+280 L<moveBlockFromFirstFirst|/moveBlockFromFirstFirst> - Move the siblings starting with B<$node> in the optional context first under the specified B<$parent> node.
 
-281 L<nextOn|/nextOn> - Step forwards as far as possible from the specified B<$node> while remaining on nodes with the specified tags.
+281 L<moveBlockFromFirstLast|/moveBlockFromFirstLast> - Move the block of siblings starting with B<$node> in the optional context last under the specified B<$parent> node.
 
-282 L<nextText|/nextText> - Return the node after the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
+282 L<moveBlockLast|/moveBlockLast> - Move the block of siblings starting with B<$node> in the optional context and ending with B<$end> last under the specified B<$parent> node.
 
-283 L<nextTextMatches|/nextTextMatches> - Return the next node to the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
+283 L<moveBlockToLastAfter|/moveBlockToLastAfter> - Move the block of siblings starting with B<$node> in the optional context after the specified B<$after> node.
 
-284 L<nextUntil|/nextUntil> - Go to the next sibling of the specified B<$node> and continue forwards until the tag of a sibling node matches one of the specified B<@tags>.
+284 L<moveBlockToLastBefore|/moveBlockToLastBefore> - Move the block of siblings starting with B<$node> in the optional context before the specified B<$after> node.
 
-285 L<nextWhile|/nextWhile> - Go to the next sibling of the specified B<$node> and continue forwards while the tag of each sibling node matches one of the specified B<@tags>.
+285 L<moveBlockToLastFirst|/moveBlockToLastFirst> - Move the siblings starting with B<$node> in the optional context first under the specified B<$parent> node.
 
-286 L<nn|/nn> - Replace new lines in a string with N to make testing easier.
+286 L<moveBlockToLastLast|/moveBlockToLastLast> - Move the block of siblings starting with B<$node> in the optional context last under the specified B<$parent> node.
 
-287 L<normalizeWhiteSpace|/normalizeWhiteSpace> - Normalize white space, remove comments DOCTYPE and xml processors from a string
+287 L<moveEndAfter|/moveEndAfter> - Move the end of a B<$node> to just after the specified B<$target> node assuming that the B<$target> node is either a subsequent sibling or a child of B<$node>.
 
-288 L<not|/not> - Return the specified B<$node> if it does not match any of the specified tags, else B<undef>
+288 L<moveEndBefore|/moveEndBefore> - Move the end of a B<$node> to just before the specified B<$target> node assuming that the B<$target> node is either a subsequent sibling or a child of B<$node>.
 
-289 L<numberNode|/numberNode> - Ensure that the specified B<$node> has a number.
+289 L<moveEndLast|/moveEndLast> - Move the end of a B<$node> to contain all of its following siblings as children.
 
-290 L<numberTree|/numberTree> - Number the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source.
+290 L<moveLabels|/moveLabels> - Move all the labels from the source node to the target node and return the source node.
 
-291 L<numberTreesJustIds|/numberTreesJustIds> - Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source.
+291 L<moveNewAttrs|/moveNewAttrs> - Move all the attributes of the source node to the target node, or, just the named attributes if the optional list of attributes to copy is supplied, without overwriting any existing attributes in the target node and return the source node.
 
-292 L<opAt|/opAt> - <= : Check that a node is in the context specified by the referenced array of words.
+292 L<moveStartAfter|/moveStartAfter> - Move the start end of a B<$node> to just after the specified B<$target> node assuming that the B<$target> node is either a preceding sibling or a child of B<$node>.
 
-293 L<opAttr|/opAttr> - % : Get the value of an attribute of the specified B<$node>.
+293 L<moveStartBefore|/moveStartBefore> - Move the start of a B<$node> to just before the specified B<$target> node assuming that the B<$target> node is either a preceding sibling or a child of B<$node>.
 
-294 L<opBy|/opBy> - x= : Traverse a L<parse|/parse> tree in post-order.
+294 L<moveStartFirst|/moveStartFirst> - Move the start of a B<$node> to contain all of its preceding siblings as children.
 
-295 L<opContents|/opContents> - @{} : nodes immediately below a node.
+295 L<new|/new> - Create a new parse tree - call this method statically as in Data::Edit::Xml::new(file or string) to parse a file or string B<or> with no parameters and then use L</input>, L</inputFile>, L</inputString>, L</errorFile>  to provide specific parameters for the parse, then call L</parse> to perform the parse and return the parse tree.
 
-296 L<opCut|/opCut> - -- : Cut out a node.
+296 L<newTag|/newTag> - Create a new non text node.
 
-297 L<opGo|/opGo> - >= : Search for a node via a specification provided as a reference to an array of words each number.
+297 L<newText|/newText> - Create a new text node.
 
-298 L<opNew|/opNew> - ** : create a new node from the text on the right hand side: if the text contains a non word character \W the node will be create as text, else it will be created as a tag
+298 L<newTree|/newTree> - Create a new tree.
 
-299 L<opPutFirst|/opPutFirst> - >> : put a node or string first under a node and return the new node.
+299 L<next|/next> - Return the node next to the specified B<$node>, optionally checking the next node's context.
 
-300 L<opPutFirstAssign|/opPutFirstAssign> - >>= : put a node or string first under a node.
+300 L<nextIn|/nextIn> - Return the nearest sibling after the specified B<$node> that matches one of the named tags or B<undef> if there is no such sibling node.
 
-301 L<opPutLast|/opPutLast> - << : put a node or string last under a node and return the new node.
+301 L<nextn|/nextn> - Return the B<$n>'th next node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
-302 L<opPutLastAssign|/opPutLastAssign> - <<= : put a node or string last under a node.
+302 L<nextOn|/nextOn> - Step forwards as far as possible from the specified B<$node> while remaining on nodes with the specified tags.
 
-303 L<opPutNext|/opPutNext> - > + : put a node or string after the specified B<$node> and return the new node.
+303 L<nextText|/nextText> - Return the node after the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
 
-304 L<opPutNextAssign|/opPutNextAssign> - += : put a node or string after the specified B<$node>.
+304 L<nextTextMatches|/nextTextMatches> - Return the next node to the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
 
-305 L<opPutPrev|/opPutPrev> - < - : put a node or string before the specified B<$node> and return the new node.
+305 L<nextUntil|/nextUntil> - Go to the next sibling of the specified B<$node> and continue forwards until the tag of a sibling node matches one of the specified B<@tags>.
 
-306 L<opPutPrevAssign|/opPutPrevAssign> - -= : put a node or string before the specified B<$node>,
+306 L<nextWhile|/nextWhile> - Go to the next sibling of the specified B<$node> and continue forwards while the tag of each sibling node matches one of the specified B<@tags>.
 
-307 L<opString|/opString> - -B: L<bitsNodeTextBlank|/bitsNodeTextBlank>
+307 L<nn|/nn> - Replace new lines in a string with N to make testing easier.
+
+308 L<normalizeWhiteSpace|/normalizeWhiteSpace> - Normalize white space, remove comments DOCTYPE and xml processors from a string
+
+309 L<not|/not> - Return the specified B<$node> if it does not match any of the specified tags, else B<undef>
+
+310 L<numberNode|/numberNode> - Ensure that the specified B<$node> has a number.
+
+311 L<numberTree|/numberTree> - Number the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source.
+
+312 L<numberTreesJustIds|/numberTreesJustIds> - Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source.
+
+313 L<opAt|/opAt> - <= : Check that a node is in the context specified by the referenced array of words.
+
+314 L<opAttr|/opAttr> - % : Get the value of an attribute of the specified B<$node>.
+
+315 L<opBy|/opBy> - x= : Traverse a L<parse|/parse> tree in post-order.
+
+316 L<opContents|/opContents> - @{} : nodes immediately below a node.
+
+317 L<opCut|/opCut> - -- : Cut out a node.
+
+318 L<opGo|/opGo> - >= : Search for a node via a specification provided as a reference to an array of words each number.
+
+319 L<opNew|/opNew> - ** : create a new node from the text on the right hand side: if the text contains a non word character \W the node will be create as text, else it will be created as a tag
+
+320 L<opPutFirst|/opPutFirst> - >> : put a node or string first under a node and return the new node.
+
+321 L<opPutFirstAssign|/opPutFirstAssign> - >>= : put a node or string first under a node.
+
+322 L<opPutLast|/opPutLast> - << : put a node or string last under a node and return the new node.
+
+323 L<opPutLastAssign|/opPutLastAssign> - <<= : put a node or string last under a node.
+
+324 L<opPutNext|/opPutNext> - > + : put a node or string after the specified B<$node> and return the new node.
+
+325 L<opPutNextAssign|/opPutNextAssign> - += : put a node or string after the specified B<$node>.
+
+326 L<opPutPrev|/opPutPrev> - < - : put a node or string before the specified B<$node> and return the new node.
+
+327 L<opPutPrevAssign|/opPutPrevAssign> - -= : put a node or string before the specified B<$node>,
+
+328 L<opString|/opString> - -B: L<bitsNodeTextBlank|/bitsNodeTextBlank>
 
 -b: L<isAllBlankText|/isAllBlankText>
 
@@ -24753,291 +26213,299 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 -z: L<prettyStringNumbered|/prettyStringNumbered>.
 
-308 L<opUnwrap|/opUnwrap> - ++ : Unwrap a node.
+329 L<opUnwrap|/opUnwrap> - ++ : Unwrap a node.
 
-309 L<opWrapContentWith|/opWrapContentWith> - * : Wrap content with a tag, returning the wrapping node.
+330 L<opWrapContentWith|/opWrapContentWith> - * : Wrap content with a tag, returning the wrapping node.
 
-310 L<opWrapWith|/opWrapWith> - / : Wrap node with a tag, returning the wrapping node.
+331 L<opWrapWith|/opWrapWith> - / : Wrap node with a tag, returning the wrapping node.
 
-311 L<ordered|/ordered> - Return the first node if the specified nodes are all in order when performing a pre-ordered traversal of the L<parse|/parse> tree else return B<undef>.
+332 L<ordered|/ordered> - Return the first node if the specified nodes are all in order when performing a pre-ordered traversal of the L<parse|/parse> tree else return B<undef>.
 
-312 L<over|/over> - Confirm that the string representing the tags at the level below the specified B<$node> match a regular expression where each pair of tags is separated by a single space.
+333 L<over|/over> - Confirm that the string representing the tags at the level below the specified B<$node> match a regular expression where each pair of tags is separated by a single space.
 
-313 L<over2|/over2> - Confirm that the string representing the tags at the level below the specified B<$node> match a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.
+334 L<over2|/over2> - Confirm that the string representing the tags at the level below the specified B<$node> match a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.
 
-314 L<overAllTags|/overAllTags> - Return the specified b<$node> if all of it's child nodes L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
+335 L<overAllTags|/overAllTags> - Return the specified b<$node> if all of it's child nodes L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
 
-315 L<overFirstTags|/overFirstTags> - Return the specified b<$node> if the first of it's child nodes L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
+336 L<overFirstTags|/overFirstTags> - Return the specified b<$node> if the first of it's child nodes L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
 
-316 L<overLastTags|/overLastTags> - Return the specified b<$node> if the last of it's child nodes L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
+337 L<overLastTags|/overLastTags> - Return the specified b<$node> if the last of it's child nodes L<match|/atPositionMatch> the specified <@tags> else return B<undef>.
 
-317 L<parentOf|/parentOf> - Returns the specified B<$parent> node if it is the parent of the specified B<$child> node and the B<$parent> node is in the specified optional context.
+338 L<parentOf|/parentOf> - Returns the specified B<$parent> node if it is the parent of the specified B<$child> node and the B<$parent> node is in the specified optional context.
 
-318 L<parse|/parse> - Parse input XML specified via: L<inputFile|/inputFile>, L<input|/input> or L<inputString|/inputString>.
+339 L<parse|/parse> - Parse input XML specified via: L<inputFile|/inputFile>, L<input|/input> or L<inputString|/inputString>.
 
-319 L<parseLineLocation|/parseLineLocation> - Parse a line location
+340 L<parseLineLocation|/parseLineLocation> - Parse a line location
 
-320 L<path|/path> - Return a list representing the path to a node from the root of the parse tree which can then be reused by L<go|/go> to retrieve the node as long as the structure of the L<parse|/parse> tree has not changed along the path.
+341 L<path|/path> - Return a list representing the path to a node from the root of the parse tree which can then be reused by L<go|/go> to retrieve the node as long as the structure of the L<parse|/parse> tree has not changed along the path.
 
-321 L<pathString|/pathString> - Return a string representing the L<path|/path> to the specified B<$node> from the root of the parse tree.
+342 L<pathString|/pathString> - Return a string representing the L<path|/path> to the specified B<$node> from the root of the parse tree.
 
-322 L<position|/position> - Return the index of the specified B<$node> in the content of the parent of the B<$node>.
+343 L<position|/position> - Return the index of the specified B<$node> in the content of the parent of the B<$node>.
 
-323 L<precedingSiblingOf|/precedingSiblingOf> - Returns the specified B<$child> node if it has the same parent as B<$sibling> and occurs before B<$sibling> and has the optionally specified context else returns B<undef>.
+344 L<precedingSiblingOf|/precedingSiblingOf> - Returns the specified B<$child> node if it has the same parent as B<$sibling> and occurs before B<$sibling> and has the optionally specified context else returns B<undef>.
 
-324 L<present|/present> - Return the count of the number of the specified tag types present immediately under a node or a hash {tag} = count for all the tags present under the node if no names are specified.
+345 L<present|/present> - Return the count of the number of the specified tag types present immediately under a node or a hash {tag} = count for all the tags present under the node if no names are specified.
 
-325 L<prettyString|/prettyString> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it.
+346 L<prettyString|/prettyString> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it.
 
-326 L<prettyStringCDATA|/prettyStringCDATA> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it with the text fields wrapped with <CDATA>.
+347 L<prettyStringCDATA|/prettyStringCDATA> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it with the text fields wrapped with <CDATA>.
 
-327 L<prettyStringContent|/prettyStringContent> - Return a readable string representing all the nodes below a node of a L<parse|/parse> tree.
+348 L<prettyStringContent|/prettyStringContent> - Return a readable string representing all the nodes below a node of a L<parse|/parse> tree.
 
-328 L<prettyStringContentNumbered|/prettyStringContentNumbered> - Return a readable string representing all the nodes below a node of a L<parse|/parse> tree with numbering added.
+349 L<prettyStringContentNumbered|/prettyStringContentNumbered> - Return a readable string representing all the nodes below a node of a L<parse|/parse> tree with numbering added.
 
-329 L<prettyStringDitaHeaders|/prettyStringDitaHeaders> - Return a readable string representing the L<parse|/parse> tree below the specified B<$node> with appropriate headers.
+350 L<prettyStringDitaHeaders|/prettyStringDitaHeaders> - Return a readable string representing the L<parse|/parse> tree below the specified B<$node> with appropriate headers.
 
-330 L<prettyStringEnd|/prettyStringEnd> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it as a here document
+351 L<prettyStringEnd|/prettyStringEnd> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it as a here document
 
-331 L<prettyStringNumbered|/prettyStringNumbered> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it with a L<number|/number> attached to each tag.
+352 L<prettyStringNumbered|/prettyStringNumbered> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it with a L<number|/number> attached to each tag.
 
-332 L<prev|/prev> - Return the node before the specified B<$node>, optionally checking the previous node's context.
+353 L<prev|/prev> - Return the node before the specified B<$node>, optionally checking the previous node's context.
 
-333 L<prevIn|/prevIn> - Return the nearest sibling node before the specified B<$node> which matches one of the named tags or B<undef> if there is no such sibling node.
+354 L<prevIn|/prevIn> - Return the nearest sibling node before the specified B<$node> which matches one of the named tags or B<undef> if there is no such sibling node.
 
-334 L<prevn|/prevn> - Return the B<$n>'th previous node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+355 L<prevn|/prevn> - Return the B<$n>'th previous node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
-335 L<prevOn|/prevOn> - Step backwards as far as possible while remaining on nodes with the specified tags.
+356 L<prevOn|/prevOn> - Step backwards as far as possible while remaining on nodes with the specified tags.
 
-336 L<prevText|/prevText> - Return the node before the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
+357 L<prevText|/prevText> - Return the node before the specified B<$node> if it is in the optional and it is a text node otherwise B<undef>.
 
-337 L<prevTextMatches|/prevTextMatches> - Return the previous node to the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
+358 L<prevTextMatches|/prevTextMatches> - Return the previous node to the specified B<$node> if: it is a text mode; its text matches the specified regular expression; the specified B<$node> is in the optional specified context.
 
-338 L<prevUntil|/prevUntil> - Go to the previous sibling of the specified B<$node> and continue backwards until the tag of a sibling node matches one of the specified B<@tags>.
+359 L<prevUntil|/prevUntil> - Go to the previous sibling of the specified B<$node> and continue backwards until the tag of a sibling node matches one of the specified B<@tags>.
 
-339 L<prevWhile|/prevWhile> - Go to the previous sibling of the specified B<$node> and continue backwards while the tag of each sibling node matches one of the specified B<@tags>.
+360 L<prevWhile|/prevWhile> - Go to the previous sibling of the specified B<$node> and continue backwards while the tag of each sibling node matches one of the specified B<@tags>.
 
-340 L<printAncestry|/printAncestry> - Print the attributes of a node and each of its parents
+361 L<printAncestry|/printAncestry> - Print the attributes of a node and each of its parents
 
-341 L<printAttributes|/printAttributes> - Print the attributes of a node.
+362 L<printAttributes|/printAttributes> - Print the attributes of a node.
 
-342 L<printAttributesExtendingIdsWithLabels|/printAttributesExtendingIdsWithLabels> - Print the attributes of a node extending the id with the labels.
+363 L<printAttributesExtendingIdsWithLabels|/printAttributesExtendingIdsWithLabels> - Print the attributes of a node extending the id with the labels.
 
-343 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels> - Print the attributes of a node replacing the id with the labels.
+364 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels> - Print the attributes of a node replacing the id with the labels.
 
-344 L<printNode|/printNode> - Print the tag and attributes of a node.
+365 L<printNode|/printNode> - Print the tag and attributes of a node.
 
-345 L<propagate|/propagate> - Propagate L<new attributes|/copyNewAttrs> from nodes that match the specified tag to all their child nodes, then L<unwrap|/unwrap> all the nodes that match the specified tag.
+366 L<propagate|/propagate> - Propagate L<new attributes|/copyNewAttrs> from nodes that match the specified tag to all their child nodes, then L<unwrap|/unwrap> all the nodes that match the specified tag.
 
-346 L<putContentAfter|/putContentAfter> - Move the content of the specified B<$node> and place it after that node if that node is in the optional B<@context>.
+367 L<putContentAfter|/putContentAfter> - Move the content of the specified B<$node> and place it after that node if that node is in the optional B<@context>.
 
-347 L<putContentBefore|/putContentBefore> - Move the content of the specified B<$node> and place it before that node if that node is in the optional B<@context>.
+368 L<putContentBefore|/putContentBefore> - Move the content of the specified B<$node> and place it before that node if that node is in the optional B<@context>.
 
-348 L<putFirst|/putFirst> - Place a L<cut out|/cut> or L<new|/new> node at the front of the content of the specified B<$node> and return the new node.
+369 L<putFirst|/putFirst> - Place a L<cut out|/cut> or L<new|/new> node at the front of the content of the specified B<$node> and return the new node.
 
-349 L<putFirstAsText|/putFirstAsText> - Add a new text node first under a parent and return the new text node.
+370 L<putFirstAsText|/putFirstAsText> - Add a new text node first under a parent and return the new text node.
 
-350 L<putFirstAsTree|/putFirstAsTree> - Put parsed text first under the specified B<$node> parent and return a reference to the parsed tree.
+371 L<putFirstAsTree|/putFirstAsTree> - Put parsed text first under the specified B<$node> parent and return a reference to the parsed tree.
 
-351 L<putFirstCut|/putFirstCut> - Cut out the B<$second> node, place it first under the B<$first> node and return the B<$second> node.
+372 L<putFirstCut|/putFirstCut> - Cut out the B<$second> node, place it first under the B<$first> node and return the B<$second> node.
 
-352 L<putFirstRequiredCleanUp|/putFirstRequiredCleanUp> - Place a required cleanup tag first under a node and return the required clean up node.
+373 L<putFirstRequiredCleanUp|/putFirstRequiredCleanUp> - Place a required cleanup tag first under a node and return the required clean up node.
 
-353 L<putLast|/putLast> - Place a L<cut out|/cut> or L<new|/new> node last in the content of the specified B<$node> and return the new node.
+374 L<putLast|/putLast> - Place a L<cut out|/cut> or L<new|/new> node last in the content of the specified B<$node> and return the new node.
 
-354 L<putLastAsText|/putLastAsText> - Add a new text node last under a parent and return the new text node.
+375 L<putLastAsText|/putLastAsText> - Add a new text node last under a parent and return the new text node.
 
-355 L<putLastAsTree|/putLastAsTree> - Put parsed text last under the specified B<$node> parent and return a reference to the parsed tree.
+376 L<putLastAsTree|/putLastAsTree> - Put parsed text last under the specified B<$node> parent and return a reference to the parsed tree.
 
-356 L<putLastCut|/putLastCut> - Cut out the B<$second> node, place it last under the B<$first> node and return the B<$second> node.
+377 L<putLastCut|/putLastCut> - Cut out the B<$second> node, place it last under the B<$first> node and return the B<$second> node.
 
-357 L<putLastRequiredCleanUp|/putLastRequiredCleanUp> - Place a required cleanup tag last under a node and return the required clean up node.
+378 L<putLastRequiredCleanUp|/putLastRequiredCleanUp> - Place a required cleanup tag last under a node and return the required clean up node.
 
-358 L<putNext|/putNext> - Place a L<cut out|/cut> or L<new|/new> node just after the specified B<$node> and return the new node.
+379 L<putNext|/putNext> - Place a L<cut out|/cut> or L<new|/new> node just after the specified B<$node> and return the new node.
 
-359 L<putNextAsText|/putNextAsText> - Add a new text node following the specified B<$node> and return the new text node.
+380 L<putNextAsText|/putNextAsText> - Add a new text node following the specified B<$node> and return the new text node.
 
-360 L<putNextAsTree|/putNextAsTree> - Put parsed text after the specified B<$node> parent and return a reference to the parsed tree.
+381 L<putNextAsTree|/putNextAsTree> - Put parsed text after the specified B<$node> parent and return a reference to the parsed tree.
 
-361 L<putNextCut|/putNextCut> - Cut out the B<$second> node, place it after the B<$first> node and return the B<$second> node.
+382 L<putNextCut|/putNextCut> - Cut out the B<$second> node, place it after the B<$first> node and return the B<$second> node.
 
-362 L<putNextRequiredCleanUp|/putNextRequiredCleanUp> - Place a required cleanup tag after a node.
+383 L<putNextRequiredCleanUp|/putNextRequiredCleanUp> - Place a required cleanup tag after a node.
 
-363 L<putPrev|/putPrev> - Place a L<cut out|/cut> or L<new|/new> node just before the specified B<$node> and return the new node.
+384 L<putPrev|/putPrev> - Place a L<cut out|/cut> or L<new|/new> node just before the specified B<$node> and return the new node.
 
-364 L<putPrevAsText|/putPrevAsText> - Add a new text node following the specified B<$node> and return the new text node
+385 L<putPrevAsText|/putPrevAsText> - Add a new text node following the specified B<$node> and return the new text node
 
-365 L<putPrevAsTree|/putPrevAsTree> - Put parsed text before the specified B<$parent> parent and return a reference to the parsed tree.
+386 L<putPrevAsTree|/putPrevAsTree> - Put parsed text before the specified B<$parent> parent and return a reference to the parsed tree.
 
-366 L<putPrevCut|/putPrevCut> - Cut out the B<$second> node, place it before the B<$first> node and return the B<$second> node.
+387 L<putPrevCut|/putPrevCut> - Cut out the B<$second> node, place it before the B<$first> node and return the B<$second> node.
 
-367 L<putPrevRequiredCleanUp|/putPrevRequiredCleanUp> - Place a required cleanup tag before a node.
+388 L<putPrevRequiredCleanUp|/putPrevRequiredCleanUp> - Place a required cleanup tag before a node.
 
-368 L<putSiblingsAfterParent|/putSiblingsAfterParent> - Move the specified B<$node> and its following siblings up one level and place them after the parent of the specified B<$node> if the specified B<$node> is in the optional B<@context>.
+389 L<putSiblingsAfterParent|/putSiblingsAfterParent> - Move the specified B<$node> and its following siblings up one level and place them after the parent of the specified B<$node> if the specified B<$node> is in the optional B<@context>.
 
-369 L<putSiblingsBeforeParent|/putSiblingsBeforeParent> - Move the specified B<$node> and its preceding siblings up one level and place them before the parent of the specified B<$node> if the specified B<$node> is in the optional B<@context>.
+390 L<putSiblingsBeforeParent|/putSiblingsBeforeParent> - Move the specified B<$node> and its preceding siblings up one level and place them before the parent of the specified B<$node> if the specified B<$node> is in the optional B<@context>.
 
-370 L<putSiblingsFirst|/putSiblingsFirst> - Move the siblings preceding the specified B<$node> in the optional B<@context> down one level and place them first under the specified B<$node> preceding any existing content.
+391 L<putSiblingsFirst|/putSiblingsFirst> - Move the siblings preceding the specified B<$node> in the optional B<@context> down one level and place them first under the specified B<$node> preceding any existing content.
 
-371 L<putSiblingsLast|/putSiblingsLast> - Move the siblings following the specified B<$node> in the optional B<@context> down one level so that they are last under the specified B<$node> following any existing content.
+392 L<putSiblingsLast|/putSiblingsLast> - Move the siblings following the specified B<$node> in the optional B<@context> down one level so that they are last under the specified B<$node> following any existing content.
 
-372 L<readCompressedFile|/readCompressedFile> - Read the specified B<$file> containing compressed xml and return the root node.
+393 L<readCompressedFile|/readCompressedFile> - Read the specified B<$file> containing compressed xml and return the root node.
 
-373 L<reindexNode|/reindexNode> - Index the children of a node so that we can access them by tag and number.
+394 L<reindexNode|/reindexNode> - Index the children of a node so that we can access them by tag and number.
 
-374 L<renameAttr|/renameAttr> - Rename attribute B<$old> to B<$new> in the specified B<$node> with optional context B<@context> regardless of whether attribute B<$new> already exists or not and return the B<$node>.
+395 L<renameAttr|/renameAttr> - Rename attribute B<$old> to B<$new> in the specified B<$node> with optional context B<@context> regardless of whether attribute B<$new> already exists or not and return the B<$node>.
 
-375 L<renameAttrValue|/renameAttrValue> - Rename attribute B<$old> to B<$new> with new value B<$newValue> in the specified B<$node> in the optional B<@context> regardless of whether attribute B<$new> already exists or not as long as the attribute B<$old> has the value B<$oldValue>.
+396 L<renameAttrValue|/renameAttrValue> - Rename attribute B<$old> to B<$new> with new value B<$newValue> in the specified B<$node> in the optional B<@context> regardless of whether attribute B<$new> already exists or not as long as the attribute B<$old> has the value B<$oldValue>.
 
-376 L<renew|/renew> - Returns a renewed copy of the L<parse|/parse> tree, optionally checking that the starting node is in a specified context: use this method if you have added nodes via the L</"Put as text"> methods and wish to traverse their L<parse|/parse> tree.
+397 L<renew|/renew> - Returns a renewed copy of the L<parse|/parse> tree, optionally checking that the starting node is in a specified context: use this method if you have added nodes via the L</"Put as text"> methods and wish to traverse their L<parse|/parse> tree.
 
-377 L<replaceContentWith|/replaceContentWith> - Replace the content of a node with the specified nodes and return the replaced content
+398 L<replaceContentWith|/replaceContentWith> - Replace the content of a node with the specified nodes and return the replaced content
 
-378 L<replaceContentWithMovedContent|/replaceContentWithMovedContent> - Replace the content of a specified target node with the contents of the specified source nodes removing the content from each source node and return the target node.
+399 L<replaceContentWithMovedContent|/replaceContentWithMovedContent> - Replace the content of a specified target node with the contents of the specified source nodes removing the content from each source node and return the target node.
 
-379 L<replaceContentWithText|/replaceContentWithText> - Replace the content of a node with the specified texts and return the replaced content
+400 L<replaceContentWithText|/replaceContentWithText> - Replace the content of a node with the specified texts and return the replaced content
 
-380 L<replaceSpecialChars|/replaceSpecialChars> - Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser|https://metacpan.org/pod/XML::Parser/> unfortunately replaces &lt; &gt; &quot; &amp; etc.
+401 L<replaceSpecialChars|/replaceSpecialChars> - Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser|https://metacpan.org/pod/XML::Parser/> unfortunately replaces &lt; &gt; &quot; &amp; etc.
 
-381 L<replaceWith|/replaceWith> - Replace a node (and all its content) with a L<new node|/newTag> (and all its content) and return the new node.
+402 L<replaceWith|/replaceWith> - Replace a node (and all its content) with a L<new node|/newTag> (and all its content) and return the new node.
 
-382 L<replaceWithBlank|/replaceWithBlank> - Replace a node (and all its content) with a new blank text node and return the new node.
+403 L<replaceWithBlank|/replaceWithBlank> - Replace a node (and all its content) with a new blank text node and return the new node.
 
-383 L<replaceWithRequiredCleanUp|/replaceWithRequiredCleanUp> - Replace a node with a required cleanup message and return the new node
+404 L<replaceWithRequiredCleanUp|/replaceWithRequiredCleanUp> - Replace a node with a required cleanup message and return the new node
 
-384 L<replaceWithText|/replaceWithText> - Replace a node (and all its content) with a new text node and return the new node.
+405 L<replaceWithText|/replaceWithText> - Replace a node (and all its content) with a new text node and return the new node.
 
-385 L<requiredCleanUp|/requiredCleanUp> - Replace a node with a required cleanup node around the text of the replaced node with special characters replaced by symbols.
+406 L<requiredCleanUp|/requiredCleanUp> - Replace a node with a required cleanup node around the text of the replaced node with special characters replaced by symbols.
 
-386 L<restore|/restore> - Return a L<parse|/parse> tree from a copy saved in a file by L<save|/save>.
+407 L<restore|/restore> - Return a L<parse|/parse> tree from a copy saved in a file by L<save|/save>.
 
-387 L<save|/save> - Save a copy of the L<parse|/parse> tree to a file which can be L<restored|/restore> and return the saved node.
+408 L<save|/save> - Save a copy of the L<parse|/parse> tree to a file which can be L<restored|/restore> and return the saved node.
 
-388 L<set|/set> - Set the values of some attributes in a node and return the node.
+409 L<set|/set> - Set the values of some attributes in a node and return the node.
 
-389 L<setAttr|/setAttr> - Set the values of some attributes in a node and return the node.
+410 L<setAttr|/setAttr> - Set the values of some attributes in a node and return the node.
 
-390 L<setDepthProfile|/setDepthProfile> - Sets the L<depthProfile|/depthProfile> for every node in the specified B<$tree>.
+411 L<setDepthProfile|/setDepthProfile> - Sets the L<depthProfile|/depthProfile> for every node in the specified B<$tree>.
 
-391 L<setRepresentationAsTagsAndText|/setRepresentationAsTagsAndText> - Sets the L<representationLast|/representationLast> for every node in the specified B<$tree> via L<stringTagsAndText|/stringTagsAndText>.
+412 L<setRepresentationAsTagsAndText|/setRepresentationAsTagsAndText> - Sets the L<representationLast|/representationLast> for every node in the specified B<$tree> via L<stringTagsAndText|/stringTagsAndText>.
 
-392 L<setRepresentationAsText|/setRepresentationAsText> - Sets the L<representationLast|/representationLast> for every node in the specified B<$tree> via L<stringText|/stringText>.
+413 L<setRepresentationAsText|/setRepresentationAsText> - Sets the L<representationLast|/representationLast> for every node in the specified B<$tree> via L<stringText|/stringText>.
 
-393 L<splitAfter|/splitAfter> - Split the parent node into two identical nodes except all the siblings after the specified B<$node> are retained by the existing parent while any preceding siblings become siblings of the new parent node which is placed before the existing parent.
+414 L<splitAfter|/splitAfter> - Split the parent node into two identical nodes except all the siblings after the specified B<$node> are retained by the existing parent while any preceding siblings become siblings of the new parent node which is placed before the existing parent.
 
-394 L<splitBefore|/splitBefore> - Split the parent node into two identical nodes except all the siblings before the specified B<$node> are retained by the existing parent while any following siblings become siblings of the new parent node which is placed after the existing parent.
+415 L<splitAndWrapFromStart|/splitAndWrapFromStart> - Split the child nodes of B<$parent> on the child nodes with a tag of B<$split> wrapping the splitting node  and all preceding nodes from the previous splitting node or the start with the specified B<$wrap>ping node with optional B<%attributes>.
 
-395 L<splitTo|/splitTo> - Lift the specified B<$node> up until it splits the specified B<$parent> node.
+416 L<splitAndWrapToEnd|/splitAndWrapToEnd> - Split the child nodes of B<$parent> on the child nodes with a tag of B<$split> wrapping the splitting node  and all following nodes up until the next splitting node or the end with the specified B<$wrap>ping node with optional B<%attributes>.
 
-396 L<string|/string> - Return a dense string representing a node of a L<parse|/parse> tree and all the nodes below it.
+417 L<splitBefore|/splitBefore> - Split the parent node into two identical nodes except all the siblings before the specified B<$node> are retained by the existing parent while any following siblings become siblings of the new parent node which is placed after the existing parent.
 
-397 L<stringContent|/stringContent> - Return a string representing all the nodes below a node of a L<parse|/parse> tree.
+418 L<splitTo|/splitTo> - Lift the specified B<$node> up until it splits the specified B<$parent> node.
 
-398 L<stringExtendingIdsWithLabels|/stringExtendingIdsWithLabels> - Return a string representing the specified L<parse|/parse> tree with the id attribute of each node extended by the L<Labels|/Labels> attached to each node.
+419 L<string|/string> - Return a dense string representing a node of a L<parse|/parse> tree and all the nodes below it.
 
-399 L<stringMd5Sum|/stringMd5Sum> - Return the md5 sum of the dense L<string|/string> representing a node of a L<parse|/parse> tree and all the nodes below it.
+420 L<stringContent|/stringContent> - Return a string representing all the nodes below a node of a L<parse|/parse> tree.
 
-400 L<stringNode|/stringNode> - Return a string representing the specified B<$node> showing the attributes, labels and node number.
+421 L<stringExtendingIdsWithLabels|/stringExtendingIdsWithLabels> - Return a string representing the specified L<parse|/parse> tree with the id attribute of each node extended by the L<Labels|/Labels> attached to each node.
 
-401 L<stringQuoted|/stringQuoted> - Return a quoted string representing a L<parse|/parse> tree a node of a L<parse|/parse> tree and all the nodes below it.
+422 L<stringMd5Sum|/stringMd5Sum> - Return the md5 sum of the dense L<string|/string> representing a node of a L<parse|/parse> tree and all the nodes below it.
 
-402 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels> - Return a string representing the specified L<parse|/parse> tree with the id attribute of each node set to the L<Labels|/Labels> attached to each node.
+423 L<stringNode|/stringNode> - Return a string representing the specified B<$node> showing the attributes, labels and node number.
 
-403 L<stringTagsAndText|/stringTagsAndText> - Return a string showing just the tags and text at and below a specified B<$node>.
+424 L<stringQuoted|/stringQuoted> - Return a quoted string representing a L<parse|/parse> tree a node of a L<parse|/parse> tree and all the nodes below it.
 
-404 L<stringText|/stringText> - Return a string showing just the text of the text nodes (separated by blanks) at and below a specified B<$node>.
+425 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels> - Return a string representing the specified L<parse|/parse> tree with the id attribute of each node set to the L<Labels|/Labels> attached to each node.
 
-405 L<stringWithConditions|/stringWithConditions> - Return a string representing the specified B<$node> of a L<parse|/parse> tree and all the nodes below it subject to conditions to select or reject some nodes.
+426 L<stringTagsAndText|/stringTagsAndText> - Return a string showing just the tags and text at and below a specified B<$node>.
 
-406 L<succeedingSiblingOf|/succeedingSiblingOf> - Returns the specified B<$child> node if it has the same parent as B<$sibling> and occurs after B<$sibling> and has the optionally specified context else returns B<undef>.
+427 L<stringText|/stringText> - Return a string showing just the text of the text nodes (separated by blanks) at and below a specified B<$node>.
 
-407 L<swap|/swap> - Swap two nodes optionally checking that the first node is in the specified context and return the first node.
+428 L<stringWithConditions|/stringWithConditions> - Return a string representing the specified B<$node> of a L<parse|/parse> tree and all the nodes below it subject to conditions to select or reject some nodes.
 
-408 L<swapAfter|/swapAfter> - Swap B<$node> with its following node if $B<$node> matches the first element of the specified context and the next node matches the rest.
+429 L<structureAdjacentSectionsByLevel|/structureAdjacentSectionsByLevel> - Structure adjacent sections by level
 
-409 L<swapBefore|/swapBefore> - Swap B<$node> with its preceding node if $B<$node> matches the first element of the specified context and the previous node matches the rest.
+430 L<succeedingSiblingOf|/succeedingSiblingOf> - Returns the specified B<$child> node if it has the same parent as B<$sibling> and occurs after B<$sibling> and has the optionally specified context else returns B<undef>.
 
-410 L<swapTags|/swapTags> - Swap the tags of two nodes optionally checking that the first node is in the specified context and return (B<$first>, B<$second>) nodes.
+431 L<swap|/swap> - Swap two nodes optionally checking that the first node is in the specified context and return the first node.
 
-411 L<swapTagWithParent|/swapTagWithParent> - Swap the tags of the specified B<$node> and its parent optionally checking that the B<$node> is in the specified context and return (parent of B<$node>, B<$node>) or () if there is no such parent node.
+432 L<swapAfter|/swapAfter> - Swap B<$node> with its following node if $B<$node> matches the first element of the specified context and the next node matches the rest.
 
-412 L<through|/through> - Traverse L<parse|/parse> tree visiting each node twice calling the specified sub B<$before> as we go down past the node and sub B<$after> as we go up past the node, finally return the specified starting node.
+433 L<swapBefore|/swapBefore> - Swap B<$node> with its preceding node if $B<$node> matches the first element of the specified context and the previous node matches the rest.
 
-413 L<throughX|/throughX> - Identical to L<through|/through> except the B<$before, $after> subs are called in an L<eval|http://perldoc.perl.org/functions/eval.html> block to prevent L<die|http://perldoc.perl.org/functions/die.html> terminating the traversal of the full tree.
+434 L<swapTags|/swapTags> - Swap the tags of two nodes optionally checking that the first node is in the specified context and return (B<$first>, B<$second>) nodes.
 
-414 L<to|/to> - Return a list of the sibling nodes preceding the specified node optionally including only those nodes that match one of the tags in the specified list.
+435 L<swapTagWithParent|/swapTagWithParent> - Swap the tags of the specified B<$node> and its parent optionally checking that the B<$node> is in the specified context and return (parent of B<$node>, B<$node>) or () if there is no such parent node.
 
-415 L<tocNumbers|/tocNumbers> - Table of Contents number the nodes in a L<parse|/parse> tree.
+436 L<through|/through> - Traverse L<parse|/parse> tree visiting each node twice calling the specified sub B<$before> as we go down past the node and sub B<$after> as we go up past the node, finally return the specified starting node.
 
-416 L<topicTypeAndBody|/topicTypeAndBody> - Topic type and corresponding body.
+437 L<throughX|/throughX> - Identical to L<through|/through> except the B<$before, $after> subs are called in an L<eval|http://perldoc.perl.org/functions/eval.html> block to prevent L<die|http://perldoc.perl.org/functions/die.html> terminating the traversal of the full tree.
 
-417 L<tree|/tree> - Build a tree representation of the parsed XML which can be easily traversed to look for things.
+438 L<to|/to> - Return a list of the sibling nodes preceding the specified node optionally including only those nodes that match one of the tags in the specified list.
 
-418 L<undoSpecialChars|/undoSpecialChars> - Reverse the results of calling L<replaceSpecialChars|/replaceSpecialChars>.
+439 L<tocNumbers|/tocNumbers> - Table of Contents number the nodes in a L<parse|/parse> tree.
 
-419 L<unwrap|/unwrap> - Unwrap the specified B<$node> by inserting its content into its parent at the point containing the specified B<$node> and return the parent node.
+440 L<topicTypeAndBody|/topicTypeAndBody> - Topic type and corresponding body.
 
-420 L<unwrapContentsKeepingText|/unwrapContentsKeepingText> - Unwrap all the non text nodes below the specified B<$node> adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified B<$node> else B<undef> if not in the optional B<@context>.
+441 L<tree|/tree> - Build a tree representation of the parsed XML which can be easily traversed to look for things.
 
-421 L<unwrapParentsWithSingleChild|/unwrapParentsWithSingleChild> - Unwrap any immediate ancestors of the specified B<$node> which have only a single child and return the specified B<$node> regardless.
+442 L<undoSpecialChars|/undoSpecialChars> - Reverse the results of calling L<replaceSpecialChars|/replaceSpecialChars>.
 
-422 L<up|/up> - Return the parent of the current node optionally checking the parent node's context or return B<undef> if the specified B<$node> is the root of the L<parse|/parse> tree.
+443 L<unwrap|/unwrap> - Unwrap the specified B<$node> by inserting its content into its parent at the point containing the specified B<$node> and return the parent node.
 
-423 L<upn|/upn> - Go up the specified number of levels from the specified B<$node> and return the node reached optionally checking the parent node's context or B<undef> if there is no such node.
+444 L<unwrapContentsKeepingText|/unwrapContentsKeepingText> - Unwrap all the non text nodes below the specified B<$node> adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified B<$node> else B<undef> if not in the optional B<@context>.
 
-424 L<upThru|/upThru> - Go up the specified path from the specified B<$node> returning the node at the top or B<undef> if no such node exists.
+445 L<unwrapParentsWithSingleChild|/unwrapParentsWithSingleChild> - Unwrap any immediate ancestors of the specified B<$node> which have only a single child and return the specified B<$node> regardless.
 
-425 L<upUntil|/upUntil> - Return the nearest ancestral node to the specified B<$node> that matches the specified B<@context> or B<undef> if there is no such node.
+446 L<unwrapSingleParentsOfSection|/unwrapSingleParentsOfSection> - Unwrap single parents of section: in word documents the header is often buried in a list to gain a section number - here we remove these unnecessary items
 
-426 L<upUntilFirst|/upUntilFirst> - Move up from the specified B<$node> until we reach the root or a first node.
+447 L<up|/up> - Return the parent of the current node optionally checking the parent node's context or return B<undef> if the specified B<$node> is the root of the L<parse|/parse> tree.
 
-427 L<upUntilIsOnlyChild|/upUntilIsOnlyChild> - Move up from the specified B<$node> until we reach the root or another only child.
+448 L<upn|/upn> - Go up the specified number of levels from the specified B<$node> and return the node reached optionally checking the parent node's context or B<undef> if there is no such node.
 
-428 L<upUntilLast|/upUntilLast> - Move up from the specified B<$node> until we reach the root or a last node.
+449 L<upThru|/upThru> - Go up the specified path from the specified B<$node> returning the node at the top or B<undef> if no such node exists.
 
-429 L<upWhile|/upWhile> - Go up one level from the specified B<$node> and then continue up while each node matches on of the specified <@tags>.
+450 L<upUntil|/upUntil> - Return the nearest ancestral node to the specified B<$node> that matches the specified B<@context> or B<undef> if there is no such node.
 
-430 L<upWhileFirst|/upWhileFirst> - Move up from the specified B<$node> as long as each node is a first node or return B<undef> if the specified B<$node> is not a first node.
+451 L<upUntilFirst|/upUntilFirst> - Move up from the specified B<$node> until we reach the root or a first node.
 
-431 L<upWhileIsOnlyChild|/upWhileIsOnlyChild> - Move up from the specified B<$node> as long as each node is an only child or return B<undef> if the specified B<$node> is not an only child.
+452 L<upUntilIsOnlyChild|/upUntilIsOnlyChild> - Move up from the specified B<$node> until we reach the root or another only child.
 
-432 L<upWhileLast|/upWhileLast> - Move up from the specified B<$node> as long as each node is a last node or return B<undef> if the specified B<$node> is not a last node.
+453 L<upUntilLast|/upUntilLast> - Move up from the specified B<$node> until we reach the root or a last node.
 
-433 L<wordStyles|/wordStyles> - Extract style information from a parse tree representing a word document.
+454 L<upWhile|/upWhile> - Go up one level from the specified B<$node> and then continue up while each node matches on of the specified <@tags>.
 
-434 L<wrapContentWith|/wrapContentWith> - Wrap the content of the specified B<$node> in a new node created from the specified <@tag> and B<%attributes>: the specified B<$node> then contains just the new node which, in turn, contains all the content of the specified B<$node>.
+455 L<upWhileFirst|/upWhileFirst> - Move up from the specified B<$node> as long as each node is a first node or return B<undef> if the specified B<$node> is not a first node.
 
-435 L<wrapDown|/wrapDown> - Wrap the content of the specified B<$node> in a sequence of new nodes forcing the original node up - deepening the L<parse|/parse> tree - return the array of wrapping nodes.
+456 L<upWhileIsOnlyChild|/upWhileIsOnlyChild> - Move up from the specified B<$node> as long as each node is an only child or return B<undef> if the specified B<$node> is not an only child.
 
-436 L<wrapFrom|/wrapFrom> - Wrap all the nodes from the B<$start> node to the B<$end> node with a new node created from the specified <@tag> and B<%attributes> and return the new node.
+457 L<upWhileLast|/upWhileLast> - Move up from the specified B<$node> as long as each node is a last node or return B<undef> if the specified B<$node> is not a last node.
 
-437 L<wrapFromFirst|/wrapFromFirst> - Wrap this B<$node> and any preceding siblings with a new node created from the specified <@tag> and B<%attributes> and return the wrapping node.
+458 L<wordStyles|/wordStyles> - Extract style information from a parse tree representing a word document.
 
-438 L<wrapRuns|/wrapRuns> - Wrap consecutive runs of children under the specified parent B<$node> that are not already wrapped with B<$wrap>.
+459 L<wrapContentWith|/wrapContentWith> - Wrap the content of the specified B<$node> in a new node created from the specified <@tag> and B<%attributes>: the specified B<$node> then contains just the new node which, in turn, contains all the content of the specified B<$node>.
 
-439 L<wrapSiblingsAfter|/wrapSiblingsAfter> - If there are any siblings after the specified B<$node>, wrap them with a new node created from the specified <@tag> and B<%attributes> and return the newly created node.
+460 L<wrapDown|/wrapDown> - Wrap the content of the specified B<$node> in a sequence of new nodes forcing the original node up - deepening the L<parse|/parse> tree - return the array of wrapping nodes.
 
-440 L<wrapSiblingsBefore|/wrapSiblingsBefore> - If there are any siblings before the specified B<$node>, wrap them with a new node created from the specified <@tag> and B<%attributes> and return the newly created node.
+461 L<wrapFrom|/wrapFrom> - Wrap all the nodes from the B<$start> node to the B<$end> node with a new node created from the specified <@tag> and B<%attributes> and return the new node.
 
-441 L<wrapSiblingsBetween|/wrapSiblingsBetween> - If there are any siblings between the specified B<$node>s, wrap them with a new node created from the specified <@tag> and B<%attributes>.
+462 L<wrapFromFirst|/wrapFromFirst> - Wrap this B<$node> and any preceding siblings with a new node created from the specified <@tag> and B<%attributes> and return the wrapping node.
 
-442 L<wrapTo|/wrapTo> - Wrap all the nodes from the B<$start> node to the B<$end> node inclusive with a new node created from the specified <@tag> and B<%attributes> and return the new node.
+463 L<wrapRuns|/wrapRuns> - Wrap consecutive runs of children under the specified parent B<$node> that are not already wrapped with B<$wrap>.
 
-443 L<wrapToLast|/wrapToLast> - Wrap this B<$node> and any following siblings with a new node created from the specified <@tag> and B<%attributes> and return the wrapping node.
+464 L<wrapSiblingsAfter|/wrapSiblingsAfter> - If there are any siblings after the specified B<$node>, wrap them with a new node created from the specified <@tag> and B<%attributes> and return the newly created node.
 
-444 L<wrapUp|/wrapUp> - Wrap the specified B<$node> in a sequence of new nodes created from the specified B<@tags> forcing the original node down - deepening the L<parse|/parse> tree - return the array of wrapping nodes.
+465 L<wrapSiblingsBefore|/wrapSiblingsBefore> - If there are any siblings before the specified B<$node>, wrap them with a new node created from the specified <@tag> and B<%attributes> and return the newly created node.
 
-445 L<wrapWith|/wrapWith> - Wrap the specified B<$node> in a new node created from the specified B<$tag> and B<%attributes> forcing the specified B<$node> down - deepening the L<parse|/parse> tree - return the new wrapping node.
+466 L<wrapSiblingsBetween|/wrapSiblingsBetween> - If there are any siblings between the specified B<$node>s, wrap them with a new node created from the specified <@tag> and B<%attributes>.
 
-446 L<writeCompressedFile|/writeCompressedFile> - Write the parse tree starting at B<$node> as compressed xml to the specified B<$file>.
+467 L<wrapTo|/wrapTo> - Wrap all the nodes from the B<$start> node to the B<$end> node inclusive with a new node created from the specified <@tag> and B<%attributes> and return the new node.
 
-447 L<xmlHeader|/xmlHeader> - Add the standard xml header to a string
+468 L<wrapToLast|/wrapToLast> - Wrap this B<$node> and any following siblings with a new node created from the specified <@tag> and B<%attributes> and return the wrapping node.
 
-448 L<xmlToJson|/xmlToJson> - Return a Json string representing valid xml contained in a file or string, optionally double escaping escape characters.
+469 L<wrapUp|/wrapUp> - Wrap the specified B<$node> in a sequence of new nodes created from the specified B<@tags> forcing the original node down - deepening the L<parse|/parse> tree - return the array of wrapping nodes.
 
-449 L<zipDown|/zipDown> - Push a node down as many levels as possible by making it a child of a node formed by merging the preceding and following siblings if they have the same tag.
+470 L<wrapWith|/wrapWith> - Wrap the specified B<$node> in a new node created from the specified B<$tag> and B<%attributes> forcing the specified B<$node> down - deepening the L<parse|/parse> tree - return the new wrapping node.
 
-450 L<zipDownOnce|/zipDownOnce> - Push a node down one level by making it a child of a node formed by merging the preceding and following siblings if they have the same tag.
+471 L<writeCompressedFile|/writeCompressedFile> - Write the parse tree starting at B<$node> as compressed xml to the specified B<$file>.
+
+472 L<xmlHeader|/xmlHeader> - Add the standard xml header to a string
+
+473 L<xmlToJson|/xmlToJson> - Return a Json string representing valid xml contained in a file or string, optionally double escaping escape characters.
+
+474 L<zipDown|/zipDown> - Push a node down as many levels as possible by making it a child of a node formed by merging the preceding and following siblings if they have the same tag.
+
+475 L<zipDownOnce|/zipDownOnce> - Push a node down one level by making it a child of a node formed by merging the preceding and following siblings if they have the same tag.
 
 =head1 Installation
 
@@ -25054,7 +26522,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -25189,15 +26657,19 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests=>1190;
+use Test::More;
 use warnings FATAL=>qw(all);
 use strict;
 use Data::Table::Text qw(:all);
 use Time::HiRes qw(time);
 use Carp qw(confess);
 
-my $windows = $^O =~ m(MSWin32)is;
-my $mac     = $^O =~ m(darwin)is;
+if ($^O =~ m(linux)i)
+ {plan tests => 1216;
+ }
+else
+ {plan skip_all => 'Only Linux is supported';
+ }
 
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
   if ((caller(1))[0]//'Data::Edit::Xml') eq "Data::Edit::Xml";
@@ -25788,7 +27260,7 @@ if (1)                                                                          
   ok -s $x eq "<a>                    </a>";
  }
 
-if (!$windows)
+if (1)
  {my @files =                                                                   #TexpandIncludes
    (writeFile("in1/a.xml", q(<a id="a"><include href="../in2/b.xml"/></a>)),    #TexpandIncludes
     writeFile("in2/b.xml", q(<b id="b"><include href="c.xml"/></b>)),           #TexpandIncludes
@@ -25805,9 +27277,6 @@ if (!$windows)
 END
   map{unlink $_} @files;
   map{rmdir  $_} map {my ($p) = parseFileName $_; $p} @files;
- }
-else                                                                            # Skip because absFromRel in expandIncludes does not work on windows
- {ok 1;
  }
 
 if (1)
@@ -26574,7 +28043,7 @@ END
   ok !-B $x->go(qw(e));                                                         #TbitsNodeTextBlank
  }
 
-if (!$windows)                                                                  # Default error file
+if (1)                                                                          # Default error file
  {my $a = eval {Data::Edit::Xml::new("</a>")};
   my ($m, $f) = split /\n/, $@;
   ok $m =~ m(Xml parse error, see file:)s;
@@ -26582,9 +28051,6 @@ if (!$windows)                                                                  
   unlink $f;
   $f =~ s'out.data'';
   rmdir $f;
- }
-else
- {ok 1 for 1..2;
  }
 
 if (1)
@@ -27442,22 +28908,31 @@ if (1)
   ok -s $a eq '<b/>';                                                           #Tchange
  }
 
-if (1)
- {my $x = Data::Edit::Xml::new(<<END);                                          #TcountTagNames #TcountAttrNames #TcountAttrValues
-<a A="A" B="B" C="C">
-  <b  B="B" C="C">
-    <c  C="C">
+if (1) {                                                                        #TcountTagNames  #TcountAttrNames #TcountAttrValues #TcountAttrNamesAndValues
+  my $x = Data::Edit::Xml::new(<<END);
+<a A="A1" B="B1" C="C1">
+  <b  B="B1" C="C1">
+    <c  C="C1">
     </c>
     <c/>
   </b>
-  <b  C="C">
-    <c/>
+  <b  B="B2">
+    <c C="C2"/>
   </b>
 </a>
 END
-  is_deeply $x->countTagNames,  { a => 1, b => 2, c => 3 };                     #TcountTagNames
-  is_deeply $x->countAttrNames, { A => 1, B => 2, C => 4 };                     #TcountAttrNames
-  is_deeply $x->countAttrValues, { A => 1, B => 2, C => 4 };                    #TcountAttrValues
+
+  is_deeply $x->countTagNames,
+   {a => 1, b => 2, c => 3};
+
+  is_deeply $x->countAttrNames,
+   {A => 1, B => 3, C => 4};
+
+  is_deeply $x->countAttrValues,
+   {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
+
+  is_deeply $x->countAttrNamesAndValues,
+   {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
  }
 
 if (1)                                                                          # *NonBlank
@@ -29811,7 +31286,7 @@ END
   ok  -t $a->lastn_3__prevn_2 eq q(D);
  }
 
-if (!$windows) {
+if (1) {
   my $a = Data::Edit::Xml::new(q(<a>).(q(<b>𝝱</b>)x1e3).q(</a>));               #TwriteCompressedFile #TreadCompressedFile
   my $file = $a->writeCompressedFile(q(zzz.xml.zip));                           #TwriteCompressedFile #TreadCompressedFile
   ok length(-s $a) eq 8007;
@@ -29823,9 +31298,6 @@ if (!$windows) {
   ok -t $a->firstn_1    eq q(b);
   ok $a->firstn_2__text eq q(𝝱);
   unlink $file;
- }
-else
- {ok 1 for 1..7
  }
 
 if (1)                                                                          #TditaPrettyPrintWithHeaders
@@ -31106,7 +32578,6 @@ END
 
  }
 
-if (!$windows) {
 if (1) {                                                                        #TstringMd5Sum
   my $a = Data::Edit::Xml::new(<<END);
 <a>
@@ -31120,13 +32591,8 @@ END
   ok ((-k $a)->id     eq q(GUID-390bf05d-8f56-71cc-6a47-71834840d695));
   ok $a->id           ne (-k $a->first)->id;
  }
- }
-else
- {ok 1 for 1..3;
- }
 
 
-if (!$windows) {
 if (1) {                                                                        #TcreateGuidId
   my $a = Data::Edit::Xml::new(<<END);
 <a>
@@ -31137,10 +32603,6 @@ if (1) {                                                                        
 END
 
   ok $a->createGuidId->id eq q(GUID-390bf05d-8f56-71cc-6a47-71834840d695);
- }
- }
-else
- {ok 1;
  }
 
 if (1) {                                                                        #TswapTags #TswapTagWithParent
@@ -31175,17 +32637,18 @@ END
 
 if (1) {                                                                        #TditaSampleBookMap
 
-ok nws(Data::Edit::Xml::ditaSampleBookMap
- (author=>q(mim),
-  chapters=>Data::Edit::Xml::new(<<END),
+  my $a = Data::Edit::Xml::ditaSampleBookMap
+   (author=>q(mim),
+    chapters=>Data::Edit::Xml::new(<<END));
 <a>
   <b>
     <c/>
   </b>
 </a>
 END
- )->prettyString) eq nws(<<END);
-<bookmap id="GUID-e12a690e-93a1-9072-c41e-ef5c258ff9d1">
+
+ok -p $a eq <<END;
+<bookmap id="GUID-3b04e859-bc04-ac2d-e4bb-f0f99b2a8f90">
   <booktitle>
     <mainbooktitle/>
   </booktitle>
@@ -31194,6 +32657,9 @@ END
     <author>mim</author>
     <source/>
     <category/>
+    <keywords>
+      <keyword/>
+    </keywords>
     <prodinfo>
       <prodname product=""/>
       <vrmlist>
@@ -31202,6 +32668,11 @@ END
       <prognum/>
       <brand/>
     </prodinfo>
+    <bookchangehistory>
+      <approved>
+        <revisionid/>
+      </approved>
+    </bookchangehistory>
     <bookrights>
       <copyrfirst>
         <year/>
@@ -31450,7 +32921,6 @@ if (1) {                                                                        
 END
 
  $a->ditaConvertConceptToTask;
-#owf(q(/home/phil/z/z/z/out.xml), -p $a);
 
  ok nws(-p $a) eq nws(<<END);
 <task id="x1">
@@ -31526,7 +32996,6 @@ if (1) {                                                                        
 END
 
  $a->ditaConvertTopicToTask;
-owf(q(/home/phil/z/z/z/22.xml), -p $a);
 
  ok nws(-p $a) eq nws(<<END);
 <task id="c1">
@@ -31679,7 +33148,6 @@ if (1) {                                                                        
 END
 
   $a->ditaConvertSimpleTableToTable;
-# owf(q(/home/phil/z/z/z/out.xml), -p $a);
 
   ok -p $a eq <<END;
 <table>
@@ -31724,8 +33192,6 @@ a id="a"
 END
  }
 
-unless($windows) {
-
 if (1) {                                                                        #ThtmlTables #TjsonString
   my $a = Data::Edit::Xml::new(<<END);
 <task id="t1">
@@ -31747,8 +33213,6 @@ END
   ok fileMd5Sum($a->htmlTables =~ s(#\w+) ()gsr) eq q(1e8555c2ea191a54361cbd8cc5baa94b);
   ok fileMd5Sum($a->jsonString)                  eq q(3afa81dc2b2a249834fbac53a1ebd5f1);
  }
-
-} else {ok 1 for 1..2}                                                          # No md5sum on windows
 
 if (1) {                                                                        #TxmlToJson
   my $x = <<END;
@@ -31832,7 +33296,6 @@ if (1) {                                                                        
 </concept>
 END
 
-# owf(q(/home/phil/z/z/z/out.xml), xmlToJson($a));
   ok xmlToJson($a) eq <<'END';
 {
    "attributes" : {
@@ -32680,7 +34143,7 @@ END
 
  ok  $e->splitTo($a->first);                                                    # b invalidated by zipDownOnce
  $e->zipDown;
- owf(q(/home/phil/z/z/z/out.xml), -p $a);
+
  ok -p $a eq <<END;
 <a>
   <b>
@@ -32717,6 +34180,600 @@ b2
 b3
   </b>
 </a>
+END
+ }
+
+if (1) {                                                                        #TditaConvertSectionToConcept
+  my $a = Data::Edit::Xml::new(<<END);
+<section>
+  <title>title</title>
+  <p>text</p>
+</section>
+END
+
+  ok -p $a->ditaConvertSectionToConcept eq <<END
+<concept>
+  <title>title</title>
+  <conbody>
+    <p>text</p>
+  </conbody>
+</concept>
+END
+ }
+
+if (1) {                                                                        #TditaConvertSectionToReference
+  my $a = Data::Edit::Xml::new(<<END);
+<section>
+  <title>title</title>
+  <p>text</p>
+</section>
+END
+
+# say STDERR "AAAA\n", -p $a->ditaConvertSectionToReference;
+  ok -p $a->ditaConvertSectionToReference eq <<END
+<reference id="GUID-a9f0f71b-5bae-90ac-7c6d-5a605a053be4">
+  <title>title</title>
+  <refbody>
+    <section>
+      <p>text</p>
+    </section>
+  </refbody>
+</reference>
+END
+ }
+
+if (1) {                                                                        #TditaConvertSectionToTask
+  my $a = Data::Edit::Xml::new(<<END);
+<section>
+  <title>title</title>
+  <ol>
+    <li>step1</li>
+    <li>step2</li>
+  </ol>
+</section>
+END
+
+  ok -p $a->ditaConvertSectionToTask eq <<END
+<task>
+  <title>title</title>
+  <taskbody>
+    <context/>
+    <steps>
+      <step>
+        <cmd>step1</cmd>
+      </step>
+      <step>
+        <cmd>step2</cmd>
+      </step>
+    </steps>
+    <result/>
+  </taskbody>
+</task>
+END
+ }
+
+if (1) {                                                                        #TditaConvertDlToUl
+
+  my $a = Data::Edit::Xml::new(<<END);
+<dl>
+  <dlentry><dt>A</dt><dt>B</dt><dt>C</dt></dlentry>
+  <dlentry><dd>a</dd><dd>b</dd><dd>b</dd></dlentry>
+</dl>
+END
+
+  $a->ditaConvertDlToUl;
+
+  ok -p $a eq <<END;
+<ul>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+  <li>a</li>
+  <li>b</li>
+  <li>b</li>
+</ul>
+END
+
+  my $b = Data::Edit::Xml::new(<<END);
+<dl>
+  <dlentry><dt>A</dt><dd>a</dd></dlentry>
+</dl>
+END
+
+  ok !$a->ditaConvertDlToUl;
+ }
+
+if (1) {                                                                        #TdownToDie
+
+  my $a = Data::Edit::Xml::new(<<END);
+<a>
+  <b>
+    <c/>
+  </b>
+  <d>
+    <e/>
+  </d>
+</a>
+END
+
+  my @a;
+  $a->downToDie(sub
+   {confess if -t $_ eq q(b);
+    push @a, -t $_;
+   });
+
+  is_deeply [@a], [qw(a d e)];
+
+  my @b;
+  $a->downToDie(sub
+   {confess if -t $_ eq q(c);
+    push @b, -t $_;
+   });
+
+  is_deeply [@b], [qw(a b d e)];
+ }
+
+if (1) {                                                                        #TsplitAndWrapToEnd #TsplitAndWrapFromStart
+
+  my $A = Data::Edit::Xml::new(<<END);
+<a>
+  <PP/>
+  <b>
+    <c/>
+  </b>
+  <QQ/>
+  <b>
+    <d/>
+  </b>
+  <RR/>
+  <b>
+    <e/>
+  </b>
+  <SS/>
+</a>
+END
+
+  my $a = $A->clone;
+  ok 3 == $a->splitAndWrapFromStart(qw(b B));
+
+  ok -p $a eq <<END;
+<a>
+  <B>
+    <PP/>
+    <b>
+      <c/>
+    </b>
+  </B>
+  <B>
+    <QQ/>
+    <b>
+      <d/>
+    </b>
+  </B>
+  <B>
+    <RR/>
+    <b>
+      <e/>
+    </b>
+  </B>
+  <SS/>
+</a>
+END
+
+
+  my $b = $A->clone;
+  ok 3 == $b->splitAndWrapToEnd(qw(b B));
+
+  ok -p $b eq <<END;
+<a>
+  <PP/>
+  <B>
+    <b>
+      <c/>
+    </b>
+    <QQ/>
+  </B>
+  <B>
+    <b>
+      <d/>
+    </b>
+    <RR/>
+  </B>
+  <B>
+    <b>
+      <e/>
+    </b>
+    <SS/>
+  </B>
+</a>
+END
+ }
+
+if (1) {                                                                        #TdivideHtmlDocumentIntoSections
+
+  my $a = Data::Edit::Xml::new(<<END);
+<a>
+  <h1>HH11</h1>    text1
+    <h2>HH22</h2>  text2
+    <h2>HH22</h2>  text3
+      <h4>HH44</h4>text4
+    <h1>HH11</h1>  text5
+</a>
+END
+
+  $a->divideHtmlDocumentIntoSections;
+
+  ok nws(-p $a) eq nws(<<END);
+<a>
+  <section outputclass="1">
+    <title>HH11</title>
+text1
+    <section outputclass="2">
+      <title>HH22</title>
+text2
+    </section>
+    <section outputclass="2">
+      <title>HH22</title>
+text3
+      <section outputclass="4">
+        <title>HH44</title>
+text4
+      </section>
+    </section>
+  </section>
+  <section outputclass="1">
+    <title>HH11</title>
+text5
+  </section>
+</a>
+END
+ }
+
+if (1) {                                                                        #TditaConvertFromHtmlDl
+  my $a = Data::Edit::Xml::new(<<END);
+<dl>
+  <dt>t11</dt>
+  <dd>d11</dd>
+  <dd>d12</dd>
+  <dt>t21</dt>
+  <dd>d21</dd>
+  <dd>d22</dd>
+  <dt>t31</dt>
+  <dd>d31</dd>
+  <dd>d32</dd>
+</dl>
+END
+
+  $a->ditaConvertFromHtmlDl;
+
+  ok -p $a eq <<END;
+<dl>
+  <dlentry>
+    <dt>t11</dt>
+    <dd>d11</dd>
+    <dd>d12</dd>
+  </dlentry>
+  <dlentry>
+    <dt>t21</dt>
+    <dd>d21</dd>
+    <dd>d22</dd>
+  </dlentry>
+  <dlentry>
+    <dt>t31</dt>
+    <dd>d31</dd>
+    <dd>d32</dd>
+  </dlentry>
+</dl>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockFirst
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a/>
+  <b/>
+  <c/>
+  <d/>
+  <e/>
+  <f>
+    <g/>
+  </f>
+  <h/>
+</x>
+END
+  my ($a, $b, $c, $d, $e, $g, $f, $h) = $x->byList;
+
+  $c->moveBlockFirst($d, $f, qw(c x));
+
+  ok -p $x eq <<END;
+<x>
+  <a/>
+  <b/>
+  <e/>
+  <f>
+    <c/>
+    <d/>
+    <g/>
+  </f>
+  <h/>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockLast
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a/>
+  <b/>
+  <c/>
+  <d/>
+  <e/>
+  <f>
+    <g/>
+  </f>
+  <h/>
+</x>
+END
+  my ($a, $b, $c, $d, $e, $g, $f, $h) = $x->byList;
+
+  $c->moveBlockLast($d, $f, qw(c x));
+
+  ok -p $x eq <<END;
+<x>
+  <a/>
+  <b/>
+  <e/>
+  <f>
+    <g/>
+    <c/>
+    <d/>
+  </f>
+  <h/>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockAfter
+  my $x = Data::Edit::Xml::new(q(<x><a/><b/><c/><d/><e/><f/><g/><h/></x>));
+
+  my ($a, $b, $c, $d, $e, $f, $g, $h) = $x->byList;
+
+  $c->moveBlockAfter($d, $f, qw(c x));
+
+  ok -C $x eq q(<a/><b/><e/><f/><c/><d/><g/><h/>);
+ }
+
+if (1) {                                                                        #TmoveBlockBefore
+  my $x = Data::Edit::Xml::new(q(<x><a/><b/><c/><d/><e/><f/><g/><h/></x>));
+
+  my ($a, $b, $c, $d, $e, $f, $g, $h) = $x->byList;
+
+  $f->moveBlockBefore($g, $b, qw(f x));
+
+  ok -C $x eq q(<a/><f/><g/><b/><c/><d/><e/><h/>);
+ }
+
+if (1) {                                                                        #TmoveBlockToLastFirst
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a/>
+  <b/>
+  <c/>
+</x>
+END
+  my ($a, $b, $c) = $x->byList;
+
+  $b->moveBlockToLastFirst($a);
+
+  ok -p $x eq <<END;
+<x>
+  <a>
+    <b/>
+    <c/>
+  </a>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockToLastLast
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a>
+    <b/>
+    <c/>
+    <d/>
+  </a>
+  <e>
+    <f/>
+    <g/>
+    <h/>
+  </e>
+</x>
+END
+  my ($b, $c, $d, $a, $f, $g, $h, $e) = $x->byList;
+
+  $c->moveBlockToLastLast($e);
+
+  ok -p $x eq <<END;
+<x>
+  <a>
+    <b/>
+  </a>
+  <e>
+    <f/>
+    <g/>
+    <h/>
+    <c/>
+    <d/>
+  </e>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockToLastAfter
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a>
+    <b/>
+    <c/>
+    <d/>
+  </a>
+  <e/>
+</x>
+END
+  my ($b, $c, $d, $a, $e) = $x->byList;
+
+  $c->moveBlockToLastAfter($e);
+
+  ok -p $x eq <<END;
+<x>
+  <a>
+    <b/>
+  </a>
+  <e/>
+  <c/>
+  <d/>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockToLastBefore
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a/>
+  <b>
+    <c/>
+    <d/>
+    <e/>
+  </b>
+</x>
+END
+  my ($a, $c, $d, $e, $b) = $x->byList;
+
+  $d->moveBlockToLastBefore($b);
+
+  ok -p $x eq <<END;
+<x>
+  <a/>
+  <d/>
+  <e/>
+  <b>
+    <c/>
+  </b>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockFromFirstFirst
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a>
+    <b/>
+    <c/>
+    <d/>
+  </a>
+  <e>
+    <f/>
+    <g/>
+    <h/>
+  </e>
+</x>
+END
+  my ($b, $c, $d, $a, $f, $g, $h, $e) = $x->byList;
+
+  $g->moveBlockFromFirstFirst($a);
+
+  ok -p $x eq <<END;
+<x>
+  <a>
+    <f/>
+    <g/>
+    <b/>
+    <c/>
+    <d/>
+  </a>
+  <e>
+    <h/>
+  </e>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockFromFirstLast
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a/>
+  <b/>
+  <c/>
+</x>
+END
+  my ($a, $b, $c) = $x->byList;
+
+  $b->moveBlockFromFirstLast($c);
+
+  ok -p $x eq <<END;
+<x>
+  <c>
+    <a/>
+    <b/>
+  </c>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockFromFirstAfter
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a>
+    <b/>
+    <c/>
+    <d/>
+  </a>
+  <e/>
+</x>
+END
+  my ($b, $c, $d, $a, $e) = $x->byList;
+
+  $c->moveBlockFromFirstAfter($e);
+  owf(q(/home/phil/z/z/z/out.xml), -p $x);
+
+  ok -p $x eq <<END;
+<x>
+  <a>
+    <d/>
+  </a>
+  <e/>
+  <b/>
+  <c/>
+</x>
+END
+ }
+
+if (1) {                                                                        #TmoveBlockFromFirstBefore
+  my $x = Data::Edit::Xml::new(<<END);
+<x>
+  <a/>
+  <b>
+    <c/>
+    <d/>
+    <e/>
+  </b>
+</x>
+END
+  my ($a, $c, $d, $e, $b) = $x->byList;
+
+  $d->moveBlockFromFirstBefore($b);
+  owf(q(/home/phil/z/z/z/out.xml), -p $x);
+
+  ok -p $x eq <<END;
+<x>
+  <a/>
+  <c/>
+  <d/>
+  <b>
+    <e/>
+  </b>
+</x>
 END
  }
 

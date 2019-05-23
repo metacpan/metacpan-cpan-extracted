@@ -4,16 +4,17 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
-# To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
 # perl Build.PL && perl Build test && sudo perl Build install
+# To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
 # document and test foot option for format table
 # E for exportable methods
 # write binary data without complaints about wide characters
 # ddd, eee, lll methods
+# formatTableHH hash with sub hash of {} fails to print see svgToDita
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20190503;                                                        # Version
+our $VERSION = 20190524;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -359,8 +360,8 @@ BEGIN{*fpf=*filePath}
 sub fp($)                                                                       # Get path from file name.
  {my ($file) = @_;                                                              # File name
   $file or confess "File required";
-  return '' unless $file =~ m(\/);                                              # Must have a / in it else no path
-  $file =~ s([^/]*+\Z) ()gsr
+  return '' unless $file =~ m(/);                                               # Must have a / in it else no path
+  $file =~ s([^/]*\Z) ()gsr
  }
 
 sub fpn($)                                                                      # Remove extension from file name.
@@ -622,10 +623,9 @@ BEGIN{*temporaryDirectory=*temporaryFolder}
 sub findAllFilesAndFolders($)                                                   #P Find all the files and folders under a folder.
  {my ($dir) = @_;                                                               # Folder to start the search with
   my @files;                                                                    # Files
-  return split /\n/, qx(dir "$dir" /b /s) if $^O =~ m(MSWin32)i;                # Execute dir command on windows
   my $c   = qq(find "$dir" -print0);                                            # Use find command to find files
   my $res = qx($c);                                                             # Execute find command
-  defined($res) or confess "No result from find commend below\n$c\n";           # Find failed for some reason
+  defined($res) or confess "No result from find command below\n$c\n";           # Find failed for some reason
   utf8::decode($res);                                                           # Decode unicode file names
   split /\0/, $res                                                              # Split out file names on \0
  } # findFiles
@@ -750,7 +750,7 @@ sub clearFolder($$;$)                                                           
   unlink $_ for @files;                                                         # Remove files
   rmdir $_  for reverse @dirs;                                                  # Remove empty folders
   unless($noMsg)
-   {-e $folder and carp "Unable to completely remove folder:\n$folder\n";       # Complain if the folder still exists
+   {-e $folder and carp "Unable to completely remove folder:\n$folder\n";     # Complain if the folder still exists
    }
  } # clearFolder
 
@@ -851,22 +851,22 @@ sub makePath($)                                                                 
   0
  } # makePath
 
-sub overWriteFile($$)                                                           # Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.
+sub overWriteFile($$)                                                           # Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.  {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, unicode string to write
  {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, unicode string to write
   $file //= temporaryFile;
   $file =~ m(\n|\r)s and confess "File name contains a new line:\n=$file=\n";
   $string or carp "No string for file:\n$file\n";
   makePath($file);
   open my $F, ">$file" or
-    confess "Cannot open file for write because:\n$file\n$!\n";
+          confess "Cannot open file for write because:\n$file\n$!\n";
   binmode($F, ":utf8");
   print  {$F} $string;
-  close  ($F);
+  close  ($F) or confess "Could not close file:\n$file\n$!\n";;
   -e $file or confess "Failed to write to file:\n$file\n";
   $file
  } # overWriteFile
 
-BEGIN{*owf=*overWriteFile}
+BEGIN{*owf=*overWriteFile}                                                      # Short form of overwrite file
 
 sub writeFile($$)                                                               #I Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
  {my ($file, $string) = @_;                                                     # New file to write to or B<undef> for a temporary file,  string to write
@@ -1115,7 +1115,7 @@ sub copyFileMd5NormalizedName($$@)                                              
  }
 
 sub copyFileMd5NormalizedCreate($$$$@)                                          # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyFileMd5Normalized|/copyFileMd5Normalized> regardless of the other files in the target folders.
- {my ($Folder, $content, $extension, $companionContent, %options) = @_;         # Target folder or a file in that folder, content of the file, file extension contents of the companion file.
+ {my ($Folder, $content, $extension, $companionContent, %options) = @_;         # Target folder or a file in that folder, content of the file, file extension, contents of the companion file, options.
   my $folder = fp $Folder;                                                      # Normalized folder name
   my $name   = nameFromString($content);                                        # Entirely satisfactory
      $name   = nameFromStringRestrictedToTitle($content) if $options{titleOnly};# Not entirely satisfactory
@@ -1142,14 +1142,14 @@ sub copyFileMd5NormalizedDelete($)                                              
 sub copyBinaryFile($$)                                                          # Copy a binary file and return the target name,
  {my ($source, $target) = @_;                                                   # Source file, target file
   overWriteBinaryFile($target, readBinaryFile($source));
-  my $s = fileSize($source);
-  my $t = fileSize($target);
-  $s eq $t or confess
-    "Copied binary file has a different size\n".formatTable
-    ([[$s, $source], [$t, $target]], <<END);
-Size Size of file
-File Name of file
-END
+#  my $s = fileSize($source);                                                   # Appears to be unreliable across multiple CPUs
+#  my $t = fileSize($target);
+#  $s eq $t or confess
+#    "Copied binary file has a different size\n".formatTable
+#    ([[$s, $source], [$t, $target]], <<END);
+#Size Size of file
+#File Name of file
+#END
   $target
  }
 
@@ -1178,7 +1178,7 @@ sub copyBinaryFileMd5Normalized($;$)                                            
  }
 
 sub copyBinaryFileMd5NormalizedCreate($$$$)                                     # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension  which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
- {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, original file name, optional content of the companion file.
+ {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, optional content of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
   my $md5    = fileMd5Sum($content);                                            # Md5 sum of content
   my $od     = fpf($folder, $extension.q(_).$md5);                              # Companion file
@@ -1802,11 +1802,11 @@ sub formatTableMultiLine($;$)                                                   
   join($s, @text).$s
  }
 
-our $formatTableWithZwSp;                                                       # If set L<formatTableBasic|/formatTableBasic> will add a zero width space in from of each column in each row.
+#our $formatTableWithZwSp;                                                       # If set L<formatTableBasic|/formatTableBasic> will add a zero width space in from of each column in each row.
 
 sub formatTableBasic($)                                                         # Tabularize an array of arrays of text.
  {my ($data) = @_;                                                              # Reference to an array of arrays of data to be formatted as a table.
-  my $zwsp = $formatTableWithZwSp ? "\x{200b}" : q();                           # Zero width space addition
+  my $zwsp   = q(); #$formatTableWithZwSp ? "\x{200b}" : q();                   # Zero width space addition
   ref($data) =~ /array/i or                                                     # Must be an array
     confess "Array reference required not:\n".dump($data)."\n";
   my @width;                                                                    # Maximum width of each column
@@ -1930,6 +1930,7 @@ sub formatTable($;$%)                                                           
     if (my $r = reftype $columnTitles)                                          # Array of column titles
      {return (undef, $columnTitles) if $r =~ m(\Aarray\Z)si;
      }
+    return (q(), q()) unless $columnTitles;                                     # Column titles are not required for hash of hashes
     my @c = map {[split m(\s+), $_, 2]} split "\n", $columnTitles;              # Column definitions
     my $s = &formatTable(\@c, [qw(Column Description)]);                        # Column definitions descriptions table
    ($s, [map {$$_[0]} @c])
@@ -2926,7 +2927,6 @@ sub Data::Table::Text::Starter::say($@)                                         
 
 sub Data::Table::Text::Starter::start($$)                                       # Start a new process to run the specified B<$sub>.
  {my ($starter, $sub) = @_;                                                     # Starter, sub to be run.
-  $^O =~ m(MSWin32)i and confess "Not available on windows";
 
   my $started  = keys %{$starter->processStartTime};                            # Number of processes started
 
@@ -3166,10 +3166,9 @@ END
     $reportFile ? (file=>$reportFile) : ());
  }
 
-sub reportAttributes($;$)                                                       # Report the attributes present in a B<$sourceFile>
- {my ($sourceFile, $reportFile) = @_;                                           # Source file, optional report file
+sub reportAttributes($)                                                         # Report the attributes present in a B<$sourceFile>
+ {my ($sourceFile) = @_;                                                        # Source file
   my $s = readFile($sourceFile);
-
   my %s;
   for my $l(split /\n/, $s)                                                     # Find the attribute subs
    {if ($l =~ m(\Asub\s*(\w+)\s*\{.*?#\s+(.*)\Z))
@@ -3179,13 +3178,24 @@ sub reportAttributes($;$)                                                       
   \%s
  }
 
-sub reportReplacableMethods($;$)                                                # Report the replaceable methods in a B<$sourceFile>
- {my ($sourceFile, $reportFile) = @_;                                           # Source file, optional report file
+sub reportReplacableMethods($)                                                  # Report the replaceable methods marked with #r in a B<$sourceFile>
+ {my ($sourceFile) = @_;                                                        # Source file
   my $s = readFile($sourceFile);
-
   my %s;
   for my $l(split /\n/, $s)                                                     # Find the attribute subs
-   {if ($l =~ m(\Asub\s*(\w+).*?#\w*r\s+(.*)\Z)i)
+   {if ($l =~ m(\Asub\s*(\w+).*?#\w*r\w*\s+(.*)\Z))
+     {$s{$1} = $2;
+     }
+   }
+  \%s
+ }
+
+sub reportExportableMethods($)                                                  # Report the exportable methods marked with #e in a B<$sourceFile>
+ {my ($sourceFile) = @_;                                                        # Source file
+  my $s = readFile($sourceFile);
+  my %s;
+  for my $l(split /\n/, $s)                                                     # Find the attribute subs
+   {if ($l =~ m(\Asub\s*(\w+).*?#\w*e\w*\s+(.*)\Z))
      {$s{$1} = $2;
      }
    }
@@ -3847,6 +3857,7 @@ END
     s(L<extensions>)    (L<file name extensions|https://en.wikipedia.org/wiki/List_of_filename_extensions>)gis;
     s(L<find>)          (L<find|https://en.wikipedia.org/wiki/Find_(Unix)>)gis;
     s(L<gbStandard>)    (L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>)gis;
+    s(L<gnuFDL>)        (L<GNU Free Documentation License|https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License>)gis;
     s(L<grep>)          (L<grep|https://en.wikipedia.org/wiki/Grep>)gis;
     s(L<gui>)           (L<graphical user interface|https://en.wikipedia.org/wiki/Graphical_user_interface>)gis;
     s(L<guid>)          (L<guid|https://en.wikipedia.org/wiki/Universally_unique_identifier>)gis;
@@ -3859,6 +3870,7 @@ END
     s(L<our>)           (L<our|https://perldoc.perl.org/functions/our.html>)gis;
     s(L<OxygenFormat)   (L<https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html>)gis;
     s(L<perl>)          (L<Perl|http://www.perl.org/>)gis;
+    s(L<perlAL>)        (L<Perl Artistic Licence|https://dev.perl.org/licenses/artistic.html>)gis;
     s(L<shell>)         (L<shell|https://en.wikipedia.org/wiki/Shell_(computing)>)gis;
     s(L<xmllint>)       (L<xmllint|http://xmlsoft.org/xmllint.html>)gis;
     s(L<Xml parser>)    (L<Xml parser|https://metacpan.org/pod/XML::Parser/>)gis;
@@ -3963,7 +3975,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  quoteFile
  readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs
  reloadHashes removeBOM removeDuplicatePrefixes removeFilePrefix
- reportAttributes reportReplacableMethods reportSettings retrieveFile
+ reportAttributes reportExportableMethods reportReplacableMethods reportSettings retrieveFile
  saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
  setFileExtension setIntersection setIntersection
  setIntersectionOfArraysOfStrings setIntersectionOverUnion
@@ -4175,7 +4187,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20190204.
+Version 20190523.
 
 
 The following sections describe the methods in each functional area of this
@@ -4270,7 +4282,7 @@ Year-monthNumber-day at hours:minute:seconds
 B<Example:>
 
 
-  ok 𝗱𝗮𝘁𝗲𝗧𝗶𝗺𝗲𝗦𝘁𝗮𝗺𝗽     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z);
+  ok 𝗱𝗮𝘁𝗲𝗧𝗶𝗺𝗲𝗦𝘁𝗮𝗺𝗽     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z), q(dts);
 
 
 =head2 dateTimeStampName()
@@ -4973,6 +4985,23 @@ B<Example:>
    }
 
 
+=head4 removeDuplicatePrefixes($)
+
+Remove duplicated leading path components from a file name.
+
+     Parameter  Description
+  1  $file      File name
+
+B<Example:>
+
+
+  ok q(a/b.c) eq 𝗿𝗲𝗺𝗼𝘃𝗲𝗗𝘂𝗽𝗹𝗶𝗰𝗮𝘁𝗲𝗣𝗿𝗲𝗳𝗶𝘅𝗲𝘀("a/a/b.c");
+
+  ok q(a/b.c) eq 𝗿𝗲𝗺𝗼𝘃𝗲𝗗𝘂𝗽𝗹𝗶𝗰𝗮𝘁𝗲𝗣𝗿𝗲𝗳𝗶𝘅𝗲𝘀("a/b.c");
+
+  ok q(b.c) eq 𝗿𝗲𝗺𝗼𝘃𝗲𝗗𝘂𝗽𝗹𝗶𝗰𝗮𝘁𝗲𝗣𝗿𝗲𝗳𝗶𝘅𝗲𝘀("b.c");
+
+
 =head2 Position
 
 Position in the file system.
@@ -5436,7 +5465,7 @@ B<Example:>
 
 =head3 overWriteFile($$)
 
-Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.
+Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.  {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, unicode string to write
 
      Parameter  Description
   1  $file      File to write to or B<undef> for a temporary file
@@ -5837,7 +5866,68 @@ Create a readable name from an arbitrary string of text.
 B<Example:>
 
 
+  if (1) {
   ok q(help) eq 𝗻𝗮𝗺𝗲𝗙𝗿𝗼𝗺𝗦𝘁𝗿𝗶𝗻𝗴(q(!@#$%^help___<>?><?>));
+  ok q(bm_The_skyscraper_analogy) eq 𝗻𝗮𝗺𝗲𝗙𝗿𝗼𝗺𝗦𝘁𝗿𝗶𝗻𝗴(<<END);
+  <bookmap id="b1">
+  <title>The skyscraper analogy</title>
+  </bookmap>
+  END
+
+  ok q(bm_The_skyscraper_analogy_An_exciting_tale_of_two_skyscrapers_that_meet_in_downtown_Houston)
+     eq 𝗻𝗮𝗺𝗲𝗙𝗿𝗼𝗺𝗦𝘁𝗿𝗶𝗻𝗴(<<END);
+  <bookmap id="b1">
+  <title>The skyscraper analogy</title>
+  An exciting tale of two skyscrapers that meet in downtown Houston
+  <concept><html>
+  </bookmap>
+  END
+
+  ok q(bm_The_skyscraper_analogy) eq nameFromStringRestrictedToTitle(<<END);
+  <bookmap id="b1">
+  <title>The skyscraper analogy</title>
+  An exciting tale of two skyscrapers that meet in downtown Houston
+  <concept><html>
+  </bookmap>
+  END
+   }
+
+
+=head3 nameFromStringRestrictedToTitle($)
+
+Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
+
+     Parameter  Description
+  1  $string    String
+
+B<Example:>
+
+
+  if (1) {
+  ok q(help) eq nameFromString(q(!@#$%^help___<>?><?>));
+  ok q(bm_The_skyscraper_analogy) eq nameFromString(<<END);
+  <bookmap id="b1">
+  <title>The skyscraper analogy</title>
+  </bookmap>
+  END
+
+  ok q(bm_The_skyscraper_analogy_An_exciting_tale_of_two_skyscrapers_that_meet_in_downtown_Houston)
+     eq nameFromString(<<END);
+  <bookmap id="b1">
+  <title>The skyscraper analogy</title>
+  An exciting tale of two skyscrapers that meet in downtown Houston
+  <concept><html>
+  </bookmap>
+  END
+
+  ok q(bm_The_skyscraper_analogy) eq 𝗻𝗮𝗺𝗲𝗙𝗿𝗼𝗺𝗦𝘁𝗿𝗶𝗻𝗴𝗥𝗲𝘀𝘁𝗿𝗶𝗰𝘁𝗲𝗱𝗧𝗼𝗧𝗶𝘁𝗹𝗲(<<END);
+  <bookmap id="b1">
+  <title>The skyscraper analogy</title>
+  An exciting tale of two skyscrapers that meet in downtown Houston
+  <concept><html>
+  </bookmap>
+  END
+   }
 
 
 =head3 uniqueNameFromFile($)
@@ -5867,12 +5957,14 @@ Create a name from the last folder in the path of a file name.  Return undef if 
 B<Example:>
 
 
+  if (1) {
   ok 𝗻𝗮𝗺𝗲𝗙𝗿𝗼𝗺𝗙𝗼𝗹𝗱𝗲𝗿(fpe(qw( a b c d e))) eq q(c);
+   }
 
 
 =head3 copyFileMd5Normalized($$)
 
-Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An companion file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the companion file is copied as well to maintain the link back to the original name of the file.
+Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in a companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. A companion file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the companion file is copied as well to maintain the link back to the original name of the file.
 
      Parameter  Description
   1  $source    Source file
@@ -5906,19 +5998,48 @@ B<Example:>
     ok copyFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($A);
+    ok 4 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($B);
+    ok 2 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($C);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+
     clearFolder($dir, 10);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
    }
 
 
-=head3 copyFileMd5NormalizedCreate($$$$)
+=head3 copyFileMd5NormalizedName($$@)
 
-Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an companion file with the same name minus the extension  which contains the specified B<$name>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
+Name a file using the GB Standard
 
      Parameter   Description
-  1  $Folder     Target folder or a file in that folder
-  2  $content    Content of the file
-  3  $extension  File extension
-  4  $Name       Original file name.
+  1  $content    Content
+  2  $extension  Extension
+  3  %options    Options
+
+B<Example:>
+
+
+  if (1) {
+    ok 𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗡𝗮𝗺𝗲(<<END, q(txt)) eq
+  <p>Hello<b>World</b></p>
+  END
+  q(Hello_World_6ba23858c1b4811660896c324acac6fa.txt);
+   }
+
+
+=head3 copyFileMd5NormalizedCreate($$$$@)
+
+Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyFileMd5Normalized|/copyFileMd5Normalized> regardless of the other files in the target folders.
+
+     Parameter          Description
+  1  $Folder            Target folder or a file in that folder
+  2  $content           Content of the file
+  3  $extension         File extension
+  4  $companionContent  Contents of the companion file
+  5  %options           Options.
 
 B<Example:>
 
@@ -5948,13 +6069,21 @@ B<Example:>
     ok copyFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($A);
+    ok 4 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($B);
+    ok 2 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($C);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+
     clearFolder($dir, 10);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
    }
 
 
 =head3 copyFileMd5NormalizedGetCompanionContent($)
 
-Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.imageDef> file does not exist.
+Return the content of the companion file to the specified B<$source> file after it has been normalized via L<copyFileMd5Normalized|/copyFileMd5Normalized> or L<copyFileMd5NormalizedCreate|/copyFileMd5NormalizedCreate> or return B<undef> if the corresponding companion file does not exist.
 
      Parameter  Description
   1  $source    Source file.
@@ -5984,10 +6113,65 @@ B<Example:>
 
     ok fne($A) eq fne($_) for $B, $C;
     ok readFile($_) eq $content for $A, $B, $C;
-    ok 𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗚𝗲𝘁𝗢𝗿𝗶𝗴𝗶𝗻𝗮𝗹𝗡𝗮𝗺𝗲($_) eq $a for $A, $B, $C;
+    ok 𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗚𝗲𝘁𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗖𝗼𝗻𝘁𝗲𝗻𝘁($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($A);
+    ok 4 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($B);
+    ok 2 == searchDirectoryTreesForMatchingFiles($dir);
+    copyFileMd5NormalizedDelete($C);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+
     clearFolder($dir, 10);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+   }
+
+
+=head3 copyFileMd5NormalizedDelete($)
+
+Delete a normalized and its companion file
+
+     Parameter  Description
+  1  $file      File
+
+B<Example:>
+
+
+  if (1) {
+    my $dir = temporaryFolder;
+    my $a = fpe($dir, qw(a a jpg));
+    my $b = fpe($dir, qw(b a jpg));
+    my $c = fpe($dir, qw(c a jpg));
+
+    my $content = join '', 1..1e3;
+
+    my $A = copyFileMd5NormalizedCreate($a, $content, q(jpg), $a);
+    ok readFile($A) eq $content;
+    ok $A eq copyFileMd5Normalized($A);
+
+    my $B = copyFileMd5Normalized($A, $b);
+    ok readFile($B) eq $content;
+    ok $B eq copyFileMd5Normalized($B);
+
+    my $C = copyFileMd5Normalized($B, $c);
+    ok readFile($C) eq $content;
+    ok $C eq copyFileMd5Normalized($C);
+
+    ok fne($A) eq fne($_) for $B, $C;
+    ok readFile($_) eq $content for $A, $B, $C;
+    ok copyFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
+
+    ok 6 == searchDirectoryTreesForMatchingFiles($dir);
+    𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗗𝗲𝗹𝗲𝘁𝗲($A);
+    ok 4 == searchDirectoryTreesForMatchingFiles($dir);
+    𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗗𝗲𝗹𝗲𝘁𝗲($B);
+    ok 2 == searchDirectoryTreesForMatchingFiles($dir);
+    𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗗𝗲𝗹𝗲𝘁𝗲($C);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+
+    clearFolder($dir, 10);
+    ok 0 == searchDirectoryTreesForMatchingFiles($dir);
    }
 
 
@@ -6033,7 +6217,7 @@ B<Example:>
 
 =head3 copyBinaryFileMd5Normalized($$)
 
-Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An accompanying file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the accompanying file is copied as well to maintain the link back to the original name of the file.
+Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in a companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. A companion file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the companion file is copied as well to maintain the link back to the original name of the file.
 
      Parameter  Description
   1  $source    Source file
@@ -6073,13 +6257,13 @@ B<Example:>
 
 =head3 copyBinaryFileMd5NormalizedCreate($$$$)
 
-Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
+Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension  which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
 
-     Parameter   Description
-  1  $Folder     Target folder or a file in that folder
-  2  $content    Content of the file
-  3  $extension  File extension
-  4  $name       Original file name.
+     Parameter          Description
+  1  $Folder            Target folder or a file in that folder
+  2  $content           Content of the file
+  3  $extension         File extension
+  4  $companionContent  Optional content of the companion file.
 
 B<Example:>
 
@@ -6115,7 +6299,7 @@ B<Example:>
 
 =head3 copyBinaryFileMd5NormalizedGetCompanionContent($)
 
-Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.imageDef> file does not exist.
+Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or L<copyBinaryFileMd5NormalizedCreate|/copyBinaryFileMd5NormalizedCreate> or return B<undef> if the corresponding companion file does not exist.
 
      Parameter  Description
   1  $source    Source file.
@@ -6145,7 +6329,7 @@ B<Example:>
 
     ok fne($A) eq fne($_) for $B, $C;
     ok readBinaryFile($_) eq $content for $A, $B, $C;
-    ok 𝗰𝗼𝗽𝘆𝗕𝗶𝗻𝗮𝗿𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗚𝗲𝘁𝗢𝗿𝗶𝗴𝗶𝗻𝗮𝗹𝗡𝗮𝗺𝗲($_) eq $a for $A, $B, $C;
+    ok 𝗰𝗼𝗽𝘆𝗕𝗶𝗻𝗮𝗿𝘆𝗙𝗶𝗹𝗲𝗠𝗱𝟱𝗡𝗼𝗿𝗺𝗮𝗹𝗶𝘇𝗲𝗱𝗚𝗲𝘁𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗖𝗼𝗻𝘁𝗲𝗻𝘁($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
     clearFolder($dir, 10);
@@ -6769,14 +6953,22 @@ Tabularize an array of arrays of text.
 B<Example:>
 
 
+  if (1) {
     my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
-
-    ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲𝗕𝗮𝘀𝗶𝗰($d) eq <<END;
+    ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲𝗕𝗮𝘀𝗶𝗰($d) eq <<END, q(ftb);
   a        1
   bb      22
   ccc    333
   dddd  4444
   END
+    }
+
+  if (0) {
+    my %pids;
+    ˢ{startProcess {} %pids, 1; ok 1 >= keys %pids} for 1..8;
+    waitForAllStartedProcessesToFinish(%pids);
+    ok !keys(%pids)
+   }
 
 
 =head2 formatTable($$%)
@@ -7858,6 +8050,24 @@ b
 ") == 2;
 
 
+=head2 javaScriptExports($)
+
+Extract the Javascript functions marked for export in a file or string.  Functions are marked for export by placing function in column 1 followed by //E on the same line.  The end of the exported function is located by
+ }
+
+     Parameter      Description
+  1  $fileOrString  File or string
+
+B<Example:>
+
+
+  if (1) {
+    ok 𝗷𝗮𝘃𝗮𝗦𝗰𝗿𝗶𝗽𝘁𝗘𝘅𝗽𝗼𝗿𝘁𝘀(<<END) eq <<END;
+  function aaa()            //E
+   {console.log('aaa');
+   }
+
+
 =head1 Unicode
 
 Translate ascii alphanumerics in strings to various Unicode blocks.
@@ -8653,6 +8863,24 @@ B<Example:>
 
 Extract, format and update documentation for a perl module.
 
+=head2 parseDitaRef($)
+
+Parse a dita reference into its components
+
+     Parameter  Description
+  1  $ref       Reference to parse
+
+B<Example:>
+
+
+  if (1) {
+    is_deeply [𝗽𝗮𝗿𝘀𝗲𝗗𝗶𝘁𝗮𝗥𝗲𝗳(q(a#b/c))], [qw(a b c)];
+    is_deeply [𝗽𝗮𝗿𝘀𝗲𝗗𝗶𝘁𝗮𝗥𝗲𝗳(q(#b/c))],  [q(), qw(b c)];
+    is_deeply [𝗽𝗮𝗿𝘀𝗲𝗗𝗶𝘁𝗮𝗥𝗲𝗳(q(#b))],    [q(), q(b), q()];
+    is_deeply [𝗽𝗮𝗿𝘀𝗲𝗗𝗶𝘁𝗮𝗥𝗲𝗳(q(#/c))],   [q(), q(), q(c)];
+   }
+
+
 =head2 reportSettings($$)
 
 Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>. Return the text of the report.
@@ -8665,6 +8893,76 @@ B<Example:>
 
 
   𝗿𝗲𝗽𝗼𝗿𝘁𝗦𝗲𝘁𝘁𝗶𝗻𝗴𝘀($0);
+
+
+=head2 reportAttributes($)
+
+Report the attributes present in a B<$sourceFile>
+
+     Parameter    Description
+  1  $sourceFile  Source file
+
+B<Example:>
+
+
+  if (1) {
+    my $f = writeFile(undef, <<END);
+
+  sub attribute {1}                                                               # An attribute
+  sub replaceable($)                                                              #r A replaceable method
+   {
+   }
+
+
+=head2 reportReplacableMethods($)
+
+Report the replaceable methods marked with #r in a B<$sourceFile>
+
+     Parameter    Description
+  1  $sourceFile  Source file
+
+B<Example:>
+
+
+  if (1) {
+    my $f = writeFile(undef, <<END);
+
+  sub attribute {1}                                                               # An attribute
+  sub replaceable($)                                                              #r A replaceable method
+   {
+   }
+
+  sub 𝗿𝗲𝗽𝗼𝗿𝘁𝗥𝗲𝗽𝗹𝗮𝗰𝗮𝗯𝗹𝗲𝗠𝗲𝘁𝗵𝗼𝗱𝘀($)
+   {my ($sourceFile) = @_;                                                        # Source file
+    my $s = readFile($sourceFile);
+    my %s;
+    for my $l(split /
+/, $s)                                                     # Find the attribute subs
+     {if ($l =~ m(\Asub\s*(\w+).*?#\w*r\w*\s+(.*)\Z))
+       {$s{$1} = $2;
+       }
+     }
+    \%s
+   }
+
+
+=head2 reportExportableMethods($)
+
+Report the exportable methods marked with #e in a B<$sourceFile>
+
+     Parameter    Description
+  1  $sourceFile  Source file
+
+B<Example:>
+
+
+  if (1) {
+    my $f = writeFile(undef, <<END);
+
+  sub attribute {1}                                                               # An attribute
+  sub replaceable($)                                                              #r A replaceable method
+   {
+   }
 
 
 =head2 htmlToc($@)
@@ -8937,6 +9235,14 @@ Track the existence of files.
 Print a file name on a separate line with escaping so it can be used easily from the command line.
 
 
+=head2 absFromAbsPlusRel2($$)
+
+Create an absolute file from an absolute file and a relative file.
+
+     Parameter  Description
+  1  $a         Absolute file name
+  2  $f         Relative file name
+
 =head2 findAllFilesAndFolders($)
 
 Find all the files and folders under a folder.
@@ -9158,453 +9464,473 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 1 L<absFromAbsPlusRel|/absFromAbsPlusRel> - Create an absolute file from an absolute file and a relative file.
 
-2 L<addCertificate|/addCertificate> - Add a certificate to the current ssh session.
+2 L<absFromAbsPlusRel2|/absFromAbsPlusRel2> - Create an absolute file from an absolute file and a relative file.
 
-3 L<addLValueScalarMethods|/addLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package if they do not already exist.
+3 L<addCertificate|/addCertificate> - Add a certificate to the current ssh session.
 
-4 L<appendFile|/appendFile> - Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
+4 L<addLValueScalarMethods|/addLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package if they do not already exist.
 
-5 L<arrayProduct|/arrayProduct> - Find the product of any strings that look like numbers in an array
+5 L<appendFile|/appendFile> - Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
 
-6 L<arraySum|/arraySum> - Find the sum of any strings that look like numbers in an array
+6 L<arrayProduct|/arrayProduct> - Find the product of any strings that look like numbers in an array
 
-7 L<arrayTimes|/arrayTimes> - Multiply the second and subsequent parameters by the first parameter and return as an array
+7 L<arraySum|/arraySum> - Find the sum of any strings that look like numbers in an array
 
-8 L<arrayToHash|/arrayToHash> - Create a hash from an array
+8 L<arrayTimes|/arrayTimes> - Multiply the second and subsequent parameters by the first parameter and return as an array
 
-9 L<asciiToHexString|/asciiToHexString> - Encode an ascii string as a string of hexadecimal digits.
+9 L<arrayToHash|/arrayToHash> - Create a hash from an array
 
-10 L<assertPackageRefs|/assertPackageRefs> - Confirm that the specified references are to the specified package
+10 L<asciiToHexString|/asciiToHexString> - Encode an ascii string as a string of hexadecimal digits.
 
-11 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
+11 L<assertPackageRefs|/assertPackageRefs> - Confirm that the specified references are to the specified package
 
-12 L<awsIp|/awsIp> - Get ip address of server at aws
+12 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
 
-13 L<awsTranslateText|/awsTranslateText> - Translate B<$text> from English to a specified B<$language> using AWS Translate with the specified global B<$options> and return the translated string.
+13 L<awsIp|/awsIp> - Get ip address of server at aws
 
-14 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
+14 L<awsTranslateText|/awsTranslateText> - Translate B<$text> from English to a specified B<$language> using AWS Translate with the specified global B<$options> and return the translated string.
 
-15 L<boldString|/boldString> - Convert alphanumerics in a string to bold.
+15 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
 
-16 L<boldStringUndo|/boldStringUndo> - Undo alphanumerics in a string to bold.
+16 L<boldString|/boldString> - Convert alphanumerics in a string to bold.
 
-17 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
+17 L<boldStringUndo|/boldStringUndo> - Undo alphanumerics in a string to bold.
 
-18 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
+18 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
 
-19 L<checkKeys|/checkKeys> - Check the keys in a hash.
+19 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
 
-20 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
+20 L<checkKeys|/checkKeys> - Check the keys in a hash.
 
-21 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
+21 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
 
-22 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
+22 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
 
-23 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
+23 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
 
-24 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
+24 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
 
-25 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|https://www.imagemagick.org/script/index.php> version 6.
+25 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
 
-26 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
+26 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|https://www.imagemagick.org/script/index.php> version 6.
 
-27 L<copyBinaryFile|/copyBinaryFile> - Copy a binary file and return the target name,
+27 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
 
-28 L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> - Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an accompanying file if the accompanying file does not already exist.
+28 L<copyBinaryFile|/copyBinaryFile> - Copy a binary file and return the target name,
 
-29 L<copyBinaryFileMd5NormalizedCreate|/copyBinaryFileMd5NormalizedCreate> - Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.
+29 L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> - Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in a companion file if the companion file does not already exist.
 
-30 L<copyBinaryFileMd5NormalizedGetCompanionContent|/copyBinaryFileMd5NormalizedGetCompanionContent> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.
+30 L<copyBinaryFileMd5NormalizedCreate|/copyBinaryFileMd5NormalizedCreate> - Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension  which contains the specified B<$companionContent>.
 
-31 L<copyFile|/copyFile> - Copy a file encoded in utf8 and return the target name
+31 L<copyBinaryFileMd5NormalizedGetCompanionContent|/copyBinaryFileMd5NormalizedGetCompanionContent> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or L<copyBinaryFileMd5NormalizedCreate|/copyBinaryFileMd5NormalizedCreate> or return B<undef> if the corresponding companion file does not exist.
 
-32 L<copyFileMd5Normalized|/copyFileMd5Normalized> - Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an accompanying file if the accompanying file does not already exist.
+32 L<copyFile|/copyFile> - Copy a file encoded in utf8 and return the target name
 
-33 L<copyFileMd5NormalizedCreate|/copyFileMd5NormalizedCreate> - Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.
+33 L<copyFileMd5Normalized|/copyFileMd5Normalized> - Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in a companion file if the companion file does not already exist.
 
-34 L<copyFileMd5NormalizedGetCompanionContent|/copyFileMd5NormalizedGetCompanionContent> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.
+34 L<copyFileMd5NormalizedCreate|/copyFileMd5NormalizedCreate> - Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension which contains the specified B<$companionContent>.
 
-35 L<copyFolder|/copyFolder> - Copy a folder
+35 L<copyFileMd5NormalizedDelete|/copyFileMd5NormalizedDelete> - Delete a normalized and its companion file
 
-36 L<countFileExtensions|/countFileExtensions> - Return a hash which counts the file extensions under the specified directories
+36 L<copyFileMd5NormalizedGetCompanionContent|/copyFileMd5NormalizedGetCompanionContent> - Return the content of the companion file to the specified B<$source> file after it has been normalized via L<copyFileMd5Normalized|/copyFileMd5Normalized> or L<copyFileMd5NormalizedCreate|/copyFileMd5NormalizedCreate> or return B<undef> if the corresponding companion file does not exist.
 
-37 L<countFileTypes|/countFileTypes> - Return a hash which counts, in parallel, the results of applying the B<file> command to each file under the specified directories.
+37 L<copyFileMd5NormalizedName|/copyFileMd5NormalizedName> - Name a file using the GB Standard
 
-38 L<countOccurencesInString|/countOccurencesInString> - Returns the number of times the first string occurs in the second string
+38 L<copyFolder|/copyFolder> - Copy a folder
 
-39 L<countSquareArray|/countSquareArray> - Count the number of elements in a square array
+39 L<countFileExtensions|/countFileExtensions> - Return a hash which counts the file extensions under the specified directories
 
-40 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+40 L<countFileTypes|/countFileTypes> - Return a hash which counts, in parallel, the results of applying the B<file> command to each file under the specified directories.
 
-41 L<currentDirectory|/currentDirectory> - Get the current working directory.
+41 L<countOccurencesInString|/countOccurencesInString> - Returns the number of times the first string occurs in the second string
 
-42 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+42 L<countSquareArray|/countSquareArray> - Count the number of elements in a square array
 
-43 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
+43 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+
+44 L<currentDirectory|/currentDirectory> - Get the current working directory.
+
+45 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+
+46 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
   <image href="$imageFile" outputclass="imageType">.
 
-44 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
+47 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
 
-45 L<Data::Table::Text::Starter::averageProcessTime|/Data::Table::Text::Starter::averageProcessTime> - Average elapsed time spent by each process
+48 L<Data::Table::Text::Starter::averageProcessTime|/Data::Table::Text::Starter::averageProcessTime> - Average elapsed time spent by each process
 
-46 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their results as an array.
+49 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their results as an array.
 
-47 L<Data::Table::Text::Starter::logEntry|/Data::Table::Text::Starter::logEntry> - Create a log entry showing progress and eta.
+50 L<Data::Table::Text::Starter::logEntry|/Data::Table::Text::Starter::logEntry> - Create a log entry showing progress and eta.
 
-48 L<Data::Table::Text::Starter::say|/Data::Table::Text::Starter::say> - Write to the log file if it is available.
+51 L<Data::Table::Text::Starter::say|/Data::Table::Text::Starter::say> - Write to the log file if it is available.
 
-49 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
+52 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
 
-50 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for at least one process to finish and consolidate its results.
+53 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for at least one process to finish and consolidate its results.
 
-51 L<dateStamp|/dateStamp> - Year-monthName-day
+54 L<dateStamp|/dateStamp> - Year-monthName-day
 
-52 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
+55 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
 
-53 L<dateTimeStampName|/dateTimeStampName> - Date time stamp without white space.
+56 L<dateTimeStampName|/dateTimeStampName> - Date time stamp without white space.
 
-54 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
+57 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
 
-55 L<decodeJson|/decodeJson> - Decode Perl from Json.
+58 L<decodeJson|/decodeJson> - Decode Perl from Json.
 
-56 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
+59 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
 
-57 L<deSquareArray|/deSquareArray> - Create a one dimensional array from a two dimensional array of arrays
+60 L<deSquareArray|/deSquareArray> - Create a one dimensional array from a two dimensional array of arrays
 
-58 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
+61 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
 
-59 L<dumpFile|/dumpFile> - Dump a data structure to a file
+62 L<dumpFile|/dumpFile> - Dump a data structure to a file
 
-60 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
+63 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
 
-61 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
+64 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
 
-62 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
+65 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
 
-63 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
+66 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
 
-64 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
+67 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
 
-65 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
+68 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
 
-66 L<encodeJson|/encodeJson> - Encode Perl to Json.
+69 L<encodeJson|/encodeJson> - Encode Perl to Json.
 
-67 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+70 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
-68 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+71 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
 
-69 L<extractTest|/extractTest> - Remove example markers from test code.
+72 L<extractTest|/extractTest> - Remove example markers from test code.
 
-70 L<fe|/fe> - Get extension of file name.
+73 L<fe|/fe> - Get extension of file name.
 
-71 L<fff|/fff> - Confess a message with a line position and a file that Geany will jump to if clicked on.
+74 L<fff|/fff> - Confess a message with a line position and a file that Geany will jump to if clicked on.
 
-72 L<fileInWindowsFormat|/fileInWindowsFormat> - Convert a unix file name to windows format
+75 L<fileInWindowsFormat|/fileInWindowsFormat> - Convert a unix file name to windows format
 
-73 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
+76 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
 
-74 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum for a file or string
+77 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum for a file or string
 
-75 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
+78 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
 
-76 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
+79 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
 
-77 L<filePath|/filePath> - Create a file name from an array of file name components.
+80 L<filePath|/filePath> - Create a file name from an array of file name components.
 
-78 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
+81 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-79 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
+82 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-80 L<fileSize|/fileSize> - Get the size of a file.
+83 L<fileSize|/fileSize> - Get the size of a file.
 
-81 L<findAllFilesAndFolders|/findAllFilesAndFolders> - Find all the files and folders under a folder.
+84 L<findAllFilesAndFolders|/findAllFilesAndFolders> - Find all the files and folders under a folder.
 
-82 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
+85 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
 
-83 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
+86 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
 
-84 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
+87 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
 
-85 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
+88 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
-86 L<firstNChars|/firstNChars> - First N characters of a string.
+89 L<firstNChars|/firstNChars> - First N characters of a string.
 
-87 L<fn|/fn> - Remove path and extension from file name.
+90 L<fn|/fn> - Remove path and extension from file name.
 
-88 L<fne|/fne> - Remove path from file name.
+91 L<fne|/fne> - Remove path from file name.
 
-89 L<formatTable|/formatTable> - Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.
+92 L<formatTable|/formatTable> - Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.
 
-90 L<formatTableA|/formatTableA> - Tabularize an array.
+93 L<formatTableA|/formatTableA> - Tabularize an array.
 
-91 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+94 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-92 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+95 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-93 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
+96 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-94 L<formatTableH|/formatTableH> - Tabularize a hash.
+97 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-95 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+98 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-96 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+99 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-97 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+100 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-98 L<formattedTablesReport|/formattedTablesReport> - Report of all the reports created.
+101 L<formattedTablesReport|/formattedTablesReport> - Report of all the reports created.
 
-99 L<fp|/fp> - Get path from file name.
+102 L<fp|/fp> - Get path from file name.
 
-100 L<fpn|/fpn> - Remove extension from file name.
+103 L<fpn|/fpn> - Remove extension from file name.
 
-101 L<fullFileName|/fullFileName> - Full name of a file.
+104 L<fullFileName|/fullFileName> - Full name of a file.
 
-102 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
+105 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
 
-103 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+106 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-104 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+107 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-105 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
+108 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-106 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+109 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-107 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
+110 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
 
-108 L<guidFromString|/guidFromString> - Create a guid from a file or string via an md5 hash.
+111 L<guidFromString|/guidFromString> - Create a guid from a file or string via an md5 hash.
 
-109 L<hexToAsciiString|/hexToAsciiString> - Decode a string of hexadecimal digits as an ascii string.
+112 L<hexToAsciiString|/hexToAsciiString> - Decode a string of hexadecimal digits as an ascii string.
 
-110 L<hostName|/hostName> - The name of the host we are running on.
+113 L<hostName|/hostName> - The name of the host we are running on.
 
-111 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+114 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-112 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|https://www.imagemagick.org/script/index.php>.
+115 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|https://www.imagemagick.org/script/index.php>.
 
-113 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+116 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-114 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list confessing to any ill defined values.
+117 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list confessing to any ill defined values.
 
-115 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list confessing to any ill defined values.
+118 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list confessing to any ill defined values.
 
-116 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+119 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-117 L<isBlank|/isBlank> - Test whether a string is blank.
+120 L<isBlank|/isBlank> - Test whether a string is blank.
 
-118 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
+121 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
 
-119 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
+122 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
 
-120 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+123 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-121 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+124 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-122 L<keyCount|/keyCount> - Count keys down to the specified level.
+125 L<javaScriptExports|/javaScriptExports> - Extract the Javascript functions marked for export in a file or string.
 
-123 L<lll|/lll> - Log messages including the project name if available.
+126 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-124 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+127 L<lll|/lll> - Log messages including the project name if available.
 
-125 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+128 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-126 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
+129 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-127 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+130 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
 
-128 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+131 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-129 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+132 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-130 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+133 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-131 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
+134 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-132 L<makePath|/makePath> - Make the path for the specified file name or folder.
+135 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
 
-133 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+136 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-134 L<max|/max> - Find the maximum number in a list confessing to any ill defined values.
+137 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-135 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+138 L<max|/max> - Find the maximum number in a list confessing to any ill defined values.
 
-136 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
+139 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-137 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
+140 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
 
-138 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+141 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
 
-139 L<min|/min> - Find the minimum number in a list confessing to any ill defined values.
+142 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-140 L<nameFromFolder|/nameFromFolder> - Create a name from the last folder in the path of a file name.
+143 L<min|/min> - Find the minimum number in a list confessing to any ill defined values.
 
-141 L<nameFromString|/nameFromString> - Create a readable name from an arbitrary string of text.
+144 L<nameFromFolder|/nameFromFolder> - Create a name from the last folder in the path of a file name.
 
-142 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+145 L<nameFromString|/nameFromString> - Create a readable name from an arbitrary string of text.
 
-143 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+146 L<nameFromStringRestrictedToTitle|/nameFromStringRestrictedToTitle> - Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
 
-144 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+147 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-145 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+148 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-146 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+149 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-147 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+150 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-148 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+151 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-149 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+152 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-150 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+153 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-151 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+154 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-152 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+155 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
 
-153 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+156 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-154 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
+157 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-155 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+158 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-156 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+159 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-157 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+160 L<parseDitaRef|/parseDitaRef> - Parse a dita reference into its components
 
-158 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+161 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-159 L<printQw|/printQw> - Print an array of words in qw() format.
+162 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-160 L<quoteFile|/quoteFile> - Quote a file name.
+163 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-161 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+164 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-162 L<readFile|/readFile> - Read a file containing unicode in utf8.
+165 L<printQw|/printQw> - Print an array of words in qw() format.
 
-163 L<readFiles|/readFiles> - Read all the files in a folder into a hash
+166 L<quoteFile|/quoteFile> - Quote a file name.
 
-164 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+167 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-165 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+168 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-166 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+169 L<readFiles|/readFiles> - Read all the files in a folder into a hash
 
-167 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+170 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-168 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+171 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-169 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+172 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-170 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+173 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-171 L<reportSettings|/reportSettings> - Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>.
+174 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-172 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
+175 L<removeDuplicatePrefixes|/removeDuplicatePrefixes> - Remove duplicated leading path components from a file name.
 
-173 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+176 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-174 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+177 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-175 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+178 L<reportAttributes|/reportAttributes> - Report the attributes present in a B<$sourceFile>
 
-176 L<setCombination|/setCombination> - Count the elements in sets represented as arrays of strings and/or the keys of hashes
+179 L<reportExportableMethods|/reportExportableMethods> - Report the exportable methods marked with #e in a B<$sourceFile>
 
-177 L<setFileExtension|/setFileExtension> - Set the extension of a file to a specified value.
+180 L<reportReplacableMethods|/reportReplacableMethods> - Report the replaceable methods marked with #r in a B<$sourceFile>
 
-178 L<setIntersection|/setIntersection> - Intersection of sets represented as arrays of strings and/or the keys of hashes
+181 L<reportSettings|/reportSettings> - Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>.
 
-179 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets represented as arrays and/or hashes
+182 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
 
-180 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+183 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-181 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition a set of sets so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified B<$confidence**2>
+184 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-182 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition a set of sets represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+185 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-183 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition a set of sets of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified B<$confidence**2>
+186 L<setCombination|/setCombination> - Count the elements in sets represented as arrays of strings and/or the keys of hashes
 
-184 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition a set of sets, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2>
+187 L<setFileExtension|/setFileExtension> - Set the extension of a file to a specified value.
 
-185 L<setUnion|/setUnion> - Union of sets represented as arrays of strings and/or the keys of hashes
+188 L<setIntersection|/setIntersection> - Intersection of sets represented as arrays of strings and/or the keys of hashes
 
-186 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+189 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets represented as arrays and/or hashes
 
-187 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+190 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-188 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
+191 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition a set of sets so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified B<$confidence**2>
 
-189 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+192 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition a set of sets represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
 
-190 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
+193 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition a set of sets of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified B<$confidence**2>
 
-191 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+194 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition a set of sets, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2>
 
-192 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+195 L<setUnion|/setUnion> - Union of sets represented as arrays of strings and/or the keys of hashes
 
-193 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+196 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-194 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
+197 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-195 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
+198 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
 
-196 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+199 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-197 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+200 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
 
-198 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a B<$known> name to a B<$new> one if the file does in fact start with the B<$known> name otherwise returns the original file name.
+201 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-199 L<swapFolderPrefix|/swapFolderPrefix> - Swaps a starting folder of a file name from a known name to a new one if the file does in fact start with the known name and the known name and new name are folders else return the file as is.
+202 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-200 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+203 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-201 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+204 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
 
-202 L<timeStamp|/timeStamp> - hours:minute:seconds
+205 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
 
-203 L<trackFiles|/trackFiles> - Track the existence of files.
+206 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-204 L<trim|/trim> - Remove any white space from the front and end of a string.
+207 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-205 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
+208 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a B<$known> name to a B<$new> one if the file does in fact start with the B<$known> name otherwise returns the original file name.
 
-206 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+209 L<swapFolderPrefix|/swapFolderPrefix> - Swaps a starting folder of a file name from a known name to a new one if the file does in fact start with the known name and the known name and new name are folders else return the file as is.
 
-207 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+210 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-208 L<uniqueNameFromFile|/uniqueNameFromFile> - Create a unique name from a file name and the md5 sum of its content
+211 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-209 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
+212 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-210 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+213 L<trackFiles|/trackFiles> - Track the existence of files.
 
-211 L<userId|/userId> - The userid we are currently running under.
+214 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-212 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+215 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
 
-213 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+216 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-214 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+217 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-215 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+218 L<uniqueNameFromFile|/uniqueNameFromFile> - Create a unique name from a file name and the md5 sum of its content
 
-216 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
+219 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
 
-217 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+220 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-218 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+221 L<userId|/userId> - The userid we are currently running under.
 
-219 L<wwwDecode|/wwwDecode> - Percent decode a url per: https://en.
+222 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-220 L<wwwEncode|/wwwEncode> - Percent encode a url per: https://en.
+223 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-221 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+224 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-222 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+225 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
-223 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+226 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
 
-224 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+227 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+
+228 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+
+229 L<wwwDecode|/wwwDecode> - Percent decode a url per: https://en.
+
+230 L<wwwEncode|/wwwEncode> - Percent encode a url per: https://en.
+
+231 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+
+232 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+233 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+234 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -9664,22 +9990,23 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::Harness qw($verbose);
-   $Test::Harness::verbose = 1;
+#use Test::Harness qw($verbose);
+#   $Test::Harness::verbose = 1;
+
+use Test::More;
 
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 534;
-my $haiku     = $^O =~ m(haiku)i;
-my $windows   = $^O =~ m(MSWin32)i;
-my $mac       = $^O =~ m(darwin)i;
-my $freeBsd   = $^O =~ m(freebsd)i;
-my $dragonFly = $^O =~ m(dragonfly)i;
-my $linux     = $^O =~ m(linux)i;
+if ($^O =~ m(linux)i)
+ {plan tests => 537;
+ }
+else
+ {plan skip_all => 'Only Linux is supported';
+ }
 
 if (1)                                                                          # Unicode to local file
- {use utf8;
+ {#use
   my $z = "𝝰 𝝱 𝝲";
   my $t = temporaryFolder;
   my $f = filePathExt($t, $z, qq(data));
@@ -9745,11 +10072,8 @@ if (1)                                                                          
   ok $s eq $z;
   ok length($s) == length($z);
 
-  if ($windows or $mac) {ok 1}
-  else
-   {my @f = findFiles($T);
-    ok $f[0] eq $f;
-   }
+  my @f = findFiles($T);
+  ok $f[0] eq $f;
 
   unlink $f;
   ok !-e $f;
@@ -9780,7 +10104,7 @@ if (1)                                                                          
   ok !-d $T;
  }
 
-if (!$windows) {                                                                # Check files
+if (1) {                                                                        # Check files
   my $d = filePath   (my @d = qw(a b c d));                                     #TcheckFile #TmatchPath
   my $f = filePathExt(qw(a b c d e x));                                         #TcheckFile
   my $F = filePathExt(qw(a b c e d));                                           #TcheckFile
@@ -9800,9 +10124,6 @@ if (!$windows) {                                                                
     pop @d;
    }
  }
-else
- {ok 1 for 1..9;
- }
 
 if (1)                                                                          # Clear folder
  {my $d = 'a';
@@ -9813,14 +10134,11 @@ if (1)                                                                          
     overWriteFile($f, '1');
     pop @D;
    }
-  if ($windows) {ok 1 for 1..3}
-  else
-   {ok findFiles($d) == 4;
-    eval q{clearFolder($d, 3)};
-    ok $@ =~ m(\ALimit is 3, but 4 files under folder:)s;
-    clearFolder($d, 4);
-    ok !-d $d;
-   }
+  ok findFiles($d) == 4;
+  eval q{clearFolder($d, 3)};
+  ok $@ =~ m(\ALimit is 3, but 4 files under folder:)s;
+  clearFolder($d, 4);
+  ok !-d $d;
  }
 
 ok formatTable                                                                  #TformatTable
@@ -10423,7 +10741,7 @@ ok fn (q(/a/b/c.d.e)) eq q(c.d);
 ok fne(q(/a/b/c.d.e)) eq q(c.d.e);
 ok fe (q(/a/b/c.d.e)) eq q(e);
 
-if (!$windows) {
+if (1) {
 ˢ{our $a = q(1);                                                                #Tcall
   our @a = qw(1);
   our %a = (a=>1);
@@ -10436,9 +10754,6 @@ if (!$windows) {
     ok $b    == 1;
    }
  };
- }
-else
- {ok 1 for 1..12;
  }
 
 ˢ{ok q(../a/) eq fp q(../a/b.c);
@@ -10457,7 +10772,7 @@ if (1) {                                                                        
 ok quoteFile(fpe(qw(a "b" c))) eq q("a/\"b\".c");                               #TquoteFile
 ok printQw(qw(a b c)) eq q(qw(a b c));                                          #TprintQw
 
-if (!$windows and !$mac) {
+if (1) {
   my $D = temporaryFolder;                                                      #TtemporaryFolder #TcreateEmptyFile #TclearFolder #TfileList #TfindFiles #TsearchDirectoryTreesForMatchingFiles #TfindDirs
   my $d = fpd($D, q(ddd));                                                                        #TcreateEmptyFile #TclearFolder #TfileList #TfindFiles #TsearchDirectoryTreesForMatchingFiles #TfindDirs
   my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                  #TcreateEmptyFile #TclearFolder #TfileList #TfindFiles #TsearchDirectoryTreesForMatchingFiles #TfindDirs
@@ -10471,9 +10786,6 @@ if (!$windows and !$mac) {
   clearFolder($D, 5);                                                                                               #TclearFolder
   ok !-e $_ for @f;                                                                                                 #TclearFolder
   ok !-d $D;                                                                                                        #TclearFolder
- }
-else                                                                            # searchDirectoryTreesForMatchingFiles uses find which does not work identically to Linux on Windows
- {ok 1 for 1..11;
  }
 
 if (1) {
@@ -10494,7 +10806,7 @@ if (1) {
   unlink $f;
  }
 
-if (!$windows) {
+if (1) {
   my $d = fpd(my $D = temporaryDirectory, qw(a));                               #TmakePath #TtemporaryDirectory
   my $f = fpe($d, qw(bbb txt));                                                 #TmakePath
   ok !-d $d;                                                                    #TmakePath
@@ -10507,7 +10819,6 @@ if (!$windows) {
   ok -d $D;
   rmdir $_ for $d, $D;
  }
-else {ok 1 for 1..4}
 
 ok nws(qq(a  b    c)) eq q(a b c);                                              #Tnws
 ok ˢ{1} == 1;                                                                   #Tˢ
@@ -10534,25 +10845,14 @@ if (0) {                                                                        
   ok !keys(%pids)
  }
 
-if (!$windows) {
-say STDERR "AAAA ";
+if (1) {
 ok dateTimeStamp     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z), q(dts);       #TdateTimeStamp
-say STDERR "BBBB ";
 ok dateTimeStampName =~ m(\A_on_\d{4}_\d\d_\d\d_at_\d\d_\d\d_\d\d\Z);           #TdateTimeStampName
-say STDERR "CCCC ";
 ok dateStamp         =~ m(\A\d{4}-\w{3}-\d\d\Z);                                #TdateStamp
-say STDERR "DDDD ";
 ok versionCode       =~ m(\A\d{8}-\d{6}\Z);                                     #TversionCode
-say STDERR "EEEE ";
 ok versionCodeDashed =~ m(\A\d{4}-\d\d-\d\d-\d\d:\d\d:\d\d\Z);                  #TversionCodeDashed
-say STDERR "FFFF ";
 ok timeStamp         =~ m(\A\d\d:\d\d:\d\d\Z);                                  #TtimeStamp
-say STDERR "GGGG ";
 ok microSecondsSinceEpoch > 47*365*24*60*60*1e6;                                #TmicroSecondsSinceEpoch
-say STDERR "HHHH ";
- }
-else
- {ok 1 for 1..7;
  }
 
 if (0) {
@@ -10665,7 +10965,6 @@ if (1)                                                                          
   ok subScriptStringUndo       (subScriptString($n))        == $n;
  }
 
-if (!$windows) {
 if (1) {                                                                        #TwriteGZipFile #TreadGZipFile
   my $s = '𝝰'x1e3;
   my $file = writeGZipFile(q(zzz.zip), $s);
@@ -10675,12 +10974,7 @@ if (1) {                                                                        
   ok length($s) == length($S);
   unlink $file;
  }
- }
-else
- {ok 1 for 1..3
- }
 
-if (!$windows) {
 if (1) {                                                                        #TdumpGZipFile #TevalGZipFile
   my $d = [1, 2, 3=>{a=>4, b=>5}];
   my $file = dumpGZipFile(q(zzz.zip), $d);
@@ -10688,10 +10982,6 @@ if (1) {                                                                        
   my $D = evalGZipFile($file);
   is_deeply $d, $D;
   unlink $file;
- }
- }
-else
- {ok 1 for 1..2
  }
 
 if (1)
@@ -10957,7 +11247,6 @@ if (1)                                                                          
   unlink q(bbb.txt);
  }
 
-if (!$windows) {
 if (1)                                                                          #TnewProcessStarter #TData::Table::Text::Starter::start #TData::Table::Text::Starter::finish
  {my $N = 100;
   my $l = q(logFile.txt);
@@ -10978,10 +11267,6 @@ if (1)                                                                          
   ok readFile($l) =~ m(Finished $N processes for: Test processes)s;
   clearFolder($s->transferArea, 1e3);
   unlink $l;
- }
- }
-else
- {ok 1 for 1..2
  }
 
 is_deeply arrayToHash(qw(a b c)), {a=>1, b=>1, c=>1};                           #TarrayToHash
@@ -11013,7 +11298,6 @@ if (1) {                                                                        
   unlink $f;
  }
 
-if ($freeBsd or $windows or $dragonFly or $linux or $haiku) {ok 1 for 1..3} else {
 if (1) {                                                                        #TwriteFiles #TreadFiles #TcopyFile #TcopyFolder
   my $h =
    {"aaa/1.txt"=>"1111",
@@ -11034,7 +11318,6 @@ if (1) {                                                                        
 
   clearFolder(q(aaa), 3);
   clearFolder(q(bbb), 3);
- }
  }
 
 if (1)                                                                          #TsetPackageSearchOrder
@@ -11400,7 +11683,7 @@ fff __LINE__, __FILE__, "Hello world";                                          
 }
 
 if (1) {
-  local $formatTableWithZwSp = 1;
+  #local $formatTableWithZwSp = 1;
   my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
   ok nws(formatTableBasic($d)) eq nws(<<END);
 a        1
@@ -11438,7 +11721,7 @@ END
  }
 
 
-if (1) {                                                                        #TcopyFileMd5Normalized #TcopyFileMd5NormalizedGetCompanionContent #TcopyFileMd5NormalizedCreate
+if (1) {                                                                        #TcopyFileMd5Normalized #TcopyFileMd5NormalizedGetCompanionContent #TcopyFileMd5NormalizedCreate #TcopyFileMd5NormalizedDelete
   my $dir = temporaryFolder;
   my $a = fpe($dir, qw(a a jpg));
   my $b = fpe($dir, qw(b a jpg));
@@ -11516,7 +11799,9 @@ if (1) {                                                                        
   unlink $f;
  }
 
-ok nameFromFolder(fpe(qw( a b c d e))) eq q(c);                                 #TnameFromFolder
+if (1) {                                                                        #TnameFromFolder
+ok nameFromFolder(fpe(qw( a b c d e))) eq q(c);
+ }
 
 if (1) {                                                                        #TparseDitaRef
   is_deeply [parseDitaRef(q(a#b/c))], [qw(a b c)];
@@ -11553,6 +11838,24 @@ if (1) {                                                                        
 <p>Hello<b>World</b></p>
 END
 q(Hello_World_6ba23858c1b4811660896c324acac6fa.txt);
+ }
+
+if (1) {                                                                        #TreportAttributes #TreportReplacableMethods #TreportExportableMethods
+  my $f = writeFile(undef, <<END);
+
+sub attribute {1}                                                               # An attribute
+sub replaceable($)                                                              #r A replaceable method
+ {
+ }
+sub exportable($)                                                               #e An exportable method
+ {
+ }
+END
+
+  is_deeply reportAttributes($f),        {attribute  =>"An attribute"};
+  is_deeply reportReplacableMethods($f), {replaceable=>"A replaceable method"};
+  is_deeply reportExportableMethods($f), {exportable =>"An exportable method"};
+  unlink $f;
  }
 
 #tttt
