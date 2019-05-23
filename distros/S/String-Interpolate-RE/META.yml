@@ -30,7 +30,7 @@ no_index:
 provides:
   String::Interpolate::RE:
     file: lib/String/Interpolate/RE.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Carp: '0'
   Exporter::Shiny: '0'
@@ -39,6 +39,6 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE
   repository: git://github.com/djerius/string-interpolate-re.git
-version: '0.09'
+version: '0.10'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

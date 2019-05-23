@@ -56156,3 +56156,11 @@ T/TE/TEKKI/SVG-Barcode-Code128-0.01.tar.gz
 T/TE/TEKKI/SVG-Barcode-QRCode-0.02.tar.gz
 D/DA/DAKKAR/Test-DBChanges-1.0.0.tar.gz
 D/DA/DAKKAR/Test-NiceDump-1.0.0.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000473.tar.gz
+M/MA/MANWAR/Map-Tube-CLI-0.63.tar.gz
+L/LS/LSKATZ/Mashtree-0.56.tar.gz
+S/SR/SRI/Mojolicious-8.17.tar.gz
+Z/ZD/ZDM/Pcore-CDN-Static-v0.39.0.tar.gz
+K/KM/KMX/Perl-Dist-Strawberry-4.018.tar.gz
+M/MG/MGUALDRON/SQL-Shell-1.16.tar.gz
+D/DJ/DJERIUS/String-Interpolate-RE-0.10.tar.gz

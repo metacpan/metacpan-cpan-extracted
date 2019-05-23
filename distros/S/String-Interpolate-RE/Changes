@@ -1,5 +1,12 @@
 Revision history for String-Interpolate-RE
 
+0.10      2019-05-23 15:21:21-04:00 America/New_York
+
+  [BUG FIX]
+
+    * v 0.09 broke calling strinterp as String::Interpolate::RE::strinterp()
+
+
 0.09      2019-05-09 17:01:26-04:00 America/New_York
 
   [ENHANCEMENT]

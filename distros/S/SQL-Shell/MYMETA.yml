@@ -1,0 +1,33 @@
+---
+abstract: 'command interpreter for DBI shells'
+author:
+  - 'British Broadcasting Corporation'
+  - 'Miguel Gualdron'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Shell
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '0'
+  IO::CaptureOutput: '0'
+  IO::Scalar: '0'
+  Log::Trace: '0'
+  Test::Assertions: '0'
+  Test::Assertions::TestScript: '0'
+  URI::Escape: '0'
+  perl: '5.008004'
+resources:
+  repository: https://github.com/mgualdron/SQL-Shell.git
+version: '1.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

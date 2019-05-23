@@ -1,4 +1,8 @@
 
+8.17  2019-05-23
+  - Fixed a bug in Mojo::UserAgent where the request timeout would not work for
+    keep-alive requests. (ilmari)
+
 8.16  2019-05-14
   - Improved Mojo::Headers to reject characters in header values that would
     corrupt the HTTP message.

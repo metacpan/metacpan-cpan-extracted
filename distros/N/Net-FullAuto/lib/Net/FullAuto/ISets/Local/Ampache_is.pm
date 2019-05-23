@@ -74,8 +74,9 @@ my $configure_ampache=sub {
    if (exists $main::aws->{permanent_ip}) {
       $permanent_ip=$main::aws->{permanent_ip}; 
    }
-   my $test_aws=
-         `wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/`;
+   my $test_aws='wget --timeout=5 --tries=1 -qO- '.
+                'http://169.254.169.254/latest/dynamic/instance-identity/';
+   $test_aws=`$test_aws`;
    if (-1<index $test_aws,'signature') {
       my $n=$main::aws->{fullauto}->
             {SecurityGroups}->[0]->{GroupName}||'';

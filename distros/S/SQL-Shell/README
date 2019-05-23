@@ -1,9 +1,25 @@
-SQL::Shell v1.15
+SQL::Shell v1.16
 
-(c) BBC 2006. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
-Enhancements and bug-fixes (c) 2016 Miguel Gualdron under the GNU GPL.
+SQL-Shell:  Interactive shell for DBI Databases
+Copyright (C) 2006  BBC
+Copyright (C) 2019  Miguel Gualdron
 
-See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+See the file COPYING in this distribution, or https://www.gnu.org/licenses/gpl-2.0.html
+
 
 QUICK START:
 
@@ -16,13 +32,46 @@ commands in the source directory:
     make install
     Then delete the source directory tree since it's no longer needed.
 
-To run the unit test against a database, define the following environment variables before running "make test":
+The optional database unit tests have been optimized for SQLite.  If you want 
+to run these, please install
 
-   UNIT_TEST_DSN (a DBI DSN)
-   UNIT_TEST_USER
-   UNIT_TEST_PASS
+    DBD::SQLite
 
-The unit test script will trash any tables in this database (hence point at an empty database).
+and set the following environment variables as follows before running
+"make test":
+
+   UNIT_TEST_DSN="DBI:SQLite:dbname=test.db"
+   UNIT_TEST_USER=anything
+   UNIT_TEST_PASS=
+
+The unit test script will create a file called t/data/test.db, and will 
+remove it at the end of the testing.
 
 Run 'perldoc SQL::Shell' to read the full documentation.
 
+
+RECENT CHANGES
+
+
+v1.16
+
+Corrected the copyright notices throughout the code to properly match the 
+COPYING file already distributed with the module.
+
+Added new commands 'send' and 'recv' to give users better control of how 
+their commands are interpreted when they don't match predefined patterns.
+
+Simplified the functionality of the 'show tables' command to improve 
+performance on platforms with large numbers of tables. (The old functionality 
+is still present in the new 'show tablecounts' command.)
+
+Added a new command 'show settings' to list some of the shell's internal 
+parameters.  More of the settings will be added to this listing in the future.
+
+Modified the DB tests to work best with SQLite, as it was nearly impossible 
+to maintain compatibility with all DB platforms.
+
+
+v1.15
+
+Fixed several long-standing issues.  All of them were minor.

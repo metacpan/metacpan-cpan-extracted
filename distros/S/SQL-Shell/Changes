@@ -1,15 +1,29 @@
-Tue Feb 23 15:14:01 2016 - 1.15
-    Releasing 1.14_02 as 1.15 since all tests pass on all platforms (cpantesters.org).
+Revision history for Perl module SQL::Shell
 
-Tue Feb 23 12:10:01 2016 - 1.14_02
-    New maintainer (MGUALDRON).
-    Fixed existing bugs.
+1.16 - 2019-05-22
 
-Tue Dec  5 14:25:01 2006 - 1.14
-    sqlsh: corrected regex for exiting "impolitely"
+  * Added new send/recv commands
+  * Added show settings
+  * Enhanced show tables
+  * Added show tablecounts, schemas, catalogs and tabletypes
 
-Mon Sep  4 12:00:50 2006 - 1.13
-    Initial CPAN release
+1.15 - 2016-02-23
 
-Version 1.12 - 08/08/06
-    Initial release prepared for CPAN
+  * Releasing 1.14_02 as 1.15 since all tests pass on all platforms (cpantesters.org).
+
+1.14_02 - 2016-02-23
+
+  * New maintainer (MGUALDRON).
+  * Fixed existing bugs.
+
+1.14 - 2006-12-05
+
+  * sqlsh: corrected regex for exiting "impolitely"
+
+1.13 - 2006-09-04
+
+  * Initial CPAN release
+
+1.12 - 2006-08-08
+
+  * Initial release prepared for CPAN

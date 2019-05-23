@@ -1,0 +1,57 @@
+{
+   "abstract" : "command interpreter for DBI shells",
+   "author" : [
+      "British Broadcasting Corporation",
+      "Miguel Gualdron"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SQL-Shell",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "IO::CaptureOutput" : "0",
+            "IO::Scalar" : "0",
+            "Log::Trace" : "0",
+            "Test::Assertions" : "0",
+            "Test::Assertions::TestScript" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.008004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mgualdron/SQL-Shell.git",
+         "web" : "https://github.com/mgualdron/SQL-Shell"
+      }
+   },
+   "version" : "1.16",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

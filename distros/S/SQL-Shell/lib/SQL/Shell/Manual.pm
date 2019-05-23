@@ -91,18 +91,80 @@ Common DBI DSNs include:
 
 =head3 show tables
 
-This lists the tables with a rowcount for each:
+This lists the tables in your database along with other attributes that may 
+be provided by your platform and driver:
 
-	DBI:SQLite:dbname=test.db> show tables                    
-	+----------------------+------+
-	| table                | rows |
-	+----------------------+------+
-	| "sqlite_master"      | 1    |
-	| "sqlite_temp_master" | 0    |
-	| "commands"           | 11   |
-	+----------------------+------+
+    DBI:SQLite:dbname=test.db> show tables
+    +-----------+-------------+--------------------+--------------+---------+
+    | TABLE_CAT | TABLE_SCHEM | TABLE_NAME         | TABLE_TYPE   | REMARKS |
+    +-----------+-------------+--------------------+--------------+---------+
+    | NULL      | main        | sqlite_master      | SYSTEM TABLE | NULL    |
+    | NULL      | temp        | sqlite_temp_master | SYSTEM TABLE | NULL    |
+    | NULL      | main        | commands           | TABLE        | NULL    |
+    +-----------+-------------+--------------------+--------------+---------+
 
 For some database drivers this may include some system tables.
+
+=head3 show tablecounts
+
+This lists the tables with a rowcount for each:
+
+    DBI:SQLite:dbname=test.db> show tablecounts
+    +-----------------------------+------+
+    | table                       | rows |
+    +-----------------------------+------+
+    | "main"."sqlite_master"      | 2    |
+    | "temp"."sqlite_temp_master" | 0    |
+    | "main"."commands"           | 12   |
+    +-----------------------------+------+
+
+For some database drivers this may include some system tables. This 
+command does a C<SELECT COUNT(*) FROM> on every table in your database.  You 
+may not want to do this on databases with large numbers of tables, and/or 
+tables with large numbers of rows.
+
+=head3 show catalogs
+
+If your platform supports it, this shows a listing of available database 
+catalogs.
+
+    DBI:ODBC:localdb> show catalogs
+    +----------------+
+    | TABLE_CAT      |
+    +----------------+
+    | AdventureWorks |
+    | master         |
+    | msdb           |
+    | tempdb         |
+    +----------------+
+
+=head3 show schemas
+
+This command will list the schemas available in your database.  Note that 
+this is different from C<show schema> (singular), which shows table 
+descriptions for every table in your schema (see below).
+
+    DBI:SQLite:dbname=test.db> show schemas
+    +-------------+
+    | TABLE_SCHEM |
+    +-------------+
+    | main        |
+    | temp        |
+    +-------------+
+
+=head3 show tabletypes
+
+List the available table-types in your database.
+
+    DBI:SQLite:dbname=test.db> show tabletypes
+    +-----------------+
+    | TABLE_TYPE      |
+    +-----------------+
+    | LOCAL TEMPORARY |
+    | SYSTEM TABLE    |
+    | TABLE           |
+    | VIEW            |
+    +-----------------+
 	
 =head3 desc
 
@@ -131,6 +193,27 @@ Lists the columns in a table, for each table in the schema:
 	| DESCRIPTION | VARCHAR2(1020) | YES  |
 	+-------------+----------------+------+
 
+=head2 Current shell settings (show settings)
+
+To list some C<sqlsh> internal settings:
+
+    DBI:SQLite:dbname=test.db> show settings
+    +------------------+-------+
+    | PARAMETER        | VALUE |
+    +------------------+-------+
+    | auto-commit      | on    |
+    | delimiter        | \t    |
+    | enter-whitespace |       |
+    | escape           | off   |
+    | longreadlen      | 512   |
+    | longtruncok      | on    |
+    | multiline        | off   |
+    | verbose          | on    |
+    | width            | 80    |
+    +------------------+-------+
+
+Note that not all settings are yet included in this output.
+
 =head2 Querying the database
 
 	DBI:SQLite:dbname=test.db> select * from commands
@@ -141,7 +224,8 @@ Lists the columns in a table, for each table in the schema:
 	| show datasources | Displays a list of available data sources for a driver       |
 	| connect          | Connects to a data source                                    |
 	| disconnect       | Disconnects from a data source                               |
-	| show tables      | List the tables in the schema with a rowcount for each table |
+	| show tables      | List the tables in the schema                                |
+	| show tablecounts | List the tables in the schema with a rowcount for each table |
 	| show schema      | Lists the columns in each table in the schema                |
 	| desc             | List the columns in a table                                  |
 	| set              | Set a parameter                                              |
@@ -230,7 +314,7 @@ You can then build up statements over multiple lines, ending with a semicolon, e
 	+----------+
 	| COUNT(*) |
 	+----------+
-	| 11       |
+	| 12       |
 	+----------+
 
 To disable multiline mode, remember you need to end the statement in a semicolon:
@@ -273,14 +357,19 @@ and you can roll back mistakes:
 	+----------+
 	| COUNT(*) |
 	+----------+
-	| 11       |
+	| 12       |
 	+----------+
 
-If you prefer to live dangerously you can switch autocommit on:
+If you prefer, you can switch autocommit on:
 	
 	set autocommit on
 	insert ...
 	update ...
+
+This is the preferred mode of operation when connecting to some database 
+platforms like SQL Server.  Depending on the platform, not all commands work 
+within a "transaction", and some platforms prefer that they be run with 
+autocommit on. Your mileage may vary.
 
 =head3 Clearing the database
 
@@ -296,6 +385,81 @@ The C<wipe tables> command can be used to remove all the data each of the tables
 	Wiped all data in database
 
 It prompts you to confirm before anihilating your database.
+
+=head2 The send and recv commands
+
+These commands were added in v1.16. Their purpose is to give the user more 
+control over how commands are interpreted by the shell before they are sent 
+to the DB without the need to make the shell identify the commands to determine 
+whether to expect output or not.  They are intended to deal with 
+platform-specific variations of SQL syntax that aren't covered by the generic 
+command-matching process in C<sqlsh>.
+
+C<send> is used when you don't expect output from the command, and C<recv> is 
+used for cases where the command provides output, and you'd like it 
+rendered and displayed, as if it had come from a C<select>.
+
+=head3 Example 1
+
+On IBM Netezza, you can query previously deleted records by giving the 
+database the following command:
+
+    set show_deleted_records=TRUE
+
+If you try to do that from C<sqlsh>, it will tell you that the command is 
+not recognized, because C<sqlsh> has a built-in C<set> command, and it is 
+trying to match it to what you have typed at the prompt.
+
+The solution is to use the C<send> command to submit the C<set> expression to 
+the DB without having it intercepted by C<sqlsh>:
+
+    send set show_deleted_records=TRUE
+
+=head3 Example 2
+
+On SQL Server there are a number of procedure calls that provide output.  For 
+instance:
+
+    exec xp_cmdshell 'dir *.exe'
+
+or simply
+
+    xp_cmdshell 'dir *.exe'
+
+While C<sqlsh> supports the C<execute> command, this is intended to run 
+commands from a local SQL file.  In this case, C<sqlsh> would just reply 
+that the command is not recognized.  The solution is to use the C<recv> 
+command:
+
+    recv exec xp_cmdshell 'dir *.exe'
+
+or
+    recv xp_cmdshell 'dir *.exe'
+
+This will make C<sqlsh> submit the exec expression to the DB as if it were 
+a C<select> command, so that any output is rendered and displayed.
+
+=head3 Example 3
+
+Several database platforms allow giving the C<use> command to query a 
+different database.  You are in effect switching databases without 
+disconnecting.  The command looks as follows:
+
+    use MY_DB_NAME
+
+If I give this command while in C<sqlsh>, it will not be recognized, 
+however, I could pass it on to the DB by using C<send>:
+
+    send use MY_DB_NAME
+
+In this case we type C<send> instead or C<recv> because we don't expect any 
+output from the C<use> command.
+
+Note that if your DB platform supports the C<use> command, you may also need 
+a command to tell you which database you're currently using. This is
+platform-dependent, but I will provide an example from SQL Server:
+
+    select dbname() as current_database
 			
 =head2 Dumping delimited data
 
@@ -311,7 +475,7 @@ An example:
 
 	DBI:SQLite:dbname=test.db> dump commands into commands.csv delimited by ,
 	Dumping commands into commands.csv
-	Dumped 11 rows into commands.csv
+	Dumped 12 rows into commands.csv
 	
 	DBI:SQLite:dbname=test.db> more commands.csv 
 	command,desc
@@ -358,7 +522,8 @@ or both:
 	+------------------+--------------------------------------------------------------+
 	| show drivers     | Displays a list of DBI drivers                               |
 	| show datasources | Displays a list of available data sources for a driver       |
-	| show tables      | List the tables in the schema with a rowcount for each table |
+	| show tables      | List the tables in the schema                                |
+	| show tablecounts | List the tables in the schema with a rowcount for each table |
 	| show schema      | Lists the columns in each table in the schema                |
 	+------------------+--------------------------------------------------------------+
 
@@ -374,6 +539,10 @@ or both:
 	        </record>
 	        <record>
 	                <COMMAND>show tables</COMMAND>
+	                <DESCRIPTION>List the tables in the schema</DESCRIPTION>
+	        </record>
+	        <record>
+	                <COMMAND>show tablecounts</COMMAND>
 	                <DESCRIPTION>List the tables in the schema with a rowcount for each table</DESCRIPTION>
 	        </record>
 	        <record>
@@ -398,14 +567,16 @@ or both:
 	+------------------+--------------------------------------------------------------+
 	| show drivers     | Displays a list of DBI drivers                               |
 	| show datasources | Displays a list of available data sources for a driver       |
-	| show tables      | List the tables in the schema with a rowcount for each table |
+	| show tables      | List the tables in the schema                                |
+	| show tablecounts | List the tables in the schema with a rowcount for each table |
 	| show schema      | Lists the columns in each table in the schema                |
 	+------------------+--------------------------------------------------------------+
 
 	DBI:Oracle:IFLDEV>> more export.sql                                  
 	INSERT into $table (COMMAND,DESCRIPTION) VALUES ('show drivers','Displays a list of DBI drivers');
 	INSERT into $table (COMMAND,DESCRIPTION) VALUES ('show datasources','Displays a list of available data sources for a driver');
-	INSERT into $table (COMMAND,DESCRIPTION) VALUES ('show tables','List the tables in the schema with a rowcount for each table');
+	INSERT into $table (COMMAND,DESCRIPTION) VALUES ('show tables','List the tables in the schema');
+	INSERT into $table (COMMAND,DESCRIPTION) VALUES ('show tablecounts','List the tables in the schema with a rowcount for each table');
 	INSERT into $table (COMMAND,DESCRIPTION) VALUES ('show schema','Lists the columns in each table in the schema');
 	
 	DBI:Oracle:IFLDEV>> no log
@@ -427,7 +598,7 @@ Here's an example:
 	CREATE table commands: 0 rows affected
 
 	DBI:SQLite:dbname=test.db> load commands.tsv into commands
-	Loaded 11 rows into commands from commands.tsv
+	Loaded 12 rows into commands from commands.tsv
 
 As with C<dump> you can change the delimiter character:
 
@@ -472,11 +643,12 @@ You can also pipe commands into sqlsh on STDIN if you call it with the C<-i> swi
 
 =head1 VERSION
 
-$Revision: 1.6 $ on $Date: 2006/08/02 12:01:15 $ by $Author: johna $
+v1.16
 
 =head1 AUTHOR
 
 John Alden
+Miguel Gualdron
 
 =cut
 	

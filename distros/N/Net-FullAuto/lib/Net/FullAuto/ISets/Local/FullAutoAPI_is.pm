@@ -443,8 +443,8 @@ if ($do==1) {
    #   '__display__');
 
    # TEST FOR AMAZON EC2 INSTANCE
-   #($stdout,$stderr)=$handle->cmd("wget -qO- ".
-   #   "wget http://169.254.169.254/latest/meta-data/public-ipv4");
+   #($stdout,$stderr)=$handle->cmd('wget --timeout=5 --tries=1 -qO- '.
+   #             'http://169.254.169.254/latest/dynamic/instance-identity/');
    #$public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
 
    my $z=1;

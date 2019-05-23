@@ -55,8 +55,9 @@ my $result=sub {
 
 my $get_isets=sub {
 
-   my $test_aws=
-         `wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/`;
+   my $test_aws='wget --timeout=5 --tries=1 -qO- '.
+                'http://169.254.169.254/latest/dynamic/instance-identity/';
+   $test_aws=`$test_aws`;
    if (-1<index $test_aws,'signature') {
       $main::aws->{'CLIPBUCKET.com'}->[0]=[];
       my $out=`which aws 2>&1`;

@@ -2,6 +2,10 @@
 ^bak
 ~$
 (?:^|/)[Mm]akefile(?:\.old)?$
+(?:^|/)[Cc]hanges\.old$
+(?:^|/)MANIFEST\.bak$
 (?:^|/)pm_to_blib$
-^SQL-Shell-\d+\.\d+\.(zip|tar\.gz|tgz)$
+^SQL-Shell-\d+\.\d+\.(zip|tar|tar\.gz|tgz)$
 [Cc][Vv][Ss]/
+^\.git/
+^\.gitignore

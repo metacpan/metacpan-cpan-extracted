@@ -11,8 +11,8 @@ use strict;
 
 BEGIN {
 	use vars qw($tests);
-	$tests = 26;
-	$tests += 27 if($ENV{UNIT_TEST_DSN});
+	$tests = 28;
+	$tests += 30 if($ENV{UNIT_TEST_DSN});
 	$tests++ if $ENV{ORACLE_HOME}; #Test show datasources if Oracle is available
 }
 
@@ -30,6 +30,9 @@ my $sqlsh = new SQL::Shell({Verbose => 1});
 #DBI stuff not requiring a connection
 my $output = execute($sqlsh, "show drivers");
 ASSERT(scalar $output =~ /Sponge/s, "List drivers");
+
+$output = execute($sqlsh, "show settings");
+ASSERT(scalar $output =~ /delimiter/s, "List settings");
 
 #TNS magic makes Oracle is a good choice for this test
 if ($ENV{ORACLE_HOME}) {
@@ -92,10 +95,13 @@ if($dsn)
 	ASSERT(scalar $output =~ /CREATE table commands/si, "Created table");
 			
 	$output = execute($sqlsh, "load data/commands.tsv into commands");
-	ASSERT(scalar $output =~ m|Loaded 11 rows into commands from data/commands.tsv|s, "Loaded data");
+	ASSERT(scalar $output =~ m|Loaded 12 rows into commands from data/commands.tsv|s, "Loaded data");
 	
 	$output = execute($sqlsh, "show tables");
-	ASSERT(scalar $output =~ /commands/si && scalar $output =~ /\b11\b/s, "Show tables");
+	ASSERT(scalar $output =~ /commands/si, "Show tables");
+	
+	$output = execute($sqlsh, "show tablecounts");
+	ASSERT(scalar $output =~ /commands/si && scalar $output =~ /\b12\b/s, "Show tablecounts");
 		
 	#Execute script
 	$output = execute($sqlsh, "execute data/sqlsh-commands.txt");
@@ -108,8 +114,10 @@ if($dsn)
 
 	#Dump tables
 	$output = execute($sqlsh, "dump all tables into .");
-	ASSERT(FILES_EQUAL("data/sqlsh-expected-dump.tsv", "COMMANDS.dat"), "dump all tables");
-	unlink('COMMANDS.dat');
+	ASSERT(FILES_EQUAL("data/sqlsh-expected-dump.tsv", '"main"."commands".dat'), "dump all tables");
+	unlink('"main"."commands".dat') if -f '"main"."commands".dat';
+	unlink('"main"."sqlite_master".dat') if -f '"main"."sqlite_master".dat';
+	unlink('"temp"."sqlite_temp_master".dat') if -f '"temp"."sqlite_temp_master".dat';
 		
 	#Logging
 	execute($sqlsh, "set log-mode sql");
@@ -131,12 +139,24 @@ if($dsn)
 	execute($sqlsh, "set display-mode record");
 	$output = execute($sqlsh, "show schema");
 	ASSERT(scalar $output =~ /field | command/si && scalar $output =~ /field | description/si, "Show schema");
+
+	#Send commands
+	execute($sqlsh, "set display-mode box");
+	$output = execute($sqlsh, "send create index idx_commands on commands (command)");
+	ASSERT(scalar $output =~ m|CREATE index idx_commands: 1 rows affected|s, "Send command");
+
+	#Recv commands
+	$output = execute($sqlsh, "recv pragma main.index_info(idx_commands)");
+	ASSERT(scalar $output =~ /command/si, "Recv command");
+	execute($sqlsh, "drop index idx_commands");
 	
 	#Wipe tables
 	execute($sqlsh, "set display-mode spaced");
-	execute($sqlsh, "wipe tables");
-	$output = execute($sqlsh, "show tables");
-	ASSERT(scalar $output =~ /commands\s+0\b/si, "Wipe tables");
+	#execute($sqlsh, "wipe tables");
+	execute($sqlsh, "delete from main.commands");
+	execute($sqlsh, "commit");
+	$output = execute($sqlsh, "show tablecounts");
+	ASSERT(scalar $output =~ /commands"?\s+0\b/si, "Wipe tables");
 
 	#Recoding
 	$output = execute($sqlsh, "load data/commands2.tsv into commands from UTF-8 to rubbish");
@@ -144,7 +164,8 @@ if($dsn)
 	$output = execute($sqlsh, "load data/commands2.tsv into commands from UTF-8 to ISO-8859-1");
 	$output = execute($sqlsh, "select DESCRIPTION from commands where COMMAND='load data'");
 	ASSERT(scalar $output =~ />>\?<</si, "Loaded data with recoding");
-	execute($sqlsh, "wipe tables");
+	#execute($sqlsh, "wipe tables");
+	execute($sqlsh, "delete from main.commands");
 
 	#Escaping
 	execute($sqlsh, "set enter-whitespace on");
@@ -164,7 +185,7 @@ if($dsn)
 	$sqlsh->install_renderers({'unittest' => \&renderer});
 	execute($sqlsh, "set display-mode unittest");
 	$output = execute($sqlsh, "select count(*) from commands");
-	ASSERT(scalar $output =~ /COUNT\(\*\):1:/s, "Custom renderer");
+	ASSERT(scalar $output =~ /count\(\*\):1:/s, "Custom renderer");
 	$sqlsh->uninstall_renderers(['unittest']);
 	$output = execute($sqlsh, "set display-mode unittest");
 	ASSERT(scalar $output =~ /'unittest' is an invalid value for display-mode/s, "Uninstall renderer");
@@ -208,6 +229,7 @@ if($dsn)
 	#Disconnect
 	execute($sqlsh, "disconnect");
 	ASSERT(!$sqlsh->is_connected(), "Disconnect");		
+	unlink('test.db') if -f 'test.db';
 }
 
 #Trap missing database connection
@@ -216,6 +238,7 @@ for my $cmd (
 	"rollback", 
 	"commit", 
 	"show tables", 
+	"show tablecounts", 
 	"load data/commands.tsv into commands",
 	"execute data/sqlsh-commands.txt",
 	"select count(*) from commands",
@@ -246,7 +269,7 @@ sub drop_all_tables {
 	TRACE("dropping all tables");
 	foreach(SQL::Shell::_list_tables($dbh))
 	{
-		$dbh->do("drop table $_");
+		$dbh->do("drop table $_") unless m/master/i;
 	}
 }
 

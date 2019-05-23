@@ -14,6 +14,7 @@ my @files = (
     't/format.t',
     't/generate.t',
     't/interp.t',
+    't/package.t',
     't/recurse.t',
     't/variable_re.t'
 );

@@ -16,7 +16,7 @@ use IO::File;
 use URI::Escape;
 
 use vars qw($VERSION);
-$VERSION = ('$Revision: 1.15 $' =~ /([\d\._]+)/)[0];
+$VERSION = ('$Revision: 1.16 $' =~ /([\d\._]+)/)[0];
 
 use constant HISTORY_SIZE => $ENV{HISTSIZE} || $ENV{HISTFILESIZE} || 50;
 use vars qw(%Renderers %Commands %Settings);
@@ -43,11 +43,13 @@ use vars qw(%Renderers %Commands %Settings);
 	qr/^disconnect$/i => \&disconnect,
 	qr/^show +\$dbh +(.*)/i => \&show_dbh,
 	qr/^(list|show) +schema$/i => \&show_schema,
-	qr/^(list|show) +tables$/i => \&show_tables,	
+	qr/^(list|show) +tablecounts$/i => \&show_tablecounts,	
+	qr/^(list|show) +(tables|catalogs|schemas|tabletypes)(?: like)?( .*)?$/i => \&show_objects,
 	qr/^(list|show) +charsets$/i => \&show_charsets,	
+	qr/^(list|show) +settings$/i => \&show_settings,
 	qr/^(?:desc|describe) +(.*)/i => \&describe,
-	qr/^((?:select|explain)\s+.*)/is => \&run_query,
-	qr/^((?:create|alter|drop|insert|replace|update|delete|grant|revoke) .*)/is => \&do_sql,
+	qr/^((?:select|explain|recv)\s+.*)/is => \&run_query,
+	qr/^((?:create|alter|drop|insert|replace|update|delete|grant|revoke|send) .*)/is => \&do_sql,
 	qr/^begin work/i => \&begin_work,
 	qr/^rollback/i => \&rollback,
 	qr/^commit/i => \&commit,
@@ -61,6 +63,20 @@ use vars qw(%Renderers %Commands %Settings);
 );
 
 %Settings = map {$_ => 1} qw(GetHistory SetHistory AddHistory MaxHistory Interactive Verbose NULL Renderer Logger Delimiter Width LogLevel EscapeStrategy AutoCommit LongTruncOk LongReadLen MultiLine);
+
+my %viewable_settings = (
+   'auto-commit'            => 'AutoCommit',
+    delimiter               => 'Delimiter',
+   'enter-whitespace'       => 'EnterWhitespace',
+   'escape'                 => 'EscapeStrategy',
+    longreadlen             => 'LongReadLen',
+    longtruncok             => 'LongTruncOk',
+    multiline               => 'MultiLine',
+    verbose                 => 'Verbose',
+    width                   => 'Width',
+);
+
+my %boolean_settings = map {$_ => 1} qw (AutoCommit LongTruncOk MultiLine Verbose);
 
 #######################################################################
 #
@@ -359,7 +375,73 @@ sub show_schema
 	return 1;
 }
 
-sub show_tables
+# Show the viewable settings:
+sub show_settings {
+    my $self = shift;
+
+    my @header = qw{ PARAMETER VALUE };
+    my @data;
+    for my $setting (sort keys %viewable_settings) {
+        my $value = $self->{settings}->{ $viewable_settings{$setting} };
+        $value = '' unless defined $value;
+        if ( exists($boolean_settings{ $viewable_settings{$setting} }) ) {
+            $value = 'on' if $value eq '1';
+            $value = 'off' if $value eq '0';
+        }
+        if ( $setting eq 'escape' ) {
+            my $mapping = {
+                'ShowWhitespace' => 'show-whitespace',
+                'UriEscape' => 'uri-escape',
+                'EscapeWhitespace' => 'escape-whitespace',
+                '' => 'off'
+            };
+            $value = $mapping->{$value};
+        }
+        push @data, _escape_whitespace([ $setting, $value ]);
+    }
+
+    $self->render_rowset(\@header, \@data);
+}
+
+
+# Show tables, schemas, catalogs, or table-types:
+sub show_objects {
+    my $self = shift;
+    my $command = shift;
+    my $object = shift;
+    my $pattern = shift;
+
+    $pattern = '%' unless defined $pattern;
+
+    my $dbh = $self->_dbh() or die "Not connected to database.\n";
+    my $sth = undef;
+
+    if ( $object eq 'catalogs' ){
+        $sth = $dbh->table_info($pattern,'','','');
+        $self->_list_object_attrib($sth, 'TABLE_CAT');
+    }
+    elsif ( $object eq 'schemas' ) {
+        $sth = $dbh->table_info('',$pattern,'','');
+        $self->_list_object_attrib($sth, 'TABLE_SCHEM');
+    }
+    elsif ( $object eq 'tables' ) {
+        if ( $pattern eq '%' ) {
+            $sth = $dbh->table_info();
+        }
+        else {
+            $sth = $dbh->table_info('','',$pattern,'');
+        }
+        $self->_list_object_attrib($sth, 'TABLE_NAME');
+    }
+    elsif ( $object eq 'tabletypes' ) {
+        $sth = $dbh->table_info('','','',$pattern);
+        $self->_list_object_attrib($sth, 'TABLE_TYPE');
+    }
+
+    return 1;
+}
+
+sub show_tablecounts
 {
 	my $self = shift;
 	my $dbh = $self->_dbh() or die "Not connected to database.\n";
@@ -380,6 +462,10 @@ sub run_query
 {
 	my ($self, $query) = @_;
 	my $dbh = $self->_dbh() or die "Not connected to database.\n";
+
+    # Remove the "recv" command, as it is not really a SQL keyword:
+    # (it is there so we can pull data from non-select commands)
+    $query =~ s/^recv\s+//gis if $query =~ m/^recv\s+/gis;
 	
 	my $settings = $self->{settings};
 	my($headers, $data) = $self->_execute_query($query);
@@ -395,6 +481,10 @@ sub do_sql
 	my ($self, $statement) = @_;
 	my $dbh = $self->_dbh() or die "Not connected to database.\n";
 
+    # Remove the "send" command, as it is not really a SQL keyword:
+    # (it is there so we can submit commands that would be interpereted by the shell)
+    $statement =~ s/^send\s+//gis if $statement =~ m/^send\s+/gis;
+
 	my $rows = $dbh->do($statement);
 	$rows = 0 if $rows eq '0E0';
 
@@ -402,6 +492,7 @@ sub do_sql
 	my $obj =
 		  scalar $cmd =~ /(create|alter|drop)/? ($statement =~ /$1\s+(\S+\s+\S+?)\b/i)[0]
 		: $cmd eq 'insert' ? ($statement =~ /into\s+(\S+?)\b/)[0]
+		: $cmd eq 'select' ? ($statement =~ /into\s+(\S+?)\b/)[0]
 		: $cmd eq 'update' ? ($statement =~/\s+(\S+?)\b/)[0]
 		: $cmd eq 'delete' ? ($statement =~/from\s+(\S+?)\b/)[0]
 		: ''
@@ -1083,6 +1174,33 @@ sub _deduce_columns
 	return \@data;
 }
 
+# Pull and render attributes from an active statement handle.
+# A helper routine for show_objects()
+sub _list_object_attrib {
+    my $self   = shift;
+    my $sth    = shift;
+    my $attrib = shift;
+
+    my @header;
+    my @data;
+
+    if ( $attrib eq 'TABLE_NAME' ) {
+        @header = qw{ TABLE_CAT TABLE_SCHEM TABLE_NAME TABLE_TYPE REMARKS };
+        while (my $row = $sth->fetchrow_hashref('NAME_uc')) {
+            my @data_row = map { $row->{$_} } @header;
+            push @data, \@data_row;
+        }
+    }
+    else {
+        @header = ( $attrib );
+        my $hash_ref = $sth->fetchall_hashref($attrib);
+        @data = map { [ $_ ] } sort keys %{ $hash_ref };
+    }
+
+    $self->render_rowset(\@header, \@data);
+        
+}
+
 #
 # History
 #
@@ -1529,9 +1647,19 @@ Outputs a property of a database handle.  Equivalent to "show \$dbh $property".
 
 Equivalent to "show schema".
 
-=item $sqlsh->show_tables()
+=item $sqlsh->show_objects()
 
-Displays a list of tables with row counts.  Equivalent to "show tables".
+Displays a list of tables, schemas, catalogs or table-types depending on the 
+object argument passed.
+
+=item $sqlsh->show_tablecounts()
+
+Displays a list of tables with row counts.  Equivalent to "show tablecounts".
+
+=item $sqlsh->show_settings()
+
+Displays a list of internal C<sqlsh> settings.  Equivalent to "show 
+settings".  Not all internal settings are included here yet.
 
 =item $sqlsh->describe($table)
 
@@ -1705,7 +1833,11 @@ The following are also affected by the C<set_param> method or the "set" command:
  disconnect - disconnect from the DB
  
  show tables - display a list of tables
+ show catalogs - display a list of catalogs
+ show schemas - display a list of schemas
+ show tabletypes - display a list of tabletypes
  show schema - display the entire schema
+ show settings - display some internal settings
  desc <table> - display schema of table
  
  show $dbh <attribute> - show a database handle object.
@@ -1743,6 +1875,8 @@ The following are also affected by the C<set_param> method or the "set" command:
  begin_work
  commit
  rollback
+ send ...
+ recv ...
  
  load <file> into <table> (delimited by foo) (uri-decode) (from bar to baz) 
   - load delimited data from a file
@@ -1759,19 +1893,37 @@ The following are also affected by the C<set_param> method or the "set" command:
  save history to <file> - saves the command history
  load history from <file> - loads the command history
  execute <file> - run a set of SQL or sqlsh commands from a file
-	
+
 =head1 VERSION
 
-$Revision: 1.14 $ on $Date: 2006/12/05 14:31:33 $ by $Author: andreww $
+Version 1.16
 
 =head1 AUTHOR
 
 John Alden with contributions by Simon Flack and Simon Stevenson <cpan _at_ bbc _dot_ co _dot_ uk>
 
+Miguel Gualdron maintainer.
+
 =head1 COPYRIGHT
 
-(c) BBC 2006. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+    SQL-Shell:  Interactive shell for DBI Databases
+    Copyright (C) 2006  BBC
+    Copyright (C) 2019  Miguel Gualdron
 
-See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+See the file COPYING in this distribution, or https://www.gnu.org/licenses/gpl-2.0.html
       
 =cut

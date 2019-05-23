@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000472';
+our $VERSION='1.0000473';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1470,8 +1470,7 @@ sub fa_install_mod {
       my $lett=unpack('a2',$distribution);
       my $minicpan=CPAN::Mini->new(
 
-         #remote => "http://www.cpan.org",
-         remote => "http://www.perl.com/CPAN",
+         remote => "http://www.cpan.org",
          local  => cwd()."/dependencies/CPAN",
          log_level => 'debug',
          exact_mirror => 1,
@@ -2060,6 +2059,9 @@ END
    &fa_install_module('Proc::ProcessTable','install','Makefile');
    &fa_install_module('Data::Password::Check','install','Makefile');
    &fa_install_module('Crypt::GeneratePassword','install','Makefile');
+   &fa_install_module('Archive::Zip','install','Makefile');
+   #&fa_install_module('Excel::Writer::XLSX','install','Makefile');
+   #&fa_install_module('Spreadsheet::Read','install','Makefile');
 
 }
 
@@ -4033,8 +4035,7 @@ if (!$@ && grep { /-*add[-_]?dependencies/i } @ARGV) {
    my $lett=unpack('a2',$distribution);
    my $minicpan=CPAN::Mini->new(
 
-      #remote => "http://www.cpan.org",
-      remote => "http://www.perl.com/CPAN",
+      remote => "http://www.cpan.org",
       local  => cwd()."/dependencies/CPAN",
       log_level => 'debug',
       exact_mirror => 1,
@@ -4388,7 +4389,8 @@ sub download_berkeleydb {
    eval {
       local $SIG{__DIE__}; # No sigdie handler;
       $Ua = FA::LWP::UserAgent->new(
-            timeout=>300,show_progress=>1)
+            timeout=>300,show_progress=>1,
+            ssl_opts => { verify_hostname => 0 })
    };
    if ($@) {
       $CPAN::Frontend->mywarn(
@@ -4412,7 +4414,7 @@ sub download_berkeleydb {
    my $already_downloaded=0;
    my $site='download.oracle.com';
    $source=~
-      s/^.*?(http:\/\/$site\/)(?:otn\/)*(b.*?\d.tar.gz).*$/$1$2/s;
+      s/^.*?(https*:\/\/$site\/)(?:otn\/)*(b.*?\d.tar.gz).*$/$1$2/s;
    my $file=$2;
    my $file=substr($file,(index $file,'/')+1,-7);
    my $fh='';my $filename='';my $suffix='.tar.gz';
@@ -4420,6 +4422,7 @@ sub download_berkeleydb {
       $already_downloaded=1;
       $filename=$ARGV[$#ARGV];
    } else {
+print "SOURCE=$source<==\n";
       $req = HTTP::Request->new(GET => $source);
       $req->header('Accept-Encoding' => 'gzip, compress');
       $res = $Ua->request($req);
