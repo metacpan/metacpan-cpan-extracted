@@ -1,0 +1,100 @@
+NAME
+    Mediafire::Api - Upload and Download files from mediafire.com file
+    sharing
+
+VERSION
+        version 0.01
+
+SYNOPSYS
+METHODS
+        use Mediafire::Api;
+
+        # Create Mediafire::Api object
+        my $mediafire = Mediafire::Api->new();
+
+        # Login on service
+        $mediafire->login(
+            -login          => $login,
+            -password       => $password,
+        );
+
+        # Upload file to server
+        my $remote_dir  = 'myfiles';            # Directory name on server
+        my $filename = '/tmp/test_file.zip';    # Full file path to upload
+
+        # Upload file on server. Return Mediafire::Api::UploadFile object
+        my $mediafire_file = $mediafire->uploadFile(
+            -file           => $filename,
+            -path           => $remote_dir,
+        );
+        # Get uploaded file key
+        print "Uploaded file key: " . $mediafire_file->getDouploadKey() . "\n";
+
+        # Find file on mediafire.com by name. Return arrayref to Mediafire::Api::File objects
+        my $find_result = $mediafire->findFileByName(
+            -filename       => 'file_to_find.txt',
+        );
+        if (@$find_result) {
+            print "Found files: " . join(' ', map {$_->name()} @$find_result);
+        }
+
+        # Download file from mediafire.com
+        $mediafire->downloadFile(
+            -mediafire_file     => $mediafire_file,
+            -dest_file          => './test_file.zip',
+        );
+
+Upload Files to server
+  new()
+  login(%opt)
+Mediafire::Api::File
+  name
+    Set/Get name of file $mediafire_file->name("New name"); my $name =
+    $mediafire->name;
+
+  key
+    Set/Get download key of file
+
+        $mediafire_file->key("downloadfilekey");
+        my $key = $mediafire_file->key;
+
+  size
+    Set/Get size of file
+
+        $mediafire->size(2343);
+        my $size = $mediafire->size;
+
+  hash
+    Set/Get sha256sum hashsum of file
+
+        $mediafire_file->hash('dffdf');
+        my $hash = $mediafire_file->hash;
+
+Find files on mediafire.com
+  findFileByName(%opt)
+    Return arrayref with Mediafire::Api::file objects
+
+        %opt:
+            -filename       => Name of file to find
+
+Download files from mediafire.com
+  downloadFile(%opt)
+    Download file from mediafire.com to $dest_file
+
+        %opt:
+            -mediafire_file         => Mediafire::Api::File object to download
+            -dest_file              => Name of file on local disk, in which will be downloaded mediafire file
+
+DEPENDENCE
+    LWP::UserAgent, JSON::XS, URI::Escape, Encode, HTTP::Request, Carp,
+    File::Basename, MIME::Detect, HTTP::Request, Crypt::Digest::SHA256
+
+AUTHORS
+    *   Pavel Andryushin <vrag867@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by Pavel Andryushin.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

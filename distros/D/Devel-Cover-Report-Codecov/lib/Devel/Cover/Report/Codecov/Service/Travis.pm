@@ -16,6 +16,7 @@ sub configuration {
         job          => $ENV{TRAVIS_JOB_ID},
         pull_request => $ENV{TRAVIS_PULL_REQUEST},
         slug         => $ENV{TRAVIS_REPO_SLUG},
+        tag          => $ENV{TRAVIS_TAG},
     };
 }
 

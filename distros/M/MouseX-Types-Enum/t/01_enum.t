@@ -156,32 +156,32 @@ subtest 'Get all enums' => sub {
     );
 };
 
-subtest 'Lazy loading' => sub {
-    {
-        package Foo;
-        use Mouse;
-        extends 'MouseX::Types::Enum';
-
-        sub A {1}
-        sub B {2}
-        sub C {3}
-
-        has foo => ( is => 'ro' );
-
-        __PACKAGE__->_build_enum;
-    }
-
-    is(Foo->_enums->{1}, undef);
-    Foo->A;
-    is(Foo->_enums->{1}, Foo->A);
-
-    my $enums = Foo->all;
-    is_deeply($enums, {
-        1 => Foo->A,
-        2 => Foo->B,
-        3 => Foo->C,
-    });
-};
+# subtest 'Lazy loading' => sub {
+#     {
+#         package Foo;
+#         use Mouse;
+#         extends 'MouseX::Types::Enum';
+#
+#         sub A {1}
+#         sub B {2}
+#         sub C {3}
+#
+#         has foo => ( is => 'ro' );
+#
+#         __PACKAGE__->_build_enum;
+#     }
+#
+#     is(Foo->_enums->{1}, undef);
+#     Foo->A;
+#     is(Foo->_enums->{1}, Foo->A);
+#
+#     my $enums = Foo->all;
+#     is_deeply($enums, {
+#         1 => Foo->A,
+#         2 => Foo->B,
+#         3 => Foo->C,
+#     });
+# };
 
 subtest 'Subroutine scopes' => sub {
     subtest 'Base class is abstract' => sub {

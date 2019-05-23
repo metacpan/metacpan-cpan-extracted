@@ -65,8 +65,6 @@ sub DESTROY ($self) {
 }
 
 sub new_image ( $self, $image, %args ) {
-
-    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
     return Pcore::Captcha->new( {
         %args,
         type  => $args{is_russian}         ? $ANTICAPTCHA_QUEUE_IMAGE_RU : $ANTICAPTCHA_QUEUE_IMAGE_EN,
@@ -76,8 +74,6 @@ sub new_image ( $self, $image, %args ) {
 }
 
 sub new_nocaptcha ( $self, %args ) {
-
-    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
     return Pcore::Captcha->new( {
         %args,
         type => $ANTICAPTCHA_QUEUE_NOCAPTCHA,
@@ -346,9 +342,9 @@ sub _run_resolver_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 88                   | Subroutines::ProhibitExcessComplexity - Subroutine "resolve" with high complexity score (22)                   |
+## |    3 | 84                   | Subroutines::ProhibitExcessComplexity - Subroutine "resolve" with high complexity score (22)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 297, 300             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 293, 296             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -476,13 +476,13 @@ sub get_connect ($connect) {
 ## |    2 | 160                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 494                  | * Link L<AnyEvent::Handle> on line 500 does not specify text                                                   |
-## |      | 494                  | * Link L<AnyEvent::Handle> on line 508 does not specify text                                                   |
-## |      | 494                  | * Link L<AnyEvent::Handle> on line 536 does not specify text                                                   |
-## |      | 494                  | * Link L<AnyEvent::Handle> on line 552 does not specify text                                                   |
-## |      | 494                  | * Link L<AnyEvent::Socket> on line 552 does not specify text                                                   |
-## |      | 494, 494             | * Link L<Pcore::Proxy> on line 518 does not specify text                                                       |
-## |      | 494                  | * Link L<Pcore::Proxy> on line 552 does not specify text                                                       |
+## |      | 492                  | * Link L<AnyEvent::Handle> on line 498 does not specify text                                                   |
+## |      | 492                  | * Link L<AnyEvent::Handle> on line 506 does not specify text                                                   |
+## |      | 492                  | * Link L<AnyEvent::Handle> on line 534 does not specify text                                                   |
+## |      | 492                  | * Link L<AnyEvent::Handle> on line 550 does not specify text                                                   |
+## |      | 492                  | * Link L<AnyEvent::Socket> on line 550 does not specify text                                                   |
+## |      | 492, 492             | * Link L<Pcore::Proxy> on line 516 does not specify text                                                       |
+## |      | 492                  | * Link L<Pcore::Proxy> on line 550 does not specify text                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 44, 49               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

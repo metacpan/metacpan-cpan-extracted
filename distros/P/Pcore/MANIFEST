@@ -11,6 +11,7 @@ lib/Pcore/AE/DNS/Cache.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/BitBucket.pm
 lib/Pcore/API/Client.pm
+lib/Pcore/API/Cloudflare.pm
 lib/Pcore/API/Docker/Engine.pm
 lib/Pcore/API/Docker/Hub.pm
 lib/Pcore/API/GitHub.pm
@@ -25,6 +26,7 @@ lib/Pcore/API/SCM/Git.pm
 lib/Pcore/API/SCM/Hg.pm
 lib/Pcore/API/SCM/Upstream.pm
 lib/Pcore/API/SMTP.pm
+lib/Pcore/API/Telegram/Bot.pm
 lib/Pcore/App.pm
 lib/Pcore/App/API.pm
 lib/Pcore/App/API/Auth.pm

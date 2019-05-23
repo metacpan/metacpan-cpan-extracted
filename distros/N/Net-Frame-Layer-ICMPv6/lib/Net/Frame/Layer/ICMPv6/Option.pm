@@ -1,5 +1,5 @@
 #
-# $Id: Option.pm,v b9194b248a66 2017/10/06 16:26:50 gomor $
+# $Id: Option.pm,v bc01789674fd 2019/05/23 05:51:45 gomor $
 #
 package Net::Frame::Layer::ICMPv6::Option;
 use strict; use warnings;
@@ -52,7 +52,8 @@ sub unpack {
    $self->length($length);
 
    # Dirty hack. Some systems does not set the length correctly
-   if ($type == NF_ICMPv6_OPTION_TARGETLINKLAYERADDRESS) {
+   if ($type == NF_ICMPv6_OPTION_TARGETLINKLAYERADDRESS
+   ||  $type == NF_ICMPv6_OPTION_SOURCELINKLAYERADDRESS) {
       $length = 6;
    }
 
@@ -191,7 +192,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

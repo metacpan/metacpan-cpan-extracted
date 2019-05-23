@@ -12,7 +12,7 @@ my $JS_PACKER;
 sub decompress ($self) {
     require JavaScript::Beautifier;
 
-    $self->{data}->$* = JavaScript::Beautifier::js_beautify(    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = JavaScript::Beautifier::js_beautify(
         $self->{data}->$*,
         {   indent_size               => 4,
             indent_character          => $SPACE,

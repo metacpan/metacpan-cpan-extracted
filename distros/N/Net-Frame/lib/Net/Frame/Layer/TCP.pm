@@ -1,5 +1,5 @@
 #
-# $Id: TCP.pm,v 7609c9d085d3 2018/03/15 15:17:19 gomor $
+# $Id: TCP.pm,v ce68fbcc7f6d 2019/05/23 05:58:40 gomor $
 #
 package Net::Frame::Layer::TCP;
 use strict; use warnings;
@@ -462,7 +462,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

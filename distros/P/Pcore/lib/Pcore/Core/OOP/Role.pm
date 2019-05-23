@@ -44,7 +44,7 @@ sub _with (@roles) {
         die qq[Class "$caller" is not a role] if !$Pcore::Core::OOP::Class::REG{$role}{is_role};
 
         # merge does
-        $Pcore::Core::OOP::Class::REG{$caller}{does}->@{ $role, keys $Pcore::Core::OOP::Class::REG{$role}{does}->%* } = ();    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+        $Pcore::Core::OOP::Class::REG{$caller}{does}->@{ $role, keys $Pcore::Core::OOP::Class::REG{$role}{does}->%* } = ();
 
         # merge attributes
         while ( my ( $attr, $spec ) = each $Pcore::Core::OOP::Class::REG{$role}{attr}->%* ) {

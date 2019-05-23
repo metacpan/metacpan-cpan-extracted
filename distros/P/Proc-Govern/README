@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.205 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2019-05-22.
+    This document describes version 0.207 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2019-05-23.
 
 SYNOPSIS
     To use as Perl module:
@@ -97,11 +97,17 @@ DESCRIPTION
 
     *   execution time limit
 
+    *   set (CPU) nice level (priority)
+
     *   preventing multiple instances from running simultaneously
 
     *   load watch
 
     *   autorestart
+
+    *   preventing system from sleeping while process is running
+
+    *   preventing screensaver from activating while process is running
 
     In the future the following features are also planned or contemplated:
 
@@ -115,8 +121,6 @@ DESCRIPTION
     *   other resource usage limit
 
     *   fork/start multiple processes
-
-    *   set (CPU) nice level
 
     *   set I/O nice level (scheduling priority/class)
 
@@ -248,6 +252,10 @@ FUNCTIONS
 
         If not given, will be taken from command.
 
+    *   nice => *int*
+
+        Set nice/priority level.
+
     *   no_screensaver => *true*
 
         Prevent screensaver from being activated.
@@ -335,13 +343,23 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Proc::Govern uses IPC::Run at its core.
+    Forks::Super (since 2009) extends the fork(), wait(), and waitpid()
+    functions with some process/job management features, e.g. set timeout,
+    retries, chdir, environment, umask, delay before start, control
+    STDIN/STDOUT/STDERR, load control, priority/nice level, daemon, and a
+    lot more. Had I known about this module, I probably wouldn't start
+    Proc::Govern.
 
-    IPC::Cmd also uses IPC::Run (as well as IPC::Open3 on systems that do
-    not have IPC::Run installed or on some archaic systems that do not
-    support IPC::Run) and its "run_forked()" routine also has some of
-    Proc::Govern's functionalities like capturing stdout and stderr,
-    timeout, hiding (discarding) output. If you only need those
+    Proc::Govern uses IPC::Run at its core; you might want to use it
+    directly. It already has some features, e.g. controlling
+    STDIN/STDOUT/STDERR and timeout. But the main selling point of IPC::Run
+    is its redirection and piping features.
+
+    IPC::Cmd is a core module, but can also use IPC::Run (as well as
+    IPC::Open3 on systems that do not have IPC::Run installed or on some
+    archaic systems that do not support IPC::Run). Its "run_forked()"
+    routine has some of Proc::Govern's functionalities like capturing stdout
+    and stderr, timeout, hiding (discarding) output. If you only need those
     functionalities, you can use IPC::Cmd as it is a core module.
 
     Proc::Govern attempts (or will attempt, some day) to provide the

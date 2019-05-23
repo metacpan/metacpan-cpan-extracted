@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::YACurl.
 
+0.09  Thu May 23 2019
+    - bump curl to 7.65.0
+
 0.08  Tue Apr 30 2019
     - CURLOPT_MIMEPOST: support file upload
     - bump nghttp2 to 1.38.0

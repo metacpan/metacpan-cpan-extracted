@@ -74,7 +74,7 @@ sub _with (@roles) {
         die qq[Class "$caller" is not a role] if !$REG{$role}{is_role};
 
         # merge does
-        $REG{$caller}{does}->@{ $role, keys $REG{$role}{does}->%* } = ();    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+        $REG{$caller}{does}->@{ $role, keys $REG{$role}{does}->%* } = ();
 
         # merge attributes
         while ( my ( $attr, $spec ) = each $REG{$role}{attr}->%* ) {

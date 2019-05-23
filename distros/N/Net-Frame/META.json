@@ -32,7 +32,7 @@
    "provides" : {
       "Net::Frame" : {
          "file" : "lib/Net/Frame.pm",
-         "version" : "1.20"
+         "version" : "1.21"
       },
       "Net::Frame::Layer" : {
          "file" : "lib/Net/Frame/Layer.pm"
@@ -71,6 +71,6 @@
          "http://www.perlfoundation.org/artistic_license_1_0"
       ]
    },
-   "version" : "1.20",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

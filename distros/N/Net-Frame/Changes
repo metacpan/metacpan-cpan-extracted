@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Frame.
 
+1.21 Thu 23 May 07:54:16 CEST 2019
+   - update: copyright notice
+
 1.20 Wed 22 May 11:15:40 CEST 2019
    - bugfix: tests for IPv4 & IPv6 DNS resolutions
    => https://rt.cpan.org/Ticket/Display.html?id=129409

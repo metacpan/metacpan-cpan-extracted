@@ -1,0 +1,35 @@
+---
+abstract: 'build composable bulk exporters'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+build_requires:
+  Test2::V0: '0'
+  lib: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-Style-Kit
+no_index:
+  directory:
+    - t/lib
+requires:
+  Carp: '0'
+  Data::OptList: '0'
+  Import::Into: '0'
+  Module::Runtime: '0'
+  Package::Stash: '0'
+  constant: '0'
+  mro: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://bitbucket.org/broadbean/p5-code-style-kit
+version: 1.0.0
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

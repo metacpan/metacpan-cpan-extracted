@@ -14,6 +14,7 @@ sub configuration {
         commit    => $ENV{DRONE_COMMIT},
         build_url => $ENV{DRONE_BUILD_URL},
         branch    => $ENV{DRONE_BRANCH},
+        tag       => $ENV{DRONE_TAG},
     };
 }
 

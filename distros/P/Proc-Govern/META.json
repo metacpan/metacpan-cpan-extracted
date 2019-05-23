@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-Proc-Govern"
       }
    },
-   "version" : "0.205",
+   "version" : "0.207",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

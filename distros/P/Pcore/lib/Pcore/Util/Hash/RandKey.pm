@@ -91,9 +91,9 @@ sub DELETE {
 sub CLEAR {
     $_[0]->[0]->%* = ();
 
-    $_[0]->[1]->@* = ();    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $_[0]->[1]->@* = ();
 
-    $_[0]->[2]->@* = ();    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $_[0]->[2]->@* = ();
 
     return;
 }

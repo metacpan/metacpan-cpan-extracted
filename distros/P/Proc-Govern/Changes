@@ -1,3 +1,15 @@
+0.207   2019-05-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Forks::Super.
+
+
+0.206   2019-05-23 (PERLANCAR)
+
+	- Add option: --nice to set nice/priority level.
+
+
 0.205   2019-05-22 (PERLANCAR)
 
 	- [bugfix] Properly restore original prevent/unprevent sleep on

@@ -1,5 +1,9 @@
 Revision history for Perl extension MouseX-Types-Enum
 
+2.02 2019-05-23T06:01:30Z
+
+    - Fix performance
+
 2.01 2019-05-10T03:22:26Z
 
     - Fix SYNOPSIS

@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Govern
   homepage: https://metacpan.org/release/Proc-Govern
   repository: git://github.com/perlancar/perl-Proc-Govern.git
-version: '0.205'
+version: '0.207'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

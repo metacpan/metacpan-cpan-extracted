@@ -1,0 +1,17 @@
+-- tabels used to run the tests for PostgreSQL
+
+CREATE TABLE t1 (
+  id SERIAL PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE t2 (
+  id SERIAL PRIMARY KEY,
+  name_id INTEGER REFERENCES t1(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  value NUMERIC DEFAULT 1.234
+);
+
+CREATE TABLE t3 (
+  id SERIAL PRIMARY KEY,
+  name TEXT
+);

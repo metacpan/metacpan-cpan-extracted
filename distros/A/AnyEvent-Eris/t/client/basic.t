@@ -9,7 +9,7 @@ BEGIN { use_ok('AnyEvent::eris::Client') }
 subtest 'New without MessageHandler' => sub {
     no strict 'refs';
     no warnings qw<redefine once>;
-    *{'AE::log'} = sub ($$;@) {
+    local *{'AE::log'} = sub ($$;@) {
         my ( $type, $error ) = @_;
         ::is( $type, 'fatal', 'Fatal error' );
         ::like(
@@ -30,7 +30,7 @@ subtest 'New without MessageHandler' => sub {
 subtest 'New with non-code MessageHandler' => sub {
     no strict 'refs';
     no warnings qw<redefine once>;
-    *{'AE::log'} = sub ($$;@) {
+    local *{'AE::log'} = sub ($$;@) {
         my ( $type, $error ) = @_;
         ::is( $type, 'fatal', 'Fatal error' );
         ::like(

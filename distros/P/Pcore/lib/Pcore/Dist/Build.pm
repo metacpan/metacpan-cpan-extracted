@@ -117,7 +117,7 @@ sub par ( $self, @ ) {
 
     require Pcore::Dist::Build::PAR;
 
-    Pcore::Dist::Build::PAR->new( { %args, dist => $self->{dist} } )->run;    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    Pcore::Dist::Build::PAR->new( { %args, dist => $self->{dist} } )->run;
 
     return;
 }

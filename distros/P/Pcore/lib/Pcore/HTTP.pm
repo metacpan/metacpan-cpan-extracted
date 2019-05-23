@@ -541,7 +541,7 @@ sub _read_data ( $h, $args, $res ) {
                 my $x = IO::Uncompress::Brotli->create;
 
                 sub ( $in_buf_ref, $out_buf_ref ) {
-                    $out_buf_ref->$* = eval { $x->decompress( $in_buf_ref->$* ) };    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+                    $out_buf_ref->$* = eval { $x->decompress( $in_buf_ref->$* ) };
 
                     # decode error
                     if ($@) {

@@ -461,6 +461,7 @@
 #define CURLOPT_MAIL_AUTH_FIRST 0x071900 /* Added in 7.25.0 */
 #define CURLOPT_MAIL_FROM_FIRST 0x071400 /* Added in 7.20.0 */
 #define CURLOPT_MAIL_RCPT_FIRST 0x071400 /* Added in 7.20.0 */
+#define CURLOPT_MAXAGE_CONN_FIRST 0x074100 /* Added in 7.65.0 */
 #define CURLOPT_MAXCONNECTS_FIRST 0x070700 /* Added in 7.7 */
 #define CURLOPT_MAXFILESIZE_FIRST 0x070a08 /* Added in 7.10.8 */
 #define CURLOPT_MAXFILESIZE_LARGE_FIRST 0x070b00 /* Added in 7.11.0 */
@@ -775,6 +776,7 @@
 #define CURLUPART_SCHEME_FIRST 0x073e00 /* Added in 7.62.0 */
 #define CURLUPART_URL_FIRST 0x073e00 /* Added in 7.62.0 */
 #define CURLUPART_USER_FIRST 0x073e00 /* Added in 7.62.0 */
+#define CURLUPART_ZONEID_FIRST 0x074100 /* Added in 7.65.0 */
 #define CURLUSESSL_ALL_FIRST 0x071100 /* Added in 7.17.0 */
 #define CURLUSESSL_CONTROL_FIRST 0x071100 /* Added in 7.17.0 */
 #define CURLUSESSL_NONE_FIRST 0x071100 /* Added in 7.17.0 */

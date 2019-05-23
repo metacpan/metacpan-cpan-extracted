@@ -18,7 +18,7 @@ my @files = (
     'lib/SMS/Send/Mocean.pm',
     't/00-compile.t',
     't/000-report-versions.t',
-    't/00_compile.t',
+    't/00_load.t',
     't/01_instantiation.t',
     't/02_required.t',
     't/03_to_mocean_field_name.t',

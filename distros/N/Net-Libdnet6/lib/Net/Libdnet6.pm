@@ -1,11 +1,11 @@
 #
-# $Id: Libdnet6.pm 2005 2015-01-28 18:59:42Z gomor $
+# $Id: Libdnet6.pm,v b57333f23cee 2019/05/23 06:13:46 gomor $
 #
 package Net::Libdnet6;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use base qw(Exporter);
 
@@ -40,6 +40,7 @@ our @EXPORT = qw(
    route_get
 );
 
+use Carp;
 use Net::Libdnet;
 use Net::IPv6Addr;
 
@@ -475,7 +476,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2015, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

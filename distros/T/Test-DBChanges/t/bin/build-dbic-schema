@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use lib 't/lib';
+use Test::DBChanges::Test;
+use DBIx::Class::Schema::Loader qw(make_schema_at);
+
+my $pgsql = pgsql();
+make_schema_at(
+    'Test::DBChanges::Schema',
+    {
+        debug => 1,
+        dump_directory => 't/lib/',
+    },
+    [
+        $pgsql->dsn, '', '',
+    ],
+);

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Generator for SVG based Code 128 barcodes",
+   "author" : [
+      "Rolf Stöckli <tekki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SVG-Barcode-Code128",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Barcode::Code128" : "2.21",
+            "SVG::Barcode" : "0.02",
+            "perl" : "v5.24.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tekki/svg-barcode-code128/issues"
+      },
+      "homepage" : "https://github.com/Tekki/svg-barcode-code128",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tekki/svg-barcode-code128.git",
+         "web" : "https://github.com/Tekki/svg-barcode-code128"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

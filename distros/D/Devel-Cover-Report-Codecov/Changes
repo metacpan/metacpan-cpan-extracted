@@ -1,5 +1,9 @@
 Revision history for Perl extension Devel-Cover-Report-Codecov
 
+0.25 2019-05-23T05:50:46Z
+    - support `tag` query for travis & drone.io
+
+
 0.24 2018-08-29T15:01:51Z
     - good bye Magnum CI
 

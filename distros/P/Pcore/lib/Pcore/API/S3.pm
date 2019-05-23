@@ -18,9 +18,9 @@ has compress    => 2;                          # 1 - yes, 2 - auto
 has max_threads => 10;
 has max_retries => 3;
 
-has _queue   => ();
-has _threads => 0;
-has _signal  => sub { Coro::Signal->new };
+has _queue   => ( init_arg => undef );
+has _threads => 0, init_arg => undef;
+has _signal  => sub { Coro::Signal->new }, init_arg => undef;
 
 const our $S3_ACL_READ_ONLY    => 0;
 const our $S3_ACL_FULL_CONTROL => 1;

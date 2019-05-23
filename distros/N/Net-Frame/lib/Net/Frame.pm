@@ -1,11 +1,11 @@
 #
-# $Id: Frame.pm,v 1b0fad89244e 2019/05/22 09:16:37 gomor $
+# $Id: Frame.pm,v ce68fbcc7f6d 2019/05/23 05:58:40 gomor $
 #
 package Net::Frame;
 use strict;
 use warnings;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 1;
 
@@ -84,7 +84,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

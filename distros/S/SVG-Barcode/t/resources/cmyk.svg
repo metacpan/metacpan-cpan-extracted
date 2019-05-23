@@ -4,4 +4,5 @@
   <rect x="75" y="25" width="50" height="50" fill="cyan"/>
   <rect x="25" y="75" width="50" height="50" fill="magenta"/>
   <rect x="75" y="75" width="50" height="50" fill="yellow"/>
+  <text x="28" y="72" font-size="10" fill="white">&lt;black&gt;</text>
 </svg>

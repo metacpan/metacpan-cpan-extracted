@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-captcha/overview"
       }
    },
-   "version" : "v1.4.3",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "v1.4.4",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

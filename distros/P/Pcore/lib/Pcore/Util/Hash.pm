@@ -30,7 +30,7 @@ sub _merge {
         elsif ( is_plain_arrayref $b->{$key} ) {
             $a->{$key} = [];
 
-            $a->{$key}->@* = $b->{$key}->@*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+            $a->{$key}->@* = $b->{$key}->@*;
         }
         else {
             $a->{$key} = $b->{$key};

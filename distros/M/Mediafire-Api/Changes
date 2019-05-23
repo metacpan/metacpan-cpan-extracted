@@ -1,0 +1,5 @@
+Revision history for Perl extension Mediafire::Api.
+
+0.01  Thu May  23 17:26:40 2019
+	- original version
+		-b 5.8.1 -XAn Mediafir::Api

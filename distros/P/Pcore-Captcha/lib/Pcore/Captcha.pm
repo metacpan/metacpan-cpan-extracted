@@ -1,4 +1,4 @@
-package Pcore::Captcha v1.4.3;
+package Pcore::Captcha v1.4.4;
 
 use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[weaken];

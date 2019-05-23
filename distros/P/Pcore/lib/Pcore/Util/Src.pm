@@ -368,7 +368,7 @@ sub _get_filter_profile ( $args, $path, $data = undef ) {
 
 sub _report_file ( $tbl, $path, $res, $max_path_len ) {
     if ( !defined $tbl->$* ) {
-        $tbl->$* = P->text->table(    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+        $tbl->$* = P->text->table(
             style    => 'compact',
             top_line => 1,
             cols     => [

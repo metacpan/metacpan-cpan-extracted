@@ -294,7 +294,7 @@ SQL
         }
     }
 
-    $self->{data}->$* = $code . $data_section;                       ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = $code . $data_section;
 
     return res $SEVERITY->{0};
 }

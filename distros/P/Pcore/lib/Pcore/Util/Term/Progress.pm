@@ -19,7 +19,7 @@ sub get_indicator (%args) {
 
     $INDICATOR = {} if $all_finished;
 
-    my $indicator = P->class->load( $args{type} // 'Bar', ns => 'Pcore::Util::Term::Progress::Indicator' )->new( { %args, id => $INDICATOR_ORDER++ } );    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    my $indicator = P->class->load( $args{type} // 'Bar', ns => 'Pcore::Util::Term::Progress::Indicator' )->new( { %args, id => $INDICATOR_ORDER++ } );
 
     $INDICATOR->{ $indicator->{id} } = $indicator;
 

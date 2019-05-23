@@ -1,4 +1,4 @@
-package Pcore::Ext v0.22.0;
+package Pcore::Ext v0.22.1;
 
 use Pcore -dist, -class, -const;
 use Pcore::Util::Scalar qw[is_ref];
@@ -239,7 +239,7 @@ sub _build_class ( $self, $class, $requires ) {
                 $self->_load_module($module);
 
                 # check, that class is present
-                die if !exists $self->{classes}->{$require};
+                die qq[Class "$require" is not exists] if !exists $self->{classes}->{$require};
             }
 
             # build class

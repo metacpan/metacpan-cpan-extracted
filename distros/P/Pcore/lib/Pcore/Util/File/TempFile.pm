@@ -60,7 +60,7 @@ sub new ( $self, @ ) {
 
     my $fh = P->file->get_fh( $args{base} . q[/] . $filename, $mode, %args );
 
-    *$fh->$* = [ P->path("$args{base}/$filename")->to_abs, $$ ];    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    *$fh->$* = [ P->path("$args{base}/$filename")->to_abs, $$ ];
 
     return bless $fh, $self;
 }

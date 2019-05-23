@@ -1,0 +1,43 @@
+---
+abstract: 'track changes to database tables'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+build_requires:
+  DBI: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  DBIx::Class::Schema::Loader: '0'
+  Exporter: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::PostgreSQL: '0'
+  base: '0'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-DBChanges
+no_index:
+  directory:
+    - t/lib
+requires:
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: '5.024'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://bitbucket.org/broadbean/p5-test-dbchanges
+version: 1.0.0
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,0 +1,32 @@
+---
+abstract: 'JSON layout, but some fields always come first'
+author:
+  - 'Johan Lindstrom <Johan.Lindstrom@broadbean.com>'
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+build_requires:
+  Log::Log4perl: '0'
+  Test::Most: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Layout-JSON-Readable
+no_index:
+  directory:
+    - t/lib
+requires:
+  Class::Tiny: '0'
+  Log::Log4perl::Layout::JSON: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://bitbucket.org/broadbean/p5-log-log4perl-layout-json-readable
+version: 1.0.0
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

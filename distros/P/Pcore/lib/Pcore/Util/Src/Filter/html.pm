@@ -18,7 +18,7 @@ sub decompress ($self) {
 
     my $proc = P->sys->run_proc( qq[html-beautify --quiet --indent-scripts separate --replace "$temp"], win32_create_no_window => 1 )->wait;
 
-    $self->{data}->$* = P->file->read_bin($temp);    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = P->file->read_bin($temp);
 
     return res 200;
 }
@@ -39,7 +39,7 @@ sub compress ($self) {
         }
     }
 
-    $self->{data}->$* = join $EMPTY, @script;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = join $EMPTY, @script;
 
     # compress css
     my @css = split m[(<style[^>]*>)(.*?)(</style[^>]*>)]smi, $self->{data}->$*;
@@ -50,11 +50,11 @@ sub compress ($self) {
         }
     }
 
-    $self->{data}->$* = join $EMPTY, @css;       ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = join $EMPTY, @css;
 
     require HTML::Packer;
 
-    eval { $self->{data}->$* = HTML::Packer->init->minify( $self->{data}, { remove_comments => 0, remove_newlines => 1, html5 => 1 } ) };    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    eval { $self->{data}->$* = HTML::Packer->init->minify( $self->{data}, { remove_comments => 0, remove_newlines => 1, html5 => 1 } ) };
 
     return res 200;
 }

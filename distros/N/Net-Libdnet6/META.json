@@ -4,7 +4,7 @@
       "GomoR <gomor_at_cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_1"
    ],
@@ -13,31 +13,32 @@
       "version" : "2"
    },
    "name" : "Net-Libdnet6",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Net::IPv6Addr" : "0",
             "Net::Libdnet" : "0",
-            "perl" : "v5.6.1"
+            "perl" : "5.006001"
          }
       }
    },
-   "provides" : {
-      "Net::Libdnet6" : {
-         "file" : "lib/Net/Libdnet6.pm",
-         "version" : "0.27"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://opensource.org/licenses/artistic-license.php"
-      ]
-   },
-   "version" : "0.27"
+   "version" : "0.28",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

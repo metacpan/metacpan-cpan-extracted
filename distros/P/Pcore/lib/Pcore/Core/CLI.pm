@@ -82,7 +82,7 @@ sub _build_opt ($self) {
         for my $name ( keys $cli_opt->%* ) {
             die qq[Option "$name" is duplicated] if exists $index->{$name};
 
-            $opt->{$name} = Pcore::Core::CLI::Opt->new( { $cli_opt->{$name}->%*, name => $name } );    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+            $opt->{$name} = Pcore::Core::CLI::Opt->new( { $cli_opt->{$name}->%*, name => $name } );
 
             $index->{$name} = 1;
 

@@ -1,3 +1,6 @@
+v1.4.4 2019-05-23T09:10:25Z
+ - perlcritic fixed
+
 v1.4.3 2019-01-03T18:57:36Z
  - to_json return plain scalar
 

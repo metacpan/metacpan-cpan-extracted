@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-05-22'; # DATE
-our $VERSION = '0.205'; # VERSION
+our $DATE = '2019-05-23'; # DATE
+our $VERSION = '0.207'; # VERSION
 
 use 5.010;
 use strict;
@@ -24,6 +24,7 @@ my $success = GetOptions(
     "version|v"              => \$opts{-version},
 
     "name|n=s"               => \$opts{name},
+    "nice=i"                 => \$opts{nice},
     "single-instance"        => \$opts{single_instance},
     "restart"                => \$opts{restart},
     "show-stderr!"           => \$opts{show_stderr},
@@ -64,6 +65,7 @@ Usage: govproc [OPTS] -- [COMMAND ...]
 
 Options:
   --name=S                  Set process name.
+  --nice=I                  Set nice level/priority.
   --single-instance         Prevent running multiple instances simultaneously.
   --restart                 Restart when child process dies/exits.
   --no-show-stderr          Hide stderr output (but you can still log it).
@@ -98,6 +100,7 @@ _
 my %ga = (
     command         => \@ARGV,
     name            => $opts{name},
+    (nice            => $opts{nice}) x !!(defined $opts{nice}),
     single_instance => $opts{single_instance},
     restart         => $opts{restart},
     pid_dir         => $opts{pid_dir},
@@ -156,7 +159,7 @@ govproc - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.205 of govproc (from Perl distribution Proc-Govern), released on 2019-05-22.
+This document describes version 0.207 of govproc (from Perl distribution Proc-Govern), released on 2019-05-23.
 
 =head1 SYNOPSIS
 

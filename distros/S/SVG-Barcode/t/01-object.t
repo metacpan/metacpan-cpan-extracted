@@ -59,7 +59,7 @@ like $@, qr/Unknown parameter inexistant!/,
 
 note 'Plot';
 ok $object = $package->new, 'Create object';
-my $text = 'Tekki';
+my $text = '<Tekki>';
 
 eval { $object->plot };
 like $@, qr/Too few arguments for subroutine/, 'Correct error for missing text';
@@ -74,6 +74,7 @@ ok my $mock = Mock::MonkeyPatch->patch(
     $self->_rect(50, 0,  50, 50, 'cyan');
     $self->_rect(0,  50, 50, 50, 'magenta');
     $self->_rect(50, 50, 50, 50, 'yellow');
+    $self->_text('<black>', 3, 47, 10, 'white');
   }
   ),
   'Mock _plot method';

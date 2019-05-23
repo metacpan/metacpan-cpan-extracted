@@ -2,24 +2,24 @@
 abstract: 'adds IPv6 support to Net::Libdnet'
 author:
   - 'GomoR <gomor_at_cpan.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: '0'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Libdnet6
-provides:
-  Net::Libdnet6:
-    file: lib/Net/Libdnet6.pm
-    version: '0.27'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Net::IPv6Addr: '0'
   Net::Libdnet: '0'
-  perl: v5.6.1
-resources:
-  license: http://opensource.org/licenses/artistic-license.php
-version: '0.27'
+  perl: '5.006001'
+version: '0.28'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@ package Devel::Cover::Report::Codecov;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use URI;
 use Furl;
@@ -226,6 +226,8 @@ You must set CODECOV_TOKEN environment variables if you don't use Travis CI, Cir
 
 =item * L<GitLab CI|https://about.gitlab.com/gitlab-ci/>
 
+=item * L<Bitrise|https://www.bitrise.io/>
+
 =back
 
 There are example Codecov CI settings in L<example-perl|https://github.com/codecov/example-perl>.
@@ -242,7 +244,7 @@ There are example Codecov CI settings in L<example-perl|https://github.com/codec
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2018 Pine Mizune
+Copyright (c) 2015-2019 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -444,6 +444,7 @@
         hv_stores(the_hv, "CURLOPT_MAIL_AUTH", newSViv(CURLOPT_MAIL_AUTH));
         hv_stores(the_hv, "CURLOPT_MAIL_FROM", newSViv(CURLOPT_MAIL_FROM));
         hv_stores(the_hv, "CURLOPT_MAIL_RCPT", newSViv(CURLOPT_MAIL_RCPT));
+        hv_stores(the_hv, "CURLOPT_MAXAGE_CONN", newSViv(CURLOPT_MAXAGE_CONN));
         hv_stores(the_hv, "CURLOPT_MAXCONNECTS", newSViv(CURLOPT_MAXCONNECTS));
         hv_stores(the_hv, "CURLOPT_MAXFILESIZE", newSViv(CURLOPT_MAXFILESIZE));
         hv_stores(the_hv, "CURLOPT_MAXFILESIZE_LARGE", newSViv(CURLOPT_MAXFILESIZE_LARGE));
@@ -730,6 +731,7 @@
         hv_stores(the_hv, "CURLUPART_SCHEME", newSViv(CURLUPART_SCHEME));
         hv_stores(the_hv, "CURLUPART_URL", newSViv(CURLUPART_URL));
         hv_stores(the_hv, "CURLUPART_USER", newSViv(CURLUPART_USER));
+        hv_stores(the_hv, "CURLUPART_ZONEID", newSViv(CURLUPART_ZONEID));
         hv_stores(the_hv, "CURLUSESSL_ALL", newSViv(CURLUSESSL_ALL));
         hv_stores(the_hv, "CURLUSESSL_CONTROL", newSViv(CURLUSESSL_CONTROL));
         hv_stores(the_hv, "CURLUSESSL_NONE", newSViv(CURLUSESSL_NONE));

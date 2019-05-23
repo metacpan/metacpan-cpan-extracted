@@ -125,7 +125,7 @@ around new => sub ( $orig, $self, $uri, @args ) {
                     $SCHEME_CACHE->{$scheme} = $class;
                 }
 
-                return $SCHEME_CACHE->{$scheme}->new( { @args, uri => $uri } ) if $SCHEME_CACHE->{$scheme};    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+                return $SCHEME_CACHE->{$scheme}->new( { @args, uri => $uri } ) if $SCHEME_CACHE->{$scheme};
             }
 
             $self = $self->$orig(@args);

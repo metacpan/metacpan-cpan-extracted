@@ -24,12 +24,12 @@ $gateway = SMS::Send->new(
 );
 
 $got = $gateway->send_sms(
-    text => "Hello world",
+    text => 'Hello world',
     to => $ENV{MOCEAN_TO},
     _from => $ENV{MOCEAN_FROM},
 );
 
 is($got->{status}, 0, 'Expect SMS sent. OK and no error encountered.');
-is('+' . $got->{receiver}, $ENV{MOCEAN_TO}, 'Expect receiver mobile number match.');
+is(q|+| . $got->{receiver}, $ENV{MOCEAN_TO}, 'Expect receiver mobile number match.');
 
 done_testing;

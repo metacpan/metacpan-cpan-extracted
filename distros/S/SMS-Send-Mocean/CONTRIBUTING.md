@@ -43,7 +43,7 @@ Update the required API parameters into 't/.env.test' file and export these
 paramters to the current shell.
 
     $ source t/.env.test; milla run prove t/04_send_sms.t
-    $ source t/.env.test  milla test --author --release
+    $ source t/.env.test;  milla test --author --release
 
 To remove these API parameters from the shell.
 

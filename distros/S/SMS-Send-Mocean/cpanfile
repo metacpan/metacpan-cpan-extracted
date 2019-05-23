@@ -19,6 +19,8 @@ on test => sub {
     requires 'Test::Perl::Critic';
     requires 'Test::Pod::Coverage';
     requires 'Test::Warn';
+    requires 'Test::Warn';
+    requires 'Test::UseAllModules';
 };
 
 on 'develop' => sub {

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Carp::Always;
+use Carp;
 use HTTP::Request::Common qw(POST);
 use JSON qw(decode_json);
 use LWP::UserAgent;
@@ -14,7 +14,7 @@ use XML::Hash::LX qw(xml2hash);
 
 use base 'SMS::Send::Driver';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my $class = shift;
@@ -24,13 +24,13 @@ sub new {
 
     my $opts = {
         _endpoint => 'https://rest.moceanapi.com/rest/1/sms',
-        %$args
+        %{$args}
     };
 
     my $self = bless $opts, $class;
 
     $self->{ua} = LWP::UserAgent->new(
-        agent => __PACKAGE__ . qq| v| . $SMS::Send::Mocean::VERSION,
+        agent => __PACKAGE__ . q| v| . $SMS::Send::Mocean::VERSION,
         timeout => 10,
     );
 
@@ -97,7 +97,7 @@ sub send_sms {
             $error_msg = url_decode($content->{result}->{err_msg});
         }
 
-        die sprintf "\n%s (error code: %d)", $error_msg, $error_code;
+        croak sprintf "\n%s (error code: %d)", $error_msg, $error_code;
     }
 }
 
@@ -105,8 +105,9 @@ sub _required {
     my ($args, @required_args) = @_;
 
     foreach (@required_args) {
-        die "'$_' parameter required" unless $args->{$_}
+        croak "'$_' parameter required" unless $args->{$_}
     }
+    return;
 }
 
 sub _to_mocean_field_name {
@@ -122,6 +123,8 @@ sub _to_mocean_field_name {
 __END__
 
 =encoding utf-8
+
+=for stopwords mocean sms
 
 =head1 NAME
 
@@ -146,12 +149,12 @@ https://moceanapi.com/.
 
 =head1 DESCRIPTION
 
-SMS::Send::Mocean is a driver for L<SMS::Send> to send message via Mocean,
+SMS::Send::Mocean is a driver for L<SMS::Send|SMS::Send> to send message via Mocean,
 https://moceanapi.com/.
 
 =head1 DEVELOPMENT
 
-Source repo at L<https://github.com/kianmeng/send-sms-mocean|https://github.com/kianmeng/sms-send-mocean>.
+Source repository at L<https://github.com/kianmeng/send-sms-mocean|https://github.com/kianmeng/sms-send-mocean>.
 
 How to contribute? Follow through the L<CONTRIBUTING.md|https://github.com/kianmeng/sms-send-mocean/blob/master/CONTRIBUTING.md> document to setup your development environment.
 
@@ -198,7 +201,7 @@ Send the SMS text to a mobile user.
 =head3 to
 
 Compulsory. The required field needed by SMS::Send. Only accept leading-plus
-number in the format of "+99 XXX XXXX".
+number in the format of "+99 999 9999".
 
 =head3 text
 
@@ -214,10 +217,10 @@ Compulsory. The login username of the Mocean API portal.
 
 Optional. Additional parameters that can be used when sending SMS. Check the
 Mocean API documentation on the L<available parameters|https://moceanapi.com/docs/#sms-api>.
-Due to the design constraints of L<SMS::Send::Driver>, all parameters name must
-start with underscore. For example, '_resp_format'. This driver will convert the
-parameter name to equivalent format used by Mocean. In this case, '_foo_bar'
-will be formatted as 'mocean-resp-format'.
+Due to the design constraints of L<SMS::Send::Driver|SMS::Send::Driver>, all
+parameters name must start with underscore. For example, '_resp_format'. This
+driver will convert the parameter name to equivalent format used by Mocean. In
+this case, '_foo_bar' will be formatted as 'mocean-resp-format'.
 
     $gateway->send_sms(
         to => '+60123456789',
@@ -227,6 +230,10 @@ will be formatted as 'mocean-resp-format'.
         _charset => 'utf-8',
     );
 
+=head1 AUTHOR
+
+Kian Meng, Ang E<lt>kianmeng@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2019 Kian Meng, Ang.
@@ -235,10 +242,6 @@ This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
 
-=head1 AUTHOR
-
-Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>
-
 =head1 SEE ALSO
 
-L<SMS::Driver>
+L<SMS::Driver|SMS::Driver>

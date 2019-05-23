@@ -15,7 +15,7 @@ name: Net-Frame
 provides:
   Net::Frame:
     file: lib/Net/Frame.pm
-    version: '1.20'
+    version: '1.21'
   Net::Frame::Layer:
     file: lib/Net/Frame/Layer.pm
   Net::Frame::Layer::ARP:
@@ -44,5 +44,5 @@ requires:
   perl: v5.6.1
 resources:
   license: http://www.perlfoundation.org/artistic_license_1_0
-version: '1.20'
+version: '1.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

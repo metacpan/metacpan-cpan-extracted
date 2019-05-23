@@ -93,10 +93,7 @@ around run => sub ( $orig, $self ) {
 
     # start HTTP server
     if ( defined $self->{app_cfg}->{server}->{listen} ) {
-        $self->{server} = Pcore::HTTP::Server->new( {
-            $self->{app_cfg}->{server}->%*,    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
-            on_request => $self->{router}
-        } );
+        $self->{server} = Pcore::HTTP::Server->new( { $self->{app_cfg}->{server}->%*, on_request => $self->{router} } );
 
         say qq[Listen: $self->{app_cfg}->{server}->{listen}];
     }
@@ -244,7 +241,7 @@ sub _init_reload ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 190, 213             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 187, 210             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

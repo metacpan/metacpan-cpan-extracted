@@ -12,7 +12,7 @@ our @EXPORT_OK = qw|plot_qrcode|;
 
 use Text::QRCode;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant DEFAULTS => {
   background => 'white',
@@ -34,32 +34,7 @@ sub plot_qrcode ($text, $params = {}) {
 sub _plot ($self, $text) {
   $self->{plotter} ||= Text::QRCode->new($self->%{qw|level version|});
 
-  my @qrcode    = $self->{plotter}->plot($text)->@*;
-  my $dimension = @qrcode;
-
-  my @dot;
-  my $size    = $self->{size};
-  my $add_dot = sub {
-    if (@dot) {
-      $self->_rect(@dot);
-      @dot = ();
-    }
-  };
-
-  for my $y (0 .. $dimension - 1) {
-    for my $x (0 .. $dimension - 1) {
-      if ($qrcode[$y][$x] eq '*') {
-        if (@dot) {
-          $dot[2] += $size;
-        } else {
-          @dot = ($x * $size, $y * $size, $size, $size);
-        }
-      } else {
-        $add_dot->();
-      }
-    }
-    $add_dot->();
-  }
+  $self->_plot_2d($self->{plotter}->plot($text), '*');
 }
 
 1;
@@ -93,7 +68,7 @@ SVG::Barcode::QRCode - Generator for SVG based QR Codes
 
 =head1 DESCRIPTION
 
-L<SVG::Barcode::QRCode> is a Generator for SVG based QR Codes.
+L<SVG::Barcode::QRCode> is a generator for SVG based QR Codes.
 
 =head1 FUNCTIONS
 

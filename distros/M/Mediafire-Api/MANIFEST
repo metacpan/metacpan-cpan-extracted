@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_test.t
+t/test_upload3.f
+lib/Mediafire/Api.pm
+lib/Mediafire/Api/DownloadFile.pm
+lib/Mediafire/Api/File.pm
+lib/Mediafire/Api/UploadFile.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

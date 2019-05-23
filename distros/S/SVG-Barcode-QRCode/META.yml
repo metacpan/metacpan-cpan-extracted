@@ -18,13 +18,13 @@ no_index:
     - t
     - inc
 requires:
-  SVG::Barcode: '0.01'
+  SVG::Barcode: '0.02'
   Text::QRCode: '0.05'
   perl: v5.24.0
 resources:
   bugtracker: https://github.com/Tekki/svg-barcode-qrcode/issues
   homepage: https://github.com/Tekki/svg-barcode-qrcode
   repository: https://github.com/Tekki/svg-barcode-qrcode.git
-version: '0.01'
+version: '0.02'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -20,14 +20,14 @@ my ($got, $gateway) = ('', '');
 
 $gateway = SMS::Send->new(
     'Mocean',
-    _api_key => $ENV{MOCEAN_API_KEY} . "xxx",
-    _api_secret => $ENV{MOCEAN_API_SECRET} . "xxx",
+    _api_key => $ENV{MOCEAN_API_KEY} . 'xxx',
+    _api_secret => $ENV{MOCEAN_API_SECRET} . 'xxx',
 );
 
 
 dies_ok {
     $got = $gateway->send_sms(
-        text => "Hello world",
+        text => 'Hello world',
         to => $ENV{MOCEAN_TO},
         _from => $ENV{MOCEAN_FROM},
     );

@@ -1,5 +1,10 @@
 Revision history for Perl extension Net::Libdnet6.
 
+0.28 Thu 23 May 08:12:42 CEST 2019
+   - bugfix: use Carp
+   => https://rt.cpan.org/Ticket/Display.html?id=114639
+   - update: copyright notice
+
 0.27 Wed Jan 28 19:57:50 CET 2015
    - bugfix: finding default route under FreeBSD > 9.x systems
    - update: copyright notice

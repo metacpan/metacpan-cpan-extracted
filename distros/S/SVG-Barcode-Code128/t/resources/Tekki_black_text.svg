@@ -1,0 +1,29 @@
+<svg width="110" height="60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="white"/>
+  <rect x="10" y="10" width="2" height="30" fill="black"/>
+  <rect x="13" y="10" width="1" height="30" fill="black"/>
+  <rect x="16" y="10" width="1" height="30" fill="black"/>
+  <rect x="21" y="10" width="2" height="30" fill="black"/>
+  <rect x="24" y="10" width="3" height="30" fill="black"/>
+  <rect x="30" y="10" width="1" height="30" fill="black"/>
+  <rect x="32" y="10" width="1" height="30" fill="black"/>
+  <rect x="34" y="10" width="2" height="30" fill="black"/>
+  <rect x="38" y="10" width="1" height="30" fill="black"/>
+  <rect x="43" y="10" width="2" height="30" fill="black"/>
+  <rect x="49" y="10" width="1" height="30" fill="black"/>
+  <rect x="52" y="10" width="1" height="30" fill="black"/>
+  <rect x="54" y="10" width="2" height="30" fill="black"/>
+  <rect x="60" y="10" width="1" height="30" fill="black"/>
+  <rect x="63" y="10" width="1" height="30" fill="black"/>
+  <rect x="65" y="10" width="1" height="30" fill="black"/>
+  <rect x="70" y="10" width="2" height="30" fill="black"/>
+  <rect x="73" y="10" width="1" height="30" fill="black"/>
+  <rect x="76" y="10" width="2" height="30" fill="black"/>
+  <rect x="79" y="10" width="3" height="30" fill="black"/>
+  <rect x="83" y="10" width="1" height="30" fill="black"/>
+  <rect x="87" y="10" width="2" height="30" fill="black"/>
+  <rect x="92" y="10" width="3" height="30" fill="black"/>
+  <rect x="96" y="10" width="1" height="30" fill="black"/>
+  <rect x="98" y="10" width="2" height="30" fill="black"/>
+  <text x="10" y="50" font-size="10" fill="black">Tekki</text>
+</svg>

@@ -14,6 +14,7 @@ subtest basic => sub {
         DRONE_COMMIT       => 'commit',
         DRONE_BUILD_URL    => 'build_url',
         DRONE_BRANCH       => 'branch',
+        DRONE_TAG          => 'tag',
     );
 
     cmp_deeply
@@ -24,6 +25,7 @@ subtest basic => sub {
             commit    => 'commit',
             build_url => 'build_url',
             branch    => 'branch',
+            tag       => 'tag',
         };
 };
 

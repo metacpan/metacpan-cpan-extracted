@@ -1,7 +1,7 @@
 package Proc::Govern;
 
-our $DATE = '2019-05-22'; # DATE
-our $VERSION = '0.205'; # VERSION
+our $DATE = '2019-05-23'; # DATE
+our $VERSION = '0.207'; # VERSION
 
 use 5.010001;
 use strict;
@@ -99,6 +99,10 @@ _
 Passed to <pm:IPC::Run>'s `start()`.
 
 _
+        },
+        nice => {
+            summary => 'Set nice/priority level',
+            schema => ['int*'],
         },
         single_instance => {
             schema => [bool => default => 0],
@@ -464,12 +468,20 @@ sub govern_process {
             -euid => $args{euid},
             -egid => $args{egid},
         ) if defined $args{euid} || defined $args{egid};
+
         log_debug "[govproc] (Re)starting program $name ...";
         $to = IPC::Run::timeout(1);
         #$self->{to} = $to;
         $h  = IPC::Run::start($cmd, \*STDIN, $out, $err, $to)
             or die "Can't start program: $?";
         $self->{h} = $h;
+
+        if (defined $args{nice}) {
+            log_debug "[govproc] Setting nice level of PID %d to %d ...",
+                $h->{KIDS}[0]{PID}, $args{nice};
+            setpriority(0, $h->{KIDS}[0]{PID}, $args{nice});
+        }
+
         IPC::Run::Patch::Setuid->unimport()
               if defined $args{euid} || defined $args{egid};
     };
@@ -625,7 +637,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.205 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-05-22.
+This document describes version 0.207 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-05-23.
 
 =head1 SYNOPSIS
 
@@ -721,11 +733,17 @@ Currently the following governing functionalities are available:
 
 =item * execution time limit
 
+=item * set (CPU) nice level (priority)
+
 =item * preventing multiple instances from running simultaneously
 
 =item * load watch
 
 =item * autorestart
+
+=item * preventing system from sleeping while process is running
+
+=item * preventing screensaver from activating while process is running
 
 =back
 
@@ -742,8 +760,6 @@ With an option to autorestart if process' memory size grow out of limit.
 =item * other resource usage limit
 
 =item * fork/start multiple processes
-
-=item * set (CPU) nice level
 
 =item * set I/O nice level (scheduling priority/class)
 
@@ -880,6 +896,10 @@ L<File::Write::Rotate>'s constructor as well as used as name of PID file.
 
 If not given, will be taken from command.
 
+=item * B<nice> => I<int>
+
+Set nice/priority level.
+
 =item * B<no_screensaver> => I<true>
 
 Prevent screensaver from being activated.
@@ -975,13 +995,22 @@ feature.
 
 =head1 SEE ALSO
 
-Proc::Govern uses L<IPC::Run> at its core.
+L<Forks::Super> (since 2009) extends the fork(), wait(), and waitpid() functions
+with some process/job management features, e.g. set timeout, retries, chdir,
+environment, umask, delay before start, control STDIN/STDOUT/STDERR, load
+control, priority/nice level, daemon, and a lot more. Had I known about this
+module, I probably wouldn't start Proc::Govern.
 
-L<IPC::Cmd> also uses IPC::Run (as well as L<IPC::Open3> on systems that do not
-have IPC::Run installed or on some archaic systems that do not support IPC::Run)
-and its C<run_forked()> routine also has some of Proc::Govern's functionalities
-like capturing stdout and stderr, timeout, hiding (discarding) output. If you
-only need those functionalities, you can use IPC::Cmd as it is a core module.
+Proc::Govern uses L<IPC::Run> at its core; you might want to use it directly. It
+already has some features, e.g. controlling STDIN/STDOUT/STDERR and timeout. But
+the main selling point of IPC::Run is its redirection and piping features.
+
+L<IPC::Cmd> is a core module, but can also use IPC::Run (as well as
+L<IPC::Open3> on systems that do not have IPC::Run installed or on some archaic
+systems that do not support IPC::Run). Its C<run_forked()> routine has some of
+Proc::Govern's functionalities like capturing stdout and stderr, timeout, hiding
+(discarding) output. If you only need those functionalities, you can use
+IPC::Cmd as it is a core module.
 
 Proc::Govern attempts (or will attempt, some day) to provide the functionality
 (or some of the functionality) of the builtins/modules/programs listed below:

@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.11;
+package Pcore::PDF v0.5.12;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -145,7 +145,7 @@ sub remove_logo ( $self, $pdf_ref ) {
         }
     }
 
-    $pdf_ref->$* = $pdf->cleansave->{content};    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $pdf_ref->$* = $pdf->cleansave->{content};
 
     return;
 }
