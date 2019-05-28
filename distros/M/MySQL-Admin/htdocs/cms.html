@@ -3,16 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <title>MySQL::Admin</title>
-<!--[if lt IE 9]>
-<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<![endif]-->
 <script type="text/javascript" src="javascript/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css"/>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <script src="style/popper.min.js"></script>
 <script src="style/tooltip.min.js"></script>
-<link rel="stylesheet" href="style/bootstrap.min-4.1.1.css"/>
-<script src="/src-min/ace.js"></script>
-<!-- load ace accessibility extension -->
-<script src="src-min/ext-chromevox.js"></script>
+<script src="style/bootstrap.min.js"></script>
+<script type="text/javascript" src="style/mysql/16/html-menu-treeview/preload.js" charset="utf-8"></script>
 <script src="javascript/bootstrap-markdown-editor.js"></script>
 <script type="text/javascript" src="javascript/require.js" charset="utf-8"></script>
 <script type="text/javascript" src="cgi-bin/translate.pl" charset="utf-8"></script>
@@ -21,13 +19,12 @@
 <script type="text/javascript" src="javascript/cms.js" charset="utf-8"></script>
 <script type="text/javascript" src="javascript/admin.js" charset="utf-8"></script>
 <script type="text/javascript" src="cgi-bin/translate.pl" charset="utf-8"></script>
-<script type="text/javascript" src="javascript/bootstrap-select.min.js" charset="utf-8"></script>
 <link rel="alternate" type="application/rss+xml"  href="cgi-bin/rss.pl"  title="News" />
-<link rel="stylesheet" href="style/bootstrap.min-3.3.7.css"/>
 <link href="style/mysql/Crystal.css" rel="stylesheet" type="text/css"/>
 <link href="style/mysql/cms.css" rel="stylesheet" type="text/css"/>
-<link href="javascript/bootstrap-select.min.css" rel="stylesheet" type="text/css"/>
 <link href="style/bootstrap-markdown-editor.css" rel="stylesheet" type="text/css"/>
+<script src="src-min/ace.js"></script>
+<script src="src-min/ext-chromevox.js"></script>
 <style type="text/css" media="screen">
     .ace_editor {
         border:1px solid lightgray;
@@ -47,6 +44,17 @@
     }
     .md-container{
         border:1px solid black;
+    }
+    .disclaimer{
+        left: 0px;
+        top: 0px;
+        background-color: RGBA(253, 253, 204, 1);
+        position: fixed;
+        width: 100%;
+    }
+    #disclaimerContent{
+        max-height: 800px;
+        overflow: auto;
     }
     </style>
 </head>
@@ -76,6 +84,6 @@
 <div class="menu closed" id="menu"></div>
 <div id="sid"></div>
 <div id="moveHere" style="display:none;" class="moveHereContent" width="100px"></div>
-<div style="text-align: center"><a class="link" href="http://info@dirk-lindner.de">Copyright (C) 2018 Dirk Lindner</a></div>
+<div style="text-align: center"><a class="link" href="http://info@dirk-lindner.de">Copyright (C) 2019 Dirk Lindner</a></div>
 </body>
 </html>

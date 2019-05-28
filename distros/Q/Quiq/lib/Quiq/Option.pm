@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Scalar::Util ();
@@ -111,8 +111,8 @@ Instantiierung eines Options-Objekts:
         # @_: @args
     
         my $opt = Quiq::Option->extract(\@_,
-            -logLevel=>1,
-            -verbose=>0,
+            -logLevel => 1,
+            -verbose => 0,
         );
         ...
     
@@ -139,8 +139,8 @@ Setzen von Options-Variablen:
         my $verbose = 0;
     
         Quiq::Option->extract(\@_,
-            -logLevel=>\$logLevel,
-            -verbose=>\$verbose,
+            -logLevel => \$logLevel,
+            -verbose => \$verbose,
         );
         ...
     
@@ -210,8 +210,8 @@ sub extract {
                 die "Ungültige Methodenoption: $key\n";
             }
             $class->throw(
-                q~OPT-00002: Ungültige Methodenoption~,
-                Option=>$key,
+                'OPT-00002: Ungültige Methodenoption',
+                Option => $key,
             );
         }
     }
@@ -303,8 +303,8 @@ sub extract {
                 die "Ungültige Option: $dashPrefix$key\n";
             }
             $class->throw(
-                q~OPT-00001: Ungültige Option~,
-                Option=>"$dashPrefix$key",
+                'OPT-00001: Ungültige Option',
+                Option => "$dashPrefix$key",
             );
         };
 
@@ -410,10 +410,10 @@ Für das Hinzufügen einer Default-Option, siehe Beispiel.
     unshift @_,'-select'; # Default-Option
     
     Quiq::Option->extractMulti(\@_,
-        -select=>\@select,
-        -from=>\@from,
-        -where=>\@where,
-        -limit=>\$limit,
+        -select => \@select,
+        -from => \@from,
+        -where => \@where,
+        -limit => \$limit,
     );
     
     unless (@from) {
@@ -442,8 +442,8 @@ sub extractMulti {
         }
         else {
             $this->throw(
-                q~OPT-00004: Ungültige Option~,
-                Option=>$key,
+                'OPT-00004: Ungültige Option',
+                Option => $key,
             );
         }
     }
@@ -462,8 +462,8 @@ sub extractMulti {
             $refType = Scalar::Util::reftype($ref);
             if (!defined $refType) {
                 $this->throw(
-                    q~OPT-00002: Ungültige Variablen-Referenz~,
-                    Option=>$arg,
+                    'OPT-00002: Ungültige Variablen-Referenz',
+                    Option => $arg,
                 );
             }
             splice @$arr,$i--,1;
@@ -475,8 +475,8 @@ sub extractMulti {
 
             if (!$sloppy) {
                 $this->throw(
-                    q~OPT-00001: Ungültige Option~,
-                    Option=>$arg);
+                    'OPT-00001: Ungültige Option',
+                    Option => $arg);
             }
             $ref = undef;
             next;
@@ -507,7 +507,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

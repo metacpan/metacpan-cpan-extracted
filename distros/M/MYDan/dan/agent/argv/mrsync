@@ -1,4 +1,4 @@
-#!# perl: agent/argv/dump
+#!# perl: agent/argv/mrsync
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ return sub
     else
     {
         Getopt::Long::GetOptionsFromArray( \@_, \%o, 
-            qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i chown=s chmod=s cc ) 
+            qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i chown=s chmod=s cc env ) 
         );
     }
 
@@ -37,7 +37,7 @@ return sub
     my %p = map{ $o{$_} => 1 }grep{ defined $o{$_} }qw( sp dp );
     my %n = map{ $_ => 1 }@{$o{src}}, @{$o{dst}};
 
-    $o{queryxdata} = MYDan::Agent::Mrsync::queryx( node => [ keys %n ], map{ $_ => $o{$_} }qw( user sudo ) );
+    $o{queryxdata} = MYDan::Agent::Mrsync::queryx( node => [ keys %n ], map{ $_ => $o{$_} }qw( user sudo env ) );
 
     map{ die "agent/argv/mrsync: $_ null" unless $o{$_} && @{$o{$_}} }qw( src dst );
     die "agent/argv/mrsync: sp undef" unless $o{sp};

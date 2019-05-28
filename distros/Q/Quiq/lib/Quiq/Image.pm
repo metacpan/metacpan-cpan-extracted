@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Path;
@@ -105,8 +105,8 @@ sub findImages {
     my $sort = '';
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -object=>\$object,
-        -sort=>\$sort,
+        -object => \$object,
+        -sort => \$sort,
     );
 
     my @arr;
@@ -317,8 +317,8 @@ sub type {
     my $sloppy = 0;
 
     Quiq::Option->extract(\@_,
-        -enum=>\$enum,
-        -sloppy=>\$sloppy,
+        -enum => \$enum,
+        -sloppy => \$sloppy,
     );
 
     # Operation ausführen
@@ -338,9 +338,9 @@ sub type {
     }
     elsif (!$sloppy) {
         $class->throw(
-            q~IMG-00001: Unknown image type~,
-            File=>$file,
-            Data=>$data,
+            'IMG-00001: Unknown image type',
+            File => $file,
+            Data => $data,
         );
     }
 
@@ -351,7 +351,7 @@ sub type {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

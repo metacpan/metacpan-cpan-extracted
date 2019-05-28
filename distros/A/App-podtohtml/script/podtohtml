@@ -2,20 +2,20 @@
 
 ### code_after_shebang
 # Note: This script is a CLI for Riap function /App/podtohtml/podtohtml
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"podtohtml.conf","env_name":"PODTOHTML_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"podtohtml","script_summary":null,"script_version":"0.006","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/podtohtml/podtohtml","use_cleanser":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"podtohtml.conf","env_name":"PODTOHTML_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"podtohtml","script_summary":null,"script_version":"0.007","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/podtohtml/podtohtml","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{browser=>{cmdline_aliases=>{b=>{}},schema=>["bool",{is=>1,req=>1},{}],summary=>"Instead of outputing HTML to STDOUT/file, view it in browser"},infile=>{cmdline_aliases=>{i=>{}},default=>"-",description=>"\nIf not found, will search in for .pod or .pm files in `\@INC`.\n\n",pos=>0,schema=>["perl::pod_or_pm_filename",{req=>1},{}],summary=>"Input file (POD)"},list_templates=>{cmdline_aliases=>{l=>{}},schema=>["bool",{is=>1,req=>1},{}],summary=>"List available templates",tags=>["category:action","category:template"]},outfile=>{cmdline_aliases=>{o=>{}},pos=>1,schema=>["filename",{req=>1},{}]},template=>{cmdline_aliases=>{t=>{}},completion=>sub{"DUMMY"},schema=>["str",{req=>1},{}],summary=>"Pick a template to use, only relevant with --browser",tags=>["category:template"]}},args_rels=>{choose_one=>["outfile","browser"]},description=>"\nThis is a thin wrapper for <pm:Pod::Html> and an alternative CLI to\n<prog:pod2html> to remove some annoyances that I experience with `pod2html`,\ne.g. the default cache directory being `.` (so it leaves `.tmp` files around).\nThis CLI also offers templates and tab completion.\n\nIt does not yet offer as many options as `pod2html`.\n\n",examples=>[{argv=>["some.pod"],summary=>"Convert POD file to HTML, print result to STDOUT",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b"],summary=>"Convert POD file to HTML, show result in browser",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b","-t","metacpan-20180911"],summary=>"Convert POD file to HTML, show result in browser using the MetaCPAN template to give an idea how it will look on MetaCPAN",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b","-t","sco-20180123"],summary=>"Convert POD file to HTML, show result in browser using the sco template to give an idea how it will look on (now-dead) search.cpan.org",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b","-t","perldoc_perl_org-20180911"],summary=>"Convert POD file to HTML, show result in browser using the perldoc.perl.org template to give an idea how it will look on perldoc.perl.org",test=>0,"x.doc.show_result"=>0},{argv=>["-l"],summary=>"List which templates are available",test=>0,"x.doc.show_result"=>0}],result=>{},summary=>"Convert POD to HTML",v=>1.1}};
+my $_pci_metas = {""=>{args=>{browser=>{cmdline_aliases=>{b=>{}},schema=>["true",{req=>1},{}],summary=>"Instead of outputing HTML to STDOUT/file, view it in browser"},infile=>{cmdline_aliases=>{i=>{}},default=>"-",description=>"\nIf not found, will search in for .pod or .pm files in `\@INC`.\n\n",pos=>0,schema=>["perl::pod_or_pm_filename",{req=>1},{}],summary=>"Input file (POD)"},list_templates=>{cmdline_aliases=>{l=>{}},schema=>["true",{req=>1},{}],summary=>"List available templates",tags=>["category:action","category:template"]},outfile=>{cmdline_aliases=>{o=>{}},pos=>1,schema=>["filename",{req=>1},{}]},template=>{cmdline_aliases=>{metacpan=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Shortcut for --template metacpan-20180911 --browser"},t=>{}},completion=>sub{"DUMMY"},schema=>["str",{req=>1},{}],summary=>"Pick a template to use, only relevant with --browser",tags=>["category:template"]}},args_rels=>{choose_one=>["outfile","browser"]},description=>"\nThis is a thin wrapper for <pm:Pod::Html> and an alternative CLI to\n<prog:pod2html> to remove some annoyances that I experience with `pod2html`,\ne.g. the default cache directory being `.` (so it leaves `.tmp` files around).\nThis CLI also offers templates and tab completion.\n\nIt does not yet offer as many options as `pod2html`.\n\n",examples=>[{argv=>["some.pod"],summary=>"Convert POD file to HTML, print result to STDOUT",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b"],summary=>"Convert POD file to HTML, show result in browser",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b","-t","metacpan-20180911"],summary=>"Convert POD file to HTML, show result in browser using the MetaCPAN template to give an idea how it will look on MetaCPAN",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b","-t","sco-20180123"],summary=>"Convert POD file to HTML, show result in browser using the sco template to give an idea how it will look on (now-dead) search.cpan.org",test=>0,"x.doc.show_result"=>0},{argv=>["some.pod","-b","-t","perldoc_perl_org-20180911"],summary=>"Convert POD file to HTML, show result in browser using the perldoc.perl.org template to give an idea how it will look on perldoc.perl.org",test=>0,"x.doc.show_result"=>0},{argv=>["-l"],summary=>"List which templates are available",test=>0,"x.doc.show_result"=>0}],result=>{},summary=>"Convert POD to HTML",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.543 on Tue Sep 11 19:31:28 2018.
+# This script is generated by Perinci::CmdLine::Inline version 0.544 on Sat May 25 14:31:43 2019.
 
 # Rinci metadata taken from these modules: App::podtohtml (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2018-09-11'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-05-25'; # DATE
+our $VERSION = '0.007'; # VERSION
 # PODNAME: podtohtml
 # ABSTRACT: Convert POD to HTML
 
@@ -129,11 +129,11 @@ my %mentioned_args;
 require Getopt::Long::EvenLess;
 my $go_spec1 = {
     'format=s' => sub { $_pci_r->{format} = $_[1]; },
-    'help|h|?' => sub { print "podtohtml - Convert POD to HTML\n\nUsage:\n  podtohtml --help (or -h, -?)\n  podtohtml --version (or -v)\n  podtohtml [options] [infile] [outfile]\n\nExamples:\n  Convert POD file to HTML, print result to STDOUT:\n  % podtohtml some.pod\n\n  Convert POD file to HTML, show result in browser:\n  % podtohtml some.pod -b\n\n  Convert POD file to HTML, show result in browser using the MetaCPAN template to give an idea how it will look on MetaCPAN:\n  % podtohtml some.pod -b -t metacpan-20180911\n\n  Convert POD file to HTML, show result in browser using the sco template to give an idea how it will look on (now-dead) search.cpan.org:\n  % podtohtml some.pod -b -t sco-20180123\n\n  Convert POD file to HTML, show result in browser using the perldoc.perl.org template to give an idea how it will look on perldoc.perl.org:\n  % podtohtml some.pod -b -t perldoc_perl_org-20180911\n\n  List which templates are available:\n  % podtohtml -l\n\nThis is a thin wrapper for <pm:Pod::Html> and an alternative CLI to\n<prog:pod2html> to remove some annoyances that I experience with `pod2html`,\ne.g. the default cache directory being `.` (so it leaves `.tmp` files around).\nThis CLI also offers templates and tab completion.\n\nIt does not yet offer as many options as `pod2html`.\n\nMain options:\n  --browser, -b    Instead of outputing HTML to STDOUT/file, view it in browser\n  --infile=s, -i   Input file (POD) (=arg[0]) [\"-\"]\n  --outfile=s, -o   (=arg[1])\n\nAction options:\n  --list-templates, -l  List available templates\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nTemplate options:\n  --list-templates, -l  List available templates\n  --template=s, -t      Pick a template to use, only relevant with --browser\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "podtohtml - Convert POD to HTML\n\nUsage:\n  podtohtml --help (or -h, -?)\n  podtohtml --version (or -v)\n  podtohtml [options] [infile] [outfile]\n\nExamples:\n  Convert POD file to HTML, print result to STDOUT:\n  % podtohtml some.pod\n\n  Convert POD file to HTML, show result in browser:\n  % podtohtml some.pod -b\n\n  Convert POD file to HTML, show result in browser using the MetaCPAN template to give an idea how it will look on MetaCPAN:\n  % podtohtml some.pod -b -t metacpan-20180911\n\n  Convert POD file to HTML, show result in browser using the sco template to give an idea how it will look on (now-dead) search.cpan.org:\n  % podtohtml some.pod -b -t sco-20180123\n\n  Convert POD file to HTML, show result in browser using the perldoc.perl.org template to give an idea how it will look on perldoc.perl.org:\n  % podtohtml some.pod -b -t perldoc_perl_org-20180911\n\n  List which templates are available:\n  % podtohtml -l\n\nThis is a thin wrapper for <pm:Pod::Html> and an alternative CLI to\n<prog:pod2html> to remove some annoyances that I experience with `pod2html`,\ne.g. the default cache directory being `.` (so it leaves `.tmp` files around).\nThis CLI also offers templates and tab completion.\n\nIt does not yet offer as many options as `pod2html`.\n\nMain options:\n  --browser, -b    Instead of outputing HTML to STDOUT/file, view it in browser\n  --infile=s, -i   Input file (POD) (=arg[0]) [\"-\"]\n  --outfile=s, -o   (=arg[1])\n\nAction options:\n  --list-templates, -l  List available templates\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nTemplate options:\n  --list-templates, -l  List available templates\n  --metacpan            Shortcut for --template metacpan-20180911 --browser\n  --template=s, -t      Pick a template to use, only relevant with --browser\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
     'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
     'naked-res' => sub { $_pci_r->{naked_res} = 1; },
     'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
-    'version|v' => sub { no warnings 'once'; require App::podtohtml; print "podtohtml version ", "0.006", ($App::podtohtml::DATE ? " ($App::podtohtml::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.543 (2018-09-11)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::podtohtml; print "podtohtml version ", "0.007", ($App::podtohtml::DATE ? " ($App::podtohtml::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.544 (2018-10-03)\n"; exit 0 },
 };
 my $go_spec2 = {
     'b' => sub {         $_pci_args{'browser'} = $_[1];
@@ -151,8 +151,18 @@ my $go_spec2 = {
  },
     'list-templates' => sub {         $_pci_args{'list_templates'} = $_[1];
  },
+    'metacpan' => sub {         my $code = sub{package App::podtohtml;use warnings;use strict;no feature;use feature ':5.10';$_[0]{'browser'} = 1;$_[0]{'template'} = 'metacpan-20180911'}; $code->(\%_pci_args);
+ },
     'naked-res' => sub {  },
+    'no-browser' => sub {         $_pci_args{'browser'} = 0;
+ },
+    'no-list-templates' => sub {         $_pci_args{'list_templates'} = 0;
+ },
     'no-naked-res|nonaked-res' => sub {  },
+    'nobrowser' => sub {         $_pci_args{'browser'} = 0;
+ },
+    'nolist-templates' => sub {         $_pci_args{'list_templates'} = 0;
+ },
     'o=s' => sub {         $_pci_args{'outfile'} = $_[1];
  },
     'outfile=s' => sub {         $_pci_args{'outfile'} = $_[1];
@@ -229,7 +239,7 @@ podtohtml - Convert POD to HTML
 
 =head1 VERSION
 
-This document describes version 0.006 of main (from Perl distribution App-podtohtml), released on 2018-09-11.
+This document describes version 0.007 of main (from Perl distribution App-podtohtml), released on 2019-05-25.
 
 =head1 SYNOPSIS
 
@@ -356,6 +366,12 @@ you want to pipe the result for more post-processing. In this case you can use
 
 List available templates.
 
+=item B<--metacpan>
+
+Shortcut for --template metacpan-20180911 --browser.
+
+See C<--template>.
+
 =item B<--template>=I<s>, B<-t>
 
 Pick a template to use, only relevant with --browser.
@@ -432,7 +448,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -443,11 +459,11 @@ __DATA__
 Data::Section::Seekable v1
 Clone/PP.pm,20,6331,0;0
 Data/Check/Structure.pm,6383,8606,1;193
-Getopt/Long/EvenLess.pm,15021,12600,2;529
-Local/_pci_check_args.pm,27654,5344,3;929
-Local/_pci_clean_json.pm,33031,3724,4;1034
-Perinci/Result/Format/Lite.pm,36793,22687,5;1087
-Text/Table/Tiny.pm,59507,7678,6;1685
+Getopt/Long/EvenLess.pm,15021,11364,2;529
+Local/_pci_check_args.pm,26418,5397,3;911
+Local/_pci_clean_json.pm,31848,4414,4;1016
+Perinci/Result/Format/Lite.pm,36300,22687,5;1078
+Text/Table/Tiny.pm,59014,7678,6;1676
 
 ### Clone/PP.pm ###
 #package Clone::PP;
@@ -983,8 +999,8 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 ### Getopt/Long/EvenLess.pm ###
 #package Getopt::Long::EvenLess;
 #
-#our $DATE = '2017-08-09'; # DATE
-#our $VERSION = '0.111'; # VERSION
+#our $DATE = '2019-02-02'; # DATE
+#our $VERSION = '0.112'; # VERSION
 #
 ## IFUNBUILT
 ## # use strict 'subs', 'vars';
@@ -1093,9 +1109,9 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #        my $name = shift;
 #
 #        my $spec_key = $spec_by_opt_name{$name};
-#        my $handler  = $spec{$spec_key};
+#        my $destination = $spec{$spec_key};
 #
-#        $handler->({name=>$name}, @_ ? $_[0] : 1);
+#        $destination->({name=>$name}, @_ ? $_[0] : 1);
 #    };
 #
 #    my $i = -1;
@@ -1217,7 +1233,7 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #
 #=head1 VERSION
 #
-#This document describes version 0.111 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2017-08-09.
+#This document describes version 0.112 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2019-02-02.
 #
 #=head1 DESCRIPTION
 #
@@ -1253,10 +1269,10 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #
 #=item * does not support desttypes (C<foo=s@>)
 #
-#=item * does not support handler other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, only C<< "foo=s" => sub { ... } >>)
+#=item * does not support destination other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, no C<< "foo=s" => \%hash >>, only C<< "foo=s" => sub { ... } >>)
 #
-#Also, in coderef handler, code will get a simple hash instead of a "callback"
-#object as its first argument.
+#Also, in coderef destination, code will get a simple hash instead of a
+#"callback" object as its first argument.
 #
 #=item * does not support hashref as first argument
 #
@@ -1275,27 +1291,7 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #and you're already able to extract C<--flag> or C<--opt=val> from C<@ARGV> but
 #you also lose a lot of stuffs like autoabbreviation, C<--opt val> syntax support
 #syntax (which is more common, but requires you specify an option spec), custom
-#handler, etc.
-#
-#B<Startup overhead>. Here's a sample startup overhead benchmark:
-#
-#                             Rate        run_gl     load_gl run_gl_evenless load_gl_evenless run_gl_less load_gl_less   perl
-# run_gl           64.096+-0.092/s            --       -0.5%          -68.6%           -69.2%      -70.1%       -70.4% -90.6%
-# load_gl            64.39+-0.16/s   0.46+-0.29%          --          -68.4%           -69.1%      -70.0%       -70.3% -90.5%
-# run_gl_evenless   203.88+-0.74/s   218.1+-1.2% 216.6+-1.4%              --            -2.1%       -4.9%        -5.8% -70.0%
-# load_gl_evenless  208.24+-0.57/s     224.9+-1% 223.4+-1.2%     2.14+-0.46%               --       -2.8%        -3.8% -69.4%
-# run_gl_less       214.28+-0.62/s   234.3+-1.1% 232.8+-1.3%      5.1+-0.49%       2.9+-0.41%          --        -1.0% -68.5%
-# load_gl_less      216.44+-0.45/s 237.68+-0.85% 236.1+-1.1%     6.16+-0.44%      3.94+-0.36% 1.01+-0.36%           -- -68.2%
-# perl                679.7+-3.7/s     960.5+-6% 955.7+-6.4%     233.4+-2.2%        226.4+-2%   217.2+-2%  214.1+-1.8%     --
-# 
-# Average times:
-#   perl            :     1.4712ms
-#   load_gl_less    :     4.6202ms
-#   run_gl_less     :     4.6668ms
-#   load_gl_evenless:     4.8022ms
-#   run_gl_evenless :     4.9048ms
-#   load_gl         :    15.5304ms
-#   run_gl          :    15.6016ms
+#destination, etc.
 #
 #=head1 FUNCTIONS
 #
@@ -1369,13 +1365,15 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #
 #If you want I<more> features intead of less, try L<Getopt::Long::More>.
 #
+#Benchmarks in L<Bencher::Scenario::GetoptModules>
+#
 #=head1 AUTHOR
 #
 #perlancar <perlancar@cpan.org>
 #
 #=head1 COPYRIGHT AND LICENSE
 #
-#This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+#This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 #
 #This is free software; you can redistribute it and/or modify it under
 #the same terms as the Perl 5 programming language system itself.
@@ -1401,7 +1399,7 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #        my $_sahv_err;
 #        if (exists $args->{"browser"}) {
 #            $_sahv_dpath = [];
-#            # req #0
+#            # req #1
 #            ((defined($args->{"browser"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
 #            
 #            &&
@@ -1411,8 +1409,8 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #            
 #            &&
 #            
-#            (# clause: is
-#            (($args->{"browser"} ? 1:0) == (1 ? 1:0) ? 1 : (($_sahv_err //= "Must have the value 1"),0)))
+#            (# clause: is_true
+#            (((1) ? $args->{"browser"} : !defined(1) ? 1 : !$args->{"browser"}) ? 1 : (($_sahv_err //= "Must be true"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
 #        $args->{"infile"} //= "-";
@@ -1434,7 +1432,7 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #        } # if date arg exists
 #        if (exists $args->{"list_templates"}) {
 #            $_sahv_dpath = [];
-#            # req #0
+#            # req #1
 #            ((defined($args->{"list_templates"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
 #            
 #            &&
@@ -1444,8 +1442,8 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #            
 #            &&
 #            
-#            (# clause: is
-#            (($args->{"list_templates"} ? 1:0) == (1 ? 1:0) ? 1 : (($_sahv_err //= "Must have the value 1"),0)))
+#            (# clause: is_true
+#            (((1) ? $args->{"list_templates"} : !defined(1) ? 1 : !$args->{"list_templates"}) ? 1 : (($_sahv_err //= "Must be true"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
 #        if (exists $args->{"outfile"}) {
@@ -1496,7 +1494,10 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #state $process_hash;
 #if (!$process_array) { $process_array = sub { my $a = shift; for my $e (@$a) { my $ref=ref($e);
 #    if ($ref && $refs{ $e }++) { if (++$ctr_circ <= 1) { $e = Clone::PP::clone($e); redo } else { $e = 'CIRCULAR'; $ref = '' } }
+#    elsif ($ref eq 'Cpanel::JSON::XS::Boolean') { $e = $e ? 1:0; $ref = '' }
 #    elsif ($ref eq 'DateTime') { $e = $e->epoch; $ref = ref($e) }
+#    elsif ($ref eq 'JSON::PP::Boolean') { $e = $e ? 1:0; $ref = '' }
+#    elsif ($ref eq 'JSON::XS::Boolean') { $e = $e ? 1:0; $ref = '' }
 #    elsif ($ref eq 'Math::BigInt') { $e = $e->bstr; $ref = ref($e) }
 #    elsif ($ref eq 'Regexp') { $e = "$e"; $ref = "" }
 #    elsif ($ref eq 'SCALAR') { $e = ${ $e }; $ref = ref($e) }
@@ -1510,7 +1511,10 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #} } }
 #if (!$process_hash) { $process_hash = sub { my $h = shift; for my $k (keys %$h) { my $ref=ref($h->{$k});
 #    if ($ref && $refs{ $h->{$k} }++) { if (++$ctr_circ <= 1) { $h->{$k} = Clone::PP::clone($h->{$k}); redo } else { $h->{$k} = 'CIRCULAR'; $ref = '' } }
+#    elsif ($ref eq 'Cpanel::JSON::XS::Boolean') { $h->{$k} = $h->{$k} ? 1:0; $ref = '' }
 #    elsif ($ref eq 'DateTime') { $h->{$k} = $h->{$k}->epoch; $ref = ref($h->{$k}) }
+#    elsif ($ref eq 'JSON::PP::Boolean') { $h->{$k} = $h->{$k} ? 1:0; $ref = '' }
+#    elsif ($ref eq 'JSON::XS::Boolean') { $h->{$k} = $h->{$k} ? 1:0; $ref = '' }
 #    elsif ($ref eq 'Math::BigInt') { $h->{$k} = $h->{$k}->bstr; $ref = ref($h->{$k}) }
 #    elsif ($ref eq 'Regexp') { $h->{$k} = "$h->{$k}"; $ref = "" }
 #    elsif ($ref eq 'SCALAR') { $h->{$k} = ${ $h->{$k} }; $ref = ref($h->{$k}) }
@@ -1525,7 +1529,10 @@ Text/Table/Tiny.pm,59507,7678,6;1685
 #%refs = (); $ctr_circ=0;
 #for ($data) { my $ref=ref($_);
 #    if ($ref && $refs{ $_ }++) { if (++$ctr_circ <= 1) { $_ = Clone::PP::clone($_); redo } else { $_ = 'CIRCULAR'; $ref = '' } }
+#    elsif ($ref eq 'Cpanel::JSON::XS::Boolean') { $_ = $_ ? 1:0; $ref = '' }
 #    elsif ($ref eq 'DateTime') { $_ = $_->epoch; $ref = ref($_) }
+#    elsif ($ref eq 'JSON::PP::Boolean') { $_ = $_ ? 1:0; $ref = '' }
+#    elsif ($ref eq 'JSON::XS::Boolean') { $_ = $_ ? 1:0; $ref = '' }
 #    elsif ($ref eq 'Math::BigInt') { $_ = $_->bstr; $ref = ref($_) }
 #    elsif ($ref eq 'Regexp') { $_ = "$_"; $ref = "" }
 #    elsif ($ref eq 'SCALAR') { $_ = ${ $_ }; $ref = ref($_) }

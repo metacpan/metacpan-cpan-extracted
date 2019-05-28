@@ -3,7 +3,7 @@ use Moo::Role;
 use Types::Standard qw(HasMethods);
 use namespace::autoclean;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 # ABSTRACT: adapt DBChanges to DBIC
 
 
@@ -57,7 +57,7 @@ Test::DBChanges::Role::DBIC - adapt DBChanges to DBIC
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::TimeLapse::Directory;
 use Quiq::Option;
@@ -51,9 +51,9 @@ sub new {
     my ($class,$path) = @_;
 
     return $class->SUPER::new(
-        path=>$path,
-        imageList=>Quiq::TimeLapse::Directory->new("$path/img"),
-        sequenceH=>{},
+        path => $path,
+        imageList => Quiq::TimeLapse::Directory->new("$path/img"),
+        sequenceH => {},
     );
 }
 
@@ -203,7 +203,7 @@ sub image {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

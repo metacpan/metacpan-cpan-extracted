@@ -12,28 +12,26 @@ our @EXPORT_OK = qw|plot_qrcode|;
 
 use Text::QRCode;
 
-our $VERSION = '0.02';
+our $VERSION = '0.10';
 
 use constant DEFAULTS => {
-  background => 'white',
-  foreground => 'black',
-  level      => 'M',
-  margin     => 10,
-  size       => 5,
-  version    => 0,
+  dotsize => 1,
+  level   => 'M',
+  version => 0,
 };
+
+SVG::Barcode::_param(__PACKAGE__, $_, DEFAULTS->{$_}) for keys DEFAULTS->%*;
 
 # functions
 
-sub plot_qrcode ($text, $params = {}) {
-  return __PACKAGE__->new($params)->plot($text);
+sub plot_qrcode ($text, %params) {
+  return __PACKAGE__->new(%params)->plot($text);
 }
 
 # internal methods
 
 sub _plot ($self, $text) {
   $self->{plotter} ||= Text::QRCode->new($self->%{qw|level version|});
-
   $self->_plot_2d($self->{plotter}->plot($text), '*');
 }
 
@@ -49,22 +47,31 @@ SVG::Barcode::QRCode - Generator for SVG based QR Codes
 
     use SVG::Barcode::QRCode;
 
-    my %params = (
-      background => 'white',
-      foreground => 'black',
-      level      => 'M',
-      margin     => 10,
-      size       => 5,
-      version    => 0,
-    );
-    my $qrcode = SVG::Barcode::QRCode->new(\%params);
+    my $qrcode = SVG::Barcode::QRCode->new;
     my $svg    = $qrcode->plot('https://perldoc.pl');
-    my $svg2   = $qrcode->param(foreground => 'red')->plot('https://perldoc.pl');
+
+    $qrcode->level;         # M
+    $qrcode->dotsize;       # 1
+    $qrcode->version;       # 0
+                            # from SVG::Barcode:
+    $qrcode->foreground;    # black
+    $qrcode->background;    # white
+    $qrcode->margin;        # 2
+    $qrcode->id;
+    $qrcode->class;
+    $qrcode->width;
+    $qrcode->height;
+
+    my %params = (
+      level  => 'H',
+      margin => 4,
+    );
+    $qrcode = SVG::Barcode::QRCode->new(%params);
 
     # use as function
     use SVG::Barcode::QRCode 'plot_qrcode';
 
-    my $svg = plot_qrcode('https://perldoc.pl', \%params);
+    $svg = plot_qrcode('https://perldoc.pl', %params);
 
 =head1 DESCRIPTION
 
@@ -76,7 +83,7 @@ L<SVG::Barcode::QRCode> is a generator for SVG based QR Codes.
 
     use SVG::Barcode::QRCode 'plot_qrcode';
 
-    my $svg = plot_qrcode($text, \%params);
+    $svg = plot_qrcode($text, %params);
 
 Returns a QR Code using the provided text and parameters.
 
@@ -84,50 +91,55 @@ Returns a QR Code using the provided text and parameters.
 
 =head2 new
 
-    $qrcode = SVG::Barcode::QRCode->new(\%params);
-    $qrcode = SVG::Barcode::QRCode->new;             # create with defaults
+    $qrcode = SVG::Barcode::QRCode->new;            # create with defaults
+    $qrcode = SVG::Barcode::QRCode->new(%params);
 
-Creates a new QR Code plotter. Inherited from L<SVG::Barcode/new>.
-
-Accepted parameters are:
-
-=over 4
-
-=item background
-
-Color of the background. Default C<'white'>.
-
-=item foreground
-
-Color of the dots. Default C<'black'>.
-
-=item level
-
-Error correction level, one of C<'L'> (low), C<'M'> (medium), C<'Q'> (quartile), C<'H'> (high). Default C<'M'>.
-
-=item margin
-
-Margin around the code. Default C<10>.
-
-=item size
-
-Size of the dots. Default C<5>.
-
-=item version
-
-Symbol version from C<1> to C<40>. C<0> will adapt the version to the required capacity. Default C<0>.
-
-=back
+Creates a new QR Code plotter. Inherited from L<SVG::Barcode|SVG::Barcode/new>.
 
 =head1 METHODS
 
-=head2 param
-
-Getter and setter for the parameters. Inherited from L<SVG::Barcode/param>.
-
 =head2 plot
 
-Creates a SVG code. Inherited from L<SVG::Barcode/plot>.
+    $svg = $qrcode->plot($text);
+
+Creates a SVG code. Inherited from L<SVG::Barcode|SVG::Barcode/plot>.
+
+=head1 PARAMETERS
+
+Inherited from L<SVG::Barcode>:
+L<background|SVG::Barcode/background>,
+L<class|SVG::Barcode/class>,
+L<foreground|SVG::Barcode/foreground>,
+L<height|SVG::Barcode/height>,
+L<id|SVG::Barcode/id>,
+L<margin|SVG::Barcode/margin>,
+L<width|SVG::Barcode/width>.
+
+=head2 dotsize
+
+    $value  = $qrcode->dotsize;
+    $qrcode = $qrcode->dotsize($newvalue);
+    $qrcode = $qrcode->dotsize('');          # 1
+
+Getter and setter for the size of the dots. Default C<1>.
+
+=head2 level
+
+    $value  = $qrcode->level;
+    $qrcode = $qrcode->level($newvalue);
+    $qrcode = $qrcode->level('');          # M
+
+Getter and setter for the error correction level.
+One of one of C<L> (low), C<M> (medium), C<Q> (quartile), C<H> (high). Default C<M>.
+
+=head2 version
+
+    $value  = $qrcode->version;
+    $qrcode = $qrcode->version($newvalue);
+    $qrcode = $qrcode->version('');          # 0
+
+Getter and setter for the symbol version.
+From C<1> to C<40>. C<0> will adapt the version to the required capacity. Default C<0>.
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Perl;
 use Quiq::Database::ResultSet::Object;
@@ -75,7 +75,7 @@ Ferner ist es möglich, die Tabellenklasse bei der Selektion per
 Option festzulegen:
 
     $tab = $rowClass->select($db,
-        -tableClass=>$tableClass,
+        -tableClass => $tableClass,
     );
 
 =cut
@@ -105,8 +105,8 @@ sub tableClass {
         # Paranoia-Test
         if (!$found) {
             $class->throw(
-                q~ROW-00001: Datensatz-Klasse definiert keine Tabellenklasse~,
-                RowClass=>$class,
+                'ROW-00001: Datensatz-Klasse definiert keine Tabellenklasse',
+                RowClass => $class,
             );
         }
     }
@@ -173,7 +173,7 @@ sub makeTable {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

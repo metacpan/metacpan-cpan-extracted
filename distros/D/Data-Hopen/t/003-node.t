@@ -3,9 +3,9 @@
 use rlib 'lib';
 use HopenTest;
 
-BEGIN {
-    use_ok 'Data::Hopen::G::Node';
-}
+use Test::Fatal;
+
+use Data::Hopen::G::Node;
 
 my $e = Data::Hopen::G::Node->new(name=>'foo');
 isa_ok($e, 'Data::Hopen::G::Node');

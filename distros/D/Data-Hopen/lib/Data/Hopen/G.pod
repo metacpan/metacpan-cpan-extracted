@@ -28,16 +28,15 @@ tools used in the hopen build system (L<App::hopen>).
 =head2 C<Data::Hopen::G::Op>
 
 An operation.  Operations can, e.g., transform their inputs or invoke a
-generator routine (L<Data::Hopen::Gen>) based on their inputs.  Operations
-can output values representing the generator action they took, or that will
-later be used by the generator or downstream nodes.
+visitor routine based on their inputs.  Operations
+can output values representing the visitor action they took, or that will
+later be used by the visitor or downstream nodes.
 
 =head2 C<Data::Hopen::G::Link>
 
-A connection between operations.  Edges should, generally speaking, B<not>
-invoke generator routines.  Instead, they should transform their inputs to
-outputs, possibly with reference to the environment or (if necessary) the
-B<identity> (but not details) of the generator in use.
+A connection between operations.  Edges are B<not> provided to a visitor
+Instead, they have the opportunity to transform their inputs to
+outputs, possibly with reference to the environment.
 
 =head2 C<Data::Hopen::G::DAG>
 
@@ -45,5 +44,10 @@ A graph of operations and edges.  Every relationship between operations and
 edges is expressed in a DAG.  A DAG has zero or more goals
 (L<Data::Hopen::G::Goal>) that represent named activities expressed
 in the DAG.
+
+=head1 VISITORS
+
+L<Data::Hopen::G::DAG/run> can take a C<visitor> parameter.  The visitor
+should be an instance of a concrete subclass of L<Data::Hopen::Visitor>.
 
 =cut

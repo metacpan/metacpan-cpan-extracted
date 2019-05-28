@@ -1,5 +1,5 @@
 ---
-abstract: 'Just a MySQL administration Web-App and CMS System'
+abstract: 'Just a MySQL MarieDB administration Web-App and CMS System'
 author:
   - 'Dirk Lindner <lze@cpan.org>'
   - 'Dirk Lindner <lze@cpan.org>'
@@ -16,10 +16,10 @@ name: MySQL-Admin
 provides:
   DBI::Library:
     file: lib/DBI/Library.pm
-    version: '1.17'
+    version: '1.18'
   DBI::Library::Database:
     file: lib/DBI/Library/Database.pm
-    version: '1.17'
+    version: '1.18'
   DBI::Library::Database::db:
     file: lib/DBI/Library/Database.pm
   DBI::Library::Database::st:
@@ -30,51 +30,52 @@ provides:
     file: lib/DBI/Library.pm
   HTML::Editor:
     file: lib/HTML/Editor.pm
-    version: '1.17'
+    version: '1.18'
   HTML::Editor::Markdown:
     file: lib/HTML/Editor/Markdown.pm
-    version: '1.16'
+    version: '1.18'
   HTML::Menu::Pages:
     file: lib/HTML/Menu/Pages.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin:
     file: lib/MySQL/Admin.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::Actions:
     file: lib/MySQL/Admin/Actions.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::Config:
     file: lib/MySQL/Admin/Config.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::Documentation:
     file: lib/MySQL/Admin/Documentation.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::GUI:
     file: lib/MySQL/Admin/GUI.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::Session:
     file: lib/MySQL/Admin/Session.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::Settings:
     file: lib/MySQL/Admin/Settings.pm
-    version: '1.17'
+    version: '1.18'
   MySQL::Admin::Translate:
     file: lib/MySQL/Admin/Translate.pm
-    version: '1.17'
+    version: '1.18'
   Template::Quick:
     file: lib/Template/Quick.pm
-    version: '1.17'
+    version: '1.18'
 requires:
   Authen::Captcha: '1.024'
   CGI: '3.48'
   CGI::QuickForm: '1.93'
   DBI: '1.50'
   Frontier::RPC2: '0.06'
-  HTML::Menu::TreeView: '1.15'
-  JSON::XS: '3.04'
+  GD: '2.71'
+  HTML::Menu::TreeView: '1.21'
+  JSON::XS: '4.02'
   MD5: '2.03'
   Mail::Sendmail: '0.79'
-  Search::Tools::UTF8: '1.003'
+  Search::Tools::UTF8: '1.007'
   Test::More: '0.7'
   Text::Markdown::Hoedown: '1.02'
   URI: '1.40'
@@ -84,5 +85,5 @@ requires:
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
   repository: https://sourceforge.net/p/lindnerei/code/ci/master/tree/
-version: '1.17'
+version: '1.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

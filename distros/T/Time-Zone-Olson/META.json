@@ -35,6 +35,7 @@
             "Carp" : "0",
             "Config" : "0",
             "DirHandle" : "0",
+            "Encode" : "0",
             "English" : "0",
             "File::Spec" : "0",
             "FileHandle" : "0",
@@ -60,6 +61,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.14",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

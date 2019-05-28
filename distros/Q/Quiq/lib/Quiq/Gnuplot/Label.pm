@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -43,10 +43,10 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        at=>[], # [$x,$y]
-        text=>undef,
-        textColor=>undef,
-        font=>undef,
+        at => [], # [$x,$y]
+        text => undef,
+        textColor => undef,
+        font => undef,
     );
     $self->set(@_);
     
@@ -57,7 +57,7 @@ sub new {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

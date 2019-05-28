@@ -14,7 +14,11 @@ use 5.006;
 use strict;
 use warnings;
 
-use PPIx::Regexp::Constant qw{ SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS };
+use PPIx::Regexp::Constant qw{
+    HASH_REF
+    SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
+};
+use Scalar::Util qw{ blessed };
 
 BEGIN {
     if ( SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS ) {
@@ -478,7 +482,6 @@ m_call	perl_version_removed	=> undef;
 klass	'PPIx::Regexp::Token::Literal', note => 'Literal';
 token	'a', note => q{Letter 'a'};
 m_call	perl_version_introduced => MINIMUM_PERL, note => '5.3.7 perlre';
-m_call	perl_version_removed	=> undef;
 token	'\b', note => 'Back space, in character class only';
 m_call	perl_version_introduced => MINIMUM_PERL;
 m_call	perl_version_removed	=> undef;
@@ -526,6 +529,9 @@ token	'{', note => 'Unescaped literal left curly', previous => 1;
 m_call	perl_version_introduced => MINIMUM_PERL;
 # m_call	perl_version_removed	=> '5.025001';
 note    '/x{/ removed in 5.025001, re-added in 5.027001';
+m_call	perl_version_removed	=> undef;
+token	'\\N{LATIN CAPITAL LETTER A}', main => q<'>;
+m_call	perl_version_introduced => '5.029010', note => '5.29.10 perldelta';
 m_call	perl_version_removed	=> undef;
 
 token	'\s', class => 'PPIx::Regexp::Token::CharClass::Simple';
@@ -1031,6 +1037,29 @@ sub token (@) {
 		    require PPIx::Regexp::Node;
 		    $context->{parent} = PPIx::Regexp::Node->__new(
 			$previous, $obj );
+		}
+		if ( my $main = delete $args{main} ) {
+		    if ( HASH_REF eq ref $main ) {
+			$main = { %{ $main } };	# Shallow clone
+		    } else {
+			$main = {
+			    start	=> $main,
+			    finish	=> $main,
+			};
+		    }
+		    foreach my $key ( qw{ start finish } ) {
+			blessed( $main->{$key} )
+			    and next;
+			require PPIx::Regexp::Token::Literal;
+			$main->{$key} =
+			PPIx::Regexp::Token::Literal->__new(
+			    $main->{$key} );
+		    }
+		    my $class = delete $main->{class} ||
+			'PPIx::Regexp::Structure::Regexp';
+		    eval "require $class; 1"
+			or die "Failed to require $class: $@";
+		    $context->{main} = $class->__new( $main, $obj );
 		}
 		$context->{object} = $obj;
 	    } ) {

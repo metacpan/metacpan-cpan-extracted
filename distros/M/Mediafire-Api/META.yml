@@ -21,7 +21,7 @@ requires:
   Carp: '1.3301'
   Crypt::Digest::SHA256: '0.061'
   Encode: '2.6'
-  File::Basename: '2.85'
+  File::Basename: '2.84'
   HTTP::Request: '6'
   JSON::XS: '3.04'
   LWP::Protocol::https: '6.06'
@@ -33,4 +33,4 @@ resources:
   bugtracker: https://github.com/vrag86/Mediafire-Api/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/Mediafire-Api
-version: '0.01'
+version: '0.02'

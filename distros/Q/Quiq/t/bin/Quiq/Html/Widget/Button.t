@@ -26,8 +26,8 @@ sub test_html : Test(2) {
     $self->is($html,qq|<button type="button"></button>\n|);
 
     $html = Quiq::Html::Widget::Button->html($h,
-        name=>'aktion',
-        value=>'Speichern',
+        name => 'aktion',
+        value => 'Speichern',
     );
     $self->is($html,qq|<button name="aktion" type="button"|.
         qq| value="Speichern">Speichern</button>\n|);

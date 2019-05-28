@@ -1,7 +1,7 @@
 package Calendar::Dates;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '0.1.3'; # VERSION
+our $DATE = '2019-05-25'; # DATE
+our $VERSION = '0.2.0'; # VERSION
 
 1;
 # ABSTRACT: Modules that contain calendar dates
@@ -22,7 +22,7 @@ Calendar::Dates - Modules that contain calendar dates
 
 =head1 VERSION
 
-This document describes version 0.1.3 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-02-15.
+This document describes version 0.2.0 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-05-25.
 
 =head1 DESCRIPTION
 
@@ -103,12 +103,14 @@ latest years.
 
 Usage:
 
- my $records = Calendar::Dates::Foo->get_entries($year [, $mon [, $day ] ]);
+ my $entries = Calendar::Dates::Foo->get_entries([ \%params, ] $year [, $mon [, $day ] ]);
 
 Return entries for a particular year (or month, or day). Method must die if year
-(or month, or day) is not supported. Entries are arrayref, where each entry is a
-L<DefHash>. The following keys are recognized, an asterisk (C<*>) signifies
-required key (see L<DefHash> for more details on each key):
+(or month, or day) is not supported.
+
+B<Result.> Result is arrayref of entries, where each entry is a L<DefHash>. The
+following keys are recognized, an asterisk (C<*>) signifies required key (see
+L<DefHash> for more details on each key):
 
 =over
 
@@ -172,13 +174,22 @@ Boolean. You can also use tag C<holiday> to mark an entry as a holiday.
 
 =back
 
+B<Optional parameters.> A hashref (parameters) can be specified as an optional
+first argument. It can be used to specify in more details what kind of entries
+are requested. For example, a Calendar::Dates::AU::Holiday module (Australian
+holiday calendar) contains different holidays for different provinces. User can
+specify:
+
+ # return 2019 holiday dates for Victoria
+ $entries = Calendar::Dates::AU::Holiday->get_entries({province=>'VIC'}, 2019);
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Calendar-Dates>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Calendar-Dates>.
+Source repository is at L<https://github.com/perlancar/repos/perl-Calendar-Dates>.
 
 =head1 BUGS
 

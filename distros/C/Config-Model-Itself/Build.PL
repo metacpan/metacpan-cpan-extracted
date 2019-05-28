@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -71,6 +71,7 @@ my $build = $class->new
     'Test::File::Contents' => '0',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
+    'Test::Pod' => '1.00',
     'Text::Diff' => '0'
   },
   'configure_requires' => {
@@ -80,8 +81,8 @@ my $build = $class->new
     'App::Cme' => '1.002',
     'App::Cme::Common' => '0',
     'Carp' => '0',
-    'Config::Model' => '2.127',
-    'Config::Model::TkUI' => '0',
+    'Config::Model' => '2.134',
+    'Config::Model::TkUI' => '1.370',
     'Config::Model::Value' => '0',
     'Data::Compare' => '0',
     'Data::Dumper' => '0',
@@ -96,15 +97,15 @@ my $build = $class->new
     'Pod::POM' => '0',
     'Scalar::Util' => '0',
     'Tk' => '0',
-    'YAML::Tiny' => '0',
+    'YAML::XS' => '0',
     'base' => '0',
     'lib' => '0',
-    'perl' => 'v5.10.1',
+    'perl' => '5.012',
     'strict' => '0',
     'warnings' => '0'
   },
 
-   add_to_cleanup => [qw/wr_test/] ,
+   add_to_cleanup => [qw/wr_test wr_root/] ,
   );
 
 

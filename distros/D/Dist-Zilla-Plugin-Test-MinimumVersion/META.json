@@ -68,6 +68,7 @@
             "Dist::Zilla::Role::TextTemplate" : "0",
             "List::Util" : "0",
             "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
             "Sub::Exporter::ForMethods" : "0",
             "Test::MinimumVersion" : "0",
             "constant" : "0",
@@ -173,11 +174,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::MinimumVersionTests" : {
          "file" : "lib/Dist/Zilla/Plugin/MinimumVersionTests.pm",
-         "version" : "2.000009"
+         "version" : "2.000010"
       },
       "Dist::Zilla::Plugin::Test::MinimumVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/MinimumVersion.pm",
-         "version" : "2.000009"
+         "version" : "2.000010"
       }
    },
    "release_status" : "stable",
@@ -195,7 +196,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "2.000009",
+   "version" : "2.000010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.029010"
@@ -252,7 +253,12 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "CONTRIBUTING",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
+                  ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
@@ -429,7 +435,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
-            "version" : "2.000009"
+            "version" : "2.000010"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -1088,7 +1094,11 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
-                     "Changes"
+                     "CONTRIBUTING",
+                     "Changes",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
                   ],
                   "allow_dirty_match" : [],
                   "changelog" : "Changes"
@@ -1111,7 +1121,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.000009",
+                  "tag" : "v2.000010",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

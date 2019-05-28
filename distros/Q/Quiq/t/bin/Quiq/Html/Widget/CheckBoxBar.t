@@ -31,9 +31,9 @@ sub test_html : Test(2) {
         q| <input type="checkbox" name="farben" value="gelb">gelb|;
 
     $html = Quiq::Html::Widget::CheckBoxBar->html($h,
-        name=>'farben',
-        options=>[qw/rot blau gelb/],
-        values=>[qw/blau rot/],
+        name => 'farben',
+        options => [qw/rot blau gelb/],
+        values => [qw/blau rot/],
     );
     $self->is($html,$expected);
 }

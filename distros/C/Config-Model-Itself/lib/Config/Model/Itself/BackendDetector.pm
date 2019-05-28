@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself::BackendDetector ;
-$Config::Model::Itself::BackendDetector::VERSION = '2.016';
+package Config::Model::Itself::BackendDetector 2.018;
+
 # since this package is mostly targeted for dev environments
 # let the detector detect models under development
 use lib 'lib';
@@ -102,7 +102,7 @@ Config::Model::Itself::BackendDetector - Detect available read/write backends us
 
 =head1 VERSION
 
-version 2.016
+version 2.018
 
 =head1 SYNOPSIS
 
@@ -159,7 +159,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2007-2018 by Dominique Dumont.
+This software is Copyright (c) 2007-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

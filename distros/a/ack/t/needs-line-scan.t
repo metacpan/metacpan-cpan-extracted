@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 2;
+use Test::More tests => 1;
 
 use lib 't';
 use Util;
@@ -22,5 +22,4 @@ HERE
     ack_lists_match( [ @args, @files ], \@expected, 'Looking for Lenore!' );
 }
 
-done_testing();
 exit 0;

@@ -1,0 +1,42 @@
+NAME
+    Spreadsheet::Open - Open spreadsheet in a spreadsheet program
+
+VERSION
+    This document describes version 0.001 of Spreadsheet::Open (from Perl
+    distribution Spreadsheet-Open), released on 2019-05-28.
+
+SYNOPSIS
+     use Spreadsheet::Open qw(open_spreadsheet);
+
+     my $ok = open_spreadsheet("/path/to/my.xlsx");
+
+DESCRIPTION
+FUNCTIONS
+  open_spreadsheet
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Spreadsheet-Open>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Spreadsheet-Open>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Spreadsheet-Open>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    "Browser::Open" to open a URL in a browser.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

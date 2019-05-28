@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -613,8 +613,8 @@ sub AUTOLOAD :lvalue {
 
     if (!ref $this) {
         $this->throw(
-            q~HASH-00002: Klassen-Methode existiert nicht~,
-            Method=>$key,
+            'HASH-00002: Klassen-Methode existiert nicht',
+            Method => $key,
         );
     }
 
@@ -622,9 +622,9 @@ sub AUTOLOAD :lvalue {
 
     if (!exists $this->{$key}) {
         $this->throw(
-            q~HASH-00001: Hash-Schlüssel oder Methode existiert nicht~,
-            Attribute=>$key,
-            Class=>ref($this)? ref($this): $this,
+            'HASH-00001: Hash-Schlüssel oder Methode existiert nicht',
+            Attribute => $key,
+            Class => ref($this)? ref($this): $this,
         );
     }
 
@@ -735,8 +735,8 @@ sub validate {
     for my $key (CORE::keys %$h) {
         if (!exists $refH->{$key}) {
             $class->throw(
-                q~HASH-00099: Unzulässiger Hash-Schlüssel~,
-                Key=>$key,
+                'HASH-00099: Unzulässiger Hash-Schlüssel',
+                Key => $key,
             );
         }
     }
@@ -1093,9 +1093,9 @@ sub arraySize {
     }
     
     $self->throw(
-        q~HASH-00005: Keine Array-Referenz~,
-        Key=>$key,
-        Class=>ref($self),
+        'HASH-00005: Keine Array-Referenz',
+        Key => $key,
+        Class => ref($self),
     );
 }
 
@@ -1420,29 +1420,29 @@ Das Benchmark-Programm (bench-hash):
     
     my $i = 0;
     Benchmark::cmpthese(-10,{
-        A=>sub {
+        A => sub {
             $h1->{$i++%5};
         },
-        B=>sub {
+        B => sub {
             eval{$h1->{$i++%5}};
         },
-        C=>sub {
+        C => sub {
             $h2->{$i++%5};
         },
-        D=>sub {
+        D => sub {
             eval{$h2->{$i++%5}};
         },
-        E=>sub {
+        E => sub {
             $h3->{$i++%5};
         },
-        F=>sub {
+        F => sub {
             $h3->get($i++%5);
         },
     });
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

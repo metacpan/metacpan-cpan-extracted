@@ -23,7 +23,7 @@ sub test_unitTest_1 : Test(2) {
     my $h = Quiq::Html::Tag->new;
 
     my $e = Quiq::JQuery::Form::ViewEdit->new(
-        layout=>'__SAVE__ __DELETE__ __EDIT__',
+        layout => '__SAVE__ __DELETE__ __EDIT__',
     );
     $self->is(ref($e),'Quiq::JQuery::Form::ViewEdit');
 

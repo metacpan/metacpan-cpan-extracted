@@ -37,19 +37,19 @@ sub test_unitTest_2 : Test(1) {
 
     my $expected = $h->tag('div',
         Quiq::Html::Widget::TextField->html($h,
-            name=>'vorname',
-            value=>'Linus',
+            name => 'vorname',
+            value => 'Linus',
         ),
     );
 
     my $e = Quiq::Html::Form::Layout->new(
-        layout=>$h->tag('div',
+        layout => $h->tag('div',
             '__VORNAME__',
         ),
-        widgets=>[
+        widgets => [
             Quiq::Html::Widget::TextField->new(
-                name=>'vorname',
-                value=>'Linus',
+                name => 'vorname',
+                value => 'Linus',
             ),
         ],
     );
@@ -64,13 +64,13 @@ sub test_unitTest_3 : Test(1) {
     my $h = Quiq::Html::Tag->new;
 
     my $e = Quiq::Html::Form::Layout->new(
-        layout=>$h->tag('div',
+        layout => $h->tag('div',
             '__NACHNAME__',
         ),
-        widgets=>[
+        widgets => [
             Quiq::Html::Widget::TextField->new(
-                name=>'vorname',
-                value=>'Linus',
+                name => 'vorname',
+                value => 'Linus',
             ),
         ],
     );

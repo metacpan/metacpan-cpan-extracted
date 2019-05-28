@@ -2,8 +2,60 @@
 use strict;
 use warnings;
 use YAML::XS;
+
+use AnyEvent;
+use AnyEvent::Handle;
+use AnyEvent::Socket;
+use Time::HiRes qw(time);
+use Sys::Hostname;
+
 use MYDan::Agent::Load;
- 
+
+my $idie = sub{ print shift;exit 1; };
+my ( $cv, $pcb ) = ( AE::cv );
+if( my $rlog = $ENV{MYDan_rlog} )
+{
+    my ( $uuid, $server, $port ) = split /:/, $rlog;
+    my %argv = ( 
+        uuid => $uuid,
+        addr => $server || $ENV{TCPREMOTEIP}, 
+        port => $port || $ENV{TCPREMOTEPORT},
+    );
+    
+    warn sprintf "download info: host:%s port:%s uuid:%s\n", map{ $argv{$_} ||'' }qw( addr port uuid );
+    
+    my ( $index, %cv, $w, $hdl ) = ( 0 );
+    
+    tcp_connect $argv{addr}, $argv{port}, sub {
+        my ( $fh ) = @_;
+        unless( $fh )
+        {
+            print "$argv{addr}:$argv{port} tcp_connect: $!";
+            $cv->send;
+            return;
+        }
+        $hdl = new AnyEvent::Handle(
+            fh => $fh,
+            rbuf_max => 10240000,
+            wbuf_max => 10240000,
+            autocork => 1,
+            on_error => sub{
+                warn 'tcp error';
+                undef $hdl;
+                $cv->send;
+            },
+            on_eof => sub{
+                warn 'tcp close';
+                undef $hdl;
+                $cv->send;
+            },
+        );
+        $hdl->push_write( $argv{uuid} . ':' . hostname . ':' );
+    },  sub{ return 5; };
+
+    $pcb = sub { $hdl->push_write( shift."\n" ) if $hdl; };
+}
+
 eval{
 
     local $/ = undef;
@@ -19,10 +71,9 @@ eval{
     MYDan::Agent::Load->new( 
         node => $param->{src}, 
         map{ $_ => $param->{$_} }qw( sp dp )
-    )->run( %$param, role => 'agent', query => $param->{load}||1 );
+    )->run( %$param, role => 'agent', pcb => $pcb, verbose => $pcb ? 1 : 0, query => $param->{load}||1 );
 };
 
 if($@) { print "load fail $@";exit 1; }
 
 exit 0;
-

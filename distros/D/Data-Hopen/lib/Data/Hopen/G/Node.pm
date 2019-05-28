@@ -3,7 +3,7 @@ package Data::Hopen::G::Node;
 use Data::Hopen;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 sub outputs;
 
@@ -32,7 +32,8 @@ be hashrefs.
 =cut
 
 sub outputs {
-    my $self = shift or croak 'Need an instance';
+    my $self = shift;
+    croak 'Need an instance' unless $self;
     if (@_) {                               # Setter
         croak "Cannot set `outputs` of @{[$self->name]} to non-hashref " .
                 ($_[0] // '(undef)')

@@ -39,6 +39,7 @@
             "Log::Any" : "0",
             "Scalar::Util" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "perl" : "5.014",
             "strict" : "0",
             "utf8" : "0",
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

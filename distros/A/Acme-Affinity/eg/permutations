@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Acme::Affinity;
+use Algorithm::Combinatorics qw/ variations_with_repetition /;
+
+my $questions = [
+    { 'how messy are you' => [ 'very messy', 'average', 'very organized' ] },
+    { 'do you like to be the center of attention' => [ 'no', 'maybe', 'yes' ] },
+];
+my $importance = {
+    'irrelevant'         => 0,
+    'a little important' => 1,
+    'somewhat important' => 10,
+    'very important'     => 50,
+    'mandatory'          => 250,
+};
+
+my @responses1;
+my $q = $questions->[0];
+for my $v ( values %$q ) {
+    my @answers = variations_with_repetition( $v, 2 );
+    for my $answer ( @answers ) {
+        for my $import ( sort { $importance->{$a} <=> $importance->{$b} } keys %$importance ) {
+            push @responses1, [ @$answer, $import ];
+        }
+    }
+}
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@responses1);
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@responses1),"\n");
+
+my @responses2;
+$q = $questions->[1];
+for my $v ( values %$q ) {
+    my @answers = variations_with_repetition( $v, 2 );
+    for my $answer ( @answers ) {
+        for my $import ( sort { $importance->{$a} <=> $importance->{$b} } keys %$importance ) {
+            push @responses2, [ @$answer, $import ];
+        }
+    }
+}
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@responses2);
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@responses2),"\n");
+
+my @response_pairs;
+for my $r1 ( @responses1 ) {
+    for my $r2 ( @responses2 ) {
+        push @response_pairs, [ $r1, $r2 ];
+    }
+}
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@response_pairs);
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@response_pairs),"\n");
+
+my @variations = variations_with_repetition( \@response_pairs, 2 );
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$variations[0]);
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@variations),"\n");
+
+for my $v ( @variations ) {
+    my $affinity = Acme::Affinity->new(
+        questions  => $questions,
+        importance => $importance,
+        me         => $v->[0],
+        you        => $v->[1],
+    );
+    print $affinity->score, "\n";
+}

@@ -1,5 +1,9 @@
 Revision history for App-CSV2Chart
 
+0.4.0   2019-05-28
+    - Add the --title flag.
+    - Extract the x axis and y axis labels from the CSV headings.
+
 0.2.0   2019-03-09
     - Add the --exec flag.
     - Add some docs.

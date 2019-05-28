@@ -26,18 +26,18 @@ sub test_html : Test(3) {
     $self->is($html,qq|<input type="text" />\n|);
 
     $html = Quiq::Html::Widget::TextField->html($h,
-        name=>'text1',
-        size=>20,
-        value=>'ein Text',
+        name => 'text1',
+        size => 20,
+        value => 'ein Text',
     );
     $self->is($html,'<input type="text" name="text1" size="20" maxlength="20"'.
         qq| value="ein Text" />\n|);
 
     $html = Quiq::Html::Widget::TextField->html($h,
-        name=>'text1',
-        size=>20,
-        maxLength=>0,
-        value=>'ein Text',
+        name => 'text1',
+        size => 20,
+        maxLength => 0,
+        value => 'ein Text',
     );
     $self->is($html,qq|<input type="text" name="text1" size="20"|.
         qq| value="ein Text" />\n|);

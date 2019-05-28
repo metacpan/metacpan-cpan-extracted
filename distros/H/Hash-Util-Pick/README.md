@@ -1,20 +1,22 @@
-[![Build Status](https://travis-ci.org/pine/p5-Hash-Util-Pick.svg?branch=master)](https://travis-ci.org/pine/p5-Hash-Util-Pick) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-Hash-Util-Pick/master.svg)](https://ci.appveyor.com/project/pine/p5-Hash-Util-Pick/branch/master)
+[![Build Status](https://travis-ci.org/pine/p5-Hash-Util-Pick.svg?branch=master)](https://travis-ci.org/pine/p5-Hash-Util-Pick) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-Hash-Util-Pick/master.svg?logo=appveyor)](https://ci.appveyor.com/project/pine/p5-Hash-Util-Pick/branch/master)
 # NAME
 
 Hash::Util::Pick - The non-destructive utilities for picking hash
 
 # SYNOPSIS
 
-    use Hash::Util::Pick qw/pick/;
+```perl
+use Hash::Util::Pick qw/pick/;
 
-    my $src = {
-        foo => 0,
-        bar => 1,
-        baz => 2,
-    };
+my $src = {
+    foo => 0,
+    bar => 1,
+    baz => 2,
+};
 
-    my $dest = pick $hash => qw/foo bar/;
-    # => { foo => 0, bar => 1 }
+my $dest = pick $hash => qw/foo bar/;
+# => { foo => 0, bar => 1 }
+```
 
 # DESCRIPTION
 
@@ -26,35 +28,47 @@ Hash::Util::Pick is the non-destructive utilities for picking hash
 
 Create hash reference picked by special keys.
 
-    pick { } => qw/foo/; # { }
-    pick { foo => 0 } => qw/bar/; # { }
-    pick { foo => 0, bar => 1 } => qw/foo/; # { foo => 0 }
+```perl
+pick { } => qw/foo/; # { }
+pick { foo => 0 } => qw/bar/; # { }
+pick { foo => 0, bar => 1 } => qw/foo/; # { foo => 0 }
+```
 
 ## `pick_by(\%hash, \&predicate)`
 
 Create hash reference picked by block.
 
-    pick_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { bar => 1 }
+```perl
+pick_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { bar => 1 }
+```
 
 ## `omit(\%hash, @keys)`
 
 Create hash reference omitted by special keys.
 
-    omit { } => qw/foo/; # { }
-    omit { foo => 0 } => qw/bar/; # { foo => 0 }
-    omit { foo => 0, bar => 1 } => qw/foo/; # { bar => 1 }
+```perl
+omit { } => qw/foo/; # { }
+omit { foo => 0 } => qw/bar/; # { foo => 0 }
+omit { foo => 0, bar => 1 } => qw/foo/; # { bar => 1 }
+```
 
 ## `omit_by(\%hash, \&predicate)`
 
 Create hash reference omitted by block.
 
-    omit_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { foo => 0 }
+```perl
+omit_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { foo => 0 }
+```
+
+# SEE ALSO
+
+- [Lodash Documentation](https://lodash.com/docs/)
 
 # LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Pine Mizune
+Copyright (c) 2016-2019 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

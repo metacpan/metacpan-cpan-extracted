@@ -105,6 +105,14 @@ Gets and/or sets the EDNS0 UDP size.
 
 Gets and/or sets the EDNS0 Extended RCODE field.
 
+=item ends_z()
+
+Gets and/or sets the EDNS0 Z bits.
+
+=item edns_data()
+
+Gets and/or sets the EDNS0 RDATA. See LDNS.xs for more details.
+
 =item needs_edns()
 
 This method returns true if the packet has the DO flag set, an EDNS0 size set,
@@ -126,6 +134,19 @@ An alias for needs_edns().
 Get or set the EDNS version in the packet. For incoming packets, returns 0 if
 the packet does not have an OPT pseudo-RR and 0 if it's an EDNS0 packet. It's
 thus rather pointless until such time as EDNS1 is defined.
+
+=item set_edns_present
+
+Set edns_present flag to true.
+
+This flag can be set when creating a packet with EDNS corner cases data that
+could not be detected by need_edns/has_edns methods.
+
+When set, need_edns/has_edns methods return true value.
+
+=item unset_edns_present
+
+Set edns_present flag to false.
 
 =item querytime([$value])
 

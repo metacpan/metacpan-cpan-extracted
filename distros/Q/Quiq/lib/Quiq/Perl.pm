@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Object;
 use Cwd ();
@@ -114,8 +114,8 @@ sub binmode {
     my $r = @_? CORE::binmode($fh,$_[0]): CORE::binmode($fh);
     if (!defined $r) {
         $class->throw(
-            q~FH-00012: binmode fehlgeschlagen~,
-            Errstr=>$!,
+            'FH-00012: binmode fehlgeschlagen',
+            Errstr => $!,
         );
     }
 
@@ -160,8 +160,8 @@ sub print {
 
     unless (CORE::print $fh @_) {
         $class->throw(
-            q~PERL-00002: print fehlgeschlagen~,
-            Errstr=>$!,
+            'PERL-00002: print fehlgeschlagen',
+            Errstr => $!,
         );
     }
 
@@ -201,9 +201,9 @@ sub use {
         }
         $@ =~ s/ at .*//s; # unnütze/störende Information abschneiden
         $class->throw(
-            q~PERL-00001: use fehlgeschlagen~,
-            Class=>$useClass,
-            Error=>$@,
+            'PERL-00001: use fehlgeschlagen',
+            Class => $useClass,
+            Error => $@,
         );
     }
 
@@ -251,18 +251,18 @@ sub perlDoFile {
     my @arr = CORE::do($file);
     if ($@) {
         Quiq::Object->throw(
-            q~PERL-00001: Datei kann nicht von do() geparst werden~,
-            File=>$file,
-            Cwd=>Cwd::getcwd,
-            InternalError=>$@,
+            'PERL-00001: Datei kann nicht von do() geparst werden',
+            File => $file,
+            Cwd => Cwd::getcwd,
+            InternalError => $@,
         );
     }
     elsif (@arr == 1 && !defined $arr[0]) {
         Quiq::Object->throw(
-            q~PERL-00002: Dateiladen per do() fehlgeschlagen~,
-            File=>$file,
-            Cwd=>Cwd::getcwd,
-            Error=>$!,
+            'PERL-00002: Dateiladen per do() fehlgeschlagen',
+            File => $file,
+            Cwd => Cwd::getcwd,
+            Error => $!,
         );
     }
 
@@ -296,8 +296,8 @@ sub sigilToType {
     elsif ($sigil eq '%') { return 'HASH' }
 
     $this->throw(
-        q~PERL-00001: Ungültiger Sigil~,
-        Sigil=>$sigil,
+        'PERL-00001: Ungültiger Sigil',
+        Sigil => $sigil,
     );
 }
 
@@ -470,9 +470,9 @@ sub createClass {
         eval $code;
         if ($@) {
             $class->throw(
-                q~PERL-00003: Klasse erzeugen fehlgeschlagen~,
-                Code=>$code,
-                Error=>$@,
+                'PERL-00003: Klasse erzeugen fehlgeschlagen',
+                Code => $code,
+                Error => $@,
             );
         }
     }
@@ -978,8 +978,8 @@ sub getHash {
     my $ref = *{"$package\::$sym"}{HASH};
     if (!$ref) {
         $this->throw(
-            q~PERL-00001: Hash existiert nicht~,
-            Error=>$@,
+            'PERL-00001: Hash existiert nicht',
+            Error => $@,
         );
     }
 
@@ -1094,8 +1094,8 @@ sub getArray {
     my $ref = *{"$package\::$sym"}{ARRAY};
     if (!$ref) {
         $this->throw(
-            q~PERL-00001: Array existiert nicht~,
-            Error=>$@,
+            'PERL-00001: Array existiert nicht',
+            Error => $@,
         );
     }
 
@@ -1371,7 +1371,7 @@ sub getVar {
     my $create = 0;
     if (@_) {
         Quiq::Option->extract(\@_,
-            -create=>\$create,
+            -create => \$create,
         );
     }
 
@@ -1776,7 +1776,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Perl;
 use Encode ();
@@ -67,7 +67,7 @@ Optionen und Argumente:
 
     my ($error,$opt,$argA) = $self->options(
         ...
-        -help=>0,
+        -help => 0,
     );
     if ($error) {
         $self->help(10,"ERROR: $error");
@@ -577,8 +577,8 @@ sub options {
     }
 
     my $optH = eval{Quiq::Option->extract(
-        -simpleMessage=>1,
-        # -mode=>'sloppy',
+        -simpleMessage => 1,
+        # -mode => 'sloppy',
         $argA,
         @_
     )};
@@ -916,8 +916,8 @@ sub new {
         }
         else {
             $class->throw(
-                q~PROG-00001: Unbekannte Option~,
-                Option=>$key,
+                'PROG-00001: Unbekannte Option',
+                Option => $key,
             );
         }
     }
@@ -932,11 +932,11 @@ sub new {
     # Objekt instantiieren
 
     return $class->SUPER::new(
-        encoding=>$encoding,
-        exitCode=>0,
-        logLevel=>0,
-        optH=>Quiq::Hash->new,
-        t0=>Time::HiRes::gettimeofday,
+        encoding => $encoding,
+        exitCode => 0,
+        logLevel => 0,
+        optH => Quiq::Hash->new,
+        t0 => Time::HiRes::gettimeofday,
     );
 }
 
@@ -944,7 +944,7 @@ sub new {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

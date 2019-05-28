@@ -1,6 +1,6 @@
 package Date::Utils;
 
-$Date::Utils::VERSION   = '0.25';
+$Date::Utils::VERSION   = '0.26';
 $Date::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Utils - Common date functions as Moo Role.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
@@ -39,7 +39,11 @@ Common date functions as Moo Role. It is being used by the following distributio
 
 =item * L<Date::Gregorian::Simple>
 
+=item * L<Date::Hebrew::Simple>
+
 =item * L<Date::Hijri::Simple>
+
+=item * L<Date::Julian::Simple>
 
 =item * L<Date::Persian::Simple>
 
@@ -292,7 +296,11 @@ Entire logic is based on the L<code|http://www.fourmilab.ch/documents/calendar> 
 
 =item * L<Calendar::Gregorian>
 
+=item * L<Calendar::Hebrew>
+
 =item * L<Calendar::Hijri>
+
+=item * L<Calendar::Julian>
 
 =item * L<Calendar::Persian>
 

@@ -38,7 +38,7 @@ ok $f->is_failed, 'Future is failed';
 is $f->failure, 'Delayed', 'right failure';
 
 my $loop = Mojo::IOLoop->new;
-$p = $class->new(ioloop => $loop);
+$p = $class->new->ioloop($loop);
 $f = $p->futurify;
 $loop->timer(0.1 => sub { $p->resolve('Custom loop') });
 $f->await;

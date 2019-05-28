@@ -18,15 +18,15 @@ no_index:
     - t
     - inc
 requires:
-  Calendar::Bahai: '0.50'
-  Calendar::Gregorian: '0.19'
-  Calendar::Hebrew: '0.09'
-  Calendar::Hijri: '0.37'
-  Calendar::Julian: '0.10'
-  Calendar::Persian: '0.39'
-  Calendar::Saka: '1.38'
+  Calendar::Bahai: '0.51'
+  Calendar::Gregorian: '0.20'
+  Calendar::Hebrew: '0.10'
+  Calendar::Hijri: '0.38'
+  Calendar::Julian: '0.11'
+  Calendar::Persian: '0.40'
+  Calendar::Saka: '1.39'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Task-Calendar.git
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

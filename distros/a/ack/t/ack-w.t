@@ -3,142 +3,112 @@
 use warnings;
 use strict;
 
-use Test::More tests => 16;
+use Test::More tests => 15;
 
 use lib 't';
 use Util;
+use Barfly;
 
 prep_environment();
 
-TRAILING_PUNC: {
+Barfly->run_tests( 't/ack-w.barfly' );
+
+subtest '-w with trailing metachar \w' => sub {
+    plan tests => 1;
+
     my @expected = line_split( <<'HERE' );
-Respite-respite and nepenthe from thy memories of Lenore!"
-Clasp a rare and radiant maiden whom the angels name Lenore!"
+A well regulated Militia, being necessary to the security of a free State,
+cases arising in the land or naval forces, or in the Militia, when in
 HERE
 
-    my @files = qw( t/text );
-    my @args = qw( Lenore! -w -h --sort-files );
+    my @files = qw( t/text/bill-of-rights.txt );
+    my @args = ( 'Milit\w\w', qw( -w -h --sort-files ) );
 
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for Lenore!' );
-}
+    ack_lists_match( [ @args, @files ], \@expected, 'Looking for militia with metacharacters' );
+};
 
-TRAILING_METACHAR_BACKSLASH_W: {
+
+subtest '-w with trailing dot' => sub {
+    plan tests => 1;
+
     my @expected = line_split( <<'HERE' );
-be a Majority of the whole Number of Electors appointed; and if there be
-President. But if there should remain two or more who have equal Votes,
+A well regulated Militia, being necessary to the security of a free State,
+cases arising in the land or naval forces, or in the Militia, when in
 HERE
 
-    my @files = qw( t/text/constitution.txt );
-    my @args = qw( ther\w -w --sort-files );
+    my @files = qw( t/text/bill-of-rights.txt );
+    my @args = ( 'Milit..', qw( -w -h --sort-files ) );
 
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for ther\\w, with -w, so no thereofs or thereins' );
-}
+    ack_lists_match( [ @args, @files ], \@expected, 'Looking for Milit..' );
+};
 
 
-TRAILING_METACHAR_DOT: {
-    # Because the . at the end of the regular expression is not a word
-    # character, a word boundary is not required after the match.
-    my @expected = line_split( <<'HERE' );
-speech, or of the press; or the right of the people peaceably to assemble,
-the right of the people to keep and bear Arms, shall not be infringed.
-The right of the people to be secure in their persons, houses, papers,
-In all criminal prosecutions, the accused shall enjoy the right to a
-twenty dollars, the right of trial by jury shall be preserved, and no
-The enumeration in the Constitution, of certain rights, shall not be
-limited Times to Authors and Inventors the exclusive Right to their
-HERE
+subtest 'Begins and ends with word char' => sub {
+    plan tests => 1;
 
-    my @files = qw( t/text );
-    my @args = ( 'right.', qw( -i -w -h --sort-files ) );
-
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for right.' );
-}
-
-BEGINS_AND_ENDS_WITH_WORD_CHAR: {
     # Normal case of whole word match.
     my @expected = line_split( <<'HERE' );
-Each House shall be the Judge of the Elections, Returns and Qualifications
-shall judge necessary and expedient; he may, on extraordinary Occasions,
+A well regulated Militia, being necessary to the security of a free State,
+cases arising in the land or naval forces, or in the Militia, when in
 HERE
 
-    my @files = qw( t/text );
-    my @args = ( 'judge', qw( -w -h -i --sort-files ) );
+    my @files = qw( t/text/bill-of-rights.txt );
+    my @args = qw( Militia -w -h --sort-files );
 
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for two "judge" as whole word, not five "judge/judges"' );
-}
+    ack_lists_match( [ @args, @files ], \@expected, 'Looking for Militia as whole word' );
+};
 
-BEGINS_BUT_NOT_ENDS_WITH_WORD_CHAR: {
+
+subtest 'Ends with grouping parens' => sub {
+    plan tests => 1;
+
     # The last character of the regexp is not a word, disabling the word boundary check at the end of the match.
     my @expected = line_split( <<'HERE' );
-All legislative Powers herein granted shall be vested in a Congress
-and shall have the sole Power of Impeachment.
-The Senate shall have the sole Power to try all Impeachments. When
-The Congress shall have Power To lay and collect Taxes, Duties, Imposts
-Execution the foregoing Powers, and all other Powers vested by this
-or Compact with another State, or with a foreign Power, or engage in War,
-The executive Power shall be vested in a President of the United States
-Resignation, or Inability to discharge the Powers and Duties of the said
-and he shall have Power to Grant Reprieves and Pardons for Offences
-He shall have Power, by and with the Advice and Consent of the Senate,
-The President shall have Power to fill up all Vacancies that may happen
-The judicial Power of the United States, shall be vested in one supreme
-The judicial Power shall extend to all Cases, in Law and Equity,
-The Congress shall have Power to declare the Punishment of Treason, but
-The Congress shall have Power to dispose of and make all needful Rules and
+A well regulated Militia, being necessary to the security of a free State,
+cases arising in the land or naval forces, or in the Militia, when in
 HERE
 
-    my @files = qw( t/text/constitution.txt );
-    my @args = ( 'pow()', qw( -w -h -i ) );
+    my @files = qw( t/text/bill-of-rights.txt );
+    my @args = ( 'Militia()', qw( -w -h --sort-files ) );
 
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for "pow()" with word flag, but regexp does not end with word char' );
-}
+    ack_lists_match( [ @args, @files ], \@expected, 'Looking for Militia with word flag, but regexp does not end with word char' );
+};
 
-ENDS_BUT_NOT_BEGINS_WITH_WORD_CHAR: {
-    # The first character of the regexp is not a word, disabling the word boundary check at the start of the match.
+
+subtest 'Begins with grouping parens' => sub {
+    plan tests => 1;
+
     my @expected = line_split( <<'HERE' );
-each State shall have the Qualifications requisite for Electors of the
-Providence Plantations one, Connecticut five, New-York six, New Jersey
-The Times, Places and Manner of holding Elections for Senators and
-Regulations, except as to the Places of chusing Senators.
-Each House shall be the Judge of the Elections, Returns and Qualifications
-return it, with his Objections to that House in which it shall have
-originated, who shall enter the Objections at large on their Journal,
-with the Objections, to the other House, by which it shall likewise be
-and House of Representatives, according to the Rules and Limitations
-To regulate Commerce with foreign Nations, and among the several States,
-and Offences against the Law of Nations;
-suppress Insurrections and repel Invasions;
-Appropriations made by Law; and a regular Statement and Account of the
-Fact, with such Exceptions, and under such Regulations as the Congress
-Regulations respecting the Territory or other Property belonging to the
-by Conventions in three fourths thereof, as the one or the other Mode of
-The Ratification of the Conventions of nine States, shall be sufficient
+A well regulated Militia, being necessary to the security of a free State,
+cases arising in the land or naval forces, or in the Militia, when in
 HERE
 
-    my @files = qw( t/text/constitution.txt );
-    my @args = ( '()tions', qw( -w -h --sort-files ) );
+    my @files = qw( t/text/bill-of-rights.txt );
+    my @args = ( '()Militia', qw( -w -h --sort-files ) );
 
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for "()tions" with word flag, but regexp does not begin with word char' );
-}
+    ack_lists_match( [ @args, @files ], \@expected, 'Looking for Militia with word flag, but regexp does not begin with word char' );
+};
 
-NEITHER_BEGINS_NOR_ENDS_WITH_WORD_CHAR: {
-    # Because the regular expression doesn't begin or end with a word character, the 'words mode' doesn't affect the match.
+
+subtest 'Wrapped in grouping parens' => sub {
+    plan tests => 1;
+
     my @expected = line_split( <<'HERE' );
-Each House shall be the Judge of the Elections, Returns and Qualifications
-Session of their respective Houses, and in going to and returning from
-return it, with his Objections to that House in which it shall have
-any Bill shall not be returned by the President within ten Days (Sundays
-their Adjournment prevent its Return, in which Case it shall not be a Law.
+A well regulated Militia, being necessary to the security of a free State,
+cases arising in the land or naval forces, or in the Militia, when in
 HERE
 
-    my @files = qw( t/text/constitution.txt );
-    my @args = ( '(return)', qw( -w -i -h ) );
+    my @files = qw( t/text/bill-of-rights.txt );
+    my @args = ( '(Militia)', qw( -w -h --sort-files ) );
 
-    ack_lists_match( [ @args, @files ], \@expected, 'Looking for "return" with word flag, but regexp does not begin or end with word char' );
-}
+    ack_lists_match( [ @args, @files ], \@expected, 'Looking for Militia with word flag, but regexp does not begin or end with word char' );
+};
 
-# Test for issue #443
-ALTERNATING_NUMBERS: {
+
+# Test for issue ack2#443
+subtest 'Alternating numbers' => sub {
+    plan tests => 1;
+
     my @expected = ();
 
     my @files = qw( t/text/number.txt );
@@ -146,6 +116,126 @@ ALTERNATING_NUMBERS: {
     my @args = ( '650|660|670|680', '-w' );
 
     ack_lists_match( [ @args, @files ], \@expected, 'Alternations should also respect boundaries when using -w' );
+};
+
+
+# In ack3, we try to warn people if they are misusing -w.
+subtest '-w warnings' => sub {
+    my ($good,$bad) = _get_good_and_bad();
+
+    plan tests => @{$good} + @{$bad};
+
+    my $happy = reslash( 't/text/ozymandias.txt' );
+    for my $pattern ( @{$good} ) {
+        subtest "Good example: $pattern" => sub {
+            plan tests => 1;
+
+            my ( undef, $stderr ) = run_ack_with_stderr( $pattern, '-w', $happy );
+            # Don't care what stdout is.
+            is_empty_array( $stderr, 'Should not trigger any warnings' );
+        }
+    }
+
+    for my $pattern ( @{$bad} ) {
+        subtest "Bad example: $pattern" => sub {
+            plan tests => 3;
+
+            # Add the -- because the pattern may have hyphens.
+            my ( $stdout, $stderr ) = run_ack_with_stderr( '-w', '--', $pattern, $happy );
+            is_empty_array( $stdout, 'Should have no output' );
+            is( scalar @{$stderr}, 1, 'One warning' );
+            like( $stderr->[0], qr/ack(-standalone)?: -w will not do the right thing/, 'Got the correct warning' );
+        };
+    }
+};
+
+
+sub _get_good_and_bad {
+    # BAD = should throw a warning with -w
+    # OK  = should not throw a warning with -w
+    my @examples = line_split( <<'HERE' );
+# Anchors
+BAD $foo
+BAD foo^
+BAD ^foo
+BAD foo$
+
+# Dot
+OK  foo.
+OK  .foo
+
+# Parentheses
+OK  (set|get)_foo
+OK  foo_(id|name)
+OK  func()
+OK  (all in one group)
+BAD )start with closing paren
+BAD end with opening paren(
+BAD end with an escaped closing paren\)
+
+# Character classes
+OK  [sg]et
+OK  foo[lt]
+OK  [one big character class]
+OK  [multiple][character][classes]
+BAD ]starting with a closing bracket
+BAD ending with a opening bracket[
+BAD ending with an escaped closing bracket \]
+
+# Quantifiers
+OK  thpppt{1,5}
+BAD }starting with an closing curly brace
+BAD ending with an opening curly brace{
+BAD ending with an escaped closing curly brace\}
+
+OK  foo+
+BAD foo\+
+BAD +foo
+OK  foo*
+BAD foo\*
+BAD *foo
+OK  foo?
+BAD foo\?
+BAD ?foo
+
+# Miscellaneous debris
+BAD -foo
+BAD foo-
+BAD &mpersand
+BAD ampersand&
+BAD function(
+BAD ->method
+BAD <header.h>
+BAD =14
+BAD /slashes/
+BAD ::Class::Whatever
+BAD Class::Whatever::
+OK  Class::Whatever
+
+HERE
+
+    my $good = [];
+    my $bad  = [];
+
+    for my $line ( @examples ) {
+        $line =~ s/\s*$//;
+        if ( $line eq '' || $line =~ /^#/ ) {
+            next;
+        }
+        elsif ( $line =~ /^OK\s+(.+)/ ) {
+            push( @{$good}, $1 );
+        }
+        elsif ( $line =~ /BAD\s+(.+)/ ) {
+            push( @{$bad}, $1 );
+        }
+        else {
+            die "Invalid line: $line";
+        }
+    }
+
+    return ($good,$bad);
 }
 
 done_testing();
+
+exit 0;

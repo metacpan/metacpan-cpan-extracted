@@ -11,7 +11,7 @@ sub get_dist ($self) {
         return $dist;
     }
     else {
-        print "Pcore distribution was not found\n\n";
+        say 'Pcore distribution was not found', "\n";
 
         exit 3;
     }

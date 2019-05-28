@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -172,28 +172,28 @@ sub new {
     my $verbosity = 1;
 
     Quiq::Option->extract(\@_,
-        -verbosity=>\$verbosity,
+        -verbosity => \$verbosity,
     );
 
     # Objekt instantiieren
 
     my $self = $class->SUPER::new(
-        t0=>scalar Time::HiRes::gettimeofday,
-        verbosity=>$verbosity,
-        storage=>$storage,
-        pluginA=>[],
-        fileA=>[],
-        parsedSections=>0,
-        parsedLines=>0,
-        parsedChars=>0,
-        parsedBytes=>0,
+        t0 => scalar Time::HiRes::gettimeofday,
+        verbosity => $verbosity,
+        storage => $storage,
+        pluginA => [],
+        fileA => [],
+        parsedSections => 0,
+        parsedLines => 0,
+        parsedChars => 0,
+        parsedBytes => 0,
         # memoize
-        entityA=>undef,
-        entityTypeA=>undef,
-        extensionRegex=>undef,
-        needsUpdateDb=>undef,
-        needsTestDb=>undef,
-        typeH=>undef,
+        entityA => undef,
+        entityTypeA => undef,
+        extensionRegex => undef,
+        needsUpdateDb => undef,
+        needsTestDb => undef,
+        typeH => undef,
     );
 
     return $self;
@@ -316,11 +316,11 @@ sub registerType {
 
     Quiq::Perl->loadClass($pluginClass);
     push @{$self->{'pluginA'}},Quiq::Hash->new(
-        class=>$pluginClass,
-        extension=>$extension,
-        entityType=>$entityType,
-        sectionType=>$sectionType,
-        keyValA=>\@keyVal,
+        class => $pluginClass,
+        extension => $extension,
+        entityType => $entityType,
+        sectionType => $sectionType,
+        keyValA => \@keyVal,
     );
         
     return;
@@ -522,7 +522,7 @@ sub commit {
     my $incomplete = 0;
 
     Quiq::Option->extract(\@_,
-        -incomplete=>\$incomplete,
+        -incomplete => \$incomplete,
     );
 
     $self->msg(1,'%T ==commit==');
@@ -532,9 +532,9 @@ sub commit {
     my $defDir = $self->storage('def');
 
     my $dt = Quiq::DestinationTree->new($defDir,
-        -quiet=>0,
-        -language=>'en',
-        -outHandle=>\*STDERR,
+        -quiet => 0,
+        -language => 'en',
+        -outHandle => \*STDERR,
     );
     $dt->addDir($defDir);
 
@@ -543,9 +543,9 @@ sub commit {
         # falls sie differiert oder nicht existiert
 
         $dt->addFile($ent->entityFile($defDir),$ent->fileSourceRef,
-            -encoding=>'utf-8',
-            -skipEmptyFiles=>1, # Sub-Entities übergehen
-            -onUpdate=>sub {
+            -encoding => 'utf-8',
+            -skipEmptyFiles => 1, # Sub-Entities übergehen
+            -onUpdate => sub {
                 # Entität als geändert markieren
                 $ent->needsUpdate(1);
             },
@@ -726,7 +726,7 @@ sub fetch {
     my $overwrite = 0;
 
     Quiq::Option->extract(\@_,
-        -overwrite=>\$overwrite,
+        -overwrite => \$overwrite,
     );
 
     if ($dir eq '-') {
@@ -744,10 +744,10 @@ sub fetch {
     elsif (-d $dir && !$overwrite) {
         my $answ = Quiq::Terminal->askUser(
             "Overwrite directory '$dir'?",
-            -values=>'y/n',
-            -default=>'y',
-            -outHandle=>\*STDERR,
-            -timer=>$self->getRef('t0'),
+            -values => 'y/n',
+            -default => 'y',
+            -outHandle => \*STDERR,
+            -timer => $self->getRef('t0'),
         );
         if ($answ ne 'y') {
             return $self;
@@ -760,9 +760,9 @@ sub fetch {
         "$dir/Language",
         "$dir/Library",
         "$dir/Package",
-        -quiet=>0,
-        -language=>'en',
-        -outHandle=>\*STDERR,
+        -quiet => 0,
+        -language => 'en',
+        -outHandle => \*STDERR,
     );
     # $dt->addDir($dir);
 
@@ -774,8 +774,8 @@ sub fetch {
         $$ref .= "\n\n# eof\n";
 
         $dt->addFile("$dir/$e->[0]",$ref,
-            -encoding=>'utf-8',
-            -skipEmptyFiles=>1, # Sub-Entities übergehen (z.B. ProgramClass)
+            -encoding => 'utf-8',
+            -skipEmptyFiles => 1, # Sub-Entities übergehen (z.B. ProgramClass)
         );
     }
 
@@ -964,7 +964,7 @@ sub findFiles {
     # Operation ausführen
 
     my @files = Quiq::Path->find($dir,
-        -type=>'f',
+        -type => 'f',
         -pattern => $self->extensionRegex,
         # FIMXE: ../PATH zulassen
         -exclude => $noDotPaths? qr{(^|/)\.[^/]+$}: undef,
@@ -1006,7 +1006,7 @@ sub parseFiles {
     # Instantiiere Parser
 
     my $par = Quiq::Section::Parser->new(
-        encoding=>'utf-8',
+        encoding => 'utf-8',
     );
 
     # Parse Dateien zu Entitäten
@@ -1035,8 +1035,8 @@ sub parseFiles {
                         # Plugin definiert worden sein
 
                         $sec->error(
-                            q~COP-00001: Missing plugin for section~,
-                            Section=>$sec->fullType,
+                            'COP-00001: Missing plugin for section',
+                            Section => $sec->fullType,
                         );
                     }
                     push @entities,$plg->class->create($sec,$self,$plg);
@@ -1056,8 +1056,8 @@ sub parseFiles {
                     # Fehler: Erster Abschnitt ist kein []-Abschnitt
 
                     $sec->error(
-                        q~COP-00002: First section must be a []-section~,
-                         Section=>$sec->fullType,
+                        'COP-00002: First section must be a []-section',
+                         Section => $sec->fullType,
                     );
                 }
                 last;
@@ -1079,7 +1079,7 @@ sub parseFiles {
 
         if (substr($$fileSourceR,-1,1) ne "\n") {
             $fileEnt->error(
-                q~COP-00003: File entity must end with a newline~,
+                'COP-00003: File entity must end with a newline',
             );
         }
     }
@@ -1211,8 +1211,8 @@ sub entities {
     });
 
     my $a = $h->{$type} || $self->throw(
-        q~COP-00000: Unknown type~,
-        Type=>$type,
+        'COP-00000: Unknown type',
+        Type => $type,
     );    
     return wantarray? @$a: $a;
 }
@@ -1392,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

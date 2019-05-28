@@ -1,16 +1,12 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-# $Author: ddumont $
-# $Date: 2008-03-24 15:05:19 +0100 (Mon, 24 Mar 2008) $
-# $Revision: 559 $
-
 #    Copyright (c) 2007-2008 Dominique Dumont.
 #
 #    This file is part of Config-Model-Itself.
@@ -29,7 +25,10 @@
 #    along with Config-Model-Itself; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
-[
+use strict;
+use warnings;
+
+return [
   [
    name => "Itself::WarpableCargoElement",
 

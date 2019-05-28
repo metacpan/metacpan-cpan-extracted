@@ -252,8 +252,9 @@ sub EXT_override_data_proxy_Direct : Override('Ext.data.proxy.Direct') {
         pageParam    => $EMPTY,
 
         reader => {
-            type         => 'json',
-            rootProperty => 'data'
+            type                => 'json',
+            rootProperty        => 'data',
+            summaryRootProperty => 'summary',
         },
 
         writer => { clientIdProperty => '__client_id__' }

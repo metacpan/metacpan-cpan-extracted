@@ -94,9 +94,9 @@ sub test_new_startup : Startup(8) {
     # INSERT mit Bind-Variablen
 
     my $cur = $db->insert($PersonTable,
-        per_id=>\'?',
-        per_vorname=>\'?',
-        per_nachname=>\'?',
+        per_id => \'?',
+        per_vorname => \'?',
+        per_nachname => \'?',
     );
     my $bindVars = $cur->bindVars;
     $self->is($bindVars,3);
@@ -107,8 +107,8 @@ sub test_new_startup : Startup(8) {
     # SELECT mit Bind-Variablen
 
     $cur = $db->select(
-        -from=>$PersonTable,
-        -where=>'per_id = ?',
+        -from => $PersonTable,
+        -where => 'per_id = ?',
     );
     $bindVars = $cur->bindVars;
     $self->is($bindVars,1);
@@ -196,8 +196,8 @@ sub test_new_blob : Test(4) {
     # Bind-Cursor erzeugen
 
     my $cur = $db->insert($table,
-        id=>\'?',
-        bin=>\'?',
+        id => \'?',
+        bin => \'?',
     );
     $cur->bindTypes(undef,'BLOB');
 
@@ -243,9 +243,9 @@ sub test_new_text : Test(5) {
     # Bind-Cursor erzeugen
 
     my $cur = $db->insert($table,
-        id=>\'?',
-        txt=>\'?',
-        txt2=>\'?',
+        id => \'?',
+        txt => \'?',
+        txt2 => \'?',
     );
     $cur->bindTypes(undef,'TEXT',undef);
 
@@ -279,9 +279,9 @@ sub test_new_columnAlias : Test(1) {
     my $db = $self->get('db');
 
     my @rows = $db->select(
-        -select=>'per_id AS id',
-        -from=>$PersonTable,
-        -orderBy=>'id',
+        -select => 'per_id AS id',
+        -from => $PersonTable,
+        -orderBy => 'id',
     );
 
     my @arr;
@@ -300,9 +300,9 @@ sub test_new_tableAlias : Test(1) {
     # Tabellenalias mit AS ist bei Oracle nicht zulässig
 
     my @rows = $db->select(
-        -select=>'per_id',
-        -from=>"$PersonTable per",
-        -orderBy=>'per.per_id',
+        -select => 'per_id',
+        -from => "$PersonTable per",
+        -orderBy => 'per.per_id',
     );
 
     my @arr;
@@ -484,7 +484,7 @@ sub test_maxBlobSize : Test(3) {
     # Bind-Cursor erzeugen
 
     my $cur = $db->insert($table,
-        dat=>\'?',
+        dat => \'?',
     );
     $cur->bindTypes('BLOB');
 
@@ -681,7 +681,7 @@ sub test_sql_oracleTrigger : Test(2) {
         ['id','INTEGER',primaryKey=>1],
         ['create_date','DATETIME',notNull=>1],
         ['id2','INTEGER',notNull=>1],
-        -reCreate=>1,
+        -reCreate => 1,
     );
 
     my $cur = $db->sql(-forceExec=>1,"
@@ -862,17 +862,17 @@ sub test_values_array : Test(5) {
     my $db = $self->get('db');
 
     my @arr = $db->values(
-        -select=>'per_id',
-        -from=>$PersonTable,
-        -orderBy=>'per_id',
+        -select => 'per_id',
+        -from => $PersonTable,
+        -orderBy => 'per_id',
     );
     $self->is($arr[0],1);
     $self->is($arr[-1],3);
 
     my $arr = $db->values(
-        -select=>'per_id',
-        -from=>$PersonTable,
-        -orderBy=>'per_id',
+        -select => 'per_id',
+        -from => $PersonTable,
+        -orderBy => 'per_id',
     );
     $self->is(ref($arr),'Quiq::Array');
     $self->is($arr->[0],1);
@@ -885,17 +885,17 @@ sub test_values_hash : Test(5) {
     my $db = $self->get('db');
 
     my %hash = $db->values(
-        -select=>'per_nachname',2,
-        -from=>$PersonTable,
-        -hash=>1,
+        -select => 'per_nachname',2,
+        -from => $PersonTable,
+        -hash => 1,
     );
     $self->is($hash{'Pirelli'},2);
     $self->is($hash{'Ratlos'},2);
 
     my $hash = $db->values(
-        -select=>'per_nachname',3,
-        -from=>$PersonTable,
-        -hash=>1,
+        -select => 'per_nachname',3,
+        -from => $PersonTable,
+        -hash => 1,
     );
     $self->is(ref($hash),'Quiq::Hash');
     $self->is($hash->{'Pirelli'},3);
@@ -908,8 +908,8 @@ sub test_values_array2 : Test(3) {
     my $db = $self->get('db');
 
     my %hash = $db->values(
-        -select=>'per_id','per_nachname',
-        -from=>$PersonTable,
+        -select => 'per_id','per_nachname',
+        -from => $PersonTable,
     );
     $self->is($hash{1},'Ratlos');
     $self->is($hash{2},'Pirelli');
@@ -922,9 +922,9 @@ sub test_values_hashref : Test(3) {
     my $db = $self->get('db');
 
     my $hash = $db->values(
-        -select=>'per_id','per_nachname',
-        -from=>$PersonTable,
-        -hash=>1,
+        -select => 'per_id','per_nachname',
+        -from => $PersonTable,
+        -hash => 1,
     );
     $self->is($hash->{1},'Ratlos');
     $self->is($hash->{2},'Pirelli');
@@ -939,9 +939,9 @@ sub test_value_cursor : Test(1) {
     my $db = $self->get('db');
 
     my $val = $db->value(
-        -select=>'per_nachname',
-        -from=>$PersonTable,
-        -where=>'per_id = 2',
+        -select => 'per_nachname',
+        -from => $PersonTable,
+        -where => 'per_id = 2',
     );
     $self->is($val,'Pirelli');
 }
@@ -960,9 +960,9 @@ sub test_insert : Test(2) {
     #--------------------------------------------------------------------------
 
     my $cur = $db->insert($PersonTable,
-        per_id=>4711,
-        per_vorname=>'Hans',
-        per_nachname=>'Mustermann',
+        per_id => 4711,
+        per_vorname => 'Hans',
+        per_nachname => 'Mustermann',
     );
     $self->is(ref($cur),'Quiq::Database::Cursor');
 
@@ -991,9 +991,9 @@ sub test_insertRows_arrays : Test(1) {
     );
 
     my @rows = $db->select(
-        -from=>$PersonTable,
-        -where=>'per_id >= 100',
-        -raw=>1,
+        -from => $PersonTable,
+        -where => 'per_id >= 100',
+        -raw => 1,
     );
     $self->is(scalar(@rows),3);
 
@@ -1015,9 +1015,9 @@ sub test_insertRows_values : Test(1) {
     );
 
     my @rows = $db->select(
-        -from=>$PersonTable,
-        -where=>'per_id >= 100',
-        -raw=>1,
+        -from => $PersonTable,
+        -where => 'per_id >= 100',
+        -raw => 1,
     );
     $self->is(scalar(@rows),3);
 
@@ -1038,9 +1038,9 @@ sub test_update : Ignore(2) {
     #--------------------------------------------------------------------------
 
     my $cur = $db->update($PersonTable,
-        per_id=>4711,
-        per_vorname=>'Hans',
-        per_nachname=>'Mustermann',
+        per_id => 4711,
+        per_vorname => 'Hans',
+        per_nachname => 'Mustermann',
     );
     $self->is(ref($cur),'Quiq::Database::Cursor');
 
@@ -1064,9 +1064,9 @@ sub test_delete : Test(2) {
     #--------------------------------------------------------------------------
 
     my $cur = $db->insert($PersonTable,
-        per_id=>4712,
-        per_vorname=>'Heinz',
-        per_nachname=>'Mustermann',
+        per_id => 4712,
+        per_vorname => 'Heinz',
+        per_nachname => 'Mustermann',
     );
 
     #--------------------------------------------------------------------------
@@ -1173,9 +1173,9 @@ sub test_addColumn : Test(3) {
     my $db = $self->get('db');
 
     my $cur = $db->addColumn($PersonTable,'mag_eis',
-        type=>'STRING(1)',
-        default=>'1',
-        notNull=>1,
+        type => 'STRING(1)',
+        default => '1',
+        notNull => 1,
     );
     $self->is(ref($cur),'Quiq::Database::Cursor');
 
@@ -1255,7 +1255,7 @@ sub test_countDistinctMinMax : Test(8) {
 
     $db->createTable($table,
         [$column=>'INTEGER(2)'],
-        -replace=>1,
+        -replace => 1,
     );
 
     my ($count,$countDistinct,$min,$max) = $db->countDistinctMinMax($table,$column);
@@ -1353,12 +1353,12 @@ sub test_createTrigger : Test(1) {
     );
 
     $db->createTrigger($table,$name,'before','insert|update','row',-replace=>1,
-        Oracle=>"
+        Oracle => "
         BEGIN
             :new.c := 'a';
         END;
         ",
-        PostgreSQL=>"
+        PostgreSQL => "
         BEGIN
             NEW.c = 'a';
             RETURN NEW;
@@ -1368,9 +1368,9 @@ sub test_createTrigger : Test(1) {
 
     $db->insert($table,n=>1);
     my $val = $db->value(
-        -select=>'c',
-        -from=>$table,
-        -where,n=>1,
+        -select => 'c',
+        -from => $table,
+        -where,n => 1,
     );
     $self->is($val,'a');
 

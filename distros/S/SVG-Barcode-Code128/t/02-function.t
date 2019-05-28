@@ -29,7 +29,7 @@ ok my $svg = $plot->($text), 'Plot code';
 is $svg, slurp("$FindBin::Bin/resources/Tekki_black_text.svg"),
   'Content is correct';
 
-ok $svg = $plot->($text, {foreground => 'red', lineheight=>20, textsize => 0}),
+ok $svg = $plot->($text, foreground => 'red', lineheight=>20, textsize => 0),
   'Plot in red without text';
 is $svg, slurp("$FindBin::Bin/resources/Tekki_red_notext.svg"),
   'Content is correct';

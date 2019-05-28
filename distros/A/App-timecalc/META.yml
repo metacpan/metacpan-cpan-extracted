@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-timecalc
   homepage: https://metacpan.org/release/App-timecalc
   repository: git://github.com/perlancar/perl-App-timecalc.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -30,7 +30,7 @@ sub test_unitTest : Test(5) {
     my $stderrFile = '/tmp/stderr.txt';
     my $stderrText = "**stderr**\n";
 
-    Quiq::Program->addMethod(main=>sub {
+    Quiq::Program->addMethod(main => sub {
         my $self = shift;
         print $stdoutText;
         warn $stderrText;
@@ -38,11 +38,11 @@ sub test_unitTest : Test(5) {
     });
 
     $prg = Quiq::Program->run(undef,
-        -env=>$envH,
-        -argv=>$argA,
-        # -stdin=>\*STDIN,
-        -stdout=>Quiq::FileHandle->new('>',$stdoutFile),
-        -stderr=>Quiq::FileHandle->new('>',$stderrFile),
+        -env => $envH,
+        -argv => $argA,
+        # -stdin => \*STDIN,
+        -stdout => Quiq::FileHandle->new('>',$stdoutFile),
+        -stderr => Quiq::FileHandle->new('>',$stderrFile),
     );
     my $h = $prg->env;
     $self->is($h->{'X'},1);

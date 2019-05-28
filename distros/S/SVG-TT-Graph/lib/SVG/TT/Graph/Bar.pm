@@ -4,9 +4,9 @@ use strict;
 use Carp;
 use SVG::TT::Graph;
 use base qw(SVG::TT::Graph);
-use vars qw($VERSION $TEMPLATE_FH);
-$VERSION = $SVG::TT::Graph::VERSION;
-$TEMPLATE_FH = \*DATA;
+
+our $VERSION = $SVG::TT::Graph::VERSION;
+our $TEMPLATE_FH = \*DATA;
 
 =head1 NAME
 
@@ -168,6 +168,9 @@ Whether or not to tidy the content of the SVG file (XML::Tidy required).
 
 Set the path to an external stylesheet, set to '' if
 you want to revert back to using the defaut internal version.
+
+Set to "inline:<style>...</style>" with your CSS in between the tags.
+You can thus override the default style without requireing an external URL.
 
 The default stylesheet handles up to 12 data sets. All data series over
 the 12th will have no style and be in black. If you have over 12 data
@@ -401,8 +404,11 @@ __DATA__
   "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
 [% stylesheet = 'included' %]
 
-[% IF config.style_sheet && config.style_sheet != '' %]
+[% IF config.style_sheet && config.style_sheet != '' && config.style_sheet.substr(0,7) != 'inline:' %]
   <?xml-stylesheet href="[% config.style_sheet %]" type="text/css"?>
+[% ELSIF config.style_sheet && config.style_sheet.substr(0,7) == 'inline:'%]
+  [% stylesheet = 'inline'
+     style_inline = config.style_sheet.substr(7) %]
 [% ELSE %]
   [% stylesheet = 'excluded' %]
 [% END %]
@@ -413,7 +419,9 @@ __DATA__
 <!-- Stephen Morgan / Leo Lapworth -->
 <!-- ////////////////////////////  -->
 
-[% IF stylesheet == 'excluded' %]
+[% IF stylesheet == 'inline' %]
+[% style_inline %]
+[% ELSIF stylesheet == 'excluded' %]
 <!-- include default stylesheet if none specified -->
 <defs>
 <style type="text/css">
@@ -715,8 +723,8 @@ __DATA__
 <rect x="[% x %]" y="[% y %]" width="[% w %]" height="[% h %]" class="graphBackground"/>
 
 <!-- axis -->
-<path d="M[% x %] [% y %] v[% h %]" class="axis" id="xAxis"/>
-<path d="M[% x %] [% base_line %] h[% w %]" class="axis" id="yAxis"/>
+<path d="M[% x %] [% base_line %] h[% w %]" class="axis" id="xAxis"/>
+<path d="M[% x %] [% y %] v[% h %]" class="axis" id="yAxis"/>
 
 <!-- //////////////////////////////  AXIS DISTRIBUTIONS //////////////////////////// -->
 <!-- get number of data points on x scale -->

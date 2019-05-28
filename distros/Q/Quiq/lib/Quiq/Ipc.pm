@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Shell;
@@ -72,7 +72,7 @@ sub filter {
     my $ignoreError = 0;
 
     Quiq::Option->extract(\@_,
-        -ignoreError=>\$ignoreError,
+        -ignoreError => \$ignoreError,
     );
     my $in = shift;
 
@@ -80,8 +80,8 @@ sub filter {
     my $pid = IPC::Open3::open3(\*W,\*R,\*E,$cmd);
     unless ($pid) {
         $class->throw(
-            q~IPC-00001: Kann Filterkommando nicht forken~,
-            Cmd=>$cmd,
+            'IPC-00001: Kann Filterkommando nicht forken',
+            Cmd => $cmd,
         );
     }
 
@@ -110,7 +110,7 @@ sub filter {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

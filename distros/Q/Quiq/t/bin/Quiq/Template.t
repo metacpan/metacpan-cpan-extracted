@@ -34,8 +34,8 @@ sub test_unitTest : Test(3) {
     # Ersetze Platzhalter
 
     $tpl->replace(
-        __TITLE__=>'Testseite',
-        __BODY__=>'Hello World!',
+        __TITLE__ => 'Testseite',
+        __BODY__ => 'Hello World!',
     );
 
     my $file2 = $self->testPath('t/data/html/simple2.html');

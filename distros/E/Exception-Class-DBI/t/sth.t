@@ -1,6 +1,5 @@
-#!/usr/bin/perl -w
-
 use strict;
+use warnings;
 use Test::More tests => 35;
 BEGIN { use_ok('Exception::Class::DBI') or die }
 # Use PurePerl to get around CursorName bug.
@@ -36,7 +35,7 @@ is( $err->err, 2, "Check err" );
 is( $err->errstr, "opendir(foo): $bang",
     "Check errstr" );
 like( $err->error,
-      qr/^DBD::ExampleP::st execute failed: opendir\(foo\): \E$bang/,
+      qr/^DBD::ExampleP::st execute failed: opendir\(foo\): $bang/,
       "Check error" );
 is( $err->state, 'S1000', "Check state" );
 ok( ! defined $err->retval, "Check retval" );

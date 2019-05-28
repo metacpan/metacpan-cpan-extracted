@@ -1,0 +1,206 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+use AnyEvent;
+use AnyEvent::Handle;
+use AnyEvent::Socket;
+use Time::HiRes qw(time);
+use Sys::Hostname;
+
+use File::Temp qw( tempfile );
+use Digest::MD5;
+
+use MYDan;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <STDIN> ) };
+
+my $cv = AE::cv;
+my $idie = sub{ print shift;exit 1; };
+
+if( my $rlog = $ENV{MYDan_rlog} )
+{
+    my ( $uuid, $server, $port ) = split /:/, $rlog;
+    my %argv = ( 
+        uuid => $uuid,
+        addr => $server || $ENV{TCPREMOTEIP}, 
+        port => $port || $ENV{TCPREMOTEPORT},
+    );
+    
+    warn sprintf "scriptsx info: host:%s port:%s uuid:%s\n", map{ $argv{$_} ||'' }qw( addr port uuid );
+    
+    my @file = ( "$MYDan::PATH/var/run/tcpserver.$ENV{TCPSERVERPORT}/tmp/$ENV{TCPSERVERINDEX}.out" );
+    
+    my ( $index, %cv, %file, $hdl, @H, $w ) = ( 0 );
+    
+    my $call = sub{
+        for my $file ( @file )
+        {
+            unless( -f $file )
+            {
+                print "nofile: $file;";
+                next;
+            }
+            next if $file{$file};
+            my $H;
+            unless( open $H, "<$file" )
+            {
+                print "open $file fail:$!";
+                next;
+            }
+    
+            my $buf;
+            while( sysread( $H, $buf, 102400 ) )
+            {
+                $hdl->push_write($buf);
+            }
+            $file{$file} = $H;
+        }
+        @H = values %file;
+    };
+    
+    tcp_connect $argv{addr}, $argv{port}, sub {
+        my ( $fh ) = @_;
+        unless( $fh )
+        {
+            print "$argv{addr}:$argv{port} tcp_connect: $!";
+            $cv->send;
+            return;
+        }
+        $hdl = new AnyEvent::Handle(
+            fh => $fh,
+            rbuf_max => 10240000,
+            wbuf_max => 10240000,
+            autocork => 1,
+            on_read => sub {
+                my $self = shift;
+                $self->unshift_read (
+                    chunk => length $self->{rbuf},
+                    sub { print $_[1]; },
+                )
+            },
+            on_error => sub{
+                print 'tcp error';
+                undef $hdl;
+                $cv->send;
+            },
+            on_eof => sub{
+                print 'tcp close';
+                $cv->send;
+            },
+        );
+        $hdl->on_drain(
+            sub{
+    	    for( 1 .. scalar @H )
+                {
+                    my ( $i, $buf ) = $index % @H;
+                    if( sysread( $H[$i], $buf, 102400 ) )
+                    {
+                        $hdl->push_write($buf);
+                        return;
+                    }
+                    $index ++;
+                }
+                $w = AnyEvent->timer ( after => 1, interval => 1, cb => sub{
+                        for( 1 .. scalar @H )
+                        {
+                            my ( $i, $buf )= $index % @H;
+                            if( sysread( $H[$i], $buf, 102400 ) )
+                            {
+                                $hdl->push_write($buf);
+                                undef $w;
+                                return;
+                            }
+                            $index ++;
+                        }
+                    });
+
+            });
+
+        &$call();
+        $hdl->push_write( $argv{uuid} . ':' . hostname . ':' );
+    },  sub{ return 5; };
+}
+
+unless( $param{argv} && ref $param{argv} eq 'ARRAY' && @{$param{argv}} )
+{
+    print "noargv";
+    exit 1;
+}
+
+my ( $pid, $filename );
+
+my $ecb = sub {
+    if( $pid )
+    {
+        system "pkill -15 -P $pid";
+        kill 'TERM', $pid;
+    }
+    unlink $filename if -e $filename;
+    exit 1;
+};
+
+my $INT  = AnyEvent->signal (signal => "INT",  cb => $ecb );
+my $TERM = AnyEvent->signal (signal => "TERM", cb => $ecb );
+
+my $ce;
+map
+{
+    my ( $type, $cont, $argv, $md5, $fh ) = @$_{qw( type cont argv md5 )};
+
+    ( $fh, $filename ) = tempfile();
+    print $fh $cont;
+    seek $fh, 0, 0;
+    my $m = Digest::MD5->new()->addfile( $fh )->hexdigest();
+    close $fh;
+
+    unless( $md5 && $m && ( $md5 eq $m ) )
+    {
+        print "md5 nomatch\n";
+        exit 1;
+    }
+
+    print "[warn]nofind pkill\n" if system "pkill --help 1>/dev/null";
+
+    if( $pid = fork )
+    {
+		$ce = AnyEvent->child ( pid => $pid, cb => sub{
+                my ( $pid, $status ) = @_;
+                unlink $filename;
+                if( $status == -1 )
+                {
+                    print "failed to execute: $!\n";
+                    exit 1;
+                }
+                elsif ( $status & 127 )
+                {
+                    printf "child died with signal %d, %s coredump\n",
+                        ( $status & 127 ), ( $status & 128 ) ? 'with' : 'without';
+                    exit 1;
+                }
+
+                my $exit = $status >> 8;
+                exit $exit if $exit && print "child exited with value $exit\n";
+                $cv->send;
+            });
+    }
+    else
+    {
+        if( $type )
+        {
+            exec "$type $filename $argv 2>&1";
+        }
+        else
+        {
+            chmod 0755, $filename;
+            exec "$filename $argv 2>&1";
+        }
+    }
+}@{$param{argv}};
+
+$cv->recv;
+
+exit 0;

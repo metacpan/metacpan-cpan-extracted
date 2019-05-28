@@ -1,3 +1,14 @@
+1.1.91  2019-05-25 (PERLANCAR)
+
+	- Declare the priority of result schema from result metadata to be
+	  *lower* than schema from function metadata's result property.
+
+
+1.1.90  2019-05-24 (PERLANCAR)
+
+	- Introduce result metadata property: schema.
+
+
 1.1.89  2019-04-15 (PERLANCAR)
 
 	- No spec changes.

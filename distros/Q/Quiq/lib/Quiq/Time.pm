@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use POSIX ();
 use Time::Local ();
@@ -244,17 +244,17 @@ sub set {
         !defined $mi || $mi !~ /^\d+$/ || $mi < 0 || $mi > 60 ||
         !defined $s || $s !~ /^\d+$/ || $s < 0 || $s > 60) {
         $self->throw(
-            q~TIME-00002: Ungültige Zeitangabe~,
-            Time=>join(', ',@_),
+            'TIME-00002: Ungültige Zeitangabe',
+            Time => join(', ',@_),
         );
     }
 
     eval {Time::Local::timegm($s,$mi,$h,$d,$mo-1,$y-1900)};
     if ($@) {
         $self->throw(
-            q~TIME-00002: Ungültige Zeitangabe~,
-            Time=>join(',',@_),
-            InternalError=>$@,
+            'TIME-00002: Ungültige Zeitangabe',
+            Time => join(',',@_),
+            InternalError => $@,
         );
     }
 
@@ -290,19 +290,19 @@ sub setTime {
 
     if (defined $h) {
         if ($h < 0 || $h > 24) {
-            $self->throw(q~TIME-00003: Illegale Stundenangabe~,Hour=>$h);
+            $self->throw('TIME-00003: Illegale Stundenangabe',Hour=>$h);
         }
         $self->[3] = $h;
     }
     if (defined $mi) {
         if ($mi < 0 || $mi > 60) {
-            $self->throw(q~TIME-00004: Illegale Minutenangabe~,Minute=>$mi);
+            $self->throw('TIME-00004: Illegale Minutenangabe',Minute=>$mi);
         }
         $self->[4] = $mi;
     }
     if (defined $s) {
         if ($s < 0 || $s > 60) {
-            $self->throw(q~TIME-00005: Illegale Sekundenangabe~,Second=>$s);
+            $self->throw('TIME-00005: Illegale Sekundenangabe',Second=>$s);
         }
         $self->[5] = $s;
     }
@@ -340,7 +340,7 @@ sub truncate {
     my $unit = shift;
 
     unless ($unit =~ tr/mhDMY//) {
-        $self->throw(q~TIME-00006: Ungültige Zeitkomponente~,Unit=>$unit);
+        $self->throw('TIME-00006: Ungültige Zeitkomponente',Unit=>$unit);
     }
 
     $self->[1] = 1 if $unit =~ tr/Y//;     # M
@@ -1068,7 +1068,7 @@ sub add {
         elsif ($unit eq 'M') { $self->addMonths($n) }
         elsif ($unit eq 'D') { $self->addDays($n) }
         else {
-            $self->throw(q~TIME-00001: Ungültige Zeitkomponente~,Unit=>$unit);
+            $self->throw('TIME-00001: Ungültige Zeitkomponente',Unit=>$unit);
         }
     }
 
@@ -1434,7 +1434,7 @@ sub monthAbbrToNum {
     my $n = $MonthAbbr->{$lang}->{$abbr};
     if (!$n) {
         $self->throw(
-            q~TIME-00099: Unknown month abbreviation~,
+            'TIME-00099: Unknown month abbreviation',
             Abbreviation => $abbr,
             Language => $lang,
         );
@@ -1447,7 +1447,7 @@ sub monthAbbrToNum {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

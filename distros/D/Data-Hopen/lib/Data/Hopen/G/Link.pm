@@ -2,7 +2,7 @@
 package Data::Hopen::G::Link;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 use parent 'Data::Hopen::G::Runnable';
 use Class::Tiny {
@@ -35,7 +35,7 @@ The output is C<{}> if no inputs are provided.
 =cut
 
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(; phase generator)], @_);
+    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
     return $self->passthrough(-nocontext => 1);
 } #run()
 

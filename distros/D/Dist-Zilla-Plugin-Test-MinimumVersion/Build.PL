@@ -88,7 +88,7 @@ EOW
         "Marcel Gr\x{fc}nauer <marcel\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Test-MinimumVersion",
-      "dist_version" => "2.000009",
+      "dist_version" => "2.000010",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Test::MinimumVersion",
       "recursive_test_files" => 1,
@@ -102,6 +102,7 @@ EOW
         "Dist::Zilla::Role::TextTemplate" => 0,
         "List::Util" => 0,
         "Moose" => 0,
+        "Moose::Util::TypeConstraints" => 0,
         "Sub::Exporter::ForMethods" => 0,
         "Test::MinimumVersion" => 0,
         "constant" => 0,

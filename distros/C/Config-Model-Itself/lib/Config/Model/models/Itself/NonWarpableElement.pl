@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -25,7 +25,10 @@
 #    along with Config-Model-Itself; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
-[
+use strict;
+use warnings;
+
+return [
     [
         name => 'Itself::NonWarpableElement',
 

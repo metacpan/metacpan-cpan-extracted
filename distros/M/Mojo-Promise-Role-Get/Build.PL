@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Mojo-Promise-Role-Get",
-      "dist_version" => "v0.1.1",
+      "dist_version" => "v0.1.2",
       "license" => "artistic_2",
       "module_name" => "Mojo::Promise::Role::Get",
       "recursive_test_files" => 1,

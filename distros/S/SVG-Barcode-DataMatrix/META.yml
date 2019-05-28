@@ -1,0 +1,30 @@
+---
+abstract: 'Generator for SVG based Data Matrix barcodes'
+author:
+  - 'Rolf Stöckli <tekki@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-Barcode-DataMatrix
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Barcode::DataMatrix: '0.10'
+  SVG::Barcode: '0.10'
+  perl: v5.24.0
+resources:
+  bugtracker: https://github.com/Tekki/svg-barcode-datamatrix/issues
+  homepage: https://github.com/Tekki/svg-barcode-datamatrix
+  repository: https://github.com/Tekki/svg-barcode-datamatrix.git
+version: '0.12'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

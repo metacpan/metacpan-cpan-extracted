@@ -2,8 +2,8 @@ NAME
     App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 VERSION
-    This document describes version 0.002 of App::CalendarDatesUtils (from
-    Perl distribution App-CalendarDatesUtils), released on 2019-02-14.
+    This document describes version 0.005 of App::CalendarDatesUtils (from
+    Perl distribution App-CalendarDatesUtils), released on 2019-05-28.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -24,9 +24,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   all => *true*
+    *   all_modules => *true*
 
         Use all installed Calendar::Dates::* modules.
+
+    *   all_years => *true*
+
+        List dates from all available years instead of a single year.
 
     *   day => *int*
 
@@ -36,7 +40,20 @@ FUNCTIONS
 
     *   month => *int*
 
+    *   params => *hash*
+
+        Specify parameters.
+
+    *   past => *bool*
+
+        Filter entries that are less than (at least) today's date.
+
     *   year => *int*
+
+        Specify year of dates to list.
+
+        The default is to list dates in the current year. You can specify
+        all_years instead to list dates from all available years.
 
     Returns an enveloped result (an array).
 

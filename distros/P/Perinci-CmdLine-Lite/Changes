@@ -1,3 +1,9 @@
+1.818   2019-05-24 (PERLANCAR)
+
+	- Get result's schema in resmeta's schema (Rinci 1.1.90) before
+	  function metadata result property.
+
+
 1.817   2019-01-14 (PERLANCAR)
 
 	- Remove --format, --json, --naked-res when function metadata

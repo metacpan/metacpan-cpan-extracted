@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 use lib 't';
 use Util;
@@ -27,7 +27,7 @@ VERIFY_LAST_LINE_IS_MISSING_NEWLINE: {
 
 
 INCOMPLETE_LAST_LINE: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 but no new line on the last line!
 the last full measure of devotion -- that we here highly resolve that
 HERE
@@ -39,3 +39,5 @@ HERE
 }
 
 done_testing();
+
+exit 0;

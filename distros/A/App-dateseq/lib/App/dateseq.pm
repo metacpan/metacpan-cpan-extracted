@@ -1,7 +1,7 @@
 package App::dateseq;
 
-our $DATE = '2016-09-28'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2019-05-26'; # DATE
+our $VERSION = '0.092'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,6 @@ _
                 'x.perl.coerce_to' => 'DateTime',
                 'x.perl.coerce_rules' => ['str_alami_en'],
             }],
-            req => 1,
             pos => 0,
         },
         to => {
@@ -48,13 +47,20 @@ _
             cmdline_aliases => {i=>{}},
             pos => 2,
         },
+        reverse => {
+            summary => 'Decrement instead of increment',
+            schema => 'true*',
+            cmdline_aliases => {r=>{}},
+        },
         business => {
-            summary => 'Only list business days (Mon-Fri)',
-            schema => ['bool*', is=>1],
+            summary => 'Only list business days (Mon-Fri), '.
+                'or non-business days',
+            schema => ['bool*'],
         },
         business6 => {
-            summary => 'Only list business days (Mon-Sat)',
-            schema => ['bool*', is=>1],
+            summary => 'Only list business days (Mon-Sat), '.
+                'or non-business days',
+            schema => ['bool*'],
         },
         header => {
             summary => 'Add a header row',
@@ -79,20 +85,58 @@ _
     },
     examples => [
         {
+            summary => 'Generate "infinite" dates from today',
+            src => '[[prog]]',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
             summary => 'Generate dates from 2015-01-01 to 2015-01-31',
             src => '[[prog]] 2015-01-01 2015-01-31',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 5,
         },
         {
-            summary => 'Generate dates from 2015-01-01 to today',
-            src => '[[prog]] 2015-01-01 today',
+            summary => 'Generate dates from yesterday to 2 weeks from now',
+            src => '[[prog]] yesterday "2 weeks from now"',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 5,
+        },
+        {
+            summary => 'Generate dates from 2015-01-31 to 2015-01-01 (reverse)',
+            src => '[[prog]] 2015-01-31 2015-01-01 -r',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 5,
+        },
+        {
+            summary => 'Generate "infinite" dates from 2015-01-01 (reverse)',
+            src => '[[prog]] 2015-01-01 -r',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Generate 10 dates from 2015-01-01',
+            src => '[[prog]] 2015-01-01 -n 10',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 5,
         },
         {
             summary => 'Generate dates with increment of 3 days',
             src => '[[prog]] 2015-01-01 2015-01-31 -i P3D',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 5,
+        },
+        {
+            summary => 'Generate first 20 business days (Mon-Fri) after 2015-01-01',
+            src => '[[prog]] 2015-01-01 --business -n 20 -f "%Y-%m-%d(%a)"',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 10,
+        },
+        {
+            summary => 'Generate first 5 non-business days (Sat-Sun) after 2015-01-01',
+            src => '[[prog]] 2015-01-01 --no-business -n 5',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 5,
         },
@@ -134,7 +178,9 @@ sub dateseq {
 
     my %args = @_;
 
+    $args{from} //= DateTime->today;
     $args{increment} //= DateTime::Duration->new(days=>1);
+    my $reverse = $args{reverse};
 
     my $fmt  = $args{date_format} // do {
         my $has_hms;
@@ -158,25 +204,37 @@ sub dateseq {
 
     my $code_filter = sub {
         my $dt = shift;
-        if ($args{business}) {
+        if (defined $args{business}) {
             my $dow = $dt->day_of_week;
-            return 0 if $dow >= 6;
+            if ($args{business}) {
+                return 0 if $dow >= 6;
+            } else {
+                return 0 if $dow <  6;
+            }
         }
-        if ($args{business6}) {
+        if (defined $args{business6}) {
             my $dow = $dt->day_of_week;
-            return 0 if $dow >= 7;
+            if ($args{business6}) {
+                return 0 if $dow >= 7;
+            } else {
+                return 0 if $dow <  7;
+            }
         }
         1;
     };
 
-    if (defined $args{to}) {
+    if (defined $args{to} || defined $args{limit}) {
         my @res;
         push @res, $args{header} if $args{header};
         my $dt = $args{from}->clone;
-        while (DateTime->compare($dt, $args{to}) <= 0) {
+        while (1) {
+            if (defined $args{to}) {
+                last if  $reverse && DateTime->compare($dt, $args{to}) <  0;
+                last if !$reverse && DateTime->compare($dt, $args{to}) >= 0;
+            }
             push @res, $strp->format_datetime($dt) if $code_filter->($dt);
             last if defined($args{limit}) && @res >= $args{limit};
-            $dt = $dt + $args{increment};
+            $dt = $reverse ? $dt - $args{increment} : $dt + $args{increment};
         }
         return [200, "OK", \@res];
     } else {
@@ -189,7 +247,8 @@ sub dateseq {
             #return undef if $finish;
             $dt = $next_dt if $j++ > 0;
             return $args{header} if $j == 0 && $args{header};
-            $next_dt = $dt + $args{increment};
+            $next_dt = $reverse ?
+                $dt - $args{increment} : $dt + $args{increment};
             #$finish = 1 if ...
             return $dt;
         };
@@ -201,7 +260,7 @@ sub dateseq {
             }
             $strp->format_datetime($dt);
         };
-        return [200, "OK", $filtered_func, {stream=>1}];
+        return [200, "OK", $filtered_func, {schema=>'str*', stream=>1}];
     }
 }
 
@@ -220,12 +279,16 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.07 of App::dateseq (from Perl distribution App-dateseq), released on 2016-09-28.
+This document describes version 0.092 of App::dateseq (from Perl distribution App-dateseq), released on 2019-05-26.
 
 =head1 FUNCTIONS
 
 
-=head2 dateseq(%args) -> [status, msg, result, meta]
+=head2 dateseq
+
+Usage:
+
+ dateseq(%args) -> [status, msg, payload, meta]
 
 Generate a sequence of dates.
 
@@ -240,11 +303,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<business> => I<bool>
 
-Only list business days (Mon-Fri).
+Only list business days (Mon-Fri), or non-business days.
 
 =item * B<business6> => I<bool>
 
-Only list business days (Mon-Sat).
+Only list business days (Mon-Sat), or non-business days.
 
 =item * B<date_format> => I<str>
 
@@ -253,7 +316,7 @@ strftime() format for each date.
 Default is C<%Y-%m-%d>, unless when hour/minute/second is specified, then it is
 C<%Y-%m-%dT%H:%M:%S>.
 
-=item * B<from>* => I<date>
+=item * B<from> => I<date>
 
 Starting date.
 
@@ -267,6 +330,10 @@ Add a header row.
 
 Only generate a certain amount of numbers.
 
+=item * B<reverse> => I<true>
+
+Decrement instead of increment.
+
 =item * B<to> => I<date>
 
 End date, if not specified will generate an infinite* stream of dates.
@@ -278,7 +345,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -306,7 +373,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

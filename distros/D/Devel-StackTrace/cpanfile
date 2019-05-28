@@ -11,7 +11,6 @@ on 'test' => sub {
   requires "Test::More" => "0.96";
   requires "base" => "0";
   requires "bytes" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'test' => sub {
@@ -20,7 +19,6 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'configure' => sub {

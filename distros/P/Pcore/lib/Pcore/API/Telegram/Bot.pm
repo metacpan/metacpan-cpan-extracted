@@ -1,64 +1,103 @@
 package Pcore::API::Telegram::Bot;
 
-use Pcore -class;
+use Pcore -class, -res;
+use Pcore::Util::Scalar qw[weaken];
 
-has key     => ( required => 1 );
-has timeout => 1;
+has key          => ( required => 1 );
+has poll_timeout => 1;
+has on_message   => ();                  # CodeRef
 
 has _offset => ( init_arg => undef );
 
 # https://core.telegram.org/bots/api
 
-sub poll_updates ($self) {
-    while () {
-        my $data = $self->get_updates;
+sub _req ( $self, $path, $data, $cb = undef ) {
+    $data = P->data->to_json($data) if $data;
 
-        for my $entry ( $data->{result}->@* ) {
-            if ( $entry->{message}->{text} eq '/' ) {
-                $self->send_message( $entry->{message}->{chat}->{id}, 'вывывывыэ' );
+    return P->http->get(
+        "https://api.telegram.org/bot$self->{key}/$path",
+        headers => [ 'Content-Type' => 'application/json', ],
+        data    => $data,
+        sub ($res) {
+            my $data = P->data->from_json( $res->{data} );
+
+            my $api_res = res 200, $data;
+
+            return $cb ? $cb->($api_res) : $api_res;
+        }
+    );
+}
+
+# TODO
+sub set_webhook ( $self, $url, %args ) {
+    return;
+}
+
+sub poll_updates ( $self, $timeout = $self->{poll_timeout} ) {
+    weaken $self;
+
+    my $coro = Coro::async_pool {
+        while () {
+            last if !defined $self;
+
+            my $res = $self->get_updates;
+
+            for my $msg ( $res->{data}->{result}->@* ) {
+                Coro::async_pool {
+                    return if !defined $self;
+
+                    $self->_on_message($msg);
+
+                    return;
+                };
             }
+
+            last if !defined $self;
+
+            Coro::AnyEvent::sleep $timeout;
         }
 
-        Coro::AnyEvent::sleep $self->{timeout};
-    }
+        return;
+    };
+
+    $coro->cede_to;
 
     return;
 }
 
 sub get_updates ($self) {
-    my $res = P->http->get(
-        "https://api.telegram.org/bot$self->{key}/getUpdates",
-        headers => [ 'Content-Type' => 'application/json', ],
-        data    => P->data->to_json( {
-            offset => $self->{_offset},
+    return $self->_req(
+        'getUpdates',
+        {   offset => $self->{_offset},
             limit  => 100,
-        } )
+        },
+        sub ($res) {
+            if ( $res->{data}->{result}->@* ) {
+                my $update_id = $res->{data}->{result}->[-1]->{update_id};
+
+                $self->{_offset} = ++$update_id if defined $update_id;
+            }
+
+            return $res;
+        }
     );
-
-    my $data = P->data->from_json( $res->{data} );
-
-    if ( $data->{result}->@* ) {
-        my $update_id = $data->{result}->[-1]->{update_id};
-
-        $self->{_offset} = ++$update_id if defined $update_id;
-    }
-
-    return $data;
 }
 
 sub send_message ( $self, $chat_id, $text ) {
-    my $res = P->http->get(
-        "https://api.telegram.org/bot$self->{key}/sendMessage",
-        headers => [ 'Content-Type' => 'application/json', ],
-        data    => P->data->to_json( {
-            chat_id => $chat_id,
+    return $self->_req(
+        'sendMessage',
+        {   chat_id => $chat_id,
             text    => $text,
-        } )
+        }
     );
+}
 
-    my $data = P->data->from_json( $res->{data} );
+sub _on_message ( $self, $msg ) {
+    if ( my $cb = $self->{on_message} ) {
+        $cb->( $self, $msg );
+    }
 
-    return $data;
+    return;
 }
 
 1;
@@ -72,6 +111,20 @@ __END__
 Pcore::API::Telegram::Bot
 
 =head1 SYNOPSIS
+
+    use Pcore::API::Telegram::Bot;
+
+    my $bot = Pcore::API::Telegram::Bot->new( key => $key );
+
+    $bot->{on_message} = sub ( $bot, $msg ) {
+        if ( $msg->{message}->{text} eq '/' ) {
+            $bot->send_message( $msg->{message}->{chat}->{id}, 'вывывывыэ' );
+        }
+
+        return;
+    };
+
+    $bot->poll_updates;
 
 =head1 DESCRIPTION
 

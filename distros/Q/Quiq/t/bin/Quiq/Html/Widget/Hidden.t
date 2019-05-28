@@ -30,16 +30,16 @@ sub test_html : Test(3) {
     # Wert
 
     $html = Quiq::Html::Widget::Hidden->html($h,
-        name=>'x',
-        value=>4711,
+        name => 'x',
+        value => 4711,
     );
     $self->is($html,qq|<input type="hidden" name="x" value="4711" />\n|);
 
     # Liste
 
     $html = Quiq::Html::Widget::Hidden->html($h,
-        name=>'x',
-        value=>[4711,4712],
+        name => 'x',
+        value => [4711,4712],
     );
     $self->is($html,qq|<input type="hidden" name="x" value="4711" />\n|.
         qq|<input type="hidden" name="x" value="4712" />\n|);

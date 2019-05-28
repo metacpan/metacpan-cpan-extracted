@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Array;
 use Quiq::Option;
@@ -165,7 +165,7 @@ und das Kaufmannsund für die Konkatenation von Querystrings.
 Ist der Wert eines Schlüssels eine Arrayreferenz, wird für
 jedes Arrayelement ein eigenes Schlüssel/Wert-Paar erzeugt:
 
-    a=>[1,2,3]
+    a => [1,2,3]
 
 wird zu
 
@@ -346,8 +346,8 @@ sub split {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -defaultSchema=>\$defaultSchema,
-            -debug=>\$debug,
+            -defaultSchema => \$defaultSchema,
+            -debug => \$debug,
         );
     }
 
@@ -397,7 +397,7 @@ sub split {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

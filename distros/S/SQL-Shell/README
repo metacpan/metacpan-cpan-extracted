@@ -1,4 +1,4 @@
-SQL::Shell v1.16
+SQL::Shell v1.17
 
 SQL-Shell:  Interactive shell for DBI Databases
 Copyright (C) 2006  BBC
@@ -51,6 +51,13 @@ Run 'perldoc SQL::Shell' to read the full documentation.
 
 
 RECENT CHANGES
+
+v1.17
+
+Added below missing dependencies to the installation prerequisites:
+
+    CGI
+    Locale::Recode
 
 
 v1.16

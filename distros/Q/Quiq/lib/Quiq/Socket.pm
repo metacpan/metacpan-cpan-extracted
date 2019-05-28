@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 
@@ -90,7 +90,7 @@ sub new {
 
     my $sloppy = 0;
     Quiq::Option->extract(\@_,
-        -sloppy=>\$sloppy,
+        -sloppy => \$sloppy,
     );
 
     # Baue Verbindung auf
@@ -98,9 +98,9 @@ sub new {
     my $self = $class->SUPER::new("$host:$port");
     if (!$self && !$sloppy) {
         $class->throw(
-            q~SOCK-00001: Verbindungsaufbau fehlgeschlagen~,
-            Host=>$host,
-            Port=>$port,
+            'SOCK-00001: Verbindungsaufbau fehlgeschlagen',
+            Host => $host,
+            Port => $port,
         );
     }
 
@@ -148,7 +148,7 @@ sub close {
     my $self = shift;
 
     CORE::close $self or do {
-        $self->throw(q~SOCK-00002: Socket schließen fehlgeschlagen~);
+        $self->throw('SOCK-00002: Socket schließen fehlgeschlagen');
     };
 
     return;
@@ -158,7 +158,7 @@ sub close {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -1,23 +1,14 @@
-# Data::Hopen - A build generator with first-class edges and explicit dependencies
+# Data::Hopen - A dataflow library with first-class edges
 
 [![Appveyor Badge](https://ci.appveyor.com/api/projects/status/github/hopenbuild/data-hopen?svg=true)](https://ci.appveyor.com/project/cxw42/data-hopen)
 
 
 
-hopen is a cross-platform software build generator.  It makes files you can
-pass to Make, Ninja, Visual Studio, or other build tools, to compile and
-link your software.  hopen gives you:
-
-- A full, Turing-complete, robust programming language to write your
-build scripts (specifically, Perl 5.14+)
-- No hidden magic!  All your data is visible and accessible in a build graph.
-- Context-sensitivity.  Your users can tweak their own builds for their own
-platforms without affecting your project.
-
-See [Data::Hopen::Conventions](https://metacpan.org/pod/release/CXW/Build-Hopen-0.000006-TRIAL/lib/Build/Hopen/Conventions.pod) for details of the input format.
-
-Why Perl?  Because (1) you probably already have it installed, and
-(2) it is the original write-once, run-everywhere language!
+`Data::Hopen` is a dataflow library that runs actions you specify, moves data
+between those actions, and permits transforming data as the data moves.  It is
+the underlying engine of the [App::hopen](https://metacpan.org/pod/App::hopen) cross-platform software build
+generator, but can be used for any dataflow task that can be represented as a
+directed acyclic graph (DAG).
 
 # INSTALLATION
 
@@ -56,14 +47,6 @@ You can also look for information at:
 - MetaCPAN
 
     [https://metacpan.org/release/Data-Hopen](https://metacpan.org/release/Data-Hopen)
-
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/Data-Hopen](http://annocpan.org/dist/Data-Hopen)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/d/Data-Hopen](https://cpanratings.perl.org/d/Data-Hopen)
 
 # INSPIRED BY
 

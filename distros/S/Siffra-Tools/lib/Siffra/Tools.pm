@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.07';
+    $VERSION = '0.08';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -359,13 +359,16 @@ sub parseBlockText()
 
         if ( !$layout->{ $tipo_de_registro } )
         {
-            my $msg = "Erro no layout do arquivo....";
+            my $tipos = join ",", sort keys %{ $layout };
+            my $msg   = "Não existe o tipo de registro [ $tipo_de_registro ] no layout cadastrado [ $tipos ] na linha [ $. ]...";
             $log->error( $msg );
+            $log->error( "Linha [ $. ] = [$linha]..." );
             $retorno->{ rows }    = undef;
             $retorno->{ message } = $msg;
             $retorno->{ error }   = 1;
             return $retorno;
         } ## end if ( !$layout->{ $tipo_de_registro...})
+
         my $tamanho_da_linha_no_layout  = $layout->{ $tipo_de_registro }->{ total_length };
         my $tamanho_da_linha_no_arquivo = length( $linha );
 

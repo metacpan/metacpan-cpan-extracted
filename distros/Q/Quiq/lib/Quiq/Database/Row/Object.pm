@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -484,8 +484,8 @@ sub getSet {
         my $oldVal = $self->[0]->{$key};
         if (!$oldVal && !exists $self->[0]->{$key}) {
             $self->throw(
-                q~ROW-00004: Datensatz-Attribut existiert nicht~,
-                Key=>$key,
+                'ROW-00004: Datensatz-Attribut existiert nicht',
+                Key => $key,
             );
         }
 
@@ -582,8 +582,8 @@ sub rowStatus {
         my $rowStatus = shift;
         if ($rowStatus !~ /^[0IUD]$/) {
             $self->throw(
-                q~ROW-00005: Ungültiger Datensatz-Status~,
-                RowStatus=>$rowStatus,
+                'ROW-00005: Ungültiger Datensatz-Status',
+                RowStatus => $rowStatus,
             );
         }
         $self->[2] = $rowStatus;
@@ -719,8 +719,8 @@ sub modifiedColumns {
     my $withValue = 0;
 
     Quiq::Option->extract(\@_,
-        -columns=>\$columns,
-        -withValue=>\$withValue,
+        -columns => \$columns,
+        -withValue => \$withValue,
     );
 
     my @arr;
@@ -732,8 +732,8 @@ sub modifiedColumns {
         }
         if (!exists $self->[0]->{$key}) {
             $self->throw(
-                q~ROW-00001: Datensatz-Attribut existiert nicht~,
-                Key=>$key,
+                'ROW-00001: Datensatz-Attribut existiert nicht',
+                Key => $key,
             );
         }
         if (CORE::exists $modHash->{$key}) {
@@ -778,7 +778,7 @@ setClauseFromModifiedRow() liefert uns die SET-Klausel für ein UPDATE:
     );
     $db->update('shopartikellieferanteninfo',
         @setClause,
-        -where,artikelid=>$artId,
+        -where,artikelid => $artId,
     );
 
 Wurde keine der Kolumnen geändert, liefert setClauseFromModifiedRow() eine leere
@@ -793,8 +793,8 @@ sub setClauseFromModifiedRow {
     # @_: @columns
 
     return $self->modifiedColumns(
-        -columns=>\@_,
-        -withValue=>1,
+        -columns => \@_,
+        -withValue => 1,
     );
 }
 
@@ -1267,8 +1267,8 @@ sub copyData {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -ignore=>\$ignore,
-            -dontCopyNull=>\$dontCopyNull,
+            -ignore => \$ignore,
+            -dontCopyNull => \$dontCopyNull,
         );
     }
 
@@ -1354,8 +1354,8 @@ sub save {
     }
     else {
         $self->throw(
-            q~ROW-00005: Ungültiger Datensatz-Status~,
-            RowStatus=>$stat,
+            'ROW-00005: Ungültiger Datensatz-Status',
+            RowStatus => $stat,
         );
     }
     $cur->{'rowOperation'} = $stat;
@@ -1425,8 +1425,8 @@ sub select {
     my $tableClass;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -cursor=>\$cursor,
-        -tableClass=>\$tableClass,
+        -cursor => \$cursor,
+        -tableClass => \$tableClass,
     );
 
     # Operation ausführen
@@ -1434,10 +1434,10 @@ sub select {
     my $stmt = $class->selectStmt($db,@_);
 
     return $db->select(
-        -cursor=>$cursor,
-        -rowClass=>$class,
-        -stmt=>$stmt,
-        -tableClass=>$tableClass,
+        -cursor => $cursor,
+        -rowClass => $class,
+        -stmt => $stmt,
+        -tableClass => $tableClass,
     );
 }
 
@@ -1474,7 +1474,7 @@ sub lookup {
     my $sloppy = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -sloppy=>\$sloppy,
+        -sloppy => \$sloppy,
     );
 
     # Operation ausführen
@@ -1482,9 +1482,9 @@ sub lookup {
     my $stmt = $class->selectStmt($db,@_);
 
     return $db->lookup(
-        -stmt=>$stmt,
-        -rowClass=>$class,
-        -sloppy=>$sloppy,
+        -stmt => $stmt,
+        -rowClass => $class,
+        -sloppy => $sloppy,
     );
 }
 
@@ -1593,8 +1593,8 @@ sub AUTOLOAD {
     my ($rowClass,$key) = our $AUTOLOAD =~ /^(.*)::(\w+)$/;
     if (!defined $key) {
         $this->throw(
-            q~ROW-00003: Methodenname enthält ungültige Zeichen~,
-            Method=>$AUTOLOAD,
+            'ROW-00003: Methodenname enthält ungültige Zeichen',
+            Method => $AUTOLOAD,
         );
     }
     return if $key !~ /[^A-Z]/;
@@ -1606,8 +1606,8 @@ sub AUTOLOAD {
 
     if (!ref $this) {
         $this->throw(
-            q~ROW-00001: Klassen-Methode existiert nicht~,
-            Attribute=>$key,
+            'ROW-00001: Klassen-Methode existiert nicht',
+            Attribute => $key,
         );
     }
 
@@ -1615,8 +1615,8 @@ sub AUTOLOAD {
 
     if (!exists $this->[0]->{$key}) {
         $this->throw(
-            q~ROW-00002: Datensatz-Attribut oder Methode existiert nicht~,
-            Attribute=>$key,
+            'ROW-00002: Datensatz-Attribut oder Methode existiert nicht',
+            Attribute => $key,
         );
     }
 
@@ -1635,7 +1635,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

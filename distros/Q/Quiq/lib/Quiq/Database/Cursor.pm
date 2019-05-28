@@ -5,13 +5,12 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Database::Row::Array;
 use Quiq::Database::Row::Object;
 use Quiq::Database::ResultSet::Array;
 use Quiq::Database::ResultSet::Object;
-use Quiq::Database::Connection;
 use Time::HiRes ();
 use Quiq::Database::Cursor;
 use Quiq::Path;
@@ -59,25 +58,25 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        apiCur=>undef,
-        bindVars=>0,
-        cacheFile=>undef,
-        cacheFh=>undef,
-        cacheOp=>'', # damit einfach mit eq verglichen werden kann
-        db=>undef,
-        hits=>0,
-        id=>0,
+        apiCur => undef,
+        bindVars => 0,
+        cacheFile => undef,
+        cacheFh => undef,
+        cacheOp => '', # damit einfach mit eq verglichen werden kann
+        db => undef,
+        hits => 0,
+        id => 0,
         # Attribut rowOperation wird bei save() gesetzt: 0, 'I', 'U', 'D'
-        rowOperation=>0,
-        rowClass=>undef, # Quiq::Database::Connection->defaultRowClass, # Initial. nötig?
-        tableClass=>undef,
-        titles=>[],
-        stmt=>undef,
-        startTime=>scalar(Time::HiRes::gettimeofday),
-        execTime=>0,
-        curName=>undef,
-        chunkSize=>0,
-        chunkPos=>0,
+        rowOperation => 0,
+        rowClass => undef,
+        tableClass => undef,
+        titles => [],
+        stmt => undef,
+        startTime => scalar(Time::HiRes::gettimeofday),
+        execTime => 0,
+        curName => undef,
+        chunkSize => 0,
+        chunkPos => 0,
     );
 
     $self->set(@_);
@@ -439,15 +438,15 @@ sub bind {
     my $id = $apiCur->id;
 
     return Quiq::Database::Cursor->new(
-        apiCur=>$apiCur,
-        bindVars=>$bindVars,
-        db=>$self, # schwache Referenz, siehe Cursor-Konstruktor
-        hits=>$hits,
-        id=>$id,
-        rowClass=>$self->{'rowClass'},
-        titles=>$titles,
-        startTime=>$startTime,
-        execTime=>$execTime,
+        apiCur => $apiCur,
+        bindVars => $bindVars,
+        db => $self, # schwache Referenz, siehe Cursor-Konstruktor
+        hits => $hits,
+        id => $id,
+        rowClass => $self->{'rowClass'},
+        titles => $titles,
+        startTime => $startTime,
+        execTime => $execTime,
     );
 }
 
@@ -604,11 +603,11 @@ sub fetchAll {
         my $tableClass = $self->{'tableClass'};
 
         $tab = $tableClass->new($rowClass,$self->{'titles'},\@rows,
-            stmt=>$self->{'stmt'},
-            hits=>$self->{'hits'},
-            startTime=>$self->{'startTime'},
-            execTime=>$self->{'execTime'},
-            fetchTime=>$self->time,
+            stmt => $self->{'stmt'},
+            hits => $self->{'hits'},
+            startTime => $self->{'startTime'},
+            execTime => $self->{'execTime'},
+            fetchTime => $self->time,
         );
     }
 
@@ -625,7 +624,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

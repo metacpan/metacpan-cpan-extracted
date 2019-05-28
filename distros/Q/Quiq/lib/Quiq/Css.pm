@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Path;
 use Quiq::String;
@@ -614,9 +614,9 @@ sub style {
         }
         else {
             $linkTags .= $h->tag('link',
-                rel=>'stylesheet',
-                type=>'text/css',
-                href=>$spec,
+                rel => 'stylesheet',
+                type => 'text/css',
+                href => $spec,
             );
         }
     }
@@ -624,7 +624,7 @@ sub style {
     return $h->cat(
         $linkTags,
         $h->tag('style',
-            -ignoreIfNull=>1,
+            -ignoreIfNull => 1,
             $style
         ),
     );
@@ -634,7 +634,7 @@ sub style {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

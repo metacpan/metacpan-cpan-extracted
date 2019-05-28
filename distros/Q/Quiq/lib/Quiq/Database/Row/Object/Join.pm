@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Array;
 use Quiq::Hash;
@@ -99,8 +99,8 @@ sub selectTemplate {
     my $ref = *{"$class\::Select"}{SCALAR};
     if (!$$ref) {
         $class->throw(
-            q~ROW-00001: Join-Klasse definiert kein Select-Statement~,
-            JoinClass=>$class,
+            'ROW-00001: Join-Klasse definiert kein Select-Statement',
+            JoinClass => $class,
         );
     }
 
@@ -209,9 +209,9 @@ sub cast {
         Quiq::Array->compare($titles,$newTitles);
     if (!@$bothA) {
         $self->throw(
-            q~ROW-00006: Datensatz-Klassen haben keine gemeinsamen Kolumnen~,
-            RowClass=>ref($self),
-            CastClass=>$newClass,
+            'ROW-00006: Datensatz-Klassen haben keine gemeinsamen Kolumnen',
+            RowClass => ref($self),
+            CastClass => $newClass,
         );
     }
     if (@$onlyNewA) {
@@ -262,7 +262,7 @@ sub cast {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use Moose;
 with (
@@ -63,9 +63,6 @@ sub BUILD {
 		confess 'You cannot setup both underscore_eval_version and semantic_version';
 	}
 
-	confess 'invalid characters in version'
-		unless LaxVersionStr->check( $self->zilla->version );  ## no critic (Modules::RequireExplicitInclusion)
-
 	return 1;
 }
 
@@ -78,6 +75,10 @@ sub munge_file {
 	}
 
 	my $version = $self->zilla->version;
+
+	confess 'invalid characters in version'
+		unless LaxVersionStr->check( $version );  ## no critic (Modules::RequireExplicitInclusion)
+
 	my $doc = $self->ppi_document_for_file($file);
 
 	return unless defined $doc;
@@ -196,7 +197,7 @@ Dist::Zilla::Plugin::OurPkgVersion - No line insertion and does Package version 
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 

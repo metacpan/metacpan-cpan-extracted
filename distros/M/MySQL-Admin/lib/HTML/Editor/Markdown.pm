@@ -6,7 +6,7 @@ use utf8;
 require Exporter;
 @HTML::Editor::Markdown::EXPORT  = qw(Markdown);
 @ISA                             = qw(Exporter);
-$HTML::Editor::Markdown::VERSION = '1.16';
+$HTML::Editor::Markdown::VERSION = '1.18';
 use HTML::Entities;
 use Text::Markdown::Hoedown;
 use Search::Tools::UTF8;

@@ -23,7 +23,7 @@ use Perl::MinimumVersion;
 use Term::ANSIColor qw/colored/;
 use YAML::Syck qw/LoadFile/;
 
-our $VERSION = version->new('0.0.9');
+our $VERSION = version->new('0.1.0');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -377,9 +377,9 @@ sub pre_specified {
     elsif (-f $option{build} ) {
         my $build = path($option{build})->slurp;
 
-        my ($required)      = $build =~ /\brequires     \s* (?: => | , ) \s* ( { [^}]*? } )/xms;
-        my ($recommends)    = $build =~ /recommends     \s* (?: => | , ) \s* ( { [^}]*? } )/xms;
-        my ($test_required) = $build =~ /build_requires \s* (?: => | , ) \s* ( { [^}]*? } )/xms;
+        my ($required)      = $build =~ /\brequires     \s* (?: => | , ) \s* ( \{ [^}]*? \} )/xms;
+        my ($recommends)    = $build =~ /recommends     \s* (?: => | , ) \s* ( \{ [^}]*? \} )/xms;
+        my ($test_required) = $build =~ /build_requires \s* (?: => | , ) \s* ( \{ [^}]*? \} )/xms;
 
         $required      = eval $required      if $required;        ## no critic
         $recommends    = eval $recommends    if $recommends;      ## no critic

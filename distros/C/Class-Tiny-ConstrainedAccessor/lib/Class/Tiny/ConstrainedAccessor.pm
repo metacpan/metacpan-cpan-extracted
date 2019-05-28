@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Class::Tiny;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000010';
 
 # Docs {{{1
 
@@ -20,7 +20,9 @@ C<use Class::Tiny> statement in a package.  This module creates custom
 accessors that behave as standard C<Class::Tiny> accessors except that
 they apply type constraints (C<isa> relationships).  Type constraints
 can come from L<Type::Tiny>, L<MooseX::Types>, L<MooX::Types::MooseLike>,
-L<MouseX::Types>, or L<Specio>.
+L<MouseX::Types>, or L<Specio>.  Alternatively, constraints can be applied
+using the technique described in
+L<"Constraints without a type system"|/CONSTRAINTS WITHOUT A TYPE SYSTEM>.
 
 Example of a class using this package:
 
@@ -29,14 +31,11 @@ Example of a class using this package:
 
     use Type::Tiny;
 
-    my $MediumInteger;
-    BEGIN {
-        # Create the type constraint
-        $MediumInteger = Type::Tiny->new(
-            name => 'MediumInteger',
-            constraint => sub { looks_like_number($_) and $_ >= 10 and $_ < 20 }
-        );
-    }
+    # Create the type constraint
+    use vars::i '$MediumInteger' = Type::Tiny->new(
+        name => 'MediumInteger',
+        constraint => sub { looks_like_number($_) and $_ >= 10 and $_ < 20 }
+    );
 
     use Class::Tiny::ConstrainedAccessor {
         medint => $MediumInteger,           # create accessor sub medint()
@@ -47,6 +46,26 @@ Example of a class using this package:
     use Class::Tiny qw(medint regular), {
         med_with_default => 12,
     };
+
+=head1 CONSTRAINTS WITHOUT A TYPE SYSTEM
+
+If you don't want to use L<Type::Tiny> or one of the other type systems listed
+above, you can create your own constraints as two-element arrayrefs.  Example:
+
+    use Class::Tiny::ConstrainedAccessor
+        'field' => [ \&checker_sub, \&message_sub ];
+
+C<checker_sub> and C<message_sub> are used as follows to check C<$value>:
+
+    checker_sub($value) or die get_message($value);
+
+Therefore, C<checker_sub> must return truthy if C<$_[0]> passes the constraint,
+or else falsy.  C<get_message> must return something that can be passed to
+C<die()>, when given a C<$_[0]> that has failed the constraint.
+
+If your profile ever tells you that constraint-checks are on the critical
+path, try custom constraints.  They may give you more control or opportunity
+for optimization than general-purpose type systems.
 
 =head1 SUBROUTINES
 
@@ -114,7 +133,7 @@ sub import {
         my $constraint = $constraints{$k};
 
         my ($checker, $get_message) =
-                _get_constraint_sub($constraint); # dies on failure
+                _get_constraint_sub($k, $constraint); # dies on failure
 
         my $accessor = _make_accessor($k, $checker, $get_message);
         $accessors{$k} = [$checker, $get_message];      # Save for BUILD()
@@ -139,21 +158,40 @@ sub import {
 } #import()
 
 # _get_constraint_sub: Get the subroutine for a constraint.
+# Takes the constraint name (for debug messages) and the constraint.
 # Returns two coderefs: checker and get_message.
 sub _get_constraint_sub {
-    my ($type) = @_;
+    my ($type_name, $type) = @_;
     my ($checker, $get_message);
+
+    # Handle the custom-constraint format
+    if(ref $type eq 'ARRAY') {
+        die "Custom constraint $type_name must have two elements: checker, get_message"
+            unless scalar @$type == 2;
+        die "$type_name: checker must be a subroutine" unless ref($type->[0]) eq 'CODE';
+        die "$type_name: get_message must be a subroutine" unless ref($type->[1]) eq 'CODE';
+        return @$type;
+    }
 
     # Get type's name, if any
     my $name = eval { $type->can('name') || $type->can('description') };
     $name = $type->$name() if $name;
 
     # Set default message
-    $get_message = $name ?  sub { 'Value is not a ' . $name } :
-                            sub { 'Value did not satisfy constraint' };
+    $name = $type_name unless $name;
+    $get_message = sub { "Value is not a $name" };
 
     # Try the different types of constraints we know about
     DONE: {
+
+        if (ref($type) eq 'CODE') { # MooX::Types::MooseLike
+            $checker = sub { eval { $type->(@_); 1 } };
+                # In profiling, seems to be about on par with `&$type;`.
+            last DONE;
+        }
+
+        die "I don't know how to handle non-reference constraint $type_name"
+            unless ref $type;   # All the rest of the checks use $type->can()
 
         if ( my $method = eval { $type->can('compiled_check') }) { # Type::Tiny
             $checker = $type->$method();
@@ -171,13 +209,10 @@ sub _get_constraint_sub {
             last DONE if $checker;
         }
 
-        if (eval { $type->can('check') } ) { # Moose, Mouse
-            $checker = sub { $type->check(@_) };
-            last DONE;
-        }
-
-        if (ref($type) eq 'CODE') { # MooX::Types
-            $checker = sub { eval { $type->(@_); 1 } };
+        if (my $method = eval { $type->can('check') } ) { # Moose, Mouse
+            $checker = sub { unshift @_, $type; goto &$method; };
+                # Like $type->check(@_), but profiles as much faster on my
+                # test system.
             last DONE;
         }
 
@@ -188,7 +223,7 @@ sub _get_constraint_sub {
 
     } #DONE
 
-    die "I don't know how to use this type (" . (ref($type)||'scalar') . ")"
+    die "$type_name: I don't know how to use type " . ref($type)
         unless $checker;
 
     return ($checker, $get_message);

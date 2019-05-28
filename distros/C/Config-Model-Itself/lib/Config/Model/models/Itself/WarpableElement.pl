@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -25,7 +25,10 @@
 #    along with Config-Model-Itself; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
-[
+use strict;
+use warnings;
+
+return [
     [
         name => "Itself::WarpableElement",
 
@@ -157,7 +160,7 @@
             allow_keys => 'specify a set of allowed keys',
             allow_keys_matching => 'Keys must match the specified regular expression.',
             default_with_init => 'specify a set of keys to create and initialization on some elements . E.g. \' foo => "X=Av Y=Bv", bar => "Y=Av Z=Cz"\' ',
-            help => 'Specify help string applicable to values. The keys are regexp matched to the beggining of the value. See C<help> parameter of L<Config::Model::Value/DESCRIPTION> for more possibilities',
+            help => 'Specify help string applicable to values. The keys are regexp matched to the beginning of the value. See C<help> parameter of L<Config::Model::Value/DESCRIPTION> for more possibilities',
             replace => 'Used for enum to substitute one value with another. This parameter must be used to enable user to upgrade a configuration with obsolete values. The old value is the key of the hash, the new one is the value of the hash',
             warn_if_key_match => 'Warn user if a key is created matching this regular expression',
             warn_unless_key_match => 'Warn user if a key is created not matching this regular expression',

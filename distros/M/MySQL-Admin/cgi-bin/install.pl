@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/perl -w
 use strict;
 use utf8;
 use lib qw(F:/software/Apache24/cgi-bin/lib);

@@ -28,7 +28,7 @@ subtest 'File::Glob' => sub {
   my $filename = File::Glob::bsd_glob('~/test.txt');
   ok -f $filename;
   note "filename = $filename";
-  open my $fh, '<', $filename;
+  open my $fh, '<', $filename or die "Unable to open $filename, $!";
   my $data = do { local $/; <$fh> };
   close $fh;
   is $data, "xx\n";
@@ -56,7 +56,7 @@ subtest 'File::HomeDir' => sub {
 
   ok -f $filename;
   
-  open my $fh, '<', $filename;
+  open my $fh, '<', $filename or die "Unable to open $filename, $!";
   my $data = do { local $/; <$fh> };
   close $fh;
   

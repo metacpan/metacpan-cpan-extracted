@@ -1,0 +1,25 @@
+---
+skip_tags: true
+
+cache:
+  - C:\strawberry -> appveyor.yml
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+
+install:
+  - IF NOT EXIST "C:\strawberry" cinst strawberryperl
+  - IF NOT EXIST "C:\ProgramData\chocolatey\bin\swig.exe" choco install swig --yes --limit-output
+  - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - cd C:\projects\%APPVEYOR_PROJECT_NAME%
+  - cpanm Dist::Zilla --notest
+  # ExtUtils::F77 1.23 breaks PDL build on Windows
+  # See https://rt.cpan.org/Public/Bug/Display.html?id=129356
+  - cpanm ExtUtils::F77@1.22
+  - dzil authordeps --missing | cpanm --notest
+  # ExtUtils::F77 if already installed has a weird STDOUT line and could break the pipe to cpanm
+  - dzil listdeps --author --missing | findstr /V "ExtUtils::F77 f77 compiler" | cpanm --notest
+
+build: off
+
+test_script:
+- dzil test -v

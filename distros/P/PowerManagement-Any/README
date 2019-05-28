@@ -2,8 +2,8 @@ NAME
     PowerManagement::Any - Common interface to some power management tasks
 
 VERSION
-    This document describes version 0.003 of PowerManagement::Any (from Perl
-    distribution PowerManagement-Any), released on 2019-05-22.
+    This document describes version 0.004 of PowerManagement::Any (from Perl
+    distribution PowerManagement-Any), released on 2019-05-28.
 
 NOTES
 FUNCTIONS

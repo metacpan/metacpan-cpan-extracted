@@ -2,7 +2,7 @@ package Zonemaster::LDNS;
 
 use 5.014;
 
-our $VERSION = '1.1.0';
+our $VERSION = '2.0.1';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw[to_idn has_idn ldns_version load_zonefile];
@@ -85,6 +85,10 @@ make up a list of servers to send queries to. If an argument cannot be parsed as
 Send a query for the given triple. If type or class are not provided they default to A and IN, respectively. Returns a L<Zonemaster::LDNS::Packet> or
 undef.
 
+=item query_with_pkt($packet)
+
+Send a L<Zonemaster::LDNS::Packet>. Returns a L<Zonemaster::LDNS::Packet> or undef.
+
 =item name2addr($name)
 
 Asks this resolver to look up A and AAAA records for the given name, and return a list of the IP addresses (as strings). In scalar context, returns
@@ -113,6 +117,10 @@ Get and optionally sets the CD flag.
 =item igntc($flag)
 
 Get and optionally sets the igntc flag.
+
+=item fallback($flag)
+
+Get and optionally sets the fallback flag.
 
 =item usevc($flag)
 

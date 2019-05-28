@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -82,16 +82,16 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        accept=>undef,
-        class=>undef,
-        disabled=>0,
-        hidden=>0,
-        id=>undef,
-        maxLength=>undef,
-        name=>undef,
-        size=>undef,
-        style=>undef,
-        value=>undef,
+        accept => undef,
+        class => undef,
+        disabled => 0,
+        hidden => 0,
+        id => undef,
+        maxLength => undef,
+        name => undef,
+        size => undef,
+        style => undef,
+        value => undef,
     );
     $self->set(@_);
 
@@ -140,15 +140,15 @@ sub html {
     }
 
     return $h->tag('input',
-        type=>'file',
-        id=>$id,
-        class=>$class,
-        style=>$style,
-        accept=>$accept,
-        name=>$name,
-        disabled=>$disabled,
-        size=>$size,
-        maxlength=>$maxLength,
+        type => 'file',
+        id => $id,
+        class => $class,
+        style => $style,
+        accept => $accept,
+        name => $name,
+        disabled => $disabled,
+        size => $size,
+        maxlength => $maxLength,
     );    
 }
 
@@ -156,7 +156,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

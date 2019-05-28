@@ -16,7 +16,8 @@ WriteMakefile(
 	'Text::Locus'      => 1.00,
         'Text::ParseWords' => 0,
 	'File::Basename'   => 0,
-	'File::Temp'       => 0
+	'File::Temp'       => 0,
+	'IPC::Cmd'         => 0
     },
     META_MERGE        => {
 	'meta-spec' => { version => 2 },

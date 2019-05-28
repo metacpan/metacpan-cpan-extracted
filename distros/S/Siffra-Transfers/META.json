@@ -36,6 +36,8 @@
             "Carp" : "0",
             "DDP" : "0",
             "Data::Dumper" : "0",
+            "IO::Pty" : "0",
+            "IO::Socket::SSL" : "0",
             "Log::Any" : "0",
             "Net::FTP" : "0",
             "Net::SFTP::Foreign" : "0",
@@ -52,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

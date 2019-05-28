@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -176,7 +176,7 @@ sub new {
 
             unless (open $self,$mode,$path) {
                 $class->throw(
-                    q~FH-00001: Kann Datei nicht öffnen~,
+                    'FH-00001: Kann Datei nicht öffnen',
                     Path=>$path,
                     Errstr=>$!,
                 );
@@ -193,7 +193,7 @@ sub new {
                 # Wir haben die Datei geöffnet und schließen sie gleich wieder
                 CORE::close $self;
             }
-            $class->throw(q~FH-00002: Kann Lock nicht setzen~,Errstr=>$!);
+            $class->throw('FH-00002: Kann Lock nicht setzen',Errstr=>$!);
         };
     }
 
@@ -230,7 +230,7 @@ sub destroy {
     my ($self) = @_; # Nicht ändern!
 
     CORE::close $self or do {
-        $self->throw(q~FH-00009: FileHandle schließen fehlgeschlagen~);
+        $self->throw('FH-00009: FileHandle schließen fehlgeschlagen');
     };
     $_[0] = undef;
 
@@ -273,7 +273,7 @@ sub read {
     undef $!;
     $n = CORE::read($self,my $data,$n);
     if (!defined $n) {
-        $self->throw(q~FH-00012: Read fehlgeschlagen~,Errstr=>$!);
+        $self->throw('FH-00012: Read fehlgeschlagen',Errstr=>$!);
     }
     elsif ($n == 0) {
         return undef;
@@ -352,7 +352,7 @@ sub readLine {
     undef $!;
     my $line = CORE::readline $self;
     if (!defined $line and $!) {
-        $self->throw(q~FH-00011: ReadLine fehlgeschlagen~,Errstr=>$!);
+        $self->throw('FH-00011: ReadLine fehlgeschlagen',Errstr=>$!);
     }
 
     return $line;
@@ -484,7 +484,7 @@ sub getc {
     undef $!;
     my $c = CORE::getc($self);
     if (!defined($c) && $! ne 'Bad file descriptor') {
-        $self->throw(q~FH-00011: getc() fehlgeschlagen~,Errstr=>$!);
+        $self->throw('FH-00011: getc() fehlgeschlagen',Errstr=>$!);
     }
 
     return $c;
@@ -625,7 +625,7 @@ sub truncate {
 
     unless (CORE::truncate $self,$length) {
         $self->throw(
-            q~FH-00013: truncate fehlgeschlagen~,
+            'FH-00013: truncate fehlgeschlagen',
             Errstr=>$!,
         );
     }
@@ -660,7 +660,7 @@ sub seek {
     my $whence = shift || 0;
 
     unless (CORE::seek $self,$pos,$whence) {
-        $self->throw(q~FH-00014: seek fehlgeschlagen~,Errstr=>$!);
+        $self->throw('FH-00014: seek fehlgeschlagen',Errstr=>$!);
     }
 
     return;
@@ -688,7 +688,7 @@ sub tell {
 
     my $pos = CORE::tell $self;
     if ($pos < 0) {
-        $self->throw(q~FH-00013: tell fehlgeschlagen~,Errstr=>$!);
+        $self->throw('FH-00013: tell fehlgeschlagen',Errstr=>$!);
     }
 
     return $pos;
@@ -755,7 +755,7 @@ sub lock {
         $lock = Fcntl::LOCK_EX|Fcntl::LOCK_NB;
     }
     else {
-        $self->throw(q~FH-00002: Unbekannter Lock-Modus~,LockMode=>$lockMode);
+        $self->throw('FH-00002: Unbekannter Lock-Modus',LockMode=>$lockMode);
     }
 
     return flock($self,$lock)? 1: 0;
@@ -782,7 +782,7 @@ sub unlock {
     my $self = shift;
 
     unless (flock $self,Fcntl::LOCK_UN) {
-        $self->throw(q~FH-00003: Kann Lock nicht aufheben~,Errstr=>$!);
+        $self->throw('FH-00003: Kann Lock nicht aufheben',Errstr=>$!);
     };
 
     return;
@@ -898,7 +898,7 @@ sub captureStderr {
     CORE::close STDERR;
     CORE::open STDERR,'>',$ref or do {
         $class->throw(
-            q~FH-00001: Abfangen von STDERR fehlgeschlagen~,
+            'FH-00001: Abfangen von STDERR fehlgeschlagen',
             Errstr=>$!,
         );
     };
@@ -935,7 +935,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

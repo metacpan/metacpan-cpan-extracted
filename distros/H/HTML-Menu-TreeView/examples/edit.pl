@@ -1,27 +1,18 @@
-#!perl
+#!/usr/bin/perl -W
 use strict;
 use CGI qw(-compile :all :cgi-lib -private_tempfiles);
 use CGI::Carp qw(fatalsToBrowser);
 use lib qw(lib);
 use HTML::Menu::TreeView qw(:all);
-use vars qw(@m_aTree %tempNode $tN $m_nRid $deleteTempIndex $tempDeleteRef $m_hrTempNode %disallowedKeys);
+use vars qw(@tree $m_sContent %tempNode $tN $m_nRid);
 my $action   = param('action') ? param('action') : "editable";
-my $m_sDump     = "./tree.pl";
+my $dump     = "./tree.pl";
 my $down     = 0;
 my $m_sStyle = "Crystal";
-my $m_nSize     = param('size') ? param('size') : 32;
-prefix('/');
-$m_nSize = ($m_nSize == 22 or $m_nSize == 16 or $m_nSize == 48) ? $m_nSize : 32;
-%disallowedKeys = (
-                   action   => 1,
-                   folder   => 1,
-                   subtree  => 1,
-                   class    => 1,
-                   dump     => 1,
-                   sid      => 1,
-                  );
-size($m_nSize);
-clasic(1) if (defined param('clasic'));
+my $size     = param('size') ? param('size') : 32;
+$size = ( $size == 22 or $size == 16 or $size == 48 ) ? $size : 32;
+size($size);
+clasic(1) if ( defined param('clasic') );
 my $jspart = qq|
 //<<drag&drop
 var dragobjekt = null;
@@ -38,7 +29,7 @@ dropid = null;
 m_bOver = true;
 m_bNoDrop = false;
 offsetLeft = 0;
-size = $m_nSize;
+size = $size;
 function startdrag(element){
   dropid = element;
   dragobjekt = document.getElementById(element);
@@ -164,222 +155,222 @@ function visible(id){
 }
 |;
 
-if (-e $m_sDump) {
-    loadTree($m_sDump);
-    *tree = \@{$HTML::Menu::TreeView::TreeView[0]};
-}
-if ($#m_aTree == -1) {
-    @m_aTree = (
-             {
-              'text'    => 'Related Sites',
-              'subtree' => [
-                            {
-                             'target'  => '_parent',
-                             'text'    => 'Lindnerei.de',
-                             'href'    => 'http://lindnerei.de/',
-                             'subtree' => [],
-                             'id'      => 'a2',
-                             'rid'     => 2
-                            },
-                            {
-                             'target'  => '_parent',
-                             'href'    => 'http://search.cpan.org/dist/HTML-Menu-TreeView/',
-                             'text'    => 'cpan.org',
-                             'subtree' => [],
-                             'id'      => 'a3',
-                             'rid'     => 3
-                            },
-                           ],
-              'id'  => 'a1',
-              'rid' => 1
-             },
-             {
-              'text'    => 'Examples',
-              'subtree' => [
-                            {
-                             'target'  => 'rightFrame',
-                             'text'    => 'OO Syntax',
-                             'href'    => 'oo.pl',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'text'    => 'Source',
-                                            'href'    => 'ooSource.pl',
-                                            'subtree' => [],
-                                            'rid'     => 7,
-                                            'id'      => 'a7'
-                                           }
-                                          ],
-                             'rid' => 6,
-                             'id'  => 'a6'
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'href'    => 'fo.pl',
-                             'text'    => 'FO Syntax',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'text'    => 'Source',
-                                            'href'    => 'foSource.pl',
-                                            'subtree' => [],
-                                            'id'      => 'a9',
-                                            'rid'     => 9
-                                           }
-                                          ],
-                             'id'  => 'a8',
-                             'rid' => 8
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'href'    => 'crystal.pl',
-                             'text'    => 'Crystal',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'href'    => 'crystalSource.pl',
-                                            'text'    => 'Source',
-                                            'subtree' => [],
-                                            'id'      => 'a11',
-                                            'rid'     => 11
-                                           }
-                                          ],
-                             'id'  => 'a10',
-                             'rid' => 10
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'text'    => 'Sort the Treeview',
-                             'href'    => 'folderFirst.pl',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'href'    => 'folderSource.pl',
-                                            'text'    => 'Source',
-                                            'subtree' => [],
-                                            'id'      => 'a13',
-                                            'rid'     => 13
-                                           }
-                                          ],
-                             'id'  => 'a12',
-                             'rid' => 12
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'href'    => 'edit.pl',
-                             'text'    => 'Edit',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'href'    => 'editSource.pl',
-                                            'text'    => 'Source',
-                                            'subtree' => [],
-                                            'id'      => 'a15',
-                                            'rid'     => 15
-                                           }
-                                          ],
-                             'id'  => 'a14',
-                             'rid' => 14
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'href'    => 'select.pl',
-                             'text'    => 'Select',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'text'    => 'Source',
-                                            'href'    => 'selectSource.pl',
-                                            'subtree' => [],
-                                            'rid'     => 17,
-                                            'id'      => 'a17'
-                                           }
-                                          ],
-                             'rid' => 16,
-                             'id'  => 'a16'
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'href'    => 'open.pl',
-                             'text'    => 'Closed Folder ',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'href'    => 'openSource.pl',
-                                            'text'    => 'Source',
-                                            'subtree' => [],
-                                            'id'      => 'a19',
-                                            'rid'     => 'a19'
-                                           }
-                                          ],
-                             'id'  => 'a18',
-                             'rid' => 'a18'
-                            },
-                            {
-                             'target'  => 'rightFrame',
-                             'text'    => 'Columns',
-                             'href'    => 'columns.pl',
-                             'subtree' => [
-                                           {
-                                            'target'  => 'rightFrame',
-                                            'href'    => 'columnsSource.pl',
-                                            'text'    => 'Source',
-                                            'subtree' => [],
-                                            'id'      => 'a21',
-                                            'rid'     => 21
-                                           }
-                                          ],
-                             'id'  => 'a20',
-                             'rid' => 20
-                            }
-                           ],
-              'id'  => 'a5',
-              'rid' => 5
-             },
-             {
-              'text'    => 'Kontakt',
-              'href'    => 'mailto:dirk.lze@gmail.com',
-              'subtree' => [],
-              'id'      => 'a22',
-              'rid'     => 22
-             }
-            );
-    saveTree($m_sDump, \@m_aTree);
-}
+if ( -e $dump ) {
+    loadTree($dump);
+    *tree = \@{ $HTML::Menu::TreeView::TreeView[0] };
+} ## end if ( -e $dump )
+if ( $#tree == -1 ) {
+    @tree = (
+        {
+            'text'    => 'Related Sites',
+            'subtree' => [
+                {
+                    'target'  => '_parent',
+                    'text'    => 'Lindnerei.de',
+                    'href'    => 'http://lindnerei.de/',
+                    'subtree' => [],
+                    'id'      => 'a2',
+                    'rid'     => 2
+                },
+                {
+                    'target'  => '_parent',
+                    'href'    => 'http://search.cpan.org/dist/HTML-Menu-TreeView/',
+                    'text'    => 'cpan.org',
+                    'subtree' => [],
+                    'id'      => 'a3',
+                    'rid'     => 3
+                },
+            ],
+            'id'  => 'a1',
+            'rid' => 1
+        },
+        {
+            'text'    => 'Examples',
+            'subtree' => [
+                {
+                    'target'  => 'rightFrame',
+                    'text'    => 'OO Syntax',
+                    'href'    => 'oo.pl',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'text'    => 'Source',
+                            'href'    => 'ooSource.pl',
+                            'subtree' => [],
+                            'rid'     => 7,
+                            'id'      => 'a7'
+                        }
+                    ],
+                    'rid' => 6,
+                    'id'  => 'a6'
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'href'    => 'fo.pl',
+                    'text'    => 'FO Syntax',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'text'    => 'Source',
+                            'href'    => 'foSource.pl',
+                            'subtree' => [],
+                            'id'      => 'a9',
+                            'rid'     => 9
+                        }
+                    ],
+                    'id'  => 'a8',
+                    'rid' => 8
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'href'    => 'crystal.pl',
+                    'text'    => 'Crystal',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'href'    => 'crystalSource.pl',
+                            'text'    => 'Source',
+                            'subtree' => [],
+                            'id'      => 'a11',
+                            'rid'     => 11
+                        }
+                    ],
+                    'id'  => 'a10',
+                    'rid' => 10
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'text'    => 'Sort the Treeview',
+                    'href'    => 'folderFirst.pl',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'href'    => 'folderSource.pl',
+                            'text'    => 'Source',
+                            'subtree' => [],
+                            'id'      => 'a13',
+                            'rid'     => 13
+                        }
+                    ],
+                    'id'  => 'a12',
+                    'rid' => 12
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'href'    => 'edit.pl',
+                    'text'    => 'Edit',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'href'    => 'editSource.pl',
+                            'text'    => 'Source',
+                            'subtree' => [],
+                            'id'      => 'a15',
+                            'rid'     => 15
+                        }
+                    ],
+                    'id'  => 'a14',
+                    'rid' => 14
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'href'    => 'select.pl',
+                    'text'    => 'Select',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'text'    => 'Source',
+                            'href'    => 'selectSource.pl',
+                            'subtree' => [],
+                            'rid'     => 17,
+                            'id'      => 'a17'
+                        }
+                    ],
+                    'rid' => 16,
+                    'id'  => 'a16'
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'href'    => 'open.pl',
+                    'text'    => 'Closed Folder ',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'href'    => 'openSource.pl',
+                            'text'    => 'Source',
+                            'subtree' => [],
+                            'id'      => 'a19',
+                            'rid'     => 'a19'
+                        }
+                    ],
+                    'id'  => 'a18',
+                    'rid' => 'a18'
+                },
+                {
+                    'target'  => 'rightFrame',
+                    'text'    => 'Columns',
+                    'href'    => 'columns.pl',
+                    'subtree' => [
+                        {
+                            'target'  => 'rightFrame',
+                            'href'    => 'columnsSource.pl',
+                            'text'    => 'Source',
+                            'subtree' => [],
+                            'id'      => 'a21',
+                            'rid'     => 21
+                        }
+                    ],
+                    'id'  => 'a20',
+                    'rid' => 20
+                }
+            ],
+            'id'  => 'a5',
+            'rid' => 5
+        },
+        {
+            'text'    => 'Kontakt',
+            'href'    => 'mailto:dirk.lze@gmail.com',
+            'subtree' => [],
+            'id'      => 'a22',
+            'rid'     => 22
+        }
+    );
+    saveTree( $dump, \@tree );
+} ## end if ( $#tree == -1 )
 my $zoom = div(
-               {style => "font-size:$m_nSize" . "px;text-align:center;"},
-               a(
-                  {
-                   -href  => './edit.pl?style=Crystal&size=16',
-                   -class => "treeviewLink$m_nSize"
-                  },
-                  '16'
-                )
-                 . '&#160;|&#160;'
-                 . a(
-                     {
-                      -href  => './edit.pl?style=Crystal&size=22',
-                      -class => "treeviewLink$m_nSize"
-                     },
-                     '22'
-                    )
-                 . '&#160;|&#160;'
-                 . a(
-                     {
-                      -href  => './edit.pl?style=Crystal&size=32',
-                      -class => "treeviewLink$m_nSize"
-                     },
-                     '32'
-                    )
-                 . '&#160;|&#160;'
-                 . a(
-                     {
-                      -href  => './edit.pl?style=Crystal&size=48',
-                      -class => "treeviewLink$m_nSize"
-                     },
-                     '48'
-                    )
-              );
+    { style => "font-size:$size" . "px;text-align:center;" },
+    a(
+        {
+            -href  => './edit.pl?style=Crystal&size=16',
+            -class => "treeviewLink$size"
+        },
+        '16'
+      )
+      . '&#160;|&#160;'
+      . a(
+        {
+            -href  => './edit.pl?style=Crystal&size=22',
+            -class => "treeviewLink$size"
+        },
+        '22'
+      )
+      . '&#160;|&#160;'
+      . a(
+        {
+            -href  => './edit.pl?style=Crystal&size=32',
+            -class => "treeviewLink$size"
+        },
+        '32'
+      )
+      . '&#160;|&#160;'
+      . a(
+        {
+            -href  => './edit.pl?style=Crystal&size=48',
+            -class => "treeviewLink$size"
+        },
+        '48'
+      )
+);
 print(
     header(),
     start_html(
@@ -403,20 +394,10 @@ print(
 		  cursor:pointer;
 		}
                |
-                  }
-              ),
+        }
+    ),
     $zoom
-      . br() . qq|
-	  <div class="popup" id="popup" style="display:none;" >
-<div id="popupContent1" class="popupContent1" align="right" >
-<div class="popupCaption" onmousedown="startdrag('popupContent1');">
-<div id="popupTitle" class="popupTitle" style="float:left"></div>
-  <div id="closeButton" class="closeButton">X</div>
-</div>
-<div id="popupContent" class="popupContent"></div>
-</div>
-</div>
-
+      . br() . '
 <div id="moveHere" style="display:none;" class="moveHereContent" width="100px"></div>
 <script language="javascript" type="text/javascript">
 if (typeof document.body.onselectstart!="undefined") //ie
@@ -428,415 +409,397 @@ document.body.onmousedown=function(){return false}
 
 document.body.style.cursor = "default";
 </script>
-<table align="center" class="mainborder" cellpadding="0"  cellspacing="0" summary="mainLayout" ><tr><td align="left">|
-     );
-
+<table align="center" class="mainborder" cellpadding="0"  cellspacing="0" summary="mainLayout" ><tr><td align="left">'
+);
 my $m_nPrid = param('rid');
 $m_nPrid =~ s/^a(.*)/$1/;
-
 SWITCH: {
-    if ($action eq 'newEntry') {
+    if ( $action eq 'newEntry' ) {
         &newEntry();
         last SWITCH;
-    }
-    if ($action eq 'saveTreeviewEntry') {
+    } ## end if ( $action eq 'newEntry')
+    if ( $action eq 'saveTreeviewEntry' ) {
         &saveTreeviewEntry();
         last SWITCH;
-    }
-    if ($action eq 'addTreeviewEntry') {
+    } ## end if ( $action eq 'saveTreeviewEntry')
+    if ( $action eq 'addTreeviewEntry' ) {
         &addTreeviewEntry();
         last SWITCH;
-    }
-    if ($action eq 'editable') {
-        &updateTree(\@m_aTree);
+    } ## end if ( $action eq 'addTreeviewEntry')
+    if ( $action eq 'editable' ) {
+        &updateTree( \@tree );
         TrOver(1);
-        print Tree(\@m_aTree);
+        print Tree( \@tree );
         last SWITCH;
-    }
-    if ($action eq 'editTreeviewEntry') {
+    } ## end if ( $action eq 'editable')
+    if ( $action eq 'editTreeviewEntry' ) {
         &editTreeviewEntry();
         last SWITCH;
-    }
-    if ($action eq 'deleteTreeviewEntry') {
+    } ## end if ( $action eq 'editTreeviewEntry')
+    if ( $action eq 'deleteTreeviewEntry' ) {
         deleteTreeviewEntry();
         last SWITCH;
-    }
-    if ($action eq 'upEntry') {
+    } ## end if ( $action eq 'deleteTreeviewEntry')
+    if ( $action eq 'upEntry' ) {
         &upEntry();
         last SWITCH;
-    }
-    if ($action eq 'downEntry') {
+    } ## end if ( $action eq 'upEntry')
+    if ( $action eq 'downEntry' ) {
         downEntry();
         last SWITCH;
-    }
-    if ($action eq 'MoveTreeViewEntry') {
+    } ## end if ( $action eq 'downEntry')
+    if ( $action eq 'MoveTreeViewEntry' ) {
         MoveTreeViewEntry();
         last SWITCH;
-    }
-    print Tree(\@m_aTree);
-}
-
-print "</td></tr></table>", end_html;
-
-
-sub newTreeviewEntry {
-    &newEntry();
-}
+    } ## end if ( $action eq 'MoveTreeViewEntry')
+    print Tree( \@tree );
+} ## end SWITCH:
+print "$m_sContent</td></tr></table>", end_html;
 
 sub saveTreeviewEntry {
     &load();
-    &saveEntry(\@m_aTree, $m_nPrid);
-    _Tree();
-}
+    &saveEntry( \@tree, $m_nPrid );
+    &updateTree( \@tree );
+    TrOver(1);
+    $m_sContent .= br();
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
+    TrOver(0);
+} ## end sub saveTreeviewEntry
 
 sub addTreeviewEntry {
     &load();
-    &addEntry(\@m_aTree, $m_nPrid);
-    _Tree();
-}
+    &addEntry( \@tree, $m_nPrid );
+    &updateTree( \@tree );
+    TrOver(1);
+    $m_sContent .= br();
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
+    TrOver(0);
+} ## end sub addTreeviewEntry
 
 sub editTreeview {
     &load();
     &rid();
-    saveTree($m_sDump, \@m_aTree);
-    _Tree();
-}
-
-sub _Tree {
-    &updateTree(\@m_aTree);
+    saveTree( $dump, \@tree );
+    &updateTree( \@tree );
     TrOver(1);
-
-    print
-      qq(<div align="center"><form action="$ENV{SCRIPT_NAME}" method="POST" accept-charset="UTF-8"><input type="hidden" name="action" value="deleteTreeviewEntrys"/><table class="marginTop"><tr><td>);
-
-    print table(
-                {
-                 align => 'center',
-                 width => '100%'
-                },
-                Tr(td(Tree(\@m_aTree)))
-               );
-    my $delete   = 'delete';
-    my $mmark    = 'selected';
-    my $markAll  = 'select_all';
-    my $umarkAll = 'unselect_all';
-    my $rebuild  = 'rebuild';
-    print
-      qq{</td></tr><tr><td><table align="center" border="0" cellpadding="0"  cellspacing="0" summary="layout" width="100%" ><tr><td style="padding-left:18px;text-align:left;"><a id="markAll" href="javascript:markInput(true);" class="links">$markAll</a><a class="links" id="umarkAll" style="display:none;" href="javascript:markInput(false);">$umarkAll</a></td><td align="right"><select  name="MultipleRebuild"  onchange="if(this.value != '$mmark' )submitForm(this.form,'links','links')"><option  value="$mmark" selected="selected">$mmark</option><option value="delete">$delete</option></select></td></tr></table></td></tr></table></div>};
+    $m_sContent .= br();
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
     TrOver(0);
-    undef @m_aTree;
-}
+} ## end sub editTreeview
 
 sub editTreeviewEntry {
     &load();
-    &editEntry(\@m_aTree, $m_nPrid);
-}
+    &editEntry( \@tree, $m_nPrid );
+} ## end sub editTreeviewEntry
 
 sub deleteTreeviewEntry {
     &load();
-    &deleteEntry(\@m_aTree, $m_nPrid);
-    _Tree();
-}
+    &deleteEntry( \@tree, $m_nPrid );
+    &updateTree( \@tree );
+    TrOver(1);
+    $m_sContent .= br();
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
+    TrOver(0);
+} ## end sub deleteTreeviewEntry
 
 sub upEntry {
     &load();
-    &sortUp(\@m_aTree, $m_nPrid);
-    _Tree();
-}
+    &sortUp( \@tree, $m_nPrid );
+    &updateTree( \@tree );
+    TrOver(1);
+    $m_sContent .= br();
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
+    TrOver(0);
+} ## end sub upEntry
 
 sub MoveTreeViewEntry {
     &load();
-    my $from = param('from');
-    $from =~ s/^a(\d+)/$1/;
-    my $to = param('to');
-    $to =~ s/^a(\d+)/$1/;
-    &getEntry(\@m_aTree, $from, $to);
+    my $f = param('from');
+    $f =~ s/^a(.*)/$1/;
+    my $t = param('to');
+    $t =~ s/^a(.*)/$1/;
+    &getEntry( \@tree, $f, $t );
     &rid();
-    saveTree($m_sDump, \@m_aTree);
-    _Tree();
-}
+    saveTree( $dump, \@tree );
+    &updateTree( \@tree );
+    TrOver(1);
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
+    TrOver(0);
+} ## end sub MoveTreeViewEntry
 
 sub moveEntry {
     my $t    = shift;
     my $find = shift;
-    for (my $i = 0 ; $i <= @$t ; $i++) {
-        next if ref @$t[$i] ne 'HASH';
-        if (@$t[$i]) {
-            if (@$t[$i]->{rid} eq $find) {
-                splice @$tempDeleteRef, $deleteTempIndex, 1;
-                splice @$t, $i, 0, $m_hrTempNode;
+    for ( my $i = 0 ; $i <= @$t ; $i++ ) {
+        next if ref @$t[$i] ne "HASH";
+        if ( @$t[$i] ) {
+            if ( @$t[$i]->{rid} == $find && defined $tN->{id} ) {
+                splice @$t, $i, 0, $tN;
                 return 1;
-            }
-            no warnings;
-            if (ref @$t[$i]->{subtree} eq 'ARRAY') {
-               moveEntry(\@{@$t[$i]->{subtree}}, $find);
-            }
-        }
-    }
-}
+            } ## end if ( @$t[$i]->{rid} ==...)
+            if ( defined @{ @$t[$i]->{subtree} } ) {
+                moveEntry( \@{ @$t[$i]->{subtree} }, $find );
+            } ## end if ( defined @{ @$t[$i...]})
+        } ## end if ( @$t[$i] )
+    } ## end for ( my $i = 0 ; $i <=...)
+} ## end sub moveEntry
 
 sub getEntry {
     my $t    = shift;
     my $find = shift;
     my $goto = shift;
-    for (my $i = 0 ; $i < @$t ; $i++) {
-        next if ref @$t[$i] ne 'HASH';
-        no warnings;
-        if (@$t[$i]->{rid} eq $find) {
-            undef $m_hrTempNode;
-            foreach (keys %{@$t[$i]}) {
-                $m_hrTempNode->{$_} = @$t[$i]->{$_};
-            }
-            $tempDeleteRef = $t;
-            $deleteTempIndex = $i;
-            moveEntry(\@m_aTree, $goto);
-            
-        } elsif (ref @$t[$i]->{subtree} eq 'ARRAY') {
-            getEntry(\@{@$t[$i]->{subtree}}, $find, $goto);
-        }
-    }
-}
+    for ( my $i = 0 ; $i < @$t ; $i++ ) {
+        next if ref @$t[$i] ne "HASH";
+        if ( @$t[$i]->{rid} == $find ) {
+            $tN->{$_} = @$t[$i]->{$_} foreach keys %{ @$t[$i] };
+            splice @$t, $i, 1;
+            moveEntry( \@tree, $goto );
+        } elsif ( defined @{ @$t[$i]->{subtree} } ) {
+            getEntry( \@{ @$t[$i]->{subtree} }, $find, $goto );
+        } ## end elsif ( defined @{ @$t[$i...]})
+    } ## end for ( my $i = 0 ; $i < ...)
+} ## end sub getEntry
 
 sub downEntry {
     &load();
     $down = 1;
-    &sortUp(\@m_aTree, $m_nPrid);
-    &updateTree(\@m_aTree);
-    _Tree();
-}
+    &sortUp( \@tree, $m_nPrid );
+    &updateTree( \@tree );
+    TrOver(1);
+    $m_sContent .= table(
+        {
+            align => 'center',
+            width => '*'
+        },
+        Tr( td( Tree( \@tree ) ) )
+    );
+    TrOver(0);
+} ## end sub downEntry
 
 sub newEntry {
-    my $value = param('title') ? param('title') : '';
-    my $push = '';
-
-    if (param('addBookMark')) {
-        &load();
-        &rid();
-        saveTree($m_sDump, \@m_aTree);
-        $m_nPrid = $m_nRid;
-        $push    = '<input type="hidden" name="addBookMark" value="addBookMark"/>';
-    }
-    my $new = 'newEntry';
-    print qq(
-<div align="center" class="marginTop">
-<b>$new</b>
-<form action="$ENV{SCRIPT_NAME}" onsubmit="submitForm(this,'addTreeviewEntry','addTreeviewEntry');return false;">
-<input type="hidden" name="rid" value="a$m_nPrid"/>$push<br/>
-<table align="center" class="mainborder" cellpadding="2"  cellspacing="2" summary="mainLayolut">
-<tr><td>) . 'txt' . qq(</td><td><input type="text" value="$value" name="text"/></td></tr>
-<tr><td>) . 'folder' . qq(</td><td><input type="checkbox" name="folder"/></td></tr>);
-
+    $m_sContent .=
+qq(<b>New Entry</b><form action="$ENV{SCRIPT_NAME}#a$m_nPrid"><br/><table align="center" class="mainborder" cellpadding="2"  cellspacing="2" summary="mainLayolut"><tr><td>Text:</td><td><input type="text" value="" name="text"></td></tr><tr><td>Folder</td><td><input type="checkbox" name="folder" /></td></tr>);
     my $node = help();
-
-    foreach my $key (sort keys %{$node}) {
-        $value = "";
-        $value = param('addBookMark') if ($key eq 'href' && param('addBookMark'));
-        $value = param('title') if ($key eq 'title' && param('title'));
-        $value = 'a' . $m_nPrid if ($key eq 'id' && param('addBookMark'));
-        print
-          qq(<tr><td></td><td>$node->{$key}</td></tr><tr><td>$key :</td><td><input type="text" value="$value" name="$key" id="$key"/><br/></td></tr>)
-          unless $disallowedKeys{$key};
-    }
-    print
-      qq|<tr><td><input type="hidden" name="action" value="addTreeviewEntry"/></td><td><input type="submit"/></td></tr></table></form></div>|;
-}
+    foreach my $key ( sort( keys %{$node} ) ) {
+        $m_sContent .= qq(<tr><td></td><td>$node->{$key}</td></tr><tr><td>$key :</td><td><input type="text" value="" name="$key"/><br/></td></tr>)
+          if ( $key ne 'class' );
+    } ## end foreach my $key ( sort( keys...))
+    $m_sContent .=
+        '<tr><td><input type="hidden" name="action" value="addTreeviewEntry"/><input type="hidden" name="rid" value="a'
+      . $m_nPrid
+      . '"></td><td><input type="submit"/></td></tr></table></form>';
+} ## end sub newEntry
 
 sub addEntry {
     my $t    = shift;
     my $find = shift;
-    $find = $find ? $find : 1;
-    for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
-        if (@$t[$i]->{rid} eq $find) {
+    for ( my $i = 0 ; $i < @$t ; $i++ ) {
+        if ( @$t[$i]->{rid} == $find ) {
             my %params = Vars();
             my $node   = {};
-            foreach my $key (sort(keys %params)) {
-                $node->{$key} = $params{$key} unless $disallowedKeys{$key};
-                $node->{$key} =
-                  "$ENV{SCRIPT_NAME}?action=$1"
-                  if ($key eq 'href' && $params{$key} =~ /^action:\/\/(.*)$/);
-            }
-            if (param('folder')) {
+            foreach my $key ( sort( keys %params ) ) {
+                $node->{$key} = $params{$key}
+                  if ( $params{$key}
+                    && $key ne 'action'
+                    && $key ne 'folder'
+                    && $key ne 'subtree'
+                    && $key ne 'class'
+                    && $key ne 'dump' );
+                $node->{$key} = "$ENV{SCRIPT_NAME}?action=$1"
+                  if ( $key eq 'href' && $params{$key} =~ /^action:\/\/(.*)$/ );
+            } ## end foreach my $key ( sort( keys...))
+            if ( param('folder') ) {
                 $node->{'subtree'} = [
-                                      {
-                                       text => 'Empty Folder',
-                                      }
-                                     ];
-            }
-            if (param('addBookMark')) {
-                unless ($node->{'text'} eq $m_aTree[$#m_aTree]->{'text'}) {
-                    push @$t, $node;
-                    &rid();
-                    saveTree($m_sDump, \@m_aTree);
-                    return;
-                }
-            }
+                    {
+                        text => 'Empty Folder',
+                    }
+                ];
+            } ## end if ( param('folder') )
             splice @$t, $i, 0, $node;
             &rid();
-            saveTree($m_sDump, \@m_aTree);
+            saveTree( $dump, \@tree );
             return;
-        } elsif (ref @$t[$i]->{subtree} eq 'ARRAY') {
-            &addEntry(\@{@$t[$i]->{subtree}}, $find);
-        }
-    }
-}
+        } elsif ( defined @{ @$t[$i]->{subtree} } ) {
+            &addEntry( \@{ @$t[$i]->{subtree} }, $find );
+        } ## end elsif ( defined @{ @$t[$i...]})
+    } ## end for ( my $i = 0 ; $i < ...)
+} ## end sub addEntry
 
 sub saveEntry {
     my $t    = shift;
     my $find = shift;
-    for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
-        if (@$t[$i]->{rid} eq $find) {
+    for ( my $i = 0 ; $i < @$t ; $i++ ) {
+        if ( @$t[$i]->{rid} == $find ) {
             my %params = Vars();
-            foreach my $key (keys %params) {
-                @$t[$i]->{$key} = $params{$key} unless $disallowedKeys{$key};
-                @$t[$i]->{$key} =
-                  "$ENV{SCRIPT_NAME}?action=$1"
-                  if ($key eq 'href' && $params{$key} =~ /^action:\/\/(.*)$/);
-            }
-            &saveTree($m_sDump, \@m_aTree);
+            foreach my $key ( sort keys %params ) {
+                @$t[$i]->{$key} = $params{$key}
+                  if ( $params{$key}
+                    && $key ne 'action'
+                    && $key ne 'folder'
+                    && $key ne 'subtree'
+                    && $key ne 'class'
+                    && $key ne 'dump' );
+                @$t[$i]->{$key} = "$ENV{SCRIPT_NAME}?action=$1"
+                  if ( $key eq 'href' && $params{$key} =~ /^action:\/\/(.*)$/ );
+            } ## end foreach my $key ( sort keys...)
+            saveTree( $dump, \@tree );
             return;
-        } elsif (ref @$t[$i]->{subtree} eq 'ARRAY') {
-            &saveEntry(\@{@$t[$i]->{subtree}}, $find);
-        }
-    }
-}
+        } elsif ( defined @{ @$t[$i]->{subtree} } ) {
+            &saveEntry( \@{ @$t[$i]->{subtree} }, $find );
+        } ## end elsif ( defined @{ @$t[$i...]})
+    } ## end for ( my $i = 0 ; $i < ...)
+} ## end sub saveEntry
 
 sub editEntry {
     my $t    = shift;
     my $find = shift;
-    my $href = "submitForm(this ,'editTreeviewEntry','editTreeviewEntry');return false;";
-    my $node = help();
-    for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
-        if (@$t[$i]->{rid} eq $find) {
-            print '<div align="center" class="marginTop"><b>'
+    my $href = "$ENV{SCRIPT_NAME}?action=editTreeviewEntry";
+    for ( my $i = 0 ; $i < @$t ; $i++ ) {
+        if ( @$t[$i]->{rid} == $find ) {
+            $m_sContent .= br();
+            $m_sContent .= "<b>"
               . @$t[$i]->{text}
-              . '</b><form onsubmit="'
+              . '</b><form action="'
               . $href
-              . '"><table align=" center " class=" mainborder " cellpadding="0"  cellspacing="0" summary="mainLayolut">';
-            print qq(<tr><td>)
-              . 'txt'
-              . qq(</td><td><input type="text" value="@$t[$i]->{text}" name="text" /></td></tr>);
-            print qq(<tr><td>)
-              . 'right'
-              . qq(</td><td><input type="text" value="@$t[$i]->{right}" name="right" /></td></tr>);
-            foreach my $key2 (
-                sort {
-                    return $a cmp $b if @$t[$i]->{$a} && @$t[$i]->{$b};
-                    return -1        if @$t[$i]->{$a};
-                    return +1        if @$t[$i]->{$b};
-                    return $a cmp $b;
-                } keys %{$node}
-              ) {
-                unless ($disallowedKeys{$key2}) {
-                    print
-                      qq(<tr><td></td><td>$node->{$key2}</td></tr><tr><td>$key2 :</td><td><input type="text" value="@$t[$i]->{$key2}" name="$key2"/><br/></td></tr>);
-                }
-            }
-            print
-              qq(<tr><td><input type="hidden" name="action" value="saveTreeviewEntry"/><input type="hidden" name="rid" value="@$t[$i]->{rid}"/></td><td><input type="submit" value="save"/></td></tr></table></form></div>);
-            saveTree($m_sDump, \@m_aTree);
+              . "#a$m_nPrid"
+              . '><table align=" center " class=" mainborder " cellpadding="0"  cellspacing="0" summary="mainLayolut">';
+            language('de') if $ENV{HTTP_ACCEPT_LANGUAGE} =~ /^de.*/;
+            my $node = help();
+            foreach my $key ( sort( keys %{ @$t[$i] } ) ) {
+                $m_sContent .= "<tr><td></td><td>$node->{$key}</td></tr>"
+                  if ( defined $node->{$key} );
+                $m_sContent .= qq(<tr><td>$key </td><td><input type="text" value="@$t[$i]->{$key}" name="$key"></td></tr>)
+                  if ( $key ne 'subtree'
+                    && $key ne 'rid'
+                    && $key ne 'action'
+                    && $key ne 'dump'
+                    && $key ne 'class'
+                    && $key ne 'addition' );
+            } ## end foreach my $key ( sort( keys...))
+            foreach my $key2 ( sort( keys %{$node} ) ) {
+                unless ( defined @$t[$i]->{$key2} ) {
+                    $m_sContent .=
+                      qq(<tr><td></td><td>$node->{$key2}</td></tr><tr><td>$key2 :</td><td><input type="text" value="" name="$key2"/><br/></td></tr>);
+                } ## end unless ( defined @$t[$i]->...)
+            } ## end foreach my $key2 ( sort( keys...))
+            $m_sContent .=
+qq(<tr><td><input type="hidden" name="action" value="saveTreeviewEntry"/><input type="hidden" name="rid" value="@$t[$i]->{id}"/></td><td><input type="submit" value="save"/></td></tr></table></form>);
+            saveTree( $dump, \@tree );
             return;
-        } elsif (ref @$t[$i]->{subtree} eq 'ARRAY') {
-            &editEntry(\@{@$t[$i]->{subtree}}, $find);
-        }
-    }
-}
+        } elsif ( defined @{ @$t[$i]->{subtree} } ) {
+            &editEntry( \@{ @$t[$i]->{subtree} }, $find );
+        } ## end elsif ( defined @{ @$t[$i...]})
+    } ## end for ( my $i = 0 ; $i < ...)
+} ## end sub editEntry
 
 sub sortUp {
     my $t    = shift;
     my $find = shift;
-    for (my $i = 0 ; $i <= @$t ; $i++) {
-        no warnings;
-        if (defined @$t[$i]) {
-            if (@$t[$i]->{rid} eq $find) {
+    for ( my $i = 0 ; $i <= @$t ; $i++ ) {
+        if ( defined @$t[$i] ) {
+            if ( @$t[$i]->{rid} == $find ) {
                 $i++ if ($down);
-                return if (($down && $i eq @$t) or (!$down && $i eq 0));
-                splice @$t, $i - 1, 2, (@$t[$i], @$t[$i - 1]);
-                saveTree($m_sDump, \@m_aTree);
-            }
-            if (ref @$t[$i]->{subtree} eq 'ARRAY') {
-                sortUp(\@{@$t[$i]->{subtree}}, $find);
-                saveTree($m_sDump, \@m_aTree);
-            }
-        }
-    }
-}
+                return if ( ( $down && $i == @$t ) or ( !$down && $i == 0 ) );
+                splice @$t, $i - 1, 2, ( @$t[$i], @$t[ $i - 1 ] );
+                saveTree( $dump, \@tree );
+            } ## end if ( @$t[$i]->{rid} ==...)
+            if ( defined @{ @$t[$i]->{subtree} } ) {
+                sortUp( \@{ @$t[$i]->{subtree} }, $find );
+                saveTree( $dump, \@tree );
+            } ## end if ( defined @{ @$t[$i...]})
+        } ## end if ( defined @$t[$i] )
+    } ## end for ( my $i = 0 ; $i <=...)
+} ## end sub sortUp
 
 sub deleteEntry {
     my $t    = shift;
     my $find = shift;
-    for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
-        if (@$t[$i]->{rid} eq $find) {
+    for ( my $i = 0 ; $i < @$t ; $i++ ) {
+        if ( @$t[$i]->{rid} == $find ) {
             splice @$t, $i, 1;
-            saveTree($m_sDump, \@m_aTree);
-        } elsif (ref @$t[$i]->{subtree} eq 'ARRAY') {
-            deleteEntry(\@{@$t[$i]->{subtree}}, $find);
-        }
-    }
-}
+            saveTree( $dump, \@tree );
+        } elsif ( defined @{ @$t[$i]->{subtree} } ) {
+            deleteEntry( \@{ @$t[$i]->{subtree} }, $find );
+        } ## end elsif ( defined @{ @$t[$i...]})
+    } ## end for ( my $i = 0 ; $i < ...)
+} ## end sub deleteEntry
 
 sub updateTree {
     my $t = shift;
-    for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
-        if (defined @$t[$i]) {
-            @$t[$i]->{onmouseup} = 'confirmMove()';
-
-            #             @$t[$i]->{id}          = @$t[$i]->{id};
-            @$t[$i]->{name}        = @$t[$i]->{id};
+    for ( my $i = 0 ; $i < @$t ; $i++ ) {
+        if ( defined @$t[$i] ) {
+            @$t[$i]->{onmouseup}   = "confirmMove()";
+            @$t[$i]->{id}          = @$t[$i]->{id};
+            @$t[$i]->{name}        = @$t[$i]->{rid};
             @$t[$i]->{onmousedown} = "prepareMove('" . @$t[$i]->{id} . "')";
             @$t[$i]->{onmousemove} = "enableDropZone('" . @$t[$i]->{id} . "')";
             @$t[$i]->{onmouseout}  = "disableDropZone('" . @$t[$i]->{id} . "')";
-            my $nPrevId = 'a' . (@$t[$i]->{rid} - 1);
-            @$t[$i]->{addition} =
-              qq|<table border="0" cellpadding="0" cellspacing="0" align="right" summary="layout"><tr>
-<td><a class="treeviewLink$m_nSize" target="_blank" title="@$t[$i]->{text}" href="@$t[$i]->{href}"><img src="/style/$m_sStyle/$m_nSize/mimetypes/www.png" border="0" alt=""></a></td>
-<td><a class="treeviewLink$m_nSize" href="$ENV{SCRIPT_NAME}?action=editTreeviewEntry&rid=@$t[$i]->{rid}"><img src="/style/$m_sStyle/$m_nSize/mimetypes/edit.png" border="0" alt="edit"></a></td><td><a class="treeviewLink$m_nSize" onclick="location.href='$ENV{SCRIPT_NAME}?action=deleteTreeviewEntry&rid=@$t[$i]->{rid}'"><img src="/style/$m_sStyle/$m_nSize/mimetypes/editdelete.png" border="0" alt="delete"></a></td><td><a class="treeviewLink$m_nSize" href="$ENV{SCRIPT_NAME}?action=upEntry&rid=@$t[$i]->{rid}#@$t[$i]->{id}"><img src="/style/$m_sStyle/$m_nSize/mimetypes/up.png" border="0" alt="up"></a></td><td><a class="treeviewLink$m_nSize" href="$ENV{SCRIPT_NAME}?action=downEntry&rid=@$t[$i]->{rid}"><img src="/style/$m_sStyle/$m_nSize/mimetypes/down.png" border="0" alt="down"></a></td><td><a class="treeviewLink$m_nSize" href="$ENV{SCRIPT_NAME}?action=newTreeviewEntry&rid=@$t[$i]->{rid}"><img src="/style/$m_sStyle/$m_nSize/mimetypes/filenew.png" border="0" alt="new"></a></td><td><input type="checkbox" name="markBox$i" class="markBox" value="@$t[$i]->{rid}" /></td></tr></table>|;
+            @$t[$i]->{addition}    = qq(<table border="0" cellpadding="0" cellspacing="0" align="right" summary="layout"><tr>
+<td><a class="treeviewLink$size" target="_blank" title="@$t[$i]->{text}" href="@$t[$i]->{href}"><img src="/style/$m_sStyle/$size/mimetypes/www.png" border="0" alt=""/></a></td>
+<td ><a class="treeviewLink$size" href="$ENV{SCRIPT_NAME}?action=editTreeviewEntry&amp;rid=@$t[$i]->{id}"><img src="/style/$m_sStyle/$size/mimetypes/edit.png" border="0" alt="edit"/></a></td><td><a class="treeviewLink$size" href="$ENV{SCRIPT_NAME}?action=deleteTreeviewEntry&amp;rid=@$t[$i]->{id}"><img src="/style/$m_sStyle/$size/mimetypes/editdelete.png" border="0" alt="delete"/></a></td><td><a class="treeviewLink$size" href="$ENV{SCRIPT_NAME}?action=upEntry&amp;rid=@$t[$i]->{id}#@$t[$i]->{id}"><img src="/style/$m_sStyle/$size/mimetypes/up.png" border="0" alt="up"/></a></td><td><a class="treeviewLink$size" href="$ENV{SCRIPT_NAME}?action=downEntry&amp;rid=@$t[$i]->{id}#@$t[$i]->{id}"><img src="/style/$m_sStyle/$size/mimetypes/down.png" border="0" alt="down"/></a></td><td><a class="treeviewLink$size" href="$ENV{SCRIPT_NAME}?action=newEntry&amp;rid=@$t[$i]->{id}"><img src="/style/$m_sStyle/$size/mimetypes/filenew.png" border="0" alt="new"/></a></td></tr></table>);
             @$t[$i]->{href} = '';
-            updateTree(\@{@$t[$i]->{subtree}}) if (ref @$t[$i]->{subtree} eq 'ARRAY');
-        }
-    }
-}
+            updateTree( \@{ @$t[$i]->{subtree} } ) if ( defined @{ @$t[$i]->{subtree} } );
+        } ## end if ( defined @$t[$i] )
+    } ## end for ( my $i = 0 ; $i < ...)
+} ## end sub updateTree
 
 sub rid {
     no warnings;
     $m_nRid = 0;
-    &getRid(\@m_aTree);
+    &getRid( \@tree );
 
     sub getRid {
         my $t = shift;
-        for (my $i = 0 ; $i < @$t ; $i++) {
+        for ( my $i = 0 ; $i < @$t ; $i++ ) {
             $m_nRid++;
-            next unless ref @$t[$i] eq 'HASH';
+            next unless ref @$t[$i] eq "HASH";
             @$t[$i]->{rid} = $m_nRid;
             @$t[$i]->{id}  = "a$m_nRid";
-            getRid(\@{@$t[$i]->{subtree}}) if (ref @$t[$i]->{subtree} eq 'ARRAY');
-        }
-    }
-}
+            getRid( \@{ @$t[$i]->{subtree} } ) if ( defined @{ @$t[$i]->{subtree} } );
+        } ## end for ( my $i = 0 ; $i < ...)
+    } ## end sub getRid
+} ## end sub rid
 
 sub load {
-    if (-e $m_sDump) {
-        loadTree($m_sDump);
-        *m_aTree = \@{$HTML::Menu::TreeView::TreeView[0]};
-    }
-}
-
-sub deleteTreeviewEntrys {
-    &load();
-    my @params = param();
-
-    for (my $i = 0 ; $i <= $#params ; $i++) {
-        if ($params[$i] =~ /markBox\d?/) {
-
-            my $id = param($params[$i]);
-            &deleteEntry(\@m_aTree, $id);
-
-        }
-    }
-    editTreeview();
-}
+    if ( -e $dump ) {
+        loadTree($dump);
+        *tree = \@{ $HTML::Menu::TreeView::TreeView[0] };
+    } ## end if ( -e $dump )
+} ## end sub load
 1;

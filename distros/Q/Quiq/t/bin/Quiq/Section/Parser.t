@@ -26,7 +26,7 @@ sub test_unitTest_statistic : Ignore(1) {
     $self->is(ref($par),'Quiq::Section::Parser');
 
     my @files = Quiq::Path->find('yeah',
-        -type=>'f',
+        -type => 'f',
     );
     for my $file (@files) {
         $par->parse($file);

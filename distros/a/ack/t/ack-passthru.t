@@ -50,6 +50,9 @@ SKIP: {
     is( scalar @escaped_lines, 2, 'Only two lines are highlighted' );
 }
 
+done_testing();
+exit 0;
+
 __DATA__
 Four score and seven years ago our fathers brought forth on this
 continent, a new nation, conceived in Liberty, and dedicated to the

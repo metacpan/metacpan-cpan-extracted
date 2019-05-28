@@ -919,6 +919,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+SIGNATURE
 t/01-Treeview.t
 t/02-Treeview.t
 t/03-Treeview.t

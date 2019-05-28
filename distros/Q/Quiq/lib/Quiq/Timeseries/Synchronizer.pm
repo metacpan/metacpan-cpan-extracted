@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Array;
@@ -31,15 +31,15 @@ Instantiiere Objekt, vereinbare Zeitraster und Werte
 
     my $tsy = Quiq::Timeseries::Synchronizer->new(600,
         qw/Temperature Windspeed/,
-        -geoCoordinates=>1, # $latitude,$longitude bei add()
-        -offset=>300,
+        -geoCoordinates => 1, # $latitude,$longitude bei add()
+        -offset => 300,
     );
 
 Füge Temperatur-Daten hinzu
 
     for my $row (Temperature->select($db,@where)) {
         $tsy->add($row->time,$row->latitude,$row->longitude,
-            Temperature=>$row->value,
+            Temperature => $row->value,
         );
     }
 
@@ -47,16 +47,16 @@ Füge Windgeschwindigkeits-Daten hinzu
 
     for my $row (WindSpeed->select($db,@where)) {
         $tsy->add($row->time,$row->latitude,$row->longitude,
-            Windspeed=>$row->value,
+            Windspeed => $row->value,
         );
     }
 
 Generiere Tabelle mit Daten
 
     my ($titleA,$rowA) = $tsy->rows(
-        Temperature=>[roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
-        WindSpeed=>[roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
-        -noValue=>'NULL',
+        Temperature => [roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
+        WindSpeed => [roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
+        -noValue => 'NULL',
     );
 
 Die resultierende Tabelle besitzt folgende Kolumnen:
@@ -81,7 +81,7 @@ Intervallbreite wird in Sekunden angegeben.
 
 legt das Zeitraster auf 0, 10, 20, 30, 40, 50 Minuten.
 
-    $interval = 600, -offset=>300
+    $interval = 600, -offset => 300
 
 legt das Zeitraster auf 5, 15, 25, 35, 45, 55 Minuten.
 
@@ -153,11 +153,11 @@ sub new {
     my $window;
 
     Quiq::Option->extract(\@_,
-        -geoCoordinates=>\$geoCoordinates,
-        -maxTime=>\$maxTime,
-        -minTime=>\$minTime,
-        -offset=>\$offset,
-        -window=>\$window,
+        -geoCoordinates => \$geoCoordinates,
+        -maxTime => \$maxTime,
+        -minTime => \$minTime,
+        -offset => \$offset,
+        -window => \$window,
     );
 
     # Parameter-Liste
@@ -168,9 +168,9 @@ sub new {
     if ($window) {
         if ($window > $interval/2) {
             $class->throw(
-                q~TSYNC-00099: Windowbreite groesser Intervallbreite~,
-                WindowWidth=>$window,
-                IntervalWidth=>$interval,
+                'TSYNC-00099: Windowbreite groesser Intervallbreite',
+                WindowWidth => $window,
+                IntervalWidth => $interval,
             );
         }
     }
@@ -178,15 +178,15 @@ sub new {
     # Objekt instantiieren
 
     my $self = $class->SUPER::new(
-        geoCoordinates=>$geoCoordinates,
-        interval=>$interval,
-        maxTime=>$maxTime,
-        minTime=>$minTime,
-        offset=>$offset,
-        window=>$window,
-        raster=>{},
-        paramArr=>\@_,
-        paramHash=>\%paramHash,
+        geoCoordinates => $geoCoordinates,
+        interval => $interval,
+        maxTime => $maxTime,
+        minTime => $minTime,
+        offset => $offset,
+        window => $window,
+        raster => {},
+        paramArr => \@_,
+        paramHash => \%paramHash,
     );
     $self->lockKeys;
 
@@ -261,8 +261,8 @@ sub add {
 
         if (!$paramHash->{$param}) {
             $self->throw(
-                q~TSYNC-00099: Unbekannter Parameter~,
-                Parameter=>$param,
+                'TSYNC-00099: Unbekannter Parameter',
+                Parameter => $param,
             );
         }
 
@@ -355,7 +355,7 @@ sub parameters {
 =head4 Synopsis
 
     [$titleA,$rowA] = $tsy->rows(
-        $param=>[$paramOpt=>$val,...],
+        $param => [$paramOpt=>$val,...],
         ...,
         @opt,
     );
@@ -436,8 +436,8 @@ sub rows {
     my $timeFormat = 'yyyymmddhhmmss';
 
     Quiq::Option->extract(\@_,
-        -noValue=>\$noValue,
-        -timeFormat=>\$timeFormat,
+        -noValue => \$noValue,
+        -timeFormat => \$timeFormat,
     );
 
     # Objektattribute
@@ -453,8 +453,8 @@ sub rows {
 
         unless ($paramHash->{$param}) {
             $self->throw(
-                q~TSYNC-00099: Unbekannter Parameter~,
-                Parameter=>$param,
+                'TSYNC-00099: Unbekannter Parameter',
+                Parameter => $param,
             );
         }
     }
@@ -504,8 +504,8 @@ sub rows {
             }
             else {
                 $self->throw(
-                    q~TSYNC-00099: Unbekannte Parameter-Option~,
-                    Option=>$opt,
+                    'TSYNC-00099: Unbekannte Parameter-Option',
+                    Option => $opt,
                 );
             }
         }
@@ -589,8 +589,8 @@ sub rows {
                 }
                 else {
                     $self->throw(
-                        q~TSYNC-00099: Unbekannte Parameter-Option~,
-                        Option=>$opt,
+                        'TSYNC-00099: Unbekannte Parameter-Option',
+                        Option => $opt,
                     );
                 }
 
@@ -611,7 +611,7 @@ sub rows {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -17,10 +17,16 @@ lib/Pcore/Ext/App/Class/Ctx/Raw.pm
 lib/Pcore/Ext/App/Class/Ctx/Type.pm
 lib/Pcore/Ext/App/Class/TiedResolver.pm
 lib/Pcore/Ext/Lib/classic/README.txt
+lib/Pcore/Ext/Lib/core/Mixin.pm
 lib/Pcore/Ext/Lib/core/README.txt
+lib/Pcore/Ext/Lib/core/Util.pm
 lib/Pcore/Ext/Lib/core/Viewport.pm
 lib/Pcore/Ext/Lib/modern/AmCharts4.pm
+lib/Pcore/Ext/Lib/modern/Form/Auth.pm
+lib/Pcore/Ext/Lib/modern/Form/ChangePassword.pm
+lib/Pcore/Ext/Lib/modern/Form/ConnectionError.pm
 lib/Pcore/Ext/Lib/modern/Link.pm
+lib/Pcore/Ext/Lib/modern/Menu.pm
 lib/Pcore/Ext/Lib/modern/PDF.pm
 lib/Pcore/Ext/Lib/modern/Plugin.pm
 lib/Pcore/Ext/Overrides/classic.pm

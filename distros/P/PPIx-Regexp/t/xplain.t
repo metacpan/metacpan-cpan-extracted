@@ -225,7 +225,7 @@ xplain(  'Anything but a hexadecimal digit' );
 note     'PPIx::Regexp::Token::CharClass::Simple';
 
 parse(
-    '/.\\C\\D\\H\\N\\R\\S\\V\\W\\X\\d\\h\\s\\v\\w\\P{Upper}\\p{Upper}/'
+    '/.\\C\\D\\H\\N\\R\\S\\V\\W\\X\\d\\h\\s\\v\\w\\P{Upper}\\p{Upper}\\p{Script=<\A(?:Latin|Greek)\z>}/'
 );
 value(   failures => [], 0 );
 choose(  child => 1, child => 0 );
@@ -279,6 +279,9 @@ xplain(  'Match character without Unicode or custom property \'Upper\'' );
 choose(  child => 1, child => 16 );
 klass(   'PPIx::Regexp::Token::CharClass::Simple' );
 xplain(  'Match character with Unicode or custom property \'Upper\'' );
+choose(  child => 1, child => 17 );
+klass(   'PPIx::Regexp::Token::CharClass::Simple' );
+xplain(  'Match character with Unicode wildcard property \'Script=<\A(?:Latin|Greek)\z>\'' );
 
 note     'PPIx::Regexp::Token::Code';
 

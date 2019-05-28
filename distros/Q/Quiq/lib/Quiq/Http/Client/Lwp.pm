@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use LWP::UserAgent ();
@@ -82,11 +82,11 @@ sub get {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -debug=>\$debug,
-            -header=>\$header,
-            -redirect=>\$redirect,
-            -sloppy=>\$sloppy,
-            -timeout=>\$timeout,
+            -debug => \$debug,
+            -header => \$header,
+            -redirect => \$redirect,
+            -sloppy => \$sloppy,
+            -timeout => \$timeout,
         );
     }
 
@@ -104,9 +104,9 @@ sub get {
     my $res = $redirect? $ua->request($req): $ua->simple_request($req);
     if ($res->is_error && !$sloppy) {
         $class->throw(
-            q~HTTP-00001: GET Request failed~,
-            Url=>$url,
-            StatusLine=>$res->status_line,
+            'HTTP-00001: GET Request failed',
+            Url => $url,
+            StatusLine => $res->status_line,
         );
     }
 
@@ -117,7 +117,7 @@ sub get {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -1,4 +1,9 @@
+1.0.1     2019-05-28 10:03:29+01:00 Europe/London
+ - skip tests against old Mojolicious, fixes #129661, thanks SREZIC
+   for the report
+
 1.0.0     2019-05-23 10:56:17+01:00 Europe/London
+ - first public release
 
 0.003     2019-01-29 12:40:04+00:00 Europe/London
  - make it work under 5.16

@@ -12,13 +12,19 @@ my $pkgcounter = 0;
 sub make_pkg {
     my ($args) = @_;
     my $requirements = $args->{requires} || [];
+    my $min_versions = $args->{min_versions} || {};
     my @parts = map { "Code::Style::Kit::Parts::$_" } @{ $args->{parts} || [] };
     my $options = $args->{options} || [];
     my $body = $args->{body} || '';
 
     for my $requirement (@{ $requirements }) {
         eval "require $requirement"
-            or skip_all "can't test, $requirement missing";
+            or skip_all "can't test, $requirement missing ($@)";
+    }
+    for my $module_name (sort keys %{ $min_versions }) {
+        my $version = $min_versions->{$module_name};
+        eval { $module_name->VERSION($version) }
+            or skip_all "can't test, $module_name needs to be at least $version ($@)";
     }
 
     ++$pkgcounter;

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -96,11 +96,11 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        doctype=>0,
-        html=>'',
-        javaScript=>[],
-        placeholders=>undef,
-        styleSheet=>[],
+        doctype => 0,
+        html => '',
+        javaScript => [],
+        placeholders => undef,
+        styleSheet => [],
     );
     while (@_) {
         my $key = shift;
@@ -149,7 +149,7 @@ sub html {
         $self->get(qw/doctype html javaScript placeholders styleSheet/);
 
     return $h->cat(
-        -placeholders=>$placeholders,
+        -placeholders => $placeholders,
         '-',
         $doctype? $h->doctype: '',
         Quiq::Css->style($h,$styleSheet),
@@ -162,7 +162,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

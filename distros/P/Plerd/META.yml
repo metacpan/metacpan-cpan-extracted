@@ -25,13 +25,15 @@ no_index:
 provides:
   Plerd:
     file: lib/Plerd.pm
-    version: '1.802'
+    version: '1.811'
   Plerd::Init:
     file: lib/Plerd/Init.pm
   Plerd::Post:
     file: lib/Plerd/Post.pm
   Plerd::SmartyPants:
     file: lib/Plerd/SmartyPants.pm
+  Plerd::Tag:
+    file: lib/Plerd/Tag.pm
   Plerd::Util:
     file: lib/Plerd/Util.pm
   Plerd::WebmentionQueue:
@@ -53,7 +55,7 @@ requires:
   Path::Class: '0'
   Readonly: '0'
   Template: '0'
-  Text::Markdown: '0'
+  Text::MultiMarkdown: '0'
   Try::Tiny: '0'
   URI: '0'
   Web::Mention: '0.6'
@@ -62,13 +64,14 @@ resources:
   bugtracker: https://github.com/jmacdotorg/plerd/issues
   homepage: https://github.com/jmacdotorg/plerd
   repository: git://github.com/jmacdotorg/plerd.git
-version: '1.802'
+version: '1.811'
 x_authority: cpan:JMAC
 x_contributors:
   - 'Christian Sánchez <sanchezchristian@gmail.com>'
   - 'David Turner <novalis@novalis.org>'
   - 'Joe Johnston <jjohn@taskboy.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Petter hassberg <dr.doddo@gmail.com>'
   - 'Rebecca Turner <me@re-becca.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

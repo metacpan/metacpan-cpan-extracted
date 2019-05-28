@@ -64,9 +64,9 @@ sub test_unitTest_2 : Test(2) {
     my $h = Quiq::Html::Tag->new;
 
     my $e = Quiq::Html::Table::Simple->new(
-        class=>'my-table',
-        border=>1,
-        rows=>[
+        class => 'my-table',
+        border => 1,
+        rows => [
             ['my-title',['A'],[colspan=>2,'B']],
             [[rowspan=>2,'a1'],['de'],['Text1_de']],
             [['en'],['Text1_en']],

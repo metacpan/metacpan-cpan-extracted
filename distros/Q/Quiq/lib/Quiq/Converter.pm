@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use POSIX ();
 use Time::Local ();
@@ -56,7 +56,7 @@ sub newlineToName {
     }
     
     $this->throw(
-        q~PATH-00099: Unknown newline string~,
+        'PATH-00099: Unknown newline string',
         NewlineString => $nl,
     );
 }
@@ -616,7 +616,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

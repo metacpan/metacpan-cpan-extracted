@@ -1,7 +1,7 @@
 package Sah::Schemas::Rinci;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '1.1.88.0'; # VERSION
+our $DATE = '2019-05-24'; # DATE
+our $VERSION = '1.1.90.0'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for Rinci
@@ -18,7 +18,7 @@ Sah::Schemas::Rinci - Sah schemas for Rinci
 
 =head1 VERSION
 
-This document describes version 1.1.88.0 of Sah::Schemas::Rinci (from Perl distribution Sah-Schemas-Rinci), released on 2019-04-15.
+This document describes version 1.1.90.0 of Sah::Schemas::Rinci (from Perl distribution Sah-Schemas-Rinci), released on 2019-05-24.
 
 =head1 HOMEPAGE
 

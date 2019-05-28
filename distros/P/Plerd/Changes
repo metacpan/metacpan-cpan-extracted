@@ -1,5 +1,15 @@
 Revision history for Plerd
 
+1.811 2019-05-27T04:24:16Z
+
+      - Fixing a tag-ordering bug.
+
+1.810 2019-05-26T22:22:27Z
+
+      - Adding support for MultiMarkdown. Thanks to Petter Hassberg for the patch.
+      
+      - Tags now decide on their own capitalization, in the case of user inconsistency, and apply it across the blog.
+
 1.802 2019-04-14T15:42:54Z
 
       - Suppressing extra whitespace from post methods (e.g. description()) whose output might use an HTML-stripped version of the post's body.

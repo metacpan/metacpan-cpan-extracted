@@ -31,6 +31,7 @@ my $nonconstraint = NotAConstraint->new;
     package NonInlineableConstraint;
     use Class::Tiny { dummy => 0xdeadbeef };
     sub inline_check { '@invalid syntax!' }
+    sub name { "" }     # For coverage testing - a falsy value
 }
 my $niconstraint = NonInlineableConstraint->new;
 
@@ -45,6 +46,14 @@ my %tests = (
     'Rejects non-blessed constraint' => ['foo', {}],
     'Rejects constraint that cannot assert_valid' => ['foo', $nonconstraint],
     'Rejects non-inlineable constraint' => ['foo', $niconstraint],
+    'Rejects glob' => ['foo', \*STDOUT],
+
+    'Rejects custom constraint with empty array' => ['foo', []],
+    'Rejects custom constraint with array too large' => ['foo', [1..3]],
+    'Rejects custom constraint with non-coderef checker' =>
+        ['foo', [0, sub{}]],
+    'Rejects custom constraint with non-coderef get_message' =>
+        ['foo', [sub{}, 0]],
 );
 
 foreach my $test (keys %tests) {

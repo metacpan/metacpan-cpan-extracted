@@ -1,3 +1,9 @@
+0.74     2019-05-24
+
+- Fix a warning that would happen when applying shebang matching to empty
+  files. Fixed by Greg Oschwald. GH #93.
+
+
 0.73     2019-01-20
 
 - Fix test failures on Windows. Based on GH #91 from Shlomi Fish.

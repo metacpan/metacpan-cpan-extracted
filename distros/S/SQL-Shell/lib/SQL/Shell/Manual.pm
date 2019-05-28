@@ -643,12 +643,12 @@ You can also pipe commands into sqlsh on STDIN if you call it with the C<-i> swi
 
 =head1 VERSION
 
-v1.16
+v1.17
 
 =head1 AUTHOR
 
-John Alden
-Miguel Gualdron
+    John Alden
+    Miguel Gualdron
 
 =cut
 	

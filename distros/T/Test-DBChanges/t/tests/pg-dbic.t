@@ -10,6 +10,7 @@ my $schema = Test::DBChanges::Schema->connect(
     $pgsql->dsn, undef, undef,
     { AutoCommit => 1 },
 );
+assert_minimum_pgsql_version($schema->storage->dbh);
 
 my $dbchanges = Test::DBChanges::Pg::DBIC->new({
     schema => $schema,

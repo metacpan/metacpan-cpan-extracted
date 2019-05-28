@@ -9,6 +9,8 @@ use AnyEvent::Socket;
 use Fcntl qw(:flock SEEK_END);
 use MYDan::Agent::FileCache;
 use MYDan::Util::FastMD5;
+use MYDan::Util::Percent;
+use Sys::Hostname;
 
 eval
 {
@@ -17,9 +19,57 @@ eval
 
     my @argv = @{$param{argv}};
 
+    my ( $cv, $rlog_pcb ) = ( AE::cv );
+
+    my $rlog = $ENV{MYDan_rlog} if $param{proxyload} && $ENV{MYDan_rlog};
+    $rlog = $param{MYDan_rlog} if ! $param{proxyload} && $param{MYDan_rlog};
+
+    if( $rlog )
+    {
+        my ( $uuid, $server, $port ) = split /:/, $rlog;
+        my %argv = ( 
+            uuid => $uuid,
+            addr => $server || $ENV{TCPREMOTEIP}, 
+            port => $port || $ENV{TCPREMOTEPORT},
+        );
+        
+        warn sprintf "proxy info: host:%s port:%s uuid:%s\n", map{ $argv{$_} ||'' }qw( addr port uuid );
+        
+        my ( $index, %cv, $w, $hdl ) = ( 0 );
+        
+        tcp_connect $argv{addr}, $argv{port}, sub {
+            my ( $fh ) = @_;
+            unless( $fh )
+            {
+                print "$argv{addr}:$argv{port} tcp_connect: $!";
+                $cv->send;
+                return;
+            }
+            $hdl = new AnyEvent::Handle(
+                fh => $fh,
+                rbuf_max => 10240000,
+                wbuf_max => 10240000,
+                autocork => 1,
+                on_error => sub{
+                    warn 'tcp error';
+                    undef $hdl;
+                    $cv->send;
+                },
+                on_eof => sub{
+                    warn 'tcp close';
+                    undef $hdl;
+                    $cv->send;
+                },
+            );
+            $hdl->push_write( $argv{uuid} . ':' . hostname . ':' );
+        },  sub{ return 5; };
+    
+        $rlog_pcb = sub { $hdl->push_write( shift. "\n" ) if $hdl; };
+    }
+
     if( $param{single} )
     {
-        my ( $cv, $skip, $cont ) = ( AE::cv, 0, '' );
+        my ( $skip, $cont ) = ( 0, '' );
         tcp_connect $argv[0], $argv[1]->{port}, sub {
             my ( $fh ) = @_  or die "tcp_connect: $!";
             my $hdl; $hdl = new AnyEvent::Handle(
@@ -71,6 +121,8 @@ eval
     }
     elsif( $param{proxyload} )
     {
+        my $percent =  MYDan::Util::Percent->new( undef, undef, $rlog_pcb ) if $rlog_pcb;
+
         my $filecache = MYDan::Agent::FileCache->new();
         my $path = "$MYDan::PATH/tmp";
 
@@ -87,7 +139,7 @@ eval
 
 
         my ( $size, $filemd5, $own, $mode, $ok,  %keepalive );
-        my ( $cv, $skip, $cont ) = ( AE::cv, 0, '' );
+        my ( $skip, $cont ) = ( 0, '' );
         tcp_connect $argv[0], $argv[1]->{port}, sub {
             my ( $fh ) = @_  or die "tcp_connect: $!";
             my $hdl; $hdl = new AnyEvent::Handle(
@@ -101,6 +153,7 @@ eval
                             if( $keepalive{save} )
                             {
                                 syswrite $TEMP, $_[1];
+                                $percent->add( length $_[1] ) if $percent;
                             }
                             else
                             {
@@ -122,10 +175,13 @@ eval
                                         undef $hdl; $cv->send; $ok = $size;
                                     }
 
+                                    $percent->renew( $size )->add( length $keepalive{cont}  ) if $percent;
+
                                     syswrite $TEMP, delete $keepalive{cont};
                                     $keepalive{save} = 1;
                                 }
                             }
+                            $percent->print('ProxyLoad.'.$argv[0].' ..') if $percent;
 
                         }
 
@@ -179,9 +235,28 @@ eval
 
     else
     {
+        my ( $ppcb, %percent, %pcb );
+
+        $ppcb = sub
+        {
+            my ( $info, $node ) = @_;
+            $node ||= 'unkown';
+
+            unless( $percent{$node} )
+            {
+                $percent{$node} = MYDan::Util::Percent->new( 
+                    $info, "ProxySend.".hostname." ..", sub{ $pcb{$node} = shift } );
+            }
+            else
+            {
+                $percent{$node}->add( $info )->print();
+                &$rlog_pcb( "$node => $pcb{$node}" );
+            }
+        } if $rlog_pcb;
+    
         my %result = MYDan::Agent::Client::Proxy->new(
             @{$argv[0]}
-        )->run( %{$argv[1]} );
+        )->run( %{$argv[1]}, pcb => $ppcb );
         print YAML::XS::Dump \%result;
     }
     exit 0;

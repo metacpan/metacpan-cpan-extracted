@@ -1,16 +1,16 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself ;
-$Config::Model::Itself::VERSION = '2.016';
+package Config::Model::Itself 2.018;
+
 use Mouse ;
-use Config::Model 2.127;
+use Config::Model 2.134;
 use 5.010;
 
 use IO::File ;
@@ -117,7 +117,7 @@ sub _build_cm_lib_dir {
     my $self = shift;
     my $p =  path('lib/Config/Model');
     if (! $p->is_dir) {
-        $p->mkpath(0, 0755) || die "can't create $p:$!";
+        $p->mkpath(0, oct(755)) || die "can't create $p:$!";
     }
     return $p;
 }
@@ -244,10 +244,7 @@ sub read_all {
         die "Cannot read from unknown dir ".$model_dir unless $model_dir->is_dir;
     }
 
-    my $apps = {};
-    if (my $app_name = delete $args{application}) {
-        $apps = $self-> read_app_files($force_load, $read_from, $app_name);
-    }
+    my $apps = $self-> read_app_files($force_load, $read_from, delete $args{application});
 
     my $root_model_arg = delete $args{root_model} || '';
     my $model = $apps->{$root_model_arg} || $root_model_arg ;
@@ -275,11 +272,41 @@ sub read_all {
     my $i = $self->meta_instance ;
 
     my %read_models ;
-    my %pod_data ;
     my %class_file_map ;
 
+    my @all_models = $self->load_model_files(
+        $read_dir, \@files, $legacy, \%class_file_map, \%read_models
+    );
+
+    $self->{root_model} = $model || (sort @all_models)[0];
+
+    # Create all classes listed in %read_models to avoid problems with
+    # include statement while calling load_data
+    my $root_obj = $self->meta_root ;
+    my $class_element = $root_obj->fetch_element('class') ;
+    foreach my $class (sort keys %read_models) {
+        $class_element->fetch_with_id($class);
+    }
+
+    #require Tk::ObjScanner; Tk::ObjScanner::scan_object(\%read_models) ;
+
+    $logger->info("loading all extracted data in Config::Model::Itself");
+    # load with a array ref to avoid warnings about missing order
+    $root_obj->load_data(
+        data => {class => [ %read_models ] },
+        check => $force_load ? 'no' : 'yes'
+    ) ;
+
+    $self->read_model_annotations( $dir, $root_obj, \@files);
+
+    return $self->{map} = \%class_file_map ;
+}
+
+sub load_model_files {
+    my ($self, $read_dir, $files, $legacy, $class_file_map, $read_models) = @_;
+
     my @all_models;
-    for my $file (@files) {
+    for my $file (@$files) {
         $logger->info("loading config file $file");
 
         # now apply some translation to read model
@@ -296,73 +323,69 @@ sub read_all {
         my $rel_file = $file ;
         $rel_file =~ s/^$read_dir\/?//;
         die "wrong reg_exp" if $file eq $rel_file ;
-        $class_file_map{$rel_file} = \@models ;
+        $class_file_map->{$rel_file} = \@models ;
 
         # - move experience, description and level status into parameter info.
         foreach my $model_name (@models) {
-            # no need to dclone model as Config::Model object is temporary
-            my $raw_model =  $tmp_model -> get_raw_model( $model_name ) ;
-            my $new_model =  $tmp_model -> get_model( $model_name ) ;
-
-            $self->upgrade_model($model_name, $new_model);
-
-            # track read class to identify later classes added by user
-            $self->add_tracked_class($model_name);
-
-            # some modifications may be done to cope with older model styles. If a modif
-            # was done, mark the class as changed so it will be saved later
-            $self->add_modified_class($model_name) unless Compare($raw_model, $new_model) ;
-
-            foreach my $item (qw/description summary level experience status/) {
-                foreach my $elt_name (keys %{$new_model->{element}}) {
-                    my $moved_data = delete $new_model->{$item}{$elt_name}  ;
-                    next unless defined $moved_data ;
-                    $new_model->{element}{$elt_name}{$item} = $moved_data ;
-                }
-                delete $new_model->{$item} ;
-            }
-
-            # Since accept specs and elements are stored in a ordered hash,
-            # load_data expects a array ref instead of a hash ref.
-            # Build this array ref taking the order into
-            # account
-            foreach my $what (qw/element accept/) {
-                my $list  = delete $new_model -> {$what.'_list'} ;
-                my $h     = delete $new_model -> {$what} ;
-                $new_model -> {$what} = [] ;
-                map {
-                    push @{$new_model->{$what}}, $_, $h->{$_}
-                } @$list ;
-            }
-
-            # remove hash key with undefined values
-            map { delete $new_model->{$_} unless defined $new_model->{$_}
-                                          and $new_model->{$_} ne ''
-              } keys %$new_model ;
-            $read_models{$model_name} = $new_model ;
+            $read_models->{$model_name} = $self->normalize_model($model_name, $tmp_model);
         }
+    }
+    return @all_models;
+}
 
+sub normalize_model {
+    my ($self, $model_name, $tmp_model) = @_;
+
+    # no need to dclone model as Config::Model object is temporary
+    my $raw_model =  $tmp_model -> get_raw_model( $model_name ) ;
+    my $new_model =  $tmp_model -> get_model_clone( $model_name ) ;
+
+    $self->upgrade_model($model_name, $new_model);
+
+    # track read class to identify later classes added by user
+    $self->add_tracked_class($model_name);
+
+    # some modifications may be done to cope with older model styles. If a modif
+    # was done, mark the class as changed so it will be saved later
+    $self->add_modified_class($model_name) unless Compare($raw_model, $new_model) ;
+
+    foreach my $item (qw/description summary level experience status/) {
+        foreach my $elt_name (keys %{$new_model->{element}}) {
+            my $moved_data = delete $new_model->{$item}{$elt_name}  ;
+            next unless defined $moved_data ;
+            $new_model->{element}{$elt_name}{$item} = $moved_data ;
+        }
+        delete $new_model->{$item} ;
     }
 
-    $self->{root_model} = $model || (sort @all_models)[0];
+    # Since accept specs and elements are stored in a ordered hash,
+    # load_data expects a array ref instead of a hash ref.
+    # Build this array ref taking the order into
+    # account
+    foreach my $what (qw/element accept/) {
+        my $list  = delete $new_model -> {$what.'_list'} ;
+        my $h     = delete $new_model -> {$what} ;
+        $new_model -> {$what} = [] ;
+        foreach my $name (@$list) {
+            push @{$new_model->{$what}}, $name, $h->{$name}
+        }
+        ;
+    }
 
-    # Create all classes listed in %read_models to avoid problems with
-    # include statement while calling load_data
-    my $root_obj = $self->meta_root ;
-    my $class_element = $root_obj->fetch_element('class') ;
-    map { $class_element->fetch_with_id($_) } sort keys %read_models ;
+    # remove hash key with undefined values
+    foreach my $name (keys %$new_model) {
+        if (not defined $new_model->{$name} or $new_model->{$name} eq '') {
+            delete $new_model->{$name};
+        }
+    }
+    return $new_model ;
+}
 
-    #require Tk::ObjScanner; Tk::ObjScanner::scan_object(\%read_models) ;
-
-    $logger->info("loading all extracted data in Config::Model::Itself");
-    # load with a array ref to avoid warnings about missing order
-    $root_obj->load_data(
-        data => {class => [ %read_models ] },
-        check => $force_load ? 'no' : 'yes'
-    ) ;
+sub read_model_annotations {
+    my ($self, $dir, $root_obj, $files) = @_;
 
     # load annotations and comment header
-    for my $file (@files) {
+    for my $file (@$files) {
         $logger->info("loading annotations from file $file");
         my $fh = IO::File->new($file) || die "Can't open $file: $!" ;
         my @lines = $fh->getlines ;
@@ -382,8 +405,6 @@ sub read_all {
         $rel_file =~ s/^$dir\/?//;
         $self->{header}{$rel_file} = \@headers;
     }
-
-    return $self->{map} = \%class_file_map ;
 }
 
 # can be removed end of 2019 (after buster is released)
@@ -412,7 +433,9 @@ sub upgrade_model {
     if ($model->{write_config} and not $multi_backend) {
         say "Model $config_class_name: merging write_config specification in rw_config";
         if (not $multi_backend) {
-            map {$model->{rw_config}{$_} = $model->{write_config}{$_} } keys %{$model->{write_config}} ;
+            foreach my $spec ( keys %{$model->{write_config}} ) {
+                $model->{rw_config}{$spec} = $model->{write_config}{$spec}
+            } ;
             delete $model->{write_config};
         }
     }
@@ -499,11 +522,11 @@ sub write_all {
     }
 
     # add remaining classes in map
-    my %new_map =  map {
-        my $f = $_;
-        $f =~ s!::!/!g;
-        ("$f.pl" => [ $_ ]) ;
-    } keys %loaded_classes ;
+    my %new_map;
+    foreach my $class (keys %loaded_classes) {
+        my $f = $class =~ s!::!/!gr;
+        $new_map{"$f.pl"} = [ $class ] ;
+    }
 
     my %map_to_write = (%$map,%new_map) ;
 
@@ -633,7 +656,7 @@ sub write_model_file {
 
     my $wr_dir = dirname($wr_file);
     unless ( -d $wr_dir ) {
-        mkpath( $wr_dir, 0, 0755 ) || die "Can't mkpath $wr_dir:$!";
+        mkpath( $wr_dir, 0, oct(755) ) || die "Can't mkpath $wr_dir:$!";
     }
 
     my $wr = IO::File->new( $wr_file, '>' )
@@ -650,8 +673,9 @@ sub write_model_file {
     # munge pod text embedded in values to avoid spurious pod formatting
     $dump =~ s/\n=/\n'.'=/g;
 
-    $wr->print(@$comments) ;
-    $wr->print( $dump, ";\n\n" );
+    $wr->print( @$comments ) ;
+    $wr->print( "use strict;\nuse warnings;\n\n" );
+    $wr->print( "return $dump;\n\n" );
 
     $wr->print( join( "\n", @$notes ) );
 
@@ -688,7 +712,9 @@ sub list_one_class_element {
     my $inc_after = $meta_class->grab_value('include_after') ;
 
     if (@include and not defined $inc_after) {
-        map { $res .= $self->list_one_class_element($_,$pad.'  ') ;} @include ;
+        foreach my $inc (@include) {
+            $res .= $self->list_one_class_element($inc,$pad.'  ') ;
+        }
     }
 
     return $res unless @elts ;
@@ -698,7 +724,9 @@ sub list_one_class_element {
 
         $res .= $pad."  - $elt_name ($type)\n";
         if (@include and defined $inc_after and $inc_after eq $elt_name) {
-            map { $res .=$self->list_one_class_element($_,$pad.'  ') ;} @include ;
+            foreach my $inc (@include) {
+                $res .= $self->list_one_class_element($inc,$pad.'  ') ;
+            }
         }
     }
     return $res ;
@@ -806,7 +834,7 @@ Config::Model::Itself - Model editor for Config::Model
 
 =head1 VERSION
 
-version 2.016
+version 2.018
 
 =head1 SYNOPSIS
 
@@ -930,6 +958,18 @@ parameter.  Unfortunately, there's no way to build the menu
 dynamically. So user cme must be restarted to change the menu if the
 application list is changed.
 
+=head1 CREDITS
+
+Here's the list of people who helped improve this project:
+
+=over
+
+=item Gregor Herrmann
+
+=back
+
+Thanks for the patches !
+
 =head1 SEE ALSO
 
 L<Config::Model>, L<Config::Model::Node>, L<Path::Tiny>
@@ -940,7 +980,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2007-2018 by Dominique Dumont.
+This software is Copyright (c) 2007-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

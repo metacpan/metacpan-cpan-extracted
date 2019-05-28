@@ -1,0 +1,71 @@
+NAME
+    App::host::struct - host alternative that returns data structure
+
+VERSION
+    This document describes version 0.001 of App::host::struct (from Perl
+    distribution App-host-struct), released on 2019-05-24.
+
+SYNOPSIS
+    See the included script host-struct.
+
+FUNCTIONS
+  host_struct
+    Usage:
+
+     host_struct(%args) -> [status, msg, payload, meta]
+
+    host alternative that returns data structure.
+
+    Early release.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "resolve")
+
+    *   name* => *str*
+
+    *   server => *str*
+
+    *   type => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-host-struct>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-host-struct>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-host-struct>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Net::DNS
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

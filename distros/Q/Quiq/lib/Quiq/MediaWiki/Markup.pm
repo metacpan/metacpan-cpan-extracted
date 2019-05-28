@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Unindent;
 use Quiq::Parameters;
@@ -1423,7 +1423,7 @@ sub fmt {
         }
         else {
             $self->throw(
-                q~MEDIAWIKI-00001: Unknown inline format~,
+                'MEDIAWIKI-00001: Unknown inline format',
                 Format => $type,
             );
         }
@@ -1823,7 +1823,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

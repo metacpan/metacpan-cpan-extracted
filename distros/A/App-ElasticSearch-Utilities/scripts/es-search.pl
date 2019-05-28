@@ -105,13 +105,20 @@ foreach my $index (sort by_index_age keys %indices) {
     my $age = $indices{$index};
     $by_age{$age} ||= [];
     push @{ $by_age{$age} }, $index;
-    @FIELDS{es_index_fields($index)} = ();
+    my $fields = es_index_fields($index);
+    foreach my $k ( keys %{ $fields } ) {
+        $FIELDS{$k} = $fields->{$k}
+            unless $FIELDS{$k};
+    }
     # Lookup the Index in our local YAML
     if( !$TimeStampCheck ) {
         $TimeStampCheck++;
         $CONFIG{timestamp} ||= es_local_index_meta(timestamp => $index);
     }
 }
+
+#------------------------------------------------------------------------#
+# Figure out the timestamp
 $CONFIG{timestamp} ||= es_globals('timestamp') || '@timestamp';
 debug_var(\%by_age);
 my @AGES = sort { $ORDER eq 'asc' ? $b <=> $a : $a <=> $b } keys %by_age;
@@ -123,7 +130,27 @@ if( $OPT{fields} ) {
     show_fields();
     exit 0;
 }
-
+# Attempt date autodiscovery
+if( !exists $FIELDS{$CONFIG{timestamp}} ) {
+    my @dates = grep { $FIELDS{$_}->{type} eq 'date' } keys %FIELDS;
+    if( @dates == 0 ) {
+        output({color=>'red',stderr=>1},"FATAL: No date fields found in the indices specified" );
+        exit 1;
+    }
+    elsif( @dates == 1 ) {
+        output({color=>'yellow',stderr=>1}, "WARNING: Timestamp field '$CONFIG{timestamp}' not found, using '$dates[0]' instead");
+        $CONFIG{timestamp} = $dates[0];
+    }
+    else {
+        output({color=>'red',stderr=>1},
+            sprintf "FATAL: Timestamp field '%s' not found and discovered multiple date fields: %s",
+                $CONFIG{timestamp},
+                join(', ', sort @dates)
+        );
+        output({color=>'yellow',indent=>1}, "Try again with '--timestamp $dates[0]' for example.");
+        exit 1;
+    }
+}
 
 # Which fields to show
 my @SHOW = ();
@@ -575,14 +602,34 @@ sub document_lookdown {
 sub show_fields {
     output({color=>'cyan'}, 'Fields available for search:' );
     my $total = 0;
+    my %types = ();
     foreach my $field (sort keys %FIELDS) {
         $total++;
-        output(" - $field");
+        my $type = $FIELDS{$field}->{type};
+        $types{$type} ||= 0;
+        $types{$type}++;
+        my $color = $type eq 'ip' ? 'magenta'
+                  : $type eq 'text' ? 'red'
+                  : $type =~ /float|integer|short|byte|double/ ? 'cyan'
+                  : $type =~ /^geo/ ? 'green'
+                  : $type =~ /^date/ ? 'yellow'
+                  : 'white';
+        output({indent=>1,kv=>1,color=>$color}, $field => $type);
+        output({indent=>2}, sprintf "nested: %s - %s",
+                @{ $FIELDS{$field} }{qw(nested_path nested_key)}
+        ) if exists $FIELDS{$field}->{nested_path};
     }
     output({color=>"yellow"},
         sprintf("# Fields: %d from a combined %d indices.\n",
             $total,
             scalar(keys %indices),
+        )
+    );
+    # Type Meta Roll Up
+    output({indent=>1}, join(', ',
+            map  { "$types{$_} $_ fields" }
+            sort { $types{$b} <=> $types{$a} }
+            keys %types
         )
     );
 }
@@ -639,7 +686,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 6.5
+version 6.6
 
 =head1 SYNOPSIS
 
@@ -653,7 +700,7 @@ Options:
     --show              Comma separated list of fields to display, default is ALL, switches to tab output
     --tail              Continue the query until CTRL+C is sent
     --top               Perform an aggregation on the fields, by a comma separated list of up to 2 items
-    --by                Perform an aggregation using the result of this, example: --by cardinality:@fields.src_ip
+    --by                Perform an aggregation using the result of this, example: --by cardinality:src_ip
     --with              Perform a sub aggregation on the query
     --bg-filter         Only used if --top aggregation is significant_terms, applies a background filter
     --match-all         Enables the ElasticSearch match_all operator
@@ -692,7 +739,7 @@ From App::ElasticSearch::Utilities:
                      (same as --pattern logstash-* or logstash-DATE)
     --datesep       Date separator, default '.' also (--date-separator)
     --pattern       Use a pattern to operate on the indexes
-    --days          If using a pattern or base, how many days back to go, default: all
+    --days          If using a pattern or base, how many days back to go, default: 1
 
 See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections from App::ElasticSearch::Utilities.
 
@@ -719,10 +766,10 @@ Examples might include:
     # Search for past 10 days vhost admin.example.com and client IP 1.2.3.4
     es-search.pl --days=10 --size=100 dst:"admin.example.com" AND src_ip:"1.2.3.4"
 
-    # Search for all apache logs past 5 days with status 500
+    # Search for all apache logs past with status 500
     es-search.pl program:"apache" AND crit:500
 
-    # Search for all apache logs past 5 days with status 500 show only file and out_bytes
+    # Search for all apache logs with status 500 show only file and out_bytes
     es-search.pl program:"apache" AND crit:500 --show file,out_bytes
 
     # Search for ip subnet client IP 1.2.3.0 to 1.2.3.255 or 1.2.0.0 to 1.2.255.255
@@ -793,7 +840,7 @@ This option is not available when using --tail.
     --top src_ip
 
 You can override the default of the C<terms> bucket aggregation by prefixing
-the parameter with the required buck aggregation, i.e.:
+the parameter with the required bucket aggregation, i.e.:
 
     --top significant_terms:src_ip
 
@@ -806,7 +853,7 @@ Aggregation syntax is as follows:
 
 A full example might look like this:
 
-    $ es-search.pl --base access dst:www.example.com --top src_ip --by cardinality:@fields.acct
+    $ es-search.pl --base access dst:www.example.com --top src_ip --by cardinality:acct
 
 This will show the top source IP's ordered by the cardinality (count of the distinct values) of accounts logging
 in as each source IP, instead of the source IP with the most records.
@@ -899,7 +946,8 @@ helps flush out "what changed in the last hour."
 
 =item B<match-all>
 
-Apply the ElasticSearch "match_all" search operator to query on all documents in the index.
+Apply the ElasticSearch "match_all" search operator to query on all documents
+in the index.  This is the default with no search parameters.
 
 =item B<prefix>
 
@@ -999,7 +1047,7 @@ In the case of --top, this limits the result set to 1,000,000 results.
 The search string is pre-analyzed before being sent to ElasticSearch.  The following plugins
 work to manipulate the query string and provide richer, more complete syntax for CLI applications.
 
-=head2 App::ElasticSearch::Utilities::AutoEscape
+=head2 App::ElasticSearch::Utilities::QueryString::AutoEscape
 
 Provide an '=' prefix to a query string parameter to promote that parameter to a C<term> filter.
 
@@ -1019,7 +1067,7 @@ Is translated into:
 
 Which provides an exact match to the term in the query.
 
-=head2 App::ElasticSearch::Utilities::Barewords
+=head2 App::ElasticSearch::Utilities::QueryString::Barewords
 
 The following barewords are transformed:
 
@@ -1033,7 +1081,7 @@ If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
     src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
 
-=head2 App::ElasticSearch::Utilities::Range
+=head2 App::ElasticSearch::Utilities::QueryString::Ranges
 
 This plugin translates some special comparison operators so you don't need to
 remember them anymore.
@@ -1058,7 +1106,7 @@ Will translate to:
 
 B<gt> via E<gt>, B<gte> via E<gt>=, B<lt> via E<lt>, B<lte> via E<lt>=
 
-=head2 App::ElasticSearch::Utilities::Underscored
+=head2 App::ElasticSearch::Utilities::QueryString::Underscored
 
 This plugin translates some special underscore surrounded tokens into
 the Elasticsearch Query DSL.
@@ -1077,7 +1125,7 @@ Translates into:
 
 =head2 App::ElasticSearch::Utilities::QueryString::FileExpansion
 
-If the match ends in .dat, .txt, or .csv, then we attempt to read a file with that name and OR the condition:
+If the match ends in .dat, .txt, .csv, or .json then we attempt to read a file with that name and OR the condition:
 
     $ cat test.dat
     50  1.2.3.4
@@ -1101,14 +1149,24 @@ Or
     1.2.3.6
     1.2.3.7
 
+Or
+
+    $ cat test.json
+    { "ip": "1.2.3.4" }
+    { "ip": "1.2.3.5" }
+    { "ip": "1.2.3.6" }
+    { "ip": "1.2.3.7" }
+
 We can source that file:
 
-    src_ip:test.dat => src_ip:(1.2.3.4 1.2.3.5 1.2.3.6 1.2.3.7)
+    src_ip:test.dat      => src_ip:(1.2.3.4 1.2.3.5 1.2.3.6 1.2.3.7)
+    src_ip:test.json[ip] => src_ip:(1.2.3.4 1.2.3.5 1.2.3.6 1.2.3.7)
 
 This make it simple to use the --data-file output options and build queries
 based off previous queries. For .txt and .dat file, the delimiter for columns
 in the file must be either a tab, comma, or a semicolon.  For files ending in
-.csv, Text::CSV_XS is used to accurate parsing of the file format.
+.csv, Text::CSV_XS is used to accurate parsing of the file format.  Files
+ending in .json are considered to be newline-delimited JSON.
 
 You can also specify the column of the data file to use, the default being the last column or (-1).  Columns are
 B<zero-based> indexing. This means the first column is index 0, second is 1, ..  The previous example can be rewritten
@@ -1118,6 +1176,21 @@ as:
 
 or:
     src_ip:test.dat[-1]
+
+For newline delimited JSON files, you need to specify the key path you want to extract from the file.  If we have a
+JSON source file with:
+
+    { "first": { "second": { "third": [ "bob", "alice" ] } } }
+    { "first": { "second": { "third": "ginger" } } }
+    { "first": { "second": { "nope":  "fred" } } }
+
+We could search using:
+
+    actor:test.json[first.second.third]
+
+Which would expand to:
+
+    { "terms": { "actor": [ "alice", "bob", "ginger" ] } }
 
 This option will iterate through the whole file and unique the elements of the list.  They will then be transformed into
 an appropriate L<terms query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.

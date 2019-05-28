@@ -19,10 +19,9 @@ my @types = (
 
 my @options = qw(
     --help-types
-    --help=types
 );
 
-plan tests => 12;
+plan tests => 11;
 
 foreach my $option ( @options ) {
     my @output = run_ack($option);
@@ -37,3 +36,7 @@ foreach my $option ( @options ) {
         }
     }
 }
+
+done_testing();
+
+exit 0;

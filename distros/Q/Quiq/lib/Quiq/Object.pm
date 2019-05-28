@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -277,7 +277,7 @@ Existiert die Methode bereits, wird sie überschrieben.
 
 =head4 Example
 
-    MyClass->addMethod(myMethod=>sub {
+    MyClass->addMethod(myMethod => sub {
         my $self = shift;
         return 4711;
     });
@@ -414,7 +414,7 @@ sub this {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

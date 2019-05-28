@@ -3,7 +3,7 @@ package Log::Log4perl::Layout::JSON::Readable;
 use strict;
 use warnings;
 use parent 'Log::Log4perl::Layout::JSON';
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 # ABSTRACT: JSON layout, but some fields always come first
 
 use Class::Tiny +{
@@ -75,7 +75,7 @@ Log::Log4perl::Layout::JSON::Readable - JSON layout, but some fields always come
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it::VERSION = '0.20';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it::VERSION = '0.21';
 # ABSTRACT: Italian localization of (part of) L<DateTime::Calendar::FrenchRevolutionary>
 
 use Moose;
@@ -52,7 +52,7 @@ has '+feast' => (
       2uva             1zafferano    3castagna        0colchico    0cavallo
       3balsamina       3carota       2amaranto        3pastinaca   0tino
       3patata          0perpetuino   3zucca           3reseda      2asino
-      3bella di notte  3zucca        0grano_saraceno  0girasole    0torchio
+      3bella_di_notte  3zucca        0grano_saraceno  0girasole    0torchio
       3canapa          0pesca        3rapa            2amarillide  0bue
       3melanzana       0peperoncino  0pomodoro        2orzo        0barile
     ),
@@ -505,7 +505,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it - Italian 
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 

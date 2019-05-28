@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Quiq::Path;
@@ -49,7 +49,7 @@ sub new {
 
     if (!-e $path) {
         $class->throw(
-             q~IMAGE-00001: File not found~,
+             'IMAGE-00001: File not found',
              Path => $path,
         );
     }
@@ -58,15 +58,15 @@ sub new {
 
     return $class->SUPER::new(
         # Eigenschaften
-        path=>$path,
-        filename=>undef,
-        basename=>undef,
-        extension=>undef,
-        width=>undef,
-        height=>undef,
-        type=>undef,
+        path => $path,
+        filename => undef,
+        basename => undef,
+        extension => undef,
+        width => undef,
+        height => undef,
+        type => undef,
         # Properties
-        propertyH=>Quiq::Hash->new->unlockKeys,
+        propertyH => Quiq::Hash->new->unlockKeys,
     );
 }
 
@@ -441,7 +441,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

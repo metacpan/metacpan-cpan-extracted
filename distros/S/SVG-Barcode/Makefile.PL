@@ -11,7 +11,6 @@ my %WriteMakefileArgs = (
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {
-  'Mock::MonkeyPatch' => '0.04',
   'Test::More' => '0.88'
 }
 ,

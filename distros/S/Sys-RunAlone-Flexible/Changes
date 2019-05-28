@@ -1,3 +1,13 @@
+0.002   2019-05-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix typo (thanks Ivan Bessarabov).
+
+	- [doc] Give more helpful error message about __END__ vs __DATA__
+	  [RT#83700].
+
+
 0.001   2019-01-29 (PERLANCAR)
 
         - First release.

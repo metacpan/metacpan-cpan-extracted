@@ -7,6 +7,8 @@ use DBI;
 my $pgsql = pgsql();
 
 my $dbh = DBI->connect($pgsql->dsn);
+assert_minimum_pgsql_version($dbh);
+
 my $dbchanges = Test::DBChanges::Pg->new({
     dbh => $dbh,
     source_names => [qw(t1 t2)],

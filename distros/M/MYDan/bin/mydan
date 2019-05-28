@@ -52,12 +52,17 @@ my @cmd =
     [ 'deploy', "本地发布切连接小工具.\n", 'dan/tools/deploy' ],
     [ 'check', "检查服务的小工具.\n", 'dan/tools/check', 'box/tools/check' ],
     [ 'secure', "私密文件管理小工具.\n", 'dan/tools/secure', 'box/tools/secure' ],
+    [ 'udpfileserver', "udp文件服务.\n", 'dan/tools/udpfileserver' ],
 
     [ 'diskSpaceControl', "控制磁盘使用空间在某个百分比.\n", 'dan/tools/diskSpaceControl', 'box/tools/diskSpaceControl' ],
 
     [ 'node', '机器管理.', 'bin/mydan.node' ],
+    [ 'code', 'git和svn代码仓库管理.适用于管理员.', 'dan/code/bin/control' ],
+    [ 'checkuser', '检查用户状态.', 'dan/code/bin/checkuser' ],
 
     [ 'reborn', "重装系统.\n", 'dan/tools/reborn', 'box/tools/reborn' ],
+
+    [ 'os', "获取当前服务器的cpu/mem等信息.\n", 'dan/tools/os', 'box/tools/os' ],
 );
 
 MYDan::Util::Command->new( $name => \@cmd,

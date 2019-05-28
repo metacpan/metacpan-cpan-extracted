@@ -11,6 +11,8 @@ use Util;
 prep_environment();
 
 subtest 'No starting directory specified' => sub {
+    plan tests => 3;
+
     my $regex = 'non';
 
     my @files = qw( t/foo/non-existent );
@@ -23,7 +25,10 @@ subtest 'No starting directory specified' => sub {
         'Correct warning message for non-existent file' );
 };
 
+
 subtest 'regex comes before -g on the command line' => sub {
+    plan tests => 3;
+
     my $regex = 'non';
 
     my @files = qw( t/foo/non-existent );
@@ -36,7 +41,10 @@ subtest 'regex comes before -g on the command line' => sub {
         'Correct warning message for non-existent file' );
 };
 
+
 subtest 'No metacharacters' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/swamp/Makefile
         t/swamp/Makefile.PL
@@ -52,6 +60,8 @@ subtest 'No metacharacters' => sub {
 
 
 subtest 'With metacharacters' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/swamp/html.htm
         t/swamp/html.html
@@ -64,9 +74,14 @@ subtest 'With metacharacters' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex" );
 };
 
+
 subtest 'Front anchor' => sub {
+    plan tests => 1;
+
     my @expected = qw(
+        t/file-iterator.t
         t/file-permission.t
+        t/filetype-detection.t
         t/filetypes.t
         t/filter.t
     );
@@ -78,7 +93,10 @@ subtest 'Front anchor' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex" );
 };
 
+
 subtest 'Back anchor' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/runtests.pl
         t/swamp/constitution-100k.pl
@@ -94,7 +112,10 @@ subtest 'Back anchor' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex" );
 };
 
+
 subtest 'Case-insensitive via -i' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/swamp/pipe-stress-freaks.F
     );
@@ -106,7 +127,10 @@ subtest 'Case-insensitive via -i' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for -i -g $regex " );
 };
 
+
 subtest 'Case-insensitive via (?i:)' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/swamp/pipe-stress-freaks.F
     );
@@ -118,7 +142,10 @@ subtest 'Case-insensitive via (?i:)' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex" );
 };
 
+
 subtest 'File on command line is always searched' => sub {
+    plan tests => 1;
+
     my @expected = ( 't/swamp/#emacs-workfile.pl#' );
     my $regex = 'emacs';
 
@@ -128,7 +155,10 @@ subtest 'File on command line is always searched' => sub {
     ack_sets_match( [ @args, @files ], \@expected, 'File on command line is always searched' );
 };
 
+
 subtest 'File on command line is always searched, even with wrong filetype' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/swamp/parrot.pir
     );
@@ -140,8 +170,11 @@ subtest 'File on command line is always searched, even with wrong filetype' => s
     ack_sets_match( [ @args, @files ], \@expected, 'File on command line is always searched, even with wrong type.' );
 };
 
+
 subtest '-Q works on -g' => sub {
-    my @expected = ();
+    plan tests => 1;
+
+    my @expected = qw();
     my $regex = 'ack-g.t$';
 
     my @files = qw( t );
@@ -150,7 +183,10 @@ subtest '-Q works on -g' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex with quotemeta." );
 };
 
+
 subtest '-w works on -g' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/text/number.txt
     );
@@ -162,7 +198,10 @@ subtest '-w works on -g' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex with '-w'." );
 };
 
+
 subtest '-v works on -g' => sub {
+    plan tests => 1;
+
     my @expected = qw(
         t/text/bill-of-rights.txt
         t/text/gettysburg.txt
@@ -175,7 +214,10 @@ subtest '-v works on -g' => sub {
     ack_sets_match( [ @args, @files ], \@expected, "Looking for file names that do not match $file_regex" );
 };
 
+
 subtest '--smart-case works on -g' => sub {
+    plan tests => 2;
+
     my @expected = qw(
         t/swamp/pipe-stress-freaks.F
         t/swamp/crystallography-weenies.f
@@ -189,12 +231,15 @@ subtest '--smart-case works on -g' => sub {
     @expected = qw(
         t/swamp/pipe-stress-freaks.F
     );
-    @args = ( '--smart-case', '-g', 'F$' );
+    @args = ( '-S', '-g', 'F$' );
 
     ack_sets_match( [ @args, @files ], \@expected, 'Looking for f$' );
 };
 
+
 subtest 'test exit codes' => sub {
+    plan tests => 4;
+
     my $file_regex = 'foo';
     my @files      = ( 't/text/' );
 
@@ -207,7 +252,10 @@ subtest 'test exit codes' => sub {
     is( get_rc(), 0, '-g with matches must exit with 0' );
 };
 
+
 subtest 'test -g on a path' => sub {
+    plan tests => 1;
+
     my $file_regex = 'text';
     my @expected   = qw(
         t/context.t
@@ -225,7 +273,10 @@ subtest 'test -g on a path' => sub {
     ack_sets_match( [ @args ], \@expected, 'Make sure -g matches the whole path' );
 };
 
+
 subtest 'test -g with --color' => sub {
+    plan tests => 2;
+
     my $file_regex = 'text';
     my $expected_original = <<'HERE';
 t/con(text).t
@@ -249,6 +300,7 @@ HERE
 
     is_deeply( \@results, \@expected, 'Colorizing -g output with --color should work');
 };
+
 
 subtest q{test -g without --color; make sure colors don't show} => sub {
     if ( !has_io_pty() ) {
@@ -279,3 +331,5 @@ HERE
 };
 
 done_testing();
+
+exit 0;

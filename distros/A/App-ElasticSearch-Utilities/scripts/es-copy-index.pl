@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 6.5
+version 6.6
 
 =head1 SYNOPSIS
 
@@ -264,7 +264,7 @@ From App::ElasticSearch::Utilities:
                      (same as --pattern logstash-* or logstash-DATE)
     --datesep       Date separator, default '.' also (--date-separator)
     --pattern       Use a pattern to operate on the indexes
-    --days          If using a pattern or base, how many days back to go, default: all
+    --days          If using a pattern or base, how many days back to go, default: 1
 
 See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections from App::ElasticSearch::Utilities.
 
@@ -398,7 +398,7 @@ The B<incident-rt1234-2013.01.11> index will now hold all the data from both of 
 The search string is pre-analyzed before being sent to ElasticSearch.  The following plugins
 work to manipulate the query string and provide richer, more complete syntax for CLI applications.
 
-=head2 App::ElasticSearch::Utilities::AutoEscape
+=head2 App::ElasticSearch::Utilities::QueryString::AutoEscape
 
 Provide an '=' prefix to a query string parameter to promote that parameter to a C<term> filter.
 
@@ -418,7 +418,7 @@ Is translated into:
 
 Which provides an exact match to the term in the query.
 
-=head2 App::ElasticSearch::Utilities::Barewords
+=head2 App::ElasticSearch::Utilities::QueryString::Barewords
 
 The following barewords are transformed:
 
@@ -432,7 +432,7 @@ If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
     src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
 
-=head2 App::ElasticSearch::Utilities::Range
+=head2 App::ElasticSearch::Utilities::QueryString::Ranges
 
 This plugin translates some special comparison operators so you don't need to
 remember them anymore.
@@ -457,7 +457,7 @@ Will translate to:
 
 B<gt> via E<gt>, B<gte> via E<gt>=, B<lt> via E<lt>, B<lte> via E<lt>=
 
-=head2 App::ElasticSearch::Utilities::Underscored
+=head2 App::ElasticSearch::Utilities::QueryString::Underscored
 
 This plugin translates some special underscore surrounded tokens into
 the Elasticsearch Query DSL.
@@ -476,7 +476,7 @@ Translates into:
 
 =head2 App::ElasticSearch::Utilities::QueryString::FileExpansion
 
-If the match ends in .dat, .txt, or .csv, then we attempt to read a file with that name and OR the condition:
+If the match ends in .dat, .txt, .csv, or .json then we attempt to read a file with that name and OR the condition:
 
     $ cat test.dat
     50  1.2.3.4
@@ -500,14 +500,24 @@ Or
     1.2.3.6
     1.2.3.7
 
+Or
+
+    $ cat test.json
+    { "ip": "1.2.3.4" }
+    { "ip": "1.2.3.5" }
+    { "ip": "1.2.3.6" }
+    { "ip": "1.2.3.7" }
+
 We can source that file:
 
-    src_ip:test.dat => src_ip:(1.2.3.4 1.2.3.5 1.2.3.6 1.2.3.7)
+    src_ip:test.dat      => src_ip:(1.2.3.4 1.2.3.5 1.2.3.6 1.2.3.7)
+    src_ip:test.json[ip] => src_ip:(1.2.3.4 1.2.3.5 1.2.3.6 1.2.3.7)
 
 This make it simple to use the --data-file output options and build queries
 based off previous queries. For .txt and .dat file, the delimiter for columns
 in the file must be either a tab, comma, or a semicolon.  For files ending in
-.csv, Text::CSV_XS is used to accurate parsing of the file format.
+.csv, Text::CSV_XS is used to accurate parsing of the file format.  Files
+ending in .json are considered to be newline-delimited JSON.
 
 You can also specify the column of the data file to use, the default being the last column or (-1).  Columns are
 B<zero-based> indexing. This means the first column is index 0, second is 1, ..  The previous example can be rewritten
@@ -517,6 +527,21 @@ as:
 
 or:
     src_ip:test.dat[-1]
+
+For newline delimited JSON files, you need to specify the key path you want to extract from the file.  If we have a
+JSON source file with:
+
+    { "first": { "second": { "third": [ "bob", "alice" ] } } }
+    { "first": { "second": { "third": "ginger" } } }
+    { "first": { "second": { "nope":  "fred" } } }
+
+We could search using:
+
+    actor:test.json[first.second.third]
+
+Which would expand to:
+
+    { "terms": { "actor": [ "alice", "bob", "ginger" ] } }
 
 This option will iterate through the whole file and unique the elements of the list.  They will then be transformed into
 an appropriate L<terms query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.

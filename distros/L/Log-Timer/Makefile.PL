@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Log-Timer",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Log::Timer",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::DirHandle;
@@ -147,17 +147,17 @@ sub new {
     my $quiet = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -cleanup=>\$cleanup,
-        -dryRun=>\$dryRun,
-        -exclude=>\$exclude,
-        -files=>\$files,
-        -force=>\$force,
-        -include=>\$include,
-        -inHandle=>\$inHandle,
-        -language=>\$language,
-        -outHandle=>\$outHandle,
-        -prefix=>\$prefix,
-        -quiet=>\$quiet,
+        -cleanup => \$cleanup,
+        -dryRun => \$dryRun,
+        -exclude => \$exclude,
+        -files => \$files,
+        -force => \$force,
+        -include => \$include,
+        -inHandle => \$inHandle,
+        -language => \$language,
+        -outHandle => \$outHandle,
+        -prefix => \$prefix,
+        -quiet => \$quiet,
     );
 
     my %path;
@@ -184,7 +184,7 @@ sub new {
         # Rekursiver Abstieg
 
         for (Quiq::Path->find($dir,
-            -exclude=>$exclude,
+            -exclude => $exclude,
         )) {
             s|^\./||; # ./ am Pfadanfang entfernen
 
@@ -339,8 +339,8 @@ sub paths {
     $bool = $tree->addFile($file,\$data,@opt);
     $bool = $tree->addFile($file,@opt);
     $bool = $tree->addFile($file,
-        -generate=>$bool,
-        -onGenerate=>sub {
+        -generate => $bool,
+        -onGenerate => sub {
             ...
             return $data;
         },
@@ -433,14 +433,14 @@ sub addFile {
     my $writeInitially = 0;
 
     Quiq::Option->extract(\@_, # ehedem: -mode=>'strict-dash'
-        -encoding=>\$encoding,
-        -force=>\$force,
-        -generate=>\$generate,
-        -onGenerate=>\$onGenerate,
-        -onUpdate=>\$onUpdate,
-        -quiet=>\$quiet,
-        -skipEmptyFiles=>\$skipEmptyFiles,
-        -writeInitially=>\$writeInitially,
+        -encoding => \$encoding,
+        -force => \$force,
+        -generate => \$generate,
+        -onGenerate => \$onGenerate,
+        -onUpdate => \$onUpdate,
+        -quiet => \$quiet,
+        -skipEmptyFiles => \$skipEmptyFiles,
+        -writeInitially => \$writeInitially,
     );
 
     # Wir ignorieren leere Dateien, wenn -skipEmptyFiles=>1
@@ -468,8 +468,8 @@ sub addFile {
           # ihren Inhalt nicht erzeugen, da wir ihn nicht haben.
 
             $self->throw(
-                q~DTREE-00001: Datei existiert nicht. Ohne Inhalt kann sie nicht angelegt werden.~,
-                File=>$file,
+                'DTREE-00001: Datei existiert nicht. Ohne Inhalt kann sie nicht angelegt werden.',
+                File => $file,
             );
         }
         else {
@@ -681,10 +681,10 @@ sub cleanup {
 
                 my $answ = Quiq::Terminal->askUser(
                     $prompt,
-                    -values=>'y/n',
-                    -default=>'y',
-                    -inHandle=>$self->[4],
-                    -outHandle=>$self->[5],
+                    -values => 'y/n',
+                    -default => 'y',
+                    -inHandle => $self->[4],
+                    -outHandle => $self->[5],
                     $timerR? (-timer=>$timerR): (),
                 );
 
@@ -766,14 +766,14 @@ Liefere die Übersetzung zum deutschen Text $textDe.
 # -----------------------------------------------------------------------------
 
 my %Text = (
-    'Verzeichnis erzeugt'=>'directory created',
-    'Datei aktualisiert'=>'file updated',
-    'Datei erzeugt'=>'file created',
-    'Verzeichnis gelöscht'=>'directory deleted',
-    'Datei gelöscht'=>'file deleted',
-    'Überzählige Dateien'=>'Obsolete files',
-    'Löschen?'=>'Remove?',
-    'Aufräumen'=>'cleanup',
+    'Verzeichnis erzeugt' => 'directory created',
+    'Datei aktualisiert' => 'file updated',
+    'Datei erzeugt' => 'file created',
+    'Verzeichnis gelöscht' => 'directory deleted',
+    'Datei gelöscht' => 'file deleted',
+    'Überzählige Dateien' => 'Obsolete files',
+    'Löschen?' => 'Remove?',
+    'Aufräumen' => 'cleanup',
 );
 
 sub getText {
@@ -785,7 +785,7 @@ sub getText {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

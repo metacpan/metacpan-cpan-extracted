@@ -1,0 +1,340 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/dateseq/dateseq
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
+
+our $DATE = '2019-05-26'; # DATE
+our $DIST = 'App-dateseq'; # DIST
+our $VERSION = '0.092'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/dateseq/dateseq",
+    program_name => "dateseq",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Generate a sequence of dates
+# PODNAME: dateseq
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dateseq - Generate a sequence of dates
+
+=head1 VERSION
+
+This document describes version 0.092 of dateseq (from Perl distribution App-dateseq), released on 2019-05-26.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % dateseq [options] [from] [to] [increment]
+
+Examples:
+
+Generate "infinite" dates from today:
+
+ % dateseq
+
+Generate dates from 2015-01-01 to 2015-01-31:
+
+ % dateseq 2015-01-01 2015-01-31
+ 2015-01-01
+ 2015-01-02
+ ... 26 more lines ...
+ 2015-01-29
+ 2015-01-30
+
+Generate dates from yesterday to 2 weeks from now:
+
+ % dateseq yesterday "2 weeks from now"
+ 2019-05-25T00:00:00
+ 2019-05-26T00:00:00
+
+Generate dates from 2015-01-31 to 2015-01-01 (reverse):
+
+ % dateseq 2015-01-31 2015-01-01 -r
+ 2015-01-31
+ 2015-01-30
+ ... 27 more lines ...
+ 2015-01-02
+ 2015-01-01
+
+Generate "infinite" dates from 2015-01-01 (reverse):
+
+ % dateseq 2015-01-01 -r
+
+Generate 10 dates from 2015-01-01:
+
+ % dateseq 2015-01-01 -n 10
+ 2015-01-01
+ 2015-01-02
+ ... 6 more lines ...
+ 2015-01-09
+ 2015-01-10
+
+Generate dates with increment of 3 days:
+
+ % dateseq 2015-01-01 2015-01-31 -i P3D
+ 2015-01-01
+ 2015-01-04
+ ... 6 more lines ...
+ 2015-01-25
+ 2015-01-28
+
+Generate first 20 business days (Mon-Fri) after 2015-01-01:
+
+ % dateseq 2015-01-01 --business -n 20 -f "%Y-%m-%d(%a)"
+ 2015-01-01(Thu)
+ 2015-01-02(Fri)
+ 2015-01-05(Mon)
+ 2015-01-06(Tue)
+ 2015-01-07(Wed)
+ ... 11 more lines ...
+ 2015-01-23(Fri)
+ 2015-01-26(Mon)
+ 2015-01-27(Tue)
+ 2015-01-28(Wed)
+
+Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
+
+ % dateseq 2015-01-01 --no-business -n 5
+ 2015-01-03
+ 2015-01-04
+ 2015-01-10
+ 2015-01-11
+ 2015-01-17
+
+Generate a CSV data:
+
+ % dateseq 2010-01-01 2015-01-31 -f "%Y,%m,%d" --header "year,month,day"
+ year,month,day
+ 2010,01,01
+ ... 1853 more lines ...
+ 2015,01,29
+ 2015,01,30
+
+Generate periods (YYYY-MM):
+
+ % dateseq 2010-01-01 2015-12-31 -i P1M -f "%Y-%m"
+ 2010-01
+ 2010-02
+ ... 68 more lines ...
+ 2015-11
+ 2015-12
+
+List non-holidays in 2015 (using Indonesian holidays):
+
+ % setop --diff <(dateseq 2015-01-01 2015-12-31) <(list-id-holidays --year 2015)
+ 2015-01-02
+ 2015-01-04
+ 2015-01-05
+ 2015-01-06
+ 2015-01-07
+ ... 335 more lines ...
+ 2015-12-27
+ 2015-12-28
+ 2015-12-29
+ 2015-12-30
+
+List non-holidays business days in 2015 (using Indonesian holidays):
+
+ % setop --diff <(dateseq 2015-01-01 2015-12-31 --business) <(list-id-holidays --year 2015)
+ 2015-01-02
+ 2015-01-05
+ 2015-01-06
+ 2015-01-07
+ 2015-01-08
+ ... 235 more lines ...
+ 2015-12-23
+ 2015-12-28
+ 2015-12-29
+ 2015-12-30
+
+Use with fsql:
+
+ % dateseq 2010-01-01 2015-12-01 -f "%Y,%m" -i P1M --header "year,month" | fsql --add-csv - --add-csv data.csv -F YEAR -F MONTH 'SELECT year, month, data1 FROM stdin WHERE YEAR(data.date)=year AND MONTH(data.date)=month'
+
+=head1 DESCRIPTION
+
+This utility is similar to Unix L<seq> command, except that it generates a
+sequence of dates.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--business>
+
+Only list business days (Mon-Fri), or non-business days.
+
+=item B<--business6>
+
+Only list business days (Mon-Sat), or non-business days.
+
+=item B<--date-format>=I<s>, B<-f>
+
+strftime() format for each date.
+
+Default is `%Y-%m-%d`, unless when hour/minute/second is specified, then it is
+`%Y-%m-%dT%H:%M:%S`.
+
+
+=item B<--from>=I<s>
+
+Starting date.
+
+=item B<--header>=I<s>
+
+Add a header row.
+
+=item B<--increment>=I<s>, B<-i>
+
+=item B<--limit>=I<s>, B<-n>
+
+Only generate a certain amount of numbers.
+
+=item B<--reverse>, B<-r>
+
+Decrement instead of increment.
+
+=item B<--to>=I<s>
+
+End date, if not specified will generate an infinite* stream of dates.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C dateseq dateseq
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete dateseq 'p/*/`dateseq`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-dateseq>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-dateseq>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

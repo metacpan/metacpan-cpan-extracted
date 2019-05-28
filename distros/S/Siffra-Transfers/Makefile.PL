@@ -31,7 +31,9 @@ my %WriteMakefileArgs = (
         'Siffra::Tools'      => 0,
         'Net::FTP'           => 0,
         'Net::SFTP::Foreign' => 0,
+        'IO::Socket::SSL'    => 0,
         'Term::ProgressBar'  => 0,
+        'IO::Pty'            => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,

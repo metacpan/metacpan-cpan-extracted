@@ -36,7 +36,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         }
     }
 
-    print 'Changelog since release: ' . $dist->version . "\n$log\n\n";
+    print 'Changelog since release: ' . $dist->version . "\n" . ( $log // "no changes\n" );
 
     return;
 }

@@ -2,7 +2,7 @@
 #
 # (c) 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Class/EHierarchy.pm, 2.00 2017/01/09 08:47:12 acorliss Exp $
+# $Id: lib/Class/EHierarchy.pm, 2.01 2019/05/23 07:29:49 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -26,7 +26,7 @@ use base qw(Exporter);
 use Carp;
 use Scalar::Util qw(weaken);
 
-($VERSION) = ( q$Revision: 2.00 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 2.01 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
 # Ordinal indexes for the @objects element records
 use constant CEH_OREF    => 0;
@@ -1675,6 +1675,9 @@ sub conceive {
     # Initialize the hierarchal code support
     $rv = _initHierarchy( $obj, $class, @args ) if $rv;
 
+    # Disown the object if we've failed initialization
+    $pobj->_disown($obj) unless $rv;
+
     return $rv ? $obj : undef;
 }
 
@@ -1723,7 +1726,7 @@ Class::EHierarchy - Base class for hierarchally ordered objects
 
 =head1 VERSION
 
-$Id: lib/Class/EHierarchy.pm, 2.00 2017/01/09 08:47:12 acorliss Exp $
+$Id: lib/Class/EHierarchy.pm, 2.01 2019/05/23 07:29:49 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -2132,7 +2135,7 @@ This method returns a list of all registered properties for the current
 object.  Property names will be filtered appropriately by the caller's 
 context.
 
-=head3 push
+=head2 push
 
     $rv = $obj->push($prop, @values);
 
@@ -2140,7 +2143,7 @@ This method pushes additional elements onto the specified array property.
 It returns the return value from the B<push> function, or undef on
 non-existent properties or invalid types.
 
-=head3 pop
+=head2 pop
 
     $rv = $obj->pop($prop);
 
@@ -2148,7 +2151,7 @@ This method pops an element off of the specified array property.
 It returns the return value from the B<pop> function, or undef on
 non-existent properties or invalid types.
 
-=head3 unshift
+=head2 unshift
 
     $rv = $obj->unshift($prop, @values);
 
@@ -2156,7 +2159,7 @@ This method unshifts additional elements onto the specified array property.
 It returns the return value from the B<unshift> function, or undef on
 non-existent properties or invalid types.
 
-=head3 shift
+=head2 shift
 
     $rv = $obj->shift($prop);
 
@@ -2164,15 +2167,15 @@ This method shifts an element off of the specified array property.
 It returns the return value from the B<shift> function, or undef on
 non-existent properties or invalid types.
 
-=head3 exists
+=head2 exists
 
     $rv = $obj->exists($prop, $key);
 
-This method checks for the existance of the specified key in the hash
+This method checks for the existence of the specified key in the hash
 property.  It returns the return value from the B<exists> function, or 
 undef on non-existent properties or invalid types.
 
-=head3 keys
+=head2 keys
 
     @keys = $obj->keys($prop);
 
@@ -2180,7 +2183,7 @@ This method returns a list of keys from the specified hash property.
 It returns the return value from the B<keys> function, or undef on
 non-existent properties or invalid types.
 
-=head3 merge
+=head2 merge
 
     $obj->merge($prop, foo => bar);
     $obj->merge($prop, 4 => foo, 5 => bar);
@@ -2189,7 +2192,7 @@ This method is a unified method for storing elements in both hashes and
 arrays.  Hashes elements are simply key/value pairs, while array elements 
 are provided as ordinal index/value pairs.  It returns a boolean value.
 
-=head3 subset
+=head2 subset
 
     @values = $obj->subset($hash, qw(foo bar) );
     @values = $obj->subset($array, 3 .. 5 );
@@ -2199,7 +2202,7 @@ hashes and arrays.  Hash values are retrieved in the order of the specified
 keys, while array elements are retrieved in the order of the specified ordinal
 indexes.
 
-=head3 remove
+=head2 remove
 
     $obj->remove($prop, @keys);
     $obj->remove($prop, 5, 8 .. 10);
@@ -2216,7 +2219,7 @@ it to be poorly performing.  You're better of retrieving the entire array
 yourself via the B<property> method, splicing what you need, and calling
 B<property> again to set the new array contents.
 
-=head3 empty
+=head2 empty
 
     $rv = $obj->empty($name);
 

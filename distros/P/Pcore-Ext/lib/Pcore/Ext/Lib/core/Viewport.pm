@@ -8,8 +8,6 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
         isCordova => \0,
 
-        roles => [],
-
         api => {
             signin          => undef,    # $api{'Auth/signin'},
             signout         => undef,    # $api{'Auth/signout'},
@@ -20,8 +18,8 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
 
         # MATERIAL THEME
         theme => {
-            accent   => undef,
-            base     => undef,
+            accent   => 'grey',
+            base     => 'blue-grey',
             darkMode => \0
         },
 
@@ -48,6 +46,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
 
         routes => {    #
             'change-password/:{token}(/.*)' => 'routeChangePassword',
+            'confirm-email/:{token}(/.*)'   => 'routeConfirmEmail',
         },
 
         init => func ['view'], <<"JS",
@@ -114,7 +113,7 @@ JS
                     me.unmask();
 
                     var item = me.getView().add({
-                        xtype: "$type{connection_error}",
+                        xtype: "$type{'/pcore/modern/Form/ConnectionError/panel'}",
                         callback: function () {
                             me.getView().remove(item);
 
@@ -136,21 +135,13 @@ JS
 JS
 
         checkSession => func ['session'], <<'JS',
+            session.hasRole = function (role) {
+                if (!this.is_authenticated) return 0;
 
-            // compare roles
-            if (session.is_authenticated && !session.is_root) {
-                if (this.roles && this.roles.length) {
-                    session.is_authenticated = false;
+                if (this.is_root) return 1;
 
-                    for (var role of this.roles) {
-                        if (session.permissions[role]) {
-                            session.is_authenticated = true;
-
-                            break;
-                        }
-                    }
-                }
-            }
+                return this.permissions[role] ? 1 : 0;
+            };
 
             if (!session.locale) session.locale = localStorage.locale || session.default_locale;
 
@@ -413,232 +404,32 @@ JS
         # ROUTES HANDLERS
         routeChangePassword => func ['values'], <<"JS",
             Ext.Viewport.add({
-                xtype: "$type{change_password}",
+                xtype: "$type{'/pcore/modern/Form/ChangePassword/dialog'}",
                 token: values.token,
                 redirectOnClose: ''
             }).show();
 
             this.unmask();
 JS
-    };
-}
 
-# CONNECTION ERROR DIALOG
-sub EXT_connection_error : Extend('Ext.Panel') {
-    return {
-        layout => {
-            type  => 'vbox',
-            pack  => 'center',
-            align => 'center',
-        },
-
-        items => [
-            { html => $l10n{'Error connecting to the application server.'}, },
-            {   xtype   => 'button',
-                iconCls => $FAS_REDO,
-                text    => $l10n{'Try again.'},
-                handler => func ['btn'],
-                <<'JS',
-                    btn.up().callback();
-JS
-            }
-        ],
-    };
-}
-
-# SIGNIN DIALOG
-sub EXT_signin_controller : Extend('Ext.app.ViewController') : Type('controller') {
-    return {
-        submit => func <<"JS",
-                var me = this,
-                    view = this.getView(),
-                    form = view.down('fieldpanel');
-
-                if (form.validate()) {
-                    Ext.fireEvent('signin',
-                        form.getFields('username').getValue(),
-                        form.getFields('password').getValue(),
-                        this.lookup('remember_me').isChecked(),
-                        function (success) {if (success) view.destroy();}
-                    );
-                }
-JS
-
-        recoverPassword => func <<"JS",
-                var me = this;
-                var view = this.getView(),
-                    form = view.down('fieldpanel'),
-                    username_field = form.getFields('username');
-
-                form.clearErrors();
-
-                if (username_field.validate()) {
-                    Ext.fireEvent('mask');
-
-                    Ext.fireEvent('recoverPassword',
-                        username_field.getValue(),
-                        function (success) {
-                            Ext.fireEvent('unmask');
-
-                            form.reset(true);
-                        }
-                    );
-                }
-JS
-    };
-}
-
-sub EXT_signin : Extend('Ext.Dialog') : Type('widget') {
-    return {
-        controller => $type{signin_controller},
-
-        title        => { text => l10n('SIGN IN') },
-        defaultFocus => 'textfield[name=username]',
-        draggable    => \0,
-        scrollable   => \1,
-        width        => 320,
-
-        keyMap => { ENTER => 'submit', },
-
-        items => [ {
-            xtype => 'fieldpanel',
-
-            items => [
-                {   xtype       => 'textfield',
-                    name        => 'username',
-                    label       => l10n('User name'),
-                    placeholder => l10n('email'),
-                    allowBlank  => \0,
-                    required    => \1,
-                },
-                {   xtype       => 'passwordfield',
-                    name        => 'password',
-                    label       => l10n('Password'),
-                    placeholder => l10n('password'),
-                    allowBlank  => \0,
-                    required    => \1,
-                },
-                {   xtype     => 'checkboxfield',
-                    reference => 'remember_me',
-                    boxLabel  => l10n('Remember me'),
-                    checked   => 1,
-                },
-            ],
-
-            buttons => [
-                {   text    => l10n('Forgot password'),
-                    ui      => 'decline',
-                    handler => 'recoverPassword',
-                },
-                {   text      => l10n('Sign in'),
-                    iconCls   => $FAS_SIGN_IN_ALT,
-                    iconAlign => 'left',
-                    ui        => 'confirm',
-                    handler   => 'submit',
-                },
-            ]
-        } ],
-    };
-}
-
-# CHANGE PASSWORD DIALOG
-sub EXT_change_password_controller : Extend('Ext.app.ViewController') : Type('controller') {
-    return {
-        submit => func <<"JS",
+        routeConfirmEmail => func ['values'], <<"JS",
             var me = this;
-            var view = this.getView();
-            var form = view.down('fieldpanel');
 
-            if (form.validate()) {
-                var password = form.getFields('password').getValue(),
-                    password1_field = form.getFields('password1');
+            $api{'Auth/confirm_email'}(values.token, function(res) {
+                me.unmask();
 
-                if (password != password1_field.getValue()) {
-                    password1_field.setError($l10n{'Passwords are not match'});
-
-                    return;
+                if (res.isSuccess()) {
+                    Ext.toast($l10n{'Thank you, your email is confirmed.'}, 5000);
+                }
+                else {
+                    Ext.toast($l10n{'Email confirmation error. Token is invalid.'}, 5000);
                 }
 
-                Ext.fireEvent('mask');
+                me.redirectTo('', {replace: true});
 
-                Ext.fireEvent('changePassword',
-                    password,
-                    view.getToken(),
-                    function (success) {
-                        Ext.fireEvent('unmask');
-
-                        if (success) me.close();
-                    }
-                );
-            }
+                return;
+            });
 JS
-
-        close => func <<"JS",
-            var view = this.getView();
-
-            view.destroy();
-JS
-
-        onDestroy => func <<"JS",
-            var view = this.getView(),
-                redirectOnClose = view.getRedirectOnClose();
-
-            if (redirectOnClose != null) this.redirectTo(redirectOnClose);
-JS
-    };
-}
-
-sub EXT_change_password : Extend('Ext.Dialog') : Type('widget') {
-    return {
-        controller => $type{change_password_controller},
-
-        config => {
-            token           => undef,    # change password token
-            redirectOnClose => undef,    # hash, to redirect to on destroy
-        },
-
-        title => { text => l10n('PASSWORD CHANGING') },
-
-        # defaultFocus => 'passwordfield[name=password]',
-        closable   => \1,
-        draggable  => \0,
-        scrollable => \1,
-        width      => 320,
-        maxHeight  => '100%',
-
-        keyMap => { ENTER => 'submit', },
-
-        listeners => { destroy => 'onDestroy' },
-
-        items => [ {
-            xtype => 'fieldpanel',
-
-            items => [
-                {   xtype       => 'passwordfield',
-                    name        => 'password',
-                    label       => l10n('New password'),
-                    placeholder => l10n('password'),
-                    required    => \1,
-                },
-                {   xtype       => 'passwordfield',
-                    name        => 'password1',
-                    label       => l10n('Confirm new password'),
-                    placeholder => l10n('password'),
-                    required    => \1,
-                },
-            ],
-
-            buttons => [
-                {   text    => l10n('Cancel'),
-                    ui      => 'decline',
-                    handler => 'close',
-                },
-                {   text    => l10n('Change'),
-                    ui      => 'confirm',
-                    handler => 'submit',
-                },
-            ]
-        } ]
     };
 }
 

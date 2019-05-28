@@ -1,7 +1,7 @@
 package Sah::Schema::rinci::result_meta;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '1.1.88.0'; # VERSION
+our $DATE = '2019-05-24'; # DATE
+our $VERSION = '1.1.90.0'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,6 +17,7 @@ our $schema = [hash => {
     _prop => {
         %Sah::Schema::rinci::meta::_dh_props,
 
+        schema => {},
         perm_err => {},
         func => {}, # XXX func.*
         cmdline => {}, # XXX cmdline.*
@@ -45,7 +46,7 @@ Sah::Schema::rinci::result_meta - Rinci envelope result metadata
 
 =head1 VERSION
 
-This document describes version 1.1.88.0 of Sah::Schema::rinci::result_meta (from Perl distribution Sah-Schemas-Rinci), released on 2019-04-15.
+This document describes version 1.1.90.0 of Sah::Schema::rinci::result_meta (from Perl distribution Sah-Schemas-Rinci), released on 2019-05-24.
 
 =head1 HOMEPAGE
 

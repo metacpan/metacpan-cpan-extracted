@@ -39,7 +39,6 @@ do { my $x = {
                                       'Symbol' => '0',
                                       'Test::Builder' => '0',
                                       'Text::Wrap' => '0',
-                                      'base' => '0',
                                       'perl' => '5.008',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -55,6 +54,7 @@ do { my $x = {
                                    'Test::More' => '0.88',
                                    'Test::Tester' => '0',
                                    'strict' => '0',
+                                   'utf8' => '0',
                                    'warnings' => '0'
                                  }
                  }

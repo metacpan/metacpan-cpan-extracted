@@ -1,5 +1,15 @@
 Revision history for perl distribution SVG-Barcode
 
+0.10 2019-05-26T06:17:16+0200
+ BREAKING CHANGES!
+ - Change parameters to methods
+ - Pass parameters to constructor as hash
+ - Use viewBox for easier scaling
+ - Allow to set svg attributes
+
+0.03 2019-05-24T21:36:27+0200
+ - Handle zero defaults correctly
+
 0.02 2019-05-23T08:26:38+0200
  - Add text element
  - Add utilities for subclasses

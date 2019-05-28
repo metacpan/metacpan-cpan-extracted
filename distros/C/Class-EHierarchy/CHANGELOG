@@ -1,5 +1,11 @@
 CHANGELOG
 
+v2.01 (2019/05/24)
+==================
+--Typos in documentation (Debian Perl Group)
+--Conceiving a child would leave an errant object alive even
+  if it failed initialization.  This is fixed.
+
 v2.00 (2017/01/23)
 ==================
 --Complete rewrite

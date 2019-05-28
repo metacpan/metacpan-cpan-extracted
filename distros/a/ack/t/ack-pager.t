@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use File::Spec ();
-use File::Temp ();
 use Test::More;
 
 use lib 't';
@@ -15,7 +13,7 @@ if ( not has_io_pty() ) {
     exit(0);
 }
 
-plan tests => 15;
+plan tests => 9;
 
 prep_environment();
 
@@ -43,7 +41,7 @@ HERE
 }
 
 PAGER: {
-    my @args = qw(--nocolor --pager=./test-pager --sort-files -i nevermore t/text);
+    my @args = qw(--nocolor --pager=t/test-pager --sort-files -i nevermore t/text);
 
     my @expected = line_split( <<'HERE' );
 t/text/raven.txt
@@ -66,7 +64,14 @@ HERE
 }
 
 PAGER_WITH_OPTS: {
-    my @args = ('--nocolor', '--pager=./test-pager --skip=2', '--sort-files', '-i', 'nevermore', 't/text');
+    my @args = (
+        '--nocolor',
+        '--pager=t/test-pager --skip=2',    # --skip is an argument passed to test-pager
+        '--sort-files',
+        '-i',
+        'nevermore',
+        't/text',
+    );
 
     my @expected = line_split( <<'HERE' );
 t/text/raven.txt
@@ -83,8 +88,15 @@ HERE
 }
 
 FORCE_NO_PAGER: {
-    my @args = ('--nocolor', '--pager=./test-pager --skip=2', '--nopager', '--sort-files',
-        '-i', 'nevermore', 't/text');
+    my @args = (
+        '--nocolor',
+        '--pager=t/test-pager --skip=2',    # --skip is an argument passed to test-pager
+        '--nopager',
+        '--sort-files',
+        '-i',
+        'nevermore',
+        't/text',
+    );
 
     my @expected = line_split( <<'HERE' );
 t/text/raven.txt
@@ -107,10 +119,10 @@ HERE
 }
 
 PAGER_ENV: {
-    local $ENV{'ACK_PAGER'} = './test-pager --skip=2';
+    local $ENV{'ACK_PAGER'} = 't/test-pager --skip=2';
     local $TODO             = q{Setting ACK_PAGER in tests won't work for the time being};
 
-    my @args = ('--nocolor', '--sort-files', '-i', 'nevermore', 't/text');
+    my @args = qw( --nocolor --sort-files -i nevermore t/text );
 
     my @expected = line_split( <<'HERE' );
 t/text/raven.txt
@@ -127,9 +139,9 @@ HERE
 }
 
 PAGER_ENV_OVERRIDE: {
-    local $ENV{'ACK_PAGER'} = './test-pager --skip=2';
+    local $ENV{'ACK_PAGER'} = 't/test-pager --skip=2';
 
-    my @args = ('--nocolor', '--nopager', '--sort-files', '-i', 'nevermore', 't/text');
+    my @args = qw( --nocolor --nopager --sort-files -i nevermore t/text );
 
     my @expected = line_split( <<'HERE' );
 t/text/raven.txt
@@ -153,10 +165,10 @@ HERE
 
 
 PAGER_ACKRC: {
-    my @args = ('--nocolor', '--sort-files', '-i', 'nevermore', 't/text');
+    my @args = qw( --nocolor --sort-files -i nevermore t/text );
 
     my $ackrc = <<'HERE';
---pager=./test-pager --skip=2
+--pager=t/test-pager --skip=2
 HERE
 
     my @expected = line_split( <<'HERE' );
@@ -177,10 +189,10 @@ HERE
 
 
 PAGER_ACKRC_OVERRIDE: {
-    my @args = ('--nocolor', '--nopager', '--sort-files', '-i', 'nevermore', 't/text');
+    my @args = qw( --nocolor --nopager --sort-files -i nevermore t/text );
 
     my $ackrc = <<'HERE';
---pager=./test-pager --skip=2
+--pager=t/test-pager --skip=2
 HERE
 
     my @expected = line_split( <<'HERE' );
@@ -206,9 +218,9 @@ HERE
 }
 
 PAGER_NOENV: {
-    local $ENV{'ACK_PAGER'} = './test-pager --skip=2';
+    local $ENV{'ACK_PAGER'} = 't/test-pager --skip=2';
 
-    my @args = ('--nocolor', '--noenv', '--sort-files', '-i', 'nevermore', 't/text');
+    my @args = qw( --nocolor --noenv --sort-files -i nevermore t/text );
 
     my @expected = line_split( <<'HERE' );
 t/text/raven.txt
@@ -230,57 +242,6 @@ HERE
     lists_match( \@got, \@expected, 'PAGER_NOENV' );
 }
 
-my $wd      = getcwd_clean();
-my $tempdir = File::Temp->newdir;
-my $pager   = File::Spec->rel2abs('test-pager');
-safe_mkdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
-
-PROJECT_ACKRC_PAGER_FORBIDDEN: {
-    my @files = untaint( File::Spec->rel2abs('t/text/') );
-    my @args = qw/ --env question(\\S+) /;
-
-    safe_chdir( $tempdir->dirname );
-    write_file '.ackrc', "--pager=$pager\n";
-
-    my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
-
-    is_empty_array( $stdout );
-    first_line_like( $stderr, qr/\QOptions --output, --pager and --match are forbidden in project .ackrc files/ );
-
-    safe_chdir( $wd );
-}
-
-HOME_ACKRC_PAGER_PERMITTED: {
-    my @files = untaint( File::Spec->rel2abs('t/text/') );
-    my @args = qw/ --env question(\\S+) /;
-
-    write_file(File::Spec->catfile($tempdir->dirname, '.ackrc'), "--pager=$pager\n");
-    safe_chdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
-    local $ENV{'HOME'} = $tempdir->dirname;
-
-    my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
-
-    is_nonempty_array( $stdout );
-    is_empty_array( $stderr );
-
-    safe_chdir( $wd );
-}
-
-ACKRC_ACKRC_PAGER_PERMITTED: {
-    my @files = untaint( File::Spec->rel2abs('t/text/') );
-    my @args = qw/ --env question(\\S+) /;
-
-    write_file(File::Spec->catfile($tempdir->dirname, '.ackrc'), "--pager=$pager\n");
-    safe_chdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
-    local $ENV{'ACKRC'} = File::Spec->catfile($tempdir->dirname, '.ackrc');
-
-    my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
-
-    is_nonempty_array( $stdout );
-    is_empty_array( $stderr );
-
-    safe_chdir( $wd );
-}
 
 done_testing();
 exit 0;

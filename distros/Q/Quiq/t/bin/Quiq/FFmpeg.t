@@ -208,8 +208,8 @@ sub test_imagesToVideo : Test(1) {
     my $verbose = 0; # MEMO: auf 1 setzen, um Code+Resultat zu sehen
     
     my $exa = Quiq::ExampleCode->new(
-        -fileHandle=>\*STDERR,
-        -verbose=>$verbose,
+        -fileHandle => \*STDERR,
+        -verbose => $verbose,
     );
 
     # Ohne Optionen
@@ -217,7 +217,7 @@ sub test_imagesToVideo : Test(1) {
     my $cmd = $exa->execute(q|
             Quiq::FFmpeg->imagesToVideo('img/*.jpg','img.mp4');
         |,
-        -asStringCallback=>sub {
+        -asStringCallback => sub {
             my ($cmd) = @_;
             return $cmd->command;
         },
@@ -236,8 +236,8 @@ sub test_videoToImages : Test(3) {
     my $verbose = 0; # MEMO: auf 1 setzen, um Code+Resultat zu sehen
     
     my $exa = Quiq::ExampleCode->new(
-        -fileHandle=>\*STDERR,
-        -verbose=>$verbose,
+        -fileHandle => \*STDERR,
+        -verbose => $verbose,
     );
 
     # Ohne Optionen
@@ -245,7 +245,7 @@ sub test_videoToImages : Test(3) {
     my $cmd = $exa->execute(q|
             Quiq::FFmpeg->videoToImages('video.mp4','img');
         |,
-        -asStringCallback=>sub {
+        -asStringCallback => sub {
             my ($cmd) = @_;
             return $cmd->command;
         },
@@ -256,10 +256,10 @@ sub test_videoToImages : Test(3) {
     
     $cmd = $exa->execute(q|
             Quiq::FFmpeg->videoToImages('video.mp4','img',
-                -aspectRatio=>'4:3',
+                -aspectRatio => '4:3',
             );
         |,
-        -asStringCallback=>sub {
+        -asStringCallback => sub {
             my ($cmd) = @_;
             return $cmd->command;
         },
@@ -270,13 +270,13 @@ sub test_videoToImages : Test(3) {
 
     $cmd = $exa->execute(q|
             Quiq::FFmpeg->videoToImages('video.mp4','img',
-                -aspectRatio=>'4:3',
-                -framestep=>6,
-                -start=>3,
-                -stop=>10,
+                -aspectRatio => '4:3',
+                -framestep => 6,
+                -start => 3,
+                -stop => 10,
             );
         |,
-        -asStringCallback=>sub {
+        -asStringCallback => sub {
             my ($cmd) = @_;
             return $cmd->command;
         },
@@ -292,8 +292,8 @@ sub test_videoInfo : Test(1) {
     my $verbose = 0; # MEMO: auf 1 setzen, um Code+Resultat zu sehen
     
     my $exa = Quiq::ExampleCode->new(
-        -fileHandle=>\*STDERR,
-        -verbose=>$verbose,
+        -fileHandle => \*STDERR,
+        -verbose => $verbose,
     );
 
     # Kommando
@@ -301,7 +301,7 @@ sub test_videoInfo : Test(1) {
     my $cmd = $exa->execute(q|
             Quiq::FFmpeg->videoInfo('video.mp4');
         |,
-        -asStringCallback=>sub {
+        -asStringCallback => sub {
             my ($cmd) = @_;
             return $cmd->command;
         },

@@ -28,53 +28,187 @@ if ( $tmpdir && ($tmpdir =~ /^\Q$home/) ) {
 
 plan tests => 26;
 
-# Set HOME to a known value, so we get predictable results:
-$ENV{'HOME'} = realpath('t/home');
+# Set HOME to a known value, so we get predictable results.
+local $ENV{HOME} = realpath('t/home');
 
-# Clear the users ACKRC so it doesn't throw out expect_ackrcs().
+# Clear the user's ACKRC so it doesn't throw out expect_ackrcs().
 delete $ENV{'ACKRC'};
 
-{
-# The tests blow up on Windows if the global files don't exist,
-# so here we create them if they don't, keeping track of the ones
-# we make so we can delete them later.
-my @created_globals;
+my $finder;
+my @global_filenames = create_globals();
 
-sub set_up_globals {
-    my (@files) = @_;
+my @global_files = map { +{ path => $_ } } @global_filenames;
+my @std_files = (@global_files, { path => File::Spec->catfile($ENV{'HOME'}, '.ackrc') });
 
-    foreach my $path (@files) {
-        my $filename = $path->{path};
-        if ( not -e $filename ) {
-            touch_ackrc( $filename );
-            push @created_globals, $path;
-        }
-    }
+my $wd      = getcwd_clean();
+my $tempdir = File::Temp->newdir;
+safe_chdir( $tempdir->dirname );
 
-    return;
-}
+$finder = App::Ack::ConfigFinder->new;
+with_home( sub {
+    expect_ackrcs( \@std_files, 'having no project file should return only the top level files' );
+} );
 
-sub clean_up_globals {
-    foreach my $path (@created_globals) {
-        my $filename = $path->{path};
-        unlink $filename or warn "Couldn't unlink $path";
-    }
+no_home( sub {
+    expect_ackrcs( \@global_files, 'only system-wide ackrc is returned if HOME is not defined with no project files' );
+} );
 
-    return;
-}
+safe_mkdir( 'foo' );
+safe_mkdir( File::Spec->catdir('foo', 'bar') );
+safe_mkdir( File::Spec->catdir('foo', 'bar', 'baz') );
+safe_chdir( File::Spec->catdir('foo', 'bar', 'baz') );
 
-}
-sub no_home (&) { ## no critic (ProhibitSubroutinePrototypes)
+touch_ackrc( '.ackrc' );
+with_home( sub {
+    expect_ackrcs( [ @std_files, { project => 1, path => File::Spec->rel2abs('.ackrc') }], 'a project file in the same directory should be detected' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => File::Spec->rel2abs('.ackrc') } ], 'a project file in the same directory should be detected' );
+} );
+
+unlink '.ackrc';
+
+my $project_file = File::Spec->catfile($tempdir->dirname, 'foo', 'bar', '.ackrc');
+touch_ackrc( $project_file );
+with_home( sub {
+    expect_ackrcs( [ @std_files, { project => 1, path => $project_file } ], 'a project file in the parent directory should be detected' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => $project_file } ], 'a project file in the parent directory should be detected' );
+} );
+unlink $project_file;
+
+$project_file = File::Spec->catfile($tempdir->dirname, 'foo', '.ackrc');
+touch_ackrc( $project_file );
+with_home( sub {
+    expect_ackrcs( [ @std_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected' );
+} );
+
+touch_ackrc( '.ackrc' );
+
+with_home( sub {
+    expect_ackrcs( [ @std_files, { project => 1, path => File::Spec->rel2abs('.ackrc') } ], 'a project file in the same directory should be detected, even with another one above it' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => File::Spec->rel2abs('.ackrc') } ], 'a project file in the same directory should be detected, even with another one above it' );
+} );
+
+unlink '.ackrc';
+unlink $project_file;
+
+touch_ackrc( '_ackrc' );
+with_home( sub {
+    expect_ackrcs( [ @std_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected' );
+} );
+
+unlink '_ackrc';
+
+$project_file = File::Spec->catfile($tempdir->dirname, 'foo', '_ackrc');
+touch_ackrc( $project_file );
+with_home( sub {
+    expect_ackrcs( [ @std_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected' );
+} );
+
+touch_ackrc( '_ackrc' );
+with_home( sub { expect_ackrcs( [ @std_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected, even with another one above it' );
+} );
+no_home( sub {
+    expect_ackrcs( [ @global_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected, even with another one above it' );
+} );
+
+unlink $project_file;
+touch_ackrc( '.ackrc' );
+
+do {
+    my $finder_fn = sub {
+        my $ok = eval { $finder->find_config_files };
+        my $err = $@;
+        ok( !$ok, '.ackrc + _ackrc is error' );
+        like( $err, qr/contains both \.ackrc and _ackrc/, 'Got the expected error' );
+    };
+    with_home( $finder_fn );
+    no_home( $finder_fn );
+
+    unlink '.ackrc';
+    $project_file = File::Spec->catfile($tempdir->dirname, 'foo', '.ackrc');
+    touch_ackrc( $project_file );
+    with_home( sub {
+        expect_ackrcs( [ @std_files, { project => 1, path => File::Spec->rel2abs('_ackrc') }], 'a lower-level _ackrc should be preferred to a higher-level .ackrc' );
+    } );
+    no_home( sub {
+        expect_ackrcs( [ @global_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a lower-level _ackrc should be preferred to a higher-level .ackrc' );
+    } );
+
+    unlink '_ackrc';
+};
+
+do {
+    my $test_home = File::Spec->catdir( $tempdir->dirname, 'foo' );
+    local $ENV{'HOME'} = $test_home;
+
+    my $user_file = File::Spec->catfile( $test_home, '.ackrc');
+    touch_ackrc( $user_file );
+
+    expect_ackrcs( [ @global_files, { path => $user_file } ], q{Don't load the same ackrc file twice} );
+    unlink($user_file);
+};
+
+do {
+    safe_chdir( $tempdir->dirname );
+    local $ENV{'HOME'} = File::Spec->catfile($tempdir->dirname, 'foo');
+
+    my $user_file = File::Spec->catfile($ENV{'HOME'}, '.ackrc');
+    touch_ackrc( $user_file );
+
+    my $ackrc = create_tempfile();
+    local $ENV{'ACKRC'} = $ackrc->filename;
+
+    expect_ackrcs( [ @global_files, { path => $ackrc->filename } ], q{ACKRC overrides user's HOME ackrc} );
+    unlink $ackrc->filename;
+
+    expect_ackrcs( [ @global_files, { path => $user_file } ], q{ACKRC doesn't override if it doesn't exist} );
+
+    touch_ackrc( $ackrc->filename );
+    safe_chdir( 'foo' );
+    expect_ackrcs( [ @global_files, { path => $ackrc->filename}, { project => 1, path => $user_file } ], q{~/.ackrc should still be found as a project ackrc} );
+    unlink $ackrc->filename;
+};
+
+safe_chdir( $wd );
+clean_up_globals();
+
+exit 0;
+
+
+sub with_home {
     my ( $fn ) = @_;
 
-    my $home = delete $ENV{'HOME'}; # Localized delete isn't supported in earlier Perls.
     $fn->();
-    $ENV{'HOME'} = $home; # XXX this won't work on exceptions...
 
     return;
 }
 
-my $finder;
+
+sub no_home {
+    my ( $fn ) = @_;
+
+    # We have to manually store the value of HOME because localized
+    # delete isn't supported until Perl 5.12.0.
+    my $home_saved = delete $ENV{HOME};
+    $fn->();
+    $ENV{HOME} = $home_saved;
+
+    return;
+}
 
 sub expect_ackrcs {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -88,159 +222,7 @@ sub expect_ackrcs {
     foreach my $element (@got, @expected) {
         $element->{'path'} = realpath($element->{'path'});
     }
-    is_deeply( \@got, \@expected, $name ) or diag(explain(\@got));
+    is_deeply( \@got, \@expected, $name ) or diag(explain(got=>\@got,expected=>\@expected));
 
     return;
 }
-
-my @global_files;
-
-if ( is_windows() ) {
-    require Win32;
-
-    @global_files = map { +{ path => File::Spec->catfile($_, 'ackrc') } } (
-        Win32::GetFolderPath(Win32::CSIDL_COMMON_APPDATA()),
-        Win32::GetFolderPath(Win32::CSIDL_APPDATA()),
-    );
-}
-else {
-    @global_files = (
-        { path => '/etc/ackrc' },
-    );
-}
-
-if ( is_windows() || is_cygwin() ) {
-    set_up_globals( @global_files );
-}
-
-my @std_files = (@global_files, { path => File::Spec->catfile($ENV{'HOME'}, '.ackrc') });
-
-my $wd      = getcwd_clean();
-my $tempdir = File::Temp->newdir;
-safe_chdir( $tempdir->dirname );
-
-$finder = App::Ack::ConfigFinder->new;
-expect_ackrcs \@std_files, 'having no project file should return only the top level files';
-
-no_home {
-    expect_ackrcs \@global_files, 'only system-wide ackrc is returned if HOME is not defined with no project files';
-};
-
-safe_mkdir( 'foo' );
-safe_mkdir( File::Spec->catdir('foo', 'bar') );
-safe_mkdir( File::Spec->catdir('foo', 'bar', 'baz') );
-
-safe_chdir( File::Spec->catdir('foo', 'bar', 'baz') );
-
-touch_ackrc( '.ackrc' );
-expect_ackrcs [ @std_files, { project => 1, path => File::Spec->rel2abs('.ackrc') }], 'a project file in the same directory should be detected';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => File::Spec->rel2abs('.ackrc') } ], 'a project file in the same directory should be detected';
-};
-
-unlink '.ackrc';
-
-my $project_file = File::Spec->catfile($tempdir->dirname, 'foo', 'bar', '.ackrc');
-touch_ackrc( $project_file );
-expect_ackrcs [ @std_files, { project => 1, path => $project_file } ], 'a project file in the parent directory should be detected';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => $project_file } ], 'a project file in the parent directory should be detected';
-};
-unlink $project_file;
-
-$project_file = File::Spec->catfile($tempdir->dirname, 'foo', '.ackrc');
-touch_ackrc( $project_file );
-expect_ackrcs [ @std_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected';
-};
-
-touch_ackrc( '.ackrc' );
-
-expect_ackrcs [ @std_files, { project => 1, path => File::Spec->rel2abs('.ackrc') } ], 'a project file in the same directory should be detected, even with another one above it';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => File::Spec->rel2abs('.ackrc') } ], 'a project file in the same directory should be detected, even with another one above it';
-};
-
-unlink '.ackrc';
-unlink $project_file;
-
-touch_ackrc( '_ackrc' );
-expect_ackrcs [ @std_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected';
-};
-
-unlink '_ackrc';
-
-$project_file = File::Spec->catfile($tempdir->dirname, 'foo', '_ackrc');
-touch_ackrc( $project_file );
-expect_ackrcs [ @std_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => $project_file } ], 'a project file in the grandparent directory should be detected';
-};
-
-touch_ackrc( '_ackrc' );
-expect_ackrcs [ @std_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected, even with another one above it';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a project file in the same directory should be detected, even with another one above it';
-};
-
-unlink $project_file;
-touch_ackrc( '.ackrc' );
-my $ok = eval { $finder->find_config_files };
-my $err = $@;
-ok( !$ok, '.ackrc + _ackrc is error' );
-like( $err, qr/contains both \.ackrc and _ackrc/, 'Got the expected error' );
-
-no_home {
-    $ok = eval { $finder->find_config_files };
-    $err = $@;
-    ok( !$ok, '.ackrc + _ackrc is error' );
-    like( $err, qr/contains both \.ackrc and _ackrc/, 'Got the expected error' );
-};
-
-unlink '.ackrc';
-$project_file = File::Spec->catfile($tempdir->dirname, 'foo', '.ackrc');
-touch_ackrc( $project_file );
-expect_ackrcs [ @std_files, { project => 1, path => File::Spec->rel2abs('_ackrc') }], 'a lower-level _ackrc should be preferred to a higher-level .ackrc';
-no_home {
-    expect_ackrcs [ @global_files, { project => 1, path => File::Spec->rel2abs('_ackrc') } ], 'a lower-level _ackrc should be preferred to a higher-level .ackrc';
-};
-
-unlink '_ackrc';
-
-do {
-    local $ENV{'HOME'} = File::Spec->catdir($tempdir->dirname, 'foo');
-
-    my $user_file = File::Spec->catfile($tempdir->dirname, 'foo', '.ackrc');
-    touch_ackrc( $user_file );
-
-    expect_ackrcs [ @global_files, { path => $user_file } ], q{don't load the same ackrc file twice};
-    unlink($user_file);
-};
-
-do {
-    safe_chdir( $tempdir->dirname );
-    local $ENV{'HOME'} = File::Spec->catfile($tempdir->dirname, 'foo');
-
-    my $user_file = File::Spec->catfile($ENV{'HOME'}, '.ackrc');
-    touch_ackrc( $user_file );
-
-    my $ackrc = File::Temp->new;
-    close $ackrc;
-    local $ENV{'ACKRC'} = $ackrc->filename;
-
-    expect_ackrcs [ @global_files, { path => $ackrc->filename } ], q{ACKRC overrides user's HOME ackrc};
-    unlink $ackrc->filename;
-
-    expect_ackrcs [ @global_files, { path => $user_file } ], q{ACKRC doesn't override if it doesn't exist};
-
-    touch_ackrc( $ackrc->filename );
-    safe_chdir( 'foo' );
-    expect_ackrcs [ @global_files, { path => $ackrc->filename}, { project => 1, path => $user_file } ], q{~/.ackrc should still be found as a project ackrc};
-    unlink $ackrc->filename;
-};
-
-safe_chdir( $wd );
-clean_up_globals();

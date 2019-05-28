@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Test-MinimumVersion
 
+2.000010  2019-05-24 04:52:07Z
+    - fixes errors made in 2.000009 so as to work again with [ExtraTests].
+
 2.000009  2019-05-18 04:34:14Z
     - remove shebang from generated test
     - add strict, warnings to generated test

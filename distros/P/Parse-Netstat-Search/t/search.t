@@ -179,14 +179,14 @@ $search->set_ports;
 ok( $#found eq '6', 'search, port+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"... failed to reset the ports and states');
 
 # find all IPv6 addresses
-$search->set_cidrs( ['::/0'] );
+$search->set_cidrs( ['fe80::/32'] );
 @found=$search->search($res);
-ok( $#found eq '0', 'IPv6 CIDR search 1') or diag('"'.$#found.'" number of returned connections for ::/0 instead of "0"');
+ok( $#found eq '0', 'IPv6 CIDR search 1') or diag('"'.$#found.'" number of returned connections for fe80::/32 instead of "0"');
 ok( $found[0]->{local_pp} eq 'lo0', 'IPv6 % removal test') or diag('"local_pp" not defined for removed % section of IPv6 address. "lo0" expected');
 
 # test for future regrestions in mixed IPv4/6 CIDR lists
-$search->set_cidrs( ['::/0','192.168.0.0/16'] );
+$search->set_cidrs( ['fe80::/32','192.168.0.0/16'] );
 @found=$search->search($res);
-ok( $#found eq '1', 'Mixed IPv4/6 CIDR search 1') or diag('"'.$#found.'" number of returned connections for ::/0,192.168.0.0/16 instead of "1"');
+ok( $#found eq '1', 'Mixed IPv4/6 CIDR search 1') or diag('"'.$#found.'" number of returned connections for fe80::/32,192.168.0.0/16 instead of "1"');
 
 done_testing(23);

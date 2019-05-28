@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Shell;
 use Quiq::File::Image;
@@ -59,7 +59,7 @@ sub new {
     my $class = shift;
 
     return $class->SUPER::new(
-        cmd=>'',
+        cmd => '',
     );
 }
     
@@ -565,7 +565,7 @@ sub morph {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

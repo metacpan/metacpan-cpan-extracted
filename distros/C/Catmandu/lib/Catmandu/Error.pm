@@ -2,7 +2,7 @@ package Catmandu::Error;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -12,9 +12,8 @@ extends 'Throwable::Error';
 with 'Catmandu::Logger';
 
 has message => (
-    is      => 'ro',
-    default => sub {""},
-    coerce  => sub {
+    is     => 'lazy',
+    coerce => sub {
         my $msg = $_[0] // "";
         $msg =~ s/\s+$//;
         $msg;
@@ -34,11 +33,15 @@ sub log_message {
     $_[0]->message;
 }
 
+sub _build_message {
+    "";
+}
+
 package Catmandu::Error::Source;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo::Role;
 use Catmandu::Util qw(is_string);
@@ -61,7 +64,7 @@ package Catmandu::BadVal;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -72,7 +75,7 @@ package Catmandu::BadArg;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -83,7 +86,7 @@ package Catmandu::NotImplemented;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -94,7 +97,7 @@ package Catmandu::NoSuchPackage;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -132,7 +135,7 @@ package Catmandu::FixParseError;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -154,7 +157,7 @@ package Catmandu::NoSuchFixPackage;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -178,7 +181,7 @@ package Catmandu::BadFixArg;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use namespace::clean;
@@ -205,7 +208,7 @@ package Catmandu::FixError;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use Data::Dumper;
@@ -232,7 +235,7 @@ package Catmandu::HTTPError;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.2002';
 
 use Moo;
 use Data::Dumper;

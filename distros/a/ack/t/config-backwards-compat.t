@@ -5,12 +5,11 @@ use warnings;
 
 use lib 't';
 use Util;
-use File::Temp;
 use Test::More tests => 3;
 
 prep_environment();
 
-my $old_config = <<'HERE';
+my $temp_config = create_tempfile( <<'HERE' );
 # Always sort
 --sort-files
 
@@ -36,10 +35,6 @@ my $old_config = <<'HERE';
 
 --ignore-dir=nytprof
 HERE
-
-my $temp_config = File::Temp->new;
-print { $temp_config } $old_config;
-close $temp_config;
 
 my @args = ( '--ackrc=' . $temp_config->filename, '--md', 'One', 't/swamp/' );
 

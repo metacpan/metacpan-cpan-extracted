@@ -2,8 +2,8 @@
 
 package Sys::RunAlone::Flexible;
 
-our $DATE = '2019-01-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-24'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 # make sure we're strict and verbose as possible
 use strict;
@@ -27,8 +27,8 @@ sub lock {
 
     # no data handle, we're screwed
     elsif ( tell( *main::DATA ) == -1 ) {
-        print STDERR "Add __END__ to end of script '$0'"
-          . " to be able use the features of Sys::RunALone::Flexible\n";
+        print STDERR "Add __END__ or __DATA__ to the end of script '$0'"
+          . " to be able use the features of Sys::RunAlone::Flexible\n";
         exit 2;
     }
 
@@ -114,7 +114,7 @@ Sys::RunAlone::Flexible - make sure only one invocation of a script is active at
 
 =head1 VERSION
 
-This document describes version 0.001 of Sys::RunAlone::Flexible (from Perl distribution Sys-RunAlone-Flexible), released on 2019-01-29.
+This document describes version 0.002 of Sys::RunAlone::Flexible (from Perl distribution Sys-RunAlone-Flexible), released on 2019-05-24.
 
 =head1 SYNOPSIS
 

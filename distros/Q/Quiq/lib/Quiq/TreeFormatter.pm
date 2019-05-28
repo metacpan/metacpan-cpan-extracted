@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 
@@ -507,7 +507,7 @@ sub asText {
     }
     else {
         $self->throw(
-            q~TREE-FORMATTER-00001: Unknown format~,
+            'TREE-FORMATTER-00001: Unknown format',
             Format => $format,
         );
     }
@@ -519,7 +519,7 @@ sub asText {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

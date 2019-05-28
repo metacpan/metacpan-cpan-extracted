@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::String;
@@ -38,8 +38,8 @@ Form eines Objektes zurückliefern. Die Ausgabe auf STDOUT
 unterbleibt.
 
     my $exa = Quiq::ExampleCode->new(
-        -objectReturn=>1,
-        -verbose=>0,
+        -objectReturn => 1,
+        -verbose => 0,
     );
 
 Ausführung im Skalar-Kontext:
@@ -69,14 +69,14 @@ gestellt werden.
 Variable vorab setzen:
 
     $exa->setVariable(
-        ffm=>$ffm,
+        ffm => $ffm,
     );
     my $cmd = $exa->execute(q|
         $ffm->videoToImages('video.mp4','img',
-            -aspectRatio=>'4:3',
-            -framestep=>6,
-            -start=>3,
-            -stop=>10,
+            -aspectRatio => '4:3',
+            -framestep => 6,
+            -start => 3,
+            -stop => 10,
         );
     |);
 
@@ -84,27 +84,27 @@ Variable per Option -variables bei Aufruf setzen:
 
     my $cmd = $exa->execute(q|
         $ffm->videoToImages('video.mp4','img',
-            -aspectRatio=>'4:3',
-            -framestep=>6,
-            -start=>3,
-            -stop=>10,
+            -aspectRatio => '4:3',
+            -framestep => 6,
+            -start => 3,
+            -stop => 10,
         );|,
-        -variables=>[
-            ffm=>$ffm,
+        -variables => [
+            ffm => $ffm,
         ],
     );
 
 oder (in anderer Reihenfolge):
 
     my $cmd = $exa->execute(
-        -variables=>[
-            ffm=>$ffm,
+        -variables => [
+            ffm => $ffm,
         ],q|
             $ffm->videoToImages('video.mp4','img',
-                -aspectRatio=>'4:3',
-                -framestep=>6,
-                -start=>3,
-                -stop=>10,
+                -aspectRatio => '4:3',
+                -framestep => 6,
+                -start => 3,
+                -stop => 10,
             );
         |,
     );
@@ -161,17 +161,17 @@ sub new {
     my $verbose = 1;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -fileHandle=>\$fileHandle,
-        -objectReturn=>\$objectReturn,
-        -verbose=>\$verbose,
+        -fileHandle => \$fileHandle,
+        -objectReturn => \$objectReturn,
+        -verbose => \$verbose,
     );
 
     # Instantiiere Objekt
 
     return $class->SUPER::new(
-        fileHandle=>$fileHandle,
-        objectReturn=>$objectReturn,
-        verbose=>$verbose,
+        fileHandle => $fileHandle,
+        objectReturn => $objectReturn,
+        verbose => $verbose,
     );
 }
     
@@ -198,9 +198,9 @@ selbst mit der Option -variables angegeben werden.
 =head4 Example
 
     $exa->setVariable(
-        obj=>$obj,
-        x=>$x,
-        y=>$y,
+        obj => $obj,
+        x => $x,
+        y => $y,
     );
 
 =cut
@@ -277,20 +277,20 @@ Der Aufruf
 
     $cmd = $exa->execute(q|
         $ffm->videoToImages('video.mp4','img',
-            -aspectRatio=>'4:3',
-            -framestep=>6,
-            -start=>3,
-            -stop=>10,
+            -aspectRatio => '4:3',
+            -framestep => 6,
+            -start => 3,
+            -stop => 10,
         );
     |);
 
 führt zu der Ausgabe
 
     $ffm->videoToImages('video.mp4','img',
-        -aspectRatio=>'4:3',
-        -framestep=>6,
-        -start=>3,
-        -stop=>10,
+        -aspectRatio => '4:3',
+        -framestep => 6,
+        -start => 3,
+        -stop => 10,
     );
     =>
     ffmpeg -y -loglevel error -stats -i 'video.mp4'
@@ -316,11 +316,11 @@ sub execute {
     my $verbose = $self->verbose;
     
     Quiq::Option->extract(\@_,
-        -asStringCallback=>\$asStringCallback,
-        -listContext=>\$listContext,
-        -objectReturn=>\$objectReturn,
-        -variables=>\$variableA,
-        -verbose=>\$verbose,
+        -asStringCallback => \$asStringCallback,
+        -listContext => \$listContext,
+        -objectReturn => \$objectReturn,
+        -variables => \$variableA,
+        -verbose => \$verbose,
     );
     $listContext //= wantarray;
     
@@ -367,8 +367,8 @@ sub execute {
 
     if ($objectReturn) {
         return Quiq::Hash->new(
-            code=>$code,
-            result=>$listContext? \@res: $res,
+            code => $code,
+            result => $listContext? \@res: $res,
         );
     }
     
@@ -379,7 +379,7 @@ sub execute {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

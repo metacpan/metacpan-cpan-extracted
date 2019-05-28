@@ -1,0 +1,9 @@
+0.02 - 2019-05-25
+  - Fix parser to allow empty function parameter lists
+  - Exception objects now stringify to class suffix and message
+  - Implemented several more Namespace::Default functions
+  - Fixed several perl 5.10 and 5.8 compatibility problems
+  - Remove accidental dependencies
+
+0.01 - 2019-05-24
+  - Initial release

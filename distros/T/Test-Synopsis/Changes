@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Synopsis
 
+0.16  2019-05-24
+        - Fix test failures when version 0.23 of
+            Test::Spelling is in use (by ppisar, #21)
+
 0.15  2016-03-02
         - Specify Pod::Simple version to prereq, as needed
           feature missing from older versions (by autarch)        

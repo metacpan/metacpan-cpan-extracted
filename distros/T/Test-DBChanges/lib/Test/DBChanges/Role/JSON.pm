@@ -3,7 +3,7 @@ use Moo::Role;
 use JSON::MaybeXS ();
 use namespace::autoclean;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 # ABSTRACT: decode data that's recorded as JSON
 
 
@@ -27,7 +27,7 @@ Test::DBChanges::Role::JSON - decode data that's recorded as JSON
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Reference;
 use Quiq::Http::Cookie;
@@ -47,8 +47,8 @@ als Basisklasse verwendet.
 =head2 Einfache HTTP-Nachricht
 
     my $msg = Quiq::Http::Message->new(
-        contentType=>'text/plain',
-        body=>"Hello world\n"
+        contentType => 'text/plain',
+        body => "Hello world\n"
     );
     print $msg->asString;
 
@@ -64,8 +64,8 @@ generiert auf STDOUT
     my $sock = Quiq::Socket->new($host,$port);
     
     my $msg = Quiq::Http::Message->new(
-        contentType=>'text/plain',
-        body=>"Hello world\n"
+        contentType => 'text/plain',
+        body => "Hello world\n"
     );
     
     print $sock $msg->asString;
@@ -183,24 +183,24 @@ sub new {
     # @_: @keyVal -or- @keyVal,$source -or- $source
 
     my $self = $class->SUPER::new(
-        received=>0,
-        protocol=>undef,
-        status=>undef,
-        statusText=>undef,
-        contentType=>undef,
-        transferEncoding=>undef,
-        charset=>undef,
-        contentLength=>undef,
-        expires=>undef,
-        location=>undef,
-        refresh=>[undef,undef],
-        setCookie=>[],
-        host=>undef,
-        connection=>undef,
-        #wwwAuthenticate=>undef,
-        authorization=>undef,
-        userAgent=>undef,
-        body=>'',
+        received => 0,
+        protocol => undef,
+        status => undef,
+        statusText => undef,
+        contentType => undef,
+        transferEncoding => undef,
+        charset => undef,
+        contentLength => undef,
+        expires => undef,
+        location => undef,
+        refresh => [undef,undef],
+        setCookie => [],
+        host => undef,
+        connection => undef,
+        #wwwAuthenticate => undef,
+        authorization => undef,
+        userAgent => undef,
+        body => '',
     );
 
     if (@_%2) {
@@ -242,18 +242,18 @@ Eigenschaften siehe L<new|"new() - Instantiiere ein HTTP Nachrichten-Objekt">().
 Ein HTTP-Request ohne Inhalt:
 
     $http->set(
-        host=>$host,
-        connection=>'close',
+        host => $host,
+        connection => 'close',
     );
 
 Eine HTTP-Response:
 
     $http->set(
-        contentType=>'text/html',
-        charset=>'utf-8',
-        setCookie=>[id=>4711],
-        setCookie=>[user=>'seitzf'],
-        body=>"Test\n",
+        contentType => 'text/html',
+        charset => 'utf-8',
+        setCookie => [id=>4711],
+        setCookie => [user=>'seitzf'],
+        body => "Test\n",
     );
 
 =cut
@@ -625,8 +625,8 @@ Generiere Id und setze permanenten Cookie, der nach 5 Jahren abläuft:
 
     $id = Quiq::Converter->intToWord(time);
     $http->setCookie(
-        id=>$id,
-        expires=>'+5y',
+        id => $id,
+        expires => '+5y',
     );
 
 =cut
@@ -823,8 +823,8 @@ sub fromString {
         # X-(.*?):
         elsif (!$received) {
             $self->throw(
-                q~HTTP-00003: Unbekannte HTTP Headerzeile~,
-                Line=>$_,
+                'HTTP-00003: Unbekannte HTTP Headerzeile',
+                Line => $_,
             );
         }
     }
@@ -860,8 +860,8 @@ sub fromString {
     }
     else {
         $self->throw(
-            q~HTTP-00001: Transfer-Encoding nicht unterstützt~,
-            Value=>$transferEncoding,
+            'HTTP-00001: Transfer-Encoding nicht unterstützt',
+            Value => $transferEncoding,
         );
     }
     $fh->close;
@@ -978,7 +978,7 @@ sub asString {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

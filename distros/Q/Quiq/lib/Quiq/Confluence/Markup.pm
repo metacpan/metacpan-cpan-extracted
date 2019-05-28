@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Unindent;
 
@@ -327,8 +327,8 @@ sub code {
         }
         else {
              $self->throw(
-                 q~CONFLUENCE-00001: Unknown code macro option~,
-                 Option=>$key,
+                 'CONFLUENCE-00001: Unknown code macro option',
+                 Option => $key,
              );
         }
     }
@@ -408,8 +408,8 @@ sub noFormat {
         }
         else {
              $self->throw(
-                 q~CONFLUENCE-00001: Unknown noformat macro option~,
-                 Option=>$key,
+                 'CONFLUENCE-00001: Unknown noformat macro option',
+                 Option => $key,
              );
         }
     }
@@ -508,8 +508,8 @@ sub panel {
         }
         else {
              $self->throw(
-                 q~CONFLUENCE-00001: Unknown panel option~,
-                 Option=>$key,
+                 'CONFLUENCE-00001: Unknown panel option',
+                 Option => $key,
              );
         }
     }
@@ -650,8 +650,8 @@ sub tableOfContents {
         }
         else {
              $self->throw(
-                 q~CONFLUENCE-00001: Unknown panel option~,
-                 Option=>$key,
+                 'CONFLUENCE-00001: Unknown panel option',
+                 Option => $key,
              );
         }
     }
@@ -949,7 +949,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

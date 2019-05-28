@@ -20,55 +20,52 @@ can_ok $package, 'new';
 
 note 'Object';
 ok my $object = $package->new, 'Create object';
-my @methods = qw|param plot|;
+my @methods = qw|plot|;
 can_ok $object, $_ for @methods;
 
 note 'Parameters';
 my %defaults = (
-  background => 'white',
-  foreground => 'black',
+  SVG::Barcode::DEFAULTS->%*,
   lineheight => 30,
   linewidth  => 1,
-  margin     => 10,
   textsize   => 10,
 );
 
 for (sort keys %defaults) {
-  is $object->param($_), $defaults{$_}, "$_ is $defaults{$_}";
+  can_ok $object, $_;
+  is $object->$_, $defaults{$_}, "$_ is $defaults{$_}";
 }
+
+ok $package->new(%defaults), 'Create again using defaults';
 
 my %non_defaults = (
   lineheight => 22,
   textsize   => 0,
 );
-ok $object = $package->new(\%non_defaults),
+ok $object = $package->new(%non_defaults),
   'Create object with non-default parameters';
 for (sort keys %non_defaults) {
-  is $object->param($_), $non_defaults{$_}, "$_ is $non_defaults{$_}";
+  is $object->$_, $non_defaults{$_}, "$_ is $non_defaults{$_}";
 }
 for (sort keys %defaults) {
   next if defined $non_defaults{$_};
-  is $object->param($_), $defaults{$_}, "$_ is $defaults{$_}";
+  is $object->$_, $defaults{$_}, "$_ is $defaults{$_}";
 }
 
-is $object->param(foreground => 'red')->param('foreground'), 'red',
-  'Set color to red';
-is $object->param(foreground => '')->param('foreground'), $defaults{foreground},
-  'Set color to default';
+is $object->linewidth(3)->linewidth, 3, 'Set linewidth to 3';
+is $object->linewidth('')->linewidth, $defaults{linewidth},
+  'Set linewidth back to default';
 
 note 'Plot';
 ok $object = $package->new, 'Create object';
 my $text = 'Tekki';
 ok my $svg = $object->plot($text), 'Plot barcode';
-spurt("$FindBin::Bin/resources/Tekki_black_text.svg",$svg);
 is $svg, slurp("$FindBin::Bin/resources/Tekki_black_text.svg"),
   'Content is correct';
 
-is $object->param(foreground => 'red')->param(textsize => 0)
-  ->param(lineheight => 20), $object,
+is $object->foreground('red')->textsize(0)->lineheight(20), $object,
   'Change color and height, hide text';
 ok $svg = $object->plot($text), 'Plot barcode';
-spurt("$FindBin::Bin/resources/Tekki_red_notext.svg",$svg);
 is $svg, slurp("$FindBin::Bin/resources/Tekki_red_notext.svg"),
   'Content is correct';
 

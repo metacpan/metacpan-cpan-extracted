@@ -649,7 +649,7 @@ sub build_local ( $self, $tag, $args ) {
     if ( $args->{remove} ) {
         for my $tag (@tags) {
             print qq[Removing image "$tag" ... ];
-            $res = $docker->image_remove($tag);
+            $res = $docker->image_remove( $tag, 1 );
             say $res;
         }
     }

@@ -3,7 +3,7 @@ package YAML::LibYAML::API;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
@@ -69,21 +69,24 @@ sub parse_filehandle_events {
 }
 
 sub emit_string_events {
-    my ($events) = @_;
+    my ($events, $options) = @_;
+    $options ||= {};
     _string_to_numeric($events);
-    return YAML::LibYAML::API::XS::emit_string_events($events);
+    return YAML::LibYAML::API::XS::emit_string_events($events, $options);
 }
 
 sub emit_file_events {
-    my ($file, $events) = @_;
+    my ($file, $events, $options) = @_;
+    $options ||= {};
     _string_to_numeric($events);
-    return YAML::LibYAML::API::XS::emit_file_events($file, $events);
+    return YAML::LibYAML::API::XS::emit_file_events($file, $events, $options);
 }
 
 sub emit_filehandle_events {
-    my ($fh, $events) = @_;
+    my ($fh, $events, $options) = @_;
+    $options ||= {};
     _string_to_numeric($events);
-    return YAML::LibYAML::API::XS::emit_filehandle_events($fh, $events);
+    return YAML::LibYAML::API::XS::emit_filehandle_events($fh, $events, $options);
 }
 
 sub _numeric_to_string {

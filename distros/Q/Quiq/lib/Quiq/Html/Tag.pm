@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -277,9 +277,9 @@ Die Methode tag() unterstützt data-* Attribute auf zwei Weisen:
 Einzelne Attribute:
 
     $h->tag('form',
-        'data-x'=>'a',
-        'data-y'=>'b',
-        'data-z'=>'c',
+        'data-x' => 'a',
+        'data-y' => 'b',
+        'data-z' => 'c',
          ...
     );
 
@@ -288,10 +288,10 @@ Einzelne Attribute:
 Liste von Attributen:
 
     $h->tag('form',
-        data=>[
-            x=>'a',
-            y=>'b',
-            z=>'c',
+        data => [
+            x => 'a',
+            y => 'b',
+            z => 'c',
         ],
         ...
     );
@@ -497,13 +497,13 @@ wird nur bei klassischem HTML - nicht bei XHTML - beachtet.
 # Werte anders gesetzt, gelten sie für die gesamte Applikation.
 
 my %Default = (
-    checkLevel=>1,            # Umfang der Element- und Attribut-Prüfungen
-    compact=>0,               # Einzeilig, Whitespace komprimiert
-    embedImages=>0,           # Einbettung von Bildern
-    # htmlVersion=>'xhtml-1.0', # XHTML vs. HTML, Versionsnr. für DOCTYPE
-    htmlVersion=>'html-5',    # XHTML vs. HTML, Versionsnr. für DOCTYPE
-    indentation=>undef,       # forcierte Einrückung
-    uppercase=>0,             # wandele Elem.- und Att.-Namen in Großschr.
+    checkLevel => 1,            # Umfang der Element- und Attribut-Prüfungen
+    compact => 0,               # Einzeilig, Whitespace komprimiert
+    embedImages => 0,           # Einbettung von Bildern
+    # htmlVersion => 'xhtml-1.0', # XHTML vs. HTML, Versionsnr. für DOCTYPE
+    htmlVersion => 'html-5',    # XHTML vs. HTML, Versionsnr. für DOCTYPE
+    indentation => undef,       # forcierte Einrückung
+    uppercase => 0,             # wandele Elem.- und Att.-Namen in Großschr.
 );
 Hash::Util::lock_keys(%Default);
 
@@ -511,87 +511,87 @@ Hash::Util::lock_keys(%Default);
 # und ihre Default-Formatierung
 
 my %Element = (
-    a=>'i',          # Link, Anker
-    abbr=>'i',       # Text ist Abkürzung
-    acronym=>'i',    # Text ist Akronym
-    address=>'v',    # Text ist Adressangabe
-    area=>'e',       # Bereich in einer clientseitigen Image-Map
-    b=>'i',          # Fettschrift
-    base=>'e',       # Basis-Pfadname für alle relativen URLs
-    bdo=>'i',        # Text mit anderer Laufrichtung
-    big=>'i',        # Großschrift
-    blockquote=>'m', # Zitatabschnitt
-    body=>'m',       # Rumpf HTML-Seite
-    br=>'e',         # Zeilenumbruch
-    button=>'v',     # Schaltfläche
-    caption=>'v',    # Beschriftung zu einer Tabelle
-    cite=>'i',       # Text ist Hinweis auf Literaturstelle
-    code=>'i',       # Codebeispiel
-    col=>'e',        # Eigenschaften einer Tabellenspalte
-    colgroup=>'m',   # Definition einer Spaltengruppe
-    dd=>'v',         # Text Definitionsliste
-    del=>'i',        # gelöschter Text
-    dfn=>'i',        # Text ist Definition
-    div=>'m',        # allgemeines Block-Element
-    dl=>'m',         # Definitionsliste
-    dt=>'v',         # Terminus Definitionsliste
-    em=>'i',         # hervorgehobener Text
-    fieldset=>'m',   # Gruppe von Feldern eines Formulars
-    form=>'m',       # Formular
-    frame=>'e',      # (Frameset-DTD) Frame eines Frameset
-    frameset=>'m',   # (Frameset-DTD) Frameset
-    h1=>'v',         # Überschrift
-    h2=>'v',         # Überschrift
-    h3=>'v',         # Überschrift
-    h4=>'v',         # Überschrift
-    h5=>'v',         # Überschrift
-    h6=>'v',         # Überschrift
-    head=>'m',       # Kopf HTML-Seite
-    hr=>'e',         # Trennbalken
-    html=>'M',       # HTML-Seite
-    i=>'i',          # kursiver Text
-    iframe=>'v',     # (Frameset-DTD) Inline-Frame
-    img=>'E',        # Bild
-    input=>'e',      # Formular-Eingabeelement
-    ins=>'i',        # eingefügter Text
-    kbd=>'i',        # Text stellt Benutzereingabe dar
-    label=>'v',      # Label zu Formular-Eingabeelement
-    legend=>'v',     # Beschriftung zu Fieldset
-    li=>'v',         # Listenelement
-    link=>'e',       # Definiert Beziehung zu anderem Dokument
-    map=>'m',        # Definition clientseitige Image-Map
-    meta=>'e',       # Information zum Dokument
-    noframes=>'m',   # (Frameset-DTD) Inhalt für nicht-framefähige Browser
-    noscript=>'m',   # Inhalt für nicht-skriptfähige Browser
-    object=>'m',     # einbettetes Objekt
-    ol=>'m',         # nummerierte Liste
-    optgroup=>'m',   # Gruppe von Optionen einer Selectliste
-    option=>'v',     # Option einer Selectliste
-    p=>'m',          # Absatz
-    param=>'e',      # Parameter eines Object
-    pre=>'p',        # Leerraum und Zeilenumbrüche erhalten
-    q=>'i',          # Kurzzitat
-    samp=>'i',       # Text stellt Ausgabe eines Programms dar
-    script=>'c',     # Code, der vom Browser ausgeführt wird
-    select=>'v',     # Auswahlmenü
-    small=>'i',      # Kleinschrift
-    span=>'i',       # allgemeines Inline-Element
-    strong=>'i',     # stark hervorgehobener Text
-    style=>'v',      # Stylesheet-Regeln
-    sub=>'i',        # tiefgestellter Text
-    sup=>'i',        # hochgestellter Text
-    table=>'M',      # Tabelle
-    tbody=>'m',      # Rumpf Tabelle
-    td=>'v',         # Tabellenzelle
-    textarea=>'p',   # Text-Eingabefeld
-    tfoot=>'m',      # Fuß Tabelle (identisch zu tbody)
-    th=>'v',         # Tabellenkopfzelle (identisch zu td)
-    thead=>'m',      # Kopf Tabelle (identisch zu tbody)
-    title=>'v',      # Titel HTML-Dokument
-    tr=>'m',         # Tabellenzeile
-    tt=>'i',         # Schreibmaschinenschrift
-    ul=>'m',         # Ungeordnete Liste
-    var=>'i',        # Text ist Variablenname
+    a => 'i',          # Link, Anker
+    abbr => 'i',       # Text ist Abkürzung
+    acronym => 'i',    # Text ist Akronym
+    address => 'v',    # Text ist Adressangabe
+    area => 'e',       # Bereich in einer clientseitigen Image-Map
+    b => 'i',          # Fettschrift
+    base => 'e',       # Basis-Pfadname für alle relativen URLs
+    bdo => 'i',        # Text mit anderer Laufrichtung
+    big => 'i',        # Großschrift
+    blockquote => 'm', # Zitatabschnitt
+    body => 'm',       # Rumpf HTML-Seite
+    br => 'e',         # Zeilenumbruch
+    button => 'v',     # Schaltfläche
+    caption => 'v',    # Beschriftung zu einer Tabelle
+    cite => 'i',       # Text ist Hinweis auf Literaturstelle
+    code => 'i',       # Codebeispiel
+    col => 'e',        # Eigenschaften einer Tabellenspalte
+    colgroup => 'm',   # Definition einer Spaltengruppe
+    dd => 'v',         # Text Definitionsliste
+    del => 'i',        # gelöschter Text
+    dfn => 'i',        # Text ist Definition
+    div => 'm',        # allgemeines Block-Element
+    dl => 'm',         # Definitionsliste
+    dt => 'v',         # Terminus Definitionsliste
+    em => 'i',         # hervorgehobener Text
+    fieldset => 'm',   # Gruppe von Feldern eines Formulars
+    form => 'm',       # Formular
+    frame => 'e',      # (Frameset-DTD) Frame eines Frameset
+    frameset => 'm',   # (Frameset-DTD) Frameset
+    h1 => 'v',         # Überschrift
+    h2 => 'v',         # Überschrift
+    h3 => 'v',         # Überschrift
+    h4 => 'v',         # Überschrift
+    h5 => 'v',         # Überschrift
+    h6 => 'v',         # Überschrift
+    head => 'm',       # Kopf HTML-Seite
+    hr => 'e',         # Trennbalken
+    html => 'M',       # HTML-Seite
+    i => 'i',          # kursiver Text
+    iframe => 'v',     # (Frameset-DTD) Inline-Frame
+    img => 'E',        # Bild
+    input => 'e',      # Formular-Eingabeelement
+    ins => 'i',        # eingefügter Text
+    kbd => 'i',        # Text stellt Benutzereingabe dar
+    label => 'v',      # Label zu Formular-Eingabeelement
+    legend => 'v',     # Beschriftung zu Fieldset
+    li => 'v',         # Listenelement
+    link => 'e',       # Definiert Beziehung zu anderem Dokument
+    map => 'm',        # Definition clientseitige Image-Map
+    meta => 'e',       # Information zum Dokument
+    noframes => 'm',   # (Frameset-DTD) Inhalt für nicht-framefähige Browser
+    noscript => 'm',   # Inhalt für nicht-skriptfähige Browser
+    object => 'm',     # einbettetes Objekt
+    ol => 'm',         # nummerierte Liste
+    optgroup => 'm',   # Gruppe von Optionen einer Selectliste
+    option => 'v',     # Option einer Selectliste
+    p => 'm',          # Absatz
+    param => 'e',      # Parameter eines Object
+    pre => 'p',        # Leerraum und Zeilenumbrüche erhalten
+    q => 'i',          # Kurzzitat
+    samp => 'i',       # Text stellt Ausgabe eines Programms dar
+    script => 'c',     # Code, der vom Browser ausgeführt wird
+    select => 'v',     # Auswahlmenü
+    small => 'i',      # Kleinschrift
+    span => 'i',       # allgemeines Inline-Element
+    strong => 'i',     # stark hervorgehobener Text
+    style => 'v',      # Stylesheet-Regeln
+    sub => 'i',        # tiefgestellter Text
+    sup => 'i',        # hochgestellter Text
+    table => 'M',      # Tabelle
+    tbody => 'm',      # Rumpf Tabelle
+    td => 'v',         # Tabellenzelle
+    textarea => 'p',   # Text-Eingabefeld
+    tfoot => 'm',      # Fuß Tabelle (identisch zu tbody)
+    th => 'v',         # Tabellenkopfzelle (identisch zu td)
+    thead => 'm',      # Kopf Tabelle (identisch zu tbody)
+    title => 'v',      # Titel HTML-Dokument
+    tr => 'm',         # Tabellenzeile
+    tt => 'i',         # Schreibmaschinenschrift
+    ul => 'm',         # Ungeordnete Liste
+    var => 'i',        # Text ist Variablenname
 );
 
 # Default-Optionen
@@ -604,185 +604,185 @@ my %DefaultOptions = (
 # Default-Attribute von Elementen allgemein
 
 my %DefaultAttributes = (
-    # form=>[method=>'post',enctype=>'multipart/form-data'],
-    img=>[alt=>''],
-    script=>[type=>'text/javascript'],
-    style=>[type=>'text/css'],
+    # form => [method=>'post',enctype=>'multipart/form-data'],
+    img => [alt=>''],
+    script => [type=>'text/javascript'],
+    style => [type=>'text/css'],
 );
 
 # Default-Attribute, nur XHTML
 
 my %DefaultAttributesXhtml = (
-    html=>[xmlns=>'http://www.w3.org/1999/xhtml'],
+    html => [xmlns=>'http://www.w3.org/1999/xhtml'],
 );
 
 # Liste aller Attribute und ihrer Domänen.
 # FIXME: anhand DTD überprüfen
 
 my %Attribute = (
-    'accept-charset'=>'charsets', # form
-    'http-equiv'=>'cdata',        # meta
-    'xml:lang'=>'languageCode',   # I18N (XHTML)
-    'xml:space'=>'space',         # ENUM pre,script,style(XHTML)
-    abbr=>'text',                 # Cell
-    accept=>'contentTypes',       # form,input
-    accesskey=>'character',       # Focus,legend
-    action=>'uri',                # form
-    align=>'cellAlign',           # ENUM CellAlign
-    alt=>'cdata',                 # input(cdata);area,img(text)
-    archive=>'uriList',           # object
-    axis=>'cdata',                # Cell
-    border=>'pixels',             # table
-    cellpadding=>'length',        # table
-    cellspacing=>'length',        # table
-    char=>'character',            # CellAlign
-    charoff=>'length',            # CellAlign
-    charset=>'charset',           # a,link,script
-    checked=>'bool',              # input
-    cite=>'uri',                  # blockquote,del,ins,q
-    class=>'class',               # Core
-    classid=>'uri',               # object
-    codebase=>'uri',              # object
-    codetype=>'contentType',      # object
-    cols=>'multiLengths',         # frameset(multiLengths),textarea(number)
-    colspan=>'number',            # Cell
-    content=>'cdata',             # meta
-    coords=>'coords',             # a, area
-    data=>'uri',                  # object
-    datetime=>'datetime',         # del, ins
-    declare=>'bool',              # object
-    defer=>'bool',                # script
-    dir=>'dir',                   # ENUM I18N
-    disabled=>'bool',             # button,input,optgroup,option,select,
+    'accept-charset' => 'charsets', # form
+    'http-equiv' => 'cdata',        # meta
+    'xml:lang' => 'languageCode',   # I18N (XHTML)
+    'xml:space' => 'space',         # ENUM pre,script,style(XHTML)
+    abbr => 'text',                 # Cell
+    accept => 'contentTypes',       # form,input
+    accesskey => 'character',       # Focus,legend
+    action => 'uri',                # form
+    align => 'cellAlign',           # ENUM CellAlign
+    alt => 'cdata',                 # input(cdata);area,img(text)
+    archive => 'uriList',           # object
+    axis => 'cdata',                # Cell
+    border => 'pixels',             # table
+    cellpadding => 'length',        # table
+    cellspacing => 'length',        # table
+    char => 'character',            # CellAlign
+    charoff => 'length',            # CellAlign
+    charset => 'charset',           # a,link,script
+    checked => 'bool',              # input
+    cite => 'uri',                  # blockquote,del,ins,q
+    class => 'class',               # Core
+    classid => 'uri',               # object
+    codebase => 'uri',              # object
+    codetype => 'contentType',      # object
+    cols => 'multiLengths',         # frameset(multiLengths),textarea(number)
+    colspan => 'number',            # Cell
+    content => 'cdata',             # meta
+    coords => 'coords',             # a, area
+    data => 'uri',                  # object
+    datetime => 'datetime',         # del, ins
+    declare => 'bool',              # object
+    defer => 'bool',                # script
+    dir => 'dir',                   # ENUM I18N
+    disabled => 'bool',             # button,input,optgroup,option,select,
                                   # textarea
-    enctype=>'contentType',       # form
-    frame=>'tframe',              # ENUM table
-    frameborder=>'frameBorder',   # ENUM frame, iframe
-    headers=>'idrefs',            # Cell
-    height=>'length',             # iframe,img,object
-    href=>'uri',                  # a,area,base,link
-    hreflang=>'languageCode',     # a,link
-    id=>'id',                     # Core
-    ismap=>'bool',                # img,input
-    label=>'text',                # optgroup,option
-    lang=>'languageCode',         # I18N
-    longdesc=>'uri',              # frame,iframe,img
-    marginheight=>'pixels',       # frame,iframe
-    marginwidth=>'pixels',        # frame,iframe
-    maxlength=>'number',          # input
-    media=>'mediaDesc',           # ENUM link,style
-    method=>'method',             # ENUM form
-    multiple=>'bool',             # select
-    name=>'nmtoken',              # button,input,meta,param,select,textarea,
+    enctype => 'contentType',       # form
+    frame => 'tframe',              # ENUM table
+    frameborder => 'frameBorder',   # ENUM frame, iframe
+    headers => 'idrefs',            # Cell
+    height => 'length',             # iframe,img,object
+    href => 'uri',                  # a,area,base,link
+    hreflang => 'languageCode',     # a,link
+    id => 'id',                     # Core
+    ismap => 'bool',                # img,input
+    label => 'text',                # optgroup,option
+    lang => 'languageCode',         # I18N
+    longdesc => 'uri',              # frame,iframe,img
+    marginheight => 'pixels',       # frame,iframe
+    marginwidth => 'pixels',        # frame,iframe
+    maxlength => 'number',          # input
+    media => 'mediaDesc',           # ENUM link,style
+    method => 'method',             # ENUM form
+    multiple => 'bool',             # select
+    name => 'nmtoken',              # button,input,meta,param,select,textarea,
                                   # object;form,frame,map(HTML)
-    nohref=>'bool',               # area
-    noresize=>'bool',             # frame
-    onblur=>'script',             # Focus,select
-    onchange=>'script',           # input,select,textarea
-    onclick=>'script',            # Event
-    ondblclick=>'script',         # Event
-    onfocus=>'script',            # Focus,select
-    onkeydown=>'script',          # Event
-    onkeypress=>'script',         # Event
-    onkeyup=>'script',            # Event
-    onload=>'script',             # body,frameset
-    onmousedown=>'script',        # Event
-    onmousemove=>'script',        # Event
-    onmouseout=>'script',         # Event
-    onmouseover=>'script',        # Event
-    onmouseup=>'script',          # Event
-    onreset=>'script',            # form
-    onselect=>'script',           # input,textarea
-    onsubmit=>'script',           # form
-    onunload=>'script',           # body,frameset
-    profile=>'uri',               # head
-    readonly=>'bool',             # input,textarea
-    rel=>'linkTypes',             # ENUM a,link
-    rev=>'linkTypes',             # ENUM a,link
-    rows=>'multiLengths',         # frameset(multiLengths);textarea(number)
-    rowspan=>'number',            # Cell
-    rules=>'trules',              # ENUM table
-    scheme=>'cdata',              # meta
-    scope=>'scope',               # ENUM Cell
-    scoped=>'bool',               # style
-    scrolling=>'scrolling',       # ENUM frame,iframe
-    selected=>'bool',             # option
-    shape=>'shape',               # ENUM a,area
-    size=>'number',               # input,select
-    span=>'number',               # col,colgroup
-    src=>'uri',                   # frame,iframe,img,input,script
-    standby=>'text',              # object
-    style=>'styleSheet',          # Core
-    summary=>'text',              # table
-    tabindex=>'number',           # Focus,object,select
-    target=>'frameTarget',        # a,area,base,form,link
-    title=>'text',                # Core,style
-    type=>'ContentType',          # button(ENUM);a,link,object,param,script,
+    nohref => 'bool',               # area
+    noresize => 'bool',             # frame
+    onblur => 'script',             # Focus,select
+    onchange => 'script',           # input,select,textarea
+    onclick => 'script',            # Event
+    ondblclick => 'script',         # Event
+    onfocus => 'script',            # Focus,select
+    onkeydown => 'script',          # Event
+    onkeypress => 'script',         # Event
+    onkeyup => 'script',            # Event
+    onload => 'script',             # body,frameset
+    onmousedown => 'script',        # Event
+    onmousemove => 'script',        # Event
+    onmouseout => 'script',         # Event
+    onmouseover => 'script',        # Event
+    onmouseup => 'script',          # Event
+    onreset => 'script',            # form
+    onselect => 'script',           # input,textarea
+    onsubmit => 'script',           # form
+    onunload => 'script',           # body,frameset
+    profile => 'uri',               # head
+    readonly => 'bool',             # input,textarea
+    rel => 'linkTypes',             # ENUM a,link
+    rev => 'linkTypes',             # ENUM a,link
+    rows => 'multiLengths',         # frameset(multiLengths);textarea(number)
+    rowspan => 'number',            # Cell
+    rules => 'trules',              # ENUM table
+    scheme => 'cdata',              # meta
+    scope => 'scope',               # ENUM Cell
+    scoped => 'bool',               # style
+    scrolling => 'scrolling',       # ENUM frame,iframe
+    selected => 'bool',             # option
+    shape => 'shape',               # ENUM a,area
+    size => 'number',               # input,select
+    span => 'number',               # col,colgroup
+    src => 'uri',                   # frame,iframe,img,input,script
+    standby => 'text',              # object
+    style => 'styleSheet',          # Core
+    summary => 'text',              # table
+    tabindex => 'number',           # Focus,object,select
+    target => 'frameTarget',        # a,area,base,form,link
+    title => 'text',                # Core,style
+    type => 'ContentType',          # button(ENUM);a,link,object,param,script,
                                   # style;input(ENUM)
-    usemap=>'uri',                # img,input,object
-    valign=>'cellValign',         # ENUM CellAlign
-    value=>'cdata',               # button,input,option,param
-    valuetype=>'valueType',       # ENUM param
-    width=>'length',              # iframe,img,object,table(length);
+    usemap => 'uri',                # img,input,object
+    valign => 'cellValign',         # ENUM CellAlign
+    value => 'cdata',               # button,input,option,param
+    valuetype => 'valueType',       # ENUM param
+    width => 'length',              # iframe,img,object,table(length);
                                   # col,colgroup(multiLength)
-    xmlns=>'uri',                 # html (XHTML)
+    xmlns => 'uri',                 # html (XHTML)
 );
 
 # Attribut-Domänen (werden aktuell nicht geprüft)
 
 my %Domain = (
-    bool=>1,
-    buttonType=>[qw/button reset submit/],
-    cdata=>1,
-    cellAlign=>[qw/center char justify left right/],
-    cellValign=>[qw/baseline bottom middle top/],
-    character=>1,
-    charset=>1,
-    charsets=>1,
-    class=>1,
-    contentType=>1,
-    contentTypes=>1,
-    coords=>1,
-    datetime=>1,
-    dir=>[qw/ltr rtl/],
-    frameBorder=>[0,1],
-    frameTarget=>1,
-    id=>1,
-    idrefs=>1,
-    inputType=>[qw/checkbox file hidden password radio reset submit text/],
-    languageCode=>1,
-    length=>1,
-    linkTypes=>[qw/stylesheet next prev copyright index glossary/], # unv.
-    mediaDesc=>[qw/all aural braille handheld print projection screen tty tv/],
-    method=>[qw/get post/],
-    multiLength=>1,
-    multiLengths=>1,
-    nmtoken=>1,
-    number=>1,
-    pixels=>1,
-    scope=>[qw/col colgroup row rowgroup/],
-    script=>1,
-    scrolling=>[qw/no yes auto/],
-    shape=>[qw/circle default poly rect/],
-    space=>['preserve'],
-    styleSheet=>1,
-    text=>1,
-    tframe=>[qw/above below border box hsides lhs rhs void vsides/],
-    trules=>[qw/all cols groups none rows/],
-    uri=>1,
-    uriList=>1,
-    valueType=>[qw/data object ref/],
+    bool => 1,
+    buttonType => [qw/button reset submit/],
+    cdata => 1,
+    cellAlign => [qw/center char justify left right/],
+    cellValign => [qw/baseline bottom middle top/],
+    character => 1,
+    charset => 1,
+    charsets => 1,
+    class => 1,
+    contentType => 1,
+    contentTypes => 1,
+    coords => 1,
+    datetime => 1,
+    dir => [qw/ltr rtl/],
+    frameBorder => [0,1],
+    frameTarget => 1,
+    id => 1,
+    idrefs => 1,
+    inputType => [qw/checkbox file hidden password radio reset submit text/],
+    languageCode => 1,
+    length => 1,
+    linkTypes => [qw/stylesheet next prev copyright index glossary/], # unv.
+    mediaDesc => [qw/all aural braille handheld print projection screen tty tv/],
+    method => [qw/get post/],
+    multiLength => 1,
+    multiLengths => 1,
+    nmtoken => 1,
+    number => 1,
+    pixels => 1,
+    scope => [qw/col colgroup row rowgroup/],
+    script => 1,
+    scrolling => [qw/no yes auto/],
+    shape => [qw/circle default poly rect/],
+    space => ['preserve'],
+    styleSheet => 1,
+    text => 1,
+    tframe => [qw/above below border box hsides lhs rhs void vsides/],
+    trules => [qw/all cols groups none rows/],
+    uri => 1,
+    uriList => 1,
+    valueType => [qw/data object ref/],
 );
 
 # # den Platzbdearf der Hashes ausgeben
 # 
 # use Devel::Size;
 # my @arr = (
-#     Default=>\%Default,
-#     Element=>\%Element,
-#     Attribute=>\%Attribute,
-#     DefaultAttributes=>\%DefaultAttributes,
-#     DefaultAttributesXhtml=>\%DefaultAttributesXhtml,
+#     Default => \%Default,
+#     Element => \%Element,
+#     Attribute => \%Attribute,
+#     DefaultAttributes => \%DefaultAttributes,
+#     DefaultAttributesXhtml => \%DefaultAttributesXhtml,
 # );
 # my $bytes = 0;
 # my $str = '';
@@ -863,7 +863,7 @@ Ohne '-' wird allein das letzte Argument als Inhalt aufgefasst.
 Besteht der Inhalt aus mehreren Teilen, müssen die Teile
 dann konkateniert werden:
 
-    $h->tag('p',class=>'p1',
+    $h->tag('p',class => 'p1',
         'Ein '.$h->tag('b','kurzer').' Text.'
     );
 
@@ -898,9 +898,9 @@ wenn der HTML-Code inkrementell geschrieben wird und z.B. im Fehlerfall
 nur der Rest mit schließenden Tags generiert werden soll.
 
     my $html = $h->tag('html',
-        -endTagOnly=>1,
+        -endTagOnly => 1,
         $h->tag('body',
-            -endTagOnly=>1,
+            -endTagOnly => 1,
             '-',
             $h->tag('h1','Fatal Error'),
             $h->tag('pre',$msg),
@@ -1042,15 +1042,15 @@ Rücke den Tag um $n Leerzeichen ein.
 
 Anzahl NEWLINEs am Ende.
 
--nl=>0 (kein NEWLINE):
+-nl => 0 (kein NEWLINE):
 
     <TAG>CONTENT</TAG>
 
--nl=>1 (ein NEWLINE):
+-nl => 1 (ein NEWLINE):
 
     <TAG>CONTENT</TAG>\n
 
--nl=>2 (zwei NEWLINEs):
+-nl => 2 (zwei NEWLINEs):
 
     <TAG>CONTENT</TAG>\n\n
 
@@ -1077,7 +1077,7 @@ statt eigentlich beim Aufruf angegebenen td soll ein th-Tag
 gesetzt werden. Beispiel:
 
     $h->tag('td',
-        -tag=>'th',
+        -tag => 'th',
         ...
     );
 
@@ -1142,9 +1142,9 @@ explizit gesetzt werden müssen.
 
     Element Attribute
     
-    form    method=>'post', enctype=>'multipart/form-data'
-    script  type=>'text/javascript'
-    style   type=>'text/css'
+    form    method => 'post', enctype => 'multipart/form-data'
+    script  type => 'text/javascript'
+    style   type => 'text/css'
 
 =cut
 
@@ -1351,9 +1351,9 @@ sub tag {
             }
             else {
                 $self->throw(
-                    q~HTML-00001: Unbekannte Option~,
-                    Option=>$key,
-                    Value=>$val,
+                    'HTML-00001: Unbekannte Option',
+                    Option => $key,
+                    Value => $val,
                 );
             }
             next;
@@ -1370,10 +1370,10 @@ sub tag {
     
         if ($endTagOnly) {
             $self->throw(
-                q~HTML-00004: Attribute bei Option -endTagOnly nicht erlaubt~,
-                Tag=>$tag,
-                Attribute=>$key,
-                Value=>$val,
+                'HTML-00004: Attribute bei Option -endTagOnly nicht erlaubt',
+                Tag => $tag,
+                Attribute => $key,
+                Value => $val,
             );
         }
 
@@ -1382,10 +1382,10 @@ sub tag {
         my $dom = $Attribute{$key} || '';
         if (!$dom && $checkLevel && $key !~ /^data-/) {
             $self->throw(
-                q~HTML-00003: Unbekanntes Attribut~,
-                Tag=>$tag,
-                Attribute=>$key,
-                Value=>$val,
+                'HTML-00003: Unbekanntes Attribut',
+                Tag => $tag,
+                Attribute => $key,
+                Value => $val,
             );
         }
 
@@ -1460,7 +1460,7 @@ sub tag {
     # Element prüfen
 
     if (!$e && $checkLevel) {
-        $self->throw(q~HTML-00002: Unbekanntes Element~,Element=>$tag);
+        $self->throw('HTML-00002: Unbekanntes Element',Element=>$tag);
     }
 
     # Content bestimmen
@@ -1532,7 +1532,7 @@ sub tag {
     }
     elsif ($fmt eq 'e' || $fmt eq 'E') {
         if (length $content) {
-            $self->throw(q~HTML-00003: Kein Content erwartet~);
+            $self->throw('HTML-00003: Kein Content erwartet');
         }
     }
     elsif ($fmt eq 'v' && $content !~ /\n/ || $fmt eq 'i') {
@@ -1563,8 +1563,8 @@ sub tag {
     }
     else {
         $self->throw(
-            q~HTML-00002: Unerlaubter Wert für Option -fmt~,
-            Value=>$fmt,
+            'HTML-00002: Unerlaubter Wert für Option -fmt',
+            Value => $fmt,
         );
     }
 
@@ -1777,7 +1777,7 @@ sub cat {
         }
         #else {
         #    $self->throw(
-        #        q~HTML-00002: Unbekannte Option~,
+        #        'HTML-00002: Unbekannte Option',
         #        Option=>$_[0],
         #    );
         #}
@@ -1871,9 +1871,9 @@ sub doctype {
         }
         else {
             $self->throw(
-                q~HTML-00001: Unbekannte Option~,
-                Option=>$key,
-                Value=>shift,
+                'HTML-00001: Unbekannte Option',
+                Option => $key,
+                Value => shift,
             );
         }
     }
@@ -1911,8 +1911,8 @@ sub doctype {
     }
     else {
         $self->throw(
-            q~HTML-00002: Unbekannte HTML-Version~,
-            Version=>"'$version'",
+            'HTML-00002: Unbekannte HTML-Version',
+            Version => "'$version'",
         );
     }
 
@@ -2032,9 +2032,9 @@ sub optional {
         }
         else {
             $self->throw(
-                q~HTML--0001: Unbekannte Option~,
-                Option=>$key,
-                Value=>$val,
+                'HTML--0001: Unbekannte Option',
+                Option => $key,
+                Value => $val,
             );
         }
     }
@@ -2174,7 +2174,7 @@ sub import {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

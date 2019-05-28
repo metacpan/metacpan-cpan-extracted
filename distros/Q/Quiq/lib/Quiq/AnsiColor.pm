@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Term::ANSIColor ();
 
@@ -102,8 +102,8 @@ AnsiColor-Objekt
 =head4 Description
 
 Instantiiere ein Objekt der Klasse und liefere dieses zurück. Durch
-den Parameter $bool kann zwischen einer Ausgabe mit oder ohne
-ANSI Colorcodes umgeschaltet werden.
+den Parameter $bool wird entschieden, ob die Ausgabe mit oder ohne
+ANSI Colorcodes erfolgt.
 
 =cut
 
@@ -196,7 +196,7 @@ sub str {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

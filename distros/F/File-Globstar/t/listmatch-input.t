@@ -1,10 +1,10 @@
-# Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>, 
+# Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This file is distributed under the same terms and conditions as
 # Perl itself.
 
-use strict;
+use common::sense;
 
 use Test::More;
 
@@ -89,7 +89,7 @@ is_deeply [unref $matcher->patterns], [
     compile_re('^\ $'),
 ], 'trailing whitespace';
 
-open HANDLE, '<', 't/patterns' 
+open HANDLE, '<', 't/patterns'
     or die "Cannot open 't/patterns' for reading: $!";
 $matcher = File::Globstar::ListMatch->new(*HANDLE, filename => 't/patterns');
 is_deeply [unref $matcher->patterns], [
@@ -98,7 +98,7 @@ is_deeply [unref $matcher->patterns], [
     compile_re('^baz$'),
 ], 'read from GLOB';
 
-open my $fh, '<', 't/patterns' 
+open my $fh, '<', 't/patterns'
     or die "Cannot open 't/patterns' for reading: $!";
 $matcher = File::Globstar::ListMatch->new($fh, filename => 't/patterns');
 is_deeply [unref $matcher->patterns], [
@@ -144,7 +144,7 @@ is_deeply [get_blessings $matcher->patterns], [
     RE_NEGATED | RE_FULL_MATCH,
     RE_DIRECTORY,
     RE_NEGATED | RE_DIRECTORY,
-    RE_NEGATED | RE_DIRECTORY | RE_FULL_MATCH,    
+    RE_NEGATED | RE_DIRECTORY | RE_FULL_MATCH,
 ], 'blessings';
 
 done_testing;

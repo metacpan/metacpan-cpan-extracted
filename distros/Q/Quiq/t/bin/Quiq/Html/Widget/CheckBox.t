@@ -26,9 +26,9 @@ sub test_html : Test(2) {
     $self->is($html,qq|<input type="checkbox">\n|);
 
     $html = Quiq::Html::Widget::CheckBox->html($h,
-        name=>'aktiv',
-        option=>1,
-        value=>'',
+        name => 'aktiv',
+        option => 1,
+        value => '',
     );
     $self->is($html,qq|<input type="checkbox" name="aktiv" value="1">\n|);
 }

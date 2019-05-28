@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Html::Table::List;
 use Quiq::Unindent;
@@ -64,13 +64,13 @@ Referenz auf eine Liste mit Kolumnen-Spezifikationen. Eine einzelne
 Kolumnen-Spezifikation ist ein Hash mit den Komponenten:
 
     {
-        name=>$name,        # interner Name, insbes. f. Wert-Lookup
-        title=>$title,      # Kolumnenüberschrift
-        type=>$type,        # DataTables-Kolumnentyp (s. Link unten)
-        align=>$align,      # 'left'|'center'|'right' (Default: 'left')
-        orderable=>$bool,   # 0|1 (Default: 1)
-        searchable=>$bool,  # 0|1 (Default: 1)
-        visible=>$bool,     # 0|1 (Default: 1)
+        name => $name,        # interner Name, insbes. f. Wert-Lookup
+        title => $title,      # Kolumnenüberschrift
+        type => $type,        # DataTables-Kolumnentyp (s. Link unten)
+        align => $align,      # 'left'|'center'|'right' (Default: 'left')
+        orderable => $bool,   # 0|1 (Default: 1)
+        searchable => $bool,  # 0|1 (Default: 1)
+        visible => $bool,     # 0|1 (Default: 1)
     }
 
 Nicht benötigte Komponenten können weggelassen werden.
@@ -144,27 +144,27 @@ Das Programm
     my $h = Quiq::Html::Tag->new('html-5');
     
     my $html = Quiq::JQuery::DataTable->html($h,
-        id=>'personTable',
-        class=>'compact stripe hover cell-border',
-        columns=>[
+        id => 'personTable',
+        class => 'compact stripe hover cell-border',
+        columns => [
             {
-                name=>'per_id',
-                title=>'Id',
-                align=>'right',
+                name => 'per_id',
+                title => 'Id',
+                align => 'right',
             },{
-                name=>'per_vorname',
-                title=>'Vorname',
+                name => 'per_vorname',
+                title => 'Vorname',
             },{
-                name=>'per_nachname',
-                title=>'Nachname',
+                name => 'per_nachname',
+                title => 'Nachname',
             },{
-                name=>'per_geburtsdatum',
-                title=>'Geburtstag',
-                align=>'center',
+                name => 'per_geburtsdatum',
+                title => 'Geburtstag',
+                align => 'center',
             },
         ],
-        rows=>scalar $tab->rows,
-        instantiate=>1,
+        rows => scalar $tab->rows,
+        instantiate => 1,
     );
 
 erzeugt den HTML-Code (lange Zeilen umbrochen)
@@ -236,7 +236,7 @@ L<instantiate() - Instantiiere Widget in JavaScript|"instantiate() - Instantiier
 
 oder durch Zuweisung an das Attribut instantiate erfolgen
 
-    instantiate=>q~
+    instantiate => q~
         fixedHeader: true,
         stateSave: true,
         dom: 't',
@@ -266,31 +266,31 @@ Das Programm
     my $h = Quiq::Html::Tag->new('html-5');
     
     my $dt = Quiq::JQuery::DataTable->new(
-        id=>'personTable',
-        class=>'compact stripe hover cell-border',
-        columns=>[
+        id => 'personTable',
+        class => 'compact stripe hover cell-border',
+        columns => [
             {
-                name=>'per_id',
-                title=>'Id',
-                align=>'right',
+                name => 'per_id',
+                title => 'Id',
+                align => 'right',
             },{
-                name=>'per_vorname',
-                title=>'Vorname',
+                name => 'per_vorname',
+                title => 'Vorname',
             },{
-                name=>'per_nachname',
-                title=>'Nachname',
+                name => 'per_nachname',
+                title => 'Nachname',
             },{
-                name=>'per_geburtsdatum',
-                title=>'Geburtstag',
-                align=>'center',
+                name => 'per_geburtsdatum',
+                title => 'Geburtstag',
+                align => 'center',
             },
         ],
-        rows=>scalar $tab->rows,
+        rows => scalar $tab->rows,
     );
     
     my $html = Quiq::Html::Page->html($h,
-        styleSheet=>Quiq::JQuery::DataTable->stylesheetUrl,
-        styleSheet=>q|
+        styleSheet => Quiq::JQuery::DataTable->stylesheetUrl,
+        styleSheet => q|
             body {
                 font-family: sans-serif;
                 font-size: 12px;
@@ -298,8 +298,8 @@ Das Programm
                 background-color: white;
             }
         |,
-        body=>$dt->html($h),
-        javaScript=>[
+        body => $dt->html($h),
+        javaScript => [
             'https://code.jquery.com/jquery-1.10.2.js',
             Quiq::JQuery::DataTable->pluginUrl,
             $dt->instantiate(q~
@@ -476,14 +476,14 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        arguments=>undef,
-        class=>undef,
-        columns=>[],
-        footer=>0,
-        id=>undef,
-        instantiate=>0,
-        rowCallback=>undef,
-        rows=>[],
+        arguments => undef,
+        class => undef,
+        columns => [],
+        footer => 0,
+        id => undef,
+        instantiate => 0,
+        rowCallback => undef,
+        rows => [],
     );
     $self->set(@_);
 
@@ -549,16 +549,16 @@ sub html {
     }
 
     my $html = Quiq::Html::Table::List->html($h,
-        allowHtml=>1,
-        border=>0,
-        class=>$class,
-        empty=>undef,
-        id=>$id,
-        rowCallback=>$rowCallback,
-        rowCallbackArguments=>[\@columns],
-        rows=>$rowA,
-        titles=>\@titles,
-        footer=>$footer,
+        allowHtml => 1,
+        border => 0,
+        class => $class,
+        empty => undef,
+        id => $id,
+        rowCallback => $rowCallback,
+        rowCallbackArguments => [\@columns],
+        rows => $rowA,
+        titles => \@titles,
+        footer => $footer,
     );
 
     if ($instantiate) {
@@ -690,7 +690,7 @@ sub getColumns {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -3,7 +3,10 @@ package Data::Hopen::G::Entity;
 use Data::Hopen;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+use overload;
+use Scalar::Util qw(refaddr);
+
+our $VERSION = '0.000013';
 
 sub name;
 
@@ -40,13 +43,17 @@ version of the entity.  That way every entity always has a name.
 =cut
 
 sub name {
-    my $self = shift or croak 'Need an instance';
-    if (@_) {                               # Setter
-        return $self->{name} = shift;
-    } elsif ( exists $self->{name} ) {      # Getter
-        return $self->{name};
+    croak 'Need an instance' unless ref $_[0];
+        # Note: avoiding `shift` since I've had problems with that in the past
+        # in classes that overload stringification.
+
+    if (@_>1) {                             # Setter
+        croak "Name `$_[1]' is disallowed" unless !!$_[1];  # no falsy names
+        return $_[0]->{name} = $_[1];
+    } elsif ( $_[0]->{name} ) {             # Getter
+        return $_[0]->{name};
     } else {                                # Default
-        return "$self";
+        return overload::StrVal($_[0]);
     }
 } #name()
 
@@ -56,7 +63,22 @@ Returns truthy if a name has been set using L</name>.
 
 =cut
 
-sub has_custom_name { !!(shift)->{name} }
+sub has_custom_name { !!($_[0]->{name}) }
+
+=head2 Stringification
+
+Stringifies to the name plus, if the name is custom, the refaddr.
+
+=cut
+
+sub _stringify {
+    $_[0]->has_custom_name ?
+        sprintf("%s (%x)", $_[0]->{name}, refaddr $_[0]) :
+        overload::StrVal($_[0]);
+} #_stringify
+
+use overload fallback => 1,
+    '""' => \&_stringify;
 
 1;
 __END__

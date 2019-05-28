@@ -83,7 +83,13 @@ sub init ($self) {
         my $attrs = do {
             local *{"$class_name\::MODIFY_CODE_ATTRIBUTES"} = $MODIFY_CODE_ATTRIBUTES;
 
-            P->class->load($class_name);
+            eval { P->class->load($class_name) };
+
+            if ($@) {
+                say qq[Can't load API class "$class_name": $@];
+
+                exit 3;
+            }
 
             ${"$class_name\::_API_MAP"};
         };
@@ -172,9 +178,11 @@ sub get_method ( $self, $method_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "init" with high complexity score (22)                      |
+## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "init" with high complexity score (23)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 144, 150             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 86                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 150, 156             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

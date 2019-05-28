@@ -29,10 +29,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MinimumVersionTests:
     file: lib/Dist/Zilla/Plugin/MinimumVersionTests.pm
-    version: '2.000009'
+    version: '2.000010'
   Dist::Zilla::Plugin::Test::MinimumVersion:
     file: lib/Dist/Zilla/Plugin/Test/MinimumVersion.pm
-    version: '2.000009'
+    version: '2.000010'
 requires:
   Data::Section: '0.004'
   Dist::Zilla: '4'
@@ -43,6 +43,7 @@ requires:
   Dist::Zilla::Role::TextTemplate: '0'
   List::Util: '0'
   Moose: '0'
+  Moose::Util::TypeConstraints: '0'
   Sub::Exporter::ForMethods: '0'
   Test::MinimumVersion: '0'
   constant: '0'
@@ -56,7 +57,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-MinimumVersion
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-MinimumVersion
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-MinimumVersion.git
-version: '2.000009'
+version: '2.000010'
 x_Dist_Zilla:
   perl:
     version: '5.029010'
@@ -101,7 +102,11 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - CONTRIBUTING
+            - INSTALL
+            - LICENCE
+            - README.pod
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -238,7 +243,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::MinimumVersion:
           max_target_perl: '5.008003'
       name: '@Author::ETHER/Test::MinimumVersion'
-      version: '2.000009'
+      version: '2.000010'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
@@ -734,7 +739,11 @@ x_Dist_Zilla:
           commit_msg: '%N-%v%t%n%n%c'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CONTRIBUTING
             - Changes
+            - INSTALL
+            - LICENCE
+            - README.pod
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
@@ -751,7 +760,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.000009
+          tag: v2.000010
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

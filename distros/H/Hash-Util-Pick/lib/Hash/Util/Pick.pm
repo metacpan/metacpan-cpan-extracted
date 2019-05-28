@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use Exporter qw/import/;
 our @EXPORT_OK = qw/
@@ -72,11 +72,19 @@ Create hash reference omitted by block.
 
     omit_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { foo => 0 }
 
+=head1 SEE ALSO
+
+=over
+
+=item * L<Lodash Documentation|https://lodash.com/docs/>
+
+=back
+
 =head1 LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Pine Mizune
+Copyright (c) 2016-2019 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

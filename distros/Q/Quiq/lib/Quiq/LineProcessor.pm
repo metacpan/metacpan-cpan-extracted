@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -36,7 +36,7 @@ Für eine Fehlerbehandlung können die Methoden $par->input()
 und $line->number() genutzt werden:
 
     $class->throw(
-        q~SDOC-00001: K\{} and k\{} are not supported anymore~,
+        'SDOC-00001: K\{} and k\{} are not supported anymore',
         Input => ''.$par->input,
         Line => $line->number,
     );
@@ -131,10 +131,10 @@ sub new {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -encoding=>\$encoding,
-            -lineClass=>\$lineClass,
-            -lineContinuation=>\$lineContinuation,
-            -skip=>\$skip,
+            -encoding => \$encoding,
+            -lineClass => \$lineClass,
+            -lineContinuation => \$lineContinuation,
+            -skip => \$skip,
         );
     }
 
@@ -143,9 +143,9 @@ sub new {
     eval "use $lineClass";
     if ($@) {
         $class->throw(
-            q~TEXT-00001: Kann Zeilenklasse nicht laden~,
-            LineClass=>$lineClass,
-            InternalError=>$@,
+            'TEXT-00001: Kann Zeilenklasse nicht laden',
+            LineClass => $lineClass,
+            InternalError => $@,
         );
     }
 
@@ -198,8 +198,8 @@ sub new {
             }
             else {
                 $class->throw(
-                    q~TEXT-00002: Ungüliger Wert für Option -lineContinuation~,
-                    Value=>$lineContinuation,
+                    'TEXT-00002: Ungüliger Wert für Option -lineContinuation',
+                    Value => $lineContinuation,
                 );
             }
         }
@@ -209,9 +209,9 @@ sub new {
     pop @lines while @lines && $lines[-1]->isEmpty;
 
     my $self = $class->SUPER::new(
-        input => $inputAsString, # Wir wollen die Bezeichnung
-        lineClass => $lineClass,
-        lineA => \@lines,
+        input  =>  $inputAsString, # Wir wollen die Bezeichnung
+        lineClass  =>  $lineClass,
+        lineA  =>  \@lines,
     );
 
     return $self;
@@ -393,7 +393,7 @@ sub dump {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

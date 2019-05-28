@@ -6,6 +6,9 @@ use Config;
 use ExtUtils::MakeMaker;
 use File::Spec;
 
+print "# Perl version $]\n";
+print "# EUMM version $ExtUtils::MakeMaker::VERSION\n";
+
 my $VERSION_FROM = File::Spec->catfile(qw(lib Class Tiny ConstrainedAccessor.pm));
 my $IS_TRIAL = check_trial();
 my $secure_perl_path = get_perl_filename();
@@ -75,7 +78,9 @@ sub get_perl_filename {
                 '"$(DISTVNAME).tar$(SUFFIX)" ' .
                 '"$(DISTVNAME)-TRIAL.tar$(SUFFIX)"' . "\n";
 
-            # Insert $newtext at the end of the `dist` target
+            # Insert $newtext at the end of the `dist` target.
+            # TODO update this to only be used on Perl versions that
+            # support \h (5.8 doesn't).
             $text =~ s{
                 ^(dist\h*:.*\n      # dist header line
                     (?:\h+\S.*\n)+) # dist body lines.  `.` doesn't match `\n`.
@@ -133,10 +138,10 @@ EOT
 # Update README.  However, ignore errors so that CPAN users of the module
 # won't see failures due to issues with readme.pl.
 README.md: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
-\t-"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f md --appveyor cxw42/class-tiny-constrainedaccessor
+\t-"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f md --appveyor cxw42/class-tiny-constrainedaccessor --travis cxw42/Class-Tiny-ConstrainedAccessor
 
 README: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
-\t-"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text --appveyor cxw42/class-tiny-constrainedaccessor
+\t-"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text --appveyor cxw42/class-tiny-constrainedaccessor --travis cxw42/Class-Tiny-ConstrainedAccessor
 
 all :: README.md README
 dist :: README.md README
@@ -151,7 +156,7 @@ EOT
 # Main options for EUMM
 my %opts = (
     NAME             => 'Class::Tiny::ConstrainedAccessor',
-    AUTHOR           => q{Christopher White <cxwembedded@gmail.com>},
+    AUTHOR           => q{Christopher White <cxw@cpan.org>},
     VERSION_FROM     => $VERSION_FROM,
     ABSTRACT_FROM    => $VERSION_FROM,
     LICENSE          => 'apache_2_0',
@@ -162,7 +167,7 @@ my %opts = (
     # is given, that means we want that version for bugfixes it includes.
     CONFIGURE_REQUIRES => {
         'Config' => '0',
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => '7.10',
         'File::Spec' => '0',
     },
     BUILD_REQUIRES => {
@@ -183,9 +188,11 @@ my %opts = (
         'MooseX::Types' => '0',
         'MooseX::Types::Moose' => '0',
         'Type::Tiny' => '0',
+        'vars::i' => '1.07',
     },
     PREREQ_PM => {
         'Class::Tiny' => '0',
+        'Scalar::Util' => '1.50',
         'strict' => '0',
         'warnings' => '0',
     },

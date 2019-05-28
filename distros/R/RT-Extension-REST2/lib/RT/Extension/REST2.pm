@@ -4,7 +4,7 @@ use 5.010001;
 
 package RT::Extension::REST2;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 our $REST_PATH = '/REST/2.0';
 
 use Plack::Builder;
@@ -296,7 +296,7 @@ Below are some examples using the endpoints above.
     # Create a ticket, setting some custom fields
     curl -X POST -H "Content-Type: application/json" -u 'root:password'
         -d '{ "Queue": "General", "Subject": "Create ticket test",
-            "From": "user1@example.com", "To": "rt@example.com",
+            "Requestor": "user1@example.com", "Cc": "user2@example.com",
             "Content": "Testing a create",
             "CustomFields": {"Severity": "Low"}}'
         'https://myrt.com/REST/2.0/ticket'
@@ -617,6 +617,59 @@ All plural resources (such as C</tickets>) require pagination, controlled by
 the query parameters C<page> and C<per_page>.  The default page size is 20
 items, but it may be increased up to 100 (or decreased if desired).  Page
 numbers start at 1.
+
+=head2 Fields
+
+When fetching search results you can include additional fields by adding
+a query parameter C<fields> which is a comma seperated list of fields
+to include. You must use the camel case version of the name as included
+in the results for the actual item.
+
+You can use additional fields parameters to expand child blocks, for
+example (line wrapping inserted for readability):
+
+    XX_RT_URL_XX/REST/2.0/tickets
+      ?fields=Owner,Status,Created,Subject,Queue
+      &fields[Queue]=Name,Description
+
+Says that in the result set for tickets, the extra fields for Owner, Status,
+Created, Subject and Queue should be included. But in addition, for the Queue
+block, also include Name and Description. The results would be similar to
+this (only one ticket is displayed):
+
+   "items" : [
+      {
+         "Subject" : "Sample Ticket",
+         "id" : "2",
+         "type" : "ticket",
+         "Owner" : {
+            "id" : "root",
+            "_url" : "XX_RT_URL_XX/REST/2.0/user/root",
+            "type" : "user"
+         },
+         "_url" : "XX_RT_URL_XX/REST/2.0/ticket/2",
+         "Status" : "resolved",
+         "Created" : "2018-06-29:10:25Z",
+         "Queue" : {
+            "id" : "1",
+            "type" : "queue",
+            "Name" : "General",
+            "Description" : "The default queue",
+            "_url" : "XX_RT_URL_XX/REST/2.0/queue/1"
+         }
+      }
+      { … },
+      …
+   ],
+
+If the user performing the query doesn't have rights to view the record
+(or sub record), then the empty string will be returned.
+
+For single object URLs like /ticket/:id, as it already contains all the
+fields by default, parameter "fields" is not needed, but you can still
+use additional fields parameters to expand child blocks:
+
+    XX_RT_URL_XX/REST/2.0/ticket/1?fields[Queue]=Name,Description
 
 =head2 Authentication Methods
 

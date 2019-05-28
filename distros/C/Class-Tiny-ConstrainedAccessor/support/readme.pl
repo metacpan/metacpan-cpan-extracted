@@ -9,13 +9,16 @@ use Getopt::Long qw(:config gnu_getopt);
 use Path::Class;
 
 # Parse command-line options
-my ($source_fn, $dest_fn, $appveyor, $appveyor_badge);
+my ($source_fn, $dest_fn, $appveyor, $appveyor_badge, $travis, $travis_badge);
 my $format = 'md';
 GetOptions( "i|input=s" => \$source_fn,
             "o|output=s" => \$dest_fn,
             "f|format=s" => \$format,
             "appveyor=s" => \$appveyor,         # username/repo
-            "avbadge=s" => \$appveyor_badge)    # default $appveyor
+            "avbadge=s" => \$appveyor_badge,    # default $appveyor
+            "travis=s" => \$travis,             # username/repo
+            "trbadge=s" => \$travis_badge,      # default $travis
+)
     or die "Error in arguments.  Usage:\nreadme_md.pl -i input -o output [-f format]\nFormat = md (default) or text.";
 
 die "Need an input file" unless $source_fn;
@@ -23,7 +26,12 @@ die "Need an output file" unless $dest_fn;
 
 $appveyor =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--appveyor <GH username>/<GH repo>' if $appveyor;
 $appveyor_badge //= $appveyor;
-$appveyor_badge =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--appveyor <GH username>/<GH repo>' if $appveyor_badge;
+$appveyor_badge =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--avbadge <GH username>/<GH repo>' if $appveyor_badge;
+
+$travis =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--travis <GH username>/<GH repo>' if $travis;
+$travis_badge //= $travis;
+$travis_badge =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--trbadge <GH username>/<GH repo>' if $travis_badge;
+
 
 # Load the right parser
 my $parser;
@@ -60,7 +68,10 @@ while(my $line = <$fh>) {
         next;
     } elsif($tweak_name && $saw_name && $line =~ m{\H\h*$/}) {
         $output .= ($format eq 'md' ? '# ' : '') . "$line\n";
-        $output .= "[![Appveyor Badge](https://ci.appveyor.com/api/projects/status/github/${appveyor_badge}?svg=true)](https://ci.appveyor.com/project/${appveyor})\n\n" if $appveyor;
+        $output .= "[![Appveyor Status](https://img.shields.io/appveyor/ci/${appveyor_badge}.svg?logo=appveyor)](https://ci.appveyor.com/project/${appveyor}) " if $appveyor;
+        $output .= "[![Travis Status](https://img.shields.io/travis/${travis_badge}.svg?logo=travis)](https://travis-ci.org/${travis}) " if $travis;
+
+        $output .= "\n\n" if $appveyor || $travis;
         $saw_name = 0;
         next;
     } elsif($tweak_name && $saw_name) {

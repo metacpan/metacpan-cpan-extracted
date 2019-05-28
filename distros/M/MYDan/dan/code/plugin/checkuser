@@ -1,0 +1,9 @@
+#!# perl: code/plugin/checkuser
+use warnings;
+use strict;
+
+return sub
+{
+    my $email = shift;
+    return 'active';
+};

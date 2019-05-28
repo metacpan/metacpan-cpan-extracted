@@ -5,7 +5,6 @@ use Pcore::Util::Text qw[add_num_sep];
 use Pcore::Util::File::Tree;
 use Archive::Zip qw[];
 use PAR::Filter;
-use Filter::Crypto::CryptFile;
 use Config;
 use Fcntl qw[:DEFAULT SEEK_END];
 
@@ -355,6 +354,20 @@ sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = u
         $src = PAR::Filter->new('PatchContent')->apply( $src, $module );
     }
 
+    my $encrypt = $self->{crypt};
+
+    if ($encrypt) {
+
+        # crypt sources, do not crypt CPAN modules
+        if ( !$is_cpan_module && ( !$module || $module ne 'Filter/Crypto/Decrypt.pm' ) ) {
+
+            # do not crypt modules, that belongs to the CPAN distribution
+            if ( !$is_cpan_module && ( my $dist = Pcore::Dist->new( P->path($source)->{dirname} ) ) ) {
+                $encrypt = 0 if $dist->cfg->{cpan};
+            }
+        }
+    }
+
     $src = \P->src->compress(
         path   => $target,
         data   => $src->$*,
@@ -362,32 +375,9 @@ sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = u
             perl_compress_keep_ln => 1,
             perl_strip_comment    => 1,
             perl_strip_pod        => 1,
+            perl_encrypt          => $encrypt,
         }
     )->{data};
-
-    # crypt sources, do not crypt CPAN modules
-    if ( !$is_cpan_module && $self->{crypt} && ( !$module || $module ne 'Filter/Crypto/Decrypt.pm' ) ) {
-        my $crypt = 1;
-
-        # do not crypt modules, that belongs to the CPAN distribution
-        if ( !$is_cpan_module && ( my $dist = Pcore::Dist->new( P->path($source)->{dirname} ) ) ) {
-            $crypt = 0 if $dist->cfg->{cpan};
-        }
-
-        if ($crypt) {
-            open my $crypt_in_fh, '<', $src or die;
-
-            open my $crypt_out_fh, '+>', \my $crypted_src or die;
-
-            Filter::Crypto::CryptFile::crypt_file( $crypt_in_fh, $crypt_out_fh, Filter::Crypto::CryptFile::CRYPT_MODE_ENCRYPTED() );
-
-            close $crypt_in_fh or die;
-
-            close $crypt_out_fh or die;
-
-            $src = \$crypted_src;
-        }
-    }
 
     $self->tree->add_file( $target, $src );
 
@@ -557,15 +547,15 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 141                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
+## |    3 | 140                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 344                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 343                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 421                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
+## |    3 | 411                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 432                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 422                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 160                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |    2 | 159                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

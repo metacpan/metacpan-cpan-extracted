@@ -1,6 +1,5 @@
-#!/usr/bin/perl -w
-
 use strict;
+use warnings;
 use Test::More tests => 21;
 BEGIN { use_ok('Exception::Class::DBI') }
 use DBI;
@@ -10,6 +9,7 @@ use DBI;
     # to set the dynamic attributes.
     use DBD::ExampleP;
     local $^W;
+    no warnings 'redefine';
     *DBD::ExampleP::dr::connect =
       sub { $_[0]->set_err(7, 'Dammit Jim!', 'ABCDE') };
 }

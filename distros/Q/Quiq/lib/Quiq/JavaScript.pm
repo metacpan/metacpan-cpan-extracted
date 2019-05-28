@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Path;
 use Scalar::Util ();
@@ -242,8 +242,8 @@ sub script {
         else {
             # sonst URL
             $scriptTags .= $h->tag('script',
-                type=>'text/javascript',
-                src=>$spec,
+                type => 'text/javascript',
+                src => $spec,
             );
         }
     }
@@ -255,7 +255,7 @@ sub script {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

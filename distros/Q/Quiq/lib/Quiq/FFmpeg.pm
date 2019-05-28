@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::File::Video;
 use POSIX ();
@@ -63,15 +63,15 @@ sub new {
     my ($class,$str) = @_;
 
     return $class->SUPER::new(
-        cmd=>$str // '',
-        inputA=>[],
-        inputObjectA=>[],
-        outputA=>[],
-        outName=>undef,
-        outWidth=>undef,
-        outHeight=>undef,
-        outStart=>undef,
-        outStop=>undef,
+        cmd => $str // '',
+        inputA => [],
+        inputObjectA => [],
+        outputA => [],
+        outName => undef,
+        outWidth => undef,
+        outHeight => undef,
+        outStart => undef,
+        outStop => undef,
     );
 }
     
@@ -922,16 +922,16 @@ sub imagesToVideo {
     my $videoFramerate = 24;
 
     Quiq::Option->extract(\@_,
-        -audio=>\$audio,
-        -duration=>\$duration,
-        -framerate=>\$framerate,
-        -loop=>\$loop,
-        -play=>\$play,
-        -preset=>\$preset,
-        -size=>\$size,
-        -videoBitrate=>\$videoBitrate,
-        -videoFilter=>\$videoFilter,
-        -videoFramerate=>\$videoFramerate,
+        -audio => \$audio,
+        -duration => \$duration,
+        -framerate => \$framerate,
+        -loop => \$loop,
+        -play => \$play,
+        -preset => \$preset,
+        -size => \$size,
+        -videoBitrate => \$videoBitrate,
+        -videoFilter => \$videoFilter,
+        -videoFramerate => \$videoFramerate,
     );
     if (@_ == 0 || @_ > 2) {
         $class->throw('Usage: $ffm->imagesToVideo($input,$output,@opt)');
@@ -1087,7 +1087,7 @@ Ohne Optionen:
 Video-Seitenverhältnis 16:9 zu Bild-Seitenverhältnis 4:3 wandeln:
 
     $ffm->videoToImages('video.mp4','img',
-        -aspectRatio=>'4:3',
+        -aspectRatio => '4:3',
     );
     =>
     ffmpeg -y -loglevel error -stats
@@ -1099,10 +1099,10 @@ Video-Seitenverhältnis 16:9 zu Bild-Seitenverhältnis 4:3 wandeln:
 Alle Optionen:
 
     $ffm->videoToImages('video.mp4','img',
-        -aspectRatio=>'4:3',
-        -framestep=>6,
-        -start=>3,
-        -stop=>10,
+        -aspectRatio => '4:3',
+        -framestep => 6,
+        -start => 3,
+        -stop => 10,
     );
     =>
     ffmpeg -y -loglevel error -stats
@@ -1130,12 +1130,12 @@ sub videoToImages {
     my $stop = undef;
     
     Quiq::Option->extract(\@_,
-        -aspectRatio=>\$aspectRatio,
-        -framestep=>\$framestep,
-        -pixelFormat=>\$pixelFormat,
-        -quality=>\$quality,
-        -start=>\$start,
-        -stop=>\$stop,
+        -aspectRatio => \$aspectRatio,
+        -framestep => \$framestep,
+        -pixelFormat => \$pixelFormat,
+        -quality => \$quality,
+        -start => \$start,
+        -stop => \$stop,
     );
     if (@_ == 0 || @_ > 2) {
         $class->throw('Usage: $ffm->videoToImages($input,$dir,@opt)');
@@ -1257,10 +1257,10 @@ sub extract {
     my $stop = undef;
     
     Quiq::Option->extract(\@_,
-        -name=>\$name,
-        -play=>\$play,
-        -start=>\$start,
-        -stop=>\$stop,
+        -name => \$name,
+        -play => \$play,
+        -start => \$start,
+        -stop => \$stop,
     );
     if (@_ == 0 || @_ > 2) {
         $class->throw('Usage: $ffm->extract($input,$output,@opt)');
@@ -1376,12 +1376,12 @@ sub extract169To43 {
     my $xOffset = undef;
 
     Quiq::Option->extract(\@_,
-        -bitrate=>\$bitrate,
-        -name=>\$name,
-        -play=>\$play,
-        -start=>\$start,
-        -stop=>\$stop,
-        -xOffset=>\$xOffset,
+        -bitrate => \$bitrate,
+        -name => \$name,
+        -play => \$play,
+        -start => \$start,
+        -stop => \$stop,
+        -xOffset => \$xOffset,
     );
     if (@_ == 0 || @_ > 2) {
         $class->throw('Usage: $ffm->extract169To43($input,$output,@opt)');
@@ -1533,7 +1533,7 @@ sub execute {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

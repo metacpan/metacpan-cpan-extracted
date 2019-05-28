@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 
@@ -162,7 +162,7 @@ sub new {
         # Einzelangaben
 
         Quiq::Option->extract(\@_,
-            -text=>\$text,
+            -text => \$text,
         );
         ($n,$width,$height,$ext) = @_;
     }
@@ -172,20 +172,20 @@ sub new {
     if (!$n || !$width || !$height || !$ext) {
     
         $class->throw(
-            q~SEQ-00001: Illegal image sequence filename~,
-            number=>$n // 'undef',
-            width=>$width // 'undef',
-            height=>$height // 'undef',
-            extension=>$ext // 'undef',
+            'SEQ-00001: Illegal image sequence filename',
+            number => $n // 'undef',
+            width => $width // 'undef',
+            height => $height // 'undef',
+            extension => $ext // 'undef',
         );
     }
     
     return $class->SUPER::new(
-        number=>$n,
-        width=>$width,
-        height=>$height,
-        text=>$text,
-        extension=>$ext,
+        number => $n,
+        width => $width,
+        height => $height,
+        text => $text,
+        extension => $ext,
     );
 }
 
@@ -314,7 +314,7 @@ sub asString {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

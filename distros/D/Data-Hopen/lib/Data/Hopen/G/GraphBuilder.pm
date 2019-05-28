@@ -6,7 +6,7 @@ use Exporter 'import';
 
 our @EXPORT; BEGIN { @EXPORT=qw(make_GraphBuilder); }
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 use Class::Tiny {
     name => 'ANON',     # Name is optional; it's here so the
@@ -64,17 +64,20 @@ change the builder's current node (L</node>).
 =cut
 
 sub add {
-    my $self = shift or croak 'Need an instance';
-    my $node = shift or croak 'Need a node';
-    $self->dag->add($node);
-    return $node;
+    my ($self, %args) = getparameters('self', ['node'], @_);
+    $self->dag->add($args{node});
+    return $args{node};
 } #add()
 
 =head2 default_goal
 
 Links the most recent node in the chain to the default goal in the DAG.
 If the DAG does not have a default goal, adds one called "all".
-Clears the builder's record of the current node and returns undef.
+
+As a side effect, calling this function clears the builder's record of the
+current node and returns C<undef>.  The idea is that this function
+will be used at the end of a chain of calls.  Clearing state in this way
+reduces the chance of unintentionally connecting nodes.
 
 =cut
 
@@ -89,10 +92,10 @@ sub default_goal {
     $self->node(undef);     # Less likely to leak state between goals.
 
     return undef;
-        # Return undef because, if this is the last thing in a hopen file,
+        # Also, if this is the last thing in an App::hopen hopen file,
         # whatever it returns gets recorded in MY.hopen.pl.  Therefore,
-        # return $self causes a copy of the whole graph to be dropped into
-        # MY.hopen.pl, which is a Bad Thing.
+        # return $self would cause a copy of the whole graph to be dropped into
+        # MY.hopen.pl, which would be a Bad Thing.
 } #default_goal()
 
 =head2 goal
@@ -154,9 +157,9 @@ sub _wrapper {
     # Create the GraphBuilder if we don't have one already.
     my $self = shift;
     $self = __PACKAGE__->new(dag=>$self)
-        unless ref $self and eval { $self->DOES(__PACKAGE__) };
+        unless eval { $self->DOES(__PACKAGE__) };
     croak "Parameter must be a DAG or Builder"
-        unless $self->dag and eval { $self->dag->DOES('Data::Hopen::G::DAG') };
+        unless eval { $self->dag->DOES('Data::Hopen::G::DAG') };
 
     unshift @_, $self;     # Put the builder on the arg list
 

@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojo::Promise::Role::Get:
     file: lib/Mojo/Promise/Role/Get.pm
-    version: v0.1.1
+    version: v0.1.2
 requires:
   Carp: '0'
   Mojolicious: '8.0'
@@ -37,10 +37,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-Promise-Role-Get/issues
   homepage: https://github.com/Grinnz/Mojo-Promise-Role-Get
   repository: https://github.com/Grinnz/Mojo-Promise-Role-Get.git
-version: v0.1.1
+version: v0.1.2
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -77,7 +77,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::DBOOK/MetaProvides::Package'
       version: '2.004003'
@@ -89,7 +89,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.14.4
+          git_version: 2.20.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -121,10 +121,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -174,12 +174,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -187,16 +187,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.1.1
+          tag: v0.1.2
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -222,12 +222,12 @@ x_Dist_Zilla:
             - (?^:^)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Commit_Version_Bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -236,10 +236,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.4
+          git_version: 2.20.1
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
@@ -273,7 +273,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::DBOOK/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:
@@ -357,8 +357,12 @@ x_Dist_Zilla:
       version: '0.029'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
       name: '@Author::DBOOK/InstallGuide'
-      version: '1.200011'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::DBOOK/Manifest'
@@ -426,5 +430,5 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -28,9 +28,9 @@ help:
 	@echo "  all                       - all of the above"
 
 POTFILES = $(srcdir)/POTFILES \
-	$(shell cat $(srcdir)/POTFILES) 
+	$(shell cat $(srcdir)/POTFILES)
 
-pot: $(TD).pot 
+pot: $(TD).pot
 
 clean:
 	rm -f *~ *.bak *.gmo
@@ -85,4 +85,3 @@ update-po:
 
 .po.gmo:
 	$(MSGFMT) --check --statistics --verbose -o $@ $<
-

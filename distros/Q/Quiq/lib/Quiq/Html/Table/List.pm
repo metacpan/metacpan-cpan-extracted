@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -90,10 +90,10 @@ Attribute von tr- und td-Elemeten setzen. Für jedes Element
 wird eine Arrayreferenz geliefert:
 
     $e = Quiq::Html::Table::List->new(
-        titles=>[qw/Id Name Vorname/],
-        align=>[qw/right left left/],
-        rows=>\@obj,
-        rowCallback=>sub {
+        titles => [qw/Id Name Vorname/],
+        align => [qw/right left left/],
+        rows => \@obj,
+        rowCallback => sub {
             my ($row,$i) = @_;
     
             my $trA = [class=>'TRCLASS'];
@@ -109,10 +109,10 @@ Lediglich Werte ausgeben. Für das tr-Element wird C<undef> geliefert,
 für die td-Elemente ein skalarer Wert (der Content des Elements):
 
     $e = Quiq::Html::Table::List->new(
-        titles=>[qw/Id Name Vorname/],
-        align=>[qw/right left left/],
-        rows=>\@obj,
-        rowCallback=>sub {
+        titles => [qw/Id Name Vorname/],
+        align => [qw/right left left/],
+        rows => \@obj,
+        rowCallback => sub {
             my ($row,$i) = @_;
     
             push @arr,$row->get('ATTRIBUTE');
@@ -149,14 +149,14 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        align=>[],
-        allowHtml=>0,
-        empty=>'&nbsp;',
-        footer=>0,
-        rowCallback=>undef,
-        rowCallbackArguments=>[],
-        rows=>[],
-        titles=>[],
+        align => [],
+        allowHtml => 0,
+        empty => '&nbsp;',
+        footer => 0,
+        rowCallback => undef,
+        rowCallbackArguments => [],
+        rows => [],
+        titles => [],
     );
 
     # Werte Konstruktoraufruf
@@ -223,8 +223,8 @@ sub html {
         my $i = 0;
         for my $title (@$titleA) {
             $ths .= $h->tag('th',
-                -text=>!$allowHtml{$title},
-                align=>$align->[$i++],
+                -text => !$allowHtml{$title},
+                align => $align->[$i++],
                 '-',
                 $title
             );
@@ -256,8 +256,8 @@ sub html {
         my $j = 0;
         for my $tdA (@tds) {
             $tds .= $h->tag('td',
-                -text=>!(@$titleA? $allowHtml{$titleA->[$j]}: $allowHtml),
-                align=>$align->[$j++],
+                -text => !(@$titleA? $allowHtml{$titleA->[$j]}: $allowHtml),
+                align => $align->[$j++],
                 ref $tdA? @$tdA: $tdA # Array oder skalarer Wert
             );
         }
@@ -271,8 +271,8 @@ sub html {
         # Keine Objekte vorhanden
         $trs = $h->tag('tr',
             $h->tag('td',
-                align=>'center',
-                colspan=>scalar(@$titleA),
+                align => 'center',
+                colspan => scalar(@$titleA),
                 '-',
                 $empty,
             )
@@ -297,7 +297,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

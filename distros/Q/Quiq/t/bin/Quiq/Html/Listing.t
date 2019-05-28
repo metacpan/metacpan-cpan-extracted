@@ -29,8 +29,8 @@ sub test_newAllParameters : Test(2) {
     my $self = shift;
 
     my $obj = Quiq::Html::Listing->new(
-        lineNumbers=>0,
-        source=>'/tmp/test.pl',
+        lineNumbers => 0,
+        source => '/tmp/test.pl',
     );
 
     my $val = $obj->get('lineNumbers');
@@ -51,9 +51,9 @@ sub test_html : Test(9) {
     my $h = Quiq::Html::Tag->new;
 
     my $html = Quiq::Html::Listing->html($h,
-        id=>'t45',
-        cssPrefix=>'xxx',
-        source=>\$source,
+        id => 't45',
+        cssPrefix => 'xxx',
+        source => \$source,
     );
 
     $self->like($html,qr/id="t45"/,'html: id');

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the affinity between two people
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use Moo;
 use strictures 2;
@@ -51,23 +51,19 @@ has you => (
 sub score {
     my $self = shift;
 
-    my $me = $self->me;
-    my $you = $self->you;
-    my $importance = $self->importance;
-
-    my $me_score  = _score( $me, $you, $importance );
-    my $you_score = _score( $you, $me, $importance );;
+    my $me_score  = _score( $self->me, $self->you, $self->importance );
+    my $you_score = _score( $self->you, $self->me, $self->importance );
 
     my $m = Math::BigRat->new($me_score);
     my $y = Math::BigRat->new($you_score);
 
-    my $question_count = Math::BigRat->new( scalar @$me );
+    my $question_count = Math::BigRat->new( scalar @{ $self->me } );
 
     my $product = $m->bmul($y);
 
     my $score = $product->broot($question_count);
 
-    return $score * 100;
+    return $score->numify * 100;
 }
 
 sub _score {
@@ -104,7 +100,7 @@ Acme::Affinity - Compute the affinity between two people
 
 =head1 VERSION
 
-version 0.0103
+version 0.0104
 
 =head1 SYNOPSIS
 

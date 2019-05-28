@@ -10,7 +10,6 @@ README
 README.mkdn
 bin/csv2chart
 dist.ini
-inc/Test/Run/Builder.pm
 lib/App/CSV2Chart.pm
 lib/App/CSV2Chart/Command/xlsx.pm
 t/00-compile.t

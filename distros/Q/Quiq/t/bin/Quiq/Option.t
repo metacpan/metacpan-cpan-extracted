@@ -20,8 +20,8 @@ sub test_extract_dontExtract : Test(3) {
 
     my $argA = [qw/--log-level=2 --verbose a b c/];
     my $opt = Quiq::Option->extract(-dontExtract=>1,$argA,
-        -logLevel=>1,
-        -verbose=>0,
+        -logLevel => 1,
+        -verbose => 0,
     );
     $self->is($opt->{'logLevel'},2);
     $self->is($opt->{'verbose'},1);
@@ -43,8 +43,8 @@ sub test_extract : Test(21) {
 
     for my $argA (@arr) {
         my $opt = Quiq::Option->extract($argA,
-            -logLevel=>1,
-            -verbose=>0,
+            -logLevel => 1,
+            -verbose => 0,
         );
         $self->is($opt->{'logLevel'},2);
         $self->is($opt->{'verbose'},1);
@@ -70,8 +70,8 @@ sub test_extract_varMode : Test(21) {
         my $verbose = 0;
 
         Quiq::Option->extract($argA,
-            -logLevel=>\$logLevel,
-            -verbose=>\$verbose,
+            -logLevel => \$logLevel,
+            -verbose => \$verbose,
         );
         $self->is($logLevel,2);
         $self->is($verbose,1);
@@ -88,7 +88,7 @@ sub test_extract_help : Test(1) {
 
     my $help = 0;
     Quiq::Option->extract($argA,
-        -help=>\$help,
+        -help => \$help,
     );
     $self->is($help,1);
 }
@@ -103,9 +103,9 @@ sub test_extract_properties : Test(3) {
     my $c = 3;
 
     Quiq::Option->extract(-properties=>1,$argA,
-        a=>\$a,
-        b=>\$b,
-        c=>\$c,
+        a => \$a,
+        b => \$b,
+        c => \$c,
     );
     $self->is($a,4);
     $self->is($b,5);
@@ -133,8 +133,8 @@ sub test_extractMulti_1 : Test(2) {
     my $limit;
 
     Quiq::Option->extractMulti(\@arr,
-        -select=>\@select,
-        -limit=>$limit,
+        -select => \@select,
+        -limit => $limit,
     );
 
     $self->isDeeply(\@select,[]);
@@ -149,8 +149,8 @@ sub test_extractMulti_2 : Test(2) {
     my $limit;
 
     Quiq::Option->extractMulti(\@arr,
-        -select=>\@select,
-        -limit=>\$limit,
+        -select => \@select,
+        -limit => \$limit,
     );
 
     $self->isDeeply(\@select,['*']);
@@ -165,8 +165,8 @@ sub test_extractMulti_3 : Test(2) {
     my $limit;
 
     Quiq::Option->extractMulti(\@arr,
-        -select=>\@select,
-        -limit=>\$limit,
+        -select => \@select,
+        -limit => \$limit,
     );
 
     $self->isDeeply(\@select,[qw/a b c d/]);

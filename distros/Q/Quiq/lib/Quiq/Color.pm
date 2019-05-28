@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Reference;
 
@@ -102,8 +102,8 @@ sub new {
 
     if ($error) {
         $class->throw(
-           q~COLOR-00001: Unknown color representation~,
-           Arguments=>join(',',@_),
+           'COLOR-00001: Unknown color representation',
+           Arguments => join(',',@_),
         );
     }
 
@@ -260,7 +260,7 @@ sub rgb {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

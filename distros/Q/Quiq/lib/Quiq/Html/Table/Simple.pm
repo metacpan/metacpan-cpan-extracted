@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -89,9 +89,9 @@ C<width>-Attribut der Tabelle.
 Klasse:
 
     $html = Quiq::Html::Table::Simple->html($h,
-        class=>'my-table',
-        border=>1,
-        rows=>[
+        class => 'my-table',
+        border => 1,
+        rows => [
             ['my-title',['A'],[colspan=>2,'B']],
             [[rowspan=>2,'a1'],['de'],['Text1_de']],
             [['en'],['Text1_en']],
@@ -178,15 +178,15 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        border=>undef,
-        cellpadding=>undef,
-        cellspacing=>0,
-        class=>undef,
-        data=>[],
-        id=>undef,
-        rows=>[],
-        style=>undef,
-        width=>undef,
+        border => undef,
+        cellpadding => undef,
+        cellspacing => 0,
+        class => undef,
+        data => [],
+        id => undef,
+        rows => [],
+        style => undef,
+        width => undef,
     );
     $self->set(@_);
 
@@ -225,16 +225,16 @@ sub html {
         id rows style width/);
 
     return $h->tag('table',
-        class=>$class,
-        id=>$id,
-        style=>$style,
-        data=>$dataA,
-        border=>$border,
-        width=>$width,
-        cellpadding=>$cellpadding,
-        cellspacing=>$cellspacing,
+        class => $class,
+        id => $id,
+        style => $style,
+        data => $dataA,
+        border => $border,
+        width => $width,
+        cellpadding => $cellpadding,
+        cellspacing => $cellspacing,
         $h->tag('tbody',
-            -ignoreTagIf=>1, # kein tbody per Default
+            -ignoreTagIf => 1, # kein tbody per Default
             do {
                 my $tbody;
                 for my $trA (@$rowA) {
@@ -280,7 +280,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

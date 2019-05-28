@@ -15,7 +15,11 @@ if ($^O eq 'MSWin32') {
 }
 delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
 
-$ENV{TZ} ||= guess_tz();
+if (($ENV{TZ}) && ($ENV{TZ} eq 'localtime')) {
+	$ENV{TZ} = guess_tz();
+} else {
+	$ENV{TZ} ||= guess_tz();
+}
 
 diag("TZ environment variable is $ENV{TZ}");
 my $timezone = Time::Zone::Olson->new();
@@ -33,6 +37,9 @@ my $bsd_date = 0;
 
 if ($^O eq 'MSWin32') {
 	diag "$^O means we need to use the SystemTimeToTzSpecificLocalTime system call as the definitive source of truth for timezone calculations";
+} elsif ($^O eq 'solaris') {
+	diag "$^O does not have a useful date binary.";
+	$perl_date = 1;
 } else {
 	my $test_gnu_date = `TZ="Australia/Melbourne" date -d "2015/02/28 11:00:00" +"%Y/%m/%d %H:%M:%S" 2>&1`;
 	chomp $test_gnu_date;
@@ -71,7 +78,7 @@ if ($^O eq 'MSWin32') {
 	diag("$^O comment for Australia/Melbourne is '" . $timezone->comment('Australia/Melbourne') . "'");
 	ok($timezone->comment('Australia/Melbourne') =~ /Canberra/smx, "\$timezone->comment('Australia/Melbourne') contains /Canberra/");
 } else {
-	ok($timezone->comment('Australia/Melbourne') eq 'Victoria', "\$timezone->comment('Australia/Melbourne') returns 'Victoria'");
+	ok($timezone->comment('Australia/Melbourne') =~ /Victoria/smx, "\$timezone->comment('Australia/Melbourne') contains /Victoria/");
 }
 my $now = time;
 my @correct_localtime = localtime $now;
@@ -247,7 +254,7 @@ sub guess_tz {
 		my $localtime_digest = $digest->hexdigest();
 		my $timezone = Time::Zone::Olson->new();
 		my $guessed;
-		foreach my $base ('/usr/share/zoneinfo', '/usr/lib/zoneinfo', $ENV{TZDIR}) {
+		foreach my $base ('/usr/share/zoneinfo', '/usr/lib/zoneinfo', '/usr/share/lib/zoneinfo', $ENV{TZDIR}) {
 			my $readlink;
 			eval {
 				if ($readlink = readlink $path) {

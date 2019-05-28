@@ -2,7 +2,7 @@
 package Data::Hopen::Util::NameSet;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 # Docs {{{1
 
@@ -141,17 +141,21 @@ Regexps are matched with whatever flags they were compiled with.
 sub _build {
     my $self = shift or croak 'Need an instance';
 
-    my $strs = join '|', map { quotemeta } @{$self->{_strings}};
-        # TODO should I be using qr/\Q$_\E/ instead, since quotemeta
-        # isn't quite right on 5.14?  Or should I be using 5.16+?
-        # See how the cpantesters results for t/008 turn out on 5.14.
-    my $str = join '|', @{$self->{_regexps}}, ($strs || ());
+    my @quoted_strs;
+    if(@{$self->{_strings}}) {
+        push @quoted_strs,
+            join '|', map { quotemeta } @{$self->{_strings}};
+            # TODO should I be using qr/\Q$_\E/ instead, since quotemeta
+            # isn't quite right on 5.14?  Or should I be using 5.16+?
+    }
+
+    my $pattern = join '|', @{$self->{_regexps}}, @quoted_strs;
         # Each regexp stringifies with surrounding parens, so we
         # don't need to add any.
 
-    return $str ? qr/\A(?:$str)\z/ : qr/(*FAIL)/;
-        # If $str is empty, the nameset is empty (`(*FAIL)`).  Without the ?: ,
-        # qr// would match anything, when we want to match nothing.
+    return $pattern ? qr/\A(?:$pattern)\z/ : qr/(*FAIL)/;
+        # If $pattern is empty, the nameset is empty (`(*FAIL)`).  Without the
+        # ?:, qr// would match anything, when we want to match nothing.
 } #_build()
 
 1;

@@ -2,60 +2,62 @@
 
 use strict;
 use warnings;
-our $VERSION = '2.28'; # Check https://beyondgrep.com/ for updates
 
-use 5.008008;
-use Getopt::Long 2.38 ();
-use Carp 1.04 ();
+our $VERSION = v3.0.0; # Check https://beyondgrep.com/ for updates
+
+use 5.010001;
 
 use File::Spec ();
 use File::Next ();
 
 use App::Ack ();
 use App::Ack::ConfigLoader ();
-use App::Ack::Resources;
-use App::Ack::Resource ();
+use App::Ack::File ();
+use App::Ack::Files ();
 
-# XXX Don't make this so brute force
-# See also: https://github.com/beyondgrep/ack2/issues/89
 use App::Ack::Filter ();
-use App::Ack::Filter::Default;
-use App::Ack::Filter::Extension;
-use App::Ack::Filter::FirstLineMatch;
-use App::Ack::Filter::Inverse;
-use App::Ack::Filter::Is;
-use App::Ack::Filter::IsPath;
-use App::Ack::Filter::Match;
-use App::Ack::Filter::Collection;
+use App::Ack::Filter::Default ();
+use App::Ack::Filter::Extension ();
+use App::Ack::Filter::FirstLineMatch ();
+use App::Ack::Filter::Inverse ();
+use App::Ack::Filter::Is ();
+use App::Ack::Filter::IsPath ();
+use App::Ack::Filter::Match ();
+use App::Ack::Filter::Collection ();
 
-our $opt_after_context;
-our $opt_before_context;
-our $opt_output;
-our $opt_print0;
-our $opt_color;
-our $opt_heading;
-our $opt_show_filename;
-our $opt_regex;
+# Global command-line options
+our $opt_1;
+our $opt_A;
+our $opt_B;
 our $opt_break;
-our $opt_count;
-our $opt_v;
-our $opt_m;
-our $opt_g;
+our $opt_color;
+our $opt_column;
+our $opt_c;
 our $opt_f;
-our $opt_lines;
+our $opt_g;
+our $opt_heading;
 our $opt_L;
 our $opt_l;
+our $opt_m;
+our $opt_output;
 our $opt_passthru;
-our $opt_column;
+our $opt_p;
+our $opt_regex;
+our $opt_show_filename;
+our $opt_show_types;
+our $opt_underline;
+our $opt_v;
 
 # Flag if we need any context tracking.
 our $is_tracking_context;
 
-# These are all our globals.
+our @special_vars_used_by_opt_output;
+our $special_vars_used_by_opt_output;
 
 MAIN: {
-    $App::Ack::orig_program_name = $0;
+    $App::Ack::ORIGINAL_PROGRAM_NAME = $0;
     $0 = join(' ', 'ack', $0);
+    $App::Ack::ors = "\n";
     if ( $App::Ack::VERSION ne $main::VERSION ) {
         App::Ack::die( "Program/library version mismatch\n\t$0 is $main::VERSION\n\t$INC{'App/Ack.pm'} is $App::Ack::VERSION" );
     }
@@ -65,7 +67,7 @@ MAIN: {
     for my $arg ( @ARGV ) {
         last if ( $arg eq '--' );
 
-        # Get the --thpppt, --bar, --cathy checking out of the way.
+        # Get the --thpppt, --bar, --cathy and --man checking out of the way.
         $arg =~ /^--th[pt]+t+$/ and App::Ack::thpppt($arg);
         $arg eq '--bar'         and App::Ack::ackbar();
         $arg eq '--cathy'       and App::Ack::cathy();
@@ -75,28 +77,272 @@ MAIN: {
         $arg eq '--noenv'       and $env_is_usable = 0;
     }
 
-    if ( !$env_is_usable ) {
+    if ( $env_is_usable ) {
+        if ( $ENV{ACK_OPTIONS} ) {
+            App::Ack::warn( 'WARNING: ack no longer uses the ACK_OPTIONS environment variable.  Use an ackrc file instead.' );
+        }
+    }
+    else {
         my @keys = ( 'ACKRC', grep { /^ACK_/ } keys %ENV );
         delete @ENV{@keys};
     }
-    load_colors();
 
-    Getopt::Long::Configure('default', 'no_auto_help', 'no_auto_version');
-    Getopt::Long::Configure('pass_through', 'no_auto_abbrev');
-    Getopt::Long::GetOptions(
-        'help'       => sub { App::Ack::show_help(); exit; },
-        'version'    => sub { App::Ack::print_version_statement(); exit; },
-        'man'        => sub { App::Ack::show_man(); exit; },
+    # Load colors
+    my $modules_loaded_ok = eval 'use Term::ANSIColor 1.10 (); 1;';
+    if ( $modules_loaded_ok && $App::Ack::is_windows ) {
+        $modules_loaded_ok = eval 'use Win32::Console::ANSI; 1;';
+    }
+    if ( $modules_loaded_ok ) {
+        $ENV{ACK_COLOR_MATCH}    ||= 'black on_yellow';
+        $ENV{ACK_COLOR_FILENAME} ||= 'bold green';
+        $ENV{ACK_COLOR_LINENO}   ||= 'bold yellow';
+        $ENV{ACK_COLOR_COLNO}    ||= 'bold yellow';
+    }
+
+    my $p = App::Ack::ConfigLoader::opt_parser( 'no_auto_abbrev', 'pass_through' );
+    $p->getoptions(
+        help     => sub { App::Ack::show_help(); exit; },
+        version  => sub { App::Ack::print( App::Ack::get_version_statement() ); exit; },
+        man      => sub { App::Ack::show_man(); },
     );
-    Getopt::Long::Configure('default', 'no_auto_help', 'no_auto_version');
 
     if ( !@ARGV ) {
         App::Ack::show_help();
         exit 1;
     }
 
-    main();
+    my @arg_sources = App::Ack::ConfigLoader::retrieve_arg_sources();
+
+    my $opt = App::Ack::ConfigLoader::process_args( @arg_sources );
+
+    $opt_1              = $opt->{1};
+    $opt_A              = $opt->{A};
+    $opt_B              = $opt->{B};
+    $opt_break          = $opt->{break};
+    $opt_c              = $opt->{c};
+    $opt_color          = $opt->{color};
+    $opt_column         = $opt->{column};
+    $opt_f              = $opt->{f};
+    $opt_g              = $opt->{g};
+    $opt_heading        = $opt->{heading};
+    $opt_L              = $opt->{L};
+    $opt_l              = $opt->{l};
+    $opt_m              = $opt->{m};
+    $opt_output         = $opt->{output};
+    $opt_p              = $opt->{p};
+    $opt_passthru       = $opt->{passthru};
+    $opt_regex          = $opt->{regex};
+    $opt_show_filename  = $opt->{show_filename};
+    $opt_show_types     = $opt->{show_types};
+    $opt_underline      = $opt->{underline};
+    $opt_v              = $opt->{v};
+
+    $App::Ack::report_bad_filenames = !$opt->{s};
+    $App::Ack::ors = $opt->{print0} ? "\0" : "\n";
+
+    if ( !defined($opt_color) && !$opt_g ) {
+        my $windows_color = 1;
+        if ( $App::Ack::is_windows ) {
+            $windows_color = eval { require Win32::Console::ANSI; };
+        }
+        $opt_color = !App::Ack::output_to_pipe() && $windows_color;
+    }
+    if ( not defined $opt_heading and not defined $opt_break  ) {
+        $opt_heading = $opt_break = $opt->{break} = !App::Ack::output_to_pipe();
+    }
+
+    if ( defined($opt->{H}) || defined($opt->{h}) ) {
+        $opt_show_filename = $opt->{show_filename} = $opt->{H} && !$opt->{h};
+    }
+
+    if ( defined $opt_output ) {
+        # Expand out \t, \n and \r.
+        $opt_output =~ s/\\n/\n/g;
+        $opt_output =~ s/\\r/\r/g;
+        $opt_output =~ s/\\t/\t/g;
+
+        my @supported_special_variables = ( 1..9, qw( _ . ` & ' +  f ) );
+        @special_vars_used_by_opt_output = grep { $opt_output =~ /\$$_/ } @supported_special_variables;
+        $special_vars_used_by_opt_output = join( '', @special_vars_used_by_opt_output );
+
+        # If the $opt_output contains $&, $` or $', those vars won't be
+        # captured until they're used at least once in the program.
+        # Do the eval to make this happen.
+        for my $i ( @special_vars_used_by_opt_output ) {
+            if ( $i eq q{&} || $i eq q{'} || $i eq q{`} ) {
+                no warnings;    # They will be undef, so don't warn.
+                eval qq{"\$$i"};    ## no critic ( ErrorHandling::RequireCheckingReturnValueOfEval )
+            }
+        }
+    }
+
+    # Set up file filters.
+    my $files;
+    if ( $App::Ack::is_filter_mode && !$opt->{files_from} ) { # probably -x
+        $files     = App::Ack::Files->from_stdin();
+        $opt_regex = shift @ARGV if not defined $opt_regex;
+        $opt_regex = build_regex( $opt_regex, $opt );
+    }
+    else {
+        if ( $opt_f ) {
+            # No need to check for regex, since mutex options are handled elsewhere.
+        }
+        else {
+            $opt_regex = shift @ARGV if not defined $opt_regex;
+            $opt_regex = build_regex( $opt_regex, $opt );
+        }
+        if ( $opt_regex && $opt_regex =~ /\n/ ) {
+            App::Ack::exit_from_ack( 0 );
+        }
+        my @start;
+        if ( not defined $opt->{files_from} ) {
+            @start = @ARGV;
+        }
+        if ( !exists($opt->{show_filename}) ) {
+            unless(@start == 1 && !(-d $start[0])) {
+                $opt_show_filename = $opt->{show_filename} = 1;
+            }
+        }
+
+        if ( defined $opt->{files_from} ) {
+            $files = App::Ack::Files->from_file( $opt, $opt->{files_from} );
+            exit 1 unless $files;
+        }
+        else {
+            @start = ('.') unless @start;
+            foreach my $target (@start) {
+                if ( !-e $target && $App::Ack::report_bad_filenames) {
+                    App::Ack::warn( "$target: No such file or directory" );
+                }
+            }
+
+            $opt->{file_filter}    = _compile_file_filter($opt, \@start);
+            $opt->{descend_filter} = _compile_descend_filter($opt);
+
+            $files = App::Ack::Files->from_argv( $opt, \@start );
+        }
+    }
+    App::Ack::set_up_pager( $opt->{pager} ) if defined $opt->{pager};
+
+    my $nmatches    = 0;
+    my $total_count = 0;
+
+    set_up_line_context();
+
+FILES:
+    while ( defined(my $file = $files->next) ) {
+        if ($is_tracking_context) {
+            set_up_line_context_for_file();
+        }
+
+        # ack -f
+        if ( $opt_f ) {
+            if ( $opt_show_types ) {
+                App::Ack::show_types( $file );
+            }
+            else {
+                App::Ack::say( $file->name );
+            }
+            ++$nmatches;
+            last FILES if defined($opt_m) && $nmatches >= $opt_m;
+        }
+        # ack -g
+        elsif ( $opt_g ) {
+            if ( $opt_show_types ) {
+                App::Ack::show_types( $file );
+            }
+            else {
+                local $opt_show_filename = 0; # XXX Why is this local?
+
+                print_line_with_options( '', $file->name, 0, $App::Ack::ors );
+            }
+            ++$nmatches;
+            last FILES if defined($opt_m) && $nmatches >= $opt_m;
+        }
+        # ack -c
+        elsif ( $opt_c ) {
+            my $matches_for_this_file = count_matches_in_file( $file );
+
+            if ( not $opt_show_filename ) {
+                $total_count += $matches_for_this_file;
+                next FILES;
+            }
+
+            if ( !$opt_l || $matches_for_this_file > 0) {
+                if ( $opt_show_filename ) {
+                    App::Ack::say( $file->name, ':', $matches_for_this_file );
+                }
+                else {
+                    App::Ack::say( $matches_for_this_file );
+                }
+            }
+        }
+        # ack -l, ack -L
+        elsif ( $opt_l || $opt_L ) {
+            my $is_match = file_has_match( $file );
+
+            if ( $opt_L ? !$is_match : $is_match ) {
+                App::Ack::say( $file->name );
+                ++$nmatches;
+
+                last FILES if $opt_1;
+                last FILES if defined($opt_m) && $nmatches >= $opt_m;
+            }
+        }
+        # Normal match-showing ack
+        else {
+            # Tells if the file needs a line-by-line scan.  This is a big
+            # optimization because if you can tell from the outset that the pattern
+            # is not found in the file at all, then there's no need to do the
+            # line-by-line iteration.
+            # Slurp up an entire file up to 10M, see if there are any matches
+            # in it, and if so, let us know so we can iterate over it directly.
+            my $needs_line_scan = 1;
+            if ( $opt_regex && !$opt_passthru && !$opt_v ) {
+                if ( $file->open() && -f $file->{fh} ) {
+                    my $buffer;
+                    my $size = 10_000_000;
+                    my $rc = sysread( $file->{fh}, $buffer, $size );
+                    if ( !defined($rc) ) {
+                        if ( $App::Ack::report_bad_filenames ) {
+                            App::Ack::warn( $file->name . ": $!" );
+                        }
+                        $needs_line_scan = 0;
+                    }
+                    else {
+                        # If we read all 10M, then we need to scan the rest.
+                        if ( $rc == $size ) {
+                            $needs_line_scan = 1;
+                        }
+                        else {
+                            # Check for the pattern in what we got.
+                            $needs_line_scan = ($buffer =~ /$opt_regex/mo);
+                        }
+                        if ( $needs_line_scan ) {
+                            $file->reset();
+                        }
+                    }
+                }
+            }
+            if ( $needs_line_scan ) {
+                $nmatches += print_matches_in_file( $file );
+            }
+            if ( $opt_1 && $nmatches ) {
+                last FILES;
+            }
+        }
+    }
+
+    if ( $opt_c && !$opt_show_filename ) {
+        App::Ack::print( $total_count, "\n" );
+    }
+
+    close $App::Ack::fh;
+
+    App::Ack::exit_from_ack( $nmatches );
 }
+
+# End of MAIN
 
 sub _compile_descend_filter {
     my ( $opt ) = @_;
@@ -122,8 +368,8 @@ sub _compile_descend_filter {
     $idirs = $opt->{idirs};
 
     return sub {
-        my $resource = App::Ack::Resource->new($File::Next::dir);
-        return !grep { $_->filter($resource) } @{$idirs};
+        my $file = App::Ack::File->new($File::Next::dir);
+        return !grep { $_->filter($file) } @{$idirs};
     };
 }
 
@@ -182,7 +428,7 @@ sub _compile_file_filter {
                 my $is_ignoring = 0;
 
                 for ( my $i = 0; $i < @dirs; $i++) {
-                    my $dir_rsrc = App::Ack::Resource->new(File::Spec->catfile(@dirs[0 .. $i]));
+                    my $dir_rsrc = App::Ack::File->new(File::Spec->catfile(@dirs[0 .. $i]));
 
                     my $j = 0;
                     for my $filter (@ignore_dir_filter) {
@@ -220,68 +466,22 @@ sub _compile_file_filter {
             }
         }
 
-        my $resource = App::Ack::Resource->new($File::Next::name);
+        my $file = App::Ack::File->new($File::Next::name);
 
-        if ( $ifiles_filters && $ifiles_filters->filter($resource) ) {
+        if ( $ifiles_filters && $ifiles_filters->filter($file) ) {
             return 0;
         }
 
-        my $match_found = $direct_filters->filter($resource);
+        my $match_found = $direct_filters->filter($file);
 
-        # Don't bother invoking inverse filters unless we consider the current resource a match
-        if ( $match_found && $inverse_filters->filter( $resource ) ) {
+        # Don't bother invoking inverse filters unless we consider the current file a match.
+        if ( $match_found && $inverse_filters->filter( $file ) ) {
             $match_found = 0;
         }
         return $match_found;
     };
 }
 
-sub show_types {
-    my $resource = shift;
-    my $ors      = shift;
-
-    my @types = filetypes( $resource );
-    my $types = join( ',', @types );
-    my $arrow = @types ? ' => ' : ' =>';
-    App::Ack::print( $resource->name, $arrow, join( ',', @types ), $ors );
-
-    return;
-}
-
-# Set default colors, load Term::ANSIColor
-sub load_colors {
-    eval 'use Term::ANSIColor 1.10 ()';
-    eval 'use Win32::Console::ANSI' if $App::Ack::is_windows;
-
-    $ENV{ACK_COLOR_MATCH}    ||= 'black on_yellow';
-    $ENV{ACK_COLOR_FILENAME} ||= 'bold green';
-    $ENV{ACK_COLOR_LINENO}   ||= 'bold yellow';
-
-    return;
-}
-
-sub filetypes {
-    my ( $resource ) = @_;
-
-    my @matches;
-
-    foreach my $k (keys %App::Ack::mappings) {
-        my $filters = $App::Ack::mappings{$k};
-
-        foreach my $filter (@{$filters}) {
-            # Clone the resource.
-            my $clone = $resource->clone;
-            if ( $filter->filter($clone) ) {
-                push @matches, $k;
-                last;
-            }
-        }
-    }
-
-    # http://search.cpan.org/dist/Perl-Critic/lib/Perl/Critic/Policy/Subroutines/ProhibitReturnSort.pm
-    @matches = sort @matches;
-    return @matches;
-}
 
 # Returns a (fairly) unique identifier for a file.
 # Use this function to compare two files to see if they're
@@ -294,7 +494,7 @@ sub get_file_id {
     }
     else {
         # XXX Is this the best method? It always hits the FS.
-        if( my ( $dev, $inode ) = (stat($filename))[0, 1] ) {
+        if ( my ( $dev, $inode ) = (stat($filename))[0, 1] ) {
             return join(':', $dev, $inode);
         }
         else {
@@ -313,30 +513,63 @@ sub build_regex {
 
     defined $str or App::Ack::die( 'No regular expression found.' );
 
-    $str = quotemeta( $str ) if $opt->{Q};
-    if ( $opt->{w} ) {
-        my $pristine_str = $str;
+    # Check for lowercaseness before we do any modifications.
+    my $regex_is_lc = $str eq lc $str;
 
-        $str = "(?:$str)";
-        $str = "\\b$str" if $pristine_str =~ /^\w/;
-        $str = "$str\\b" if $pristine_str =~ /\w$/;
+    $str = quotemeta( $str ) if $opt->{Q};
+
+    # Whole words only.
+    if ( $opt->{w} ) {
+        my $ok = 1;
+
+        if ( $str =~ /^\\[wd]/ ) {
+            # Explicit \w is good.
+        }
+        else {
+            # Can start with \w, (, [ or dot.
+            if ( $str !~ /^[\w\(\[\.]/ ) {
+                $ok = 0;
+            }
+        }
+
+        # Can end with \w, }, ), ], +, *, or dot.
+        if ( $str !~ /[\w\}\)\]\+\*\?\.]$/ ) {
+            $ok = 0;
+        }
+        # ... unless it's escaped.
+        elsif ( $str =~ /\\[\}\)\]\+\*\?\.]$/ ) {
+            $ok = 0;
+        }
+
+        if ( !$ok ) {
+            App::Ack::die( '-w will not do the right thing if your regex does not begin and end with a word character.' );
+        }
+
+        if ( $str =~ /^\w+$/ ) {
+            # No need for fancy regex if it's a simple word.
+            $str = sprintf( '\b(?:%s)\b', $str );
+        }
+        else {
+            $str = sprintf( '(?:^|\b|\s)\K(?:%s)(?=\s|\b|$)', $str );
+        }
     }
 
-    my $regex_is_lc = $str eq lc $str;
-    if ( $opt->{i} || ($opt->{smart_case} && $regex_is_lc) ) {
+    if ( $opt->{i} || ($opt->{S} && $regex_is_lc) ) {
         $str = "(?i)$str";
     }
 
     my $re = eval { qr/$str/m };
     if ( !$re ) {
-        die "Invalid regex '$str':\n  $@";
+        my $err = $@;
+        chomp $err;
+        App::Ack::die( "Invalid regex '$str':\n  $err" );
     }
 
     return $re;
 
 }
 
-my $match_column_number;
+my $match_colno;
 
 {
 
@@ -353,21 +586,15 @@ my $before_context_pos;
 my $after_context_pending;
 
 # Number of latest line that got printed
-my $printed_line_no;
-
-my $is_iterating;
+my $printed_lineno;
 
 my $is_first_match;
-my $has_printed_something;
-
-BEGIN {
-    $has_printed_something = 0;
-}
+state $has_printed_something = 0;
 
 # Set up context tracking variables.
 sub set_up_line_context {
-    $n_before_ctx_lines = $opt_output ? 0 : ($opt_before_context || 0);
-    $n_after_ctx_lines  = $opt_output ? 0 : ($opt_after_context || 0);
+    $n_before_ctx_lines = $opt_output ? 0 : ($opt_B || 0);
+    $n_after_ctx_lines  = $opt_output ? 0 : ($opt_A || 0);
 
     @before_context_buf = (undef) x $n_before_ctx_lines;
     $before_context_pos = 0;
@@ -381,44 +608,25 @@ sub set_up_line_context {
 
 # Adjust context tracking variables when entering a new file.
 sub set_up_line_context_for_file {
-    $printed_line_no = 0;
+    $printed_lineno = 0;
     $after_context_pending = 0;
-    if ( $opt_heading && !$opt_lines ) {
+    if ( $opt_heading ) {
         $is_first_match = 1;
     }
 
     return;
 }
 
-=begin Developers
+sub print_matches_in_file {
+    my $file = shift;
 
-This subroutine jumps through a number of optimization hoops to
-try to be fast in the more common use cases of ack.  For one thing,
-in non-context tracking searches (not using -A, -B, or -C),
-conditions that normally would be checked inside the loop happen
-outside, resulting in three nearly identical loops for -v, --passthru,
-and normal searching.  Any changes that happen to one should propagate
-to the others if they make sense.  The non-context branches also inline
-does_match for performance reasons; any relevant changes that happen here
-must also happen there.
+    my $max_count = $opt_m || -1;   # Go negative for no limit so it can never reduce to 0.
+    my $nmatches  = 0;
+    my $filename  = $file->name;
 
-=end Developers
+    my $has_printed_for_this_file = 0;
 
-=cut
-
-sub print_matches_in_resource {
-    my ( $resource ) = @_;
-
-    my $max_count      = $opt_m || -1;
-    my $nmatches       = 0;
-    my $filename       = $resource->name;
-    my $ors            = $opt_print0 ? "\0" : "\n";
-
-    my $has_printed_for_this_resource = 0;
-
-    $is_iterating = 1;
-
-    my $fh = $resource->open();
+    my $fh = $file->open;
     if ( !$fh ) {
         if ( $App::Ack::report_bad_filenames ) {
             App::Ack::warn( "$filename: $!" );
@@ -435,274 +643,283 @@ sub print_matches_in_resource {
     if ( $is_tracking_context ) {
         $after_context_pending = 0;
         while ( <$fh> ) {
-            if ( does_match( $_ ) && $max_count ) {
-                if ( !$has_printed_for_this_resource ) {
+            chomp;
+            my $does_match;
+            $match_colno = undef;
+
+            if ( $opt_v ) {
+                $does_match = !/$opt_regex/o;
+            }
+            else {
+                if ( $does_match = /$opt_regex/o ) {
+                    # @- = @LAST_MATCH_START
+                    # @+ = @LAST_MATCH_END
+                    $match_colno = $-[0] + 1;
+                }
+            }
+            if ( $does_match && $max_count ) {
+                if ( !$has_printed_for_this_file ) {
                     if ( $opt_break && $has_printed_something ) {
                         App::Ack::print_blank_line();
                     }
                     if ( $opt_show_filename && $opt_heading ) {
-                        App::Ack::print_filename( $display_filename, $ors );
+                        App::Ack::say( $display_filename );
                     }
                 }
                 print_line_with_context( $filename, $_, $. );
-                $has_printed_for_this_resource = 1;
+                $has_printed_for_this_file = 1;
                 $nmatches++;
                 $max_count--;
             }
-            elsif ( $opt_passthru ) {
-                chomp; # XXX Proper newline handling?
-                # XXX Inline this call?
-                if ( $opt_break && !$has_printed_for_this_resource && $has_printed_something ) {
-                    App::Ack::print_blank_line();
-                }
-                print_line_with_options( $filename, $_, $., ':' );
-                $has_printed_for_this_resource = 1;
-            }
             else {
-                chomp; # XXX Proper newline handling?
-                print_line_if_context( $filename, $_, $., '-' );
+                if ( $after_context_pending ) {
+                    # Disable $opt_column since there are no matches in the context lines.
+                    local $opt_column = 0;
+                    print_line_with_options( $filename, $_, $., '-' );
+                    --$after_context_pending;
+                }
+                elsif ( $n_before_ctx_lines ) {
+                    # Save line for "before" context.
+                    $before_context_buf[$before_context_pos] = $_;
+                    $before_context_pos = ($before_context_pos+1) % $n_before_ctx_lines;
+                }
             }
 
             last if ($max_count == 0) && ($after_context_pending == 0);
         }
     }
-    else {
-        if ( $opt_passthru ) {
-            local $_;
+    elsif ( $opt_passthru ) {
+        local $_ = undef;
 
-            while ( <$fh> ) {
-                $match_column_number = undef;
-                if ( $opt_v ? !/$opt_regex/o : /$opt_regex/o ) {
-                    if ( !$opt_v ) {
-                        $match_column_number = $-[0] + 1;
-                    }
-                    if ( !$has_printed_for_this_resource ) {
-                        if ( $opt_break && $has_printed_something ) {
-                            App::Ack::print_blank_line();
-                        }
-                        if ( $opt_show_filename && $opt_heading ) {
-                            App::Ack::print_filename( $display_filename, $ors );
-                        }
-                    }
-                    print_line_with_context( $filename, $_, $. );
-                    $has_printed_for_this_resource = 1;
-                    $nmatches++;
-                    $max_count--;
+        while ( <$fh> ) {
+            chomp;
+            $match_colno = undef;
+            if ( $opt_v ? !/$opt_regex/o : /$opt_regex/o ) {
+                if ( !$opt_v ) {
+                    $match_colno = $-[0] + 1;
                 }
-                else {
-                    chomp; # XXX proper newline handling?
-                    if ( $opt_break && !$has_printed_for_this_resource && $has_printed_something ) {
+                if ( !$has_printed_for_this_file ) {
+                    if ( $opt_break && $has_printed_something ) {
                         App::Ack::print_blank_line();
                     }
-                    print_line_with_options( $filename, $_, $., ':' );
-                    $has_printed_for_this_resource = 1;
-                }
-                last unless $max_count != 0;
-            }
-        }
-        elsif ( $opt_v ) {
-            local $_;
-
-            $match_column_number = undef;
-            while ( <$fh> ) {
-                if ( !/$opt_regex/o ) {
-                    if ( !$has_printed_for_this_resource ) {
-                        if ( $opt_break && $has_printed_something ) {
-                            App::Ack::print_blank_line();
-                        }
-                        if ( $opt_show_filename && $opt_heading ) {
-                            App::Ack::print_filename( $display_filename, $ors );
-                        }
+                    if ( $opt_show_filename && $opt_heading ) {
+                        App::Ack::say( $display_filename );
                     }
-                    print_line_with_context( $filename, $_, $. );
-                    $has_printed_for_this_resource = 1;
-                    $nmatches++;
-                    $max_count--;
                 }
-                last unless $max_count != 0;
+                print_line_with_context( $filename, $_, $. );
+                $has_printed_for_this_file = 1;
+                $nmatches++;
+                $max_count--;
             }
-        }
-        else {
-            local $_;
-
-            while ( <$fh> ) {
-                $match_column_number = undef;
-                if ( /$opt_regex/o ) {
-                    $match_column_number = $-[0] + 1;
-                    if ( !$has_printed_for_this_resource ) {
-                        if ( $opt_break && $has_printed_something ) {
-                            App::Ack::print_blank_line();
-                        }
-                        if ( $opt_show_filename && $opt_heading ) {
-                            App::Ack::print_filename( $display_filename, $ors );
-                        }
-                    }
-                    s/[\r\n]+$//g;
-                    print_line_with_options( $filename, $_, $., ':' );
-                    $has_printed_for_this_resource = 1;
-                    $nmatches++;
-                    $max_count--;
+            else {
+                if ( $opt_break && !$has_printed_for_this_file && $has_printed_something ) {
+                    App::Ack::print_blank_line();
                 }
-                last unless $max_count != 0;
+                print_line_with_options( $filename, $_, $., ':' );
+                $has_printed_for_this_file = 1;
             }
+            last if $max_count == 0;
         }
-
     }
+    elsif ( $opt_v ) {
+        local $_ = undef;
 
-    $is_iterating = 0;
+        $match_colno = undef;
+        while ( <$fh> ) {
+            chomp;
+            if ( !/$opt_regex/o ) {
+                if ( !$has_printed_for_this_file ) {
+                    if ( $opt_break && $has_printed_something ) {
+                        App::Ack::print_blank_line();
+                    }
+                    if ( $opt_show_filename && $opt_heading ) {
+                        App::Ack::say( $display_filename );
+                    }
+                }
+                print_line_with_context( $filename, $_, $. );
+                $has_printed_for_this_file = 1;
+                $nmatches++;
+                $max_count--;
+            }
+            last if $max_count == 0;
+        }
+    }
+    else {
+        local $_ = undef;
+
+        my $last_match_lineno;
+        while ( <$fh> ) {
+            chomp;
+            $match_colno = undef;
+            if ( /$opt_regex/o ) {
+                $match_colno = $-[0] + 1;
+                if ( !$has_printed_for_this_file ) {
+                    if ( $opt_break && $has_printed_something ) {
+                        App::Ack::print_blank_line();
+                    }
+                    if ( $opt_show_filename && $opt_heading ) {
+                        App::Ack::say( $display_filename );
+                    }
+                }
+                if ( $opt_p ) {
+                    if ( $last_match_lineno ) {
+                        if ( $. > $last_match_lineno + $opt_p ) {
+                            App::Ack::print_blank_line();
+                        }
+                    }
+                    elsif ( !$opt_break && $has_printed_something ) {
+                        App::Ack::print_blank_line();
+                    }
+                }
+                s/[\r\n]+$//;
+                print_line_with_options( $filename, $_, $., ':' );
+                $has_printed_for_this_file = 1;
+                $nmatches++;
+                $max_count--;
+                $last_match_lineno = $.;
+            }
+            last if $max_count == 0;
+        }
+    }
 
     return $nmatches;
 }
 
+
 sub print_line_with_options {
-    my ( $filename, $line, $line_no, $separator ) = @_;
+    my ( $filename, $line, $lineno, $separator ) = @_;
 
     $has_printed_something = 1;
-    $printed_line_no = $line_no;
-
-    my $ors = $opt_print0 ? "\0" : "\n";
+    $printed_lineno = $lineno;
 
     my @line_parts;
 
-    if( $opt_color ) {
-        $filename = Term::ANSIColor::colored($filename,
-            $ENV{ACK_COLOR_FILENAME});
-        $line_no  = Term::ANSIColor::colored($line_no,
-            $ENV{ACK_COLOR_LINENO});
+    # Figure out how many spaces are used per line for the ANSI coloring.
+    state $chars_used_by_coloring;
+    if ( !defined($chars_used_by_coloring) ) {
+        $chars_used_by_coloring = 0;
+        if ( $opt_color ) {
+            my $filename_uses = length( Term::ANSIColor::colored( 'x', $ENV{ACK_COLOR_FILENAME} ) ) - 1;
+            my $lineno_uses   = length( Term::ANSIColor::colored( 'x', $ENV{ACK_COLOR_LINENO} ) ) - 1;
+            if ( $opt_heading ) {
+                $chars_used_by_coloring = $lineno_uses;
+            }
+            else {
+                $chars_used_by_coloring = $filename_uses + $lineno_uses;
+            }
+            if ( $opt_column ) {
+                $chars_used_by_coloring += length( Term::ANSIColor::colored( 'x', $ENV{ACK_COLOR_LINENO} ) ) - 1;
+            }
+        }
     }
 
-    if($opt_show_filename) {
-        if( $opt_heading ) {
-            push @line_parts, $line_no;
+    if ( $opt_show_filename ) {
+        my $colno;
+        $colno = get_match_colno() if $opt_column;
+        if ( $opt_color ) {
+            $filename = Term::ANSIColor::colored( $filename, $ENV{ACK_COLOR_FILENAME} );
+            $lineno   = Term::ANSIColor::colored( $lineno,   $ENV{ACK_COLOR_LINENO} );
+            $colno    = Term::ANSIColor::colored( $colno,    $ENV{ACK_COLOR_COLNO} ) if $opt_column;
+        }
+        if ( $opt_heading ) {
+            push @line_parts, $lineno;
+            push @line_parts, $colno if $opt_column;
         }
         else {
-            push @line_parts, $filename, $line_no;
-        }
-
-        if( $opt_column ) {
-            push @line_parts, get_match_column();
+            push @line_parts, $filename, $lineno;
+            push @line_parts, $colno if $opt_column;
         }
     }
-    if( $opt_output ) {
+
+    if ( $opt_output ) {
         while ( $line =~ /$opt_regex/og ) {
-            # XXX We need to stop using eval() for --output.  See https://github.com/beyondgrep/ack2/issues/421
-            my $output = eval $opt_output;
-            App::Ack::print( join( $separator, @line_parts, $output ), $ors );
+            no strict;
+
+            my $output = $opt_output;
+
+            # Stash copies of the special variables because we can't rely
+            # on them not changing in the process of doing the s///.
+            my %keep = map { ($_ => ${$_} // '') } @special_vars_used_by_opt_output;
+            $keep{_} = $line if exists $keep{_}; # Manually set it because $_ gets reset in a map.
+            $keep{f} = $filename if exists $keep{f};
+            $output =~ s/\$([$special_vars_used_by_opt_output])/$keep{$1}/ego;
+            App::Ack::say( join( $separator, @line_parts, $output ) );
         }
     }
     else {
+        my $underline = '';
+
+        # We have to do underlining before any highlighting because highlighting modifies string length.
+        if ( $opt_underline ) {
+            while ( $line =~ /$opt_regex/og ) {
+                my $match_start = $-[0];
+                next unless defined($match_start);
+
+                my $match_end = $+[0];
+                my $match_length = $match_end - $match_start;
+                last if $match_length <= 0;
+
+                my $spaces_needed = $match_start - length $underline;
+
+                $underline .= (' ' x $spaces_needed);
+                $underline .= ('^' x $match_length);
+            }
+        }
         if ( $opt_color ) {
-            # This match is redundant, but we need to perfom it in order to get if capture groups are set.
-            $line =~ /$opt_regex/o;
+            my $highlighted = 0; # If highlighted, need to escape afterwards.
 
-            if ( @+ > 1 ) { # If we have captures...
-                while ( $line =~ /$opt_regex/og ) {
-                    my $offset = 0; # Additional offset for when we add stuff.
-                    my $previous_match_end = 0;
+            while ( $line =~ /$opt_regex/og ) {
+                my $match_start = $-[0];
+                next unless defined($match_start);
 
-                    last if $-[0] == $+[0];
+                my $match_end = $+[0];
+                my $match_length = $match_end - $match_start;
+                last if $match_length <= 0;
 
-                    for ( my $i = 1; $i < @+; $i++ ) {
-                        my ( $match_start, $match_end ) = ( $-[$i], $+[$i] );
+                if ( $opt_color ) {
+                    my $substring    = substr( $line, $match_start, $match_length );
+                    my $substitution = Term::ANSIColor::colored( $substring, $ENV{ACK_COLOR_MATCH} );
 
-                        next unless defined($match_start);
-                        next if $match_start < $previous_match_end;
+                    # Fourth argument replaces the string specified by the first three.
+                    substr( $line, $match_start, $match_length, $substitution );
 
-                        my $substring = substr( $line,
-                            $offset + $match_start, $match_end - $match_start );
-                        my $substitution = Term::ANSIColor::colored( $substring,
-                            $ENV{ACK_COLOR_MATCH} );
-
-                        substr( $line, $offset + $match_start,
-                            $match_end - $match_start, $substitution );
-
-                        $previous_match_end  = $match_end; # Offsets do not need to be applied.
-                        $offset             += length( $substitution ) - length( $substring );
-                    }
-
-                    pos($line) = $+[0] + $offset;
+                    # Move the offset of where /g left off forward the number of spaces of highlighting.
+                    pos($line) = $match_end + (length( $substitution ) - length( $substring ));
+                    $highlighted = 1;
                 }
             }
-            else {
-                my $matched = 0; # If matched, need to escape afterwards.
-
-                while ( $line =~ /$opt_regex/og ) {
-
-                    $matched = 1;
-                    my ( $match_start, $match_end ) = ($-[0], $+[0]);
-                    next unless defined($match_start);
-                    last if $match_start == $match_end;
-
-                    my $substring = substr( $line, $match_start,
-                        $match_end - $match_start );
-                    my $substitution = Term::ANSIColor::colored( $substring,
-                        $ENV{ACK_COLOR_MATCH} );
-
-                    substr( $line, $match_start, $match_end - $match_start,
-                        $substitution );
-
-                    pos($line) = $match_end +
-                    (length( $substitution ) - length( $substring ));
-                }
-                # XXX Why do we do this?
-                $line .= "\033[0m\033[K" if $matched;
-            }
+            # Reset formatting and delete everything to the end of the line.
+            $line .= "\e[0m\e[K" if $highlighted;
         }
 
         push @line_parts, $line;
-        App::Ack::print( join( $separator, @line_parts ), $ors );
-    }
+        App::Ack::say( join( $separator, @line_parts ) );
 
-    return;
-}
+        if ( $underline ne '' ) {
+            pop @line_parts; # Leave only the stuff on the left.
+            if ( @line_parts ) {
+                my $stuff_on_the_left = join( $separator, @line_parts );
+                my $spaces_needed = length($stuff_on_the_left) - $chars_used_by_coloring + 1;
 
-sub iterate {
-    my ( $resource, $cb ) = @_;
-
-    $is_iterating = 1;
-
-    my $fh = $resource->open();
-    if ( !$fh ) {
-        if ( $App::Ack::report_bad_filenames ) {
-            App::Ack::warn( $resource->name . ': ' . $! );
-        }
-        return;
-    }
-
-    # Check for context before the main loop, so we don't pay for it if we don't need it.
-    if ( $is_tracking_context ) {
-        $after_context_pending = 0;
-
-        while ( <$fh> ) {
-            last unless $cb->();
+                App::Ack::print( ' ' x $spaces_needed );
+            }
+            App::Ack::say( $underline );
         }
     }
-    else {
-        local $_;
-
-        while ( <$fh> ) {
-            last unless $cb->();
-        }
-    }
-
-    $is_iterating = 0;
 
     return;
 }
 
 sub print_line_with_context {
-    my ( $filename, $matching_line, $line_no ) = @_;
+    my ( $filename, $matching_line, $lineno ) = @_;
 
-    my $ors                 = $opt_print0 ? "\0" : "\n";
-    my $is_tracking_context = $opt_after_context || $opt_before_context;
-
-    $matching_line =~ s/[\r\n]+$//g;
+    $matching_line =~ s/[\r\n]+$//;
 
     # Check if we need to print context lines first.
-    if ( $is_tracking_context ) {
-        my $before_unprinted = $line_no - $printed_line_no - 1;
-        if ( !$is_first_match && ( !$printed_line_no || $before_unprinted > $n_before_ctx_lines ) ) {
-            App::Ack::print('--', $ors);
+    if ( $opt_A || $opt_B ) {
+        my $before_unprinted = $lineno - $printed_lineno - 1;
+        if ( !$is_first_match && ( !$printed_lineno || $before_unprinted > $n_before_ctx_lines ) ) {
+            App::Ack::say( '--' );
         }
 
         # We want at most $n_before_ctx_lines of context.
@@ -718,12 +935,12 @@ sub print_line_with_context {
             # Disable $opt->{column} since there are no matches in the context lines.
             local $opt_column = 0;
 
-            print_line_with_options( $filename, $line, $line_no-$before_unprinted, '-' );
+            print_line_with_options( $filename, $line, $lineno-$before_unprinted, '-' );
             $before_unprinted--;
         }
     }
 
-    print_line_with_options( $filename, $matching_line, $line_no, ':' );
+    print_line_with_options( $filename, $matching_line, $lineno, ':' );
 
     # We want to get the next $n_after_ctx_lines printed.
     $after_context_pending = $n_after_ctx_lines;
@@ -733,330 +950,57 @@ sub print_line_with_context {
     return;
 }
 
-# Print the line only if it's part of a context we need to display.
-sub print_line_if_context {
-    my ( $filename, $line, $line_no, $separator ) = @_;
-
-    if ( $after_context_pending ) {
-        # Disable $opt_column since there are no matches in the context lines.
-        local $opt_column = 0;
-        print_line_with_options( $filename, $line, $line_no, $separator );
-        --$after_context_pending;
-    }
-    elsif ( $n_before_ctx_lines ) {
-        # Save line for "before" context.
-        $before_context_buf[$before_context_pos] = $_;
-        $before_context_pos = ($before_context_pos+1) % $n_before_ctx_lines;
-    }
-
-    return;
 }
 
+sub get_match_colno {
+    return $match_colno;
 }
 
-# does_match() MUST have an $opt_regex set.
-
-=begin Developers
-
-This subroutine is inlined a few places in print_matches_in_resource
-for performance reasons, so any changes here must be copied there as
-well.
-
-=end Developers
-
-=cut
-
-sub does_match {
-    my ( $line ) = @_;
-
-    $match_column_number = undef;
-
-    if ( $opt_v ) {
-        return ( $line !~ /$opt_regex/o );
-    }
-    else {
-        if ( $line =~ /$opt_regex/o ) {
-            # @- = @LAST_MATCH_START
-            # @+ = @LAST_MATCH_END
-            $match_column_number = $-[0] + 1;
-            return 1;
-        }
-        else {
-            return;
-        }
-    }
-}
-
-sub get_match_column {
-    return $match_column_number;
-}
-
-sub resource_has_match {
-    my ( $resource ) = @_;
+# Same as C<count_matches_in_file>, but exits as soon as there is a match.
+sub file_has_match {
+    my ( $file ) = @_;
 
     my $has_match = 0;
-    my $fh = $resource->open();
+    my $fh = $file->open();
     if ( !$fh ) {
         if ( $App::Ack::report_bad_filenames ) {
-            App::Ack::warn( $resource->name . ': ' . $! );
+            App::Ack::warn( $file->name . ': ' . $! );
         }
     }
     else {
         while ( <$fh> ) {
+            chomp;
             if (/$opt_regex/o xor $opt_v) {
                 $has_match = 1;
                 last;
             }
         }
-        close $fh;
+        $file->close;
     }
 
     return $has_match;
 }
 
-sub count_matches_in_resource {
-    my ( $resource ) = @_;
+sub count_matches_in_file {
+    my ( $file ) = @_;
 
     my $nmatches = 0;
-    my $fh = $resource->open();
+    my $fh = $file->open;
     if ( !$fh ) {
         if ( $App::Ack::report_bad_filenames ) {
-            App::Ack::warn( $resource->name . ': ' . $! );
+            App::Ack::warn( $file->name . ': ' . $! );
         }
     }
     else {
         while ( <$fh> ) {
             ++$nmatches if (/$opt_regex/o xor $opt_v);
         }
-        close $fh;
+        $file->close;
     }
 
     return $nmatches;
 }
 
-sub main {
-    my @arg_sources = App::Ack::ConfigLoader::retrieve_arg_sources();
-
-    my $opt = App::Ack::ConfigLoader::process_args( @arg_sources );
-
-    $opt_after_context  = $opt->{after_context};
-    $opt_before_context = $opt->{before_context};
-    $opt_output         = $opt->{output};
-    $opt_print0         = $opt->{print0};
-    $opt_color          = $opt->{color};
-    $opt_heading        = $opt->{heading};
-    $opt_show_filename  = $opt->{show_filename};
-    $opt_regex          = $opt->{regex};
-    $opt_break          = $opt->{break};
-    $opt_count          = $opt->{count};
-    $opt_v              = $opt->{v};
-    $opt_m              = $opt->{m};
-    $opt_g              = $opt->{g};
-    $opt_f              = $opt->{f};
-    $opt_lines          = $opt->{lines};
-    $opt_L              = $opt->{L};
-    $opt_l              = $opt->{l};
-    $opt_passthru       = $opt->{passthru};
-    $opt_column         = $opt->{column};
-
-    $App::Ack::report_bad_filenames = !$opt->{dont_report_bad_filenames};
-
-    if ( $opt->{flush} ) {
-        $| = 1;
-    }
-
-    if ( !defined($opt_color) && !$opt_g ) {
-        my $windows_color = 1;
-        if ( $App::Ack::is_windows ) {
-            $windows_color = eval { require Win32::Console::ANSI; };
-        }
-        $opt_color = !App::Ack::output_to_pipe() && $windows_color;
-    }
-    if ( not defined $opt_heading and not defined $opt_break  ) {
-        $opt_heading = $opt_break = $opt->{break} = !App::Ack::output_to_pipe();
-    }
-
-    if ( defined($opt->{H}) || defined($opt->{h}) ) {
-        $opt_show_filename = $opt->{show_filename} = $opt->{H} && !$opt->{h};
-    }
-
-    if ( my $output = $opt_output ) {
-        $output        =~ s{\\}{\\\\}g;
-        $output        =~ s{"}{\\"}g;
-        $opt_output = qq{"$output"};
-    }
-
-    my $resources;
-    if ( $App::Ack::is_filter_mode && !$opt->{files_from} ) { # probably -x
-        $resources    = App::Ack::Resources->from_stdin( $opt );
-        $opt_regex = shift @ARGV if not defined $opt_regex;
-        $opt_regex = $opt->{regex} = build_regex( $opt_regex, $opt );
-    }
-    else {
-        if ( $opt_f || $opt_lines ) {
-            if ( $opt_regex ) {
-                App::Ack::warn( "regex ($opt_regex) specified with -f or --lines" );
-                App::Ack::exit_from_ack( 0 ); # XXX the 0 is misleading
-            }
-        }
-        else {
-            $opt_regex = shift @ARGV if not defined $opt_regex;
-            $opt_regex = $opt->{regex} = build_regex( $opt_regex, $opt );
-        }
-        if ( $opt_regex && $opt_regex =~ /\n/ ) {
-            App::Ack::exit_from_ack( 0 );
-        }
-        my @start;
-        if ( not defined $opt->{files_from} ) {
-            @start = @ARGV;
-        }
-        if ( !exists($opt->{show_filename}) ) {
-            unless(@start == 1 && !(-d $start[0])) {
-                $opt_show_filename = $opt->{show_filename} = 1;
-            }
-        }
-
-        if ( defined $opt->{files_from} ) {
-            $resources = App::Ack::Resources->from_file( $opt, $opt->{files_from} );
-            exit 1 unless $resources;
-        }
-        else {
-            @start = ('.') unless @start;
-            foreach my $target (@start) {
-                if ( !-e $target && $App::Ack::report_bad_filenames) {
-                    App::Ack::warn( "$target: No such file or directory" );
-                }
-            }
-
-            $opt->{file_filter}    = _compile_file_filter($opt, \@start);
-            $opt->{descend_filter} = _compile_descend_filter($opt);
-
-            $resources = App::Ack::Resources->from_argv( $opt, \@start );
-        }
-    }
-    App::Ack::set_up_pager( $opt->{pager} ) if defined $opt->{pager};
-
-    my $ors        = $opt_print0 ? "\0" : "\n";
-    my $only_first = $opt->{1};
-
-    my $nmatches    = 0;
-    my $total_count = 0;
-
-    set_up_line_context();
-
-RESOURCES:
-    while ( defined(my $resource = $resources->next) ) {
-        if ($is_tracking_context) {
-            set_up_line_context_for_file();
-        }
-
-        if ( $opt_f ) {
-            if ( $opt->{show_types} ) {
-                show_types( $resource, $ors );
-            }
-            else {
-                App::Ack::print( $resource->name, $ors );
-            }
-            ++$nmatches;
-            last RESOURCES if defined($opt_m) && $nmatches >= $opt_m;
-        }
-        elsif ( $opt_g ) {
-            if ( $opt->{show_types} ) {
-                show_types( $resource, $ors );
-            }
-            else {
-                local $opt_show_filename = 0; # XXX Why is this local?
-
-                print_line_with_options( '', $resource->name, 0, $ors );
-            }
-            ++$nmatches;
-            last RESOURCES if defined($opt_m) && $nmatches >= $opt_m;
-        }
-        elsif ( $opt_lines ) {
-            my %line_numbers;
-            foreach my $line ( @{ $opt_lines } ) {
-                my @lines             = split /,/, $line;
-                @lines                = map {
-                    /^(\d+)-(\d+)$/
-                        ? ( $1 .. $2 )
-                        : $_
-                } @lines;
-                @line_numbers{@lines} = (1) x @lines;
-            }
-
-            my $filename = $resource->name;
-
-            local $opt_color = 0;
-
-            iterate( $resource, sub {
-                chomp;
-
-                if ( $line_numbers{$.} ) {
-                    print_line_with_context( $filename, $_, $. );
-                }
-                elsif ( $opt_passthru ) {
-                    print_line_with_options( $filename, $_, $., ':' );
-                }
-                elsif ( $is_tracking_context ) {
-                    print_line_if_context( $filename, $_, $., '-' );
-                }
-                return 1;
-            });
-        }
-        elsif ( $opt_count ) {
-            my $matches_for_this_file = count_matches_in_resource( $resource );
-
-            if ( not $opt_show_filename ) {
-                $total_count += $matches_for_this_file;
-                next RESOURCES;
-            }
-
-            if ( !$opt_l || $matches_for_this_file > 0) {
-                if ( $opt_show_filename ) {
-                    App::Ack::print( $resource->name, ':', $matches_for_this_file, $ors );
-                }
-                else {
-                    App::Ack::print( $matches_for_this_file, $ors );
-                }
-            }
-        }
-        elsif ( $opt_l || $opt_L ) {
-            my $is_match = resource_has_match( $resource );
-
-            if ( $opt_L ? !$is_match : $is_match ) {
-                App::Ack::print( $resource->name, $ors );
-                ++$nmatches;
-
-                last RESOURCES if $only_first;
-                last RESOURCES if defined($opt_m) && $nmatches >= $opt_m;
-            }
-        }
-        else {
-            my $needs_line_scan = 1;
-            if ( $opt->{regex} && !$opt->{passthru} ) {
-                if ( $resource->open ) {
-                    $needs_line_scan = $resource->needs_line_scan( $opt );
-                    if ( $needs_line_scan ) {
-                        $resource->reset();
-                    }
-                }
-            }
-            if ( $needs_line_scan ) {
-                $nmatches += print_matches_in_resource( $resource, $opt );
-            }
-            if ( $nmatches && $only_first ) {
-                last RESOURCES;
-            }
-        }
-    }
-
-    if ( $opt_count && !$opt_show_filename ) {
-        App::Ack::print( $total_count, "\n" );
-    }
-
-    close $App::Ack::fh;
-    App::Ack::exit_from_ack( $nmatches );
-}
 
 =pod
 
@@ -1075,7 +1019,7 @@ ack - grep-like text finder
 
 ack is designed as an alternative to F<grep> for programmers.
 
-ack searches the named input files or directories for lines containing a
+ack searches the named input FILEs or DIRECTORYs for lines containing a
 match to the given PATTERN.  By default, ack prints the matching lines.
 If no FILE or DIRECTORY is given, the current directory will be searched.
 
@@ -1139,17 +1083,6 @@ to add/remove multiple directories from the ignore list.
 For a complete list of directories that do not get searched, run
 C<ack --dump>.
 
-=head1 WHEN TO USE GREP
-
-I<ack> trumps I<grep> as an everyday tool 99% of the time, but don't
-throw I<grep> away, because there are times you'll still need it.
-
-E.g., searching through huge files looking for regexes that can be
-expressed with I<grep> syntax should be quicker with I<grep>.
-
-If your script or parent program uses I<grep> C<--quiet> or C<--silent>
-or needs exit 2 on IO error, use I<grep>.
-
 =head1 OPTIONS
 
 =over 4
@@ -1204,6 +1137,10 @@ Sets the color to be used for filenames.
 
 Sets the color to be used for matches.
 
+=item B<--color-colno=I<color>>
+
+Sets the color to be used for column numbers.
+
 =item B<--color-lineno=I<color>>
 
 Sets the color to be used for line numbers.
@@ -1246,6 +1183,11 @@ as a path to search.
 The list of files to be searched is specified in I<FILE>.  The list of
 files are separated by newlines.  If I<FILE> is C<->, the list is loaded
 from standard input.
+
+Note that the list of files is B<not> filtered in any way.  If you
+add C<--type=html> in addition to C<--files-from>, the C<--type> will
+be ignored.
+
 
 =item B<--[no]filter>
 
@@ -1304,17 +1246,29 @@ searched.
 Print a filename heading above each file's results.  This is the default
 when used interactively.
 
-=item B<--help>, B<-?>
+=item B<--help>
 
 Print a short help statement.
 
-=item B<--help-types>, B<--help=types>
+=item B<--help-types>
 
 Print all known types.
 
+=item B<--help-colors>
+
+Print a chart of various color combinations.
+
+=item B<--help-rgb-colors>
+
+Like B<--help-colors> but with more precise RGB colors.
+
 =item B<-i>, B<--ignore-case>
 
-Ignore case distinctions in PATTERN
+Ignore case distinctions in PATTERN.  Overrides B<--smart-case> and B<-I>.
+
+=item B<-I>, B<--no-ignore-case>
+
+Turns on case distinctions in PATTERN.  Overrides B<--smart-case> and B<-i>.
 
 =item B<--ignore-ack-defaults>
 
@@ -1336,23 +1290,14 @@ specify B<--ignore-dir=foo> and then no files from any foo directory
 are taken into account by ack unless given explicitly on the command
 line.
 
-=item B<--ignore-file=I<FILTERTYPE:FILTERARGS>>
+=item B<--ignore-file=I<FILTER:ARGS>>
 
-Ignore files matching I<FILTERTYPE:FILTERARGS>.  The filters are specified
+Ignore files matching I<FILTER:ARGS>.  The filters are specified
 identically to file type filters as seen in L</"Defining your own types">.
 
 =item B<-k>, B<--known-types>
 
-Limit selected files to those with types that ack knows about.  This is
-equivalent to the default behavior found in ack 1.
-
-=item B<--lines=I<NUM>>
-
-Only print line I<NUM> of each file. Multiple lines can be given with
-multiple B<--lines> options or as a comma separated list (B<--lines=3,5,7>).
-B<--lines=4-7> also works, as well as any combination
-(B<--lines=3,15-20,43>) The lines are always output in ascending order, no
-matter the order given on the command line. No pattern is matched.
+Limit selected files to those with types that ack knows about.
 
 =item B<-l>, B<--files-with-matches>
 
@@ -1374,7 +1319,8 @@ same set of files.
 
 =item B<-m=I<NUM>>, B<--max-count=I<NUM>>
 
-Stop reading a file after I<NUM> matches.
+Print only I<NUM> matches out of each file.  If you want to stop ack
+after printing the first match of any kind, use the B<-1> options.
 
 =item B<--man>
 
@@ -1387,14 +1333,62 @@ No descending into subdirectories.
 =item B<-o>
 
 Show only the part of each line matching PATTERN (turns off text
-highlighting)
+highlighting).  This is exactly the same as C<--output=$&>.
 
 =item B<--output=I<expr>>
 
 Output the evaluation of I<expr> for each line (turns off text
-highlighting)
-If PATTERN matches more than once then a line is output for each non-overlapping match.
-For more information please see the section L</"Examples of F<--output>">.
+highlighting). If PATTERN matches more than once then a line is
+output for each non-overlapping match.
+
+I<expr> may contain the strings "\n", "\r" and "\t", which will be
+expanded to their corresponding characters line feed, carriage return
+and tab, respectively.
+
+I<expr> may also contain the following Perl special variables:
+
+=over 4
+
+=item C<$1> through C<$9>
+
+The subpattern from the corresponding set of capturing parentheses.
+If your pattern is C<(.+) and (.+)>, and the string is "this and
+that', then C<$1> is "this" and C<$2> is "that".
+
+=item C<$_>
+
+The contents of the line in the file.
+
+=item C<$.>
+
+The number of the line in the file.
+
+=item C<$&>, C<$`> and C<$'>
+
+C<$&> is the the string matched by the pattern, C<$`> is what
+precedes the match, and C<$'> is what follows it.  If the pattern
+is C<gra(ph|nd)> and the string is "lexicographic", then C<$&> is
+"graph", C<$`> is "lexico" and C<$'> is "ic".
+
+Use of these variables in your output will slow down the pattern
+matching.
+
+=item C<$+>
+
+The match made by the last parentheses that matched in the pattern.
+For example, if your pattern is C<Version: (.+)|Revision: (.+)>,
+then C<$+> will contain whichever set of parentheses matched.
+
+=item C<$f>
+
+C<$f> is available, in C<--output> only, to insert the filename.
+This is a stand-in for the discovered C<$filename> usage in old C<< ack2 --output >>,
+which is disallowed with C<ack3> improved security.
+
+The intended usage is to provide the grep or compile-error syntax needed for editor/IDE go-to-line integration,
+e.g. C<--output=$f:$.:$_> or C<--output=$f\t$.\t$&>
+
+=back
 
 =item B<--pager=I<program>>, B<--nopager>
 
@@ -1404,7 +1398,7 @@ via the C<ACK_PAGER> and C<ACK_PAGER_COLOR> environment variables.
 Using --pager does not suppress grouping and coloring like piping
 output on the command-line does.
 
-B<--nopager> cancels any setting in ~/.ackrc, C<ACK_PAGER> or C<ACK_PAGER_COLOR>.
+B<--nopager> cancels any setting in F<~/.ackrc>, C<ACK_PAGER> or C<ACK_PAGER_COLOR>.
 No output will be sent through a pager.
 
 =item B<--passthru>
@@ -1413,17 +1407,54 @@ Prints all lines, whether or not they match the expression.  Highlighting
 will still work, though, so it can be used to highlight matches while
 still seeing the entire file, as in:
 
-    # Watch a log file, and highlight a certain IP address
+    # Watch a log file, and highlight a certain IP address.
     $ tail -f ~/access.log | ack --passthru 123.45.67.89
 
 =item B<--print0>
 
-Only works in conjunction with -f, -g, -l or -c (filename output). The filenames
-are output separated with a null byte instead of the usual newline. This is
-helpful when dealing with filenames that contain whitespace, e.g.
+Only works in conjunction with B<-f>, B<-g>, B<-l> or B<-c>, options
+that only list filenames.  The filenames are output separated with a
+null byte instead of the usual newline. This is helpful when dealing
+with filenames that contain whitespace, e.g.
 
-    # remove all files of type html
+    # Remove all files of type HTML.
     ack -f --html --print0 | xargs -0 rm -f
+
+=item B<-p[N]>, B<--proximate[=N]>
+
+Groups together match lines that are within N lines of each other.
+This is useful for visually picking out matches that appear close
+to other matches.
+
+For example, if you got these results without the C<--proximate> option,
+
+    15: First match
+    18: Second match
+    19: Third match
+    37: Fourth match
+
+they would look like this with C<--proximate=1>
+
+    15: First match
+
+    18: Second match
+    19: Third match
+
+    37: Fourth match
+
+and this with C<--proximate=3>.
+
+    15: First match
+    18: Second match
+    19: Third match
+
+    37: Fourth match
+
+If N is omitted, N is set to 1.
+
+=item B<-P>
+
+Negates the effect of the B<--proximate> option.  Shortcut for B<--proximate=0>.
 
 =item B<-Q>, B<--literal>
 
@@ -1439,11 +1470,13 @@ compatibility with grep. You can also use it for turning B<--no-recurse> off.
 Suppress error messages about nonexistent or unreadable files.  This is taken
 from fgrep.
 
-=item B<--[no]smart-case>, B<--no-smart-case>
+=item B<-S>, B<--[no]smart-case>, B<--no-smart-case>
 
 Ignore case in the search strings if PATTERN contains no uppercase
-characters. This is similar to C<smartcase> in vim. This option is
-off by default, and ignored if C<-i> is specified.
+characters. This is similar to C<smartcase> in the vim text editor.
+The options overrides B<-i> and B<-I>.
+
+B<-S> is a synonym for B<--smart-case>.
 
 B<-i> always overrides this option.
 
@@ -1473,16 +1506,15 @@ Type specifications can be repeated and are ORed together.
 
 See I<ack --help=types> for a list of valid types.
 
-=item B<--type-add I<TYPE>:I<FILTER>:I<FILTERARGS>>
+=item B<--type-add I<TYPE>:I<FILTER>:I<ARGS>>
 
-Files with the given FILTERARGS applied to the given FILTER
+Files with the given ARGS applied to the given FILTER
 are recognized as being of (the existing) type TYPE.
 See also L</"Defining your own types">.
 
+=item B<--type-set I<TYPE>:I<FILTER>:I<ARGS>>
 
-=item B<--type-set I<TYPE>:I<FILTER>:I<FILTERARGS>>
-
-Files with the given FILTERARGS applied to the given FILTER are recognized as
+Files with the given ARGS applied to the given FILTER are recognized as
 being of type TYPE. This replaces an existing definition for type TYPE.  See
 also L</"Defining your own types">.
 
@@ -1491,9 +1523,26 @@ also L</"Defining your own types">.
 The filters associated with TYPE are removed from Ack, and are no longer considered
 for searches.
 
+=item B<--[no]underline>
+
+Turns on underlining of matches, where "underlining" is printing a line of
+carets under the match.
+
+    $ ack -u foo
+    peanuts.txt
+    17: Come kick the football you fool
+                      ^^^          ^^^
+    623: Price per square foot
+                          ^^^
+
+This is useful if you're dumping the results of an ack run into a text
+file or printer that doesn't support ANSI color codes.
+
+The setting of underline does not affect highlighting of matches.
+
 =item B<-v>, B<--invert-match>
 
-Invert match: select non-matching lines
+Invert match: select non-matching lines.
 
 =item B<--version>
 
@@ -1501,26 +1550,15 @@ Display version and copyright information.
 
 =item B<-w>, B<--word-regexp>
 
-Turn on "words mode".  This sometimes matches a whole word, but the
-semantics is quite subtle.  If the passed regexp begins with a word
-character, then a word boundary is required before the match.  If the
-passed regexp ends with a word character, or with a word character
-followed by newline, then a word boundary is required after the match.
-
-Thus, for example, B<-w> with the regular expression C<ox> will not
-match the strings C<box> or C<oxen>.  However, if the regular
-expression is C<(ox|ass)> then it will match those strings.  Because
-the regular expression's first character is C<(>, the B<-w> flag has
-no effect at the start, and because the last character is C<)>, it has
-no effect at the end.
-
-Force PATTERN to match only whole words.  The PATTERN is wrapped with
-C<\b> metacharacters.
+Force PATTERN to match only whole words.
 
 =item B<-x>
 
-An abbreviation for B<--files-from=->; the list of files to search are read
+An abbreviation for B<--files-from=->. The list of files to search are read
 from standard input, with one line per file.
+
+Note that the list of files is B<not> filtered in any way.  If you add
+C<--type=html> in addition to C<-x>, the C<--type> will be ignored.
 
 =item B<-1>
 
@@ -1617,9 +1655,9 @@ The following does B<NOT> work in the F<.ackrc> file:
 In order to see all currently defined types, use I<--help-types>, e.g.
 I<ack --type-set backup:ext:bak --type-add perl:ext:perl --help-types>
 
-In addition to filtering based on extension (like ack 1.x allowed), ack 2
-offers additional filter types.  The generic syntax is
-I<--type-set TYPE:FILTER:FILTERARGS>; I<FILTERARGS> depends on the value
+In addition to filtering based on extension, ack offers additional
+filter types.  The generic syntax is
+I<--type-set TYPE:FILTER:ARGS>; I<ARGS> depends on the value
 of I<FILTER>.
 
 =over 4
@@ -1645,7 +1683,7 @@ Example:
 =item match:I<PATTERN>
 
 I<match> filters match the target filename against a regular expression.
-The regular expression is made case insensitive for the search.
+The regular expression is made case-insensitive for the search.
 
 Example:
 
@@ -1663,7 +1701,65 @@ Example:
 
 =back
 
-More filter types may be made available in the future.
+=head1 ACK COLORS
+
+ack allows customization of the colors it uses when presenting matches
+onscreen.  It uses the colors available in Perl's L<Term::ANSIColor>
+module, which provides the following listed values. Note that case does not
+matter when using these values.
+
+There are four different colors ack uses:
+
+    Aspect      Option              Env. variable       Default
+    --------    -----------------   ------------------  ---------------
+    filename    --color-filename    ACK_COLOR_FILENAME  black on_yellow
+    match       --color-match       ACK_COLOR_MATCH     bold green
+    line no.    --color-lineno      ACK COLOR_LINENO    bold yellow
+    column no.  --color-colno       ACK COLOR_COLNO     bold yellow
+
+The column number column is only used if the column number is shown because
+of the --column option.
+
+Colors may be specified by command-line option, such as
+C<ack --color-filename='red on_white'>, or by setting an environment
+variable, such as C<ACK_COLOR_FILENAME='red on_white'>.  Options for colors
+can be set in your ACKRC file (See "THE .ackrc FILE").
+
+ack can understand the following colors for the foreground:
+
+    black red green yellow blue magenta cyan white
+
+The optional background color is specified by prepending "on_" to one of
+the foreground colors:
+
+    on_black on_red on_green on_yellow on_blue on_magenta on_cyan on_white
+
+Each of the foreground colors can be modified with the following
+attributes, which may or may not be supported by your terminal:
+
+    bold faint italic underline blink reverse concealed
+
+Any combinations of modifiers can be added to the foreground color. If your
+terminal supports it, and you enjoy visual punishment, you can specify:
+
+    ack --color-filename="blink italic underline bold red on_yellow"
+
+For charts of the colors and what they look like, run C<ack --help-colors>
+and C<ack --help-rgb-colors>.
+
+If the eight standard colors, in their bold, faint and unmodified states,
+aren't enough for you to choose from, you can also specify colors by their
+RGB values.  They are specified as "rgbXYZ" where X, Y, and Z are values
+between 0 and 5 giving the intensity of red, green and blue, respectively.
+Therefore, "rgb500" is pure red, "rgb505" is purple, and so on.
+
+Background colors can be specified with the "on_" prefix prepended on an
+RGB color, so that "on_rgb505" would be a purple background.
+
+The modifier attributes of blink, italic, underscore and so on may or may
+not work on the RGB colors.
+
+For a chart of the 216 possible RGB colors, run C<ack --help-rgb-colors>.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -1678,43 +1774,26 @@ on the command line.
 Specifies the location of the user's F<.ackrc> file.  If this file doesn't
 exist, F<ack> looks in the default location.
 
-=item ACK_OPTIONS
+=item ACK_COLOR_COLNO
 
-This variable specifies default options to be placed in front of
-any explicit options on the command line.
+Color specification for the column number in ack's output.  By default, the
+column number is not shown.  You have to enable it with the B<--column>
+option.  See the section "ack Colors" above.
 
 =item ACK_COLOR_FILENAME
 
-Specifies the color of the filename when it's printed in B<--group>
-mode.  By default, it's "bold green".
-
-The recognized attributes are clear, reset, dark, bold, underline,
-underscore, blink, reverse, concealed black, red, green, yellow,
-blue, magenta, on_black, on_red, on_green, on_yellow, on_blue,
-on_magenta, on_cyan, and on_white.  Case is not significant.
-Underline and underscore are equivalent, as are clear and reset.
-The color alone sets the foreground color, and on_color sets the
-background color.
-
-This option can also be set with B<--color-filename>.
-
-=item ACK_COLOR_MATCH
-
-Specifies the color of the matching text when printed in B<--color>
-mode.  By default, it's "black on_yellow".
-
-This option can also be set with B<--color-match>.
-
-See B<ACK_COLOR_FILENAME> for the color specifications.
+Color specification for the filename in ack's output.  See the section "ack
+Colors" above.
 
 =item ACK_COLOR_LINENO
 
-Specifies the color of the line number when printed in B<--color>
-mode.  By default, it's "bold yellow".
+Color specification for the line number in ack's output.  See the section
+"ack Colors" above.
 
-This option can also be set with B<--color-lineno>.
+=item ACK_COLOR_MATCH
 
-See B<ACK_COLOR_FILENAME> for the color specifications.
+Color specification for the matched text in ack's output.  See the section
+"ack Colors" above.
 
 =item ACK_PAGER
 
@@ -1736,27 +1815,6 @@ like piping output on the command-line does.
 If you are not on Windows, you never need to use C<ACK_PAGER_COLOR>.
 
 =back
-
-=head1 AVAILABLE COLORS
-
-F<ack> uses the colors available in Perl's L<Term::ANSIColor> module, which
-provides the following listed values. Note that case does not matter when using
-these values.
-
-=head2 Foreground colors
-
-    black  red  green  yellow  blue  magenta  cyan  white
-
-    bright_black  bright_red      bright_green  bright_yellow
-    bright_blue   bright_magenta  bright_cyan   bright_white
-
-=head2 Background colors
-
-    on_black  on_red      on_green  on_yellow
-    on_blue   on_magenta  on_cyan   on_white
-
-    on_bright_black  on_bright_red      on_bright_green  on_bright_yellow
-    on_bright_blue   on_bright_magenta  on_bright_cyan   on_bright_white
 
 =head1 ACK & OTHER TOOLS
 
@@ -1797,13 +1855,13 @@ file is found.  If no files are found, then 1 is returned.
 
 If ack gives you output you're not expecting, start with a few simple steps.
 
-=head2 Use B<--noenv>
+=head2 Try it with B<--noenv>
 
 Your environment variables and F<.ackrc> may be doing things you're
 not expecting, or forgotten you specified.  Use B<--noenv> to ignore
 your environment and F<.ackrc>.
 
-=head2 Use B<-f> to see what files have been selected
+=head2 Use B<-f> to see what files have been selected for searching
 
 Ack's B<-f> was originally added as a debugging tool.  If ack is
 not finding matches you think it should find, run F<ack -f> to see
@@ -1813,188 +1871,8 @@ options to show the type of each file selected.
 =head2 Use B<--dump>
 
 This lists the ackrc files that are loaded and the options loaded
-from them.
-So for example you can find a list of directories that do not get searched or where filetypes are defined.
-
-=head1 TIPS
-
-=head2 Use the F<.ackrc> file.
-
-The F<.ackrc> is the place to put all your options you use most of
-the time but don't want to remember.  Put all your --type-add and
---type-set definitions in it.  If you like --smart-case, set it
-there, too.  I also set --sort-files there.
-
-=head2 Use F<-f> for working with big codesets
-
-Ack does more than search files.  C<ack -f --perl> will create a
-list of all the Perl files in a tree, ideal for sending into F<xargs>.
-For example:
-
-    # Change all "this" to "that" in all Perl files in a tree.
-    ack -f --perl | xargs perl -p -i -e's/this/that/g'
-
-or if you prefer:
-
-    perl -p -i -e's/this/that/g' $(ack -f --perl)
-
-=head2 Use F<-Q> when in doubt about metacharacters
-
-If you're searching for something with a regular expression
-metacharacter, most often a period in a filename or IP address, add
-the -Q to avoid false positives without all the backslashing.  See
-the following example for more...
-
-=head2 Use ack to watch log files
-
-Here's one I used the other day to find trouble spots for a website
-visitor.  The user had a problem loading F<troublesome.gif>, so I
-took the access log and scanned it with ack twice.
-
-    ack -Q aa.bb.cc.dd /path/to/access.log | ack -Q -B5 troublesome.gif
-
-The first ack finds only the lines in the Apache log for the given
-IP.  The second finds the match on my troublesome GIF, and shows
-the previous five lines from the log in each case.
-
-=head2 Examples of F<--output>
-
-Following variables are useful in the expansion string:
-
-=over 4
-
-=item C<$&>
-
-The whole string matched by PATTERN.
-
-=item C<$1>, C<$2>, ...
-
-The contents of the 1st, 2nd ... bracketed group in PATTERN.
-
-=item C<$`>
-
-The string before the match.
-
-=item C<$'>
-
-The string after the match.
-
-=back
-
-For more details and other variables see
-L<http://perldoc.perl.org/perlvar.html#Variables-related-to-regular-expressions|perlvar>.
-
-This example shows how to add text around a particular pattern
-(in this case adding _ around word with "e")
-
-    ack2.pl "\w*e\w*" quick.txt --output="$`_$&_$'"
-    _The_ quick brown fox jumps over the lazy dog
-    The quick brown fox jumps _over_ the lazy dog
-    The quick brown fox jumps over _the_ lazy dog
-
-This shows how to pick out particular parts of a match using ( ) within regular expression.
-
-  ack '=head(\d+)\s+(.*)' --output=' $1 : $2'
-  input file contains "=head1 NAME"
-  output  "1 : NAME"
-
-=head1 COMMUNITY
-
-There are ack mailing lists and a Slack channel for ack.  See
-L<https://beyondgrep.com/community/> for details.
-
-=head1 FAQ
-
-=head2 Why isn't ack finding a match in (some file)?
-
-First, take a look and see if ack is even looking at the file.  ack is
-intelligent in what files it will search and which ones it won't, but
-sometimes that can be surprising.
-
-Use the C<-f> switch, with no regex, to see a list of files that ack
-will search for you.  If your file doesn't show up in the list of files
-that C<ack -f> shows, then ack never looks in it.
-
-NOTE: If you're using an old ack before 2.0, it's probably because it's of
-a type that ack doesn't recognize.  In ack 1.x, the searching behavior is
-driven by filetype.  B<If ack 1.x doesn't know what kind of file it is,
-ack ignores the file.>  You can use the C<--show-types> switch to show
-which type ack thinks each file is.
-
-=head2 Wouldn't it be great if F<ack> did search & replace?
-
-No, ack will always be read-only.  Perl has a perfectly good way
-to do search & replace in files, using the C<-i>, C<-p> and C<-n>
-switches.
-
-You can certainly use ack to select your files to update.  For
-example, to change all "foo" to "bar" in all PHP files, you can do
-this from the Unix shell:
-
-    $ perl -i -p -e's/foo/bar/g' $(ack -f --php)
-
-=head2 Can I make ack recognize F<.xyz> files?
-
-Yes!  Please see L</"Defining your own types">.  If you think
-that F<ack> should recognize a type by default, please see
-L</"ENHANCEMENTS">.
-
-=head2 There's already a program/package called ack.
-
-Yes, I know.
-
-=head2 Why is it called ack if it's called ack-grep?
-
-The name of the program is "ack".  Some packagers have called it
-"ack-grep" when creating packages because there's already a package
-out there called "ack" that has nothing to do with this ack.
-
-I suggest you make a symlink named F<ack> that points to F<ack-grep>
-because one of the crucial benefits of ack is having a name that's
-so short and simple to type.
-
-To do that, run this with F<sudo> or as root:
-
-   ln -s /usr/bin/ack-grep /usr/bin/ack
-
-Alternatively, you could use a shell alias:
-
-    # bash/zsh
-    alias ack=ack-grep
-
-    # csh
-    alias ack ack-grep
-
-=head2 What does F<ack> mean?
-
-Nothing.  I wanted a name that was easy to type and that you could
-pronounce as a single syllable.
-
-=head2 Can I do multi-line regexes?
-
-No, ack does not support regexes that match multiple lines.  Doing
-so would require reading in the entire file at a time.
-
-If you want to see lines near your match, use the C<--A>, C<--B>
-and C<--C> switches for displaying context.
-
-=head2 Why is ack telling me I have an invalid option when searching for C<+foo>?
-
-ack treats command line options beginning with C<+> or C<-> as options; if you
-would like to search for these, you may prefix your search term with C<--> or
-use the C<--match> option.  (However, don't forget that C<+> is a regular
-expression metacharacter!)
-
-=head2 Why does C<"ack '.{40000,}'"> fail?  Isn't that a valid regex?
-
-The Perl language limits the repetition quantifier to 32K.  You
-can search for C<.{32767}> but not C<.{32768}>.
-
-=head2 Ack does "X" and shouldn't, should it?
-
-We try to remain as close to grep's behavior as possible, so when in doubt,
-see what grep does!  If there's a mismatch in functionality there, please
-bring it up on the ack-users mailing list.
+from them.  You may be loading an F<.ackrc> file that you didn't know
+you were loading.
 
 =head1 ACKRC LOCATION SEMANTICS
 
@@ -2055,175 +1933,29 @@ The C<--ackrc> option may be included on the command line to specify an
 ackrc file that can override all others.  It is consulted even if C<--noenv>
 is present.
 
-=item * ACK_OPTIONS
-
-Options are then loaded from the environment variable C<ACK_OPTIONS>.  This can
-be omitted using C<--noenv>.
-
 =item * Command line
 
 Options are then loaded from the command line.
 
 =back
 
-=head1 DIFFERENCES BETWEEN ACK 1.X AND ACK 2.X
+=head1 BUGS & ENHANCEMENTS
 
-A lot of changes were made for ack 2; here is a list of them.
-
-=head2 GENERAL CHANGES
-
-=over 4
-
-=item *
-
-When no selectors are specified, ack 1.x only searches through files that
-it can map to a file type.  ack 2.x, by contrast, will search through
-every regular, non-binary file that is not explicitly ignored via
-B<--ignore-file> or B<--ignore-dir>.  This is similar to the behavior of the
-B<-a/--all> option in ack 1.x.
-
-=item *
-
-A more flexible filter system has been added, so that more powerful file types
-may be created by the user.  For details, please consult
-L</"Defining your own types">.
-
-=item *
-
-ack now loads multiple ackrc files; see L</"ACKRC LOCATION SEMANTICS"> for
-details.
-
-=item *
-
-ack's default filter definitions aren't special; you may tell ack to
-completely disregard them if you don't like them.
-
-=back
-
-=head2 REMOVED OPTIONS
-
-=over 4
-
-=item *
-
-Because of the change in default search behavior, the B<-a/--all> and
-B<-u/--unrestricted> options have been removed.  In addition, the
-B<-k/--known-types> option was added to cause ack to behave with
-the default search behavior of ack 1.x.
-
-=item *
-
-The B<-G> option has been removed.  Two regular expressions on the
-command line was considered too confusing; to simulate B<-G>'s functionality,
-you may use the new B<-x> option to pipe filenames from one invocation of
-ack into another.
-
-=item *
-
-The B<--binary> option has been removed.
-
-=item *
-
-The B<--skipped> option has been removed.
-
-=item *
-
-The B<--text> option has been removed.
-
-=item *
-
-The B<--invert-file-match> option has been removed.  Instead, you may
-use B<-v> with B<-g>.
-
-=back
-
-=head2 CHANGED OPTIONS
-
-=over 4
-
-=item *
-
-The options that modify the regular expression's behavior (B<-i>, B<-w>,
-B<-Q>, and B<-v>) may now be used with B<-g>.
-
-=back
-
-=head2 ADDED OPTIONS
-
-=over 4
-
-=item *
-
-B<--files-from> was added so that a user may submit a list of filenames as
-a list of files to search.
-
-=item *
-
-B<-x> was added to tell ack to accept a list of filenames via standard input;
-this list is the list of filenames that will be used for the search.
-
-=item *
-
-B<-s> was added to tell ack to suppress error messages about non-existent or
-unreadable files.
-
-=item *
-
-B<--ignore-directory> and B<--noignore-directory> were added as aliases for
-B<--ignore-dir> and B<--noignore-dir> respectively.
-
-=item *
-
-B<--ignore-file> was added so that users may specify patterns of files to
-ignore (ex. /.*~$/).
-
-=item *
-
-B<--dump> was added to allow users to easily find out which options are
-set where.
-
-=item *
-
-B<--create-ackrc> was added so that users may create custom ackrc files based
-on the default settings loaded by ack, and so that users may easily view those
-defaults.
-
-=item *
-
-B<--type-del> was added to selectively remove file type definitions.
-
-=item *
-
-B<--ignore-ack-defaults> was added so that users may ignore ack's default
-options in favor of their own.
-
-=item *
-
-B<--bar> was added so ack users may consult Admiral Ackbar.
-
-=back
-
-=head1 AUTHOR
-
-Andy Lester, C<< <andy at petdance.com> >>
-
-=head1 BUGS
+ack is based at GitHub at L<https://github.com/beyondgrep/ack3>
 
 Please report any bugs or feature requests to the issues list at
-Github: L<https://github.com/beyondgrep/ack2/issues>
+Github: L<https://github.com/beyondgrep/ack3/issues>.
 
-=head1 ENHANCEMENTS
+Please include the operating system that you're using; the output of
+the command C<ack --version>; and any customizations in your F<.ackrc>
+you may have.
 
-All enhancement requests MUST first be posted to the ack-users
-mailing list at L<http://groups.google.com/group/ack-users>.  I
-will not consider a request without it first getting seen by other
-ack users.  This includes requests for new filetypes.
+To suggest enhancements, please submit an issue at
+L<https://github.com/beyondgrep/ack3/issues>.  Also read the
+F<DEVELOPERS.md> file in the ack code repository.
 
-There is a list of enhancements I want to make to F<ack> in the ack
-issues list at Github: L<https://github.com/beyondgrep/ack2/issues>
-
-Patches are always welcome, but patches with tests get the most
-attention.
+Also, feel free to discuss your issues on the ack mailing
+list at L<https://groups.google.com/group/ack-users>.
 
 =head1 SUPPORT
 
@@ -2235,43 +1967,144 @@ Support for and information about F<ack> can be found at:
 
 L<https://beyondgrep.com/>
 
-=item * The ack-users mailing list
+=item * Source repository
 
-L<http://groups.google.com/group/ack-users>
+L<https://github.com/beyondgrep/ack3>
 
 =item * The ack issues list at Github
 
-L<https://github.com/beyondgrep/ack2/issues>
+L<https://github.com/beyondgrep/ack3/issues>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * The ack announcements mailing list
 
-L<http://annocpan.org/dist/ack>
+L<http://groups.google.com/group/ack-announcement>
 
-=item * CPAN Ratings
+=item * The ack users' mailing list
 
-L<http://cpanratings.perl.org/d/ack>
+L<http://groups.google.com/group/ack-users>
 
-=item * Search CPAN
+=item * The ack development mailing list
 
-L<http://search.cpan.org/dist/ack>
-
-=item * MetaCPAN
-
-L<http://metacpan.org/release/ack>
-
-=item * Git source repository
-
-L<https://github.com/beyondgrep/ack2>
+L<http://groups.google.com/group/ack-users>
 
 =back
+
+=head1 COMMUNITY
+
+There are ack mailing lists and a Slack channel for ack.  See
+L<https://beyondgrep.com/community/> for details.
+
+=head1 FAQ
+
+This is the Frequently Asked Questions list for ack.
+
+=head2 Can I stop using grep now?
+
+Many people find I<ack> to be better than I<grep> as an everyday tool
+99% of the time, but don't throw I<grep> away, because there are times
+you'll still need it.  For example, you might be looking through huge
+log files and not using regular expressions.  In that case, I<grep>
+will probably perform better.
+
+=head2 Why isn't ack finding a match in (some file)?
+
+First, take a look and see if ack is even looking at the file.  ack is
+intelligent in what files it will search and which ones it won't, but
+sometimes that can be surprising.
+
+Use the C<-f> switch, with no regex, to see a list of files that ack
+will search for you.  If your file doesn't show up in the list of files
+that C<ack -f> shows, then ack never looks in it.
+
+=head2 Wouldn't it be great if F<ack> did search & replace?
+
+No, ack will always be read-only.  Perl has a perfectly good way
+to do search & replace in files, using the C<-i>, C<-p> and C<-n>
+switches.
+
+You can certainly use ack to select your files to update.  For
+example, to change all "foo" to "bar" in all PHP files, you can do
+this from the Unix shell:
+
+    $ perl -i -p -e's/foo/bar/g' $(ack -f --php)
+
+=head2 Can I make ack recognize F<.xyz> files?
+
+Yes!  Please see L</"Defining your own types"> in the ack manual.
+
+=head2 Will you make ack recognize F<.xyz> files by default?
+
+We might, depending on how widely-used the file format is.
+
+Submit an issue at in the GitHub issue queue at
+L<https://github.com/beyondgrep/ack3/issues>.  Explain what the file format
+is, where we can find out more about it, and what you have been using
+in your F<.ackrc> to support it.
+
+Please do not bother creating a pull request.  The code for filetypes
+is trivial compared to the rest of the process we go through.
+
+=head2 Why is it called ack if it's called ack-grep?
+
+The name of the program is "ack".  Some packagers have called it
+"ack-grep" when creating packages because there's already a package
+out there called "ack" that has nothing to do with this ack.
+
+I suggest you make a symlink named F<ack> that points to F<ack-grep>
+because one of the crucial benefits of ack is having a name that's
+so short and simple to type.
+
+To do that, run this with F<sudo> or as root:
+
+   ln -s /usr/bin/ack-grep /usr/bin/ack
+
+Alternatively, you could use a shell alias:
+
+    # bash/zsh
+    alias ack=ack-grep
+
+    # csh
+    alias ack ack-grep
+
+=head2 What does F<ack> mean?
+
+Nothing.  I wanted a name that was easy to type and that you could
+pronounce as a single syllable.
+
+=head2 Can I do multi-line regexes?
+
+No, ack does not support regexes that match multiple lines.  Doing
+so would require reading in the entire file at a time.
+
+If you want to see lines near your match, use the C<--A>, C<--B>
+and C<--C> switches for displaying context.
+
+=head2 Why is ack telling me I have an invalid option when searching for C<+foo>?
+
+ack treats command line options beginning with C<+> or C<-> as options; if you
+would like to search for these, you may prefix your search term with C<--> or
+use the C<--match> option.  (However, don't forget that C<+> is a regular
+expression metacharacter!)
+
+=head2 Why does C<"ack '.{40000,}'"> fail?  Isn't that a valid regex?
+
+The Perl language limits the repetition quantifier to 32K.  You
+can search for C<.{32767}> but not C<.{32768}>.
+
+=head2 Ack does "X" and shouldn't, should it?
+
+We try to remain as close to grep's behavior as possible, so when in
+doubt, see what grep does!  If there's a mismatch in functionality there,
+please submit an issue to GitHub, and/or bring it up on the ack-users
+mailing list.
+
+=cut
 
 =head1 ACKNOWLEDGEMENTS
 
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
-Tim Gim Yee,
-Michele Campeotto,
 H.Merijn Brand,
 Duke Leto,
 Gerhard Poul,
@@ -2385,6 +2218,10 @@ Ricardo Signes,
 Pete Krawczyk and
 Rob Hoelz.
 
+=head1 AUTHOR
+
+Andy Lester, C<< <andy at petdance.com> >>
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2005-2019 Andy Lester.
@@ -2396,3 +2233,5 @@ See http://www.perlfoundation.org/artistic_license_2_0 or the LICENSE.md
 file that comes with the ack distribution.
 
 =cut
+
+1;

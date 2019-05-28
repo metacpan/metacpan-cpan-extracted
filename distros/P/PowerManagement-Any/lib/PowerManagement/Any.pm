@@ -1,7 +1,7 @@
 package PowerManagement::Any;
 
-our $DATE = '2019-05-22'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-05-28'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,13 +23,15 @@ sub _target_is_masked {
     my $target = shift;
 
     my ($out, $err);
-    system({capture_stdout=>\$out, capture_stderr=>\$err},
+    # systemctl status returns exit code=3 for dead/inactive status, so we
+    # explicitly turns log=0 here.
+    system({capture_stdout=>\$out, capture_stderr=>\$err, log=>0},
            "systemctl", "status", $target);
-    # systemctl status always returns exit code=3, even for unknown target?
-    #if ($?) {
-    #    return [500, "Error when running 'systemctl status sleep.target'".
-    #                ": \$?=$?, stderr=$err"];
-    #}
+    if ($? && (my $exit_code = $? < 0 ? $? : $? >> 8) != 3) {
+        log_warn "systemctl status failed, exit code=%d, stderr=%s",
+            $exit_code, $err;
+        return [500, "systemctl status failed with exit code=$exit_code"];
+    }
     $out =~ /^\s*Loaded: ([^(]+)/m or do {
         return [412, "Cannot parse 'systemctl status $target': $out"];
     };
@@ -99,7 +101,7 @@ sub _prevent_or_unprevent_sleep_or_check {
         return [304, "Failed to unmask sleep.target"]
             if $which eq 'unprevent' && $is_masked;
 
-        return [200, "OK", {'func.mechanism' => 'systemd'}];
+        return [200, "OK", undef, {'func.mechanism' => 'systemd'}];
     } # SYSTEMD
 
     [412, "Don't know how to perform prevent/unprevent sleep on this system"];
@@ -172,7 +174,7 @@ PowerManagement::Any - Common interface to some power management tasks
 
 =head1 VERSION
 
-This document describes version 0.003 of PowerManagement::Any (from Perl distribution PowerManagement-Any), released on 2019-05-22.
+This document describes version 0.004 of PowerManagement::Any (from Perl distribution PowerManagement-Any), released on 2019-05-28.
 
 =head1 NOTES
 

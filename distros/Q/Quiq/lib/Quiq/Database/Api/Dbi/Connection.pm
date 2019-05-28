@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use DBI ();
@@ -72,8 +72,8 @@ sub new {
     my $utf8 = 0;
 
     Quiq::Option->extract(\@_,
-        -handle=>\$handle,
-        -utf8=>\$utf8,
+        -handle => \$handle,
+        -utf8 => \$utf8,
     );
 
     my $dsn = $udlObj->dsn;
@@ -179,11 +179,11 @@ sub new {
     }
     else {
         $dbh = DBI->connect($dsn,$user,$passw,{
-            HandleError=>$errSub,
-            RaiseError=>1,
-            ShowErrorStatement=>1,
-            AutoCommit=>$autoCommit,
-            Warn=>0,
+            HandleError => $errSub,
+            RaiseError => 1,
+            ShowErrorStatement => 1,
+            AutoCommit => $autoCommit,
+            Warn => 0,
         });
         $strict = 1;
     }
@@ -240,16 +240,16 @@ sub new {
     }
 
     return $class->SUPER::new(
-        dbh=>$dbh,
-        dbms=>$dbms,
+        dbh => $dbh,
+        dbms => $dbms,
         # Strict-Umschaltung
-        strict=>$strict,
-        errSub=>$errSub,
-        HandleError=>undef,
-        RaiseError=>undef,
-        ShowErrorStatement=>undef,
-        AutoCommit=>undef,
-        Warn=>undef,
+        strict => $strict,
+        errSub => $errSub,
+        HandleError => undef,
+        RaiseError => undef,
+        ShowErrorStatement => undef,
+        AutoCommit => undef,
+        Warn => undef,
     );
 }
 
@@ -506,13 +506,13 @@ sub sql {
     }
 
     return Quiq::Database::Api::Dbi::Cursor->new(
-        sth=>$sth,
-        bindVars=>$bindVars,
-        db=>$self,
-        # titles=>$titles,
-        titles=>\@titles,
-        hits=>$hits,
-        id=>$id,
+        sth => $sth,
+        bindVars => $bindVars,
+        db => $self,
+        # titles => $titles,
+        titles => \@titles,
+        hits => $hits,
+        id => $id,
     );
 }
 
@@ -520,7 +520,7 @@ sub sql {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

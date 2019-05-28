@@ -4,9 +4,9 @@ use strict;
 use Carp;
 use SVG::TT::Graph;
 use base qw(SVG::TT::Graph);
-use vars qw($VERSION $TEMPLATE_FH);
-$VERSION = $SVG::TT::Graph::VERSION;
-$TEMPLATE_FH = \*DATA;
+
+our $VERSION = $SVG::TT::Graph::VERSION;
+our $TEMPLATE_FH = \*DATA;
 
 use Data::Dumper;
 use HTTP::Date;
@@ -188,6 +188,9 @@ Whether or not to tidy the content of the SVG file (XML::Tidy required).
 Set the path to an external stylesheet, set to '' if
 you want to revert back to using the default internal version.
 
+Set to "inline:<style>...</style>" with your CSS in between the tags.
+You can thus override the default style without requireing an external URL.
+
 The default stylesheet handles up to 12 data sets. All data series over
 the 12th will have no style and be in black. If you have over 12 data
 sets you can assign them all random colors (see the random_color()
@@ -261,6 +264,8 @@ to 1, set to '0' if you want to turn them off.
 
 Format string for presenting the X axis labels.
 The POSIX strftime() function is used for formatting
+after calling the POSIX tzset() function with the timezone
+specified in timescale_time_zone if present 
 (see strftime man pages and LC_TIME locale information).
 
 =item show_y_labels()
@@ -286,7 +291,10 @@ These time periods are used by the L<DateTime::Duration> methods.
 
 This determines the time zone used for the date intervals on the X axis.
 Values are those that L<DateTime> accepts for its constructor's 'time_zone'
-parameter. The default is 'floating'.
+parameter. The default is 'floating'.  If passing in data for a different
+timezone than that set for your system, note that you also must embed the 
+timezone information into the values passed to 'add_data', for example by 
+formatting your DateTime objects with L<DateTime::Format::RFC3339>. 
 
 =item stagger_x_labels()
 
@@ -568,6 +576,11 @@ sub dateadd {
 sub calculations {
   my $self = shift;
 
+  # Need to set the timezone in order for x-axis labels to be 
+  # formatted correctly by strftime:
+  $ENV{'TZ'} = $self->{config}->{timescale_time_zone};
+  POSIX::tzset();
+
   # run through the data and calculate maximum and minimum values
   my ($max_key_size,$max_time,$min_time,$max_value,$min_value,$max_x_label_length,$x_label);
 
@@ -638,8 +651,11 @@ __DATA__
 [% USE date %]
 [% stylesheet = 'included' %]
 
-[% IF config.style_sheet && config.style_sheet != '' %]
+[% IF config.style_sheet && config.style_sheet != '' && config.style_sheet.substr(0,7) != 'inline:' %]
   <?xml-stylesheet href="[% config.style_sheet %]" type="text/css"?>
+[% ELSIF config.style_sheet && config.style_sheet.substr(0,7) == 'inline:'%]
+  [% stylesheet = 'inline'
+     style_inline = config.style_sheet.substr(7) %]
 [% ELSE %]
   [% stylesheet = 'excluded' %]
 [% END %]
@@ -651,7 +667,9 @@ __DATA__
 <!-- Dave Meibusch                 -->
 <!-- ////////////////////////////  -->
 
-[% IF stylesheet == 'excluded' %]
+[% IF stylesheet == 'inline' %]
+[% style_inline %]
+[% ELSIF stylesheet == 'excluded' %]
 [%# include default stylesheet if none specified %]
 <defs>
 <style type="text/css">
@@ -924,8 +942,8 @@ __DATA__
 </clipPath>
 
 <!-- axis -->
-<path d="M[% x %] [% y %] v[% h %]" class="axis" id="xAxis"/>
-<path d="M[% x %] [% base_line %] h[% w %]" class="axis" id="yAxis"/>
+<path d="M[% x %] [% base_line %] h[% w %]" class="axis" id="xAxis"/>
+<path d="M[% x %] [% y %] v[% h %]" class="axis" id="yAxis"/>
 
 <!-- //////////////////////////////  AXIS DISTRIBUTIONS //////////////////////////// -->
 <!-- x axis scaling -->

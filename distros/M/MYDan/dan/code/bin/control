@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+ $0 [--search user]
+ $0 [--list]
+ $0 [--block user]
+ $0 [--unblock user]
+
+ $0 [--name name]
+
+=cut
+
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use MYDan::Code;
+use FindBin qw( $RealBin );
+use YAML::XS;
+
+$| ++;
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( search=s block=s unblock=s list name=s ) )->dump();
+
+my ( $f, $conf ) = "$RealBin/../config";
+if( -f $f )
+{
+    $conf = eval{ YAML::XS::LoadFile $f };
+    die "load config fail: $@" if $@;
+}
+else
+{
+    die "nofind config file:$f\n";
+}
+
+my ( $cf, $checkuser )= "$RealBin/../plugin/checkuser.private";
+if( -f $cf )
+{
+    $checkuser = do $cf;
+    die "load code: $cf fail: $!" unless $checkuser && ref $checkuser eq 'CODE'; 
+}
+
+my $code = MYDan::Code->new( conf => $conf, name => $o{name}, checkuser => $checkuser );
+
+if( $o{search} )
+{
+    $code->searchUser( $o{search} );
+}
+elsif( $o{list} )
+{
+    $code->getUsers();
+}
+elsif( $o{block} )
+{
+    $code->blockUser( $o{block} );
+}
+elsif( $o{unblock} )
+{
+    $code->unblockUser( $o{unblock} );
+}
+else
+{
+    print YAML::XS::Dump $conf;
+    $option->assert();
+}
+

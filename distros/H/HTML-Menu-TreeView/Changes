@@ -1,4 +1,6 @@
-Revision history for Perl extension HTML::Menu::TreeView version 1.20
+Revision history for Perl extension HTML::Menu::TreeView version 1.22
+
+1.22 typo corrected.
 
 1.20 This distribution reports a dependency on Module::Build, which is being set here:
      

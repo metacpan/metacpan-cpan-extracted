@@ -1,0 +1,76 @@
+{
+   "abstract" : "A parser for S3 XML responses",
+   "author" : [
+      "Takumi Akiyama <t.akiym@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amazon-S3-Thin-ResponseParser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XML::LibXML" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Amazon::S3::Thin::ResponseParser" : {
+         "file" : "lib/Amazon/S3/Thin/ResponseParser.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hatena/Amazon-S3-Thin-ResponseParser/issues"
+      },
+      "homepage" : "https://github.com/hatena/Amazon-S3-Thin-ResponseParser",
+      "repository" : {
+         "url" : "git://github.com/hatena/Amazon-S3-Thin-ResponseParser.git",
+         "web" : "https://github.com/hatena/Amazon-S3-Thin-ResponseParser"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:AKIYM",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

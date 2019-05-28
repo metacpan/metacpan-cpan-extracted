@@ -1,7 +1,7 @@
 package Sah::Schemas::URL;
 
-our $DATE = '2018-06-26'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-05-28'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to URL
@@ -18,7 +18,7 @@ Sah::Schemas::URL - Sah schemas related to URL
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schemas::URL (from Perl distribution Sah-Schemas-URL), released on 2018-06-26.
+This document describes version 0.009 of Sah::Schemas::URL (from Perl distribution Sah-Schemas-URL), released on 2019-05-28.
 
 =head1 SAH SCHEMAS
 
@@ -27,6 +27,8 @@ This document describes version 0.008 of Sah::Schemas::URL (from Perl distributi
 =item * L<url|Sah::Schema::url>
 
 URL string.
+
+=item * L<urls|Sah::Schema::urls>
 
 =back
 
@@ -58,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

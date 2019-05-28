@@ -1,8 +1,7 @@
 use strict;
 use Module::Build;
 use vars qw($skip);
-
-my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<'SUBCLASS' );
+my $class = Module::Build->subclass( class => "Module::Build::Custom", code => <<'SUBCLASS' );
     use File::Copy;
     use File::Path;
     my $release = 'blib/rhtml/';
@@ -15,7 +14,6 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         &change($dir);
         $self->SUPER::ACTION_build;
         &replacePath('blib/lib/HTML/Menu/TreeView.pm');
-
     }
 
     sub change {
@@ -39,7 +37,7 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         }
     }
 
-    sub replacePath{
+    sub replacePath {
         my $f = shift;
         chmod 0644, $f;
         open( EDIT, "+<$f" ) or die "replacePath $f $! $/";
@@ -53,7 +51,6 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         truncate( EDIT, tell(EDIT) );
         close(EDIT);
     }
-	
 	sub replace{
 		my $replace = shift;
 		my $with    = shift;
@@ -105,23 +102,23 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
 SUBCLASS
 my $inctance = $class->new(
     get_options => {
-                    skip => {store => \$skip},
-                   },
+        skip => { store => \$skip },
+    },
     module_name => 'HTML::Menu::TreeView',
     requires    => {
-                 'Test::More'    => '>=0.7',
-                 'perl'          => '5.006000',
-                },
-    ($] >= 5.005 ? (AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>') : ()),
+        'Test::More' => '>=0.7',
+        'perl'       => '5.006000',
+    },
+    ( $] >= 5.005 ? ( AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>' ) : () ),
     dist_abstract      => 'Create a HTML TreeView from scratch',
     license            => 'lgpl',
     create_makefile_pl => 'passthrough',
-    meta_merge => { 
-    resources => {
-        repository => 'https://sourceforge.net/p/lindnerei/ajax/HEAD/tree/HTML-Menu-TreeView'
-    }
+    meta_merge         => {
+        resources => {
+            repository => 'https://sourceforge.net/p/lindnerei/ajax/HEAD/tree/HTML-Menu-TreeView'
+        }
     },
-      sign =>1,
+    #sign => 1,
 );
 $inctance->{properties}{htd} = "/var/www/htdocs";
 eval 'use HTML::Menu::TreeView qw(documentRoot)';
@@ -132,13 +129,13 @@ $inctance->{properties}{cgi} = $inctance->args('cgi') if defined $inctance->args
 
 unless ($skip) {
     $inctance->{properties}{htd} =
-      Module::Build->prompt("Where is your Document root ?", $inctance->{properties}{htd});
+      Module::Build->prompt( "Where is your Document root ?", $inctance->{properties}{htd} );
     $inctance->{properties}{cgi} =
-      Module::Build->prompt("Where is your cgi-bin Directory ?", $inctance->{properties}{cgi});
+      Module::Build->prompt( "Where is your cgi-bin Directory ?", $inctance->{properties}{cgi} );
 } else {
     print "Document root: $inctance->{properties}{htd}$/";
     print "cgi-bin Directory : $inctance->{properties}{cgi}$/";
-}
+} ## end else
 $inctance->{properties}{install_path}{lib}   = $inctance->{properties}{cgi} . '/lib/';
 $inctance->{properties}{install_path}{rhtml} = $inctance->{properties}{htd};
 $inctance->create_build_script;

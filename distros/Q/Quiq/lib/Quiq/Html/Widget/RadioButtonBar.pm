@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Html::Widget::RadioButton;
 
@@ -108,19 +108,19 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        disabled=>0,
-        hidden=>0,
-        id=>undef,
-        labels=>[],
-        name=>undef,
-        onClick=>[],
-        options=>[],
-        orientation=>'h',
-        buttonClass=>undef,
-        style=>undef,
-        titles=>[],
-        value=>undef,
+        class => undef,
+        disabled => 0,
+        hidden => 0,
+        id => undef,
+        labels => [],
+        name => undef,
+        onClick => [],
+        options => [],
+        orientation => 'h',
+        buttonClass => undef,
+        style => undef,
+        titles => [],
+        value => undef,
     );
     $self->set(@_);
 
@@ -166,11 +166,11 @@ sub html {
     }
 
     return $h->tag('span',
-        -fmt=>'v', # generierten Code einzeilig belassen
-        -ignoreTagIf=>!$id && !$class && !$style,
-        id=>$id,
-        class=>$class,
-        style=>$style,
+        -fmt => 'v', # generierten Code einzeilig belassen
+        -ignoreTagIf => !$id && !$class && !$style,
+        id => $id,
+        class => $class,
+        style => $style,
         do {
             my $html;
             for (my $i = 0; $i < @$optionA; $i++) {
@@ -178,14 +178,14 @@ sub html {
                     $html .= $orientation eq 'v'? $h->tag('br',-nl=>0): ' ';
                 }
                 $html .= Quiq::Html::Widget::RadioButton->html($h,
-                    class=>$buttonClass,
-                    disabled=>$disabled,
-                    label=>$labelA->[$i] // $optionA->[$i],
-                    name=>$name,
-                    onClick=>$onClickA->[$i],
-                    option=>$optionA->[$i],
-                    title=>$titleA->[$i],
-                    value=>$value,
+                    class => $buttonClass,
+                    disabled => $disabled,
+                    label => $labelA->[$i] // $optionA->[$i],
+                    name => $name,
+                    onClick => $onClickA->[$i],
+                    option => $optionA->[$i],
+                    title => $titleA->[$i],
+                    value => $value,
                 );
                 chomp $html;
             }
@@ -198,7 +198,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -2,14 +2,14 @@ NAME
     App::podtohtml - Convert POD to HTML
 
 VERSION
-    This document describes version 0.006 of App::podtohtml (from Perl
-    distribution App-podtohtml), released on 2018-09-11.
+    This document describes version 0.007 of App::podtohtml (from Perl
+    distribution App-podtohtml), released on 2019-05-25.
 
 FUNCTIONS
   podtohtml
     Usage:
 
-     podtohtml(%args) -> [status, msg, result, meta]
+     podtohtml(%args) -> [status, msg, payload, meta]
 
     Convert POD to HTML.
 
@@ -59,7 +59,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   browser => *bool*
+    *   browser => *true*
 
         Instead of outputing HTML to STDOUT/file, view it in browser.
 
@@ -69,7 +69,7 @@ FUNCTIONS
 
         If not found, will search in for .pod or .pm files in @INC.
 
-    *   list_templates => *bool*
+    *   list_templates => *true*
 
         List available templates.
 
@@ -84,7 +84,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -112,7 +112,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

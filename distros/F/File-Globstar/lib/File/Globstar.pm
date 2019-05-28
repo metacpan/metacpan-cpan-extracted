@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This file is distributed under the same terms and conditions as
@@ -8,8 +8,8 @@
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
 package File::Globstar;
-$File::Globstar::VERSION = '0.5';
-use strict;
+$File::Globstar::VERSION = '0.6';
+use common::sense;
 
 use Locale::TextDomain qw(File-Globstar);
 use File::Glob qw(bsd_glob);
@@ -42,26 +42,6 @@ sub empty($) {
     return if defined $what && length $what;
 
     return 1;
-}
-
-sub _find_files($) {
-    my ($directory) = @_;
-
-    my $empty = empty $directory;
-    $directory = '.' if $empty;
-
-    my @hits;
-    File::Find::find sub {
-        return if -d $_;
-        return if '.' eq substr $_, 0, 1;
-        push @hits, $File::Find::name;
-    }, $directory;
-
-    if ($empty) {
-        @hits = map { substr $_, 2 } @hits;
-    }
-
-    return @hits;
 }
 
 sub _find_directories($) {
@@ -124,11 +104,11 @@ sub _globstar($$;$) {
     }
 
     my $current = $directory;
- 
+
     # This is a quotemeta() that does not escape the slash and the
     # colon.  Escaped slashes confuse bsd_glob() and escaping colons
     # may make a full port to Windows harder.
-    $current =~ s{([\x00-\x2e\x3b-\x40\x5b-\x60\x7b-\x7f])}{\\$1}g;
+    $current =~ s{([\x00-\x2e\x3b-\x40\x5b-\x5e\x60\x7b-\x7f])}{\\$1}g;
     if ($directory ne '' && '/' ne substr $directory, -1, 1) {
         $current .= '/';
     }
@@ -204,7 +184,7 @@ sub quotestar {
 
     $string =~ s/([\\\[\]*?])/\\$1/g;
     $string =~ s/^!/\\!/ if $listmatch;
-    
+
     return $string;
 }
 
@@ -220,11 +200,11 @@ sub _transpile_range($) {
     # Backslashes escape inside Perl ranges but not in ours.  Escape them:
     $range =~ s/\\/\\\\/g;
 
-    # Quote dots and equal sign to prevent Perl from interpreting 
+    # Quote dots and equal sign to prevent Perl from interpreting
     # equivalence and collating classes.
     $range =~ s/\./\\\./g;
     $range =~ s/\=/\\\=/g;
-    
+
     return "[$range]";
 }
 
@@ -249,7 +229,7 @@ sub translatestar {
     $pattern =~ s
                 {
                     (.*?)               # Anything, followed by ...
-                    (  
+                    (
                        \\.              # escaped character
                     |                   # or
                        \A\*\*(?=/)      # leading **/
@@ -298,7 +278,7 @@ sub translatestar {
                         if ($2 =~ /\*\*/) {
                             die $invalid_msg;
                         }
-                        die "should not happen: $2"; 
+                        die "should not happen: $2";
                     }
                     $translated;
                 }gsex;
@@ -326,7 +306,7 @@ sub pnmatchstar {
 
     my $full_path = $string;
 
-    # Check whether the regular expression is compiled.  
+    # Check whether the regular expression is compiled.
     # (ref $pattern) may be false here because it can be 0.
     my $reftype = reftype $pattern;
     unless (defined $reftype && $regex_type eq $reftype) {
@@ -339,7 +319,7 @@ sub pnmatchstar {
 
     my $match = $string =~ $pattern;
     if ($flags & RE_DIRECTORY) {
-        undef $match if !$options{isDirectory};        
+        undef $match if !$options{isDirectory};
     }
 
     my $negated = $flags & RE_NEGATED;
@@ -357,9 +337,8 @@ sub pnmatchstar {
     }
 
     return 1 if $negated;
-    
+
     return;
 }
 
 1;
-

@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+ $0 [--email name]
+
+=cut
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use FindBin qw( $RealBin );
+
+$| ++;
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( email=s ) )->dump();
+
+$option->assert( 'email' );
+
+my ( $cf, $checkuser ) = "$RealBin/../plugin/checkuser";
+$cf = $cf.'.private' if -f $cf.'.private';
+$checkuser = do $cf;
+die "load code: $cf fail: $!" unless $checkuser && ref $checkuser eq 'CODE'; 
+
+print &$checkuser( $o{email} ). "\n";

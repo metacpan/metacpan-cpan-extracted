@@ -20,7 +20,7 @@ csv2chart
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ csv2chart - command line utility to convert CSV data to a graphical chart
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 COPYRIGHT & LICENSE
 

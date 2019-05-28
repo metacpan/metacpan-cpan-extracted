@@ -4,7 +4,7 @@ use Future::Mojo;
 use Scalar::Util;
 use Role::Tiny;
 
-our $VERSION = '0.001';
+our $VERSION = 'v1.0.0';
 
 requires qw(ioloop then);
 
@@ -57,6 +57,30 @@ Mojo::Promise::Role::Futurify - Chain a Future from a Mojo::Promise
       }
     }
   })->await;
+  
+  # using Future::Utils in a Mojolicious application
+  use Mojolicious::Lite;
+  use Future::Utils 'fmap_concat';
+  my $ua = Mojo::UserAgent->new;
+  
+  get '/foo' => sub {
+    my $c = shift;
+    my $count = $c->param('count') // 50;
+    
+    my $f = fmap_concat {
+      $ua->get_p('https://example.com')->with_roles('+Futurify')->futurify;
+    } foreach => [1..$count], concurrent => 10;
+    
+    my $tx = $c->render_later->tx;
+    $f->on_done(sub {
+      my @txs = @_;
+      $c->render(json => [titles => map { $_->res->dom->at('title')->text } @txs]);
+    })->on_fail(sub {
+      $c->reply->exception(@_);
+    })->on_ready(sub { undef $tx })->retain;
+  };
+  
+  app->start;
 
 =head1 DESCRIPTION
 

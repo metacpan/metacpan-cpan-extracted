@@ -2,8 +2,8 @@ NAME
     App::timecalc - Time calculator
 
 VERSION
-    This document describes version 0.001 of App::timecalc (from Perl
-    distribution App-timecalc), released on 2019-05-18.
+    This document describes version 0.003 of App::timecalc (from Perl
+    distribution App-timecalc), released on 2019-05-25.
 
 SYNOPSIS
     See included script timecalc.

@@ -1,5 +1,11 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.5.1    2019-05-28 12:45:40+01:00 Europe/London
+  [Documentation]
+  - Documented known issue with custom profiling points.
+
+  - Bumped copyright year.
+
 v0.5.0    2018-12-03 17:39:30+00:00 Europe/London
   [Enhancements]
   - disable_stats_report default is based on !$c->debug.

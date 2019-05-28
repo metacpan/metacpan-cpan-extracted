@@ -1,9 +1,92 @@
 ==================================================
-Changes from 2017-05-08 00:00:00 +0000 to present.
+Changes from 2017-05-26 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.5 at 2019-05-08 02:45:04 +0000
+version 6.6 at 2019-05-26 21:14:01 +0000
+----------------------------------------
+
+  Change: 762f7e14e368ade8b947f92563023a5a416ae152
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-26 14:12:14 +0000
+
+    Dccoumentation regenerated for 6.6 release 
+
+  Change: d9d69b0e228ee5d07c7a8b18ee6051044192e6d5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-26 13:29:52 +0000
+
+    Fix documentation of es_index_fields() 
+
+  Change: 9b032b8ee358990d929f7c120a8edc160151df19
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-26 13:26:50 +0000
+
+    Use field metadata to automatically set timestamp
+
+    Since we have the field metadata, we can use that metadata to autodiscover
+    the date field for sorting. 
+
+  Change: 63e56193f8eef5f8176843be49709004cec10eaa
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-26 13:24:37 +0000
+
+    es_index_fields() patched to return field metadata
+
+    Instead of just flagging the presence of a field, the field types are
+    returned along with other meta-data including if the field is nested.
+
+    `es-search.pl` now displays field data types and whether a field is
+    contained within a nested path. 
+
+  Change: 8202a0722d7a29e5fc6dc701806e8ced5dafcc14
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 20:24:47 +0000
+
+    Fix formatting 
+
+  Change: 38aad622f61630b8da086364c7aea778e10081f1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 20:20:13 +0000
+
+    Regenerate .mkdown prepping for the 6.6 release 
+
+  Change: 2770f819958265a79677c0c0d200ebbf9c5fc7b5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 20:16:43 +0000
+
+    Fix the defined or so 0 isn't translated to -1 
+
+  Change: ccbcb6c100f218b1c60e619a90d2cd57ac63f49e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 20:13:41 +0000
+
+    Add .json support to the ::QueryString::FileExpansion plugin 
+
+  Change: 69a1b7dc9d4e4bed31bf0ed103e3ff2e98c78a38
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 08:38:41 +0000
+
+    Documentation Update and set default --days to 1
+
+    Reviewing the documentation found some spelling errors and incorrect
+    wording. Fixed that up. Also changed the default --days a query runs
+    against to 1 as that's a better default setting. 
+
+  Change: d91a9c6a8815a326eafc26f497dc282e9f27c46a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-19 12:26:56 +0000
+
+    Documentation consistency patches 
+
+  Change: 06b670f490597d78951fdd5b784f8168f6c98cc7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-19 12:12:08 +0000
+
+    Patch documentation for INSTALL to be secure 
+
+----------------------------------------
+version 6.5 at 2019-05-08 02:42:02 +0000
 ----------------------------------------
 
   Change: 0db6a92889a94daf54f17432b53f26a91153e4f7
@@ -593,5 +676,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-05-08 00:00:00 +0000.
+Plus 60 releases after 2017-05-26 00:00:00 +0000.
 =================================================

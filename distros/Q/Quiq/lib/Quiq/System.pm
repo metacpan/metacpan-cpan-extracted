@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Shell;
 use Quiq::FileHandle;
@@ -207,9 +207,9 @@ sub user {
 
     return getpwuid($uid) // do {
         $this->throw(
-            q~SYS-00001: Benutzer existiert nicht~,
-            Uid=>$uid,
-            Error=>"$!",
+            'SYS-00001: Benutzer existiert nicht',
+            Uid => $uid,
+            Error => "$!",
         );
     };
 }
@@ -235,9 +235,9 @@ sub uid {
 
     return getpwnam($user) // do {
         $this->throw(
-            q~SYS-00001: Benutzer existiert nicht~,
-            User=>$user,
-            Error=>"$!",
+            'SYS-00001: Benutzer existiert nicht',
+            User => $user,
+            Error => "$!",
         );
     };
 }
@@ -274,7 +274,7 @@ sub searchProgram {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -sloppy=>\$sloppy,
+            -sloppy => \$sloppy,
         );
     }
 
@@ -298,9 +298,9 @@ sub searchProgram {
     }
 
     $class->throw(
-        q~PATH-00020: Programm/Skript nicht gefunden~,
-        Program=>$program,
-        Paths=>$ENV{'PATH'},
+        'PATH-00020: Programm/Skript nicht gefunden',
+        Program => $program,
+        Paths => $ENV{'PATH'},
     );
 }
 
@@ -308,7 +308,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

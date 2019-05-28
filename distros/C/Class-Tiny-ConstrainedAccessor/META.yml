@@ -1,7 +1,7 @@
 ---
 abstract: 'Generate Class::Tiny accessors that apply type constraints'
 author:
-  - 'Christopher White <cxwembedded@gmail.com>'
+  - 'Christopher White <cxw@cpan.org>'
 build_requires:
   Exporter: '0'
   Getopt::Long: '2.50'
@@ -16,12 +16,13 @@ build_requires:
   Type::Tiny: '0'
   lib::relative: '0.002'
   parent: '0'
+  vars::i: '1.07'
 configure_requires:
   Config: '0'
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.10'
   File::Spec: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,16 +35,17 @@ no_index:
 provides:
   Class::Tiny::ConstrainedAccessor:
     file: lib/Class/Tiny/ConstrainedAccessor.pm
-    version: '0.000008'
+    version: '0.000010'
 requires:
   Class::Tiny: '0'
+  Scalar::Util: '1.50'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues
   repository: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor
-version: '0.000008'
+version: '0.000010'
 x_contributors:
   - 'Christopher White <cxw@cpan.org>'
   - 'Toby Inkster <tobyink@cpan.org>'

@@ -9,6 +9,7 @@ use Config;
 use Carp();
 use English qw( -no_match_vars );
 use DirHandle();
+use Encode();
 use POSIX();
 
 BEGIN {
@@ -17,7 +18,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -36,7 +37,6 @@ sub _SECONDS_IN_ONE_HOUR                   { return 3_600 }
 sub _SECONDS_IN_ONE_DAY                    { return 86_400 }
 sub _NEGATIVE_ONE                          { return -1 }
 sub _LOCALTIME_ISDST_INDEX                 { return 8 }
-sub _LOCALTIME_DAY_OF_WEEK_INDEX           { return 6 }
 sub _LOCALTIME_YEAR_INDEX                  { return 5 }
 sub _LOCALTIME_MONTH_INDEX                 { return 4 }
 sub _LOCALTIME_DAY_INDEX                   { return 3 }
@@ -69,6 +69,7 @@ sub _EVERY_FOUR_YEARS                      { return 4 }
 sub _EVERY_ONE_HUNDRED_YEARS               { return 100 }
 sub _DEFAULT_DST_START_HOUR                { return 2 }
 sub _DEFAULT_DST_END_HOUR                  { return 2 }
+sub _DAY_OF_WEEK_AT_EPOCH                  { return 4 }
 
 sub _TZ_DEFINITION_KEYS {
     return
@@ -725,9 +726,37 @@ sub _win32_timezones {
 
 sub _unix_timezones {
     my ($self) = @_;
-    my $path = File::Spec->catfile( $self->directory(), 'zone.tab' );
+    my @paths = (
+        File::Spec->catfile( $self->directory(), 'zone1970.tab' ),
+        File::Spec->catfile( $self->directory(), 'zone.tab' ),
+    );
+    if ( $OSNAME eq 'solaris' ) {
+        push @paths,
+          File::Spec->catfile( $self->directory(), 'tab', 'zone_sun.tab' );
+    }
+    if ( $self->{_unix_zonetab_path} ) {
+        if ( $self->{_unix_zonetab_path} ne $paths[0] ) {
+            unshift @paths, $self->{_unix_zonetab_path};
+        }
+    }
+    my $last_path;
+    foreach my $path (@paths) {
+        if ( my @sorted_zones = $self->_read_unix_timezones($path) ) {
+            $self->{_unix_zonetab_path} = $path;
+            return @sorted_zones;
+        }
+        else {
+            $last_path = $path;
+        }
+    }
+    delete $self->{_unix_zonetab_path};
+    Carp::croak("Failed to open $last_path for reading:$EXTENDED_OS_ERROR");
+}
+
+sub _read_unix_timezones {
+    my ( $self, $path ) = @_;
     my $handle = FileHandle->new($path)
-      or Carp::croak("Failed to open $path for reading:$EXTENDED_OS_ERROR");
+      or return ();
     my @stat = stat $handle
       or Carp::croak("Failed to stat $path:$EXTENDED_OS_ERROR");
     my $last_modified = $stat[ _STAT_MTIME_IDX() ];
@@ -746,13 +775,23 @@ sub _unix_timezones {
     else {
         $self->{_zones}    = [];
         $self->{_comments} = {};
-        while ( my $line = <$handle> ) {
-            next if ( $line =~ /^[#]/smx );
-            chomp $line;
+        while ( my $encoded = <$handle> ) {
+            next if ( $encoded =~ /^[#]/smx );
+            my $decoded;
+            if ( $path =~ /zone1970[.]tab$/smx ) {
+                $decoded = Encode::decode( 'UTF-8', $encoded, 1 );
+            }
+            else {
+                $decoded = $encoded;
+            }
+            chomp $decoded;
             my ( $country_code, $coordinates, $timezone, $comment ) =
-              split /\t/smx, $line;
-            push @{ $self->{_zones} }, $timezone;
-            $self->{_comments}->{$timezone} = $comment;
+              split /\t/smx, $decoded;
+            my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+            if ( $timezone =~ /^$timezone_full_name_regex$/smx ) {
+                push @{ $self->{_zones} }, $timezone;
+                $self->{_comments}->{$timezone} = $comment;
+            }
         }
         close $handle
           or Carp::croak("Failed to close $path:$EXTENDED_OS_ERROR");
@@ -907,29 +946,37 @@ sub _in_dst_according_to_v2_tz_rule {
         my $check_year =
           ( $self->_gm_time($check_time) )[ _LOCALTIME_YEAR_INDEX() ] +
           _LOCALTIME_BASE_YEAR();
-        my $dst_start_time = $self->_get_time_for_wday_week_month_year(
-            $tz_definition->{start_day},   $tz_definition->{start_week},
-            $tz_definition->{start_month}, $check_year
-          ) +
-          ( $tz_definition->{start_hour} *
-              _SECONDS_IN_ONE_MINUTE() *
-              _MINUTES_IN_ONE_HOUR() ) +
-          ( $tz_definition->{start_minute} * _SECONDS_IN_ONE_MINUTE() ) +
-          $tz_definition->{start_second} -
-          $tz_definition->{std_offset_in_seconds};
-        my $dst_end_time = $self->_get_time_for_wday_week_month_year(
-            $tz_definition->{end_day},   $tz_definition->{end_week},
-            $tz_definition->{end_month}, $check_year
-          ) +
-          ( $tz_definition->{end_hour} *
-              _SECONDS_IN_ONE_MINUTE() *
-              _MINUTES_IN_ONE_HOUR() ) +
-          ( $tz_definition->{end_minute} * _SECONDS_IN_ONE_MINUTE() ) +
-          $tz_definition->{end_second} -
-          $tz_definition->{dst_offset_in_seconds};
+        my $dst_start_time = $self->_get_time_for_wday_week_month_year_offset(
+            day    => $tz_definition->{start_day},
+            week   => $tz_definition->{start_week},
+            month  => $tz_definition->{start_month},
+            year   => $check_year,
+            offset => (
+                $tz_definition->{start_hour} *
+                  _SECONDS_IN_ONE_MINUTE() *
+                  _MINUTES_IN_ONE_HOUR()
+              ) +
+              ( $tz_definition->{start_minute} * _SECONDS_IN_ONE_MINUTE() ) +
+              $tz_definition->{start_second} -
+              $tz_definition->{std_offset_in_seconds}
+        );
+        my $dst_end_time = $self->_get_time_for_wday_week_month_year_offset(
+            day    => $tz_definition->{end_day},
+            week   => $tz_definition->{end_week},
+            month  => $tz_definition->{end_month},
+            year   => $check_year,
+            offset => (
+                $tz_definition->{end_hour} *
+                  _SECONDS_IN_ONE_MINUTE() *
+                  _MINUTES_IN_ONE_HOUR()
+              ) +
+              ( $tz_definition->{end_minute} * _SECONDS_IN_ONE_MINUTE() ) +
+              $tz_definition->{end_second} -
+              $tz_definition->{dst_offset_in_seconds}
+        );
 
         if ( $dst_start_time < $dst_end_time ) {
-            if (   ( $dst_start_time < $check_time )
+            if (   ( $dst_start_time <= $check_time )
                 && ( $check_time < $dst_end_time ) )
             {
                 return 1;
@@ -937,7 +984,7 @@ sub _in_dst_according_to_v2_tz_rule {
         }
         else {
             if (   ( $check_time >= $dst_start_time )
-                || ( $dst_end_time >= $check_time ) )
+                || ( $dst_end_time > $check_time ) )
             {
                 return 1;
             }
@@ -947,22 +994,25 @@ sub _in_dst_according_to_v2_tz_rule {
     return 0;
 }
 
-sub _get_time_for_wday_week_month_year {
-    my ( $self, $wday, $week, $month, $year ) = @_;
+sub _get_time_for_wday_week_month_year_offset {
+    my ( $self, %params ) = @_;
 
-    my $check_year = _EPOCH_YEAR();
-    my $time       = 0;
-    my $increment  = 0;
-    my $leap_year  = 1;
-    while ( $check_year < $year ) {
+    my $check_year        = _EPOCH_YEAR();
+    my $time              = $params{offset};
+    my $check_day_of_week = _DAY_OF_WEEK_AT_EPOCH();
+    my $increment         = 0;
+    my $leap_year         = 1;
+    while ( $check_year < $params{year} ) {
         $check_year += 1;
         if ( $self->_is_leap_year($check_year) ) {
             $leap_year = 1;
             $increment = _DAYS_IN_A_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+            $check_day_of_week += _DAYS_IN_A_LEAP_YEAR();
         }
         else {
             $leap_year = 0;
             $increment = _DAYS_IN_A_NON_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+            $check_day_of_week += _DAYS_IN_A_NON_LEAP_YEAR();
         }
         $time += $increment;
     }
@@ -970,22 +1020,22 @@ sub _get_time_for_wday_week_month_year {
     $increment = 0;
     my $check_month   = 1;
     my @days_in_month = $self->_days_in_month($leap_year);
-    while ( $check_month < $month ) {
+    while ( $check_month < $params{month} ) {
 
         $increment = $days_in_month[ $check_month - 1 ] * _SECONDS_IN_ONE_DAY();
-        $time += $increment;
-        $check_month += 1;
+        $check_day_of_week += $days_in_month[ $check_month - 1 ];
+        $time              += $increment;
+        $check_month       += 1;
     }
 
-    if ( $week == _LAST_WEEK_VALUE() ) {
+    if ( $params{week} == _LAST_WEEK_VALUE() ) {
         $time +=
           ( $days_in_month[ $check_month - 1 ] - 1 ) * _SECONDS_IN_ONE_DAY();
-        my $check_day_of_week =
-          ( $self->_gm_time($time) )[ _LOCALTIME_DAY_OF_WEEK_INDEX() ];
+        $check_day_of_week += $days_in_month[ $check_month - 1 ] - 1;
 
-        while ( $check_day_of_week != $wday ) {
+        while ( ( $check_day_of_week % _DAYS_IN_ONE_WEEK() ) != $params{day} ) {
 
-            $time -= _SECONDS_IN_ONE_DAY;
+            $time -= _SECONDS_IN_ONE_DAY();
             $check_day_of_week -= 1;
             if ( $check_day_of_week < 0 ) {
                 $check_day_of_week = _LOCALTIME_WEEKDAY_HIGHEST_VALUE();
@@ -993,21 +1043,23 @@ sub _get_time_for_wday_week_month_year {
         }
     }
     else {
-        my $check_day_of_week =
-          ( $self->_gm_time($time) )[ _LOCALTIME_DAY_OF_WEEK_INDEX() ];
+
         my $check_week = 1;
-        $increment = _DAYS_IN_ONE_WEEK() * _SECONDS_IN_ONE_DAY();
-        while ( $check_week < $week ) {
-            $check_week += 1;
-            $time += $increment;
-        }
-
-        while ( $check_day_of_week != $wday ) {
-
+        while ( ( $check_day_of_week % _DAYS_IN_ONE_WEEK() ) != $params{day} ) {
             $time += _SECONDS_IN_ONE_DAY();
             $check_day_of_week += 1;
             $check_day_of_week = $check_day_of_week % _DAYS_IN_ONE_WEEK();
+            if ( $check_day_of_week % _DAYS_IN_ONE_WEEK() == 0 ) {
+                $check_week += 1;
+            }
         }
+        $increment = _DAYS_IN_ONE_WEEK() * _SECONDS_IN_ONE_DAY();
+        while ( $check_week < $params{week} ) {
+            $check_week        += 1;
+            $check_day_of_week += _DAYS_IN_ONE_WEEK();
+            $time              += $increment;
+        }
+
     }
 
     return $time;
@@ -2389,6 +2441,7 @@ sub reset_cache {
         foreach my $key (qw(_tzdata _zonetab_last_modified _comments _zones)) {
             $self->{$key} = {};
         }
+        delete $self->{_unix_zonetab_path};
     }
     else {
         $_tzdata_cache  = {};
@@ -2405,7 +2458,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.13
+Version 0.18
 
 =cut
 

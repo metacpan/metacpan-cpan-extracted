@@ -1,7 +1,7 @@
 package App::podtohtml;
 
-our $DATE = '2018-09-11'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-05-25'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -88,19 +88,18 @@ _
         browser => {
             summary => 'Instead of outputing HTML to STDOUT/file, '.
                 'view it in browser',
-            schema => ['bool*', is=>1],
+            schema => 'true*',
             cmdline_aliases => {b=>{}},
         },
         list_templates => {
             summary => 'List available templates',
-            schema => ['bool*', is=>1],
+            schema => 'true*',
             cmdline_aliases => {l=>{}},
             tags => ['category:action', 'category:template'],
         },
         template => {
             summary => 'Pick a template to use, only relevant with --browser',
             schema => ['str*'],
-            cmdline_aliases => {t=>{}},
             tags => ['category:template'],
             completion => sub {
                 require App::podtohtml; # this weird thing is when we are run in _podtohtml
@@ -110,6 +109,10 @@ _
                     word => $args{word},
                     array => App::podtohtml::_list_templates(),
                 );
+            },
+            cmdline_aliases => {
+                t=>{},
+                metacpan => { is_flag => 1, summary => 'Shortcut for --template metacpan-20180911 --browser', code => sub { $_[0]{browser} = 1; $_[0]{template} = 'metacpan-20180911' } },
             },
         },
     },
@@ -242,7 +245,7 @@ App::podtohtml - Convert POD to HTML
 
 =head1 VERSION
 
-This document describes version 0.006 of App::podtohtml (from Perl distribution App-podtohtml), released on 2018-09-11.
+This document describes version 0.007 of App::podtohtml (from Perl distribution App-podtohtml), released on 2019-05-25.
 
 =head1 FUNCTIONS
 
@@ -251,7 +254,7 @@ This document describes version 0.006 of App::podtohtml (from Perl distribution 
 
 Usage:
 
- podtohtml(%args) -> [status, msg, result, meta]
+ podtohtml(%args) -> [status, msg, payload, meta]
 
 Convert POD to HTML.
 
@@ -302,7 +305,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<browser> => I<bool>
+=item * B<browser> => I<true>
 
 Instead of outputing HTML to STDOUT/file, view it in browser.
 
@@ -312,7 +315,7 @@ Input file (POD).
 
 If not found, will search in for .pod or .pm files in C<@INC>.
 
-=item * B<list_templates> => I<bool>
+=item * B<list_templates> => I<true>
 
 List available templates.
 
@@ -329,7 +332,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -361,7 +364,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

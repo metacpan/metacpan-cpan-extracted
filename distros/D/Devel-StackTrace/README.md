@@ -4,7 +4,7 @@ Devel::StackTrace - An object representing a stack trace
 
 # VERSION
 
-version 2.03
+version 2.04
 
 # SYNOPSIS
 
@@ -258,11 +258,12 @@ Dave Rolsky <autarch@urth.org>
 - Graham Knop <haarg@haarg.org>
 - Ivan Bessarabov <ivan@bessarabov.ru>
 - Mark Fowler <mark@twoshortplanks.com>
+- Pali <pali@cpan.org>
 - Ricardo Signes <rjbs@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2017 by David Rolsky.
+This software is Copyright (c) 2000 - 2019 by David Rolsky.
 
 This is free software, licensed under:
 

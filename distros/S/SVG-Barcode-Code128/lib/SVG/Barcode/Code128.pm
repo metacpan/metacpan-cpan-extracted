@@ -12,21 +12,20 @@ our @EXPORT_OK = qw|plot_code128|;
 
 use Barcode::Code128;
 
-our $VERSION = '0.01';
+our $VERSION = '0.10';
 
 use constant DEFAULTS => {
-  background => 'white',
-  foreground => 'black',
   lineheight => 30,
   linewidth  => 1,
-  margin     => 10,
   textsize   => 10,
 };
 
+SVG::Barcode::_param(__PACKAGE__, $_, DEFAULTS->{$_}) for keys DEFAULTS->%*;
+
 # functions
 
-sub plot_code128 ($text, $params = {}) {
-  return __PACKAGE__->new($params)->plot($text);
+sub plot_code128 ($text, %params) {
+  return __PACKAGE__->new(%params)->plot($text);
 }
 
 # internal methods
@@ -51,22 +50,31 @@ SVG::Barcode::Code128 - Generator for SVG based Code 128 barcodes
 
     use SVG::Barcode::Code128;
 
-    my %params = (
-      background => 'white',
-      foreground => 'black',
-      lineheight => 30,
-      linewidth  => 2,
-      margin     => 10,
-      textsize   => 10,
-    );
-    my $code128 = SVG::Barcode::Code128->new(\%params);
+    my $code128 = SVG::Barcode::Code128->new;
     my $svg     = $code128->plot('https://perldoc.pl');
-    my $svg2    = $code128->param(foreground => 'red')->plot('https://perldoc.pl');
+
+    $code118->linewidth;     # 1
+    $code118->lineheight;    # 30
+    $code118->textsize;      # 10
+                             # from SVG::Barcode:
+    $code118->foreground;    # black
+    $code118->background;    # white
+    $code118->margin;        # 2
+    $code118->id;
+    $code118->class;
+    $code118->width;
+    $code118->height;
+
+    my %params = (
+      lineheight => 40,
+      textsize   => 0,
+    );
+    $code128 = SVG::Barcode::Code128->new(%params);
 
     # use as function
     use SVG::Barcode::Code128 'plot_code128';
 
-    my $svg = plot_code128('https://perldoc.pl', \%params);
+    my $svg = plot_code128('https://perldoc.pl', %params);
 
 =head1 DESCRIPTION
 
@@ -78,7 +86,7 @@ L<SVG::Barcode::Code128> is a generator for SVG based Code 128 barcodes.
 
     use SVG::Barcode::Code128 'plot_code128';
 
-    my $svg = plot_code128($text, \%params);
+    $svg = plot_code128($text, %params);
 
 Returns a Code 128 barcode using the provided text and parameters.
 
@@ -86,50 +94,51 @@ Returns a Code 128 barcode using the provided text and parameters.
 
 =head2 new
 
-    $code128 = SVG::Barcode::Code128->new(\%params);
     $code128 = SVG::Barcode::Code128->new;             # create with defaults
+    $code128 = SVG::Barcode::Code128->new(\%params);
 
-Creates a new Code 128 plotter. Inherited from L<SVG::Barcode/new>.
-
-Accepted parameters are:
-
-=over 4
-
-=item background
-
-Color of the background. Default C<'white'>.
-
-=item foreground
-
-Color of the dots. Default C<'black'>.
-
-=item lineheight
-
-Height of the lines. Default C<30>.
-
-=item linewidth
-
-Width of a single line. Default C<2>.
-
-=item margin
-
-Margin around the code. Default C<10>.
-
-=item textsize
-
-Size of the text at the bottom of the code. C<0> means no text. Default C<10>.
-
-=back
+Creates a new Code 128 plotter. Inherited from L<SVG::Barcode|SVG::Barcode/new>.
 
 =head1 METHODS
 
-=head2 param
-
-Getter and setter for the parameters. Inherited from L<SVG::Barcode/param>.
-
 =head2 plot
 
-Creates a SVG code. Inherited from L<SVG::Barcode/plot>.
+Creates a SVG code. Inherited from L<SVG::Barcode|SVG::Barcode/plot>.
+
+=head1 PARAMETERS
+
+Inherited from L<SVG::Barcode>:
+L<background|SVG::Barcode/background>,
+L<class|SVG::Barcode/class>,
+L<foreground|SVG::Barcode/foreground>,
+L<height|SVG::Barcode/height>,
+L<id|SVG::Barcode/id>,
+L<margin|SVG::Barcode/margin>,
+L<width|SVG::Barcode/width>.
+
+=head2 lineheight
+
+    $value  = $qrcode->lineheight;
+    $qrcode = $qrcode->lineheight($newvalue);
+    $qrcode = $qrcode->lineheight('');          # 30
+
+Getter and setter for the height of a line. Default C<30>.
+
+=head2 linewidth
+
+    $value  = $qrcode->linewidth;
+    $qrcode = $qrcode->linewidth($newvalue);
+    $qrcode = $qrcode->linewidth('');          # 1
+
+Getter and setter for the width of a single line. Default C<1>.
+
+=head2 textsize
+
+    $value  = $qrcode->textsize;
+    $qrcode = $qrcode->textsize($newvalue);
+    $qrcode = $qrcode->textsize('');          # 10
+
+Getter and setter for the size of the text a the bottom. C<0> hides the text. Default C<10>.
 
 =head1 SEE ALSO
 

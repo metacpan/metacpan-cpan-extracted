@@ -1,6 +1,6 @@
 package Sim::OPT::Modish;
 #!/usr/bin/perl
-# Modish, version 0.255.
+# Modish, version 0.279.
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # The subroutine createconstrdbfile has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
 # All rights reserved, 2015-19.
@@ -128,7 +128,7 @@ $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (s
 
 # Configuration file for modish, version 0.241.
 #
-#@defaults = ( [ 2, 2 ], 5, 1, 7, 0.01 );
+#@defaults = ( [ 2, 2 ], 1, 1, 7, 0.01 );
 #
 ### The line above means: ( [ resolution_x, resolution_y ], $dirvectorsnum, $bounceambnum, $bouncemaxnum, $distgrid, $threshold )
 ### resolution_x, resolution_y are the gridding values
@@ -2681,12 +2681,14 @@ sub pursue
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) )
               {
 
-                #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
                 if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
                 {
+                  #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
+
+
                   if ( $dir == 0 ){ $dir = 0.0001; say "IMPOSED \$dir = 0.0001;"; say REPORT "IMPOSED \$dir = 0.0001;"; }
                   if ( $diff == 0 ){ $diff = 0.0001; say "IMPOSED \$diff = 0.0001;"; say REPORT "IMPOSED \$diff = 0.0001;"; }
                 }
@@ -2709,8 +2711,8 @@ sub pursue
                     }
                     elsif ( ( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures ) )
                     {
-                      @returns = `gendaylit -ang $alt $azi -s -g $groundrefl -W $dir $diff -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gendaylit -ang $alt $azi -s -g $groundrefl -W $dir $diff -a $lat -o $long -m $standardmeridian";
+                      @returns = `gendaylit $monthnum $day $hour -s -g $groundrefl -W $dir $diff -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gendaylit $monthnum $day $hour -s -g $groundrefl -W $dir $diff -a $lat -o $long -m $standardmeridian";
                     }
                   }
                 }
@@ -2718,19 +2720,19 @@ sub pursue
                 {
                   if ( $skycond eq "clear" )
                   {
-                    @returns = `gensky -ang $alt $azi -s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi -s -g $groundrefl -a $lat -o $long -m $standardmeridian";
+                    @returns = `gensky $monthnum $day $hour -s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour -s -g $groundrefl -a $lat -o $long -m $standardmeridian";
                     #say REPORT "gensky " . dump( @returns );
                   }
                   elsif ( $skycond eq "cloudy" )
                   {
-                    @returns = `gensky -ang $alt $azi -i -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi -i -g $groundrefl -a $lat -o $long -m $standardmeridian";
+                    @returns = `gensky $monthnum $day $hour -i -g $groundrefl -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour -i -g $groundrefl -a $lat -o $long -m $standardmeridian";
                   }
                   elsif ( $skycond eq "overcast" )
                   {
-                    @returns = `gensky -ang $alt $azi -c -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi -c -g $groundrefl -a $lat -o $long -m $standardmeridian";
+                    @returns = `gensky $monthnum $day $hour -c -g $groundrefl -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour -c -g $groundrefl -a $lat -o $long -m $standardmeridian";
                   }
                   #say "gensky -ang $alt $azi -s -g $groundrefl -a $lat -o $long -m $standardmeridian";
                 }
@@ -2743,35 +2745,48 @@ sub pursue
                 #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
                 #}
 
+                foreach my $li ( @returns )
+                {
+                  if ( $li =~ /Warning: sun altitude below zero/ )
+                  {
+                    if ( "gensky" ~~ @calcprocedures )
+                    {
+                      if ( $skycond eq "clear" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi -s -g 0 -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gendaylit -ang 0.0001 $azi -s -g 0 -a $lat -o $long -m $standardmeridian";
+                        #say REPORT "gensky " . dump( @returns );
+                      }
+                      elsif ( $skycond eq "cloudy" )
+                      {
+                        @returns = `gendaylit -ang 0.0001 $azi -i -g 0 -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gendaylit -ang 0.0001 $azi -i -g 0 -a $lat -o $long -m $standardmeridian";
+                      }
+                      elsif ( $skycond eq "overcast" )
+                      {
+                        @returns = `gendaylit -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gendaylit -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian";
+                      }
+                      last;
+                    }
+                  }
+                  elsif ( "gendaylit" ~~ @calcprocedures )
+                  {
+                    @returns = `gendaylit -ang 0.0001 $azi -s -g 0 -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gendaylit -ang 0.0001 $azi -s -g 0 -a $lat -o $long -m $standardmeridian";
+                    last;
+                  }
+                }
+
 
                 if ( ( "gendaylit" ~~ @calcprocedures ) or ( "gensky" ~~ @calcprocedures ) )
                 {
-                  #say REPORT "rm $skyfile";
                   open( SKYFILE, ">$skyfile" ) or die;
 
-                  #say "ALT: $alt\n";
-                  my $counter = 0;
                   foreach my $line ( @returns )
                   {
-                    if ( $counter == 2 )
-                    {
-                      if ( $newline ne "" )
-                      {
-                        print SKYFILE $newline;
-                        #print REPORT "SUBSTITUTED:" . $newline;
-                      }
-                      else
-                      {
-                        print SKYFILE $line;
-                        #print REPORT "CONFIRMED:" . $line;
-                      }
-                    }
-                    else
-                    {
-                      print SKYFILE $line;
-                      #print REPORT "CONFIRMED:" . $line;
-                    }
-                    $counter++;
+                    print SKYFILE $line;
+                    print REPORT $line;
                   }
 
                   if ( not ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) )
@@ -2810,13 +2825,13 @@ solar source sun
                 say REPORT "IN CALCULATIONS FOR DIFFUSE RADIATION, cycle " . ( $countrad + 1 ) . ", \$hour: $hour, \$surfnum: $surfnum, \$month: $month";
 
 
-                my $newline;
-                my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
-                $altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
-                if ( $altreturn <= 0 )
-                {
-                  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
-                }
+                #my $newline;
+                #my @alts = split( " +", $returns[2] ); #say REPORT "ALTS: " . dump ( @alts );
+                #$altreturn = $alts[5]; #say REPORT "\$altreturn: " . dump ( $altreturn );
+                #if ( $altreturn <= 0 )
+                #{
+                #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
+                #}
 
                 #open( SKYFILE, "$skyfile" ) or die;
                 #my @lines = <SKYFILE>;
@@ -2913,12 +2928,14 @@ solar source sun
                   and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) or ( "plain" ~~ @calcprocedures ) ) )
               {
 
-                #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
+
                 if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
                 {
+                  #say "\$month:$monthnum, \$hour:$hour, \$dir:$dir, \$diff:$diff, \$alt:$alt, \$azi:$azi, \$lat:$lat, \$long:$long, \$standardmeridian:$standardmeridian";
+
                   if ( $dir == 0 ){ $dir = 0.0001; say "IMPOSED \$dir = 0.0001;"; say REPORT "IMPOSED \$dir = 0.0001;"; }
                   if ( $diff == 0 ){ $diff = 0.0001; say "IMPOSED \$diff = 0.0001;"; say REPORT "IMPOSED \$diff = 0.0001;"; }
                 }
@@ -2936,7 +2953,7 @@ solar source sun
                   $thisgref= 0;
                 }
 
-                my ( $altreturn );
+                my ( $altreturn, $lightsolar );
 
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
                 {
@@ -2953,6 +2970,43 @@ solar source sun
                 {
                   if ( $skycond eq "clear" )
                   {
+                    @returns = `gensky $monthnum $day $hour +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour +s -g $thisgref -a $lat -o $long -m $standardmeridian";
+                    #say REPORT "gensky " . dump( @returns );
+                  }
+                  elsif ( $skycond eq "cloudy" )
+                  {
+                    @returns = `gensky $monthnum $day $hour +i -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour +i -g $thisgref -a $lat -o $long -m $standardmeridian";
+                    #say REPORT "gensky " . dump( @returns );
+                  }
+                  elsif ( $skycond eq "overcast" )
+                  {
+                    @returns = `gensky $monthnum $day $hour -c -g $thisgobs black:ref -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour -c -g $thisgref -a $lat -o $long -m $standardmeridian";
+                    #say REPORT "gensky " . dump( @returns );
+                  }
+
+                  my $ct = 0;
+                  foreach my $el ( @returns )
+                  {
+                    if ( $el =~ /void light solar/ )
+                    {
+                      $lightsolar = $returns[$ct+3];
+                      if ( $lightsolar =~ /3 0.0 0.0 0.0/ )
+                      {
+                        $lightsolar = "3 0.1 0.1 0.1";
+                      }
+                    }
+                    $ct++;
+                  }
+
+                }
+                elsif ( not( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures )
+                  and ( "gendaylit" ~~ @calcprocedures ) )
+                {
+                  if ( $skycond eq "clear" )
+                  {
                     @returns = `gensky -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gensky -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
                     #say REPORT "gensky " . dump( @returns );
@@ -2965,83 +3019,79 @@ solar source sun
                   }
                   elsif ( $skycond eq "overcast" )
                   {
-                    @returns = `gensky -ang $alt $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                    @returns = `gensky -ang $alt $azi -c -g $thisgobs black:ref -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gensky -ang $alt $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian";
                     #say REPORT "gensky " . dump( @returns );
                   }
-                }
-                elsif ( not( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures )
-                  and ( "gendaylit" ~~ @calcprocedures ) )
-                {
-                  my @rets;
-                  if ( $skycond eq "clear" )
-                  {
-                    @rets = `gensky -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
-                    #say REPORT "gensky " . dump( @rets );
-                  }
-                  elsif ( $skycond eq "cloudy" )
-                  {
-                    @rets = `gensky -ang $alt $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian";
-                    #say REPORT "gensky " . dump( @rets );
-                  }
-                  elsif ( $skycond eq "overcast" )
-                  {
-                    @rets = `gensky -ang $alt $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian";
-                    #say REPORT "gensky " . dump( @rets );
-                  }
-
-                  my ( $lightsolar );
-                  my $ct = 0;
-                  foreach my $el ( @rets )
-                  {
-                    if ( $el =~ /void light solar/ )
-                    {
-                      $lightsolar = $rets[$ct+3];
-                    }
-                    #last;
-                    $ct++;
-                  }
-
-                  @returns = `gendaylit -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                  say REPORT "gendaylit -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
 
                   my $ct = 0;
                   foreach my $el ( @returns )
                   {
                     if ( $el =~ /void light solar/ )
                     {
-                      $returns[$ct+3] = $lightsolar;
+                      $lightsolar = $returns[$ct+3];
+                      if ( $lightsolar =~ /3 0.0 0.0 0.0/ )
+                      {
+                        $lightsolar = "3 0.1 0.1 0.1";
+                      }
                     }
-                    #last;
                     $ct++;
                   }
+
+                  @returns = `gendaylit -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                  say REPORT "gendaylit -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
+
                 }
 
+                my $positive = "no";
+                my $ct = 0;
                 foreach my $li ( @returns )
                 {
-                  if ( $li =~ /^Warning: sun altitude below zero/ )
+
+                  if ( $li =~ /void light solar/ )
                   {
-                    if ( $skycond eq "clear" )
+                    $positive = "yes";
+                    if ( $lightsolar ne "" )
                     {
-                      @returns = `gensky -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky -ang $alt $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
-                      #say REPORT "gensky " . dump( @returns );
+                      $returns[$ct+3] = $lightsolar;
+                      if ( $returns[$ct+3] =~ /3 0.0 0.0 0.0/ )
+                      {
+                        $returns[$ct+3] = "3 0.1 0.1 0.1";
+                      }
                     }
-                    elsif ( $skycond eq "cloudy" )
-                    {
-                      @returns = `gensky -ang $alt $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky -ang $alt $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian";
-                    }
-                    elsif ( $skycond eq "overcast" )
-                    {
-                      @returns = `gensky -ang $alt $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky -ang $alt $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian";
-                    }
-                    last;
                   }
+
+                  if ( $liXXX =~ /^Warning: sun altitude below zero/ )
+                  {
+                    #if ( "gensky" ~~ @calcprocedures )
+                    #{
+                      if ( $skycond eq "clear" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gensky -ang 0.0001 $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
+                        #say REPORT "gensky " . dump( @returns );
+                      }
+                      elsif ( $skycond eq "cloudy" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gensky -ang 0.0001 $azi +i -g $thisgref -a $lat -o $long -m $standardmeridian";
+                      }
+                      elsif ( $skycond eq "overcast" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gensky -ang 0.0001 $azi -c -g $thisgref -a $lat -o $long -m $standardmeridian";
+                      }
+                      last;
+                    #}
+                    #if ( "gendaylit" ~~ @calcprocedures )
+                    #{
+                    #  @returns = `gendaylit -ang 0.0001 $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian`;
+                    #  say REPORT "gendaylit -ang 0.0001 $azi +s -g $thisgref -a $lat -o $long -m $standardmeridian";
+                    #  #say REPORT "gendaylit " . dump( @returns );
+                    #  last;
+                    #}
+                  }
+                  $ct++;
                 }
 
 
@@ -3055,15 +3105,6 @@ solar source sun
                 #  $newline = "$alts[0] $alts[1] $alts[2] $alts[3] $alts[4] 0.0001 $alts[6]";
                 #}
 
-                foreach my $el ( @returns )
-                {
-                  if ( $el =~ /void light solar/ )
-                  {
-                    $positive = "yes";
-                    last;
-                  }
-                }
-
                 if ( $positive ne "yes" )
                 {
                   push ( @returns,
@@ -3071,46 +3112,22 @@ solar source sun
                   "void light solar\n",
                   "0\n",
                   "0\n",
-                  "3 0.001 0.001 0.001\n",
+                  "3 0.1 0.1 0.1\n",
                   "\n",
                   "solar source sun\n",
                   "0\n",
                   "0\n",
-                  "4 0.001 0.001 0.001 0.0\n" );
+                  "4 0.1 0.1 0.1 0.1\n" );
                 }
 
-                if ( ( ( "gendaylit" ~~ @calcprocedures ) ) or ( "gensky" ~~ @calcprocedures ) )
+                open( SKYFILE, ">$skyfile" ) or die;
+                print REPORT "OBTAINED\n";
+                foreach my $line ( @returns )
                 {
-                  #say REPORT "rm -f $skyfile";
-
-                  open( SKYFILE, ">$skyfile" ) or die;
-
-                  my $counter = 0;
-                  foreach my $line ( @returns )
-                  {
-                    if ( $counter == 2 )
-                    {
-                      if ( $newline ne "" )
-                      {
-                        print SKYFILE $newline;
-                        #print REPORT "SUBSTITUTED:" . $newline;
-                      }
-                      else
-                      {
-                        print SKYFILE $line;
-                        #print REPORT "CONFIRMED:" . $line;
-                      }
-                    }
-                    else
-                    {
-                      print SKYFILE $line;
-                      #print REPORT "CONFIRMED:" . $line;
-                    }
-                    $counter++;
-                  }
-
-                  close SKYFILE;
+                  print SKYFILE $line;
+                  print REPORT $line;
                 }
+                close SKYFILE;
 
                 #adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \@specularratios,
                 #  \%obslayers, \@selectives, \%paths, \@calcprocedures, $count, $groundrefl, $action, "yes" );
@@ -3185,6 +3202,7 @@ solar source sun
                 # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
                 # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
 
+                my ( $altreturn, $lightsolar );
                 if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
                 {
                   @returns = `gendaylit -ang $alt $azi +s -g 0 -W $dir 0 -a $lat -o $long -m $standardmeridian`;
@@ -3196,6 +3214,40 @@ solar source sun
                   say REPORT "gendaylit -ang $alt $azi +s -g 0 -W $dir $diff -a $lat -o $long -m $standardmeridian";
                 }
                 elsif ( ( "gensky" ~~ @calcprocedures ) and not( "getweather" ~~ @calcprocedures )
+                  and not( "getsimple" ~~ @calcprocedures ) )
+                {
+                  if ( $skycond eq "clear" )
+                  {
+                    @returns = `gensky $monthnum $day $hour +s -g 0 -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour +s -g 0 -a $lat -o $long -m $standardmeridian";
+                  }
+                  elsif ( $skycond eq "cloudy" )
+                  {
+                    @returns = `gensky $monthnum $day $hour +i -g 0 -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour +i -g 0 -a $lat -o $long -m $standardmeridian";
+                  }
+                  elsif ( $skycond eq "overcast" )
+                  {
+                    @returns = `gensky $monthnum $day $hour -c -g 0 -a $lat -o $long -m $standardmeridian`;
+                    say REPORT "gensky $monthnum $day $hour -c -g 0 -a $lat -o $long -m $standardmeridian";
+                  }
+
+                  my $ct = 0;
+                  foreach my $el ( @returns )
+                  {
+                    if ( $el =~ /void light solar/ )
+                    {
+                      $lightsolar = $returns[$ct+3];
+                      if ( $lightsolar =~ /3 0.0 0.0 0.0/ )
+                      {
+                        $lightsolar = "3 0.1 0.1 0.1";
+                      }
+                    }
+                    $ct++;
+                  }
+
+                }
+                elsif ( ( "gendaylit" ~~ @calcprocedures ) and not( "getweather" ~~ @calcprocedures )
                   and not( "getsimple" ~~ @calcprocedures ) )
                 {
                   if ( $skycond eq "clear" )
@@ -3213,83 +3265,93 @@ solar source sun
                     @returns = `gensky -ang $alt $azi -c -g 0 -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gensky -ang $alt $azi -c -g 0 -a $lat -o $long -m $standardmeridian";
                   }
-                                  }
-                elsif ( ( "gendaylit" ~~ @calcprocedures ) and not( "getweather" ~~ @calcprocedures )
-                  and not( "getsimple" ~~ @calcprocedures ) )
-                {
-                  my @rets;
-                  if ( $skycond eq "clear" )
-                  {
-                    @rets = `gensky -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian";
-                    #say REPORT "gensky " . dump( @rets );
-                  }
-                  elsif ( $skycond eq "cloudy" )
-                  {
-                    @rets = `gensky -ang $alt $azi +i -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi +i -g $groundrefl -a $lat -o $long -m $standardmeridian";
-                    say REPORT "gensky " . dump( @rets );
-                  }
-                  elsif ( $skycond eq "overcast" )
-                  {
-                    @rets = `gensky -ang $alt $azi -c -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                    say REPORT "gensky -ang $alt $azi -c -g $groundrefl -a $lat -o $long -m $standardmeridian";
-                    #say REPORT "gensky " . dump( @rets );
-                  }
-
-                  #say "ORIGINAL RETS!" . dump( @rets );
-
-                  my ( $lightsolar );
-                  my $ct = 0;
-                  foreach my $el ( @rets )
-                  {
-                    #say "EL! $el $ct";
-                    if ( $el =~ /void light solar/ )
-                    {
-                      $lightsolar = $rets[$ct+3];
-                      #say "LIGHTSOLAR! $lightsolar";
-                    }
-                    $ct++;
-                  }
-
-                  @returns = `gendaylit -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                  say REPORT "gendaylit -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian";
 
                   my $ct = 0;
                   foreach my $el ( @returns )
                   {
                     if ( $el =~ /void light solar/ )
                     {
-                      $returns[$ct+3] = $lightsolar;
+                      $lightsolar = $returns[$ct+3];
+                      if ( $lightsolar =~ /3 0.0 0.0 0.0/ )
+                      {
+                        $lightsolar = "3 0.1 0.1 0.1";
+                      }
                     }
                     $ct++;
                   }
-                }
 
+                  @returns = `gendaylit -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
+                  say REPORT "gendaylit -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian";
+                }
                 #say "RETURNS1: " . dump( @returns );
 
+                my $positive = "no";
+                my $ct = 0;
                 foreach my $li ( @returns )
                 {
-                  if ( $li =~ /Warning: sun altitude below zero/ )
+
+                  if ( $li =~ /void light solar/ )
                   {
-                    if ( $skycond eq "clear" )
+                    $positive = "yes";
+                    if ( $lightsolar ne "" )
                     {
-                      @returns = `gensky -ang $alt $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky -ang $alt $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
-                      #say REPORT "gensky " . dump( @returns );
+                      $returns[$ct+3] = $lightsolar;
+                      if ( $returns[$ct+3] =~ /3 0.0 0.0 0.0/ )
+                      {
+                        $returns[$ct+3] = "3 0.1 0.1 0.1";
+                      }
                     }
-                    elsif ( $skycond eq "cloudy" )
-                    {
-                      @returns = `gensky -ang $alt $azi +i -g 0 -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky -ang $alt $azi +i -g 0 -a $lat -o $long -m $standardmeridian";
-                    }
-                    elsif ( $skycond eq "overcast" )
-                    {
-                      @returns = `gensky -ang $alt $azi -c -g 0 -a $lat -o $long -m $standardmeridian`;
-                      say REPORT "gensky -ang $alt $azi -c -g 0 -a $lat -o $long -m $standardmeridian";
-                    }
-                    last;
                   }
+
+                  if ( $line =~ /void brightfunc skyfunc/ )
+                  {
+                    $returns[$counter+3] = "7 0 0 0 0 0 0 0\n",
+                  }
+
+                  if ( $liXXX =~ /Warning: sun altitude below zero/ )
+                  {
+                    if ( "gensky" ~~ @calcprocedures )
+                    {
+                      if ( $skycond eq "clear" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gensky -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
+                        #say REPORT "gensky " . dump( @returns );
+                      }
+                      elsif ( $skycond eq "cloudy" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi +i -g 0 -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gensky -ang 0.0001 $azi +i -g 0 -a $lat -o $long -m $standardmeridian";
+                      }
+                      elsif ( $skycond eq "overcast" )
+                      {
+                        @returns = `gensky -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian`;
+                        say REPORT "gensky -ang 0.0001 $azi -c -g 0 -a $lat -o $long -m $standardmeridian";
+                      }
+                      last;
+                    }
+                    elsif ( "gendaylit" ~~ @calcprocedures )
+                    {
+                      @returns = `gendaylit -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
+                      say REPORT "gendaylit -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
+                    }
+                  }
+                  $ct++;
+                }
+
+                if ( $positive ne "yes" )
+                {
+                  push ( @returns,
+                  "\n",
+                  "void light solar\n",
+                  "0\n",
+                  "0\n",
+                  "3 0.1 0.1 0.1\n",
+                  "\n",
+                  "solar source sun\n",
+                  "0\n",
+                  "0\n",
+                  "4 0.1 0.1 0.1 0.1\n" );
                 }
 
                 #say "RETURNS2: " . dump( @returns );
@@ -3306,68 +3368,22 @@ solar source sun
 
                 #say "RETURNS3: " . dump( @returns );
 
-                foreach my $el ( @returns )
-                {
-                  if ( $el =~ /void light solar/ )
-                  {
-                    $positive = "yes";
-                    last;
-                  }
-                }
-
-                if ( $positive ne "yes" )
-                {
-                  push ( @returns,
-                  "\n",
-                  "void light solar\n",
-                  "0\n",
-                  "0\n",
-                  "3 0.001 0.001 0.001\n",
-                  "\n",
-                  "solar source sun\n",
-                  "0\n",
-                  "0\n",
-                  "4 0.001 0.001 0.001 0.0\n" );
-                }
 
                 #say "RETURNS4: " . dump( @returns );
 
-                if ( ( "gendaylit" ~~ @calcprocedures ) or ( "gensky" ~~ @calcprocedures ) )
-                {
-                  #my $skyold = $skyfile . ".old";
-                  #`mv -f $skyfile $skyold`;
-                  open( SKYFILE, ">$skyfile" ) or die;
 
-                  my $counter = 0;
-                  foreach my $line ( @returns )
-                  {
-                    if ( $counter == 2 )
-                    {
-                      if ( $newline ne "" )
-                      {
-                        print SKYFILE $newline;
-                        #print REPORT "SUBSTITUTED:" . $newline;
-                      }
-                      else
-                      {
-                        print SKYFILE $line;
-                        #print REPORT "CONFIRMED:" . $line;
-                      }
-                    }
-                    else
-                    {
-                      if ( $line =~ /void brightfunc skyfunc/ )
-                      {
-                        $returns[$counter+3] = "7 0 0 0 0 0 0 0\n",
-                      }
-                      print SKYFILE $line;
-                      #print REPORT "CONFIRMED:" . $line;
-                    }
-                    $counter++;
-                  }
-                  close SKYFILE;
+                #my $skyold = $skyfile . ".old";
+                #`mv -f $skyfile $skyold`;
+                open( SKYFILE, ">$skyfile" ) or die;
+
+                print REPORT "OBTAINED";
+                foreach my $line ( @returns )
+                {
+                  print SKYFILE $line;
+                  print REPORT $line;
                 }
                 close SKYFILE;
+
 
                 #adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \@specularratios,
                 #  \%obslayers, \@selectives, \%paths, \@calcprocedures, $count, $groundrefl, $action, "yes" );
@@ -4749,6 +4765,11 @@ sub modifyshda
                           $newshadingvalue = $el;
                         }
                         else
+                        {
+                          $newshadingvalue = $el;
+                        }
+
+                        if ( ( $newshadingvalue eq "1.0000" ) and ( $el ne "1.0000" ) )
                         {
                           $newshadingvalue = $el;
                         }
@@ -6729,22 +6750,19 @@ modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );  (Which means: calculate for z
 modish is a program for altering the shading values calculated by the ESP-r building simulation platform to take into account reflections from obstructions.
 More precisely, modish brings into account the reflective effect of solar obstructions on solar gains on building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface.
 
-The effect of solar reflections is taken into account at each hour on the basis of the ratios
-between the irradiances measured at the models' surfaces in: a) the original model; b) a transitional model derived from that.
-
-The irradiances are calculated through Radiance and derive from the following building models: a) a model in which the solar obstructions have their true reflectivity ; b) a model in which the solar obstructions are completely black.
+The effect of solar reflections is taken into account at each hour on the basis of the ratios between the irradiances measured at the models' surfaces in a model anologue of the original one, and a twin fictiotious model derived from that. The irradiances are calculated through Radiance and derive from a model in which the solar obstructions have their true reflectivity and a model in which the solar obstructions are black.
 
 The value given by 1 minus those irradiance ratios gives the diffuse shading factors that are put in the ISH file in place of the original values.
 
-The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: the ".mod.shda" file is usable by ESP-r. It features the newly calculated shading factors; the ".report.shda" file lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. Note that when the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor may be negative, and the irradiance ratio will be greater than 1.
+The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: a ".mod.shda" file which is usable by ESP-r and features the new shading factors; a ".report.shda" file which lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. When the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor can be negative, and the irradiance ratio is greater than 1.
 
 To this procedure another procedure can be chained to take additionally into account in the shading effect of the obstrucontions with respect to the radiation reflected from the ground.
 
-Finally, modish is capable of calculating the shading factors from scratch by the means of the Radiance raytracer.
+Finally, modish is capable of calculating the shading factors from scratch.
 
 At the moment, the documentation describing how these operations are obtained and other information is inserted at the beginning of the source code.
 
-The settings for managing modish are specified in a configuration file in the example folder and written as a comment at the beginning of the source code. This file must be named "modish_defaults.pl" and be placed in the same directory from which modish is called, together with the "fix.sh" and the "perlfix.pl" file.
+The settings for managing modish are specified in the "modish_defaults.pl" configuration file in the example folder and also written as a comment at the beginning of the source code. This file must be placed in the same directory from which modish is called, together with the files "fix.sh" and the "perlfix.pl".
 
 To launch modish, if it is installed as a Perl module:
 
@@ -6755,7 +6773,7 @@ modish( "PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg", zone_number, surface_1_numbe
 Example:
 modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );
 
-If instead the file Modish.pm is used by itself, as a script, it has to be launched from the command like with:
+If instead the file Modish.pm is used as a script, it has to be launched from the command like with:
 
 perl ./modish PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg zone_number surface_1_number surface_2_number surface_n_number
 
@@ -6763,17 +6781,15 @@ For example:
 
 perl ./modish.pl/home/x/model/cfg/model.cfg 1 7 9 (which means: calculate for zone 1, surfaces 7 and 9.)
 
-The path of the ESP-r model configuration path has to be specified in full, like in the example above.
+The path of the ESP-r model configuration file has to be specified in full, like in the example above.
 
-To be sure that the code works as a script, the header "package" etc. should be transformed in a comment.
+To be sure that the code works as a script, the header "package" etc. should be transformed into a comment.
 
 In calculating the irradiance ratios, the program defaults to: 5 direction vectors; diffuse reflections: 2 ; direct reflections: 7; surface grid: 2 x 2; distance from the surface for calculating the irradiances: 0.01 (metres).
 
-For the program to work correctly, the materials, construction and optics databases must be local to the ESP-r model.
+For the program to work correctly, the ESP-r model materials, construction and optics databases must be local to the model.
 
-modish should works with Linux and hopefully still the Mac.
-
-Here below is an example of configuration file ("modish_defaults.pl") that the author uses. Explanations are written in the comments at the beginning of the source code.
+Here below is an example of configuration file. Explanations are written in the comments at the beginning of the source code.
 
 
 ___
@@ -6793,7 +6809,7 @@ $add = " -ad 512 -aa 0.5 -dc .25 -dr 2 -ss 1 -st .05 -ds .04 -dt .02 -bv "; #RAD
 
 =head1 AUTHOR
 
-Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
+Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>. The subroutine "createconstrdbfile" has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
 
 =head1 COPYRIGHT AND LICENSE
 

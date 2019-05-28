@@ -39,7 +39,7 @@ sub test_html_2 : Test(1) {
     );
 
     my $c = Quiq::Html::Fragment->new(
-        html=>$h->tag('div',
+        html => $h->tag('div',
             'Ein Test'
         ),
     );
@@ -60,7 +60,7 @@ sub test_html_3 : Test(1) {
             }
         |),
         $h->tag('div',
-            id=>'container',
+            id => 'container',
             'Ein Test',
         ),
         $h->tag('script',q|
@@ -71,22 +71,22 @@ sub test_html_3 : Test(1) {
     );
 
     my $c = Quiq::Html::Fragment->new(
-        styleSheet=>q|
+        styleSheet => q|
             #container {
                 background-color: red;
             }
         |,
-        html=>$h->tag('div',
-            id=>'container',
+        html => $h->tag('div',
+            id => 'container',
             '__TEXT__'
         ),
-        javaScript=>q|
+        javaScript => q|
             $(function() {
                 alert('ready');
             });
         |,
-        placeholders=>[
-            __TEXT__=>'Ein Test',
+        placeholders => [
+            __TEXT__ => 'Ein Test',
         ],
     );
 

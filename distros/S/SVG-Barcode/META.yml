@@ -3,7 +3,6 @@ abstract: 'Base class for SVG 1D and 2D codes'
 author:
   - 'Rolf Stöckli <tekki@cpan.org>'
 build_requires:
-  Mock::MonkeyPatch: '0.04'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -24,6 +23,6 @@ resources:
   bugtracker: https://github.com/Tekki/svg-barcode/issues
   homepage: https://github.com/Tekki/svg-barcode
   repository: https://github.com/Tekki/svg-barcode.git
-version: '0.02'
+version: '0.10'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

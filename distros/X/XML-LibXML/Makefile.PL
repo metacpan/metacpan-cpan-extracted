@@ -15,17 +15,12 @@
 use strict;
 use warnings;
 
-require 5.008;
+require 5.008001;
 
 use Alien::Libxml2;
 use ExtUtils::MakeMaker;
 use Config;
 
-my %BuildReqs = (
-  "Alien::Libxml2" => 0,
-  "Config" => 0,
-  "ExtUtils::MakeMaker" => 0,
-);
 my %ConfigReqs = (
   "Alien::Libxml2" => 0,
   "Config" => 0,
@@ -38,6 +33,7 @@ my %DevReqs = (
   'Test::TrailingSpace' => 0,
 );
 my %TestReqs = (
+  "Config" => 0,
   "Errno" => 0,
   "IO::File" => 0,
   "IO::Handle" => 0,
@@ -48,7 +44,6 @@ my %TestReqs = (
   "utf8" => 0,
 );
 my %prereqs = (
-  "Alien::Libxml2" => 0,
   "Carp" => 0,
   "DynaLoader" => 0,
   "Encode" => 0, # actually used in one module. requires Perl 5.8+
@@ -83,6 +78,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl_5",
   "ABSTRACT" => "Interface to Gnome libxml2 xml parsing and DOM library",
   "AUTHOR" => "Petr Pajas <PAJAS\@cpan.org>",
+  "MIN_PERL_VERSION" => '5.008001',
   "VERSION_FROM" => "LibXML.pm",
   'META_MERGE' => {
     'dynamic_config' => 0,
@@ -113,7 +109,6 @@ my %WriteMakefileArgs = (
       "xs",
     ],
   },
-  "BUILD_REQUIRES" => \%BuildReqs,
   "CONFIGURE_REQUIRES" => \%ConfigReqs,
   "TEST_REQUIRES" => \%TestReqs,
   "PREREQ_PM" => \%prereqs,
@@ -127,14 +122,16 @@ my %WriteMakefileArgs = (
     %xsbuild,
 );
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
-    my %fallback = (%prereqs, %TestReqs, %BuildReqs);
+    my %fallback = (%prereqs, %TestReqs);
     delete $WriteMakefileArgs{TEST_REQUIRES};
-    delete $WriteMakefileArgs{BUILD_REQUIRES};
     $WriteMakefileArgs{PREREQ_PM} = \%fallback;
 }
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION('6.52') };
+
+delete $WriteMakefileArgs{MIN_PERL_VERSION}
+  unless eval { ExtUtils::MakeMaker->VERSION('6.48') };
 
 delete $WriteMakefileArgs{META_MERGE}
   unless eval { ExtUtils::MakeMaker->VERSION('6.46') };

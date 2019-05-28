@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -27,7 +27,7 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert eine SSH-Verbindung zu einem Host.
 Über die Verbindung können Shell-Kommandos ausgeführt werden. Die
-Klasse ist ein Wrapper um die Klasse Net::SSH::Perl, die das
+Klasse ist ein Wrapper fr die Klasse Net::SSH::Perl, die das
 SSH Netzprotokoll direkt spricht.
 
 =head1 EXAMPLE
@@ -64,6 +64,10 @@ Hostname
 
 Schreibe Debug-Information über die SSH-Kommunikation nach STDERR.
 
+=item -loginShell => $bool (Default: 1)
+
+Default für Methode exec(): Führe Kommandos per Login-Shell aus.
+
 =item -user => $user (Default: I<Wert von $USER>)
 
 Name des Benutzers.
@@ -91,6 +95,7 @@ sub new {
 
     my ($argA,$opt) = Quiq::Parameters->extractToObject(\@_,1,1,
         -debug => 0,
+        -loginShell => 1,
         -user => $ENV{'USER'},
     );
     my $host = shift @$argA;
@@ -98,6 +103,7 @@ sub new {
     # Operation ausführen
 
     my $obj = Net::SSH::Perl->new($host,
+        # interactive => 0,
         debug => $opt->debug,
     );
 
@@ -107,12 +113,15 @@ sub new {
     if ($@) {
         $@ =~ s/ at .*//;
         $class->throw(
-            q~SSH-00099: Login failed~,
+            'SSH-00099: Login failed',
             Reason => $@,
         );
     }
 
+    # Objekt instantiieren
+
     return $class->SUPER::new(
+        loginShell => $opt->loginShell,
         obj => $obj,
     );
 }
@@ -132,7 +141,7 @@ sub new {
 
 =over 4
 
-=item $cmd
+=item $cmd (String)
 
 Kommandozeile
 
@@ -142,7 +151,7 @@ Kommandozeile
 
 =over 4
 
-=item -login => $bool (Default: 1)
+=item -loginShell => $bool (Default: I<Wert der Option beim Konstruktor>)
 
 Führe das Remote-Kommando unter einer Login-Shell aus. Als Shell
 wird die bash verwendet.
@@ -160,15 +169,16 @@ liefere den Exitcode als dritten Returnwert zurück.
 
 =item $stdout
 
-Ausgabe des Kommandos auf stdout.
+Ausgabe des Kommandos auf stdout (String).
 
 =item $stderr
 
-Ausgabe des Kommandos auf stderr.
+Ausgabe des Kommandos auf stderr (String).
 
 =item $exit
 
-Exitcode des Kommandos. Ist immer 0, außer wenn -sloppy=>1 gesetzt ist.
+Exitcode des Kommandos (Integer). Wird gesetzt, wenn -sloppy=>1 ist,
+sonst konstant 0.
 
 =back
 
@@ -182,25 +192,25 @@ sub exec {
 
     # Argumente und Optionen
 
-    my $login = 1;
+    my $loginShell = $self->get('loginShell');
     my $sloppy = 0;
 
     my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
-        -login => \$login,
+        -loginShell => \$loginShell,
         -sloppy => \$sloppy,
     );
     my $cmd = shift @$argA;
 
     # Operation ausführen
 
-    if ($login) {
+    if ($loginShell) {
         # Login-Shell
 
         $cmd =~ s/'/\\'/g; # Single Quotes schützen
         $cmd = "/bin/bash -lc '$cmd'";
     }
 
-    my ($stdout,$stderr,$exit) = $self->obj->cmd($cmd,'');
+    my ($stdout,$stderr,$exit) = $self->obj->cmd($cmd);
     $exit //= 0;
     if (!$sloppy) {
         # $exit ist als Exitcode kodiert
@@ -214,7 +224,7 @@ sub exec {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

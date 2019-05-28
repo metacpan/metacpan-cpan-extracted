@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Pod::WSDL ();
 use SOAP::Transport::HTTP ();
@@ -197,12 +197,12 @@ sub run {
         # Generiere WSDL-Spezifikation und schreibe sie nach STDOUT
 
         my $wsdl = Pod::WSDL->new(
-            source=>$class, 
-            location=>$ENV{'SCRIPT_URI'} ||
+            source => $class, 
+            location => $ENV{'SCRIPT_URI'} ||
                 "$ENV{'REQUEST_SCHEME'}://$ENV{'SERVER_NAME'}".
                 "$ENV{'REQUEST_URI'}",
-            pretty=>1,
-            withDocumentation=>0,
+            pretty => 1,
+            withDocumentation => 0,
         );
         print "Content-Type: text/xml\n\n",$wsdl->WSDL;
     }
@@ -217,7 +217,7 @@ sub run {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

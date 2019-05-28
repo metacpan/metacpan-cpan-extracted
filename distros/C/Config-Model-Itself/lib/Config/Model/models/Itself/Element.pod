@@ -239,7 +239,7 @@ allow
 
 =head2 help
 
-Specify help string applicable to values. The keys are regexp matched to the beggining of the value. See C<help> parameter of L<Config::Model::Value/DESCRIPTION> for more possibilities. I< Optional. Type hash of string.  > 
+Specify help string applicable to values. The keys are regexp matched to the beginning of the value. See C<help> parameter of L<Config::Model::Value/DESCRIPTION> for more possibilities. I< Optional. Type hash of string.  > 
 
 =head2 status
 

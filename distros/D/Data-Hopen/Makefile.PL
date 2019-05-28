@@ -173,20 +173,27 @@ my %opts = (
         'Pod::Text' => '0',         # pod2text
     },
     TEST_REQUIRES => {
+        'Capture::Tiny' => '0',
         'Carp' => '0',
         'Exporter' => '0',
         'Import::Into' => '0',
+        'List::AutoNumbered' => '0.000006',
+        'Quote::Code' => '1.0102',
         'rlib' => '0',
         'Scalar::Util' => '0',
-        'Test::Deep' => '0.084',        # for superhashof
+        'Sub::Identify' => '0.14',
+        'Test::Deep' => '0.098',        # for superhashof, Test::Deep::NoTest
         ## 'Test::Directory' => '0.02',    # for subdirs
+        'Test::Fatal' => '0.014',
         'Test::More' => '0',
         # Test::TempDir::Tiny?  If so, remove Test::Directory dependency?
+        'Test::Warn' => '0.35',     # for metadata
     },
     PREREQ_PM => {
         #'Algorithm::Dependency' => '1.106',
             # - Probably don't need this; we can use Graph::topological_sort().
 
+        #'base' => '0',                  # as used by Hash::Merge
         'Carp' => '0',
 
         'Class::Method::Modifiers' => '2.10',   # most recent code change
@@ -197,10 +204,9 @@ my %opts = (
             # - Looks like it might be handy.
             # 0.002+ because that has only core dependencies.
 
-        #'Class::Method::Modifiers' => '1.05',  # version nums from Antlers
-        #'Role::Tiny' => '1.000000',
 
         ## 'Class::XPath' => '1.4',
+        #'Clone::Choose' => '0.008',     # as used by Hash::Merge
         'Config' => '0',
         #'Cwd' => '0',
 
@@ -250,6 +256,8 @@ my %opts = (
         ## 'Pod::Usage' => '0',
         # 'Probe::Perl' => '0', # For perl interpreter file location or other info.
                                 # Alternative: Padre::Perl
+
+        #'Role::Tiny' => '1.000000',            # version num from Antlers
 
         'Scalar::Util' => '0',
         'Set::Scalar' => '1.27',    # For correct metadata

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Fcntl ();
 use DB_File ();
@@ -71,8 +71,8 @@ sub new {
     }
     else {
         $class->throw(
-            q~BDB-00001: Unbekannter Mode~,
-            Mode=>$mode,
+            'BDB-00001: Unbekannter Mode',
+            Mode => $mode,
         );
     }
 
@@ -81,10 +81,10 @@ sub new {
         $DB_File::DB_HASH;
     unless ($ref) {
         $class->throw(
-            q~BDB-00001: Kann Persistenten Hash nicht öffnen~,
-            File=>$file,
-            Mode=>$mode,
-            Errstr=>$!,
+            'BDB-00001: Kann Persistenten Hash nicht öffnen',
+            File => $file,
+            Mode => $mode,
+            Errstr => $!,
         );
     }
 
@@ -113,12 +113,12 @@ sub sync {
     my $self = shift;
 
     my $x = tied %$self || $self->throw(
-        q~BDB-00002: Kann Tie-Objekt nicht ermitteln~,
+        'BDB-00002: Kann Tie-Objekt nicht ermitteln',
     );
     if ($x->sync < 0) {
         $self->throw(
-            q~BDB-00003: Sync ist fehlgeschlagen~,
-            Errstr=>$!,
+            'BDB-00003: Sync ist fehlgeschlagen',
+            Errstr => $!,
         );
     }
 
@@ -147,7 +147,7 @@ sub close {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

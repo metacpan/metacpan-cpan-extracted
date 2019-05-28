@@ -10,6 +10,7 @@ use Path::Tiny;
 use Config::Model::Itself ;
 use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use Test::Memory::Cycle;
+use Test::File::Contents;
 
 use warnings;
 use strict;
@@ -169,6 +170,9 @@ my $rw_obj2 = Config::Model::Itself -> new(
 ) ;
 
 $rw_obj2 -> write_all();
+
+my $written_model_file = $wr_model2->child("models/MasterModel.pl");
+file_contents_like  $written_model_file,  qr/use strict;/,  "stricture was added when writing file";
 
 # create 3rd instance 
 

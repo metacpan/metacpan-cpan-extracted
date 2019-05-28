@@ -1,8 +1,9 @@
 # Data::Hopen::Scope::Hash - a hash-based nested key-value store based
+# TODO handle $set == FIRST_ONLY
 package Data::Hopen::Scope::Hash;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 use parent 'Data::Hopen::Scope';
 use Class::Tiny {
@@ -40,23 +41,6 @@ Not used, but provided so you can use L<Data::Hopen/hnew> to make Scopes.
 
 =head1 METHODS
 
-See also L</add>, below, which is part of the public API.
-
-Several of the functions receive a C<$levels> parameter.  Its meaning is:
-
-=over
-
-=item *
-
-If C<$levels> is provided and nonzero, go up that many more levels
-(i.e., C<$levels==0> means only return this scope's local names).
-
-=item *
-If C<$levels> is not provided or not defined, go all the way to the
-outermost Scope.
-
-=back
-
 =cut
 
 # }}}1
@@ -72,33 +56,39 @@ sub _set0 {
     return true;
 } #_set0()
 
-=head1 FUNCTIONS TO BE OVERRIDDEN IN SUBCLASSES
+=head2 put
 
-To implement a Scope with a different data-storage model than the hash
-this class uses, subclass Scope and override these functions.  Only L</add>
-is part of the public API.
-
-=head2 add
-
-Add key-value pairs to this scope.  Returns the scope so you can
-chain.  Example usage:
-
-    my $scope = Data::Hopen::Scope::Hash->new()->add(foo => 1);
-
-C<add> is responsible for handling any conflicts that may occur.  In this
+Add key-value pairs to this scope.  See L<Data::Hopen::Scope/put>.  In this
 particular implementation, the last-added value for a particular key wins.
 
 TODO add $set option
 
 =cut
 
-sub add {
+sub put {
     my $self = shift or croak 'Need an instance';
     croak "Got an odd number of parameters" if @_%2;
     my %new = @_;
     @{$self->_content}{keys %new} = values %new;
     return $self;
 } #add()
+
+=head2 merge
+
+Merge in values.  See L<Data::Hopen::Scope/merge>.
+
+=cut
+
+sub merge {
+    my $self = shift or croak 'Need an instance';
+    croak "Got an odd number of parameters" if @_%2;
+    my %new = @_;
+
+    my $merger = $self->_merger;
+    $self->_content($merger->merge($self->_content, \%new));
+
+    return $self;
+} #merge()
 
 =head2 adopt_hash
 

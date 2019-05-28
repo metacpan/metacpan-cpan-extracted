@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Quiq - Class library for rapid development
 =head1 DESCRIPTION
 
 Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
-die ich in Perl-Projekten einsetze. Sie sind nach
+die ich in Perl-Projekten (nur Unix) einsetze. Sie sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
 
@@ -686,7 +686,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

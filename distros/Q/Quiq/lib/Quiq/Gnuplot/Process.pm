@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Gnuplot::Plot;
 use Quiq::FileHandle;
@@ -50,8 +50,8 @@ sub new {
     $fh->autoFlush;
 
     my $self = $class->SUPER::new(
-        debug=>0,
-        fh=>$fh,
+        debug => 0,
+        fh => $fh,
     );
     $self->set(@_);
     
@@ -330,7 +330,7 @@ sub print {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

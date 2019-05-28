@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -91,17 +91,17 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        disabled=>0,
-        hidden=>0,
-        id=>undef,
-        label=>'',
-        name=>undef,
-        onClick=>undef,
-        option=>undef,
-        style=>undef,
-        title=>undef,
-        value=>undef,
+        class => undef,
+        disabled => 0,
+        hidden => 0,
+        id => undef,
+        label => '',
+        name => undef,
+        onClick => undef,
+        option => undef,
+        style => undef,
+        title => undef,
+        value => undef,
     );
     $self->set(@_);
 
@@ -140,17 +140,17 @@ sub html {
     }
 
     my $html .= $h->tag('input',
-        -nl=>0,
-        type=>'checkbox',
-        id=>$id,
-        name=>$name,
-        class=>$class,
-        style=>$style,
-        disabled=>$disabled,
-        value=>$option,
-        checked=>defined($value) && $value eq $option? 1: 0,
-        title=>$title,
-        onclick=>$onClick,
+        -nl => 0,
+        type => 'checkbox',
+        id => $id,
+        name => $name,
+        class => $class,
+        style => $style,
+        disabled => $disabled,
+        value => $option,
+        checked => defined($value) && $value eq $option? 1: 0,
+        title => $title,
+        onclick => $onClick,
     );
     if ($label ne '') {
         $html .= $label;
@@ -164,7 +164,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

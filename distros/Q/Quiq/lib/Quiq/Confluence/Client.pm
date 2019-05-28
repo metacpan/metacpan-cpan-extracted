@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use LWP::UserAgent ();
 use Quiq::Option;
@@ -585,7 +585,7 @@ sub send {
     my $res = $ua->request($req);
     if (!$res->is_success) {
         $self->throw(
-            q~CLIENT-00001: HTTP request failed~,
+            'CLIENT-00001: HTTP request failed',
             StatusLine => $res->status_line,
             Response => $res->content,
         );
@@ -660,7 +660,7 @@ sub url {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use namespace::autoclean;
 with 'Test::DBChanges::Role::DBI',
     'Test::DBChanges::Role::Pg';
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 # ABSTRACT: track changes to PostgreSQL tables
 
 
@@ -23,7 +23,7 @@ Test::DBChanges::Pg - track changes to PostgreSQL tables
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,8 @@ version 1.0.0
 =head1 DESCRIPTION
 
 This class installs a set of triggers in the database, that record all
-changes (insert, update, delete) to a set of tables.
+changes (insert, update, delete) to a set of tables. This requires
+PostgreSQL version 9.4 at least, because it uses the C<JSONB> type.
 
 It can then parse this record into a
 L<changeset|Test::DBChanges::ChangeSet>, which will build hashrefs

@@ -1,36 +1,21 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-#    Copyright (c) 2008,2010 Dominique Dumont.
-#
-#    This file is part of Config-Model-Itself.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+package Config::Model::Itself::TkEditUI 2.018;
 
-package Config::Model::Itself::TkEditUI ;
-$Config::Model::Itself::TkEditUI::VERSION = '2.016';
 use strict;
 use warnings ;
 use Carp ;
 use 5.10.0;
+
+use Config::Model::TkUI 1.370;
+
 
 use base qw/Config::Model::TkUI/;
 
@@ -72,7 +57,7 @@ sub build_menu {
     my $cw = shift ;
 
     # search for config_dir override
-    my $root = $cw->{root};
+    my $root = $cw->{instance}->config_root;
     my $items = [];
     my %app;
 
@@ -91,7 +76,7 @@ sub test_model {
     my $cw = shift ;
     my $app = shift;
 
-    if ( $cw->{root}->instance->needs_save ) {
+    if ( $cw->{instance}->needs_save ) {
         my $answer = $cw->Dialog(
             -title          => "save model before test",
             -text           => "Save model ?",
@@ -113,6 +98,7 @@ sub test_model {
         $cw->_launch_test($app);
     }
 }
+
 sub _launch_test {
     my $cw = shift ;
     my $app = shift;
@@ -127,18 +113,19 @@ sub _launch_test {
     $cw->{test_model} =  $model ;
 
     my %args = ( root_dir => $cw->{root_dir} );
+    my $root = $cw->{instance}->config_root;
 
-    $args{root_class_name} = $app ? $cw->{root}->grab_value("application:$app model") : $cw->{model_name};
+    $args{root_class_name} = $app ? $root->grab_value("application:$app model") : $cw->{model_name};
     $args{instance_name} = $app ? "test $app" : $cw->{model_name};
 
     if ($app) {
         $args{application} = $app;
-        $args{config_dir} = $cw->{root}->grab_value("application:$app config_dir");
+        $args{config_dir} = $root->grab_value("application:$app config_dir");
     }
 
-    my $root = $model->instance ( %args )-> config_root ;
+    my $instance_to_test = $model->instance ( %args ) ;
 
-    $cw -> {test_widget} = $cw->ConfigModelUI (-root => $root, -quit => 'soft') ;
+    $cw -> {test_widget} = $cw->ConfigModelUI (-instance => $instance_to_test, -quit => 'soft') ;
 }
 
 1;

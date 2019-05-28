@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::OrderedHash;
 use Quiq::FileHandle;
@@ -81,9 +81,9 @@ sub new {
 
     my $oh = Quiq::OrderedHash->new;
     my $self = $class->SUPER::new(
-        file=>$file,
-        oHash=>$oh,
-        imageList=>$lst,
+        file => $file,
+        oHash => $oh,
+        imageList => $lst,
     );
 
     # Sequenz-Definitionen einlesen.
@@ -103,11 +103,11 @@ sub new {
         if (@arr < 2 || @arr > 3) {
             # Prüfe Dateiaufbau
             $self->throw(
-                q~SEQ-00001: Falsche Kolumnen-Anzahl~,
-                File=>$file,
-                Line=>$.,
-                MaxColumns=>3,
-                Columns=>scalar(@arr),
+                'SEQ-00001: Falsche Kolumnen-Anzahl',
+                File => $file,
+                Line => $.,
+                MaxColumns => 3,
+                Columns => scalar(@arr),
             );
         }
         my $key = shift @arr;
@@ -202,9 +202,9 @@ sub def {
     my ($self,$key) = @_;
     my $arr = $self->oHash->get($key) || do {
         $self->throw(
-            q~IMGSET-00002: Schlüssel existiert nicht~,
-            File=>$self->file,
-            Key=>$key,
+            'IMGSET-00002: Schlüssel existiert nicht',
+            File => $self->file,
+            Key => $key,
         );
     };
     return wantarray? @$arr: $arr;
@@ -378,7 +378,7 @@ sub images {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

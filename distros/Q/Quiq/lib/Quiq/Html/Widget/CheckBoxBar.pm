@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Html::Widget::CheckBox;
 
@@ -107,19 +107,19 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        disabled=>0,
-        hidden=>0,
-        id=>undef,
-        labels=>[],
-        name=>undef,
-        onClick=>[],
-        options=>[],
-        orientation=>'h',
-        buttonClass=>undef,
-        style=>undef,
-        titles=>[],
-        values=>[],
+        class => undef,
+        disabled => 0,
+        hidden => 0,
+        id => undef,
+        labels => [],
+        name => undef,
+        onClick => [],
+        options => [],
+        orientation => 'h',
+        buttonClass => undef,
+        style => undef,
+        titles => [],
+        values => [],
     );
     $self->set(@_);
 
@@ -168,11 +168,11 @@ sub html {
     @values{@$valueA} = (1) x @$valueA;
 
     return $h->tag('span',
-        -fmt=>'v', # generierten Code einzeilig belassen
-        -ignoreTagIf=>!$id && !$class && !$style,
-        id=>$id,
-        class=>$class,
-        style=>$style,
+        -fmt => 'v', # generierten Code einzeilig belassen
+        -ignoreTagIf => !$id && !$class && !$style,
+        id => $id,
+        class => $class,
+        style => $style,
         do {
             my $html;
             for (my $i = 0; $i < @$optionA; $i++) {
@@ -182,14 +182,14 @@ sub html {
                     $html .= $orientation eq 'v'? $h->tag('br',-nl=>0): ' ';
                 }
                 $html .= Quiq::Html::Widget::CheckBox->html($h,
-                    class=>$buttonClass,
-                    disabled=>$disabled,
-                    label=>$labelA->[$i] // $option,
-                    name=>$name,
-                    onClick=>$onClickA->[$i],
-                    option=>$option,
-                    title=>$titleA->[$i],
-                    value=>$values{$option}? $option: undef,
+                    class => $buttonClass,
+                    disabled => $disabled,
+                    label => $labelA->[$i] // $option,
+                    name => $name,
+                    onClick => $onClickA->[$i],
+                    option => $option,
+                    title => $titleA->[$i],
+                    value => $values{$option}? $option: undef,
                 );
                 chomp $html;
             }
@@ -202,7 +202,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

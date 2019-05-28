@@ -33,9 +33,11 @@
       },
       "runtime" : {
          "requires" : {
+            "CGI" : "0",
             "DBI" : "0",
             "IO::CaptureOutput" : "0",
             "IO::Scalar" : "0",
+            "Locale::Recode" : "0",
             "Log::Trace" : "0",
             "Test::Assertions" : "0",
             "Test::Assertions::TestScript" : "0",
@@ -52,6 +54,6 @@
          "web" : "https://github.com/mgualdron/SQL-Shell"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

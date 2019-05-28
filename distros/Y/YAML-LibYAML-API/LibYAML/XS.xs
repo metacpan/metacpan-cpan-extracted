@@ -117,17 +117,22 @@ parse_filehandle_events(FILE *fh, AV *perl_events)
 
 
 SV *
-emit_string_events(AV *perl_events)
+emit_string_events(AV *perl_events, HV *options)
     CODE:
     {
         dXCPT;
         yaml_emitter_t emitter;
+        SV **val;
         SV *yaml = newSVpvn("", 0);
 
         XCPT_TRY_START
         {
             if (!yaml_emitter_initialize(&emitter)) {
                 croak("%s\n", "Could not initialize the emitter object");
+            }
+            val = hv_fetch(options, "indent", 6, TRUE);
+            if (val && SvOK(*val) && SvIOK( *val )) {
+                yaml_emitter_set_indent(&emitter, SvIV(*val));
             }
             yaml_emitter_set_output(&emitter, &append_output, (void *) yaml);
             yaml_emitter_set_canonical(&emitter, 0);
@@ -154,11 +159,12 @@ emit_string_events(AV *perl_events)
     OUTPUT: RETVAL
 
 SV *
-emit_file_events(const char *filename, AV *perl_events)
+emit_file_events(const char *filename, AV *perl_events, HV *options)
     CODE:
     {
         dXCPT;
         yaml_emitter_t emitter;
+        SV **val;
         SV *yaml = newSVpvn("", 0);
         FILE *output;
 
@@ -166,6 +172,10 @@ emit_file_events(const char *filename, AV *perl_events)
         {
             if (!yaml_emitter_initialize(&emitter)) {
                 croak("%s\n", "Could not initialize the emitter object");
+            }
+            val = hv_fetch(options, "indent", 6, TRUE);
+            if (val && SvOK(*val) && SvIOK( *val )) {
+                yaml_emitter_set_indent(&emitter, SvIV(*val));
             }
             output = fopen(filename, "wb");
             yaml_emitter_set_output_file(&emitter, output);
@@ -197,11 +207,12 @@ emit_file_events(const char *filename, AV *perl_events)
     OUTPUT: RETVAL
 
 SV *
-emit_filehandle_events(FILE *output, AV *perl_events)
+emit_filehandle_events(FILE *output, AV *perl_events, HV *options)
     CODE:
     {
         dXCPT;
         yaml_emitter_t emitter;
+        SV **val;
         SV *yaml = newSVpvn("", 0);
 
         XCPT_TRY_START
@@ -209,6 +220,12 @@ emit_filehandle_events(FILE *output, AV *perl_events)
             if (!yaml_emitter_initialize(&emitter)) {
                 croak("%s\n", "Could not initialize the emitter object");
             }
+
+            val = hv_fetch(options, "indent", 6, TRUE);
+            if (val && SvOK(*val) && SvIOK( *val )) {
+                yaml_emitter_set_indent(&emitter, SvIV(*val));
+            }
+
             yaml_emitter_set_output_file(&emitter, output);
             yaml_emitter_set_canonical(&emitter, 0);
             yaml_emitter_set_unicode(&emitter, 0);

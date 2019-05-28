@@ -1,7 +1,7 @@
 package Calendar::Dates::CFA;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-05-25'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,25 @@ use Role::Tiny::With;
 
 with 'Calendar::DatesRoles::DataPreparer::CalendarVar::FromData';
 with 'Calendar::DatesRoles::DataUser::CalendarVar';
+
+sub filter_entry {
+    my ($self, $entry, $params) = @_;
+
+    if (defined(my $mon = $params->{exam_month})) {
+        $mon eq 'jun' || $mon eq 'dec' or die "Invalid exam_month, please specify either jun/dec";
+        return 0 unless grep { /\A$mon/ } @{ $entry->{tags} // [] };
+    }
+    if (defined(my $lvl = $params->{exam_level})) {
+        my $mentions_lvl1 = $entry->{summary} =~ /levels? I\b/i;
+        my $mentions_lvl2 = $entry->{summary} =~ /levels? II & III\b/i;
+        my $mentions_lvl3 = $entry->{summary} =~ /levels? II & III\b/i;
+        my $is_dec = grep { /\Adec/ } @{ $entry->{tags} // [] };
+        return 0 if $lvl == 1 && !$mentions_lvl1 && ($mentions_lvl2 || $mentions_lvl3);
+        return 0 if $lvl == 2 && $is_dec || !$mentions_lvl2 && ($mentions_lvl1 || $mentions_lvl3);
+        return 0 if $lvl == 3 && $is_dec || !$mentions_lvl3 && ($mentions_lvl1 || $mentions_lvl2);
+    }
+    1;
+}
 
 1;
 # ABSTRACT: CFA exam calendar
@@ -25,7 +44,7 @@ Calendar::Dates::CFA - CFA exam calendar
 
 =head1 VERSION
 
-This document describes version 0.005 of Calendar::Dates::CFA (from Perl distribution Calendar-Dates-CFA), released on 2019-02-15.
+This document describes version 0.007 of Calendar::Dates::CFA (from Perl distribution Calendar-Dates-CFA), released on 2019-05-25.
 
 =head1 SYNOPSIS
 
@@ -33,7 +52,7 @@ This document describes version 0.005 of Calendar::Dates::CFA (from Perl distrib
 
  use Calendar::Dates::CFA;
  my $min_year = Calendar::Dates::CFA->get_min_year; # => 2018
- my $max_year = Calendar::Dates::CFA->get_max_year; # => 2019
+ my $max_year = Calendar::Dates::CFA->get_max_year; # => 2020
  my $entries  = Calendar::Dates::CFA->get_entries(2019);
 
 C<$entries> result:
@@ -152,10 +171,26 @@ C<$entries> result:
      year    => 2019,
    },
    {
+     date    => "2019-12-03",
+     day     => 3,
+     month   => 12,
+     summary => "Test center change request submission deadline",
+     tags    => ["dec2019exam"],
+     year    => 2019,
+   },
+   {
      date    => "2019-12-07",
      day     => 7,
      month   => 12,
      summary => "Exam day",
+     tags    => ["dec2019exam"],
+     year    => 2019,
+   },
+   {
+     date    => "2019-12-08",
+     day     => 8,
+     month   => 12,
+     summary => "Religious alternate exam date",
      tags    => ["dec2019exam"],
      year    => 2019,
    },
@@ -176,41 +211,70 @@ This module provides CFA exam calendar using the L<Calendar::Dates> interface.
  | key           | value |
  +---------------+-------+
  | Earliest year | 2018  |
- | Latest year   | 2019  |
+ | Latest year   | 2020  |
  +---------------+-------+
 
 =head1 DATES SAMPLES
 
 Entries for year 2018:
 
- +------------+-----+-------+-----------------------------------------------------+-------------+------+
- | date       | day | month | summary                                             | tags        | year |
- +------------+-----+-------+-----------------------------------------------------+-------------+------+
- | 2018-10-15 | 15  | 10    | First deadline to request disability accommodations | jun2019exam | 2018 |
- | 2018-10-17 | 17  | 10    | Early registration fee deadline                     | jun2019exam | 2018 |
- +------------+-----+-------+-----------------------------------------------------+-------------+------+
+ +------------+-----------------------------------------------------+-------------+
+ | date       | summary                                             | tags        |
+ +------------+-----------------------------------------------------+-------------+
+ | 2018-10-15 | First deadline to request disability accommodations | jun2019exam |
+ | 2018-10-17 | Early registration fee deadline                     | jun2019exam |
+ +------------+-----------------------------------------------------+-------------+
 
 Entries for year 2019:
 
- +------------+-----+-------+--------------------------------------------------------------------------+-------------+------+
- | date       | day | month | summary                                                                  | tags        | year |
- +------------+-----+-------+--------------------------------------------------------------------------+-------------+------+
- | 2019-01-23 | 23  | 1     | Exam results announcement (Dec 2018, Levels I & II)                      | dec2018exam | 2019 |
- | 2019-02-13 | 13  | 2     | Standard registration fee deadline                                       | jun2019exam | 2019 |
- | 2019-02-18 | 18  | 2     | Second deadline to request disability accommodations                     | jun2019exam | 2019 |
- | 2019-03-13 | 13  | 3     | Final (late) registration fee deadline                                   | jun2019exam | 2019 |
- | 2019-03-18 | 18  | 3     | Final deadline to request disability accommodations                      | jun2019exam | 2019 |
- | 2019-06-11 | 11  | 6     | Deadline for submission of test center change requests                   | jun2019exam | 2019 |
- | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2019exam | 2019 |
- | 2019-06-16 | 16  | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2019exam | 2019 |
- | 2019-06-16 | 16  | 6     | Religious alternate exam date (Americas and EMEA, all levels)            | jun2019exam | 2019 |
- | 2019-06-17 | 17  | 6     | Religious alternate exam date (Asia Pacific, all levels)                 | jun2019exam | 2019 |
- | 2019-01-24 | 24  | 1     | Exam registration open                                                   | dec2019exam | 2019 |
- | 2019-03-27 | 27  | 3     | Early registration fee deadline                                          | dec2019exam | 2019 |
- | 2019-08-14 | 14  | 8     | Standard registration fee deadline                                       | dec2019exam | 2019 |
- | 2019-09-11 | 11  | 9     | Final (late) registration fee deadline                                   | dec2019exam | 2019 |
- | 2019-12-07 | 7   | 12    | Exam day                                                                 | dec2019exam | 2019 |
- +------------+-----+-------+--------------------------------------------------------------------------+-------------+------+
+ +------------+--------------------------------------------------------------------------+-------------+
+ | date       | summary                                                                  | tags        |
+ +------------+--------------------------------------------------------------------------+-------------+
+ | 2019-01-23 | Exam results announcement (Dec 2018, Levels I & II)                      | dec2018exam |
+ | 2019-02-13 | Standard registration fee deadline                                       | jun2019exam |
+ | 2019-02-18 | Second deadline to request disability accommodations                     | jun2019exam |
+ | 2019-03-13 | Final (late) registration fee deadline                                   | jun2019exam |
+ | 2019-03-18 | Final deadline to request disability accommodations                      | jun2019exam |
+ | 2019-06-11 | Deadline for submission of test center change requests                   | jun2019exam |
+ | 2019-06-15 | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2019exam |
+ | 2019-06-16 | Exam day: Asia-Pacific (Level I only)                                    | jun2019exam |
+ | 2019-06-16 | Religious alternate exam date (Americas and EMEA, all levels)            | jun2019exam |
+ | 2019-06-17 | Religious alternate exam date (Asia Pacific, all levels)                 | jun2019exam |
+ | 2019-01-24 | Exam registration open                                                   | dec2019exam |
+ | 2019-03-27 | Early registration fee deadline                                          | dec2019exam |
+ | 2019-08-14 | Standard registration fee deadline                                       | dec2019exam |
+ | 2019-09-11 | Final (late) registration fee deadline                                   | dec2019exam |
+ | 2019-12-03 | Test center change request submission deadline                           | dec2019exam |
+ | 2019-12-07 | Exam day                                                                 | dec2019exam |
+ | 2019-12-08 | Religious alternate exam date                                            | dec2019exam |
+ +------------+--------------------------------------------------------------------------+-------------+
+
+Entries for year 2020:
+
+ +------------+--------------------------------------------------------------------------+-------------+
+ | date       | summary                                                                  | tags        |
+ +------------+--------------------------------------------------------------------------+-------------+
+ | 2020-06-06 | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2020exam |
+ | 2020-06-07 | Exam day: Asia-Pacific (Level I only)                                    | jun2020exam |
+ +------------+--------------------------------------------------------------------------+-------------+
+
+=for Pod::Coverage ^(filter_entry)$
+
+=head1 PARAMETERS
+
+=head2 exam_month
+
+Can be used to select dates related to a certain exam month only. Value is
+either C<jun> or C<dec>. Example:
+
+ $entries = Calendar::Dates::CFA->get_entries({exam_month=>'jun'}, 2019);
+
+=head2 exam_level
+
+Can be used to select dates related to a certain exam level only. Value is
+either 1, 2, 3.
+
+ $entries = Calendar::Dates::CFA->get_entries({exam_level=>2}, 2019);
 
 =head1 HOMEPAGE
 
@@ -277,4 +341,11 @@ __DATA__
 2019-03-27;Early registration fee deadline;dec2019exam
 2019-08-14;Standard registration fee deadline;dec2019exam
 2019-09-11;Final (late) registration fee deadline;dec2019exam
+2019-12-03;Test center change request submission deadline;dec2019exam
 2019-12-07;Exam day;dec2019exam
+2019-12-08;Religious alternate exam date;dec2019exam
+
+# jun2020exam
+# 2019-08-xx;Exam registration open;jun2020exam
+2020-06-06;Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels);jun2020exam
+2020-06-07;Exam day: Asia-Pacific (Level I only);jun2020exam

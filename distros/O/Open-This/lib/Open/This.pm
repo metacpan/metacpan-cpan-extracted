@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -30,16 +30,27 @@ sub parse_text {
     my $file_name;
     my %parsed = ( original_text => $text );
 
-    $parsed{line_number} = _maybe_extract_line_number( \$text );
-    $parsed{sub_name}    = _maybe_extract_subroutine_name( \$text );
+    my ( $line, $col ) = _maybe_extract_line_number( \$text );
+    $parsed{line_number}   = $line;
+    $parsed{column_number} = $col if $col;
+    $parsed{sub_name}      = _maybe_extract_subroutine_name( \$text );
 
     # Is this is an actual file.
     $parsed{file_name} = $text if -e path($text);
+    if ( !exists $parsed{file_name} ) {
+        if ( my $bin = _which($text) ) {
+            $parsed{file_name} = $bin;
+            $text = $bin;
+        }
+    }
 
     $parsed{is_module_name} = is_module_name($text);
 
-    if ( !$parsed{file_name} && $parsed{is_module_name} ) {
-        $parsed{file_name} = _maybe_find_local_file($text);
+    if ( !$parsed{file_name} ) {
+        if ( my $is_module_name = is_module_name($text) ) {
+            $parsed{is_module_name} = $is_module_name;
+            $parsed{file_name}      = _maybe_find_local_file($text);
+        }
     }
 
     # This is a loadable module.  Have this come after the local module checks
@@ -107,6 +118,30 @@ sub editor_args_from_parsed_text {
     my $parsed = shift;
     return unless $parsed;
 
+    # See https://vi.stackexchange.com/questions/18499/can-i-open-a-file-at-an-arbitrary-line-and-column-via-the-command-line
+    if ( exists $parsed->{column_number} ) {
+        if ( $ENV{EDITOR} eq 'vim' || $ENV{EDITOR} eq 'vi' ) {
+            return (
+                sprintf(
+                    q{+call cursor(%i,%i)},
+                    $parsed->{line_number},
+                    $parsed->{column_number},
+                ),
+                $parsed->{file_name}
+            );
+        }
+        if ( $ENV{EDITOR} eq 'nano' ) {
+            return (
+                sprintf(
+                    q{+%i,%i},
+                    $parsed->{line_number},
+                    $parsed->{column_number},
+                ),
+                $parsed->{file_name}
+            );
+        }
+    }
+
     return (
         ( $parsed->{line_number} ? '+' . $parsed->{line_number} : () ),
         $parsed->{file_name}
@@ -121,6 +156,12 @@ sub _maybe_extract_line_number {
 
     if ( $$text =~ s{ line (\d+).*}{} ) {
         return $1;
+    }
+
+    # ripgrep (rg --vimgrep)
+    # ./lib/Open/This.pm:17:3
+    if ( $$text =~ s{(\w):(\d+):(\d+).*}{$1} ) {
+        return $2, $3;
     }
 
     # git-grep (don't match on ::)
@@ -183,6 +224,27 @@ sub _maybe_find_local_file {
     return undef;
 }
 
+# search for binaries in path
+
+sub _which {
+    my $maybe_file = shift;
+    return unless $maybe_file;
+
+    require_module('File::Spec');
+
+    # we only want binary names here -- no paths
+    my ( $volume, $dir, $file ) = File::Spec->splitpath($maybe_file);
+    return if $dir;
+
+    my @path = File::Spec->path;
+    for my $path (@path) {
+        my $abs = path( $path, $file );
+        return $abs->stringify if $abs->is_file;
+    }
+
+    return;
+}
+
 # ABSTRACT: Try to Do the Right Thing when opening files
 1;
 
@@ -198,7 +260,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head1 DESCRIPTION
 

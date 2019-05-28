@@ -1,181 +1,118 @@
-
-/*
-=head2 NAME
-
-    MySQL::Admin::Documentation
-
-=head2 SYNOPSIS
-
-    MySQL administration Web-App and Content Management System
-
-    cpan MySQL::Admin
-
-This System works like following: index.html 
-
-Css Overview:
-
-=begin html
-
-<pre>
-#############################################
-#  .window                                  #
-#  #######################################  #
-#  #.tab                                 #  #   
-#  #######################################  #
-#  #.menu                  #.content     #  #
-#  # ##################### #             #  # 
-#  # #.menuContainer     # #             #  #
-#  # #.verticalMenuLayout# #.ShowTables  #  #
-#  # #.menuCaption       # #.caption     #  #
-#  # #.menuContent       # #             #  #
-#  # ##################### #             #  #
-#  #                       #             #  #
-#  #######################################  #
-#                                           #
-#############################################
-</pre>
-
-=end html
-
-javascript/cms.js
-    
-      // In the  function init() a ( xmlhttprequest ) load the Content.
-      // <a onclick="requestURI('$ENV{SCRIPT_NAME}?action=HelloWorld','HelloWorld','HelloWorld')">HelloWorld</a>      
-
-=begin html
-
-<pre>
-      requestURI(
-        url,     // Script url  
-        id,      // Tabwidget id
-        txt,     // Tabwidget text
-        bHistory,// Browser History
-        formData,// Form Data 
-        method,  // Submit Type GET or POST
-       );
-    or 
-    <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
-    <input type="hidden" name="action" value="">
-</pre>
-
-=end html
-
-    since apache 2.x GET have maxrequestline so use POST for alarge requests.
-    
-    POST requests don't saved in the Browser history (back button ). 
-    
-install.sql
-
-    The actions will bill stored in actions.
-
-=begin html
-
-<pre>
-    INSERT INTO actions (
-        `action`, #Name of the action
-        `file`,   #file contain the code
-        `title`,  #title 
-        `right`,  #right 0 guest 1 user 5 admin
-        `sub`     # sub name  main for the while file 
-        ) values('HelloWorld','HelloWorld.pl','HelloWorld','0','main');
-
-    INSERT INTO actions (`action`,`file`,`title`,`right`,`sub`) values('HelloSub','HelloSub.pl','HelloWorld','0','HelloSub');
-</pre>
-
-=end html
-
-    In action_set:
-
-=begin html
-
-<pre>
-    INSERT INTO actions_set (
-        `action`,           #action called
-        `foreign_action`,   #foreign key
-        `output_id`         #output id 
-        ) values('HelloWorld','HelloWorld','content');
-
-    INSERT INTO actions_set (`action`,`foreign_action`,`output_id`) values('HelloWorld','HelloSub','otherOutput');
-    
-    
-    INSERT INTO mainMenu (
-        `title`,   # link title
-        `action`,  # action defined in actions_set
-        `right`,   # 0 guest 1 user 5 admin
-        `position`,# top 1 ... x bottom 
-        `menu`,    #top or left
-        `output`   #requestURI or javascript or loadPage  or href
-        )  values('HelloWorld','HelloWorld','0','1','top','requestURI');
-</pre>
-
-=end html
-
-  This will call 2 files HelloWorld.pl HelloSub.pl with following output.
-
-cgi-bin/Content/HelloWorld.pl
-
-    #Files are called via do ().
-    
-    #you are in the MySQL::Admin::GUI namespace
-
-    print  "Hello World !"
-    
-    .br()
-    
-    .a(
-    
-      {
-      
-      -href => "mailto:$m_hrSettings->{admin}{email}"
-      
-      },'Mail me')
-    
-    .br()
-    
-    1;
-
-cgi-bin/Content/HelloSub.pl
-
-    sub HelloSub{
-
-      print "sub called";
-    
-    }
-    
-    1;
-
-
-cgi-bin/mysql.pl
-
-    Returns a actionset stored in the Mysql Database.
-    
-    One sub for every output id.
-    
-    <xml>
-    
-    <output id="otherOutput">sub called</output>
-
-    <output id="content">Hello World !<br /><a href="mailto:">Mail me</a><br /></output>
-
-    </xml>
-
-this file will be transformed trough xslt in main Template     
-
-index.html
-
-    <div id=otherOutput>sub called</div>
-
-    <div id=content>Hello World !<br /><a href="mailto:">Mail me</a><br /></div>
-
-</pre>
-
-I write a whole Documentation soon.No feedback so I'm not in rush.
-
-Look at http://lindnerei.sourceforge.net or http://lindnerei.de for further Details.
- 
-=cut
- 
-*/
+/**
+ * @fileOverview
+ * MySQL::Admin::Documentation
+ * MySQL administration Web-App and Content Management System
+ * cpan MySQL::Admin
+ * This System works like following: index.html
+ * Css Overview:
+ * <pre>
+ * #############################################
+ * #  .window                                  #
+ * #  #######################################  #
+ * #  #.tab                                 #  #
+ * #  #######################################  #
+ * #  #.menu                  #.content     #  #
+ * #  # ##################### #             #  #
+ * #  # #.menuContainer     # #             #  #
+ * #  # #.verticalMenuLayout# #.ShowTables  #  #
+ * #  # #.menuCaption       # #.caption     #  #
+ * #  # #.menuContent       # #             #  #
+ * #  # ##################### #             #  #
+ * #  #                       #             #  #
+ * #  #######################################  #
+ * #                                           #
+ * #############################################
+ * </pre>
+ * javascript/cms.js
+ *
+ * In the  function init() a ( xmlhttprequest ) load the Content.
+ * <a onclick="requestURI('$ENV{SCRIPT_NAME}?action=HelloWorld','HelloWorld','HelloWorld')">HelloWorld</a>
+ * <pre><code>
+ *       requestURI(
+ *         url,     // Script url
+ *         id,      // Tabwidget id
+ *         txt,     // Tabwidget text
+ *         bHistory,// Browser History
+ *         formData,// Form Data
+ *         method,  // Submit Type GET or POST
+ *        );
+ *     or
+ *     <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
+ *     <input type="hidden" name="action" value="">
+ * </code></pre>
+ * since apache 2.x GET have maxrequestline so use POST for alarge requests.
+ * POST requests don't saved in the Browser history (back button ).
+ *
+ * install.sql
+ * The actions will bill stored in actions.
+ *
+ * <pre><code>
+ *     INSERT INTO actions (
+ *         `action`, #Name of the action
+ *         `file`,   #file contain the code
+ *         `title`,  #title
+ *         `right`,  #right 0 guest 1 user 5 admin
+ *         `sub`     # sub name  main for the while file
+ *         ) values('HelloWorld','HelloWorld.pl','HelloWorld','0','main');
+ *
+ *     INSERT INTO actions (`action`,`file`,`title`,`right`,`sub`) values('HelloSub','HelloSub.pl','HelloWorld','0','HelloSub');
+ * </code></pre>
+ *
+ * In action_set:
+ *
+ * <pre><code>
+ *     INSERT INTO actions_set (
+ *         `action`,           #action called
+ *         `foreign_action`,   #foreign key
+ *         `output_id`         #output id
+ *         ) values('HelloWorld','HelloWorld','content');
+ *     INSERT INTO actions_set (`action`,`foreign_action`,`output_id`) values('HelloWorld','HelloSub','otherOutput');
+ *
+ *     INSERT INTO mainMenu (
+ *         `title`,   # link title
+ *         `action`,  # action defined in actions_set
+ *         `right`,   # 0 guest 1 user 5 admin
+ *         `position`,# top 1 ... x bottom
+ *         `menu`,    #top or left
+ *         `output`   #requestURI or javascript or loadPage  or href
+ *         )  values('HelloWorld','HelloWorld','0','1','top','requestURI');
+ * </code></pre>
+ *
+ * This will call 2 files HelloWorld.pl HelloSub.pl with following output.
+ * cgi-bin/Content/HelloWorld.pl
+ * #Files are called via do ().
+ * #you are in the MySQL::Admin::GUI namespace
+ *     print  "Hello World !"
+ *     .br()
+ *     .a(
+ *       {
+ *       -href => "mailto:$m_hrSettings->{admin}{email}"
+ *       },'Mail me')
+ *     .br()
+ *     1;
+ *
+ * cgi-bin/Content/HelloSub.pl
+ *     sub HelloSub{
+ *       print "sub called";
+ *     }
+ *     1;
+ *
+ * cgi-bin/mysql.pl
+ *     Returns a actionset stored in the Mysql Database.
+ *     One sub for every output id.
+ *     <xml>
+ *     <output id="otherOutput">sub called</output>
+ *     <output id="content">Hello World !<br /><a href="mailto:">Mail me</a><br /></output>
+ *     </xml>
+ * this file will be transformed trough xslt in main Template
+ *
+ * index.html
+ *     <div id=otherOutput>sub called</div>
+ *     <div id=content>Hello World !<br /><a href="mailto:">Mail me</a><br /></div>
+ * </pre>
+ * I write a whole Documentation soon.No feedback so I'm not in rush.
+ * Look at http://lindnerei.sourceforge.net or http://lindnerei.de for further Details.
+ */
 
 style = "mysql";
 size = 16;
@@ -186,67 +123,53 @@ maxLength = 1000;
 m_sid = '123';
 m_txt = '';
 
-/*
-
-=head2 loadPage(inXml, inXsl, outId, tabId, title)
-
-param inXml
-
-  XmL Document or filename
-
-param inXsl
-
-  XsL Document or filename
-  
-outId, tabId, title set L<requestURI>
-  
-=cut
-
-*/
-
+/**
+ *
+ *
+ * @param {*} inXml XmL Document or filename
+ * @param {*} inXsl XsL Document or filename
+ * @param {string} outId
+ * @param {string} tabId
+ * @param {string} title
+ */
 function loadPage(inXml, inXsl, outId, tabId, title) {
     xml = typeof inXml == 'object' ? inXml : loadXMLDoc(inXml);
     xsl = typeof inXsl == 'object' ? inXsl : loadXMLDoc(inXsl);
     if (typeof XSLTProcessor == 'undefined') {
-		var xslt = new ActiveXObject("Msxml2.XSLTemplate");
-		if (xslt) {
-			var xslDoc = new ActiveXObject("Msxml2.FreeThreadedDOMDocument");
-			var xmlstr = xsl.xml ? xsl.xml : (new XMLSerializer()).serializeToString(xsl);
-			xslDoc.loadXML(xmlstr);
-			xslt.stylesheet = xslDoc;
-			var xslProc = xslt.createProcessor();
-			xslProc.input = xslDoc;
-			xslProc.transform();
-			document.getElementById(outId).innerHTML =  xslProc.output;
-		}else{
-			ex = xml.transformNode(xsl);
-			document.getElementById(outId).innerHTML = ex;
-		}
+        var xslt = new ActiveXObject("Msxml2.XSLTemplate");
+        if (xslt) {
+            var xslDoc = new ActiveXObject("Msxml2.FreeThreadedDOMDocument");
+            var xmlstr = xsl.xml ? xsl.xml : (new XMLSerializer()).serializeToString(xsl);
+            xslDoc.loadXML(xmlstr);
+            xslt.stylesheet = xslDoc;
+            var xslProc = xslt.createProcessor();
+            xslProc.input = xslDoc;
+            xslProc.transform();
+            document.getElementById(outId).innerHTML = xslProc.output;
+        } else {
+            ex = xml.transformNode(xsl);
+            document.getElementById(outId).innerHTML = ex;
+        }
     } else if (document.implementation && document.implementation.createDocument) {
         xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xsl);
         resultDocument = xsltProcessor.transformToFragment(xml, document);
         node = document.getElementById(outId);
         setText(outId, '');
-        if (node.childNodes[0]) node.removeChild(node.childNodes[0]);
+        if (node.childNodes[0])
+            node.removeChild(node.childNodes[0]);
         if (node) node.appendChild(resultDocument);
     }
     setCurrentTab(tabId, title);
     if (outId == 'content') disableOutputEscaping('content');
 }
 
-/*
-
-=head2 intputMask(id, regexp) 
-
- onkeydown="intputMask(this.id,"(\w+)")"
- 
- Would only accept chars for given id as Input.
-  
-=cut
-
-*/
-
+/**
+ * onkeydown="intputMask(this.id,"(\w+)")"
+ *  Would only accept chars for given id as Input.
+ * @param {string} id
+ * @param {string} regexp
+ */
 function intputMask(id, regexp) {
     var rxObj = regexp;
     rxObj.exec(document.getElementById(id).value);
@@ -278,7 +201,7 @@ function showEditorOptions() {
 
 function closePopup() {
     hide('popup');
-    if(tmpID !== 'editorOptions')
+    if (tmpID !== 'editorOptions')
         setText(tmpID, tmpTxt);
     document.getElementById('popupContent1').style.left = '25%';
     document.getElementById('popupContent1').style.width = '50%';
@@ -287,24 +210,29 @@ function closePopup() {
 function setCurrentTab(id, title) {
     var body = document.getElementsByTagName('body')[0];
     var nodes = body.getElementsByTagName("td");
-    for (var i = 0, j = nodes.length; i < j; i++) {
+
+    for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].className == 'headerItemHover') {
             nodes[i].className = 'headerItem';
             nodes[i].firstChild.className = 'menuLink';
         }
     }
+
     var entry = document.getElementById(id);
     var entryDynamic = document.getElementById('dynamicTab');
+
     if (entry) {
-        var body = document.getElementsByTagName('body')[0];
-        var nodes = body.getElementsByTagName("td");
-        for (var i = 0, j = nodes.length; i < j; i++) {
-            if (nodes[i].className == 'headerItemHover') {
-                nodes[i].className = 'headerItem';
-                if (nodes[i].firstChild) nodes[i].firstChild.className = 'menuLink';
+
+        for (var j = 0; j < nodes.length; j++) {
+            if (nodes[j].className == 'headerItemHover') {
+                nodes[j].className = 'headerItem';
+                if (nodes[j].firstChild) nodes[j].firstChild.className = 'menuLink';
             }
         }
-        if (entry.className == 'headerItem') entry.className = 'headerItemHover';
+
+        if (entry.className == 'headerItem')
+            entry.className = 'headerItemHover';
+
         if (entryDynamic) {
             entryDynamic.style.display = 'none';
             entryDynamic.className = 'headerItem';
@@ -313,108 +241,81 @@ function setCurrentTab(id, title) {
     }
     if (entryDynamic && title) {
         entryDynamic.style.display = '';
-        entryDynamic.className = 'headerItemHover'
+        entryDynamic.className = 'headerItemHover';
         entryDynamic.innerHTML = '<a class="dynamicLink">' + translate(title) + '</a>';
     }
 }
 var currentId, currentTxt;
 var act = 'save';
 
-//requestURI('cgi-bin/mysql.pl?action=loadSidebar',action,action,false,false,'GET',false)
-/*
-=head2 submitForm(node, tabId, tabTitle, bHistory, method, uri)
-
-=begin html
-
-<pre>
-      requestURI(
-        node,       // Script url  
-        tabId,      // Tabwidget id
-        tabTitle,   // Tabwidget text
-        bHistory,   // Browser History
-        method,     // Form Data 
-        uri,        // Submit Type GET or POST
-       );
-    or 
-    <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
-    <input type="hidden" name="action" value="">
-</pre>
-
-=end html
-
-=cut
-*/
-
+/**
+ *<pre><code>
+ * <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
+ * <input type="hidden" name="action" value="foo">
+ * </code></pre>
+ * @param {HTMLElement} node
+ * @param {string} tabId Tabwidget id
+ * @param {string} tabTitle Tabwidget text
+ * @param {boolean} bHistory Browser History
+ * @param {string} Submit Type GET or POST
+ * @param {sting} uri script url
+ */
 function submitForm(node, tabId, tabTitle, bHistory, method, uri) {
     bHistory = typeof bHistory !== 'undefined' ? bHistory : true;
     method = typeof method !== 'undefined' ? method : 'POST';
     var url = typeof uri !== 'undefined' ? uri : 'cgi-bin/mysql.pl?';
-    try{
-    if (checkForm(node)) {
-        var formData = new FormData();
-        formData.append("sid", m_sid);
-        formData.append("m_blogin", m_blogin);
-        for (var i = 0; i < node.elements.length; i++) {
-            if (node.elements[i].type == 'checkbox' || node.elements[i].type == 'radio') {
-                if (node.elements[i].checked) {
+    try {
+        if (checkForm(node)) {
+            var formData = new FormData();
+            formData.append("sid", m_sid);
+            formData.append("m_blogin", m_blogin);
+            for (var i = 0; i < node.elements.length; i++) {
+                if (node.elements[i].type == 'checkbox' || node.elements[i].type == 'radio') {
+                    if (node.elements[i].checked) {
+                        if (method == 'POST') formData.append(node.elements[i].name, node.elements[i].value);
+                        else url += node.elements[i].name + "=" + encodeURIComponent(node.elements[i].value) + "&";
+                    }
+                } else if (node.elements[i].name == 'submit') {
+                    if (method == 'POST') formData.append(node.elements[i].name, act);
+                    else url += node.elements[i].name + "=" + encodeURIComponent(act) + "&";
+                } else if (node.elements[i].type == 'file') {
+                    var file = node.elements[i];
+                    if (method == 'POST') formData.append(file.name, file.files[0]);
+                } else if (node.elements[i].type == 'select-multiple') {
+                    for (var j = 0, len = node.elements[i].options.length; j < len; j++) {
+                        var opt = node.elements[i].options[j];
+                        if (opt.selected) {
+                            if (method == 'POST') formData.append(node.elements[i].name, node.elements[i].options[j].value);
+                            else url += node.elements[i].name + "=" + encodeURIComponent(node.elements[i].options[j].value) + "&";
+                        }
+                    }
+                } else {
                     if (method == 'POST') formData.append(node.elements[i].name, node.elements[i].value);
                     else url += node.elements[i].name + "=" + encodeURIComponent(node.elements[i].value) + "&";
                 }
-            } else if (node.elements[i].name == 'submit') {
-                if (method == 'POST') formData.append(node.elements[i].name, act);
-                else url += node.elements[i].name + "=" + encodeURIComponent(act) + "&";
-            } else if (node.elements[i].type == 'file') {
-                var file = node.elements[i];
-                if (method == 'POST') formData.append(file.name, file.files[0]);
-            } else if (node.elements[i].type == 'select-multiple') {
-                for (var j = 0, len = node.elements[i].options.length; j < len; j++) {
-                    var opt = node.elements[i].options[j];
-                    if (opt.selected) {
-                        if (method == 'POST') formData.append(node.elements[i].name, node.elements[i].options[j].value);
-                        else url += node.elements[i].name + "=" + encodeURIComponent(node.elements[i].options[j].value) + "&";
-                    }
-                }
-            } else {
-                if (method == 'POST') formData.append(node.elements[i].name, node.elements[i].value);
-                else url += node.elements[i].name + "=" + encodeURIComponent(node.elements[i].value) + "&";
             }
+            requestURI(url, tabId, tabTitle, bHistory, formData, method);
         }
-        requestURI(url, tabId, tabTitle, bHistory, formData, method);
-    }
-    }catch(e){
-        alert(e)
+    } catch (e) {
+        alert(e);
     }
 }
 var http_request = false;
 var oldpage = 0;
 
-
-//requestURI('cgi-bin/mysql.pl?action=loadSidebar',action,action,false,false,'GET',false)
-/*
-=head2 requestURI(url, id, txt, bHistory, formData, method, bWaid)
-
-=begin html
-
-<pre>
-      requestURI(
-        url,     // Script url  
-        id,      // Tabwidget id
-        txt,     // Tabwidget text
-        bHistory,// Browser History
-        formData,// Form Data 
-        method,  // Submit Type GET or POST
-       );
-    or 
-    <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
-    <input type="hidden" name="action" value="">
-</pre>
-
-=end html
-
-=cut
-*/
-
-function requestURI(url, id, txt, bHistory, formData, method, bWaid) {
+/**
+ * <pre><code>
+ * <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
+ * <input type="hidden" name="action" value="foo">
+ * </code></pre>
+ * @param {string} url node Script url
+ * @param {string} id tabId Tabwidget id
+ * @param {string} txt Tabwidget text
+ * @param {boolean} bHistory Browser History
+ * @param {string} formData
+ * @param {string} method Submit Type GET or POST
+ */
+function requestURI(url, id, txt, bHistory, formData, method) {
     setAction(id);
     closePopup();
     if (url.indexOf("sid=") == -1) {
@@ -438,7 +339,7 @@ function requestURI(url, id, txt, bHistory, formData, method, bWaid) {
         } catch (e) {
             try {
                 http_request = new ActiveXObject("Microsoft.XMLHTTP");
-            } catch (e) {}
+            } catch (e) { }
         }
     }
 
@@ -455,14 +356,12 @@ function requestURI(url, id, txt, bHistory, formData, method, bWaid) {
     }
 }
 
-/*
-=head2 loadXMLDoc(filename)
-
-var xml = loadXMLDoc(filename);
-
-=cut
-*/
-
+/**
+ *
+ *
+ * @param {string} url
+ * @returns any
+ */
 function loadXMLDoc(filename) {
 
     if (window.ActiveXObject) {
@@ -472,13 +371,13 @@ function loadXMLDoc(filename) {
     }
     xhttp.open("GET", filename, false);
     xhttp.overrideMimeType("text/xml");
-	if (window.ActiveXObject) {
-		try {
-			xhttp.responseType = "msxml-document"
-		} catch (err) {
-			alert(err);
-		}
-	}
+    if (window.ActiveXObject) {
+        try {
+            xhttp.responseType = "msxml-document";
+        } catch (err) {
+            alert(err);
+        }
+    }
     xhttp.send(null);
     return xhttp.responseXML;
 }
@@ -489,27 +388,27 @@ function setContent() {
             hide('load');
             response = http_request.responseXML;
             for (var i = 0; i < response.getElementsByTagName('output').length; i++) {
-				var obj = response.getElementsByTagName('output')[i];
+                var obj = response.getElementsByTagName('output')[i];
                 var outID = obj.getAttribute('id');
-				var typeName = obj.getAttribute('type');
-			
+                var typeName = obj.getAttribute('type');
+
                 var txt = response.getElementsByTagName('output')[i].textContent;
-	            if (navigator.userAgent.indexOf("Firefox") != -1) 
-					txt = txt.replace("<![CDATA[", "").replace("]]>", "");
-				if(typeName === 'script'){
-					eval(txt);
-				}else if(typeName === 'xml'){
-					var xsl = obj.getAttribute('xsl');
-					var title = obj.getAttribute('title');
-					var tabId = obj.getAttribute('tabId');
-					var parser = new DOMParser(); 
-					var xmlDoc = parser.parseFromString(txt,"text/xml");
-					loadPage(xmlDoc, xsl, outID, tabId, title);
-					evalId(outID);
-				}else{
-					setText(outID, txt);
-					evalId(outID);
-				}
+                if (navigator.userAgent.indexOf("Firefox") != -1)
+                    txt = txt.replace("<![CDATA[", "").replace("]]>", "");
+                if (typeName === 'script') {
+                    eval(txt);
+                } else if (typeName === 'xml') {
+                    var xsl = obj.getAttribute('xsl');
+                    var title = obj.getAttribute('title');
+                    var tabId = obj.getAttribute('tabId');
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(txt, "text/xml");
+                    loadPage(xmlDoc, xsl, outID, tabId, title);
+                    evalId(outID);
+                } else {
+                    setText(outID, txt);
+                    evalId(outID);
+                }
             }
             if (!m_blogin && (bAction == 'login' || bAction == 'logout')) loadMenu();
             setCurrentTab(cAction, m_txt);
@@ -522,9 +421,9 @@ function setContent() {
             }
             return false;
         }
-        if (m_sid == '123' && m_blogin && ( cAction != 'reg' && cAction != 'datenschutz' && cAction != 'lostPassword'  && cAction != 'make' && cAction != 'makePassword') ) {
-           showPopup('loginContent', true);
-		   evalId('popupContent');
+        if (m_sid == '123' && m_blogin && (cAction != 'reg' && cAction != 'datenschutz' && cAction != 'lostPassword' && cAction != 'make' && cAction != 'makePassword')) {
+            showPopup('loginContent', true);
+            evalId('popupContent');
         } else {
             var closeButton = document.getElementById("closeButton");
             closeButton.addEventListener('click', closePopup);
@@ -536,15 +435,22 @@ function alert(txt) {
     visible('popup');
     setText('popupContent', '<div align="center">' + txt + '<br/><input type="submit" id="confirmButton" value="Ok"/></div>');
     var node = document.getElementById("confirmButton");
-    node.addEventListener('click', function(evt) {
+    node.addEventListener('click', function (evt) {
         hide('popup');
     });
 }
-// window.onerror = logError;
-// 
-// function logError(message, file, line) {
-//     console.log("Message: " + message + "file: " + file + "line: " + line);
-// }
+window.onerror = logError;
+
+function logError(message, file, line) {
+
+    var formData = new FormData();
+    formData.append("message", message);
+    formData.append("file", file);
+    formData.append("line", line);
+    formData.append("action", "logJsError");
+    requestURI("cgi-bin/mysql.pl", "", "", false, formData, "POST");
+    console.log("Message: " + message + "file: " + file + "line: " + line);
+}
 
 function confirm2(txt, sub, arg, arg2, arg3) {
     visible('popup');
@@ -552,12 +458,12 @@ function confirm2(txt, sub, arg, arg2, arg3) {
         '</b><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input  type="submit" id="confirmButton" value="Ok"/></div>'
     );
     var node = document.getElementById("confirmButton");
-    node.addEventListener('click', function(evt) {
+    node.addEventListener('click', function (evt) {
         hide('popup');
         sub(arg, arg2, arg3);
     });
     var node2 = document.getElementById("cancelButton");
-    node2.addEventListener('click', function(evt) {
+    node2.addEventListener('click', function (evt) {
         hide('popup');
     });
 }
@@ -573,13 +479,13 @@ function moveHere(txt, sub, arg, arg2, arg3) {
     document.getElementById('moveHere').style.top = (posY - dragY) + "px";
     document.getElementById('moveHere').style.zIndex = 4;
 
-    node.addEventListener('click', function(evt) {
+    node.addEventListener('click', function (evt) {
         stopDrop();
         evt.stopPropagation();
         sub(arg, arg2, arg3);
     });
     var node2 = document.getElementById("moveCancelButton");
-    node2.addEventListener('click', function(evt) {
+    node2.addEventListener('click', function (evt) {
         stopDrop();
         evt.stopPropagation();
         window.document.title = translate('links');
@@ -597,14 +503,14 @@ function stopDrop() {
 
 function prompt(txt, sub) {
     visible('popup');
-    setText('popupContent', '<b>' + txt +'</b><br/><input  type="text" align="center" id="promptPopUp"/><br/><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input type="submit" id="confirmButton" value="Ok"/></div>');
+    setText('popupContent', '<b>' + txt + '</b><br/><input  type="text" align="center" id="promptPopUp"/><br/><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input type="submit" id="confirmButton" value="Ok"/></div>');
     var node = document.getElementById("confirmButton");
-    node.addEventListener('click', function(evt) {
+    node.addEventListener('click', function (evt) {
         hide('popup');
         sub(document.getElementById('promptPopUp').value);
     });
     var node2 = document.getElementById("cancelButton");
-    node2.addEventListener('click', function(evt) {
+    node2.addEventListener('click', function (evt) {
         hide('popup');
         evt.stopPropagation();
     });
@@ -612,12 +518,12 @@ function prompt(txt, sub) {
 
 function disclaimer(txt, sub) {
     visible('disclaimer');
-    setText('disclaimerContent', '<div align="center" style="padding:0.4em;"><b>' + txt +'</b>&#160;<input type="checkbox" onclick="$(\'#confirmButtonDisclaimer\').toggle()" /><a href="javascript:requestURI(\'cgi-bin/mysql.pl?action=datenschutz\',\'datenschutz\',\'datenschutz\');">'+translate('datenschutz')+'</a><br/><input type="submit" id="confirmButtonDisclaimer" style="display:none;" value="Ok"/></div>');
+    setText('disclaimerContent', '<div align="center" style="padding:0.4em;"><b>' + txt + '</b>&#160;<input type="checkbox" onclick="$(\'#confirmButtonDisclaimer\').toggle()" /><div id="datenschutz"><a href="javascript:requestURI(\'cgi-bin/mysql.pl?action=datenschutz\',\'datenschutz\',\'datenschutz\');">' + translate('datenschutz') + '</a></div><br/><input type="submit" id="confirmButtonDisclaimer" style="display:none;" value="Ok"/></div>');
     var node = document.getElementById("confirmButtonDisclaimer");
-    node.addEventListener('click', function(evt) {
+    node.addEventListener('click', function (evt) {
         hide('disclaimer');
-        $('#confirmButtonDisclaimer').toggle()
-        privatPolicy = true
+        $('#confirmButtonDisclaimer').toggle();
+        privatPolicy = true;
         sub();
     });
 }
@@ -627,7 +533,7 @@ function errorPopUp(txt, sub, arg, arg2, arg3) {
     visible('popup');
     setText('popupContent', '<b>' + txt + '</b><div align="right" style="padding:0.4em;">&#160;<input type="submit" id="confirmButton" value="Ok"/></div>');
     var node = document.getElementById("confirmButton");
-    node.addEventListener('click', function(evt) {
+    node.addEventListener('click', function (evt) {
         hide('popup');
         sub(arg, arg2, arg3);
     });
@@ -640,7 +546,7 @@ function checkForm(form) {
         if (selectElement[i]) {
             var value = selectElement[i].value;
             var regexp = selectElement[i].dataset.regexp;
-            if ( value && regexp) {
+            if (value && regexp) {
                 if (eval('value.match(' + regexp + ')')) {
                     selectElement[i].style.borderColor = 'green';
                     selectElement[i].title = selectElement[i].dataset.right;
@@ -659,42 +565,36 @@ function errorMessage(text) {
     location.href = "install.html";
 }
 
-/*
-=head2 evalId(id)
-
-eval <script></script> tags within given id
-
-=cut
-*/
-
 function evalId(id) {
     var content = document.getElementById(id);
+
     if (content) {
         var node = content.getElementsByTagName("script");
+
         for (var i = 0, j = node.length; i < j; i++) {
-            if (node[i] && node[i].childNodes[0]) eval(node[i].childNodes[0].nodeValue);
+
+            if (node[i] && node[i].childNodes[0]) {
+                var code = node[i].childNodes[0].nodeValue;
+                try {
+                    eval(code);
+                } catch (e) {
+                    logError(e, code,node[i].childNodes[0].id);
+                }
+            }
         }
     }
 }
 
 function showEditor(txt) {
-    if(document.getElementById('editor')){
+    if (document.getElementById('editor')) {
         editor = ace.edit("editor");
         editor.session.setMode("ace/mode/perl");
-        editor.setTheme("ace/theme/sqlserver");
-        if(txt){
+        editor.setTheme("ace/theme/chrome");
+        if (txt) {
             editor.setValue(txt, 1);
         }
     }
 }
-
-/*
-=head2 translate(string)
-
-use MySQL::Admin for translations.
-
-=cut
-*/
 
 function translate(string) {
     var lng = navigator.language.indexOf("de") > -1 ? 'de' : 'en';
@@ -702,7 +602,7 @@ function translate(string) {
         var l = new Lang();
         if (string) {
             string = string.replace(/\s/g, '');
-            var ret = eval('l.' + lng + string.toLowerCase());
+            var ret = l[lng + string.toLowerCase()];
             return ret ? ret : string;
         } else {
             traversTranslate('tab', lng, l);
@@ -718,7 +618,7 @@ function traversTranslate(id, lng, l) {
         var node = document.getElementById(id).getElementsByTagName("a");
         for (var i = 0, j = node.length; i < j; i++) {
             if (node[i] && node[i].childNodes[0]) {
-                var ret = eval('l.' + lng + node[i].childNodes[0].nodeValue.toLowerCase());
+                var ret = l[lng + node[i].childNodes[0].nodeValue.toLowerCase()];
                 if (ret) {
                     node[i].childNodes[0].nodeValue = ret;
                     node[i].title = ret;
@@ -729,15 +629,13 @@ function traversTranslate(id, lng, l) {
 }
 
 function disableOutputEscaping(id) {
- //   if (navigator.userAgent.indexOf("Firefox") != -1) document.getElementById(id).innerHTML = document.getElementById(id).textContent;
+    //   if (navigator.userAgent.indexOf("Firefox") != -1) document.getElementById(id).innerHTML = document.getElementById(id).textContent;
 }
-
 
 function insertAtCursorPosition(txt) {
     var textarea = document.getElementById('sqlEdit');
     if (typeof document.selection != 'undefined') {
         range = document.selection.createRange();
-        var txt = range.text;
         range.text = txt;
         range.moveStart('character', txt.length);
         range.select();
@@ -752,6 +650,7 @@ function insertAtCursorPosition(txt) {
 }
 
 var nCurrentRow = 0;
+
 function enter(event) {
     var keyCode = event.keyCode ? event.keyCode : event.charCode ? event.charCode : event.which;
     if (keyCode == 13) return true;
@@ -794,14 +693,12 @@ function addEntry(idSelect, idEdit) {
     document.getElementById(idSelect).options[n].className = 'set';
 }
 
-/*
-=head2 getElementPosition(id) 
-
- object.x - .y =  getElementPosition(id);
-
-=cut
-*/
-
+/**
+ * object.x - .y =  getElementPosition(id);
+ *
+ * @param {string} id
+ * @returns object
+ */
 function getElementPosition(id) {
     var node = document.getElementById(id);
     var offsetLeft = 0;
@@ -811,18 +708,11 @@ function getElementPosition(id) {
         offsetTop += node.offsetTop;
         node = node.offsetParent;
     }
-    var position = new Object();
+    var position = {};
     position.x = offsetLeft;
     position.y = offsetTop;
     return position;
 }
-
-/*
-=head2 move(id, x, y)
-
-
-=cut
-*/
 
 function move(id, x, y) {
     Element = document.getElementById(id);
@@ -845,19 +735,16 @@ function showMenu(linkId, menuId) {
     displayTree(menuId);
 }
 
-/*
-=head2 getWindowSize()
-
- object.x - .y =  getWindowSize();
-
-=cut
-*/
-
+/**
+ * object.x - .y =  getWindowSize();
+ *
+ * @returns object
+ */
 function getWindowSize() {
     var nWidth = 0,
         nHeight = 0;
-    var o = new Object;
-    if (typeof(window.innerWidth) == 'number') { //Gecko
+    var o = {};
+    if (typeof (window.innerWidth) == 'number') { //Gecko
         o.x = window.innerWidth;
         o.y = window.innerHeight;
         return o;
@@ -878,11 +765,12 @@ var pnPageY = 0;
 
 window.onscroll = function () {
     var topUp = document.getElementById('topUp');
-    if(topUp && window.pageYOffset >= 250)
+    if (topUp && window.pageYOffset >= 250)
         visible('topUp');
     else
         hide('topUp');
-}
+};
+
 function scrollToTop() {
     pnPageY = window.pageYOffset;
     var node = document.getElementById('topUp');
@@ -970,9 +858,9 @@ function markTables(bool) {
 var html = 0;
 markDownEditor = null;
 
-function enableHtml(enable){
-    if(typeof enable === 'boolean')
-       html = enable;
+function enableHtml(enable) {
+    if (typeof enable === 'boolean')
+        html = enable;
     else
         html = !html;
 
@@ -983,29 +871,27 @@ function enableHtml(enable){
         }
         editor = ace.edit("edit");
         editor.session.setMode("ace/mode/perl");
-        editor.setTheme("ace/theme/sqlserver");
+        editor.setTheme("ace/theme/chrome");
         editor.setValue($('#txt').val(), 1);
         hide('txt');
         visible('edit');
         visible('editorRim');
         $('.md-container').hide();
     } else {
-        if(document.getElementById('htmlButton')){
+        if (document.getElementById('htmlButton')) {
             document.getElementById('htmlButton').checked = false;
         }
-        if(document.getElementById('enlarged')){
+        if (document.getElementById('enlarged')) {
             document.getElementById('enlarged').style.display = '';
         }
-        if(!markDownEditor){
-            markDownEditor = $('#txt').markdownEditor(
-                {
-                    theme:"ace/theme/sqlserver",
-                    uploadPath:false,
-                    preview:false,
-                    fontSize: '1em',
-                    fullscreen: false
-                }
-            );
+        if (!markDownEditor) {
+            markDownEditor = $('#txt').markdownEditor({
+                theme: "chrome",
+                uploadPath: false,
+                preview: false,
+                fontSize: '1em',
+                fullscreen: false
+            });
 
         }
         visible('txt');
@@ -1014,8 +900,9 @@ function enableHtml(enable){
         $('.md-container').show();
     }
 }
-function saveText(){
-    if(html)
+
+function saveText() {
+    if (html)
         document.getElementById('txt').value = editor.getValue();
 }
 
@@ -1068,6 +955,7 @@ function drag(EVENT) {
     }
 }
 //drag&drop>>
+
 function displayTree(id) {
     var e = document.getElementById(id);
     if (!e) return;
@@ -1122,59 +1010,24 @@ function datum() {
     return d;
 }
 
-/*
-=head2 setText(id, string)
-
-
-=cut
-*/
-
 function setText(id, string) {
     var element = document.getElementById(id);
     if (element) element.innerHTML = string;
     else window.status = id + string;
 }
 
-/*
-=head2 getText(id) 
-
-
-=cut
-*/
-
 function getText(id) {
     var element = document.getElementById(id);
     if (element) return element.innerHTML;
 }
 
-/*
-=head2 hide(id) 
-
-
-=cut
-*/
-
 function hide(id) {
     if (document.getElementById(id)) document.getElementById(id).style.display = "none";
 }
 
-/*
-=head2 visible(id) 
-
-
-=cut
-*/
-
 function visible(id) {
     if (document.getElementById(id)) document.getElementById(id).style.display = "";
 }
-
-/*
-=head2 ScrolBarWidth()
-
-
-=cut
-*/
 
 function ScrolBarWidth() {
     //2 verschachtelte divs erzeugen.
@@ -1189,7 +1042,8 @@ function ScrolBarWidth() {
     inside.style.height = '100px'; //das innere div ist höher damit scrollbars angezeigt werden.
     ouside.appendChild(inside);
     document.body.appendChild(ouside); //outside an body anhängen.
-    var nWidthWithScrollBars = nWidthWithoutScrollBars = 0;
+    var nWidthWithScrollBars = 0;
+    var nWidthWithoutScrollBars = 0;
     // outside ohne scrollbar anzeigen
     ouside.style.overflow = 'hidden';
     nWidthWithoutScrollBars = inside.offsetWidth; //Breite ohne scrollbar
@@ -1206,15 +1060,15 @@ var m_bOver = true;
 function prepareMove(id) {
     if (document.body) {
         if (typeof document.body.onselectstart != "undefined") { //ie
-            document.body.onselectstart = function() {
-                return false
+            document.body.onselectstart = function () {
+                return false;
             };
         } else if (typeof document.body.style.MozUserSelect != "undefined") { //gecko
             document.body.style.MozUserSelect = "none";
         } else { //Opera
-            document.body.onmousedown = function() {
+            document.body.onmousedown = function () {
                 return false;
-            }
+            };
         }
     }
     dragobjekt = document.getElementById(id);
@@ -1224,16 +1078,9 @@ function prepareMove(id) {
     m_bOver = false;
     var o = getElementPosition(id);
     move(id, o.x + 25, o.y + 25);
-    document.getElementById(id)
+    document.getElementById(id);
     startdrag(id);
 }
-
-/*
-=head2 enableDropZone(id)
-
-
-=cut
-*/
 
 function enableDropZone(id) {
     if (!dragobjekt) return;
@@ -1248,13 +1095,14 @@ function disableDropZone(id) {
 function confirmMove() {
     m_bNoDrop = true;
     if (dropzone && dragobjekt.id != dropzone) {
-        moveHere(translate('move') + " " + dragobjekt.innerHTML + " " + translate('before') + " " + document.getElementById(dropzone).innerHTML + " ?", function() {
+        moveHere(translate('move') + " " + dragobjekt.innerHTML + " " + translate('before') + " " + document.getElementById(dropzone).innerHTML + " ?", function () {
             requestURI('cgi-bin/mysql.pl?action=MoveTreeViewEntry&dump=' + m_sDump + '&from=' + document.getElementById(dropid).id + "&to=" + document.getElementById(dropzone).id + "#" + document.getElementById(
                 dropzone).id);
         });
     }
     m_bOver = true;
 }
+
 var bAction = 'ShowDatabases';
 
 function setAction(n) {
@@ -1265,32 +1113,32 @@ var dbAction = 'ShowTable';
 function setDbAction(n) {
     dbAction = n;
 }
+
 function showCatList() {
-    var o = getElementPosition('catLink');       
-    move('catlist', o.x, o.y+24);
+    var o = getElementPosition('catLink');
+    move('catlist', o.x, o.y + 24);
     displayTree('catlist');
     var e = document.getElementById('catLink');
     e.className = (e.className == 'catLink') ? 'catLinkPressed' : 'catLink';
 }
 
 function showTab(id) {
-	if(document.getElementById(id).classList)
-		document.getElementById(id).classList.remove('closed');
-	else
-		document.getElementById(id).className -= 'closed';
+    if (document.getElementById(id).classList)
+        document.getElementById(id).classList.remove('closed');
+    else
+        document.getElementById(id).className -= 'closed';
     if (document.getElementById(id).firstChild) document.getElementById(id).firstChild.style.display = '';
     var elements = document.getElementsByClassName('cnt');
     for (var i = 0; i < elements.length; i++) {
         if (elements[i].id != id && elements[i].style.display == '') {
             if (elements[i].firstChild) elements[i].firstChild.style.display = 'none';
-            if(elements[i].classList)
-				elements[i].classList.add('closed');
-			else
-				elements[i].className -= 'closed';
+            if (elements[i].classList)
+                elements[i].classList.add('closed');
+            else
+                elements[i].className -= 'closed';
         }
     }
 }
-
 
 window.onpopstate = loadHistory;
 
@@ -1306,6 +1154,7 @@ function loadHistory() {
     } else requestURI('cgi-bin/mysql.pl?action=' + defaultAction, defaultAction, defaultAction);
     return true;
 }
+
 var nCurrentShown;
 
 function DisplayTable(id) {
@@ -1313,7 +1162,8 @@ function DisplayTable(id) {
     visible(id);
     nCurrentShown = id;
 }
-var aCurrentShown = new Array();
+
+var aCurrentShown = [];
 
 function DisplayTables(i, id) {
     hide(aCurrentShown[i]);
@@ -1372,33 +1222,25 @@ function breakOut() {
     }
 }
 
-/*
-=head2 Autocomplete(evt)
-
-
-oAutocomplete = $("txt");
-
-autocomplete.push("foo");
-
-autocomplete.push("bar");
-
-oAutocomplete.addEventListener('keyup', Autocomplete);
-
-Autocomplete(evt) 
-
-<textarea id="txt"></textarea>
-
-=cut
-*/
-
+/**
+ * oAutocomplete = $("txt");
+ * autocomplete.push("foo");
+ * autocomplete.push("bar");
+ * oAutocomplete.addEventListener('keyup', Autocomplete);
+ * Autocomplete(evt)
+ * <pre><code><textarea id="txt"></textarea></code></pre>
+ *
+ * @param {*} evt
+ * @returns
+ */
 function Autocomplete(evt) {
     if (breakOut()) return;
     if (evt.which == 8 || evt.which == 16 || evt.which === 37 || evt.which === 38 || evt.which === 39 || evt.which === 39 || evt.which === 40) return;
     var offset = 3;
-    while (oAutocomplete.selectionStart - offset >= 0 && offset < 10) { //todo port to IE
-        var match = ''
+    while (oAutocomplete.selectionStart - offset >= 0 && offset < 10) {// todo port to IE
+        var match = '';
         if (oAutocomplete.value.substr(oAutocomplete.selectionStart - offset - 1, 1) == ' ' || oAutocomplete.value.substr(oAutocomplete.selectionStart - offset - 1,
-                1).search(new RegExp("\\b")) == -1 || oAutocomplete.selectionStart - offset == 0) {
+            1).search(new RegExp("\\b")) == -1 || oAutocomplete.selectionStart - offset == 0) {
             match = oAutocomplete.value.substr(oAutocomplete.selectionStart - offset, offset);
         }
         var i = 0;
@@ -1419,15 +1261,11 @@ function Autocomplete(evt) {
     }
 }
 
-
-/*
-=head2 selKeyword(id) 
-
-insert vales from an  <select></select> into autocomplete
-
-=cut
-*/
-
+/**
+ * insert vales from an select into autocomplete
+ *
+ * @param {string} id
+ */
 function selKeyword(id) {
     for (var i = 0; i < document.getElementById(id).options.length; i++) autocomplete.push(document.getElementById(id).options[i].value);
 }
@@ -1452,35 +1290,31 @@ function ShowNewRow() {
     document.getElementById('popupContent1').style.width = '96%';
     showPopup('ShowNewRow');
 }
-/*
-=head2 checkButton(id,parent)
 
-fake (styled) checkbox for HTML::Editor 
-
-=cut
-*/
-
-function checkButton(id,parent){
-    if(parent.className == 'htmlButton' ){
-         document.getElementById(id).checked = "checked" 
-         parent.className = 'htmlButtonChecked'
-    }else{
-       parent.className = 'htmlButton'
-       document.getElementById(id).checked = "" 
+/**
+ * fake (styled) checkbox for HTML::Editor
+ *
+ * @param {string} id
+ * @param {HTMLElement} parent
+ */
+function checkButton(id, parent) {
+    if (parent.className == 'htmlButton') {
+        document.getElementById(id).checked = "checked";
+        parent.className = 'htmlButtonChecked';
+    } else {
+        parent.className = 'htmlButton';
+        document.getElementById(id).checked = "";
     }
 }
-/*
-=head2 COPYRIGHT
 
-    Copyright (C) 2006-2018 by Hr. Dirk Lindner
-
-    perl -e'sub lze_Rocks{print/(...)/ for shift;}sub{&{"@_"}}->("lze_Rocks")'
-
-    This program is free software; you can redistribute it and/or modify it 
-    under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; This program is distributed in the hope 
-    that it will be useful, but WITHOUT ANY WARRANTY; without even
-    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details
-=cut
-*/
+/**
+ * @copyright
+ *     Copyright (C) 2006-2018 by Hr. Dirk Lindner
+ *     perl -e'sub lze_Rocks{print/(...)/ for shift;}sub{&{"@_"}}->("lze_Rocks")'
+ *     This program is free software; you can redistribute it and/or modify it
+ *     under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation; This program is distributed in the hope
+ *     that it will be useful, but WITHOUT ANY WARRANTY; without even
+ *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *     See the GNU Lesser General Public License for more details
+ */

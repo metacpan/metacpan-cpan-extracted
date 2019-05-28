@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Math;
@@ -84,7 +84,7 @@ sub isNumber {
 
     if (!Quiq::Math->isNumber($val)) {
         $class->throw(
-            q~ASSERT-00001: Not a number~,
+            'ASSERT-00001: Not a number',
             defined $name? (Name => $name): (),
             Value => $val,
         );
@@ -150,7 +150,7 @@ sub notNull {
     if (!defined($val) || $val eq '') {
         $class->throw(
             defined $name? (Name => $name): (),
-            q~ASSERT-00002: Value is null~,
+            'ASSERT-00002: Value is null',
         );
     }
 
@@ -161,7 +161,7 @@ sub notNull {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

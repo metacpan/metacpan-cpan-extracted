@@ -1,4 +1,5 @@
 use utf8;
+use warnings;
 no warnings 'redefine';
 use vars qw(@t $ff $ss $folderfirst $sortstate);
 $folderfirst = param('folderfirst') ? 1 : 0;

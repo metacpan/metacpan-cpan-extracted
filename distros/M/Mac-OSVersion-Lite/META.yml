@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,14 +34,14 @@ no_index:
 provides:
   Mac::OSVersion::Lite:
     file: lib/Mac/OSVersion/Lite.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/pine/p5-Mac-OSVersion-Lite/issues
   homepage: https://github.com/pine/p5-Mac-OSVersion-Lite
   repository: git://github.com/pine/p5-Mac-OSVersion-Lite.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:PINE
 x_contributors:
   - 'Pine Mizune <pinemz@gmail.com>'

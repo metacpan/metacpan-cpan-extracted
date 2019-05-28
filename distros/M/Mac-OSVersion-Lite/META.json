@@ -4,7 +4,7 @@
       "Pine Mizune"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.2",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "mit"
    ],
@@ -35,6 +35,7 @@
          "requires" : {
             "CPAN::Uploader" : "0.103013",
             "Minilla" : "v3.0.1",
+            "Pod::Markdown::Github" : "0.04",
             "Software::License::MIT" : "0.103011",
             "Test::CPAN::Meta" : "0.25",
             "Test::MinimumVersion::Fast" : "0.04",
@@ -66,7 +67,7 @@
    "provides" : {
       "Mac::OSVersion::Lite" : {
          "file" : "lib/Mac/OSVersion/Lite.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/pine/p5-Mac-OSVersion-Lite"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:PINE",
    "x_contributors" : [
       "Pine Mizune <pinemz@gmail.com>"

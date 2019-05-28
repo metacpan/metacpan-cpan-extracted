@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 no bytes;
 use Quiq::Section::Object;
@@ -144,16 +144,16 @@ sub new {
     # Objekt instantiieren
 
     my $self = $class->SUPER::new(
-        encoding=>undef,
-        defaultSection=>undef,
-        sectionRegex=>qr/^# (<\w+>|\[\w+\]|\(\w+\)|\{\w+\})/,
-        keyRegex=>qr/^(\w+):$/,
-        sourceNotNeeded=>0,
-        startLine=>"--BEGIN--\n",
-        parsedSections=>0,
-        parsedLines=>0,
-        parsedChars=>0,
-        parsedBytes=>0,
+        encoding => undef,
+        defaultSection => undef,
+        sectionRegex => qr/^# (<\w+>|\[\w+\]|\(\w+\)|\{\w+\})/,
+        keyRegex => qr/^(\w+):$/,
+        sourceNotNeeded => 0,
+        startLine => "--BEGIN--\n",
+        parsedSections => 0,
+        parsedLines => 0,
+        parsedChars => 0,
+        parsedBytes => 0,
     );
     $self->set(@_);
 
@@ -359,7 +359,7 @@ sub parse {
                 }
                 else {
                     # Syntaxfehler
-                    die q~SECPAR-00001: Abschnitt erwartet~,"\n";
+                    die 'SECPAR-00001: Abschnitt erwartet',"\n";
                 }
             }
             elsif ($state == 1) {
@@ -451,7 +451,7 @@ sub parse {
             }
             else {
                 # Paranoia
-                die q~SECPAR-00002: Unerwarteter Zustand~,"\n";
+                die 'SECPAR-00002: Unerwarteter Zustand',"\n";
             }
             $source .= $_;
             $line++;
@@ -613,10 +613,10 @@ sub error {
     my ($self,$msg,$source,$file,$lineNumber) = @_;
 
     $self->throw($msg,
-        # Source=>$source,
+        # Source => $source,
         $msg !~ /^File:/m? (File=>$file): (),
         $msg !~ /^Line:/m? (Line=>$lineNumber): (),
-        -stacktrace=>0,
+        -stacktrace => 0,
     );
 }
 
@@ -728,7 +728,7 @@ Als Beispiel siehe quiq-confluence:
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

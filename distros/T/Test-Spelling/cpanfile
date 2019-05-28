@@ -2,7 +2,6 @@ on 'runtime' => sub {
     requires 'perl' => '5.008';
     requires 'strict';
     requires 'warnings';
-    requires 'base';
     requires 'Exporter' => '5.57';
     requires 'File::Spec';
     requires 'IPC::Run3';
@@ -19,6 +18,9 @@ on 'build' => sub {
 on 'test' => sub {
     requires 'strict';
     requires 'warnings';
+    requires 'utf8';
+    requires 'ExtUtils::MakeMaker';
+    requires 'File::Spec';
     requires 'Test::More' => '0.88'; # already uses done_testing
     requires 'Test::Tester';
 };

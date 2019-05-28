@@ -34,8 +34,6 @@ my %Paths;
 if ($recursive) {
     foreach my $key (@INC) {
         if (-d $key) {
-
-            #           my $key = "/var/www/html/admin/cgi-bin/lib/";
             $Changeroot  = 1;
             $root        = $key;
             @r           = split "", $root;
@@ -351,7 +349,7 @@ Dirk Lindner <dirk.lze@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2015 by Hr. Dirk Lindner
+Copyright (C) 2007-2019 by Hr. Dirk Lindner
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public License

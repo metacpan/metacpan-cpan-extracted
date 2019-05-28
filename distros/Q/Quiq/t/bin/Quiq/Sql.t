@@ -331,8 +331,8 @@ sub test_createUser : Test(4) {
 
     my $sql = Quiq::Sql->new('Oracle');
     my $stmt = $sql->createUser('user1','yyy',
-        -defaultTableSpace=>'dflt',
-        -tempTableSpace=>'tmp',
+        -defaultTableSpace => 'dflt',
+        -tempTableSpace => 'tmp',
     );
     $self->like($stmt,qr/CREATE USER user1/);
     $self->like($stmt,qr/IDENTIFIED BY yyy/);
@@ -590,9 +590,9 @@ sub test_addForeignKeyConstraint : Test(6) {
 
     my $sql = Quiq::Sql->new('PostgreSQL');
     my $stmt = $sql->addForeignKeyConstraint('tab1',['col1','col2'],'tab2',
-        -constraintName=>'tab1_tab2_FK',
-        -defer=>1,
-        -onDelete=>'cascade',
+        -constraintName => 'tab1_tab2_FK',
+        -defer => 1,
+        -onDelete => 'cascade',
     );
     $self->like($stmt,qr/ALTER TABLE tab1 ADD/);
     $self->like($stmt,qr/CONSTRAINT tab1_tab2_FK/);
@@ -668,8 +668,8 @@ sub test_createFunction_postgresql : Test(4) {
     my $sql = Quiq::Sql->new('PostgreSQL');
     my $stmt = $sql->createFunction(
         '<name>',
-        -replace=>1,
-        -returns=>'<returns>','
+        -replace => 1,
+        -returns => '<returns>','
         <body>
         ',
     );
@@ -694,7 +694,7 @@ sub test_createTrigger_oracle : Test(6) {
         'before',
         'insert|update',
         'row',
-        -replace=>1,'
+        -replace => 1,'
         <body>
         '
     );
@@ -719,8 +719,8 @@ sub test_createTrigger_postgresql : Test(6) {
         'before',
         'insert|update',
         'row',
-        -replace=>1,
-        -execute=>'<proc>',
+        -replace => 1,
+        -execute => '<proc>',
     );
     # warn $stmt,"\n";
     $self->like($stmt,qr/^CREATE TRIGGER <name>/);
@@ -809,10 +809,10 @@ sub test_select : Test(7) {
     # SELECT, FROM, WHERE, ORDER BY
 
     $stmt = $sql->select(
-        -select=>'col1','col2','col3',
-        -from=>'tab',
-        -where=>'col1 > col2','col2 > col3',
-        -orderBy=>1,
+        -select => 'col1','col2','col3',
+        -from => 'tab',
+        -where => 'col1 > col2','col2 > col3',
+        -orderBy => 1,
     );
 
     my $stmt2 = Quiq::String->removeIndentation(<< '    __SQL__');
@@ -834,7 +834,7 @@ sub test_select : Test(7) {
     # Mit Statement-Muster und Platzhaltern
 
     $stmt = $sql->select(
-        -stmt=>'
+        -stmt => '
         SELECT
             %SELECT%
         FROM
@@ -844,10 +844,10 @@ sub test_select : Test(7) {
         ORDER BY
             %ORDERBY%
         ',
-        -select=>'col1','col2','col3',
-        -from=>'tab',
-        -where=>'col1 > col2','col2 > col3',
-        -orderBy=>1,
+        -select => 'col1','col2','col3',
+        -from => 'tab',
+        -where => 'col1 > col2','col2 > col3',
+        -orderBy => 1,
     );
 
     $self->is($stmt,$stmt2);
@@ -855,14 +855,14 @@ sub test_select : Test(7) {
     # Mit Statement-Muster und Klausel-Ergänzungen
 
     $stmt = $sql->select(
-        -stmt=>'
+        -stmt => '
         SELECT
             %SELECT%
         ',
-        -select=>'col1','col2','col3',
-        -from=>'tab',
-        -where=>'col1 > col2','col2 > col3',
-        -orderBy=>1,
+        -select => 'col1','col2','col3',
+        -from => 'tab',
+        -where => 'col1 > col2','col2 > col3',
+        -orderBy => 1,
     );
 
     $self->is($stmt,$stmt2);
@@ -876,9 +876,9 @@ sub test_select : Test(7) {
     __SQL__
 
     $stmt = $sql->select(
-        -stmt=>$select,
-        -select=>qw/sta_id sta_name par_id par_name/,
-        -orderBy=>qw/sta_name par_name/,
+        -stmt => $select,
+        -select => qw/sta_id sta_name par_id par_name/,
+        -orderBy => qw/sta_name par_name/,
     );
     
     $stmt2 = Quiq::String->removeIndentation(<< '    __SQL__');
@@ -919,10 +919,10 @@ sub test_insert_1 : Test(1) {
     __SQL__
 
     my $stmt = $sql->insert('person',
-        per_id=>10,
-        per_vorname=>'Hanno',
-        per_nachname=>'Seitz',
-        per_geburtstag=>undef,
+        per_id => 10,
+        per_vorname => 'Hanno',
+        per_nachname => 'Seitz',
+        per_geburtstag => undef,
     );
     $self->is($stmt,$stmt1);
 }
@@ -973,8 +973,8 @@ sub test_insert_2 : Test(1) {
     __SQL__
 
     my $stmt = $sql->insert('objekt',
-        obj_id=>4711,
-        obj_letzteaenderung=>\'SYSDATE',
+        obj_id => 4711,
+        obj_letzteaenderung => \'SYSDATE',
     );
     $self->is($stmt,$stmt1);
 }
@@ -990,18 +990,18 @@ sub test_insert_3 : Test(3) {
     $self->is($stmt,'');
 
     $stmt = $sql->insert('person',
-        per_id=>undef,
-        per_vorname=>undef,
-        per_nachname=>undef,
-        per_geburtstag=>undef,
+        per_id => undef,
+        per_vorname => undef,
+        per_nachname => undef,
+        per_geburtstag => undef,
     );
     $self->is($stmt,'');
 
     $stmt = $sql->insert('person',
-        per_id=>'',
-        per_vorname=>'',
-        per_nachname=>'',
-        per_geburtstag=>'',
+        per_id => '',
+        per_vorname => '',
+        per_nachname => '',
+        per_geburtstag => '',
     );
     $self->is($stmt,'');
 }
@@ -1029,10 +1029,10 @@ sub test_insert_4 : Test(1) {
     __SQL__
 
     my $stmt = $sql->insert('person',
-        per_id=>\'?',
-        per_vorname=>\'?',
-        per_nachname=>\'?',
-        per_geburtstag=>\'?',
+        per_id => \'?',
+        per_vorname => \'?',
+        per_nachname => \'?',
+        per_geburtstag => \'?',
     );
     $self->is($stmt,$stmt1);
 }
@@ -1057,7 +1057,7 @@ sub test_update : Test(3) {
     __SQL__
 
     $stmt = $sql->update('person',
-        per_vorname=>'Hanno',
+        per_vorname => 'Hanno',
     );
     $self->is($stmt,$stmt0);
 
@@ -1072,9 +1072,9 @@ sub test_update : Test(3) {
     __SQL__
 
     $stmt = $sql->update('person',
-        per_vorname=>'Hanno',
-        per_nachname=>'Seitz',
-        -where,per_id=>4711,
+        per_vorname => 'Hanno',
+        per_nachname => 'Seitz',
+        -where,per_id => 4711,
     );
     $self->is($stmt,$stmt0);
 }

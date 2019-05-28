@@ -66,9 +66,9 @@ done_testing();
 sub check_with {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my ( @args ) = @_;
+    my @args = @_;
 
-    return subtest "check_with( $args[0] )" => sub {
+    return subtest subtest_name( @args ) => sub {
         plan tests => 4;
 
         my $opts = {};

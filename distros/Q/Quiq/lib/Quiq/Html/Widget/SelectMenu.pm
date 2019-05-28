@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -96,18 +96,18 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        disabled=>0,
-        hidden=>0,
-        id=>undef,
-        javaScript=>undef,
-        name=>undef,
-        onChange=>undef,
-        options=>[],
-        style=>undef,
-        styles=>[],
-        texts=>[],
-        value=>undef,
+        class => undef,
+        disabled => 0,
+        hidden => 0,
+        id => undef,
+        javaScript => undef,
+        name => undef,
+        onChange => undef,
+        options => [],
+        style => undef,
+        styles => [],
+        texts => [],
+        value => undef,
     );
 
     # Werte Konstruktoraufruf
@@ -167,21 +167,21 @@ sub html {
         my $style = $styles->[$i];
 
         $str .= $h->tag('option',
-            -nl=>0,
-            value=>$option,
-            style=>$style,
-            selected=>defined($value) && $option eq $value,
+            -nl => 0,
+            value => $option,
+            style => $style,
+            selected => defined($value) && $option eq $value,
             $text
         );
     }
 
     my $html = $h->tag('select',
-        name=>$name,
-        id=>$id,
-        class=>$class,
-        style=>$style,
-        disabled=>$disabled,
-        onchange=>$onChange,
+        name => $name,
+        id => $id,
+        class => $class,
+        style => $style,
+        disabled => $disabled,
+        onchange => $onChange,
         '-',
         $str
     );
@@ -198,7 +198,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

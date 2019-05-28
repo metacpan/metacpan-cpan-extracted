@@ -3,7 +3,7 @@ package Guard::Timer;
 use strict;
 use warnings;
 use Exporter 'import';
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 # ABSTRACT: a scope guard that keeps time
 
 
@@ -42,7 +42,7 @@ Guard::Timer - a scope guard that keeps time
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

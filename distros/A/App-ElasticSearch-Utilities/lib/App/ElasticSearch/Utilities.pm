@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '6.5'; # VERSION
+our $VERSION = '6.6'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -136,7 +136,7 @@ my %DEF = (
                    exists $_GLOBALS{base} ? $_GLOBALS{base} : undef,
     PATTERN     => exists $opt{pattern}   ? $opt{pattern} : '*',
     DAYS        => exists $opt{days}      ? $opt{days} :
-                   exists $_GLOBALS{days} ? $_GLOBALS{days} : 7,
+                   exists $_GLOBALS{days} ? $_GLOBALS{days} : 1,
     DATESEP     => exists $opt{datesep}               ? $opt{datesep} :
                    exists $_GLOBALS{datesep}          ? $_GLOBALS{datesep} :
                    exists $_GLOBALS{"date-separator"} ? $_GLOBALS{"date-separator"} :
@@ -664,48 +664,65 @@ sub es_index_fields {
         _find_fields(\%fields,$ref->{$mapping});
     }
     # Return the results
-    return wantarray ? sort keys %fields : [ sort keys %fields ];
+    return \%fields;
 }
 
-my $x=0;
-sub _add_fields {
-    my ($f,@path) = @_;
+{
+    # Closure for field metadata
+    my $nested_path;
 
-    return unless @path;
+    sub _add_fields {
+        my ($f,$type,@path) = @_;
 
-    # Store the full path
-    my $key = join('.', @path);
-    $f->{$key} = 1;
-}
+        return unless @path;
 
-sub _find_fields {
-    my ($f,$ref,@path) = @_;
+        my %i = (
+            type   => $type,
+            subkey => $f,
+        );
 
-    # Handle things with properties
-    if( exists $ref->{properties} && is_hashref($ref->{properties}) ) {
-        foreach my $k (sort keys %{ $ref->{properties} }) {
-            _find_fields($f,$ref->{properties}{$k},@path,$k);
+        # Store the full path
+        my $key = join('.', @path);
+
+        if( $nested_path ) {
+            $i{nested_path} = $nested_path;
+            $i{nested_key}  = substr( $key, length($nested_path)+1 );
         }
+
+        $f->{$key} = \%i;
     }
-    # Handle elements that contain data
-    elsif( exists $ref->{type} ) {
-        _add_fields($f,@path);
-        # Handle multifields
-        if( exists $ref->{fields} && is_hashref($ref->{fields}) ) {
-            foreach my $k (sort keys %{ $ref->{fields} } ) {
-                _add_fields($f,@path,$k);
+
+    sub _find_fields {
+        my ($f,$ref,@path) = @_;
+
+        # Handle things with properties
+        if( exists $ref->{properties} && is_hashref($ref->{properties}) ) {
+            $nested_path = join('.', @path) if $ref->{type} and $ref->{type} eq 'nested';
+            foreach my $k (sort keys %{ $ref->{properties} }) {
+                _find_fields($f,$ref->{properties}{$k},@path,$k);
+            }
+            undef($nested_path);
+        }
+        # Handle elements that contain data
+        elsif( exists $ref->{type} ) {
+            _add_fields($f,$ref->{type},@path);
+            # Handle multifields
+            if( exists $ref->{fields} && is_hashref($ref->{fields}) ) {
+                foreach my $k (sort keys %{ $ref->{fields} } ) {
+                    _add_fields($f,$ref->{type},@path,$k);
+                }
             }
         }
-    }
-    # Unknown data, throw an error if we care that deeply.
-    else {
-        debug({stderr=>1,color=>'red'},
-            sprintf "_find_fields(): Invalid property at: %s ref info: %s",
-                join('.', @path),
-                join(',', is_hashref($ref) ? sort keys %{$ref} :
-                          ref $ref         ? ref $ref : 'unknown ref'
-                ),
-        );
+        # Unknown data, throw an error if we care that deeply.
+        else {
+            debug({stderr=>1,color=>'red'},
+                sprintf "_find_fields(): Invalid property at: %s ref info: %s",
+                    join('.', @path),
+                    join(',', is_hashref($ref) ? sort keys %{$ref} :
+                            ref $ref         ? ref $ref : 'unknown ref'
+                    ),
+            );
+        }
     }
 }
 
@@ -838,7 +855,6 @@ sub es_local_index_meta {
         }
     }
 
-
     return;
 }
 
@@ -856,7 +872,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 6.5
+version 6.6
 
 =head1 SYNOPSIS
 
@@ -1008,7 +1024,13 @@ Checks if the specified index is valid
 
 =head2 es_index_fields('index-name')
 
-Returns a list of the fields in a given index.
+Returns a hash reference with the following data:
+
+    key_name:
+      type: field_data_type
+      # If the field is nested
+      nested_path: nested_path
+      nested_key: nested_key
 
 =head2 es_close_index('index-name')
 
@@ -1108,7 +1130,7 @@ From App::ElasticSearch::Utilities:
                      (same as --pattern logstash-* or logstash-DATE)
     --datesep       Date separator, default '.' also (--date-separator)
     --pattern       Use a pattern to operate on the indexes
-    --days          If using a pattern or base, how many days back to go, default: all
+    --days          If using a pattern or base, how many days back to go, default: 1
 
 See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections from App::ElasticSearch::Utilities.
 
@@ -1309,7 +1331,7 @@ Or if you'd prefer to manually install:
 
     export RELEASE=<CurrentRelease>
 
-    wget --no-check-certificate https://github.com/reyjrar/es-utils/blob/master/releases/App-ElasticSearch-Utilities-$RELEASE.tar.gz?raw=true -O es-utils.tgz
+    wget "https://github.com/reyjrar/es-utils/blob/master/releases/App-ElasticSearch-Utilities-$RELEASE.tar.gz?raw=true" -O es-utils.tgz
 
     tar -zxvf es-utils.tgz
 

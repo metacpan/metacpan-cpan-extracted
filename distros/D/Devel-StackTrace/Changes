@@ -1,3 +1,13 @@
+2.04   2019-05-24
+
+- Add a partial workaround for "Bizarre copy" errors (GH #11) that come when
+  attempting to look at arguments in the call stack. This is only a partial
+  fix as there are cases that can lead to a SEGV. Ultimately this needs to be
+  fixed in the Perl core. See
+  https://rt.perl.org/Public/Bug/Display.html?id=131046 for relevant
+  discussion. Fixed by pali. GH #21.
+
+
 2.03   2017-11-18
 
 - If all frames in the trace were skipped (via skip_frames, frame_filter,

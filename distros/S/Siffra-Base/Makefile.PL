@@ -27,7 +27,8 @@ my %WriteMakefileArgs = (
         'version'      => 0,
         # Default req
 
-        'Test::More' => 0,
+        'Test::More'         => 0,
+        'Test::Perl::Critic' => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,

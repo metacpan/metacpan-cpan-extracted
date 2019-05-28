@@ -1,3 +1,28 @@
+2.018 2019-05-27
+
+  Bug fix:
+    * Fix usage of Config::Model::TkUI. This fixes the non-regression
+      tests that break with new TkUI.
+      (require Config::Model::TkUI 1.370)
+
+2.017 2019-05-26
+
+  Improve the way models files are written:
+    * use YAML::XS instead of YAML::Tiny
+    * write "use strict;" abd "use warnings;" in model files
+
+  Deprecation update:
+    * use get_model_clone instead of get_model
+      (require Config::Model 2.134)
+
+  Test changes:
+    * setup perlcritic tests (require Perl 5.012)
+
+  Doc updates:
+    * add cme meta dump-yaml example in pod doc
+    * Fix typo in model doc (Tx gregoa)
+    * add credit section
+
 2.016 2018-12-17
 
   Test fixes:

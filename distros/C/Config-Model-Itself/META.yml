@@ -13,6 +13,7 @@ build_requires:
   Test::File::Contents: '0'
   Test::Memory::Cycle: '0'
   Test::More: '0'
+  Test::Pod: '1.00'
   Text::Diff: '0'
 configure_requires:
   Module::Build: '0.34'
@@ -27,8 +28,8 @@ requires:
   App::Cme: '1.002'
   App::Cme::Common: '0'
   Carp: '0'
-  Config::Model: '2.127'
-  Config::Model::TkUI: '0'
+  Config::Model: '2.134'
+  Config::Model::TkUI: '1.370'
   Config::Model::Value: '0'
   Data::Compare: '0'
   Data::Dumper: '0'
@@ -43,16 +44,16 @@ requires:
   Pod::POM: '0'
   Scalar::Util: '0'
   Tk: '0'
-  YAML::Tiny: '0'
+  YAML::XS: '0'
   base: '0'
   lib: '0'
-  perl: v5.10.1
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/dod38fr/config-model-itself/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-itself.git
-version: '2.016'
+version: '2.018'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

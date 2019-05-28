@@ -54,7 +54,7 @@ use vars qw(
 );
 @MySQL::Admin::GUI::EXPORT  = qw( ContentHeader Body ChangeDb Unique openFile action applyRights maxlength);
 @ISA                        = qw( Exporter MySQL::Admin );
-$MySQL::Admin::GUI::VERSION = '1.17';
+$MySQL::Admin::GUI::VERSION = '1.18';
 $m_bMod_perl                = ( $ENV{MOD_PERL} ) ? 1 : 0;
 local $^W = 0;
 our @m_processlist;
@@ -91,8 +91,7 @@ sub ContentHeader {
     init($m_hrSettingsfile) unless $m_bMod_perl and $m_bFirstTime;
     $m_nSkipCaptch = 0;
     $m_bMainTemplate = param('m_blogin') eq 'true' ? 1 : 0;
-my $cyrptpass ;
-    #todo klären wiso m_hrLng durch init nicht gesetzt wird.
+    my $cyrptpass ;
     *m_hrLng     = \$MySQL::Admin::Translate::lang;
     $m_oDatabase = new DBI::Library::Database();
     $m_oDatabase->serverName( $m_hrSettings->{cgi}{serverName} );
@@ -111,26 +110,14 @@ my $cyrptpass ;
     $m_sAction = ( $m_sAction =~ /^(\w{3,50})$/ ) ? $1 : $m_hrSettings->{defaultAction};
     $m_sJson = {
         m_sCurrentAction => $m_sAction,
-        m_nSize          => $m_hrSettings->{size},
         m_nRight         => $m_nRight,
-        htmlright        => $m_hrSettings->{htmlright},
-        style            => $m_hrSettings->{cgi}{style},
+        m_nHtmlright     => $m_hrSettings->{htmlright},
+        msStyle          => $m_hrSettings->{cgi}{style},
+        m_sServerName    => $m_hrSettings->{cgi}{serverName},
+        m_nSize          => $m_hrSettings->{size},
+        m_sTitle         => $m_hrSettings->{cgi}{title}
     };
-    $m_sCurrentHost = param('m_shost') ? param('m_shost') : $m_hrSettings->{database}{CurrentHost};
-    $m_sCurrentUser = param('m_suser') ? param('m_suser') : $m_hrSettings->{database}{CurrentUser};
-    $m_sCurrentPass = param('m_spass') ? param('m_spass') : $m_hrSettings->{database}{CurrentPass};
-
-    if ( param('ChangeCurrentDb') ) {
-        $m_sCurrentDb                          = param('ChangeCurrentDb');
-        $m_hrSettings->{database}{CurrentDb}   = $m_sCurrentDb;
-        $m_hrSettings->{database}{CurrentHost} = $m_sCurrentHost;
-        $m_hrSettings->{database}{CurrentUser} = $m_sCurrentUser;
-        $m_hrSettings->{database}{CurrentPass} = $m_sCurrentPass;
-        $m_sAction                             = 'ShowTables';
-        saveSettings($m_hrSettingsfile);
-    } else {
-        $m_sCurrentDb = $m_hrSettings->{database}{CurrentDb};
-    } ## end else [ if ( param('ChangeCurrentDb'...))]
+    
     my $cookiepath = $m_hrSettings->{cgi}{cookiePath};
     $m_sSid =
         defined cookie( -name => 'sid' ) ? cookie( -name => 'sid' )
@@ -157,13 +144,14 @@ my $cyrptpass ;
         );
         $m_sUser   = 'guest';
         $m_sSid    = '123';
-        $m_sAction = $m_bMainTemplate ? $m_hrSettings->{defaultAction} : 'news'
-          if ( $m_sAction eq 'logout' );
+        $m_sAction = $m_bMainTemplate ? $m_hrSettings->{defaultAction} : 'news' if ( $m_sAction eq 'logout' );
+
     } elsif ( $m_sAction eq 'login' ) {
         my $ip = remote_addr();
         my $u  = param('user');
         my $p  = param('pass');
         $m_nSkipCaptch = 0;
+        $DB::signal = 1;
         eval {
             my $captcha = Authen::Captcha->new(
                 data_folder   => "$m_hrSettings->{cgi}{bin}/config/",
@@ -171,7 +159,9 @@ my $cyrptpass ;
             );
             $m_nSkipCaptch = $captcha->check_code( param("captcha"), param("md5") );
         };
+
         $m_nSkipCaptch = 1 if $@;
+
         if ( defined $u && defined $p && defined $ip && $m_nSkipCaptch > 0 ) {
             use MD5;
             my $md5 = new MD5;
@@ -225,6 +215,25 @@ my $cyrptpass ;
     } ## end else [ if ( $m_sAction eq 'logout'...)]
     my $ip = remote_addr();
     $m_nRight = $m_oDatabase->userright($m_sUser);
+    $m_sCurrentHost = $m_hrSettings->{database}{CurrentHost};
+    $m_sCurrentUser = $m_hrSettings->{database}{CurrentUser};
+    $m_sCurrentPass = $m_hrSettings->{database}{CurrentPass};
+
+    if ( param('m_ChangeCurrentDb') && $m_nRight >= 5) {
+        $m_sCurrentHost = param('m_shost') ? param('m_shost') : $m_sCurrentHost;
+        $m_sCurrentUser = param('m_suser') ? param('m_suser') : $m_sCurrentUser;
+        $m_sCurrentPass = param('m_spass') ? param('m_spass') : $m_sCurrentPass;
+        $m_sCurrentDb                          = param('m_ChangeCurrentDb');
+        $m_hrSettings->{database}{CurrentDb}   = $m_sCurrentDb;
+        $m_hrSettings->{database}{CurrentHost} = $m_sCurrentHost;
+        $m_hrSettings->{database}{CurrentUser} = $m_sCurrentUser;
+        $m_hrSettings->{database}{CurrentPass} = $m_sCurrentPass;
+        $m_sAction                             = 'ShowTables';
+        saveSettings($m_hrSettingsfile);
+    } else {
+        $m_sCurrentDb = $m_hrSettings->{database}{CurrentDb};
+    } ## end else [ if ( param('ChangeCurrentDb'...))]
+
     print qq(<?xml version="1.0" encoding="UTF-8"?>\n<xml>\n\n);
     $m_sJson->{m_sSid} = $m_sSid;
     my $encode_json = encode_json $m_sJson;
@@ -381,7 +390,7 @@ sub openFile {
         close $fh;
         return $lines;
     } else {
-        warn "file exestiert nicht $/";
+        warn "file not found: $file$/";
     } ## end else [ if ( -e $file ) ]
 } ## end sub openFile
 
@@ -443,7 +452,7 @@ sub action {
 sub maxlength {
     my $maxWidth = shift;
     ++$maxWidth;
-    my $txt = decode_utf8(shift, Encode::FB_QUIET);
+    my $txt = shift;
     if ( length($$txt) > $maxWidth ) {
         my $maxLength = $maxWidth;
         my $i++;
@@ -479,7 +488,7 @@ Dirk Lindner <lze@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2018 by Hr. Dirk Lindner
+Copyright (C) 2005-2019 by Hr. Dirk Lindner
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public License

@@ -97,6 +97,7 @@ if ( $OSNAME eq 'MSWin32' ) {
 		TODO: {
 			local $TODO = "Known missing case" if ($timezone =~ /^(?:
 											(?:
+												Armenian|
 												Kamchatka|
 												Magallanes|
 												Mexico|

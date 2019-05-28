@@ -2,14 +2,13 @@ package SVG::TT::Graph;
 
 use strict;
 use Carp;
-
-use vars qw($VERSION $AUTOLOAD $TEMPLATE_FH);
 use Template;
 use POSIX;
-
 require 5.6.1;
 
-$VERSION = '0.25';
+our $VERSION = '0.26';
+our $AUTOLOAD;
+our $TEMPLATE_FH;
 
 =head1 NAME
 
@@ -20,9 +19,8 @@ SVG::TT::Graph - Base module for generating SVG graphics
   package SVG::TT::Graph::GRAPH_TYPE;
   use SVG::TT::Graph;
   use base qw(SVG::TT::Graph);
-  use vars qw($VERSION);
-  $VERSION = $SVG::TT::Graph::VERSION;
-  $TEMPLATE_FH = \*DATA;
+  our $VERSION = $SVG::TT::Graph::VERSION;
+  our $TEMPLATE_FH = \*DATA;
 
   sub _set_defaults {
     my $self = shift;
@@ -214,9 +212,10 @@ sub get_template {
   my $self = shift;
 
   # Template filehandle
-  my $class = ref($self);
-  my $template_fh = eval('$'.$class.'::TEMPLATE_FH');
-  croak $class . ' must have a template' if not $template_fh;
+  my $template_fh_sr = $self->_get_template_fh_sr();
+  croak ref($self) . ' must have a template' if not $template_fh_sr;
+
+  my $template_fh = $$template_fh_sr;
 
   # Read in TT template
   my $start = tell $template_fh;
@@ -230,6 +229,17 @@ sub get_template {
   seek $template_fh, $start, 0;
 
   return $template;
+}
+
+sub _get_template_fh_sr {
+    my ($self) = @_;
+
+    my $ns_ref = \%main::;
+    for my $node ( split m<::>, ref $self ) {
+        $ns_ref = $ns_ref->{"${node}::"};
+    }
+
+    return *{$ns_ref->{'TEMPLATE_FH'}}{'SCALAR'};
 }
 
 =head2 burn()

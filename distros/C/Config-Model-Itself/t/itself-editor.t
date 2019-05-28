@@ -104,7 +104,7 @@ SKIP: {
     } ;
 
     my $cmu = $mw->ConfigModelEditUI (
-        -root => $meta_root,
+        -instance => $meta_inst,
         -root_dir => $wr_conf1->stringify,
         -cm_lib_dir => $wr_model1->relative($wr_lib)->stringify ,
         -store_sub => $write_sub,

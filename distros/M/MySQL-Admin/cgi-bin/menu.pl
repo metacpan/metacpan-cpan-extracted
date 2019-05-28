@@ -33,7 +33,7 @@ $m_sUser = $m_oDb->getName($m_sSid);
 $m_sUser = defined $m_sUser ? $m_sUser : 'guest';
 $m_nRight = $m_oDb->userright($m_sUser);
 $m_nRight = defined $m_nRight ? $m_nRight: 0;
-@menuNavi = $m_oDb->fetch_AoH("select * from $m_hrS->{database}{name}.mainMenu where `right` <= $m_nRight order by position");
+@menuNavi = $m_oDb->fetch_AoH("select * from $m_hrS->{database}{name}.mainmenu where `right` <= $m_nRight order by position");
 print q(<?xml version="1.0" encoding="UTF-8"?><actions>);
 print uri_escape("javascript:requestURI('cgi-bin/mysql.pl?action=EditFile&name='+cAction,'EditFile','EditFile')");
 for(my $i = 0; $i <= $#menuNavi;$i++){

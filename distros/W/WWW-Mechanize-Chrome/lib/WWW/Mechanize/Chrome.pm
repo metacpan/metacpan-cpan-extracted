@@ -22,7 +22,7 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::Chrome;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -1200,9 +1200,9 @@ sub clear_js_errors {
     $self->driver->send_message('Runtime.discardConsoleEntries')->get;
 };
 
-=head2 C<< $mech->eval_in_page( $str ) >>
+=head2 C<< $mech->eval_in_page( $str, %options ) >>
 
-=head2 C<< $mech->eval( $str ) >>
+=head2 C<< $mech->eval( $str, %options ) >>
 
   my ($value, $type) = $mech->eval( '2+2' );
 
@@ -1213,19 +1213,36 @@ Returns a pair of value and Javascript type.
 This allows access to variables and functions declared
 "globally" on the web page.
 
+=over 4
+
+=item returnByValue
+
+If you want to create an object in Chrome and only want to keep a handle to that
+remote object, use C<JSON::false> for the C<returnByValue> option:
+
+    my ($dummyObj,$type) = $mech->eval(
+        'new Object',
+        returnByValue => JSON::false
+    );
+
+This is also helpful if the object in Chrome cannot be serialized as JSON.
+For example, C<window> is such an object. The return value is a hash, whose
+C<objectId> is the most interesting part.
+
+=back
+
 This method is special to WWW::Mechanize::Chrome.
 
 =cut
 
-sub eval_in_page {
-    my ($self,$str) = @_;
+sub eval_in_page($self,$str, %options) {
     # Report errors from scope of caller
     # This feels weirdly backwards here, but oh well:
     local @Chrome::DevToolsProtocol::CARP_NOT
         = (@Chrome::DevToolsProtocol::CARP_NOT, (ref $self)); # we trust this
     local @CARP_NOT
         = (@CARP_NOT, 'Chrome::DevToolsProtocol', (ref $self)); # we trust this
-    my $result = $self->driver->evaluate("$str")->get;
+    my $result = $self->driver->evaluate("$str", %options)->get;
 
     if( $result->{error} ) {
         $self->signal_condition(
@@ -1242,7 +1259,11 @@ sub eval_in_page {
         );
     }
 
-    return $result->{result}->{value}, $result->{result}->{type};
+    if( exists $result->{result}->{value}) {
+        return $result->{result}->{value}, $result->{result}->{type};
+    } else {
+        return $result->{result}, $result->{result}->{type};
+    }
 };
 
 {
@@ -1303,8 +1324,11 @@ sub callFunctionOn_future( $self, $str, %options ) {
                                $result->{exceptionDetails}->{exception}->{description},
             );
         }
-
-        return Future->done( $result->{result}->{value}, $result->{result}->{type} );
+        if( exists $result->{result}->{value}) {
+            return Future->done( $result->{result}->{value}, $result->{result}->{type} );
+        } else {
+            return Future->done( $result->{result}, $result->{result}->{type} );
+        }
     })
 };
 

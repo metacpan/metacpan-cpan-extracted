@@ -10,7 +10,7 @@ configure_requires:
   Locale::Msgfmt: 0.15
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+generated_by: 'Module::Install version 1.19'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ requires:
   Zonemaster::LDNS: 1
   perl: 5.14.2
 resources:
-  bugtracker: https://github.com/dotse/zonemaster-cli/issues
+  bugtracker: https://github.com/zonemaster/zonemaster-cli/issues
   license: http://opensource.org/licenses/bsd-license.php
-  repository: https://github.com/dotse/zonemaster-cli
-version: '1.001003'
+  repository: https://github.com/zonemaster/zonemaster-cli
+version: '2.000001'

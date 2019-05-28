@@ -1,7 +1,5 @@
 package Pcore::Ext::Lib::modern::PDF;
 
-use Pcore -class;
-
 use Pcore -l10n;
 use Pcore::CDN::Static::FA qw[:ALL];
 

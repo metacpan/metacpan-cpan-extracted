@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.2.0';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.4.0';
 use strict;
 use warnings;
 
@@ -34,8 +34,11 @@ sub abstract
 
 sub opt_spec
 {
-    return ( [ "output|o=s", "Output path" ],
-        [ 'exec|e=s@', "Execute command on the output" ] );
+    return (
+        [ "output|o=s", "Output path" ],
+        [ "title=s",    "Chart Title" ],
+        [ 'exec|e=s@',  "Execute command on the output" ]
+    );
 }
 
 sub execute
@@ -81,9 +84,10 @@ sub execute
     );
 
     # Add a chart title and some axis labels.
-    $chart1->set_title( name => 'Results of sample analysis' );
-    $chart1->set_x_axis( name => 'Test number' );
-    $chart1->set_y_axis( name => 'Sample length (mm)' );
+    $chart1->set_title(
+        name => ( $opt->{title} // 'Results of sample analysis' ) );
+    $chart1->set_x_axis( name => $headings->[0] );
+    $chart1->set_y_axis( name => $headings->[1] );
 
     # Set an Excel chart style. Blue colors with white outline and shadow.
     $chart1->set_style(11);
@@ -254,7 +258,7 @@ App::CSV2Chart::Command::xlsx
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 NAME
 
@@ -262,7 +266,7 @@ csv2chart xlsx - generate an .xlsx file with an embedded chart from CSV data
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

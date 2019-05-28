@@ -13,8 +13,8 @@ my $s = Data::Hopen::Scope::Environment->new();
 isa_ok($s, 'Data::Hopen::Scope::Environment');
 ok($s->DOES('Data::Hopen::Scope'), 'Scope::Environment DOES Scope');
 
-$s->add(foo_hopen => 42);
-cmp_ok($ENV{foo_hopen}, '==', 42, 'add() updates %ENV');
+$s->put(foo_hopen => 42);
+cmp_ok($ENV{foo_hopen}, '==', 42, 'put() updates %ENV');
 cmp_ok($s->find('foo_hopen'), '==', 42, 'Retrieving previously-set variable works');
 
 foreach my $varname (qw(SHELL COMSPEC PATH)) {
@@ -29,8 +29,8 @@ local *varname_outer = \'+;!@#$%^&*() Another crazy variable name that is not a 
 local *varname_env = \'__ENV_VAR_FOR_TESTING_HOPEN_';
     # On Win32, ENV variable names are all uppercase.
 
-my $inner = Data::Hopen::Scope::Hash->new()->add($varname_inner => 42);
-my $outer = Data::Hopen::Scope::Hash->new()->add($varname_outer => 1337);
+my $inner = Data::Hopen::Scope::Hash->new()->put($varname_inner => 42);
+my $outer = Data::Hopen::Scope::Hash->new()->put($varname_outer => 1337);
 
 $inner->outer($s);
 $s->outer($outer);

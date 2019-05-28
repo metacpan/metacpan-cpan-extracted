@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 36;
+use Test::More tests => 19;
 
 use lib 't';
 use Util;
@@ -77,7 +77,7 @@ HERE
 
 # Try context 1.
 CONTEXT_ONE: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 
 "For the love of God, Montresor!"
 HERE
@@ -106,7 +106,7 @@ HERE
 
 # -1 must not stop the ending context from displaying.
 CONTEXT_DEFAULT: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 or prohibiting the free exercise thereof; or abridging the freedom of
 speech, or of the press; or the right of the people peaceably to assemble,
 and to petition the Government for a redress of grievances.
@@ -121,7 +121,7 @@ HERE
 
 # -C with overlapping contexts (adjacent lines)
 CONTEXT_OVERLAPPING: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 This is line 03
 This is line 04
 This is line 05
@@ -139,7 +139,7 @@ HERE
 
 # -C with contexts that touch.
 CONTEXT_ADJACENT: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 This is line 01
 This is line 02
 This is line 03
@@ -161,7 +161,7 @@ HERE
 
 # -C with contexts that just don't touch.
 CONTEXT_NONADJACENT: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 This is line 01
 This is line 02
 This is line 03
@@ -245,7 +245,7 @@ HERE
 #    even though there is a 4th match in the after context of the third match
 #    ("ratifying" in the last line)
 CONTEXT_MAX_COUNT: {
-    my @expected = line_split( <<"HERE" );
+    my @expected = line_split( <<'HERE' );
 ratified by the Legislatures of three fourths of the several States, or
 by Conventions in three fourths thereof, as the one or the other Mode of
 Ratification may be proposed by the Congress; Provided that no Amendment
@@ -290,7 +290,7 @@ HERE
 # Grouping works with context and multiple files.
 # i.e. a separator line between different matches in the same file and no separator between files
 GROUPING_MULTIPLE_FILES: {
-    my @expected = line_split( <<'HERE' );
+    my @expected = line_split( <<"HERE" );
 t/text/amontillado.txt
 258-As I said these words I busied myself among the pile of bones of
 259:which I have before spoken. Throwing them aside, I soon uncovered
@@ -341,3 +341,7 @@ HERE
 
     ack_lists_match( [ @args, @files ], \@expected, "Looking for $regex" );
 }
+
+done_testing();
+
+exit 0;

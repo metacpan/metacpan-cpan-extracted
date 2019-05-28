@@ -1,11 +1,12 @@
 package App::CalendarDatesUtils;
 
-our $DATE = '2019-02-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-05-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+#use Log::ger;
 
 our %SPEC;
 
@@ -28,6 +29,13 @@ $SPEC{list_calendar_dates} = {
     summary => 'List dates from one or more Calendar::Dates::* modules',
     args => {
         year => {
+            summary => 'Specify year of dates to list',
+            description => <<'_',
+
+The default is to list dates in the current year. You can specify all_years
+instead to list dates from all available years.
+
+_
             schema => 'int*',
             pos => 0,
         },
@@ -39,36 +47,62 @@ $SPEC{list_calendar_dates} = {
             schema => ['int*', in=>[1, 31]],
             pos => 2,
         },
+        all_years => {
+            summary => 'List dates from all available years '.
+                'instead of a single year',
+            schema => 'true*',
+        },
         modules => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'modules',
             schema => ['array*', of=>'perl::modname*'],
             cmdline_aliases => {m=>{}},
-            'x.completion' => [perl_modname => {ns_prefix=>'Calendar::Dates'}],
+            'x.element_completion' => [perl_modname => {ns_prefix=>'Calendar::Dates::'}],
         },
-        all => {
+        all_modules => {
             summary => 'Use all installed Calendar::Dates::* modules',
             schema => 'true*',
-            cmdline_aliases => {a=>{}},
+        },
+        params => {
+            summary => 'Specify parameters',
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'param',
+            'schema' => ['hash*', of=>'str*'],
         },
         detail => {
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
         },
+        past => {
+            schema => 'bool*',
+            'summary' => "Filter entries that are less than (at least) today's date",
+        },
     },
     args_rels => {
-        req_one => ['modules', 'all'],
+        'req_one&' => [
+            ['modules', 'all_modules'],
+        ],
+        'choose_one&' => [
+            ['year', 'all_years'],
+        ],
     },
 };
 sub list_calendar_dates {
     my %args = @_;
 
-    my $year = $args{year} // (localtime)[5]+1900;
+    my @lt = localtime;
+    my $year_today = $lt[5]+1900;
+    my $mon_today  = $lt[4]+1;
+    my $day_today  = $lt[3];
+    #log_trace "date_today: %04d-%02d-%02d", $year_today, $mon_today, $day_today;
+    #my $date_today = sprintf "%04d-%02d-%02d", $year_today, $mon_today, $day_today;
+
+    my $year = $args{year} // $year_today;
     my $mon  = $args{month};
     my $day  = $args{day};
 
     my $modules;
-    if ($args{all}) {
+    if ($args{all_modules}) {
         $modules = list_calendar_dates_modules()->[2];
     } else {
         $modules = $args{modules};
@@ -80,14 +114,38 @@ sub list_calendar_dates {
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
         require $mod_pm;
 
-        my $res;
-        eval { $res = $mod->get_entries($year, $mon, $day) };
-        if ($@) {
-            warn "Can't get entries from $mod: $@, skipped";
-            next;
+        my $years;
+        if ($args{all_years}) {
+            $years = [ $mod->get_min_year .. $mod->get_max_year ];
+        } else {
+            $years = [ $year ];
         }
 
-        push @rows, @$res;
+        for my $y (@$years) {
+            my $res;
+            eval {
+                my @args = ($y, $mon, $day);
+                if ($args{params} && keys %{$args{params}}) {
+                    unshift @args, $args{params};
+                }
+                $res = $mod->get_entries(@args);
+            };
+            if ($@) {
+                warn "Can't get entries from $mod (year=$y): $@, skipped";
+                next;
+            }
+            for my $item (@$res) {
+                if (defined $args{past}) {
+                    my $date_cmp =
+                        $item->{year}  <=> $year_today ||
+                        $item->{month} <=> $mon_today  ||
+                        $item->{day}   <=> $day_today;
+                    next if  $args{past} &&  $date_cmp >  0;
+                    next if !$args{past} &&  $date_cmp <= 0;
+                }
+                push @rows, $item;
+            }
+        }
     }
 
     unless ($args{detail}) {
@@ -112,7 +170,7 @@ App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CalendarDatesUtils (from Perl distribution App-CalendarDatesUtils), released on 2019-02-14.
+This document describes version 0.005 of App::CalendarDatesUtils (from Perl distribution App-CalendarDatesUtils), released on 2019-05-28.
 
 =head1 DESCRIPTION
 
@@ -143,9 +201,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<all> => I<true>
+=item * B<all_modules> => I<true>
 
 Use all installed Calendar::Dates::* modules.
+
+=item * B<all_years> => I<true>
+
+List dates from all available years instead of a single year.
 
 =item * B<day> => I<int>
 
@@ -155,7 +217,20 @@ Use all installed Calendar::Dates::* modules.
 
 =item * B<month> => I<int>
 
+=item * B<params> => I<hash>
+
+Specify parameters.
+
+=item * B<past> => I<bool>
+
+Filter entries that are less than (at least) today's date.
+
 =item * B<year> => I<int>
+
+Specify year of dates to list.
+
+The default is to list dates in the current year. You can specify all_years
+instead to list dates from all available years.
 
 =back
 

@@ -1,41 +1,31 @@
 ---
 abstract: 'DBI Exception objects'
 author:
-  - 'David E. Wheeler <david@justatheory.com>'
+  - unknown
 build_requires:
-  Module::Build: 0.2701
-  Test::Harness: 2.03
-  Test::More: 0.17
+  ExtUtils::MakeMaker: '6.64'
+  Test::Harness: '2.03'
+  Test::More: '0.17'
 configure_requires:
-  Module::Build: 0.2701
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Exception-Class-DBI
-provides:
-  Exception::Class::DBI:
-    file: lib/Exception/Class/DBI.pm
-    version: 1.01
-  Exception::Class::DBI::DBH:
-    file: lib/Exception/Class/DBI.pm
-    version: 0
-  Exception::Class::DBI::H:
-    file: lib/Exception/Class/DBI.pm
-    version: 0
-  Exception::Class::DBI::STH:
-    file: lib/Exception/Class/DBI.pm
-    version: 0
-recommends:
-  Test::Pod: 1.41
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  DBI: 1.28
-  Exception::Class: 1.02
+  DBI: '1.28'
+  Exception::Class: '1.02'
+  perl: '5.006000'
 resources:
-  bugtracker: http://github.com/theory/exception-class-dbi/issues/
-  homepage: http://search.cpan.org/dist/Exception-Class-DBI/
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/theory/exception-class-dbi/
-version: 1.01
+  bugtracker: https://github.com/plicease/Exception-Class-DBI/issues
+  homepage: https://metacpan.org/pod/Exception-Class-DBI
+  repository: https://github.com/plicease/Exception-Class-DBI.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

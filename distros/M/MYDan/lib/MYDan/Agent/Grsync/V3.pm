@@ -50,8 +50,8 @@ sub run
    
                 my %query = ( 
                     code => 'mrsync',
-                    argv => &$argv( 'mrsync', undef, %o, %$sync, %path ),
-                     map{ $_ => $o{$_} }qw( user sudo ) 
+                    argv => &$argv( 'mrsync', undef, %o, %$sync, %path, pcb => undef ),
+                     map{ $_ => $o{$_} }qw( user sudo env ) 
                 );
     
                 my %result = MYDan::Agent::Client->new(
@@ -107,7 +107,7 @@ sub run
                 MYDan::Agent::Load->new(
                     node => $host,
                     sp => $path{sp}, dp => $load,
-                )->run( %{$this->{agent}}, %o, 
+                )->run( %{$this->{agent}}, %o, verbose => $o{pcb} ? 1 : 0,
 		    ( defined $o{cc} ) ? () 
 		        : ( 'chown' => undef, 'chmod' => undef ) 
 		);
@@ -154,9 +154,10 @@ sub run
             );
 
             map{ print "localhost => $_: DUMP\n" }keys %dump;
+            my %MYDan_rlog = ( MYDan_rlog => $o{env}{MYDan_rlog} ) if $o{env} && $o{env}{MYDan_rlog};
             my %result = MYDan::Agent::Client->new(
                 keys %dump
-            )->run( %{$this->{agent}}, %o, query => \%query );
+            )->run( %{$this->{agent}}, %o, %MYDan_rlog, query => \%query, verbose => $o{pcb} ? 1 : 0 );
 
             map{ 
                 my $stat = $result{$_} && $result{$_} eq "ok\n--- 0\n" 
@@ -187,11 +188,11 @@ sub run
         
                     my %query = ( 
                         code => 'mrsync',
-                        argv => &$argv( 'mrsync', undef, %o, %sync ),
-			map{ $_ => $o{$_} }qw( user sudo ) 
+                        argv => &$argv( 'mrsync', undef, %o, %sync, pcb => undef ),
+			map{ $_ => $o{$_} }qw( user sudo env ) 
                     );
         
-                    my %result = MYDan::Agent::Client->new( $p )->run( %{$this->{agent}}, %o, query => \%query );
+                    my %result = MYDan::Agent::Client->new( $p )->run( %{$this->{agent}}, %o, query => \%query, pcb => undef );
     		    my $result = $result{$p} || '';
         	    if( $result =~ s/--- 0\n// && $result =~ s/###mrsync_failed:([\w\._-]*):mrsync_failed###$//)
     		    {

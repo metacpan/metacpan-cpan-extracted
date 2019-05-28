@@ -1,5 +1,7 @@
 #!perl -T
 
+# https://github.com/beyondgrep/ack2/issues/491
+
 use strict;
 use warnings;
 use lib 't';
@@ -12,6 +14,7 @@ prep_environment();
 
 my $dir = File::Temp->newdir;
 my $wd  = getcwd_clean();
+
 safe_chdir( $dir->dirname );
 write_file('space-newline.txt', " \n");
 write_file('space-newline-newline.txt', " \n\n");
@@ -30,4 +33,7 @@ sets_match(\@results, [
     'space-newline-newline.txt:1',
 ], 'both files should be in -c output with correct counts');
 
-safe_chdir( $wd );
+safe_chdir( $wd );  # Get out of temp directory so it can be cleaned up.
+
+done_testing();
+exit 0;

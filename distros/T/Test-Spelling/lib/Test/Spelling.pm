@@ -11,7 +11,7 @@ use File::Spec;
 use IPC::Run3;
 use Symbol 'gensym';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 our @EXPORT = qw(
     pod_file_spelling_ok
@@ -101,11 +101,12 @@ sub invalid_words_in {
 
     my $document = '';
     open my $handle, '>', \$document;
-    open my $infile, '<:encoding(UTF-8)', $file;
+    # the UTF-8 parsing seems to have broken many tests
+    #open my $infile, '<:encoding(UTF-8)', $file;
 
     # save digested POD to the string $document
-    get_pod_parser()->parse_from_filehandle($infile, $handle);
-
+    #get_pod_parser()->parse_from_filehandle($infile, $handle);
+    get_pod_parser()->parse_from_file($file, $handle);
     my @words = _get_spellcheck_results($document);
 
     chomp for @words;

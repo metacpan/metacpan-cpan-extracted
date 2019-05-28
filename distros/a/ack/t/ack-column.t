@@ -5,6 +5,7 @@ use strict;
 
 use Test::More tests => 4;
 
+
 use lib 't';
 use Util;
 
@@ -59,3 +60,6 @@ HERE
 
     lists_match( \@results, \@expected, 'Checking without column numbers' );
 }
+
+done_testing();
+exit 0;

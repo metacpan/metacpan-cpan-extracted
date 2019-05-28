@@ -10,5 +10,5 @@ TEXTDOMAIN = File-Globstar
 # Initial copyright holder added to pot and po files.
 COPYRIGHT_HOLDER = Guido Flohr
 
-# Where to send msgid bugs?  
+# Where to send msgid bugs?
 MSGID_BUGS_ADDRESS = guido.flohr@cantanea.com

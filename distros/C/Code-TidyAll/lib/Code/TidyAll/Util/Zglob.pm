@@ -5,7 +5,7 @@ package Code::TidyAll::Util::Zglob;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Exporter qw(import);
 
@@ -125,7 +125,7 @@ Code::TidyAll::Util::Zglob - Test::Glob hacked up to support "**/*"
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SUPPORT
 

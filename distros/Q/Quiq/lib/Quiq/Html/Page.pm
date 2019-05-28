@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -30,7 +30,7 @@ L<Quiq::Html::Base>
     $h = Quiq::Html::Tag->new;
     
     $obj = Quiq::Html::Page->new(
-        body=>'hello world!',
+        body => 'hello world!',
     );
     
     $html = $obj->html($h);
@@ -110,17 +110,17 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        body=>'',
-        comment=>undef,
-        encoding=>'utf-8',
-        head=>'',
-        noNewline=>0,
-        placeholders=>[],
-        javaScript=>[],
-        javaScriptToHead=>0,
-        styleSheet=>[],
-        title=>'',
-        topIndentation=>2,
+        body => '',
+        comment => undef,
+        encoding => 'utf-8',
+        head => '',
+        noNewline => 0,
+        placeholders => [],
+        javaScript => [],
+        javaScriptToHead => 0,
+        styleSheet => [],
+        title => '',
+        topIndentation => 2,
     );
 
     while (@_) {
@@ -177,7 +177,7 @@ sub html {
     $body = $h->cat($body);
     if ($body !~ /^<body/i) {
         $body = $h->tag('body',
-            -ind=>$topIndentation,
+            -ind => $topIndentation,
             '-',
             $body,
             $javaScriptToHead? (): $scriptTags,
@@ -190,16 +190,16 @@ sub html {
         $h->tag('html',
             '-',
             $h->tag('head',
-                -ind=>$topIndentation,
+                -ind => $topIndentation,
                 '-',
                 $h->tag('title',
-                    -ignoreIf=>!$title,
+                    -ignoreIf => !$title,
                     '-',
                     $title,
                 ),
                 $h->tag('meta',
-                    'http-equiv'=>'content-type',
-                    content=>"text/html; charset=$encoding",
+                    'http-equiv' => 'content-type',
+                    content => "text/html; charset=$encoding",
                 ),
                 $h->cat($head),
                 $styleTags,
@@ -228,7 +228,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

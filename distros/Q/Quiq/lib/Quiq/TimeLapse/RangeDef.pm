@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::OrderedHash;
 use Quiq::Path;
@@ -252,9 +252,9 @@ sub new {
 
                 if ($clipH->exists($clip) || $rangeH->exists($clip)) {
                     $class->throw(
-                        q~TIMELAPSE-00003: Duplicate clip/range key~,
-                        Key=>$clip,
-                        File=>$file,
+                        'TIMELAPSE-00003: Duplicate clip/range key',
+                        Key => $clip,
+                        File => $file,
                     );
                 }
 
@@ -264,10 +264,10 @@ sub new {
                 # Clip-Properties
 
                 my $h = Quiq::Hash->new(
-                    endFrames=>undef,
-                    framerate=>undef,
-                    pick=>undef,
-                    reverse=>undef,
+                    endFrames => undef,
+                    framerate => undef,
+                    pick => undef,
+                    reverse => undef,
                 );
                 if ($prop) {
                     $h->set(split /[=\s]/,$prop);
@@ -289,9 +289,9 @@ sub new {
                     ($range,$def) = split /\s+/,$_,2;
                     if ($rangeH->exists($range) || $clipH->exists($range)) {
                         $class->throw(
-                            q~TIMELAPSE-00003: Duplicate range/clip key~,
-                            Key=>$range,
-                            File=>$file,
+                            'TIMELAPSE-00003: Duplicate range/clip key',
+                            Key => $range,
+                            File => $file,
                         );
                     }
 
@@ -342,12 +342,12 @@ sub new {
     }
 
     return $class->SUPER::new(
-        dir=>$dir,
-        fileA=>\@files,
-        clipH=>$clipH,
-        clipPropertyH=>$clipPropertyH,
-        rangeH=>$rangeH,
-        junkExpr=>$junkExpr,
+        dir => $dir,
+        fileA => \@files,
+        clipH => $clipH,
+        clipPropertyH => $clipPropertyH,
+        rangeH => $rangeH,
+        junkExpr => $junkExpr,
     );
 }
 
@@ -525,7 +525,7 @@ sub expression {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

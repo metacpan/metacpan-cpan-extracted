@@ -1,6 +1,12 @@
 Revision history for Perl extension File-Globstar.
 
-0.5  2017-12-03
+0.6  2019-05-25
+    - enable coveralls.io
+    - removed unused code
+    - issues fixed:
+      * https://github.com/gflohr/File-Globstar/pull/2
+      * https://github.com/gflohr/File-Globstar/issues/5
+        (https://github.com/gflohr/File-Globstar/pull/6)
 
 0.5  2017-12-03
     - removed Pod::Coverage::TrustPod and Test::Perl::Critic as test

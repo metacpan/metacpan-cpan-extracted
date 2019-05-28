@@ -62,7 +62,7 @@ sub run
 
     my $filecache = MYDan::Agent::FileCache->new();
 
-    my $path = "$MYDan::PATH/tmp";
+    my ( $path, $hint ) = ( "$MYDan::PATH/tmp", '' );
     unless( -d $path ){ mkdir $path;chmod 0777, $path; }
     $path .= '/load.data.';
 
@@ -109,6 +109,7 @@ sub run
 
         if( my $rnode = $proxy{$node} )
         {
+            $hint = "FromProxy";
             my %rquery = ( 
                 code => 'proxy', 
                 proxyload => 1,
@@ -127,12 +128,13 @@ sub run
         }
     }
 
+    $hint .= ".$node";
     my ( $cv, $len, %keepalive )
         = ( AE::cv, $position,  cont => '', save => 0 );
     
     printf "position: %d\n", $position if $run{verbose};
 
-    my $percent =  MYDan::Util::Percent->new()->add( $position );
+    my $percent =  MYDan::Util::Percent->new(undef, undef, $run{pcb} )->add( $position );
     
     my %hosts = MYDan::Util::Hosts->new()->match( $node );
 
@@ -199,7 +201,7 @@ sub run
                            }
                        }
 
-                       $percent->print('Load ..') if $run{verbose};
+                       $percent->print('Load'.$hint.' ..') if $run{verbose};
                    }
                );
             },
@@ -222,7 +224,7 @@ sub run
     {
 
 	$percent->add( $ok );
-	$percent->print('Load ..') if $run{verbose};
+	$percent->print( 'Load' . $hint . ' ..' ) if $run{verbose};
         unlink $temp;
         return;
     }

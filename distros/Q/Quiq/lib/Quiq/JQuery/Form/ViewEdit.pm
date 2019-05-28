@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Unindent;
 use Quiq::Hash;
@@ -168,26 +168,26 @@ Liste der Widgets, die in das Layout eingesetzt werden.
 =head1 EXAMPLE
 
     $html = Quiq::JQuery::Form::ViewEdit->html($h,
-        instantiate=>1,
-        id=>'personForm',
-        state=>'insert',
-        action=>$c->url_for('/person/speichern'),
-        onSuccess=>q|
+        instantiate => 1,
+        id => 'personForm',
+        state => 'insert',
+        action => $c->url_for('/person/speichern'),
+        onSuccess => q|
             function () {
                 var d = new Date;
                 var date = $.formatDate(d,'YYYY-MM-DD hh:mm:ss');
                 $('input[name=formTime]').val(date);
             }
         |,
-        text=>{
-            saveButton=>'Speichern',
-            deleteButton=>'Löschen',
-            editCheckbox=>'Bearbeiten',
+        text => {
+            saveButton => 'Speichern',
+            deleteButton => 'Löschen',
+            editCheckbox => 'Bearbeiten',
         },
-        layout=>$h->cat(
+        layout => $h->cat(
             Quiq::Html::Table::Simple->html($h,
-                class=>'form',
-                rows=>[
+                class => 'form',
+                rows => [
                     ['form-section',[colspan=>2,'Person']],
                     ['form-widget',['Id:'],['__PER_ID__']],
                     ['form-widget',['Vorname:'],['__PER_VORNAME__']],
@@ -195,34 +195,34 @@ Liste der Widgets, die in das Layout eingesetzt werden.
                 ],
             ),
             Quiq::Html::Table::Simple->html($h,
-                class=>'form',
-                rows=>[
+                class => 'form',
+                rows => [
                     [['__SAVE__ __DELETE__ __EDIT__']],
                 ],
             ),
         ),
-        widgets=>[
+        widgets => [
             Quiq::Html::Widget::Hidden->new(
-                name=>'formular',
-                value=>'person',
+                name => 'formular',
+                value => 'person',
             ),
             Quiq::Html::Widget::Hidden->new(
-                name=>'formTime',
-                value=>$formTime,
+                name => 'formTime',
+                value => $formTime,
             ),
             Quiq::Html::Widget::ReadOnly->new(
-                name=>'per_id',
-                value=>$per->per_id,
+                name => 'per_id',
+                value => $per->per_id,
             ),
             Quiq::Html::Widget::TextField->new(
-                name=>'per_vorname',
-                size=>30,
-                value=>$per->per_vorname,
+                name => 'per_vorname',
+                size => 30,
+                value => $per->per_vorname,
             ),
             Quiq::Html::Widget::TextField->new(
-                name=>'per_nachname',
-                size=>30,
-                value=>$per->per_nachname,
+                name => 'per_nachname',
+                size => 30,
+                value => $per->per_nachname,
             ),
         ],
     );
@@ -414,19 +414,19 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        action=>undef,
-        id=>undef,
-        hidden=>undef,
-        instantiate=>0,
-        layout=>'',
-        onSuccess=>undef,
-        state=>'update',
-        text=>Quiq::Hash->new(
-            saveButton=>'Speichern',
-            deleteButton=>'Löschen',
-            editCheckbox=>'Bearbeiten',
+        action => undef,
+        id => undef,
+        hidden => undef,
+        instantiate => 0,
+        layout => '',
+        onSuccess => undef,
+        state => 'update',
+        text => Quiq::Hash->new(
+            saveButton => 'Speichern',
+            deleteButton => 'Löschen',
+            editCheckbox => 'Bearbeiten',
         ),
-        widgets=>[],
+        widgets => [],
     );
 
     while (@_) {
@@ -435,7 +435,7 @@ sub new {
             $self->get($key)->join(shift);
             next;
         }
-        $self->set($key=>shift);
+        $self->set($key => shift);
     }
 
     return $self;
@@ -475,28 +475,28 @@ sub html {
 
     my @widgets = @$widgetA;
     push @widgets,Quiq::Html::Widget::Button->new(
-        class=>'saveButton',
-        name=>'save',
-        content=>$textH->get('saveButton'),
+        class => 'saveButton',
+        name => 'save',
+        content => $textH->get('saveButton'),
     );
     push @widgets,Quiq::Html::Widget::Button->new(
-        class=>'deleteButton',
-        name=>'delete',
-        content=>$textH->get('deleteButton'),
+        class => 'deleteButton',
+        name => 'delete',
+        content => $textH->get('deleteButton'),
     );
     push @widgets,Quiq::Html::Widget::CheckBox->new(
-        class=>'editCheckbox',
-        name=>'edit',
-        label=>$textH->get('editCheckbox'),
+        class => 'editCheckbox',
+        name => 'edit',
+        label => $textH->get('editCheckbox'),
     );
 
     my $html = Quiq::Html::Form::Layout->html($h,
-        form=>[
-            id=>$id,
+        form => [
+            id => $id,
         ],
-        layout=>$layout,
-        hidden=>$hiddenA,
-        widgets=>\@widgets,
+        layout => $layout,
+        hidden => $hiddenA,
+        widgets => \@widgets,
     );
 
     if ($instantiate) {
@@ -570,7 +570,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

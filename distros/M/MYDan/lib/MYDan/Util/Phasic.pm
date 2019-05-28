@@ -128,7 +128,7 @@ sub run
         while ( $queue[1]->pending() )
         {
             my ( $src, $dst, $ok, $info ) = $queue[1]->dequeue_nb( 4 );
-            my @w8 = delete @busy{ $src, $dst };
+            delete @busy{ $src, $dst };
 
             $multi{$src} ++ if defined $src{$src};
 
@@ -138,13 +138,13 @@ sub run
             {
                 unless( $quiesce{$dst} )
                 { 
-                    $src{$dst} = $w8[1];
+                    $src{$dst} = $w8{$dst};
                     $multi{$dst} = $MULTI;
                 }
             }
             elsif ( $err{$dst} ++ < $retry )
             {
-                $dst{$dst} = $w8[1];
+                $dst{$dst} = $w8{$dst};
             }
             else
             {
@@ -168,7 +168,7 @@ sub run
         {
             my $dst = ( keys %dst )[ int( rand time ) % 2 ? -1 : 0 ];
             my $w8 = $busy{$dst} = delete $dst{$dst};
-            my %dist = map { $_ => abs( $src{$_} - $w8 ) } keys %src;
+            my %dist = map { $_ => abs( $w8{$_} - $w8 ) }keys %src;
             my $src = ( sort { $dist{$a} <=> $dist{$b} } keys %dist )[0];
 
             $busy{$src} = delete $src{$src};
@@ -181,7 +181,7 @@ sub run
 
             my $dst = ( keys %dst )[ int( rand time ) % 2 ? -1 : 0 ];
             my $w8 = $busy{$dst} = delete $dst{$dst};
-            my %dist = map { $_ => abs( $multi{$_} - $w8 ) }@multi;
+            my %dist = map { $_ => abs( $w8{$_} - $w8 ) }@multi;
             my $src = ( sort { $dist{$a} <=> $dist{$b} } keys %dist )[0];
 
             $multi{$src} --;

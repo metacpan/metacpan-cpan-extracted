@@ -355,8 +355,8 @@ sub DumpTree {
 	}
 	my $ChildsCount = scalar @{$NodeHash->{c}} if $NodeHash->{c};
 
-	$FirstBlockN = $NodeHash->{b_id} unless defined $FirstBlockN;
-	$LastBlockN = $NodeHash->{b_id} if $NodeHash->{b_id};
+	$FirstBlockN = ($NodeHash->{b_id}||0) unless defined $FirstBlockN;
+	$LastBlockN = defined $NodeHash->{b_id} ? $NodeHash->{b_id} : 0;
 
 	for my $ChildHash (@{$NodeHash->{c}}) {
 		$ChildsCount--;
@@ -624,6 +624,11 @@ sub ProceedDescr {
 		return $getParts->($node, $NameParts);
 	};
 
+	my $Created = $xpc->findnodes('/fbd:fb3-description/fbd:document-info/@created');
+	$description .= ',Created:"'.$Created.'"' if $Created;
+	my $Updated = $xpc->findnodes('/fbd:fb3-description/fbd:document-info/@updated');
+	$description .= ',Updated:"'.$Updated.'"' if $Updated;
+
 	if ( my $WrittenNode = $xpc->findnodes('/fbd:fb3-description/fbd:written')->[0] ) {
 
 		my $WrittenParts = {'Date' => 'date', 'DatePublic' => 'date-public', 'Lang' => 'lang'};
@@ -783,7 +788,7 @@ sub trim {
 sub HyphString {
 	use utf8;
 	my $word = shift;
-
+	return $word if $Lang eq 'pl';
 	my @wordArrayWithUnknownSymbols = split $RgxNonChar , $word; #собрали все слова и неизвестные символы. Для слова "пример!№?;слова" будет содержать "пример", "!№?;", "слова".
 
 	for my $word (@wordArrayWithUnknownSymbols) {
@@ -796,6 +801,7 @@ sub HyphString {
 sub HyphParticularWord {
 	use utf8;
 	my $word = shift;
+
 	my $softHyphMinPart = 2;
 
 	return $word if ( length($word) < 2 * $softHyphMinPart + 1 || $word eq uc($word));

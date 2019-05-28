@@ -3,16 +3,18 @@ package Data::Hopen::Scope;
 use Data::Hopen::Base;
 use Exporter 'import';
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 # Class definition
 use Class::Tiny {
     outer => undef,
     local => false,
     name => 'anonymous scope',
+    merge_strategy => undef,
 
     # Internal
-    _first_set => undef,    # name of the first set
+    _first_set => undef,        # name of the first set
+    _merger_instance => undef,  # A Hash::Merge instance
 };
 
 # Static exports
@@ -27,6 +29,7 @@ use constant _LOCAL => 'local';
 use Config;
 use Data::Hopen qw(getparameters);
 use Data::Hopen::Util::Data qw(clone forward_opts);
+use Hash::Merge;
 use POSIX ();
 use Set::Scalar;
 use Sub::ScopeFinalizer qw(scope_finalizer);
@@ -69,6 +72,33 @@ lookups (see L</$levels> below).
 =head2 name
 
 Not used, but provided so you can use L<Data::Hopen/hnew> to make Scopes.
+
+=head2 merge_strategy
+
+How the inputs of L</merge> will be treated.  Case-insensitive.  Note that
+changes after the first time you call L</merge> will be ignored!
+(TODO change this - just need a custom setter)
+
+Values are:
+
+=over
+
+=item C<undef> or C<'combine'> (default)
+
+L<Hash::Merge/Retainment Precedence>.  Same-name keys
+are merged, so no data is lost.
+
+=over C<'keep'>
+
+L<Hash::Merge/Left Precedence>.  Existing data will not be replaced by
+new data.
+
+=over C<'replace'>
+
+L<Hash::Merge/Right Precedence>.  New data will replace existing data.
+under a particular key will win.
+
+=back
 
 =head1 PARAMETERS
 
@@ -135,7 +165,7 @@ If not provided or not defined, go all the way to the outermost Scope.
 
 =head1 METHODS
 
-See also L</add>, below, which is part of the public API.
+See also L</put>, below, which is part of the public API.
 
 =cut
 
@@ -212,7 +242,7 @@ and example:
 If no names are available in the given C<$levels>, returns an empty
 C<Set::Scalar>.
 
-TODO?  Support a C<$set> parameter?
+TODO support a C<$set> parameter
 
 =cut
 
@@ -247,7 +277,7 @@ If C<$levels> is not provided, go all the way to the outermost Scope.
 If C<$deep> is provided and truthy, make a deep copy of each value (using
 L<Data::Hopen/clone>.  Otherwise, just copy.
 
-TODO?  Support a C<$set> parameter?
+TODO support a C<$set> parameter
 
 =cut
 
@@ -307,29 +337,78 @@ sub outerize {
     return $saver;
 } #outerize()
 
+=head2 _merger (internal)
+
+Creates a L<Hash::Merge> instance based on L</merge_strategy>, if one
+doesn't exist.  Returns the instance.
+
+Provided for the convenience of subclasses; not actually used by
+any concrete functions in this package.
+
+=cut
+
+sub _merger {
+    my $self = shift or croak 'Need an instance';
+    return $self->_merger_instance if $self->_merger_instance;
+
+    my $s = $self->merge_strategy;
+    my $precedence =
+        !defined $s ? 'RETAINMENT_PRECEDENT' :
+            $s =~ /^combine$/i ? 'RETAINMENT_PRECEDENT' :
+                $s =~ /^keep$/i ? 'LEFT_PRECEDENT' :
+                    $s =~ /^replace$/i ? 'RIGHT_PRECEDENT' :
+                        undef;
+    die "Invalid merge strategy $s" unless defined $precedence;
+
+    my $merger = Hash::Merge->new($precedence);
+    $merger->set_clone_behavior(false);
+        # TODO CHECKME --- I would rather clone everything except blessed
+        # references, but doing so appears to be nontrivial.  For now,
+        # I am trying not cloning.
+    $self->_merger_instance($merger);
+
+    return $merger;
+} #_merger()
+
 =head1 FUNCTIONS TO BE OVERRIDDEN IN SUBCLASSES
 
 To implement a Scope with a different data-storage model than the hash
-this class uses, subclass Scope and override these functions.  Only L</add>
-is part of the public API.
+this class uses, subclass Scope and override these functions.  Of these,
+only L</put> and L</merge> are part of the public API.
 
-=head2 add
+=head2 put
 
 Add key-value pairs to this scope.  Returns the scope so you can
 chain.  Example usage:
 
-    my $scope = Data::Hopen::Scope->new()->add(foo => 1);
+    my $scope = Data::Hopen::Scope->new()->put(foo => 1);
 
-C<add> is responsible for handling any conflicts that may occur.  In this
-particular implementation, the last-added value for a particular key wins.
+C<put> overwrites data in case of any conflicts.  See L</merge> if you
+want more control.
 
 TODO add C<$set> option.  TODO? add -deep option?
 
 =cut
 
-sub add {
+sub put {
     ...
-} #add()
+} #put()
+
+=head2 merge
+
+Merges key-value pairs into this scope.  Returns the scope so you can
+chain.  Example usage:
+
+    my $scope = Data::Hopen::Scope->new()->merge(foo => 1);
+
+See L</merge_strategy> for options controlling the behaviour of C<merge()>.
+=cut
+
+sub merge { #blub blub
+    my $self = shift or croak 'Need an instance';
+    my $merger = $self->_merger;
+    ...
+} #merge()
 
 =head2 _names_here
 

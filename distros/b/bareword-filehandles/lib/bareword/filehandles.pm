@@ -1,6 +1,6 @@
 package bareword::filehandles;
 # ABSTRACT: disables bareword filehandles
-$bareword::filehandles::VERSION = '0.006';
+$bareword::filehandles::VERSION = '0.007';
 { use 5.008001; }
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ bareword::filehandles - disables bareword filehandles
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -68,6 +68,12 @@ compiled.
 
 Enables bareword filehandles for the remainder of the scope being
 compiled.
+
+=head1 LIMITATIONS
+
+L<Filetest operators|perlfunc/-X> (C<-X>) can not be checked on Perl
+versions before 5.32, because hooking the op check function for these
+breaks stacked tests, e.g. C<-f -w -x $file>.
 
 =head1 SEE ALSO
 

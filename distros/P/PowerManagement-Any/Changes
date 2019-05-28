@@ -1,3 +1,10 @@
+0.004   2019-05-28 (PERLANCAR)
+
+	- [ux] Shut up log when 'systemctl status' exits with code=3.
+
+	- Fix envelope response.
+
+
 0.003   2019-05-22 (PERLANCAR)
 
 	- Tweak CLI output for sleep_is_prevented().

@@ -1,5 +1,9 @@
 Revision history for Acme-Affinity
 
+0.0104 2019-05-26 12:38:01
+    - Math::BigRat->numify the returned ->score.
+    - Add an example program to compute all possible scores.
+
 0.0103 2019-03-31 21:02:46
     - Added 100% and 0% test cases.
 

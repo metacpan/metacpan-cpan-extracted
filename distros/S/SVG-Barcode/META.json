@@ -35,7 +35,6 @@
       },
       "test" : {
          "requires" : {
-            "Mock::MonkeyPatch" : "0.04",
             "Test::More" : "0.88"
          }
       }
@@ -52,7 +51,7 @@
          "web" : "https://github.com/Tekki/svg-barcode"
       }
    },
-   "version" : "0.02",
+   "version" : "0.10",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

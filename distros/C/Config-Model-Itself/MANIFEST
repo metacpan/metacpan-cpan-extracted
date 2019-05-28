@@ -42,6 +42,7 @@ lib/Config/Model/models/Itself/WarpValue.pl
 lib/Config/Model/models/Itself/WarpValue.pod
 lib/Config/Model/models/Itself/WarpableCargoElement.pl
 lib/Config/Model/models/Itself/WarpableElement.pl
+t/author-critic.t
 t/backend_detect.t
 t/cme-meta-edit.t
 t/cme-meta-plugin.t

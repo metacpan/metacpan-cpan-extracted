@@ -327,6 +327,18 @@ sub test_removeComments_2 : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_quote : Test(2) {
+    my $self = shift;
+
+    my $str = Quiq::String->quote('Eine Zeichenkette');
+    $self->is($str,"'Eine Zeichenkette'");
+
+    $str = Quiq::String->quote("Eine Zeichenkette mit '...' (single quotes)");
+    $self->is($str,q|'Eine Zeichenkette mit \'...\' (single quotes)'|);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_wrap : Test(4) {
     my $self = shift;
 
@@ -358,7 +370,6 @@ sub test_wrap : Test(4) {
 
     $txt = Quiq::String->wrap($t3,-width=>12);
     $self->is($txt,$r3);
-
 }
 
 # -----------------------------------------------------------------------------

@@ -62,9 +62,9 @@ sub test_rule_normal : Test(1) {
     my $self = shift;
 
     my $val = Quiq::Css->rule('p.abstract',
-        fontStyle=>'italic',
-        marginLeft=>'0.5cm',
-        marginRight=>'0.5cm',
+        fontStyle => 'italic',
+        marginLeft => '0.5cm',
+        marginRight => '0.5cm',
     );
 
     my $expect = << '    __CSS__';

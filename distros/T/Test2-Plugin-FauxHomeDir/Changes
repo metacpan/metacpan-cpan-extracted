@@ -1,5 +1,10 @@
 Revision history for Test2-Plugin-FauxHomeDir
 
+0.05      2019-05-24 10:12:14 -0400
+  - Patch the patched File::HomeDir that is patched by Portable Strawberry Perl on windows
+    (gh#2, gh#4)
+  - Better diagnostics when things fail (gh#3 shawnlaffan++)
+
 0.04      2018-04-18 12:46:06 -0400
   - Add real_home_dir method
     mildly begrudgingly

@@ -9,6 +9,12 @@ use MYDan::Util::OptConf;
 use MYDan::Agent::Client;
 use MYDan::VSSH::Print;
 
+use AE;
+use AnyEvent;  
+use AnyEvent::Socket;  
+use AnyEvent::Handle;  
+use Data::UUID;
+
 $| ++;
 
 $MYDan::Util::OptConf::THIS = 'agent';
@@ -27,10 +33,14 @@ $MYDan::Util::OptConf::ARGC = -1;
      [--version]
      [--secret "x=1;xx=2" ]
 
+     [--immediately]
+     [--addr 10.10.10.10]
+     [--listen 9999]
+
 =cut
 my $option = MYDan::Util::OptConf->load();
-my %o = $option->set( timeout => 60 )->get(
-     qw( range=s sudo=s timeout=i max=i verbose env=s user=s port=s version secret=s )
+my %o = $option->set( timeout => 60, addr => 0 )->get(
+     qw( range=s sudo=s timeout=i max=i verbose env=s user=s port=s version secret=s immediately addr=s listen=i )
 )->dump();
 
 $option->assert( 'range' );
@@ -40,6 +50,71 @@ my $code = shift;
 $o{version} = 1 if $code eq 'version';
 
 $o{user} = `id -un` and chop $o{user} unless $o{user};
+
+if( $o{immediately} )
+{
+    my $listen = $o{listen};
+    unless( $listen )
+    {
+        my $scan = `netstat  -tun|awk '{print \$4}'|awk -F: '{print \$2}'`;
+        my %open = map{ $_ => 1 }my @open = $scan =~ /(\d+)/g;
+        my %port = map{ $_ => 1 }65112 .. 65535;
+        ( $listen ) = grep{ ! $open{$_} }keys %port;
+    }
+    
+    my ( $cv, $index, $uuid, %index, %head ) = ( AE::cv, 0, Data::UUID->new->create_str() );
+    tcp_server undef, $listen, sub {
+        my ( $fh, $ip, $port ) = @_ or die "[MYDan]tcp_server: $!";
+    
+        $index ++;
+        warn "[MYDan]tcp connet from $ip:$port\n";
+    
+    	my $handle; $handle = new AnyEvent::Handle(
+    		fh => $fh,
+    		rbuf_max => 10240000,
+    		wbuf_max => 10240000,
+    		autocork => 1,
+    		on_read => sub {
+    			my $self = shift;
+                $self->unshift_read (
+                	chunk => length $self->{rbuf},
+                	sub {
+                        if( $head{"$ip:$port"} )
+                        {
+                            map{ print $head{"$ip:$port"}.':'.$_, "\n"; }split "\n", $_[1];
+                        }
+                        else
+                        {
+                            my $x = $_[1];
+                            $x =~ s/^([^:]+):([^:]+)://;
+                            if( $1 ne $uuid )
+                            {
+                                $handle->push_shutdown;
+                                return;
+                            }
+                		    warn "[MYDan]host:$2 ip:$ip port:$port:\n";
+                            print $x;
+                            $head{"$ip:$port"} = $2;
+                        }
+                	},
+                )
+    		},
+    
+    		on_error => sub{
+    			warn "[MYDan]tcp error: $ip:$port\n";
+    		},
+    		on_eof => sub{
+    			warn "[MYDan]tcp close: $ip:$port\n";
+    		},
+    	);
+        $index{$index}{handle} = $handle;
+    };
+    
+    my $int = AnyEvent->signal( signal => "INT", cb => sub{ warn "kill.\n"; $cv->send; } );
+    
+    my $env = 'MYDan_rlog='.join ":", $uuid, $o{addr}, $listen;
+    $o{env} = $o{env} ? join( ';', $env, $o{env} ) : $env;
+}
 
 my $time = time;
 my %query = ( code => $code, argv => argv( $code ), map{ $_ => $o{$_} }qw( user sudo ) );

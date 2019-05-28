@@ -15,6 +15,7 @@ on 'test' => sub {
 on 'develop' => sub {
     requires 'CPAN::Uploader', '0.103013';
     requires 'Minilla', '3.0.1';
+    requires 'Pod::Markdown::Github', '0.04';
     requires 'Software::License::MIT', '0.103011';
     requires 'Test::CPAN::Meta', '0.25';
     requires 'Test::MinimumVersion::Fast', '0.04';

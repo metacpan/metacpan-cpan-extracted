@@ -34,10 +34,10 @@ sub test_html_unordered : Test(2) {
     # Unordered List
 
     my $c = Quiq::Html::List->new(
-        id=>'list01',
-        class=>'list',
-        isText=>1,
-        items=>['Apfel & Birne','Orange','Pflaume','Zitrone'],
+        id => 'list01',
+        class => 'list',
+        isText => 1,
+        items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
     );
     $self->is(ref($c),'Quiq::Html::List');
 
@@ -62,11 +62,11 @@ sub test_html_ordered : Test(2) {
     # Unordered List
 
     my $c = Quiq::Html::List->new(
-        type=>'ordered',
-        id=>'list01',
-        class=>'list',
-        isText=>1,
-        items=>['Apfel & Birne','Orange','Pflaume','Zitrone'],
+        type => 'ordered',
+        id => 'list01',
+        class => 'list',
+        isText => 1,
+        items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
     );
     $self->is(ref($c),'Quiq::Html::List');
 

@@ -1,3 +1,46 @@
+v0.28.5 2019-05-28T11:41:11Z
+ - change password form
+
+v0.28.4 2019-05-28T11:09:21Z
+ - change password form
+
+v0.28.3 2019-05-28T10:56:29Z
+ - password recovery form
+
+v0.28.2 2019-05-28T10:47:19Z
+ - password recovery form
+
+v0.28.1 2019-05-28T10:43:04Z
+ - password recovery form
+
+v0.28.0 2019-05-28T10:07:19Z
+ - confirm-email route
+
+v0.27.0 2019-05-28T05:22:10Z
+ - modern forms
+ - auth form
+
+v0.26.3 2019-05-27T08:39:46Z
+ - menu defaut handler
+
+v0.26.2 2019-05-27T05:49:01Z
+ - menu swipe removed
+
+v0.26.1 2019-05-27T05:38:06Z
+ - route mixin
+
+v0.26.0 2019-05-27T05:09:45Z
+ - route mixin
+
+v0.25.0 2019-05-26T16:46:29Z
+ - ext menu
+
+v0.24.0 2019-05-25T12:00:48Z
+ - grid summary
+
+v0.23.0 2019-05-24T12:59:44Z
+ - util lib added
+
 v0.22.1 2019-05-23T09:40:27Z
  - die message clarified
 

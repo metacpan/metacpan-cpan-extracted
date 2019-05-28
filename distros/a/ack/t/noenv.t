@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 3;
 
 use lib 't';
 use Util;
@@ -48,8 +48,9 @@ write_file( '.ackrc', <<'ACKRC' );
 ACKRC
 
 subtest 'without --noenv' => sub {
+    plan tests => 1;
+
     local @ARGV = ('-f', 'lib/');
-    local $ENV{'ACK_OPTIONS'} = '--perl';
 
     my @sources = App::Ack::ConfigLoader::retrieve_arg_sources();
     @sources    = remove_defaults_and_globals(@sources);
@@ -59,10 +60,7 @@ subtest 'without --noenv' => sub {
             name     => File::Spec->canonpath(realpath(File::Spec->catfile($tempdir->dirname, '.ackrc'))),
             contents => [ '--type-add=perl:ext:pl,t,pm' ],
             project  => 1,
-        },
-        {
-            name     => 'ACK_OPTIONS',
-            contents => '--perl',
+            is_ackrc => 1,
         },
         {
             name     => 'ARGV',
@@ -72,8 +70,9 @@ subtest 'without --noenv' => sub {
 };
 
 subtest 'with --noenv' => sub {
+    plan tests => 1;
+
     local @ARGV = ('--noenv', '-f', 'lib/');
-    local $ENV{'ACK_OPTIONS'} = '--perl';
 
     my @sources = App::Ack::ConfigLoader::retrieve_arg_sources();
     @sources    = remove_defaults_and_globals(@sources);
@@ -86,15 +85,15 @@ subtest 'with --noenv' => sub {
     ], 'Short list comes back because of --noenv' );
 };
 
-NOENV_IN_CONFIG: {
-    append_file( '.ackrc', "--noenv\n" );
+subtest '--noenv in config' => sub {
+    plan tests => 3;
 
-    local $ENV{'ACK_OPTIONS'} = '--perl';
+    append_file( '.ackrc', "--noenv\n" );
 
     my ( $stdout, $stderr ) = run_ack_with_stderr('--env', 'perl');
     is_empty_array( $stdout );
     is( @{$stderr}, 1 );
     like( $stderr->[0], qr/--noenv found in (?:.*)[.]ackrc/ ) or diag(explain($stderr));
-}
+};
 
 safe_chdir( $wd ); # Go back to the original directory to avoid warnings

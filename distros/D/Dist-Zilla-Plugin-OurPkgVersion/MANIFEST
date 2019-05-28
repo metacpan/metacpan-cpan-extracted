@@ -32,6 +32,8 @@ corpus/semanticDZT/dist.ini
 corpus/semanticDZT/lib/semanticDZT.pm
 corpus/vDZT/dist.ini
 corpus/vDZT/lib/vDZT.pm
+corpus/version_provider/dist.ini
+corpus/version_provider/lib/DZT0.pm
 dist.ini
 lib/Dist/Zilla/Plugin/OurPkgVersion.pm
 maint/cip-before-install
@@ -47,6 +49,7 @@ t/05-skip_main_module.t
 t/06-overwrite.t
 t/07-semantic.t
 t/08-build_exceptions.t
+t/09-version_provider.t
 t/author-critic.t
 t/author-eol.t
 t/author-minimum-version.t

@@ -1,6 +1,6 @@
 # Class::Tiny::ConstrainedAccessor - Generate Class::Tiny accessors that apply type constraints
 
-[![Appveyor Badge](https://ci.appveyor.com/api/projects/status/github/cxw42/class-tiny-constrainedaccessor?svg=true)](https://ci.appveyor.com/project/cxw42/class-tiny-constrainedaccessor)
+[![Appveyor Status](https://img.shields.io/appveyor/ci/cxw42/class-tiny-constrainedaccessor.svg?logo=appveyor)](https://ci.appveyor.com/project/cxw42/class-tiny-constrainedaccessor) [![Travis Status](https://img.shields.io/travis/cxw42/Class-Tiny-ConstrainedAccessor.svg?logo=travis)](https://travis-ci.org/cxw42/Class-Tiny-ConstrainedAccessor) 
 
 
 
@@ -9,7 +9,9 @@
 accessors that behave as standard `Class::Tiny` accessors except that
 they apply type constraints (`isa` relationships).  Type constraints
 can come from [Type::Tiny](https://metacpan.org/pod/Type::Tiny), [MooseX::Types](https://metacpan.org/pod/MooseX::Types), [MooX::Types::MooseLike](https://metacpan.org/pod/MooX::Types::MooseLike),
-[MouseX::Types](https://metacpan.org/pod/MouseX::Types), or [Specio](https://metacpan.org/pod/Specio).
+[MouseX::Types](https://metacpan.org/pod/MouseX::Types), or [Specio](https://metacpan.org/pod/Specio).  Alternatively, constraints can be applied
+using the technique described in
+["Constraints without a type system"](#constraints-without-a-type-system).
 
 Example of a class using this package:
 
@@ -18,14 +20,11 @@ Example of a class using this package:
 
     use Type::Tiny;
 
-    my $MediumInteger;
-    BEGIN {
-        # Create the type constraint
-        $MediumInteger = Type::Tiny->new(
-            name => 'MediumInteger',
-            constraint => sub { looks_like_number($_) and $_ >= 10 and $_ < 20 }
-        );
-    }
+    # Create the type constraint
+    use vars::i '$MediumInteger' = Type::Tiny->new(
+        name => 'MediumInteger',
+        constraint => sub { looks_like_number($_) and $_ >= 10 and $_ < 20 }
+    );
 
     use Class::Tiny::ConstrainedAccessor {
         medint => $MediumInteger,           # create accessor sub medint()
@@ -36,6 +35,26 @@ Example of a class using this package:
     use Class::Tiny qw(medint regular), {
         med_with_default => 12,
     };
+
+# CONSTRAINTS WITHOUT A TYPE SYSTEM
+
+If you don't want to use [Type::Tiny](https://metacpan.org/pod/Type::Tiny) or one of the other type systems listed
+above, you can create your own constraints as two-element arrayrefs.  Example:
+
+    use Class::Tiny::ConstrainedAccessor
+        'field' => [ \&checker_sub, \&message_sub ];
+
+`checker_sub` and `message_sub` are used as follows to check `$value`:
+
+    checker_sub($value) or die get_message($value);
+
+Therefore, `checker_sub` must return truthy if `$_[0]` passes the constraint,
+or else falsy.  `get_message` must return something that can be passed to
+`die()`, when given a `$_[0]` that has failed the constraint.
+
+If your profile ever tells you that constraint-checks are on the critical
+path, try custom constraints.  They may give you more control or opportunity
+for optimization than general-purpose type systems.
 
 # SUBROUTINES
 

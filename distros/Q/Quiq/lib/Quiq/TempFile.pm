@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use Quiq::Path;
@@ -94,7 +94,7 @@ sub new {
         }
         else {
             $class->throw(
-                q~TEMPFILE-00001: Unknown option~,
+                'TEMPFILE-00001: Unknown option',
                 Option => $_[0],
             )
         }
@@ -107,7 +107,7 @@ sub new {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

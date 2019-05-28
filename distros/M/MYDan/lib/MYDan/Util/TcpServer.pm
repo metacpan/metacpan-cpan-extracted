@@ -9,7 +9,7 @@ use Data::Dumper;
 use Tie::File;
 use Fcntl 'O_RDONLY';
 use POSIX ":sys_wait_h";
-use Time::HiRes qw(time);
+use Time::HiRes qw(time sleep );
 use AnyEvent;
 use AnyEvent::Impl::Perl;
 use AnyEvent::Socket;
@@ -54,6 +54,10 @@ sub new
     }
 
     map{ $this{$_} ||= $this{buf} }qw( rbuf wbuf );
+
+    $this{limit} ||= 104857600; #100m
+    map{ $this{$_} ||= $this{limit}; $this{$_} /= 10; }qw( rlimit wlimit );
+    map{ $this{"${_}ctrl"}{itime} = 0; }qw( r w );
 
     bless \%this, ref $class || $class;
 }
@@ -113,6 +117,8 @@ sub run
                                 $data->{file} = $1;
                             }
                             $data->{body} = 1;
+
+                            $this->rwlimit( w => length $buf );
                             $data->{handle}->push_write($buf);
                         }
                         else
@@ -126,6 +132,7 @@ sub run
                                     $data->{fh} = $tmp_handle;
                                     if( $n = sysread( $data->{fh}, $buf, 102400 ) )
                                     {
+                                        $this->rwlimit( w => length $buf );
                                         $data->{handle}->push_write($buf);
                                         return;
                                     }
@@ -229,7 +236,9 @@ sub run
                    $tport = '0' unless $tport && $tport =~ /^\d+$/;
 
                    $ENV{TCPREMOTEIP} = $tip;
-                   $ENV{TCPREMOTEPORT} = $port;
+                   $ENV{TCPREMOTEPORT} = $tport;
+                   $ENV{TCPSERVERINDEX} = $index;
+                   $ENV{TCPSERVERPORT} = $port;
 		   if( defined $index{$index}{extfile} )
 		   {
                        $ENV{MYDanExtractFile} = $index{$index}{extfile};
@@ -303,6 +312,7 @@ sub run
 		   if( $len < $index{$index}{querysize} )
 		   {
                        $index{$index}{rbuf} += $len;
+                       $this->rwlimit( r => $len );
                        $self->push_read (
                            chunk => $len,
 			   sub { syswrite( $tmp_handle, $_[1] ) }
@@ -313,6 +323,7 @@ sub run
 		   else
 		   {
                        $index{$index}{rbuf} += $index{$index}{querysize};
+                       $this->rwlimit( r => $index{$index}{querysize} );
                        $self->push_read(
 			    chunk => $index{$index}{querysize},
 			   sub { syswrite( $tmp_handle, $_[1] ) }
@@ -323,6 +334,8 @@ sub run
 	       }
 
                return unless $len;
+               
+               $this->rwlimit( r => $len );
                $self->push_read (
                    chunk => $len,
                    sub { 
@@ -429,5 +442,32 @@ sub dfok
     return undef unless $df && ref $df eq 'HASH' && defined $df->{bfree} && defined $df->{ffree};
     return ( $df->{bfree} > 102400 && $df->{ffree} > 4000 ) ? 1 : 0;
 }
+
+sub rwlimit
+{
+    my ( $this, $type, $len ) = @_;
+    my $limit = $this->{"${type}limit"};
+
+    my $time = time * 10;
+    my $itime = int $time;
+
+    if( $this->{"${type}ctrl"}{itime} eq $itime )
+    {
+        $this->{"${type}ctrl"}{time} = $time;
+        $this->{"${type}ctrl"}{len} += $len; 
+
+        if( $this->{"${type}ctrl"}{len} > $limit )
+        {
+            my $x = ( $itime + 1 - $time ) / 10;
+            sleep $x if $x > 0;
+        }
+    }
+    else
+    {
+        $this->{"${type}ctrl"} = +{ itime => $itime, time => $time, len => $len };
+    }
+
+}
+
 
 1;

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Encode::Guess ();
 use Encode ();
@@ -84,8 +84,8 @@ sub autoDecode {
     else {
         # Unerwarteter Fehler
         $class->throw(
-            q~PATH-00099: Zeichen-Dekodierung fehlgeschlagen~,
-            Message=>$dec,
+            'PATH-00099: Zeichen-Dekodierung fehlgeschlagen',
+            Message => $dec,
         );
     }
 
@@ -162,8 +162,8 @@ sub indent {
     my $strip = 0;
     if (@_) {
         Quiq::Option->extract(\@_,
-            -indentBlankLines=>\$indentBlankLines,
-            -strip=>\$strip,
+            -indentBlankLines => \$indentBlankLines,
+            -strip => \$strip,
         );
     }
 
@@ -276,9 +276,9 @@ sub reduceIndentation {
     if ($m) {
         if ($m < $n || $m%$n) {
             $class->throw(
-                q~STRING-00001: Einrücktiefe kann nicht reduziert werden~,
-                TextIndentation=>$m,
-                WantedIndentation=>$n,
+                'STRING-00001: Einrücktiefe kann nicht reduziert werden',
+                TextIndentation => $m,
+                WantedIndentation => $n,
             );
         }
         elsif ($m > $n) {
@@ -402,7 +402,7 @@ sub removeIndentation {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -addNL=>\$addNL,
+            -addNL => \$addNL,
         );
     } 
 
@@ -595,6 +595,35 @@ sub removeComments {
 
 # -----------------------------------------------------------------------------
 
+=head2 Quoting
+
+=head3 quote() - Fasse Zeichenkette in Single Quotes ein
+
+=head4 Synopsis
+
+    $quotedStr = $class->quote($str);
+
+=head4 Description
+
+Fasse Zeichenkette $str in einfache Anführungsstriche (') ein und liefere
+das Resultat zurück. Enthält die Zeichenkette bereits einfache
+Anführungsstriche, werden diese per Backslash geschützt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub quote {
+    my ($class,$str) = @_;
+
+    $str =~ s/'/\\'/g;
+    $str = "'$str'";
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Umbruch
 
 =head3 wrap() - Umbreche Fließtext
@@ -666,7 +695,7 @@ sub wrap {
     my $width = 70;
     if (@_) {
         Quiq::Option->extract(\@_,
-            -width=>\$width,
+            -width => \$width,
         );
     }
 
@@ -706,7 +735,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

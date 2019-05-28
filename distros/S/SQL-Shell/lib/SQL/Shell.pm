@@ -16,7 +16,7 @@ use IO::File;
 use URI::Escape;
 
 use vars qw($VERSION);
-$VERSION = ('$Revision: 1.16 $' =~ /([\d\._]+)/)[0];
+$VERSION = ('$Revision: 1.17 $' =~ /([\d\._]+)/)[0];
 
 use constant HISTORY_SIZE => $ENV{HISTSIZE} || $ENV{HISTFILESIZE} || 50;
 use vars qw(%Renderers %Commands %Settings);
@@ -1896,7 +1896,7 @@ The following are also affected by the C<set_param> method or the "set" command:
 
 =head1 VERSION
 
-Version 1.16
+Version 1.17
 
 =head1 AUTHOR
 

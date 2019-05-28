@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Path;
 use Quiq::ImagePool::Directory;
@@ -54,8 +54,8 @@ sub new {
     # Objekt instantiieren
 
     return $class->SUPER::new(
-        root=>$path,
-        directoryH=>{},
+        root => $path,
+        directoryH => {},
     );
 }
 
@@ -243,7 +243,7 @@ sub images {
     my $count = 0;
 
     Quiq::Option->extract(\@_,
-        -count=>\$count,
+        -count => \$count,
     );
 
     my @images;
@@ -275,7 +275,7 @@ sub images {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

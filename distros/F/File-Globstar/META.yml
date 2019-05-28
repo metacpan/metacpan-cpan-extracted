@@ -9,11 +9,12 @@ build_requires:
   Git: '0'
   Module::Build: '0.28'
   Test::More: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,12 +28,14 @@ requires:
   Locale::TextDomain: '0'
   Scalar::Util: '1.21'
   base: '0'
+  common::sense: '0'
   constant: '0'
-  strict: '0'
+  perl: '5.008'
   vars: '0'
 resources:
   bugtracker: https://github.com/gflohr/File-Globstar/issues
   homepage: http://www.guido-flohr.net/globstar-for-perl/
   repository: git://github.com/gflohr/File-Globstar.git
-version: '0.5'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.6'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -19,9 +19,10 @@ use Encode ();
 use Fcntl qw/:DEFAULT/;
 use Quiq::Perl;
 use Quiq::Unindent;
+use Quiq::DirHandle;
+use Quiq::Parameters;
 use File::Find ();
 use Quiq::Shell;
-use Quiq::DirHandle;
 use Cwd ();
 use Quiq::Process;
 
@@ -143,7 +144,7 @@ sub checkFileSecurity {
     my $mode = $this->mode($file);
     if ($mode & 00044) {
         $this->throw(
-            q~PATH-00099: File is readable for others~,
+            'PATH-00099: File is readable for others',
             File => $file,
         );
     }
@@ -284,7 +285,7 @@ sub copy {
 
     if (!$overwrite && -e $destPath) {
         $class->throw(
-            q~PATH-00099: Zieldatei existiert bereits~,
+            'PATH-00099: Zieldatei existiert bereits',
             Path => $destPath,
         );
     }
@@ -300,9 +301,9 @@ sub copy {
     my $fh2 = Quiq::FileHandle->new('>',$destPath);
     while (<$fh1>) {
         print $fh2 $_ or $class->throw(
-            q~PATH-00007: Schreiben auf Datei fehlgeschlagen~,
-            SourcePath=>$srcPath,
-            DestinationPath=>$destPath,
+            'PATH-00007: Schreiben auf Datei fehlgeschlagen',
+            SourcePath => $srcPath,
+            DestinationPath => $destPath,
         );
     }
     $fh1->close;
@@ -416,7 +417,7 @@ sub duplicate {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -preserve=>\$preserve,
+            -preserve => \$preserve,
         );
     }
 
@@ -497,7 +498,7 @@ sub encoding {
     # Unerwarteter Fehler
 
     $class->throw(
-        q~PATH-00099: Can't decode file content~,
+        'PATH-00099: Can\'t decode file content',
         Path => $path,
         Message => $dec,
     );
@@ -525,10 +526,10 @@ sub link {
 
     CORE::link $path,$link or do {
         $class->throw(
-            q~FS-00002: Kann Link nicht erzeugen~,
-            Path=>$path,
-            Link=>$link,
-            Error=>$!,
+            'FS-00002: Kann Link nicht erzeugen',
+            Path => $path,
+            Link => $link,
+            Error => $!,
         );
     };
 
@@ -655,12 +656,12 @@ sub read {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -autoDecode=>\$autoDecode,
-            -decode=>\$decode,
-            -delete=>\$delete,
-            -maxLines=>\$maxLines,
-            -skip=>\$skip,
-            -skipLines=>\$skipLines,
+            -autoDecode => \$autoDecode,
+            -decode => \$decode,
+            -delete => \$delete,
+            -maxLines => \$maxLines,
+            -skip => \$skip,
+            -skipLines => \$skipLines,
         );
     }
 
@@ -801,12 +802,12 @@ sub write {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -append=>\$append,
-            -encode=>\$encode,
-            -lock=>\$lock,
-            -mode=>\$mode,
-            -recursive=>\$recursive,
-            -unindent=>\$unindent,
+            -append => \$append,
+            -encode => \$encode,
+            -lock => \$lock,
+            -mode => \$mode,
+            -recursive => \$recursive,
+            -unindent => \$unindent,
         );
     }
 
@@ -830,18 +831,18 @@ sub write {
     local *F;
     sysopen(F,$file,$flags) || do {
         $class->throw(
-            q~PATH-00006: Datei kann nicht zum Schreiben geöffnet werden~,
-            Path=>$file,
-            Error=>"$!",
+            'PATH-00006: Datei kann nicht zum Schreiben geöffnet werden',
+            Path => $file,
+            Error => "$!",
         );
     };
 
     if ($lock) {
         flock(F,Fcntl::LOCK_EX) || do {
             $class->throw(
-                q~PATH-00099: Can't get exclusive lock~,
-                Path=>$file,
-                Error=>"$!",
+                'PATH-00099: Can\'t get exclusive lock',
+                Path => $file,
+                Error => "$!",
             );
         };
     }
@@ -864,9 +865,9 @@ sub write {
             my $errStr = "$!";
             close F;
             $class->throw(
-                q~PATH-00007: Schreiben auf Datei fehlgeschlagen~,
-                Path=>$file,
-                Error=>$errStr,
+                'PATH-00007: Schreiben auf Datei fehlgeschlagen',
+                Path => $file,
+                Error => $errStr,
             );
         }
     }
@@ -934,6 +935,124 @@ sub writeInline {
 # -----------------------------------------------------------------------------
 
 =head2 Verzeichnis-Operationen
+
+=head3 count() - Anzahl der Verzeichniseinträge
+
+=head4 Synopsis
+
+    $n = $this->count($dir);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Pfad des Verzeichnisses.
+
+=back
+
+=head4 Returns
+
+Anzahl Verzeichniseinträge (Integer)
+
+=head4 Description
+
+Ermittele die Anzahl Einträge des Verzeichnisses $dir und liefere diese
+zurück. Die Einträge C<.> und C<..> werden I<nicht> mitgezählt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub count {
+    my ($this,$dir) = @_;
+
+    my $n = 0;
+    my $dh = Quiq::DirHandle->new($dir);
+    while (my $entry = $dh->next) {
+        if ($entry eq '.' || $entry eq '..') {
+            next;
+        }
+        $n++;
+    }
+    $dh->close;
+
+    return $n;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 entries() - Liste der Verzeichniseinträge
+
+=head4 Synopsis
+
+    @paths | $pathA = $this->entries($dir,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Pfad des Verzeichnisses.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -encoding => $charset (Default: 'utf-8')
+
+Dekodiere die Verzeichniseinträge gemäß Zeichensatz $charset.
+
+=back
+
+=head4 Returns
+
+Liste der Verzeichniseinträge (Array of Strings). Im Skalarkontext
+eine Referenz auf die Liste.
+
+=head4 Description
+
+Ermittele die Einträge des Verzeichnisses $dir und liefere diese
+als Liste zurück. Die Liste umfasst alle Verzeichniseinträge
+außer C<.> und C<..>.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub entries {
+    my $this = shift;
+    # @_: $dir,@opt
+
+    # Options
+
+    my $encoding = 'utf-8';
+
+    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+        -encoding => \$encoding,
+    );
+    my $dir = shift @$argA;
+
+    # Operation ausführen
+
+    my @arr;
+    my $dh = Quiq::DirHandle->new($dir);
+    while (my $entry = $dh->next) {
+        if ($entry eq '.' || $entry eq '..') {
+            next;
+        }
+        push @arr,$encoding? Encode::decode($encoding,$entry): $entry;
+    }
+    $dh->close;
+
+    return wantarray? @arr: \@arr;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 find() - Liefere Pfade innerhalb eines Verzeichnisses
 
@@ -1051,19 +1170,19 @@ sub find {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -decode=>\$decode,
-            -exclude=>\$exclude,
-            -follow=>\$follow,
-            -leavesOnly=>\$leavesOnly,
-            -olderThan=>\$olderThan,
-            -outHandle=>\$outHandle,
-            -pattern=>\$pattern,
-            -slash=>\$slash,
-            -sloppy=>\$sloppy,
-            -subPath=>\$subPath,
-            -testSub=>\$testSub,
-            -type=>\$type,
-            -verbose=>\$verbose,
+            -decode => \$decode,
+            -exclude => \$exclude,
+            -follow => \$follow,
+            -leavesOnly => \$leavesOnly,
+            -olderThan => \$olderThan,
+            -outHandle => \$outHandle,
+            -pattern => \$pattern,
+            -slash => \$slash,
+            -sloppy => \$sloppy,
+            -subPath => \$subPath,
+            -testSub => \$testSub,
+            -type => \$type,
+            -verbose => \$verbose,
         );
     }
 
@@ -1076,13 +1195,13 @@ sub find {
         if ($sloppy) {
             return wantarray? (): undef;
         }
-        $class->throw(q~PATH-00011: Verzeichnis existiert nicht~,
-            Dir=>$dir,
+        $class->throw('PATH-00011: Verzeichnis existiert nicht',
+            Dir => $dir,
         );
     }
     elsif (!-d $dir) {
-        $class->throw(q~PATH-00013: Pfad ist kein Verzeichnis~,
-            Path=>$dir,
+        $class->throw('PATH-00013: Pfad ist kein Verzeichnis',
+            Path => $dir,
         );
     }
 
@@ -1296,7 +1415,7 @@ sub maxFileNumber {
     my $sloppy = 0;
     
     Quiq::Option->extract(\@_,
-        -sloppy=>\$sloppy,
+        -sloppy => \$sloppy,
     );
 
     # Verarbeitung
@@ -1313,8 +1432,8 @@ sub maxFileNumber {
                 next;
             }
             $class->throw(
-                q~PATH-00099: Dateiname beginnt nicht mit Ziffernfolge~,
-                File=>$file,
+                'PATH-00099: Dateiname beginnt nicht mit Ziffernfolge',
+                File => $file,
             );
         }
         if ($n+0 > $max) {
@@ -1390,11 +1509,11 @@ sub mkdir {
 
     if (@_) {
         Quiq::Option->extract(-dontExtract=>1,\@_,
-            -createParent=>\$createParent,
-            -forceMode=>\$forceMode,
-            -mode=>\$mode,
-            -mustNotExist=>\$mustNotExist,
-            -recursive=>\$recursive,
+            -createParent => \$createParent,
+            -forceMode => \$forceMode,
+            -mode => \$mode,
+            -mustNotExist => \$mustNotExist,
+            -recursive => \$recursive,
         );
     }
 
@@ -1410,8 +1529,8 @@ sub mkdir {
     if (-d $dir) {
         if ($mustNotExist) {
             $class->throw(
-                q~PATH-00005: Verzeichnis existiert bereits~,
-                Dir=>$dir,
+                'PATH-00005: Verzeichnis existiert bereits',
+                Dir => $dir,
             );
         }    
         return;
@@ -1421,9 +1540,9 @@ sub mkdir {
         my ($parentDir) = $class->split($dir);
         $class->mkdir($parentDir,
             @_,
-            -createParent=>0,
-            -mustNotExist=>0,
-            -recursive=>1,
+            -createParent => 0,
+            -mustNotExist => 0,
+            -recursive => 1,
         );
     }
 
@@ -1436,8 +1555,8 @@ sub mkdir {
 
     CORE::mkdir($dir,$mode) || do {
         $class->throw(
-            q~PATH-00004: Kann Verzeichnis nicht erzeugen~,
-            Path=>$dir,
+            'PATH-00004: Kann Verzeichnis nicht erzeugen',
+            Path => $dir,
         );
     };
 
@@ -1485,8 +1604,8 @@ sub rmdir {
 
     CORE::rmdir($dir) || do {
         $class->throw(
-            q~PATH-00005: Verzeichnis kann nicht gelöscht werden~,
-            Path=>$dir,
+            'PATH-00005: Verzeichnis kann nicht gelöscht werden',
+            Path => $dir,
         );
     };
 
@@ -1606,9 +1725,9 @@ sub chmod {
 
     CORE::chmod $mode,$path or do {
         $class->throw(
-            q~PATH-00003: Setzen von Zugriffsrechten fehlgeschlagen~,
-            Path=>$path,
-            Mode=>$mode,
+            'PATH-00003: Setzen von Zugriffsrechten fehlgeschlagen',
+            Path => $path,
+            Mode => $mode,
         );
     };
 
@@ -1651,9 +1770,9 @@ sub delete {
         eval {Quiq::Shell->exec("/bin/rm -r '$dir' >/dev/null 2>&1")};
         if ($@) {
             $class->throw(
-                q~PATH-00001: Verzeichnis löschen fehlgeschlagen~,
-                Error=>$@,
-                Path=>$path,
+                'PATH-00001: Verzeichnis löschen fehlgeschlagen',
+                Error => $@,
+                Path => $path,
             );
         }
     }
@@ -1661,8 +1780,8 @@ sub delete {
         # Datei löschen
         if (!CORE::unlink $path) {
             Quiq::Path->throw(
-                q~PATH-00002: Datei löschen fehlgeschlagen~,
-                Path=>$path,
+                'PATH-00002: Datei löschen fehlgeschlagen',
+                Path => $path,
             );
         }
     }
@@ -1722,7 +1841,7 @@ sub expandTilde {
     if ($path && substr($path,0,1) eq '~') {
         if (!exists $ENV{'HOME'}) {
             $class->throw(
-                q~PATH-00016: Environment-Variable HOME existiert nicht~,
+                'PATH-00016: Environment-Variable HOME existiert nicht',
             );
         }
         substr($path,0,1) = $ENV{'HOME'};
@@ -1834,14 +1953,14 @@ sub glob {
 
     if (!@arr) {
         $this->throw(
-            q~PATH-00014: Pfad existert nicht~,
-            Pattern=>$pat,
+            'PATH-00014: Pfad existert nicht',
+            Pattern => $pat,
         );
     }
     elsif (@arr > 1) {
         $this->throw(
-            q~PATH-00015: Mehr als ein Pfad erfüllt Muster~,
-            Pattern=>$pat,
+            'PATH-00015: Mehr als ein Pfad erfüllt Muster',
+            Pattern => $pat,
         );
     }
 
@@ -1869,9 +1988,9 @@ sub isEmpty {
         my $i = 0;
         unless (opendir D,$path) {
             $class->throw(
-                q~PATH-00005: Verzeichnis kann nicht geöffnet werden~,
-                Path=>$path,
-                Error=>"$!",
+                'PATH-00005: Verzeichnis kann nicht geöffnet werden',
+                Path => $path,
+                Error => "$!",
             );
         }
         while (readdir D) {
@@ -1931,8 +2050,8 @@ sub mode {
     my @stat = CORE::stat $path;
     unless (@stat) {
         $this->throw(
-            q~PATH-00001: stat ist fehlgeschlagen~,
-            Path=>$path,
+            'PATH-00001: stat ist fehlgeschlagen',
+            Path => $path,
         );
     }
 
@@ -1970,16 +2089,16 @@ sub mtime {
 
         if (!-e $path) {
             $class->throw(
-                q~PATH-00011: Pfad existiert nicht~,
-                Path=>$path,
+                'PATH-00011: Pfad existiert nicht',
+                Path => $path,
             );
         }
         my $atime = (stat($path))[8]; # atime lesen, die nicht ändern
         if (!utime $atime,$mtime,$path) {
             $class->throw(
-                q~PATH-00012: Kann mtime nicht setzen~,
-                Path=>$path,
-                Error=>"$!",
+                'PATH-00012: Kann mtime nicht setzen',
+                Path => $path,
+                Error => "$!",
             );
         }
     }
@@ -2016,8 +2135,8 @@ sub newer {
 
     if (!-e $path1) {
         $class->throw(
-            q~PATH-00011: Pfad existiert nicht~,
-            Path=>$path1,
+            'PATH-00011: Pfad existiert nicht',
+            Path => $path1,
         );
     }
 
@@ -2053,9 +2172,9 @@ sub readlink {
 
     return readlink($symlinkPath) // do {
             $class->throw(
-                q~PATH-00099: Kann Symlink-Zielpfad nicht ermitteln~,
-                Path=>$symlinkPath,
-                Error=>"$!",
+                'PATH-00099: Kann Symlink-Zielpfad nicht ermitteln',
+                Path => $symlinkPath,
+                Error => "$!",
             );
     }; 
 }
@@ -2148,14 +2267,14 @@ sub rename {
     my $recursive = 0;
 
     Quiq::Option->extract(\@_,
-        -overwrite=>\$overwrite,
-        -recursive=>\$recursive,
+        -overwrite => \$overwrite,
+        -recursive => \$recursive,
     );
 
     if (!$overwrite && -e $newPath) {
         $class->throw(
-            q~PATH-00099: Zieldatei existiert bereits~,
-            Path=>$newPath,
+            'PATH-00099: Zieldatei existiert bereits',
+            Path => $newPath,
         );
     }
 
@@ -2170,10 +2289,10 @@ sub rename {
 
     CORE::rename $oldPath,$newPath or do {
         $class->throw(
-            q~PATH-00010: Kann Pfad nicht umbenennen~,
-            Error=>"$!",
-            OldPath=>$oldPath,
-            NewPath=>$newPath,
+            'PATH-00010: Kann Pfad nicht umbenennen',
+            Error => "$!",
+            OldPath => $oldPath,
+            NewPath => $newPath,
         );
     };
 
@@ -2252,7 +2371,7 @@ sub symlink {
     my $force = 0;
 
     Quiq::Option->extract(\@_,
-        -force=>\$force,
+        -force => \$force,
     );
 
     if ($force && -l $symlink) {
@@ -2261,10 +2380,10 @@ sub symlink {
 
     CORE::symlink $path,$symlink or do {
         $class->throw(
-            q~FS-00001: Kann Symlink nicht erzeugen~,
-            Path=>$path,
-            Symlink=>$symlink,
-            Error=>$!,
+            'FS-00001: Kann Symlink nicht erzeugen',
+            Path => $path,
+            Symlink => $symlink,
+            Error => $!,
         );
     };
 
@@ -2337,8 +2456,8 @@ sub symlinkRelative {
     my $verbose = delete $opt{'-verbose'};
     if (%opt) {
         $class->throw(
-            q~FILESYS-00001: Unbekannte Option(en)~,
-            Options=>join(', ',keys %opt),
+            'FILESYS-00001: Unbekannte Option(en)',
+            Options => join(', ',keys %opt),
         );
     }
 
@@ -2390,7 +2509,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

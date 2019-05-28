@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 
@@ -65,14 +65,14 @@ L<Accordion Widget Beispiele|http://jqueryui.com/accordion/>
 Perl:
 
     $html = Quiq::JQuery::Accordion->html($h,
-        id=>'accordion',
-        tabs=>[{
-                label=>'A',
-                link=>'a',
+        id => 'accordion',
+        tabs => [{
+                label => 'A',
+                link => 'a',
             },{
-                label=>'B',
-                content=>$h->tag('p',
-                    -text=>1,
+                label => 'B',
+                content => $h->tag('p',
+                    -text => 1,
                     'Text des Reiters B',
                 ),
         }],
@@ -115,9 +115,9 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        id=>undef,
-        tabs=>[],
+        class => undef,
+        id => undef,
+        tabs => [],
     );
     $self->set(@_);
 
@@ -158,9 +158,9 @@ sub html {
     }
 
     return $h->tag('div',
-        -ignoreIfNull=>1,
-        id=>$id,
-        class=>$class,
+        -ignoreIfNull => 1,
+        id => $id,
+        class => $class,
         '-',
         do {
             my $html;
@@ -169,8 +169,8 @@ sub html {
                 $html .= $h->cat(
                     $h->tag('h3',
                         $h->tag('a',
-                            -ignoreTagIf=>!$url,
-                            href=>$url,
+                            -ignoreTagIf => !$url,
+                            href => $url,
                             $t->{'label'},
                         ),
                     ),
@@ -188,7 +188,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

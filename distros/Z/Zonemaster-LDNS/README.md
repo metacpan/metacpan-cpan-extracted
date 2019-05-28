@@ -20,7 +20,7 @@ Zonemaster LDNS
 
 This module provides a Perl interface to the [ldns library](https://www.nlnetlabs.nl/projects/ldns/) from [NLnet Labs](https://www.nlnetlabs.nl/). This module includes the necessary C code from ldns, so the library does not need to be globally installed. It does, however, rely on a sufficiently recent version of OpenSSL being present.
 
-This module is written as part of the [Zonemaster project](http://github.com/dotse/zonemaster), and therefore primarily exposes the functionality needed for that. Since Zonemaster is a diagnostic tool, that means the functions most used are those for looking things up and inspecting them.
+This module is written as part of the [Zonemaster project](http://github.com/zonemaster/zonemaster), and therefore primarily exposes the functionality needed for that. Since Zonemaster is a diagnostic tool, that means the functions most used are those for looking things up and inspecting them.
 
 If you want a module that specifically aims to be a complete and transparent interface to ldns, [DNS::LDNS](http://search.cpan.org/~erikoest/DNS-LDNS/) is a better fit than this module.
 
@@ -36,6 +36,9 @@ Run-time dependencies:
 Compile-time dependencies (only when installing from source):
  * `make`
  * `Devel::CheckLib`
+ * `Module::Install`
+ * `Module::Install::XSUtil`
+ * `Test::More >= 1.302015`
  * `git` (if [Internal ldns] is enabled)
  * `libtool` (if [Internal ldns] is enabled)
  * `autoconf` (if [Internal ldns] is enabled)
@@ -50,7 +53,7 @@ There is a small part in the code that may not be compatible with non-Unix opera
 
 ### Recommended installation
 
-The recommended way to install Zonemaster::LDNS is to install it from CPAN as a dependency to Zonemaster::Engine. If you follow the [installation instructions for Zonemaster::Engine](https://github.com/dotse/zonemaster-engine/blob/master/docs/Installation.md) you will get all the prerequisites and dependencies for Zonemaster::LDNS before installing it from CPAN.
+The recommended way to install Zonemaster::LDNS is to install it from CPAN as a dependency to Zonemaster::Engine. If you follow the [installation instructions for Zonemaster::Engine](https://github.com/zonemaster/zonemaster-engine/blob/master/docs/Installation.md) you will get all the prerequisites and dependencies for Zonemaster::LDNS before installing it from CPAN.
 
 ### Installation from source
 
@@ -58,7 +61,7 @@ Override the default set of features by appending `--FEATURE` and/or
 `--no-FEATURE` options to the `perl Makefile.PL` command.
 
 ```sh
-git clone https://github.com/dotse/zonemaster-ldns
+git clone https://github.com/zonemaster/zonemaster-ldns
 cd zonemaster-ldns
 perl Makefile.PL
 make

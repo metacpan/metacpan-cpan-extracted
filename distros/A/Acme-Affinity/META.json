@@ -64,7 +64,7 @@
          "web" : "https://github.com/ology/Acme-Affinity"
       }
    },
-   "version" : "0.0103",
+   "version" : "0.0104",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

@@ -125,9 +125,10 @@ INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) 
 INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('navigation','navigation.pl','navigation','0','main','html',NULL,'112');
 INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('mainMenu','main.pl','Menu','0','main','html',NULL,'113');
 INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('impressum','impressum.pl','Impressum','0','main','html',NULL,'114');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('HelpTopics','tables.pl','HelpTopics','5','HelpTopics','html',NULL,'121');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('makePassword','reg.pl','makePassword','0','makePassword','html',NULL,'122');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('lostPassword','reg.pl','lostPassword','0','lostPassword','html',NULL,'123');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('HelpTopics','tables.pl','HelpTopics','5','HelpTopics','html',NULL,'115');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('makePassword','reg.pl','makePassword','0','makePassword','html',NULL,'116');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('lostPassword','reg.pl','lostPassword','0','lostPassword','html',NULL,'117');
+INSERT INTO actions (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('datenschutz','datenschutz.pl','Datenschutzerklärung','0','main','html',NULL,'118');
 
 CREATE TABLE `actions_set` (
   `action` varchar(25) NOT NULL,
@@ -256,6 +257,7 @@ INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('S
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('HelpTopics','HelpTopics','content','122');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('makePassword','makePassword','content','123');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('lostPassword','lostPassword','content','124');
+INSERT INTO actions_set (`action`,`foreign_action`,`output_id`,`id`) values('datenschutz','datenschutz','datenschutz','125');
 
 CREATE TABLE `cats` (
   `name` varchar(100) NOT NULL DEFAULT '',

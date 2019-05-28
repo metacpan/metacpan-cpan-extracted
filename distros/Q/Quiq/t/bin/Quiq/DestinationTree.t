@@ -28,8 +28,8 @@ sub unit_setup : Setup(2) Group(^unit_) {
     $self->ok(-d $fixDir,'Fixture-Verzeichnis erzeugt');
 
     my $tree = Quiq::DestinationTree->new("$fixDir/a",
-        -exclude=>qr/\.o$/,
-        -quiet=>1,
+        -exclude => qr/\.o$/,
+        -quiet => 1,
     );
     $self->is(ref($tree),'Quiq::DestinationTree');
 

@@ -1,3 +1,9 @@
+0.08  - 28-May-2019
+- Fix bug where very big data structure can't be validated because of JavaScript::Duktape::XS internal error
+0.07  - 27-May-2019
+- Allow to specify ajv source code with `ajv_src' option (#gh3)
+- Ability to get modified data after validation (#gh3)
+- Changed minimum Perl version to 5.14
 0.06  - 08-Mar-2019
 - Bumped Ajv to 6.8.1
 - Changed min version Perl back to 5.18 re

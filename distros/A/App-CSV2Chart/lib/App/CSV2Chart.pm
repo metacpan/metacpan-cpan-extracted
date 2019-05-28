@@ -1,6 +1,6 @@
 # ABSTRACT: generate charts on the command line.
 package App::CSV2Chart;
-$App::CSV2Chart::VERSION = '0.2.0';
+$App::CSV2Chart::VERSION = '0.4.0';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ App::CSV2Chart - generate charts on the command line.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ csv2chart - command line utility to convert CSV data to a graphical chart
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SEE ALSO
 

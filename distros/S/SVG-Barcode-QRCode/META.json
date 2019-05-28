@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "SVG::Barcode" : "0.02",
+            "SVG::Barcode" : "0.10",
             "Text::QRCode" : "0.05",
             "perl" : "v5.24.0"
          }
@@ -53,7 +53,7 @@
          "web" : "https://github.com/Tekki/svg-barcode-qrcode"
       }
    },
-   "version" : "0.02",
+   "version" : "0.10",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

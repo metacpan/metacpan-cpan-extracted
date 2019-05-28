@@ -74,9 +74,9 @@ tcp_server undef, $listen, sub {
             $self->unshift_read (
             	chunk => length $self->{rbuf},
             	sub {
-                    if( $head{$ip} )
+                    if( $head{"$ip:$port"} )
                     {
-                        print $_[1];
+                        map{ print $head{"$ip:$port"}.':'.$_, "\n"; }split "\n", $_[1];
                     }
                     else
                     {
@@ -89,7 +89,7 @@ tcp_server undef, $listen, sub {
                         }
             		    warn "[MYDan]host:$2 ip:$ip port:$port:\n";
                         print $x;
-                        $head{$ip} = 1;
+                        $head{"$ip:$port"} = $2;
                     }
             	},
             )

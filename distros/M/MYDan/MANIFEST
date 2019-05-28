@@ -14,6 +14,7 @@ dan/agent/argv/edump
 dan/agent/argv/mrsync
 dan/agent/argv/reborn
 dan/agent/argv/scripts
+dan/agent/argv/scriptsx
 dan/agent/argv/sdump
 dan/agent/argv/unzipdir
 dan/agent/argv/zipdir
@@ -39,6 +40,7 @@ dan/agent/code/mrsync
 dan/agent/code/proxy
 dan/agent/code/reborn
 dan/agent/code/scripts
+dan/agent/code/scriptsx
 dan/agent/code/sdump
 dan/agent/code/sexec
 dan/agent/code/shell
@@ -62,6 +64,10 @@ dan/bootstrap/exec/3600*keyupdate
 dan/bootstrap/exec/3600_procupdate
 dan/bootstrap/exec/604800_mydanupdate
 dan/bootstrap/exec/agent
+dan/code/bin/checkuser
+dan/code/bin/control
+dan/code/config.example
+dan/code/plugin/checkuser
 dan/collector/bin/co
 dan/collector/bin/stat
 dan/collector/call/tc.sh
@@ -151,6 +157,7 @@ dan/tools/mcmd
 dan/tools/mrsync
 dan/tools/mssh
 dan/tools/ntpsync
+dan/tools/os
 dan/tools/range
 dan/tools/rcall
 dan/tools/reborn
@@ -163,6 +170,7 @@ dan/tools/supervisor
 dan/tools/sync
 dan/tools/tai64nlocal
 dan/tools/tcpserver
+dan/tools/udpfileserver
 dan/tools/unalias
 dan/tools/vssh
 dan/tools/whois
@@ -234,6 +242,9 @@ lib/MYDan/API.pm
 lib/MYDan/API/Agent.pm
 lib/MYDan/Bootstrap.pm
 lib/MYDan/Bootstrap/ProcUpdate.pm
+lib/MYDan/Code.pm
+lib/MYDan/Code/Gitlab.pm
+lib/MYDan/Code/SVN.pm
 lib/MYDan/Collector.pm
 lib/MYDan/Collector/Jobs.pm
 lib/MYDan/Collector/Parse.pm
@@ -298,6 +309,9 @@ lib/MYDan/Subscribe.pm
 lib/MYDan/Subscribe/Conf.pm
 lib/MYDan/Subscribe/DBI/DB.pm
 lib/MYDan/Sync.pm
+lib/MYDan/UDPFileServer.pm
+lib/MYDan/UDPFileServer/Client.pm
+lib/MYDan/UDPFileServer/Server.pm
 lib/MYDan/Util/Alias.pm
 lib/MYDan/Util/Check.pm
 lib/MYDan/Util/Check/Http.pm
@@ -329,6 +343,7 @@ lib/MYDan/Util/Pass.pm
 lib/MYDan/Util/Percent.pm
 lib/MYDan/Util/Phasic.pm
 lib/MYDan/Util/ProcLock.pm
+lib/MYDan/Util/Progress.pm
 lib/MYDan/Util/Proxy.pm
 lib/MYDan/Util/Reborn.pm
 lib/MYDan/Util/ReservedSpace/File.pm

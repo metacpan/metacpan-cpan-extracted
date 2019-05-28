@@ -43,7 +43,7 @@ sub test_html : Test(2) {
     $self->is($html,'');
 
     $html = Quiq::Html::Table::List->html($h,
-        titles=>[qw/A B C/],
+        titles => [qw/A B C/],
     );
     $self->is($html,$Table);
 }

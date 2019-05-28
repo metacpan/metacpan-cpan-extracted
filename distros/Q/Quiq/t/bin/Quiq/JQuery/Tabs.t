@@ -49,18 +49,18 @@ sub test_html_2 : Test(1) {
     my $h = Quiq::Html::Tag->new;
 
     my $html = Quiq::JQuery::Tabs->html($h,
-        id=>'tabs',
-        tabs=>[
+        id => 'tabs',
+        tabs => [
             {
-                label=>'A',
-                link=>'#a',
-                content=>$h->tag('p',
-                    -text=>1,
+                label => 'A',
+                link => '#a',
+                content => $h->tag('p',
+                    -text => 1,
                     'Text des Reiters A',
                 ),
             },{
-                label=>'B',
-                link=>'b',
+                label => 'B',
+                link => 'b',
             },
         ],
     );

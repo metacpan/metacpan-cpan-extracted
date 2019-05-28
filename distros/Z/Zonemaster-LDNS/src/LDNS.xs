@@ -232,6 +232,53 @@ query(obj, dname, rrtype="A", rrclass="IN")
     OUTPUT:
         RETVAL
 
+#
+# Function: query_with_pkt
+# ------------------------
+# Sister function of 'query' that takes a 'ready to send'
+# packet instead of create a new one from provided parameters.
+#
+# obj: LDNS resolver object
+# query_pkt: the packet to send
+#
+# returns: a "Zonemaster::LDNS::Packet" object with answer of the query
+#
+SV *
+query_with_pkt(obj, query_pkt)
+    Zonemaster::LDNS obj;
+    Zonemaster::LDNS::Packet query_pkt;
+    CODE:
+    {
+        ldns_status status;
+        ldns_pkt *pkt;
+
+        status = ldns_resolver_send_pkt(&pkt, obj, query_pkt);
+        if ( status != LDNS_STATUS_OK) {
+            /* Remove and reinsert nameserver to make ldns forget it failed */
+            ldns_status s;
+            ldns_rdf *ns = ldns_resolver_pop_nameserver(obj);
+            if (ns != NULL) {
+                s = ldns_resolver_push_nameserver(obj, ns);
+                if ( s != LDNS_STATUS_OK) {
+                    croak("Failed to reinsert nameserver after failure (ouch): %s", ldns_get_errorstr_by_id(s));
+                }
+                ldns_rdf_deep_free(ns);
+            }
+            croak("%s", ldns_get_errorstr_by_id(status));
+            RETVAL = NULL;
+        }
+        ldns_pkt *clone = ldns_pkt_clone(pkt);
+        ldns_pkt_set_timestamp(clone, ldns_pkt_timestamp(pkt));
+        RETVAL = sv_setref_pv(newSV(0), "Zonemaster::LDNS::Packet", clone);
+        ldns_pkt_free(pkt);
+#ifdef USE_ITHREADS
+        net_ldns_remember_packet(RETVAL);
+#endif
+    }
+    OUTPUT:
+        RETVAL
+
+
 bool
 recurse(obj,...)
     Zonemaster::LDNS obj;
@@ -301,6 +348,25 @@ igntc(obj,...)
             ldns_resolver_set_igntc(obj, SvIV(ST(1)));
         }
         RETVAL = ldns_resolver_igntc(obj);
+    OUTPUT:
+        RETVAL
+
+#
+# Function: fallback
+# ------------------
+# Get/set 'fallback' flag
+#
+# returns: a boolean
+#
+bool
+fallback(obj,...)
+    Zonemaster::LDNS obj;
+    CODE:
+        if ( items > 1 ) {
+            SvGETMAGIC(ST(1));
+            ldns_resolver_set_fallback(obj, SvIV(ST(1)));
+        }
+        RETVAL = ldns_resolver_fallback(obj);
     OUTPUT:
         RETVAL
 
@@ -825,10 +891,10 @@ U16
 packet_id(obj,...)
     Zonemaster::LDNS::Packet obj;
     CODE:
-		if ( items > 1 ) {
+        if ( items > 1 ) {
             SvGETMAGIC(ST(1));
-			ldns_pkt_set_id(obj, (U16)SvIV(ST(1)));
-		}
+            ldns_pkt_set_id(obj, (U16)SvIV(ST(1)));
+        }
         RETVAL = ldns_pkt_id(obj);
     OUTPUT:
         RETVAL
@@ -941,10 +1007,10 @@ U32
 packet_querytime(obj,...)
     Zonemaster::LDNS::Packet obj;
     CODE:
-		if ( items > 1 ) {
+        if ( items > 1 ) {
             SvGETMAGIC(ST(1));
-			ldns_pkt_set_querytime(obj, (U32)SvIV(ST(1)));
-		}
+            ldns_pkt_set_querytime(obj, (U32)SvIV(ST(1)));
+        }
         RETVAL = ldns_pkt_querytime(obj);
     OUTPUT:
         RETVAL
@@ -1223,6 +1289,28 @@ packet_new_from_wireformat(class,buf)
     OUTPUT:
         RETVAL
 
+#
+# Function: set_edns_present
+# --------------------------
+# Set edns_present property of Packet object
+#
+SV *
+packet_set_edns_present(obj)
+    Zonemaster::LDNS::Packet obj;
+    CODE:
+        obj->_edns_present = true;
+
+#
+# Function: unset_edns_present
+# ----------------------------
+# Unset edns_present property of Packet object
+#
+SV *
+packet_unset_edns_present(obj)
+    Zonemaster::LDNS::Packet obj;
+    CODE:
+        obj->_edns_present = false;
+
 U16
 packet_edns_size(obj,...)
     Zonemaster::LDNS::Packet obj;
@@ -1249,6 +1337,19 @@ packet_edns_rcode(obj,...)
     OUTPUT:
         RETVAL
 
+U16
+packet_edns_z(obj,...)
+    Zonemaster::LDNS::Packet obj;
+    CODE:
+        if(items>=2)
+        {
+            SvGETMAGIC(ST(1));
+            ldns_pkt_set_edns_z(obj, (U16)SvIV(ST(1)));
+        }
+        RETVAL = ldns_pkt_edns_z(obj);
+    OUTPUT:
+        RETVAL 
+
 U8
 packet_edns_version(obj,...)
     Zonemaster::LDNS::Packet obj;
@@ -1259,6 +1360,40 @@ packet_edns_version(obj,...)
             ldns_pkt_set_edns_version(obj, (U8)SvIV(ST(1)));
         }
         RETVAL = ldns_pkt_edns_version(obj);
+    OUTPUT:
+        RETVAL
+
+#
+# Function: edns_data
+# -------------------
+# Get/set EDNS data
+# 
+# Beware, this code can only take a unique U32 parameter which means it 
+# is not a full implementation of EDNS data but it is enough for our 
+# current purpose. It can only deal with option codes with OPTION-LENGTH=0
+# (see 6.1.2 section of RFC 6891) which means OPTION-DATA is always empty.
+#
+# returns: a bytes string
+#
+SV *
+packet_edns_data(obj,...)
+    Zonemaster::LDNS::Packet obj;
+    CODE:
+        ldns_rdf* opt;
+        if(items>=2)
+        {
+            SvGETMAGIC(ST(1));
+            opt = ldns_native2rdf_int32(LDNS_RDF_TYPE_INT32, (U32)SvIV(ST(1)));
+            if(opt == NULL) 
+            {
+                croak("Failed to set OPT RDATA");
+            }
+            ldns_pkt_set_edns_data(obj, opt);
+        }
+        else {
+            opt = ldns_pkt_edns_data(obj);
+        }
+        RETVAL = newSVpvn((char*)(opt), 4);
     OUTPUT:
         RETVAL
 

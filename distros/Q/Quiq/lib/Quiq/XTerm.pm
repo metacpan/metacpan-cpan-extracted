@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Shell;
 
@@ -58,8 +58,8 @@ sub new {
 
     if ($program !~ /^(xterm|gnome-terminal)$/) {
         $class->throw(
-            q~XTERM-00001: Unknown terminal type~,
-            Type=>$program,
+            'XTERM-00001: Unknown terminal type',
+            Type => $program,
         );
     }
 
@@ -143,7 +143,7 @@ sub launch {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

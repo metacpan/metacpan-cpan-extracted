@@ -76,13 +76,13 @@ like $error, qr/event loop is running/, 'right exception message';
 Mojo::IOLoop->remove($_) for $t, $timeout;
 
 my $loop = Mojo::IOLoop->new;
-$p = $class->new(ioloop => $loop);
+$p = $class->new->ioloop($loop);
 $t = $loop->timer(0.01 => sub { $p->resolve('success') });
 $timeout = _timeout($loop);
 is_deeply [$p->get], ['success'], 'secondary loop timer resolved';
 $loop->remove($_) for $t, $timeout;
 
-$p1 = $class->new(ioloop => $loop)->resolve('success');
+$p1 = $class->new->ioloop($loop)->resolve('success');
 $p2 = $class->new;
 my $result;
 $t = Mojo::IOLoop->timer(0.01 => sub { $result = $p1->get; $p2->resolve(2) });

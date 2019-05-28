@@ -117,6 +117,23 @@ is (-e $tag_detail_file, 1, 'Tag detail file created.');
 
 is ($plerd->has_tags, 1, 'The blog knows that it has tags.');
 
+my $foo_tag_file =
+    Path::Class::File->new( $docroot_dir, 'tags', 'Foo.html' );
+my $tag_detail_content = $foo_tag_file->slurp;
+like(
+    $tag_detail_content,
+    qr{<h1>Tag: Foo.*<li>.*<li>.*</ul>.*sidebar"}s,
+    "The 'foo' tag page links to two posts, even though they capitalized "
+    . "it differently.",
+);
+
+my $tag_index_content = $tag_index_file->slurp;
+like(
+    $tag_index_content,
+    qr{<h1>All Tags.*<li>.*<li>.*</ul>.*sidebar"}s,
+    "The tag-index page links to two tags.",
+);
+
 }
 
 ### Make sure re-titling posts works as expected
@@ -174,6 +191,12 @@ like ( $plerd->post_with_url( "http://blog.example.com/$ymd-metatags-with-image.
 like ( $plerd->post_with_url( "http://blog.example.com/$ymd-metatags-with-image-and-alt.html" )->description,
     qr/This file, which is awesome, sets up some attributes/,
     'Automatically derived description works, with leading image tag present.',
+);
+
+# make sure that multimarkdown tables work
+like ( $plerd->post_with_url( "http://blog.example.com/$ymd-markdown-table.html")->body,
+    qr{<td>Pizza</td>},
+    'Markdown tables are rendered.',
 );
 
 ### Test miscellaneous-attribute pass-through

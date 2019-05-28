@@ -4,6 +4,7 @@ author:
   - 'Caleb Cushing <xenoterracide@gmail.com>'
   - 'Grahan Ollis <plicease@cpan.org>'
 build_requires:
+  Dist::Zilla::Role::VersionProvider: '0'
   ExtUtils::MakeMaker: '0'
   Path::Tiny: '0'
   Test::DZil: '0'
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues
   homepage: https://metacpan.org/dist/Dist-Zilla-Plugin-OurPkgVersion
   repository: git://github.com/plicease/dist-zilla-plugin-ourpkgversion.git
-version: '0.18'
+version: '0.20'
 x_contributors:
   - 'Alceu Rodrigues de Freitas Junior <alceu.junior@quintoandar.com.br>'
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'

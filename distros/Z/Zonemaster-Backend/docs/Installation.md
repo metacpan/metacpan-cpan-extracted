@@ -43,6 +43,9 @@ Zonemaster::Engine installation].
 > install from your operating system distribution (rather than CPAN).
 > We recommend following the Zonemaster::Engine installation instruction.
 
+Prerequisite for FreeBSD is that the package system is upadated and activated
+(see the FreeBSD section of [Zonemaster::Engine installation]).
+
 For details on supported versions of Perl, database engine and operating system
 for Zonemaster::Backend, see the [declaration of prerequisites].
 
@@ -65,7 +68,7 @@ sudo yum install perl-Module-Install perl-IO-CaptureOutput perl-String-ShellQuot
 Install dependencies not available from binary packages:
 
 ```sh 
-sudo cpanm Class::Method::Modifiers Config::IniFiles Daemon::Control JSON::RPC::Dispatch Parallel::ForkManager Plack::Builder Plack::Middleware::Debug Role::Tiny Router::Simple::Declare Starman
+sudo cpanm Class::Method::Modifiers Config::IniFiles Daemon::Control JSON::RPC::Dispatch Net::IP::XS Parallel::ForkManager Plack::Builder Plack::Middleware::Debug Role::Tiny Router::Simple::Declare Starman
 ```
 
 Install Zonemaster::Backend: 
@@ -234,13 +237,13 @@ See the [post-installation] section for post-installation matters.
 Install dependencies available from binary packages:
 
 ```sh
-sudo apt-get install libclass-method-modifiers-perl libconfig-inifiles-perl libdata-dump-perl libdbd-sqlite3-perl libdbi-perl libfile-sharedir-perl libfile-slurp-perl libhtml-parser-perl libintl-perl libio-captureoutput-perl libjson-pp-perl libmoose-perl libplack-perl librole-tiny-perl librouter-simple-perl libstring-shellquote-perl libtest-requires-perl libtest-warn-perl libtext-microtemplate-perl libtie-simple-perl starman
+sudo apt-get install libclass-method-modifiers-perl libconfig-inifiles-perl libdbd-sqlite3-perl libdbi-perl libfile-sharedir-perl libfile-slurp-perl libhtml-parser-perl libintl-perl libio-captureoutput-perl libjson-pp-perl libjson-rpc-perl liblog-any-adapter-dispatch-perl liblog-any-perl liblog-dispatch-perl libmoose-perl libplack-perl libplack-middleware-debug-perl librole-tiny-perl librouter-simple-perl libstring-shellquote-perl starman
 ```
 
 Install dependencies not available from binary packages:
 
 ```sh
-sudo cpanm Daemon::Control JSON::RPC Net::IP::XS Parallel::ForkManager Plack::Middleware::Debug
+sudo cpanm Daemon::Control JSON::Validator Net::IP::XS Parallel::ForkManager Try::Tiny
 ```
 
 Install Zonemaster::Backend:
@@ -291,23 +294,9 @@ sudo apt-get install mysql-server libdbd-mysql-perl
 Initialize the database:
 
 ```sh
-mysql --user=root --password < ./initial-mysql.sql
+sudo mysql --password < ./initial-mysql.sql
 ```
 
-For latest versions of MySQL, wherein the root password is blank and you get an
-error "Access denied for the above command" on running the above command ,
-follow the below procedure: 
-
-```sh
-If you know the root password
-        mysql -u root 
-In MySQL prompt type the following 
-        SET PASSWORD FOR 'root'@'localhost' =PASSWORD("root-password");
-        flush privileges;
-        quit;
-Run again 
-	mysql --user=root --password < ./initial-mysql.sql
-```
 > **Note:** This creates a database called `zonemaster`, as well as a user
 > called "zonemaster" with the password "zonemaster" (as stated in the config
 > file). This user has just enough permissions to run the backend software.
@@ -332,7 +321,7 @@ sudo apt-get install libdbd-pg-perl postgresql
 ```
 
 Check that you have a PostgreSQL installation 9.2 or later. The version should also match the supported database
-engine version depending on OS found in [Zonemaster/README](https://github.com/dotse/zonemaster/blob/master/README.md).
+engine version depending on OS found in [Zonemaster/README](https://github.com/zonemaster/zonemaster/blob/master/README.md).
 
 ```sh
 psql --version
@@ -424,11 +413,10 @@ cpanm Zonemaster::Backend
 > The command above might try to install "DBD::Pg" and "DBD::mysql".
 > You can ignore if it fails. The relevant libraries are installed further down in these instructions.
 
-Add `zonemaster` user and group:
+Add `zonemaster` user and `zonemaster` group (the group is created automatically): 
 
 ```sh
-pw groupadd zonemaster
-pw useradd zonemaster -g zonemaster -s /sbin/nologin -d /nonexistent -c "Zonemaster daemon user"
+pw useradd zonemaster -s /sbin/nologin -d /nonexistent -c "Zonemaster daemon user"
 ```
 
 Install files to their proper locations:
@@ -588,15 +576,15 @@ sudo -u postgres psql -f ./cleanup-postgres.sql # MUST BE VERIFIED!
 
 -------
 
-[Declaration of prerequisites]: https://github.com/dotse/zonemaster#prerequisites
+[Declaration of prerequisites]: https://github.com/zonemaster/zonemaster#prerequisites
 [JSON-RPC API]: API.md
-[Main Zonemaster repository]: https://github.com/dotse/zonemaster/blob/master/README.md
+[Main Zonemaster repository]: https://github.com/zonemaster/zonemaster/blob/master/README.md
 [Post-installation]: #7-post-installation
-[Zonemaster::CLI installation]: https://github.com/dotse/zonemaster-cli/blob/master/docs/Installation.md
-[Zonemaster::GUI installation]: https://github.com/dotse/zonemaster-gui/blob/master/docs/Installation.md
-[Zonemaster::Engine installation]: https://github.com/dotse/zonemaster-engine/blob/master/docs/Installation.md
-[Zonemaster::Engine]: https://github.com/dotse/zonemaster-engine/blob/master/README.md
-[Zonemaster::LDNS]: https://github.com/dotse/zonemaster-ldns/blob/master/README.md
+[Zonemaster::CLI installation]: https://github.com/zonemaster/zonemaster-cli/blob/master/docs/Installation.md
+[Zonemaster::GUI installation]: https://github.com/zonemaster/zonemaster-gui/blob/master/docs/Installation.md
+[Zonemaster::Engine installation]: https://github.com/zonemaster/zonemaster-engine/blob/master/docs/Installation.md
+[Zonemaster::Engine]: https://github.com/zonemaster/zonemaster-engine/blob/master/README.md
+[Zonemaster::LDNS]: https://github.com/zonemaster/zonemaster-ldns/blob/master/README.md
 
 Copyright (c) 2013 - 2017, IIS (The Internet Foundation in Sweden) \
 Copyright (c) 2013 - 2017, AFNIC \

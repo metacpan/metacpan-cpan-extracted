@@ -1593,7 +1593,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               int8_t value = (int8_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].bval = value;
@@ -1638,7 +1638,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               int16_t value = (int16_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].sval = value;
@@ -1683,7 +1683,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               int32_t value = (int32_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].ival = value;
@@ -1728,7 +1728,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               int64_t value = (int64_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].lval = value;
@@ -1773,7 +1773,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               float value = (float)SvNV(sv_field_value);
               stack[arg_var_id + field_index].fval = value;
@@ -1818,7 +1818,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               double value = (double)SvNV(sv_field_value);
               stack[arg_var_id + field_index].dval = value;
@@ -1830,15 +1830,36 @@ call_sub(...)
           }
           break;
         }
+        // Object type
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
         case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
         case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
         {
-          if (SvOK(sv_value)) {
-            // Convert Perl array to SPVM object
-            if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
+          // undef
+          if (!SvOK(sv_value)) {
+            stack[arg_var_id].oval = NULL;
+          }
+          else {
+            // If arument type is byte[] and value is perl non-ref-scalar, the value is converted to byte[]
+            if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 1 && !SvROK(sv_value)) {
+              // Copy
+              sv_value = sv_2mortal(newSVsv(sv_value));
+              
+              // Encode to UTF-8
+              sv_utf8_encode(sv_value);
+              
+              int32_t length = sv_len(sv_value);
+              const char* chars = SvPV_nolen(sv_value);
+              
+              void* string = env->new_str_len_raw(env, chars, length);
+              env->inc_ref_count(env, string);
+              
+              sv_value = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::Data::Array");
+            }
+            // Value is array refence
+            else if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
               
               SV* sv_elems = sv_value;
               
@@ -1846,8 +1867,24 @@ call_sub(...)
               
               int32_t length = av_len(av_elems) + 1;
               
-              // Convert string array to SPVM::Data::Array
-              if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 2) {
+              // Check first value of array reference is no-ref-scalar
+              int32_t first_arg_is_no_ref_scalar;
+              if (length > 0) {
+                SV** sv_str_value_ptr = av_fetch(av_elems, 0, 0);
+                SV* sv_str_value = sv_str_value_ptr ? *sv_str_value_ptr : &PL_sv_undef;
+                if (SvROK(sv_str_value)) {
+                  first_arg_is_no_ref_scalar = 0;
+                }
+                else {
+                  first_arg_is_no_ref_scalar = 1;
+                }
+              }
+              else {
+                first_arg_is_no_ref_scalar = 0;
+              }
+              
+              // If arument type is byte[][] and first value of array reference is no-ref-scalar, the value is convert to byte[][]
+              if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 2 && first_arg_is_no_ref_scalar) {
                 // New array
                 SPVM_OBJECT* array = env->new_marray_raw(env, SPVM_BASIC_TYPE_C_ID_BYTE, 1, length);
 
@@ -1879,6 +1916,7 @@ call_sub(...)
                 SV* sv_marray = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::Data::Array");
                 sv_value = sv_marray;
               }
+              // 1-dimension array
               else if (arg->type_dimension == 1) {
                 switch (arg->basic_type_id) {
                   case SPVM_BASIC_TYPE_C_ID_BYTE: {
@@ -2049,33 +2087,7 @@ call_sub(...)
                 }
               }
             }
-            // Convert string to SPVM::Data::Array
-            else if (!SvROK(sv_value) && arg->type_dimension == 1) {
-              switch (arg->basic_type_id) {
-                case SPVM_BASIC_TYPE_C_ID_BYTE: {
-                  // Copy
-                  sv_value = sv_2mortal(newSVsv(sv_value));
-                  
-                  // Encode to UTF-8
-                  sv_utf8_encode(sv_value);
-                  
-                  int32_t length = sv_len(sv_value);
-                  const char* chars = SvPV_nolen(sv_value);
-                  
-                  void* string = env->new_str_len_raw(env, chars, length);
-                  env->inc_ref_count(env, string);
-                  
-                  sv_value = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::Data::Array");
-                  break;
-                }
-              }
-            }
-          }
-          
-          if (!SvOK(sv_value)) {
-            stack[arg_var_id].oval = NULL;
-          }
-          else {
+            
             if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::Data")) {
               SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
               int32_t arg_basic_type_id = arg->basic_type_id;
@@ -2101,11 +2113,15 @@ call_sub(...)
               croak("%dth argument of %s::%s() must be inherit SPVM::Data at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
             }
           }
+          
           arg_var_id++;
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_BYTE: {
           args_contain_ref = 1;
+          if (!SvROK(sv_value)) {
+            croak("%dth argument of %s::%s() must be scalar reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+          }
           SV* sv_value_deref = SvRV(sv_value);
           int8_t value = (int8_t)SvIV(sv_value_deref);
           ref_stack[ref_stack_top].bval = value;
@@ -2117,6 +2133,9 @@ call_sub(...)
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_SHORT: {
           args_contain_ref = 1;
+          if (!SvROK(sv_value)) {
+            croak("%dth argument of %s::%s() must be scalar reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+          }
           SV* sv_value_deref = SvRV(sv_value);
           int16_t value = (int16_t)SvIV(sv_value_deref);
           ref_stack[ref_stack_top].sval = value;
@@ -2128,6 +2147,9 @@ call_sub(...)
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_INT: {
           args_contain_ref = 1;
+          if (!SvROK(sv_value)) {
+            croak("%dth argument of %s::%s() must be scalar reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+          }
           SV* sv_value_deref = SvRV(sv_value);
           int32_t value = (int32_t)SvIV(sv_value_deref);
           ref_stack[ref_stack_top].ival = value;
@@ -2139,6 +2161,9 @@ call_sub(...)
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_LONG: {
           args_contain_ref = 1;
+          if (!SvROK(sv_value)) {
+            croak("%dth argument of %s::%s() must be scalar reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+          }
           SV* sv_value_deref = SvRV(sv_value);
           int64_t value = (int64_t)SvIV(sv_value_deref);
           ref_stack[ref_stack_top].lval = value;
@@ -2150,6 +2175,9 @@ call_sub(...)
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_FLOAT: {
           args_contain_ref = 1;
+          if (!SvROK(sv_value)) {
+            croak("%dth argument of %s::%s() must be scalar reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+          }
           SV* sv_value_deref = SvRV(sv_value);
           float value = (float)SvNV(sv_value_deref);
           ref_stack[ref_stack_top].fval = value;
@@ -2161,6 +2189,9 @@ call_sub(...)
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_DOUBLE: {
           args_contain_ref = 1;
+          if (!SvROK(sv_value)) {
+            croak("%dth argument of %s::%s() must be scalar reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
+          }
           SV* sv_value_deref = SvRV(sv_value);
           double value = (double)SvNV(sv_value_deref);
           ref_stack[ref_stack_top].dval = value;
@@ -2204,7 +2235,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               int8_t value = (int8_t)SvIV(sv_field_value);
               ((SPVM_VALUE_byte*)&ref_stack[ref_stack_top])[field_index] = value;
@@ -2253,7 +2284,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                sv_field_value = sv_2mortal(newSViv(0));
+                sv_field_value = &PL_sv_undef;
               }
               int16_t value = (int16_t)SvIV(sv_field_value);
               ((SPVM_VALUE_short*)&ref_stack[ref_stack_top])[field_index] = value;
@@ -2302,7 +2333,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               int32_t value = (int32_t)SvIV(sv_field_value);
               ((SPVM_VALUE_int*)&ref_stack[ref_stack_top])[field_index] = value;
@@ -2351,7 +2382,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                sv_field_value = sv_2mortal(newSViv(0));
+                sv_field_value = &PL_sv_undef;
               }
               int64_t value = (int64_t)SvIV(sv_field_value);
               ((SPVM_VALUE_long*)&ref_stack[ref_stack_top])[field_index] = value;
@@ -2400,7 +2431,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               float value = (float)SvNV(sv_field_value);
               ((SPVM_VALUE_float*)&ref_stack[ref_stack_top])[field_index] = value;
@@ -2449,7 +2480,7 @@ call_sub(...)
                 sv_field_value = *sv_field_value_ptr;
               }
               else {
-                croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
+                sv_field_value = &PL_sv_undef;
               }
               double value = (double)SvNV(sv_field_value);
               ((SPVM_VALUE_double*)&ref_stack[ref_stack_top])[field_index] = value;

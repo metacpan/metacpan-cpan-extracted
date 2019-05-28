@@ -5,7 +5,7 @@ use Test::PostgreSQL;
 use Test::More;
 use Test::Deep;
 use Exporter 'import';
-our @EXPORT = qw(pgsql empty_changeset);
+our @EXPORT = qw(pgsql assert_minimum_pgsql_version empty_changeset);
 
 sub pgsql {
     return ( eval {
@@ -29,6 +29,13 @@ EOF
             ],
         );
     } or plan skip_all => $@ );
+}
+
+sub assert_minimum_pgsql_version {
+    my ($dbh) = @_;
+
+    my $version = $dbh->selectall_arrayref('SHOW server_version_num')->[0][0];
+    $version >= 90400 or plan skip_all => "need PostgreSQL >= 9.4, this is $version";
 }
 
 sub empty_changeset {

@@ -31,7 +31,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -39,6 +39,8 @@ BEGIN
     @EXPORT_OK   = qw();
     %EXPORT_TAGS = ();
 } ## end BEGIN
+
+# TODO - Verificar o diretorio de Download para se não existir criar.
 
 =head2 C<new()>
 

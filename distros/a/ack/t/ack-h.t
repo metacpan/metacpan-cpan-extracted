@@ -55,7 +55,7 @@ HERE
 
 WITH_SWITCHES_MULTIPLE_FILES: {
     for my $opt ( qw( -h --no-filename ) ) {
-        my @expected = line_split( <<"HERE" );
+        my @expected = line_split( <<'HERE' );
 use strict;
 HERE
 
@@ -66,3 +66,7 @@ HERE
         lists_match( \@results, \@expected, "Looking for strict in multiple files with $opt" );
     }
 }
+
+done_testing();
+
+exit 0;

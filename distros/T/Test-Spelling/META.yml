@@ -8,6 +8,7 @@ build_requires:
   Test::More: '0.88'
   Test::Tester: '0'
   strict: '0'
+  utf8: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,7 +30,7 @@ no_index:
 provides:
   Test::Spelling:
     file: lib/Test/Spelling.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Exporter: '5.57'
   File::Spec: '0'
@@ -38,7 +39,6 @@ requires:
   Symbol: '0'
   Test::Builder: '0'
   Text::Wrap: '0'
-  base: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/genio/test-spelling/issues
   homepage: https://github.com/genio/test-spelling
   repository: https://github.com/genio/test-spelling.git
-version: '0.23'
+version: '0.24'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -286,7 +286,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.23
+          tag: v0.24
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

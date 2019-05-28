@@ -1,5 +1,9 @@
 Revision history for Perl module SQL::Shell
 
+1.17 - 2019-05-24
+
+  * Added missing prerequisites to Makefile.PL
+
 1.16 - 2019-05-22
 
   * Added new send/recv commands

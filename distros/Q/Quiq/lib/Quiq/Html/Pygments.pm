@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::CommandLine;
 use Quiq::Shell;
@@ -161,7 +161,7 @@ sub css {
     my $bgColor = $1;
     if (!$bgColor) {
         $class->throw(
-            q~PYG-00001: Can't determine main background-color~,
+            'PYG-00001: Can\'t determine main background-color',
             Style => $style,
             CssRules => $rules,
         );
@@ -367,7 +367,7 @@ sub stylesPage {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

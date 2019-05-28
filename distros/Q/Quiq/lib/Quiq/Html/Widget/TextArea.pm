@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Html::Tag;
 
@@ -88,16 +88,16 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        cols=>undef,
-        disabled=>0,
-        hidden=>0,
-        id=>undef,
-        name=>undef,
-        onKeyUp=>undef,
-        rows=>undef,
-        style=>undef,
-        value=>undef,
+        class => undef,
+        cols => undef,
+        disabled => 0,
+        hidden => 0,
+        id => undef,
+        name => undef,
+        onKeyUp => undef,
+        rows => undef,
+        style => undef,
+        value => undef,
     );
 
     # Werte Konstruktoraufruf
@@ -136,14 +136,14 @@ sub html {
     my $h = Quiq::Html::Tag->new;
 
     return $h->tag('textarea',
-        id=>$id,
-        name=>$name,
-        class=>$class,
-        style=>$style,
-        disabled=>$disabled,
-        onkeyup=>$onKeyUp,
-        cols=>$cols,
-        rows=>$rows,
+        id => $id,
+        name => $name,
+        class => $class,
+        style => $style,
+        disabled => $disabled,
+        onkeyup => $onKeyUp,
+        cols => $cols,
+        rows => $rows,
         $value
     );    
 }
@@ -152,7 +152,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -36,6 +36,7 @@
             "Clone" : "0",
             "File::Basename" : "0",
             "File::Temp" : "0",
+            "IPC::Cmd" : "0",
             "Text::Locus" : "1",
             "Text::ParseWords" : "0",
             "perl" : "5.01"
@@ -45,7 +46,7 @@
    "provides" : {
       "Config::HAProxy" : {
          "file" : "lib/Config/HAProxy.pm",
-         "version" : "1.02"
+         "version" : "1.05"
       },
       "Config::HAProxy::Iterator" : {
          "file" : "lib/Config/HAProxy/Iterator.pm"
@@ -80,5 +81,5 @@
          "web" : "http://git.gnu.org.ua/cgit/config-haproxy.git/"
       }
    },
-   "version" : "1.02"
+   "version" : "1.05"
 }

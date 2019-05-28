@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Log::Log4perl::Layout::JSON::Readable",
   "PREREQ_PM" => {
-    "Class::Tiny" => 0,
+    "Class::Tiny" => "1.001",
     "Log::Log4perl::Layout::JSON" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t t/tests/*.t"
   }
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Class::Tiny" => 0,
+  "Class::Tiny" => "1.001",
   "Log::Log4perl" => 0,
   "Log::Log4perl::Layout::JSON" => 0,
   "Test::Most" => 0,

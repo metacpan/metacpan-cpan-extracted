@@ -13,7 +13,7 @@ Data::JSONSchema::Ajv - JSON Schema Validator wrapping Ajv
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 DESCRIPTION
 
@@ -84,16 +84,30 @@ Light-weight in this context just means it's not very many lines of actual Perl
 
   my $ajv = Data::JSONSchema::Ajv->new(
       { v5 => $JSON::PP::true }, # Ajv options. Try: {},
-      {}, # Module options. See `draft`
+      {}, # Module options. See below
   );
 
 Instantiates a new L<JavaScript::Duktape::XS> environment and loads C<Ajv> into it.
 Accepts two hashrefs (or undefs). The first is passed straight through to
 C<Ajv>, whose options are documented L<here|https://epoberezkin.github.io/ajv/>.
 
-The second one allows you to specify a JSON Schema draft version. Allowable
-options are C<04>, C<06>, and C<07>. No support for multiple schemas at this
-time. Default is C<07>.
+The second one allows you to specify options of this module:
+
+=over
+
+=item ajv_src
+
+String that contains source code of standalone version of Ajv library, which can be
+found L<here|https://cdnjs.com/libraries/ajv>. This module already has some version
+(possibly not last) of Ajv hardcoded inside it and will use it if this option doesn't
+specified.
+
+=item draft
+
+A JSON Schema draft version as a string. Allowable values are C<04>, C<06>, and C<07>.
+No support for multiple schemas at this time. Default is C<07>.
+
+=back
 
 =head2 make_validator
 
@@ -114,11 +128,20 @@ Single method object:
 =head2 validate
 
   my $errors = $validator->validate( $data_structure );
+  my $errors = $validator->validate( \$data_structure );
 
-Validate a data-structure against the schema. Returns C<undef> on success, and
-a data-structure complaining on failure. The data-structure is whatever C<Ajv>
-produces - you can either read its documentation, or be lazy and simply
-L<Data::Dumper> it.
+Validate a data-structure against the schema. Whith some options specified
+(like C<removeAdditional>, C<coerceTypes>) Ajv may modify input data. If you
+want to receive this modifications you need to pass your data structure by
+reference: for example if you normally pass hashref or arrayref in this case
+you need to pass reference to hashref or reference to arrayref. If you are
+validating just a simple scalar like string or number you can also pass it
+by reference, but you'll not get any data modifications because on Ajv's side
+they are passed by value and can't be modified. You can try to wrap such
+scalars in array with one element and modify schema a little to pass this
+limitation. Returns C<undef> on success, and a data-structure complaining
+on failure. The data-structure is whatever C<Ajv> produces - you can either
+read its documentation, or be lazy and simply L<Data::Dumper> it.
 
 =head1 BOOLEANS AND UNDEFINED/NULL
 
@@ -157,8 +180,7 @@ This Perl wrapper written by Peter Sergeant.
 
 package Data::JSONSchema::Ajv {
     use Carp qw/croak/;
-    use Storable qw/dclone/;
-    use Cpanel::JSON::XS qw/decode_json/;
+    use Cpanel::JSON::XS;
 
     sub new {
         my ( $class, $ajv_options, $my_options ) = @_;
@@ -170,6 +192,7 @@ package Data::JSONSchema::Ajv {
 
         $my_options ||= {};
         my $draft_version = delete $my_options->{'draft'} // '07';
+        my $ajv_src = delete $my_options->{ajv_src};
         my $json_obj = delete $my_options->{'json'}
             // Cpanel::JSON::XS->new->ascii->allow_nonref;
         if ( keys %$my_options ) {
@@ -177,7 +200,7 @@ package Data::JSONSchema::Ajv {
         }
 
         my $js = JavaScript::Duktape::XS->new();
-        $js->eval($Data::JSONSchema::Ajv::src::src);
+        $js->eval($ajv_src || $Data::JSONSchema::Ajv::src::src);
 
         # Setup appropriately for different version of the schema
         if ( $draft_version eq '04' ) {
@@ -187,7 +210,7 @@ package Data::JSONSchema::Ajv {
             warn "Over-riding 'meta' as you specified draft-04"
                 if exists $ajv_options->{'meta'};
             $ajv_options->{'meta'}
-                = decode_json($Data::JSONSchema::Ajv::src::04::src);
+                = $json_obj->decode($Data::JSONSchema::Ajv::src::04::src);
         }
         elsif ( $draft_version eq '06' ) {
             warn "Over-riding 'meta' as you specified draft-06"
@@ -205,9 +228,11 @@ package Data::JSONSchema::Ajv {
             '_json'    => $json_obj,
         }, $class;
 
-        $self->_inject_escaped( ajvOptions => $ajv_options );
+        $js->set( ajvOptions => $ajv_options );
 
         $js->eval('var ajv = new Ajv(ajvOptions);');
+        $js->typeof('ajv') ne 'undefined'
+            or die "Can't create ajv object. Bad `ajv_src' specified?";
 
         return $self;
     }
@@ -220,7 +245,7 @@ package Data::JSONSchema::Ajv {
         my $validator_name = "validator_$counter";
 
         if ( ref $schema ) {
-            $self->_inject_escaped( $schema_name, $schema );
+            $self->{'_context'}->set( $schema_name, $schema );
             $self->{'_context'}
                 ->eval("var $validator_name = ajv.compile($schema_name);");
         }
@@ -228,30 +253,20 @@ package Data::JSONSchema::Ajv {
             $self->{'_context'}
                 ->eval("var $validator_name = ajv.compile($schema);");
         }
+        
+        $self->{'_context'}->typeof($validator_name) ne 'undefined'
+            or die "Can't compile schema passed";
 
         return bless [ $self => $validator_name ],
             'Data::JSONSchema::Ajv::Validator';
     }
 
     sub duktape { my $self = shift; return $self->{'_context'}; }
-
-    sub _inject_escaped {
-        my ( $self, $name, $data ) = @_;
-
-        my $js = $self->duktape;
-
-        # Change various markers to be magic strings
-        my $data_dump = $self->{'_json'}->encode($data);
-
-        # Change them back in JS land if needed
-        $js->eval("$name = $data_dump;");
-    }
-
 }
-$Data::JSONSchema::Ajv::VERSION = '0.06';;
+$Data::JSONSchema::Ajv::VERSION = '0.08';;
 
 package Data::JSONSchema::Ajv::Validator {
-$Data::JSONSchema::Ajv::Validator::VERSION = '0.06';
+$Data::JSONSchema::Ajv::Validator::VERSION = '0.08';
 use strict;
     use warnings;
 
@@ -259,14 +274,21 @@ use strict;
         my ( $self,   $input ) = @_;
         my ( $parent, $name )  = @$self;
         my $js = $parent->{'_context'};
+        
+        my $input_reftype = ref $input;
 
         my $data_name = "data_$name";
-        $parent->_inject_escaped( $data_name, $input );
+        $js->set( $data_name, $input_reftype eq 'REF' || $input_reftype eq 'SCALAR' ? $$input : $input );
 
         $js->eval("var result = $name($data_name)");
-        $js->set( $data_name, undef );
 
         my $result = $js->get('result');
+        
+        if ( $input_reftype eq 'REF' ) {
+            $$input = $js->get($data_name);
+        }
+
+        $js->set( $data_name, undef );
 
         if ($result) {
             return;

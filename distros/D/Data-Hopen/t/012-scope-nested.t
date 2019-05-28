@@ -34,10 +34,10 @@ use constant CRAZY_NAME => "==|>  something wacky  \x{00a2} <|==";
     # U+00A2: not in the POSIX Portable Character Set (references at
     #   https://stackoverflow.com/a/2821183/2877364)
 
-$innermost->add(CRAZY_NAME, 42);
+$innermost->put(CRAZY_NAME, 42);
 cmp_ok($innermost->find(CRAZY_NAME), '==', 42, 'Retrieving from hash works');
 
-$middle->add(bar => 1337);
+$middle->put(bar => 1337);
 cmp_ok($middle->find('bar'), '==', 1337, 'Retrieving from hash works');
 cmp_ok($innermost->find('bar'), '==', 1337, 'Retrieving from hash through outer works');
 ok(!defined($middle->find(CRAZY_NAME)), "Inner doesn't leak into outer");

@@ -1,5 +1,11 @@
 Revision history for Open-This
 
+0.000016  2019-05-27 17:20:10Z
+    - Add column number parsing for ripgrep output and add support for opening
+      files at arbitrary columns in vim (GH#12) (Olaf Alders)
+    - Add support for opening files at arbitrary columns in nano (GH#14) (Olaf Alders)
+    - ot can now open binaries which are in the user's path (GH#13) (Olaf Alders)
+
 0.000015  2019-01-28 21:43:33Z
     - Don't exec if $EDITOR is empty, die with message (GH#9) (Boris Dppen)
     - Render the command name in description as a link (GH#7) (Boris Dppen)

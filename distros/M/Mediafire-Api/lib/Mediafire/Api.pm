@@ -15,7 +15,7 @@ use JSON::XS;
 use Mediafire::Api::UploadFile;
 use Mediafire::Api::DownloadFile;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ############################ PRIVATE METHODS ############################################
 

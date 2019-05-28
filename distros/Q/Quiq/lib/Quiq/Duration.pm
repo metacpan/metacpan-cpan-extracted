@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Math;
@@ -101,7 +101,7 @@ sub new {
     #
     #if ($sec !~ /^[0-9.:dhms]+$/) {
     #    $class->throw(
-    #        q~DURATION-00002: Illegal duration~,
+    #        'DURATION-00002: Illegal duration',
     #        Duration => $sec,
     #    );
     #}
@@ -212,10 +212,10 @@ sub asShortString {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -maxUnit=>\$maxUnit,
-            -minUnit=>\$minUnit,
-            -notBlank=>\$notBlank,
-            -precision=>\$precision,
+            -maxUnit => \$maxUnit,
+            -minUnit => \$minUnit,
+            -notBlank => \$notBlank,
+            -precision => \$precision,
         );
     }
 
@@ -384,9 +384,9 @@ sub stringToSeconds {
         }
         else {
             $class->throw(
-                q~DURATION-00001: Unbekannter Anteil einer Dauer~,
-                Unit=>$unit,
-                Value=>$x,
+                'DURATION-00001: Unbekannter Anteil einer Dauer',
+                Unit => $unit,
+                Value => $x,
             );
         }
     }
@@ -514,7 +514,7 @@ sub secondsToString {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

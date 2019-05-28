@@ -1,0 +1,20 @@
+Revision history for App-hopen
+
+0.000010    2019-05-26
+    First non-trial release.
+    Major internal changes.  Finished removing Data-Hopen leftovers.
+
+0.000009    2019-02-24 (TRIAL RELEASE)
+    Split former Build-Hopen into App-hopen and Data-Hopen
+
+0.000008    2019-02-09 (TRIAL RELEASE)
+    Tweak File::Glob usage to support Perl 5.14
+
+0.000007    2019-02-08 (TRIAL RELEASE)
+    First version that can generate a Makefile
+
+0.000006    2019-02-06 (TRIAL RELEASE)
+    Substantially expanded
+
+0.000003    2018-01-02 (TRIAL RELEASE)
+    First full trial release

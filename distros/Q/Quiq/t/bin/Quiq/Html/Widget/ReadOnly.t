@@ -30,17 +30,17 @@ sub test_html : Test(3) {
     # ohne CSS
 
     $html = Quiq::Html::Widget::ReadOnly->html($h,
-        name=>'x',
-        value=>4711,
+        name => 'x',
+        value => 4711,
     );
     $self->is($html,qq|<input type="hidden" name="x" value="4711" />4711\n|);
 
     # mit CSS
 
     $html = Quiq::Html::Widget::ReadOnly->html($h,
-        id=>'x1',
-        name=>'x',
-        value=>4711,
+        id => 'x1',
+        name => 'x',
+        value => 4711,
     );
     $self->is($html,q|<span id="x1"><input type="hidden" name="x"|.
         qq| value="4711" />4711</span>\n|);

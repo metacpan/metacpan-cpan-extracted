@@ -1,5 +1,14 @@
 Revision history for Perl extension Config::HAProxy.
 
+1.05  Mon May 27 13:59:57 2019
+	- unlink temporary file on error
+
+1.04  Sun May 26 12:23:54 2019
+	- fix improper use of IPC::Cmd
+
+1.03  Sun May 26 09:12:10 2019
+	- implement configuration syntax check
+
 1.02  Mon Jul 16 07:38:31 2018
 	- remove the leftover use of autodie
 

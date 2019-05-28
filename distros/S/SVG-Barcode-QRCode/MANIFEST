@@ -6,7 +6,7 @@ MANIFEST			This list of files
 t/00-basic.t
 t/01-object.t
 t/02-function.t
-t/resources/Grapejuice_7x7_red.svg
-t/resources/Tekki_5x5_black.svg
+t/resources/Grapejuice_200x200_H_red.svg
+t/resources/Tekki_200x200_black.svg
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

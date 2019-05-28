@@ -77,9 +77,12 @@ is based on a JSON data type, but additionally imposes its own restrictions.
 
 Basic data type: string
 
-This parameter is a free-form string that represent the password of an authenticated account (see [*Privilege levels*](API.md#privilege-levels))
+A string of alphanumerics, hyphens (`-`) and underscores (`_`), of at least 1
+and at most 512 characters.
+I.e. a string matching `/^[a-zA-Z0-9-_]{1,512}$/`.
 
-> Note: Currently there are no restrictions on what characters that are allowed.
+Represents the password of an authenticated account (see *[Privilege levels]*)
+
 
 ### Batch id
 
@@ -94,18 +97,25 @@ The unique id of a *batch*.
 
 Basic data type: string
 
-This parameter is a free-form string that represent the name of the client. It used to monitor which client (GUI) uses the API.
+A string of alphanumerics, hyphens, underscores, pluses (`+`), tildes (`~`),
+full stops (`.`), colons (`:`) and spaces (` `), of at least 1 and at most 512
+characters.
+I.e. a string matching `/^[a-zA-Z0-9-+~_.: ]{1,50}$/`.
 
-> Note: Currently there are no restrictions on what characters that are allowed.
+Represents the name of the client.
+Used for monitoring which client (GUI) uses the API.
 
 
 ### Client version
 
 Basic data type: string
 
-This parameter is a free-form string that represent the version of the client. It used to monitor which client (GUI) uses the API.
+A string of alphanumerics, hyphens, pluses, tildes, underscores, full stops,
+colons and spaces, of at least 1 and at most 512 characters.
+I.e. a string matching `/^[a-zA-Z0-9-+~_.: ]{1,50}$/`.
 
-> Note: Currently there are no restrictions on what characters that are allowed.
+Represents the version of the client.
+Used for monitoring which client (GUI) uses the API.
 
 
 ### Domain name
@@ -130,9 +140,9 @@ DS for [Delegation Signer](https://tools.ietf.org/html/rfc4034) references DNSKE
 
 Properties:
 * `"digest"`: A string, required. Either 40 or 64 hexadecimal characters (case insensitive).
-* `"algorithm"`: An non negative integer, optional.
-* `"digtype"`: An non negative integer, optional.
-* `"keytag"`: An non negative integer, optional.
+* `"algorithm"`: An non negative integer, required.
+* `"digtype"`: An non negative integer, required.
+* `"keytag"`: An non negative integer, required.
 
 Extra properties in *DS info* objects are ignored when present in RPC method arguments, and never returned as part of RPC method results.
 
@@ -141,27 +151,10 @@ Extra properties in *DS info* objects are ignored when present in RPC method arg
 
 Basic data type: string
 
-This parameter is a string that are an IPv4 or IPv6. It's validate with the following regexes:
+This parameter is a string that are an IPv4 or IPv6. It's validated with the following regexes:
  - IPv4 : `/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/`
  - IPv6 : `/^([0-9A-Fa-f]{1,4}:[0-9A-Fa-f:]{1,}(:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})?)|([0-9A-Fa-f]{1,4}::[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})$/`
 
-
-### Location - **Deprecated** 
-
-Basic data type: object
-
-The object has five keys, `"isp"`, `"country"`, `"city"`, `"longitude"`  and `"latitude"`.
-
-
-* `"isp"`: a string. The Internet Service Provider of the user.
-* `"country"`: a string. The country of the user.
-* `"city"`: a string. The city of the user.
-* `"longitude"`: a string. The longtitude of the user. Validate with `^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$`.
-* `"latitude"`: a string. The latitude of the user. Validate with `^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$`.
-
->
-> TODO Add regex
->
 
 ### Name server
 
@@ -170,13 +163,13 @@ Basic data type: object
 Properties:
 
 * `"ns"`: A *domain name*, required.
-* `"ip"`: An *IP address*, IPv4 or IPv6 , optional.
+* `"ip"`: An *IP address* (IPv4 or IPv6), optional. (default: unset)
 
 
 ### Priority
 
 Basic data type: number (integer)
- 
+
 This parameter is any integer that will be used by The Zonemaster Test Agents to sort the test requests from highest to lowest priority.
 This parameter will typically be used in a setup where a GUI will send requests to the RPC API and would like to get response as soon as possible while at the same time using the idle time for background batch testing.
 The drawback of this setup will be that the GUI will have to wait for at least one background processing slot to become free (would be a few secods in a typical installation with up to 30 parallel zonemaster processes allowed)
@@ -185,17 +178,13 @@ The drawback of this setup will be that the GUI will have to wait for at least o
 
 Basic data type: string
 
+This parameter is a case-insensitive string validated with the case-insensitive
+regex `/^[a-z0-9]$|^[a-z0-9][a-z0-9_-]{0,30}[a-z0-9]$/i`.
+
 The name of a [*profile*](Architecture.md#profile).
 
-One of the strings:
+When a method received an unknown *profile name* value for in parameter with this type, it returns the following error message:
 
-* `"default_profile"`
-* `"test_profile_1"`
-* `"test_profile_2"`
-
-The `"test_profile_2"` *profile* is identical to `"default_profile"`.
-
-When a *profile* other than the ones listed above is requested the user receives the following error message :
 ```json
 {
     "jsonrpc": "2.0",
@@ -206,6 +195,7 @@ When a *profile* other than the ones listed above is requested the user receives
     }
 }
 ```
+
 
 ### Progress percentage
 
@@ -240,6 +230,12 @@ One of the strings (in order from least to most severe):
 
 Basic data type: string
 
+Either:
+ * A string of at least 1 and at most 9 digits where the first digit is not a zero, or
+ * a string of exactly 16 lower-case hex-digits.
+
+I.e. a string matching `/^([0-9]|[1-9][0-9]{1,8}|[0-9a-f]{16})$/`.
+
 Each *test* has a unique *test id*.
 
 
@@ -263,12 +259,17 @@ This key is added when the module name is `"NAMESERVER"`.
 
 Basic data type: string
 
-Default database timestamp format: "Y-M-D H:M:S.ms"
+Default database timestamp format: "Y-M-D H:M:S.ms".
 Example: "2017-12-18 07:56:17.156939"
+
 
 ### Translation language
 
 Basic data type: string
+
+A string of alphanumeric, hyphens, underscores, full stops and at-signs (`@`),
+of at least 1 and at most 30 characters.
+I.e. a string matching `/^[a-zA-Z0-9-_.@]{1,30}$/`.
 
 * Any string starting with `"fr"` is interpreted as French.
 * Any string starting with `"sv"` is interpreted as Swedish.
@@ -286,10 +287,12 @@ Basic data type: string
 ### Username
 
 Basic data type: string
- 
-This parameter is a free-form string that represent the name of an authenticated account (see [*Privilege levels*](API.md#privilege-levels))
 
-> Note: Currently there are no restrictions on what characters that are allowed.
+A string of alphanumerics, dashes, full stops and at-signs, of at least 1 and at
+most 50 characters.
+I.e. a string matching `/^[a-zA-Z0-9]{1,50}$/`.
+
+Represents the name of an authenticated account (see *[Privilege levels]*)
 
 
 ## API method: `version_info`
@@ -333,12 +336,38 @@ An object with the following properties:
 >
 
 
-## API method: `get_host_by_name` (formerly `get_ns_ips`)
+## API method: `profile_names`
 
->
-> We renamed `get_ns_ips` into `get_host_by_name` to be more explicit. 
-> The method `get_ns_ips` is deprecated, please use `get_host_by_name` instead.
->
+Returns the names of the public subset of the [available profiles].
+
+Example request:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "profile_names"
+}
+```
+
+Example response:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": [
+    "default",
+    "another-profile"
+  ]
+}
+```
+
+
+#### `"result"`
+
+An array of *Profile names* in lower case. `"default"` is always included.
+
+
+## API method: `get_host_by_name`
 
 Looks up the A and AAAA records for a hostname (*domain name*) on the public Internet.
 
@@ -353,17 +382,6 @@ Example request:
   "params": {"hostname": "zonemaster.net"}
 }
 ```
-
-*Deprecated syntax:*
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "method": "get_ns_ips",
-  "params": "zonemaster.net"
-}
-``` 
-
 
 Example response:
 ```json
@@ -386,7 +404,7 @@ Example response:
 
 An object with the property:
 
-`"hostname"`: A *domain name*. The hostname whose IP addresses are to be resolved.
+`"hostname"`: A *domain name*, required. The hostname whose IP addresses are to be resolved.
 
 
 #### `"result"`
@@ -420,17 +438,6 @@ Example request:
   "id": 3,
   "method": "get_data_from_parent_zone",
   "params": {"domain": "zonemaster.net"}
-}
-```
-
-*Deprecated syntax:*
-```json
-
-{
-  "jsonrpc": "2.0",
-  "id": 3,
-  "method": "get_data_from_parent_zone",
-  "params": "zonemaster.net"
 }
 ```
 
@@ -480,7 +487,7 @@ Example response:
 
 An object with the property:
 
-`"domain"`: A *domain name*. The domain whose DNS records are requested.
+`"domain"`: A *domain name*, required. The domain whose DNS records are requested.
 
 
 #### `"result"`
@@ -517,7 +524,7 @@ Example request:
   "params": {
     "client_id": "Zonemaster Dancer Frontend",
     "domain": "zonemaster.net",
-    "profile": "default_profile",
+    "profile": "default",
     "client_version": "1.0.1",
     "nameservers": [
       {
@@ -551,20 +558,20 @@ Example response:
 An object with the following properties:
 
 * `"domain"`: A *domain name*, required. The zone to test.
-* `"ipv6"`: A boolean, optional. (default `false`). Used to configure the test and enable IPv4 tests.
-* `"ipv4"`: A boolean, optional. (default `false`). Used to configure the test and enable IPv6 tests.
-* `"nameservers"`: A list of *name server* objects, optional. Used to perform un-delegated test.
-* `"ds_info"`: A list of *DS info* objects, optional. Used to perform un-delegated test.
-* `"advanced"`: **Deprecated**. A boolean, optional.
-* `"profile"`: A *profile name*, optional. Used to perform the test with a specific set of parameters and tests.
-* `"client_id"`: A *client id*, optional. Used to monitor which client uses the API.
-* `"client_version"`: A *client version*, optional. Used to monitor which client use the API
-* `"config"`: A string, optional. The name of a config profile.
-* `"user_ip"`: **Deprecated**. An *IP address*, optional. Used to monitor information about the user. (We only keep the location of the IP).
-* `"user_location_info"`: **Deprecated**. An *location* object, optional. Used to monitor information about the user. 
-* `"priority"`: A *priority*, optional.
-* `"queue"`: A *queue*, optional.
+* `"ipv6"`: A boolean, optional. (default `true`). Used to configure the test and enable IPv4 tests.
+* `"ipv4"`: A boolean, optional. (default `true`). Used to configure the test and enable IPv6 tests.
+* `"nameservers"`: A list of *name server* objects, optional. (default: `[]`). Used to perform un-delegated test.
+* `"ds_info"`: A list of *DS info* objects, optional. (default: `[]`). Used to perform un-delegated test.
+* `"profile"`: A *profile name*, optional. (default `"default"`). Run the tests using the given profile.
+* `"config"`: **Deprecated**. A string, optional. Ignored. Specify `"profile"` instead.
+* `"client_id"`: A *client id*, optional. (default: unset). Used to monitor which client uses the API.
+* `"client_version"`: A *client version*, optional. (default: unset). Used to monitor which client use the API
+* `"priority"`: A *priority*, optional. (default: `10`)
+* `"queue"`: A *queue*, optional. (default: `0`)
 
+>
+> TODO: Clarify the purpose of each `"params"` property.
+>
 
 #### `"result"`
 
@@ -574,6 +581,9 @@ If the test has been run with the same domain name within an interval of 10 mins
 then the new request does not trigger a new test, but returns with the results of the last test
  
 #### `"error"`
+
+* If the given `profile` is not among the [available profiles], a user
+  error is returned.
 
 >
 > TODO: List all possible error codes and describe what they mean enough for clients to know how react to them.
@@ -596,16 +606,6 @@ Example request:
 }
 ```
 
-*Deprecated syntax:*
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 5,
-  "method": "test_progress",
-  "params": "c45a3f8256c4a155"
-}
-```
-
 Example response:
 ```json
 {
@@ -620,7 +620,7 @@ Example response:
 
 An object with the property:
 
-`"test_id"`: A *test id*. The *test* to report on.
+`"test_id"`: A *test id*, required. The *test* to report on.
 
 
 #### `"result"`
@@ -665,7 +665,7 @@ Example response:
       "ds_info": [],
       "client_version": "1.0.1",
       "domain": "zonemaster.net",
-      "profile": "default_profile",
+      "profile": "default",
       "ipv6": true,
       "advanced": true,
       "nameservers": [
@@ -763,17 +763,7 @@ Example request:
     "limit": 200,
     "filter": "all",
     "frontend_params": {
-      "domain": "zonemaster.net",      
-      "nameservers": [
-        {
-          "ns": "ns3.nic.se",
-          "ip": "2001:67c:124c:2007::45"
-        },
-        {
-          "ns": "ns2.nic.fr",
-          "ip": "192.93.0.4"
-        }
-      ]
+      "domain": "zonemaster.net"
     }
   }
 }
@@ -815,24 +805,13 @@ An object with the following properties:
 
 * `"offset"`: An *unsigned integer*, optional. (default: 0). Position of the first returned element from the database returned list.  
 * `"limit"`: An *unsigned integer*, optional. (default: 200). Number of element returned from the *offset* element.
-* `"filter"`: A string ["old_behavior" - *Deprecated*, "all", "delegated" and "undelegated"], optional. (default: `old_behavior`)
-* `"frontend_params"`: An object.
+* `"filter"`: A string, one of `"all"`, `"delegated"` and `"undelegated"`, optional. (default: `"all"`)
+* `"frontend_params"`: An object, required.
 
 The value of "frontend_params" is an object with the following properties:
 
 * `"domain"`: A *domain name*, required.
-* `"ipv6"`: **Deprecated**. A boolean, optional. (default: `false`)
-* `"ipv4"`: **Deprecated**. A boolean, optional. (default: `false`)
-* `"nameservers"`: **Deprecated**. A boolean in order to return either "regular" (false) or "undelegated" (true), optional.
-* `"ds_info"`: **Deprecated**. A list of *DS info* objects, optional.
-* `"advanced"`: **Deprecated**. A boolean, optional.
-* `"profile"`: **Deprecated**. A *profile name*, optional.
-* `"client_id"`: **Deprecated**. A *client id*, optional.
-* `"client_version"`: **Deprecated**. A *client version*, optional.
-* `"config"`: **Deprecated**. A string, optional. The name of a *config profile*.
 
-Please, use a non-deprecated value for `"filter"` property: "all", "delegated" and "undelegated".
-The default filter value, "old_behavior", will be removed and replaced by the value "all".
 
 #### `"result"`
 
@@ -840,9 +819,6 @@ An object with the following properties:
 
 * `"id"` A *test id*.
 * `"creation_time"`: A *timestamp*. Time when the Test was enqueued.
-* `"advanced_options"`: **Deprecated**. A string or `null`.
-  `"1"` if the `"advanced"` flag was set in the method call to `start_domain_test` that created this Test.
-  In some future release this property will no longer be included in the result.
 * `"overall_result"`: A string. The most severe problem level logged in the test results.
 It could be:
     * `"ok"`, all is normal
@@ -973,30 +949,23 @@ Example response:
 
 An object with the following properties:
 
-* `"username"`: An *username*. The name of the account of an authorized user.
-* `"api_key"`: An *api key*. The api_key associated with the username.
-* `"domains"`: A list of *domain names*. The domains to be tested.
-* `"test_params"`: As described below.
+* `"username"`: An *username*, required. The name of the account of an authorized user.
+* `"api_key"`: An *api key*, required. The api_key associated with the username.
+* `"domains"`: A list of *domain names*, required. The domains to be tested.
+* `"test_params"`: As described below, optional. (default: `{}`)
 
 The value of `"test_params"` is an object with the following properties:
 
-* `"client_id"`: A *client id*, optional.
-* `"profile"`: A *profile name*, optional.
-* `"client_version"`: A *client version*, optional.
-* `"nameservers"`: A list of *name server* objects, optional.
-* `"ds_info"`: A list of *DS info* objects, optional.
-* `"advanced"`: **Deprecated**. A boolean, optional.
-* `"ipv6"`: A boolean, optional. (default: `false`)
-* `"ipv4"`: A boolean, optional. (default: `false`)
-* `"config"`: A string, optional. The name of a *config profile*.
-* `"user_ip"`: **Deprecated**. An *IP address*, optional.
-* `"user_location_info"`: **Deprecated**. An *location* object, optional.
-* `"priority"`: A *priority*, optional
-* `"queue"`: A *queue*, optional
-
->
-> TODO: Are domain names actually validated in practice? Can you explain ? => There are some security tests (look postgres.pm).
->
+* `"client_id"`: A *client id*, optional. (default: unset)
+* `"profile"`: A *profile name*, optional (default `"default"`). Run the tests using the given profile.
+* `"config"`: **Deprecated.** A string, optional. Ignored. Specify profile instead.
+* `"client_version"`: A *client version*, optional. (default: unset)
+* `"nameservers"`: A list of *name server* objects, optional. (default: `[]`)
+* `"ds_info"`: A list of *DS info* objects, optional. (default: `[]`)
+* `"ipv4"`: A boolean, optional. (default: `true`)
+* `"ipv6"`: A boolean, optional. (default: `true`)
+* `"priority"`: A *priority*, optional. (default: `5`)
+* `"queue"`: A *queue*, optional. (default: `0`)
 
 
 #### `"result"`
@@ -1008,6 +977,9 @@ A *batch id*.
 
 * You can't create a new batch job.
   A *batch* with unfinished *tests* already exists for this *api user*.
+* If the given `profile` is not among the [available profiles], a user
+  error is returned.
+
 
 >
 > TODO: List all possible error codes and describe what they mean enough for clients to know how react to them.
@@ -1027,15 +999,6 @@ Example request:
     "id": 147559211994909,
     "method": "get_batch_job_result",
     "params": {"batch_id": "8"}
-}
-```
-*Deprecated syntax:*
-```json
-{
-    "jsonrpc": "2.0",
-    "id": 147559211994909,
-    "method": "get_batch_job_result",
-    "params": "8"
 }
 ```
 
@@ -1063,7 +1026,7 @@ Example response:
 
 An object with the property:
 
-* `"batch_id"`: A *batch id*.
+* `"batch_id"`: A *batch id*, required.
 
 
 #### `"result"`
@@ -1081,91 +1044,6 @@ An object with the following properties:
 > TODO: List all possible error codes and describe what they mean enough for clients to know how react to them.
 >
 
-
-## API method: `validate_syntax` - **Deprecated**
-
-*This API method is Deprecated. Use directly `start_domain_test`*
-
-Checks the `"params"` structure for syntax coherence. It is very strict on what
-is allowed and what is not to avoid any SQL injection and cross site scripting
-attempts. It also checks the domain name for syntax to ensure the domain name
-seems to be a valid domain name and a test by the *Zonemaster Engine* can be started.
-
-Example request:
-```json
-{
-    "jsonrpc": "2.0",
-    "id": 143014426992009,
-    "method": "validate_syntax",
-    "params": {
-        "domain": "zonemaster.net",
-        "ipv6": 1,
-        "ipv4": 1,
-        "nameservers": [
-            {
-                "ns": "ns1.nic.fr",
-                "ip": "1.2.3.4"
-            },
-            {
-                "ns": "ns2.nic.fr",
-                "ip": "192.134.4.1"
-            }
-        ]
-    }
-}
-```
-
-Example response:
-```json
-{
-    "jsonrpc": "2.0",
-    "id": 143014426992009,
-    "result": {
-        "status": "ok",
-        "message": "Syntax ok"
-    }
-}
-```
-
-
-#### `"params"`
-
-An object with the following properties:
-
-* `"domain"`: A *domain name*, required.
-* `"ipv6"`: A boolean, optional. (default `false`)
-* `"ipv4"`: A boolean, optional. (default `false`)
-* `"ds_info"`: A list of *DS info* objects, optional.
-* `"nameservers"`: A list of *name server* objects, optional.
-* `"profile"`: A *profile name*, optional.
-* `"advanced"`: **Deprecated**. A boolean, optional.
-* `"client_id"`: A *client id*, optional.
-* `"client_version"`: A *client version*, optional.
-* `"config"`: A string, optional. The name of a *config profile*.
-* `"user_ip"`: **Deprecated**. An *IP address*, optional.
-* `"user_location_info"`: **Deprecated**. A *location* object, optional.
-
-If the `"nameservers"` key is _not_ set, a recursive query made by the
-server to its locally configured resolver for NS records for the
-value of the `"domain"` key must return a reply with at least one
-resource record in the Answer Section.
-
-At least one of `"ipv4"` and `"ipv6"` must be present and either `1` or `true`.
-
-#### `"result"`
-
-An object with the following properties:
-
-* `"status"`: either `"ok"` or `"nok"`.
-* `"message"`: a string. Human-readable details about the status.
-
-#### `"error"`
-
->
-> TODO: List all possible error codes and describe what they mean enough for clients to know how react to them.
->
-
-
 ## API method: `get_test_params`
 
 Return all *params* objects of a *test*.
@@ -1182,16 +1060,6 @@ Example request:
 }
 ```
 
-*Deprecated syntax:*
-```json
-{
-    "jsonrpc": "2.0",
-    "id": 143014426992009,
-    "method": "get_test_params",
-    "params": "6814584dc820354a"
-}
-```
-
 Example response:
 ```json
 {
@@ -1199,7 +1067,7 @@ Example response:
     "id": 143014426992009,
     "result": {
          "domain": "zonemaster.net",
-         "profile": "default_profile",
+         "profile": "default",
          "client_id": "Zonemaster Dancer Frontend",
          "advanced": true,
          "nameservers": [
@@ -1237,3 +1105,6 @@ The `"params"` object sent to `start_domain_test` or `add_batch_job` when the *t
 >
 > TODO: List all possible error codes and describe what they mean enough for clients to know how react to them.
 >
+
+[Available profiles]: Configuration.md#profiles-section
+[Privilege levels]: #privilege-levels

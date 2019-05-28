@@ -1,10 +1,11 @@
 package Exception::Class::DBI;
 
-use 5.00500;
+use 5.006;
 use strict;
+use warnings;
 use Exception::Class;
-use vars qw($VERSION);
-$VERSION = '1.01';
+
+our $VERSION = '1.04';
 
 use Exception::Class (
     'Exception::Class::DBI' => {
@@ -605,17 +606,19 @@ STH exceptions.
 =head1 Support
 
 This module is stored in an open L<GitHub
-repository|http://github.com/theory/exception-class-dbi/>. Feel free to fork
+repository|http://github.com/plicease/Exception-Class-DBI/>. Feel free to fork
 and contribute!
 
 Please file bug reports via L<GitHub
-Issues|http://github.com/theory/exception-class-dbi/issues/> or by sending
+Issues|http://github.com/plicease/Exception-Class-DBI/issues/> or by sending
 mail to
-L<bug-Exception-Class-DBI.cpan.org|mailto:bug-Exception-Class-DBI.cpan.org>.
+L<bug-Exception-Class-DBI@rt.cpan.org|mailto:bug-Exception-Class-DBI@rt.cpan.org>.
 
 =head1 Author
 
-David E. Wheeler <david@justatheory.com>
+Original Author is David E. Wheeler <david@justatheory.com>
+
+Current maintainer is Graham Ollis <plicease@cpan.org>
 
 =head1 See Also
 
@@ -628,7 +631,7 @@ it. There's lots more information in these exception objects, so use them!
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2011, David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2002-2019, David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

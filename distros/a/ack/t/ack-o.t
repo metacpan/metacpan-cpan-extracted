@@ -3,9 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 11;
-use File::Spec ();
-use File::Temp ();
+use Test::More tests => 4;
 
 use lib 't';
 use Util;
@@ -48,6 +46,24 @@ HERE
 }
 
 
+# Give an output function and find match in multiple files (so print filenames, just like grep -o).
+WITH_OUTPUT: {
+    my @files = qw( t/text/ );
+    my @args = qw/ --output=x$1x free(\\S+) --sort-files /;
+
+    my @target_file = map { reslash($_) } qw(
+        t/text/bill-of-rights.txt
+        t/text/gettysburg.txt
+    );
+    my @expected = (
+        "$target_file[0]:4:xdomx",
+        "$target_file[1]:23:xdomx",
+    );
+
+    ack_sets_match( [ @args, @files ], \@expected, 'Find all the things with --output function' );
+}
+
+
 # Find a match in multiple files, and output it in double quotes.
 OUTPUT_DOUBLE_QUOTES: {
     my @files = qw( t/text/ );
@@ -67,57 +83,6 @@ OUTPUT_DOUBLE_QUOTES: {
     );
 
     ack_sets_match( [ @args, @files ], \@expected, 'Find all the things with --output function' );
-}
-
-my $wd      = getcwd_clean();
-my $tempdir = File::Temp->newdir;
-safe_mkdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
-
-PROJECT_ACKRC_OUTPUT_FORBIDDEN: {
-    my @files = untaint( File::Spec->rel2abs('t/text/') );
-    my @args = qw/ --env question(\\S+) /;
-
-    safe_chdir( $tempdir->dirname );
-    write_file '.ackrc', "--output=foo\n";
-
-    my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
-
-    is_empty_array( $stdout );
-    first_line_like( $stderr, qr/\QOptions --output, --pager and --match are forbidden in project .ackrc files/ );
-
-    safe_chdir( $wd );
-}
-
-HOME_ACKRC_OUTPUT_PERMITTED: {
-    my @files = untaint( File::Spec->rel2abs('t/text/') );
-    my @args = qw/ --env question(\\S+) --sort-files /;
-
-    write_file(File::Spec->catfile($tempdir->dirname, '.ackrc'), "--output=foo\n");
-    safe_chdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
-    local $ENV{'HOME'} = $tempdir->dirname;
-
-    my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
-
-    is_nonempty_array( $stdout );
-    is_empty_array( $stderr );
-
-    safe_chdir( $wd );
-}
-
-ACKRC_ACKRC_OUTPUT_PERMITTED: {
-    my @files = untaint( File::Spec->rel2abs('t/text/') );
-    my @args = qw/ --env question(\\S+) --sort-files /;
-
-    write_file(File::Spec->catfile($tempdir->dirname, '.ackrc'), "--output=foo\n");
-    safe_chdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
-    local $ENV{'ACKRC'} = File::Spec->catfile($tempdir->dirname, '.ackrc');
-
-    my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
-
-    is_nonempty_array( $stdout );
-    is_empty_array( $stderr );
-
-    safe_chdir( $wd );
 }
 
 done_testing();

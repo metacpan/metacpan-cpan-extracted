@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'Barcode::Code128' => '2.21',
-  'SVG::Barcode' => '0.02',
+  'SVG::Barcode' => '0.10',
   'perl' => 'v5.24.0'
 }
 ,

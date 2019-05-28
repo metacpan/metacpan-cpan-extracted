@@ -1,5 +1,18 @@
 Revision history for Perl extension Exception::Class::DBI.
 
+1.04 2019-05-27 14:41:02 -0400
+  - Production release identical to 1.03_01
+
+1.03_01 2019-05-10 20:53:22 -0600
+  - Require Perl 5.6 (for warnings)
+  - Migrate to ExtUtils::MakeMaker for installer
+  - Fix warnings in tests
+  - New maintainer, GitHub repository and issue tracker
+    (old GitHub URLs should forward to the new ones)
+
+1.02  2011-06-19
+      - Fixed broken rt.cpan.org email address.
+
 1.01  2011-06-20T04:27:43
         - Fixed a warning in `t/sth.t`.
         - Moved repostitory to

@@ -1,5 +1,5 @@
 {
-   "abstract" : "A build generator with first-class edges and explicit dependencies",
+   "abstract" : "A dataflow library with first-class edges",
    "author" : [
       "Christopher White <cxwembedded@gmail.com>"
    ],
@@ -71,12 +71,18 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Carp" : "0",
             "Exporter" : "0",
             "Import::Into" : "0",
+            "List::AutoNumbered" : "0.000006",
+            "Quote::Code" : "1.0102",
             "Scalar::Util" : "0",
-            "Test::Deep" : "0.084",
+            "Sub::Identify" : "0.14",
+            "Test::Deep" : "0.098",
+            "Test::Fatal" : "0.014",
             "Test::More" : "0",
+            "Test::Warn" : "0.35",
             "rlib" : "0"
          }
       }
@@ -84,83 +90,103 @@
    "provides" : {
       "Data::Hopen" : {
          "file" : "lib/Data/Hopen.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Base" : {
          "file" : "lib/Data/Hopen/Base.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::CollectOp" : {
          "file" : "lib/Data/Hopen/G/CollectOp.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::DAG" : {
          "file" : "lib/Data/Hopen/G/DAG.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::Entity" : {
          "file" : "lib/Data/Hopen/G/Entity.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::Goal" : {
          "file" : "lib/Data/Hopen/G/Goal.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::GraphBuilder" : {
          "file" : "lib/Data/Hopen/G/GraphBuilder.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::Link" : {
          "file" : "lib/Data/Hopen/G/Link.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
+      },
+      "Data::Hopen::G::NoOp" : {
+         "file" : "lib/Data/Hopen/G/NoOp.pm",
+         "version" : "0.000013"
       },
       "Data::Hopen::G::Node" : {
          "file" : "lib/Data/Hopen/G/Node.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::G::Op" : {
          "file" : "lib/Data/Hopen/G/Op.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
+      },
+      "Data::Hopen::G::OutputOp" : {
+         "file" : "lib/Data/Hopen/G/OutputOp.pm",
+         "version" : "0.000013"
       },
       "Data::Hopen::G::Runnable" : {
          "file" : "lib/Data/Hopen/G/Runnable.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
+      },
+      "Data::Hopen::OrderedPredecessorGraph" : {
+         "file" : "lib/Data/Hopen/OrderedPredecessorGraph.pm",
+         "version" : "0.000013"
       },
       "Data::Hopen::Scope" : {
          "file" : "lib/Data/Hopen/Scope.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Scope::Environment" : {
          "file" : "lib/Data/Hopen/Scope/Environment.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Scope::Hash" : {
          "file" : "lib/Data/Hopen/Scope/Hash.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Scope::Inputs" : {
          "file" : "lib/Data/Hopen/Scope/Inputs.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Scope::Overrides" : {
          "file" : "lib/Data/Hopen/Scope/Overrides.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::TEMPLATE" : {
          "file" : "lib/Data/Hopen/TEMPLATE.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Util::Data" : {
          "file" : "lib/Data/Hopen/Util/Data.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Data::Hopen::Util::Filename" : {
          "file" : "lib/Data/Hopen/Util/Filename.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
+      },
+      "Data::Hopen::Util::MergeWithoutCloneBlessed" : {
+         "file" : "lib/Data/Hopen/Util/MergeWithoutCloneBlessed.pm",
+         "version" : "0.000013"
       },
       "Data::Hopen::Util::NameSet" : {
          "file" : "lib/Data/Hopen/Util/NameSet.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
+      },
+      "Data::Hopen::Visitor" : {
+         "file" : "lib/Data/Hopen/Visitor.pm",
+         "version" : "0.000013"
       }
    },
    "release_status" : "stable",
@@ -174,6 +200,6 @@
          "web" : "https://github.com/hopenbuild/Data-Hopen"
       }
    },
-   "version" : "0.000012",
+   "version" : "0.000013",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

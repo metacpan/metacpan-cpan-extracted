@@ -1,8 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.006'
+                                        'ExtUtils::MakeMaker' => '0'
                                       },
                         'suggests' => {
                                         'JSON::PP' => '2.27300'
@@ -56,8 +55,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::More' => '0.96',
                                    'base' => '0',
-                                   'bytes' => '0',
-                                   'perl' => '5.006'
+                                   'bytes' => '0'
                                  }
                  }
      };

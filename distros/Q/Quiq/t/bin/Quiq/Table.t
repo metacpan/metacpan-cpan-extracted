@@ -31,15 +31,15 @@ sub test_unitTest : Test(23) {
     my $columnA = $tab->columns;
     $self->isDeeply($columnA,[qw/a b c d/]);
 
-    # columnIndex()
+    # index()
 
-    my $i = $tab->columnIndex('a');
+    my $i = $tab->index('a');
     $self->is($i,0);
 
-    $i = $tab->columnIndex('d');
+    $i = $tab->index('d');
     $self->is($i,3);
 
-    eval {$tab->columnIndex('z')};
+    eval {$tab->index('z')};
     $self->ok($@);
 
     # count()

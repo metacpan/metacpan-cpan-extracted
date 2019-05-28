@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -791,7 +791,8 @@ sub _matched_by_plugin {
 
     my %is_ignored = map { $_ => 1 }
         $self->_zglob( [ @{ $self->ignores || [] }, @{ $plugin->ignores || [] } ] );
-    my @matched = grep { !$is_ignored{$_} } grep { -f && !-l } $self->_zglob( $plugin->selects );
+    my @matched
+        = grep { !$is_ignored{$_} } grep { -f && -s && !-l } $self->_zglob( $plugin->selects );
 
     my $shebang = $plugin->shebang
         or return @matched;
@@ -849,7 +850,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

@@ -12,6 +12,7 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
   Test2::API
+  Test2::Mock
   Test2::V0
 );
 

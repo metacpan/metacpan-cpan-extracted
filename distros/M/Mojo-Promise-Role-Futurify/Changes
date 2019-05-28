@@ -1,2 +1,5 @@
+v1.0.0    2019-05-24 11:30:21 EDT
+  - Avoid behavior broken in Mojolicious 8.15 in tests (#1)
+
 0.001     2017-12-17 16:02:38 EST
   - First release

@@ -29,8 +29,8 @@ sub test_unitTest_root: Test(7) {
     my $baseClass = 'BaseClass';
     Quiq::Perl->createClass($baseClass,'Quiq::ClassConfig');
     $baseClass->def(
-        name=>'B',
-        columns=>[qw/
+        name => 'B',
+        columns => [qw/
             Id
         /],
     );
@@ -38,8 +38,8 @@ sub test_unitTest_root: Test(7) {
     my $subClass1 = 'SubClass1';
     Quiq::Perl->createClass($subClass1,$baseClass);
     $subClass1->def(
-        name=>'S',
-        columns=>[qw/
+        name => 'S',
+        columns => [qw/
             Name
         /],
     );

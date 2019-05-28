@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Parameters;
 
@@ -147,9 +147,9 @@ sub new {
     #                 |   | 2 floatPrefix
     #                 |   | | 3 scale
     #                 |   | | | 4 align
-    #                 |   | | | |     5 Option $noTrailingZeros
-    #                 |   | | | |     |
-    my $self = bless ['d',0,0,0,undef,$noTrailingZeros],$class;
+    #                 |   | | | |   5 Option $noTrailingZeros
+    #                 |   | | | |   |
+    my $self = bless ['d',0,0,0,'r',$noTrailingZeros],$class;
 
     # Analysiere Werte
 
@@ -205,7 +205,7 @@ sub align {
         $self->[4] = shift;
     }
 
-    return $self->type eq 's'? $self->[4] // 'l': 'r';
+    return $self->type eq 's'? ($self->[1] == 0? 'l': $self->[4]): 'r';
 }
 
 # -----------------------------------------------------------------------------
@@ -236,11 +236,12 @@ sub scale {
 
 # -----------------------------------------------------------------------------
 
-=head3 type() - Typ der Kolumne
+=head3 type() - Liefere/Setze Typ der Kolumne
 
 =head4 Synopsis
 
     $type = $prp->type;
+    $type = $prp->type($type);
 
 =head4 Returns
 
@@ -276,6 +277,12 @@ besteht oder wenigsténs einen nichtnumerischen Wert enthält.
 
 sub type {
     my $self = shift;
+    # @_: $type
+
+    if (@_) {
+        $self->[0] = shift;
+    }
+
     return $self->[1] == 0? 's': $self->[0];
 }
 
@@ -379,6 +386,7 @@ sub analyze {
 
                 if ($val !~ /^[+-]?(\d*\.(\d+)$|\d+)$/) {
                     $type = 's';
+                    $align = 'l';
                     $floatPrefix = 0;
                     $scale = 0;
                 }
@@ -471,7 +479,7 @@ sub format {
         }
 
         if ($type eq 's') {
-            $val = sprintf '%*s',-$width,$val;
+            $val = sprintf '%*s',$self->[4] eq 'l'? -$width: $width,$val;
         }
         elsif ($type eq 'd') {
             # %d funktioniert bei großen Zahlen mit z.B. 24 Stellen nicht.
@@ -489,7 +497,7 @@ sub format {
         }
         else {
             $self->throw(
-                q~PROP-00099: Unknown type~,
+                'PROP-00099: Unknown type',
                 Type => $type,
             );
         }
@@ -515,7 +523,7 @@ sub format {
     }
     else {
         $self->throw(
-            q~PROP-00099: Unknown format~,
+            'PROP-00099: Unknown format',
             Format => $format,
         );
     }
@@ -525,9 +533,48 @@ sub format {
 
 # -----------------------------------------------------------------------------
 
+=head3 set() - Setze Eigenschaften explizit
+
+=head4 Synopsis
+
+    $prp->set($type,$align);
+
+=head4 Arguments
+
+=over 4
+
+=item $type
+
+Typ der Wertemenge: s (Text)
+
+=item $align
+
+Ausrichtung der Werte der Wertemenge: l (left), r (right).
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub set {
+    my ($self,$type,$align) = @_;
+
+    if (defined $type) {
+        $self->type($type);
+    }
+    if (defined $align) {
+        $self->align($align);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

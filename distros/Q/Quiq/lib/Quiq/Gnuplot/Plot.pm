@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Gnuplot::Graph;
 use Quiq::Gnuplot::Arrow;
@@ -46,27 +46,27 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        terminal=>undef,
-        output=>undef,
-        timeSeries=>0,
-        formatX=>undef,
-        ytics=>undef,
-        yMin=>undef,
-        yMax=>undef,
-        title=>undef,
-        titleFont=>'giant',
-        xlabel=>undef,
-        ylabel=>undef,
-        width=>undef,
-        height=>undef,
-        graphs=>[],
-        arrows=>[],
-        labels=>[],
-        mxTics=>1,
-        myTics=>1,
-        legendPosition=>'left top',
-        xMin=>undef,
-        xMax=>undef,
+        terminal => undef,
+        output => undef,
+        timeSeries => 0,
+        formatX => undef,
+        ytics => undef,
+        yMin => undef,
+        yMax => undef,
+        title => undef,
+        titleFont => 'giant',
+        xlabel => undef,
+        ylabel => undef,
+        width => undef,
+        height => undef,
+        graphs => [],
+        arrows => [],
+        labels => [],
+        mxTics => 1,
+        myTics => 1,
+        legendPosition => 'left top',
+        xMin => undef,
+        xMax => undef,
     );
     $self->set(@_);
     
@@ -243,7 +243,7 @@ sub graphsWithData {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

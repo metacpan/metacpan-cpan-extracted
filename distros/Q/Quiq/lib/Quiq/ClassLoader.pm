@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -261,12 +261,12 @@ sub AUTOLOAD {
     if ($@) {
         $@ =~ s/ at .*//s;
         $die->($class,$sub,$@,
-            q~CLASSLOADER-00001: Modul kann nicht geladen werden~);
+            'CLASSLOADER-00001: Modul kann nicht geladen werden');
     }
 
     unless ($this->can($sub)) {
         $die->($class,$sub,undef,
-            q~CLASSLOADER-00002: Methode existiert nicht~);
+            'CLASSLOADER-00002: Methode existiert nicht');
     }
 
     return $this->$sub(@_);
@@ -310,7 +310,7 @@ werden kann.
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

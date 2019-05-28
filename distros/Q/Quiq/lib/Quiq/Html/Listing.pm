@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::FileHandle;
 
@@ -28,10 +28,10 @@ L<Quiq::Html::Base>
     my $h = Quiq::Html::Tag->new;
     
     my $obj = Quiq::Html::Listing->new(
-        language=>'Perl',
-        lineNumbers=>1,
-        colNumbers=>79,
-        source=>$file,
+        language => 'Perl',
+        lineNumbers => 1,
+        colNumbers => 79,
+        source => $file,
     );
     
     my $html = $obj->html($h);
@@ -133,14 +133,14 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        anchor=>'doc',
-        colNumbers=>0,
-        cssPrefix=>'listing',
-        escape=>1,
-        language=>undef,
-        lineNumbers=>1,
-        minLineNumberWidth=>1,
-        source=>undef,
+        anchor => 'doc',
+        colNumbers => 0,
+        cssPrefix => 'listing',
+        escape => 1,
+        language => undef,
+        lineNumbers => 1,
+        minLineNumberWidth => 1,
+        source => undef,
     );
     $self->set(@_);
 
@@ -199,8 +199,8 @@ sub html {
             }
             else {
                 $self->throw(
-                    q~LISTING-00002: Unbekannter Anker-Typ~,
-                    Anchor=>$anchor,
+                    'LISTING-00002: Unbekannter Anker-Typ',
+                    Anchor => $anchor,
                 );
             }
         }
@@ -236,7 +236,7 @@ sub html {
             my $commentSub = sub {
                 my ($h,$prefix,$str) = @_;
                 return $h->tag('span',
-                    class=>"$prefix-comment",
+                    class => "$prefix-comment",
                     '-',
                     $str
                 );
@@ -256,7 +256,7 @@ sub html {
                     # Sdoc registrieren zu können. Dann l{} statt U{}.
 
                     $html = $h->tag('a',
-                        name=>"perl_method_$1",
+                        name => "perl_method_$1",
                     );
                 }
 
@@ -278,7 +278,7 @@ sub html {
                             $html .= $podCmd;
                         }
                         $html .= $h->tag('span',
-                            class=>"$cssPrefix-doc",
+                            class => "$cssPrefix-doc",
                             '-',
                             $line
                         );
@@ -302,14 +302,14 @@ sub html {
             elsif ($lang eq 'CoTeDo') {
                 if ($line =~ /^# (\[|\&lt;|eof)/) { # Entity-Zeile
                     $line = $h->tag('span',
-                        class=>"$cssPrefix-entity",
+                        class => "$cssPrefix-entity",
                         '-',
                         $line
                     );
                 }
                 elsif ($line =~ /^\w+:$/) { # keyRegex SectionParser
                     $line = $h->tag('span',
-                        class=>"$cssPrefix-key",
+                        class => "$cssPrefix-key",
                         '-',
                         $line
                     );
@@ -321,8 +321,8 @@ sub html {
             }
             else {
                 $self->throw(
-                    q~LISTING-00001: Unbekannte Sprache~,
-                    Language=>$lang,
+                    'LISTING-00001: Unbekannte Sprache',
+                    Language => $lang,
                 );
             }
         }
@@ -331,15 +331,15 @@ sub html {
         }
 
         $html .= $h->tag('tr',
-            class=>sprintf("$cssPrefix-tr-%s",$i%2? 'odd': 'even'),
+            class => sprintf("$cssPrefix-tr-%s",$i%2? 'odd': 'even'),
             '-',
             $h->tag('td',
-                -ignoreIf=>$noLn,
-                class=>"$cssPrefix-td-ln",
+                -ignoreIf => $noLn,
+                class => "$cssPrefix-td-ln",
                 sprintf('%*d',$lnWidth,$i++)
             ),
             $h->tag('td',
-                class=>"$cssPrefix-td-line",
+                class => "$cssPrefix-td-line",
                 $line
             )
         );
@@ -361,10 +361,10 @@ sub html {
 
         $html = $h->tag('tr','-',
             $h->tag('td',
-                class=>"$cssPrefix-td-edge",
+                class => "$cssPrefix-td-edge",
             ),
             $h->tag('td',
-                class=>"$cssPrefix-td-cn",
+                class => "$cssPrefix-td-cn",
                 $str
             )
         ).
@@ -372,10 +372,10 @@ sub html {
     }
 
     $html = $h->tag('table',
-        id=>$id,
-        class=>"$cssPrefix-table",
-        cellpadding=>0,
-        cellspacing=>0,
+        id => $id,
+        class => "$cssPrefix-table",
+        cellpadding => 0,
+        cellspacing => 0,
         $html
     );
 
@@ -400,7 +400,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 package Calendar::Dates::FRM;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-05-28'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,18 @@ use Role::Tiny::With;
 
 with 'Calendar::DatesRoles::DataPreparer::CalendarVar::FromData';
 with 'Calendar::DatesRoles::DataUser::CalendarVar';
+
+sub filter_entry {
+    my ($self, $entry, $params) = @_;
+
+    if (defined(my $mon = $params->{exam_month})) {
+        $mon eq 'may' || $mon eq 'nov' or die "Invalid exam_month, please specify either may/nov";
+        return 0 unless grep { /\A$mon/ } @{ $entry->{tags} // [] };
+    }
+    # exam_level has no effect currently, each exam date is relevant to both
+    # levels/parts.
+    1;
+}
 
 1;
 # ABSTRACT: FRM exam calendar
@@ -25,7 +37,7 @@ Calendar::Dates::FRM - FRM exam calendar
 
 =head1 VERSION
 
-This document describes version 0.005 of Calendar::Dates::FRM (from Perl distribution Calendar-Dates-FRM), released on 2019-02-15.
+This document describes version 0.006 of Calendar::Dates::FRM (from Perl distribution Calendar-Dates-FRM), released on 2019-05-28.
 
 =head1 SYNOPSIS
 
@@ -215,45 +227,63 @@ This module provides FRM exam calendar using the L<Calendar::Dates> interface.
 
 Entries for year 2018:
 
- +------------+-----+-------+---------------------------+-------------+------+
- | date       | day | month | summary                   | tags        | year |
- +------------+-----+-------+---------------------------+-------------+------+
- | 2018-12-01 | 1   | 12    | Early registration opened | may2019exam | 2018 |
- +------------+-----+-------+---------------------------+-------------+------+
+ +------------+---------------------------+-------------+
+ | date       | summary                   | tags        |
+ +------------+---------------------------+-------------+
+ | 2018-12-01 | Early registration opened | may2019exam |
+ +------------+---------------------------+-------------+
 
 Entries for year 2019:
 
- +------------+-----+-------+------------------------------+-------------+------+
- | date       | day | month | summary                      | tags        | year |
- +------------+-----+-------+------------------------------+-------------+------+
- | 2019-01-03 | 3   | 1     | Exam results sent via email  | nov2018exam | 2019 |
- | 2019-01-31 | 31  | 1     | Early registration closed    | may2019exam | 2019 |
- | 2019-02-01 | 1   | 2     | Standard registration opened | may2019exam | 2019 |
- | 2019-02-28 | 28  | 2     | Standard registration closed | may2019exam | 2019 |
- | 2019-03-01 | 1   | 3     | Late registration opened     | may2019exam | 2019 |
- | 2019-04-15 | 15  | 4     | Late registration closed     | may2019exam | 2019 |
- | 2019-04-15 | 15  | 4     | Defer deadline               | may2019exam | 2019 |
- | 2019-05-01 | 1   | 5     | Admission tickets released   | may2019exam | 2019 |
- | 2019-05-18 | 18  | 5     | Exam day                     | may2019exam | 2019 |
- | 2019-06-28 | 28  | 6     | Exam results sent via email  | may2019exam | 2019 |
- | 2019-05-01 | 1   | 5     | Early registration opened    | nov2019exam | 2019 |
- | 2019-07-31 | 31  | 7     | Early registration closed    | nov2019exam | 2019 |
- | 2019-08-01 | 1   | 8     | Standard registration opened | nov2019exam | 2019 |
- | 2019-08-31 | 31  | 8     | Standard registration closed | nov2019exam | 2019 |
- | 2019-09-01 | 1   | 9     | Late registration opened     | nov2019exam | 2019 |
- | 2019-10-15 | 15  | 10    | Late registration closed     | nov2019exam | 2019 |
- | 2019-10-15 | 15  | 10    | Defer deadline               | nov2019exam | 2019 |
- | 2019-11-01 | 1   | 11    | Admission tickets released   | nov2019exam | 2019 |
- | 2019-11-16 | 16  | 11    | Exam day                     | nov2019exam | 2019 |
- +------------+-----+-------+------------------------------+-------------+------+
+ +------------+------------------------------+-------------+
+ | date       | summary                      | tags        |
+ +------------+------------------------------+-------------+
+ | 2019-01-03 | Exam results sent via email  | nov2018exam |
+ | 2019-01-31 | Early registration closed    | may2019exam |
+ | 2019-02-01 | Standard registration opened | may2019exam |
+ | 2019-02-28 | Standard registration closed | may2019exam |
+ | 2019-03-01 | Late registration opened     | may2019exam |
+ | 2019-04-15 | Late registration closed     | may2019exam |
+ | 2019-04-15 | Defer deadline               | may2019exam |
+ | 2019-05-01 | Admission tickets released   | may2019exam |
+ | 2019-05-18 | Exam day                     | may2019exam |
+ | 2019-06-28 | Exam results sent via email  | may2019exam |
+ | 2019-05-01 | Early registration opened    | nov2019exam |
+ | 2019-07-31 | Early registration closed    | nov2019exam |
+ | 2019-08-01 | Standard registration opened | nov2019exam |
+ | 2019-08-31 | Standard registration closed | nov2019exam |
+ | 2019-09-01 | Late registration opened     | nov2019exam |
+ | 2019-10-15 | Late registration closed     | nov2019exam |
+ | 2019-10-15 | Defer deadline               | nov2019exam |
+ | 2019-11-01 | Admission tickets released   | nov2019exam |
+ | 2019-11-16 | Exam day                     | nov2019exam |
+ +------------+------------------------------+-------------+
 
 Entries for year 2020:
 
- +------------+-----+-------+-----------------------------+-------------+------+
- | date       | day | month | summary                     | tags        | year |
- +------------+-----+-------+-----------------------------+-------------+------+
- | 2020-01-02 | 2   | 1     | Exam results sent via email | nov2019exam | 2020 |
- +------------+-----+-------+-----------------------------+-------------+------+
+ +------------+-----------------------------+-------------+
+ | date       | summary                     | tags        |
+ +------------+-----------------------------+-------------+
+ | 2020-01-02 | Exam results sent via email | nov2019exam |
+ +------------+-----------------------------+-------------+
+
+=for Pod::Coverage ^(filter_entry)$
+
+=head1 PARAMETERS
+
+=head2 exam_month
+
+Can be used to select dates related to a certain exam month only. Value is
+either C<may> or C<nov>. Example:
+
+ $entries = Calendar::Dates::FRM->get_entries({exam_month=>'nov'}, 2019);
+
+=head2 exam_level
+
+Can be used to select dates related to a certain exam level (part) only. Value
+is either 1, 2.
+
+ $entries = Calendar::Dates::FRM->get_entries({exam_level=>2}, 2019);
 
 =head1 HOMEPAGE
 

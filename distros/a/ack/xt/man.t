@@ -1,5 +1,7 @@
 #!perl
 
+## no critic ( Bangs::ProhibitDebuggingModules )
+
 use strict;
 use warnings;
 use lib 't';
@@ -20,7 +22,18 @@ sub strip_special_chars {
     my $man_options;
 
     sub _populate_man_options {
-        my ( $man_output, undef ) = run_ack_with_stderr( '--man' );
+        my ( $man_output, $man_stderr ) = run_ack_with_stderr( '--man' );
+
+        if ( !@{$man_stderr} ) {
+            pass( 'Nothing in stderr' );
+        }
+        elsif ( @{$man_stderr} > 1 ) {
+            fail( 'I have more than two lines in stderr' );
+            diag explain $man_stderr;
+        }
+        else {
+            is( $man_stderr->[0], 'stty: standard input: Inappropriate ioctl for device', 'The one warning is one we can ignore' );
+        }
 
         my $in_options_section;
 
@@ -63,8 +76,6 @@ sub strip_special_chars {
 
                 next unless $indent == $min_indent;
 
-                my @options;
-
                 while ( $line =~ /(-[^\s=,]+)/g ) {
                     my $option = $1;
                     chop $option if $option =~ /\[$/;
@@ -88,27 +99,27 @@ sub strip_special_chars {
 }
 
 sub check_for_option_in_man_output {
-    my ( $expected_option ) = @_;
-
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $expected_option = shift;
 
     my @options = get_man_options();
 
-    my $found;
-
     foreach my $option ( @options ) {
         if ( $option eq $expected_option ) {
-            $found = 1;
-            last;
+            return pass( "Found $expected_option in --man output" );
         }
     }
 
-    return ok( $found, "Option '$expected_option' found in --man output" );
+    require Data::Dumper;
+    diag Data::Dumper::Dumper( 'Returned options' => \@options );
+
+    return fail( "Option '$expected_option' not found in --man output" );
 }
 
-my @options = get_options();
+my @options = get_expected_options();
 
-plan tests => scalar(@options);
+plan tests => scalar(@options) + 1;
 
 prep_environment();
 

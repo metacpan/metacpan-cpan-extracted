@@ -64,7 +64,6 @@
             "Symbol" : "0",
             "Test::Builder" : "0",
             "Text::Wrap" : "0",
-            "base" : "0",
             "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
@@ -80,6 +79,7 @@
             "Test::More" : "0.88",
             "Test::Tester" : "0",
             "strict" : "0",
+            "utf8" : "0",
             "warnings" : "0"
          }
       }
@@ -87,7 +87,7 @@
    "provides" : {
       "Test::Spelling" : {
          "file" : "lib/Test/Spelling.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/genio/test-spelling"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -413,7 +413,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.23",
+                  "tag" : "v0.24",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

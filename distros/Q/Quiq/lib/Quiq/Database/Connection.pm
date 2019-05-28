@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -164,11 +164,11 @@ sub new {
     my $udl = @_? shift: $ENV{'UDL'};
 
     if (!defined $udl || $udl eq '') {
-        $class->throw(q~DB-00002: Kein UDL~);
+        $class->throw('DB-00002: Kein UDL');
     }
     elsif (@_) {
         $class->throw(
-            q~DB-00002: Zu viele Parameter~,
+            'DB-00002: Zu viele Parameter',
             Parameters => join(',',@_),
         );
     }
@@ -260,9 +260,9 @@ sub newFromSbit {
     my ($class,$db) = @_;
 
     return $class->new($db->udlDbms,
-        -handle=>$db->dbh,
-        -log=>0,
-        -logfile=>'/tmp/tsplot.log',
+        -handle => $db->dbh,
+        -log => 0,
+        -logfile => '/tmp/tsplot.log',
     );
 }
 
@@ -385,7 +385,7 @@ Bei eingeschaltetem Strict-Modus wird eine Exception
 =head4 Example
 
     my $db = Quiq::Database::Connection->new('dbi#mysql',
-        -handle=>$main::dbh,
+        -handle => $main::dbh,
     );
     
     ...
@@ -1087,8 +1087,8 @@ sub exportTable {
 
     my $colSep = '|';
     my $cur = $self->select($table,
-        -cursor=>1,
-        -raw=>1,
+        -cursor => 1,
+        -raw => 1,
     );
     my $titleA = $cur->titles;
 
@@ -1855,8 +1855,8 @@ sub save {
     }
     else {
         $self->throw(
-            q~DB-00003: Ungültiger Datensatz-Status~,
-            RowStatus=>$stat,
+            'DB-00003: Ungültiger Datensatz-Status',
+            RowStatus => $stat,
         );
     }
     $cur->{'rowOperation'} = $stat;
@@ -1992,23 +1992,23 @@ sub select {
     my $tableClass = undef;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -cache=>\$cache,
-        -chunkSize=>\$chunkSize,
-        -cursor=>\$cursor,
-        -fetchMode=>\$fetchMode,
-        -raw=>\$raw,
-        -rowClass=>\$rowClass,
-        -tableClass=>\$tableClass,
+        -cache => \$cache,
+        -chunkSize => \$chunkSize,
+        -cursor => \$cursor,
+        -fetchMode => \$fetchMode,
+        -raw => \$raw,
+        -rowClass => \$rowClass,
+        -tableClass => \$tableClass,
     );
 
     my $stmt = $self->stmt->select(@_);
     my $cur = $self->sql($stmt,
-        -cache=>$cache,
-        -chunkSize=>$chunkSize,
-        -fetchMode=>$fetchMode,
-        -raw=>$raw,
-        -rowClass=>$rowClass,
-        -tableClass=>$tableClass,
+        -cache => $cache,
+        -chunkSize => $chunkSize,
+        -fetchMode => $fetchMode,
+        -raw => $raw,
+        -rowClass => $rowClass,
+        -tableClass => $tableClass,
     );
     if ($cursor || $cur->bindVars) {
         return $cur;
@@ -2087,8 +2087,8 @@ sub lookup {
     my $sloppy = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -new=>\$new,
-        -sloppy=>\$sloppy,
+        -new => \$new,
+        -sloppy => \$sloppy,
     );
 
     # Operation ausführen
@@ -2108,8 +2108,8 @@ sub lookup {
 
     if ($row2 && !($sloppy & 2)) {
         $self->throw(
-            q~DB-00003: Mehr als ein Datensatz gefunden~,
-            Sql=>$stmt,
+            'DB-00003: Mehr als ein Datensatz gefunden',
+            Sql => $stmt,
         );
     }
 
@@ -2121,8 +2121,8 @@ sub lookup {
             return;
         }
         $self->throw(
-            q~DB-00001: Datensatz nicht gefunden~,
-            Sql=>$stmt,
+            'DB-00001: Datensatz nicht gefunden',
+            Sql => $stmt,
         );
     }
 
@@ -2232,8 +2232,8 @@ sub nullRow {
         my $rowClass = undef;
 
         Quiq::Option->extract(-mode=>'sloppy',\@_,
-            -raw=>\$raw,
-            -rowClass=>\$rowClass,
+            -raw => \$raw,
+            -rowClass => \$rowClass,
         );
 
         unless ($rowClass) {
@@ -2312,62 +2312,62 @@ C<< -hash=>1 >> angegeben ist.
 Alle Werte einer Kolumne (sortiert):
 
     @arr = $db->values(
-        -select=>'per_nachname',
-        -from=>'person',
-        -orderBy=>1,
+        -select => 'per_nachname',
+        -from => 'person',
+        -orderBy => 1,
     );
 
 Nur verschiedene Werte (sortiert):
 
     @arr = $db->values(
-        -select=>'per_nachname',
-        -distinct=>1,
-        -from=>'person',
-        -orderBy=>1,
+        -select => 'per_nachname',
+        -distinct => 1,
+        -from => 'person',
+        -orderBy => 1,
     );
 
 Abbildung von Id auf Nachname:
 
     %hash = $db->values(
-        -select=>'per_id','per_nachname',
-        -from=>'person',
+        -select => 'per_id','per_nachname',
+        -from => 'person',
     );
 
 Dasselbe, nur dass eine Referenz (Hash-Objekt) geliefert wird:
 
     $hash = $db->values(
-        -select=>'per_id','per_nachname',
-        -from=>'person',
-        -hash=>1,
+        -select => 'per_id','per_nachname',
+        -from => 'person',
+        -hash => 1,
     );
 
 Lookup-Hash für Nachname:
 
     $hash = $db->values(
-        -select=>'per_nachname',1,
-        -from=>'person',
-        -hash=>1,
+        -select => 'per_nachname',1,
+        -from => 'person',
+        -hash => 1,
     );
 
 Array mit Paaren:
 
     @arr = $db->values(
-        -select=>'per_id','per_nachname',
-        -from=>'person',
+        -select => 'per_id','per_nachname',
+        -from => 'person',
     );
 
 Dasselbe, nur dass eine Referenz (Array-Objekt) geliefert wird:
 
     $arr = $db->values(
-        -select=>'per_id','per_nachname',
-        -from=>'person',
+        -select => 'per_id','per_nachname',
+        -from => 'person',
     );
 
 Array mit Abfolge von Tripeln:
 
     @arr = $db->values(
-        -select=>'per_id','per_nachname','per_vorname',
-        -from=>'person',
+        -select => 'per_id','per_nachname','per_vorname',
+        -from => 'person',
     );
 
 =cut
@@ -2383,7 +2383,7 @@ sub values {
     my $hash = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -hash=>\$hash,
+        -hash => \$hash,
     );
 
     # Operation ausführen
@@ -2470,14 +2470,14 @@ sub value {
     my $default = undef;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -default=>\$default,
+        -default => \$default,
     );
 
     # Operation ausführen
 
     my ($val) = $self->lookup(@_,
         defined $default? (-sloppy=>1): (),
-        -raw=>1,
+        -raw => 1,
     );
 
     return defined $val? $val: $default;
@@ -2524,7 +2524,7 @@ sub insert {
     my $sloppy = 0;
 
     Quiq::Option->extract(\@_,
-        -sloppy=>\$sloppy,
+        -sloppy => \$sloppy,
     );
 
     my $stmt = $self->stmt->insert($table,@_);
@@ -2650,9 +2650,9 @@ sub update {
 
         #unless (@_) {
         #    $self->throw(
-        #        q~DB-00002: Keine WHERE-Bedingung für Datensatz-Update~,
-        #        Table=>$table,
-        #        Row=>$row->asString('|'),
+        #        'DB-00002: Keine WHERE-Bedingung für Datensatz-Update',
+        #        Table => $table,
+        #        Row => $row->asString('|'),
         #    );
         #}
 
@@ -2701,9 +2701,9 @@ sub delete {
 
         unless (@_) {
             $self->throw(
-                q~DB-00002: Keine WHERE-Bedingung für Datensatz-Delete~,
-                Table=>$table,
-                Row=>$row->asString('|'),
+                'DB-00002: Keine WHERE-Bedingung für Datensatz-Delete',
+                Table => $table,
+                Row => $row->asString('|'),
             );
         }
     }
@@ -2842,10 +2842,10 @@ sub createTable {
     my $sloppy = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -reCreate=>\$replace, # Rückwärtskompatibilität
-        -recreate=>\$replace, # Rückwärtskompatibilität
-        -replace=>\$replace,
-        -sloppy=>\$sloppy,
+        -reCreate => \$replace, # Rückwärtskompatibilität
+        -recreate => \$replace, # Rückwärtskompatibilität
+        -replace => \$replace,
+        -sloppy => \$sloppy,
     );
 
     # Tabelle droppen
@@ -2945,9 +2945,9 @@ sub tableExists {
 
     local $@;
     my $stmt = $self->stmt->select(
-        -select=>0,
-        -from=>$table,
-        -limit=>0,
+        -select => 0,
+        -from => $table,
+        -limit => 0,
     );
     eval { $self->sql($stmt) };
     return $@? 0: 1;
@@ -3019,1012 +3019,7 @@ sub countRows {
 
 # -----------------------------------------------------------------------------
 
-=head2 Columns
-
-=head3 columnExists() - Prüfe, ob Kolumne existiert
-
-=head4 Synopsis
-
-    $cur = $db->columnExists($table,$column);
-
-=head4 Description
-
-Prüfe, ob Kolumne existiert. Wenn ja, liefere "wahr", sonst "falsch".
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub columnExists {
-    my ($self,$table,$column) = @_;
-
-    # Wir öffnen im Falle von PostgreSQL ein parallele Verbindung,
-    # damit der Statement-Fehler bei einer nicht-exitierenden
-    # Kolumne die aktuelle Transaction nicht stört
-
-    if ($self->isPostgreSQL) {
-        $self = $self->new;
-    }
-
-    local $@;
-    my $stmt = $self->stmt->select(
-        -select=>$column,
-        -from=>$table,
-        -limit=>0,
-    );
-    eval { $self->sql($stmt) };
-    return $@? 0: 1;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 addColumn() - Füge Kolumne zu Tabelle hinzu
-
-=head4 Synopsis
-
-    $cur = $db->addColumn($table,$column,@colDef,@opt);
-
-=head4 Options
-
-=over 4
-
-=item -sloppy => $bool (Default: 0)
-
-Wirf keine Exception, wenn die Kolumne bereits existiert, sondern
-liefere undef.
-
-=back
-
-=head4 Example
-
-    $cur = $db->addColumn('person','mag_eis',
-        type=>'STRING(1)',
-        notNull=>1,
-        default=>1,
-    );
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub addColumn {
-    my $self = shift;
-    # @_: $table,$column,@colDef
-
-    # Optionen
-
-    my $sloppy = 0;
-
-    Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -sloppy=>\$sloppy,
-    );
-
-    # Statement ausführen
-
-    my $stmt = $self->stmt->addColumn(@_);
-    my $cur = eval { $self->sqlAtomic($stmt) };
-    if ($@) {
-        if ($sloppy &&
-                $@ =~ /ORA-01430|PGSQL-00007|SQLITE-00001|MYSQL-01060/) {
-            return undef;
-        }
-        die $@;
-    }
-
-    return $cur;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 dropColumn() - Entferne Kolumne aus Tabelle
-
-=head4 Synopsis
-
-    $cur = $db->dropColumn($table,$column);
-
-=head4 Description
-
-Entferne Kolumne $column aus Tabelle $table und liefere das
-Resultat der Statement-Ausführung zurück.
-
-Es ist kein Fehler, wenn die Kolumne nicht existiert. In dem Fall
-wird undef geliefert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dropColumn {
-    my ($self,$table,$column) = @_;
-
-    # Statement ausführen
-
-    my $stmt = $self->stmt->dropColumn($table,$column);
-    my $cur = eval { $self->sqlAtomic($stmt) };
-    if ($@) {
-        if ($@ =~ /ORA-00904|PGSQL-00007|SQLITE-00001|MYSQL-01091/) {
-            return undef;
-        }
-        die $@;
-    }
-
-    return $cur;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 modifyColumn() - Modifiziere Kolumne
-
-=head4 Synopsis
-
-    $cur = $db->modifyColumn($table,$column,$property=>$value);
-
-=head4 Description
-
-Modifiziere Kolumne $column in Tabelle $table und liefere das
-Resultat der Statement-Ausführung zurück.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub modifyColumn {
-    my $self = shift;
-    # @_: $table,$column,$property,$value
-
-    # Statement ausführen
-
-    my $stmt = $self->stmt->modifyColumn(@_);
-    return $self->sqlAtomic($stmt);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 renameColumn() - Benenne Kolumne um
-
-=head4 Synopsis
-
-    $cur = $db->renameColumn($table,$oldName,$newName;
-
-=head4 Description
-
-Benenne Tabelle $table die Kolumne $oldName in $newName um und
-liefere das Resultat der Statement-Ausführung zurück.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub renameColumn {
-    my $self = shift;
-    # @_: $table,$oldName,$newName
-
-    # Statement ausführen
-
-    my $stmt = $self->stmt->renameColumn(@_);
-    return $self->sqlAtomic($stmt);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 distinctValues() - Liefere die Anzahl der unterschiedlichen Werte
-
-=head4 Synopsis
-
-    $n = $db->distinctValues($table,$column);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub distinctValues {
-    my ($self,$table,$column) = @_;
-    $table = $self->stmt->legalizeTablename($table);
-    return $self->value($table,-select=>"COUNT(DISTINCT $column)");
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 minValue() - Liefere den kleinsten Kolumnenwert
-
-=head4 Synopsis
-
-    $val = $db->minValue($table,$column);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub minValue {
-    my ($self,$table,$column) = @_;
-    $table = $self->stmt->legalizeTablename($table);
-    return $self->value($table,-select=>"MIN($column)");
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 maxValue() - Liefere den größten Kolumnenwert
-
-=head4 Synopsis
-
-    $val = $db->maxValue($table,$column);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub maxValue {
-    my ($self,$table,$column) = @_;
-    return $self->value($table,-select=>"MAX($column)");
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 countDistinctMinMax() - Liefere Count/Count Distinct/Min/Max
-
-=head4 Synopsis
-
-    ($count,$distinctCount,$min,$max) = $db->countDistinctMinMax($table,$column);
-
-=head4 Description
-
-Die Methode liefert Information über den Inhalt einer Tabellenkolumne.
-Sie ist für das Reverse Engineering einer unbekannte Datenbanktabelle
-nützlich.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub countDistinctMinMax {
-    my ($self,$table,$column) = @_;
-
-    $table = $self->stmt->legalizeTablename($table);
-    return $self->lookup(
-        -select=>"COUNT($column)","COUNT(DISTINCT $column)",
-            "MIN($column)","MAX($column)",
-        -from=>$table,
-        -raw=>1,
-    );
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Indexes
-
-=head3 indexExists() - Prüfe, ob Index existiert
-
-=head4 Synopsis
-
-    $bool = $db->indexExists($table,\@colNames);
-
-=head4 Description
-
-Prüfe, ob Index existiert. Wenn ja, liefere "wahr", sonst "falsch".
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub indexExists {
-    my $self = shift;
-    my $tableName = shift;
-    my $colNameA = shift;
-
-    my $indexName = $self->stmt->indexName($tableName,$colNameA);
-
-    #!! FIXME: Methode indexName() implementieren
-    #
-    #my ($table) = $self->stmt->splitObjectName($tableName);
-    #my $indexName = lc $table.'_IX_'.join('_',@$colNameA);
-    #$self->stmt->checkName(\$indexName);
-
-    my $row;
-    if ($self->isPostgreSQL) {
-        ($row) = $self->lookup(
-            -from=>'pg_class',
-            -where,relname=>$indexName,
-                relkind=>'i',
-            -raw=>1,
-            -sloppy=>1,
-        );
-    }
-    else {
-        $self->throw('Not implemented');
-    }
-
-    return $row? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 createIndex() - Erzeuge Index
-
-=head4 Synopsis
-
-    $cur = $db->createIndex($table,\@colNames,@opt);
-
-=head4 Options
-
-=over 4
-
-=item -indexName => $str (Default: <TABLE>_ix_<COLUMNS>)
-
-Name des Index.
-
-=item -reCreate => $bool (Default: 0)
-
-Erzeuge Index neu, falls er bereits existiert.
-
-=item -tableSpace => $tableSpaceName (Default: keiner)
-
-Name des Tablespace, in dem der Index erzeugt wird
-(Oracle und PostgreSQL).
-
-=item -unique => $bool (Default: 0)
-
-Statement für Unique Index.
-
-=back
-
-=head4 Description
-
-Erzeuge Index für Tabelle $table und Kolumnen @colNames auf der Datenbank.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub createIndex {
-    my $self = shift;
-    my $tableName = shift;
-    my $colNameA = shift;
-    # @_: @opt
-
-    # Optionen
-
-    my $indexName = undef;
-    my $reCreate = 0;
-    my $tableSpace = undef;
-    my $unique = 0;
-
-    if (@_) {
-        Quiq::Option->extract(\@_,
-             -indexName=>\$indexName,
-             -reCreate=>\$reCreate,
-             -tableSpace=>\$tableSpace,
-             -unique=>\$unique,
-        );
-    }
-
-    # Index droppen
-
-    if ($reCreate) {
-        $self->dropIndex($tableName,$colNameA);
-    }
-
-    # Index erzeugen
-
-    my $stmt = $self->stmt->createIndex($tableName,$colNameA,
-        -indexName=>$indexName,
-        -tableSpace=>$tableSpace,
-        -unique=>$unique,
-    );
-
-    return $self->sqlAtomic($stmt,@_);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 createUniqueIndex() - Erzeuge Unique Index
-
-=head4 Synopsis
-
-    $cur = $db->createUniqueIndex($table,\@colNames,@opt);
-
-=head4 Options
-
-Siehe $db->createIndex()
-
-=head4 Description
-
-Erzeuge Unique Index für Tabelle $table und Kolumnen @colNames
-auf der Datenbank.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub createUniqueIndex {
-    my $self = shift;
-    my $tableName = shift;
-    my $colNameA = shift;
-    # @_: @opt
-
-    return $self->createIndex($tableName,$colNameA,-unique=>1,@_);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 dropIndex() - Droppe Index
-
-=head4 Synopsis
-
-    $cur = $db->dropIndex($table,\@colNames);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dropIndex {
-    my $self = shift;
-    my $tableName = shift;
-    my $colNameA = shift;
-
-    # Index droppen
-
-    my $stmt = $self->stmt->dropIndex($tableName,$colNameA);
-    return $self->sqlAtomic($stmt);
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Sequences
-
-=head3 createSequence() - Erzeuge Sequenz
-
-=head4 Synopsis
-
-    $db->createSequence($name,@opt);
-
-=head4 Options
-
-=over 4
-
-=item -reCreate => $bool (Default: 0)
-
-Droppe Sequenz, falls sie bereits existiert.
-
-=item -startWith => $n (Default: 1)
-
-Die Sequenz beginnt mit Startwert $n.
-
-=back
-
-=head4 Description
-
-Erzeuge Sequenz $name auf Datenbank $db. Die Methode liefert
-keinen Wert zurück.
-
-Unter Oracle und PostgreSQL, die das Konzept der Sequenz haben,
-wird eine normale Sequenz auf der Datenbank erzeugt.
-
-Unter MySQL und SQLite, die das Konzept der Sequenz nicht haben,
-wird eine Tabelle mit Autoinkrement-Kolumne zur Simulation einer
-Sequenz erzeugt.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub createSequence {
-    my $self = shift;
-    my $name = shift;
-
-    # Optionen
-
-    my $reCreate = 0;
-    my $startWith = 1;
-
-    if (@_) {
-        Quiq::Option->extract(\@_,
-            -reCreate=>\$reCreate,
-            -startWith=>\$startWith,
-        );
-    }
-
-    # Sequenz droppen (Fehler ignorieren, falls sie nicht existiert)
-
-    if ($reCreate) {
-        eval { $self->dropSequence($name) };
-    }
-
-    # Sequenz erzeugen
-
-    my @stmt = $self->stmt->createSequence($name,-startWith=>$startWith);
-    for my $stmt (@stmt) {
-        $self->sqlAtomic($stmt);
-    }
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 dropSequence() - Droppe Sequenz
-
-=head4 Synopsis
-
-    $cur = $db->dropSequence($name);
-
-=head4 Description
-
-Droppe Sequenz $name und liefere das Resultat der Statementausführung
-zurück.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dropSequence {
-    my $self = shift;
-    my $name = shift;
-
-    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
-
-    # Sequenz droppen
-
-    my $cur;
-    if ($oracle || $postgresql) {
-        my $stmt = $self->stmt->dropSequence($name);
-        $cur = $self->sqlAtomic($stmt);
-    }
-    elsif ($mysql || $sqlite) {
-        $cur = $self->dropTable($name);
-    }
-
-    return $cur;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 setSequence() - Setze Sequenz auf neuen Startwert
-
-=head4 Synopsis
-
-    $db->setSequence($sequence,$n);
-
-=head4 Description
-
-Setze Sequenz $sequence auf Wert $n. Die Methode liefert keinen
-Wert zurück.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub setSequence {
-    my ($self,$name,$n) = @_;
-
-    # Sequenz setzen
-
-    my @stmt = $self->stmt->setSequence($name,$n);
-    for my $stmt (@stmt) {
-        $self->sql($stmt);
-    }
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 nextValue() - Liefere nächsten Sequenzwert
-
-=head4 Synopsis
-
-    $n = $db->nextValue($sequence);
-
-=head4 Description
-
-Ermittele den nächsten Sequenzwert der Sequenz $sequence
-und liefere diesen zurück.
-
-Unter Oracle und PostgreSQL wird die betreffende Sequenz befragt.
-
-Unter MySQL und SQLite wird ein leerer Datensatz in die
-Sequenz-Tabelle eingefügt und dessen automatisch generierter
-Primärschlüsselwert ermittelt. Um die Sequenz-Tabelle nicht beliebig
-anwachsen zu lassen, wird die Tabelle alle 100 Werte (d.h. wenn
-$n % 100 == 0) bereinigt: alle Datensätze mit einem kleineren Wert als $n
-werden gelöscht.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub nextValue {
-    my ($self,$name) = @_;
-
-    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
-
-    # Operation ausführen
-
-    my $n;
-    if ($oracle || $postgresql) {
-        my $stmt;
-        if ($oracle) {
-            $stmt = "SELECT $name.nextval n FROM dual";
-        }
-        elsif ($postgresql) {
-            $stmt = "SELECT nextval('$name') AS n";
-        }
-        # FIXME: auf lookupValue() umstellen
-        $n = $self->sql($stmt)->fetch->n;
-    }
-    elsif ($mysql || $sqlite) {
-        $n = $self->insert($name,n=>\'NULL')->id;
-        if ($n % 100 == 0) {
-            # Tabelle bereinigen
-            $self->sql("DELETE FROM $name WHERE n < $n");
-        }
-    }
-    else {
-        # FIXME
-        die;
-    }
-
-    return $n;
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Views
-
-=head3 createView() - Erzeuge View
-
-=head4 Synopsis
-
-    $cur = $db->createView($viewName,$selectStmt,@opt);
-
-=head4 Options
-
-=over 4
-
-=item -reCreate => $bool (Default: 0)
-
-Erzeuge View neu, falls sie bereits existiert.
-
-=back
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub createView {
-    my $self = shift;
-    my $viewName = shift;
-    my $selectStmt = shift;
-    # @_: @opt
-
-    # Optionen
-
-    my $reCreate = 0;
-
-    Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -reCreate=>\$reCreate,
-    );
-
-    # View droppen
-
-    if ($reCreate) {
-        $self->dropView($viewName);
-    }
-
-    # View erzeugen
-
-    my $stmt = $self->stmt->createView($viewName,$selectStmt);
-    my $cur = $self->sqlAtomic($stmt,-fetchMode=>0); # kein Cursor bei PG
-
-    return $cur;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 dropView() - Lösche View
-
-=head4 Synopsis
-
-    $cur = $db->dropView($viewName);
-
-=head4 Description
-
-Lösche die View $viewName von der Datenbank $db und liefere das
-Resultat-Objekt der Statementausführung zurück.
-
-Es wird vorab geprüft, ob die View existiert. Ist dies nicht
-der Fall, wird nicht zu löschen versucht und ein Null-Cursor
-zurückgeliefert.
-
-Wird die View erfolgreich gedroppt, führt die Methode ein COMMIT
-durch. Schlägt dies fehl, führt sie ein ROLLBACK durch.
-Dies ist für PostgreSQL und SQLite notwendig.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dropView {
-    my ($self,$viewName) = @_;
-
-    # Wenn zu droppende view nicht existiert, brauchen wir nichts
-    # tun und liefern einen Null-Cursor.
-
-    unless ($self->viewExists($viewName)) {
-        return $self->sql;
-    }
-
-    my $stmt = $self->stmt->dropView($viewName);
-    my $cur = $self->sqlAtomic($stmt);
-
-    return $cur;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 viewExists() - Prüfe, ob View existiert
-
-=head4 Synopsis
-
-    $bool = $db->viewExists($viewName);
-
-=head4 Description
-
-Prüfe, ob View existiert. Wenn ja, liefere "wahr", sonst "falsch".
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub viewExists {
-    my ($self,$viewName) = @_;
-
-    # Wir öffnen im Falle von PostgreSQL eine parallele Verbindung,
-    # damit der Statement-Fehler im Falle einer nicht-exitierenden
-    # View die aktuelle Transaction nicht stört
-
-    if ($self->isPostgreSQL) {
-        $self = $self->new;
-    }
-
-    local $@;
-    my $stmt = $self->stmt->select(
-        -select=>0,
-        -from=>$viewName,
-        -limit=>0,
-    );
-    eval { $self->sql($stmt) };
-    return $@? 0: 1;
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Trigger
-
-=head3 createTrigger() - Erzeuge Trigger
-
-=head4 Synopsis
-
-    $cur = $db->createTrigger($table,$name,$when,$event,$level,$body,@opt);
-    $cur = $db->createTrigger($table,$name,$when,$event,$level,
-        $dbms=>$body,
-        ...,
-        @opt
-    );
-
-=head4 Options
-
-=over 4
-
-=item -replace => $bool (Default: 0)
-
-Ersetze den Trigger, falls ein solcher existiert.
-
-=back
-
-=head4 Returns
-
-Cursor
-
-=head4 Description
-
-Erzeuge einen Trigger mit Name $name für Tabelle $table und Zeitpunkt
-$when (BEFORE oder AFTER), der bei Ereignis $event (INSERT, UPDATE
-oder DELETE) auf Ebene $level (ROW oder STATEMENT) feuert und die
-Rumpf/Anweisungsfolge $body ausführt.
-
-Es kann ein einzelner Rumpf angegeben werden, wenn die Applikation
-auf einem bestimmten RDBMS läuft. Oder es können, um portabel
-programmieren zu können, unterschiedliche Prozedur-Rümpfe für
-verschiedene RDBMSe definiert werden:
-
-    ...
-    Oracle=>"
-    <oracle_body>
-    ",
-    PostgreSQL=>"
-    <postgresql_body>
-    ",
-    ...
-
-Die Methode wählt dann die zur Datenbank $db passende
-Rumpf-Definition aus.
-
-=head4 Example
-
-Erzeuge unterschiedlichen Triggercode für Oracle und PostgreSQL:
-
-    $db->createTrigger('mytab','mytrig','before','insert|update','row',
-        Oracle=>"
-        BEGIN
-            :new.c := 'a';
-        END
-        ",
-        PostgreSQL=>"
-        BEGIN
-            NEW.c = 'a';
-            RETURN NEW;
-        END;
-        ",
-    );
-
-Für Oracle wird ein Trigger mit Rumpf erzeugt:
-
-    CREATE TRIGGER mytrig
-    BEFORE INSERT OR UPDATE ON mytab
-    FOR EACH ROW
-    BEGIN
-        :new.c := 'a';
-    END;
-
-Für PostgreSQL wird zunächst eine Funktion C<set_c_proc> (Triggername
-plus "_proc") erzeugt, welche die Triggerfunktionalität implementiert:
-
-    CREATE FUNCTION mytrig_proc()
-    RETURNS trigger
-    AS $SQL$
-    BEGIN
-        NEW.c = 'a';
-        RETURN NEW;
-    END;
-    $SQL$ LANGUAGE plpgsql
-
-Dann wird der Trigger definiert, der diese Funktion aufruft:
-
-    CREATE TRIGGER set_c
-    BEFORE INSERT OR UPDATE ON mytab
-    FOR EACH ROW
-    EXECUTE PROCEDURE mytrig_proc()
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub createTrigger {
-    my $self = shift;
-    my $table = shift;
-    my $name = shift;
-    my $when = shift;
-    my $event = shift;
-    my $level = shift;
-    # @_: $body,@opt -or- $dbms=>$body,...,@opt
-
-    # Optionen
-
-    my $replace = 0;
-
-    Quiq::Option->extract(\@_,
-        -replace=>\$replace,
-    );
-
-    # Body ermitteln
-    my $body = @_ == 1? shift: {@_}->{$self->dbms};
-
-    # Trigger droppen
-
-    if ($replace && $self->triggerExists($name)) {
-        $self->dropTrigger($name);
-    }
-
-    # Trigger erzeugen
-
-    my $sql = $self->stmt;
-    if ($self->isOracle) {
-        my $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
-            $body);
-        return $self->sqlAtomic($stmt,-forceExec=>1);
-    }
-    elsif ($self->isPostgreSQL) { 
-        my $procName = $name.'_proc';
-
-        my $stmt = $sql->createFunction($procName,$body,
-            -returns=>'trigger'
-        );
-        $self->sqlAtomic($stmt);
-
-        $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
-            -execute=>$procName,
-        );
-        return $self->sqlAtomic($stmt);
-    }
-
-    $self->throw('Not implemented');
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 dropTrigger() - Entferne Trigger
-
-=head4 Synopsis
-
-    $cur = $db->dropTrigger($name);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dropTrigger {
-    my $self = shift;
-    my $name = shift;
-
-    my $sql = $self->stmt;
-
-    if ($self->isOracle) {
-        my $stmt = $sql->dropTrigger($name);
-        return $self->sqlAtomic($stmt);
-    }
-    elsif ($self->isPostgreSQL) {
-        my $stmt = $sql->dropFunction($name.'_proc',-cascade=>1);
-        return $self->sqlAtomic($stmt);
-    }
-
-    $self->throw('Not implemented');
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 triggerExists() - Prüfe, ob Trigger existiert
-
-=head4 Synopsis
-
-    $bool = $db->triggerExists($name);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub triggerExists {
-    my $self = shift;
-    my $name = shift;
-
-    my $row;
-    if ($self->isOracle) {
-        ($row) = $self->lookup(
-            -from=>'all_triggers',
-            -where,trigger_name=>$name,
-            -raw=>1,
-            -sloppy=>1,
-        );
-    }
-    elsif ($self->isPostgreSQL) {
-        ($row) = $self->lookup(
-            -from=>'pg_proc',
-            -where,proname=>$name.'_proc',
-            -raw=>1,
-            -sloppy=>1,
-        );
-    }
-    else {
-        $self->throw('Not implemented');
-    }
-
-    return $row? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Spezielle Operationen
-
-=head3 tableDiff() - Ermittele Daten-Differenzen
+=head3 tableDiff() - Daten-Differenzen zwischen zwei Tabellen
 
 =head4 Synopsis
 
@@ -4046,7 +3041,7 @@ Tabellenname, mit oder ohne Schema-Präfix.
 
 =head4 Options
 
-Im folgenden ist @titles ein Array von Kolumnennamen und $ttitles
+Im folgenden ist @titles ein Array von Kolumnennamen und $titles
 eine kommaseparierte Liste von Kolumnennamen.
 
 =over 4
@@ -4297,6 +3292,1148 @@ sub tableDiff {
 
 # -----------------------------------------------------------------------------
 
+=head3 doublets() - Dubletten in einer Tabelle
+
+=head4 Synopsis
+
+    $tab = $db->doublets($table,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $table
+
+Tabellenname, mit oder ohne Schema-Präfix.
+
+=back
+
+=head4 Options
+
+Im folgenden ist @titles ein Array von Kolumnennamen und $titles
+eine kommaseparierte Liste von Kolumnennamen.
+
+=over 4
+
+=item -columns => \@titles | $titles (Default: I<Alle Kolumnen der Tabelle>)
+
+Kolumnen, die auf Dubletten hin untersucht werden.
+
+=item -ignoreColumns => \@titles | $titles
+
+Kolumnen, die ignoriert werden. Diese Option ist nützlich, wenn
+alle Kolumnen betrachtet werden sollen, bis auf die mit dieser
+Option genannten.
+
+=item -limit => $n (Default: 10)
+
+Begrenze die Anzahl der gemeldeten Dubletten.
+
+=item -sortColumns => \@titles | $titles (Default: I<Kolumnen>)
+
+Kolumnen, nach denen die Gesamt-Differenzliste sortiert wird.
+
+=back
+
+=head4 Returns
+
+Ergebnismengen-Objekt (Quiq::ResultSet::Object)
+
+=head4 Description
+
+Suche Dubletten in der Tabelle $table und liefere ein Ergebnisobjekt
+mit den Treffern zurück.
+
+=head4 Example
+
+    $  perl -MQuiq::Database::Connection -E 'print Quiq::Database::Connection\
+         ->new("dbi#postgresql:dsstest%xv882js:*\@tdca.ruv.de:5432")\
+         ->doublets("dss_meta.cpm_load_objects",-columns=>"load_object,\
+         target_object",-limit=>10)->asTable'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub doublets {
+    my $self = shift;
+
+    # Optionen und Argumente
+
+    my $columns = undef;
+    my $ignoreColumns = undef;
+    my $limit = 10;
+    my $sortColumns = undef;
+
+    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+        -columns => \$columns,
+        -ignoreColumns => \$ignoreColumns,
+        -limit => \$limit,
+        -sortColumns => \$sortColumns,
+    );
+    my ($table) = @$argA;
+
+    # Select-Kolumnen
+
+    my @columns;
+    if (ref $columns) {
+        @columns = @$columns;
+    }
+    elsif ($columns) {
+        @columns = split /\s*,\s*/,$columns;
+    }
+    else {
+        @columns = $self->titles($table);
+    }
+
+    # Ignore-Kolumnen
+
+    my @ignoreColumns;
+    if (ref $ignoreColumns) {
+        @ignoreColumns = @$ignoreColumns;
+    }
+    elsif ($ignoreColumns) {
+        for my $ignoreTitle (split /\s*,\s*/,$ignoreColumns) {
+            for (my $i = 0; $i < @columns; $i++) {
+                if ($ignoreTitle eq $columns[$i]) {
+                    splice @columns,$i--,1;
+                }
+            }
+        }
+    }
+
+    # Sortier-Kolumnen
+
+    my @sortColumns;
+    if (ref $sortColumns) {
+        @sortColumns = @$sortColumns;
+    }
+    elsif ($sortColumns) {
+        @sortColumns = split /\s*,\s*/,$sortColumns;
+    }
+    else {
+       @sortColumns = @columns;
+    }
+
+    # Dubletten ermitteln
+
+    return $self->select(
+        -select => @columns,'COUNT(1)',
+        -from => $table,
+        -groupBy => @columns,
+        -having => 'COUNT(1) > 1',
+        -orderBy => @sortColumns,
+        -limit => $limit,
+    );
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Columns
+
+=head3 columnExists() - Prüfe, ob Kolumne existiert
+
+=head4 Synopsis
+
+    $cur = $db->columnExists($table,$column);
+
+=head4 Description
+
+Prüfe, ob Kolumne existiert. Wenn ja, liefere "wahr", sonst "falsch".
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub columnExists {
+    my ($self,$table,$column) = @_;
+
+    # Wir öffnen im Falle von PostgreSQL ein parallele Verbindung,
+    # damit der Statement-Fehler bei einer nicht-exitierenden
+    # Kolumne die aktuelle Transaction nicht stört
+
+    if ($self->isPostgreSQL) {
+        $self = $self->new;
+    }
+
+    local $@;
+    my $stmt = $self->stmt->select(
+        -select => $column,
+        -from => $table,
+        -limit => 0,
+    );
+    eval { $self->sql($stmt) };
+    return $@? 0: 1;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 addColumn() - Füge Kolumne zu Tabelle hinzu
+
+=head4 Synopsis
+
+    $cur = $db->addColumn($table,$column,@colDef,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Wirf keine Exception, wenn die Kolumne bereits existiert, sondern
+liefere undef.
+
+=back
+
+=head4 Example
+
+    $cur = $db->addColumn('person','mag_eis',
+        type => 'STRING(1)',
+        notNull => 1,
+        default => 1,
+    );
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub addColumn {
+    my $self = shift;
+    # @_: $table,$column,@colDef
+
+    # Optionen
+
+    my $sloppy = 0;
+
+    Quiq::Option->extract(-mode=>'sloppy',\@_,
+        -sloppy => \$sloppy,
+    );
+
+    # Statement ausführen
+
+    my $stmt = $self->stmt->addColumn(@_);
+    my $cur = eval { $self->sqlAtomic($stmt) };
+    if ($@) {
+        if ($sloppy &&
+                $@ =~ /ORA-01430|PGSQL-00007|SQLITE-00001|MYSQL-01060/) {
+            return undef;
+        }
+        die $@;
+    }
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dropColumn() - Entferne Kolumne aus Tabelle
+
+=head4 Synopsis
+
+    $cur = $db->dropColumn($table,$column);
+
+=head4 Description
+
+Entferne Kolumne $column aus Tabelle $table und liefere das
+Resultat der Statement-Ausführung zurück.
+
+Es ist kein Fehler, wenn die Kolumne nicht existiert. In dem Fall
+wird undef geliefert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub dropColumn {
+    my ($self,$table,$column) = @_;
+
+    # Statement ausführen
+
+    my $stmt = $self->stmt->dropColumn($table,$column);
+    my $cur = eval { $self->sqlAtomic($stmt) };
+    if ($@) {
+        if ($@ =~ /ORA-00904|PGSQL-00007|SQLITE-00001|MYSQL-01091/) {
+            return undef;
+        }
+        die $@;
+    }
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 modifyColumn() - Modifiziere Kolumne
+
+=head4 Synopsis
+
+    $cur = $db->modifyColumn($table,$column,$property=>$value);
+
+=head4 Description
+
+Modifiziere Kolumne $column in Tabelle $table und liefere das
+Resultat der Statement-Ausführung zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub modifyColumn {
+    my $self = shift;
+    # @_: $table,$column,$property,$value
+
+    # Statement ausführen
+
+    my $stmt = $self->stmt->modifyColumn(@_);
+    return $self->sqlAtomic($stmt);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 renameColumn() - Benenne Kolumne um
+
+=head4 Synopsis
+
+    $cur = $db->renameColumn($table,$oldName,$newName;
+
+=head4 Description
+
+Benenne Tabelle $table die Kolumne $oldName in $newName um und
+liefere das Resultat der Statement-Ausführung zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub renameColumn {
+    my $self = shift;
+    # @_: $table,$oldName,$newName
+
+    # Statement ausführen
+
+    my $stmt = $self->stmt->renameColumn(@_);
+    return $self->sqlAtomic($stmt);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 distinctValues() - Liefere die Anzahl der unterschiedlichen Werte
+
+=head4 Synopsis
+
+    $n = $db->distinctValues($table,$column);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub distinctValues {
+    my ($self,$table,$column) = @_;
+    $table = $self->stmt->legalizeTablename($table);
+    return $self->value($table,-select=>"COUNT(DISTINCT $column)");
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 minValue() - Liefere den kleinsten Kolumnenwert
+
+=head4 Synopsis
+
+    $val = $db->minValue($table,$column);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub minValue {
+    my ($self,$table,$column) = @_;
+    $table = $self->stmt->legalizeTablename($table);
+    return $self->value($table,-select=>"MIN($column)");
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 maxValue() - Liefere den größten Kolumnenwert
+
+=head4 Synopsis
+
+    $val = $db->maxValue($table,$column);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub maxValue {
+    my ($self,$table,$column) = @_;
+    return $self->value($table,-select=>"MAX($column)");
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 countDistinctMinMax() - Liefere Count/Count Distinct/Min/Max
+
+=head4 Synopsis
+
+    ($count,$distinctCount,$min,$max) = $db->countDistinctMinMax($table,$column);
+
+=head4 Description
+
+Die Methode liefert Information über den Inhalt einer Tabellenkolumne.
+Sie ist für das Reverse Engineering einer unbekannte Datenbanktabelle
+nützlich.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub countDistinctMinMax {
+    my ($self,$table,$column) = @_;
+
+    $table = $self->stmt->legalizeTablename($table);
+    return $self->lookup(
+        -select => "COUNT($column)","COUNT(DISTINCT $column)",
+            "MIN($column)","MAX($column)",
+        -from => $table,
+        -raw => 1,
+    );
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Indexes
+
+=head3 indexExists() - Prüfe, ob Index existiert
+
+=head4 Synopsis
+
+    $bool = $db->indexExists($table,\@colNames);
+
+=head4 Description
+
+Prüfe, ob Index existiert. Wenn ja, liefere "wahr", sonst "falsch".
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub indexExists {
+    my $self = shift;
+    my $tableName = shift;
+    my $colNameA = shift;
+
+    my $indexName = $self->stmt->indexName($tableName,$colNameA);
+
+    #!! FIXME: Methode indexName() implementieren
+    #
+    #my ($table) = $self->stmt->splitObjectName($tableName);
+    #my $indexName = lc $table.'_IX_'.join('_',@$colNameA);
+    #$self->stmt->checkName(\$indexName);
+
+    my $row;
+    if ($self->isPostgreSQL) {
+        ($row) = $self->lookup(
+            -from => 'pg_class',
+            -where,relname => $indexName,
+                relkind => 'i',
+            -raw => 1,
+            -sloppy => 1,
+        );
+    }
+    else {
+        $self->throw('Not implemented');
+    }
+
+    return $row? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 createIndex() - Erzeuge Index
+
+=head4 Synopsis
+
+    $cur = $db->createIndex($table,\@colNames,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -indexName => $str (Default: <TABLE>_ix_<COLUMNS>)
+
+Name des Index.
+
+=item -reCreate => $bool (Default: 0)
+
+Erzeuge Index neu, falls er bereits existiert.
+
+=item -tableSpace => $tableSpaceName (Default: keiner)
+
+Name des Tablespace, in dem der Index erzeugt wird
+(Oracle und PostgreSQL).
+
+=item -unique => $bool (Default: 0)
+
+Statement für Unique Index.
+
+=back
+
+=head4 Description
+
+Erzeuge Index für Tabelle $table und Kolumnen @colNames auf der Datenbank.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createIndex {
+    my $self = shift;
+    my $tableName = shift;
+    my $colNameA = shift;
+    # @_: @opt
+
+    # Optionen
+
+    my $indexName = undef;
+    my $reCreate = 0;
+    my $tableSpace = undef;
+    my $unique = 0;
+
+    if (@_) {
+        Quiq::Option->extract(\@_,
+             -indexName => \$indexName,
+             -reCreate => \$reCreate,
+             -tableSpace => \$tableSpace,
+             -unique => \$unique,
+        );
+    }
+
+    # Index droppen
+
+    if ($reCreate) {
+        $self->dropIndex($tableName,$colNameA);
+    }
+
+    # Index erzeugen
+
+    my $stmt = $self->stmt->createIndex($tableName,$colNameA,
+        -indexName => $indexName,
+        -tableSpace => $tableSpace,
+        -unique => $unique,
+    );
+
+    return $self->sqlAtomic($stmt,@_);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 createUniqueIndex() - Erzeuge Unique Index
+
+=head4 Synopsis
+
+    $cur = $db->createUniqueIndex($table,\@colNames,@opt);
+
+=head4 Options
+
+Siehe $db->createIndex()
+
+=head4 Description
+
+Erzeuge Unique Index für Tabelle $table und Kolumnen @colNames
+auf der Datenbank.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createUniqueIndex {
+    my $self = shift;
+    my $tableName = shift;
+    my $colNameA = shift;
+    # @_: @opt
+
+    return $self->createIndex($tableName,$colNameA,-unique=>1,@_);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dropIndex() - Droppe Index
+
+=head4 Synopsis
+
+    $cur = $db->dropIndex($table,\@colNames);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub dropIndex {
+    my $self = shift;
+    my $tableName = shift;
+    my $colNameA = shift;
+
+    # Index droppen
+
+    my $stmt = $self->stmt->dropIndex($tableName,$colNameA);
+    return $self->sqlAtomic($stmt);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Sequences
+
+=head3 createSequence() - Erzeuge Sequenz
+
+=head4 Synopsis
+
+    $db->createSequence($name,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -reCreate => $bool (Default: 0)
+
+Droppe Sequenz, falls sie bereits existiert.
+
+=item -startWith => $n (Default: 1)
+
+Die Sequenz beginnt mit Startwert $n.
+
+=back
+
+=head4 Description
+
+Erzeuge Sequenz $name auf Datenbank $db. Die Methode liefert
+keinen Wert zurück.
+
+Unter Oracle und PostgreSQL, die das Konzept der Sequenz haben,
+wird eine normale Sequenz auf der Datenbank erzeugt.
+
+Unter MySQL und SQLite, die das Konzept der Sequenz nicht haben,
+wird eine Tabelle mit Autoinkrement-Kolumne zur Simulation einer
+Sequenz erzeugt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createSequence {
+    my $self = shift;
+    my $name = shift;
+
+    # Optionen
+
+    my $reCreate = 0;
+    my $startWith = 1;
+
+    if (@_) {
+        Quiq::Option->extract(\@_,
+            -reCreate => \$reCreate,
+            -startWith => \$startWith,
+        );
+    }
+
+    # Sequenz droppen (Fehler ignorieren, falls sie nicht existiert)
+
+    if ($reCreate) {
+        eval { $self->dropSequence($name) };
+    }
+
+    # Sequenz erzeugen
+
+    my @stmt = $self->stmt->createSequence($name,-startWith=>$startWith);
+    for my $stmt (@stmt) {
+        $self->sqlAtomic($stmt);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dropSequence() - Droppe Sequenz
+
+=head4 Synopsis
+
+    $cur = $db->dropSequence($name);
+
+=head4 Description
+
+Droppe Sequenz $name und liefere das Resultat der Statementausführung
+zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub dropSequence {
+    my $self = shift;
+    my $name = shift;
+
+    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+
+    # Sequenz droppen
+
+    my $cur;
+    if ($oracle || $postgresql) {
+        my $stmt = $self->stmt->dropSequence($name);
+        $cur = $self->sqlAtomic($stmt);
+    }
+    elsif ($mysql || $sqlite) {
+        $cur = $self->dropTable($name);
+    }
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 setSequence() - Setze Sequenz auf neuen Startwert
+
+=head4 Synopsis
+
+    $db->setSequence($sequence,$n);
+
+=head4 Description
+
+Setze Sequenz $sequence auf Wert $n. Die Methode liefert keinen
+Wert zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub setSequence {
+    my ($self,$name,$n) = @_;
+
+    # Sequenz setzen
+
+    my @stmt = $self->stmt->setSequence($name,$n);
+    for my $stmt (@stmt) {
+        $self->sql($stmt);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 nextValue() - Liefere nächsten Sequenzwert
+
+=head4 Synopsis
+
+    $n = $db->nextValue($sequence);
+
+=head4 Description
+
+Ermittele den nächsten Sequenzwert der Sequenz $sequence
+und liefere diesen zurück.
+
+Unter Oracle und PostgreSQL wird die betreffende Sequenz befragt.
+
+Unter MySQL und SQLite wird ein leerer Datensatz in die
+Sequenz-Tabelle eingefügt und dessen automatisch generierter
+Primärschlüsselwert ermittelt. Um die Sequenz-Tabelle nicht beliebig
+anwachsen zu lassen, wird die Tabelle alle 100 Werte (d.h. wenn
+$n % 100 == 0) bereinigt: alle Datensätze mit einem kleineren Wert als $n
+werden gelöscht.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub nextValue {
+    my ($self,$name) = @_;
+
+    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+
+    # Operation ausführen
+
+    my $n;
+    if ($oracle || $postgresql) {
+        my $stmt;
+        if ($oracle) {
+            $stmt = "SELECT $name.nextval n FROM dual";
+        }
+        elsif ($postgresql) {
+            $stmt = "SELECT nextval('$name') AS n";
+        }
+        # FIXME: auf lookupValue() umstellen
+        $n = $self->sql($stmt)->fetch->n;
+    }
+    elsif ($mysql || $sqlite) {
+        $n = $self->insert($name,n=>\'NULL')->id;
+        if ($n % 100 == 0) {
+            # Tabelle bereinigen
+            $self->sql("DELETE FROM $name WHERE n < $n");
+        }
+    }
+    else {
+        # FIXME
+        die;
+    }
+
+    return $n;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Views
+
+=head3 createView() - Erzeuge View
+
+=head4 Synopsis
+
+    $cur = $db->createView($viewName,$selectStmt,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -reCreate => $bool (Default: 0)
+
+Erzeuge View neu, falls sie bereits existiert.
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createView {
+    my $self = shift;
+    my $viewName = shift;
+    my $selectStmt = shift;
+    # @_: @opt
+
+    # Optionen
+
+    my $reCreate = 0;
+
+    Quiq::Option->extract(-mode=>'sloppy',\@_,
+        -reCreate => \$reCreate,
+    );
+
+    # View droppen
+
+    if ($reCreate) {
+        $self->dropView($viewName);
+    }
+
+    # View erzeugen
+
+    my $stmt = $self->stmt->createView($viewName,$selectStmt);
+    my $cur = $self->sqlAtomic($stmt,-fetchMode=>0); # kein Cursor bei PG
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dropView() - Lösche View
+
+=head4 Synopsis
+
+    $cur = $db->dropView($viewName);
+
+=head4 Description
+
+Lösche die View $viewName von der Datenbank $db und liefere das
+Resultat-Objekt der Statementausführung zurück.
+
+Es wird vorab geprüft, ob die View existiert. Ist dies nicht
+der Fall, wird nicht zu löschen versucht und ein Null-Cursor
+zurückgeliefert.
+
+Wird die View erfolgreich gedroppt, führt die Methode ein COMMIT
+durch. Schlägt dies fehl, führt sie ein ROLLBACK durch.
+Dies ist für PostgreSQL und SQLite notwendig.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub dropView {
+    my ($self,$viewName) = @_;
+
+    # Wenn zu droppende view nicht existiert, brauchen wir nichts
+    # tun und liefern einen Null-Cursor.
+
+    unless ($self->viewExists($viewName)) {
+        return $self->sql;
+    }
+
+    my $stmt = $self->stmt->dropView($viewName);
+    my $cur = $self->sqlAtomic($stmt);
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 viewExists() - Prüfe, ob View existiert
+
+=head4 Synopsis
+
+    $bool = $db->viewExists($viewName);
+
+=head4 Description
+
+Prüfe, ob View existiert. Wenn ja, liefere "wahr", sonst "falsch".
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub viewExists {
+    my ($self,$viewName) = @_;
+
+    # Wir öffnen im Falle von PostgreSQL eine parallele Verbindung,
+    # damit der Statement-Fehler im Falle einer nicht-exitierenden
+    # View die aktuelle Transaction nicht stört
+
+    if ($self->isPostgreSQL) {
+        $self = $self->new;
+    }
+
+    local $@;
+    my $stmt = $self->stmt->select(
+        -select => 0,
+        -from => $viewName,
+        -limit => 0,
+    );
+    eval { $self->sql($stmt) };
+    return $@? 0: 1;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Trigger
+
+=head3 createTrigger() - Erzeuge Trigger
+
+=head4 Synopsis
+
+    $cur = $db->createTrigger($table,$name,$when,$event,$level,$body,@opt);
+    $cur = $db->createTrigger($table,$name,$when,$event,$level,
+        $dbms => $body,
+        ...,
+        @opt
+    );
+
+=head4 Options
+
+=over 4
+
+=item -replace => $bool (Default: 0)
+
+Ersetze den Trigger, falls ein solcher existiert.
+
+=back
+
+=head4 Returns
+
+Cursor
+
+=head4 Description
+
+Erzeuge einen Trigger mit Name $name für Tabelle $table und Zeitpunkt
+$when (BEFORE oder AFTER), der bei Ereignis $event (INSERT, UPDATE
+oder DELETE) auf Ebene $level (ROW oder STATEMENT) feuert und die
+Rumpf/Anweisungsfolge $body ausführt.
+
+Es kann ein einzelner Rumpf angegeben werden, wenn die Applikation
+auf einem bestimmten RDBMS läuft. Oder es können, um portabel
+programmieren zu können, unterschiedliche Prozedur-Rümpfe für
+verschiedene RDBMSe definiert werden:
+
+    ...
+    Oracle => "
+    <oracle_body>
+    ",
+    PostgreSQL => "
+    <postgresql_body>
+    ",
+    ...
+
+Die Methode wählt dann die zur Datenbank $db passende
+Rumpf-Definition aus.
+
+=head4 Example
+
+Erzeuge unterschiedlichen Triggercode für Oracle und PostgreSQL:
+
+    $db->createTrigger('mytab','mytrig','before','insert|update','row',
+        Oracle => "
+        BEGIN
+            :new.c := 'a';
+        END
+        ",
+        PostgreSQL => "
+        BEGIN
+            NEW.c = 'a';
+            RETURN NEW;
+        END;
+        ",
+    );
+
+Für Oracle wird ein Trigger mit Rumpf erzeugt:
+
+    CREATE TRIGGER mytrig
+    BEFORE INSERT OR UPDATE ON mytab
+    FOR EACH ROW
+    BEGIN
+        :new.c := 'a';
+    END;
+
+Für PostgreSQL wird zunächst eine Funktion C<set_c_proc> (Triggername
+plus "_proc") erzeugt, welche die Triggerfunktionalität implementiert:
+
+    CREATE FUNCTION mytrig_proc()
+    RETURNS trigger
+    AS $SQL$
+    BEGIN
+        NEW.c = 'a';
+        RETURN NEW;
+    END;
+    $SQL$ LANGUAGE plpgsql
+
+Dann wird der Trigger definiert, der diese Funktion aufruft:
+
+    CREATE TRIGGER set_c
+    BEFORE INSERT OR UPDATE ON mytab
+    FOR EACH ROW
+    EXECUTE PROCEDURE mytrig_proc()
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createTrigger {
+    my $self = shift;
+    my $table = shift;
+    my $name = shift;
+    my $when = shift;
+    my $event = shift;
+    my $level = shift;
+    # @_: $body,@opt -or- $dbms=>$body,...,@opt
+
+    # Optionen
+
+    my $replace = 0;
+
+    Quiq::Option->extract(\@_,
+        -replace => \$replace,
+    );
+
+    # Body ermitteln
+    my $body = @_ == 1? shift: {@_}->{$self->dbms};
+
+    # Trigger droppen
+
+    if ($replace && $self->triggerExists($name)) {
+        $self->dropTrigger($name);
+    }
+
+    # Trigger erzeugen
+
+    my $sql = $self->stmt;
+    if ($self->isOracle) {
+        my $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
+            $body);
+        return $self->sqlAtomic($stmt,-forceExec=>1);
+    }
+    elsif ($self->isPostgreSQL) { 
+        my $procName = $name.'_proc';
+
+        my $stmt = $sql->createFunction($procName,$body,
+            -returns => 'trigger'
+        );
+        $self->sqlAtomic($stmt);
+
+        $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
+            -execute => $procName,
+        );
+        return $self->sqlAtomic($stmt);
+    }
+
+    $self->throw('Not implemented');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dropTrigger() - Entferne Trigger
+
+=head4 Synopsis
+
+    $cur = $db->dropTrigger($name);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub dropTrigger {
+    my $self = shift;
+    my $name = shift;
+
+    my $sql = $self->stmt;
+
+    if ($self->isOracle) {
+        my $stmt = $sql->dropTrigger($name);
+        return $self->sqlAtomic($stmt);
+    }
+    elsif ($self->isPostgreSQL) {
+        my $stmt = $sql->dropFunction($name.'_proc',-cascade=>1);
+        return $self->sqlAtomic($stmt);
+    }
+
+    $self->throw('Not implemented');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 triggerExists() - Prüfe, ob Trigger existiert
+
+=head4 Synopsis
+
+    $bool = $db->triggerExists($name);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub triggerExists {
+    my $self = shift;
+    my $name = shift;
+
+    my $row;
+    if ($self->isOracle) {
+        ($row) = $self->lookup(
+            -from => 'all_triggers',
+            -where,trigger_name => $name,
+            -raw => 1,
+            -sloppy => 1,
+        );
+    }
+    elsif ($self->isPostgreSQL) {
+        ($row) = $self->lookup(
+            -from => 'pg_proc',
+            -where,proname => $name.'_proc',
+            -raw => 1,
+            -sloppy => 1,
+        );
+    }
+    else {
+        $self->throw('Not implemented');
+    }
+
+    return $row? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Spezielle Operationen
+
 =head3 diff() - Ermittele Datendifferenzen
 
 =head4 Synopsis
@@ -4420,9 +4557,9 @@ ein Bind-Cursor geliefert.
 =head3 Beispiel mit INSERT
 
     my $bindCur = $db->insert('person',
-        per_id=>\'?',
-        per_vorname=>\'?',
-        per_nachname=>\'?',
+        per_id => \'?',
+        per_vorname => \'?',
+        per_nachname => \'?',
     );
     
     $bindCur->bind(
@@ -4434,8 +4571,8 @@ ein Bind-Cursor geliefert.
 =head3 Beispiel mit SELECT
 
     my $bindCur = $db->select(
-        -from=>'person',
-        -where=>'per_nachname = ?',
+        -from => 'person',
+        -where => 'per_nachname = ?',
     );
     
     my $cur = $bindCur->bind('Mustermann');
@@ -4482,9 +4619,9 @@ neu erzeugt wurde:
         # initialisieren
     
         $row->set(
-            per_id=>$db->nextValue('id');
-            per_vorname=>'Erika',
-            per_namchname=>'Mustermann',
+            per_id => $db->nextValue('id');
+            per_vorname => 'Erika',
+            per_namchname => 'Mustermann',
         );
     
         # speichern
@@ -4497,9 +4634,9 @@ neu erzeugt wurde:
 
     my $per_id = $db->nextValue('id');
     $db->insert('person',
-        per_id=>$per_id,
-        per_vorname=>'Rudi',
-        per_nachname=>'Ratlos',
+        per_id => $per_id,
+        per_vorname => 'Rudi',
+        per_nachname => 'Ratlos',
     );
     my $per = $db->lookup('person',-where,per_id=>$per_id);
 
@@ -4511,18 +4648,18 @@ der Datensatz selektiert werden.
 
     my $per = $db->nullRow('person');
     $per->set(
-        per_id=>$db->nextValue('id'),
-        per_vorname=>'Rudi',
-        per_nachname=>'Ratlos',
+        per_id => $db->nextValue('id'),
+        per_vorname => 'Rudi',
+        per_nachname => 'Ratlos',
     );
     $db->insert('person',$row);
 
 =head3 Mittels Objekt (noch nicht implementiert)
 
     my $per = Person->new($db,
-        per_id=>$db->nextValue('id'),
-        per_vorname=>'Rudi',
-        per_nachname=>'Ratlos',
+        per_id => $db->nextValue('id'),
+        per_vorname => 'Rudi',
+        per_nachname => 'Ratlos',
     );
     $per->insert($db);
 
@@ -4569,10 +4706,10 @@ Der Defaultwert ist 1024*1024 Bytes (1MB).
 =head3 Daten speichern
 
     $cur = $db->insert('person',
-        per_id=>\'?',
-        per_vorname=>\'?',
-        per_nachname=>\'?',
-        per_foto=>\'?',
+        per_id => \'?',
+        per_vorname => \'?',
+        per_nachname => \'?',
+        per_foto => \'?',
     );
     
     # BLOB-Kolumne bekannt machen, damit die Schnittstelle
@@ -4680,7 +4817,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

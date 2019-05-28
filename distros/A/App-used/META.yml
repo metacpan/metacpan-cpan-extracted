@@ -17,7 +17,7 @@ name: App-used
 provides:
   App::used:
     file: lib/App/used.pm
-    version: v0.0.9
+    version: v0.1.0
 requires:
   File::chdir: '0'
   List::Util: '0'
@@ -31,5 +31,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::used
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-used.git
-version: v0.0.9
+version: v0.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

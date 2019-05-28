@@ -1,1 +1,5 @@
+1.0.1     2019-05-28 10:13:13+01:00 Europe/London
+  - depend on newer Class::Tiny that implements BUILD*
+
 1.0.0     2019-05-23 10:58:11+01:00 Europe/London
+  - first public release

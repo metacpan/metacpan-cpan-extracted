@@ -43,6 +43,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Dist::Zilla::Role::VersionProvider' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::DZil' => '0',

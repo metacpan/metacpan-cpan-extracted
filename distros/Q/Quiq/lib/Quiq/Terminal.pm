@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -134,15 +134,15 @@ sub askUser {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -automatic=>\$automatic,
-            -color=>\$color,
-            -default=>\$default,
-            -inHandle=>\$in,
-            -outHandle=>\$out,
-            -timer=>\$timer,
-            -ttyIn=>\$ttyIn,
-            -ttyOut=>\$ttyOut,
-            -values=>\$values,
+            -automatic => \$automatic,
+            -color => \$color,
+            -default => \$default,
+            -inHandle => \$in,
+            -outHandle => \$out,
+            -timer => \$timer,
+            -ttyIn => \$ttyIn,
+            -ttyOut => \$ttyOut,
+            -values => \$values,
         );
     }
 
@@ -152,7 +152,7 @@ sub askUser {
         }
         else {
             $class->throw(
-                q~ASK-00001: Im Automatikmodus ist Defaultwert erforderlich~,
+                'ASK-00001: Im Automatikmodus ist Defaultwert erforderlich',
             );
         }
     }
@@ -290,7 +290,7 @@ sub ansiEsc {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

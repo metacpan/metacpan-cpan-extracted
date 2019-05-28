@@ -48,6 +48,7 @@
             "Log::Any" : "0",
             "Statistics::Descriptive" : "0",
             "Time::HiRes" : "0",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -64,11 +65,11 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://bitbucket.org/broadbean/p5-log-timer",
+         "url" : "git://bitbucket.org/broadbean/p5-log-timer.git",
          "web" : "https://bitbucket.org/broadbean/p5-log-timer"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

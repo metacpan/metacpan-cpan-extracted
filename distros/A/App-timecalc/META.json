@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-App-timecalc"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

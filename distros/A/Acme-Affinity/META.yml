@@ -29,7 +29,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-Affinity
   repository: https://github.com/ology/Acme-Affinity
-version: '0.0103'
+version: '0.0104'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

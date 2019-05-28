@@ -45,6 +45,7 @@ WriteMakefile(
 	'Carp' => 0,
         'Config' => 0,
 	'DirHandle' => 0,
+	'Encode' => 0,
 	'English' => 0,
 	'FileHandle' => 0,
 	'File::Spec' => 0,

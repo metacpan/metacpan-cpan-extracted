@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -76,15 +76,15 @@ sub new {
         my $rowA = shift || [];
 
         $self = $class->SUPER::new(
-            rowClass=>$self->rowClass,
-            titles=>scalar $self->titles,
-            rows=>$rowA,
-            stmt=>'',
-            hits=>0,
-            startTime=>scalar(Time::HiRes::gettimeofday),
-            execTime=>0,
-            fetchTime=>0,
-            formatA=>undef, # wird von $self->formats() gesetzt
+            rowClass => $self->rowClass,
+            titles => scalar $self->titles,
+            rows => $rowA,
+            stmt => '',
+            hits => 0,
+            startTime => scalar(Time::HiRes::gettimeofday),
+            execTime => 0,
+            fetchTime => 0,
+            formatA => undef, # wird von $self->formats() gesetzt
         );
     }
     else {
@@ -94,15 +94,15 @@ sub new {
         # @_: @keyVal
 
         $self = $class->SUPER::new(
-            rowClass=>$rowClass,
-            titles=>$titles,
-            rows=>$rowA,
-            stmt=>'',
-            hits=>0,
-            startTime=>scalar(Time::HiRes::gettimeofday),
-            execTime=>0,
-            fetchTime=>0,
-            formatA=>undef, # wird von $self->formats() gesetzt
+            rowClass => $rowClass,
+            titles => $titles,
+            rows => $rowA,
+            stmt => '',
+            hits => 0,
+            startTime => scalar(Time::HiRes::gettimeofday),
+            execTime => 0,
+            fetchTime => 0,
+            formatA => undef, # wird von $self->formats() gesetzt
         );
     }
 
@@ -314,7 +314,7 @@ sub lookup {
 
     if (substr($_[0],0,1) eq '-') {
         Quiq::Option->extract(\@_,
-            -sloppy=>\$sloppy,
+            -sloppy => \$sloppy,
         );
     }
 
@@ -331,9 +331,9 @@ sub lookup {
     # Exception
 
     $self->throw(
-        q~TAB-00001: Datensatz nicht gefunden~,
-        Key=>$key,
-        Value=>$val,
+        'TAB-00001: Datensatz nicht gefunden',
+        Key => $key,
+        Value => $val,
     );
 }
 
@@ -448,9 +448,9 @@ sub loadFromFile {
     my $rowStatus = undef;
 
     Quiq::Option->extract(\@_,
-        -colSep=>\$colSep,
-        -rowClass=>\$rowClass,
-        -rowStatus=>\$rowStatus,
+        -colSep => \$colSep,
+        -rowClass => \$rowClass,
+        -rowStatus => \$rowStatus,
     );
     $colSep = qr/\Q$colSep/;
 
@@ -802,8 +802,8 @@ sub asTable {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -msg=>\$msg,
-            -info=>\$info,
+            -msg => \$msg,
+            -info => \$info,
         );
         if ($msg) {
             $msg = $info? " - $msg": $msg;
@@ -871,7 +871,7 @@ sub asTable {
         $str .= sprintf "\n%s rows",$self->count;
         if (my $duration = $self->execTime + $self->fetchTime) {
             $str .= ', '.Quiq::Duration->new($duration)->asShortString(
-                -precision=>3,
+                -precision => 3,
             );
         }
     }
@@ -960,7 +960,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

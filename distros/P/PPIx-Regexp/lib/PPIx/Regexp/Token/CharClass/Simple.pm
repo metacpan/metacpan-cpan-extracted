@@ -46,12 +46,15 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.064';
+our $VERSION = '0.065';
 
-use constant UNICODE_PROPERTY_LITERAL =>
-    qr/ \A \\ [Pp] (?:
+use constant UNICODE_PROPERTY_LITERAL_VALUE => qr/
 		\{ \s* \^? \w [\w:=\s-]* \} |
 		[CLMNPSZ]	# perluniprops for 5.26.1
+    /smx;
+use constant UNICODE_PROPERTY_LITERAL =>
+    qr/ \A \\ [Pp] (?:
+	@{[ UNICODE_PROPERTY_LITERAL_VALUE ]}
     ) /smx;
 
 # CAVEAT: The following regular expression, despite its name, matches
@@ -96,12 +99,22 @@ use constant UNICODE_PROPERTY =>
 	my ( $self ) = @_;
 	if ( $self->content() =~ m/ \A \\ ( [Pp] ) ( [{] .* [}] | . ) \z /smx ) {
 	    my ( $kind, $prop ) = ( $1, $2 );
+
+	    my $literal = ( $prop =~
+		m/ \A @{[ UNICODE_PROPERTY_LITERAL_VALUE ]} \z /smx );
+
 	    if ( 1 < length $prop ) {
 		$prop =~ s/ \A [{] //smx;
 		$prop =~ s/ [}] \z //smx;
 	    }
-	    return sprintf
+
+	    $literal
+		and return sprintf
 		q<Match character %s Unicode or custom property '%s'>,
+		$kind_of_match{$kind}, $prop;
+
+	    return sprintf
+		q<Match character %s Unicode wildcard property '%s'>,
 		$kind_of_match{$kind}, $prop;
 	}
 	return $self->SUPER::explain();

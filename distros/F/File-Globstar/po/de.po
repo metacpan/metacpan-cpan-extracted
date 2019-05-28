@@ -1,5 +1,5 @@
 # German translations for File-Globstar.
-# Copyright (C) 2016-2017 Guido Flohr.
+# Copyright (C) 2016-2019 Guido Flohr.
 # This file is distributed under the same license as the
 # File-Globstar package.
 msgid ""

@@ -3,7 +3,7 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 # Create accessor routines
 BEGIN {
@@ -23,8 +23,8 @@ BEGIN {
         bitmask
     );
 
-    for my $a (@attrs) {
-        *{$a} = sub { my $s = shift; return $s->{$a} };
+    for my $attr (@attrs) {
+        *{$attr} = sub { my $s = shift; return $s->{$attr} };
     }
 }
 
@@ -183,7 +183,7 @@ Devel::StackTrace::Frame - A single frame in a stack trace
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 
@@ -245,7 +245,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2017 by David Rolsky.
+This software is Copyright (c) 2000 - 2019 by David Rolsky.
 
 This is free software, licensed under:
 

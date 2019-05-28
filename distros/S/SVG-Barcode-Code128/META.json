@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Barcode::Code128" : "2.21",
-            "SVG::Barcode" : "0.02",
+            "SVG::Barcode" : "0.10",
             "perl" : "v5.24.0"
          }
       },
@@ -53,7 +53,7 @@
          "web" : "https://github.com/Tekki/svg-barcode-code128"
       }
    },
-   "version" : "0.01",
+   "version" : "0.10",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

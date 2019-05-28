@@ -26,9 +26,9 @@ sub test_html : Test(2) {
     $self->is($html,qq|<input type="radio">\n|);
 
     $html = Quiq::Html::Widget::RadioButton->html($h,
-        name=>'aktiv',
-        option=>1,
-        value=>'',
+        name => 'aktiv',
+        option => 1,
+        value => '',
     );
     $self->is($html,qq|<input type="radio" name="aktiv" value="1">\n|);
 }

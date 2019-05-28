@@ -60,7 +60,6 @@ sub ACTION_build
     &replace('%htdocs%',"$m_hrSettings->{cgi}{DocumentRoot}","$cwd/blib/perl/config/mysql-admin.conf");
     &replace('%htdocs%',"$m_hrSettings->{cgi}{DocumentRoot}","$cwd/blib/lib/MySQL/Admin/Documentation.pm");
     &replace('%docu%',"$m_hrSettings->{cgi}{bin}./lib/MySQL/Admin/Documentatio.pm","$cwd/blib/lib/MySQL/Admin/Documentation.pm");
-
 }
 
 sub ACTION_realclean
@@ -298,17 +297,18 @@ my $inctance = $class->new(
     },
     module_name => 'MySQL::Admin',
     requires    => {
-        'HTML::Menu::TreeView'    => '>=1.15',
+        'HTML::Menu::TreeView'    => '>=1.21',
         'Test::More'              => '>=0.7',
         'DBI'                     => '>=1.50',
         'CGI'                     => '>=3.48',
         'MD5'                     => '>=2.03',
         'URI'                     => '>=1.40',
         'CGI::QuickForm'          => '>=1.93',
-        'JSON::XS'                => '>=3.04',
+        'JSON::XS'                => '>=4.02',
         'XML::Simple'             => '>=2.25',
         'perl'                    => '5.006000',
-        'Search::Tools::UTF8'     => '>=1.003',
+        'Search::Tools::UTF8'     => '>=1.007',
+        'GD'                      => '>=2.71',
         'Authen::Captcha'         => '>=1.024',
         'Frontier::RPC2'          => '>=0.06',
         'XML::XSLT'               => '>=0.48',
@@ -316,7 +316,7 @@ my $inctance = $class->new(
         'Text::Markdown::Hoedown' => '>=1.02'
     },
     ( $] >= 5.005 ? ( AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>' ) : () ),
-    dist_abstract      => 'Just a MySQL administration Web-App and CMS System',
+    dist_abstract      => 'Just a MySQL MarieDB administration Web-App and CMS System',
     license            => 'lgpl',
     create_makefile_pl => 'passthrough',
     meta_merge         => {

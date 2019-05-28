@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Underscored;
 use strict;
 use warnings;
 
-our $VERSION = '6.5'; # VERSION
+our $VERSION = '6.6'; # VERSION
 
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
@@ -49,11 +49,11 @@ App::ElasticSearch::Utilities::QueryString::Underscored - Extend some _<type>_ q
 
 =head1 VERSION
 
-version 6.5
+version 6.6
 
 =head1 SYNOPSIS
 
-=head2 App::ElasticSearch::Utilities::Underscored
+=head2 App::ElasticSearch::Utilities::QueryString::Underscored
 
 This plugin translates some special underscore surrounded tokens into
 the Elasticsearch Query DSL.

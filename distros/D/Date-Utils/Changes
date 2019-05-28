@@ -1,5 +1,8 @@
 Revision history for Date::Utils
 
+0.26  Mon May 27 12:40:00 2019
+      - Updated pod and SEE ALSO section.
+
 0.25  Sat Mar 09 10:10:00 2019
       - Updated dependency on Date::Exception v0.07.
 

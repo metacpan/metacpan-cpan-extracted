@@ -1,0 +1,40 @@
+=head1 NAME
+
+Data::Hopen::Phase - Namespace for hopen phases.
+
+=head1 SYNOPSIS
+
+The specific phases in hopen live under C<Data::Hopen::Phase>.  The
+current phases are:
+
+=over
+
+=item L<Data::Hopen::Phase::Probe>
+
+Read a foundations file and one or more context files; output a capability
+file and an options file.  The user may edit the options file.
+
+=item L<Data::Hopen::Phase::Gen>
+
+Read the capability, option, and context files, plus a recipes file identifying
+the build graph.  Output one or more blueprint files.
+
+=item B<Build>
+
+Not part of hopen --- run the blueprint files through make(1), ninja(1), or
+another build tool.
+
+If the dependencies change as the result of a build, the Gen phase is re-run.
+However, the Probe phase does not have to be re-run.
+
+=back
+
+=head1 PHILOSOPHY
+
+Hopen is a single-pass build system.  You do not have to re-run to converge
+on a final set of blueprint files.
+
+Hopen is context-aware.  You can change the build of a repo without having
+to touch files in that repo.
+
+=cut

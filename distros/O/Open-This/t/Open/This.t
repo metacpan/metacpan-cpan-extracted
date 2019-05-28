@@ -35,6 +35,30 @@ use Test::Differences;
 }
 
 {
+    my $text = './lib/Open/This.pm:17:3';
+    my ( $line_number, $column_number )
+        = Open::This::_maybe_extract_line_number( \$text );
+    is( $line_number,   17, 'ripgrep line_number' );
+    is( $column_number, 3,  'ripgrep column_number' );
+    is(
+        $text, './lib/Open/This.pm',
+        'ripgrep context line number and column number stripped'
+    );
+}
+
+{
+    my $text = './lib/Open/This.pm:135:20:sub _maybe_extract_line_number {';
+    my ( $line_number, $column_number )
+        = Open::This::_maybe_extract_line_number( \$text );
+    is( $line_number,   135, 'ripgrep line_number' );
+    is( $column_number, 20,  'ripgrep column_number' );
+    is(
+        $text, './lib/Open/This.pm',
+        'ripgrep context line number and column number stripped'
+    );
+}
+
+{
     my $text        = 'lib/Open/This.pm-17';
     my $line_number = Open::This::_maybe_extract_line_number( \$text );
     is(

@@ -165,7 +165,7 @@ to `bug-Test-Synopsis at rt.cpan.org`
 
 # AUTHOR
 
-Tatsuhiko Miyagawa &lt;miyagawa@bulknews.net>
+Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
 Goro Fuji blogged about the original idea at
 [http://d.hatena.ne.jp/gfx/20090224/1235449381](http://d.hatena.ne.jp/gfx/20090224/1235449381) based on the testing

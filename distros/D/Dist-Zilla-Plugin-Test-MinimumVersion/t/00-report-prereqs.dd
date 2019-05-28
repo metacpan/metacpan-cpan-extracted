@@ -45,6 +45,7 @@ do { my $x = {
                                       'Dist::Zilla::Role::TextTemplate' => '0',
                                       'List::Util' => '0',
                                       'Moose' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
                                       'Sub::Exporter::ForMethods' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'constant' => '0',

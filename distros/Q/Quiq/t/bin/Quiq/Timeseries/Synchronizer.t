@@ -47,10 +47,10 @@ sub test_new_2 : Test(7) {
 
     my $obj = Quiq::Timeseries::Synchronizer->new(600,
         qw/Latitude Longitude Temperature/,
-        -minTime=>1000,
-        -maxTime=>2000,
-        -offset=>300,
-        -window=>200,
+        -minTime => 1000,
+        -maxTime => 2000,
+        -offset => 300,
+        -window => 200,
     );
     $self->is(ref($obj),'Quiq::Timeseries::Synchronizer');
 
@@ -194,20 +194,20 @@ sub test_rows : Test(2) {
     }
 
     my $optA = [
-        count=>1,
-        meanValue=>1,
-        closestValue=>1,
-        closestTime=>1,
-        min=>1,
-        max=>1,
-        stdDeviation=>1,
-        roundTo=>2,
-        stdDeviation=>1,
+        count => 1,
+        meanValue => 1,
+        closestValue => 1,
+        closestTime => 1,
+        min => 1,
+        max => 1,
+        stdDeviation => 1,
+        roundTo => 2,
+        stdDeviation => 1,
     ];
     my ($titleA,$rowA) = $tsy->rows(
-        $param=>$optA,
-        -timeFormat=>'yyyymmddxhhmmss',
-        -noValue=>'NULL',
+        $param => $optA,
+        -timeFormat => 'yyyymmddxhhmmss',
+        -noValue => 'NULL',
     );
 
     my @expectedTitles = qw/Time P1_Count P1 P1_ClosestValue P1_ClosestTime
@@ -245,20 +245,20 @@ sub test_rows_geoPosition : Test(2) {
     my $param = 'Temperature';
 
     my $tsy = Quiq::Timeseries::Synchronizer->new(10,$param,
-        -geoCoordinates=>1,
+        -geoCoordinates => 1,
     );
     $tsy->add(2,40.7143528,-74.0059731,$param=>52);
     $tsy->add(3,41.8781136,-87.6297982,$param=>64);
     $tsy->add(4,33.7489954,-84.3879824,$param=>73);
 
     my $optA = [
-        count=>1,
-        meanValue=>1,
+        count => 1,
+        meanValue => 1,
     ];
     my ($titleA,$rowA) = $tsy->rows(
-        $param=>[meanValue=>1,count=>1],
-        -timeFormat=>'yyyymmddxhhmmss',
-        -noValue=>'NULL',
+        $param => [meanValue=>1,count=>1],
+        -timeFormat => 'yyyymmddxhhmmss',
+        -noValue => 'NULL',
     );
 
     my @expectedTitles = qw/Time Latitude Longitude Temperature

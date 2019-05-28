@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Time::HiRes ();
 use Quiq::Option;
@@ -116,19 +116,19 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        cmdPrefix=>'',
-        cmdAnsiColor=>undef, 
-        dryRun=>0,
-        dirStack=>[],
-        log=>0,
-        logDest=>*STDOUT,
-        logRewrite=>undef,
-        msgPrefix=>'',
-        quiet=>0,
-        time=>0,
-        timePrefix=>'',
-        timeSummary=>0,
-        t0=>Time::HiRes::gettimeofday,
+        cmdPrefix => '',
+        cmdAnsiColor => undef, 
+        dryRun => 0,
+        dirStack => [],
+        log => 0,
+        logDest => *STDOUT,
+        logRewrite => undef,
+        msgPrefix => '',
+        quiet => 0,
+        time => 0,
+        timePrefix => '',
+        timeSummary => 0,
+        t0 => Time::HiRes::gettimeofday,
     );
     $self->set(@_);
 
@@ -278,9 +278,9 @@ sub exec {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -capture=>\$capture,
-            -quiet=>\$quiet,
-            -sloppy=>\$sloppy,
+            -capture => \$capture,
+            -quiet => \$quiet,
+            -sloppy => \$sloppy,
         );
     }
 
@@ -322,8 +322,8 @@ sub exec {
     }
     else {
         $self->throw(
-            q~CMD-00004: Ungültiger Wert für -capture~,
-            Capture=>$capture,
+            'CMD-00004: Ungültiger Wert für -capture',
+            Capture => $capture,
         );
     }
 
@@ -404,7 +404,7 @@ Die Methode liefert keinen Wert zurück.
 =head4 Description
 
 Wechsle in Arbeitsverzeichnis $dir. Anmerkung: Diese Änderung gilt
-für den gesamten Prozess, nicht nur für das Shell-Objekt.
+auch für den aufrufenden Prozess, nicht nur für das Shell-Objekt.
 
 =cut
 
@@ -524,28 +524,28 @@ sub checkError {
     }
     elsif ($errCode == -1) {
         $this->throw(
-            q~CMD-00001: Kommando konnte nicht aufgerufen werden~,
-            Command=>$cmd,
-            ErrorMessage=>$errMsg,
+            'CMD-00001: Kommando konnte nicht aufgerufen werden',
+            Command => $cmd,
+            ErrorMessage => $errMsg,
         );
     }
     elsif ($errCode & 127) {       # Abbruch mit Signal
         my $sig = $errCode & 127;  # unterste 8 Bit sind Signalnummer
         my $core = $errCode & 128; # 8. Bit zeigt Coredump an
         $this->throw(
-            q~CMD-00003: Kommando wurde abgebrochen~,
-            Signal=>$sig.($core? ' (Coredump)': ''),
-            Command=>$cmd,
-            ErrorMessage=>$errMsg,
+            'CMD-00003: Kommando wurde abgebrochen',
+            Signal => $sig.($core? ' (Coredump)': ''),
+            Command => $cmd,
+            ErrorMessage => $errMsg,
         );
     }
     $errCode >>= 8;
     $this->throw(
-        q~CMD-00002: Kommando endete mit Fehler~,
-        ExitCode=>$errCode,
-        Command=>$cmd,
-        Cwd=>Cwd::getcwd,
-        ErrorMessage=>$errMsg,
+        'CMD-00002: Kommando endete mit Fehler',
+        ExitCode => $errCode,
+        Command => $cmd,
+        Cwd => Cwd::getcwd,
+        ErrorMessage => $errMsg,
     );
 }
 
@@ -588,7 +588,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

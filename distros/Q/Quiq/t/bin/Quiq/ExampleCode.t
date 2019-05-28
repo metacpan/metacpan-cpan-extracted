@@ -27,8 +27,8 @@ sub test_unitTest : Test(2) {
     # 1) Wertrückgabe
         
     my $exa = Quiq::ExampleCode->new(
-        -fileHandle=>\*STDERR,
-        -verbose=>$verbose,
+        -fileHandle => \*STDERR,
+        -verbose => $verbose,
     );
 
     my $cmd = $exa->execute(q|
@@ -40,17 +40,17 @@ sub test_unitTest : Test(2) {
     # 2) Rückgabe Objekt
     
     $exa = Quiq::ExampleCode->new(
-        -fileHandle=>\*STDERR,
-        -objectReturn=>1,
-        -verbose=>0,
+        -fileHandle => \*STDERR,
+        -objectReturn => 1,
+        -verbose => 0,
     );
     
     my $obj = $exa->execute(q|
         Quiq::FFmpeg->videoToImages('video.mp4','img',
-            -aspectRatio=>'4:3',
-            -framestep=>6,
-            -start=>3,
-            -stop=>10,
+            -aspectRatio => '4:3',
+            -framestep => 6,
+            -start => 3,
+            -stop => 10,
         );
     |);
     $cmd = $obj->result;

@@ -1,7 +1,7 @@
 package Calendar::DatesRoles::DataUser::CalendarVar;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,6 +53,7 @@ sub get_max_year {
 
 sub get_entries {
     my $mod = shift;
+    my $params = ref $_[0] eq 'HASH' ? shift : {};
     my ($year, $month, $day) = @_;
 
     die "Please specify year" unless defined $year;
@@ -67,6 +68,7 @@ sub get_entries {
         next unless $e->{year} == $year;
         next if defined $month && $e->{month} != $month;
         next if defined $day   && $e->{day}   != $day;
+        next if $mod->can("filter_entry") && !$mod->filter_entry($e, $params);
         push @res, $e;
     }
 
@@ -88,7 +90,7 @@ Calendar::DatesRoles::DataUser::CalendarVar - Provide Calendar::Dates interface 
 
 =head1 VERSION
 
-This document describes version 0.001 of Calendar::DatesRoles::DataUser::CalendarVar (from Perl distribution Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-02-15.
+This document describes version 0.002 of Calendar::DatesRoles::DataUser::CalendarVar (from Perl distribution Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-05-25.
 
 =head1 DESCRIPTION
 

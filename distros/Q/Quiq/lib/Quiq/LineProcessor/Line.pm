@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ sub new {
 
     if (!$inputR || !ref $inputR) {
         $class->throw(
-            q~LINE-00002: Illegal path~,
+            'LINE-00002: Illegal path',
             Path => !defined($inputR)? 'undef': $inputR,
             Text => $text,
             Line => $number,
@@ -373,8 +373,8 @@ sub dump {
     }
 
     $self->throw(
-        q~LINE-00001: Ungültiges Ausgabeformat~,
-        Format=>$format,
+        'LINE-00001: Ungültiges Ausgabeformat',
+        Format => $format,
     );
 }
 
@@ -382,7 +382,7 @@ sub dump {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

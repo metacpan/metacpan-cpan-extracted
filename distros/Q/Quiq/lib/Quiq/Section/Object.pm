@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Path;
 
@@ -683,9 +683,9 @@ sub get {
         my $val = $self->[3]->{$key};
         if (ref($val) && $key =~ /^[A-Z]/) {
             $self->throw(
-                q~SECOBJ-00001: Schlüssel besitzt mehrere Werte~,
-                Key=>$key,
-                Values=>'['.join(',',@$val).']',
+                'SECOBJ-00001: Schlüssel besitzt mehrere Werte',
+                Key => $key,
+                Values => '['.join(',',@$val).']',
             );
         }
         push @arr,$val;
@@ -786,12 +786,12 @@ sub getBool {
     }
     else {
         $self->throw(
-            q~COTEDO-00001: Illegal attribute value. Only Yes/No allowed.~,
-            Attribute=>$key,
-            Value=>$val,
-            File=>$self->file,
-            Line=>$self->line,
-            -stacktrace=>0,
+            'COTEDO-00001: Illegal attribute value. Only Yes/No allowed.',
+            Attribute => $key,
+            Value => $val,
+            File => $self->file,
+            Line => $self->line,
+            -stacktrace => 0,
         );
     }
 
@@ -835,11 +835,11 @@ sub getMandatory {
     my $val = $self->get($key);
     if (!defined $val || $val eq '') { 
         $self->throw(
-            q~SECOBJ-00002: Attribute has no value~,
-            Key=>$key,
-            File=>$self->file,
-            Line=>$self->line,
-            -stacktrace=>0,
+            'SECOBJ-00002: Attribute has no value',
+            Key => $key,
+            File => $self->file,
+            Line => $self->line,
+            -stacktrace => 0,
         );
     }
 
@@ -1069,10 +1069,10 @@ setze ihn auf den angegebenen Defaultwert.
 =head4 Example
 
     $sec->setDefault(
-        Width=>1000,
-        EntityMenuWidth=>345,
-        BorderWidth=>1,
-        PackageMenuHeight=>34,
+        Width => 1000,
+        EntityMenuWidth => 345,
+        BorderWidth => 1,
+        PackageMenuHeight => 34,
     );
 
 =cut
@@ -1248,12 +1248,12 @@ sub validate {
 
     if (!$contentAllowed && $self->[4] ne '' && $self->[4] ne '# eof') {
         $self->throw(
-            q~SECTION-00001: Inhalt ist nicht erlaubt~,
-            Section=>$self->type,
-            Content=>$self->[4],
-            File=>$self->file,
-            Line=>$self->line,
-            -stacktrace=>0,
+            'SECTION-00001: Inhalt ist nicht erlaubt',
+            Section => $self->type,
+            Content => $self->[4],
+            File => $self->file,
+            Line => $self->line,
+            -stacktrace => 0,
         );
     }
 
@@ -1280,12 +1280,12 @@ sub validate {
         }
 
         $self->throw(
-            q~SECTION-00001: Unknown section attributes~,
-            Section=>$self->type,
-            Keys=>join(', ',@keys),
-            File=>$self->file,
-            Line=>$self->line,
-            -stacktrace=>0,
+            'SECTION-00001: Unknown section attributes',
+            Section => $self->type,
+            Keys => join(', ',@keys),
+            File => $self->file,
+            Line => $self->line,
+            -stacktrace => 0,
         );
     }
 
@@ -1356,9 +1356,9 @@ sub error {
     $self->throw(
         $msg,
         @_,
-        File=>$self->file,
-        Line=>$self->line,
-        -stacktrace=>0,
+        File => $self->file,
+        Line => $self->line,
+        -stacktrace => 0,
     );
 }
 
@@ -1394,8 +1394,8 @@ sub AUTOLOAD {
 
     if (!ref $this) {
         $this->throw(
-            q~HASH-00002: Klassen-Methode existiert nicht~,
-            Method=>$key,
+            'HASH-00002: Klassen-Methode existiert nicht',
+            Method => $key,
         );
     }
 
@@ -1403,9 +1403,9 @@ sub AUTOLOAD {
 
     if (!exists $this->[3]->{$key}) {
         $this->throw(
-            q~HASH-00001: Schlüssel existiert nicht~,
-            Attribute=>$key,
-            Class=>ref($this)? ref($this): $this,
+            'HASH-00001: Schlüssel existiert nicht',
+            Attribute => $key,
+            Class => ref($this)? ref($this): $this,
         );
     }
 
@@ -1432,7 +1432,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

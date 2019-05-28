@@ -1,5 +1,36 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+2.0.1 2019-05-21
+
+- Removed
+  - Ubuntu 14.04 is no longer supported
+
+- Changed
+  - inc::Module::install is no longer bundled
+  - Dependency declarations have been cleaned up
+
+
+2.0.0 2019-01-25 (pre-release version)
+ - Status
+   - This is a pre-release version not fully tested on all supported
+     OS's and Perl versions. This version will not be available on
+     CPAN.
+ - API change
+   - Change set_edns_present/unset_edns_present methods returned 
+     values (part of #62)
+ - Features
+   - Added support to access EDNS (OPT record) to be able to implement
+     test cases for ENDS and DNS Flag Day https://dnsflagday.net/ e.g.
+     (#62):
+     - New EDNS accessor
+     - Add EDNS RDATA get/set functions
+     - Add interface to "fallback" resolver flag
+ - Fixed
+   - All link references on Github now to zonemaster/zonemaster instead
+     of old dotse/zonemaster #60
+   - Updated supported perl versions for travis (#62)   
+
+
 1.1.0 2018-06-25
  - Features
    - Ldns 1.7.0 using submodule (#41) 

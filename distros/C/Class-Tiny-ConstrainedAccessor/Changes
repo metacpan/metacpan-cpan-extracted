@@ -1,5 +1,12 @@
 Revision history for Class-Tiny-ConstrainedAccessor
 
+0.000010    2019-05-25
+        - Non-trial release of 0.000009
+
+0.000009    2019-05-25 (TRIAL VERSION)
+        - Added custom-constraint support.  This way you can use constraints
+          without needing a type system.
+
 0.000008    2019-03-28
         - Finally remember to update this file! :)
 
@@ -12,8 +19,7 @@ Revision history for Class-Tiny-ConstrainedAccessor
         - Compared to v0.000003, the package now checks constructor
           parameters and passes tests on all supported Perl versions.
 
-0.000005    2019-03-24
-        - Trial release
+0.000005    2019-03-24 (TRIAL VERSION)
         - See changes for v0.000004, including checking constructor parameters.
         - Fix tests to run on <5.010
 
@@ -24,11 +30,11 @@ Revision history for Class-Tiny-ConstrainedAccessor
 0.000003    2019-03-19
         - Updated documentation.  First non-TRIAL release.
 
-0.000002    2019-03-17
+0.000002    2019-03-17 (TRIAL VERSION)
         - Support other type systems (GH-1).  Thanks to TOBYINK for code.
         - Constraint-check default values (GH-3).
         - Run as far back as 5.006 (GH-2).
 
-0.000001    2019-03-12
+0.000001    2019-03-12 (TRIAL VERSION)
         First version, released on an unsuspecting world.
 

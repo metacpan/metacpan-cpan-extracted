@@ -30,10 +30,10 @@ sub test_html : Test(2) {
         q| <input type="radio" name="vererbung" value="0">lokal|;
 
     $html = Quiq::Html::Widget::RadioButtonBar->html($h,
-        name=>'vererbung',
-        options=>[1,0],
-        labels=>['erben','lokal'],
-        value=>1,
+        name => 'vererbung',
+        options => [1,0],
+        labels => ['erben','lokal'],
+        value => 1,
     );
     $self->is($html,$expected);
 }

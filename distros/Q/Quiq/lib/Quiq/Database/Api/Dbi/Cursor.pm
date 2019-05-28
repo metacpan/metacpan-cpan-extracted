@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -74,13 +74,13 @@ sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(
-        sth=>undef,
-        bindVars=>0,
-        bindTypes=>[],
-        db=>undef,
-        titles=>[],
-        hits=>0,
-        id=>0,
+        sth => undef,
+        bindVars => 0,
+        bindTypes => [],
+        db => undef,
+        titles => [],
+        hits => 0,
+        id => 0,
     );
     $self->set(@_);
 
@@ -385,7 +385,7 @@ sub fetch {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

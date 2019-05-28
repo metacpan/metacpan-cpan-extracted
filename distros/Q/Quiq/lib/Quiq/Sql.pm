@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -114,14 +114,14 @@ sub new {
     }
 
     if (!$dbmsName) {
-        $class->throw(q~SQL-00001: Unbekanntes DBMS~,Dbms=>$dbms);
+        $class->throw('SQL-00001: Unbekanntes DBMS',Dbms=>$dbms);
     }
 
     # Objekt instantiieren
 
     return $class->SUPER::new(
-        dbms=>$dbmsName,
-        version=>$version,
+        dbms => $dbmsName,
+        version => $version,
     );
 }
 
@@ -402,8 +402,8 @@ sub resolve {
         my $val = shift;
         if ($val =~ /%s/) {
             $self->throw(
-                q~SQL-00099: Wert enthält %s~,
-                Value=>$val,
+                'SQL-00099: Wert enthält %s',
+                Value => $val,
             );
         }
         $stmt =~ s/\?/$self->stringLiteral($val,'NULL')/e;
@@ -692,7 +692,7 @@ sub commands {
     my $cmdA = $Commands{$dbms};
     if (!@$cmdA) {
         $self->throw(
-            q~SQL-00099: No commands defined for DBMS~,
+            'SQL-00099: No commands defined for DBMS',
             Dbms => $dbms,
         );
     }
@@ -763,54 +763,54 @@ Einige Konvertierungen im Falle von Oracle:
 # -----------------------------------------------------------------------------
 
 my %DataType = (
-    Oracle=>{
-        STRING=>'VARCHAR2',
-        TEXT=>'CLOB',
-        INTEGER=>'NUMBER',
-        REAL=>'NUMBER',
-        DATETIME=>'TIMESTAMP',
-        BLOB=>'BLOB',
+    Oracle => {
+        STRING => 'VARCHAR2',
+        TEXT => 'CLOB',
+        INTEGER => 'NUMBER',
+        REAL => 'NUMBER',
+        DATETIME => 'TIMESTAMP',
+        BLOB => 'BLOB',
     },
-    PostgreSQL=>{
-        STRING=>'VARCHAR',
-        TEXT=>'TEXT',
-        INTEGER=>'NUMERIC',
-        REAL=>'NUMERIC',
-        DATETIME=>'TIMESTAMP',
-        BLOB=>'BYTEA',
+    PostgreSQL => {
+        STRING => 'VARCHAR',
+        TEXT => 'TEXT',
+        INTEGER => 'NUMERIC',
+        REAL => 'NUMERIC',
+        DATETIME => 'TIMESTAMP',
+        BLOB => 'BYTEA',
     },
-    SQLite=>{
-        STRING=>'TEXT',
-        TEXT=>'TEXT',
-        INTEGER=>'INTEGER',
-        REAL=>'REAL',
-        DATETIME=>'TIMESTAMP',
-        BLOB=>'BLOB',
+    SQLite => {
+        STRING => 'TEXT',
+        TEXT => 'TEXT',
+        INTEGER => 'INTEGER',
+        REAL => 'REAL',
+        DATETIME => 'TIMESTAMP',
+        BLOB => 'BLOB',
     },
-    MySQL=>{
-        STRING=>'VARCHAR',
-        TEXT=>'LONGTEXT',
-        INTEGER=>'BIGINT',
-        REAL=>'DECIMAL',
-        DATETIME=>'TIMESTAMP',
-        BLOB=>'LONGBLOB',
+    MySQL => {
+        STRING => 'VARCHAR',
+        TEXT => 'LONGTEXT',
+        INTEGER => 'BIGINT',
+        REAL => 'DECIMAL',
+        DATETIME => 'TIMESTAMP',
+        BLOB => 'LONGBLOB',
     },
-    Access=>{
-        STRING=>'TEXT',
-        TEXT=>'MEMO',
-        INTEGER=>'LONG',
-        REAL=>'DOUBLE',
-        DATETIME=>'DATETIME',
-        BLOB=>'LONGBINARY',
+    Access => {
+        STRING => 'TEXT',
+        TEXT => 'MEMO',
+        INTEGER => 'LONG',
+        REAL => 'DOUBLE',
+        DATETIME => 'DATETIME',
+        BLOB => 'LONGBINARY',
     },
-    MSSQL=>{
+    MSSQL => {
         # FIXME: Ungeprüft
-        STRING=>'TEXT',
-        TEXT=>'MEMO',
-        INTEGER=>'LONG',
-        REAL=>'DOUBLE',
-        DATETIME=>'DATETIME',
-        BLOB=>'LONGBINARY',
+        STRING => 'TEXT',
+        TEXT => 'MEMO',
+        INTEGER => 'LONG',
+        REAL => 'DOUBLE',
+        DATETIME => 'DATETIME',
+        BLOB => 'LONGBINARY',
     },
 );
 
@@ -828,17 +828,17 @@ sub dataType {
     my $dbms = $self->{'dbms'};
     if (!exists $DataType{$dbms}{$portableType}) {
         $self->throw(
-            q~SQL-00003: Unbekannter Datentyp~,
-            Type=>$portableType,
+            'SQL-00003: Unbekannter Datentyp',
+            Type => $portableType,
         );
     }
 
     my $dbmsType = $DataType{$dbms}{$portableType};
     unless ($dbmsType) {
         $self->throw(
-            q~SQL-00004: Datentyp von DBMS nicht unterstützt~,
-            Dbms=>$dbms,
-            Type=>$portableType,
+            'SQL-00004: Datentyp von DBMS nicht unterstützt',
+            Dbms => $dbms,
+            Type => $portableType,
         );
     }
 
@@ -907,46 +907,46 @@ nicht-leeren Aufzählung von folgenden Schlüssel/Wert-Paaren:
 
 =over 4
 
-=item default=>$value
+=item default => $value
 
 Defaultwert der Kolumne.
 
-=item null=>$bool
+=item null => $bool
 
 Kolumne ist kein Pflichtfeld. Diese explizite Setzung wird bei
 MySQL gebraucht, wenn ein TIMESTAMP-Feld nicht
 '0000-00-00 00:00:00' als Defaultwert erhalten soll.
 
-=item notNull=>$bool
+=item notNull => $bool
 
 Kolumne ist Pflichtfeld.
 
-=item autoIncrement=>$bool
+=item autoIncrement => $bool
 
 Das DBMS erzeugt beim Einfügen eines Datensatzes einen
 eindeutigen Wert (SQLite und MySQL).
 
-=item primaryKey=>$bool
+=item primaryKey => $bool
 
 Kolumne ist Primärschlüsselkolumne.
 
-=item type=>$type
+=item type => $type
 
 Portabler Kolumnentyp.
 
-=item oracleType=>$oracleType
+=item oracleType => $oracleType
 
 Kolumnentyp für Oracle.
 
-=item postgresqlType=>$postgresqlType
+=item postgresqlType => $postgresqlType
 
 Kolumnentyp für PostgreSQL.
 
-=item sqliteType=>$sqliteType
+=item sqliteType => $sqliteType
 
 Kolumnentyp für SQLite.
 
-=item mysqlType=>$mysqlType
+=item mysqlType => $mysqlType
 
 Kolumnentyp für MySQL.
 
@@ -970,7 +970,7 @@ für das DBMS angegeben ist:
 
     $sql = Quiq::Sql->new('Oracle');
     $type = $sql->columnDef(
-        type=>'STRING(20)',
+        type => 'STRING(20)',
     );
     ==>
     'VARCHAR2(20)'
@@ -981,8 +981,8 @@ DBMS-Typ wird verwendet, wenn angegeben:
 
     $sql = Quiq::Sql->new('Oracle');
     $type = $sql->columnDef(
-        type=>'INTEGER(5)',
-        oracleType=>'NUMBER(5)',
+        type => 'INTEGER(5)',
+        oracleType => 'NUMBER(5)',
     );
     ==>
     'NUMBER(5)'
@@ -998,16 +998,16 @@ sub columnDef {
     # @_: @typeSpec
 
     my $keyVal = Quiq::Hash->new(
-        default=>undef,
-        null=>undef,
-        notNull=>undef,
-        primaryKey=>undef,
-        autoIncrement=>undef, # unportabel, nicht Oracle und PostgreSQL
-        type=>undef,
-        oracleType=>undef,
-        postgresqlType=>undef,
-        sqliteType=>undef,
-        mysqlType=>undef,
+        default => undef,
+        null => undef,
+        notNull => undef,
+        primaryKey => undef,
+        autoIncrement => undef, # unportabel, nicht Oracle und PostgreSQL
+        type => undef,
+        oracleType => undef,
+        postgresqlType => undef,
+        sqliteType => undef,
+        mysqlType => undef,
     );
     if (@_%2 == 1) {
         unshift @_,'type';
@@ -1025,8 +1025,8 @@ sub columnDef {
     }
     if (!$type) {
         $self->throw(
-            q~SQL-00007: Kein Kolumnen-Typ für DBMS angegeben~,
-            DBMS=>$dbms,
+            'SQL-00007: Kein Kolumnen-Typ für DBMS angegeben',
+            DBMS => $dbms,
         );
     }
 
@@ -1481,8 +1481,8 @@ sub createUser {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-             -defaultTableSpace=>\$defaultTableSpace,
-             -tempTableSpace=>\$tempTableSpace,
+             -defaultTableSpace => \$defaultTableSpace,
+             -tempTableSpace => \$tempTableSpace,
         );
     }
 
@@ -1613,7 +1613,7 @@ sub splitTableName {
     if (!$table) {
         if (!$sloppy) {
             $class->throw(
-                q~SQL-00099: Tablename without schema prefix~,
+                'SQL-00099: Tablename without schema prefix',
                 Tablename => $name,
             );
         }
@@ -1673,37 +1673,37 @@ Folgende Kolumnen-Optionen sind definiert:
 
 =over 4
 
-=item notNull=>$bool
+=item notNull => $bool
 
 Kolumne ist Pflichtfeld.
 
-=item autoIncrement=>$bool
+=item autoIncrement => $bool
 
 Das DBMS erzeugt beim Einfügen eines Datensatzes einen
 eindeutigen Wert (nicht Oracle und PostgreSQL, diese
 haben das Konzept der Sequenz).
 
-=item primaryKey=>$bool
+=item primaryKey => $bool
 
 Kolumne ist Primärschlüsselkolumne.
 
-=item type=>$type
+=item type => $type
 
 Portabler Kolumnentyp.
 
-=item oracleType=>$oracleType
+=item oracleType => $oracleType
 
 Kolumnentyp für Oracle.
 
-=item postgresqlType=>$postgresqlType
+=item postgresqlType => $postgresqlType
 
 Kolumnentyp für PostgreSQL.
 
-=item sqliteType=>$sqliteType
+=item sqliteType => $sqliteType
 
 Kolumnentyp für SQLite.
 
-=item mysqlType=>$mysqlType
+=item mysqlType => $mysqlType
 
 Kolumnentyp für MySQL.
 
@@ -1732,8 +1732,8 @@ sub createTable {
 
     if (@_) {
         Quiq::Option->extract(-mode=>'sloppy',\@_,
-             -tableSpace=>\$tableSpace,
-             -tableType=>\$tableType,
+             -tableSpace => \$tableSpace,
+             -tableType => \$tableType,
         );
     }
 
@@ -2242,9 +2242,9 @@ sub addPrimaryKeyConstraint {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-             -constraintName=>\$constraintName,
-             -exceptionTable=>\$exceptionTable,
-             -tableSpace=>\$tableSpace,
+             -constraintName => \$constraintName,
+             -exceptionTable => \$exceptionTable,
+             -tableSpace => \$tableSpace,
         );
     }
 
@@ -2373,12 +2373,12 @@ sub addForeignKeyConstraint {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -constraintName=>\$constraintName,
-            -defer=>\$defer,
-            -disable=>\$disable,
-            -exceptionTable=>\$exceptionTable,
-            -onDelete=>\$onDelete,
-            -refTableColumns=>\$refTableColumns,
+            -constraintName => \$constraintName,
+            -defer => \$defer,
+            -disable => \$disable,
+            -exceptionTable => \$exceptionTable,
+            -onDelete => \$onDelete,
+            -refTableColumns => \$refTableColumns,
         );
     }
 
@@ -2512,8 +2512,8 @@ sub addNotNullConstraint {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-             -constraintName=>\$constraintName,
-             -exceptionTable=>\$exceptionTable,
+             -constraintName => \$constraintName,
+             -exceptionTable => \$exceptionTable,
         );
     }
 
@@ -2604,8 +2604,8 @@ sub addCheckConstraint {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-             -constraintName=>\$constraintName,
-             -exceptionTable=>\$exceptionTable,
+             -constraintName => \$constraintName,
+             -exceptionTable => \$exceptionTable,
         );
     }
 
@@ -2707,9 +2707,9 @@ sub addUniqueConstraint {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-             -constraintName=>\$constraintName,
-             -exceptionTable=>\$exceptionTable,
-             -tableSpace=>\$tableSpace,
+             -constraintName => \$constraintName,
+             -exceptionTable => \$exceptionTable,
+             -tableSpace => \$tableSpace,
         );
     }
 
@@ -2841,9 +2841,9 @@ sub createIndex {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-             -indexName=>\$indexName,
-             -tableSpace=>\$tableSpace,
-             -unique=>\$unique,
+             -indexName => \$indexName,
+             -tableSpace => \$tableSpace,
+             -unique => \$unique,
         );
     }
 
@@ -2965,7 +2965,7 @@ sub createSequence {
     my $startWith = 1;
     if (@_) {
         Quiq::Option->extract(\@_,
-             -startWith=>\$startWith,
+             -startWith => \$startWith,
         );
     }
 
@@ -3145,8 +3145,8 @@ sub createFunction {
     my $returns = undef;
 
     Quiq::Option->extract(\@_,
-        -replace=>\$replace,
-        -returns=>\$returns,
+        -replace => \$replace,
+        -returns => \$returns,
     );
     my $name = shift;
     my $body = Quiq::String->removeIndentation(shift);
@@ -3201,7 +3201,7 @@ sub dropFunction {
     my $cascade = 0;
 
     Quiq::Option->extract(\@_,
-        -cascade=>\$cascade,
+        -cascade => \$cascade,
     );
     my $name = shift;
 
@@ -3227,7 +3227,7 @@ sub dropFunction {
     $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
         $body,@opt);
     $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
-        -execute=>$proc,@opt);
+        -execute => $proc,@opt);
 
 =head4 Options
 
@@ -3253,7 +3253,7 @@ B<Oracle>
         'before',
         'insert|update',
         'row',
-        -replace=>1,'
+        -replace => 1,'
         <body>
         '
     );
@@ -3280,7 +3280,7 @@ B<PostgreSQL>
         'before',
         'insert|update',
         'row',
-        -execute=>'<proc>',
+        -execute => '<proc>',
     );
     
     CREATE TRIGGER <name>
@@ -3320,8 +3320,8 @@ sub createTrigger {
     my $replace = 0;
 
     Quiq::Option->extract(\@_,
-        -execute=>\$execute,
-        -replace=>\$replace,
+        -execute => \$execute,
+        -replace => \$replace,
     );
     my $body = Quiq::String->removeIndentation(shift);
 
@@ -3876,9 +3876,9 @@ SELECT mit Statement-Muster
     __SQL__
     
     $stmt = $sql->select(
-        -stmt=>$select,
-        -select=>qw/sta_id sta_name par_id par_name/,
-        -orderBy=>qw/sta_name par_name/,
+        -stmt => $select,
+        -select => qw/sta_id sta_name par_id par_name/,
+        -orderBy => qw/sta_name par_name/,
     );
     =>
     SELECT
@@ -3930,19 +3930,19 @@ sub select {
     my $stmt = '';
 
     Quiq::Option->extractMulti(\@_,
-        -args=>\@args,
-        -comment=>\$comment,
-        -select=>\@select,
-        -distinct=>\$distinct,
-        -hint=>\$hint,
-        -from=>\@from,
-        -where=>\@where,
-        -groupBy=>\@groupBy,
-        -having=>\@having,
-        -orderBy=>\@orderBy,
-        -limit=>\$limit,
-        -offset=>\$offset,
-        -stmt=>\$stmt,
+        -args => \@args,
+        -comment => \$comment,
+        -select => \@select,
+        -distinct => \$distinct,
+        -hint => \$hint,
+        -from => \@from,
+        -where => \@where,
+        -groupBy => \@groupBy,
+        -having => \@having,
+        -orderBy => \@orderBy,
+        -limit => \$limit,
+        -offset => \$offset,
+        -stmt => \$stmt,
     );
 
     my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
@@ -4077,9 +4077,9 @@ sub select {
     }
     elsif ($selectClause) {
         $self->throw(
-            q~SELECT-00001: Kein Platzhalter für SELECT-Kolumnen~,
-            Stmt=>$stmt,
-            SelectClause=>$selectClause,
+            'SELECT-00001: Kein Platzhalter für SELECT-Kolumnen',
+            Stmt => $stmt,
+            SelectClause => $selectClause,
         );
     }
 
@@ -4092,9 +4092,9 @@ sub select {
         }
         else {
             $self->throw(
-                q~SELECT-00002: Kein Platzhalter für FROM-Klausel~,
-                Stmt=>$stmt,
-                FromClause=>$fromClause,
+                'SELECT-00002: Kein Platzhalter für FROM-Klausel',
+                Stmt => $stmt,
+                FromClause => $fromClause,
             );
         }
     }
@@ -4109,9 +4109,9 @@ sub select {
         }
         else {
             $self->throw(
-                q~SELECT-00003: Kein Platzhalter für WHERE-Klausel~,
-                Stmt=>$stmt,
-                WhereClause=>$whereClause,
+                'SELECT-00003: Kein Platzhalter für WHERE-Klausel',
+                Stmt => $stmt,
+                WhereClause => $whereClause,
             );
         }
     }
@@ -4125,9 +4125,9 @@ sub select {
         }
         else {
             $self->throw(
-                q~SELECT-00003: Kein Platzhalter für GROUP BY-Klausel~,
-                Stmt=>$stmt,
-                GroupByClause=>$groupByClause,
+                'SELECT-00003: Kein Platzhalter für GROUP BY-Klausel',
+                Stmt => $stmt,
+                GroupByClause => $groupByClause,
             );
         }
     }
@@ -4141,9 +4141,9 @@ sub select {
         }
         else {
             $self->throw(
-                q~SELECT-00003: Kein Platzhalter für HAVING-Klausel~,
-                Stmt=>$stmt,
-                HavingClause=>$havingClause,
+                'SELECT-00003: Kein Platzhalter für HAVING-Klausel',
+                Stmt => $stmt,
+                HavingClause => $havingClause,
             );
         }
     }
@@ -4157,9 +4157,9 @@ sub select {
         }
         else {
             $self->throw(
-                q~SELECT-00003: Kein Platzhalter für ORDER BY-Klausel~,
-                Stmt=>$stmt,
-                OrderByClause=>$orderByClause,
+                'SELECT-00003: Kein Platzhalter für ORDER BY-Klausel',
+                Stmt => $stmt,
+                OrderByClause => $orderByClause,
             );
         }
     }
@@ -4183,9 +4183,9 @@ sub select {
             }
             else {
                 $self->throw(
-                    q~SELECT-00003: Kein Platzhalter für OFFSET~,
-                    Stmt=>$stmt,
-                    Offset=>$offset,
+                    'SELECT-00003: Kein Platzhalter für OFFSET',
+                    Stmt => $stmt,
+                    Offset => $offset,
                 );
             }
         }
@@ -4209,9 +4209,9 @@ sub select {
             }
             else {
                 $self->throw(
-                    q~SELECT-00003: Kein Platzhalter für LIMIT~,
-                    Stmt=>$stmt,
-                    Limit=>$limit,
+                    'SELECT-00003: Kein Platzhalter für LIMIT',
+                    Stmt => $stmt,
+                    Limit => $limit,
                 );
             }
         }
@@ -4276,10 +4276,10 @@ Werte leer, wird ein Null-Statement (Leerstring) geliefert.
 Normales INSERT, Schlüssel/Wert-Paare
 
     $stmt = $sql->insert('person',
-        per_id=>10,
-        per_vorname=>'Hanno',
-        per_nachname=>'Seitz',
-        per_geburtstag=>undef,
+        per_id => 10,
+        per_vorname => 'Hanno',
+        per_nachname => 'Seitz',
+        per_geburtstag => undef,
     );
     
     =>
@@ -4325,8 +4325,8 @@ Normales Insert, Schlüssel und Werte als getrennte Listen
 INSERT mit berechnetem Kolumnenwert
 
     $stmt = $sql->insert('objekt',
-        obj_id=>4711,
-        obj_letzteaenderung=>\'SYSDATE',
+        obj_id => 4711,
+        obj_letzteaenderung => \'SYSDATE',
     );
     
     =>
@@ -4353,10 +4353,10 @@ Null-Statements
     ''
     
     $stmt = $sql->insert('person',
-        per_id=>'',
-        per_vorname=>'',
-        per_nachname=>'',
-        per_geburtstag=>'',
+        per_id => '',
+        per_vorname => '',
+        per_nachname => '',
+        per_geburtstag => '',
     );
     
     =>
@@ -4368,10 +4368,10 @@ Null-Statements
 INSERT mit Platzhaltern
 
     $stmt = $sql->insert('person',
-        per_id=>\'?',
-        per_vorname=>\'?',
-        per_nachname=>\'?',
-        per_geburtstag=>\'?',
+        per_id => \'?',
+        per_vorname => \'?',
+        per_nachname => \'?',
+        per_geburtstag => \'?',
     );
     
     INSERT INTO person
@@ -4457,8 +4457,8 @@ sub insert {
 =head4 Example
 
     $stmt = $sql->update('person',
-        per_geburtstag=>'7.4.2000',
-        -where,per_id=>4711,
+        per_geburtstag => '7.4.2000',
+        -where,per_id => 4711,
     );
 
 =cut
@@ -4472,7 +4472,7 @@ sub update {
 
     my @where;
     Quiq::Option->extractMulti(\@_,
-        -where=>\@where,
+        -where => \@where,
     );
 
     unless (@_) {
@@ -4523,7 +4523,7 @@ sub delete {
     my $hint;
 
     Quiq::Option->extractMulti(\@_,
-        -hint=>\$hint,
+        -hint => \$hint,
     );
 
     my $stmt = 'DELETE';
@@ -4864,7 +4864,7 @@ sub keyExpr {
     my $refType = ref $expr;
     if (!$refType) {
         if (!defined $expr || $expr eq '') {
-            $self->throw(q~SQL-00005: Identifier fehlt~);
+            $self->throw('SQL-00005: Identifier fehlt');
         }
         return $expr;
     }
@@ -5033,24 +5033,24 @@ sub whereExpr {
 # -----------------------------------------------------------------------------
 
 my %opMethod = (
-    '!='=>'opRel',
-    '<'=>'opRel',
-    '<='=>'opRel',
-    '='=>'opRel',
-    '>'=>'opRel',
-    '>='=>'opRel',
-    'LIKE'=>'opRel',
-    'AS'=>'opAS',
-    'BETWEEN'=>'opBETWEEN',
-    'CAST'=>'opCAST',
-    'IN'=>'opIN',
-    'LOWER'=>'opFunc',
-    'MAX'=>'opFunc',
-    'MIN'=>'opFunc',
-    'SUBSTR'=>'opFunc',
-    'UPPER'=>'opFunc',
-    'COALESCE'=>'opFunc',
-    'CASEXPR'=>'opCASEXPR',
+    '!=' => 'opRel',
+    '<' => 'opRel',
+    '<=' => 'opRel',
+    '=' => 'opRel',
+    '>' => 'opRel',
+    '>=' => 'opRel',
+    'LIKE' => 'opRel',
+    'AS' => 'opAS',
+    'BETWEEN' => 'opBETWEEN',
+    'CAST' => 'opCAST',
+    'IN' => 'opIN',
+    'LOWER' => 'opFunc',
+    'MAX' => 'opFunc',
+    'MIN' => 'opFunc',
+    'SUBSTR' => 'opFunc',
+    'UPPER' => 'opFunc',
+    'COALESCE' => 'opFunc',
+    'CASEXPR' => 'opCASEXPR',
 );
 
 sub expr {
@@ -5061,7 +5061,7 @@ sub expr {
 
     my $meth = $opMethod{$op};
     if (!$meth) {
-        $self->throw(q~SQL-00006: Unbekannte SQL-Operation~,Operation=>$op);
+        $self->throw('SQL-00006: Unbekannte SQL-Operation',Operation=>$op);
     }
 
     # Argumente (indirekt rekursiv) auflösen
@@ -5363,8 +5363,8 @@ sub exists {
     my $not = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -active=>\$active,
-        -not=>\$not,
+        -active => \$active,
+        -not => \$not,
     );
 
     if (!$active) {
@@ -5421,7 +5421,7 @@ sub notExists {
             \'CASE %C WHEN 9685 THEN 24 WHEN 9684 THEN 26 WHEN 9687 THEN 28 END',
         ],
         't.product_ticket_type'=>'LOTTERY_CLUB_TICKET',
-        -limit=>100,
+        -limit => 100,
     );
 
 =cut
@@ -5456,8 +5456,8 @@ sub diff {
         }
         else {
             $self->throw(
-                q~SQL-00003: Unbekannter Datentyp~,
-                Type=>$type,
+                'SQL-00003: Unbekannter Datentyp',
+                Type => $type,
             );
         }
 
@@ -5489,9 +5489,9 @@ sub diff {
     my @where = (@_,'('.join(" OR\n    ",@or).')');
 
     return $self->select(
-        -select=>@select,
-        -from=>$fromClause,
-        -where=>@where,
+        -select => @select,
+        -from => $fromClause,
+        -where => @where,
         @opt,
     );
 }
@@ -5500,7 +5500,7 @@ sub diff {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

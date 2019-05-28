@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Ipc;
@@ -60,21 +60,21 @@ sub new {
     my $verbose = 1;
 
     Quiq::Option->extract(\@_,
-        -verbose=>\$verbose,
+        -verbose => \$verbose,
     );
 
     # Objekt instantiieren
 
     return $class->SUPER::new(
-        file=>$file,
-        verbose=>$verbose,
-        width=>undef,
-        height=>undef,
-        aspectRatio=>undef,
-        bitrate=>undef,
-        framerate=>undef,
-        duration=>undef,
-        frames=>undef,
+        file => $file,
+        verbose => $verbose,
+        width => undef,
+        height => undef,
+        aspectRatio => undef,
+        bitrate => undef,
+        framerate => undef,
+        duration => undef,
+        frames => undef,
     );
 }
 
@@ -361,7 +361,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

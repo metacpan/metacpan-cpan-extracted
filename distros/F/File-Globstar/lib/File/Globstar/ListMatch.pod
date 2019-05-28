@@ -9,16 +9,16 @@ File::Globstar::ListMatch - Match File Names Against List Of Patterns
     use File::Globstar::ListMatch;
 
     # Parse from file.
-    $matcher = File::Globstar::ListMatch('.gitignore', 
-                                         ignoreCase => 1,
-                                         isExclude => 1);
+    $matcher = File::Globstar::ListMatch->new('.gitignore',
+                                              ignoreCase => 1,
+                                              isExclude => 1);
 
     # Parse from file handle.
-    $matcher = File::Globstar::ListMatch(STDIN, ignoreCase => 0);
+    $matcher = File::Globstar::ListMatch->new(STDIN, ignoreCase => 0);
 
     # Parse list of patterns.  Comments and blank lines are not
     # stripped!
-    $matcher = File::Globstar::ListMatch([
+    $matcher = File::Globstar::ListMatch->new([
         'src/**/*.o',
         '.*',
         '!.gitignore'
@@ -33,7 +33,7 @@ File::Globstar::ListMatch - Match File Names Against List Of Patterns
     # But not this one.
     '.gitignore'
     EOF
-    $matcher = File::Globstar::ListMatch(\$pattern);
+    $matcher = File::Globstar::ListMatch->new(\$pattern);
 
     $filename = 'path/to/hello.o';
     if ($matcher->match($filename)) {
@@ -43,7 +43,7 @@ File::Globstar::ListMatch - Match File Names Against List Of Patterns
 =head1 DESCRIPTION
 
 Files containing list of files are very common as arguments to command-line options such
-as "--ignore", "--exclude" or "--include".  A well-known example is the 
+as "--ignore", "--exclude" or "--include".  A well-known example is the
 syntax used by L<git|https://git-scm.com/> as described in
 L<https://git-scm.com/docs/gitignore>.
 
@@ -56,20 +56,20 @@ well as existing files.
 
 =head2 INPUT FILE FORMAT
 
-Unless you pass a reference to an array of patterns as input, comments and 
+Unless you pass a reference to an array of patterns as input, comments and
 blank lines are discarded.
 
 =over 4
 
 =item B<Comments>
 
-Comments are lines that start with a hash-sign.  You can escape hash-signs that 
+Comments are lines that start with a hash-sign.  You can escape hash-signs that
 are part of the pattern with a backslash: "\#".
 
 =item B<Blank Lines>
 
 Blank lines are empty lines or lines consisting of whitespace only.  Whitespace
-is a sequence of US-ASCII whitespace characters:  horizontal tabs 
+is a sequence of US-ASCII whitespace characters:  horizontal tabs
 (ASCII 9), line  feeds (ASCII 10), vertical tabs (ASCII 11), form feeds
 (ASCII 12), carriage returns (ASCII 13), and space (ASCII 32).  Other
 characters with the Unicode property "WSpace=Y" are not considered whitespace.
@@ -96,21 +96,21 @@ a backslash.
 
 =item B<A leading slash is stripped off>
 
-But the pattern must match the entire significant "path" (actually string). 
+But the pattern must match the entire significant "path" (actually string).
 For example "/foobar" matches for "/foobar" but not for "/sub/sub/foobar".
 
 =item B<A trailing slash is stripped off>
 
 But the pattern can only match "directories".  This is why the method
-B<match()> below has an optional second argument that lets you specify, 
+B<match()> below has an optional second argument that lets you specify,
 whether the string to be matched is considered a directory or not.
 
-=back 
+=back
 
 =head2 MATCHING ALGORITHM
 
 The string (normally a filename) passed to the matcher is compared
-subsequently to all patterns.  If none of the patterns match or if the last 
+subsequently to all patterns.  If none of the patterns match or if the last
 match was against a negated pattern, the overall result is false.  Otherwise it
 is true.
 
@@ -119,13 +119,13 @@ path name, otherwise just against the basename of the file
 with a leading "directory" part stripped off.
 
 If a pattern starts with a leading slash, that slash is stripped off for
-the purpose of comparison but the string must match relative to the 
+the purpose of comparison but the string must match relative to the
 base "directory".
 
 The semantics of a match are the same as for B<fnmatchstar()> in
 L<File::Globstar>.  But keep in mind that a leading exclamation mark (for
 negation), a leading "directory" part, a leading slash, or a trailing slash
-may be stripped off according to the rules outline above. 
+may be stripped off according to the rules outline above.
 
 =head1 METHODS
 
@@ -195,13 +195,13 @@ ignored.  Thake this example:
      /node_modules
      !/node_modules/foobar
 
-The second line gets ignored.  In exclude mode it is assumed that you 
+The second line gets ignored.  In exclude mode it is assumed that you
 recurse a directory calling B<match()> for every file you visit.  If a file
 matches it is always ignored.  And if it is a directory, it is not only
 ignored but the recursion also stops here.
 
 The exact rule is: You cannot re-include a file by negating a pattern if one
-of the file's parent directories would be excluded.  
+of the file's parent directories would be excluded.
 
 This is the  behavior of git, when evaluating ignore lists.  If you want to
 avoid that behavior, see below for B<matchInclude()>.
@@ -268,7 +268,7 @@ Line 2 would then kickout the last three matches from the result list.
 
 =item B<patterns>
 
-Returns the patterns as a list of compiled regular expressions.  This is 
+Returns the patterns as a list of compiled regular expressions.  This is
 useful probably only for testing.
 
 =back
@@ -283,10 +283,10 @@ B<File::Globstar::ListMatch>, put a ".*" in front of the patterns.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
 all rights reserved.
 
 =head1 SEE ALSO
 
-File::Globstar(3pm), File::Glob(3pm), glob(3), glob(7), fnmatch(3), glob(1), 
+File::Globstar(3pm), File::Glob(3pm), glob(3), glob(7), fnmatch(3), glob(1),
 perl(1)

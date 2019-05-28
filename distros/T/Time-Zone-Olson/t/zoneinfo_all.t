@@ -36,20 +36,27 @@ diag("TZ environment variable is untainted as $ENV{TZ}");
 
 my $perl_date = 0;
 my $bsd_date = 0;
-my $test_gnu_date = `TZ="Australia/Melbourne" date -d "2015/02/28 11:00:00" +"%Y/%m/%d %H:%M:%S" 2>&1`;
-if (defined $test_gnu_date) {
-	chomp $test_gnu_date;
-}
-if (($test_gnu_date) && ($test_gnu_date eq '2015/02/28 11:00:00')) {
+if ($^O eq 'MSWin32') {
+	diag "$^O means we need to use the SystemTimeToTzSpecificLocalTime system call as the definitive source of truth for timezone calculations";
+} elsif ($^O eq 'solaris') {
+	diag "$^O does not have a useful date binary.";
+	$perl_date = 1;
 } else {
-	my $test_bsd_date = `TZ="Australia/Melbourne" date -r 1425081600 +"%Y/%m/%d %H:%M:%S" 2>&1`;
-	if (defined $test_bsd_date) {
-		chomp $test_bsd_date;
+	my $test_gnu_date = `TZ="Australia/Melbourne" date -d "2015/02/28 11:00:00" +"%Y/%m/%d %H:%M:%S" 2>&1`;
+	if (defined $test_gnu_date) {
+		chomp $test_gnu_date;
 	}
-	if (($test_bsd_date) && ($test_bsd_date eq '2015/02/28 11:00:00')) {
-		$bsd_date = 1;
+	if (($test_gnu_date) && ($test_gnu_date eq '2015/02/28 11:00:00')) {
 	} else {
-		$perl_date = 1;
+		my $test_bsd_date = `TZ="Australia/Melbourne" date -r 1425081600 +"%Y/%m/%d %H:%M:%S" 2>&1`;
+		if (defined $test_bsd_date) {
+			chomp $test_bsd_date;
+		}
+		if (($test_bsd_date) && ($test_bsd_date eq '2015/02/28 11:00:00')) {
+			$bsd_date = 1;
+		} else {
+			$perl_date = 1;
+		}
 	}
 }
 
@@ -57,10 +64,13 @@ ok($timezone->timezone() =~ /^\w+(\/\w+)?$/, "\$timezone->timezone() parses corr
 ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->areas()");
 ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
 if (!$timezone->win32_registry()) {
-ok($timezone->comment('Australia/Melbourne') eq 'Victoria', "\$timezone->comment('Australia/Melbourne') returns 'Victoria'");
+my $comment = $timezone->comment('Australia/Melbourne');
+ok($comment =~ /Victoria/smx, "\$timezone->comment('Australia/Melbourne') contains /Victoria/");
+diag("Comment for 'Australia/Melbourne' is '$comment'");
 }
 diag(`zdump -v /usr/share/zoneinfo/$ENV{TZ} | head -n 10`);
-if ($bsd_date) {
+if ($^O eq 'MSWin32') {
+} elsif ($bsd_date) {
 	diag("bsd test of early date:" . `TZ="Australia/Melbourne" date -r "-2172355201" +"%Y/%m/%d %H:%M:%S" 2>&1`);
 } elsif ($perl_date) {
 } else {

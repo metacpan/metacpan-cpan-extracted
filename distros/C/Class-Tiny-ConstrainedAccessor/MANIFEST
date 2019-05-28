@@ -15,9 +15,11 @@ t/04-bad-defaults-type-tiny.t
 t/05-type-tiny-build.t
 t/06-type-tiny-nobuild.t
 t/07-value-is-valid.t
+t/08-custom-constraint.t
 t/10-moox-types-mooselike.t
 t/11-mousex-types.t
 t/12-specio.t
+t/MY/Class/CustomConstraint.pm
 t/MY/Class/MooseXTypes.pm
 t/MY/Class/MooXTypesMooseLike.pm
 t/MY/Class/MouseXTypes.pm

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Quiq::Html::List;
@@ -62,18 +62,18 @@ L<Tabs Widget Beispiele|http://jqueryui.com/tabs/>
 Perl:
 
     $html = Quiq::JQuery::Tabs->html($h,
-        id=>'tabs',
-        tabs=>[
+        id => 'tabs',
+        tabs => [
             {
-                label=>'A',
-                link=>'#a',
-                content=>$h->tag('p',
-                    -text=>1,
+                label => 'A',
+                link => '#a',
+                content => $h->tag('p',
+                    -text => 1,
                     'Text des Reiters A',
                 ),
             },{
-                label=>'B',
-                link=>'b',
+                label => 'B',
+                link => 'b',
             },
         ],
     );
@@ -116,8 +116,8 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        id=>undef,
-        tabs=>[],
+        id => undef,
+        tabs => [],
     );
     $self->set(@_);
 
@@ -162,15 +162,15 @@ sub html {
     }
 
     return $h->tag('div',
-        id=>$id,
+        id => $id,
         '-',
         # <ul>-Abschnitt
         Quiq::Html::List->html($h,
-            items=>do{
+            items => do{
                 my @items;
                 for my $t (@$tabA) {
                     push @items,$h->tag('a',
-                        href=>$t->{'link'},
+                        href => $t->{'link'},
                         $t->{'label'},
                     );
                 }
@@ -184,7 +184,7 @@ sub html {
             for my $t (@$tabA) {
                 if (my ($anchor) = $t->{'link'} =~ /^#(.*)/) {
                     $html .= $h->tag('div',
-                        id=>$anchor,
+                        id => $anchor,
                         $t->{'content'}
                     );
                 }
@@ -198,7 +198,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

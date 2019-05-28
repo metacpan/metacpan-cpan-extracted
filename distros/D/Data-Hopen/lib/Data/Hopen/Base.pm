@@ -8,7 +8,7 @@ package Data::Hopen::Base;
 use parent 'Exporter';
 use Import::Into;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 # Pragmas
 use 5.014;
@@ -36,7 +36,9 @@ our @EXPORT = qw(true false);
 
 #DEBUG
 BEGIN {
-    $SIG{'__DIE__'} = sub { Carp::confess(@_) } unless $SIG{'__DIE__'};
+    unless($SIG{'__DIE__'}) {
+        $SIG{'__DIE__'} = sub { Carp::confess(@_) };
+    }
     #$Exporter::Verbose=1;
 }
 

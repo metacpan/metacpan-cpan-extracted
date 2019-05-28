@@ -10,12 +10,13 @@ use if $^O eq 'cygwin', 'File::Spec::Win32';
 use Test2::API qw( test2_add_callback_post_load test2_stack test2_add_callback_exit );
 
 # ABSTRACT: Setup a faux home directory for tests
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 my $real;
 my $faux;
 my $user;
+my @mocks;
 
 sub real_home_dir
 {
@@ -24,6 +25,8 @@ sub real_home_dir
 
 sub import
 {
+  my @notes;
+
   unless(defined $faux)
   {
     if($^O eq 'MSWin32')
@@ -58,6 +61,25 @@ sub import
     {
       $ENV{USERPROFILE} = $faux;
       ($ENV{HOMEDRIVE}, $ENV{HOMEPATH}) = File::Spec->splitpath($faux,1);
+      if(eval { require Portable })
+      {
+        push @notes, "Portable strawberry detected";
+        if(eval { require File::HomeDir })
+        {
+          # annoyingly, Strawberry Portable Perl patches
+          # File::HomeDir, but not things like File::Glob
+          # so since there isn't a good interface to override
+          # this behavior, we need to patch the patch :(
+          push @notes, "Patching File::HomeDir";
+          require Test2::Mock;
+          push @mocks, Test2::Mock->new(
+            class => 'File::HomeDir',
+            override => [
+              my_home => sub { $faux },
+            ],
+          );
+        }
+      }
     }
     elsif($^O eq 'cygwin')
     {
@@ -69,6 +91,9 @@ sub import
     {
       $ENV{HOME} = $faux;
     }
+
+    push @notes, "Test2::Plugin::FauxHomeDir using faux home dir $faux";
+    push @notes, "Test2::Plugin::FauxHomeDir real home dir is    $real";
     
     test2_add_callback_post_load(sub {
       test2_stack()->top;
@@ -77,7 +102,7 @@ sub import
         Test2::Event::Note->new(
           message => $_
         ),
-      ) for "Test2::Plugin::FauxHomeDir using faux home dir $faux", "Test2::Plugin::FauxHomeDir real home dir is    $real";
+      ) for @notes;
     });
 
     test2_add_callback_exit(sub {
@@ -115,7 +140,7 @@ Test2::Plugin::FauxHomeDir - Setup a faux home directory for tests
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -206,7 +231,11 @@ hiding bugs.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -63,9 +63,9 @@ sub create {
     $sec->validate($class->contentAllowed,scalar $class->attributes);
         
     $sec->set(
-        parent=>$parent,
+        parent => $parent,
         # memoize
-        name=>undef,
+        name => undef,
         # Subklassen-Attribute
         @_,
     );
@@ -121,7 +121,7 @@ sub name {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

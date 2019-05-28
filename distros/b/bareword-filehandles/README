@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.006
+    version 0.007
 
 SYNOPSIS
 
@@ -33,6 +33,12 @@ METHODS
 
     Enables bareword filehandles for the remainder of the scope being
     compiled.
+
+LIMITATIONS
+
+    Filetest operators (-X) can not be checked on Perl versions before
+    5.32, because hooking the op check function for these breaks stacked
+    tests, e.g. -f -w -x $file.
 
 SEE ALSO
 

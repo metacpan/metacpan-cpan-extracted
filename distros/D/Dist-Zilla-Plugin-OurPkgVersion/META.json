@@ -67,6 +67,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Dist::Zilla::Role::VersionProvider" : "0",
             "ExtUtils::MakeMaker" : "0",
             "Path::Tiny" : "0",
             "Test::DZil" : "0",
@@ -87,7 +88,7 @@
          "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_contributors" : [
       "Alceu Rodrigues de Freitas Junior <alceu.junior@quintoandar.com.br>",
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",

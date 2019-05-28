@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Html::Widget::Hidden;
 use Quiq::Template;
@@ -89,32 +89,32 @@ Liste der Widgets, die in das Layout eingesetzt werden.
 Der Code
 
     Quiq::Html::Form::Layout->html($h,
-        layout=>Quiq::Html::Table::Simple->html($h,
-            class=>'form',
-            rows=>[
+        layout => Quiq::Html::Table::Simple->html($h,
+            class => 'form',
+            rows => [
                 [['Vorname:'],['__VORNAME__']],
                 [['Nachname:'],['__NACHNAME__']],
                 [[''],['__AKTION__']],
             ],
         ),
-        widgets=>[
+        widgets => [
             Quiq::Html::Widget::Hidden->new(
-                name=>'id',
-                value=>'4711',
+                name => 'id',
+                value => '4711',
             ),
             Quiq::Html::Widget::TextField->new(
-                name=>'vorname',
-                value=>'Lieschen',
+                name => 'vorname',
+                value => 'Lieschen',
             ),
             Quiq::Html::Widget::TextField->new(
-                name=>'nachname',
-                value=>'Müller',
+                name => 'nachname',
+                value => 'Müller',
             ),
             Quiq::Html::Widget::Button->new(
-                id=>'speichern',
-                name=>'aktion',
-                value=>'speichern',
-                content=>'Speichern',
+                id => 'speichern',
+                name => 'aktion',
+                value => 'speichern',
+                content => 'Speichern',
             ),
         ],
     );
@@ -166,10 +166,10 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        form=>undef,
-        hidden=>undef,
-        layout=>'',
-        widgets=>[],
+        form => undef,
+        hidden => undef,
+        layout => '',
+        widgets => [],
     );
     $self->set(@_);
 
@@ -212,8 +212,8 @@ sub html {
     if ($hiddenA) {
         for (my $i = 0; $i < @$hiddenA; $i += 2) {
             $hidden .= Quiq::Html::Widget::Hidden->html($h,
-                name=>$hiddenA->[$i],
-                value=>$hiddenA->[$i+1],
+                name => $hiddenA->[$i],
+                value => $hiddenA->[$i+1],
             );
         }
     }
@@ -231,13 +231,13 @@ sub html {
     }
 
     $layout = $h->tag('form',
-        -ignoreTagIf=>!$formA,
+        -ignoreTagIf => !$formA,
         @$formA,
         $hidden.$layout
     );
 
     my $tpl = Quiq::Template->new('text',\$layout,
-        -singleReplace => 1,
+        -singleReplace  =>  1,
     );
     $tpl->replace(@keyVal);
     $tpl->removeOptional;
@@ -249,7 +249,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

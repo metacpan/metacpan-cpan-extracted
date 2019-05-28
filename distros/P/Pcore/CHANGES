@@ -1,3 +1,43 @@
+v0.86.4 2019-05-26T20:36:05Z
+ - api map error handler
+
+v0.86.3 2019-05-26T07:36:35Z
+ - dist encrypt
+
+v0.86.2 2019-05-26T06:43:16Z
+ - dist encrypt
+
+v0.86.1 2019-05-26T06:21:27Z
+ - dist encrypt
+ - dist log fixed
+
+v0.86.0 2019-05-26T04:31:48Z
+ - docker build encrypt
+ - dist encrypt
+
+v0.85.3 2019-05-26T02:44:20Z
+ - FB api
+
+v0.85.2 2019-05-25T12:15:49Z
+ - FB api
+
+v0.85.1 2019-05-25T06:04:56Z
+ - pub suffixes updated
+
+v0.85.0 2019-05-25T05:42:11Z
+ - perl 5.30.0
+
+v0.84.2 2019-05-25T02:36:09Z
+ - FB api
+
+v0.84.1 2019-05-24T15:17:38Z
+ - FB api
+
+v0.84.0 2019-05-24T06:18:41Z
+ - captcha api
+ - telegram bot api
+ - FB api
+
 v0.83.0 2019-05-23T09:41:39Z
  - cloudflare api
  - tg bot

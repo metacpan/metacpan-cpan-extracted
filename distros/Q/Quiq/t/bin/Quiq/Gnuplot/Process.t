@@ -29,7 +29,7 @@ sub test_unitTest : Test(1) {
     }
 
     my $gnu = Quiq::Gnuplot::Process->new(
-        debug=>0, # 1 schreibt Kommandos nach STDERR
+        debug => 0, # 1 schreibt Kommandos nach STDERR
     );
     $self->is(ref($gnu),'Quiq::Gnuplot::Process');
 
@@ -39,20 +39,20 @@ sub test_unitTest : Test(1) {
     Quiq::Path->delete($file);
 
     my $plt = Quiq::Gnuplot::Plot->new(
-        terminal=>'png large',
-        width=>800,
-        height=>500,
-        output=>$file,
-        title=>'Lastverhalten Inkassoserver',
-        xlabel=>'Prozesse (lpt-client)',
-        ylabel=>'Requests/Sekunde',
-        myTics=>0,
+        terminal => 'png large',
+        width => 800,
+        height => 500,
+        output => $file,
+        title => 'Lastverhalten Inkassoserver',
+        xlabel => 'Prozesse (lpt-client)',
+        ylabel => 'Requests/Sekunde',
+        myTics => 0,
     );
     
     my $gph = Quiq::Gnuplot::Graph->new(
-        title=>undef,
-        with=>'linespoints',
-        data=>[qw/
+        title => undef,
+        with => 'linespoints',
+        data => [qw/
             1 24
             10 251
             20 524
@@ -63,9 +63,9 @@ sub test_unitTest : Test(1) {
     $plt->add($gph);
 
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'Lastgrenze System',
-        with=>'lines',
-        data=>[qw/
+        title => 'Lastgrenze System',
+        with => 'lines',
+        data => [qw/
             0 850
             80 850
         /],
@@ -73,9 +73,9 @@ sub test_unitTest : Test(1) {
     $plt->add($gph);
 
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'maximale Tageslast',
-        with=>'lines',
-        data=>[qw/
+        title => 'maximale Tageslast',
+        with => 'lines',
+        data => [qw/
             0 200
             80 200
         /],
@@ -83,9 +83,9 @@ sub test_unitTest : Test(1) {
     $plt->add($gph);
 
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'mittlere Tageslast',
-        with=>'lines',
-        data=>[qw/
+        title => 'mittlere Tageslast',
+        with => 'lines',
+        data => [qw/
             0 130
             80 130
         /],
@@ -97,20 +97,20 @@ sub test_unitTest : Test(1) {
     # Zeitreihe
 
     $plt = Quiq::Gnuplot::Plot->new(
-        timeSeries=>1,
-        terminal=>'png large',
-        width=>800,
-        height=>500,
-        output=>'/tmp/graph2.png',
-        title=>'Zeitreihentest',
-        xlabel=>'Zeit',
-        ylabel=>'Wert',
+        timeSeries => 1,
+        terminal => 'png large',
+        width => 800,
+        height => 500,
+        output => '/tmp/graph2.png',
+        title => 'Zeitreihentest',
+        xlabel => 'Zeit',
+        ylabel => 'Wert',
     );
 
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'',
-        with=>'linespoints',
-        data=>[
+        title => '',
+        with => 'linespoints',
+        data => [
             '2013-10-23 13:26:16',10.3,
             '2013-10-23 13:29:16',10.4,
             '2013-10-23 14:12:16',10.5,
@@ -124,18 +124,18 @@ sub test_unitTest : Test(1) {
     # Performace-Daten
 
     $plt = Quiq::Gnuplot::Plot->new(
-        timeSeries=>1,
-        terminal=>'png large',
-        width=>1400,
-        height=>600,
-        output=>'/tmp/graph3.png',
-        title=>'CPU ALL inka-batch-01',
-        xlabel=>'Zeit',
-        ylabel=>'Sys% + User%',
-        yMin=>0,
-        yMax=>100,
-        ytics=>10,
-        myTics=>0,
+        timeSeries => 1,
+        terminal => 'png large',
+        width => 1400,
+        height => 600,
+        output => '/tmp/graph3.png',
+        title => 'CPU ALL inka-batch-01',
+        xlabel => 'Zeit',
+        ylabel => 'Sys% + User%',
+        yMin => 0,
+        yMax => 100,
+        ytics => 10,
+        myTics => 0,
     );
 
     my @data;
@@ -148,9 +148,9 @@ sub test_unitTest : Test(1) {
     }
     # warn "@data\n" ;
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'Batch-Prozesse',
-        with=>'linespoints',
-        data=>[@data],
+        title => 'Batch-Prozesse',
+        with => 'linespoints',
+        data => [@data],
     );
     $plt->add($gph);
 
@@ -158,9 +158,9 @@ sub test_unitTest : Test(1) {
         't/data/gnuplot/process/cpu_percent.dat');
     @data = split /[|\n]/,Quiq::Path->read($datFile); 
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'Sys% + User% (1 CPU = 6.25%)',
-        with=>'lines',
-        data=>[@data],
+        title => 'Sys% + User% (1 CPU = 6.25%)',
+        with => 'lines',
+        data => [@data],
     );
     $plt->add($gph);
 
@@ -169,27 +169,27 @@ sub test_unitTest : Test(1) {
     # Performace-Daten
 
     $plt = Quiq::Gnuplot::Plot->new(
-        timeSeries=>1,
-        terminal=>'png large',
-        width=>1400,
-        height=>600,
-        output=>'/tmp/graph4.png',
-        title=>'Genutzte CPUs inka-batch-01' ,
-        xlabel=>'Zeit',
-        ylabel=>'CPUs',
-        yMin=>0,
-        yMax=>16,
-        ytics=>1,
-        myTics=>0,
+        timeSeries => 1,
+        terminal => 'png large',
+        width => 1400,
+        height => 600,
+        output => '/tmp/graph4.png',
+        title => 'Genutzte CPUs inka-batch-01' ,
+        xlabel => 'Zeit',
+        ylabel => 'CPUs',
+        yMin => 0,
+        yMax => 16,
+        ytics => 1,
+        myTics => 0,
     );
 
     $datFile = $self->testPath(
         't/data/gnuplot/process/cpu_count.dat');
     @data = split /[|\n]/,Quiq::Path->read($datFile);
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'Genutzte CPUs (mit: Sys + User > 5%)',
-        with=>'lines',
-        data=>[@data],
+        title => 'Genutzte CPUs (mit: Sys + User > 5%)',
+        with => 'lines',
+        data => [@data],
     );
     $plt->add($gph);
 
@@ -203,10 +203,10 @@ sub test_unitTest : Test(1) {
     }
     # warn "@data\n" ;
     $gph = Quiq::Gnuplot::Graph->new(
-        title=>'Batch-Prozesse',
-        with=>'linespoints',
-        # style=>27, # Style-Angabe funktioniert nicht mehr
-        data=>[@data],
+        title => 'Batch-Prozesse',
+        with => 'linespoints',
+        # style => 27, # Style-Angabe funktioniert nicht mehr
+        data => [@data],
     );
     $plt->add($gph);
 

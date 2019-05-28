@@ -11,6 +11,7 @@ lib/Plerd.pm
 lib/Plerd/Init.pm
 lib/Plerd/Post.pm
 lib/Plerd/SmartyPants.pm
+lib/Plerd/Tag.pm
 lib/Plerd/Util.pm
 lib/Plerd/WebmentionQueue.pm
 minil.toml
@@ -26,6 +27,7 @@ t/source_model/extra-headers.md
 t/source_model/formatted-title.md
 t/source_model/good-date.md
 t/source_model/good-source-file.md
+t/source_model/markdown-table.md
 t/source_model/metatag-setup-with-image-and-alt.md
 t/source_model/metatag-setup-with-image.md
 t/source_model/metatag-setup.md

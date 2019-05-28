@@ -146,6 +146,7 @@ BOOT:
 
     bareword_check(stat, OP_STAT);
     bareword_check(stat, OP_LSTAT);
+#if PERL_VERSION_GE(5,31,1)
     bareword_check(stat, OP_FTRREAD);
     bareword_check(stat, OP_FTRWRITE);
     bareword_check(stat, OP_FTREXEC);
@@ -173,3 +174,4 @@ BOOT:
     bareword_check(stat, OP_FTTTY);
     bareword_check(stat, OP_FTTEXT);
     bareword_check(stat, OP_FTBINARY);
+#endif

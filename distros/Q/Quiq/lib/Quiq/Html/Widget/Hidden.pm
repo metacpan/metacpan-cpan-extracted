@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ Keine Information:
 Wert:
 
     $html = Quiq::Html::Widget::Hidden->html($h,
-        name=>'x',
-        value=>4711,
+        name => 'x',
+        value => 4711,
     );
     -->
     <input type="hidden" name="x" value="4711" />\n
@@ -80,8 +80,8 @@ Wert:
 Liste von Werten:
 
     $html = Quiq::Html::Widget::Hidden->html($h,
-        name=>'x',
-        value=>[4711,4712],
+        name => 'x',
+        value => [4711,4712],
     );
     -->
     <input type="hidden" name="x" value="4711" />\n
@@ -108,12 +108,12 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        id=>undef,
-        disabled=>0,
-        hidden=>1,
-        ignoreIfNull=>0,
-        name=>undef,
-        value=>undef,
+        id => undef,
+        disabled => 0,
+        hidden => 1,
+        ignoreIfNull => 0,
+        name => undef,
+        value => undef,
     );
 
     # Werte Konstruktoraufruf
@@ -174,11 +174,11 @@ sub html {
     my $str = '';
     for my $val (@$arr) {
         $str .= $h->tag('input',
-            type=>'hidden',
-            id=>$id,
-            disabled=>$disabled,
-            name=>$name,
-            value=>$val,
+            type => 'hidden',
+            id => $id,
+            disabled => $disabled,
+            name => $name,
+            value => $val,
         );
     }
 
@@ -189,7 +189,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

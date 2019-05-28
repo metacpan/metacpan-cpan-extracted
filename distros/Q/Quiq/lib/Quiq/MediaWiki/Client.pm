@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Parameters;
 use Quiq::AnsiColor;
@@ -268,7 +268,7 @@ sub login {
 
     if ($res->{'login'}->{'result'} ne 'Success') {
         $self->throw(
-            q~MEDIAWIKI-00099: Login failed~,
+            'MEDIAWIKI-00099: Login failed',
             User => $user,
             Reason => $res->{'login'}->{'result'},
         );
@@ -331,7 +331,7 @@ sub getToken {
     my $token = $h->{$action.'token'};
     if (!$token) {
         $self->throw(
-            q~MEDIAWIKI-00099: No token~,
+            'MEDIAWIKI-00099: No token',
             Action => $action,
         );
     }
@@ -1175,7 +1175,7 @@ sub send {
     }
     else {
         $self->throw(
-            q~MEDIAWIKI-00099: Unknown request method~,
+            'MEDIAWIKI-00099: Unknown request method',
             Method => $method,
         );
     }
@@ -1188,7 +1188,7 @@ sub send {
 
     if (!$res->is_success) {
         $self->throw(
-            q~MEDIAWIKI-00099: HTTP request failed~,
+            'MEDIAWIKI-00099: HTTP request failed',
             StatusLine => $res->status_line,
             Response => $res->content,
         );
@@ -1213,7 +1213,7 @@ sub send {
 
     if ($res->header('MediaWiki-API-Error')) {
         $self->throw(
-            q~MEDIAWIKI-00099: API error~,
+            'MEDIAWIKI-00099: API error',
             Code => $json->{'error'}->{'code'},
             Info => $json->{'error'}->{'info'},
         );
@@ -1301,7 +1301,7 @@ sub reduceToPage {
     my @pageIds = keys %{$res->{'query'}->{'pages'}};
     if (@pageIds > 1) {
         $self->throw(
-            q~MEDIAWIKI-00099: More than one page~,
+            'MEDIAWIKI-00099: More than one page',
             PageIds => "@pageIds",
         );
     }
@@ -1317,7 +1317,7 @@ sub reduceToPage {
             return undef;
         }
         $self->throw(
-            q~MEDIAWIKI-00099: Page not found~,
+            'MEDIAWIKI-00099: Page not found',
         );
     }
 
@@ -1357,7 +1357,7 @@ sub log {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

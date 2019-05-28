@@ -1,0 +1,9 @@
+lib/Data/Promise.pm
+t/Data-Promose.t
+Changes
+Makefile.PL
+MANIFEST
+README.md
+CONTRIBUTING.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

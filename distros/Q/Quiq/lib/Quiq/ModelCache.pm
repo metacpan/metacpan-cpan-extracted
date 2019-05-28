@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -106,8 +106,8 @@ Tabellen:
 Programm:
 
     my $mod = Quiq::ModelCache->new($db,
-        [person=>'per'],
-        [telefon=>'tel'],
+        [person => 'per'],
+        [telefon => 'tel'],
     );
     
     for my $per ($mod->all('person')) {
@@ -153,8 +153,8 @@ sub new {
     }
 
     return $class->SUPER::new(
-        db=>$db,
-        prefixH=>\%prefix,
+        db => $db,
+        prefixH => \%prefix,
         @keyVal,
     );
 }
@@ -189,10 +189,10 @@ sub all {
         
         for my $ent ($tab->rows) {
             # Typbezeichnung hinzufügen
-            $ent->add(type=>$type);
+            $ent->add(type => $type);
             
             # Referenz auf Cache hinzufügen
-            $ent->add(model=>$self);
+            $ent->add(model => $self);
             $ent->weaken('model');
         }
         
@@ -233,9 +233,9 @@ sub lookup {
     };
 
     return $h->{$id} || $self->throw(
-        q~MODEL-00001: Entity not found~,
-        Type=>$type,
-        PrimaryKey=>$id,
+        'MODEL-00001: Entity not found',
+        Type => $type,
+        PrimaryKey => $id,
     );
 }
 
@@ -373,7 +373,7 @@ sub fk {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

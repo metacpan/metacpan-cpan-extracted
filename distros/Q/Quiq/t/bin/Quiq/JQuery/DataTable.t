@@ -36,29 +36,29 @@ sub test_unitTest_2 : Test(4) {
     my $h = Quiq::Html::Tag->new;
 
     my $e = Quiq::JQuery::DataTable->new(
-        id=>'myTable',
-        columns=>[
+        id => 'myTable',
+        columns => [
             { # A
-                title=>'A',
+                title => 'A',
             }, { # B
-                title=>'B',
+                title => 'B',
             },
         ],
-        rows=>[
+        rows => [
             Quiq::Hash->new(
-                a=>1,
-                b=>1,
+                a => 1,
+                b => 1,
             ),
             Quiq::Hash->new(
-                a=>2,
-                b=>2,
+                a => 2,
+                b => 2,
             ),
         ],
-        rowCallback=>sub {
+        rowCallback => sub {
             my ($row,$i) = @_;
             return (undef,$row->a,$row->b);
         },
-        instantiate=>1,
+        instantiate => 1,
     );
 
     my $html = $e->html($h);

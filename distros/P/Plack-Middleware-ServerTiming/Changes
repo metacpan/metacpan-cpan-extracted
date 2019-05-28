@@ -1,9 +1,9 @@
 Revision history for Perl extension Plack-Middleware-ServerTiming
 
-0.03 2018-03-09T11:12:56Z
+0.04 2019-05-27T13:49:47Z
 
-    - add guard() for recoding elapsed time within the scope
-    - ignore undef as metric value
+    - Added missing test prereq as reported by CPANTS. GH#3 (@manwar++)
+    - Fix prereq_matches_use kwalitee issue
 
 0.02 2018-03-07T06:56:34Z
 

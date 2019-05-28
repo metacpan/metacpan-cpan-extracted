@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -69,9 +69,9 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        class=>undef,
-        cssPrefix=>undef,
-        id=>undef,
+        class => undef,
+        cssPrefix => undef,
+        id => undef,
     );
     $self->unlockKeys;
     $self->set(@_); # Wir dürfen die Attribute beliebig erweitern
@@ -84,7 +84,7 @@ sub new {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

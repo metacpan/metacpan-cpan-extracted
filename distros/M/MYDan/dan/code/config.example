@@ -1,0 +1,14 @@
+-
+  name: git1
+  token: xxxxxxxxxxxxxxxx
+  apiurl: http://gitlab.mydan.org/api/v4
+
+-
+  name: git2
+  token: xxxxxxxxxxxxxxxx
+  apiurl: https://gitlab.mydan.com/api/v4
+
+- 
+  name: svn1
+  path:
+    - /opt/mydan/dan/code/temp/svn1/*/*.txt

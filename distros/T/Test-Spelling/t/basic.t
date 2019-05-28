@@ -25,12 +25,13 @@ check_test(sub { pod_file_spelling_ok('t/corpus/bad-pod.pm', 'bad pod has no err
     diag => "Errors:\n    incorectly",
 });
 
-add_stopwords("ünıçöđé");
+SKIP: {
+    skip "Unicode support reverted", 1;
+    add_stopwords("ünıçöđé");
 
-check_test(sub { pod_file_spelling_ok('t/corpus/unicode-pod.pm', 'unicode pod has no errors') }, {
-    ok   => 1,
-    name => 'unicode pod has no errors',
-});
-
+    check_test(sub { pod_file_spelling_ok('t/corpus/unicode-pod.pm', 'unicode pod has no errors') }, {
+        ok   => 1,
+        name => 'unicode pod has no errors',
+    });
+};
 done_testing;
-

@@ -358,7 +358,7 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
         else if (strEQ(type, "scalar_event")) {
             val = hv_fetch(perl_event, "value", 5, TRUE);
             if (val && SvOK(*val) && SvPOK( *val )) {
-                scalar_value = SvPV(*val, len);
+                scalar_value = SvPVutf8(*val, len);
             }
             else {
                 croak("%s\n", "scalar value not defined");

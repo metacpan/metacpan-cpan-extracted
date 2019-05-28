@@ -1,0 +1,13 @@
+Changes
+lib/MPV/Simple.pm
+lib/MPV/Simple/JSON.pm
+lib/MPV/Simple/Pipe.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Simple.xs
+t/MPV-Simple.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

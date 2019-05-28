@@ -1,4 +1,4 @@
-Exception/Class/DBI version 1.01
+Exception/Class/DBI version 1.02
 ================================
 
 This module offers a set of DBI-specific exception classes. They inherit from
@@ -39,6 +39,7 @@ Dependencies
 
 This module requires these other modules and libraries:
 
+* Perl 5.6 or later
 * DBI 1.28 or later (1.30 or later strongly recommended).
 * Exception::Class 1.02 or later (1.05 or later strongly recommended).
 * Test::Simple 0.40 (for testing).

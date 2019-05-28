@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 use ExtUtils::Depends;
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
@@ -61,7 +61,7 @@ use ExtUtils::Depends;
     )->get_makefile_vars,
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 if ("$]" < 5.012) {
 requires('Lexical::SealRequireHints', 0.005)
 }
@@ -79,7 +79,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;

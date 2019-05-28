@@ -58,12 +58,18 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head1 SYNOPSIS
 
     ot "lib/Foo/Bar.pm line 222"
     # Executes $ENV{EDITOR} +222 lib/Foo/Bar.pm
+
+    ot "./lib/Foo/Bar.pm:135:20: blah;"
+    # If you're using vim, opens your file at line 135 and column 20.
+    # Otherwise, executes $ENV{EDITOR} +222 lib/Foo/Bar.pm This is handy if you
+    # use, for example, ripgrep:
+    # rg --vimgrep blah
 
     # open Foo::Bar which is in your lib, t/lib or @INC
     ot Foo::Bar
@@ -82,6 +88,12 @@ version 0.000015
 
     # Open a core module at a function
     ot "Test::More::diag()"
+
+    # Open a binary which is in your $ENV{PATH}
+    ot cpanm
+
+    # Open a binary which is in your $ENV{PATH} at an arbitrary column and line
+    ot cpanm:10:3
 
     # open Foo::Bar on the GitHub web site in your browser
     ot -b Foo::Bar

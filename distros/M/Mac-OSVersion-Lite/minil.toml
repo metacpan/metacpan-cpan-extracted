@@ -1,7 +1,8 @@
-name = "Mac-OSVersion-Lite"
+authority = "cpan:PINE"
+authors = ["Pine Mizune"]
 badges = ["travis", "appveyor", "codecov"]
-authority="cpan:PINE"
-license="mit"
-
+license = "mit"
+markdown_maker = "Pod::Markdown::Github"
 module_maker="ModuleBuildTiny"
+name = "Mac-OSVersion-Lite"
 

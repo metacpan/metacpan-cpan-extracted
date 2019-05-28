@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Perl;
 
@@ -27,14 +27,14 @@ Information definieren (Anwendungsbeispiel):
     package Model::Object;
     
     __PACKAGE__->def(
-        table=>'Object',
-        prefix=>'Obj',
-        columns=>[
-            id=>{
-                domain=>'Integer',
-                primaryKey=>1,
-                notNull=>1,
-                description=>'Primärschlüssel',
+        table => 'Object',
+        prefix => 'Obj',
+        columns => [
+            id => {
+                domain => 'Integer',
+                primaryKey => 1,
+                notNull => 1,
+                description => 'Primärschlüssel',
             },
             ...
         ],
@@ -362,7 +362,7 @@ sub defCumulate {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

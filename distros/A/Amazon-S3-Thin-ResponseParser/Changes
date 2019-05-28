@@ -1,0 +1,11 @@
+Revision history for Perl extension Amazon-S3-Thin-ResponseParser
+
+0.02 2019-05-27T03:21:16Z
+
+    - Fix broken links in POD
+    - Move Github respository
+
+0.01 2019-05-24T10:29:29Z
+
+    - original version
+

@@ -40,8 +40,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Libxml2" : "0",
-            "Config" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -54,7 +52,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Libxml2" : "0",
             "Carp" : "0",
             "DynaLoader" : "0",
             "Encode" : "0",
@@ -71,6 +68,7 @@
             "constant" : "0",
             "overload" : "0",
             "parent" : "0",
+            "perl" : "5.008001",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -78,6 +76,7 @@
       },
       "test" : {
          "requires" : {
+            "Config" : "0",
             "Errno" : "0",
             "IO::File" : "0",
             "IO::Handle" : "0",
@@ -97,6 +96,6 @@
          "web" : "https://github.com/shlomif/perl-XML-LibXML"
       }
    },
-   "version" : "2.0200",
+   "version" : "2.0201",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

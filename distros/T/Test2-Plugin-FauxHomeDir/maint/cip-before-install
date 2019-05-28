@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cip exec cpanm -n File::HomeDir Path::Tiny

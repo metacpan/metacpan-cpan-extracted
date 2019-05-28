@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -166,20 +166,20 @@ sub new {
     my $show = 1;
 
     Quiq::Option->extract(\@_,
-        -show=>\$show,
+        -show => \$show,
     );
     my $n = shift || 0;
 
     # Objekt instantiieren
 
     my $self = $class->SUPER::new(
-        t0=>scalar Time::HiRes::gettimeofday,
-        n=>$n,
-        duration=>0,
-        i=>0,
-        fmt=>'', # letztes Format
-        msg=>'', # letzte Meldung
-        show=>$show,
+        t0 => scalar Time::HiRes::gettimeofday,
+        n => $n,
+        duration => 0,
+        i => 0,
+        fmt => '', # letztes Format
+        msg => '', # letzte Meldung
+        show => $show,
     );
 
     return $self;
@@ -737,7 +737,7 @@ sub warn {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

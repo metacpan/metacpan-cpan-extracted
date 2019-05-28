@@ -3,9 +3,9 @@
 use rlib 'lib';
 use HopenTest;
 
-BEGIN {
-    use_ok 'Data::Hopen::Util::NameSet';
-}
+use Test::Fatal;
+
+use Data::Hopen::Util::NameSet;
 
 # NOTE: Even though `$s ~~ 'x'` (object first) is supported for now, we don't
 # use it.  This is to retain compatibility with the 5.27.7-style smartmatch
@@ -16,11 +16,11 @@ my $s;
 # Run the tests twice: once without add() and once with add().
 for(my $iter=0; $iter<2; ++$iter) {
 
-    # Set up this iter's test object
-    if($iter == 0) {
-        $s = Data::Hopen::Util::NameSet->new();
-        isa_ok($s, 'Data::Hopen::Util::NameSet');
-        ok(!$s->contains('x'), "Empty nameset rejects 'x'");
+# Set up this iter's test object
+if($iter == 0) {
+    $s = Data::Hopen::Util::NameSet->new();
+    isa_ok($s, 'Data::Hopen::Util::NameSet');
+    ok(!$s->contains('x'), "Empty nameset rejects 'x'");
         ok(!('x' ~~ $s), "Empty nameset rejects 'x'");
         $s->add('foo', 'bar', qr/bat/, [qr/qu+x/i, 'array', ['inner array']],
                 {key=>'value'}, 'русский', 'язык');
@@ -58,19 +58,51 @@ for(my $iter=0; $iter<2; ++$iter) {
 
 } #foreach test
 
-# Complex
+# Complex, new()
 $s = Data::Hopen::Util::NameSet->new(qw(foo bar), qr/./);
 ok($s->complex, 'set with regexps is complex');
 $s = Data::Hopen::Util::NameSet->new(qw(foo bar));
 ok(!$s->complex, 'set without regexps is not complex');
 
-# Complex
+# Complex, add()
 $s = Data::Hopen::Util::NameSet->new;
 $s->add(qw(foo bar), qr/./);
 ok($s->complex, 'set with regexps is complex');
 $s = Data::Hopen::Util::NameSet->new;
 $s->add(qw(foo bar));
 ok(!$s->complex, 'set without regexps is not complex');
+
+# More add()
+ok(!defined exception { $s->add() }, 'add() without parms succeeds');
+ok(!defined exception { $s->add({key1 => 42, key2 => undef}) },
+    'add(hashref) succeeds');
+ok($s->contains($_), "add(hashref) added $_") foreach qw(key1 key2);
+
+# More _build()
+$s = Data::Hopen::Util::NameSet->new(qr/foo/);
+ok($s->contains('foo'), 'nameset without strings accepts foo from regex');
+ok(!$s->contains('bar'), 'nameset without strings rejects bar');
+
+# Error cases
+like(exception { Data::Hopen::Util::NameSet::new() },
+    qr/Call as/,
+    'new() throws when called directly');
+
+like(exception { Data::Hopen::Util::NameSet::add() },
+    qr/Need an instance/,
+    'add() throws when called directly');
+
+like(exception { Data::Hopen::Util::NameSet::contains() },
+    qr/Need an instance/,
+    'contains() throws when called directly');
+
+like(exception { Data::Hopen::Util::NameSet::_build() },
+    qr/Need an instance/,
+    '_build() throws when called directly');
+
+like(exception { Data::Hopen::Util::NameSet->new(sub {}) },
+    qr/I don't know how to handle this/,
+    'new(CODEREF) throws');
 
 done_testing();
 # vi: set fenc=utf8:

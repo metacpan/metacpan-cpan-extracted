@@ -12,9 +12,11 @@ use Text::ParseWords;
 use File::Basename;
 use File::Temp qw(tempfile);
 use File::stat;
+use File::Spec;
+use IPC::Cmd qw(run);
 use Carp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.05';
 
 my %sections = (
     global => 1,
@@ -26,7 +28,8 @@ my %sections = (
 sub new {
     my $class = shift;
     my $filename = shift // '/etc/haproxy/haproxy.cfg';
-    my $self = bless { _filename => $filename }, $class;
+    my $self = bless { _filename => $filename,
+		       _lint => { enable => 1 } }, $class;
     $self->reset();
     return $self;
 }
@@ -169,15 +172,77 @@ sub write {
     close $fh unless ref($file) eq 'GLOB';
 }
 
-sub save {
+sub lint {
     my $self = shift;
 
+    if (@_) {
+	if (@_ == 1) {
+	    $self->{_lint}{enable} = !!shift;
+	} elsif (@_ % 2 == 0) {
+	    local %_ = @_;
+	    my $v;
+	    if (defined($v = delete $_{enable})) {
+		$self->{_lint}{enable} = $v;
+	    }
+	    if (defined($v = delete $_{command})) {
+		$self->{_lint}{command} = $v;
+	    }
+	    if (defined($v = delete $_{path})) {
+		$self->{_lint}{path} = $v;
+	    }
+	    croak "unrecognized keywords" if keys %_;
+	} else {
+	    croak "bad number of arguments";
+	}
+    }
+
+    if ($self->{_lint}{enable}) {
+	$self->{_lint}{command} ||= 'haproxy -c -f';
+	if ($self->{_lint}{path}) {
+	    my ($prog, $args) = split /\s+/, $self->{_lint}{command}, 2;
+	    if (!File::Spec->file_name_is_absolute($prog)) {
+		foreach my $dir (split /:/, $self->{_lint}{path}) {
+		    my $name = File::Spec->catfile($dir, $prog);
+		    if (-x $name) {
+			$prog = $name;
+			last;
+		    }
+		}
+		if ($args) {
+		    $prog .= ' '.$args;
+		}
+		$self->{_lint}{command} = $prog;
+	    }
+	}
+	return $self->{_lint}{command};
+    }
+}
+
+sub save {
+    my $self = shift;
+    croak "bad number of arguments" if @_ % 2;
+    local %_ = @_;
+    my $dry_run = delete $_{dry_run};
+    my @wrargs = %_;
+    
     return unless $self->tree;# FIXME
     return unless $self->tree->is_dirty;
     my ($fh, $tempfile) = tempfile('haproxy.XXXXXX',
 				   DIR => dirname($self->filename));
-    $self->write($fh, @_);
+    $self->write($fh, @wrargs);
     close($fh);
+    if (my $cmd = $self->lint) {
+	my ($ok, $err, $full, $outbuf, $errbuf) =
+	    run(command => "$cmd $tempfile");
+	unless ($ok) {
+	    unlink $tempfile;
+	    if ($errbuf && @$errbuf) {
+		croak "Syntax check failed: ".join("\n", @$errbuf)."\n";
+	    }
+	    croak $err;
+	}
+    }
+    return 1 if $dry_run;
     
     my $sb = stat($self->filename);
     $self->backup;
@@ -188,7 +253,8 @@ sub save {
     # This will fail unless we are root, let it be so.
     chown $sb->uid, $sb->gid, $self->filename;
     
-    $self->tree->clear_dirty
+    $self->tree->clear_dirty;
+    return 1;
 }
 
 sub backup_name {
@@ -233,9 +299,12 @@ Config::HAProxy - Parser for HAProxy configuration file
         # do something with $node
     }
 
-    $cfg->save;
+    $cfg->lint(enable => 1, command => 'haproxy -c -f',
+               path => '/sbin:/usr/sbin')
 
-    $cfg->write($file_or_handle);
+    $cfg->save(%hash);
+
+    $cfg->write($file_or_handle, %hash);
 
     $cfg->backup;
     $name = $self->backup_name;
@@ -361,11 +430,56 @@ Returns the last node in the tree.
     
 =head1 SAVING
 
+=head2 lint
+
+    $cfg->lint(%hash);
+
+Configures configuration syntax check. The check will be run by the B<save>
+method prior to writing to the configuration file. Takes a hash as argument.
+Allowed keys are:
+
+=over 4
+
+=item B<enable =E<gt> I<BOOL>>
+
+If I<BOOL> is 0, disables syntax check.  Default is 1.
+
+=item B<command =E<gt> I<CMD>>    
+
+Defines the shell command to use for syntax check. The command will be run
+as
+
+    CMD FILE
+
+where I<FILE> is the name of the HAProxy configuration file to check.
+
+Default command is B<haproxy -c -f>.
+
+=item B<path =E<gt> I<PATH>>
+
+Sets the search path for the syntax checker. I<PATH> is a colon-delimited
+list of directories. Unless the first word of B<command> is an absolute
+file name, it will be looked for in these directories. The first match
+will be used. Default is system B<$PATH>.    
+
+=back
+
+Returns the command name.
+
 =head2 save
 
-    $cfg->save;
+    $cfg->save(%hash);
 
-Saves the parse tree in the configuration file.
+Saves the parse tree in the configuration file. Syntax check will be run
+prior to saving (unless previously disabled). If syntax errors are discovered,
+the method will B<croak> with a diagnostic message starting with words
+C<Syntax check failed:>.
+
+If I<%hash> contains a non-zero B<dry_run> value, B<save> will only run syntax
+check, without actually saving the file. If B<$cfg-E<gt>lint(enable =E<gt> 0)>
+was called previously, this is a no-op.
+
+Other keys in I<%hash> are the same as in B<write>, described below.
 
 =head2 write
 

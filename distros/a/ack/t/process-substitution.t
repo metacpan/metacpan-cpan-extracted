@@ -36,7 +36,7 @@ my @output;
 
 if ( $pid ) {
     close $write;
-    while(<$read>) {
+    while ( <$read> ) {
         chomp;
         push @output, $_;
     }
@@ -48,7 +48,6 @@ else {
     open STDERR, '>&', $write or die "Can't open: $!";
 
     my @args = build_ack_invocation( qw( --noenv --nocolor --smart-case this ) );
-    # XXX doing this by hand here eq '=('
     my $perl = caret_X();
 
     if ( $ENV{'ACK_TEST_STANDALONE'} ) {

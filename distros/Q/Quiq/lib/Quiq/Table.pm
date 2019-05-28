@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Quiq::Properties;
 use Quiq::TableRow;
 use Quiq::Parameters;
+use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
 
@@ -42,10 +43,10 @@ L<Quiq::Hash>
     $columnA = $tab->columns;
     # ['a','b','c','d']
     
-    $i = $tab->columnIndex('c');
+    $i = $tab->index('c');
     # 2
     
-    $i = $tab->columnIndex('z');
+    $i = $tab->index('z');
     # Exception
     
     # Zeilen
@@ -91,6 +92,10 @@ von gleichförmigen Zeilen. Die Namen der Kolumnen werden dem Konstruktor
 der Klasse übergeben. Sie bezeichnen die Komponenten der Zeilen. Die
 Zeilen sind Objekte der Klasse Quiq::TableRow.
 
+=head1 EXAMPLE
+
+Siehe quiq-ls
+
 =head1 METHODS
 
 =head2 Klassenmethoden
@@ -127,14 +132,23 @@ Liste der Zeilen ist zunächst leer.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$columnA) = @_;
+    my $class = shift;
+    my $columnA = shift;
+    my $rowA = shift // [];
 
     my $i = 0;
-    return $class->SUPER::new(
+    my $self = $class->SUPER::new(
         columnA => $columnA,
         columnH => Quiq::Hash->new({map {$_ => $i++} @$columnA}),
+        propertyH => undef,
         rowA => [],
     );
+
+    for my $row (@$rowA) {
+        $self->push($row);
+    }
+
+    return $self;
 }
 
 # -----------------------------------------------------------------------------
@@ -194,11 +208,47 @@ sub count {
 
 # -----------------------------------------------------------------------------
 
-=head3 columnProperties() - Eigenschaften der Werte einer Kolumne
+=head3 index() - Index einer Kolumne
 
 =head4 Synopsis
 
-    $prp = $tab->columnProperties($column);
+    $i = $tab->index($column);
+
+=head4 Arguments
+
+=over 4
+
+=item $column
+
+Kolumnenname (String).
+
+=back
+
+=head4 Returns
+
+Integer
+
+=head4 Description
+
+Liefere den Index der Kolumne $column. Der Index einer Kolumne ist ihre
+Position innerhalb des Kolumnen-Arrays.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub index {
+    my ($self,$column) = @_;
+    return $self->{'columnH'}->{$column};
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 properties() - Eigenschaften einer Kolumne
+
+=head4 Synopsis
+
+    $prp = $tab->properties($column);
 
 =head4 Arguments
 
@@ -218,57 +268,27 @@ Properties-Objekt (Quiq::Properties)
 
 Ermittele die Eigenschaften der Werte der Kolumne $column und liefere
 ein Objekt, das diese Eigenschaften abfragbar zur Verfügung stellt,
-zurück.
+zurück. Die Eigenschaften werden gecacht, so dass bei einem wiederholten
+Aufruf die Eigenschaften nicht erneut ermittelt werden müssen. Wird die
+Tabelle mit push() erweitert, wird der Cache automatisch gelöscht.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub columnProperties {
+sub properties {
     my ($self,$column) = @_;
 
-    my $prp = Quiq::Properties->new;
-    for my $val ($self->values($column,-distinct=>1)) {
-        $prp->analyze($val);
+    my $prp = $self->{'propertyH'}->{$column};
+    if (!$prp) {
+        $prp = Quiq::Properties->new;
+        for my $val ($self->values($column,-distinct=>1)) {
+            $prp->analyze($val);
+        }
+        $self->{'propertyH'}->{$column} = $prp;
     }
 
     return $prp;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 columnIndex() - Index einer Kolumne
-
-=head4 Synopsis
-
-    $i = $tab->columnIndex($column);
-
-=head4 Arguments
-
-=over 4
-
-=item $column
-
-Kolumnenname (String).
-
-=back
-
-=head4 Returns
-
-Integer
-
-=head4 Description
-
-Liefere den Index der Kolumne $column. Der Index einer Kolumne ist ihre
-Position innerhalb des Kolumnen-Array.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub columnIndex {
-    my ($self,$column) = @_;
-    return $self->{'columnH'}->{$column};
 }
 
 # -----------------------------------------------------------------------------
@@ -295,6 +315,8 @@ Füge eine Zeile mit den Daten @arr zur Tabelle hinzu. Die Anzahl der
 Elemente in @arr muss mit der Anzahl der Kolumnen übereinstimmen,
 sonst wird eine Exception geworfen.
 
+Sind durch
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -304,6 +326,7 @@ sub push {
 
     my $row = Quiq::TableRow->new($self,$valueA);
     $self->SUPER::push('rowA',$row);
+    $self->{'propertyH'} &&= undef; # Kolumneneigenschaften löschen
 
     return;
 }
@@ -394,10 +417,10 @@ sub values {
     # Erstelle Werteliste
 
     my (@arr,%seen);
-    my $i = $self->columnIndex($column);
+    my $i = $self->index($column);
     for my $row (@{$self->{'rowA'}}) {
         my $val = $row->[1][$i];
-        if ($distinct && $seen{$val}++) {
+        if ($distinct && $seen{$val//''}++) {
             next;
         }
         CORE::push @arr,$val;
@@ -433,9 +456,88 @@ sub width {
 
 # -----------------------------------------------------------------------------
 
+=head2 Formatierung
+
+=head3 asText() - Tabelle als Text
+
+=head4 Synopsis
+
+    $text = $tab->asText(@opt);
+
+=head4 Options
+
+=over 4
+
+=item -colorize => $sub
+
+Callback-Funktion, die für jede Zelle gerufen wird und eine Termnal-Farbe
+für die jeweilige Zelle liefert. Die Funktion hat die Struktur:
+
+    sub {
+        my ($tab,$row,$column,$val) = @_;
+        ...
+        return $color;
+    }
+
+Die Terminal-Farbe ist eine Zeichenkette, wie sie Quiq::AnsiColor
+erwartet. Anwendungsbeispiel siehe quiq-ls.
+
+=back
+
+=head4 Returns
+
+Text-Tabelle (String)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub asText {
+    my $self = shift;
+
+    # Optionen
+
+    my $colorizeS = undef;
+
+    Quiq::Parameters->extractToVariables(\@_,0,0,
+        -colorize => \$colorizeS,
+    );
+
+    # Kolumnennamen
+    my $columnA = $self->columns;
+
+    # Kolumneneigenschaften
+    my @properties = map {$self->properties($_)} $self->columns;
+
+    # Terminal-Farben
+    my $a = Quiq::AnsiColor->new;
+
+    # Erzeuge Tabellenzeile
+
+    my $str = '';
+    for my $row ($self->rows) {
+        my @row;
+        my $valueA = $row->values;
+        for (my $i = 0; $i < @$valueA; $i++) {
+            my $val = sprintf $properties[$i]->format('text',$valueA->[$i]);
+            if ($colorizeS) {
+                if (my $color = $colorizeS->($self,$row,$columnA->[$i],$val)) {
+                    $val = $a->str($color,$val);
+                }
+            }
+            CORE::push @row,$val;
+        }
+        $str .= '| '.join(' | ',@row)." |\n";
+    }
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

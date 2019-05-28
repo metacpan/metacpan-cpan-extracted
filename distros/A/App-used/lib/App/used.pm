@@ -14,7 +14,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION     = version->new('0.0.9');
+our $VERSION     = version->new('0.1.0');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -28,7 +28,7 @@ App::used - Find modules used or required in perl files or directories of perl f
 
 =head1 VERSION
 
-This documentation refers to App::used version 0.0.9
+This documentation refers to App::used version 0.1.0
 
 
 =head1 SYNOPSIS

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Cwd ();
 use Hash::Util ();
@@ -157,11 +157,11 @@ sub new {
     my $varDir = "$prefix/var/opt/$application";
 
     my $self = bless {
-        name=>$application,
-        prefix=>$prefix,
-        homeDir=>$homeDir,
-        etcDir=>$etcDir,
-        varDir=>$varDir,
+        name => $application,
+        prefix => $prefix,
+        homeDir => $homeDir,
+        etcDir => $etcDir,
+        varDir => $varDir,
     },$class;
     Hash::Util::lock_ref_keys($self);
 
@@ -361,7 +361,7 @@ Trennzeichens erlaubt:
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

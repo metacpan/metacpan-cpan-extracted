@@ -26,16 +26,16 @@ sub test_html : Test(3) {
     $self->is($html,qq|<input type="file" />\n|);
 
     $html = Quiq::Html::Widget::FileUpload->html($h,
-        name=>'file1',
-        size=>20,
+        name => 'file1',
+        size => 20,
     );
     $self->is($html,'<input type="file" name="file1" size="20"'.
         qq| maxlength="20" />\n|);
 
     $html = Quiq::Html::Widget::FileUpload->html($h,
-        name=>'file1',
-        size=>20,
-        maxLength=>0,
+        name => 'file1',
+        size => 20,
+        maxLength => 0,
     );
     $self->is($html,qq|<input type="file" name="file1" size="20" />\n|);
 }

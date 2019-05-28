@@ -17,6 +17,8 @@ WriteMakefile(
       Test::Assertions::TestScript => 0,
       IO::CaptureOutput => 0,
       IO::Scalar => 0,
+      CGI => 0,
+      Locale::Recode => 0,
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },

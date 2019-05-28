@@ -152,7 +152,7 @@ sub tag_zusammengesetzterInhalt : Test(2) {
     my $expected = qq|<p class="x">\n  Ein\n  <b>kurzer</b>\n  Text\n</p>\n|;
 
     my $val = $h->tag('p',
-        class=>'x',
+        class => 'x',
         "Ein\n".
         $h->tag('b',-nl=>1,'kurzer').
         'Text'
@@ -160,7 +160,7 @@ sub tag_zusammengesetzterInhalt : Test(2) {
     $self->is($val,$expected,"tag: Content konkateniert");
 
     $val = $h->tag('p',
-        class=>'x',
+        class => 'x',
         '-',
         "Ein\n",
         $h->tag('b',-nl=>1,'kurzer'),
@@ -177,9 +177,9 @@ sub tag_dataTags : Test(4) {
     # Einzel-Attribute
 
     my $html = $h->tag('form',
-        'data-x'=>'a',
-        'data-y'=>'b',
-        'data-z'=>'c',
+        'data-x' => 'a',
+        'data-y' => 'b',
+        'data-z' => 'c',
     );
     $self->is($html,qq|<form data-x="a" data-y="b" data-z="c"></form>\n|);
 
@@ -188,15 +188,15 @@ sub tag_dataTags : Test(4) {
     # a) leere Liste
 
     $html = $h->tag('form',
-        data=>[],
+        data => [],
     );
     $self->is($html,qq|<form></form>\n|);
 
     # b) ein Element
 
     $html = $h->tag('form',
-        data=>[
-            x=>'a',
+        data => [
+            x => 'a',
         ],
     );
     $self->is($html,qq|<form data-x="a"></form>\n|);
@@ -204,10 +204,10 @@ sub tag_dataTags : Test(4) {
     # c) mehrere Elemente
 
     $html = $h->tag('form',
-        data=>[
-            x=>'a',
-            y=>'b',
-            z=>'c',
+        data => [
+            x => 'a',
+            y => 'b',
+            z => 'c',
         ],
     );
     $self->is($html,qq|<form data-x="a" data-y="b" data-z="c"></form>\n|);

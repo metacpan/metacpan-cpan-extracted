@@ -21,10 +21,10 @@ name: App-CSV2Chart
 provides:
   App::CSV2Chart:
     file: lib/App/CSV2Chart.pm
-    version: v0.2.0
+    version: v0.4.0
   App::CSV2Chart::Command::xlsx:
     file: lib/App/CSV2Chart/Command/xlsx.pm
-    version: v0.2.0
+    version: v0.4.0
 requires:
   App::Cmd::Setup: '0'
   Excel::Writer::XLSX: '0'
@@ -35,10 +35,10 @@ resources:
   bugtracker: https://github.com/shlomif/app-csv2chart/issues
   homepage: http://metacpan.org/release/App-CSV2Chart
   repository: https://github.com/shlomif/CSV2Chart.git
-version: 0.2.0
+version: 0.4.0
 x_Dist_Zilla:
   perl:
-    version: '5.028001'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -397,5 +397,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

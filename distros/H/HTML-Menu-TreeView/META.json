@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "HTML-Menu-TreeView",
    "prereqs" : {
@@ -29,18 +29,18 @@
    "provides" : {
       "HTML::Menu::TreeView" : {
          "file" : "lib/HTML/Menu/TreeView.pm",
-         "version" : "1.21"
+         "version" : "1.22"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/lgpl-license.php"
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ],
       "repository" : {
          "url" : "https://sourceforge.net/p/lindnerei/ajax/HEAD/tree/HTML-Menu-TreeView"
       }
    },
-   "version" : "1.21",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.22",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

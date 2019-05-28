@@ -1,9 +1,15 @@
+NAME
+
+    Time::Zone::Olson - Provides an Olson timezone database interface
+
 VERSION
-    Version 0.13
+
+    Version 0.18
 
 SYNOPSIS
-        use Time::Zone::Olson();
 
+        use Time::Zone::Olson();
+    
         my $time_zone = Time::Zone::Olson->new( timezone => 'Australia/Melbourne' ); # set timezone at creation time
         my $now = $time_zone->time_local($seconds, $minutes, $hours, $day, $month, $year); # convert for Australia/Melbourne time
         foreach my $area ($time_zone->areas()) {
@@ -15,214 +21,287 @@ SYNOPSIS
         }
 
 DESCRIPTION
-    Time::Zone::Olson is intended to provide a simple interface to the Olson
-    database that is available on most UNIX systems. It provides an
+
+    Time::Zone::Olson is intended to provide a simple interface to the
+    Olson database that is available on most UNIX systems. It provides an
     interface to list common time zones, such as Australia/Melbourne that
     are stored in the zone.tab file, and localtime/Time::Local::timelocal
-    replacements to translate times to and from the users timezone, without
-    changing the timezone used by Perl. This allows logging/etc to be
-    conducted in the system's local time.
+    replacements to translate times to and from the users time zone,
+    without changing the time zone used by Perl. This allows logging/etc to
+    be conducted in the system's local time.
 
-    Time::Zone::Olson was designed to produce the same result as a 64bit
+    Time::Zone::Olson was designed to produce the same result as a 64 bit
     copy of the date(1) command.
 
-SUBROUTINES/METHODS
-  new
-    Time::Zone::Olson->new() will return a new timezone object. It accepts a
-    hash as a parameter with an optional `timezone' key, which contains an
-    Olson timezone value, such as 'Australia/Melbourne'. The hash also
-    allows a `directory' key, with the file system location of the Olson
-    timezone database as a value.
+    Time::Zone::Olson will attempt to function even without an actual Olson
+    database on Win32 platforms by translating information available in the
+    Win32 registry.
 
-    Both of these parameters default to `$ENV{TZ}' and `$ENV{TZDIR}'
+SUBROUTINES/METHODS
+
+ new
+
+    Time::Zone::Olson->new() will return a new time zone object. It accepts
+    a hash as a parameter with an optional timezone key, which contains an
+    Olson time zone value, such as 'Australia/Melbourne'. The hash also
+    allows a directory key, with the file system location of the Olson time
+    zone database as a value.
+
+    Both of these parameters default to $ENV{TZ} and $ENV{TZDIR}
     respectively.
 
-  areas
-    The areas() object method will return a list of the areas (such as Asia,
-    Australia, Africa, America, Europe) from the zone.tab file. The areas
-    will be sorted alphabetically.
+ areas
 
-  locations
+    The areas() object method will return a list of the areas (such as
+    Asia, Australia, Africa, America, Europe) from the zone.tab file. The
+    areas will be sorted alphabetically.
+
+ locations
+
     The locations($area) object method will return a list of the locations
     (such as Melbourne, Perth, Hobart) for a specified area from the
     zone.tab file. The locations will be sorted alphabetically.
 
-  comment
+ comment
+
     The comment($timezone) object method will return the matching comment
-    from the zone.tab file for the timezone parameter. For example, if
-    `"Australia/Melbourne"' was passed as a parameter, the comment function
-    would return `"Victoria"'
+    from the zone.tab file for the time zone parameter. For example, if
+    "Australia/Melbourne" was passed as a parameter, the "comment" function
+    would return "Victoria". For Win32 platforms, it will return the
+    contents of the Display registry setting. For example, for
+    "Australia/Melbourne", it would return "(UTC+10) Canberra, Melbourne,
+    Sydney".
 
-  directory
-    This object method can be used to get or set the root directory of the
-    Olson database, usually located at /usr/share/zoneinfo.
+ directory
 
-  timezone
-    This object method can be used to get or set the timezone, which will
-    affect all future calls to local_time or time_local. The parameter for
-    this method should be in the Olson format of a timezone, such as
-    `"Australia/Melbourne"'.
+    This method can be used to get or set the root directory of the Olson
+    database, usually located at /usr/share/zoneinfo.
 
-  equiv
-    This object method takes a timezone name as a parameter. It then
-    compares the transition times and offsets for the currently set timezone
-    to the transition times and offsets for the specified timezone and
-    returns true if they match exactly from the current time. The second
-    optional parameter can specify the start time to use when comparing the
-    two time zones.
+ timezone
 
-  offset
-    This object method can be used to get or set the offset for all
-    local_time or time_local calls. The offset should be specified in
-    minutes from GMT.
+    This method can be used to get or set the time zone, which will affect
+    all future calls to "local_time" or "time_local". The parameter for
+    this method should be in the Olson format of a time zone, such as
+    "Australia/Melbourne".
 
-  area
-    This object method will return the area component of the current
-    timezone, such as Australia
+ equiv
 
-  location
-    This object method will return the location component of the current
-    timezone, such as Melbourne
+    This method takes a time zone name as a parameter. It then compares the
+    transition times and offsets for the currently set time zone to the
+    transition times and offsets for the specified time zone and returns
+    true if they match exactly from the current time. The second optional
+    parameter can specify the start time to use when comparing the two time
+    zones.
 
-  local_offset
-    This object method takes the same arguments as `localtime' but returns
-    the appropriate offset from GMT in minutes. This can to used as a
-    `offset' parameter to a subsequent call to Time::Zone::Olson.
+ offset
 
-  local_time
-    This object method has the same signature as the 64 bit version of the
-    `localtime' function. That is, it accepts up to a 64 bit signed integer
-    as the sole argument and returns the `(seconds, minutes, hours, day,
-    month, year, wday, yday, isdst)' definition for the timezone for the
-    object. The timezone used to calculate the local time may be specified
-    as a parameter to the new method or via the timezone method.
+    This method can be used to get or set the offset for all "local_time"
+    or "time_local" calls. The offset should be specified in minutes from
+    GMT.
 
-  time_local
-    This object method has the same signature as the 64 bit version of the
-    `Time::Local::timelocal' function. That is, it accepts `(seconds,
-    minutes, hours, day, month, year, wday, yday, isdst)' as parameters in a
-    list and returns the correct UNIX time in seconds according to the
-    current timezone for the object. The timezone used to calculate the
-    local time may be specified as a parameter to the new method or via the
-    timezone method.
+ area
+
+    This method will return the area component of the current time zone,
+    such as Australia
+
+ location
+
+    This method will return the location component of the current time
+    zone, such as Melbourne
+
+ local_offset
+
+    This method takes the same arguments as localtime but returns the
+    appropriate offset from GMT in minutes. This can to used as a offset
+    parameter to a subsequent call to Time::Zone::Olson.
+
+ local_time
+
+    This method has the same signature as the 64 bit version of the
+    localtime function. That is, it accepts up to a 64 bit signed integer
+    as the sole argument and returns the (seconds, minutes, hours, day,
+    month, year, wday, yday, isdst) definition for the time zone for the
+    object. The time zone used to calculate the local time may be specified
+    as a parameter to the "new" method or via the "timezone" method.
+
+ time_local
+
+    This method has the same signature as the 64 bit version of the
+    Time::Local::timelocal function. That is, it accepts (seconds, minutes,
+    hours, day, month, year, wday, yday, isdst) as parameters in a list and
+    returns the correct UNIX time in seconds according to the current time
+    zone for the object. The time zone used to calculate the local time may
+    be specified as a parameter to the "new" method or via the "timezone"
+    method.
 
     During a time zone change such as +11 GMT to +10 GMT, there will be two
     possible UNIX times that can result in the same local time. In this
-    case, like `Time::Local::timelocal', this function will return the lower
+    case, like Time::Local::timelocal, this function will return the lower
     of the two times.
 
-  transition_times
-    This object method can be used to get the list of transition times for
-    the current timezone. This method is only intended for testing the
-    results of Time::Zone::Olson.
+ transition_times
 
-  leap_seconds
-    This object method can be used to get the list of leap seconds for the
-    current timezone. This method is only intended for testing the results
+    This method can be used to get the list of transition times for the
+    current time zone. This method is only intended for testing the results
     of Time::Zone::Olson.
 
-  reset_cache
-    This object or class method can be used to reset the cache. This method
-    is only intended for testing the results of Time::Zone::Olson. In actual
-    use, cached values are only used if the `mtime' of the relevant files
-    has not changed.
+ leap_seconds
+
+    This method can be used to get the list of leap seconds for the current
+    time zone. This method is only intended for testing the results of
+    Time::Zone::Olson.
+
+ reset_cache
+
+    This method can be used to reset the cache. This method is only
+    intended for testing the results of Time::Zone::Olson. In actual use,
+    cached values are only used if the mtime of the relevant files has not
+    changed.
+
+ win32_mapping
+
+    This method will return a hash containing the mapping between Windows
+    time zones and Olson time zones. This method is only intended for
+    testing the results of Time::Zone::Olson.
+
+ win32_registry
+
+    This method will return true if the object is using the Win32 registry
+    for Olson tz calculations. Otherwise it will return false.
 
 DIAGNOSTICS
-    `%s is not a TZ file'
-        The designated path did not have the `TZif' prefix at the start of
-        the file. Maybe either the directory or the timezone name is
-        incorrect?
 
-    `Failed to read header from %s:%s'
-        The designated file encountered an error reading either the V1 or V2
-        headers
+    %s is not a TZ file
 
-    `Failed to read entire header from %s. %d bytes were read instead of the
-    expected %d'
-        The designated file is shorter than expected
+      The designated path did not have the TZif prefix at the start of the
+      file. Maybe either the directory or the time zone name is incorrect?
 
-    `%s is not an timezone in the existing Olson database'
-        The designated timezone could not be found on the file system. The
-        timezone is expected to be in the designated directory + the
-        timezone name, for example, /usr/share/zoneinfo/Australia/Melbourne
+    Failed to read header from %s:%s
 
-    `%s does not have a valid format for a TZ timezone'
-        The designated timezone name could not be matched by the regular
-        expression for a timezone in Time::Zone::Olson
+      The designated file encountered an error reading either the version 1
+      or version 2 headers
 
-    `Failed to close %s:%s'
-        There has been a file system error while reading or closing the
-        designated path
+    Failed to read entire header from %s. %d bytes were read instead of the
+    expected %d
 
-    `Failed to open %s for reading:%s'
-        There has been a file system error while opening the the designated
-        path. This could be permissions related, or the timezone in question
-        doesn't exist?
+      The designated file is shorter than expected
 
-    `Failed to stat %s:%s'
-        There has been a file system error while doing a stat on the
-        designated path. This could be permissions related, or the timezone
-        in question doesn't exist?
+    %s is not an time zone in the existing Olson database
 
-    `Failed to read %s from %s:%s'
-        There has been a file system error while reading from the designated
-        path. The file could be corrupt?
+      The designated time zone could not be found on the file system. The
+      time zone is expected to be in the designated directory + the time
+      zone name, for example, /usr/share/zoneinfo/Australia/Melbourne
 
-    `Failed to read all the %s from %s. %d bytes were read instead of the
-    expected %d'
-        The designated file is shorter than expected. The file could be
-        corrupt?
+    %s does not have a valid format for a TZ time zone
 
-    `The tz definition at the end of %s could not be read in %d bytes'
-        The designated file is longer than expected. Maybe the timezone
-        version is greater than the currently recognized 3?
+      The designated time zone name could not be matched by the regular
+      expression for a time zone in Time::Zone::Olson
 
-    `Failed to read tz definition from %s:%'
-        There has been a file system error while reading from the designated
-        path. The file could be corrupt?
+    Failed to close %s:%s
 
-    `Failed to parse the tz definition of %s from %s'
-        This is probably a bug in Time::Zone::Olson in failing to parse the
-        `TZ' variable at the end of the file.
+      There has been a file system error while reading or closing the
+      designated path
+
+    Failed to open %s for reading:%s
+
+      There has been a file system error while opening the the designated
+      path. This could be permissions related, or the time zone in question
+      doesn't exist?
+
+    Failed to stat %s:%s
+
+      There has been a file system error while doing a stat on the
+      designated path. This could be permissions related, or the time zone
+      in question doesn't exist?
+
+    Failed to read %s from %s:%s
+
+      There has been a file system error while reading from the designated
+      path. The file could be corrupt?
+
+    Failed to read all the %s from %s. %d bytes were read instead of the
+    expected %d
+
+      The designated file is shorter than expected. The file could be
+      corrupt?
+
+    The tz definition at the end of %s could not be read in %d bytes
+
+      The designated file is longer than expected. Maybe the time zone
+      version is greater than the currently recognized 3?
+
+    Failed to read tz definition from %s:%
+
+      There has been a file system error while reading from the designated
+      path. The file could be corrupt?
+
+    Failed to parse the tz definition of %s from %s
+
+      This is probably a bug in Time::Zone::Olson in failing to parse the
+      TZ variable at the end of the file.
+
+    Failed to open %s:%s
+
+      There has been an error while opening the the designated registry
+      entry.
+
+    Failed to read from %s:%s
+
+      There has been an file system error while reading from the registry.
+
+    Failed to close %s:%s
+
+      There has been an error while reading or closing the designated
+      registry entry
 
 CONFIGURATION AND ENVIRONMENT
+
     Time::Zone::Olson requires no configuration files or environment
-    variables. However, it will use the values of `$ENV{TZ}' and
-    `$ENV{TZDIR}' as defaults for missing parameters.
+    variables. However, it will use the values of $ENV{TZ} and $ENV{TZDIR}
+    as defaults for missing parameters.
 
 DEPENDENCIES
+
     Time::Zone::Olson requires Perl 5.10 or better. For environments where
     the unpack 'q' parameter is not supported, the following module is also
     required
 
-    * Math::Int64
+      * Math::Int64
 
 INCOMPATIBILITIES
+
     None reported
 
 BUGS AND LIMITATIONS
+
     On Win32 platforms, the Olson TZ database is usually unavailable. In an
     attempt to provide a workable alternative, the Win32 Registry is
-    interrogated and translated to allow Olson timezones (such as
+    interrogated and translated to allow Olson time zones (such as
     Australia/Melbourne) to be used on Win32 nodes. Therefore, the use of
     Time::Zone::Olson should be cross-platform compatible, but the actual
     results may be different, depending on the compatibility of the Win32
-    Registry timezones and the Olson TZ database.
+    Registry time zones and the Olson TZ database.
 
-    Please report any bugs or feature requests to `bug-time-zone-olson at
-    rt.cpan.org', or through the web interface at
+    Please report any bugs or feature requests to bug-time-zone-olson at
+    rt.cpan.org, or through the web interface at
     http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson. I will
     be notified, and then you'll automatically be notified of progress on
     your bug as I make changes.
 
 SEE ALSO
-    * DateTime::TimeZone
-    * DateTime::TimeZone::Tzfile
+
+      * DateTime::TimeZone
+
+      * DateTime::TimeZone::Tzfile
+
+      * DateTime::TimeZone::Local::Win32
 
 AUTHOR
-    David Dick, `<ddick at cpan.org>'
+
+    David Dick, <ddick at cpan.org>
 
 LICENSE AND COPYRIGHT
+
     Copyright 2019 David Dick.
 
     This program is free software; you can redistribute it and/or modify it

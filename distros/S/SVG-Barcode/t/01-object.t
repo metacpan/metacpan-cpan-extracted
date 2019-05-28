@@ -7,7 +7,6 @@ no warnings 'experimental::signatures';
 
 use FindBin;
 use Test::More;
-use Mock::MonkeyPatch;
 
 my $package;
 
@@ -21,40 +20,44 @@ can_ok $package, 'new';
 
 note 'Object';
 ok my $object = $package->new, 'Create object';
-my @methods = qw|param plot|;
+my @methods = qw|plot|;
 can_ok $object, $_ for @methods;
 
 note 'Parameters';
 my %defaults = (
   background => 'white',
+  class      => '',
   foreground => 'black',
-  margin     => 10,
+  height     => '',
+  id         => '',
+  margin     => 2,
+  width      => '',
 );
 
 for (sort keys %defaults) {
-  is $object->param($_), $defaults{$_}, "$_ is $defaults{$_}";
+  can_ok $object, $_;
+  is $object->$_, $defaults{$_}, "$_ is $defaults{$_}";
 }
 
 my %non_defaults = (
   background => 'cyan',
   margin     => 2,
 );
-ok $object = $package->new(\%non_defaults), 'Create object with parameters';
+ok $object = $package->new(%non_defaults), 'Create object with parameters';
 for (sort keys %non_defaults) {
-  is $object->param($_), $non_defaults{$_}, "$_ is $non_defaults{$_}";
+  is $object->$_, $non_defaults{$_}, "$_ is $non_defaults{$_}";
 }
 for (sort keys %defaults) {
   next if $non_defaults{$_};
-  is $object->param($_), $defaults{$_}, "$_ is $defaults{$_}";
+  is $object->$_, $defaults{$_}, "$_ is $defaults{$_}";
 }
 
-is $object->param(foreground => 'red')->param('foreground'), 'red',
-  'Set color to red';
-is $object->param(foreground => '')->param('foreground'), $defaults{foreground},
-  'Set color to default';
+is $object->foreground('red')->foreground, 'red', 'Set foreground to red';
+is $object->foreground('')->foreground, $defaults{foreground},
+  'Set foreground back to default';
 
-eval { $object->param(inexistant => 'illegal') };
-like $@, qr/Unknown parameter inexistant!/,
+eval { $package->new(inexistant => 'illegal') };
+like $@, qr/Can't locate object method "inexistant"/,
   'Correct error for inexistant parameter';
 
 note 'Plot';
@@ -68,18 +71,20 @@ eval { $object->plot($text) };
 like $@, qr/Method _plot not implemented by subclass!/,
   'Correct error for unimplemented method';
 
-ok my $mock = Mock::MonkeyPatch->patch(
-  'SVG::Barcode::_plot' => sub ($self, $text) {
-    $self->_rect(0,  0,  50, 50);
-    $self->_rect(50, 0,  50, 50, 'cyan');
-    $self->_rect(0,  50, 50, 50, 'magenta');
-    $self->_rect(50, 50, 50, 50, 'yellow');
-    $self->_text('<black>', 3, 47, 10, 'white');
-  }
-  ),
-  'Mock _plot method';
-ok my $svg = $object->param(margin => 25)->plot($text), 'Generate svg';
+{
+  no strict 'refs';    ## no critic 'ProhibitNoStrict'
+  no warnings 'redefine';
+  *SVG::Barcode::_plot = sub ($self, $text) {
+    $self->_rect(0, 0, 5, 5);
+    $self->_rect(5, 0, 5, 5, 'cyan');
+    $self->_rect(0, 5, 5, 5, 'magenta');
+    $self->_rect(5, 5, 5, 5, 'yellow');
+    $self->_text('<black>', .3, 4.7, 1, 'white');
+  };
+}
 
+ok my $svg = $object->margin(2)->width('100%')->height('100%')->plot($text),
+  'Generate svg';
 is $svg, slurp("$FindBin::Bin/resources/cmyk.svg"), 'Content is correct';
 
 done_testing();

@@ -1,25 +1,19 @@
-# Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>, 
+# Copyright (C) 2016-2019 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This file is distributed under the same terms and conditions as
 # Perl itself.
 
-use strict;
+use common::sense;
 
 use Cwd;
 use File::Spec;
 
 BEGIN {
-    my ($volume, $directory) = File::Spec->splitpath(Cwd::abs_path($0));
-    my $here = File::Spec->catpath($volume, $directory);
-    my $gitdir = File::Spec->catdir($here, File::Spec->updir, '.git');
-
-    $ENV{AUTHOR_TESTING} = 1 if -d $gitdir;
-
-    unless ($ENV{AUTHOR_TESTING}) {
-        print qq{1..0 # SKIP these tests are for testing by the author\n};
-        exit
-    }
+  unless ($ENV{AUTHOR_TESTING}) {
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
+  }
 }
 
 # We run all the tests from listmatch-xmode.t but with a
@@ -34,4 +28,5 @@ unshift @INC, $libdir;
 
 $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE} = 1;
 
+use lib q/./;
 require "t/listmatch-xmode.t";

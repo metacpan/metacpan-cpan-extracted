@@ -1,3 +1,15 @@
+0.065		2019-05-25	T. R. Wyant
+    Quash undef error in __is_ppi_regexp_element() when passed a
+    PPI::Token::Regexp::Transliterate
+
+    Support proper version for qr'\N{name}'. Until 5.29.10 this
+    construction failed to parse because it did not interpolate. But
+    PPIx::Regexp blithely ignored this detail. As of 5.29.10, something
+    like m'\N{LATIN CAPITAL LETTER L}' matches identically to m'L'. So I
+    implemented introduction as of that version.
+
+    Have explain() recognize Unicode property wildcards.
+
 0.064		2019-04-01	T. R. Wyant
     Empty \p{} should be an error.
     

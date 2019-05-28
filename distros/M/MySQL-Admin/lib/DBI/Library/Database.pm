@@ -36,7 +36,7 @@ use DBI::Library qw(:all $m_dbh $m_dsn);
         qw(getIndex CurrentPass CurrentUser CurrentHost CurrentDb Driver addUser hasAcount isMember right checkPass checkSession setSid getName checkFlood GetColumns GetAttrs GetCollation GetColumnCollation GetExtra GetNull GetEngineForRow GetEngines GetCharacterSet GetDataBases GetAutoIncrement GetPrimaryKey GetAutoIncrementValue)
     ],
 );
-$DBI::Library::Database::VERSION = '1.17';
+$DBI::Library::Database::VERSION = '1.18';
 $m_nSecs                         = 10;
 
 =head1 NAME
@@ -299,11 +299,7 @@ sub floodtime {
 
 =head2 checkFlood
 
-checked wann die letzte aktion der ip adresse war und
-
-erlaubt sie nur wenn midestens time zeit zur letzen aktion vergangen ist.
-
-checkFlood(ip,optionaler abstand in sekunden )
+checkFlood(ip,optional time in seconds )
 
 checkFlood( remote_addr() );
 
@@ -315,7 +311,7 @@ sub checkFlood {
     $m_nSecs = defined $p[1] ? $p[1] : $m_nSecs;
     my $return = 0;
     if ( defined $ip ) {
-        my $sql = q(SELECT ti  FROM flood where remote_addr = ? );
+        my $sql = q(SELECT ti FROM flood where remote_addr = ? );
         my $sth = $m_dbh->prepare($sql) or warn $m_dbh->errstr;
         $sth->execute($ip);
         my $ltime = $sth->fetchrow_array();

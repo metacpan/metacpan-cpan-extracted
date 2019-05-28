@@ -5,13 +5,15 @@ Mac::OSVersion::Lite - It's the lightweight version object for Mac OS X
 
 # SYNOPSIS
 
-    use Mac::OSVersion::Lite;
-    use feature qw/say/;
+```perl
+use Mac::OSVersion::Lite;
+use feature qw/say/;
 
-    my $version = Mac::OSVersion::Lite->new;
-    say $version->major; # 10
-    say $version->minor; # 11
-    say $version->name;  # el_capitan
+my $version = Mac::OSVersion::Lite->new;
+say $version->major; # 10
+say $version->minor; # 11
+say $version->name;  # el_capitan
+```
 
 # DESCRIPTION
 
@@ -65,7 +67,7 @@ Convert a `SemVer::V2::Strict` instance to string.
 
 The MIT License (MIT)
 
-Copyright (c) 2017 Pine Mizune
+Copyright (c) 2017-2019 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

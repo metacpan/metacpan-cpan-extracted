@@ -9,17 +9,10 @@ use Type::Tiny;
 
 sub BUILD;  # So C::T::CA won't create one automatically
 
-my $MediumInteger;
-BEGIN {
-    $MediumInteger = Type::Tiny->new(
+use vars::i '$MediumInteger' => Type::Tiny->new(
         name => 'MediumInteger',
         constraint => sub { looks_like_number($_) and $_ >= 10 and $_ < 20 }
     );
-
-    # Sanity check
-    my $av = eval { $MediumInteger->can('assert_valid') };
-    die "cannot assert_valid: $@" unless $av;
-}
 
 use Class::Tiny::ConstrainedAccessor
     medint => $MediumInteger,           # create accessor sub medint()
@@ -38,5 +31,10 @@ sub BUILD {
     print "# " . __PACKAGE__ . "::BUILD()\n";
     $self->_check_all_constraints($args);
 } #BUILD()
+
+# Sanity check
+my $av = eval { $MediumInteger->can('assert_valid') };
+die "cannot assert_valid: $@" unless $av;
+
 
 1;

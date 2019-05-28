@@ -1,3 +1,9 @@
+0.007   2019-05-25 (PERLANCAR)
+
+	- Add option --metacpan as a shortcut for: --template
+	  metacpan-20180911 --browser.
+
+
 0.006   2018-09-11 (PERLANCAR)
 
 	- [ux] Provide completion for --template (-t).
@@ -41,6 +47,6 @@
 	  exists).
 
 
-0.001   20167-01-31 (PERLANCAR)
+0.001   2017-01-31 (PERLANCAR)
 
         - First release.

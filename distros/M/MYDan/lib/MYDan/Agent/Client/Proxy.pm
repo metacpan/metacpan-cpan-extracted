@@ -105,6 +105,8 @@ sub run
                  return;
              }
 
+             &{$run{pcb}}( $efsize, $node ) if $run{pcb};
+
              my $hdl;
              push @work, \$hdl;
              $hdl = new AnyEvent::Handle(
@@ -138,6 +140,7 @@ sub run
                                              $hdl->on_drain(sub {
                                                      my ( $n, $buf );
                                                      $n = sysread( $EF, $buf, 102400 );
+                                                     &{$run{pcb}}( $n, $node ) if $run{pcb};
                                                      if( $n )
                                                      {
                                                          $hdl->push_write($buf);

@@ -167,6 +167,9 @@ sub run
 
     if( $this->{spIsDir} )
     {
+        delete $ENV{MYDanExtractFile};
+        delete $ENV{MYDanExtractFileAim};
+
     	my %query = ( 
     		code => 'unzipdir', argv => +{ uuid => $this->{uuid}, 
                 path => [ $this->{opt}{dp} ], map{ $_ => $opt->{$_} }qw( delete chown chmod ) }, 

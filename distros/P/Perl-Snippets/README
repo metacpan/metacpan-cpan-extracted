@@ -1,0 +1,148 @@
+NAME
+    Perl::Snippets - A collection of Perl idioms or short pieces of Perl
+    code
+
+VERSION
+    This document describes version 0.001 of Perl::Snippets (from Perl
+    distribution Perl-Snippets), released on 2019-05-28.
+
+DESCRIPTION
+    This distribution catalogs (in its POD pages) various idioms or short
+    pieces of code that a Perl programmer usually uses. You can also
+    copy-paste them to your code.
+
+    The pieces of code are often too small to refactor into modules, or
+    sometimes they have been refactored as modules but you still want to
+    "inline" them to avoid adding a dependency. The pieces of code are often
+    Perl idioms (patterns of code that are specific to Perl programming),
+    but not always.
+
+THE IDIOMS
+  Arrays (ARY)
+  Arrays / Sorting arrays (ARY/SORT)
+   snippet ARY/SORT/1
+     my @sorted = map  { $_->[0] }
+                  sort { $a->[1] <=> $b->[1] }
+                  map  { [$_, gen_key_for($_)] }
+                  @ary;
+
+    This is the infamous Schwartzian transform named after Randal Schwartz
+    who popularized it during the early days of Perl 5 in 1994. Basically,
+    it's a one-statement way to sort an array using a key. Examples of
+    functions to generate a key: "length($_)" (to sort by string length),
+    "lc($_)" (to do case-insensitive sorting).
+
+    Related documentation:
+    <https://en.wikipedia.org/wiki/Schwartzian_transform>
+
+  Hashes (HASH)
+  I/O (IO)
+  I/O / File I/O (IO/FILE)
+   snippet IO/FILE/1
+     my $content = do { local $/; <$fh> };
+
+    The above snippet slurps the whole file (which has been opened with
+    filehandle $fh) into memory (scalar variable). The "do {}" block
+    localizes the effect of $/. If you start from a filename and want to
+    open it first:
+
+   snippet IO/FILE/2
+     my $content = do { local $/; open my $fh, "<", $filename; <$fh> };
+
+   snippet IO/FILE/3
+     my @lines = do { local $/; open my $fh, "<", $filename; <$fh> };
+
+    Like the previous snippet but you get the content as an array of lines.
+    Each line still has their terminating newlines. If you want to trim
+    those:
+
+   snippet IO/FILE/4
+     chomp(my @lines = do { local $/; open my $fh, "<", $filename; <$fh> });
+
+    Related modules: File::Slurper.
+
+    Related documentation: $/ in perlvar.
+
+  Modules (MOD)
+   snippet MOD/LOAD/1
+     { (my $mod_pm = "$mod.pm") =~ s!::!/!g; require $mod_pm }
+
+    You have a module name in $mod (e.g. "Foo::Bar") and want to
+    load/"require" it. You cannot just use "require $mod" because require
+    expects its non-bareware argument to be in the form of "Foo/Bar.pm". So
+    the above snippet converts $mod to that form.
+
+    This is safer than "eval "use $mod"" or "eval "require $mod"" which work
+    but necessitates you to check that $mod does not contain arbitrary and
+    dangerous code.
+
+    Related modules: Module::Load
+
+    Related documentation: "require" in perlfunc.
+
+   snippet MOD/LOAD/2
+     require Foo::Bar; Foo::Bar->import("baz", "qux");
+
+    The above snippet loads "Foo::Bar" module and imports things from the
+    module. It is the run-time equivalent of "use Foo::Bar "baz", "qux";".
+    "require Foo::Bar;" itself is the run-time equivalent of "use Foo::Bar
+    ();", i.e. loading a module without importing anything from it.
+
+  Process / Child process (PROC/CHLD)
+    Some bit-fiddling and logic is needed to extract exit code from $?
+    ($CHILD_ERROR). Process::Status makes things easier by presenting you
+    with an object that you can query, but if you just want an exit code:
+
+   snippet PROC/CHLD/1
+     my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+
+    This snippet extracts all the information contained in $?: exit code
+    (which can be -1 to mean there is no child process being created due to
+    an execution error, e.g. "system "non-existent-command""), what signal
+    the child process dies from, and whether the child process dumps core.
+
+   snippet PROC/CHLD/2
+     my $exit_code = $? < 0 ? $? : $? >> 8.
+
+    This snippets just extracts the exit code of child process (which can be
+    -1 to mean that there is no child process being created due to an
+    execution error, e.g. "system "non-existent-command"").
+
+    Related modules: Process::Status, Proc::ChildError.
+
+    Related documentation: $? in perlvar.
+
+  Objects (OBJ)
+  References (REF)
+  Subroutines (SUB)
+  Subroutines / subroutine arguments (SUB/ARG)
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perl-Snippets>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perl-Snippets>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Snippets>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Common Perl idioms (2004) <https://www.perlmonks.org/?node_id=376948>
+
+    The Idioms subchapter in the Modern Perl book.
+    <http://modernperlbooks.com/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

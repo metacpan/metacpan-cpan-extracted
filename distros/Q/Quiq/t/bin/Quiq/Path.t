@@ -554,11 +554,11 @@ sub test_symlinkRelative : Test(5) {
     #     und diese nutzen.
 
     my @paths = (
-        'a'=>'x',
-        'a'=>'x/y',
-        'a/b'=>'x',
-        'a/b'=>'x/y',
-        'a/b/c'=>'x/y',
+        'a' => 'x',
+        'a' => 'x/y',
+        'a/b' => 'x',
+        'a/b' => 'x/y',
+        'a/b/c' => 'x/y',
     );
     while (@paths) {
         my $path = shift @paths;

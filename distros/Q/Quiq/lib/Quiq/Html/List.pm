@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -67,10 +67,10 @@ Die I<Unordered List> ist der Default.
 Der Aufruf
 
     $html = Quiq::Html::List->html($h,
-        id=>'list01',
-        class=>'list',
-        isText=>1,
-        items=>['Apfel & Birne','Orange','Pflaume','Zitrone'],
+        id => 'list01',
+        class => 'list',
+        isText => 1,
+        items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
     );
 
 liefert
@@ -90,11 +90,11 @@ C<< type=>'ordered' >> erzeugt.
 Der Aufruf
 
     $html = Quiq::Html::List->html($h,
-        type=>'ordered',
-        id=>'list02',
-        class=>'list',
-        isText=>1,
-        items=>['Apfel & Birne','Orange','Pflaume','Zitrone'],
+        type => 'ordered',
+        id => 'list02',
+        class => 'list',
+        isText => 1,
+        items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
     );
 
 liefert
@@ -130,9 +130,9 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        items=>[],
-        isText=>0,
-        type=>'unordered',
+        items => [],
+        isText => 0,
+        type => 'unordered',
     );
     $self->set(@_);
 
@@ -170,13 +170,13 @@ sub html {
         $self->get(qw/class id items isText type/);
 
     return $h->tag($type eq 'ordered'? 'ol': 'ul',
-        id=>$id,
-        class=>$class,
+        id => $id,
+        class => $class,
         do {
             my $html;
             for my $item (@$itemA) {
                 $html .= $h->tag('li',
-                    -text=>$isText,
+                    -text => $isText,
                     $item,
                 );
             }
@@ -189,7 +189,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

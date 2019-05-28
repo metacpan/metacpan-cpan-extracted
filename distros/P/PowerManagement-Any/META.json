@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.88"
+            "Rinci" : "v1.1.90"
          }
       },
       "runtime" : {
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-PowerManagement-Any"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

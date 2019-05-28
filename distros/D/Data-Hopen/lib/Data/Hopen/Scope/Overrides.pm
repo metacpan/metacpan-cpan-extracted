@@ -3,7 +3,7 @@ package Data::Hopen::Scope::Overrides;
 use Data::Hopen;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 # TODO if using exporter
 use parent 'Exporter';

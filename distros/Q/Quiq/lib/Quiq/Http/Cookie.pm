@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Time::RFC822;
 
@@ -126,12 +126,12 @@ sub new {
     # @_: @options
 
     my $self = $class->SUPER::new(
-        name=>$name,
-        value=>$value,
-        domain=>undef,
-        path=>undef,
-        expires=>undef,
-        secure=>0,
+        name => $name,
+        value => $value,
+        domain => undef,
+        path => undef,
+        expires => undef,
+        secure => 0,
     );
     $self->set(@_);
 
@@ -199,7 +199,7 @@ ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

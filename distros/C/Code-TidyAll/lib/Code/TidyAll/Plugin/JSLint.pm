@@ -13,7 +13,7 @@ has '+ok_exit_codes' => (
     default => sub { [ 0, 1 ] },
 );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 sub _build_cmd {'jslint'}
 
@@ -42,7 +42,7 @@ Code::TidyAll::Plugin::JSLint - Use jslint with tidyall
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

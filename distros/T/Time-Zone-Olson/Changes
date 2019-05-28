@@ -1,5 +1,17 @@
 Revision history for Time-Zone-Olson
 
+0.18   Tue May 28 20:24:00 2019
+       More tz rule and Solaris fixes.
+
+0.17   Mon May 27 18:02:00 2019
+       Fine tuning tz rule interpretation for the southern hemisphere.
+
+0.16   Mon May 27 06:47:00 2019
+       Fixing zone1970.tab support for older Olson databases.
+
+0.15    Sun May 26 21:04:00 2019
+       Improving support for Solaris and Win32.
+
 0.14    Tue May 21 18:37:00 2019
        Added support for Solaris.  Merging of preliminary Win32 code into the main module.
 

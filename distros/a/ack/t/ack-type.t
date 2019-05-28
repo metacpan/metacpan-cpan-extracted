@@ -2,10 +2,10 @@
 
 use strict;
 use warnings;
-use lib 't';
 
-use Cwd ();
 use Test::More tests => 16;
+
+use lib 't';
 use Util;
 
 prep_environment();
@@ -25,8 +25,9 @@ t/swamp/perl.pl:1:#!perl -T
 t/swamp/perl.pm:1:#!perl -T
 HERE
 
-    foreach my $line ( @expected ) {
-        $line =~ s/^(.*?)(?=:)/reslash( $1 )/ge;
+    # Reslash the filenames in case we are on Windows.
+    foreach ( @expected ) {
+        s/^(.*?)(?=:)/reslash( $1 )/ge;
     }
 
     my @args    = qw( --type=perl --nogroup --noheading --nocolor );
@@ -43,8 +44,9 @@ t/swamp/c-header.h:1:/*    perl.h
 t/swamp/Makefile:1:# This Makefile is for the ack extension to perl.
 HERE
 
-    foreach my $line ( @expected ) {
-        $line =~ s/^(.*?)(?=:)/reslash( $1 )/ge;
+    # Reslash the filenames in case we are on Windows.
+    for ( @expected ) {
+        s/^(.*?)(?=:)/reslash( $1 )/ge;
     }
 
     my @args    = qw( --type=noperl --nogroup --noheading --nocolor );
@@ -120,3 +122,6 @@ HERE
     });
     is_deeply( \@lines, \@expected );
 }
+
+done_testing();
+exit 0;

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2018 by Dominique Dumont.
+# This software is Copyright (c) 2007-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 # ABSTRACT: Work on the configuration model of an application
 
-package App::Cme::Command::meta ;
-$App::Cme::Command::meta::VERSION = '2.016';
+package App::Cme::Command::meta 2.018;
+
 use strict ;
 use warnings ;
 use 5.10.1;
@@ -22,7 +22,8 @@ use base qw/App::Cme::Common/;
 use Config::Model 2.075;
 
 use Config::Model::Itself ;
-use YAML::Tiny;
+use YAML::XS;
+$YAML::XS::LoadBlessed = 0;
 
 use Tk ;
 use Config::Model::TkUI ;
@@ -111,9 +112,9 @@ sub read_data {
         @data = <STDIN> ;
     }
     else {
-        open(LOAD,$load_file) || die "cannot open load file $load_file:$!";
-        @data = <LOAD> ;
-        close LOAD;
+        open my $load, '<', $load_file || die "cannot open load file $load_file:$!";
+        @data = <$load> ;
+        close $load;
     }
 
     return wantarray ? @data : join('',@data);
@@ -142,7 +143,7 @@ sub load_meta_model {
     my $cm_lib_dir = path(split m!/!, $opt->{dir}) ; # replace with cm_lib_dir ???
 
     if (! $cm_lib_dir->is_dir) {
-        $cm_lib_dir->mkpath(0, 0755) || die "can't create $cm_lib_dir:$!";
+        $cm_lib_dir->mkpath(0, oct(755)) || die "can't create $cm_lib_dir:$!";
     }
 
     my $meta_model = $self->{meta_model} = Config::Model -> new();
@@ -320,8 +321,6 @@ sub dump_yaml{
     my ($self, $opt, $args) = @_;
     my ($rw_obj, $cm_lib_dir, $meta_root, $write_sub) = $self->load_meta_root($opt, $args) ;
 
-    require YAML::Tiny;
-    import YAML::Tiny qw/Dump/;
     my $dump_file = shift @$args || 'model.yml';
     say "Dumping ".$rw_obj->root_model." in $dump_file";
 
@@ -354,7 +353,7 @@ sub _edit {
     $mw->optionAdd('*BorderWidth' => 1);
 
     my $cmu = $mw->ConfigModelEditUI(
-        -root       => $meta_root,
+        -instance   => $meta_root->instance,
         -store_sub  => $write_sub,
         -model_name => $root_model,
         -cm_lib_dir => $cm_lib_dir
@@ -406,7 +405,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.016
+version 2.018
 
 =head1 SYNOPSIS
 
@@ -496,6 +495,10 @@ other types of dump
 
 Dump configuration content in the specified file (or C<model.yml>) in
 YAML format.
+
+For instance:
+
+ $ cme meta dump-yaml Ssh::PortForward contrib/ssh-portforward.yml
 
 =head2 save
 
@@ -643,7 +646,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2007-2018 by Dominique Dumont.
+This software is Copyright (c) 2007-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

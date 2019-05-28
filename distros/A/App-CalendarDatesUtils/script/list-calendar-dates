@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CalendarDatesUtils/list_calendar_dates
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-02-14'; # DATE
+our $DATE = '2019-05-28'; # DATE
 our $DIST = 'App-CalendarDatesUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ list-calendar-dates - List dates from one or more Calendar::Dates::* modules
 
 =head1 VERSION
 
-This document describes version 0.002 of list-calendar-dates (from Perl distribution App-CalendarDatesUtils), released on 2019-02-14.
+This document describes version 0.005 of list-calendar-dates (from Perl distribution App-CalendarDatesUtils), released on 2019-05-28.
 
 =head1 SYNOPSIS
 
@@ -54,9 +54,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--all>, B<-a>
+=item B<--all-modules>
 
 Use all installed Calendar::Dates::* modules.
+
+=item B<--all-years>
+
+List dates from all available years instead of a single year.
 
 =item B<--day>=I<s>
 
@@ -80,7 +84,29 @@ Valid values:
 
  [1,12]
 
+=item B<--param>=I<s>%
+
+Specify parameters.
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--params-json>=I<s>
+
+Specify parameters (JSON-encoded).
+
+See C<--param>.
+
+=item B<--past>
+
+Filter entries that are less than (at least) today's date.
+
 =item B<--year>=I<s>
+
+Specify year of dates to list.
+
+The default is to list dates in the current year. You can specify all_years
+instead to list dates from all available years.
+
 
 =back
 

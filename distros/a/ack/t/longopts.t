@@ -13,15 +13,12 @@ use Test::More;
 
 # --no-recurse is inconsistent w/--nogroup
 
-plan tests => 38;
+plan tests => 42;
 
 use lib 't';
 use Util;
 
 prep_environment();
-
-my $swamp = 't/swamp';
-my $ack   = './ack';
 
 # Help
 for my $arg ( qw( --help ) ) {
@@ -59,23 +56,25 @@ for my $arg ( qw( -i --ignore-case ) ) {
 
 SMART_CASE: {
     my @files = 't/swamp/options.pl';
-    my $opt = '--smart-case';
-    like(
-        +run_ack( $opt, 'upper case', @files ),
-        qr{UPPER CASE},
-        qq{$opt turn on ignore-case when PATTERN has no upper}
-    );
-    unlike(
-        +run_ack( $opt, 'Upper case', @files ),
-        qr{UPPER CASE},
-        qq{$opt does nothing when PATTERN has upper}
-    );
 
-    like(
-        +run_ack( $opt, '-i', 'UpPer CaSe', @files ),
-        qr{UPPER CASE},
-        qq{-i overrides $opt, forcing ignore case, even when PATTERN has upper}
-    );
+    for my $opt ( '-S', '--smart-case' ) {
+        like(
+            +run_ack( $opt, 'upper case', @files ),
+            qr{UPPER CASE},
+            qq{$opt turn on ignore-case when PATTERN has no upper}
+        );
+        unlike(
+            +run_ack( $opt, 'Upper case', @files ),
+            qr{UPPER CASE},
+            qq{$opt does nothing when PATTERN has upper}
+        );
+
+        like(
+            +run_ack( $opt, '-i', 'UpPer CaSe', @files ),
+            qr{UPPER CASE},
+            qq{-i overrides $opt, forcing ignore case, even when PATTERN has upper}
+        );
+    }
 }
 
 # Invert match
@@ -146,12 +145,4 @@ for my $arg ( qw( -L --files-without-matches ) ) {
         qr{\Q$expected},
         qq{$arg prints matching files}
     );
-}
-
-LINE: {
-    my @files = 't/swamp/options.pl';
-    my $opt   = '--line=1';
-    my @lines = run_ack( $opt, @files );
-
-    is_deeply( \@lines, ['#!/usr/bin/env perl'], 'Only one matching line should be a shebang' );
 }

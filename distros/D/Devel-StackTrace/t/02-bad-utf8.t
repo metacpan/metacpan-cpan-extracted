@@ -20,7 +20,7 @@ use Devel::StackTrace;
 my $raw_bad = do { use bytes; chr(0xED) . chr(0xA1) . chr(0xBA) };
 
 my $decoded = Encode::decode( 'utf8' => $raw_bad );
-my $trace = foo($decoded);
+my $trace   = foo($decoded);
 
 my $string = eval { $trace->as_string() };
 

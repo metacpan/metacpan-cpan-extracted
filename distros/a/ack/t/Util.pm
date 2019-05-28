@@ -1,5 +1,7 @@
 package Util;
 
+use 5.010001;
+
 use parent 'Exporter';
 
 use warnings;
@@ -10,11 +12,14 @@ use Cwd ();
 use File::Next ();
 use File::Spec ();
 use File::Temp ();
+use Scalar::Util qw( tainted );
 use Term::ANSIColor ();
 use Test::More;
 
 our @EXPORT = qw(
     prep_environment
+    create_globals
+    clean_up_globals
     touch_ackrc
 
     has_io_pty
@@ -30,6 +35,8 @@ our @EXPORT = qw(
     read_file
     write_file
     append_file
+    create_tempfile
+    touch
 
     reslash
     reslash_all
@@ -39,6 +46,7 @@ our @EXPORT = qw(
     run_ack
     run_ack_with_stderr
     run_ack_interactive
+    run_piped
     pipe_into_ack
     pipe_into_ack_with_stderr
 
@@ -46,49 +54,44 @@ our @EXPORT = qw(
     sets_match
     ack_lists_match
     ack_sets_match
+    ack_error_matches
 
     untaint
 
     line_split
     colorize
+    get_expected_options
     caret_X
     get_rc
     getcwd_clean
+    filter_out_perldoc_noise
 
     safe_chdir
     safe_mkdir
 
-    get_options
+    msg
+    subtest_name
 );
 
 my $orig_wd;
 my @temp_files; # We store temp files here to make sure they're properly reclaimed at interpreter shutdown.
 
-sub check_message {
-    my $msg = shift;
-
-    if ( !$msg ) {
-        my (undef,undef,undef,$sub) = caller(1);
-        Carp::croak( "You must pass a message to $sub" );
-    }
-
-    return $msg;
-}
-
 sub prep_environment {
-    my @ack_args   = qw( ACK_OPTIONS ACKRC ACK_PAGER HOME ACK_COLOR_MATCH ACK_COLOR_FILENAME ACK_COLOR_LINE );
+    my @ack_args   = qw( ACKRC ACK_PAGER HOME ACK_COLOR_MATCH ACK_COLOR_FILENAME ACK_COLOR_LINENO ACK_COLOR_COLNO );
     my @taint_args = qw( PATH CDPATH IFS ENV );
     delete @ENV{ @ack_args, @taint_args };
 
     if ( is_windows() ) {
         # To pipe, perl must be able to find cmd.exe, so add %SystemRoot%\system32 to the path.
         # See http://kstruct.com/2006/09/13/perl-taint-mode-and-cmdexe/
-        $ENV{'SystemRoot'} =~ /([A-Z]:(\\[A-Z0-9_]+)+)/i;
+        $ENV{SystemRoot} =~ /([A-Z]:(\\[A-Z0-9_]+)+)/i or die 'Unrecognizable SystemRoot';
         my $system32_dir = File::Spec->catdir($1,'system32');
         $ENV{'PATH'} = $system32_dir;
     }
 
     $orig_wd = getcwd_clean();
+
+    return;
 }
 
 sub is_windows {
@@ -149,7 +152,7 @@ sub build_ack_invocation {
     foreach my $arg ( @args ) {
         if ( ref($arg) eq 'HASH' ) {
             if ( $options ) {
-                Carp::croak('You may not specify more than one options hash');
+                die 'You may not specify more than one options hash';
             }
             else {
                 $options = $arg;
@@ -161,11 +164,8 @@ sub build_ack_invocation {
 
     if ( my $ackrc = $options->{ackrc} ) {
         if ( ref($ackrc) eq 'SCALAR' ) {
-            my $temp_ackrc = File::Temp->new;
+            my $temp_ackrc = create_tempfile( ${$ackrc} );
             push @temp_files, $temp_ackrc;
-
-            print { $temp_ackrc } $$ackrc, "\n";
-            close $temp_ackrc;
             $ackrc = $temp_ackrc->filename;
         }
 
@@ -242,7 +242,7 @@ sub run_ack {
     my @args = @_;
 
     my ($stdout, $stderr) = run_ack_with_stderr( @args );
-    @args = grep { ref($_) ne 'HASH' } @args;
+    @args = grep { ref ne 'HASH' } @args;
 
     if ( $TODO ) {
         fail( q{Automatically fail stderr check for TODO tests.} );
@@ -268,9 +268,6 @@ our $ack_return_code;
 sub run_cmd {
     my ( @cmd ) = @_;
 
-    # my $cmd = join( ' ', @cmd );
-    # diag( "Running command: $cmd" );
-
     my $options = {};
 
     foreach my $arg (@cmd) {
@@ -278,24 +275,25 @@ sub run_cmd {
             $options = $arg;
         }
     }
-    @cmd = grep { ref($_) ne 'HASH' } @cmd;
+    @cmd = grep { ref ne 'HASH' } @cmd;
 
-    record_option_coverage(@cmd);
+    _record_option_coverage(@cmd);
 
-    check_command_for_taintedness( @cmd );
+    _check_command_for_taintedness( @cmd );
 
     my ( @stdout, @stderr );
 
     if ( is_windows() ) {
+        ## no critic ( InputOutput::ProhibitTwoArgOpen )
+        ## no critic ( InputOutput::ProhibitBarewordFileHandles )
         require Win32::ShellQuote;
         # Capture stderr & stdout output into these files (only on Win32).
-        my $catchout = File::Temp->new;
-        my $catcherr = File::Temp->new;
-        my $catchout_file = $catchout->filename;
-        my $catcherr_file = $catcherr->filename;
+        my $tempdir = File::Temp->newdir;
+        my $catchout_file = File::Spec->catfile( $tempdir->dirname, 'stdout.log' );
+        my $catcherr_file = File::Spec->catfile( $tempdir->dirname, 'stderr.log' );
 
-        open(SAVEOUT, ">&STDOUT") or die "Can't dup STDOUT: $!";
-        open(SAVEERR, ">&STDERR") or die "Can't dup STDERR: $!";
+        open(SAVEOUT, '>&STDOUT') or die "Can't dup STDOUT: $!";
+        open(SAVEERR, '>&STDERR') or die "Can't dup STDERR: $!";
         open(STDOUT, '>', $catchout_file) or die "Can't open $catchout_file: $!";
         open(STDERR, '>', $catcherr_file) or die "Can't open $catcherr_file: $!";
         my $cmd = Win32::ShellQuote::quote_system_string(@cmd);
@@ -306,8 +304,8 @@ sub run_cmd {
         system( $cmd );
         close STDOUT;
         close STDERR;
-        open(STDOUT, ">&SAVEOUT") or die "Can't restore STDOUT: $!";
-        open(STDERR, ">&SAVEERR") or die "Can't restore STDERR: $!";
+        open(STDOUT, '>&SAVEOUT') or die "Can't restore STDOUT: $!";
+        open(STDERR, '>&SAVEERR') or die "Can't restore STDERR: $!";
         close SAVEOUT;
         close SAVEERR;
         @stdout = read_file($catchout_file);
@@ -318,14 +316,14 @@ sub run_cmd {
         my ( $stderr_read, $stderr_write );
 
         pipe $stdout_read, $stdout_write
-            or Carp::croak( "Unable to create pipe: $!" );
+            or die "Unable to create pipe: $!";
 
         pipe $stderr_read, $stderr_write
-            or Carp::croak( "Unable to create pipe: $!" );
+            or die "Unable to create pipe: $!";
 
         my $pid = fork();
         if ( $pid == -1 ) {
-            Carp::croak( "Unable to fork: $!" );
+            die "Unable to fork: $!";
         }
 
         if ( $pid ) {
@@ -372,7 +370,7 @@ sub run_cmd {
             close $stderr_read;
 
             if (my $input = $options->{input}) {
-                check_command_for_taintedness( @{$input} );
+                _check_command_for_taintedness( @{$input} );
                 open STDIN, '-|', @{$input} or die "Can't open STDIN: $!";
             }
 
@@ -383,7 +381,7 @@ sub run_cmd {
         }
     } # end else not Win32
 
-    my ($sig,$core,$rc) = (($? & 127),  ($? & 128) , ($? >> 8));
+    my ($sig,$core,$rc) = (($? & 127), ($? & 128), ($? >> 8));  ## no critic ( Bangs::ProhibitBitwiseOperators Variables::ProhibitUnusedVarsStricter )
     $ack_return_code = $rc;
     ## XXX what to do with $core or $sig?
 
@@ -403,9 +401,6 @@ sub get_rc {
 sub run_ack_with_stderr {
     my @args = @_;
 
-    my @stdout;
-    my @stderr;
-
     my $perl = caret_X();
 
     @args = build_ack_invocation( @args );
@@ -419,19 +414,142 @@ sub run_ack_with_stderr {
     return run_cmd( @args );
 }
 
+
+sub run_piped {
+    my $lhs_args = shift;
+    my $rhs_args = shift;
+
+    my $stdout;
+    my $stderr;
+
+    my ( $stdout_read, $stdout_write );
+    my ( $stderr_read, $stderr_write );
+    my ( $lhs_rhs_read, $lhs_rhs_write );
+
+    pipe( $stdout_read, $stdout_write );
+    pipe( $stderr_read, $stderr_write );
+    pipe( $lhs_rhs_read, $lhs_rhs_write );
+
+    my $lhs_pid;
+    my $rhs_pid;
+
+    $lhs_pid = fork();
+
+    if ( !defined($lhs_pid) ) {
+        die 'Unable to fork';
+    }
+
+    if ( $lhs_pid ) {
+        $rhs_pid = fork();
+
+        if ( !defined($rhs_pid) ) {
+            kill TERM => $lhs_pid;
+            waitpid $lhs_pid, 0;
+            die 'Unable to fork';
+        }
+    }
+
+    if ( $rhs_pid ) { # parent
+        close $stdout_write;
+        close $stderr_write;
+        close $lhs_rhs_write;
+        close $lhs_rhs_read;
+
+        _do_parent(
+            stdout_read  => $stdout_read,
+            stderr_read  => $stderr_read,
+            stdout_lines => ($stdout = []),
+            stderr_lines => ($stderr = []),
+        );
+
+        waitpid $lhs_pid, 0;
+        waitpid $rhs_pid, 0;
+    }
+    elsif ( $lhs_pid ) { # right-hand-side child
+        close $stdout_read;
+        close $stderr_read;
+        close $stderr_write;
+        close $lhs_rhs_write;
+
+        open STDIN, '<&', $lhs_rhs_read or die "Can't open: $!";
+        open STDOUT, '>&', $stdout_write or die "Can't open: $!";
+        close STDERR;
+
+        exec @{$rhs_args};
+    }
+    else { # left-hand side child
+        close $stdout_read;
+        close $stdout_write;
+        close $lhs_rhs_read;
+        close $stderr_read;
+
+        open STDOUT, '>&', $lhs_rhs_write or die "Can't open: $!";
+        open STDERR, '>&', $stderr_write or die "Can't open: $!";
+        close STDIN;
+
+        exec @{$lhs_args};
+    }
+
+    return ($stdout,$stderr);
+}
+
+
+sub _do_parent {
+    my %params = @_;
+
+    my ( $stdout_read, $stderr_read, $stdout_lines, $stderr_lines ) =
+        @params{qw/stdout_read stderr_read stdout_lines stderr_lines/};
+
+    while ( $stdout_read || $stderr_read ) {
+        my $rin = '';
+
+        vec( $rin, fileno($stdout_read), 1 ) = 1 if $stdout_read;
+        vec( $rin, fileno($stderr_read), 1 ) = 1 if $stderr_read;
+
+        select( $rin, undef, undef, undef );
+
+        if ( $stdout_read && vec( $rin, fileno($stdout_read), 1 ) ) {
+            my $line = <$stdout_read>;
+
+            if ( defined( $line ) ) {
+                push @{$stdout_lines}, $line;
+            }
+            else {
+                close $stdout_read;
+                undef $stdout_read;
+            }
+        }
+
+        if ( $stderr_read && vec( $rin, fileno($stderr_read), 1 ) ) {
+            my $line = <$stderr_read>;
+
+            if ( defined( $line ) ) {
+                push @{$stderr_lines}, $line;
+            }
+            else {
+                close $stderr_read;
+                undef $stderr_read;
+            }
+        }
+    }
+
+    chomp @{$stdout_lines};
+    chomp @{$stderr_lines};
+
+    return;
+}
+
+
+
 # Pipe into ack and return STDOUT and STDERR as array refs.
 sub pipe_into_ack_with_stderr {
     my $input = shift;
     my @args = @_;
 
-    my $tempfile;
-
     if ( ref($input) eq 'SCALAR' ) {
         # We could easily do this without temp files, but that would take
         # slightly more time than I'm willing to spend on this right now.
-        $tempfile = File::Temp->new;
-        print {$tempfile} $$input . "\n";
-        close $tempfile;
+        my $tempfile = create_tempfile( ${$input} );
         $input = $tempfile->filename;
     }
 
@@ -443,25 +561,25 @@ sub pipe_into_ack_with_stderr {
 
 # Pipe into ack and return STDOUT as array, for arguments see pipe_into_ack_with_stderr.
 sub pipe_into_ack {
-    my ($stdout, $stderr) = pipe_into_ack_with_stderr( @_ );
-    return @$stdout;
+    my ($stdout, undef) = pipe_into_ack_with_stderr( @_ );
+    return @{$stdout};
 }
 
 
 # Use this one if order is important.
 sub lists_match {
-    local $Test::Builder::Level = $Test::Builder::Level + 1; ## no critic
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my @actual   = @{+shift};
     my @expected = @{+shift};
-    my $msg      = check_message( shift );
+    my $msg      = _check_message( shift );
 
     # Normalize all the paths
     for my $path ( @expected, @actual ) {
-        $path = File::Next::reslash( $path ); ## no critic (Variables::ProhibitPackageVars)
+        $path = File::Next::reslash( $path );
     }
 
-    return subtest "lists_match( $msg )" => sub {
+    return subtest subtest_name( $msg ) => sub {
         plan tests => 1;
 
         my $ok;
@@ -482,33 +600,32 @@ sub lists_match {
 }
 
 sub ack_lists_match {
-    local $Test::Builder::Level = $Test::Builder::Level + 1; ## no critic
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $args     = shift;
     my $expected = shift;
-    my $message  = check_message( shift );
+    my $msg      = _check_message( shift );
 
-    my @args     = @{$args};
+    my @args = @{$args};
+    return subtest subtest_name( $msg, @args ) => sub {
+        plan tests => 2;
 
-    my @results = run_ack( @args );
+        my @results = run_ack( @args );
+        my $ok = lists_match( \@results, $expected, $msg );
 
-    return subtest "ack_lists_match( $message )" => sub {
-        plan tests => 1;
-
-        my $ok = lists_match( \@results, $expected, $message );
-        $ok or diag( join( ' ', '$ ack', @args ) );
+        return $ok;
     };
 }
 
 # Use this one if you don't care about order of the lines.
 sub sets_match {
-    local $Test::Builder::Level = $Test::Builder::Level + 1; ## no critic
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my @actual   = @{+shift};
     my @expected = @{+shift};
-    my $msg      = check_message( shift );
+    my $msg      = _check_message( shift );
 
-    return subtest "sets_match( $msg )" => sub {
+    return subtest subtest_name( $msg ) => sub {
         plan tests => 1;
 
         return lists_match( [sort @actual], [sort @expected], $msg );
@@ -516,32 +633,50 @@ sub sets_match {
 }
 
 sub ack_sets_match {
-    local $Test::Builder::Level = $Test::Builder::Level + 1; ## no critic
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $args     = shift;
     my $expected = shift;
-    my $message  = check_message( shift );
-    my @args     = @{$args};
+    my $msg      = _check_message( shift );
 
-    return subtest "ack_sets_match( $message )" => sub {
+    my @args = @{$args};
+
+    return subtest subtest_name( $msg, @args ) => sub {
         plan tests => 2;
 
         my @results = run_ack( @args );
-        my $ok = sets_match( \@results, $expected, $message );
-        $ok or diag( join( ' ', '$ ack', @args ) );
 
-        return $ok;
+        return sets_match( \@results, $expected, $msg );
     };
 }
 
 
-sub record_option_coverage {
+sub ack_error_matches {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $args     = shift;
+    my $expected = shift;
+    my $msg      = shift;
+
+    return subtest subtest_name( $msg, $args, $expected ) => sub {
+        plan tests => 4;
+
+        my ( $stdout, $stderr ) = run_ack_with_stderr( @{$args} );
+        isnt( get_rc(), 0, 'Nonzero error' );
+        is_empty_array( $stdout, 'No normal output' );
+        is( scalar @{$stderr}, 1, 'Just one error' );
+        like( $stderr->[0], $expected, 'Error matches' );
+    };
+}
+
+
+sub _record_option_coverage {
     my ( @command_line ) = @_;
 
     return unless $ENV{ACK_OPTION_COVERAGE};
     return if $ENV{ACK_TEST_STANDALONE}; # We don't need to record the second time around.
 
-    my $record_options = File::Spec->catfile($orig_wd, 'record-options');
+    my $record_options = File::Spec->catfile( $orig_wd, 'dev', 'record-options' );
 
     my $perl = caret_X();
     if ( @command_line == 1 ) {
@@ -580,7 +715,7 @@ Turns a multi-line input string into its corresponding array of lines, with colo
 sub colorize {
     my $input = shift;
 
-    my @lines = split( /\n/, $input );
+    my @lines = line_split( $input );
 
     for my $line ( @lines ) {
         # File name
@@ -593,7 +728,7 @@ sub colorize {
         my $n;
         $n += $line =~ s/\((.+?)\)/Term::ANSIColor::colored($1, 'black on_yellow')/eg;
 
-        $line .= "\033[0m\033[K" if $n;
+        $line .= "\e[0m\e[K" if $n;
     }
 
     return @lines;
@@ -616,22 +751,22 @@ BEGIN {
             my ( @args) = @_;
 
             my @cmd = build_ack_invocation(@args);
-            @cmd    = grep { ref($_) ne 'HASH' } @cmd;
+            @cmd    = grep { ref ne 'HASH' } @cmd;
 
-            record_option_coverage(@cmd);
+            _record_option_coverage(@cmd);
 
             my $pty = IO::Pty->new;
 
             my $pid = fork;
 
-            if($pid) {
+            if ( $pid ) {
                 $pty->close_slave();
                 $pty->set_raw();
 
-                if(wantarray) {
+                if ( wantarray ) {
                     my @lines;
 
-                    while(<$pty>) {
+                    while ( <$pty> ) {
                         chomp;
                         push @lines, $_;
                     }
@@ -642,7 +777,7 @@ BEGIN {
                 else {
                     my $output = '';
 
-                    while(<$pty>) {
+                    while ( <$pty> ) {
                         $output .= $_;
                     }
                     close $pty;
@@ -653,7 +788,7 @@ BEGIN {
             else {
                 $pty->make_slave_controlling_terminal();
                 my $slave = $pty->slave();
-                if(-t *STDIN) {
+                if ( -t *STDIN ) {
                     # Is there something we can fall back on? Maybe re-opening /dev/console?
                     $slave->clone_winsize_from(\*STDIN);
                 }
@@ -687,7 +822,7 @@ BEGIN {
             Test::More::fail(<<'HERE');
 Your system doesn't seem to have IO::Pty, and the developers
 forgot to check in this test file.  Please file a bug report
-at https://github.com/beyondgrep/ack2/issues with the name of
+at https://github.com/beyondgrep/ack3/issues with the name of
 the file that generated this failure.
 HERE
         };
@@ -697,7 +832,7 @@ HERE
 # This should not be treated as a complete list of the available
 # options, but it's complete enough to rely on until we find a
 # more elegant way to generate this list.
-sub get_options {
+sub get_expected_options {
     return (
         '--ackrc',
         '--after-context',
@@ -726,13 +861,14 @@ sub get_options {
         '--heading',
         '--help',
         '--help-types',
+        '--help-colors',
+        '--help-rgb-colors',
         '--ignore-ack-defaults',
         '--ignore-case',
         '--ignore-dir',
         '--ignore-directory',
         '--ignore-file',
         '--invert-match',
-        '--lines',
         '--literal',
         '--man',
         '--match',
@@ -769,7 +905,6 @@ sub get_options {
         '--with-filename',
         '--word-regexp',
         '-1',
-        '-?',
         '-A',
         '-B',
         '-C',
@@ -777,6 +912,7 @@ sub get_options {
         '-L',
         '-Q',
         '-R',
+        '-S',
         '-c',
         '-f',
         '-g',
@@ -796,17 +932,10 @@ sub get_options {
 
 
 # This is just a handy diagnostic tool.
-sub check_command_for_taintedness {
+sub _check_command_for_taintedness {
     my @args = @_;
 
-    my $bad = 0;
-
-    my @tainted;
-    for my $arg ( @args ) {
-        if ( is_tainted( $arg ) ) {
-            push( @tainted, $arg );
-        }
-    }
+    my @tainted = grep { tainted( $_ ) } @args;
 
     if ( @tainted ) {
         die "Can't execute this command because of taintedness:\nAll args: @args\nTainted:  @tainted\n";
@@ -816,35 +945,23 @@ sub check_command_for_taintedness {
 }
 
 
-sub is_tainted {
-    no warnings qw(void uninitialized);
-
-    return !eval { local $SIG{__DIE__} = 'DEFAULT'; join('', shift), kill 0; 1 };
-}
-
-
 sub untaint {
     my ( $s ) = @_;
 
-    $s =~ /\A(.*)\z/;
+    $s =~ /\A(.*)\z/ or die 'Somehow unable to untaint';
     return $1;
 }
 
 
 sub caret_X {
-    # XXX How is it $^X can be tainted?  We should not have to untaint it.
-    $^X =~ /(.+)/;
-    my $perl = $1;
-
-    return $perl;
+    return untaint( $^X ); # XXX How is it $^X can be tainted?  We should not have to untaint it.
 }
 
 
 sub getcwd_clean {
-    # XXX How is it that this guy is tainted?
-    my $wd = Cwd::getcwd();
-    $wd =~ /(.+)/;
-    return $1;
+    my $cwd = Cwd::getcwd();
+    $cwd =~ /./ or die 'cwd is empty';
+    return untaint( $cwd ); # XXX How is it that Cwd is tainted?
 }
 
 
@@ -855,6 +972,168 @@ sub windows_slashify {
 
     return $str;
 }
+
+
+sub create_tempfile {
+    my @lines = @_;
+
+    my $tempfile = File::Temp->new();
+    print {$tempfile} join( "\n", @lines );
+    close $tempfile or die $!;
+
+    return $tempfile;
+}
+
+
+sub touch {
+    my $filename = shift;
+
+    open my $fh, '>>', $filename or die "Unable to append to $filename: $!";
+    close $fh or die $!;
+
+    return;
+}
+
+
+sub _check_message {
+    my $msg = shift;
+
+    if ( !defined( $msg ) ) {
+        my (undef,undef,undef,$sub) = caller(1);
+        die "You must pass a message to $sub";
+    }
+
+    return $msg;
+}
+
+=head2 msg( [@args] )
+
+Returns a basic diagnostic string based on the arguments passed in.
+It is not strictly accurate, like something from Data::Dumper, but is
+meant to balance accuracy of diagnostics with ease.
+
+    msg( 'User codes', [ 'ABC', '123' ], undef, { foo => bar } )
+
+will return
+
+    'User codes, [ABC, 123], undef, { foo => bar }'
+
+=cut
+
+sub msg {
+    my @args = @_;
+
+    my @disp;
+    for my $i ( @args ) {
+        if ( !defined($i) ) {
+            push( @disp, 'undef' );
+        }
+        elsif ( ref($i) eq 'HASH' ) {
+            push( @disp, join( ', ', map { "$_=>" . ($i->{$_} // 'undef') } sort keys %{$i} ) );
+        }
+        elsif ( ref($i) eq 'ARRAY' ) {
+            push( @disp, '[' . join( ', ', map { $_ // 'undef' } @{$i} ) . ']' );
+        }
+        else {
+            push( @disp, "$i" );
+        }
+    }
+
+    return join( ', ', @disp );
+}
+
+
+=head2 subtest_name( [@args] )
+
+Returns a string for a name for a subtest, including the name of the
+subroutine and basic string representations of the arguments.
+
+This makes it easy for you to keep track of the important args passed into
+the test, and include the function name without repetitively typing it.
+
+    sub test_whatever {
+        my $user = shift;
+        my $foo  = shift;
+        my $bar  = shift;
+        my $msg  = shfit;
+
+        return subtest subtest_name( $foo, $bar, $msg ) => sub {
+            ....
+    }
+
+    test_whatever( 17, { this => 'that', other => undef }, 'Try it again without NYP' );
+
+This will then give you TAP output like this:
+
+    # Subtest: main::test_whatever( 17, {other=>undef, this=>that}, Try it again without NYP )
+
+Note that in the example, we didn't pass C<$user> because it wasn't
+interesting to debugging.
+
+=cut
+
+sub subtest_name {
+    my @args = @_;
+
+    my (undef, undef, undef, $sub) = caller(1);
+
+    ($sub ne '') or die 'subtest_name() can only be called inside a function';
+
+    return $sub unless @args;
+
+    my $disp = msg( @args );
+
+    return "$sub( $disp )";
+}
+
+
+# The tests blow up on Windows if the global files don't exist,
+# so here we create them if they don't, keeping track of the ones
+# we make so we can delete them later.
+
+my @created_global_files;
+
+sub create_globals {
+    my @files;
+
+    if ( is_windows() ) {
+        require Win32;
+
+        my @paths = map {
+            File::Spec->catfile( Win32::GetFolderPath( $_ ), 'ackrc' )
+        } (
+            Win32::CSIDL_COMMON_APPDATA(),
+            Win32::CSIDL_APPDATA()
+        );
+
+        # Brute-force untaint the paths we built so they can be unlinked later.
+        @files = map { /(.+)/ ? $1 : die } @paths;
+    }
+    else {
+        @files = ( '/etc/ackrc' );
+    }
+
+    if ( is_windows() || is_cygwin() ) {
+        for my $filename ( @files ) {
+            if ( not -e $filename ) {
+                touch_ackrc( $filename );
+                push @created_global_files, $filename;
+            }
+        }
+    }
+
+    return @files;
+}
+
+
+sub clean_up_globals {
+    foreach my $filename ( @created_global_files ) {
+        unlink $filename or warn "Couldn't unlink $filename: $!";
+    }
+
+    return;
+}
+
 
 sub touch_ackrc {
     my $filename = shift or die;
@@ -880,4 +1159,30 @@ sub safe_mkdir {
 
     return;
 }
+
+
+sub filter_out_perldoc_noise {
+    my $stderr = shift;
+
+    # Don't worry if man complains about long lines, or if the terminal doesn't handle Unicode.
+    $stderr = [
+        grep {
+            !m{
+                can't\ break\ line
+                |
+                Wide\ character\ in\ print
+                |
+                Unknown\ escape\ E<0x[[:xdigit:]]+>
+                |
+                stty:\ stdin\ isn't\ a\ terminal
+                |
+                stty:\ standard\ input:\ Inappropriate\ ioctl\ for\ device
+            }x
+        } @{$stderr}
+    ];
+
+    return $stderr;
+}
+
+
 1;

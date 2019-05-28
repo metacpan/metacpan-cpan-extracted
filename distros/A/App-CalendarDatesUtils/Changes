@@ -1,3 +1,21 @@
+0.005   2019-05-28 (PERLANCAR)
+
+	- list-calendar-dates: Add option: --(no-)past.
+
+
+0.004   2019-05-25 (PERLANCAR)
+
+	- list-calendar-dates: Add --param option.
+
+
+0.003   2019-05-25 (PERLANCAR)
+
+	- list-calendar-dates: Remove --all (-a), replace it with
+	  --all-modules and --all-years.
+
+	- [bugfix] Fix completion in Rinci metadata.
+
+
 0.002   2019-02-14 (PERLANCAR)
 
 	- list-calendar-dates: allow listing from multiple modules, add

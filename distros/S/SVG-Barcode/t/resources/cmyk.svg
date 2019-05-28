@@ -1,8 +1,8 @@
-<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+<svg height="100%" viewBox="0 0 14 14" width="100%" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
-  <rect x="25" y="25" width="50" height="50" fill="black"/>
-  <rect x="75" y="25" width="50" height="50" fill="cyan"/>
-  <rect x="25" y="75" width="50" height="50" fill="magenta"/>
-  <rect x="75" y="75" width="50" height="50" fill="yellow"/>
-  <text x="28" y="72" font-size="10" fill="white">&lt;black&gt;</text>
+  <rect x="2" y="2" width="5" height="5" fill="black"/>
+  <rect x="7" y="2" width="5" height="5" fill="cyan"/>
+  <rect x="2" y="7" width="5" height="5" fill="magenta"/>
+  <rect x="7" y="7" width="5" height="5" fill="yellow"/>
+  <text x="2.3" y="6.7" font-size="1" fill="white">&lt;black&gt;</text>
 </svg>

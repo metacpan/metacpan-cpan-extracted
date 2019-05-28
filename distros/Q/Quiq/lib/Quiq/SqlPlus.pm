@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Unindent;
 use Quiq::Option;
@@ -205,13 +205,13 @@ sub script {
     my $help = 0;
 
     Quiq::Option->extract(\@_,
-        -author=>\$author,
-        -description=>\$description,
-        -commit=>\$commit,
-        -before=>\$before,
-        -beforeAndAfter=>\$beforeAndAfter,
-        -after=>\$after,
-        -help=>\$help,
+        -author => \$author,
+        -description => \$description,
+        -commit => \$commit,
+        -before => \$before,
+        -beforeAndAfter => \$beforeAndAfter,
+        -after => \$after,
+        -help => \$help,
     );
 
     my $template = Quiq::Unindent->string(q|
@@ -312,7 +312,7 @@ sub script {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -10,4 +10,3 @@ print "Content-Type: text/html$/$/" . '
 ';
 &showSource("./fo.pl");
 print '</td></tr></table></body></html>';
-

@@ -1,3 +1,7 @@
+[![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/gflohr/File-Globstar/blob/master/LICENSE)
+[![Travis (.org)](https://img.shields.io/travis/gflohr/File-Globstar.svg)](https://travis-ci.org/gflohr/File-Globstar)
+[![Coverage Status](https://coveralls.io/repos/github/gflohr/File-Globstar/badge.svg?branch=master)](https://coveralls.io/github/gflohr/File-Globstar?branch=master)
+
 # File-Globstar
 
 This library implements globbing with support for "**" in Perl.
@@ -49,7 +53,7 @@ See [File::Globstar](lib/File/Globstar.pod) and [File::Globstar::ListMatch](lib/
 
 ## Contributing
 
-Translate 
+Translate
 
 ## Bugs
 
@@ -58,6 +62,5 @@ Please report bugs at
 
 ## Copyright
 
-Copyright (C) 2016-2017, Guido Flohr, <guido.flohr@cantanea.com>,
+Copyright (C) 2016-2019, Guido Flohr, <guido.flohr@cantanea.com>,
 all rights reserved.
-

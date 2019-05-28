@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Duration;
 use Quiq::Path;
@@ -77,7 +77,7 @@ sub new {
     my ($class,$imageA) = @_;
 
     return $class->SUPER::new(
-        imageA=>$imageA,
+        imageA => $imageA,
     );
 }
 
@@ -175,7 +175,7 @@ sub export {
     my $max = Quiq::Path->maxFileNumber($dir);
 
     my $pro = Quiq::Progress->new($self->count,
-        -show=>1,
+        -show => 1,
     );
     my $i = 0;
     for my $img ($self->images) {
@@ -235,7 +235,7 @@ sub morph {
 
     $| = 1;
     my $pro = Quiq::Progress->new(($self->count-1)*($n+1)+1,
-        -show=>1,
+        -show => 1,
     );
 
     my $j = 0;
@@ -354,13 +354,13 @@ sub generate {
     my $videoFramerate = 24;
 
     Quiq::Option->extract(\@_,
-        -dryRun=>\$dryRun,
-        -endFrames=>\$endFrames,
-        -framerate=>\$framerate,
-        -preset=>\$preset,
-        -size=>\$size,
-        -videoBitrate=>\$videoBitrate,
-        -videoFramerate=>\$videoFramerate,
+        -dryRun => \$dryRun,
+        -endFrames => \$endFrames,
+        -framerate => \$framerate,
+        -preset => \$preset,
+        -size => \$size,
+        -videoBitrate => \$videoBitrate,
+        -videoFramerate => \$videoFramerate,
     );
 
     # Prüfe Änderungen an der Sequenz mittels SHA1 Hash. Wenn keine
@@ -435,11 +435,11 @@ sub generate {
     # Video generieren
 
     my $cmd = Quiq::FFmpeg->imagesToVideo("$dir/*.jpg",$file,
-        -framerate=>$framerate,
-        -preset=>$preset,
-        -size=>$size,
-        -videoBitrate=>$videoBitrate,
-        -videoFramerate=>$videoFramerate,
+        -framerate => $framerate,
+        -preset => $preset,
+        -size => $size,
+        -videoBitrate => $videoBitrate,
+        -videoFramerate => $videoFramerate,
     );
     printf "%s\n",$cmd->command;
     $cmd->execute;
@@ -590,7 +590,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

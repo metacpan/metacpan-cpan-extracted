@@ -85,8 +85,10 @@ sub image_push ( $self, $tag ) {
 }
 
 # https://docs.docker.com/engine/api/v1.39/#operation/ImageDelete
-sub image_remove ( $self, $tag ) {
+sub image_remove ( $self, $tag, $force = undef ) {
     my $url = $self->_create_url("images/$tag");
+
+    $url .= "?force=1" if $force;
 
     my $res = P->http->request(
         method  => 'DELETE',
@@ -131,6 +133,16 @@ sub _create_url ( $self, $path ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 91                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

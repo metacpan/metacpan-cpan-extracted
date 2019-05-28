@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -129,15 +129,15 @@ sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(
-        api=>'',
-        dbms=>'',
-        db=>'',
-        user=>'',
-        password=>'',
-        host=>'',
-        port=>'',
+        api => '',
+        dbms => '',
+        db => '',
+        user => '',
+        password => '',
+        host => '',
+        port => '',
         # FIXME: auf Quiq::OrderedHash umstellen
-        options=>Quiq::Hash->new->unlockKeys,
+        options => Quiq::Hash->new->unlockKeys,
     );
     if (@_) {
         $self->udl(@_);
@@ -437,7 +437,7 @@ sub asString {
     my $secure = 0;
     
     Quiq::Option->extract(\@_,
-        -secure=>\$secure,
+        -secure => \$secure,
     );
 
     my $str = '';
@@ -561,8 +561,8 @@ sub dsn {
 
     if ($api ne 'dbi') {
         $self->throw(
-            q~UDL-00001: DSN nur für DBI API definiert~,
-            API=>$api,
+            'UDL-00001: DSN nur für DBI API definiert',
+            API => $api,
         );
     }
 
@@ -607,8 +607,8 @@ sub dsn {
     }
     else {
         $self->throw(
-            q~UDL-00002: Nicht-unterstütztes DBMS~,
-            Dbms=>$dbms,
+            'UDL-00002: Nicht-unterstütztes DBMS',
+            Dbms => $dbms,
         );
     }
 
@@ -733,7 +733,7 @@ sub udl {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

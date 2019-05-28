@@ -104,13 +104,13 @@ sub test_new_keyVal : Test(9) {
     my $self = shift;
 
     my $obj = Quiq::Udl->new(
-        api=>'dbi',
-        dbms=>'oracle',
-        db=>'xyz',
-        user=>'xyz_admin',
-        password=>'koala3',
-        host=>'pluto.gaga.de',
-        options=>'file=/tmp/xyz;name=gaga',
+        api => 'dbi',
+        dbms => 'oracle',
+        db => 'xyz',
+        user => 'xyz_admin',
+        password => 'koala3',
+        host => 'pluto.gaga.de',
+        options => 'file=/tmp/xyz;name=gaga',
     );
     $self->is(ref($obj),'Quiq::Udl');
     $self->is($obj->api,'dbi');
@@ -170,13 +170,13 @@ sub test_asString_string : Test(2) {
     my $udlStr2 = 'dbi#oracle:xyz%admin:*@pluto.gaga.de;file=/tmp/xyz';
 
     my $obj = Quiq::Udl->new(
-        api=>'dbi',
-        dbms=>'oracle',
-        db=>'xyz',
-        user=>'admin',
-        password=>'koala3',
-        host=>'pluto.gaga.de',
-        options=>'file=/tmp/xyz',
+        api => 'dbi',
+        dbms => 'oracle',
+        db => 'xyz',
+        user => 'admin',
+        password => 'koala3',
+        host => 'pluto.gaga.de',
+        options => 'file=/tmp/xyz',
     );
 
     my $str = $obj->asString;

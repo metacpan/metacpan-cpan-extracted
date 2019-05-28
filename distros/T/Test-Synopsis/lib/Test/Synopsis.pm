@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 use parent qw( Test::Builder::Module );
 our @EXPORT = qw( synopsis_ok all_synopsis_ok );
@@ -168,6 +168,7 @@ __END__
 
 =for stopwords Goro blogged Znet Zoffix DOHERTY Doherty
   KRYDE Ryde ZOFFIX Gr nauer Grünauer pm HEREDOC HEREDOCs DROLSKY
+  Mengué
 
 =for test_synopsis $main::for_checked=1
 

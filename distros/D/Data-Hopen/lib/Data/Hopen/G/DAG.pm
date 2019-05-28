@@ -2,23 +2,25 @@
 package Data::Hopen::G::DAG;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {
     goals   => sub { [] },
     default_goal => undef,
+    winner => undef,
 
     # Private attributes with simple defaults
     #_node_by_name => sub { +{} },   # map from node names to nodes in either
     #                                # _init_graph or _graph
 
     # Private attributes - initialized by BUILD()
-    _graph  => undef,   # L<Graph> instance
+    _graph  => undef,   # L<Data::Hopen::OrderedPredecessorGraph> instance
     _final   => undef,  # The graph sink - all goals have edges to this
 
     #Initialization operations
-    _init_graph => undef,   # L<Graph> for initializations
+    _init_graph => undef,   # L<Data::Hopen::OrderedPredecessorGraph>
+                            # for initializations
     _init_first => undef,   # Graph node for initialization - the first
                             # init operation to be performed.
 
@@ -31,7 +33,10 @@ use Data::Hopen::G::Link;
 use Data::Hopen::G::Node;
 use Data::Hopen::G::CollectOp;
 use Data::Hopen::Util::Data qw(forward_opts);
-use Graph;
+use Data::Hopen::OrderedPredecessorGraph;
+use Getargs::Mixed; # parameters, which doesn't permit undef
+use Hash::Merge;
+use Scalar::Util qw(refaddr);
 use Storable ();
 
 # Class data {{{1
@@ -66,6 +71,31 @@ Arrayref of the goals for this DAG.
 
 The default goal for this DAG.
 
+=head2 winner
+
+When a node has multiple predecessors, their outputs are combined using
+L<Hash::Merge> to form the input to that node.  This sets the C<Hash::Merge>
+precedence.  Valid values (case-insensitive) are:
+
+=over
+
+=item C<undef>
+
+(the default): L<Hash::Merge/Retainment Precedence>.  Same-name keys
+are merged, so no data is lost.
+
+=over C<"first">
+
+L<Hash::Merge/Left Precedence>.  The first predecessor to add a value
+under a particular key will win.
+
+=over C<"last">
+
+L<Hash::Merge/Right Precedence>.  The last predecessor to add a value
+under a particular key will win.
+
+=back
+
 =head2 _graph
 
 The actual L<Graph>.  If you find that you have to use it, please open an
@@ -93,22 +123,24 @@ The first node to be run in _init_graph.
 
 =head2 _run
 
-Traverses the graph.  The DAG is similar to a subroutine in this respect.
-The outputs from all the goals
-of the DAG are aggregated and provided as the outputs of the DAG.
-The output is a hash keyed by the name of each goal, with each goal's outputs
-as the values under that name.  Usage:
+Traverses the graph.  The DAG is similar to a subroutine in this respect.  The
+outputs from all the goals of the DAG are aggregated and provided as the
+outputs of the DAG.  The output is a hash keyed by the name of each goal, with
+each goal's outputs as the values under that name.  Usage:
 
     my $hrOutputs = $dag->run([-context=>$scope][, other options])
 
 C<$scope> must be a L<Data::Hopen::Scope> or subclass if provided.
 Other options are as L<Data::Hopen::Runnable/run>.
 
+When evaluating a node, the edges from its predecessors are traversed in
+the order those predecessors were added to the graph.
+
 =cut
 
 # The implementation of run().  $self->scope has already been linked to the context.
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(; phase generator)], @_);
+    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
     my $retval = {};
 
     # --- Get the initialization ops ---
@@ -126,16 +158,40 @@ sub _run {
 
     # Remove _final from the order for now - I don't yet know what it means
     # to traverse _final.
-    die "Last item in order isn't _final!  This might indicate a bug in hopen."
-        unless $order[$#order] == $self->_final;
-    pop @order;
+    warn "Last item in order isn't _final!  This might indicate a bug in hopen, or that some graph edges are missing."
+        unless $QUIET or refaddr $order[$#order] == refaddr $self->_final;
+
+    @order = grep { refaddr $_ != refaddr $self->_final } @order;
+
+    # --- Check for non-connected ops, and goals with no inputs ---
+
+    unless($QUIET) {
+        foreach my $node ($self->_graph->isolated_vertices) {
+            warn "Node @{[$node->name]} is not connected to any other nodes";
+        }
+
+        foreach my $goal (@{$self->goals}) {
+            warn "Goal @{[$goal->name]} has no inputs"
+                if $self->_graph->is_predecessorless_vertex($goal);
+        }
+    }
+
+    # --- Set up for the merge ---
+
+    my $merge_strategy =
+        !defined $self->winner ? 'combine' :
+            $self->winner =~ /^first$/i ? 'keep' :
+                $self->winner =~ /^last$/i ? 'replace' :
+                    undef;
+    die "Invalid winner value ${[$self->winner]}" if !defined $merge_strategy;
 
     # --- Traverse ---
 
     # Note: while hacking, please make sure Goal nodes can appear
     # anywhere in the graph.
 
-    hlog { my $x = 'Traversing DAG ' . $self->name; $x, '*' x (78-length($x)) };
+    hlog { my $x = 'Traversing DAG ' . $self->name; $x, '*' x (76-length($x)) };
+
     my $graph = $self->_init_graph;
     foreach my $node (@init_order, undef, @order) {
 
@@ -154,9 +210,10 @@ sub _run {
             # on input edges, beats the scope of the DAG as a whole.
         $node_inputs->local(true);
             # A CollectOp won't reach above the node's inputs by default.
+        $node_inputs->merge_strategy($merge_strategy);
 
         # Iterate over each node's edges and process any Links
-        foreach my $pred ($graph->predecessors($node)) {
+        foreach my $pred ($graph->ordered_predecessors($node)) {
             hlog { ('From', $pred->name, 'to', $node->name) };
 
             # Goals do not feed outputs to other Goals.  This is so you can
@@ -168,17 +225,22 @@ sub _run {
 
             my $links = $graph->get_edge_attribute($pred, $node, LINKS);
 
-            unless($links) {    # Simple case: predecessor's outputs become our inputs
-                $node_inputs->add(%{$pred->outputs});
+            # Simple case (no links): predecessor's outputs become our inputs
+            unless($links) {
+                hlog { '  -- no links' };
+                $node_inputs->merge(%{$pred->outputs});
+                    # TODO specify which set these are.
+                    # Use the predecessor's identity as the set.
                 next;
             }
 
             # More complex case: Process all the links
             my $hrPredOutputs = $pred->outputs;
                 # In one test, outputs was undef if not on its own line.
-            my $link_inputs = Data::Hopen::Scope::Hash->new->add(%{$hrPredOutputs});
+            my $link_inputs = Data::Hopen::Scope::Hash->new->put(%{$hrPredOutputs});
                 # All links get the same outer scope --- they are parallel,
                 # not in series.
+                # TODO use the predecessor's identity as the set.
             $link_inputs->outer($self->scope);
                 # The links run at the same scope level as the node.
             $link_inputs->local(true);
@@ -191,29 +253,30 @@ sub _run {
                 $link_outputs = $link->run(
                     -context=>$link_inputs,
                     forward_opts(\%args, {'-'=>1}, 'phase')
-                    # Generator not passed to links.
+                    # visitor not passed to links.
                 );
             } #foreach incoming link
 
-            $node_inputs->add(%{$link_outputs});
+            $node_inputs->merge(%{$link_outputs});
                 # TODO specify which set these are.
+
         } #foreach predecessor node
 
         my $step_output = $node->run(-context=>$node_inputs,
-            forward_opts(\%args, {'-'=>1}, 'phase', 'generator')
+            forward_opts(\%args, {'-'=>1}, 'phase', 'visitor')
         );
         $node->outputs($step_output);
 
-        # Give the Generator a chance, and stash the results if necessary.
+        # Give the visitor a chance, and stash the results if necessary.
         if(eval { $node->DOES('Data::Hopen::G::Goal') }) {
-            $args{generator}->visit_goal($node) if $args{generator};
+            $args{visitor}->visit_goal($node, $node_inputs) if $args{visitor};
 
             # Save the result if there is one.  Don't save {}.
-            # use $node->outputs, not $step_output, since the generator may
+            # use $node->outputs, not $step_output, since the visitor may
             # alter $node->outputs.
             $retval->{$node->name} = $node->outputs if keys %{$node->outputs};
         } else {
-            $args{generator}->visit_node($node) if $args{generator};
+            $args{visitor}->visit_node($node, $node_inputs) if $args{visitor};
         }
 
     } #foreach node in topo-sort order
@@ -230,8 +293,9 @@ akin to top-level Makefile targets.  Usage:
 
     my $goalOp = $dag->goal('name')
 
-Returns a passthrough operation representing the goal.  Any inputs passed into
-that operation are provided as outputs of the DAG under the corresponding name.
+Returns the L<Data::Hopen::G::Goal> node that is the goal.  By default, any
+inputs passed into a goal are provided as outputs of that goal, and are
+saved as outputs of the DAG under the goal's name.
 
 The first call to C<goal()> also sets L</default_goal>.
 
@@ -245,6 +309,7 @@ sub goal {
     #$self->_node_by_name->{$name} = $goal;
     $self->_graph->add_edge($goal, $self->_final);
     $self->default_goal($goal) unless $self->default_goal;
+    push @{$self->goals}, $goal;
     return $goal;
 } #goal()
 
@@ -301,9 +366,11 @@ sub connect {
     #$self->_node_by_name->{$_->name} = $_ foreach ($op1, $op2);
 
     # Save the BHG::Link as an edge attribute (not idempotent!)
-    my $attrs = $self->_graph->get_edge_attribute($op1, $op2, LINKS) || [];
-    push @$attrs, $link if $link;
-    $self->_graph->set_edge_attribute($op1, $op2, LINKS, $attrs);
+    if($link) {
+        my $attrs = $self->_graph->get_edge_attribute($op1, $op2, LINKS) || [];
+        push @$attrs, $link;
+        $self->_graph->set_edge_attribute($op1, $op2, LINKS, $attrs);
+    }
 
     return undef;   # TODO decide what to return
 } #connect()
@@ -321,10 +388,9 @@ Returns the node, for the sake of chaining.
 =cut
 
 sub add {
-    my $self = shift or croak 'Need an instance';
-    my $node = shift or croak 'Need a node';
+    my ($self, undef, $node) = parameters('self', ['node'], @_);
     return if $self->_graph->has_vertex($node);
-    hlog { __PACKAGE__, 'adding', Dumper($node) } 2;
+    hlog { __PACKAGE__, $self->name, 'adding', Dumper($node) } 2;
 
     $self->_graph->add_vertex($node);
     #$self->_node_by_name->{$node->name} = $node if $node->name;
@@ -404,7 +470,7 @@ sub BUILD {
     $self->name('__R_DAG_' . $_id_counter++) unless $self->has_custom_name;
 
     # Graph of normal operations
-    my $graph = Graph->new( directed => true,
+    my $graph = Data::Hopen::OrderedPredecessorGraph->new( directed => true,
                             refvertexed => true);
     my $final = Data::Hopen::G::Node->new(
                                     name => '__R_DAG_ROOT' . $_id_counter++);
@@ -413,7 +479,7 @@ sub BUILD {
     $self->_final($final);
 
     # Graph of initialization operations
-    my $init_graph = Graph->new( directed => true,
+    my $init_graph = Data::Hopen::OrderedPredecessorGraph->new( directed => true,
                             refvertexed => true);
     my $init = Data::Hopen::G::CollectOp->new(
                                     name => '__R_DAG_INIT' . $_id_counter++);
@@ -429,23 +495,17 @@ __END__
 
 =head1 IMPLEMENTATION
 
-Each DAG has a hidden "root" node.  All outputs have edges from the root node.
-The traversal order is reverse topological from the root node, but is not
-constrained beyond that.  Generators can ask for the nodes in root-first or
-root-last order.
+Each DAG has a hidden L</_final> node.  All outputs have edges from the _final
+node.  The traversal order is reverse topological from the root node, but is
+not constrained beyond that.
 
 The DAG is built backwards from the outputs toward the inputs, although calls
-to L</output> and L</connect> can appear in any order in the C<hopen> file as
-long as everything is hooked in by the end of the file.
+to L</output> and L</connect> can appear in any order as
+long as everything is hooked in before the DAG is run.
 
-The following is in flux:
+The following is TODO:
 
- - C<DAG>: A class representing a DAG.  An instance called C<main> represents
-   what will be generated.
-
-   - C<DAG:set_default(<goal>)>: make C<< goal >> the default goal of this DAG
-     (default target).
-   - C<DAG:inject(<op1>,<op2>[, after/before'])>: Returns an operation that
+   - C<DAG::inject(<op1>,<op2>[, after/before'])>: Returns an operation that
      lives on the edge between C<op1> and C<op2>.  If the third parameter is
      false, C<'before'>, or omitted, the new operation will be the first
      operation on that edge.  If the third parameter is true or C<'after'>,

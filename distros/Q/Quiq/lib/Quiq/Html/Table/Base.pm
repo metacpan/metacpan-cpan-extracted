@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 # -----------------------------------------------------------------------------
 
@@ -103,15 +103,15 @@ sub new {
     # Defaultwerte
 
     my $self = $class->SUPER::new(
-        border=>1,
-        cellpadding=>undef,
-        cellspacing=>0,
-        class=>undef,
-        flat=>0,
-        id=>undef,
-        indentPos=>0,
-        style=>undef,
-        width=>undef,
+        border => 1,
+        cellpadding => undef,
+        cellspacing => 0,
+        class => undef,
+        flat => 0,
+        id => undef,
+        indentPos => 0,
+        style => undef,
+        width => undef,
         @_, # Umfang der Attribute kann von Subklasse erweitert werden
     );
 
@@ -178,15 +178,15 @@ sub html {
     # Nicht-leer
 
     my $html = $h->tag('table',
-        -indPos=>$indentPos,
+        -indPos => $indentPos,
         $flat? (-fmt=>'p',-nl=>0): (-fmt=>'v',-nl=>1),
-        class=>$class,
-        id=>$id,
-        style=>$style,
-        border=>$border? $border: undef,
-        cellpadding=>$cellpadding,
-        cellspacing=>$cellspacing,
-        width=>$width,
+        class => $class,
+        id => $id,
+        style => $style,
+        border => $border? $border: undef,
+        cellpadding => $cellpadding,
+        cellspacing => $cellspacing,
+        width => $width,
         $body,
     );
 
@@ -197,7 +197,7 @@ sub html {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

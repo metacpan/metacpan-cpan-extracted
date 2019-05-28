@@ -61,32 +61,34 @@ my %WriteMakefileArgs = (
     "namespace::autoclean"              => 0
   },
   "TEST_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Path::Tiny"          => 0,
-    "Test::DZil"          => 0,
-    "Test::Exception"     => 0,
-    "Test::Version"       => "0.04"
+    "Dist::Zilla::Role::VersionProvider" => 0,
+    "ExtUtils::MakeMaker"                => 0,
+    "Path::Tiny"                         => 0,
+    "Test::DZil"                         => 0,
+    "Test::Exception"                    => 0,
+    "Test::Version"                      => "0.04"
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.20",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Dist::Zilla"                       => "6.00",
-  "Dist::Zilla::Role::FileFinderUser" => 0,
-  "Dist::Zilla::Role::FileMunger"     => 0,
-  "Dist::Zilla::Role::PPI"            => 0,
-  "ExtUtils::MakeMaker"               => 0,
-  "Moose"                             => 0,
-  "MooseX::Types::Perl"               => 0,
-  "PPI"                               => 0,
-  "Path::Tiny"                        => 0,
-  "Test::DZil"                        => 0,
-  "Test::Exception"                   => 0,
-  "Test::Version"                     => "0.04",
-  "namespace::autoclean"              => 0
+  "Dist::Zilla"                        => "6.00",
+  "Dist::Zilla::Role::FileFinderUser"  => 0,
+  "Dist::Zilla::Role::FileMunger"      => 0,
+  "Dist::Zilla::Role::PPI"             => 0,
+  "Dist::Zilla::Role::VersionProvider" => 0,
+  "ExtUtils::MakeMaker"                => 0,
+  "Moose"                              => 0,
+  "MooseX::Types::Perl"                => 0,
+  "PPI"                                => 0,
+  "Path::Tiny"                         => 0,
+  "Test::DZil"                         => 0,
+  "Test::Exception"                    => 0,
+  "Test::Version"                      => "0.04",
+  "namespace::autoclean"               => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

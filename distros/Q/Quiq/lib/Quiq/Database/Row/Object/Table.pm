@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Perl;
 
@@ -197,9 +197,9 @@ sub primaryKeyWhere {
     my $val = $self->$key;
     if ($val eq '') {
         $self->throw(
-            q~ROW-00005: Primärschlüsselkolumne ist NULL~,
-            PrimaryKeyColumn=>$key,
-            Row=>$self->asString('|'),
+            'ROW-00005: Primärschlüsselkolumne ist NULL',
+            PrimaryKeyColumn => $key,
+            Row => $self->asString('|'),
         );
     }
 
@@ -437,7 +437,7 @@ sub delete {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 24;
+use Test::More tests => 42;
 
 use lib 't';
 use Util;
@@ -12,11 +12,11 @@ prep_environment();
 
 ARG: {
     my @expected = line_split( <<'HERE' );
-shall have a new birth of freedom -- and that government of the people,
+shall have a new birth of freedom -- and that government of the people,xshall have a new birth of freedom -- and that government of the people,
 HERE
 
     my @files = qw( t/text/gettysburg.txt );
-    my @args = qw( free --output=$_ );
+    my @args = qw( free --output=$_x$_ );
     my @results = run_ack( @args, @files );
 
     lists_match( \@results, \@expected, 'Matching line' );
@@ -95,7 +95,7 @@ PREMATCH_MULTIPLE_FILES: {
 }
 
 POSTMATCH: {
-    my @expected = line_split( <<'HERE' );
+    my @expected = split( /\n/, <<'HERE' );
  -- and that government of the people,
 HERE
 
@@ -172,3 +172,136 @@ HERE
 
     lists_match( \@results, \@expected, 'Line number' );
 }
+
+LAST_PAREN_MATCH: {
+    my @expected = line_split( <<'HERE' );
+t/text/amontillado.txt:124:love
+t/text/amontillado.txt:309:love
+t/text/amontillado.txt:311:love
+t/text/constitution.txt:267:hate
+HERE
+
+    my @files = qw( t/text/ );
+    my @args = qw( (love)|(hate) --sort-files --output=$+ );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Last paren match' );
+}
+
+
+COMBOS_1: {
+    my @expected = line_split( <<'HERE' );
+t/text/amontillado.txt:124:love-124-d; you are happy,
+t/text/amontillado.txt:309:love-309- of God, Montresor!"
+t/text/amontillado.txt:311:love-311- of God!"
+t/text/constitution.txt:267:hate-267-ver, from any King, Prince, or foreign State.
+HERE
+
+    my @files = qw( t/text/ );
+    my @args = qw( (love)|(hate) --sort-files --output=$+-$.-$' );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Combos 1' );
+}
+
+
+COMBOS_2: {
+    my @expected = line_split( <<'HERE' );
+t/text/amontillado.txt:124:happy-happy-happy
+t/text/raven.txt:73:happy-happy-happy
+HERE
+
+    my @files = qw( t/text/ );
+    my @args = qw( (happy) --sort-files -i --output=$1-$&-$1 );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Combos 2' );
+}
+
+
+COMBOS_3: {
+    my @expected = line_split( <<'HERE' );
+t/text/amontillado.txt:124:precious. You are rich, respected, admired, beloved; you are ---,--happy
+t/text/raven.txt:73:Caught from some un--- master whom unmerciful Disaster--happy
+HERE
+
+    my @files = qw( t/text/ );
+    my @args = qw( (happy) --sort-files -i --output=$`---$'--$+ );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Combos 2' );
+}
+
+
+NUMERIC_SUBSTITUTIONS: {
+    # Make sure that substitutions don't affect future substitutions.
+    my @expected = line_split( <<'HERE' );
+t/text/constitution.txt:269:Section 10 on line 269
+HERE
+
+    my @files = qw( t/text/bill-of-rights.txt t/text/constitution.txt );
+    my @args = ( '(\d\d)', '--output=Section $1 on line $.' );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Numeric substitutions' );
+}
+
+
+CHARACTER_SUBSTITUTIONS: {
+    # Make sure that substitutions don't affect future substitutions.
+    my @expected = line_split( <<"HERE" );
+t/text/bill-of-rights.txt:15:No Soldier shall, in time of peace be
+in any house, without\tin any house, without
+HERE
+
+    my @files = qw( t/text/ );
+    my @args = ( '\s+quartered\s+(.+)', '--output=$`\n$1\t$1' );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Character substitutions' );
+}
+
+
+# $f is the filenname, needed for grep, emulating ack2 $filename:$lineno:$_
+FILENAME_SUBSTITUTION_1 : {
+    my @expected = line_split( <<'HERE' );
+t/text/ozymandias.txt:4:Half sunk, a shattered visage lies, whose frown,
+HERE
+
+    my @files = qw( t/text/ozymandias.txt );
+    my @args = qw( visage --output=$f:$.:$_ );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Filename with matching line' );
+}
+
+
+FILENAME_SUBSTITUTION_2 : {
+    my @expected = line_split( <<'HERE' );
+t/text/ozymandias.txt:4:visage
+HERE
+
+    my @files = qw( t/text/ozymandias.txt );
+    my @args = qw( visage --output=$f:$.:$& );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Filename with match' );
+}
+
+
+FILENAME_SUBSTITUTION_3 : {
+    my @expected = line_split( <<'HERE' );
+t/text/ozymandias.txt:4:visage
+HERE
+
+    my @files = qw( t/text/ozymandias.txt );
+    my @args = qw( (visage) --output=$f:$.:$+ );
+    my @results = run_ack( @args, @files );
+
+    lists_match( \@results, \@expected, 'Filename with last match' );
+}
+
+
+
+done_testing();
+exit 0;

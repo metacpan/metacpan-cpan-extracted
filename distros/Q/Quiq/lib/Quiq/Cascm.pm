@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
@@ -244,7 +244,7 @@ sub edit {
     my $state = $self->packageState($package);
     if (!$state) {
         $self->throw(
-            q~CASCM-00099: Package does not exist~,
+            'CASCM-00099: Package does not exist',
             Package => $package,
         );
     }
@@ -261,8 +261,8 @@ sub edit {
             $which = Quiq::Terminal->askUser(
                 'Local file exists and differs from repository file.'.
                     ' Which file: l=local, r=repository, q=quit?',
-                -values=>'l/r/q',
-                -default=>'l',
+                -values => 'l/r/q',
+                -default => 'l',
             );
             if ($which eq 'q') {
                 return $output;
@@ -292,8 +292,8 @@ sub edit {
     if ($p->compare($localFile,$backupFile)) {
         my $answ = Quiq::Terminal->askUser(
             "Save changes to repository?",
-            -values=>'y/n',
-            -default=>'y',
+            -values => 'y/n',
+            -default => 'y',
         );
         if ($answ eq 'y') {
             $self->movePackage($self->states->[0],$package);
@@ -368,7 +368,7 @@ sub view {
 
 =over 4
 
-=item $packge
+=item $package
 
 Package, dem die Dateien innerhalb von CASCM zugeordnet werden.
 
@@ -409,7 +409,7 @@ sub putFiles {
     my $workspace = $self->workspace;
     my $p = Quiq::Path->new;
 
-    my $output;
+    my $output = '';
     for my $srcFile (@files) {
         my (undef,$file) = $p->split($srcFile);
         my $repoFile = sprintf '%s/%s',$repoDir,$file;
@@ -419,7 +419,7 @@ sub putFiles {
             # und die Workspace-Datei sich unterscheiden. Wenn nein, ist
             # nichts zu tun.
 
-            if (!$p->different($srcFile,"$workspace/$repoFile")) {
+            if (!$p->compare($srcFile,"$workspace/$repoFile")) {
                 # Bei fehlender Differenz tun wir nichts
                 next;
             }
@@ -438,6 +438,70 @@ sub putFiles {
 
         # Checke Workspace-Datei ins Repository ein
         $output .= $self->checkin($package,$repoFile);
+    }
+
+    return $output;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 putDir() - Füge Dateien eines Verzeichnisbaums zum Repository hinzu
+
+=head4 Synopsis
+
+    $output = $scm->putDir($package,$dir);
+
+=head4 Arguments
+
+=over 4
+
+=item $package
+
+Package, dem die Dateien innerhalb von CASCM zugeordnet werden.
+
+=item $dir
+
+Quellverzeichnis, dem die Dateien entnommen werden. Die Pfade
+I<innerhalb> von $dir werden als Repository-Pfade verwendet.
+Die Repository-Pfade müssen vorab existieren, sonst wird eine
+Exception geworfen.
+
+=back
+
+=head4 Returns
+
+Konkatenierte Ausgabe der der checkout- und checkin-Kommandos (String)
+
+=head4 Description
+
+Füge alle Dateien in Verzeichnis $dir via Methode put()
+zum Repository hinzu bzw. aktualisiere sie. Details siehe dort.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub putDir {
+    my ($self,$package,$dir) = @_;
+
+    my $workspace = $self->workspace;
+    my $p = Quiq::Path->new;
+
+    my @files = sort $p->find($dir,-type=>'f');
+
+    my $output;
+
+    for my $srcFile (@files) {
+        my ($repoDir,$repoFile) = $p->split($srcFile);
+        $repoDir =~ s|^\Q$dir/||; # Pfadanfang entfernen
+        my $workspaceDir = "$workspace/$repoDir";
+        if (!$p->exists($workspaceDir)) {
+            $self->throw(
+                'CASCM-00099: Workspace directory does not exist',
+                WorkspaceDir => $workspaceDir,
+            );
+        }
+        $output .= $self->putFiles($package,$repoDir,$srcFile);
     }
 
     return $output;
@@ -887,7 +951,7 @@ sub repoFileToFile {
     my $file = sprintf '%s/%s',$self->workspace,$repoFile;
     if (!$p->exists($file)) {
         $self->throw(
-            q~CASCM-00099: Repository file does not exist~,
+            'CASCM-00099: Repository file does not exist',
             File => $file,
         );
     }
@@ -1380,7 +1444,7 @@ sub movePackage {
     my $i = Quiq::Array->index(\@states,$state);
     if ($i < 0) {
         $self->throw(
-            q~CASCM-00099: State does not exist~,
+            'CASCM-00099: State does not exist',
             State => $state,
         );
     }
@@ -1735,13 +1799,13 @@ sub runCmd {
                 $file = "$dir/$file";
             }            
             $self->throw(
-                q~CASCM-00001: Repository file not found~,
+                'CASCM-00001: Repository file not found',
                 File => $file,
             );
         }
 
         $self->throw(
-            q~CASCM-00001: Command failed~,
+            'CASCM-00001: Command failed',
             Command => $cmdLine,
             Output => $output,
         );
@@ -1861,7 +1925,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

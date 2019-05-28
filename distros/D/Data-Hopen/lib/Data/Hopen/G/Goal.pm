@@ -2,7 +2,7 @@
 package Data::Hopen::G::Goal;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {
@@ -44,14 +44,14 @@ Passes through the inputs if L</should_output> is set.
 # }}}1
 
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(; phase generator)], @_);
+    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
     hlog { Goal => $self->name, ($self->should_output ? 'with' : 'without'),
             'outputs' };
 
     return {} unless $self->should_output;
 
     return $self->passthrough(-nocontext=>1, -levels => 'local',
-            forward_opts(\%args, {'-'=>1}, qw[phase generator]));
+            forward_opts(\%args, {'-'=>1}, qw[phase visitor]));
 } #_run()
 
 =head2 BUILD

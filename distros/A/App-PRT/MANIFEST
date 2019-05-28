@@ -68,6 +68,8 @@ t/data/package_in_block/multi_packages.pl
 t/data/package_in_block/package_block_statement.pl
 t/data/package_in_block/package_in_block.pl
 t/data/readme/README.md
+t/data/tokens_before_package/lib/My/Commented.pm
+t/data/tokens_before_package/lib/My/POD.pm
 t/test.pm
 t/test.t
 xt/perlcritic.t

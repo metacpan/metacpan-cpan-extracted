@@ -40,14 +40,18 @@ my @choices = $backend->get_choice ;
 
 ok( (scalar grep { $_ eq 'IniFile'} @choices), "IniFile plugin backend was found") ;
 
-# test break when using directly Config::Model repo because get_help
-# retrieves info from NAME section which is added at build time by
-# Pod::Weaver
-my $help = $backend->get_help('IniFile') ;
-like($help,qr/provided by L<Config::Model::Backend::IniFile>/,
-   "Found IniFile NAME section from pod") ;
+SKIP: {
+    skip "this help is available after Config::Model is built", 1 unless
+        $Config::Model::VERSION < 3;
+    # test break when using directly Config::Model repo because get_help
+    # retrieves info from NAME section which is added at build time by
+    # Pod::Weaver
+    my $help = $backend->get_help('IniFile') ;
+    like($help,qr/provided by L<Config::Model::Backend::IniFile>/,
+         "Found IniFile doc in pod") ;
+}
 
-$help = $backend->get_help('cds_file') ;
+my $help = $backend->get_help('cds_file') ;
 is($help,"file ...", "cds_file help was kept") ;
 
 memory_cycle_ok($model, "memory cycle");

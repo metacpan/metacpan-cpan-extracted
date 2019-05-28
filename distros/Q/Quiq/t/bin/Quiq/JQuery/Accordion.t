@@ -48,15 +48,15 @@ sub test_html_2 : Test(1) {
     my $h = Quiq::Html::Tag->new;
 
     my $html = Quiq::JQuery::Accordion->html($h,
-        id=>'accordion',
-        tabs=>[
+        id => 'accordion',
+        tabs => [
             {
-                label=>'A',
-                link=>'a',
+                label => 'A',
+                link => 'a',
             },{
-                label=>'B',
-                content=>$h->tag('p',
-                    -text=>1,
+                label => 'B',
+                content => $h->tag('p',
+                    -text => 1,
                     'Text des Reiters B',
                 ),
             },

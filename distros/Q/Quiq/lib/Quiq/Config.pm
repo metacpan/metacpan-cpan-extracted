@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Path;
@@ -196,8 +196,8 @@ sub new {
                 Quiq::Path->write($cfgFile,$create,-recursive=>1);
             }
             else {
-                $class->throw(q~CFG-00002: Config file not found~,
-                    ConfigFile=>$cfgFile,
+                $class->throw('CFG-00002: Config file not found',
+                    ConfigFile => $cfgFile,
                 );
             }
         }
@@ -243,8 +243,8 @@ sub get {
     for my $key (@_) {
         if (!exists $self->{$key}) {
             $self->throw(
-                q~CFG-00001: Config-Variable existiert nicht~,
-                Variable=>$key,
+                'CFG-00001: Config-Variable existiert nicht',
+                Variable => $key,
             );
         }
     }
@@ -300,7 +300,7 @@ sub try {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 

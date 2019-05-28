@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.140';
+our $VERSION = '1.141';
 
 use Quiq::Option;
 use Quiq::Hash;
@@ -106,9 +106,9 @@ sub values {
 
     if (@_) {
         Quiq::Option->extract(\@_,
-            -distinct=>\$distinct,
-            -hash=>\$hash,
-            -notNull=>\$notNull,
+            -distinct => \$distinct,
+            -hash => \$hash,
+            -notNull => \$notNull,
         );
     }
 
@@ -181,7 +181,7 @@ sub index {
     my $unique = 1;
 
     Quiq::Option->extract(\@_,
-        -unique=>\$unique,
+        -unique => \$unique,
     );
 
     # Verarbeitung
@@ -604,7 +604,7 @@ sub selectChilds {
     my $type = "$foreignTable.$foreignKeyColumn";
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -type=>\$type,
+        -type => \$type,
     );
 
     # Subselect generieren
@@ -704,7 +704,7 @@ sub selectParents {
     my $type = $foreignKeyColumn;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
-        -type=>\$type,
+        -type => \$type,
     );
 
     # Subselect generieren
@@ -779,36 +779,36 @@ und Parameter zu der Kombination aus Fahrten und Parametern:
     my @mea_id = $req->getArray('mea_id');
     
     my $tab = FerryBox::Model::Join::RouSecPasPamMea->select($db2,
-        -select=>'rou.id rou_id','sec.id sec_id','pas.id pas_id',
+        -select => 'rou.id rou_id','sec.id sec_id','pas.id pas_id',
             'pam.id pam_id','mea.id mea_id',
         -where,
-            'pas.id'=>['IN',@pas_id],
-            'mea.id'=>['IN',@mea_id],
+            'pas.id' => ['IN',@pas_id],
+            'mea.id' => ['IN',@mea_id],
     );
     
     my $rouT = $tab->selectParentRows($db2,
-        rou_id=>'FerryBox::Model::Table::Route',
-        -select=>qw/id name/,
+        rou_id => 'FerryBox::Model::Table::Route',
+        -select => qw/id name/,
     );
     
     my $secT = $tab->selectParentRows($db2,
-        sec_id=>'FerryBox::Model::Table::Section',
-        -select=>qw/id route_id secname/,
+        sec_id => 'FerryBox::Model::Table::Section',
+        -select => qw/id route_id secname/,
     );
     
     my $pasT = $tab->selectParentRows($db2,
-        pas_id=>'FerryBox::Model::Table::Passage',
-        -select=>qw/id section_id starttime/,
+        pas_id => 'FerryBox::Model::Table::Passage',
+        -select => qw/id section_id starttime/,
     );
     
     my $pamT = $tab->selectParentRows($db2,
-        pam_id=>'FerryBox::Model::Table::Passage_Measseq',
-        -select=>qw/id passage_id measseq_id/,
+        pam_id => 'FerryBox::Model::Table::Passage_Measseq',
+        -select => qw/id passage_id measseq_id/,
     );
     
     my $meaT = $tab->selectParentRows($db2,
-        mea_id=>'FerryBox::Model::Table::Measseq',
-        -select=>qw/id route_id meas/,
+        mea_id => 'FerryBox::Model::Table::Measseq',
+        -select => qw/id route_id meas/,
     );
 
 =cut
@@ -836,7 +836,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.140
+1.141
 
 =head1 AUTHOR
 
