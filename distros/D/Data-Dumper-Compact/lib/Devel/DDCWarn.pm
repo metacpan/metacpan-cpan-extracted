@@ -2,8 +2,10 @@ package Devel::DDCWarn;
 
 use strictures 2;
 use Data::Dumper::Compact;
-
 use base qw(Exporter);
+
+our $VERSION = '0.004000';
+$VERSION =~ tr/_//d;
 
 our @EXPORT = map +($_, $_.'T'), qw(Df Dto Dwarn Derr);
 
@@ -35,7 +37,11 @@ sub Df { $ddc->format(_ef(@_)) }
 
 sub DfT {
   my ($tag, @args) = @_;
-  $ddc->format([ list => [ [ key => $tag ], _ef(@args) ] ]);
+  my @fmt = (ref($tag) eq 'ARRAY'
+    ? do { ($tag, my $tweak) = @$tag; _ef($tweak->(@args)) }
+    : _ef(@args)
+  );
+  $ddc->format([ list => [ [ key => $tag ], @fmt ] ]);
 }
 
 sub _dto {
@@ -183,6 +189,17 @@ to a DDC list.
 A tag plus a single value is formatted as a two element list. A tag plus
 multiple values is formatted as a list containing the tag and a list of the
 values.
+
+If the tag is an arrayref, is assumed to be:
+
+  my $x = Df([ $tag, $tweak ] => @things);
+
+and what's dumped is C<<$tweak->(@things)>> instead of C<@things>. This
+means that e.g. one can write:
+
+  return Dwarn([ foo => sub { +{ @_ } } ], %things);
+
+to output the things as a hashref while still returning a flattened hash.
 
 =head1 CONFIGURATION
 

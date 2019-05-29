@@ -3,7 +3,8 @@ badges = ["travis"]
 authority = "cpan:PINE"
 license = "mit"
 
-module_maker="ModuleBuild"
+module_maker='ModuleBuild'
+markdown_maker = 'Pod::Markdown::Github'
 
 [build]
 build_class = 'builder::MyBuilder'

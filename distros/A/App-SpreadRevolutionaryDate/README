@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.21
+    version 0.22
 
 DESCRIPTION
 
@@ -288,12 +288,16 @@ CONFIGURATION
 
  PromptUser option
 
+    If "msgmaker" option is PromptUser, instead of spreading the
+    revolutionary date, prompts the user (with confirmation) for the
+    message to be spread, with a default value (if user enters nothing when
+    prompted).
+
   default
 
-    This option can only be specified once, with a value as string. Instead
-    of spreading the revolutionary date, prompt user (with confirmation)
-    for the message to be spread, with a default value (if user enters
-    nothing when prompted). If default option is not defined, the default
+    This option can only be specified once, with a value as string. If
+    default option is set, the user is not prompted and this default
+    message is spread. If default option is not defined, the default
     message is 'Goodbye old world, hello revolutionary worlds' if the user
     enters nothing when prompted. The default option should be defined in
     the [promptuser] section of the configuration file. It is only used if
@@ -426,7 +430,7 @@ COMMAND LINE PARAMETERS
 
  RevolutionaryDate parameters
 
-  --revolutionarydate_acab
+  --revolutionarydate_acab | -ra
 
     Same as "acab" configuration option above.
 
@@ -436,7 +440,7 @@ COMMAND LINE PARAMETERS
 
  PromptUser parameter
 
-  --promptuser_default <msg>
+  --promptuser_default <msg> | -pud <msg>
 
     Same as "default" configuration option above.
 

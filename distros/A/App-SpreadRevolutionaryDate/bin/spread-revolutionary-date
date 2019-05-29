@@ -34,7 +34,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 DESCRIPTION
 
@@ -203,9 +203,11 @@ This boolean option takes no value, either it is defined or not, defaults to C<t
 
 =head2 PromptUser option
 
+If L</msgmaker> option is C<PromptUser>, instead of spreading the revolutionary date, prompts the user (with confirmation) for the message to be spread, with a default value (if user enters nothing when prompted).
+
 =head3 default
 
-This option can only be specified once, with a value as string. Instead of spreading the revolutionary date, prompt user (with confirmation) for the message to be spread, with a default value (if user enters nothing when prompted). If C<default> option is not defined, the default message is C<'Goodbye old world, hello revolutionary worlds'> if the user enters nothing when prompted. The C<default> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
+This option can only be specified once, with a value as string. If C<default> option is set, the user is not prompted and this default message is spread. If C<default> option is not defined, the default message is C<'Goodbye old world, hello revolutionary worlds'> if the user enters nothing when prompted. The C<default> option should be defined in the C<[promptuser]> section of the configuration file. It is only used if L</msgmaker> option is C<PromptUser>.
 
 =head1 COMMAND LINE PARAMETERS
 
@@ -321,7 +323,7 @@ Same as L</test_channels> configuration option above.
 
 =head2 RevolutionaryDate parameters
 
-=head3 --revolutionarydate_acab
+=head3 --revolutionarydate_acab | -ra
 
 Same as L</acab> configuration option above.
 
@@ -331,7 +333,7 @@ Same as L</wikipedia_link> configuration option above.
 
 =head2 PromptUser parameter
 
-=head3 --promptuser_default <msg>
+=head3 --promptuser_default <msg> | -pud <msg>
 
 Same as L</default> configuration option above.
 

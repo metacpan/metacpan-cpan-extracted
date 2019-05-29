@@ -1,7 +1,7 @@
 ---
 abstract: 'The fast Text::Diff module'
 author:
-  - '-2017 Pine Mizune'
+  - '-2019 Pine Mizune'
 build_requires:
   File::Slurp: '0'
   Test::More: '0.98'
@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.16'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +29,16 @@ no_index:
 provides:
   Text::Diff::Unified::XS:
     file: lib/Text/Diff/Unified/XS.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/pine/p5-Text-Diff-Unified-XS/issues
   homepage: https://github.com/pine/p5-Text-Diff-Unified-XS
   repository: git://github.com/pine/p5-Text-Diff-Unified-XS.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:PINE
 x_contributors:
   - 'Pine Mizune <pinemz@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

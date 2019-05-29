@@ -1,0 +1,29 @@
+<config>
+  <cloud id="GlobalNOC">
+    <class id="CDS">
+      <version value="1">
+        <service id="Node">
+	  <location url="https://fake.grnoc.iu.edu/cds/1/node.cgi" weight="1" />
+	</service>
+      </version>
+    </class>
+    <class id="RR">
+      <version value="1">
+        <service id="Data">
+	  <location url="http://localhost:8529/service1.cgi" weight="1" />
+	  <location url="http://localhost:8529/service2.cgi" weight="1" />
+	  <location url="http://localhost:8529/service3.cgi" weight="1" />
+	  <location url="http://localhost:8529/service4.cgi" weight="2" />
+	</service>
+      </version>
+    </class>
+    <class id="AuthFailover">
+      <version value="1">
+        <service id="Data">
+	  <location url="http://localhost:8529/protected/protected.cgi" weight="1" />
+	  <location url="http://localhost:8529/other-protected/protected.cgi" weight="2" />
+	</service>
+      </version>
+    </class>
+  </cloud>
+</config> 

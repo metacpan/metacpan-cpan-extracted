@@ -1,0 +1,67 @@
+{
+   "abstract" : "Link to device backups in RANCID/WebSVN",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-NetdiscoX-Web-Plugin-RANCID",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Netdisco" : "2.042007",
+            "Dancer" : "1.3132",
+            "File::ShareDir" : "1.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Distribution" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::NetdiscoX::Web::Plugin::RANCID" : {
+         "file" : "lib/App/NetdiscoX/Web/Plugin/RANCID.pm",
+         "version" : "2.005000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/netdisco/nd2-web-plugin-rancid/issues"
+      },
+      "homepage" : "http://netdisco.org/",
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/netdisco/nd2-web-plugin-rancid"
+      },
+      "x_IRC" : "irc://irc.freenode.org/#netdisco",
+      "x_MailingList" : "https://lists.sourceforge.net/lists/listinfo/netdisco-users"
+   },
+   "version" : "2.005000",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

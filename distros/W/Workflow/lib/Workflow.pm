@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone );
 my @INTERNAL = qw( _factory );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.45';
+$Workflow::VERSION = '1.46';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -361,8 +361,8 @@ __END__
 
 [![CPAN version](https://badge.fury.io/pl/Workflow.svg)](http://badge.fury.io/pl/Workflow)
 [![Build Status](https://travis-ci.org/jonasbn/perl-workflow.svg?branch=master)](https://travis-ci.org/jonasbn/perl-workflow)
-[![Coverage Status](https://coveralls.io/repos/jonasbn/perl-workflow/badge.png)](https://coveralls.io/r/jonasbn/perl-workflow)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/perl-workflow)
+[![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-workflow/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-workflow?branch=master)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/perl-workflow)
 
 =end markdown
 
@@ -1453,6 +1453,8 @@ Jonas B. Nielsen (jonasbn) E<lt>jonasbn@cpan.orgE<gt>, current maintainer.
 Chris Winters E<lt>chris@cwinters.comE<gt>, original author.
 
 The following folks have also helped out (listed here in no particular order):
+
+Patch from Oliver Welter resulting in release 1.46
 
 Bug report from Slaven Rezić resulting in maintenance release 1.45
 

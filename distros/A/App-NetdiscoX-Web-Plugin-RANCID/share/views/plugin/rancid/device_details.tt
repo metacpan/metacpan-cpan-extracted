@@ -1,3 +1,7 @@
+[% IF session.rancid_display %]
 <a href="[% settings.plugin_rancid.location.replace('\%GROUP\%',rancidgroup).replace('\%DEVICE\%',ranciddevice) %]"
   [% ' target="_blank"' UNLESS settings.plugin_rancid.open_in_same_window %]
 >View Configuration <i class="icon-circle-arrow-right"></i></a>
+[% ELSE %]
+<i>No RANCID backup known for this device.</i>
+[% END %]

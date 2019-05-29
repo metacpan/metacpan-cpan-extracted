@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-Diff-Unified-XS
 
+0.09 2019-05-29T09:25:28Z
+    - update document
+
 0.08 2017-06-12T14:49:58Z
     - support perl 5.26.0
 

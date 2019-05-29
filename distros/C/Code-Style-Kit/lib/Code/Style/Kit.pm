@@ -10,7 +10,7 @@ use Module::Runtime qw(use_module);
 
 use constant DEBUG => $ENV{CODE_STYLE_KIT_DEBUG};
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: build composable bulk exporters
 
 
@@ -228,7 +228,7 @@ Code::Style::Kit - build composable bulk exporters
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

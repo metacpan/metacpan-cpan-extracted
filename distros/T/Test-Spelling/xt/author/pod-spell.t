@@ -6,7 +6,7 @@ use Test::More;
 use Test::Spelling 0.12;
 use Pod::Wordlist;
 
-set_spell_cmd('aspell list');
+
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__

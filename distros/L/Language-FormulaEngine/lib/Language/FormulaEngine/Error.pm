@@ -16,7 +16,7 @@ our @EXPORT_OK= ( @subclasses, qw( auto_wrap_error ) );
 our %EXPORT_TAGS= ( all => \@EXPORT_OK );
 
 # ABSTRACT: Exception objects for formula functions
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 has message => ( is => 'rw', required => 1 );
@@ -122,7 +122,7 @@ Language::FormulaEngine::Error - Exception objects for formula functions
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

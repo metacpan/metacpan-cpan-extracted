@@ -1,5 +1,5 @@
 ---
-abstract: 'check for spelling errors in POD files'
+abstract: 'Check for spelling errors in POD files'
 author:
   - 'Ivan Tubert-Brohman <itub@cpan.org>'
 build_requires:
@@ -30,7 +30,7 @@ no_index:
 provides:
   Test::Spelling:
     file: lib/Test/Spelling.pm
-    version: '0.24'
+    version: '0.25'
 requires:
   Exporter: '5.57'
   File::Spec: '0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/genio/test-spelling/issues
   homepage: https://github.com/genio/test-spelling
   repository: https://github.com/genio/test-spelling.git
-version: '0.24'
+version: '0.25'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -286,7 +286,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.24
+          tag: v0.25
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -344,7 +344,7 @@ x_Dist_Zilla:
           directories:
             - bin
             - lib
-          spell_cmd: 'aspell list'
+          spell_cmd: ''
           stopwords:
             - Brohman
             - CPAN

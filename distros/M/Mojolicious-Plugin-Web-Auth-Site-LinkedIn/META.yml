@@ -3,19 +3,19 @@ abstract: 'LinkedIn OAuth Plugin for Mojolicious::Plugin::Web::Auth'
 author:
   - 'Vikas N Kumar <vikas@cpan.org>'
 build_requires:
-  Module::Build: 0.28
-  Test::More: 0
-  perl: 5.006
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  Module::Build: 0.28
-  perl: 5.006
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mojolicious-Plugin-Web-Auth-Site-LinkedIn
 no_index:
   directory:
@@ -23,14 +23,15 @@ no_index:
     - t
     - xt
 requires:
-  Mojo::Base: 0
-  Mojolicious::Plugin::Web::Auth: 0.12
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Mojo::Base: '0'
+  Mojolicious::Plugin::Web::Auth: '0.12'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: http://github.com/vikasnkumar/Mojolicious-Plugin-Web-Auth-Site-LinkedIn/issues
   homepage: https://github.com/vikasnkumar/mojolicious-plugin-web-auth-site-linkedin
   repository: https://github.com/vikasnkumar/mojolicious-plugin-web-auth-site-linkedin.git
-version: 0.03
-x_serialization_backend: 'YAML::Tiny version 1.51'
+version: '0.04'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -15,7 +15,7 @@ use DateTime::Format::Flexible;
 use namespace::clean;
 
 # ABSTRACT: Default spreadsheet-like set of functions and behavior
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # No official versioned namespace yet, but this code is for when I publish one.
 
@@ -353,7 +353,7 @@ BEGIN { *_date= *fn_datevalue; } # for convenience
 sub fn_date {
 	my ($y, $m, $d)= @_;
 	try { DateTime->new(year => $y, month => $m, day => $d) }
-	catch { die ErrInval($_->message) };
+	catch { die ErrInval(ref $_ && $_->can("message")? $_->message : "$_") };
 }
 
 sub fn_datedif {
@@ -408,14 +408,14 @@ sub fn_year {
 	_date($_[0])->year
 }
 
-# Perl older than 5.12 can't actually reference the functions in CORE:: namespace.
+# Perl older than 5.16 can't actually reference the functions in CORE:: namespace.
 # For example, perl -e 'my $sub= sub { CORE::ord(shift) }; print $sub->("A")' works but
 # perl -e 'my $sub= sub { &CORE::ord }; print $sub->("A")' does not.  Neither does
 # perl -e 'CORE->can("ord")->("A")', nor does *fn_foo= *CORE::foo used above.
 # I could of course just wrap each core function with a function defined in this
 # package, but it would be a needless performance hit for modern perl, and clutter
 # the code above.
-if ($] lt '5.012') {
+unless (CORE->can("abs")) {
 	require Sub::Util;
 	my $stash= \%Language::FormulaEngine::Namespace::Default::;
 	for my $fn (grep /^fn_/, keys %$stash) {
@@ -424,8 +424,8 @@ if ($] lt '5.012') {
 		#print "# Stash $fn is $symname\n";
 		# prototypes make this annoying
 		my $code= $symname eq 'CORE::substr'? "sub { substr(shift, \@_) }"
-			: $symname =~ /^CORE::(abs|cos|exp|sin|chr|ord|uc|lc|length)$/? "sub { $symname(\$_[0]) }"
-			: "sub { $symname(\@_) }";
+			: $symname eq 'CORE::join'? "sub { join(shift, \@_) }"
+			: "sub { $symname(shift) }";
 		my $sub= eval $code or die "$@";
 		no strict 'refs'; no warnings 'redefine';
 		# The name of the sub needs to remain as CORE::foo else test cases will fail
@@ -448,7 +448,7 @@ Language::FormulaEngine::Namespace::Default - Default spreadsheet-like set of fu
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

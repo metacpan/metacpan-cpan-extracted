@@ -1,0 +1,34 @@
+PerlSetupEnv On
+SetEnv PERL5OPT "-MDevel::Cover=-db,@DocumentRoot@/../../cover_db,-silent,1,-dir,@DocumentRoot@ -I@DocumentRoot@/../blib/lib/"
+PerlPassEnv PERL_TEST_HARNESS_DUMP_TAP
+
+<Location />
+  AddHandler cgi-script .cgi
+  Options ExecCGI
+</Location>
+
+<Location /protected>
+  AddHandler cgi-script .cgi
+  Options ExecCGI
+  
+  AuthType Basic
+  AuthName "The Realm"
+  AuthUserFile htdocs/protected/auth_file
+  Require valid-user
+
+  Order allow,deny
+  Allow from all
+</Location>
+
+<Location /second-protected>
+  AddHandler cgi-script .cgi
+  Options ExecCGI
+  
+  AuthType Basic
+  AuthName "The Realm"
+  AuthUserFile htdocs/second-protected/auth_file
+  Require user dummy
+
+  Order allow,deny
+  Allow from all
+</Location>

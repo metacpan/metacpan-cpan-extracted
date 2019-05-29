@@ -1,5 +1,14 @@
 Revision history for Test-Spelling
 
+0.25      2019-05-28
+  - Re-worded the documentation.
+  - Ordered documented function in alphabetical order.
+  - Fixed up the synopsis.
+  - Put function usage examples directly below the function name; this
+    makes it easier to get clickable links for functions in metacpan
+  - Documented get_pod_parser
+  - Moved hunspell up to the preferred checker
+
 0.24      2019-05-24
   - Fixup the prereqs some
   - Revert the unicode support added in the last release as it caused

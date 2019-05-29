@@ -3,7 +3,7 @@ NAME
     for Mojolicious::Plugin::Web::Auth
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
         # Mojolicious
@@ -12,7 +12,7 @@ SYNOPSIS
             key         => 'LinkedIn consumer key',
             secret      => 'LinkedIn consumer secret',
             on_finished => sub {
-                my ( $c, $access_token, $user_info ) = @_;
+                my ( $c, $access_token, $email_info ) = @_;
                 ...
             },
             on_error => sub {
@@ -27,7 +27,7 @@ SYNOPSIS
             key         => 'LinkedIn consumer key',
             secret      => 'LinkedIn consumer secret',
             on_finished => sub {
-                my ( $c, $access_token, $user_info ) = @_;
+                my ( $c, $access_token, $email_info ) = @_;
                 ...
             };
 
@@ -44,7 +44,7 @@ AUTHOR
     Vikas N Kumar <vikas@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2016 by Vikas N Kumar.
+    This software is copyright (c) 2019 by Vikas N Kumar.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

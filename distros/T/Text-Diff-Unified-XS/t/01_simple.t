@@ -20,7 +20,7 @@ subtest 'from string' => sub {
     my $data_dir = File::Spec->catfile(dirname(__FILE__), 'data');
     my $data_a   = read_file(File::Spec->catfile($data_dir, 'a.txt'));
     my $data_b   = read_file(File::Spec->catfile($data_dir, 'b.txt'));
-	my $diff_str = read_file(File::Spec->catfile($data_dir, 'diff.txt'));
+    my $diff_str = read_file(File::Spec->catfile($data_dir, 'diff.txt'));
 
     is diff(\$data_a, \$data_b), $diff_str;
 };
@@ -38,7 +38,7 @@ subtest 'from file' => sub {
     my $header =
         "--- $file_a\tSun Jan  3 12:34:56 2016\n".
         "+++ $file_b\tThu May 12 23:45:00 2016\n";
-	my $diff   = read_file(File::Spec->catfile($data_dir, 'diff.txt'));
+    my $diff   = read_file(File::Spec->catfile($data_dir, 'diff.txt'));
 
     is diff($file_a, $file_b), $header . $diff;
 };

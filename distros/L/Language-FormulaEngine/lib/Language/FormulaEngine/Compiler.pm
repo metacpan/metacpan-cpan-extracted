@@ -17,7 +17,7 @@ use Sub::Util 'subname', 'set_subname';
 use namespace::clean;
 
 # ABSTRACT: Compile a parse tree into perl code
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 *_clean_eval= *Language::FormulaEngine::Compiler::_CleanEval::_clean_eval;
 
@@ -171,7 +171,7 @@ Language::FormulaEngine::Compiler - Compile a parse tree into perl code
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,33 @@
+Revision history for GRNOC-Config
+
+1.0.9   01-01-2012
+	ISSUE=1762 PROJ=102 This will allow the config module to return undefined if the attribute doesn't exist, but the path does
+
+1.0.8   12-29-2010
+	ISSUE=1572 PROJ=102 GRNOC-Config will also work with XML strings instead of just files
+
+1.0.7   4-22-2010
+	Will now validate your xml using the validate function
+
+1.0.6   11-24-2009
+	Changed get to use XML::LibXML to improve speed
+
+1.0.5   11-17-2009 aragusa
+	Added the ability to edit configs
+
+1.0.4   6-?-2009 cviecco
+	Support for XML::LibXML
+	
+1.0.3   2-18-2009 4:30pm aragusa
+	no longer dies when it has invalid xml or no file
+	improved error output
+	improved debugging
+
+1.0.2   mitch/ian made some changes
+
+1.0.1   12-5-2008 2:30pm aragusa
+	force_array option available default is on
+	also have the ability of pulling just attributes instead of entire nodes 
+
+1.0.0   12-5-2008 11:00am aragusa
+        First version, released on an unsuspecting world.

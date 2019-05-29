@@ -1,7 +1,7 @@
 package Perl::Snippets;
 
-our $DATE = '2019-05-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-05-29'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: A collection of Perl idioms or short pieces of Perl code
@@ -18,7 +18,7 @@ Perl::Snippets - A collection of Perl idioms or short pieces of Perl code
 
 =head1 VERSION
 
-This document describes version 0.001 of Perl::Snippets (from Perl distribution Perl-Snippets), released on 2019-05-28.
+This document describes version 0.002 of Perl::Snippets (from Perl distribution Perl-Snippets), released on 2019-05-29.
 
 =head1 DESCRIPTION
 
@@ -169,6 +169,8 @@ feature.
 L<Common Perl idioms (2004)|https://www.perlmonks.org/?node_id=376948>
 
 The Idioms subchapter in the Modern Perl book. L<http://modernperlbooks.com/>
+
+L<perlsecret>
 
 =head1 AUTHOR
 

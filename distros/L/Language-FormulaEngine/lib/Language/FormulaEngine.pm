@@ -5,7 +5,7 @@ use Try::Tiny;
 use Module::Runtime 'require_module';
 
 # ABSTRACT: Parser/Interpreter/Compiler for simple spreadsheet formula language
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 has parser => (
@@ -81,7 +81,7 @@ Language::FormulaEngine - Parser/Interpreter/Compiler for simple spreadsheet for
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ and shouldn't have side effects on the data structures you expose to the user.
 The optional L</compile> method does use C<eval> though, so you should do an audit for
 yourself if you plan to use it where security is a concern.
 
-=head2 Features:
+B<Features:>
 
 =over
 

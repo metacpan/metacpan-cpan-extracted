@@ -29,7 +29,7 @@ my $false = '';
 my $zero  = 0;
 my $undef = undef;
 
-# venus
+# Venus
 no warnings;
 is( 0+ '23a',       23,   '0+' );
 is( 0+ '3.00',      3,    '0+' );
@@ -205,8 +205,12 @@ is( "@got", '31337 eleet', '=<>=~' );
 # kite
 @got = ( ~~<DATA>, ~~<DATA> );
 is( "@got", "camel\n llama\n", '~~<>' );
-@got = ( ~~<DATA> );     # return '' instead of undef at EOF
-is( "@got", '', '~~<>' );
+
+{
+    no warnings 'uninitialized';
+    @got = ( ~~ <DATA> );    # return '' instead of undef at EOF
+    is( "@got", '', '~~<>' );
+}
 
 # ornate double-bladed sword
 $got = 1;

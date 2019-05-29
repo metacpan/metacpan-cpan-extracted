@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::SET;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_hashref is_blessed_hashref];
 
 has _buf => ( required => 1 );    # ArrayRef
 
@@ -37,11 +37,23 @@ sub get_query ( $self, $dbh, $final, $i ) {
             my @sql1;
 
             for my $field ( keys $token->%* ) {
-                push @sql1, $dbh->quote_id($field) . ' = $' . $i->$*++;
 
                 # Scalar or blessed ArrayRef values are processed as parameters
                 if ( !is_ref $token->{$field} || is_arrayref $token->{$field} ) {
+                    push @sql1, $dbh->quote_id($field) . ' = $' . $i->$*++;
+
                     push @bind, $token->{$field};
+                }
+
+                # object
+                elsif ( is_blessed_hashref $token->{$field} ) {
+                    my ( $sql, $bind ) = $token->{$field}->get_query( $dbh, 0, $i );
+
+                    if ($sql) {
+                        push @sql1, $dbh->quote_id($field) . ' = ' . $sql;
+
+                        push @bind, $bind->@* if $bind;
+                    }
                 }
                 else {
                     die 'Unsupported ref type';
@@ -49,9 +61,9 @@ sub get_query ( $self, $dbh, $final, $i ) {
             }
 
             if (@sql1) {
-                $sql[-1] .= q[,] if @sql;
+                $sql[-1] .= ',' if @sql;
 
-                push @sql, join q[, ], @sql1;
+                push @sql, join ', ', @sql1;
             }
         }
         else {

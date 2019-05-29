@@ -1,5 +1,12 @@
 Revision history for Data-Dumper-Compact
 
+0.004000 - 2019-05-29
+  - Add tweak feature to DwarnT
+
+0.003003 - 2019-05-29
+  - Add versions to everything so people can depend on them
+  - Don't barf on empty array/hash refs
+
 0.003002 - 2019-05-16
   - Doc improvements for JSON::Dumper::Compact
 

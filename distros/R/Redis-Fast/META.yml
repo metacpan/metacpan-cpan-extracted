@@ -18,7 +18,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ no_index:
 provides:
   Redis::Fast:
     file: lib/Redis/Fast.pm
-    version: '0.22'
+    version: '0.23'
   Redis::Fast::Hash:
     file: lib/Redis/Fast/Hash.pm
   Redis::Fast::List:
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/shogo82148/Redis-Fast/issues
   homepage: https://github.com/shogo82148/Redis-Fast
   repository: git://github.com/shogo82148/Redis-Fast.git
-version: '0.22'
+version: '0.23'
 x_contributors:
   - 'Aaron Crane <arc@aaroncrane.co.uk>'
   - 'Aaron Crane <arc@cpan.org>'
@@ -74,6 +74,7 @@ x_contributors:
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'Michael Klishin <michaelklishin@me.com>'
   - 'Michiel Beijen <michiel.beijen@otrs.com>'
+  - 'Mikio Fujita <mikio.fjt@gmail.com>'
   - 'Pedro Melo <melo@simplicidade.org>'
   - 'Rafael Garcia-Suarez <rgs@consttype.org>'
   - 'Steffen Mueller <smueller@cpan.org>'

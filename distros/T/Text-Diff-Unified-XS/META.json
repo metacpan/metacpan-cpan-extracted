@@ -1,10 +1,10 @@
 {
    "abstract" : "The fast Text::Diff module",
    "author" : [
-      "-2017 Pine Mizune"
+      "-2019 Pine Mizune"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.12",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "mit"
    ],
@@ -37,6 +37,7 @@
             "CPAN::Uploader" : "0.103012",
             "Minilla" : "v3.0.12",
             "Perl::Critic" : "1.125",
+            "Pod::Markdown::Github" : "0.04",
             "Software::License::MIT" : "0.103011",
             "Test::CPAN::Meta" : "0.25",
             "Test::MinimumVersion::Fast" : "0.04",
@@ -64,7 +65,7 @@
    "provides" : {
       "Text::Diff::Unified::XS" : {
          "file" : "lib/Text/Diff/Unified/XS.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -78,10 +79,11 @@
          "web" : "https://github.com/pine/p5-Text-Diff-Unified-XS"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:PINE",
    "x_contributors" : [
       "Pine Mizune <pinemz@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 0
 }

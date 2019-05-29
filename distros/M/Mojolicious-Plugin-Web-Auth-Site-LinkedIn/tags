@@ -6,7 +6,9 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 Mojolicious::Plugin::Web::Auth::Site::LinkedIn	Mojolicious-Plugin-Web-Auth-Site-LinkedIn-0.01/lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^package Mojolicious::Plugin::Web::Auth::Site::LinkedIn;$/;"	p
 Mojolicious::Plugin::Web::Auth::Site::LinkedIn	Mojolicious-Plugin-Web-Auth-Site-LinkedIn-0.02/lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^package Mojolicious::Plugin::Web::Auth::Site::LinkedIn;$/;"	p
+Mojolicious::Plugin::Web::Auth::Site::LinkedIn	Mojolicious-Plugin-Web-Auth-Site-LinkedIn-0.03/lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^package Mojolicious::Plugin::Web::Auth::Site::LinkedIn;$/;"	p
 Mojolicious::Plugin::Web::Auth::Site::LinkedIn	lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^package Mojolicious::Plugin::Web::Auth::Site::LinkedIn;$/;"	p
 moniker	Mojolicious-Plugin-Web-Auth-Site-LinkedIn-0.01/lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^sub moniker {'linkedin'}$/;"	s
 moniker	Mojolicious-Plugin-Web-Auth-Site-LinkedIn-0.02/lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^sub moniker {'linkedin'}$/;"	s
+moniker	Mojolicious-Plugin-Web-Auth-Site-LinkedIn-0.03/lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^sub moniker {'linkedin'}$/;"	s
 moniker	lib/Mojolicious/Plugin/Web/Auth/Site/LinkedIn.pm	/^sub moniker {'linkedin'}$/;"	s

@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::SQL;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_blessed_hashref];
 
 has _buf => ( required => 1 );    # ArrayRef
 
@@ -41,6 +41,17 @@ sub get_query ( $self, $dbh, $final, $i ) {
                 push @sql, $dbh->quote($token);
             }
         }
+
+        # object
+        elsif ( is_blessed_hashref $token ) {
+            my ( $sql, $bind ) = $token->get_query( $dbh, 0, $i );
+
+            if ($sql) {
+                push @sql, $sql;
+
+                push @bind, $bind->@* if $bind;
+            }
+        }
         else {
             die 'Unsupported ref type';
         }
@@ -52,12 +63,6 @@ sub get_query ( $self, $dbh, $final, $i ) {
     else {
         return join( $SPACE, @sql ), \@bind;
     }
-}
-
-sub get_quoted ( $self, $dbh ) {
-    my ( $sql, $bind ) = $self->get_query( $dbh, 0, undef );
-
-    return $sql;
 }
 
 1;

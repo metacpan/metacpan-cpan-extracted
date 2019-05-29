@@ -69,6 +69,14 @@ sub test_scanner {
 			[ String => 'foo',   0, 6 ],
 			[ String => 'foo\\', 0, 11 ],
 		],
+		[ q{ f(0x40,0xfE) },
+			[ Identifier =>  'f', 0,  1 ],
+			[ '('        =>  '(', 0,  2 ],
+			[ Number     => 0x40, 0,  3 ],
+			[ ','        =>  ',', 0,  7 ],
+			[ Number     => 0xfE, 0,  8 ],
+			[ ')'        =>  ')', 0, 12 ],
+		],
 	);
 
 	for (@tests) {

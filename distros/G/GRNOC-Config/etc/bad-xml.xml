@@ -1,0 +1,9 @@
+<config>
+  <db name='somedb'>
+    <credentials user='readonly' password='password' />
+    <host address='127.0.0.1' port='3306' />
+  </dbasdfasdf>
+  <!-- <something>else</something> -->
+  <something>else again</something>
+  <yet>again</yet1>
+</config>

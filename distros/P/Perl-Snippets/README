@@ -3,8 +3,8 @@ NAME
     code
 
 VERSION
-    This document describes version 0.001 of Perl::Snippets (from Perl
-    distribution Perl-Snippets), released on 2019-05-28.
+    This document describes version 0.002 of Perl::Snippets (from Perl
+    distribution Perl-Snippets), released on 2019-05-29.
 
 DESCRIPTION
     This distribution catalogs (in its POD pages) various idioms or short
@@ -136,6 +136,8 @@ SEE ALSO
 
     The Idioms subchapter in the Modern Perl book.
     <http://modernperlbooks.com/>
+
+    perlsecret
 
 AUTHOR
     perlancar <perlancar@cpan.org>

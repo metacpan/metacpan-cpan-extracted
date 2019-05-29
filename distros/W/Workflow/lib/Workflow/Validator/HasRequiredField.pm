@@ -5,7 +5,7 @@ use strict;
 use base qw( Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 
-$Workflow::Validator::HasRequiredField::VERSION = '1.45';
+$Workflow::Validator::HasRequiredField::VERSION = '1.46';
 
 sub validate {
     my ( $self, $wf, @required_fields ) = @_;
@@ -17,8 +17,8 @@ sub validate {
         }
     }
     if ( scalar @no_value ) {
-        validation_error "The following fields require a value: ", join ', ',
-            @no_value, { invalid_fields => \@no_value };
+        validation_error "The following fields require a value: ",
+            join(', ',@no_value), { invalid_fields => \@no_value };
     }
 }
 

@@ -1,0 +1,54 @@
+#!/bin/sh
+
+: <<=cut
+=pod
+
+=head1 NAME
+
+wrt-help - print help for wrt, WRiting Tool
+
+=head1 SYNOPSIS
+
+    wrt help
+    wrt -h
+    wrt --help
+
+=head1 DESCRIPTION
+
+C<wrt-help> displays basic help for the wrt utility.
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://code.p1k3.com/gitea/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes <code@p1k3.com>
+
+=cut
+
+print_help() {
+  echo "wrt - a writing tool"
+  echo
+  echo "Usage: wrt [command] [args]"
+  echo "    wrt init         Initialize a wrt repository"
+  echo "    wrt display      Print HTML for entries"
+  echo "    wrt render-all   Render all defined entries to filesystem"
+  echo "    wrt ls           List entries in repository"
+  echo "    wrt config       Display current configuration"
+  echo "    wrt addprop      Add a property to an entry"
+  echo "    wrt findprop     Find entries containing certain properties"
+  echo "    wrt version, -v  Print the installed version of wrt"
+  echo "    wrt help, -h     Print this help message"
+  echo
+  echo "You must specify a command."
+}
+
+print_help
+exit 0

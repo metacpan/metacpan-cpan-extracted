@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Net::DNS::Async" => 0,
     "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
+    "Time::HiRes" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
   "Test::More" => 0,
+  "Time::HiRes" => 0,
   "strict" => 0,
   "warnings" => 0
 );

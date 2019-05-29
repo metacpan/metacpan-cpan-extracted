@@ -5,7 +5,7 @@ package Types::PDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -109,28 +109,28 @@ facet ndims => sub {
 };
 
 
-facetize qw[ empty null ndims ], class_type Piddle, { class => 'PDL' };
+facet 'type', sub {
+    my ( $o, $var ) = @_;
+    return unless exists $o->{type};
+    my $type = eval { PDL::Type->new( delete $o->{type} )->ioname };
+    croak( "type must be a valid type name or a PDL::Type object: $@\n" )
+      if $@;
 
-facetize qw[ null ],
-  declare Piddle0D,
-  as Piddle[ ndims => 0];
+    errf '%{var}s->type->ioname eq q[%{type}s]',
+      { var => $var, type => $type };
+};
 
-facetize qw[ empty null ],
-  declare Piddle1D,
-  as Piddle[ ndims => 1];
+facetize qw[ empty null ndims type ], class_type Piddle, { class => 'PDL' };
 
-facetize qw[ empty null ],
-  declare Piddle2D,
-  as Piddle[ ndims => 2];
+facetize qw[ null ], declare Piddle0D, as Piddle [ ndims => 0 ];
 
-facetize qw[ empty null ],
-  declare Piddle3D,
-  as Piddle[ ndims => 3];
+facetize qw[ empty null ], declare Piddle1D, as Piddle [ ndims => 1 ];
 
-declare_coercion PiddleFromAny,
-  to_type Piddle,
-  from Any,
-  q[ do { local $@;
+facetize qw[ empty null ], declare Piddle2D, as Piddle [ ndims => 2 ];
+
+facetize qw[ empty null ], declare Piddle3D, as Piddle [ ndims => 3 ];
+
+declare_coercion PiddleFromAny, to_type Piddle, from Any, q[ do { local $@;
           require PDL::Core;
           my $new = eval { PDL::Core::topdl( $_ )  };
           $@ ? $_ : $new
@@ -158,7 +158,7 @@ Types::PDL - PDL types using Type::Tiny
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -189,6 +189,7 @@ It accepts the following parameters:
   ndims
   ndims_min
   ndims_max
+  type
 
 =head3 C<Piddle0D>
 
@@ -196,6 +197,7 @@ Allows an object blessed into the class C<PDL> with C<ndims> = 0.
 It accepts the following parameters:
 
   null
+  type
 
 =head3 C<Piddle1D>
 
@@ -204,6 +206,7 @@ It accepts the following parameters:
 
   null
   empty
+  type
 
 =head3 C<Piddle2D>
 
@@ -212,6 +215,7 @@ It accepts the following parameters:
 
   null
   empty
+  type
 
 =head3 C<Piddle3D>
 
@@ -220,6 +224,7 @@ It accepts the following parameters:
 
   null
   empty
+  type
 
 =head2 Coercions
 
@@ -268,6 +273,15 @@ this with C<ndims>.
 
 The maximum number of dimensions the piddle may have. Don't specify
 this with C<ndims>.
+
+=head3 C<type>
+
+The type of the piddle. The value may be a L<PDL::Type> object or a
+string containing the name of a type (e.g., C<double>). For a complete
+list of types, run this command:
+
+  perl -MPDL::Types=mapfld,ppdefs \
+    -E 'say mapfld( $_ => 'ppsym' => 'ioname' )  for ppdefs'
 
 =head1 BUGS AND LIMITATIONS
 
@@ -320,6 +334,7 @@ __END__
 #pod   ndims
 #pod   ndims_min
 #pod   ndims_max
+#pod   type
 #pod
 #pod =head3 C<Piddle0D>
 #pod
@@ -327,6 +342,7 @@ __END__
 #pod It accepts the following parameters:
 #pod
 #pod   null
+#pod   type
 #pod
 #pod =head3 C<Piddle1D>
 #pod
@@ -335,6 +351,7 @@ __END__
 #pod
 #pod   null
 #pod   empty
+#pod   type
 #pod
 #pod =head3 C<Piddle2D>
 #pod
@@ -343,6 +360,7 @@ __END__
 #pod
 #pod   null
 #pod   empty
+#pod   type
 #pod
 #pod =head3 C<Piddle3D>
 #pod
@@ -351,6 +369,7 @@ __END__
 #pod
 #pod   null
 #pod   empty
+#pod   type
 #pod
 #pod =head2 Coercions
 #pod
@@ -401,6 +420,15 @@ __END__
 #pod
 #pod The maximum number of dimensions the piddle may have. Don't specify
 #pod this with C<ndims>.
+#pod
+#pod =head3 C<type>
+#pod
+#pod The type of the piddle. The value may be a L<PDL::Type> object or a
+#pod string containing the name of a type (e.g., C<double>). For a complete
+#pod list of types, run this command:
+#pod
+#pod   perl -MPDL::Types=mapfld,ppdefs \
+#pod     -E 'say mapfld( $_ => 'ppsym' => 'ioname' )  for ppdefs'
 #pod
 #pod
 #pod =head1 SEE ALSO

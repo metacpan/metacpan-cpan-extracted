@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Perinci::CmdLine::Util::Config",
   "PREREQ_PM" => {
-    "Config::IOD::Reader" => "0.33",
+    "Config::IOD::Reader" => "0.341",
     "Data::Sah::Normalize" => 0,
-    "Log::ger" => "0.023",
+    "Exporter" => "5.57",
+    "Log::ger" => "0.027",
     "Perinci::Sub::Normalize" => "0.19",
     "strict" => 0,
     "warnings" => 0
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.721",
+  "VERSION" => "1.722",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,12 +39,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Config::IOD::Reader" => "0.33",
+  "Config::IOD::Reader" => "0.341",
   "Data::Sah::Normalize" => 0,
+  "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.023",
+  "Log::ger" => "0.027",
   "Perinci::Sub::Normalize" => "0.19",
   "Test::More" => 0,
   "strict" => 0,

@@ -41,15 +41,26 @@ plugin 'Mojolicious::Plugin::Web::Auth',
     key         => $pit->{key},
     secret      => $pit->{secret},
     on_finished => sub {
-    my ( $c, $access_token, $account_info ) = @_;
+    my ( $c, $access_token, $email_info ) = @_;
+    my ($email, $email_urn);
+    if (ref $email_info eq 'HASH') {
+        if (ref $email_info->{elements} eq 'ARRAY') {
+            if (ref $email_info->{elements}->[0] eq 'HASH') {
+                if (ref $email_info->{elements}->[0]->{'handle~'} eq 'HASH') {
+                    $email = lc $email_info->{elements}->[0]->{'handle~'}->{emailAddress};
+                }
+                $email_urn = $email_info->{elements}->[0]->{handle};
+            }
+        }
+    }
     $c->session( 'access_token' => $access_token );
-    $c->session( 'account_info' => $account_info );
+    $c->session( 'email' => $email );
     return $c->redirect_to('index');
     };
 
 get '/' => sub {
     my ($c) = @_;
-    unless ( $c->session('account_info') ) {
+    unless ( $c->session('email') ) {
         return $c->redirect_to('login');
     }
 } => 'index';
@@ -74,7 +85,7 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default';
-Hello <%= session('account_info')->{data}->{username} %>@<%= site %>
+Hello <%= session('email') %>@<%= site %>
 <form method="post" action="/logout">
 <button type="submit">Logout</button>
 </form>

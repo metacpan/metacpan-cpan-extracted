@@ -31,6 +31,7 @@ my %defaults = (
   height     => '',
   id         => '',
   margin     => 2,
+  scale      => '',
   width      => '',
 );
 
@@ -62,7 +63,7 @@ like $@, qr/Can't locate object method "inexistant"/,
 
 note 'Plot';
 ok $object = $package->new, 'Create object';
-my $text = '<Tekki>';
+my $text = '<black>';
 
 eval { $object->plot };
 like $@, qr/Too few arguments for subroutine/, 'Correct error for missing text';
@@ -79,12 +80,11 @@ like $@, qr/Method _plot not implemented by subclass!/,
     $self->_rect(5, 0, 5, 5, 'cyan');
     $self->_rect(0, 5, 5, 5, 'magenta');
     $self->_rect(5, 5, 5, 5, 'yellow');
-    $self->_text('<black>', .3, 4.7, 1, 'white');
+    $self->_text($text, .3, 4.7, 1, 'white');
   };
 }
 
-ok my $svg = $object->margin(2)->width('100%')->height('100%')->plot($text),
-  'Generate svg';
+ok my $svg = $object->margin(2)->scale(10)->plot($text), 'Generate svg';
 is $svg, slurp("$FindBin::Bin/resources/cmyk.svg"), 'Content is correct';
 
 done_testing();

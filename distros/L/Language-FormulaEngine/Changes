@@ -1,3 +1,7 @@
+0.03 - 2019-05-28
+  - Fixed bugs in default namespace functions for perl < 5.16
+  - Documentation updates
+
 0.02 - 2019-05-25
   - Fix parser to allow empty function parameter lists
   - Exception objects now stringify to class suffix and message

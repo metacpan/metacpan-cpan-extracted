@@ -14,6 +14,7 @@ lib/App/PRT/Command/AddMethod.pm
 lib/App/PRT/Command/AddUse.pm
 lib/App/PRT/Command/DeleteMethod.pm
 lib/App/PRT/Command/IntroduceVariables.pm
+lib/App/PRT/Command/ListFiles.pm
 lib/App/PRT/Command/MoveClassMethod.pm
 lib/App/PRT/Command/RenameClass.pm
 lib/App/PRT/Command/RenameNameSpace.pm
@@ -29,6 +30,7 @@ t/App-PRT-Command-AddMethod.t
 t/App-PRT-Command-AddUse.t
 t/App-PRT-Command-DeleteMethod.t
 t/App-PRT-Command-IntroduceVariables.t
+t/App-PRT-Command-ListFiles.t
 t/App-PRT-Command-MoveClassMethod.t
 t/App-PRT-Command-RenameClass.t
 t/App-PRT-Command-RenameNameSpace.t
@@ -62,6 +64,11 @@ t/data/greeting/use_greeting.pl
 t/data/greeting/use_greeting_and_hi.pl
 t/data/hello_world/hello_world.pl
 t/data/inherit/inherit.pl
+t/data/list_files/bin/amazing.pl
+t/data/list_files/bin/ignored-file
+t/data/list_files/cpanfile
+t/data/list_files/lib/My/Class.pm
+t/data/list_files/lib/ignored-file
 t/data/method_call_with_whitespace/hello.pl
 t/data/method_with_comment/FoodWithComment.pm
 t/data/package_in_block/multi_packages.pl

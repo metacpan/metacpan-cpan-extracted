@@ -7,7 +7,7 @@ use Mu;
 use strictures 2;
 use namespace::clean;
 
-our $VERSION = '0.003002';
+our $VERSION = '0.004000';
 $VERSION =~ tr/_//d;
 
 sub import {
@@ -229,7 +229,7 @@ sub _format_arraylike {
       (map $self->_indent($self->_format($_).','), @$payload),
     $r);
   }
-  my @pl = @$payload;
+  return $l.$r unless my @pl = @$payload;
   my $last_pl = pop @pl;
   # We don't want 'foo =>' at the end of the array, so for the last
   # entry use plain _format which will render key-as-string, and don't
@@ -316,6 +316,7 @@ sub _format_hashkey {
 sub _format_hash {
   my ($self, $payload) = @_;
   my ($keys, $hash) = @$payload;
+  return '{}' unless @$keys;
   my %k = (map +(
     $_ => $self->_format_hashkey($_)), @$keys
   );

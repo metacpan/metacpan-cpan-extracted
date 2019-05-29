@@ -12,7 +12,7 @@ our @EXPORT_OK = qw|plot_datamatrix|;
 
 use Barcode::DataMatrix;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use constant DEFAULTS => {
   dotsize       => 1,
@@ -64,6 +64,7 @@ SVG::Barcode::DataMatrix - Generator for SVG based Data Matrix barcodes
     $datamatrix->class;
     $datamatrix->width;
     $datamatrix->height;
+    $datamatrix->scale;
 
     my %params = (
       level  => 'H',
@@ -116,6 +117,7 @@ L<foreground|SVG::Barcode/foreground>,
 L<height|SVG::Barcode/height>,
 L<id|SVG::Barcode/id>,
 L<margin|SVG::Barcode/margin>,
+L<scale|SVG::Barcode/scale>,
 L<width|SVG::Barcode/width>.
 
 =head2 dotsize

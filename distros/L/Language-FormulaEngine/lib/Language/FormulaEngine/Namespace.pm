@@ -6,7 +6,7 @@ use Language::FormulaEngine::Error ':all';
 use namespace::clean;
 
 # ABSTRACT: Object holding function and variable names
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 has variables            => ( is => 'rw', default => sub { +{} } );
@@ -100,7 +100,7 @@ Language::FormulaEngine::Namespace - Object holding function and variable names
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

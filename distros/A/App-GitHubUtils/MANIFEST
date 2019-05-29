@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/GitHubUtils.pm
 script/create-the-github-repo
+script/git-clone-from-github
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

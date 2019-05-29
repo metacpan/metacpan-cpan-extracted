@@ -6,7 +6,7 @@ use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayr
 has _buf => ( required => 1 );    # ArrayRef
 
 sub get_query ( $self, $dbh, $final, $i ) {
-    my ( @sql, @idx );
+    my ( @sql, @idx, @bind );
 
     for my $token ( $self->{_buf}->@* ) {
 
@@ -23,12 +23,20 @@ sub get_query ( $self, $dbh, $final, $i ) {
 
                 # Scalar or blessed ArrayRef value is processed as parameter
                 if ( !is_ref $token->{$field} || is_arrayref $token->{$field} ) {
-                    push @row, $dbh->quote( $token->{$field} );
+                    push @row, '$' . $i->$*++;
+
+                    push @bind, $token->{$field};
                 }
 
                 # object
                 elsif ( is_blessed_hashref $token->{$field} ) {
-                    push @row, $token->{$field}->get_quoted($dbh);
+                    my ( $sql, $bind ) = $token->{$field}->get_query( $dbh, 0, $i );
+
+                    if ($sql) {
+                        push @row, $sql;
+
+                        push @bind, $bind->@* if $bind;
+                    }
                 }
                 else {
                     die 'Unsupported ref type';
@@ -47,12 +55,20 @@ sub get_query ( $self, $dbh, $final, $i ) {
 
                 # Scalar or ArrayRef value is processed as parameter
                 if ( !is_ref $field || is_arrayref $field ) {
-                    push @row, $dbh->quote($field);
+                    push @row, '$' . $i->$*++;
+
+                    push @bind, $field;
                 }
 
                 # object
                 elsif ( is_blessed_hashref $field ) {
-                    push @row, $field->get_quoted($dbh);
+                    my ( $sql, $bind ) = $field->get_query( $dbh, 0, $i );
+
+                    if ($sql) {
+                        push @row, $sql;
+
+                        push @bind, $bind->@* if $bind;
+                    }
                 }
                 else {
                     die 'Unsupported ref type';
@@ -68,10 +84,10 @@ sub get_query ( $self, $dbh, $final, $i ) {
     }
 
     if (@idx) {
-        return '(' . join( ', ', map { $dbh->quote_id($_) } @idx ) . ') VALUES ' . join( ', ', @sql ), undef;
+        return '(' . join( ', ', map { $dbh->quote_id($_) } @idx ) . ') VALUES ' . join( ', ', @sql ), \@bind;
     }
     else {
-        return 'VALUES ' . join( ', ', @sql ), undef;
+        return 'VALUES ' . join( ', ', @sql ), \@bind;
     }
 }
 
@@ -82,7 +98,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 8                    | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (21)                 |
+## |    3 | 8                    | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (25)                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

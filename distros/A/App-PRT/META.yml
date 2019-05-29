@@ -3,7 +3,9 @@ abstract: 'Command line Perl Refactoring Tool'
 author:
   - '-2019 hitode909 and contributors.'
 build_requires:
+  Capture::Tiny: '0.39'
   File::Copy::Recursive: '0'
+  File::pushd: '1.013'
   Path::Class: '0'
   Test::Class: '0'
   Test::Deep: '0'
@@ -35,7 +37,7 @@ no_index:
 provides:
   App::PRT:
     file: lib/App/PRT.pm
-    version: '0.21'
+    version: '0.22'
   App::PRT::CLI:
     file: lib/App/PRT/CLI.pm
   App::PRT::Collector::AllFiles:
@@ -54,6 +56,8 @@ provides:
     file: lib/App/PRT/Command/DeleteMethod.pm
   App::PRT::Command::IntroduceVariables:
     file: lib/App/PRT/Command/IntroduceVariables.pm
+  App::PRT::Command::ListFiles:
+    file: lib/App/PRT/Command/ListFiles.pm
   App::PRT::Command::MoveClassMethod:
     file: lib/App/PRT/Command/MoveClassMethod.pm
   App::PRT::Command::RenameClass:
@@ -77,11 +81,12 @@ resources:
   bugtracker: https://github.com/hitode909/App-PRT/issues
   homepage: https://github.com/hitode909/App-PRT
   repository: git://github.com/hitode909/App-PRT.git
-version: '0.21'
+version: '0.22'
 x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Takanori Ishikawa <takanori.ishikawa@gmail.com>'
   - 'moznion <moznion@gmail.com>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Chris White <cxwembedded@gmail.com>'
+  - 'Chris White <chrisw@leehayes.com>'
   - 'hitode909 <hitode909@gmail.com>'

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.21';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.22';
 # ABSTRACT: Subclass overloading L<DateTime::Calendar::FrenchRevolutionary> to allow language extension
 
 use Moose;
@@ -70,7 +70,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar - Subclass o
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 METHODS
 

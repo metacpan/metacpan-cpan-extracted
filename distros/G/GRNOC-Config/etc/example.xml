@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+  <db name="Test">
+    <credentials user="readonly" password="password"/>
+    <host address="127.0.0.1" port="3306"/>
+  </db>
+  
+  
+  <tester>this is</tester>
+  <tester>an array</tester>
+  <yet>again</yet>
+</config>

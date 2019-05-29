@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.1.3';
+our $VERSION = '1.1.4';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -387,6 +387,8 @@ sub process_BIN_SHARE {
     }
     
     $bin_share->{LOADABLE} = has_binary($params);
+    
+    $bin_share->{CPLUS} //= $params->{CPLUS} if $params->{CPLUS};
     
     # generate info file
     mkdir 'blib';

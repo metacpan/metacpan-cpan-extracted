@@ -3,8 +3,8 @@ NAME
     results of several names from several servers
 
 VERSION
-    This document describes version 0.002 of App::resolvetable (from Perl
-    distribution App-resolvetable), released on 2019-05-28.
+    This document describes version 0.003 of App::resolvetable (from Perl
+    distribution App-resolvetable), released on 2019-05-29.
 
 FUNCTIONS
   resolvetable
@@ -18,6 +18,12 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "show-addresses")
+
+        The default action is to show resolve result ("show-addresses"). If
+        set to "show-times", will show resolve times instead to compare
+        speed among DNS servers.
 
     *   colorize => *bool*
 

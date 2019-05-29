@@ -1,0 +1,5 @@
+<config>
+<match regex="@FOO\.ORG$" realm="FOO ECP URL" />
+<match regex="@BAR\.NET$" realm="BAR ECP URL" />
+<match regex=".*" realm="Default ECP URL" />
+</config> 

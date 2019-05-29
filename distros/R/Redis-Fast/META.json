@@ -4,7 +4,7 @@
       "Ichinose Shogo <shogo82148@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.2",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
    "provides" : {
       "Redis::Fast" : {
          "file" : "lib/Redis/Fast.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Redis::Fast::Hash" : {
          "file" : "lib/Redis/Fast/Hash.pm"
@@ -93,7 +93,7 @@
          "web" : "https://github.com/shogo82148/Redis-Fast"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_contributors" : [
       "Aaron Crane <arc@aaroncrane.co.uk>",
       "Aaron Crane <arc@cpan.org>",
@@ -114,6 +114,7 @@
       "Masayuki Matsuki <y.songmu@gmail.com>",
       "Michael Klishin <michaelklishin@me.com>",
       "Michiel Beijen <michiel.beijen@otrs.com>",
+      "Mikio Fujita <mikio.fjt@gmail.com>",
       "Pedro Melo <melo@simplicidade.org>",
       "Rafael Garcia-Suarez <rgs@consttype.org>",
       "Steffen Mueller <smueller@cpan.org>",
@@ -138,6 +139,6 @@
       "zhihong zhang <zzh_621@yahoo.com>",
       "Ævar Arnfjörð Bjarmason <avarab@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 0
 }

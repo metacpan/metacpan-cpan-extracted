@@ -16,7 +16,8 @@ my @files = (
     't/empty.t',
     't/ndims.t',
     't/null.t',
-    't/subtypes.t'
+    't/subtypes.t',
+    't/type.t'
 );
 
 notabs_ok($_) foreach @files;

@@ -1,3 +1,11 @@
+0.003   2019-05-29 (PERLANCAR)
+
+	- Add option --times (--action=show-times) to show timing results
+	  instead of the results.
+
+	- [ux] When --colorize, mark undefined result with red X.
+
+
 0.002   2019-05-28 (PERLANCAR)
 
 	- No functional changes.

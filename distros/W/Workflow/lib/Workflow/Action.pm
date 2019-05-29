@@ -13,7 +13,7 @@ use Workflow::Validator::HasRequiredField;
 use Workflow::Factory qw( FACTORY );
 use Carp qw(croak);
 
-$Workflow::Action::VERSION = '1.45';
+$Workflow::Action::VERSION = '1.46';
 
 my @PROPS    = qw( name class description );
 my @INTERNAL = qw( _factory );
@@ -75,6 +75,9 @@ sub validate {
     foreach my $validator_info (@validators) {
         my $validator    = $validator_info->{validator};
         my $args         = $validator_info->{args};
+
+        # TODO: Revisit this statement it does not look right
+        # runtime_args becomes the WF object??
         my @runtime_args = ($wf);
         foreach my $arg ( @{$args} ) {
             if ( $arg =~ /^\$(.*)$/ ) {

@@ -1,5 +1,8 @@
 Revision history for perl distribution SVG-Barcode-DataMatrix
 
+0.13 2019-05-28T17:23:41+0200
+ - Upgrade to SVG::Barcode 0.11 with scale parameter
+
 0.12 2019-05-26T06:54:51+0200
  - Remove references to QR Code
 

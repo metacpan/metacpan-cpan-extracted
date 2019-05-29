@@ -1,3 +1,7 @@
+v0.86.5 2019-05-29T13:57:03Z
+ - query_to_string
+ - dbi tokens improved
+
 v0.86.4 2019-05-26T20:36:05Z
  - api map error handler
 

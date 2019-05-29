@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:complexType name="credentialsType">
+  <xs:attribute name="user" type="xs:string" use="required" />
+  <xs:attribute name="password" type="xs:string" use="required" />
+</xs:complexType>
+
+<xs:complexType	name="hostType">
+  <xs:attribute name="address" type="xs:string" use="required" />
+  <xs:attribute name="port" type="xs:string" use="required" />
+</xs:complexType>
+
+<xs:complexType name="dbInfoType">
+  <xs:sequence>
+    <xs:element name="credentials" type="credentialsType" />
+    <xs:element name="host" type="hostType" />
+  </xs:sequence>
+  <xs:attribute name="name" type="xs:string" use="optional" />
+</xs:complexType>
+
+<xs:complexType name="configType">
+  <xs:sequence>
+    <xs:element name="db" type="dbInfoType" />
+    <xs:element name="something" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
+    <xs:element name="tester" type="xs:string" maxOccurs="unbounded"/>
+    <xs:element name="yet" type="xs:string" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:element name="config" type="configType" />
+
+</xs:schema>

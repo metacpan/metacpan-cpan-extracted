@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GitHubUtils/create_the_github_repo
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2018-10-09'; # DATE
+our $DATE = '2019-05-29'; # DATE
 our $DIST = 'App-GitHubUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ create-the-github-repo - Create github repo
 
 =head1 VERSION
 
-This document describes version 0.003 of create-the-github-repo (from Perl distribution App-GitHubUtils), released on 2018-10-09.
+This document describes version 0.004 of create-the-github-repo (from Perl distribution App-GitHubUtils), released on 2019-05-29.
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

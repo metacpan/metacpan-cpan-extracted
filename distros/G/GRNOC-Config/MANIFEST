@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/GRNOC/Config.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/functional.t
+t/noconfig.t
+t/bad-xml.t
+t/validate.t
+t/TEST
+etc/example.xml
+etc/bad-xml.xml
+etc/example_schema.xsd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

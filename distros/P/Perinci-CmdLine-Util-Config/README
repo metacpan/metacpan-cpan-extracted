@@ -3,17 +3,17 @@ NAME
     files
 
 VERSION
-    This document describes version 1.721 of Perinci::CmdLine::Util::Config
+    This document describes version 1.722 of Perinci::CmdLine::Util::Config
     (from Perl distribution Perinci-CmdLine-Util-Config), released on
-    2018-03-05.
+    2019-05-29.
 
 FUNCTIONS
   get_args_from_config
     Usage:
 
-     get_args_from_config(%args) -> [status, msg, result, meta]
+     get_args_from_config(%args) -> [status, msg, payload, meta]
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -38,7 +38,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -47,9 +47,9 @@ FUNCTIONS
   get_default_config_dirs
     Usage:
 
-     get_default_config_dirs() -> [status, msg, result, meta]
+     get_default_config_dirs() -> [status, msg, payload, meta]
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     No arguments.
 
@@ -58,7 +58,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -67,9 +67,9 @@ FUNCTIONS
   read_config
     Usage:
 
-     read_config(%args) -> [status, msg, result, meta]
+     read_config(%args) -> [status, msg, payload, meta]
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -88,7 +88,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -114,7 +114,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,197 @@
+GRNOC::WebService::Client v1.5.1 -- Thu Apr 26 2018
+===================================================
+
+  *ISSUE=6579 PROJ=168 Support for default realm
+
+GRNOC::WebService::Client v1.5.0-2 -- Thu Sep 14 2017
+===================================================
+
+Bug Fixes:
+ * ISSUE=3222 PROJ=160 Require https support on el7
+
+
+GRNOC::WebService::Client v1.5.0 -- Fri Aug 18 2017
+===================================================
+New Features:
+ * ISSUE=1002 PROJ=168 Support for Shibboleth ECP.
+
+GRNOC::WebService::Client v1.4.1 -- Fri Mar 17 2017
+====================================================
+Bug Fixes:
+    *PULLREQ=5 Adds ability to ignore missing or self-signed ssl certs.
+
+GRNOC::WebService::Client v1.4.0 -- Tue Nov 29 2016
+====================================================
+New Featues:
+    *ISSUE=2804 PROJ=161 Adding ability to retry webservice requests on given HTTP status codes
+
+
+GRNOC::WebService::Client v1.3.3 -- Wed Oct 5 2016
+===================================================
+
+Bug Fixes:
+ * ISSUE=2171 PROJ=160 Clear error state between subsequent calls to avoid cases where
+error state would persist after a transient problem.
+
+
+GRNOC::WebService::Client v1.3.2 -- Tue Jun 02 2015
+===================================================
+
+Features:
+ * ISSUE=11086 Webservice Client instances will now automatically save their cookies if applicable after any successful
+request is made instead of relying on code to make an explicit call. This is similar to prior behavior that
+was lost when a thread-safe change was made to the saving mechanism.
+ * ISSUE=10952 Improved error messages when failing to handle URNs.
+
+Bug Fixes:
+ * ISSUE=11282 Webservice Clients will now properly choose a random URL when given multiple equally weighted URLs 
+instead of always choosing the first, ensuring a RR behavior for equal weighted URLs.
+
+
+GRNOC::WebService::Client v1.3.1 -- Fri May 09 2014
+===================================================
+
+Bug Fixes:
+ * ISSUE=8594 Fixed issue where in multithreaded or multiprocess environments
+a shared cookie jar would sometimes fail to function properly causing redundant
+logins.
+ * ISSUE=8678 Cleaned up misc harmless warnings that Client was generating 
+when parsing headers.
+
+
+GRNOC::WebService::Client v1.3.0 -- Fri May 09 2014
+===================================================
+
+Features:
+
+ * ISSUE=8568 adding built-in pagination support
+
+
+GRNOC::WebService::Client v1.2.2 -- Tue Jan 21 2014
+===================================================
+
+Features:
+ * ISSUE=7733 Added ability to change the method parameter name in the constructor. Default is still 'method'.
+ * ISSUE=7779 Adding ability to change the cookie jar and explicitly save the cookie jar, adding unit tests.
+
+Bug Fixes:
+ * ISSUE=7730 Fix bug where null values weren't properly being sent when passed in an array context
+
+
+GRNOC::WebService::Client v1.2.1 -- Fri Nov 15 2013
+===================================================
+
+Features:
+ * ISSUE=6445 Added  optionalerror_callback constructor argument for
+ webservice client to get called whenever a failure or an 'error' bit in json 
+return is detected
+ * ISSUE=7485 Client now supports file uploads.
+ * ISSUE=6443 Client now parses and stores all header information from the last
+successful request, accessible via get_headers
+
+Bug Fixes:
+ * ISSUE=6447 properly clear out old service urls before trying to load new ones
+
+
+GRNOC::WebService::Client v1.2.0 -- Wed Mar 28 2013
+===================================================
+Features:
+ * ISSUE=5720 Overhauled the way URLs are fetched and Cosign interacted with to allow for reauthorization in a persistent environment such as mod_perl.
+
+
+GRNOC::WebService::Client v1.1.7 -- Wed Feb 27 2013
+===================================================
+Features:
+ * ISSUE=3514 Added oldstyle_urls constructor flag to allow the CGI module to print urls that are compatible with web services built in PHP.
+
+Bug Fixes:
+ * ISSUE=5476 Changed authorization behavior so that only one request is sent.
+
+GRNOC::WebService::Client v1.1.6 -- Oct Apr 30 2012
+===================================================
+
+Features:
+
+* ISSUE=4543 Added set_timeout method to control the timeout behavior of the client.
+
+
+GRNOC::WebService::Client v1.1.5 -- Tue Apr 17 2012
+===================================================
+
+Features:
+
+* ISSUE=3579 Added user_agent attrib to constructor on Client for reporting purposes.
+
+Bug Fixes:
+
+* ISSUE=3684 Webservice Cient no longer crashes when it receives invalid JSON.
+* ISSUE=3709 Client now no longer assumes you are using a cache file when you use URNs. 
+* ISSUE=3709 Client now clears out old urls when changing the URN. 
+* ISSUE=3709 Client now passes debug flags to aggregate objects.
+
+
+GRNOC::WebService::Client v1.1.4 -- Tue Mar 14 2012
+===================================================
+
+Features:
+
+* ISSUE=3454 Added the wsutil command line tool for testing and timing webservices.
+* ISSUE=3454 Added a timing option to the Client constructor to turn on timing debugging.
+
+
+GRNOC::WebService::Client v1.1.3 -- Tue Nov 29 2011
+===================================================
+
+Features:
+
+* ISSUE=2956 PROJ=102 Added set_credentials to allow the credentials uid, realm, and passwd to be change dynamically.
+
+
+GRNOC::WebService::Client v1.1.2 -- Tue Jun 28 2011
+===================================================
+
+Features:
+
+* ISSUE=2313 PROJ=102 set_raw_output() & get_content_type() methods added, as well as unit tests to verify the ability to receive the raw HTTP response (non-JSON-decoded)
+
+Bug Fixes:
+
+* dont set basic auth creds unless a realm is given as well as username & password
+
+
+GRNOC::WebService::Client v1.1.1 -- Mon Jun 13 2011
+===================================================
+
+Bug Fixes:
+
+* ISSUE=2354 PROJ=102 introduce Module::Build w/ spec file to guarantee JSON version 2 requirements
+
+
+OLD CHANGES
+===========
+
+1.1.0   06-07-2011
+        ISSUE=2342 PROJ=102 Webservice Client follows Cosign redirects properly
+        ISSUE=2311 PROJ=102 Fully flushed out RemoteMethod information
+        ISSUE=2349 PROJ=102 Added raw_output to constructor to allow for data to be returned without any decoding or manipulation (before was hard coded for JSON decode)
+
+1.0.5   06-06-2011
+        ISSUE=2311 PROJ=102 dding ability for WS Client to understand service names and grab urls out of name service config file
+         dont supply user/pass credentials unless they are given
+1.0.4   04-14-2011
+        ISSUE=2132 PROJ=102 Switched to JSON::XS 2.x
+
+1.0.2   12-13-2010
+        ISSUE=1135 PROJ=102 HTTP Basic Auth support
+
+1.0.1   11-12-2010
+        ISSUE=1478 PROJ=102 keep-alive support and fixes when running under mod_perl
+
+1.0.0   06-08-2010
+        First production tag of the GRNOC::WebService::Client module
+        ISSUE=855 PROJ=102 Supports POST methods
+        ISSUE=393 PROJ=102 Configurable Timeouts 
+
+0.03            08-16-09
+         splitting out client library from others, finished
+         support for new version of Cosgin 

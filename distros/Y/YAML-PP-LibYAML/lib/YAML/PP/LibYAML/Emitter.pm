@@ -3,7 +3,7 @@ package YAML::PP::LibYAML::Emitter;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use YAML::LibYAML::API::XS;
 use YAML::PP::Writer;
@@ -13,13 +13,15 @@ use base 'YAML::PP::Emitter';
 
 sub new {
     my ($class, %args) = @_;
+    my $indent = delete $args{indent} || 2;
     my $self = bless {
-        %args,
+        indent => $indent,
     }, $class;
     $self->{events} = [];
     return $self;
 }
 sub events { return $_[0]->{events} }
+sub indent { return $_[0]->{indent} }
 
 
 sub mapping_start_event {
@@ -83,17 +85,24 @@ sub stream_end_event {
     my $events = $self->events;
     my $writer = $self->writer;
     $writer->init();
+    my $options = {
+        indent => $self->indent,
+    };
 
     if ($writer->can('open_handle')) {
         if (openhandle($writer->output)) {
-            YAML::LibYAML::API::XS::emit_filehandle_events($writer->open_handle, $events);
+            YAML::LibYAML::API::XS::emit_filehandle_events(
+                $writer->open_handle, $events, $options
+            );
         }
         else {
-            YAML::LibYAML::API::XS::emit_file_events($writer->output, $events);
+            YAML::LibYAML::API::XS::emit_file_events(
+                $writer->output, $events, $options
+            );
         }
     }
     else {
-        my $out = YAML::LibYAML::API::XS::emit_string_events($events);
+        my $out = YAML::LibYAML::API::XS::emit_string_events($events, $options);
         $self->writer->write($out);
     }
 

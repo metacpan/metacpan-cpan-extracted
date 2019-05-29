@@ -1,6 +1,6 @@
 package App::WRT;
 
-use version; our $VERSION = version->declare("v6.2.3");
+use version; our $VERSION = version->declare("v6.2.4");
 
 use strict;
 use warnings;
@@ -30,8 +30,6 @@ use App::WRT::Util   qw(dir_list get_date file_get_contents);
 =head1 NAME
 
 App::WRT - WRiting Tool, a static site/blog generator and related utilities
-
-=for HTML <a href="https://travis-ci.org/brennen/wrt"><img src="https://travis-ci.org/brennen/wrt.svg?branch=master"></a>
 
 =head1 SYNOPSIS
 
@@ -1061,11 +1059,11 @@ sub feed_print {
 =head1 SEE ALSO
 
 walawiki.org, Blosxom, rassmalog, Text::Textile, XML::Atom::SimpleFeed,
-Image::Size, CGI::Fast, and about a gazillion static site generators.
+Image::Size, and about a gazillion static site generators.
 
 =head1 AUTHOR
 
-Copyright 2001-2017 Brennen Bearnes
+Copyright 2001-2019 Brennen Bearnes
 
 =head1 LICENSE
 

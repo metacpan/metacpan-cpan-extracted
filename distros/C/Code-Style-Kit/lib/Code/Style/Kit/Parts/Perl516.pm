@@ -1,7 +1,7 @@
 package Code::Style::Kit::Parts::Perl516;
 use strict;
 use warnings;
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: use features from perl 5.16
 
 
@@ -31,7 +31,7 @@ Code::Style::Kit::Parts::Perl516 - use features from perl 5.16
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

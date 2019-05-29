@@ -46,6 +46,7 @@ if (eval { ExtUtils::MakeMaker->VERSION(6.46) }) {
             'Peter Vereshagin <veresc@cpan.org>',
             'Graham Knop <haarg@cpan.org>',
             'Mohammad S Anwar <manwar@cpan.org>',
+            'Robert Rothenberg <rrwo@cpan.org>',
         ],
     };
 }

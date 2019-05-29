@@ -3,7 +3,7 @@ package YAML::PP::LibYAML::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use YAML::LibYAML::API::XS;
 use YAML::PP::Reader;

@@ -72,6 +72,23 @@ $dump = do { local $/; <$fh> };
 close $fh;
 cmp_ok($dump, 'eq', $yaml, "dump_file(filehandle)");
 
+subtest options => sub {
+    my $yp = YAML::PP::LibYAML->new(
+        indent => 4,
+        header => 0,
+        footer => 1,
+    );
+    $data = { x => 1, y => { z => 2 } };
+    $dump = $yp->dump_string($data);
+    my $exp = <<'EOM';
+x: 1
+y:
+    z: 2
+...
+EOM
+    cmp_ok($dump, 'eq', $exp, "dump with options");
+};
+
 done_testing;
 
 END {

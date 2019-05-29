@@ -1,5 +1,11 @@
 Revision history for Types-PDL
 
+0.02      2019-05-24 17:21:06-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * added the 'type' facet to specialize on the piddle type
+
 0.01      2017-10-02 16:41:22-04:00 America/New_York
 
     * First release upon an unsuspecting world

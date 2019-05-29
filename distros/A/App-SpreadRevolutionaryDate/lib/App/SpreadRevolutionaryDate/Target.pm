@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.21';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.22';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
@@ -55,7 +55,7 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 DESCRIPTION
 

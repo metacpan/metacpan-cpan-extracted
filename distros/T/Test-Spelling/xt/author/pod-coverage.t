@@ -27,7 +27,7 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'Test::Spelling' => [
-                                   qr/^(?:get_pod_parser|invalid_words_in|spellchecker_candidates)$/
+                                   qr/^(?:invalid_words_in|spellchecker_candidates)$/
                                  ]
            );
 

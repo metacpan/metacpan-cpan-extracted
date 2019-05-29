@@ -1,7 +1,7 @@
 package Code::Style::Kit::Parts::Moo;
 use strict;
 use warnings;
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: Moo-based OO
 
 
@@ -46,7 +46,7 @@ Code::Style::Kit::Parts::Moo - Moo-based OO
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use Carp 'croak';
 use POSIX 'fmax';
 use Sub::Util 'set_subname';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use constant DEFAULTS => {
   background => 'white',
@@ -19,6 +19,7 @@ use constant DEFAULTS => {
   height     => '',
   id         => '',
   margin     => 2,
+  scale      => '',
   width      => '',
 };
 
@@ -46,6 +47,12 @@ sub plot ($self, $text) {
   $self->{vbheight} += $self->{margin};
   $self->{vbwidth}  += $self->{margin};
   my @attr = (qq|viewBox="0 0 $self->{vbwidth} $self->{vbheight}"|);
+
+  my $scale;
+  if ($self->{scale} and $scale = $self->{scale} * 1) {
+    $self->{$_} = $self->{"vb$_"} * $scale for qw|height width|;
+  }
+
   for my $name (qw|id class width height|) {
     my $value = $self->$name or next;
     push @attr, qq|$name="$value"|;
@@ -56,6 +63,8 @@ sub plot ($self, $text) {
     = qq|<svg $attributes xmlns="http://www.w3.org/2000/svg">\n|
     . join("\n", $self->{elements}->@*)
     . qq|\n</svg>|;
+
+  $self->{height} = $self->{width} = '' if $scale;
 
   return $svg;
 }
@@ -191,6 +200,7 @@ SVG::Barcode - Base class for SVG 1D and 2D codes
     use SVG::Barcode::Subclass;
 
     my $plotter = SVG::Barcode::Subclass->new;
+    my $svg     = $plotter->plot($text);
 
     $plotter->foreground;    # black
     $plotter->background;    # white
@@ -199,14 +209,13 @@ SVG::Barcode - Base class for SVG 1D and 2D codes
     $plotter->class;
     $plotter->width;
     $plotter->height;
+    $plotter->scale;
 
     %params = (
       foreground => 'red',
       id         => 'barcode',
     );
     $plotter = SVG::Barcode::Subclass->new(%params);
-
-    my $svg = $plotter->plot($text);
 
 =head1 DESCRIPTION
 
@@ -288,6 +297,17 @@ Getter and setter for the id of the svg element. Default C<''>.
     $plotter = $plotter->margin('');          # 2
 
 Getter and setter for the margin around the barcode. Default C<2>.
+
+=head2 scale
+
+    $value   = $plotter->scale;
+    $plotter = $plotter->scale($newvalue);
+    $plotter = $plotter->scale('');          # ''
+
+Getter and setter for the scale of the svg element.
+Sets L</width> and L</height> to products of the width and height of the graphics.
+Used to display small barcodes without blur.
+Default C<''>.
 
 =head2 width
 

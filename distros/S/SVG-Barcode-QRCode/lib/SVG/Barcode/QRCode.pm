@@ -12,7 +12,7 @@ our @EXPORT_OK = qw|plot_qrcode|;
 
 use Text::QRCode;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use constant DEFAULTS => {
   dotsize => 1,
@@ -61,6 +61,7 @@ SVG::Barcode::QRCode - Generator for SVG based QR Codes
     $qrcode->class;
     $qrcode->width;
     $qrcode->height;
+    $qrcode->scale;
 
     my %params = (
       level  => 'H',
@@ -113,6 +114,7 @@ L<foreground|SVG::Barcode/foreground>,
 L<height|SVG::Barcode/height>,
 L<id|SVG::Barcode/id>,
 L<margin|SVG::Barcode/margin>,
+L<scale|SVG::Barcode/scale>,
 L<width|SVG::Barcode/width>.
 
 =head2 dotsize

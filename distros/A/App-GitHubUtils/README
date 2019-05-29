@@ -2,8 +2,8 @@ NAME
     App::GitHubUtils - Utilities related to GitHub
 
 VERSION
-    This document describes version 0.003 of App::GitHubUtils (from Perl
-    distribution App-GitHubUtils), released on 2018-10-09.
+    This document describes version 0.004 of App::GitHubUtils (from Perl
+    distribution App-GitHubUtils), released on 2019-05-29.
 
 DESCRIPTION
     This distribution provides the following command-line utilities related
@@ -11,11 +11,13 @@ DESCRIPTION
 
     *   create-the-github-repo
 
+    *   git-clone-from-github
+
 FUNCTIONS
   create_the_github_repo
     Usage:
 
-     create_the_github_repo() -> [status, msg, result, meta]
+     create_the_github_repo() -> [status, msg, payload, meta]
 
     Create github repo.
 
@@ -34,7 +36,65 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  git_clone_from_github
+    Usage:
+
+     git_clone_from_github(%args) -> [status, msg, payload, meta]
+
+    git clone, with some conveniences.
+
+    Instead of having to type:
+
+     % git clone git@github.com:USER/PREFIX-NAME.git
+
+    you can just type:
+
+     % git-clone-from-github NAME
+
+    The utility will try the "users" specified in config file, as well as
+    "prefixes" and clone the first repo that exists. You can put something
+    like this in "githubutils.conf":
+
+     [prog=git-clone-from-github]
+     users = ["perlancar", "perlancar2"]
+     prefixes = ["perl5-", "perl-"]
+     suffixes = ["-p5"]
+
+    The utility will check whether repo in these URLs exist:
+
+     git@github.com:perlancar/perl5-NAME.git
+     git@github.com:perlancar/perl-NAME.git
+     git@github.com:perlancar/NAME-p5.git
+     git@github.com:perlancar2/perl5-NAME.git
+     git@github.com:perlancar2/perl-NAME.git
+     git@github.com:perlancar2/NAME-p5.git
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   name* => *str*
+
+    *   prefixes => *array[str]*
+
+    *   suffixes => *array[str]*
+
+    *   users => *array[str]*
+
+        If not specified, will use "login" from "github-cmd.conf" file.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -66,7 +126,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/resolvetable/resolvetable
 # and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-05-28'; # DATE
+our $DATE = '2019-05-29'; # DATE
 our $DIST = 'App-resolvetable'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ resolvetable - Produce a colored table containing DNS resolve results of several
 
 =head1 VERSION
 
-This document describes version 0.002 of resolvetable (from Perl distribution App-resolvetable), released on 2019-05-28.
+This document describes version 0.003 of resolvetable (from Perl distribution App-resolvetable), released on 2019-05-29.
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,21 @@ C<*> marks required options.
 
 =over
 
+=item B<--action>=I<s>
+
+Default value:
+
+ "show-addresses"
+
+Valid values:
+
+ ["show-addresses","show-times"]
+
+The default action is to show resolve result (`show-addresses`). If set to
+`show-times`, will show resolve times instead to compare speed among DNS
+servers.
+
+
 =item B<--colorize>
 
 =item B<--name>=I<s@>*
@@ -76,6 +91,12 @@ Can be specified multiple times.
 =item B<--servers-json>=I<s>
 
 See C<--server>.
+
+=item B<--times>
+
+Shortcut for --action=show-times.
+
+See C<--action>.
 
 =item B<--type>=I<s>, B<-t>
 

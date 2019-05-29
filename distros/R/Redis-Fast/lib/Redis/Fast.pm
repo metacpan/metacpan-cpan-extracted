@@ -2,7 +2,7 @@ package Redis::Fast;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.22';
+    our $VERSION = '0.23';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -309,7 +309,7 @@ sub info {
     my $self = shift;
     $self->__is_valid_command('info');
     my ($ret, $error) = $self->__info(@_);
-    confess "[keys] $error, " if defined $error;
+    confess "[info] $error, " if defined $error;
     return $ret unless ref $ret eq 'ARRAY';
     return @$ret;
 }

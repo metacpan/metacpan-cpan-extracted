@@ -19,6 +19,7 @@ It accepts the following parameters:
   ndims
   ndims_min
   ndims_max
+  type
 
    "Piddle0D"
 
@@ -26,6 +27,7 @@ Allows an object blessed into the class "PDL" with "ndims" = 0. It
 accepts the following parameters:
 
   null
+  type
 
    "Piddle1D"
 
@@ -34,6 +36,7 @@ accepts the following parameters:
 
   null
   empty
+  type
 
    "Piddle2D"
 
@@ -42,6 +45,7 @@ accepts the following parameters:
 
   null
   empty
+  type
 
    "Piddle3D"
 
@@ -50,6 +54,7 @@ accepts the following parameters:
 
   null
   empty
+  type
 
   Coercions
 
@@ -97,6 +102,15 @@ with "ndims".
 
 The maximum number of dimensions the piddle may have. Don't specify this
 with "ndims".
+
+   "type"
+
+The type of the piddle. The value may be a PDL::Type object or a string
+containing the name of a type (e.g., "double"). For a complete list of
+types, run this command:
+
+  perl -MPDL::Types=mapfld,ppdefs \
+    -E 'say mapfld( $_ => 'ppsym' => 'ioname' )  for ppdefs'
 
 INSTALLATION
 

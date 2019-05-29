@@ -25,21 +25,25 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Rinci" : "0.01"
+            "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.69"
+            "Rinci" : "v1.1.90"
          }
       },
       "runtime" : {
          "requires" : {
             "App::GitUtils" : "0",
             "Cwd" : "0",
-            "IPC::System::Options" : "0.330",
-            "Log::ger" : "0.023",
+            "Data::Sah::Compiler::perl::TH::array" : "0",
+            "Data::Sah::Compiler::perl::TH::str" : "0",
+            "IPC::System::Options" : "0.331",
+            "Log::ger" : "0.027",
             "Perinci::CmdLine::Any" : "0",
-            "Perinci::CmdLine::Base" : "1.811",
+            "Perinci::CmdLine::Base" : "1.816",
+            "Perinci::CmdLine::Call" : "0",
             "Perinci::CmdLine::Classic" : "1.770",
+            "Perinci::CmdLine::Util::Config" : "1.722",
             "Perinci::Sub::DepChecker" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -67,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-GitHubUtils"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -76,6 +80,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript create-the-github-repo",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript git-clone-from-github",
             "version" : "0.421"
          },
          {
@@ -172,7 +181,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.593"
+            "version" : "0.596"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -256,9 +265,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Author::PERLANCAR/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Author::PERLANCAR/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -466,7 +475,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
             "name" : "@Author::PERLANCAR/Test::Rinci",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",
