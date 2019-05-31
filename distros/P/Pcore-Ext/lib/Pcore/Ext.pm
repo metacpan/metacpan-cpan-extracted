@@ -1,4 +1,4 @@
-package Pcore::Ext v0.28.5;
+package Pcore::Ext v0.28.6;
 
 use Pcore -dist, -class, -const;
 use Pcore::Util::Scalar qw[is_ref];

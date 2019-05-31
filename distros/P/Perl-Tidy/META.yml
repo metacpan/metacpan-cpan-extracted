@@ -17,5 +17,6 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '20181120'
+resources:
+  repository: https://github.com/perltidy/perltidy.git
+version: '20190601'

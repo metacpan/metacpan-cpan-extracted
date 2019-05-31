@@ -8,7 +8,7 @@ use warnings;
 use base qw{ Exporter };
 
 use Carp;
-use PPIx::QuoteLike::Constant qw{ VARIABLE_RE @CARP_NOT };
+use PPIx::QuoteLike::Constant qw{ HAVE_PPIX_REGEXP VARIABLE_RE @CARP_NOT };
 use Scalar::Util ();
 
 use constant LEFT_CURLY		=> q<{>;
@@ -16,20 +16,13 @@ use constant RIGHT_CURLY	=> q<}>;
 
 our @EXPORT_OK = qw{ __variables };
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 require PPIx::QuoteLike;
 
-# We can't depend on PPIx::Regexp without getting into a circular
-# dependency. I think. But we can sure use it if we can come by it.
-my $have_ppix_regexp = eval {
-    require PPIx::Regexp;
-    1;
-};
-
 {
 
-    # TODO make these state varables one we can require Perl 5.10.
+    # TODO make these state varables once we can require Perl 5.10.
     my $postderef = { map { $_ => 1 } qw{ @* %* } };
 
     my $cast_allowed_for_bare_bracketed_variable = {
@@ -39,12 +32,49 @@ my $have_ppix_regexp = eval {
 	my ( $ppi ) = @_;
 
 	Scalar::Util::blessed( $ppi )
-	    and $ppi->isa( 'PPI::Node' )
-	    or croak 'Argument must be a PPI::Node';
+	    or croak 'Argument must be an object';
+
+	# TODO the following two lines are a crock, but there does not
+	# seem to be a good alternative. Bad alternatives:
+	# * Introduce PPIx::QuoteLike::Element. But it seems stupid to
+	#   introduce a class simply to mark these as members of the
+	#   PPIx::QuoteLike family.
+	#   If I go this way at all, PPIx::QuoteLike::Element should be
+	#   analogous to PPIx::Regexp::Element in that it carries at
+	#   least the navigational and Perl version methods.
+	# * Use DOES(). But that was not introduced until 5.10. So I
+	#   could:
+	#   - Depend on UNIVERSAL::DOES. This kindly steps aside if
+	#     UNIVERSAL::DOES() exists, but it seems stupid to introduce
+	#     a dependency that is only needed under really old Perls.
+	#   - Same as above, only make the dependence conditional on the
+	#     version of Perl. This may actually be the best
+	#     alternative, but it's still pretty crufty.
+	$ppi->isa( 'PPIx::QuoteLike' )
+	    and return $ppi->variables();
+	$ppi->isa( 'PPIx::QuoteLike::Token' )
+	    and return $ppi->variables();
 
 	my %var;
 
-	foreach my $sym ( @{ $ppi->find( 'PPI::Token::Symbol' ) || [] } ) {
+	$ppi->isa( 'PPIx::Regexp::Element' )
+	    and do {
+		foreach my $code ( @{ $ppi->find(
+		    'PPIx::Regexp::Token::Code' ) || [] } ) {
+		    foreach my $name ( __variables( $code->ppi() ) ) {
+			$var{ $name } = 1;
+		    }
+		}
+		return keys %var;
+	    };
+
+
+	$ppi->isa( 'PPI::Element' )
+	    or croak 'Argument must be a PPI::Element, ',
+		'PPIx::Regexp::Element, PPIx::QuoteLike, or ',
+		'PPIx::QuoteLike::Token';
+
+	foreach my $sym ( _find( $ppi, 'PPI::Token::Symbol' ) ) {
 	    # The problem we're solving here is that PPI parses postfix
 	    # dereference as though it makes reference to non-existent
 	    # punctuation variables '@*' or '%*'. The following
@@ -74,9 +104,7 @@ my $have_ppix_regexp = eval {
         # by a Symbol, so as long as nobody decides the '$#' cast causes
         # $elem->symbol() to return something other than '$foo', we're
         # cool.
-        foreach my $elem (
-            @{ $ppi->find( 'PPI::Token::ArrayIndex' ) || [] }
-        ) {
+        foreach my $elem ( _find( $ppi, 'PPI::Token::ArrayIndex' ) ) {
             my $name = $elem->content();
             $name =~ s/ \A \$ [#] /@/smx or next;
 	    $var{$name} = 1;
@@ -88,9 +116,7 @@ my $have_ppix_regexp = eval {
         # words in most Perl, we start at the top and work down. Perl
         # also handles punctuation variables specified this way, but
         # since PPI goes berserk when it sees this, we won't bother.
-        foreach my $elem (
-            @{ $ppi->find( 'PPI::Structure::Block' ) || [] }
-        ) {
+        foreach my $elem ( _find( $ppi, 'PPI::Structure::Block' ) ) {
 
             my $previous = $elem->sprevious_sibling()
                 or next;
@@ -154,7 +180,7 @@ my $have_ppix_regexp = eval {
 		PPI::Token::QuoteLike::Readline
 		PPI::Token::HereDoc
 	    } ) {
-	    foreach my $elem ( @{ $ppi->find( $class ) || [] } ) {
+	    foreach my $elem ( _find( $ppi, $class ) ) {
 
 		my $ql = PPIx::QuoteLike->new( $elem )
 		    or next;
@@ -169,13 +195,13 @@ my $have_ppix_regexp = eval {
 	# By the same token we might have a regexp
 	# TODO for consistency's sake, give PPIx::Regexp a variables()
 	# method.
-	if ( $have_ppix_regexp ) {
+	if ( HAVE_PPIX_REGEXP ) {
 	    foreach my $class ( qw{
 		    PPI::Token::QuoteLike::Regexp
 		    PPI::Token::Regexp::Match
 		    PPI::Token::Regexp::Substitute
 		} ) {
-		foreach my $elem ( @{ $ppi->find( $class ) || [] } ) {
+		foreach my $elem ( _find( $ppi, $class ) ) {
 		    my $re = PPIx::Regexp->new( $elem )
 			or next;
 		    foreach my $code ( @{ $re->find(
@@ -190,6 +216,18 @@ my $have_ppix_regexp = eval {
 
 	return ( keys %var );
     }
+}
+
+# We want __variables to work when passed a single token. So we go
+# through this to do what we wish PPI did -- return an array for a
+# PPI::Node, or return either the element itself or nothing otherwise.
+sub _find {
+    my ( $elem, $class ) = @_;
+    $elem->isa( 'PPI::Node' )
+	and return @{ $elem->find( $class ) || [] };
+    $elem->isa( $class )
+	and return $elem;
+    return;
 }
 
 # The problem this solves is that PPI can parse '{_}' as containing a
@@ -319,9 +357,10 @@ Despite the leading underscores, this exportable subroutine is public
 and supported. The underscores are so it will not appear to be public
 code to various tools when imported into other code.
 
-This subroutine takes as its only argument a L<PPI::Node|PPI::Node>, and
-returns the names of all variables found in that node, in no particular
-order. Scope is not taken into account.
+This subroutine takes as its only argument a
+L<PPI::Element|PPI::Element>, and returns the names of all variables
+found in that element, in no particular order. Scope is not taken into
+account.
 
 In addition to reporting variables parsed as such by L<PPI|PPI>, and
 various corner cases such as C<${]}> where PPI is blind to the use of
@@ -353,7 +392,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2018 by Thomas R. Wyant, III
+Copyright (C) 2016-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

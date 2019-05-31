@@ -36,7 +36,7 @@ my $DUMMY_PASSWORD = '>>NOt REALly a PaSSwoRd<<';
 
 has formCfg => sub {
     my $self = shift;
-
+    
     if ($self->config->{type} eq 'edit' and not $self->args->{selection}{cbuser_id}){
         return [{
             label => trm('Error'),

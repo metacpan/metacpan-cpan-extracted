@@ -2,7 +2,9 @@ use 5.14.0;
 
 package Map::Metro::Plugin::Map::Madrid;
 
-our $VERSION = '0.1001'; # VERSION
+# ABSTRACT: Map::Metro map for Madrid
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1002';
 
 use Moose;
 with 'Map::Metro::Plugin::Map';
@@ -19,8 +21,6 @@ sub map_package {
 
 1;
 
-# ABSTRACT: Map::Metro map for Madrid
-
 __END__
 
 =pod
@@ -31,9 +31,22 @@ __END__
 
 Map::Metro::Plugin::Map::Madrid - Map::Metro map for Madrid
 
+
+
+=begin html
+
+<p>
+<img src="https://img.shields.io/badge/perl-5.16+-blue.svg" alt="Requires Perl 5.16+" />
+<a href="https://travis-ci.org/Csson/p5-Map-Metro-Madrid"><img src="https://api.travis-ci.org/Csson/p5-Map-Metro-Madrid.svg?branch=master" alt="Travis status" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/Map-Metro-Plugin-Map-Madrid-0.1002"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Map-Metro-Plugin-Map-Madrid/0.1002" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Map-Metro-Plugin-Map-Madrid%200.1002"><img src="http://badgedepot.code301.com/badge/cpantesters/Map-Metro-Plugin-Map-Madrid/0.1002" alt="CPAN Testers result" /></a>
+</p>
+
+=end html
+
 =head1 VERSION
 
-Version 0.1001, released 2015-03-20.
+Version 0.1002, released 2019-05-31.
 
 =head1 SYNOPSIS
 
@@ -92,7 +105,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+This software is copyright (c) 2016 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

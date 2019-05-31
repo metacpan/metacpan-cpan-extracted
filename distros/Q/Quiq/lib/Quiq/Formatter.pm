@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 # -----------------------------------------------------------------------------
 
@@ -125,11 +125,11 @@ sub readableNumber {
 
 =item $now
 
-Bezugszeitpunkt (Unix Epoch).
+Bezugszeitpunkt in Unix Epoch oder als ISO-Datum.
 
 =item $time
 
-Zeit (Unix Epoch).
+Zeit in Unix Epoch oder als ISO-Datum.
 
 =back
 
@@ -155,7 +155,7 @@ z.B. in einer Verzeichnisliste:
 
     $ quiq-ls ~/dvl
     | rwxr-xr-x | xv882js | rvgroup | 2018-07-07 07:08:17 |  | d | ~/dvl/.cotedo  |
-    | rwxr-xr-x | xv882js | rvgroup | 2018-06-29 11:06:38 |  | d | ~/dvl/.yeah    |
+    | rwxr-xr-x | xv882js | rvgroup | 2018-06-29 11:06:38 |  | d | ~/dvl/.jaz    |
     | rwxr-xr-x | xv882js | rvgroup |         17 07:29:51 |  | d | ~/dvl/Blob     |
     | rwxr-xr-x | xv882js | rvgroup |         17 07:29:52 |  | d | ~/dvl/Export   |
     | rwxr-xr-x | xv882js | rvgroup |         17 07:29:52 |  | d | ~/dvl/Language |
@@ -189,15 +189,31 @@ Alle Komponenten, bis auf die Sekunden, sind identisch:
 sub reducedIsoTime {
     my ($class,$now,$time) = @_;
 
-    my @now = localtime $now;
-    my @time = localtime $time;
+    my (@now,@time);
+    if ($now =~ /^\d+$/) {
+        @now = localtime $now;
+        $now[4]++;
+        $now[5] += 1900;
+    }
+    else {
+        @now = reverse split /\D+/,$now;
+    }
+
+    if ($time =~ /^\d+$/) {
+        @time = localtime $time;
+        $time[4]++;
+        $time[5] += 1900;
+    }
+    else {
+        @time = reverse split /\D+/,$time;
+    }
 
     my $str = '';
     if ($time[5] != $now[5]) {
-        $str .= $time[5]+1900;
+        $str .= $time[5];
     }
     if ($str || $time[4] != $now[4]) {
-        $str .= sprintf '%s%02d',$str? '-': '',$time[4]+1;
+        $str .= sprintf '%s%02d',$str? '-': '',$time[4];
     }
     if ($str || $time[3] != $now[3]) {
         $str .= sprintf '%s%02d',$str? '-': '',$time[3];
@@ -219,7 +235,7 @@ sub reducedIsoTime {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

@@ -83,11 +83,11 @@ sub _deps ($self) {
     if ( -f 'cpanfile' ) {
         my @args = (                                   #
             'cpanm',
-            '--with-feature', ( $MSWIN ? 'windows' : 'linux' ),
-            ( $self->{devel}      ? '--with-develop'    : () ),
-            ( $self->{recommends} ? '--with-recommends' : () ),
-            ( $self->{suggests}   ? '--with-suggests'   : () ),
-            ( $self->{verbose}    ? '--verbose'         : () ),
+            '--with-feature', ( $MSWIN ? 'windows'           : 'linux' ),
+            ( $self->{devel}           ? '--with-develop'    : () ),
+            ( $self->{recommends}      ? '--with-recommends' : () ),
+            ( $self->{suggests}        ? '--with-suggests'   : () ),
+            ( $self->{verbose}         ? '--verbose'         : () ),
             '--metacpan', '--installdeps', q[.],
         );
 

@@ -1,7 +1,8 @@
 package Curio::Declare;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Package::Stash;
+use Curio::Util;
 
 use strictures 2;
 use namespace::clean;
@@ -29,6 +30,7 @@ sub import {
         my $type = $EXPORTS{ $sub_name };
         my $builder = "_build_$type\_sub";
         my $sub = __PACKAGE__->can( $builder )->( $target, $sub_name );
+        $sub = subname( $sub_name, $sub );
         $stash->add_symbol( "&$sub_name", $sub );
     }
 
@@ -209,17 +211,22 @@ See L<Curio::Factory/add_key> for details.
 
 See L<Curio::Factory/alias_key> for details.
 
-=head1 SUPPORT
-
-See L<Curio/SUPPORT>.
-
-=head1 AUTHORS
-
-See L<Curio/AUTHORS>.
-
 =head1 COPYRIGHT AND LICENSE
 
-See L<Curio/COPYRIGHT AND LICENSE>.
+Copyright (C) 2019 Aran Clary Deltac
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 

@@ -29,11 +29,15 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "20181120"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perltidy/perltidy.git",
+         "web" : "https://github.com/perltidy/perltidy"
+      }
+   },
+   "version" : "20190601"
 }

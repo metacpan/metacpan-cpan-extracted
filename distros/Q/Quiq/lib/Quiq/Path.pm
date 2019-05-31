@@ -9,10 +9,13 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Quiq::Option;
 use Quiq::FileHandle;
+use Quiq::TempFile;
+use Quiq::Shell;
+use Quiq::Terminal;
 use Encode::Guess ();
 use Quiq::String;
 use Encode ();
@@ -22,7 +25,6 @@ use Quiq::Unindent;
 use Quiq::DirHandle;
 use Quiq::Parameters;
 use File::Find ();
-use Quiq::Shell;
 use Cwd ();
 use Quiq::Process;
 
@@ -440,6 +442,72 @@ sub duplicate {
     }
 
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 edit() - Bearbeite Datei im Editor
+
+=head4 Synopsis
+
+    $changed = $this->edit($file);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Datei, die bearbeitet werden soll.
+
+=back
+
+=head4 Returns
+
+Boolschen Wert, der anzeigt, ob die Datei verändert wurde.
+
+=head4 Description
+
+Öffne Datei $file im Editor, so dass diese vom Benutzer bearbeitet werden
+kann. Die Methode prüft nach Verlassen des Editors, ob die Datei geändert
+wurde. Falls ja, wird der Benutzer gefragt, ob er die Änderungen
+beibehalten möchte. Falls ja, liefert die Methode wahr, andernfalls
+falsch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub edit {
+    my ($this,$file) = @_;
+
+    # Erzeuge eine temporäre Kopie
+
+    my $tmpFile = Quiq::TempFile->new;
+    $this->copy($file,$tmpFile);
+
+    # Öffne Datei im Editor
+
+    my $changed = 0;
+    my $editor = $ENV{'EDITOR'} || 'vi';
+    Quiq::Shell->exec("$editor $tmpFile");
+    if ($this->compare($tmpFile,$file)) {
+        # Rückfrage an Benutzer
+
+        my $answ = Quiq::Terminal->askUser(
+            "Confirm changes?",
+            -values => 'y/n',
+            -default => 'y',
+        );
+        if ($answ eq 'y') {
+            # Schreibe die Änderungen auf die Datei
+
+            $this->copy($tmpFile,$file);
+            $changed = 1;
+        }
+    }
+
+    return $changed;
 }
 
 # -----------------------------------------------------------------------------
@@ -2509,7 +2577,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

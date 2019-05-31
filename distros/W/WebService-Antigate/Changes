@@ -1,5 +1,11 @@
 Revision history for Perl extension WebService::Antigate.
 
+0.12  Fri May 31 20:06:40 +07 2019
+      - Fix service key passing when no `file' or `content' option specified for V1
+
+0.11  Fri May 31 19:33:31 +07 2019
+      - Do not require `file' or `content' option in V1, to allow imageless captchas
+
 0.10  Mon Oct 30 19:19:45 +07 2017
       - POD fixes
 

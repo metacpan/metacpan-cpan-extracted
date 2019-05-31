@@ -1,11 +1,11 @@
-#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # The Gearhart-Brenan Dita Topic Naming Standard
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2019
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = "20190506";
+our $VERSION = "20190530";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -57,28 +57,28 @@ sub hexAsWords($)                                                               
 
 #D1 Make and manage utf8 files                                                  # Make and manage files that conform to the L<GBStandard> and are coded in utf8.
 
-sub gbStandardFileName($$)                                                      #E Return the L<GBStandard> file name given the content and extension of a proposed file.
- {my ($content, $extension) = @_;                                               # Content, extension
+sub gbStandardFileName($$%)                                                     #E Return the L<GBStandard> file name given the content and extension of a proposed file.
+ {my ($content, $extension, %options) = @_;                                     # Content, extension, various ingenious options designed by Micaela
   defined($content) or
     confess "Content must be defined";
   defined($extension) && $extension =~ m(\A\S{2,}\Z)s or
     confess "Extension must be non blank and at least two characters long";
-  my $name   = nameFromStringRestrictedToTitle($content);                       # Human readable component ideally taken from the title tag
+  my $name   = nameFromStringRestrictedToTitle($content, %options);             # Human readable component ideally taken from the title tag
   my $md5    = fileMd5Sum($content);                                            # Md5 sum
   fpe($name.q(_).(useWords ? hexAsWords($md5) : $md5), $extension)              # Add extension
  }
 
-sub gbStandardCompanionFileName($)                                              #E Return the name of the companion file given a file whose name complies with the L<GBStandard>.
+sub gbStandardCompanionFileName($)                                              #E Return the name of the L<Companion File> given a file whose name complies with the L<GBStandard>.
  {my ($file) = @_;                                                              # L<GBStandard> file name
   setFileExtension($file);                                                      # Remove extension to get companion file name
  }
 
-sub gbStandardCompanionFileContent($)                                           #E Return the content of the companion file given a file whose name complies with the L<GBStandard>.
+sub gbStandardCompanionFileContent($)                                           #E Return the content of the L<Companion File> given a file whose name complies with the L<GBStandard>.
  {my ($file) = @_;                                                              # L<GBStandard> file name
   readFile(gbStandardCompanionFileName($file))                                  # L<GBStandard> companion file name content
  }
 
-sub gbStandardCreateFile($$$;$)                                                 #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>
+sub gbStandardCreateFile($$$;$)                                                 #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>
  {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, contents of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
   my $file   = gbStandardFileName($content, $extension);                        # Entirely satisfactory
@@ -117,10 +117,13 @@ sub gbStandardCopyFile($;$)                                                     
   if ($target and $target ne fp($source))                                       # New target folder specified
    {my $t = fpf($target, $correctName//$source);                                # Target of copy
     copyFile($source, $t);                                                      # Copy file
-    my $comp = gbStandardCompanionFileName($source);                            # Companion file
-    if (-e $comp)                                                               # Copy companion file if it exists
-     {my $t = gbStandardCompanionFileName($t);                                  # Target of copy
-      copyFile($comp, $t);                                                      # Copy companion file
+    my $cs = gbStandardCompanionFileName($source);                              # Companion file source
+    my $ct = gbStandardCompanionFileName($t);                                   # Companion file target
+    if (-e $cs)                                                                 # Copy companion source file if it exists
+     {copyFile($cs, $ct);                                                       # Copy companion source file
+     }
+    else                                                                        # Create companion target file if it does not exist
+     {dumpFile($ct, {source=>$source});                                         # Write source file name to companion file target
      }
     return $t;
    }
@@ -157,12 +160,12 @@ sub gbBinaryStandardCompanionFileName($)                                        
   setFileExtension($file);                                                      # Remove extension to get companion file name
  }
 
-sub gbBinaryStandardCompanionFileContent($)                                     #E Return the content of the companion file given a file whose name complies with the binary L<GBStandard>.
+sub gbBinaryStandardCompanionFileContent($)                                     #E Return the content of the L<Companion File> given a file whose name complies with the binary L<GBStandard>.
  {my ($file) = @_;                                                              # L<GBStandard> file name
   readFile(gbStandardCompanionFileName($file))                                  # L<GBStandard> companion file name content
  }
 
-sub gbBinaryStandardCreateFile($$$;$)                                           #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>.
+sub gbBinaryStandardCreateFile($$$;$)                                           #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>.
  {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, contents of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
   my $file   = gbBinaryStandardFileName($content, $extension);                  # Entirely satisfactory
@@ -201,10 +204,14 @@ sub gbBinaryStandardCopyFile($;$)                                               
   if ($target and $target ne fp($source))                                       # New target folder specified
    {my $t = fpf($target, $correctName//$source);                                # Target of copy
     copyBinaryFile($source, $t);                                                # Copy file
-    my $comp = gbBinaryStandardCompanionFileName($source);                      # Companion file
-    if (-e $comp)                                                               # Copy companion file if it exists
-     {my $t = gbBinaryStandardCompanionFileName($t);                            # Target of copy
-      copyFile($comp, $t);                                                      # Copy companion file
+    my $cs = gbBinaryStandardCompanionFileName($source);                        # Companion file source
+    my $ct = gbBinaryStandardCompanionFileName($t);                             # Companion file target
+
+    if (-e $cs)                                                                 # Copy companion source file if it exists
+     {copyFile($cs, $ct);                                                       # Copy companion source file
+     }
+    else                                                                        # Create companion target file if it does not exist
+     {dumpFile($ct, {source=>$source});                                         # Write source file name to companion file target
      }
     return $t;
    }
@@ -216,7 +223,7 @@ sub gbBinaryStandardCopyFile($;$)                                               
   undef
  }
 
-sub gbBinaryStandardDelete($)                                                   #E Delete a file and its companion file if there is one.
+sub gbBinaryStandardDelete($)                                                   #E Delete a file and its L<Companion File> if there is one.
  {my ($file) = @_;                                                              # File to delete
   my $comp   = gbBinaryStandardCompanionFileName($file);
   unlink $_ for $comp, $file;
@@ -256,6 +263,8 @@ gbStandardRename
 
 # podDocumentation
 
+my $nameFromStringMaximumLength = Data::Table::Text::nameFromStringMaximumLength;
+
 my $documentationSynopsis = <<END;
 
 The L<GBStandard> can be usefully applied to documents written in L<Dita>.
@@ -263,7 +272,7 @@ The L<GBStandard> can be usefully applied to documents written in L<Dita>.
 The L<GBStandard> creates a readable, deterministic file name which depends
 solely on the content to be stored in that file. Such file names are guaranteed
 to differ between files that contain differing content while being identical
-for files that contain identical content by the use of an L<md5> sum in the file
+for files that contain identical content by the use of an L<md5> in the file
 name.
 
 The L<GBStandard> name looks like this:
@@ -271,25 +280,23 @@ The L<GBStandard> name looks like this:
   human_readable_part_derived_from_content + _ + md5_sum_of_content + extension
 
 The human readable part from content is derived from the content of the file by
-interpreting the file content as either L<unicode> or L<ascii> if the binary
-standard is being used and then, for files that do not contain a B<title> tag:
+interpreting the file content as L<unicode> encoded as L<utf8>, then:
 
- - replacing all instances of <text> with single underscores
+ - replacing instances of xml tags with underscores
 
- - replacing all runs of non a-z,0-9 alpha numeric characters with single
-   underscores
+ - replacing all runs of non a-z,0-9 alpha numeric characters with underscores
 
  - replacing contiguous runs of underscores with a single underscore
 
  - removing any leading or trailing underscores
 
- - truncating the component if it extends beyond 128 characters.
+ - truncating the component if it extends beyond $nameFromStringMaximumLength characters.
 
-For files that do contain a B<title> tag the content of the B<title> tag is
-processed as described above to obtain the human readable component of the file
-name. If any of the following L<Dita> tags are found in a source file which
-also contains a B<title> tag then the following codes are prefixed to this
-file name as well:
+If the file contains a B<title> tag then only the content of the B<title> tag
+is processed as described above to obtain the human readable component of the
+file name. If any of the following L<Dita> tags are found in a source file
+which also contains a B<title> tag then the following codes are prefixed to
+this file name as well:
 
   Code      Tag
   bm_       bookmap
@@ -311,30 +318,36 @@ then the L<GBStandard> name for the file is:
 
  abc_541ddaddd3d82f73a30a666c285b7e92.xml
 
-If the option to present the L<md5> sum as five letter English words is chosen
+If the option to present the L<md5> as five letter English words is chosen
 then the standardized name for this content becomes:
 
  abc_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.xml
 
 `head2 Benefits
 
-The names generated by the L<GBStandard> can be exploited in numerous ways to
-simplify the creation, conversion and management of large repositories of
+The file names generated by the L<GBStandard> can be exploited in numerous ways
+to simplify the creation, conversion and management of large repositories of
 documents written to the L<dita> standard:
 
 `head3 Parallel Processing
 
-The name generated by the L<GBStandard>is unique when computed by competing
-parallel processes so files that have the same name have the same content and
-can be safely overwritten by another process without attempting to coordinate
-names between processes.  Likewise files that have different names have different
-content and so can be written separately.
+Complex long running document transformations can be speeded up by running the
+transformations in parallel.
+
+The file name generated by the L<GBStandard> is unique when computed by
+competing parallel processes so files that have the same name have the same
+content and can be safely overwritten by another process without attempting to
+coordinate names between processes.  Likewise files that have different names
+are guarenteed to have different content and so can be written out without
+checking for an existing file of that name.
 
 Alternative systems relying on coordination between the parallel processes to
 choose names to avoid collisions and reuse identical content perform ever more
-badly as the number of files increases because there are that many more files
-to check for matching content and names.  Coordination between parallel
-processes stops them from being truly parallel.
+badly as the number of files increases because there are ever more files to
+check for matching content and names.  Coordination between parallel processes
+stops the processes from running fully in parallel. Conversely, eliminating the
+need for coordination between parallel processes allows each process to run
+more fully in parallel.
 
 As a consequence, the L<GBStandard> enables parallel L<Dita> conversions to
 scale effectively.
@@ -344,7 +357,6 @@ scale effectively.
 Files are automatically flattened by the L<GBStandard> as files with the same
 content have the same name and so can safely share one global folder without
 fear of name collisions or having multiple names for identical content.
-
 
 `head3 Relocating Dita References After Folder Restructuring
 
@@ -365,28 +377,31 @@ Imagine the user has several files in different folders all starting:
 
 The L<GBStandard> computes the human readable component of the name in a
 consistent way using only the contents of each file.  Once the name has been
-standardized, all these files can be placed in one folder to get a directory
+standardized, all these files can be placed in B<one> folder to get a directory
 listing like:
 
   license_agreement_a6e3...
   license_agreement_b532...
   license_agreement_c65d...
 
-This grouping signals that these files are potentially similar to each other.
+This grouping signals that these files are potentially similar to each other
+and thus might be better merged into one shareable file.
 
-As the user applies the L<GBStandard> to more files, more such matches occur.
+As the L<GBStandard> is applied to ever more such files, ever more such matches
+occur.
 
 `head3 Copying And Moving Files For Global Interoperability
 
 Users can copy files named using the L<GBStandard> around from folder to folder
-without fear of collisions or duplication obviating the need for time consuming
-checks and reportage before performing such actions.  The meta data in the
-companion file can also be copied in a similar fearless manner.
+without fear of collisions or duplication obviating the need for the time
+consuming checks and reportage otherwise required before performing such
+actions.  The meta data in the L<Companion File> can also be copied in a similar
+fearless manner.
 
-Say two users want to share content: files named using the L<GBStandard> can be
-incorporated directly into the other user's file system without fear of
+If two users wish to share content: their files named using the L<GBStandard>
+can be incorporated directly into the other user's file system without fear of
 collisions or duplicating content thus promoting global content sharing and
-collaboration.
+collaboration of L<Dita> content.
 
 `head3 Guidization For Content Management Systems
 
@@ -399,11 +414,11 @@ in the L<GBStandard> file name.
 
 The L<GBStandard> encourages L<Dita> users to use meta data tags to describe
 their documents so that content can be found by searching with L<grep> rather
-than relying on lengthy file names in which the file meta data is encoded and
-then using L<find>.  Such file names quickly become very long and unmanageable:
-on the one hand they need spaces in them to make them readable, but on the
-other hand, the spaces make such files difficult to cut and paste or use from
-the L<commandLine>.
+than encoding file meta data in file names then searching for the required file
+using L<find>.  Such file names quickly become very long and unmanageable: on
+the one hand they need spaces in them to make them readable, but on the other
+hand, the spaces make such files difficult to cut and paste or use from the
+L<commandLine>.
 
 `head3 Cut And Paste
 
@@ -412,14 +427,15 @@ file names can be selected by a mouse double click and thus easily copied and
 pasted into other documents.
 
 Conversely, one has to use cut and paste to manipulate such file names making
-it impossible to misspell such file names in other documents.
+it impossible to mistype such file names in other documents.
 
 `head3 CSV files
 
-Files named using the L<GBStandard> can be safely included in csv files!
+Files named using the L<GBStandard> can be safely included in B<.csv> files
+because they have no spaces in them!
 
 Conversely, one has to use cut and paste to manipulate such file names making
-it impossible to misspell such file names in other documents.
+it impossible to mistype such file names in other documents.
 
 `head3 Automatic File Versioning
 
@@ -433,23 +449,36 @@ cannot be found.
 As file names named with the L<GBStandard> do not have spaces in them (such as
 L<zeroWidthSpace>) they work well on the L<commandLine> and with the many
 L<commandLine> tools that are used to manipulate such files enhancing the
-productivity leverage that L<commandLine> has versus L<GUI> processing.
+productivity leverage that L<commandLine> has always had versus L<GUI>
+processing.
 
 `head3 Locating Files by Their Original Names Or Other Meta-Data
 
-Each file produced by the L<GBStandard> can have a companion file of the same
-name but without an extension.  The companion file contains meta-data about the
+Each file produced by the L<GBStandard> can have a L<Companion File> of the same
+name but without an extension.  The L<Companion File> contains meta-data about the
 file such as its original location etc. which can be searched by L<grep> or
 similar.
 
-The companion file contains information about a file named using the
-L<GBStandard> such as its original file name and other meta data.
-
-To find such a file use L<grep> to find the companion file containing the
+To find such a file use L<grep> to find the L<Companion File> containing the
 searched for content, paste that file name into the L<commandLine> after
-entering any command such as B<ll> and then press the tab key to have the
-L<shell> expand it to the get the L<GBStandard> file that corresponds to the
-located companion file.
+entering any command such as B<ll> and then press B<.> followed by the L<tab>
+key to have the L<shell> expand it to the get the L<GBStandard> file that
+corresponds to the located L<Companion File>.  For example:
+
+  \\grep -r 'SR-dashboard-ds.png'
+
+  png_f940c7db293fe377e7d49c4e0c654cb2:  source => "/home/phil/r/pureStorage/docBook/download/OE_User_Guide/SRRBeta/images/screenshots/dashboard/SR-dashboard-ds.png",
+
+  ls png_f940c7db293fe377e7d49c4e0c654cb2.png
+
+`head2 Companion File
+
+Each file named using the L<GBStandard> may be accompanied by a L<Companion File>
+that contains meta data describing the file, said data formatted as a L<Perl>
+data structure.
+
+The name of the L<Companion File> is obtained by removing the extension from the
+file named using the L<GBStandard>.
 
 `head2 Alternate File Names
 
@@ -482,7 +511,7 @@ garbled file names that would otherwise be chosen if the normal standard were
 applied directly to naming such content and to place such fields close together
 in a directory listings.
 
-Consequqntl6y, a B<png> file with content:
+Consequently, a B<png> file with content:
 
   q(\0abc\1)
 
@@ -513,7 +542,7 @@ The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be usefully ap
 The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> creates a readable, deterministic file name which depends
 solely on the content to be stored in that file. Such file names are guaranteed
 to differ between files that contain differing content while being identical
-for files that contain identical content by the use of an L<md5 sum|https://en.wikipedia.org/wiki/MD5> sum in the file
+for files that contain identical content by the use of an L<md5 sum|https://en.wikipedia.org/wiki/MD5> in the file
 name.
 
 The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name looks like this:
@@ -521,25 +550,23 @@ The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name looks like th
   human_readable_part_derived_from_content + _ + md5_sum_of_content + extension
 
 The human readable part from content is derived from the content of the file by
-interpreting the file content as either L<Unicode|https://en.wikipedia.org/wiki/Unicode> or L<Ascii|https://en.wikipedia.org/wiki/ASCII> if the binary
-standard is being used and then, for files that do not contain a B<title> tag:
+interpreting the file content as L<Unicode|https://en.wikipedia.org/wiki/Unicode> encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>, then:
 
- - replacing all instances of <text> with single underscores
+ - replacing instances of xml tags with underscores
 
- - replacing all runs of non a-z,0-9 alpha numeric characters with single
-   underscores
+ - replacing all runs of non a-z,0-9 alpha numeric characters with underscores
 
  - replacing contiguous runs of underscores with a single underscore
 
  - removing any leading or trailing underscores
 
- - truncating the component if it extends beyond 128 characters.
+ - truncating the component if it extends beyond $nameFromStringMaximumLength characters.
 
-For files that do contain a B<title> tag the content of the B<title> tag is
-processed as described above to obtain the human readable component of the file
-name. If any of the following L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> tags are found in a source file which
-also contains a B<title> tag then the following codes are prefixed to this
-file name as well:
+If the file contains a B<title> tag then only the content of the B<title> tag
+is processed as described above to obtain the human readable component of the
+file name. If any of the following L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> tags are found in a source file
+which also contains a B<title> tag then the following codes are prefixed to
+this file name as well:
 
   Code      Tag
   bm_       bookmap
@@ -561,30 +588,36 @@ then the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the 
 
  abc_541ddaddd3d82f73a30a666c285b7e92.xml
 
-If the option to present the L<md5 sum|https://en.wikipedia.org/wiki/MD5> sum as five letter English words is chosen
+If the option to present the L<md5 sum|https://en.wikipedia.org/wiki/MD5> as five letter English words is chosen
 then the standardized name for this content becomes:
 
  abc_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.xml
 
 =head2 Benefits
 
-The names generated by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be exploited in numerous ways to
-simplify the creation, conversion and management of large repositories of
+The file names generated by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be exploited in numerous ways
+to simplify the creation, conversion and management of large repositories of
 documents written to the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> standard:
 
 =head3 Parallel Processing
 
-The name generated by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>is unique when computed by competing
-parallel processes so files that have the same name have the same content and
-can be safely overwritten by another process without attempting to coordinate
-names between processes.  Likewise files that have different names have different
-content and so can be written separately.
+Complex long running document transformations can be speeded up by running the
+transformations in parallel.
+
+The file name generated by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> is unique when computed by
+competing parallel processes so files that have the same name have the same
+content and can be safely overwritten by another process without attempting to
+coordinate names between processes.  Likewise files that have different names
+are guarenteed to have different content and so can be written out without
+checking for an existing file of that name.
 
 Alternative systems relying on coordination between the parallel processes to
 choose names to avoid collisions and reuse identical content perform ever more
-badly as the number of files increases because there are that many more files
-to check for matching content and names.  Coordination between parallel
-processes stops them from being truly parallel.
+badly as the number of files increases because there are ever more files to
+check for matching content and names.  Coordination between parallel processes
+stops the processes from running fully in parallel. Conversely, eliminating the
+need for coordination between parallel processes allows each process to run
+more fully in parallel.
 
 As a consequence, the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> enables parallel L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> conversions to
 scale effectively.
@@ -594,7 +627,6 @@ scale effectively.
 Files are automatically flattened by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> as files with the same
 content have the same name and so can safely share one global folder without
 fear of name collisions or having multiple names for identical content.
-
 
 =head3 Relocating Dita References After Folder Restructuring
 
@@ -615,28 +647,31 @@ Imagine the user has several files in different folders all starting:
 
 The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> computes the human readable component of the name in a
 consistent way using only the contents of each file.  Once the name has been
-standardized, all these files can be placed in one folder to get a directory
+standardized, all these files can be placed in B<one> folder to get a directory
 listing like:
 
   license_agreement_a6e3...
   license_agreement_b532...
   license_agreement_c65d...
 
-This grouping signals that these files are potentially similar to each other.
+This grouping signals that these files are potentially similar to each other
+and thus might be better merged into one shareable file.
 
-As the user applies the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> to more files, more such matches occur.
+As the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> is applied to ever more such files, ever more such matches
+occur.
 
 =head3 Copying And Moving Files For Global Interoperability
 
 Users can copy files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> around from folder to folder
-without fear of collisions or duplication obviating the need for time consuming
-checks and reportage before performing such actions.  The meta data in the
-companion file can also be copied in a similar fearless manner.
+without fear of collisions or duplication obviating the need for the time
+consuming checks and reportage otherwise required before performing such
+actions.  The meta data in the L<Companion File> can also be copied in a similar
+fearless manner.
 
-Say two users want to share content: files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be
-incorporated directly into the other user's file system without fear of
+If two users wish to share content: their files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
+can be incorporated directly into the other user's file system without fear of
 collisions or duplicating content thus promoting global content sharing and
-collaboration.
+collaboration of L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> content.
 
 =head3 Guidization For Content Management Systems
 
@@ -649,11 +684,11 @@ in the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name.
 
 The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> encourages L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> users to use meta data tags to describe
 their documents so that content can be found by searching with L<grep|https://en.wikipedia.org/wiki/Grep> rather
-than relying on lengthy file names in which the file meta data is encoded and
-then using L<find|https://en.wikipedia.org/wiki/Find_(Unix)>.  Such file names quickly become very long and unmanageable:
-on the one hand they need spaces in them to make them readable, but on the
-other hand, the spaces make such files difficult to cut and paste or use from
-the L<command line|https://en.wikipedia.org/wiki/Command-line_interface>.
+than encoding file meta data in file names then searching for the required file
+using L<find|https://en.wikipedia.org/wiki/Find_(Unix)>.  Such file names quickly become very long and unmanageable: on
+the one hand they need spaces in them to make them readable, but on the other
+hand, the spaces make such files difficult to cut and paste or use from the
+L<command line|https://en.wikipedia.org/wiki/Command-line_interface>.
 
 =head3 Cut And Paste
 
@@ -662,14 +697,15 @@ file names can be selected by a mouse double click and thus easily copied and
 pasted into other documents.
 
 Conversely, one has to use cut and paste to manipulate such file names making
-it impossible to misspell such file names in other documents.
+it impossible to mistype such file names in other documents.
 
 =head3 CSV files
 
-Files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be safely included in csv files!
+Files named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can be safely included in B<.csv> files
+because they have no spaces in them!
 
 Conversely, one has to use cut and paste to manipulate such file names making
-it impossible to misspell such file names in other documents.
+it impossible to mistype such file names in other documents.
 
 =head3 Automatic File Versioning
 
@@ -683,23 +719,36 @@ cannot be found.
 As file names named with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> do not have spaces in them (such as
 L<zero width space|https://en.wikipedia.org/wiki/Zero-width_space>) they work well on the L<command line|https://en.wikipedia.org/wiki/Command-line_interface> and with the many
 L<command line|https://en.wikipedia.org/wiki/Command-line_interface> tools that are used to manipulate such files enhancing the
-productivity leverage that L<command line|https://en.wikipedia.org/wiki/Command-line_interface> has versus L<graphical user interface|https://en.wikipedia.org/wiki/Graphical_user_interface> processing.
+productivity leverage that L<command line|https://en.wikipedia.org/wiki/Command-line_interface> has always had versus L<graphical user interface|https://en.wikipedia.org/wiki/Graphical_user_interface>
+processing.
 
 =head3 Locating Files by Their Original Names Or Other Meta-Data
 
-Each file produced by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can have a companion file of the same
-name but without an extension.  The companion file contains meta-data about the
+Each file produced by the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> can have a L<Companion File> of the same
+name but without an extension.  The L<Companion File> contains meta-data about the
 file such as its original location etc. which can be searched by L<grep|https://en.wikipedia.org/wiki/Grep> or
 similar.
 
-The companion file contains information about a file named using the
-L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> such as its original file name and other meta data.
-
-To find such a file use L<grep|https://en.wikipedia.org/wiki/Grep> to find the companion file containing the
+To find such a file use L<grep|https://en.wikipedia.org/wiki/Grep> to find the L<Companion File> containing the
 searched for content, paste that file name into the L<command line|https://en.wikipedia.org/wiki/Command-line_interface> after
-entering any command such as B<ll> and then press the tab key to have the
-L<shell|https://en.wikipedia.org/wiki/Shell_(computing)> expand it to the get the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file that corresponds to the
-located companion file.
+entering any command such as B<ll> and then press B<.> followed by the L<tab|https://en.wikipedia.org/wiki/Tab_key>
+key to have the L<shell|https://en.wikipedia.org/wiki/Shell_(computing)> expand it to the get the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file that
+corresponds to the located L<Companion File>.  For example:
+
+  \\grep -r 'SR-dashboard-ds.png'
+
+  png_f940c7db293fe377e7d49c4e0c654cb2:  source => "/home/phil/r/pureStorage/docBook/download/OE_User_Guide/SRRBeta/images/screenshots/dashboard/SR-dashboard-ds.png",
+
+  ls png_f940c7db293fe377e7d49c4e0c654cb2.png
+
+=head2 Companion File
+
+Each file named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> may be accompanied by a L<Companion File>
+that contains meta data describing the file, said data formatted as a L<Perl|http://www.perl.org/>
+data structure.
+
+The name of the L<Companion File> is obtained by removing the extension from the
+file named using the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
 =head2 Alternate File Names
 
@@ -726,6 +775,20 @@ method names that start with:
 
  gbBinaryStandard
 
+The binary standard forms file names by prefixing the L<md5 sum|https://en.wikipedia.org/wiki/MD5> value with the
+extension of the file in lower case and an underscore to prevent the long
+garbled file names that would otherwise be chosen if the normal standard were
+applied directly to naming such content and to place such fields close together
+in a directory listings.
+
+Consequently, a B<png> file with content:
+
+  q(\0abc\1)
+
+will be represented by the name:
+
+  png_2786f1147a331ec6ebf60c1ba636a458.png
+
 =head2 Documentation Copyright
 
 The documentation for this module is dual licensed with the L<GNU Free Documentation License|https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License> as well
@@ -737,7 +800,7 @@ as a universal standard.
 The Gearhart-Brenan Dita Topic Naming Standard.
 
 
-Version "20190505".
+Version "20190530".
 
 
 The following sections describe the methods in each functional area of this
@@ -749,13 +812,14 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 Make and manage files that conform to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> and are coded in utf8.
 
-=head2 gbStandardFileName($$)
+=head2 gbStandardFileName($$%)
 
 Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name given the content and extension of a proposed file.
 
      Parameter   Description
   1  $content    Content
   2  $extension  Extension
+  3  %options    Various ingenious options designed by Micaela
 
 B<Example:>
 
@@ -777,7 +841,7 @@ This method can be imported via:
 
 =head2 gbStandardCompanionFileName($)
 
-Return the name of the companion file given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+Return the name of the L<Companion File> given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
      Parameter  Description
   1  $file      L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name
@@ -793,9 +857,61 @@ This method can be imported via:
   use Dita::GB::Standard qw(gbStandardCompanionFileName)
 
 
+=head2 gbStandardCompanionFileContent($)
+
+Return the content of the L<Companion File> given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+
+     Parameter  Description
+  1  $file      L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name
+
+B<Example:>
+
+
+  if (1) {
+    my $s = qq(\0abc\1);
+    my $S = q(Hello World);
+    my $d = q(out/);
+    my $D = q(out2/);
+    clearFolder($_, 10) for $d, $D;
+
+    my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
+    ok -e $f;
+    ok readFile($f) eq $s;
+
+    my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
+    ok -e $c;
+    ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($c) eq $S;
+
+    ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
+
+    my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
+    ok -e $F;
+    ok readFile($F) eq $s;
+
+    my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
+    ok -e $C;
+    ok gbBinaryStandardCompanionFileContent($C) eq $S;
+
+    ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($F) eq $S;                                  # Check companion file content
+
+    ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
+
+    gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
+    ok !-e $F;
+    ok !-e $C;
+
+    clearFolder($_, 10) for $d, $D;
+   }
+
+
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbStandardCompanionFileContent)
+
+
 =head2 gbStandardCreateFile($$$$)
 
-Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>
+Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>
 
      Parameter          Description
   1  $Folder            Target folder or a file in that folder
@@ -1006,10 +1122,10 @@ B<Example:>
 
   if (1) {
     if (useWords)
-     {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(xml)) eq q(abc_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.xml);
+     {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(png)) eq q(png_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.png);
      }
     else
-     {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(xml)) eq q(abc_2786f1147a331ec6ebf60c1ba636a458.xml);
+     {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(png)) eq q(png_2786f1147a331ec6ebf60c1ba636a458.png);
      }
    }
 
@@ -1037,9 +1153,61 @@ This method can be imported via:
   use Dita::GB::Standard qw(gbBinaryStandardCompanionFileName)
 
 
+=head2 gbBinaryStandardCompanionFileContent($)
+
+Return the content of the L<Companion File> given a file whose name complies with the binary L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+
+     Parameter  Description
+  1  $file      L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name
+
+B<Example:>
+
+
+  if (1) {
+    my $s = qq(\0abc\1);
+    my $S = q(Hello World);
+    my $d = q(out/);
+    my $D = q(out2/);
+    clearFolder($_, 10) for $d, $D;
+
+    my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
+    ok -e $f;
+    ok readFile($f) eq $s;
+
+    my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
+    ok -e $c;
+    ok gbStandardCompanionFileContent($c) eq $S;
+
+    ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($f) eq $S;                            # Check companion file content
+
+    my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
+    ok -e $F;
+    ok readFile($F) eq $s;
+
+    my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
+    ok -e $C;
+    ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($C) eq $S;
+
+    ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
+
+    ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
+
+    gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
+    ok !-e $F;
+    ok !-e $C;
+
+    clearFolder($_, 10) for $d, $D;
+   }
+
+
+This method can be imported via:
+
+  use Dita::GB::Standard qw(gbBinaryStandardCompanionFileContent)
+
+
 =head2 gbBinaryStandardCreateFile($$$$)
 
-Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>.
+Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>.
 
      Parameter          Description
   1  $Folder            Target folder or a file in that folder
@@ -1063,7 +1231,9 @@ B<Example:>
 
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
-    ok readFile($c) eq $S;
+    ok gbStandardCompanionFileContent($c) eq $S;
+
+    ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
 
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
@@ -1071,7 +1241,9 @@ B<Example:>
 
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
-    ok readFile($C) eq $S;
+    ok gbBinaryStandardCompanionFileContent($C) eq $S;
+
+    ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
 
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
 
@@ -1111,7 +1283,9 @@ B<Example:>
 
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
-    ok readFile($c) eq $S;
+    ok gbStandardCompanionFileContent($c) eq $S;
+
+    ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
 
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
@@ -1119,7 +1293,9 @@ B<Example:>
 
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
-    ok readFile($C) eq $S;
+    ok gbBinaryStandardCompanionFileContent($C) eq $S;
+
+    ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
 
     ok !𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗥𝗲𝗻𝗮𝗺𝗲($F);                                               # No rename required to standardize file name
 
@@ -1160,7 +1336,9 @@ B<Example:>
 
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
-    ok readFile($c) eq $S;
+    ok gbStandardCompanionFileContent($c) eq $S;
+
+    ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
 
     my $F = 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗽𝘆𝗙𝗶𝗹𝗲($f, $D);                                     # Copy file
     ok -e $F;
@@ -1168,7 +1346,9 @@ B<Example:>
 
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
-    ok readFile($C) eq $S;
+    ok gbBinaryStandardCompanionFileContent($C) eq $S;
+
+    ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
 
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
 
@@ -1187,7 +1367,7 @@ This method can be imported via:
 
 =head2 gbBinaryStandardDelete($)
 
-Delete a file and its companion file if there is one.
+Delete a file and its L<Companion File> if there is one.
 
      Parameter  Description
   1  $file      File to delete
@@ -1208,7 +1388,9 @@ B<Example:>
 
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
-    ok readFile($c) eq $S;
+    ok gbStandardCompanionFileContent($c) eq $S;
+
+    ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
 
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
@@ -1216,7 +1398,9 @@ B<Example:>
 
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
-    ok readFile($C) eq $S;
+    ok gbBinaryStandardCompanionFileContent($C) eq $S;
+
+    ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
 
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
 
@@ -1237,29 +1421,33 @@ This method can be imported via:
 =head1 Index
 
 
-1 L<gbBinaryStandardCompanionFileName|/gbBinaryStandardCompanionFileName> - Return the name of the companion file given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+1 L<gbBinaryStandardCompanionFileContent|/gbBinaryStandardCompanionFileContent> - Return the content of the L<Companion File> given a file whose name complies with the binary L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-2 L<gbBinaryStandardCopyFile|/gbBinaryStandardCopyFile> - Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+2 L<gbBinaryStandardCompanionFileName|/gbBinaryStandardCompanionFileName> - Return the name of the companion file given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-3 L<gbBinaryStandardCreateFile|/gbBinaryStandardCreateFile> - Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>.
+3 L<gbBinaryStandardCopyFile|/gbBinaryStandardCopyFile> - Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-4 L<gbBinaryStandardDelete|/gbBinaryStandardDelete> - Delete a file and its companion file if there is one.
+4 L<gbBinaryStandardCreateFile|/gbBinaryStandardCreateFile> - Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>.
 
-5 L<gbBinaryStandardFileName|/gbBinaryStandardFileName> - Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name given the content and extension of a proposed file.
+5 L<gbBinaryStandardDelete|/gbBinaryStandardDelete> - Delete a file and its L<Companion File> if there is one.
 
-6 L<gbBinaryStandardRename|/gbBinaryStandardRename> - Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+6 L<gbBinaryStandardFileName|/gbBinaryStandardFileName> - Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name given the content and extension of a proposed file.
 
-7 L<gbStandardCompanionFileName|/gbStandardCompanionFileName> - Return the name of the companion file given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+7 L<gbBinaryStandardRename|/gbBinaryStandardRename> - Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-8 L<gbStandardCopyFile|/gbStandardCopyFile> - Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+8 L<gbStandardCompanionFileContent|/gbStandardCompanionFileContent> - Return the content of the L<Companion File> given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-9 L<gbStandardCreateFile|/gbStandardCreateFile> - Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A companion file can, optionally, be  created with the specified B<$companionContent>
+9 L<gbStandardCompanionFileName|/gbStandardCompanionFileName> - Return the name of the L<Companion File> given a file whose name complies with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-10 L<gbStandardDelete|/gbStandardDelete> - Delete a file and its companion file if there is one.
+10 L<gbStandardCopyFile|/gbStandardCopyFile> - Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
-11 L<gbStandardFileName|/gbStandardFileName> - Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name given the content and extension of a proposed file.
+11 L<gbStandardCreateFile|/gbStandardCreateFile> - Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>
 
-12 L<gbStandardRename|/gbStandardRename> - Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
+12 L<gbStandardDelete|/gbStandardDelete> - Delete a file and its companion file if there is one.
+
+13 L<gbStandardFileName|/gbStandardFileName> - Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name given the content and extension of a proposed file.
+
+14 L<gbStandardRename|/gbStandardRename> - Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
 
 
@@ -1275,29 +1463,33 @@ Or individually via:
 
 
 
-1 L<gbBinaryStandardCompanionFileName|/gbBinaryStandardCompanionFileName>
+1 L<gbBinaryStandardCompanionFileContent|/gbBinaryStandardCompanionFileContent>
 
-2 L<gbBinaryStandardCopyFile|/gbBinaryStandardCopyFile>
+2 L<gbBinaryStandardCompanionFileName|/gbBinaryStandardCompanionFileName>
 
-3 L<gbBinaryStandardCreateFile|/gbBinaryStandardCreateFile>
+3 L<gbBinaryStandardCopyFile|/gbBinaryStandardCopyFile>
 
-4 L<gbBinaryStandardDelete|/gbBinaryStandardDelete>
+4 L<gbBinaryStandardCreateFile|/gbBinaryStandardCreateFile>
 
-5 L<gbBinaryStandardFileName|/gbBinaryStandardFileName>
+5 L<gbBinaryStandardDelete|/gbBinaryStandardDelete>
 
-6 L<gbBinaryStandardRename|/gbBinaryStandardRename>
+6 L<gbBinaryStandardFileName|/gbBinaryStandardFileName>
 
-7 L<gbStandardCompanionFileName|/gbStandardCompanionFileName>
+7 L<gbBinaryStandardRename|/gbBinaryStandardRename>
 
-8 L<gbStandardCopyFile|/gbStandardCopyFile>
+8 L<gbStandardCompanionFileContent|/gbStandardCompanionFileContent>
 
-9 L<gbStandardCreateFile|/gbStandardCreateFile>
+9 L<gbStandardCompanionFileName|/gbStandardCompanionFileName>
 
-10 L<gbStandardDelete|/gbStandardDelete>
+10 L<gbStandardCopyFile|/gbStandardCopyFile>
 
-11 L<gbStandardFileName|/gbStandardFileName>
+11 L<gbStandardCreateFile|/gbStandardCreateFile>
 
-12 L<gbStandardRename|/gbStandardRename>
+12 L<gbStandardDelete|/gbStandardDelete>
+
+13 L<gbStandardFileName|/gbStandardFileName>
+
+14 L<gbStandardRename|/gbStandardRename>
 
 =head1 Installation
 
@@ -1434,7 +1626,7 @@ if (1) {                                                                        
 
 ok gbBinaryStandardCompanionFileName(q(a/b.c)) eq q(a/b);                       #TgbBinaryStandardCompanionFileName
 
-if (1) {                                                                        #TgbBinaryStandardCreateFile #TgbBinaryStandardCopyFile #TgbBinaryStandardDelete #TgbBinaryStandardRename
+if (1) {                                                                        #TgbBinaryStandardCreateFile #TgbBinaryStandardCopyFile #TgbBinaryStandardDelete #TgbBinaryStandardRename #TgbStandardCompanionFileContent  #TgbBinaryStandardCompanionFileContent
   my $s = qq(\0abc\1);
   my $S = q(Hello World);
   my $d = q(out/);
@@ -1447,7 +1639,7 @@ if (1) {                                                                        
 
   my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
   ok -e $c;
-  ok readFile($c) eq $S;
+  ok gbStandardCompanionFileContent($c) eq $S;
 
   ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
 
@@ -1457,7 +1649,7 @@ if (1) {                                                                        
 
   my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
   ok -e $C;
-  ok readFile($C) eq $S;
+  ok gbBinaryStandardCompanionFileContent($C) eq $S;
 
   ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
 
@@ -1469,5 +1661,3 @@ if (1) {                                                                        
 
   clearFolder($_, 10) for $d, $D;
  }
-
-

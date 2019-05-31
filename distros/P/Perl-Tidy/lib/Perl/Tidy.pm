@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2018 by Steve Hancock
+#    Copyright (c) 2000-2019 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -109,7 +109,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20181120';
+    $VERSION = '20190601';
 }
 
 sub streamhandle {
@@ -209,7 +209,7 @@ EOM
 sub find_input_line_ending {
 
     # Peek at a file and return first line ending character.
-    # Quietly return undef in case of any trouble.
+    # Return undefined value in case of any trouble.
     my ($input_file) = @_;
     my $ending;
 
@@ -254,7 +254,6 @@ sub catfile {
 
     my @parts = @_;
 
-    #BEGIN { eval "require File::Spec"; $missing_file_spec = $@; }
     BEGIN {
         eval { require File::Spec };
         $missing_file_spec = $@;
@@ -267,7 +266,7 @@ sub catfile {
 
     # Perl 5.004 systems may not have File::Spec so we'll make
     # a simple try.  We assume File::Basename is available.
-    # return undef if not successful.
+    # return if not successful.
     my $name      = pop @parts;
     my $path      = join '/', @parts;
     my $test_file = $path . $name;
@@ -728,7 +727,7 @@ EOM
 
     while ( my $input_file = shift @ARGV ) {
         my $fileroot;
-        my $input_file_permissions;
+        my @input_file_stat;
 
         #---------------------------------------------------------------
         # prepare this input stream
@@ -796,8 +795,8 @@ EOM
             }
 
             # we should have a valid filename now
-            $fileroot               = $input_file;
-            $input_file_permissions = ( stat $input_file )[2] & oct(7777);
+            $fileroot        = $input_file;
+            @input_file_stat = stat($input_file);
 
             if ( $^O eq 'VMS' ) {
                 ( $fileroot, $dot ) = check_vms_filename($fileroot);
@@ -919,9 +918,7 @@ EOM
                 }
 
                 # do not overwrite input file with -o
-                if ( defined($input_file_permissions)
-                    && ( $output_file eq $input_file ) )
-                {
+                if ( @input_file_stat && ( $output_file eq $input_file ) ) {
                     Die("Use 'perltidy -b $input_file' to modify in-place\n");
                 }
             }
@@ -1298,7 +1295,7 @@ EOM
                 if (   $rOpts->{'character-encoding'}
                     && $rOpts->{'character-encoding'} eq 'utf8' )
                 {
-                    binmode $fout, ":encoding(UTF-8)";
+                    binmode $fout, ":raw:encoding(UTF-8)";
                 }
                 else { binmode $fout }
             }
@@ -1319,13 +1316,66 @@ EOM
 
         # set output file permissions
         if ( $output_file && -f $output_file && !-l $output_file ) {
-            if ($input_file_permissions) {
+            if (@input_file_stat) {
 
-                # give output script same permissions as input script, but
-                # make it user-writable or else we can't run perltidy again.
-                # Thus we retain whatever executable flags were set.
+                # Set file ownership and permissions
                 if ( $rOpts->{'format'} eq 'tidy' ) {
-                    chmod( $input_file_permissions | oct(600), $output_file );
+                    my ( $mode_i, $uid_i, $gid_i ) =
+                      @input_file_stat[ 2, 4, 5 ];
+                    my ( $uid_o, $gid_o ) = ( stat($output_file) )[ 4, 5 ];
+                    my $input_file_permissions  = $mode_i & oct(7777);
+                    my $output_file_permissions = $input_file_permissions;
+
+                    #rt128477: avoid inconsistent owner/group and suid/sgid
+                    if ( $uid_i != $uid_o || $gid_i != $gid_o ) {
+
+               # try to change owner and group to match input file if in -b mode
+               # note: chown returns number of files successfully changed
+                        if ( $in_place_modify
+                            && chown( $uid_i, $gid_i, $output_file ) )
+                        {
+                            # owner/group successfully changed
+                        }
+                        else {
+
+                            # owner or group differ: do not copy suid and sgid
+                            $output_file_permissions = $mode_i & oct(777);
+                            if ( $input_file_permissions !=
+                                $output_file_permissions )
+                            {
+                                Warn(
+"Unable to copy setuid and/or setgid bits for output file '$output_file'\n"
+                                );
+                            }
+                        }
+                    }
+
+                    # Make the output file for rw unless we are in -b mode.
+                    # Explanation: perltidy does not unlink existing output
+                    # files before writing to them, for safety.  If a
+                    # designated output file exists and is not writable,
+                    # perltidy will halt.  This can prevent a data loss if a
+                    # user accidentally enters "perltidy infile -o
+                    # important_ro_file", or "perltidy infile -st
+                    # >important_ro_file". But it also means that perltidy can
+                    # get locked out of rerunning unless it marks its own
+                    # output files writable. The alternative, of always
+                    # unlinking the designated output file, is less safe and
+                    # not always possible, except in -b mode, where there is an
+                    # assumption that a previous backup can be unlinked even if
+                    # not writable.
+                    if ( !$in_place_modify ) {
+                        $output_file_permissions |= oct(600);
+                    }
+
+                    if ( !chmod( $output_file_permissions, $output_file ) ) {
+
+                        # couldn't change file permissions
+                        my $operm = sprintf "%04o", $output_file_permissions;
+                        Warn(
+"Unable to set permissions for output file '$output_file' to $operm\n"
+                        );
+                    }
                 }
 
                 # else use default permissions for html and any other format
@@ -1768,6 +1818,7 @@ sub generate_options {
     $add_option->( 'break-after-all-operators',               'baao',  '!' );
     $add_option->( 'break-before-all-operators',              'bbao',  '!' );
     $add_option->( 'keep-interior-semicolons',                'kis',   '!' );
+    $add_option->( 'one-line-block-semicolons',               'olbs',  '=i' );
 
     ########################################
     $category = 6;    # Controlling list formatting
@@ -1781,6 +1832,7 @@ sub generate_options {
     ########################################
     $add_option->( 'break-at-old-keyword-breakpoints',   'bok', '!' );
     $add_option->( 'break-at-old-logical-breakpoints',   'bol', '!' );
+    $add_option->( 'break-at-old-method-breakpoints',    'bom', '!' );
     $add_option->( 'break-at-old-ternary-breakpoints',   'bot', '!' );
     $add_option->( 'break-at-old-attribute-breakpoints', 'boa', '!' );
     $add_option->( 'ignore-old-breakpoints',             'iob', '!' );
@@ -1795,6 +1847,14 @@ sub generate_options {
     $add_option->( 'long-block-line-count',           'lbl',  '=i' );
     $add_option->( 'maximum-consecutive-blank-lines', 'mbl',  '=i' );
     $add_option->( 'keep-old-blank-lines',            'kbl',  '=i' );
+
+    $add_option->( 'keyword-group-blanks-list',         'kgbl', '=s' );
+    $add_option->( 'keyword-group-blanks-size',         'kgbs', '=s' );
+    $add_option->( 'keyword-group-blanks-repeat-count', 'kgbr', '=i' );
+    $add_option->( 'keyword-group-blanks-before',       'kgbb', '=i' );
+    $add_option->( 'keyword-group-blanks-after',        'kgba', '=i' );
+    $add_option->( 'keyword-group-blanks-inside',       'kgbi', '!' );
+    $add_option->( 'keyword-group-blanks-delete',       'kgbd', '!' );
 
     $add_option->( 'blank-lines-after-opening-block',       'blao',  '=i' );
     $add_option->( 'blank-lines-before-closing-block',      'blbc',  '=i' );
@@ -1906,6 +1966,9 @@ sub generate_options {
 
         'closing-side-comment-else-flag' => [ 0, 2 ],
         'comma-arrow-breakpoints'        => [ 0, 5 ],
+
+        'keyword-group-blanks-before' => [ 0, 2 ],
+        'keyword-group-blanks-after'  => [ 0, 2 ],
     );
 
     # Note: we could actually allow negative ci if someone really wants it:
@@ -1924,6 +1987,14 @@ sub generate_options {
       blanks-before-comments
       blank-lines-before-subs=1
       blank-lines-before-packages=1
+
+      keyword-group-blanks-size=5
+      keyword-group-blanks-repeat-count=0
+      keyword-group-blanks-before=1
+      keyword-group-blanks-after=1
+      nokeyword-group-blanks-inside
+      nokeyword-group-blanks-delete
+
       block-brace-tightness=0
       block-brace-vertical-tightness=0
       brace-tightness=1
@@ -1972,6 +2043,7 @@ sub generate_options {
       notabs
       nowarning-output
       character-encoding=none
+      one-line-block-semicolons=1
       outdent-labels
       outdent-long-quotes
       outdent-long-comments
@@ -2061,6 +2133,11 @@ sub generate_options {
         'bbs'                  => [qw(blbs=1 blbp=1)],
         'noblanks-before-subs' => [qw(blbs=0 blbp=0)],
         'nbbs'                 => [qw(blbs=0 blbp=0)],
+
+        'keyword-group-blanks'   => [qw(kgbb=2 kgbi kgba=2)],
+        'kgb'                    => [qw(kgbb=2 kgbi kgba=2)],
+        'nokeyword-group-blanks' => [qw(kgbb=1 nkgbi kgba=1)],
+        'nkgb'                   => [qw(kgbb=1 nkgbi kgba=1)],
 
         'break-at-old-trinary-breakpoints' => [qw(bot)],
 
@@ -2253,39 +2330,6 @@ sub process_command_line {
         return _process_command_line(@q);
     }
 }
-
-# This is the original coding, which worked,
-# but I've rewritten it (above) to keep Perl-Critic from complaining
-# Keep for awhile.
-
-=pod
-sub process_command_line {
-
-    my (
-        $perltidyrc_stream,  $is_Windows, $Windows_type,
-        $rpending_complaint, $dump_options_type
-    ) = @_;
-
-    my $use_cache = !defined($perltidyrc_stream) && !$dump_options_type;
-    if ($use_cache) {
-        my $cache_key = join( chr(28), @ARGV );
-        if ( my $result = $process_command_line_cache{$cache_key} ) {
-            my ( $argv, @retvals ) = @{$result};
-            @ARGV = @{$argv};
-            return @retvals;
-        }
-        else {
-            my @retvals = _process_command_line(@_);
-            $process_command_line_cache{$cache_key} = [ \@ARGV, @retvals ]
-              if $retvals[0]->{'memoize'};
-            return @retvals;
-        }
-    }
-    else {
-        return _process_command_line(@_);
-    }
-}
-=cut
 
 # (note the underscore here)
 sub _process_command_line {
@@ -2607,11 +2651,13 @@ sub check_options {
         $rOpts->{'check-syntax'} = 0;
     }
 
+    ###########################################################################
     # Added Dec 2017: Deactivating check-syntax for all systems for safety
     # because unexpected results can occur when code in BEGIN blocks is
     # executed.  This flag was included to help check for perltidy mistakes,
     # and may still be useful for debugging.  To activate for testing comment
-    # out the next three lines.
+    # out the next three lines.  Also fix sub 'do_check_syntax' in this file.
+    ###########################################################################
     else {
         $rOpts->{'check-syntax'} = 0;
     }
@@ -3531,7 +3577,7 @@ sub show_version {
     print STDOUT <<"EOM";
 This is perltidy, v$VERSION 
 
-Copyright 2000-2018, Steve Hancock
+Copyright 2000-2019, Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.
@@ -3649,6 +3695,7 @@ Following Old Breakpoints
  -kis    keep interior semicolons.  Allows multiple statements per line.
  -boc    break at old comma breaks: turns off all automatic list formatting
  -bol    break at old logical breakpoints: or, and, ||, && (default)
+ -bom    break at old method call breakpoints: ->
  -bok    break at old list keyword breakpoints such as map, sort (default)
  -bot    break at old conditional (ternary ?:) operator breakpoints (default)
  -boa    break at old attribute breakpoints 
@@ -3830,7 +3877,6 @@ sub check_syntax {
 
             # the perl version number will be helpful for diagnosing the problem
             $logger_object->write_logfile_entry( $^V . "\n" );
-            ##qx/perl -v $error_redirection/ . "\n" );
         }
     }
     else {

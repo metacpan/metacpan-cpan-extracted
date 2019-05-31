@@ -4,7 +4,7 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -12,23 +12,32 @@ Version 0.01
     use Genealogy::ChroniclingAmerica;
 
     HTTP::Cache::Transparent::init({
-        BasePath => '/var/cache/loc'
+        BasePath => '/tmp/cache'
     });
-    my $f = Genealogy::ChroniclingAmerica->new({
+    my $loc = Genealogy::ChroniclingAmerica->new({
         firstname => 'John',
         lastname => 'Smith',
-        country => 'Indiana',
+        state => 'Indiana',
         date_of_death => 1862
     });
 
-    while(my $url = $f->get_next_entry()) {
+    while(my $url = $loc->get_next_entry()) {
         print "$url\n";
     }
-}
 
 # SUBROUTINES/METHODS
 
 ## new
+
+Creates a Genealogy::ChroniclingAmerica object.
+
+It takes three mandatory arguments state, firstname and lastname.
+State must be the full name, not an abbreviation.
+
+There are four optional arguments: middlename, date\_of\_birth, date\_of\_death, ua and host:
+host is the domain of the site to search, the default is chroniclingamerica.loc.gov.
+ua is a pointer to an object that understands get and env\_proxy messages, such
+as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP::UserAgent::Throttled).
 
 ## get\_next\_entry
 
@@ -39,6 +48,9 @@ Returns the next match as a URL.
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
+
+If a middle name is given and no match is found,
+it should search again without the middle name.
 
 Please report any bugs or feature requests to `bug-genealogy-chroniclingamerica at rt.cpan.org`,
 or through the web interface at
@@ -73,6 +85,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2018 Nigel Horne.
+Copyright 2018,2019 Nigel Horne.
 
 This program is released under the following licence: GPL2

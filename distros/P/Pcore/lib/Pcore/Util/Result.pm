@@ -92,9 +92,9 @@ sub res ( $status, @args ) {
 sub resolve_reason ( $status, $status_reason = undef ) {
     _load_data() if !defined $STATUS_REASON;
 
-    if ( $status_reason && $status_reason->{$status} ) { return $status_reason->{$status} }
-    elsif ( exists $STATUS_REASON->{$status} ) { return $STATUS_REASON->{$status} }
-    elsif ( $status < 200 ) { return $STATUS_CATEGORY->[1] }
+    if    ( $status_reason && $status_reason->{$status} ) { return $status_reason->{$status} }
+    elsif ( exists $STATUS_REASON->{$status} )            { return $STATUS_REASON->{$status} }
+    elsif ( $status < 200 )                               { return $STATUS_CATEGORY->[1] }
     elsif ( $status >= 200 && $status < 300 ) { return $STATUS_CATEGORY->[2] }
     elsif ( $status >= 300 && $status < 400 ) { return $STATUS_CATEGORY->[3] }
     elsif ( $status >= 400 && $status < 500 ) { return $STATUS_CATEGORY->[4] }

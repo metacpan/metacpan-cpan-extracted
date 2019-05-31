@@ -100,7 +100,7 @@ JS
 
                     Ext.fireEvent('mask');
 
-                    $api{'Users/create'}(form.getValues(), function(res) {
+                    $api{'Admin/Users/create'}(form.getValues(), function(res) {
                         Ext.fireEvent('unmask');
 
                         if (res.isSuccess()) {

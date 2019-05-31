@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.22';
+$Geo::Coder::OpenCage::VERSION = '0.23';
 use strict;
 use warnings;
 
@@ -10,6 +10,8 @@ $Data::Dumper::Sortkeys = 1;
 use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
+# FIXME - must be a way to get this from dist.ini?
+my $version = 0.23;
 
 sub new {
     my $class = shift;
@@ -20,8 +22,9 @@ sub new {
     }
 
     my $self = {
+        version => $version,
         api_key => $params{api_key},
-        ua      => HTTP::Tiny->new(agent => "Geo::Coder::OpenCage"),
+        ua      => HTTP::Tiny->new(agent => 'Geo::Coder::OpenCage ' . $version),
         json    => JSON::MaybeXS->new( utf8 => 1 ),
         url     => URI->new('https://api.opencagedata.com/geocode/v1/json/'),
     };
@@ -125,7 +128,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

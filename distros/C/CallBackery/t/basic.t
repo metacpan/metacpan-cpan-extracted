@@ -2,7 +2,6 @@ use FindBin;
 
 use lib $FindBin::Bin.'/../thirdparty/lib/perl5';
 use lib $FindBin::Bin.'/../lib';
-use lib $FindBin::Bin.'/../example/lib';
 
 use Mojo::Base -strict;
 
@@ -22,6 +21,7 @@ $t->app->log->on(message => sub {
     }
 });
 
+
 for (1..2){
     $t->post_ok('/QX-JSON-RPC' => json => { id => 1, service => 'default', method => 'ping'} )
       ->status_is(200)
@@ -33,5 +33,24 @@ for (1..2){
       ->status_is(200);
     $ENV{CALLBACKERY_RPC_LOG}=1;
 }
+$ENV{CALLBACKERY_RPC_LOG}=0;
+
+my $c = p1->new;
+
+my $data = {
+    k => { lalala => '123' }
+};
+
+$c->dataCleaner($data);
+
+is ($data->{k}{lalala},'xxx','pass clean check');
 
 done_testing();
+1;
+
+package p1;
+use Mojo::Base qw(CallBackery::Controller::RpcService);
+sub passMatch {
+    qr{lalala};
+};
+1;

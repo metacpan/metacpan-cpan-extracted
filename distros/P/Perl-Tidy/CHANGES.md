@@ -1,5 +1,69 @@
 # Perltidy Change Log
 
+## 2019 06 01
+
+    - rt #128477: Prevent inconsistent owner/group and setuid/setgid bits. 
+      In the -b (--backup-and-modify-in-place) mode, an attempt is made to set ownership
+      of the output file equal to the input file, if they differ.
+      In all cases, if the final output file ownership differs from input file, any setuid/setgid bits are cleared.
+
+    - Added option -bom  (--break-at-old-method-breakpoints) by
+      merrillymeredith which preserves breakpoints of method chains. Modified to also handle a cuddled call style.
+
+    - Merged patch to fix Windows EOL translation error with UTF-8 written by
+      Ron Ivy. This update prevents automatic conversion to 'DOS' CRLF line
+      endings.  Also, Windows system testing at the appveyor site is working again.
+
+    - RT #128280, added flag --one-line-block-semicolons=n (-olbs=n) 
+      to control semicolons in one-line blocks.  The values of n are:
+        n=0 means no semicolons termininating simple one-line blocks
+        n=1 means stable; do not change from input file [DEFAULT and current]
+        n=2 means always add semicolons in one-line blocks
+      The current behavior corresponds to the default n=1.
+
+    - RT #128216, Minor update to prevent inserting unwanted blank line at
+      indentation level change.  This should not change existing scripts.
+
+    - RT #81852: Improved indentation when quoted word (qw) lists are 
+      nested within other containers using the --weld-nested (-wn) flag.
+      The example given previously (below) is now closer to what it would
+      be with a simple list instead of qw:
+
+      # perltidy -wn
+      use_all_ok( qw{
+          PPI
+          PPI::Tokenizer
+          PPI::Lexer
+          PPI::Dumper
+          PPI::Find
+          PPI::Normal
+          PPI::Util
+          PPI::Cache
+      } );
+
+    - RT#12764, introduced new feature allowing placement of blanks around
+      sequences of selected keywords. This can be activated with the -kgb* 
+      series of parameters described in the manual.
+
+    - Rewrote vertical algnment module.  It is better at finding
+      patterns in complex code. For example,
+
+	OLD:
+           /^-std$/ && do { $std       = 1;     next; };
+           /^--$/   && do { @link_args = @argv; last; };
+           /^-I(.*)/ && do { $path = $1 || shift @argv; next; };
+
+	NEW:
+           /^-std$/  && do { $std       = 1;                 next; };
+           /^--$/    && do { @link_args = @argv;             last; };
+           /^-I(.*)/ && do { $path      = $1 || shift @argv; next; };
+
+    - Add repository URLs to META files 
+
+    - RT #118553, "leave only one newline at end of file". This option was not 
+      added because of undesirable side effects, but a new filter script
+      was added which can do this, "examples/delete_ending_blank_lines.pl".
+
 ## 2018 11 20
 
     - fix RT#127736 Perl-Tidy-20181119 has the EXE_FILES entry commented out in

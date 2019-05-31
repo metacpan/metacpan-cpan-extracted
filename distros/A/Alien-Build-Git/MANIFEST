@@ -15,6 +15,7 @@ lib/Alien/Build/Git.pm
 lib/Alien/Build/Plugin/Download/Git.pm
 lib/Alien/Build/Plugin/Fetch/Git.pm
 lib/Alien/git.pm
+maint/cip-before-install
 maint/update-corpus.pl
 t/00_diag.t
 t/01_use.t

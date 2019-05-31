@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -625,7 +625,7 @@ sub load {
         if (@paths) {
             # Wir laden die Dateien aus den angegebenen Pfaden. (Sub)Pfade,
             # die mit einem Punkt beginnen (.PATH) ignorieren wir in
-            # diesem Fall, damit .yeah, .cotedo nicht konsultiert werden.
+            # diesem Fall, damit .jaz, .cotedo nicht konsultiert werden.
 
             for my $path (@paths) {
                 if (-d $path) {
@@ -1392,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

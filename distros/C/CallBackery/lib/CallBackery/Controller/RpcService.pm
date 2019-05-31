@@ -85,11 +85,11 @@ sub dataCleaner {
         /HASH/ && do {
             for my $key (keys %$data) {
                 my $value = $data->{$key};
-                if (ref $value){
-                    $self->dataCleaner($value);
-                }
-                elsif ($key =~ /$match/){
+                if ($key =~ /$match/){
                     $data->{$key} = 'xxx';
+                }
+                elsif (ref $value){
+                    $self->dataCleaner($value);
                 }
             }
         }

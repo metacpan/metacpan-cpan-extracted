@@ -137,6 +137,6 @@ jshint: --verbose # --show-non-errors
 
 perltidy: >-
     --perl-best-practices --tight-secret-operators --continuation-indentation=2
-    --weld-nested-containers --maximum-line-length=0 --format-skipping
-    --format-skipping-begin="# <<<" --format-skipping-end="# >>>" --converge
-    --nostandard-output --character-encoding=utf8
+    --weld-nested-containers --one-line-block-semicolons=0 --maximum-line-length=0
+    --format-skipping --format-skipping-begin="# <<<" --format-skipping-end="# >>>"
+    --converge --nostandard-output --character-encoding=utf8

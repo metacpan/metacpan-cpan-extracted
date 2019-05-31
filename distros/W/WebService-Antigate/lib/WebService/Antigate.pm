@@ -4,7 +4,7 @@ use strict;
 use LWP::UserAgent ();
 use Carp ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 our $DOMAIN = 'anti-captcha.com'; # service domain often changes because of the abuse
 our $WAIT   = 220;                # default time that recognize() or upload() can work

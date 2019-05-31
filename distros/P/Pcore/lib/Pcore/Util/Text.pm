@@ -7,39 +7,39 @@ use Text::Xslate qw[mark_raw unmark_raw];
 our $ENC_CACHE = {};
 
 our $EXPORT = [ qw[
-      cut
-      cut_all
-      decode_eol
-      decode_html_entities
-      decode_utf8
-      encode_hex
-      encode_html
-      encode_html_attr
-      encode_js_string
-      encode_utf8
-      escape_perl
-      expand_num
-      add_num_sep
-      fullchomp
-      lcut
-      lcut_all
-      ltrim
-      ltrim_multi
-      mark_raw
-      rcut
-      rcut_all
-      remove_ansi
-      remove_bom
-      rtrim
-      rtrim_multi
-      table
-      to_camel_case
-      to_snake_case
-      trim
-      trim_multi
-      unmark_raw
-      wrap
-      ] ];
+    cut
+    cut_all
+    decode_eol
+    decode_html_entities
+    decode_utf8
+    encode_hex
+    encode_html
+    encode_html_attr
+    encode_js_string
+    encode_utf8
+    escape_perl
+    expand_num
+    add_num_sep
+    fullchomp
+    lcut
+    lcut_all
+    ltrim
+    ltrim_multi
+    mark_raw
+    rcut
+    rcut_all
+    remove_ansi
+    remove_bom
+    rtrim
+    rtrim_multi
+    table
+    to_camel_case
+    to_snake_case
+    trim
+    trim_multi
+    unmark_raw
+    wrap
+] ];
 
 # TODO
 # - crunch - ?;

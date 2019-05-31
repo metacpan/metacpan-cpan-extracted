@@ -8,6 +8,7 @@ cpanfile
 lib/Curio.pm
 lib/Curio/Declare.pm
 lib/Curio/Factory.pm
+lib/Curio/Manual.pod
 lib/Curio/Role.pm
 lib/Curio/Util.pm
 minil.toml

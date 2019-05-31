@@ -14,11 +14,11 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -26,23 +26,32 @@ our $VERSION = '0.01';
     use Genealogy::ChroniclingAmerica;
 
     HTTP::Cache::Transparent::init({
-	BasePath => '/var/cache/loc'
+	BasePath => '/tmp/cache'
     });
-    my $f = Genealogy::ChroniclingAmerica->new({
+    my $loc = Genealogy::ChroniclingAmerica->new({
 	firstname => 'John',
 	lastname => 'Smith',
-	country => 'Indiana',
+	state => 'Indiana',
 	date_of_death => 1862
     });
 
-    while(my $url = $f->get_next_entry()) {
+    while(my $url = $loc->get_next_entry()) {
 	print "$url\n";
     }
-}
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
+
+Creates a Genealogy::ChroniclingAmerica object.
+
+It takes three mandatory arguments state, firstname and lastname.
+State must be the full name, not an abbreviation.
+
+There are four optional arguments: middlename, date_of_birth, date_of_death, ua and host:
+host is the domain of the site to search, the default is chroniclingamerica.loc.gov.
+ua is a pointer to an object that understands get and env_proxy messages, such
+as L<LWP::UserAgent::Throttled>.
 
 =cut
 
@@ -55,25 +64,37 @@ sub new {
 	my %args;
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::croak("Usage: __PACKAGE__->new(%args)");
+	} elsif(ref($_[0]) || !defined($_[0])) {
+		Carp::croak('Usage: ', __PACKAGE__, '->new(%args)');
 	} elsif(@_ % 2 == 0) {
 		%args = @_;
 	}
 
-	die "First name is not optional" unless($args{'firstname'});
-	die "Last name is not optional" unless($args{'lastname'});
-	die "State is not optional" unless($args{'state'});
+	unless($args{'firstname'}) {
+		Carp::croak('First name is not optional');
+		return;	# Don't know why this is needed, but it is
+	}
+	unless(defined($args{'lastname'})) {
+		Carp::croak('Last name is not optional');
+		return;
+	}
+	unless($args{'state'}) {
+		Carp::croak('State is not optional');
+		return;
+	}
 
-	die "State needs to be the full name" if(length($args{'state'}) == 2);
+	Carp::croak('State needs to be the full name') if(length($args{'state'}) == 2);
 
-	my $ua = delete $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	$ua->env_proxy(1);
+	my $ua = $args{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	$ua->env_proxy(1) unless(delete $args{'ua'});
 
-	my $rc = { ua => $ua, };
+	my $rc = { ua => $ua };
 	$rc->{'host'} = $args{'host'} || 'chroniclingamerica.loc.gov';
 
 	my %query_parameters = ( 'format' => 'json', 'state' => ucfirst(lc($args{'state'})) );
+	if($query_parameters{'state'} eq 'District of columbia') {
+		$query_parameters{'state'} = 'District of Columbia';
+	}
 	my $name = $args{'firstname'};
 	if($args{'middlename'}) {
 		$rc->{'name'} = "$name $args{middlename} $args{lastname}";
@@ -95,12 +116,13 @@ sub new {
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string();
 	# ::diag(">>>>$url = ", $rc->{'name'});
+	# print ">>>>$url = ", $rc->{'name'}, "\n";
 
 	my $resp = $ua->get($url);
 
 	if($resp->is_error()) {
-		Carp::carp("API returned error: on $url ", $resp->status_line());
-		return {};
+		Carp::carp("API returned error on $url: ", $resp->status_line());
+		return;
 	}
 
 	unless($resp->is_success()) {
@@ -152,7 +174,8 @@ sub get_next_entry
 
 	my $text = $entry->{'ocr_eng'};
 
-	if($text !~ /$self->{'name'}/i) {
+	$text =~ s/[\r\n]/ /g;
+	if($text !~ /$self->{'name'}/ims) {
 		return $self->get_next_entry();
 	}
 
@@ -161,7 +184,8 @@ sub get_next_entry
 	my $resp = $self->{'ua'}->get($entry->{'url'});
 
 	if($resp->is_error()) {
-		Carp::carp("API returned error: on $entry->{url} ", $resp->status_line());
+		# print 'got: ', $resp->content(), "\n";
+		Carp::carp("get_next_entry: API returned error on $entry->{url}: ", $resp->status_line());
 		return;
 	}
 
@@ -169,8 +193,7 @@ sub get_next_entry
 		die $resp->status_line();
 	}
 
-	my $data = $self->{'json'}->decode($resp->content());
-	return $data->{'pdf'};
+	return $self->{'json'}->decode($resp->content())->{'pdf'};
 }
 
 =head1 AUTHOR
@@ -178,6 +201,9 @@ sub get_next_entry
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
+
+If a middle name is given and no match is found,
+it should search again without the middle name.
 
 Please report any bugs or feature requests to C<bug-genealogy-chroniclingamerica at rt.cpan.org>,
 or through the web interface at
@@ -216,7 +242,7 @@ L<https://metacpan.org/release/Genealogy-ChroniclingAmerica>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Nigel Horne.
+Copyright 2018,2019 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

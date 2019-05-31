@@ -18,7 +18,7 @@ sub example1
   
   local $CWD = "$dir";
   
-  my $tar = Archive::Tar->new($corpus->child('example1.tar'));
+  my $tar = Archive::Tar->new($corpus->child('example1.tar')->stringify);
   $tar->extract;
   
   path($dir)->child('example1')->stringify;

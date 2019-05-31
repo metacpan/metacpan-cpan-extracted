@@ -164,7 +164,7 @@
 <dt id="o-filename---outfile-filename"><b>-o</b>=filename, <b>--outfile</b>=filename</dt>
 <dd>
 
-<p>Name of the output file (only if a single input file is being processed). If no output file is specified, and output is not redirected to the standard output, the output will go to <i>filename.tdy</i>.</p>
+<p>Name of the output file (only if a single input file is being processed). If no output file is specified, and output is not redirected to the standard output (see <b>-st</b>), the output will go to <i>filename.tdy</i>. [Note: - does not redirect to standard output. Use <b>-st</b> instead.]</p>
 
 </dd>
 <dt id="st---standard-output"><b>-st</b>, <b>--standard-output</b></dt>
@@ -1530,7 +1530,7 @@
 
 <p>This format option is quite general but there are some limitations.</p>
 
-<p>One limitiation is that any line length limit still applies and can cause long welded sections to be broken into multiple lines.</p>
+<p>One limitation is that any line length limit still applies and can cause long welded sections to be broken into multiple lines.</p>
 
 <p>Another limitation is that an opening symbol which delimits quoted text cannot be included in a welded pair. This is because quote delimiters are treated specially in perltidy.</p>
 
@@ -1705,7 +1705,7 @@
 
 <p>The flag <b>-sot</b> is an abbreviation for <b>-sop -sohb -sosb</b>.</p>
 
-<p>The flag <b>-sobb</b> is a abbreviation for <b>-bbvt=2 -bbvtl=&#39;*&#39;</b>. This will case a cascade of opening block braces to appear on a single line, although this an uncommon occurrence except in test scripts.</p>
+<p>The flag <b>-sobb</b> is an abbreviation for <b>-bbvt=2 -bbvtl=&#39;*&#39;</b>. This will case a cascade of opening block braces to appear on a single line, although this an uncommon occurrence except in test scripts.</p>
 
 </dd>
 <dt id="sct---stack-closing-tokens-and-related-flags"><b>-sct</b>, <b>--stack-closing-tokens</b> and related flags</dt>
@@ -1927,6 +1927,37 @@
 <p>By default, if a logical expression is broken at a <code>&amp;&amp;</code>, <code>||</code>, <code>and</code>, or <code>or</code>, then the container will remain broken. Also, breaks at internal keywords <code>if</code> and <code>unless</code> will normally be retained. To prevent this, and thus form longer lines, use <b>-nbol</b>.</p>
 
 </dd>
+<dt id="bom---break-at-old-method-breakpoints"><b>-bom</b>, <b>--break-at-old-method-breakpoints</b></dt>
+<dd>
+
+<p>By default, a method call arrow <code>-&gt;</code> is considered a candidate for a breakpoint, but method chains will fill to the line width before a break is considered. With <b>-bom</b>, breaks before the arrow are preserved, so if you have preformatted a method chain:</p>
+
+<pre><code>  my $q = $rs
+    -&gt;related_resultset(&#39;CDs&#39;)
+    -&gt;related_resultset(&#39;Tracks&#39;)
+    -&gt;search({
+      &#39;track.id&#39; =&gt; {-ident =&gt; &#39;none_search.id&#39;},
+    })-&gt;as_query;</code></pre>
+
+<p>It will <b>keep</b> these breaks, rather than become this:</p>
+
+<pre><code>  my $q = $rs-&gt;related_resultset(&#39;CDs&#39;)-&gt;related_resultset(&#39;Tracks&#39;)-&gt;search({
+      &#39;track.id&#39; =&gt; {-ident =&gt; &#39;none_search.id&#39;},
+    })-&gt;as_query;</code></pre>
+
+<p>This flag will also look for and keep a &#39;cuddled&#39; style of calls, in which lines begin with a closing paren followed by a call arrow, as in this example:</p>
+
+<pre><code>  my $q = $rs-&gt;related_resultset(
+      &#39;CDs&#39;
+  )-&gt;related_resultset(
+      &#39;Tracks&#39;
+  )-&gt;search( {
+      &#39;track.id&#39; =&gt; { -ident =&gt; &#39;none_search.id&#39; },
+  } )-&gt;as_query;</code></pre>
+
+<p>You may want to include the <b>-weld-nested-containers</b> flag in this case to keep nested braces and parens together, as in the last line.</p>
+
+</dd>
 <dt id="bok---break-at-old-keyword-breakpoints"><b>-bok</b>, <b>--break-at-old-keyword-breakpoints</b></dt>
 <dd>
 
@@ -2138,6 +2169,125 @@
 </dd>
 </dl>
 
+<p><b>Controls for blank lines around lines of consecutive keywords</b></p>
+
+<p>The parameters in this section provide some control over the placement of blank lines within and around groups of statements beginning with selected keywords. These blank lines are called here <b>keyword group blanks</b>, and all of the parameters begin with <b>--keyword-group-blanks*</b>, or <b>-kgb*</b> for short. The default settings do not employ these controls but they can be enabled with the following parameters:</p>
+
+<p><b>-kgbl=s</b> or <b>--keyword-group-blanks-list=s</b>; <b>s</b> is a quoted string of keywords</p>
+
+<p><b>-kgbs=s</b> or <b>--keyword-group-blanks-size=s</b>; <b>s</b> gives the number of keywords required to form a group.</p>
+
+<p><b>-kgbb=n</b> or <b>--keyword-group-blanks-before=n</b>; <b>n</b> = (0, 1, or 2) controls a leading blank</p>
+
+<p><b>-kgba=n</b> or <b>--keyword-group-blanks-after=n</b>; <b>n</b> = (0, 1, or 2) controls a trailing blank</p>
+
+<p><b>-kgbi</b> or <b>--keyword-group-blanks-inside</b> is a switch for adding blanks between subgroups</p>
+
+<p><b>-kgbd</b> or <b>--keyword-group-blanks-delete</b> is a switch for removing initial blank lines between keywords</p>
+
+<p><b>-kgbr=n</b> or <b>--keyword-group-blanks-repeat-count=n</b> can limit the number of times this logic is applied</p>
+
+<p>In addition, the following abbreviations are available to for simplified usage:</p>
+
+<p><b>-kgb</b> or <b>--keyword-group-blanks</b> is short for <b>-kgbb=2 -kgba=2 kgbi</b></p>
+
+<p><b>-nkgb</b> or <b>--nokeyword-group-blanks</b>, is short for <b>-kgbb=1 -kgba=1 nkgbi</b></p>
+
+<p>Before describing the meaning of the parameters in detail let us look at an example which is formatted with default parameter settings.</p>
+
+<pre><code>        print &quot;Entering test 2\n&quot;;
+        use Test;
+        use Encode qw(from_to encode decode
+          encode_utf8 decode_utf8
+          find_encoding is_utf8);
+        use charnames qw(greek);
+        my @encodings     = grep( /iso-?8859/, Encode::encodings() );
+        my @character_set = ( &#39;0&#39; .. &#39;9&#39;, &#39;A&#39; .. &#39;Z&#39;, &#39;a&#39; .. &#39;z&#39; );
+        my @source        = qw(ascii iso8859-1 cp1250);
+        my @destiny       = qw(cp1047 cp37 posix-bc);
+        my @ebcdic_sets   = qw(cp1047 cp37 posix-bc);
+        my $str           = join( &#39;&#39;, map( chr($_), 0x20 .. 0x7E ) );
+        return unless ($str);</code></pre>
+
+<p>using <b>perltidy -kgb</b> gives:</p>
+
+<pre><code>        print &quot;Entering test 2\n&quot;;
+                                      &lt;----------this blank controlled by -kgbb
+        use Test;
+        use Encode qw(from_to encode decode
+          encode_utf8 decode_utf8
+          find_encoding is_utf8);
+        use charnames qw(greek);
+                                      &lt;---------this blank controlled by -kgbi
+        my @encodings     = grep( /iso-?8859/, Encode::encodings() );
+        my @character_set = ( &#39;0&#39; .. &#39;9&#39;, &#39;A&#39; .. &#39;Z&#39;, &#39;a&#39; .. &#39;z&#39; );
+        my @source        = qw(ascii iso8859-1 cp1250);
+        my @destiny       = qw(cp1047 cp37 posix-bc);
+        my @ebcdic_sets   = qw(cp1047 cp37 posix-bc);
+        my $str           = join( &#39;&#39;, map( chr($_), 0x20 .. 0x7E ) );
+                                      &lt;----------this blank controlled by -kgba
+        return unless ($str);</code></pre>
+
+<p>Blank lines have been introduced around the <b>my</b> and <b>use</b> sequences. What happened is that the default keyword list includes <b>my</b> and <b>use</b> but not <b>print</b> and <b>return</b>. So a continuous sequence of nine <b>my</b> and <b>use</b> statements was located. This number exceeds the default threshold of five, so blanks were placed before and after the entire group. Then, since there was also a subsequence of six <b>my</b> lines, a blank line was introduced to separate them.</p>
+
+<p>Finer control over blank placement can be achieved by using the individual parameters rather than the <b>-kgb</b> flag. The individual controls are as follows.</p>
+
+<p><b>-kgbl=s</b> or <b>--keyword-group-blanks-list=s</b>, where <b>s</b> is a quoted string, defines the set of keywords which will be formed into groups. The string is a space separated list of keywords. The default set is <b>s=&quot;use require local our my&quot;</b>, but any list of keywords may be used. Comment lines may also be included in a keyword group, even though they are not keywords. To include ordinary block comments, include the symbol <b>BC</b>. To include static block comments (which normally begin with &#39;##&#39;), include the symbol <b>SBC</b>.</p>
+
+<p><b>-kgbs=s</b> or <b>--keyword-group-blanks-size=s</b>, where <b>s</b> is a string describing the number of consecutive keyword statements forming a group. If <b>s</b> is an integer then it is the minimum number required for a group. A maximum value may also be given with the format <b>s=min.max</b>, where <b>min</b> is the minimum number and <b>max</b> is the maximum number, and the min and max values are separated by one or more dots. No groups will be found if the maximum is less than the minimum. The maximum is unlimited if not given. The default is <b>s=5</b>. Some examples:</p>
+
+<pre><code>    s      min   max         number for group
+    3      3     unlimited   3 or more
+    1.1    1     1           1
+    1..3   1     3           1 to 3
+    1.0    1     0           (no match)
+    </code></pre>
+
+<p><b>-kgbb=n</b> or <b>--keyword-group-blanks-before=n</b> specifies whether a blank should appear before the first line of the group, as follows:</p>
+
+<pre><code>   n=0 =&gt; (delete) an existing blank line will be removed
+   n=1 =&gt; (stable) no change to the input file is made  [DEFAULT]
+   n=2 =&gt; (insert) a blank line is introduced if possible</code></pre>
+
+<p><b>-kgba=n</b> or <b>--keyword-group-blanks-after=n</b> likewise specifies whether a blank should appear after the last line of the group, using the same scheme (0=delete, 1=stable, 2=insert).</p>
+
+<p><b>-kgbi</b> or <b>--keyword-group-blanks-inside</b> controls the insertion of blank lines between the first and last statement of the entire group. If there is a continuous run of a single statement type with more than the minimum threshold number (as specified with <b>-kgbs=s</b>) then this switch causes a blank line be inserted between this subgroup and the others. In the example above this happened between the <b>use</b> and <b>my</b> statements.</p>
+
+<p><b>-kgbd</b> or <b>--keyword-group-blanks-delete</b> controls the deletion of any blank lines that exist in the the group when it is first scanned. When statements are initially scanned, any existing blank lines are included in the collection. Any such orignial blank lines will be deleted before any other insertions are made when the parameter <b>-kgbd</b> is set. The default is not to do this, <b>-nkgbd</b>.</p>
+
+<p><b>-kgbr=n</b> or <b>--keyword-group-blanks-repeat-count=n</b> specifies <b>n</b>, the maximum number of times this logic will be applied to any file. The special value <b>n=0</b> is the same as n=infinity which means it will be applied to an entire script [Default]. A value <b>n=1</b> could be used to make it apply just one time for example. This might be useful for adjusting just the <b>use</b> statements in the top part of a module for example.</p>
+
+<p><b>-kgb</b> or <b>--keyword-group-blanks</b> is an abbreviation equivalent to setting <b>-kgbb=1 -kgba=1 -kgbi</b>. This turns on keyword group formatting with a set of default values.</p>
+
+<p><b>-nkgb</b> or <b>--nokeyword-group-blanks</b> is equivalent to <b>-kgbb=0 -kgba nkgbi</b>. This flag turns off keyword group blank lines and is the default setting.</p>
+
+<p>Here are a few notes about the functioning of this technique.</p>
+
+<ul>
+
+<li><p>These parameters are probably more useful as part of a major code reformatting operation rather than as a routine formatting operation.</p>
+
+<p>In particular, note that deleting old blank lines with <b>-kgbd</b> is an irreversible operation so it should be applied with care. Existing blank lines may be serving an important role in controlling vertical alignment.</p>
+
+</li>
+<li><p>Conflicts which arise among these <b>kgb*</b> parameters and other blank line controls are generally resolved by producing the maximum number of blank lines implied by any parameter.</p>
+
+<p>For example, if the flags <b>--freeze-blank-lines</b>, or <b>--keep-old-blank-lines=2</b>, are set, then they have priority over any blank line deletion implied by the <b>-kgb</b> flags of this section, so no blank lines will be deleted.</p>
+
+<p>For another example, if a keyword group ends at a <b>sub</b> and the flag <b>kgba=0</b> requests no blank line there, but we also have <b>--blank-lines-before-subs=2</b>, then two blank lines will still be introduced before the sub.</p>
+
+</li>
+<li><p>The introduction of blank lines does not occur if it would conflict with other input controls or code validity. For example, a blank line will not be placed within a here-doc or within a section of code marked with format skipping comments. And in general, a blank line will only be introduced at the end of a group if the next statement is a line of code.</p>
+
+</li>
+<li><p>The count which is used to determine the group size is not the number of lines but rather the total number of keywords which are found. Individual statements with a certain leading keyword may continue on multiple lines, but if any of these lines is nested more than one level deep then that group will be ended.</p>
+
+</li>
+<li><p>The search for groups of lines with similar leading keywords is based on the input source, not the final formatted source. Consequently, if the source code is badly formatted, it would be best to make a first formatting pass without these options.</p>
+
+</li>
+</ul>
+
 <h2 id="Styles">Styles</h2>
 
 <p>A style refers to a convenient collection of existing parameters.</p>
@@ -2188,6 +2338,62 @@
         ? ( $section ? &#39; in &#39; : &#39;&#39; ) . &quot;the $page$page_ext manpage&quot;
         : &#39; elsewhere in this document&#39;
       );</code></pre>
+
+</dd>
+<dt id="One-line-blocks">One-line blocks</dt>
+<dd>
+
+<p>There are a few points to note regarding one-line blocks. A one-line block is something like this,</p>
+
+<pre><code>        if ($x &gt; 0) { $y = 1 / $x }  </code></pre>
+
+<p>where the contents within the curly braces is short enough to fit on a single line.</p>
+
+<p>With few exceptions, perltidy retains existing one-line blocks, if it is possible within the line-length constraint, but it does not attempt to form new ones. In other words, perltidy will try to follow the one-line block style of the input file.</p>
+
+<p>If an existing one-line block is longer than the maximum line length, however, it will be broken into multiple lines. When this happens, perltidy checks for and adds any optional terminating semicolon (unless the <b>-nasc</b> option is used) if the block is a code block.</p>
+
+<p>The main exception is that perltidy will attempt to form new one-line blocks following the keywords <code>map</code>, <code>eval</code>, and <code>sort</code>, because these code blocks are often small and most clearly displayed in a single line.</p>
+
+<p>One-line block rules can conflict with the cuddled-else option. When the cuddled-else option is used, perltidy retains existing one-line blocks, even if they do not obey cuddled-else formatting.</p>
+
+<p>Occasionally, when one-line blocks get broken because they exceed the available line length, the formatting will violate the requested brace style. If this happens, reformatting the script a second time should correct the problem.</p>
+
+<p>Sometimes it might be desirable to convert a script to have one-line blocks whenever possible. Although there is currently no flag for this, a simple workaround is to execute perltidy twice, once with the flag <b>-noadd-newlines</b> and then once again with normal parameters, like this:</p>
+
+<pre><code>     cat infile | perltidy -nanl | perltidy &gt;outfile</code></pre>
+
+<p>When executed on this snippet</p>
+
+<pre><code>    if ( $? == -1 ) {
+        die &quot;failed to execute: $!\n&quot;;
+    }
+    if ( $? == -1 ) {
+        print &quot;Had enough.\n&quot;;
+        die &quot;failed to execute: $!\n&quot;;
+    }</code></pre>
+
+<p>the result is</p>
+
+<pre><code>    if ( $? == -1 ) { die &quot;failed to execute: $!\n&quot;; }
+    if ( $? == -1 ) {
+        print &quot;Had enough.\n&quot;;
+        die &quot;failed to execute: $!\n&quot;;
+    }</code></pre>
+
+<p>This shows that blocks with a single statement become one-line blocks.</p>
+
+</dd>
+<dt id="olbs-n---one-line-block-semicolons-n"><b>-olbs=n</b>, <b>--one-line-block-semicolons=n</b></dt>
+<dd>
+
+<p>This flag controls the placement of semicolons at the end of one-line blocks. Semicolons are optional before a closing block brace, and frequently they are omitted at the end of a one-line block containing just a single statement. By default, perltidy follows the input file regarding these semicolons, but this behavior can be controlled by this flag. The values of n are:</p>
+
+<pre><code>  n=0 remove terminal semicolons in one-line blocks having a single statement
+  n=1 stable; keep input file placement of terminal semicolons [DEFAULT ]
+  n=2 add terminal semicolons in all one-line blocks</code></pre>
+
+<p>Note that the <b>n=2</b> option has no effect if adding semicolons is prohibited with the <b>-nasc</b> flag. Also not that while <b>n=2</b> adds missing semicolons to all one-line blocks, regardless of complexity, the <b>n=0</b> option only removes ending semicolons which terminate one-line blocks containing just one semicolon. So these two options are not exact inverses.</p>
 
 </dd>
 </dl>
@@ -2339,26 +2545,6 @@
 <p>A similar technique can be used with <b>--extrude</b> instead of <b>--mangle</b> to make the minimum number of one-line blocks.</p>
 
 <p>Another use for <b>--mangle</b> is to combine it with <b>-dac</b> to reduce the file size of a perl script.</p>
-
-</dd>
-<dt id="One-line-blocks">One-line blocks</dt>
-<dd>
-
-<p>There are a few points to note regarding one-line blocks. A one-line block is something like this,</p>
-
-<pre><code>        if ($x &gt; 0) { $y = 1 / $x }  </code></pre>
-
-<p>where the contents within the curly braces is short enough to fit on a single line.</p>
-
-<p>With few exceptions, perltidy retains existing one-line blocks, if it is possible within the line-length constraint, but it does not attempt to form new ones. In other words, perltidy will try to follow the one-line block style of the input file.</p>
-
-<p>If an existing one-line block is longer than the maximum line length, however, it will be broken into multiple lines. When this happens, perltidy checks for and adds any optional terminating semicolon (unless the <b>-nasc</b> option is used) if the block is a code block.</p>
-
-<p>The main exception is that perltidy will attempt to form new one-line blocks following the keywords <code>map</code>, <code>eval</code>, and <code>sort</code>, because these code blocks are often small and most clearly displayed in a single line.</p>
-
-<p>One-line block rules can conflict with the cuddled-else option. When the cuddled-else option is used, perltidy retains existing one-line blocks, even if they do not obey cuddled-else formatting.</p>
-
-<p>Occasionally, when one-line blocks get broken because they exceed the available line length, the formatting will violate the requested brace style. If this happens, reformatting the script a second time should correct the problem.</p>
 
 </dd>
 <dt id="Debugging">Debugging</dt>
@@ -2687,7 +2873,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This man page documents perltidy version 20181120</p>
+<p>This man page documents perltidy version 20190601</p>
 
 <h1 id="BUG-REPORTS">BUG REPORTS</h1>
 

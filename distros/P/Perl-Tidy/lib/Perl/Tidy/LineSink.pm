@@ -8,7 +8,7 @@
 package Perl::Tidy::LineSink;
 use strict;
 use warnings;
-our $VERSION = '20181120';
+our $VERSION = '20190601';
 
 sub new {
 
@@ -29,10 +29,10 @@ sub new {
                 && $rOpts->{'character-encoding'} eq 'utf8' )
             {
                 if ( ref($fh) eq 'IO::File' ) {
-                    $fh->binmode(":encoding(UTF-8)");
+                    $fh->binmode(":raw:encoding(UTF-8)");
                 }
                 elsif ( $output_file eq '-' ) {
-                    binmode STDOUT, ":encoding(UTF-8)";
+                    binmode STDOUT, ":raw:encoding(UTF-8)";
                 }
             }
 

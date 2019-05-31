@@ -5,8 +5,14 @@ use Test2::V0;
 use Test2::Require::Module qw( Algorithm::Loops );
 use Test2::Require::Module qw( List::MoreUtils );
 
-use Algorithm::Loops qw( NestedLoops );
-use List::MoreUtils qw( zip );
+# Avoid CPANTS test_prereq_matches_use.
+BEGIN {
+    eval { require Algorithm::Loops };
+    Algorithm::Loops->import(qw( NestedLoops ));
+
+    eval { require List::MoreUtils };
+    List::MoreUtils->import(qw( zip ));
+}
 
 use Curio::Factory;
 

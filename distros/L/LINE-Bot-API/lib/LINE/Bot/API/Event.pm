@@ -18,6 +18,8 @@ use LINE::Bot::API::Event::MemberJoin;
 use LINE::Bot::API::Event::MemberLeave;
 use LINE::Bot::API::Event::Postback;
 use LINE::Bot::API::Event::BeaconDetection;
+use LINE::Bot::API::Event::Things;
+use LINE::Bot::API::Event::AccountLink;
 
 my %TYPE2CLASS = (
     message      => 'LINE::Bot::API::Event::Message',
@@ -29,6 +31,8 @@ my %TYPE2CLASS = (
     memberLeft   => 'LINE::Bot::API::Event::MemberLeave',
     postback     => 'LINE::Bot::API::Event::Postback',
     beacon       => 'LINE::Bot::API::Event::BeaconDetection',
+    things       => 'LINE::Bot::API::Event::Things',
+    accountLink  => 'LINE::Bot::API::Event::AccountLink',
 );
 
 sub parse_events_json {
@@ -137,6 +141,10 @@ LINE::Bot::API::Event - Handler for Webhook Event Objects
 
             say $event->beacon_hwid;
             say $event->beacon_type;
+        } elsif ($event->is_things_event) {
+            say $event->reply_token;
+            say $event->things_device_id;
+            say $event->things_type;
         }
     }
 

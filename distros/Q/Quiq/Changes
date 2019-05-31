@@ -1,3 +1,20 @@
+1.142 2019-05-31
+================
+[Quiq::Formatter]
+* Methode reducedIsoTime() um ISO-Zeitangaben erweitert.
+
+[Quiq::Path]
+* Um Methode edit() erweitert.
+
+[Quiq::Table]
+* Doku bearbeitet.
+
+[Quiq::TableRow]
+* Doku bearbeitet.
+
+[Quiq::Terminal]
+* Doku bearbeitet.
+
 1.140 2019-05-16
 ================
 [Quiq::Cascm]

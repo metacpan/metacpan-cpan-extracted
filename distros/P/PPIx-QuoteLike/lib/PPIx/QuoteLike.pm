@@ -18,7 +18,7 @@ use PPIx::QuoteLike::Token::Unknown;
 use PPIx::QuoteLike::Token::Whitespace;
 use Scalar::Util ();
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use constant CODE_REF	=> ref sub {};
 
@@ -160,6 +160,24 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 		    push @children, PPIx::QuoteLike::Token::Control->__new(
 			content	=> "$1",		# Remove magic
 		    );
+		    redo;
+		}
+
+		# Handle \N{...} separately because it can not contain
+		# an interpolation even inside of an
+		# otherwise-interpolating string. That is to say,
+		# "\N{$foo}" is simply invalid, and does not even try to
+		# interpolate $foo.  {
+		if ( $content =~ m/ \G ( \\ N [{] ( [^}]+ ) [}] ) /smxgc ) {
+		    my ( $seq, $name ) = ( $1, $2 );
+		    # TODO The Regexp is certainly too permissive. For
+		    # the moment all I am doing is disallowing
+		    # interpolation.
+		    push @children, $name =~ m/ [\$\@] /smx ?
+			$self->_unknown( $seq, "Unknown charname '$name'" ) :
+			PPIx::QuoteLike::Token::String->__new(
+			    content	=> $seq,
+			);
 		    redo;
 		}
 
@@ -749,6 +767,12 @@ reasonably like string literals. Its real reason for being is to find
 interpolated variables for L<Perl::Critic|Perl::Critic> policies and
 similar code.
 
+=head1 INHERITANCE
+
+C<PPIx::QuoteLike> is not descended from any other class.
+
+C<PPIx::QuoteLike> has no descendants.
+
 =head1 METHODS
 
 This class supports the following public methods:
@@ -1007,7 +1031,7 @@ another.
 Sometimes the introduction of new syntax changes the way a string is
 parsed. For example, the C<\F> (fold case) case control was introduced
 in Perl 5.15.8. But it did not represent a syntax error prior to that
-version of Perl, it was simply parsed as C<V>. So
+version of Perl, it was simply parsed as C<F>. So
 
  $ perl -le 'print "Foo\FBar"'
 
@@ -1029,7 +1053,7 @@ it out. I<Caveat user>.
 =head2 Non-Standard Syntax
 
 There are modules out there that alter the syntax of Perl. If the syntax
-of a regular expression is altered, this module has no way to understand
+of a quote-like string is altered, this module has no way to understand
 that it has been altered, much less to adapt to the alteration. The
 following modules are known to cause problems:
 
@@ -1056,7 +1080,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2018 by Thomas R. Wyant, III
+Copyright (C) 2016-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

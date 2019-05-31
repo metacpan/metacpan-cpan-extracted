@@ -27,43 +27,47 @@ my %MESSAGES = (
 sub try_upload {
     my ($self, %opts) = @_;
     
-    Carp::croak "Captcha file or content should be specified and exists"
-        if (!defined($opts{file}) && !defined($opts{content})) || (defined($opts{file}) && ! -e $opts{file});
+    Carp::croak "Specified captcha file doesn't exist"
+        if defined($opts{file}) && ! -e $opts{file};
     
     my $file;
     my $response = $self->{ua}->post
         (
             "$self->{scheme}://$self->{subdomain}$self->{domain}/in.php",
-            Content_Type => "form-data",
-            Content    =>
-            [
-                key    => $self->{key},
-                method => 'post',
-                file   =>
-                [
-                    defined($opts{file}) ?
-                        (
-                            $file = delete $opts{file},
-                            defined($opts{name}) ?
-                                delete $opts{name}
+            defined $opts{file} || defined $opts{content}
+                ? (
+                    Content_Type => "form-data",
+                    Content    =>
+                    [
+                        key    => $self->{key},
+                        method => 'post',
+                        file   =>
+                        [
+                            defined($opts{file}) ?
+                                (
+                                    $file = delete $opts{file},
+                                    defined($opts{name}) ?
+                                        delete $opts{name}
+                                        :
+                                        $file !~ /\..{1,5}$/ ? # filename without extension
+                                            $self->_name_by_file_signature($file)
+                                            :
+                                            undef
+                                )
                                 :
-                                $file !~ /\..{1,5}$/ ? # filename without extension
-                                    $self->_name_by_file_signature($file)
-                                    :
-                                    undef
-                        )
-                        :
-                        (
-                            undef,
-                            defined($opts{name}) ?
-                                delete $opts{name}
-                                :
-                                $self->_name_by_signature($opts{content}),
-                            Content => delete $opts{content}
-                        )
-                ],
-                %opts
-            ]
+                                (
+                                    undef,
+                                    defined($opts{name}) ?
+                                        delete $opts{name}
+                                        :
+                                        $self->_name_by_signature($opts{content}),
+                                    Content => delete $opts{content}
+                                )
+                        ],
+                        %opts
+                    ]
+                  )
+                : { key => $self->{key}, %opts }
         );
     
     unless($response->is_success) {
@@ -199,12 +203,12 @@ Tries to upload captcha to the service. Accepts this options:
    soft_id         undef        id of your application to earn money
    header_acao     0            1 if server should return "Access-Control-Allow-Origin: *" header
    
-You must specify either `file' option or `content'. Other options are facultative. If you want to upload captcha from variable
-(`content' option) instead from file, you must specify the name of the file with `name' option. Antigate webservice determines
-file format by extension, so it is important to specify proper extension in file name. If `file' option used and file name has
-no extension and `name' was not specified or if `content' option used and `name' was not specified, this module will try to
-specify proper name by file signature. If file has unknown signature $WebService::Antigate::FNAME will be used as file name.
-On success captcha id is returned. On failure returns undef and sets errno and errstr.
+For image related captchas you must specify either `file' option or `content'. Other options are facultative. If you want to
+upload captcha from variable (`content' option) instead from file, you must specify the name of the file with `name' option.
+Antigate webservice determines file format by extension, so it is important to specify proper extension in file name. If `file'
+option used and file name has no extension and `name' was not specified or if `content' option used and `name' was not specified,
+this module will try to specify proper name by file signature. If file has unknown signature $WebService::Antigate::FNAME will be
+used as file name. On success captcha id is returned. On failure returns undef and sets errno and errstr.
 
 This list of settings supported by the service may be outdated. But you can specify any other options supported by the service
 here without any changes of the module.

@@ -12,6 +12,7 @@ requires 'Dist::Zilla::Plugin::Test::ReportPrereqs';
 
 requires 'Dist::Zilla::Plugin::StaticInstall';
 
+requires 'Dist::Zilla::Plugin::OurPkgVersion';
 requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
 requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod';
 

@@ -103,6 +103,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     return;
                 }
                 var control = form.getControl(s.key);
+                var reConfFormInProgress;
                 var callback = function(e){
                     var data = e.getData();
                     // handle events from selectboxes
@@ -137,12 +138,40 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                             }
                         }, 'validatePluginData',cfg.name,s.key,form.getData());
                     }
+                    if (s.triggerFormReset && ! reConfFormInProgress){
+                        var that = this;
+                        reConfFormInProgress=true;
+                        rpc.callAsyncSmart(function(pluginConfig) {
+                            if (pluginConfig){
+                                that._reConfForm(pluginConfig.form);
+                            }
+                            reConfFormInProgress = false;
+                        }, 'getPluginConfig',cfg.name,{ 
+                            triggerField: s.key,
+                            currentFormData: form.getData()
+                        });
+                    }
                 };
                 if (control.getSelection){
                     control.addListener('changeSelection',callback,this);
                 }
                 else {
                     control.addListener('changeValue',callback,this);
+                }
+            },this);
+        },
+        _reConfForm: function(formCfg){
+            formCfg.forEach(function(s){
+                if (!s.key){
+                    return;
+                }               
+                if (s.widget == 'selectBox' || s.widget == 'comboBox'){
+                    this._form.setSelectBoxData(s.key,s.cfg.structure);
+                }
+                if (s.set){
+                    var ctrl = this._form.getControl(s.key);
+                    delete s.set.value; // do NOT change the value of anything.
+                    ctrl.set(s.set);
                 }
             },this);
         },

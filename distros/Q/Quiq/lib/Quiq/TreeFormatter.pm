@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Quiq::Option;
 
@@ -182,9 +182,9 @@ Ein Ausschnitt aus der produzierten Ausgabe:
        :   needsTest()
        :   needsUpdate()
        |
-       +--Yeah/Type
+       +--Jaz/Type
           |
-          +--Yeah/Type/Export
+          +--Jaz/Type/Export
           |  : Erzeugung
           |  :   create()
           |  : Entitäten
@@ -201,11 +201,11 @@ Ein Ausschnitt aus der produzierten Ausgabe:
           |  :   rewriteRules()
           |  :   export()
           |
-          +--Yeah/Type/Language
+          +--Jaz/Type/Language
           |
-          +--Yeah/Type/Library
+          +--Jaz/Type/Library
           |
-          +--Yeah/Type/Package
+          +--Jaz/Type/Package
           |  : Erzeugung
           |  :   create()
           |  : Eigenschaften
@@ -519,7 +519,7 @@ sub asText {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

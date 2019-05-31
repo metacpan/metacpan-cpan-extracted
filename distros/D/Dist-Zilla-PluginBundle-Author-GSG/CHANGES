@@ -1,9 +1,45 @@
 ==================================================
-Changes from 2018-05-02 00:00:00 +0000 to present.
+Changes from 2018-05-31 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.0.6 at 2019-05-02 17:02:56 +0000
+version 0.0.7 at 2019-05-31 16:35:46 +0000
+------------------------------------------
+
+  Change: 8a2c6f6a6ab37d4c86c053cdc817f562f58fc1a9
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2019-05-31 12:18:28 +0000
+
+    Update README.md 
+
+  Change: 9e1c17d552f9ad6ef0004d08c625b4e258dc7d4c
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2019-05-23 17:02:21 +0000
+
+    Merge pull request #1 in
+    ~FLICKING/p5-dist-zilla-pluginbundle-author-gsg from
+    feature/add-ourpkgversion to master
+
+    * commit 'c289a803b6c8ae05ae8290dc65c8f6384205d74c':
+
+    Add OurPkgVersion to pod and readme
+
+    Add OurPkgVersion plugin 
+
+  Change: c289a803b6c8ae05ae8290dc65c8f6384205d74c
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2019-05-21 16:08:30 +0000
+
+    Add OurPkgVersion to pod and readme 
+
+  Change: f7d8f2a4248604c47dcb533eec795bed126966fa
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2019-05-06 16:39:34 +0000
+
+    Add OurPkgVersion plugin 
+
+------------------------------------------
+version 0.0.6 at 2019-05-02 16:58:04 +0000
 ------------------------------------------
 
   Change: a65e53ce67e28e7dec0b426eb4f6fe78787d11bd

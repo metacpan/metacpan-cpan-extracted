@@ -26,11 +26,11 @@ requires:
   Locale::TextDomain: 1.23
   MooseX::Getopt: 0
   Text::Reflow: 0
-  Zonemaster::Engine: 2
-  Zonemaster::LDNS: 1
+  Zonemaster::Engine: 3
+  Zonemaster::LDNS: 2
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-cli/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-cli
-version: '2.000001'
+version: '2.000002'

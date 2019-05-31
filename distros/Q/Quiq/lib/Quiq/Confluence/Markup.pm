@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Quiq::Unindent;
 
@@ -949,7 +949,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

@@ -1,3 +1,11 @@
+0.17.0 2019-05-31 16:02:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add the triggerFormReset key to form elements, when a widget has this key
+   set the form configuration will be re-queried from the server, and the 
+   current content of the form will be available in $self->args. In this
+   way it is possible to change settings of the form widgets based on the curent
+   form content, as well as altering the content of selectboxes.
+
 0.16.0 2019-04-23 17:04:50 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - if the getUserConfig returns a sessionCookie property, start using it

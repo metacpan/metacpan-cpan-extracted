@@ -21,12 +21,12 @@ has on_bind       => ();    # Maybe [CodeRef], ($self, $bindings), must return t
 has on_event      => ();    # Maybe [CodeRef], ($self, $ev)
 has on_rpc        => ();    # Maybe [CodeRef], ($self, $req, $tx)
 
-has _conn_ver     => ( 0, init_arg => undef );             # increased on each reset call
+has _conn_ver => ( 0, init_arg => undef );    # increased on each reset call
 has _req_cb       => ( sub { {} }, init_arg => undef );    # HashRef, tid => $cb
-has is_ready      => ( init_arg => undef );                # Bool
-has _peer_is_text => ( init_arg => undef );                # remote peer message serialization protocol
-has _listener     => ( init_arg => undef );                # ConsumerOf['Pcore::Core::Event::Listener']
-has _auth_cb      => ( init_arg => undef );
+has is_ready      => ( init_arg             => undef );    # Bool
+has _peer_is_text => ( init_arg             => undef );    # remote peer message serialization protocol
+has _listener     => ( init_arg             => undef );    # ConsumerOf['Pcore::Core::Event::Listener']
+has _auth_cb      => ( init_arg             => undef );
 
 const our $PROTOCOL => 'pcore';
 

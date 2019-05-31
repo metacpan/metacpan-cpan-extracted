@@ -1,5 +1,5 @@
 package Curio;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Curio::Declare qw();
 use Curio::Role qw();
@@ -105,19 +105,15 @@ a third for your CRM client.
 
 Your second job is to then modify your application to use your Curio
 classes.  If your application uses an existing framework, such as
-L<Catalyst> or L<Dancer2>, then you may want to take a look at the
-available L</INTEGRATIONS>.
+L<Catalyst>, then you may want to take a look at the available
+L</INTEGRATIONS>.
 
 Keep in mind that Curio doesn't just have to be used for connections
 to remote services.  It can be used to make singleton classes, as a
 ready to go generic object factory, a place to put global application
 context information, etc.
 
-=head1 BEWARE OF EARLY RELEASES
-
-The first versions of Curio that are hitting CPAN are early releases
-and may see major interface changes before things settle down.  This
-notice will be removed when that point is reached.
+From here head on over to the L<Curio::Manual>.
 
 =head1 IMPORT ARGUMENTS
 
@@ -133,31 +129,9 @@ relative to the C<Curio::Role> namespace and will have that appended
 to it.  So, if you set the role to C<::CHI> it will be automatically
 converted to C<Curio::Role::CHI>.
 
-See L</AVAILABLE ROLES> for a list of existing Curio roles.
+See L</ROLES> for a list of existing Curio roles.
 
 The default role is L<Curio::Role>.
-
-=head1 BOILERPLATE
-
-Near the top of most Curio classes is this line:
-
-    use Curio;
-
-Which is exactly the same as:
-
-    use Moo;
-    use Curio::Declare;
-    use namespace::clean;
-    with 'Curio::Role';
-    __PACKAGE__->initialize();
-
-If you're not into the declarative interface, or have some
-other reason to switch around this boilerplate, you may copy the
-above and modify to fit your needs rather than using this module
-directly.
-
-Read more about L<Moo> and L<namespace::clean> if you are not
-familiar with them.
 
 =head1 MOTIVATION
 
@@ -172,7 +146,7 @@ resources, such as connections to services.  Often times you'll see
 code which passes a connection to a function, which then passes that
 on to another function, which then creates an object with the connection
 passed as an argument, etc.  This is what is being avoided; it's a messy
-way to writer code and prone to error.
+way to write code and prone to error.
 
 =item 2.
 
@@ -196,50 +170,7 @@ this one purpose.
 These challenges can be solved by Curio and, by solving them,
 your applications will be more robust and resilient to change.
 
-=head1 IMPORTANT PRACTICES
-
-=head2 Avoid Holding onto Curio Objects and Resources
-
-Curio is designed to make it cheap to retrieve Curio objects
-and the underlying resources.  Take advantage of this.  Don't
-pass around your resource objects or put them in attributes.
-Instead, when you need them, get the from your Curio classes.
-
-If your Curio class supports keys, then passing around the
-key that you want particular code to be using, rather than the
-Curio object or the resource, is a much better way of handling
-things.
-
-Read more of the reasoning for this in L</MOTIVATION>.
-
-=head2 Use Curio Directly
-
-It is tempting to use the L</INTEGRATIONS> such as
-L<Catalyst::Model::Curio>, and sometimes it is necessary to do so.
-Most of the time there is no need to add that extra layer of complexity.
-
-Using Catalyst as an example, there are few reasons you can't
-just use your Curio classes directly from your Catalyst controllers.
-
-At ZipRecruiter, where we have some massive Catalyst applications, we
-only use Catalyst models in the few cases where other parts of
-Catalyst demand that models be setup.  For the most part we bypass the
-model system completely and it makes everything much cleaner and
-easier to deal with.
-
-=head2 Appropriate Uses of Key Aliases
-
-Key aliases are meant as a tool for migrating and merging keys.
-They are meant to be something you temporarily setup as you change
-your code to use the new keys, and then once done you remove the
-aliases.
-
-It can be tempting to use key aliases to provide simpler or alternative
-names for existing keys.  The problem with doing this is now you've
-introduced multiple keys for the same Curio class which in practice
-does cause unnecessary confusion.
-
-=head1 AVAILABLE ROLES
+=head1 ROLES
 
 These roles, available on CPAN, provide a base set of functionality
 for your Curio classes to wrap around specific resource types.
@@ -249,6 +180,10 @@ for your Curio classes to wrap around specific resource types.
 =item *
 
 L<Curio::Role::CHI>
+
+=item *
+
+L<Curio::Role::GitLab::API::v4>
 
 =back
 
@@ -267,7 +202,7 @@ L<Catalyst::Model::Curio>
 
 =back
 
-On a related note, take a look at L</Use Curio Directly>.
+On a related note, take a look at L<Curio::Manual/Use Curio Directly>.
 
 =head1 SEE ALSO
 
@@ -303,7 +238,7 @@ development this distribution would not exist.
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <aran@bluefeet.dev>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

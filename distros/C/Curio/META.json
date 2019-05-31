@@ -1,7 +1,7 @@
 {
    "abstract" : "Procurer of fine resources and services.",
    "author" : [
-      "Aran Clary Deltac <aran@bluefeet.dev>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
@@ -74,23 +74,23 @@
    "provides" : {
       "Curio" : {
          "file" : "lib/Curio.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Curio::Declare" : {
          "file" : "lib/Curio/Declare.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Curio::Factory" : {
          "file" : "lib/Curio/Factory.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Curio::Role" : {
          "file" : "lib/Curio/Role.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Curio::Util" : {
          "file" : "lib/Curio/Util.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -104,7 +104,7 @@
          "web" : "https://github.com/bluefeet/Curio"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:BLUEFEET",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Quiq::Hash;
 use Quiq::Properties;
@@ -311,11 +311,11 @@ Liste von Zeilendaten (Strings).
 
 =head4 Description
 
-Füge eine Zeile mit den Daten @arr zur Tabelle hinzu. Die Anzahl der
+Füge eine Zeile mit den Kolumnenwerten @arr zur Tabelle hinzu. Die Anzahl der
 Elemente in @arr muss mit der Anzahl der Kolumnen übereinstimmen,
-sonst wird eine Exception geworfen.
-
-Sind durch
+sonst wird eine Exception geworfen. Durch das Hinzufügen einer Zeile
+werden die gecachten Kolumneneigenschaften - sofern vorhanden -
+gelöscht (siehe Methode L<properties|"properties() - Eigenschaften einer Kolumne">()).
 
 =cut
 
@@ -537,7 +537,7 @@ sub asText {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

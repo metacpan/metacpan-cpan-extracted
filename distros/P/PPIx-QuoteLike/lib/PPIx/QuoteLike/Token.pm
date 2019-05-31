@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use PPIx::QuoteLike::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 # Private to this package.
 sub __new {
@@ -103,6 +103,18 @@ This is an abstract class, and should not be instantiated by the user.
 =head1 DESCRIPTION
 
 This Perl module represents the base of the token hierarchy.
+
+=head1 INHERITANCE
+
+C<PPIx::QuoteLike::Token> is not descended from any other class.
+
+C<PPIx::QuoteLike::Token> is the parent of
+L<PPIx::QuoteLike::Token::Control|PPIx::QuoteLike::Token::Control>,
+L<PPIx::QuoteLike::Token::Interpolation|PPIx::QuoteLike::Token::Interpolation>,
+L<PPIx::QuoteLike::Token::String|PPIx::QuoteLike::Token::String>,
+L<PPIx::QuoteLike::Token::Structure|PPIx::QuoteLike::Token::Structure>,
+L<PPIx::QuoteLike::Token::Unknown|PPIx::QuoteLike::Token::Unknown> and
+L<PPIx::QuoteLike::Token::Whitespace|PPIx::QuoteLike::Token::Whitespace>.
 
 =head1 METHODS
 
@@ -205,7 +217,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2018 by Thomas R. Wyant, III
+Copyright (C) 2016-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

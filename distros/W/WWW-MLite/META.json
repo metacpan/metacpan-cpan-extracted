@@ -1,12 +1,12 @@
 {
    "abstract" : "Lite Web Application Framework",
    "author" : [
-      "Lepenkov Sergey (Serz Minus) <minus@mail333.com>"
+      "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "open_source"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,36 +33,28 @@
       },
       "runtime" : {
          "recommends" : {
-            "DBI" : "0",
             "Data::Dumper" : "0"
          },
          "requires" : {
-            "Archive::Extract" : "0.6",
-            "CGI::Session" : "4.42",
-            "CTK" : "1.16",
-            "DBI" : "0",
-            "Digest" : "1.16",
-            "Digest::MD5" : "2.36",
-            "ExtUtils::Manifest" : "1.58",
-            "File::Copy" : "2.09",
-            "File::Copy::Recursive" : "0.38",
-            "File::Find" : "0",
+            "CTK" : "2",
             "File::Temp" : "0.22",
-            "Module::Load" : "0",
+            "HTTP::Message" : "6.08",
+            "IO" : "0",
+            "Storable" : "0",
             "URI" : "1.5",
-            "perl" : "5.008001"
+            "perl" : "5.016001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://www.serzik.com",
+      "homepage" : "https://www.serzik.com",
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
+         "https://dev.perl.org/licenses"
       ],
       "repository" : {
          "url" : "http://svn.serzik.com/WWW-MLite/trunk"
       }
    },
-   "version" : "1.05"
+   "version" : "2.00"
 }

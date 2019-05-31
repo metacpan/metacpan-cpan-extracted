@@ -1,6 +1,8 @@
 Build.PL
 Changes
+eg/README
 eg/pqldump
+eg/variables
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 inc/My/Module/Recommend.pm
@@ -25,6 +27,7 @@ README
 t/basic.t
 t/dump.t
 t/parse.t
+t/variables.t
 t/version.t
 xt/author/carp_not.t
 xt/author/changes.t

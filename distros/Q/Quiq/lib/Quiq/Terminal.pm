@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -267,15 +267,15 @@ B<Terminal-Eigenschaften>
 
 Rote Schrift:
 
-    Quiq::Terminal->ansiEsc('red');
+    $esc = Quiq::Terminal->ansiEsc('red');
 
 Fette weiße Schrift auf rotem Grund:
 
-    Quiq::Terminal->ansiEsc('bold white on_red');
+    $esc = Quiq::Terminal->ansiEsc('bold white on_red');
 
 Terminal in den Anfangszustand zurückversetzen:
 
-    Quiq::Terminal->ansiEsc('reset');
+    $esc = Quiq::Terminal->ansiEsc('reset');
 
 =cut
 
@@ -290,7 +290,7 @@ sub ansiEsc {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

@@ -1,0 +1,21 @@
+This directory contains sample Perl scripts that make use of the
+PPIx::QuoteLike modules. Specifically it contains:
+
+README
+    This file
+
+pqldump
+    This script dumps quotelike things from its argument, which can be
+    either the name of a Perl file or a literal string. In the former
+    case the file is run through PPI::Document and anything looking like
+    a string is dumped. In the latter case the content of the argument
+    is dumped. Regular expressions are not dumped by this script; see
+    eg/predump in the PPIx-Regexp distribution for that.
+
+variables
+    This script lists all variables used by the file or literal Perl
+    code given in its argument. Variables will be found in regular
+    expressions only if PPIx::Regexp can be loaded.
+
+
+# ex: set filetype=text textwidth=72 autoindent :

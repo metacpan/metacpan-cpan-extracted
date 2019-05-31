@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 use Encode ();
 use Quiq::Reference;
@@ -26,11 +26,9 @@ L<Quiq::Object>
 
 =head1 DESCRIPTION
 
-Ein Objekt der Klasse repräsentiert ein Array.
-
-Jede der Methoden kann sowohl auf ein Objekt der Klasse
-als auch per Aufruf als Klassenmethode auf ein "normales"
-Perl-Array angewendet werden.
+Ein Objekt der Klasse repräsentiert ein Array. Jede der Methoden kann
+sowohl auf ein Objekt der Klasse als auch per Aufruf als Klassenmethode
+auf ein ungeblesstes Perl-Array angewendet werden.
 
 Aufruf als Objektmethode:
 
@@ -54,7 +52,7 @@ Aufruf als Klassenmethode:
 =head4 Description
 
 Instantiiere ein Array-Objekt und liefere eine Referenz auf dieses
-Objekt zurück.  Ohne Angabe einer Array-Referenz wird ein leeres
+Objekt zurück. Ohne Angabe einer Array-Referenz wird ein leeres
 Array-Objekt instantiiert.
 
 =cut
@@ -110,6 +108,8 @@ Die drei Ergebnislisten sind als Mengen zu sehen: Jedes Element taucht
 in einer der drei Listen höchstens einmal auf, auch wenn es in den
 Eingangslisten mehrfach vorkommt.
 
+Die gelieferten Arrays sind auf die Klasse geblesst.
+
 =head4 Example
 
 =over 2
@@ -118,7 +118,7 @@ Eingangslisten mehrfach vorkommt.
 
 Verwalte Objekte auf Datenbank
 
-Die Funktion ist nützlich, wenn eine Menge von Objekten
+Die Methode ist nützlich, wenn eine Menge von Objekten
 auf einer Datenbank identisch zu einer Menge von Elementen
 einer Benutzerauswahl gehalten werden soll. Die Objekte werden
 durch ihre Objekt-Id identifiziert. Die Liste der
@@ -133,7 +133,7 @@ Die Liste der identischen Objekte wird hier nicht benötigt.
 
 =item *
 
-Prüfe, ob zwei Arrays die gleichen Elemente enthalten
+Prüfe zwei Arrays auf Identiät
 
 Prüfe, ob zwei Arrays die gleichen Elemente enthalten, aber nicht
 unbedingt in der gleichen Reihenfolge:
@@ -1060,7 +1060,7 @@ sub restore {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 

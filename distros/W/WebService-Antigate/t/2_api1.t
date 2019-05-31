@@ -33,6 +33,8 @@ is($recognizer->last_captcha_id, CAPTCHA_ID, '->last_captcha_id');
 is($recognizer->recognize(CAPTCHA_ID), CAPTCHA_TEXT, '->recognize(CAPTCHA_ID)');
 is($recognizer->recognize(CAPTCHA_ID+1), undef, '->recognize(CAPTCHA_ID+1)');
 
+is($recognizer->upload(method => 'userrecaptcha'), CAPTCHA_ID, '->upload without content');
+
 is($recognizer->abuse(CAPTCHA_ID), 1, '->abuse(CAPTCHA_ID)');
 is($recognizer->abuse(CAPTCHA_ID+1), undef, '->abuse(CAPTCHA_ID+1)');
 

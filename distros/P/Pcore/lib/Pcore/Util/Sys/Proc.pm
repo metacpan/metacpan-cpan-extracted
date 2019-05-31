@@ -7,9 +7,9 @@ use if $MSWIN, 'Win32::Process';
 use POSIX qw[:sys_wait_h];
 use Config qw[%Config];
 use overload    #
-  q[bool] => sub { return $_[0]->is_success },
-  q[<=>]  => sub { return !$_[2] ? $_[0]->_get_exit_code <=> $_[1] : $_[1] <=> $_[0]->_get_exit_code },
-  q[""]   => sub { return $_[0]->{status} . $SPACE . $_[0]->{reason} },
+  q[bool]  => sub { return $_[0]->is_success },
+  q[<=>]   => sub { return !$_[2] ? $_[0]->_get_exit_code <=> $_[1] : $_[1] <=> $_[0]->_get_exit_code },
+  q[""]    => sub { return $_[0]->{status} . $SPACE . $_[0]->{reason} },
   fallback => undef;
 
 has win32_alive_timeout => 0.5;
@@ -159,7 +159,7 @@ sub _create_process ( $self, $cmd, $win32_cflags, $restore ) {
 
     # prepare environment
     local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
-    local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
+    local $ENV{PATH}     = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
 
     # run process
     if ($MSWIN) {

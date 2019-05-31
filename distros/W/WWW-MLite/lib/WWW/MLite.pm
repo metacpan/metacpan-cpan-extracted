@@ -1,5 +1,8 @@
-package WWW::MLite; # $Id: MLite.pm 32 2014-08-01 10:31:31Z minus $
+package WWW::MLite; # $Id: MLite.pm 44 2019-05-31 10:06:54Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,81 +10,395 @@ WWW::MLite - Lite Web Application Framework
 
 =head1 VERSION
 
-Version 1.05
+Version 2.00
 
 =head1 SYNOPSIS
 
-    use WWW::MLite;
+    package MyApp;
 
-=head1 ABSTRACT
+    use base qw/WWW::MLite/;
 
-WWW::MLite - Lite Web Application Framework
+    use HTTP::Status qw/:constants/;
+    use Data::Dumper;
+
+    __PACKAGE__->register_method( # GET /myapp
+        name    => "getIndex",
+        description => "Index page",
+        method  => "GET",
+        path    => "/myapp",
+        deep    => 0,
+        attrs   => {
+                foo         => 'blah-blah-blah',
+                bar         => 'on',
+                deserialize => 0,
+                serialize   => 1,
+            },
+        requires => undef,
+        returns => undef,
+        code    => sub {
+        my $self = shift;
+        my @params = @_;
+
+        $self->data(Dumper({
+                params => [@params],
+                name   => $self->name,
+                description => $self->info("description"),
+                attrs  => $self->info("attrs"),
+                path   => $self->info("path"),
+                method => $self->info("method"),
+                requires => $self->info("requires"),
+                returns => $self->info("returns"),
+            }));
+
+        return HTTP_OK; # HTTP RC
+    });
+
+    1;
+
+    package main;
+
+    use FindBin qw/$Bin/;
+    use lib "$Bin/../lib";
+
+    use CGI;
+    use File::Spec;
+
+    my $q = new CGI;
+    my $server = MyApp->new(
+        project     => "MyApp",
+        ident       => "myapp",
+        root        => File::Spec->catdir($Bin, "conf"),
+        #confopts    => {... Config::General options ...},
+        configfile  => File::Spec->catfile($Bin, "conf", "myapp.conf"),
+        log         => "on",
+        logfd       => fileno(STDERR),
+        #logfile     => '/path/to/log/file.log',
+        nph         => 0, # NPH (no-parsed-header)
+    );
+    print $server->call($q->request_method, $q->request_uri, $q) or die($server->error);
 
 =head1 DESCRIPTION
 
 Lite Web Application Framework
 
-=head1 METHODS
+This module allows you to quickly and easily write a REST servers
 
-=over 8
+=head2 new
 
-=item B<new>
+    my $server = MyApp->new(
+        project     => "MyApp",
+        ident       => "myapp",
+        root        => File::Spec->catdir($Bin, "conf"),
+        #confopts    => {... Config::General options ...},
+        configfile  => File::Spec->catfile($Bin, "conf", "myapp.conf"),
+        log         => "on",
+        logfd       => fileno(STDERR),
+        #logfile     => '/path/to/log/file.log',
+        nph         => 0, # NPH (no-parsed-header)
+    );
 
-    my $mlite = new WWW::MLite( ... args ... );
+Returns CTK object as WWW::MLite server
 
-Returns object
+=over 4
 
-=item B<show>
+=item confopts
 
-    $mlite->show( qw/foo bar baz/ );
+Optional value. L<Config::General> options
 
-Run project and send data to Apache
+=item configfile
 
-=item B<register>
+File of configuration
 
-    $mlite->register( qw/Foo Bar Baz/ );
+Default: /etc/myapp/myapp.conf
 
-Register all announced modules after creating object
+=item log
 
-=item B<get_recs>
+General switch for logging enable/disable
 
-    $mlite->get_recs( qw/foo bar baz/ )
+Default: off
 
-Get metadata as one hash
+Also see configuration for logging manage
 
-=item B<get_rec>
+=item logfd
 
-    my $data = $mlite->get_rec( "foo" )
+File descriptor or fileno
 
-Get data one key only
+Default: none (use syslog)
 
-=item B<get_node, get>
+See L<IO::Handle>
 
-    my $name = $mlite->get( 'name' );
+=item logfile
 
-Getting node by name
+Log file path. Not recommended!
 
-=item B<set_node, set>
+=item nph
 
-    $mlite->set( key => 'value' );
+Enable or disable NPH mode (no-parsed-header)
 
-Setting node by name
+Default: 0
 
-=item B<config, conf>
+See L<CGI/USING-NPH-SCRIPTS>
 
-    my $config = $mlite->config;
+This option for the response subroutine only!
 
-Getting config-node
+=item root
+
+Root directory for project. This is NOT document root directory!
+
+Default: /etc/myapp
 
 =back
 
+See also L<CTK> and L<CTK::App>
+
+=head1 METHODS
+
+List of available methods
+
+=head2 call
+
+See L</call_method>
+
+=head2 call_method
+
+    $server->call_method( $ENV{REQUEST_URI}, $ENV{REQUEST_METHOD}, ... );
+
+Runs the callback function from current method with additional parameters
+
+Note: any number of parameters can be specified,
+all of them will be receive in the callback function and in your overridden the response subroutine
+
+Returns: response content
+
+=head2 check_http_method
+
+    $server->check_http_method("GET"); # returns 1
+    $server->check_http_method("OPTIONS"); # returns 0
+
+Checks the availability of the HTTP method by its name and returns the status
+
+=head2 code
+
+    my $code = $server->code;
+    my $code = $server->code( 500 );
+
+Gets/Sets response HTTP code
+
+Default: 200 (HTTP_OK)
+
+See L<HTTP::Status>
+
+=head2 cleanup
+
+    $server->cleanup;
+
+Cleans the all working data and resets it to default values
+
+=head2 data
+
+    my $data = $server->data;
+    $server->data({
+            param1 => "new value",
+        });
+
+Gets/Sets working data structure or HTTP content
+
+Default: undef
+
+See L<HTTP::Response>
+
+=head2 head
+
+    my $head = $server->head;
+    $server->head({
+            "Content-Type" => "text/plain",
+        });
+
+Gets/Sets HTTP headers
+
+Default: "text/plain"
+
+See L<HTTP::Headers>
+
+=head2 info
+
+    my $info = $server->info;
+    my $description => $server->info("description");
+    my $attrs = $server->info("attrs");
+    my $path = $server->info("path");
+    my $method = $server>info("method");
+    my $requires = $server->info("requires");
+    my $returns = $server->info("returns");
+
+Returns the info structure or info-data of current method
+
+=head2 lookup_method
+
+    my $method = $server->lookup_method($ENV{REQUEST_URI}, $ENV{REQUEST_METHOD});
+
+Returns $method structure from hash of registered methods; or undef if method is not registered
+
+=head2 message
+
+    my $message = $server->message;
+    my $message = $server->message( "Internal Server Error" );
+
+Gets/Sets response HTTP message
+
+Default: "OK"
+
+See L<HTTP::Status>
+
+=head2 name
+
+    my $name = $server->name;
+
+Returns name of current method. Default: default
+
+=head2 register_method
+
+    use base qw/WWW::MLite/;
+
+    use HTTP::Status qw/:constants/;
+    use Data::Dumper;
+
+    __PACKAGE__->register_method( # GET /myapp
+        name    => "getIndex",
+        description => "Index page",
+        method  => "GET",
+        path    => "/myapp",
+        deep    => 0,
+        attrs   => {
+                foo         => 'blah-blah-blah',
+                bar         => 'on',
+                deserialize => 0,
+                serialize   => 1,
+            },
+        requires => [
+                qw/ user1 user2 userX /
+            ],
+        returns => {
+                type => 'any',
+            },
+        code    => sub {
+        my $self = shift;
+        my @params = @_;
+
+        # ... your method's code here ...
+
+        return HTTP_OK; # HTTP RC
+    });
+
+Registers new method and returns operation status
+
+B<NOTE!> This is non class method!
+
+=over 4
+
+=item attrs
+
+Sets attributes of the method as hashref
+
+Default: {}
+
+In the method's code or response method, you can get the attribute values using the $self->info("attrs") method
+
+=item code
+
+Sets callback function
+
+Default: sub { return HTTP::Status::HTTP_OK }
+
+This callback function MUST return HTTP status code
+
+See L<HTTP::Status>
+
+=item deep, depth
+
+Enables deeply scanning of path for method lookup. If this param is set to true then the
+mechanism of the deeply lookuping will be enabled. For example:
+
+For registered path /foo with enabled deep lookuping will be matched any another
+incoming path that begins from /foo prefix: /foo, /foo/bar, /foo/bar/baz and etc.
+
+Default: 0
+
+=item description
+
+Sets the description of method
+
+Default: none
+
+=item name
+
+Sets the name of method
+
+Default: default
+
+=item method
+
+Sets the HTTP method for trapping. Supported: GET, POST, PUT, DELETE.
+
+Default: GET
+
+=item path
+
+Sets the URL's path for trapping
+
+Default: /
+
+=item requires
+
+Array-ref structure that contains list of groups/users or any data for authorization
+
+Default: []
+
+=item returns
+
+Hash-ref structure that contains schema
+
+Default: {}
+
+See L<JSON::Schema>, L<JSON::Validator>, L<http://json-schema.org/>
+
+=back
+
+=head2 response
+
+The method for response prepare.
+
+You can override this method in Your class.
+
+But note! This method MUST returns serialized or plain content for output
+
+For examle:
+
+    sub response {
+        my $self = shift;
+        my $rc = $self->code; # RC HTTP code (from yuor methods)
+        my $head = $self->head; # HTTP Headers (hashref)
+        my $data = $self->data; # The working data
+        my $msg = $self->message || HTTP::Status::status_message($rc) || "Unknown code";
+
+        my @res = (sprintf("Status: %s %s", $rc, $msg));
+        push @res, sprintf("Content-Type: %s", "text/plain; charset=utf-8");
+        push @res, "", $data // "";
+        return join("\015\012", @res);
+    }
+
+=head2 again
+
+Internal use only!
+
+See L<CTK::App/again>
+
+=head1 EXAMPLES
+
+See all examples on METACPAN website L<https://metacpan.org/release/WWW-MLite>
+
 =head1 HISTORY
 
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<CTK>
+See C<Changes> file
 
 =head1 TO DO
 
@@ -91,201 +408,366 @@ See C<TODO> file
 
 * none noted
 
+Please report any bugs to https://rt.cpan.org/.
+
 =head1 SEE ALSO
 
-C<perl>, L<CTK>
+L<CTK>, L<HTTP::Message>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.05';
+$VERSION = '2.00';
 
-use Module::Load;
-use CTK::Util qw/ :API /;
+use base qw/ CTK /;
+$CTK::PLUGIN_ALIAS_MAP{log} = "WWW::MLite::Log";
+
+use Storable qw/dclone/; # for dclone
+use HTTP::Status qw//;
+use HTTP::Message;
+use HTTP::Headers;
+use HTTP::Response;
+use HTTP::Date;
 use CTK::ConfGenUtil;
-use WWW::MLite::Config;
-
-use base qw/
-        WWW::MLite::Log
-        WWW::MLite::Transaction
-    /;
+use CTK::TFVals qw/ :ALL /;
 
 use constant {
-        HANDLER         => 'handler',
+        APP_PLUGINS => [qw/
+                config log
+            /],
+        METHODS => {
+                GET     => 1,
+                POST    => 1,
+                PUT     => 1,
+                DELETE  => 1,
+                PATCH   => 1,
+            },
+        EOL                 => "\015\012",
+        KEY_MASK            => "%s#%s", # METHOD, PATH
+        REG_KEY_MASK        => "%s#%s#%d", # CLASS, SERVER_NAME, SERVER_PORT
+        DEFAULT_METHOD      => "GET",
+        DEFAULT_NAME        => "default",
+        DEFAULT_PATH        => "/", # Root
+        DEFAULT_SERVER_NAME => "localhost",
+        DEFAULT_SERVER_PORT => 80,
+        DEFAULT_CONTENT_TYPE=> "text/plain",
     };
 
-sub new {
-    my $class   = shift;
-    my %args    = @_;
-    
-    # Подгружаем модуль
-    my $h_module = $args{module};
-    croak("The 'module' argument missing") unless $h_module;
-    load $h_module;
-    #croak("Module '$h_module' can't loaded");
+my %method_registry;
 
-    # Проверяем наличие главного хендлера
-    my $h_handler = $args{handler} || HANDLER;
-    croak("The 'handler' argument missing") unless $h_handler;
-    my $handler = undef;
-    #eval "\$handler = $h_module->can(\$h_handler)"; croak("Method '$h_handler' not exists. $@") if $@;
-    croak("Method '$h_handler' not exists") unless $handler = $h_module->can($h_handler);
-    
-    
-    
+sub again {
+    my $self = shift;
+    my $args = $self->origin;
+    my $status = $self->load_plugins(@{(APP_PLUGINS)});
+    $self->{status} = 0 unless $status;
+    my $config = $self->configobj;
 
-    my $self = bless {
-        name        => $args{name} || 'noname',
-        prefix      => defined($args{prefix}) ? $args{prefix} : '',
-        module      => $h_module,
-        handler     => $handler,
-        params      => $args{params},
-        register    => _to_arrayref($args{register}),
-        meta        => {},
-        inheritance => $args{inheritance} ? 1 : 0, # Включить наследование зерегистрированных модулей
-        config      => new WWW::MLite::Config( # Конфигурационные опции
-                            file => $args{config_file}, 
-                            dirs => $args{config_dirs},
-                        ),
-    }, $class;
-    
-    # Регистрация модулей, если они заданы
-    $self->register();
+    # Autoloading logger (data from config)
+    my $log_on = $config->get("logenable") || $config->get("logenabled") || 0;
+    if ($self->logmode && $log_on) {
+        my $logopts = $args->{logopts} || {};
+        my $logfile = defined($args->{logfile}) ? $self->logfile : $config->get("logfile"); # From args or config
+        $logopts->{facility} = $args->{logfacility} if defined($args->{logfacility}); # From args only!
+        if ($args->{logfd}) {
+            $logopts->{fd} = $args->{logfd};
+        } else {
+            $logopts->{file} = $logfile if defined($logfile) && length($logfile);
+        }
+        $logopts->{ident} = defined($args->{ident})
+            ? $args->{ident}
+            : ($config->get("logident") // $self->project); # From args or config
+        $logopts->{level} = defined($args->{loglevel})
+            ? $args->{loglevel}
+            : ($config->get("loglevel")); # From args or config
+        $self->logger_init(%$logopts) or do {
+            $self->error("Can't initialize logger");
+            $self->{status} = 0;
+        };
+    }
+
+    # Set methods
+    my $registry_key = sprintf(REG_KEY_MASK,
+        ref($self),
+        $ENV{SERVER_NAME} || DEFAULT_SERVER_NAME,
+        $ENV{SERVER_PORT} || DEFAULT_SERVER_PORT,
+    );
+    $self->{methods} = exists($method_registry{$registry_key}) ? $method_registry{$registry_key} : {},
+
+    # Set name, info, code, head, data
+    $self->{name} = undef; # Method name
+    $self->{info} = undef; # Method info (without code)
+    $self->{code} = undef; # Response code (RC)
+    $self->{message} = undef; # Response message
+    $self->{head} = undef; # Response headers
+    $self->{data} = undef; # Response data
+    $self->{request_method} = undef; # Request method
+    $self->{request_uri} = undef; # Request uri
 
     return $self;
 }
-sub show {
-    my $self = shift;
-    croak("The method call not in the WWW::MLite context") unless ref($self) =~ /WWW\:\:MLite/;
-    return $self->{handler}->($self, @_);
-}
-sub register {
-    my $self = shift;
-    my @mdls = @_;
-    @mdls = @{($self->{register})} unless @mdls;
-    return 0 unless @mdls;
-    
-    load $_ for @mdls;
-    push @WWW::MLite::ISA, @mdls if $self->{inheritance};
-    my $meta = $self->{meta};
-    
-    for (@mdls) {
-        my @rec = (); 
-        if ($_->can("meta")) {
-            @rec = $_->meta;
-        } else {
-            carp("Method 'meta' not exists in $_ package");
-            next;
-        }
-        $meta->{$_} = {
-                status      => 'registered',
-                actions     => {@rec},
-            };
+
+sub register_method {
+    my $class = shift; # Caller's class
+    croak("Can't use reference in class name context") if ref($class);
+    my %info = @_;
+    my $registry_key = sprintf(REG_KEY_MASK,
+        $class,
+        $ENV{SERVER_NAME} || DEFAULT_SERVER_NAME,
+        $ENV{SERVER_PORT} || DEFAULT_SERVER_PORT,
+    );
+    $method_registry{$registry_key} = {} unless exists($method_registry{$registry_key});
+    my $methods = $method_registry{$registry_key};
+
+    # Method & Path
+    my $meth = $info{method} || DEFAULT_METHOD;
+    $meth = DEFAULT_METHOD unless grep {$_ eq $meth} keys %{(METHODS())};
+    my $path = $info{path} // "";
+    $path =~ s/\/+$//;
+    $path = DEFAULT_PATH unless length($path);
+
+    # Meta
+    my $name = $info{name} || DEFAULT_NAME;
+    my $code = $info{code} || sub {return HTTP::Status::HTTP_OK};
+    my $attrs = $info{attrs} && is_hash($info{attrs}) ? $info{attrs} : {};
+    my $returns = $info{returns} && is_hash($info{returns}) ? $info{returns} : {};
+    my $description = $info{description} || "";
+    my $deep = $info{deep} || $info{depth} || 0;
+    my $requires = array($info{requires} || []);
+
+    # Key
+    my $key = sprintf(KEY_MASK, $meth, $path);
+    if ($methods->{$key}) {
+        my $tname = $methods->{$key}{name} || DEFAULT_NAME;
+        return 0 if $tname ne $name;
     }
+
+    $methods->{$key} = {
+            method  => $meth,
+            path    => $path,
+            name    => $name,
+            code    => $code,
+            deep    => $deep,
+            requires=> $requires,
+            attrs   => $attrs,
+            returns => $returns,
+            description => $description,
+        };
     return 1;
 }
-sub get_recs {
-    # Get metadata as one hash where key = name of action, value = data of action
+sub check_http_method {
     my $self = shift;
-    my @rq = @_;
-    my $metas = hash($self->{meta});
-    my %recs = ();
-    foreach my $k (keys %$metas) {
-        my $actions = hash($metas, $k, "actions");
-        foreach my $a (keys %$actions) {
-            if (@rq) {
-                next unless grep {$a eq $_} @rq;
-            }
-            $recs{$a} = hash($actions, $a);
-            $recs{$a}{module} = $k;
-        }
-    }
-    return {%recs}
+    my $meth = shift;
+    return 0 unless $meth;
+    return 1 if $meth eq 'HEAD';
+    my $meths = METHODS;
+    return $meths->{$meth} ? 1 : 0;
 }
-sub get_rec {
-    # Get data by name of action
+
+sub name {
+    my $self = shift;
+    return $self->{name} || DEFAULT_NAME;
+}
+sub info {
     my $self = shift;
     my $name = shift;
-    return {} unless defined $name;
-    return hash($self->get_recs($name), $name);
+    my $meta = dclone($self->{info} || {name => $self->name});
+    return $meta unless defined($name);
+    return undef unless defined $meta->{$name};
+    return $meta->{$name};
+}
+sub code {
+    my $self = shift;
+    my $value = shift;
+    return fv2zero($self->{code}) unless defined($value);
+    $self->{code} = $value || HTTP::Status::HTTP_OK;
+    return $self->{code};
+}
+sub message {
+    my $self = shift;
+    my $value = shift;
+    return $self->{message} unless defined($value);
+    $self->{message} = $value || HTTP::Status::status_message(HTTP::Status::HTTP_OK);
+    return $self->{message};
+}
+sub head {
+    my $self = shift;
+    my $struct = shift;
+    return $self->{head} unless defined($struct);
+    $self->{head} = $struct;
+    return $struct;
+}
+sub data {
+    my $self = shift;
+    my $struct = shift;
+    return $self->{data} unless defined($struct);
+    $self->{data} = $struct;
+    return $struct;
 }
 
-sub get_node {
-    # Прочитать ноду из глобального массива
+sub lookup_method {
     my $self = shift;
-    my $node = shift;
-    return $self->{$node};
-}
-sub get { goto &get_node };
-sub set_node {
-    # Добавить ноду к глобальному массиву
-    my $self = shift;
-    my $node = shift;
-    my $data = shift;
-    $self->{$node} = $data;
-}
-sub set { goto &set_node };
-sub config { return shift->{config}; };
-sub conf { goto &config };
+    my ($imeth, $ipath) = @_;
 
-sub _to_arrayref {
-    my $p = shift;
-    if ($p && ref($p) eq 'ARRAY') {
-        return $p;
-    } elsif (defined($p)) {
-        return [$p];
+    # Method
+    my $meth = uc($imeth || DEFAULT_METHOD);
+    $meth = "GET" if $meth eq 'HEAD';
+    unless ($self->check_http_method($meth)) {
+        $self->error(sprintf("The HTTP %s method not allowed", $meth));
+        return undef;
     }
-    return [];
-}
-sub AUTOLOAD {
-    # Это своего рода интерфейс ко всем свойствам через объектную модель
-    # если такого свойства не окажится, то значит ругаемся карпом !!
-    my $self = shift;
-    our $AUTOLOAD;
-    my $AL = $AUTOLOAD;
-    my $ss = undef;
-    $ss = $1 if $AL=~/\:\:([^\:]+)$/;
-    if ($ss && defined($self->{$ss})) {
-        return $self->{$ss};
-    } else {
-        carp("Can't find WWW::MLite node \"$ss\"");
+
+    # Path
+    my $path = $ipath || DEFAULT_PATH;
+    $path =~ s/[?\#](.*)$//;
+    $path =~ s/\/+$//;
+    $path = DEFAULT_PATH unless length($path);
+
+    # Get method
+    my $name;
+    my $key = sprintf(KEY_MASK, $meth, $path);
+    my $methods = $self->{methods};
+    # ...by key
+    return $methods->{$key} if $methods->{$key}
+        && $methods->{$key}{name}
+        && $methods->{$key}{code};
+    # ...by path
+    foreach my $p (_scan_backward($path)) {
+        my $ikey = sprintf(KEY_MASK, $meth, $p);
+        return $methods->{$ikey} if $methods->{$ikey}
+            && $methods->{$ikey}{deep}
+            && $methods->{$ikey}{name}
+            && $methods->{$key}{code};
     }
+    $self->error(sprintf("Method not found (%s %s)", $meth, $path));
     return undef;
 }
-sub DESTROY {
+sub call_method {
     my $self = shift;
-    #print STDERR "Object WWW::MLite destroyed\n";
-    return 1 unless $self && ref($self);
-    #my $oo = $self->oracle;
-    #my $mo = $self->mysql;
-    #my $msoo = $self->multistore;
-    #undef $oo;
-    #undef $mo;
-    #undef $msoo;
+    my $meth = shift;
+    my $path = shift;
+    my @params = @_;
+    $self->cleanup;
+    $self->{request_method} = $meth;
+    $self->{request_uri} = $path;
+    my $method = $self->lookup_method($meth, $path) or return;
+    unless(ref($method) eq 'HASH') {
+        $self->error("Incorrect method structure");
+        return;
+    }
+
+    # Get info
+    my %info;
+    my $func;
+    foreach my $k (keys %$method) {
+        next unless defined $k;
+        if ($k eq 'code') {
+            $func = $method->{code};
+            next;
+        } elsif ($k eq 'name') {
+            $self->{name} = $method->{name};
+        }
+        $info{$k} = $method->{$k};
+    }
+    $self->{info} = dclone(\%info);
+
+    # Call method
+    my $rc;
+    if(ref($func) eq 'CODE') {
+        $rc = &$func($self, @params);
+    } else {
+        $self->message(sprintf("The code of method %s not found!", $self->name));
+        $rc = HTTP::Status::HTTP_NOT_IMPLEMENTED;
+    }
+    $self->{code} = $rc;
+
+    # Call response
+    unless (HTTP::Status::status_message($rc)) {
+        $self->message(sprintf("Method %s returns incorrect HTTP status code!", $self->name));
+        $self->{code} = HTTP::Status::HTTP_INTERNAL_SERVER_ERROR;
+    }
+    return $self->response(@params);
+}
+sub call { goto &call_method }
+
+sub cleanup {
+    my $self = shift;
+    $self->error(""); # Flush error
+    $self->{name} = undef; # Method name
+    $self->{info} = undef; # Method info (without code)
+    $self->{code} = undef; # Response code (RC)
+    $self->{message} = undef; # Response message
+    $self->{head} = undef; # Response headers
+    $self->{data} = undef; # Response data
+    $self->{request_method} = undef; # Request method
+    $self->{request_uri} = undef; # Request uri
     return 1;
 }
 
+sub response {
+    my $self = shift;
+    my $rc = $self->code;
+    my $head = $self->head;
+    my $data = $self->data;
+    my $msg = $self->message || HTTP::Status::status_message($rc) || "Unknown code";
+
+    # Content
+    my $dct = DEFAULT_CONTENT_TYPE;
+    my $content = $data // "";
+    $content = "" if $rc =~ /^(1\d\d|[23]04)$/; # make sure content we have no content
+    if (utf8::is_utf8($content)) {
+        utf8::encode($content);
+        $dct .= "; charset=utf-8";
+    }
+    my $cl = length($content);
+    $cl += length("\n") if $self->origin->{nph}; # Hack for HTTP::Message::as_string (eol char)
+
+    # Headers
+    my $h = HTTP::Headers->new(Status => sprintf("%s %s", $rc, $msg));
+    if (is_void($head)) { # No data!
+        $h->header('Server' => sprintf("%s/%s", __PACKAGE__, $VERSION));
+        $h->header('Connection' => 'close');
+        $h->header('Date' => HTTP::Date::time2str(time()));
+        $h->header('Content-Type' => $dct);
+    } elsif (is_hash($head)) { # Data!
+        $h->header(%$head);
+    }
+    $h->header('Content-Length' => $cl) if $cl && !$h->header('Content-Length');
+
+    # Response
+    my $ishead = $self->{request_method} && $self->{request_method} eq 'HEAD' ? 1 : 0;
+    my $r = HTTP::Response->new($rc, $msg, $h, ($cl && !$ishead ? $content : ""));
+
+    # Done!
+    return $self->origin->{nph}
+        ? $r->as_string
+        : join(EOL, $r->{'_headers'}->as_string(EOL), ($cl && !$ishead ? $content : ""));
+}
+
+sub _scan_backward { # Returns for /foo/bar/baz array: /foo/bar/baz, /foo/bar, /foo, /
+    my $p = shift // '';
+    my @out = ($p) if length($p) && $p ne '/';
+    while ($p =~ s/\/[^\/]+$//) {
+        push @out, $p if length($p)
+    }
+    push @out, '/';
+    return @out;
+}
 
 1;
+
+__END__

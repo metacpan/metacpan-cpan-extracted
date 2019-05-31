@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
-# VERSION
+our $VERSION = '0.0.7'; # VERSION
 
 use Moose;
 with qw(
@@ -25,6 +25,7 @@ sub configure {
         'Author::GSG',
 
         'MetaJSON',
+        'OurPkgVersion',
         'Prereqs::FromCPANfile',
         'ReadmeAnyFromPod',
 
@@ -120,7 +121,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 
@@ -149,6 +150,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     #[Author::GSG]
 
     [MetaJSON]
+    [OurPkgVersion]
     [Prereqs::FromCPANfile]
     [ReadmeAnyFromPod]
 
@@ -365,10 +367,20 @@ This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Andrew Fresh
+=for stopwords Andrew Fresh Mark Flickinger
+
+=over 4
+
+=item *
 
 Andrew Fresh <andrew.fresh@grantstreet.com>
+
+=item *
+
+Mark Flickinger <mark.flickinger@grantstreet.com>
+
+=back
 
 =cut

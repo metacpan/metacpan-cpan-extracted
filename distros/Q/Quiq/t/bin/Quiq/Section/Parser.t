@@ -25,7 +25,7 @@ sub test_unitTest_statistic : Ignore(1) {
     my $par = Quiq::Section::Parser->new;
     $self->is(ref($par),'Quiq::Section::Parser');
 
-    my @files = Quiq::Path->find('yeah',
+    my @files = Quiq::Path->find('jaz',
         -type => 'f',
     );
     for my $file (@files) {

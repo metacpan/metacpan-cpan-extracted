@@ -126,8 +126,8 @@ sub decompress ( $self ) {
                     }
                 }
                 else {
-                    $max_severity = $v->severity if $v->severity > $max_severity;
-                    $violations->{$policy}->{severity} = $v->severity;
+                    $max_severity                               = $v->severity if $v->severity > $max_severity;
+                    $violations->{$policy}->{severity}          = $v->severity;
                     $violations->{$policy}->{desc}->{$desc_md5} = {
                         text => $v->description,
                         line => [ $v->line_number ],

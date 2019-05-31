@@ -11,7 +11,7 @@ has max_threads => 10;
 has _headers => ( init_arg => undef );
 has _queue   => ( init_arg => undef );
 has _threads => 0, init_arg => undef;
-has _signal  => sub { Coro::Signal->new }, init_arg => undef;
+has _signal => sub { Coro::Signal->new }, init_arg => undef;
 
 const our $API_VER => 4;
 

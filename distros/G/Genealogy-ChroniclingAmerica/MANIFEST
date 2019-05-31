@@ -1,3 +1,4 @@
+.ignore.txt
 Changes
 lib/Genealogy/ChroniclingAmerica.pm
 LICENCE
@@ -6,6 +7,7 @@ MANIFEST			This list of files
 README.md
 t/00-load.t
 t/10-new.t
+t/carp.t
 t/chronicling.t
 t/coverage.t
 t/dist.t

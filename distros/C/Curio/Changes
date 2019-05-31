@@ -1,5 +1,15 @@
 Revision history for Perl extension Curio.
 
+0.03 2019-05-31T02:59:12Z
+
+ - Started the Curio::Manual.
+ - Avoid CPANTS test_prereq_matches_use in permutations.t.
+ - Fixed a croakf bug that cause croak to just croak the number
+   of arguments passed rather than the error message.
+ - The generated fetch() method is now named so that in error
+   messages it is named "fetch" instead of "ANON".
+ - The generated Curio::Declare functions are now named as well.
+
 0.02 2019-05-10T06:50:59Z
 
  - Support custom Curio class roles.

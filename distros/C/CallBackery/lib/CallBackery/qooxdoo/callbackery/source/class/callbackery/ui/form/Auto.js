@@ -312,7 +312,8 @@ qx.Class.define("callbackery.ui.form.Auto", {
         setSelectBoxData : function(box, data) {
             var model;
             this._settingData = true;
-
+            var ctrl = this._boxCtrl[box];
+            var value = ctrl.getSelection().toArray()[0];
             if (data.length == 0) {
                 model = qx.data.marshal.Json.createModel([ {
                     title : '',
@@ -323,8 +324,8 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 model = qx.data.marshal.Json.createModel(data);
             }
 
-            this._boxCtrl[box].setModel(model);
-            this._boxCtrl[box].getTarget().resetSelection();
+            ctrl.setModel(model);
+            ctrl.setSelection(new qx.data.Array([value]));
             this._settingData = false;
         },
 

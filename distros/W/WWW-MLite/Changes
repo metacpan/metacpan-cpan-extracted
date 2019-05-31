@@ -1,0 +1,34 @@
+# $Id: Changes 41 2019-05-29 17:01:36Z minus $
+# Version/Revision history.
+
+1.00 Tue May 20 11:39:42 2014 GMT
+    * Initial release
+
+1.01 Tue Jun  3 22:34:47 2014 MSK
+    * Documentation modified
+    * DBI require added
+
+1.02 Thu Jun  5 12:15:46 2014 MSK
+    * Documentation modified
+    * Inheritance option added
+
+1.03 Wed Jun 25 11:19:43 2014 MSK
+    * Documentation modified
+    * Skeleton added
+
+1.04 Tue Jul 29 17:24:06 2014 MSK
+    * Documentation modified
+    * WWW::MLite::AuthSsn added
+    * Skeleton modified
+
+1.05 Fri Aug  1 14:30:26 2014 MSK
+    * Documentation modified
+
+1.06 Sat Aug  2 21:25:50 2014 MSK
+    * Bad with CGI::Session fixed
+    * On Windows, FreeBSD and CentOS tested
+    * Added db directory to Makefile.PL of skeleton
+    * Skel.pm -- added new URL
+
+2.00 Wed May 29 12:25:34 MSK 2019
+    * Adapted for CTKlib v2.00

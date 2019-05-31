@@ -18,4 +18,13 @@ dies_ok {
     my $geocoder = Geo::Coder::OpenCage->new();
 } 'exception thrown when no api key passed to new()';
 
+
+# make sure we didn't forget to update version 
+{
+    my $geocoder = Geo::Coder::OpenCage->new(api_key => "abcde");
+    my $v = $geocoder->{ua}->agent;
+    $v =~ s/Geo::Coder::OpenCage //;
+    is($v > 0.22, 1, 'version number greater than 0.22');
+}
+
 done_testing();

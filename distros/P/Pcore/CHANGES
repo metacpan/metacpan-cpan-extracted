@@ -1,3 +1,8 @@
+v0.87.0 2019-05-31T18:50:22Z
+ - resources updated
+ - perlridy --one-line-block-semicolons=0
+ - perltidy
+
 v0.86.5 2019-05-29T13:57:03Z
  - query_to_string
  - dbi tokens improved

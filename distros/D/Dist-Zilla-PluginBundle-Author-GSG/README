@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.0.6
+    version 0.0.7
 
 SYNOPSIS
 
@@ -33,6 +33,7 @@ SYNOPSIS
         #[Author::GSG]
     
         [MetaJSON]
+        [OurPkgVersion]
         [Prereqs::FromCPANfile]
         [ReadmeAnyFromPod]
     
@@ -212,7 +213,8 @@ Setting up a new dist
 
       You should probably use a token instead of your password, which you
       can get by following GitHub's instructions
-      <https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line>.
+      <https://help.github.com/en/articles/creating-a-personal-access-token
+      -for-the-command-line>.
 
           git config --global github.user  github_login_name
           git config --global github.token token_from_instructions_above
@@ -229,7 +231,9 @@ COPYRIGHT AND LICENSE
 
       The Artistic License 2.0 (GPL Compatible)
 
-CONTRIBUTOR
+CONTRIBUTORS
 
-    Andrew Fresh <andrew.fresh@grantstreet.com>
+      * Andrew Fresh <andrew.fresh@grantstreet.com>
+
+      * Mark Flickinger <mark.flickinger@grantstreet.com>
 

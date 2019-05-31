@@ -562,6 +562,42 @@ if ( ok $obj, q<Able to parse "@{$x[$i]}"> ) {
     }
 }
 
+$obj = PPIx::QuoteLike->new( q/"\N{$foo}"/ );
+if ( ok $obj, q{Able to parse "\N{$foo}"} ) {
+    cmp_ok $obj->failures(), '==', 1, q{Failures parsing "\N{$foo}"};
+    cmp_ok $obj->interpolates(), '==', 1, q{Does "\N{$foo}" interpolate};
+    is $obj->content(), q/"\N{$foo}"/, q{Can recover "\N{$foo}"};
+    is $obj->__get_value( 'type' ), q{}, q{Type of "\N{$foo}"};
+    is $obj->delimiters(), q{""}, q{Delimiters of "\N{$foo}"};
+    is $obj->__get_value( 'start' ), q{"}, q{Start delimiter of "\N{$foo}"};
+    is $obj->__get_value( 'finish' ), q{"}, q{Finish delimiter of "\N{$foo}"};
+    is $obj->encoding(), undef, q{"\N{$foo}" encoding};
+    if ( eval { require PPI::Document; 1 } ) {
+	is_deeply [ sort $obj->variables() ],
+	    [ qw{  } ],
+	    q{"\N{$foo}" interpolated variables};
+    }
+    cmp_ok $obj->postderef(), '==', 1, q{"\N{$foo}" postderef};
+    cmp_ok scalar $obj->elements(), '==', 4,
+	q{Number of elements of "\N{$foo}"};
+    cmp_ok scalar $obj->children(), '==', 1,
+	q{Number of children of "\N{$foo}"};
+    if ( my $kid = $obj->child( 0 ) ) {
+	ok $kid->isa( 'PPIx::QuoteLike::Token::Unknown' ),
+	    q{"\N{$foo}" child 0 class};
+	is $kid->content(), q/\N{$foo}/,
+	    q{"\N{$foo}" child 0 content};
+	is $kid->error(), q{Unknown charname '$foo'},
+	    q{"\N{$foo}" child 0 error};
+	cmp_ok $kid->parent(), '==', $obj,
+	    q{"\N{$foo}" child 0 parent};
+	cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 0 - 1 ),
+	    q{"\N{$foo}" child 0 previous sibling};
+	cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 0 + 1 ),
+	    q{"\N{$foo}" child 0 next sibling};
+    }
+}
+
 $obj = PPIx::QuoteLike->new( <<'__END_OF_HERE_DOCUMENT'
 << "EOD"
 $foo->{bar}bazzle

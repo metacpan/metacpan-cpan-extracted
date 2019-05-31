@@ -1,3 +1,14 @@
+0.007		2019-05-31	T. R. Wyant
+    Prohibit interpolation inside \N{...}.
+
+    Fix error message in eg/pqldump
+
+    Allow PPIx::QuoteLike::Utils::__variables() to take a PPI::Element
+    (rather than PPI::Node), PPIx::Regexp::Element, PPIx::QuoteLike, or
+    PPIx::QuoteLike::Token.
+
+    Add eg/variables
+
 0.006		2018-07-09	T. R. Wyant
     Only standalone graphemes and non-characters allowed as delimiters
     starting with Perl 5.29.0.

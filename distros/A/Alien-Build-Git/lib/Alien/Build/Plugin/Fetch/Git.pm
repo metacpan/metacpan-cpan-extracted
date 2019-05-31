@@ -13,7 +13,7 @@ use File::chdir;
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Alien::Build plugin to fetch from git
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub init
@@ -151,7 +151,7 @@ Alien::Build::Plugin::Fetch::Git - Alien::Build plugin to fetch from git
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

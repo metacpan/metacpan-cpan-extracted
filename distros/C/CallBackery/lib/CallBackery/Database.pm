@@ -449,4 +449,4 @@ CREATE TABLE IF NOT EXISTS cbuserright (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS cbuserright_idx
-    ON cbuserright(cbuserright_cbuser,cbuserright_cbright)
+    ON cbuserright(cbuserright_cbuser,cbuserright_cbright);

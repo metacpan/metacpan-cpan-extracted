@@ -1,5 +1,5 @@
 package Curio::Util;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw();
 
@@ -25,7 +25,8 @@ sub croak {
 }
 
 sub croakf {
-    my $msg = sprintf( @_ );
+    my $msg = shift;
+    $msg = sprintf( $msg, @_ );
     return croak( $msg );
 }
 

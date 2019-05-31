@@ -1,5 +1,427 @@
-$Id: README 4 2014-05-20 14:04:23Z minus $
+NAME
 
-Project based on MVCskel
+    WWW::MLite - Lite Web Application Framework
 
-Coming soon...
+VERSION
+
+    Version 2.00
+
+SYNOPSIS
+
+        package MyApp;
+    
+        use base qw/WWW::MLite/;
+    
+        use HTTP::Status qw/:constants/;
+        use Data::Dumper;
+    
+        __PACKAGE__->register_method( # GET /myapp
+            name    => "getIndex",
+            description => "Index page",
+            method  => "GET",
+            path    => "/myapp",
+            deep    => 0,
+            attrs   => {
+                    foo         => 'blah-blah-blah',
+                    bar         => 'on',
+                    deserialize => 0,
+                    serialize   => 1,
+                },
+            requires => undef,
+            returns => undef,
+            code    => sub {
+            my $self = shift;
+            my @params = @_;
+    
+            $self->data(Dumper({
+                    params => [@params],
+                    name   => $self->name,
+                    description => $self->info("description"),
+                    attrs  => $self->info("attrs"),
+                    path   => $self->info("path"),
+                    method => $self->info("method"),
+                    requires => $self->info("requires"),
+                    returns => $self->info("returns"),
+                }));
+    
+            return HTTP_OK; # HTTP RC
+        });
+    
+        1;
+    
+        package main;
+    
+        use FindBin qw/$Bin/;
+        use lib "$Bin/../lib";
+    
+        use CGI;
+        use File::Spec;
+    
+        my $q = new CGI;
+        my $server = MyApp->new(
+            project     => "MyApp",
+            ident       => "myapp",
+            root        => File::Spec->catdir($Bin, "conf"),
+            #confopts    => {... Config::General options ...},
+            configfile  => File::Spec->catfile($Bin, "conf", "myapp.conf"),
+            log         => "on",
+            logfd       => fileno(STDERR),
+            #logfile     => '/path/to/log/file.log',
+            nph         => 0, # NPH (no-parsed-header)
+        );
+        print $server->call($q->request_method, $q->request_uri, $q) or die($server->error);
+
+DESCRIPTION
+
+    Lite Web Application Framework
+
+    This module allows you to quickly and easily write a REST servers
+
+ new
+
+        my $server = MyApp->new(
+            project     => "MyApp",
+            ident       => "myapp",
+            root        => File::Spec->catdir($Bin, "conf"),
+            #confopts    => {... Config::General options ...},
+            configfile  => File::Spec->catfile($Bin, "conf", "myapp.conf"),
+            log         => "on",
+            logfd       => fileno(STDERR),
+            #logfile     => '/path/to/log/file.log',
+            nph         => 0, # NPH (no-parsed-header)
+        );
+
+    Returns CTK object as WWW::MLite server
+
+    confopts
+
+      Optional value. Config::General options
+
+    configfile
+
+      File of configuration
+
+      Default: /etc/myapp/myapp.conf
+
+    log
+
+      General switch for logging enable/disable
+
+      Default: off
+
+      Also see configuration for logging manage
+
+    logfd
+
+      File descriptor or fileno
+
+      Default: none (use syslog)
+
+      See IO::Handle
+
+    logfile
+
+      Log file path. Not recommended!
+
+    nph
+
+      Enable or disable NPH mode (no-parsed-header)
+
+      Default: 0
+
+      See "USING-NPH-SCRIPTS" in CGI
+
+      This option for the response subroutine only!
+
+    root
+
+      Root directory for project. This is NOT document root directory!
+
+      Default: /etc/myapp
+
+    See also CTK and CTK::App
+
+METHODS
+
+    List of available methods
+
+ call
+
+    See "call_method"
+
+ call_method
+
+        $server->call_method( $ENV{REQUEST_URI}, $ENV{REQUEST_METHOD}, ... );
+
+    Runs the callback function from current method with additional
+    parameters
+
+    Note: any number of parameters can be specified, all of them will be
+    receive in the callback function and in your overridden the response
+    subroutine
+
+    Returns: response content
+
+ check_http_method
+
+        $server->check_http_method("GET"); # returns 1
+        $server->check_http_method("OPTIONS"); # returns 0
+
+    Checks the availability of the HTTP method by its name and returns the
+    status
+
+ code
+
+        my $code = $server->code;
+        my $code = $server->code( 500 );
+
+    Gets/Sets response HTTP code
+
+    Default: 200 (HTTP_OK)
+
+    See HTTP::Status
+
+ cleanup
+
+        $server->cleanup;
+
+    Cleans the all working data and resets it to default values
+
+ data
+
+        my $data = $server->data;
+        $server->data({
+                param1 => "new value",
+            });
+
+    Gets/Sets working data structure or HTTP content
+
+    Default: undef
+
+    See HTTP::Response
+
+ head
+
+        my $head = $server->head;
+        $server->head({
+                "Content-Type" => "text/plain",
+            });
+
+    Gets/Sets HTTP headers
+
+    Default: "text/plain"
+
+    See HTTP::Headers
+
+ info
+
+        my $info = $server->info;
+        my $description => $server->info("description");
+        my $attrs = $server->info("attrs");
+        my $path = $server->info("path");
+        my $method = $server>info("method");
+        my $requires = $server->info("requires");
+        my $returns = $server->info("returns");
+
+    Returns the info structure or info-data of current method
+
+ lookup_method
+
+        my $method = $server->lookup_method($ENV{REQUEST_URI}, $ENV{REQUEST_METHOD});
+
+    Returns $method structure from hash of registered methods; or undef if
+    method is not registered
+
+ message
+
+        my $message = $server->message;
+        my $message = $server->message( "Internal Server Error" );
+
+    Gets/Sets response HTTP message
+
+    Default: "OK"
+
+    See HTTP::Status
+
+ name
+
+        my $name = $server->name;
+
+    Returns name of current method. Default: default
+
+ register_method
+
+        use base qw/WWW::MLite/;
+    
+        use HTTP::Status qw/:constants/;
+        use Data::Dumper;
+    
+        __PACKAGE__->register_method( # GET /myapp
+            name    => "getIndex",
+            description => "Index page",
+            method  => "GET",
+            path    => "/myapp",
+            deep    => 0,
+            attrs   => {
+                    foo         => 'blah-blah-blah',
+                    bar         => 'on',
+                    deserialize => 0,
+                    serialize   => 1,
+                },
+            requires => [
+                    qw/ user1 user2 userX /
+                ],
+            returns => {
+                    type => 'any',
+                },
+            code    => sub {
+            my $self = shift;
+            my @params = @_;
+    
+            # ... your method's code here ...
+    
+            return HTTP_OK; # HTTP RC
+        });
+
+    Registers new method and returns operation status
+
+    NOTE! This is non class method!
+
+    attrs
+
+      Sets attributes of the method as hashref
+
+      Default: {}
+
+      In the method's code or response method, you can get the attribute
+      values using the $self->info("attrs") method
+
+    code
+
+      Sets callback function
+
+      Default: sub { return HTTP::Status::HTTP_OK }
+
+      This callback function MUST return HTTP status code
+
+      See HTTP::Status
+
+    deep, depth
+
+      Enables deeply scanning of path for method lookup. If this param is
+      set to true then the mechanism of the deeply lookuping will be
+      enabled. For example:
+
+      For registered path /foo with enabled deep lookuping will be matched
+      any another incoming path that begins from /foo prefix: /foo,
+      /foo/bar, /foo/bar/baz and etc.
+
+      Default: 0
+
+    description
+
+      Sets the description of method
+
+      Default: none
+
+    name
+
+      Sets the name of method
+
+      Default: default
+
+    method
+
+      Sets the HTTP method for trapping. Supported: GET, POST, PUT, DELETE.
+
+      Default: GET
+
+    path
+
+      Sets the URL's path for trapping
+
+      Default: /
+
+    requires
+
+      Array-ref structure that contains list of groups/users or any data
+      for authorization
+
+      Default: []
+
+    returns
+
+      Hash-ref structure that contains schema
+
+      Default: {}
+
+      See JSON::Schema, JSON::Validator, http://json-schema.org/
+
+ response
+
+    The method for response prepare.
+
+    You can override this method in Your class.
+
+    But note! This method MUST returns serialized or plain content for
+    output
+
+    For examle:
+
+        sub response {
+            my $self = shift;
+            my $rc = $self->code; # RC HTTP code (from yuor methods)
+            my $head = $self->head; # HTTP Headers (hashref)
+            my $data = $self->data; # The working data
+            my $msg = $self->message || HTTP::Status::status_message($rc) || "Unknown code";
+    
+            my @res = (sprintf("Status: %s %s", $rc, $msg));
+            push @res, sprintf("Content-Type: %s", "text/plain; charset=utf-8");
+            push @res, "", $data // "";
+            return join("\015\012", @res);
+        }
+
+ again
+
+    Internal use only!
+
+    See "again" in CTK::App
+
+EXAMPLES
+
+    See all examples on METACPAN website
+    https://metacpan.org/release/WWW-MLite
+
+HISTORY
+
+    See Changes file
+
+TO DO
+
+    See TODO file
+
+BUGS
+
+    * none noted
+
+    Please report any bugs to https://rt.cpan.org/.
+
+SEE ALSO
+
+    CTK, HTTP::Message
+
+AUTHOR
+
+    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+
+COPYRIGHT
+
+    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See LICENSE file and https://dev.perl.org/licenses/
+

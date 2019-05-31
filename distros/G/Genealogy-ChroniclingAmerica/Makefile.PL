@@ -10,7 +10,7 @@ my $online_tests;
 
 if($ENV{RELEASE_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
+} elsif($ENV{NO_NETWORK_TESTING}) {
 	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
@@ -48,6 +48,7 @@ WriteMakefile(
     PREREQ_PM => {
     	'Carp' => 0,
     	'JSON' => 0,
+	'LWP::Protocol::https' => 0,
 	'LWP::UserAgent' => 0,
     	'URI' => 0,
     },
@@ -76,12 +77,14 @@ sub are_online
 		$host = $1;
 	}
 	my $s = IO::Socket::INET->new(
-		# PeerAddr => 'www.ripe.net:43',
-		# PeerAddr => 'whois.apnic.net:43',
 		PeerAddr => $host,
 		Timeout => 5
 	);
 	if($s) {
+		if($ENV{'AUTOMATED_TESTING'}) {
+			close($s);
+			return 1;
+		}
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests

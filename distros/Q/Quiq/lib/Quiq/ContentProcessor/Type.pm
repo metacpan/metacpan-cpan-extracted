@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.141';
+our $VERSION = '1.142';
 
 # -----------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ Die Plugin-Klassen bilden eine Hierarchie von Klassen, an deren
 Spitze eine allgemeine, abstrakte Klasse steht (stehen sollte),
 die von der dieser Klasse abgeleitet ist:
 
-    package Yeah::Type;
+    package Jaz::Type;
     use base qw/Quiq::ContentProcessor::Type/;
     
     __PACKAGE__->def(
@@ -56,8 +56,8 @@ für den ContentProcessor essentiellen Attribute (siehe Code der
 Methode). Die Methode wird in der Typ-Klasse überschrieben und von
 dort aus gerufen:
 
-    package Yeah::Type::Program::Shell;
-    use base qw/Yeah::Type::Program/;
+    package Jaz::Type::Program::Shell;
+    use base qw/Jaz::Type::Program/;
     
     __PACKAGE__->def(
         Attributes => [qw/
@@ -662,7 +662,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.141
+1.142
 
 =head1 AUTHOR
 
