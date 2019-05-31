@@ -3,7 +3,7 @@ package MVC::Neaf::Request;
 use strict;
 use warnings;
 
-our $VERSION = 0.2603;
+our $VERSION = '0.2701';
 
 =head1 NAME
 
@@ -51,7 +51,7 @@ use Time::HiRes ();
 use Sys::Hostname ();
 use Digest::MD5 qw(md5);
 
-use MVC::Neaf::Util qw( http_date run_all_nodie canonize_path encode_b64 );
+use MVC::Neaf::Util qw( JSON http_date run_all_nodie canonize_path encode_b64 );
 use MVC::Neaf::Upload;
 use MVC::Neaf::Exception;
 use MVC::Neaf::Route::Null;
@@ -91,7 +91,7 @@ sub client_ip {
     my $self = shift;
 
     return $self->{client_ip} ||= do {
-        my @fwd = $self->header_in( "X-Forwarded-For" );
+        my @fwd = $self->header_in( 'X-Forwarded-For', '.*' );
         @fwd == 1 && $fwd[0] || $self->do_get_client_ip || "127.0.0.1";
     };
 };
@@ -707,20 +707,69 @@ sub _all_params {
 
 =head2 body()
 
-Returns request body for PUT/POST requests.
-This is not regex-checked - the check is left for the user.
+See L</body_raw> below.
 
-Also the data is NOT converted to C<utf8>.
+=head2 body_text()
+
+Returns request body for PUT/POST requests as unicode text.
+
+B<WARNING> Encodings other than UTF-8 are not supported as of yet.
+
+=head2 body_json()
+
+Get decoded request body in JSON format.
+In case of errors, error 422 is thrown.
+
+=head2 body_raw()
+
+Returns request body for PUT/POST requests as binary data.
+Decoding and validation is left up to the user.
 
 =cut
 
-sub body {
+sub body_raw {
     my $self = shift;
+
+    carp ("MVC::Neaf: using body() is discouraged for method ".$self->method)
+        if ($query_allowed{$self->method});
 
     $self->{body} = $self->do_get_body
         unless exists $self->{body};
+
     return $self->{body};
 };
+
+*body = *body = \&body_raw;
+
+_helper_fallback( body_text => sub {
+    my $self = shift;
+
+    # TODO adhere to charset= in content_type
+    return decode_utf8( $self->body_raw );
+});
+
+my $codec = JSON->new->utf8->allow_nonref;
+_helper_fallback( body_json => sub {
+    my ($self, $validator) = @_;
+
+    # TODO add validator support - if fails, also 422
+    # TODO but note validator is likely to be path-specific, not call-specific
+    my $data;
+    eval {
+        # Content-Type must be application/json or empty
+        $self->content_type =~ /^(application\/json\b|$)/
+            or die "Unexpected content type for body_json: ".$self->content_type;
+        $data = $codec->decode( $self->body );
+        1;
+    } || do {
+        # TODO do we need to log error here?
+        $@ =~ s/at \S+ line \d+\.?\n?$//;
+        $self->log_message( warning => "Failed to read JSON from request via body_json(): ".$@);
+        die 422;
+    };
+
+    return $data;
+} );
 
 =head2 upload_utf8( ... )
 
@@ -820,7 +869,7 @@ sub get_cookie {
 
     $self->{neaf_cookie_in} ||= do {
         my %hash;
-        foreach ($self->header_in("cookie")) {
+        foreach ($self->header_in('cookie', qr/.*/)) {
             while (/(\S+?)=([^\s;]*);?/g) {
                 $hash{$1} = decode_utf8(uri_unescape($2));
             };
@@ -1023,7 +1072,7 @@ sub redirect {
 
 =item * C<header_in()> - return headers as-is
 
-=item * C<$req-E<gt>header_in( "header_name" )>
+=item * C<$req-E<gt>header_in( "header_name", qr/.../ )>
 
 =back
 
@@ -1034,23 +1083,34 @@ so C<Http-Header>, C<HTTP_HEADER> and C<http_header> are all the same.
 Without argument, returns a L<HTTP::Headers::Fast> object.
 
 With a name, returns all values for that header in list context,
-or ", " - joined value as one scalar in scalar context -
-this is actually a frontend to HTTP::Headers::Fast C<header()> method.
+or ", " - joined value as one scalar in scalar context.
+An empty string is returned if no such header is present.
 
-B<[NOTE]> No regex checks are made (yet) on headers, these may be added
-in the future.
+If regex fails to match I<any> of the header values, error 422 is thrown.
+
+This call still works without regex, but such behavior is deprecated.
 
 =cut
 
 sub header_in {
-    my ($self, $name) = @_;
+    my ($self, $name, $regex) = @_;
 
     $self->{header_in} ||= $self->do_get_header_in;
     return $self->{header_in} unless defined $name;
 
     $name = lc $name;
     $name =~ s/-/_/g;
-    return $self->{header_in}->header( $name );
+    my @list = $self->{header_in}->header( $name );
+
+    # TODO 0.30 deprecate w/o regex
+    if ($regex) {
+        $regex = qr/^$regex$/
+            unless ref $regex and ref $regex eq 'Regexp';
+        $_ =~ $regex or die 422 # TODO 0.30 configurable
+            for @list;
+    };
+
+    return wantarray ? @list : join ', ', @list;
 };
 
 =head2 referer
@@ -1066,7 +1126,7 @@ sub referer {
     if (@_) {
         $self->{referer} = shift
     } else {
-        return $self->{referer} ||= $self->header_in( "referer" );
+        return $self->{referer} ||= $self->header_in( 'referer', qr/.*/ );
     };
 };
 
@@ -1083,10 +1143,31 @@ sub user_agent {
     if (@_) {
         $self->{user_agent} = shift
     } else {
-        $self->{user_agent} = $self->header_in("user_agent")
+        $self->{user_agent} = $self->header_in( 'user_agent', qr/.*/ )
             unless exists $self->{user_agent};
         return $self->{user_agent};
     };
+};
+
+=head2 content_type
+
+Returns C<Content-Type> request header, if present, or an empty string.
+
+The usage of Content-Type in GET/HEAD requests is discouraged.
+See also L<body>.
+
+=cut
+
+sub content_type {
+    my ($self, $regex) = @_;
+
+    carp ("MVC::Neaf: using content_type is discouraged for method ".$self->method)
+        if ($query_allowed{$self->method});
+
+    my $ctype = $self->header_in('content_type', $regex || qr/.*/);
+    $ctype = '' unless defined $ctype;
+
+    return $ctype;
 };
 
 =head2 dump ()
@@ -2014,7 +2095,7 @@ sub get_default {
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,30 +1,29 @@
 PRIORITY | COMPLEXITY | COMMENT
     -- next version --
-*     **    API Add regex-check for http headers, too
-*     *     API Make custom error handlers path-based
-*     **    API load_resources() automagically
+*     *     TPL Add tentative default favicon
+**    *     MOD form->data_hash instead of %{ form->data }
+*     *     TPL Add tentative script to query self via ajax
     -- todo --
+****  *     API Add -charset for content encoding
+**    **    TST Coverage >90%
+*     *     MOD Add tentative script directory
 *     *     API Add /foo/:bar with mandatory param_regex{bar} [HOLD v.0.3]
 *     **    TPL create a <script>var foo = "bar"</script> upon request
 **    **    TST blog, wiki & chat examples
 *     ***   DOC Big rewrite of docs
+***   **    TPL Add XSLate support
 *     ***   MOD Oauth2 example/helper
 *     ***   TPL Predefined header/footer to spare user of boilerplate
 **    *     MOD static file_regex, dir_regex
 **    *     REF Add digest, hmac, and digest_fast to Util
 **    **    API Add encoding detect & strict/coding flags to upload_utf8
-**    **    API body_json( validator ) - die 422 is !json || val fails
-*     ***** COR Async support via $req->future
     -- backlog --
-**    **    TST Coverage >90%
 **    *     API Add rendering in -continue via Request->write( \%hash )
 **    *     API Add encoding field to route to allow for non-utf8
-**    *     MOD form->data_hash instead of %{ form->data }
 **    **    REF Use Digest::SHA3 if avail (thx @akuklev)
 **    **    API Generate a catalog of public resources on 404
 **    **    MOD Session::Redis
 **    **    MOD static: X-Accel-Redirect (@cono)
-**    **    TPL Add default favicon for neaf
 ***   *     REF Req https detection: change to is_secure? http:https.
 **    ***   API body_content() or smth - decoded as Content-Type suggests (ned accept_body => [ ... ])
 **    ***   MOD Add json schema support to forms
@@ -32,11 +31,9 @@ PRIORITY | COMPLEXITY | COMMENT
 **    ****  MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
 ***   *     MOD Add form defaults populating BOTH raw and data
 ***   **    API multiple uploads under same name, wildcard uploads
-***   **    TPL Add XSLate support
 ***   **    MOD Add well-known regexes from Regexp::Common to default Form
 ***   ***   DOC HOWTO add dumper to TT view (pre-render)
 ****  *     API helper_object to manage shared objects
-****  *     API Add -charset for content encoding
 ****  **    COR Add per-route exceptions instead of 404,422
 ****  **    DEV last source file, complain if no run() at EOF
 ****  **    MOD Add "cleanup" method to X::Session - for offline cleanups
@@ -45,6 +42,7 @@ PRIORITY | COMPLEXITY | COMMENT
 ****  ****  API Periodic actions in webapp
 ***** **    API Add named forms to route defn JFYI
     -- think more --
+*     ***** COR Async support via $req->future
 **    **    API neaf chroot => '/path', $req->prefix to fetch, pop on run()
 **    ***   MOD api module: neaf crude => '/path' => $object; get /foo =>'method'
 ***   *     MOD Deprecate form( { ... } ) in favor of form( rules => { ... } ) as we already have a shortened syntax for that

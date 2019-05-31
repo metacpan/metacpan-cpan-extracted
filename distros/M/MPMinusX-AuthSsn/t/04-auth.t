@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Serz Minus (Lepenkov Sergey), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 # 
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 04-auth.t 2 2013-08-07 09:50:14Z minus $
+# $Id: 04-auth.t 4 2019-05-28 10:57:50Z minus $
 #
 #########################################################################
 use Test::More tests => 10;
@@ -18,10 +18,12 @@ use MPMinusX::AuthSsn;
 my $m = new Test::MPMinus
 my $usid = undef;
 my $ssn = new MPMinusX::AuthSsn($m, $usid);
+#diag(explain($ssn));
 is($ssn->authen( \&authen ), 0, "Access denied authen(LOGIN_INCORRECT): ".$ssn->reason());
 is($ssn->authen( \&authen, 'foo' ), 0, "Access denied authen(PASSWORD_INCORRECT): ".$ssn->reason());
 is($ssn->authen( \&authen, 'foo', 'hack' ), 0, "Access denied authen(AUTH_REQUIRED): ".$ssn->reason());
 is($ssn->authen( \&authen, 'foo', 'bar' ), 1, "Grant access authen(OK): ".$ssn->reason());
+#diag(explain($ssn));
 is($ssn->get('login'), 'foo', "Login is foo");
 is($ssn->authz( \&authz ), 0, "Access denied authz(FORBIDDEN): ".$ssn->reason());
 $ssn->set(role  => 1);

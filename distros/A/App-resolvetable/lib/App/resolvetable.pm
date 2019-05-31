@@ -1,7 +1,7 @@
 package App::resolvetable;
 
-our $DATE = '2019-05-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-05-30'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,6 +56,37 @@ sub _colorize_maj_min {
     }
 }
 
+# colorize the shortest time with green
+sub _colorize_shortest_time {
+    my $hash = shift;
+    no warnings 'numeric';
+
+    my %time;
+    my @keys = keys %$hash;
+    for (@keys) {
+        next unless defined $hash->{$_};
+        next if $_ eq 'name';
+        my $time =
+            $hash->{$_} =~ /^\s*</ ? 0.01 :
+            $hash->{$_} =~ /^\s*>/ ? 4001 : $hash->{$_}+0;
+        $time{ $hash->{$_} } = $time;
+    }
+    my @times_from_shortest = sort { $time{$a} <=> $time{$b} } keys %time;
+
+    # no defined values
+    return unless @times_from_shortest;
+
+    my $green = "33cc33";
+
+    for (@keys) {
+        my $val = $hash->{$_};
+        next unless defined $val;
+        next if $_ eq 'name';
+        $hash->{$_} = ansifg($green) . $hash->{$_} . "\e[0m"
+            if $hash->{$_} eq $times_from_shortest[0];
+    }
+}
+
 sub _mark_undef_with_x {
     my $row = shift;
     for (keys %$row) {
@@ -68,19 +99,19 @@ sub _mark_undef_with_x {
 $SPEC{'resolvetable'} = {
     v => 1.1,
     summary => 'Produce a colored table containing DNS resolve results of '.
-        'several names from several servers',
+        'several names from several servers/resolvers',
     args => {
         action => {
-            schema => ['str*', in=>[qw/show-addresses show-times/]],
+            schema => ['str*', in=>[qw/show-addresses show-timings/]],
             default => 'show-addresses',
             cmdline_aliases => {
-                times => {is_flag=>1, summary=>'Shortcut for --action=show-times', code=>sub { $_[0]{action} = 'show-times' }},
+                timings => {is_flag=>1, summary=>'Shortcut for --action=show-timings', code=>sub { $_[0]{action} = 'show-timings' }},
             },
             description => <<'_',
 
 The default action is to show resolve result (`show-addresses`). If set to
-`show-times`, will show resolve times instead to compare speed among DNS
-servers.
+`show-timings`, will show resolve times instead to compare speed among DNS
+servers/resolvers.
 
 _
         },
@@ -170,7 +201,7 @@ sub resolvetable {
             };
             _colorize_maj_min($row) if $args{colorize};
             _mark_undef_with_x($row) if $args{colorize};
-        } elsif ($action eq 'show-times') {
+        } elsif ($action eq 'show-timings') {
             $row = {
                 name => $name,
                 map {
@@ -182,8 +213,8 @@ sub resolvetable {
                         my $ms = ($endtime - $starttime)*1000;
                         if ($ms > 4000) {
                             $val = ">4000ms";
-                        } elsif ($ms < 1) {
-                            $val = "   <1ms";
+                        } elsif ($ms <= 0.5) {
+                            $val = "<=0.5ms";
                         } else {
                             $val = sprintf("%3.0fms", $ms);
                         }
@@ -196,7 +227,8 @@ sub resolvetable {
         } else {
             die "Unknown action '$action'";
         }
-        _mark_undef_with_x($row) if $args{colorize};
+        _colorize_shortest_time($row) if $args{colorize};
+        _mark_undef_with_x($row)      if $args{colorize};
         push @rows, $row;
     }
 
@@ -204,7 +236,7 @@ sub resolvetable {
 }
 
 1;
-# ABSTRACT: Produce a colored table containing DNS resolve results of several names from several servers
+# ABSTRACT: Produce a colored table containing DNS resolve results of several names from several servers/resolvers
 
 __END__
 
@@ -214,11 +246,15 @@ __END__
 
 =head1 NAME
 
-App::resolvetable - Produce a colored table containing DNS resolve results of several names from several servers
+App::resolvetable - Produce a colored table containing DNS resolve results of several names from several servers/resolvers
 
 =head1 VERSION
 
-This document describes version 0.003 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-05-29.
+This document describes version 0.004 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-05-30.
+
+=head1 DESCRIPTION
+
+Sample screenshot 1 (with C<--colorize>):
 
 =head1 FUNCTIONS
 
@@ -229,7 +265,7 @@ Usage:
 
  resolvetable(%args) -> [status, msg, payload, meta]
 
-Produce a colored table containing DNS resolve results of several names from several servers.
+Produce a colored table containing DNS resolve results of several names from several servers/resolvers.
 
 This function is not exported.
 
@@ -240,8 +276,8 @@ Arguments ('*' denotes required arguments):
 =item * B<action> => I<str> (default: "show-addresses")
 
 The default action is to show resolve result (C<show-addresses>). If set to
-C<show-times>, will show resolve times instead to compare speed among DNS
-servers.
+C<show-timings>, will show resolve times instead to compare speed among DNS
+servers/resolvers.
 
 =item * B<colorize> => I<bool>
 
@@ -266,6 +302,12 @@ that contains extra information.
 
 Return value:  (any)
 
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.004/share/images/Screenshot_20190530_111051.png" />
+
+Sample screenshot 2 (with C<--colorize --timings>):
+
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.004/share/images/Screenshot_20190530_112052.png" />
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-resolvetable>.
@@ -281,6 +323,8 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
 
 =head1 AUTHOR
 

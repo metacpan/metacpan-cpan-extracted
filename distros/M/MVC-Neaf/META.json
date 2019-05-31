@@ -60,6 +60,7 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.87",
             "Test::Warn" : "0"
          }
@@ -76,6 +77,6 @@
          "web" : "https://github.com/dallaylaen/perl-mvc-neaf"
       }
    },
-   "version" : 0.2603,
+   "version" : "0.2701",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

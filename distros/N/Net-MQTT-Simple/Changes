@@ -3,6 +3,14 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.23  2019-04-29 18:18
+        - New: env variables MQTT_SIMPLE_USERNAME and MQTT_SIMPLE_PASSWORD
+        - New: undocumented global $Net::MQTT::Simple::PROTOCOL_LEVEL
+        - Fix: workaround for apparent bug in mosquitto 1.6(.1?)
+    !!  - Now depends on a sane Perl installation with strict and warnings
+    !!  - Default protocol version is now 3.1.1
+    !!  - Client identifier is now random instead of PID based
+
 1.22  2018-12-01 21:01
         - New: username/password authentication (login method)
         - Changelog now uses ISO dates

@@ -3,7 +3,7 @@ package MVC::Neaf::Route;
 use strict;
 use warnings;
 
-our $VERSION = 0.2603;
+our $VERSION = '0.2701';
 
 =head1 NAME
 
@@ -401,7 +401,7 @@ make_getters( %RO_FIELDS );
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

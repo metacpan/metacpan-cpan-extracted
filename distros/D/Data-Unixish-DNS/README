@@ -1,0 +1,38 @@
+NAME
+    Data::Unixish::DNS - dux functions related to DNS
+
+VERSION
+    This document describes version 0.001 of Data::Unixish::DNS (from Perl
+    distribution Data-Unixish-DNS), released on 2019-05-30.
+
+SYNOPSIS
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Unixish-DNS>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Unixish-DNS>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Unixish-DNS>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Unixish
+
+    dux
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

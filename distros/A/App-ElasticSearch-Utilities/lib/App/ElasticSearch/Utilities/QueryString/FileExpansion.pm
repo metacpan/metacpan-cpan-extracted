@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::FileExpansion;
 use strict;
 use warnings;
 
-our $VERSION = '6.6'; # VERSION
+our $VERSION = '6.7'; # VERSION
 
 use CLI::Helpers qw(:output);
 use File::Slurp::Tiny qw(read_lines);
@@ -78,7 +78,8 @@ sub _parse_txt {
     if(@rows) {
         for(@rows) {
             chomp;
-            my @cols = split /[\s,]+/;
+            # Split on tabs or nulls
+            my @cols = split /[\t\0]/;
             my $value = $cols[$col];
             if(defined $value) {
                 $uniq{$value} = 1;
@@ -145,7 +146,7 @@ App::ElasticSearch::Utilities::QueryString::FileExpansion - Build a terms query 
 
 =head1 VERSION
 
-version 6.6
+version 6.7
 
 =head1 SYNOPSIS
 
@@ -190,7 +191,7 @@ We can source that file:
 
 This make it simple to use the --data-file output options and build queries
 based off previous queries. For .txt and .dat file, the delimiter for columns
-in the file must be either a tab, comma, or a semicolon.  For files ending in
+in the file must be either a tab or a null.  For files ending in
 .csv, Text::CSV_XS is used to accurate parsing of the file format.  Files
 ending in .json are considered to be newline-delimited JSON.
 

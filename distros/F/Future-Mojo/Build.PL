@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Future-Mojo",
-      "dist_version" => "1.000",
+      "dist_version" => "1.001",
       "license" => "artistic_2",
       "module_name" => "Future::Mojo",
       "recursive_test_files" => 1,

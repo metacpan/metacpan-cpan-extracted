@@ -3,12 +3,21 @@
 use strict;
 use warnings;
 use Test::More;
-use MVC::Neaf::Util qw(JSON encode_json decode_json);
+
+sub warnextract(&) { ## no critic
+    my $code = shift;
+
+    my @warn;
+    local $SIG{__WARN__} = sub { push @warn, shift };
+    $code->();
+
+    note "Got warning: ".$_ for @warn;
+    return @warn;
+};
 
 use MVC::Neaf;
 
 my @warn;
-$SIG{__WARN__} = sub { push @warn, shift };
 
 neaf pre_route => sub {
     my $req = shift;
@@ -24,43 +33,34 @@ get '/kaboom' => sub {
     return { -view => 'TT', -template => \'[% IF kaboom %]' };
 };
 
-my @ret;
-my $body;
+subtest "expection in handler" => sub {
+    my @ret;
+    my @warn = warnextract {
+        @ret = neaf->run_test('/kaboom');
+    };
 
-note "EXPECTION IN HANDLER";
-@ret = neaf->run_test('/kaboom');
-is $ret[0], 500, "tpl error = status 500";
-note $ret[2];
-$body = eval { decode_json( $ret[2] ) };
-is ref $body, 'HASH', "jsoned hash returned";
-is $body->{error}, 500, "Error 500 inside";
-ok $body->{req_id}, "req_id present";
-is $body->{reason}, undef, "no reason in reply";
+    is $ret[0], 500, "tpl error = status 500";
 
-is scalar @warn, 1, "1 warning reported";
-like $warn[0], qr/ERROR.*\Q$body->{req_id}\E.*foobared/
-    , "req_id and original error retained";
+    my ($req_id) = $ret[2] =~ qr{<b>([-\w]+)</b>};
+    like $req_id, qr/[-\w]{8}/, "reasonably long request id";
 
-note "WARN: $_" for @warn;
-undef $body;
-@warn = ();
+    is scalar @warn, 1, "exactly 1 warning";
+    like $warn[0], qr/ERROR.*\Q$req_id\E.*foobared/, "req_id and original error retained";
+};
 
-note "EXPECTION IN TEMPLATE";
-@ret = neaf->run_test('/kaboom?tpl=1');
-is $ret[0], 500, "tpl error = status 500";
-note $ret[2];
-$body = eval { decode_json( $ret[2] ) };
-is ref $body, 'HASH', "jsoned hash returned";
-is $body->{error}, 500, "Error 500 inside";
-ok $body->{req_id}, "req_id present";
-# TODO 0.25 Also show reason via Exception
-# like $body->{reason}, qr/render/, "reason present";
+subtest "expection in template" => sub {
+    my @ret;
+    my @warn = warnextract {
+        @ret = neaf->run_test('/kaboom?tpl=1');
+    };
 
-is scalar @warn, 1, "1 warning reported";
-like $warn[0], qr/ERROR.*\Q$body->{req_id}\E/, "req_id retained";
+    is $ret[0], 500, "tpl error = status 500";
 
-note "WARN: $_" for @warn;
-undef $body;
-@warn = ();
+    my ($req_id) = $ret[2] =~ qr{<b>([-\w]+)</b>};
+    like $req_id, qr/[-\w]{8}/, "reasonably long request id";
+
+    is scalar @warn, 1, "exactly 1 warning";
+    like $warn[0], qr/ERROR.*\Q$req_id\E.*rendering/, "req_id retained";
+};
 
 done_testing;

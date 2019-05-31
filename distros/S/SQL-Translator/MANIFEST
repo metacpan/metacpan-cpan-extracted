@@ -1,20 +1,5 @@
 AUTHORS
 Changes
-inc/Module/AutoInstall.pm
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/AutoInstall.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/ReadmeFromPod.pm
-inc/Module/Install/Scripts.pm
-inc/Module/Install/Share.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/SQL/Translator.pm
 lib/SQL/Translator/Diff.pm
 lib/SQL/Translator/Filter/DefaultExtra.pm
@@ -95,10 +80,9 @@ lib/SQL/Translator/Schema/View.pm
 lib/SQL/Translator/Types.pm
 lib/SQL/Translator/Utils.pm
 lib/Test/SQL/Translator.pm
+maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-META.yml
-README
 script/sqlt
 script/sqlt-diagram
 script/sqlt-diff
@@ -226,3 +210,7 @@ t/sqlite-rename-field.t
 xt/eol.t
 xt/notabs.t
 xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

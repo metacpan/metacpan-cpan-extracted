@@ -1,5 +1,14 @@
 Revision history for App-Deps-Verify
 
+0.8.3       2019-05-30
+    - Fix doc issues.
+
+0.8.2       2019-05-30
+    - Add docs to bin/deps-app - thanks to xcombelle.
+
+0.8.1       2019-05-30
+    - Add support for the "gm" executable.
+
 0.8.0       2019-02-08
     - Add support for multiple yamls to write_rpm_spec_text_to_fh .
 

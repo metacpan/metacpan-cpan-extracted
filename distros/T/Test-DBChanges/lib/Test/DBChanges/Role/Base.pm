@@ -5,7 +5,7 @@ use Types::Standard qw(ArrayRef Str);
 use Test::DBChanges::ChangeSet;
 use namespace::autoclean;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: base role for all DBChanges classes
 
 
@@ -51,7 +51,7 @@ Test::DBChanges::Role::Base - base role for all DBChanges classes
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 DESCRIPTION
 

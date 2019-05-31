@@ -1,3 +1,14 @@
+0.004   2019-05-30 (PERLANCAR)
+
+	- [doc] Add screenshots.
+
+	- [ux] When --action=show-timings and --colorize, color the fastest
+	  server with green.
+
+	- Rename --times (--action=show-times) to --timings
+	  (--action=show-timings).
+
+
 0.003   2019-05-29 (PERLANCAR)
 
 	- Add option --times (--action=show-times) to show timing results

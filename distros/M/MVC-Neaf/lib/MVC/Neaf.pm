@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.2603;
+our $VERSION = '0.2701';
 
 =head1 NAME
 
@@ -720,13 +720,15 @@ And by running this one gets
 
 =head2 set_error_handler()
 
-    neaf 403 => sub { ... }
-
-    $neaf->set_error_handler ( $status => CODEREF( $request, %options ) )
+    $neaf->set_error_handler ( $status => CODEREF( $request, %options ), %where )
 
 Set custom error handler.
 
-Status must be a 3-digit number (as in HTTP).
+Status MUST be a 3-digit number (as in HTTP).
+
+%where may include C<path>, C<method>, and C<exclude> keys.
+If omitted, just install error handler globally.
+
 Other allowed keys MAY appear in the future.
 
 The following options will be passed to coderef:
@@ -745,9 +747,9 @@ This is DEPRECATED and will silently disappear around version 0.25
 The coderef MUST return an unblessed hash just like a normal controller does.
 
 In case of exception or unexpected return format
-default JSON-based error will be returned.
+default HTML error page will be returned.
 
-Also available as C<set_error_handler( status =E<gt> \%hash )>.
+Also available in static form, as C<set_error_handler( status =E<gt> \%hash )>.
 
 This is a synonym to C<sub { +{ status =E<gt> $status,  ... } }>.
 
@@ -758,6 +760,8 @@ This is a synonym to C<sub { +{ status =E<gt> $status,  ... } }>.
     $neaf->load_resources( $file_name || \*FH )
 
 Load pseudo-files from a file, like templates or static files.
+This is automatically called upon C<run> if C<__DATA__> is present,
+unless C<neaf-E<gt>magic(0)> was called.
 
 The format is as follows:
 
@@ -794,6 +798,14 @@ Unknown format value will cause exception though.
 B<[EXPERIMENTAL]> This method and exact format of data is being worked on.
 
 =cut
+
+=head2 magic
+
+    neaf->magic( 0 || 1)
+    my $get = neaf->magic
+
+Get/set whether automatic actions should occur.
+Currently only affects calling L</load_resources> upon L</run>.
 
 =head2 set_helper
 
@@ -1405,7 +1417,7 @@ adding of multiple methods for the same path.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

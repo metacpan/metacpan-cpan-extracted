@@ -5,6 +5,7 @@ requires "Type::Library" => "0";
 requires "Type::TinyX::Facets" => "0";
 requires "Type::Utils" => "0";
 requires "Types::Standard" => "0";
+requires "perl" => "5.010";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -17,7 +18,6 @@ on 'test' => sub {
   requires "PDL::Types" => "0";
   requires "Test2::V0" => "0";
   requires "Test::More" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'test' => sub {

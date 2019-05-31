@@ -3,7 +3,7 @@ use Moo::Role;
 use 5.024;
 use namespace::autoclean;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: fetches data recorded by triggers
 
 
@@ -50,7 +50,7 @@ Test::DBChanges::Role::Triggers - fetches data recorded by triggers
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 DESCRIPTION
 

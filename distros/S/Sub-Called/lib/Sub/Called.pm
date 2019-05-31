@@ -11,7 +11,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(with_ampersand already_called not_called);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 sub with_ampersand {
@@ -24,12 +24,6 @@ sub with_ampersand {
     my $svref = \&{$sub};
     my $obj   = B::svref_2object( $svref );
 
-use Data::Printer;
-p $obj;
-p @{[  $sub, $line, $func ]};
-p @{[ caller(2) ]};
-p @{[ caller(1) ]};
-    
     my $op      = $sub eq 'main' ? B::main_start() : $obj->START;
     my $is_line = 0;
     my $retval  = 0;
@@ -112,7 +106,7 @@ Sub::Called - get information about how the subroutine is called
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

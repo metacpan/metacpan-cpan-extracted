@@ -1,5 +1,16 @@
 Revision history for Types-PDL
 
+0.03      2019-05-30 15:41:57-04:00 America/New_York
+
+  [BUG FIX]
+
+    * not all of the documented Type::Tiny types recognized
+      the 'type' facet
+
+  [ENHANCEMENT]
+
+    * new facet 'shape' to validate the piddle's shape
+
 0.02      2019-05-24 17:21:06-04:00 America/New_York
 
   [ENHANCEMENT]

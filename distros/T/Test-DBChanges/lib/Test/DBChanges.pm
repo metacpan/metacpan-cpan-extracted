@@ -2,7 +2,7 @@ package Test::DBChanges;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: track changes to database tables
 
 
@@ -20,7 +20,7 @@ Test::DBChanges - track changes to database tables
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

@@ -19,6 +19,7 @@ It accepts the following parameters:
   ndims
   ndims_min
   ndims_max
+  shape
   type
 
    "Piddle0D"
@@ -36,6 +37,7 @@ accepts the following parameters:
 
   null
   empty
+  shape
   type
 
    "Piddle2D"
@@ -45,6 +47,7 @@ accepts the following parameters:
 
   null
   empty
+  shape
   type
 
    "Piddle3D"
@@ -54,6 +57,7 @@ accepts the following parameters:
 
   null
   empty
+  shape
   type
 
   Coercions
@@ -102,6 +106,48 @@ with "ndims".
 
 The maximum number of dimensions the piddle may have. Don't specify this
 with "ndims".
+
+   "shape"
+
+The shape of the piddle.
+
+The value is a list of specifications for dimensions, expressed either
+as elements in a Perl array or as comma-delimited fields in a string.
+
+The specifications are reminiscent of regular expressions. A
+specification is composed of an extent size followed by an optional
+quantifier indicating the number of dimensions it should match.
+
+Extent sizes may be
+
+1   A non-zero positive integer representing the extent of the
+    dimension.
+
+2   The strings "X" or ":" indicating that any extent is accepted for
+    that dimension
+
+Quantifiers may be
+
+  *           Match 0 or more times
+  +           Match 1 or more times
+  ?           Match 1 or 0 times
+  {n}         Match exactly n times
+  {n,}        Match at least n times
+  {n,m}       Match at least n but not more than m times
+
+Here are some example specifications and the shapes they might match (in
+the match, "X" means any extent):
+
+  2,2     => (2,2)
+  3,3,3   => (3,3,3)
+  3{3}    => (3,3,3)
+  3{2,3}  => (3,3),  (3,3,3)
+  1,X     => (1,X)
+  1,X+    => (1,X), (1,X,X),  (1,X,X,X), ...
+  1,X{1,} => (1,X), (1,X,X),  (1,X,X,X), ...
+  1,X?,3   => (1,X,3), (1,3)
+  1,2,X*   => (1,2), (1,2,X),  (1,2,X,X), ...
+  1,2,3*,5   => (1,2,5), (1,2,3,5),  (1,2,3,3,5), ...
 
    "type"
 

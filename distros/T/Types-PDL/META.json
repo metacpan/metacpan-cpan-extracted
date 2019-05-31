@@ -102,6 +102,7 @@
             "Type::TinyX::Facets" : "0",
             "Type::Utils" : "0",
             "Types::Standard" : "0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -118,15 +119,14 @@
             "PDL::Lite" : "0",
             "PDL::Types" : "0",
             "Test2::V0" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Types::PDL" : {
          "file" : "lib/Types/PDL.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -140,7 +140,7 @@
          "web" : "https://gitlab.com/djerius/types-pdl"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }

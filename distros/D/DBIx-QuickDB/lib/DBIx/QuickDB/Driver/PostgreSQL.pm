@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use IPC::Cmd qw/can_run/;
 
@@ -134,7 +134,7 @@ sub bootstrap {
     my $dir = $self->{+DIR};
     my $db_dir = $self->{+DATA_DIR};
     mkdir($db_dir) or die "Could not create data dir: $!";
-    $self->run_command([$self->{+INITDB}, '-D', $db_dir]);
+    $self->run_command([$self->{+INITDB}, '-E', 'UTF8', '-D', $db_dir]);
 
     open(my $cf, '>', "$db_dir/postgresql.conf") or die "Could not open config file: $!";
     for my $key (sort keys %{$self->{+CONFIG}}) {

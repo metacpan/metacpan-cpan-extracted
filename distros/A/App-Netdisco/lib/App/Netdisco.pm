@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.042008';
+our $VERSION = '2.042009';
 use App::Netdisco::Configuration;
 
 =head1 NAME
@@ -83,6 +83,11 @@ On Fedora/Red-Hat:
  root:~# postgresql-setup initdb
  root:~# systemctl start postgresql
  root:~# systemctl enable postgresql
+
+On openSUSE:
+
+ root:~# zypper refresh
+ root:~# zypper install curl automake gcc make postgresql postgresql-server openssh openssl net-snmp perl perl-DBD-Pg perl-SNMP
 
 On BSD systems please see L<our BSD tips|https://github.com/netdisco/netdisco/wiki/BSD-Install>.
 

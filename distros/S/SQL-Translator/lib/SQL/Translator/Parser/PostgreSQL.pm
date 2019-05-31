@@ -89,7 +89,7 @@ View table:
 use strict;
 use warnings;
 
-our $VERSION = '1.59';
+our $VERSION = '1.60';
 
 our $DEBUG;
 $DEBUG   = 0 unless defined $DEBUG;
@@ -1012,8 +1012,12 @@ DQSTRING : '"' <skip: ''> /((?:[^"]|"")+)/ '"'
 SQSTRING : "'" <skip: ''> /((?:[^']|'')*)/ "'"
     { ($return = $item[3]) =~ s/''/'/g }
 
+DOLLARSTRING : /\$[^\$]*\$/ <skip: ''> /.*?(?=\Q$item[1]\E)/s "$item[1]"
+    { $return = $item[3]; }
+
 VALUE : /[-+]?\d*\.?\d+(?:[eE]\d+)?/
     | SQSTRING
+    | DOLLARSTRING
     | /null/i
     { 'NULL' }
 

@@ -2,7 +2,7 @@ package MVC::Neaf::Route::Main;
 
 use strict;
 use warnings;
-our $VERSION = 0.2603;
+our $VERSION = '0.2701';
 
 =head1 NAME
 
@@ -23,12 +23,12 @@ containing a hash of other routes designated by their path prefixes.
 use Carp;
 use Encode;
 use Module::Load;
-use Scalar::Util qw( blessed looks_like_number );
+use Scalar::Util qw( blessed looks_like_number reftype );
 use URI::Escape;
 
 use parent qw(MVC::Neaf::Route);
 use MVC::Neaf::Util qw( run_all run_all_nodie http_date canonize_path check_path
-     maybe_list supported_methods extra_missing encode_b64 decode_b64 );
+     maybe_list supported_methods extra_missing encode_b64 decode_b64 data_fh );
 use MVC::Neaf::Util::Container;
 use MVC::Neaf::Request::PSGI;
 use MVC::Neaf::Route::PreRoute;
@@ -83,6 +83,9 @@ sub new {
     # This is required for $self->hooks to produce something.
     # See also todo_hooks where the real hooks sit.
     $self->{hooks} = {};
+
+    # magical by default
+    $self->{magic} = 1;
 
     return $self;
 };
@@ -865,12 +868,37 @@ sub set_forced_view {
     return $self;
 };
 
+=head2 magic( bool )
+
+Get/set "magic" bit that triggers stuff like loading resources from __DATA__
+on run() and such.
+
+Neaf is magical by default.
+
+=cut
+
+# Dumb accessor(boolean)
+sub magic {
+    my $self = shift;
+    if (@_) {
+        $self->{magic} = !! shift;
+        return $self;
+    } else {
+        return $self->{magic};
+    };
+};
+
 =head2 load_resources()
 
     $neaf->load_resources( $file_name || \*FH )
 
 Load pseudo-files from a file (typically C<__DATA__>),
 say templates or static files.
+
+As of 0.27, load_resources happens automatically upon L<run>,
+but only once for each calling file.
+Use C<neaf-E<gt>magic(0)> if you know better
+(e.g. you want to use __DATA__ for something else).
 
 The format is as follows:
 
@@ -917,26 +945,36 @@ my $INLINE_SPEC = qr/^(?:\[(\w+)\]\s+)?(\S+)((?:\s+\w+=\S+)*)$/;
 my %load_resources_opt;
 $load_resources_opt{$_}++ for qw( view format type );
 sub load_resources {
-    my ($self, $file) = @_;
+    my ($self, $file, $name) = @_;
+
+    if (!ref $file and defined $file) {
+        open my $fd, "<", $file
+            or $self->my_croak( "Failed to open(r) $file: $!" );
+        $name = $file;
+        $file = $fd;
+    };
+
+    # Don't load the same filename twice
+    return $self
+        if defined $name and $self->{load_resources}{$name}++;
 
     my $content;
 
     if (ref $file eq 'GLOB') {
         local $/;
         $content = <$file>;
+        defined $content
+            or $self->my_croak( "Failed to read from $file: $!" );
+        close $file;
         # Die later
     } elsif (ref $file eq 'SCALAR') {
         $content = $$file;
-    } elsif (!ref $file and defined $file) {
-        open my $fd, "<", $file
-            or $self->my_croak( "Failed to open(r) $file: $!" );
-        $content = <$fd>;
     } else {
         $self->my_croak( "Argument must be a scalar, a scalar ref, or a file descriptor" );
     };
 
     defined $content
-        or $self->my_croak( "Failed to read from $file: $!" );
+        or $self->my_croak( "Failed load content" );
 
     # TODO 0.40 The regex should be: ^@@\s+(/\S+(?:\s+\w+=\S+)*)\s*$
     #     but we must deprecate '[TT] foo.html' first
@@ -1110,11 +1148,15 @@ sub set_session_handler {
 
 =head2 set_error_handler()
 
-    $neaf->set_error_handler ( $status => CODEREF( $request, %options ) )
+    $neaf->set_error_handler ( $status => CODEREF( $request, %options ), %where )
 
 Set custom error handler.
 
-Status must be a 3-digit number (as in HTTP).
+Status MUST be a 3-digit number (as in HTTP).
+
+%where may include C<path>, C<method>, and C<exclude> keys.
+If omitted, just install error handler globally.
+
 Other allowed keys MAY appear in the future.
 
 The following options will be passed to coderef:
@@ -1133,21 +1175,22 @@ This is DEPRECATED and will silently disappear around version 0.25
 The coderef MUST return an unblessed hash just like a normal controller does.
 
 In case of exception or unexpected return format
-default JSON-based error will be returned.
+default HTML error page will be returned.
 
-Also available as C<set_error_handler( status =E<gt> \%hash )>.
+Also available in static form, as C<set_error_handler( status =E<gt> \%hash )>.
 
 This is a synonym to C<sub { +{ status =E<gt> $status,  ... } }>.
 
 =cut
 
-# TODO 0.30 helper
 sub set_error_handler {
-    my ($self, $status, $code) = @_;
+    my ($self, $status, $code, %where) = @_;
     $self = _one_and_true($self) unless ref $self;
 
     $status =~ /^(?:\d\d\d)$/
-        or $self->my_croak( "1st arg must be http status");
+        or $self->my_croak( "1st argument must be an http status");
+    extra_missing( \%where, { path => 1, exclude => 1, method => 1 } );
+
     if (ref $code eq 'HASH') {
         my $hash = $code;
         $code = sub {
@@ -1156,10 +1199,13 @@ sub set_error_handler {
             return { -status => $opt{status}, %opt, %$hash };
         };
     };
-    UNIVERSAL::isa($code, 'CODE')
-        or $self->my_croak( "2nd arg must be callback or hash");
+    reftype $code eq 'CODE'
+        or $self->my_croak( "2nd argument must be a callback or hash");
 
-    $self->{error_template}{$status} = $code;
+    my $store = $self->{error_template}{$status}
+        ||= MVC::Neaf::Util::Container->new();
+
+    $store->store( $code, %where );
 
     return $self;
 };
@@ -1269,6 +1315,13 @@ sub _make_route_re {
 Run the application.
 This SHOULD be the last statement in your application's main file.
 
+When run() is called, the routes are compiled into one giant regex,
+and the post-setup is run, if needed.
+
+Additionally if neaf is in magical mode,
+L</load_resources> is called on the enclosing file's DATA descriptor.
+Magic mode is on by default. See L</magic-bool>.
+
 If called in void context, assumes execution as C<CGI>
 and prints results to C<STDOUT>.
 If command line options are present at the moment,
@@ -1289,6 +1342,13 @@ sub run {
     my $self = shift;
     $self = _one_and_true($self) unless ref $self;
 
+    # "Magically" load __DATA__ section from calling file
+    if ($self->{magic}) {
+        my ($file, $data) = data_fh(1);
+        $self->load_resources( $data, $file )
+            if $data;
+    };
+
     if (!defined wantarray) {
         # void context - we're being called as CGI
         if (@ARGV) {
@@ -1303,6 +1363,8 @@ sub run {
         };
     };
 
+    # Do postsetup after CGI/CLI execution
+    # because it's unneeded there - only one route may be needed so why bother
     $self->post_setup;
 
     return sub {
@@ -1479,8 +1541,6 @@ sub get_routes {
 
     return \%ret;
 };
-
-
 
 =head1 RUN TIME METHODS
 
@@ -1738,7 +1798,7 @@ sub _error_to_reply {
     };
 
     # Try fancy error template
-    if (my $tpl = $self->{error_template}{$err->status}) {
+    if (my $tpl = $self->_get_error_handler( $err->status, $req )) {
         my $ret = eval {
             my $data = $tpl->( $req,
                 status => $err->status,
@@ -1759,6 +1819,15 @@ sub _error_to_reply {
     $req->log_error( $err->reason )
         if $err->is_sudden;
     $req->_set_reply( $err->make_reply( $req ) );
+};
+
+sub _get_error_handler {
+    my ($self, $status, $req) = @_;
+
+    my $store = $self->{error_template}{$status};
+    return unless $store;
+
+    return $store->fetch_last( method => $req->method, path => $req->path );
 };
 
 =head1 DEPRECATED METHODS
@@ -1794,7 +1863,7 @@ sub route {
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

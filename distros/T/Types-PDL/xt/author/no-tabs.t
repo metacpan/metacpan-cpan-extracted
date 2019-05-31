@@ -15,7 +15,10 @@ my @files = (
     't/coercions.t',
     't/empty.t',
     't/ndims.t',
+    't/nelem.t',
     't/null.t',
+    't/shape.t',
+    't/shape_match.t',
     't/subtypes.t',
     't/type.t'
 );

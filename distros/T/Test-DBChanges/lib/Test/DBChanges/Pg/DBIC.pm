@@ -5,7 +5,7 @@ use namespace::autoclean;
 with 'Test::DBChanges::Role::DBIC',
     'Test::DBChanges::Role::Pg';
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: track changes to DBIC+PostgreSQL resultsets
 
 
@@ -23,7 +23,7 @@ Test::DBChanges::Pg::DBIC - track changes to DBIC+PostgreSQL resultsets
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

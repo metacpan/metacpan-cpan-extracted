@@ -26,7 +26,7 @@ no_index:
 provides:
   Amazon::S3::Thin::ResponseParser:
     file: lib/Amazon/S3/Thin/ResponseParser.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   XML::LibXML: '0'
   perl: '5.008001'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/hatena/Amazon-S3-Thin-ResponseParser/issues
   homepage: https://github.com/hatena/Amazon-S3-Thin-ResponseParser
   repository: git://github.com/hatena/Amazon-S3-Thin-ResponseParser.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:AKIYM
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

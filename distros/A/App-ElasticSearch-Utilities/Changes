@@ -1,9 +1,58 @@
 ==================================================
-Changes from 2017-05-26 00:00:00 +0000 to present.
+Changes from 2017-05-30 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.6 at 2019-05-26 21:14:01 +0000
+version 6.7 at 2019-05-30 05:02:27 +0000
+----------------------------------------
+
+  Change: b223877862510dac87c842505b5e4624503fffc7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-29 22:01:39 +0000
+
+    Docs updated for the 6.7 release 
+
+  Change: 4c6fb9711924541da25bffb2c606bf0fbc49d3ed
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-29 21:46:29 +0000
+
+    Make handling of pretty printing consistent and less insane 
+
+  Change: fde91b31d2f38ea3447cb35cb0513b02d540ab9d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-29 21:46:29 +0000
+
+    Short-hand --json or --jq to enable JSON output 
+
+  Change: 21ba6625d90306ed6c01897bb0f944baab362370
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-29 21:46:29 +0000
+
+    Fix the "Displaying X of Y" for aggregations
+
+    This outputs the cardinality of the field in the `--top` option. Care is
+    taken for stepped data, and multi day requests to represent the max
+    displayed and the max available. 
+
+  Change: 2898b207bf4f83845ca887d8bd79718c2db1d71f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-29 21:22:10 +0000
+
+    Fix delimiters for .dat/.txt files
+
+    The documentation was incorrect and the logic wasn't great either. Split
+    .txt and .dat lines only by tabs or null characters. Attempting to split on
+    spaces meant fields were not able to contain spaces and the column count
+    could vary between lines. 
+
+  Change: 5ee650b8ee015c3d7a8f5d8388c0024041070117
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-28 20:11:47 +0000
+
+    TravisCI Integration Updated via App::CISetup 
+
+----------------------------------------
+version 6.6 at 2019-05-26 21:12:14 +0000
 ----------------------------------------
 
   Change: 762f7e14e368ade8b947f92563023a5a416ae152
@@ -676,5 +725,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-05-26 00:00:00 +0000.
+Plus 60 releases after 2017-05-30 00:00:00 +0000.
 =================================================

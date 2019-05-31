@@ -3,7 +3,7 @@ use Moo::Role;
 use Types::Standard qw(HasMethods);
 use namespace::autoclean;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: adapt DBChanges to DBI
 
 
@@ -44,7 +44,7 @@ Test::DBChanges::Role::DBI - adapt DBChanges to DBI
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 DESCRIPTION
 

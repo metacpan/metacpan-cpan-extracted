@@ -55,7 +55,7 @@
    "provides" : {
       "Amazon::S3::Thin::ResponseParser" : {
          "file" : "lib/Amazon/S3/Thin/ResponseParser.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/hatena/Amazon-S3-Thin-ResponseParser"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:AKIYM",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1

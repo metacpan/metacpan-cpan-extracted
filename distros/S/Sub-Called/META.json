@@ -43,7 +43,7 @@
    "provides" : {
       "Sub::Called" : {
          "file" : "lib/Sub/Called.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "http://github.com/reneeb/Sub-Called"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"

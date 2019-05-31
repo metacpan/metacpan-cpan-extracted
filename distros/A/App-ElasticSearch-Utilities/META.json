@@ -100,7 +100,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "6.6",
+   "version" : "6.7",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -550,7 +550,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-6.6",
+                  "tag" : "release-6.7",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%v"
                },

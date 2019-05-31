@@ -2,7 +2,7 @@ package MVC::Neaf::Util;
 
 use strict;
 use warnings;
-our $VERSION = 0.2603;
+our $VERSION = '0.2701';
 
 =head1 NAME
 
@@ -21,6 +21,7 @@ This module optionally exports anything it has.
 
 use Carp;
 use MIME::Base64 3.11;
+use Scalar::Util qw( openhandle );
 
 use parent qw(Exporter);
 our @EXPORT_OK = qw(
@@ -29,6 +30,8 @@ our @EXPORT_OK = qw(
     JSON encode_json decode_json encode_b64 decode_b64
     extra_missing make_getters maybe_list http_date rex
     supported_methods
+    data_fh
+    bare_html_escape
 );
 our @CARP_NOT;
 
@@ -341,11 +344,53 @@ if (!$luck) {
     *JSON = sub () { "JSON::PP" };
 };
 
+=head2 data_fh($n)
+
+Get C<DATA> filehandle in the calling package $n levels up the stack,
+together with the file name (so that we don't read the same __DATA__ twice).
+
+=cut
+
+sub data_fh {
+    my $n = shift;
+
+    my @caller = caller($n);
+
+    my $fh = do {
+        no strict 'refs'; ## no critic
+        \*{ $caller[0].'::DATA' };
+    };
+    return unless openhandle $fh and !eof $fh;
+
+    return ($caller[1], $fh);
+};
+
+=head2 bare_html_escape( $dangerous )
+
+A crude html-entities escaper.
+Should be replaced by something real.
+
+=cut
+
+# TODO 0.40 replace with a normal module
+my %entity = (
+    '&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '"' => '&quot;',
+);
+my $entity_rex = qr([&<>"]);
+sub bare_html_escape {
+    my $str = shift;
+    $str =~ s/($entity_rex)/$entity{$1}/g;
+    return $str;
+};
+
 =head1 LICENSE AND COPYRIGHT
 
 This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+Copyright 2016-2019 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

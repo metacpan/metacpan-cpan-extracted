@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-# PODNAME: verify-deps
+# PODNAME: deps-app
+# ABSTRACT: verify the presence of dependencies or install them.
 
 use strict;
 use warnings;
@@ -16,11 +17,42 @@ __END__
 
 =head1 NAME
 
-verify-deps
+deps-app - verify the presence of dependencies or install them.
 
 =head1 VERSION
 
-version 0.8.0
+version 0.8.3
+
+=head1 SYNOPSIS
+
+    deps-app plinst -i bin/common-required-deps.yml -i bin/required-modules.yml
+    deps-app verify -o build-deps.stamp -i bin/common-required-deps.yml -i bin/required-modules.yml
+
+=head1 DESCRIPTION
+
+Install dependencies specified in one or more YAML files such as:
+
+=over 4
+
+=item * L<https://github.com/shlomif/shlomi-fish-homepage/blob/master/bin/required-modules.yml>
+
+=item * L<https://github.com/shlomif/perl-begin/blob/master/bin/required-modules.yml>
+
+=item * L<https://github.com/shlomif/fc-solve/blob/master/fc-solve/site/wml/bin/required-modules.yml>
+
+=back
+
+=head1 OPTIONS
+
+    --man - displays the man page.
+    --help - displays the help.
+    --version - displays the version.
+
+=head1 AUTHOR
+
+Shlomi Fish, L<http://www.shlomifish.org/> .
+
+=head1 ACKNOWLEDGEMENTS
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

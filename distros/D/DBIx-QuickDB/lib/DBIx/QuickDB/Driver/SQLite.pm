@@ -4,7 +4,7 @@ use warnings;
 
 use IPC::Cmd qw/can_run/;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use parent 'DBIx::QuickDB::Driver';
 

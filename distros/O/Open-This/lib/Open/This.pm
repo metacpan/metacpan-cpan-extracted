@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000017';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -45,6 +45,10 @@ sub parse_text {
     }
 
     $parsed{is_module_name} = is_module_name($text);
+
+    if ( !$parsed{file_name} && $text =~ m{\Ahttp}i ) {
+        $parsed{file_name} = _maybe_extract_file_from_url( \$text );
+    }
 
     if ( !$parsed{file_name} ) {
         if ( my $is_module_name = is_module_name($text) ) {
@@ -119,8 +123,13 @@ sub editor_args_from_parsed_text {
     return unless $parsed;
 
     # See https://vi.stackexchange.com/questions/18499/can-i-open-a-file-at-an-arbitrary-line-and-column-via-the-command-line
+    # nvim +'call cursor(11,2)' filename
+    # vi   +'call cursor(11,2)' filename
+    # vim  +'call cursor(11,2)' filename
     if ( exists $parsed->{column_number} ) {
-        if ( $ENV{EDITOR} eq 'vim' || $ENV{EDITOR} eq 'vi' ) {
+        if (   $ENV{EDITOR} eq 'nvim'
+            || $ENV{EDITOR} eq 'vi'
+            || $ENV{EDITOR} eq 'vim' ) {
             return (
                 sprintf(
                     q{+call cursor(%i,%i)},
@@ -130,6 +139,8 @@ sub editor_args_from_parsed_text {
                 $parsed->{file_name}
             );
         }
+
+        # nano +11,2 filename
         if ( $ENV{EDITOR} eq 'nano' ) {
             return (
                 sprintf(
@@ -142,6 +153,12 @@ sub editor_args_from_parsed_text {
         }
     }
 
+    # emacs +11 filename
+    # nano  +11 filename
+    # nvim  +11 filename
+    # pico  +11 filename
+    # vi    +11 filename
+    # vim   +11 filename
     return (
         ( $parsed->{line_number} ? '+' . $parsed->{line_number} : () ),
         $parsed->{file_name}
@@ -207,6 +224,29 @@ sub _maybe_extract_line_number_via_sub_name {
     }
 }
 
+sub _maybe_extract_file_from_url {
+    my $text = shift;
+
+    require_module('URI');
+    my $uri = URI->new($$text);
+
+    my @parts = $uri->path_segments;
+
+    # Is this a GitHub(ish) URL?
+    if ( $parts[3] eq 'blob' ) {
+        my $file = path( @parts[ 5 .. scalar @parts - 1 ] );
+
+        return unless $file->is_file;
+
+        $file = $file->stringify;
+
+        if ( $uri->fragment && $uri->fragment =~ m{\A[\d]\z} ) {
+            $file .= ':' . $uri->fragment;
+        }
+        return $file if $file;
+    }
+}
+
 sub _maybe_find_local_file {
     my $text          = shift;
     my $possible_name = module_notional_filename($text);
@@ -260,7 +300,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000016
+version 0.000017
 
 =head1 DESCRIPTION
 

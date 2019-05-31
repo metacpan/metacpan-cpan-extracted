@@ -1,5 +1,15 @@
 Changes for SQL::Translator
 
+1.60 - 2019-05-29
+ * No changes since 1.59_01
+
+1.59_01 - 2019-04-28
+ * Add support for parsing PostgreSQL dollar-quoted strings
+ * Add support for materialized views in Oracle producer
+ * switched JSON backend from JSON.pm to JSON::MaybeXS
+ * Port Makefile.PL from Module::Install to Distar
+ * Synchronise the version number across all modules
+
 0.11024 2018-01-09
 
  * Remove temporary diagnostics added in 0.11023_01

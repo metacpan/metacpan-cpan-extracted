@@ -29,16 +29,10 @@ get '/tpl' => sub {
     my $id = $capture->id;
 
     is $st, 500, "Status 500 if died";
-    is $head->header("content-type"), "application/json", "JSON in reply";
+    like $head->header("content-type"), qr(^text/html\b), "HTML in reply";
 
-    my $ref = eval {
-        decode_json( $content );
-    };
-    diag "Decode failed: $@"
-        unless $ref;
-    is ref $ref, 'HASH', "a proper hash";
-    is $ref->{error}, 500, "Status preserved";
-    is $ref->{req_id}, $id, "Id sent to user";
+    like $content, qr(<span>500</span>), "Status preserved";
+    like $content, qr(<b>\Q$id\E</b>), "Id sent to user";
 
     is scalar @warn, 1, "1 warning issued";
     like $warn[0], qr/\Q$id\E/, "req_id in log";
@@ -55,24 +49,19 @@ get '/tpl' => sub {
     my $id = $capture->id;
 
     is $st, 500, "Status 500 if died";
-    is $head->header("content-type"), "application/json", "JSON in reply";
-    note $content;
+    like $head->header("content-type"), qr(^text/html\b), "HTML in reply";
 
-    my $ref = eval {
-        decode_json( $content );
-    };
-    diag "Decode failed: $@"
-        unless $ref;
-    is ref $ref, 'HASH', "a proper hash";
-    is $ref->{error}, 500, "Status preserved";
-    is $ref->{req_id}, $id, "Id sent to user";
+    like $content, qr(<span>500</span>), "Status preserved";
+    like $content, qr(<b>\Q$id\E</b>), "Id sent to user";
     # TODO 0.25 must also explain reason via Exception
     # like $ref->{reason}, qr/render/i, "Rendering error or smth";
 
     is scalar @warn, 1, "1 warning issued";
     like $warn[0], qr/\Q$id\E/, "req_id in log";
 
+    note $content;
     note "WARN: $_" for @warn;
 }
 
 done_testing;
+

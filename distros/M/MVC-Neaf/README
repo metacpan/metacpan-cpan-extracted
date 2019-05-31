@@ -94,7 +94,7 @@ It changes rapidly though.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Konstantin S. Uvarin aka KHEDIN
+Copyright 2016-2019 Konstantin S. Uvarin aka KHEDIN
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

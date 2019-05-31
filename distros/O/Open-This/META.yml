@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/oalders/open-this/issues
   homepage: https://github.com/oalders/open-this
   repository: https://github.com/oalders/open-this.git
-version: '0.000016'
+version: '0.000017'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -291,6 +291,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - Dockerfile
             - Install
             - LICENSE
             - META.json
@@ -442,7 +443,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000016
+          tag: v0.000017
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

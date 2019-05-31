@@ -1,5 +1,5 @@
 This archive contains the distribution App-Deps-Verify,
-version 0.8.0:
+version 0.8.3:
 
   An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 

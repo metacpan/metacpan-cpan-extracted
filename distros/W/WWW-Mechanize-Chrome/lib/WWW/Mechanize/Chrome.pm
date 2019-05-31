@@ -20,9 +20,9 @@ use Data::Dumper;
 use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
-use HTTP::Cookies::Chrome;
+use HTTP::Cookies::ChromeDevTools;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -1439,7 +1439,13 @@ Retrieves the URL C<URL>.
 It returns a L<HTTP::Response> object for interface compatibility
 with L<WWW::Mechanize>.
 
-Note that Chrome does not support download of files.
+Note that the returned L<HTTP::Response> object gets the response body
+filled in lazily, so you might have to wait a moment to get the response
+body from the result. This is a premature optimization and later releases of
+WWW::Mechanize::Chrome are planned to fetch the response body immediately when
+accessing the response body.
+
+Note that Chrome does not support download of files through the API.
 
 =cut
 
@@ -2133,14 +2139,14 @@ sub set_download_directory( $self, $dir="" ) {
 
     my $cookies = $mech->cookie_jar
 
-Returns all the Chrome cookies in a L<HTTP::Cookies::Chrome> instance.
+Returns all the Chrome cookies in a L<HTTP::Cookies::ChromeDevTools> instance.
 Setting a cookie in there will also set the cookie in Chrome.
 
 =cut
 
 sub cookie_jar( $self ) {
     $self->{cookie_jar} ||= do {
-        my $c = HTTP::Cookies::Chrome->new( driver => $self->driver );
+        my $c = HTTP::Cookies::ChromeDevTools->new( driver => $self->driver );
         $c->load;
         $c
     };
@@ -2548,6 +2554,8 @@ sub content_encoding {
 Writes C<$html> into the current document. This is mostly
 implemented as a convenience method for L<HTML::Display::MozRepl>.
 
+The value passed in as C<$html> will be stringified.
+
 =cut
 
 sub update_html( $self, $content ) {
@@ -2555,7 +2563,7 @@ sub update_html( $self, $content ) {
         # Find "HTML" child node:
         my $nodeId = $root->{root}->{children}->[0]->{nodeId};
         $self->log('trace', "Setting HTML for node " . $nodeId );
-        $self->driver->send_message('DOM.setOuterHTML', nodeId => 0+$nodeId, outerHTML => $content )
+        $self->driver->send_message('DOM.setOuterHTML', nodeId => 0+$nodeId, outerHTML => "$content" )
      })->get;
 };
 

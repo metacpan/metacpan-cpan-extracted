@@ -8,31 +8,30 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'MPMinus'               => 1.17,
-        'CTK'                   => 1.12,
+        'MPMinus'               => 1.21,
+        'CTK'                   => 2.00,
         'Apache::Session'       => 1.90,
         'DBD::SQLite'           => 1.40,
     };
 
 WriteMakefile(
     'NAME'                  => 'MPMinusX::AuthSsn',
-    'DISTNAME'              => 'MPMinusX-AuthSsn',
-    'MIN_PERL_VERSION'      => 5.008001,
+    'MIN_PERL_VERSION'      => 5.016001,
     'VERSION_FROM'          => 'lib/MPMinusX/AuthSsn.pm', 
     'ABSTRACT_FROM'         => 'lib/MPMinusX/AuthSsn.pm', ,
     'BUILD_REQUIRES'        => $build_requires,
     'PREREQ_PM'             => $prereq_pm,
-    'AUTHOR'                => 'Lepenkov Sergey (Serz Minus) <minus@mail333.com>',
-    'LICENSE'               => 'gpl',
+    'AUTHOR'                => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
+    'LICENSE'               => 'perl',
     'META_MERGE' => {
         recommends => {
             'DBI'           => 0,
             'Data::Dumper'  => 0,
         },
         resources => {
-            homepage        => 'http://www.serzik.ru',
-            repository      => 'http://svn.serzik.ru/MPMinusX-AuthSsn/trunk',
-            license         => 'http://opensource.org/licenses/gpl-license.php',
+            homepage        => 'https://www.serzik.com',
+            repository      => 'http://svn.serzik.com/MPMinusX-AuthSsn/trunk',
+            license         => 'https://dev.perl.org/licenses',
         },
     },
 );

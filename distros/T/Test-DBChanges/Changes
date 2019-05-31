@@ -1,3 +1,7 @@
+1.0.2     2019-05-30 14:42:17+01:00 Europe/London
+  - bumped Test::PostgreSQL dependency, we need a recent one that
+    implements "seeding"
+
 1.0.1     2019-05-28 10:34:58+01:00 Europe/London
   - skip tests on PostgreSQL before 9.4, we need the JSONB type
 

@@ -27,17 +27,9 @@ get '/foo/bar' => sub {
     local $SIG{__WARN__} = sub { push @warn, shift };
 
     my $content = neaf->run_test( '/foo/bar' );
-    my $ref = eval {
-        decode_json( $content );
-    };
-    diag "Decode failed: ".$@ || "unknown reason"
-        unless $ref;
 
-    is ref $ref, 'HASH', "A hash returned";
-    is $ref->{error}, 500, "Error 500 reported";
-    ok $ref->{req_id}, "request_id present";
-
-    my $id = $ref->{req_id};
+    my ($id) = $content =~ qr{<b>([-\w]+)</b>};
+    like $id, qr/[-\w]{8}/, "some reasonably long identifier";
     note "req_id=$id";
 
     my $file = __FILE__;

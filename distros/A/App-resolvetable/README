@@ -1,10 +1,13 @@
 NAME
     App::resolvetable - Produce a colored table containing DNS resolve
-    results of several names from several servers
+    results of several names from several servers/resolvers
 
 VERSION
-    This document describes version 0.003 of App::resolvetable (from Perl
-    distribution App-resolvetable), released on 2019-05-29.
+    This document describes version 0.004 of App::resolvetable (from Perl
+    distribution App-resolvetable), released on 2019-05-30.
+
+DESCRIPTION
+    Sample screenshot 1 (with "--colorize"):
 
 FUNCTIONS
   resolvetable
@@ -13,7 +16,7 @@ FUNCTIONS
      resolvetable(%args) -> [status, msg, payload, meta]
 
     Produce a colored table containing DNS resolve results of several names
-    from several servers.
+    from several servers/resolvers.
 
     This function is not exported.
 
@@ -22,8 +25,8 @@ FUNCTIONS
     *   action => *str* (default: "show-addresses")
 
         The default action is to show resolve result ("show-addresses"). If
-        set to "show-times", will show resolve times instead to compare
-        speed among DNS servers.
+        set to "show-timings", will show resolve times instead to compare
+        speed among DNS servers/resolvers.
 
     *   colorize => *bool*
 
@@ -46,6 +49,8 @@ FUNCTIONS
 
     Return value: (any)
 
+    Sample screenshot 2 (with "--colorize --timings"):
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-resolvetable>.
@@ -61,6 +66,7 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 

@@ -3,7 +3,7 @@ package Future::Role::Promisify;
 use Mojo::Promise;
 use Role::Tiny;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 requires qw(on_done on_fail retain);
 
@@ -26,21 +26,21 @@ Future::Role::Promisify - Chain a Mojo::Promise from a Future
 
 =head1 SYNOPSIS
 
-use IO::Async::Loop::Mojo;
-use Role::Tiny ();
+  use IO::Async::Loop::Mojo;
+  use Role::Tiny ();
 
-my $loop = IO::Async::Loop::Mojo->new;
-my $future = $loop->timeout_future(after => 5);
-Role::Tiny->apply_roles_to_object($future, 'Future::Role::Promisify');
-$future->promisify->then(sub { say 'Resolved' })->catch(sub { warn 'Rejected' })->wait;
+  my $loop = IO::Async::Loop::Mojo->new;
+  my $future = $loop->timeout_future(after => 5);
+  Role::Tiny->apply_roles_to_object($future, 'Future::Role::Promisify');
+  $future->promisify->then(sub { say 'Resolved' })->catch(sub { warn 'Rejected' })->wait;
 
-use Future::Mojo;
-use Mojo::IOLoop;
+  use Future::Mojo;
+  use Mojo::IOLoop;
 
-my $loop = Mojo::IOLoop->new;
-my $future = Future::Mojo->new($loop);
-$loop->timer(1 => sub { $future->done('Success!') });
-$future->promisify->then(sub { say @_ })->wait;
+  my $loop = Mojo::IOLoop->new;
+  my $future = Future::Mojo->new($loop);
+  $loop->timer(1 => sub { $future->done('Success!') });
+  $future->promisify->then(sub { say @_ })->wait;
 
 =head1 DESCRIPTION
 

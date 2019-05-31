@@ -34,12 +34,12 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "Test::PostgreSQL" => 0,
+    "Test::PostgreSQL" => "1.27",
     "base" => 0,
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.0.1",
+  "VERSION" => "1.0.2",
   "test" => {
     "TESTS" => "t/*.t t/tests/*.t"
   }
@@ -58,7 +58,7 @@ my %FallbackPrereqs = (
   "Test::Deep" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Test::PostgreSQL" => 0,
+  "Test::PostgreSQL" => "1.27",
   "Types::Standard" => 0,
   "base" => 0,
   "lib" => 0,

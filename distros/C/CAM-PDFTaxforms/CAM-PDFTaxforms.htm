@@ -1,0 +1,327 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CAM::PDFTaxforms - CAM::PDF wrapper to also allow editing of checkboxes (ie. for IRS Tax forms).</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#API">API</a>
+    <ul>
+      <li><a href="#Functions-intended-to-be-used-externally">Functions intended to be used externally</a></li>
+      <li><a href="#For-additional-methods-and-functions-see-the-CAM::PDF-documentation">For additional methods and functions, see the CAM::PDF documentation.</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SCRIPTS">SCRIPTS</a></li>
+  <li><a href="#COMPATIBILITY">COMPATIBILITY</a></li>
+  <li><a href="#PERFORMANCE">PERFORMANCE</a></li>
+  <li><a href="#DEPENDS">DEPENDS</a></li>
+  <li><a href="#KEYWORDS">KEYWORDS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>CAM::PDFTaxforms - CAM::PDF wrapper to also allow editing of checkboxes (ie. for IRS Tax forms).</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jim Turner <code>&lt;https://metacpan.org/author/TURNERJW&gt;</code>.</p>
+
+<p>This module is a wrapper around and a drop-in replacement for <a>CAM::PDF</a>, by Chris Dolan.</p>
+
+<h1 id="ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</h1>
+
+<p>Thanks to Chris Dolan and everyone involved in developing and supporting CAM::PDF, on which this module is based and relies on.</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>Copyright (c) 2010-2019 Jim Turner <code>&lt;mailto:turnerjw784@yahoo.com&gt;</code></p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as CAM::PDF and Perl itself.</p>
+
+<p><a>CAM::PDF</a>:</p>
+
+<p>Copyright (c) 2002-2006 Clotho Advanced Media, Inc., <a href="http://www.clotho.com/">http://www.clotho.com/</a></p>
+
+<p>Copyright (c) 2007-2008 Chris Dolan</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    #!/usr/bin/perl -w
+
+    use strict;
+    use CAM::PDFTaxforms;
+    my $pdf = CAM::PDFTaxforms-&gt;new(&#39;f1040.pdf&#39;) or die &quot;Could not open PDF ($!)!&quot;;    
+    my $page1 = $pdf-&gt;getPageContent(1);
+
+    #DISPLAY THE LIST NAMES OF EDITABLE FIELDS:
+    my @fieldnames = $pdf-&gt;getFormFieldList();
+    print &quot;--fields=&quot;.join(&#39;|&#39;,@fieldnames).&quot;=\n&quot;;
+
+    #UPDATE THE VALUES OF ONE OF THE FIELDS AND A COUPLE OF THE CHECKBOXES:
+    $pdf-&gt;fillFormFields(&#39;fieldname1&#39; =&gt; &#39;value1&#39;, &#39;fieldname2&#39; =&gt; &#39;value2&#39;);
+
+    #WRITE THE UPDATED PDF FORM TO A NEW FILE NAME:
+    $pdf-&gt;cleanoutput(&#39;f1040_completed.pdf&#39;);</code></pre>
+
+<p>Many example programs are included in this distribution to do useful tasks. See the <code>bin</code> subdirectory.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package is a wrapper for and creates a <a>CAM::PDF</a> object. The difference is that some method functions are overridden to fix some issues and add some new features, namely to better handle IRS tax forms, many of which have checkboxes, in addition to numeric and text fields. Several other patches have also been applied, particularly those provided by CAM::PDF bugs #58144, #122890 and #125299. Otherwise, it should work well as a full drop-in replacement for CAM::PDF in the API.</p>
+
+<p>CAM::PDF description:</p>
+
+<p>This package reads and writes any document that conforms to the PDF specification generously provided by Adobe at <a href="http://partners.adobe.com/public/developer/pdf/index_reference.html">http://partners.adobe.com/public/developer/pdf/index_reference.html</a> (link last checked Oct 2005).</p>
+
+<p>The file format through PDF 1.5 is well-supported, with the exception of the &quot;linearized&quot; or &quot;optimized&quot; output format, which this module can read but not write. Many specific aspects of the document model are not manipulable with this package (like fonts), but if the input document is correctly written, then this module will preserve the model integrity.</p>
+
+<p>The PDF writing feature saves as PDF 1.4-compatible. That means that we cannot write compressed object streams. The consequence is that reading and then writing a PDF 1.5+ document may enlarge the resulting file by a fair margin.</p>
+
+<p>This library grants you some power over the PDF security model. Note that applications editing PDF documents via this library MUST respect the security preferences of the document. Any violation of this respect is contrary to Adobe&#39;s intellectual property position, as stated in the reference manual at the above URL.</p>
+
+<p>Technical detail regarding corrupt PDFs: This library adheres strictly to the PDF specification. Adobe&#39;s Acrobat Reader is more lenient, allowing some corrupted PDFs to be viewable. Therefore, it is possible that some PDFs may be readable by Acrobat that are illegible to this library. In particular, files which have had line endings converted to or from DOS/Windows style (i.e. CR-NL) may be rendered unusable even though Acrobat does not complain. Future library versions may relax the parser, but not yet.</p>
+
+<p>This version is HACKED by Jim Turner 09/2010 to enable the fillFormFields() function to also modify checkboxes (primarily on IRS Tax forms).</p>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<p>See the example subdirectory in the source tree. There is a sample blank 2018 official IRS Schedule B tax form and two programs: <i>dof1040sb.pl</i>, which fills in the form using the sample input data text file <i>f1040sb_inputs.txt</i>, and creates a filled in version of the form called <i>f1040sb_out.pdf</i>. The other program (<i>test1040sb.pl</i>) can read the data filled in the filled in form created by the other program and displays it as output.</p>
+
+<p>To run the programs, switch to the examples subdirectory in the source tree and run them without arguments (ie. <b>./dof1040sb.pl</b>).</p>
+
+<p>To see the names of the fields and their current values in a PDF form, such as the aforementioned tax form, run the included program, ie: <i>listpdffields2.pl -d f1040sb_out.pdf</i>.</p>
+
+<h1 id="API">API</h1>
+
+<h2 id="Functions-intended-to-be-used-externally">Functions intended to be used externally</h2>
+
+<pre><code> $self = CAM::PDFTaxform-&gt;new(content | filename | &#39;-&#39;)
+ $self-&gt;toPDF()
+ $self-&gt;needsSave()
+ $self-&gt;save()
+ $self-&gt;cleansave()
+ $self-&gt;output(filename | &#39;-&#39;)
+ $self-&gt;cleanoutput(filename | &#39;-&#39;)
+ $self-&gt;previousRevision()
+ $self-&gt;allRevisions()
+ $self-&gt;preserveOrder()
+ $self-&gt;appendObject(olddoc, oldnum, [follow=(1|0)])
+ $self-&gt;replaceObject(newnum, olddoc, oldnum, [follow=(1|0)])
+    (olddoc can be undef in the above for adding new objects)
+ $self-&gt;numPages()
+ $self-&gt;getPageText(pagenum)
+ $self-&gt;getPageDimensions(pagenum)
+ $self-&gt;getPageContent(pagenum)
+ $self-&gt;setPageContent(pagenum, content)
+ $self-&gt;appendPageContent(pagenum, content)
+ $self-&gt;deletePage(pagenum)
+ $self-&gt;deletePages(pagenum, pagenum, ...)
+ $self-&gt;extractPages(pagenum, pagenum, ...)
+ $self-&gt;appendPDF(CAM::PDF object)
+ $self-&gt;prependPDF(CAM::PDF object)
+ $self-&gt;wrapString(string, width, fontsize, page, fontlabel)
+ $self-&gt;getFontNames(pagenum)
+ $self-&gt;addFont(page, fontname, fontlabel, [fontmetrics])
+ $self-&gt;deEmbedFont(page, fontname, [newfontname])
+ $self-&gt;deEmbedFontByBaseName(page, basename, [newfont])
+ $self-&gt;getPrefs()
+ $self-&gt;setPrefs()
+ $self-&gt;canPrint()
+ $self-&gt;canModify()
+ $self-&gt;canCopy()
+ $self-&gt;canAdd()
+ $self-&gt;getFormFieldList()
+ $self-&gt;fillFormFields(fieldname, value, [fieldname, value, ...])
+   or $self-&gt;fillFormFields(%values)
+ $self-&gt;clearFormFieldTriggers(fieldname, fieldname, ...)</code></pre>
+
+<p>Note: &#39;clean&#39; as in cleansave() and cleanobject() means write a fresh PDF document. The alternative (e.g. save()) reuses the existing doc and just appends to it. Also note that &#39;clean&#39; functions sort the objects numerically. If you prefer that the new PDF docs more closely resemble the old ones, call preserveOrder() before cleansave() or cleanobject().</p>
+
+<h2 id="For-additional-methods-and-functions-see-the-CAM::PDF-documentation">For additional methods and functions, see the <a>CAM::PDF</a> documentation.</h2>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="doc-CAM::PDFTaxforms-new-content">$doc = CAM::PDFTaxforms-&gt;new($content)</dt>
+<dd>
+
+</dd>
+<dt id="doc-CAM::PDFTaxforms-new-ownerpass-userpass">$doc = CAM::PDFTaxforms-&gt;new($ownerpass, $userpass)</dt>
+<dd>
+
+</dd>
+<dt id="doc-CAM::PDFTaxforms-new-content-ownerpass-userpass-prompt">$doc = CAM::PDFTaxforms-&gt;new($content, $ownerpass, $userpass, $prompt)</dt>
+<dd>
+
+</dd>
+<dt id="doc-CAM::PDFTaxforms-new-content-ownerpass-userpass-options">$doc = CAM::PDFTaxforms-&gt;new($content, $ownerpass, $userpass, $options)</dt>
+<dd>
+
+<p>Instantiate a new CAM::PDFTaxforms object. <code>$content</code> can be a document in a string, a filename, or &#39;-&#39;. The latter indicates that the document should be read from standard input. If the document is password protected, the passwords should be passed as additional arguments. If they are not known, a boolean <code>$prompt</code> argument allows the programmer to suggest that the constructor prompt the user for a password. This is rudimentary prompting: passwords are in the clear on the console.</p>
+
+<p>This constructor takes an optional final argument which is a hash reference. This hash can contain any of the following optional parameters:</p>
+
+<dl>
+
+<dt id="prompt_for_password-boolean">prompt_for_password =&gt; $boolean</dt>
+<dd>
+
+<p>This is the same as the <code>$prompt</code> argument described above.</p>
+
+</dd>
+<dt id="fault_tolerant-boolean">fault_tolerant =&gt; $boolean</dt>
+<dd>
+
+<p>This flag causes the instance to be more lenient when reading the input PDF. Currently, this only affects PDFs which cannot be successfully decrypted.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="hashref-doc-getFieldValue-fieldname1-fieldname2-...-fieldnameN">$hashref = $doc-&gt;getFieldValue(&#39;fieldname1&#39; [, fieldname2, ... fieldnameN ])</dt>
+<dd>
+
+<p>(CAM::PDFTaxforms only, not available in CAM::PDF)</p>
+
+<p>Fetches the corresponding current values for each field name in the argument list. Returns a reference to a hash containing the field names as keys and the corresponding values. If a field does not exist or does not contain a value, an empty string is returned in the hash as it&#39;s value. If called in array / hash context, then a list of field names and values in the order (fieldname1, value1, fieldname2, value2, ... fieldnameN valueN) is returned.</p>
+
+</dd>
+<dt id="doc-fillFormFields-name-value">$doc-&gt;fillFormFields($name =&gt; $value, ...)</dt>
+<dd>
+
+</dd>
+<dt id="doc-fillFormFields-opts_hash-name-value">$doc-&gt;fillFormFields($opts_hash, $name =&gt; $value, ...)</dt>
+<dd>
+
+<p>Set the default values of PDF form fields. The name should be the full hierarchical name of the field as output by the getFormFieldList() function. The argument list can be a hash if you like. A simple way to use this function is something like this:</p>
+
+<pre><code>    my %fields = (fname =&gt; &#39;John&#39;, lname =&gt; &#39;Smith&#39;, state =&gt; &#39;WI&#39;);
+    $field{zip} = 53703;
+    $self-&gt;fillFormFields(%fields);</code></pre>
+
+<p>NOTE: For checkbox fields specify any value that is <i>false</i> in Perl (ie. 0, &#39;&#39;, or <i>undef</i>), or any of the strings: &#39;Off&#39;, &#39;No&#39;, or &#39;Unchecked&#39; (case insensitive) to un-check a checkbox, or any other value that is <i>true</i> in Perl to check it. Checkbox fields are only supported by CAM::PDFTaxforms and was the original reason for creating it.</p>
+
+<p>If the first argument is a hash reference, it is interpreted as options for how to render the filled data:</p>
+
+<dl>
+
+<dt id="background_color-none-gray-r-g-b">background_color =&lt; &#39;none&#39; | $gray | [$r, $g, $b]</dt>
+<dd>
+
+<p>Specify the background color for the text field.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="doc-getFormFieldList">$doc-&gt;getFormFieldList()</dt>
+<dd>
+
+<p>Return an array of the names of all of the PDF form fields. The names are the full hierarchical names constructed as explained in the PDF reference manual. These names are useful for the fillFormFields() function.</p>
+
+</dd>
+<dt id="doc-getFormField-name">$doc-&gt;getFormField($name)</dt>
+<dd>
+
+<p><i>For INTERNAL use</i></p>
+
+<p>Return the object containing the form field definition for the specified field name. <code>$name</code> can be either the full name or the &quot;short/alternate&quot; name.</p>
+
+</dd>
+</dl>
+
+<h1 id="SCRIPTS">SCRIPTS</h1>
+
+<p>CAM::PDF includes a number of handy utility scripts, installed in the users local/bin path, but we add a modified version of their <i>listpdffields.pl</i> utility that is called <b>listpdffields2.pl</b> which adds a -d (--data) option for displaying the names of all the fields found in a PDF form, along with their corresponding current values (if any).</p>
+
+<dl>
+
+<dt id="listpdffiles2.pl--dhsvV-pdfformfile.pdf"><b>listpdffiles2.pl</b> [-dhsvV] <i>pdfformfile.pdf</i></dt>
+<dd>
+
+<p>The general format is:</p>
+
+<p>listpdffiles2.pl -d <i>pdfformfile.pdf</i></p>
+
+</dd>
+</dl>
+
+<h1 id="COMPATIBILITY">COMPATIBILITY</h1>
+
+<p>This library was primarily developed against the 3rd edition of the reference (PDF v1.4) with several important updates from 4th edition (PDF v1.5). This library focuses most deeply on PDF v1.2 features. Nonetheless, it should be forward and backward compatible in the majority of cases.</p>
+
+<h1 id="PERFORMANCE">PERFORMANCE</h1>
+
+<p>This module is written with good speed and flexibility in mind, often at the expense of memory consumption. Entire PDF documents are typically slurped into RAM. As an example, simply calling <code>new(&#39;PDFReference15_v15.pdf&#39;)</code> (the 13.5 MB Adobe PDF Reference V1.5 document) pushes Perl to consume 89 MB of RAM on my development machine.</p>
+
+<h1 id="DEPENDS">DEPENDS</h1>
+
+<p><a>CAM::PDF</a>, <a>Text::PDF</a>, <a>Crypt::RC4</a>, <a>Digest::MD5</a></p>
+
+<h1 id="KEYWORDS">KEYWORDS</h1>
+
+<p>pdf taxforms</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>CAM::PDF</a> (Obviously) as this module is a wrapper around it (and requires it as a prerequisite). Also see the docs there for all the other methods and features available to CAM::PDFTaxforms (it&#39;s NOT just for IRS tax forms)!</p>
+
+<p>There are several other PDF modules on CPAN. Below is a brief description of a few of them. If these comments are out of date, please inform me.</p>
+
+<dl>
+
+<dt id="PDF::API2"><a>PDF::API2</a></dt>
+<dd>
+
+<p>As of v0.46.003, LGPL license.</p>
+
+<p>This is the leading PDF library, in my opinion.</p>
+
+<p>Excellent text and font support. This is the highest level library of the bunch, and is the most complete implementation of the Adobe PDF spec. The author is amazingly responsive and patient.</p>
+
+</dd>
+<dt id="Text::PDF"><a>Text::PDF</a></dt>
+<dd>
+
+<p>As of v0.25, Artistic license.</p>
+
+<p>Excellent compression support (CAM::PDF cribs off this Text::PDF feature). This has not been developed since 2003.</p>
+
+</dd>
+<dt id="PDF::Reuse"><a>PDF::Reuse</a></dt>
+<dd>
+
+<p>As of v0.32, Artistic/GPL license, like Perl itself.</p>
+
+<p>This library is not object oriented, so it can only process one PDF at a time, while storing all data in global variables. I&#39;m not fond of it, but it&#39;s quite popular, so don&#39;t take my word for it!</p>
+
+</dd>
+</dl>
+
+<p>Additionally, PDFLib is a commercial package not on CPAN (<a>www.pdflib.com</a>). It is a C-based library with a Perl interface. It is designed for PDF creation, not for reuse.</p>
+
+
+</body>
+
+</html>
+
+

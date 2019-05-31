@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/hatena/Amazon-S3-Thin-ResponseParser.svg?branch=master)](https://travis-ci.com/hatena/Amazon-S3-Thin-ResponseParser)
 # NAME
 
 Amazon::S3::Thin::ResponseParser - A parser for S3 XML responses
@@ -37,6 +38,31 @@ This module provides a helper for the `list_objects` API which provide by [Amazo
 
     If you specify the `xml => $xml` argument, you can replace the XML parser.
     The `$xml` should be an instance of [XML::LibXML](https://metacpan.org/pod/XML::LibXML).
+
+- $error = $response\_parser->error($content);
+
+        my $res = $s3_client->get_object($bucket, $key);
+        if ($res->is_error) {
+            my $error = $response_parser->error($res->content);
+            if ($error->{code} eq 'NoSuchKey') {
+                die 'no such key';
+            } else {
+                warn $error->{code}, $error->{message};
+            }
+        }
+
+    This takes an XML response as `$content` and it will return an error.
+    The `$content` should be valid XML formed
+    [Error Responses](https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html).
+
+    `$error` is a hashref that looks like following form.
+
+        {
+            code       => 'NoSuchKey',
+            message    => 'The resource you requested does not exist',
+            resource   => '/mybucket/myfoto.jpg',
+            request_id => '4442587FB7D0A2F9',
+        };
 
 - ($list\_objects, $error) = $response\_parser->list\_objects($content);
 

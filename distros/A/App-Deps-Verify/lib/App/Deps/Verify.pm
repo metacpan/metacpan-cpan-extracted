@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.8.0';
+$App::Deps::Verify::VERSION = '0.8.3';
 # ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 
 use strict;
@@ -253,6 +253,12 @@ sub write_rpm_spec_text_from_yaml_file_to_fh
     );
 }
 
+my %EXES_TRANSLATIONS = (
+    convert => 'imagemagick',
+    gm      => 'graphicsmagick',
+    node    => 'nodejs',
+);
+
 sub write_rpm_spec_text_to_fh
 {
     my ( $self, $args, ) = @_;
@@ -279,27 +285,19 @@ Url:        $keys->{url}
 BuildArch:  noarch
 EOF
     {
-    EXECUTABLES:
         foreach my $exess ( map { $_->{required}->{executables} } @$yamls )
         {
+        EXECUTABLES:
             foreach my $line (@$exess)
             {
                 my $cmd = $line->{exe};
-                if ( $cmd eq 'sass' )
+                if ( $cmd eq 'sass' or $cmd eq 'minify' )
                 {
                     next EXECUTABLES;
                 }
-                elsif ( $cmd eq 'convert' )
+                elsif ( exists $EXES_TRANSLATIONS{$cmd} )
                 {
-                    $cmd = 'imagemagick';
-                }
-                elsif ( $cmd eq 'minify' )
-                {
-                    next EXECUTABLES;
-                }
-                elsif ( $cmd eq 'node' )
-                {
-                    $cmd = 'nodejs';
+                    $cmd = $EXES_TRANSLATIONS{$cmd};
                 }
                 $o->print("Requires: $cmd\n");
             }
@@ -358,7 +356,7 @@ App::Deps::Verify - An app and API to verify the presence of dependencies (Perl
 
 =head1 VERSION
 
-version 0.8.0
+version 0.8.3
 
 =head1 SYNOPSIS
 

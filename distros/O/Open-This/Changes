@@ -1,5 +1,8 @@
 Revision history for Open-This
 
+0.000017  2019-05-29 18:24:11Z
+    - Parse file paths out of full GitHub URLs. (GH#15) (Olaf Alders)
+
 0.000016  2019-05-27 17:20:10Z
     - Add column number parsing for ripgrep output and add support for opening
       files at arbitrary columns in vim (GH#12) (Olaf Alders)

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString;
 use strict;
 use warnings;
 
-our $VERSION = '6.6'; # VERSION
+our $VERSION = '6.7'; # VERSION
 
 use App::ElasticSearch::Utilities qw(:config);
 use App::ElasticSearch::Utilities::Query;
@@ -152,7 +152,7 @@ App::ElasticSearch::Utilities::QueryString - CLI query string fixer
 
 =head1 VERSION
 
-version 6.6
+version 6.7
 
 =head1 SYNOPSIS
 
@@ -359,7 +359,7 @@ We can source that file:
 
 This make it simple to use the --data-file output options and build queries
 based off previous queries. For .txt and .dat file, the delimiter for columns
-in the file must be either a tab, comma, or a semicolon.  For files ending in
+in the file must be either a tab or a null.  For files ending in
 .csv, Text::CSV_XS is used to accurate parsing of the file format.  Files
 ending in .json are considered to be newline-delimited JSON.
 

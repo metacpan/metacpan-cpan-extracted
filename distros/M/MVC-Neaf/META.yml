@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
+  Test::Exception: '0'
   Test::More: '0.87'
   Test::Warn: '0'
 configure_requires:
@@ -35,5 +36,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/perl-mvc-neaf/issues
   repository: https://github.com/dallaylaen/perl-mvc-neaf.git
-version: 0.2603
+version: '0.2701'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

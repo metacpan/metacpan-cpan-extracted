@@ -21,6 +21,7 @@ t/00-report-prereqs.t
 t/Open/This.t
 t/bin/date
 t/git.t
+t/github.t
 t/lib/Foo/Bar.pm
 t/nano.t
 t/other-lib/Foo/Baz.pm

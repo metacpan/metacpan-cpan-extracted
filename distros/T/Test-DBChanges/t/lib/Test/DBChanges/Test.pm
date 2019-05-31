@@ -1,7 +1,7 @@
 package Test::DBChanges::Test;
 use strict;
 use warnings;
-use Test::PostgreSQL;
+use Test::PostgreSQL 1.27;
 use Test::More;
 use Test::Deep;
 use Exporter 'import';

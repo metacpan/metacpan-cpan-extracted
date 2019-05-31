@@ -21,14 +21,14 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
-        'Date::Utils'          => '0.25',
+        'Date::Utils'          => '0.26',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Gregorian-Simple-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Gregorian::Simple' => { file => 'lib/Date/Gregorian/Simple.pm', version => '0.13' },
+            'Date::Gregorian::Simple' => { file => 'lib/Date/Gregorian/Simple.pm', version => '0.14' },
         },
         resources => {
             repository => {

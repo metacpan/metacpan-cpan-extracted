@@ -4,7 +4,7 @@ use warnings;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub new {
     my ($class, %args) = @_;
@@ -24,20 +24,27 @@ sub _xpc {
     return $xpc;
 }
 
+sub error {
+    my ($self, $content) = @_;
+
+    my $xpc = $self->_xpc($content);
+
+    # https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+    return {
+        code       => $xpc->findvalue('/Error/Code'),
+        message    => $xpc->findvalue('/Error/Message'),
+        request_id => $xpc->findvalue('/Error/RequestId'),
+        resource   => $xpc->findvalue('/Error/Resource'),
+    };
+}
+
 sub list_objects {
     my ($self, $content) = @_;
 
     my $xpc = $self->_xpc($content);
 
     if ($xpc->findnodes('/Error')) {
-        # https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
-        my $error = {
-            code       => $xpc->findvalue('/Error/Code'),
-            message    => $xpc->findvalue('/Error/Message'),
-            request_id => $xpc->findvalue('/Error/RequestId'),
-            resource   => $xpc->findvalue('/Error/Resource'),
-        };
-        return (undef, $error);
+        return (undef, $self->error($content));
     }
 
     # https://docs.aws.amazon.com/AmazonS3/latest/API/v2-RESTBucketGET.html
@@ -142,6 +149,31 @@ This will create a new instance of L<Amazon::S3::Thin::ResponseParser>.
 
 If you specify the C<< xml => $xml >> argument, you can replace the XML parser.
 The C<$xml> should be an instance of L<XML::LibXML>.
+
+=item $error = $response_parser->error($content);
+
+    my $res = $s3_client->get_object($bucket, $key);
+    if ($res->is_error) {
+        my $error = $response_parser->error($res->content);
+        if ($error->{code} eq 'NoSuchKey') {
+            die 'no such key';
+        } else {
+            warn $error->{code}, $error->{message};
+        }
+    }
+
+This takes an XML response as C<$content> and it will return an error.
+The C<$content> should be valid XML formed
+L<< Error Responses|https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html >>.
+
+C<$error> is a hashref that looks like following form.
+
+    {
+        code       => 'NoSuchKey',
+        message    => 'The resource you requested does not exist',
+        resource   => '/mybucket/myfoto.jpg',
+        request_id => '4442587FB7D0A2F9',
+    };
 
 =item ($list_objects, $error) = $response_parser->list_objects($content);
 

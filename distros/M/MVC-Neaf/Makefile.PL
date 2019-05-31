@@ -9,6 +9,7 @@ my %test_req = (
         'Test::More'          => 0.87, # done_testing
         'Test::Warn'          => 0,
         'File::Temp'          => 0,
+        'Test::Exception'     => 0,
 );
 
 WriteMakefile(

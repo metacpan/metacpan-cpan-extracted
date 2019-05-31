@@ -1,12 +1,12 @@
 {
    "abstract" : "MPMinus AAA via Apache::Session and DBD::SQLite",
    "author" : [
-      "Lepenkov Sergey (Serz Minus) <minus@mail333.com>"
+      "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "open_source"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,22 +38,22 @@
          },
          "requires" : {
             "Apache::Session" : "1.9",
-            "CTK" : "1.12",
+            "CTK" : "2",
             "DBD::SQLite" : "1.4",
-            "MPMinus" : "1.17",
-            "perl" : "5.008001"
+            "MPMinus" : "1.21",
+            "perl" : "5.016001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://www.serzik.ru",
+      "homepage" : "https://www.serzik.com",
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
+         "https://dev.perl.org/licenses"
       ],
       "repository" : {
-         "url" : "http://svn.serzik.ru/MPMinusX-AuthSsn/trunk"
+         "url" : "http://svn.serzik.com/MPMinusX-AuthSsn/trunk"
       }
    },
-   "version" : "1.00"
+   "version" : "1.01"
 }

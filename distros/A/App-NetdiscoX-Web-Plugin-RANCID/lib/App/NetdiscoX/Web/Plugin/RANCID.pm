@@ -3,7 +3,7 @@ package App::NetdiscoX::Web::Plugin::RANCID;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.006000';
 
 use Dancer ':syntax';
 

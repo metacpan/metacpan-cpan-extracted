@@ -32,12 +32,21 @@ is_deeply $ex->make_reply(My::Fake::Request->new)->{-headers}, [
          Allow => 'GET, POST',
     ], "Header round trip";
 
-$ex = MVC::Neaf::Exception->new( 405, -location => '/', -headers => [ Allow => 'GET, POST' ] );
+$ex = MVC::Neaf::Exception->new( 405, -location => '/?foo=1&bar=2', -headers => [ Allow => 'GET, POST' ] );
 is_deeply $ex->make_reply(My::Fake::Request->new)->{-headers}, [
-        Location => '/',
+        Location => '/?foo=1&bar=2',
         Allow    => 'GET, POST',
     ], "Header round trip (redir)";
 
+
+my $req = My::Fake::Request->new;
+my $error_page = $ex->make_reply($req)->{-content};
+my $id = $req->id;
+
+like $error_page, qr(<span>405</span>), 'Status present in page';
+like $error_page, qr(<i>/\?foo=1&amp;bar=2), "Link present in page";
+like $error_page, qr(<a href="/\?foo=1&amp;bar=2">), "Clickable link in page";
+like $error_page, qr(<b>\Q$id\E</b>), "Request id also in page";
 
 done_testing;
 
@@ -48,5 +57,5 @@ sub new {
 };
 
 sub id {
-    1;
+    'wasd42137';
 };

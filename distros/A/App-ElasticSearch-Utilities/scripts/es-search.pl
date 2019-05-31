@@ -35,6 +35,7 @@ GetOptions(\%OPT, qw(
     filter
     format=s
     help|h
+    json|jq
     manual|m
     match-all
     max-batch-size=i
@@ -86,12 +87,17 @@ if( $OPT{bases} ) {
 #--------------------------------------------------------------------------#
 # App Config
 my %CONFIG = (
-    size      => (exists $OPT{size}      && $OPT{size} > 0)         ? int($OPT{size})         : 20,
-    format    => (exists $OPT{format}    && length $OPT{format})    ? lc $OPT{format}         : 'yaml',
+    size      => ($OPT{size} && $OPT{size} > 0) ? int($OPT{size}) : 20,
+    format    => $OPT{json}   ? 'json'
+               : $OPT{format} ? lc $OPT{format}
+               : 'yaml',
     'max-batch-size' => $OPT{'max-batch-size'} || 50,
     $OPT{timestamp} ? ( timestamp => $OPT{timestamp} ) : (),
 );
 $OPT{'no-decorators'} = 1 if $CONFIG{format} eq 'json';
+$CONFIG{pretty} = $OPT{pretty} ? 1
+                : $CONFIG{format} =~ /pretty/ ? 1
+                : 0;
 #------------------------------------------------------------------------#
 # Handle Indices
 my $ORDER = exists $OPT{asc} && $OPT{asc} ? 'asc' : 'desc';
@@ -210,7 +216,7 @@ if( exists $OPT{top} ) {
 
     my %agg     = ();
     my %sub_agg = ();
-    if(exists $OPT{by}) {
+    if( $OPT{by}) {
         my ($type,$field) = split /\:/, $OPT{by};
         if( exists $SUPPORTED_AGGREGATIONS{$type} ) {
             $SUBAGG = $type;
@@ -220,7 +226,7 @@ if( exists $OPT{top} ) {
             output({color=>'red'}, "Aggregation '$type' is not currently supported, ignoring.");
         }
     }
-    if( exists $OPT{with} ) {
+    if( $OPT{with} ) {
         my @with = is_arrayref($OPT{with}) ? @{ $OPT{with} } : ( $OPT{with} );
         foreach my $with ( @with )  {
             my @attrs = split /:/, $with;
@@ -273,6 +279,7 @@ if( exists $OPT{top} ) {
         $agg{$top_agg}->{size} = $CONFIG{size};
     }
     $q->add_aggregations( top => \%agg );
+    $q->add_aggregations( out_of => { cardinality => { field => $field  } } );
 
     if( $OPT{interval} ) {
         $q->wrap_aggregations( step => {
@@ -293,6 +300,7 @@ else {
 
 my %displayed_indices = ();
 my $TOTAL_HITS        = 0;
+my $OUT_OF            = 0;
 my $last_hit_ts       = undef;
 my $duration          = 0;
 my $displayed         = 0;
@@ -371,6 +379,8 @@ AGES: while( !$DONE && @AGES ) {
 
         # Handle Aggregations
         if( exists $result->{aggregations} ) {
+            my $out_of =  $result->{aggregations}{out_of}{value};
+            $OUT_OF = $out_of if $out_of > $OUT_OF;
             my $steps = exists $result->{aggregations}{step} ? $result->{aggregations}{step}{buckets}
                       : [ $result->{aggregations} ];
             my $indent = exists $result->{aggregations}{step} ? 1 : 0;
@@ -380,6 +390,8 @@ AGES: while( !$DONE && @AGES ) {
                     output({color=>'cyan',clear=>1}, sprintf "%d\t%s", @{$step}{qw(doc_count key_as_string)});
                 }
                 if( @$aggs ) {
+                    # For top the N of T needs to represent maximums
+                    $displayed = scalar(@$aggs) if scalar(@$aggs) > $displayed;
                     output({color=>'cyan',indent=>$indent},$agg_header) unless $OPT{'no-decorators'};
                     foreach my $agg ( @$aggs ) {
                         $AGGS_TOTALS{$agg->{key}} ||= 0;
@@ -456,9 +468,7 @@ AGES: while( !$DONE && @AGES ) {
                             # Simple output
                             output({indent=>$indent,data=>!$CONFIG{summary}}, join("\t",@out));
                         }
-                        $displayed++;
                     }
-                    $TOTAL_HITS = exists $result->{aggegrations}{top}{other} ? $result->{aggregations}{top}{other} + $displayed : $TOTAL_HITS;
                 }
                 elsif(exists $result->{aggregations}{top}) {
                     output({indent=>1,color=>'red'}, "= No results.");
@@ -530,7 +540,7 @@ AGES: while( !$DONE && @AGES ) {
                 $output = join("\t",@cols);
             }
             else {
-                $output = $CONFIG{format} =~ /^json/? to_json($record,{allow_nonref=>1,canonical=>1,pretty=>$CONFIG{format} eq 'jsonpretty'})
+                $output = $CONFIG{format} =~ /^json/? to_json($record,{allow_nonref=>1,canonical=>1,pretty=>$CONFIG{pretty}})
                         : Dump $record;
             }
 
@@ -559,8 +569,13 @@ AGES: while( !$DONE && @AGES ) {
 
 output({stderr=>1,color=>'yellow'},
     "# Search Parameters:",
-    (map { "#    $_" } split /\r?\n/, to_json($q->query,{allow_nonref=>1,canonical=>1,pretty=>exists $OPT{pretty}})),
-    "# Displaying $displayed of $TOTAL_HITS in $duration seconds.",
+    (map { "#    $_" } split /\r?\n/, to_json($q->query,{allow_nonref=>1,canonical=>1,pretty=>$CONFIG{pretty}})),
+    sprintf("# Displaying %d of %d results%s took %0.2f seconds.",
+        $displayed,
+        $OUT_OF || $TOTAL_HITS,
+        $OUT_OF ? " in $TOTAL_HITS documents" : '',
+        $duration,
+    ),
     sprintf("# Indexes (%d of %d) searched: %s\n",
             scalar(keys %displayed_indices),
             scalar(keys %indices),
@@ -686,7 +701,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 6.6
+version 6.7
 
 =head1 SYNOPSIS
 
@@ -1164,7 +1179,7 @@ We can source that file:
 
 This make it simple to use the --data-file output options and build queries
 based off previous queries. For .txt and .dat file, the delimiter for columns
-in the file must be either a tab, comma, or a semicolon.  For files ending in
+in the file must be either a tab or a null.  For files ending in
 .csv, Text::CSV_XS is used to accurate parsing of the file format.  Files
 ending in .json are considered to be newline-delimited JSON.
 

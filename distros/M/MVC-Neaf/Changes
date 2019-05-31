@@ -1,5 +1,16 @@
 Revision history for MVC-Neaf
 
+0.2701  Thu May 30 2019
+        - BUG Fix regex type check on perls <= 5.010
+
+0.27    Thu May 30 2019
+        - API call load_resources(\*DATA) upon run() automatically
+        - API Add body_json(), body_raw(), body_text(), and content_type() calls to request
+        - API custom error handlers (neaf 404) can be configure per-path
+        - API BREAK Replace a JSON default error page with a HTML one
+        - API Add magic(bool) switch
+        - API Add regexp check for headers
+
 0.2603  Sat Nov 24 2018
         - BUG Fix Apache2 test warning
 

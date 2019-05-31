@@ -1,3 +1,248 @@
-$Id: README 2 2013-08-07 09:50:14Z minus $
+NAME
 
-Coming soon...
+    MPMinusX::AuthSsn - MPMinus AAA via Apache::Session and DBD::SQLite
+
+VERSION
+
+    Version 1.01
+
+SYNOPSIS
+
+        use MPMinusX::AuthSsn;
+    
+        # AuthSsn session
+        my $ssn;
+    
+        ... see description ...
+    
+        sub hCleanup {
+            ...
+            undef $ssn;
+            ...
+        }
+
+ABSTRACT
+
+    MPMinusX::AuthSsn - MPMinus AAA via Apache::Session and DBD::SQLite
+
+DESCRIPTION
+
+    Methods of using
+
+ METHOD #1. MPMINUS HANDLERS LEVEL (RECOMENDED)
+
+        sub hInit {
+            ...
+            my $usid = $usr{usid} || $q->cookie('usid') || '';
+            $ssn = new MPMinusX::AuthSsn( $m, $usid );
+            ...
+        }
+        sub hResponse {
+            ...
+            my $access = $ssn->access( sub {
+                    my $self = shift;
+                    return $self->status(0, 'FORBIDDEN') if $self->get('login') eq 'admin';
+                } );
+            if ($access) {
+                # Auhorized!
+                $h{login} = $ssn->get('login');
+            }
+            $template->cast_if("authorized", $access);
+            ....
+        }
+
+ METHOD #2. MPMINUS TRANSACTION LEVEL
+
+        sub default_access {
+            my $usid = $usr{usid} || $q->cookie('usid') || '';
+            $ssn = new MPMinusX::AuthSsn( $m, $usid );
+            return $ssn->access();
+        }
+        sub default_deny {
+            my $m = shift;
+            my $r = $m->r;
+            $r->headers_out->set(Location => "/auth.mpm");
+            return Apache2::Const::REDIRECT;
+        }
+        sub default_form {
+            ...
+            $h{login} = $ssn->get('login');
+            ...
+        }
+
+METHODS
+
+    new
+
+          my $authssn = new MPMinusX::AuthSsn( $m, $sid, $expires );
+
+      Returns object
+
+    authen
+
+          $ssn->authen( $callback, ...arguments... );
+
+      AAA Authentication.
+
+      The method returns status operation: 1 - successfully; 0 - not
+      successfully
+
+    authz
+
+          $ssn->authz( $callback, ...arguments... );
+
+      AAA Authorization.
+
+      The method returns status operation: 1 - successfully; 0 - not
+      successfully
+
+    access
+
+          $ssn->access( $callback, ...arguments... );
+
+      AAA Accounting (AAA Access).
+
+      The method returns status operation: 1 - successfully; 0 - not
+      successfully
+
+    get
+
+          $ssn->get( $key );
+
+      Returns session value by $key
+
+    set
+
+          $ssn->set( $key, $value );
+
+      Sets session value by $key
+
+    delete
+
+          $ssn->delete();
+
+      Delete the session
+
+    sid, usid
+
+          $ssn->sid();
+
+      Returns current usid value
+
+    expires
+
+          $ssn->expires();
+
+      Returns current expires value
+
+    status
+
+          $ssn->status();
+          $ssn->status( $newstatus, $reason );
+
+      Returns status of a previously executed operation. If you specify
+      $reason, there will push installation $newstatus
+
+    reason
+
+          $ssn->reason();
+
+      Returns reason of a previously executed operation.
+
+      Now supported following values: DEFAULT, OK, UNAUTHORIZED, ERROR,
+      SERVER_ERROR, NEW, TIMEOUT, LOGIN_INCORRECT, PASSWORD_INCORRECT,
+      DECLINED, AUTH_REQUIRED, FORBIDDEN.
+
+      For translating this values to regular form please use method
+      reason_translate like that
+
+    init
+
+          $ssn->init( $usid, $needcreate );
+
+      Internal method. Please do not use it
+
+      Method returns status operation: 1 - successfully; 0 - not
+      successfully
+
+    toexpire
+
+          $ssn->toexpire( $time );
+
+      Returns expiration interval relative to ctime() form.
+
+      If used with no arguments, returns the expiration interval if it was
+      ever set. If no expiration was ever set, returns undef.
+
+      All the time values should be given in the form of seconds. Following
+      keywords are also supported for your convenience:
+
+          +-----------+---------------+
+          |   alias   |   meaning     |
+          +-----------+---------------+
+          |     s     |   Second      |
+          |     m     |   Minute      |
+          |     h     |   Hour        |
+          |     d     |   Day         |
+          |     w     |   Week        |
+          |     M     |   Month       |
+          |     y     |   Year        |
+          +-----------+---------------+
+
+      Examples:
+
+          $ssn->toexpire("2h"); # expires in two hours
+          $ssn->toexpire(3600); # expires in one hour
+
+      Note: all the expiration times are relative to session's last access
+      time, not to its creation time. To expire a session immediately, call
+      delete() method.
+
+CONFIGURATION
+
+    Sample in file conf/auth.conf:
+
+        <Auth>
+            expires +3m
+            #sidkey usid
+            #tplkey authorized
+            #tplpfx auth
+            #file   /document_root/session.db
+            #dsn    dbi:SQLite:dbname=/document_root/session.db
+        </Auth>
+
+HISTORY
+
+    See Changes file
+
+DEPENDENCIES
+
+    MPMinus
+
+TO DO
+
+    See TODO file
+
+BUGS
+
+    * none noted
+
+SEE ALSO
+
+    MPMinus, CTK, Apache::Session, DBD::SQLite
+
+AUTHOR
+
+    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+
+COPYRIGHT
+
+    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See LICENSE file and https://dev.perl.org/licenses/
+

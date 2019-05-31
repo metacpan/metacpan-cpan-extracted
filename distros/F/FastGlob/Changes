@@ -1,0 +1,23 @@
+Revision history for FastGlob
+
+1.5       2019-05-30 15:35:49-06:00 America/Denver
+
+adjust CONTRIBUTING.md
+adjust author and remove duplicate POD sections
+
+1.4       2019-05-30 15:25:36-06:00 America/Denver
+
+Package the distro with Dist::Zilla
+Move tests outside of FileGlob
+Remove 'use vars'
+
+1.3       2000-10-30 Marc Mengel E<lt>F<mengel@fnal.gov>E<gt>
+
+Bugfixes for
+empty components (e.g. C<foo//bar>), and
+adjacent wildcards (e.g. x?? y** or x?*).
+
+1.2       1999-02 Brad Appleton E<lt>F<bradapp@enteract.com>E<gt>
+
+Modified to use qr// (and some other minor speedups) and made callable
+as a standalone script

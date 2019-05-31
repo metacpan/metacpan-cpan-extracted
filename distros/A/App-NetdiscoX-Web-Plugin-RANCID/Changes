@@ -1,3 +1,8 @@
+2.006000 - 2019-05-30
+
+  * use env instead of direct reference to perl for tests
+  * dynamic_build disabled, not needed
+
 2.005000 - 2019-04-29
 
   * implement earendilfr's patches to use check_acl & take into account

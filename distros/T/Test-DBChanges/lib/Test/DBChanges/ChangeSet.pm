@@ -4,7 +4,7 @@ use 5.024;
 use Types::Standard qw(HashRef ArrayRef);
 use Test::DBChanges::TableChangeSet;
 use namespace::autoclean;
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: set of changes to DB tables
 
 
@@ -74,7 +74,7 @@ Test::DBChanges::ChangeSet - set of changes to DB tables
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

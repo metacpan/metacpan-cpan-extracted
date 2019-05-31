@@ -20,39 +20,75 @@ for my $pdl_type ( @pdl_types ) {
 
     subtest $ioname => sub {
 
-        my $pdl = PDL->new( $pdl_type );
-        my $ttype;
+        for my $ttype (
+            [ Piddle   => \&Piddle,   sub { PDL->new( $pdl_type, 1 ) } ],
+            [ Piddle0  => \&Piddle0D, sub { PDL->new( $pdl_type ) } ],
+            [ Piddle1D => \&Piddle1D, sub { PDL->new( $pdl_type, [ 1, 2 ] ) } ],
+            [
+                Piddle2D => \&Piddle2D,
+                sub { PDL->new( $pdl_type, [ [ 1, 2 ] ] ) }
+            ],
+            [
+                Piddle3D => \&Piddle3D,
+                sub { PDL->new( $pdl_type, [ [ [ 1, 2 ] ] ] ) }
+            ],
+          )
+        {
 
-        subtest 'PDL::Type' => sub {
+            my ( $label, $type_generator, $pdl_generator ) = @$ttype;
 
-          SKIP: {
+            my $pdl = $pdl_generator->();
 
-                ok( lives { $ttype = Piddle([ type => $pdl_type ]) },
-                    'create type' )
-                  or skip "error creating type: $@", scalar keys %Type;
+            subtest $label => sub {
 
-                ok( $ttype->check( $pdl ), "correct type" );
 
-                ok( !$ttype->check( $Type{$_} ), "incorrect type: $_" )
-                  for grep { $_ ne $ioname } keys %Type;
-            }
-        };
+                subtest 'PDL::Type' => sub {
 
-        subtest 'type name' => sub {
+                  SKIP: {
 
-          SKIP: {
+                        my $type;
 
-                ok( lives { $ttype = Piddle[ type => $ioname ] },
-                    'create type' )
-                  or skip "error creating type: $@", scalar keys %Type;
+                        ok(
+                            lives {
+                                $type
+                                  = $type_generator->( [ type => $pdl_type ] )
+                            },
+                            'create type'
+                          )
+                          or skip "error creating type: $@", scalar keys %Type;
 
-                ok( $ttype->check( $pdl ), "correct type" );
+                        ok( $type->check( $pdl ), "correct type" );
 
-                ok( !$ttype->check( $Type{$_} ), "incorrect type: $_" )
-                  for grep { $_ ne $ioname } keys %Type;
-            }
-        };
+                        ok( !$type->check( $Type{$_} ), "incorrect type: $_" )
+                          for grep { $_ ne $ioname } keys %Type;
+                    }
+                };
 
+                subtest 'type name' => sub {
+
+                  SKIP: {
+
+                        my $type;
+
+                        ok(
+                            lives {
+                                $type
+                                  = $type_generator->( [ type => $ioname ] )
+                            },
+                            'create type'
+                          )
+                          or skip "error creating type: $@", scalar keys %Type;
+
+                        ok( $type->check( $pdl ), "correct type" );
+
+                        ok( !$type->check( $Type{$_} ), "incorrect type: $_" )
+                          for grep { $_ ne $ioname } keys %Type;
+                    }
+                };
+
+            };
+
+        }
     };
 }
 

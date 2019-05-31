@@ -36,14 +36,11 @@ my ($head, $body) = split /\n\s*\n/s, $result, 2;
 
 note "STDERR = \n".$log;
 
-my $data = eval {
-    decode_json($body);
-};
-ok $data, "Got valid JSON, error=$@";
-is $data->{error}, 500, "Error 500 inside";
-ok $data->{req_id}, "req_id present";
+like $body, qr(<span>500</span>), "Error 500 present";
+my ($req_id) = $body =~ qr(<b>(.*)</b>);
+like $req_id, qr(^[-\w]{8,}$), "Error id present and reasonably long";
 
-like $log, qr/req_id=$data->{req_id}/, "Req id round trip";
+like $log, qr/req_id=$req_id/, "Req id round trip";
 like $log, qr/Foobared at/, "Exception as expected";
 
 done_testing;

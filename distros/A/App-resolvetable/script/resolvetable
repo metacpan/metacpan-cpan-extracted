@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/resolvetable/resolvetable
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-05-29'; # DATE
+our $DATE = '2019-05-30'; # DATE
 our $DIST = 'App-resolvetable'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,7 @@ my $cmdline = Perinci::CmdLine::Classic->new(
 
 $cmdline->run;
 
-# ABSTRACT: Produce a colored table containing DNS resolve results of several names from several servers
+# ABSTRACT: Produce a colored table containing DNS resolve results of several names from several servers/resolvers
 # PODNAME: resolvetable
 
 __END__
@@ -35,17 +35,17 @@ __END__
 
 =head1 NAME
 
-resolvetable - Produce a colored table containing DNS resolve results of several names from several servers
+resolvetable - Produce a colored table containing DNS resolve results of several names from several servers/resolvers
 
 =head1 VERSION
 
-This document describes version 0.003 of resolvetable (from Perl distribution App-resolvetable), released on 2019-05-29.
+This document describes version 0.004 of resolvetable (from Perl distribution App-resolvetable), released on 2019-05-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % resolvetable [options] <name> ...
+ % resolvetable [options] <names>
 
 Examples:
 
@@ -67,11 +67,11 @@ Default value:
 
 Valid values:
 
- ["show-addresses","show-times"]
+ ["show-addresses","show-timings"]
 
 The default action is to show resolve result (`show-addresses`). If set to
-`show-times`, will show resolve times instead to compare speed among DNS
-servers.
+`show-timings`, will show resolve times instead to compare speed among DNS
+servers/resolvers.
 
 
 =item B<--colorize>
@@ -92,9 +92,9 @@ Can be specified multiple times.
 
 See C<--server>.
 
-=item B<--times>
+=item B<--timings>
 
-Shortcut for --action=show-times.
+Shortcut for --action=show-timings.
 
 See C<--action>.
 

@@ -93,7 +93,7 @@
          "web" : "https://github.com/oalders/open-this"
       }
    },
-   "version" : "0.000016",
+   "version" : "0.000017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -418,6 +418,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     "Dockerfile",
                      "Install",
                      "LICENSE",
                      "META.json",
@@ -614,7 +615,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000016",
+                  "tag" : "v0.000017",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

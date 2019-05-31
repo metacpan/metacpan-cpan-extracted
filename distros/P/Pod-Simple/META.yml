@@ -31,6 +31,7 @@ requires:
   Test: '1.25'
   Test::More: '0'
   Text::Wrap: '98.112902'
+  if: '0'
   integer: '0'
   overload: '0'
   strict: '0'
@@ -40,5 +41,5 @@ resources:
   homepage: http://search.cpan.org/dist/Pod-Simple/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/perl-pod/pod-simple.git
-version: '3.36'
+version: '3.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

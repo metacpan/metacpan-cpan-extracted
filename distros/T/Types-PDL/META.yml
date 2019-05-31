@@ -11,7 +11,6 @@ build_requires:
   PDL::Types: '0'
   Test2::V0: '0'
   Test::More: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -32,7 +31,7 @@ no_index:
 provides:
   Types::PDL:
     file: lib/Types/PDL.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   B: '0'
   Carp: '0'
@@ -41,11 +40,12 @@ requires:
   Type::TinyX::Facets: '0'
   Type::Utils: '0'
   Types::Standard: '0'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Types-PDL
   repository: https://gitlab.com/djerius/types-pdl.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

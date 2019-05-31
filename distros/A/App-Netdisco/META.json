@@ -81,6 +81,7 @@
             "Plack::Middleware::Expires" : "0.03",
             "Plack::Middleware::ReverseProxy" : "0.15",
             "Pod::Usage" : "0",
+            "Regexp::Common" : "2017060201",
             "Role::Tiny" : "1.002005",
             "SNMP::Info" : "3.68",
             "SQL::Abstract" : "1.85",
@@ -120,7 +121,7 @@
    "provides" : {
       "App::Netdisco" : {
          "file" : "lib/App/Netdisco.pm",
-         "version" : "2.042008"
+         "version" : "2.042009"
       },
       "App::Netdisco::AnyEvent::Nbtstat" : {
          "file" : "lib/App/Netdisco/AnyEvent/Nbtstat.pm"
@@ -142,7 +143,7 @@
       },
       "App::Netdisco::DB" : {
          "file" : "lib/App/Netdisco/DB.pm",
-         "version" : "57"
+         "version" : "58"
       },
       "App::Netdisco::DB::ExplicitLocking" : {
          "file" : "lib/App/Netdisco/DB/ExplicitLocking.pm"
@@ -185,9 +186,6 @@
       },
       "App::Netdisco::DB::Result::DevicePower" : {
          "file" : "lib/App/Netdisco/DB/Result/DevicePower.pm"
-      },
-      "App::Netdisco::DB::Result::DeviceRoute" : {
-         "file" : "lib/App/Netdisco/DB/Result/DeviceRoute.pm"
       },
       "App::Netdisco::DB::Result::DeviceSkip" : {
          "file" : "lib/App/Netdisco/DB/Result/DeviceSkip.pm"
@@ -814,6 +812,6 @@
       "x_IRC" : "irc://irc.freenode.org/#netdisco",
       "x_MailingList" : "https://lists.sourceforge.net/lists/listinfo/netdisco-users"
    },
-   "version" : "2.042008",
+   "version" : "2.042009",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

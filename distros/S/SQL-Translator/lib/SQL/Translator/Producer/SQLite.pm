@@ -25,7 +25,7 @@ use SQL::Translator::Utils qw(debug header_comment parse_dbms_version batch_alte
 use SQL::Translator::Generator::DDL::SQLite;
 
 our ( $DEBUG, $WARN );
-our $VERSION = '1.59';
+our $VERSION = '1.60';
 $DEBUG = 0 unless defined $DEBUG;
 $WARN = 0 unless defined $WARN;
 
@@ -66,7 +66,8 @@ sub produce {
     local $NO_QUOTES = 0
       if $translator->quote_identifiers and $translator->quote_identifiers ne '0E0';
 
-    my $head = (header_comment() . "\n") unless $no_comments;
+    my $head;
+    $head = (header_comment() . "\n") unless $no_comments;
 
     my @create = ();
 

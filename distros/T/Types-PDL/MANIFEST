@@ -6,9 +6,11 @@ META.json
 META.yml
 Makefile.PL
 README
+README.mkdn.orig
 cpanfile
 dist.ini
 lib/Types/PDL.pm
+lib/Types/PDL.pm.orig
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -16,7 +18,10 @@ t/basic.t
 t/coercions.t
 t/empty.t
 t/ndims.t
+t/nelem.t
 t/null.t
+t/shape.t
+t/shape_match.t
 t/subtypes.t
 t/type.t
 weaver.ini

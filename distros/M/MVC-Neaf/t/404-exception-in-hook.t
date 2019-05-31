@@ -19,8 +19,7 @@ warnings_like {
     $content = neaf->run_test( '/foo?pre_render=1' );
 } [qr/RANDR/], "Warning about pre-render";
 
-my $ref = decode_json( $content );
-is $ref->{error}, 500, "pre_render => error 500";
+like $content, qr(Error 500), "pre_render => error 500";
 
 warnings_like {
     $content = neaf->run_test( '/foo?pre_reply=1' );

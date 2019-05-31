@@ -3,55 +3,57 @@ abstract: 'SQL DDL transformations and more'
 author:
   - 'Ken Youens-Clark <kclark@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  JSON: '2.0'
-  Test::Differences: 0
+  ExtUtils::MakeMaker: '0'
+  JSON::MaybeXS: '1.003003'
+  Test::Differences: '0'
   Test::Exception: '0.31'
   Test::More: '0.88'
-  Text::ParseWords: 0
+  Text::ParseWords: '0'
   XML::Writer: '0.500'
   YAML: '0.66'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+  ExtUtils::MakeMaker: '6.54'
+  File::ShareDir::Install: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SQL-Translator
 no_index:
   directory:
-    - inc
-    - share
     - t
+    - inc
+    - maint
+    - share
     - xt
 recommends:
-  GD: 0
-  Graph::Directed: 0
-  GraphViz: 0
+  GD: '0'
+  Graph::Directed: '0'
+  GraphViz: '0'
   Spreadsheet::ParseExcel: '0.41'
   Template: '2.20'
   Text::RecordParser: '0.02'
   XML::LibXML: '1.69'
 requires:
-  Carp::Clan: 0
+  Carp::Clan: '0'
   DBI: '1.54'
-  Digest::SHA: 0
+  Digest::SHA: '0'
   File::ShareDir: '1.0'
   Moo: '1.000003'
   Package::Variant: '1.001001'
   Parse::RecDescent: '1.967009'
-  Scalar::Util: 0
-  Sub::Quote: 0
+  Scalar::Util: '0'
+  Sub::Quote: '0'
   Try::Tiny: '0.04'
-  perl: 5.8.1
+  perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#sql-translator
   Ratings: http://cpanratings.perl.org/d/SQL-Translator
   bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Translator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-translator/
-version: '0.11024'
+version: '1.60'
 x_authority: cpan:JROBINSON
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

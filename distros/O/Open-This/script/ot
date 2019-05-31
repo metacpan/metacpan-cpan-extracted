@@ -58,7 +58,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000016
+version 0.000017
 
 =head1 SYNOPSIS
 
@@ -97,6 +97,10 @@ version 0.000016
 
     # open Foo::Bar on the GitHub web site in your browser
     ot -b Foo::Bar
+
+    # open a file locally, using a GitHub link.  You must be at the top level
+    # of this repository on a local checkout.
+    ot https://github.com/oalders/git-helpers/blob/master/lib/Git/Helpers.pm#L50
 
 =head1 DESCRIPTION
 

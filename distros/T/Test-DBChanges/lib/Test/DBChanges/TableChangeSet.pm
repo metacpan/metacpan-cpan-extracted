@@ -4,7 +4,7 @@ use 5.024;
 use Types::Standard qw(Str CodeRef ArrayRef HashRef);
 use namespace::autoclean;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: set of changes to one DB table
 
 
@@ -101,7 +101,7 @@ Test::DBChanges::TableChangeSet - set of changes to one DB table
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

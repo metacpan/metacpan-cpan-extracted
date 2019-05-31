@@ -59,6 +59,9 @@ if ($one) {
 defined $publish or @topics or die $usage;
 
 my $m = $class->new($host);
+
+$username = $ENV{MQTT_SIMPLE_USERNAME} if not defined $username;
+$password = $ENV{MQTT_SIMPLE_PASSWORD} if not defined $password;
 $m->login($username, $password) if defined $username;
 
 if (defined $publish) {
@@ -140,8 +143,8 @@ mqtt-simple - Very simple MQTT implementation
 =head1 DESCRIPTION
 
 This is just a simple utility program. It doesn't do much. Specifically, all
-the QoS and username/password features are unsupported. Also, don't expect
-fancy error messages and such :-)
+the QoS features are unsupported. Also, don't expect fancy error messages and
+such :-)
 
 =head1 COMMAND LINE OPTIONS
 
@@ -208,6 +211,14 @@ an ASCII newline would be displayed as C<^J> unless C<--raw> is used.
 Prefix messages with a timestamp. Optionally, a I<format> for C<strftime> can
 be supplied.
 
+=item -u --user --username I<username>
+
+Specify a username. Overrides the environment variable C<MQTT_SIMPLE_USERNAME>.
+
+=item --pass --password I<password>
+
+Specify a password. Overrides the environment variable C<MQTT_SIMPLE_USERNAME>.
+
 =back
 
 =head2 SSL options
@@ -223,7 +234,7 @@ Use SSL instead of unencrypted connection.
 Disable SSL certificate validation and enable clear text passwords. Useful for
 testing, bad idea in production.
 
-Overrides the environment variable C<MQTT_SIMPLE_SSL_INSECURE> and
+Overrides the environment variables C<MQTT_SIMPLE_SSL_INSECURE> and
 C<MQTT_SIMPLE_ALLOW_INSECURE_LOGIN>.
 
 =item --ca I<path>

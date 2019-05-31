@@ -1,5 +1,8 @@
-package MPMinusX::AuthSsn; # $Id: AuthSsn.pm 2 2013-08-07 09:50:14Z minus $
+package MPMinusX::AuthSsn; # $Id: AuthSsn.pm 5 2019-05-28 10:59:30Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MPMinusX::AuthSsn - MPMinus AAA via Apache::Session and DBD::SQLite
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -15,7 +18,7 @@ Version 1.00
 
     # AuthSsn session
     my $ssn;
-    
+
     ... see description ...
 
     sub hCleanup {
@@ -150,7 +153,7 @@ Returns status of a previously executed operation. If you specify $reason, there
 
 Returns reason of a previously executed operation.
 
-Now supported following values: DEFAULT, OK, UNAUTHORIZED, ERROR, SERVER_ERROR, NEW, TIMEOUT, LOGIN_INCORRECT, 
+Now supported following values: DEFAULT, OK, UNAUTHORIZED, ERROR, SERVER_ERROR, NEW, TIMEOUT, LOGIN_INCORRECT,
 PASSWORD_INCORRECT, DECLINED, AUTH_REQUIRED, FORBIDDEN.
 
 For translating this values to regular form please use method reason_translate like that
@@ -169,10 +172,10 @@ Method returns status operation: 1 - successfully; 0 - not successfully
 
 Returns expiration interval relative to ctime() form.
 
-If used with no arguments, returns the expiration interval if it was ever set. 
-If no expiration was ever set, returns undef. 
+If used with no arguments, returns the expiration interval if it was ever set.
+If no expiration was ever set, returns undef.
 
-All the time values should be given in the form of seconds. 
+All the time values should be given in the form of seconds.
 Following keywords are also supported for your convenience:
 
     +-----------+---------------+
@@ -192,7 +195,7 @@ Examples:
     $ssn->toexpire("2h"); # expires in two hours
     $ssn->toexpire(3600); # expires in one hour
 
-Note: all the expiration times are relative to session's last access time, not to its creation time. 
+Note: all the expiration times are relative to session's last access time, not to its creation time.
 To expire a session immediately, call delete() method.
 
 =back
@@ -206,12 +209,13 @@ Sample in file conf/auth.conf:
         #sidkey usid
         #tplkey authorized
         #tplpfx auth
-        #file   /document_root/db/session.db
+        #file   /document_root/session.db
+        #dsn    dbi:SQLite:dbname=/document_root/session.db
     </Auth>
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 DEPENDENCIES
 
@@ -227,36 +231,33 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-C<perl>, L<MPMinus>, L<CTK>, L<Apache::Session>, L<DBD::SQLite>
+L<MPMinus>, L<CTK>, L<Apache::Session>, L<DBD::SQLite>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use vars qw/ $VERSION /;
-$VERSION = '1.00';
 
+use vars qw/ $VERSION /;
+$VERSION = '1.01';
+
+use Carp;
 use Apache::Session::Flex;
+use File::Spec;
+
 use CTK::Util qw/ :API :FORMAT :DATE /;
 use CTK::ConfGenUtil;
 use CTK::DBI;
@@ -266,95 +267,93 @@ use constant {
         SIDKEY          => 'usid',
         TPLKEY          => 'authorized',
         TPLPFX          => '',
-        SESSION_DIR     => 'sessions', # not used
+        SESSION_DIR     => 'sessions',
         SESSION_FILE    => 'sessions.db',
+        SESSION_DSN_MSK => 'dbi:SQLite:dbname=%s',
         SESSION_EXPIRES => '+1h', # 3600sec as default
-        
-        # Определяем таблицу перевода состояний
+
+        # Statuses translating map
         STAT => {
-            DEFAULT             => to_utf8('Статус неопределен'),
-            OK                  => to_utf8('Операция прошла успешно'),
-            UNAUTHORIZED        => to_utf8('Вы неавторизированы'),
-            ERROR               => to_utf8('Сессия несуществует или возникла ошибка создания сессии'),
-            SERVER_ERROR        => to_utf8('Ошибка сервера'),
-            NEW                 => to_utf8('Сесиия создана успешно'),
-            TIMEOUT             => to_utf8('Период жизни сессии истек'),
-            LOGIN_INCORRECT     => to_utf8('Неправильный логин'),
-            PASSWORD_INCORRECT  => to_utf8('Неправильный пароль'),
-            DECLINED            => to_utf8('Такой учетной записи нет'),
-            AUTH_REQUIRED       => to_utf8('Неверно введен пароль'),
-            FORBIDDEN           => to_utf8('Доступ запрещен'),
+            DEFAULT             => "Status not defined",
+            OK                  => "OK",
+            UNAUTHORIZED        => "Unauthorized",
+            ERROR               => "Session not exists or session creation error has occurred",
+            SERVER_ERROR        => "Server error",
+            NEW                 => "Created",
+            TIMEOUT             => "The session has expired",
+            LOGIN_INCORRECT     => "Login incorrect",
+            PASSWORD_INCORRECT  => "Password incorrect",
+            DECLINED            => "Account not found",
+            AUTH_REQUIRED       => "Auth required",
+            FORBIDDEN           => "Forbidden",
         },
     };
 
 sub new {
-    # Конструктор: создаем или используем ранее созданную сессиию
     my $class   = shift;
     my $m       = shift;
     my $usid    = shift || undef; # USID User Session IDentifier
-    my $expires = shift || undef; # Дефолтное Количество секунд которое может существовать сессия
+    my $expires = shift || undef;
     croak("The method call not in the MPMinus context") unless ref($m) =~ /MPMinus/;
 
     my $authconf    = hash($m->conf(CONFKEY));
     my $s_sidkey    = value($authconf, 'sidkey') || SIDKEY;
     my $s_tplkey    = value($authconf, 'tplkey') || TPLKEY;
     my $s_tplpfx    = value($authconf, 'tplpfx') || TPLPFX;
-    my $s_dir       = value($authconf, 'dir') || catdir($m->conf('document_root'),$m->conf('dir_db'),SESSION_DIR);
-    my $s_file      = value($authconf, 'file') || catfile($m->conf('document_root'),$m->conf('dir_db'),SESSION_FILE);
+    my $s_dir       = value($authconf, 'dir') || File::Spec->catdir($m->conf('document_root'), SESSION_DIR);
+    my $s_file      = value($authconf, 'file') || File::Spec->catfile($s_dir, SESSION_FILE);
+    my $dsn         = value($authconf, 'dsn') || sprintf(SESSION_DSN_MSK, $s_file);
     my $s_expires   = value($authconf, 'expires') || SESSION_EXPIRES;
     $expires ||= $s_expires;
-    #$m->log_error("Expires in OUT: ".$class->toexpire($expires));
 
-    # Создаем пустой объект
+    # Create
     my $self = bless {
         session     => {},
         transtable  => STAT,
-        status      => 0, # Связки не произошло
+        status      => 0, # No tied
         reason      => "UNAUTHORIZED",
         dir         => $s_dir,
         file        => $s_file,
-        expires     => $class->toexpire($expires), # сессия с момента последнего доступа к ней!
+        expires     => $class->toexpire($expires),
         $s_sidkey   => undef,
         sidkey      => $s_sidkey,
         tplkey      => $s_tplkey,
         tplpfx      => $s_tplpfx,
+        dsn         => $dsn,
+        prepared    => 0,
     }, $class;
-    
-    # Секция инициализации как использование
-    $self->init($usid, 0) if $usid; # Используем существующую сессию (НЕ создаем, создание ТОЛЬКО при авторизации)
-    
+
+    # Initialize as "read mode"
+    $self->init($usid, 0) if $usid;
+
     return $self;
 }
 sub init {
-    # Непосредственно инициализатор сессии
     my $self = shift;
     my $usid = shift || undef; # USID User Session IDentifier
-    my $create = shift || 0; # 1 - создать сессию; 0 - не создавать сессию, а просто свзять и все
-    
-    #
-    # Выполняет задачу валидации и создания сессии.
-    # Если пользователь ввел данные но они неверные, то возвращается ошибка со статусом ERROR
-    # Если пользователь вошел впервые то для него создается сессия со статусом NEW
-    # Если пользователь уже не первый раз посещает страницы с сессией то используется сессиия со статусом OK
-    #
-    
+    my $create = shift || 0; # 1 - create session; 0 - read session
+
     my %session;
     my $ssndata = $self->{session} && ref($self->{session}) eq 'HASH' ? $self->{session} : {};
     my $reason;
 
-    # Пути
-    my $sdir  = $self->{dir}; #use File::Path; mkpath( $sdir, {verbose => 0} ) unless -e $sdir;
+    # Paths
+    my $dsn  = $self->{dsn};
     my $sfile = $self->{file};
-    
-    # Создание пустой базы если ее нет или она пуста
-    my $dsn = "dbi:SQLite:dbname=$sfile";
-    unless ($sfile && (-e $sfile) && !(-z _)) {
-        my $sqlc = new CTK::DBI( -dsn  => $dsn);
+
+    # Prepare database
+    if ($sfile) { # My custom file
+        $self->{prepared} = 1 if (-e $sfile) && (-s _); # file and file is not empty
+    }
+
+    unless ($self->{prepared}) {
+        my $sqlc = new CTK::DBI(-dsn  => $dsn);
         $sqlc->execute('CREATE TABLE IF NOT EXISTS sessions ( id CHAR(32) NOT NULL PRIMARY KEY, a_session TEXT NOT NULL )');
         $sqlc->disconnect;
+        $self->{prepared} = 1;
     }
-    
-    # Опции для Apache::Session
+
+    # Apache::Session options
     my $opts = {
         Store       => 'MySQL',
         Lock        => 'Null',
@@ -363,29 +362,29 @@ sub init {
         DataSource  => $dsn,
     };
 
-    # Создаем новый галстук
+    # Tie!
     my $retstat = $self->status;
     eval { tie %session, 'Apache::Session::Flex', $usid, $opts; };
     if ($@) {
-        $reason = 'ERROR'; # Ошибки при инициализации объекта
+        $reason = 'ERROR'; # Init error
     } else {
         if ($usid) {
-            $reason = 'OK'; # Непервый удачный заход
+            $reason = 'OK'; # Not init request
         } else {
-            $reason = 'NEW'; # Первый заход!
+            $reason = 'NEW'; # Init request
         }
-        # Определяем созданный USID
+        # USID
         $self->{$self->{sidkey}} = $session{_session_id};
-        
-        # Добавляем данные в только-что созданную сессию (т.к. $create == 1)
+
+        # Add data to created session
         if ($create) {
-            $session{time_create} = time(); # Время создания
-            $session{time_access} = time(); # Время доступа
-            $session{expires}     = $self->{expires}; # Время кастомизированное для данной сессии
+            $session{time_create} = time(); # Create time
+            $session{time_access} = time(); # Access time
+            $session{expires}     = $self->{expires}; # Time for current session
             $session{$_} = $ssndata->{$_} foreach (keys %$ssndata);
         }
         $self->{session} = \%session;
-        $retstat = 1; # Связка произошла удачно
+        $retstat = 1; # Ok
     }
 
     return $self->status($retstat, $reason);
@@ -393,89 +392,75 @@ sub init {
 
 sub authen { # AAA-authen
     #
-    # Аутентификация. Проверка - правильно ли введены логин и пароль
-    #
-    # Может принимать значения:
+    # Possible responses:
     #   LOGIN_INCORRECT / PASSWORD_INCORRECT / AUTH_REQUIRED / DECLINED / FORBIDDEN / OK
     #
-    
+
     my $self = shift;
     my $callback = shift;
 
     # !!! callback here !!!
     if ($callback && ref($callback) eq 'CODE') {
-        return 0 unless $callback->($self,@_);
+        return 0 unless $callback->($self, @_);
     }
-    
+
     return $self->status(1, 'OK');
 }
 sub authz {  # AAA-authz
     #
-    # Авторизация. Проверка ролей и бан-листов уровня БД
-    #
-    # Может принимать значения:
+    # Possible responses:
     #   FORBIDDEN / OK
     #
-    
+
     my $self = shift;
     my $callback = shift;
 
     # !!! callback here !!!
     if ($callback && ref($callback) eq 'CODE') {
-        return 0 unless $callback->($self,@_);
-    }    
-    
-    # Авторизация прошла успешно. Можно создавать сессию
-    return 0 unless $self->init(undef,1);
+        return 0 unless $callback->($self, @_);
+    }
+
+    # РђРІС‚РѕСЂРёР·Р°С†РёСЏ РїСЂРѕС€Р»Р° СѓСЃРїРµС€РЅРѕ. РњРѕР¶РЅРѕ СЃРѕР·РґР°РІР°С‚СЊ СЃРµСЃСЃРёСЋ
+    return 0 unless $self->init(undef, 1);
     return 1;
 }
 sub access { # AAA-access
-    #
-    # Проверка данных сессии на предмет разрешения доступа к расширенному функционалу
-    # Бан-листы и прочее
-    #
-
     my $self = shift;
     my $callback = shift;
-    
-    # Проверка - а есть ли ошибки при инициализации ??
     return $self->status(0, $self->reason) unless $self->status;
 
-    # Проверка expires и обновление данных последнего доступа.
+    # РџСЂРѕРІРµСЂРєР° expires Рё РѕР±РЅРѕРІР»РµРЅРёРµ РґР°РЅРЅС‹С… РїРѕСЃР»РµРґРЅРµРіРѕ РґРѕСЃС‚СѓРїР°.
     my $expires = $self->expires;
     my $lastaccess = $self->get('time_access') || 0;
     my $newaccess = time();
     my $accessto = (($newaccess - $lastaccess) > $expires); # true - timeout
     if ($accessto) {
-        $self->delete(); # Удаляем если время истекло
+        $self->delete(); # Expired
         return $self->status(0, 'TIMEOUT');
     }
-    
+
     # !!! callback here !!!
     if ($callback && ref($callback) eq 'CODE') {
-        return 0 unless $callback->($self,@_);
+        return 0 unless $callback->($self, @_);
     }
-    
-    # Все проверки прошли успешно. обновляем время
-    $self->set('time_access', $newaccess); # Время доступа
-    
-    return $self->status(1, 'OK'); # Доступ разрешен!
+
+    # Ok
+    $self->set('time_access', $newaccess);
+
+    return $self->status(1, 'OK'); # Access granted
 }
 
 sub sid {
-    # Получение USID
     my $self = shift;
     return $self->{$self->{sidkey}} || undef;
 }
 sub usid { goto &sid }
 sub expires {
-    # Получение expires
     my $self = shift;
     my $expires = $self->{session}->{expires} ? $self->{session}->{expires} : $self->{expires};
     return $expires || 0;
 }
 sub status {
-    # Получение/установка статуса и причины или установка если задана причина
     my $self = shift;
     my $ns   = shift || 0;
     my $nr   = shift || '';
@@ -486,37 +471,31 @@ sub status {
     return $self->{status};
 }
 sub reason {
-    # Получение описания статуса
     my $self = shift;
     return $self->{reason};
 }
 sub get {
-    # Получение указанного ключа из сессии
     my $self = shift;
     my $key = shift || return;
     return $self->{session}->{$key} || undef;
 }
 sub set {
-    # Запись указанного ключа в сессию
     my $self = shift;
     my $key = shift || return 0;
     my $value = shift;
     return $self->{session}->{$key} = $value;
 }
 sub delete {
-    # Удаление сессии
     my $self = shift;
-    tied(%{$self->{session}})->delete() if $self->{status}; # Удаляем если есть что
+    tied(%{$self->{session}})->delete() if $self->{status};
     return $self->status(0, 'UNAUTHORIZED');
 }
 sub reason_translate {
-    # Перевод описания reason на русский язык с с расшифровкой
     my $self = shift;
     my $reason = shift || $self->reason() || 'DEFAULT';
-
     return $self->{transtable}->{DEFAULT} unless
         grep {$_ eq 'DEFAULT'} keys %{$self->{transtable}};
-        
+
     return $self->{transtable}->{$reason};
 }
 sub toexpire {

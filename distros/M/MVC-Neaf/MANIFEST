@@ -88,6 +88,7 @@ t/141-tt-loadfile.t
 t/143-static-cache.t
 t/144-util-container.t
 t/145-set_path_defaults.t
+t/146-Request-header_in.t
 t/201-Neaf.t
 t/202-Neaf-content-length.t
 t/203-Neaf-alias.t
@@ -132,6 +133,12 @@ t/243-run-cgi.t
 t/244-force-view.t
 t/245-error-tpl.t
 t/246-strict-empty.t
+t/247-body_json.t
+t/248-load_resources-on-run.t
+t/249-load_resources-by-require.t
+t/249-load_resources-by-require.t.1.psgi
+t/249-load_resources-by-require.t.2.psgi
+t/250-set_error_template.t
 t/301-default-view.t
 t/401-pre-logic-403-tpl.t
 t/402-error-logged.t

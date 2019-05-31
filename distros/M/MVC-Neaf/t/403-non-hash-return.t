@@ -17,12 +17,6 @@ warnings_like {
     $content = neaf->run_test('/garbled');
 } [qr/Controller must return hash.*\b$file\b.*\b$line\.?\n?$/], "Warning correct";
 
-my $ref = eval {
-    decode_json( $content );
-};
-ok $ref, "Json returned"
-    or diag "FAIL: $@";
-
-is $ref->{error}, 500, "Error 500";
+like $content, qr/Error 500/, "Error returned to the user";
 
 done_testing;

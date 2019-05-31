@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Serz Minus (Lepenkov Sergey), <minus@mail333.com>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2013 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 # 
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-new.t 2 2013-08-07 09:50:14Z minus $
+# $Id: 02-new.t 4 2019-05-28 10:57:50Z minus $
 #
 #########################################################################
 use Test::More tests => 5;

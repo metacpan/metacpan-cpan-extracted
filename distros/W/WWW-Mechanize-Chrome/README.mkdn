@@ -591,7 +591,13 @@ Retrieves the URL `URL`.
 It returns a [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for interface compatibility
 with [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize).
 
-Note that Chrome does not support download of files.
+Note that the returned [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object gets the response body
+filled in lazily, so you might have to wait a moment to get the response
+body from the result. This is a premature optimization and later releases of
+WWW::Mechanize::Chrome are planned to fetch the response body immediately when
+accessing the response body.
+
+Note that Chrome does not support download of files through the API.
 
 ## `$mech->_collectEvents`
 
@@ -680,7 +686,7 @@ about the current directory of your Perl script.
 
     my $cookies = $mech->cookie_jar
 
-Returns all the Chrome cookies in a [HTTP::Cookies::Chrome](https://metacpan.org/pod/HTTP::Cookies::Chrome) instance.
+Returns all the Chrome cookies in a [HTTP::Cookies::ChromeDevTools](https://metacpan.org/pod/HTTP::Cookies::ChromeDevTools) instance.
 Setting a cookie in there will also set the cookie in Chrome.
 
 ## `$mech->add_header( $name => $value, ... )`
@@ -838,6 +844,8 @@ to convert the content from UTF-8 back to its native encoding.
 
 Writes `$html` into the current document. This is mostly
 implemented as a convenience method for [HTML::Display::MozRepl](https://metacpan.org/pod/HTML::Display::MozRepl).
+
+The value passed in as `$html` will be stringified.
 
 ## `$mech->base()`
 

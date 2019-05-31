@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 6.6
+version 6.7
 
 =head1 SYNOPSIS
 
@@ -515,7 +515,7 @@ We can source that file:
 
 This make it simple to use the --data-file output options and build queries
 based off previous queries. For .txt and .dat file, the delimiter for columns
-in the file must be either a tab, comma, or a semicolon.  For files ending in
+in the file must be either a tab or a null.  For files ending in
 .csv, Text::CSV_XS is used to accurate parsing of the file format.  Files
 ending in .json are considered to be newline-delimited JSON.
 
