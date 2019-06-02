@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 =head1 NAME
 
@@ -259,7 +259,7 @@ our %BACKEND_STATE = (
 # used for error and notice responses
 our %NOTICE_CODE = (
     S   => 'severity',
-    V   => 'severity',
+    V   => 'severity_unlocalised',
     C   => 'code',
     M   => 'message',
     D   => 'detail',
@@ -268,6 +268,11 @@ our %NOTICE_CODE = (
     p   => 'internal_position',
     q   => 'internal_query',
     W   => 'where',
+    s   => 'schema',
+    t   => 'table',
+    c   => 'column',
+    d   => 'data_type',
+    n   => 'constraint',
     F   => 'file',
     L   => 'line',
     R   => 'routine'
@@ -405,6 +410,21 @@ our %ERROR_CODE = (
     '2202E' => 'array_subscript_error',
     '2202G' => 'invalid_tablesample_repeat',
     '2202H' => 'invalid_tablesample_argument',
+    '22030' => 'duplicate_json_object_key_value',
+    '22032' => 'invalid_json_text',
+    '22033' => 'invalid_json_subscript',
+    '22034' => 'more_than_one_json_item',
+    '22035' => 'no_json_item',
+    '22036' => 'non_numeric_json_item',
+    '22037' => 'non_unique_keys_in_json_object',
+    '22038' => 'singleton_json_item_required',
+    '22039' => 'json_array_not_found',
+    '2203A' => 'json_member_not_found',
+    '2203B' => 'json_number_not_found',
+    '2203C' => 'object_not_found',
+    '2203D' => 'too_many_json_array_elements',
+    '2203E' => 'too_many_json_object_members',
+    '2203F' => 'json_scalar_required',
     '22P01' => 'floating_point_exception',
     '22P02' => 'invalid_text_representation',
     '22P03' => 'invalid_binary_representation',
@@ -522,6 +542,7 @@ our %ERROR_CODE = (
     '55006' => 'object_in_use',
     '55P02' => 'cant_change_runtime_param',
     '55P03' => 'lock_not_available',
+    '55P04' => 'unsafe_new_enum_value_usage',
     '57000' => 'operator_intervention',
     '57014' => 'query_canceled',
     '57P01' => 'admin_shutdown',

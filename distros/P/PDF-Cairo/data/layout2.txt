@@ -1,0 +1,47 @@
+<span face="Courier" size="5120">SENIOR COMPUTER SPECIALIST, U-1435-1688-112194, COMPUTER AND INFORMATION
+SCIENCE; master's degree in computer science or a related field and eight
+years of systems administration experience in a UNIX environment, or ten years
+of systems administration and programming experience in a large heterogeneous
+UNIX environment or an equivalent combination of education and experience;
+extensive experience programming in C and Perl; solid understanding of
+distributed and parallel programming techniques and object-oriented
+programming; programming with BSD sockets or System V Streams interfaces;
+extensive experience with all aspects of UNIX systems administration, for
+example Client-Server techniques, configuration of mail and news systems,
+system installation and configuration, printing systems, advanced security
+concepts, third party software installation, diagnostic tools such as
+etherfind, nfswatch and network analyzers; extensive experience with
+networking and distributed computing concept and services, such as Network
+File System (NFS), Network Information Service (NIS or NIS+), Domain Name
+Service (DNS), extensive knowledge of TCP/IP and routing, Ethernet, token
+ring, and ATM networks, secure RPC, kerberos and other distributed
+authentication systems; extensive understanding of advanced concepts in modern
+operating systems, such as virtual memory, inter-process communication, device
+drivers and file systems; familiarity with BSD or System V versions of Unix;
+experience with project management and planning; knowledge of RS-232, 10BaseT,
+Fiber, Coax, Ethernet and SCSI hardware and cabling; familiarity with new
+technology, such as multicast backbone and new protocols such as SIP or TUBA;
+extensive experience smoothly integrating new technology into existing
+computing environment; familiarity with standards groups such as Internet
+Engineering Task Force (IETF), ATM Forum and POSIX, and recent work in
+standards for UNIX operating systems, programing languages and networks;
+knowledge of postscript and postscript printers; knowledge of TeX and
+Metafont; experience writing purchase justifications, technical reports,
+project design and planning documentation, user and reference documentation;
+experience training users and making technical presentations; experienced with
+Sun and HP hardware and software desired; experience with and knowledge of
+distributed administration models, such as Distributed Computing Environment
+(DCE), Distributed Management Environment (DME), Tivoli, CA-Unicenter and
+other related systems; experience with and knowledge of UNIX security tools,
+such as COPS, Internet Security Scanner (ISS), Tripwire, Texas A&amp;M TAMU
+package and others; experience installing and administering Sybase release 4.9
+or 10 desired; experience with programming in Tcl/Tk, Wafe, other languages
+and application toolkits desired; experience in X11 programming desired;
+conducts research and development for operation and integration of
+heterogeneous UNIX Operating Systems and Systems Performance enhancements;
+develops requirements; plans and completes detail design, implementation,
+testing and documentation of distributed and/or parallel processing programs;
+performs systems administration of heterogeneous distributed UNIX machines for
+IICF. Salary range begins at: $37,272.</span>
+
+<span font="Times Italic 6">(actual job posting from <b>1995</b>)</span>

@@ -1,21 +1,21 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014 Kevin Ryde
+# Copyright 2014, 2017 Kevin Ryde
 
-# This file is part of Math-PlanePath.
+# This file is part of Math-OEIS.
 #
-# Math-PlanePath is free software; you can redistribute it and/or modify it
+# Math-OEIS is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation; either version 3, or (at your option) any later
 # version.
 #
-# Math-PlanePath is distributed in the hope that it will be useful, but
+# Math-OEIS is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
 #
 # You should have received a copy of the GNU General Public License along
-# with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+# with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 use 5.006;
 use strict;

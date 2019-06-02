@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.721'; # VERSION
+our $DATE = '2019-06-01'; # DATE
+our $VERSION = '0.722'; # VERSION
 
 use 5.010;
 use strict;
@@ -177,7 +177,7 @@ pmlist - List Perl modules (and PODs, and module prefixes)
 
 =head1 VERSION
 
-This document describes version 0.721 of pmlist (from Perl distribution App-PMUtils), released on 2019-02-24.
+This document describes version 0.722 of pmlist (from Perl distribution App-PMUtils), released on 2019-06-01.
 
 =head1 SYNOPSIS
 

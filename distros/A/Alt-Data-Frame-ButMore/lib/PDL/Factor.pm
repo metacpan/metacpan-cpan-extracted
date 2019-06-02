@@ -11,11 +11,9 @@ use PDL::Lite ();   # PDL::Lite is the minimal to get PDL work
 use PDL::Core qw(pdl);
 use PDL::Primitive qw(which);
 
-use Data::Rmap qw(rmap);
 use Module::Load;
 use Ref::Util qw(is_plain_arrayref);
 use Safe::Isa;
-use Storable qw(dclone);
 use Scalar::Util qw(blessed);
 use Type::Params;
 use Types::Standard qw(slurpy ArrayRef ConsumerOf Int);
@@ -94,21 +92,28 @@ sub new {
             return $data->copy;
         }
 
+        #TODO: this does not support ND piddle yet.
+
         # reorder levels
         my @levels      = @{ delete $opt{levels} };
         my @integer_old = $data->{PDL}->list;
-        my $i           = 0;
-        my %levels_old  = map { $i++ => $_ } @{ $data->levels };
-        $i = 0;
-        my %levels_new  = map { $_ => $i++ } @levels;
-        my @integer_new = map {
-            my $enum = $levels_old{$_};
-            defined $enum ? $levels_new{$enum} : -1;
-        } @integer_old;
+        my @levels_old = @{ $data->levels };
+        my %levels_new = do {
+            my $i = 0;
+            map { $_ => $i++ } @levels;
+        };
+        my @integer_new = do {
+            no warnings 'numeric';
+            map {
+                my $level = $levels_old[$_];
+                defined $level ? $levels_new{$level} : -1;
+            } @integer_old;
+        };
 
-        my $new = $class->new( \@levels, levels => \@levels, %opt );
+        my $new = $class->new( [ $levels[0] ], levels => \@levels, %opt );
         my $p = PDL::Core::indx( \@integer_new );
-        $new->{PDL} = $p->setbadif( $p < 0 );
+        $p = $p->setbadif( $data->isbad ) if $data->badflag;
+        $new->{PDL} = $p;
         return $new;
     }
 
@@ -127,12 +132,20 @@ sub new {
         $levels = $class->_extract_levels($enum);
     }
 
-    $enum = $enum->$_DOES('PDL') ? $enum->unpdl : dclone($enum);
-    my $i = 0;
-    my %levels = map { $_ => $i++; } @$levels;
-    rmap {
-        $_ = ($levels{$_} // -1); # assign index of level
-    } $enum;
+    # this is faster than Data::Rmap::rmap().
+    state $rmap = sub {
+        my ( $x, $levels ) = @_;
+        is_plain_arrayref($x)
+          ? [ map { __SUB__->( $_, $levels ) } @$x ]
+          : ( $levels->{$x} // -1 );
+    };
+
+    my %levels = do {
+        my $i = 0;
+        map { $_ => $i++; } @$levels;
+    };
+    $enum =
+      $rmap->( ( $enum->$_DOES('PDL') ? $enum->unpdl : $enum ), \%levels );
 
     my $self = $class->initialize();
 
@@ -321,7 +334,7 @@ PDL::Factor - PDL subclass for keeping categorical data
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 SYNOPSIS
 

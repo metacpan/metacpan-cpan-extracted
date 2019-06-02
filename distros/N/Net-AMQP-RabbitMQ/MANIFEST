@@ -64,9 +64,11 @@ t/029_amqp_properties.t
 t/030_ssl.t
 t/031_magic_header_fields.t
 t/032_cancel_consume_ack_exception.t
+t/033_fork.t
 t/lib/NAR/Blessed.pm
 t/lib/NAR/Helper.pm
-t/ssl/cacert.pem
+t/ssl/cloudamqp.cacert.pem
+t/ssl/vagrant.cacert.pem
 threads.c
 typemap
 xt/017_changes.t

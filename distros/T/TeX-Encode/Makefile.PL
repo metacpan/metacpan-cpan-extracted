@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.005",
+  "VERSION" => "2.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 requires('Encode', '2.91') if (has_module('Encode') || 0) eq '2.90';
 
 
@@ -77,7 +77,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;

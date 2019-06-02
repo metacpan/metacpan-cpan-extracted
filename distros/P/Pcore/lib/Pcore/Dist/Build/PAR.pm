@@ -6,6 +6,7 @@ use Pcore::Dist::Build::PAR::Script;
 
 has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
+has force => ();
 has crypt => ();
 has clean => ();
 has gui   => ();
@@ -18,7 +19,7 @@ sub _build_release ($self) {
 
 sub run ($self) {
     if ( !$self->{dist}->par_cfg ) {
-        say q[par profile wasn't found.];
+        say q[PAR profile wasn't found.];
 
         exit 1;
     }
@@ -27,8 +28,8 @@ sub run ($self) {
 
         exit 1;
     }
-    elsif ( !$self->{dist}->is_commited ) {
-        say q[Working copy has uncommited changes];
+    elsif ( !$self->{dist}->is_commited && !$self->{force} ) {
+        say q[Working copy has uncommited changes. Use --force to make PAR.];
 
         exit 1;
     }

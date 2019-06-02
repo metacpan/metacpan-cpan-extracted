@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -256,6 +256,13 @@ sub match {
 #pod
 #pod =cut
 
+our @CARP_NOT = qw(
+    Yancy::Controller::Yancy Yancy::Controller::Yancy::MultiTenant
+    Mojolicious::Plugin::Yancy Mojolicious::Plugins Mojolicious
+    Mojo::Server Yancy::Plugin::Editor Yancy::Plugin::Auth
+    Mojolicious::Renderer Yancy::Plugin::Auth::Token
+    Yancy::Plugin::Auth::Password
+);
 our %DERPED;
 sub derp(@) {
     my @args = @_;
@@ -264,7 +271,6 @@ sub derp(@) {
     if ( $args[0] !~ /\.$/ ) {
         $args[0] .= '.';
     }
-    local $Carp::CarpLevel = 1;
     carp sprintf( $args[0], @args[1..$#args] );
     $DERPED{ $key } = 1;
 }
@@ -281,7 +287,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 

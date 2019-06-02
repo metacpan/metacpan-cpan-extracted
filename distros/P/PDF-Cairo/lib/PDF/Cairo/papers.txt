@@ -1,0 +1,193 @@
+#source:
+#	http://partners.adobe.com/asn/developer/pdfs/tn/5003.PPD_Spec_v4.3.pdf
+#   pages 187-192
+#
+# name points_x points_y notes
+# alias=name[,Rotated]
+#
+# Notes:
+# I = ISO
+# E = Envelope
+# J = Japanese
+# S = ~10-20pts smaller imaging area
+# V = "varies across devices"
+# XxY size originally defined as XxY (mm/in inferred from points)
+#
+10x11               720    792   10x11
+10x13               720    936   10x13
+10x14               720   1008   10x14
+12x11               864    792   12x11
+15x11              1080    792   15x11
+4x6                 288    432   4x6
+7x9                 504    648   7x9
+8x10                576    720   8x10
+9x11                648    792   9x11
+11x17            = Tabloid
+12x18            = ARCHB
+17x11            = Ledger
+17x22            = AnsiC
+18x24            = ARCHC
+22x34            = AnsiD
+24x36            = ARCHD
+34x44            = AnsiE
+36x48            = ARCHE
+8.5x11           = Letter
+8.5x14           = Legal
+9x12             = ARCHA
+
+A0                 2384   3370   I,J,841x1189
+A1                 1684   2384   I,J,594x841
+A2                 1191   1684   I,J,420x594
+A3                  842   1191   I,J,297x420
+A3Extra             913   1262   V,322x445
+A4                  595    842   I,J,210x297
+A4Extra             667    914   V,9.27x12.69
+A4Plus              595    936   210x330
+A4Small             595    842   S,210x297
+A5                  420    595   I,J,148x210
+A5Extra             492    668   V,174x235
+A6                  297    420   I,J,105x148
+A7                  210    297   I,J,74x105
+A8                  148    210   I,J,62x74
+A9                  105    148   I,J,37x52
+A10                  73    105   I,J,26x37
+
+AnsiC              1224   1584   17x22
+AnsiD              1584   2448   22x34
+AnsiE              2448   3168   34x44
+
+ARCHA               648    864   9x12
+ARCHB               864   1296   12x18
+ARCHC              1296   1728   18x24
+ARCHD              1728   2592   24x36
+ARCHE              2592   3456   36x48
+
+# note that these are the Japanese B sizes; Adobe
+# calls the ISO B sizes "ISOBn"
+B0                 2920   4127   1030x1456
+B1                 2064   2920   728x1030
+B2                 1460   2064   515x728
+B3                 1032   1460   364x515
+B4                  729   1032   257x364
+B5                  516    729   182x257
+B6                  363    516   128x182
+B7                  258    363   91x128
+B8                  181    258   64x91
+B9                  127    181   45x64
+B10                  91    127   32x45
+
+C4               = EnvC4
+C5               = EnvC5
+C6               = EnvC6
+Comm10           = Env10
+DL               = EnvDL
+
+DoublePostcard        567  419.5 200x148
+
+Env9                279    639   E,3.875x8.875
+Env10               297    684   E,4.125x9.5
+Env11               324    747   E,4.5x10.375
+Env12               342    792   E,4.75x11
+Env14               360    828   E,5x11.5
+EnvC0              2599   3676   I,E,917x1297
+EnvC1              1837   2599   I,E,648x917
+EnvC2              1298   1837   I,E,458x648
+EnvC3               918   1296   I,E,324x458
+EnvC4               649    918   I,E,229x324
+EnvC5               459    649   I,E,162x229
+EnvC6               323    459   I,E,114x162
+EnvC65              324    648   E,114x229
+EnvC7               230    323   I,E,81x114
+EnvChou3            340    666   E,120x235
+EnvChou4            255    581   E,90x205
+Envdl               312    624   E,110x220
+EnvInvite           624    624   E,220x220
+EnvISOB4            708   1001   E,250x353
+EnvISOB5            499    709   E,176x250
+EnvISOB6            499    354   E,176x125
+EnvItalian          312    652   E,110x230
+EnvKaku2            680    941   E,240x332
+EnvKaku3            612    785   E,216x277
+EnvMonarch          279    540   E,3.875x7.5
+EnvPersonal         261    468   E,3.625x6.5
+EnvPRC1             289    468   E,102x165
+EnvPRC2             289    499   E,102x176
+EnvPRC3             354    499   E,125x176
+EnvPRC4             312    590   E,110x208
+EnvPRC5             312    624   E,110x220
+EnvPRC6             340    652   E,120x230
+EnvPRC7             454    652   E,160x230
+EnvPRC8             340    876   E,120x309
+EnvPRC9             649    918   E,229x324
+EnvPRC10            918   1298   E,324x458
+EnvYou4             298    666   E,105x235
+
+Chou3            = EnvChou3
+Chou4            = EnvChou4
+Invite           = EnvInvite
+Italian          = EnvItalian
+Kaku2            = EnvKaku2
+Kaku3            = EnvKaku3
+Monarch          = EnvMonarch
+Personal         = EnvPersonal
+PRC1             = EnvPRC1
+PRC2             = EnvPRC2
+PRC3             = EnvPRC3
+PRC4             = EnvPRC4
+PRC5             = EnvPRC5
+PRC6             = EnvPRC6
+PRC7             = EnvPRC7
+PRC8             = EnvPRC8
+PRC9             = EnvPRC9
+PRC10            = EnvPRC10
+You4             = EnvYou4
+
+Executive           522    756   V,7.25x10.5
+FanFoldUS          1071    792   14.875x11
+FanFoldGerman       612    864   8.5x12
+FanFoldGermanLegal  612    936   8.5x13
+Folio               595    935   210x330
+FanFold          = FanFoldUS
+
+ISOB0              2835   4008   I,1000x1414
+ISOB1              2004   2835   I,707x1000
+ISOB2              1417   2004   I,500x707
+ISOB3              1001   1417   I,353x500
+ISOB4               709   1001   I,250x353
+ISOB5               499    709   I,176x250
+ISOB5Extra          569.7  782   V,7.9x10.8
+ISOB6               354    499   I,125x176
+ISOB7               249    354   I,88x125
+ISOB8               176    249   I,62x88
+ISOB9               125    176   I,44x62
+ISOB10               88    125   I,31x44
+
+#anfoldgermanlegal 1234.5 1234.5 N
+Ledger             1224    792   17x11
+Legal               612   1008   8.5x14
+LegalExtra          684   1080   V,9.5x15
+Letter              612    792   8.5x11
+LetterExtra         684    864   V,9.5x12
+LetterPlus          612    913.7 8.5x12.69
+LetterSmall         612    792   S,8.5x11
+Note                612    792   S,8.5x11
+Postcard            284    419   100x148
+PRC16K              414    610   146x215
+PRC32K              275    428   97x151
+PRC32KBig        = PRC32K
+Quarto              610    780
+Statement           396    612   5.5x8.5
+SuperA              643   1009   227x356
+SuperB              864   1380   305x487
+Tabloid             792   1224   11x17
+TabloidExtra        864   1296   12x18
+
+USLegal          = Legal
+USLetter         = Letter
+LegalUS          = Legal
+LetterUS         = Letter
+
+# well-known e-readers
+Kindle              259    346
+KindleOasis         304    403
+Sony                249    326

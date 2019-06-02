@@ -180,7 +180,6 @@ subtest compare => sub {
             y => PDL::SV->new( [qw(foo bar baz])] ),
         ]
     );
-
     my $df2 = Data::Frame->new(
         columns => [
             x => pdl( 1, 1, 3 ),
@@ -235,6 +234,50 @@ subtest compare => sub {
         ( $df1 != $df2 )->which(),
         pdl( [ [ 1, 0 ], [ 2, 1 ] ] ),
         '$df->which()'
+    );
+};
+
+subtest compare_tolerance => sub {
+    local $Data::Frame::TOLERANCE_REL = 1e-2;
+
+    my $df1 = Data::Frame->new(
+        columns => [
+            x => pdl( -1, -2, 3, 4.1 ),
+        ]
+    );
+    my $df2 = Data::Frame->new(
+        columns => [
+            x => pdl( -1.001, -1, 3.001, 4 ),
+        ]
+    );
+
+    dataframe_is(
+        ( $df1 == $df2 ),
+        Data::Frame->new(
+            columns => [ x => pdl( 1, 0, 1, 0 ) ]
+        ),
+        'overload ==',
+    );
+    dataframe_is(
+        ( $df1 != $df2 ),
+        Data::Frame->new(
+            columns => [ x => pdl( 0, 1, 0, 1 ) ]
+        ),
+        'overload !=',
+    );
+    dataframe_is(
+        ( $df1 < $df2 ),
+        Data::Frame->new(
+            columns => [ x => pdl( 1, 1, 1, 0 ) ]
+        ),
+        'overload <',
+    );
+    dataframe_is(
+        ( $df1 > $df2 ),
+        Data::Frame->new(
+            columns => [ x => pdl( 1, 0, 1, 1 ) ]
+        ),
+        'overload >',
     );
 };
 
@@ -329,6 +372,17 @@ subtest summary => sub {
         ),
         'summary($custom_percentiles)'
     );
+};
+
+subtest id => sub {
+    my $df = Data::Frame->new(
+        columns => [
+            a => pdl(          [ 1, 1, 1, 2 ] ),
+            b => PDL::SV->new( [qw(BAD BAD BAD BAD)] )->setbadat(1)
+        ]
+    );
+    my $id = $df->id();
+    pdl_is( $id, pdl( [ 0, 1, 0, 2 ] ), 'id()' );
 };
 
 done_testing;

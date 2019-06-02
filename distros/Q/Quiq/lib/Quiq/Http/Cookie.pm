@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.142';
+our $VERSION = '1.143';
 
 use Quiq::Time::RFC822;
 
@@ -199,7 +199,7 @@ ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 VERSION
 
-1.142
+1.143
 
 =head1 AUTHOR
 

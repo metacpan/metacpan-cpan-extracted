@@ -2,7 +2,7 @@
 
 # 0-Test-YAML-Meta.t -- run Test::CPAN::Meta::YAML if available
 
-# Copyright 2009, 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2013, 2014, 2017 Kevin Ryde
 
 # 0-Test-YAML-Meta.t is shared by several distributions.
 #
@@ -52,7 +52,7 @@ SKIP: {
   #
   eval 'use Test::CPAN::Meta::YAML 0.15; 1'
     or plan skip_all => "due to Test::CPAN::Meta::YAML 0.15 not available -- $@";
-  
+
   Test::CPAN::Meta::YAML::meta_spec_ok('META.yml');
 }
 

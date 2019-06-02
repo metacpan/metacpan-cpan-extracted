@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.142';
+our $VERSION = '1.143';
 
 use Quiq::Gnuplot::Plot;
 use Quiq::FileHandle;
@@ -330,7 +330,7 @@ sub print {
 
 =head1 VERSION
 
-1.142
+1.143
 
 =head1 AUTHOR
 

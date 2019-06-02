@@ -1,5 +1,11 @@
                       User-Visible podlators Changes
 
+podlators 4.12 (2019-05-31)
+
+    Skip the man/no-encode.t test if Encode is already loaded while
+    running the test suite, which seems to happen sometimes with CPAN
+    Testers tests.
+
 podlators 4.11 (2018-05-07)
 
     [Pod::Text] The default value of the sentence option is false, not

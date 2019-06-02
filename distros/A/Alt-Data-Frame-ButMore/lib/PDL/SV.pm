@@ -7,10 +7,9 @@ use warnings;
 
 use PDL::Lite ();   # PDL::Lite is the minimal to get PDL work
 use PDL::Core qw(pdl);
-use PDL::Primitive qw(which whichND);
+use PDL::Primitive qw(which);
 
-use Data::Rmap qw(rmap_array);
-use Ref::Util;
+use Ref::Util qw(is_plain_arrayref);
 use Safe::Isa;
 use Type::Params;
 use Types::Standard qw(slurpy ArrayRef ConsumerOf Int);
@@ -79,12 +78,14 @@ sub new {
     my ( $class, @args ) = @_;
     my $data = shift @args;    # first arg
 
-    my ($faked_data) = rmap_array {
-        Ref::Util::is_plain_arrayref( $_->[0] )
-          ? [ $_[0]->recurse() ]
-          : [ (0) x @$_ ]
-    }
-    $data;
+    state $rmap = sub {
+        my ( $x ) = @_; 
+        is_plain_arrayref($x)
+          ? [ map { __SUB__->( $_ ) } @$x ]
+          : 0;
+    };  
+
+    my $faked_data = $rmap->($data);
 
     my $self = $class->initialize();
     my $pdl  = $self->{PDL};
@@ -112,7 +113,7 @@ sub initialize {
 # code modified from <https://metacpan.org/pod/Hash::Path>
 sub _array_get {
     my ( $self, $array, $indices ) = @_;
-    return $array unless scalar @$indices;
+
     my $return_value = $array->[ $indices->[0] ];
     for ( 1 .. $#$indices ) {
         $return_value = $return_value->[ $indices->[$_] ];
@@ -180,7 +181,7 @@ sub uniq {
 sub sever {
     my ($self) = @_;
 
-    $self->_internal( [ map { $_ // 'BAD' } @{ $self->_effective_internal } ] );
+    $self->_internal( $self->_effective_internal );
     my $p = PDL->sequence( $self->dims );
     $p = $p->setbadif( $self->isbad ) if $self->badflag;
     $self->{PDL} = $p;
@@ -210,35 +211,39 @@ sub at {
 sub unpdl {
     my $self = shift;
 
-    my $data     = $self->{PDL}->unpdl;
-    my $internal = $self->_internal;
-    if ($self->ndims == 1) {    # for speed
-        my $f =
-          $self->badflag
-          ? sub { $_ eq 'BAD' ? 'BAD' : $internal->[$_] }
-          : sub { $internal->[$_] };
-        $data = [ map { $f->($_) } @$data ];
-    } else {
-        my $f =
-          $self->badflag
-          ? sub { $_ = ( $_ eq 'BAD' ? 'BAD' : $internal->[$_] ); }
-          : sub { $_ = $internal->[$_] };
-        Data::Rmap::rmap_scalar { $f->($_) } $data;
+    if ($self->ndims == 1) {    # shortcut for 1D for performance
+        return [ $self->list ];
     }
-    return $data;
+
+    state $rmap = sub {
+        my ( $x, $f ) = @_;
+        is_plain_arrayref($x)
+          ? [ map { __SUB__->( $_, $f ) } @$x ]
+          : $f->($x);
+    };
+
+    my $internal = $self->_internal;
+    my $f =
+      $self->badflag
+      ? sub { $_ eq 'BAD' ? 'BAD' : $internal->[$_] }
+      : sub { $internal->[$_] };
+    return $rmap->( $self->{PDL}->unpdl, $f );
 }
 
 
 sub list {
     my ($self) = @_;
 
-    my @data     = $self->{PDL}->list;
     my $internal = $self->_internal;
+    my @list = do {
+        no warnings 'numeric';
+        map { $internal->[$_] } $self->{PDL}->list;
+    };
     if ($self->badflag) {
-        return (map { $_ eq 'BAD' ? 'BAD' : $internal->[$_] } @data);
-    } else {
-        return (map { $internal->[$_] } @data);
+        my @bad_indices = which($self->isbad)->list;
+        @list[@bad_indices] = (('BAD') x @bad_indices);
     }
+    return @list;
 }
 
 
@@ -247,8 +252,10 @@ sub copy {
 
     my $new = PDL::SV->new( [] );
     $new->{PDL} = PDL->sequence( $self->dims );
-    $new->{PDL} = $new->{PDL}->setbadif( $self->isbad ) if $self->badflag;
-    $new->_internal( [ map { $_ // 'BAD' } @{ $self->_effective_internal } ] );
+    $new->_internal( $self->_effective_internal );
+    if ( $self->badflag ) {
+        $new->{PDL} = $new->{PDL}->setbadif( $self->isbad );
+    }
     return $new;
 }
 
@@ -323,9 +330,15 @@ sub _effective_internal {
     my ($self) = @_;
 
     my $internal = $self->_internal;
-    my $rslt =
-      [ map { $_ eq 'BAD' ? undef : $internal->[$_] } ( $self->{PDL}->list ) ];
-    return $rslt;
+    my @indices = $self->{PDL}->list;
+
+    no warnings 'numeric';
+    my @rslt = @$internal[@indices];
+    if ($self->badflag) {
+        my @isbad = which($self->isbad)->list;
+        @rslt[@isbad] = ((undef) x @isbad);
+    }
+    return \@rslt;
 }
 
 sub _compare {
@@ -406,7 +419,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 SYNOPSIS
 

@@ -21,9 +21,9 @@ my $g = Game::Theory::TwoPersonMatrix->new(
 # Initial strategies
 my %strategy = (
     1 => cooperate(),
-#    2 => cooperate(),
+    2 => cooperate(),
 #    1 => defect(),
-    2 => defect(),
+#    2 => defect(),
 #    1 => random(),
 #    2 => random(),
 );
@@ -45,10 +45,16 @@ for ( 1 .. $n )
 
     # Set next strategies
     %strategy = (
-        1 => tit_for_tat(\@moves)->{1},
-#        1 => tit_for_two_tats(\@moves)->{1},
-        2 => random(),
-#        2 => defect()
+#        1 => cooperate(),
+#        2 => cooperate(),
+#        1 => defect(),
+#        2 => defect(),
+#        1 => random(),
+#        2 => random(),
+#        1 => tit_for_tat(\@moves)->{1},
+#        2 => tit_for_tat(\@moves)->{2},
+        1 => tit_for_two_tats(\@moves)->{1},
+        2 => tit_for_two_tats(\@moves)->{2},
     );
 }
 
@@ -78,7 +84,7 @@ sub tit_for_tat {
 sub tit_for_two_tats {
     my $moves = shift;
 
-    return tit_for_tat() if @$moves == 1;
+    return tit_for_tat($moves) if @$moves == 1;
 
     my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
     my ( $strat3, $strat4 ) = split /,/, $moves->[-2];

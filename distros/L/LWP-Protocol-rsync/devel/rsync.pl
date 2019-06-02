@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2014 Kevin Ryde
+# Copyright 2012, 2014, 2019 Kevin Ryde
 
 # This file is part of LWP-Protocol-rsync.
 #
@@ -24,6 +24,56 @@ use strict;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+{
+  my $url;
+  # my $url = 'rsync://localhost:9999/top/usr/share/fluxbox/styles/Squared_blue/pixmaps/close.xpm';
+  # my $url = 'rsync://localhost:9999/top/usr/share/fluxbox/styles/Squared_blue/pixmaps/copy of stick.xpm';
+  # my $url = 'rsync://localhost:9999/top/so/kernel/linux-2.6.32.59/drivers/block/smart1,2.h';
+  # $url = 'file:///so/kernel/linux-2.6.32.59/drivers/block/smart1%2C2.h';
+  # $url = 'rsync://localhost:9999/top/so/kernel/linux-2.6.32.59/drivers/block/smart1%2C2.h';
+  $url = 'rsync://localhost:9999/writeonly/dummy.txt';
+  $url = 'rsync://localhost:9999/unlistable/etc/ucf.conf';
+  $url = 'rsync://fred@localhost:9999/topauth/etc/ucf.conf';
+  # { my $uri = URI->new('rsync://localhost:9999/top/so/');
+  #   $uri->path('/top/so/kernel/linux-2.6.32.59/drivers/block/smart1,%32.h');
+  #   $url = $uri->as_string;
+  # }
+  $url = 'rsync://[::ffff:127.0.0.1]:9999/top/etc/ucf.conf';
+  $url = 'rsync://fred:abcde@localhost:9999/topauth/etc/ucf.conf';
+  $url = 'rsync://:9999/top/etc/ucf.conf';
+  $url = 'rsync://localhost:9999/top/so/kernel/linux-2.6.32.59/drivers/block/smart1%2C%32.h';
+  $url = 'rsync://localhost:9999/top/tmp/*.txt';
+  $url = 'rsync://localhost:9999/top/tmp/bar';
+  $url = 'rsync://localhost:9999/top/etc/ucf.conf';
+  $url = 'rsync://localhost:9999/top/tmp/x.txt';
+  $url = 'rsync://fred@localhost:9999/topauth/etc/ucf.conf';
+  $url = 'rsync://localhost:9999/top/tmp';  # directory
+  $url = 'rsync://download.tuxfamily.org/pub/user42/quick-yes.el';
+
+  print $url,"\n";
+  require LWP::UserAgent;
+  my $ua = LWP::UserAgent->new;
+  $ua->add_handler('response_header' => sub { print "response_header\n"; });
+  $ua->add_handler('response_data' => sub { print "response_data\n"; });
+
+  {
+    my $resp = $ua->head($url);
+    print "HEAD status_line: ",$resp->status_line,"|||\n";
+    print $resp->as_string;
+  }
+  {
+    my $resp = $ua->get($url,
+                        # ':content_file' => '/tmp/out.txt',
+                        # ':content_cb' => sub { print "content_cb: ",$_[0]; },
+                        # ':read_size_hint' => 50,
+                        'If-Modified-Since' => 'Thu, 20 Mar 2014 06:39:13 GMT',
+                       );
+    print "GET status_line: ",$resp->status_line,"|||\n";
+    print $resp->as_string;
+  }
+  exit 0;
+}
 
 {
   my $path = "/tmp/\n";
@@ -52,55 +102,7 @@ use strict;
   exit 0;
 }
 
-{
-  my $url;
-  # my $url = 'rsync://download.tuxfamily.org/pub/user42/quick-yes.el';
-  # my $url = 'rsync://localhost:9999/top/usr/share/fluxbox/styles/Squared_blue/pixmaps/close.xpm';
-  # my $url = 'rsync://localhost:9999/top/usr/share/fluxbox/styles/Squared_blue/pixmaps/copy of stick.xpm';
-  # my $url = 'rsync://localhost:9999/top/so/kernel/linux-2.6.32.59/drivers/block/smart1,2.h';
-  # $url = 'file:///so/kernel/linux-2.6.32.59/drivers/block/smart1%2C2.h';
-  # $url = 'rsync://localhost:9999/top/so/kernel/linux-2.6.32.59/drivers/block/smart1%2C2.h';
-  $url = 'rsync://localhost:9999/writeonly/dummy.txt';
-  $url = 'rsync://localhost:9999/unlistable/etc/ucf.conf';
-  $url = 'rsync://fred@localhost:9999/topauth/etc/ucf.conf';
-  # { my $uri = URI->new('rsync://localhost:9999/top/so/');
-  #   $uri->path('/top/so/kernel/linux-2.6.32.59/drivers/block/smart1,%32.h');
-  #   $url = $uri->as_string;
-  # }
-  $url = 'rsync://[::ffff:127.0.0.1]:9999/top/etc/ucf.conf';
-  $url = 'rsync://fred:abcde@localhost:9999/topauth/etc/ucf.conf';
-  $url = 'rsync://:9999/top/etc/ucf.conf';
-  $url = 'rsync://localhost:9999/top/so/kernel/linux-2.6.32.59/drivers/block/smart1%2C%32.h';
-  $url = 'rsync://localhost:9999/top/tmp/*.txt';
-  $url = 'rsync://localhost:9999/top/tmp/bar';
-  $url = 'rsync://localhost:9999/top/etc/ucf.conf';
-  $url = 'rsync://localhost:9999/top/tmp/x.txt';
-  $url = 'rsync://fred@localhost:9999/topauth/etc/ucf.conf';
-  $url = 'rsync://localhost:9999/top/tmp';  # directory
 
-  print $url,"\n";
-  require LWP::UserAgent;
-  my $ua = LWP::UserAgent->new;
-  $ua->add_handler('response_header' => sub { print "response_header\n"; });
-  $ua->add_handler('response_data' => sub { print "response_data\n"; });
-
-  {
-    my $resp = $ua->head($url);
-    print "HEAD status_line: ",$resp->status_line,"|||\n";
-    print $resp->as_string;
-  }
-  {
-    my $resp = $ua->get($url,
-                        # ':content_file' => '/tmp/out.txt',
-                        # ':content_cb' => sub { print "content_cb: ",$_[0]; },
-                        # ':read_size_hint' => 50,
-                        'If-Modified-Since' => 'Thu, 20 Mar 2014 06:39:13 GMT',
-                       );
-    print "GET status_line: ",$resp->status_line,"|||\n";
-    print $resp->as_string;
-  }
-  exit 0;
-}
 
 {
   require HTTP::Response;

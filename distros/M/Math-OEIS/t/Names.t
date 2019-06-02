@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -19,7 +19,7 @@
 
 use 5.006;
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 8;
 
 use lib 't';
 use MyTestHelpers;
@@ -27,12 +27,11 @@ BEGIN { MyTestHelpers::nowarnings(); }
 
 use Math::OEIS::Names;
 
-
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 10;
+  my $want_version = 11;
   is ($Math::OEIS::Names::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS::Names->VERSION,  $want_version,
@@ -50,28 +49,25 @@ use Math::OEIS::Names;
 #------------------------------------------------------------------------------
 # line_split()
 
-{
-  my @ret = Math::OEIS::Names->line_split('bogosity');
-  is (scalar(@ret), 0);
-}
-{
-  my @ret = Math::OEIS::Names->line_split('A000001 some text');
-  is (scalar(@ret), 2);
-  is ($ret[0], 'A000001');
-  is ($ret[1], 'some text');
-}
-{
-  my @ret = Math::OEIS::Names->line_split("A000001  \tsome text");
-  is (scalar(@ret), 2);
-  is ($ret[0], 'A000001');
-  is ($ret[1], 'some text');
-}
+is_deeply([Math::OEIS::Names->line_split('bogosity')],
+          []);
+is_deeply([Math::OEIS::Names->line_split("A000001 some text\n")],
+          ['A000001','some text']);
+is_deeply([Math::OEIS::Names->line_split("A000001  \tsome text")],
+          ['A000001','some text']);
+
 
 #------------------------------------------------------------------------------
 # sample file reading
 
+require FindBin;
+require File::Spec;
+my $test_names_filename = File::Spec->catfile($FindBin::Bin, 'test-names');
+diag "bin dir ",$FindBin::Bin;
+diag "test filename: ",$test_names_filename;
+
 {
-  my $names = Math::OEIS::Names->new (filename => 't/test-names');
+  my $names = Math::OEIS::Names->new (filename => $test_names_filename);
   my $name = $names->anum_to_name('A000001');
   is ($name, 'Name number one');
 }

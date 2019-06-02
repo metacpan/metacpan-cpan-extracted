@@ -10,7 +10,7 @@ use PDL::Factor  ();
 use PDL::SV      ();
 use PDL::Logical ();
 
-use List::AllUtils;
+use List::AllUtils qw(uniq);
 use Scalar::Util qw(looks_like_number);
 use Type::Params;
 use Types::PDL qw(PiddleFromAny);
@@ -25,7 +25,6 @@ our @EXPORT_OK = (
       BAD NA
       ifelse is_discrete
       guess_and_convert_to_pdl
-
       dataframe factor logical
       ),
 );
@@ -37,8 +36,8 @@ sub dataframe {
     require Data::Frame;    # to avoid circular use
     Data::Frame->new( columns => \@_ );
 }
-sub factor    { PDL::Factor->new(@_); }
-sub logical   { PDL::Logical->new(@_); }
+sub factor  { PDL::Factor->new(@_); }
+sub logical { PDL::Logical->new(@_); }
 
 
 fun BAD ($n=1) { PDL::Core::zeros($n)->setbadat( PDL::Core::ones($n) ); }
@@ -76,14 +75,71 @@ fun is_discrete (ColumnLike $x) {
 }
 
 
+sub _is_na {
+    my ($na, $include_empty) = @_;
+
+    my @na = uniq(@$na, ($include_empty ? '' : ()));
+
+    # see utils/benchmarks/is_na.pl for why grep is used here
+    return sub {
+        scalar( grep { $_[0] eq $_ } @na );
+    };
+}
+
+sub _numeric_from_arrayref {
+    my ($x, $na, $f) = @_;
+    $f //= \&PDL::Core::pdl;
+
+    my $is_na = _is_na($na, 1);
+    my $isbad = pdl( [ map { &$is_na($_) } @$x ] );
+    my $p = do {
+        local $SIG{__WARN__} = sub { };
+        $f->($x);
+    };
+    return $p->setbadif($isbad);
+}
+
+sub _logical_from_arrayref {
+    my ($x, $na) = @_;
+
+    my $is_na = _is_na($na, 1);
+    my $isbad = pdl( [ map { &$is_na($_) } @$x ] );
+    my $p = PDL::Logical->new($x);
+    return $p->setbadif($isbad);
+}
+
+sub _datetime_from_arrayref {
+    my ($x, $na) = @_;
+    return _numeric_from_arrayref( $x, $na,
+        sub { PDL::DateTime->new_from_datetime( $_[0] ) } );
+}
+
+sub _factor_from_arrayref {
+    my ($x, $na) = @_;
+
+    my $is_na = _is_na($na, 0);
+    my $isbad = pdl( [ map { &$is_na($_) } @$x ] );
+    if ( $isbad->any ) {    # remove $na from levels
+        my $levels = [ sort grep { !&$is_na($_) } uniq(@$x) ];
+        return PDL::Factor->new( $x, levels => $levels )->setbadif($isbad);
+    } else {
+        return PDL::Factor->new($x);
+    }
+}
+
+sub _pdlsv_from_arrayref {
+    my ($x, $na) = @_;
+
+    my $is_na = _is_na($na, 0);
+    my $isbad = pdl( [ map { &$is_na($_) } @$x ] );
+    return PDL::SV->new($x)->setbadif($isbad);
+}
+
 fun guess_and_convert_to_pdl ( (ArrayRef | Value | ColumnLike) $x,
-        :$strings_as_factors=false, :$test_count=1000, :$na=[qw(BAD NA)]) {
+        :$strings_as_factors=false, :$test_count=1000, :$na=[qw(NA BAD)]) {
     return $x if ( $x->$_DOES('PDL') );
 
-    my $is_na = sub {
-        length( $_[0] ) == 0 or List::AllUtils::any { $_[0] eq $_ } @$na;
-    };
-
+    my $is_na0 = _is_na($na, 1);
     my $like_number;
     if ( !ref $x ) {
         $like_number = looks_like_number($x);
@@ -91,27 +147,23 @@ fun guess_and_convert_to_pdl ( (ArrayRef | Value | ColumnLike) $x,
     }
     else {
         $like_number = List::AllUtils::all {
-            looks_like_number($_) or &$is_na($_);
+            looks_like_number($_) or &$is_na0($_);
         }
         @$x[ 0 .. List::AllUtils::min( $test_count - 1, $#$x ) ];
     }
 
+    # The $na parameter is only effective for logical and numeric columns.
+    # This is in align with R's from_csv behavior.
     if ($like_number) {
-        my @data   = map { &$is_na($_) ? 'nan' : $_ } @$x;
-        my $piddle = pdl( \@data );
-        $piddle->inplace->setnantobad;
-        return $piddle;
+        return _numeric_from_arrayref($x, $na);
     }
     else {
-        my $piddle =
-          $strings_as_factors
-          ? PDL::Factor->new($x)
-          : PDL::SV->new($x);
-        my @is_bad = List::AllUtils::indexes { &$is_na($_) } @$x;
-        if (@is_bad) {
-            $piddle = $piddle->setbadif( pdl( \@is_bad ) );
+        if ($strings_as_factors) {
+            return _factor_from_arrayref($x, $na);
         }
-        return $piddle;
+        else {
+            return _pdlsv_from_arrayref($x, $na);
+        }
     }
 }
 
@@ -129,11 +181,11 @@ Data::Frame::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 DESCRIPTION
 
-This module provides some utility functions used by the Data::Frame project.
+This module provides some utility functions used by the L<Data::Frame> project.
 
 =head1 FUNCTIONS
 

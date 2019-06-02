@@ -1,0 +1,48 @@
+---
+abstract: 'Loads a config from a table in a database'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Warnings: '0.026'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Context-Loader-DB
+provides:
+  Data::Context::Finder::DB:
+    file: lib/Data/Context/Finder/DB.pm
+    version: v0.0.1
+  Data::Context::Finder::DB::Schema:
+    file: lib/Data/Context/Finder/DB/Schema.pm
+    version: v0.0.1
+  Data::Context::Finder::DB::Schema::Result::Data:
+    file: lib/Data/Context/Finder/DB/Schema/Result/Data.pm
+    version: v0.0.1
+  Data::Context::Loader::DB:
+    file: lib/Data/Context/Loader/DB.pm
+    version: v0.0.1
+requires:
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  Data::Context: '0.3'
+  Data::Context::Finder: '0.3'
+  Data::Context::Loader: '0.3'
+  Data::Context::Util: '0.3'
+  JSON::XS: '0'
+  Moose: '0'
+  MooseX::NonMoose: '0.26'
+  namespace::autoclean: '0'
+  perl: '5.008'
+  version: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data::Context::Loader::DB
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/Data-Context-Loader-DB.git
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

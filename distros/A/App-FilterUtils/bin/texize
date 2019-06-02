@@ -1,0 +1,35 @@
+#!/usr/bin/perl -CASD
+
+use strict;
+use warnings;
+
+use App::FilterUtils::texize;
+our $VERSION = '0.002'; # VERSION
+
+App::FilterUtils::texize->run();
+
+exit 0;
+
+__END__
+
+=head1 Command-line utility
+
+texize - Filter input through TeX::Encode
+
+=head1 DOCUMENTATION
+
+See 'L<perldoc App::FilterUtils::texize|App::FilterUtils::texize>' or 'texize --help' for documentation.
+
+=head1 AUTHOR
+
+Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2019 Ahmad Fatoum
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

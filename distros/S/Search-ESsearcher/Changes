@@ -1,0 +1,12 @@
+Revision history for Search-ESsearcher
+
+0.1.0	 2019-06-02/09:00
+		 - Add bf2b, beats fail2ban support.
+		 - Actually set the output template now.
+		 - name validation no longer chokes on numbers.
+		 - Now prints the proper help info instead of the
+		   one for the default, syslog.
+
+0.0.0	 2019-06-02/04:40
+		 - Initial release.
+

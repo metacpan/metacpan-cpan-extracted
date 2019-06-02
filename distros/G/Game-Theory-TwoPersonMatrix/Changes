@@ -1,5 +1,14 @@
 Revision history for Game-Theory-TwoPersonMatrix
 
+0.2101 2019-06-01 16:43:22
+    - Improved documentation slightly.
+
+0.2100 2019-06-01 16:28:32
+    - Added code to handle the weighted choice [0,0] case.
+    - Added sprintf() calls to test cases.
+    - Improved the eg/play code.
+    - Added a primsoner's dilemma tournament program.
+
 0.2007 2016-01-20 19:22:22
     - Simplified code in eg/minimax and eg/maximin.
     - Cleaned up distribution a bit.

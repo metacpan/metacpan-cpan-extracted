@@ -1,17 +1,18 @@
 ---
 abstract: 'LWP back-end for rsync:// by running the rsync program.'
 author:
-  - 'Kevin Ryde <user42@zip.com.au>'
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: LWP-Protocol-rsync
 no_index:
   directory:
@@ -19,24 +20,19 @@ no_index:
     - inc
     - devel
     - xt
-optional_features:
-  maximum_tests:
-    description: "Have \"make test\" do as much as possible."
-    requires:
-      LWP::UserAgent: 0
 requires:
-  File::Spec: 0
-  File::Temp: 0
-  HTTP::Date: 0
-  HTTP::Response: 0
-  HTTP::Status: 0
-  IPC::Run: 0
-  LWP::MediaTypes: 0
-  LWP::Protocol: 0
-  Test: 0
-  URI::Escape: 0
-  perl: 5.005
+  File::Spec: '0'
+  File::Temp: '0'
+  HTTP::Date: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  IPC::Run: '0'
+  LWP::MediaTypes: '0'
+  LWP::Protocol: '0'
+  URI::Escape: '0'
+  perl: '5.005'
 resources:
   homepage: http://user42.tuxfamily.org/lwp-protocol-rsync/index.html
   license: http://www.gnu.org/licenses/gpl.html
-version: 1
+version: '2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

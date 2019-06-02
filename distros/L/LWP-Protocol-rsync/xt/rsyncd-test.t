@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014 Kevin Ryde
+# Copyright 2014, 2017 Kevin Ryde
 
 # This file is part of LWP-Protocol-rsync.
 #
@@ -36,8 +36,6 @@ use POSIX ();
 use Taint::Util;
 use File::chdir;
   
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 my $conf_filename = File::Spec->catfile($FindBin::Bin, 'rsyncd-test.conf');
 untaint($conf_filename);

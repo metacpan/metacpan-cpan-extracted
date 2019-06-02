@@ -36,13 +36,13 @@ no_index:
 provides:
   TeX::Encode:
     file: lib/TeX/Encode.pm
-    version: '2.005'
+    version: '2.006'
   TeX::Encode::BibTeX:
     file: lib/TeX/Encode/BibTeX.pm
-    version: '2.005'
+    version: '2.006'
   TeX::Encode::charmap:
     file: lib/TeX/Encode/charmap.pm
-    version: '2.005'
+    version: '2.006'
 requires:
   Carp: '0'
   Encode::Encoding: '0.1'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/athreef/TeX-Encode/issues
   homepage: https://github.com/athreef/TeX-Encode
   repository: https://github.com/athreef/TeX-Encode.git
-version: '2.005'
+version: '2.006'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -220,7 +220,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000033'
           version: '0.006'
       name: DynamicPrereqs
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -237,16 +237,16 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
       name: '@Git/Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -254,12 +254,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -267,16 +267,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.005
-          tag_format: v%v
-          tag_message: v%v
+          tag: v2.006
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -285,10 +285,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
       name: '@Git/Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: ChangelogFromGit
@@ -301,14 +301,14 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
       name: Git::NextVersion
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: OurPkgVersion
-      version: '0.12'
+      version: '0.14'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:

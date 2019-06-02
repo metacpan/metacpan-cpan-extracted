@@ -1,6 +1,6 @@
 package Modern::Perl;
 # ABSTRACT: enable all of the features of Modern Perl with one import
-$Modern::Perl::VERSION = '1.20181021';
+$Modern::Perl::VERSION = '1.20190601';
 use 5.010_000;
 
 use strict;
@@ -14,19 +14,18 @@ use IO::File   ();
 use IO::Handle ();
 
 my $wanted_date;
-sub VERSION
-{
+
+sub VERSION {
     my ($self, $version) = @_;
 
-    return $Modern::Perl::VERSION || 2018 unless defined $version;
-    return $Modern::Perl::VERSION || 2018 if             $version < 2009;
+    return $Modern::Perl::VERSION || 2019 unless defined $version;
+    return $Modern::Perl::VERSION || 2019 if             $version < 2009;
 
     $wanted_date = $version if (caller(1))[3] =~ /::BEGIN/;
-    return 2018;
+    return 2019;
 }
 
-sub import
-{
+sub import {
     my ($class, $date) = @_;
     $date = $wanted_date unless defined $date;
 
@@ -39,35 +38,31 @@ sub import
     mro::set_mro( scalar caller(), 'c3' );
 }
 
-sub unimport
-{
+sub unimport {
     warnings->unimport;
     strict->unimport;
     feature->unimport;
 }
 
-my %dates =
-(
-    2009 => ':5.10',
-    2010 => ':5.10',
-    2011 => ':5.12',
-    2012 => ':5.14',
-    2013 => ':5.16',
-    2014 => ':5.18',
-    2015 => ':5.20',
-    2016 => ':5.24',
-    2017 => ':5.24',
-    2018 => ':5.26',
-    2019 => ':5.28',
-);
+sub validate_date {
+    my %dates = (
+        2009 => ':5.10',
+        2010 => ':5.10',
+        2011 => ':5.12',
+        2012 => ':5.14',
+        2013 => ':5.16',
+        2014 => ':5.18',
+        2015 => ':5.20',
+        2016 => ':5.24',
+        2017 => ':5.24',
+        2018 => ':5.26',
+        2019 => ':5.28',
+    );
 
-sub validate_date
-{
     my $date = shift;
 
     # always enable unicode_strings when available
-    unless ($date)
-    {
+    unless ($date) {
         return ':5.12' if $] > 5.011003;
         return ':5.10';
     }
@@ -93,7 +88,7 @@ Modern::Perl - enable all of the features of Modern Perl with one import
 
 =head1 VERSION
 
-version 1.20181021
+version 1.20190601
 
 =head1 SYNOPSIS
 
@@ -119,6 +114,16 @@ more information, L<http://www.modernperlbooks.com/> for further discussion of
 Modern Perl and its implications, and
 L<http://onyxneon.com/books/modern_perl/index.html> for a freely-downloadable
 Modern Perl tutorial.
+
+=head2 CLI Usage
+
+As of Modern::Perl 2019, you may also enable this pragma from the command line:
+
+    $ perl -Modern::Perl -e "say 'Take that, awk!'"
+
+You may also enable year-specific features:
+
+    $ perl -Modern::Perl=2020 -e "say 'Looking forward to Perl 5.30!'"
 
 =head2 Wrapping Modern::Perl
 
@@ -181,7 +186,7 @@ chromatic, C<< <chromatic at wgz.org> >>
 
 =head1 BUGS
 
-None reported.
+None known.
 
 Please report any bugs or feature requests to C<bug-modern-perl at
 rt.cpan.org>, or through the web interface at

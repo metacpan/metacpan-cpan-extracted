@@ -33,7 +33,7 @@ sub SUPER
 
 package SUPER;
 # ABSTRACT: control superclass method dispatch
-$SUPER::VERSION = '1.20141117';
+$SUPER::VERSION = '1.20190531';
 use strict;
 use warnings;
 
@@ -41,6 +41,19 @@ use Carp;
 
 use Scalar::Util 'blessed';
 use Sub::Identify ();
+
+BEGIN {
+    # Due to a perl bug (fixed in v5.17.4, commit 3c104e59), if SUPER.pm is
+    # loaded, perl can no longer find methods on parent when:
+    # 1) the invocant is "main" (or isa "main")
+    # 2) using the SUPER pseudo-class syntax (i.e. "main"->SUPER::...)
+    # We work around that bug by handling ->SUPER::... ourselves.
+    if ($] < 5.017004)
+    {
+        no strict 'refs';
+        *{"SUPER::AUTOLOAD"} = \&UNIVERSAL::SUPER;
+    }
+}
 
 # no need to use Exporter
 sub import
@@ -254,7 +267,7 @@ which you really want to dispatch.
 Created by Simon Cozens, C<simon@cpan.org>.  Copyright (c) 2003 Simon Cozens.
 
 Maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt> after version 1.01.
-Copyright (c) 2004-2014 chromatic.
+Copyright (c) 2004-2019 chromatic.
 
 Thanks to Joshua ben Jore for bug reports and suggestions.
 

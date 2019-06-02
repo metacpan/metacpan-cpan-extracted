@@ -2,12 +2,12 @@ use strict;
 use warnings;
 package App::FilterUtils::artype;
 # ABSTRACT: Fix-up display of Arabic characters on unsupporting UIs
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 use base 'App::Cmd::Simple';
 use utf8;
 use charnames qw();
 use open qw( :encoding(UTF-8) :std );
-use Module::Load qw(load);
+
 use Getopt::Long::Descriptive;
 
 use utf8;

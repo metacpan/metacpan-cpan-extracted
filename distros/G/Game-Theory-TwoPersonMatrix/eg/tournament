@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Partly taken from https://www.forbes.com/sites/rogerkay/2011/12/19/generous-tit-for-tat-a-winning-strategy
+# And https://medium.com/thinking-is-hard/a-prisoners-dilemma-cheat-sheet-4d85fe289d87
+
+use Game::Theory::TwoPersonMatrix;
+use Algorithm::Combinatorics qw/ combinations_with_repetition /;
+use List::Util::WeightedChoice qw/ choose_weighted /;
+
+use constant COOP   => 1;
+use constant DEFECT => 2;
+
+# Set the number of moves
+my $max = shift || 100;
+
+my $players = {
+    jesus   => [ \&cooperate, \&cooperate ], # Always cooperate
+    lucifer => [ \&defect, \&defect ], # Always defect
+    random  => [ \&random, \&random ],
+    tft     => [ \&cooperate, \&tit_for_tat ], # Cooperate, then do whatever the opponent did the last move
+    rtft    => [ \&defect, \&rev_tit_for_tat ], # Defect, then do the opposite of whatever the opponent did the last move
+    atft    => [ \&defect, \&tit_for_tat ], # Defect, then do whatever the opponent did the last move
+    tftt    => [ \&cooperate, \&tit_for_two_tats ], # Cooperate or defect if the opponent defected against twice in a row
+    gtft    => [ \&cooperate, \&generous_tit_for_tat ], # Tit-for-tat except 10% cooperate when defected against
+    grudger => [ \&cooperate, \&grudger ], # Cooperate until defected against; then defect forever
+    fbf     => [ \&cooperate, \&firm_but_fair ], # Cooperate, then cooperate until defected against. Cooperate if defected last and defected against
+};
+
+my %scores;
+@scores{ keys %$players } = (0) x keys %$players;
+
+# A Prisoner's Dilemma
+my $g = Game::Theory::TwoPersonMatrix->new(
+    payoff1 => [ [3, 0], [5, 1] ],
+    payoff2 => [ [3, 5], [0, 1] ],
+);
+
+my $iter = combinations_with_repetition( [ sort keys %$players ], 2 );
+
+my $i = 0;
+
+while ( my $v = $iter->next ) {
+    $i++;
+#    print "$i: @$v\n";
+
+    my ( $player, $opponent, @moves );
+
+    my %strategy = (
+        1 => $players->{ $v->[0] }[0]->()->{1},
+        2 => $players->{ $v->[1] }[0]->()->{2},
+    );
+
+    for my $n ( 1 .. $max ) {
+        # Each player makes a move
+        my ($play) = $g->play(%strategy);
+
+        # The strategies are encoded in the key
+        push @moves, ( keys %$play )[0];
+
+        # Update the score for each player
+        my ($p) = values %$play;
+        $player   += $p->[0];
+        $opponent += $p->[1];
+
+        # Set next strategies
+        %strategy = (
+            1 => $players->{ $v->[0] }[1]->(\@moves)->{1},
+            2 => $players->{ $v->[1] }[1]->(\@moves)->{2},
+        );
+    }
+
+#    print "\t= $player vs $opponent\n";
+    $scores{ $v->[0] } += $player;
+    $scores{ $v->[1] } += $opponent;
+}
+
+for my $player ( sort { $scores{$b} <=> $scores{$a} } keys %scores ) {
+    print "$player = $scores{$player}\n";
+}
+
+sub random {
+    return {
+        1 => { 1 => 0.5, 2 => 0.5 },
+        2 => { 1 => 0.5, 2 => 0.5 }
+    };
+}
+
+sub cooperate {
+    return {
+        1 => { 1 => 1, 2 => 0 },
+        2 => { 1 => 1, 2 => 0 },
+    };
+}
+
+sub defect {
+    return {
+        1 => { 1 => 0, 2 => 1 },
+        2 => { 1 => 0, 2 => 1 },
+    };
+}
+
+sub grudger { # https://en.wikipedia.org/wiki/Grim_trigger
+    my $moves = shift;
+
+    #    Player1, Player2
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+    return {
+        1 => {                                                      # Player1
+            1 => $strat1 == COOP && $strat2 == COOP ? 1 : 0,        # Cooperate
+            2 => $strat1 == DEFECT || $strat2 == DEFECT ? 1 : 0,    # Defect
+        },
+        2 => {                                                      # Player2
+            1 => $strat1 == COOP && $strat2 == COOP ? 1 : 0,        # Cooperate
+            2 => $strat1 == DEFECT || $strat2 == DEFECT ? 1 : 0,    # Defect
+        },
+    }
+}
+
+sub tit_for_tat { # https://en.wikipedia.org/wiki/Tit_for_tat
+    my $moves = shift;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+
+    return {
+        1 => {
+            1 => $strat2 == COOP ? 1 : 0,
+            2 => $strat2 == DEFECT ? 1 : 0,
+        },
+        2 => {
+            1 => $strat1 == COOP ? 1 : 0,
+            2 => $strat1 == DEFECT ? 1 : 0,
+        },
+    }
+}
+
+sub generous_tit_for_tat {
+    my $moves = shift;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+
+    return {
+        1 => {
+            1 => $strat2 == COOP ? 1 : 0,
+            2 => $strat2 == DEFECT ? choose_weighted( [ 1, 0 ], [ 9, 1 ] ) : 0,
+        },
+        2 => {
+            1 => $strat1 == COOP ? 1 : 0,
+            2 => $strat1 == DEFECT ? choose_weighted( [ 1, 0 ], [ 9, 1 ] ) : 0,
+        },
+    }
+}
+
+
+sub rev_tit_for_tat {
+    my $moves = shift;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+
+    return {
+        1 => {
+            1 => $strat2 == DEFECT ? 1 : 0,
+            2 => $strat2 == COOP ? 1 : 0,
+        },
+        2 => {
+            1 => $strat1 == DEFECT ? 1 : 0,
+            2 => $strat1 == COOP ? 1 : 0,
+        },
+    }
+}
+
+sub tit_for_two_tats { # https://en.wikipedia.org/wiki/Tit_for_tat#Tit_for_two_tats
+    my $moves = shift;
+
+    return cooperate() if @$moves == 1;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+    my ( $strat3, $strat4 ) = split /,/, $moves->[-2];
+
+    # Defect if the opponent has defected twice in a row
+    return {
+        1 => {
+            1 => $strat2 == COOP || $strat4 == COOP ? 1 : 0,
+            2 => $strat2 == DEFECT && $strat4 == DEFECT ? 1 : 0,
+        },
+        2 => {
+            1 => $strat1 == COOP || $strat3 == COOP ? 1 : 0,
+            2 => $strat1 == DEFECT && $strat3 == DEFECT ? 1 : 0,
+        },
+    }
+}
+
+sub firm_but_fair {
+    my $moves = shift;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+
+    return {
+        1 => {
+            1 => $strat1 == DEFECT && $strat2 == DEFECT ? 1 : 0,
+            2 => $strat1 == COOP && $strat2 == DEFECT ? 1 : 0,
+        },
+        2 => {
+            1 => $strat1 == DEFECT && $strat2 == DEFECT ? 1 : 0,
+            2 => $strat1 == DEFECT && $strat2 == COOP ? 1 : 0,
+        },
+    }
+}

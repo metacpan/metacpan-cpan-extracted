@@ -17,6 +17,7 @@ my $res = request('/');
       bag(
         re('^catalyst\.response\.time:\d+\|ms$'),
         re('^catalyst\.stats\.root\.base\.time:\d+\|ms$'),
+        re('^catalyst\.stats\.rootx\.foo-bar_baz\.time:\d+\|ms$'),
       ),
       'expected metrics'
       or diag( explain \@MockStatsd::Data );

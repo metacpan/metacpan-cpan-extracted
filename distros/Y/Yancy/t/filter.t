@@ -20,7 +20,7 @@ use Digest;
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend );
 
-my $collections = \%Yancy::Backend::Test::SCHEMA;
+my $schema = \%Yancy::Backend::Test::SCHEMA;
 my %data = (
     people => [
         {
@@ -47,12 +47,13 @@ my %data = (
         },
     ],
 );
-my ( $backend_url, $backend, %items ) = init_backend( $collections, %data );
+my ( $backend_url, $backend, %items ) = init_backend( $schema, %data );
 
 my $t = Test::Mojo->new( 'Yancy', {
     backend => $backend_url,
-    collections => $collections,
+    schema => $schema,
     read_schema => 1,
+    editor => { require_user => undef, },
 } );
 
 subtest 'register and run a filter' => sub {
@@ -215,8 +216,9 @@ subtest 'api runs filters during create' => sub {
 subtest 'register filters from config' => sub {
     my $t = Test::Mojo->new( 'Yancy', {
         backend => $backend_url,
-        collections => $collections,
+        schema => $schema,
         read_schema => 1,
+        editor => { require_user => undef, },
         filters => {
             'test.digest' => sub {
                 my ( $name, $value, $conf ) = @_;
@@ -240,59 +242,6 @@ subtest 'register filters from config' => sub {
     is $filtered_user->{password},
         Digest->new( 'SHA-1' )->add( 'unfiltered' )->b64digest,
         'filter is executed';
-};
-
-my $openapi = $t->app->yancy->openapi->validator->schema->get( "" );
-subtest 'api uses filters on operation' => sub {
-    local $openapi->{paths}{"/user/{username}"}{put}{"x-filter"} = [ 'test.lc_email' ];
-    my ( $backend_url, $backend ) = init_backend( $collections, %data );
-    my $t = Test::Mojo->new( 'Yancy', {
-        backend => $backend_url,
-        openapi => $openapi,
-    } );
-    $t->app->yancy->filter->add(
-        'test.lc_email' => sub {
-            my ( $name, $value, $conf ) = @_;
-            $value->{ email } = lc $value->{ email };
-            return $value;
-        },
-    );
-    my $doug = {
-        %{ $backend->get( user => 'doug' ) },
-        email => 'dOuG@pReAcTiOn.me',
-    };
-    delete $doug->{id}; # because user.id is readOnly
-    $t->put_ok( '/yancy/api/user/doug', json => $doug )
-      ->status_is( 200 )->or( sub { diag shift->tx->res->body } );
-    is $backend->get( user => 'doug' )->{email}, 'doug@preaction.me',
-        'filter on operation is run';
-};
-
-subtest 'api filters operation outputs' => sub {
-    local $openapi->{paths}{"/user/{username}"}{"x-filter-output"} = [ 'test.lc_email' ];
-    my ( $backend_url, $backend ) = init_backend( $collections, %data );
-    my $t = Test::Mojo->new( 'Yancy', {
-        backend => $backend_url,
-        openapi => $openapi,
-    } );
-    $t->app->yancy->filter->add(
-        'test.lc_email' => sub {
-            my ( $name, $value, $conf ) = @_;
-            $value->{ email } = lc $value->{ email };
-            return $value;
-        },
-    );
-    my $email = 'dOuG@pReAcTiOn.me';
-    my $doug = {
-        %{ $backend->get( user => 'doug' ) },
-        email => $email,
-    };
-    delete $doug->{id}; # because user.id is readOnly
-    $t->put_ok( '/yancy/api/user/doug', json => $doug )
-      ->status_is( 200 )->or( sub { diag shift->tx->res->body } )
-      ->json_is( '/email', lc $email );
-    is $backend->get( user => 'doug' )->{email}, $email,
-        'backend entity unchanged';
 };
 
 done_testing;

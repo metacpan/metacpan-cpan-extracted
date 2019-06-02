@@ -1,0 +1,36 @@
+Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API
+-------------------------------------------------------------------------------
+
+<https://finalrewind.org/projects/Travel-Status-DE-DBWagenreihung/>
+
+This software is not stable yet; API, script and module names/usage may change
+without notice. There is no backwards compatibility.
+
+Dependencies
+------------
+
+* perl 5.20 or newer
+* JSON
+* LWP::UserAgent
+* Travel::Status::DE::IRIS
+
+Installation
+------------
+
+From a release tarball:
+
+* perl Build.PL
+* ./Build
+* sudo ./Build install
+
+From git:
+
+* perl Build.PL
+* ./Build
+* ./Build manifest
+* sudo ./Build install
+
+See also the Module::Build documentation.
+
+You can then run 'man Travel::Status::DE::DBWagenreihung'.  This distribution
+also ships the script 'db-wagenreihung', see 'man db-wagenreihung'.

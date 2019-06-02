@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.6.1';
 
 
 sub statsd_client {
@@ -31,7 +31,7 @@ sub statsd_metric_name_filter {
     return "$stat" unless is_plain_arrayref($stat);
 
     my $metric = "catalyst.stats." . $stat->[1] . ".time";
-    $metric =~ s/\W+/./g;
+    $metric =~ s/[^\w\-_]+/./g;
 
     return $metric;
 }
@@ -80,7 +80,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.5.1
+version v0.6.1
 
 =head1 SYNOPSIS
 
@@ -143,6 +143,10 @@ Returns the statsd client.
 This method returns the name to be used for logging stats, or C<undef>
 if the metric should be ignored.
 
+Only alphanumeric characters, hyphens or underscores in namespaces are
+accepted. All other characters are converted to dots, with consecutive
+dots compressed into a single dot.
+
 If it is passed a non-arrayref, then it will stringify the argument
 and return that.
 
@@ -185,7 +189,7 @@ top-level names in the C<catalyst.stats.*> namespaces, e.g.
 
   $stats->profile( end => 'here' );
 
-will be logged to statsd in the C<statlyst.stats.here.time> namespace.
+will be logged to statsd in the C<catalyst.stats.here.time> namespace.
 
 If you do not want this, then you can work around this by prefixing
 the block name with a controller name, e.g.

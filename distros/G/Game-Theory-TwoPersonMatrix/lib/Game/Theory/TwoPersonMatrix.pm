@@ -6,13 +6,13 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2007';
+our $VERSION = '0.2101';
 
 use Carp;
 use Algorithm::Combinatorics qw( permutations );
 use Array::Transpose;
 use List::MoreUtils qw( all zip );
-use List::Util qw( max min );
+use List::Util qw( max min sum0 );
 use List::Util::WeightedChoice qw( choose_weighted );
 
 
@@ -464,11 +464,13 @@ sub play
     my $player  = 1;
     my $keys    = [ sort keys %{ $self->{$player} } ];
     my $weights = [ map { $self->{$player}{$_} } @$keys ];
+    $weights = [ 1, 1 ] if 0 == sum0 @$weights;
     my $rplay   = choose_weighted( $keys, $weights );
 
     $player   = 2;
     $keys     = [ sort keys %{ $self->{$player} } ];
     $weights  = [ map { $self->{$player}{$_} } @$keys ];
+    $weights  = [ 1, 1 ] if 0 == sum0 @$weights;
     my $cplay = choose_weighted( $keys, $weights );
 
     $play->{ "$rplay,$cplay" } = exists $self->{payoff} && $self->{payoff}
@@ -492,7 +494,7 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2007
+version 0.2101
 
 =head1 SYNOPSIS
 
@@ -550,6 +552,9 @@ to the tabular format of a matrix game:
 
 A non-zero sum game is represented by two payoff profiles, as above in the
 SYNOPSIS.
+
+A prisoner's dilemma tournament of different strategies, ala Axelrod, can be
+found the the F<eg/> directory of this distribution.
 
 =head1 METHODS
 
@@ -678,7 +683,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,8 +1,8 @@
-                              podlators 4.11
+                              podlators 4.12
              (format POD source into various output formats)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>.  This
+  Copyright 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>.  This
   software is distributed under the same terms as Perl itself.  Please see
   the section LICENSE below for more information.
 
@@ -87,11 +87,21 @@ BUILDING AND INSTALLATION
 
       perl Makefile.PL
       make
-      make test
       make install
 
-  You'll probably need to do the last as root unless you're installing
+  You will have to run the last command as root unless you're installing
   into a local Perl module tree in your home directory.
+
+TESTING
+
+  podlators comes with a test suite, which you can run after building
+  with:
+
+      make test
+
+  If a test fails, you can run a single test with verbose output via:
+
+      prove -vb <path-to-test>
 
   To enable tests that don't detect functionality problems but are used to
   sanity-check the release, set the environment variable RELEASE_TESTING
@@ -143,7 +153,7 @@ LICENSE
   The podlators package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>
+    Copyright 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>
 
     This program is free software; you may redistribute it and/or modify
     it under the same terms as Perl itself.  This means that you may

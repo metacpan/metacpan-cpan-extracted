@@ -2,3 +2,9 @@ Revision history for Perl module CAM::PDF
 
 1.00  30 May, 2019
       - Initial release based on CAM::PDF v1.60.
+1.10  2 Jun, 2019
+      - Fix text harness failure due to tests often running in parallel.
+      - Make "radio-button" checkbox groups work.
+      - Apply CAM::PDF patches applicable to our overridden methods 
+        from CAM::PDF bugs #58144, #122890 and #125299.
+      - Add "KNOWN BUGS / TODO" section to docs.

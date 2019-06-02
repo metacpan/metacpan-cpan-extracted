@@ -1,23 +1,29 @@
 ==================================================
-Changes from 2016-11-16 00:00:00 +0000 to present.
+Changes from 2018-06-02 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2017-11-16 22:31:37 +0000
+version 0.002 at 2019-06-02 07:23:07 +0000
 ------------------------------------------
 
-  Change: 289e7f4efefb6b8ca8b2a0fecf5d680900e2e212
+  Change: deeb033c1939517e349a4a8e2935ea4086c92a86
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-11-16 23:30:56 +0000
+  Date : 2019-06-02 09:23:00 +0000
 
-    Migrate more of my utilities 
+    add new texize utility 
 
-  Change: e1a2782815850fc4cb5815a0ad334e5092334608
+  Change: 1cfb76f2db1ce20b73d9c357672577e86e8215d4
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-11-16 14:40:51 +0000
+  Date : 2019-06-02 09:16:42 +0000
 
-    Migrate bin/2base script to module 
+    byte: recognize /^(0x|0|0b)/ prefixes in arguments 
 
-================
-End of releases.
-================
+  Change: ecbdacdd756a0099804304cde7e2360e31a99aff
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-06-02 09:12:01 +0000
+
+    treewide: remove unnecessary use Module::Load 'load' 
+
+===============================================
+Plus 1 release after 2018-06-02 00:00:00 +0000.
+===============================================

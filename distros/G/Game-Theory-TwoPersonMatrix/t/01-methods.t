@@ -11,7 +11,7 @@ $g = Game::Theory::TwoPersonMatrix->new(
     payoff => [ [5,0], [-1,2] ]
 );
 isa_ok $g, 'Game::Theory::TwoPersonMatrix', '2x2';
-cmp_ok $g->expected_payoff(), '==', 1.18, 'expected_payoff';
+cmp_ok sprintf('%.2f', $g->expected_payoff()), '==', 1.18, 'expected_payoff';
 
 $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => '0.2', 2 => '0.3', 3 => '0.5' },
@@ -22,7 +22,7 @@ $g = Game::Theory::TwoPersonMatrix->new(
     ]
 );
 isa_ok $g, 'Game::Theory::TwoPersonMatrix', '3x3';
-is $g->expected_payoff(), -0.17, 'expected_payoff';
+is sprintf('%.2f', $g->expected_payoff()), -0.17, 'expected_payoff';
 
 $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => '0.3', 2 => '0',   3 => '0.7' },
@@ -33,7 +33,7 @@ $g = Game::Theory::TwoPersonMatrix->new(
     ]
 );
 isa_ok $g, 'Game::Theory::TwoPersonMatrix', '3x4';
-is $g->expected_payoff(), -0.37, 'expected_payoff';
+is sprintf('%.2f', $g->expected_payoff()), -0.37, 'expected_payoff';
 
 $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => 'p', 2 => '(1 - p)' },

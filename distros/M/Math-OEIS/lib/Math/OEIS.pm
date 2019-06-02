@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -18,9 +18,10 @@
 package Math::OEIS;
 use 5.006;
 use strict;
+use warnings;
 use File::Spec;
 
-our $VERSION = 10;
+our $VERSION = 11;
 
 sub local_directories {
   # my ($class) = @_;
@@ -60,7 +61,7 @@ sub local_filename {
 1;
 __END__
 
-=for stopwords OEIS filename Ryde ie
+=for stopwords Math OEIS filename Ryde ie
 
 =head1 NAME
 
@@ -123,7 +124,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

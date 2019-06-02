@@ -1,16 +1,16 @@
 {
    "abstract" : "LWP back-end for rsync:// by running the rsync program.",
    "author" : [
-      "Kevin Ryde <user42@zip.com.au>"
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LWP-Protocol-rsync",
    "no_index" : {
@@ -20,18 +20,6 @@
          "devel",
          "xt"
       ]
-   },
-   "optional_features" : {
-      "maximum_tests" : {
-         "description" : "Have \"make test\" do as much as possible.",
-         "prereqs" : {
-            "runtime" : {
-               "requires" : {
-                  "LWP::UserAgent" : "0"
-               }
-            }
-         }
-      }
    },
    "prereqs" : {
       "build" : {
@@ -54,9 +42,16 @@
             "IPC::Run" : "0",
             "LWP::MediaTypes" : "0",
             "LWP::Protocol" : "0",
-            "Test" : "0",
             "URI::Escape" : "0",
             "perl" : "5.005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         },
+         "suggests" : {
+            "LWP::UserAgent" : "0"
          }
       }
    },
@@ -67,5 +62,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "1"
+   "version" : 2,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

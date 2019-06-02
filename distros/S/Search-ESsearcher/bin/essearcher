@@ -1,0 +1,310 @@
+#!/usr/bin/env perl
+#
+#This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+#
+#This is free software, licensed under:
+#
+#  The Artistic License 2.0 (GPL Compatible)
+
+
+use strict;
+use warnings;
+use Search::ESsearcher;
+use Getopt::Long qw(:config pass_through);
+use Data::Dumper;
+
+sub version{
+	print "essearch: 0.0.1\n";
+};
+
+# disable color if asked
+if ( defined( $ENV{NO_COLOR} ) ){
+	$ENV{ANSI_COLORS_DISABLED}=1;
+}
+
+# set all the templates the servers use to to fault
+my $search;
+my $options;
+my $output;
+my $elastic;
+my $module;
+my $invert;
+my $print_search;
+my $print_results;
+my $help;
+my $warn;
+my $critical;
+my $check;
+GetOptions(
+		   's=s' => \$search,
+		   'g=s' => \$options,
+		   'o=s' => \$output,
+		   'e=s' => \$elastic,
+		   'S' => \$print_search,
+		   'R' => \$print_results,
+		   'm=s' => \$module,
+		   'i' => \$invert,
+		   'h' => \$help,
+		   'help' => \$help,
+		   'n=s' => \$check,
+		   'w=s' => \$warn,
+		   'c=s' => \$critical,
+		   );
+
+# if -n is set, make sure we have -w and -c
+if ( defined( $check ) &&
+	 (
+	  ( !defined( $warn ) ) ||
+	  ( !defined( $critical) )
+	  )
+	){
+	warn('-n is set, but either -c or -w is not');
+	exit 255;
+}
+
+#make sure we have a valid value for check if it is defined
+if ( defined( $check ) &&
+	 ( $check ne 'gt' ) &&
+	 ( $check ne 'gte' ) &&
+	 ( $check ne 'lt' ) &&
+	 ( $check ne 'lte' )
+	){
+	warn('-n is set, but is not gt, gte, lt, or lte');
+	exit 255;
+}
+
+# Use module as the base to use allowing
+# the other settings to override it if defined.
+if (defined( $module )){
+	if (!defined( $options )){
+		$options=$module;
+	}
+	if (!defined( $output )){
+		$output=$module;
+	}
+	if (!defined( $search )){
+		$search=$module;
+	}
+}
+
+my $ess = Search::ESsearcher->new();
+# print the help if asked to
+if ( $help ){
+	$ess->search_set( $search );
+	&version;
+	print '
+-s <search>  The search template to use.
+-g <getopts> The getopts config to use.
+-o <output>  Thee output template to use.
+-m <module>  Set all of the above to the same.
+             Any of the above being set will override this.
+-e <elastic> The elasticsearch config to use.
+-S           Print the search out after filling it in and exit.
+-R           Run the search and print it via Data::Dumper.
+-i           Invert the results.
+-n <check>   Operate as a nagios style check.
+-w <warn>    Number of hits to throw a warning at.
+-c <crit>    Number of hits to throw a critical at.
+-h           Print the help.
+--help       Print the help.
+
+In check mode, -w and -c both most be specified. The value
+of -n is used to determine the equality to use when evaluating
+-w and -c. The table is as below.
+
+gt  >
+gte >=
+lt  <
+lte <=
+
+The order is as below.
+
+$hits $check $warn/critical
+
+The printed help after this line varies based on the loaded
+search template. If one is found it will be printed.
+
+'.$ess->fetch_help;
+	exit 255;
+}
+
+# reels in the options
+$ess->options_set( $options );
+$ess->load_options;
+$ess->get_options;
+
+# reels in the search template
+$ess->search_set( $search );
+$ess->load_search;
+my $filled_in=$ess->search_fill_in;
+if ( $print_search ){
+	print $filled_in;
+	exit 255;
+}
+
+# reels in the elastic config
+$ess->elastic_set( $elastic );
+$ess->load_elastic;
+
+#runs the search
+my $results=$ess->search_run;
+if ($print_results){
+	print Dumper($results);
+	exit;
+}
+# act as a nagios/ichinga2 style check instead of running the output section if requested
+if ( defined( $check ) ){
+	if (
+		( ref( $results ) ne 'HASH' ) ||
+		( !defined( $results->{hits} ) )||
+		( !defined( $results->{hits}{hits} ) )
+		){
+		print "UNKNOWN - search failed;\n";
+		exit 3;
+	}
+
+	my $found=$#{ $results->{hits}{hits} } + 1;
+
+	my $is_critical;
+	my $is_warn;
+
+	if ( $check eq 'gt' ){
+		if ( $found > $critical ){
+			$is_critical=1;
+		}elsif( $found > $warn ){
+			$is_warn=1;
+		}
+	}elsif( $check eq 'gte' ){
+		if ( $found >= $critical ){
+			$is_critical=1;
+		}elsif( $found >= $warn ){
+			$is_warn=1;
+		}
+	}elsif( $check eq 'lt' ){
+		if ( $found < $critical ){
+			$is_critical=1;
+		}elsif( $found < $warn ){
+			$is_warn=1;
+		}
+	}elsif( $check eq 'lte' ){
+		if ( $found <= $critical ){
+			$is_critical=1;
+		}elsif( $found <= $warn ){
+			$is_warn=1;
+		}
+	}
+
+	if ( $is_warn ){
+		print "WARNING - ".$found.' '.$check.' '.$warn." hits;\n";
+		exit 1;
+	}elsif( $is_critical ){
+		print "CRITICAL - ".$found.' '.$check.' '.$critical." hits;\n";
+		exit 2;
+	}
+
+	print "OK - ".$found." hits;\n";
+	exit 0;
+}
+
+# processes the results
+$ess->output_set( $output );
+$ess->load_output;
+my @formatted=$ess->results_process( $results );
+if (!defined($formatted[0])){
+	exit 0;
+}
+#invert if requested
+if ($invert){
+	@formatted=reverse(@formatted);
+}
+print join("\n", @formatted)."\n";
+exit 0;
+
+
+=head1 NAME
+
+essearcher - A utility for using templates for searching elasticsearch.
+
+=head1 SYNOPSIS
+
+essearcher [B<-e> <elastic>] [B<-s> <search>] [B<-g> <options>] [B<-o> <options>] ...
+
+essearcher [B<-m> <name>] [B<-e> <elastic>] ...
+
+essearcher B<-n> B<-w> <warn> B<-c> <critical> ...
+
+=head1 FLAGS
+
+=head2 -s <search>
+
+The search template to use.
+
+=head2 -g <getopts>
+
+The getopts config to use.
+
+=head2 -o <output>
+
+Thee output template to use.
+
+=head2 -m <module>
+
+Set all of the above to the same.
+Any of the above being set will override this.
+
+=head2 -e <elastic>
+
+The elasticsearch config to use.
+
+=head2 -S
+
+Print the search out after filling it in and exit.
+
+=head2 -R
+
+Run the search and print it via Data::Dumper.
+
+=head2 -i
+
+Invert the results.
+
+=head2 -n <check>
+
+Operate as a nagios style check.
+
+In check mode, -w and -c both most be specified. The value
+of -n is used to determine the equality to use when evaluating
+-w and -c. The table is as below.
+
+gt  >
+gte >=
+lt  <
+lte <=
+
+The order is as below.
+
+$hits $check $warn/critical
+
+=head2 -w <warn>
+
+Number of hits to throw a warning at.
+
+=head2 -c <crit>
+
+Number of hits to throw a critical at.
+
+=head2 -h
+
+Print the help.
+
+=head2 --help
+
+Print the help.
+
+=head1 ENVIROMENTAL VARIABLES
+
+=head2 NO_COLOR
+
+If this is set, it disables color output.
+
+=cut

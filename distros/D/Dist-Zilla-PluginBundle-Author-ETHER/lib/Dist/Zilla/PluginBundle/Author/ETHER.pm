@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.147-3-g5a10818
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.148-4-g907c1a8
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.148';
+our $VERSION = '0.149';
 
 use Moose;
 with
@@ -333,7 +333,7 @@ sub configure
         [ 'Test::CPAN::Changes' => { ':version' => '0.012' } ],
         [ 'GenerateFile::FromShareDir' => 'generate xt/author/changes_has_content.t' => { -dist => 'Dist-Zilla-PluginBundle-Author-ETHER', -source_filename => 'changes_has_content.t', -destination_filename => 'xt/author/changes_has_content.t' } ],
         'Test::ChangesHasContent',
-        [ 'Test::MinimumVersion' => { ':version' => '2.000008', max_target_perl => '5.006' } ],
+        [ 'Test::MinimumVersion' => { ':version' => '2.000010', max_target_perl => '5.006' } ],
         [ 'PodSyntaxTests'      => { ':version' => '5.040' } ],
         [ 'PodCoverageTests'    => { ':version' => '5.040' } ],
         [ 'Test::PodSpelling'   => { ':version' => '2.006003', stopwords => ['irc'], directories => [qw(examples lib script t xt)] } ],
@@ -630,7 +630,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.148
+version 0.149
 
 =head1 SYNOPSIS
 
@@ -731,7 +731,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     -destinotion_filename = xt/author/changes_has_content.t
     [Test::ChangesHasContent]
     [Test::MinimumVersion]
-    :version = 2.000008
+    :version = 2.000010
     max_target_perl = 5.006
     [PodSyntaxTests]
     :version = 5.040

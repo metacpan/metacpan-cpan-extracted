@@ -1,4 +1,4 @@
-Copyright 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-OEIS.
 
@@ -16,6 +16,11 @@ You should have received a copy of the GNU General Public License along
 with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 11, May 2019
+    - Stripped don't force Math::BigInt back-end
+    - Names,Stripped document line_split(), and Stripped values_split()
+    - Grep=-search output coding quiet fallback
 
 Version 10, June 2017
     - Grep new values_min, values_max, exclude_list

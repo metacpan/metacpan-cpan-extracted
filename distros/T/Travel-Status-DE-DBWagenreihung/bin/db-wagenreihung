@@ -1,0 +1,193 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.020;
+use utf8;
+
+our $VERSION = '0.01';
+
+use Getopt::Long;
+use List::Util qw(min);
+use Travel::Status::DE::IRIS;
+use Travel::Status::DE::DBWagenreihung;
+
+my $developer_mode = 0;
+
+binmode( STDOUT, ':encoding(utf-8)' );
+
+sub show_help {
+	my ($code) = @_;
+
+	say "Usage: db-wagenreihung <station> <train number>";
+
+	exit $code;
+}
+
+sub show_version {
+	say "db-wagenreihung version ${VERSION}";
+
+	exit 0;
+}
+
+GetOptions(
+	'h|help'  => sub { show_help(0) },
+	'devmode' => \$developer_mode,
+	'version' => sub { show_version() },
+) or show_help(1);
+
+if ( @ARGV != 2 ) {
+	show_help(1);
+}
+
+my ( $station, $train_number ) = @ARGV;
+
+my $col_first  = "\e[38;5;11m";
+my $col_mixed  = "\e[38;5;208m";
+my $col_second = "\e[0m";          #"\e[38;5;9m";
+my $col_reset  = "\e[0m";
+
+my $res = Travel::Status::DE::IRIS->new(
+	developer_mode => $developer_mode,
+	station        => $station,
+	with_related   => 1
+);
+
+if ( $res->errstr ) {
+	say STDERR $res->errstr;
+	exit 1;
+}
+
+my @trains = grep { $_->train_no eq $train_number } $res->results;
+
+if ( @trains != 1 ) {
+	say STDERR "Unable to find train in reported departures";
+	exit 1;
+}
+
+my $wr = Travel::Status::DE::DBWagenreihung->new(
+	departure      => $trains[0]->sched_departure || $trains[0]->sched_arrival,
+	developer_mode => $developer_mode,
+	train_number   => $train_number,
+);
+
+printf(
+	"%s: %s → %s  (%s)\n%s Gleis %s\n\n",
+	join( ' / ', map { $wr->train_type . ' ' . $_ } $wr->train_numbers ),
+	join( ' / ', $wr->origins ),
+	join(
+		' / ',
+		map {
+			sprintf( '%s (%s)', $_->{name}, join( q{}, @{ $_->{sections} } ) )
+		} $wr->destinations
+	),
+	$wr->train_subtype // 'IC?',
+	$wr->station_name,
+	$wr->platform
+);
+
+for my $section ( $wr->sections ) {
+	my $section_length = $section->length_percent;
+	my $spacing_left   = int( ( $section_length - 2 ) / 2 ) - 1;
+	my $spacing_right  = int( ( $section_length - 2 ) / 2 );
+
+	if ( $section_length % 2 ) {
+		$spacing_left++;
+	}
+
+	printf( "▏%s%s%s▕",
+		' ' x $spacing_left,
+		$section->name,
+		' ' x $spacing_right );
+}
+print "\n";
+
+my @start_percentages = map { $_->{position}{start_percent} } $wr->wagons;
+print ' ' x ( ( min @start_percentages ) - 1 );
+print $wr->direction == 100 ? '>' : '<';
+
+for my $wagon ( $wr->wagons ) {
+	my $wagon_length
+	  = $wagon->{position}->{end_percent} - $wagon->{position}->{start_percent};
+	my $spacing_left  = int( $wagon_length / 2 ) - 2;
+	my $spacing_right = int( $wagon_length / 2 ) - 1;
+
+	if ( $wagon_length % 2 ) {
+		$spacing_left++;
+	}
+
+	my $wagon_desc = $wagon->number || '?';
+
+	if ( $wagon->is_locomotive or $wagon->is_powercar ) {
+		$wagon_desc = ' ■ ';
+	}
+
+	my $class_color = '';
+	if ( $wagon->class_type == 1 ) {
+		$class_color = $col_first;
+	}
+	elsif ( $wagon->class_type == 2 ) {
+		$class_color = $col_second;
+	}
+	elsif ( $wagon->class_type == 12 ) {
+		$class_color = $col_mixed;
+	}
+
+	printf( "%s%s%3s%s%s",
+		' ' x $spacing_left, $class_color, $wagon_desc,
+		$col_reset,          ' ' x $spacing_right );
+}
+print $wr->direction == 100 ? '>' : '<';
+print "\n\n";
+
+for my $wagon ( $wr->wagons ) {
+	printf(
+		"%3s: %3s %10s  %s\n",
+		$wagon->number || '?',
+		$wagon->model  || '???',
+		$wagon->type, join( q{  }, $wagon->attributes )
+	);
+}
+
+__END__
+
+=head1 NAME
+
+db-wagenreihung - Interface to Deutsche Bahn Wagon Order API
+
+=head1 SYNOPSIS
+
+B<db-wagenreihung> I<station> I<train-number>
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DESCRIPTION
+
+db-wagenreihung shows wagon orders as reported by the Deutsche Bahn Wagon Order
+API. At the moment, only long-distance ICE trains operated by Deutsche
+Bahn are supported. Most IC/EC lines also work, but results may not be
+entirely correct.
+
+The departure of I<train-number> must be in the time range between now and
+two hours in the future.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * JSON(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * Travel::Status::DE::IRIS(3pm)
+
+=back
+
+=head1 AUTHOR
+
+Copyright (C) 2018-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

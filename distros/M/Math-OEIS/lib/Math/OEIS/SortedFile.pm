@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -19,6 +19,7 @@
 package Math::OEIS::SortedFile;
 use 5.006;
 use strict;
+use warnings;
 use Carp 'croak';
 use Search::Dict;
 use Math::OEIS;
@@ -27,7 +28,7 @@ eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
     || die "Oops, error making a weaken() fallback: $@";
 
-our $VERSION = 10;
+our $VERSION = 11;
 
 # singleton here results in a separate instance object in each derived subclass
 use Class::Singleton;
@@ -140,7 +141,7 @@ sub anum_to_line {
 1;
 __END__
 
-=for stopwords Ryde OEIS
+=for stopwords Math OEIS Ryde
 
 =head1 NAME
 
@@ -165,7 +166,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -158,14 +158,15 @@ sub BUILD {
 method _format_cell ($col, $ridx,
                      :$na='BAD', :$isbad=$col->isbad)
 {
+    my $is_numeric = $self->_is_numeric_column($col);
     if ($isbad->at($ridx)) {
-        return $na;
+        return $is_numeric ? $na : "<$na>";
     }
 
     if ( $col->$_DOES('PDL::DateTime') ) {
         return $col->dt_at($ridx);
     }
-    elsif ( $self->_is_numeric_column($col) ) {
+    elsif ( $is_numeric ) {
         if ( $col->type >= PDL::float ) {
 
             # This is to fix some float precision problem with perl
@@ -429,7 +430,7 @@ method column($colname) {
 			msg => "column $colname does not exist",
 			trace => failure->croak_trace,
 		}) unless $self->exists( $colname );
-	return $self->_columns->get( $colname );
+	return $self->_columns->get($colname);
 }
 
 # supports negative indices
@@ -818,17 +819,30 @@ method sorti ($by_columns, $ascending=true) {
 }
 
 
-method _serialize_row ($i) {
-    state $sereal = Sereal::Encoder->new();
-    my @row_data = map { $self->column($_)->at($i) } @{ $self->column_names };
+my $sereal = Sereal::Encoder->new();
+
+sub _serialize_row {
+    my ($self, $i, $columns, $columns_isbad) = @_;
+
+    my @row_data =
+      map {
+        my $isbad = $columns_isbad->[$_];
+        ( defined $isbad and $isbad->at($i) )
+          ? ( 1, undef )
+          : ( 0, $columns->[$_]->at($i) );
+      } ( 0 .. $#$columns );
     return $sereal->encode( \@row_data );
 }
 
 method uniq () {
     my %uniq;
     my @uniq_ridx;
+
+    my @columns = map { $self->column($_) } @{ $self->column_names };
+    my @columns_isbad = map { $_->badflag ? $_->isbad : undef } @columns;
+
     for my $i ( 0 .. $self->nrow - 1 ) {
-        my $key = $self->_serialize_row($i);
+        my $key = $self->_serialize_row($i, \@columns, \@columns_isbad);
         unless ( exists $uniq{$key} ) {
             $uniq{$key} = 1;
             push @uniq_ridx, $i;
@@ -839,10 +853,13 @@ method uniq () {
 
 
 method id () {
+    my @columns = map { $self->column($_) } @{ $self->column_names };
+    my @columns_isbad = map { $_->badflag ? $_->isbad : undef } @columns;
+
     my %uniq_serialized;
     my @uniq_rindices;
     for my $ridx ( 0 .. $self->nrow - 1 ) {
-        my $key = $self->_serialize_row($ridx);
+        my $key = $self->_serialize_row($ridx, \@columns, \@columns_isbad);
         if ( not exists $uniq_serialized{$key} ) {
             $uniq_serialized{$key} = [];
             push @uniq_rindices, $ridx;
@@ -940,7 +957,7 @@ method _compare ($other, $mode) {
         my ( $col, $x ) = @_;
         my $a = $col->abs;
         my $b = ref($x) ? $x->abs : abs($x);
-        return ifelse( $a > $b, $a, $b ) * $TOLERANCE_REL;
+        return (ifelse( $a > $b, $a, $b ) * abs($TOLERANCE_REL));
     };
 
     state $fcompare_float = {
@@ -1050,11 +1067,11 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 STATUS
 
-This library is current experimental.
+This library is currently experimental.
 
 =head1 SYNOPSIS
 

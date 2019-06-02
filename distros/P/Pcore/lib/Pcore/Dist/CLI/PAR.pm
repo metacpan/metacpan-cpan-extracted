@@ -16,6 +16,10 @@ sub CLI ($self) {
                 desc    => 'clean temp dir on exit',
                 negated => 1,
             },
+            force => {
+                desc    => 'do not check for uncommited changes',
+                default => 0,
+            },
         },
     };
 }
@@ -24,7 +28,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $dist = $self->get_dist;
 
     if ( !$dist->par_cfg ) {
-        if ( P->term->prompt( qq[Create PAR profile?], [qw[yes no]], enter => 1 ) eq 'yes' ) {
+        if ( P->term->prompt( q[Create PAR profile?], [qw[yes no]], enter => 1 ) eq 'yes' ) {
             require Pcore::Util::File::Tree;
 
             # copy files
@@ -51,16 +55,6 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 27                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

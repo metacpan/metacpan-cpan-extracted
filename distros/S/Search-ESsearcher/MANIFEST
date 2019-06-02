@@ -1,0 +1,15 @@
+Changes
+lib/Search/ESsearcher.pm
+lib/Search/ESsearcher/Templates/syslog.pm
+lib/Search/ESsearcher/Templates/bf2b.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+bin/essearcher
+t/00-load.t
+t/01-load.t
+t/02-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+bin/essearcher

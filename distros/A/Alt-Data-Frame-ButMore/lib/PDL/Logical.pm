@@ -8,7 +8,7 @@ use warnings;
 use PDL::Lite ();   # PDL::Lite is the minimal to get PDL work
 use PDL::Core qw(pdl);
 
-use Data::Rmap qw(rmap_array);
+use Ref::Util qw(is_plain_arrayref);
 use Safe::Isa;
 
 use parent 'PDL';
@@ -26,14 +26,17 @@ sub new {
     if ( $data->$_DOES('PDL') ) {
         $data = !!$data;
     }
-    elsif ( ref($data) eq 'ARRAY' ) {
-        my ($data1) = rmap_array {
-            ( ref( $_->[0] ) eq 'ARRAY' )
-              ? [ $_[0]->recurse() ]
-              : [ map { $_ ? 1 : 0 } @$_ ];
-        }
-        $data;
-        $data = pdl($data1);
+    elsif ( is_plain_arrayref($data) ) {
+
+        # this is faster than Data::Rmap::rmap().
+        state $rmap = sub {
+            my ($x) = @_;
+            is_plain_arrayref($x)
+              ? [ map { __SUB__->($_) } @$x ]
+              : ( $x ? 1 : 0 );
+        };
+
+        $data = pdl( $rmap->($data) );
     }
     else {
         $data = pdl( $data ? 1 : 0 );
@@ -64,7 +67,7 @@ PDL::Logical - PDL subclass for keeping logical data
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 SYNOPSIS
 

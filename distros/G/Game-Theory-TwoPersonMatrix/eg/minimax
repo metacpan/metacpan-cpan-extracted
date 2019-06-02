@@ -8,7 +8,7 @@ use warnings;
 use Game::Theory::TwoPersonMatrix;
 use Math::Algebra::Symbols;
 
-my ($q) = symbols(qw(p));
+my ($q) = symbols(qw(q));
 
 my $strategy0 = { 1 => '(1 - $q)', 2 => '$q' };
 my $strategy1 = { 1 => 1, 2 => 0 };
@@ -34,7 +34,7 @@ print 'simplify: ', $c2->simplify, "\n";
 my $s = $c1 eq $c2;
 my $v = $s->solve($q);
 print 'minimax strategy: ', $v, "\n";
-$s = $c2->sub( p => $v );
+$s = $c2->sub( q => $v );
 print 'minimax expectation: ', $s, "\n";
 
 print "Ex 2:\n";
@@ -57,6 +57,6 @@ print 'simplify: ', $c2->simplify, "\n";
 $s = $c1 eq $c2;
 $v = $s->solve($q);
 print 'minimax strategy: ', $v, "\n";
-$s = $c2->sub( p => $v );
+$s = $c2->sub( q => $v );
 print 'minimax expectation: ', $s, "\n";
 

@@ -23,5 +23,4 @@ t/pdf.t
 t/pod-coverage.t
 t/pod.t
 t/sample1.pdf
-t/z_dof1040sb.t
 t/z_test1040sb.t

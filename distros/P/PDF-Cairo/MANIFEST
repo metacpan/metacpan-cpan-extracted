@@ -1,0 +1,38 @@
+Changes
+data/layout1.txt
+data/layout2.txt
+data/layout3.txt
+data/treasure-map.svg
+data/v04image002.png
+examples/README.md
+examples/box-slice.pl
+examples/calendar.pl		This example requires the DateTime module.
+examples/frontpage.pl
+examples/hexgrid.pl
+examples/images.pl
+examples/inkle-draft.pl
+examples/isopad.pl
+examples/kanjigrid.pl
+examples/layout.pl
+examples/polygon.pl
+examples/svg.pl
+examples/tategaki.pl
+examples/textpath.pl
+examples/yoko-ruled.pl
+lib/PDF/Cairo/papers.txt
+lib/PDF/Cairo/Papers.pm
+lib/PDF/Cairo/rgb.txt
+lib/PDF/Cairo/Box.pm
+lib/PDF/Cairo/Font.pm
+lib/PDF/Cairo/Colors.pm
+lib/PDF/Cairo/Layout.pm
+lib/PDF/Cairo/Util.pm
+lib/PDF/Cairo.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

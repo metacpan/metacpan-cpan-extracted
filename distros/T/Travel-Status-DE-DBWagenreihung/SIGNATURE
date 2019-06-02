@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 8d7c4d4f85fd9cd0f03471d8d0fa49045ff326c1cf1beccff52567b51f2b730d Build.PL
+SHA256 2dcb16fe3682f9f030db8d38c4281fd7213082d67271e471c9ad5c811baad172 Changelog
+SHA256 33c040643962c7c5f22fd032c8b42bcdf98c2436ceebb16403de79bea8ea713f MANIFEST
+SHA256 96394e050d9ff096f56a0587cba7c7b79a64bda9b49166f65487b11c12bc5e2d META.json
+SHA256 d26723bcf1696ec60fa3e318a541f219da186f0103a1504af312ced3c8a56a3a META.yml
+SHA256 c41500208d12211f4351b4197afb33b7a4dd3f4da5a310730d16cf6f73685a61 README
+SHA256 5617171b64aee41f2416f7bb90f6a0d18dd325880f5ee0a4a8e49ca7ce16690f bin/db-wagenreihung
+SHA256 92339ee12f9834f43c873740e2e28ab37cd10182beabc04abd29e148600c59a6 lib/Travel/Status/DE/DBWagenreihung.pm
+SHA256 b66080a23b103137d14080cf39276fa742be92d884469149eae27b9c9a7d4f65 lib/Travel/Status/DE/DBWagenreihung/Section.pm
+SHA256 7e1625b63129981e6e5fca844a7ab7ab92ba0f6c4cddc275683d4116190d088d lib/Travel/Status/DE/DBWagenreihung/Wagon.pm
+SHA256 588a60b456403a9f2a901b11646918be3f2fe413d4b1b792dccd18a80bb264e9 t/00-compile-pm.t
+SHA256 32c2f94b5292bcf6ef1994151a5d84b4581c5cf920418841c551d6f5489621cd t/01-compile-pl.t
+SHA256 574e3508c4f991d21b61f06a070d71f04f4403b094f55423150cb5dbb18194a9 t/02-compile-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeBu3Bxxr9kjq6wihEA1b+1Fm4AUFAlzxoBQACgkQEA1b+1Fm
+4AWA2hAAmHpcKRi0aolYDAcCBZOOXuWYrc5kMOKYdPJ4nauQeQN+gpY3YP15bQLN
+jTIQAk3Unsl+8Zi4izteSfdfLvgI6RX5uxBFnx/eFZPS54P/6A9B/Iq3mJDCRvGc
+cvigoYEknBSk7FVmrjk/Csm09zOwR2w38pN40YxtuOQZduVcEDplGxOQNsbNjDeM
+2Pw5l8I1IAFBm/WzSxvs2p2aWhSkAMpz0HUD/0M8r3iqT8mUiD/5DWLkAhTebo1a
+48vvwxwqsOLQ6SehyGUL384gC8OVx8DFLJVgQ/wMCbaIUAN4PVrvW/+/cFwojb9w
+mLiJ1gEZjjaM5e+BJ/Hr5ljZeSfJG31Iq5jixCOv0vDdUgfy/pqQnenyiXaKkAan
+c6bRXk7JA9olj3qWEiY0yv7CxCxjBtxtZ+L1lR1JwAyorh1zsKRifb8wfoK+df4f
+0uwoOpVAYosQVdGYfDXVFaIlqfgR6A6QnJ6vmuVnheg1AeP/iXMKFD0CyUwMQUXn
+gOiCujeH16oJ88VO2b9kTvJwgOuRn+AJvXibEo/J9xg0tFIG7olOqBvMTY/OXJzl
+UOsHfQsIKWdSAK/paA3Sz2DyQGLaqzBlXJQ2954PYJEHLCtxLX0Ryk702X8BdJ2m
+2hqJ45l0G7EhfRUFAGFz38pB64W5gdIRKToJzIVxMk/FEU0lqc0=
+=eEf+
+-----END PGP SIGNATURE-----

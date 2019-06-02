@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Mo" => 0,
     "Perinci::Access::Lite" => "0.09",
     "Perinci::CmdLine::Help" => "0.15",
-    "Perinci::CmdLine::Util::Config" => "1.721",
+    "Perinci::CmdLine::Util::Config" => "1.722",
     "Perinci::Object" => "0.310",
     "Perinci::Result::Format::Lite" => "0.273",
     "Perinci::Sub::Complete" => "0.89",
@@ -66,7 +66,7 @@ my %WriteMakefileArgs = (
     "Test::Perinci::CmdLine" => "1.47",
     "YAML::Old" => 0
   },
-  "VERSION" => "1.818",
+  "VERSION" => "1.819",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -100,7 +100,7 @@ my %FallbackPrereqs = (
   "Mo" => 0,
   "Perinci::Access::Lite" => "0.09",
   "Perinci::CmdLine::Help" => "0.15",
-  "Perinci::CmdLine::Util::Config" => "1.721",
+  "Perinci::CmdLine::Util::Config" => "1.722",
   "Perinci::Object" => "0.310",
   "Perinci::Result::Format::Lite" => "0.273",
   "Perinci::Sub::Complete" => "0.89",

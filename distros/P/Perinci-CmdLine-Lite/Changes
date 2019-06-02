@@ -1,3 +1,15 @@
+1.819   2019-06-02 (PERLANCAR)
+
+	- Introduce cmdline.resut.interactive and
+	  cmdline.result.noninteractive.
+
+	- Observe PERINCI_CMDLINE_DUMP_ARGS & PERINCI_CMDLINE_DUMP_CONFIG.
+
+	- Rename PERINCI_CMDLINE_DUMP to PERINCI_CMDLINE_DUMP_OBJECT (old
+	  name is still supported but no longer documented, will be removed
+	  in the future).
+
+
 1.818   2019-05-24 (PERLANCAR)
 
 	- Get result's schema in resmeta's schema (Rinci 1.1.90) before

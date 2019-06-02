@@ -12,6 +12,7 @@ use PDL::SV        ();
 use PDL::DateTime  ();
 use PDL::Types     ();
 
+use List::AllUtils qw(uniq);
 use Package::Stash;
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 use Scalar::Util qw(openhandle looks_like_number);
@@ -86,11 +87,11 @@ classmethod from_csv ($file, :$header=true, :$sep=",", :$quote='"',
 
     my @row_names;
     my $rows = $csv->getline_all($fh);
+
+    my $offset = $row_names_from_first_column ? 1 : 0;
     for my $row (@$rows) {
-        my $offset = 0;
         if ($row_names_from_first_column) {
             push @row_names, $row->[0];
-            $offset = 1;
         }
         for my $i ( 0 .. $#col_names ) {
             my $col = $col_names[$i];
@@ -111,20 +112,30 @@ classmethod from_csv ($file, :$header=true, :$sep=",", :$quote='"',
     }
 
     state $additional_type_to_piddle = {
-        datetime => sub { PDL::DateTime->new_from_datetime($_[0]) },
-        factor   => sub { PDL::Factor->new($_[0]) },
-        logical  => sub { PDL::Logical->new($_[0]) },
+        datetime => \&Data::Frame::Util::_datetime_from_arrayref,
+        factor   => \&Data::Frame::Util::_factor_from_arrayref,
+        logical  => \&Data::Frame::Util::_logical_from_arrayref,
+        pdlsv    => \&Data::Frame::Util::_pdlsv_from_arrayref,
     };
+
     my $package_pdl_core = Package::Stash->new('PDL::Core');
-    my $to_piddle = sub {
+    my $to_piddle        = sub {
         my ($name) = @_;
         my $x = $columns{$name};
 
         if ( my $type = $dtype->{$name} ) {
-            my $f_new = $additional_type_to_piddle->{$type}
-              // $package_pdl_core->get_symbol("&$type");
-            if ($f_new) {
-                return $f_new->($x);
+            my $piddle_maker = $additional_type_to_piddle->{$type};
+            unless ($piddle_maker) {
+                if ( my $f = $package_pdl_core->get_symbol("&$type") ) {
+                    $piddle_maker = sub {
+                        my ( $x, $na ) = @_;
+                        Data::Frame::Util::_numeric_from_arrayref( $x, $na,
+                            $f );
+                    };
+                }
+            }
+            if ($piddle_maker) {
+                return $piddle_maker->( $x, $na );
             }
             else {
                 die "Invalid data type '$type'";
@@ -209,7 +220,7 @@ Data::Frame::IO::CSV - Partial class for data frame's conversion from/to CSV
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 METHODS
 
@@ -230,18 +241,25 @@ Some of the parameters are explained below,
 
 =item *
 
-C<$file> can be a file name string, a Path::Tiny object, or an opened file
+C<$file>
 
-handle.
+This can be a file name string, a Path::Tiny object, or an opened file handle.
 
 =item *
 
-C<$dtype> is a hashref associating column names to their types. Types
+C<$dtype>
 
-can be the PDL type names like C<"long">, C<"double">, or names of some PDL's
-derived class like C<"PDL::SV">, C<"PDL::Factor">, C<"PDL::DateTime">. If a
-column is not specified in C<$dtype>, its type would be automatically
-decided.
+A hashref associating column names to their types.
+Types can be the PDL type names like C<"long">, C<"double">, or C<"pdlsv">, 
+C<"factor">, C<"datetime">, C<"logical">.
+If a column is not specified in C<$dtype>, its type is automatically decided.
+
+=item *
+
+C<$na>
+
+An arrayref of strings which are to be interpreted as C<BAD> values.
+Blank fields are also considered to be missing value in logical and numeric fields.
 
 =back
 

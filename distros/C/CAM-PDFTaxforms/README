@@ -28,7 +28,7 @@ or
 
 DEPENDENCIES
     Perl 5, CAM::PDF, Text::PDF, Crypt::RC4, Digest::MD5
-    
+
 NAME
     CAM::PDFTaxforms - CAM::PDF wrapper to also allow editing of checkboxes
     (ie. for IRS Tax forms).
@@ -126,16 +126,16 @@ DESCRIPTION
     fillFormFields() function to also modify checkboxes (primarily on IRS
     Tax forms).
 
-EXAMPLE
-    See the example subdirectory in the source tree. There is a sample blank
-    2018 official IRS Schedule B tax form and two programs: *dof1040sb.pl*,
-    which fills in the form using the sample input data text file
-    *f1040sb_inputs.txt*, and creates a filled in version of the form called
-    *f1040sb_out.pdf*. The other program (*test1040sb.pl*) can read the data
-    filled in the filled in form created by the other program and displays
-    it as output.
+EXAMPLES
+    See the *example/* subdirectory in the source tree. There is a sample
+    blank 2018 official IRS Schedule B tax form and two programs:
+    *dof1040sb.pl*, which fills in the form using the sample input data text
+    file *f1040sb_inputs.txt*, and creates a filled in version of the form
+    called *f1040sb_out.pdf*. The other program (*test1040sb.pl*) can read
+    the data filled in the filled in form created by the other program and
+    displays it as output.
 
-    To run the programs, switch to the examples subdirectory in the source
+    To run the programs, switch to the *example/* subdirectory in the source
     tree and run them without arguments (ie. ./dof1040sb.pl).
 
     To see the names of the fields and their current values in a PDF form,
@@ -144,7 +144,7 @@ EXAMPLE
 
 API
   Functions intended to be used externally
-     $self = CAM::PDFTaxform->new(content | filename | '-')
+     $self = CAM::PDFTaxforms->new(content | filename | '-')
      $self->toPDF()
      $self->needsSave()
      $self->save()
@@ -266,6 +266,10 @@ METHODS
         specified field name. $name can be either the full name or the
         "short/alternate" name.
 
+    $doc->writeAny($node)
+        Returns the serialization of the specified node. This handles all
+        Node types, including object Nodes.
+
 SCRIPTS
     CAM::PDF includes a number of handy utility scripts, installed in the
     users local/bin path, but we add a modified version of their
@@ -297,6 +301,27 @@ DEPENDS
 
 KEYWORDS
     pdf taxforms
+
+KNOWN BUGS / TODO
+    1) Checkboxes / radio buttons set programatically to "CHECKED" by
+    CAM::PDFTaxforms ARE checked, and shown as so in the form, but evince,
+    and perhaps Acrobat(tm) form editor don't seem to consider them checked
+    the first time a user clicks on them to uncheck them, requiring a second
+    click. This can be especially disconcerting to the user for
+    radio-buttons as it is possible to click a second button in the group
+    checking it, but the originally-checked button is NOT automatically
+    unchecked. I need to somehow FIX this, but have so far been unable to do
+    so (as of v1.1 - sorry!), so please don't file a bug on this UNLESS you
+    have a PATCH for either me OR CAM::PDF itself!
+
+    2) CAM::PDF is used under the hood for most of the actual work, and has
+    many open bugs / issues (see:
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CAM-PDF>), so, except
+    for the patched ones mentioned in the DESCRIPTION section above, those
+    issues remain unfixed here as well! Therefore, check if your issue works
+    if using standard CAM::PDF first before filing a new bug here (or unless
+    it involves a specific CAM::PDFTextforms feature, or you have a patch,
+    in which case you're likely to get it merged here sooner!).
 
 SEE ALSO
     CAM::PDF (Obviously) as this module is a wrapper around it (and requires

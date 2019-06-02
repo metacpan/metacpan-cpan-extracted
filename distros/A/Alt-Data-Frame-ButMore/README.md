@@ -7,11 +7,11 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 # VERSION
 
-version 0.0049
+version 0.0051
 
 # STATUS
 
-This library is current experimental.
+This library is currently experimental.
 
 # SYNOPSIS
 

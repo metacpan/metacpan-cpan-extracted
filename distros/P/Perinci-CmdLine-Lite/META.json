@@ -65,7 +65,7 @@
             "Mo" : "0",
             "Perinci::Access::Lite" : "0.09",
             "Perinci::CmdLine::Help" : "0.15",
-            "Perinci::CmdLine::Util::Config" : "1.721",
+            "Perinci::CmdLine::Util::Config" : "1.722",
             "Perinci::Object" : "0.310",
             "Perinci::Result::Format::Lite" : "0.273",
             "Perinci::Sub::Complete" : "0.89",
@@ -104,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.818",
+   "version" : "1.819",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

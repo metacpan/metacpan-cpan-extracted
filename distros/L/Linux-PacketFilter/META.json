@@ -1,0 +1,60 @@
+{
+   "abstract" : "Simple interface to Linux packet filtering",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-PacketFilter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "Text::Control" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/FGasper/p5-Linux-PacketFilter/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/FGasper/p5-Linux-PacketFilter.git",
+         "web" : "https://github.com/FGasper/p5-Linux-PacketFilter"
+      }
+   },
+   "version" : "0.01"
+}

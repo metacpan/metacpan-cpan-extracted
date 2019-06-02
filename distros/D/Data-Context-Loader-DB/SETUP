@@ -1,0 +1,8 @@
+
+Created test data with:
+
+$ perl -Ilib -MData::Context::Loader::DB::Schema -E 'Data::Context::Loader::DB::Schema->("dbi:SQLite:dbname=t/test.sqlite")->deploy'
+$ find ../Data-Context/t/dc-json/ -type f | grep '[.]js' | perl -Ilib -MData::Context::Loader::DB::Schema -MPath::Tiny -MJSON::XS=decode_json -nlE '$t = Data::Context::Loader::DB::Schema->connect("dbi:SQLite:dbname=t/test.sqlite")->resultset("Data"); $n = path($_); s{.*n[/]}{}; s{[.]dc[.]jso?n?$}{}; $d = JSON::XS->new->utf8->relaxed->shrink->decode(scalar $n->slurp); say "$_\t$n"; $t->new({name => $_, json => $d})->insert'
+
+$ perl -Ilib -MData::Context::Loader::DB::Schema -E 'Data::Context::Loader::DB::Schema->("dbi:Pg:dbname=bem")->deploy'
+$ find ../Data-Context/t/dc-json/ -type f | grep '[.]js' | perl -Ilib -MData::Context::Loader::DB::Schema -MPath::Tiny -MJSON::XS=decode_json -nlE '$t = Data::Context::Loader::DB::Schema->connect("dbi:Pg:dbname=bem")->resultset("Data"); $n = path($_); s{.*n[/]}{}; s{[.]dc[.]jso?n?$}{}; $d = JSON::XS->new->utf8->relaxed->shrink->decode(scalar $n->slurp); say "$_\t$n"; $t->new({name => $_, json => $d})->insert'

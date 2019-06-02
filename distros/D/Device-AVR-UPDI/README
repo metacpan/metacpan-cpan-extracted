@@ -1,0 +1,178 @@
+NAME
+
+    Device::AVR::UPDI - interact with an AVR microcontroller over UPDI
+
+DESCRIPTION
+
+    This module provides a class for interacting with an AVR
+    microcontroller in one of the newer ATmega 0-series, or ATtiny 0-series
+    or 1-series types, which uses the UPDI programming and debug interface.
+
+ Hardware Interface
+
+    This code expects to find a serial port connected to the UPDI pin of
+    the microcontroller as a shared single-wire interface. Suitable
+    hardware to provide this can be created using a USB-UART adapter,
+    connecting the RX line directly to the MCU's UPDI pin, and connecting
+    TX via a current-limiting resistor of 4.7 kohm.
+
+       +------------+                    +-------------------+
+       |         RX-|-------------+      |                   |
+       | USB-UART   |             +------|-UPDI              |
+       |         TX-|---[ 4k7 ]---+      |  ATmega or ATtiny |
+       +------------+                    +-------------------|
+
+CONSTRUCTORS
+
+ new
+
+       $updi = Device::AVR::UPDI->new( ... )
+
+    Constructs and returns a new Device::AVR::UPDI instance.
+
+    Takes the following named arguments:
+
+    dev => STRING
+
+      Path to the device node representing the serial port connection.
+
+    fh => IO
+
+      Alternative to dev, provides an IO handle directly. This should be an
+      instance of IO::Termios, or at least, provide the same interface.
+
+    part => STRING
+
+      Name of the AVR chip to interact with. This is used to define
+      parameters like memory size and location of internal peripherals.
+
+      Any of the following forms are accepted
+
+         part => "ATtiny814"  | "attiny814"  | "t814"
+         part => "ATmega4809" | "atmega4809" | "m4809"
+
+    After construction, the link must be initialised by calling "init_link"
+    before any of the command methods are used.
+
+ACCESSORS
+
+ partinfo
+
+       $partinfo = $updi->partinfo
+
+    Returns the Part Info structure containing base addresses and other
+    parameters which may be useful for interacting with the chip.
+
+    The returned structure provides the following fields
+
+       $sig = $partinfo->signature
+    
+       $addr = $partinfo->baseaddr_nvmctrl
+       $addr = $partinfo->baseaddr_fuse
+       $addr = $partinfo->baseaddr_flash
+       $addr = $partinfo->baseaddr_sigrow
+    
+       $bytes = $partinfo->pagesize
+    
+       $fusenames = $partinfo->fusenames
+
+METHODS
+
+ init_link
+
+       $updi->init_link->get
+
+    Initialise the UPDI link for proper communication.
+
+    This method must be invoked after the object is constructed, before
+    using any of the other commands.
+
+ read_updirev
+
+       $rev = $updi->read_updirev->get
+
+    Reads the UPDIREV field of the STATUSA register.
+
+ read_asi_sys_status
+
+    Reads the ASI_SYS_STATUS register.
+
+ read_sib
+
+       $sib = $updi->read_sib->get
+
+    Reads the System Information Block.
+
+    This is returned in a HASH reference, containing four keys:
+
+       {
+          family       => "tinyAVR",
+          nvm_version  => "P:0",
+          ocd_version  => "D:0",
+          dbg_osc_freq => 3,
+       }
+
+ read_signature
+
+       $signature = $updi->read_signature->get
+
+    Reads the three signature bytes from the Signature Row of the device.
+    This is returned as a plain byte string of length 3.
+
+ request_reset
+
+       $updi->request_reset( $reset )->get
+
+    Sets or clears the system reset request. Typically used to issue a
+    system reset by momentarilly toggling the request on and off again:
+
+       await $updi->request_reset( 1 );
+       await $updi->request_reset( 0 );
+
+ erase_chip
+
+       $updi->erase_chip->get
+
+    Requests a full chip erase, waiting until the erase is complete.
+
+    After this, the chip will be unlocked.
+
+ enable_nvmprog
+
+       $updi->enable_nvmprog->get
+
+    Requests the chip to enter NVM programming mode.
+
+ write_nvm_page
+
+       $updi->write_nvm_page( $addr, $data )->get
+
+    Writes a single page into NVM flash using the NVM controller.
+
+ write_fuse
+
+       $updi->write_fuse( $idx, $value )->get
+
+    Writes a fuse value. $idx is the index of the fuse within the FUSES
+    memory segment, from 0 onwards.
+
+ read_fuse
+
+       $value = $updi->read_fuse( $idx )->get
+
+    Reads a fuse value. $idx is the index of the fuse within the FUSES
+    memory segment, from 0 onwards.
+
+SEE ALSO
+
+      * "AVR UPDI Programming Cable"
+
+      An adapter cable to flash firmware onto an AVR microcontroller chip
+      via UPDI, compatible with this module.
+
+      https://www.tindie.com/products/16571/
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

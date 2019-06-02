@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use App::FilterUtils::untashkeel;
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 App::FilterUtils::untashkeel->run();
 

@@ -76,12 +76,14 @@ lib/Yancy/Controller/Yancy/API.pm
 lib/Yancy/Controller/Yancy/MultiTenant.pm
 lib/Yancy/Help/Config.pod
 lib/Yancy/Help/Standalone.pod
+lib/Yancy/Help/Upgrading.pod
 lib/Yancy/Plugin/Auth.pm
 lib/Yancy/Plugin/Auth/Basic.pm
 lib/Yancy/Plugin/Auth/Github.pm
 lib/Yancy/Plugin/Auth/OAuth2.pm
 lib/Yancy/Plugin/Auth/Password.pm
 lib/Yancy/Plugin/Auth/Token.pm
+lib/Yancy/Plugin/Editor.pm
 lib/Yancy/Plugin/Form.pm
 lib/Yancy/Plugin/Form/Bootstrap4.pm
 lib/Yancy/Util.pm

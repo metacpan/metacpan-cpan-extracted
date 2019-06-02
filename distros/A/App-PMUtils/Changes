@@ -1,3 +1,8 @@
+0.722   2019-06-01 (PERLANCAR)
+
+	- [ux] Add pmlatest as alias for pmchkver, more memorable.
+
+
 0.721   2019-02-24 (PERLANCAR)
 
 	- Add utility: pmgrep.

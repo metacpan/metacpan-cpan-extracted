@@ -1,4 +1,4 @@
-# Copyright 2014 Kevin Ryde
+# Copyright 2014, 2019 Kevin Ryde
 #
 # This file is part of Math-OEIS.
 #
@@ -17,3 +17,5 @@
 #
 A000001 Name number one
 A000002 Name number two
+A000003 Values include negatives
+A000004 A bignum value

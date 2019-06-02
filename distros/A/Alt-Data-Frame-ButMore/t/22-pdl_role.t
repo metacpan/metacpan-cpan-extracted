@@ -3,6 +3,7 @@
 use Data::Frame::Setup;
 
 use PDL::Core qw(pdl);
+use PDL::Factor ();
 use PDL::SV ();
 
 use Test2::V0;
@@ -67,6 +68,39 @@ subtest repeat_to_length => sub {
         pdl_is( $pdl->repeat_to_length($n),
             $_->{out}, '$pdl->repeat_to_length' );
     }
+};
+
+subtest repeat_factor => sub {
+    my $f1 = PDL::Factor->new( [qw(a b c c b a)], levels => [qw(b c a)] );
+    pdl_is( $f1->repeat(3),
+        PDL::Factor->new( [ (qw(a b c c b a)) x 3 ], levels => [qw(b c a)] ),
+        'repeat()' );
+
+    pdl_is(
+        $f1->setbadat(1)->repeat(3),
+        PDL::Factor->new( [ (qw(a b c c b a)) x 3 ], levels => [qw(b c a)] )
+          ->setbadif( pdl( [ ( 0, 1, 0, 0, 0, 0 ) x 3 ] ) ),
+        'repeat() piddle with bad values'
+    );
+
+    my $f2 = PDL::Factor->new( [qw(c)], levels => [qw(b c a)] );
+    pdl_is( $f2->repeat(3),
+        PDL::Factor->new( [ (qw(c c c)) ], levels => [qw(b c a)] ), 'repeat' );
+};
+
+subtest repeat_pdlsv => sub {
+    my $p1 = PDL::SV->new( [qw(foo bar baz)] )->setbadat(1);
+    pdl_is(
+        $p1->repeat(3),
+        PDL::SV->new( [ (qw(foo bar baz)) x 3 ] )
+          ->setbadif( pdl( [ ( 0, 1, 0 ) x 3 ] ) ),
+        'repeat()'
+    );
+};
+
+subtest id => sub {
+    my $p1 = PDL::SV->new( [qw(BAD BAD BAD foo)] )->setbadat(1);
+    pdl_is( $p1->id, pdl( [ 0, -1, 0, 1 ] ), 'id()' );
 };
 
 done_testing;

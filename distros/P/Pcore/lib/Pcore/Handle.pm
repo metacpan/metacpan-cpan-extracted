@@ -28,14 +28,14 @@ const our $TLS_CTX      => {
         SSL_verify_mode => SSL_VERIFY_NONE,
         SSL_dh_file     => undef,
         SSL_dh          => undef,
-        SSL_ecdh_curve  => undef,
+        SSL_ecdh_curve  => undef,             # if you don't want to have ECDH key exchange this could be set to undef
     },
     $TLS_CTX_HIGH => {
         $MSWIN ? ( SSL_ca_file => Pcore::Util::CA->ca_file ) : (),
         SSL_verify_mode => SSL_VERIFY_PEER,
         SSL_dh_file     => $ENV->{share}->get('data/dhparam-4096.pem'),
-        SSL_dh          => undef,
-        SSL_ecdh_curve  => 'secp384r1',                                   # prime256v1
+
+        # SSL_ecdh_curve  => 'X25519:secp521r1:secp384r1:prime256v1', # lets OpenSSL pick the best settings
     },
 };
 

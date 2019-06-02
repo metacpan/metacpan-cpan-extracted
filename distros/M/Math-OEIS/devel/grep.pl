@@ -1,28 +1,70 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
-# This file is part of Math-PlanePath.
+# This file is part of Math-OEIS.
 #
-# Math-PlanePath is free software; you can redistribute it and/or modify it
+# Math-OEIS is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation; either version 3, or (at your option) any later
 # version.
 #
-# Math-PlanePath is distributed in the hope that it will be useful, but
+# Math-OEIS is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
 #
 # You should have received a copy of the GNU General Public License along
-# with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+# with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 use 5.004;
 use strict;
+use FindBin;
 use Math::OEIS::Grep;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+
+{
+  # grep-not-in-oeis.pl non-ascii
+  system("$FindBin::Bin/../examples/grep-not-in-oeis.pl",
+         "$FindBin::Bin/$FindBin::Script");
+  # Sierpinski
+  # not in OEIS: 24, 60, 168, 492, 1464, 4380, 13128
+  # not A178674 3^n+3 is half
+  exit 0;
+}
+{
+  # my ($m,$n);
+  # require Data::Dumper;
+  # use Math::BigInt try => 'Calc';
+  # BEGIN {
+  #   $m = Math::BigInt->new(123);
+  #   print Data::Dumper::Dumper($m);
+  # }
+  # use Math::BigInt try => 'GMP';
+  # BEGIN {
+  #   $n = Math::BigInt->new(123);
+  #   print Data::Dumper::Dumper($n);
+  # }
+  # ### $m
+  # ### $n
+  # print $m + $n;
+  exit;
+}
+{
+  # non-ascii
+  # require Module::Mask;
+  # my $mask = Module::Mask->new;
+  # $mask->mask_modules('Encode::Locale');
+
+  # Math::OEIS::Grep->import(-search=>1,2,12,152,3472,126752,6781632,500231552);
+
+  # Sierpinski
+  Math::OEIS::Grep->import(-search=>1,3,5,15,17,51,85,255,257,771,1285,3855,4369,13107,21845,65535);
+  exit 0;
+}
 
 {
   # bug of matching too much when regexp allowed to end
@@ -64,14 +106,7 @@ use Smart::Comments;
                            use_mmap => 0);
   exit 0;
 }
-{
-  # non-ascii
-  require Module::Mask;
-  my $mask = Module::Mask->new;
-  $mask->mask_modules('Encode::Locale');
-  Math::OEIS::Grep->import(-search=>1,2,12,152,3472,126752,6781632,500231552);
-  exit 0;
-}
+
 {
   # average line length in the "stripped" file
 

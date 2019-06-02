@@ -1,8 +1,12 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
+#pod
+#pod B<DEPRECATED>: This module has been merged into the
+#pod L<Yancy::Controller::Yancy> class and the editor now uses that class by
+#pod default.
 #pod
 #pod This module contains the routes that L<Yancy> uses to work with the
 #pod backend data. This API is used by the Yancy editor.
@@ -10,12 +14,13 @@ our $VERSION = '1.026';
 #pod =head1 SUBCLASSING
 #pod
 #pod To change how the API provides access to the data in your database, you
-#pod can create a custom controller. To do so, you should extend this class
-#pod and override the desired methods to provide the desired functionality.
+#pod can create a custom controller. To do so, you should extend
+#pod L<Yancy::Controller::Yancy> and override the desired methods to provide
+#pod the desired functionality.
 #pod
 #pod     package MyApp::Controller::CustomYancyAPI;
-#pod     use Mojo::Base 'Yancy::Controller::Yancy::API';
-#pod     sub list_items {
+#pod     use Mojo::Base 'Yancy::Controller::Yancy';
+#pod     sub list {
 #pod         my ( $c ) = @_;
 #pod         return unless $c->openapi->valid_input;
 #pod         my $items = $c->yancy->backend->list( $c->stash( 'schema' ) );
@@ -29,7 +34,9 @@ our $VERSION = '1.026';
 #pod     use Mojolicious::Lite;
 #pod     push @{ app->routes->namespaces }, 'MyApp::Controller';
 #pod     plugin Yancy => {
-#pod         api_controller => 'CustomYancyAPI',
+#pod         editor => {
+#pod             default_controller => 'CustomYancyAPI',
+#pod         },
 #pod     };
 #pod
 #pod For an example, you could extend this class to add authorization based
@@ -45,7 +52,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use Mojo::JSON qw( to_json );
 use Yancy::Util qw( derp );
 
-#pod =method list_items
+#pod =method list
 #pod
 #pod List the items in a schema. The schema name should be in the
 #pod stash key C<schema>.
@@ -58,7 +65,7 @@ use Yancy::Util qw( derp );
 #pod
 #pod =cut
 
-sub list_items {
+sub list {
     my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
@@ -124,41 +131,7 @@ sub _is_type {
         : $type eq $is_type;
 }
 
-#pod =method add_item
-#pod
-#pod Add a new item to the schema. The schema name should be in the
-#pod stash key C<schema>.
-#pod
-#pod The new item is extracted from the OpenAPI input, under parameter name
-#pod C<newItem>, and must be a hash/JSON "object". It will be filtered by
-#pod filters conforming with L<Mojolicious::Plugin::Yancy/yancy.filter.add>
-#pod that are passed in the array-ref in stash key C<filters>, after the
-#pod schema and property filters have been applied.
-#pod
-#pod The return value is filtered like each result is in L</list_items>.
-#pod
-#pod =cut
-
-sub add_item {
-    my ( $c ) = @_;
-    return unless $c->openapi->valid_input;
-    if ( $c->stash( 'collection' ) ) {
-        derp '"collection" stash key is now "schema" in controller configuration';
-    }
-    my $schema_name = $c->stash( 'schema' ) || $c->stash( 'collection' );
-    my $item = $c->yancy->filter->apply( $schema_name, $c->validation->param( 'newItem' ) );
-    $item = _apply_op_filters( $schema_name, $item, $c->stash( 'filters' ), $c->yancy->filters )
-        if $c->stash( 'filters' );
-    my $res = $c->yancy->backend->create( $schema_name, $item );
-    $res = _apply_op_filters( $schema_name, $res, $c->stash( 'filters_out' ), $c->yancy->filters )
-        if $c->stash( 'filters_out' );
-    return $c->render(
-        status => 201,
-        openapi => $res,
-    );
-}
-
-#pod =method get_item
+#pod =method get
 #pod
 #pod Get a single item from a schema. The schema should be in the stash key
 #pod C<schema>.
@@ -170,7 +143,7 @@ sub add_item {
 #pod
 #pod =cut
 
-sub get_item {
+sub get {
     my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
@@ -188,19 +161,23 @@ sub get_item {
     );
 }
 
-#pod =method set_item
+#pod =method set
 #pod
-#pod Update an item in a schema. The schema should be in the stash key
-#pod C<schema>.
+#pod Create or update an item in a schema. The schema should be in the stash
+#pod key C<schema>.
 #pod
-#pod The item to be updated is determined as with L</get_item>, and what to
-#pod update it with is determined as with L</add_item>.
+#pod The item to be updated is determined as with L</get>, if any.
+#pod The new item is extracted from the OpenAPI input, under parameter name
+#pod C<newItem>, and must be a hash/JSON "object". It will be filtered by
+#pod filters conforming with L<Mojolicious::Plugin::Yancy/yancy.filter.add>
+#pod that are passed in the array-ref in stash key C<filters>, after the
+#pod schema and property filters have been applied.
 #pod
-#pod The return value is filtered like each result is in L</list_items>.
+#pod The return value is filtered like each result is in L</list>.
 #pod
 #pod =cut
 
-sub set_item {
+sub set {
     my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
@@ -212,10 +189,15 @@ sub set_item {
     my $item = $c->yancy->filter->apply( $schema_name, $args->{ newItem } );
     $item = _apply_op_filters( $schema_name, $item, $c->stash( 'filters' ), $c->yancy->filters )
         if $c->stash( 'filters' );
-    $c->yancy->backend->set( $schema_name, $id, $item );
 
-    # ID field may have changed
-    $id = $item->{ $c->stash( 'id_field' ) } || $id;
+    if ( $id ) {
+        $c->yancy->backend->set( $schema_name, $id, $item );
+        # ID field may have changed
+        $id = $item->{ $c->stash( 'id_field' ) } || $id;
+    }
+    else {
+        $id = $c->yancy->backend->create( $schema_name, $item );
+    }
 
     my $res = _delete_null_values( $c->yancy->backend->get( $schema_name, $id ) );
     $res = _apply_op_filters( $schema_name, $res, $c->stash( 'filters_out' ), $c->yancy->filters )
@@ -226,16 +208,16 @@ sub set_item {
     );
 }
 
-#pod =method delete_item
+#pod =method delete
 #pod
 #pod Delete an item from a schema. The schema name should be in the
 #pod stash key C<schema>.
 #pod
-#pod The item to be deleted is determined as with L</get_item>.
+#pod The item to be deleted is determined as with L</get>.
 #pod
 #pod =cut
 
-sub delete_item {
+sub delete {
     my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
@@ -292,16 +274,20 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 DESCRIPTION
+
+B<DEPRECATED>: This module has been merged into the
+L<Yancy::Controller::Yancy> class and the editor now uses that class by
+default.
 
 This module contains the routes that L<Yancy> uses to work with the
 backend data. This API is used by the Yancy editor.
 
 =head1 METHODS
 
-=head2 list_items
+=head2 list
 
 List the items in a schema. The schema name should be in the
 stash key C<schema>.
@@ -312,20 +298,7 @@ array-ref in stash key C<filters_out>.
 
 C<$limit>, C<$offset>, and C<$order_by> may be provided as query parameters.
 
-=head2 add_item
-
-Add a new item to the schema. The schema name should be in the
-stash key C<schema>.
-
-The new item is extracted from the OpenAPI input, under parameter name
-C<newItem>, and must be a hash/JSON "object". It will be filtered by
-filters conforming with L<Mojolicious::Plugin::Yancy/yancy.filter.add>
-that are passed in the array-ref in stash key C<filters>, after the
-schema and property filters have been applied.
-
-The return value is filtered like each result is in L</list_items>.
-
-=head2 get_item
+=head2 get
 
 Get a single item from a schema. The schema should be in the stash key
 C<schema>.
@@ -335,32 +308,37 @@ is extracted from the OpenAPI input, under a parameter of that name.
 
 The return value is filtered like each result is in L</list_items>.
 
-=head2 set_item
+=head2 set
 
-Update an item in a schema. The schema should be in the stash key
-C<schema>.
+Create or update an item in a schema. The schema should be in the stash
+key C<schema>.
 
-The item to be updated is determined as with L</get_item>, and what to
-update it with is determined as with L</add_item>.
+The item to be updated is determined as with L</get>, if any.
+The new item is extracted from the OpenAPI input, under parameter name
+C<newItem>, and must be a hash/JSON "object". It will be filtered by
+filters conforming with L<Mojolicious::Plugin::Yancy/yancy.filter.add>
+that are passed in the array-ref in stash key C<filters>, after the
+schema and property filters have been applied.
 
-The return value is filtered like each result is in L</list_items>.
+The return value is filtered like each result is in L</list>.
 
-=head2 delete_item
+=head2 delete
 
 Delete an item from a schema. The schema name should be in the
 stash key C<schema>.
 
-The item to be deleted is determined as with L</get_item>.
+The item to be deleted is determined as with L</get>.
 
 =head1 SUBCLASSING
 
 To change how the API provides access to the data in your database, you
-can create a custom controller. To do so, you should extend this class
-and override the desired methods to provide the desired functionality.
+can create a custom controller. To do so, you should extend
+L<Yancy::Controller::Yancy> and override the desired methods to provide
+the desired functionality.
 
     package MyApp::Controller::CustomYancyAPI;
-    use Mojo::Base 'Yancy::Controller::Yancy::API';
-    sub list_items {
+    use Mojo::Base 'Yancy::Controller::Yancy';
+    sub list {
         my ( $c ) = @_;
         return unless $c->openapi->valid_input;
         my $items = $c->yancy->backend->list( $c->stash( 'schema' ) );
@@ -374,7 +352,9 @@ and override the desired methods to provide the desired functionality.
     use Mojolicious::Lite;
     push @{ app->routes->namespaces }, 'MyApp::Controller';
     plugin Yancy => {
-        api_controller => 'CustomYancyAPI',
+        editor => {
+            default_controller => 'CustomYancyAPI',
+        },
     };
 
 For an example, you could extend this class to add authorization based

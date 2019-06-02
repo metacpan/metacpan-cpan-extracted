@@ -1,0 +1,16 @@
+sync
+{
+    ts
+    {
+        plugin                      lokalise
+
+        data
+        {
+            config_file              ./files/config/not_found.cfg
+            resource_directory       ./files/resources
+            file_mask                *.xliff
+            file_format              xliff
+            languages                de es fr-ca
+        }
+    }
+}

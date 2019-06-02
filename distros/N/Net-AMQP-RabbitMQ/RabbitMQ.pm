@@ -2,11 +2,30 @@ package Net::AMQP::RabbitMQ;
 use strict;
 use warnings;
 
-our $VERSION = '2.30000';
+our $VERSION = '2.40000';
 
 use XSLoader;
 XSLoader::load "Net::AMQP::RabbitMQ", $VERSION;
 use Scalar::Util qw(blessed);
+
+# Hash::FieldHash and/or Hash::Util's fieldhash may or may not be available
+#
+# On versions earlier than 5.9.4, Hash::Util::FieldHash didn't exist and
+# hence Hash::Util::fieldhash didn't either.
+#
+# We need one of them to fix #151: REQUEST: optionally leave connection alive
+# in net_amqp_rabbitmq_DESTROY to allow forking
+#
+# If neither is found #151 will remain unfixed
+my $have_fieldhash = eval {
+    require Hash::FieldHash;
+    Hash::FieldHash->import('fieldhash');
+    1;
+} || eval {
+    require Hash::Util;
+    Hash::Util->import('fieldhash');
+    1;
+};
 
 =encoding UTF-8
 
@@ -560,7 +579,7 @@ calls are made.
 =head1 RUNNING THE TEST SUITE
 
 The test suite runs live tests against a RabbitMQ server at
-C<rabbitmq.thisaintnews.com>.
+C<https://www.cloudamqp.com/>.
 
 There are separte variables for the ssl and none ssl host/user/password/port.
 
@@ -572,19 +591,23 @@ host (or the test server is down), you can use these environment variables:
 =item MQHOST
 
 Hostname or IP address of the RabbitMQ server to connect to (defaults
-to C<rabbitmq.thisaintnews.com>).
+to C<hornet.rmq.cloudamqp.com>).
 
 =item MQUSERNAME
 
-Username for authentication (defaults to "nartest").
+Username for authentication (defaults to username for L<https://www.cloudamqp.com>).
 
 =item MQPASSWORD
 
-Password for authentication (defaults to "reallysecure").
+Password for authentication (defaults to password for L<https://www.cloudamqp.com>).
 
 =item MQPORT
 
 Port of the RabbitMQ server to connect to (defaults to 5672)
+
+=item MQVHOST
+
+Vhost to use (defaults to vhost for for L<https://www.cloudamqp.com>).
 
 =item MQSSL
 
@@ -600,24 +623,24 @@ backwards compatibility, still do.
 =item MQSSLHOST
 
 Hostname or IP address of the RabbitMQ server to connect to (defaults
-to C<rabbitmq.thisaintnews.com>).
+to C<hornet.rmq.cloudamqp.com>).
 
 =item MQSSLUSERNAME
 
-Username for authentication (defaults to "nartest").
+Username for authentication (defaults to username for L<https://www.cloudamqp.com>).
 
 =item MQSSLPASSWORD
 
-Password for authentication (defaults to "reallysecure").
+Password for authentication (defaults to password for L<https://www.cloudamqp.com>).
 
 =item MQSSLPORT
 
-Port of the RabbitMQ server to connect to (defaults to 5673)
+Port of the RabbitMQ server to connect to (defaults to 5671)
 
 =item MQSSLCACERT
 
 Path to the certificate file for SSL-enabled connections, defaults to
-F<t/ssl/cacert.pem>.
+F<t/ssl/cloudamqp.cacert.pem>.
 
 =item MQSSLVERIFYHOST
 
@@ -627,6 +650,10 @@ true).
 =item MQSSLINIT
 
 Whether the openssl library should be initialized (defaults to true).
+
+=item MQSSLVHOST
+
+Vhost to use when in SSL mode (defaults to vhost for for L<https://www.cloudamqp.com>).
 
 =back
 
@@ -665,6 +692,12 @@ Karen Etheridge E<lt>ether@cpan.orgE<gt>
 
 Eric Brine E<lt>ikegami@cpan.orgE<gt>
 
+Peter Valdemar Mørch E<lt>pmorch@cpan.orgE<gt>
+
+=head1 THANKS
+
+Special thanks to L<https://www.cloudamqp.com> for providing us with the RabbitMQ server the tests run against.
+
 =head1 LICENSE
 
 This software is licensed under the Mozilla Public License. See the LICENSE file in the top distribution directory for the full license text.
@@ -672,6 +705,23 @@ This software is licensed under the Mozilla Public License. See the LICENSE file
 librabbitmq is licensed under the MIT License. See the LICENSE-MIT file in the top distribution directory for the full license text.
 
 =cut
+
+# Since we can't store the PID in $self, which is a amqp_connection_state_t, we
+# store the pid for $self in $pids{$self}.
+# (See L<perlobj#Inside-Out-objects>).
+
+my %pids;
+if ($have_fieldhash) {
+    fieldhash(%pids);
+}
+
+sub new {
+    my $class = shift;
+    my $self = $class->_new(@_);
+    $pids{$self} = $$
+        if $have_fieldhash;
+    return $self;
+}
 
 sub publish {
     my ($self, $channel, $routing_key, $body, $options, $props) = @_;
@@ -688,6 +738,13 @@ sub publish {
     }
 
     $self->_publish($channel, $routing_key, $body, $options, $props);
+}
+
+sub DESTROY {
+    my ($self) = @_;
+    $self->_destroy_connection_close
+        if !$have_fieldhash || $pids{$self} && $pids{$self} == $$;
+    $self->_destroy_cleanup;
 }
 
 1;

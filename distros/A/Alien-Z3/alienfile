@@ -1,0 +1,27 @@
+use alienfile;
+use lib './inc';
+use Sys::Info;
+
+my $cpu_count = $ENV{ALIEN_Z3_CPUCOUNT} || Sys::Info->new()->device('CPU')->count || 1;
+
+share {
+    plugin Download => (
+        url => 'https://github.com/Z3Prover/z3/archive/z3-4.8.4.tar.gz'
+    );
+ 
+    plugin 'Extract::CustomTar' => 'tar.gz';
+ 
+    plugin 'Build::CMake';
+ 
+    build [
+        [ '%{cmake}', -G => '%{cmake_generator}',
+          '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', 'z3-z3-4.8.4/'],
+ 
+        '%{cmake} --build . -j '.$cpu_count,
+        '%{cmake} --build . --target install'
+    ];
+ 
+    plugin 'Gather::IsolateDynamic' => ();
+};
+
+

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2019-05-25'; # DATE
-our $VERSION = '1.818'; # VERSION
+our $DATE = '2019-06-02'; # DATE
+our $VERSION = '1.819'; # VERSION
 
 use 5.010001;
 use strict;
@@ -525,12 +525,12 @@ sub _read_env {
     $words;
 }
 
-sub do_dump {
+sub do_dump_object {
     require Data::Dump;
 
     my ($self, $r) = @_;
 
-    local $r->{in_dump} = 1;
+    local $r->{in_dump_object} = 1;
 
     # check whether subcommand is defined. try to search from --cmd, first
     # command-line argument, or default_subcommand.
@@ -551,14 +551,40 @@ sub do_dump {
     # package
     $self->{'x.main.spec'} = \%main::SPEC;
 
+    my $label = $ENV{PERINCI_CMDLINE_DUMP_OBJECT} //
+        $ENV{PERINCI_CMDLINE_DUMP}; # old name that will be removed
     my $dump = join(
         "",
-        "# BEGIN DUMP $ENV{PERINCI_CMDLINE_DUMP}\n",
+        "# BEGIN DUMP $label\n",
         Data::Dump::dump($self), "\n",
-        "# END DUMP $ENV{PERINCI_CMDLINE_DUMP}\n",
+        "# END DUMP $label\n",
     );
 
     [200, "OK", $dump,
+     {
+         stream => 0,
+         "cmdline.skip_format" => 1,
+     }];
+}
+
+sub do_dump_args {
+    require Data::Dump;
+
+    my ($self, $r) = @_;
+
+    [200, "OK", Data::Dump::dump($r->{args}) . "\n",
+     {
+         stream => 0,
+         "cmdline.skip_format" => 1,
+     }];
+}
+
+sub do_dump_config {
+    require Data::Dump;
+
+    my ($self, $r) = @_;
+
+    [200, "OK", Data::Dump::dump($r->{config}) . "\n",
      {
          stream => 0,
          "cmdline.skip_format" => 1,
@@ -1486,9 +1512,11 @@ sub run {
         common_opts => $co,
     };
 
-    # dump is special case, we delegate to do_dump()
-    if ($ENV{PERINCI_CMDLINE_DUMP}) {
-        $r->{res} = $self->do_dump($r);
+    # dump object is special case, we delegate to do_dump_object()
+    if ($ENV{PERINCI_CMDLINE_DUMP_OBJECT} //
+            $ENV{PERINCI_CMDLINE_DUMP} # old name that will be removed
+        ) {
+        $r->{res} = $self->do_dump_object($r);
         goto FORMAT;
     }
 
@@ -1564,6 +1592,12 @@ sub run {
         log_trace("[pericmd] Running hook_after_parse_argv ...");
         $self->hook_after_parse_argv($r);
 
+        if ($ENV{PERINCI_CMDLINE_DUMP_CONFIG}) {
+            log_trace "[pericmd] Dumping config ...";
+            $r->{res} = $self->do_dump_config($r);
+            goto FORMAT;
+        }
+
         $self->parse_cmdline_src($r);
 
         #log_trace("TMP: parse_res: %s", $parse_res);
@@ -1583,6 +1617,11 @@ sub run {
 
         my $meth = "action_$r->{action}";
         die [500, "Unknown action $r->{action}"] unless $self->can($meth);
+        if ($ENV{PERINCI_CMDLINE_DUMP_ARGS}) {
+            log_trace "[pericmd] Dumping arguments ...";
+            $r->{res} = $self->do_dump_args($r);
+            goto FORMAT;
+        }
         log_trace("[pericmd] Running %s() ...", $meth);
         $r->{res} = $self->$meth($r);
         #log_trace("[pericmd] res=%s", $r->{res}); #1
@@ -1620,8 +1659,15 @@ sub run {
     $r->{format} //= $r->{meta}{'cmdline.default_format'};
     my $restore_orig_result;
     my $orig_result;
-    if (exists $r->{res}[3]{'cmdline.result'}) {
-        # temporarily change the result for formatting
+    if (exists $r->{res}[3]{'cmdline.result.noninteractive'} && !(-t STDOUT)) {
+        $restore_orig_result = 1;
+        $orig_result = $r->{res}[2];
+        $r->{res}[2] = $r->{res}[3]{'cmdline.result.noninteractive'};
+    } elsif (exists $r->{res}[3]{'cmdline.result.interactive'} && -t STDOUT) {
+        $restore_orig_result = 1;
+        $orig_result = $r->{res}[2];
+        $r->{res}[2] = $r->{res}[3]{'cmdline.result.interactive'};
+    } elsif (exists $r->{res}[3]{'cmdline.result'}) {
         $restore_orig_result = 1;
         $orig_result = $r->{res}[2];
         $r->{res}[2] = $r->{res}[3]{'cmdline.result'};
@@ -1688,7 +1734,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.818 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-05-25.
+This document describes version 1.819 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-06-02.
 
 =head1 DESCRIPTION
 
@@ -2113,6 +2159,14 @@ Replace result. Can be useful for example in this case:
 
 When called as a normal function we return boolean value. But as a CLI, we
 display a more user-friendly message.
+
+=head2 attribute: cmdline.result.interactive => any
+
+Like C<cmdline.result> but when script is run interactively.
+
+=head2 attribute: cmdline.result.noninteractive => any
+
+Like C<cmdline.result> but when script is run non-interactively (in a pipeline).
 
 =head2 attribute: cmdline.default_format => str
 
@@ -2609,13 +2663,31 @@ C<cmdline.page_result> result metadata is active). Can also be set to C<''> or
 C<0> to explicitly disable paging even though C<cmd.page_result> result metadata
 is active.
 
-=head2 PERINCI_CMDLINE_DUMP
+=head2 PERINCI_CMDLINE_DUMP_ARGS
 
-String. Default undef. If set to a true value, will dump Perinci::CmdLine
-object at the start of run() and exit. Useful to get object's attributes and
-reconstruct the object later. Used in, e.g. L<App::shcompgen> to generate an
-appropriate completion script for the CLI, or L<Pod::Weaver::Plugin::Rinci> to
-generate POD documentation about the script. See also L<Perinci::CmdLine::Dump>.
+Boolean. If set to true, instead of running normal action, will instead dump
+arguments that will be passed to function, (after merge with values from
+environment/config files, and validation/coercion), in Perl format (using
+L<Data::Dump>) and exit.
+
+Useful for debugging or information extraction.
+
+=head2 PERINCI_CMDLINE_DUMP_CONFIG
+
+Boolean. If set to true, instead of running normal action, will dump
+configuration that is using C<read_config()>, in Perl format (using
+L<Data::Dump>) and exit.
+
+Useful for debugging or information extraction.
+
+=head2 PERINCI_CMDLINE_DUMP_OBJECT
+
+String. Default undef. If set to a true value, instead of running normal action,
+will dump Perinci::CmdLine object at the start of run() in Perl format (using
+L<Data::Dump>) and exit. Useful to get object's attributes and reconstruct the
+object later. Used in, e.g. L<App::shcompgen> to generate an appropriate
+completion script for the CLI, or L<Pod::Weaver::Plugin::Rinci> to generate POD
+documentation about the script. See also L<Perinci::CmdLine::Dump>.
 
 The value of the this variable will be used as the label in the dump delimiter,
 .e.g:
@@ -2623,6 +2695,8 @@ The value of the this variable will be used as the label in the dump delimiter,
  # BEGIN DUMP foo
  ...
  # END DUMP foo
+
+Useful for debugging or information extraction.
 
 =head2 PERINCI_CMDLINE_OUTPUT_DIR
 

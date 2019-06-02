@@ -1,5 +1,8 @@
 Revision history for Perl extension SUPER.
 
+1.20190531 2019-05-31 16:57:30-07:00 America/Los_Angeles
+    - allow main->SUPER::... to work when SUPER.pm is loaded (PR #1, Charles McGarvey)
+
 1.20141117 2014-11-17 09:12:01-08:00 America/Los_Angeles
     - improved export mechanism
     - removed useless Exporter tests

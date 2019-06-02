@@ -61,7 +61,7 @@ sub repeat {
         $p = $class->new( [ ( @{ $self->unpdl } ) x $n ] );
     }
     elsif ( $self->$_DOES('PDL::Factor') ) {
-        $p = $class->new( $self->levels, levels => $self->levels );
+        $p = $class->new( $self, levels => $self->levels );
         $p->{PDL} = $repeat->( $p->{PDL}, $n );
     }
     else {
@@ -116,9 +116,9 @@ sub as_pdlsv {
 sub id {
     my ($self) = @_;
 
-    my %uniq_values;
-    my @uniq_indices;
-    for my $ridx ( 0 .. $self->length - 1 ) {
+    my %uniq_values;    # value to row indices
+    my @uniq_indices;   # first index for each set of uniq values
+    for my $ridx ( which($self->isgood)->list ) {
         my $value = $self->at($ridx);
         if ( not exists $uniq_values{$value} ) {
             $uniq_values{$value} = [];
@@ -130,7 +130,8 @@ sub id {
     my %index_to_value = pairmap { $b->[0] => $a } %uniq_values;
 
     my $rslt = PDL::Core::zeros( $self->length );
-    for my $i ( 1 .. $#uniq_indices ) {
+    $rslt .= -1;    # for BAD values
+    for my $i ( 0 .. $#uniq_indices ) {
         my $value =
           $index_to_value{ $uniq_indices[ $i ] }; 
         my $indices = $uniq_values{$value};
@@ -153,7 +154,7 @@ Data::Frame::PDL - A mixin to add some methods to PDL
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 DESCRIPTION
 

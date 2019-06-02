@@ -1,11 +1,11 @@
-# podlators 4.11
+# podlators 4.12
 
 [![Build
 status](https://travis-ci.org/rra/podlators.svg?branch=master)](https://travis-ci.org/rra/podlators)
 [![CPAN
 version](https://img.shields.io/cpan/v/podlators.svg)](https://metacpan.org/release/podlators)
 
-Copyright 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>.  This software
+Copyright 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>.  This software
 is distributed under the same terms as Perl itself.  Please see the
 section [License](#license) below for more information.
 
@@ -91,12 +91,25 @@ process as any other ExtUtils::MakeMaker module:
 ```
     perl Makefile.PL
     make
-    make test
     make install
 ```
 
 You'll probably need to do the last as root unless you're installing into
 a local Perl module tree in your home directory.
+
+## Testing
+
+podlators comes with a test suite, which you can run after building with:
+
+```
+    make test
+```
+
+If a test vails, you can run a single test with verbose output via:
+
+```
+    prove -vb <path-to-test>
+```
 
 To enable tests that don't detect functionality problems but are used to
 sanity-check the release, set the environment variable `RELEASE_TESTING`
@@ -139,7 +152,7 @@ Perl module issues in the same place.
 The podlators package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 1999-2010, 2012-2018
+> Copyright 1999-2010, 2012-2019
 >     Russ Allbery <rra@cpan.org>
 >
 > This program is free software; you may redistribute it and/or modify it

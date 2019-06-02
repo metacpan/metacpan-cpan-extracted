@@ -1,5 +1,5 @@
 package TeX::Encode::charmap;
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.006'; # VERSION
 
 =head1 NAME
 
@@ -91,6 +91,7 @@ chr(0x00f8) => '\\o', # ø
 chr(0x00fe) => '\\th', # þ
 chr(0x0110) => '\\DJ', # Đ
 chr(0x0111) => '\\dj', # đ
+chr(0x0131) => '\\i', # ı
 chr(0x0132) => '\\IJ', # Ĳ
 chr(0x0133) => '\\ij', # ĳ
 chr(0x0141) => '\\L', # Ł
@@ -543,7 +544,6 @@ chr(0x1e29) => "\\ch", # ḩ
 chr(0x1e23) => "\\\.h", # ḣ
 chr(0x0127) => "\\\=h", # ħ
 chr(0x1e96) => "\\bh", # ẖ
-chr(0x1e25) => "\\dh", # ḥ
 
 ### i
 

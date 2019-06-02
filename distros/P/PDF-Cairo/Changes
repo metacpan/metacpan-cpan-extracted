@@ -1,0 +1,30 @@
+Revision history for PDF-Cairo
+
+1.02    2019/06/02 15:15 PDT
+        bugfix: showimage() needs full save/restore, not just matrix
+        bugfix: print() valign typo
+        bugfix: make layout ink height positive (bbox height remains negative)
+        bugfix: make newpage() return $self
+        showimage()/place(): add align/valign/center
+        add frontpage example to test a mix of different features
+        add all layout options to Layout::new()
+        add height/width methods to images and recordings (including SVG)
+
+1.01    2019/05/30 10:00 PDT
+        bugfix: flip angles for arc() from Cairo space to PDF space
+        add loadsvg() using Image::CairoSVG, with example
+        move utility functions to PDF::Cairo::Util
+        rename replay() to place(), for use with both recording() and loadsvg()
+        make place() also work as an alias for showimage()
+        add scale/rotate options to place(), rename width/height options to
+            clip for clarity
+        incorporate perlcritic suggested fixes
+        reorganize POD docs for clarity
+        add compatibility support for 'strokecolor(0.5)', etc
+        croak on attempt to print() undefined string
+        add preserve option to fill/stroke, and strokefill to mirror fillstroke
+        make Perl 5.016 the minimum version
+
+1.00    2019/05/06 13:30 PDT
+        First version, released on an unsuspecting world.
+

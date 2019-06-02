@@ -10,7 +10,7 @@ use File::Spec::Functions qw(catfile abs2rel);
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.900.1');
+our $VERSION = qv('0.900.2');
 
 sub name {
     return 'Lokalise translation software (https://lokalise.co/) synchronization plugin';

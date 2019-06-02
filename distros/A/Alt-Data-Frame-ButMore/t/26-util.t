@@ -56,4 +56,32 @@ subtest factor => sub {
     is($f2->unpdl, [qw(1 1 2 1 0 1 0 2 2 1)], 'unpdl');
 };
 
+subtest guess_and_convert_to_pdl => sub {
+    my $x1 = ['foo', 'bar', '', 'NA', 'BAD'];
+
+    pdl_is(
+        guess_and_convert_to_pdl($x1),
+        PDL::SV->new( [ qw(foo bar), '', '', '' ] )
+          ->setbadif( pdl( [ 0, 0, 0, 1, 1 ] ) ),
+        'default params on strings'
+    );
+    pdl_is(
+        guess_and_convert_to_pdl( $x1, strings_as_factors => 1 ),
+        PDL::Factor->new( [ qw(foo bar), '', '', '' ],
+            levels => [ '', qw(bar foo) ] )
+          ->setbadif( pdl( [ 0, 0, 0, 1, 1 ] ) ),
+        'strings_as_factors'
+    );
+
+    local $Test2::Tools::PDL::TOLERANCE = 1e-8;
+    my $x2 = [1, 2.01, -3, '', 'NA', 'BAD'];
+
+    pdl_is(
+        guess_and_convert_to_pdl($x2),
+        pdl( [ 1, 2.01, -3, 0, 0, 0 ] )
+          ->setbadif( pdl( [ 0, 0, 0, 1, 1, 1 ] ) ),
+        'numeric'
+    );
+};
+
 done_testing;

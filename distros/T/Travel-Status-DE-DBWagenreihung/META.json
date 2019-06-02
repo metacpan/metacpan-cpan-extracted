@@ -1,0 +1,67 @@
+{
+   "abstract" : "Interface to Deutsche Bahn Wagon Order API.",
+   "author" : [
+      "Copyright (C) 2018-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Travel-Status-DE-DBWagenreihung",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Travel::Status::DE::IRIS" : "1.2",
+            "perl" : "v5.20.0"
+         }
+      }
+   },
+   "provides" : {
+      "Travel::Status::DE::DBWagenreihung" : {
+         "file" : "lib/Travel/Status/DE/DBWagenreihung.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::DE::DBWagenreihung::Section" : {
+         "file" : "lib/Travel/Status/DE/DBWagenreihung/Section.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::DE::DBWagenreihung::Wagon" : {
+         "file" : "lib/Travel/Status/DE/DBWagenreihung/Wagon.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Status-DE-DBWagenreihung"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

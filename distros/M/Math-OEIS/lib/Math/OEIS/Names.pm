@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -18,18 +18,19 @@
 package Math::OEIS::Names;
 use 5.006;
 use strict;
+use warnings;
 use Carp 'croak';
 
 use Math::OEIS::SortedFile;
 our @ISA = ('Math::OEIS::SortedFile');
 
-our $VERSION = 10;
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+our $VERSION = 11;
 
 use constant base_filename => 'names';
 
-# C<($anum,$str) = Math::OEIS::Names-E<gt>line_split($line)>
-# Split a line from the names or stripped file into A-number and text.
-# Not a documented feature yet.
 sub line_split {
   my ($self, $line) = @_;
   ### Names line_split(): $line
@@ -45,7 +46,7 @@ use constant::defer _HAVE_ENCODE => sub {
 
 sub anum_to_name {
   my ($self, $anum) = @_;
-  ### $anum
+  ### Names anum_to_name(): $anum
   my $line = $self->anum_to_line($anum);
   if (! defined $line) { return undef; }
 
@@ -68,7 +69,7 @@ sub anum_to_name {
 1;
 __END__
 
-=for stopwords OEIS gunzipped lookup UTF-8 Oopery filename filehandle Ryde
+=for stopwords Math OEIS gunzipped lookup UTF-8 Oopery filename filehandle Ryde
 
 =head1 NAME
 
@@ -76,6 +77,7 @@ Math::OEIS::Names - read the OEIS F<names> file
 
 =head1 SYNOPSIS
 
+ use Math::OEIS::Names;
  my $name = Math::OEIS::Names->anum_to_name('A123456');
 
 =head1 DESCRIPTION
@@ -88,13 +90,13 @@ downloaded and unzipped to F<~/OEIS/names>,
     gunzip names.gz
 
 F<names> is a very large file listing each A-number and the sequence name.
-The name is a single line description, perhaps a slightly long line.
+The name is a single line description, sometimes a slightly long line.
 
 The F<names> file is sorted by A-number so C<anum_to_name()> is a text file
 binary search (currently implemented with L<Search::Dict>).
 
 Terms of use for the names file data can be found at (Creative Commons
-Attribution Non-Commercial 3.0, at the time of writing).
+Attribution Non-Commercial 3.0 at the time of writing)
 
 =over
 
@@ -111,13 +113,16 @@ L<http://oeis.org/wiki/The_OEIS_End-User_License_Agreement>
 For a given C<$anum> string such as "A000001" return the sequence name
 as a string, or if not found then return C<undef>.
 
-The returned C<$name> may contain non-ASCII characters.  In Perl 5.8 up
-they're returned as Perl wide chars.  In earlier Perl C<$name> is the native
-encoding of the names file (which is UTF-8).
+The returned C<$name> may contain non-ASCII characters.  In Perl 5.8 up,
+they're returned as Perl wide chars.  In earlier Perl, C<$name> is the
+native encoding of the names file (which is UTF-8).
+
+If running in C<perl -T> taint mode then C<$name> is tainted in the usual
+way for reading from a file.
 
 =item C<Math::OEIS::Names-E<gt>close()>
 
-Close the F<names> file, if not already closed.
+Close the F<names> file, or do nothing if already closed or never opened.
 
 =back
 
@@ -133,35 +138,44 @@ file.  The optional key/value parameters are
     filename => $filename         default ~/OEIS/names
     fh       => $filehandle
 
-The default filename is F<~/OEIS/names>, or other directory per
-F<Math::OEIS-E<gt>local_directories()> .  A different filename can be given
-or an open filehandle.  When reading an C<fh> the C<filename> can be given
-too and may be used in diagnostics.
+The default file is per C<default_filename()> below.  A different filename
+can be given or an open filehandle C<fh>.  For C<fh>, its C<filename> can be
+given too and might be used in diagnostics.
 
 =item C<$name = $obj-E<gt>anum_to_name($anum)>
 
-For a given C<$anum> string such as "A000001" return the sequence name
-as a string, or if not found then return C<undef>.
-
-When running in C<perl -T> taint mode the C<$name> returned is tainted in
-the usual way for reading from a file.
+For a given C<$anum> string such as "A000001", return the sequence name as a
+string, or if not found then return C<undef>.
 
 =item C<$filename = $obj-E<gt>filename()>
 
 Return the F<names> filename from a given C<$obj> object.  This is the
-C<filename> parameter if given, or C<default_filename()> otherwise.
+C<filename> parameter if given, or filename which was determined by
+C<default_filename()> otherwise.
 
 =item C<$filename = Math::OEIS::Names-E<gt>default_filename()>
 
 =item C<$filename = $obj-E<gt>default_filename()>
 
 Return the default filename which is used if no C<filename> or C<fh> option
-is given.  C<default_filename()> can be called either as a class method or
-object method.
+is given.  The file is F<names> in C<Math::OEIS-E<gt>local_directories()>.
 
 =item C<$obj-E<gt>close()>
 
-Close the file handle, if not already closed.
+Close the file handle, or do nothing if already closed.
+
+=item C<($anum,$str) = Math::OEIS::Names-E<gt>line_split($line)>
+
+Split a line from the names file into A-number and text.  C<$line> should be
+like
+
+    A123456 some descriptive text
+
+Any trailing newline on C<$line> is stripped.
+
+If C<$line> is not an A-number and text like this then return an empty list.
+The names file starts with some comment lines (C<#>) and they get this empty
+return.
 
 =back
 
@@ -178,7 +192,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

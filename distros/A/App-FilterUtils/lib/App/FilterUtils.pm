@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::FilterUtils;
 # ABSTRACT: Command-line filter utilities
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 =pod
 

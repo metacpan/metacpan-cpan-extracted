@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -22,37 +22,46 @@
 # Do some Math::OEIS::Grep searches for numbers in the given files.
 # The numbers should appear as for instance
 #
-#     not in OEIS: 17238, 12783, 4839, 589
+#     # not in OEIS: 17238, 12783, 4839, 589
 #
 # The idea is that a document or program can note values you didn't find in
 # the OEIS (and haven't decided to add yet, or ever maybe) but which with a
-# machine-readable note can be grepped in the future to see if they have
-# been added, or something close.
+# machine-readable form so grep in the future to see if they or something
+# close has been added.
 #
-# The results are rough, and the input format may change wildly, but this is
-# an example of using Math::OEIS::Grep in a mechanical way.
+# Sequences which match but you know are false (become different later, only
+# a middle match, etc) can be excluded by further "not" lines like
+#
+#     # not in OEIS: 17238, 12783, 4839, 589
+#     # not A123456 as its formula is different after 512 terms
+#     # not A000006 which begins differently
+#
+# The results are rough, and the document style demanded may change wildly,
+# but this is an example of using Math::OEIS::Grep in a mechanical way.
 #
 
 use 5.010;
 use strict;
 use warnings;
+use Encode ();
+use Encode::Locale;
 use File::Basename;
 use File::Slurp;
 use List::Util 'min';
 use Math::OEIS::Grep;
+use PerlIO::encoding;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+our $VERSION = 11;
+$|=1;
+
 # output coding for the benefit of Math::OEIS::Grep printing sequence names
 # which have non-ASCII (usually people's names)
-use Encode::Locale;
+$PerlIO::encoding::fallback = Encode::PERLQQ();
 binmode(STDOUT, ":encoding(console_out)");
 binmode(STDERR, ":encoding(console_out)");
-
-
-our $VERSION = 10;
-$|=1;
 
 # $pos is a position in string $str, starting $pos=0 for start of the string.
 # Return the line number of $pos in $str, starting from 1 for first line.
@@ -120,13 +129,17 @@ foreach my $filename (@filenames) {
     }
 
     {
-      # notice duplicate searches, which can be due to too much cut and
-      # paste, or sometimes an unnoticed relationship between formulas etc
+      # Notice duplicate searches, which can be due to too much cut and
+      # paste, or sometimes an unnoticed relationship between formulas etc.
+      # Those on immediately following lines are ok, being some subset
+      # search.
       my $str = join(',',@values);
-      foreach my $seen (@seen) {
+      foreach my $seen (reverse @seen) {  # reverse for most recent first
         my $seen_str = $seen->{'str'};
         my $len = min(length($str),length($seen_str));
         if (index($str,$seen_str)>=0 || index($seen_str,$str)>=0) {
+          last if ($filename eq $seen->{'filename'}   # close previous
+                   && abs($linenum - $seen->{'linenum'}) <= 2);
           print "$filename:$linenum: duplicate",
             ($filename eq $seen->{'filename'} ? '' : ' in different file'),
             "\n";

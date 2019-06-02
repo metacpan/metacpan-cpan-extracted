@@ -1,0 +1,10 @@
+<span font="Times 10">This is a test of the <i>Emergency Broadcast
+System</i>. The broadcasters of your area, in voluntary cooperation with
+the Federal, State, and Local authorities, have developed this system
+to keep you informed in the event of an emergency. If this had been an
+actual emergency, the Attention Signal you just heard would have been
+followed by official information, news or instructions. This station
+serves the <b>Arkham</b> area.
+
+
+This concludes this test of the <i>Emergency Broadcast System</i>.</span>

@@ -33,7 +33,7 @@ use LWP::Protocol::rsync;
 
 #------------------------------------------------------------------------------
 
-my $want_version = 1;
+my $want_version = 2;
 ok ($LWP::Protocol::rsync::VERSION,
     $want_version,
     'VERSION variable');

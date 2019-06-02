@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.721'; # VERSION
+our $DATE = '2019-06-01'; # DATE
+our $VERSION = '0.722'; # VERSION
 
 use 5.010;
 use strict;
@@ -133,13 +133,14 @@ pmchkver - Check local module's version against version on CPAN
 
 =head1 VERSION
 
-This document describes version 0.721 of pmchkver (from Perl distribution App-PMUtils), released on 2019-02-24.
+This document describes version 0.722 of pmchkver (from Perl distribution App-PMUtils), released on 2019-06-01.
 
 =head1 SYNOPSIS
 
 Basic usage:
 
  % pmchkver Some::Module Another::Module
+ % pmlatest Some::Module Another::Module
 
 Will return 1 or 0 for each module, depending on whether the corresponding
 installed module is the latest version on CPAN.

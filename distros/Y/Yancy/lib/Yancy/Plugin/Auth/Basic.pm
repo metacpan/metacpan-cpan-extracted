@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -280,7 +280,7 @@ sub register {
     $app->yancy->schema( $coll, $schema );
 
     # Add login pages
-    my $route = $config->{route} || $app->yancy->route;
+    my $route = $config->{route} || $app->yancy->editor->route;
     push @{ $app->renderer->classes }, __PACKAGE__;
     $route->get( '/login', \&_get_login, 'yancy.login_form' );
     $route->post( '/login', \&_post_login, 'yancy.check_login' );
@@ -416,7 +416,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 

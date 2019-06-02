@@ -4,7 +4,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 # VERSION
 
-version v0.5.1
+version v0.6.1
 
 # SYNOPSIS
 
@@ -77,6 +77,10 @@ $c->statsd_metric_name_filter( $stat_or_name );
 This method returns the name to be used for logging stats, or `undef`
 if the metric should be ignored.
 
+Only alphanumeric characters, hyphens or underscores in namespaces are
+accepted. All other characters are converted to dots, with consecutive
+dots compressed into a single dot.
+
 If it is passed a non-arrayref, then it will stringify the argument
 and return that.
 
@@ -121,7 +125,7 @@ $stats->profile( begin => 'here' );
 $stats->profile( end => 'here' );
 ```
 
-will be logged to statsd in the `statlyst.stats.here.time` namespace.
+will be logged to statsd in the `catalyst.stats.here.time` namespace.
 
 If you do not want this, then you can work around this by prefixing
 the block name with a controller name, e.g.

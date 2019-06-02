@@ -31,7 +31,6 @@
             "Carp" : "0",
             "Class::Method::Modifiers" : "0",
             "Data::Dumper" : "0",
-            "Data::Rmap" : "0",
             "Devel::OverloadInfo" : "0.005",
             "Eval::Quosure" : "0.001001",
             "Exporter::Tiny" : "0",
@@ -65,7 +64,6 @@
             "Scalar::Util" : "0",
             "Sereal::Decoder" : "4.005",
             "Sereal::Encoder" : "4.005",
-            "Storable" : "0",
             "Syntax::Keyword::Try" : "0.09",
             "Test2::API" : "0",
             "Test2::Util::Ref" : "0",
@@ -94,7 +92,7 @@
          "requires" : {
             "FindBin" : "0",
             "Math::BigInt" : "0",
-            "Test2::Tools::PDL" : "0.0003",
+            "Test2::Tools::PDL" : "0.0004",
             "Test2::Tools::Warnings" : "0",
             "Test2::V0" : "0",
             "Test::File::ShareDir" : "0"
@@ -111,7 +109,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.0049",
+   "version" : "0.0051",
    "x_contributors" : [
       "Mohammad S Anwar <manwar@cpan.org>"
    ],

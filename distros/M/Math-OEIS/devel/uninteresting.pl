@@ -1,25 +1,29 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017 Kevin Ryde
+# Copyright 2016, 2017, 2018 Kevin Ryde
 
-# This file is part of Math-PlanePath.
+# This file is part of Math-OEIS.
 #
-# Math-PlanePath is free software; you can redistribute it and/or modify it
+# Math-OEIS is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation; either version 3, or (at your option) any later
 # version.
 #
-# Math-PlanePath is distributed in the hope that it will be useful, but
+# Math-OEIS is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
 #
 # You should have received a copy of the GNU General Public License along
-# with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+# with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # Find the smallest "uninteresting" number, being a number which doesn't
-# appear in the stripped file sample values.
+# appear in the OEIS stripped file sample values.
+#
+# This depends on the number of sample values shown in OEIS entries.  For
+# example A000027 is all integers so if its sample values were big enough
+# then everything would appear there.
 
 use 5.004;
 use strict;
@@ -29,10 +33,10 @@ use Math::OEIS::Stripped;
 use Smart::Comments;
 
 {
-  # When gaps in the interesting numbers are filled.
+  # Find when gaps in the interesting numbers are filled.
   #
-  # If number n appears first in say A123456 then it was a gap in the
-  # interesting numbers until that sequence.
+  # If n first appears in say A123456 then it was a gap in the interesting
+  # numbers until that sequence.
   #
   # So going by successive numbers n, if it has a new high A-number then n
   # was a gap for a while.  Print here those n and A-numbers of new highs.
@@ -112,9 +116,11 @@ use Smart::Comments;
     print "negatives\n";
   }
   exit 0;
+}
 
-  # return true if a progress message should be printed
+{
   my $t;
+  # return true if a progress message should be printed
   sub progress {
     $t ||= 0;
     my $u = time();
@@ -130,6 +136,9 @@ use Smart::Comments;
 
 #------------------------------------------------------------------------------
 
+# uninteresting  18159  0b100011011101111
+# has its 1-bit run lengths successive 1,2,3,...
+
 # GP-DEFINE  \\ select_first_n(f,n) returns a vector of length n which are the
 # GP-DEFINE  \\ indices i for which function f(i) is true.
 # GP-DEFINE  \\ Indices checked start from 0 so i=0,1,2,...
@@ -140,7 +149,9 @@ use Smart::Comments;
 # GP-DEFINE  }
 # GP-DEFINE  from_binary(n) = fromdigits(digits(n),2);
 # GP-DEFINE  to_binary(n)=fromdigits(binary(n));
-# GP-DEFINE  one_bit_run_lengths(n) = {
+#
+# GP-DEFINE  \\ return a vector of the run lengths of 1-bits in n
+# GP-DEFINE  onebit_run_lengths(n) = {
 # GP-DEFINE    my(v=binary(n),l=List([]),i=1,s);
 # GP-DEFINE    while(1,
 # GP-DEFINE          while(i<=#v && v[i]==0, i++);
@@ -150,24 +161,34 @@ use Smart::Comments;
 # GP-DEFINE          listput(l,i-s));
 # GP-DEFINE    Vec(l);
 # GP-DEFINE  }
-# GP-Test  one_bit_run_lengths(from_binary(0)) == []
-# GP-Test  one_bit_run_lengths(from_binary(1)) == [1]
-# GP-Test  one_bit_run_lengths(from_binary(11100)) == [3]
-# GP-Test  one_bit_run_lengths(from_binary(1011011101111)) == [1,2,3,4]
-# GP-DEFINE  is_one_bit_run_lengths_successive(n) = {
-# GP-DEFINE    my(v=one_bit_run_lengths(n));
+# GP-Test  onebit_run_lengths(from_binary(0)) == []
+# GP-Test  onebit_run_lengths(from_binary(1)) == [1]
+# GP-Test  onebit_run_lengths(from_binary(11100)) == [3]
+# GP-Test  onebit_run_lengths(from_binary(1011011101111)) == [1,2,3,4]
+#
+# GP-DEFINE  \\ return 1 if run lengths of 1-bits in n are successive 1,2,3,...
+# GP-DEFINE  is_onebit_run_lengths_successive(n) = {
+# GP-DEFINE    my(v=onebit_run_lengths(n));
 # GP-DEFINE    v==vector(#v,n,n); \\ && #v>=4;
 # GP-DEFINE  }
 #
-# GP-Test  select_first_n(is_one_bit_run_lengths_successive,20)
-# GP-Test  apply(to_binary,select_first_n(is_one_bit_run_lengths_successive,30))
+# GP-Test  select_first_n(is_onebit_run_lengths_successive,20)
+# GP-Test  apply(to_binary,select_first_n(is_onebit_run_lengths_successive,30))
 # not in OEIS: 1, 2, 4, 8, 11, 16, 19, 22, 32, 35, 38, 44, 64, 67, 70, 76, 88, 128, 131
 # not in OEIS: 1, 10, 100, 1000, 1011, 10000, 10011, 10110, 100000, 100011, 100110, 101100, 1000000, 1000011, 1000110, 1001100, 1011000, 10000000, 10000011
 #
-# with >=4 runs
-# GP-Test  select_first_n(is_one_bit_run_lengths_successive,20)
-# GP-Test  apply(to_binary,select_first_n(is_one_bit_run_lengths_successive,30))
-# not in OEIS: 5871, 9967, 11503, 11727, 11742, 18159, 19695, 19919, 19934, 22767, 22991, 23006, 23439, 23454, 23484, 34543, 36079, 36303, 36318, 39151
-# not in OEIS: 1011011101111, 10011011101111, 10110011101111, 10110111001111, 10110111011110, 100011011101111, 100110011101111, 100110111001111, 100110111011110, 101100011101111, 101100111001111, 101100111011110, 101101110001111, 101101110011110, 101101110111100
+# with >=2 runs
+# select_first_n(n->is_onebit_run_lengths_successive(n) \
+#                   && #onebit_run_lengths(n)>=2, 15)
+# apply(to_binary,select_first_n(n->is_onebit_run_lengths_successive(n) \
+#                                   && #onebit_run_lengths(n)>=2, 15))
+# not in OEIS: 11, 19, 22, 35, 38, 44, 67, 70, 76, 88, 131, 134, 140, 152, 176
+# not in OEIS: 1011, 10011, 10110, 100011, 100110, 101100, 1000011, 1000110, 1001100, 1011000, 10000011, 10000110, 10001100, 10011000, 10110000
 #
-# uninteresting  18159  0b100011011101111
+# with >=4 runs
+# select_first_n(n->is_onebit_run_lengths_successive(n) \
+#                   && #onebit_run_lengths(n)>=4, 15)
+# apply(to_binary,select_first_n(n->is_onebit_run_lengths_successive(n) \
+#                                   && #onebit_run_lengths(n)>=4, 15))
+# not in OEIS: 5871, 9967, 11503, 11727, 11742, 18159, 19695, 19919, 19934, 22767, 22991, 23006, 23439, 23454, 23484
+# not in OEIS: 1011011101111, 10011011101111, 10110011101111, 10110111001111, 10110111011110, 100011011101111, 100110011101111, 100110111001111, 100110111011110, 101100011101111, 101100111001111, 101100111011110, 101101110001111, 101101110011110, 101101110111100

@@ -1,11 +1,11 @@
 package CAM::PDFTaxforms;
 
 use 5.006;
-use warnings;
-use strict;
+#use warnings;
+#use strict;
 use parent 'CAM::PDF';
 
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 =head1 NAME
 
@@ -109,9 +109,9 @@ versions may relax the parser, but not yet.
 This version is HACKED by Jim Turner 09/2010 to enable the fillFormFields() 
 function to also modify checkboxes (primarily on IRS Tax forms).
 
-=head1 EXAMPLE
+=head1 EXAMPLES
 
-See the example subdirectory in the source tree.  There is a sample 
+See the I<example/> subdirectory in the source tree.  There is a sample 
 blank 2018 official IRS Schedule B tax form and two programs:  
 I<dof1040sb.pl>, which fills in the form using the sample input data 
 text file I<f1040sb_inputs.txt>, and creates a filled in version of the 
@@ -119,7 +119,7 @@ form called I<f1040sb_out.pdf>.  The other program (I<test1040sb.pl>)
 can read the data filled in the filled in form created by the other 
 program and displays it as output.
 
-To run the programs, switch to the examples subdirectory in the source 
+To run the programs, switch to the I<example/> subdirectory in the source 
 tree and run them without arguments (ie. B<./dof1040sb.pl>).
 
 To see the names of the fields and their current values in a PDF form, 
@@ -130,7 +130,7 @@ I<listpdffields2.pl -d f1040sb_out.pdf>.
 
 =head2 Functions intended to be used externally
 
- $self = CAM::PDFTaxform->new(content | filename | '-')
+ $self = CAM::PDFTaxforms->new(content | filename | '-')
  $self->toPDF()
  $self->needsSave()
  $self->save()
@@ -251,7 +251,8 @@ LOOP1:	 foreach my $fieldName (@fieldNames)
       my $dict = $self->getValue($objnode);
 
       if ($propdict->{FT} && $self->getValue($propdict->{FT}) =~ /^Btn$/o) {
-      	  $fieldHashRef->{$fieldName} = ($dict->{AS}->{value} =~ /^Yes$/io) ? 1 : 0;
+         $fieldHashRef->{$fieldName} = (defined $dict->{AS}->{value})
+               ? $dict->{AS}->{value} : $dict->{V}->{value};
       } else {
       	  $fieldHashRef->{$fieldName} = $dict->{V}->{value};
       }
@@ -329,17 +330,37 @@ LOOP1:   while (@list > 0)
 
       # This read-write dict does not include inherited properties
       my $dict = $self->getValue($objnode);
-      $dict->{V}  = CAM::PDF::Node->new('string', $value, $objnum, $gennum)
-      		 unless ($dict->{V});   #JWT:ADDED CONDITION!
-      #$dict->{DV} = CAM::PDF::Node->new('string', $value, $objnum, $gennum);
+      $dict->{V}  = CAM::PDF::Node->new('string', $value, $objnum, $gennum);
 
-      #if ($propdict->{FT} && $self->getValue($propdict->{FT}) eq 'Tx')  # Is it a text field?  #JWT:CHGD. TO NEXT:
       if ($propdict->{FT} && $self->getValue($propdict->{FT}) =~ /^(Tx|Btn)$/o)  # Is it a text field?
       {
          my $fieldType = $1;  #JWT:ADDED NEXT 6 TO ALLOW SETTING OF CHECKBOX BUTTONS (VALUE MUST BE EITHER "Yes" or "Off"!:
          if ($fieldType eq 'Btn')
          {
-            $dict->{AS}->{value} = (!$value || $value =~ /^(?:Off|No|Unchecked)$/io) ? 'Off' : 'Yes';
+            if ($dict->{AS}->{value} =~ /^(?:Yes|Off)$/o) {
+               $dict->{AS}->{value} = $dict->{V}->{value};
+	        } else {
+               my @kidnames = $self->getFormFieldList($key);
+               if (@kidnames > 0) {
+                  local * setRadioButtonKids = sub {
+                  	  my ($indx, $vindx) = @_;
+                  	  my $objnode = $self->getFormField($kidnames[$indx]);
+                  	  return  unless ($objnode);
+                  	  my $dict = $self->getValue($objnode);
+                     if ($indx == $vindx) {
+                        $dict->{AS}->{value} = (!$value || $value =~ /^(?:Off|No|Unchecked)$/io) ? 'Off' : 'Yes';   #JWT:HAVE TO HAVE TO GET THE RADIO BUTTON CHECKED!
+                     } else {
+                     	  $dict->{AS}->{value} = 'Off';
+                     }
+                     return;
+                  };
+
+                  my $vindx = $value - 1;
+                  for (my $i=0;$i<=$#kidnames;$i++) {
+                  	  &setRadioButtonKids($i, $vindx);
+                  }
+               }
+	        }
             $filled++;
             next LOOP1;
          }
@@ -358,10 +379,7 @@ LOOP1:   while (@list > 0)
             my $num = $self->appendObject(undef, $newobj, 0);
             $dict->{AP}->{value}->{N} = CAM::PDF::Node->new('reference', $num, $objnum, $gennum);
          }
-#        my $formobj = $self->dereference($dict->{AP}->{value}->{N}->{value});  #JWT:CHGD. TO NEXT:
-         my $formobj = $self->dereference(($fieldType eq 'Btn') 
-                 ? $dict->{AP}->{value}->{N}->{value}->{Yes}->{value}
-                 : $dict->{AP}->{value}->{N}->{value});
+         my $formobj = $self->dereference($dict->{AP}->{value}->{N}->{value});  #xxxJWT:CHGD. TO NEXT:
          my $formonum = $formobj->{objnum};
          my $formgnum = $formobj->{gennum};
          my $formdict = $self->getValue($formobj);
@@ -412,7 +430,6 @@ LOOP1:   while (@list > 0)
          if ($propdict->{DA}) {
             $da = $self->getValue($propdict->{DA});
 
-#print "--da=$da=\n";
             # Try to pull out all of the resources used in the text object
             @rsrcs = ($da =~ m{ /([^\s<>/\[\]()]+) }gxmso);
 
@@ -424,7 +441,6 @@ LOOP1:   while (@list > 0)
             {
                $fontname = $1;
                $fontsize = $2;
-#print "--font: name=$fontname= sz=$fontsize= DR=".$propdict->{DR}."=\n";
                if ($fontname)
                {
                   if ($propdict->{DR})
@@ -460,7 +476,6 @@ LOOP1:   while (@list > 0)
             my $q = $self->getValue($propdict->{Q}) || 0;
             $flags{Justify} = $q==2 ? 'right' : ($q==1 ? 'center' : 'left');
          }
-#print "-justify1=$flags{Justify}=\n";
 
          # The order of the following sections is important!
          $text =~ s/ [^\n] /*/gxms  if ($flags{Password});  # Asterisks for password characters
@@ -539,7 +554,6 @@ LOOP1:   while (@list > 0)
                elsif ($flags{Justify} eq 'right')
                {
                   $text = "$diff 0 Td $text";
-#print "-justify3=text=$text= WIDTH=$width= FS=$fontsize= DX=$dx=\n";
                }
             }
          }
@@ -556,7 +570,7 @@ LOOP1:   while (@list > 0)
 
          $text =  "$tl $da $tm $text Tj";
          $text = "$background /Tx BMC q 1 1 ".($dx-$border).q{ }.($dy-$border)." re W n BT $text ET Q EMC";
-         my $len = ($fieldType eq 'Btn') ? 0 : length($text);  #JWT:CHANGED
+#         my $len = ($fieldType eq 'Btn') ? 0 : length($text);  #JWT:CHANGED
          unless ($fieldType eq 'Btn')  #JWT:ADDED CONDITION:
          {
             $formdict->{Length} = CAM::PDF::Node->new('number', $len, $formonum, $formgnum);
@@ -650,6 +664,7 @@ sub getFormFieldList
    }
 
    my @list;
+   my $nonamecnt = '0';
    for my $kid (@{$kidlist})
    {
       if ((! ref $kid) || (ref $kid) ne 'CAM::PDF::Node' || $kid->{type} ne 'reference')
@@ -658,7 +673,8 @@ sub getFormFieldList
       }
       my $objnode = $self->dereference($kid->{value});
       my $dict = $self->getValue($objnode);
-      my $name = '(no name)';  # assume the worst
+      my $name = "(no name$nonamecnt)";  # assume the worst
+      ++$nonamecnt;
       $name = $self->getValue($dict->{T})  if (exists $dict->{T});
       $name = $prefix . $name;
       $name =~ s/\x00//gso;   #JWT:HANDLE IRS'S FSCKED-UP HIGH-ASCII FIELD NAMES!
@@ -734,6 +750,45 @@ sub getFormField
    return $self->{formcache}->{$fieldname};
 }
 
+=item $doc->writeAny($node)
+
+Returns the serialization of the specified node.  This handles all
+Node types, including object Nodes.
+
+=cut
+
+sub writeAny
+{
+   my $self = shift;
+   my $objnode = shift;
+
+   if (! ref $objnode)
+   {
+      die 'Not a ref';
+   }
+
+   my $key = $objnode->{type};
+
+   return 1  unless (defined($key) && $key);  #JWT:ADDED!
+
+   my $val = $objnode->{value};
+   my $objnum = $objnode->{objnum};
+   my $gennum = $objnode->{gennum};
+
+   return $key eq 'string'     ? $self->writeString($self->{crypt}->encrypt($self, $val, $objnum, $gennum))
+        : $key eq 'hexstring'  ? '<' . (unpack 'H*', $self->{crypt}->encrypt($self, $val, $objnum, $gennum)) . '>'
+        : $key eq 'number'     ? "$val"
+        : $key eq 'reference'  ? "$val 0 R" # TODO: lookup the gennum and use it instead of 0 (?)
+        : $key eq 'boolean'    ? $val
+        : $key eq 'null'       ? 'null'
+        : $key eq 'label'      ? "/$val"
+        : $key eq 'array'      ? $self->_writeArray($objnode)
+        : $key eq 'dictionary' ? $self->_writeDictionary($objnode)
+        : $key eq 'object'     ? $self->_writeObject($objnode)
+#JWT:CHGD. TO NEXT (TO PREVENT DEATH!):        : die "Unknown key '$key' in writeAny (objnum ".($objnum||'<none>').")\n";
+        : warn "Unknown key '$key' (value=$val= objnum=$objnum gen=$gennum) in writeAny (objnum ".($objnum||'<none>').")\n";
+}
+
 1;
 
 __END__
@@ -783,6 +838,28 @@ L<CAM::PDF>, L<Text::PDF>, L<Crypt::RC4>, L<Digest::MD5>
 =head1 KEYWORDS
 
 pdf taxforms
+
+=head1 KNOWN BUGS / TODO
+
+1)  Checkboxes / radio buttons set programatically to "CHECKED" by 
+CAM::PDFTaxforms ARE checked, and shown as so in the form, but 
+B<evince>, and perhaps Acrobat(tm) form editor don't seem to 
+consider them checked the first time a user clicks on them to 
+uncheck them, requiring a second click.  This can be especially 
+disconcerting to the user for radio-buttons as it is possible to click 
+a second button in the group checking it, but the originally-checked 
+button is NOT automatically unchecked.  I need to somehow FIX this, 
+but have so far been unable to do so (as of v1.1 - sorry!), so please 
+don't file a bug on this UNLESS you have a PATCH for either me OR 
+CAM::PDF itself!
+
+2)  CAM::PDF is used under the hood for most of the actual work, and 
+has many open bugs / issues (see:  L<https://rt.cpan.org/Public/Dist/Display.html?Name=CAM-PDF>), 
+so, except for the patched ones mentioned in the B<DESCRIPTION> section above, 
+those issues remain unfixed here as well!  Therefore, check if your issue 
+works if using standard B<CAM::PDF> first before filing a new bug here 
+(or unless it involves a specific CAM::PDFTextforms feature, or you have 
+a patch, in which case you're likely to get it merged here sooner!).
 
 =head1 SEE ALSO
 

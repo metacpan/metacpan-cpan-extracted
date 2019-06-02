@@ -1,4 +1,4 @@
-Copyright 2014 Kevin Ryde
+Copyright 2014, 2019 Kevin Ryde
 
 This file is part of LWP-Protocol-rsync.
 
@@ -15,6 +15,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with LWP-Protocol-rsync.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 2, June 2019
+    - new email
 
 Version 1, March 2014
     - the first version

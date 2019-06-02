@@ -5,7 +5,7 @@ package Alt::Data::Frame::ButMore;
 use strict;
 use warnings;
 
-our $VERSION = '0.0049'; # VERSION
+our $VERSION = '0.0051'; # VERSION
 
 1;
 
@@ -21,11 +21,11 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 =head1 VERSION
 
-version 0.0049
+version 0.0051
 
 =head1 STATUS
 
-This library is current experimental.
+This library is currently experimental.
 
 =head1 SYNOPSIS
 

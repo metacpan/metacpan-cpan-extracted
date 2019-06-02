@@ -18,7 +18,7 @@
   <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
   <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
-  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
   <li><a href="#API">API</a>
     <ul>
       <li><a href="#Functions-intended-to-be-used-externally">Functions intended to be used externally</a></li>
@@ -31,6 +31,7 @@
   <li><a href="#PERFORMANCE">PERFORMANCE</a></li>
   <li><a href="#DEPENDS">DEPENDS</a></li>
   <li><a href="#KEYWORDS">KEYWORDS</a></li>
+  <li><a href="#KNOWN-BUGS-TODO">KNOWN BUGS / TODO</a></li>
   <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
@@ -101,11 +102,11 @@
 
 <p>This version is HACKED by Jim Turner 09/2010 to enable the fillFormFields() function to also modify checkboxes (primarily on IRS Tax forms).</p>
 
-<h1 id="EXAMPLE">EXAMPLE</h1>
+<h1 id="EXAMPLES">EXAMPLES</h1>
 
-<p>See the example subdirectory in the source tree. There is a sample blank 2018 official IRS Schedule B tax form and two programs: <i>dof1040sb.pl</i>, which fills in the form using the sample input data text file <i>f1040sb_inputs.txt</i>, and creates a filled in version of the form called <i>f1040sb_out.pdf</i>. The other program (<i>test1040sb.pl</i>) can read the data filled in the filled in form created by the other program and displays it as output.</p>
+<p>See the <i>example/</i> subdirectory in the source tree. There is a sample blank 2018 official IRS Schedule B tax form and two programs: <i>dof1040sb.pl</i>, which fills in the form using the sample input data text file <i>f1040sb_inputs.txt</i>, and creates a filled in version of the form called <i>f1040sb_out.pdf</i>. The other program (<i>test1040sb.pl</i>) can read the data filled in the filled in form created by the other program and displays it as output.</p>
 
-<p>To run the programs, switch to the examples subdirectory in the source tree and run them without arguments (ie. <b>./dof1040sb.pl</b>).</p>
+<p>To run the programs, switch to the <i>example/</i> subdirectory in the source tree and run them without arguments (ie. <b>./dof1040sb.pl</b>).</p>
 
 <p>To see the names of the fields and their current values in a PDF form, such as the aforementioned tax form, run the included program, ie: <i>listpdffields2.pl -d f1040sb_out.pdf</i>.</p>
 
@@ -113,7 +114,7 @@
 
 <h2 id="Functions-intended-to-be-used-externally">Functions intended to be used externally</h2>
 
-<pre><code> $self = CAM::PDFTaxform-&gt;new(content | filename | &#39;-&#39;)
+<pre><code> $self = CAM::PDFTaxforms-&gt;new(content | filename | &#39;-&#39;)
  $self-&gt;toPDF()
  $self-&gt;needsSave()
  $self-&gt;save()
@@ -247,6 +248,12 @@
 <p>Return the object containing the form field definition for the specified field name. <code>$name</code> can be either the full name or the &quot;short/alternate&quot; name.</p>
 
 </dd>
+<dt id="doc-writeAny-node">$doc-&gt;writeAny($node)</dt>
+<dd>
+
+<p>Returns the serialization of the specified node. This handles all Node types, including object Nodes.</p>
+
+</dd>
 </dl>
 
 <h1 id="SCRIPTS">SCRIPTS</h1>
@@ -280,6 +287,12 @@
 <h1 id="KEYWORDS">KEYWORDS</h1>
 
 <p>pdf taxforms</p>
+
+<h1 id="KNOWN-BUGS-TODO">KNOWN BUGS / TODO</h1>
+
+<p>1) Checkboxes / radio buttons set programatically to &quot;CHECKED&quot; by CAM::PDFTaxforms ARE checked, and shown as so in the form, but <b>evince</b>, and perhaps Acrobat(tm) form editor don&#39;t seem to consider them checked the first time a user clicks on them to uncheck them, requiring a second click. This can be especially disconcerting to the user for radio-buttons as it is possible to click a second button in the group checking it, but the originally-checked button is NOT automatically unchecked. I need to somehow FIX this, but have so far been unable to do so (as of v1.1 - sorry!), so please don&#39;t file a bug on this UNLESS you have a PATCH for either me OR CAM::PDF itself!</p>
+
+<p>2) CAM::PDF is used under the hood for most of the actual work, and has many open bugs / issues (see: <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=CAM-PDF">https://rt.cpan.org/Public/Dist/Display.html?Name=CAM-PDF</a>), so, except for the patched ones mentioned in the <b>DESCRIPTION</b> section above, those issues remain unfixed here as well! Therefore, check if your issue works if using standard <b>CAM::PDF</b> first before filing a new bug here (or unless it involves a specific CAM::PDFTextforms feature, or you have a patch, in which case you&#39;re likely to get it merged here sooner!).</p>
 
 <h1 id="SEE-ALSO">SEE ALSO</h1>
 

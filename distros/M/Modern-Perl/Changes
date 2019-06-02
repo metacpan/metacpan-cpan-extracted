@@ -1,5 +1,10 @@
 Revision history for Modern::Perl
 
+1.20190601 2019-06-01 09:19:36-07:00 America/Los_Angeles
+    - update for 2019
+    - reduce scope of lexical %dates (RT #128406)
+    - support `perl -Modern::Perl=20xx` (RT #96319)
+
 1.20181021 2018-10-21 12:09:32-07:00 America/Los_Angeles
     - autogenerate META.json file (Mohammad S Anwar, GH PR #7)
     - remove Module::Build build dependency to make installation easier

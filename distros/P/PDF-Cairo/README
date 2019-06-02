@@ -1,0 +1,50 @@
+PDF-Cairo
+
+PDF::Cairo is a simple API for creating PDF files using the Cairo
+graphics library, loosely based on PDF::API2::Lite, but with more
+robust font support provided by Font::FreeType and Pango if those
+modules are also installed (strongly recommended). If the Fontconfig
+CLI utilities fc-list and fc-match are in your path, they will be used
+to search for the Adobe PDF core fonts or the closest equivalent. If
+not, names like Times-Roman will be replaced with the Cairo internal
+font mapping.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PDF::Cairo
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=PDF-Cairo
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PDF-Cairo
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/PDF-Cairo
+
+    Search CPAN
+        https://metacpan.org/release/PDF-Cairo
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by J Greely.
+
+This is free software, licensed under:
+
+  MIT License
+
