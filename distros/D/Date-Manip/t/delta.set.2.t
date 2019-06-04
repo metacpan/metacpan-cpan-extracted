@@ -1,40 +1,33 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: set (err)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  if ($test[0] eq 'reset') {
-     $obj->_init();
-     return;
-  }
-
-  $err = $obj->set({ @test });
-  if ($err) {
-     $val = $obj->err();
-     $obj->_init();
-     return $val;
-  } else {
-     @val = $obj->value();
-     return @val;
-  }
-}
-
-$obj = new Date::Manip::Delta;
+my $obj = new Date::Manip::Delta;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my (@test)=@_;
+   if ($test[0] eq 'reset') {
+      $obj->_init();
+      return;
+   }
+
+   my $err = $obj->set({ @test });
+   if ($err) {
+      my $val = $obj->err();
+      $obj->_init();
+      return $val;
+   } else {
+      my @val = $obj->value();
+      return @val;
+   }
+}
+
+my $tests="
 
 delta
 [ 1 2 3 4 5 6 7 ]
@@ -127,9 +120,9 @@ exact
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

@@ -1,137 +1,113 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'object';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 $ENV{'TZ'} = 'America/Chicago';
-use Date::Manip;
 
-use Cwd;
-my $vers;
-if ($ENV{'RELEASE_TESTING'}) {
-   my $dir  = getcwd;
-   $dir     =~ /Date-Manip-([0-9.]+)/;
-   $vers = $1;
-} else {
-   # We'll only test the directory/version on my machine.
-   # In some instances elsewhere, the install directory in renamed
-   # unpredicatbly, so we won't do this test there.
-   $vers = DateManipVersion();
-}
-
-if ($vers >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-%obj = ();
-%dmb = ();
-%dmt = ();
+our %obj = ();
+our %dmb = ();
+our %dmt = ();
 
 sub test {
-  ($label,$op,@args)=@_;
-  my $new;
+   my($label,$op,@args)=@_;
+   my $new;
 
-  if ($op eq 'new') {
-     my($type,@a) = @args;
-     if (@a  &&  exists $obj{$a[0]}) {
-        my $o = $obj{$a[0]};
-        shift(@a);
-        unshift(@a,$o);
-     }
-     if      ($type eq 'Base') {
-        $new = new Date::Manip::Base @a;
-     } elsif ($type eq 'TZ') {
-        $new = new Date::Manip::TZ @a;
-     } elsif ($type eq 'Date') {
-        $new = new Date::Manip::Date @a;
-     } elsif ($type eq 'Delta') {
-        $new = new Date::Manip::Delta @a;
-     } elsif ($type eq 'Recur') {
-        $new = new Date::Manip::Recur @a;
-     }
+   if ($op eq 'new') {
+      my($type,@a) = @args;
+      if (@a  &&  exists $obj{$a[0]}) {
+         my $o = $obj{$a[0]};
+         shift(@a);
+         unshift(@a,$o);
+      }
+      if ($type eq 'Base') {
+         $new = new Date::Manip::Base @a;
+      } elsif ($type eq 'TZ') {
+         $new = new Date::Manip::TZ @a;
+      } elsif ($type eq 'Date') {
+         $new = new Date::Manip::Date @a;
+      } elsif ($type eq 'Delta') {
+         $new = new Date::Manip::Delta @a;
+      } elsif ($type eq 'Recur') {
+         $new = new Date::Manip::Recur @a;
+      }
 
-  } elsif ($op eq 'new_config') {
-     my $o = $obj{$args[0]};
-     shift(@args);
-     $new  = $o->new_config(@args);
+   } elsif ($op eq 'new_config') {
+      my $o = $obj{$args[0]};
+      shift(@args);
+      $new  = $o->new_config(@args);
 
-  } elsif ($op eq 'base') {
-     my $o = $obj{$args[0]};
-     shift(@args);
-     $new  = $o->base(@args);
+   } elsif ($op eq 'base') {
+      my $o = $obj{$args[0]};
+      shift(@args);
+      $new  = $o->base(@args);
 
-  } elsif ($op eq 'tz') {
-     my $o = $obj{$args[0]};
-     shift(@args);
-     $new  = $o->tz(@args);
+   } elsif ($op eq 'tz') {
+      my $o = $obj{$args[0]};
+      shift(@args);
+      $new  = $o->tz(@args);
 
-  } elsif ($op eq 'config') {
-     my $o = $obj{$args[0]};
-     shift(@args);
-     $o->config(@args);
-     return (0);
+   } elsif ($op eq 'config') {
+      my $o = $obj{$args[0]};
+      shift(@args);
+      $o->config(@args);
+      return (0);
 
-  } elsif ($op eq 'get_config') {
-     my $o = $obj{$args[0]};
-     shift(@args);
-     my @ret = $o->get_config(@args);
-     if (@ret > 3) {
-        @ret = @ret[0..2];
-     }
-     return @ret;
+   } elsif ($op eq 'get_config') {
+      my $o = $obj{$args[0]};
+      shift(@args);
+      my @ret = $o->get_config(@args);
+      if (@ret > 3) {
+         @ret = @ret[0..2];
+      }
+      return @ret;
 
-  } elsif ($op eq 'version') {
-     my $o = $obj{$args[0]};
-     shift(@args);
-     return $o->version(@args);
+   } elsif (exists $obj{$op}) {
+      my $o = $obj{$op};
+      $new = $o->new(@args);
+   }
 
-  } elsif (exists $obj{$op}) {
-     my $o = $obj{$op};
-     $new = $o->new(@args);
-  }
+   if (! defined $new) {
+      return (undef);
+   }
 
-  if (! defined $new) {
-     return (undef);
-  }
+   my($dmb,$dmt);
+   if (ref($new) eq 'Date::Manip::Base') {
+      $dmb = $new;
+      $dmt = '---';
+   } elsif (ref($new) eq 'Date::Manip::TZ') {
+      $dmb = $new->base();
+      $dmt = $new;
+   } else {
+      $dmb = $new->base();
+      $dmt = $new->tz();
+   }
 
-  my($dmb,$dmt);
-  if (ref($new) eq 'Date::Manip::Base') {
-     $dmb = $new;
-     $dmt = '---';
-  } elsif (ref($new) eq 'Date::Manip::TZ') {
-     $dmb = $new->base();
-     $dmt = $new;
-  } else {
-     $dmb = $new->base();
-     $dmt = $new->tz();
-  }
+   $obj{$label} = $new;
+   my @ret;
+   @ret = (ref($new));
 
-  $obj{$label} = $new;
-  my @ret;
-  @ret = (ref($new));
+   if (! exists $dmb{$dmb}) {
+      $dmb{$dmb} = $label;
+   }
+   push(@ret,$dmb{$dmb});
 
-  if (! exists $dmb{$dmb}) {
-     $dmb{$dmb} = $label;
-  }
-  push(@ret,$dmb{$dmb});
-  
-  if ($dmt eq '---') {
-     push(@ret,$dmt);
-  } else {
-     if (! exists $dmt{$dmt}) {
-        $dmt{$dmt} = $label;
-     }
-     push(@ret,$dmt{$dmt});
-  }
+   if ($dmt eq '---') {
+      push(@ret,$dmt);
+   } else {
+      if (! exists $dmt{$dmt}) {
+         $dmt{$dmt} = $label;
+      }
+      push(@ret,$dmt{$dmt});
+   }
 
-  return @ret;
+   return @ret;
 }
 
-$tests="
+my $tests="
 
 ### new CLASS
 
@@ -385,25 +361,11 @@ o0109  new  Base o0101  [ defaults 1 ]
 
 - get_config o0004            => dateformat defaults defaulttime
 
-### version
-
-- version o0001    => $vers
-
-- version o0001 1  => $vers
-
-- version o0002 1  => '$vers [america/chicago]'
-
-- config  o0002 setdate now,america/new_york => 0
-
-- version o0002    => $vers
-
-- version o0002 1  => '$vers [america/chicago]'
-
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

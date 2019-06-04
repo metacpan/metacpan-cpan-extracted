@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::riap_url;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.101'; # VERSION
+our $DATE = '2019-06-03'; # DATE
+our $VERSION = '0.102'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ Perinci::Sub::XCompletion::riap_url - Generate completion for Riap URL
 
 =head1 VERSION
 
-This document describes version 0.101 of Perinci::Sub::XCompletion::riap_url (from Perl distribution Perinci-Sub-XCompletion), released on 2019-02-24.
+This document describes version 0.102 of Perinci::Sub::XCompletion::riap_url (from Perl distribution Perinci-Sub-XCompletion), released on 2019-06-03.
 
 =head1 SYNOPSIS
 

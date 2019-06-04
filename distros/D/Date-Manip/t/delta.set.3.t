@@ -1,34 +1,27 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: set (new)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  my $o = $obj->new_delta();
-  $err = $o->set(@test);
-  if ($err) {
-     return $o->err();
-  } else {
-     @val = $o->value();
-     return @val;
-  }
-}
-
-$obj = new Date::Manip::Delta;
+my $obj = new Date::Manip::Delta;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   my $o = $obj->new_delta();
+   my $err = $o->set(@test);
+   if ($err) {
+      return $o->err();
+   } else {
+      my @val = $o->value();
+      return @val;
+   }
+}
+
+my $tests="
 
 { delta [ 0 0 0 0 1 20 30 ] }                                  => 0 0 0 0 1 20 30
 
@@ -200,9 +193,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Token;
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 # ABSTRACT: A simple token-based auth
 
 #pod =head1 SYNOPSIS
@@ -53,7 +53,7 @@ our $VERSION = '1.027';
 #pod =head2 token_digest
 #pod
 #pod This is the hashing mechanism that should be used for creating new
-#pod tokens via the L</add_token> helper. The default type is C<SHA-1>.
+#pod tokens via the L<add_token|/yancy.auth.add_token> helper. The default type is C<SHA-1>.
 #pod
 #pod This value should be a hash of digest configuration. The one required
 #pod field is C<type>, and should be a type supported by the L<Digest> module:
@@ -262,7 +262,7 @@ Yancy::Plugin::Auth::Token - A simple token-based auth
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -315,7 +315,7 @@ unique, and it should be treated like a password.
 =head2 token_digest
 
 This is the hashing mechanism that should be used for creating new
-tokens via the L</add_token> helper. The default type is C<SHA-1>.
+tokens via the L<add_token|/yancy.auth.add_token> helper. The default type is C<SHA-1>.
 
 This value should be a hash of digest configuration. The one required
 field is C<type>, and should be a type supported by the L<Digest> module:

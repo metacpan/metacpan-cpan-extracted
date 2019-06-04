@@ -1,17 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: DateCalc (date,delta,business 8:30-5:00)';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
    my($d1,$d2) = (@_);
@@ -19,10 +12,10 @@ sub test {
 }
 
 Date_Init("ForceDate=1997-03-08-12:30:00,America/New_York");
-Date_Init("ConfigFile=$testdir/Manip.cnf");
+Date_Init("ConfigFile=Manip.cnf");
 Date_Init("WorkDayBeg=08:30","WorkDayEnd=17:00");
 
-$tests="
+my $tests="
 
 'Wed Nov 20 1996 noon' '+0:5:0:0 business' => 1996112108:30:00
 
@@ -32,9 +25,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

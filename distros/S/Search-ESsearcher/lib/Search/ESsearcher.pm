@@ -17,11 +17,11 @@ Search::ESsearcher - Provides a handy system for doing templated elasticsearch s
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -896,6 +896,19 @@ sub search_run{
 	eval{
 		$results=$self->{es}->search( $self->{search_hash} );
 	};
+
+	# @timestamp can't be handled via 
+		if (
+		( ref( $results ) eq 'HASH' ) ||
+		( defined( $results->{hits} ) )||
+		( defined( $results->{hits}{hits} ) )
+		){
+			foreach my $item ( @{ $results->{hits}{hits} } ){
+				if (!defined( $item->{'_source'}{'timestamp'})  )  {
+					$item->{'_source'}{'timestamp'}=$item->{'_source'}{'@timestamp'}
+				}
+			}
+	}
 
 	return $results;
 }

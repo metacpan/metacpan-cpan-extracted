@@ -1,33 +1,26 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: parse (fractional)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  $err = $obj->parse(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     @val = $obj->value();
-     return @val;
-  }
-}
-
-$obj = new Date::Manip::Delta;
+my $obj = new Date::Manip::Delta;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   my $err = $obj->parse(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my @val = $obj->value();
+      return @val;
+   }
+}
+
+my $tests="
 
 '1.5 days'                => 0 0 0 1 12 0 0
 
@@ -37,9 +30,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

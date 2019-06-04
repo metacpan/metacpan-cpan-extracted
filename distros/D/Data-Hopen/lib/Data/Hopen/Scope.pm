@@ -1,9 +1,10 @@
 # Data::Hopen::Scope - a nested key-value store
 package Data::Hopen::Scope;
+use strict;
 use Data::Hopen::Base;
 use Exporter 'import';
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 # Class definition
 use Class::Tiny {
@@ -88,12 +89,12 @@ Values are:
 L<Hash::Merge/Retainment Precedence>.  Same-name keys
 are merged, so no data is lost.
 
-=over C<'keep'>
+=item C<'keep'>
 
 L<Hash::Merge/Left Precedence>.  Existing data will not be replaced by
 new data.
 
-=over C<'replace'>
+=item C<'replace'>
 
 L<Hash::Merge/Right Precedence>.  New data will replace existing data.
 under a particular key will win.

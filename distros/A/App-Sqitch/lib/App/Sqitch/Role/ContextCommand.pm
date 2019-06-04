@@ -9,7 +9,7 @@ use Path::Class;
 use App::Sqitch::Types qw(ArrayRef);
 use Locale::TextDomain qw(App-Sqitch); # XXX Until deprecation removed below.
 
-our $VERSION = '0.9999';
+our $VERSION = 'v1.0.0'; # VERSION
 
 requires 'options';
 requires 'configure';

@@ -83,6 +83,10 @@ sub TO_JSON \{
             \}
         \}
     \}
+    my $plotly_meta = delete $hash\{'pmeta'\};
+    if (defined $plotly_meta) \{
+        $hash\{'meta'\} = $plotly_meta;
+    \}
     %hash = (%hash, %$extra_args);
     delete $hash\{'extra_args'\};
     if ($self->can('type') && (!defined $hash\{'type'\})) \{

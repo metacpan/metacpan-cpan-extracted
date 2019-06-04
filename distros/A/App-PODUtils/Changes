@@ -1,3 +1,10 @@
+0.041   2019-06-03 (PERLANCAR)
+
+	- Add utility: podless.
+
+	- [doc] Mention App::PMUtils & App::PlUtils.
+
+
 0.040   2018-09-11 (PERLANCAR)
 
 	- [removed] Remove view-pod-in-browser (duplicate functionality

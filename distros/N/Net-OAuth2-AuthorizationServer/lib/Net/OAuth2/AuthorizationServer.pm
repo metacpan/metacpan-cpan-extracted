@@ -11,7 +11,7 @@ Authorization Server
 
 =head1 VERSION
 
-0.22
+0.23
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ use Net::OAuth2::AuthorizationServer::ImplicitGrant;
 use Net::OAuth2::AuthorizationServer::PasswordGrant;
 use Net::OAuth2::AuthorizationServer::ClientCredentialsGrant;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 GRANT TYPES
 

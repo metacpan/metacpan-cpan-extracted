@@ -1,27 +1,20 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'tz :: convert_to_gmt';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  return $obj->convert_to_gmt(@test);
-}
-
-$obj = new Date::Manip::TZ;
+our $obj = new Date::Manip::TZ;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   return $obj->convert_to_gmt(@test);
+}
+
+my $tests="
 [ 1985 01 01 12 00 00 ] America/New_York =>
   0 [ 1985 1 1 17 0 0 ] [ 0 0 0 ] 0 GMT
 
@@ -36,9 +29,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

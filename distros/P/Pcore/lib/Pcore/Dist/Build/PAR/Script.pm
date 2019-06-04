@@ -52,7 +52,6 @@ sub _build_exe_filename ($self) {
     return $filename . q[-] . join( q[-], @attrs ) . $self->par_suffix;
 }
 
-# TODO enable repack
 sub run ($self) {
     say qq[\nBuilding ] . ( $self->{crypt} ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . $SPACE . $BLACK . $ON_GREEN . ( $self->{clean} ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}\n];
 
@@ -116,56 +115,19 @@ sub run ($self) {
 
     say 'done';
 
-    # TODO enable
-    # my $repacked_path = $self->_repack_parl( $parl_path, $zip );
-    my $repacked_path = $parl_path;
-
     # patch windows exe icon
-    $self->_patch_icon("$repacked_path");
+    $self->_patch_icon("$parl_path");
+
+    # patch windows GUI
+    $self->_patch_gui("$parl_path") if $self->{gui} && $MSWIN;
 
     my $target_exe = "$self->{dist}->{root}/data/" . $self->exe_filename;
 
-    P->file->move( $repacked_path, $target_exe );
+    P->file->move( $parl_path, $target_exe );
 
     P->file->chmod( 'rwx------', $target_exe );
 
     say 'final binary size: ' . $BLACK . $ON_GREEN . $SPACE . add_num_sep( -s $target_exe ) . $SPACE . $RESET . ' bytes';
-
-    $self->_gui($target_exe) if $self->{gui} && $MSWIN;
-
-    return;
-}
-
-sub _gui ( $self, $file ) {
-    my ( $record, $magic, $signature, $offset, $size );
-
-    open my $exe, '+<', $file or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
-
-    binmode $exe or die $!;
-    seek $exe, 0, 0 or die $!;
-
-    # read IMAGE_DOS_HEADER structure
-    read $exe, $record, 64 or die $!;
-    ( $magic, $offset ) = unpack 'Sx58L', $record;
-
-    die "$file is not an MSDOS executable file.\n" unless $magic == 0x5a4d;    # "MZ"
-
-    # read signature, IMAGE_FILE_HEADER and first WORD of IMAGE_OPTIONAL_HEADER
-    seek $exe, $offset, 0 or die $!;
-    read $exe, $record, 4 + 20 + 2 or die $!;
-
-    ( $signature, $size, $magic ) = unpack 'Lx16Sx2S', $record;
-
-    die 'PE header not found' unless $signature == 0x4550;                     # "PE\0\0"
-
-    die 'Optional header is neither in NT32 nor in NT64 format'
-      unless ( $size == 224 && $magic == 0x10b )                               # IMAGE_NT_OPTIONAL_HDR32_MAGIC
-      || ( $size == 240 && $magic == 0x20b );                                  # IMAGE_NT_OPTIONAL_HDR64_MAGIC
-
-    # Offset 68 in the IMAGE_OPTIONAL_HEADER(32|64) is the 16 bit subsystem code
-    seek $exe, $offset + 4 + 20 + 68, 0 or die $!;
-    print {$exe} pack 'S', 2;                                                  # IMAGE_WINDOWS
-    close $exe or die $!;
 
     return;
 }
@@ -358,13 +320,19 @@ sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = u
 
     if ($encrypt) {
 
-        # crypt sources, do not crypt CPAN modules
-        if ( !$is_cpan_module && ( !$module || $module ne 'Filter/Crypto/Decrypt.pm' ) ) {
+        # do not encrypt modules, that are located on CPAN
+        if ($is_cpan_module) {
+            $encrypt = 0;
+        }
 
-            # do not crypt modules, that belongs to the CPAN distribution
-            if ( !$is_cpan_module && ( my $dist = Pcore::Dist->new( P->path($source)->{dirname} ) ) ) {
-                $encrypt = 0 if $dist->cfg->{cpan};
-            }
+        # do not encrypt Filter::Crypto::Decrypt
+        elsif ( $module && $module eq 'Filter/Crypto/Decrypt.pm' ) {
+            $encrypt = 0;
+        }
+
+        # do not encrypt modules, that are belongs to Pcore CPAN distributions
+        elsif ( !$is_cpan_module && ( my $dist = Pcore::Dist->new( P->path($source)->{dirname} ) ) ) {
+            $encrypt = 0 if $dist->cfg->{cpan};
         }
     }
 
@@ -407,115 +375,6 @@ sub _add_dist ( $self, $dist ) {
     return;
 }
 
-# TODO temporary not used
-sub _repack_parl ( $self, $parl_path, $zip ) {
-    print 'repacking parl ... ';
-
-    my $src = \P->file->read_bin($parl_path);
-
-    my $in_len = length $src->$*;
-
-    # cut magic string
-    $src->$* =~ s/(.{4})\x0APAR[.]pm\x0A\z//sm;
-
-    # unpack overlay length
-    my $overlay_length = unpack 'N', $1;
-
-    # extract overlay
-    # src = raw exe header
-    # overlay = files sections + par zip section + cache id string
-    my $overlay = substr $src->$*, length( $src->$* ) - $overlay_length, $overlay_length, $EMPTY;
-
-    # cut cache id, now overlay = files sections + par zip section
-    $overlay =~ s/.{40}\x{00}CACHE\z//sm;
-
-    my $file_section = {};
-
-    while (1) {
-        last if $overlay !~ s/\AFILE//sm;
-
-        my $filename_length = unpack( 'N', substr $overlay, 0, 4, $EMPTY ) - 9;
-
-        substr $overlay, 0, 9, $EMPTY;
-
-        my $filename = substr $overlay, 0, $filename_length, $EMPTY;
-
-        my $content_length = unpack 'N', substr $overlay, 0, 4, $EMPTY;
-
-        my $content = substr $overlay, 0, $content_length, $EMPTY;
-
-        if ( $filename =~ /[.](?:pl|pm)\z/sm ) {
-
-            # compress perl sources
-            $file_section->{$filename} = \P->src->compress(
-                path   => $filename,
-                data   => $content,
-                filter => {
-                    perl_compress         => 1,
-                    perl_compress_keep_ln => 0,
-                },
-            )->{data};
-        }
-        else {
-            $file_section->{$filename} = \$content;
-        }
-    }
-
-    my $path = P->file1->tempfile;
-
-    # write raw exe
-    P->file->write_bin( $path, $src );
-
-    # patch windows exe icon
-    $self->_patch_icon($path);
-
-    my $md5 = Digest::MD5->new;
-
-    $md5->add( $src->$* );
-
-    my $fh = P->file->get_fh( $path, O_RDWR );
-
-    $fh->seek( 0, SEEK_END );
-
-    my $exe_header_length = $fh->tell;
-
-    # adding files sections
-    for my $filename ( sort keys $file_section->%* ) {
-        my $content = ref $file_section->{$filename} ? $file_section->{$filename} : \P->file->read_bin( $file_section->{$filename} );
-
-        $fh->print( 'FILE' . pack( 'N', length($filename) + 9 ) . sprintf( '%08x', Archive::Zip::computeCRC32( $content->$* ) ) . q[/] . $filename . pack( 'N', length $content->$* ) . $content->$* );
-
-        $md5->add( $content->$* );
-    }
-
-    # addding par zip section, handle should be opened in r/w mode
-    $zip->writeToFileHandle( $fh, 1 ) and die;
-
-    # calculate par zip section hash
-    for my $member ( sort { $a->fileName cmp $b->fileName } $zip->members ) {
-        $md5->add( $member->fileName . $member->crc32String );
-    }
-
-    my $hash = $md5->hexdigest;
-
-    # writing cache id
-    $fh->print( pack( 'Z40', $hash ) . "\x00CACHE" );
-
-    # writing overlay length
-    $fh->print( pack( 'N', $fh->tell - $exe_header_length ) . "\x00PAR.pm\n" );
-
-    my $out_len = $fh->tell;
-
-    say 'done, ', $BLACK . $ON_GREEN . $SPACE . add_num_sep( $out_len - $in_len ) . $SPACE . $RESET . ' bytes';
-
-    say 'hash: ' . $hash;
-
-    # need to close fh before copy / patch file
-    $fh->close;
-
-    return $path;
-}
-
 sub _patch_icon ( $self, $path ) {
 
     # .ico
@@ -534,6 +393,40 @@ sub _patch_icon ( $self, $path ) {
     return;
 }
 
+sub _patch_gui ( $self, $file ) {
+    my ( $record, $magic, $signature, $offset, $size );
+
+    open my $exe, '+<', $file or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+
+    binmode $exe or die $!;
+    seek $exe, 0, 0 or die $!;
+
+    # read IMAGE_DOS_HEADER structure
+    read $exe, $record, 64 or die $!;
+    ( $magic, $offset ) = unpack 'Sx58L', $record;
+
+    die "$file is not an MSDOS executable file.\n" unless $magic == 0x5a4d;    # "MZ"
+
+    # read signature, IMAGE_FILE_HEADER and first WORD of IMAGE_OPTIONAL_HEADER
+    seek $exe, $offset, 0 or die $!;
+    read $exe, $record, 4 + 20 + 2 or die $!;
+
+    ( $signature, $size, $magic ) = unpack 'Lx16Sx2S', $record;
+
+    die 'PE header not found' unless $signature == 0x4550;                     # "PE\0\0"
+
+    die 'Optional header is neither in NT32 nor in NT64 format'
+      unless ( $size == 224 && $magic == 0x10b )                               # IMAGE_NT_OPTIONAL_HDR32_MAGIC
+      || ( $size == 240 && $magic == 0x20b );                                  # IMAGE_NT_OPTIONAL_HDR64_MAGIC
+
+    # Offset 68 in the IMAGE_OPTIONAL_HEADER(32|64) is the 16 bit subsystem code
+    seek $exe, $offset + 4 + 20 + 68, 0 or die $!;
+    print {$exe} pack 'S', 2;                                                  # IMAGE_WINDOWS
+    close $exe or die $!;
+
+    return;
+}
+
 sub _error ( $self, $msg ) {
     say $BOLD . $GREEN . 'PAR ERROR: ' . $msg . $RESET;
 
@@ -547,15 +440,11 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 140                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
+## |    3 | 305                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 343                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 397                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 411                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 422                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 159                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |    2 | 416                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

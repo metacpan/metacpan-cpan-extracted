@@ -1,36 +1,29 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: parse_format';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($format,$string,@g) = @_;
-  ($err,%m) = $obj->parse_format($format,$string);
-  if ($err) {
-     return $err;
-  }
-  $v = $obj->value();
-  push(@ret,$v);
-  foreach my $g (@g) {
-    push(@ret,$m{$g});
-  }
-  return @ret;
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-21-12:30:45,America/New_York");
 
-$tests=q{
+sub test {
+   my($format,$string,@g) = @_;
+   my($err,%m) = $obj->parse_format($format,$string);
+   if ($err) {
+      return $err;
+   }
+   my $v = $obj->value();
+   my(@ret) = ($v);
+   foreach my $g (@g) {
+      push(@ret,$m{$g});
+   }
+   return @ret;
+}
+
+my $tests=q{
 
 '(?<PRE>.*?)%Y-%m-%d(?<POST>.*)'
 'before 2014-01-25 after'
@@ -43,9 +36,9 @@ POST
 
 };
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 1;
 

@@ -1,9 +1,10 @@
 # Data::Hopen::Scope::Hash - a hash-based nested key-value store based
 # TODO handle $set == FIRST_ONLY
 package Data::Hopen::Scope::Hash;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Data::Hopen::Scope';
 use Class::Tiny {

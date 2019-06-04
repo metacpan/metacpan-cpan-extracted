@@ -1,26 +1,15 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: DateCalc (date,delta,business 8:30-5:00)';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 Date_Init("WorkDayBeg=08:30","WorkDayEnd=17:00");
 
-$tests="
+my $tests="
 'Wed Nov 20 1996 noon' +0:5:0:0 2 => 1996112108:30:00
 
 'Wed Nov 20 1996 noon' +3:7:0:0 2 => 1996112610:30:00
@@ -29,10 +18,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&DateCalc,
-          tests => $tests);
-$t->done_testing();
-
+$::ti->tests(func  => \&DateCalc,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

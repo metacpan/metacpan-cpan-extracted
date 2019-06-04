@@ -1,41 +1,34 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: parse (holidays)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj = new Date::Manip::Date;
+$obj->config("forcedate","2000-01-21-12:00:00,America/New_York");
+$obj->config("ConfigFile","Manip.cnf");
 
 sub test {
-  (@test)=@_;
-  if ($test[0] eq "config") {
-     shift(@test);
-     $obj->config(@test);
-     return ();
-  }
+   my(@test)=@_;
+   if ($test[0] eq "config") {
+      shift(@test);
+      $obj->config(@test);
+      return ();
+   }
 
-  my $err = $obj->parse(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     $d2 = $obj->value("gmt");
-     return($d1,$d2);
-  }
+   my $err = $obj->parse(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      my $d2 = $obj->value("gmt");
+      return($d1,$d2);
+   }
 }
 
-$obj = new Date::Manip::Date;
-$obj->config("forcedate","2000-01-21-12:00:00,America/New_York");
-$obj->config("ConfigFile","$testdir/Manip.cnf");
-
-$tests="
+my $tests="
 
 'Christmas'               => 2000122500:00:00 2000122505:00:00
 
@@ -57,9 +50,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

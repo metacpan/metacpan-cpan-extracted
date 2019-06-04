@@ -1,34 +1,27 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: prev';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  my $date = shift(@test);
-  $obj->set("date",$date);
-  $err = $obj->prev(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     return [ $obj->value() ];
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   my $date = shift(@test);
+   $obj->set("date",$date);
+   my $err = $obj->prev(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      return [ $obj->value() ];
+   }
+}
+
+my $tests="
 
 [ 1996 11 22 17 49 30 ] 4         0                            => [ 1996 11 21 17 49 30 ]
 
@@ -114,9 +107,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
+$::ti->tests(func  => \&test,
           tests => $tests);
-$t->done_testing();
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

@@ -14,7 +14,6 @@ sub new {
     return {};
 }
 
-
 sub supported_engines {
 
     my @a = qw( 4 8 );
@@ -25,47 +24,44 @@ sub supported_engines {
     return wantarray ? @a : $hr;
 }
 
-
 sub compute_engine {
-    my ($self, $engine, @params) = @_;
+    my ( $self, $engine, @params ) = @_;
 
     return $self->vr4_signature(@params) if $engine == 4;
     return $self->vr8_signature(@params) if $engine == 8;
 
-    $self->log (1,"engine $engine not supported");
+    $self->log( 1, "engine $engine not supported" );
     return;
 }
 
 #
 # The following *_signature subroutines should be
-# the same as the ones on the server 
-# 
-
+# the same as the ones on the server
+#
 
 #
 # VR4 Engine - Ephemereal signatures of decoded body content
 #
-sub vr4_signature { 
-    my ($self, $text, $ep4) = @_;
-    my ($seed, $separator) = split /-/, $ep4, 2;
+sub vr4_signature {
+    my ( $self, $text, $ep4 ) = @_;
+    my ( $seed, $separator ) = split /-/, $ep4, 2;
 
-    return $self->log(1,"vr4_signature: Bad ep4: $ep4") unless ($seed && $separator);
+    return $self->log( 1, "vr4_signature: Bad ep4: $ep4" ) unless ( $seed && $separator );
 
-    my $ehash = new Razor2::Signature::Ephemeral (seed => $seed, separator => $separator);
+    my $ehash = new Razor2::Signature::Ephemeral( seed => $seed, separator => $separator );
     my $digest = $ehash->hexdigest($$text);
 
     my $sig = hextobase64($digest);
-    $self->log (11,"engine 4 computing on ". length($$text) .", sig=$sig");
+    $self->log( 11, "engine 4 computing on " . length($$text) . ", sig=$sig" );
     return $sig;
 }
 
-
-sub vr8_signature { 
-    my ($self, $text) = @_;
+sub vr8_signature {
+    my ( $self, $text ) = @_;
     my $vr8 = Razor2::Engine::VR8->new();
 
     my $sigs = $vr8->signature($text);
-    
+
     return $sigs;
 }
 

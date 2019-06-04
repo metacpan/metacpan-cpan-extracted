@@ -4,6 +4,7 @@
 
 # Miscellaneous
 ^\.editorconfig
+\.mailmap$
 ^\.[^\\\/]*\.yml
 \bfoo\b.*
 t/.*\.out$
@@ -11,8 +12,8 @@ lua$
 TEMPLATE
 Data-Hopen-.*
 TODO
-\brunhopen$
 \.stackdump$
+\bMETA_new\.yml\b
 
 # Backup files
 \.swp$

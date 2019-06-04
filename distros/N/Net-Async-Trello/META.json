@@ -86,8 +86,8 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Trello"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

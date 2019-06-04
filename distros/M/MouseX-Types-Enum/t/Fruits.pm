@@ -7,7 +7,7 @@ use Mouse;
 extends 'MouseX::Types::Enum';
 
 has name => (is => 'ro', isa => 'Str');
-has color => (is => 'ro', isa => 'Str');
+has color => (is => 'ro', isa => 'Str', required => 1);
 has price => (is => 'ro', isa => 'Num');
 has has_seed => (is => 'ro', isa => 'Int', default => 1);
 

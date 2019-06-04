@@ -266,6 +266,41 @@ PERL5
     ok($err =~ /is duplicate/);
 };
 
+subtest 'has no id' => sub {
+    {
+        eval <<"PERL5";
+{
+    package NoIdEnum;
+    use Mouse;
+    extends 'MouseX::Types::Enum';
+
+    sub AAA {}
+
+    __PACKAGE__->_build_enum;
+}
+PERL5
+        my $err = $@;
+        ok($err =~ /unique id is required/);
+    }
+};
+subtest 'has zero id' => sub {
+    {
+        eval <<"PERL5";
+{
+    package ZeroIdEnum;
+    use Mouse;
+    extends 'MouseX::Types::Enum';
+
+    sub AAA {0}
+
+    __PACKAGE__->_build_enum;
+}
+PERL5
+        my $err = $@;
+        ok(!$err);
+    }
+};
+
 subtest 'invalid arg length' => sub {
     eval <<"PERL5";
 {
@@ -317,7 +352,7 @@ subtest 'enum name pattern' => sub {
     use Mouse;
     extends 'MouseX::Types::Enum';
 
-    has fizz => ( is => 'ro' );
+    has fizz => (is => 'ro');
 
     sub FIZZ1 {1, fizz => 'fizz'}
 
@@ -329,7 +364,7 @@ subtest 'enum name pattern' => sub {
     use Mouse;
     extends 'MouseX::Types::Enum';
 
-    has bar => ( is => 'ro' );
+    has bar => (is => 'ro');
 
     sub BAR1 {1, bar => 'bar'}
 
@@ -342,6 +377,5 @@ subtest 'multiple use parent' => sub {
     ok(Bar->BAR1);
     ok(Bar->BAR1->bar);
 };
-
 
 done_testing;

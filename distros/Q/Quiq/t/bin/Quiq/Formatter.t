@@ -67,13 +67,13 @@ sub test_readableNumber : Test(10) {
 sub test_reducedIsoTime : Test(6) {
     my $self = shift;
 
-    # Unix Epoch (Stunden wg. localtime nicht portabel testbar)
+    # Unix Epoch (Stunden, Tag wg. localtime nicht einfach portabel zu testen)
 
     my $val = Quiq::Formatter->reducedIsoTime(1558593179,1530940097);
-    $self->like($val,qr/2018-07-07 \d\d:08:17/);
+    $self->like($val,qr/2018-07-0\d \d\d:08:17/);
 
     $val = Quiq::Formatter->reducedIsoTime(1558593179,1558070991);
-    $self->like($val,qr/17 \d\d:29:51/);
+    $self->like($val,qr/1\d \d\d:29:51/);
 
     $val = Quiq::Formatter->reducedIsoTime(1558593179,1558593168);
     $self->is($val,'48');

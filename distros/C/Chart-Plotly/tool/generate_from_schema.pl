@@ -201,6 +201,9 @@ sub GenerateTraceAST {
 
 sub RenderField {
     my $field_name = shift();
+    if ($field_name eq "meta") { # Collision with Moose meta attribute
+        $field_name = 'pmeta'; # Plotly meta
+    } 
     my $ast = shift();
 
     my $file_contents = "=item * " . $field_name . "\n";

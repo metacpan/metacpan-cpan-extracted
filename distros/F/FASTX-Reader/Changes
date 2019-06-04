@@ -1,6 +1,15 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 Some APIs *can change* with the release of the first stable release (v 0.1).
 
+0.11	2019-06-03
+	* Cleanup via dist.ini
+
+0.10	2019-06-03
+	* FIXED Comments parser was not working for FASTA files
+	* Added unit tests for comments
+	* Moved release tests to xt/release
+	* Added 'Counter.pl' sample script, counting sequences in FASTA/FASTQ files
+
 0.09	2019-05-16
 	* Removed test/ directory
 

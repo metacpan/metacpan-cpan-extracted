@@ -32,6 +32,7 @@ die "Input file not found: $filepath\n" unless (-e "$filepath");
 my $fasta_reader = FASTX::Reader->new({ filename => "$filepath" });
  
 while (my $seq = $fasta_reader->getRead() ) {
+  print STEDRR "Printing ", $seq->{name}, ' (', $seq->{comment}, ")\n";
   print $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
 }
 ```

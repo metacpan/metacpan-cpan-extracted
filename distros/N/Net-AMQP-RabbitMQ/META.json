@@ -56,7 +56,7 @@
          "web" : "https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq"
       }
    },
-   "version" : "2.40000",
+   "version" : "2.40001",
    "x_contributors" : [
       "jesus - Theo Schlossnagle <jesus@omniti.com>",
       "markellis - Mark Ellis <markellis@cpan.org>",
@@ -71,5 +71,5 @@
       "FGA - Fabrice Gabolde <fga@cpan.org>",
       "ikegami - Eric Brine <ikegami@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

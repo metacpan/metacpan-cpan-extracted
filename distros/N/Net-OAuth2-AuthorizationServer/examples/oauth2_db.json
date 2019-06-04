@@ -1,13 +1,1 @@
-{
-  "clients" : {
-    "TrendyNewService" : {
-      "client_secret" : "boo",
-      "scopes" : {
-        "post_images" : true,
-        "track_location" : true,
-        "annoy_friends" : true,
-        "download_data" : false
-      }
-    }
-  }
-}
+{"access_tokens":{"MTU1OTY0MjAwOC03NDcxMTYtMC43NDg0MTUxNTg0NTc3NDMtWkVjUnR6M3BmQ00yNnZYa25TZEQyWlZnSkx3bHR3":{"client_id":"TrendyNewService","expires":1559642608,"refresh_token":"MTU1OTY0MjAwOC03NDczMjYtMC41MzgzMDc5MzM1MDU2NTYtZVZSUGNGWXV2R0dlNnBaMGtqeFR3OVFEeWdobGlk","scope":{"annoy_friends":1,"post_images":1},"user_id":"Lee"}},"auth_codes":{"MTU1OTY0MTcwNC00Nzg1OTMtMC42ODQ3NDE1MzQzMDg4ODEtak1NejI3U1VUdGhqeTE1TE1SZ21QTHZRYzIwUUts":{"client_id":"TrendyNewService","expires":1559642004,"redirect_uri":"https:\/\/127.0.0.1:3001\/auth","scope":{"annoy_friends":1,"post_images":1},"user_id":"Lee"},"MTU1OTY0MTg1My0zODY3MTEtMC4xODcwMDYyMTMwNjc4NDMtR1d2Z1o5VTE1WTBQRjdKWm5KV0pOenhMWFdqZFVl":{"client_id":"TrendyNewService","expires":1559642153,"redirect_uri":"https:\/\/127.0.0.1:3001\/auth","scope":{"annoy_friends":1,"post_images":1},"user_id":"Lee"},"MTU1OTY0MTgzNC0zNjQ1MzItMC44NTI5NjY4Mzg1ODk1MDYtOUVFaUVQd0RvZ1ZhVmdvRWNocTZNeDE1dHVLSDV6":{"client_id":"TrendyNewService","expires":1559642134,"redirect_uri":"https:\/\/127.0.0.1:3001\/auth","scope":{"annoy_friends":1,"post_images":1},"user_id":"Lee"},"MTU1OTY0MjAwOC01ODk3MDAtMC41Njk2MzcwMjM2NDcwNTgtYUNIM1dCVGNGZnJ5QUxyWnZhZGdYWm5qVWRId0cz":{"access_token":"MTU1OTY0MjAwOC03NDcxMTYtMC43NDg0MTUxNTg0NTc3NDMtWkVjUnR6M3BmQ00yNnZYa25TZEQyWlZnSkx3bHR3","client_id":"TrendyNewService","expires":1559642308,"redirect_uri":"https:\/\/127.0.0.1:3001\/auth","scope":{"annoy_friends":1,"post_images":1},"user_id":"Lee"}},"auth_codes_by_client":{"TrendyNewService":"MTU1OTY0MjAwOC01ODk3MDAtMC41Njk2MzcwMjM2NDcwNTgtYUNIM1dCVGNGZnJ5QUxyWnZhZGdYWm5qVWRId0cz"},"clients":{"TrendyNewService":{"client_secret":"boo","scopes":{"annoy_friends":true,"download_data":false,"post_images":true,"track_location":true}}},"refresh_tokens":{"MTU1OTY0MjAwOC03NDczMjYtMC41MzgzMDc5MzM1MDU2NTYtZVZSUGNGWXV2R0dlNnBaMGtqeFR3OVFEeWdobGlk":{"access_token":"MTU1OTY0MjAwOC03NDcxMTYtMC43NDg0MTUxNTg0NTc3NDMtWkVjUnR6M3BmQ00yNnZYa25TZEQyWlZnSkx3bHR3","auth_code":"MTU1OTY0MjAwOC01ODk3MDAtMC41Njk2MzcwMjM2NDcwNTgtYUNIM1dCVGNGZnJ5QUxyWnZhZGdYWm5qVWRId0cz","client_id":"TrendyNewService","scope":{"annoy_friends":1,"post_images":1},"user_id":"Lee"}},"refresh_tokens_by_client":{"TrendyNewService":"MTU1OTY0MjAwOC03NDczMjYtMC41MzgzMDc5MzM1MDU2NTYtZVZSUGNGWXV2R0dlNnBaMGtqeFR3OVFEeWdobGlk"},"verified_auth_codes":{"MTU1OTY0MjAwOC01ODk3MDAtMC41Njk2MzcwMjM2NDcwNTgtYUNIM1dCVGNGZnJ5QUxyWnZhZGdYWm5qVWRId0cz":1}}

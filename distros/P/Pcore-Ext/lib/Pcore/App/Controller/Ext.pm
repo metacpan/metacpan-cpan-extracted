@@ -12,53 +12,40 @@ has _index => ();
 
 # TODO api_url
 sub BUILD ( $self, $args ) {
+
+    # init Ext
+    my $ext = $self->{app}->{ext} //= Pcore::Ext->new( app => $self->{app} );
+
+    # TODO return if in production mode and app is absolute, eg: Module::Path::App
     return if index( $self->{ext_app}, '::' ) != -1 && !$self->{app}->{devel};
 
+    # expand app namespace, if it is relative to the current dist
     my $ns = index( $self->{ext_app}, '::' ) == -1 ? ref( $self->{app} ) . '::Ext::' . $self->{ext_app} : $self->{ext_app};
 
-    my $app = $self->{app}->{ext}->{ $self->{ext_app} } = Pcore::Ext->new(
-        namespace => $ns,
-        app       => $self->{app},      # maybe InstanceOf['Pcore::App']
-        cdn       => undef,             # maybe InstanceOf['Pcore::CDN']
-        prefixes  => {
-            pcore => undef,
-            dist  => undef,
-            app   => undef,
-        },
+    $ext->create_app(
+        $self->{ext_app},
+        {   namespace => $ns,
+            cdn       => undef,    # maybe InstanceOf['Pcore::CDN']
+            prefixes  => {
+                pcore => undef,
+                dist  => undef,
+                app   => undef,
+            },
 
-        # TODO
-        # api_url => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+            # TODO
+            # api_url => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+        }
     );
-
-    $app->build;
-
-    die qq[Ext app "$self->{ext_app}" not found] if !defined $self->{app}->{ext}->{ $self->{ext_app} };
 
     return;
 }
 
-sub _get_app ($self) { return $self->{app}->{ext}->{ $self->{ext_app} } }
+sub _get_app ($self) { return $self->{app}->{ext}->{ext_app}->{ $self->{ext_app} } }
 
 around run => sub ( $orig, $self, $req ) {
     return $req->return_xxx(404) if !$self->_get_app;
 
-    if ( defined $req->{path} ) {
-        if ( $req->{path} eq 'app.js' ) {
-            $self->_return_app($req);
-        }
-        elsif ( $req->{path} eq 'overrides.js' ) {
-            $self->_return_overrides($req);
-        }
-        elsif ( $req->{path} eq 'locale.js' ) {
-            $self->_return_locale($req);
-        }
-        else {
-            $self->$orig($req);
-        }
-    }
-    else {
-        $self->_return_index($req);
-    }
+    $self->_return_index($req);
 
     return;
 };
@@ -72,10 +59,12 @@ sub _return_index ( $self, $req ) {
         my $cdn = $self->{app}->{cdn};
 
         # overrides
-        push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('overrides.js') );
+        # push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('overrides.js') );
+        push $resources->@*, $cdn->get_script_tag( $cdn->("/app/overrides.js") );
 
         # app
-        push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('app.js') );
+        # push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('app.js') );
+        push $resources->@*, $cdn->get_script_tag( $cdn->("/app/$self->{ext_app}/app.js") );
 
         # generate HTML tmpl
         $self->{_index} = \P->text->encode_utf8(
@@ -95,61 +84,17 @@ sub _return_index ( $self, $req ) {
     return;
 }
 
-sub _return_overrides ( $self, $req ) {
-    my $app = $self->_get_app;
-
-    my $etag = 'W/' . $app->get_overrides_md5( $self->{app}->{devel} );
-
-    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $etag ) {
-        $req->(304)->finish;    # not modified
-    }
-    else {
-        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $etag ], $app->get_overrides( $self->{app}->{devel} ) )->finish;
-    }
-
-    return;
-}
-
-sub _return_locale ( $self, $req ) {
-    my $app = $self->_get_app;
-
-    # get locale from query param
-    ( my $locale ) = $req->{env}->{QUERY_STRING} =~ m/locale=([[:alpha:]-]+)/sm;
-
-    return $req->(404)->finish if !$locale;
-
-    my $etag = $app->get_locale_md5( $locale, $self->{app}->{devel} );
-
-    return $req->(404)->finish if !$etag;
-
-    $etag = 'W/' . $etag;
-
-    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $etag ) {
-        $req->(304)->finish;    # not modified
-    }
-    else {
-        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $etag ], $app->get_locale( $locale, $self->{app}->{devel} ) )->finish;
-    }
-
-    return;
-}
-
-sub _return_app ( $self, $req ) {
-    my $app = $self->_get_app;
-
-    my $etag = 'W/' . $app->get_app_md5( $self->{app}->{devel} );
-
-    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $etag ) {
-        $req->(304)->finish;    # not modified
-    }
-    else {
-        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $etag ], $app->get_app( $self->{app}->{devel} ) )->finish;
-    }
-
-    return;
-}
-
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 63                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

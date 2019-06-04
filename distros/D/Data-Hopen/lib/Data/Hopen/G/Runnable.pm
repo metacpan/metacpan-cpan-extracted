@@ -1,8 +1,9 @@
 # Data::Hopen::G::Runnable - parent class for anything runnable in a hopen graph
 package Data::Hopen::G::Runnable;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use Data::Hopen;
 use Data::Hopen::Scope::Hash;

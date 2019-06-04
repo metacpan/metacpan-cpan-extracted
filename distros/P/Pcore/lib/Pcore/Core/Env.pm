@@ -17,7 +17,7 @@ has dists_order   => ( init_arg => undef );                        # ArrayRef, r
 has cli           => ( init_arg => undef );                        # HashRef, parsed CLI data
 has share         => ( init_arg => undef );                        # InstanceOf ['Pcore::Core::Env::Share'], share object
 has user_cfg_path => ( is       => 'lazy', init_arg => undef );
-has user_cfg      => ( is       => 'lazy', init_arg => undef );    # $HOME/.pcore/pcore.ini config
+has user_cfg      => ( is       => 'lazy', init_arg => undef );    # $HOME/.pcore/pcore.yaml config
 
 has PCORE_SHARE_DIR => ();
 has USER_DIR        => ();                                         # OS user profile dir
@@ -287,15 +287,12 @@ sub set_scandeps ( $self, $path ) {
     return;
 }
 
-sub _build_user_cfg_path ($self) { return "$self->{PCORE_USER_DIR}/pcore.ini" }
+sub _build_user_cfg_path ($self) { return "$self->{PCORE_USER_DIR}/pcore.yaml" }
 
 sub _build_user_cfg ($self) {
-    if ( !-f $self->user_cfg_path ) {
-        return {};
-    }
-    else {
-        return P->cfg->read( $self->user_cfg_path );
-    }
+    P->file->copy( $ENV->{share}->get('/Pcore/dist-tmpl/pcore.yaml'), $self->user_cfg_path, umask => 'rw' ) if !-f $self->user_cfg_path;
+
+    return P->cfg->read( $self->user_cfg_path );
 }
 
 sub register_dist ( $self, $dist ) {
@@ -425,13 +422,13 @@ END {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 207                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
-## |      | 334                  | * Subroutine "END" with high complexity score (23)                                                             |
+## |      | 331                  | * Subroutine "END" with high complexity score (23)                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 345                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 342                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 385                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 382                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 412                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 409                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

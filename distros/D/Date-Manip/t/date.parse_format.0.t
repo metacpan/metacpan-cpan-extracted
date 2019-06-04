@@ -1,32 +1,25 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: parse_format';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test) = @_;
-  $err = $obj->parse_format(@test);
-  if ($err) {
-     return $err;
-  }
-  $v = $obj->value();
-  return $v;
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-21-12:30:45,America/New_York");
 
-$tests=q{
+sub test {
+   my(@test) = @_;
+   my $err = $obj->parse_format(@test);
+   if ($err) {
+      return $err;
+   }
+   my $v = $obj->value();
+   return $v;
+}
+
+my $tests=q{
 
 %Y\\.%m\\-%d
 2000.12-13
@@ -45,9 +38,9 @@ $tests=q{
 
 };
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 1;
 

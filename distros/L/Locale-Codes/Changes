@@ -7,6 +7,11 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.61  2019-06-01  sbeck
+  -  NEW CODE(s)
+  -  Converted tests to use Test::Inter
+        Now uses the same module to do tests as all my other modules.
+
 3.60  2019-03-01  sbeck
   -  NEW CODE(s)
 

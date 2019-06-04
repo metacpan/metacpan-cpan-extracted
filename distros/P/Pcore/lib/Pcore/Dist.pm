@@ -232,7 +232,8 @@ sub _build_id ($self) {
     # convert date to UTC
     $id->{date} = P->date->from_string( $id->{date} )->at_utc->to_string if defined $id->{date};
 
-    $id->{release} //= $self->version;
+    # try to get version from the main module
+    $id->{release} //= $self->module->version;
 
     $id->{release_id} = $id->{release};
     $id->{release_id} .= "+$id->{release_distance}" if $id->{release_distance};

@@ -1,50 +1,43 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: calc (delta,delta,business 08:30-17:00)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-
-  $err = $obj1->parse(shift(@test));
-  if ($err) {
-     return $obj1->err();
-  }
-
-  $err = $obj2->parse(shift(@test));
-  if ($err) {
-     return $obj2->err();
-  }
-
-  my $obj3 = $obj1->calc($obj2,@test);
-  $ret = $obj3->value();
-  return $ret;
-}
-
-$obj1 = new Date::Manip::Delta;
+our $obj1 = new Date::Manip::Delta;
 $obj1->config("forcedate","now,America/New_York");
 $obj1->config(qw(workdaybeg 08:30:00));
-$obj2 = $obj1->new_delta();
+our $obj2 = $obj1->new_delta();
 
-$tests="
+sub test {
+   my(@test)=@_;
+
+   my $err = $obj1->parse(shift(@test));
+   if ($err) {
+      return $obj1->err();
+   }
+
+   $err = $obj2->parse(shift(@test));
+   if ($err) {
+      return $obj2->err();
+   }
+
+   my $obj3 = $obj1->calc($obj2,@test);
+   my $ret = $obj3->value();
+   return $ret;
+}
+
+my $tests="
 
 '+1:6:30:30 business'  '+1:3:45:45 business'  => 0:0:0:3:1:46:15
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

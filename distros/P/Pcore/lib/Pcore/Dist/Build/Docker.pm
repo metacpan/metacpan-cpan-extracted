@@ -3,11 +3,13 @@ package Pcore::Dist::Build::Docker;
 use Pcore -class, -ansi, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
-has dist          => ();                                     # InstanceOf ['Pcore::Dist']
-has dockerhub_api => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Hub']
+has dist => ();                                     # InstanceOf ['Pcore::Dist']
+has api  => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Cloud']
 
-sub _build_dockerhub_api($self) {
-    return Pcore::API::Docker::Hub->new;
+sub _build_api($self) {
+    require Pcore::API::Docker::Cloud;
+
+    return Pcore::API::Docker::Cloud->new;
 }
 
 sub init ( $self, $args ) {
@@ -25,7 +27,7 @@ sub init ( $self, $args ) {
         exit 3;
     }
 
-    my $repo_namespace = $args->{namespace} || $ENV->user_cfg->{DOCKERHUB}->{default_namespace} || $ENV->user_cfg->{DOCKERHUB}->{username};
+    my $repo_namespace = $args->{namespace} || $ENV->user_cfg->{DOCKER}->{default_namespace} || $ENV->user_cfg->{DOCKER}->{username};
 
     if ( !$repo_namespace ) {
         say 'DockerHub repo namespace is not defined';
@@ -43,17 +45,15 @@ sub init ( $self, $args ) {
         exit 3;
     }
     elsif ( $confirm eq 'yes' ) {
-        my $api = $self->dockerhub_api;
+        my $api = $self->api;
 
         print q[Creating DockerHub repository ... ];
 
-        my $res = $api->create_autobuild(
+        my $res = $api->create_repo(
             $repo_id,
-            $scm_upstream->{hosting},
-            $scm_upstream->{repo_id},
-            $self->{dist}->module->abstract || $self->{dist}->name,
-            private => 0,
-            active  => 1
+            desc      => $self->{dist}->module->abstract || $self->{dist}->name,
+            full_desc => $EMPTY,
+            private   => 0,
         );
 
         say $res->{reason};
@@ -122,40 +122,16 @@ sub set_from_tag ( $self, $tag ) {
     return;
 }
 
-sub status ( $self ) {
-    my ( $tags, $build_history, $build_settings );
+sub ls ( $self ) {
+    my $tags;
 
     my $cv = P->cv->begin;
 
     $cv->begin;
-    $self->dockerhub_api->get_tags(
+    $self->api->get_tags(
         $self->{dist}->docker->{repo_id},
         sub ($res) {
             $tags = $res;
-
-            $cv->end;
-
-            return;
-        }
-    );
-
-    $cv->begin;
-    $self->dockerhub_api->get_build_history(
-        $self->{dist}->docker->{repo_id},
-        sub ($res) {
-            $build_history = $res;
-
-            $cv->end;
-
-            return;
-        }
-    );
-
-    $cv->begin;
-    $self->dockerhub_api->get_autobuild_settings(
-        $self->{dist}->docker->{repo_id},
-        sub ($res) {
-            $build_settings = $res;
 
             $cv->end;
 
@@ -197,36 +173,6 @@ sub status ( $self ) {
                 width  => 35,
                 align  => 1,
                 format => sub ( $val, $id, $row ) {
-                    return $val ? P->date->from_string($val)->to_http_date : q[-];
-                }
-            },
-            status_text => {
-                title  => 'LATEST BUILD STATUS',
-                width  => 15,
-                format => sub ( $val, $id, $row ) {
-                    return if !defined $val;
-
-                    if ( $val eq 'error' || $val eq 'cancelled' ) {
-                        $val = $BOLD . $WHITE . $ON_RED . " $val " . $RESET;
-                    }
-                    elsif ( $val eq 'success' ) {
-                        $val = $BLACK . $ON_GREEN . " $val " . $RESET;
-                    }
-                    elsif ( $val eq 'queued' ) {
-                        $val = $BLACK . $ON_YELLOW . " $val " . $RESET;
-                    }
-                    else {
-                        $val = $BLACK . $ON_WHITE . " $val " . $RESET;
-                    }
-
-                    return $val;
-                }
-            },
-            build_status_updated => {
-                title  => 'BUILD STATUS UPDATED',
-                width  => 35,
-                align  => 1,
-                format => sub ( $val, $id, $row ) {
                     return q[-] if !$val;
 
                     my $duration = P->date->duration( P->date->from_string($val), P->date->now_utc );
@@ -255,25 +201,6 @@ sub status ( $self ) {
         };
     }
 
-    # index autobuild tags
-    for my $autobuild_tag ( $build_settings->{data}->{build_tags}->@* ) {
-        $report->{ $autobuild_tag->{name} }->{is_autobuild_tag} = 1 if $autobuild_tag->{name} ne '{sourceref}';
-    }
-
-    # index builds
-    for my $build ( reverse sort { $a->{id} <=> $b->{id} } values $build_history->{data}->%* ) {
-
-        # skip build if it was completed successfully, and tag was removed
-        next if $build->{status_text} eq 'success' && !exists $report->{ $build->{dockertag_name} };
-
-        # collect only last tag build status
-        if ( !exists $report->{ $build->{dockertag_name} }->{status_text} ) {
-            $report->{ $build->{dockertag_name} }->{status_text} = $build->{status_text};
-
-            $report->{ $build->{dockertag_name} }->{build_status_updated} = $build->{last_updated};
-        }
-    }
-
     if ( keys $report->%* ) {
         my $version_tags = [];
 
@@ -295,221 +222,31 @@ sub status ( $self ) {
     return;
 }
 
-sub build_status ( $self ) {
-    my $orgs = $self->dockerhub_api->get_user_orgs;
-
-    my $namespaces = [ $self->dockerhub_api->{username} ];
-
-    push $namespaces->@*, keys $orgs->{data}->%* if $orgs && $orgs->{data};
-
-    my $repos;
-
-    my $cv = P->cv->begin;
-
-    for my $namespace ( $namespaces->@* ) {
-        $cv->begin;
-
-        $self->dockerhub_api->get_all_repos(
-            $namespace,
-            sub ($res) {
-                if ( $res && $res->{data} ) {
-                    push $repos->@*, keys $res->{data}->%*;
-                }
-
-                $cv->end;
-
-                return;
-            }
-        );
-    }
-
-    $cv->end->recv;
-
-    return if !$repos;
-
-    my ( $build_history, $autobuild_tags );
-
-    $cv = P->cv->begin;
-
-    for my $repo_id ( $repos->@* ) {
-        $cv->begin;
-        $self->dockerhub_api->get_build_history(
-            $repo_id,
-            sub ($res) {
-                if ( $res && $res->{data} ) {
-                    for my $autobuild ( reverse sort { $a->{id} <=> $b->{id} } values $res->{data}->%* ) {
-                        my $build_id = "$repo_id:$autobuild->{dockertag_name}";
-
-                        if ( !exists $build_history->{$build_id} ) {
-                            $build_history->{$build_id} = $autobuild;
-
-                            $autobuild->{build_id} = $build_id;
-                            $autobuild->{repo_id}  = $repo_id;
-                        }
-                    }
-                }
-
-                $cv->end;
-
-                return;
-            }
-        );
-
-        $cv->begin;
-        $self->dockerhub_api->get_autobuild_tags(
-            $repo_id,
-            sub ($res) {
-                if ( $res && $res->{data} ) {
-                    for my $autobuild_tag ( values $res->{data}->%* ) {
-                        $autobuild_tags->{"$repo_id:$autobuild_tag->{name}"} = undef;
-                    }
-                }
-
-                $cv->end;
-
-                return;
-            }
-        );
-    }
-
-    $cv->end->recv;
-
-    for my $repo_tag ( keys $build_history->%* ) {
-        delete $build_history->{$repo_tag} if !exists $autobuild_tags->{$repo_tag};
-    }
-
-    my $tbl = P->text->table(
-        cols => [
-            repo_id => {
-                title => 'REPO ID',
-                width => 50,
-            },
-            dockertag_name => {
-                title  => 'BUILD TAG',
-                width  => 15,
-                format => sub ( $val, $id, $row ) {
-                    if ( $val =~ /\Av[\d.]+\z/sm ) {
-                        $val = $BLACK . $ON_CYAN . " $val " . $RESET;
-                    }
-                    else {
-                        $val = $BLACK . $ON_GREEN . " $val " . $RESET;
-                    }
-
-                    return $val;
-                }
-            },
-            status_text => {
-                title  => 'LATEST BUILD STATUS',
-                width  => 15,
-                format => sub ( $val, $id, $row ) {
-                    if ( $val eq 'error' || $val eq 'cancelled' ) {
-                        $val = $BOLD . $WHITE . $ON_RED . " $val " . $RESET;
-                    }
-                    elsif ( $val eq 'success' ) {
-                        $val = $BLACK . $ON_GREEN . " $val " . $RESET;
-                    }
-                    elsif ( $val eq 'queued' ) {
-                        $val = $BLACK . $ON_YELLOW . " $val " . $RESET;
-                    }
-                    else {
-                        $val = $BLACK . $ON_WHITE . " $val " . $RESET;
-                    }
-
-                    return $val;
-                }
-            },
-            created_date => {
-                title  => 'CREATED DATE',
-                width  => 35,
-                align  => 1,
-                format => sub ( $val, $id, $row ) {
-                    return q[-] if !$val;
-
-                    my $now = P->date->now_utc;
-
-                    my $date = P->date->from_string($val);
-
-                    my $delta_minutes = $date->delta_minutes($now);
-
-                    my $minutes = $delta_minutes % 60;
-
-                    my $delta_hours = int( $delta_minutes / 60 );
-
-                    my $hours = $delta_hours % 24;
-
-                    my $days = int( $delta_hours / 24 );
-
-                    my $res = $EMPTY;
-
-                    $res .= "$days days " if $days;
-
-                    $res .= "$hours hours " if $hours;
-
-                    return "${res}$minutes minutes ago";
-                }
-            },
-        ],
-    );
-
-    my ( $report1, $report2, $report3 ) = ( [], [], [] );
-
-    for my $build ( sort { $a->{created_date} cmp $b->{created_date} } values $build_history->%* ) {
-        if ( $build->{status_text} eq 'building' ) {
-            push $report3->@*, $build;
-        }
-        elsif ( $build->{status_text} eq 'queued' ) {
-            push $report2->@*, $build;
-        }
-        else {
-            push $report1->@*, $build;
-        }
-    }
-
-    $report2 = [ reverse sort { $a->{created_date} cmp $b->{created_date} } $report2->@* ];
-
-    print $tbl->render_all( [ $report1->@*, $report2->@*, $report3->@* ] );
-
-    return;
-}
-
-sub create_tag ( $self, $tag_name, $source_name, $source_type, $dockerfile_location ) {
-    print qq[Creating autobuild tag "$tag_name" ... ];
-
-    my $autobuild_tags = $self->dockerhub_api->get_autobuild_tags( $self->{dist}->docker->{repo_id} );
-
-    if ( !$autobuild_tags ) {
-        say $autobuild_tags->{reason};
-    }
-    else {
-        for my $autobuild_tag ( values $autobuild_tags->{data}->%* ) {
-            if ( $autobuild_tag->{name} eq $tag_name ) {
-                say q[tag already exists];
-
-                return $autobuild_tag;
-            }
-        }
-    }
-
-    my $res = $self->dockerhub_api->create_autobuild_tag( $self->{dist}->docker->{repo_id}, $tag_name, $source_name, $source_type, $dockerfile_location );
-
-    say $res;
-
-    return $res;
-}
-
 sub remove_tag ( $self, $keep, $tags ) {
     my $remove = sub ($tags) {
         my $results;
 
+        my $cv = P->cv->begin;
+
         for my $tag ( is_plain_arrayref $tags ? $tags->@* : $tags ) {
-            print qq[Removing tag "$tag" ... ];
+            $cv->begin;
 
-            my $res = $self->dockerhub_api->unlink_tag( $self->{dist}->docker->{repo_id}, $tag );
+            $self->api->delete_tag(
+                $self->{dist}->docker->{repo_id},
+                $tag,
+                sub($res) {
+                    say qq[Removing tag "$tag" ... $res];
 
-            $results->{$tag} = $res;
+                    $results->{$tag} = $res;
 
-            say $res;
+                    $cv->end;
+
+                    return;
+                }
+            );
         }
+
+        $cv->end->recv;
 
         return $results;
     };
@@ -517,7 +254,7 @@ sub remove_tag ( $self, $keep, $tags ) {
     if ( !defined $tags ) {
         print q[Get docker tags ... ];
 
-        $tags = $self->dockerhub_api->get_tags(
+        $tags = $self->api->get_tags(
             $self->{dist}->docker->{repo_id},
             sub ($res) {
                 say $res;
@@ -544,16 +281,6 @@ sub remove_tag ( $self, $keep, $tags ) {
     }
 
     return $remove->($tags);
-}
-
-sub trigger_build ( $self, $tag ) {
-    print qq[Triggering build for tag "$tag" ... ];
-
-    my $res = $self->dockerhub_api->trigger_autobuild_by_tag_name( $self->{dist}->docker->{repo_id}, $tag );
-
-    say $res;
-
-    return $res;
 }
 
 sub build_local ( $self, $tag, $args ) {
@@ -710,20 +437,6 @@ sub _build_dockerignore ( $self, $path ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 125                  | * Subroutine "status" with high complexity score (28)                                                          |
-## |      | 298                  | * Subroutine "build_status" with high complexity score (31)                                                    |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 475                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

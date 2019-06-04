@@ -1,3 +1,10 @@
+v0.29.0 2019-06-04T20:05:42Z
+ - perltidy
+ - ext classic removed
+ - ext_type removed
+ - refactored
+ - locales
+
 v0.28.6 2019-05-31T16:41:24Z
  - api path changed
 

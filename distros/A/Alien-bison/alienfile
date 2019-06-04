@@ -1,7 +1,13 @@
 use alienfile;
 
+configure {
+  requires 'Alien::Build' => '1.74';
+  requires 'Alien::Build::Plugin::Decode::Mojo';
+  requires 'Alien::Build::Plugin::Probe::GnuWin32' => '0.59';
+};
+
 plugin 'Probe::GnuWin32' => (
-  registery_key_regex => qr/^flex/i,
+  registry_key_regex  => qr/^flex/i,
   exe_name            => 'bison',
   exe_version         => qr/bison .*?([0-9\.]+)/,
   exe_match           => qr/bison/,
@@ -24,6 +30,7 @@ share {
   plugin 'Download' => (
     url     => 'http://ftp.gnu.org/gnu/bison/',
     version => qr/^bison-([0-9\.]+)\.tar\.gz$/,
+    decoder => 'Decode::Mojo',
   );
 
   plugin 'Extract' => 'tar.gz';  

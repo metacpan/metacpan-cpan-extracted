@@ -6,6 +6,7 @@ use base qw/Quiq::Test::Class/;
 use strict;
 use warnings;
 use v5.10.0;
+use utf8;
 
 # -----------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_new : Test(3) {
+sub test_new : Test(4) {
     my $self = shift;
 
     # ohne Parameter
@@ -24,10 +25,15 @@ sub test_new : Test(3) {
     $self->is(ref($t),'Quiq::Epoch');
     $self->ok($$t >= time);
 
-    # mit Parameter
+    # mit Epoch-Wert
 
     $t = Quiq::Epoch->new(12345678);
     $self->is($$t,12345678);
+
+    # mit ISO-Zeitangabe (Wert hängt von lokaler Zeitzone ab)
+
+    $t = Quiq::Epoch->new('2019-06-02 11:12:31');
+    $self->ok($$t > 1559400000);
 }
 
 # -----------------------------------------------------------------------------
@@ -37,6 +43,18 @@ sub test_epoch : Test(1) {
 
     my $epoch = Quiq::Epoch->new->epoch;
     $self->ok($epoch >= time);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_localtime : Test(4) {
+    my $self = shift;
+
+    my @arr = Quiq::Epoch->new(1559466751)->localtime;
+    $self->is($arr[0],31);
+    $self->is($arr[1],12);
+    $self->is($arr[4],6);
+    $self->is($arr[5],2019);
 }
 
 # -----------------------------------------------------------------------------

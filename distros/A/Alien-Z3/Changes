@@ -1,2 +1,6 @@
+0.002 - June 3rd 2019
+  * Don't build z3 example code
+  * Fix up small bits of the pod a little
+
 0.001 - June 2nd 2019
   * Builds and installs to share dir.  No bindings.

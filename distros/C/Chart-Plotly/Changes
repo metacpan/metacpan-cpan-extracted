@@ -1,3 +1,7 @@
+0.026 2019-06-03 22:00:00+0000 
+  - Update to plotly.js 1.48.1
+  - Add new trace types: funnel, funnelarea
+  - Add support for 'meta' plotly attribute as 'pmeta' to avoid collision with MOP
 0.025 2019-04-23 23:00:00+0000 
   - Fix probleam with the release process
 0.024 2019-04-23 22:00:00+0000 

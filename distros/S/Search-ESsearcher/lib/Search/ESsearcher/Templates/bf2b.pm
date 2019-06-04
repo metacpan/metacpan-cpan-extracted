@@ -6,15 +6,15 @@ use warnings;
 
 =head1 NAME
 
-Search::ESsearcher::Templates::syslog - Provicdes support for fail2ban logs sucked down via beats.
+Search::ESsearcher::Templates::sfail2ban - Provicdes support for fail2ban logs sucked down via beats.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 =head1 LOGSTASH
 
@@ -225,7 +225,7 @@ return '
 					  }
 					   },
 					  [% END %]
-					  [% IF o.clientip %]
+					  [% IF o.ip %]
 					  {"query_string": {
 						  "default_field": "clientip",
 						  "query": [% aon( o.ip ).json %]
@@ -323,22 +323,27 @@ sub help{
 
 
 
+--status <status>    The status value of the message.
 --host <log host>    The system beats in question is running on.
---country <country>  The 2 letter country code.
 --jail <jail>        The fail2ban jail in question.
+--ip <ip>            The IP to search for.
+
+--country <country>  The 2 letter country code.
 --region <state>     The state/province/etc to search for.
 --postal <zipcode>   The postal code to search for.
 --city <cide>        The city to search for.
---ip <ip>            The IP to search for.
---dgt <date>          Date greater than.
---dgte <date>         Date greater than or equal to.
---dlt <date>          Date less than.
---dlte <date>         Date less than or equal to.
---msg <message>       Messages to match.
---field <field>       The term field to use for matching them all.
---field2 <field2>     The term field to use for what beats is setting.
---fieldv <fieldv>     The value of the term field to matching them all.
---field2v <field2v>   The value to look for in the field beats is setting.
+
+--dgt <date>         Date greater than.
+--dgte <date>        Date greater than or equal to.
+--dlt <date>         Date less than.
+--dlte <date>        Date less than or equal to.
+
+--msg <message>      Messages to match.
+
+--field <field>      The term field to use for matching them all.
+--field2 <field2>    The term field to use for what beats is setting.
+--fieldv <fieldv>    The value of the term field to matching them all.
+--field2v <field2v>  The value to look for in the field beats is setting.
 
 
 AND, OR, or NOT shortcut

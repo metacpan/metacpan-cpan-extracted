@@ -1,37 +1,30 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: printf (nonUS)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  $obj->parse($test[0]);
-  return $obj->printf($test[1]);
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
 $obj->config("dateformat","nonUS");
 
-$tests=q{
+sub test {
+   my(@test)=@_;
+   $obj->parse($test[0]);
+   return $obj->printf($test[1]);
+}
+
+my $tests=q{
 
 'Jan 3, 1996 8:11:12'  '%D %x'  =>  '01/03/96 03/01/96'
 
 };
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

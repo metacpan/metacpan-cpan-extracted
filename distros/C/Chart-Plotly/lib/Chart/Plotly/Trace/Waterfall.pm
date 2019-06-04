@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Waterfall::Textfont;
 use Chart::Plotly::Trace::Waterfall::Totals;
 use Chart::Plotly::Trace::Waterfall::Transform;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: Draws waterfall trace which is useful graph to displays the contribution of various elements (either positive or negative) in a bar chart. The data visualized by the span of the bars is set in `y` if `orientation` is set th *v* (the default) and the labels are set in `x`. By setting `orientation` to *h*, the roles are interchanged.
 
@@ -36,6 +36,10 @@ sub TO_JSON {
             }
         }
     }
+    my $plotly_meta = delete $hash{'pmeta'};
+    if ( defined $plotly_meta ) {
+        $hash{'meta'} = $plotly_meta;
+    }
     %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
     if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
@@ -53,7 +57,7 @@ has alignmentgroup => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "Set several traces linked to the same position axis or matching axes to the same offsetgroup where bars of the same position coordinate will line up.",
+      "Set several traces linked to the same position axis or matching axes to the same alignmentgroup. This controls whether bars compute their positional range dependently or independently.",
 );
 
 has base => ( is            => "rw",
@@ -156,6 +160,12 @@ has idssrc => ( is            => "rw",
 has increasing => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Waterfall::Increasing", );
 
+has insidetextanchor => (
+         is            => "rw",
+         isa           => enum( [ "end", "middle", "start" ] ),
+         documentation => "Determines if texts are kept at center or start/end points in `textposition` *inside* mode.",
+);
+
 has insidetextfont => ( is  => "rw",
                         isa => "Maybe[HashRef]|Chart::Plotly::Trace::Waterfall::Insidetextfont", );
 
@@ -176,6 +186,18 @@ has measure => (
 has measuresrc => ( is            => "rw",
                     isa           => "Str",
                     documentation => "Sets the source reference on plot.ly for  measure .",
+);
+
+has pmeta => (
+    is  => "rw",
+    isa => "Any|ArrayRef[Any]",
+    documentation =>
+      "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
+);
+
+has metasrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  meta .",
 );
 
 has name => ( is            => "rw",
@@ -240,8 +262,21 @@ has text => (
       "Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
 );
 
+has textangle => (
+    is => "rw",
+    documentation =>
+      "Sets the angle of the tick labels with respect to the bar. For example, a `tickangle` of -90 draws the tick labels vertically. With *auto* the texts may automatically be rotated to fit with the maximum size in bars.",
+);
+
 has textfont => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Waterfall::Textfont", );
+
+has textinfo => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Determines which trace information appear on the graph. In the case of having multiple waterfalls, totals are computed separately (per trace).",
+);
 
 has textposition => (
     is  => "rw",
@@ -357,7 +392,7 @@ Chart::Plotly::Trace::Waterfall - Draws waterfall trace which is useful graph to
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -457,7 +492,7 @@ Trace type.
 
 =item * alignmentgroup
 
-Set several traces linked to the same position axis or matching axes to the same offsetgroup where bars of the same position coordinate will line up.
+Set several traces linked to the same position axis or matching axes to the same alignmentgroup. This controls whether bars compute their positional range dependently or independently.
 
 =item * base
 
@@ -527,6 +562,10 @@ Sets the source reference on plot.ly for  ids .
 
 =item * increasing
 
+=item * insidetextanchor
+
+Determines if texts are kept at center or start/end points in `textposition` *inside* mode.
+
 =item * insidetextfont
 
 =item * legendgroup
@@ -540,6 +579,14 @@ An array containing types of values. By default the values are considered as 're
 =item * measuresrc
 
 Sets the source reference on plot.ly for  measure .
+
+=item * pmeta
+
+Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.
+
+=item * metasrc
+
+Sets the source reference on plot.ly for  meta .
 
 =item * name
 
@@ -581,7 +628,15 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
 
+=item * textangle
+
+Sets the angle of the tick labels with respect to the bar. For example, a `tickangle` of -90 draws the tick labels vertically. With *auto* the texts may automatically be rotated to fit with the maximum size in bars.
+
 =item * textfont
+
+=item * textinfo
+
+Determines which trace information appear on the graph. In the case of having multiple waterfalls, totals are computed separately (per trace).
 
 =item * textposition
 

@@ -1,3 +1,40 @@
+v0.90.0 2019-06-04T15:32:25Z
+ - docker ls show duration
+ - refactored
+
+v0.89.8 2019-06-03T15:56:47Z
+ - dist version deep rec fixed
+
+v0.89.7 2019-06-03T15:26:56Z
+ - dockerfile
+
+v0.89.6 2019-06-03T14:42:24Z
+ - docker fixes
+
+v0.89.5 2019-06-03T11:42:22Z
+ - pcore crypt protect option
+
+v0.89.4 2019-06-03T10:50:43Z
+ - typo
+
+v0.89.3 2019-06-03T10:20:57Z
+ - typo
+
+v0.89.2 2019-06-03T09:42:57Z
+ - typo
+
+v0.89.1 2019-06-03T09:33:37Z
+ - pcore crypt protect option
+
+v0.89.0 2019-06-03T08:37:45Z
+ - par encrypt fixed
+ - PAR scripts names as args
+ - PAR repack removed
+ - comments
+ - pcore.ini -> pcore.yaml
+ - docker api refactored
+ - pcore crypt protect option
+
 v0.88.1 2019-06-02T15:37:36Z
  - tls curves use auto
 

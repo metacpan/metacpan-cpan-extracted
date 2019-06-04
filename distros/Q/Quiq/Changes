@@ -1,3 +1,34 @@
+1.145 2019-06-04
+================
+[Quiq::Epoch]
+* Test ISO-Zeitangabe korrigiert.
+
+1.144 2019-06-04
+================
+[Quiq::Config]
+* Konstruktor umgeschrieben.
+
+[Quiq::ContentProcessor]
+* Methode fetch() durch fetchToDir(), fetchToFile() ersetzt.
+
+[Quiq::Epoch]
+* ISO-Zeitangabe als neues Konstruktorargument.
+* Methode loacaltime() hinzugefügt.
+
+[Quiq::Formatter]
+* Testcode verbessert.
+
+[Quiq::Path]
+* Methode checkFileSecurity() verbessert.
+
+[Quiq::Sql]
+* Doku bearbeitet.
+
+1.143 2019-06-01
+================
+[Quiq::Formatter]
+* Tests von Methode reducedIsoTime() verbessert
+
 1.142 2019-05-31
 ================
 [Quiq::Formatter]
@@ -143,7 +174,7 @@ Link-Generierung für POD verbessert.
 [Quiq::Database::Connection]
 * DBMS MSSQL eingeführt.
 
-[Sdoc1::Node]
+[Sdoc2::Node]
 * Link-Generierung für POD korrigiert.
 
 [Quiq::Cascm]
@@ -281,7 +312,7 @@ Konstruktor-Option -warnings hinzugefügt.
 
 Methode loadPage() hinzugefügt.
 
-[Sdoc1::Code]
+[Sdoc2::Code]
 Kosmetik.
 
 [Quiq::AnsiColor]
@@ -299,7 +330,7 @@ Fehlermeldung bei nicht-existentem Schlüssel verbessert.
 [Quiq::Path]
 Methode checkFileSecurity() hinzugefügt.
 
-[Sdoc1]
+[Sdoc2]
 Methoden code(), paragraph() hinzugefügt.
 
 Methode section() verallgemeinert.

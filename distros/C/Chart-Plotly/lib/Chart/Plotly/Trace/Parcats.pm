@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Parcats::Stream;
 use Chart::Plotly::Trace::Parcats::Tickfont;
 use Chart::Plotly::Trace::Parcats::Transform;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: Parallel categories diagram for multidimensional categorical data.
 
@@ -32,6 +32,10 @@ sub TO_JSON {
                 $hash{$name} = $value ? \1 : \0;
             }
         }
+    }
+    my $plotly_meta = delete $hash{'pmeta'};
+    if ( defined $plotly_meta ) {
+        $hash{'meta'} = $plotly_meta;
     }
     %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
@@ -103,6 +107,18 @@ has labelfont => ( is  => "rw",
 has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcats::Line", );
 
+has pmeta => (
+    is  => "rw",
+    isa => "Any|ArrayRef[Any]",
+    documentation =>
+      "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
+);
+
+has metasrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  meta .",
+);
+
 has name => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
@@ -159,7 +175,7 @@ Chart::Plotly::Trace::Parcats - Parallel categories diagram for multidimensional
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -277,6 +293,14 @@ Template string used for rendering the information that appear on hover box. Not
 =item * labelfont
 
 =item * line
+
+=item * pmeta
+
+Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.
+
+=item * metasrc
+
+Sets the source reference on plot.ly for  meta .
 
 =item * name
 

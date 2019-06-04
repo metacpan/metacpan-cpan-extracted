@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Carpet::Font;
 use Chart::Plotly::Trace::Carpet::Hoverlabel;
 use Chart::Plotly::Trace::Carpet::Stream;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: The data describing carpet axis layout is set in `y` and (optionally) also `x`. If only `y` is present, `x` the plot is interpreted as a cheater plot and is filled in using the `y` values. `x` and `y` may either be 2D arrays matching with each dimension matching that of `a` and `b`, or they may be 1D arrays with total length equal to that of `a` and `b`.
 
@@ -30,6 +30,10 @@ sub TO_JSON {
                 $hash{$name} = $value ? \1 : \0;
             }
         }
+    }
+    my $plotly_meta = delete $hash{'pmeta'};
+    if ( defined $plotly_meta ) {
+        $hash{'meta'} = $plotly_meta;
     }
     %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
@@ -157,6 +161,18 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
+has pmeta => (
+    is  => "rw",
+    isa => "Any|ArrayRef[Any]",
+    documentation =>
+      "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
+);
+
+has metasrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  meta .",
+);
+
 has name => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
@@ -239,7 +255,7 @@ Chart::Plotly::Trace::Carpet - The data describing carpet axis layout is set in 
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -370,6 +386,14 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 =item * idssrc
 
 Sets the source reference on plot.ly for  ids .
+
+=item * pmeta
+
+Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.
+
+=item * metasrc
+
+Sets the source reference on plot.ly for  meta .
 
 =item * name
 

@@ -1,44 +1,36 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: list_holidays (new years)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-
-  if ($test[0] eq 'configfile') {
-     $obj->config('EraseHolidays',1,
-                  'ConfigFile',"$testdir/$test[1]");
-     return ();
-  }
-
-  @ret = ();
-  ($y0,$y1) = @test;
-  foreach my $y ($y0..$y1) {
-    @date = $obj->list_holidays($y);
-    foreach my $date (@date) {
-       my $d = $date->value();
-       push(@ret,$d);
-    }
-  }
-  return @ret;
-}
-
-$obj = new Date::Manip::Date;
-
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-01-00:00:00,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+
+   if ($test[0] eq 'configfile') {
+      $obj->config('EraseHolidays',1,
+                   'ConfigFile',"$test[1]");
+      return ();
+   }
+
+   my @ret = ();
+   my($y0,$y1) = @test;
+   foreach my $y ($y0..$y1) {
+      my @date = $obj->list_holidays($y);
+      foreach my $date (@date) {
+         my $d = $date->value();
+         push(@ret,$d);
+      }
+   }
+   return @ret;
+}
+
+my $tests="
 
 configfile New_Years.1.cnf =>
 
@@ -121,9 +113,9 @@ configfile New_Years.4.cnf =>
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

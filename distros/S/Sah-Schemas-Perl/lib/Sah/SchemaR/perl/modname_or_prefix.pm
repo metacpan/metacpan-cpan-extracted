@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::modname_or_prefix;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2019-06-03'; # DATE
+our $VERSION = '0.019'; # VERSION
 
-our $rschema = ["str",[{description=>"\nPerl module name, e.g. `Foo::Bar`, `Foo::Bar::`.\n\nContains coercion rule so inputing `Foo-Bar` or `Foo/Bar` will be normalized to\n`Foo::Bar` while inputing `Foo-Bar-` or `Foo/Bar/` will be normalized to\n`Foo::Bar::`\n\nSee also: `perl::modname` and `perl::modprefix`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:::)?\\z",summary=>"Perl module name or prefix","x.completion"=>"perl_modname_or_prefix","x.perl.coerce_rules"=>["str_normalize_perl_modname_or_prefix"]}],["str"]];
+our $rschema = ["str",[{description=>"\nPerl module name e.g. `Foo::Bar` or prefix e.g. `Foo::Bar::`.\n\nContains coercion rule so inputing `Foo-Bar` or `Foo/Bar` will be normalized to\n`Foo::Bar` while inputing `Foo-Bar-` or `Foo/Bar/` will be normalized to\n`Foo::Bar::`\n\nSee also: `perl::modname` and `perl::modprefix`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:::)?\\z",summary=>"Perl module name or prefix","x.completion"=>"perl_modname_or_prefix","x.perl.coerce_rules"=>["str_normalize_perl_modname_or_prefix"]}],["str"]];
 
 1;
 # ABSTRACT: Perl module name or prefix
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modname_or_prefix - Perl module name or prefix
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::SchemaR::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
+This document describes version 0.019 of Sah::SchemaR::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
 
 =head1 DESCRIPTION
 

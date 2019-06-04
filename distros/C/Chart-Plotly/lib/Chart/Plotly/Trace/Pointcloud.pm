@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Pointcloud::Hoverlabel;
 use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
@@ -28,6 +28,10 @@ sub TO_JSON {
                 $hash{$name} = $value ? \1 : \0;
             }
         }
+    }
+    my $plotly_meta = delete $hash{'pmeta'};
+    if ( defined $plotly_meta ) {
+        $hash{'meta'} = $plotly_meta;
     }
     %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
@@ -102,6 +106,18 @@ has legendgroup => (
 
 has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pointcloud::Marker", );
+
+has pmeta => (
+    is  => "rw",
+    isa => "Any|ArrayRef[Any]",
+    documentation =>
+      "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
+);
+
+has metasrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  meta .",
+);
 
 has name => ( is            => "rw",
               isa           => "Str",
@@ -237,7 +253,7 @@ Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -329,6 +345,14 @@ Sets the source reference on plot.ly for  indices .
 Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * marker
+
+=item * pmeta
+
+Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.
+
+=item * metasrc
+
+Sets the source reference on plot.ly for  meta .
 
 =item * name
 

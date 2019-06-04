@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Histogram2dcontour::Transform;
 use Chart::Plotly::Trace::Histogram2dcontour::Xbins;
 use Chart::Plotly::Trace::Histogram2dcontour::Ybins;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` and `y` (where `x` and `y` represent marginal distributions, binning is set in `xbins` and `ybins` in this case) or `z` (where `z` represent the 2D distribution and binning set, binning is set by `x` and `y` in this case). The resulting distribution is visualized as a contour plot.
 
@@ -34,6 +34,10 @@ sub TO_JSON {
                 $hash{$name} = $value ? \1 : \0;
             }
         }
+    }
+    my $plotly_meta = delete $hash{'pmeta'};
+    if ( defined $plotly_meta ) {
+        $hash{'meta'} = $plotly_meta;
     }
     %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
@@ -74,6 +78,19 @@ has autocontour => (
     isa => "Bool",
     documentation =>
       "Determines whether or not the contour level attributes are picked by an algorithm. If *true*, the number of contour levels can be set in `ncontours`. If *false*, set the contour level attributes in `contours`.",
+);
+
+has bingroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set the `xbingroup` and `ybingroup` default prefix For example, setting a `bingroup` of *1* on two histogram2d traces will make them their x-bins and y-bins match separately.",
+);
+
+has coloraxis => (
+    is => "rw",
+    documentation =>
+      "Sets a reference to a shared color axis. References to these shared color axes are *coloraxis*, *coloraxis2*, *coloraxis3*, etc. Settings for these shared color axes are set in the layout, under `layout.coloraxis`, `layout.coloraxis2`, etc. Note that multiple color scales can be linked to the same color axis.",
 );
 
 has colorbar => ( is  => "rw",
@@ -166,6 +183,18 @@ has line => ( is  => "rw",
 has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Histogram2dcontour::Marker", );
 
+has pmeta => (
+    is  => "rw",
+    isa => "Any|ArrayRef[Any]",
+    documentation =>
+      "Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.",
+);
+
+has metasrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  meta .",
+);
+
 has name => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
@@ -252,6 +281,13 @@ has xaxis => (
       "Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.",
 );
 
+has xbingroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set a group of histogram traces which will have compatible x-bin settings. Using `xbingroup`, histogram2d and histogram2dcontour traces  (on axes of the same axis type) can have compatible x-bin settings. Note that the same `xbingroup` value can be used to set (1D) histogram `bingroup`",
+);
+
 has xbins => ( is  => "rw",
                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Histogram2dcontour::Xbins", );
 
@@ -278,6 +314,13 @@ has yaxis => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
+);
+
+has ybingroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Set a group of histogram traces which will have compatible y-bin settings. Using `ybingroup`, histogram2d and histogram2dcontour traces  (on axes of the same axis type) can have compatible y-bin settings. Note that the same `ybingroup` value can be used to set (1D) histogram `bingroup`",
 );
 
 has ybins => ( is  => "rw",
@@ -357,7 +400,7 @@ Chart::Plotly::Trace::Histogram2dcontour - The sample data from which statistics
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -428,6 +471,14 @@ Determines whether the colorscale is a default palette (`autocolorscale: true`) 
 
 Determines whether or not the contour level attributes are picked by an algorithm. If *true*, the number of contour levels can be set in `ncontours`. If *false*, set the contour level attributes in `contours`.
 
+=item * bingroup
+
+Set the `xbingroup` and `ybingroup` default prefix For example, setting a `bingroup` of *1* on two histogram2d traces will make them their x-bins and y-bins match separately.
+
+=item * coloraxis
+
+Sets a reference to a shared color axis. References to these shared color axes are *coloraxis*, *coloraxis2*, *coloraxis3*, etc. Settings for these shared color axes are set in the layout, under `layout.coloraxis`, `layout.coloraxis2`, etc. Note that multiple color scales can be linked to the same color axis.
+
 =item * colorbar
 
 =item * colorscale
@@ -486,6 +537,14 @@ Sets the legend group for this trace. Traces part of the same legend group hide/
 
 =item * marker
 
+=item * pmeta
+
+Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.
+
+=item * metasrc
+
+Sets the source reference on plot.ly for  meta .
+
 =item * name
 
 Sets the trace name. The trace name appear as the legend item and on hover.
@@ -542,6 +601,10 @@ Sets the sample data to be binned on the x axis.
 
 Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.
 
+=item * xbingroup
+
+Set a group of histogram traces which will have compatible x-bin settings. Using `xbingroup`, histogram2d and histogram2dcontour traces  (on axes of the same axis type) can have compatible x-bin settings. Note that the same `xbingroup` value can be used to set (1D) histogram `bingroup`
+
 =item * xbins
 
 =item * xcalendar
@@ -559,6 +622,10 @@ Sets the sample data to be binned on the y axis.
 =item * yaxis
 
 Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
+
+=item * ybingroup
+
+Set a group of histogram traces which will have compatible y-bin settings. Using `ybingroup`, histogram2d and histogram2dcontour traces  (on axes of the same axis type) can have compatible y-bin settings. Note that the same `ybingroup` value can be used to set (1D) histogram `bingroup`
 
 =item * ybins
 

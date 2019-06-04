@@ -1,8 +1,9 @@
 # Data::Hopen::Util::Filename - functions for manipulating filenames
 package Data::Hopen::Util::Filename;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Exporter';
 our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);

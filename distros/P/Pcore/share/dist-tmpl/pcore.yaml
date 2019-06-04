@@ -1,0 +1,26 @@
+---
+author:
+email:
+license: Perl_5
+copyright_holder:
+
+editor: vim
+
+PAUSE:
+    username:
+    password:
+
+BITBUCKET:
+    username:
+    password:
+    default_repo_namespace:
+
+GITHUB:
+    username:
+    token:
+    default_repo_namespace:
+
+DOCKER:
+    username:
+    password:
+    default_repo_namespace:

@@ -10,14 +10,13 @@ build_requires:
   Test::Alien: '0'
   perl: '5.008001'
 configure_requires:
-  Alien::Build: '1.19'
+  Alien::Build: '1.74'
   Alien::Build::MM: '0.32'
-  Alien::Build::Plugin::Fetch::CurlCommand: '1.19'
-  Alien::Build::Plugin::Fetch::Wget: '1.19'
+  Alien::Build::Plugin::Decode::Mojo: '0'
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,19 +29,23 @@ resources:
   bugtracker: https://github.com/plicease/Alien-LibreSSL/issues
   homepage: https://metacpan.org/pod/Alien::LibreSSL
   repository: git://github.com/plicease/Alien-LibreSSL.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.28'
   requires:
     share:
       Archive::Tar: '0'
       Config: '0'
-      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
-      LWP::Protocol::https: '0'
-      LWP::UserAgent: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

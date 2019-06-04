@@ -1,25 +1,14 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: UnixDate';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 
-$tests="
+my $tests="
 
 'Wed Jan 3, 1996  at 8:11:12'
 '%y %Y %m %f %b %h %B %U %W %j %d %e %v %a %A %w %E'
@@ -33,9 +22,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&UnixDate,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&UnixDate,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

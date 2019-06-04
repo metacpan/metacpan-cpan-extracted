@@ -113,8 +113,8 @@ lib/App/Sqitch/Role/TargetConfigCommand.pm
 lib/App/Sqitch/Target.pm
 lib/App/Sqitch/Types.pm
 lib/App/Sqitch/X.pm
-lib/LocaleData/de/LC_MESSAGES/App-Sqitch.mo
-lib/LocaleData/fr/LC_MESSAGES/App-Sqitch.mo
+lib/LocaleData/de_DE/LC_MESSAGES/App-Sqitch.mo
+lib/LocaleData/fr_FR/LC_MESSAGES/App-Sqitch.mo
 lib/LocaleData/it_IT/LC_MESSAGES/App-Sqitch.mo
 lib/sqitch-add-usage.pod
 lib/sqitch-add.pod

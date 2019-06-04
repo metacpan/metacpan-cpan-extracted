@@ -1,5 +1,12 @@
 Revision history for Search-ESsearcher
 
+0.2.0	 2019-06-03/04:30
+		 - The bf2b template now properly processes --ip
+		 - Add the httpAccess template.
+		 - Add a missing flag to the help for bf2b.
+		 - Added the option for pretty printing -S via -p
+
+
 0.1.0	 2019-06-02/09:00
 		 - Add bf2b, beats fail2ban support.
 		 - Actually set the output template now.

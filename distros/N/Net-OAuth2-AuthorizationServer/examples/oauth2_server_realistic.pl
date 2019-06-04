@@ -41,7 +41,9 @@ app->config(
 );
 
 my $resource_owner_logged_in_sub = sub {
-  my ( $c ) = @_;
+  my ( %args ) = @_;
+
+  my $c = $args{mojo_controller};
 
   if ( ! $c->session( 'logged_in' ) ) {
     # we need to redirect back to the /oauth/authorize route after
@@ -56,7 +58,10 @@ my $resource_owner_logged_in_sub = sub {
 };
 
 my $resource_owner_confirm_scopes_sub = sub {
-  my ( $c,$client_id,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$scopes_ref,$redirect_uri,$response_type )
+    = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
 
   my $is_allowed = $c->flash( "oauth_${client_id}" );
 
@@ -75,7 +80,10 @@ my $resource_owner_confirm_scopes_sub = sub {
 };
 
 my $verify_client_sub = sub {
-  my ( $c,$client_id,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$scopes_ref,$client_secret,$redirect_uri,$response_type )
+      = @args{ qw/ mojo_controller client_id scopes client_secret redirect_uri response_type / };
 
   my $oauth2_data = load_oauth2_data();
 
@@ -100,7 +108,10 @@ my $verify_client_sub = sub {
 };
 
 my $store_auth_code_sub = sub {
-  my ( $c,$auth_code,$client_id,$expires_in,$uri,@scopes ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$auth_code,$client_id,$expires_in,$uri,$scopes_ref ) =
+      @args{qw/ mojo_controller auth_code client_id expires_in redirect_uri scopes / };
 
   my $oauth2_data = load_oauth2_data();
 
@@ -111,7 +122,7 @@ my $store_auth_code_sub = sub {
     user_id       => $user_id,
     expires       => time + $expires_in,
     redirect_uri  => $uri,
-    scope         => { map { $_ => 1 } @scopes },
+    scope         => { map { $_ => 1 } @{ $scopes_ref } },
   };
 
   $oauth2_data->{auth_codes_by_client}{$client_id} = $auth_code;
@@ -122,7 +133,10 @@ my $store_auth_code_sub = sub {
 };
 
 my $verify_auth_code_sub = sub {
-  my ( $c,$client_id,$client_secret,$auth_code,$uri ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$client_secret,$auth_code,$uri )
+      = @args{qw/ mojo_controller client_id client_secret auth_code redirect_uri / };
 
   my $oauth2_data = load_oauth2_data();
 
@@ -166,10 +180,15 @@ my $verify_auth_code_sub = sub {
 };
 
 my $store_access_token_sub = sub {
+  my ( %args ) = @_;
+
   my (
     $c,$client,$auth_code,$access_token,$refresh_token,
     $expires_in,$scope,$old_refresh_token
-  ) = @_;
+  ) = @args{qw/
+    mojo_controller client_id auth_code access_token
+    refresh_token expires_in scopes old_refresh_token
+  / };
 
   my $oauth2_data = load_oauth2_data();
   my $user_id;
@@ -230,7 +249,10 @@ my $store_access_token_sub = sub {
 };
 
 my $verify_access_token_sub = sub {
-  my ( $c,$access_token,$scopes_ref,$is_refresh_token ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$access_token,$scopes_ref,$is_refresh_token )
+        = @args{qw/ mojo_controller access_token scopes is_refresh_token /};
 
   my $oauth2_data = load_oauth2_data();
 

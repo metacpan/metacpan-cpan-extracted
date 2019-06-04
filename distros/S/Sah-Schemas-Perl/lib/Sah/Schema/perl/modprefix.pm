@@ -1,13 +1,13 @@
 package Sah::Schema::perl::modprefix;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2019-06-03'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module prefix',
     description => <<'_',
 
-Perl module name, e.g. `Foo::Bar::`.
+Perl module prefix, e.g. `Foo::Bar::`.
 
 Contains coercion rule so you can also input:
 
@@ -49,11 +49,11 @@ Sah::Schema::perl::modprefix - Perl module prefix
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::Schema::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
+This document describes version 0.019 of Sah::Schema::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
 
 =head1 DESCRIPTION
 
-Perl module name, e.g. C<Foo::Bar::>.
+Perl module prefix, e.g. C<Foo::Bar::>.
 
 Contains coercion rule so you can also input:
 

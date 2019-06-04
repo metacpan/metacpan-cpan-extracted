@@ -10,7 +10,7 @@
 ##
 ## $Id: razor-check,v 1.1 2005/06/16 19:45:54 rsoderberg Exp $
 
-use lib qw(lib);
+
 use strict;
 use Razor2::Client::Agent;
 

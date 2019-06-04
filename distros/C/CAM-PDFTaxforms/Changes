@@ -8,3 +8,7 @@ Revision history for Perl module CAM::PDF
       - Apply CAM::PDF patches applicable to our overridden methods 
         from CAM::PDF bugs #58144, #122890 and #125299.
       - Add "KNOWN BUGS / TODO" section to docs.
+1.20  3 Jun, 2019
+      - Forgot to turn strict & warnings back on.
+      - Fix minor glitch in how checkboxes & radio buttons are handled.
+      - Minor code cleanups.

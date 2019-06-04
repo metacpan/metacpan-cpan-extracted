@@ -1,30 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: week_of_year';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  my($date,$first) = @test;
-  $obj->set("date",$date);
-  return $obj->week_of_year($first);
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
 $obj->config(qw(Jan1Week1 1));
 
-$tests="
+sub test {
+   my($date,$first) = @_;
+   $obj->set("date",$date);
+   return $obj->week_of_year($first);
+}
+
+my $tests="
 
 # Date, FirstDate
 
@@ -48,9 +40,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
+$::ti->tests(func  => \&test,
           tests => $tests);
-$t->done_testing();
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

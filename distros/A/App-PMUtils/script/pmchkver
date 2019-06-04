@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-01'; # DATE
-our $VERSION = '0.722'; # VERSION
+our $DATE = '2019-06-02'; # DATE
+our $VERSION = '0.723'; # VERSION
 
 use 5.010;
 use strict;
@@ -111,7 +111,11 @@ sub pmchkver {
     }
 
     [200, "OK", $args{detail} ? \@recs : [map {$_->{latest}} @recs],
-     {'table.fields' => [qw/module local_version cpan_version installed on_cpan latest/]}];
+     {
+         'table.fields' => [qw/module local_version cpan_version installed on_cpan latest/],
+         ('cmdline.result.interactive' => "Installed $recs[0]{module} ($recs[0]{local_version}) is ".
+              ($recs[0]{latest} ? "the latest" : "NOT the latest ($recs[0]{cpan_version})")) x !!(@recs == 1),
+     }];
 }
 
 Perinci::CmdLine::Any->new(
@@ -133,7 +137,7 @@ pmchkver - Check local module's version against version on CPAN
 
 =head1 VERSION
 
-This document describes version 0.722 of pmchkver (from Perl distribution App-PMUtils), released on 2019-06-01.
+This document describes version 0.723 of pmchkver (from Perl distribution App-PMUtils), released on 2019-06-02.
 
 =head1 SYNOPSIS
 

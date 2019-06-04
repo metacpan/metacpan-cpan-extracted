@@ -264,11 +264,14 @@ sub help{
 --facility <facility> The syslog facility.
 --severity <severity> The severity level of the message.
 --pid <pid>           The PID that sent the message.
+
 --dgt <date>          Date greater than.
 --dgte <date>         Date greater than or equal to.
 --dlt <date>          Date less than.
 --dlte <date>         Date less than or equal to.
+
 --msg <message>       Messages to match.
+
 --field <field>       The term field to use for matching them all.
 --fieldv <fieldv>     The value of the term field to matching them all.
 

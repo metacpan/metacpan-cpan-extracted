@@ -106,10 +106,10 @@ testhere:   # Run the tests from lib rather than blib
 \tprove -lj4
 
 README.md: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
-\t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f md --appveyor cxw42/data-hopen --avbadge hopenbuild/data-hopen
+\t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f md --appveyor cxw42/data-hopen --travis hopenbuild/Data-Hopen
 
 README: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
-\t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text --appveyor hopenbuild/Data-Hopen --avbadge hopenbuild/data-hopen
+\t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text --appveyor hopenbuild/Data-Hopen --travis hopenbuild/Data-Hopen
 
 all :: README.md README
 dist :: README.md README
@@ -143,7 +143,7 @@ EOT
 # Main options for EUMM
 my %opts = (
     NAME             => 'Data::Hopen',
-    AUTHOR           => q{Christopher White <cxwembedded@gmail.com>},
+    AUTHOR           => q{Christopher White <cxw@cpan.org>},
     VERSION_FROM     => $VERSION_FROM,
     ABSTRACT_FROM    => $VERSION_FROM,
     LICENSE          => 'lgpl_2_1',
@@ -290,9 +290,14 @@ my %opts = (
                 requires => {
                     'App::RewriteVersion' => '0',   # for perl-bump-version
                     'Module::Metadata' => '1.000016',
+                    'Test::Kwalitee' => '0',
                 },
             },
         },
+
+        x_contributors => [
+            'Mohammad S Anwar <manwar@cpan.org>',
+        ],
 
         @provides,
 

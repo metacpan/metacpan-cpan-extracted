@@ -1,35 +1,28 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'base :: _fix_year (C)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  @ret = $obj->_fix_year(@test);
-  return @ret;
-}
-
-$dmt = new Date::Manip::TZ;
-$obj = $dmt->base();
+our $dmt = new Date::Manip::TZ;
+our $obj = $dmt->base();
 $dmt->config("forcedate","now,America/New_York");
 $obj->_method("c");
 
-$y  = ( localtime(time) )[5];
-$y += 1900;
-$y  =~ /^(..)/;
-$c  = $1;
+sub test {
+   my(@test)=@_;
+   my @ret = $obj->_fix_year(@test);
+   return @ret;
+}
 
-$tests="
+my $y  = ( localtime(time) )[5];
+$y    += 1900;
+$y     =~ /^(..)/;
+my $c  = $1;
+
+my $tests="
 
 1999  => 1999
 
@@ -43,9 +36,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 
 #Local Variables:

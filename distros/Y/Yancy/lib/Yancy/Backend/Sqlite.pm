@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -155,8 +155,8 @@ sub filter_table { return $_[1] !~ /^sqlite_/ }
 
 my %DEFAULT2FIXUP = (
     NULL => undef,
-    TRUE => true,
-    FALSE => false,
+    TRUE => 1,
+    FALSE => 0,
 );
 sub fixup_default {
     my ( $self, $value ) = @_;
@@ -205,7 +205,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

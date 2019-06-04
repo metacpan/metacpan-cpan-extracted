@@ -1,11 +1,11 @@
 package CAM::PDFTaxforms;
 
 use 5.006;
-#use warnings;
-#use strict;
+use warnings;
+use strict;
 use parent 'CAM::PDF';
 
-our $VERSION = '1.10';
+our $VERSION = '1.20';
 
 =head1 NAME
 
@@ -320,7 +320,7 @@ LOOP1:   while (@list > 0)
       next if (!$key || ref($key));
 
       my $objnode = $self->getFormField($key);
-      next if (!$objnode);
+      next unless ($objnode);
 
       my $objnum = $objnode->{objnum};
       my $gennum = $objnode->{gennum};
@@ -330,48 +330,56 @@ LOOP1:   while (@list > 0)
 
       # This read-write dict does not include inherited properties
       my $dict = $self->getValue($objnode);
-      $dict->{V}  = CAM::PDF::Node->new('string', $value, $objnum, $gennum);
+      $dict->{V} = CAM::PDF::Node->new('string', $value, $objnum, $gennum);
 
       if ($propdict->{FT} && $self->getValue($propdict->{FT}) =~ /^(Tx|Btn)$/o)  # Is it a text field?
       {
          my $fieldType = $1;  #JWT:ADDED NEXT 6 TO ALLOW SETTING OF CHECKBOX BUTTONS (VALUE MUST BE EITHER "Yes" or "Off"!:
-         if ($fieldType eq 'Btn')
+         if ($fieldType eq 'Btn')   #WE'RE A BUTTON (CHECKBOX OR RADIO)
          {
-            if ($dict->{AS}->{value} =~ /^(?:Yes|Off)$/o) {
-               $dict->{AS}->{value} = $dict->{V}->{value};
-	        } else {
-               my @kidnames = $self->getFormFieldList($key);
-               if (@kidnames > 0) {
-                  local * setRadioButtonKids = sub {
-                  	  my ($indx, $vindx) = @_;
-                  	  my $objnode = $self->getFormField($kidnames[$indx]);
-                  	  return  unless ($objnode);
-                  	  my $dict = $self->getValue($objnode);
-                     if ($indx == $vindx) {
-                        $dict->{AS}->{value} = (!$value || $value =~ /^(?:Off|No|Unchecked)$/io) ? 'Off' : 'Yes';   #JWT:HAVE TO HAVE TO GET THE RADIO BUTTON CHECKED!
-                     } else {
-                     	  $dict->{AS}->{value} = 'Off';
-                     }
-                     return;
-                  };
-
-                  my $vindx = $value - 1;
-                  for (my $i=0;$i<=$#kidnames;$i++) {
-                  	  &setRadioButtonKids($i, $vindx);
+            my @kidnames = $self->getFormFieldList($key);
+            if (@kidnames > 0) {    #WE HAVE KIDS, SO WE'RE A RADIO-BUTTON:
+               local * setRadioButtonKids = sub {
+               	  my ($indx, $vindx) = @_;
+               	  my $objnode = $self->getFormField($kidnames[$indx]);
+               	  return  unless ($objnode);
+               	  my $dict = $self->getValue($objnode);
+                  if ($indx == $vindx) {
+                     $dict->{AS}->{value} = $value;
+                  } else {
+                  	  $dict->{AS}->{value} = 'Off';
                   }
+                  return;
+               };
+
+               $dict->{V}->{value} = ($value > 0) ? $value : 'Off';
+               my $vindx = $value - 1;
+               for (my $i=0;$i<=$#kidnames;$i++) {
+               	  &setRadioButtonKids($i, $vindx);
                }
-	        }
+            } else {                #WE'RE A SINGLE CHECKBOX:
+            	  if (!$value || $value =~ /^(?:Off|No|Unchecked)$/io) {  #USER WANTS IT UNCHECKED:
+            	     $dict->{AS}->{value} = 'Off';
+            	     $dict->{V}->{value} = 'Off';
+            	  } else {  #USER WANTS IT CHECKED:
+            	     my ($onValue) = defined($dict->{AP}->{value}->{N}->{value}
+            	           && ref($dict->{AP}->{value}->{N}->{value}) =~ /^HASH/) 
+            	        ? keys(%{$dict->{AP}->{value}->{N}->{value}}) : ('Yes');
+            	     $dict->{AS}->{value} = $onValue;
+            	     $dict->{V}->{value} = $onValue;
+            	  }
+            }
             $filled++;
             next LOOP1;
          }
-         else
+         else  #WE'RE A TEXT FIELD:
          {
          	  $dict->{V}->{value} = $value;
          }
 
          # Set up display of form value
-         $dict->{AP} = CAM::PDF::Node->new('dictionary', {}, $objnum, $gennum)  if (!$dict->{AP});
-         if (!$dict->{AP}->{value}->{N})
+         $dict->{AP} = CAM::PDF::Node->new('dictionary', {}, $objnum, $gennum)  unless ($dict->{AP});
+         unless ($dict->{AP}->{value}->{N})
          {
             my $newobj = CAM::PDF::Node->new('object',
                                             CAM::PDF::Node->new('dictionary',{}),
@@ -379,12 +387,18 @@ LOOP1:   while (@list > 0)
             my $num = $self->appendObject(undef, $newobj, 0);
             $dict->{AP}->{value}->{N} = CAM::PDF::Node->new('reference', $num, $objnum, $gennum);
          }
-         my $formobj = $self->dereference($dict->{AP}->{value}->{N}->{value});  #xxxJWT:CHGD. TO NEXT:
+         my $formobj = ($self->dereference($fieldType eq 'Btn' && defined($dict->{AS}->{value})
+               && $dict->{AS}->{value} 
+               && defined($dict->{AP}->{value}->{N}->{value}->{$dict->{AS}->{value}}->{value})
+                  ? $dict->{AP}->{value}->{N}->{value}->{$dict->{AS}->{value}}->{value}
+                  : $dict->{AP}->{value}->{N}->{value}));
          my $formonum = $formobj->{objnum};
          my $formgnum = $formobj->{gennum};
          my $formdict = $self->getValue($formobj);
 
-         $formdict->{Subtype} = CAM::PDF::Node->new('label', 'Form', $formonum, $formgnum)  if (!$formdict->{Subtype});
+         $formdict->{Subtype} = CAM::PDF::Node->new('label', 'Form', $formonum, $formgnum)
+               unless ($formdict->{Subtype});
+
          my @rect = (0,0,0,0);
          if ($dict->{Rect})
          {
@@ -400,7 +414,7 @@ LOOP1:   while (@list > 0)
          }
          my $dx = $rect[2]-$rect[0];
          my $dy = $rect[3]-$rect[1];
-         if (!$formdict->{BBox})
+         unless ($formdict->{BBox})
          {
             $formdict->{BBox} = CAM::PDF::Node->new('array',
                [
@@ -545,7 +559,7 @@ LOOP1:   while (@list > 0)
                   $width -= 0.29  while ($commas =~ s/\,//o);  #JWT:FIXME (HACK) FUDGE FOR WIDTH OF COMMAS (SMALLER THAN DIGITS)
                }
                my $diff = $dx - $width * $fontsize;
-               $diff = 0  if ($diff < 0);
+               $diff = 0  if ($diff < 0);  #JWT:ADDED.
 
                if ($flags{Justify} eq 'center')
                {
@@ -570,10 +584,9 @@ LOOP1:   while (@list > 0)
 
          $text =  "$tl $da $tm $text Tj";
          $text = "$background /Tx BMC q 1 1 ".($dx-$border).q{ }.($dy-$border)." re W n BT $text ET Q EMC";
-#         my $len = ($fieldType eq 'Btn') ? 0 : length($text);  #JWT:CHANGED
          unless ($fieldType eq 'Btn')  #JWT:ADDED CONDITION:
          {
-            $formdict->{Length} = CAM::PDF::Node->new('number', $len, $formonum, $formgnum);
+            $formdict->{Length} = CAM::PDF::Node->new('number', length($text), $formonum, $formgnum);
             # JWT:NEXT 3 ADDED PER BUG#125299 PATCH:
             $formdict->{StreamData} = CAM::PDF::Node->new('stream', $text, $formonum, $formgnum);
             delete $formdict->{ Filter };
@@ -581,18 +594,21 @@ LOOP1:   while (@list > 0)
          }
 
          if (@rsrcs > 0) {
-            $formdict->{Resources} = CAM::PDF::Node->new('dictionary', {}, $formonum, $formgnum)  if (!$formdict->{Resources});
+            $formdict->{Resources} = CAM::PDF::Node->new('dictionary', {}, $formonum, $formgnum)
+                  unless ($formdict->{Resources});
+
             my $rdict = $self->getValue($formdict->{Resources});
-            if (!$rdict->{ProcSet})
+            unless ($rdict->{ProcSet})
             {
                $rdict->{ProcSet} = CAM::PDF::Node->new('array',
                   [
                      CAM::PDF::Node->new('label', 'PDF', $formonum, $formgnum),
                      CAM::PDF::Node->new('label', 'Text', $formonum, $formgnum),
                   ],
-                  $formonum,$formgnum);
+                  $formonum, $formgnum);
             }
-            $rdict->{Font} = CAM::PDF::Node->new('dictionary', {}, $formonum, $formgnum)  if (!$rdict->{Font});
+            $rdict->{Font} = CAM::PDF::Node->new('dictionary', {}, $formonum, $formgnum)
+                  unless ($rdict->{Font});
 
             my $fdict = $self->getValue($rdict->{Font});
 
@@ -605,7 +621,7 @@ LOOP1:   while (@list > 0)
                #JWT: CHGD. TO NEXT 11 (BUG#58144 PATCH): if (!$fobj)
                my $root = $self->getRootDict()->{AcroForm};
                my $ifdict = $self->getValue($root);
-               if (!exists $ifdict->{DR})
+               unless (exists $ifdict->{DR})
                {
                   #JWT:die "Could not find resource /$font while preparing form field $key\n";
                   warn "Could not find resource1 /$font while preparing form field $key\n";
@@ -613,7 +629,7 @@ LOOP1:   while (@list > 0)
                my $dr = $self->getValue($ifdict->{DR});
                my $fobjnum = $dr->{Font}->{value}->{$font}->{value};
 
-               if (!$fobjnum)
+               unless ($fobjnum)
                {
                   #JWT:die "Could not find resource /$font while preparing form field $key\n";
                   warn "Could not find resource2 /$font while preparing form field $key\n";
@@ -649,17 +665,17 @@ sub getFormFieldList
    if (defined $parentname && $parentname ne q{})
    {
       my $parent = $self->getFormField($parentname);
-      return if (!$parent);
+      return  unless ($parent);
       my $dict = $self->getValue($parent);
-      return if (!exists $dict->{Kids});
+      return  unless (exists $dict->{Kids});
       $kidlist = $self->getValue($dict->{Kids});
    }
    else
    {
       my $root = $self->getRootDict()->{AcroForm};
-      return if (!$root);
+      return  unless ($root);
       my $parent = $self->getValue($root);
-      return if (!exists $parent->{Fields});
+      return  unless (exists $parent->{Fields});
       $kidlist = $self->getValue($parent->{Fields});
    }
 
@@ -707,9 +723,9 @@ sub getFormField
    my $self = shift;
    my $fieldname = shift;
 
-   return if (!defined $fieldname);
+   return  unless (defined $fieldname);
 
-   if (! exists $self->{formcache}->{$fieldname})
+   unless (exists $self->{formcache}->{$fieldname})
    {
       my $kidlist;
       my $parent;
@@ -762,10 +778,7 @@ sub writeAny
    my $self = shift;
    my $objnode = shift;
 
-   if (! ref $objnode)
-   {
-      die 'Not a ref';
-   }
+   die 'Not a ref'  unless (ref $objnode);
 
    my $key = $objnode->{type};
 

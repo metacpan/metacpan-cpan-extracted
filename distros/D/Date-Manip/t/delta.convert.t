@@ -1,30 +1,23 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: convert';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($delta,$to)=@_;
-  $obj->parse($delta);
-  $obj->convert($to);
-  @val = $obj->value();
-  return (@val,($$obj{"data"}{"mode"} eq 'business' ? 1 : 0) );
-}
-
-$obj = new Date::Manip::Delta;
+my $obj = new Date::Manip::Delta;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my($delta,$to)=@_;
+   $obj->parse($delta);
+   $obj->convert($to);
+   my @val = $obj->value();
+   return (@val,($$obj{"data"}{"mode"} eq 'business' ? 1 : 0) );
+}
+
+my $tests="
 
 '0:0:0:0:2:30:0'                exact   => 0 0 0 0 2 30 0 0
 
@@ -186,9 +179,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

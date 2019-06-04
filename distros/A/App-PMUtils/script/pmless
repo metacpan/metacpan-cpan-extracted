@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-01'; # DATE
-our $VERSION = '0.722'; # VERSION
+our $DATE = '2019-06-02'; # DATE
+our $VERSION = '0.723'; # VERSION
 
 use 5.010;
 use strict;
@@ -58,7 +58,7 @@ pmless - Show Perl module source code with `less`
 
 =head1 VERSION
 
-This document describes version 0.722 of pmless (from Perl distribution App-PMUtils), released on 2019-06-01.
+This document describes version 0.723 of pmless (from Perl distribution App-PMUtils), released on 2019-06-02.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Koha::Contrib::Mirabel;
-$Koha::Contrib::Mirabel::VERSION = '1.0.0';
+$Koha::Contrib::Mirabel::VERSION = '1.0.2';
 # ABSTRACT: Synchronise un catalogue Koha avec Mir@bel
 use Moose;
 
@@ -20,7 +20,7 @@ use MARC::Moose::Field::Std;
 has url => (
     is => 'rw',
     isa => 'Str',
-    default => 'http://www.reseau-mirabel.info/site/service?',
+    default => 'https://reseau-mirabel.info/site/service?',
 );
 
 
@@ -122,7 +122,12 @@ sub sync {
         say "** TEST **" unless $self->doit;
     }
 
-    my $doc = get($self->url . 'partenaire=' . $self->partenaire);
+    my $url = $self->url . 'partenaire=' . $self->partenaire;
+    my $doc = get($url);
+    unless ($doc) {
+        say "Le service web ne répond pas : $url";
+        exit;
+    }
     my $xml = XML::Simple->new(
         keyattr => [], SuppressEmpty => 1,
         ForceArray => [ 'revue', 'service' ], );
@@ -173,7 +178,7 @@ sub clean {
     my $found = 0;
     my $tag = $self->tag;
     for my $biblionumber (@{$self->all_bibs}) {
-        my $record = GetMarcBiblio($biblionumber);
+        my $record = GetMarcBiblio( { biblionumber => $biblionumber } );
         $record = MARC::Moose::Record::new_from($record, 'Legacy');
         my $has_id = 0;
         for my $field ( $record->field($tag) ) {
@@ -246,7 +251,7 @@ Koha::Contrib::Mirabel - Synchronise un catalogue Koha avec Mir@bel
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 ATTRIBUTES
 
@@ -257,8 +262,8 @@ de l'instance courtante de Koha.
 
 =head2 tag
 
-Le tag du champ des notices biblio où se trouvent les infor Mir@bel. Récupéré
-dans la préférence MirabelTag de l'instance courtante de Koha.
+Le tag du champ des notices biblio où se trouvent les info Mir@bel. Récupéré
+dans la préférence MirabelTag de l'instance courante de Koha.
 
 =head2 verbose
 
@@ -267,7 +272,8 @@ traitements réalisés.
 
 =head2 doit
 
-Effecture réellement les traitements de mise à jour du Catalogue Koha. Par défaut NON.
+Effectue réellement les traitements de mise à jour du Catalogue Koha. Par
+défaut NON.
 
 =head1 METHODS
 

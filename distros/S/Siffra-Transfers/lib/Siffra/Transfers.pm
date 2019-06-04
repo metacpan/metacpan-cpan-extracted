@@ -31,7 +31,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.05';
+    $VERSION = '0.06';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -59,9 +59,8 @@ BEGIN
 
 sub new
 {
-    my ( $class, %parameters ) = @_;
     $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
-
+    my ( $class, %parameters ) = @_;
     my $self = $class->SUPER::new( %parameters );
 
     $self->_initialize( %parameters );
@@ -71,9 +70,9 @@ sub new
 
 sub _initialize()
 {
+    $log->debug( "_initialize", { package => __PACKAGE__ } );
     my ( $self, %parameters ) = @_;
     $self->SUPER::_initialize( %parameters );
-    $log->debug( "_initialize", { package => __PACKAGE__ } );
 
     $self->{ config } = {
         protocol       => undef,

@@ -18,7 +18,7 @@ use Date::Manip::Zones;
 use Date::Manip::TZ;
 
 our($VERSION);
-$VERSION='6.76';
+$VERSION='6.77';
 
 our($DEBUG);
 $DEBUG = 0;

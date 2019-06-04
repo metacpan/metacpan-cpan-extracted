@@ -1,31 +1,20 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: NthDayOfYear';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 
 sub Test_NthDayOfYear {
-  my(@tmp)=&Date_NthDayOfYear(@_);
-  push @tmp,sprintf("%5.2f",pop(@tmp));
-  return join(":",@tmp);
+   my(@tmp)=&Date_NthDayOfYear(@_);
+   push @tmp,sprintf("%5.2f",pop(@tmp));
+   return join(":",@tmp);
 }
 
-$tests="
+my $tests="
 
 1997 10   => '1997:1:10:0:0: 0.00'
 
@@ -43,9 +32,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&Test_NthDayOfYear,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&Test_NthDayOfYear,
+             tests => $tests);
+$::ti->done_testing();
 
 
 #Local Variables:

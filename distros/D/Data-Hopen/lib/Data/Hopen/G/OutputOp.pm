@@ -1,9 +1,10 @@
 # Data::Hopen::G::OutputOp - operation with a fixed output
 package Data::Hopen::G::OutputOp;
 use Data::Hopen;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny qw(output);

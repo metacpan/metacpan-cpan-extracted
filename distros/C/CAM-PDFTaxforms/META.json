@@ -1,46 +1,58 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "CAM::PDF wrapper to also allow editing of checkboxes (ie. for IRS Tax forms).",
    "author" : [
-      "unknown"
+      "Jim Turner. <turnerjw784@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4212",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "CAM-PDFTaxforms",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Getopt::Long" : "2.0",
+            "Pod::Usage" : "1.0",
+            "Test::Memory::Cycle" : "1.02",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         },
          "requires" : {
             "CAM::PDF" : "1.52",
             "Crypt::RC4" : "2.02",
             "Digest::MD5" : "2.16",
-            "Test::More" : "0",
-            "Text::PDF" : "0.29"
+            "Text::PDF" : "0.29",
+            "perl" : "v5.6.0"
          }
       }
    },
+   "provides" : {
+      "CAM::PDFTaxforms" : {
+         "file" : "lib/CAM/PDFTaxforms.pm",
+         "version" : "1.20"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.10",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

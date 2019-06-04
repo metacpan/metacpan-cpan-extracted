@@ -15,8 +15,8 @@ lib/Pcore/API/AntiCaptcha/Role.pm
 lib/Pcore/API/BitBucket.pm
 lib/Pcore/API/Client.pm
 lib/Pcore/API/Cloudflare.pm
+lib/Pcore/API/Docker/Cloud.pm
 lib/Pcore/API/Docker/Engine.pm
-lib/Pcore/API/Docker/Hub.pm
 lib/Pcore/API/Dynadot.pm
 lib/Pcore/API/Facebook.pm
 lib/Pcore/API/Facebook/Marketing.pm
@@ -103,13 +103,10 @@ lib/Pcore/Dist/CLI/Crypt/Encrypt.pm
 lib/Pcore/Dist/CLI/Deploy.pm
 lib/Pcore/Dist/CLI/Docker.pm
 lib/Pcore/Dist/CLI/Docker/Build.pm
-lib/Pcore/Dist/CLI/Docker/Create.pm
 lib/Pcore/Dist/CLI/Docker/From.pm
 lib/Pcore/Dist/CLI/Docker/Init.pm
 lib/Pcore/Dist/CLI/Docker/Ls.pm
 lib/Pcore/Dist/CLI/Docker/Remove.pm
-lib/Pcore/Dist/CLI/Docker/Status.pm
-lib/Pcore/Dist/CLI/Docker/Trigger.pm
 lib/Pcore/Dist/CLI/Id.pm
 lib/Pcore/Dist/CLI/Issues.pm
 lib/Pcore/Dist/CLI/Log.pm
@@ -260,6 +257,7 @@ share/dist-tmpl/docker/share/docker.yaml
 share/dist-tmpl/git/.gitignore
 share/dist-tmpl/hg/.hgignore
 share/dist-tmpl/par/share/par.yaml
+share/dist-tmpl/pcore.yaml
 share/dist-tmpl/tmpl-app/Dockerfile
 share/dist-tmpl/tmpl-app/bin/main.pl
 share/dist-tmpl/tmpl-app/cpanfile

@@ -1,34 +1,27 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'tz :: define_offset';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($offset,@args) = @_;
-  $obj->define_offset("reset");
-  ($err,$val) = $obj->define_offset($offset,@args);
-  return ($err,$val)  if ($err);
-  @ret = (0);
-  push(@ret,$obj->zone($offset,"stdonly"));
-  push(@ret,1);
-  push(@ret,$obj->zone($offset,"dstonly"));
-  return @ret;
-}
-
-$obj = new Date::Manip::TZ;
+our $obj = new Date::Manip::TZ;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my($offset,@args) = @_;
+   $obj->define_offset("reset");
+   my($err,$val) = $obj->define_offset($offset,@args);
+   return ($err,$val)  if ($err);
+   my @ret = (0);
+   push(@ret,$obj->zone($offset,"stdonly"));
+   push(@ret,1);
+   push(@ret,$obj->zone($offset,"dstonly"));
+   return @ret;
+}
+
+my $tests="
 
 # +06:30:00;
 #    0 => [
@@ -83,9 +76,9 @@ Asia/Yangon
    Asia/Kolkata
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

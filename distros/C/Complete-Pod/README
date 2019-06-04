@@ -1,0 +1,85 @@
+NAME
+    Complete::Pod - Complete with installed Perl .pod names
+
+VERSION
+    This document describes version 0.001 of Complete::Pod (from Perl
+    distribution Complete-Pod), released on 2019-06-03.
+
+SYNOPSIS
+     use Complete::Pod qw(complete_pod);
+     my $res = complete_pod(word => 'Text::A');
+     # -> ['CGI', 'CORE', 'Config', 'perllocal', 'perlsecret']
+
+FUNCTIONS
+  complete_pod
+    Usage:
+
+     complete_pod(%args) -> any
+
+    Complete with installed Perl .pod names.
+
+    This is basically Complete::Module's "complete_module" but with
+    "find_pm"=0, "find_pmc"=0, and "find_pod"=1.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   find_prefix => *bool* (default: 1)
+
+        Whether to find module prefixes.
+
+    *   ns_prefix => *str*
+
+        Namespace prefix.
+
+        This is useful if you want to complete module under a specific
+        namespace (instead of the root). For example, if you set "ns_prefix"
+        to "Dist::Zilla::Plugin" (or "Dist::Zilla::Plugin::") and word is
+        "F", you can get "['FakeRelease', 'FileFinder::', 'FinderCode']"
+        (those are modules under the "Dist::Zilla::Plugin::" namespace).
+
+    *   path_sep => *str*
+
+        Path separator.
+
+        For convenience in shell (bash) completion, instead of defaulting to
+        "::" all the time, will look at "word". If word does not contain any
+        "::" then will default to "/". This is because "::" (contains colon)
+        is rather problematic as it is by default a word-break character in
+        bash and the word needs to be quoted to avoid word-breaking by bash.
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (any)
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Pod>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Pod>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Pod>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Complete::Module
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

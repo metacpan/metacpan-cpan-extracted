@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.08';
+    $VERSION = '0.09';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -84,9 +84,8 @@ See Also   :
 
 sub new
 {
-    my ( $class, %parameters ) = @_;
     $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
-
+    my ( $class, %parameters ) = @_;
     my $self = $class->SUPER::new( %parameters );
 
     return $self;
@@ -94,12 +93,20 @@ sub new
 
 sub _initialize()
 {
-    my ( $self, %parameters ) = @_;
     $log->debug( "_initialize", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+    $self->SUPER::_initialize( %parameters );
 
-    require JSON::XS;
+    eval { require JSON::XS; };
     $self->{ json } = JSON::XS->new->utf8;
 } ## end sub _initialize
+
+sub _finalize()
+{
+    $log->debug( "_finalize", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+    $self->SUPER::_finalize( %parameters );
+}
 
 sub END
 {
@@ -348,7 +355,7 @@ sub parseBlockText()
     } ## end if ( !$file || !-e $file...)
 
     $log->info( "Começando a parsear o arquivo [ $file ]..." );
-    open FH, "<", $file or die "Erro ao abrir o arquivo [ $file ]...";
+    open FH, "<:encoding(UTF-8)", $file or die "Erro ao abrir o arquivo [ $file ]...";
     while ( my $linha = <FH> )
     {
         $linha =~ s/\n|\r//g;

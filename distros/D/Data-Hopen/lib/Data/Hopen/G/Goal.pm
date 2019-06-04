@@ -1,8 +1,9 @@
 # Data::Hopen::G::Goal - A named build goal
 package Data::Hopen::G::Goal;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {

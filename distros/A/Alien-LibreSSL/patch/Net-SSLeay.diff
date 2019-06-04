@@ -1,8 +1,29 @@
-Index: inc/Module/Install/PRIVATE/Net/SSLeay.pm
-===================================================================
---- inc/Module/Install/PRIVATE/Net/SSLeay.pm	(revision 499)
-+++ inc/Module/Install/PRIVATE/Net/SSLeay.pm	(working copy)
-@@ -26,26 +26,29 @@
+diff --git a/SSLeay.xs b/SSLeay.xs
+index 67acfe0..10dbb4a 100644
+--- a/SSLeay.xs
++++ b/SSLeay.xs
+@@ -849,13 +849,15 @@ int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
+ 
+     res = POPi;
+     if (res) {
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++	STRLEN newsecretlen;
++#endif
+         /* See if there is a preferred cipher selected, if so it is an index into the stack */
+         if (SvIOK(pref_cipher))
+             *cipher = sk_SSL_CIPHER_value(peer_ciphers, SvIV(pref_cipher));
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x10100000L
+ 	/* Use any new master secret set by the callback function in secret */
+-	STRLEN newsecretlen;
+ 	char* newsecretdata = SvPV(secretsv, newsecretlen);
+ 	memcpy(secret, newsecretdata, newsecretlen);
+ #endif
+diff --git a/inc/Module/Install/PRIVATE/Net/SSLeay.pm b/inc/Module/Install/PRIVATE/Net/SSLeay.pm
+index ad0203a..e89637a 100644
+--- a/inc/Module/Install/PRIVATE/Net/SSLeay.pm
++++ b/inc/Module/Install/PRIVATE/Net/SSLeay.pm
+@@ -26,25 +26,53 @@ sub ssleay {
      my $prefix = $self->find_openssl_prefix;
      my $exec   = $self->find_openssl_exec($prefix);
  
@@ -14,17 +35,51 @@ Index: inc/Module/Install/PRIVATE/Net/SSLeay.pm
 -    from http://www.openssl.org/.
 -EOM
 -        exit 0; # according http://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
+-    }
 +    if (-x $exec) {
 +        $self->check_openssl_version($prefix, $exec);
 +        my $opts = $self->ssleay_get_build_opts($prefix, $exec);
 +
-+        $self->makemaker_args(
-+            CCCDLFLAGS => $opts->{cccdlflags},
-+            OPTIMIZE => $opts->{optimize},
-+            INC => join(' ', map qq{"-I$_"}, @{$opts->{inc_paths}}),
-+            LIBS => join(' ', (map qq{"-L$_"}, @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
-+        );
-+    } else {
++        if (eval { require ExtUtils::CBuilder }) {
++          my $source = 'test.c';
++          open(my $fh, '>', $source);
++          print $fh "#include <openssl/err.h>\n";
++          close $fh;
++          my $b = ExtUtils::CBuilder->new;
++          my $object = eval {
++            $b->compile(
++              source       => $source, 
++              include_dirs => [$opts->{inc_paths}],
++            );
++          };
++
++          if ($object) {
++              unlink $object;
++              $self->makemaker_args(
++                  CCCDLFLAGS => $opts->{cccdlflags},
++                  OPTIMIZE => $opts->{optimize},
++                  INC => join(' ', map qq{"-I$_"}, @{$opts->{inc_paths}}),
++                  LIBS => join(' ', (map qq{"-L$_"}, @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
++              );
++
++          } else {
++              undef $exec;
+ 
+-    $self->check_openssl_version($prefix, $exec);
+-    my $opts = $self->ssleay_get_build_opts($prefix, $exec);
++          }
++          
++          unlink $source;
++        }
++    }
+ 
+-    $self->makemaker_args(
+-        CCCDLFLAGS => $opts->{cccdlflags},
+-        OPTIMIZE => $opts->{optimize},
+-        INC => join(' ', map qq{"-I$_"}, @{$opts->{inc_paths}}),
+-        LIBS => join(' ', (map qq{"-L$_"}, @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
+-    );
++    if (! -x $exec) {
 +    
 +        $self->makemaker_args(
 +            CC => '$(FULLPERL) -MAlien::Base::Wrapper=Alien::LibreSSL -e cc --',
@@ -35,18 +90,7 @@ Index: inc/Module/Install/PRIVATE/Net/SSLeay.pm
 +            },
 +        );
 +    
-     }
++    }
  
--    $self->check_openssl_version($prefix, $exec);
--    my $opts = $self->ssleay_get_build_opts($prefix, $exec);
--
--    $self->makemaker_args(
--        CCCDLFLAGS => $opts->{cccdlflags},
--        OPTIMIZE => $opts->{optimize},
--        INC => join(' ', map qq{"-I$_"}, @{$opts->{inc_paths}}),
--        LIBS => join(' ', (map qq{"-L$_"}, @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
--    );
--
      if ( $self->prompt(
              "Do you want to run external tests?\n".
-             "These tests *will* *fail* if you do not have network connectivity.",

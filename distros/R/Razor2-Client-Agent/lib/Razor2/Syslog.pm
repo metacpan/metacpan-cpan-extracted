@@ -1,124 +1,123 @@
 package Razor2::Syslog;
 
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use IO::Socket;
 use IO::File;
 use Data::Dumper;
 
 require Exporter;
 
-@ISA = qw(Exporter AutoLoader);
+our @ISA = qw(Exporter AutoLoader);
+
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
-	
-);
-$VERSION = '0.03';
-
+our @EXPORT  = qw();
+our $VERSION = '0.03';
 
 # Preloaded methods go here.
 
-my %syslog_priorities=(
-	emerg   => 0,
-	alert   => 1,
-	crit    => 2,
-	err     => 3,
-	warning => 4,
+my %syslog_priorities = (
+    emerg   => 0,
+    alert   => 1,
+    crit    => 2,
+    err     => 3,
+    warning => 4,
     notice  => 5,
     info    => 6,
-	debug   => 7
+    debug   => 7
 );
 
-my %syslog_facilities=(
-	kern	=> 0,
-	user	=> 1,
-	mail	=> 2,
-	daemon	=> 3,	
-	auth	=> 4,
-	syslog	=> 5,
-	lpr	=> 6,
-	news 	=> 7,
-	uucp 	=> 8,
-	cron	=> 9,
-	authpriv=> 10,
-	ftp	=> 11,
-	local0	=> 16,
-	local1	=> 17,
-	local2	=> 18,
-	local3	=> 19,
-	local4	=> 20,
-	local5	=> 21,
-	local6	=> 22,
+my %syslog_facilities = (
+    kern     => 0,
+    user     => 1,
+    mail     => 2,
+    daemon   => 3,
+    auth     => 4,
+    syslog   => 5,
+    lpr      => 6,
+    news     => 7,
+    uucp     => 8,
+    cron     => 9,
+    authpriv => 10,
+    ftp      => 11,
+    local0   => 16,
+    local1   => 17,
+    local2   => 18,
+    local3   => 19,
+    local4   => 20,
+    local5   => 21,
+    local6   => 22,
 );
-
 
 sub new {
 
-  my $class = shift;
-  my $name = $0;
-  if($name =~ /.+\/(.+)/){
-     $name = $1;
-  }
-  my $self = { Name     => $name,
-               Facility => 'local5',
-               Priority => 'err',
-               SyslogPort    => 514,
-               SyslogHost    => '127.0.0.1'};
-  bless $self,$class;
-  my %par = @_;
+    my $class = shift;
+    my $name  = $0;
+    if ( $name =~ /.+\/(.+)/ ) {
+        $name = $1;
+    }
+    my $self = {
+        Name       => $name,
+        Facility   => 'local5',
+        Priority   => 'err',
+        SyslogPort => 514,
+        SyslogHost => '127.0.0.1'
+    };
+    bless $self, $class;
+    my %par = @_;
 
-  foreach (keys %par){
-    $self->{$_}=$par{$_};
-  }
+    foreach ( keys %par ) {
+        $self->{$_} = $par{$_};
+    }
 
-  my $sock=new IO::Socket::INET(PeerAddr => $$self{SyslogHost},
-                        PeerPort => $$self{SyslogPort},
-                        Proto    => 'udp');
-  die "Socket could not be created : $!\n" unless $sock;
+    my $sock = new IO::Socket::INET(
+        PeerAddr => $$self{SyslogHost},
+        PeerPort => $$self{SyslogPort},
+        Proto    => 'udp'
+    );
+    die "Socket could not be created : $!\n" unless $sock;
 
-  $self->{sock} = $sock;
+    $self->{sock} = $sock;
 
-  return $self;
+    return $self;
 
 }
-
 
 sub send {
 
-  my $self = shift;
-  my $msg=shift;
-  my %par = @_;
-  my %local=%$self;
+    my $self  = shift;
+    my $msg   = shift;
+    my %par   = @_;
+    my %local = %$self;
 
-  foreach (keys %par){
-    $local{$_}=$par{$_};
-  }
+    foreach ( keys %par ) {
+        $local{$_} = $par{$_};
+    }
 
-  my $pid=$$;
-  my $facility_i=$syslog_facilities{$local{Facility}};
-  my $priority_i=$syslog_priorities{$local{Priority}};  
+    my $pid        = $$;
+    my $facility_i = $syslog_facilities{ $local{Facility} };
+    my $priority_i = $syslog_priorities{ $local{Priority} };
 
-  if(!defined $facility_i){
-    $facility_i=21;
-  }
+    if ( !defined $facility_i ) {
+        $facility_i = 21;
+    }
 
-  if(!defined $priority_i){
-    $priority_i=4;
-  }
+    if ( !defined $priority_i ) {
+        $priority_i = 4;
+    }
 
-  my $d=(($facility_i<<3)|($priority_i));
-  my $message = "<$d>$local{Name}\[$pid\]: $msg";
+    my $d = ( ( $facility_i << 3 ) | ($priority_i) );
+    my $message = "<$d>$local{Name}\[$pid\]: $msg";
 
-  my $sock = $self->{sock};
+    my $sock = $self->{sock};
 
-  # Send the message to the socket directly.
-  $sock->send($message);
-  # Flush the socket, to ensure that messages don't arrive combined into one packet.
-  $sock->flush;
+    # Send the message to the socket directly.
+    $sock->send($message);
+
+    # Flush the socket, to ensure that messages don't arrive combined into one packet.
+    $sock->flush;
 
 }
-
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 

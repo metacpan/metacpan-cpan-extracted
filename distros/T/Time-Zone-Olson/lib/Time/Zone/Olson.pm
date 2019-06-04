@@ -11,6 +11,8 @@ use English qw( -no_match_vars );
 use DirHandle();
 use Encode();
 use POSIX();
+use Digest::SHA();
+use File::Find();
 
 BEGIN {
     if ( $OSNAME eq 'MSWin32' ) {
@@ -18,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.18';
+our $VERSION = '0.21';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -29,6 +31,7 @@ sub _SIZE_OF_LEAP_SECOND_V2                { return 8 }
 sub _PAIR                                  { return 2 }
 sub _STAT_MTIME_IDX                        { return 9 }
 sub _MAX_LENGTH_FOR_TRAILING_TZ_DEFINITION { return 256 }
+sub _MAX_LENGTH_FOR_A_TIMEZONE             { return 256 }
 sub _MONTHS_IN_ONE_YEAR                    { return 12 }
 sub _HOURS_IN_ONE_DAY                      { return 24 }
 sub _MINUTES_IN_ONE_HOUR                   { return 60 }
@@ -77,7 +80,7 @@ sub _TZ_DEFINITION_KEYS {
 }
 
 sub _TIMEZONE_FULL_NAME_REGEX {
-    return qr/(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?/smx;
+    return qr/(?<tz>(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?)/smx;
 }
 
 sub _WIN32_ERROR_FILE_NOT_FOUND {
@@ -589,9 +592,31 @@ sub new {
         $self->offset( $params{offset} );
     }
     else {
-        $self->timezone( $params{timezone} || $ENV{TZ} );
+        my $env_tz;
+        if ( ( exists $ENV{TZ} ) && ( defined $ENV{TZ} ) ) {
+            if ( ( $ENV{TZ} eq 'localtime' ) && ( $OSNAME eq 'solaris' ) ) {
+            }
+            else {
+                $env_tz = $ENV{TZ};
+            }
+        }
+        if ( ( defined $params{timezone} ) || ( defined $env_tz ) ) {
+            $self->timezone( $params{timezone} || $env_tz );
+        }
     }
     return $self;
+}
+
+sub _resolved_directory_path {
+    my ($self) = @_;
+    my $path = $self->directory();
+    if ( defined $path ) {
+        while ( my $readlink = readlink $path )
+        {    # darwin has multiple layers of symlinks
+            $path = $readlink;
+        }
+    }
+    return $path;
 }
 
 sub directory {
@@ -616,7 +641,7 @@ sub offset {
 sub equiv {
     my ( $self, $compare_time_zone, $from_time ) = @_;
     $from_time = defined $from_time ? $from_time : time;
-    my $class = ref $self;
+    my $class   = ref $self;
     my $compare = $class->new( 'timezone' => $compare_time_zone );
     my %offsets_compare;
     foreach my $transition_time ( $compare->transition_times() ) {
@@ -862,11 +887,17 @@ sub comment {
 
 sub area {
     my ($self) = @_;
+    if ( !defined $self->{area} ) {
+        $self->timezone();
+    }
     return $self->{area};
 }
 
 sub location {
     my ($self) = @_;
+    if ( !defined $self->{area} ) {
+        $self->timezone();
+    }
     return $self->{location};
 }
 
@@ -874,46 +905,346 @@ sub timezone {
     my ( $self, $new ) = @_;
     my $old = $self->{tz};
     if ( defined $new ) {
-        if ( defined $new ) {
-            my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
-            if ( $new =~ /^$timezone_full_name_regex$/smx ) {
-                $self->{area}     = $LAST_PAREN_MATCH{area};
-                $self->{location} = $LAST_PAREN_MATCH{location};
-                if ( $self->win32_registry() ) {
-                    my %mapping = Time::Zone::Olson->win32_mapping();
-                    if ( !defined $mapping{$new} ) {
-                        Carp::croak(
+        my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+        if ( $new =~ /^$timezone_full_name_regex$/smx ) {
+            $self->{area}     = $LAST_PAREN_MATCH{area};
+            $self->{location} = $LAST_PAREN_MATCH{location};
+            $self->{tz}       = $LAST_PAREN_MATCH{tz};
+            if ( $self->win32_registry() ) {
+                my %mapping = Time::Zone::Olson->win32_mapping();
+                if ( !defined $mapping{$new} ) {
+                    Carp::croak(
 "'$new' is not an time zone in the existing Win32 registry"
-                        );
-                    }
+                    );
                 }
-                else {
-                    my $path = File::Spec->catfile( $self->directory(), $new );
-                    if ( !-f $path ) {
-                        Carp::croak(
-"'$new' is not an time zone in the existing Olson database"
-                        );
-                    }
-                }
-            }
-            elsif ( my $tz_definition =
-                $self->_parse_tz_variable( $new, 'TZ' ) )
-            {
-                $self->{_tzdata}->{$new} = {
-                    tz_definition    => $tz_definition,
-                    transition_times => [],
-                    no_tz_file       => 1,
-                };
             }
             else {
-                Carp::croak(
-                    "'$new' does not have a valid format for a TZ timezone");
+                my @directories;
+                foreach my $key (qw(area location)) {
+                    if ( defined $self->{$key} ) {
+                        push @directories, $self->{$key};
+                    }
+                }
+                my $path =
+                  File::Spec->catfile( $self->directory(), @directories );
+                if ( !-f $path ) {
+                    Carp::croak(
+"'$new' is not an time zone in the existing Olson database"
+                    );
+                }
             }
         }
-        $self->{tz} = $new;
+        elsif ( my $tz_definition = $self->_parse_tz_variable( $new, 'TZ' ) ) {
+            $self->{_tzdata}->{ $tz_definition->{tz} } = {
+                tz_definition    => $tz_definition,
+                transition_times => [],
+                no_tz_file       => 1,
+            };
+            $self->{tz} = $tz_definition->{tz};
+        }
+        else {
+            Carp::croak(
+                "'$new' does not have a valid format for a TZ timezone");
+        }
         delete $self->{offset};
     }
+    elsif ( !defined $old ) {
+        $self->{tz} = $self->_guess_tz();
+        $old = $self->{tz};
+    }
     return $old;
+}
+
+sub _guess_tz {
+    my ($self) = @_;
+    if ( $OSNAME eq 'MSWin32' ) {
+        return $self->_guess_win32_tz();
+    }
+    else {
+        return $self->_guess_olson_tz();
+    }
+}
+
+sub _guess_olson_tz {
+    my ($self)      = @_;
+    my $path        = '/etc/localtime';
+    my $base        = $self->_resolved_directory_path();
+    my $quoted_base = quotemeta $base;
+    if ( my $readlink = readlink $path ) {
+        my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+        if ( $readlink =~ /$quoted_base.$timezone_full_name_regex$/smx ) {
+            my $guessed = $LAST_PAREN_MATCH{area};
+            $self->{area} = $LAST_PAREN_MATCH{area};
+            if ( defined $LAST_PAREN_MATCH{location} ) {
+                $guessed .= q[/] . $LAST_PAREN_MATCH{location};
+                $self->{location} = $LAST_PAREN_MATCH{location};
+            }
+            return $guessed;
+        }
+    }
+    elsif ( $EXTENDED_OS_ERROR == POSIX::EINVAL() ) {
+        my @paths = (qw(/etc/timezone));
+        if ( $OSNAME eq 'freebsd' ) {
+            push @paths, '/var/db/zoneinfo';
+        }
+        elsif ( $OSNAME eq 'linux' ) {
+            push @paths, '/etc/sysconfig/clock';
+        }
+        foreach my $path (@paths) {
+            if ( my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() ) ) {
+                my $result =
+                  $handle->read( my $buffer, _MAX_LENGTH_FOR_A_TIMEZONE() );
+                defined $result
+                  or
+                  Carp::croak("Failed to read from $path:$EXTENDED_OS_ERROR");
+                close $handle
+                  or Carp::croak("Failed to close $path:$EXTENDED_OS_ERROR");
+                chomp $buffer;
+                my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+                if (
+                    $buffer =~ m{^
+				(?:ZONE=")? # for \/etc\/sysconfig\/clock
+					$timezone_full_name_regex
+				"? # for \/etc\/sysconfig\/clock
+				$}smx
+                  )
+                {
+                    my $guessed = $LAST_PAREN_MATCH{area};
+                    $self->{area} = $LAST_PAREN_MATCH{area};
+                    if ( defined $LAST_PAREN_MATCH{location} ) {
+                        $guessed .= q[/] . $LAST_PAREN_MATCH{location};
+                        $self->{location} = $LAST_PAREN_MATCH{location};
+                    }
+                    return $guessed;
+                }
+            }
+        }
+    }
+    my $digest = Digest::SHA->new('sha512');
+    $digest->addfile($path);
+    my $localtime_digest = $digest->hexdigest();
+    my $guessed;
+    File::Find::find(
+        {
+            'no_chdir' => 1,
+            'wanted'   => sub {
+                if (
+                    my $possible = $self->_guess_olson_tz_from_filesystem(
+                        $base, $localtime_digest
+                    )
+                  )
+                {
+                    $guessed = $possible;
+                }
+            },
+        },
+        $base
+    );
+    return $guessed;
+}
+
+sub _guess_olson_tz_from_filesystem {
+    my ( $self, $base, $localtime_digest ) = @_;
+    my $quoted_base              = quotemeta $base;
+    my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+    if ( $File::Find::name =~ /^$quoted_base.$timezone_full_name_regex$/smx ) {
+        my $area = $LAST_PAREN_MATCH{area};
+        my ( $location, $path );
+        if ( defined $LAST_PAREN_MATCH{location} ) {
+            $location = $LAST_PAREN_MATCH{location};
+        }
+        if ( $self->_check_area_location( $area, $location ) ) {
+            if ( defined $location ) {
+                $path = File::Spec->catfile( $base, $area, $location );
+            }
+            else {
+                $path = File::Spec->catfile( $base, $area );
+            }
+        }
+        else {
+            return;
+        }
+        if ( -f $path ) {
+            my $digest = Digest::SHA->new('sha512');
+            $digest->addfile($path);
+            my $test_digest = $digest->hexdigest();
+            if ( $test_digest eq $localtime_digest ) {
+                $self->{area}     = $area;
+                $self->{location} = $location;
+                return "$area/$location";
+            }
+        }
+    }
+    return;
+}
+
+sub _check_area_location {
+    my ( $self, $check_area, $check_location ) = @_;
+    foreach my $area ( $self->areas() ) {
+        if ( $area eq $check_area ) {
+            if ( defined $check_location ) {
+                foreach my $location ( $self->locations($area) ) {
+                    if ( $location eq $check_location ) {
+                        return 1;
+                    }
+                }
+            }
+            else {
+                return 1;
+            }
+
+        }
+    }
+    return;
+}
+
+sub _guess_win32_tz {
+    my ($self) = @_;
+    require Win32API::Registry;
+    my $current_timezone_registry_path =
+      'SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
+    Win32API::Registry::RegOpenKeyEx(
+        Win32API::Registry::HKEY_LOCAL_MACHINE(),
+        $current_timezone_registry_path,
+        0,
+        Win32API::Registry::KEY_QUERY_VALUE(),
+        my $current_timezone_registry_key
+      )
+      or Carp::croak(
+        "Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:"
+          . Win32API::Registry::regLastError() );
+    my $win32_timezone_name;
+    if (
+        Win32API::Registry::RegQueryValueEx(
+            $current_timezone_registry_key, 'TimeZoneKeyName',
+            [],                             my $type,
+            $win32_timezone_name, []
+        )
+      )
+    {
+    }
+    elsif (
+        Win32API::Registry::regLastError() == _WIN32_ERROR_FILE_NOT_FOUND() )
+    {
+    }
+    else {
+        Carp::croak(
+"Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\TimeZoneKeyName:"
+              . Win32API::Registry::regLastError() );
+    }
+    if ($win32_timezone_name) {
+    }
+    else {
+        $win32_timezone_name =
+          $self->_guess_old_win32_tz( $current_timezone_registry_path,
+            $current_timezone_registry_key );
+    }
+    Win32API::Registry::RegCloseKey($current_timezone_registry_key)
+      or Carp::croak(
+        "Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:"
+          . Win32API::Registry::regLastError() );
+    my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+    my %mapping                  = Time::Zone::Olson->win32_mapping();
+    foreach my $key ( sort { $a cmp $b } keys %mapping ) {
+        if ( $mapping{$key} eq $win32_timezone_name ) {
+            if ( $key =~ /^$timezone_full_name_regex$/smx ) {
+                $self->{area} = $LAST_PAREN_MATCH{area};
+                if ( defined $LAST_PAREN_MATCH{location} ) {
+                    $self->{location} = $LAST_PAREN_MATCH{location};
+                }
+            }
+            return $key;
+        }
+    }
+    return;
+}
+
+sub _guess_old_win32_tz {
+    my ( $self, $current_timezone_registry_path,
+        $current_timezone_registry_key ) = @_;
+    my $win32_timezone_name;
+
+    Win32API::Registry::RegQueryValueEx( $current_timezone_registry_key,
+        'StandardName', [], my $type, my $standard_name, [] )
+      or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\StandardName:"
+          . Win32API::Registry::regLastError() );
+    my ( $description, $major, $minor, $build, $id ) = Win32::GetOSVersion();
+    my $old_timezone_registry_path;
+    if ( $id < 2 ) {
+        $old_timezone_registry_path =
+          'SOFTWARE\Microsoft\Windows\CurrentVersion\Time Zones';
+    }
+    else {
+        $old_timezone_registry_path =
+          'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones';
+    }
+    Win32API::Registry::RegOpenKeyEx(
+        Win32API::Registry::HKEY_LOCAL_MACHINE(),
+        $old_timezone_registry_path,
+        0,
+        Win32API::Registry::KEY_QUERY_VALUE() |
+          Win32API::Registry::KEY_ENUMERATE_SUB_KEYS(),
+        my $old_timezone_registry_key
+      )
+      or Carp::croak(
+        "Failed to open LOCAL_MACHINE\\$old_timezone_registry_path:"
+          . Win32API::Registry::regLastError() );
+    my $enumerate_timezones         = 1;
+    my $old_timezone_registry_index = 0;
+    while ($enumerate_timezones) {
+        if (
+            Win32API::Registry::RegEnumKeyEx(
+                $old_timezone_registry_key, $old_timezone_registry_index,
+                my $subkey_name,
+                [], [], [], [], [],
+            )
+          )
+        {
+            Win32API::Registry::RegOpenKeyEx(
+                $old_timezone_registry_key, $subkey_name, 0,
+                Win32API::Registry::KEY_QUERY_VALUE(),
+                my $old_timezone_specific_registry_key
+              )
+              or Carp::croak(
+"Failed to open LOCAL_MACHINE\\$old_timezone_registry_path\\$subkey_name:"
+                  . Win32API::Registry::regLastError() );
+            Win32API::Registry::RegQueryValueEx(
+                $old_timezone_specific_registry_key,
+                'Std', [], my $type, my $local_language_timezone_name, [] )
+              or Carp::croak(
+"Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\$subkey_name\\Std:"
+                  . Win32API::Registry::regLastError() );
+            if ( $local_language_timezone_name eq $standard_name ) {
+                $win32_timezone_name = $subkey_name;
+            }
+        }
+        elsif (
+            Win32API::Registry::regLastError() == _WIN32_ERROR_NO_MORE_ITEMS() )
+        {    # ERROR_NO_MORE_TIMES from winerror.h
+            $enumerate_timezones = 0;
+        }
+        else {
+            Carp::croak(
+"Failed to read from LOCAL_MACHINE\\$old_timezone_registry_path:"
+                  . Win32API::Registry::regLastError() );
+        }
+        $old_timezone_registry_index += 1;
+    }
+    Win32API::Registry::RegCloseKey($old_timezone_registry_key)
+      or Carp::croak(
+        "Failed to close LOCAL_MACHINE\\$old_timezone_registry_path:"
+          . Win32API::Registry::regLastError() );
+    my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+    if ( defined $win32_timezone_name ) {
+        if ( $win32_timezone_name =~ /^$timezone_full_name_regex$/smx ) {
+            $self->{area} = $LAST_PAREN_MATCH{area};
+            if ( defined $LAST_PAREN_MATCH{location} ) {
+                $self->{location} = $LAST_PAREN_MATCH{location};
+            }
+        }
+    }
+    return $win32_timezone_name;
 }
 
 sub _is_leap_year {
@@ -1035,7 +1366,7 @@ sub _get_time_for_wday_week_month_year_offset {
 
         while ( ( $check_day_of_week % _DAYS_IN_ONE_WEEK() ) != $params{day} ) {
 
-            $time -= _SECONDS_IN_ONE_DAY();
+            $time              -= _SECONDS_IN_ONE_DAY();
             $check_day_of_week -= 1;
             if ( $check_day_of_week < 0 ) {
                 $check_day_of_week = _LOCALTIME_WEEKDAY_HIGHEST_VALUE();
@@ -1046,7 +1377,7 @@ sub _get_time_for_wday_week_month_year_offset {
 
         my $check_week = 1;
         while ( ( $check_day_of_week % _DAYS_IN_ONE_WEEK() ) != $params{day} ) {
-            $time += _SECONDS_IN_ONE_DAY();
+            $time              += _SECONDS_IN_ONE_DAY();
             $check_day_of_week += 1;
             $check_day_of_week = $check_day_of_week % _DAYS_IN_ONE_WEEK();
             if ( $check_day_of_week % _DAYS_IN_ONE_WEEK() == 0 ) {
@@ -1159,7 +1490,7 @@ sub _negative_gm_time {
   HOUR: while (1) {
         if ( $check_time - $increment > $time ) {
             $check_time -= $increment;
-            $hour -= 1;
+            $hour       -= 1;
         }
         else {
             last HOUR;
@@ -1170,7 +1501,7 @@ sub _negative_gm_time {
   MINUTE: while (1) {
         if ( $check_time - $increment > $time ) {
             $check_time -= $increment;
-            $minute -= 1;
+            $minute     -= 1;
         }
         else {
             last MINUTE;
@@ -1241,7 +1572,7 @@ sub _positive_gm_time {
   HOUR: while (1) {
         if ( $check_time + $increment <= $time ) {
             $check_time += $increment;
-            $hour += 1;
+            $hour       += 1;
         }
         else {
             last HOUR;
@@ -1252,7 +1583,7 @@ sub _positive_gm_time {
   MINUTE: while (1) {
         if ( $check_time + $increment <= $time ) {
             $check_time += $increment;
-            $minute += 1;
+            $minute     += 1;
         }
         else {
             last MINUTE;
@@ -1329,7 +1660,7 @@ sub _positive_time_local {
     my $check_day = 1;
   DAY: while (1) {
         if ( $check_day < $localtime[ _LOCALTIME_DAY_INDEX() ] ) {
-            $time += _SECONDS_IN_ONE_DAY();
+            $time      += _SECONDS_IN_ONE_DAY();
             $check_day += 1;
         }
         else {
@@ -1342,7 +1673,7 @@ sub _positive_time_local {
     my $check_hour = 0;
   HOUR: while (1) {
         if ( $check_hour < $localtime[ _LOCALTIME_HOUR_INDEX() ] ) {
-            $time += _SECONDS_IN_ONE_HOUR();
+            $time       += _SECONDS_IN_ONE_HOUR();
             $check_hour += 1;
         }
         else {
@@ -1352,7 +1683,7 @@ sub _positive_time_local {
     my $check_minute = 0;
   MINUTE: while (1) {
         if ( $check_minute < $localtime[ _LOCALTIME_MINUTE_INDEX() ] ) {
-            $time += _SECONDS_IN_ONE_MINUTE();
+            $time         += _SECONDS_IN_ONE_MINUTE();
             $check_minute += 1;
         }
         else {
@@ -1433,7 +1764,7 @@ sub _negative_time_local {
     my $check_day = $days_in_month[$check_month];
   DAY: while (1) {
         if ( $check_day > $localtime[ _LOCALTIME_DAY_INDEX() ] ) {
-            $time -= _SECONDS_IN_ONE_DAY();
+            $time      -= _SECONDS_IN_ONE_DAY();
             $check_day -= 1;
         }
         else {
@@ -1446,7 +1777,7 @@ sub _negative_time_local {
     my $check_hour = _HOURS_IN_ONE_DAY() - 1;
   HOUR: while (1) {
         if ( $check_hour > $localtime[ _LOCALTIME_HOUR_INDEX() ] ) {
-            $time -= _SECONDS_IN_ONE_HOUR();
+            $time       -= _SECONDS_IN_ONE_HOUR();
             $check_hour -= 1;
         }
         else {
@@ -1456,7 +1787,7 @@ sub _negative_time_local {
     my $check_minute = _MINUTES_IN_ONE_HOUR();
   MINUTE: while (1) {
         if ( $check_minute > $localtime[ _LOCALTIME_MINUTE_INDEX() ] ) {
-            $time -= _SECONDS_IN_ONE_MINUTE();
+            $time         -= _SECONDS_IN_ONE_MINUTE();
             $check_minute -= 1;
         }
         else {
@@ -1822,7 +2153,7 @@ sub _read_time_zone_abbreviation_strings {
 sub _read_leap_seconds {
     my ( $self, $handle, $path, $leapcnt, $sizeof_leap_second ) = @_;
     my $sizeof_leap_seconds = $leapcnt * _PAIR() * $sizeof_leap_second;
-    my $result = $handle->read( my $buffer, $sizeof_leap_seconds );
+    my $result              = $handle->read( my $buffer, $sizeof_leap_seconds );
     if ( defined $result ) {
         if ( $result != $sizeof_leap_seconds ) {
             Carp::croak(
@@ -1961,10 +2292,10 @@ qr/(?:$end_julian_without_feb29_regex|$end_julian_with_feb29_regex|$end_month_we
     my $end_datetime_regex = qr/$end_date_regex(?:$end_time_regex)?/smx;
 
     if ( $tz_variable =~
-/^$std_name_regex$std_offset_regex(?:$dst_name_regex(?:$dst_offset_regex)?,$start_datetime_regex,$end_datetime_regex)?$/smx
+/^($std_name_regex$std_offset_regex(?:$dst_name_regex(?:$dst_offset_regex)?,$start_datetime_regex,$end_datetime_regex)?)$/smx
       )
     {
-        my $tz_definition = { tz => $tz_variable };
+        my $tz_definition = { tz => $1 };
         foreach my $key ( _TZ_DEFINITION_KEYS() ) {
             if ( defined $LAST_PAREN_MATCH{$key} ) {
                 $tz_definition->{$key} = $LAST_PAREN_MATCH{$key};
@@ -2238,7 +2569,7 @@ sub _read_tzfile {
     {
     }
     else {
-        my $path = File::Spec->catfile( $self->directory, $tz );
+        my $path   = File::Spec->catfile( $self->directory, $tz );
         my $handle = FileHandle->new($path)
           or Carp::croak("Failed to open $path for reading:$EXTENDED_OS_ERROR");
         my @stat = stat $handle
@@ -2458,7 +2789,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.18
+Version 0.21
 
 =cut
 

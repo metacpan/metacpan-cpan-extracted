@@ -18,63 +18,65 @@ my %type = ('country'  => 'Country',
            );
 my $generic_tests;
 
-sub do_tests {
-   my($data_type,$inp_file,$test_type,$codeset,$show_errs) = @_;
-   my $type = $type{$data_type};
-   $::data_type = $data_type;
-   $::test_type = $test_type;
-   $inp_file    = $data_type  if (! $inp_file);
+sub init_tests {
+   my($codeset,$show_errs) = @_;
 
-   my($runtests) = shift(@ARGV);
+   # $0 = "DATATYPE_FLAG_NUM.t"
+   #       DATATYPE  = country, language, etc.
+   #       FLAG      = func, old, oo, or some other value
+   #
+   # If FLAG is func, old, or oo, then:
+   #     INPUTFILE is based on DATATYPE
+   #     TESTTYPE is the same as FLAG
+   # Otherwise
+   #     INPUTFILE is FLAG
+   #     TESTTYPE is oo
+   #
+   # Module is based on DATATYPE
 
-   # Load the test function and the data for the tests
+   my $tmp      = $0;
+   $tmp         =~ s,^.*/,,;
+   $tmp         =~ s,\.t$,,;
+   my($dt,$flag,$n) = split(/_/,$tmp);
 
-   my($dir,$tdir);
-   if ( -f "t/testfunc.pl" ) {
-     require "./t/testfunc.pl";
-     require "./t/vals_${inp_file}.pl";
-     $dir="./lib";
-     $tdir="t";
-   } elsif ( -f "testfunc.pl" ) {
-     require "./testfunc.pl";
-     require "./vals_${inp_file}.pl";
-     $dir="../lib";
-     $tdir=".";
+   $::data_type = $dt;
+   my $inp_file;
+   if ($flag =~ /^(func|old|oo)$/) {
+      $::test_type = $flag;
+      $inp_file    = $dt;
    } else {
-     die "ERROR: cannot find testfunc.pl\n";
+      $::test_type = 'oo';
+      $inp_file    = $flag;
    }
+   my $mod         = $type{$::data_type};
 
-   unshift(@INC,$dir);
-
+   require "vals_${inp_file}.pl";
    $::tests .= $generic_tests  if (! defined($show_errs));
 
-   if ($test_type eq 'old') {
-      $::module = "Locale::$type";
+   if ($::test_type eq 'old') {
+      $::module = "Locale::$mod";
       eval("use $::module");
       my $tmp   = $::module . "::show_errors";
       &{ $tmp }(0);
-   } elsif ($test_type eq 'func') {
-      $::module = "Locale::Codes::$type";
+   } elsif ($::test_type eq 'func') {
+      $::module = "Locale::Codes::$mod";
       eval("use $::module");
       my $tmp   = $::module . "::show_errors";
       &{ $tmp }(0);
    } elsif (defined($codeset)) {
       eval("use Locale::Codes");
-      $::obj = Locale::Codes->new($data_type,$codeset,$show_errs);
+      $::obj = Locale::Codes->new($::data_type,$codeset,$show_errs);
       $::obj->show_errors(1);
    } elsif (defined($show_errs)) {
       eval("use Locale::Codes");
       $::obj = Locale::Codes->new();
-      $::obj->type($data_type);
+      $::obj->type($::data_type);
       $::obj->show_errors($show_errs);
    } else {
       eval("use Locale::Codes");
-      $::obj = new Locale::Codes $data_type;
+      $::obj = new Locale::Codes $::data_type;
       $::obj->show_errors(0);
    }
-
-   print "$::data_type [$::test_type]\n";
-   test_Func(\&test,$::tests,$runtests);
 }
 
 sub test {

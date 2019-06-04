@@ -1,41 +1,34 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: parse_date (common)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  if ($test[0] eq "config") {
-     shift(@test);
-     $obj->config(@test);
-     return ();
-  }
-
-  $obj->_init();
-  my $err = $obj->parse_date(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     $d2 = $obj->value("gmt");
-     return($d1,$d2);
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-21-12:00:00,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   if ($test[0] eq "config") {
+      shift(@test);
+      $obj->config(@test);
+      return ();
+   }
+
+   $obj->_init();
+   my $err = $obj->parse_date(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      my $d2 = $obj->value("gmt");
+      return($d1,$d2);
+   }
+}
+
+my $tests="
 
 # Common dates
 
@@ -129,9 +122,9 @@ Mar052009 => 2009030500:00:00 2009030505:00:00
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

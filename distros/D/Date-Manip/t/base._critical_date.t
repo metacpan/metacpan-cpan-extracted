@@ -1,27 +1,20 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'base :: _critical_date';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $dmt = new Date::Manip::TZ;
+our $obj = $dmt->base();
+$dmt->config("forcedate","now,America/New_York");
 
 sub test {
-   (@test)=@_;
-   @ret = $obj->_critical_date(@test);
+   my(@test)=@_;
+   my @ret = $obj->_critical_date(@test);
    return @ret;
 }
-
-$dmt = new Date::Manip::TZ;
-$obj = $dmt->base();
-$dmt->config("forcedate","now,America/New_York");
 
 #################################################################################
 # Rule    Syria   2008    max     -       Apr     Fri>=1  0:00    1:00    S
@@ -106,7 +99,7 @@ $dmt->config("forcedate","now,America/New_York");
 #################################################################################
 
 # YEAR MON FLAG NUM DOW ISDST TIME TIMETYPE STDOFF DSTOFF
-$tests="
+my $tests="
 
 2038 04 ge 1 5 1 00:00:00 w 02:00:00 03:00:00 =>
    [ 2038 4 1 21 59 59 ]
@@ -170,9 +163,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 
 #Local Variables:

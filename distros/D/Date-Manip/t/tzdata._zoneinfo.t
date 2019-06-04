@@ -1,31 +1,27 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'tzdata :: _zoneInfo';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
+$::ti->use_ok('Date::Manip::TZdata');
 
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-$t->use_ok('Date::Manip::TZdata');
-
-if ( -d "$testdir/../tzdata" ) {
-  $obj = new Date::Manip::TZdata("$testdir/..");
+my $obj;
+my $moddir = $::ti->testdir('mod');
+if ( -d "$moddir/tzdata" ) {
+   $obj = new Date::Manip::TZdata($moddir);
 } else {
-  $t->skip_all('No tzdata directory');
+   $::ti->skip_all('No tzdata directory');
 }
 
 sub test {
-  (@test)=@_;
-  return $obj->_zoneInfo(@test);
+   my(@test)=@_;
+   return $obj->_zoneInfo(@test);
 }
 
-$tests="
+my $tests="
 
 America/Chicago rules 1800 => - 1
 
@@ -43,9 +39,9 @@ Asia/Tbilisi rules 1996 => E-EurAsia 2 01:00:00 3
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

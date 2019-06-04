@@ -1,38 +1,31 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: calc (date,date,approx)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj1 = new Date::Manip::Date;
+$obj1->config("forcedate","now,America/New_York");
+our $obj2 = $obj1->new_date();
 
 sub test {
-  (@test)=@_;
+   my(@test)=@_;
 
-  $err = $obj1->parse(shift(@test));
-  return $$obj1{"err"}  if ($err);
-  $err = $obj2->parse(shift(@test));
-  return $$obj2{"err"}  if ($err);
-  push(@test,"approx");
+   my $err = $obj1->parse(shift(@test));
+   return $$obj1{"err"}  if ($err);
+   $err = $obj2->parse(shift(@test));
+   return $$obj2{"err"}  if ($err);
+   push(@test,"approx");
 
-  my $obj3 = $obj1->calc($obj2,@test);
-  return   if (! defined $obj3);
-  $ret = $obj3->value();
-  return $ret;
+   my $obj3 = $obj1->calc($obj2,@test);
+   return   if (! defined $obj3);
+   my $ret = $obj3->value();
+   return $ret;
 }
 
-$obj1 = new Date::Manip::Date;
-$obj1->config("forcedate","now,America/New_York");
-$obj2 = $obj1->new_date();
-
-$tests="
+my $tests="
 
 'Jan 10 1996 12:00:00'  'Jan  7 1998 12:00:00'  0 =>  2:0:0:-3:0:0:0
 
@@ -124,9 +117,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

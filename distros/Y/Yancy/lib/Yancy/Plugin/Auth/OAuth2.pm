@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::OAuth2;
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 # ABSTRACT: Authenticate using an OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -114,7 +114,7 @@ sub init {
     $self->route->to( cb => currym( $self, '_handle_auth' ) );
 }
 
-#pod =method
+#pod =method current_user
 #pod
 #pod Returns the access token of the currently-logged-in user.
 #pod
@@ -242,7 +242,7 @@ Yancy::Plugin::Auth::OAuth2 - Authenticate using an OAuth2 provider
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -270,7 +270,7 @@ maintain any kind of account information for the user.
 
 =head1 METHODS
 
-=head2
+=head2 current_user
 
 Returns the access token of the currently-logged-in user.
 

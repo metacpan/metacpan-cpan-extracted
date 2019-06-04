@@ -31,6 +31,10 @@
 #  define CX_CUR() (&cxstack[cxstack_ix])
 #endif
 
+#ifndef OpSIBLING
+#  define OpSIBLING(op)  (op->op_sibling)
+#endif
+
 #ifdef SAVEt_CLEARPADRANGE
 #  include "save_clearpadrange.c.inc"
 #endif
@@ -147,6 +151,8 @@ typedef struct {
 
   U32 padlen;
   SV **padslots;
+
+  PMOP *curpm;           /* value of PL_curpm at suspend time */
 } SuspendedState;
 
 #ifdef DEBUG
@@ -1065,6 +1071,11 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
       }
   }
 
+  if(PL_curpm)
+    state->curpm  = PL_curpm;
+  else
+    state->curpm = NULL;
+
   dounwind(cxix);
 }
 
@@ -1339,6 +1350,9 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     Safefree(frame);
   }
   state->frames = NULL;
+
+  if(state->curpm)
+    PL_curpm = state->curpm;
 }
 
 /*
@@ -1800,6 +1814,84 @@ static SV *MY_lex_scan_ident(pTHX)
   return NULL;
 }
 
+enum {
+  NO_FORBID,
+  FORBID_FOREACH_NONLEXICAL,
+  FORBID_MAP,
+  FORBID_GREP,
+};
+
+static void check_optree(pTHX_ OP *op, int forbid, COP **last_cop);
+static void check_optree(pTHX_ OP *op, int forbid, COP **last_cop)
+{
+  OP *op_first;
+  OP *kid = NULL;
+
+  if(OP_CLASS(op) == OA_COP)
+    *last_cop = (COP *)op;
+
+  switch(op->op_type) {
+    case OP_LEAVELOOP:
+      if((op_first = cUNOPx(op)->op_first)->op_type != OP_ENTERITER)
+        break;
+
+      /* This is a foreach loop of some kind. If it's not using a lexical
+       * iterator variable, disallow await inside the body.
+       * Check the first child, then apply forbid to the remainder of the body
+       */
+      check_optree(aTHX_ op_first, forbid, last_cop);
+      kid = OpSIBLING(op_first);
+
+      if(!op_first->op_targ)
+        forbid = FORBID_FOREACH_NONLEXICAL;
+      break;
+
+    case OP_MAPSTART:
+    case OP_GREPSTART:
+      /* children are: PUSHMARK, BODY, ITEMS... */
+      if((op_first = cUNOPx(op)->op_first)->op_type != OP_PUSHMARK)
+        break;
+
+      kid = OpSIBLING(op_first);
+      check_optree(aTHX_ kid,
+        op->op_type == OP_MAPSTART ? FORBID_MAP : FORBID_GREP, last_cop);
+
+      kid = OpSIBLING(kid);
+      break;
+
+    case OP_CUSTOM:
+      if(op->op_ppaddr != &pp_await)
+        break;
+      if(!forbid)
+        /* await is allowed here */
+        break;
+
+      char *reason;
+      switch(forbid) {
+        case FORBID_FOREACH_NONLEXICAL:
+          reason = "foreach on non-lexical iterator variable";
+          break;
+        case FORBID_MAP:
+          reason = "map";
+          break;
+        case FORBID_GREP:
+          reason = "grep";
+          break;
+      }
+
+      croak("await is not allowed inside %s at %s line %d.\n",
+        reason, CopFILE(*last_cop), CopLINE(*last_cop));
+      break;
+  }
+
+  if(op->op_flags & OPf_KIDS) {
+    if(!kid)
+      kid = cUNOPx(op)->op_first;
+    for(; kid; kid = OpSIBLING(kid))
+      check_optree(aTHX_ kid, forbid, last_cop);
+  }
+}
+
 /*
  * Keyword plugins
  */
@@ -1836,6 +1928,9 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   I32 save_ix = block_start(TRUE);
 
   OP *body = parse_block(0);
+
+  COP *last_cop = PL_curcop;
+  check_optree(aTHX_ body, NO_FORBID, &last_cop);
 
   SvREFCNT_inc(PL_compcv);
   body = block_end(save_ix, body);
@@ -1878,7 +1973,9 @@ static int await_keyword_plugin(pTHX_ OP **op_ptr)
   SV **asynccvrefp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
   if(!asynccvrefp || !*asynccvrefp ||
      SvRV(*asynccvrefp) != (SV *)PL_compcv)
-    croak("Cannot 'await' outside of an 'async sub'");
+    croak(CvEVAL(PL_compcv) ?
+      "await is not allowed inside string eval" :
+      "Cannot 'await' outside of an 'async sub'");
 
   lex_read_space(0);
 

@@ -471,7 +471,7 @@ BUGS AND QUESTIONS
         address to use is: sbeck@cpan.org.
 
     CPAN Bug Tracking
-        You can submit it using the CPAN tracking too. This can be done at
+        You can submit it using the CPAN tracking tool. This can be done at
         the following URL:
 
         <http://rt.cpan.org/Public/Dist/Display.html?Name=Locale-Codes>
@@ -484,7 +484,8 @@ BUGS AND QUESTIONS
 
     Please do not use other means to report bugs (such as forums for a
     specific OS or Linux distribution) as it is impossible for me to keep up
-    with all of them.
+    with all of them. These are the current methods that are guaranteed to
+    notify me.
 
     When filing a bug report, please include the following information:
 

@@ -1,50 +1,43 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'recur :: unmodified date range';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($recur,$arg1,$arg2) = @_;
-  $err = $obj->parse($recur);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $start = undef;
-     $end   = undef;
-     if (defined($arg1)) {
-        $start = $obj->new_date();
-        $start->parse($arg1);
-     }
-     if (defined($arg2)) {
-        $end = $obj->new_date();
-        $end->parse($arg2);
-     }
-     @dates = $obj->dates($start,$end);
-     $err   = $obj->err();
-     return $err  if ($err);
-     @ret   = ();
-     foreach my $d (@dates) {
-        $v = $d->value();
-        push(@ret,$v);
-     }
-     return @ret;
-  }
-}
-
-$obj = new Date::Manip::Recur;
+my $obj = new Date::Manip::Recur;
 $obj->config("forcedate","2000-01-21-00:00:00,America/New_York");
 
-$tests="
+sub test {
+   my ($recur,$arg1,$arg2) = @_;
+   my $err = $obj->parse($recur);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $start = undef;
+      my $end   = undef;
+      if (defined($arg1)) {
+         $start = $obj->new_date();
+         $start->parse($arg1);
+      }
+      if (defined($arg2)) {
+         $end = $obj->new_date();
+         $end->parse($arg2);
+      }
+      my @dates = $obj->dates($start,$end);
+      $err   = $obj->err();
+      return $err  if ($err);
+      my @ret   = ();
+      foreach my $d (@dates) {
+        my $v = $d->value();
+        push(@ret,$v);
+     }
+      return @ret;
+   }
+}
+
+my $tests="
 
 1*1:0:1:0:0:0***2004010100:00:00*2007123123:59:59
    =>
@@ -69,9 +62,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

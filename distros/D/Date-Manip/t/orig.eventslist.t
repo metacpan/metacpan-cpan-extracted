@@ -1,50 +1,43 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: Event_List';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
-  $ref = Events_List(@_);
+   my $ref = Events_List(@_);
 
-  if (ref($ref) eq "ARRAY") {
-     @ret = ();
-     @tmp = @$ref;
-     while (@tmp) {
-        $v = shift(@tmp);
-        if (ref($v) eq "ARRAY") {
-           unshift(@tmp,@$v);
-        } else {
-           push(@ret,$v);
-        }
-     }
-     return @ret;
-  }
+   if (ref($ref) eq "ARRAY") {
+      my @ret = ();
+      my @tmp = @$ref;
+      while (@tmp) {
+         my $v = shift(@tmp);
+         if (ref($v) eq "ARRAY") {
+            unshift(@tmp,@$v);
+         } else {
+            push(@ret,$v);
+         }
+      }
+      return @ret;
+   }
 
-  if (ref($ref) eq "HASH") {
-     @ret = ();
-     foreach $key (sort keys %$ref) {
-        push(@ret,$key,$$ref{$key});
-     }
-     return @ret;
-  }
+   if (ref($ref) eq "HASH") {
+      my @ret = ();
+      foreach my $key (sort keys %$ref) {
+         push(@ret,$key,$$ref{$key});
+      }
+      return @ret;
+   }
 
-  return ();
+   return ();
 }
 
 Date_Init("ForceDate=1997-03-08-12:30:00,America/New_York");
-Date_Init("ConfigFile=$testdir/OldEvents.cnf");
+Date_Init("ConfigFile=OldEvents.cnf");
 
-$tests ="
+my $tests ="
 
 2000-02-01 =>
    2000020100:00:00
@@ -102,9 +95,9 @@ $tests ="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

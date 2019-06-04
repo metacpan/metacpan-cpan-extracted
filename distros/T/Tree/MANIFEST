@@ -30,6 +30,7 @@ t/Tree/014_clone.t
 t/Tree/015_traverse.t
 t/Tree/016_events.t
 t/Tree/017_traverse_scalar.t
+t/Tree/018_no_fatal_warnings.t
 t/Tree_Binary/000_binary_trees.t
 t/Tree_Binary/001_mirror.t
 t/Tree_Binary/002_clone.t

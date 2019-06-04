@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pie.
 
@@ -42,7 +42,7 @@ has colorsrc => ( is            => "rw",
 );
 
 has description => ( is      => "ro",
-                     default => "Sets the font used for `textinfo` lying outside the pie.", );
+                     default => "Sets the font used for `textinfo` lying outside the sector.", );
 
 has family => (
     is  => "rw",
@@ -79,7 +79,7 @@ Chart::Plotly::Trace::Pie::Outsidetextfont - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 

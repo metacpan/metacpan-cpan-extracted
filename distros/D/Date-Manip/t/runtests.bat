@@ -1,3 +1,4 @@
+perl -I../lib _version.t 1
 perl -I../lib base._calc_date_ymwd.t 1
 perl -I../lib base._config.t 1
 perl -I../lib base._critical_date.t 1

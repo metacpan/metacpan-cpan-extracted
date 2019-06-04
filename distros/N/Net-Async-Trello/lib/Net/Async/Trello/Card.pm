@@ -3,7 +3,7 @@ package Net::Async::Trello::Card;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use parent qw(Net::Async::Trello::Generated::Card);
 

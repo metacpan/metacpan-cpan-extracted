@@ -1,17 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: Date_ConvTZ';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
   return Date_ConvTZ(@_);
@@ -19,7 +12,7 @@ sub test {
 
 Date_Init("ForceDate=now,America/New_York");
 
-$tests="
+my $tests="
 
 2001012812:05:00   +0000 BST           => 2001012812:05:00
 
@@ -51,9 +44,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

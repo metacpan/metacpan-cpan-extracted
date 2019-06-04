@@ -1,3 +1,8 @@
+0.102   2019-06-03 (PERLANCAR)
+
+	- Add completion: perl_podname.
+
+
 0.101   2019-02-24 (PERLANCAR)
 
 	- Add submodule: perl_modname_or_prefix.

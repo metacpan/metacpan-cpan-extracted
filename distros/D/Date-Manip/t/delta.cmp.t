@@ -1,29 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: cmp';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj1 = new Date::Manip::Delta;
+our $obj2 = $obj1->new_delta();
 
 sub test {
-  (@test)=@_;
-  $obj1->parse($test[0]);
-  $obj2->parse($test[1]);
-  return $obj1->cmp($obj2);
+   my(@test)=@_;
+   $obj1->parse($test[0]);
+   $obj2->parse($test[1]);
+   return $obj1->cmp($obj2);
 }
 
-$obj1 = new Date::Manip::Delta;
-$obj2 = $obj1->new_delta();
-
-$tests="
+my $tests="
 
 0:0:0:0:-1:0:0   0:0:0:0:1:0:0   => -1
 
@@ -33,9 +26,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

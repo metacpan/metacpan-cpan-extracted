@@ -1,8 +1,6 @@
 package Pcore::App;
 
 use Pcore -role;
-use Pcore::Util::Scalar qw[is_ref];
-use Pcore::Util::Path::Poll qw[:POLL];
 use Pcore::Service::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
@@ -17,6 +15,7 @@ has router => ( init_arg => undef ); # InstanceOf ['Pcore::App::Router']
 has api    => ( init_arg => undef ); # Maybe [ ConsumerOf ['Pcore::App::API'] ]
 has node   => ( init_arg => undef ); # InstanceOf ['Pcore::Node']
 has cdn    => ( init_arg => undef ); # InstanceOf['Pcore::CDN']
+has ext    => ( init_arg => undef ); # InstanceOf['Pcore::Ext']
 
 sub BUILD ( $self, $args ) {
 
@@ -98,8 +97,6 @@ around run => sub ( $orig, $self ) {
         say qq[Listen: $self->{app_cfg}->{server}->{listen}];
     }
 
-    $self->_init_reload if $self->{devel};
-
     say qq[App "@{[ref $self]}" started];
 
     return;
@@ -163,88 +160,7 @@ sub start_nginx ($self) {
     return;
 }
 
-sub _init_reload ($self) {
-    my $ext_ns = ref($self) . '::Ext' =~ s[::][/]smgr;
-
-    for my $inc_path ( grep { !is_ref $_ } @INC ) {
-
-        # Ext reloader
-        P->path("$inc_path/$ext_ns")->poll_tree(
-            abs       => 0,
-            is_dir    => 0,
-            max_depth => 0,
-            sub ( $root, $changes ) {
-                my $error;
-
-                for my $change ( $changes->@* ) {
-                    next if $change->[1] == $POLL_REMOVED;
-
-                    my $module_path = "$ext_ns/$change->[0]";
-                    my $full_path   = "$inc_path/$module_path";
-
-                    print "reloading ext module: $module_path ... ";
-
-                    eval { Pcore::Ext->load_class( $module_path, $full_path, 1 ) };
-
-                    if ($@) {
-                        $error = 1;
-
-                        say 'ERROR';
-
-                        $@->sendlog;
-                    }
-                    else {
-                        say 'OK';
-                    }
-                }
-
-                if ( !$error ) {
-                    no warnings qw[once];
-
-                    $Pcore::Ext::EXT     = undef;
-                    $Pcore::Ext::APP     = undef;
-                    $Pcore::Ext::SCANNED = 0;
-
-                    print 'rebuilding ext apps ... ';
-
-                    eval { Pcore::Ext->scan( $self, ref($self) . '::Ext' ) };
-
-                    if ($@) {
-                        say 'ERROR';
-
-                        $@->sendlog;
-                    }
-                    else {
-                        say 'OK';
-
-                        # clear app cache
-                        for my $class ( values $self->{router}->{class_ctrl}->%* ) {
-                            if ( $class->does('Pcore::App::Controller::Ext') ) {
-                                $class->{_cache} = undef;
-                            }
-                        }
-                    }
-                }
-
-                return;
-            }
-        );
-    }
-
-    return;
-}
-
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 187, 210             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

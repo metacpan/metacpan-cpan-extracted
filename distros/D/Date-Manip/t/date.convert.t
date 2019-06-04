@@ -1,35 +1,28 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: convert';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($date,$isdst,@test)=@_;
-  $obj->_init();
-  $err = $obj->set("date",$date,$isdst);
-  $err = $obj->convert(@test) if (! $err);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     return($d1);
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my($date,$isdst,@test)=@_;
+   $obj->_init();
+   my $err = $obj->set("date",$date,$isdst);
+   $err = $obj->convert(@test) if (! $err);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      return($d1);
+   }
+}
+
+my $tests="
 
 [ 1985 01 01 00 30 00 ] 0 America/Chicago => 1984123123:30:00
 
@@ -57,9 +50,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
+$::ti->tests(func  => \&test,
           tests => $tests);
-$t->done_testing();
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

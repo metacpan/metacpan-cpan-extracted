@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Github;
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 # ABSTRACT: Authenticate using Github's OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -91,7 +91,7 @@ sub init {
     return $self->SUPER::init( $app, $config );
 }
 
-#pod =method
+#pod =method current_user
 #pod
 #pod Returns the user row of the currently-logged-in user.
 #pod
@@ -233,7 +233,7 @@ Yancy::Plugin::Auth::Github - Authenticate using Github's OAuth2 provider
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -256,7 +256,7 @@ This module allows authenticating using the Github OAuth2 API.
 
 =head1 METHODS
 
-=head2
+=head2 current_user
 
 Returns the user row of the currently-logged-in user.
 

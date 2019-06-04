@@ -4,9 +4,9 @@ use 5.006;
 
 use base 'Tree::Fast';
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Scalar::Util qw( blessed refaddr weaken );
 

@@ -12,9 +12,10 @@ use warnings;
 use Search::ESsearcher;
 use Getopt::Long qw(:config pass_through);
 use Data::Dumper;
+use JSON;
 
 sub version{
-	print "essearch: 0.0.1\n";
+	print "essearch: 0.1.0\n";
 };
 
 # disable color if asked
@@ -35,6 +36,7 @@ my $help;
 my $warn;
 my $critical;
 my $check;
+my $pretty;
 GetOptions(
 		   's=s' => \$search,
 		   'g=s' => \$options,
@@ -49,6 +51,7 @@ GetOptions(
 		   'n=s' => \$check,
 		   'w=s' => \$warn,
 		   'c=s' => \$critical,
+		   'p' => \$pretty,
 		   );
 
 # if -n is set, make sure we have -w and -c
@@ -100,6 +103,7 @@ if ( $help ){
              Any of the above being set will override this.
 -e <elastic> The elasticsearch config to use.
 -S           Print the search out after filling it in and exit.
+-p           Print the search JSON prettily.
 -R           Run the search and print it via Data::Dumper.
 -i           Invert the results.
 -n <check>   Operate as a nagios style check.
@@ -138,6 +142,17 @@ $ess->search_set( $search );
 $ess->load_search;
 my $filled_in=$ess->search_fill_in;
 if ( $print_search ){
+	#clean it up if requested
+	if ( $pretty ){
+#		eval{
+			my $json=JSON->new;
+			$json->pretty(1);
+			$json->relaxed(1);
+			$json->canonical(1);
+			my $decoded=$json->decode( $filled_in );
+			$filled_in=$json->encode($decoded);
+#		}
+	}
 	print $filled_in;
 	exit 255;
 }
@@ -256,6 +271,14 @@ Any of the above being set will override this.
 
 The elasticsearch config to use.
 
+=head2 -p
+
+If -S is given, then it will attempt to pretty print the JSON.
+
+This will involve parsing it and then turning it back into JSON.
+
+So it will spit out ugly JSON is malformed JSON is fed into it.
+
 =head2 -S
 
 Print the search out after filling it in and exit.
@@ -306,5 +329,11 @@ Print the help.
 =head2 NO_COLOR
 
 If this is set, it disables color output.
+
+=head1 NOTE
+
+This script has dynamic command line options. The ones shown above are just the defaults.
+
+For others see the help documentation via --help or check the pod of the module you are using.
 
 =cut

@@ -17,7 +17,7 @@ use constant extra_target_keys => qw(engine target);
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::TargetConfigCommand';
 
-our $VERSION = '0.9999';
+our $VERSION = 'v1.0.0'; # VERSION
 
 sub execute {
     my ( $self, $project ) = @_;

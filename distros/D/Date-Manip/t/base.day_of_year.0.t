@@ -1,29 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'base :: day_of_year (Y/M/D)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  @ret = $obj->day_of_year(@test);
-  return @ret;
-}
-
-$dmt = new Date::Manip::TZ;
-$obj = $dmt->base();
+our $dmt = new Date::Manip::TZ;
+our $obj = $dmt->base();
 $dmt->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   my @ret = $obj->day_of_year(@test);
+   return @ret;
+}
+
+my $tests="
 
 [ 1999 1 1 ]  => 1
 
@@ -52,9 +45,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

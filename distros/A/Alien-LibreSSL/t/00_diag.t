@@ -13,8 +13,7 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MM
-  Alien::Build::Plugin::Fetch::CurlCommand
-  Alien::Build::Plugin::Fetch::Wget
+  Alien::Build::Plugin::Decode::Mojo
   ExtUtils::MakeMaker
   Test2::V0
   Test::Alien

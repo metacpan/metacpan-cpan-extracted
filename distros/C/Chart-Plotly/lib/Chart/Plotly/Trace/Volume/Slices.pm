@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Volume::Slices::X;
 use Chart::Plotly::Trace::Volume::Slices::Y;
 use Chart::Plotly::Trace::Volume::Slices::Z;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace volume.
 
@@ -61,7 +61,7 @@ Chart::Plotly::Trace::Volume::Slices - This attribute is one of the possible opt
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 

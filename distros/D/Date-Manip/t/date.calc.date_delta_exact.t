@@ -1,42 +1,33 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-BEGIN {
-  use Test::Inter;
-  $t = new Test::Inter 'date :: calc (date,exact delta)';
-  $testdir = $t->testdir();
-}
-use lib "$testdir/../lib";
+use warnings;
+use strict;
+use Test::Inter;
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj1 = new Date::Manip::Date;
+$obj1->config("forcedate","now,America/New_York");
+our $obj2 = $obj1->new_delta();
 
 sub test {
-  (@test)=@_;
+   my(@test)=@_;
 
-  $err = $obj1->parse(shift(@test));
-  return $$obj1{"err"}  if ($err);
-  $err = $obj2->parse(shift(@test));
-  return $$obj2{"err"}  if ($err);
+   my $err = $obj1->parse(shift(@test));
+   return $$obj1{"err"}  if ($err);
+   $err = $obj2->parse(shift(@test));
+   return $$obj2{"err"}  if ($err);
 
-  my $obj3 = $obj1->calc($obj2,@test);
-  return   if (! defined $obj3);
-  $err = $obj3->err();
-  return $err  if ($err);
-  $ret = $obj3->value();
-  $abb = $$obj3{'data'}{'abb'};
-  return ($ret,$abb);
+   my $obj3 = $obj1->calc($obj2,@test);
+   return   if (! defined $obj3);
+   $err = $obj3->err();
+   return $err  if ($err);
+   my $ret = $obj3->value();
+   my $abb = $$obj3{'data'}{'abb'};
+   return ($ret,$abb);
 }
 
-$obj1 = new Date::Manip::Date;
-$obj1->config("forcedate","now,America/New_York");
-$obj2 = $obj1->new_delta();
-
-$tests="
+my $tests="
 
 2011-12-11-12:00:00    +24:0:0      => 2011121212:00:00 EST
 
@@ -76,9 +67,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

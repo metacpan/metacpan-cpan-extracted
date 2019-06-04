@@ -1,27 +1,16 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: Date (today/now TodayIsMidnight=1)';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 Date_Init("ForceDate=1997-03-08-12:30:00");
 Date_Init("TodayIsMidnight=1","Internal=0");
 
-$tests="
+my $tests="
 
 today => 1997030800:00:00
 
@@ -41,9 +30,9 @@ now => 1997030812:30:00
 
 ";
 
-$t->tests(func  => \&ParseDate,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&ParseDate,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

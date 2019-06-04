@@ -1,39 +1,33 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: parse (Spanish)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-sub test {
-  (@test)=@_;
-  if ($test[0] eq "config") {
-     shift(@test);
-     $obj->config(@test);
-     return ();
-  }
-
-  my $err = $obj->parse(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     return $d1;
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-21-12:30:45,America/New_York");
 $obj->config("language","Spanish","dateformat","nonUS");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   if ($test[0] eq "config") {
+      shift(@test);
+      $obj->config(@test);
+      return ();
+   }
+
+   my $err = $obj->parse(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      return $d1;
+   }
+}
+
+my $tests="
 
 'sábado Mayo 8, 2010'  => 2010050800:00:00
 
@@ -41,9 +35,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

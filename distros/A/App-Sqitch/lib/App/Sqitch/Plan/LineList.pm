@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use utf8;
 
-our $VERSION = '0.9999';
+our $VERSION = 'v1.0.0'; # VERSION
 
 sub new {
     my $class = shift;

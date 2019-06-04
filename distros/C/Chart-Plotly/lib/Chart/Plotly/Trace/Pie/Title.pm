@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Pie::Title::Font;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pie.
 
@@ -51,7 +51,7 @@ has text => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "Sets the title of the pie chart. If it is empty, no title is displayed. Note that before the existence of `title.text`, the title's contents used to be defined as the `title` attribute itself. This behavior has been deprecated.",
+      "Sets the title of the chart. If it is empty, no title is displayed. Note that before the existence of `title.text`, the title's contents used to be defined as the `title` attribute itself. This behavior has been deprecated.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -69,7 +69,7 @@ Chart::Plotly::Trace::Pie::Title - This attribute is one of the possible options
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ Specifies the location of the `title`. Note that the title's position used to be
 
 =item * text
 
-Sets the title of the pie chart. If it is empty, no title is displayed. Note that before the existence of `title.text`, the title's contents used to be defined as the `title` attribute itself. This behavior has been deprecated.
+Sets the title of the chart. If it is empty, no title is displayed. Note that before the existence of `title.text`, the title's contents used to be defined as the `title` attribute itself. This behavior has been deprecated.
 
 =back
 

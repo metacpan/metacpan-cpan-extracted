@@ -1,32 +1,25 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'recur :: is';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+my $obj = new Date::Manip::Recur;
 
 sub test {
-  ($test)=@_;
-  if ($test eq 'date') {
-     return $obj->is_date();
-  } elsif ($test eq 'delta') {
-     return $obj->is_delta();
-  } elsif ($test eq 'recur') {
-     return $obj->is_recur();
-  }
+   my ($test)=@_;
+   if ($test eq 'date') {
+      return $obj->is_date();
+   } elsif ($test eq 'delta') {
+      return $obj->is_delta();
+   } elsif ($test eq 'recur') {
+      return $obj->is_recur();
+   }
 }
 
-$obj = new Date::Manip::Recur;
-
-$tests="
+my $tests="
 
 date => 0
 
@@ -36,9 +29,9 @@ recur => 1
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

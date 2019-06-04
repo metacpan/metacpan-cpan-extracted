@@ -31,14 +31,17 @@ t/10pad.t
 t/11contexts.t
 t/12closure.t
 t/13regexp.t
+t/14packagevar.t
 t/20context-block.t
 t/21context-while.t
 t/22context-foreach.t
+t/23context-map.t
 t/30stringeval.t
 t/31destroy.t
 t/40croak.t
 t/41end.t
 t/42unresolved.t
+t/43failure.t
 t/80await+try.t
 t/81memory-growth.t
 t/90rt128176.t

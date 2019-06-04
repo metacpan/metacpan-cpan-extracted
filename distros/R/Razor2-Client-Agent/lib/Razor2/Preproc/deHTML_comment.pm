@@ -1,19 +1,17 @@
 package Razor2::Preproc::deHTML_comment;
 
-
-sub new { 
+sub new {
 
     my $class = shift;
     return bless {}, $class;
 
 }
 
-
 sub isit {
 
-    my ($self, $text) = @_;
+    my ( $self, $text ) = @_;
     my $isit = 0;
-    my ($hdr, $body) = split /\n\r*\n/, $$text, 2;
+    my ( $hdr, $body ) = split /\n\r*\n/, $$text, 2;
 
     return 0 unless $body;
 
@@ -25,18 +23,16 @@ sub isit {
 
 }
 
-
 sub doit {
 
-    my ($self, $text) = @_;
-    my ($hdr, $body) = split /\n\r*\n/, $$text, 2;
+    my ( $self, $text ) = @_;
+    my ( $hdr, $body ) = split /\n\r*\n/, $$text, 2;
 
     $body =~ s/<!--.*?-->//gs;
 
     $$text = "$hdr\n\n$body";
 
 }
-
 
 1;
 

@@ -1,5 +1,14 @@
 Revision history for Time-Zone-Olson
 
+0.21   Tue Jun 04 21:10:00 2019
+       Untainting TZ environment variable. Cleanups.
+
+0.20   Tue Jun 04 19:48:00 2019
+       Improving the guess ability for older debians and freebsd.  Allowing tz specifications with just a location, such as 'UTC'.
+
+0.19   Mon Jun 03 17:26:00 2019
+       Incorporating the ability to guess TZ from the environment if a tz parameter is not found.
+
 0.18   Tue May 28 20:24:00 2019
        More tz rule and Solaris fixes.
 

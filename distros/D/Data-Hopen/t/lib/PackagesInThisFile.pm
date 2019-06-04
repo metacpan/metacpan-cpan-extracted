@@ -30,7 +30,8 @@ sub import {
 
     # Find the subroutines in those packages
     my @subs = map
-                {
+                {;  # ';' says this is a BLOCK, not a HASH --- see perlref
+                    # and https://www.perlmonks.org/?node_id=434081 .
                     no strict 'refs';
                     no warnings 'once';
                     [$_, *{ $_ . '::' . $sub_name }{CODE}]

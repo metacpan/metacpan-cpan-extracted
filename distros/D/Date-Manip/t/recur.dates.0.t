@@ -1,41 +1,34 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'recur :: std';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+my $obj = new Date::Manip::Recur;
+$obj->config("forcedate","2000-01-21-00:00:00,America/New_York");
+$obj->config("ConfigFile","Manip.cnf");
 
 sub test {
-  (@test)=@_;
-  $err = $obj->parse(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     @dates = $obj->dates();
-     $err   = $obj->err();
-     return $err  if ($err);
-     @ret   = ();
-     foreach my $d (@dates) {
-        $v = $d->value();
-        push(@ret,$v);
-     }
-     return @ret;
-  }
+   my(@test)=@_;
+   my $err = $obj->parse(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my @dates = $obj->dates();
+      $err   = $obj->err();
+      return $err  if ($err);
+      my @ret   = ();
+      foreach my $d (@dates) {
+         my $v = $d->value();
+         push(@ret,$v);
+      }
+      return @ret;
+   }
 }
 
-$obj = new Date::Manip::Recur;
-$obj->config("forcedate","2000-01-21-00:00:00,America/New_York");
-$obj->config("ConfigFile","$testdir/Manip.cnf");
-
-$tests="
+my $tests="
 
 ### All Y/M/W/D combos
 
@@ -1377,9 +1370,9 @@ now
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

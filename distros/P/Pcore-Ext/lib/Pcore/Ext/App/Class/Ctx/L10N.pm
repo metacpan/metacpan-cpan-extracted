@@ -14,7 +14,7 @@ sub BUILD ( $self, $args ) {
 }
 
 use overload    #
-  '""' => sub ( $self, @ )   { return $self->to_js_func },
+  '""' => sub ( $self, @ ) { return $self->to_js_func },
   '.'  => sub ( $self, $str, $pos ) {
     return __PACKAGE__->new(
         class => $self->{class},

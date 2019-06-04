@@ -1,5 +1,8 @@
 Revision history for Alien-bison
 
+0.20      2019-06-04 08:18:31 -0700
+  - Use Decode::Mojo instead of Decode::HTML
+
 0.19      2017-03-20 02:27:47 -0400
   - Remove custon bin_dir no longer necessary
 

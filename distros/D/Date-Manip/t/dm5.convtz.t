@@ -1,25 +1,14 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: ConvTZ';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 
-$tests ="
+my $tests ="
 
 today +0000 +0100 2 => ''
 
@@ -39,14 +28,14 @@ today +0000 +0100 2 => ''
 
 ";
 
-$t->tests(func  => \&Date_ConvTZ,
-          tests => $tests);
-$t->tests(func  => \&Date_ConvTZ,
-          tests => [ [ '2007030113:34:34', 'EST', 'GMT' ],
-                     [ '2007030113:34:34', '',    'GMT' ],
-                     [ '2007030113:34:34', undef, 'GMT' ] ],
-          expected => "2007030118:34:34" );
-$t->done_testing();
+$::ti->tests(func  => \&Date_ConvTZ,
+             tests => $tests);
+$::ti->tests(func  => \&Date_ConvTZ,
+             tests => [ [ '2007030113:34:34', 'EST', 'GMT' ],
+                        [ '2007030113:34:34', '',    'GMT' ],
+                        [ '2007030113:34:34', undef, 'GMT' ] ],
+             expected => "2007030118:34:34" );
+$::ti->done_testing();
 
 
 #Local Variables:

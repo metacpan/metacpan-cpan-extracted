@@ -1,5 +1,25 @@
 use alienfile;
 
+configure {
+  requires 'Alien::Build' => '1.74';
+  requires 'Alien::Build::Plugin::Decode::Mojo';
+};
+
+if($^O eq 'darwin' && ! -d '/usr/include/openssl')
+{
+  # The OpenSSL that ships with recent OS X is completely broken
+  # from a developer perspective.  They provide an openssl binary,
+  # libraries and a .pc file, but no headers.  I guess the reason
+  # is OpenSSL is considered deprecated on the platform, but then
+  # why ship the .pc file?  We set PKG_CONFIG_LIBDIR to just the
+  # to skip /usr/lib/pkgconfig, unless the user has specified it.
+  # (presumably if they have set it, they have done so for a reason).
+  $ENV{PKG_CONFIG_LIBDIR} ||= join ':', qw(
+    /usr/local/lib/pkgconfig
+    /usr/local/share/pkgconfig
+  );
+}
+
 plugin 'PkgConfig' => 'openssl';
 
 share {
@@ -8,6 +28,7 @@ share {
   plugin Download => (
     version       => qr/^libressl-([0-9\.]+)\.tar\.gz$/,
     bootstrap_ssl => 1,
+    decoder       => 'Decode::Mojo',
   );
 
   unless(meta->has_hook('fetch'))
@@ -43,16 +64,16 @@ share {
       requires 'Text::Patch';
       requires 'Path::Tiny';
 
-      meta->after_hook(
-        extract => sub {
-          my($build) = @_;
-          my($dir) = map { $_->basename } Path::Tiny->new('.')->children;
-          chdir $dir;
-          $build->system('%{perl} %{.install.patch}/libressl-2.6.2.pl');
-          die 'execute failed' if $?;
-          chdir '..';
-        }
-      );
+      #meta->after_hook(
+      #  extract => sub {
+      #    my($build) = @_;
+      #    my($dir) = map { $_->basename } Path::Tiny->new('.')->children;
+      #    chdir $dir;
+      #    $build->system('%{perl} %{.install.patch}/libressl-2.6.2.pl');
+      #    die 'execute failed' if $?;
+      #    chdir '..';
+      #  }
+      #);
 
       gather sub {
         my($build) = @_;

@@ -21,6 +21,12 @@ sub CLI ($self) {
                 default => 0,
             },
         },
+        arg => [
+            script => {
+                min => 0,
+                max => 0,
+            },
+        ],
     };
 }
 
@@ -46,7 +52,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         return;
     }
     else {
-        $dist->build->par( $opt->%* );
+        $dist->build->par( $opt->%*, script => $arg->{script} );
 
         return;
     }

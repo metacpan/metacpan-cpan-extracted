@@ -2,19 +2,15 @@
 
 use warnings;
 use strict;
-require 5.002;
+use Test::Inter;
+my $t = new Test::Inter $0;
+require "do_tests.pl";
 
-if ( -f "t/do_tests.pl" ) {
-   require "./t/do_tests.pl";
-} elsif (-f "do_tests.pl") {
-   require "./do_tests.pl";
-} else {
-  die "ERROR: cannot find do_tests.pl\n";
-}
+init_tests();
+$t->tests(func  => \&tests,
+          tests => $::tests);
+$t->done_testing();
 
-do_tests('langext','','func');
-
-1;
 # Local Variables:
 # mode: cperl
 # indent-tabs-mode: nil

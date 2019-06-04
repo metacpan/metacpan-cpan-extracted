@@ -1,46 +1,39 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: set (Printable=2)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  $err = $obj->set(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     my $ret = $obj->value();
-     return $ret;
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
 $obj->config("printable",2);
 
-$tests=join('',<DATA>);
+sub test {
+   my(@test)=@_;
+   my $err = $obj->set(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $ret = $obj->value();
+      return $ret;
+   }
+}
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
-
-1;
-__DATA__
+my $tests="
 
 date [ 1996 1 1 12 0 0 ]  => 1996-01-01-12:00:00
 
 date [ 1996 13 1 12 0 0 ] => '[set] Invalid date argument'
 
+";
+
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
+
+1;
 #Local Variables:
 #mode: cperl
 #indent-tabs-mode: nil

@@ -30,7 +30,9 @@ sub oauth2_functions {
 }
 
 sub _resource_owner_logged_in {
-	my ( $c ) = @_;
+  my ( %args ) = @_;
+
+  my $c = $args{mojo_controller};
 
 	if ( ! $c->session( 'session_id' ) ) {
 		# we need to redirect back to the /oauth/authorize route after
@@ -45,7 +47,10 @@ sub _resource_owner_logged_in {
 }
 
 sub _resource_owner_confirm_scopes {
-	my ( $c,$client_id,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$scopes_ref,$redirect_uri,$response_type )
+    = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
 
 	my $is_allowed = $c->flash( "oauth_${client_id}" );
 
@@ -64,7 +69,11 @@ sub _resource_owner_confirm_scopes {
 }
 
 sub _verify_client {
-	my ( $c,$client_id,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$scopes_ref,$client_secret,$redirect_uri,$response_type )
+      = @args{ qw/ mojo_controller client_id scopes client_secret redirect_uri response_type / };
+
 
 	if ( my $client = $c->model->rs( 'Oauth2Client' )->find( $client_id ) ) {
 
@@ -98,7 +107,10 @@ sub _verify_client {
 }
 
 sub _store_auth_code {
-	my ( $c,$auth_code,$client_id,$expires_in,$uri,@scopes ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$auth_code,$client_id,$expires_in,$uri,$scopes_ref ) =
+      @args{qw/ mojo_controller auth_code client_id expires_in redirect_uri scopes / };
 
 	my $user_id = $c->session( 'user_id' );
 
@@ -130,7 +142,11 @@ sub _store_auth_code {
 }
 
 sub _verify_auth_code {
-	my ( $c,$client_id,$client_secret,$auth_code,$uri ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$client_secret,$auth_code,$uri )
+      = @args{qw/ mojo_controller client_id client_secret auth_code redirect_uri / };
+
 
 	my $client = $c->model->rs( 'Oauth2Client' )->find( $client_id )
 		|| return ( 0,'unauthorized_client' );
@@ -200,10 +216,15 @@ sub _check_password {
 }
 
 sub _store_access_token {
-	my (
-		$c,$client,$auth_code,$access_token,$refresh_token,
-		$expires_in,$scope,$old_refresh_token
-	) = @_;
+  my ( %args ) = @_;
+
+  my (
+    $c,$client,$auth_code,$access_token,$refresh_token,
+    $expires_in,$scope,$old_refresh_token
+  ) = @args{qw/
+    mojo_controller client_id auth_code access_token
+    refresh_token expires_in scopes old_refresh_token
+  / };
 
 	my ( $user_id );
 
@@ -288,7 +309,11 @@ sub _store_access_token {
 }
 
 sub _verify_access_token {
-	my ( $c,$access_token,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$access_token,$scopes_ref,$is_refresh_token )
+        = @args{qw/ mojo_controller access_token scopes is_refresh_token /};
+
 
 	if (
 		my $rt = $c->model->rs( 'Oauth2RefreshToken' )->find( $access_token )

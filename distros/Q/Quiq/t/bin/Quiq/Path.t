@@ -34,6 +34,34 @@ sub test_append : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_checkFileSecurity : Test(4) {
+    my $self = shift;
+
+    my $p = Quiq::Path->new;
+
+    my $file = Quiq::TempFile->new;
+
+    $p->chmod($file,0600);
+
+    eval {$p->checkFileSecurity($file)};
+    $self->ok(!$@);
+
+    $p->chmod($file,0640);
+
+    eval {$p->checkFileSecurity($file)};
+    $self->ok($@);
+
+    eval {$p->checkFileSecurity($file,1)};
+    $self->ok(!$@);
+
+    $p->chmod($file,0642);
+
+    eval {$p->checkFileSecurity($file,1)};
+    $self->ok($@);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_compareData : Test(2) {
     my $self = shift;
 

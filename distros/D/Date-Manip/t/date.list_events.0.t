@@ -1,38 +1,31 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: list_events';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj = new Date::Manip::Date;
+$obj->config("forcedate","now,America/New_York");
+$obj->config("ConfigFile","Events.cnf");
 
 sub test {
-  ($date,@test)=@_;
-  $obj->err(1);
-  $obj->parse($date);
-  @d = $obj->list_events(@test);
-  @ret = ();
-  foreach $d (@d) {
-     ($d0,$d1,$name) = @$d;
-     $v0 = $d0->value();
-     $v1 = $d1->value();
-     push(@ret,$v0,$v1,$name);
-  }
-  return @ret;
+   my($date,@test)=@_;
+   $obj->err(1);
+   $obj->parse($date);
+   my @d = $obj->list_events(@test);
+   my @ret = ();
+   foreach my $d (@d) {
+      my ($d0,$d1,$name) = @$d;
+      my $v0 = $d0->value();
+      my $v1 = $d1->value();
+      push(@ret,$v0,$v1,$name);
+   }
+   return @ret;
 }
 
-$obj = new Date::Manip::Date;
-$obj->config("forcedate","now,America/New_York");
-$obj->config("ConfigFile","$testdir/Events.cnf");
-
-$tests ="
+my $tests ="
 
 2000-02-01
    =>
@@ -151,9 +144,9 @@ $tests ="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

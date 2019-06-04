@@ -4,11 +4,11 @@ use 5.006;
 
 use base 'Tree';
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Scalar::Util qw( blessed );
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 sub _init {
     my $self = shift;

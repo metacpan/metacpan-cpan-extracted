@@ -1,6 +1,6 @@
 #!/usr/bin/perl -sw
 ##
-## Razor2::Errorhandler -- Base class that provides error 
+## Razor2::Errorhandler -- Base class that provides error
 ##                         handling functionality.
 ##
 ## Copyright (c) 2001, Vipul Ved Prakash.  All rights reserved.
@@ -9,49 +9,47 @@
 ##
 ## $Id: Errorhandler.pm,v 1.5 2005/08/03 21:43:09 rsoderberg Exp $
 
-package Razor2::Errorhandler; 
+package Razor2::Errorhandler;
 use strict;
 
-sub new { 
-    bless {}, shift
+sub new {
+    bless {}, shift;
 }
 
-
-sub error { 
+sub error {
     no strict;
-    my ($self, $errstr, $construction_error) = @_;
-    if ($construction_error) { 
-        my ($package, @undef) = caller();
+    my ( $self, $errstr, $construction_error ) = @_;
+    if ($construction_error) {
+        my ( $package, @undef ) = caller();
         my $location = "$package\::errstr";
-        my $spot = *{$location}{SCALAR};
+        my $spot     = *{$location}{SCALAR};
         $$spot = "$errstr\n";
-    } else {
+    }
+    else {
         $$self{errstr} = "$errstr\n";
     }
-    $self->log($self->{logerrors},"Error: $errstr\n") if $self->{logerrors};
+    $self->log( $self->{logerrors}, "Error: $errstr\n" ) if $self->{logerrors};
     use strict;
     return;
-} 
+}
 
-
-sub errstr { 
+sub errstr {
     my $self = shift;
     return $$self{errstr};
 }
 
-sub errprefix { 
-    my ($self, $prefix) = @_;
-    $$self{errstr} = $prefix .": ". $$self{errstr};
+sub errprefix {
+    my ( $self, $prefix ) = @_;
+    $$self{errstr} = $prefix . ": " . $$self{errstr};
     return;
 }
 
-sub errstrrst { 
+sub errstrrst {
     my $self = shift;
     $$self{errstr} = "";
 }
 
 1;
-
 
 =head1 NAME
 
@@ -126,5 +124,4 @@ Vipul Ved Prakash, E<lt>mail@vipul.netE<gt>
 Razor::Client(3)
 
 =cut
-
 

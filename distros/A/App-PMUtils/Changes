@@ -1,3 +1,9 @@
+0.723   2019-06-02 (PERLANCAR)
+
+	- [ux] pmchkver/pmlatest: Show a human friendly message when run
+	  interactively.
+
+
 0.722   2019-06-01 (PERLANCAR)
 
 	- [ux] Add pmlatest as alias for pmchkver, more memorable.

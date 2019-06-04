@@ -1,43 +1,35 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use Test::More;
-use Test::Inter;
 binmode(STDOUT,':utf8');
 binmode(STDERR,':utf8');
+use warnings;
+use strict;
+use Test::Inter;
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-$t = new Test::Inter 'date :: parse (Russian, cp1251)';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-sub test {
-  (@test)=@_;
-  if ($test[0] eq "config") {
-     shift(@test);
-     $obj->config(@test);
-     return ();
-  }
-
-  my $err = $obj->parse(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     return $d1;
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","1997-03-08-12:30:00,America/New_York");
 $obj->config("language","Russian","dateformat","nonUS");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   if ($test[0] eq "config") {
+      shift(@test);
+      $obj->config(@test);
+      return ();
+   }
+
+   my $err = $obj->parse(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      return $d1;
+   }
+}
+
+my $tests="
 
 '\xd1\xc5\xc3\xce\xc4\xcd\xdf' => '1997030800:00:00'
 
@@ -49,9 +41,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 # Local Variables:
 # mode: cperl

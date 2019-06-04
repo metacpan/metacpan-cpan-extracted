@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.143';
+our $VERSION = '1.145';
 
 use Time::HiRes ();
+use Time::Local ();
 use POSIX ();
 
 # -----------------------------------------------------------------------------
@@ -49,6 +50,7 @@ Zeitpunkt ist hochauflösend, umfasst also auch Sekundenbruchteile.
 
     $t = $class->new;
     $t = $class->new($epoch);
+    $t = $class->new($iso);
 
 =head4 Description
 
@@ -63,6 +65,15 @@ der aktuelle Zeitpunkt genommen.
 sub new {
     my $class = shift;
     my $epoch = shift // scalar(Time::HiRes::gettimeofday);
+
+    if ($epoch !~ /^[\d.]+$/) {
+        # ISO Zeitangabe
+
+        my @arr = reverse split /\D+/,$epoch;
+        $arr[4]--;
+        $epoch = Time::Local::timelocal(@arr);
+    }
+
     return bless \$epoch,$class;
 } 
 
@@ -92,6 +103,44 @@ Liefere den Epoch-Wert des Zeitpunkts.
 
 sub epoch {
     return ${(shift)}
+} 
+
+# -----------------------------------------------------------------------------
+
+=head3 localtime() - Zeitkomponenten in lokaler Zeit
+
+=head4 Synopsis
+
+    ($s,$mi,$h,$d,$m,$y) = $t->localtime;
+
+=head4 Description
+
+Liefere die Zeitkomponenten Sekunden, Minuten, Stunden, Tag, Monat, Jahr
+in lokaler Zeit. Im Unterschied zu localtime() aus dem Perl Core sind
+Monat ($m) und Jahr (y) "richtig" wiedergegeben. d.h die Komponente $m
+muss nicht inkrementiert und die Komponente $y muss nicht um 1900
+erhöht werden.
+
+=head4 Example
+
+    Quiq::Epoch->new(1559466751)->localtime;
+    =>
+    (31,12,11,2,6,2019) # 2019-06-02 11:12:31
+    
+    (in Zeitzone MESZ)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub localtime {
+    my $self = shift;
+
+    my @arr = CORE::localtime $$self;
+    $arr[4]++;
+    $arr[5] += 1900;
+
+    return @arr;
 } 
 
 # -----------------------------------------------------------------------------
@@ -128,14 +177,14 @@ sub as {
         $self->throw;
     }
     
-    return POSIX::strftime($strFmt,localtime $$self);
+    return POSIX::strftime($strFmt,CORE::localtime $$self);
 } 
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.143
+1.145
 
 =head1 AUTHOR
 

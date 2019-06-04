@@ -1,0 +1,69 @@
+#!perl
+#
+# launcher script for Game::PlatformsOfPeril
+
+use 5.24.0;
+use warnings;
+use File::ShareDir qw(dist_dir);
+
+our ( $ddelay, $err, $level, $prefix, $rdelay, $seed );
+
+BEGIN {
+    use Getopt::Long qw(GetOptions);
+
+    GetOptions(
+        'help|h|?' => sub {
+            warn <<'TLDR';
+Usage: pperil [--err=file] [--level=N] [--prefix=path] [--seed=N]
+
+  --err    - send STDERR to this file if not already redirected
+  --ddelay - draw delay in seconds between moves
+  --level  - level integer to start on
+  --prefix - path to the levels directory (containing the files
+             level0, level1, ...)
+  --rdelay - delay (secs) following a rotation
+  --seed   - PRNG uses the given integer as the seed
+
+pperil hides STDERR by default so will hide warning or error messages;
+debug with a command similar to
+
+  pperil 2>err
+  pperil --err=err
+
+and then inspect the err file
+
+TLDR
+            exit 1;
+        },
+        'err=s'    => \$err,
+        'ddelay=f' => \$ddelay,
+        'level=i'  => \$level,
+        'prefix=s' => \$prefix,
+        'rdelay=f' => \$rdelay,
+        'seed=i'   => sub { $seed = srand $_[1] }
+    ) or exit 1;
+
+    $level  //= 0;
+    $prefix //= dist_dir('Game-PlatformsOfPeril');
+    $seed   //= srand;
+}
+
+# NOTE this must happen after the GetOptions call as otherwise the seed
+# will not apply to the rand() calls made when the module loads
+use Game::PlatformsOfPeril;
+
+if ( -t STDERR ) {
+    close STDERR;
+    if ( defined $err ) {
+        unless ( open STDERR, '>', $err ) {
+            say "Could not redirect STDERR to '$err': $!";
+            exit 1;
+        }
+        STDERR->autoflush(1);
+    }
+}
+
+$Game::PlatformsOfPeril::Redraw_Delay = $ddelay if defined $ddelay;
+$Game::PlatformsOfPeril::Rotate_Delay = $rdelay if defined $rdelay;
+
+Game::PlatformsOfPeril::game_loop( $prefix, $level, $seed );

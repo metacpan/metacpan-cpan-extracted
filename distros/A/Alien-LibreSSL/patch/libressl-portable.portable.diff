@@ -1,0 +1,32 @@
+diff --git a/apps/openssl/compat/poll_win.c b/apps/openssl/compat/poll_win.c
+index c9422b9..cc9fdac 100644
+--- a/apps/openssl/compat/poll_win.c
++++ b/apps/openssl/compat/poll_win.c
+@@ -44,9 +44,9 @@ conn_has_oob_data(int fd)
+ static int
+ is_socket(int fd)
+ {
++	WSANETWORKEVENTS events;
+ 	if (fd < 3)
+ 		return 0;
+-	WSANETWORKEVENTS events;
+ 	return (WSAEnumNetworkEvents((SOCKET)fd, NULL, &events) == 0);
+ }
+ 
+diff --git a/crypto/compat/posix_win.c b/crypto/compat/posix_win.c
+index d6e2dcb..0aacc15 100644
+--- a/crypto/compat/posix_win.c
++++ b/crypto/compat/posix_win.c
+@@ -29,10 +29,11 @@ FILE *
+ posix_fopen(const char *path, const char *mode)
+ {
+ 	if (strchr(mode, 'b') == NULL) {
++		FILE *f;
+ 		char *bin_mode = NULL;
+ 		if (asprintf(&bin_mode, "%sb", mode) == -1)
+ 			return NULL;
+-		FILE *f = fopen(path, bin_mode);
++		f = fopen(path, bin_mode);
+ 		free(bin_mode);
+ 		return f;
+ 	}

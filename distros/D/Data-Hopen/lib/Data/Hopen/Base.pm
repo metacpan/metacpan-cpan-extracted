@@ -8,7 +8,7 @@ package Data::Hopen::Base;
 use parent 'Exporter';
 use Import::Into;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 # Pragmas
 use 5.014;
@@ -74,5 +74,7 @@ Data::Hopen::Base - basic definitions for hopen
 
 C<use Data::Hopen::Base;> to pull in C<5.014>, L<strict>, L<warnings>,
 L<Carp>, L<Data::Dumper>, C<true>, and C<false>.
+
+NOTE: Modules also C<use strict> manually for the sake of Kwalitee.
 
 =cut

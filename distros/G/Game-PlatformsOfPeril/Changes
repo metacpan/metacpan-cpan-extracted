@@ -1,0 +1,11 @@
+Revision history for Game::PlatformsOfPeril
+
+0.02    2019-06-04
+        Better ensure minimum terminal size of 70x24. Better handle
+        demise of animates. Install level maps with module. move_nop()
+        causes monsters to track player. Also some level maps. And now
+        the monsters are always tracking-happy murder bots. Fix totally
+        broken level changing code.
+
+0.01    2019-06-03
+        First version, released on an unsuspecting world.

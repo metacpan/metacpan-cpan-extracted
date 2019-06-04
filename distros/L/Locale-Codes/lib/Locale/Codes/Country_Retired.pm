@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Thu Feb 21 10:52:57 EST 2019
+#    Generated on: Tue May 28 14:06:31 EDT 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.60';
+$VERSION='3.61';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -365,6 +365,7 @@ $Locale::Codes::Retired{'country'}{'alpha-2'}{'name'} = {
    q(korea, republic of) => [ q(kr), q(Korea, Republic of) ],
    q(libyan arab jamahiriya) => [ q(ly), q(Libyan Arab Jamahiriya) ],
    q(macau) => [ q(mo), q(Macau) ],
+   q(macedonia, the former yugoslav republic of) => [ q(mk), q(Macedonia, The former Yugoslav Republic of) ],
    q(micronesia (federated states of)) => [ q(fm), q(Micronesia (Federated States of)) ],
    q(micronesia, federated states of) => [ q(fm), q(Micronesia, Federated States of) ],
    q(micronesia, the federated states of) => [ q(fm), q(Micronesia, The Federated States of) ],
@@ -437,7 +438,7 @@ $Locale::Codes::Retired{'country'}{'alpha-3'}{'name'} = {
    q(macao) => [ q(mac), q(Macao) ],
    q(macao special administrative region of china) => [ q(mac), q(Macao Special Administrative Region of China) ],
    q(macau) => [ q(mac), q(Macau) ],
-   q(macedonia, the former yugoslav republic of) => [ q(mkd), q(Macedonia, the Former Yugoslav Republic of) ],
+   q(macedonia, the former yugoslav republic of) => [ q(mkd), q(Macedonia, The former Yugoslav Republic of) ],
    q(micronesia (federated states of)) => [ q(fsm), q(Micronesia (Federated States of)) ],
    q(micronesia, federated states of) => [ q(fsm), q(Micronesia, Federated States of) ],
    q(micronesia, the federated states of) => [ q(fsm), q(Micronesia, The Federated States of) ],
@@ -498,6 +499,7 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
    q(korea, democratic people's republic of) => [ q(kp), q(Korea, Democratic People's Republic of) ],
    q(korea, republic of) => [ q(kr), q(Korea, Republic of) ],
    q(libyan arab jamahiriya) => [ q(LY), q(Libyan Arab Jamahiriya) ],
+   q(macedonia, the former yugoslav republic of) => [ q(mk), q(Macedonia, The former Yugoslav Republic of) ],
    q(micronesia, federated states of) => [ q(fm), q(Micronesia, Federated States of) ],
    q(micronesia, the federated states of) => [ q(fm), q(Micronesia, The Federated States of) ],
    q(moldova, republic of) => [ q(md), q(Moldova, Republic of) ],
@@ -524,16 +526,19 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
    q(czech republic) => [ q(CZ), q(Czech Republic) ],
+   q(macedonia, the former yugoslav republic of) => [ q(MK), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SZ), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
    q(czech republic) => [ q(CZE), q(Czech Republic) ],
+   q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SWZ), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
    q(czech republic) => [ q(203), q(Czech Republic) ],
+   q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(748), q(SWAZILAND) ],
 };
 
@@ -580,7 +585,7 @@ $Locale::Codes::Retired{'country'}{'numeric'}{'name'} = {
    q(macao) => [ q(446), q(Macao) ],
    q(macao special administrative region of china) => [ q(446), q(Macao Special Administrative Region of China) ],
    q(macau) => [ q(446), q(Macau) ],
-   q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, the Former Yugoslav Republic of) ],
+   q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
    q(micronesia (federated states of)) => [ q(583), q(Micronesia (Federated States of)) ],
    q(micronesia, federated states of) => [ q(583), q(Micronesia, Federated States of) ],
    q(micronesia, the federated states of) => [ q(583), q(Micronesia, The Federated States of) ],

@@ -16,7 +16,7 @@ use if $] >= 5.027007, 'deprecate';
 use Locale::Codes::Constants;
 
 our($VERSION);
-$VERSION='3.60';
+$VERSION='3.61';
 
 use Exporter qw(import);
 our(@EXPORT_OK,%EXPORT_TAGS);
@@ -239,10 +239,9 @@ sub code2name {
 
    } elsif ($retired  &&  exists $Retired{$type}{$codeset}{'code'}{$code}) {
       return $Retired{$type}{$codeset}{'code'}{$code};
-
-   } else {
-      return undef;
    }
+
+   return undef;
 }
 
 sub name2code {

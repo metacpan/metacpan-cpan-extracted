@@ -1,5 +1,8 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.23     2019-06-04
+        - Fix examples to work with recent version of deps (GH #23, GH #25)
+
 0.22     2019-04-27
         - Add support for JWEs as well as JWTs (GH #24)
         - Fix make sure user_id is returned in AuthorizationCodeGrant defaults

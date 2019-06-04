@@ -5,13 +5,13 @@ use Pcore -class;
 extends qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
-    return { abstract => 'list DockerHub repositories builds', };
+    return { abstract => 'show available DockerHub repository tags', };
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    require Pcore::Dist::Build::Docker;
+    my $dist = $self->get_dist;
 
-    Pcore::Dist::Build::Docker->new->build_status;
+    $dist->build->docker->ls;
 
     return;
 }
@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Dist::CLI::Docker::Ls - list DockerHub repositories builds
+Pcore::Dist::CLI::Docker::Ls - show available DockerHub repository tags
 
 =head1 SYNOPSIS
 

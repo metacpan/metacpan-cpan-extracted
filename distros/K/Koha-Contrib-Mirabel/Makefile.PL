@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "YAML" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.2",
   "test" => {
     "TESTS" => ""
   }

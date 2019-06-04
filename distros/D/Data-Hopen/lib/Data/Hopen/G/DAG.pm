@@ -1,8 +1,9 @@
 # Data::Hopen::G::DAG - hopen build graph
 package Data::Hopen::G::DAG;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {
@@ -84,12 +85,12 @@ precedence.  Valid values (case-insensitive) are:
 (the default): L<Hash::Merge/Retainment Precedence>.  Same-name keys
 are merged, so no data is lost.
 
-=over C<"first">
+=item C<"first">
 
 L<Hash::Merge/Left Precedence>.  The first predecessor to add a value
 under a particular key will win.
 
-=over C<"last">
+=item C<"last">
 
 L<Hash::Merge/Right Precedence>.  The last predecessor to add a value
 under a particular key will win.

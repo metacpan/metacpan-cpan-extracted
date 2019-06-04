@@ -26,6 +26,20 @@ async sub identity
    }, 'async/await from within string eval';
 }
 
+# await at string-eval level should be forbidden (RT126035)
+{
+   my $ok;
+   my $e;
+
+   (async sub {
+      $ok = !eval q{await $_[0]};
+      $e = $@;
+   })->();
+
+   ok( $ok, 'await in string eval fails to compile' );
+   $ok and like( $e, qr/^await is not allowed inside string eval /, '' );
+}
+
 is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,
    'cxstack_ix did not grow during the test' );
 

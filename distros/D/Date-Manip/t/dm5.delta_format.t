@@ -1,25 +1,14 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: FormatDelta';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 
-$tests="
+my $tests="
 
 1:2:3:4:5:6:7
 4
@@ -75,9 +64,9 @@ approx
 
 ";
 
-$t->tests(func  => \&Delta_Format,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&Delta_Format,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

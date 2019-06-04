@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.143';
+our $VERSION = '1.145';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -125,30 +125,65 @@ sub append {
 
 # -----------------------------------------------------------------------------
 
-=head3 checkFileSecurity() - Prüfe, ob Datei nur für Owner lesbar ist
+=head3 checkFileSecurity() - Prüfe, ob Datei geschützt ist
 
 =head4 Synopsis
 
-    $this->checkFileSecurity($file);
+    $this->checkFileSecurity($file); # nur Owner darf schreiben und lesen
+    $this->checkFileSecurity($file,$readableByOthers); # nur Owner darf schreiben
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Datei, deren Rechte geprüft werden.
+
+=item $readableByOthers
+
+Wenn wahr, dürfen auch andere die Datei lesen.
+
+=back
 
 =head4 Description
 
-Prüfe, ob die Datei $file nur für ihren Owner lesbar ist.
+Prüfe, ob die Datei $file vor unerlaubtem Zugriff geschützt ist.
 Wenn nicht, wirf eine Exception.
+
+Per Default darf die Datei nur für ihren Owner lesbar und schreibbar
+sein, muss also die Zugriffsrechte rw------- besitzen.
+
+Ist $readable wahr, darf die Datei von der Gruppe und anderen
+gelesen werden, darf also die Zugriffsrechte rw-r--r-- besitzen.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub checkFileSecurity {
-    my ($this,$file) = @_;
+    my ($this,$file,$readable) = @_;
 
     my $mode = $this->mode($file);
-    if ($mode & 00044) {
+
+    # Die Datei darf nur für ihren Owner schreibbar sein
+
+    if ($mode & 00022) {
         $this->throw(
-            'PATH-00099: File is readable for others',
+            'PATH-00099: File is writeable by others',
             File => $file,
         );
+    }
+
+    if (!$readable) {
+        # Die Datei darf nur für ihren Owner lesbar sein
+
+        if ($mode & 00044) {
+            $this->throw(
+                'PATH-00099: File is readable by others',
+                File => $file,
+            );
+        }
     }
 
     return;
@@ -2577,7 +2612,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.143
+1.145
 
 =head1 AUTHOR
 

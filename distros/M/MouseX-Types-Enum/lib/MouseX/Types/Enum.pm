@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 use Mouse;
 use Carp qw/confess/;
@@ -72,7 +72,7 @@ sub _build_enum {
             next if exists $ignored_subs{$sub_name};
             my ($id, @args) = $child->$sub_name;
             confess "seems to be invalid argument." if scalar(@args) % 2;
-            confess "unique id is required for $child->$sub_name ." unless $id;
+            confess "unique id is required for $child->$sub_name ." unless defined $id;
             my %args = @args;
 
             if (exists $child->_enums->{$id}) {

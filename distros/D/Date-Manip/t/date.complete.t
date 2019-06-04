@@ -1,36 +1,29 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: complete';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($date,@arg)=@_;
-  
-  my $err = $obj->parse($date);
-  if ($err) {
-     $err = $obj->err();
-     return ($obj->value(),$err);
-  } else {
-     my $d = $obj->value();
-     my $c = $obj->complete(@arg);
-     return($d,$c);
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-21-00:00:00,America/New_York");
 
-$tests="
+sub test {
+   my($date,@arg)=@_;
+
+   my $err = $obj->parse($date);
+   if ($err) {
+      $err = $obj->err();
+      return ($obj->value(),$err);
+   } else {
+      my $d = $obj->value();
+      my $c = $obj->complete(@arg);
+      return($d,$c);
+   }
+}
+
+my $tests="
 
 2000-06                  => 2000060100:00:00  0
 
@@ -48,9 +41,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

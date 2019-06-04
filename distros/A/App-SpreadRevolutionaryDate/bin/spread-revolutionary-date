@@ -13,7 +13,6 @@ use utf8;
 
 BEGIN {
     $ENV{OUTPUT_CHARSET} = 'UTF-8';
-    $ENV{PERL_UNICODE} = 'AS';
 }
 
 # PODNAME: spread-revolutionary-date
@@ -34,7 +33,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 DESCRIPTION
 

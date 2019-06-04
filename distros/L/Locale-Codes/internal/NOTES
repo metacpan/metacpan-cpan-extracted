@@ -62,7 +62,7 @@ the changes are good.
    ./internal/deprecate_codes
 
 #########################################################################
-Update the Change file with the date
+Update the Change POD file with the date, and then run:
 
 ../support/pod_to_changes > Changes
 

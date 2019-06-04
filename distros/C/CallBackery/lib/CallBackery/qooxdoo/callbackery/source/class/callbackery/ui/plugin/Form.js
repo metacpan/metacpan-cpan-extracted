@@ -98,12 +98,12 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var rpc = callbackery.data.Server.getInstance();
             var cfg = this._cfg;
             var form = this._form;
+            var reConfFormInProgress;
             cfg.form.forEach(function(s){
                 if (!s.key){
                     return;
                 }
                 var control = form.getControl(s.key);
-                var reConfFormInProgress;
                 var callback = function(e){
                     var data = e.getData();
                     // handle events from selectboxes
@@ -174,6 +174,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     ctrl.set(s.set);
                 }
             },this);
+            this._loadDataReadOnly();
         },
         _loadDataReadOnly: function(){
             // this.setEnabled(false);
@@ -198,7 +199,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     that._form.setData(statusData,true);
                 }
                 that._loading--;
-            },'getPluginData',this._cfg.name,'allFields',parentFormData);
+            },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         },
         _loadData: function(){
             var that = this;

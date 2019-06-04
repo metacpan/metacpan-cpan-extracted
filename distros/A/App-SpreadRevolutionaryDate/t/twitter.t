@@ -12,7 +12,6 @@ use utf8;
 
 BEGIN {
     $ENV{OUTPUT_CHARSET} = 'UTF-8';
-    $ENV{PERL_UNICODE} = 'AS';
 }
 use open qw(:std :encoding(UTF-8));
 binmode(DATA, ":encoding(UTF-8)");

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.143';
+our $VERSION = '1.145';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -658,11 +658,11 @@ sub load {
 
 # -----------------------------------------------------------------------------
 
-=head3 fetch() - Hole Entitäts-Definitionen aus dem Storage
+=head3 fetchToDir() - Hole Entitäts-Definitionen aus dem Storage
 
 =head4 Synopsis
 
-    $cop = $cop->fetch($dir,$layout,@opt);
+    $cop = $cop->fetchToDir($dir,$layout,@opt);
 
 =head4 Arguments
 
@@ -698,7 +698,7 @@ ContentProcessor-Objekt (für Method-Chaining)
 =head4 Description
 
 Übertrage alle Entitäts-Definitionen in Verzeichnis $dir (oder
-STDOUT, s.u.) gemäß Layout $layout. Per Differenzbildung wird
+nach STDOUT, s.u.) gemäß Layout $layout. Per Differenzbildung wird
 dabei ein konsistenter Stand hergestellt. Existiert Verzeichnis
 $dir nicht, wird es angelegt. Andernfalls wird eine Rückfrage
 gestellt, ob das Verzeichnis überschrieben werden soll (siehe
@@ -716,7 +716,7 @@ werden, um andere Strukturen zu generieren.
 
 # -----------------------------------------------------------------------------
 
-sub fetch {
+sub fetchToDir {
     my ($self,$dir,$layout) = @_;
 
     $self->msg(1,'%T ==fetch==');
@@ -815,10 +815,10 @@ Array mit zweielementigen Arrays
 
 =head4 Description
 
-Liefere die Liste der Dateien, die von der Methode L<fetch|"fetch() - Hole Entitäts-Definitionen aus dem Storage">()
-geschrieben werden. Jede Datei wird durch ein zweielementiges
-Array repräsentiert, bestehend aus einem Datei-Pfad sowie dem
-Datei-Inhalt. Der Datei-Inhalt kann als String oder
+Liefere die Liste der Dateien, die von den Methode L<fetchToDir|"fetchToDir() - Hole Entitäts-Definitionen aus dem Storage">()
+und [ANCHOR NOT FOUND]() geschrieben werden. Jede Datei wird durch ein
+zweielementiges Array repräsentiert, bestehend aus einem Datei-Pfad
+sowie dem Datei-Inhalt. Der Datei-Inhalt kann als String oder
 String-Referenz angegeben sein.
 
 Diese (Basisklassen-)Methode liefert für jede Entität die
@@ -1392,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.143
+1.145
 
 =head1 AUTHOR
 

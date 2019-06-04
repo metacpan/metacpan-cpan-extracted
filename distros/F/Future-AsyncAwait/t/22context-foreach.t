@@ -194,27 +194,21 @@ SKIP: {
    );
 }
 
-# TODO:
-#   This ought to be a compiletime check. That's hard right now so for now
-#   it's a runtime check
 {
    our $VAR;
 
-   my $f1 = Future->new;
-
-   async sub foreach_pkgvar
-   {
-      foreach $VAR ( 1 .. 3 ) {
-         await $f1;
+   my $ok = !eval q{
+      async sub foreach_pkgvar
+      {
+         foreach $VAR ( 1 .. 3 ) {
+            await $f1;
+         }
       }
-   }
+   };
+   my $e = $@;
 
-   my $fret = foreach_pkgvar();
-   $f1->done;
-
-   ok( $fret->failure, 'foreach $VAR failed' );
-   like( $fret->failure, qr/\bnon-lexical iterator\b/,
-      'Failure message refers to non-lexical iterator' );
+   ok( $ok, 'await in non-lexical foreach loop fails to compile' );
+   $ok and like( $e, qr/^await is not allowed inside foreach on non-lexical iterator variable /, '' );
 }
 
 done_testing;

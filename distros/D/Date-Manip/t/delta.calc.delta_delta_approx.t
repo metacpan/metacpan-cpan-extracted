@@ -1,41 +1,34 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: calc (delta,delta,approx)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj1 = new Date::Manip::Delta;
+$obj1->config("forcedate","now,America/New_York");
+our $obj2 = $obj1->new_delta();
 
 sub test {
-  (@test)=@_;
+   my (@test)=@_;
 
-  $err = $obj1->parse(shift(@test));
-  if ($err) {
-     return $obj1->err();
-  }
+   my $err = $obj1->parse(shift(@test));
+   if ($err) {
+      return $obj1->err();
+   }
 
-  $err = $obj2->parse(shift(@test));
-  if ($err) {
-     return $obj2->err();
-  }
+   $err = $obj2->parse(shift(@test));
+   if ($err) {
+      return $obj2->err();
+   }
 
-  my $obj3 = $obj1->calc($obj2,@test);
-  $ret = $obj3->value();
-  return $ret;
+   my $obj3 = $obj1->calc($obj2,@test);
+   my $ret  = $obj3->value();
+   return $ret;
 }
 
-$obj1 = new Date::Manip::Delta;
-$obj1->config("forcedate","now,America/New_York");
-$obj2 = $obj1->new_delta();
-
-$tests="
+my $tests="
 
 1:1:1:1:1:1:1   2:12:5:2:48:120:120  => 4:1:6:5:3:3:1
 
@@ -55,9 +48,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

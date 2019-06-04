@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Pie::Marker::Line;
 
-our $VERSION = '0.025';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pie.
 
@@ -39,7 +39,7 @@ has colors => (
     is  => "rw",
     isa => "ArrayRef|PDL",
     documentation =>
-      "Sets the color of each sector of this pie chart. If not specified, the default trace color set is used to pick the sector colors.",
+      "Sets the color of each sector. If not specified, the default trace color set is used to pick the sector colors.",
 );
 
 has colorssrc => ( is            => "rw",
@@ -65,7 +65,7 @@ Chart::Plotly::Trace::Pie::Marker - This attribute is one of the possible option
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * colors
 
-Sets the color of each sector of this pie chart. If not specified, the default trace color set is used to pick the sector colors.
+Sets the color of each sector. If not specified, the default trace color set is used to pick the sector colors.
 
 =item * colorssrc
 

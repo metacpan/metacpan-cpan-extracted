@@ -1,30 +1,23 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: cmp';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj1 = new Date::Manip::Date;
+$obj1->config("forcedate","now,America/New_York");
+our $obj2 = $obj1->new_date();
 
 sub test {
-  (@test)=@_;
-  $obj1->parse($test[0]);
-  $obj2->parse($test[1]);
-  return $obj1->cmp($obj2);
+   my (@test)=@_;
+   $obj1->parse($test[0]);
+   $obj2->parse($test[1]);
+   return $obj1->cmp($obj2);
 }
 
-$obj1 = new Date::Manip::Date;
-$obj1->config("forcedate","now,America/New_York");
-$obj2 = $obj1->new_date();
-
-$tests="
+my $tests="
 
 2007020312:00:00 2007020312:00:00 => 0
 
@@ -36,9 +29,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

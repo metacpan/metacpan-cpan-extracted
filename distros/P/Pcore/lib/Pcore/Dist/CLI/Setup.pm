@@ -5,7 +5,7 @@ use Pcore -class;
 extends qw[Pcore::Core::CLI::Cmd];
 
 sub CLI ($self) {
-    return { abstract => 'setup ~/.pcore/pcore.ini', };
+    return { abstract => 'setup ~/.pcore/pcore.yaml', };
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Dist::CLI::Setup - setup ~/.pcore/pcore.ini
+Pcore::Dist::CLI::Setup - setup ~/.pcore/pcore.yaml
 
 =head1 SYNOPSIS
 

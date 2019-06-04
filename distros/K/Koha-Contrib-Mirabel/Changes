@@ -1,5 +1,13 @@
 Revision history for Perl module koha-mirabel
 
+1.0.2 2019-06-03
+
+  - Fix bug on command koha-mirabel clean
+
+1.0.1 2019-02-14
+
+  - Services appelés en HTTPS
+
 1.0.0 2019-02-06
 
   - Update for Koha 17.11 and above. Won't work with previous versions.

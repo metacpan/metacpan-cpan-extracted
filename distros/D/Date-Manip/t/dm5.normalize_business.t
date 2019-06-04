@@ -1,21 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: Normalize (after business day)';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 
@@ -28,15 +17,15 @@ sub Test_Normalize {
   return $tmp;
 }
 
-$tests="
+my $tests="
 
 +0:0:0:0:9:9:1 => +0:0:0:0:9:9:1
 
 ";
 
-$t->tests(func  => \&Test_Normalize,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&Test_Normalize,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

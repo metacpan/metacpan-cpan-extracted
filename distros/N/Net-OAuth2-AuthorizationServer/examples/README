@@ -41,7 +41,7 @@ Server
 What we have available in this examples/ directory:
 ---------------------------------------------------
 
-examples/oauth2_client.pl           - A Client - this will need at least v1.51 of
+examples/oauth2_client.pl           - A Client - make sure you are up to date with
                                      the Mojolicious::Plugin::OAuth2 module
 
 examples/oauth2_server_simple.pl    - An Authorization Server and Resource Server
@@ -79,6 +79,10 @@ the command line                   - A Resource Owner (A person, You!)
 
 To run:
 -------
+
+# make sure you have up to date dependencies:
+  - Mojolicious
+  - Mojolicious::Plugin::OAuth2
 
 cd examples;
 perl -I../lib ~/bin/morbo -l "https://*:3000" oauth2_server_realistic.pl &

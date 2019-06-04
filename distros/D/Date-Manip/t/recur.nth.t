@@ -1,74 +1,68 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'recur :: nth/next/prev';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($op,$arg) = @_;
-
-  if ($op eq 'freq') {
-     $err = $obj->frequency($arg);
-     return $obj->err()  if ($err);
-     return 0;
-
-  } elsif ($op eq 'basedate') {
-     $err = $obj->basedate($arg);
-     return $obj->err()  if ($err);
-     return 0;
-
-  } elsif ($op eq 'start') {
-     $err = $obj->start($arg);
-     return $obj->err()  if ($err);
-     return 0;
-
-  } elsif ($op eq 'end') {
-     $err = $obj->end($arg);
-     return $obj->err()  if ($err);
-     return 0;
-
-  } elsif ($op eq 'next') {
-     ($date,$err)   = $obj->next($arg);
-     return $err   if ($err);
-     return $date  if (! defined($date));
-     my $val = $date->value();
-     return $val;
-
-  } elsif ($op eq 'prev') {
-     ($date,$err)   = $obj->prev($arg);
-     return $err   if ($err);
-     return $date  if (! defined($date));
-     my $val = $date->value();
-     return $val;
-
-  } elsif ($op eq 'nth') {
-     ($date,$err)   = $obj->nth($arg);
-     return $err   if ($err);
-     return $date  if (! defined($date));
-     my $val = $date->value();
-     return $val;
-  }
-}
-
-$obj = new Date::Manip::Recur;
+my $obj = new Date::Manip::Recur;
 $obj->config("forcedate","2000-01-21-00:00:00,America/New_York");
 
-$tests="
+sub test {
+   my ($op,$arg) = @_;
+   my ($date,$err);
+
+   if ($op eq 'freq') {
+      $err = $obj->frequency($arg);
+      return $obj->err()  if ($err);
+      return 0;
+
+   } elsif ($op eq 'basedate') {
+      $err = $obj->basedate($arg);
+      return $obj->err()  if ($err);
+      return 0;
+
+   } elsif ($op eq 'start') {
+      $err = $obj->start($arg);
+      return $obj->err()  if ($err);
+      return 0;
+
+   } elsif ($op eq 'end') {
+      $err = $obj->end($arg);
+      return $obj->err()  if ($err);
+      return 0;
+
+   } elsif ($op eq 'next') {
+      ($date,$err)   = $obj->next($arg);
+      return $err   if ($err);
+      return $date  if (! defined($date));
+      my $val = $date->value();
+      return $val;
+
+   } elsif ($op eq 'prev') {
+      ($date,$err)   = $obj->prev($arg);
+      return $err   if ($err);
+      return $date  if (! defined($date));
+      my $val = $date->value();
+      return $val;
+
+   } elsif ($op eq 'nth') {
+      ($date,$err)   = $obj->nth($arg);
+      return $err   if ($err);
+      return $date  if (! defined($date));
+      my $val = $date->value();
+      return $val;
+   }
+}
+
+my $tests="
 
 freq 1*2:0:4:12:0:0       => 0
 
 basedate 1999-12-30-00:00:00  => 0
 
-nth 0                      => 1999020412:00:00  
+nth 0                      => 1999020412:00:00
 
 nth 2                      => 2001020412:00:00
 
@@ -230,9 +224,9 @@ prev                      => 2007123112:00:00
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

@@ -33,7 +33,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     $dist->build->docker->remove_tag( $opt->{keep}, $arg->{tag} );
 
-    $dist->build->docker->status;
+    $dist->build->docker->ls;
 
     return;
 }

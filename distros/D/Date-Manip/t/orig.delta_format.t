@@ -1,28 +1,21 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: Delta_Format';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
-  return Delta_Format(@_);
+   return Delta_Format(@_);
 }
 
 Date_Init("ForceDate=1997-03-08-12:30:00,America/New_York");
 
-$delta='1:2:3:4:5:6:7';
-$bus="business $delta";
+my $delta ='1:2:3:4:5:6:7';
+my $bus   ="business $delta";
 
-$tests="
+my $tests="
 
 $delta '%yv %Mv %wv %dv %hv %mv %sv'
    => '1 2 3 4 5 6 7'
@@ -89,9 +82,9 @@ $delta approx 4 '%yt %Mt %wt %dt %ht %mt %st'
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

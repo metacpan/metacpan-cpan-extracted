@@ -1,37 +1,26 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: Date';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 Date_Init("ForceDate=1997-03-08-12:30:00");
 
-($currS,$currMN,$currH,$currD,$currM,$currY)=("00","30","12","08","03","1997");
+my($currS,$currMN,$currH,$currD,$currM,$currY)=("00","30","12","08","03","1997");
 
-$today="$currY$currM$currD$currH:$currMN:$currS";
-$todaydate    ="$currY$currM$currD";
-$yesterdaydate="$currY$currM". $currD-1;
-$tomorrowdate ="$currY$currM". $currD+1;
-$overmorrowdate="$currY$currM". $currD+2;
-$yesterday    ="$yesterdaydate$currH:$currMN:$currS";
-$tomorrow     ="$tomorrowdate$currH:$currMN:$currS";
-$overmorrow    ="$overmorrowdate$currH:$currMN:$currS";
+my $today         ="$currY$currM$currD$currH:$currMN:$currS";
+my $todaydate     ="$currY$currM$currD";
+my $yesterdaydate ="$currY$currM". $currD-1;
+my $tomorrowdate  ="$currY$currM". $currD+1;
+my $overmorrowdate="$currY$currM". $currD+2;
+my $yesterday     ="$yesterdaydate$currH:$currMN:$currS";
+my $tomorrow      ="$tomorrowdate$currH:$currMN:$currS";
+my $overmorrow    ="$overmorrowdate$currH:$currMN:$currS";
 
-$tests="
+my $tests="
 
 now => $today
 
@@ -557,9 +546,9 @@ Dec101965 => 1965121000:00:00
 2005-159T15:52:59 => 2005060815:52:59
 ";
 
-$t->tests(func  => \&ParseDateString,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&ParseDateString,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

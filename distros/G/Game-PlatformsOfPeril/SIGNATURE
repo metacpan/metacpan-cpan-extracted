@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 2a225db8a19893c4397b41fae070de66d72af65edd8647f4d7a0607fa1ffd122 .gitignore
+SHA256 738d68cbd0dd903d3274dc78e99966e6aa9a0482d18c0f13fe27622c08aa203b Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 cb4ff4e249f78510a60f7f8e3cb5314deb69a5fe1f58627b6efe8424d19d6ef5 MANIFEST
+SHA256 38154e6e4f5ea4b287d7d55ec80b939c5258ebdd95de9d44de56a58c5bb4ff0b META.json
+SHA256 451cbda1a4931ba6e16cc7a3c089005fff6a39f967703e91506b2c64dd4282c7 META.yml
+SHA256 29afc285a29a68b8a6bb441e8c76f53b75bec98e945e3c5e87af02ab1d373e0f Makefile.PL
+SHA256 82f6541e3a403192c9a36f26ebea7ff2e372b083beb0a7ddecba5ab3f457a722 README
+SHA256 e0116cbf2038321d0c378159c5ee117c5b9c476ab4b42ef9e5101742f856e38b levels/level0
+SHA256 ec51ed89ea9f22e147699ad6c5702fc2149787c3719d286c61af9dc4cf739d16 levels/level1
+SHA256 7d8f8e50327ffe543c855af3e67bea8b92e26b0803edfbbe33fbddb5b9277759 lib/Game/PlatformsOfPeril.pm
+SHA256 3995d0fa8a4ea6117005d39013024aeb77b00d0f2de2de9c829036800d0d604b pperil
+SHA256 2fa0ccaf203dc53cbbdecd498e0df45026a221ae8184cf73aa782b1c36b00a44 t/00-load.t
+SHA256 903b477522c73bfcd5db74bd63282c490e4dd4cb774f0b70132c4486b84e0c49 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJc9m+tAAoJEIGZLuHhLAOF1j8H/1ASnQd9Ol8gxpnpTrm20/So
+H8kPW50b9u9TbzkqD8T9ZaE1ChiTw533GYDP8yh2PF9fkEZii6VqbAo9uYaVDucn
+pQHFewp/j843HAuCqXKvlhkVQzdvW82VyGUHlG7WDF7NkQ0MQosdBOgBw5/e8fbG
+oqe2Ha6I9u3GowltmXMhj4s2MdHcdEGLGlxQ+Xiu1jIeC8G1cKpQcn1Qfj2LN77G
+CCrzCcHB29816OcATaFJwNPaSXpOm7TqfOocPFFxxD1IfXclUZPECyIG1dwrJmHv
+wuq/46ZHnrtIcMoGe1362HuMJI/dNUr3pe3TXFY29IF9j/EeQIX8Fxw+JvCGNzE=
+=m3FN
+-----END PGP SIGNATURE-----

@@ -1,49 +1,43 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use utf8;
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: parse (French)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-sub test {
-  (@test)=@_;
-  if ($test[0] eq "config") {
-     shift(@test);
-     $obj->config(@test);
-     return ();
-  }
-
-  my $err = $obj->parse(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     return $d1;
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-01-21-12:30:45,America/New_York");
 $obj->config("language","French","dateformat","nonUS");
 
-($currS,$currMN,$currH,$currD,$currM,$currY)=("45","30","12","21","01","2000");
+sub test {
+   my(@test)=@_;
+   if ($test[0] eq "config") {
+      shift(@test);
+      $obj->config(@test);
+      return ();
+   }
 
-$now           = "${currY}${currM}${currD}${currH}:${currMN}:${currS}";
-$today         = "${currY}${currM}${currD}00:00:00";
-$yesterdaydate = "${currY}${currM}". ${currD}-1;
-$tomorrowdate  = "${currY}${currM}". ${currD}+1;
-$yesterday     = "${yesterdaydate}00:00:00";
-$tomorrow      = "${tomorrowdate}00:00:00";
+   my $err = $obj->parse(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      return $d1;
+   }
+}
 
-$tests="
+my($currS,$currMN,$currH,$currD,$currM,$currY)=("45","30","12","21","01","2000");
+
+my $now           = "${currY}${currM}${currD}${currH}:${currMN}:${currS}";
+my $today         = "${currY}${currM}${currD}00:00:00";
+my $yesterdaydate = "${currY}${currM}". ${currD}-1;
+my $tomorrowdate  = "${currY}${currM}". ${currD}+1;
+my $yesterday     = "${yesterdaydate}00:00:00";
+my $tomorrow      = "${tomorrowdate}00:00:00";
+
+my $tests="
 
 '5-3-2009 5:30 du soir' => 2009030517:30:00
 
@@ -236,9 +230,9 @@ demain => $tomorrow
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

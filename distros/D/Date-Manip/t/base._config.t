@@ -1,30 +1,23 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'base :: _config';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $dmt = new Date::Manip::TZ;
+our $obj = $dmt->base();
+$dmt->config("forcedate","now,America/New_York");
+$dmt->config("ConfigFile","Manip.cnf");
 
 sub test {
-  (@test)=@_;
-  @ret = $obj->_config(@test);
-  return @ret;
+   my(@test)=@_;
+   my @ret = $obj->_config(@test);
+   return @ret;
 }
 
-$dmt = new Date::Manip::TZ;
-$obj = $dmt->base();
-$dmt->config("forcedate","now,America/New_York");
-$dmt->config("ConfigFile","$testdir/Manip.cnf");
-
-$tests="
+my $tests="
 
 DateFormat       => US
 
@@ -34,10 +27,9 @@ DateFormat       => Other
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
-
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

@@ -1,32 +1,25 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'tz :: all_periods';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  @per = $obj->all_periods(@test);
-  @ret = ();
-  foreach my $per (@per) {
-     push(@ret,@$per);
-  }
-  return @ret;
-}
-
-$obj = new Date::Manip::TZ;
+our $obj = new Date::Manip::TZ;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my (@test)=@_;
+   my @per = $obj->all_periods(@test);
+   my @ret = ();
+   foreach my $per (@per) {
+      push(@ret,@$per);
+   }
+   return @ret;
+}
+
+my $tests="
 America/New_York 0001 =>
    [ 1 1 2 0 0 0 ]
    [ 1 1 1 19 3 58 ]
@@ -211,9 +204,9 @@ America/New_York 2100 =>
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

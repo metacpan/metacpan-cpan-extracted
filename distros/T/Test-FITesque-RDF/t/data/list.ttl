@@ -1,0 +1,25 @@
+@prefix test: <http://example.org/test-fixtures#> .
+@prefix deps: <http://ontologi.es/doap-deps#>.
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://example.org/my-parameters#> .
+
+
+<#test-list> a test:FixtureTable ;
+    test:fixtures ( <#test1> <#test2> ) .
+
+<#test1> a test:Test ;
+    test:handler "Internal::Fixture::Simple"^^deps:CpanId ;
+    test:param_base <http://example.org/my-parameters#> ;
+    dc:identifier "string_found" ;
+    test:params [ my:all "counter-clockwise dahut" ] .
+        
+<#test2> a test:Test ;
+    test:handler "Internal::Fixture::Multi"^^deps:CpanId ;
+    test:param_base <http://example.org/my-parameters#> ;
+    dc:identifier "multiplication" ;
+    test:params [
+        my:factor1 6 ;
+        my:factor2 7 ;
+        my:product 42 
+    ] .
+        

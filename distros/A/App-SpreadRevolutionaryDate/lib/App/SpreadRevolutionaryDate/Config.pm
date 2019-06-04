@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.22';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.24';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -25,6 +25,13 @@ use Class::Load ':all';
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
+
+BEGIN {
+  unless ($ENV{PERL_UNICODE} && $ENV{PERL_UNICODE} =~ /A/) {
+    use Encode qw(decode_utf8);
+    @ARGV = map { decode_utf8($_, 1) } @ARGV;
+  }
+}
 
 
 sub new {
@@ -222,13 +229,6 @@ sub new {
     $self->check_target_mandatory_options($target);
   }
 
-  # Add acab option for RevolutionaryDate for backward compatibility
-  $self->revolutionarydate_acab($self->acab)
-    if  $self->msgmaker eq 'RevolutionaryDate'
-        && !$self->revolutionarydate_acab
-        && $self->acab;
-
-
   return $self;
 }
 
@@ -297,12 +297,17 @@ sub get_msgmaker_arguments {
 
   # Add acab option for RevolutionaryDate for backward compatibility
   $msgmaker_args{acab} = $self->acab
-    if  $msgmaker eq 'RevolutionaryDate'
-        && !exists($msgmaker_args{acab})
+    if  $msgmaker eq 'revolutionarydate'
+        && !$msgmaker_args{acab}
         && $self->acab;
 
   # Do not prompt if PromptUser default is set
-  $ENV{PERL_MM_USE_DEFAULT} = 1 if $msgmaker_args{default};
+  if ($msgmaker eq 'promptuser') {
+    require App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
+    if ($msgmaker_args{default} && $msgmaker_args{default} ne App::SpreadRevolutionaryDate::MsgMaker::PromptUser->meta->get_attribute('default')->default) {
+      $ENV{PERL_MM_USE_DEFAULT} = 1
+    }
+  }
 
   return %msgmaker_args;
 }
@@ -364,7 +369,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 METHODS
 

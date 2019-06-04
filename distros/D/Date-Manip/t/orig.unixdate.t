@@ -1,25 +1,18 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: UnixDate';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
-  return UnixDate(@_);
+   return UnixDate(@_);
 }
 
 Date_Init("ForceDate=1997-03-08-12:30:00,America/New_York");
 
-$tests="
+my $tests="
 
 'Wed Jan 3, 1996  at 8:11:12'
 '%y %Y %m %f %b %h %B %U %W %j %d %e %v %a %A %w %E'
@@ -33,9 +26,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

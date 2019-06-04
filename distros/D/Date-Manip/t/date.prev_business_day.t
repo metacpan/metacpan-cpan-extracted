@@ -1,30 +1,23 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: prev_business_day';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($date,@test)=@_;
-  $obj->parse($date);
-  $obj->prev_business_day(@test);
-  $ret = $obj->value();
-  return $ret;
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my($date,@test)=@_;
+   $obj->parse($date);
+   $obj->prev_business_day(@test);
+   my $ret = $obj->value();
+   return $ret;
+}
+
+my $tests="
 
 #      August 2009
 # Su Mo Tu We Th Fr Sa
@@ -73,9 +66,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

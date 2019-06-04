@@ -1,34 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'DM5 :: Date (French)';
-$testdir = '';
-$testdir = $t->testdir();
-
-BEGIN {
-   $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
-if ($] < 5.010  ||  $ENV{'DATE_MANIP_TEST_DM5'}) {
-   $t->feature("TEST_DM5",1);
-}
-
-$t->skip_all('Date::Manip 5.xx tests ignored (set DATE_MANIP_TEST_DM5 to test)',
-             'TEST_DM5');
+$::ti = new Test::Inter $0;
+require "tests-dm5.pl";
 
 Date_Init("TZ=EST");
 Date_Init("Language=French","DateFormat=US","Internal=0");
 Date_Init("ForceDate=1997-03-08-12:30:00");
 
-($currS,$currMN,$currH,$currD,$currM,$currY)=("00","30","12","08","03","1997");
+my($currS,$currMN,$currH,$currD,$currM,$currY)=("00","30","12","08","03","1997");
 
-$today="$currY$currM$currD$currH:$currMN:$currS";
-#$todaydate="$currY$currM$currD";
-$yesterday="$currY$currM". $currD-1 ."$currH:$currMN:$currS";
-$tomorrow ="$currY$currM". $currD+1 ."$currH:$currMN:$currS";
+my $today     ="$currY$currM$currD$currH:$currMN:$currS";
+my $yesterday ="$currY$currM". $currD-1 ."$currH:$currMN:$currS";
+my $tomorrow  ="$currY$currM". $currD+1 ."$currH:$currMN:$currS";
 
-$tests="
+my $tests="
 
 aujourd'hui => $today
 
@@ -210,10 +198,9 @@ Decembre/10/12:00 => 1997121012:00:00
 'DeC premier 1965' => 1965120100:00:00
 ";
 
-$t->tests(func  => \&ParseDate,
-          tests => $tests);
-$t->done_testing();
-
+$::ti->tests(func  => \&ParseDate,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

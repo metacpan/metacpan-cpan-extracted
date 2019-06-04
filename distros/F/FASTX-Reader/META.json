@@ -1,7 +1,7 @@
 {
    "abstract" : "A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.",
    "author" : [
-      "Andrea Telatin <andrea.telatin@quadram.ac.uk>"
+      "Andrea Telatin <andrea@telatin.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
@@ -31,7 +31,7 @@
    "provides" : {
       "FASTX::Reader" : {
          "file" : "lib/FASTX/Reader.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -40,8 +40,8 @@
          "url" : "https://github.com/telatin/FASTQ-Parser"
       }
    },
-   "version" : "0.09",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.11",
+   "x_generated_by_perl" : "v5.22.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

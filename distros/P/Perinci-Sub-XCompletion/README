@@ -3,8 +3,8 @@ NAME
     x.{,element_,index_}completion attributes
 
 VERSION
-    This document describes version 0.101 of Perinci::Sub::XCompletion (from
-    Perl distribution Perinci-Sub-XCompletion), released on 2019-02-24.
+    This document describes version 0.102 of Perinci::Sub::XCompletion (from
+    Perl distribution Perinci-Sub-XCompletion), released on 2019-06-03.
 
 SYNOPSIS
     In Rinci metadata:

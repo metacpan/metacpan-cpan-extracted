@@ -1,34 +1,27 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: list_holidays (New Years 2)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj = new Date::Manip::Date;
+$obj->config("forcedate","2000-01-01-00:00:00,America/New_York");
+$obj->config("ConfigFile","Holidays.2.cnf");
 
 sub test {
-  (@test)=@_;
-  @date = $obj->list_holidays(@test);
-  @ret  = ();
-  foreach my $date (@date) {
-     my $val = $date->value();
-     push(@ret,$val);
-  }
-  return @ret;
+   my(@test)=@_;
+   my @date = $obj->list_holidays(@test);
+   my @ret  = ();
+   foreach my $date (@date) {
+      my $val = $date->value();
+      push(@ret,$val);
+   }
+   return @ret;
 }
 
-$obj = new Date::Manip::Date;
-$obj->config("forcedate","2000-01-01-00:00:00,America/New_York");
-$obj->config("ConfigFile","$testdir/Holidays.2.cnf");
-
-$tests="
+my $tests="
 
 # Test New Year's Day definition:
 # Test Y, Y-1 with Y having Jan 1 on Mon (1990)
@@ -87,9 +80,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

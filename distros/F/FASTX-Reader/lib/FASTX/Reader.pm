@@ -3,7 +3,7 @@ use 5.014;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.09';
+$FASTX::Reader::VERSION = '0.11';
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
 
@@ -54,8 +54,9 @@ sub getRead {
           return;
       }
   }
-  my $name = /^.(\S+)/? $1 : '';
-  my $comm = /^.\S+\s+(.*)/? $1 : ''; # retain "comment"
+  my ($name, $comm) = /^.(\S+)(?:\s+)(\S+)/ ? ($1, $2) : 
+	                    /^.(\S+)/ ? ($1, '') : ('', '');
+  #my $comm = /^.\S+\s+(.*)/? $1 : ''; # retain "comment"
   my $seq = '';
   my $c;
   $aux->[0] = undef;
@@ -68,6 +69,7 @@ sub getRead {
   $aux->[0] = $_;
   $aux->[1] = 1 if (!defined($aux->[0]));
   $return->{name} = $name;
+  $return->{comment} = $comm;
   $return->{seq} = $seq;
   $self->{counter}++;
   return $return if ($c ne '+');
@@ -178,7 +180,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, based on He
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -267,7 +269,7 @@ has substantially contributed to the development of this module, and is a collab
 
 =head1 AUTHOR
 
-Andrea Telatin <andrea.telatin@quadram.ac.uk>
+Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 

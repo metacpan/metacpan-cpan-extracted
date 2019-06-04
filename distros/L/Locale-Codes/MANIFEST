@@ -2,7 +2,6 @@ Changes
 examples/code2country
 examples/country2code
 INSTALL
-internal/_no_tests
 internal/ADDING_CODESET
 internal/build.yaml
 internal/changes.head
@@ -71,6 +70,12 @@ Makefile.PL
 MANIFEST			This list of files
 README
 README.first
+t/_pod.t
+t/_pod_coverage.ign
+t/_pod_coverage.t
+t/_version.t
+t/country_errs_1.t
+t/country_errs_2.t
 t/country_func.t
 t/country_old.t
 t/country_oo.t
@@ -78,8 +83,6 @@ t/currency_func.t
 t/currency_old.t
 t/currency_oo.t
 t/do_tests.pl
-t/errors.1.t
-t/errors.2.t
 t/langext_func.t
 t/langext_oo.t
 t/langfam_func.t
@@ -89,18 +92,14 @@ t/language_old.t
 t/language_oo.t
 t/langvar_func.t
 t/langvar_oo.t
-t/pod.t
-t/pod_coverage.ign
-t/pod_coverage.t
 t/runtests
 t/runtests.bat
 t/script_func.t
 t/script_old.t
 t/script_oo.t
-t/testfunc.pl
 t/vals_country.pl
 t/vals_currency.pl
-t/vals_error.pl
+t/vals_errs.pl
 t/vals_langext.pl
 t/vals_langfam.pl
 t/vals_language.pl

@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/PODUtils.pm
 script/elide-pod
+script/podless
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

@@ -40,7 +40,6 @@
             "File::Spec" : "0.82",
             "File::Temp" : "0.17",
             "HTML::Entities" : "3.69",
-            "base" : "0",
             "if" : "0",
             "overload" : "0",
             "parent" : "0.225",
@@ -79,6 +78,6 @@
          "web" : "https://github.com/leejo/CGI.pm"
       }
    },
-   "version" : "4.43",
+   "version" : "4.44",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

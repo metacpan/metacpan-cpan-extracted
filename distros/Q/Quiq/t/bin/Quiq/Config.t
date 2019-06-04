@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use v5.10.0;
 
+use Quiq::Process;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
@@ -35,18 +37,39 @@ sub test_unitTest_file : Test(5) {
     $self->like($@,qr/CFG-00001:/);
 }
 
-sub test_unitTest_code : Test(1) {
+sub test_unitTest_text : Test(4) {
     my $self = shift;
 
     my $cfg = Quiq::Config->new('a=>1, b=>2');
     $self->is(ref($cfg),'Quiq::Config');
+
+    my $val = $cfg->get('a');
+    $self->is($val,1);
+
+    $val = $cfg->get('b');
+    $self->is($val,2);
+
+    eval {$cfg->get('c')};
+    $self->ok($@);
 }
 
-# -----------------------------------------------------------------------------
+sub test_unitTest_hash : Test(4) {
+    my $self = shift;
 
-# FIXME: Tests auf Paketebene heben
+    my $cfg = Quiq::Config->new({a=>1,b=>2});
+    $self->is(ref($cfg),'Quiq::Config');
 
-sub test_get : Test(3) {
+    my $val = $cfg->get('a');
+    $self->is($val,1);
+
+    $val = $cfg->get('b');
+    $self->is($val,2);
+
+    eval {$cfg->get('c')};
+    $self->ok($@);
+}
+
+sub test_unitTest_get : Test(3) {
     my $self = shift;
 
     my $conf = Quiq::Config->new($self->testPath(

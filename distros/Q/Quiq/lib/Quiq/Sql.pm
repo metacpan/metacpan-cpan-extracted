@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.143';
+our $VERSION = '1.145';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -3480,6 +3480,10 @@ sub createView {
 
     $stmt = $sql->dropView($viewName);
 
+=head4 Description
+
+Generiere ein DROP VIEW Statement und liefere dieses zurück.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -5500,7 +5504,7 @@ sub diff {
 
 =head1 VERSION
 
-1.143
+1.145
 
 =head1 AUTHOR
 

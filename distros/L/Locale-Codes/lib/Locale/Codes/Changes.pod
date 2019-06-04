@@ -18,15 +18,27 @@ changed. Any time there are any changes to the codes, it will be
 flagged below with a change: NEW CODE(s).
 
 I intend to check for new codes four times a year (March, June,
-September, December). I will also check on request, so if a code
-changes that you use, feel free to contact me.  Any time there are new
-codes, I will add them to the module and release a new version.
+September, December). I will also try to respond to requests for a
+release due to changes made to the standards, so if a code
+changes that you use, feel free to contact me.  Based on my available
+time and the time until the next release is scheduled, I will try to
+do a release any time the standards change.
 
 =head1 VERSION 3.63  (planned 2019-12-01  sbeck)
 
 =head1 VERSION 3.62  (planned 2019-09-01  sbeck)
 
-=head1 VERSION 3.61  (planned 2019-06-01  sbeck)
+=head1 VERSION 3.61  (2019-06-01  sbeck)
+
+=over 4
+
+=item NEW CODE(s)
+
+=item Converted tests to use Test::Inter
+
+Now uses the same module to do tests as all my other modules.
+
+=back
 
 =head1 VERSION 3.60  (2019-03-01  sbeck)
 
@@ -803,7 +815,7 @@ returned:
 
 Previous versions had only two semi-private routines: rename_country
 and alias_code which had the ability to modify the internal data in
-a couple very limited ways. It was requested (in an anonymous posting
+a couple of very limited ways. It was requested (in an anonymous posting
 by someone named Steve and also by Steve Hay) that better support
 for modifying internal data, so a full set of routines were added.
 
@@ -872,16 +884,12 @@ RT 54526
 
 =item NEW CODE(s)
 
-=back
-
-=over 4
-
 =item B<(*) New maintainer>
 
 From 1997 to 2004, Locale::Codes was maintained by Neil
 Bowers. Unfortunately, no updates were made from June 2004 to January
-2010. During that time, a number of changes have been made to the
-standards since then, so the data included was out-of-date.
+2010. During that time, a number of changes were made to the
+standards, so the data included was out-of-date.
 
 I contacted Neil to get his permission to assume maintenance of
 the module, and he kindly agreed.

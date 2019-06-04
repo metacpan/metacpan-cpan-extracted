@@ -1,28 +1,21 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'delta :: printf';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($delta,@test)=@_;
-  $obj->parse($delta);
-  return $obj->printf(@test);
-}
-
-$obj = new Date::Manip::Delta;
+my $obj = new Date::Manip::Delta;
 $obj->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my($delta,@test)=@_;
+   $obj->parse($delta);
+   return $obj->printf(@test);
+}
+
+my $tests="
 
 1:2:3:4:5:6:7
 '|A %% B|'
@@ -58,7 +51,7 @@ $tests="
 '|%.4yyM %.4MMM %.4wws %.4dds %.4hhs %.4mms %.4sss|'
    =>
    '|1.1667 2.0000 3.6018 4.2126 5.1019 6.1167 7.0000|'
- 
+
 1:2:3:4:5:6:7
 '|%.4Myw|'
    =>
@@ -217,9 +210,9 @@ $tests="
     '|+5:6|'
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

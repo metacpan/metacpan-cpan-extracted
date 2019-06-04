@@ -1,9 +1,10 @@
 # Data::Hopen::Scope::Overrides - Scope that can override each set individually
 package Data::Hopen::Scope::Overrides;
 use Data::Hopen;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 # TODO if using exporter
 use parent 'Exporter';

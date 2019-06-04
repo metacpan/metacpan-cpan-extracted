@@ -27,7 +27,7 @@ no_index:
 provides:
   MouseX::Types::Enum:
     file: lib/MouseX/Types/Enum.pm
-    version: '2.02'
+    version: '2.03'
 requires:
   Class::Inspector: '0'
   Mouse: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/ikenox/Perl-MouseX-Types-Enum/issues
   homepage: https://github.com/ikenox/Perl-MouseX-Types-Enum
   repository: git://github.com/ikenox/Perl-MouseX-Types-Enum.git
-version: '2.02'
+version: '2.03'
 x_contributors:
   - 'Naoto Ikeno <naoto.ikeno@dena.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

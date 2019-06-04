@@ -3,9 +3,12 @@ use strict;
 use warnings;
 
 # ABSTRACT: Perl distribution for Z3 Solver
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent 'Alien::Base';
+
+1;
+__END__
 
 =pod
 
@@ -27,11 +30,9 @@ version 0.001
 
 This Alien module wraps the Z3 C library. This release supports version 4.8.4 of the Z3 library
 
-=cut
+=head1 KNOWN ISSUES
 
-1;
-__END__
-
+The z3 binary is also built along with the library, this requires a significant amount of RAM to build.
 
 =head1 AUTHOR
 

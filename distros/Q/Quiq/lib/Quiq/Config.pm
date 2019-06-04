@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.143';
+our $VERSION = '1.145';
 
 use Quiq::Option;
-use Quiq::Path;
 use Quiq::Reference;
+use Quiq::Path;
 use Quiq::Unindent;
 use Quiq::Perl;
 use Quiq::Process;
@@ -86,10 +86,9 @@ Verzeichnis über einen Dienst wie FTP:
 
 =head4 Synopsis
 
-    [1] $cfg = $class->new($file,@opt);
-    [2] $cfg = $class->new(\@dirs,$file,@opt);
+    [1] $cfg = $class->new(@files,@opt);
     [3] $cfg = $class->new($str);
-    [4] $cfg = $class->new(@keyVal);
+    [4] $cfg = $class->new(\%keyVal);
 
 =head4 Options
 
@@ -109,21 +108,15 @@ ob die Datei nur für den Benutzer lesbar/schreibbar ist.
 
 =head4 Description
 
-[1] Instantiiere Konfigurationsobjekt aus Datei $file
+[1] Instantiiere Konfigurationsobjekt aus einer der Dateien @files
 und liefere eine Referenz auf dieses Objekt zurück. Beginnt $file
 mit einer Tilde (~), wird sie zum Homedir des rufenden Users
-expandiert.
+expandiert. Die erste gefundene Datei wird geöffnet.
 
-[2] Durchsuche die Verzeichnisse @dirs nach Datei $file. Beginnt
-ein Verzeichnisname mit einer Tilde (~), wird sie zum Homedir des
-rufenden Users expandiert. Die erste gefundene Datei wird
-geöffnet. Ein Leerstring '' in @dirs hat dieselbe Bedeutung wie
-'.' und steht für das aktuelle Verzeichnis.
-
-[3] Als Parameter ist der Konfigurationscode als Zeichenkette
+[2] Als Parameter ist der Konfigurationscode als Zeichenkette
 der Form "$key => $val, ..." angegeben.
 
-[4] Die Konfiguration ist inline angegeben.
+[3] Die Konfiguration ist inline durch Hash %keyVal angegeben.
 
 =cut
 
@@ -131,7 +124,7 @@ der Form "$key => $val, ..." angegeben.
 
 sub new {
     my $class = shift;
-    # @_: $file -or- \@dirs,$file -or- $str
+    # @_: @files -or- $str -or- \%keyVal
 
     # Optionen
 
@@ -146,35 +139,47 @@ sub new {
     # Operation ausführen
 
     my %cfg;
-    if (@_ == 1 && $_[0] =~ /=>/) { # "$key => $val, ..."
+    if ($_[0] =~ /=>/) { # "$key => $val, ..."
         %cfg = eval shift;
     }
-    elsif (@_ >= 2 && !ref $_[0]) { # @keyVal
-        %cfg = @_;
+    elsif (Quiq::Reference->isHashRef($_[0])) { # \%keyVal
+        %cfg = %{shift()};
     }
     else {
-        # $file -or- \@dirs,$file
+        # @files
 
+        my $cfgFile;
         my $p = Quiq::Path->new;
 
         # Datei suchen
 
-        my $dirA;
-        if (Quiq::Reference->isArrayRef($_[0])) { # \@dirs
-            $dirA = shift;
+        for my $file (@_) {
+            if ($p->exists($file)) {
+                $cfgFile = $p->expandTilde($file);
+            }
         }
-        my $cfgFile = $p->expandTilde(shift);
+        if (!defined $cfgFile) {
+            if (defined $create) {
+                # Wir speichern die Datei unter dem ersten Dateinamen,
+                # dessen Verzeichnis existiert.
 
-        # Configdatei suchen, wenn \@dirs
-
-        if ($dirA) {
-            for (@$dirA) {
-                my $dir = $p->expandTilde($_);
-                my $file = $dir? "$dir/$cfgFile": $cfgFile;
-                if (-e $file) {
-                    $cfgFile = $file;
-                    last;
+                for my $file (@_) {
+                    my ($dir) = $p->split($file);
+                    if ($p->exists($dir)) {
+                        $cfgFile = $p->expandTilde($file);
+                    }
                 }
+                $create = Quiq::Unindent->trimNl($create);
+                $p->write($cfgFile,$create,-recursive=>1);
+                if ($secure) {
+                    $p->chmod($cfgFile,$secure? 0600: 0644);
+                }
+            }
+            else {
+                $class->throw(
+                    'CFG-00002: Config file not found',
+                    ConfigFile => $cfgFile,
+                );
             }
         }
 
@@ -185,30 +190,16 @@ sub new {
         if (substr($cfgFile,0,1) ne '/') {
             # Wenn der Dateiname kein absoluter Pfad ist,
             # müssen wir ./ voranstellen, weil perlDoFile()
-            # die Datei sonst nicht findet. Warum?
+            # sonst @INC nach der Datei absucht (und sie
+            # dann nicht findet)
     
             $cfgFile = "./$cfgFile";
         }
     
-        if (!-e $cfgFile) {
-            if (defined $create) {
-                $create = Quiq::Unindent->trimNl($create);
-                Quiq::Path->write($cfgFile,$create,-recursive=>1);
-            }
-            else {
-                $class->throw('CFG-00002: Config file not found',
-                    ConfigFile => $cfgFile,
-                );
-            }
-        }
-
         %cfg = Quiq::Perl->perlDoFile($cfgFile);
     }
 
-    my $self = bless \%cfg,$class;
-    # $self->lockKeys;
-
-    return $self;
+    return bless \%cfg,$class;
 }
 
 # -----------------------------------------------------------------------------
@@ -243,7 +234,7 @@ sub get {
     for my $key (@_) {
         if (!exists $self->{$key}) {
             $self->throw(
-                'CFG-00001: Config-Variable existiert nicht',
+                'CFG-00001: Config variable does not exist',
                 Variable => $key,
             );
         }
@@ -300,7 +291,7 @@ sub try {
 
 =head1 VERSION
 
-1.143
+1.145
 
 =head1 AUTHOR
 

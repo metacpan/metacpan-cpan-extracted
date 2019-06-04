@@ -14,7 +14,7 @@ share {
     plugin 'Build::CMake';
  
     build [
-        [ '%{cmake}', -G => '%{cmake_generator}',
+        [ '%{cmake}', -G => '%{cmake_generator}', '-DBUILD_LIBZ3_SHARE=ON', '-DENABLE_EXAMPLE_TARGETS=OFF', '-DBUILD_DOCUMENTATION=OFF',
           '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', 'z3-z3-4.8.4/'],
  
         '%{cmake} --build . -j '.$cpu_count,

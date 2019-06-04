@@ -1,5 +1,10 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+0.006     2019-06-04 23:47:47+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - some updates to handle primary keys on tables in ::DDL
+
 0.005     2019-05-05 19:21:51+08:00 Asia/Kuala_Lumpur
     No new features.
 

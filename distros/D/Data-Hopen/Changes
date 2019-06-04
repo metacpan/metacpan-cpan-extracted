@@ -1,29 +1,40 @@
 Revision history for Data-Hopen
 
+0.000015    2019-06-04
+    - No changes - stable release of 0.000014
+
+0.000014    2019-05-30 (TRIAL RELEASE)
+    - Added Data::Hopen::G::GraphBuilder::to()
+    - Fix test failures on earlier Perl versions
+
 0.000013    2019-05-26
-        Functional changes throughout
+    - Functional changes throughout
 
 0.000012    2019-02-28
-        No changes - stable release of 0.000011
+    - No changes - stable release of 0.000011
 
-0.000011    2019-02-28
-        Bugfixes in Scope
+0.000011    2019-02-28 (TRIAL RELEASE)
+    - Bugfixes in Scope
 
 0.000010    2019-02-14
-        Finished removing code now in App::hopen
+    - Finished removing code now in App::hopen
 
-0.000009    2019-02-13
-        Renamed from Build::Hopen to Data::Hopen
+0.000009    2019-02-13 (TRIAL RELEASE)
+    - Renamed from Build::Hopen to Data::Hopen
 
-0.000008    2019-02-09
-        Tweaked File::Glob usage to support Perl 5.14
+0.000008    2019-02-09 (TRIAL RELEASE)
+    (as Build::Hopen)
+    - Tweaked File::Glob usage to support Perl 5.14
 
-0.000007    2019-02-08
-        First version that can generate a Makefile
+0.000007    2019-02-08 (TRIAL RELEASE)
+    (as Build::Hopen)
+    - First version that can generate a Makefile
 
-0.000006    2019-02-06
-        Substantially expanded
+0.000006    2019-02-06 (TRIAL RELEASE)
+    (as Build::Hopen)
+    - Substantially expanded
 
-0.000003    2018-01-02
-        First full trial release
+0.000003    2018-01-02 (TRIAL RELEASE)
+    (as Build::Hopen)
+    - First full trial release
 

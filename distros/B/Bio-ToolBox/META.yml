@@ -15,10 +15,10 @@ name: Bio-ToolBox
 provides:
   Bio::ToolBox:
     file: lib/Bio/ToolBox.pm
-    version: 1.65
+    version: 1.66
   Bio::ToolBox::Data:
     file: lib/Bio/ToolBox/Data.pm
-    version: 1.64
+    version: 1.66
   Bio::ToolBox::Data::Feature:
     file: lib/Bio/ToolBox/Data/Feature.pm
     version: 1.65
@@ -26,16 +26,16 @@ provides:
     file: lib/Bio/ToolBox/Data.pm
   Bio::ToolBox::Data::Stream:
     file: lib/Bio/ToolBox/Data/Stream.pm
-    version: 1.61
+    version: 1.66
   Bio::ToolBox::Data::core:
     file: lib/Bio/ToolBox/Data/core.pm
-    version: 1.65
+    version: 1.66
   Bio::ToolBox::Data::file:
     file: lib/Bio/ToolBox/Data/file.pm
     version: 1.64
   Bio::ToolBox::GeneTools:
     file: lib/Bio/ToolBox/GeneTools.pm
-    version: 1.65
+    version: 1.66
   Bio::ToolBox::SeqFeature:
     file: lib/Bio/ToolBox/SeqFeature.pm
     version: 1.63
@@ -44,7 +44,7 @@ provides:
     version: 1.65
   Bio::ToolBox::db_helper:
     file: lib/Bio/ToolBox/db_helper.pm
-    version: 1.61
+    version: 1.66
   Bio::ToolBox::db_helper::alignment_callbacks:
     file: lib/Bio/ToolBox/db_helper/alignment_callbacks.pm
     version: 1.62
@@ -53,7 +53,7 @@ provides:
     version: 1.62
   Bio::ToolBox::db_helper::big:
     file: lib/Bio/ToolBox/db_helper/big.pm
-    version: 1.60
+    version: 1.66
   Bio::ToolBox::db_helper::big::BedIteratorWrapper:
     file: lib/Bio/ToolBox/db_helper/big.pm
   Bio::ToolBox::db_helper::big::BigWigSet:
@@ -86,7 +86,7 @@ provides:
     version: 1.64
   Bio::ToolBox::parser::gff:
     file: lib/Bio/ToolBox/parser/gff.pm
-    version: 1.64
+    version: 1.66
   Bio::ToolBox::parser::ucsc:
     file: lib/Bio/ToolBox/parser/ucsc.pm
     version: 1.65
@@ -117,4 +117,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/tjparnell/biotoolbox
-version: 1.65
+version: 1.66

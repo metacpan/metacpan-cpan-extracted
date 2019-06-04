@@ -1,6 +1,15 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.22 2019-05-29T08:43:15
+0.24 2019-06-04T07:47:15
+ - Fix backward compatibility processing of --acab option
+ - Fix not prompting user if --promptuser_default option is set
+
+0.23 2019-06-03T12:37:04Z
+ - Fix skipping prompt only if --promptuser_default is set
+ - Decode ARGV in UTF9 if PERL_UNICODE env var does not contain 'A'
+ - Remove uneffective setting or PERL_UNICODE env var in BEGIN blocks
+
+0.22 2019-05-29T08:43:15Z
  - Do not prompt if --promptuser_default option is set
  - Add --promptuser_default option as documented
  - Add --revolutionarydate_acab option as documented

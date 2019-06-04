@@ -1,0 +1,16 @@
+use Chart::Plotly;
+use Chart::Plotly::Plot;
+use JSON;
+{$traces_packages}
+
+{$comment}
+{$traces_declaration}
+
+my $plot = Chart::Plotly::Plot->new(
+    traces => [{$list_of_traces}],
+    layout => 
+        {$layout}
+); 
+
+Chart::Plotly::show_plot($plot);
+    

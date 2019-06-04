@@ -43,7 +43,9 @@ DESCRIPTION
     The below example starts with prefix declarations. Since this is a
     pre-release, some of the prefixes are preliminary examples. Then, the
     tests in the fixture table are listed explicitly. Only tests mentioned
-    using the `test:fixtures` predicate will be used.
+    using the `test:fixtures` predicate will be used. Tests may be an RDF
+    List, in which case, the tests will run in the specified sequence, if not,
+    no sequence may be assumed.
 
     Then, two test fixtures are declared. The `test:handler` predicate is used
     to identify the class containing implementations, while `dc:identifier` is
@@ -54,8 +56,8 @@ DESCRIPTION
     local part of the predicate used in the description (i.e. the part after
     the colon in e.g. `my:all`). It is up to the test writer to mint the URIs
     of the parameters, and the `param_base` is used to set indicate the
-    namespace, so that the local part can be resolved. The resolution itself
-    happens in URI::NamespaceMap.
+    namespace, so that the local part can be resolved, if wanted. The
+    resolution itself happens in URI::NamespaceMap.
 
       @prefix test: <http://example.org/test-fixtures#> .
       @prefix deps: <http://ontologi.es/doap-deps#>.

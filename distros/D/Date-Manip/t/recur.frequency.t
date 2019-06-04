@@ -1,47 +1,40 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'recur :: frequency';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  $err = $obj->frequency(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     @ret = @{ $$obj{"data"}{"interval"} };
-     push(@ret,"*");
-     foreach my $v (@{ $$obj{"data"}{"rtime"} }) {
-        $str = "";
-        foreach my $v2 (@$v) {
-           $str .= ","  if ($str ne "");
-           if (ref($v2)) {
-              ($x,$y) = @$v2;
-              $str .= "$x-$y";
-           } else {
-              $str .= "$v2";
-           }
-        }
-        push(@ret,$str);
-     }
-     return @ret;
-  }
-}
-
-$obj = new Date::Manip::Recur;
+my $obj = new Date::Manip::Recur;
 $obj->config("forcedate","2000-01-21-00:00:00,America/New_York");
 
-$tests="
+sub test {
+   my (@test)=@_;
+   my $err = $obj->frequency(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my @ret = @{ $$obj{"data"}{"interval"} };
+      push(@ret,"*");
+      foreach my $v (@{ $$obj{"data"}{"rtime"} }) {
+         my $str = "";
+         foreach my $v2 (@$v) {
+            $str .= ","  if ($str ne "");
+            if (ref($v2)) {
+               my($x,$y) = @$v2;
+               $str .= "$x-$y";
+            } else {
+               $str .= "$v2";
+            }
+         }
+         push(@ret,$str);
+      }
+      return @ret;
+   }
+}
+
+my $tests="
 
 1:2:3:4:5:6
    => '[frequency] Invalid frequency string'
@@ -1098,9 +1091,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

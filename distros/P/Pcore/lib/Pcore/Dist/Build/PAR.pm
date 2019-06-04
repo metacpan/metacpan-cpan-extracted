@@ -6,10 +6,11 @@ use Pcore::Dist::Build::PAR::Script;
 
 has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
-has force => ();
-has crypt => ();
-has clean => ();
-has gui   => ();
+has force  => ();
+has crypt  => ();
+has clean  => ();
+has gui    => ();
+has script => ();                 # Maybe[ArrayRef]
 
 has release => ( is => 'lazy', init_arg => undef );
 
@@ -34,10 +35,22 @@ sub run ($self) {
         exit 1;
     }
 
+    my $par_cfg = $self->{dist}->par_cfg;
+
+    $self->{script} //= [];
+    my %scripts = map { $_ => 1 } $self->{script}->@*;
+
+    my @scripts = %scripts ? keys %scripts : keys $par_cfg->%*;
+
     # build scripts
-    for my $script ( sort keys $self->{dist}->par_cfg->%* ) {
-        if ( $self->{dist}->par_cfg->{$script}->{disabled} ) {
-            say qq[Script "$script" is ] . $BOLD . $WHITE . $ON_RED . ' disabled ' . $RESET . '. Skipping.';
+    for my $script ( sort @scripts ) {
+        if ( !$par_cfg->{$script} ) {
+            say qq[Profile for script "$script" is ] . $BOLD . $WHITE . $ON_RED . ' not found ' . $RESET . '. Skip.';
+
+            next;
+        }
+        elsif ( !$scripts{$script} && $par_cfg->{$script}->{disabled} ) {
+            say qq[Script "$script" is ] . $BOLD . $WHITE . $ON_RED . ' disabled ' . $RESET . '. Skip.';
 
             next;
         }
@@ -60,7 +73,7 @@ sub run ($self) {
             exit 1;
         }
 
-        my $profile = $self->{dist}->par_cfg->{$script};
+        my $profile = { $par_cfg->{$script}->%* };
 
         $profile->{dist}    = $self->{dist};
         $profile->{script}  = P->path("$self->{dist}->{root}/bin/$script");
@@ -80,7 +93,7 @@ sub run ($self) {
         $profile->{mod}->@{ grep { !/\A[(]eval\s/sm } $pardeps->@* } = ();
 
         # remove Inline.pm
-        # TODO maybe remove all Inline::* family???
+        # TODO maybe remove all Inline::* modules???
         delete $profile->{mod}->{'Inline.pm'};
 
         # add Filter::Crypto::Decrypt deps if crypt mode is used

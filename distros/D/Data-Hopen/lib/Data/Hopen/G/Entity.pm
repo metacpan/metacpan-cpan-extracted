@@ -1,12 +1,13 @@
 # Data::Hopen::G::Entity - base class for hopen's data model
 package Data::Hopen::G::Entity;
 use Data::Hopen;
+use strict;
 use Data::Hopen::Base;
 
 use overload;
 use Scalar::Util qw(refaddr);
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 sub name;
 

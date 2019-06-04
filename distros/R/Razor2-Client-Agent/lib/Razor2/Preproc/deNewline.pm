@@ -1,26 +1,23 @@
 package Razor2::Preproc::deNewline;
 use MIME::QuotedPrint;
 
-
-sub new { 
+sub new {
     return bless {}, shift;
 }
-
 
 sub isit {
     1;
 }
 
-
 sub doit {
 
-    my ($self, $text) = @_;
+    my ( $self, $text ) = @_;
 
-    my ($hdr, $body) = split /\n\r*\n/, $$text, 2;
+    my ( $hdr, $body ) = split /\n\r*\n/, $$text, 2;
 
     return unless $body;
 
-    unless ($body =~ s/\n+$//s) { 
+    unless ( $body =~ s/\n+$//s ) {
         return $text;
     }
 
@@ -28,6 +25,5 @@ sub doit {
     return $text;
 
 }
-
 
 1;

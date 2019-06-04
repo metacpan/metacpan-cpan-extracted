@@ -217,8 +217,11 @@ Return all field values of the form.
 
 sub getAllFieldValues {
     my $self = shift;
+    my $parentForm = shift;
+    my $currentForm = shift;
     my %map;
     my @promises;
+    $self->args($currentForm) if $currentForm;
     for my $key (keys %{$self->formCfgMap}){
         my $value = $self->getFieldValue($key);
         if (eval { blessed $value && $value->isa('Mojo::Promise')}){

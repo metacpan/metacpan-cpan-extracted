@@ -29,7 +29,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.05';
+    $VERSION = '0.06';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -73,11 +73,15 @@ See Also   :
 
 sub new
 {
-    my ( $class, %parameters ) = @_;
     $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
-
+    my ( $class, %parameters ) = @_;
     my $self = $class->SUPER::new( %parameters );
-    $self->{ beachmarck }->{ started } = time();
+
+    $self->{ beachmarck } = {
+        created  => $^T,
+        started  => undef,
+        finished => undef
+    };
 
     $self->{ configurations } = \%parameters;
 
@@ -87,15 +91,16 @@ sub new
 
 sub _initialize()
 {
+    $log->debug( "_initialize", { package => __PACKAGE__ } );
     my ( $self, %parameters ) = @_;
     $self->SUPER::_initialize( %parameters );
-    $log->debug( "_initialize", { package => __PACKAGE__ } );
 }
 
 sub _finalize()
 {
-    my ( $self, %parameters ) = @_;
     $log->debug( "_finalize", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+    $self->SUPER::_finalize( %parameters );
 }
 
 =head2 C<loadApplication()>
@@ -194,9 +199,11 @@ sub run
 
     if ( ref $self->{ application }->{ instance } eq $self->{ configurations }->{ application }->{ package } )
     {
+        $self->{ beachmarck }->{ started } = time();
         $retorno = eval { $self->{ application }->{ instance }->start(); };
+        $self->{ beachmarck }->{ finished } = time();
         $log->error( "Problemas durante execucao de start: $@" ) if ( $@ );
-    }
+    } ## end if ( ref $self->{ application...})
     else
     {
         $log->error( "Impossivel de executar $self->{ configurations }->{ application }->{ package }::start\nSub nao existe" );
@@ -211,7 +218,7 @@ sub run
 sub getExecutionTime()
 {
     my ( $self, %parameters ) = @_;
-    return ( time() - $self->{ beachmarck }->{ started } );
+    return ( $self->{ beachmarck }->{ finished } - $self->{ beachmarck }->{ started } );
 }
 
 =head2 C<getExecutionInfo()>
@@ -228,8 +235,8 @@ sub getExecutionInfo()
 
 sub END
 {
-    my ( $self, %parameters ) = @_;
     $log->debug( "END", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
     eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
 }
 
@@ -321,3 +328,4 @@ perl(1).
 
 # The preceding line will help the module return a true value
 
+__DATA__

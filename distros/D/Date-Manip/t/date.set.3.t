@@ -1,35 +1,28 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: set (Printable=0)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  $err = $obj->set(@test);
-  if ($err) {
-     return $obj->err();
-  } else {
-     $d1 = $obj->value();
-     $d2 = $obj->value("local");
-     $d3 = $obj->value("gmt");
-     return($d1,$d2,$d3);
-  }
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/Los_Angeles");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   my $err = $obj->set(@test);
+   if ($err) {
+      return $obj->err();
+   } else {
+      my $d1 = $obj->value();
+      my $d2 = $obj->value("local");
+      my $d3 = $obj->value("gmt");
+      return($d1,$d2,$d3);
+   }
+}
+
+my $tests="
 
 date [ 1996 1 1 12 0 0 ]       => 1996010112:00:00 1996010112:00:00 1996010120:00:00
 
@@ -48,9 +41,9 @@ time [ 12 40 50 ]              => 1996010112:40:50 1996010112:40:50 1996010120:4
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

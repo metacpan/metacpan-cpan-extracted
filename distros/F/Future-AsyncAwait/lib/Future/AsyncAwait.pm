@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Carp;
 
@@ -149,8 +149,6 @@ That said, using it just in places like unit-tests and short-term scripts it
 does appear to be quite stable, so do try experimenting with it in this sort
 of situation, and let me know what does and doesn't work. 
 
-=head2 Things That Work
-
 Most cases involving awaiting on still-pending futures should work fine:
 
    async sub foo
@@ -213,7 +211,7 @@ Plain lexical variables are preserved across an C<await> deferral:
       print $message;
    }
 
-=head3 Cancellation
+=head2 Cancellation
 
 Cancelled futures cause a suspended C<async sub> to simply stop running.
 
@@ -257,56 +255,6 @@ cancelled, but will not propagate the request backwards into the future that
 the C<async sub> is currently waiting on. See L</TODO>.
 
 =back
-
-=head2 Things That Don't Yet Work
-
-C<local> variable assignments inside an C<async> function will confuse the
-suspend mechanism:
-
-   our $DEBUG = 0;
-
-   async sub quark
-   {
-      local $DEBUG = 1;
-      await func();
-   }
-
-Since C<foreach> loops on non-lexical iterator variables (usually the C<$_>
-global variable) effectively imply a C<local>-like behaviour, these are also
-disallowed.
-
-   async sub splurt
-   {
-      foreach ( LIST ) {
-         await ...
-      }
-   }
-
-As C<map> and C<grep> involve implicit C<local> behaviour on the C<$_>
-variable, they also don't support C<await> inside them.
-
-   async sub quoo
-   {
-      grep { await ... } LIST;
-   }
-
-   async sub bah
-   {
-      map { await ... } LIST;
-   }
-
-Additionally, complications with the savestack appear to be affecting some
-uses of package-level C<our> variables captured by async functions:
-
-   our $VAR;
-
-   async sub bork
-   {
-      print "VAR is $VAR\n";
-      await func();
-   }
-
-See also the L</TODO> list for further things.
 
 =head1 WITH OTHER MODULES
 
@@ -377,6 +325,25 @@ awkward questions about semantics, there are certain situations and cases
 where internally-implied localisation of variables would still be useful and
 can be supported without the semantic ambiguities of generic C<local>.
 
+   our $DEBUG = 0;
+
+   async sub quark
+   {
+      local $DEBUG = 1;
+      await func();
+   }
+
+Since C<foreach> loops on non-lexical iterator variables (usually the C<$_>
+global variable) effectively imply a C<local>-like behaviour, these are also
+disallowed.
+
+   async sub splurt
+   {
+      foreach ( LIST ) {
+         await ...
+      }
+   }
+
 Some notes on what makes the problem hard can be found at
 
 L<https://rt.cpan.org/Ticket/Display.html?id=122793>
@@ -424,9 +391,25 @@ L<https://rt.cpan.org/Ticket/Display.html?id=128620>
 
 =item *
 
-Regexp context gets lost over C<await> boundaries
+C<await> inside C<map> or C<grep> blocks does not work. This is due to the
+difficulty of detecting the map or grep context from internal perl state at
+suspend time, sufficient to be able to restore it again when resuming.
 
-L<https://rt.cpan.org/Ticket/Display.html?id=129321>
+L<https://rt.cpan.org/Ticket/Display.html?id=129748>
+
+As a workaround, consider converting a C<map> expression to the equivalent
+form using C<push> onto an accumulator array with a C<foreach> loop:
+
+   my @results = map { await func($_) } ITEMS;
+
+becomes
+
+   my @results;
+   foreach my $item ( ITEMS ) {
+      push @results, await func($item);
+   }
+
+with a similar transformation for C<grep> expressions.
 
 =back
 

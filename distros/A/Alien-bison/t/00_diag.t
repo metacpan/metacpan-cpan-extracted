@@ -13,11 +13,11 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MM
+  Alien::Build::Plugin::Decode::Mojo
   Alien::Build::Plugin::Probe::GnuWin32
   Capture::Tiny
   ExtUtils::MakeMaker
   File::chdir
-  IPC::Cmd
   Test::More
 );
 

@@ -5,8 +5,8 @@ use Pcore -class, -const, -res;
 const our $API_VER               => 'v1.39';
 const our $DEFAULT_BUILD_TIMEOUT => 60 * 60 * 2;
 
-has username => sub { $ENV->user_cfg->{DOCKERHUB}->{username} };
-has password => sub { $ENV->user_cfg->{DOCKERHUB}->{password} };
+has username => sub { $ENV->user_cfg->{DOCKER}->{username} };
+has password => sub { $ENV->user_cfg->{DOCKER}->{password} };
 
 has host          => '/var/run/docker.sock';
 has build_timeout => $DEFAULT_BUILD_TIMEOUT;

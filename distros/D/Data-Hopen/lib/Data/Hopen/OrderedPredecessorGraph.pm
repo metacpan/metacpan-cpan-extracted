@@ -1,8 +1,9 @@
 # Data::Hopen::OrderedPredecessorGraph - Graph that keeps predecessors in order
 package Data::Hopen::OrderedPredecessorGraph;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Graph';
 

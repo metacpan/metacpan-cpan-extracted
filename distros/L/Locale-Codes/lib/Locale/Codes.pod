@@ -529,7 +529,7 @@ to use is:  sbeck@cpan.org.
 
 =item CPAN Bug Tracking
 
-You can submit it using the CPAN tracking too.  This can be done at the
+You can submit it using the CPAN tracking tool.  This can be done at the
 following URL:
 
 L<http://rt.cpan.org/Public/Dist/Display.html?Name=Locale-Codes>
@@ -545,7 +545,7 @@ L<https://github.com/SBECK-github/Locale-Codes>
 
 Please do not use other means to report bugs (such as forums for a specific
 OS or Linux distribution) as it is impossible for me to keep up with all of
-them.
+them.  These are the current methods that are guaranteed to notify me.
 
 When filing a bug report, please include the following information:
 

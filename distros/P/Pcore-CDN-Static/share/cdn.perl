@@ -149,22 +149,14 @@
             my $debug = $args->{devel} ? '-debug' : $EMPTY;
 
             # framework
-            if ( $args->{type} eq 'classic' ) {
-                push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/ext-all$debug.js") );
-            }
-            else {
-                push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/ext-modern-all$debug.js") );
-            }
-
-            # ux
-            # push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/packages/ux/$framework/ux$debug.js") );
+            push @res, $cdn->get_script_tag( $cdn->("/static/ext/$ver/ext$debug.js") );
 
             # theme
-            push @res, $cdn->get_css_tag( $cdn->("/static/extjs/$ver/$args->{type}/theme-$args->{theme}/resources/theme-$args->{theme}-all$debug.css") );
-            push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/$args->{type}/theme-$args->{theme}/theme-$args->{theme}$debug.js") );
+            push @res, $cdn->get_css_tag( $cdn->("/static/ext/$ver/theme-$args->{theme}/resources/theme-$args->{theme}-all$debug.css") );
+            push @res, $cdn->get_script_tag( $cdn->("/static/ext/$ver/theme-$args->{theme}/theme-$args->{theme}$debug.js") );
 
             # fashion, only for modern material theme
-            push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/css-vars.js") );
+            push @res, $cdn->get_script_tag( $cdn->("/static/ext/$ver/css-vars.js") );
 
             return @res;
         }
@@ -179,7 +171,7 @@
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (37)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (35)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

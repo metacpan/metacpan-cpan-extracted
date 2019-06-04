@@ -1,9 +1,10 @@
 # Data::Hopen::Util::Data - general-purpose data-manipulation functions
 package Data::Hopen::Util::Data;
 use Data::Hopen;
+use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000015';
 
 use parent 'Exporter';
 our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);

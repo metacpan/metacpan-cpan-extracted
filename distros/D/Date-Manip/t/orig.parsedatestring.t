@@ -1,37 +1,30 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: ParseDateString';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
-  return ParseDateString(@_);
+   return ParseDateString(@_);
 }
 
 Date_Init("ForceDate=1997-03-08-12:30:00,America/New_York");
 
-($currS,$currMN,$currH,$currD,$currM,$currY)=("00","30","12","08","03","1997");
+my ($currS,$currMN,$currH,$currD,$currM,$currY)=("00","30","12","08","03","1997");
 
-$now           = "${currY}${currM}${currD}${currH}:${currMN}:${currS}";
-$today         = "${currY}${currM}${currD}00:00:00";
-$todaydate     = "${currY}${currM}${currD}";
-$yesterdaydate = "${currY}${currM}". ${currD}-1;
-$tomorrowdate  = "${currY}${currM}". ${currD}+1;
-$overmorrowdate= "${currY}${currM}". ${currD}+2;
-$yesterday     = "${yesterdaydate}00:00:00";
-$tomorrow      = "${tomorrowdate}00:00:00";
-$overmorrow    = "${overmorrowdate}00:00:00";
+my $now           = "${currY}${currM}${currD}${currH}:${currMN}:${currS}";
+my $today         = "${currY}${currM}${currD}00:00:00";
+my $todaydate     = "${currY}${currM}${currD}";
+my $yesterdaydate = "${currY}${currM}". ${currD}-1;
+my $tomorrowdate  = "${currY}${currM}". ${currD}+1;
+my $overmorrowdate= "${currY}${currM}". ${currD}+2;
+my $yesterday     = "${yesterdaydate}00:00:00";
+my $tomorrow      = "${tomorrowdate}00:00:00";
+my $overmorrow    = "${overmorrowdate}00:00:00";
 
-$tests="
+my $tests="
 
 now => $now
 
@@ -564,9 +557,9 @@ Dec101965 => 1965121000:00:00
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

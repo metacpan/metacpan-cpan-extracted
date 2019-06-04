@@ -134,8 +134,6 @@ BETA-VERSION WARNING
     it in this sort of situation, and let me know what does and doesn't
     work.
 
- Things That Work
-
     Most cases involving awaiting on still-pending futures should work
     fine:
 
@@ -199,7 +197,7 @@ BETA-VERSION WARNING
           print $message;
        }
 
-  Cancellation
+ Cancellation
 
     Cancelled futures cause a suspended async sub to simply stop running.
 
@@ -236,56 +234,6 @@ BETA-VERSION WARNING
       executing if cancelled, but will not propagate the request backwards
       into the future that the async sub is currently waiting on. See
       "TODO".
-
- Things That Don't Yet Work
-
-    local variable assignments inside an async function will confuse the
-    suspend mechanism:
-
-       our $DEBUG = 0;
-    
-       async sub quark
-       {
-          local $DEBUG = 1;
-          await func();
-       }
-
-    Since foreach loops on non-lexical iterator variables (usually the $_
-    global variable) effectively imply a local-like behaviour, these are
-    also disallowed.
-
-       async sub splurt
-       {
-          foreach ( LIST ) {
-             await ...
-          }
-       }
-
-    As map and grep involve implicit local behaviour on the $_ variable,
-    they also don't support await inside them.
-
-       async sub quoo
-       {
-          grep { await ... } LIST;
-       }
-    
-       async sub bah
-       {
-          map { await ... } LIST;
-       }
-
-    Additionally, complications with the savestack appear to be affecting
-    some uses of package-level our variables captured by async functions:
-
-       our $VAR;
-    
-       async sub bork
-       {
-          print "VAR is $VAR\n";
-          await func();
-       }
-
-    See also the "TODO" list for further things.
 
 WITH OTHER MODULES
 
@@ -325,6 +273,25 @@ TODO
       variables would still be useful and can be supported without the
       semantic ambiguities of generic local.
 
+         our $DEBUG = 0;
+      
+         async sub quark
+         {
+            local $DEBUG = 1;
+            await func();
+         }
+
+      Since foreach loops on non-lexical iterator variables (usually the $_
+      global variable) effectively imply a local-like behaviour, these are
+      also disallowed.
+
+         async sub splurt
+         {
+            foreach ( LIST ) {
+               await ...
+            }
+         }
+
       Some notes on what makes the problem hard can be found at
 
       https://rt.cpan.org/Ticket/Display.html?id=122793
@@ -360,9 +327,27 @@ KNOWN BUGS
 
       https://rt.cpan.org/Ticket/Display.html?id=128620
 
-      * Regexp context gets lost over await boundaries
+      * await inside map or grep blocks does not work. This is due to the
+      difficulty of detecting the map or grep context from internal perl
+      state at suspend time, sufficient to be able to restore it again when
+      resuming.
 
-      https://rt.cpan.org/Ticket/Display.html?id=129321
+      https://rt.cpan.org/Ticket/Display.html?id=129748
+
+      As a workaround, consider converting a map expression to the
+      equivalent form using push onto an accumulator array with a foreach
+      loop:
+
+         my @results = map { await func($_) } ITEMS;
+
+      becomes
+
+         my @results;
+         foreach my $item ( ITEMS ) {
+            push @results, await func($item);
+         }
+
+      with a similar transformation for grep expressions.
 
 ACKNOWLEDGEMENTS
 

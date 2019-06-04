@@ -1,30 +1,23 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: is_business_day';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+our $obj = new Date::Manip::Date;
+$obj->config("forcedate","now,America/New_York");
+$obj->config("ConfigFile","Manip.cnf");
 
 sub test {
-  (@test)=@_;
-  my($date) = shift(@test);
-  $obj->set("date",$date);
-  return $obj->is_business_day(@test);
+   my(@test)=@_;
+   my($date) = shift(@test);
+   $obj->set("date",$date);
+   return $obj->is_business_day(@test);
 }
 
-$obj = new Date::Manip::Date;
-$obj->config("forcedate","now,America/New_York");
-$obj->config("ConfigFile","$testdir/Manip.cnf");
-
-$tests="
+our $tests="
 
 [ 2009 08 01 12 00 00 ] => 0
 
@@ -54,9 +47,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
+$::ti->tests(func  => \&test,
           tests => $tests);
-$t->done_testing();
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

@@ -22,7 +22,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.05';
+    $VERSION = '0.06';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -87,7 +87,7 @@ BEGIN
                 filename  => $logDirectory . $logFilename,
                 min_level => DEBUG ? 'debug' : 'info',
                 newline   => 1,
-                mode      => 'write',
+                mode      => 'append',
                 binmode   => ':encoding(UTF-8)',
             ],
             [

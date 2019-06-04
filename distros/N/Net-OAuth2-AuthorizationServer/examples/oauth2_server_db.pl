@@ -21,7 +21,7 @@ my $client = MongoDB::MongoClient->new(
   my $clients = $db->get_collection( 'clients' );
 
   if ( ! $clients->find_one({ client_id => 'TrendyNewService' }) ) {
-    $clients->insert({
+    $clients->insert_one({
       client_id     => "TrendyNewService",
       client_secret => "boo",
       scopes => {
@@ -46,7 +46,9 @@ helper db => sub {
 };
 
 my $resource_owner_logged_in_sub = sub {
-  my ( $c ) = @_;
+  my ( %args ) = @_;
+
+  my $c = $args{mojo_controller};
 
   if ( ! $c->session( 'logged_in' ) ) {
     # we need to redirect back to the /oauth/authorize route after
@@ -61,7 +63,10 @@ my $resource_owner_logged_in_sub = sub {
 };
 
 my $resource_owner_confirm_scopes_sub = sub {
-  my ( $c,$client_id,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$scopes_ref,$redirect_uri,$response_type )
+    = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
 
   my $is_allowed = $c->flash( "oauth_${client_id}" );
 
@@ -80,7 +85,11 @@ my $resource_owner_confirm_scopes_sub = sub {
 };
 
 my $verify_client_sub = sub {
-  my ( $c,$client_id,$scopes_ref ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$scopes_ref,$client_secret,$redirect_uri,$response_type )
+      = @args{ qw/ mojo_controller client_id scopes client_secret redirect_uri response_type / };
+
 
   if (
     my $client = $c->db->get_collection( 'clients' )
@@ -105,24 +114,32 @@ my $verify_client_sub = sub {
 };
 
 my $store_auth_code_sub = sub {
-  my ( $c,$auth_code,$client_id,$expires_in,$uri,@scopes ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$auth_code,$client_id,$expires_in,$uri,$scopes_ref ) =
+      @args{qw/ mojo_controller auth_code client_id expires_in redirect_uri scopes / };
+
 
   my $auth_codes = $c->db->get_collection( 'auth_codes' );
 
-  my $id = $auth_codes->insert({
+  my $id = $auth_codes->insert_one({
     auth_code    => $auth_code,
     client_id    => $client_id,
     user_id      => $c->session( 'user_id' ),
     expires      => time + $expires_in,
     redirect_uri => $uri,
-    scope        => { map { $_ => 1 } @scopes },
+    scope        => { map { $_ => 1 } @{ $scopes_ref } },
   });
 
   return;
 };
 
 my $verify_auth_code_sub = sub {
-  my ( $c,$client_id,$client_secret,$auth_code,$uri ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$client_id,$client_secret,$auth_code,$uri )
+      = @args{qw/ mojo_controller client_id client_secret auth_code redirect_uri / };
+
 
   my $auth_codes      = $c->db->get_collection( 'auth_codes' );
   my $ac              = $auth_codes->find_one({
@@ -158,8 +175,8 @@ my $verify_auth_code_sub = sub {
         "OAuth2::Server: Auth code already used to get access token"
       );
 
-      $auth_codes->remove({ auth_code => $auth_code });
-      $c->db->get_collection( 'access_tokens' )->remove({
+      $auth_codes->delete_many({ auth_code => $auth_code });
+      $c->db->get_collection( 'access_tokens' )->delete_many({
         access_token => $ac->{access_token}
       });
     }
@@ -172,16 +189,21 @@ my $verify_auth_code_sub = sub {
   # to and not everything the client is capable of)
   my $scope = $ac->{scope};
 
-  $auth_codes->update( $ac,{ verified => 1 } );
+  $auth_codes->update_one( $ac,{ '$set' => { verified => 1 } } );
 
   return ( $client_id,undef,$scope,$ac->{user_id} );
 };
 
 my $store_access_token_sub = sub {
+  my ( %args ) = @_;
+
   my (
     $c,$client,$auth_code,$access_token,$refresh_token,
     $expires_in,$scope,$old_refresh_token
-  ) = @_;
+  ) = @args{qw/
+    mojo_controller client_id auth_code access_token
+    refresh_token expires_in scopes old_refresh_token
+  / };
 
   my $access_tokens  = $c->db->get_collection( 'access_tokens' );
   my $refresh_tokens = $c->db->get_collection( 'refresh_tokens' );
@@ -220,9 +242,9 @@ my $store_access_token_sub = sub {
   }
 
   # if the client has en existing refresh token we need to revoke it
-  $refresh_tokens->remove({ client_id => $client, user_id => $user_id });
+  $refresh_tokens->delete_many({ client_id => $client, user_id => $user_id });
 
-  $access_tokens->insert({
+  $access_tokens->insert_one({
     access_token  => $access_token,
     scope         => $scope,
     expires       => time + $expires_in,
@@ -231,7 +253,7 @@ my $store_access_token_sub = sub {
     user_id       => $user_id,
   });
 
-  $refresh_tokens->insert({
+  $refresh_tokens->insert_one({
     refresh_token => $refresh_token,
     access_token  => $access_token,
     scope         => $scope,
@@ -243,7 +265,11 @@ my $store_access_token_sub = sub {
 };
 
 my $verify_access_token_sub = sub {
-  my ( $c,$access_token,$scopes_ref,$is_refresh_token ) = @_;
+  my ( %args ) = @_;
+
+  my ( $c,$access_token,$scopes_ref,$is_refresh_token )
+        = @args{qw/ mojo_controller access_token scopes is_refresh_token /};
+
 
   my $rt = $c->db->get_collection( 'refresh_tokens' )->find_one({
     refresh_token => $access_token
@@ -298,7 +324,7 @@ my $verify_access_token_sub = sub {
 sub _revoke_access_token {
   my ( $c,$access_token ) = @_;
 
-  $c->db->get_collection( 'access_tokens' )->remove({
+  $c->db->get_collection( 'access_tokens' )->delete_many({
     access_token => $access_token,  
   });
 }

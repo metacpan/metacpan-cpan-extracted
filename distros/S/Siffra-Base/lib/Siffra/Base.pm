@@ -23,7 +23,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.07';
+    $VERSION = '0.08';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -51,7 +51,6 @@ BEGIN
         ( my $message = $_[ 0 ] ) =~ s/\n|\r//g;
         $log->fatal( $message, { package => __PACKAGE__ } );
 
-        p @_;
         die Dumper @_;    # Now terminate really
     };
 
@@ -82,8 +81,8 @@ BEGIN
 
 sub new
 {
-    my ( $class, %parameters ) = @_;
     $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
+    my ( $class, %parameters ) = @_;
 
     my $self = {};
 
@@ -94,8 +93,14 @@ sub new
 
 sub _initialize()
 {
-    my ( $self, %parameters ) = @_;
     $log->debug( "_initialize", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+}
+
+sub _finalize()
+{
+    $log->debug( "_finalize", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
 }
 
 sub END
@@ -103,37 +108,6 @@ sub END
     $log->debug( "END", { package => __PACKAGE__ } );
     eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
 }
-
-=head2 C<AUTOLOAD>
-
-  Usage     : $self->block_new_method() within text_pm_file()
-  Purpose   : Build 'new()' method as part of a pm file
-  Returns   : String holding sub new.
-  Argument  : $module: pointer to the module being built
-              (as there can be more than one module built by EU::MM);
-              for the primary module it is a pointer to $self
-  Throws    : n/a
-  Comment   : This method is a likely candidate for alteration in a subclass,
-              e.g., pass a single hash-ref to new() instead of a list of
-              parameters.
-
-=cut
-
-sub AUTOLOAD
-{
-    my ( $self, @parameters ) = @_;
-    our $AUTOLOAD;
-    return if ( $AUTOLOAD =~ /DESTROY/ );
-
-    # Remove qualifier from original method name...
-    my $called = $AUTOLOAD =~ s/.*:://r;
-
-    # Is there an attribute of that name?
-    die "No such attribute ****[ $called ]****" unless exists $self->{ $called };
-
-    # If so, return it...
-    return $self->{ $called };
-} ## end sub AUTOLOAD
 
 sub DESTROY
 {
@@ -155,29 +129,24 @@ sub DESTROY
     }
 } ## end sub DESTROY
 
-=head2 C<getLogger>
+=head2 C<AUTOLOAD>
 =cut
 
-sub getLogger()
+sub AUTOLOAD
 {
-    my ( $package,        $filename,        $line,        $subroutine,        $hasargs,        $wantarray,        $evaltext,        $is_require,        $hints,        $bitmask,        $hinthash )        = caller( 0 );    # EU mesmo
-    my ( $parent_package, $parent_filename, $parent_line, $parent_subroutine, $parent_hasargs, $parent_wantarray, $parent_evaltext, $parent_is_require, $parent_hints, $parent_bitmask, $parent_hinthash ) = caller( 1 );    # QUEM me chamou
+    my ( $self, @parameters ) = @_;
+    our $AUTOLOAD;
+    return if ( $AUTOLOAD =~ /DESTROY/ );
 
-    my $log = Log::Any->get_logger();
+    # Remove qualifier from original method name...
+    my $called = $AUTOLOAD =~ s/.*:://r;
 
-    $log->context->{ subroutine }        = $subroutine;
-    $log->context->{ parent_subroutine } = $parent_subroutine;
-    my ( $self, %parameters ) = @_;
+    # Is there an attribute of that name?
+    die "No such attribute ****[ $called ]****" unless exists $self->{ $called };
 
-    $log->debug( $subroutine, { package => __PACKAGE__, file => __FILE__ } );
-
-    return $log;
-
-    # ->context = {
-    #     me     => $subroutine,
-    #     parent => $parent_subroutine
-    # };
-} ## end sub getLogger
+    # If so, return it...
+    return $self->{ $called };
+} ## end sub AUTOLOAD
 
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.

@@ -14,12 +14,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-PODUtils",
   "EXE_FILES" => [
-    "script/elide-pod"
+    "script/elide-pod",
+    "script/podless"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::PODUtils",
   "PREREQ_PM" => {
+    "Complete::Module" => 0,
+    "Module::Path::More" => "0.32",
     "Perinci::CmdLine::Any" => 0,
     "Pod::Elide" => "0.003",
     "strict" => 0,
@@ -31,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.040",
+  "VERSION" => "0.041",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,9 +42,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Complete::Module" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Module::Path::More" => "0.32",
   "Perinci::CmdLine::Any" => 0,
   "Pod::Elide" => "0.003",
   "Test::More" => 0,

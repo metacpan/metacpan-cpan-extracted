@@ -1,28 +1,21 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'date :: printf';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  ($date,@test)=@_;
-  $obj->parse($date);
-  return $obj->printf(@test);
-}
-
-$obj = new Date::Manip::Date;
+our $obj = new Date::Manip::Date;
 $obj->config("forcedate","2000-06-06-12:00:00,America/New_York");
 
-$tests=q{
+sub test {
+   my($date,@test)=@_;
+   $obj->parse($date);
+   return $obj->printf(@test);
+}
+
+my $tests=q{
 
 'Jan 3, 1996 8:11:12'     '%y %Y %m %f %d %e'    => '96 1996 01  1 03  3'
 
@@ -90,9 +83,9 @@ $tests=q{
 
 };
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

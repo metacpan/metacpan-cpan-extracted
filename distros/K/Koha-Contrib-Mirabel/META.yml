@@ -27,4 +27,4 @@ requires:
   utf8: '0'
 resources:
   repository: https://github.com/fredericd/Koha-Contrib-Mirabel
-version: 1.0.0
+version: 1.0.2

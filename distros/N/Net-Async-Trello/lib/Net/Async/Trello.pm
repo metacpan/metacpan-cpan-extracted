@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 =head1 NAME
 
@@ -61,10 +61,10 @@ Returns profile information for the current user.
 =cut
 
 sub me {
-	my ($self, %args) = @_;
-	$self->http_get(
-		uri => URI->new($self->base_uri . 'members/me')
-	)->transform(
+    my ($self, %args) = @_;
+    $self->http_get(
+        uri => URI->new($self->base_uri . 'members/me')
+    )->transform(
         done => sub {
             Net::Async::Trello::Member->new(
                 %{ $_[0] },
@@ -81,7 +81,7 @@ Returns a L<Ryu::Source> representing the available boards.
 =cut
 
 sub boards {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
     $self->api_get_list(
         endpoint => 'boards',
         class    => 'Net::Async::Trello::Board',
@@ -105,11 +105,13 @@ Returns a L<Future>.
 =cut
 
 sub board {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
     my $id = delete $args{id};
-	$self->http_get(
-		uri => URI->new($self->base_uri . 'board/' . $id)
-	)->transform(
+    my $uri = URI->new($self->base_uri . 'board/' . $id);
+    $uri->query_param($_ => $args{$_}) for keys %args;
+    $self->http_get(
+        uri => $uri
+    )->transform(
         done => sub {
             Net::Async::Trello::Board->new(
                 %{ $_[0] },
@@ -120,11 +122,11 @@ sub board {
 }
 
 sub card {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
     my $id = delete $args{id};
-	$self->http_get(
-		uri => URI->new($self->base_uri . 'cards/' . $id)
-	)->transform(
+    $self->http_get(
+        uri => URI->new($self->base_uri . 'cards/' . $id)
+    )->transform(
         done => sub {
             Net::Async::Trello::Card->new(
                 %{ $_[0] },
@@ -141,13 +143,13 @@ Performs a search.
 =cut
 
 sub search {
-	my ($self, %args) = @_;
-	$self->http_get(
-		uri => $self->endpoint(
+    my ($self, %args) = @_;
+    $self->http_get(
+        uri => $self->endpoint(
             'search',
             
         ),
-	)->transform(
+    )->transform(
         done => sub {
             Net::Async::Trello::Card->new(
                 %{ $_[0] },
@@ -158,11 +160,11 @@ sub search {
 }
 
 sub configure {
-	my ($self, %args) = @_;
-	for my $k (grep exists $args{$_}, qw(key secret token token_secret ws_token)) {
-		$self->{$k} = delete $args{$k};
-	}
-	$self->SUPER::configure(%args);
+    my ($self, %args) = @_;
+    for my $k (grep exists $args{$_}, qw(key secret token token_secret ws_token)) {
+        $self->{$k} = delete $args{$k};
+    }
+    $self->SUPER::configure(%args);
 }
 
 sub ws_token { shift->{ws_token} }
@@ -173,22 +175,22 @@ sub token { shift->{token} }
 sub token_secret { shift->{token_secret} }
 
 sub http {
-	my ($self) = @_;
-	$self->{http} ||= do {
-		require Net::Async::HTTP;
-		$self->add_child(
-			my $ua = Net::Async::HTTP->new(
-				fail_on_error            => 1,
-				max_connections_per_host => 2,
-				pipeline                 => 0,
-				max_in_flight            => 4,
-				decode_content           => 1,
-				timeout                  => 30,
-				user_agent               => 'Mozilla/4.0 (perl; Net::Async::Trello; TEAM@cpan.org)',
-			)
-		);
-		$ua
-	}
+    my ($self) = @_;
+    $self->{http} ||= do {
+        require Net::Async::HTTP;
+        $self->add_child(
+            my $ua = Net::Async::HTTP->new(
+                fail_on_error            => 1,
+                max_connections_per_host => 2,
+                pipeline                 => 0,
+                max_in_flight            => 4,
+                decode_content           => 1,
+                timeout                  => 30,
+                user_agent               => 'Mozilla/4.0 (perl; Net::Async::Trello; TEAM@cpan.org)',
+            )
+        );
+        $ua
+    }
 }
 
 =head1 METHODS - Internal
@@ -202,14 +204,14 @@ sub base_uri { shift->{base_uri} //= URI->new('https://api.trello.com/1/') }
 sub mime_type { shift->{mime_type} //= 'application/json' }
 
 sub oauth {
-	my ($self) = @_;
-	$self->{oauth} //= Net::Async::OAuth::Client->new(
-		realm           => 'Trello',
-		consumer_key    => $self->key,
-		consumer_secret => $self->secret,
-		token           => $self->token,
-		token_secret    => $self->token_secret,
-	)
+    my ($self) = @_;
+    $self->{oauth} //= Net::Async::OAuth::Client->new(
+        realm           => 'Trello',
+        consumer_key    => $self->key,
+        consumer_secret => $self->secret,
+        token           => $self->token,
+        token_secret    => $self->token_secret,
+    )
 }
 
 =head2 endpoints
@@ -217,8 +219,8 @@ sub oauth {
 =cut
 
 sub endpoints {
-	my ($self) = @_;
-	$self->{endpoints} ||= do {
+    my ($self) = @_;
+    $self->{endpoints} ||= do {
         my $path = Path::Tiny::path(__DIR__)->parent(3)->child('share/endpoints.json');
         $path = Path::Tiny::path(
             File::ShareDir::dist_file(
@@ -235,24 +237,24 @@ sub endpoints {
 =cut
 
 sub endpoint {
-	my ($self, $endpoint, %args) = @_;
-	URI::Template->new(
+    my ($self, $endpoint, %args) = @_;
+    URI::Template->new(
         $self->endpoints->{$endpoint . '_url'}
     )->process(%args);
 }
 
 sub http_get {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
 
-	$args{headers}{Authorization} = $self->oauth->authorization_header(
-		method => 'GET',
-		uri => $args{uri}
-	);
+    $args{headers}{Authorization} = $self->oauth->authorization_header(
+        method => 'GET',
+        uri => $args{uri}
+    );
 
-	$log->tracef("GET %s { %s }", ''. $args{uri}, \%args);
+    $log->tracef("GET %s { %s }", ''. $args{uri}, \%args);
     $self->http->GET(
         (delete $args{uri}),
-		%args
+        %args
     )->then(sub {
         my ($resp) = @_;
         $log->tracef("%s => %s", $args{uri}, $resp->decoded_content);
@@ -277,19 +279,19 @@ sub http_get {
 }
 
 sub http_post {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
 
-	$args{headers}{Authorization} = $self->oauth->authorization_header(
-		method => 'GET',
-		uri => $args{uri}
-	);
+    $args{headers}{Authorization} = $self->oauth->authorization_header(
+        method => 'GET',
+        uri => $args{uri}
+    );
 
-	$log->tracef("POST %s { %s }", ''. $args{uri}, \%args);
+    $log->tracef("POST %s { %s }", ''. $args{uri}, \%args);
     $self->http->POST(
         (delete $args{uri}),
         encode_json_utf8(delete $args{body}),
         content_type => 'application/json',
-		%args
+        %args
     )->then(sub {
         my ($resp) = @_;
         $log->tracef("%s => %s", $args{uri}, $resp->decoded_content);
@@ -314,19 +316,19 @@ sub http_post {
 }
 
 sub http_put {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
 
-	$args{headers}{Authorization} = $self->oauth->authorization_header(
-		method => 'PUT',
-		uri    => $args{uri}
-	);
+    $args{headers}{Authorization} = $self->oauth->authorization_header(
+        method => 'PUT',
+        uri    => $args{uri}
+    );
 
-	$log->tracef("PUT %s { %s }", ''. $args{uri}, \%args);
+    $log->tracef("PUT %s { %s }", ''. $args{uri}, \%args);
     $self->http->PUT(
         (delete $args{uri}),
         encode_json_utf8(delete $args{body}),
         content_type => 'application/json',
-		%args
+        %args
     )->then(sub {
         my ($resp) = @_;
         $log->tracef("%s => %s", $args{uri}, $resp->decoded_content);
@@ -351,18 +353,18 @@ sub http_put {
 }
 
 sub socket_io {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
 
     my $uri = $self->endpoint('socket_io');
-	$args{headers}{Authorization} = $self->oauth->authorization_header(
-		method => 'GET',
-		uri => $uri,
-	);
+    $args{headers}{Authorization} = $self->oauth->authorization_header(
+        method => 'GET',
+        uri => $uri,
+    );
 
-	$log->tracef("GET %s { }", ''. $uri);
+    $log->tracef("GET %s { }", ''. $uri);
     $self->http->GET(
         $uri,
-		%args
+        %args
     )->then(sub {
         my ($resp) = @_;
         return { } if $resp->code == 204;
@@ -379,7 +381,7 @@ sub api_get_list {
     use Future::Utils qw(fmap0);
     use namespace::clean qw(retain_future refaddr);
 
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
     my $label = $args{endpoint}
     ? ('Trello[' . $args{endpoint} . ']')
     : (caller 1)[3];

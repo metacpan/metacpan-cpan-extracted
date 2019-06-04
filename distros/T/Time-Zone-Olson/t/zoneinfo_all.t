@@ -9,15 +9,14 @@ use POSIX();
 use Config;
 use English qw( -no_match_vars );
 use Time::Local();
-use File::Find();
-use Digest::SHA();
+use Taint::Util();
 
 $ENV{PATH} = '/bin:/usr/bin:/usr/sbin:/sbin';
 delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
 
-$ENV{TZ} ||= guess_tz();
-
-diag("TZ environment variable is $ENV{TZ}");
+if ($ENV{TZ}) {
+	diag("TZ environment variable is $ENV{TZ}");
+}
 
 my $timezone = Time::Zone::Olson->new();
 ok($timezone, "Time::Zone::Olson->new() generates an object");
@@ -27,12 +26,8 @@ if ($timezone->win32_registry()) {
 	diag("Olson tz directory is " . $timezone->directory() . " for $^O");
 }
 
-if ($timezone->location()) {
-	$ENV{TZ} = $timezone->area() . '/' . $timezone->location();
-} else {
-	$ENV{TZ} = $timezone->area();
-}
-diag("TZ environment variable is untainted as $ENV{TZ}");
+diag("Local timezone has been determined to be " . $timezone->timezone() );
+ok($timezone->timezone(), "Local timezone has been determined to be " . $timezone->timezone() );
 
 my $perl_date = 0;
 my $bsd_date = 0;
@@ -60,7 +55,7 @@ if ($^O eq 'MSWin32') {
 	}
 }
 
-ok($timezone->timezone() =~ /^\w+(\/\w+)?$/, "\$timezone->timezone() parses correctly");
+ok($timezone->timezone() =~ /^\w+(\/[\w\-\/+]+)?$/, "\$timezone->timezone() parses correctly");
 ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->areas()");
 ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
 if (!$timezone->win32_registry()) {
@@ -68,7 +63,8 @@ my $comment = $timezone->comment('Australia/Melbourne');
 ok($comment =~ /Victoria/smx, "\$timezone->comment('Australia/Melbourne') contains /Victoria/");
 diag("Comment for 'Australia/Melbourne' is '$comment'");
 }
-diag(`zdump -v /usr/share/zoneinfo/$ENV{TZ} | head -n 10`);
+my $tz = $timezone->timezone();
+diag(`zdump -v /usr/share/zoneinfo/$tz | head -n 10`);
 if ($^O eq 'MSWin32') {
 } elsif ($bsd_date) {
 	diag("bsd test of early date:" . `TZ="Australia/Melbourne" date -r "-2172355201" +"%Y/%m/%d %H:%M:%S" 2>&1`);
@@ -82,7 +78,7 @@ foreach my $area ($timezone->areas()) {
 	foreach my $location ($timezone->locations($area)) {
 		if ( $ENV{RELEASE_TESTING} ) {
 		} else {
-			next if ("$area/$location" ne $ENV{TZ});
+			next if ("$area/$location" ne $tz);
 		}
 		$timezone->timezone("$area/$location");
 		my $transition_time_index = 0;
@@ -363,107 +359,6 @@ sub get_external_date {
 	}
 	chomp $formatted_date;
 	return $formatted_date;
-}
-
-sub guess_tz {
-	my $path = '/etc/localtime';
-	if (-e $path) {
-		my $digest = Digest::SHA->new('sha512');
-		$digest->addfile($path);
-		my $localtime_digest = $digest->hexdigest();
-		my $timezone = Time::Zone::Olson->new();
-		my $guessed;
-		foreach my $base ('/usr/share/zoneinfo', '/usr/lib/zoneinfo', $ENV{TZDIR}) {
-			my $readlink;
-			eval {
-				if ($readlink = readlink $path) {
-					if ($readlink =~ /^($base[\/\\])(\w+(?:\/[\w\-\/]+)?)$/) {
-						my ($directory, $test_timezone) = ($1, $2);
-						$guessed = $test_timezone;
-					}
-				}
-			};
-			if (!defined $guessed) {
-				if (($base) && (-e $base)) {
-					File::Find::find({	'no_chdir'	=> 1, 
-								'wanted'	=> sub {
-							if ($File::Find::name =~ /^($base[\/\\])(\w+(?:\/[\w\-\/]+)?)$/) {
-								my ($directory, $test_timezone) = ($1, $2);
-								my $digest = Digest::SHA->new('sha512');
-								eval {
-									$digest->addfile("$directory$test_timezone");
-									my $test_digest = $digest->hexdigest();
-									if ($test_digest eq $localtime_digest) {
-										if ($test_timezone =~ /^(\w+)\/([\w\-\/]+)$/) {
-											my ($test_area, $test_location) = ($1, $2);
-											foreach my $area ($timezone->areas()) {
-												if ($area eq $test_area) {
-													foreach my $location ($timezone->locations($area)) {
-														if ($location eq $test_location) {
-															$guessed = $test_timezone;
-														}
-													}
-												}
-											}
-										}
-									}
-								};
-							}
-						}}, $base);
-				}
-			}
-		}
-		if (defined $guessed) {
-			return $guessed;
-		}
-	} elsif ($^O eq 'MSWin32') {
-		require Win32API::Registry;
-		my $current_timezone_registry_path = 'SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
-		Win32API::Registry::RegOpenKeyEx(Win32API::Registry::HKEY_LOCAL_MACHINE(), $current_timezone_registry_path, 0, Win32API::Registry::KEY_QUERY_VALUE(), my $current_timezone_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:" . Win32API::Registry::regLastError());
-		my $win32_timezone_name;
-		if (Win32API::Registry::RegQueryValueEx($current_timezone_registry_key, 'TimeZoneKeyName', [], my $type, $win32_timezone_name, [])) {
-		} elsif ($! == POSIX::ENOENT()) {
-		} else {
-			die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\TimeZoneKeyName:" . Win32API::Registry::regLastError();
-		}
-		if ($win32_timezone_name) {
-		} else {
-			Win32API::Registry::RegQueryValueEx($current_timezone_registry_key, 'StandardName', [], my $type, my $standard_name, []) or die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\StandardName:" . Win32API::Registry::regLastError();
-			my ($description, $major, $minor, $build, $id) = Win32::GetOSVersion();
-			my $old_timezone_registry_path;
-			if ($id < 2) {
-				$old_timezone_registry_path = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Time Zones';
-			} else {
-				$old_timezone_registry_path = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones';
-			}
-			Win32API::Registry::RegOpenKeyEx(Win32API::Registry::HKEY_LOCAL_MACHINE(), $old_timezone_registry_path, 0, Win32API::Registry::KEY_QUERY_VALUE() | Win32API::Registry::KEY_ENUMERATE_SUB_KEYS(), my $old_timezone_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$old_timezone_registry_path:" . Win32API::Registry::regLastError());
-			my $enumerate_timezones = 1;
-			my $old_timezone_registry_index = 0;
-			while ($enumerate_timezones) {
-				if (Win32API::Registry::RegEnumKeyEx($old_timezone_registry_key, $old_timezone_registry_index, my $subkey_name, [], [], [], [], [],)) {
-					Win32API::Registry::RegOpenKeyEx($old_timezone_registry_key, $subkey_name, 0, Win32API::Registry::KEY_QUERY_VALUE(), my $old_timezone_specific_registry_key) or Carp::croak("Failed to open LOCAL_MACHINE\\$old_timezone_registry_path\\$subkey_name:" . Win32API::Registry::regLastError());
-					Win32API::Registry::RegQueryValueEx($old_timezone_specific_registry_key, 'Std', [], my $type, my $local_language_timezone_name, []) or die "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\$subkey_name\\Std:" . Win32API::Registry::regLastError();
-					if ($local_language_timezone_name eq $standard_name) {
-						$win32_timezone_name = $subkey_name
-					}
-				} elsif ( Win32API::Registry::regLastError() == 259 ) { # ERROR_NO_MORE_TIMES from winerror.h
-					$enumerate_timezones = 0;
-				} else {
-					Carp::croak("Failed to read from LOCAL_MACHINE\\$old_timezone_registry_path:$EXTENDED_OS_ERROR");
-				}
-				    $old_timezone_registry_index += 1;
-			}
-			Win32API::Registry::RegCloseKey($old_timezone_registry_key) or Carp::croak("Failed to close LOCAL_MACHINE\\$old_timezone_registry_path:$EXTENDED_OS_ERROR");
-		}
-		Win32API::Registry::RegCloseKey($current_timezone_registry_key) or die "Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:" . Win32API::Registry::regLastError();
-		my %mapping = Time::Zone::Olson->win32_mapping();
-		foreach my $key (sort { $a cmp $b } keys %mapping) {
-			if ($mapping{$key} eq $win32_timezone_name) {
-				return $key;
-			}
-		}
-	}
-	return 'Australia/Melbourne';
 }
 
 Test::More::done_testing();

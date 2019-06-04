@@ -1,5 +1,15 @@
 Revision history for Future-AsyncAwait
 
+0.27    2019-06-04 20:48:42
+        [CHANGES]
+         * Detect certain forbidden constructs at compile-time; await inside:
+            + non-lexical foreach
+            + map and grep (RT129748)
+            + string-eval (RT126036)
+
+        [BUGFIXES]
+         * Preserve regexp context across await boundary (RT129321)
+
 0.26    2019-04-27 12:41:11
         [BUGFIXES]
          * Further fixes for foreach(LIST) handling (RT129319)

@@ -1,5 +1,5 @@
 ---
-abstract: 'Sane database change management'
+abstract: 'Sensible database change management'
 author:
   - '"iovation Inc."'
 build_requires:
@@ -9,7 +9,7 @@ build_requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
   FindBin: '0'
-  IO::Pager: '0'
+  IO::Pager: '0.34'
   Module::Build: '0.35'
   Module::Runtime: '0'
   Path::Class: '0.33'
@@ -18,7 +18,7 @@ build_requires:
   Test::Exception: '0'
   Test::File: '0'
   Test::File::Contents: '0.20'
-  Test::MockModule: '0.05'
+  Test::MockModule: '0.17'
   Test::More: '0.94'
   Test::NoWarnings: '0.083'
   Test::Warn: '0'
@@ -83,7 +83,7 @@ recommends:
   Type::Tiny::XS: '0.010'
 requires:
   Clone: '0'
-  Config::GitLike: '1.11'
+  Config::GitLike: '1.15'
   DBI: '0'
   DateTime: '1.04'
   DateTime::TimeZone: '0'
@@ -93,12 +93,12 @@ requires:
   Encode::Locale: '0'
   File::Basename: '0'
   File::Copy: '0'
-  File::HomeDir: '0'
   File::Path: '0'
   File::Temp: '0'
   Getopt::Long: '0'
   Hash::Merge: '0'
   IO::Handle: '0'
+  IO::Pager: '0.34'
   IPC::Run3: '0'
   IPC::System::Simple: '1.17'
   List::MoreUtils: '0'
@@ -146,6 +146,6 @@ resources:
   bugtracker: https://github.com/sqitchers/sqitch/issues/
   homepage: https://sqitch.org/
   repository: https://github.com/sqitchers/sqitch/
-version: '0.9999'
-x_generated_by_perl: v5.28.1
+version: v1.0.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

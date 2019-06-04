@@ -1,53 +1,46 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'base :: _fix_year (50)';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  @ret = $obj->_fix_year(@test);
-  return @ret;
-}
-
-$dmt = new Date::Manip::TZ;
-$obj = $dmt->base();
+our $dmt = new Date::Manip::TZ;
+our $obj = $dmt->base();
 $dmt->config("forcedate","now,America/New_York");
 $obj->_method("50");
 
-sub _y {
-  my($yyyy) = @_;
-  $yyyy     =~ /^..(..)/;
-  my $yy    = $1;
-  return($yyyy,$yy);
+sub test {
+   my(@test)=@_;
+   my @ret = $obj->_fix_year(@test);
+   return @ret;
 }
 
-$y  = ( localtime(time) )[5];
-$y += 1900;
+sub _y {
+   my($yyyy) = @_;
+   $yyyy     =~ /^..(..)/;
+   my $yy    = $1;
+   return($yyyy,$yy);
+}
 
-($yyyy,$yy)       = _y($y);
+my $y               = ( localtime(time) )[5];
+$y                 += 1900;
 
-($yyyyM05,$yyM05) = _y($y-5);
-($yyyyP05,$yyP05) = _y($y+5);
+my($yyyy,$yy)       = _y($y);
 
-($yyyyM49,$yyM49) = _y($y-49);
-($yyyyM50,$yyM50) = _y($y-50);
-($yyyyM51,$yyM51) = _y($y-51);  $yyyyM51 += 100;
+my($yyyyM05,$yyM05) = _y($y-5);
+my($yyyyP05,$yyP05) = _y($y+5);
 
-($yyyyP48,$yyP48) = _y($y+48);
-($yyyyP49,$yyP49) = _y($y+49);
-($yyyyP50,$yyP50) = _y($y+50);  $yyyyP50 -= 100;
+my($yyyyM49,$yyM49) = _y($y-49);
+my($yyyyM50,$yyM50) = _y($y-50);
+my($yyyyM51,$yyM51) = _y($y-51);  $yyyyM51 += 100;
 
-$tests="
+my($yyyyP48,$yyP48) = _y($y+48);
+my($yyyyP49,$yyP49) = _y($y+49);
+my($yyyyP50,$yyP50) = _y($y+50);  $yyyyP50 -= 100;
+
+my $tests="
 
 $yy     => $yyyy
 
@@ -69,10 +62,9 @@ $yyP50  => $yyyyP50
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
-
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

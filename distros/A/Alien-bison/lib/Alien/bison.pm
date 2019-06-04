@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build bison, the parser generator
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 sub alien_helper
@@ -29,7 +29,7 @@ Alien::bison - Find or build bison, the parser generator
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,8 @@ From a Perl script
 
  use Alien::bison;
  use Env qw( @PATH );
- unshift @PATH, Alien::bison->bin_dir;  # bison is now in your path
+ unshift @PATH, Alien::bison->bin_dir;
+ system 'bison', ...;
 
 From Alien::Base Build.PL
 

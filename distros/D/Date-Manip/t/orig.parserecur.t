@@ -1,27 +1,20 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'Orig :: ParseRecur';
-$testdir = '';
-$testdir = $t->testdir();
-
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
-   @d = ParseRecur(@_);
+   my @d = ParseRecur(@_);
    return @d;
 }
 
 Date_Init("ForceDate=1997-03-08-12:30:00,America/New_York");
-Date_Init("ConfigFile=$testdir/Manip.cnf");
+Date_Init("ConfigFile=Manip.cnf");
 
-$tests ="
+my $tests ="
 
 1*1:1:1:0:0:0*EASTER
 'Jan 1 1997'
@@ -823,9 +816,9 @@ __undef__
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

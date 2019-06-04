@@ -1,29 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter 'base :: _calc_date_ymwd';
-$testdir = '';
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-use Date::Manip;
-if (DateManipVersion() >= 6.00) {
-   $t->feature("DM6",1);
-}
-
-$t->skip_all('Date::Manip 6.xx required','DM6');
-
-
-sub test {
-  (@test)=@_;
-  @ret = $obj->_calc_date_ymwd(@test);
-  return @ret;
-}
-
-$dmt = new Date::Manip::TZ;
-$obj = $dmt->base();
+our $dmt = new Date::Manip::TZ;
+our $obj = $dmt->base();
 $dmt->config("forcedate","now,America/New_York");
 
-$tests="
+sub test {
+   my(@test)=@_;
+   my @ret = $obj->_calc_date_ymwd(@test);
+   return @ret;
+}
+
+my $tests="
 
 [ 2009 08 15 ]          [ 0 0 0 5 ]   0 => [ 2009 8 20 ]
 
@@ -47,10 +40,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
-
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

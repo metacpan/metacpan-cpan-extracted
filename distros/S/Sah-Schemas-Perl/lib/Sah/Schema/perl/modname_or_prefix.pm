@@ -1,13 +1,13 @@
 package Sah::Schema::perl::modname_or_prefix;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2019-06-03'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name or prefix',
     description => <<'_',
 
-Perl module name, e.g. `Foo::Bar`, `Foo::Bar::`.
+Perl module name e.g. `Foo::Bar` or prefix e.g. `Foo::Bar::`.
 
 Contains coercion rule so inputing `Foo-Bar` or `Foo/Bar` will be normalized to
 `Foo::Bar` while inputing `Foo-Bar-` or `Foo/Bar/` will be normalized to
@@ -42,11 +42,11 @@ Sah::Schema::perl::modname_or_prefix - Perl module name or prefix
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::Schema::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
+This document describes version 0.019 of Sah::Schema::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
 
 =head1 DESCRIPTION
 
-Perl module name, e.g. C<Foo::Bar>, C<Foo::Bar::>.
+Perl module name e.g. C<Foo::Bar> or prefix e.g. C<Foo::Bar::>.
 
 Contains coercion rule so inputing C<Foo-Bar> or C<Foo/Bar> will be normalized to
 C<Foo::Bar> while inputing C<Foo-Bar-> or C<Foo/Bar/> will be normalized to

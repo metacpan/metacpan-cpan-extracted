@@ -13,9 +13,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/prove-with-prereqs-only',
-    'bin/prove-with-prereqs-r-only',
-    'bin/prove-with-prereqs-rs-only'
+    'script/prove-with-prereqs-only',
+    'script/prove-with-prereqs-r-only',
+    'script/prove-with-prereqs-rs-only'
 );
 
 # no fake home requested

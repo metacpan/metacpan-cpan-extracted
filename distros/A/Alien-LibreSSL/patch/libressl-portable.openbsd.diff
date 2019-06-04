@@ -1,0 +1,42 @@
+diff --git a/src/lib/libcrypto/modes/gcm128.c b/src/lib/libcrypto/modes/gcm128.c
+index 69b1dd4f4..7a938ee37 100644
+--- a/src/lib/libcrypto/modes/gcm128.c
++++ b/src/lib/libcrypto/modes/gcm128.c
+@@ -1515,13 +1515,15 @@ int CRYPTO_gcm128_finish(GCM128_CONTEXT *ctx,const unsigned char *tag,
+ 	alen = BSWAP8(alen);
+ 	clen = BSWAP8(clen);
+ #else
+-	u8 *p = ctx->len.c;
++	{
++		u8 *p = ctx->len.c;
+ 
+-	ctx->len.u[0] = alen;
+-	ctx->len.u[1] = clen;
++		ctx->len.u[0] = alen;
++		ctx->len.u[1] = clen;
+ 
+-	alen = (u64)GETU32(p)  <<32|GETU32(p+4);
+-	clen = (u64)GETU32(p+8)<<32|GETU32(p+12);
++		alen = (u64)GETU32(p)  <<32|GETU32(p+4);
++		clen = (u64)GETU32(p+8)<<32|GETU32(p+12);
++	}
+ #endif
+ #endif
+ 
+diff --git a/src/lib/libcrypto/x509/x509_vpm.c b/src/lib/libcrypto/x509/x509_vpm.c
+index 348222747..3ec31caab 100644
+--- a/src/lib/libcrypto/x509/x509_vpm.c
++++ b/src/lib/libcrypto/x509/x509_vpm.c
+@@ -101,11 +101,11 @@ sk_deep_copy(void *sk_void, void *copy_func_void, void *free_func_void)
+ 	void *(*copy_func)(void *) = copy_func_void;
+ 	void (*free_func)(void *) = free_func_void;
+ 	_STACK *ret = sk_dup(sk);
++	size_t i;
+ 
+ 	if (ret == NULL)
+ 		return NULL;
+ 
+-	size_t i;
+ 	for (i = 0; i < ret->num; i++) {
+ 		if (ret->data[i] == NULL)
+ 			continue;
