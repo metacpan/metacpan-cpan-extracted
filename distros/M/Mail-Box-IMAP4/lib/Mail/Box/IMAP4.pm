@@ -8,7 +8,7 @@
 
 package Mail::Box::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.004';
+$VERSION = '3.005';
 
 use base 'Mail::Box::Net';
 
@@ -53,10 +53,11 @@ sub init($)
     my $ch        = $self->{MBI_c_head}
       = $args->{cache_head} || ($writeable ? 'NO' : 'DELAY');
 
-    $args->{head_type} ||= 'Mail::Box::IMAP4::Head'
+    $args->{head_type}    ||= 'Mail::Box::IMAP4::Head'
         if $ch eq 'NO' || $ch eq 'PARTIAL';
 
-    $args->{body_type}  ||= 'Mail::Message::Body::Lines';
+    $args->{body_type}    ||= 'Mail::Message::Body::Lines';
+	$args->{message_type} ||= 'Mail::Box::IMAP4::Message';
 
     $self->SUPER::init($args);
 

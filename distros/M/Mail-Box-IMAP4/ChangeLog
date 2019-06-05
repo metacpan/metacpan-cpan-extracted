@@ -1,6 +1,12 @@
 
 ===== history of Mail-Box-IMAP4
 
+version 3.005:
+
+	Fixes:
+	- ignore StartTLS on SSL connection.
+	- enforce message_type is ::IMAP::Message, not ::IMAPs
+
 version 3.004: Fri  3 May 09:24:50 CEST 2019
 
 	Fixes:

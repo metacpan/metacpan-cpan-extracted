@@ -4,13 +4,13 @@
       "BLUHM <bluhm@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OSPF-LSDB",
    "no_index" : {
@@ -55,6 +55,6 @@
          "url" : "git://git.code.sf.net/p/ospfview/code"
       }
    },
-   "version" : "1.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

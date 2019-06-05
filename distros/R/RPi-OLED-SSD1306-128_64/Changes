@@ -1,0 +1,8 @@
+Revision history for RPi-OLED-SSD1306-128_64
+
+2.3602  2019-06-05
+        - added wiringPi checks in Makefile.PL, so CPAN testers don't go crazy
+
+2.3601  2019-06-05
+        First version, released on an unsuspecting world.
+

@@ -1,3 +1,9 @@
+0.012   2019-06-03 (PERLANCAR)
+
+	- Downgrade MetaCPAN::Client & App::lcpan::Call from requires ->
+	  suggests.
+
+
 0.011   2019-05-20 (PERLANCAR)
 
 	- Add subcommand: list-cpan.

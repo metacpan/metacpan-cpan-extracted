@@ -16,7 +16,7 @@ use HTTP::Headers();
 use URI();
 use CGI();
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new
 {
@@ -175,7 +175,7 @@ JIRA::REST::OAuth - Sub Class JIRA::REST providing OAuth 1.0 support.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -204,9 +204,9 @@ Adam R. Schobelock, C<< <schobes at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-jira-rest-oauth at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=JIRA-REST-OAuth>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests through the web interface at 
+L<https://github.com/schobes/JIRA-REST-OAuth/issues>.  I will be notified, and 
+then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 

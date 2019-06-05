@@ -31,7 +31,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Pcore" : "v0.24.5",
+            "Pcore" : "v0.90.4",
             "Pcore::CDN::Static" : "v0.1.0"
          }
       }
@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-ext/overview"
       }
    },
-   "version" : "v0.29.0",
+   "version" : "v0.30.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

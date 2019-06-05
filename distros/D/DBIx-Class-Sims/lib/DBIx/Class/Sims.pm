@@ -5,7 +5,7 @@ use 5.010_001;
 
 use strictures 2;
 
-our $VERSION = '0.320000';
+our $VERSION = '0.400000';
 
 {
   # Do **NOT** import a clone() function into the DBIx::Class::Schema namespace
@@ -921,6 +921,11 @@ might associate with a different parent that has not been created yet.
 Note that any child rows are not guaranteed to exist yet.
 
 =back
+
+=head1 DEBUGGING
+
+If you set the envvar C<< SIMS_DEBUG >> to true, then lots of useful information
+will be output.
 
 =head1 TODO
 

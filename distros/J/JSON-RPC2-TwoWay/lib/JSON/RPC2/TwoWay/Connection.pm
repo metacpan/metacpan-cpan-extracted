@@ -4,7 +4,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 # standard perl
 use Carp;
@@ -37,7 +37,7 @@ sub new {
 }
 
 sub call {
-	my ($self, $name, $args, $cb, $raw) = @_;
+	my ($self, $name, $args, $cb) = @_;
 	croak 'no self?' unless $self;
 	croak 'args should be a array or hash reference'
 		unless ref $args eq 'ARRAY' or ref $args eq 'HASH';
@@ -51,8 +51,25 @@ sub call {
 		params => $args,
 		id  => $id,
 	});
-	$self->{calls}->{$id} = [ $cb, $raw ]; # more?
+	$self->{calls}->{$id} = [ $cb, 0 ]; # not raw
 	#say STDERR "call: $request" if $self->{debug};
+	$self->write($request);
+	return;
+}
+
+sub callraw {
+	my ($self, $request, $cb) = @_;
+	croak 'no self?' unless $self;
+	croak 'request should be a array or hash reference'
+		unless ref $request eq 'HASH';
+	croak 'callback should be a code reference' if ref $cb ne 'CODE';
+	my $id = md5_base64($self->{next_id}++ . encode_json($request) . refaddr($cb));
+	croak 'duplicate call id' if $self->{calls}->{$id};
+	$request->{jsonrpc} = '2.0';
+	$request->{id} = $id;
+	$request = encode_json($request);
+	$self->{calls}->{$id} = [ $cb, 1 ]; # raw
+	#say STDERR "callraw: $request" if $self->{debug};
 	$self->write($request);
 	return;
 }
@@ -174,8 +191,8 @@ JSON::RPC2::TwoWay::Connection - Transport-independent bidirectional JSON-RPC 2.
     owner => $owner, 
     write => sub { $stream->write(@_) }
   );
-  $err = $con->serve($stream->read);
-  die $err if $err;
+  @err = $con->handle($stream->read);
+  die $err[-1] if @err;
 
 =head1 DESCRIPTION
 
@@ -217,7 +234,7 @@ This coderef will be called for all output: both requests and responses.
 
 =head2 call
 
-$con->call('method', { arg => 'foo' }, $cb, $raw);
+$con->call('method', { arg => 'foo' }, $cb);
 
 Calls the remote method indicated in the first argument.
 
@@ -228,11 +245,21 @@ empty reference when there are no arguments.
 The third argument is a callback: this callback will
 be called with the results of the called method.
 
-The optional fourth argument is the raw-mode flag.  If set to a true value
-the callback of the third argument will the called with the full JSON RPC
-2.0 response object.
-
 Call throws an error in case of missing arguments, otherwise it returns
+immediately with no return value.
+
+=head2 callraw
+
+$con->callraw({ method => 'method', params => {..} }, $cb);
+
+Enhances the first argument (which should be a hashref) to a full JSON-RPC
+2.0 request object and sends the request.  This allows for manipulating and
+extending the actual request.
+
+The third argument is a callback: this callback will
+be called with the results of the called method.
+
+Callraw throws an error in case of missing arguments, otherwise it returns
 immediately with no return value.
 
 =head3 the result callback
@@ -243,7 +270,8 @@ of protocol error like calling a normal method as a notification.
 
 If there are 2 arguments the first one is always false, the second one will
 contain the results from the remote method, see "REGISTERED CALLBACK CALLING
-CONVENTION" in "L<JSON::RPC2::TwoWay>.
+CONVENTION" in "L<JSON::RPC2::TwoWay>.  The full response will be passed for
+access to any extra fields.
 
 =head2 notify
 
@@ -320,7 +348,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Wieger Opmeer.
+This software is copyright (c) 2016-2019 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -47,7 +47,10 @@ sub build_schema {
       while (my ($name, $opts) = each %{$defn->{$rel_type}}) {
         while (my ($foreign, $column) = each %{$opts}) {
           $column = ref($column) eq 'HASH'
-            ? Dumper($column) : "'$column'";
+            ? Dumper($column)
+            : $column =~ /^sub \{/
+                ? "$column"
+                : "'$column'";
 
           $pkg .= "  __PACKAGE__->$rel_type(\n";
           $pkg .= "    $name => '${prefix}::$foreign' => $column,\n";

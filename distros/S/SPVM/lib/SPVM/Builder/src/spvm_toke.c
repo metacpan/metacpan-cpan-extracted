@@ -893,6 +893,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   str_length++;
                   char_ptr++;
                 }
+                else if (*char_ptr == '$') {
+                  str[str_length] = '$';
+                  str_length++;
+                  char_ptr++;
+                }
                 // Hex ascii code
                 else if (*char_ptr == 'x') {
                   char_ptr++;
@@ -1422,7 +1427,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 break;
               case 'b' :
-                if (strcmp(keyword, "byte") == 0) {
+                if (strcmp(keyword, "break") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BREAK);
+                  return BREAK;
+                }
+                else if (strcmp(keyword, "byte") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BYTE);
                   return BYTE;
                 }

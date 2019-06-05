@@ -33,7 +33,7 @@ sub load_locale : prototype($) ($locale) {
 
         $LOADED_DIST_LOCALES->{ $dist->{name} }->{$locale} = 1;
 
-        my $po_path = "$dist->{share_dir}l10n/$locale.po";
+        my $po_path = "$dist->{share_dir}/l10n/$locale.po";
 
         next if !-f $po_path;
 
@@ -60,7 +60,7 @@ sub load_locale : prototype($) ($locale) {
                             my $exp = $1;
 
                             if ( exists $LOCALE_PLURAL_FORM->{$locale}->{exp} ) {
-                                die qq[Plural form expression for locale "$locale" redefined] if $LOCALE_PLURAL_FORM->{$locale}->{exp} ne $exp;
+                                die qq[Plural form expression for locale "$locale" redefined:\n$LOCALE_PLURAL_FORM->{$locale}->{exp}\n$exp] if $LOCALE_PLURAL_FORM->{$locale}->{exp} ne $exp;
                             }
                             else {
                                 $LOCALE_PLURAL_FORM->{$locale}->{exp} = $exp;

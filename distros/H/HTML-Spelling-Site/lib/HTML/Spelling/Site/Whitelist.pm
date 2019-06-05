@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.2.0';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.4.0';
 use strict;
 use warnings;
 use autodie;
@@ -188,7 +188,7 @@ sub get_sorted_text
                             )
                         }
                     )
-                    )
+                )
                 }
                 sort { _rec_sorter( $a->{files}, $b->{files}, 0 ) }
                 @{ $self->_records }
@@ -237,7 +237,7 @@ HTML::Spelling::Site::Whitelist
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -269,7 +269,7 @@ HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 METHODS
 

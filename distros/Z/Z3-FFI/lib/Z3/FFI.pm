@@ -3,7 +3,7 @@ package Z3::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Data::Dumper;
 use FFI::Platypus;
@@ -11,6 +11,11 @@ use FFI::CheckLib qw//;
 use FFI::Platypus::API qw/arguments_get_string/;
 use File::ShareDir qw/dist_dir/;
 use Path::Tiny;
+
+my $search_path = path(dist_dir('Alien-Z3'))->child('dynamic');
+my $ffi_lib = FFI::CheckLib::find_lib_or_die(lib => 'z3', libpath => $search_path);
+my $ffi = FFI::Platypus->new();
+$ffi->lib($ffi_lib);
 
 use constant {
   # Z3_bool
@@ -167,19 +172,19 @@ my $functions = [
   [fixedpoint_add_cover => ["Z3_context", "Z3_fixedpoint", "int", "Z3_func_decl", "Z3_ast"] => "void"],
   [fixedpoint_get_statistics => ["Z3_context", "Z3_fixedpoint"] => "Z3_stats"],
   [fixedpoint_register_relation => ["Z3_context", "Z3_fixedpoint", "Z3_func_decl"] => "void"],
-  #[fixedpoint_set_predicate_representation => ["Z3_context", "Z3_fixedpoint", "Z3_func_decl", "uint", "Z3_symbol_arr"] => "void"],
+  [fixedpoint_set_predicate_representation => ["Z3_context", "Z3_fixedpoint", "Z3_func_decl", "uint", "Z3_symbol_arr"] => "void"],
   [fixedpoint_get_rules => ["Z3_context", "Z3_fixedpoint"] => "Z3_ast_vector"],
   [fixedpoint_get_assertions => ["Z3_context", "Z3_fixedpoint"] => "Z3_ast_vector"],
   [fixedpoint_set_params => ["Z3_context", "Z3_fixedpoint", "Z3_params"] => "void"],
   [fixedpoint_get_help => ["Z3_context", "Z3_fixedpoint"] => "Z3_string"],
   [fixedpoint_get_param_descrs => ["Z3_context", "Z3_fixedpoint"] => "Z3_param_descrs"],
-  #[fixedpoint_to_string => ["Z3_context", "Z3_fixedpoint", "uint", "Z3_ast_arr"] => "Z3_string"],
+  [fixedpoint_to_string => ["Z3_context", "Z3_fixedpoint", "uint", "Z3_ast_arr"] => "Z3_string"],
   [fixedpoint_from_string => ["Z3_context", "Z3_fixedpoint", "Z3_string"] => "Z3_ast_vector"],
   [fixedpoint_from_file => ["Z3_context", "Z3_fixedpoint", "Z3_string"] => "Z3_ast_vector"],
   [fixedpoint_push => ["Z3_context", "Z3_fixedpoint"] => "void"],
   [fixedpoint_pop => ["Z3_context", "Z3_fixedpoint"] => "void"],
   [fixedpoint_init => ["Z3_context", "Z3_fixedpoint", "void*"] => "void"],
-  #[fixedpoint_set_reduce_assign_callback => ["Z3_context", "Z3_fixedpoint", "Z3_fixedpoint_reduce_assign_callback_fptr"] => "void"],
+  #[fixedpoint_set_reduce_assign_callback => ["Z3_context", "Z3_fixedpoint", "Z3_fixedpoint_reduce_assign_callback_fptr"] => "void"], # TODO figure out these functions?
   #[fixedpoint_set_reduce_app_callback => ["Z3_context", "Z3_fixedpoint", "Z3_fixedpoint_reduce_app_callback_fptr"] => "void"],
   #[fixedpoint_add_callback => ["Z3_context", "Z3_fixedpoint", "void *state", "Z3_fixedpoint_new_lemma_eh", "Z3_fixedpoint_predecessor_eh", "Z3_fixedpoint_unfold_eh"] => "void"],
   [fixedpoint_add_constraint  => ["Z3_context", "Z3_fixedpoint", "Z3_ast", "uint"] => "void"],
@@ -189,8 +194,8 @@ my $functions = [
   [fixedpoint_get_rule_names_along_trace => ["Z3_context", "Z3_fixedpoint"] => "Z3_symbol"],
   [fixedpoint_add_invariant => ["Z3_context", "Z3_fixedpoint", "Z3_func_decl", "Z3_ast"] => "void"],
   [fixedpoint_get_reachable => ["Z3_context", "Z3_fixedpoint", "Z3_func_decl"] => "Z3_ast"],
-  #[qe_model_project => ["Z3_context", "Z3_model", "uint", "Z3_app_arr", "Z3_ast"] => "Z3_ast"],
-  #[qe_model_project_skolem => ["Z3_context", "Z3_model", "uint", "Z3_app_arr", "Z3_ast", "Z3_ast_map"] => "Z3_ast"],
+  [qe_model_project => ["Z3_context", "Z3_model", "uint", "Z3_app_arr", "Z3_ast"] => "Z3_ast"],
+  [qe_model_project_skolem => ["Z3_context", "Z3_model", "uint", "Z3_app_arr", "Z3_ast", "Z3_ast_map"] => "Z3_ast"],
   [model_extrapolate  => ["Z3_context", "Z3_model", "Z3_ast"] => "Z3_ast"],
   [qe_lite  => ["Z3_context", "Z3_ast_vector", "Z3_ast"] => "Z3_ast"],
   [polynomial_subresultants => ["Z3_context", "Z3_ast", "Z3_ast", "Z3_ast"] => "Z3_ast_vector"],
@@ -232,17 +237,88 @@ my $functions = [
   [mk_bv_sort => ["Z3_context", "uint"] => "Z3_sort"],
   [mk_finite_domain_sort => ["Z3_context", "Z3_symbol", "uint64_t"] => "Z3_sort"],
   [mk_array_sort => ["Z3_context", "Z3_sort", "Z3_sort"] => "Z3_sort"],
-#  [mk_array_sort_n => ["Z3_context", "uint", "Z3_sort *", "Z3_sort"] => "Z3_sort"],
-#  [mk_tuple_sort => ["Z3_context", "Z3_symbol", "uint", "Z3_symbol_arr", "Z3_sort_arr", "Z3_func_decl *", "Z3_func_decl_arr"] => "Z3_sort"],
+  [mk_array_sort_n => ["Z3_context", "uint", "Z3_sort_ptr", "Z3_sort"] => "Z3_sort", sub {
+    my ($xsub, $ctx, $n, $domain, $range) = @_;
+    die "\$domain needs to be passed as a scalar reference to mk_array_sort_n" unless ref($domain) eq 'SCALAR';
+
+    my $ret = $xsub->($ctx, $n, $domain, $range);
+    my $pointer = $$domain;
+    # rebless the inner object into the right type for later
+    $$domain = bless \$pointer, "Z3::FFI::Types::Z3_sort";
+
+    return $ret;
+  }],
+  [mk_tuple_sort => ["Z3_context", "Z3_symbol", "uint", "Z3_symbol_arr", "Z3_sort_arr", "Z3_func_decl_ptr", "Z3_func_decl_arr"] => "Z3_sort", sub {
+    my ($xsub, $ctx, $mk_tuple_name, $num_fields, $field_names, $field_sorts, $mk_tuple_decl, $proj_decl) = @_;
+    my $ct_names = scalar @$field_names;
+    my $ct_sorts = scalar @$field_sorts;
+    die "Number of field names ($ct_names) doesn't match \$num_fields ($num_fields)" unless $ct_names == $num_fields;
+    die "Number of field sorts ($ct_sorts) doesn't match \$num_fields ($num_fields)" unless $ct_sorts == $num_fields;
+    die "\$mk_tuple_decl needs to be passed as a scalar reference to mk_tuple_sort" unless ref($mk_tuple_decl) eq 'SCALAR';
+    # set the array here to be long enough
+    @{$proj_decl} = (undef() x $num_fields);
+
+    my $ret = $xsub->($ctx, $mk_tuple_name, $num_fields, $field_names, $field_sorts, $mk_tuple_decl, $proj_decl);
+    my $pointer = $$mk_tuple_decl;
+    # rebless the inner object into the right type for later
+    $$mk_tuple_decl = bless \$pointer, "Z3::FFI::Types::Z3_func_decl";
+
+    return $ret;
+  }],
   [mk_enumeration_sort => ["Z3_context", "Z3_symbol", "uint", "Z3_symbol_arr", "Z3_func_decl_arr", "Z3_func_decl_arr"] => "Z3_sort"],
-  [mk_list_sort => ["Z3_context", "Z3_symbol", "Z3_sort", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr"] => "Z3_sort"],
-  [mk_constructor => ["Z3_context", "Z3_symbol", "Z3_symbol", "uint", "Z3_symbol_arr", "Z3_sort_arr", "uint[]"] => "Z3_constructor"],
+  [mk_list_sort => ["Z3_context", "Z3_symbol", "Z3_sort", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_ptr"] => "Z3_sort", sub {
+    my ($xsub, $ctx, $name, $elem_sort, $nil_decl, $is_nil_decl, $cons_decl, $is_cons_decl, $head_decl, $tail_decl) = @_;
+    die "\$nil_decl needs to be passed as a scalar reference to mk_list_sort"     unless ref($nil_decl) eq 'SCALAR';
+    die "\$is_nil_decl needs to be passed as a scalar reference to mk_list_sort"  unless ref($is_nil_decl) eq 'SCALAR';
+    die "\$cons_decl needs to be passed as a scalar reference to mk_list_sort"    unless ref($cons_decl) eq 'SCALAR';
+    die "\$is_cons_decl needs to be passed as a scalar reference to mk_list_sort" unless ref($is_cons_decl) eq 'SCALAR';
+    die "\$head_decl needs to be passed as a scalar reference to mk_list_sort"    unless ref($head_decl) eq 'SCALAR';
+    die "\$tail_decl needs to be passed as a scalar reference to mk_list_sort"    unless ref($tail_decl) eq 'SCALAR';
+
+    my $ret = $xsub->($ctx, $name, $elem_sort, $nil_decl, $is_nil_decl, $cons_decl, $is_cons_decl, $head_decl, $tail_decl);
+    my $pointer = $$nil_decl;
+    $$nil_decl = bless \$pointer, "Z3::FFI::Types::Z3_func_decl";
+    my $pointer2 = $$is_nil_decl;
+    $$is_nil_decl = bless \$pointer2, "Z3::FFI::Types::Z3_func_decl";
+    my $pointer3 = $$cons_decl;
+    $$cons_decl = bless \$pointer3, "Z3::FFI::Types::Z3_func_decl";
+    my $pointer4 = $$is_cons_decl;
+    $$is_cons_decl = bless \$pointer4, "Z3::FFI::Types::Z3_func_decl";
+    my $pointer5 = $$head_decl;
+    $$head_decl = bless \$pointer, "Z3::FFI::Types::Z3_func_decl";
+    my $pointer6 = $$tail_decl;
+    $$tail_decl = bless \$pointer6, "Z3::FFI::Types::Z3_func_decl";
+    
+    return $ret;
+  }],
+  [mk_constructor => ["Z3_context", "Z3_symbol", "Z3_symbol", "uint", "Z3_symbol_arr", "Z3_sort_arr", "uint[]"] => "Z3_constructor", sub {
+    my ($xsub, $ctx, $name, $recognizer, $num_fields, $field_names, $sorts, $sort_refs) = @_;
+    my $ct_field_names = scalar @$field_names;
+    die "Number of field_names ($ct_field_names) doesn't match \$num_fields ($num_fields)" unless $ct_field_names == $num_fields;
+
+    $xsub->($ctx, $name, $recognizer, $num_fields, $field_names, $sorts, $sort_refs);
+  }],
   [del_constructor => ["Z3_context", "Z3_constructor"] => "void"],
   [mk_datatype => ["Z3_context", "Z3_symbol", "uint", "Z3_constructor_arr"] => "Z3_sort"],
   [mk_constructor_list => ["Z3_context", "uint", "Z3_constructor_arr"] => "Z3_constructor_list"],
   [del_constructor_list => ["Z3_context", "Z3_constructor_list"] => "void"],
   [mk_datatypes => ["Z3_context", "uint", "Z3_symbol_arr", "Z3_sort_arr", "Z3_constructor_list_arr"] => "void"],
-#  [query_constructor => ["Z3_context", "Z3_constructor", "uint", "Z3_func_decl*", "Z3_func_decl*", "Z3_func_decl_arr"] => "void"],
+  [query_constructor => ["Z3_context", "Z3_constructor", "uint", "Z3_func_decl_ptr", "Z3_func_decl_ptr", "Z3_func_decl_arr"] => "void", sub {
+    my ($xsub, $ctx, $constructor, $num_fields, $func_constructor, $func_tester, $accessors) = @_;
+    my $ct_accessors = scalar @$accessors;
+    die "Number of accessors ($ct_accessors) doesn't match \$num_fields ($num_fields)" unless $ct_accessors == $num_fields;
+    die "\$func_constructor needs to be passed as a scalar reference to query_constructor" unless ref($func_constructor) eq 'SCALAR';
+    die "\$func_tester needs to be passed as a scalar reference to query_constructor" unless ref($func_constructor) eq 'SCALAR';
+
+    my $ret = $xsub->($ctx, $constructor, $num_fields, $func_constructor, $func_tester, $accessors);
+    my $pointer = $$func_tester;
+    my $pointer2 = $$func_constructor;
+    # rebless the inner object into the right type for later
+    $$func_tester = bless \$pointer, "Z3::FFI::Types::Z3_func_decl";
+    $$func_constructor = bless \$pointer2, "Z3::FFI::Types::Z3_func_decl";
+    
+    return $ret;
+  }],
   [mk_func_decl => ["Z3_context", "Z3_symbol", "uint", "Z3_sort_arr", "Z3_sort"] => "Z3_func_decl"],
   [mk_app => ["Z3_context", "Z3_func_decl", "uint", "Z3_ast_arr"] => "Z3_ast"],
   [mk_const => ["Z3_context", "Z3_symbol", "Z3_sort"] => "Z3_ast"],
@@ -325,11 +401,32 @@ my $functions = [
   [mk_bvmul_no_overflow => ["Z3_context", "Z3_ast", "Z3_ast", "bool"] => "Z3_ast"],
   [mk_bvmul_no_underflow => ["Z3_context", "Z3_ast", "Z3_ast"] => "Z3_ast"],
   [mk_select => ["Z3_context", "Z3_ast", "Z3_ast"] => "Z3_ast"],
-  [mk_select_n => ["Z3_context", "Z3_ast", "uint", "Z3_ast_ptr"] => "Z3_ast"],
+  [mk_select_n => ["Z3_context", "Z3_ast", "uint", "Z3_ast_arr"] => "Z3_ast", sub {
+    my ($xsub, $ctx, $ast, $ct, $indexes) = @_;
+    # subtract one, $indexes is going to be NULL terminated, which doesn't matter for this call
+    # so the count will be off by one from what we got passed
+    die "\$ct($ct) and \$indexes(".(@$indexes-1).") don't match" unless $ct == @$indexes-1;
+
+    $xsub->($ctx, $ast, $ct, $indexes);
+  }],
   [mk_store => ["Z3_context", "Z3_ast", "Z3_ast", "Z3_ast"] => "Z3_ast"],
-  [mk_store_n => ["Z3_context", "Z3_ast", "uint", "Z3_ast_ptr", "Z3_ast"] => "Z3_ast"],
+  [mk_store_n => ["Z3_context", "Z3_ast", "uint", "Z3_ast_arr", "Z3_ast"] => "Z3_ast", sub {
+    my ($xsub, $ctx, $ast, $ct, $indexes, $val) = @_;
+    # subtract one, $indexes is going to be NULL terminated, which doesn't matter for this call
+    # so the count will be off by one from what we got passed
+    die "\$ct($ct) and \$indexes(".(@$indexes-1).") don't match" unless $ct == @$indexes-1;
+
+    $xsub->($ctx, $ast, $ct, $indexes, $val);
+  }],
   [mk_const_array => ["Z3_context", "Z3_sort", "Z3_ast"] => "Z3_ast"],
-  [mk_map => ["Z3_context", "Z3_func_decl", "uint", "Z3_ast_ptr"] => "Z3_ast"],
+  [mk_map => ["Z3_context", "Z3_func_decl", "uint", "Z3_ast_arr"] => "Z3_ast", sub {
+    my ($xsub, $ctx, $ast, $ct, $args) = @_;
+    # subtract one, $indexes is going to be NULL terminated, which doesn't matter for this call
+    # so the count will be off by one from what we got passed
+    die "\$ct($ct) and \$args(".(@$args-1).") don't match" unless $ct == @$args-1;
+
+    $xsub->($ctx, $ast, $ct, $args);
+  }],
   [mk_array_default => ["Z3_context", "Z3_ast"] => "Z3_ast"],
   [mk_as_array => ["Z3_context", "Z3_func_decl"] => "Z3_ast"],
   [mk_set_sort => ["Z3_context", "Z3_sort"] => "Z3_sort"],
@@ -499,7 +596,17 @@ my $functions = [
   [mk_model => ["Z3_context"] => "Z3_model"],
   [model_inc_ref => ["Z3_context", "Z3_model"] => "void"],
   [model_dec_ref => ["Z3_context", "Z3_model"] => "void"],
-  [model_eval => ["Z3_context", "Z3_model", "Z3_ast", "bool", "Z3_ast_ptr"] => "Z3_bool"],
+  [model_eval => ["Z3_context", "Z3_model", "Z3_ast", "bool", "Z3_ast_ptr"] => "Z3_bool", sub {
+    my ($xsub, $ctx, $model, $ast, $completion, $val) = @_;
+    die "\$val needs to be passed as a scalar reference to model_eval" unless ref($val) eq 'SCALAR';
+
+    my $ret = $xsub->($ctx, $model, $ast, $completion, $val);
+    my $pointer = $$val;
+    # rebless the inner object into the right type for later
+    $$val = bless \$pointer, "Z3::FFI::Types::Z3_ast";
+
+    return $ret;
+  }],
   [model_get_const_interp => ["Z3_context", "Z3_model", "Z3_func_decl"] => "Z3_ast"],
   [model_has_interp => ["Z3_context", "Z3_model", "Z3_func_decl"] => "bool"],
   [model_get_func_interp => ["Z3_context", "Z3_model", "Z3_func_decl"] => "Z3_func_interp"],
@@ -543,7 +650,19 @@ my $functions = [
   [parse_smtlib2_file => ["Z3_context", "Z3_string", "uint", "Z3_symbol_arr", "Z3_sort_arr", "uint", "Z3_symbol_arr", "Z3_func_decl_arr"] => "Z3_ast_vector"],
   [eval_smtlib2_string => ["Z3_context", "Z3_string"] => "Z3_string"],
   [get_error_code => ["Z3_context"] => "Z3_error_code"],
-#  [set_error_handler => ["Z3_context", "Z3_error_handler"] => "void"], # TODO this needs some work with function callbacks
+  [set_error_handler => ["Z3_context", "Z3_error_handler"] => "void", sub {
+    my ($xsub, $ctx, $sub) = @_;
+    die "\$sub needs to be a coderef when passed to set_error_handler" unless ref($sub) eq 'CODE';
+
+    # extra level, but so we can wrap the arguments properly
+    my $closure = $ffi->closure(sub {
+      my ($ctx_ptr, $err_ptr) = @_;
+      my $ctx = bless \$ctx_ptr, 'Z3::FFI::Types::Z3_context';
+      my $err = bless \$err_ptr, 'Z3::FFI::Types::Z3_error_code';
+      $sub->($ctx, $err);
+    });
+    $xsub->($ctx, $closure);
+  }],
   [set_error => ["Z3_context", "Z3_error_code"] => "void"],
   [get_error_msg => ["Z3_context", "Z3_error_code"] => "Z3_string"],
   [get_version => ["uint *", "uint *", "uint *", "uint *"] => "void"],
@@ -824,13 +943,21 @@ my $functions = [
   [rcf_neq => ["Z3_context", "Z3_rcf_num", "Z3_rcf_num"] => "bool"],
   [rcf_num_to_string => ["Z3_context", "Z3_rcf_num", "bool", "bool"] => "Z3_string"],
   [rcf_num_to_decimal_string => ["Z3_context", "Z3_rcf_num", "uint"] => "Z3_string"],
-  [rcf_get_numerator_denominator => ["Z3_context", "Z3_rcf_num", "Z3_rcf_num_ptr", "Z3_rcf_num_ptr"] => "void"],
-];
+  [rcf_get_numerator_denominator => ["Z3_context", "Z3_rcf_num", "Z3_rcf_num_ptr", "Z3_rcf_num_ptr"] => "void", sub {
+    my ($xsub, $ctx, $in, $num, $denom) = @_;
+    die "\$num needs to be passed as a scalar reference to rcf_get_numerator_denominator" unless ref($num) eq 'SCALAR';
+    die "\$denom needs to be passed as a scalar reference to rcf_get_numerator_denominator" unless ref($denom) eq 'SCALAR';
 
-my $search_path = path(dist_dir('Alien-Z3'))->child('dynamic');
-my $ffi_lib = FFI::CheckLib::find_lib_or_die(lib => 'z3', libpath => $search_path);
-my $ffi = FFI::Platypus->new();
-$ffi->lib($ffi_lib);
+    my $ret = $xsub->($ctx, $in, $num, $denom);
+    my $pointer = $$num;
+    my $pointer2 = $$denom;
+    # rebless the inner object into the right type for later
+    $$num = bless \$pointer, "Z3::FFI::Types::Z3_rcf_num";
+    $$denom = bless \$pointer2, "Z3::FFI::Types::Z3_rcf_num";
+    
+    return $ret;
+    }],
+];
 
 my $real_types = {
   Z3_bool => 'bool',
@@ -846,7 +973,7 @@ my $real_types = {
   Z3_goal_prec => 'int',
   Z3_string => 'string',
   Z3_string_ptr => 'string *',
-  # Z3_error_handler => # TODO ...
+  Z3_error_handler => '(opaque, opaque)->void',
 };
 
 for my $type (@$opaque_types) {
@@ -865,24 +992,9 @@ for my $type (@$opaque_types) {
       return $$val
   }});
 
-  $ffi->custom_type($type."_arr" => {
-    native_type => 'opaque',
-    native_to_perl => sub {
-      ...
-    },
-    perl_to_native => sub {
-      ...
-    }
-  });
-  $ffi->custom_type($type."_ptr" => {
-    native_type => 'opaque',
-    native_to_perl => sub {
-      ...
-    },
-    perl_to_native => sub {
-      ...
-    }
-  });
+  $ffi->load_custom_type("Z3::FFI::ArrayType" => $type."_arr", $type);
+
+  $ffi->type("opaque*" => $type."_ptr");
 }
   
 
@@ -893,12 +1005,8 @@ for my $type_name (keys %$real_types) {
 
 for my $function (@$functions) {
   my $name = shift @$function;
-#  print "Making Function $name\n";
   $ffi->attach(["Z3_$name" => $name], @$function);
 }
-
-my $config = mk_config();
-my $context = mk_context($config);
 
 1;
 
@@ -919,9 +1027,9 @@ This is built for Z3 version 4.8.4
 
 This is a direct translation of the Z3 C API to a Perl API.  It's most likely not the level for working with Z3 from perl.
 
-This is a mostly functional implementation right now.  A few functions are not implemented, Z3_set_error_handler in particular.
-This early release is also missing support for any Z3_...[] array types and the few pointer types that get used.  These will be implemented
-in future versions
+This is a mostly functional implementation right now.   Three functions related to fixed point math are unimplemented currently.
+
+It should work for any examples from the C API in Z3.
 
 =head1 USE
 
@@ -934,15 +1042,25 @@ All functions have the Z3_ stripped from their name and are declared as part of 
     my $context = Z3::FFI::mk_context($config); # Create the Z3 Context object
     ... # work with the Z3 context
 
+This is a nearly complete and direct translation of the Z3 C API to Perl.  All the sames kinds of semantics of the C API regarding ownership and allocation will apply.
+You likely don't want to use this library directly, but instead wait for the higher level version wrapper of this API to get finished, which will roughly match the Python
+API that already exists.
+
+For some good examples of how to actually use this library, see the t/ directory in the distrobution.
+
 =head1 TODO
 
 =over 1
 
-=item Finish the array types to allow more functions to be called.
+=item More testing, from the C API example files
 
-=item Finish the pointer types to allow the rest of the functions to be called.
+=back
 
-=item Figure out if there's a way to handle the Z3_set_error_handler function
+=head1 EXPECTED ISSUES
+
+=over 1
+
+=item Memory leaks.  Due to the differing levels of the APIs and languages, I strongly suspect that there's going to be some memory leaks somewhere.  I'll try to fix these as they're found, but they are not a priority at the moment.
 
 =back
 

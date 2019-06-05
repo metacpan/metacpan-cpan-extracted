@@ -3,11 +3,10 @@ Z3::FFI
 This is a direct translation of the Z3 C API to a Perl API. It's most
 likely not the level for working with Z3 from perl.
 
-This is a mostly functional implementation right now. A few functions
-are not implemented, Z3_set_error_handler in particular. This early
-release is also missing support for any Z3_...[] array types and the few
-pointer types that get used. These will be implemented in future
-versions
+This is a mostly functional implementation right now. Three functions
+related to fixed point math are unimplemented currently.
+
+It should work for any examples from the C API in Z3.
 
 INSTALLATION
 

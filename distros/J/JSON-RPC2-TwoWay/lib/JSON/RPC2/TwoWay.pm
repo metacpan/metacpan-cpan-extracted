@@ -3,7 +3,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 # standard perl
 use Carp;
@@ -169,9 +169,12 @@ JSON::RPC2::TwoWay - Transport-independent bidirectional JSON-RPC 2.0
   $rpc = JSON::RPC2::TwoWay->new();
   $rpc->register('ping', \&handle_ping);
 
-  $con = $rpc->newconnection($owner, $stream);
-  $err = $con->serve($stream->read());
-  die $err if $err;
+  $con = $rpc->newconnection(
+    owner => $owner, 
+    write => sub { $stream->write(@_) }
+  );
+  @err = $con->handle($stream->read);
+  die $err[-1] if @err;
 
 =head1 DESCRIPTION
 
@@ -296,7 +299,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Wieger Opmeer.
+This software is copyright (c) 2016-2019 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2101';
+our $VERSION = '0.2200';
 
 use Carp;
 use Algorithm::Combinatorics qw( permutations );
@@ -461,23 +461,26 @@ sub play
     # Allow for alternate strategies
     $self->{$_} = $strategies{$_} for keys %strategies;
 
-    my $player  = 1;
-    my $keys    = [ sort keys %{ $self->{$player} } ];
-    my $weights = [ map { $self->{$player}{$_} } @$keys ];
-    $weights = [ 1, 1 ] if 0 == sum0 @$weights;
-    my $rplay   = choose_weighted( $keys, $weights );
-
-    $player   = 2;
-    $keys     = [ sort keys %{ $self->{$player} } ];
-    $weights  = [ map { $self->{$player}{$_} } @$keys ];
-    $weights  = [ 1, 1 ] if 0 == sum0 @$weights;
-    my $cplay = choose_weighted( $keys, $weights );
+    my $rplay = $self->_player_move(1);
+    my $cplay = $self->_player_move(2);
 
     $play->{ "$rplay,$cplay" } = exists $self->{payoff} && $self->{payoff}
         ? $self->{payoff}[$rplay - 1][$cplay - 1]
         : [ $self->{payoff1}[$rplay - 1][$cplay - 1], $self->{payoff2}[$rplay - 1][$cplay - 1] ];
 
     return $play;
+}
+
+sub _player_move {
+    my ( $self, $player ) = @_;
+
+    my $keys    = [ sort keys %{ $self->{$player} } ];
+    my $weights = [ map { $self->{$player}{$_} } @$keys ];
+
+    # Handle the [0, 0, ...] edge case
+    $weights = [ (1) x @$weights ] if 0 == sum0 @$weights;
+
+    return choose_weighted( $keys, $weights );
 }
 
 1;
@@ -494,7 +497,7 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2101
+version 0.2200
 
 =head1 SYNOPSIS
 
@@ -510,21 +513,21 @@ version 0.2101
  $g->row_reduce();
  $g->col_reduce();
  my $player = 1;
- my $p = $g->saddlepoint();
+ my $s = $g->saddlepoint();
  my $o = $g->oddments();
  my $e = $g->expected_payoff();
  my $c = $g->counter_strategy($player);
- my $u = $g->play();
+ my $p = $g->play();
 
  $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => 0.1, 2 => 0.2, 3 => 0.7 },
     2 => { 1 => 0.1, 2 => 0.2, 3 => 0.3, 4 => 0.4 },
     # Payoff table for the row player
-    payoff1 => [ [5,3,8,2],   # 1
+    payoff1 => [ [5,3,8,2],   # 1st strategy
                  [6,5,7,1],   # 2
                  [7,4,6,0] ], # 3
     # Payoff table for the column player (opponent)
-    #             1 2 3 4
+    #             1 2 3 4th strategy
     payoff2 => [ [2,0,1,3],
                  [3,4,4,1],
                  [5,6,8,2] ],
@@ -534,12 +537,12 @@ version 0.2101
  my $n = $g->nash();
  $e = $g->expected_payoff();
  $c = $g->counter_strategy($player);
- $u = $g->play();
+ $p = $g->play();
 
 =head1 DESCRIPTION
 
-A C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game
-of player names, strategies and utilities ("payoffs").
+A C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game of player
+names, strategies and utilities ("payoffs").
 
 Players 1 and 2 are the "row" and "column" players, respectively.  This is due
 to the tabular format of a matrix game:
@@ -550,11 +553,40 @@ to the tabular format of a matrix game:
  Player |   0.5    1   -1  < Payoff
     1   |   0.5   -1    1  <
 
-A non-zero sum game is represented by two payoff profiles, as above in the
-SYNOPSIS.
+A non-zero sum game is represented by two payoff profiles, as in the SYNOPSIS.
 
-A prisoner's dilemma tournament of different strategies, ala Axelrod, can be
-found the the F<eg/> directory of this distribution.
+A prisoner's dilemma, where Blue is the row player, Red is the column player,
+and T > R > P > S is:
+
+    \  Red |           |
+      \    | Cooperate | Defect
+ Blue   \  |           |
+ --------------------------------
+           | \   R2    | \   T2
+ Cooperate |   \       |   \
+           | R1  \     | S1  \
+ --------------------------------
+           | \   S2    | \   P2
+ Defect    |   \       |   \
+           | T1  \     | P1  \
+
+And in this implementation that would be:
+
+ $g = Game::Theory::TwoPersonMatrix->new(
+    payoff1 => [ [ -1, -3 ], [  0, -2 ] ],  # Blue: [ R1, S1 ], [ T1, P1 ]
+    payoff2 => [ [ -1,  0 ], [ -3, -2 ] ],  # Red:  [ R2, T2 ], [ S2, P2 ]
+ );
+
+Where the two player strategies are to either Cooperate (1) or Defect (2).  This
+is given by a hash for each of the two players, where the values are Boolean:
+
+ %strategy = (
+    1 => { 1 => $cooporate1, 2 => $defect1 }, # Blue
+    2 => { 1 => $cooporate2, 2 => $defect2 }, # Red
+ );
+
+See the F<eg/play> program in this distribution for an example that exercises
+strategic variations of the prisoner's dilemma.
 
 =head1 METHODS
 
@@ -576,9 +608,11 @@ found the the F<eg/> directory of this distribution.
 Create a new C<Game::Theory::TwoPersonMatrix> object.
 
 Player strategies are given by a hash reference of numbered keys - one for each
-strategy.  Payoffs are given by array references of lists of outcomes.  For
-zero-sum games this is a single payoff list.  For non-zero-sum games this is
-given as two lists - one for each player.
+strategy.  These are each assumed to add to 1.  Otherwise YMMV.
+
+Payoffs are given by array references of lists of outcomes.  For zero-sum games
+this is a single payoff list.  For non-zero-sum games this is given as two lists
+- one for each player.
 
 =head2 expected_payoff()
 
@@ -609,7 +643,7 @@ non-zero-sum game, given pure opponent strategies.
 
 =head2 saddlepoint()
 
- $p = $g->saddlepoint;
+ $s = $g->saddlepoint;
 
 Return the saddlepoint of a zero-sum game, or C<undef> if there is none.
 
@@ -659,23 +693,27 @@ for its row.
 
 =head2 play()
 
- $u = $g->play();
- $u = $g->play(%strategies);
+ $p = $g->play();
+ $p = $g->play(%strategies);
 
-Return a single outcome for a zero-sum game or a pair for a non-zero-sum game.
+Return a single outcome for a zero-sum game, or a pair for a non-zero-sum game
+as a hashref keyed by each strategy chosen and with values of the payoff(s)
+earned.
 
-An optional list of player strategies can be provided.  This is a hashref of the
+An optional list of player strategies can be provided.  This is a hash of the
 same type of strategies that are given to the constructor.
 
 =head1 SEE ALSO
 
 The F<eg/> and F<t/> scripts in this distribution.
 
-"A Gentle Introduction to Game Theory"
+"A Gentle Introduction to Game Theory" from which this API is derived:
 
 L<http://www.amazon.com/Gentle-Introduction-Theory-Mathematical-World/dp/0821813390>
 
 L<http://books.google.com/books?id=8doVBAAAQBAJ>
+
+L<https://en.wikipedia.org/wiki/Prisoner%27s_dilemma>
 
 =head1 AUTHOR
 

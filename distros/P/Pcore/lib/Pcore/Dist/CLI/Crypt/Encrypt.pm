@@ -1,6 +1,7 @@
 package Pcore::Dist::CLI::Crypt::Encrypt;
 
 use Pcore -class, -ansi;
+use Package::Stash::XS qw[];
 
 extends qw[Pcore::Dist::CLI];
 
@@ -49,6 +50,10 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     say 'ENCRYPTED' if $opt->{verbose};
 
+    # allow encrypted code to be loaded into the current process
+    my $stash = Package::Stash::XS->new('B');
+    $stash->remove_symbol('$VERSION');
+
     if ( $opt->{protect} && ( my $mod = P->perl->module('Filter/Crypto/CryptFile.pm') ) ) {
         my $auto_deps = $mod->auto_deps;
 
@@ -96,7 +101,9 @@ sub _process_file ( $self, $path, $verbose ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 29                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 30                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 55                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

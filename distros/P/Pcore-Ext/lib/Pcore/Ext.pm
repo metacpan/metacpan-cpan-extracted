@@ -1,9 +1,8 @@
-package Pcore::Ext v0.29.0;
+package Pcore::Ext v0.30.2;
 
 use Pcore -dist, -class;
 use Pcore::Ext::App;
 use Pcore::Util::Scalar qw[is_ref];
-use Package::Stash::XS qw[];
 
 has app => ( required => 1 );    # InstanceOf['Pcore::App']
 
@@ -15,12 +14,14 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-sub create_app ( $self, $name, $cfg ) {
+sub create_app ( $self, $package, $cfg ) {
     my $app;
 
-    if ( !exists $self->{ext_app}->{$name} ) {
-        $cfg->{devel} = $self->{app}->{devel};
-        $cfg->{name}  = $name;
+    if ( !exists $self->{ext_app}->{$package} ) {
+        $cfg->{devel}     = $self->{app}->{devel};
+        $cfg->{ext}       = $self;
+        $cfg->{id}        = P->digest->md5_hex($package);
+        $cfg->{namespace} = $package;
 
         $cfg->{api_namespace} //= $cfg->{namespace} =~ s/:://smgr;
 
@@ -30,19 +31,19 @@ sub create_app ( $self, $name, $cfg ) {
         $cfg->{prefixes}->{dist}  //= ref( $self->{app} ) . '::Ext' =~ s[::][/]smgr;
         $cfg->{prefixes}->{app}   //= $cfg->{namespace} =~ s[::][/]smgr;
 
-        $app = $self->{ext_app}->{$name} = Pcore::Ext::App->new($cfg);
+        $app = $self->{ext_app}->{$package} = Pcore::Ext::App->new($cfg);
 
         $app->build;
     }
 
-    return $self->{ext_app}->{$name};
+    return $self->{ext_app}->{$package};
 }
 
 sub rebuild_all ($self) {
     $Pcore::Ext::App::MODULES = {};
 
-    while ( my ( $name, $app ) = each $self->{ext_app}->%* ) {
-        print "rebuild: $name ... ";
+    while ( my ( $package, $app ) = each $self->{ext_app}->%* ) {
+        print "rebuild: $package ... ";
 
         eval { $app->build };
 
@@ -59,18 +60,7 @@ sub rebuild_all ($self) {
 
 sub clear_cache ($self) {
     for my $module ( keys $Pcore::Ext::App::MODULES->%* ) {
-        delete $INC{$module};
-
-        my $prefix  = $module =~ s/[.]pm\z//smr;
-        my $package = $prefix =~ s[/][::]smgr;
-
-        my $stash = Package::Stash::XS->new($package);
-
-        for my $sym ( $stash->list_all_symbols ) {
-            next if substr( $sym, -1, 1 ) eq ':';
-
-            $stash->remove_glob($sym);
-        }
+        P->class->unload($module);
     }
 
     undef $Pcore::Ext::App::FRAMEWORK if !$self->{app}->{devel};
@@ -108,7 +98,7 @@ sub _init_reload ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 47                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 48                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

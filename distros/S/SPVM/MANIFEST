@@ -156,10 +156,7 @@ lib/SPVM/HTTP/Client.spvm
 lib/SPVM/HTTP/Client/CookieJar.spvm
 lib/SPVM/HTTP/Client/CookieJar/Cookie.spvm
 lib/SPVM/HTTP/Client/CookieJar/CookieParser.spvm
-lib/SPVM/HTTP/Client/Handle.spvm
-lib/SPVM/HTTP/Client/Handle/SocketWrapper.spvm
-lib/SPVM/HTTP/Client/Request.spvm
-lib/SPVM/HTTP/Headers.spvm
+lib/SPVM/HTTP/Client/Response.spvm
 lib/SPVM/HTTP/URL.spvm
 lib/SPVM/HTTP/URL/Encode.spvm
 lib/SPVM/HTTP/URL/Escape.spvm
@@ -192,6 +189,7 @@ lib/SPVM/Math/StringToNumber.spvm
 lib/SPVM/MIME/Base64.c
 lib/SPVM/MIME/Base64.config
 lib/SPVM/MIME/Base64.spvm
+lib/SPVM/Regex.spvm
 lib/SPVM/Short.pm
 lib/SPVM/Short.spvm
 lib/SPVM/ShortList.spvm
@@ -281,6 +279,7 @@ spvmdoc/jp/public/js/google-code-prettify/prettify.js
 spvmdoc/jp/public/js/google-code-prettify/run_prettify.js
 spvmdoc/jp/public/js/jquery-1.9.0.min.js
 spvmdoc/jp/public/language.html
+spvmdoc/jp/public/native-api.html
 spvmdoc/jp/serve.pl
 t/copy_default_to_precompile.pl
 t/create_use_all_testcase.pl
@@ -426,7 +425,6 @@ t/default/lib/TestCase/Lib/SPVM/Hash.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/Client.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/Client/CookieJar.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/Client/CookieJar/CookieParser.spvm
-t/default/lib/TestCase/Lib/SPVM/HTTP/Headers.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/URL.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/URL/Encode.spvm
 t/default/lib/TestCase/Lib/SPVM/HTTP/URL/Escape.spvm
@@ -441,6 +439,7 @@ t/default/lib/TestCase/Lib/SPVM/Long.spvm
 t/default/lib/TestCase/Lib/SPVM/LongList.spvm
 t/default/lib/TestCase/Lib/SPVM/Math.spvm
 t/default/lib/TestCase/Lib/SPVM/MIME/Base64.spvm
+t/default/lib/TestCase/Lib/SPVM/Regex.spvm
 t/default/lib/TestCase/Lib/SPVM/Short.spvm
 t/default/lib/TestCase/Lib/SPVM/ShortList.spvm
 t/default/lib/TestCase/Lib/SPVM/StringBuffer.spvm

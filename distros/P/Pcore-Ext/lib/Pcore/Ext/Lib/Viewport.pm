@@ -251,7 +251,7 @@ JS
             }
 JS
 
-        loadLocale => func [ 'locale', 'cb' ], <<"JS",
+        loadLocale => func [ 'locale', 'cb' ], <<'JS',
             if (Ext.L10N.hasLocale(locale)) {
                 cb();
 
@@ -259,7 +259,7 @@ JS
             }
 
             Ext.Loader.loadScript({
-                url: '@{[ $cdn->('/app/') ]}/' + APP.getApplication().appName + '/locale/' + locale + '.js',
+                url: APP.getApplication().appCdn + '/locale/' + locale + '.js',
                 onLoad: function () {
                     cb();
                 }

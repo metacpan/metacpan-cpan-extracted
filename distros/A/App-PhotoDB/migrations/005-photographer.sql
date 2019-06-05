@@ -4,7 +4,6 @@ WHERE `NEGATIVE`.`photographer_id` is null and `FILM`.`photographer_id` is not n
 
 CREATE
      OR REPLACE ALGORITHM = UNDEFINED
-    SQL SECURITY DEFINER
 VIEW `exifdata` AS
     SELECT
         `f`.`film_id` AS `film_id`,

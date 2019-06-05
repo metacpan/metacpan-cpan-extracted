@@ -23,14 +23,14 @@ Table to catalog accessories that are not tracked in more specific tables
 
 Table to define compatibility between accessories and cameras or lenses
 
-    +--------------+-------------+----------------------------------+
-    | COLUMN_NAME  | COLUMN_TYPE | COLUMN_COMMENT                   |
-    +--------------+-------------+----------------------------------+
-    | compat_id    | int(11)     | Unique ID for this compatibility |
-    | accessory_id | int(11)     | ID of the accessory              |
-    | camera_id    | int(11)     | ID of the compatible camera      |
-    | lens_id      | int(11)     | ID of the compatible lens        |
-    +--------------+-------------+----------------------------------+
+    +----------------+-------------+-----------------------------------+
+    | COLUMN_NAME    | COLUMN_TYPE | COLUMN_COMMENT                    |
+    +----------------+-------------+-----------------------------------+
+    | compat_id      | int(11)     | Unique ID for this compatibility  |
+    | accessory_id   | int(11)     | ID of the accessory               |
+    | cameramodel_id | int(11)     | ID of the compatible camera model |
+    | lensmodel_id   | int(11)     | ID of the compatible lens         |
+    +----------------+-------------+-----------------------------------+
 
 =head2 ACCESSORY_TYPE
 
@@ -100,10 +100,34 @@ Table to catalog types of camera body style
 
 Table to catalog cameras - both cameras with fixed lenses and cameras with interchangeable lenses
 
+    +----------------+--------------+------------------------------------------------------------------------+
+    | COLUMN_NAME    | COLUMN_TYPE  | COLUMN_COMMENT                                                         |
+    +----------------+--------------+------------------------------------------------------------------------+
+    | camera_id      | int(11)      | Auto-incremented camera ID                                             |
+    | cameramodel_id | int(11)      | ID which specifies the model of camera                                 |
+    | acquired       | date         | Date on which the camera was acquired                                  |
+    | cost           | decimal(6,2) | Price paid for the camera, in local currency units                     |
+    | serial         | varchar(45)  | Serial number of the camera                                            |
+    | datecode       | varchar(12)  | Date code of the camera, if different from the serial number           |
+    | manufactured   | smallint(6)  | Year of manufacture of the camera                                      |
+    | own            | tinyint(1)   | Whether the camera is currently owned                                  |
+    | lens_id        | int(11)      | If fixed_mount is true, specify the lens_id                            |
+    | notes          | text         | Freeform text field for extra notes                                    |
+    | lost           | date         | Date on which the camera was lost/sold/etc                             |
+    | lost_price     | decimal(6,2) | Price at which the camera was sold                                     |
+    | source         | varchar(150) | Where the camera was acquired from                                     |
+    | condition_id   | int(11)      | Denotes the cosmetic condition of the camera                           |
+    | display_lens   | int(11)      | Lens ID of the lens that this camera should normally be displayed with |
+    +----------------+--------------+------------------------------------------------------------------------+
+
+=head2 CAMERAMODEL
+
+Table to catalog camera models - both cameras with fixed lenses and cameras with interchangeable lenses
+
     +---------------------+--------------+------------------------------------------------------------------------------+
     | COLUMN_NAME         | COLUMN_TYPE  | COLUMN_COMMENT                                                               |
     +---------------------+--------------+------------------------------------------------------------------------------+
-    | camera_id           | int(11)      | Auto-incremented camera ID                                                   |
+    | cameramodel_id      | int(11)      | Auto-incremented camera model ID                                             |
     | manufacturer_id     | int(11)      | Denotes the manufacturer of the camera.                                      |
     | model               | varchar(45)  | The model name of the camera                                                 |
     | mount_id            | int(11)      | Denotes the lens mount of the camera if it is an interchangeable-lens camera |
@@ -114,14 +138,8 @@ Table to catalog cameras - both cameras with fixed lenses and cameras with inter
     | metering_type_id    | int(11)      | Denotes the technology used in the meter                                     |
     | body_type_id        | int(11)      | Denotes the style of camera body                                             |
     | weight              | int(11)      | Weight of the camera body (without lens or batteries) in grammes (g)         |
-    | acquired            | date         | Date on which the camera was acquired                                        |
-    | cost                | decimal(6,2) | Price paid for the camera, in local currency units                           |
     | introduced          | smallint(6)  | Year in which the camera model was introduced                                |
     | discontinued        | smallint(6)  | Year in which the camera model was discontinued                              |
-    | serial              | varchar(45)  | Serial number of the camera                                                  |
-    | datecode            | varchar(12)  | Date code of the camera, if different from the serial number                 |
-    | manufactured        | smallint(6)  | Year of manufacture of the camera                                            |
-    | own                 | tinyint(1)   | Whether the camera is currently owned                                        |
     | negative_size_id    | int(11)      | Denotes the size of negative made by the camera                              |
     | shutter_type_id     | int(11)      | Denotes type of shutter                                                      |
     | shutter_model       | varchar(45)  | Model of shutter                                                             |
@@ -132,13 +150,10 @@ Table to catalog cameras - both cameras with fixed lenses and cameras with inter
     | video               | tinyint(1)   | Whether the camera can take video/movie                                      |
     | digital             | tinyint(1)   | Whether this is a digital camera                                             |
     | fixed_mount         | tinyint(1)   | Whether the camera has a fixed lens                                          |
-    | lens_id             | int(11)      | If fixed_mount is true, specify the lens_id                                  |
+    | lensmodel_id        | int(11)      | If fixed_mount is true, specify the lensmodel_id                             |
     | battery_qty         | int(11)      | Quantity of batteries needed                                                 |
     | battery_type        | int(11)      | Denotes type of battery needed                                               |
     | notes               | text         | Freeform text field for extra notes                                          |
-    | lost                | date         | Date on which the camera was lost/sold/etc                                   |
-    | lost_price          | decimal(6,2) | Price at which the camera was sold                                           |
-    | source              | varchar(150) | Where the camera was acquired from                                           |
     | min_shutter         | varchar(10)  | Fastest available shutter speed, expressed like 1/400                        |
     | max_shutter         | varchar(10)  | Slowest available shutter speed, expressed like 30 (no ")                    |
     | bulb                | tinyint(1)   | Whether the camera supports bulb (B) exposure                                |
@@ -156,10 +171,8 @@ Table to catalog cameras - both cameras with fixed lenses and cameras with inter
     | x_sync              | varchar(6)   | X-sync shutter speed, expressed like 1/125                                   |
     | meter_min_ev        | tinyint(4)   | Lowest EV/LV the built-in meter supports                                     |
     | meter_max_ev        | tinyint(4)   | Highest EV/LV the built-in meter supports                                    |
-    | condition_id        | int(11)      | Denotes the cosmetic condition of the camera                                 |
     | dof_preview         | tinyint(1)   | Whether the camera has depth of field preview                                |
     | tripod              | tinyint(1)   | Whether the camera has a tripod bush                                         |
-    | display_lens        | int(11)      | Lens ID of the lens that this camera should normally be displayed with       |
     +---------------------+--------------+------------------------------------------------------------------------------+
 
 =head2 CONDITION
@@ -255,7 +268,7 @@ Table to associate cameras with available exposure programs
     +---------------------+-------------+------------------------+
     | COLUMN_NAME         | COLUMN_TYPE | COLUMN_COMMENT         |
     +---------------------+-------------+------------------------+
-    | camera_id           | int(11)     | ID of camera           |
+    | cameramodel_id      | int(11)     | ID of camera model     |
     | exposure_program_id | int(11)     | ID of exposure program |
     +---------------------+-------------+------------------------+
 
@@ -422,10 +435,32 @@ Table to catalogue different film formats. These are distinct from negative size
 
 Table to catalog lenses
 
+    +--------------+--------------+-------------------------------------------------------------+
+    | COLUMN_NAME  | COLUMN_TYPE  | COLUMN_COMMENT                                              |
+    +--------------+--------------+-------------------------------------------------------------+
+    | lens_id      | int(11)      | Unique ID for this lens                                     |
+    | lensmodel_id | int(11)      |                                                             |
+    | serial       | varchar(45)  | Serial number of this lens                                  |
+    | date_code    | varchar(45)  | Date code of this lens, if different from the serial number |
+    | manufactured | smallint(6)  | Year in which this specific lens was manufactured           |
+    | acquired     | date         | Date on which this lens was acquired                        |
+    | cost         | decimal(6,2) | Price paid for this lens in local currency units            |
+    | notes        | text         | Freeform notes field                                        |
+    | own          | tinyint(1)   | Whether we currently own this lens                          |
+    | lost         | date         | Date on which lens was lost/sold/disposed                   |
+    | lost_price   | decimal(6,2) | Price for which the lens was sold                           |
+    | source       | varchar(150) | Place where the lens was acquired from                      |
+    | condition_id | int(11)      | Denotes the cosmetic condition of the camera                |
+    +--------------+--------------+-------------------------------------------------------------+
+
+=head2 LENSMODEL
+
+Table to catalog lens models
+
     +------------------------+--------------+---------------------------------------------------------------------------------------------------------------------------------------------+
     | COLUMN_NAME            | COLUMN_TYPE  | COLUMN_COMMENT                                                                                                                              |
     +------------------------+--------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-    | lens_id                | int(11)      | Unique ID for this lens                                                                                                                     |
+    | lensmodel_id           | int(11)      | Unique ID for this lens model                                                                                                               |
     | mount_id               | int(11)      | Denotes the ID of the lens mount, if this is an interchangeable lens                                                                        |
     | zoom                   | tinyint(1)   | Whether this is a zoom lens                                                                                                                 |
     | min_focal_length       | int(11)      | Shortest focal length of this lens, in mm                                                                                                   |
@@ -445,27 +480,17 @@ Table to catalog lenses
     | filter_thread          | decimal(4,1) | Diameter of lens filter thread, in mm                                                                                                       |
     | magnification          | decimal(5,3) | Maximum magnification ratio of the lens, expressed like 0.765                                                                               |
     | url                    | varchar(145) | URL to more information about this lens                                                                                                     |
-    | serial                 | varchar(45)  | Serial number of this lens                                                                                                                  |
-    | date_code              | varchar(45)  | Date code of this lens, if different from the serial number                                                                                 |
     | introduced             | smallint(6)  | Year in which this lens model was introduced                                                                                                |
     | discontinued           | smallint(6)  | Year in which this lens model was discontinued                                                                                              |
-    | manufactured           | smallint(6)  | Year in which this specific lens was manufactured                                                                                           |
     | negative_size_id       | int(11)      | ID of the negative size which this lens is designed for                                                                                     |
-    | acquired               | date         | Date on which this lens was acquired                                                                                                        |
-    | cost                   | decimal(6,2) | Price paid for this lens in local currency units                                                                                            |
     | fixed_mount            | tinyint(1)   | Whether this is a fixed lens (i.e. on a compact camera)                                                                                     |
     | notes                  | text         | Freeform notes field                                                                                                                        |
-    | own                    | tinyint(1)   | Whether we currently own this lens                                                                                                          |
-    | lost                   | date         | Date on which lens was lost/sold/disposed                                                                                                   |
-    | lost_price             | decimal(6,2) | Price for which the lens was sold                                                                                                           |
-    | source                 | varchar(150) | Place where the lens was acquired from                                                                                                      |
     | coating                | varchar(45)  | Notes about the lens coating type                                                                                                           |
     | hood                   | varchar(45)  | Model number of the compatible lens hood                                                                                                    |
     | exif_lenstype          | varchar(45)  | EXIF LensID number, if this lens has one officially registered. See documentation at http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/ |
     | rectilinear            | tinyint(1)   | Whether this is a rectilinear lens                                                                                                          |
     | length                 | int(11)      | Length of lens in mm                                                                                                                        |
     | diameter               | int(11)      | Width of lens in mm                                                                                                                         |
-    | condition_id           | int(11)      | Denotes the cosmetic condition of the camera                                                                                                |
     | image_circle           | int(11)      | Diameter of image circle projected by lens, in mm                                                                                           |
     | formula                | varchar(45)  | Name of the type of lens formula (e.g. Tessar)                                                                                              |
     | shutter_model          | varchar(45)  | Name of the integrated shutter, if any                                                                                                      |
@@ -539,7 +564,7 @@ Table to associate cameras with available metering modes
     +------------------+-------------+---------------------+
     | COLUMN_NAME      | COLUMN_TYPE | COLUMN_COMMENT      |
     +------------------+-------------+---------------------+
-    | camera_id        | int(11)     | ID of camera        |
+    | cameramodel_id   | int(11)     | ID of camera model  |
     | metering_mode_id | int(11)     | ID of metering mode |
     +------------------+-------------+---------------------+
 
@@ -794,12 +819,12 @@ Table to list all possible shutter speeds
 
 Table to associate cameras with shutter speeds
 
-    +---------------+-------------+------------------------------------+
-    | COLUMN_NAME   | COLUMN_TYPE | COLUMN_COMMENT                     |
-    +---------------+-------------+------------------------------------+
-    | camera_id     | int(11)     | ID of the camera                   |
-    | shutter_speed | varchar(10) | Shutter speed that this camera has |
-    +---------------+-------------+------------------------------------+
+    +----------------+-------------+------------------------------------+
+    | COLUMN_NAME    | COLUMN_TYPE | COLUMN_COMMENT                     |
+    +----------------+-------------+------------------------------------+
+    | cameramodel_id | int(11)     | ID of the camera model             |
+    | shutter_speed  | varchar(10) | Shutter speed that this camera has |
+    +----------------+-------------+------------------------------------+
 
 =head2 SHUTTER_TYPE
 

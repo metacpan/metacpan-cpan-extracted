@@ -19,7 +19,6 @@ ok($tel->set_number('0046 12345678')->is_valid_number, 'checking for 0046 123456
 ok($tel->set_number('0051 12345678')->is_valid_number, 'checking for 0051 12345678');
 ok($tel->set_number('0052 12345678')->is_valid_number, 'checking for 0052 12345678');
 ok($tel->set_number('0053 12345678')->is_valid_number, 'checking for 0053 12345678');
-ok($tel->set_number('0054 12345678')->is_valid_number, 'checking for 0054 12345678');
 ok($tel->set_number('0055 12345678')->is_valid_number, 'checking for 0055 12345678');
 ok($tel->set_number('0056 12345678')->is_valid_number, 'checking for 0056 12345678');
 ok($tel->set_number('0057 12345678')->is_valid_number, 'checking for 0057 12345678');
@@ -30,7 +29,6 @@ ok($tel->set_number('0063 12345678')->is_valid_number, 'checking for 0063 123456
 ok($tel->set_number('0065 12345678')->is_valid_number, 'checking for 0065 12345678');
 ok($tel->set_number('0066 12345678')->is_valid_number, 'checking for 0066 12345678');
 ok($tel->set_number('0067 12345678')->is_valid_number, 'checking for 0067 12345678');
-ok($tel->set_number('0070 12345678')->is_valid_number, 'checking for 0070 12345678');
 ok($tel->set_number('0073 12345678')->is_valid_number, 'checking for 0073 12345678');
 ok($tel->set_number('0074 12345678')->is_valid_number, 'checking for 0074 12345678');
 ok($tel->set_number('0077 12345678')->is_valid_number, 'checking for 0077 12345678');
@@ -59,11 +57,13 @@ ok(!$tel->set_number('0047 12345678')->is_valid_number, 'checking for 0047 12345
 ok(!$tel->set_number('0048 12345678')->is_valid_number, 'checking for 0048 12345678');
 ok(!$tel->set_number('0049 12345678')->is_valid_number, 'checking for 0049 12345678');
 ok(!$tel->set_number('0050 12345678')->is_valid_number, 'checking for 0050 12345678');
+ok(!$tel->set_number('0054 12345678')->is_valid_number, 'checking for 0054 12345678');
 ok(!$tel->set_number('0058 12345678')->is_valid_number, 'checking for 0058 12345678');
 ok(!$tel->set_number('0059 12345678')->is_valid_number, 'checking for 0059 12345678');
 ok(!$tel->set_number('0064 12345678')->is_valid_number, 'checking for 0064 12345678');
 ok(!$tel->set_number('0068 12345678')->is_valid_number, 'checking for 0068 12345678');
 ok(!$tel->set_number('0069 12345678')->is_valid_number, 'checking for 0069 12345678');
+ok(!$tel->set_number('0070 12345678')->is_valid_number, 'checking for 0070 12345678');
 ok(!$tel->set_number('0071 12345678')->is_valid_number, 'checking for 0071 12345678');
 ok(!$tel->set_number('0072 12345678')->is_valid_number, 'checking for 0072 12345678');
 ok(!$tel->set_number('0075 12345678')->is_valid_number, 'checking for 0075 12345678');

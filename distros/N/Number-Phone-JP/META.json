@@ -43,6 +43,6 @@
    "resources" : {
       "X_twitter" : "https://twitter.com/nipotan"
    },
-   "version" : "0.20190507",
+   "version" : "0.20190521",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

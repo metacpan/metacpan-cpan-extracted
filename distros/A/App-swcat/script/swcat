@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-05-20'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2019-06-03'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010;
 use strict;
@@ -43,7 +43,7 @@ swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.011 of swcat (from Perl distribution App-swcat), released on 2019-05-20.
+This document describes version 0.012 of swcat (from Perl distribution App-swcat), released on 2019-06-03.
 
 =head1 SYNOPSIS
 

@@ -51,7 +51,8 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala2 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v2.9.5 );
+        my $ver = version->parse( $args->{ver} // v3.0.0 );
+        $ver = 'v3.0.0-rc1';
 
         if (wantarray) {
             my @res;

@@ -40,7 +40,6 @@ requires 'Inline::CPP', v0.75.0;
 requires 'Crypt::Argon2', v0.5.0;
 
 # Pcore::Dist
-requires 'Filter::Crypto';
 requires 'Pod::Markdown';
 requires 'Software::License';
 requires 'Module::CPANfile';
@@ -49,15 +48,14 @@ requires 'Module::CPANfile';
 on develop => sub {
     requires 'Module::Build::Tiny';
     requires 'CPAN::Changes';
+    requires 'Filter::Crypto';
+    requires 'PAR::Packer';
 
     # debugging and profiling
     requires 'Devel::NYTProf';
-    requires 'Devel::Cover';
 
+    # requires 'Devel::Cover';
     # suggests 'Devel::hdb';
-
-    # PAR
-    requires 'PAR::Packer';
 };
 
 # Pcore::Handle::sqlite

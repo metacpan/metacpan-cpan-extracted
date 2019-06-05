@@ -21,10 +21,24 @@ my $short_source = sub {
   return $x;
 };
 
+my $cond = sub {
+  my $x = $_[0]{cond};
+  if (reftype($x) eq 'CODE') {
+    $x = $x->({
+      foreign_alias => 'foreign',
+      self_alias => 'self',
+    });
+  }
+  if (reftype($x) ne 'HASH') {
+    die "cond is not a HASH\n" . np($_[0]);
+  }
+  return $x;
+};
+
 # ribasushi says: at least make sure the cond is a hashref (not guaranteed)
-my $self_fk_cols = sub { map {/^self\.(.*)/; $1} values %{$_[0]{cond}} };
+my $self_fk_cols = sub { map {/^self\.(.*)/; $1} values %{$cond->($_[0])} };
 my $self_fk_col  = sub { ($self_fk_cols->(@_))[0] };
-my $foreign_fk_cols = sub { map {/^foreign\.(.*)/; $1} keys %{$_[0]{cond}} };
+my $foreign_fk_cols = sub { map {/^foreign\.(.*)/; $1} keys %{$cond->($_[0])} };
 my $foreign_fk_col  = sub { ($foreign_fk_cols->(@_))[0] };
 ###### TO HERE ######
 
@@ -131,6 +145,25 @@ sub create_search {
   return $rs;
 }
 
+sub find_child_dependencies {
+  my $self = shift;
+  my ($name, $item) = @_;
+
+  my (%child_deps);
+  my $source = $self->schema->source($name);
+  RELATIONSHIP:
+  foreach my $rel_name ( $source->relationships ) {
+    my $rel_info = $source->relationship_info($rel_name);
+    unless ( $is_fk->($rel_info) ) {
+      if ($item->{$rel_name}) {
+        $child_deps{$rel_name} = delete $item->{$rel_name};
+      }
+    }
+  }
+
+  return \%child_deps;
+}
+
 sub fix_fk_dependencies {
   my $self = shift;
   my ($name, $item) = @_;
@@ -144,15 +177,12 @@ sub fix_fk_dependencies {
   # 2. If we don't have something and the column is non-nullable, then:
   #   a. If rows exists, pick a random one.
   #   b. If rows don't exist, $create_item->($fksrc, {})
-  my (%child_deps, %deferred_fks);
+  my (%deferred_fks);
   my $source = $self->schema->source($name);
   RELATIONSHIP:
   foreach my $rel_name ( $source->relationships ) {
     my $rel_info = $source->relationship_info($rel_name);
     unless ( $is_fk->($rel_info) ) {
-      if ($item->{$rel_name}) {
-        $child_deps{$rel_name} = delete $item->{$rel_name};
-      }
       next RELATIONSHIP;
     }
 
@@ -205,20 +235,20 @@ sub fix_fk_dependencies {
       # First, find the inverse relationship. If it doesn't exist or if there
       # is more than one, then die.
       my @inverse = $self->find_inverse_relationships(
-        $fk_name, $rel_name, $fkcol,
+        $name, $rel_name, $fk_name, $fkcol,
       );
       if (@inverse == 0) {
         die "Cannot find an inverse relationship for ${name}->${rel_name}\n";
       }
       elsif (@inverse > 1) {
-        die "Too many inverse relationships for ${name}->${rel_name}\n";
+        die "Too many inverse relationships for ${name}->${rel_name} ($fk_name / $fkcol)\n" . np(@inverse);
       }
 
       # We cannot add this relationship to the $cond because that would result
       # in an infinite loop. So, restrict the $rs here.
       $rs = $rs->search(
-        { join('.', $inverse[0]->{rel}, $inverse[0]->{col}) => undef },
-        { join => $inverse[0]->{rel} },
+        { join('.', $inverse[0]{rel}, $inverse[0]{col}) => undef },
+        { join => $inverse[0]{rel} },
       );
     }
 
@@ -235,7 +265,7 @@ sub fix_fk_dependencies {
 
     my $meta = delete $cond->{__META__} // {};
 
-    #warn "Looking for $name->$rel_name(".np($cond).")\n";
+    warn "Looking for $name->$rel_name(".np($cond).")\n" if $ENV{SIMS_DEBUG};
 
     my $parent;
     unless ($meta->{create}) {
@@ -259,7 +289,7 @@ sub fix_fk_dependencies {
     $item->{$col} = $parent->get_column($fkcol);
   }
 
-  return \%child_deps, \%deferred_fks;
+  return \%deferred_fks;
 }
 
 {
@@ -305,14 +335,20 @@ sub fix_fk_dependencies {
 
 sub find_inverse_relationships {
   my $self = shift;
-  my ($name, $rel_name, $fkcol) = @_;
+  my ($parent, $rel_to_child, $child, $fkcol) = @_;
 
-  my $source = $self->schema->source($name);
+  my $fksource = $self->schema->source($child);
 
   my @inverses;
-  foreach my $rel_name ( $source->relationships ) {
-    my $rel_info = $source->relationship_info($rel_name);
-    next if $is_fk->($rel_info);
+  foreach my $rel_name ( $fksource->relationships ) {
+    my $rel_info = $fksource->relationship_info($rel_name);
+
+    # Skip relationships that aren't back towards the table we're coming from.
+    next unless $short_source->($rel_info) eq $parent;
+
+    # Assumption: We don't need to verify the $fkcol because there shouldn't be
+    # multiple relationships on different columns between the same tables. This
+    # is likely to be violated, but only by badly-designed schemas.
 
     push @inverses, {
       rel => $rel_name,
@@ -332,9 +368,15 @@ sub unique_constraints_containing {
     [ $source->unique_constraint_columns($_) ]
   } $source->unique_constraint_names();
 
+  # Only return true if the unique constraint is solely built from the column.
+  # When we handle multi-column relationships, then we will need to handle the
+  # situation where the relationship's columns are the UK.
+  #
+  # The situation where the UK has multiple columns, one of which is the the FK,
+  # is potentially undecideable.
   return grep {
     my $coldef = $_;
-    grep { $column eq $_ } @$coldef
+    ! grep { $column ne $_ } @$coldef
   } @uniques;
 }
 
@@ -357,6 +399,11 @@ sub find_by_unique_constraints {
     my %criteria;
     foreach my $colname (@{$unique}) {
       my $value = $item->{$colname};
+      if (ref($value) eq 'SCALAR') {
+        $value = $self->convert_backreference(
+          $name, $colname, $$value,
+        );
+      }
       my $classname = blessed($value);
       if ( $classname && $classname->isa('DateTime') ) {
         $value = $self->datetime_parser->format_datetime($value);
@@ -450,7 +497,7 @@ sub fix_child_dependencies {
     if ($child_deps->{$rel_name}) {
       my $n = DBIx::Class::Sims::Util->normalize_aoh($child_deps->{$rel_name});
       unless ($n) {
-        die "Don't know what to do with $name->{$rel_name}\n\t".np($row);
+        die "Don't know what to do with $name\->{$rel_name}\n\t".np($row);
       }
       @children = @{$n};
     }
@@ -714,30 +761,38 @@ sub create_item {
 
   $self->fix_columns($name, $item);
 
+  # Don't keep going if we have already satisfy all UKs
+  my $row = $self->find_by_unique_constraints($name, $item);
+
   my $source = $self->schema->source($name);
   $self->{hooks}{preprocess}->($name, $source, $item);
 
-  my ($child_deps, $deferred_fks) = $self->fix_fk_dependencies($name, $item);
-  $self->fix_values($name, $item);
-
-  #warn "Creating $name (".np($item).")\n";
-  my $row = $self->find_by_unique_constraints($name, $item);
+  my ($child_deps) = $self->find_child_dependencies($name, $item);
   unless ($row) {
-    $row = eval {
-      my $to_create = MyCloner::clone($item);
-      delete $to_create->{__META__};
-      $self->schema->resultset($name)->create($to_create);
-    }; if ($@) {
-      my $e = $@;
-      warn "ERROR Creating $name (".np($item).")\n";
-      die $e;
+    my ($deferred_fks) = $self->fix_fk_dependencies($name, $item);
+    $self->fix_values($name, $item);
+
+    warn "Ensuring $name (".np($item).")\n" if $ENV{SIMS_DEBUG};
+    $row = $self->find_by_unique_constraints($name, $item);
+    unless ($row) {
+      warn "Creating $name (".np($item).")\n" if $ENV{SIMS_DEBUG};
+      $row = eval {
+        my $to_create = MyCloner::clone($item);
+        delete $to_create->{__META__};
+        $self->schema->resultset($name)->create($to_create);
+      }; if ($@) {
+        my $e = $@;
+        warn "ERROR Creating $name (".np($item).")\n";
+        die $e;
+      }
+      # This tracks everything that was created, not just what was requested.
+      $self->{created}{$name}++;
     }
-    # This tracks everything that was created, not just what was requested.
-    $self->{created}{$name}++;
+
+    $self->fix_deferred_fks($name, $row, $deferred_fks);
   }
 
   $self->fix_child_dependencies($name, $row, $child_deps);
-  $self->fix_deferred_fks($name, $row, $deferred_fks);
 
   $self->{hooks}{postprocess}->($name, $source, $row);
 

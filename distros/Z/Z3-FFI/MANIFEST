@@ -11,9 +11,12 @@ api.code
 api.lst
 dist.ini
 lib/Z3/FFI.pm
+lib/Z3/FFI/ArrayType.pm
 perlcritic.rc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/demorgan.t
+t/get_version.t
 t/load-ffi.t
 xt/author/00-compile.t
 xt/author/critic.t

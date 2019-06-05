@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::ComputeFunction 2.134;
+package Config::Model::Role::ComputeFunction 2.135;
 
 # ABSTRACT: compute &index or &element functions
 
@@ -90,7 +90,7 @@ Config::Model::Role::ComputeFunction - compute &index or &element functions
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 

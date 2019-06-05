@@ -3,5 +3,16 @@
 use strict;
 use warnings;
 use App::PhotoDB;
+use Getopt::Long;
 
-&App::PhotoDB::main;
+# Parse command line arguments
+my %args = ();
+GetOptions (\%args,
+	'host|h=s',
+	'schema|s=s',
+	'user|u=s',
+	'password|p=s',
+	'skipmigrations',
+);
+
+&App::PhotoDB::main(\%args);

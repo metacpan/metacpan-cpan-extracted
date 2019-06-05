@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Z3::FFI",
   "PREREQ_PM" => {
     "Alien::Z3" => "0.001",
+    "Carp" => 0,
     "Data::Dumper" => 0,
     "FFI::CheckLib" => 0,
     "FFI::Platypus" => "0.87",
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::Z3" => "0.001",
+  "Carp" => 0,
   "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "FFI::CheckLib" => 0,

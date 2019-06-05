@@ -3,7 +3,7 @@ package Paubox_Email_SDK::Message;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 # constructor
 sub new {
@@ -19,6 +19,7 @@ sub new {
         'bcc' => [],
         'subject' => '',
         'allowNonTLS' => '' || 0,
+        'forceSecureNotification' => '',
         'text_content' => '',
         'html_content' => '',
         'attachments' => [], 

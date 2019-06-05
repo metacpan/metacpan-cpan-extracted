@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::ShellVar 2.134;
+package Config::Model::Backend::ShellVar 2.135;
 
 use Carp;
 use Mouse;
@@ -132,7 +132,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@
 
 package Mail::Box::IMAP4s;
 use vars '$VERSION';
-$VERSION = '3.004';
+$VERSION = '3.005';
 
 use base 'Mail::Box::IMAP4';
 
@@ -22,6 +22,7 @@ use IO::Socket::SSL qw(SSL_VERIFY_NONE);
 sub init($)
 {   my ($self, $args) = @_;
     $args->{server_port} = 993;
+	$args->{starttls}    = 0;
     $self->SUPER::init($args);
 }
 
@@ -30,7 +31,7 @@ sub type() {'imap4s'}
 
 sub createTransporter($@)
 {   my ($self, $class, %args) = @_;
-    $args{starttls} = exists $args{starttls} ? $args{starttls} : 1;
+    $args{starttls} = 0;
     $args{ssl} ||= { SSL_verify_mode => SSL_VERIFY_NONE };
     $self->SUPER::createTransporter($class, %args);
 }

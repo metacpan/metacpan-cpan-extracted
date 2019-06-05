@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TypeConstraints 2.134;
+package Config::Model::TypeConstraints 2.135;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -31,7 +31,7 @@ Config::Model::TypeConstraints - Mouse type constraints for Config::Model
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 

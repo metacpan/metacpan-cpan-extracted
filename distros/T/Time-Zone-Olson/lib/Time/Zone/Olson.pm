@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -907,9 +907,9 @@ sub timezone {
     if ( defined $new ) {
         my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
         if ( $new =~ /^$timezone_full_name_regex$/smx ) {
+            $self->{tz}       = $LAST_PAREN_MATCH{tz};
             $self->{area}     = $LAST_PAREN_MATCH{area};
             $self->{location} = $LAST_PAREN_MATCH{location};
-            $self->{tz}       = $LAST_PAREN_MATCH{tz};
             if ( $self->win32_registry() ) {
                 my %mapping = Time::Zone::Olson->win32_mapping();
                 if ( !defined $mapping{$new} ) {
@@ -965,6 +965,14 @@ sub _guess_tz {
     }
 }
 
+sub determining_path {
+    my ($self) = @_;
+    if ( !defined $self->{determining_path} ) {
+        $self->_guess_tz();
+    }
+    return $self->{determining_path};
+}
+
 sub _guess_olson_tz {
     my ($self)      = @_;
     my $path        = '/etc/localtime';
@@ -973,22 +981,23 @@ sub _guess_olson_tz {
     if ( my $readlink = readlink $path ) {
         my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
         if ( $readlink =~ /$quoted_base.$timezone_full_name_regex$/smx ) {
-            my $guessed = $LAST_PAREN_MATCH{area};
+            my $guessed = $LAST_PAREN_MATCH{tz};
             $self->{area} = $LAST_PAREN_MATCH{area};
             if ( defined $LAST_PAREN_MATCH{location} ) {
-                $guessed .= q[/] . $LAST_PAREN_MATCH{location};
                 $self->{location} = $LAST_PAREN_MATCH{location};
             }
+            $self->{determining_path} = $path;
             return $guessed;
         }
     }
     elsif ( $EXTENDED_OS_ERROR == POSIX::EINVAL() ) {
-        my @paths = (qw(/etc/timezone));
+        my @paths;
         if ( $OSNAME eq 'freebsd' ) {
-            push @paths, '/var/db/zoneinfo';
+            push @paths, '/var/db/zoneinfo';    # freebsd 11
         }
         elsif ( $OSNAME eq 'linux' ) {
-            push @paths, '/etc/sysconfig/clock';
+            push @paths, '/etc/timezone';           # debian jessie
+            push @paths, '/etc/sysconfig/clock';    # rhel6, empty in rhel7
         }
         foreach my $path (@paths) {
             if ( my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() ) ) {
@@ -1003,43 +1012,45 @@ sub _guess_olson_tz {
                 my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
                 if (
                     $buffer =~ m{^
-				(?:ZONE=")? # for \/etc\/sysconfig\/clock
-					$timezone_full_name_regex
-				"? # for \/etc\/sysconfig\/clock
-				$}smx
+                                (?:ZONE=")? # for \/etc\/sysconfig\/clock
+                                $timezone_full_name_regex
+                                "? # for \/etc\/sysconfig\/clock
+                                $}smx
                   )
                 {
-                    my $guessed = $LAST_PAREN_MATCH{area};
+                    my $guessed = $LAST_PAREN_MATCH{tz};
                     $self->{area} = $LAST_PAREN_MATCH{area};
                     if ( defined $LAST_PAREN_MATCH{location} ) {
-                        $guessed .= q[/] . $LAST_PAREN_MATCH{location};
                         $self->{location} = $LAST_PAREN_MATCH{location};
                     }
+                    $self->{determining_path} = $path;
                     return $guessed;
                 }
             }
         }
     }
-    my $digest = Digest::SHA->new('sha512');
-    $digest->addfile($path);
-    my $localtime_digest = $digest->hexdigest();
     my $guessed;
-    File::Find::find(
-        {
-            'no_chdir' => 1,
-            'wanted'   => sub {
-                if (
-                    my $possible = $self->_guess_olson_tz_from_filesystem(
-                        $base, $localtime_digest
-                    )
-                  )
-                {
-                    $guessed = $possible;
-                }
+    if ( my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() ) ) {
+        my $digest = Digest::SHA->new('sha512');
+        $digest->addfile($handle);
+        my $localtime_digest = $digest->hexdigest();
+        File::Find::find(
+            {
+                'no_chdir' => 1,
+                'wanted'   => sub {
+                    if (
+                        my $possible = $self->_guess_olson_tz_from_filesystem(
+                            $base, $localtime_digest
+                        )
+                      )
+                    {
+                        $guessed = $possible;
+                    }
+                },
             },
-        },
-        $base
-    );
+            $base
+        );
+    }
     return $guessed;
 }
 
@@ -2789,7 +2800,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -2876,6 +2887,10 @@ During a time zone change such as +11 GMT to +10 GMT, there will be two possible
 =head2 transition_times
 
 This method can be used to get the list of transition times for the current time zone.  This method is only intended for testing the results of Time::Zone::Olson.
+
+=head2 determining_path
+
+This method can be used to determine which file system path was used to determine the current operating system timezone.  If it returns undef, then the current operating system timezone was determined by other means (such as the win32 registry, or comparing the SHA256 digests of /etc/localtime with timezones in L</directory>).
 
 =head2 leap_seconds
 

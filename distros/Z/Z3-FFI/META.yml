@@ -26,9 +26,13 @@ no_index:
 provides:
   Z3::FFI:
     file: lib/Z3/FFI.pm
-    version: '0.001'
+    version: '0.002'
+  Z3::FFI::ArrayType:
+    file: lib/Z3/FFI/ArrayType.pm
+    version: '0.002'
 requires:
   Alien::Z3: '0.001'
+  Carp: '0'
   Data::Dumper: '0'
   FFI::CheckLib: '0'
   FFI::Platypus: '0.87'
@@ -41,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/simcop2387/Z3-FFI/issues
   repository: git://github.com/simcop2387/Z3-FFI.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -172,7 +176,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -180,16 +184,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
-          tag_format: v%v
-          tag_message: v%v
+          tag: v0.002
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: GitHub::Meta
@@ -205,7 +209,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: Git::Push
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Readme::Brief
       name: Readme::Brief

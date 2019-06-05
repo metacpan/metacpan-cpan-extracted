@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Pcore-Ext\n"
 "Report-Msgid-Bugs-To: zdm <zdm@softvisio.net>\n"
-"POT-Creation-Date: 2019-03-29 10:52+0200\n"
+"POT-Creation-Date: 2019-06-05 06:06+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: zdm <zdm@softvisio.net>\n"
 "Language-Team: \n"
@@ -13,20 +13,149 @@ msgstr ""
 "X-Poedit-KeywordsList: l10n;l10n:1,2;%l10n\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.2.3\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "X-Poedit-SearchPath-0: lib\n"
 
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:307
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:28 lib/Pcore/Ext/Lib/Form/Auth.pm:151
+msgid "SIGN IN"
+msgstr "ВОЙТИ"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:47
+msgid "REGISTER ACCOUNT"
+msgstr "ЗАРЕГИСТРИРОВАТЬ АККАУНТ"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:58
+msgid "RECOVER PASSWORD"
+msgstr "ВОССТАНОВИТЬ ПАРОЛЬ"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:96
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:18
+msgid "Passwords are not match"
+msgstr "Пароли не совпадают"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:107
+msgid "Account created"
+msgstr "Аккаунт создан"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:178 lib/Pcore/Ext/Lib/Form/Auth.pm:325
+msgid "User Name or Email"
+msgstr "Имя Пользователя или Email"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:184 lib/Pcore/Ext/Lib/Form/Auth.pm:261
+msgid "Password"
+msgstr "Пароль"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:190
+msgid "Remember Me"
+msgstr "Запомнить меня"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:208
+msgid "Forgot password?"
+msgstr "Забыли пароль?"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:215
+msgid "Sign in"
+msgstr "Войти"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:233
+msgid "Do not have account?"
+msgstr "Нет аккаунта?"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:235
+msgid "Create yours now."
+msgstr "Создай сейчас."
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:254
+msgid "Email"
+msgstr "Email"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:267
+msgid "Confirm Password"
+msgstr "Подтвердите Пароль"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:287 lib/Pcore/Ext/Lib/Form/Auth.pm:376
+msgid "Register"
+msgstr "Зарегистрировать"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:304
+msgid "Already have account?"
+msgstr "Уже есть аккаунт?"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:306
+msgid "Tap here to sign in."
+msgstr "Нажми сюда для входа."
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:345
+msgid "Recover Password"
+msgstr "Восстановить Пароль"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:361
+msgid "You can"
+msgstr "Ты можешь"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:363
+msgid "Signin"
+msgstr "Войти"
+
+#: lib/Pcore/Ext/Lib/Form/Auth.pm:374
+msgid "or"
+msgstr "или"
+
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:61
+msgid "PASSWORD CHANGING"
+msgstr "ИЗМЕНЕНИЕ ПАРОЛЯ"
+
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:80
+msgid "New Password"
+msgstr "Новый Пароль"
+
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:85
+msgid "Confirm New Password"
+msgstr "Подтвердите Новый Пароль"
+
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:91
+msgid "Cancel"
+msgstr "Отменить"
+
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:95
+msgid "Change Password"
+msgstr "Изменить Пароль"
+
+#: lib/Pcore/Ext/Lib/Form/ConnectionError.pm:15
+msgid "Error connecting to the application server."
+msgstr "Ошибка соединения с сервером приложения."
+
+#: lib/Pcore/Ext/Lib/Form/ConnectionError.pm:18
+msgid "Try again."
+msgstr "Попробовать еще раз."
+
+#: lib/Pcore/Ext/Lib/Menu.pm:150
+msgid "Profile"
+msgstr "Профиль"
+
+#: lib/Pcore/Ext/Lib/Menu.pm:154
+msgid "Sign out"
+msgstr "Выйти"
+
+#: lib/Pcore/Ext/Lib/Menu.pm:169
+msgid "DARK MODE"
+msgstr "ТЕМНЫЙ РЕЖИМ"
+
+#: lib/Pcore/Ext/Lib/Util.pm:12
+msgid "No item selected"
+msgstr "Ничего не выбрано"
+
+#: lib/Pcore/Ext/Lib/Viewport.pm:297
 msgid "You have no permissions to access this area"
 msgstr "У вас нет прав доступа к этому разделу"
 
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:357
+#: lib/Pcore/Ext/Lib/Viewport.pm:347
 msgid "Password changed"
 msgstr "Пароль изменен"
 
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:374
+#: lib/Pcore/Ext/Lib/Viewport.pm:364
 msgid ""
 "Password change instructions was sent to the email address, associated with "
 "your account."
@@ -34,71 +163,13 @@ msgstr ""
 "Инструкции по смене пароля были отправлены на email адрес, связанный с вашей "
 "учетной записью."
 
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:436
-msgid "Error connecting to the application server."
-msgstr "Ошибка соединения с сервером приложения"
+#: lib/Pcore/Ext/Lib/Viewport.pm:421
+msgid "Thank you, your email is confirmed."
+msgstr "Спасибо, Ваш email подтвержден."
 
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:439
-msgid "Try again."
-msgstr "Попробовать еще раз."
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:495
-msgid "SIGN IN"
-msgstr "ВОЙТИ"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:509
-msgid "User name"
-msgstr "Имя пользователя"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:510
-msgid "email"
-msgstr ""
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:516
-msgid "Password"
-msgstr "Пароль"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:517
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:620
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:626
-msgid "password"
-msgstr "пароль"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:523
-msgid "Remember me"
-msgstr "Запомнить меня"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:529
-msgid "Forgot password"
-msgstr "Забыли пароль"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:533
-msgid "Sign in"
-msgstr "Войти"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:557
-msgid "Passwords are not match"
-msgstr "Пароли не совпадают"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:600
-msgid "PASSWORD CHANGING"
-msgstr "ИЗМЕНЕНИЕ ПАРОЛЯ"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:619
-msgid "New password"
-msgstr "Новый пароль"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:625
-msgid "Confirm new password"
-msgstr "Подтвердите новый пароль"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:632
-msgid "Cancel"
-msgstr "Отменить"
-
-#: lib/Pcore/Ext/Lib/core/Viewport.pm:636
-msgid "Change"
-msgstr "Изменить"
+#: lib/Pcore/Ext/Lib/Viewport.pm:424
+msgid "Email confirmation error. Token is invalid."
+msgstr "Ошибка подтверждения email. Неизвестный токен."
 
 #: lib/Pcore/Ext/Overrides/core.pm:58 lib/Pcore/Ext/Overrides/core.pm:84
 msgid "January"
@@ -265,11 +336,17 @@ msgstr "Свернуть панель"
 msgid "Expand panel"
 msgstr "Развернуть панель"
 
+#~ msgid "User name"
+#~ msgstr "Имя пользователя"
+
+#~ msgid "password"
+#~ msgstr "пароль"
+
+#~ msgid "Change"
+#~ msgstr "Изменить"
+
 #~ msgid "Total {0}"
 #~ msgstr "Всего {0}"
 
 #~ msgid "Reload"
 #~ msgstr "Перезагрузить"
-
-#~ msgid "Change password"
-#~ msgstr "Изменить пароль"

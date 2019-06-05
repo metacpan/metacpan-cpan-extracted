@@ -1,3 +1,8 @@
+1.11 2019-06-05
+    - Better error message if ospfd control socket is missing.
+    - Since OpenBSD 6.4 control socket for ospfd is per routing
+      domain.  Hard code routing domain 0.
+
 1.10 2018-12-17
     - Perl 5.16.0 needs another dot directory to test libs.
     - Replace sudo with doas on OpenBSD ospfd.

@@ -27,10 +27,12 @@ package TestCase::For {
       }
       
       switch ($i) {
-        case 1:
-          last;
-        default:
+        case 1: {
+          break;
+        }
+        default: {
           $num1++;
+        }
       }
       $num1++;
     }

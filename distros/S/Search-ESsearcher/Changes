@@ -1,5 +1,12 @@
 Revision history for Search-ESsearcher
 
+0.3.1	 2019-06-05/05:0
+		 - Add missing options to postfix pod.
+
+0.3.0	 2019-06-05/01:30
+		 - Add postfix support.
+		 - Add repo info.
+
 0.2.0	 2019-06-03/04:30
 		 - The bf2b template now properly processes --ip
 		 - Add the httpAccess template.

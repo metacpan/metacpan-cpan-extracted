@@ -52,6 +52,7 @@ my $builder = $class->new(
 		'Test::More' => '0.47',
 		'Test::Perl::Critic' => 0,
 		'Test::Compile' => 0,
+		'Test::Expect' => 0,
 	},
 );
 $builder->create_build_script();

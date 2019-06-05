@@ -273,6 +273,8 @@ ok($tel->set_number('020 36912345')->is_valid_number, 'checking for 020 36912345
 ok($tel->set_number('020 37012345')->is_valid_number, 'checking for 020 37012345');
 ok($tel->set_number('020 37112345')->is_valid_number, 'checking for 020 37112345');
 ok($tel->set_number('020 37212345')->is_valid_number, 'checking for 020 37212345');
+ok($tel->set_number('020 37312345')->is_valid_number, 'checking for 020 37312345');
+ok($tel->set_number('020 37412345')->is_valid_number, 'checking for 020 37412345');
 ok($tel->set_number('020 38012345')->is_valid_number, 'checking for 020 38012345');
 ok($tel->set_number('020 38112345')->is_valid_number, 'checking for 020 38112345');
 ok($tel->set_number('020 38212345')->is_valid_number, 'checking for 020 38212345');
@@ -334,8 +336,6 @@ ok(!$tel->set_number('020 33612345')->is_valid_number, 'checking for 020 3361234
 ok(!$tel->set_number('020 33712345')->is_valid_number, 'checking for 020 33712345');
 ok(!$tel->set_number('020 33812345')->is_valid_number, 'checking for 020 33812345');
 ok(!$tel->set_number('020 33912345')->is_valid_number, 'checking for 020 33912345');
-ok(!$tel->set_number('020 37312345')->is_valid_number, 'checking for 020 37312345');
-ok(!$tel->set_number('020 37412345')->is_valid_number, 'checking for 020 37412345');
 ok(!$tel->set_number('020 37512345')->is_valid_number, 'checking for 020 37512345');
 ok(!$tel->set_number('020 37612345')->is_valid_number, 'checking for 020 37612345');
 ok(!$tel->set_number('020 37712345')->is_valid_number, 'checking for 020 37712345');

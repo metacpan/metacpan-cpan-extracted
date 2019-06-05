@@ -8,7 +8,7 @@
 
 package Mail::Server::IMAP4::List;
 use vars '$VERSION';
-$VERSION = '3.004';
+$VERSION = '3.005';
 
 
 use strict;

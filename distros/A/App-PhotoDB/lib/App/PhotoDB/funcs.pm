@@ -27,7 +27,7 @@ use File::Basename;
 use Time::Piece;
 use Text::TabularDisplay;
 
-our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci multiplechoice search tabulate);
+our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci multiplechoice search tabulate runmigrations canondatecode);
 
 =head2 prompt
 
@@ -90,7 +90,7 @@ sub prompt {
 	$msg .= "$char ";
 
 	# Create terminal handler
-	my $term = &term;
+	my $term = $App::PhotoDB::term;
 
 	my $rv;
 	# Repeatedly prompt user until we get a response of the correct type
@@ -270,7 +270,26 @@ Variable representing the database handle
 =cut
 
 sub db {
-	my $connect = ReadINI(&ini);
+	my $href = shift;
+	my $args = $href->{args};
+
+	my $skipmigrations = $$args{skipmigrations} // 0;
+
+	my $connect;
+	if (defined($$args{host}) && defined($$args{schema}) && defined($$args{user}) && defined($$args{password})) {
+		# use args
+		$$connect{'database'}{'host'} = $$args{host};
+		$$connect{'database'}{'schema'} = $$args{schema};
+		$$connect{'database'}{'user'} = $$args{user};
+		$$connect{'database'}{'pass'} = $$args{password};
+
+	} elsif (defined($$args{host}) || defined($$args{schema}) || defined($$args{user}) || defined($$args{password})) {
+		# warn user they they must pass in ALL or NO args
+		print "If configuring the database by command line arguments, you must provide all of host, schema, user, password\n";
+		exit;
+	} else {
+		$connect = ReadINI(&ini);
+	}
 
 	# host, schema, user, pass
 	if (!defined($$connect{'database'}{'host'}) || !defined($$connect{'database'}{'schema'}) || !defined($$connect{'database'}{'user'}) || !defined($$connect{'database'}{'pass'})) {
@@ -289,6 +308,31 @@ sub db {
 		}
 	) or die "Couldn't connect to database: " . DBI->errstr;
 
+	&runmigrations($dbh) unless $skipmigrations;
+
+	return $dbh;
+}
+
+=head2 runmigrations
+
+Run database migrations
+
+=head4 Usage
+
+    &runmigrations($db);
+
+=head4 Arguments
+
+=item * C<$db> DB handle
+
+=head4 Returns
+
+Nothing
+
+=cut
+
+sub runmigrations {
+	my $dbh = shift;
 	use DB::SQL::Migrations;
 	my $migrator = DB::SQL::Migrations->new(dbh=>$dbh, migrations_directory=>'migrations');
 
@@ -300,7 +344,7 @@ sub db {
 	# Run migrations
 	$migrator->apply();
 
-	return $dbh;
+	return;
 }
 
 # Update an existing record in any table
@@ -2151,13 +2195,13 @@ sub search {
 	return;
 }
 
-=head2 unsci
+=head2 tabulate
 
 Display multi-column SQL views as tabulated data.
 
 =head4 Usage
 
-    &tabulate({db=>$db, view=$view});
+    &tabulate({db=>$db, view=>$view});
 
 =head4 Arguments
 
@@ -2193,6 +2237,113 @@ sub tabulate {
 	print $table->render;
 	print "\n";
 	return $rows;
+}
+
+
+=head2 canondatecode
+
+Decode Canon datecodes to discover the year of manufacture. Datecodes are sometimes ambiguous so by passing in the dates that the model was
+introduced and discontinued, the year of manufacture can be pinned down.
+
+=head4 Usage
+
+    my $manufactured = &canondatecode({datecode=>$datecode, introduced=>$introduced, discontinued=>$discontinued});
+
+=head4 Arguments
+
+=item * C<$datecode> the datecode to decode
+
+=item * C<$introduced> year that the model was introduced. Assumes 1800 if not defined.
+
+=item * C<$discontinued> year that the model was discontinued. Assumes 2100 if not defined.
+
+=head4 Returns
+
+Year of manufacture if the decoding was successful, otherwise undef
+
+=cut
+
+sub canondatecode {
+	my $href = shift;
+	my $datecode = $href->{datecode};
+	my $introduced = $href->{introduced} // 1800;
+	my $discontinued = $href->{discontinued} // 2100;
+
+	# Reformat datecode for reliable matching
+	$datecode = uc($datecode);
+	$datecode =~ s/[^A-Z0-9]//g;
+
+	# Map alphabet to numbers
+	my %h;
+	@h{'A' .. 'Z'} = (0 .. 25);
+
+	my @guesses;
+
+	# AB1234, B1234A, B123A
+	# From 1960-2012, the date code is in the form of "AB1234". "A" indicates the factory. Prior to 1986, "A" is moved to the end.
+	# "B" is a year code that indicates the year of manufacture. Canon increments this letter each year starting with A in 1960
+	# Of the 4 digits, the first two are the month of manufacture. Sometimes the leading 0 is omitted.
+	if ($datecode =~ /^[A-Z]?([A-Z])[0-9]{3,4}[A-Z]?$/ ) {
+		my $dateletter = $1;
+		my $epochstart = 1960;
+		my $epochend = 2012;
+		my $datenumber = $h{$dateletter};
+
+		for (my $i=0; ; $i++) {
+			my $guess = $epochstart + $datenumber + $i*26;
+
+			# Stop if we go above the end date of the datecode epoch
+			last if ($guess > $epochend);
+
+			push(@guesses, $guess);
+		}
+
+	# From 2008, the date code is 10 digits. The first two correspond to the year & month of manufacture.
+	# From 2008-2012 the month code runs from 38-97. In 2013, it is reset to 01. These are treated as different epochs.
+	} elsif ($datecode =~ /^(\d{2})\d{8}$/ ) {
+		my $datenumber = $1;
+
+		# First epoch
+		if ($datenumber >= 38 and $datenumber <= 97) {
+			my $epochstart = 2008;
+			my $epochend = 2012;
+			my $start = 38;
+
+			my $guess = $epochstart + int(($datenumber - $start) / 12);
+			push(@guesses, $guess);
+		}
+
+		# Second epoch
+		{
+			my $epochstart = 2013;
+			my $epochend = 2100;
+			my $start = 1;
+
+			for (my $i=0; ; $i++) {
+				my $guess = $epochstart + int((($datenumber + $i*100) - $start) / 12);
+				last if ($guess > $epochend);
+				push(@guesses, $guess);
+			}
+		}
+	}
+
+	# Now examine our guesses for plausibility based on when the lens was released & discontinued
+	my @plausible;
+	foreach my $guess (@guesses) {
+		# Skip if our guess is before the lens was introduced
+		next if ($guess < $introduced);
+
+		# Stop if our guess is after the lens was discontinued
+		next if ($guess > $discontinued);
+
+		push(@plausible, $guess);
+	}
+
+	# If we narrowed it down to one year, return that. Otherwise, return nothing.
+	if (scalar(@plausible) == 1) {
+		return $plausible[0];
+	}
+	return;
 }
 
 # This ensures the lib loads smoothly

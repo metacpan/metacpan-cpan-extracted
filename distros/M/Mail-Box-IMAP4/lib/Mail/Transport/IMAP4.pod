@@ -122,7 +122,7 @@ You need to pass at least an empty HASH or ARRAY to enable SSL.
 
 =item starttls => BOOLEAN
 
-Run SSL connection with StartTLS.
+Run connection setup with StartTLS into an SSL connection.
 
 =item timeout => SECONDS
 
@@ -271,19 +271,21 @@ messages, and empty array is returned.  The retrieval is done by
 L<Mail::IMAPClient|Mail::IMAPClient> method C<fetch()>, which is then
 parsed.
 
-=item $obj-E<gt>B<flagsToLabels>($what|$flags)
+=item $obj-E<gt>B<flagsToLabels>($what, @flags)
 
-=item Mail::Transport::IMAP4-E<gt>B<flagsToLabels>($what|$flags)
+=item Mail::Transport::IMAP4-E<gt>B<flagsToLabels>($what, @flags)
 
 In SCALAR context, a hash with labels is returned.  In LIST context, pairs
 are returned.
 
-The $what parameter can be C<'SET'>, C<'CLEAR'>, or C<'REPLACE'>.  With the
-latter, all standard imap flags do not appear in the list will be ignored:
-their value may either by set or cleared.  See L<getFlags()|Mail::Transport::IMAP4/"Protocol [internals]">
+The $what parameter can be C<'SET'>, C<'CLEAR'>, or C<'REPLACE'>.  With
+the latter, all standard imap flags which do not appear in the list will
+be ignored: their value may either by set or cleared.  See L<getFlags()|Mail::Transport::IMAP4/"Protocol [internals]">
 
-Unknown flags in LIST are stripped from their backslash and lower-cased.
-For instance, '\SomeWeirdFlag' will become `someweirdflag => 1'.
+Unknown flags in C<@flags> are stripped from their backslash and
+
+lower-cased.  For instance, '\SomeWeirdFlag' will become `someweirdflag
+=> 1'.  It will be set to '1' for C<SET>, and '0' in case of C<CLEAR>.
 
 example: translating IMAP4 flags into MailBox flags
 
@@ -454,8 +456,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.004,
-built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.005,
+built on June 05, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

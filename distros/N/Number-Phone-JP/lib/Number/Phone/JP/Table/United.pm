@@ -3,12 +3,12 @@ package Number::Phone::JP::Table::United;
 use strict;
 use warnings;
 
-our $VERSION = '0.20190507';
+our $VERSION = '0.20190521';
 
-# Table last modified: 2019-05-07
+# Table last modified: 2019-05-21
 our %TEL_TABLE = (
     # Pref => q<Assoc-Pref-Regex>,
-    570 => '(?:(?:5(?:7[0-2]|5[05])|9(?:[19]9|43)|2(?:00|22)|3(?:00|33)|7(?:77|83)|88[128]|0\d{2}|111|666)\d{3})',
+    570 => '(?:(?:5(?:7[0-2]|50)|9(?:[19]9|43)|88[128]|[23]00|0\d{2}|666|783)\d{3})',
 );
 
 1;

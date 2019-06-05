@@ -1,0 +1,45 @@
+NAME
+    Search::QS - A converter between query string URI and search query
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      use Search::QS;
+
+      my $qs = new Search::QS;
+      # parse query_string
+      $qs->parse($qs);
+      # reconvert object to query_string
+      print $qs->to_qs;
+
+DESCRIPTION
+    This module converts a query string like This
+
+      http://www.example.com?flt[Name]=Foo
+
+    into perl objects which rappresent a search.
+
+    In filters() there are all flt (filter) elements.
+
+    In options() there are query options like limit, start and sorting.
+
+METHODS
+  filters()
+Return an instance of Search::QS::Filters
+  options()
+Return an instance of Search::QS::Options
+  parse($query_string)
+Parse the $query_string and fills related objects in filters() and options()
+  to_qs()
+Return a query string which represents current state of filters() and options()
+elements
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

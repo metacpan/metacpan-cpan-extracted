@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 3;
 
 my @module_files = (
-    'Z3/FFI.pm'
+    'Z3/FFI.pm',
+    'Z3/FFI/ArrayType.pm'
 );
 
 

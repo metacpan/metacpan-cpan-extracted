@@ -128,14 +128,14 @@ Debug option.
 **Arguments**:
 
 - 1. bucket - a string with the bucket
-- 2. headers (**optional**) - hashref with extra headr information
+- 2. headers (**optional**) - hashref with extra header information
 
 ## delete\_bucket( $bucket \[, $headers\])
 
 **Arguments**:
 
 - 1. bucket - a string with the bucket
-- 2. headers (**optional**) - hashref with extra headr information
+- 2. headers (**optional**) - hashref with extra header information
 
 # Operations on Objects
 
@@ -145,7 +145,7 @@ Debug option.
 
 - 1. bucket - a string with the bucket
 - 2. key - a string with the key
-- 3. headers (**optional**) - hashref with extra headr information
+- 3. headers (**optional**) - hashref with extra header information
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `content()`
 method on the returned object to read the contents:
@@ -160,6 +160,27 @@ The GET operation retrieves an object from Amazon S3.
 
 For more information, please refer to
 [Amazon's documentation for GET](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectGET.html).
+
+## head\_object( $bucket, $key )
+
+**Arguments**:
+
+- 1. bucket - a string with the bucket
+- 2. key - a string with the key
+
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `header()`
+method on the returned object to read the metadata:
+
+    my $res = $s3->head_object( 'my.bucket', 'my/key.ext' );
+
+    if ($res->is_success) {
+        my $etag = $res->header('etag'); #=> `"fba9dede5f27731c9771645a39863328"`
+    }
+
+The HEAD operation retrieves metadata of an object from Amazon S3.
+
+For more information, please refer to
+[Amazon's documentation for HEAD](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html).
 
 ## delete\_object( $bucket, $key )
 
@@ -176,9 +197,9 @@ Use the response object to see if it succeeded or not.
 For more information, please refer to
 [Amazon's documentation for DELETE](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectDELETE.html).
 
-## copy\_object( $src\_bucket, $src\_key, $dst\_bucket, $dst\_key )
+## copy\_object( $src\_bucket, $src\_key, $dst\_bucket, $dst\_key \[, $headers\] )
 
-**Arguments**: a list with source (bucket, key) and destination (bucket, key)
+**Arguments**: a list with source (bucket, key) and destination (bucket, key), hashref with extra header information (**optional**).
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
 
@@ -197,7 +218,7 @@ For more information, please refer to
 - 1. bucket - a string with the destination bucket
 - 2. key - a string with the destination key
 - 3. content - a string with the content to be uploaded
-- 4. headers (**optional**) - hashref with extra headr information
+- 4. headers (**optional**) - hashref with extra header information
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
 

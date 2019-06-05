@@ -8,7 +8,7 @@
 
 package Mail::Transport::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.004';
+$VERSION = '3.005';
 
 use base 'Mail::Transport::Receive';
 
@@ -43,10 +43,11 @@ sub init($)
 
     unless(ref $imap)
     {   # Create the IMAP transporter
-        my @opts;
+        my @opts = (Starttls => $args->{starttls});
+
         if(my $ssl = $args->{ssl})
         {    $ssl = [ %$ssl ] if ref $ssl eq 'HASH';
-             push @opts, Starttls => $args->{starttls}, Ssl => $ssl;
+             push @opts, Ssl => $ssl;
         }
 
         $imap = $self->createImapClient($imap, @opts)

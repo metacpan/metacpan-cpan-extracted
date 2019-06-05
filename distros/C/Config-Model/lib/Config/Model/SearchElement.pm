@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SearchElement 2.134;
+package Config::Model::SearchElement 2.135;
 
 use Log::Log4perl qw(get_logger :levels);
 use Carp;
@@ -30,11 +30,9 @@ sub new {
 
     bless $self, $type;
 
-    $self->{privilege} = $args{privilege} || 'master';
-
     my $root_class = $self->{node}->config_class_name;
 
-    $self->{data} = $self->_sniff_class( $root_class, $self->{privilege}, {} );
+    $self->{data} = $self->_sniff_class( $root_class, {} );
 
     return $self;
 }
@@ -43,7 +41,7 @@ sub new {
 # either Data::Dumper or Tk::ObjScanner (both are available on CPAN)
 
 sub _sniff_class {
-    my ( $self, $class, $privilege, $found_ref ) = @_;
+    my ( $self, $class, $found_ref ) = @_;
 
     my @lines;
     my %h;
@@ -76,8 +74,8 @@ sub _sniff_class {
             or $c_type =~ /(warped_)?node/ ) {
             my $tmp =
                   $element_type eq 'node' || $c_type eq 'node'
-                ? $self->_sniff_class( $cfg_class_name, $privilege, \%local_found )
-                : $self->_sniff_warped_node( $element_model, $privilege, \%local_found );
+                ? $self->_sniff_class( $cfg_class_name, \%local_found )
+                : $self->_sniff_warped_node( $element_model, \%local_found );
 
             # merge all tmp in %h
             map { $h{$_}{next_step}{$element} = $tmp->{$_}; } keys %$tmp;
@@ -91,7 +89,7 @@ sub _sniff_class {
 }
 
 sub _sniff_warped_node {
-    my ( $self, $element_model, $privilege, $found_ref ) = @_;
+    my ( $self, $element_model, $found_ref ) = @_;
 
     my %warp_tmp;
     my $ref = $element_model->{warp}{rules};
@@ -103,7 +101,7 @@ sub _sniff_warped_node {
 
         # sniff all classes mentionned in warped node rules
         my %local_found = %$found_ref;
-        my $tmp = $self->_sniff_class( $sub_class, $privilege, \%local_found );
+        my $tmp = $self->_sniff_class( $sub_class, \%local_found );
 
         # merge all tmp in %warp_tmp
         map { $warp_tmp{$_}{next_class}{$sub_class} = $tmp->{$_}; } keys %$tmp;
@@ -190,8 +188,6 @@ sub next_choice {
     }
 
 }
-
-# TBD if choice is an id, Node is a hash...
 
 sub choose {
     my $self   = shift;
@@ -333,7 +329,7 @@ Config::Model::SearchElement - Search an element in a configuration model
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 

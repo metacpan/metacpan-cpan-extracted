@@ -5,15 +5,16 @@ use warnings;
 # Partly taken from https://www.forbes.com/sites/rogerkay/2011/12/19/generous-tit-for-tat-a-winning-strategy
 # And https://medium.com/thinking-is-hard/a-prisoners-dilemma-cheat-sheet-4d85fe289d87
 
+use lib '/Users/gene/sandbox/Game-Theory-TwoPersonMatrix/lib';
 use Game::Theory::TwoPersonMatrix;
-use Algorithm::Combinatorics qw/ combinations_with_repetition /;
+use Algorithm::Combinatorics qw/ combinations /;
 use List::Util::WeightedChoice qw/ choose_weighted /;
 
 use constant COOP   => 1;
 use constant DEFECT => 2;
 
 # Set the number of moves
-my $max = shift || 100;
+my $max = shift || 200;
 
 my $players = {
     jesus   => [ \&cooperate, \&cooperate ], # Always cooperate
@@ -28,8 +29,24 @@ my $players = {
     fbf     => [ \&cooperate, \&firm_but_fair ], # Cooperate, then cooperate until defected against. Cooperate if defected last and defected against
 };
 
+my $population = [
+    ('jesus')   x 2,
+    ('lucifer') x 2,
+    ('random')  x 2,
+    ('tft')     x 2,
+    ('rtft')    x 2,
+    ('atft')    x 2,
+    ('tftt')    x 2,
+    ('gtft')    x 2,
+    ('grudger') x 2,
+    ('fbf')     x 2,
+];
+
 my %scores;
 @scores{ keys %$players } = (0) x keys %$players;
+
+my %wins;
+@wins{ keys %$players } = (0) x keys %$players;
 
 # A Prisoner's Dilemma
 my $g = Game::Theory::TwoPersonMatrix->new(
@@ -37,7 +54,7 @@ my $g = Game::Theory::TwoPersonMatrix->new(
     payoff2 => [ [3, 5], [0, 1] ],
 );
 
-my $iter = combinations_with_repetition( [ sort keys %$players ], 2 );
+my $iter = combinations( $population, 2 );
 
 my $i = 0;
 
@@ -45,8 +62,9 @@ while ( my $v = $iter->next ) {
     $i++;
 #    print "$i: @$v\n";
 
-    my ( $player, $opponent, @moves );
+    my @moves;
 
+    # Set initial strategies
     my %strategy = (
         1 => $players->{ $v->[0] }[0]->()->{1},
         2 => $players->{ $v->[1] }[0]->()->{2},
@@ -61,8 +79,15 @@ while ( my $v = $iter->next ) {
 
         # Update the score for each player
         my ($p) = values %$play;
-        $player   += $p->[0];
-        $opponent += $p->[1];
+        $scores{ $v->[0] } += $p->[0];
+        $scores{ $v->[1] } += $p->[1];
+
+        if ( $p->[0] > $p->[1] ) {
+            $wins{ $v->[0] }++;
+        }
+        elsif ( $p->[1] > $p->[0] ) {
+            $wins{ $v->[1] }++;
+        }
 
         # Set next strategies
         %strategy = (
@@ -70,14 +95,16 @@ while ( my $v = $iter->next ) {
             2 => $players->{ $v->[1] }[1]->(\@moves)->{2},
         );
     }
-
-#    print "\t= $player vs $opponent\n";
-    $scores{ $v->[0] } += $player;
-    $scores{ $v->[1] } += $opponent;
 }
 
+print "Wins:\n";
+for my $player ( sort { $wins{$b} <=> $wins{$a} } keys %wins ) {
+    print "\t$player = $wins{$player}\n";
+}
+
+print "Scores:\n";
 for my $player ( sort { $scores{$b} <=> $scores{$a} } keys %scores ) {
-    print "$player = $scores{$player}\n";
+    print "\t$player = $scores{$player}\n";
 }
 
 sub random {

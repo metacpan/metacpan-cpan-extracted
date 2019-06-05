@@ -1,0 +1,9 @@
+package TestCase::Lib::SPVM::Regex {
+  use SPVM::Regex;
+  
+  sub compile : int () {
+    my $re = SPVM::Regex->new("abc");
+    
+    return 1;
+  }
+}

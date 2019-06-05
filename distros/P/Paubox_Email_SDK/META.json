@@ -34,12 +34,14 @@
          "requires" : {
             "Config::General" : "2.63",
             "JSON" : "4.02",
+            "MIME::Base64" : "3.15",
             "REST::Client" : "273",
+            "String::Util" : "1.26",
             "TryCatch" : "1.003002"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.0",
+   "version" : "1.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

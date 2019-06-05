@@ -9,7 +9,7 @@ use Encode;
 use Amazon::S3::Thin::Resource;
 use Amazon::S3::Thin::Credentials;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $MAIN_HOST = 's3.amazonaws.com';
@@ -129,8 +129,8 @@ sub delete_object {
 }
 
 sub copy_object {
-    my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key) = @_;
-    my $headers = {};
+    my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key, $headers) = @_;
+    $headers ||= {};
     $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
     my $request = $self->_compose_request('PUT', $self->_resource($dst_bucket, $dst_key), $headers);
     return $self->_send($request);
@@ -455,7 +455,7 @@ B<Arguments>:
 
 =item 1. bucket - a string with the bucket
 
-=item 2. headers (B<optional>) - hashref with extra headr information
+=item 2. headers (B<optional>) - hashref with extra header information
 
 =back
 
@@ -467,7 +467,7 @@ B<Arguments>:
 
 =item 1. bucket - a string with the bucket
 
-=item 2. headers (B<optional>) - hashref with extra headr information
+=item 2. headers (B<optional>) - hashref with extra header information
 
 =back
 
@@ -485,7 +485,7 @@ B<Arguments>:
 
 =item 2. key - a string with the key
 
-=item 3. headers (B<optional>) - hashref with extra headr information
+=item 3. headers (B<optional>) - hashref with extra header information
 
 =back
 
@@ -503,6 +503,32 @@ The GET operation retrieves an object from Amazon S3.
 For more information, please refer to
 L<< Amazon's documentation for GET|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectGET.html >>.
 
+=head2 head_object( $bucket, $key )
+
+B<Arguments>:
+
+=over 3
+
+=item 1. bucket - a string with the bucket
+
+=item 2. key - a string with the key
+
+=back
+
+B<Returns>: an L<HTTP::Response> object for the request. Use the C<header()>
+method on the returned object to read the metadata:
+
+    my $res = $s3->head_object( 'my.bucket', 'my/key.ext' );
+
+    if ($res->is_success) {
+        my $etag = $res->header('etag'); #=> `"fba9dede5f27731c9771645a39863328"`
+    }
+
+The HEAD operation retrieves metadata of an object from Amazon S3.
+
+For more information, please refer to
+L<< Amazon's documentation for HEAD|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html >>.
+
 =head2 delete_object( $bucket, $key )
 
 B<Arguments>: a string with the bucket name, and a string with the key name.
@@ -518,9 +544,9 @@ Use the response object to see if it succeeded or not.
 For more information, please refer to
 L<< Amazon's documentation for DELETE|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectDELETE.html >>.
 
-=head2 copy_object( $src_bucket, $src_key, $dst_bucket, $dst_key )
+=head2 copy_object( $src_bucket, $src_key, $dst_bucket, $dst_key [, $headers] )
 
-B<Arguments>: a list with source (bucket, key) and destination (bucket, key)
+B<Arguments>: a list with source (bucket, key) and destination (bucket, key), hashref with extra header information (B<optional>).
 
 B<Returns>: an L<HTTP::Response> object for the request.
 
@@ -545,7 +571,7 @@ B<Arguments>:
 
 =item 3. content - a string with the content to be uploaded
 
-=item 4. headers (B<optional>) - hashref with extra headr information
+=item 4. headers (B<optional>) - hashref with extra header information
 
 =back
 

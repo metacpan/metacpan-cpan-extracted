@@ -1,5 +1,8 @@
 Revision history for Time-Zone-Olson
 
+0.22   Wed Jun 05 21:15:00 2019
+       Adding determining_path method.
+
 0.21   Tue Jun 04 21:10:00 2019
        Untainting TZ environment variable. Cleanups.
 

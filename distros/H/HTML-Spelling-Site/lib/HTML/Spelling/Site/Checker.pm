@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.2.0';
+$HTML::Spelling::Site::Checker::VERSION = '0.4.0';
 use strict;
 use warnings;
 use autodie;
@@ -17,7 +17,7 @@ use IO::All qw/ io /;
 has '_inside' =>
     ( is => 'rw', isa => 'HashRef', default => sub { return +{}; } );
 has 'whitelist_parser' => ( is => 'ro', required => 1 );
-has 'check_word_cb' => ( is => 'ro', isa => 'CodeRef', required => 1 );
+has 'check_word_cb'    => ( is => 'ro', isa      => 'CodeRef', required => 1 );
 has 'timestamp_cache_fn' => ( is => 'ro', isa => 'Str', required => 1 );
 
 sub _tag
@@ -27,6 +27,12 @@ sub _tag
     $self->_inside->{$tag} += $num;
 
     return;
+}
+
+sub should_check
+{
+    my ( $self, $args ) = @_;
+    return ( $args->{word} !~ m#\A[\p{Hebrew}\-'’]+\z# );
 }
 
 sub _calc_mispellings
@@ -126,7 +132,7 @@ s{\A(?:(?:ֹו?(?:ש|ל|מ|ב|כש|לכש|מה|שה|לכשה|ב-))|ו)-?}{};
                                 { filename => $filename, word => $word }
                             )
                         )
-                            && ( $word !~ m#\A[\p{Hebrew}\-'’]+\z# )
+                            && $self->should_check( { word => $word } )
                             && ( !( $check_word->($word) ) )
                     );
 
@@ -240,7 +246,7 @@ HTML::Spelling::Site::Checker
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -406,7 +412,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 METHODS
 
@@ -420,6 +426,11 @@ cache of the last-checked timestamps of the files is stored in JSON format.
 =head2 $finder->spell_check();
 
 Performs the spell check and prints the erroneous words to stdout.
+
+=head2 $bool = $finder->should_check({word=>$word_string})
+
+Whether the word should be checked for being misspelled or not. Can be
+overridden in subclasses. (Was added in version 0.4.0).
 
 =head2 $finder->test_spelling({ files => [@files], blurb => $blurb, });
 

@@ -69,6 +69,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-IMAP4"
       }
    },
-   "version" : "3.004",
+   "version" : "3.005",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

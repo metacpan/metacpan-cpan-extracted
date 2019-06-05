@@ -1,5 +1,16 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.400000 May 25 2019 12:30:00 PDT
+   - THIS RELEASE CONTAINS A POTENTIALLY BREAKING BEHAVIOR CHANGE.
+   - Only process children when a unique constraint is met.
+       - This means no parent or value settings are processed. Only children.
+   - Fix a nasty bug when the FK is also a UK and there is more than one
+     relationship emanating from the child table.
+   - Add support for relationships defined by subroutines
+       - The assumption that all relationships are single-column is likely to
+         have to be dealt with soon. but, not yet.
+   - Add SIMS_DEBUG envvar to output useful debugging information.
+
 0.320000 May 11 2019 12:30:00 PDT
    - Handle the case where a FK is also a UK
        - Note: This currently only works for a single-column UK containing the

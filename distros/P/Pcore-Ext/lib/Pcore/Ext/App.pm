@@ -7,10 +7,11 @@ use Package::Stash::XS qw[];
 use Pcore::Ext::App::Class;
 
 has devel     => ();
-has name      => ( required => 1 );
+has ext       => ( required => 1 );    # InstanceOf['Pcore::Ext']
+has id        => ( required => 1 );
 has namespace => ( required => 1 );
 
-has cdn           => ();       # maybe InstanceOf['Pcore::CDN']
+has cdn           => ();               # maybe InstanceOf['Pcore::CDN']
 has api_namespace => ();
 has prefixes      => ();
 has api_url       => '/api';
@@ -44,22 +45,12 @@ sub _load_module ( $self, $module ) {
         }
     }
     else {
-        my $prefix = $module =~ s/[.]pm\z//smr;
+        my $package = P->class->module_to_package($module);
 
-        my $package = $prefix =~ s[/][::]smgr;
+        my $prefix = $package =~ s[::][/]smgr;
 
         # remove all package symbols
-        if ( $INC{$module} ) {
-            delete $INC{$module};
-
-            my $stash = Package::Stash::XS->new($package);
-
-            for my $sym ( $stash->list_all_symbols ) {
-                next if substr( $sym, -1, 1 ) eq ':';
-
-                $stash->remove_glob($sym);
-            }
-        }
+        P->class->unload($package) if $INC{$module};
 
         my $package_ref_attrs;
 
@@ -91,13 +82,10 @@ sub _load_module ( $self, $module ) {
 
         eval { require $module };
 
-        my $stash = Package::Stash::XS->new($package);
-
-        # cleanup
-        $stash->remove_symbol('&MODIFY_CODE_ATTRIBUTES');
-
         # package compilation error
         die $@ if $@;
+
+        my $stash = Package::Stash::XS->new($package);
 
         # scan EXT_ methods
         for my $method_name ( grep {/\AEXT_/sm} $stash->list_all_symbols('CODE') ) {
@@ -358,7 +346,7 @@ sub _build_app ($self) {
 
         Ext.application({
             name: 'APP',
-            appName: '$self->{name}',
+            appCdn: '@{[ $self->{cdn}->("/app/$self->{id}") ]}',
             api: new PCORE({
                 url: '$data->{api_url}',
                 version: '$self->{ext_api_ver}',
@@ -376,7 +364,7 @@ JS
     $js = $self->_prepare_js($js);
 
     # CDN deploy
-    $self->{cdn}->upload( "/app/$self->{name}/app.js", $js );
+    $self->{cdn}->upload( "/app/$self->{id}/app.js", $js );
 
     return;
 }
@@ -512,7 +500,7 @@ sub _build_locales ( $self ) {
 JS
 
         # CDN deploy
-        $self->{cdn}->upload( "/app/$self->{name}/locale/$locale.js", $self->_prepare_js($js) );
+        $self->{cdn}->upload( "/app/$self->{id}/locale/$locale.js", $self->_prepare_js($js) );
     }
 
     return;
@@ -544,13 +532,13 @@ sub _prepare_js ( $self, $js ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 85, 86               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 76, 77               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 92                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 83                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 195                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
+## |    3 | 183                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 464                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 452                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

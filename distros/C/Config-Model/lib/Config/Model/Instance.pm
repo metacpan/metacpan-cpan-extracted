@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.134;
+package Config::Model::Instance 2.135;
 
 #use Scalar::Util qw(weaken) ;
 use strict;
@@ -274,6 +274,7 @@ has tree => (
 sub reset_config {
     my $self = shift;
     $self->_clear_config;
+    $self->clear_changes;
     return $self->config_root;
 }
 
@@ -387,7 +388,7 @@ sub modify {
 
 sub load {
     my $self   = shift;
-    my $loader = Config::Model::Loader->new( start_node => $self->{tree} );
+    my $loader = Config::Model::Loader->new( start_node => $self->config_root );
     my %args   = @_ eq 1 ? ( step => $_[0] ) : @_;
     $loader->load( %args );
     return $self;
@@ -395,7 +396,7 @@ sub load {
 
 sub search_element {
     my $self = shift;
-    $self->{tree}->search_element(@_);
+    $self->config_root->search_element(@_);
 }
 
 sub wizard_helper {
@@ -660,7 +661,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 
@@ -883,7 +884,7 @@ L<Config::Model::Role::Grab/grab_value>
 =head2 searcher
 
 Returns an object dedicated to search an element in the configuration
-model (respecting privilege level).
+model.
 
 This method returns a L<Config::Model::Searcher> object. See
 L<Config::Model::Searcher> for details on how to handle a search.

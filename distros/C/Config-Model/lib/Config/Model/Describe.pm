@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-package Config::Model::Describe 2.134;
+package Config::Model::Describe 2.135;
 
 use Carp;
 use strict;
@@ -214,7 +214,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 

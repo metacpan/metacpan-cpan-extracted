@@ -175,6 +175,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "FREE_TMP",
   "REFCNT",
   "ALLOW",
+  "BREAK",
 };
 
 int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_OP* op_package_current, SPVM_OP* op_package_dist) {
@@ -858,7 +859,7 @@ SPVM_OP* SPVM_OP_build_eval(SPVM_COMPILER* compiler, SPVM_OP* op_eval, SPVM_OP* 
   return op_eval;
 }
 
-SPVM_OP* SPVM_OP_build_switch_statement(SPVM_COMPILER* compiler, SPVM_OP* op_switch, SPVM_OP* op_term_condition, SPVM_OP* op_block) {
+SPVM_OP* SPVM_OP_build_switch_statement(SPVM_COMPILER* compiler, SPVM_OP* op_switch, SPVM_OP* op_term_condition, SPVM_OP* op_switch_block) {
   
   SPVM_OP* op_switch_condition = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SWITCH_CONDITION, op_term_condition->file, op_term_condition->line);
   SPVM_OP_insert_child(compiler, op_switch_condition, op_switch_condition->last, op_term_condition);
@@ -868,9 +869,7 @@ SPVM_OP* SPVM_OP_build_switch_statement(SPVM_COMPILER* compiler, SPVM_OP* op_swi
   SPVM_OP_insert_child(compiler, op_switch_condition_free_tmp, op_switch_condition_free_tmp->last, op_switch_condition);
   
   SPVM_OP_insert_child(compiler, op_switch, op_switch->last, op_switch_condition_free_tmp);
-  SPVM_OP_insert_child(compiler, op_switch, op_switch->last, op_block);
-  
-  op_block->uv.block->id = SPVM_BLOCK_C_ID_SWITCH;
+  SPVM_OP_insert_child(compiler, op_switch, op_switch->last, op_switch_block);
   
   SPVM_SWITCH_INFO* switch_info = SPVM_SWITCH_INFO_new(compiler);
   op_switch->uv.switch_info = switch_info;
@@ -880,18 +879,43 @@ SPVM_OP* SPVM_OP_build_switch_statement(SPVM_COMPILER* compiler, SPVM_OP* op_swi
   return op_switch;
 }
 
-SPVM_OP* SPVM_OP_build_case_statement(SPVM_COMPILER* compiler, SPVM_OP* op_case_info, SPVM_OP* op_term) {
+SPVM_OP* SPVM_OP_build_switch_block(SPVM_COMPILER* compiler, SPVM_OP* op_switch_block, SPVM_OP* op_case_statements, SPVM_OP* op_default_statement) {
+  
+  if (op_case_statements->id != SPVM_OP_C_ID_LIST) {
+    SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, op_case_statements->file, op_case_statements->line);
+    SPVM_OP_insert_child(compiler, op_list, op_list->last, op_case_statements);
+    op_case_statements = op_list;
+  }
+  
+  SPVM_OP_insert_child(compiler, op_switch_block, op_switch_block->last, op_case_statements);
+  if (op_default_statement) {
+    SPVM_OP_insert_child(compiler, op_switch_block, op_switch_block->last, op_default_statement);
+  }
+  
+  return op_switch_block;
+}
+
+SPVM_OP* SPVM_OP_build_case_statement(SPVM_COMPILER* compiler, SPVM_OP* op_case_info, SPVM_OP* op_term, SPVM_OP* op_block) {
   
   SPVM_CASE_INFO* case_info = SPVM_CASE_INFO_new(compiler);
   
   SPVM_OP_insert_child(compiler, op_case_info, op_case_info->last, op_term);
   op_term->flag = SPVM_OP_C_FLAG_CONSTANT_CASE;
+
+  SPVM_OP_insert_child(compiler, op_case_info, op_case_info->last, op_block);
   
   case_info->op_case_info = op_case_info;
   
   op_case_info->uv.case_info = case_info;
   
   return op_case_info;
+}
+
+SPVM_OP* SPVM_OP_build_default_statement(SPVM_COMPILER* compiler, SPVM_OP* op_default, SPVM_OP* op_block) {
+  
+  SPVM_OP_insert_child(compiler, op_default, op_default->last, op_block);
+  
+  return op_default;
 }
 
 SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_term_condition, int32_t is_not) {
@@ -1175,6 +1199,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_CASE:
     case SPVM_OP_C_ID_LAST:
     case SPVM_OP_C_ID_NEXT:
+    case SPVM_OP_C_ID_BREAK:
     case SPVM_OP_C_ID_DIE:
     {
       // Dummy int variable

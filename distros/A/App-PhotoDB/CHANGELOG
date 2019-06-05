@@ -1,5 +1,14 @@
 Revision history for Perl module App::PhotoDB
 
+0.06 2019-06-04
+
+ * Abstract camera and lens models out from ownership (#182, #283, #286, #292)
+ * Improve output of DB test command
+ * Enable user to skip migrations on startup, and run them manually (#281)
+ * Huge improvements to CI tests to add functional testing and SQL view validation (#276, #278)
+ * Improve appearance of confirmation when updating data (#294)
+ * Add automatic decoding of Canon date codes (#291)
+
 0.05 2019-04-25
 
   * Add task to update negs copied from other negs (#272)

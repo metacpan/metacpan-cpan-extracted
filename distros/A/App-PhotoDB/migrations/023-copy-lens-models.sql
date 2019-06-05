@@ -1,0 +1,4 @@
+insert into LENSMODEL (lensmodel_id, mount_id, zoom, min_focal_length, max_focal_length, manufacturer_id, model, closest_focus, max_aperture, min_aperture, elements, groups, weight, nominal_min_angle_diag, nominal_max_angle_diag, aperture_blades, autofocus, filter_thread, magnification, url, introduced, discontinued, negative_size_id, fixed_mount, notes, coating, hood, exif_lenstype, rectilinear, length, diameter, image_circle, formula, shutter_model)
+select
+lens_id, mount_id, zoom, min_focal_length, max_focal_length, manufacturer_id, model, closest_focus, max_aperture, min_aperture, elements, groups, weight, nominal_min_angle_diag, nominal_max_angle_diag, aperture_blades, autofocus, filter_thread, magnification, url, introduced, discontinued, negative_size_id, fixed_mount, notes, coating, hood, exif_lenstype, rectilinear, length, diameter, image_circle, formula, shutter_model
+from LENS;

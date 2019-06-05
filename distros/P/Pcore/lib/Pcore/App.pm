@@ -1,6 +1,6 @@
 package Pcore::App;
 
-use Pcore -role;
+use Pcore -role, -const;
 use Pcore::Service::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
@@ -16,6 +16,14 @@ has api    => ( init_arg => undef ); # Maybe [ ConsumerOf ['Pcore::App::API'] ]
 has node   => ( init_arg => undef ); # InstanceOf ['Pcore::Node']
 has cdn    => ( init_arg => undef ); # InstanceOf['Pcore::CDN']
 has ext    => ( init_arg => undef ); # InstanceOf['Pcore::Ext']
+
+const our $LOCALES => {
+    en => 'English',
+
+    # ru => 'Русский',
+    # de => 'Deutsche',
+
+};
 
 sub BUILD ( $self, $args ) {
 
@@ -34,10 +42,16 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
+# LOCALES
+sub get_locales ($self) {
+    return $LOCALES;
+}
+
 sub get_default_locale ( $self, $req ) {
     return 'en';
 }
 
+# RUN
 around run => sub ( $orig, $self ) {
 
     # create node
@@ -86,6 +100,12 @@ around run => sub ( $orig, $self ) {
     print 'Scanning HTTP controllers ... ';
     $self->{router}->init;
     say 'done';
+
+    if ( defined $self->{ext} ) {
+        print 'Clearing Ext build cache ... ';
+        $self->{ext}->clear_cache;
+        say 'done';
+    }
 
     $res = $self->$orig;
     exit 3 if !$res;

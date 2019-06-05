@@ -18,6 +18,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Alien::Z3' => '0.001',
+                                      'Carp' => '0',
                                       'Data::Dumper' => '0',
                                       'FFI::CheckLib' => '0',
                                       'FFI::Platypus' => '0.87',

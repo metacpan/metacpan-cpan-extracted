@@ -163,10 +163,6 @@ Audit cameras without shutter speed data
 
 The C<camera> command provides subcommands for working with cameras.
 
-=head3 camera accessory
-
-Add accessory compatibility info to a camera
-
 =head3 camera add
 
 Add a new camera to the database
@@ -183,17 +179,9 @@ Associate a camera with a lens for display purposes
 
 Edit an existing camera
 
-=head3 camera exposureprogram
-
-Add available exposure program info to a camera
-
 =head3 camera info
 
 Show information about a camera
-
-=head3 camera meteringmode
-
-Add available metering mode info to a camera
 
 =head3 camera repair
 
@@ -211,25 +199,51 @@ Sell a camera
 
 C<camera show-lenses> shows all lenses which are compatible with a camera.
 
-=head3 camera shutterspeeds
-
-Add available shutter speed info to a camera
-
 =cut
 	$handlers{camera} = {
-		'accessory'       => { 'handler' => \&camera_accessory,       'desc' => 'Add accessory compatibility info to a camera' },
-		'add'             => { 'handler' => \&camera_add,             'desc' => 'Add a new camera to the database' },
-		'choose'          => { 'handler' => \&camera_choose,          'desc' => 'Choose a camera based on several criteria' },
-		'display-lens'    => { 'handler' => \&camera_displaylens,     'desc' => 'Associate a camera with a lens for display purposes' },
-		'edit'            => { 'handler' => \&camera_edit,            'desc' => 'Edit an existing camera' },
-		'exposureprogram' => { 'handler' => \&camera_exposureprogram, 'desc' => 'Add available exposure program info to a camera' },
-		'info'            => { 'handler' => \&camera_info,            'desc' => 'Show information about a camera' },
-		'meteringmode'    => { 'handler' => \&camera_meteringmode,    'desc' => 'Add available metering mode info to a camera' },
-		'repair'          => { 'handler' => \&camera_repair,          'desc' => 'Repair a camera' },
-		'search'          => { 'handler' => \&camera_search,          'desc' => 'Search for a camera' },
-		'sell'            => { 'handler' => \&camera_sell,            'desc' => 'Sell a camera' },
-		'show-lenses'     => { 'handler' => \&notimplemented,         'desc' => 'Not yet implemented' },
-		'shutterspeeds'   => { 'handler' => \&camera_shutterspeeds,   'desc' => 'Add available shutter speed info to a camera' },
+		'add'          => { 'handler' => \&camera_add,         'desc' => 'Add a new camera to the database' },
+		'choose'       => { 'handler' => \&camera_choose,      'desc' => 'Choose a camera based on several criteria' },
+		'display-lens' => { 'handler' => \&camera_displaylens, 'desc' => 'Associate a camera with a lens for display purposes' },
+		'edit'         => { 'handler' => \&camera_edit,        'desc' => 'Edit an existing camera' },
+		'info'         => { 'handler' => \&camera_info,        'desc' => 'Show information about a camera' },
+		'repair'       => { 'handler' => \&camera_repair,      'desc' => 'Repair a camera' },
+		'search'       => { 'handler' => \&camera_search,      'desc' => 'Search for a camera' },
+		'sell'         => { 'handler' => \&camera_sell,        'desc' => 'Sell a camera' },
+		'show-lenses'  => { 'handler' => \&notimplemented,     'desc' => 'Not yet implemented' },
+	};
+
+=head2 cameramodel
+
+The C<cameramodel> command provides a set of subcommands for working with camera models.
+
+=head3 cameramodel add
+
+Add a new camera model to PhotoDB
+
+=head3 cameramodel accessory
+
+Add accessory compatibility info to a camera model
+
+=head3 cameramodel exposureprogram
+
+Add available exposure program info to a camera model
+
+=head3 cameramodel meteringmode
+
+Add available metering mode info to a camera model
+
+=head3 cameramodel shutterspeeds
+
+Add available shutter speed info to a camera model
+
+=cut
+
+	$handlers{cameramodel} = {
+		'accessory'       => { 'handler' => \&cameramodel_accessory,       'desc' => 'Add accessory compatibility info to a camera model' },
+		'add'             => { 'handler' => \&cameramodel_add,             'desc' => 'Add a new camera model to PhotoDB' },
+		'exposureprogram' => { 'handler' => \&cameramodel_exposureprogram, 'desc' => 'Add available exposure program info to a camera model' },
+		'meteringmode'    => { 'handler' => \&cameramodel_meteringmode,    'desc' => 'Add available metering mode info to a camera model' },
+		'shutterspeeds'   => { 'handler' => \&cameramodel_shutterspeeds,   'desc' => 'Add available shutter speed info to a camera model' },
 	};
 
 =head2 data
@@ -430,21 +444,32 @@ Write EXIF tags to scans from a film
 		'tag'      => { 'handler' => \&film_tag,      'desc' => 'Write EXIF tags to scans from a film' },
 	};
 
+=head2 lensmodel
+
+The C<lensmodel> command provides a set of subcommands for working with lens models.
+
+=head3 lensmodel add
+
+Add a new lens model to PhotoDB
+
+=head3 lensmodel accessory
+
+Add accessory compatibility info to a lens model
+
+=cut
+
+        $handlers{lensmodel} = {
+                'accessory' => { 'handler' => \&lensmodel_accessory, 'desc' => 'Add accessory compatibility info to a lens model' },
+                'add'       => { 'handler' => \&lensmodel_add,       'desc' => 'Add a new lens model to PhotoDB' },
+        };
+
 =head2 lens
 
 The C<lens> command provides subcommands for working with lenses (for cameras, enlargers and projectors).
 
-=head3 lens accessory
-
-Add accessory compatibility info to a lens
-
 =head3 lens add
 
 Add a new lens to the database
-
-=head3 lens edit
-
-Edit an existing lens
 
 =head3 lens info
 
@@ -464,9 +489,7 @@ Sell a lens
 
 =cut
 	$handlers{lens} = {
-		'accessory' => { 'handler' => \&lens_accessory, 'desc' => 'Add accessory compatibility info to a lens' },
 		'add'       => { 'handler' => \&lens_add,       'desc' => 'Add a new lens to the database' },
-		'edit'      => { 'handler' => \&lens_edit,      'desc' => 'Edit an existing lens' },
 		'info'      => { 'handler' => \&lens_info,      'desc' => 'Show information about a lens' },
 		'repair'    => { 'handler' => \&lens_repair,    'desc' => 'Repair a lens' },
 		'search'    => { 'handler' => \&lens_search,    'desc' => 'Search for a lens' },
@@ -706,10 +729,15 @@ Run a selection of maintenance tasks on the database
 
 Run a selection of reports on the database
 
+=head3 run migrations
+
+Run migrations to upgrade the database schema to the latest version
+
 =cut
 	$handlers{run} = {
-		'task'   => { 'handler' => \&run_task,   'desc' => 'Run a selection of maintenance tasks on the database' },
-		'report' => { 'handler' => \&run_report, 'desc' => 'Run a selection of reports on the database' },
+		'task'       => { 'handler' => \&run_task,       'desc' => 'Run a selection of maintenance tasks on the database' },
+		'report'     => { 'handler' => \&run_report,     'desc' => 'Run a selection of reports on the database' },
+		'migrations' => { 'handler' => \&run_migrations, 'desc' => 'Run migrations to upgrade the database schema to the latest version' },
 	};
 
 # This ensures the lib loads smoothly

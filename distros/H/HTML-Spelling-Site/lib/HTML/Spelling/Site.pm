@@ -1,5 +1,5 @@
 package HTML::Spelling::Site;
-$HTML::Spelling::Site::VERSION = '0.2.0';
+$HTML::Spelling::Site::VERSION = '0.4.0';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ HTML::Spelling::Site
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ HTML site.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SEE ALSO
 

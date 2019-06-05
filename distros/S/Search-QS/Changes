@@ -1,0 +1,13 @@
+Changelog for Search-QS
+
+0.01 2019-06-05T08:29:53
+ - Shared code for tests exported in a single module
+ - Add documentation to Filter(s), Options and Sort
+ - Add documentation to Search::QS::Filter
+ - Add documentation to Search::QS
+ - Add parse and to_qs to main class. Add tests
+ - Add Search::QS::Options and tests
+ - Add parse to Filters.pm. Add tests to check Filters.pm
+ - Moved from Set::Object to Set::Array. Add tests for query string decode
+   and filters encode
+ - First commit

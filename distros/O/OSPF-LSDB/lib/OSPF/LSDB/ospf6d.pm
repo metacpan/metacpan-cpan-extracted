@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012,2018 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2019 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -68,8 +68,10 @@ use fields qw(
 
 sub new {
     my OSPF::LSDB::ospf6d $self = OSPF::LSDB::ospfd::new(@_);
+    $self->{ospfd} = "ospf6d";
     $self->{ospfctl} = "ospf6ctl";
-    $self->{ospfsock} = "/var/run/ospf6d.sock";
+    # XXX hard coded routing domain 0
+    $self->{ospfsock} = "/var/run/ospf6d.sock.0";
     %{$self->{showdb}} = (%{$self->{showdb}}, (
 	link   => "link",
 	intra  => "intra",

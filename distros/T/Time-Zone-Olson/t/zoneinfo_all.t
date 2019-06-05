@@ -9,7 +9,6 @@ use POSIX();
 use Config;
 use English qw( -no_match_vars );
 use Time::Local();
-use Taint::Util();
 
 $ENV{PATH} = '/bin:/usr/bin:/usr/sbin:/sbin';
 delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
@@ -28,6 +27,9 @@ if ($timezone->win32_registry()) {
 
 diag("Local timezone has been determined to be " . $timezone->timezone() );
 ok($timezone->timezone(), "Local timezone has been determined to be " . $timezone->timezone() );
+if (defined $timezone->determining_path()) {
+	diag("Local timezone was determined using " . $timezone->determining_path() );
+}
 
 my $perl_date = 0;
 my $bsd_date = 0;
@@ -65,13 +67,16 @@ diag("Comment for 'Australia/Melbourne' is '$comment'");
 }
 my $tz = $timezone->timezone();
 diag(`zdump -v /usr/share/zoneinfo/$tz | head -n 10`);
+my $todo;
 if ($^O eq 'MSWin32') {
 } elsif ($bsd_date) {
 	diag("bsd test of early date:" . `TZ="Australia/Melbourne" date -r "-2172355201" +"%Y/%m/%d %H:%M:%S" 2>&1`);
 } elsif ($perl_date) {
+	$todo = "perl does not always agree with date(1)";
 } else {
 	diag("gnu test of early date:" . `TZ="Australia/Melbourne" date -d "1901/02/28 23:59:59 GMT" +"%Y/%m/%d %H:%M:%S" 2>&1`);
 }
+$TODO = $todo;
 
 my $count = 0;
 foreach my $area ($timezone->areas()) {

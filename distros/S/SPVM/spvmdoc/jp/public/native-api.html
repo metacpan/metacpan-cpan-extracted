@@ -1,0 +1,839 @@
+<html>
+  <head>
+    <title>SPVMネイティブAPI仕様 1.0 ベータ</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/images/spvm-logo.png">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <script type="text/javascript" src="/js/jquery-1.9.0.min.js"></script>
+    <script type="text/javascript" src="/js/google-code-prettify/prettify.js"></script>
+    <link  type="text/css" rel="stylesheet" href="/js/google-code-prettify/prettify.css"/>
+    <script>
+      $(function(){
+        // google code prettifyの有効化
+        $("pre").addClass("prettyprint");
+        function init(event){
+          prettyPrint();
+        }
+        if(window.addEventListener)window.addEventListener("load",init,false);
+        else if(window.attachEvent)window.attachEvent("onload",init);
+        
+        $(".to-top").click(function() {
+          // ページの一番上までスクロールさせます。
+          $('body, html').animate({scrollTop: 0}, 300, 'linear');;
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="container">
+        <h1>
+          <a style="color:#333;text-decoration:none;" href="/language.html"><img src="/images/spvm-logo.png">SPVMネイティブAPI仕様 1.0ベータ</a>
+        </h1>
+      </div>
+    </div>
+    
+    <div class="container">
+      <div>
+        <a href="/">SPVMドキュメント</a> &gt SPVMネイティブAPI仕様
+      </div>
+      
+      <h2 id="native-api-summary">SPVMネイティブAPI仕様</a></h2>
+      <p>
+        <b>SPVMネイティブAPI仕様</b>がこのドキュメントには記述されています。SPVMは、1.0のリリースに向けて、ベータテスト中です。SPVMネイティブAPI仕様は、警告なく変更されることがあります。
+      </p>
+      <p>
+        最終更新日 2019年6月5日
+      </p>
+      
+      <h2 id="native-api-toc">目次</h2>
+      <ul class="toc">
+        <li><a href="#native-api-summary">SPVMネイティブAPIとは</a></li>
+        <li><a href="#native-api-native-sub-declaration">ネイティブサブルーチンの宣言</a></li>
+        <li><a href="#native-api-native-sub-definition">ネイティブサブルーチンの定義</a></li>
+        <li><a href="#native-api-native-sub-compile">ネイティブサブルーチンのコンパイル</a></li>
+        <li><a href="#native-api-native-sub-get-arg">引数の取得</a></li>
+        <li><a href="#native-api-native-sub-set-retval">戻り値の設定</a></li>
+        <li><a href="#native-api-list">ネイティブAPIの一覧</a></li>
+      </ul>
+      
+      <h2 id="native-api-summary">SPVMネイティブAPIとは</h2>
+      <p>
+        SPVMネイティブAPIとは、SPVMのネイティブサブルーチンの中で呼び出すことのできるC言語のAPIのことです。SPVMのネイティブサブルーチンの仕様についてもここに記述されます。
+      </p>
+      <ul class="list">
+        <li>ネイティブサブルーチンの定義方法</li>
+        <li>SPVMのサブルーチンの引数をネイティブサブルーチンで受け取る</li>
+        <li>ネイティブサブルーチンの戻り値を、SPVMのサブルーチンの戻り値として返す</li>
+        <li>SPVMの配列の要素をC言語の配列として取得</li>
+      </ul>
+      <p>
+        作成したネイティブサブルーチンは、SPVMから呼び出すことができます。
+      </p>
+
+      <h2 id="native-api-native-sub-declaration">SPVMネイティブサブルーチンの宣言</h2>
+      <p>
+        SPVMネイティブサブルーチンの宣言は、サブルーチンのディスクリプタ「native」を使うことによって行います。サブルーチンのブロックを書かずに、セミコロンで終わります。以下は、Foo::Barというモジュールの中で宣言する場合の例です。
+      </p>
+<pre>
+# Foo/Bar.spvm
+package Foo::Bar {
+  native sub sum : int ($num1 : int, $num2 : int);
+}
+</pre>
+
+      <h2 id="native-api-native-sub-definition">ネイティブサブルーチンの定義</h2>
+      <p>
+        ネイティブサブルーチンの定義は、ネイティブソースファイルの中で行います。ネイティブソースファイルは、SPVMのモジュールの拡張子を、対象の言語の拡張子に変えたものになります。たとえばC言語であれば「.c」に変えたものです。C++であれば、「.cpp」に変えたものです。これは、ネイティブサブルーチンの設定において、変更することができます。
+      </p>
+<pre>
+# モジュール名がFoo::Barの場合のネイティブソースファイル
+Foo/Bar.c
+</pre>
+      <p>
+        ネイティブソースファイルを作成するときは、合わせてネイティブ設定ファイルを作成する必要があります。ネイティブ設定ファイルは、SPVMのモジュールの拡張子を「.config」に変えたものになります。ネイティブ設定ファイルが存在しない場合は、例外が発生します。
+      </p>
+<pre>
+# モジュール名がFoo::Barの場合のネイティブ設定ファイル
+Foo/Bar.config
+</pre>
+
+     <p>
+       ネイティブ設定ファイルはPerlのソースコードです。SPVM::Builder::Configオブジェクトをソースコードの最後に記述して、返却しなければなりません。そうでない場合は、例外が発生します。
+     </p>
+     <p>
+       SPVMと同じC99で、C言語を書きたい場合は、以下のように記述します。
+     </p>
+     
+<pre>
+use strict;
+use warnings;
+
+use SPVM::Builder::Config;
+my $bconf = SPVM::Builder::Config->new_c99;
+
+$bconf;
+</pre>
+      <p>
+        C99以外でコンパイルしたい場合や、ライブラリを追加したい場合はSPVM::Builder::Configのドキュメントのサンプルを見てください。
+      </p>
+      <p>
+        ネイティブサブルーチンの定義は、ネイティブソースファイルの中で行います。この場合の例は「Foo/Bar.c」です。
+      </p>
+
+<pre>
+#include "spvm_native.h"
+
+int32_t SPNATIVE__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t num1 = stack[0].ival;
+  int32_t num2 = stakc[1].ival;
+  
+  int32_t total = num1 + num2;
+  
+  stack[0].ival = total;
+
+  return SPVM_SUCCESS;
+}
+</pre>
+
+      <p>
+        ネイティブソースファイルの先頭で「spvm_native.h」をインクルードしてください。このヘッダファイルには、SPVMネイティブAPIと必要な構造体が定義されています。
+      </p>
+      <p>
+        ネイティブサブルーチンの定義は、簡単なC言語の関数です。
+      </p>
+      <p>
+        ネイティブサブルーチンのCにおける関数名は「SPNATIVE__」で始まり、モジュール名の「::」を「__」に変換したものが続き、「__」が続き、サブルーチン名で終わります。SPVMにおけるサブルーチン名との対応が正しくない場合は、コンパイルエラーが発生します。
+      </p>
+      <p>
+        引数は二つで、第一引数は、実行環境の情報を持った「SPVM_ENV* env」で、第二引数は引数と戻り値に利用される「SPVM_VALUE* stack」です。
+      </p>
+      <p>
+        戻り値の型は「int32_t」です。サブルーチンが例外を発生させる場合は「SPVM_EXCEPTION」、それ以外の場合は「SPVM_SUCCESS」を返却します。
+      </p>
+      <p>
+        上記のサンプルでは、SPVMのint型の引数を二つ受け取り、合計を計算し、戻り値を返すということを行っています。
+      </p>
+      
+      <h2 id="native-api-native-sub-compile">ネイティブサブルーチンのコンパイル</h2>
+      <p>
+        ネイティブサブルーチンは、Perlをコンパイルしたコンパイラで、コンパイルされて、OSに応じた、動的に読み可能な共有ライブラリにコンパイルされます。Unix/Linuxにおいては、共有ライブラリ(.so)、Windowsにおいてはダイナミックリンクライブラリ(.dll)などです。
+      </p>
+      <p>
+        動的に読み可能な共有ライブラリへのコンパイルは、SPVMのコンパイル時に行われます。コンパイルのときに、ビルドディレクトリが存在していなければなりません。ビルドディレクトリが存在しない場合は、例外が発生します。
+      </p>
+      <p>
+        ビルドディレクトリのデフォルトは、実行したPerlスクリプトが存在するディレクトリの「spvm_build」ディレクトリで、環境変数「SPVM_BUILD_DIR」で変更することができます。
+      </p>
+      <p>
+        PerlからSPVMネイティブサブルーチンを利用したい場合は実行したPerlスクリプトが存在するディレクトリに「spvm_build」ディレクトリ作成します。
+      </p>
+<pre>
+script.pl
+spvm_build/
+</pre>
+      <p>
+        中間的に生成されるオブジェクトファイルは、ビルドディレクトリの下の「work/object」の下に生成されます。オブジェクトファイル名は、SPVMのモジュールの拡張子を「.o」に変えたものになります。
+      </p>
+<pre>
+spvm_build/work/object/Foo/Bar.o
+</pre>
+      <p>
+        動的に読み可能な共有ライブラリは、ビルドディレクトリの下の「work/lib」の下に生成されます。動的に読み可能な共有ライブラリのファイル名は、SPVMのモジュールの拡張子を、OSに応じた、動的に読み可能な共有ライブラリの拡張子に変えたものになります。
+      </p>
+<pre>
+# Unix/Linux
+spvm_build/work/object/Foo/Bar.so
+
+# Windows
+spvm_build/work/object/Foo/Bar.dll
+</pre>
+      <h2 id="native-api-native-sub-get-arg">引数の取得</h2>
+      <ul class="list">
+        <li><a href="#native-api-native-sub-get-arg-stack">引数とスタック</a></li>
+        <li><a href="#native-api-native-sub-get-arg-byte">byte型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-short">short型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-int">int型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-long">long型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-float">float型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-double">double型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-object">オブジェクト型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-stack">引数のスタック</a></li>
+        <li><a href="#native-api-native-sub-get-arg-byte-ref">byteのリファレンス型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-short-ref">shortのリファレンス型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-int-ref">intのリファレンス型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-long-ref">longのリファレンス型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-float-ref">floatのリファレンス型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-double-ref">doubleのリファレンス型の引数の取得</a></li>
+        <li><a href="#native-api-native-sub-get-arg-mulnum">複数数値型の引数の取得</a></li>
+      </ul>
+      
+      <h3 href="#native-api-native-sub-get-arg-stack">引数とスタック</h3>
+      <p>
+        スタックとは、ネイティブサブルーチンの定義における第二引数で渡される「SPVM_VALUE* stack」のことで、この中に引数が格納されています。
+      </p>
+<pre>
+int32_t SPNATIVE__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+}
+</pre>
+      <p>
+        SPVM_VALUEは、SPVMの値を格納するためのC言語の共用体です。数値型、オブジェクト型、リファレンス型の値を保存できます。
+      </p>
+      <p>
+        「SPVM_VALUE* stack」の「SPVM_VALUE型の配列」の先頭のポインタです。SPVM側からコールされたネイティブサブルーチンの引数の値がこの配列に設定されます。
+      </p>
+      <p>
+        たとえば、int型の第一引数の値を取得する場合は、以下のように書きます。
+      </p>
+<pre>
+int32_t args1 = stack[0].ival;
+</pre>
+      <p>
+        たとえば、long型の第二引数の値を取得する場合は、以下のように書きます。
+      </p>
+<pre>
+int64_t args2 = stack[0].lval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-byte">byte型の引数の取得</h3>
+      <p>
+        SPVMのbyte型の引数を取得するには、bvalフィールドにアクセスします。C言語のint8_t型に代入します。
+      </p>
+<pre>
+int8_t args1 = stack[0].bval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-short">short型の引数の取得</h3>
+      <p>
+        SPVMのshort型の引数を取得するには、svalフィールドにアクセスします。C言語のint16_t型に代入します。
+      </p>
+<pre>
+int16_t args1 = stack[0].sval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-int">int型の引数の取得</h3>
+      <p>
+        SPVMのint型の引数を取得するには、ivalフィールドにアクセスします。C言語のint32_t型に代入します。
+      </p>
+<pre>
+int32_t args1 = stack[0].ival;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-long">long型の引数の取得</h3>
+      <p>
+        SPVMのlong型の引数を取得するには、lvalフィールドにアクセスします。C言語のint64_t型に代入します。
+      </p>
+<pre>
+int64_t args1 = stack[0].lval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-float">float型の引数の取得</h3>
+      <p>
+        SPVMのfloat型の引数を取得するには、fvalフィールドにアクセスします。C言語のfloat型に代入します。
+      </p>
+<pre>
+float args1 = stack[0].fval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-double">double型の引数の取得</h3>
+      <p>
+        SPVMのdouble型の引数を取得するには、dvalフィールドにアクセスします。C言語のdouble型に代入します。
+      </p>
+<pre>
+double args1 = stack[0].dval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-object">オブジェクト型の引数の取得</h3>
+      <p>
+        SPVMのobject型の引数を取得するには、ovalフィールドにアクセスします。C言語のvoid*型に代入します。
+      </p>
+<pre>
+void* args1 = stack[0].oval;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-byte-ref">byteのリファレンス型の引数の取得</h3>
+      <p>
+        SPVMのbyteのリファレンス型の引数を取得するには、brefフィールドにアクセスします。C言語のint8_t*型に代入します。
+      </p>
+<pre>
+int8_t* args1 = stack[0].bref;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-short">shortのリファレンス型の引数の取得</h3>
+      <p>
+        SPVMのshortのリファレンス型の引数を取得するには、srefフィールドにアクセスします。C言語のint16_t*型に代入します。
+      </p>
+<pre>
+int16_t* args1 = stack[0].sref;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-int">intのリファレンス型の引数の取得</h3>
+      <p>
+        SPVMのintのリファレンス型の引数を取得するには、irefフィールドにアクセスします。C言語のint32_t*型に代入します。
+      </p>
+<pre>
+int32_t* args1 = stack[0].iref;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-long">longのリファレンス型の引数の取得</h3>
+      <p>
+        SPVMのlongのリファレンス型の引数を取得するには、lrefフィールドにアクセスします。C言語のint64_t*型に代入します。
+      </p>
+<pre>
+int64_t* args1 = stack[0].lref;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-float">floatのリファレンス型の引数の取得</h3>
+      <p>
+        SPVMのfloatのリファレンス型の引数を取得するには、frefフィールドにアクセスします。C言語のfloat*型に代入します。
+      </p>
+<pre>
+float* args1 = stack[0].fref;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-double">doubleのリファレンス型の引数の取得</h3>
+      <p>
+        SPVMのdoubleのリファレンス型の引数を取得するには、drefフィールドにアクセスします。C言語のdouble*型に代入します。
+      </p>
+<pre>
+double* args1 = stack[0].dref;
+</pre>
+
+      <h3 id="native-api-native-sub-get-arg-mulnum">複数数値型の引数の取得</h3>
+      <p>
+        ネイティブサブルーチンにおいては、複数数値型の引数は、複数の引数に代入されます。
+      </p>
+      <p>
+        たとえば、SPVM::Complex_2d型の引数の場合は、二つの引数から取得します。フィールド名からはアクセスできないことに注意してください。
+      </p>
+<pre>
+double args_re = stack[0].dval;
+double args_im = stack[1].dval;
+</pre>
+
+      <h2 id="native-api-native-sub-set-retval">戻り値の設定</h2>
+      <ul class="list">
+        <li><a href="#native-api-native-sub-set-retval-stack">戻り値とスタック</a></li>
+        <li><a href="#native-api-native-sub-set-retval-byte">byte型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-short">short型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-int">int型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-long">long型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-float">float型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-double">double型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-object">オブジェクト型の戻り値の設定</a></li>
+        <li><a href="#native-api-native-sub-set-retval-mulnum">複数数値型の戻り値の設定</a></li>
+      </ul>
+      
+      <h3 id="native-api-native-sub-set-retval-stack">戻り値とスタック</h3>
+      <p>
+        ネイティブサブルーチンは、C言語のreturn文によって戻り値を返すのではなく、スタックを使って戻り値を設定します。
+      </p>
+      <p>
+        たとえば、int型の戻り値を返す場合は、以下のように書きます。
+      </p>
+<pre>
+stack[0].ival = 3;
+</pre>
+      <p>
+        たとえば、long型の第二引数の値を取得する場合は、以下のように書きます。
+      </p>
+<pre>
+stack[0].lval = 56;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-byte">byte型の戻り値の設定</h3>
+      <p>
+        SPVMのbyte型の戻り値を設定するには、bvalフィールドに代入します。C言語のint8_t型の値を代入します。
+      </p>
+<pre>
+int8_t retval;
+stack[0].bval = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-short">short型の戻り値の設定</h3>
+      <p>
+        SPVMのshort型の戻り値を設定するには、svalフィールドに代入します。C言語のint16_t型の値を代入します。
+      </p>
+<pre>
+int16_t retval;
+stack[0].sval = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-int">int型の戻り値の設定</h3>
+      <p>
+        SPVMのint型の戻り値を設定するには、ivalフィールドに代入します。C言語のint32_t型の値を代入します。
+      </p>
+<pre>
+int32_t retval;
+stack[0].ival = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-long">long型の戻り値の設定</h3>
+      <p>
+        SPVMのlong型の戻り値を設定するには、lvalフィールドに代入します。C言語のint64_t型の値を代入します。
+      </p>
+<pre>
+int64_t retval;
+stack[0].lval = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-float">float型の戻り値の設定</h3>
+      <p>
+        SPVMのfloat型の戻り値を設定するには、fvalフィールドに代入します。C言語のfloat型の値を代入します。
+      </p>
+<pre>
+float retval;
+stack[0].fval = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-double">double型の戻り値の設定</h3>
+      <p>
+        SPVMのdouble型の戻り値を設定するには、dvalフィールドに代入します。C言語のdouble型の値を代入します。
+      </p>
+<pre>
+double retval;
+stack[0].dval = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-object">オブジェクト型の戻り値の設定</h3>
+      <p>
+        SPVMのobject型の戻り値を設定するには、ovalフィールドに代入します。C言語のvoid*型の値を代入します。
+      </p>
+<pre>
+void* retval;
+stack[0].oval = retval;
+</pre>
+
+      <h3 id="native-api-native-sub-set-retval-mulnum">複数数値型の戻り値の設定</h3>
+      <p>
+        ネイティブサブルーチンにおいては、複数数値型の戻り値は、複数の戻り値に代入します。
+      </p>
+      <p>
+        たとえば、SPVM::Complex_2d型の戻り値の場合は、二つの戻り値を設定します。
+      </p>
+<pre>
+double retval_re;
+double retval_im;
+stack[0].dval = retval_re;
+stack[1].dval = retval_im;
+</pre>
+
+      <h2 id="native-api-index">ネイティブAPIのインデックス</h2>
+      <p>
+        ネイティブAPIは、名前に対応するインデックスを持っています。この番号は、ネイティブサブルーチンののバイナリ互換性を保つために、永続的に維持されます。新しいAPIの追加の場合は、末尾に追加されます。
+      </p>
+
+<pre>
+0     runtime_package_vars_heap_offset
+1     object_header_byte_size
+2     weaken_backref_head
+3     object_ref_count_offset
+4     object_basic_type_id_offset
+5     object_type_dimension_offset
+6     object_runtime_type_offset
+7     object_flag_offset
+8     object_length_offset
+9     byte_object_basic_type_id
+10    short_object_basic_type_id
+11    int_object_basic_type_id
+12    long_object_basic_type_id
+13    float_object_basic_type_id
+14    double_object_basic_type_id
+15    runtime
+16    exception_object
+17    native_mortal_stack
+18    native_mortal_stack_top
+19    native_mortal_stack_capacity
+20    basic_type_id
+21    field_id
+22    field_offset
+23    pkgvar_id
+24    sub_id
+25    method_sub_id
+26    new_obj_raw
+27    new_obj
+28    new_barray_raw
+29    new_barray
+30    new_sarray_raw
+31    new_sarray
+32    new_iarray_raw
+33    new_iarray
+34    new_larray_raw
+35    new_larray
+36    new_farray_raw
+37    new_farray
+38    new_darray_raw
+39    new_darray
+40    new_oarray_raw
+41    new_oarray
+42    new_marray_raw
+43    new_marray
+44    new_varray_raw
+45    new_varray
+46    new_str_raw
+47    new_str
+48    new_str_len_raw
+49    new_str_len
+50    new_pointer_raw
+51    new_pointer
+52    concat_raw
+53    concat
+54    new_stack_trace_raw
+55    new_stack_trace
+56    len
+57    belems
+58    selems
+59    ielems
+60    lelems
+61    felems
+62    delems
+63    oelems
+64    set_oelems
+65    bfield
+66    sfield
+67    ifield
+68    lfield
+69    ffield
+70    dfield
+71    ofield
+72    set_bfield
+73    set_sfield
+74    set_ifield
+75    set_lfield
+76    set_ffield
+77    set_dfield
+78    set_ofield
+79    bpkgvar
+80    spkgvar
+81    ipkgvar
+82    lpkgvar
+83    fpkgvar
+84    dpkgvar
+85    opkgvar
+86    set_bpkgvar
+87    set_spkgvar
+88    set_ipkgvar
+89    set_lpkgvar
+90    set_fpkgvar
+91    set_dpkgvar
+92    set_opkgvar
+93    pointer
+94    set_pointer
+95    call_sub
+96    exception
+97    set_exception
+98    ref_count
+99    inc_ref_count
+100   dec_ref_count
+101   enter_scope
+102   push_mortal
+103   leave_scope
+104   remove_mortal
+105   is_type
+106   has_callback
+107   object_basic_type_id
+108   object_type_dimension
+109   weaken
+110   isweak
+111   unweaken
+112   alloc_memory_block_zero
+113   free_memory_block
+114   memory_blocks_count
+115   type_name_raw
+116   type_name
+117   new_env
+118   free_env
+</pre>
+
+      <h2 id="native-api-list">ネイティブAPIの一覧</h2>
+      <ul class="list">
+        <li><a href="#native-api-native-sub-api-runtime_package_vars_heap_offset">runtime_package_vars_heap_offset</a></li>
+        <li><a href="#native-api-native-sub-api-object_header_byte_size">object_header_byte_size</a></li>
+        <li><a href="#native-api-native-sub-api-weaken_backref_head">weaken_backref_head</a></li>
+        <li><a href="#native-api-native-sub-api-object_ref_count_offset">object_ref_count_offset</a></li>
+        <li><a href="#native-api-native-sub-api-object_basic_type_id_offset">object_basic_type_id_offset</a></li>
+        <li><a href="#native-api-native-sub-api-object_type_dimension_offset">object_type_dimension_offset</a></li>
+        <li><a href="#native-api-native-sub-api-object_runtime_type_offset">object_runtime_type_offset</a></li>
+        <li><a href="#native-api-native-sub-api-object_flag_offset">object_flag_offset</a></li>
+        <li><a href="#native-api-native-sub-api-object_length_offset">object_length_offset</a></li>
+        <li><a href="#native-api-native-sub-api-byte_object_basic_type_id">byte_object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-short_object_basic_type_id">short_object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-int_object_basic_type_id">int_object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-long_object_basic_type_id">long_object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-float_object_basic_type_id">float_object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-double_object_basic_type_id">double_object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-runtime">runtime</a></li>
+        <li><a href="#native-api-native-sub-api-exception_object">exception_object</a></li>
+        <li><a href="#native-api-native-sub-api-native_mortal_stack">native_mortal_stack</a></li>
+        <li><a href="#native-api-native-sub-api-native_mortal_stack_top">native_mortal_stack_top</a></li>
+        <li><a href="#native-api-native-sub-api-native_mortal_stack_capacity">native_mortal_stack_capacity</a></li>
+        <li><a href="#native-api-native-sub-api-basic_type_id">basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-field_id">field_id</a></li>
+        <li><a href="#native-api-native-sub-api-field_offset">field_offset</a></li>
+        <li><a href="#native-api-native-sub-api-pkgvar_id">pkgvar_id</a></li>
+        <li><a href="#native-api-native-sub-api-sub_id">sub_id</a></li>
+        <li><a href="#native-api-native-sub-api-method_sub_id">method_sub_id</a></li>
+        <li><a href="#native-api-native-sub-api-new_obj_raw">new_obj_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_obj">new_obj</a></li>
+        <li><a href="#native-api-native-sub-api-new_barray_raw">new_barray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_barray">new_barray</a></li>
+        <li><a href="#native-api-native-sub-api-new_sarray_raw">new_sarray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_sarray">new_sarray</a></li>
+        <li><a href="#native-api-native-sub-api-new_iarray_raw">new_iarray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_iarray">new_iarray</a></li>
+        <li><a href="#native-api-native-sub-api-new_larray_raw">new_larray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_larray">new_larray</a></li>
+        <li><a href="#native-api-native-sub-api-new_farray_raw">new_farray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_farray">new_farray</a></li>
+        <li><a href="#native-api-native-sub-api-new_darray_raw">new_darray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_darray">new_darray</a></li>
+        <li><a href="#native-api-native-sub-api-new_oarray_raw">new_oarray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_oarray">new_oarray</a></li>
+        <li><a href="#native-api-native-sub-api-new_marray_raw">new_marray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_marray">new_marray</a></li>
+        <li><a href="#native-api-native-sub-api-new_varray_raw">new_varray_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_varray">new_varray</a></li>
+        <li><a href="#native-api-native-sub-api-new_str_raw">new_str_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_str">new_str</a></li>
+        <li><a href="#native-api-native-sub-api-new_str_len_raw">new_str_len_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_str_len">new_str_len</a></li>
+        <li><a href="#native-api-native-sub-api-new_pointer_raw">new_pointer_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_pointer">new_pointer</a></li>
+        <li><a href="#native-api-native-sub-api-concat_raw">concat_raw</a></li>
+        <li><a href="#native-api-native-sub-api-concat">concat</a></li>
+        <li><a href="#native-api-native-sub-api-new_stack_trace_raw">new_stack_trace_raw</a></li>
+        <li><a href="#native-api-native-sub-api-new_stack_trace">new_stack_trace</a></li>
+        <li><a href="#native-api-native-sub-api-len">len</a></li>
+        <li><a href="#native-api-native-sub-api-belems">belems</a></li>
+        <li><a href="#native-api-native-sub-api-selems">selems</a></li>
+        <li><a href="#native-api-native-sub-api-ielems">ielems</a></li>
+        <li><a href="#native-api-native-sub-api-lelems">lelems</a></li>
+        <li><a href="#native-api-native-sub-api-felems">felems</a></li>
+        <li><a href="#native-api-native-sub-api-delems">delems</a></li>
+        <li><a href="#native-api-native-sub-api-oelems">oelems</a></li>
+        <li><a href="#native-api-native-sub-api-set_oelems">set_oelems</a></li>
+        <li><a href="#native-api-native-sub-api-bfield">bfield</a></li>
+        <li><a href="#native-api-native-sub-api-sfield">sfield</a></li>
+        <li><a href="#native-api-native-sub-api-ifield">ifield</a></li>
+        <li><a href="#native-api-native-sub-api-lfield">lfield</a></li>
+        <li><a href="#native-api-native-sub-api-ffield">ffield</a></li>
+        <li><a href="#native-api-native-sub-api-dfield">dfield</a></li>
+        <li><a href="#native-api-native-sub-api-ofield">ofield</a></li>
+        <li><a href="#native-api-native-sub-api-set_bfield">set_bfield</a></li>
+        <li><a href="#native-api-native-sub-api-set_sfield">set_sfield</a></li>
+        <li><a href="#native-api-native-sub-api-set_ifield">set_ifield</a></li>
+        <li><a href="#native-api-native-sub-api-set_lfield">set_lfield</a></li>
+        <li><a href="#native-api-native-sub-api-set_ffield">set_ffield</a></li>
+        <li><a href="#native-api-native-sub-api-set_dfield">set_dfield</a></li>
+        <li><a href="#native-api-native-sub-api-set_ofield">set_ofield</a></li>
+        <li><a href="#native-api-native-sub-api-bpkgvar">bpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-spkgvar">spkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-ipkgvar">ipkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-lpkgvar">lpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-fpkgvar">fpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-dpkgvar">dpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-opkgvar">opkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_bpkgvar">set_bpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_spkgvar">set_spkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_ipkgvar">set_ipkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_lpkgvar">set_lpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_fpkgvar">set_fpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_dpkgvar">set_dpkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-set_opkgvar">set_opkgvar</a></li>
+        <li><a href="#native-api-native-sub-api-pointer">pointer</a></li>
+        <li><a href="#native-api-native-sub-api-set_pointer">set_pointer</a></li>
+        <li><a href="#native-api-native-sub-api-call_sub">call_sub</a></li>
+        <li><a href="#native-api-native-sub-api-exception">exception</a></li>
+        <li><a href="#native-api-native-sub-api-set_exception">set_exception</a></li>
+        <li><a href="#native-api-native-sub-api-ref_count">ref_count</a></li>
+        <li><a href="#native-api-native-sub-api-inc_ref_count">inc_ref_count</a></li>
+        <li><a href="#native-api-native-sub-api-dec_ref_count">dec_ref_count</a></li>
+        <li><a href="#native-api-native-sub-api-enter_scope">enter_scope</a></li>
+        <li><a href="#native-api-native-sub-api-push_mortal">push_mortal</a></li>
+        <li><a href="#native-api-native-sub-api-leave_scope">leave_scope</a></li>
+        <li><a href="#native-api-native-sub-api-remove_mortal">remove_mortal</a></li>
+        <li><a href="#native-api-native-sub-api-is_type">is_type</a></li>
+        <li><a href="#native-api-native-sub-api-has_callback">has_callback</a></li>
+        <li><a href="#native-api-native-sub-api-object_basic_type_id">object_basic_type_id</a></li>
+        <li><a href="#native-api-native-sub-api-object_type_dimension">object_type_dimension</a></li>
+        <li><a href="#native-api-native-sub-api-weaken">weaken</a></li>
+        <li><a href="#native-api-native-sub-api-isweak">isweak</a></li>
+        <li><a href="#native-api-native-sub-api-unweaken">unweaken</a></li>
+        <li><a href="#native-api-native-sub-api-alloc_memory_block_zero">alloc_memory_block_zero</a></li>
+        <li><a href="#native-api-native-sub-api-free_memory_block">free_memory_block</a></li>
+        <li><a href="#native-api-native-sub-api-memory_blocks_count">memory_blocks_count</a></li>
+        <li><a href="#native-api-native-sub-api-type_name_raw">type_name_raw</a></li>
+        <li><a href="#native-api-native-sub-api-type_name">type_name</a></li>
+        <li><a href="#native-api-native-sub-api-new_env">new_env</a></li>
+        <li><a href="#native-api-native-sub-api-free_env">free_env</a></li>
+      </ul>
+
+      <h3 id="native-api-native-sub-api-runtime_package_vars_heap_offset">runtime_package_vars_heap_offset</h3>
+      <h3 id="native-api-native-sub-api-object_header_byte_size">object_header_byte_size</h3>
+      <h3 id="native-api-native-sub-api-weaken_backref_head">weaken_backref_head</h3>
+      <h3 id="native-api-native-sub-api-object_ref_count_offset">object_ref_count_offset</h3>
+      <h3 id="native-api-native-sub-api-object_basic_type_id_offset">object_basic_type_id_offset</h3>
+      <h3 id="native-api-native-sub-api-object_type_dimension_offset">object_type_dimension_offset</h3>
+      <h3 id="native-api-native-sub-api-object_runtime_type_offset">object_runtime_type_offset</h3>
+      <h3 id="native-api-native-sub-api-object_flag_offset">object_flag_offset</h3>
+      <h3 id="native-api-native-sub-api-object_length_offset">object_length_offset</h3>
+      <h3 id="native-api-native-sub-api-byte_object_basic_type_id">byte_object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-short_object_basic_type_id">short_object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-int_object_basic_type_id">int_object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-long_object_basic_type_id">long_object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-float_object_basic_type_id">float_object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-double_object_basic_type_id">double_object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-runtime">runtime</h3>
+      <h3 id="native-api-native-sub-api-exception_object">exception_object</h3>
+      <h3 id="native-api-native-sub-api-native_mortal_stack">native_mortal_stack</h3>
+      <h3 id="native-api-native-sub-api-native_mortal_stack_top">native_mortal_stack_top</h3>
+      <h3 id="native-api-native-sub-api-native_mortal_stack_capacity">native_mortal_stack_capacity</h3>
+      <h3 id="native-api-native-sub-api-basic_type_id">basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-field_id">field_id</h3>
+      <h3 id="native-api-native-sub-api-field_offset">field_offset</h3>
+      <h3 id="native-api-native-sub-api-pkgvar_id">pkgvar_id</h3>
+      <h3 id="native-api-native-sub-api-sub_id">sub_id</h3>
+      <h3 id="native-api-native-sub-api-method_sub_id">method_sub_id</h3>
+      <h3 id="native-api-native-sub-api-new_obj_raw">new_obj_raw</h3>
+      <h3 id="native-api-native-sub-api-new_obj">new_obj</h3>
+      <h3 id="native-api-native-sub-api-new_barray_raw">new_barray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_barray">new_barray</h3>
+      <h3 id="native-api-native-sub-api-new_sarray_raw">new_sarray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_sarray">new_sarray</h3>
+      <h3 id="native-api-native-sub-api-new_iarray_raw">new_iarray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_iarray">new_iarray</h3>
+      <h3 id="native-api-native-sub-api-new_larray_raw">new_larray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_larray">new_larray</h3>
+      <h3 id="native-api-native-sub-api-new_farray_raw">new_farray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_farray">new_farray</h3>
+      <h3 id="native-api-native-sub-api-new_darray_raw">new_darray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_darray">new_darray</h3>
+      <h3 id="native-api-native-sub-api-new_oarray_raw">new_oarray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_oarray">new_oarray</h3>
+      <h3 id="native-api-native-sub-api-new_marray_raw">new_marray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_marray">new_marray</h3>
+      <h3 id="native-api-native-sub-api-new_varray_raw">new_varray_raw</h3>
+      <h3 id="native-api-native-sub-api-new_varray">new_varray</h3>
+      <h3 id="native-api-native-sub-api-new_str_raw">new_str_raw</h3>
+      <h3 id="native-api-native-sub-api-new_str">new_str</h3>
+      <h3 id="native-api-native-sub-api-new_str_len_raw">new_str_len_raw</h3>
+      <h3 id="native-api-native-sub-api-new_str_len">new_str_len</h3>
+      <h3 id="native-api-native-sub-api-new_pointer_raw">new_pointer_raw</h3>
+      <h3 id="native-api-native-sub-api-new_pointer">new_pointer</h3>
+      <h3 id="native-api-native-sub-api-concat_raw">concat_raw</h3>
+      <h3 id="native-api-native-sub-api-concat">concat</h3>
+      <h3 id="native-api-native-sub-api-new_stack_trace_raw">new_stack_trace_raw</h3>
+      <h3 id="native-api-native-sub-api-new_stack_trace">new_stack_trace</h3>
+      <h3 id="native-api-native-sub-api-len">len</h3>
+      <h3 id="native-api-native-sub-api-belems">belems</h3>
+      <h3 id="native-api-native-sub-api-selems">selems</h3>
+      <h3 id="native-api-native-sub-api-ielems">ielems</h3>
+      <h3 id="native-api-native-sub-api-lelems">lelems</h3>
+      <h3 id="native-api-native-sub-api-felems">felems</h3>
+      <h3 id="native-api-native-sub-api-delems">delems</h3>
+      <h3 id="native-api-native-sub-api-oelems">oelems</h3>
+      <h3 id="native-api-native-sub-api-set_oelems">set_oelems</h3>
+      <h3 id="native-api-native-sub-api-bfield">bfield</h3>
+      <h3 id="native-api-native-sub-api-sfield">sfield</h3>
+      <h3 id="native-api-native-sub-api-ifield">ifield</h3>
+      <h3 id="native-api-native-sub-api-lfield">lfield</h3>
+      <h3 id="native-api-native-sub-api-ffield">ffield</h3>
+      <h3 id="native-api-native-sub-api-dfield">dfield</h3>
+      <h3 id="native-api-native-sub-api-ofield">ofield</h3>
+      <h3 id="native-api-native-sub-api-set_bfield">set_bfield</h3>
+      <h3 id="native-api-native-sub-api-set_sfield">set_sfield</h3>
+      <h3 id="native-api-native-sub-api-set_ifield">set_ifield</h3>
+      <h3 id="native-api-native-sub-api-set_lfield">set_lfield</h3>
+      <h3 id="native-api-native-sub-api-set_ffield">set_ffield</h3>
+      <h3 id="native-api-native-sub-api-set_dfield">set_dfield</h3>
+      <h3 id="native-api-native-sub-api-set_ofield">set_ofield</h3>
+      <h3 id="native-api-native-sub-api-bpkgvar">bpkgvar</h3>
+      <h3 id="native-api-native-sub-api-spkgvar">spkgvar</h3>
+      <h3 id="native-api-native-sub-api-ipkgvar">ipkgvar</h3>
+      <h3 id="native-api-native-sub-api-lpkgvar">lpkgvar</h3>
+      <h3 id="native-api-native-sub-api-fpkgvar">fpkgvar</h3>
+      <h3 id="native-api-native-sub-api-dpkgvar">dpkgvar</h3>
+      <h3 id="native-api-native-sub-api-opkgvar">opkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_bpkgvar">set_bpkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_spkgvar">set_spkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_ipkgvar">set_ipkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_lpkgvar">set_lpkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_fpkgvar">set_fpkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_dpkgvar">set_dpkgvar</h3>
+      <h3 id="native-api-native-sub-api-set_opkgvar">set_opkgvar</h3>
+      <h3 id="native-api-native-sub-api-pointer">pointer</h3>
+      <h3 id="native-api-native-sub-api-set_pointer">set_pointer</h3>
+      <h3 id="native-api-native-sub-api-call_sub">call_sub</h3>
+      <h3 id="native-api-native-sub-api-exception">exception</h3>
+      <h3 id="native-api-native-sub-api-set_exception">set_exception</h3>
+      <h3 id="native-api-native-sub-api-ref_count">ref_count</h3>
+      <h3 id="native-api-native-sub-api-inc_ref_count">inc_ref_count</h3>
+      <h3 id="native-api-native-sub-api-dec_ref_count">dec_ref_count</h3>
+      <h3 id="native-api-native-sub-api-enter_scope">enter_scope</h3>
+      <h3 id="native-api-native-sub-api-push_mortal">push_mortal</h3>
+      <h3 id="native-api-native-sub-api-leave_scope">leave_scope</h3>
+      <h3 id="native-api-native-sub-api-remove_mortal">remove_mortal</h3>
+      <h3 id="native-api-native-sub-api-is_type">is_type</h3>
+      <h3 id="native-api-native-sub-api-has_callback">has_callback</h3>
+      <h3 id="native-api-native-sub-api-object_basic_type_id">object_basic_type_id</h3>
+      <h3 id="native-api-native-sub-api-object_type_dimension">object_type_dimension</h3>
+      <h3 id="native-api-native-sub-api-weaken">weaken</h3>
+      <h3 id="native-api-native-sub-api-isweak">isweak</h3>
+      <h3 id="native-api-native-sub-api-unweaken">unweaken</h3>
+      <h3 id="native-api-native-sub-api-alloc_memory_block_zero">alloc_memory_block_zero</h3>
+      <h3 id="native-api-native-sub-api-free_memory_block">free_memory_block</h3>
+      <h3 id="native-api-native-sub-api-memory_blocks_count">memory_blocks_count</h3>
+      <h3 id="native-api-native-sub-api-type_name_raw">type_name_raw</h3>
+      <h3 id="native-api-native-sub-api-type_name">type_name</h3>
+      <h3 id="native-api-native-sub-api-new_env">new_env</h3>
+      <h3 id="native-api-native-sub-api-free_env">free_env</h3>
+
+    </div>
+    <div class="footer">
+      <div><a href="javascript:void(0)" class="to-top">▲</a></div>
+      <a href="https://github.com/yuki-kimoto/SPVM">SPVMプロジェクト</a>
+    </div>
+  </body>
+</html>

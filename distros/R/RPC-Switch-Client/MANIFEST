@@ -12,4 +12,6 @@ examples/rpc-switch-methods
 examples/rpc-switch-worker
 examples/rpc-switch-workers
 lib/RPC/Switch/Client.pm
+lib/RPC/Switch/Client/ReqAuth.pm
+lib/RPC/Switch/Client/ReqAuth/Password.pm
 t/00-load.t

@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2019 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -60,15 +60,17 @@ use base 'OSPF::LSDB';
 use File::Slurp;
 use Regexp::Common;
 use fields qw(
-    ospfctl ospfsock showdb
+    ospfd ospfctl ospfsock showdb
     selfid
     router network summary boundary external
 );
 
 sub new {
     my OSPF::LSDB::ospfd $self = OSPF::LSDB::new(@_);
+    $self->{ospfd} = "ospfd";
     $self->{ospfctl} = "ospfctl";
-    $self->{ospfsock} = "/var/run/ospfd.sock";
+    # XXX hard coded routing domain 0
+    $self->{ospfsock} = "/var/run/ospfd.sock.0";
     $self->{showdb} = {
 	router   => "router",
 	network  => "network",
@@ -87,10 +89,12 @@ sub ospfctl_show {
     my @cmd = ($self->{ospfctl}, "show", @_);
     if ($self->{ssh}) {
 	unshift @cmd, "ssh", $self->{ssh};
-    } else {
+    } elsif (-S $self->{ospfsock}) {
 	# no doas if user is root or in wheel group
 	# srw-rw----  1 root  wheel  0 Jun 13 10:10 /var/run/ospfd.sock
 	unshift @cmd, "doas" unless -w $self->{ospfsock};
+    } else {
+	die "Control socket '$self->{ospfsock}' for $self->{ospfd} missing.\n";
     }
     my @lines = wantarray ? `@cmd` : scalar `@cmd`;
     die "Command '@cmd' failed: $?\n" if $?;

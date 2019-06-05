@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.134;
+package Config::Model::Node 2.135;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -1223,7 +1223,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.134
+version 2.135
 
 =head1 SYNOPSIS
 
@@ -1614,7 +1614,7 @@ Returns empty if no matching element is found.
 =head2 model_searcher
 
 Returns an object dedicated to search an element in the configuration
-model (respecting privilege level).
+model.
 
 This method returns a L<Config::Model::SearchElement> object. See
 L<Config::Model::SearchElement> for details on how to handle a search.

@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "JSON::MaybeXS" : "0",
-            "JSON::RPC2::TwoWay" : "0.03",
+            "JSON::RPC2::TwoWay" : "0.04",
             "MojoX::NetstringStream" : "0.06",
             "Mojolicious" : "7.55",
             "perl" : "5.010"
@@ -41,7 +41,7 @@
          "web" : "https://github.com/a6502/RPC-Switch-Client"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

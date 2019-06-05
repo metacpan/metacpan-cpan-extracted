@@ -1,3 +1,18 @@
+v0.90.5 2019-06-05T08:14:51Z
+ - filter decrypt hack
+
+v0.90.4 2019-06-05T06:45:29Z
+ - class util refactored
+
+v0.90.3 2019-06-05T05:26:27Z
+ - locales
+
+v0.90.2 2019-06-05T04:35:41Z
+ - module <-> package conversion methods added
+
+v0.90.1 2019-06-05T03:02:22Z
+ - typo
+
 v0.90.0 2019-06-04T15:32:25Z
  - docker ls show duration
  - refactored

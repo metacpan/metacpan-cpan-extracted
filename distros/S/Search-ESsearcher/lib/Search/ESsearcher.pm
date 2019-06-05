@@ -17,11 +17,11 @@ Search::ESsearcher - Provides a handy system for doing templated elasticsearch s
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.1
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.1';
 
 
 =head1 SYNOPSIS
@@ -1186,6 +1186,10 @@ L<https://cpanratings.perl.org/d/Search-ESsearcher>
 =item * Search CPAN
 
 L<https://metacpan.org/release/Search-ESsearcher>
+
+=item * Repository
+
+L<https://github.com/VVelox/Search-ESsearcher>
 
 =back
 

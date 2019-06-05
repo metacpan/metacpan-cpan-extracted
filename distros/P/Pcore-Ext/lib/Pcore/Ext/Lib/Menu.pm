@@ -22,7 +22,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') {
                 localeButton = this.lookup('change-locale-button'),
                 locales = this.getViewModel().get('settings').locales;
 
-            if (Ext.isObject(locales) && !Ext.Object.isEmpty(locales)) {
+            if (view.getShowLocalesButton() && Ext.isObject(locales) && !Ext.Object.isEmpty(locales)) {
                 var localeMenu = [];
 
                 for (var locale of Object.keys(locales).sort()) {
@@ -79,16 +79,14 @@ JS
 
             Ext.fireEvent('signout');
 JS
-
-        profile => func <<"JS",
-            this.getView().hide();
-JS
     };
 }
 
 sub EXT_panel : Extend('Ext.ActionSheet') {
     return {
         controller => $type{controller},
+
+        config => { showLocalesButton => \1, },
 
         cover      => \1,
         reveal     => \0,

@@ -432,8 +432,15 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               break;
             }
             case SPVM_OP_C_ID_LAST: {
-              if (check_ast_info->loop_block_stack_length == 0 && check_ast_info->op_switch_stack->length == 0) {
-                SPVM_COMPILER_error(compiler, "last statement must be in loop block or switch block at %s line %d\n", op_cur->file, op_cur->line);
+              if (check_ast_info->loop_block_stack_length == 0) {
+                SPVM_COMPILER_error(compiler, "last statement must be in loop block at %s line %d\n", op_cur->file, op_cur->line);
+                return;
+              }
+              break;
+            }
+            case SPVM_OP_C_ID_BREAK: {
+              if (check_ast_info->op_switch_stack->length == 0) {
+                SPVM_COMPILER_error(compiler, "break statement must be in switch block or switch block at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               break;
@@ -480,12 +487,18 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               SPVM_SWITCH_INFO* switch_info = op_cur->uv.switch_info;
               SPVM_LIST* cases = switch_info->case_infos;
-              int32_t length = cases->length;
+              int32_t cases_length = cases->length;
               
+              // Need at least one case
+              if (cases_length == 0) {
+                SPVM_COMPILER_error(compiler, "Switch statement need at least one case statement in  at %s line %d\n", op_cur->file, op_cur->line);
+                return;
+              }
+
               // Check case type
               {
                 int32_t i;
-                for (i = 0; i < length; i++) {
+                for (i = 0; i < cases_length; i++) {
                   SPVM_CASE_INFO* case_info = SPVM_LIST_fetch(cases, i);
                   SPVM_OP* op_constant = case_info->op_case_info->first;
                   SPVM_CONSTANT* constant = op_constant->uv.constant;
@@ -494,9 +507,15 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_COMPILER_error(compiler, "case value must be constant at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
+
+                  // Upgrade byte to int
+                  if (constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                    constant->type = SPVM_TYPE_create_int_type(compiler);
+                    constant->value.ival = (int32_t)constant->value.bval;
+                  }
                   
-                  SPVM_TYPE* case_multi_numeric_type = SPVM_OP_get_type(compiler, op_constant);
-                  if (!(case_multi_numeric_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT && case_multi_numeric_type->dimension == 0)) {
+                  SPVM_TYPE* case_value_type = SPVM_OP_get_type(compiler, op_constant);
+                  if (!(case_value_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT && case_value_type->dimension == 0)) {
                     SPVM_COMPILER_error(compiler, "case value must be int constant at %s line %d\n", case_info->op_case_info->file, case_info->op_case_info->line);
                     return;
                   }
@@ -525,10 +544,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_COMPILER_error(compiler, "Too many switch at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              op_cur->uv.switch_info->constant_pool_id = package->info_switch_infos->length;
               SPVM_LIST_push(package->info_switch_infos, op_cur->uv.switch_info);
-              
-              op_cur->uv.switch_info->constant_pool_id_new = package->constant_pool->length;
               
               // Min
               SPVM_CASE_INFO* case_info_mini = SPVM_LIST_fetch(switch_info->case_infos, 0);
@@ -540,12 +556,15 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               // Decide switch type
               double range = (double)max - (double)min;
-              if (4.0 + range <= (3.0 + 2.0 * (double) length) * 1.5) {
+              if (4.0 + range <= (3.0 + 2.0 * (double) cases_length) * 1.5) {
                 switch_info->id = SPVM_SWITCH_INFO_C_ID_TABLE_SWITCH;
               }
               else {
                 switch_info->id = SPVM_SWITCH_INFO_C_ID_LOOKUP_SWITCH;
               }
+              
+              // Switch info constant pool id
+              op_cur->uv.switch_info->constant_pool_id = package->constant_pool->length;
               
               // Table switch constant pool
               if (switch_info->id == SPVM_SWITCH_INFO_C_ID_TABLE_SWITCH) {
@@ -3704,6 +3723,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         case SPVM_OP_C_ID_DIE:
                         case SPVM_OP_C_ID_LAST:
                         case SPVM_OP_C_ID_NEXT:
+                        case SPVM_OP_C_ID_BREAK:
                         case SPVM_OP_C_ID_ADD:
                         case SPVM_OP_C_ID_SUBTRACT:
                         case SPVM_OP_C_ID_MULTIPLY:

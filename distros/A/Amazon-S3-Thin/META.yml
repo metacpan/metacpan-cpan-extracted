@@ -26,7 +26,7 @@ no_index:
 provides:
   Amazon::S3::Thin:
     file: lib/Amazon/S3/Thin.pm
-    version: '0.23'
+    version: '0.24'
   Amazon::S3::Thin::Credentials:
     file: lib/Amazon/S3/Thin/Credentials.pm
   Amazon::S3::Thin::Resource:
@@ -50,13 +50,14 @@ resources:
   bugtracker: https://github.com/DQNEO/Amazon-S3-Thin/issues
   homepage: https://github.com/DQNEO/Amazon-S3-Thin
   repository: git://github.com/DQNEO/Amazon-S3-Thin.git
-version: '0.23'
+version: '0.24'
 x_contributors:
   - 'Bob Showalter <showaltb@gmail.com>'
   - 'Bob Stockdale <bstockdale@zappos.com>'
   - 'Breno G. de Oliveira <garu@cpan.org>'
   - 'DQNEO <dqneoo@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
   - 'Timothy Appnel <tim@appnel.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1
