@@ -34,8 +34,8 @@ has table_class_name => (
 );
 
 has extends => (
-	is => 'ro',
-	isa => 'Str',
+	is       => 'ro',
+	isa      => 'Str',
 	required => 1,
 );
 
@@ -59,26 +59,29 @@ method generate {
 	my %seen;
 	my @columns = $self->table->get_columns;
 
-	foreach my $col (@columns) {
-		$seen{ $col->name }++;
-	}
+	foreach my $column (@columns) {
+		$seen{ $column->name }++;
+		
+		foreach my $table ( $self->table->get_parent_tables(column_name => $column->name) ) {
+			foreach my $parent_col ( $table->get_columns ) {
+				
+				next if $seen{ $parent_col->name };
+			
+				if ($column->is_null) {
+					$parent_col->is_null(1);
+				}
+				
+				push @attr,
+				  $self->attribute_maker->make_attribute(
+					name     => $parent_col->name,
+					comments => $self->get_column_attribute_comments($parent_col),
+					is       => 'rw',
+					isa      => $parent_col->get_moose_type,
+					trigger  => $self->get_column_trigger($parent_col),
+				  );
 
-	foreach my $table ( $self->table->get_parent_tables ) {
-
-		foreach my $col ( $table->get_columns ) {
-
-			next if $seen{ $col->name };
-
-			push @attr,
-			  $self->attribute_maker->make_attribute(
-				name     => $col->name,
-				comments => $self->get_column_attribute_comments($col),
-				is       => 'rw',
-				isa      => $col->get_moose_type,
-				trigger  => $self->get_column_trigger($col),
-			  );
-
-			$seen{ $col->name } = 1;
+				$seen{ $parent_col->name } = 1;
+			}
 		}
 	}
 
@@ -90,10 +93,10 @@ method generate {
 			'namespace::autoclean', 'Method::Signatures',
 			"Data::Printer alias => 'pdump'"
 		],
-		extends => [$self->extends],
+		extends => [ $self->extends ],
 		attribs => \@attr,
 	);
-	
+
 	$self->trace('exit');
 }
 

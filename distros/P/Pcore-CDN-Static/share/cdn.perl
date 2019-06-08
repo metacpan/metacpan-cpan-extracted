@@ -11,7 +11,7 @@
 
     # FontAwesome
     fa5 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v5.8.2 );
+        my $ver = version->parse( $args->{ver} // v5.9.0 );
 
         state $native_prefix = 'https://use.fontawesome.com/releases';
 

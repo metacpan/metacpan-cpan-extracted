@@ -1,7 +1,7 @@
 package Algorithm::Backoff::Fibonacci;
 
-our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -16,6 +16,7 @@ $SPEC{new} = {
     is_func => 0,
     args => {
         %Algorithm::Backoff::attr_consider_actual_delay,
+        %Algorithm::Backoff::attr_max_actual_duration,
         %Algorithm::Backoff::attr_max_attempts,
         %Algorithm::Backoff::attr_jitter_factor,
         %Algorithm::Backoff::attr_delay_on_success,
@@ -75,7 +76,7 @@ Algorithm::Backoff::Fibonacci - Backoff using Fibonacci sequence
 
 =head1 VERSION
 
-This document describes version 0.003 of Algorithm::Backoff::Fibonacci (from Perl distribution Algorithm-Backoff), released on 2019-04-10.
+This document describes version 0.004 of Algorithm::Backoff::Fibonacci (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
 
 =head1 SYNOPSIS
 
@@ -83,28 +84,30 @@ This document describes version 0.003 of Algorithm::Backoff::Fibonacci (from Per
 
  # 1. instantiate
 
- my $ar = Algorithm::Backoff::Fibonacci->new(
-     #max_attempts     => 0, # optional, default 0 (retry endlessly)
-     #jitter_factor    => 0.25, # optional, default 0
-     initial_delay1    => 2, # required
-     initial_delay2    => 3, # required
-     #max_delay        => 20, # optional
-     #delay_on_success => 0, # optional, default 0
+ my $ab = Algorithm::Backoff::Fibonacci->new(
+     #consider_actual_delay => 1, # optional, default 0
+     #max_actual_duration   => 0, # optional, default 0 (retry endlessly)
+     #max_attempts          => 0, # optional, default 0 (retry endlessly)
+     #jitter_factor         => 0.25, # optional, default 0
+     initial_delay1         => 2, # required
+     initial_delay2         => 3, # required
+     #max_delay             => 20, # optional
+     #delay_on_success      => 0, # optional, default 0
  );
 
  # 2. log success/failure and get a new number of seconds to delay, timestamp is
  # optional but must be monotonically increasing.
 
  my $secs;
- $secs = $ar->failure();   # =>  2 (= initial_delay1)
- $secs = $ar->failure();   # =>  3 (= initial_delay2)
- $secs = $ar->failure();   # =>  5 (= 2+3)
- $secs = $ar->failure();   # =>  8 (= 3+5)
+ $secs = $ab->failure();   # =>  2 (= initial_delay1)
+ $secs = $ab->failure();   # =>  3 (= initial_delay2)
+ $secs = $ab->failure();   # =>  5 (= 2+3)
+ $secs = $ab->failure();   # =>  8 (= 3+5)
  sleep 1;
- $secs = $ar->failure();   # => 12 (= 5+8 -1)
- $secs = $ar->failure();   # => 20 (= min(13+8, 20) = max_delay)
+ $secs = $ab->failure();   # => 12 (= 5+8 -1)
+ $secs = $ab->failure();   # => 20 (= min(13+8, 20) = max_delay)
 
- $secs = $ar->success();   # =>  0 (= delay_on_success)
+ $secs = $ab->success();   # =>  0 (= delay_on_success)
 
 =head1 DESCRIPTION
 
@@ -114,8 +117,12 @@ example, if the two initial numbers are 2 and 3:
  2, 3, 5, 8, 13, 21, ...
 
 C<initial_delay1> and C<initial_delay2> are required. The other attributes are
-optional. It is recommended to add a jitter factor, e.g. 0.25 to add some
-randomness.
+optional.
+
+There are limits on the number of attempts (`max_attempts`) and total duration
+(`max_actual_duration`).
+
+It is recommended to add a jitter factor, e.g. 0.25 to add some randomness.
 
 =head1 METHODS
 
@@ -164,6 +171,18 @@ If you set this to a value larger than 0, the actual delay will be between a
 random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
 
 =item * B<max_attempts> => I<uint> (default: 0)
 

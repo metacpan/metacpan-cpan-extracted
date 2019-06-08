@@ -4,7 +4,7 @@
       "John Gravatt <gravattj@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -36,7 +36,7 @@
             "Data::Printer" : "0",
             "Method::Signatures" : "0",
             "Module::Refresh" : "0",
-            "MySQL::Util" : "0.38",
+            "MySQL::Util" : "0.4",
             "Perl::Tidy::Sweetened" : "0",
             "SQL::Abstract::Complete" : "0",
             "Text::Trim" : "0",
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

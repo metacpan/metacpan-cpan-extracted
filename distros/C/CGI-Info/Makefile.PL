@@ -44,6 +44,7 @@ WriteMakefile(
 		'String::Clean::XSS' => 0,
 		'Log::Any' => 0,
 		'JSON::Parse' => 0,
+		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		# 'String::EscapeCage' => 0.02,
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,

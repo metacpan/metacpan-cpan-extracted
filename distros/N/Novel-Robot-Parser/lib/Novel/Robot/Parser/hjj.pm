@@ -17,7 +17,7 @@ sub charset { 'cp936' }
 sub site_type { 'tiezi' }
 
 sub parse_novel {
-  my ( $self, $h , $r) = @_;
+  my ( $self, $h, $r) = @_;
   my %t;
   for ( $$h ) {
     ( $t{title} )   = m{<td bgcolor="\#E8F3FF"><div [^>]+?style="float: left;">\s*主题：(.+?)\s*<font color="\#999999" size="-1">}s;
@@ -25,7 +25,7 @@ sub parse_novel {
     $t{content} ||= '';
     $t{content} =~ s#</?font[^>]+>##sg;
     ( $t{writer}, $t{time} ) =
-      m#№0&nbsp;</font>.*?☆☆☆</font>(.*?)</b><font color="99CC00">于</font>(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})留言#s;
+      m#№0 </font>.*?☆☆☆</font>(.*?)</b><font color="99CC00">于</font>(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})留言#s;
 
     $t{writer} ||= 'unknown';
     $t{writer} =~ s/<\/?(font|b).*?>//gsi;
@@ -83,7 +83,7 @@ sub parse_board {
   my ( $self, $h ) = @_;
   my ( $title ) =
     $$h =~ m[<div style="float:left;position:relative;padding-top:3px;padding-left:4px;"><font color="red">(.+?)</font></div>]s;
-  return $title;
+  return { title => $title };
 }
 
 sub parse_board_item {

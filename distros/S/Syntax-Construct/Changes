@@ -1,5 +1,12 @@
 Revision history for Syntax-Construct
 
+1.009   2019-06-07
+
+        - Perl 5.30 was released
+        - Test that constructs return a wrong value in older versions,
+          add a flag for tests that fail only sometimes
+        - Fix missing or wrong tests
+
 1.008   2018-09-26
 
         - Fix links to 5.26 delta
@@ -148,7 +155,7 @@ Revision history for Syntax-Construct
 
 0.04    2014-04-23
 
-        - Links to perldelta for 5.18.	
+        - Links to perldelta for 5.18.
 
 0.03    2014-01-18
 

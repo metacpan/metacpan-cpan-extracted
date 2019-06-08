@@ -49,15 +49,20 @@ subtest 'test reset' => sub {
     is $a->loops, 0, "Reset loop counter too";
 };
 
-for ( 1 .. $a->size) {
+for ( 1 .. $a->size * 2) {
     subtest "test peek and size for starting index $_" => sub {
-        for (0 .. $a->size ) {
+        for (0 .. $a->size *2 ) {
+            $DB::single=1;
             my $expected = $a->peek($_);
-            my $got = $a->[($_ + $a->index) % $a->size];
+            my $idx = ($_ + $a->index) % $a->size;
+            diag "Peek index is $idx";
+            my $got = $a->[$idx];
             is $got, $expected, "peeking $_: $expected and $got are the same";
         }
     };
+    $a->next;
 }
+$a->reset;
 
 
 

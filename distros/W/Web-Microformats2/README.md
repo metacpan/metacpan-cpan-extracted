@@ -35,7 +35,7 @@ it as a queryable in-memory object. They can also serialize this object
 as JSON (using the Microformats2 rules for this), or read an already
 JSON-serialized Microformats2 structure for further analysis.
 
-See ["ABOUT MICROFORMATS"](#about-microformats), below, for arguments about why this might
+See ["ABOUT MICROFORMATS2"](#about-microformats2), below, for arguments about why this might
 be interesting to you.
 
 # CLASSES
@@ -61,16 +61,15 @@ be interesting to you.
 
 # STATUS
 
-These modules are **alpha**. Their developer is still figuring out how
-they want to be used, and their interface may change dramatically. This
-software is currently being "dogfooded" on an experimental branch of the
-author's own essay blog.
+These modules provide a _reasonably complete_ implementation of [the
+Microformats2 Living
+Specification](http://microformats.org/wiki/microformats2-parsing). They
+pass all of [the official MF2 baseline test
+cases](https://github.com/microformats/tests), a copy of which is
+included with these modules' own test suite.
 
-Further, the parser implementation is incomplete. The HTML and JSON
-documents found in t/microformats-v2 are based on the full Microformats2
-parser test suite found at [https://github.com/microformats/tests](https://github.com/microformats/tests), as
-of mid-2018, and this library currently passes around 80 percent of
-them.
+The author considers this software **beta**. Its public interface may
+still change, but not without some effort at supporting its current API.
 
 # ABOUT MICROFORMATS2
 
@@ -105,7 +104,8 @@ user-definable labels for metadata items and their constituent
 properties.
 
 For more information about Microformats2, please see
-[http://microformats.org/wiki/microformats2](http://microformats.org/wiki/microformats2).
+[https://microformats.io](https://microformats.io). For a deep dive into the MF2 specification,
+see [http://microformats.org/wiki/microformats2](http://microformats.org/wiki/microformats2).
 
 # SUPPORT
 

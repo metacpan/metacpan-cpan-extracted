@@ -1,10 +1,11 @@
 package Tie::Hash::MinPerfHashTwoLevel::OnDisk;
 use strict;
 use warnings;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
+our $DEFAULT_VARIANT = 5;
 
 # this also installs the XS routines we use into our namespace.
-use Algorithm::MinPerfHashTwoLevel ( 'hash_with_state', '$DEFAULT_VARIANT', ':flags', 'MAX_VARIANT' );
+use Algorithm::MinPerfHashTwoLevel ( 'hash_with_state', '$DEFAULT_VARIANT', ':flags', 'MAX_VARIANT', 'MIN_VARIANT' );
 use Exporter qw(import);
 my %constants;
 BEGIN {
@@ -21,7 +22,7 @@ use constant \%constants;
 use Carp;
 
 our %EXPORT_TAGS = (
-    'all' => [ qw(mph2l_tied_hashref mph2l_make_file MAX_VARIANT), sort keys %constants ],
+    'all' => [ qw(mph2l_tied_hashref mph2l_make_file MAX_VARIANT MIN_VARIANT), sort keys %constants ],
     'flags' => ['MPH_F_DETERMINISTIC', grep /MPH_F_/, sort keys %constants],
     'magic' => [grep /MAGIC/, sort keys %constants],
 );
@@ -145,23 +146,28 @@ sub make_file {
     my $comment= $opts{comment}||"";
     my $debug= $opts{debug} || 0;
     my $variant= int($opts{variant});
-    my $deterministic= $opts{canonical} || $opts{deterministic};
-    delete $opts{canonical};
-    delete $opts{deterministic};
+    my $deterministic;
+    $deterministic //= delete $opts{canonical};
+    $deterministic //= delete $opts{deterministic};
+    $deterministic //= 1;
 
                     #1234567812345678
     $opts{seed} = "MinPerfHash2Levl"
         if !defined($opts{seed}) and $deterministic;
 
     my $compute_flags= int($opts{compute_flags}||0);
-    $compute_flags += MPH_F_NO_DEDUPE if delete $opts{no_dedupe};
-    $compute_flags += MPH_F_DETERMINISTIC
+    $compute_flags |= MPH_F_NO_DEDUPE if delete $opts{no_dedupe};
+    $compute_flags |= MPH_F_DETERMINISTIC
         if $deterministic;
-    $compute_flags += MPH_F_FILTER_UNDEF
+    $compute_flags |= MPH_F_FILTER_UNDEF
         if delete $opts{filter_undef};
 
-    die "Unknown file variant $variant"
-        if $variant > MAX_VARIANT or $variant < 0;
+    die "Unknown variant '$variant', max known is "
+        . MAX_VARIANT . " default is " . $DEFAULT_VARIANT
+        if $variant > MAX_VARIANT;
+    die "Unknown variant '$variant', min known is "
+        . MIN_VARIANT . " default is " . $DEFAULT_VARIANT
+        if $variant < MIN_VARIANT;
 
     die "comment cannot contain null"
         if index($comment,"\0") >= 0;
@@ -338,8 +344,7 @@ MPH_F_FILTER_UNDEF bit in compute_flags.
 =item max_tries
 
 The maximum number of attempts to make to find a solution for this keyset.
-Defaults to 10. This value is more relevant for older variants, as of variant 3
-computation should succeed on first attempt unless you are extremely unlucky.
+Defaults to 3. 
 
 =item debug
 
@@ -355,15 +360,13 @@ When omitted the variant is determined by the global var
 which itself defaults to the latest version. This is mostly for testing,
 Older variants will be deprecated and removed eventually.
 
-The list of variants is as follows:
+The list of supported variants is as follows:
 
-    0 - Pure xor search, high chance of failure to construct, and "slow"
-        construction of buckets with no collisions, 16 byte alignment,
-        two checksums.
-    1 - Xor search with "fast" construction of buckets with collisions,
-        16 byte alignment, two checksums.
-    2 - Xor, fast, with inthash, 16 byte alignment, two checksums.
-    3 - Xor, fast, with inthash, 8 byte alignment, one checksum.
+    5 - Xor, siphash, with inthash, 8 byte alignment, one checksum.
+
+Variants 0 through 3 were available in v0.14, variant 4 was never released.
+Prior to variant 5 the hash function was stadtx hash, but in variant 5 we
+switched to SipHash 1-3.
 
 =back
 
@@ -442,57 +445,51 @@ function which is wrapper around this function.
 
 =head2 FILE FORMAT
 
-Currently there are four file format variants, 0 through 3. In general the file formats
-are very similar.
+Currently there is only one support file format variant, 5.
 
 The file structure consists of a header, followed by a byte vector of seed/state
 data for the hash function, followed by a bucket table with records of a fixed size,
-followed by a bitvector of the flags for the keys with two bits per key,
-followed by a bitvector of flags for values with one bit per value, followed by a
-string table containing the comment for the file and the strings it contains.
-The key flags may be 0 for "latin-1/not-utf8", 1 for "is-utf8", and 2 for "was-utf8"
-which is used for keys which can be represented as latin-1, but should be restored
-as unicode/utf8. The val flags are similar but do not (need to) support "was-utf8".
+optionally followed by a bitvector of the flags for the keys with two bits per key,
+optionally followed by a bitvector of flags for values with one bit per value,
+followed by a string table containing the comment for the file and the strings it 
+contains, and lastly a checksum; the last 8 bytes of the file contain a hash of the
+rest of the file. The key flags may be 0 for "latin-1/not-utf8", 1 for "is-utf8", 
+and 2 for "was-utf8" which is used for keys which can be represented as latin-1, 
+but should be restored as unicode/utf8. The val flags are similar but do not (need to) 
+support "was-utf8".
 
 Structure:
 
     Header
     Hash-state
     Bucket-table
-    Key flags
-    Val flags
+    Key flags (optional)
+    Val flags (optional)
     Strings
+    Checksum
 
 Header:
 
     U32 magic_num       -> 1278363728 -> "PH2L"
-    U32 variant         -> 3
+    U32 variant         -> 5
     U32 num_buckets     -> number of buckets/keys in hash
     U32 state_ofs       -> offset in file where hash preseeded state is found
     U32 table_ofs       -> offset in file where bucket table starts
     U32 key_flags_ofs   -> offset in file where key flags are located
     U32 val_flags ofs   -> offset in file where val flags are located
     U32 str_buf_ofs     -> offset in file where strings are located
-    U64 table_checksum  -> hash value checksum of table and key/val flags
-    U64 str_buf_checksum-> hash value checksum of string data
+    U64 general_flags   -> flags used for this header
+    U64 reserved        -> reserved field.
 
-All "_ofs" members in the header are aligned on 16 byte boundaries for variants
-0-2, and on 8 byte boundaries for later variants, and may be right padded with nulls
-if necessary to make them be the correct length.
+All "_ofs" values in the header are a multiple of 8, and the relevant sections
+maybe be null padded to ensure this is so.
 
 The string buffer contains the comment at str_buf_ofs+1, its length can be found
 with strlen(), the comment may NOT contain nulls, and will be null terminated. All
 other strings in the table are NOT null padded, the length data stored in the
-bucket records should be used to determine the length of the keys and values. In
-variant 3 and later the last 8 bytes of the string buffer contains a hash checksum
-of the rest of the entire file. This value is itself 8 byte aligned.
-
-The table_checksum is the hash (using the seed/state data stored at state_ofs)
-of the data in the file from table_ofs to str_buf_ofs, eg it includes the
-key_flags bit vector and val_flags bit vector. The str_buf_checksum is
-similar but of the data from the str_buf_ofs to the end of the file. In variant
-3 and later these fields are not used and will be set to 0. In some future
-variant they may be repurposed.
+bucket records should be used to determine the length of the keys and values. 
+The last 8 bytes of the file contains a hash checksum of the rest of the entire 
+file. This value is itself 8 byte aligned.
 
 Buckets:
 
@@ -505,7 +502,7 @@ Buckets:
    U16 key_len      -> length of key
    U16 val_len      -> length of value
 
-The hash function used is stadtx hash, which uses a 16 byte seed to produce
+The hash function used is Siphash 1-3, which uses a 16 byte seed to produce
 a 32 byte state vector used for hashing. The file contains the state vector
 required for hashing and does not include the original seed.
 

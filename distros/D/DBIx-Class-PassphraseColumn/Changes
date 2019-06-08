@@ -1,7 +1,13 @@
-0.02  Fri, 13 May 2011 11:34:27 +0200
+Revision history for DBIx-Class-PassphraseColumn
+
+0.03      2019-06-07 01:04:05Z
+  * add DBD::SQLite to test requirements (RT#79809)
+  * remove unused SQL::Translator from test requirements.
+
+0.02      2011-05-13 09:34:27Z
   * Stop hashed passphrases from being overwritten by plain-text
     passphrases. Thanks, Gareth Harper <spansh@gmail.com> for finding this and
     suggesting a fix.
 
-0.01  Thu, 09 Dec 2010 16:12:39 +0100
+0.01      2010-12-09 15:12:39Z
   * Initial release.

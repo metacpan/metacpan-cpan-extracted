@@ -1,6 +1,6 @@
 package Promises::Channel;
 # ABSTRACT: a coordination channel implemented with Promises
-$Promises::Channel::VERSION = '0.01';
+$Promises::Channel::VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -65,7 +65,6 @@ sub put {
   my $soon = deferred;
 
   my $promise = $soon->promise->then(sub {
-    my ($self, $item) = @_;
     $self->drain;
     return $self;
   });
@@ -153,17 +152,19 @@ Promises::Channel - a coordination channel implemented with Promises
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
+  # See notes about recursion in Promises::Cookbook::Recursion
+  use Promises backend => ['AE'], 'deferred';
   use Promises::Channel qw(channel);
 
   my $channel = channel
     limit => 4;
 
 
-  # Use to invert control on an AnyEvent::Handle
+  # Use $channel to invert control on an AnyEvent::Handle
   $ae_handle->on_read(sub {
     my $handle = shift;
 
@@ -178,13 +179,12 @@ version 0.01
   });
 
 
-  # See notes about recursion in Promises::Cookbook::Recursion
   sub reader {
     my ($channel, $line) = @_;
     do_stuff $line;
 
-    # Queue the next read
-    $channel->get->then(\&reader);
+    # Queue the next read, using done to avoid recursion
+    $channel->get->done(\&reader);
   }
 
   $channel->get->then(\&reader);
@@ -271,7 +271,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Jeff Ober.
+This software is copyright (c) 2019 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

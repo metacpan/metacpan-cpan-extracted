@@ -1,5 +1,30 @@
 Changelog for Yancy
 
+1.031     2019-06-06 21:24:24-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed screenshot display in documentation.
+
+1.030     2019-06-06 21:05:22-05:00 America/Chicago
+
+    [Added]
+
+    - Added 'yancy.editor.include' and 'yancy.editor.menu' helpers.
+      These helpers allow you to add new VueJS components to the editor
+      application to help manage the content in your web application.
+
+1.029     2019-06-06 00:22:57-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed some bugs in the editor caused by switching to
+      Yancy::Controller::Yancy.
+
+    [Added]
+
+    - Added Selenium tests for the Yancy editor
+
 1.028     2019-06-04 12:11:51-05:00 America/Chicago
 
     [Fixed]

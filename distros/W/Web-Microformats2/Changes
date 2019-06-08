@@ -1,14 +1,37 @@
 Revision history for Web::Microformats2
 
+0.501 2019-06-06T16:26:33Z
+
+    - Improved parsing of an edge case where the input document wants to
+    place a new h-format under several u- or p- properties. (Probably
+    erroneously, but we should still handle it gracefully.)
+
+0.5 2018-07-30T13:50:48Z
+
+    - Added support for parsing and presenting "rel" attributes.
+    
+    - Improved rendering of implied "value" data.
+    
+    - Improved rendering of implied "name" properties.
+    
+    - Added partial support for implied dates (regarding parsed datetime
+    properties that specify a time but no date).
+    
+    - All 73 of the official Microformats2 tests pass now, so I removed
+    all the TODO stuff from the test suite.
+
 0.401 2018-07-23T11:59:13Z
 
     - Improved parsing and presentation of datetime properties.
     
-    - Updated the tests to account for recent specification changes. (As a happy side effect, eleven formerly TODO-marked tests now run and pass.)
+    - Updated the tests to account for recent specification changes. (As
+    a happy side effect, eleven formerly TODO-marked tests now run and
+    pass.)
 
 0.4 2018-05-18T13:10:37Z
 
-    - Tests should now pass with older Perl versions. (GitHub issue #1; thanks to Slaven Rezić for the bug report.)
+    - Tests should now pass with older Perl versions. (GitHub issue #1;
+    thanks to Slaven Rezić for the bug report.)
     
     - Adding Travis config.
 
@@ -20,11 +43,13 @@ Revision history for Web::Microformats2
 
     - Improved parsing of implied name properties.
 
-    - Better handling of HTML documents that define multiple top-level Microformats2 items.
+    - Better handling of HTML documents that define multiple top-level
+    Microformats2 items.
 
 0.02 2018-04-20T19:59:48Z
 
-    - Changing the public method used for returning a item's types. (New, flexible "all_types" method, removing blunt "types" from POD.)
+    - Changing the public method used for returning a item's types.
+    (New, flexible "all_types" method, removing blunt "types" from POD.)
 
 0.01 2018-04-18T01:23:53Z
 

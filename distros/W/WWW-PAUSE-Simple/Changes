@@ -1,3 +1,9 @@
+0.444   2019-06-05 (PERLANCAR)
+
+	- Use exponential backoff strategy for retries, deprecate
+	  retry_delay and replace it with retry_max_delay.
+
+
 0.443   2019-05-06 (PERLANCAR)
 
 	- ls: Add options --{size,mtime}-{min,max}.

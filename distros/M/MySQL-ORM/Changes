@@ -1,5 +1,7 @@
 Revision history for MySQL-ORM
 
+0.10    - improved MySQL::ORM::Generate::Class::ResultClassX::generate() to better handle null columns in selectx 
+
 0.09    - reverted uniq columns feature added in 0.07
 
 0.08	- fixed bug with get_id() method sig generation

@@ -1,5 +1,7 @@
 Revision history for MySQL-Util
 
+0.40    - Added column_name arg to MySQL::Util::Lite::Table::get_parent_tables()
+
 0.39    - Treat datetime column type as Str instead of Num
 
 0.38    - Use fully qualified db name when searching for columns/keys.

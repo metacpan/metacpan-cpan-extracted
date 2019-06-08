@@ -14,7 +14,7 @@ use Data::Dumper;
 
 ### {{{ data
 
-our $VERSION = 0.31;
+our $VERSION = 0.32;
 
 our %SITE_DOM_NAME = (
   'bbs.jjwxc.net'   => 'hjj',
@@ -22,6 +22,7 @@ our %SITE_DOM_NAME = (
   'tieba.baidu.com' => 'tieba',
 
   'www.bearead.com' => 'bearead',
+  'wwwj.bearead.com' => 'bearead',
   'www.ddshu.net'   => 'ddshu',
   'www.kanunu8.com' => 'kanunu8',
 );
@@ -59,7 +60,7 @@ our %NULL_CHAPTER = (
 sub new {
   my ( $self, %opt ) = @_;
 
-  $opt{site} = $self->detect_site( $opt{site} );
+  $opt{site} = $self->detect_site( $opt{site});
 
   my $module = "Novel::Robot::Parser::$opt{site}";
   eval "require $module;";
@@ -68,9 +69,23 @@ sub new {
   bless { browser => $browser, %opt }, $module;
 }
 
+sub domain { }
+
+sub detect_domain {
+    my ( $self, $url ) = @_;
+    return ($url, $url) unless ( $url =~ /^https?:/ );
+
+    my ( $dom ) = $url =~ m#^.*?\/\/(.+?)(?:/|$)#;
+
+    my $base_dom = $dom;
+    $base_dom=~s/^[^.]+\.//;
+    $base_dom = $base_dom=~/\./ ? $base_dom : $dom;
+    return ($dom, $base_dom);
+}
+
 sub detect_site {
   my ( $self, $url ) = @_;
-  return $url unless ( $url =~ /^http/ );
+  return $url unless ( $url =~ /^https?:/ );
 
   my ( $dom ) = $url =~ m#^.*?\/\/(.+?)/#;
   my $site = exists $SITE_DOM_NAME{$dom} ? $SITE_DOM_NAME{$dom} : 'default';
@@ -90,11 +105,11 @@ sub get_item_info {
   my $c = $self->{browser}->request_url( $i_url, $post_data );
   my $r = $self->extract_elements(
     \$c,
-    path => $self->can( "scrape_novel" )->(),
+    path => $self->scrape_novel(),
     sub  => $self->can( "parse_novel" ),
   );
   $r->{floor_list} = $self->parse_novel_list( \$c, $r );
-  $r->{floor_num} = $self->update_url_list( $r->{floor_list}, $url );
+  ($r->{floor_list}, $r->{floor_num}) = $self->update_url_list( $r->{floor_list}, $url );
   return $r;
 }
 
@@ -123,14 +138,14 @@ sub get_novel_ref {
       info_sub  => sub {
         $self->extract_elements(
           @_,
-          path => $self->can( "scrape_novel" )->(),
+          path => $self->scrape_novel(),
           sub  => $self->can( "parse_novel" ),
         );
       },
       content_sub => sub {
         $self->extract_elements(
           @_,
-          path => $self->can( "scrape_novel_item" )->(),
+          path => $self->scrape_novel_item(),
           sub  => $self->can( "parse_novel_item" ),
         );
       },
@@ -140,12 +155,16 @@ sub get_novel_ref {
 
     $r->{url}        = $index_url;
     $r->{floor_list} = $floor_list || [];
-    $r->{floor_num}  = $max_floor_num || undef;
+    #$r->{floor_num}  = $max_floor_num || undef;
   } ## end else [ if ( $index_url !~ /^https?:/)]
 
+  ( $r->{floor_list}, $r->{floor_num} ) = $self->update_url_list( $r->{floor_list}, $index_url );
   $self->update_floor_list( $r, %o );
   $r->{writer_url} = $self->format_abs_url( $r->{writer_url}, $index_url );
 
+  for my $k (qw/writer book/){
+      $r->{$k} = $o{$k} if(exists $o{$k});
+  }
   $r->{$_} ||= $NULL_INDEX{$_} for keys( %NULL_INDEX );
   $r->{$_} = $self->tidy_string( $r->{$_} ) for qw/writer book/;
 
@@ -157,7 +176,15 @@ sub generate_novel_url {
   return ( $index_url, @args );
 }
 
-sub scrape_novel { {} }
+sub scrape_novel { 
+    my ( $self ) = @_;
+    my $r = {};
+    $r->{book}{path} = $self->{book_path} if(exists $self->{book_path});
+    $r->{book}{regex} = $self->{book_regex} if(exists $self->{book_regex});
+    $r->{writer}{path} = $self->{writer_path} if(exists $self->{writer_path});
+    $r->{writer}{regex} = $self->{writer_regex} if(exists $self->{writer_regex});
+    return $r;
+}
 
 sub parse_novel {
   my ( $self, $h, $r ) = @_;
@@ -204,7 +231,12 @@ sub parse_novel {
   return $r;
 } ## end sub parse_novel
 
-sub scrape_novel_list { }
+sub scrape_novel_list {
+    my ( $self ) = @_;
+    my $r = {};
+    $r->{path} = $self->{novel_list_path} if(exists $self->{novel_list_path});
+    return $r;
+}
 
 sub parse_novel_list {
   my ( $self, $h, $r ) = @_;
@@ -212,7 +244,8 @@ sub parse_novel_list {
   return $r->{floor_list} if ( exists $r->{floor_list} );
 
   my $path_r = $self->scrape_novel_list();
-  return $self->guess_novel_list( $h ) unless ( $path_r );
+
+  return $self->guess_novel_list( $h ) unless ( exists $path_r->{path} );
 
   my $parse_novel = scraper {
     process $path_r->{path},
@@ -315,7 +348,14 @@ sub guess_novel_list {
   return $res_arr || [];
 } ## end sub guess_novel_list
 
-sub scrape_novel_item { {} }
+sub scrape_novel_item { 
+    my ( $self ) = @_;
+    my $r = {};
+    $r->{content}{path} = $self->{content_path} if(exists $self->{content_path});
+    $r->{content}{regex} = $self->{content_regex} if(exists $self->{content_regex});
+    $r = { content => { path=> '//div[@id="content"]', extract=>'HTML' } } unless(exists $r->{content});
+    return $r;
+}
 
 sub parse_novel_item {
   my ( $self, $h, $r ) = @_;
@@ -373,7 +413,7 @@ sub get_tiezi_ref {
 
   my ( $topic, $floor_list ) = $self->get_iterate_data( 'novel', $url, %o );
 
-  $self->update_url_list( $floor_list, $url );
+  $floor_list = $self->update_url_list( $floor_list, $url );
 
   unshift @$floor_list, $topic if ( $topic->{content} );
   my %r = (
@@ -397,7 +437,7 @@ sub get_iterate_data {
     info_sub => sub {
       $self->extract_elements(
         @_,
-        path => $self->can( "scrape_$class" )->(),
+        path => $self->can( "scrape_$class" )->($self),
         sub  => $self->can( "parse_$class" ),
       );
     },
@@ -432,7 +472,7 @@ sub get_board_ref {
 
   my ( $topic, $item_list ) = $self->get_iterate_data( 'board', $url, %o );
 
-  $self->update_url_list( $item_list, $url );
+  $item_list = $self->update_url_list( $item_list, $url );
 
   return ( $topic, $item_list );
 }
@@ -457,7 +497,7 @@ sub get_query_ref {
 
   my ( $info, $item_list ) = $self->get_iterate_data( 'query', $url, %o, post_data => $post_data );
 
-  $self->update_url_list( $item_list, $url );
+  $item_list = $self->update_url_list( $item_list, $url );
 
   return ( $info, $item_list );
 }
@@ -472,16 +512,23 @@ sub update_url_list {
   my ( $self, $arr, $base_url ) = @_;
 
   my $i = 0;
+  my %rem;
+  my @res;
   for my $chap ( @$arr ) {
     $chap = { url => $chap || '' } if ( ref( $chap ) ne 'HASH' );
 
     $chap->{url} = $self->format_abs_url( $chap->{url}, $base_url );
 
+    next if(exists $rem{$chap->{url}});
+    $rem{$chap->{url}}=1;
+
     ++$i;
     $chap->{pid} //= $i; #page id
     $chap->{id}  //= $i; #floor id
+    push @res, $chap;
   }
-  return $i;
+  $i = $arr->[-1]{id} if(exists $arr->[-1]{id} and $arr->[-1]{id}>$i);
+  return wantarray? (\@res, $i) : $i;
 }
 
 sub format_abs_url {
@@ -543,7 +590,7 @@ sub update_floor_list {
   my ( $self, $r, %o ) = @_;
 
   my $flist = $r->{floor_list};
-  $r->{floor_num} //= scalar( @$flist );
+  #$r->{floor_num} //= $flist->[-1]{id} // scalar( @$flist );
 
   $flist->[$_]{content} = $self->tidy_content( $flist->[$_]{content} ) for ( 0 .. $#$flist );
 
@@ -607,10 +654,14 @@ sub tidy_content {
   for ( $c ) {
     last unless ( $c );
     s###sg;
+    s#　#\n#sg;
+    s#\s{5,}#\n#sg;
     s#<script(\s+[^>]+\>|\>)[^<]*</script>##sg;
     s#\s*\<[^>]+?\>#\n#sg;
-    s{\n\n\n*}{\n}sg;
+    s{\n+}{\n}sg;
     s{\s*(\S.*?)\s*\n}{\n<p>$1</p>}sg;
+    s#\s+上一章\s+.+?下一章.+$##s;
+    s#[^\n]+加入书签[^\n]+##s;
   }
   return $c;
 }

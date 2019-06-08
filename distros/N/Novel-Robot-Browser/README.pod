@@ -84,16 +84,17 @@ get/post url, return unicode content, auto detect CJK charset
             }, 
             );
 
-=head2 set_cookie
-    
-    $browser->set_cookie($cookie);
-
 =head2 read_moz_cookie
     
+    #firefox sqlite3 : cookies.sqlite
     $browser->read_moz_cookie($mozilla_cookies_sqlite_file, $domain);
 
-=head2 clear_cookie
-    
-    $browser->clear_cookie();
+    #netscape http cookie file: cookie.txt
+    #same as: curl -b cookie.txt -c cookie.txt http://www.xxx.com
+    $browser->read_moz_cookie($netscape_http_cookie_file, $domain);
+
+    #cookie string: name1=value1; name2=value2
+    #same as: curl -b "name1=value1; name2=value2" http://www.xxx.com
+    $browser->read_moz_cookie($cookie_string, $domain);
 
 =cut

@@ -1,5 +1,14 @@
 Revision history for Graphics-ColorNames:
 
+v3.5.0    2019-06-06 21:28:32+01:00 Europe/London
+  [Incompatabilities]
+  - Bumped minimum prerequisite to Perl v5.10.
+
+  [Documentation]
+  - Corrected typo.
+
+  - Updated copyright year.
+
 v3.4.0    2018-11-18 19:12:44+00:00 Europe/London
   [Incompatabilities]
   - Autoloaded color name methods were removed.

@@ -36,6 +36,7 @@ WriteMakefile(
     PREREQ_PM => {
         'X::Tiny' => 0,
         'XSLoader' => 0.24,
+        'Promise::ES6' => 0.04,
     },
 
     TEST_REQUIRES => {

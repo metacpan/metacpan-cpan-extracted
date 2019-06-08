@@ -1,0 +1,40 @@
+NAME
+    App::pause::Unpacked - A CLI for PAUSE (unpacked version)
+
+VERSION
+    This document describes version 0.490 of App::pause::Unpacked (from Perl
+    distribution App-pause-Unpacked), released on 2019-06-05.
+
+DESCRIPTION
+    This distribution is for testing/development purposes. Users should just
+    install the App::pause distribution because it has fewer dependencies.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-pause-Unpacked>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-pause-Unpacked>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause-Unpacked>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::pause
+
+    pause-unpacked
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

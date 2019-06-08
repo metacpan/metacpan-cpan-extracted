@@ -31,7 +31,7 @@ has type => (
 );
 
 has is_null => (
-	is => 'ro',
+	is => 'rw',
 	isa => 'Bool',
 	required => 1,
 );

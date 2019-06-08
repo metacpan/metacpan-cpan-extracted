@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     fibonacci(n,k)            n-th Fibonacci number of k-th order
     fibmod(n,m)               n-th Fibonacci number modulo m
     polygonal(n,k)            n-th k-gonal number
-    harmonic(n)               n-th harmonic number: 1+1/2+...+1/n
+    harmonic(n)               n-th harmonic number: 1 + 1/2 + ... + 1/n
     secant_number(n)          n-th secant/zig number
     tangent_number(n)         n-th tangent/zag number
     euler(n)                  n-th Euler number: E_n
@@ -94,7 +94,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     isub(a,b)                 integer subtraction: a-b
     imul(a,b)                 integer multiplication: a*b
     idiv(a,b)                 integer division: int(a/b)
-    imod(a,b)                 integer remainder of a/b
+    imod(a,b)                 integer remainder: a%b
     ipow(n,k)                 integer exponentiation: n^k
     ipow2(k)                  integer exponentiation: 2^k
     ipow10(k)                 integer exponentiation: 10^k
@@ -105,19 +105,19 @@ Additionally, each Math::AnyNum object is B<immutable>.
     ilog2(n)                  integer logarithm of n to base 2
     ilog10(n)                 integer logarithm of n to base 10
     divmod(a,b)               quotient and remainder of a/b
-    invmod(n,k)               multiplicative inverse of n modulo k
-    powmod(a,b,n)             modular exponentiation: a ^ b mod n
+    invmod(n,m)               multiplicative inverse of n modulo m
+    powmod(a,b,m)             modular exponentiation: a ^ b mod m
     isqrtrem(n)               integer sqrt remainder: n - isqrt(n)^2
     irootrem(n,k)             integer root remainder: n - iroot(n,k)^k
     is_square(n)              return 1 if n is a perfect square
-    is_power(n)               return 1 if n = c^k for integer c
-    is_power(n,k)             return 1 if n = c^k for integer c, k
+    is_power(n)               return 1 if n = c^k for integers c, k > 1
+    is_power(n,k)             return 1 if n = c^k for integers c, k
     is_polygonal(n,k)         return 1 if n is a first k-gonal number
     is_polygonal2(n,k)        return 1 if n is a second k-gonal number
     is_coprime(n,k)           return 1 if gcd(n,k) = 1
     is_smooth(n,k)            return 1 if all prime factors of n are <= k
     is_smooth_over_prod(n,k)  return 1 if n is smooth over the primes p|k
-    is_prime(n,[r])           Miller-Rabin primality test
+    is_prime(n,r=20)          Miller-Rabin primality test
     primorial(n)              product of primes <= n
     next_prime(n)             next prime > n
     valuation(n,k)            number of times n is divisible by k
@@ -220,9 +220,9 @@ Additionally, each Math::AnyNum object is B<immutable>.
     round(x,-k)         round x to k places after the decimal point
     acmp(a,b)           absolute comparison: abs(a) <=> abs(b)
     approx_cmp(a,b,k)   approximate comparison: round(a,k) <=> round(b,k)
-    rat(x)              convert x into a rational number
-    rat(str)            parse a decimal expansion as fraction
-    rat_approx(x)       rational approximation of real number x
+    rat(x)              convert x to a rational number
+    rat(str)            parse a decimal expansion as an exact fraction
+    rat_approx(x)       rational approximation of a real number x
     numerator(r)        numerator of rational number r
     denominator(r)      denominator of rational number r
     nude(r)             numerator and denominator of r
@@ -2545,43 +2545,6 @@ L<Maht::BigFloat> and L<Math::BigRat>, as well as to L<bigint>, L<bignum> and L<
 The original project was called C<Math::BigNum>, but because of some design flaws, that project
 was abandoned and much of its code ended up in this module.
 
-=head1 AUTHOR
-
-Daniel Șuteu, C<< <trizen@protonmail.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/trizen/Math-AnyNum/issues>.
-I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Math::AnyNum
-
-You can also look for information at:
-
-=over 4
-
-=item * GitHub
-
-L<https://github.com/trizen/Math-AnyNum>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Math-AnyNum>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Math-AnyNum>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-AnyNum/>
-
-=back
-
 =head1 SEE ALSO
 
 =over 4
@@ -2614,45 +2577,20 @@ L<Math::GComplex> - Generic library for complex number operations, with support 
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 REPOSITORY
 
-Copyright 2017-2019 Daniel Șuteu.
+L<https://github.com/trizen/Math-AnyNum>
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+=head1 AUTHOR
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+=head1 COPYRIGHT AND LICENSE
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+Copyright (C) 2017-2019 Daniel Șuteu
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.0 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut

@@ -60,7 +60,7 @@
    "provides" : {
       "Cookie::Baker" : {
          "file" : "lib/Cookie/Baker.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -74,12 +74,13 @@
          "web" : "https://github.com/kazeburo/Cookie-Baker"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "David Romano <unobe@cpan.org>",
       "Ichinose Shogo <shogo82148@gmail.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
-      "Shoichi Kaji <skaji@cpan.org>"
+      "Shoichi Kaji <skaji@cpan.org>",
+      "kwry <kwrkwrr@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1

@@ -55,7 +55,7 @@
    "provides" : {
       "Cookie::Baker::XS" : {
          "file" : "lib/Cookie/Baker/XS.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/kazeburo/Cookie-Baker-XS"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 0
 }

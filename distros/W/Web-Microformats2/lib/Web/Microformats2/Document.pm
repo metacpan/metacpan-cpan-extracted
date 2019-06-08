@@ -2,6 +2,7 @@ package Web::Microformats2::Document;
 use Moose;
 use Encode qw(encode_utf8);
 use JSON qw(decode_json);
+use List::Util qw(any);
 
 use Web::Microformats2::Item;
 
@@ -72,7 +73,11 @@ sub new_from_json {
 
     my $data_ref = decode_json (encode_utf8($json));
 
-    my $document = $class->new;
+    my $document = $class->new(
+        rels => $data_ref->{rels} || {},
+        rel_urls => $data_ref->{rel_urls} || {},
+    );
+
     for my $deflated_item ( @{ $data_ref->{items} } ) {
         my $item = $class->_inflate_item( $deflated_item );
         $document->add_top_level_item( $item );
@@ -127,6 +132,45 @@ sub get_first {
 
     return;
 }
+
+sub add_rel {
+    my $self = shift;
+
+    my ( $rel, $url ) = @_;
+
+    $self->rels->{ $rel } ||= [];
+    unless ( any { $_ eq $url } @{ $self->{rels}->{$rel} } ) {
+        push @{ $self->{rels}->{$rel} }, $url;
+    }
+}
+
+sub add_rel_url {
+    my $self = shift;
+
+    my ( $url, $rel_url_value_ref ) = @_;
+
+    my $current_value;
+    unless ( $current_value = $self->rel_urls->{ $url } ) {
+        $current_value = $self->rel_urls->{ $url } = {};
+    }
+
+    foreach (qw( hreflang media title type text)) {
+        if (
+            ( defined $rel_url_value_ref->{ $_ } )
+            && not ( defined $current_value->{ $_ } )
+        ) {
+            $current_value->{ $_ } = $rel_url_value_ref->{ $_ };
+        }
+    }
+
+    $current_value->{rels} ||= [];
+    for my $rel ( @{ $rel_url_value_ref->{rels} }) {
+        unless ( any { $_ eq $rel } @{ $current_value->{ rels } } ) {
+            push @{ $current_value->{ rels } }, $rel;
+        }
+    }
+}
+
 
 1;
 

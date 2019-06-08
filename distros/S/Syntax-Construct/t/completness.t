@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-my $plan; BEGIN { $plan = 5 * 70 + 2 + 5 * 64 }; # Constructs + old + alias
+my $plan; BEGIN { $plan = 5 * 74 + 2 + 5 * 65 }; # Constructs + old + alias
 
 use FindBin;
 use Test::More tests => $plan;
@@ -31,7 +31,7 @@ while (my $line = <$IN>) {
         $aliases{$_}{doc}++ for split ' ', $aliases;
 
     } elsif ($in_alias
-             and my ($alias, $name) = $line =~ /'(\S+)' => '(\S+)'/
+             and my ($alias, $name) = $line =~ /'(\S+)' => ['"](\S+)['"]/
     ) {
         $aliases{$alias}{alias}{$name}++;
 
@@ -54,7 +54,6 @@ while (my $line = <$IN>) {
     } elsif ($in_alias && $line =~ /\);/) {
         undef $in_alias;
     }
-
 }
 
 open my $TEST, '<', "$FindBin::Bin/02-constructs.t" or die $!;
@@ -63,7 +62,7 @@ while (<$TEST>) {
     if (/^ +(?:'([.0-9]+)'|(old)) => \[$/) {
         $version = $1 || $2;
     }
-    if (my ($constr) = /^ +\[ '(.+)',/) {
+    if (my ($constr) = /^ +\[ ['"](.+)['"],/) {
         $constructs{$constr}{test}++;
         $constructs{$constr}{version}{$version}++;
     }

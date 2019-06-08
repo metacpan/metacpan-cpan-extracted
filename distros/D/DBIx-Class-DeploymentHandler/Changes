@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-DeploymentHandler
 
+0.002232  2019-06-06 21:49:17-04:00 America/New_York
+ - Add missing dependency on YAML.pm
+
 0.002231  2019-05-10 09:28:36-04:00 America/New_York
  - Revert conversion to Moo; this code is now identical to v0.002224, with one
    small fix from 0.002225, having to do with Pg chunk-splitting when there

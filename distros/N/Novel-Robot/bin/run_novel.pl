@@ -41,8 +41,8 @@ sub main_ebook {
     if ( $o{f} =~ /\.txt/i ) {
       my $fname = decode( locale => $o{f} );
       my ( $writer, $book ) = $fname =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
-      $o{w} //= $writer;
-      $o{b} //= $book;
+      $o{w} ||= $writer;
+      $o{b} ||= $book;
       $f_e = get_ebook( $o{f}, $o{w}, $o{b}, %o );
       $msg = "$o{w} 《$o{b}》";
     } else {
@@ -55,6 +55,8 @@ sub main_ebook {
     my $info = decode( locale => `get_novel.pl -u "$o{u}" -D 1` );
     chomp( $info );
     my ( $writer, $book, $url, $chap_num ) = split ',', $info;
+    $writer = $o{w} if($o{w});
+    $book = $o{b} if($o{b});
     $f_e = get_ebook( $o{u}, $writer, $book, %o );
     $msg = "$writer 《$book》 $chap_num   $url";
   }else {
@@ -62,7 +64,7 @@ sub main_ebook {
     $msg = "$o{s} : $o{w} 《$o{b}》";
   }
 
-  send_ebook( $f_e, $msg, %o ) if ( $o{t} );
+  send_ebook( $f_e, $msg, %o ) if ( $o{t} and $f_e and -f $f_e );
   return $f_e;
 } ## end sub main_ebook
 
@@ -80,10 +82,17 @@ sub get_ebook {
     system( encode( locale => qq[get_novel.pl -s "$o{s}" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   }
 
+  my $min_id='';
+  if($o{G} and ($min_id) = $o{G}=~m#-i\s+(\d+)-#){
+      $book.="-$min_id" if($min_id and $min_id>1);
+  }
+
   $o{o}=~s#/?$##;
   my $ebook_f = ($o{o} and -d $o{o}) ? "$o{o}/$writer-$book.$o{T}" : 
                 $o{o} ? $o{o} : "$writer-$book.$o{T}";
   my ( $type ) = $ebook_f =~ /\.([^.]+)$/;
+
+  return unless(-f $html_f and -s $html_f);
 
   #conv html to ebook
   my ( $fh_e, $f_e ) = $o{t}

@@ -4,6 +4,7 @@ use Search::QS;
 use File::Basename;
 use lib dirname (__FILE__);
 use URLEncode;
+use URI::Escape;
 
 my $num = 0;
 
@@ -23,6 +24,12 @@ $qs ='flt[c:one]=1&flt[c:one]=$and:1&flt[d:one]=2&flt[d:one]=$and:1&'.
     'flt[c:two]=2&flt[c:two]=$and:2&flt[d:two]=3&flt[d:two]=$op:>&'.
     'flt[d:two]=$and:2&flt[d:three]=10';
 is(convert_url_params_to_filter_and_return($qs), $qs);
+$num++;
+
+# encoded query as_string
+# SQL: ( Name = Foo )
+$qs = 'flt%5BName%5D=Foo';
+is(convert_url_params_to_filter_and_return($qs), uri_unescape($qs));
 $num++;
 
 done_testing($num);

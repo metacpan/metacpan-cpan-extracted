@@ -1,5 +1,9 @@
 Revision history for RPi-OLED-SSD1306-128_64
 
+2.3603 2019-06-06
+        - MANIFEST.SKIP was preventing us from including a core C file, breaking
+          cpan installs with "undefined symbol" error
+
 2.3602  2019-06-05
         - added wiringPi checks in Makefile.PL, so CPAN testers don't go crazy
 

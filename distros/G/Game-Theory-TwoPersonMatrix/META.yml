@@ -31,7 +31,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Game-Theory-TwoPersonMatrix
   repository: https://github.com/ology/Game-Theory-TwoPersonMatrix
-version: '0.2200'
+version: '0.2203'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -217,6 +217,7 @@ x_Dist_Zilla:
             - bimatrix
             - equilibria
             - metacpan
+            - nash
             - oddments
             - saddlepoint
           wordlist: Pod::Wordlist

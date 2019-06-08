@@ -1,3 +1,9 @@
+0.001077  2019-06-06 15:04:32-07:00 America/Los_Angeles
+
+    - Add --retry options (toddr)
+    - Make sure all events are flushed if there is a sync issue
+    - Added some tests
+
 0.001076  2019-05-20 14:54:50-07:00 America/Los_Angeles
 
     - Fix TAP parsers nesting parsing

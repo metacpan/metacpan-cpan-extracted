@@ -2,14 +2,14 @@ NAME
     Algorithm::Backoff - Various backoff strategies for retry
 
 VERSION
-    This document describes version 0.003 of Algorithm::Backoff (from Perl
-    distribution Algorithm-Backoff), released on 2019-04-10.
+    This document describes version 0.004 of Algorithm::Backoff (from Perl
+    distribution Algorithm-Backoff), released on 2019-06-05.
 
 SYNOPSIS
      # 1. pick a strategy and instantiate
 
      use Algorithm::Backoff::Constant;
-     my $ar = Algorithm::Backoff::Constant->new(
+     my $ab = Algorithm::Backoff::Constant->new(
          delay             => 2, # required
          #delay_on_success => 0, # optional, default 0
      );
@@ -17,9 +17,9 @@ SYNOPSIS
      # 2. log success/failure and get a new number of seconds to delay, timestamp is
      # optional but must be monotonically increasing.
 
-     my $secs = $ar->failure(); # => 2
-     my $secs = $ar->success(); # => 0
-     my $secs = $ar->failure(); # => 2
+     my $secs = $ab->failure(); # => 2
+     my $secs = $ab->success(); # => 0
+     my $secs = $ab->failure(); # => 2
 
 DESCRIPTION
     This distribution provides several classes that implement various

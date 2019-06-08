@@ -1,0 +1,57 @@
+{
+   "abstract" : "PKCS functions, using the OpenSSL libraries",
+   "author" : [
+      "Lanlan Pan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-OpenSSL-PKCS-Func",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+         },
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/abbypan/Crypt-OpenSSL-PKCS-Func/issues"
+      },
+      "homepage" : "http://github.com/abbypan/Crypt-OpenSSL-PKCS-Func",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/abbypan/Crypt-OpenSSL-PKCS-Func"
+      }
+   },
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

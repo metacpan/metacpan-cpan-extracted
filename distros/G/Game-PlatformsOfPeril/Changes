@@ -1,5 +1,9 @@
 Revision history for Game::PlatformsOfPeril
 
+0.03    2019-06-06
+        Add 'x' command to examine level. Change bomb and make bomb keys
+        to make them harder to press. More level maps.
+
 0.02    2019-06-04
         Better ensure minimum terminal size of 70x24. Better handle
         demise of animates. Install level maps with module. move_nop()

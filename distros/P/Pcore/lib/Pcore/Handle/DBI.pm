@@ -129,7 +129,9 @@ sub prepare_query ( $self, $query ) {
     return join( $SPACE, @sql ), @bind ? \@bind : undef;
 }
 
-sub query_to_string ( $self, $sql, $bind ) {
+sub query_to_string ( $self, $query ) {
+    my ( $sql, $bind ) = $self->prepare_query($query);
+
     $sql =~ s/\$(\d+)/$self->quote($bind->[$1 - 1])/smge;
 
     return $sql;

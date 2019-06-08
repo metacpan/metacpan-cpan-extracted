@@ -1,0 +1,617 @@
+#!perl
+
+our $DATE = '2019-06-05'; # DATE
+our $DIST = 'App-pause-Unpacked'; # DIST
+our $VERSION = '0.490'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::pause;
+use Perinci::CmdLine::pause;
+
+Perinci::CmdLine::pause->new(
+    %App::pause::cli_attrs,
+)->run;
+
+# ABSTRACT: A CLI for PAUSE (unpacked version)
+# PODNAME: pause-unpacked
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pause-unpacked - A CLI for PAUSE (unpacked version)
+
+=head1 VERSION
+
+This document describes version 0.490 of pause-unpacked (from Perl distribution App-pause-Unpacked), released on 2019-06-05.
+
+=head1 SYNOPSIS
+
+Use like you would use L<pause>:
+
+ % pause upload Foo-Bar-1.23.tar.gz
+ ...
+
+=head1 DESCRIPTION
+
+This is an unpacked version of L<pause>, for development/testing only. Normal
+users should just use L<pause>.
+
+=head1 SUBCOMMANDS
+
+=head2 B<cleanup>
+
+Delete older versions of distributions.
+
+Developer releases will not be deleted.
+
+To delete developer releases, you can use C<delete_files> (rm), e.g. from the
+command line:
+
+ % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases
+ % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore
+
+
+=head2 B<ls>
+
+List files.
+
+=head2 B<ls-dists>
+
+List distributions.
+
+Distribution names will be extracted from tarball/zip filenames.
+
+Unknown/unparseable filenames will be skipped.
+
+
+=head2 B<ls-mods>
+
+List modules (permissions).
+
+=head2 B<reindex>
+
+Force reindexing.
+
+=head2 B<rm>
+
+Delete files.
+
+When a file is deleted, it is not immediately deleted but has
+scheduled_for_deletion status for 72 hours, then deleted. During that time, the
+file can be undeleted.
+
+
+=head2 B<undelete>
+
+Undelete files.
+
+When a file is deleted, it is not immediately deleted but has
+scheduled_for_deletion status for 72 hours, then deleted. During that time, the
+file can be undeleted.
+
+
+=head2 B<upload>
+
+Upload file(s).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--password>=I<s>
+
+PAUSE password.
+
+If unset, default value will be searched from `~/.pause`. Encrypted `.pause` is
+not yet supported.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--retries>=I<s>
+
+Number of retries when received 5xx HTTP error from server.
+
+Default value:
+
+ 35
+
+=item B<--retry-delay>=I<s>
+
+How long to wait before retrying (deprecated).
+
+This setting is now deprecated. Will use a constant backoff strategy of delaying
+this many seconds. The default (when this setting is not specified) is now to
+use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
+... seconds. The default `retries` of 35 makes this strategy retries for a
+little over a day (88941 seconds). The terminal delay setting (default 3600
+seconds) can be set via `retry_max_delay`.
+
+
+=item B<--retry-max-delay>=I<s>
+
+How long to wait at most before retrying.
+
+Default value:
+
+ 3600
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--username>=I<s>
+
+PAUSE ID.
+
+If unset, default value will be searched from `~/.pause`. Encrypted `.pause` is
+not yet supported.
+
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand cleanup
+
+=over
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--num-keep>=I<s>, B<-n>
+
+Number of new versions (including newest) to keep.
+
+Default value:
+
+ 1
+
+1 means to only keep the newest version, 2 means to keep the newest and the
+second newest, and so on.
+
+
+=item B<--protect-file>=I<s@>
+
+Protect some files/wildcard patterns from delete/cleanup.
+
+Can be specified multiple times.
+
+=item B<--protect-files-json>=I<s>
+
+Protect some files/wildcard patterns from delete/cleanup (JSON-encoded).
+
+See C<--protect-file>.
+
+=back
+
+=head2 Options for subcommand ls
+
+=over
+
+=item B<--del>
+
+Only list files which are scheduled for deletion.
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--file>=I<s@>
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=item B<--mtime-max>=I<s>
+
+=item B<--mtime-min>=I<s>
+
+=item B<--size-max>=I<s>
+
+=item B<--size-min>=I<s>
+
+=back
+
+=head2 Options for subcommand ls-dists
+
+=over
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--newest>
+
+Only show newest non-dev version.
+
+Dev versions will be skipped.
+
+
+=item B<--newest-n>=I<s>
+
+Only show this number of newest non-dev versions.
+
+Dev versions will be skipped.
+
+
+=back
+
+=head2 Options for subcommand ls-mods
+
+=over
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--module>=I<s@>
+
+Module name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+Module names/wildcard patterns (JSON-encoded).
+
+See C<--module>.
+
+=item B<--type>=I<s>
+
+Only list modules matching certain type.
+
+=back
+
+=head2 Options for subcommand reindex
+
+=over
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=back
+
+=head2 Options for subcommand rm
+
+=over
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=item B<--protect-file>=I<s@>
+
+Protect some files/wildcard patterns from delete/cleanup.
+
+Can be specified multiple times.
+
+=item B<--protect-files-json>=I<s>
+
+Protect some files/wildcard patterns from delete/cleanup (JSON-encoded).
+
+See C<--protect-file>.
+
+=back
+
+=head2 Options for subcommand undelete
+
+=over
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=back
+
+=head2 Options for subcommand upload
+
+=over
+
+=item B<--delay>=I<s>
+
+Pause a number of seconds between files.
+
+If you upload a lot of files (e.g. 7-10 or more) at a time, the PAUSE indexer
+currently might choke with SQLite database locking problem and thus fail to
+index your releases. Giving a delay of say 2-3 minutes (120-180 seconds) between
+files will alleviate this problem.
+
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=item B<--subdir>=I<s>
+
+Subdirectory to put the file(s) into.
+
+Default value:
+
+ ""
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C pause-unpacked pause-unpacked
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete pause-unpacked 'p/*/`pause-unpacked`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/pause.conf>, F<~/pause.conf>, or F</etc/pause.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ password (see --password)
+ retries (see --retries)
+ retry_delay (see --retry-delay)
+ retry_max_delay (see --retry-max-delay)
+ username (see --username)
+
+=head2 Configuration for subcommand cleanup
+
+ detail (see --detail)
+ num_keep (see --num-keep)
+ protect_files (see --protect-file)
+
+=head2 Configuration for subcommand ls
+
+ del (see --del)
+ detail (see --detail)
+ files (see --file)
+ mtime_max (see --mtime-max)
+ mtime_min (see --mtime-min)
+ size_max (see --size-max)
+ size_min (see --size-min)
+
+=head2 Configuration for subcommand ls-dists
+
+ detail (see --detail)
+ newest (see --newest)
+ newest_n (see --newest-n)
+
+=head2 Configuration for subcommand ls-mods
+
+ detail (see --detail)
+ modules (see --module)
+ type (see --type)
+
+=head2 Configuration for subcommand reindex
+
+ files (see --file)
+
+=head2 Configuration for subcommand rm
+
+ files (see --file)
+ protect_files (see --protect-file)
+
+=head2 Configuration for subcommand undelete
+
+ files (see --file)
+
+=head2 Configuration for subcommand upload
+
+ delay (see --delay)
+ files (see --file)
+ subdir (see --subdir)
+
+=head1 ENVIRONMENT
+
+=head2 PAUSE_UNPACKED_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/pause.conf>
+
+F<~/pause.conf>
+
+F</etc/pause.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-pause-Unpacked>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-pause-Unpacked>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause-Unpacked>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<pause> from L<App::pause>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

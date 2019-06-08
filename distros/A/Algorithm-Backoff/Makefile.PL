@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Algorithm-Backoff",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Algorithm::Backoff",
   "PREREQ_PM" => {
     "Time::HiRes" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Number::Delta" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

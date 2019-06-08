@@ -7,7 +7,7 @@ use base qw/Exporter/;
 use URI::Escape;
 
 BEGIN {
-    our $VERSION = "0.10";
+    our $VERSION = "0.11";
     our @EXPORT = qw/bake_cookie crush_cookie/;
     my $use_pp = $ENV{COOKIE_BAKER_PP};
     if (!$use_pp) {
@@ -39,7 +39,7 @@ sub bake_cookie {
     $cookie .= 'path='. $args{path} . '; '       if $args{path};
     $cookie .= 'expires=' . _date($args{expires}) . '; ' if exists $args{expires} && defined $args{expires};
     $cookie .= 'max-age=' . $args{"max-age"} . '; ' if exists $args{"max-age"};
-    if (exists $args{samesite} && $args{samesite} =~ m/^(?:lax|strict)/i) {
+    if (exists $args{samesite} && $args{samesite} =~ m/^(?:lax|strict|none)/i) {
         $cookie .= 'SameSite=' . ucfirst(lc($args{samesite})) . '; '
     }
     $cookie .= 'secure; '                     if $args{secure};
@@ -200,9 +200,9 @@ If true, sets secure flag. false by default.
 
 =item samesite
 
-If defined as 'lax' or 'strict' (case-insensitive), sets the SameSite restriction for the cookie as described in the
+If defined as 'lax' or 'strict' or 'none' (case-insensitive), sets the SameSite restriction for the cookie as described in the
 L<draft proposal|https://tools.ietf.org/html/draft-west-first-party-cookies-07>, which is already implemented in
-Chrome (v51), Opera (v38) and Firefox (v60).
+Chrome (v51), Safari (v12), Edge (v16),  Opera (v38) and Firefox (v60).
 
 =back
 

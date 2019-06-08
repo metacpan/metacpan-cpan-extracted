@@ -24,6 +24,7 @@ my @binfo = split /\n/, $info;
 for (@binfo){
     next if /^$/;
     next if /(?:currently|following)/i;
+    next if /\s+cperl/;
     like ($_, qr/\d\.\d{1,2}/, "$_ in brew_info contains a perl");
 }
 

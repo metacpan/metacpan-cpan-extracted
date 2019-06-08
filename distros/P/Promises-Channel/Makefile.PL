@@ -23,10 +23,11 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test2::V0" => 0,
+    "Test::LeakTrace" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Promises" => 0,
   "Test2::V0" => 0,
+  "Test::LeakTrace" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0
 );

@@ -27,7 +27,7 @@ no_index:
 provides:
   WWW::Form::UrlEncoded::XS:
     file: lib/WWW/Form/UrlEncoded/XS.pm
-    version: '0.25'
+    version: '0.26'
 requires:
   Exporter: '0'
   perl: '5.008001'
@@ -35,6 +35,8 @@ resources:
   bugtracker: https://github.com/kazeburo/WWW-Form-UrlEncoded-XS/issues
   homepage: https://github.com/kazeburo/WWW-Form-UrlEncoded-XS
   repository: git://github.com/kazeburo/WWW-Form-UrlEncoded-XS.git
-version: '0.25'
+version: '0.26'
+x_contributors:
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

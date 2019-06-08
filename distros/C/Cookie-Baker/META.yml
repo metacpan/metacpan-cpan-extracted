@@ -27,7 +27,7 @@ no_index:
 provides:
   Cookie::Baker:
     file: lib/Cookie/Baker.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Exporter: '0'
   URI::Escape: '0'
@@ -36,11 +36,12 @@ resources:
   bugtracker: https://github.com/kazeburo/Cookie-Baker/issues
   homepage: https://github.com/kazeburo/Cookie-Baker
   repository: git://github.com/kazeburo/Cookie-Baker.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'David Romano <unobe@cpan.org>'
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'kwry <kwrkwrr@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

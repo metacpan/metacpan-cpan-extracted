@@ -1,4 +1,10 @@
 Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
+0.15  Jun 06, 2019
+    Use a better hash function, Siphash (1-3 variant), and take the opportunity
+    to ditch the old variants. The latest and only supported variant is version 5.
+
+    WARNING: This version is NOT capable of reading old files, use version 0.14
+    to do that or regenerate from source using this version.
 
 0.14  May 22, 2019
     Sigh. Yet another rerelease of the v0.11 changes, missed an upstream commit.

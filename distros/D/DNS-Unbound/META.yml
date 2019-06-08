@@ -1,5 +1,5 @@
 ---
-abstract: 'A Perl interface to NLNetLabs’s L<Unbound|https://nlnetlabs.nl/projects/unbound/> recursive DNS resolver'
+abstract: 'libunbound in Perl'
 author:
   - 'Felipe Gasper (FELIPE)'
 build_requires:
@@ -19,10 +19,11 @@ no_index:
     - t
     - inc
 requires:
+  Promise::ES6: '0.04'
   X::Tiny: '0'
   XSLoader: '0.24'
 resources:
   bugtracker: https://github.com/FGasper/p5-DNS-Unbound/issues
   repository: https://github.com/FGasper/p5-DNS-Unbound.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

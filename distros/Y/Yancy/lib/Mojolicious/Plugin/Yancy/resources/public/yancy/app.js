@@ -2,6 +2,9 @@
 Vue.component('edit-field', {
     template: '#edit-field',
     props: {
+        name: {
+            required: true
+        },
         value: {
             required: true
         },
@@ -220,13 +223,14 @@ Vue.component('item-form', {
     }
 });
 
-var app = new Vue({
+var app = window.Yancy = new Vue({
     el: '#app',
     data: function () {
         var current = this.parseHash();
         return {
             hasSchema: null,
             currentSchemaName: current.schema || null,
+            currentComponent: null,
             schema: {},
             openedRow: null,
             deleteIndex: null,
@@ -302,7 +306,12 @@ var app = new Vue({
 
         setSchema: function ( name ) {
             this.currentSchemaName = name;
+            this.currentComponent = null;
             $( '#sidebar-collapse' ).collapse('hide');
+        },
+
+        setComponent: function ( name ) {
+            this.currentComponent = name;
         },
 
         fetchSpec: function () {
@@ -515,7 +524,8 @@ var app = new Vue({
                     url: url,
                     method: 'PUT',
                     data: value,
-                    dataType: "json"
+                    dataType: "json",
+                    contentType: "application/json"
                 }
             ).done(
                 function ( data, status, jqXHR ) {
@@ -548,38 +558,15 @@ var app = new Vue({
                     url: url,
                     method: 'POST',
                     data: value,
-                    dataType: "json"
+                    dataType: "json",
+                    contentType: "application/json"
                 }
             ).done(
                 function ( data, status, jqXHR ) {
-                    var id = self.currentOperations['add'].schema['x-id-field'] || 'id';
-                    var urlParams = {};
-                    urlParams[ id ] = data;
-
-                    $.ajax(
-                        {
-                            url: self.fillUrl( self.currentOperations['get'].url, urlParams ),
-                            method: 'GET',
-                            dataType: 'json'
-                        }
-                    ).done(
-                        function ( data, status, jqXHR ) {
-                            self.items.unshift( data );
-                            self.total++;
-                            self.cancelAddItem();
-                            self.addToast( { icon: "fa-save", title: "Added", text: "Item added" } );
-                        }
-                    ).fail(
-                        function ( jqXHR, textStatus, errorThrown ) {
-                            if ( jqXHR.responseJSON ) {
-                                self.parseErrorResponse( jqXHR.responseJSON );
-                                self.$set( self.error, 'addItem', 'Could not fetch new item' );
-                            }
-                            else {
-                                self.$set( self.error, 'addItem', jqXHR.responseText );
-                            }
-                        }
-                    );
+                    self.items.unshift( data );
+                    self.total++;
+                    self.cancelAddItem();
+                    self.addToast( { icon: "fa-save", title: "Added", text: "Item added" } );
                 }
             ).fail(
                 function ( jqXHR, textStatus, errorThrown ) {
@@ -622,13 +609,6 @@ var app = new Vue({
                         copy[ prop['x-html-field'] ]
                             = marked( copy[k], { sanitize: false });
                     }
-                }
-                else if ( copy[k] === null ) {
-                    // `null` doesn't pass type checks, and Perl doesn't
-                    // distinguish between `undef` and `defined but no
-                    // value` in an object, so make this field `undef`
-                    // to Perl
-                    delete copy[k];
                 }
             }
             return JSON.stringify( copy );

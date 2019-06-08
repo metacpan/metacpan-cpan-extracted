@@ -20,15 +20,15 @@ has name => (
 );
 
 has schema_name => (
-	is => 'ro',
-	isa => 'Str',
+	is       => 'ro',
+	isa      => 'Str',
 	required => 1,
 );
 
 has columns => (
-	is => 'rw',
-	isa => 'ArrayRef[MySQL::Util::Lite::Column]',
-	lazy => 1,
+	is      => 'rw',
+	isa     => 'ArrayRef[MySQL::Util::Lite::Column]',
+	lazy    => 1,
 	builder => '_build_columns',
 );
 
@@ -40,10 +40,52 @@ has _util => (
 
 method get_fq_name {
 
-	return sprintf('%s.%s', $self->schema_name, $self->name);	
+	return sprintf( '%s.%s', $self->schema_name, $self->name );
 }
 
-method get_parent_tables {
+method get_parent_tables (Str :$column_name) {
+
+	if ($column_name) {
+		return $self->_get_column_parent_tables( column_name => $column_name );
+	}
+	else {
+		return $self->_get_parent_tables;
+	}
+}
+
+method _get_column_parent_tables (Str :$column_name) {
+
+	my %seen;
+	my @ret;
+	my @fks = $self->get_foreign_keys;
+
+	foreach my $fk (@fks) {
+		
+		foreach my $con ( @{ $fk->column_constraints } ) {
+
+			if ( $con->column_name eq $column_name ) {
+				
+				my $fq_table_name = sprintf( "%s.%s",
+					$con->parent_schema_name, $con->parent_table_name );
+
+				if ( !$seen{$fq_table_name} ) {
+					push @ret,
+					  MySQL::Util::Lite::Table->new(
+						name        => $con->parent_table_name,
+						schema_name => $con->parent_schema_name,
+						_util       => $self->_util
+					  );
+				}
+
+				$seen{$fq_table_name}++;
+			}
+		}
+	}
+
+	return @ret;
+}
+
+method _get_parent_tables {
 
 	my %seen;
 	my @ret;
@@ -51,7 +93,7 @@ method get_parent_tables {
 
 	foreach my $fk (@fks) {
 		foreach my $col ( @{ $fk->column_constraints } ) {
-			
+
 			my $fq_table_name = sprintf( "%s.%s",
 				$col->parent_schema_name, $col->parent_table_name );
 
@@ -67,7 +109,7 @@ method get_parent_tables {
 			$seen{$fq_table_name}++;
 		}
 	}
-	
+
 	return @ret;
 }
 
@@ -79,7 +121,7 @@ method get_foreign_keys {
 	foreach my $fk_name ( keys %$fks_href ) {
 		push @fks,
 		  MySQL::Util::Lite::ForeignKey->new(
-			name        => $fk_name,
+			name  => $fk_name,
 			_util => $self->_util,
 		  );
 	}
@@ -98,13 +140,13 @@ method has_parents {
 }
 
 method get_autoinc_column {
-	
+
 	my $cols = $self->columns;
 	foreach my $col (@$cols) {
 		if ( $col->is_autoinc ) {
 			return $col;
 		}
-	}	
+	}
 }
 
 method get_column (Str :$name) {
@@ -119,27 +161,27 @@ method get_column (Str :$name) {
 
 method get_primary_key () {
 
-	my $pk_name = $self->_util->get_pk_name($self->name);
+	my $pk_name = $self->_util->get_pk_name( $self->name );
 	if ($pk_name) {
 		return MySQL::Util::Lite::PrimaryKey->new(
-			name => $pk_name,
+			name       => $pk_name,
 			table_name => $self->get_fq_name,
-			_util => $self->_util,
-			);			
-	}	
+			_util      => $self->_util,
+		);
+	}
 
-	return;	
+	return;
 }
 
-method get_alternate_keys() {
+method get_alternate_keys () {
 
-	my $href = $self->_util->get_ak_constraints($self->name);
+	my $href = $self->_util->get_ak_constraints( $self->name );
 	my @aks;
 
 	foreach my $ak_name ( keys %$href ) {
 		push @aks,
 		  MySQL::Util::Lite::AlternateKey->new(
-			name        => $ak_name,
+			name  => $ak_name,
 			_util => $self->_util,
 		  );
 	}
@@ -151,7 +193,7 @@ method get_columns {
 	return @{ $self->columns };
 }
 
-method _build_columns{
+method _build_columns {
 
 	my @cols;
 	my $aref = $self->_util->describe_table( $self->get_fq_name );

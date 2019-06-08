@@ -10,7 +10,7 @@ BEGIN { use_ok('Algorithm::MinPerfHashTwoLevel') };
 #########################
 
 my $class= "Algorithm::MinPerfHashTwoLevel";
-my $o= $class->new("seed"=>"1234567812345678",debug=>$ENV{TEST_VERBOSE},variant=>1);
+my $o= $class->new("seed"=>"1234567812345678",debug=>$ENV{TEST_VERBOSE});
 my (%bad,$data);
 
 %bad= ("x"=>"whatever","y"=>"z","p"=>"q");

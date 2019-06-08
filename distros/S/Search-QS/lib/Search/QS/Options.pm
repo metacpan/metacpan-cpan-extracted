@@ -1,5 +1,5 @@
 package Search::QS::Options;
-$Search::QS::Options::VERSION = '0.01';
+$Search::QS::Options::VERSION = '0.02';
 use v5.14;
 use strict;
 use warnings;
@@ -72,6 +72,7 @@ sub reset() {
     $s->start(0);
 }
 
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
@@ -89,7 +90,7 @@ Search::QS::Options - Options query search like limits, start and sort
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -97,7 +98,7 @@ version 0.01
 
   my $opt = new Search::QS::Options;
   # parse query_string
-  $opt->parse($qs);
+  $opt->parse_qs($qs);
   # reconvert object to query_string
   print $opt->to_qs;
 
@@ -119,9 +120,11 @@ Set/Get the max number of elements to show
 
 An array (L<Set::Array>) of L<Search::QS::Options::Sort> with sort informations
 
-=head2 parse($query_string)
+=head2 parse($perl_struct)
 
-Parse a query string and extract options informations
+$perl_struct is an HASHREF which represents a query string like
+the one returned by L<URI::Encode/"url_params_mixed">.
+It parses the struct and extract filter informations
 
 =head2 to_qs()
 
@@ -130,6 +133,10 @@ Return a query string of the internal rappresentation of the object
 =head2 reset()
 
 Initialize the object with default values
+
+=head1 SEE ALSO
+
+L<Seach::QS::Options::Sort>
 
 =head1 AUTHOR
 

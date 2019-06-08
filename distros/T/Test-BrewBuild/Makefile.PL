@@ -66,12 +66,12 @@ WriteMakefile(
         'Config::Tiny' => 0,
         'File::Copy::Recursive' => 0,
         # 'Git::Repository' => '1.318', # doesn't work on windows
-        'Logging::Simple' => '0.07',
+        'Logging::Simple' => '1.04',
         'LWP::Simple'   => 0,
         'MetaCPAN::Client' => 2.017000,
         'Module::Load' => 0,   # corelist since 5.9.4
         'Parallel::ForkManager' => 0,
-        'Plugin::Simple' => '0.06',
+        'Plugin::Simple' => '1.01',
         'Proc::Background' => 0,
         'Test::BrewBuild::Plugin::Author' => '0.02',
         'Test::BrewBuild::Plugin::TestAgainst' => '0.06',

@@ -4,7 +4,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 # VERSION
 
-version v3.4.0
+version v3.5.0
 
 # SYNOPSIS
 
@@ -230,12 +230,10 @@ See [Graphics::ColorNames::GrayScale](https://metacpan.org/pod/Graphics::ColorNa
 
 The following changes are planned in the future:
 
-- Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
 - The tied interface will be removed, but implemented in a separate
 module for users that wish to use it.
 - The namespace for color schemes will be moved to the
-`Graphics::ColorNames::Schemes` but optios will be added to use the
+`Graphics::ColorNames::Schemes` but options will be added to use the
 existing scheme.
 
     This will allow modules to be named like `Graphics::ColorNames::Tied`
@@ -297,7 +295,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2001-2018 by Robert Rothenberg.
+This software is Copyright (c) 2001-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

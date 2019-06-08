@@ -5,7 +5,7 @@ use warnings;
 use Carp qw(croak);
 use Exporter qw(import);
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 our @EXPORT = qw(
     re_brewbuild

@@ -14,6 +14,8 @@ sub charset { 'utf8' }
 
 sub site_type { 'tiezi' }
 
+sub domain { 'lofter.com' }
+
 sub extract_content {
   my ( $self, $book, $h ) = @_;
   my $r = scraper {

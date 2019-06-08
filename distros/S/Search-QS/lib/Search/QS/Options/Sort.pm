@@ -1,5 +1,5 @@
 package Search::QS::Options::Sort;
-$Search::QS::Options::Sort::VERSION = '0.01';
+$Search::QS::Options::Sort::VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ Search::QS::Options::Sort - A sort element
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

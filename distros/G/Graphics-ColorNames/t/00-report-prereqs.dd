@@ -22,7 +22,7 @@ do { my $x = {
                                       'Exporter' => '5.57',
                                       'Module::Load' => '0.10',
                                       'Module::Loaded' => '0',
-                                      'perl' => 'v5.6.0',
+                                      'perl' => 'v5.10.0',
                                       'version' => '0'
                                     }
                     },
@@ -40,7 +40,7 @@ do { my $x = {
                                    'Test::Most' => '0',
                                    'constant' => '0',
                                    'lib' => '0',
-                                   'perl' => 'v5.6.0'
+                                   'perl' => 'v5.10.0'
                                  }
                  }
      };

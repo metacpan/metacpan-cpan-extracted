@@ -296,6 +296,21 @@ Then use the special C<--rpi> flag in the dispatch command:
     bbtester start -a
     bbdispatch -t localhost -r https://github.com/user/repo -a --rpi
 
+=head1 RUN TESTER AT STARTUP
+
+To run a tester at startup, add similar lines (correct to suit your environment)
+to your crontab (hint: `crontab -e`):
+
+    PATH=/home/pi/perl5/perlbrew/perls/perl-5.30.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+    @reboot perl /home/pi/perl5/perlbrew/perls/perl-5.30.0/bin/bbtester start > /tmp/cron_bbtester.log 2>&1
+
+The first is to get your current Perl into the C<PATH> environment variable, the
+second actually starts the tester after a restart of the system.
+
+The redirection at the end of the second line creates a debug output file, which
+you can review if you find the tester not starting up properly.
+
 =head1 SEE ALSO
 
 Details on the L<configuration file|https://metacpan.org/pod/distribution/Test-BrewBuild/lib/Test/BrewBuild/brewbuild.conf.pod>.

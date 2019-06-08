@@ -2,7 +2,7 @@ package Test2::Harness::Renderer::Formatter;
 use strict;
 use warnings;
 
-our $VERSION = '0.001076';
+our $VERSION = '0.001077';
 
 use Carp qw/croak/;
 
@@ -99,7 +99,7 @@ sub render_event {
 
         if ($self->{+SHOW_JOB_LAUNCH}) {
             push @{$f->{info}} => {
-                tag       => 'LAUNCH',
+                tag       => $f->{harness_job_launch}->{retry} ? 'RETRY' : 'LAUNCH',
                 debug     => 0,
                 important => 1,
                 details   => File::Spec->abs2rel($job->file),

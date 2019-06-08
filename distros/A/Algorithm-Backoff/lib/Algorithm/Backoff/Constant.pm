@@ -1,7 +1,7 @@
 package Algorithm::Backoff::Constant;
 
-our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -16,6 +16,7 @@ $SPEC{new} = {
     is_func => 0,
     args => {
         %Algorithm::Backoff::attr_consider_actual_delay,
+        %Algorithm::Backoff::attr_max_actual_duration,
         %Algorithm::Backoff::attr_max_attempts,
         %Algorithm::Backoff::attr_jitter_factor,
         %Algorithm::Backoff::attr_delay_on_success,
@@ -56,7 +57,7 @@ Algorithm::Backoff::Constant - Backoff using a constant delay
 
 =head1 VERSION
 
-This document describes version 0.003 of Algorithm::Backoff::Constant (from Perl distribution Algorithm-Backoff), released on 2019-04-10.
+This document describes version 0.004 of Algorithm::Backoff::Constant (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
 
 =head1 SYNOPSIS
 
@@ -64,27 +65,29 @@ This document describes version 0.003 of Algorithm::Backoff::Constant (from Perl
 
  # 1. instantiate
 
- my $ar = Algorithm::Backoff::Constant->new(
+ my $ab = Algorithm::Backoff::Constant->new(
      #consider_actual_delay => 1, # optional, default 0
-     #max_attempts     => 0, # optional, default 0 (retry endlessly)
-     #jitter_factor    => 0, # optional, set to positive value to add randomness
-     delay             => 2, # required
-     #delay_on_success => 0, # optional, default 0
+     #max_actual_duration   => 0, # optional, default 0 (retry endlessly)
+     #max_attempts          => 0, # optional, default 0 (retry endlessly)
+     #jitter_factor         => 0, # optional, set to positive value to add randomness
+     delay                  => 2, # required
+     #delay_on_success      => 0, # optional, default 0
  );
 
  # 2. log success/failure and get a new number of seconds to delay, timestamp is
  # optional argument (default is current time) but must be monotonically
  # increasing.
 
- my $secs = $ar->failure(1554652553); # => 2
- my $secs = $ar->success();           # => 0
- my $secs = $ar->failure();           # => 2
+ my $secs = $ab->failure(1554652553); # => 2
+ my $secs = $ab->success();           # => 0
+ my $secs = $ab->failure();           # => 2
 
 =head1 DESCRIPTION
 
 This backoff strategy is one of the simplest: it waits X second(s) after each
-failure, or Y second(s) (default 0) after a success. Some randomness can be
-introduced to avoid "thundering herd problem".
+failure, or Y second(s) (default 0) after a success. There are limits on the
+number of attempts (`max_attempts`) and total duration (`max_actual_duration`).
+Some randomness can be introduced to avoid "thundering herd problem".
 
 =head1 METHODS
 
@@ -129,6 +132,18 @@ If you set this to a value larger than 0, the actual delay will be between a
 random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
 
 =item * B<max_attempts> => I<uint> (default: 0)
 

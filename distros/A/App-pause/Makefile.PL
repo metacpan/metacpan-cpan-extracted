@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Log::ger::Output" => "0.005",
     "Log::ger::Output::Screen" => "0.007",
     "Log::ger::Util" => "0.008",
-    "Perinci::CmdLine::Util::Config" => "1.721",
+    "Perinci::CmdLine::Util::Config" => "1.722",
     "Perinci::Result::Format::Lite" => "0.273",
     "Scalar::Util" => 0,
     "Scalar::Util::Numeric" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.651",
+  "VERSION" => "0.652",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,7 +66,7 @@ my %FallbackPrereqs = (
   "Log::ger::Output" => "0.005",
   "Log::ger::Output::Screen" => "0.007",
   "Log::ger::Util" => "0.008",
-  "Perinci::CmdLine::Util::Config" => "1.721",
+  "Perinci::CmdLine::Util::Config" => "1.722",
   "Perinci::Result::Format::Lite" => "0.273",
   "Scalar::Util" => 0,
   "Scalar::Util::Numeric" => 0,

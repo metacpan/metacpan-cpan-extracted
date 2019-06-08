@@ -30,6 +30,7 @@ use 5.020;
 use strict;
 use warnings;
 
+use lib qw(../lib);
 use experimental qw(signatures);
 use Math::AnyNum qw(isqrt ipow bernoulli faulhaber_sum);
 

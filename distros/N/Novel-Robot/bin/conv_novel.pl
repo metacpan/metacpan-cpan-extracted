@@ -18,6 +18,8 @@ my $convert_file = convert_novel( %opt );
 
 sub convert_novel {
   my ( %opt ) = @_;
+  return unless(-f $opt{f} and -s $opt{f});
+
   $opt{t} ||= 'mobi';
 
   my $dst_file = $opt{t};
@@ -25,7 +27,7 @@ sub convert_novel {
     $dst_file = $opt{f};
     $dst_file =~ s/[a-z0-9]+$/$opt{t}/i;
   }
-  print "$opt{f} => $dst_file\n";
+  print decode(locale=>"$opt{f} => $dst_file\n");
 
   my ( $writer, $book ) = $opt{f} =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
   my %conv = (

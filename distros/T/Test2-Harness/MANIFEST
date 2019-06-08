@@ -136,6 +136,7 @@ t/Test2/Harness/Util/TestFile.t
 t/Test2/Harness/Watcher.t
 t/Test2/Tools/HarnessTester.t
 t/example_log.jsonl.bz2
+t/fail.t
 t/failure_cases.t
 t/failure_cases/badplan.tx
 t/failure_cases/buffered_subtest_abrupt_end.tx

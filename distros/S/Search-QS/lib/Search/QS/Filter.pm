@@ -1,5 +1,5 @@
 package Search::QS::Filter;
-$Search::QS::Filter::VERSION = '0.01';
+$Search::QS::Filter::VERSION = '0.02';
 use v5.14;
 use Moose;
 
@@ -109,7 +109,7 @@ Search::QS::Filter - Incapsulation of a single filter element
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ version 0.01
 
   my $flt = new Search::QS::Filter;
   # parse query_string
-  $flt->parse($qs);
+  $flt->parse_qs($qs);
   # reconvert object to query_string
   print $flt->to_qs;
 
@@ -128,7 +128,8 @@ search element in an SQL string. Like
 
   fullname = "Joe"
 
-it has a fied L<name()> "fullname", an L<operator()> "=" and a L<value()> "Joe".
+it has a fied L</"name__"> "fullname", an L</"operator__"> "=" and a
+L</"value__"> "Joe".
 
 =head1 METHODS
 
@@ -162,7 +163,7 @@ distinguish different operation with same field name.
 
 As an example
 
-  fld[a:1]=1&fld[a:1]=>&fld[a:2]=5&fld[a:2]=<
+  fld[a:1]=1&fld[a:1]=$op:>&fld[a:2]=5&fld[a:2]=$op:<
 
 must be
 
@@ -183,11 +184,13 @@ is traslated in
 
 =head2 orGroup()
 
-Like L<andGroup()> but for OR operator
+Like L</"andGroup__"> but for OR operator
 
-=head2 parse($query_string)
+=head2 parse($perl_struct)
 
-Parse a query string and extract filter informations
+$perl_struct is an HASHREF which represents a query string like
+the one returned by L<URI::Encode/"url_params_mixed">.
+It parses the struct and extract filter informations
 
 =head2 to_qs()
 

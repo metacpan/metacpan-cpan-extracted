@@ -1,0 +1,99 @@
+{
+    "items": [
+        {
+            "type": [
+                "h-entry"
+            ],
+            "properties": {
+                "content": [
+                    {
+                        "html": "My post",
+                        "value": "My post"
+                    }
+                ],
+                "in-reply-to": [
+                    {
+                        "type": [
+                            "h-cite"
+                        ],
+                        "properties": {
+                            "name": [
+                                "Two RSS experiments for June 2019"
+                            ],
+                            "url": [
+                                "https://fogknife.com/2019-06-03-two-takes-on-rss-for-june-2019.html"
+                            ]
+                        },
+                        "value": "https://fogknife.com/2019-06-03-two-takes-on-rss-for-june-2019.html"
+                    }
+                ],
+                "name": [
+                    {
+                        "type": [
+                            "h-cite"
+                        ],
+                        "properties": {
+                            "name": [
+                                "Two RSS experiments for June 2019"
+                            ],
+                            "url": [
+                                "https://fogknife.com/2019-06-03-two-takes-on-rss-for-june-2019.html"
+                            ]
+                        },
+                        "value": "Two RSS experiments for June 2019"
+                    }
+                ],
+                "foo": [
+                    {
+                        "type": [
+                            "h-cite"
+                        ],
+                        "properties": {
+                            "name": [
+                                "Two RSS experiments for June 2019"
+                            ],
+                            "url": [
+                                "https://fogknife.com/2019-06-03-two-takes-on-rss-for-june-2019.html"
+                            ]
+                        },
+                        "value": "Two RSS experiments for June 2019"
+                    }
+                ],
+                "bar": [
+                    {
+                        "type": [
+                            "h-cite"
+                        ],
+                        "properties": {
+                            "name": [
+                                "Two RSS experiments for June 2019"
+                            ],
+                            "url": [
+                                "https://fogknife.com/2019-06-03-two-takes-on-rss-for-june-2019.html"
+                            ]
+                        },
+                        "value": "Two RSS experiments for June 2019"
+                    }
+                ],
+                "baz": [
+                    {
+                        "type": [
+                            "h-cite"
+                        ],
+                        "properties": {
+                            "name": [
+                                "Two RSS experiments for June 2019"
+                            ],
+                            "url": [
+                                "https://fogknife.com/2019-06-03-two-takes-on-rss-for-june-2019.html"
+                            ]
+                        },
+                        "value": "Two RSS experiments for June 2019"
+                    }
+                ]
+            }
+        }
+    ],
+    "rels": {},
+    "rel-urls": {}
+}

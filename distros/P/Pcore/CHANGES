@@ -1,3 +1,7 @@
+v0.90.6 2019-06-06T05:29:13Z
+ - old code removed
+ - dbi query to string
+
 v0.90.5 2019-06-05T08:14:51Z
  - filter decrypt hack
 

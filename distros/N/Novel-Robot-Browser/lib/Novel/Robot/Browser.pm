@@ -5,10 +5,13 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 
-use Novel::Robot::Browser::CookieJar;
+#use Novel::Robot::Browser::CookieJar;
+use HTTP::CookieJar;
+use Data::Dumper;
 
+use File::Slurp qw/slurp/;
 use Encode::Detect::CJK qw/detect/;
 use Encode;
 use HTTP::Tiny;
@@ -43,7 +46,8 @@ sub _init_browser {
   $headers ||= {};
   my %h = ( %DEFAULT_HEADER, %$headers );
 
-  my $cookie_jar = Novel::Robot::Browser::CookieJar->new();
+  #my $cookie_jar = Novel::Robot::Browser::CookieJar->new();
+  my $cookie_jar = HTTP::CookieJar->new;
 
   my $http = HTTP::Tiny->new(
     default_headers => \%h,
@@ -200,10 +204,13 @@ sub request_url_simple {
 
   my $res;
   if ( $form ) {
-    $self->{browser}{headers}{'content-type'} = 'application/x-www-form-urlencoded';
     $res = $self->{browser}->request(
       'POST', $url,
-      { content => $self->format_post_content( $form ) } );
+      { content => $self->format_post_content( $form ) , 
+        headers => {
+            'content-type' => 'application/x-www-form-urlencoded', 
+        }, 
+      } );
   } else {
     $res = $self->{browser}->get( $url );
   }
@@ -222,49 +229,32 @@ sub request_url_simple {
   return $r || $DEFAULT_URL_CONTENT;
 } ## end sub request_url_simple
 
-
-sub set_cookie {
-  my ( $self, $cookie ) = @_;
-  $self->{browser}{cookie_jar}{cookie} = $cookie;
-  return $self;
-}
-
-sub clear_cookie {
-    my ( $self, $cookie ) = @_;
-    $self->set_cookie('');
-}
-
 sub read_moz_cookie {
   my ( $self, $cookie, $dom ) = @_;
 
-  if ( -f $cookie ) {                  #firefox sqlite3
-    my $sqlite3_cookie = `sqlite3 "$cookie" "select * from moz_cookies where baseDomain='$dom'"`;
-    my @segment = map { my @c = split /\|/; "$c[3]=$c[4]" } ( split /\n/, $sqlite3_cookie );
-    $cookie = join( "; ", @segment );
+  my @segment;
+  if ( -f $cookie and $cookie =~ /\.sqlite$/ ) {  # firefox sqlite3
+    my $sqlite3_cookie =
+      `sqlite3 "$cookie" "select host,isSecure,path,isHttpOnly,expiry,name,value from moz_cookies where baseDomain='$dom'"`;
+    @segment = map { [ split /\|/ ] } split /\n/, $sqlite3_cookie;
+  } elsif ( -f $cookie and $cookie =~ /\.txt$/ ) {  # Netscape HTTP Cookie File
+    my @ck = slurp( $cookie );
+    @segment = grep { $_->[0] and $_->[0] =~ /(^|\.)\Q$dom\E$/ } map { [ split /\s+/ ] } @ck;
+  } else {                             # cookie string : name1=value1; name2=value2
+    my @ck = split /;\s*/, $cookie;
+    @segment = map { my @c = split /=/; [ $dom, undef, '/', undef, 0, $c[0], $c[1] ] } @ck;
   }
+  #print Dumper(\@segment);
 
-  $self->set_cookie( $cookie );
+  @segment = grep { defined $_->[6] and $_->[6]=~/\S/ } @segment;
+
+  my @jar = map { "$_->[5]=$_->[6]; Domain=$_->[0]; Path=$_->[2]; Expiry=$_->[4]" } @segment;
+  $self->{browser}{cookie_jar}->load_cookies( @jar );
+
+  $cookie = join( "; ", map { "$_->[5]=$_->[6]" } @segment );
+  #$self->{browser}{cookie_jar}{cookie} = $cookie;
+
   return $cookie;
-
-  #use HTTP::CookieJar;
-  #my @segment;
-  #if ( -f $cookie ) {                  #firefox sqlite3
-  #my $sqlite3_cookie = `sqlite3 "$cookie" "select name,value,host,path from moz_cookies where baseDomain='$dom'"`;
-  #@segment = map { [ split /\|/ ] } ( split /\n/, $sqlite3_cookie );
-  #}else{
-  #@segment = map { [ (split /=/, $_), $dom, '/' ] } ( split /;\s*/, $cookie );
-  #}
-
-  #$self->{browser}{cookie_jar}{store}{ $_->[2] }{ $_->[3] }{ $_->[0] } = {
-  #domain => $_->[2],
-  #path => $_->[3],
-  #name => $_->[0],
-  #value => $_->[1],
-  #creation_time=> time,
-  #last_access_time => time,
-  #}  for @segment;
-
-  #$cookie = join( "; ", map { "$_->[1]=$_->[2]" } @segment );
 
 } ## end sub read_moz_cookie
 

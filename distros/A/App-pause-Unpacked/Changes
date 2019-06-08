@@ -1,0 +1,32 @@
+0.490   2019-06-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - Update & reupload to CPAN.
+
+
+0.48    2016-06-02 (PERLANCAR)
+
+        - Update to App-pause 0.55.
+
+
+0.47    2015-09-10 (PERLANCAR)
+
+        - Update to App-pause 0.47 & synchronize version number.
+
+
+0.44    2015-07-28 (PERLANCAR)
+
+        - Update to App-pause 0.44 & synchronize version number.
+
+
+0.02    2015-07-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Add missing dependency.
+
+
+0.01    2015-07-07 (PERLANCAR)
+
+        - First release.

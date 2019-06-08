@@ -14,7 +14,7 @@ use Test::BrewBuild;
 use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Git;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 $| = 1;
 

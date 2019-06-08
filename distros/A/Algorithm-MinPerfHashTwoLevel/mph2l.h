@@ -1,9 +1,11 @@
-#ifndef STADTX_SEED_BYTES
-#define STADTX_SEED_BYTES (sizeof(U64) * 2)
+#ifndef MPH_SEED_BYTES
+#define MPH_SEED_BYTES (sizeof(U64) * 2)
 #endif
-#ifndef STADTX_STATE_BYTES
-#define STADTX_STATE_BYTES (sizeof(U64) * 4)
+#ifndef MPH_STATE_BYTES
+#define MPH_STATE_BYTES (sizeof(U64) * 4)
 #endif
+
+#define U64 U64TYPE
 
 #ifndef MPH_MAP_POPULATE
 #ifdef MAP_POPULATE
@@ -81,6 +83,13 @@
 #define MAGIC_DECIMAL 1278363728 /* PH2L */
 #define MAGIC_BIG_ENDIAN_DECIMAL 1346908748
 
+#define MPH_VALS_ARE_SAME_UTF8NESS_FLAG_BIT   1           /* 0000 0001 */
+#define MPH_VALS_ARE_SAME_UTF8NESS_MASK       3           /* 0000 0011 */
+#define MPH_VALS_ARE_SAME_UTF8NESS_SHIFT      1           /*  000 0001 */
+#define MPH_KEYS_ARE_SAME_UTF8NESS_FLAG_BIT   4           /* 0000 0100 */
+#define MPH_KEYS_ARE_SAME_UTF8NESS_MASK       (7 << 2)    /* 0001 1100 */
+#define MPH_KEYS_ARE_SAME_UTF8NESS_SHIFT      3           /*    0 0011 */
+
 /*
 #ifndef av_top_index
 #define av_top_index(x) av_len(x)
@@ -116,15 +125,13 @@ STMT_START {                                                            \
     if (got_he) sv_setuv(HeVAL(got_he),uv);                             \
 } STMT_END
 
-#define HASH2INDEX(x,h2,xor_val,bucket_count,variant) STMT_START {      \
+#define HASH2INDEX(x,h2,xor_val,bucket_count) STMT_START {      \
         x= h2 ^ xor_val;                                                \
-        if (variant > 1) {                                              \
         /* see: https://stackoverflow.com/a/12996028                    \
          * but we could use any similar integer hash function. */       \
-            x = ((x >> 16) ^ x) * 0x45d9f3b;                            \
-            x = ((x >> 16) ^ x) * 0x45d9f3b;                            \
-            x = ((x >> 16) ^ x);                                        \
-        }                                                               \
+        x = ((x >> 16) ^ x) * 0x45d9f3b;                                \
+        x = ((x >> 16) ^ x) * 0x45d9f3b;                                \
+        x = ((x >> 16) ^ x);                                            \
         x %= bucket_count;                                              \
 } STMT_END
 
@@ -170,8 +177,13 @@ struct mph_header {
     U32 val_flags_ofs;
     U32 str_buf_ofs;
 
-    U64 table_checksum;
-    U64 str_buf_checksum;
+    union {
+        U64 table_checksum;
+        U64 general_flags;
+    };
+    union {
+        U64 str_buf_checksum;
+    };
 };
 
 struct mph_bucket {

@@ -8,7 +8,9 @@ L<Novel::Robot::Packer> pack novel/bbs content to txt / html , etc
 
 小说/贴子 打包引擎
 
-=head2 type 支持输出类型
+=head2 type
+
+支持输出类型
 
     raw  : 经过MessagePack压缩的二进制文件
 
@@ -20,11 +22,15 @@ L<Novel::Robot::Packer> pack novel/bbs content to txt / html , etc
 
 =head1 FUNCTION
 
-=head2 new 初始化解析模块
+=head2 new
+
+初始化解析模块
 
    my $packer = Novel::Robot::Packer->new(type => 'html');
 
-=head2 main 打包文件
+=head2 main
+
+打包文件
 
    my $book_ref = {
        writer => 'xxx',

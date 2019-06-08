@@ -6,38 +6,6 @@ use Path::Class::Dir;
 use FindBin;
 use JSON;
 
-# %TODO_TESTS: Hash of tests that the parser should support someday, but
-#              that day is not today.
-my %TODO_TESTS =
-(
-          'h-recipe' => [
-                          'all'
-                        ],
-          'h-product' => [
-                           'simpleproperties',
-                           'aggregate'
-                         ],
-          'rel' => [
-                     'duplicate-rels',
-                     'xfn-all',
-                     'license',
-                     'nofollow',
-                     'varying-text-duplicate-rels',
-                     'xfn-elsewhere',
-                     'rel-urls'
-                   ],
-          'h-resume' => [
-                          'work',
-                          'education'
-                        ],
-          'h-review' => [
-                          'vcard',
-                        ],
-          'h-event' => [
-                         'concatenate',
-                       ],
-);
-
 use_ok ("Web::Microformats2");
 
 my $parser = Web::Microformats2::Parser->new;
@@ -61,16 +29,7 @@ sub handle_file {
 
     my $candidate = decode_json($parser->parse( $html )->as_json);
     my $target = decode_json($target_json);
-    if ( first { $_ eq $main } @{ $TODO_TESTS{ $file->parent->basename } } ) {
-        my $parent = $file->parent->basename;
-        local $TODO = "This Microformat2 parser doesn't support the "
-                      . "'$parent/$main' test yet.";
-
-        TODO: { is_deeply( $candidate, $target ) }
-    }
-    else {
-        is_deeply( $candidate, $target );
-    }
+    is_deeply( $candidate, $target );
 }
 
 done_testing();

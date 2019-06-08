@@ -49,6 +49,21 @@ else {
     is ($bc->brew, 'perlbrew', "nix: brew() is ok");
 
     my $inst = "i perl-$perlver";
+
+    my $installed_ok = eval {
+        $bc->installed($inst);
+        1;
+    };
+
+    is $installed_ok, undef, "installed() without legacy param croaks";
+
+    $installed_ok = eval {
+        $bc->installed;
+        1;
+    };
+
+    is $installed_ok, undef, "installed() without any params croaks";
+
     my @inst = $bc->installed(0, $inst);
     is ($inst[0], "perl-$perlver", "nix: installed is ok");
 

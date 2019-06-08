@@ -2,8 +2,8 @@ NAME
     WWW::PAUSE::Simple - An API for PAUSE
 
 VERSION
-    This document describes version 0.443 of WWW::PAUSE::Simple (from Perl
-    distribution WWW-PAUSE-Simple), released on 2019-05-06.
+    This document describes version 0.444 of WWW::PAUSE::Simple (from Perl
+    distribution WWW-PAUSE-Simple), released on 2019-06-05.
 
 SYNOPSIS
 DESCRIPTION
@@ -44,13 +44,25 @@ FUNCTIONS
 
         Protect some files/wildcard patterns from delete/cleanup.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   username => *str*
 
@@ -119,13 +131,25 @@ FUNCTIONS
 
         Protect some files/wildcard patterns from delete/cleanup.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   username => *str*
 
@@ -189,13 +213,25 @@ FUNCTIONS
         If unset, default value will be searched from "~/.pause". Encrypted
         ".pause" is not yet supported.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   username => *str*
 
@@ -249,13 +285,25 @@ FUNCTIONS
         If unset, default value will be searched from "~/.pause". Encrypted
         ".pause" is not yet supported.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   size_max => *uint*
 
@@ -305,13 +353,25 @@ FUNCTIONS
         If unset, default value will be searched from "~/.pause". Encrypted
         ".pause" is not yet supported.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   type => *str*
 
@@ -359,13 +419,25 @@ FUNCTIONS
         If unset, default value will be searched from "~/.pause". Encrypted
         ".pause" is not yet supported.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   username => *str*
 
@@ -419,13 +491,25 @@ FUNCTIONS
         If unset, default value will be searched from "~/.pause". Encrypted
         ".pause" is not yet supported.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   username => *str*
 
@@ -485,13 +569,25 @@ FUNCTIONS
         If unset, default value will be searched from "~/.pause". Encrypted
         ".pause" is not yet supported.
 
-    *   retries => *int* (default: 5)
+    *   retries => *int* (default: 35)
 
         Number of retries when received 5xx HTTP error from server.
 
-    *   retry_delay => *duration* (default: 3)
+    *   retry_delay => *duration*
 
-        How long to wait before retrying.
+        How long to wait before retrying (deprecated).
+
+        This setting is now deprecated. Will use a constant backoff strategy
+        of delaying this many seconds. The default (when this setting is not
+        specified) is now to use an exponential backoff strategy of delaying
+        3, 6, 12, 24, ..., 3600, 3600, ... seconds. The default "retries" of
+        35 makes this strategy retries for a little over a day (88941
+        seconds). The terminal delay setting (default 3600 seconds) can be
+        set via "retry_max_delay".
+
+    *   retry_max_delay => *duration* (default: 3600)
+
+        How long to wait at most before retrying.
 
     *   subdir => *str* (default: "")
 

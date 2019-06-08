@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 8;
+use Test::Most tests => 11;
 use Test::NoWarnings;
 
 BEGIN {
@@ -21,4 +21,10 @@ PATHS: {
 
 	ok($i->logdir('.') eq '.');
 	ok($i->logdir() eq '.');
+
+	$dir = CGI::Info::logdir();
+	ok(defined($dir));
+	diag($dir);
+	ok(-w $dir);
+	ok(-d $dir);
 }

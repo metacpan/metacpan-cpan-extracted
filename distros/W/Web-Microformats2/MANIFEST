@@ -58,6 +58,8 @@ t/microformats-v2/h-entry/justahyperlink.html
 t/microformats-v2/h-entry/justahyperlink.json
 t/microformats-v2/h-entry/justaname.html
 t/microformats-v2/h-entry/justaname.json
+t/microformats-v2/h-entry/redundantproperties.html
+t/microformats-v2/h-entry/redundantproperties.json
 t/microformats-v2/h-entry/scriptstyletags.html
 t/microformats-v2/h-entry/scriptstyletags.json
 t/microformats-v2/h-entry/summarycontent.html

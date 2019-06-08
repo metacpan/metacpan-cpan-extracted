@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW-Form-UrlEncoded
 
+0.26 2019-06-07T06:35:00Z
+
+   - https://github.com/kazeburo/WWW-Form-UrlEncoded/pull/8
+   - https://github.com/kazeburo/WWW-Form-UrlEncoded/pull/7
+
 0.25 2018-09-21T07:45:39Z
 
    - use JSON::PP for less deps https://github.com/kazeburo/WWW-Form-UrlEncoded/pull/6

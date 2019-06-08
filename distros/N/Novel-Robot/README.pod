@@ -107,8 +107,8 @@ download novel from url
 
 下载小说
 
-    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] -o [目标文件名/目标文件夹]
+    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] --cookie [cookie] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] --cookie [cookie登录信息] -o [目标文件名/目标文件夹]
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
@@ -119,16 +119,22 @@ download novel from url
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
+jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie "name1=value1; name2=value2"
+
 =head2 convert txt
 
 convert txt, parse chapter name with regex
 
 转换txt，可指定章节标题的正则式
 
-    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -t [type] -R [chapter_regex]
-    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -R [章节标题匹配的正则式]
+    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -t [type] -r [chapter_regex]
+    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -r [章节标题匹配的正则式]
     get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
-    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -R "第[ \\t\\d]+章" -t html
+    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
     get_novel.pl -f 飘灯-像妖怪一样自由.txt -t html
 
 =head2 only print info
@@ -147,24 +153,33 @@ only print info, but not download, 输出小说信息（不下载）
     -w : writer name 作者名
     -b : book name，书名
     -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -R : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -c : firefox cookies.sqlite / netscape HTTP cookie file / cookie string, details in Novel::Robot::Browser
 
     -t : save type, 小说保存类型，例如txt/html
     -o : output filename, 保存的小说文件名
-    -C : with_toc, 小说保存时是否生成目录(默认是)
 
+    -p : min_page_num-max_page_num, 只取 x-y 页
+    -i : min_item_num-max_item_num, 只取 x-y 章/楼
+
+    -C : with_toc, 小说保存时是否生成目录(默认是)
     -G : grep_content , 提取关键字
     -F : filter_content , 过滤关键字
     -A : only_poster, 贴子只看楼主
     -N : min_content_word_num, 贴子每楼层最小字数
 
-    -P : min_page_num-max_page_num, 只取 x-y 页
-    -i : min_item_num-max_item_num, 只取 x-y 章/楼
-
-    -p : max_process_num, 进程个数 
+    --novel_list_path : xpath to extract novel_list, 提取novel_list的路径
+    --content_path    : xpath to extract content, 提取content的路径
+    --writer_path     : xpath to extract writer, 提取writer的路径
+    --book_path       : xpath to extract book, 提取book的路径
+    --content_regex   : regex to extract content, 提取content的正则
+    --writer_regex    : regex to extract writer, 提取writer的正则
+    --book_regex      : regex to extract book, 提取book的正则
 
     -D : only print info, not download, 只输出信息，不下载
     -v : verbose, 显示进度条(默认显示)
+
+    -P : max_process_num, 进程个数 
 
 =head1 conv_novel.pl
     

@@ -1,7 +1,7 @@
 package Algorithm::Backoff::Exponential;
 
-our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -16,6 +16,7 @@ $SPEC{new} = {
     is_func => 0,
     args => {
         %Algorithm::Backoff::attr_consider_actual_delay,
+        %Algorithm::Backoff::attr_max_actual_duration,
         %Algorithm::Backoff::attr_max_attempts,
         %Algorithm::Backoff::attr_jitter_factor,
         %Algorithm::Backoff::attr_delay_on_success,
@@ -63,7 +64,7 @@ Algorithm::Backoff::Exponential - Backoff exponentially
 
 =head1 VERSION
 
-This document describes version 0.003 of Algorithm::Backoff::Exponential (from Perl distribution Algorithm-Backoff), released on 2019-04-10.
+This document describes version 0.004 of Algorithm::Backoff::Exponential (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
 
 =head1 SYNOPSIS
 
@@ -71,14 +72,15 @@ This document describes version 0.003 of Algorithm::Backoff::Exponential (from P
 
  # 1. instantiate
 
- my $ar = Algorithm::Backoff::Exponential->new(
+ my $ab = Algorithm::Backoff::Exponential->new(
      #consider_actual_delay => 1, # optional, default 0
-     #max_attempts     => 0, # optional, default 0 (retry endlessly)
-     #jitter_factor    => 0.25, # optional, default 0
-     initial_delay     => 5, # required
-     #max_delay        => 100, # optional
-     #exponent_base    => 2, # optional, default 2 (binary exponentiation)
-     #delay_on_success => 0, # optional, default 0
+     #max_actual_duration   => 0, # optional, default 0 (retry endlessly)
+     #max_attempts          => 0, # optional, default 0 (retry endlessly)
+     #jitter_factor         => 0.25, # optional, default 0
+     initial_delay          => 5, # required
+     #max_delay             => 100, # optional
+     #exponent_base         => 2, # optional, default 2 (binary exponentiation)
+     #delay_on_success      => 0, # optional, default 0
  );
 
  # 2. log success/failure and get a new number of seconds to delay, timestamp is
@@ -87,13 +89,13 @@ This document describes version 0.003 of Algorithm::Backoff::Exponential (from P
  # for example, using the parameters initial_delay=5, max_delay=100:
 
  my $secs;
- $secs = $ar->failure();   # =>  5 (= initial_delay)
- $secs = $ar->failure();   # => 10 (5 * 2^1)
- $secs = $ar->failure();   # => 20 (5 * 2^2)
- $secs = $ar->failure();   # => 33 (5 * 2^3 - 7)
- $secs = $ar->failure();   # => 80 (5 * 2^4)
- $secs = $ar->failure();   # => 100 ( min(5 * 2^5, 100) )
- $secs = $ar->success();   # => 0 (= delay_on_success)
+ $secs = $ab->failure();   # =>  5 (= initial_delay)
+ $secs = $ab->failure();   # => 10 (5 * 2^1)
+ $secs = $ab->failure();   # => 20 (5 * 2^2)
+ $secs = $ab->failure();   # => 33 (5 * 2^3 - 7)
+ $secs = $ab->failure();   # => 80 (5 * 2^4)
+ $secs = $ab->failure();   # => 100 ( min(5 * 2^5, 100) )
+ $secs = $ab->success();   # => 0 (= delay_on_success)
 
 =head1 DESCRIPTION
 
@@ -105,6 +107,9 @@ Only the C<initial_delay> is required. C<exponent_base> is 2 by default (binary
 expoential). For the first failure attempt (C<attempts> = 1) the delay equals
 the initial delay. Then it is doubled, quadrupled, and so on (using the default
 exponent base of 2).
+
+There are limits on the number of attempts (`max_attempts`) and total duration
+(`max_actual_duration`).
 
 It is recommended to add a jitter factor, e.g. 0.25 to add some randomness.
 
@@ -153,6 +158,18 @@ If you set this to a value larger than 0, the actual delay will be between a
 random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
 
 =item * B<max_attempts> => I<uint> (default: 0)
 

@@ -69,6 +69,7 @@ has 'children' => (
     traits => ['Array'],
     handles => {
         add_child => 'push',
+        has_children => 'count',
     },
 );
 
@@ -86,6 +87,11 @@ has 'types' => (
 has 'value' => (
     is => 'rw',
     isa => 'Maybe[Str]',
+);
+
+has 'last_seen_date' => (
+    is => 'rw',
+    isa => 'Maybe[DateTime]',
 );
 
 sub add_property {

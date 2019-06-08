@@ -1,6 +1,13 @@
 Changelog for Search-QS
 
-0.01 2019-06-05T08:29:53
+0.02 2019-06-06T15:39:08
+ - Updated documentation and add more tests
+ - Add a few documentation
+ - Some minor changes to documentation
+ - Generated README.pod
+ - Add ReadmeAnyFromPod in dzil conf file
+
+0.01 2019-06-05T08:26:17
  - Shared code for tests exported in a single module
  - Add documentation to Filter(s), Options and Sort
  - Add documentation to Search::QS::Filter

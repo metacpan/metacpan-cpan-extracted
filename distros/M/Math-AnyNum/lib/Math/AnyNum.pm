@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -6877,10 +6877,12 @@ sub __lucasUV__ {
     my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
     my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
 
-    my $t = Math::GMPz::Rmpz_init_set_ui(2);
-    my $s = Math::GMPz::Rmpz_remove($t, $n, $t);
+    my $t = Math::GMPz::Rmpz_init();
+    my $s = Math::GMPz::Rmpz_scan1($n, 0);
 
-    foreach my $bit (split(//, substr(Math::GMPz::Rmpz_get_str($t, 2), 0, -1))) {
+    Math::GMPz::Rmpz_div_2exp($t, $n, $s + 1);
+
+    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($t, 2))) {
 
         Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
 
@@ -6930,10 +6932,12 @@ sub __lucasUVmod__ {
     my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
     my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
 
-    my $t = Math::GMPz::Rmpz_init_set_ui(2);
-    my $s = Math::GMPz::Rmpz_remove($t, $n, $t);
+    my $t = Math::GMPz::Rmpz_init();
+    my $s = Math::GMPz::Rmpz_scan1($n, 0);
 
-    foreach my $bit (split(//, substr(Math::GMPz::Rmpz_get_str($t, 2), 0, -1))) {
+    Math::GMPz::Rmpz_div_2exp($t, $n, $s + 1);
+
+    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($t, 2))) {
 
         Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
         Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
@@ -6997,6 +7001,9 @@ sub lucasU ($$$) {
     # U_0(P, Q) = 0
     Math::GMPz::Rmpz_sgn($n) || goto &zero;
 
+    # undefined for n < 0
+    Math::GMPz::Rmpz_sgn($n) < 0 && goto &nan;
+
     my $D = Math::GMPz::Rmpz_init();
 
     Math::GMPz::Rmpz_mul($D, $P, $P);
@@ -7033,6 +7040,9 @@ sub lucasUmod ($$$$) {
     # U_0(P, Q) = 0
     Math::GMPz::Rmpz_sgn($n) || goto &zero;
 
+    # undefined for n < 0
+    Math::GMPz::Rmpz_sgn($n) < 0 && goto &nan;
+
     my $D = Math::GMPz::Rmpz_init();
 
     Math::GMPz::Rmpz_mul($D, $P, $P);
@@ -7063,6 +7073,9 @@ sub lucasV ($$$) {
     $Q = _star2mpz($Q) // goto &nan;
     $n = _star2mpz($n) // goto &nan;
 
+    # undefined for n < 0
+    Math::GMPz::Rmpz_sgn($n) < 0 && goto &nan;
+
     my ($V) = __lucasV__($P, $Q, $n);
 
     bless \$V;
@@ -7078,6 +7091,9 @@ sub lucasVmod ($$$$) {
 
     # undefined for m=0
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+    # undefined for n < 0
+    Math::GMPz::Rmpz_sgn($n) < 0 && goto &nan;
 
     my ($V) = __lucasVmod__($P, $Q, $n, $m);
 
@@ -7531,7 +7547,7 @@ sub _secant_numbers {
         return @cache;
     }
 
-    $n <<= 1 if ($n <= 250);
+    $n <<= 1 if ($n <= 512);
 
     my @S = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -7545,7 +7561,7 @@ sub _secant_numbers {
         }
     }
 
-    push @cache, @S[@cache .. (@S <= 1000 ? $#S : 1000)];
+    push @cache, @S[@cache .. (@S <= 1024 ? $#S : 1024)];
 
     return @S;
 }
@@ -7559,7 +7575,7 @@ sub _tangent_numbers {
         return @cache;
     }
 
-    $n <<= 1 if ($n <= 250);
+    $n <<= 1 if ($n <= 512);
 
     my @T = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -7574,7 +7590,7 @@ sub _tangent_numbers {
         }
     }
 
-    push @cache, @T[@cache .. (@T <= 1000 ? $#T : 1000)];
+    push @cache, @T[@cache .. (@T <= 1024 ? $#T : 1024)];
 
     return @T;
 }
@@ -7630,7 +7646,7 @@ sub _bernoulli_numbers {
         $B[($k >> 1) + 1] = $q;
     }
 
-    push @cache, @B[@cache .. (@B <= 1000 ? $#B : 1000)];
+    push @cache, @B[@cache .. (@B <= 1024 ? $#B : 1024)];
 
     return (@cache, (@B > @cache ? @B[@cache .. $#B] : ()));
 }
@@ -7702,7 +7718,7 @@ sub __bernfrac__ {
         goto &_zero;
     }
 
-    if ($n <= 500) {
+    if ($n < 512) {
         return ((_bernoulli_numbers($n))[($n>>1)+1]);
     }
 
@@ -7711,10 +7727,7 @@ sub __bernfrac__ {
 
     my $log2B = (CORE::log(4 * $tau * $n) / 2 + $n * (CORE::log($n / $tau) - 1)) / CORE::log(2);
 
-    my $prec = CORE::int($n + $log2B) +
-          ($n <= 90 ? (3, 3, 4, 4, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10, 12, 9, 7, 6, 0, 0, 0,
-                       0, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4)[($n>>1)-1] : 0);
-
+    my $prec = CORE::int($n + $log2B) + ($n <= 90 ? 24 : 0);
     state $d = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_fac_ui($d, $n);                      # d = n!
 

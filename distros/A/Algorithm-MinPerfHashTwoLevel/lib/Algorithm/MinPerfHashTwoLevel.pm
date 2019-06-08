@@ -1,8 +1,8 @@
 package Algorithm::MinPerfHashTwoLevel;
 use strict;
 use warnings;
-our $VERSION = '0.14';
-our $DEFAULT_VARIANT = 3;
+our $VERSION = '0.15';
+our $DEFAULT_VARIANT = 5;
 
 use Exporter qw(import);
 use Carp ();
@@ -15,7 +15,8 @@ BEGIN {
         MPH_F_DETERMINISTIC         =>  (1<<1),
        #MPH_F_NO_DEDUPE             =>  (1<<2),
        #MPH_F_VALIDATE              =>  (1<<3),
-        MAX_VARIANT                 =>  3,
+        MAX_VARIANT                 =>  5,
+        MIN_VARIANT                 =>  5,
         STADTX_HASH_SEED_BYTES      => 16,
         STADTX_HASH_STATE_BYTES     => 32,
     );
@@ -26,6 +27,7 @@ our %EXPORT_TAGS = (
     'all' => [
         '$DEFAULT_VARIANT',
         'MAX_VARIANT',
+        'MIN_VARIANT',
         qw(
             seed_state
             hash_with_state
@@ -67,6 +69,9 @@ sub new {
     die "Unknown variant '$o->{variant}' in constructor new(), max known is "
         . MAX_VARIANT . " default is " . $DEFAULT_VARIANT
         if $o->{variant} > MAX_VARIANT;
+    die "Unknown variant '$o->{variant}' in constructor new(), min known is "
+        . MIN_VARIANT . " default is " . $DEFAULT_VARIANT
+        if $o->{variant} < MIN_VARIANT;
 
     return $o;
 }
@@ -207,7 +212,7 @@ as follows:
     2. find the xor_val for bucket[idx1]
     3. if the xor_val is zero we are done, the key is not in the hash
     4. compute idx2:
-        if variant > 0 and int(xor_val) < 0
+        if int(xor_val) < 0
             idx2 = -xor_val-1
         else
             idx2 = INTHASH(h2 ^ xor_val) % n;
@@ -218,7 +223,7 @@ In essence this module performs the task of computing the xor_val for
 each bucket such that the idx2 for every element is unique, it does it in C/XS so
 that it is fast.
 
-The INTHASH() function used depends by variant, with variant 2 and later it is:
+The INTHASH() function used is:
 
     x = ((x >> 16) ^ x) * 0x45d9f3b;
     x = ((x >> 16) ^ x) * 0x45d9f3b;
@@ -226,8 +231,7 @@ The INTHASH() function used depends by variant, with variant 2 and later it is:
 
 which is just a simple 32 bit integer hash function I found at
 https://stackoverflow.com/a/12996028, but any decent reversible
-integer hash function would do. For variant 0 and 1 it is the identity
-function. The default is variant 3.
+integer hash function would do. 
 
 *NOTE* in Perl a given string may have differing binary representations
 if it is encoded as utf8 or not. This module uses the same conventions
@@ -249,7 +253,8 @@ Construct a new Algorithm::MinPerfHashTwoLevel object. Optional arguments
 which may be provided are 'source_hash' which is a hash reference to use
 as the source for the minimal perfect hash, 'seed' which is expected to be
 a 16 byte string, and 'debug' which is expected to be 0 or 1, as well
-as variant, which may be 0, 1 or 2. The default is 2.
+as variant, which may be 5 (use version v0.14 for variants before 5). 
+The default is 5.
 
 =item compute
 

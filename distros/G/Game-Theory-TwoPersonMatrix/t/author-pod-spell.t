@@ -30,5 +30,6 @@ equilibria
 gene
 lib
 metacpan
+nash
 oddments
 saddlepoint

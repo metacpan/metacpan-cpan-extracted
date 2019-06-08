@@ -6,6 +6,8 @@ Home page:    <https://metacpan.org/release/Test-FITesque-RDF>
 Bug tracker:  <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.006	2019-06-07	Create HTTP request-response objects
+
 0.005	2019-06-03	Support several vocabularies for parameters
 
 0.004	2019-06-03	Support RDF lists

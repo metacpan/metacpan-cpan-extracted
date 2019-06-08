@@ -11,8 +11,11 @@ Files: Changes
  lib/Test/FITesque/RDF.pm
  t/01basic.t
  t/integration-basic.t
+ t/integration-http-list.t
+ t/lib/Internal/Fixture/HTTPList.pm
  t/lib/Internal/Fixture/Multi.pm
  t/lib/Internal/Fixture/Simple.pm
+ t/unit-http-list.t
  t/unit-list.t
  t/unit-multi-vocab.t
  t/unit-multi.t
@@ -25,6 +28,7 @@ Files: INSTALL
  LICENSE
  README
  README.md
+ t/data/http-list.ttl
  t/data/list.ttl
  t/data/multi-vocab.ttl
  t/data/multi.ttl

@@ -1,14 +1,10 @@
 use strict;
 use warnings;
 
-package DBIx::Class::PassphraseColumn;
-BEGIN {
-  $DBIx::Class::PassphraseColumn::AUTHORITY = 'cpan:FLORA';
-}
-BEGIN {
-  $DBIx::Class::PassphraseColumn::VERSION = '0.02';
-}
+package DBIx::Class::PassphraseColumn; # git description: 0.02-6-g962fbc2
 # ABSTRACT: Automatically hash password/passphrase columns
+
+our $VERSION = '0.03';
 
 use Class::Load 'load_class';
 use Sub::Name 'subname';
@@ -16,11 +12,143 @@ use namespace::clean;
 
 use parent 'DBIx::Class';
 
+#pod =head1 SYNOPSIS
+#pod
+#pod     __PACKAGE__->load_components(qw(PassphraseColumn));
+#pod
+#pod     __PACKAGE__->add_columns(
+#pod         id => {
+#pod             data_type         => 'integer',
+#pod             is_auto_increment => 1,
+#pod         },
+#pod         passphrase => {
+#pod             data_type        => 'text',
+#pod             passphrase       => 'rfc2307',
+#pod             passphrase_class => 'SaltedDigest',
+#pod             passphrase_args  => {
+#pod                 algorithm   => 'SHA-1',
+#pod                 salt_random => 20,
+#pod             },
+#pod             passphrase_check_method => 'check_passphrase',
+#pod         },
+#pod     );
+#pod
+#pod     __PACKAGE__->set_primary_key('id');
+#pod
+#pod
+#pod In application code:
+#pod
+#pod     # 'plain' will automatically be hashed using the specified passphrase_class
+#pod     # and passphrase_args. The result of the hashing will stored in the
+#pod     # specified encoding
+#pod     $rs->create({ passphrase => 'plain' });
+#pod
+#pod     my $row = $rs->find({ id => $id });
+#pod     my $passphrase = $row->passphrase; # an Authen::Passphrase instance
+#pod
+#pod     if ($row->check_passphrase($input)) { ...
+#pod
+#pod     $row->passphrase('new passphrase');
+#pod     $row->passphrase( Authen::Passphrase::RejectAll->new );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This component can be used to automatically hash password columns using any
+#pod scheme supported by L<Authen::Passphrase> whenever the value of these columns is
+#pod changed.
+#pod
+#pod =head1 COMPARISON TO SIMILAR MODULES
+#pod
+#pod This module is similar to both L<DBIx::Class::EncodedColumn> and
+#pod L<DBIx::Class::DigestColumns>. Here's a brief comparison that might help you
+#pod decide which one to choose.
+#pod
+#pod =over 4
+#pod
+#pod =item * C<DigestColumns> performs the hashing operation on C<insert> and
+#pod C<update>. C<PassphraseColumn> and C<EncodedColumn> perform the operation when
+#pod the value is set, or on C<new>.
+#pod
+#pod =item * C<DigestColumns> supports only algorithms of the Digest family.
+#pod
+#pod =item * C<EncodedColumn> employs a set of thin wrappers around different cipher
+#pod modules to provide support for any cipher you wish to use and wrappers are very
+#pod simple to write.
+#pod
+#pod =item * C<PassphraseColumn> delegates password hashing and encoding to
+#pod C<Authen::Passphrase>, which already has support for a huge number of hashing
+#pod schemes. Writing a new C<Authen::Passphrase> subclass to support other schemes
+#pod is easy.
+#pod
+#pod =item * C<EncodedColumn> and C<DigestColumns> require all values in a hashed column to
+#pod use the same hashing scheme. C<PassphraseColumn> stores both the hashed
+#pod passphrase value I<and> the scheme used to hash it. Therefore it's possible to
+#pod have different rows using different hashing schemes.
+#pod
+#pod This is especially useful when, for example, being tasked with importing records
+#pod (e.g. users) from a legacy application, that used a certain hashing scheme and
+#pod has no plain-text passwords available, into another application that uses
+#pod another hashing scheme.
+#pod
+#pod =item * C<PassphraseColumn> and C<EncodedColumn> support having more than one hashed
+#pod column per table and each column can use a different hashing
+#pod scheme. C<DigestColumns> is limited to one hashed column per table.
+#pod
+#pod =item * C<DigestColumns> supports changing certain options at runtime, as well as the
+#pod option to not automatically hash values on set. Neither C<PassphraseColumn> nor
+#pod C<EncodedColumn> support this.
+#pod
+#pod =back
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod This module provides the following options for C<add_column>:
+#pod
+#pod =begin :list
+#pod
+#pod = C<< passphrase => $encoding >>
+#pod
+#pod This specifies the encoding that passphrases will be stored in. Possible values are
+#pod C<rfc2307> and C<crypt>. The value of C<$encoding> is passed on unmodified to the
+#pod C<inflate_passphrase> option provided by
+#pod L<DBIx::Class::InflateColumn::Authen::Passphrase>. Please refer to its
+#pod documentation for details.
+#pod
+#pod = C<< passphrase_class => $name >>
+#pod
+#pod When receiving a plain string value for a passphrase, that value will be hashed
+#pod using the C<Authen::Passphrase> subclass specified by C<$name>. A value of
+#pod C<SaltedDigest>, for example, will cause passphrases to be hashed using
+#pod C<Authen::Passphrase::SaltedDigest>.
+#pod
+#pod = C<< passphrase_args => \%args >>
+#pod
+#pod When attempting to hash a given passphrase, the C<%args> specified in this
+#pod options will be passed to the constructor of the C<Authen::Passphrase> class
+#pod specified using C<passphrase_class>, in addition to the actual password to hash.
+#pod
+#pod = C<< passphrase_check_method => $method_name >>
+#pod
+#pod If this option is specified, a method with the name C<$method_name> will be
+#pod created in the result class. This method takes one argument, a plain text
+#pod passphrase, and returns a true value if the provided passphrase matches the
+#pod encoded passphrase stored in the row it's being called on.
+#pod
+#pod =end :list
+#pod
+#pod =cut
 
 __PACKAGE__->load_components(qw(InflateColumn::Authen::Passphrase));
 
 __PACKAGE__->mk_classdata('_passphrase_columns');
 
+#pod =method register_column
+#pod
+#pod Chains with the C<register_column> method in C<DBIx::Class::Row>, and sets up
+#pod passphrase columns according to the options documented above. This would not
+#pod normally be directly called by end users.
+#pod
+#pod =cut
 
 sub register_column {
     my ($self, $column, $info, @rest) = @_;
@@ -67,6 +195,11 @@ sub register_column {
     $self->next::method($column, $info, @rest);
 }
 
+#pod =method set_column
+#pod
+#pod Hash a passphrase column whenever it is set.
+#pod
+#pod =cut
 
 sub set_column {
     my ($self, $col, $val, @rest) = @_;
@@ -78,6 +211,12 @@ sub set_column {
     return $self->next::method($col, $val, @rest);
 }
 
+#pod =method new
+#pod
+#pod Hash all passphrase columns on C<new()> so that C<copy()>, C<create()>, and
+#pod others B<DWIM>.
+#pod
+#pod =cut
 
 sub new {
     my ($self, $attr, @rest) = @_;
@@ -91,17 +230,31 @@ sub new {
     return $self->next::method($attr, @rest);
 }
 
+#pod =head1 SEE ALSO
+#pod
+#pod L<DBIx::Class::InflateColumn::Authen::Passphrase>
+#pod
+#pod L<DBIx::Class::EncodedColumn>
+#pod
+#pod L<DBIx::Class::DigestColumns>
+#pod
+#pod =cut
 
 1;
 
 __END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
 DBIx::Class::PassphraseColumn - Automatically hash password/passphrase columns
+
+=head1 VERSION
+
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -215,8 +368,8 @@ This module provides the following options for C<add_column>:
 
 =item C<< passphrase => $encoding >>
 
-This specifies the encoding passphrases will be stored in. Possible values are
-C<rfc2307> and C<crypt>. The value of C<$encoding> is pass on unmodified to the
+This specifies the encoding that passphrases will be stored in. Possible values are
+C<rfc2307> and C<crypt>. The value of C<$encoding> is passed on unmodified to the
 C<inflate_passphrase> option provided by
 L<DBIx::Class::InflateColumn::Authen::Passphrase>. Please refer to its
 documentation for details.
@@ -251,16 +404,26 @@ L<DBIx::Class::EncodedColumn>
 
 L<DBIx::Class::DigestColumns>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class-PassphraseColumn>
+(or L<bug-DBIx-Class-PassphraseColumn@rt.cpan.org|mailto:bug-DBIx-Class-PassphraseColumn@rt.cpan.org>).
+
 =head1 AUTHOR
 
 Florian Ragwitz <rafl@debian.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTOR
 
-This software is copyright (c) 2011 by Florian Ragwitz.
+=for stopwords Karen Etheridge
+
+Karen Etheridge <ether@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2010 by Florian Ragwitz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

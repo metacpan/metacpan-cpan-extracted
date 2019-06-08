@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.028';
+our $VERSION = '1.031';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -15,14 +15,14 @@ our $VERSION = '1.028';
 #pod
 #pod =begin html
 #pod
-#pod <p>
-#pod   <img alt="Screenshot of list of Futurama characters"
-#pod     src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot.png?raw=true"
-#pod     width="600px">
-#pod   <img alt="Screenshot of editing form for a person"
-#pod     src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-edit.png?raw=true"
-#pod     width="600px">
-#pod </p>
+#pod <div style="display: flex">
+#pod <div style="margin: 3px; flex: 1 1 50%">
+#pod <img alt="Screenshot of list of Futurama characters" src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot.png?raw=true" style="max-width: 100%">
+#pod </div>
+#pod <div style="margin: 3px; flex: 1 1 50%">
+#pod <img alt="Screenshot of editing form for a person" src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-edit.png?raw=true" style="max-width: 100%">
+#pod </div>
+#pod </div>
 #pod
 #pod =end html
 #pod
@@ -90,6 +90,12 @@ our $VERSION = '1.028';
 #pod Yancy comes with plugins to enhance your website.
 #pod
 #pod =over
+#pod
+#pod =item *
+#pod
+#pod L<The Editor plugin|Yancy::Plugin::Editor> allows for customization of
+#pod the Yancy editor application, including adding your own components and
+#pod editors.
 #pod
 #pod =item *
 #pod
@@ -197,7 +203,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.028
+version 1.031
 
 =head1 SYNOPSIS
 
@@ -210,14 +216,14 @@ version 1.028
 
 =head1 DESCRIPTION
 
-=for html <p>
-  <img alt="Screenshot of list of Futurama characters"
-    src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot.png?raw=true"
-    width="600px">
-  <img alt="Screenshot of editing form for a person"
-    src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-edit.png?raw=true"
-    width="600px">
-</p>
+=for html <div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Screenshot of list of Futurama characters" src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot.png?raw=true" style="max-width: 100%">
+</div>
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Screenshot of editing form for a person" src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-edit.png?raw=true" style="max-width: 100%">
+</div>
+</div>
 
 L<Yancy> is a simple content management system (CMS) for administering
 content in a database. Yancy accepts a configuration file that describes
@@ -283,6 +289,12 @@ websites. L<View the example application directory|https://github.com/preaction/
 Yancy comes with plugins to enhance your website.
 
 =over
+
+=item *
+
+L<The Editor plugin|Yancy::Plugin::Editor> allows for customization of
+the Yancy editor application, including adding your own components and
+editors.
 
 =item *
 

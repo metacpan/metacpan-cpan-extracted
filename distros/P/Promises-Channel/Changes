@@ -1,2 +1,5 @@
+0.02 2019-06-06
+-bugfix: 'get()' followed by 'put()' lacks 'drain()' ==> blocks the channel (thanks to ehuelsmann for identifying and fixing)
+
 0.01 2018-12-19
 -Initial release

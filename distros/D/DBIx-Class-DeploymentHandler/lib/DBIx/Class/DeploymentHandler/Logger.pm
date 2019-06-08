@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::Logger;
-$DBIx::Class::DeploymentHandler::Logger::VERSION = '0.002231';
+$DBIx::Class::DeploymentHandler::Logger::VERSION = '0.002232';
 use warnings;
 use strict;
 

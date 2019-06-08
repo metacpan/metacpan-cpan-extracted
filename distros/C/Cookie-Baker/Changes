@@ -1,5 +1,9 @@
 Revision history for Perl extension Cookie-Baker
 
+0.11 2019-06-07T06:27:50Z
+
+   - Supportt SameSite=None https://github.com/kazeburo/Cookie-Baker/pull/15
+
 0.10 2018-09-21T07:40:25Z
 
    - Add samesite https://github.com/kazeburo/Cookie-Baker/pull/13

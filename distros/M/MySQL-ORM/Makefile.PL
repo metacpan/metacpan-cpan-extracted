@@ -18,7 +18,7 @@ WriteMakefile(
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
-		'MySQL::Util'             => 0.38,
+		'MySQL::Util'             => 0.40,
 		'Method::Signatures'      => 0,
 		'Data::Printer'           => 0,
 		'SQL::Abstract::Complete' => 0,

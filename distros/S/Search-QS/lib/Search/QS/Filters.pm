@@ -1,5 +1,5 @@
 package Search::QS::Filters;
-$Search::QS::Filters::VERSION = '0.01';
+$Search::QS::Filters::VERSION = '0.02';
 use v5.14;
 use Moose;
 use Search::QS::Filter;
@@ -98,7 +98,7 @@ Search::QS::Filters - A collection of L<Search::QS::Filter>
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ version 0.01
 
   my $flts = new Search::QS::Filters;
   # parse query_string
-  $flts->parse($qs);
+  $flts->parse_qs($qs);
   # reconvert object to query_string
   print $flts->to_qs;
 
@@ -117,9 +117,11 @@ L<Search::QS::Filter>
 
 =head1 METHODS
 
-=head2 parse($query_string)
+=head2 parse($perl_struct)
 
-Parse a query string and extract filter informations
+$perl_struct is an HASHREF which represents a query string like
+the one returned by L<URI::Encode/"url_params_mixed">.
+It parses the struct and extract filter informations
 
 =head2 to_qs()
 
@@ -145,7 +147,7 @@ same andGroup key
 An HASHREF with keys the orGroup keys and elements the filters with the
 same orGroup key
 
-=item @nogroup
+=item nogroup
 
 An ARRAYREF with all filters non in a and/or-Group.
 

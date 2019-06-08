@@ -4,12 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 
-my %introduces = ( '5.028' => [qw[
+my %introduces = ( '5.030' => [qw[
+                                  unicode12.1 uniprop_wildcards qr'N
+                                  turkic-casing
+                             ]],
+                   '5.028' => [qw[
                                  delete% unicode10.0 state@=
                              ]],
-
                    '5.026' => [qw[
                                  <<~ /xx ^CAPTURE unicode9.0 unicode-scx
                               ]],
@@ -133,6 +136,8 @@ my %alias = (
     'unicode-10.0' => 'unicode10.0',
     'state-array' => 'state@=',
     'state-hash' => 'state@=',
+    # 5.030
+    'named-char-in-single-quoted-regex' => "qr'N",
 );
 
 my %_introduced = map {
@@ -229,7 +234,7 @@ Syntax::Construct - Identify which non-feature constructs are used in the code.
 
 =head1 VERSION
 
-Version 1.008
+Version 1.009
 
 =head1 SYNOPSIS
 
@@ -286,11 +291,11 @@ perldeltas and other places.
 =item 2.
 
 Users of their modules win as they get meaningful error messages
-telling them what Perl version they need to upgrade to.
+telling them which Perl version they need to upgrade to.
 
 =item 3.
 
-The programmer they hired to workaround the problem wins as they know
+The programmer they hired to work around the problem wins as they know
 what constructs to replace in the code to make it run in the ancient
 version.
 
@@ -730,21 +735,41 @@ in L<perl5260delta>.
 
 =head3 delete%
 
-See L<perldelta/delete-on-key/value-hash-slices>.
+See L<perl5280delta/delete-on-key/value-hash-slices>.
 
 Alias: hash-delete-slice
 
 =head3 unicode10.0
 
-See L<perldelta/Unicode 10.0 is supported>.
+See L<perl5280delta/Unicode 10.0 is supported>.
 
 Alias: unicode-10.0
 
 =head3 state@=
 
-See L<perldelta/Initialisation-of-aggregate-state-variables>.
+See L<perl5280delta/Initialisation-of-aggregate-state-variables>.
 
 Aliases: state-array state-hash
+
+=head2 5.030
+
+=head3 unicode12.1
+
+L<perldelta/Unicode 12.1 is supported>
+
+=head3 uniprop_wildcards
+
+L<perldelta/Wildcards in Unicode property value specifications are now partially supported>
+
+=head3 qr'N
+
+L<perldelta/qr'\N{name}' is now supported>
+
+Alias: named-char-in-single-quoted-regex
+
+=head3 turkic-casing
+
+L<perldelta/Turkic UTF-8 locales are now seamlessly supported>
 
 =for completeness
 =head2 old
@@ -771,6 +796,10 @@ messages to users of older versions.
 =head1 AUTHOR
 
 E. Choroba, C<< <choroba at cpan.org> >>
+
+=head2 Contributors
+
+Gabor Szabo, JJ Merelo, tynovsky
 
 =head1 BUGS
 
@@ -822,10 +851,9 @@ L<http://search.cpan.org/dist/Syntax-Construct/>
 
 L<Perl::MinimumVersion>
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2018 E. Choroba.
+Copyright 2013 - 2019 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -1,5 +1,21 @@
 Revision history for Test-BrewBuild
 
+2.21    2019-06-07
+        - modified text in dispatch auto mode LCD output (closes #233)
+        - Dispatch auto() now logs at startup how many seconds between each test
+          run (closes #238)
+        - removed a debug print line from Dispatch::auto()'s LCD output
+          (closes #244)
+        - fix issue in brew_info tests where perlbrew added non-conforming
+          versions in 'perlbrew available'
+        - in BC::installed() we now croak if the proper params not sent in
+        - if only one Perl is installed, we now check to ensure we have the
+          perl version header in the results, if not, we add it (fixes #241)
+        - if we're using LCD output and the LCD is 4 row by 20 col, display the
+          number of test failures (closes #235)
+        - add troubleshooting section in POD to inform how to proceed if
+          installation fails (closes #242)
+
 2.20    2018-04-16
         - modified layout of LCD output to be more conducive of numerous runs
         - refactored the bbdispatch "auto" argument handling, fixing an issue
@@ -19,7 +35,7 @@ Revision history for Test-BrewBuild
           Dispatch; sets the LCD row and column count, and modified the display
           for 4x20 LCDs
         - removed "--yes" from the perlbrew uninstall command. Newer versions
-          of Perlbrew don't seem to honour it
+          of Perlbrew (ie. > 0.76) don't seem to honour it
         - slight test cleanup
         - _dzil_unshim() now returns early if not operating on a Dist::Zilla
           distribution (closes #230)

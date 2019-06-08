@@ -11,7 +11,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -43,7 +43,13 @@ sub get_item {
     my ( $self, $index_url, %o ) = @_;
 
     my $item_ref = $self->{parser}->get_item_ref( $index_url, %o );
+
+    my $last_floor_num = $item_ref->{floor_num} || scalar(@{$item_ref->{floor_list}});
+    print "last_floor_num: $last_floor_num\n" if ( $o{verbose} );
+
     return unless ($item_ref);
+    return unless(@{$item_ref->{floor_list}});
+    return unless(grep { $_->{content} } @{$item_ref->{floor_list}});
 
     $self->{packer}->format_item_output( $item_ref, \%o );
     my $r = $self->{packer}->main( $item_ref, %o );

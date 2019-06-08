@@ -1,5 +1,5 @@
 package Search::QS;
-$Search::QS::VERSION = '0.01';
+$Search::QS::VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -48,6 +48,7 @@ sub to_qs {
 
 }
 
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
@@ -65,7 +66,7 @@ Search::QS - A converter between query string URI and search query
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -73,7 +74,7 @@ version 0.01
 
   my $qs = new Search::QS;
   # parse query_string
-  $qs->parse($qs);
+  $qs->parse_qs($qs);
   # reconvert object to query_string
   print $qs->to_qs;
 
@@ -85,24 +86,73 @@ This module converts a query string like This
 
 into perl objects which rappresent a search.
 
-In L<filters()> there are all flt (filter) elements.
+In L</"filters__"> there are all flt (filter) elements.
 
-In L<options()> there are query options like limit, start and sorting.
+In L</"options__"> there are query options like limit, start and sorting.
 
 =head1 METHODS
 
 =head2 filters()
+
 Return an instance of L<Search::QS::Filters>
 
 =head2 options()
+
 Return an instance of L<Search::QS::Options>
 
-=head2 parse($query_string)
-Parse the $query_string and fills related objects in L<filters()> and L<options()>
+=head2 parse($perl_struct)
+
+$perl_struct is an HASHREF which represents a query string like
+the one returned by L<URI::Encode/"url_params_mixed">.
+It parses the $perl_struct and fills related objects in
+L</"filters__"> and L</"options__">
 
 =head2 to_qs()
-Return a query string which represents current state of L<filters()> and L<options()>
+
+    Return a query string which represents current state of L<filters__> and L<options__>
 elements
+
+=head1 Examples
+
+Here some Examples.
+
+=over
+
+=item C<?flt[Name]=Foo>
+
+should be converted into
+
+  Name = 'Foo'
+
+=item C<?flt[Name]=Foo%&flt[Name]=$op:like>
+
+should be converted into
+
+  Name like 'Foo%'
+
+=item C<?flt[age]=5&flt[age]=9&flt[Name]=Foo>
+
+should be converted into
+
+  (age = 5 OR age = 9) AND (Name = Foo)
+
+=item C<?flt[FirstName]=Foo&flt[FirstName]=$or:1&flt[LastName]=Bar&flt[LastName]=$or:1>
+
+should be converted into
+
+  ( (FirstName = Foo) OR (LastName = Bar) )
+
+=item ?flt[c:one]=1&flt[c:one]=$and:1&flt[d:one]=2&flt[d:one]=$and:1&flt[c:two]=2&flt[c:two]=$and:2&flt[d:two]=3&flt[d:two]=$op:>&flt[d:two]=$and:2&flt[d:three]=10
+
+should be converted into
+
+  (d = 10) AND  ( (c = 1) AND (d = 2) )  OR  ( (c = 2) AND (d > 3) )
+
+=back
+
+=head1 SEE ALSO
+
+L<Seach::QS::Filters>, L<Seach::QS::Filter>, L<Seach::QS::Options>
 
 =head1 AUTHOR
 

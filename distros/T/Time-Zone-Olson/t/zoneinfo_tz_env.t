@@ -24,6 +24,7 @@ if (defined $test_gnu_date) {
 }
 my %dates;
 foreach my $tz (
+			'WET0WEST,M3.5.0,M10.5.0/3',
 			'EST5EDT,M3.2.0,M11.1.0',
 			'<-04>4<-03>,M11.1.0/0,M2.3.0/0',
 			'AEST-10AEDT,M10.1.0,M4.1.0/3',

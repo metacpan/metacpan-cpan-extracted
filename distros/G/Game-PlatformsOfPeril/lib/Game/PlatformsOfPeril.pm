@@ -28,7 +28,7 @@
 
 package Game::PlatformsOfPeril;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.24.0;
 use warnings;
@@ -75,23 +75,27 @@ sub MOVE_OK ()     { 1 }
 sub MOVE_NEWLVL () { 2 }
 
 # for the level map
-sub COLS ()               { 23 }
-sub ROWS ()               { 23 }
-sub MAP_DISPLAY_OFFSET () { 1 }
+sub COLS ()         { 23 }
+sub ROWS ()         { 23 }
+sub MAP_DISP_OFF () { 1 }
 
 # level map is row, col while points are [ col, row ]
 sub PROW () { 1 }
 sub PCOL () { 0 }
 
-sub MESSAGE_ROW () { 1 }
-sub MESSAGE_COL () { 25 }
+sub MSG_ROW () { 1 }
+sub MSG_COL () { 25 }
 # these also used to determine the minimum size for the terminal
-sub MESSAGE_MAX ()      { 24 }
-sub MESSAGE_COLS_MAX () { 70 }
+sub MSG_MAX ()      { 24 }
+sub MSG_COLS_MAX () { 70 }
 
 # for Animates (and also some Things for the first few slots)
 sub WHAT ()       { 0 }
 sub DISP ()       { 1 }
+# NOTE that GROUND use TYPE to distinguish between different types of
+# those (FLOOR, STAIR, STATUE) which makes the graph code simpler as
+# that only needs to look at WHAT for whether motion is possible in that
+# cell; ANI and ITEM instead use TYPE to tell ANI apart from ITEM
 sub TYPE ()       { 2 }
 sub STASH ()      { 3 }
 sub UPDATE ()     { 4 }
@@ -129,6 +133,17 @@ our %CharMap = (
 our (
     @Death_Row, @Graphs, $LMap,  $Monst_Name, @RedrawA,
     @RedrawB,   $Hero,   $TCols, $TRows
+);
+
+our %Examine_Offsets = (
+    'h' => [ -1, +0 ],    # left
+    'j' => [ +0, +1 ],    # down
+    'k' => [ +0, -1 ],    # up
+    'l' => [ +1, +0 ],    # right
+    'y' => [ -1, -1 ],
+    'u' => [ +1, -1 ],
+    'b' => [ -1, +1 ],
+    'n' => [ +1, +1 ],
 );
 
 our $Level = 0;
@@ -169,6 +184,18 @@ our %Things = (
     STAIR,  [ FLOOR,  "\e[37m%\e[0m",   STAIR ],
     STATUE, [ FLOOR,  "\e[1;33m&\e[0m", STATUE ],
     WALL,   [ WALL,   "\e[35m#\e[0m",   WALL ],
+);
+
+our %Descriptions = (
+    BOMB,   'Bomb. Avoid.',
+    FLOOR,  'Empty cell.',
+    GEM,    'A gem. Get these.',
+    HERO,   'The much suffering hero.',
+    LADDER, 'A ladder.',
+    MONST,  $Monst_Name . '. Wants to kill you.',
+    STAIR,  'A way out of this mess.',
+    STATUE, 'Empty cell with decorative statue.',
+    WALL,   'A wall.',
 );
 
 our %Animates = (
@@ -226,6 +253,7 @@ our %Key_Commands = (
     'l' => move_player( +1, +0 ),    # right
     '.' => \&move_nop,               # rest
     ' ' => \&move_nop,               # also rest
+    'x' => \&move_examine,
     '<' => sub {
         post_message( $Scientist . q{'s magic wonder left boot, activate!} );
         rotate_left();
@@ -272,14 +300,20 @@ our %Key_Commands = (
         if ( $Animates{ HERO, }[LMC][GROUND][TYPE] == STAIR ) {
             load_level();
             print clear_screen(), draw_level();
-            post_message( 'Level ' . $Level );
+            post_message( 'Level '
+                  . $Level
+                  . ' (You have '
+                  . $Animates{ HERO, }[STASH][BOMB_STASH]
+                  . ' bombs and '
+                  . $Animates{ HERO, }[STASH][GEM_STASH]
+                  . ' gems.)' );
             return MOVE_NEWLVL;
         } else {
             post_message('There are no stairs here?');
             return MOVE_FAILED;
         }
     },
-    'b' => sub {
+    'B' => sub {
         my $lmc = $Animates{ HERO, }[LMC];
         return MOVE_FAILED, 'You have no bombs (make them from gems).'
           if $Animates{ HERO, }[STASH][BOMB_STASH] < 1;
@@ -289,7 +323,7 @@ our %Key_Commands = (
         make_item( $lmc->[WHERE], BOMB, 0 );
         return MOVE_OK;
     },
-    'm' => sub {
+    'M' => sub {
         return MOVE_FAILED, 'You need more gems.'
           if $Animates{ HERO, }[STASH][GEM_STASH] < BOMB_COST;
         $Animates{ HERO, }[STASH][GEM_STASH] -= BOMB_COST;
@@ -308,6 +342,10 @@ our %Key_Commands = (
     },
     "\032" => sub {                                    # <C-z>
         post_message('You hear a strange noise in the background.');
+        return MOVE_FAILED;
+    },
+    "\033" => sub {
+        post_message('You cannot escape quite so easily.');
         return MOVE_FAILED;
     },
 );
@@ -335,11 +373,7 @@ sub apply_gravity {
 
 sub bad_terminal {
     ( $TCols, $TRows ) = (GetTerminalSize)[ 0, 1 ];
-    return (
-             not defined $TCols
-          or $TCols < MESSAGE_COLS_MAX
-          or $TRows < MESSAGE_MAX
-    );
+    return ( not defined $TCols or $TCols < MSG_COLS_MAX or $TRows < MSG_MAX );
 }
 
 sub bail_out {
@@ -348,10 +382,20 @@ sub bail_out {
     game_over("Suddenly, the platforms collapse about you.");
 }
 
+sub between {
+    my ( $min, $max, $value ) = @_;
+    if ( $value < $min ) {
+        $value = $min;
+    } elsif ( $value > $max ) {
+        $value = $max;
+    }
+    return $value;
+}
+
 sub draw_level {
     my $s = '';
     for my $rownum ( 0 .. ROWS - 1 ) {
-        $s .= at MAP_DISPLAY_OFFSET, MAP_DISPLAY_OFFSET + $rownum;
+        $s .= at( MAP_DISP_OFF, MAP_DISP_OFF + $rownum );
         for my $lmc ( $LMap->[$rownum]->@* ) {
             if ( defined $lmc->[ANI] ) {
                 $s .= $lmc->[ANI][DISP];
@@ -425,7 +469,7 @@ sub find_hero {
 }
 
 sub game_loop {
-    game_over( 'Terminal must be at least ' . MESSAGE_COLS_MAX . 'x' . MESSAGE_MAX )
+    game_over( 'Terminal must be at least ' . MSG_COLS_MAX . 'x' . MSG_MAX )
       if bad_terminal();
     ( $Level_Path, $Level, $Seed ) = @_;
     $SIG{$_} = \&bail_out for qw(INT HUP TERM PIPE QUIT USR1 USR2 __DIE__);
@@ -439,7 +483,7 @@ sub game_loop {
     post_message('seek to destroy your way of life!');
     post_help();
     post_message('');
-    post_message( 'Seed ' . $Seed );
+    post_message( 'Seed ' . $Seed . ' of version ' . $VERSION );
     $SIG{CONT}  = \&redraw_level;
     $SIG{WINCH} = sub {
         post_message('The terminal is too small!') if bad_terminal();
@@ -713,6 +757,45 @@ sub move_animate {
     return MOVE_OK;
 }
 
+# so the player can see if there is a ladder under something; this is an
+# important consideration on some levels
+sub move_examine {
+    my $key;
+    my $row = $Animates{ HERO, }[LMC][WHERE][PROW];
+    my $col = $Animates{ HERO, }[LMC][WHERE][PCOL];
+    print at( MSG_COL, MSG_ROW + $_ ), clear_right for 1 .. MSG_MAX;
+    print at( MSG_COL, MSG_ROW ), clear_right,
+      'Move cursor to view a cell. Esc exits', show_cursor;
+    while (1) {
+        print at( MSG_COL, MSG_ROW + $_ ), clear_right for 3 .. 5;
+        my $disp_row = 2;
+        for my $i ( ANI, ITEM ) {
+            my $x = $LMap->[$row][$col][$i];
+            if ( defined $x ) {
+                print at( MSG_COL, MSG_ROW + $disp_row++ ), clear_right, $x->[DISP],
+                  ' - ', $Descriptions{ $x->[WHAT] };
+            }
+        }
+        my $g = $LMap->[$row][$col][GROUND];
+        print at( MSG_COL, MSG_ROW + $disp_row ), clear_right, $g->[DISP],
+          ' - ', $Descriptions{ $g->[TYPE] },
+          at( MAP_DISP_OFF + $col, MAP_DISP_OFF + $row );
+        $key = ReadKey(0);
+        last if $key eq "\033";
+        my $distance = 1;
+        if ( ord $key < 97 ) {    # SHIFT moves faster
+            $key      = lc $key;
+            $distance = 5;
+        }
+        my $dir = $Examine_Offsets{$key} // next;
+        $row = between( 0, ROWS - 1, $row + $dir->[PROW] * $distance );
+        $col = between( 0, COLS - 1, $col + $dir->[PCOL] * $distance );
+    }
+    print hide_cursor;
+    show_messages();
+    return MOVE_FAILED;
+}
+
 sub move_nop { return MOVE_OK }
 
 sub move_player {
@@ -739,8 +822,8 @@ sub post_help {
     post_message('');
     post_message(' h j k l - move');
     post_message(' < >     - activate left or right boot');
-    post_message(' b       - drop a Bomb');
-    post_message( ' m       - make a Bomb (consumes ' . BOMB_COST . ' Gems)' );
+    post_message(' B       - drop a Bomb');
+    post_message( ' M       - make a Bomb (consumes ' . BOMB_COST . ' Gems)' );
     post_message(
         ' %       - when on ' . $Things{ STAIR, }[DISP] . ' goes to the next level' );
     post_message(' . space - pass a turn (handy when falling)');
@@ -761,7 +844,7 @@ sub post_help {
 
     sub post_message {
         my ($msg) = @_;
-        while ( @log >= MESSAGE_MAX ) { shift @log }
+        while ( @log >= MSG_MAX ) { shift @log }
         push @log, $msg;
         show_messages();
     }
@@ -769,7 +852,7 @@ sub post_help {
 
     sub show_messages {
         for my $i ( 0 .. $#log ) {
-            print at( MESSAGE_COL, MESSAGE_ROW + $i ), clear_right, $log[$i];
+            print at( MSG_COL, MSG_ROW + $i ), clear_right, $log[$i];
         }
     }
 }
@@ -789,11 +872,11 @@ sub redraw_ref {
         for my $i ( ANI, ITEM ) {
             my $target = $LMap->[ $point->[PROW] ][ $point->[PCOL] ][$i];
             if ( defined $target ) {
-                print at( map { MAP_DISPLAY_OFFSET + $_ } $point->@* ), $target->[DISP];
+                print at( map { MAP_DISP_OFF + $_ } $point->@* ), $target->[DISP];
                 next CELL;
             }
         }
-        print at( map { MAP_DISPLAY_OFFSET + $_ } $point->@* ),
+        print at( map { MAP_DISP_OFF + $_ } $point->@* ),
           $LMap->[ $point->[PROW] ][ $point->[PCOL] ][GROUND][DISP];
     }
 }
@@ -863,12 +946,11 @@ sub track_hero {
 }
 
 sub update_hero {
-    my ( $key, $ret, %seen );
+    my ( $key, $ret );
     tcflush( STDIN_FILENO, TCIFLUSH );
     while (1) {
         while (1) {
             $key = ReadKey(0);
-            next if $seen{$key}++;
             last if exists $Key_Commands{$key};
             post_message( sprintf "Illegal command \\%03o", ord $key );
         }

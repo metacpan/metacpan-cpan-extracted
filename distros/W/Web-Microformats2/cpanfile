@@ -2,6 +2,7 @@ requires "DateTime::Format::ISO8601";
 requires "HTML::Entities";
 requires "HTML::TreeBuilder::XPath";
 requires "JSON";
+requires "List::Util";
 requires "Moose";
 requires "MooseX::Types::URI";
 requires "Readonly";

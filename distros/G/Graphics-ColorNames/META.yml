@@ -12,7 +12,7 @@ build_requires:
   Test::Most: '0'
   constant: '0'
   lib: '0'
-  perl: v5.6.0
+  perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -27,20 +27,20 @@ name: Graphics-ColorNames
 provides:
   Graphics::ColorNames:
     file: lib/Graphics/ColorNames.pm
-    version: v3.4.0
+    version: v3.5.0
   Graphics::ColorNames::X:
     file: lib/Graphics/ColorNames/X.pm
-    version: v3.4.0
+    version: v3.5.0
 requires:
   Exporter: '5.57'
   Module::Load: '0.10'
   Module::Loaded: '0'
-  perl: v5.6.0
+  perl: v5.10.0
   version: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames
   repository: git://github.com/robrwo/Graphics-ColorNames.git
-version: v3.4.0
+version: v3.5.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Alan D. Salewski <alans@cji.com>'
@@ -51,5 +51,5 @@ x_contributors:
   - 'Claus Färber <cfaerber@cpan.org>'
   - 'Andreas J. König <andk@cpan.org>'
   - 'Slaven Rezić <slaven@rezic.de>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

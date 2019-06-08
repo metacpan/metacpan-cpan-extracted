@@ -17,6 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "WWW::PAUSE::Simple",
   "PREREQ_PM" => {
+    "Algorithm::Backoff::Constant" => 0,
+    "Algorithm::Backoff::Exponential" => 0,
     "Date::Parse" => 0,
     "Exporter" => "5.57",
     "File::Basename" => 0,
@@ -37,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.443",
+  "VERSION" => "0.444",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +47,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Algorithm::Backoff::Constant" => 0,
+  "Algorithm::Backoff::Exponential" => 0,
   "Date::Parse" => 0,
   "Exporter" => "5.57",
   "File::Basename" => 0,

@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -31,7 +31,6 @@ sub _SIZE_OF_LEAP_SECOND_V2                { return 8 }
 sub _PAIR                                  { return 2 }
 sub _STAT_MTIME_IDX                        { return 9 }
 sub _MAX_LENGTH_FOR_TRAILING_TZ_DEFINITION { return 256 }
-sub _MAX_LENGTH_FOR_A_TIMEZONE             { return 256 }
 sub _MONTHS_IN_ONE_YEAR                    { return 12 }
 sub _HOURS_IN_ONE_DAY                      { return 24 }
 sub _MINUTES_IN_ONE_HOUR                   { return 60 }
@@ -73,6 +72,7 @@ sub _EVERY_ONE_HUNDRED_YEARS               { return 100 }
 sub _DEFAULT_DST_START_HOUR                { return 2 }
 sub _DEFAULT_DST_END_HOUR                  { return 2 }
 sub _DAY_OF_WEEK_AT_EPOCH                  { return 4 }
+sub _MAX_SIZE_FOR_A_GUESS_FILE_CONTENTS    { return 4096 }
 
 sub _TZ_DEFINITION_KEYS {
     return
@@ -990,41 +990,42 @@ sub _guess_olson_tz {
             return $guessed;
         }
     }
-    elsif ( $EXTENDED_OS_ERROR == POSIX::EINVAL() ) {
+    elsif (
+        ( $EXTENDED_OS_ERROR == POSIX::EINVAL() )
+        || (   ( $EXTENDED_OS_ERROR == POSIX::ENOENT() )
+            && ( $OSNAME eq 'cygwin' ) )
+      )
+    {
         my @paths;
-        if ( $OSNAME eq 'freebsd' ) {
-            push @paths, '/var/db/zoneinfo';    # freebsd 11
-        }
-        elsif ( $OSNAME eq 'linux' ) {
-            push @paths, '/etc/timezone';           # debian jessie
-            push @paths, '/etc/sysconfig/clock';    # rhel6, empty in rhel7
-        }
-        foreach my $path (@paths) {
-            if ( my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() ) ) {
-                my $result =
-                  $handle->read( my $buffer, _MAX_LENGTH_FOR_A_TIMEZONE() );
-                defined $result
-                  or
-                  Carp::croak("Failed to read from $path:$EXTENDED_OS_ERROR");
-                close $handle
-                  or Carp::croak("Failed to close $path:$EXTENDED_OS_ERROR");
-                chomp $buffer;
-                my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
-                if (
-                    $buffer =~ m{^
-                                (?:ZONE=")? # for \/etc\/sysconfig\/clock
-                                $timezone_full_name_regex
-                                "? # for \/etc\/sysconfig\/clock
-                                $}smx
-                  )
+        my %paths = (
+            'dragonfly' => [
+                '/var/db/zoneinfo',    # dragonfly 5
+            ],
+            'freebsd' => [
+                '/var/db/zoneinfo',    # freebsd 11
+            ],
+            'gnukfreebsd' => [ '/var/db/zoneinfo', '/etc/timezone', ],
+            'linux'       => [
+                '/etc/timezone',           # debian jessie
+                '/etc/sysconfig/clock',    # rhel6, opensuse, empty in rhel7
+            ],
+            'cygwin' => [
+'/proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/TimeZoneInformation/TimeZoneKeyName',
+            ],
+        );
+        if ( $paths{$OSNAME} ) {
+            foreach my $path ( @{ $paths{$OSNAME} } ) {
+                if ( my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() ) )
                 {
-                    my $guessed = $LAST_PAREN_MATCH{tz};
-                    $self->{area} = $LAST_PAREN_MATCH{area};
-                    if ( defined $LAST_PAREN_MATCH{location} ) {
-                        $self->{location} = $LAST_PAREN_MATCH{location};
+                    if (
+                        my $guessed =
+                        $self->_guess_olson_tz_from_file_contents(
+                            $path, $handle
+                        )
+                      )
+                    {
+                        return $guessed;
                     }
-                    $self->{determining_path} = $path;
-                    return $guessed;
                 }
             }
         }
@@ -1052,6 +1053,56 @@ sub _guess_olson_tz {
         );
     }
     return $guessed;
+}
+
+sub _guess_olson_tz_from_file_contents {
+    my ( $self, $path, $handle ) = @_;
+    my $result =
+      $handle->read( my $buffer, _MAX_SIZE_FOR_A_GUESS_FILE_CONTENTS() );
+    defined $result
+      or Carp::croak("Failed to read from $path:$EXTENDED_OS_ERROR");
+    close $handle
+      or Carp::croak("Failed to close $path:$EXTENDED_OS_ERROR");
+    chomp $buffer;
+    my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
+    foreach my $line ( split /\r?\n/smx, $buffer ) {
+        if ( $OSNAME eq 'cygwin' ) {
+            $line =~ s/\0$//smx;
+            foreach
+              my $possible ( sort { $a cmp $b } keys %olson_to_win32_timezones )
+            {
+                if (   ( $olson_to_win32_timezones{$possible} eq $line )
+                    && ( $possible =~ /^$timezone_full_name_regex$/smx ) )
+                {
+                    my $guessed = $LAST_PAREN_MATCH{tz};
+                    $self->{area} = $LAST_PAREN_MATCH{area};
+                    if ( defined $LAST_PAREN_MATCH{location} ) {
+                        $self->{location} = $LAST_PAREN_MATCH{location};
+                    }
+                    $self->{determining_path} = $path;
+                    return $guessed;
+
+                }
+            }
+        }
+        if (
+            $line =~ m{^
+                                (?:(?:TIME)?ZONE=")? # for \/etc\/sysconfig\/clock
+                                $timezone_full_name_regex
+                                "? # for \/etc\/sysconfig\/clock
+                                $}smx
+          )
+        {
+            my $guessed = $LAST_PAREN_MATCH{tz};
+            $self->{area} = $LAST_PAREN_MATCH{area};
+            if ( defined $LAST_PAREN_MATCH{location} ) {
+                $self->{location} = $LAST_PAREN_MATCH{location};
+            }
+            $self->{determining_path} = $path;
+            return $guessed;
+        }
+    }
+    return;
 }
 
 sub _guess_olson_tz_from_filesystem {
@@ -1109,6 +1160,13 @@ sub _check_area_location {
     return;
 }
 
+sub _truncate_win32_regquery {
+    my ( $self, $value ) = @_;
+    $value =~
+      s/\0.*$//smx;   # Windows 7 at least has rubbish after the first null byte
+    return $value;
+}
+
 sub _guess_win32_tz {
     my ($self) = @_;
     require Win32API::Registry;
@@ -1129,10 +1187,12 @@ sub _guess_win32_tz {
         Win32API::Registry::RegQueryValueEx(
             $current_timezone_registry_key, 'TimeZoneKeyName',
             [],                             my $type,
-            $win32_timezone_name, []
+            $win32_timezone_name,           my $size,
         )
       )
     {
+        $win32_timezone_name =
+          $self->_truncate_win32_regquery($win32_timezone_name);
     }
     elsif (
         Win32API::Registry::regLastError() == _WIN32_ERROR_FILE_NOT_FOUND() )
@@ -1180,6 +1240,7 @@ sub _guess_old_win32_tz {
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\StandardName:"
           . Win32API::Registry::regLastError() );
+    $standard_name = $self->_truncate_win32_regquery($standard_name);
     my ( $description, $major, $minor, $build, $id ) = Win32::GetOSVersion();
     my $old_timezone_registry_path;
     if ( $id < 2 ) {
@@ -1226,6 +1287,8 @@ sub _guess_old_win32_tz {
               or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\$subkey_name\\Std:"
                   . Win32API::Registry::regLastError() );
+            $local_language_timezone_name =
+              $self->_truncate_win32_regquery($local_language_timezone_name);
             if ( $local_language_timezone_name eq $standard_name ) {
                 $win32_timezone_name = $subkey_name;
             }
@@ -2526,16 +2589,19 @@ sub _read_win32_tzfile {
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dlt:$EXTENDED_OS_ERROR"
       );
+    $daylight_name = $self->_truncate_win32_regquery($daylight_name);
     Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Std', [],
         [], my $standard_name, [] )
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Std:$EXTENDED_OS_ERROR"
       );
+    $standard_name = $self->_truncate_win32_regquery($standard_name);
     Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Display',
         [], [], my $comment, [] )
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Std:$EXTENDED_OS_ERROR"
       );
+    $comment = $self->_truncate_win32_regquery($comment);
     Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'TZI', [],
         [], my $binary, [] )
       or Carp::croak(
@@ -2800,7 +2866,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.22
+Version 0.24
 
 =cut
 
@@ -2844,7 +2910,7 @@ The locations($area) object method will return a list of the locations (such as 
 
 =head2 comment
 
-The comment($timezone) object method will return the matching comment from the zone.tab file for the time zone parameter.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Win32 platforms, it will return the contents of the Display registry setting.  For example, for C<"Australia/Melbourne">, it would return "(UTC+10) Canberra, Melbourne, Sydney".
+The comment($timezone) object method will return the matching comment from the zone.tab file for the time zone parameter.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Win32 platforms, it will return the contents of the C<Display> registry setting.  For example, for C<"Australia/Melbourne">, it would return C<"(UTC+10) Canberra, Melbourne, Sydney">.
 
 =head2 directory
 
@@ -2890,7 +2956,7 @@ This method can be used to get the list of transition times for the current time
 
 =head2 determining_path
 
-This method can be used to determine which file system path was used to determine the current operating system timezone.  If it returns undef, then the current operating system timezone was determined by other means (such as the win32 registry, or comparing the SHA256 digests of /etc/localtime with timezones in L</directory>).
+This method can be used to determine which file system path was used to determine the current operating system timezone.  If it returns undef, then the current operating system timezone was determined by other means (such as the win32 registry, or comparing the digests of /etc/localtime with timezones in L</directory>).
 
 =head2 leap_seconds
 

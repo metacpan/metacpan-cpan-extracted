@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.028';
+our $VERSION = '1.031';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -517,8 +517,7 @@ sub set {
         return;
     }
 
-    my $data = $c->req->headers->content_type eq 'application/json'
-            ? $c->req->json : $c->req->params->to_hash;
+    my $data = eval { $c->req->json } || $c->req->params->to_hash;
     delete $data->{csrf_token};
     #; use Data::Dumper;
     #; $c->app->log->debug( Dumper $data );
@@ -735,7 +734,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.028
+version 1.031
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2200';
+our $VERSION = '0.2203';
 
 use Carp;
 use Algorithm::Combinatorics qw( permutations );
@@ -37,6 +37,7 @@ sub expected_payoff
     my ($self) = @_;
 
     my $expected_payoff;
+
     # For each strategy of player 1...
     for my $i ( sort keys %{ $self->{1} } )
     {
@@ -64,6 +65,7 @@ sub s_expected_payoff
     my ($self) = @_;
 
     my $expected_payoff;
+
     # For each strategy of player 1...
     for my $i ( sort keys %{ $self->{1} } )
     {
@@ -112,15 +114,16 @@ sub counter_strategy
     my $opponent = $player == 1 ? 2 : 1;
 
     my @keys = 1 .. keys %{ $self->{$player} };
-    my @pure = ( 1, (0) x ( keys( %{ $self->{$player} } ) - 1 ) );
+    my @pure = ( 1, (0) x ( @keys - 1 ) );
 
     my $i = permutations( \@pure );
-    while ( my $x = $i->next )
+
+    while ( my $strategies = $i->next )
     {
-        next if $seen{"@$x"}++;
+        next if $seen{"@$strategies"}++;
 
         my $g = Game::Theory::TwoPersonMatrix->new(
-            $player   => { zip @keys, @$x },
+            $player   => { zip @keys, @$strategies },
             $opponent => $self->{$opponent},
             payoff    => $self->{payoff} || $self->{"payoff$player"},
         );
@@ -312,13 +315,17 @@ sub mm_tally
         # Find minimum of column maximums for the opponent
         my @m = ();
         my %s = ();
+
         my $transposed = transpose( $self->{payoff2} );
+
         for my $row ( 0 .. @$transposed - 1 )
         {
             $s{$row} = min @{ $transposed->[$row] };
             push @m, $s{$row};
         }
+
         $mm_tally->{2}{value} = max @m;
+
         for my $row ( sort keys %s )
         {
             push @{ $mm_tally->{2}{strategy} }, ( $s{$row} == $mm_tally->{2}{value} ? 1 : 0 );
@@ -332,13 +339,17 @@ sub mm_tally
         # Find minimum of column maximums
         my @m = ();
         my %s = ();
+
         my $transposed = transpose( $self->{payoff} );
+
         for my $row ( 0 .. @$transposed - 1 )
         {
             $s{$row} = max @{ $transposed->[$row] };
             push @m, $s{$row};
         }
+
         $mm_tally->{2}{value} = min @m;
+
         for my $row ( sort keys %s )
         {
             push @{ $mm_tally->{2}{strategy} }, ( $s{$row} == $mm_tally->{2}{value} ? 1 : 0 );
@@ -396,9 +407,11 @@ sub pareto_optimal
                 for my $c ( 0 .. $csize )
                 {
                     next if ( $r == $row && $c == $col ) || $seen{"$r,$c"}++;
+
                     my $p = $self->{payoff1}[$row][$col];
                     my $q = $self->{payoff2}[$row][$col];
 #warn "\trc:$r,$c = ($self->{payoff1}[$r][$c],$self->{payoff2}[$r][$c])\n";
+
                     if ( $p >= $self->{payoff1}[$r][$c] && $q >= $self->{payoff2}[$r][$c] )
                     {
 #warn "\t\t$row,$col > $r,$c at ($p,$q)\n";
@@ -438,8 +451,10 @@ sub nash
                 push @col, $self->{payoff1}[$r][$col];
             }
             my $cmax = max @col;
+
             my $p = $self->{payoff1}[$row][$col];
             my $q = $self->{payoff2}[$row][$col];
+
             if ( $p == $cmax && $q == $rmax )
             {
 #warn "\t$p == $cmax && $q == $rmax\n";
@@ -497,7 +512,7 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2200
+version 0.2203
 
 =head1 SYNOPSIS
 
@@ -510,14 +525,14 @@ version 0.2200
                 [ 3,-2, 2],
                 [ 2,-3, 1] ]
  );
- $g->row_reduce();
  $g->col_reduce();
+ $g->row_reduce();
  my $player = 1;
- my $s = $g->saddlepoint();
- my $o = $g->oddments();
- my $e = $g->expected_payoff();
- my $c = $g->counter_strategy($player);
- my $p = $g->play();
+ my $x = $g->saddlepoint();
+ $x = $g->oddments();
+ $x = $g->expected_payoff();
+ $x = $g->counter_strategy($player);
+ $x = $g->play();
 
  $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => 0.1, 2 => 0.2, 3 => 0.7 },
@@ -532,16 +547,16 @@ version 0.2200
                  [3,4,4,1],
                  [5,6,8,2] ],
  );
- my $t = $g->mm_tally();
- my $m = $g->pareto_optimal();
- my $n = $g->nash();
- $e = $g->expected_payoff();
- $c = $g->counter_strategy($player);
- $p = $g->play();
+ $x = $g->mm_tally();
+ $x = $g->pareto_optimal();
+ $x = $g->nash();
+ $x = $g->expected_payoff();
+ $x = $g->counter_strategy($player);
+ $x = $g->play();
 
 =head1 DESCRIPTION
 
-A C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game of player
+C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game of player
 names, strategies and utilities ("payoffs").
 
 Players 1 and 2 are the "row" and "column" players, respectively.  This is due
@@ -562,35 +577,36 @@ and T > R > P > S is:
       \    | Cooperate | Defect
  Blue   \  |           |
  --------------------------------
-           | \   R2    | \   T2
- Cooperate |   \       |   \
-           | R1  \     | S1  \
+           |  \   R2   |  \   T2
+ Cooperate |    \      |    \
+           | R1   \    | S1   \
  --------------------------------
-           | \   S2    | \   P2
- Defect    |   \       |   \
-           | T1  \     | P1  \
+           |  \   S2   |  \   P2
+ Defect    |    \      |    \
+           | T1   \    | P1   \
 
 And in this implementation that would be:
 
  $g = Game::Theory::TwoPersonMatrix->new(
+    %strategies,
     payoff1 => [ [ -1, -3 ], [  0, -2 ] ],  # Blue: [ R1, S1 ], [ T1, P1 ]
     payoff2 => [ [ -1,  0 ], [ -3, -2 ] ],  # Red:  [ R2, T2 ], [ S2, P2 ]
  );
 
-Where the two player strategies are to either Cooperate (1) or Defect (2).  This
-is given by a hash for each of the two players, where the values are Boolean:
+The two player strategies are to either cooperate (1) or defect (2).  This is
+given by a hash for each of the two players, where the values are Boolean:
 
- %strategy = (
+ %strategies = (
     1 => { 1 => $cooporate1, 2 => $defect1 }, # Blue
     2 => { 1 => $cooporate2, 2 => $defect2 }, # Red
  );
 
-See the F<eg/play> program in this distribution for an example that exercises
+See the F<eg/> programs in this distribution for examples that exercise
 strategic variations of the prisoner's dilemma.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
  $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => 0.5, 2 => 0.5 },
@@ -614,87 +630,92 @@ Payoffs are given by array references of lists of outcomes.  For zero-sum games
 this is a single payoff list.  For non-zero-sum games this is given as two lists
 - one for each player.
 
-=head2 expected_payoff()
+The number of row and column payoff values must equal the number of the player
+and opponent strategies, respectively.
 
- $e = $g->expected_payoff();
+=head2 expected_payoff
 
-Return the expected payoff value of a game.
+ $x = $g->expected_payoff();
 
-=head2 s_expected_payoff()
+Return the expected payoff of a game.  This is the sum of the strategic
+probabilities of each payoff.
+
+=head2 s_expected_payoff
 
  $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => '(1 - p)', 2 => 'p' },
     2 => { 1 => 1, 2 => 0 },
     payoff => [ ['a','b'], ['c','d'] ]
  );
- $s = $g->s_expected_payoff();
+ $x = $g->s_expected_payoff();
+ # (1 - p) * 1 * a + (1 - p) * 0 * b + p * 1 * c + p * 0 * d
 
 Return the symbolic expected payoff expression for a non-numeric game.
 
 Using real payoff values, we solve the resulting expression for B<p> in the
 F<eg/> examples.
 
-=head2 counter_strategy()
+=head2 counter_strategy
 
- $c = $g->counter_strategy($player);
+ $x = $g->counter_strategy($player);
 
-Return the expected payoff, for a given player, of either a zero-sum or
-non-zero-sum game, given pure opponent strategies.
+Return the expected payoff for a given player, of either a zero-sum or
+non-zero-sum game, given pure strategies.
 
-=head2 saddlepoint()
+=head2 saddlepoint
 
- $s = $g->saddlepoint;
+ $x = $g->saddlepoint;
 
 Return the saddlepoint of a zero-sum game, or C<undef> if there is none.
 
 A saddlepoint is simultaneously minimum for its row and maximum for its column.
 
-=head2 oddments()
+=head2 oddments
 
- $o = $g->oddments();
+ $x = $g->oddments();
 
 Return each player's "oddments" for a 2x2 zero-sum game with no saddlepoint.
 
-=head2 row_reduce()
+=head2 row_reduce
 
  $g->row_reduce();
 
 Reduce a zero-sum game by identifying and eliminating strictly dominated rows
 and their associated player strategies.
 
-=head2 col_reduce()
+=head2 col_reduce
 
  $g->col_reduce();
 
 Reduce a zero-sum game by identifying and eliminating strictly dominated columns
 and their associated opponent strategies.
 
-=head2 mm_tally()
+=head2 mm_tally
 
- $t = $g->mm_tally();
+ $x = $g->mm_tally();
 
 For zero-sum games, return the maximum of row minimums and the minimum of column
 maximums.  For non-zero-sum games, return the maximum of row and column minimums.
 
-=head2 pareto_optimal()
+=head2 pareto_optimal
 
- $m = $g->pareto_optimal();
+ $x = $g->pareto_optimal();
 
 Return the Pareto optimal outcomes for a non-zero-sum game.
 
-=head2 nash()
+=head2 nash
 
- $n = $g->nash();
+ $x = $g->nash();
 
-Identify the Nash equilibria in a non-zero-sum game.
+Identify the Nash equilibria.
 
 Given payoff pair C<(a,b)>, B<a> is maximum for its column and B<b> is maximum
 for its row.
 
-=head2 play()
+=head2 play
 
- $p = $g->play();
- $p = $g->play(%strategies);
+ $x = $g->play();
+ $x = $g->play(%strategies);
 
 Return a single outcome for a zero-sum game, or a pair for a non-zero-sum game
 as a hashref keyed by each strategy chosen and with values of the payoff(s)

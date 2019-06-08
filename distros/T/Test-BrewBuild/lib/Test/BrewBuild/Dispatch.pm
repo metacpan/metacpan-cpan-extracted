@@ -16,7 +16,7 @@ use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Git;
 use Test::BrewBuild::Regex;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 $| = 1;
 
@@ -43,6 +43,7 @@ sub new {
     $self->{autotest} = $args{autotest} if defined $args{autotest};
     $self->{forks} = defined $args{forks} ? $args{forks} : 4;
     $self->{rpi} = defined $args{rpi} ? $args{rpi} : undef;
+    $self->{fail_count} = 0;
 
     $self->_config;
 
@@ -69,6 +70,8 @@ sub auto {
 
     my $sleep = defined $self->{auto_sleep} ? $self->{auto_sleep} : 60;
 
+    $log->_7("waiting $sleep seconds between test runs");
+
     my $runs = $self->{auto};
     my $run_count = 1;
 
@@ -94,6 +97,7 @@ sub auto {
 
         if (grep /FAIL/, @short_results){
             $log->_5("auto run status: FAIL");
+            $self->{fail_count}++;
             $ENV{BB_RUN_STATUS} = 'FAIL';
             $results_returned = 1;
         }
@@ -247,7 +251,10 @@ sub _lcd_display {
         $lcd->print("commit: $args{commit}");
 
         $lcd->position(0, 3);
-        $lcd->print("runs: $args{run_count}");
+        $lcd->print("run: $args{run_count}");
+
+        $lcd->position(10, 3);
+        $lcd->print("fails: $self->{fail_count}");
     }
     else {
         $lcd->position(0, 0);
@@ -375,7 +382,6 @@ sub _config {
         $self->{rpi} = $conf->{rpi} || 0;
         $self->{rpi_lcd_rows} = $conf->{rpi_lcd_rows} || 4;
         $self->{rpi_lcd_cols} = $conf->{rpi_lcd_cols} || 20;
-        print "r: $self->{rpi_lcd_rows}, c: $self->{rpi_lcd_cols}\n";
     }
 }
 sub _fork {

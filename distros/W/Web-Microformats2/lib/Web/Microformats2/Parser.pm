@@ -8,6 +8,7 @@ use v5.10;
 use Scalar::Util;
 use JSON;
 use DateTime::Format::ISO8601;
+use Carp;
 
 use Web::Microformats2::Item;
 use Web::Microformats2::Document;
@@ -56,11 +57,14 @@ sub parse {
 
 # analyze_element: Recursive method that scans an element for new microformat
 # definitions (h-*) or properties (u|dt|e|p-*) and then does the right thing.
+# It also builds up the MF2 document's rels and rel-urls as it goes.
 sub analyze_element {
     my $self = shift;
     my ( $document, $element, $current_item ) = @_;
 
     return unless blessed( $element) && $element->isa( 'HTML::Element' );
+
+    $self->_add_element_rels_to_mf2_document( $element, $document );
 
     my $mf2_attrs = $self->_tease_out_mf2_attrs( $element );
 
@@ -89,19 +93,12 @@ sub analyze_element {
             # this property name.)
             unless ( $new_item ) {
                 for my $property ( @$properties_ref ) {
-                    my $vcp_fragments_ref =
-                        $self->_seek_value_class_pattern( $element );
-                    if ( @$vcp_fragments_ref ) {
+                    my $value = $self->_parse_property_value( $element );
+                    if ( defined $value ) {
                         $current_item->add_property(
                             "p-$property",
-                            join q{}, @$vcp_fragments_ref,
-                        )
-                    }
-                    elsif ( my $alt = $element->findvalue( './@title|@value|@alt' ) ) {
-                        $current_item->add_property( "p-$property", $alt );
-                    }
-                    elsif ( my $text = _trim( decode_entities($element->as_text) ) ) {
-                        $current_item->add_property( "p-$property", $text );
+                            $value,
+                        );
                     }
                 }
             }
@@ -187,7 +184,7 @@ sub analyze_element {
                 my $vcp_fragments_ref =
                     $self->_seek_value_class_pattern( $element );
                 if ( @$vcp_fragments_ref ) {
-                    $dt_string = $self->_format_datetime(join q{T}, @$vcp_fragments_ref);
+                    $dt_string = $self->_format_datetime(join (q{T}, @$vcp_fragments_ref), $current_item);
                 }
                 elsif ( my $alt = $element->findvalue( './@datetime|@title|@value' ) ) {
                     $dt_string = $alt;
@@ -220,28 +217,42 @@ sub analyze_element {
             }
         }
 
-        # Now add a "value" attribute to this new item, if appropriate,
-        # according to the MF2 spec.
-        if ( $mf2_attrs->{p}->[0] ) {
-            $new_item->value( $new_item->get_properties('name')->[0] );
-        }
-        elsif ( $mf2_attrs->{u}->[0] ) {
-            $new_item->value( $new_item->get_properties('url')->[0] );
-        }
-
         # Put this onto the parent item's property-list, or its children-list,
         # depending on context.
-        my $item_property;
-        my $prefix;
-        if (
-            $current_item
-            && (
-                ( ( $item_property = $mf2_attrs->{p}->[0]) && ($prefix = 'p') )
-                ||
-                ( ( $item_property = $mf2_attrs->{u}->[0]) && ($prefix = 'u') )
-            )
-        ) {
-            $current_item->add_property( "$prefix-$item_property", $new_item );
+        my @item_properties;
+        for my $prefix (qw( u p ) ) {
+            push @item_properties, map { "$prefix-$_" } @{ $mf2_attrs->{$prefix} };
+        }
+        if ( $current_item && @item_properties ) {
+            for my $item_property ( @item_properties ) {
+                # We place a clone of the new item into the current item's
+                # property list, rather than the item itself. This allows for
+                # edge cases where the same item needs to go under multiple
+                # properties, but carry different 'value' attributes.
+                my $cloned_new_item =
+                    bless { %$new_item }, ref $new_item;
+
+                $current_item
+                    ->add_property( "$item_property", $cloned_new_item );
+
+                # Now add a "value" attribute to this new item, if appropriate,
+                # according to the MF2 spec.
+                my $value_attribute;
+                if ( $item_property =~ /^p-/ ) {
+                    if ( my $name = $new_item->get_properties('name')->[0] ) {
+                        $value_attribute = $name;
+                    }
+                    else {
+                        $value_attribute =
+                            $self->_parse_property_value( $element );
+                    }
+                }
+                elsif ( $item_property =~ /^u-/ ) {
+                    $value_attribute = $new_item->get_properties('url')->[0];
+                }
+
+                $cloned_new_item->value( $value_attribute ) if defined ($value_attribute);
+            }
         }
         elsif ($current_item) {
             $current_item->add_child ( $new_item );
@@ -333,7 +344,7 @@ sub _set_implied_name {
 
     my $types = $item->types;
 
-    return if $item->has_p_properties || $item->has_e_properties;
+    return if $item->has_properties || $item->has_children;
 
     my $xpath;
     my $name;
@@ -547,7 +558,7 @@ sub _trim {
 }
 
 sub _format_datetime {
-    my ($self, $dt_string) = @_;
+    my ($self, $dt_string, $current_item) = @_;
 
     my $dt;
 
@@ -556,7 +567,7 @@ sub _format_datetime {
 
     $dt_string =~ s/t/T/;
 
-    # XXX Will have to come back to this...
+    # Note presence of AM/PM, but toss it out of the string.
     $dt_string =~ s/((?:a|p)\.?m\.?)//i;
     my $am_or_pm = $1 || '';
 
@@ -585,12 +596,31 @@ sub _format_datetime {
     # Treat a space separator between date & time as a 'T'.
     $dt_string =~ s/ /T/;
 
+    # If this is a time with no date, try to apply a previously-seen
+    # date to it.
+    my $date_is_defined = 1;
+    if ( $dt_string =~ /^\d\d:/ ) {
+        if ( my $previous_dt = $current_item->last_seen_date ) {
+            $dt_string = $previous_dt->ymd . "T$dt_string";
+        }
+        else {
+            $date_is_defined = 0;
+            carp "Encountered a value-class datetime with only a time, "
+                 . "no date, and no date defined earlier. Results may "
+                 . "not be what you expect. (Data: $dt_string)";
+        }
+    }
+
     eval {
     $dt = DateTime::Format::ISO8601->new
               ->parse_datetime( $dt_string );
     };
 
     return if $@;
+
+    if ($date_is_defined) {
+        $current_item->last_seen_date( $dt );
+    }
 
     if ($am_or_pm =~ /^[pP]/) {
         # There was a 'pm' specified, so add 12 hours.
@@ -617,6 +647,61 @@ sub _format_datetime {
     }
 
     return $dt->strftime( $format );
+}
+
+sub _parse_property_value {
+    my ( $self, $element ) = @_;
+
+    my $value;
+
+    my $vcp_fragments_ref =
+        $self->_seek_value_class_pattern( $element );
+    if ( @$vcp_fragments_ref ) {
+        $value = join q{}, @$vcp_fragments_ref;
+    }
+    elsif ( my $alt = $element->findvalue( './@title|@value|@alt' ) ) {
+        $value = $alt;
+    }
+    elsif ( my $text = _trim( decode_entities($element->as_text) ) ) {
+        $value = $text;
+    }
+
+    return $value;
+}
+
+sub _add_element_rels_to_mf2_document {
+    my ( $self, $element, $document ) = @_;
+
+    return unless $element->tag =~ /^(a|link)$/;
+
+    my $rel = $element->attr( 'rel' );
+    return unless defined $rel;
+
+    my $href = $element->attr( 'href' );
+    my $url = URI->new_abs( $href, $self->url_context)->as_string;
+
+    my @rels = split /\s+/, $rel;
+    for my $rel ( @rels ) {
+        $document->add_rel( $rel, $url );
+    }
+
+    my $rel_url_value = {};
+    foreach (qw( hreflang media title type ) ) {
+        next if defined $rel_url_value->{ $_ };
+        my $value = $element->attr( $_ );
+        if ( defined $value ) {
+            $rel_url_value->{ $_ } = $value;
+        }
+    }
+    my $text = ($element->as_text);
+    if ( defined $text ) {
+        $rel_url_value->{ text } = $text;
+    }
+
+    $rel_url_value->{ rels } = \@rels;
+
+    $document->add_rel_url( $url, $rel_url_value );
+
 }
 
 1;

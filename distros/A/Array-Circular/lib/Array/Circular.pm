@@ -44,7 +44,7 @@ sub loops {
 sub next {
     my ($self, $num) = @_;
     return unless @$self;
-
+    return $self->current if defined $num && $num == 0; # undefined just goes next.  zero gives current.
     if ($num) {
 	croak "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
 	$num--;
@@ -110,10 +110,10 @@ sub current_and_previous {
 
 sub peek {
     my ($self, $count) = @_;
-    $count //=1 ;
-    my $idx = ($count + $self->index) % $self->size;
-    $idx = 0 - $idx if $count < 0;
-    return $self->[$idx];
+    return $self->current if $count == 0;
+    my $val = $self->next($count);
+    $self->prev($count);
+    return $val;
 }
 
 sub size {

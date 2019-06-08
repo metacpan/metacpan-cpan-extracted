@@ -6,7 +6,7 @@ package Graphics::ColorNames::X;
 use strict;
 use warnings;
 
-our $VERSION = 'v3.4.0';
+our $VERSION = 'v3.5.0';
 
 
 sub NamesRgbTable() {
@@ -705,7 +705,7 @@ Graphics::ColorNames::X - X-Windows color names and equivalent RGB values
 
 =head1 VERSION
 
-version v3.4.0
+version v3.5.0
 
 =head1 SYNOPSIS
 
@@ -752,7 +752,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2001-2018 by Robert Rothenberg.
+This software is Copyright (c) 2001-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

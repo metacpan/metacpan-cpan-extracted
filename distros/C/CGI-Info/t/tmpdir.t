@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 29;
+use Test::Most tests => 32;
 use Test::NoWarnings;
 
 BEGIN {
@@ -63,6 +63,11 @@ PATHS: {
 
 	$ENV{'C_DOCUMENT_ROOT'} = '/';
 	$dir = $i->tmpdir();
+	ok(-w $dir);
+	ok(-d $dir);
+
+	$dir = CGI::Info::tmpdir();
+	ok(defined($dir));
 	ok(-w $dir);
 	ok(-d $dir);
 }

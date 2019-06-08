@@ -21,7 +21,7 @@ use Test::BrewBuild::Dispatch;
 use Test::BrewBuild::Regex;
 use Test::BrewBuild::Tester;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 my $log;
 my $bcmd;
@@ -336,7 +336,15 @@ sub test {
 
     my $failed = 0;
 
+    my @perls_installed = $bcmd->installed(0, $self->brew_info);
+
     my $results = $self->_exec;
+
+    if (@perls_installed == 1){
+        if ($results !~ /${ re_brewbuild('check_result') }/){
+            $results = "$perls_installed[0]\n==========\n" . $results;
+        }
+    }
 
     $log->_7("\n*****\n$results\n*****");
 
@@ -1103,6 +1111,19 @@ and Unix.
 =head2 help
 
 Displays the C<brewbuild> command line usage information.
+
+=head1 TROUBLESHOOTING
+
+=head2 Installation Issues
+
+On some Linux variants, not all of the software required for SSL is installed.
+
+If you have install failures (reading the `cpanm` build log often complains
+about L<MetaCPAN::Client> failing), try running the following command line
+commands, then re-run C<cpanm Test::BrewBuild>:
+
+    sudo apt-get install libssl-dev
+    sudo apt-get install libz-dev
 
 =head1 AUTHOR
 

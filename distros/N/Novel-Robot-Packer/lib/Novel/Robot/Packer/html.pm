@@ -36,7 +36,7 @@ sub process_template {
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <style type="text/css">
 body {
-	font-size: medium;
+	font-size: large;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	margin: 1em 8em 1em 8em;
 	text-indent: 2em;
@@ -46,7 +46,7 @@ body {
 	border-bottom: 0.2em solid #ee9b73;
 	margin: 0.8em 0.2em 0.8em 0.2em;
 	text-indent: 0em;
-	font-size: x-large;
+	font-size: xx-large;
     font-weight: bold;
     padding-bottom: 0.25em;
 }

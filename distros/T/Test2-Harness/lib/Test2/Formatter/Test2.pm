@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001076';
+our $VERSION = '0.001077';
 
 use Test2::Util::Term qw/term_size/;
 use Test2::Harness::Util qw/hub_truth/;
@@ -63,6 +63,7 @@ sub DEFAULT_TAG_COLOR() {
         'RUN INFO' => Term::ANSIColor::color('bold bright_blue'),
         'JOB INFO' => Term::ANSIColor::color('bold bright_blue'),
         'LAUNCH'   => Term::ANSIColor::color('bold bright_white'),
+        'RETRY'    => Term::ANSIColor::color('bold bright_white'),
         'PASSED'   => Term::ANSIColor::color('bold bright_green'),
         'FAILED'   => Term::ANSIColor::color('bold bright_red'),
         'REASON'   => Term::ANSIColor::color('magenta'),

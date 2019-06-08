@@ -8,7 +8,7 @@ use Logging::Simple;
 use LWP::Simple qw(head);
 use Test::BrewBuild::Regex;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 my $log;
 

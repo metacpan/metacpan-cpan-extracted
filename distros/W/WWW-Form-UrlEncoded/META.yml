@@ -27,7 +27,7 @@ no_index:
 provides:
   WWW::Form::UrlEncoded:
     file: lib/WWW/Form/UrlEncoded.pm
-    version: '0.25'
+    version: '0.26'
   WWW::Form::UrlEncoded::PP:
     file: lib/WWW/Form/UrlEncoded/PP.pm
 requires:
@@ -37,8 +37,10 @@ resources:
   bugtracker: https://github.com/kazeburo/WWW-Form-UrlEncoded/issues
   homepage: https://github.com/kazeburo/WWW-Form-UrlEncoded
   repository: git://github.com/kazeburo/WWW-Form-UrlEncoded.git
-version: '0.25'
+version: '0.26'
 x_contributors:
+  - 'Charlène <julianaito@posteo.jp>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

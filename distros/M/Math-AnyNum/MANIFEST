@@ -55,7 +55,6 @@ t/integer_operations.t
 t/inv.t
 t/kronecker.t
 t/log.t
-t/manifest.t
 t/miller_rabin_test.t
 t/misc_functions.t
 t/mod.t

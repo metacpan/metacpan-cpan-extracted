@@ -4,6 +4,7 @@ use warnings;
 
 # Partly taken from https://www.forbes.com/sites/rogerkay/2011/12/19/generous-tit-for-tat-a-winning-strategy
 # And https://medium.com/thinking-is-hard/a-prisoners-dilemma-cheat-sheet-4d85fe289d87
+# And http://www.prisoners-dilemma.com/strategies.html
 
 use lib '/Users/gene/sandbox/Game-Theory-TwoPersonMatrix/lib';
 use Game::Theory::TwoPersonMatrix;
@@ -17,16 +18,19 @@ use constant DEFECT => 2;
 my $max = shift || 200;
 
 my $players = {
-    jesus   => [ \&cooperate, \&cooperate ], # Always cooperate
-    lucifer => [ \&defect, \&defect ], # Always defect
+    jesus   => [ \&cooperate, \&cooperate ],
+    lucifer => [ \&defect, \&defect ],
     random  => [ \&random, \&random ],
-    tft     => [ \&cooperate, \&tit_for_tat ], # Cooperate, then do whatever the opponent did the last move
-    rtft    => [ \&defect, \&rev_tit_for_tat ], # Defect, then do the opposite of whatever the opponent did the last move
-    atft    => [ \&defect, \&tit_for_tat ], # Defect, then do whatever the opponent did the last move
-    tftt    => [ \&cooperate, \&tit_for_two_tats ], # Cooperate or defect if the opponent defected against twice in a row
-    gtft    => [ \&cooperate, \&generous_tit_for_tat ], # Tit-for-tat except 10% cooperate when defected against
-    grudger => [ \&cooperate, \&grudger ], # Cooperate until defected against; then defect forever
-    fbf     => [ \&cooperate, \&firm_but_fair ], # Cooperate, then cooperate until defected against. Cooperate if defected last and defected against
+    tft     => [ \&cooperate, \&tit_for_tat ],
+    atft    => [ \&defect, \&tit_for_tat ], # "Agressive tit-for-tat"
+    rtft    => [ \&defect, \&rev_tit_for_tat ],
+    tftt    => [ \&cooperate, \&tit_for_two_tats ],
+    gtft    => [ \&cooperate, \&generous_tit_for_tat ],
+    grim    => [ \&cooperate, \&grim ],
+    fbf     => [ \&cooperate, \&firm_but_fair ],
+    pavlov  => [ \&cooperate, \&pavlov ],
+    sm      => [ \&cooperate, \&soft_majority ],
+    hm      => [ \&defect, \&hard_majority ],
 };
 
 my $population = [
@@ -38,8 +42,10 @@ my $population = [
     ('atft')    x 2,
     ('tftt')    x 2,
     ('gtft')    x 2,
-    ('grudger') x 2,
+    ('grim')    x 2,
     ('fbf')     x 2,
+    ('pavlov')  x 2,
+    ('sm')      x 2,
 ];
 
 my %scores;
@@ -48,51 +54,64 @@ my %scores;
 my %wins;
 @wins{ keys %$players } = (0) x keys %$players;
 
-# A Prisoner's Dilemma
+# A prisoner's dilemma
 my $g = Game::Theory::TwoPersonMatrix->new(
     payoff1 => [ [3, 0], [5, 1] ],
     payoff2 => [ [3, 5], [0, 1] ],
 );
 
+# A hawk-dove game
+#my $g = Game::Theory::TwoPersonMatrix->new(
+#    payoff1 => [ [0, 3], [1, 2] ], # [X, W], [L, T]
+#    payoff2 => [ [0, 1], [3, 2] ], # [X, L], [W, T]
+#);
+
 my $iter = combinations( $population, 2 );
 
 my $i = 0;
 
-while ( my $v = $iter->next ) {
+# Play each player against the others
+while ( my $pair = $iter->next ) {
     $i++;
-#    print "$i: @$v\n";
+#    print "$i: @$pair\n";
+
+    my $player   = $pair->[0];
+    my $opponent = $pair->[1];
 
     my @moves;
 
     # Set initial strategies
     my %strategy = (
-        1 => $players->{ $v->[0] }[0]->()->{1},
-        2 => $players->{ $v->[1] }[0]->()->{2},
+        1 => $players->{$player}[0]->()->{1},
+        2 => $players->{$opponent}[0]->()->{2},
     );
 
-    for my $n ( 1 .. $max ) {
+    for ( 1 .. $max ) {
         # Each player makes a move
         my ($play) = $g->play(%strategy);
 
         # The strategies are encoded in the key
         push @moves, ( keys %$play )[0];
 
-        # Update the score for each player
-        my ($p) = values %$play;
-        $scores{ $v->[0] } += $p->[0];
-        $scores{ $v->[1] } += $p->[1];
+        # The payoffs are in the values
+        my ($v) = values %$play;
 
-        if ( $p->[0] > $p->[1] ) {
-            $wins{ $v->[0] }++;
+        # Update the score for each player
+        $scores{$player}   += $v->[0];
+        $scores{$opponent} += $v->[1];
+
+        # Tally the number of times won
+        if ( $v->[0] > $v->[1] ) {
+            $wins{$player}++;
         }
-        elsif ( $p->[1] > $p->[0] ) {
-            $wins{ $v->[1] }++;
+        elsif ( $v->[1] > $v->[0] ) {
+            $wins{$opponent}++;
         }
 
         # Set next strategies
         %strategy = (
-            1 => $players->{ $v->[0] }[1]->(\@moves)->{1},
-            2 => $players->{ $v->[1] }[1]->(\@moves)->{2},
+            1 => $players->{$player}[1]->(\@moves)->{1},
+            2 => $players->{$opponent}[1]->(\@moves)->{2},
         );
     }
 }
@@ -115,6 +134,7 @@ sub random {
 }
 
 sub cooperate {
+    # Always cooperate
     return {
         1 => { 1 => 1, 2 => 0 },
         2 => { 1 => 1, 2 => 0 },
@@ -122,17 +142,20 @@ sub cooperate {
 }
 
 sub defect {
+    # Always defect
     return {
         1 => { 1 => 0, 2 => 1 },
         2 => { 1 => 0, 2 => 1 },
     };
 }
 
-sub grudger { # https://en.wikipedia.org/wiki/Grim_trigger
+sub grim { # https://en.wikipedia.org/wiki/Grim_trigger
     my $moves = shift;
 
     #    Player1, Player2
     my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+
+    # Cooperate until defected against, then defect forever
     return {
         1 => {                                                      # Player1
             1 => $strat1 == COOP && $strat2 == COOP ? 1 : 0,        # Cooperate
@@ -150,6 +173,7 @@ sub tit_for_tat { # https://en.wikipedia.org/wiki/Tit_for_tat
 
     my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
 
+    # Do whatever the opponent did the last move
     return {
         1 => {
             1 => $strat2 == COOP ? 1 : 0,
@@ -167,24 +191,28 @@ sub generous_tit_for_tat {
 
     my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
 
+    my $defect1 = $strat2 == DEFECT && choose_weighted( [ 1, 0 ], [ 9, 1 ] );
+    my $defect2 = $strat1 == DEFECT && choose_weighted( [ 1, 0 ], [ 9, 1 ] );
+
+    # Tit-for-tat except 10% cooperate when defected against
     return {
         1 => {
-            1 => $strat2 == COOP ? 1 : 0,
-            2 => $strat2 == DEFECT ? choose_weighted( [ 1, 0 ], [ 9, 1 ] ) : 0,
+            1 => !$defect1 ? 1 : 0,
+            2 => $defect1 ? 1 : 0,
         },
         2 => {
-            1 => $strat1 == COOP ? 1 : 0,
-            2 => $strat1 == DEFECT ? choose_weighted( [ 1, 0 ], [ 9, 1 ] ) : 0,
+            1 => !$defect2 ? 1 : 0,
+            2 => $defect2 ? 1 : 0,
         },
     }
 }
-
 
 sub rev_tit_for_tat {
     my $moves = shift;
 
     my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
 
+    # Do the opposite of whatever the opponent did the last move
     return {
         1 => {
             1 => $strat2 == DEFECT ? 1 : 0,
@@ -202,18 +230,18 @@ sub tit_for_two_tats { # https://en.wikipedia.org/wiki/Tit_for_tat#Tit_for_two_t
 
     return cooperate() if @$moves == 1;
 
-    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
-    my ( $strat3, $strat4 ) = split /,/, $moves->[-2];
+    my ( $strat11, $strat12 ) = split /,/, $moves->[-1];
+    my ( $strat21, $strat22 ) = split /,/, $moves->[-2];
 
     # Defect if the opponent has defected twice in a row
     return {
         1 => {
-            1 => $strat2 == COOP || $strat4 == COOP ? 1 : 0,
-            2 => $strat2 == DEFECT && $strat4 == DEFECT ? 1 : 0,
+            1 => !( $strat12 == DEFECT && $strat22 == DEFECT ) ? 1 : 0,
+            2 => $strat12 == DEFECT && $strat22 == DEFECT ? 1 : 0,
         },
         2 => {
-            1 => $strat1 == COOP || $strat3 == COOP ? 1 : 0,
-            2 => $strat1 == DEFECT && $strat3 == DEFECT ? 1 : 0,
+            1 => !( $strat11 == DEFECT && $strat21 == DEFECT ) ? 1 : 0,
+            2 => $strat11 == DEFECT && $strat21 == DEFECT ? 1 : 0,
         },
     }
 }
@@ -223,14 +251,93 @@ sub firm_but_fair {
 
     my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
 
+    # Cooperate except after receiving a sucker's payoff
     return {
         1 => {
-            1 => $strat1 == DEFECT && $strat2 == DEFECT ? 1 : 0,
+            1 => !( $strat1 == COOP && $strat2 == DEFECT ) ? 1 : 0,
             2 => $strat1 == COOP && $strat2 == DEFECT ? 1 : 0,
         },
         2 => {
-            1 => $strat1 == DEFECT && $strat2 == DEFECT ? 1 : 0,
+            1 => !( $strat1 == DEFECT && $strat2 == COOP ) ? 1 : 0,
             2 => $strat1 == DEFECT && $strat2 == COOP ? 1 : 0,
+        },
+    }
+}
+
+sub pavlov {
+    my $moves = shift;
+
+    my ( $strat1, $strat2 ) = split /,/, $moves->[-1];
+
+    # If a reward or temptation payoff is received last round then repeat choice, otherwise opposite
+    return {
+        1 => {
+            1 => ( $strat1 == COOP && $strat2 == COOP ) || ( $strat1 == DEFECT && $strat2 == DEFECT ) ? 1 : 0,
+            2 => ( $strat1 == DEFECT && $strat2 == COOP ) || ( $strat1 == COOP && $strat2 == DEFECT ) ? 1 : 0,
+        },
+        2 => {
+            1 => ( $strat1 == COOP && $strat2 == COOP ) || ( $strat1 == DEFECT && $strat2 == DEFECT ) ? 1 : 0,
+            2 => ( $strat1 == COOP && $strat2 == DEFECT ) || ( $strat1 == DEFECT && $strat2 == COOP ) ? 1 : 0,
+        },
+    }
+}
+
+sub soft_majority {
+    my $moves = shift;
+
+    my %strat;
+
+    for my $move ( @$moves ) {
+        my ( $one, $two ) = split /,/, $move;
+
+        $strat{1}{coop}   += $one == COOP ? 1 : 0;
+        $strat{1}{defect} += $one == DEFECT ? 1 : 0;
+        $strat{2}{coop}   += $two == COOP ? 1 : 0;
+        $strat{2}{defect} += $two == DEFECT ? 1 : 0;
+    }
+
+    my $defect1 = $strat{2}{coop} < $strat{2}{defect};
+    my $defect2 = $strat{1}{coop} < $strat{1}{defect};
+
+    # Defect if the number of opponent defections is greater than their cooperations
+    return {
+        1 => {
+            1 => !$defect1 ? 1 : 0,
+            2 => $defect1 ? 1 : 0,
+        },
+        2 => {
+            1 => !$defect2 ? 1 : 0,
+            2 => $defect2 ? 1 : 0,
+        },
+    }
+}
+
+sub hard_majority {
+    my $moves = shift;
+
+    my %strat;
+
+    for my $move ( @$moves ) {
+        my ( $one, $two ) = split /,/, $move;
+
+        $strat{1}{coop}   += $one == COOP ? 1 : 0;
+        $strat{1}{defect} += $one == DEFECT ? 1 : 0;
+        $strat{2}{coop}   += $two == COOP ? 1 : 0;
+        $strat{2}{defect} += $two == DEFECT ? 1 : 0;
+    }
+
+    my $defect1 = $strat{2}{coop} <= $strat{2}{defect};
+    my $defect2 = $strat{1}{coop} <= $strat{1}{defect};
+
+    # Defect if the number of opponent defections is greater than or equal to their cooperations
+    return {
+        1 => {
+            1 => !$defect1 ? 1 : 0,
+            2 => $defect1 ? 1 : 0,
+        },
+        2 => {
+            1 => !$defect2 ? 1 : 0,
+            2 => $defect2 ? 1 : 0,
         },
     }
 }

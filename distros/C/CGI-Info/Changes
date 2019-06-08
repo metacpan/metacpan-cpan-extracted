@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+0.70	Fri  7 Jun 12:39:52 EDT 2019
+	Allow logdir() and tmpdir() to be called as a class methods
+	Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
+	Trap SQL injections with SELECT statements
+
 0.69	Sat  9 Mar 19:28:32 EST 2019
 	Added logdir()
 

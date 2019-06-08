@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 164;
+use Test::Most tests => 167;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -88,6 +88,12 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = "foo=bar&userName=' OR '1'='1&fred=wilma";
 	$i = new_ok('CGI::Info');
 	ok(!defined($i->params()));
+
+	# SQL Injection is prevented
+	$ENV{'QUERY_STRING'} = "page=surnames&surname='Stock%20or%20(1,2\)=(SELECT*from(select%20name_const(CHAR(111,108,111,108,111,115,104,101,114\),1\),name_const(CHAR( <-- HERE 111,108,111,108,111,115,104,101,114\),1\)\)a\)%20--%20and%201%3D1'";
+	$i = new_ok('CGI::Info');
+	ok(!defined($i->params()));
+	ok($i->as_string() eq '');
 
 	$ENV{'QUERY_STRING'} = '<script>alert(123)</script>=wilma';
 	$i = new_ok('CGI::Info');

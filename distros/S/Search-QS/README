@@ -1,43 +1,98 @@
 NAME
+
     Search::QS - A converter between query string URI and search query
 
 VERSION
-    version 0.01
+
+    version 0.02
 
 SYNOPSIS
-      use Search::QS;
 
+      use Search::QS;
+    
       my $qs = new Search::QS;
       # parse query_string
-      $qs->parse($qs);
+      $qs->parse_qs($qs);
       # reconvert object to query_string
       print $qs->to_qs;
 
 DESCRIPTION
+
     This module converts a query string like This
 
       http://www.example.com?flt[Name]=Foo
 
     into perl objects which rappresent a search.
 
-    In filters() there are all flt (filter) elements.
+    In "filters__" there are all flt (filter) elements.
 
-    In options() there are query options like limit, start and sorting.
+    In "options__" there are query options like limit, start and sorting.
 
 METHODS
-  filters()
-Return an instance of Search::QS::Filters
-  options()
-Return an instance of Search::QS::Options
-  parse($query_string)
-Parse the $query_string and fills related objects in filters() and options()
-  to_qs()
-Return a query string which represents current state of filters() and options()
-elements
+
+ filters()
+
+    Return an instance of Search::QS::Filters
+
+ options()
+
+    Return an instance of Search::QS::Options
+
+ parse($perl_struct)
+
+    $perl_struct is an HASHREF which represents a query string like the one
+    returned by "url_params_mixed" in URI::Encode. It parses the
+    $perl_struct and fills related objects in "filters__" and "options__"
+
+ to_qs()
+
+        Return a query string which represents current state of L<filters__> and L<options__>
+    elements
+
+Examples
+
+    Here some Examples.
+
+    ?flt[Name]=Foo
+
+      should be converted into
+
+        Name = 'Foo'
+
+    ?flt[Name]=Foo%&flt[Name]=$op:like
+
+      should be converted into
+
+        Name like 'Foo%'
+
+    ?flt[age]=5&flt[age]=9&flt[Name]=Foo
+
+      should be converted into
+
+        (age = 5 OR age = 9) AND (Name = Foo)
+
+    ?flt[FirstName]=Foo&flt[FirstName]=$or:1&flt[LastName]=Bar&flt[LastName]=$or:1
+
+      should be converted into
+
+        ( (FirstName = Foo) OR (LastName = Bar) )
+
+    ?flt[c:one]=1&flt[c:one]=$and:1&flt[d:one]=2&flt[d:one]=$and:1&flt[c:two]=2&flt[c:two]=$and:2&flt[d:two]=3&flt[d:two]=$op:>&flt[d:two]=$and:2&flt[d:three]=10
+
+      should be converted into
+
+        (d = 10) AND  ( (c = 1) AND (d = 2) )  OR  ( (c = 2) AND (d > 3) )
+
+SEE ALSO
+
+    Seach::QS::Filters, Seach::QS::Filter, Seach::QS::Options
+
 AUTHOR
+
     Emiliano Bruni <info@ebruni.it>
 
 COPYRIGHT AND LICENSE
+
     This software is copyright (c) 2019 by Emiliano Bruni.
 
     This is free software; you can redistribute it and/or modify it under

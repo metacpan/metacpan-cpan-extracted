@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.001076';
+our $VERSION = '0.001077';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -270,6 +270,14 @@ Disable Test2::Plugin::MemUsage (Loaded by default)
 =item --no-uuids
 
 Disable Test2::Plugin::UUID (Loaded by default)
+
+=item --retry-job-count=1
+
+When re-running failed tests, use a different number of parallel jobs. You might do this if your tests are not reliably parallel safe
+
+=item --retry=1
+
+Run any jobs that failed a second time. NOTE: --retry=1 means failing tests will be attempted twice!
 
 =item --slack "#CHANNEL"
 

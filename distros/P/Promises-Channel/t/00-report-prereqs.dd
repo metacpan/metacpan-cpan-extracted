@@ -23,6 +23,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test2::V0' => '0',
+                                   'Test::LeakTrace' => '0',
                                    'Test::More' => '0',
                                    'Test::Pod' => '0'
                                  }

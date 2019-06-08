@@ -19,6 +19,7 @@ eg/doc-site/index.markdown
 eg/doc-site/myapp.conf
 eg/doc-site/myapp.pl
 eg/doc-site/myapp.preaction.conf
+eg/doc-site/public/screenshot-custom-element.png
 eg/doc-site/public/screenshot-edit.png
 eg/doc-site/public/screenshot.png
 eg/test-app/myapp.auth.conf
@@ -123,12 +124,15 @@ t/plugin/auth/github.t
 t/plugin/auth/oauth2.t
 t/plugin/auth/password.t
 t/plugin/auth/token.t
+t/plugin/editor.t
 t/plugin/form/bootstrap4.t
 t/schema/dbicdump.pl
 t/schema/mysql.sql
 t/schema/openapi.pl
 t/schema/pg.sql
 t/schema/sqlite.sql
+t/selenium/.gitignore
+t/selenium/editor.t
 t/share/openapi-spec.json
 t/share/templates/blog_delete.html.ep
 t/share/templates/blog_edit.html.ep
@@ -138,6 +142,7 @@ t/share/templates/extend/blog_list.html.ep
 t/share/templates/extend/blog_view.html.ep
 t/share/templates/people.html.ep
 t/share/templates/people/index.html.ep
+t/share/templates/plugin/editor/custom_element.html.ep
 t/share/templates/user_edit.html.ep
 t/share/templates/user_profile_edit.html.ep
 t/share/withindex/templates/index.html.ep

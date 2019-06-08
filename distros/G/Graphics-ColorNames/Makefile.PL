@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006000;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Graphics-ColorNames",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.006000",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Graphics::ColorNames",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "v3.4.0",
+  "VERSION" => "v3.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

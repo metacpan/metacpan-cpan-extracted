@@ -1,4 +1,4 @@
-package Pcore v0.90.5;
+package Pcore v0.90.6;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -243,9 +243,6 @@ sub config_stdout ($h) {
 
 sub _CORE_RUN {
 
-    # crack Filter::Crypto protection
-    $B::VERSION = undef;
-
     # EMBEDDED mode, if run not from INIT block or -embedded pragma specified:
     # CLI not parsed / processed;
     # process permissions not changed;
@@ -423,7 +420,7 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 158, 187, 190, 194,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
 ## |      | 226, 229, 234, 237,  |                                                                                                                |
-## |      | 265, 396             |                                                                                                                |
+## |      | 262, 393             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 244                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

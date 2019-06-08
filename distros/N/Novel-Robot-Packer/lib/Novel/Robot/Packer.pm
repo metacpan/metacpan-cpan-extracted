@@ -5,7 +5,7 @@ use warnings;
 use Encode::Locale;
 use Encode;
 
-our $VERSION = 0.20;
+our $VERSION = 0.21;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -39,7 +39,14 @@ sub format_item_output {
 sub format_default_filename {
     my ( $self, $r, $o) = @_;
 
-    my $f =  "$r->{writer}-$r->{book}." . $self->suffix();
+    my $item_info='';
+    if(exists $o->{min_item_num} and $o->{min_item_num}>1){
+        $item_info="-$o->{min_item_num}";
+    }
+    elsif(exists $o->{min_page_num} and $o->{min_page_num}>1){
+        $item_info="-$o->{min_page_num}";
+    }
+    my $f =  "$r->{writer}-$r->{book}$item_info." . $self->suffix();
     $f =~ s{[\[\]/><\\`;'\$^*\(\)\%#@!"&:\?|\s^,~]}{}g;
     return encode( locale => $f );
 }

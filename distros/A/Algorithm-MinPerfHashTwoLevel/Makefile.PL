@@ -3,6 +3,7 @@ use strict;
 use warnings;
 no warnings 'portable';
 use Config;
+use v5.10; # we dont build from before v5.10
 
 os_unsupported() unless $Config{d_mmap}; # we use mmap
 die "requires 64-bit integer support (little-endian)\n"

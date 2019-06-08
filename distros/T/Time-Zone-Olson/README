@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.22
+    Version 0.24
 
 SYNOPSIS
 
@@ -150,7 +150,7 @@ SUBROUTINES/METHODS
     This method can be used to determine which file system path was used to
     determine the current operating system timezone. If it returns undef,
     then the current operating system timezone was determined by other
-    means (such as the win32 registry, or comparing the SHA256 digests of
+    means (such as the win32 registry, or comparing the digests of
     /etc/localtime with timezones in "directory").
 
  leap_seconds

@@ -1,3 +1,10 @@
+0.652   2019-06-05 (PERLANCAR)
+
+	- Update to WWW::PAUSE::Simple 0.444 (use exponential backoff
+	  strategy for retry, deprecate --retry-delay, add
+	  --retry-max-delay).
+
+
 0.651   2019-05-06 (PERLANCAR)
 
 	- Rebuild with WWW::PAUSE::Simple 0.443 (--{size,mtime}-{min,max}

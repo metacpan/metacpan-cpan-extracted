@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use version;
+use v5.10;
 
 use Exporter qw/ import /;
 
@@ -15,7 +15,7 @@ use File::Spec::Functions qw/ file_name_is_absolute /;
 use Module::Load 0.10;
 use Module::Loaded;
 
-our $VERSION = 'v3.4.0';
+our $VERSION = 'v3.5.0';
 
 our %EXPORT_TAGS = (
     'all'     => [qw( hex2tuple tuple2hex all_schemes )],
@@ -26,6 +26,7 @@ our @EXPORT    = ();
 
 sub VERSION {
     my ( $class, $wanted ) = @_;
+    require version;
     return version->parse($VERSION);
 }
 
@@ -356,7 +357,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 =head1 VERSION
 
-version v3.4.0
+version v3.5.0
 
 =head1 SYNOPSIS
 
@@ -558,18 +559,13 @@ The following changes are planned in the future:
 
 =item *
 
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
-
-=item *
-
 The tied interface will be removed, but implemented in a separate
 module for users that wish to use it.
 
 =item *
 
 The namespace for color schemes will be moved to the
-C<Graphics::ColorNames::Schemes> but optios will be added to use the
+C<Graphics::ColorNames::Schemes> but options will be added to use the
 existing scheme.
 
 This will allow modules to be named like C<Graphics::ColorNames::Tied>
@@ -664,7 +660,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2001-2018 by Robert Rothenberg.
+This software is Copyright (c) 2001-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

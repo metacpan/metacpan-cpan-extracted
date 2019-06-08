@@ -1,4 +1,4 @@
-# ABSTRACT: http://www.jjwxc.net
+# ABSTRACT: https://www.jjwxc.net
 
 =pod
 
@@ -23,12 +23,14 @@ use base 'Novel::Robot::Parser';
 use Web::Scraper;
 use Encode;
 
-sub base_url { 'http://www.jjwxc.net' }
+sub base_url { 'https://www.jjwxc.net' }
+
+sub domain { 'jjwxc.net' }
 
 sub generate_novel_url {
   my ( $self, $index_url ) = @_;
   my ( $novelid ) = $index_url =~ m#novelid=(\d+)#;
-  my $u = $novelid ? "http://m.jjwxc.net/book2/$novelid?more=0&whole=1" : $index_url;
+  my $u = $novelid ? "https://m.jjwxc.net/book2/$novelid?more=0&whole=1" : $index_url;
   return $u;
 }
 
@@ -51,7 +53,7 @@ sub parse_novel {
     $t =~ s/\s+/ /g;
 
     my $ui = 2 * $i - 2;
-    my $u  = "http://m.jjwxc.net$f[$ui]";
+    my $u  = "https://m.jjwxc.net$f[$ui]";
     push @{ $r{floor_list} }, { id => $i, title => $t, url => $u };
   }
 
@@ -61,7 +63,7 @@ sub parse_novel {
 sub parse_novel_item {
   my ( $self, $h ) = @_;
 
-  my ( $c ) = $$h =~ m#<h2[^>]+>.+?<li>(.+?)</li>#s;
+  my ( $c ) = $$h =~ m#<h2[^>]+>.+?<li[^>]*>(.+?)</li>#s;
 
   return { content => $c || '' };
 }

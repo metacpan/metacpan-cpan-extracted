@@ -1,7 +1,7 @@
 package Algorithm::Backoff;
 
-our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -25,6 +25,25 @@ failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
 seconds before calling failure() again (i.e. specify the timestamp that is 2
 seconds larger than the previous timestamp), failure() will return 2 seconds.
 And if you waited 4 seconds or more, failure() will return 0.
+
+_
+    },
+);
+
+our %attr_max_actual_duration = (
+    max_actual_duration => {
+        summary => 'Maximum number of seconds for all of the attempts (0 means unlimited)',
+        schema => ['ufloat*'],
+        default => 0,
+        description => <<'_',
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
 
 _
     },
@@ -97,6 +116,7 @@ sub new {
 
     # check known attributes
     for my $arg (keys %args) {
+        $arg =~ /\A(_start_timestamp)\z/ and next;
         $attrspec->{$arg} or die "$class: Unknown attribute '$arg'";
     }
     # check required attributes and set default
@@ -110,6 +130,7 @@ sub new {
         }
     }
     $args{_attempts} = 0;
+    $args{_start_timestamp} //= time();
     bless \%args, $class;
 }
 
@@ -158,6 +179,10 @@ sub failure {
 
     $timestamp //= time();
 
+    return -1 if defined $self->{max_actual_duration} &&
+        $self->{max_actual_duration} > 0 &&
+        $timestamp - $self->{_start_timestamp} >= $self->{max_actual_duration};
+
     $self->{_attempts}++;
     return -1 if $self->{max_attempts} &&
         $self->{_attempts} >= $self->{max_attempts};
@@ -194,14 +219,14 @@ Algorithm::Backoff - Various backoff strategies for retry
 
 =head1 VERSION
 
-This document describes version 0.003 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-04-10.
+This document describes version 0.004 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
 
 =head1 SYNOPSIS
 
  # 1. pick a strategy and instantiate
 
  use Algorithm::Backoff::Constant;
- my $ar = Algorithm::Backoff::Constant->new(
+ my $ab = Algorithm::Backoff::Constant->new(
      delay             => 2, # required
      #delay_on_success => 0, # optional, default 0
  );
@@ -209,9 +234,9 @@ This document describes version 0.003 of Algorithm::Backoff (from Perl distribut
  # 2. log success/failure and get a new number of seconds to delay, timestamp is
  # optional but must be monotonically increasing.
 
- my $secs = $ar->failure(); # => 2
- my $secs = $ar->success(); # => 0
- my $secs = $ar->failure(); # => 2
+ my $secs = $ab->failure(); # => 2
+ my $secs = $ab->success(); # => 0
+ my $secs = $ab->failure(); # => 2
 
 =head1 DESCRIPTION
 

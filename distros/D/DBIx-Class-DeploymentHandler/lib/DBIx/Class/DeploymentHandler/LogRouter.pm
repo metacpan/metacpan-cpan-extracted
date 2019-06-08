@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::LogRouter;
-$DBIx::Class::DeploymentHandler::LogRouter::VERSION = '0.002231';
+$DBIx::Class::DeploymentHandler::LogRouter::VERSION = '0.002232';
 use Moo;
 use DBIx::Class::DeploymentHandler::Logger;
 

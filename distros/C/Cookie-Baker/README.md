@@ -78,9 +78,9 @@ There is no XS implementation of bake\_cookie yet.
 
     - samesite
 
-        If defined as 'lax' or 'strict' (case-insensitive), sets the SameSite restriction for the cookie as described in the
+        If defined as 'lax' or 'strict' or 'none' (case-insensitive), sets the SameSite restriction for the cookie as described in the
         [draft proposal](https://tools.ietf.org/html/draft-west-first-party-cookies-07), which is already implemented in
-        Chrome (v51), Opera (v38) and Firefox (v60).
+        Chrome (v51), Safari (v12), Edge (v16),  Opera (v38) and Firefox (v60).
 
 - crush\_cookie
 

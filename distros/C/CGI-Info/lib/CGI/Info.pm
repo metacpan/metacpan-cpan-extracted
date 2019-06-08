@@ -21,11 +21,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.69
+Version 0.70
 
 =cut
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 =head1 SYNOPSIS
 
@@ -686,7 +686,7 @@ sub params {
 	# String::EscapeCage->import();
 
 	foreach my $arg (@pairs) {
-		my($key, $value) = split(/=/, $arg);
+		my($key, $value) = split(/=/, $arg, 2);
 
 		next unless($key);
 
@@ -726,12 +726,13 @@ sub params {
 		}
 		$value = $self->_sanitise_input($value);
 
-		if($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
 			if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
 			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
+			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{_logger}) {
 					if($ENV{'REMOTE_ADDR'}) {
@@ -1197,6 +1198,10 @@ sub tmpdir {
 
 	my $dir;
 
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
+
 	if($ENV{'C_DOCUMENT_ROOT'} && (-d $ENV{'C_DOCUMENT_ROOT'})) {
 		$dir = File::Spec->catdir($ENV{'C_DOCUMENT_ROOT'}, $name);
 		if((-d $dir) && (-w $dir)) {
@@ -1267,6 +1272,10 @@ Gets and sets the name of a directory that you can use to store logs in.
 sub logdir {
 	my $self = shift;
 	my $dir = shift;
+
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
 
 	if(defined($dir)) {
 		# No sanity testing is done

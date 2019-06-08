@@ -1,6 +1,10 @@
 Revision history for Perl module DNS::Unbound
 
-0.04 Sun, 19 May 2019
+0.05 - Fri, 7 June 2019
+- Add asynchronous query support.
+- Fix instantiation of ResolveError exception.
+
+0.04 - Sun, 19 May 2019
 - BUG FIX: Prevent excess destruction of context struct.
 - OPTIMIZATION: Store ints as IV rather than NV.
 

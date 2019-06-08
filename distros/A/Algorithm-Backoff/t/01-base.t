@@ -36,7 +36,22 @@ subtest "attr: max_attempts" => sub {
     is  ($ar->failure(1), -1);
 };
 
-# XXX test for each strategy
+# XXX test max_actual_duration for each strategy
+subtest "attr: max_actual_duration" => sub {
+    my $ar;
+
+    $ar = Algorithm::Backoff::Constant->new(
+        delay => 2,
+        max_actual_duration => 4,
+        max_attempts => 3,
+        _start_timestamp => 0,
+    );
+    isnt($ar->failure(0), -1);
+    isnt($ar->failure(2), -1);
+    is  ($ar->failure(4), -1);
+};
+
+# XXX test consider_actual_delay for each strategy
 subtest "attr: consider_actual_delay" => sub {
     my $ar;
 
@@ -61,7 +76,7 @@ subtest "attr: consider_actual_delay" => sub {
     is($ar->failure(11), 0);
 };
 
-# XXX test each strategy
+# XXX test jitter_factor for each strategy
 subtest "attr: jitter_factor" => sub {
     my $ar = Algorithm::Backoff::Constant->new(
         delay => 2,

@@ -5,7 +5,7 @@ use warnings;
 package Test::FITesque::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use Moo;
 use Attean::RDF;
@@ -15,7 +15,11 @@ use Test::FITesque::Test;
 use Types::Standard qw(InstanceOf);
 use Types::Namespace qw(Iri Namespace);
 use Types::Path::Tiny qw(Path);
+use Carp qw(croak);
 use Data::Dumper;
+use HTTP::Request;
+use HTTP::Response;
+
 
 has source => (
 					is      => 'ro',
@@ -52,6 +56,8 @@ sub transform_rdf {
   my $self = shift;
   my $ns = URI::NamespaceMap->new(['deps', 'dc', 'rdf']);
   $ns->add_mapping(test => 'http://example.org/test-fixtures#'); # TODO: Get a proper URI
+  $ns->add_mapping(http => 'http://www.w3.org/2007/ont/http#');
+  $ns->add_mapping(httph => 'http://www.w3.org/2007/ont/httph#');
   my $parser = Attean->get_parser(filename => $self->source)->new( base => $self->base_uri );
   my $model = Attean->temporary_model;
 
@@ -59,6 +65,9 @@ sub transform_rdf {
   $model->add_iter($parser->parse_iter_from_io( $self->source->openr_utf8 )->as_quads($graph_id));
 
   my $tests_uri_iter = $model->objects(undef, iri($ns->test->fixtures->as_string))->materialize; # TODO: Implement coercions in Attean
+  if (scalar $tests_uri_iter->elements == 0) { # TODO: Better to check if there are fixture table entries that has no test
+	 croak "No tests found in " . $self->source;
+  }
 
   if ($model->holds($tests_uri_iter->peek, iri($ns->rdf->first->as_string), undef, $graph_id)) {
 	 # Then, the object is a list. This supports either unordered
@@ -70,8 +79,12 @@ sub transform_rdf {
 
   while (my $test_uri = $tests_uri_iter->next) {
 	 my @instance;
-	 my $params_base = URI::Namespace->new($model->objects($test_uri, iri($ns->test->param_base->as_string))->next);
-	 $ns->guess_and_add($params_base);
+	 my $params_base_term = $model->objects($test_uri, iri($ns->test->param_base->as_string))->next;
+	 my $params_base;
+	 if ($params_base_term) {
+		$params_base = URI::Namespace->new($params_base_term);
+		$ns->guess_and_add($params_base);
+	 }
 	 my $test_bgp = bgp(triplepattern($test_uri, iri($ns->test->handler->as_string), variable('handler')),
 							  triplepattern($test_uri, iri($ns->dc->identifier->as_string), variable('method')),
 							  triplepattern($test_uri, iri($ns->test->params->as_string), variable('paramid')));
@@ -87,15 +100,68 @@ sub transform_rdf {
 		my $params_iter = $model->get_quads($test->value('paramid')); # Get the parameters for each test
 		my $params;
 		while (my $param = $params_iter->next) {
-		  my $key = $params_base->local_part($param->predicate) || $param->predicate->as_string;
-		  my $value = $param->object->value;
-		  $params->{$key} = $value;
+		  # First, see if there is are HTTP request-responses that can be constructed
+		  my $req_head = $model->objects(undef, iri($ns->test->requests->as_string))->next;
+		  my $res_head = $model->objects(undef, iri($ns->test->responses->as_string))->next;
+		  my @requests;
+		  my @responses;
+
+		  if ($req_head && $res_head) { # TODO: Test role?
+			 # There is a list of HTTP requests and responses
+			 my $req_iter = $model->get_list($graph_id, $req_head);
+			 while (my $req_subject = $req_iter->next) {
+				my $req = HTTP::Request->new;
+				my $req_entry_iter = $model->get_quads($req_subject);
+				while (my $req_data = $req_entry_iter->next) {
+				  my $local_header = $ns->httph->local_part($req_data->predicate);
+				  if ($req_data->predicate->equals($ns->http->method)) {
+					 $req->method($req_data->object->value);
+				  } elsif ($req_data->predicate->equals($ns->http->requestURI)) {
+					 $req->uri($req_data->object->as_string);
+				  } elsif (defined($local_header)) {
+					 $req->push_header(_find_header($local_header, $req_data));
+				  }
+				}
+				push(@requests, $req);
+			 }
+			 $params->{'http-requests'} = \@requests;
+
+			 my $res_iter = $model->get_list($graph_id, $res_head);
+			 while (my $res_subject = $res_iter->next) {
+				my $res = HTTP::Response->new;
+				my $res_entry_iter = $model->get_quads($res_subject);
+				while (my $res_data = $res_entry_iter->next) {
+				  my $local_header = $ns->httph->local_part($res_data->predicate);
+				  if ($res_data->predicate->equals($ns->http->status)) {
+					 $res->code($res_data->object->value);
+				  } elsif (defined($local_header)) {
+					 $res->push_header(_find_header($local_header, $res_data));
+				  }
+				}
+				push(@responses, $res);
+			 }
+			 $params->{'http-responses'} = \@responses;
+		  } else {
+			 my $key = $param->predicate->as_string;
+			 if (defined($params_base) && $params_base->local_part($param->predicate)) {
+				$key = $params_base->local_part($param->predicate)
+			 }
+			 my $value = $param->object->value;
+			 $params->{$key} = $value;
+		  }
 		}
 		push(@instance, [$method, $params])
 	 }
 	 push(@data, \@instance);
   }
   return \@data;
+}
+
+sub _find_header {
+  my ($local_header, $data) = @_;
+  $local_header =~ s/_/-/g; # Some heuristics for creating HTTP headers
+  $local_header =~ s/\b(\w)/\u$1/g;
+  return ($local_header => $data->object->value)
 }
 
 1;
@@ -173,12 +239,20 @@ used to identify the class containing implementations, while
 C<dc:identifier> is used to name the function within that class.
 
 The C<test:params> predicate is used to link the parameters that will
-be sent as a hashref into the function. The key of the hashref will be
-the local part of the predicate used in the description (i.e. the part
-after the colon in e.g. C<my:all>). It is up to the test writer to
-mint the URIs of the parameters, and the C<param_base> is used to set
-indicate the namespace, so that the local part can be resolved, if
-wanted. The resolution itself happens in L<URI::NamespaceMap>.
+be sent as a hashref into the function.
+
+There are two different mechanisms for passing parameters to the test
+scripts, one is simply to pass arbitrary key-value pairs, the other is
+to pass lists of HTTP request-response objects.
+
+=head3 Key-value parameters
+
+The key of the hashref passed as arguments will be the local part of
+the predicate used in the description (i.e. the part after the colon
+in e.g. C<my:all>). It is up to the test writer to mint the URIs of
+the parameters, and the C<param_base> is used to set indicate the
+namespace, so that the local part can be resolved, if wanted. The
+resolution itself happens in L<URI::NamespaceMap>.
 
 
   @prefix test: <http://example.org/test-fixtures#> .
@@ -207,7 +281,24 @@ wanted. The resolution itself happens in L<URI::NamespaceMap>.
     ] .
 
 
+=head3 HTTP request-response lists
 
+To allow testing HTTP-based interfaces, this module also allows the
+construction of two ordered lists, one with HTTP requests, the other
+with HTTP responses. With those, the framework will construct
+L<HTTP::Request> and L<HTTP::Response> objects respectively. In tests
+scripts, the request objects will typically be passed to the
+L<LWP::UserAgent> as input, and then the response from the remote
+server will be compared with the expected L<HTTP::Response>s made by
+the test fixture.
+
+This gets more complex, please see the test data file
+C<t/data/http-list.ttl> file for example.
+
+=head1 TODO
+
+Separate the implementation-specific details (such as C<test:handler>)
+from the actual fixture tables.
 
 =head1 BUGS
 

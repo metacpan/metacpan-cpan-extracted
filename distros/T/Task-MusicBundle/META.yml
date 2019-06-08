@@ -37,6 +37,7 @@ requires:
   MIDI::Tools: '0'
   MIDI::Trans: '0'
   MIDI::Tweaks: '0'
+  MIDI::Util: '0'
   Music::AtonalUtil: '0'
   Music::Canon: '0'
   Music::Chord::Namer: '0'
@@ -69,7 +70,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-MusicBundle
   repository: https://github.com/ology/Task-MusicBundle
-version: '0.16'
+version: '0.1700'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -262,8 +263,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename:
-            - LICENSE
+          exclude_filename: []
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -283,10 +283,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: License
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
@@ -378,4 +374,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'
